@@ -280,7 +280,8 @@ trk! は、遊んでくれる人の声で育っていくゲームです。どん
 
 | 送りたいこと | 送り先 |
 |---|---|
-| 感想・「この曲で遊んだ！」・スクショやプレイ動画 | X **[@ttrk143](https://x.com/ttrk143)**（ハッシュタグ **#trkAGRG** を付けてもらえると見つけやすいです） |
+| 感想・称賛・苦情・ご意見 | [💬 感想・苦情・ご意見を送る](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues/new?template=feedback.yml) または X **[@ttrk143](https://x.com/ttrk143)** |
+| 譜面・難易度バランスへの意見 | [🎵 譜面・難易度への意見を送る](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues/new?template=chart_feedback.yml) |
 | 不具合の報告 | [🐛 不具合を報告する](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues/new?template=bug_report.yml) |
 | 「こんなモード・設定がほしい」 | [💡 アイデアを送る](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues/new?template=feature_request.yml) |
 | パック・マイプリセット・MOD・自作キャラの紹介 | X で **#trkAGRG** を付けて投稿、または Issues |

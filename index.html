@@ -194,7 +194,10 @@
             </div>
             <!-- library.js がここに「▶ AUTO」と「📻 ラジオ」の切り替えを追加します -->
 
-            <h3 data-i18n="difficulty"></h3>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
+              <h3 data-i18n="difficulty" style="margin:0"></h3>
+              <button type="button" id="expertDiffToggle" class="miniBtn" title="🔥 MASTER・2000 RUSH" aria-label="MASTER・2000 RUSH" style="padding:2px 8px;font-size:12px;cursor:pointer;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#ffb000;font-weight:700">🔥 MASTER</button>
+            </div>
             <div class="seg" id="difficultyPicker">
               <button type="button" data-mode="easy" data-i18n="easy">Easy</button>
               <button type="button" data-mode="normal" data-i18n="normal">Normal</button>
@@ -353,6 +356,75 @@
               <div id="makerStatus" class="hint status"></div>
             </details>
 
+            <!-- 🩷 MMDマスコット（ミクモード・モデル追加） -->
+            <details id="mmdPanel" class="subPanel">
+              <summary data-i18n="mmdTitle"></summary>
+              <div class="hint" data-i18n="mmdHint"></div>
+              <label class="check"><input id="mmdAgree" type="checkbox"><span data-i18n="mmdAgree"></span></label>
+              <div class="miniActions" id="mmdPresetRow" hidden></div>
+              <div class="hint" id="mmdPresetHint" data-i18n="mmdPresetHint" hidden></div>
+              <label class="check" id="mmdQuickUIRow"><input id="mmdQuickUI" type="checkbox"><span data-i18n="mmdQuickUILabel"></span></label>
+              <h3 data-i18n="mmdModelHead"></h3>
+              <div class="miniActions">
+                <label class="fileBtn small disabled" id="mmdModelFileLabel">
+                  <input id="mmdModelFile" type="file" accept=".pmx,.pmd" hidden disabled>
+                  <span data-i18n="mmdChooseModel"></span>
+                </label>
+                <label class="fileBtn small disabled" id="mmdFolderFileLabel">
+                  <input id="mmdFolderFile" type="file" webkitdirectory multiple hidden disabled>
+                  <span data-i18n="mmdChooseFolder"></span>
+                </label>
+                <button id="mmdClearModel" type="button" data-i18n="mmdClearModel"></button>
+              </div>
+              <label class="check"><input id="mmdRemember" type="checkbox"><span data-i18n="mmdRemember"></span></label>
+              <h3 data-i18n="mmdMotionHead"></h3>
+              <div class="miniActions">
+                <select id="mmdMotionSelect"></select>
+                <label class="fileBtn small disabled" id="mmdMotionFileLabel">
+                  <input id="mmdMotionFile" type="file" accept=".vmd" hidden disabled>
+                  <span data-i18n="mmdChooseMotion"></span>
+                </label>
+                <button id="mmdClearMotion" type="button" data-i18n="mmdClearMotion"></button>
+              </div>
+              <div class="hint" data-i18n="mmdBuiltinNote"></div>
+              <label class="field">
+                <span data-i18n="mmdBpm"></span>
+                <input id="mmdBpm" type="number" min="0" max="300" step="1">
+              </label>
+              <h3 data-i18n="mmdFitHead"></h3>
+              <div class="makerRow two">
+                <label class="field">
+                  <span data-i18n="mmdSize"></span>
+                  <span class="inline tight">
+                    <input id="mmdSize" type="range" min="0.5" max="1.8" step="0.05">
+                    <span id="mmdSizeVal" class="mono"></span>
+                  </span>
+                </label>
+                <label class="field">
+                  <span data-i18n="mmdTurn"></span>
+                  <span class="inline tight">
+                    <input id="mmdTurn" type="range" min="-60" max="60" step="5">
+                    <span id="mmdTurnVal" class="mono"></span>
+                  </span>
+                </label>
+              </div>
+              <label class="field">
+                <span data-i18n="mmdCreditLabel"></span>
+                <input id="mmdCredit" type="text" maxlength="120" autocomplete="off">
+              </label>
+              <div class="vrmRow">
+                <canvas id="mmdPreview" width="360" height="240"></canvas>
+                <div id="mmdInfo" class="hint vrmInfo"></div>
+              </div>
+              <div class="miniActions" style="margin-top:10px">
+                <button id="mmdCheckBtn" type="button" data-i18n="mmdCheck"></button>
+                <button id="mmdCopyBtn" type="button" data-i18n="mmdCopy"></button>
+              </div>
+              <div class="hint" data-i18n="mmdCheckHint"></div>
+              <div id="mmdCheckOut" class="hint mono" hidden></div>
+              <div id="mmdStatus" class="hint status"></div>
+            </details>
+
             <h3 data-i18n="gameLayout"></h3>
             <div class="seg" id="layoutPicker">
               <button type="button" data-layout="classic" data-i18n="layoutClassic"></button>
@@ -393,15 +465,6 @@
             <label class="check"><input id="playerMode" type="checkbox"><span data-i18n="playerMode"></span></label>
             <div class="hint" data-i18n="hideHint"></div>
 
-            <h3 data-i18n="secTruck"></h3>
-            <div class="hint" data-i18n="truckHint"></div>
-            <div class="inline">
-              <span data-i18n="laneTint"></span>
-              <input id="laneTint" type="range" min="0" max="0.5" step="0.01">
-              <span id="laneTintVal" class="mono"></span>
-            </div>
-            <label class="check"><input id="truckBounce" type="checkbox"><span data-i18n="truckBounce"></span></label>
-
             <h3 data-i18n="swayTitle"></h3>
             <label class="check"><input id="swayBeat" type="checkbox"><span data-i18n="swayBeat"></span></label>
             <label class="check"><input id="swayHit" type="checkbox"><span data-i18n="swayHit"></span></label>
@@ -411,7 +474,25 @@
               <span id="swayPowerVal" class="mono"></span>
             </div>
             <div id="swayReducedNote" class="hint" data-i18n="swayReduced" hidden></div>
-            <!-- modes.js（🪐 ORBIT）・stage.js（🎪 STAGE）・stagefx.js（🎭 演出）の設定がここに入ります -->
+
+            <!-- 🚚🪐🎪 各モードの専用設定（TRUCK・ORBIT・STAGE） -->
+            <details id="modeViewPanel" class="subPanel">
+              <summary data-i18n="secModes"></summary>
+              <h3 data-i18n="secTruck"></h3>
+              <div class="hint" data-i18n="truckHint"></div>
+              <div class="inline">
+                <span data-i18n="laneTint"></span>
+                <input id="laneTint" type="range" min="0" max="0.5" step="0.01">
+                <span id="laneTintVal" class="mono"></span>
+              </div>
+              <label class="check"><input id="truckBounce" type="checkbox"><span data-i18n="truckBounce"></span></label>
+
+              <!-- modes.js（🪐 ORBIT）の挿入位置 -->
+              <div id="orbitSettingsAnchor"></div>
+
+              <!-- stage.js（🎪 STAGE）・stagefx.js（🎭 演出）の挿入位置 -->
+              <div id="stageSettingsAnchor"></div>
+            </details>
 
             <!-- tv-dock.js が扱う：🎨 カスタムTVスキンのエディタ -->
             <details id="tvMaker" class="subPanel">
@@ -499,38 +580,42 @@
               <option value="none" data-i18n="mascotNone"></option>
               <option value="buddy" data-i18n="mascotBuddy"></option>
               <option value="vrm" data-i18n="mascotVrm"></option>
+              <option value="mmd" data-i18n="mascotMmd"></option>
             </select>
             <div class="hint" data-i18n="mascotHint"></div>
 
-            <h3 data-i18n="noteStyle"></h3>
-            <div class="noteRows">
-              <div class="noteRow">
-                <i id="notePrev0" class="dot big"></i>
-                <strong data-i18n="donNote"></strong>
-                <input id="noteColor0" type="color">
-                <select id="noteShape0">
-                  <option value="circle" data-i18n="shapeCircle"></option>
-                  <option value="diamond" data-i18n="shapeDiamond"></option>
-                  <option value="square" data-i18n="shapeSquare"></option>
-                </select>
+            <!-- 🥁 ノーツの見た目（1行に格納可能な subPanel） -->
+            <details id="noteStylePanel" class="subPanel">
+              <summary data-i18n="noteStyle"></summary>
+              <div class="noteRows">
+                <div class="noteRow">
+                  <i id="notePrev0" class="dot big"></i>
+                  <strong data-i18n="donNote"></strong>
+                  <input id="noteColor0" type="color">
+                  <select id="noteShape0">
+                    <option value="circle" data-i18n="shapeCircle"></option>
+                    <option value="diamond" data-i18n="shapeDiamond"></option>
+                    <option value="square" data-i18n="shapeSquare"></option>
+                  </select>
+                </div>
+                <div class="noteRow">
+                  <i id="notePrev1" class="dot big"></i>
+                  <strong data-i18n="kaNote"></strong>
+                  <input id="noteColor1" type="color">
+                  <select id="noteShape1">
+                    <option value="circle" data-i18n="shapeCircle"></option>
+                    <option value="diamond" data-i18n="shapeDiamond"></option>
+                    <option value="square" data-i18n="shapeSquare"></option>
+                  </select>
+                </div>
               </div>
-              <div class="noteRow">
-                <i id="notePrev1" class="dot big"></i>
-                <strong data-i18n="kaNote"></strong>
-                <input id="noteColor1" type="color">
-                <select id="noteShape1">
-                  <option value="circle" data-i18n="shapeCircle"></option>
-                  <option value="diamond" data-i18n="shapeDiamond"></option>
-                  <option value="square" data-i18n="shapeSquare"></option>
-                </select>
+              <div class="seg" id="notePresets">
+                <button type="button" data-preset="classic" data-i18n="presetClassic"></button>
+                <button type="button" data-preset="clarity" data-i18n="presetClarity"></button>
+                <button type="button" data-preset="skin" data-i18n="presetSkin"></button>
               </div>
-            </div>
-            <div class="seg" id="notePresets">
-              <button type="button" data-preset="classic" data-i18n="presetClassic"></button>
-              <button type="button" data-preset="clarity" data-i18n="presetClarity"></button>
-              <button type="button" data-preset="skin" data-i18n="presetSkin"></button>
-            </div>
-            <div class="hint" data-i18n="noteHint"></div>
+              <div class="hint" data-i18n="noteHint"></div>
+            </details>
           </details>
         </div>
 
@@ -578,6 +663,12 @@
               <input id="cover" type="range" min="0.2" max="0.7" step="0.05">
               <span id="coverVal" class="mono"></span>
             </div>
+            <label class="check"><input id="optMirror" type="checkbox"><span data-i18n="modMirror"></span></label>
+            <label class="check"><input id="optRandom" type="checkbox"><span data-i18n="modRandom"></span></label>
+
+            <h3 data-i18n="secExpert"></h3>
+            <label class="check"><input id="showMasterDiff" type="checkbox"><span data-i18n="showMasterDiff"></span></label>
+            <div class="hint" data-i18n="showMasterDiffHint"></div>
           </details>
 
           <details class="panel" open>
@@ -617,31 +708,35 @@
             <div class="hint" data-i18n="quickRetryHint"></div>
             <!-- player.js がここに「⏯ 再生の操作」と区間リピートを追加します -->
 
-            <h3 data-i18n="truckCtlTitle"></h3>
-            <div class="seg" id="truckKeyPresets">
-              <button type="button" data-truckpreset="layout" data-i18n="truckPresetLayout"></button>
-              <button type="button" data-truckpreset="ud" data-i18n="truckPresetUD"></button>
-              <button type="button" data-truckpreset="lr" data-i18n="truckPresetLR"></button>
-            </div>
-            <div class="keyRows" style="margin-top:10px">
-              <div class="keyRow">
-                <strong data-i18n="truckLane0"></strong><span class="keyValue" id="truckKeyValue0"></span>
-                <button type="button" data-truckbind="0" data-i18n="assign"></button>
+            <!-- 🚚🎪🚛 各モードの操作キー（TRUCK・STAGE・CATCH・速度） -->
+            <details id="modeControlsPanel" class="subPanel">
+              <summary data-i18n="modeKeysTitle"></summary>
+              <h3 data-i18n="truckCtlTitle"></h3>
+              <div class="seg" id="truckKeyPresets">
+                <button type="button" data-truckpreset="layout" data-i18n="truckPresetLayout"></button>
+                <button type="button" data-truckpreset="ud" data-i18n="truckPresetUD"></button>
+                <button type="button" data-truckpreset="lr" data-i18n="truckPresetLR"></button>
               </div>
-              <div class="keyRow">
-                <strong data-i18n="truckLane1"></strong><span class="keyValue" id="truckKeyValue1"></span>
-                <button type="button" data-truckbind="1" data-i18n="assign"></button>
+              <div class="keyRows" style="margin-top:10px">
+                <div class="keyRow">
+                  <strong data-i18n="truckLane0"></strong><span class="keyValue" id="truckKeyValue0"></span>
+                  <button type="button" data-truckbind="0" data-i18n="assign"></button>
+                </div>
+                <div class="keyRow">
+                  <strong data-i18n="truckLane1"></strong><span class="keyValue" id="truckKeyValue1"></span>
+                  <button type="button" data-truckbind="1" data-i18n="assign"></button>
+                </div>
+                <div class="keyRow">
+                  <strong data-i18n="truckToggle"></strong><span class="keyValue" id="truckKeyValue2"></span>
+                  <button type="button" data-truckbind="2" data-i18n="assign"></button>
+                </div>
               </div>
-              <div class="keyRow">
-                <strong data-i18n="truckToggle"></strong><span class="keyValue" id="truckKeyValue2"></span>
-                <button type="button" data-truckbind="2" data-i18n="assign"></button>
-              </div>
-            </div>
-            <label class="check"><input id="truckHitKeys" type="checkbox"><span data-i18n="truckHitKeys"></span></label>
-            <div id="truckKeyPreview" class="hint"></div>
-            <div id="truckBindStatus" class="hint status"></div>
-            <div class="hint" data-i18n="truckCtlHint"></div>
-            <!-- stage.js（🎪）・catch.js（🚛）・speed.js（⏩）のキー設定がここに入ります -->
+              <label class="check"><input id="truckHitKeys" type="checkbox"><span data-i18n="truckHitKeys"></span></label>
+              <div id="truckKeyPreview" class="hint"></div>
+              <div id="truckBindStatus" class="hint status"></div>
+              <div class="hint" data-i18n="truckCtlHint"></div>
+              <!-- stage.js（🎪）・catch.js（🚛）・speed.js（⏩）のキー設定がここに入ります -->
+            </details>
           </details>
 
           <details class="panel" id="packPanel">
@@ -753,73 +848,6 @@
             <div id="seStatus" class="hint status"></div>
             <label class="check"><input id="previewEnabled" type="checkbox"><span data-i18n="previewEnabled"></span></label>
           </details>
-          <details class="panel" id="mmdPanel">
-            <summary data-i18n="mmdTitle"></summary>
-            <div class="hint" data-i18n="mmdHint"></div>
-            <label class="check"><input id="mmdAgree" type="checkbox"><span data-i18n="mmdAgree"></span></label>
-            <div class="miniActions" id="mmdPresetRow" hidden></div>
-            <div class="hint" id="mmdPresetHint" data-i18n="mmdPresetHint" hidden></div>
-            <h3 data-i18n="mmdModelHead"></h3>
-            <div class="miniActions">
-              <label class="fileBtn small disabled" id="mmdModelFileLabel">
-                <input id="mmdModelFile" type="file" accept=".pmx,.pmd" hidden disabled>
-                <span data-i18n="mmdChooseModel"></span>
-              </label>
-              <label class="fileBtn small disabled" id="mmdFolderFileLabel">
-                <input id="mmdFolderFile" type="file" webkitdirectory multiple hidden disabled>
-                <span data-i18n="mmdChooseFolder"></span>
-              </label>
-              <button id="mmdClearModel" type="button" data-i18n="mmdClearModel"></button>
-            </div>
-            <label class="check"><input id="mmdRemember" type="checkbox"><span data-i18n="mmdRemember"></span></label>
-            <label class="check"><input id="mmdQuickUI" type="checkbox"><span data-i18n="mmdQuickUILabel"></span></label>
-            <h3 data-i18n="mmdMotionHead"></h3>
-            <div class="miniActions">
-              <select id="mmdMotionSelect"></select>
-              <label class="fileBtn small disabled" id="mmdMotionFileLabel">
-                <input id="mmdMotionFile" type="file" accept=".vmd" hidden disabled>
-                <span data-i18n="mmdChooseMotion"></span>
-              </label>
-              <button id="mmdClearMotion" type="button" data-i18n="mmdClearMotion"></button>
-            </div>
-            <div class="hint" data-i18n="mmdBuiltinNote"></div>
-            <label class="field">
-              <span data-i18n="mmdBpm"></span>
-              <input id="mmdBpm" type="number" min="0" max="300" step="1">
-            </label>
-            <h3 data-i18n="mmdFitHead"></h3>
-            <div class="makerRow two">
-              <label class="field">
-                <span data-i18n="mmdSize"></span>
-                <span class="inline tight">
-                  <input id="mmdSize" type="range" min="0.5" max="1.8" step="0.05">
-                  <span id="mmdSizeVal" class="mono"></span>
-                </span>
-              </label>
-              <label class="field">
-                <span data-i18n="mmdTurn"></span>
-                <span class="inline tight">
-                  <input id="mmdTurn" type="range" min="-60" max="60" step="5">
-                  <span id="mmdTurnVal" class="mono"></span>
-                </span>
-              </label>
-            </div>
-            <label class="field">
-              <span data-i18n="mmdCreditLabel"></span>
-              <input id="mmdCredit" type="text" maxlength="120" autocomplete="off">
-            </label>
-            <div class="vrmRow">
-              <canvas id="mmdPreview" width="360" height="240"></canvas>
-              <div id="mmdInfo" class="hint vrmInfo"></div>
-            </div>
-            <div class="miniActions">
-              <button id="mmdCheckBtn" type="button" data-i18n="mmdCheck"></button>
-              <button id="mmdCopyBtn" type="button" data-i18n="mmdCopy"></button>
-            </div>
-            <div class="hint" data-i18n="mmdCheckHint"></div>
-            <div id="mmdCheckOut" class="hint mono" hidden></div>
-            <div id="mmdStatus" class="hint status"></div>
-          </details>
           <!-- fx.js がここに「🎛 サウンドエフェクト」の欄を追加します -->
           <!-- ⭐ お気に入りのフォルダ管理（中身は js/favs.js が作ります） -->
           <details class="panel" id="favPanel">
@@ -914,6 +942,10 @@
       <!-- verified.js が公認曲のとき「✔公認・💬 作者のことば」をクレジットの先頭に入れます -->
       <div id="credits"></div>
       <div class="hint pclCredit" hidden></div>
+      <div class="hint center contactLine" style="margin-top:14px">
+        <a href="https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues/new?template=feedback.yml" target="_blank" rel="noopener noreferrer" data-i18n="feedbackLink"></a> ／
+        <a href="https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues/new?template=chart_feedback.yml" target="_blank" rel="noopener noreferrer" data-i18n="chartFeedbackLink"></a>
+      </div>
     </div>
   </section>
 

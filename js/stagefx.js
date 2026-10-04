@@ -194,13 +194,19 @@ const baseShowJudge = showJudge;
 showJudge = function (kind, delta, star) {
   baseShowJudge(kind, delta, star);
   const sub = $("judgeSub");
-  if (settings.fastSlow === "off") sub.textContent = "";
-  else if (settings.fastSlow === "all" && kind === "perfect" && !star && delta) sub.textContent = tr(delta < 0 ? "early" : "late");
+  if (settings.fastSlow === "off") {
+    sub.textContent = "";
+    sub.className = "";
+  } else if (settings.fastSlow === "all" && kind === "perfect" && !star && delta) {
+    const isEarly = delta < 0;
+    sub.textContent = tr(isEarly ? "early" : "late");
+    sub.className = isEarly ? "early" : "late";
+  }
 };
 
 /* ============ 設定画面（STAGEの設定の下、マスコットの上） ============ */
 (() => {
-  const anchor = document.querySelector('#settingsScreen [data-i18n="mascotSel"]'); if (!anchor) return;
+  const anchor = $("stageSettingsAnchor") || document.querySelector('#settingsScreen [data-i18n="mascotSel"]'); if (!anchor) return;
   const h3 = el("h3", "", tr("fxTitle")); h3.dataset.i18n = "fxTitle";
   const size = makeSeg("judgeSizePicker", "judgeSize", [["s", "sizeS"], ["m", "sizeM"], ["l", "sizeL"]]);
   size.addEventListener("click", applyJudgeStyle);

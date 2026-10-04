@@ -232,10 +232,10 @@ const VRM_RECT = {
 /* ---------- 難易度（判定幅はms） ---------- */
 const DIFFS = {
   easy:   { div:1, density:.55, perfect:50, good:120 },
-  normal: { div:2, density:.42, perfect:42, good:105 },
-  hard:   { div:4, density:.36, perfect:36, good:95 },
-  master: { div:4, density:.60, perfect:33, good:85 },
-  rush:   { div:4, target:2000, perfect:33, good:85 }
+  normal: { div:2, density:.48, perfect:42, good:105 },
+  hard:   { div:4, density:.60, perfect:36, good:95 },
+  master: { div:4, density:.82, perfect:30, good:80 },
+  rush:   { div:4, target:2000, density:.95, perfect:28, good:75 }
 };
 const DIFF_IDS = Object.keys(DIFFS);
 

@@ -162,10 +162,10 @@ if (typeof prefs !== "undefined") {
     prefs.tvFav = [...DEFAULT_TV_FAV, ...cur.filter(id => !DEFAULT_TV_FAV.includes(id))];
   }
   // 既存の保存値を settings に反映（core.js の settings は既に存在）
-  // 🛟 ただし ?safe=1（セーフモード）のときは読み戻さない。core.js が入れた「TVは家庭用・映像OFF」を守る
+  // 🛟 ただし ?safe=1（セーフモード）のときは読み戻さない。core.js が入れた「TVは映画館・映像OFF」を守る
   const keepSafe = (typeof safeModeOn !== "undefined") && safeModeOn;
   if (typeof settings !== "undefined" && !keepSafe) {
-    settings.tvDockSkin = pick(prefs.tvDockSkin, Object.keys(TV_DOCK_SKINS), "home");
+    settings.tvDockSkin = pick(prefs.tvDockSkin, Object.keys(TV_DOCK_SKINS), "cinema");
     settings.tvDockFive = !!prefs.tvDockFive;
     settings.tvDockOpen = prefs.tvDockOpen === true;
     settings.tvFav = idList(prefs.tvFav, TV_FAV_MAX);   // TV_FAV_MAX=0＝上限なし
@@ -177,7 +177,7 @@ if (typeof prefs !== "undefined") {
     settings.tvSongWhilePlaying = prefs.tvSongWhilePlaying === true;  // ◀▶ を演奏中も効かせる（初期オフ）
     settings.tvMenuPreview = prefs.tvMenuPreview !== false;   // 選曲中のTVに映像を映す（初期オン）
     settings.tvMenuVideo = prefs.tvMenuVideo === true;        // 音のプレビューがオフでも映像を流す（初期オフ）
-    settings.tvDockSkin = settings.tvDockSkin || "home";
+    settings.tvDockSkin = settings.tvDockSkin || "cinema";
     settings.tvFavSeeded = true;
   }
 } else {
@@ -187,7 +187,7 @@ if (typeof prefs !== "undefined") {
 
 // settings がまだ無い場合の保険
 if (typeof settings !== "undefined") {
-  settings.tvDockSkin = settings.tvDockSkin || "home";
+  settings.tvDockSkin = settings.tvDockSkin || "cinema";
   settings.tvDockFive = !!settings.tvDockFive;
   settings.tvDockOpen = !!settings.tvDockOpen;
   settings.tvFav = settings.tvFav || DEFAULT_TV_FAV.slice();
@@ -199,7 +199,7 @@ if (typeof settings !== "undefined") {
   settings.tvMenuVideo = settings.tvMenuVideo === true;
 }
 
-const tvSkinDef = () => TV_DOCK_SKINS[settings.tvDockSkin] || TV_DOCK_SKINS.home;
+const tvSkinDef = () => TV_DOCK_SKINS[settings.tvDockSkin] || TV_DOCK_SKINS.cinema;
 const tvSlotCount = () => settings.tvDockFive ? 5 : tvSkinDef().n;
 const tvSlotCols = () => settings.tvDockFive ? 5 : tvSkinDef().cols;
 
@@ -965,7 +965,7 @@ addEventListener("DOMContentLoaded", () => {
   resetBtn.addEventListener("click", () => {
     settings.videoStyle = "color";
     settings.bgDim = 0; settings.bgBlur = 0;
-    settings.tvDockSkin = "home";
+    settings.tvDockSkin = "cinema";
     settings.tvDockFive = false;
     settings.tvOrder = "tv-first";
     settings.tvOverlay = true;
@@ -1283,8 +1283,8 @@ addEventListener("DOMContentLoaded", () => {
   let lastSkin = "";
   function render(skinChanged) {
     const nm = names();
-    // 知らないスキン名（古い設定・壊れた設定ファイル）は家庭用テレビとして描く
-    const skinId = TV_DOCK_SKINS[settings.tvDockSkin] ? settings.tvDockSkin : "home";
+    // 知らないスキン名（古い設定・壊れた設定ファイル）は映画館スクリーンとして描く
+    const skinId = TV_DOCK_SKINS[settings.tvDockSkin] ? settings.tvDockSkin : "cinema";
     dock.dataset.skin = skinId;
     applyTvSkinVars(dock, skinId);
     dock.classList.toggle("off", settings.videoStyle === "off");
@@ -1589,7 +1589,7 @@ Object.assign(TEXT.ko, {
       if (!isCustomCurrent()) { toast("tvmLocked"); return; }
       if (!confirm(tr("tvmConfirmDelete"))) return;
       unregisterTvSkin(settings.tvDockSkin);
-      settings.tvDockSkin = "home"; saveUserPrefs(); emit("tvChange"); toast("tvmDeleted");
+      settings.tvDockSkin = "cinema"; saveUserPrefs(); emit("tvChange"); toast("tvmDeleted");
     });
 
     maker.addEventListener("toggle", () => { if (maker.open) { fillSelects(); paint(); } });

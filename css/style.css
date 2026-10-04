@@ -34,7 +34,7 @@ button,input,select,textarea{font:inherit;color:inherit}
   overflow:hidden;background:var(--stage-bg);user-select:none;-webkit-user-select:none}
 #view,#fx{position:absolute;inset:0;width:1920px;height:1080px}
 #fx{z-index:3;pointer-events:none}
-#vrmCanvas{position:absolute;z-index:2;pointer-events:none}
+#vrmCanvas,#mmdCanvas{position:absolute;z-index:2;pointer-events:none}
 #video{position:fixed;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none}
 
 /* ===== 4. プレイ中のHUD ===== */
@@ -64,6 +64,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* ORBIT・STAGE・CATCH の位置は stagefx.js が style で決めます */
 #judge.show{animation:judgePop .45s ease-out}
 #judge.perfect{color:var(--j-perfect)}#judge.good{color:var(--j-good)}#judge.miss{color:var(--j-miss)}
+#judge small.early{color:#38bdf8;text-shadow:0 0 10px rgba(56,189,248,.8),0 2px 6px #000}
+#judge small.late{color:#f87171;text-shadow:0 0 10px rgba(248,113,113,.8),0 2px 6px #000}
 @keyframes judgePop{0%{opacity:0;transform:translate(-50%,12px) scale(.8)}25%{opacity:1;transform:translate(-50%,0) scale(1.08)}100%{opacity:0;transform:translate(-50%,-30px) scale(1)}}
 
 #progress{position:absolute;z-index:8;left:0;bottom:0;height:7px;width:0;
@@ -124,7 +126,10 @@ details.panel>summary::after{content:"＋";color:var(--ui-muted)}
 details.panel[open]>summary::after{content:"－"}
 details.panel[open]>summary{margin-bottom:14px}
 .subPanel{margin-top:12px;border:1px dashed var(--ui-border);border-radius:14px;padding:10px 14px;background:var(--ui-soft)}
-.subPanel>summary{cursor:pointer;font-weight:800;font-size:16px;color:var(--ui-accent)}
+.subPanel>summary{cursor:pointer;font-weight:800;font-size:16px;color:var(--ui-accent);list-style:none;display:flex;justify-content:space-between;align-items:center}
+.subPanel>summary::-webkit-details-marker{display:none}
+.subPanel>summary::after{content:"＋";color:var(--ui-muted);font-weight:normal}
+.subPanel[open]>summary::after{content:"－"}
 .subPanel[open]>summary{margin-bottom:10px}
 
 /* ===== 7. フォーム部品 ===== */
@@ -151,6 +156,8 @@ details.panel[open]>summary{margin-bottom:14px}
 .seg button{flex:1 1 0;border:none;border-radius:12px;background:transparent;padding:11px 12px;font-size:16px;white-space:nowrap}
 .seg button:hover{background:var(--ui-button-hover);border:none}
 .seg button.selected{background:var(--ui-accent);color:var(--ui-on-accent)}
+#expertDiffToggle{transition:all .15s ease}
+#expertDiffToggle.selected{background:#ffb000 !important;color:#000 !important;border-color:#ffb000 !important;box-shadow:0 0 10px rgba(255,176,0,.4)}
 .primary{width:100%;padding:18px;font-size:26px;font-weight:900;background:var(--ui-accent);color:var(--ui-on-accent);border-color:transparent}
 .primary:hover{background:var(--ui-accent);color:var(--ui-on-accent);filter:brightness(1.1)}
 .primary.slim{width:auto;padding:12px 26px;font-size:18px}
@@ -279,6 +286,17 @@ details.panel[open]>summary{margin-bottom:14px}
 .statGrid span{display:block;font-size:13px;color:var(--ui-muted);letter-spacing:.1em}
 .statGrid b{font-size:28px;font-variant-numeric:tabular-nums}
 .statGrid .p b{color:var(--j-perfect)}.statGrid .m b{color:var(--j-miss)}
+.fastSlowRow{display:flex;gap:10px;margin:-4px 0 14px;justify-content:center}
+.fastSlowRow .fsBadge{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;border-radius:12px;font-variant-numeric:tabular-nums;border:1px solid var(--ui-border);background:var(--ui-soft)}
+.fastSlowRow .fastBadge{border-color:rgba(56,189,248,.35);background:rgba(56,189,248,.08)}
+.fastSlowRow .slowBadge{border-color:rgba(248,113,113,.35);background:rgba(248,113,113,.08)}
+.fastSlowRow .fsLabel{font-size:13px;font-weight:900;letter-spacing:.1em}
+.fastSlowRow .fastBadge .fsLabel{color:#38bdf8}
+.fastSlowRow .slowBadge .fsLabel{color:#f87171}
+.fastSlowRow .fsVal{font-size:22px;font-weight:800}
+.fastSlowRow .fastBadge .fsVal{color:#7dd3fc}
+.fastSlowRow .slowBadge .fsVal{color:#fca5a5}
+.fastSlowRow .fsSub{font-size:12px;color:var(--ui-muted);font-weight:normal}
 .best{color:var(--ui-muted)}.best.new{color:var(--ui-accent);font-weight:900}
 #credits{margin-top:14px;color:var(--ui-muted);font-size:14px;line-height:1.7}
 
@@ -939,6 +957,16 @@ details.panel[open]>summary{margin-bottom:14px}
 #mmdPanel #mmdPreview{width:180px;height:120px;border-radius:10px;background:rgba(127,127,127,.16);border:1px solid var(--ui-border);flex:none}
 #mmdPanel .vrmInfo{flex:1;min-width:0;text-align:left}
 #mmdStatus.hint{min-height:1.2em}
+#mmdQuickPanel .mmdQuickBody{display:flex;gap:14px;align-items:center;margin-top:10px}
+#mmdQuickPanel .mmdQuickCanvasWrap{flex:none;position:relative}
+#mmdQuickPreview{width:120px;height:120px;border-radius:14px;background:rgba(127,127,127,.12);
+  border:1px solid var(--ui-border);display:block;cursor:pointer;transition:transform .15s}
+#mmdQuickPreview:hover{transform:scale(1.03)}
+#mmdQuickPanel .mmdQuickControls{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+@media (max-width: 600px){
+  #mmdQuickPanel .mmdQuickBody{flex-direction:column;align-items:stretch}
+  #mmdQuickPreview{margin:0 auto;width:140px;height:140px}
+}
 
 /* ============================================================
    ⭐ お気に入りのフォルダ管理（js/favs.js）

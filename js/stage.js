@@ -128,7 +128,9 @@ const stageLaneX = (lane, q) => { const w = stageWidthAt(q); return STAGE.cx - w
 const stageMap = { src:null, len:0, key:"", lanes:new Int8Array(0), wide:new Uint8Array(0), hype:new Uint8Array(0) };
 function ensureStageMap() {
   const N = stageN(), seed = $("seed").value;
-  const key = `${N}|${seed}|${chartDiff}|${settings.stagePattern}|${settings.stageMirror}|${settings.stageRandom}|${settings.stageHype}|${chartMeta.bpm}`;
+  const isMirror = !!(settings.stageMirror || settings.modMirror);
+  const isRandom = settings.stageRandom === "random" || !!settings.modRandom;
+  const key = `${N}|${seed}|${chartDiff}|${settings.stagePattern}|${isMirror}|${isRandom}|${settings.stageHype}|${chartMeta.bpm}`;
   if (stageMap.src === chart && stageMap.len === chart.length && stageMap.key === key) return;
   const base = { easy:0, normal:1, hard:2, master:3, rush:3 }[chartDiff] ?? 1;
   const tier = settings.stagePattern === "calm" ? Math.min(base, 1) : settings.stagePattern === "tech" ? Math.min(3, base + 1) : base;
@@ -171,9 +173,9 @@ function ensureStageMap() {
     loud.forEach((v, i) => { hype[i] = v >= thr ? 1 : 0; });
   }
   /* ミラー */
-  if (settings.stageMirror) for (let i = 0; i < L; i++) lanes[i] = N - 1 - lanes[i] - wide[i];
+  if (isMirror) for (let i = 0; i < L; i++) lanes[i] = N - 1 - lanes[i] - wide[i];
   /* 🎲 RANDOM：レーンの並びを1回だけ入れ替える */
-  if (settings.stageRandom === "random") {
+  if (isRandom) {
     const perm = [...Array(N).keys()];
     for (let i = N - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [perm[i], perm[j]] = [perm[j], perm[i]]; }
     for (let i = 0; i < L; i++) {
@@ -351,7 +353,7 @@ function makeRange(key, label, min, max, step) {
   return row;
 }
 (() => {
-  const anchor = document.querySelector('#settingsScreen [data-i18n="mascotSel"]'); if (!anchor) return;
+  const anchor = $("stageSettingsAnchor") || document.querySelector('#settingsScreen [data-i18n="mascotSel"]'); if (!anchor) return;
   const h3 = el("h3", "", tr("stageViewTitle")); h3.dataset.i18n = "stageViewTitle";
   const reset = () => { stageMap.src = null; };
   const lanes = makeSeg("stageLanesPicker", "stageLanes", [["4", "stageLanes4"], ["5", "stageLanes5"], ["6", "stageLanes6"]]);

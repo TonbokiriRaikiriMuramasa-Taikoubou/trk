@@ -170,6 +170,9 @@ function syncOptionsUI() {
   $("resumeCountdown").checked = settings.resumeCountdown;
   $("optHidden").checked = settings.hidden;
   $("optSudden").checked = settings.sudden;
+  if ($("optMirror")) $("optMirror").checked = !!settings.modMirror;
+  if ($("optRandom")) $("optRandom").checked = !!settings.modRandom;
+  if ($("showMasterDiff")) $("showMasterDiff").checked = !!settings.showMasterDiff;
   $("rate").value = settings.rate;
   $("rateVal").textContent = settings.rate.toFixed(2) + "x";
   $("cover").value = settings.cover;
@@ -178,9 +181,28 @@ function syncOptionsUI() {
 }
 function optionsChanged() { saveUserPrefs(); syncOptionsUI(); emit("options"); }
 [["countdown", "countdown"], ["countdownSE", "countdownSE"], ["resumeCountdown", "resumeCountdown"],
- ["optHidden", "hidden"], ["optSudden", "sudden"]].forEach(([id, key]) => {
-  $(id).addEventListener("change", e => { settings[key] = e.target.checked; optionsChanged(); });
+ ["optHidden", "hidden"], ["optSudden", "sudden"], ["optMirror", "modMirror"], ["optRandom", "modRandom"]].forEach(([id, key]) => {
+  const el = $(id);
+  if (el) el.addEventListener("change", e => { settings[key] = e.target.checked; optionsChanged(); });
 });
+const expCheck = $("showMasterDiff");
+if (expCheck) {
+  expCheck.addEventListener("change", e => {
+    settings.showMasterDiff = e.target.checked;
+    refreshSeedSecrets();
+    optionsChanged();
+    if (settings.showMasterDiff && typeof showToast === "function") showToast(tr("expertUnlocked"));
+  });
+}
+const expToggle = $("expertDiffToggle");
+if (expToggle) {
+  expToggle.addEventListener("click", () => {
+    settings.showMasterDiff = !settings.showMasterDiff;
+    refreshSeedSecrets();
+    optionsChanged();
+    if (settings.showMasterDiff && typeof showToast === "function") showToast(tr("expertUnlocked"));
+  });
+}
 $("judgePicker").addEventListener("click", e => {
   const b = e.target.closest("button[data-judge]"); if (!b) return;
   settings.judge = b.dataset.judge; optionsChanged();

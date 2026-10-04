@@ -62,7 +62,69 @@
   （pmd＋テクスチャ18＋ReadMe.txt原文＋preset.json、計18.6MB。jsdom実HTTP検証で22項目全部OK）
 - **NOTICE.md に 3a 追加**：assets/mmd/ は GPL対象外・れあどめ原文同梱が条件・商用フォークは assets/mmd/ ごと削除
 - 新i18nキー：`mmdPresetBtn` `mmdPresetHint` `mmdPresetMissing` `mmdMotionJump` `mmdMotionIdol`（4言語）＋ `mmdHint` を4言語とも更新
-- `sw.js` の `CACHE`＝**`trk-v2026.10.5-mikumiku1`**
+- `sw.js` の `CACHE`＝**`trk-v2026.10.5-expert-patterns1`**
+- **🔥 難易度レベルの大幅拡張（Lv. 1 〜 20）＆上級・達人向けの専門的配置（トリル・連打・複合）**：
+  - **レベル幅の拡張**：従来の狭い推定（2・4・6・8・10）から、平均NPS・瞬間最大密度・16分音符比率・交互トリル出現率・超高速域（gap <= 100ms）を総合評価する **Lv. 1 〜 20** の音ゲー標準スケールへ刷新。
+    - 初級（Easy）：Lv. 1 〜 3（4分音符中心、全年齢向け）
+    - 中級（Normal）：Lv. 4 〜 6（8分音符、基本リズム）
+    - 上級（Hard）：Lv. 7 〜 11（16分音符の3連・5連複合、交互トリル）
+    - 達人（MASTER）：Lv. 11 〜 15（長連打、高速トリル、複雑な複合ストリーム）
+    - 2000 RUSH：Lv. 16 〜 20（極限の超高密度ストリーム）
+  - **専門的配置の生成（`generateNotes`）**：
+    - 盛り上がり区間（RMS・オンセット）で3連打（ドドカ・カカド・ドカド）、5連打（ドドカカド・5連トリル）、長連打を構造的に生成。
+    - 高速16分区間で本格的な交互トリル（ドカドカドカ…）を生成。
+    - 小節頭・強拍でのドン（赤）アンカー配置で音ゲーとしての叩き心地・グルーヴ感を強化。
+  - **全年齢向けと高難易度アクセスの両立**：
+    - 初期表示は初心者や全年齢が安心できる「初級・中級・上級」の3ボタンを維持。
+    - 選曲画面の「🔥 MASTER」クイックボタン、または設定内「高難易度（MASTER・2000 RUSH）を表示する」チェックボックスでワンタップ即座に解放可能。隠しSeed（765/143等）でも解放可能。
+- **🎬 初期TVスキンを「映画館スクリーン」（cinema）に設定**：
+  - 黒を基調とした映画館スクリーン（`cinema`）を標準TVスキンに変更（`core.js` の safeMode / resetVideoPrefs、`tv-dock.js` の初期値・フォールバック・削除時フォールバック）。
+- **❤ 音ゲーノーツ数とライフの動的スケーリング（Standard & Knight再調整）**：
+  - 音ゲー（IIDX・SDVX・太鼓・osu!・チュウニズム等）のゲージ設計（TOTAL値・生存許容率・コンボ回復間隔）を徹底調査・研究。
+  - 譜面の総ノーツ数（`chart.length`）に応じて、初期ライフ・最大上限・コンボ回復間隔を動的スケーリング：
+    - **Standard**（完走支援）：
+      - 短曲（〜100ノーツ）：初期16・最大27・9コンボで+1
+      - 標準曲（〜500ノーツ）：初期23・最大39・13コンボで+1
+      - 長曲（1200+ノーツ）：初期35・最大60・22コンボで+1
+    - **Knight**（⚔ KNIGHT称号・ハードサバイバル）：
+      - 短曲（〜100ノーツ）：初期5・最大7・21コンボで+1
+      - 標準曲（〜500ノーツ）：初期7・最大10・30コンボで+1
+      - 長曲（1200+ノーツ）：初期10・最大14・45コンボで+1
+    - **trk!**（chicken）：1ミス即終了（調整なし・維持）
+    - **Infinite**（none）：ミスしても完走（0ライフ・維持）
+    - **TRUCK・ORBIT**：それぞれの専用ゲーム性（障害物・円形軌道）に応じた動的スケーリングを適用。
+  - `i18n-options.js` の `livesHint` を4言語（ja/en/zh/ko）すべて更新。
+- **🩷 設定画面の整理（1行格納・全体設定とモード別の分離・MMD配置の適正化）**：
+  - **MMDの配置移動**：右下から左カラム「🎨 見た目」のスキン追加（`#skinMaker`）直下・ゲームレイアウトの上に移動。1行に格納できる `<details id="mmdPanel" class="subPanel">`（見出し「🩷 MMDマスコット（ミクモード・モデル追加）」）に改修。色々なMMDキャラをアップロードして試しやすい外見カスタマイズの特等席へ。
+  - **全体設定とモード別の分離**：
+    - 各モード専用の表示設定（TRUCK色・バウンス、ORBIT軌道・惑星、STAGEレーン・演出・照明）を `<details id="modeViewPanel" class="subPanel">`（「🚚🪐🎪 各モードの専用設定」）に集約。
+    - 各モードのキー設定（TRUCK、STAGE、CATCH、速度キー）を `<details id="modeControlsPanel" class="subPanel">`（「🚚🎪🚛 各モードの操作キー」）に集約。
+    - ノーツの見た目（色・形状）も `<details id="noteStylePanel" class="subPanel">` に格納。
+  - **1行格納（アコーディオン）UI**：各設定群が閉じると1行にスッキリ収まるようにし、`.subPanel>summary` にも `＋`／`－` の展開インジケーターを追加。
+  - **VRMの配置維持**：マニアックなVRM（VRChat系モデル）は従来どおり右カラムの位置を維持。
+- **🩷 ミクモード（MMDデスクトップマスコット機能）の改善**：
+  - 設定画面の「ミクのUIを前に設定するオプション」の位置を、`mmdPresetHint` の直下（「💠 Lat式ミク をマスコットにする」のすぐ下）に移動。
+  - 文言を **「🩷 ミクモードをONにする（MMDデスクトップマスコット機能）」**（`mmdQuickUILabel`、4言語）に改訂。
+  - 💠 Lat式ミク をマスコットにするボタンを押すと、自動的に `settings.mascot = "mmd"` かつ `settings.mmdQuickUI = true` で即時ONになるよう連動。
+  - チェックボックス「ミクモードをONにする」を手動でONにした際も、未読み込みなら同梱Lat式ミクを自動読み込み、マスコットをMMDに切り替え。
+  - 表の選曲画面（`#mmdQuickPanel`）に **`#mmdQuickPreview` キャンバス** を追加。選曲中も3Dミクがその場でリアルタイムに動き（👀ひとやすみ／🎲おまかせ／🎯えらぶ）、デスクトップマスコットとして表ですぐにミクの姿が見られるように。クリックでモーション切り替え（👀⇔🎲）も可能。
+  - `mascotSelect` に `<option value="mmd">` を追加し、マスコット切り替え整合性を担保。
+  - `css/style.css` に `#mmdCanvas` の `position:absolute; z-index:2; pointer-events:none` および `#mmdQuickPanel` プレビュー用スタイルを追加。
+- **🥁 音ゲーマー向け機能・MOD・判定分析の強化**：
+  - **FAST / SLOW（Early / Late）の精密トラッキング**：
+    - `judgeNote()` で -3ms未満を FAST（`stats.fast`）、+3ms超を SLOW（`stats.slow`）として集計。さらに音ゲーマーが最も気にする GOOD 判定時の内訳（`stats.goodFast` / `stats.goodSlow`）も記録。
+    - リザルト画面に視認性の高い `.fastSlowRow`（シアンの `fastBadge`、コーラルの `slowBadge`、GOOD内訳付き）を表示。
+    - プレイ中の判定文字下（`#judge small`）に、リアルタイムでネオンシアン（`.early` `#38bdf8`）とネオンコーラル（`.late` `#f87171`）の光彩カラーを適用。
+  - **あべこべ（MIRROR）＆ でたらめ（RANDOM）MOD の全面実装**：
+    - `settings.modMirror`（ドンとカツの配置を反転）および `settings.modRandom`（赤青のランダム化）を新設。
+    - `resetRun()` 時に `origLane` を保持し、設定オフ時は完全に元の譜面へ復帰。`modRandom` は Seed・難易度・総ノーツ数をキーとする `mulberry32` 擬似乱数により、リトライ時も完全同一のランダム譜面を再現。
+    - 太鼓・音ゲーのルールに準拠し、MIRRORとRANDOMは公式記録対象（`activeMods()` に反映）。
+    - 多レーン（STAGE）モードともシームレスに連動。
+- **💬 GitHub Issues フィードバック・苦情・譜面意見窓口の本格整備**：
+  - `.github/ISSUE_TEMPLATE/feedback.yml`：称賛・楽しかった点から理不尽に感じた苦情・操作性の不満まで率直に投稿できるフォームを新設。
+  - `.github/ISSUE_TEMPLATE/chart_feedback.yml`：自動生成譜面・トリル配置・推定レベル（Lv.1〜20）への意見を曲名・難易度ごとに募集するフォームを新設。
+  - `.github/ISSUE_TEMPLATE/config.yml` および `README.md` のお問い合わせ窓口を更新。
+  - 選曲画面（フッター）だけでなく、演奏終了後のリザルト画面（`#endScreen`）下部にも直接投稿リンク（`feedbackLink`, `chartFeedbackLink`、4言語対応）を配備。
 - 検証：`jsdom-mmdpreset.mjs`（18本目）全部OK／`node --check` 全ファイルOK
 
 ### 1-2. 規模（数字で見る現在地）

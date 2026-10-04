@@ -179,6 +179,7 @@ trk/
 | 22 | speed.js | ⏩速度パネル・速度キー（main の後） |
 | 23 | vrm.js | 🧍VRM（`packsReady` を待つ） |
 | 24 | mmd.js | 🩷MMD（持ち込みモデル・自作VMD。`packsReady` を待つ） |
+| 25 | favs.js | ⭐ お気に入りのフォルダ管理（1軍／2軍／🧊／📤元。tv・fx・song の3系統） |
 🧊＝凍結中（しばらく触らない。会話に貼らなくてよい）
 
 ---
@@ -359,6 +360,19 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 - 動作確認：`jsdom-mmd.mjs`（VMDのバイト列とSJIS・同意ゲート・CDN不達→`mmdNetError`・モデル読み込みと保存・誤形式→`mmdVmdBad`・大きすぎ→`mmdTooBig`・フォルダ読み・BPM同期・playing/preview の描画・4言語・`?safe=1`）
   - 落とし穴：ハーネスの `stubCanvas` が `createImageData()` を返さないと、TV砂嵐（`tv-dock.js` の `drawStaticNoise`）が `img.data` で毎フレーム jsdomError を出す。**製品側のバグではない**
 
+### ⭐ お気に入りのフォルダ管理（js/favs.js）
+- **3系統**：`tv`（映像フィルター。1軍＝`settings.tvFav`）／`fx`（エフェクト。1軍＝`settings.fxFav`）／`song`（曲。1軍＝`settings.songFav`＝新規）。**1軍はこれまでの保存場所のまま**、2軍〜元お気に入り・ピン・ロック・選択中フォルダだけ `settings.favs` に足す（既存キー・形式は不変）
+- **4つの固定フォルダ**：`main`（⭐1軍＝ボタンに並ぶ）／`sub`（⭐2軍＝控え。チップで切り替えるとボタンに出る）／`frozen`（🧊フリーズ。**既定で🔒**）／`former`（📤元お気に入り。外したものが自動で入り、🎲の候補には出ない）
+- **上限なし**：`TV_FAV_MAX` / `FAV_MAX` は 0（＝上限なし）にした。`idList(v, max)` は `max > 0` のときだけ切る
+- **🧊凍結**＝フォルダごとの🔒。凍結中は追加・削除・移動を断る（`{ok:false, why:"locked"}`）。解除は🔓
+- **📌ピン**＝「絶対に外れない」。`pool(kind)` ＝ いまのフォルダ＋**ピン（ほかのフォルダにいても必ず候補に入る）**。ピン中のものは外せない（`why:"pinned"`）
+- **窓口 `window.TrkFavs`（version 1）**：`state` `list` `count` `groupOf` `has` `inGroup` `pinned` `locked` `activeOf` `setActive` `toggleLock` `add` `move` `remove` `restore` `clearFormer` `togglePin` `pool` `nameOf` `exportObj` `importObj` `exportJSON` `importFile` `exportText` `menu` `menuButton` `chips` `renderPanel` `msg` `toast` `refresh` `fxToggle`
+- **UI**：ドックのチップ（`.favChipsWrap`）／曲リストの ⭐タブ＋チップ（`.favChipsRow`）／行の ☆★ と ⋯／設定画面の `#favPanel`（4フォルダの一覧・移動・ピン・凍結・書き出し・読み込み・コピー）
+- **書き出し形式**：`trk-favs`（`{format,version,kind,groups:{main,sub,frozen,former},pins,locks}`）。読み込みは**足し算**（消さない）
+- **fx.js は凍結中なので包む**：`favBtn` の listener を付け替えて `TrkFavs.fxToggle()` に繋ぎ、読み込み時に40個で切られたぶんを `prefs.fxFav` から戻す。外れても fx.js は今までどおり（1軍だけ）動く
+- **🎲 の扱い**：ドックの「⭐🎲お気に入りから」＝ `pool`（いまのフォルダ＋📌）。曲リストの🎲＝いまの一覧＋📌の曲。📻ラジオと ◀▶ は今までどおり「いま開いている棚の並び」のまま（ピンでも列は変えない）
+- 動作確認：`jsdom-favs.mjs`（上限なし45個・読み込みで55個・フォルダ切替のスロット・🧊凍結／🔓解除・📌ピン（🎲の候補）・📤元→↩戻す→🗑空にする・`trk-favs` の書き出し／読み込み／誤形式・fx の★・曲の⭐タブと⋯メニュー・長押しで2軍へ・4言語・?safe=1・**コンソールエラー0**）
+
 ### キー入力の優先順位
 - `window` のキャプチャ段階で、**登録順**に受け取る：player.js → truck.js → modes.js(ORBIT) → stage.js → catch.js → extras.js(測定中) → speed.js → その後 main.js（通常段階）。
 - AUTO中：各モードはキーで判定しない。←/→・R は player.js が使う。
@@ -387,7 +401,8 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 | `shadow_taiko_custom_skins_v1` | カスタムスキン |
 | `trk_fx_presets_v1` | マイプリセット（形式 `trk-fx`） |
 | `trk_tv_skins_v1` | 🎨 カスタムTVスキン（形式 `trk-tvskin`、最大30個。選んでいるTVは `settings.tvDockSkin`） |
-| IndexedDB `shadow_taiko_packs` / `_songs` / `_library` / `_vrm` / `_mmd` | パック（`sha256` 付き）・追加した曲・フォルダ・VRM・MMD（"model"/"motion"。持ち込みファイルの控え） |fxDockSkin fxDockFive fxDockOpen fxAntenna fxEqLock fxLockChain fxFavSeeded
+| IndexedDB `shadow_taiko_packs` / `_songs` / `_library` / `_vrm` / `_mmd` | パック（`sha256` 付き）・追加した曲・フォルダ・VRM・MMD（"model"/"motion"。持ち込みファイルの控え） |
+| `settings.songFav`（新） / `settings.favs`（新） | ⭐ 曲のお気に入り（1軍）と、3系統ぶんのフォルダ分け（`{tv,fx,song}` の `sub`／`frozen`／`former`／`pins`／`locks`／`active`）。どちらも `shadow_taiko_preferences_v2` の中 |fxDockSkin fxDockFive fxDockOpen fxAntenna fxEqLock fxLockChain fxFavSeeded
 
 **形式名**：`shadow-taiko-pack`、`shadow-taiko-chart`、`shadow-taiko-records`、`skin.shadow-taiko`、`trk-fx`、`trk-verified`、`trk-tvskin`（カスタムTVスキン）、譜面ファイル `*.shadow-taiko.json`
 

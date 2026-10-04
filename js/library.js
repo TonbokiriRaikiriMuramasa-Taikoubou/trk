@@ -159,9 +159,20 @@ function libTabIdOf(it) {
   const seg = libFolderSeg(it);
   return seg ? "folder:" + seg : "folder";
 }
-/* タブの一覧（順番：すべて → パック → フォルダー → 追加した曲 → 公認） */
+/* ⭐ お気に入り（js/favs.js）。いま選んでいるフォルダの曲を数える */
+function libFavKeys(all) {
+  const F = window.TrkFavs;
+  if (!F) return { n:0 };
+  const g = F.activeOf("song");
+  let n = 0;
+  for (const it of all) if (F.inGroup("song", g, it.key)) n++;
+  return { n, group:g };
+}
+/* タブの一覧（順番：すべて → ⭐お気に入り → パック → フォルダー → 追加した曲 → 公認） */
 function libTabsOf(all) {
   const tabs = [{ id:"all", icon:"📚", label:tr("libTabAll"), n:all.length }];
+  const favN = libFavKeys(all).n;
+  if (favN) tabs.push({ id:"fav", icon:"⭐", label:tr("favTab"), n:favN });
   const packs = new Map(), folders = new Map(), addons = new Map();
   let nFiles = 0;
   for (const it of all) {
@@ -187,6 +198,7 @@ function libTabsOf(all) {
 }
 function libTabMatch(it, id) {
   if (!id || id === "all") return true;
+  if (id === "fav") { const F = window.TrkFavs; return !!(F && F.inGroup("song", F.activeOf("song"), it.key)); }
   if (id === "file") return it.source === "file";
   if (id === "verified") return it.source === "pack" && libIsVerified(it);
   if (id.startsWith("pack:")) return it.source === "pack" && "pack:" + libPackKey(it) === id;
@@ -240,6 +252,14 @@ function renderLib() {
     best:(a, b) => v(b, "best") - v(a, "best")
   }[settings.libSort] || (() => 0);
   items.sort(cmp);
+  if (tabId === "fav") {
+    const F = window.TrkFavs;
+    if (F) {
+      const bar = el("div", "favChipsRow");
+      bar.append(F.chips("song", { former:true, onChange: () => renderLib() }));
+      box.append(bar);
+    }
+  }
   libView = items.map(x => x.it);
   if (!items.length) { box.append(el("div", "libEmpty", tr(scope.length ? "libNoMatch" : "libTabEmpty"))); return; }
   for (const { it, info } of items.slice(0, LIB_SHOW)) {
@@ -256,6 +276,24 @@ function renderLib() {
     b.append(left, meta);
     b.addEventListener("click", () => selectSong(it));
     wrap.append(b);
+    /* ⭐ お気に入り（📌は ⋯ のメニューから） */
+    const F = window.TrkFavs;
+    if (F) {
+      const inFav = F.has("song", it.key);
+      const sb = el("button", "libFav" + (inFav ? " on" : ""), inFav ? "★" : "☆");
+      sb.type = "button";
+      sb.title = tr(inFav ? "favDel" : "favAdd");
+      sb.setAttribute("aria-label", tr(inFav ? "favIn" : "favAdd") + " " + it.title);
+      sb.setAttribute("aria-pressed", String(inFav));
+      sb.addEventListener("click", e => {
+        e.stopPropagation();
+        if (inFav) { const r = F.remove("song", it.key); if (!r.ok) F.toast(F.msg(r.why, r.g)); }
+        else F.add("song", it.key, { group:"main", append:false });
+        renderLib();
+      });
+      wrap.append(sb);
+      if (inFav || F.groupOf("song", it.key)) wrap.append(F.menuButton("song", it.key, "libMenu"));
+    }
     if (it.source === "file") {
       const del = el("button", "", "✕"); del.type = "button"; del.title = tr("libRemove"); del.setAttribute("aria-label", tr("libRemove"));
       del.style.cssText = "padding:6px 12px;font-size:14px;border-radius:12px";
@@ -527,7 +565,19 @@ $("libReconnectBtn").addEventListener("click", async () => {
 let libSearchTimer = 0;
 $("libSearch").addEventListener("input", () => { clearTimeout(libSearchTimer); libSearchTimer = setTimeout(renderLib, 150); });
 $("libSort").addEventListener("change", e => { settings.libSort = e.target.value; saveUserPrefs(); renderLib(); });
-$("libRandomBtn").addEventListener("click", () => { if (libView.length) selectSong(libView[Math.floor(Math.random() * libView.length)]); });
+$("libRandomBtn").addEventListener("click", () => {
+  /* 🎲 おまかせ：いまの一覧 ＋ 📌ピンの曲（ほかのタブにいても、必ず候補に入る） */
+  const pool = libView.slice();
+  const F = window.TrkFavs;
+  if (F) {
+    for (const key of F.state("song").pins) {
+      if (F.groupOf("song", key) === "former") continue;
+      const it = allSongs().find(x => x.key === key);
+      if (it && !pool.includes(it)) pool.push(it);
+    }
+  }
+  if (pool.length) selectSong(pool[Math.floor(Math.random() * pool.length)]);
+});
 
 on("records", renderLib);
 on("chart", updateSpBuilder);

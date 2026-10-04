@@ -49,10 +49,10 @@ const TV_DOCK_SKINS = {
   videowall: { n:8, cols:4, deco:"videowall",label:L4("🧱 ビデオウォール", "🧱 Video wall", "🧱 电视墙", "🧱 비디오월") },
   hologram:  { n:6, cols:3, deco:"hologram",label:L4("🔮 ホログラム", "🔮 Hologram", "🔮 全息投影", "🔮 홀로그램") }
 };
-const TV_FAV_MAX = 40, TV_RECENT_MAX = 5, TV_TEMP_ID = "__tv_temp", TV_LONG_MS = 600;
+const TV_FAV_MAX = 0, TV_RECENT_MAX = 5, TV_TEMP_ID = "__tv_temp", TV_LONG_MS = 600;   /* 0＝上限なし（⭐は js/favs.js がフォルダ分けする） */
 const DEFAULT_TV_FAV = ["color", "vivid", "cinema", "crt", "vhs", "underwater", "thermal", "gameboy", "vaporwave", "aurora"];
 
-const idList = (v, max) => Array.isArray(v) ? [...new Set(v.filter(x => typeof x === "string" && /^[a-z0-9_]{1,40}$/.test(x)))].slice(0, max) : [];
+const idList = (v, max) => Array.isArray(v) ? [...new Set(v.filter(x => typeof x === "string" && /^[a-z0-9_]{1,40}$/.test(x)))].slice(0, max > 0 ? max : undefined) : [];
 
 /* ============ 🎨 カスタムTVスキン（保存庫） ============
    ・設定画面のエディタで作る。形式は trk-tvskin、保存先は trk_tv_skins_v1（新しいキー。これまでのキーは変えない）
@@ -166,7 +166,7 @@ if (typeof prefs !== "undefined") {
     settings.tvDockSkin = pick(prefs.tvDockSkin, Object.keys(TV_DOCK_SKINS), "home");
     settings.tvDockFive = !!prefs.tvDockFive;
     settings.tvDockOpen = prefs.tvDockOpen === true;
-    settings.tvFav = idList(prefs.tvFav, TV_FAV_MAX);
+    settings.tvFav = idList(prefs.tvFav, TV_FAV_MAX);   // TV_FAV_MAX=0＝上限なし
     settings.tvRecent = idList(prefs.tvRecent, TV_RECENT_MAX);
     settings.tvOrder = pick(prefs.tvOrder, ["tv-first", "fx-first"], "tv-first");
     settings.tvPowerPrev = typeof prefs.tvPowerPrev === "string" ? prefs.tvPowerPrev : "color";
@@ -204,6 +204,7 @@ const tvSlotCols = () => settings.tvDockFive ? 5 : tvSkinDef().cols;
 Object.assign(TEXT.ja, {
   tvTitle:"📺 テレビ（映像出力）",
   tvMoreTitle:"📺 くわしく（設定と映像の確認）",
+  tvNoFavShort:"⭐ お気に入りがありません",
   tvFavLabel:"⭐ ボタンに入りきらないお気に入り",
   tvFavLabelN:"⭐ お気に入り {n}個（このTVのボタンは {m}個・ぜんぶ入っています）",
   tvFavOverflow:"⭐ ボタンに入りきらないお気に入り（ボタンは {m}個・お気に入りは {n}個）",
@@ -251,6 +252,7 @@ Object.assign(TEXT.en, {
   tvFavLabel:"⭐ Favorites that don't fit on the buttons",
   tvFavLabelN:"⭐ {n} favorites (this TV has {m} buttons — all of them fit)",
   tvFavOverflow:"⭐ Favorites that don't fit on the buttons (buttons: {m}, favorites: {n})",
+  tvNoFavShort:"⭐ No favorites yet",
   tvNoFav:"No favorites yet. Long-press a button to save the current video filter.",
   tvMore:"⚙ More video settings",
   tvReset:"↺ Reset TV settings", tvResetDone:"TV settings reset",
@@ -295,6 +297,7 @@ Object.assign(TEXT.zh, {
   tvFavLabel:"⭐ 按钮放不下的收藏",
   tvFavLabelN:"⭐ 收藏 {n}个（这台电视有 {m} 个按钮，全部放得下）",
   tvFavOverflow:"⭐ 按钮放不下的收藏（按钮 {m}个、收藏 {n}个）",
+  tvNoFavShort:"⭐ 还没有收藏",
   tvNoFav:"还没有收藏。长按按钮即可登记当前视频滤镜。",
   tvMore:"⚙ 视频详细设置",
   tvReset:"↺ 重置电视设置", tvResetDone:"已重置电视设置",
@@ -339,6 +342,7 @@ Object.assign(TEXT.ko, {
   tvFavLabel:"⭐ 버튼에 다 들어가지 않는 즐겨찾기",
   tvFavLabelN:"⭐ 즐겨찾기 {n}개 (이 TV 버튼은 {m}개 · 전부 들어갑니다)",
   tvFavOverflow:"⭐ 버튼에 다 안 들어가는 즐겨찾기 (버튼 {m}개 · 즐겨찾기 {n}개)",
+  tvNoFavShort:"⭐ 즐겨찾기가 없습니다",
   tvNoFav:"아직 즐겨찾기가 없습니다. 버튼을 길게 누르면 현재 영상을 등록할 수 있습니다.",
   tvMore:"⚙ 영상 자세한 설정",
   tvReset:"↺ TV 설정 초기화", tvResetDone:"TV 설정을 초기화했습니다",
@@ -859,6 +863,8 @@ addEventListener("DOMContentLoaded", () => {
 
   const overLabel = tx("div", "tvFavLabel", "hint");
   const overflow = el("div", "tvFavRow");
+  /* ⭐ フォルダのチップ（1軍／2軍／🧊フリーズ／📤元お気に入り。中身は js/favs.js が作る） */
+  const favChips = el("div", "favChipsWrap");
 
   const body = el("details", "panel tvMore"); body.open = settings.tvDockOpen;
   body.addEventListener("toggle", () => { settings.tvDockOpen = body.open; saveUserPrefs(); });
@@ -1050,7 +1056,7 @@ addEventListener("DOMContentLoaded", () => {
 
   body.append(tx("summary","tvMoreTitle"), quickRow, skinRow, dimRow, blurRow, tabsBar, paneSetup, panePreview);
 
-  dock.append(dev, overLabel, overflow, body);
+  dock.append(dev, favChips, overLabel, overflow, body);
   col.append(dock);
 
   // 液晶フラッシュ
@@ -1084,8 +1090,11 @@ addEventListener("DOMContentLoaded", () => {
   video.addEventListener("pause", () => render());
   rTv.addEventListener("click", () => randomTv());
   rFav.addEventListener("click", () => {
-    const list = (settings.tvFav || []).filter(id => id !== settings.videoStyle && tvPresetById(id) && !tvPresetById(id).off);
+    const F = window.TrkFavs;
+    const src = F ? F.pool("tv") : (settings.tvFav || []);
+    const list = src.filter(id => id !== settings.videoStyle && tvPresetById(id) && !tvPresetById(id).off);
     if (list.length) selectTv(list[Math.floor(Math.random()*list.length)]);
+    else lcdFlash(tr("tvNoFavShort"));
   });
   rPar.addEventListener("click", () => {
     const dim = Math.round(Math.random()*18)/20; // 0-0.9
@@ -1101,11 +1110,22 @@ addEventListener("DOMContentLoaded", () => {
     if (settings.videoStyle === "off") { lcdFlash(tr("tvNeedOn")); return; }
     const id = settings.videoStyle;
     if (!tvPresetById(id) || tvPresetById(id).off) { lcdFlash(tr("tvNeedOn")); return; }
+    const F = window.TrkFavs;
+    if (F) {
+      /* ⭐ いま選んでいるフォルダ（1軍／2軍／🧊）へ入れる。上限なし。🧊は凍結中なら断る */
+      const g = ["main", "sub", "frozen"].includes(F.activeOf("tv")) ? F.activeOf("tv") : "main";
+      const r = F.add("tv", id, { group:g, index:i });
+      if (!r.ok) { lcdFlash(F.msg(r.why)); return; }
+      emit("language");
+      lcdFlash(tr("tvSaved", { n:i+1, name: tvPresetName(tvPresetById(id)) }));
+      render();
+      return;
+    }
     const arr = (settings.tvFav || []).filter(x => x !== id);
     arr.splice(Math.min(i, arr.length), 0, id);
-    settings.tvFav = arr.slice(0, TV_FAV_MAX);
+    settings.tvFav = arr;
     saveUserPrefs();
-    if (typeof emit === "function") emit("language"); // fx側と同様に再描画
+    if (typeof emit === "function") emit("language");
     lcdFlash(tr("tvSaved", { n:i+1, name: tvPresetName(tvPresetById(id)) }));
     render();
   }
@@ -1253,24 +1273,46 @@ addEventListener("DOMContentLoaded", () => {
 
     rTv.textContent = tr("tvRand"); rFav.textContent = tr("tvRandFav"); rPar.textContent = tr("tvRandParam");
 
-    // スロット
-    const fav = (settings.tvFav || []).filter(id => { const p = tvPresetById(id); return p && !p.off; });
+    // スロット（⭐いまのフォルダの中身。1軍＝これまでの settings.tvFav）
+    const F = window.TrkFavs;
+    const favGroup = F && ["main", "sub", "frozen"].includes(F.activeOf("tv")) ? F.activeOf("tv") : "main";
+    const favAll = F ? F.list("tv", favGroup) : (settings.tvFav || []);
+    const fav = favAll.filter(id => { const p = tvPresetById(id); return p && !p.off; });
     const n = tvSlotCount();
     slots.style.setProperty("--cols", tvSlotCols());
     slots.textContent = "";
     for (let i=0;i<n;i++) slots.append(slotButton(i, fav[i], nm[fav[i]]));
 
+    /* ⭐ フォルダのチップ（切り替えると、ボタンの中身が入れ替わる） */
+    if (F) {
+      favChips.textContent = "";
+      favChips.append(F.chips("tv", { former:true, onChange: () => render() }));
+    }
     overflow.textContent = "";
     const rest = fav.slice(n);
-    /* お気に入りの数と、このTVのボタン数を出す（TVごとの持ちやすさが見える） */
-    overLabel.textContent = rest.length ? tr("tvFavOverflow", { n: fav.length, m: n }) : tr("tvFavLabelN", { n: fav.length, m: n });
-    overLabel.hidden = !fav.length;
-    if (!fav.length) overflow.append(tx("div","tvNoFav","hint"));
+    /* フォルダ名と数、このTVのボタン数を出す（TVごとの持ちやすさが見える） */
+    if (!F) overLabel.textContent = rest.length ? tr("tvFavOverflow", { n: fav.length, m: n }) : tr("tvFavLabelN", { n: fav.length, m: n });
+    else {
+      const lock = F.locked("tv", favGroup) ? " 🔒" : "";
+      const former = F.count("tv", "former");
+      overLabel.textContent = tr("favHintDock", { g: F.label(favGroup) + lock, n: favAll.length, m: n })
+        + (former ? " ／ " + tr("favHintN", { g: F.label("former"), n: former }) : "");
+    }
+    overLabel.hidden = !favAll.length;
+    if (!favAll.length) overflow.append(tx("div","tvNoFav","hint"));
     for (const id of rest) {
       const on = settings.videoStyle === id;
-      const b = btn(on ? "selected" : "", "⭐" + (nm[id]||id));
+      const b = btn(on ? "selected" : "", "⭐" + (F && F.pinned("tv", id) ? "📌" : "") + (nm[id]||id));
       b.setAttribute("aria-pressed", String(on));
       b.addEventListener("click", () => { if (on) selectTv("off"); else selectTv(id); });
+      if (F) {
+        /* 長押しでメニュー（1軍／2軍／🧊／📌／外す） */
+        let t = 0, lng = false;
+        b.addEventListener("pointerdown", () => { lng = false; t = setTimeout(() => { lng = true; F.menu(b, "tv", id); }, TV_LONG_MS); });
+        for (const ev of ["pointerup","pointerleave","pointercancel"]) b.addEventListener(ev, () => clearTimeout(t));
+        b.addEventListener("click", e => { if (lng) { e.stopImmediatePropagation(); lng = false; } }, true);
+        b.addEventListener("contextmenu", e => { e.preventDefault(); F.menu(b, "tv", id); });
+      }
       overflow.append(b);
     }
 

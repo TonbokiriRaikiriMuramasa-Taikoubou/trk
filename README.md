@@ -153,7 +153,7 @@ AUTO中か、「シークバーを表示（練習用）」をオンにしてい�
 - **ノーツ**：色と形（丸・ひし形・四角）を、スキンとは別に決められます。
 - **背景映像**：カラー・モノクロ・暗め・非表示に加えて、**暗さ**と**ぼかし**をスライダーで調整できます。選曲画面の📺TVドックから、**映像フィルター45種**（レトロ・シネマ・不思議・自然など）と**TVスキン30種**（ブラウン管・ウッド・アーケード・水槽・プロジェクターなど）を切り替えられます。映像が変になったら `?safe=1` で安全な状態に戻せます。
 - **カスタムTV**：設定画面の🎨から、色6つ・形（ボタン数／列／角の丸み／画面のふち）・飾り28種・質感（光る／ガラスの反射／走査線）を選んで、自分のテレビを作れます。保存するとTVドックのスキン一覧に出て、`trk-tvskin`（JSON）で共有できます（最大30個）。
-- **📺 の物理ボタンで曲を送る**：TVドックの電源・一時停止のとなりに **◀ ▶** があります。テレビのチャンネル送りみたいに、**前の曲・次の曲**へ（リストの端は先頭／末尾へ回り込み、液晶に `♪ 曲名` が出ます）。
+- **📺 の物理ボタンで曲を送る**：TVドックの電源・一時停止のとなりに **◀ ▶** があります。テレビのチャンネル送りみたいに、**前の曲・次の曲**へ（リストの端は先頭／末尾へ回り込み、液晶に `♪ 曲名` が出ます）。**演奏中は、初期設定では曲が飛びません**（ゲームに集中できます）。「演奏中も ◀ ▶ で曲を変える」にチェックを入れると、演奏中でも押したその場で曲が切り替わります（その回の記録は残りません）。
 - **ならべ方**：選曲画面は **📺 TV →（お気に入り）→ 🎛 ラック →（お気に入り）→ 📺 TVくわしい → 🎛 ラックくわしい** の順。テレビの**すぐ下にラック**が来るので「テレビの下にオーディオ機器」という自然な姿になります（TVとラックの上下は「くわしい」の中で入れ替え可）。
 - **⭐ お気に入りはフォルダ分け**：ドックの下に **⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り** のチップが並びます（それぞれ個数つき）。押すとボタンの中身がそのフォルダに入れ替わり、🔒で凍結、あふれたぶんは下の行に出ます。長押し（または ⋯）で、移動・📌ピン・取り外しができます。**上限はありません**。
 - **🧩 アドオン**：本体に入れられない機能を、あとから足せます。設定画面「🧩 アドオン」→「📄 アドオンを入れる」で `.js` か `.trk-addon`（JSON）を選ぶだけ（`trk_addons_v1` に保存）。アドオンは**曲を足す**（曲リストの 🧩 タブに自動でまとまります）、**置き場所**（設定画面・曲リスト・TVのくわしい・ラックのくわしい）にUIを足す、**自分の音を本体のエフェクターに通す**（`api.fx.tapElement`）ことができます。書き方は [docs/ADDONS.md](docs/ADDONS.md) と見本の [`js/addons/example.js`](js/addons/example.js)。壊れたときは `?safe=1` で読み込まれません。
@@ -166,7 +166,7 @@ AUTO中か、「シークバーを表示（練習用）」をオンにしてい�
 - **揺れ**：ビートやドン／カッに合わせてレーンを傾けます（初期値オフ。OSの「視差効果を減らす」がオンなら止まります）
 - **マスコット**：オレンジ相棒、初音ミク（PCL・非公式の二次創作）、**自分のVRMモデル**（VRM 1.0）、**自分のMMDモデル**（.pmx／.pmd）。VRM の .vrma も MMD の .vmd も、曲のBPMに合わせて動きます。
 - **⭐ お気に入りは、フォルダで分ける**：曲・映像フィルター・エフェクトのお気に入りを、**⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り**の4つに分けて持ち歩けます。**個数の上限はありません**（ボタンに入りきらないぶんは、下に並びます）。🧊は凍結（追加・削除を止める）、📌は「**絶対に外れない**」（🎲おまかせの候補に必ず入ります）。外したものは📤元お気に入りに残り、抽選には出てきません。📤書き出し／📥読み込み（`trk-favs`）で、別の端末にも持っていけます。
-- **🩷 MMDマスコット（持ち込み式）**：Lat式ミクやタワシ式CHAN×CO系ミクなど、**お手持ちのMMDモデル**を動かせます。テクスチャごとフォルダを選ぶだけ。内蔵モーションは trk! がコードで作る自作の3種（step／swing／turn）で、自分の `.vmd` も読み込めます。**モデルとモーションは同梱していません**（MMDの模型は再配布できないものがほとんどです）。大きさ・向き・画面下のクレジットを設定でき、チェックを入れると次に開いたときも復元します。`?safe=1` のときは読み込みません。
+- **🩷 MMDマスコット（持ち込み式）**：Lat式ミクやタワシ式CHAN×CO系ミクなど、**お手持ちのMMDモデル**を動かせます。テクスチャごとフォルダを選ぶだけ。内蔵モーションは trk! がコードで作る自作の3種（step／swing／turn）で、自分の `.vmd` も読み込めます。**モデルとモーションは同梱していません**（MMDの模型は再配布できないものがほとんどです）。大きさ・向き・画面下のクレジットを設定でき、チェックを入れると次に開いたときも復元します。`?safe=1` のときは読み込みません。**うまく動かないときは、同じパネルの「🔎 動作チェック」**を押すと、WebGL・CDN（three／three-mmd-loader）・モデル・モーションの状態が1か所に出ます。「📋 結果をコピー」でそのまま貼ってもらえれば、原因を切り分けられます。
 
 ---
 
@@ -425,7 +425,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 - 🎪 **STAGE** — 4/5/6-lane vertical play with stairs, trills and wide notes (inspired by World Dai Star: Yume no Stellarium)
 - 🚛 **CATCH** — catch falling parcels with your truck; grab nitro cans 🚀 for **Blast mode**
 
-**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, VRM 1.0 mascots, MMD mascots (bring your own model), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), shareable `.stpack` packs, and 🎛 **sound effects** (115 EQ/FX presets, game-reactive effects, automatic latency compensation, shareable `trk-fx` JSON presets).
+**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, VRM 1.0 mascots, MMD mascots (bring your own model, with an on-device 🔎 self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), shareable `.stpack` packs, and 🎛 **sound effects** (115 EQ/FX presets, game-reactive effects, automatic latency compensation, shareable `trk-fx` JSON presets).
 
 **✔ Verified packs:** song packs whose composer/charter identity and rights have been confirmed get a ✔ badge and a short message from the creator (up to 280, like a free X post). See [docs/verified.md](docs/verified.md).
 

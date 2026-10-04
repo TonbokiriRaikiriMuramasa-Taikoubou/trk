@@ -162,7 +162,9 @@ if (typeof prefs !== "undefined") {
     prefs.tvFav = [...DEFAULT_TV_FAV, ...cur.filter(id => !DEFAULT_TV_FAV.includes(id))];
   }
   // 既存の保存値を settings に反映（core.js の settings は既に存在）
-  if (typeof settings !== "undefined") {
+  // 🛟 ただし ?safe=1（セーフモード）のときは読み戻さない。core.js が入れた「TVは家庭用・映像OFF」を守る
+  const keepSafe = (typeof safeModeOn !== "undefined") && safeModeOn;
+  if (typeof settings !== "undefined" && !keepSafe) {
     settings.tvDockSkin = pick(prefs.tvDockSkin, Object.keys(TV_DOCK_SKINS), "home");
     settings.tvDockFive = !!prefs.tvDockFive;
     settings.tvDockOpen = prefs.tvDockOpen === true;
@@ -172,6 +174,7 @@ if (typeof prefs !== "undefined") {
     settings.tvPowerPrev = typeof prefs.tvPowerPrev === "string" ? prefs.tvPowerPrev : "color";
     settings.tvOverlay = prefs.tvOverlay !== false;
     /* 🆕 メニューでmp4の映像を流す（選曲中） */
+    settings.tvSongWhilePlaying = prefs.tvSongWhilePlaying === true;  // ◀▶ を演奏中も効かせる（初期オフ）
     settings.tvMenuPreview = prefs.tvMenuPreview !== false;   // 選曲中のTVに映像を映す（初期オン）
     settings.tvMenuVideo = prefs.tvMenuVideo === true;        // 音のプレビューがオフでも映像を流す（初期オフ）
     settings.tvDockSkin = settings.tvDockSkin || "home";
@@ -205,6 +208,10 @@ Object.assign(TEXT.ja, {
   tvTitle:"📺 テレビ（映像出力）",
   tvMoreTitle:"📺 くわしく（設定と映像の確認）",
   tvNoFavShort:"⭐ お気に入りがありません",
+  tvSongPlay:"▶◀ 演奏中も ◀▶ で曲を変える",
+  tvSongPlayHint:"初期オフ。オンのときは、演奏中に ◀▶ を押すと、いまのプレイをやめてその曲に移ります（記録は残りません）。",
+  tvSongPlayOn:"▶◀ 演奏中も曲を変えられます", tvSongPlayOff:"▶◀ 演奏中は曲を変えません",
+  tvSongSkip:"♪ {t} に切り替えました",
   tvFavLabel:"⭐ ボタンに入りきらないお気に入り",
   tvFavLabelN:"⭐ お気に入り {n}個（このTVのボタンは {m}個・ぜんぶ入っています）",
   tvFavOverflow:"⭐ ボタンに入りきらないお気に入り（ボタンは {m}個・お気に入りは {n}個）",
@@ -253,6 +260,10 @@ Object.assign(TEXT.en, {
   tvFavLabelN:"⭐ {n} favorites (this TV has {m} buttons — all of them fit)",
   tvFavOverflow:"⭐ Favorites that don't fit on the buttons (buttons: {m}, favorites: {n})",
   tvNoFavShort:"⭐ No favorites yet",
+  tvSongPlay:"▶◀ Let ◀▶ change songs while playing",
+  tvSongPlayHint:"Off by default. When on, pressing ◀▶ during play stops the current run and switches to that song (the run is not recorded).",
+  tvSongPlayOn:"▶◀ You can change songs while playing", tvSongPlayOff:"▶◀ Songs stay locked while playing",
+  tvSongSkip:"♪ Switched to {t}",
   tvNoFav:"No favorites yet. Long-press a button to save the current video filter.",
   tvMore:"⚙ More video settings",
   tvReset:"↺ Reset TV settings", tvResetDone:"TV settings reset",
@@ -298,6 +309,10 @@ Object.assign(TEXT.zh, {
   tvFavLabelN:"⭐ 收藏 {n}个（这台电视有 {m} 个按钮，全部放得下）",
   tvFavOverflow:"⭐ 按钮放不下的收藏（按钮 {m}个、收藏 {n}个）",
   tvNoFavShort:"⭐ 还没有收藏",
+  tvSongPlay:"▶◀ 演奏中也可以用 ◀▶ 换曲",
+  tvSongPlayHint:"默认关闭。开启后，演奏中按 ◀▶ 会结束当前演奏并切到那首歌（不会记录成绩）。",
+  tvSongPlayOn:"▶◀ 已允许演奏中换曲", tvSongPlayOff:"▶◀ 演奏中不会换曲",
+  tvSongSkip:"♪ 已切到 {t}",
   tvNoFav:"还没有收藏。长按按钮即可登记当前视频滤镜。",
   tvMore:"⚙ 视频详细设置",
   tvReset:"↺ 重置电视设置", tvResetDone:"已重置电视设置",
@@ -343,6 +358,10 @@ Object.assign(TEXT.ko, {
   tvFavLabelN:"⭐ 즐겨찾기 {n}개 (이 TV 버튼은 {m}개 · 전부 들어갑니다)",
   tvFavOverflow:"⭐ 버튼에 다 안 들어가는 즐겨찾기 (버튼 {m}개 · 즐겨찾기 {n}개)",
   tvNoFavShort:"⭐ 즐겨찾기가 없습니다",
+  tvSongPlay:"▶◀ 연주 중에도 ◀▶로 곡 바꾸기",
+  tvSongPlayHint:"기본은 꺼짐. 켜면 연주 중 ◀▶를 눌렀을 때 지금 플레이를 닫고 그 곡으로 넘어갑니다(기록은 남지 않습니다).",
+  tvSongPlayOn:"▶◀ 연주 중에도 곡을 바꿀 수 있습니다", tvSongPlayOff:"▶◀ 연주 중에는 곡을 바꾸지 않습니다",
+  tvSongSkip:"♪ {t}(으)로 바꿨습니다",
   tvNoFav:"아직 즐겨찾기가 없습니다. 버튼을 길게 누르면 현재 영상을 등록할 수 있습니다.",
   tvMore:"⚙ 영상 자세한 설정",
   tvReset:"↺ TV 설정 초기화", tvResetDone:"TV 설정을 초기화했습니다",
@@ -919,6 +938,20 @@ addEventListener("DOMContentLoaded", () => {
     return { lab, inp };
   })();
 
+  /* 🆕 演奏中も ◀▶ で曲を変える（初期オフ。使いたい人だけオンにする） */
+  const songPlayCheck = (() => {
+    const lab = el("label","check"), inp = document.createElement("input");
+    inp.type = "checkbox"; inp.id = "tvSongWhilePlaying";
+    lab.append(inp, tx("span","tvSongPlay"));
+    inp.addEventListener("change", () => {
+      settings.tvSongWhilePlaying = inp.checked;
+      saveUserPrefs();
+      lcdFlash(tr(inp.checked ? "tvSongPlayOn" : "tvSongPlayOff"));
+      render();
+    });
+    return { lab, inp };
+  })();
+
   const moreBtn = tx("button","tvMore","fxMini"); moreBtn.type = "button";
   moreBtn.addEventListener("click", () => {
     openSettings();
@@ -959,7 +992,8 @@ addEventListener("DOMContentLoaded", () => {
 
   const paneSetup = el("div", "tvPane");
   paneSetup.append(tx("div","tvOverlayHint","hint"), overlayCheck.lab, five.lab, orderRow,
-    tx("div","tvOrderHint","hint"), el("div","miniActions", makerBtn, moreBtn, resetBtn));
+    tx("div","tvOrderHint","hint"), songPlayCheck.lab, tx("div","tvSongPlayHint","hint"),
+    el("div","miniActions", makerBtn, moreBtn, resetBtn));
 
   const pvWrap = el("div", "tvpWrap");
   const pvCanvas = document.createElement("canvas"); pvCanvas.className = "tvpCanvas";
@@ -1074,13 +1108,20 @@ addEventListener("DOMContentLoaded", () => {
   /* ◀ ▶：選曲リストを前へ・次へ（ラジオのチャンネル送りみたいに）
      曲の選び方は library.js の nextSong() / prevSong() に任せる（ラジオと同じ並び） */
   const songStep = async dir => {
-    if (phase !== "title") return;
+    const playing = phase !== "title";
+    if (playing && !settings.tvSongWhilePlaying) return;        // 初期オフ（ゲーム中は曲が飛ばない）
     const pickSong = dir > 0 ? (typeof nextSong === "function" ? nextSong : null)
                              : (typeof prevSong === "function" ? prevSong : null);
     const it = pickSong ? pickSong() : null;
     if (!it) { lcdFlash(tr("tvNoSongs")); return; }
     if (typeof selectSong !== "function") return;
-    lcdFlash("♪ " + String(it.title || "").slice(0, 36));
+    if (playing) {
+      /* 演奏中に切り替える設定のとき：いまのプレイを閉じて、選曲画面でその曲を選び直す */
+      lcdFlash(tr("tvSongSkip", { t:String(it.title || "").slice(0, 24) }));
+      try { if (typeof toTitle === "function") toTitle(); } catch (_) {}
+    } else {
+      lcdFlash("♪ " + String(it.title || "").slice(0, 36));
+    }
     await selectSong(it);
     render();
   };
@@ -1340,6 +1381,7 @@ addEventListener("DOMContentLoaded", () => {
     five.inp.checked = settings.tvDockFive;
     orderSel.value = settings.tvOrder;
     overlayCheck.inp.checked = settings.tvOverlay;
+    songPlayCheck.inp.checked = !!settings.tvSongWhilePlaying;
     menuPrevCheck.inp.checked = settings.tvMenuPreview !== false;
     menuVidCheck.inp.checked = settings.tvMenuVideo === true;
 

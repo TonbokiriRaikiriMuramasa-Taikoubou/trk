@@ -144,6 +144,7 @@ function resetVideoPrefs() {
   settings.tvDockSkin = "home"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = true;
   settings.tvPowerPrev = "color"; settings.previewEnabled = true;
+  settings.tvSongWhilePlaying = false;   /* ◀▶ を演奏中も効かせる設定も一緒に戻す */
   /* tv-dock.js の「選曲中に映像を流す」も一緒に戻す */
   settings.tvMenuPreview = true; settings.tvMenuVideo = false;
   if (typeof view !== "undefined" && view) { try { view.style.filter = videoFilter(); } catch(_) {} }
@@ -178,6 +179,7 @@ function enterSafeMode() {
   settings.tvOrder = "tv-first"; settings.tvOverlay = false;
   settings.previewEnabled = false;
   settings.tvMenuPreview = false; settings.tvMenuVideo = false;   // セーフモードは映像を流さない
+  settings.tvSongWhilePlaying = false;                            // セーフモードでは演奏中の曲送りもしない
   settings.fxPower = 0; settings.hideGameplayUI = false;
   if (settings.mascot === "mmd") settings.mascot = "skin";     // 🩷 セーフモードでは MMD を使わない
   if (typeof view !== "undefined" && view) { try { view.style.filter = "none"; } catch(_) {} }

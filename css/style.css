@@ -946,3 +946,7 @@ details.panel[open]>summary{margin-bottom:14px}
   border:1px solid var(--ui-border);cursor:pointer;flex:none}
 .libFav.on{background:var(--ui-accent);color:var(--ui-on-accent);border-color:transparent}
 .libMenu{padding:4px 9px;font-size:15px}
+
+/* 🔎 MMDの動作チェックの結果（折り返して読めるように） */
+#mmdPanel #mmdCheckOut{text-align:left;white-space:pre-wrap;word-break:break-word;font-size:12px;line-height:1.5;
+  background:rgba(127,127,127,.12);border:1px solid var(--ui-border);border-radius:10px;padding:8px 10px;margin-top:6px}

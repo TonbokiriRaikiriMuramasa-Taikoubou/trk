@@ -325,7 +325,11 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 
 ### 📺◀▶ 曲送りボタンと、TV→ラックのならべ方（tv-dock.js）
 - **◀ ▶**：`.tvTop` の中の `.tvSong`（⏻ と ⏸ の間）。`songStep(dir)` は **library.js の `nextSong()` / `prevSong()`** に任せる（ラジオと同じ並び。`libView` → 無ければ `allSongs()`）。
-  端は回り込み（`prevSong()` は新設：`(i-1+len)%len`）、`phase !== "title"` のときは何もしない（ゲーム中に曲が飛ばないため）。選んだら液晶に `♪ 曲名`
+  端は回り込み（`prevSong()` は新設：`(i-1+len)%len`）。**初期設定では `phase !== "title"` のときは何もしない**（ゲーム中に曲が飛ばないため）。選んだら液晶に `♪ 曲名`
+- **🆕 演奏中も曲を送る（`settings.tvSongWhilePlaying`。新規の保存項目・初期 false）**：設定 →🎛設定タブの `#tvSongWhilePlaying`（`songPlayCheck`）。
+  オンのときは、演奏中に ◀▶ を押すと `lcdFlash(tr("tvSongSkip", {t}))` → `toTitle()`（いまのプレイを閉じる＝**記録は残らない**）→ `selectSong(it)` で、その曲を選び直す。
+  オフのときは今までどおり無反応。**キー（←/→＝player.js の10秒スキップ）には触っていない**（キーバインドは従来のまま）
+  ⚠ 新しい設定を足したら、`core.js` の `enterSafeMode()` と `resetVideoPrefs()` の**両方**に初期値を戻す行を足し、`tv-dock.js` の読み戻し側（`keepSafe`）でも守ること
 - **ならべ方**：`applyOrder()` が `dockParts()` で `#tvDock`・`#fxDock` と、その中の `<details>`（`.tvMore` / `.dockMore`）を拾い、
   **TV →（お気に入り）→ ラック →（お気に入り）→ TVくわしい → ラックくわしい** の順に `.songCol` へ並べ直す（`anchor.after()` は要素の移動になる）。
   くわしい欄は**ドックの外**へ出るので、2回目以降は `.songCol > details.…` から拾う（`pick()`。これを忘れると整列のたびに迷子になる）。
@@ -359,6 +363,9 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 - **正直な限界**：three とローダーはCDNから取るので**初回はオンラインが要る**。検証環境（サンドボックス）からは jsDelivr に届かないため、テストは偽ライブラリ `TrkMMD._injectLibs()` で代用している。**本物のモデル・.vmd・CDNは実機で確かめること**
 - 動作確認：`jsdom-mmd.mjs`（VMDのバイト列とSJIS・同意ゲート・CDN不達→`mmdNetError`・モデル読み込みと保存・誤形式→`mmdVmdBad`・大きすぎ→`mmdTooBig`・フォルダ読み・BPM同期・playing/preview の描画・4言語・`?safe=1`）
   - 落とし穴：ハーネスの `stubCanvas` が `createImageData()` を返さないと、TV砂嵐（`tv-dock.js` の `drawStaticNoise`）が `img.data` で毎フレーム jsdomError を出す。**製品側のバグではない**
+- **🆕 🔎 動作チェック（実機用の切り分け。`#mmdCheckBtn` / `#mmdCopyBtn` / `#mmdCheckOut`）**：`diagnose()` が ①WebGL（`WEBGL_debug_renderer_info` で GPU 名も）②CDN の three／three-mmd-loader（`libs()` を実際に読む）③いまのモデル・モーション・canvas・UA を調べ、`checkText(r)` が8行以下のプレーンなテキストにする。`runCheck()` が `#mmdCheckOut` に出して、`mmdCheckOk`／`mmdCheckNg` を出す。`copyText(t)` は `navigator.clipboard` → `execCommand("copy")` の順（両方だめなら `mmdCopyNg` で下の行を選ばせる）
+  - 窓口：`TrkMMD.diagnose()` `check()` `checkText(r)` `lastCheck()`。`console.log("[trk! MMD check]\n" + テキスト)` も出す（実機のF12から拾える）
+  - 環境が悪いときの見え方：CDN 不可 → `three=NG  loader=false` ＋ `libError=…`／セーフモード → `safe=true`／WebGL 不可 → `webgl=false`（この順で切り分ける）
 
 ### ⭐ お気に入りのフォルダ管理（js/favs.js）
 - **3系統**：`tv`（映像フィルター。1軍＝`settings.tvFav`）／`fx`（エフェクト。1軍＝`settings.fxFav`）／`song`（曲。1軍＝`settings.songFav`＝新規）。**1軍はこれまでの保存場所のまま**、2軍〜元お気に入り・ピン・ロック・選択中フォルダだけ `settings.favs` に足す（既存キー・形式は不変）

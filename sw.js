@@ -1,22 +1,50 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-/* trk! サービスワーカー：ネット優先。オフラインのときだけ保存した版を使う。
-   同じサイトのファイルだけを対象にし、CDN（three.js）や読み込んだ曲は扱いません。 */
-const CACHE = "trk-v2026.10";
+/* trk! offline shell: network first, cached same-origin app files as a fallback. */
+const CACHE = "trk-v2026.10.1";
+const CACHE_PREFIX = "trk-";
+const SCOPE = new URL(self.registration.scope);
 
-self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("install", event => {
+  event.waitUntil(self.skipWaiting());
+});
 
-self.addEventListener("activate", e => e.waitUntil((async () => {
-  for (const k of await caches.keys()) if (k !== CACHE) await caches.delete(k);   // 古い版を消す
-  await self.clients.claim();
-})()));
+self.addEventListener("activate", event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE).map(key => caches.delete(key)));
+    await self.clients.claim();
+  })());
+});
 
-self.addEventListener("fetch", e => {
-  const req = e.request;
-  if (req.method !== "GET" || new URL(req.url).origin !== location.origin) return;
-  e.respondWith(
-    fetch(req).then(res => {
-      if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
-      return res;
-    }).catch(() => caches.match(req))
-  );
+self.addEventListener("fetch", event => {
+  const request = event.request;
+  if (request.method !== "GET") return;
+
+  const url = new URL(request.url);
+  if (url.origin !== SCOPE.origin || !url.pathname.startsWith(SCOPE.pathname)) return;
+
+  event.respondWith((async () => {
+    try {
+      const response = await fetch(request);
+      if (response.ok && response.type === "basic") {
+        try {
+          const cache = await caches.open(CACHE);
+          await cache.put(request, response.clone());
+        } catch { /* storage may be unavailable or full; the network response still works */ }
+      }
+      return response;
+    } catch {
+      const cached = await caches.match(request);
+      if (cached) return cached;
+      if (request.mode === "navigate") {
+        const offlineHome = new URL("index.html", SCOPE).href;
+        const fallback = await caches.match(offlineHome);
+        if (fallback) return fallback;
+      }
+      return new Response("trk! is offline. Reconnect to load this file.", {
+        status: 503,
+        headers: { "Content-Type": "text/plain; charset=utf-8" }
+      });
+    }
+  })());
 });

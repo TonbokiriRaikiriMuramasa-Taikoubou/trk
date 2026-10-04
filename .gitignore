@@ -11,6 +11,9 @@
 *.stpack
 test-songs/
 
+# GitHub Pages workflow artifact staging
+_site/
+
 # OS・エディタ
 .DS_Store
 Thumbs.db

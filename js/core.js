@@ -119,6 +119,18 @@ const settings = {
   libTab: typeof prefs.libTab === "string" ? prefs.libTab : "all",            // 📚 選んでいる棚（タブ）のID
   libSkin: typeof prefs.libSkin === "string" ? prefs.libSkin : "player",      // 📚 棚のスキン（js/lib-skins.js が検証）
   libSkinQuick: prefs.libSkinQuick !== false,                                 // 📚 曲リストの 🎨 ボタンを出す
+  /* 📊 スペクトラム（js/spectrum.js が値と実在を検証して読み戻す） */
+  specOn: prefs.specOn !== false,                                             // 表示する（初期オン）
+  /* 見え方と色の一覧は spectrum.js（このあとに読み込む）が決めています。ここでは
+     TrkSpec があればその一覧、なければ初期のぶんで検証し、spectrum.js の読み込み時に
+     もう一度 prefs から読み直して広げます（core.js 側の直し忘れを防ぐ）。 */
+  specStyle: pick(prefs.specStyle, (window.TrkSpec && TrkSpec.styles()) || ["ring", "bars", "mirror", "wave"], "ring"),
+  specTheme: pick(prefs.specTheme, (window.TrkSpec && TrkSpec.themes()) || ["neon", "sunset", "mono", "rainbow"], "neon"),
+  specGain: num(prefs.specGain, .4, 2.5, 1),
+  specPeaks: prefs.specPeaks !== false,
+  specTv: prefs.specTv === true,                                              // 📺 TVに重ねる（初期オフ）
+  specSkin: prefs.specSkin !== false,                                         // 📊 曲名バナーをスキンにする（初期オン）
+  specSkinOpen: prefs.specSkinOpen === true,                                  // 大きく開いた状態（初期は閉じ）
   /* プレイオプション */
   lives: pick(prefs.lives, ["standard", "knight", "chicken", "none"], "standard"),
   countdown: prefs.countdown !== false,
@@ -153,6 +165,10 @@ function resetVideoPrefs() {
   settings.tvSongWhilePlaying = false;   /* ◀▶ を演奏中も効かせる設定も一緒に戻す */
   /* tv-dock.js の「選曲中に映像を流す」も一緒に戻す */
   settings.tvMenuPreview = true; settings.tvMenuVideo = false;
+  /* 📊 スペクトラム（js/spectrum.js）も映像まわりとして一緒に戻す */
+  settings.specOn = true; settings.specStyle = "ring"; settings.specTheme = "neon";
+  settings.specGain = 1; settings.specPeaks = true; settings.specTv = false;
+  settings.specSkin = true; settings.specSkinOpen = false;
   if (typeof view !== "undefined" && view) { try { view.style.filter = videoFilter(); } catch(_) {} }
   if (typeof menuVideoTick === "function") { try { menuVideoTick(); } catch(_) {} }
 }
@@ -186,6 +202,8 @@ function enterSafeMode() {
   settings.previewEnabled = false;
   settings.tvMenuPreview = false; settings.tvMenuVideo = false;   // セーフモードは映像を流さない
   settings.tvSongWhilePlaying = false;                            // セーフモードでは演奏中の曲送りもしない
+  settings.specOn = false; settings.specTv = false;               // 📊 スペクトラムも出さない（音の通り道を作らない）
+  settings.specSkin = false; settings.specSkinOpen = false;
   settings.fxPower = 0; settings.hideGameplayUI = false;
   if (settings.mascot === "mmd") settings.mascot = "skin";     // 🩷 セーフモードでは MMD を使わない
   if (typeof view !== "undefined" && view) { try { view.style.filter = "none"; } catch(_) {} }

@@ -135,8 +135,8 @@ const SKINS = {
 };
 
 /* ---------- マスコット（内蔵：オレンジ相棒・VRM。キャラクターは registerMascot で追加） ---------- */
-const MASCOT_IDS = ["buddy", "vrm"];
-const MASCOT_FAMILY = { buddy:"buddy", vrm:"vrm" };
+const MASCOT_IDS = ["buddy", "vrm", "mmd"];
+const MASCOT_FAMILY = { buddy:"buddy", vrm:"vrm", mmd:"mmd" };
 const MASCOT_DEFS = {};
 const MASCOT_CAPTIONS = {
   buddy: {

@@ -35,13 +35,23 @@ under the Piapro Character License (PCL). https://piapro.jp/license/pcl/summary
 
 ## 3. User content
 Songs, charts, skins, `.stpack` packs, VRM models, motions and character mods are
-owned by their creators. They are not part of trk! and are not covered by the GPL
+owned by their creators. The same goes for MMD models (`.pmx`/`.pmd`), their
+textures and `.vmd` motions: **trk! never bundles, hosts or uploads them.**
+You pick a model or a folder from your own device in the settings panel, and the
+MMD terms of that model's author apply (most MMD models forbid redistribution,
+use outside MMD/MMM, and commercial use).
+The three built-in motions (step / swing / turn) are **not** someone else's work:
+trk! generates those `.vmd` bytes itself in `js/mmd.js`, so they are covered by
+the GPL like the rest of the code. They are not part of trk! and are not covered by the GPL
 unless their creators say so. trk! never bundles or uploads them.
 
 ## 4. Third-party libraries
-Loaded from jsDelivr only when the VRM mascot is used:
+Loaded from jsDelivr only when the VRM or MMD mascot is used:
 - three.js — MIT License — https://github.com/mrdoob/three.js
 - @pixiv/three-vrm, @pixiv/three-vrm-animation — MIT License — https://github.com/pixiv/three-vrm
+- @yohawing/three-mmd-loader — MIT License — https://github.com/yohawing/three-mmd-loader
+  (PMX/PMD/VMD loading; MMD is a trademark of Yu Higuchi / MikuMikuDance, and this
+  loader is an independent, unaffiliated implementation)
 
 ## 5. Not affiliated
 trk! is an independent fan project. It is not affiliated with or endorsed by

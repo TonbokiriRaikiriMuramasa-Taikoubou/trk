@@ -32,7 +32,7 @@ const DOCK_SKINS = {
   future:  { n:8,  cols:4, deco:"scan",    label:L4("🛸 未来端末", "🛸 Future device", "🛸 未来终端", "🛸 미래 단말기") },
   aero:    { n:5,  cols:5, deco:"bubbles", label:L4("🫧 Frutiger Aero", "🫧 Frutiger Aero", "🫧 Frutiger Aero", "🫧 Frutiger Aero") }
 };
-const FAV_MAX = 40, TEMP_ID = "__chart", LONG_MS = 600;
+const FAV_MAX = 0, TEMP_ID = "__chart", LONG_MS = 600;   /* 0＝上限なし（⭐は js/favs.js がフォルダ分けする） */
 settings.fxDockSkin = pick(prefs.fxDockSkin, Object.keys(DOCK_SKINS), "standard");
 settings.fxDockFive = !!prefs.fxDockFive;
 settings.fxDockOpen = prefs.fxDockOpen === true;      // くわしい欄は最初は閉じる
@@ -46,6 +46,7 @@ const slotCols = () => settings.fxDockFive ? 5 : skinDef().cols;
 /* ============ 文章（接頭辞 dock…） ============ */
 Object.assign(TEXT.ja, {
   dockTitle:"🎛 くわしく（EQ・スキン・メニュー）", dockFavLabel:"⭐ ボタンに入りきらないお気に入り",
+  dockNoFavShort:"⭐ お気に入りがありません",
   dockNoFav:"お気に入りはまだありません。ボタンを長押しすると、今のエフェクトを登録できます。",
   dockMore:"⚙ 詳しい設定（ゲーム連動・マイプリセットなど）",
   dockPower:"⏻ 電源（ミュート）", dockAntenna:"📡 アンテナ（バックグラウンド再生）",
@@ -60,6 +61,7 @@ Object.assign(TEXT.ja, {
 });
 Object.assign(TEXT.en, {
   dockTitle:"🎛 More (EQ, skin, menu)", dockFavLabel:"⭐ Favorites that don't fit on the buttons",
+  dockNoFavShort:"⭐ No favorites yet",
   dockNoFav:"No favorites yet. Long-press a button to save the current effect there.",
   dockMore:"⚙ More settings (game-reactive, my presets, …)",
   dockPower:"⏻ Power (mute)", dockAntenna:"📡 Antenna (background playback)",
@@ -74,6 +76,7 @@ Object.assign(TEXT.en, {
 });
 Object.assign(TEXT.zh, {
   dockTitle:"🎛 详细（均衡器・皮肤・菜单）", dockFavLabel:"⭐ 按钮放不下的收藏",
+  dockNoFavShort:"⭐ 还没有收藏",
   dockNoFav:"还没有收藏。长按按钮即可登记当前音效。", dockMore:"⚙ 详细设置（游戏联动・我的预设等）",
   dockPower:"⏻ 电源（静音）", dockAntenna:"📡 天线（后台播放）",
   dockAntOn:"📡 天线开启：切到后台也继续播放", dockAntOff:"📡 天线关闭", dockMute:"🔇 MUTE", dockFxOff:"FX OFF",
@@ -87,6 +90,7 @@ Object.assign(TEXT.zh, {
 });
 Object.assign(TEXT.ko, {
   dockTitle:"🎛 자세히 (EQ・스킨・메뉴)", dockFavLabel:"⭐ 버튼에 다 들어가지 않는 즐겨찾기",
+  dockNoFavShort:"⭐ 즐겨찾기가 없습니다",
   dockNoFav:"아직 즐겨찾기가 없습니다. 버튼을 길게 누르면 지금 이펙트를 등록할 수 있습니다.", dockMore:"⚙ 자세한 설정 (게임 연동・내 프리셋 등)",
   dockPower:"⏻ 전원 (음소거)", dockAntenna:"📡 안테나 (백그라운드 재생)",
   dockAntOn:"📡 안테나 ON: 백그라운드에서도 계속 재생", dockAntOff:"📡 안테나 OFF", dockMute:"🔇 MUTE", dockFxOff:"FX OFF",
@@ -187,9 +191,10 @@ addEventListener("DOMContentLoaded", () => {
   const slotHint = tx("div", "dockSlotHint", "hint dockHint");
   dev.append(rod, top, deco, slots, rnd, slotHint);
 
-  /* ---- 入りきらないお気に入り ---- */
+  /* ---- ⭐ お気に入り（フォルダのチップと、ボタンに入りきらないぶん） ---- */
   const overLabel = tx("div", "dockFavLabel", "hint");
   const overflow = el("div", "fxFavRow");
+  const favChips = el("div", "favChipsWrap");
 
   /* ---- くわしい欄（メニュー・EQ・スキン） ---- */
   const body = el("details", "panel dockMore"); body.open = settings.fxDockOpen;
@@ -229,7 +234,7 @@ addEventListener("DOMContentLoaded", () => {
   body.append(tx("summary", "dockTitle"), quick, eqBox, tx("div", "dockLockHint", "hint"), lockChain.lab,
     skinRow, five.lab, tx("div", "dockAntHint", "hint"), more);
 
-  dock.append(dev, overLabel, overflow, body);
+  dock.append(dev, favChips, overLabel, overflow, body);
   col.append(dock);
 
   /* ---- 液晶の一時メッセージ ---- */
@@ -245,8 +250,11 @@ addEventListener("DOMContentLoaded", () => {
   });
   rFx.addEventListener("click", () => TrkFX.random());
   rFav.addEventListener("click", () => {
-    const list = (settings.fxFav || []).filter(id => id !== settings.fxPreset && names()[id]);
+    const F = window.TrkFavs;
+    const src = F ? F.pool("fx") : (settings.fxFav || []);
+    const list = src.filter(id => id !== settings.fxPreset && names()[id]);
     if (list.length) TrkFX.select(list[Math.floor(Math.random() * list.length)]);
+    else lcdFlash(tr("dockNoFavShort"));
   });
   rPar.addEventListener("click", () => {
     const eq = settings.fxEq.map((v, i) => settings.fxEqLock[i] ? v : Math.round((Math.random() * 12 - 6) * 2) / 2);
@@ -265,10 +273,20 @@ addEventListener("DOMContentLoaded", () => {
     if (!settings.fxOn) { lcdFlash(tr("dockNeedOn")); return; }
     const id = settings.fxPreset;
     if (id === TEMP_ID || !names()[id]) { lcdFlash(tr("dockTempNo")); return; }
+    const F = window.TrkFavs;
+    if (F) {
+      /* ⭐ いま選んでいるフォルダ（1軍／2軍／🧊）へ入れる。上限なし。🧊は凍結中なら断る */
+      const g = ["main", "sub", "frozen"].includes(F.activeOf("fx")) ? F.activeOf("fx") : "main";
+      const r = F.add("fx", id, { group:g, index:i });
+      if (!r.ok) { lcdFlash(F.msg(r.why)); return; }
+      emit("language");
+      lcdFlash(tr("dockSaved", { n:i + 1, name:names()[id] }));
+      return;
+    }
     const arr = (settings.fxFav || []).filter(x => x !== id);
     arr.splice(Math.min(i, arr.length), 0, id);
-    settings.fxFav = arr.slice(0, FAV_MAX); saveUserPrefs();
-    emit("language");                                  // fx.js の設定画面（★の並び）も作り直す
+    settings.fxFav = arr; saveUserPrefs();
+    emit("language");
     lcdFlash(tr("dockSaved", { n:i + 1, name:names()[id] }));
   }
   function slotButton(i, id, nm) {
@@ -315,20 +333,42 @@ addEventListener("DOMContentLoaded", () => {
       : (video.muted ? tr("dockMute") + " · " : "") + (settings.fxOn ? (nm[settings.fxPreset] || "FX") : tr("dockFxOff")) + (settings.fxAntenna ? " 📡" : "");
     /* ランダム */
     rFx.textContent = tr("dockRandFx"); rFav.textContent = tr("dockRandFav"); rPar.textContent = tr("dockRandParam");
-    /* ボタンと、入りきらないお気に入り */
-    const fav = (settings.fxFav || []).filter(id => nm[id]), n = slotCount();
+    /* ⭐ ボタン（いまのフォルダの中身。1軍＝これまでの settings.fxFav）と、入りきらないぶん */
+    const F = window.TrkFavs;
+    const favGroup = F && ["main", "sub", "frozen"].includes(F.activeOf("fx")) ? F.activeOf("fx") : "main";
+    const favAll = F ? F.list("fx", favGroup) : (settings.fxFav || []);
+    const fav = favAll.filter(id => nm[id]), n = slotCount();
     slots.style.setProperty("--cols", slotCols());
     slots.textContent = "";
     for (let i = 0; i < n; i++) slots.append(slotButton(i, fav[i], nm[fav[i]]));
+    if (F) {
+      favChips.textContent = "";
+      favChips.append(F.chips("fx", { former:true, onChange: () => render() }));
+    }
     overflow.textContent = "";
     const rest = fav.slice(n);
-    overLabel.hidden = !rest.length && fav.length > 0;
+    if (!F) overLabel.hidden = !rest.length && fav.length > 0;
+    else {
+      const lock = F.locked("fx", favGroup) ? " 🔒" : "";
+      const former = F.count("fx", "former");
+      overLabel.textContent = tr("favHintDock", { g: F.label(favGroup) + lock, n: favAll.length, m: n })
+        + (former ? " ／ " + tr("favHintN", { g: F.label("former"), n: former }) : "");
+      overLabel.hidden = !favAll.length;
+    }
     if (!fav.length) overflow.append(tx("div", "dockNoFav", "hint"));
     for (const id of rest) {
       const on = settings.fxOn && settings.fxPreset === id;
-      const b = btn(on ? "selected" : "", "⭐" + nm[id]);
+      const b = btn(on ? "selected" : "", "⭐" + (F && F.pinned("fx", id) ? "📌" : "") + nm[id]);
       b.setAttribute("aria-pressed", String(on));
       b.addEventListener("click", () => { if (on) TrkFX.off(); else TrkFX.select(id); });
+      if (F) {
+        /* 長押しでメニュー（1軍／2軍／🧊／📌／外す） */
+        let t = 0, lng = false;
+        b.addEventListener("pointerdown", () => { lng = false; t = setTimeout(() => { lng = true; F.menu(b, "fx", id); }, LONG_MS); });
+        for (const ev of ["pointerup", "pointerleave", "pointercancel"]) b.addEventListener(ev, () => clearTimeout(t));
+        b.addEventListener("click", e => { if (lng) { e.stopImmediatePropagation(); lng = false; } }, true);
+        b.addEventListener("contextmenu", e => { e.preventDefault(); F.menu(b, "fx", id); });
+      }
       overflow.append(b);
     }
     /* くわしい欄 */

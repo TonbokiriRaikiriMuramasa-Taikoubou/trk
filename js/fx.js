@@ -15,6 +15,7 @@
    【約束】
    ・オンにするまでは音の通り道を変えない。createMediaElementSource(video) は一度だけ（2回目はエラー）
      音を使う機能は、新しく作らず TrkFX.tap() を使う
+     ・アドオン（js/addons.js）が持ってきた音を混ぜたいときは TrkFX.tapElement(el)（同じ要素は一度だけ）
    ・譜面のタイミングは変えない：音程や再生位置を動かすエフェクトは入れない
    ・外から読むJSON（trk-fx）は、決められた種類と範囲の値だけ。プログラムは実行しない
    ・文章キーは sfx…（stagefx.js の fx… と重ならないように）
@@ -262,7 +263,7 @@ function matches(p, q) {
 }
 
 /* ============ ⑤ 音の部品 ============ */
-const G = { ac:null, src:null, ok:true, made:[], ticks:[], comps:0, eq:[], game:null, vol:null, lim:null, out:null, noise:{}, ir:new Map() };
+const G = { ac:null, src:null, ok:true, made:[], ticks:[], comps:0, eq:[], game:null, vol:null, lim:null, out:null, noise:{}, ir:new Map(), extra:new Map() };
 let cur = null;                                       // 作り直すときに消すノードの一覧（rebuild 中だけ）
 let bypass = false;                                   // 👂 元の音と比べている間だけ true
 const active = () => settings.fxOn && !bypass;
@@ -507,6 +508,30 @@ function setBypass(v) {
   bypass = v;
   rebuild(); applyOut();
   document.querySelectorAll(".fxCompare").forEach(b => b.classList.toggle("selected", v));
+}
+/* ほかの音（アドオンが持ってきた <audio>/<video>）も、同じエフェクターに通す
+   ・同じ要素は一度だけ（createMediaElementSource は2回呼ぶとエラー）
+   ・エフェクトがオフでも、EQを通さない素通しの道としてつながる（音量だけ本体に合わせる）
+   ・使い終わったら el.pause() してから disconnect するのがおすすめ（戻り値は MediaElementSource） */
+function tapElement(el) {
+  if (!el || typeof el.play !== "function") return null;
+  if (G.extra.has(el)) return G.extra.get(el);
+  if (!ensureGraph()) return null;
+  try {
+    const src = G.ac.createMediaElementSource(el);
+    G.extra.set(el, src);
+    src.connect(G.eq[0]);                    // プリセット → EQ → ゲーム連動 → 音量 → 出口
+    if (G.ac.state === "suspended") G.ac.resume().catch(() => {});
+    el.addEventListener("play", () => { if (G.ac.state === "suspended") G.ac.resume(); });
+    return src;
+  } catch (e) { console.error(e); return null; }
+}
+function untapElement(el) {
+  const src = G.extra.get(el);
+  if (!src) return false;
+  try { src.disconnect(); } catch (_) {}
+  G.extra.delete(el);
+  return true;
 }
 /* エフェクト後の音を見る（波形・スペクトラム表示などに。初めて呼ぶと音の通り道を作る） */
 function tap(fftSize = 2048) {
@@ -901,9 +926,11 @@ on("language", syncUI);
    TrkFX.off()         → エフェクトをオフ
    TrkFX.clean(json)   → trk-fx を確かめて整えた中身を返す（正しくなければ null）
    TrkFX.delayMs()     → 今の自動補正（ms）
-   TrkFX.tap(fftSize)  → エフェクト後の音を見る AnalyserNode（使えなければ null）。使い終わったら disconnect() */
+   TrkFX.tap(fftSize)  → エフェクト後の音を見る AnalyserNode（使えなければ null）。使い終わったら disconnect()
+   TrkFX.tapElement(el)   → アドオンなど、ほかの <audio>/<video> を同じエフェクターに通す（MediaElementSource。同じ要素は一度だけ）
+   TrkFX.untapElement(el) → その通り道を外す（true / false） */
 window.TrkFX = Object.freeze({
-  version:2,
+  version:3,
   list:() => CATS.flatMap(c => presetsOf(c).map(p => ({ id:p.id, cat:p.cat, name:presetName(p) }))),
   current:() => settings.fxOn ? exportObj() : null,
   apply:json => applyFxObj(json),
@@ -914,7 +941,9 @@ window.TrkFX = Object.freeze({
   off:() => setOn(false),
   clean:json => copy(cleanPreset(json)),
   delayMs:() => fxDelayMs(),
-  tap
+  tap,
+  tapElement,
+  untapElement
 });
 
 /* ============ ⑯ 起動 ============

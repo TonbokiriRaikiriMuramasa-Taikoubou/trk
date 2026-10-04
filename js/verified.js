@@ -277,6 +277,16 @@ function refreshAll() {
   renderLib(); renderBanner();
   renderPackList().catch(() => {});
 }
+/* ============ 窓口（曲タブの「✔公認」など、他のファイルから公認を調べる用） ============ */
+window.TrkVerified = {
+  version: 1,
+  /* 曲（パックの曲）→ 公認の情報。公認でなければ null */
+  verifyOf: it => verifyOf(it),
+  /* 曲 → 作者・BPM・ことばの情報（無ければ null） */
+  infoOf: it => (it && songInfo[it.key]) || null,
+  badge
+};
+
 loadVerified();
 })();
 /* ✅ verified.js 完了 */

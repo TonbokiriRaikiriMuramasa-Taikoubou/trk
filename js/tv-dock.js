@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ==========================================================================
    trk! tv-dock.js — 📺 映像出力のTV風ドック（メイン画面の曲リストの下）
-   ・本体のスキン8種（ボタン数がそれぞれ違う）、電源・一時停止・お気に入り登録
-   ・映像フィルター20+種類（tv-presets.js）をまとめて触れる
-   ・TVの下にオーディオがあるのが自然なので、上下入れ替えオプション
+   ・本体のスキン30種（ボタン数がそれぞれ違う）、電源・一時停止・お気に入り登録
+   ・映像フィルター45種類（tv-presets.js）をまとめて触れる
+   ・🆕 カスタムTVスキン：設定画面の #tvMaker で色・形・飾りを決めて作れる（trk-tvskin / trk_tv_skins_v1）
+   ・🆕 ◀ ▶ の物理ボタン：前の曲・次の曲へ（選曲リストをチャンネル送りのように）
+   ・🆕 ならべ方：TV →（お気に入り）→ ラック →（お気に入り）→ TVくわしい → ラックくわしい
+     （TVとラックの上下は設定で入れ替え可。「くわしい」は、いつも下のほう）
    ・FxDockと似た構造だが、映像系（videoStyle, bgDim, bgBlur）を扱う
    読み込み順：tv-presets.js → core.js → fx-dock.js → tv-dock.js → fx.js
    ========================================================================== */
@@ -46,10 +49,112 @@ const TV_DOCK_SKINS = {
   videowall: { n:8, cols:4, deco:"videowall",label:L4("🧱 ビデオウォール", "🧱 Video wall", "🧱 电视墙", "🧱 비디오월") },
   hologram:  { n:6, cols:3, deco:"hologram",label:L4("🔮 ホログラム", "🔮 Hologram", "🔮 全息投影", "🔮 홀로그램") }
 };
-const TV_FAV_MAX = 40, TV_RECENT_MAX = 5, TV_TEMP_ID = "__tv_temp", TV_LONG_MS = 600;
+const TV_FAV_MAX = 0, TV_RECENT_MAX = 5, TV_TEMP_ID = "__tv_temp", TV_LONG_MS = 600;   /* 0＝上限なし（⭐は js/favs.js がフォルダ分けする） */
 const DEFAULT_TV_FAV = ["color", "vivid", "cinema", "crt", "vhs", "underwater", "thermal", "gameboy", "vaporwave", "aurora"];
 
-const idList = (v, max) => Array.isArray(v) ? [...new Set(v.filter(x => typeof x === "string" && /^[a-z0-9_]{1,40}$/.test(x)))].slice(0, max) : [];
+const idList = (v, max) => Array.isArray(v) ? [...new Set(v.filter(x => typeof x === "string" && /^[a-z0-9_]{1,40}$/.test(x)))].slice(0, max > 0 ? max : undefined) : [];
+
+/* ============ 🎨 カスタムTVスキン（保存庫） ============
+   ・設定画面のエディタで作る。形式は trk-tvskin、保存先は trk_tv_skins_v1（新しいキー。これまでのキーは変えない）
+   ・TV_DOCK_SKINS に同じ形のエントリを足すので、render()/buildDeco() はそのまま使える
+   ・見た目は CSS 変数（--tv-…）で流し込む（css/style.css の .tvCustom） */
+const TV_SKINS_KEY = "trk_tv_skins_v1", TV_SKIN_MAX = 30, TV_SKIN_FORMAT = "trk-tvskin";
+const TV_COLOR_KEYS = ["body", "bezel", "screen", "button", "accent", "text"];
+const TV_VAR_KEYS = ["--tv-body", "--tv-body2", "--tv-bezel", "--tv-screen", "--tv-button", "--tv-accent", "--tv-text",
+  "--tv-on-accent", "--tv-radius", "--tv-bezelw", "--tv-lcd-bg", "--tv-lcd-text"];
+/* 飾り（物理デコ）に使える名前。ラベルは、それを使っている内蔵TVスキンから借りる */
+const TV_DECO_KEYS = ["home", "tube", "wood", "antenna", "paper", "dials", "wall", "holo", "screen", "phone", "arcade",
+  "laptop", "cinema", "car", "airplane", "vr", "aquarium", "scope", "cctv", "gameboy", "jumbotron", "frame",
+  "transparent", "toy", "cardboard", "window", "microwave", "videowall"];
+const tvDecoLabel = k => {
+  const hit = Object.values(TV_DOCK_SKINS).find(d => !d.custom && d.deco === k);
+  return hit ? (hit.label[lang] || hit.label.en) : k;
+};
+/* エディタの「ひな形」。ここから色と形を変えて作る */
+const TV_MAKER_PRESETS = {
+  standard: { name:"My TV", n:5, cols:5, radius:18, bezel:4, deco:"", glow:false, glare:true, scan:false,
+    colors:{ body:"#2a2a2e", bezel:"#111111", screen:"#181818", button:"#3a3a40", accent:"#ffd166", text:"#eeeeee" } },
+  crt:      { name:"My CRT", n:4, cols:4, radius:26, bezel:8, deco:"tube", glow:true, glare:true, scan:true,
+    colors:{ body:"#d8c8a8", bezel:"#3a2e22", screen:"#1e2a1e", button:"#b8a888", accent:"#7dff9b", text:"#2a2218" } },
+  wood:     { name:"My Wood", n:6, cols:3, radius:10, bezel:10, deco:"wood", glow:false, glare:false, scan:false,
+    colors:{ body:"#8b5a2b", bezel:"#4a2a14", screen:"#201a12", button:"#6a4520", accent:"#ffcf8a", text:"#ffe8c8" } },
+  future:   { name:"My Future", n:8, cols:4, radius:26, bezel:2, deco:"holo", glow:true, glare:true, scan:false,
+    colors:{ body:"#0a2a3a", bezel:"#00ffff", screen:"#001a22", button:"#123a4a", accent:"#00ffff", text:"#bbffff" } }
+};
+const customTvDefs = {};
+const tvInt = (v, lo, hi, def) => Number.isFinite(Number(v)) ? Math.min(hi, Math.max(lo, Math.round(Number(v)))) : def;
+
+/* 外から来た trk-tvskin は、決められた項目と範囲だけを受け付ける */
+function sanitizeTvDef(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const c = (raw.colors && typeof raw.colors === "object") ? raw.colors : raw;
+  const colors = {};
+  for (const k of TV_COLOR_KEYS) {
+    const v = c[k];
+    if (typeof v !== "string" || !HEX.test(v.trim())) return null;
+    colors[k] = v.trim().toLowerCase();
+  }
+  const s = (raw.shape && typeof raw.shape === "object") ? raw.shape : raw;
+  const n = tvInt(s.n, 3, 8, 5);
+  return {
+    name: String(raw.name || "").trim().slice(0, 24) || "My TV",
+    colors,
+    shape: {
+      n, cols: tvInt(s.cols, 1, 4, Math.min(n, 4)),
+      radius: tvInt(s.radius, 0, 40, 18), bezel: tvInt(s.bezel, 0, 16, 4),
+      deco: TV_DECO_KEYS.includes(s.deco) ? s.deco : "",
+      glow: !!s.glow, glare: s.glare !== false, scan: !!s.scan
+    }
+  };
+}
+function buildTvSkinEntry(def) {
+  const label = { ja:"🎨 " + def.name, en:"🎨 " + def.name, zh:"🎨 " + def.name, ko:"🎨 " + def.name };
+  return { custom:true, def, n:def.shape.n, cols:def.shape.cols, deco:def.shape.deco || "", label };
+}
+function saveTvSkins() { try { localStorage.setItem(TV_SKINS_KEY, JSON.stringify(customTvDefs)); } catch (_) {} }
+function registerTvSkin(id, def) { customTvDefs[id] = def; TV_DOCK_SKINS[id] = buildTvSkinEntry(def); saveTvSkins(); }
+function unregisterTvSkin(id) { delete customTvDefs[id]; delete TV_DOCK_SKINS[id]; saveTvSkins(); }
+(function loadTvSkins() {
+  let raw = {};
+  try { raw = JSON.parse(localStorage.getItem(TV_SKINS_KEY)) || {}; } catch (_) {}
+  for (const [id, d] of Object.entries(raw)) {
+    if (!/^custom_tv_[a-z0-9]+$/.test(id)) continue;
+    const def = sanitizeTvDef(d); if (!def) continue;
+    customTvDefs[id] = def; TV_DOCK_SKINS[id] = buildTvSkinEntry(def);
+  }
+})();
+const newTvSkinId = () => "custom_tv_" + Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36);
+
+/* 色と形を CSS 変数にして流し込む（#tvDock とエディタのプレビューの両方で使う） */
+function paintTvVars(node, def) {
+  const c = def.colors, s = def.shape, dark = luminance(c.body) < .35;
+  node.style.setProperty("--tv-body", c.body);
+  node.style.setProperty("--tv-body2", mixHex(c.body, dark ? "#000000" : "#ffffff", dark ? .45 : .18));
+  node.style.setProperty("--tv-bezel", c.bezel);
+  node.style.setProperty("--tv-screen", c.screen);
+  node.style.setProperty("--tv-button", c.button);
+  node.style.setProperty("--tv-accent", c.accent);
+  node.style.setProperty("--tv-text", c.text);
+  node.style.setProperty("--tv-on-accent", luminance(c.accent) > .45 ? "#111111" : "#ffffff");
+  node.style.setProperty("--tv-radius", s.radius + "px");
+  node.style.setProperty("--tv-bezelw", s.bezel + "px");
+  node.style.setProperty("--tv-lcd-bg", mixHex(c.screen, "#000000", .45));
+  node.style.setProperty("--tv-lcd-text", c.accent);
+  node.dataset.glare = s.glare ? "1" : "0";
+  node.dataset.scan = s.scan ? "1" : "0";
+  node.dataset.glow = s.glow ? "1" : "0";
+  node.classList.add("tvCustom");
+}
+function clearTvVars(node) {
+  TV_VAR_KEYS.forEach(k => node.style.removeProperty(k));
+  delete node.dataset.glare; delete node.dataset.scan; delete node.dataset.glow;
+  node.classList.remove("tvCustom");
+}
+function applyTvSkinVars(node, id) {
+  const e = TV_DOCK_SKINS[id];
+  if (e && e.custom && e.def) { paintTvVars(node, e.def); return; }
+  if (node.classList.contains("tvCustom")) clearTvVars(node);
+}
 
 if (typeof prefs !== "undefined") {
   if (!prefs.tvFavSeeded) {
@@ -57,15 +162,21 @@ if (typeof prefs !== "undefined") {
     prefs.tvFav = [...DEFAULT_TV_FAV, ...cur.filter(id => !DEFAULT_TV_FAV.includes(id))];
   }
   // 既存の保存値を settings に反映（core.js の settings は既に存在）
-  if (typeof settings !== "undefined") {
+  // 🛟 ただし ?safe=1（セーフモード）のときは読み戻さない。core.js が入れた「TVは家庭用・映像OFF」を守る
+  const keepSafe = (typeof safeModeOn !== "undefined") && safeModeOn;
+  if (typeof settings !== "undefined" && !keepSafe) {
     settings.tvDockSkin = pick(prefs.tvDockSkin, Object.keys(TV_DOCK_SKINS), "home");
     settings.tvDockFive = !!prefs.tvDockFive;
     settings.tvDockOpen = prefs.tvDockOpen === true;
-    settings.tvFav = idList(prefs.tvFav, TV_FAV_MAX);
+    settings.tvFav = idList(prefs.tvFav, TV_FAV_MAX);   // TV_FAV_MAX=0＝上限なし
     settings.tvRecent = idList(prefs.tvRecent, TV_RECENT_MAX);
     settings.tvOrder = pick(prefs.tvOrder, ["tv-first", "fx-first"], "tv-first");
     settings.tvPowerPrev = typeof prefs.tvPowerPrev === "string" ? prefs.tvPowerPrev : "color";
     settings.tvOverlay = prefs.tvOverlay !== false;
+    /* 🆕 メニューでmp4の映像を流す（選曲中） */
+    settings.tvSongWhilePlaying = prefs.tvSongWhilePlaying === true;  // ◀▶ を演奏中も効かせる（初期オフ）
+    settings.tvMenuPreview = prefs.tvMenuPreview !== false;   // 選曲中のTVに映像を映す（初期オン）
+    settings.tvMenuVideo = prefs.tvMenuVideo === true;        // 音のプレビューがオフでも映像を流す（初期オフ）
     settings.tvDockSkin = settings.tvDockSkin || "home";
     settings.tvFavSeeded = true;
   }
@@ -84,6 +195,8 @@ if (typeof settings !== "undefined") {
   settings.tvOrder = settings.tvOrder || "tv-first";
   settings.tvPowerPrev = settings.tvPowerPrev || "color";
   settings.tvOverlay = settings.tvOverlay !== false;
+  settings.tvMenuPreview = settings.tvMenuPreview !== false;
+  settings.tvMenuVideo = settings.tvMenuVideo === true;
 }
 
 const tvSkinDef = () => TV_DOCK_SKINS[settings.tvDockSkin] || TV_DOCK_SKINS.home;
@@ -93,8 +206,15 @@ const tvSlotCols = () => settings.tvDockFive ? 5 : tvSkinDef().cols;
 /* ============ 文章（接頭辞 tv…） ============ */
 Object.assign(TEXT.ja, {
   tvTitle:"📺 テレビ（映像出力）",
-  tvMoreTitle:"📺 くわしく（映像・TVスキン・並び順）",
+  tvMoreTitle:"📺 くわしく（設定と映像の確認）",
+  tvNoFavShort:"⭐ お気に入りがありません",
+  tvSongPlay:"▶◀ 演奏中も ◀▶ で曲を変える",
+  tvSongPlayHint:"初期オフ。オンのときは、演奏中に ◀▶ を押すと、いまのプレイをやめてその曲に移ります（記録は残りません）。",
+  tvSongPlayOn:"▶◀ 演奏中も曲を変えられます", tvSongPlayOff:"▶◀ 演奏中は曲を変えません",
+  tvSongSkip:"♪ {t} に切り替えました",
   tvFavLabel:"⭐ ボタンに入りきらないお気に入り",
+  tvFavLabelN:"⭐ お気に入り {n}個（このTVのボタンは {m}個・ぜんぶ入っています）",
+  tvFavOverflow:"⭐ ボタンに入りきらないお気に入り（ボタンは {m}個・お気に入りは {n}個）",
   tvNoFav:"お気に入りはまだありません。ボタンを長押しすると、今の映像を登録できます。",
   tvMore:"⚙ 映像の詳しい設定",
   tvReset:"↺ テレビ設定をリセット", tvResetDone:"テレビ設定をリセットしました",
@@ -109,8 +229,8 @@ Object.assign(TEXT.ja, {
   tvNeedOn:"先に映像フィルターを選んでください（非表示以外）",
   tvSaved:"{n}番に「{name}」を登録しました",
   tvSkinLabel:"テレビ本体のスキン", tvFive:"どのスキンでも5ボタンにする",
-  tvOrderLabel:"ドックの並び順", tvOrderTvFirst:"📺 テレビが上・🎛 オーディオが下（自然）", tvOrderFxFirst:"🎛 オーディオが上・📺 テレビが下",
-  tvOrderHint:"社会的にはTVの下にオーディオ機器があるのが自然なので、デフォルトはテレビが上です。お好みで入れ替えられます。",
+  tvOrderLabel:"ドックの並び順", tvOrderTvFirst:"📺 テレビが上・🎛 ラックが下（自然）", tvOrderFxFirst:"🎛 ラックが上・📺 テレビが下",
+  tvOrderHint:"デフォルトは「テレビ →（お気に入り）→ ラック →（お気に入り）→ テレビくわしい → ラックくわしい」の順です。テレビとラックだけ入れ替えられます（くわしいは、いつも下のほう）。",
   tvOverlay:"📺 映像オーバーレイ（走査線・レターボックス・ノイズなど）を表示",
   tvOverlayHint:"CRTやVHS、シネマなどのフィルターで、走査線やフィルムグレイン、黒帯などの演出を重ねます。",
   tvQuick:"📺 映像", tvOff:"📺 OFF",
@@ -119,12 +239,31 @@ Object.assign(TEXT.ja, {
   tvSearch:"🔍 映像フィルターを探す", tvNoMatch:"見つかりません。", tvHits:"{n}個見つかりました",
   tvDim:"背景の暗さ", tvBlur:"背景のぼかし",
   tvCurrent:"いまの映像：{name}",
-  tvPrev:"前の映像", tvNext:"次の映像", tvRandom:"おまかせ"
+  tvPrev:"前の映像", tvNext:"次の映像", tvRandom:"おまかせ",
+  tvPrevSong:"◀ 前の曲", tvNextSong:"▶ 次の曲", tvNoSongs:"曲がありません",
+  /* 🆕 メニューでmp4の映像を流す・「確認」タブ */
+  tvpTabSetup:"🎛 TVの設定", tvpTabPreview:"🖼 映像の確認",
+  tvpPreviewHint:"いま選んでいる映像フィルター・TVスキン・暗さ・ぼかしを、この画面で確かめられます。曲を選ぶと、ここにそのmp4が流れます（ゲーム画面と同じ大きさで表示）。",
+  tvpNoVideo:"まだ映像がありません。曲を選ぶと、ここに流れます。",
+  tvpOff:"映像はOFFです（⏻ か、フィルターで「非表示」を選ぶと戻ります）。",
+  tvpNow:"いまの映像：{name}",
+  tvpMenuPreview:"🖼 選曲中のTVに映像を映す",
+  tvpMenuPreviewHint:"選曲画面のTV（下のドック）の画面に、流れているmp4を映します。動きが気になるときはオフに。",
+  tvpMenuVideo:"🎬 音のプレビューがオフでも、メニューで映像を再生する（音は出しません）",
+  tvpMenuVideoHint:"設定の「選曲中に曲のプレビューを再生する」がオンのときは、そちら（音あり）を優先します。",
+  tvpPower:"⏻ 映像のON/OFF"
 });
 Object.assign(TEXT.en, {
   tvTitle:"📺 TV (video output)",
-  tvMoreTitle:"📺 More (video, TV skin, order)",
+  tvMoreTitle:"📺 More (setup & video check)",
   tvFavLabel:"⭐ Favorites that don't fit on the buttons",
+  tvFavLabelN:"⭐ {n} favorites (this TV has {m} buttons — all of them fit)",
+  tvFavOverflow:"⭐ Favorites that don't fit on the buttons (buttons: {m}, favorites: {n})",
+  tvNoFavShort:"⭐ No favorites yet",
+  tvSongPlay:"▶◀ Let ◀▶ change songs while playing",
+  tvSongPlayHint:"Off by default. When on, pressing ◀▶ during play stops the current run and switches to that song (the run is not recorded).",
+  tvSongPlayOn:"▶◀ You can change songs while playing", tvSongPlayOff:"▶◀ Songs stay locked while playing",
+  tvSongSkip:"♪ Switched to {t}",
   tvNoFav:"No favorites yet. Long-press a button to save the current video filter.",
   tvMore:"⚙ More video settings",
   tvReset:"↺ Reset TV settings", tvResetDone:"TV settings reset",
@@ -139,8 +278,8 @@ Object.assign(TEXT.en, {
   tvNeedOn:"Pick a video filter first (not Off)",
   tvSaved:"Saved “{name}” to button {n}",
   tvSkinLabel:"TV device skin", tvFive:"Use 5 buttons on every skin",
-  tvOrderLabel:"Dock order", tvOrderTvFirst:"📺 TV on top, 🎛 Audio below (natural)", tvOrderFxFirst:"🎛 Audio on top, 📺 TV below",
-  tvOrderHint:"It's natural to have the TV above the audio system, so TV on top is the default. Swap if you like.",
+  tvOrderLabel:"Dock order", tvOrderTvFirst:"📺 TV on top, 🎛 Rack below (natural)", tvOrderFxFirst:"🎛 Rack on top, 📺 TV below",
+  tvOrderHint:"Default order: TV →(favorites)→ rack →(favorites)→ TV options → rack options. You can swap the TV and the rack (the option boxes always stay below).",
   tvOverlay:"📺 Show video overlays (scanlines, letterbox, noise…)",
   tvOverlayHint:"CRT, VHS, cinema etc. add scanlines, grain, letterbox bars for atmosphere.",
   tvQuick:"📺 Video", tvOff:"📺 OFF",
@@ -149,12 +288,31 @@ Object.assign(TEXT.en, {
   tvSearch:"🔍 Search video filters", tvNoMatch:"No matches.", tvHits:"{n} found",
   tvDim:"Background dim", tvBlur:"Background blur",
   tvCurrent:"Current: {name}",
-  tvPrev:"Prev video", tvNext:"Next video", tvRandom:"Random"
+  tvPrev:"Prev video", tvNext:"Next video", tvRandom:"Random",
+  tvPrevSong:"◀ Previous song", tvNextSong:"▶ Next song", tvNoSongs:"No songs",
+  /* 🆕 menu mp4 playback + Preview tab */
+  tvpTabSetup:"🎛 TV setup", tvpTabPreview:"🖼 Video check",
+  tvpPreviewHint:"Check the current filter, TV skin, dim and blur right here. Pick a song and its mp4 plays in this box (same framing as in game).",
+  tvpNoVideo:"No video yet. Pick a song and it plays here.",
+  tvpOff:"Video is off (use ⏻ or choose “Off” in the filter list).",
+  tvpNow:"Now showing: {name}",
+  tvpMenuPreview:"🖼 Show the video on the TV in song select",
+  tvpMenuPreviewHint:"Plays the current mp4 inside the TV dock's screen. Turn off if the motion bothers you.",
+  tvpMenuVideo:"🎬 Play video in the menu even when sound previews are off (muted)",
+  tvpMenuVideoHint:"When “Play song previews in song select” is on, that one (with sound) takes priority.",
+  tvpPower:"⏻ Video on/off"
 });
 Object.assign(TEXT.zh, {
   tvTitle:"📺 电视（视频输出）",
-  tvMoreTitle:"📺 详细（视频・电视皮肤・顺序）",
+  tvMoreTitle:"📺 详细（设置与画面确认）",
   tvFavLabel:"⭐ 按钮放不下的收藏",
+  tvFavLabelN:"⭐ 收藏 {n}个（这台电视有 {m} 个按钮，全部放得下）",
+  tvFavOverflow:"⭐ 按钮放不下的收藏（按钮 {m}个、收藏 {n}个）",
+  tvNoFavShort:"⭐ 还没有收藏",
+  tvSongPlay:"▶◀ 演奏中也可以用 ◀▶ 换曲",
+  tvSongPlayHint:"默认关闭。开启后，演奏中按 ◀▶ 会结束当前演奏并切到那首歌（不会记录成绩）。",
+  tvSongPlayOn:"▶◀ 已允许演奏中换曲", tvSongPlayOff:"▶◀ 演奏中不会换曲",
+  tvSongSkip:"♪ 已切到 {t}",
   tvNoFav:"还没有收藏。长按按钮即可登记当前视频滤镜。",
   tvMore:"⚙ 视频详细设置",
   tvReset:"↺ 重置电视设置", tvResetDone:"已重置电视设置",
@@ -169,8 +327,8 @@ Object.assign(TEXT.zh, {
   tvNeedOn:"请先选择视频滤镜（非隐藏）",
   tvSaved:"已将“{name}”登记到 {n} 号",
   tvSkinLabel:"电视机身皮肤", tvFive:"所有皮肤都用5个按钮",
-  tvOrderLabel:"Dock 顺序", tvOrderTvFirst:"📺 电视在上、🎛 音频在下（自然）", tvOrderFxFirst:"🎛 音频在上、📺 电视在下",
-  tvOrderHint:"电视在音响上面是比较自然的结构，默认电视在上。可按喜好调换。",
+  tvOrderLabel:"Dock 顺序", tvOrderTvFirst:"📺 电视在上、🎛 机架在下（自然）", tvOrderFxFirst:"🎛 机架在上、📺 电视在下",
+  tvOrderHint:"默认顺序：电视 →（收藏）→ 机架 →（收藏）→ 电视详细 → 机架详细。电视与机架可以互换（详细选项始终在下方）。",
   tvOverlay:"📺 显示视频叠加（扫描线・黑边・噪点等）",
   tvOverlayHint:"CRT、VHS、影院等滤镜会叠加扫描线、颗粒、黑边等效果。",
   tvQuick:"📺 视频", tvOff:"📺 关闭",
@@ -179,12 +337,31 @@ Object.assign(TEXT.zh, {
   tvSearch:"🔍 搜索视频滤镜", tvNoMatch:"没有结果。", tvHits:"找到{n}个",
   tvDim:"背景暗度", tvBlur:"背景模糊",
   tvCurrent:"当前视频：{name}",
-  tvPrev:"上一个视频", tvNext:"下一个视频", tvRandom:"随机"
+  tvPrev:"上一个视频", tvNext:"下一个视频", tvRandom:"随机",
+  tvPrevSong:"◀ 上一首", tvNextSong:"▶ 下一首", tvNoSongs:"没有歌曲",
+  /* 🆕 菜单中播放mp4 + 「确认」标签页 */
+  tvpTabSetup:"🎛 电视设置", tvpTabPreview:"🖼 画面确认",
+  tvpPreviewHint:"可在此确认当前的滤镜、电视皮肤、暗度和模糊。选一首歌后，其mp4会在这里播放（与游戏画面相同的取景）。",
+  tvpNoVideo:"还没有画面。选一首歌后就会在这里播放。",
+  tvpOff:"画面已关闭（用⏻ 或在滤镜中选“隐藏”即可恢复）。",
+  tvpNow:"当前画面：{name}",
+  tvpMenuPreview:"🖼 在选曲画面把视频映到电视上",
+  tvpMenuPreviewHint:"把正在播放的mp4映到选曲画面下方电视坞的屏幕上。觉得晃眼时可关闭。",
+  tvpMenuVideo:"🎬 即使关闭试听，也在菜单中播放视频（无声）",
+  tvpMenuVideoHint:"当设置里的“选曲时播放歌曲试听”开启时，优先使用那个（有声音）。",
+  tvpPower:"⏻ 画面开/关"
 });
 Object.assign(TEXT.ko, {
   tvTitle:"📺 TV (영상 출력)",
-  tvMoreTitle:"📺 자세히 (영상・TV 스킨・순서)",
+  tvMoreTitle:"📺 자세히 (설정과 영상 확인)",
   tvFavLabel:"⭐ 버튼에 다 들어가지 않는 즐겨찾기",
+  tvFavLabelN:"⭐ 즐겨찾기 {n}개 (이 TV 버튼은 {m}개 · 전부 들어갑니다)",
+  tvFavOverflow:"⭐ 버튼에 다 안 들어가는 즐겨찾기 (버튼 {m}개 · 즐겨찾기 {n}개)",
+  tvNoFavShort:"⭐ 즐겨찾기가 없습니다",
+  tvSongPlay:"▶◀ 연주 중에도 ◀▶로 곡 바꾸기",
+  tvSongPlayHint:"기본은 꺼짐. 켜면 연주 중 ◀▶를 눌렀을 때 지금 플레이를 닫고 그 곡으로 넘어갑니다(기록은 남지 않습니다).",
+  tvSongPlayOn:"▶◀ 연주 중에도 곡을 바꿀 수 있습니다", tvSongPlayOff:"▶◀ 연주 중에는 곡을 바꾸지 않습니다",
+  tvSongSkip:"♪ {t}(으)로 바꿨습니다",
   tvNoFav:"아직 즐겨찾기가 없습니다. 버튼을 길게 누르면 현재 영상을 등록할 수 있습니다.",
   tvMore:"⚙ 영상 자세한 설정",
   tvReset:"↺ TV 설정 초기화", tvResetDone:"TV 설정을 초기화했습니다",
@@ -199,8 +376,8 @@ Object.assign(TEXT.ko, {
   tvNeedOn:"먼저 영상 필터를 골라 주세요 (끄기 제외)",
   tvSaved:"{n}번에 '{name}'을(를) 등록했습니다",
   tvSkinLabel:"TV 본체 스킨", tvFive:"모든 스킨을 5버튼으로",
-  tvOrderLabel:"Dock 순서", tvOrderTvFirst:"📺 TV가 위, 🎛 오디오가 아래 (자연스러움)", tvOrderFxFirst:"🎛 오디오가 위, 📺 TV가 아래",
-  tvOrderHint:"사회적으로 TV 아래에 오디오 기기가 있는 것이 자연스러워 기본은 TV가 위입니다. 취향에 따라 바꾸세요.",
+  tvOrderLabel:"Dock 순서", tvOrderTvFirst:"📺 TV가 위, 🎛 랙이 아래 (자연스러움)", tvOrderFxFirst:"🎛 랙이 위, 📺 TV가 아래",
+  tvOrderHint:"기본 순서: TV →(즐겨찾기)→ 랙 →(즐겨찾기)→ TV 자세히 → 랙 자세히. TV와 랙만 서로 바꿀 수 있습니다(자세히는 항상 아래).",
   tvOverlay:"📺 영상 오버레이 표시 (주사선・레터박스・노이즈 등)",
   tvOverlayHint:"CRT나 VHS, 시네마 등은 주사선이나 필름 그레인, 흑색 바 등을 겹쳐 분위기를 냅니다.",
   tvQuick:"📺 영상", tvOff:"📺 OFF",
@@ -209,7 +386,19 @@ Object.assign(TEXT.ko, {
   tvSearch:"🔍 영상 필터 검색", tvNoMatch:"결과가 없습니다.", tvHits:"{n}개 찾음",
   tvDim:"배경 어둡기", tvBlur:"배경 흐림",
   tvCurrent:"현재 영상: {name}",
-  tvPrev:"이전 영상", tvNext:"다음 영상", tvRandom:"랜덤"
+  tvPrev:"이전 영상", tvNext:"다음 영상", tvRandom:"랜덤",
+  tvPrevSong:"◀ 이전 곡", tvNextSong:"▶ 다음 곡", tvNoSongs:"곡이 없습니다",
+  /* 🆕 메뉴에서 mp4 재생 + 「확인」 탭 */
+  tvpTabSetup:"🎛 TV 설정", tvpTabPreview:"🖼 영상 확인",
+  tvpPreviewHint:"지금 고른 필터·TV 스킨·어둡기·흐림을 이 화면에서 확인할 수 있습니다. 곡을 고르면 그 mp4가 여기서 재생됩니다(게임 화면과 같은 구도).",
+  tvpNoVideo:"아직 영상이 없습니다. 곡을 고르면 여기서 재생됩니다.",
+  tvpOff:"영상이 꺼져 있습니다(⏻ 또는 필터에서 “숨기기”를 고르면 돌아옵니다).",
+  tvpNow:"지금 영상: {name}",
+  tvpMenuPreview:"🖼 곡 선택 화면의 TV에 영상 비추기",
+  tvpMenuPreviewHint:"재생 중인 mp4를 곡 선택 화면 아래 TV 독 화면에 비춥니다. 움직임이 신경 쓰이면 끄세요.",
+  tvpMenuVideo:"🎬 미리듣기가 꺼져 있어도 메뉴에서 영상을 재생합니다(무음)",
+  tvpMenuVideoHint:"설정의 “곡 선택 중 미리듣기 재생”이 켜져 있으면 그쪽(소리 있음)을 우선합니다.",
+  tvpPower:"⏻ 영상 켜기/끄기"
 });
 
 /* ============ 映像フィルターの取得 ============ */
@@ -535,41 +724,103 @@ function togglePause() {
 }
 
 /* ============ 並び順の制御 ============ */
-function applyOrder() {
+function dockParts() {
   const tvDock = document.getElementById("tvDock");
   const fxDock = document.getElementById("fxDock");
   const col = document.querySelector(".songCol");
+  /* 「くわしい」（details）は、ドックの中にあることも、列の下のほうにあることもある。
+     どちらでも見つけられるようにしておく（2回目以降の整列で迷子にならないため）。 */
+  const pick = (dock, cls) => {
+    if (dock) { const inside = [...dock.children].find(c => c.tagName === "DETAILS"); if (inside) return inside; }
+    return col ? col.querySelector(":scope > details." + cls) : null;
+  };
+  return { tvDock, fxDock, col, tvMore: pick(tvDock, "tvMore"), fxMore: pick(fxDock, "dockMore") };
+}
+/* ならべ方（デフォルト）：
+     TV →（お気に入り）→ ラック →（お気に入り）→ TVくわしい → ラックくわしい
+   ・「くわしい」は、それぞれのドックの外へ出して列の下のほうに並べる
+   ・壁掛けTVのときは、本体だけヘッダーへ移す（お気に入りとくわしいは列に残す） */
+function applyOrder() {
+  const col = document.querySelector(".songCol");
   const head = document.querySelector("#selectScreen .head");
-  if (!tvDock) return;
-  // 壁掛けテレビはヘッダーに移動（タイトルの横の空きスペース）
+  const { tvDock, fxDock, tvMore, fxMore } = dockParts();
+  if (!col || tvDock !== document.getElementById("tvDock")) return;   // ドックが無い（または別物）ときは何もしない
+
   if (settings.tvDockSkin === "wall") {
-    if (head && tvDock.parentElement !== head) {
-      head.appendChild(tvDock);
-      tvDock.classList.add("wall-mounted");
-    } else if (head) {
-      tvDock.classList.add("wall-mounted");
-    }
-    return;
+    if (head && tvDock.parentElement !== head) head.appendChild(tvDock);
+    tvDock.classList.add("wall-mounted");
   } else {
     tvDock.classList.remove("wall-mounted");
-    // 通常は songCol に戻す
-    if (col && tvDock.parentElement !== col) {
-      // fxDock が col にある場合はその前に、なければ末尾に
-      if (fxDock && fxDock.parentElement === col) {
-        if (settings.tvOrder === "tv-first") col.insertBefore(tvDock, fxDock);
-        else col.appendChild(tvDock);
-      } else {
-        col.appendChild(tvDock);
-      }
-    }
-    if (!fxDock || !col) return;
-    if (settings.tvOrder === "tv-first") {
-      if (tvDock.nextSibling !== fxDock) col.insertBefore(tvDock, fxDock);
-    } else {
-      if (fxDock.nextSibling !== tvDock) col.insertBefore(fxDock, tvDock);
-    }
+    if (tvDock.parentElement !== col) col.appendChild(tvDock);   // ヘッダーから列へ戻す
+  }
+
+  const tvFirst = settings.tvOrder !== "fx-first";
+  const list = [];
+  if (settings.tvDockSkin !== "wall") list.push(tvFirst ? tvDock : fxDock, tvFirst ? fxDock : tvDock);
+  else list.push(fxDock);
+  list.push(tvFirst ? tvMore : fxMore, tvFirst ? fxMore : tvMore);
+
+  const seq = list.filter(Boolean);
+  let anchor = seq[0];
+  if (!anchor || anchor.parentElement !== col) return;
+  for (let i = 1; i < seq.length; i++) { anchor.after(seq[i]); anchor = seq[i]; }   // after() は既存要素の移動になる
+}
+
+/* ============ 🎬🖼 選曲中にmp4を流す（メニュー再生・確認用の描画） ============
+   注意：ドックを組み立てている中のスコープでは const screen（TV画面のdiv）が
+   core.js の画面名（"select" / "settings"）を隠してしまうので、画面名はこの関数で読む */
+const screenName = () => (typeof screen === "string" ? screen : "");
+
+/* ・音は出さない。音ありのプレビュー（settings.previewEnabled）がオンのときは、そちらを優先する
+   ・fit:"contain" はゲーム画面と同じ（黒帯つきで全体を映す）／fit:"cover" はTVの画面いっぱい（はみ出しは切る） */
+function paintVideoFrame(ctx, W, H, fit) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.filter = "none";
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, W, H);
+  if (!videoReady || !video.videoWidth || settings.videoStyle === "off") return false;
+  const vw = video.videoWidth, vh = video.videoHeight;
+  const s = (fit === "cover" ? Math.max : Math.min)(W / vw, H / vh);
+  const dw = vw * s, dh = vh * s;
+  try { ctx.filter = newVideoFilter(); } catch (_) {}
+  try { ctx.drawImage(video, (W - dw) / 2, (H - dh) / 2, dw, dh); } catch (_) { return false; }
+  ctx.filter = "none";
+  const preset = currentTvPreset();
+  drawTvOverlay(ctx, W, H, (preset && preset.overlay) || tvFilterBase().overlay || null);
+  return true;
+}
+
+/* 「🎬 音のプレビューがオフでも、メニューで映像を再生する」の中身 */
+let menuMutedByUs = false, menuPlayingByUs = false;
+function menuVideoWanted() {
+  return settings.tvMenuVideo === true && settings.previewEnabled !== true &&
+    phase === "title" && screen === "select" && !document.hidden && videoReady && !!video.src;
+}
+function menuVideoTick() {
+  if (!menuVideoWanted()) {
+    if (menuPlayingByUs) { try { video.pause(); } catch (_) {} menuPlayingByUs = false; }
+    if (menuMutedByUs) { video.muted = false; menuMutedByUs = false; }
+    return;
+  }
+  if (video.paused) {
+    if (!video.muted) { video.muted = true; menuMutedByUs = true; }
+    video.play().then(() => { menuPlayingByUs = true; }).catch(() => {});
+  } else {
+    menuPlayingByUs = false;   // 誰かが再生している場合は、止めるときも触らない
   }
 }
+video.addEventListener("ended", () => {
+  if (!menuVideoWanted()) return;
+  try { video.currentTime = (typeof previewStartFor === "function") ? previewStartFor() : 0; } catch (_) {}
+  video.play().catch(() => {});
+});
+document.addEventListener("visibilitychange", menuVideoTick);
+on("screen", menuVideoTick);
+on("phase", menuVideoTick);
+video.addEventListener("canplay", menuVideoTick);
+video.addEventListener("loadeddata", menuVideoTick);
+video.addEventListener("play", menuVideoTick);   // 「pause」は見ない（⏯で止めたものを勝手に戻さないため）
 
 /* ============ 画面の組み立て ============ */
 addEventListener("DOMContentLoaded", () => {
@@ -610,12 +861,17 @@ addEventListener("DOMContentLoaded", () => {
   const pow = btn("tvKey tvPow", powLed, el("span", "", "⏻"));
   const pauseBtn = btn("tvKey tvPause", pauseLed, el("span", "", "⏯"));
   const lcd = el("div", "tvLcd");
-  const top = el("div", "tvTop"); top.append(pow, lcd, pauseBtn);
+  /* 🆕 ◀ ▶ の物理ボタン：選曲リストの前の曲・次の曲へ（テレビのチャンネル送りみたいに） */
+  const prevSongBtn = btn("tvKey tvSong", el("span", "", "◀"));
+  const nextSongBtn = btn("tvKey tvSong", el("span", "", "▶"));
+  const top = el("div", "tvTop"); top.append(pow, prevSongBtn, lcd, nextSongBtn, pauseBtn);
   const screenWrap = el("div", "tvScreenWrap");
   const screen = el("div", "tvScreen");
   const screenGlare = el("i", "tvGlare");
   const speaker = el("div", "tvSpeaker");
-  screen.append(screenGlare);
+  /* 🆕 選曲中は、この画面に流れているmp4を映す（paintVideoFrame が描く） */
+  const liveCanvas = document.createElement("canvas"); liveCanvas.className = "tvLive";
+  screen.append(liveCanvas, screenGlare, el("i", "tvScanlines"));   // 走査線はカスタムTVスキン用（[data-scan="1"] のときだけ出る）
   screenWrap.append(screen, speaker);
   const deco = el("div", "tvDeco");
   const slots = el("div", "tvSlots");
@@ -626,6 +882,8 @@ addEventListener("DOMContentLoaded", () => {
 
   const overLabel = tx("div", "tvFavLabel", "hint");
   const overflow = el("div", "tvFavRow");
+  /* ⭐ フォルダのチップ（1軍／2軍／🧊フリーズ／📤元お気に入り。中身は js/favs.js が作る） */
+  const favChips = el("div", "favChipsWrap");
 
   const body = el("details", "panel tvMore"); body.open = settings.tvDockOpen;
   body.addEventListener("toggle", () => { settings.tvDockOpen = body.open; saveUserPrefs(); });
@@ -649,6 +907,16 @@ addEventListener("DOMContentLoaded", () => {
   skinRow.append(tx("span","tvSkinLabel"), skinSel);
   skinSel.addEventListener("change", () => { settings.tvDockSkin = skinSel.value; saveUserPrefs(); render(true); });
 
+  // 🎨 カスタムTVスキンのエディタを開く
+  const makerBtn = tx("button","tvMakerOpen","fxMini slim"); makerBtn.type = "button";
+  makerBtn.addEventListener("click", () => {
+    openSettings();
+    const mk = document.getElementById("tvMaker");
+    if (!mk) return;
+    mk.open = true;
+    setTimeout(() => mk.scrollIntoView({behavior:"smooth", block:"center"}), 50);
+  });
+
   const five = (() => {
     const lab = el("label","check"), inp = document.createElement("input");
     inp.type = "checkbox"; lab.append(inp, tx("span","tvFive"));
@@ -670,6 +938,20 @@ addEventListener("DOMContentLoaded", () => {
     return { lab, inp };
   })();
 
+  /* 🆕 演奏中も ◀▶ で曲を変える（初期オフ。使いたい人だけオンにする） */
+  const songPlayCheck = (() => {
+    const lab = el("label","check"), inp = document.createElement("input");
+    inp.type = "checkbox"; inp.id = "tvSongWhilePlaying";
+    lab.append(inp, tx("span","tvSongPlay"));
+    inp.addEventListener("change", () => {
+      settings.tvSongWhilePlaying = inp.checked;
+      saveUserPrefs();
+      lcdFlash(tr(inp.checked ? "tvSongPlayOn" : "tvSongPlayOff"));
+      render();
+    });
+    return { lab, inp };
+  })();
+
   const moreBtn = tx("button","tvMore","fxMini"); moreBtn.type = "button";
   moreBtn.addEventListener("click", () => {
     openSettings();
@@ -688,8 +970,10 @@ addEventListener("DOMContentLoaded", () => {
     settings.tvOrder = "tv-first";
     settings.tvOverlay = true;
     settings.tvPowerPrev = "color";
+    settings.tvMenuPreview = true; settings.tvMenuVideo = false;
     if (typeof view !== "undefined") view.style.filter = newVideoFilter();
     saveUserPrefs();
+    menuVideoTick();
     const vs = document.getElementById("videoStyle");
     if (vs) vs.value = settings.videoStyle;
     if (typeof dimInp !== "undefined") { dimInp.value = 0; blurInp.value = 0; }
@@ -698,9 +982,115 @@ addEventListener("DOMContentLoaded", () => {
     applyOrder();
   });
 
-  body.append(tx("summary","tvMoreTitle"), quickRow, dimRow, blurRow, tx("div","tvOverlayHint","hint"), overlayCheck.lab, skinRow, five.lab, orderRow, tx("div","tvOrderHint","hint"), el("div","miniActions", moreBtn, resetBtn));
+  /* ---- 🎛 設定 / 🖼 確認 のタブと中身 ---- */
+  const tabsBar = el("div", "seg tvTabs");
+  const tabSetup = btn("");
+  const tabPrev = btn("");
+  const setLabel = (node, key) => { node.textContent = tr(key); node.dataset.i18n = key; };
+  setLabel(tabSetup, "tvpTabSetup"); setLabel(tabPrev, "tvpTabPreview");
+  tabsBar.append(tabSetup, tabPrev);
 
-  dock.append(dev, overLabel, overflow, body);
+  const paneSetup = el("div", "tvPane");
+  paneSetup.append(tx("div","tvOverlayHint","hint"), overlayCheck.lab, five.lab, orderRow,
+    tx("div","tvOrderHint","hint"), songPlayCheck.lab, tx("div","tvSongPlayHint","hint"),
+    el("div","miniActions", makerBtn, moreBtn, resetBtn));
+
+  const pvWrap = el("div", "tvpWrap");
+  const pvCanvas = document.createElement("canvas"); pvCanvas.className = "tvpCanvas";
+  pvCanvas.width = 1920; pvCanvas.height = 1080;
+  const pvChip = el("div", "tvpChip");
+  pvWrap.append(pvCanvas, pvChip);
+
+  const menuPrevCheck = (() => {
+    const lab = el("label","check"), inp = document.createElement("input");
+    inp.type = "checkbox"; lab.append(inp, tx("span","tvpMenuPreview"));
+    inp.addEventListener("change", () => { settings.tvMenuPreview = inp.checked; saveUserPrefs(); render(); });
+    return { lab, inp };
+  })();
+  const menuVidCheck = (() => {
+    const lab = el("label","check"), inp = document.createElement("input");
+    inp.type = "checkbox"; lab.append(inp, tx("span","tvpMenuVideo"));
+    inp.addEventListener("change", () => { settings.tvMenuVideo = inp.checked; saveUserPrefs(); menuVideoTick(); render(); });
+    return { lab, inp };
+  })();
+  const pvPower = btn("fxMini", tr("tvpPower")); pvPower.dataset.i18n = "tvpPower";
+  pvPower.addEventListener("click", () => { togglePower(); render(); });
+
+  const panePreview = el("div", "tvPane");
+  panePreview.append(pvWrap, tx("div","tvpPreviewHint","hint"), menuPrevCheck.lab, tx("div","tvpMenuPreviewHint","hint"),
+    menuVidCheck.lab, tx("div","tvpMenuVideoHint","hint"), el("div","miniActions", pvPower, moreBtn));
+
+  let tab = "setup", pvRaf = 0, pvMutedByUs = false, pvPlayedByUs = false;
+  const previewOn = () => tab === "preview" && !panePreview.hidden && body.open && !document.hidden &&
+    phase === "title" && screenName() === "select";
+  function pvChipText() {
+    if (settings.videoStyle === "off") { pvChip.textContent = tr("tvOff"); return; }
+    pvChip.textContent = tr("tvpNow", { name: names()[settings.videoStyle] || settings.videoStyle });
+  }
+  function pvPlaceholder(ctx, text) {
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.filter = "none"; ctx.globalAlpha = 1;
+    ctx.fillStyle = "#000"; ctx.fillRect(0, 0, 1920, 1080);
+    ctx.fillStyle = "rgba(255,255,255,.82)";
+    ctx.font = `600 56px ${FONT_DEFAULT}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(text, 960, 540);
+  }
+  function pvFrame() {
+    pvRaf = requestAnimationFrame(pvFrame);
+    const ctx = pvCanvas.getContext("2d"); if (!ctx) return;
+    if (settings.videoStyle === "off") { pvPlaceholder(ctx, tr("tvpOff")); return; }
+    if (!paintVideoFrame(ctx, 1920, 1080, "contain")) pvPlaceholder(ctx, tr("tvpNoVideo"));
+  }
+  /* 「確認」タブを開いている間は、止まっていたら（音なしで）動かす */
+  function pvKeepPlaying() {
+    if (!previewOn() || settings.previewEnabled) return;
+    if (video.paused && videoReady) {
+      if (!video.muted) { video.muted = true; pvMutedByUs = true; }
+      video.play().then(() => { pvPlayedByUs = true; }).catch(() => {});
+    }
+  }
+  function pvRelease() {
+    if (settings.tvMenuVideo === true) return;   // メニュー再生が続くので触らない
+    if (pvPlayedByUs) { try { video.pause(); } catch (_) {} pvPlayedByUs = false; }
+    if (pvMutedByUs) { video.muted = false; pvMutedByUs = false; }
+  }
+  function previewTick() {
+    pvChipText();
+    if (previewOn()) {
+      if (!pvRaf) pvRaf = requestAnimationFrame(pvFrame);
+      pvKeepPlaying();
+    } else {
+      if (pvRaf) { cancelAnimationFrame(pvRaf); pvRaf = 0; }
+      pvRelease();
+    }
+  }
+  function showTab(which) {
+    tab = which === "preview" ? "preview" : "setup";
+    paneSetup.hidden = tab !== "setup";
+    panePreview.hidden = tab !== "preview";
+    tabSetup.classList.toggle("selected", tab === "setup");
+    tabPrev.classList.toggle("selected", tab === "preview");
+    tabSetup.setAttribute("aria-pressed", String(tab === "setup"));
+    tabPrev.setAttribute("aria-pressed", String(tab === "preview"));
+    previewTick();
+  }
+  tabSetup.addEventListener("click", () => showTab("setup"));
+  tabPrev.addEventListener("click", () => showTab("preview"));
+  body.addEventListener("toggle", previewTick);
+  video.addEventListener("ended", () => {
+    if (!previewOn() || !pvPlayedByUs) return;   // 音ありプレビューが動かしている場合は library.js に任せる
+    try { video.currentTime = (typeof previewStartFor === "function") ? previewStartFor() : 0; } catch (_) {}
+    video.play().catch(() => {});
+  });
+  document.addEventListener("visibilitychange", previewTick);
+  video.addEventListener("play", previewTick);
+  video.addEventListener("pause", previewTick);
+  video.addEventListener("canplay", previewTick);
+  showTab("setup");
+
+  body.append(tx("summary","tvMoreTitle"), quickRow, skinRow, dimRow, blurRow, tabsBar, paneSetup, panePreview);
+
+  dock.append(dev, favChips, overLabel, overflow, body);
   col.append(dock);
 
   // 液晶フラッシュ
@@ -715,12 +1105,37 @@ addEventListener("DOMContentLoaded", () => {
     togglePause();
     lcdFlash(tr("tvPause"));
   });
+  /* ◀ ▶：選曲リストを前へ・次へ（ラジオのチャンネル送りみたいに）
+     曲の選び方は library.js の nextSong() / prevSong() に任せる（ラジオと同じ並び） */
+  const songStep = async dir => {
+    const playing = phase !== "title";
+    if (playing && !settings.tvSongWhilePlaying) return;        // 初期オフ（ゲーム中は曲が飛ばない）
+    const pickSong = dir > 0 ? (typeof nextSong === "function" ? nextSong : null)
+                             : (typeof prevSong === "function" ? prevSong : null);
+    const it = pickSong ? pickSong() : null;
+    if (!it) { lcdFlash(tr("tvNoSongs")); return; }
+    if (typeof selectSong !== "function") return;
+    if (playing) {
+      /* 演奏中に切り替える設定のとき：いまのプレイを閉じて、選曲画面でその曲を選び直す */
+      lcdFlash(tr("tvSongSkip", { t:String(it.title || "").slice(0, 24) }));
+      try { if (typeof toTitle === "function") toTitle(); } catch (_) {}
+    } else {
+      lcdFlash("♪ " + String(it.title || "").slice(0, 36));
+    }
+    await selectSong(it);
+    render();
+  };
+  prevSongBtn.addEventListener("click", () => songStep(-1));
+  nextSongBtn.addEventListener("click", () => songStep(1));
   video.addEventListener("play", () => render());
   video.addEventListener("pause", () => render());
   rTv.addEventListener("click", () => randomTv());
   rFav.addEventListener("click", () => {
-    const list = (settings.tvFav || []).filter(id => id !== settings.videoStyle && tvPresetById(id) && !tvPresetById(id).off);
+    const F = window.TrkFavs;
+    const src = F ? F.pool("tv") : (settings.tvFav || []);
+    const list = src.filter(id => id !== settings.videoStyle && tvPresetById(id) && !tvPresetById(id).off);
     if (list.length) selectTv(list[Math.floor(Math.random()*list.length)]);
+    else lcdFlash(tr("tvNoFavShort"));
   });
   rPar.addEventListener("click", () => {
     const dim = Math.round(Math.random()*18)/20; // 0-0.9
@@ -736,11 +1151,22 @@ addEventListener("DOMContentLoaded", () => {
     if (settings.videoStyle === "off") { lcdFlash(tr("tvNeedOn")); return; }
     const id = settings.videoStyle;
     if (!tvPresetById(id) || tvPresetById(id).off) { lcdFlash(tr("tvNeedOn")); return; }
+    const F = window.TrkFavs;
+    if (F) {
+      /* ⭐ いま選んでいるフォルダ（1軍／2軍／🧊）へ入れる。上限なし。🧊は凍結中なら断る */
+      const g = ["main", "sub", "frozen"].includes(F.activeOf("tv")) ? F.activeOf("tv") : "main";
+      const r = F.add("tv", id, { group:g, index:i });
+      if (!r.ok) { lcdFlash(F.msg(r.why)); return; }
+      emit("language");
+      lcdFlash(tr("tvSaved", { n:i+1, name: tvPresetName(tvPresetById(id)) }));
+      render();
+      return;
+    }
     const arr = (settings.tvFav || []).filter(x => x !== id);
     arr.splice(Math.min(i, arr.length), 0, id);
-    settings.tvFav = arr.slice(0, TV_FAV_MAX);
+    settings.tvFav = arr;
     saveUserPrefs();
-    if (typeof emit === "function") emit("language"); // fx側と同様に再描画
+    if (typeof emit === "function") emit("language");
     lcdFlash(tr("tvSaved", { n:i+1, name: tvPresetName(tvPresetById(id)) }));
     render();
   }
@@ -839,19 +1265,44 @@ addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /* ---- ドックの画面に映像を映す（実際の大きさに合わせて描く） ---- */
+  let liveRaf = 0;
+  function liveFrame() {
+    liveRaf = requestAnimationFrame(liveFrame);
+    const w = liveCanvas.clientWidth, h = liveCanvas.clientHeight;
+    if (!w || !h) return;
+    const dpr = Math.min(2, (typeof devicePixelRatio === "number" ? devicePixelRatio : 1));
+    const W = Math.max(2, Math.round(w * dpr)), H = Math.max(2, Math.round(h * dpr));
+    if (liveCanvas.width !== W || liveCanvas.height !== H) { liveCanvas.width = W; liveCanvas.height = H; }
+    const ctx = liveCanvas.getContext("2d"); if (!ctx) return;
+    paintVideoFrame(ctx, W, H, "cover");
+  }
+  function startLive() { if (!liveRaf) liveRaf = requestAnimationFrame(liveFrame); }
+  function stopLive() { if (liveRaf) { cancelAnimationFrame(liveRaf); liveRaf = 0; } }
+
   let lastSkin = "";
   function render(skinChanged) {
     const nm = names();
-    dock.dataset.skin = settings.tvDockSkin;
+    // 知らないスキン名（古い設定・壊れた設定ファイル）は家庭用テレビとして描く
+    const skinId = TV_DOCK_SKINS[settings.tvDockSkin] ? settings.tvDockSkin : "home";
+    dock.dataset.skin = skinId;
+    applyTvSkinVars(dock, skinId);
     dock.classList.toggle("off", settings.videoStyle === "off");
     dock.classList.toggle("playing", !video.paused && settings.videoStyle !== "off");
     if (skinChanged || lastSkin !== settings.tvDockSkin) { buildDeco(); lastSkin = settings.tvDockSkin; }
 
     const isOff = settings.videoStyle === "off";
+    /* 🖼 選曲中のTVに映像を映す（動いているときだけ） */
+    const liveOn = settings.tvMenuPreview !== false && !isOff && videoReady && !video.paused &&
+      phase === "title" && screenName() === "select";
+    screen.dataset.live = liveOn ? "1" : "0";
+    if (liveOn) startLive(); else stopLive();
     powLed.classList.toggle("on", !isOff);
     pauseLed.classList.toggle("on", !video.paused && !isOff);
     pow.title = tr("tvPower"); pow.setAttribute("aria-label", pow.title); pow.setAttribute("aria-pressed", String(!isOff));
     pauseBtn.title = tr("tvPause"); pauseBtn.setAttribute("aria-label", pauseBtn.title);
+    prevSongBtn.title = tr("tvPrevSong"); prevSongBtn.setAttribute("aria-label", prevSongBtn.title);
+    nextSongBtn.title = tr("tvNextSong"); nextSongBtn.setAttribute("aria-label", nextSongBtn.title);
 
     const curName = isOff ? tr("tvOff") : (nm[settings.videoStyle] || settings.videoStyle);
     lcd.textContent = flash && Date.now() < flash.until ? flash.text : curName + (isOff ? "" : (video.paused ? " ⏸" : " ▶"));
@@ -863,22 +1314,46 @@ addEventListener("DOMContentLoaded", () => {
 
     rTv.textContent = tr("tvRand"); rFav.textContent = tr("tvRandFav"); rPar.textContent = tr("tvRandParam");
 
-    // スロット
-    const fav = (settings.tvFav || []).filter(id => { const p = tvPresetById(id); return p && !p.off; });
+    // スロット（⭐いまのフォルダの中身。1軍＝これまでの settings.tvFav）
+    const F = window.TrkFavs;
+    const favGroup = F && ["main", "sub", "frozen"].includes(F.activeOf("tv")) ? F.activeOf("tv") : "main";
+    const favAll = F ? F.list("tv", favGroup) : (settings.tvFav || []);
+    const fav = favAll.filter(id => { const p = tvPresetById(id); return p && !p.off; });
     const n = tvSlotCount();
     slots.style.setProperty("--cols", tvSlotCols());
     slots.textContent = "";
     for (let i=0;i<n;i++) slots.append(slotButton(i, fav[i], nm[fav[i]]));
 
+    /* ⭐ フォルダのチップ（切り替えると、ボタンの中身が入れ替わる） */
+    if (F) {
+      favChips.textContent = "";
+      favChips.append(F.chips("tv", { former:true, onChange: () => render() }));
+    }
     overflow.textContent = "";
     const rest = fav.slice(n);
-    overLabel.hidden = !rest.length && fav.length > 0;
-    if (!fav.length) overflow.append(tx("div","tvNoFav","hint"));
+    /* フォルダ名と数、このTVのボタン数を出す（TVごとの持ちやすさが見える） */
+    if (!F) overLabel.textContent = rest.length ? tr("tvFavOverflow", { n: fav.length, m: n }) : tr("tvFavLabelN", { n: fav.length, m: n });
+    else {
+      const lock = F.locked("tv", favGroup) ? " 🔒" : "";
+      const former = F.count("tv", "former");
+      overLabel.textContent = tr("favHintDock", { g: F.label(favGroup) + lock, n: favAll.length, m: n })
+        + (former ? " ／ " + tr("favHintN", { g: F.label("former"), n: former }) : "");
+    }
+    overLabel.hidden = !favAll.length;
+    if (!favAll.length) overflow.append(tx("div","tvNoFav","hint"));
     for (const id of rest) {
       const on = settings.videoStyle === id;
-      const b = btn(on ? "selected" : "", "⭐" + (nm[id]||id));
+      const b = btn(on ? "selected" : "", "⭐" + (F && F.pinned("tv", id) ? "📌" : "") + (nm[id]||id));
       b.setAttribute("aria-pressed", String(on));
       b.addEventListener("click", () => { if (on) selectTv("off"); else selectTv(id); });
+      if (F) {
+        /* 長押しでメニュー（1軍／2軍／🧊／📌／外す） */
+        let t = 0, lng = false;
+        b.addEventListener("pointerdown", () => { lng = false; t = setTimeout(() => { lng = true; F.menu(b, "tv", id); }, TV_LONG_MS); });
+        for (const ev of ["pointerup","pointerleave","pointercancel"]) b.addEventListener(ev, () => clearTimeout(t));
+        b.addEventListener("click", e => { if (lng) { e.stopImmediatePropagation(); lng = false; } }, true);
+        b.addEventListener("contextmenu", e => { e.preventDefault(); F.menu(b, "tv", id); });
+      }
       overflow.append(b);
     }
 
@@ -906,6 +1381,9 @@ addEventListener("DOMContentLoaded", () => {
     five.inp.checked = settings.tvDockFive;
     orderSel.value = settings.tvOrder;
     overlayCheck.inp.checked = settings.tvOverlay;
+    songPlayCheck.inp.checked = !!settings.tvSongWhilePlaying;
+    menuPrevCheck.inp.checked = settings.tvMenuPreview !== false;
+    menuVidCheck.inp.checked = settings.tvMenuVideo === true;
 
     // スクリーンの見た目
     const curPreset = tvPresetById(settings.videoStyle);
@@ -927,9 +1405,11 @@ addEventListener("DOMContentLoaded", () => {
   const update = () => { if (queued) return; queued=true; requestAnimationFrame(()=>{ queued=false; render(); }); };
   const mo = new MutationObserver(update);
   if (vsSel) mo.observe(vsSel, { childList:true });
-  on("language", () => { update(); applyOrder(); });
+  on("language", () => { update(); applyOrder(); previewTick(); pvChipText(); });
   on("skin", update);
-  on("tvChange", update);
+  on("tvChange", () => { update(); applyOrder(); menuVideoTick(); previewTick(); });
+  on("phase", update);
+  on("screen", update);
 
   render(true);
   applyOrder();
@@ -941,10 +1421,192 @@ addEventListener("DOMContentLoaded", () => {
   if (typeof view !== "undefined") view.style.filter = newVideoFilter();
 });
 
+/* ============ 🎨 カスタムTVスキンのエディタ（設定画面の #tvMaker） ============
+   ・色6つ・形4つ・飾り1つ・質感3つを触って、自分のテレビを作る（プレビューはライブで更新）
+   ・保存すると trk_tv_skins_v1 に入り、TV_DOCK_SKINS に登録されてスキン一覧に出る
+   ・作ったTVは trk-tvskin（JSON）で書き出し・読み込みできる */
+Object.assign(TEXT.ja, {
+  tvmTitle:"🎨 カスタムTVスキン", tvmHint:"色・形・飾りを決めて、自分のテレビを作れます。保存するとTVドックのスキン一覧に「🎨 名前」で出てきます（最大30個）。",
+  tvmName:"名前", tvmColorHead:"色", tvmColorBody:"筐体", tvmColorBezel:"画面の枠", tvmColorScreen:"画面", tvmColorButton:"ボタン", tvmColorAccent:"アクセント", tvmColorText:"文字",
+  tvmShape:"形", tvmButtons:"ボタンの数", tvmCols:"ならべる列", tvmRadius:"角の丸み", tvmBezelW:"画面のふち",
+  tvmDeco:"飾り（物理デコ）", tvmDecoNone:"なし", tvmTex:"質感", tvmGlow:"光らせる（アクセント色）", tvmGlare:"ガラスの反射", tvmScan:"走査線",
+  tvmPreset:"ひな形", tvmPreview:"プレビュー", tvmOpen:"🎨 カスタムTVスキンを作る",
+  tvmSaved:"保存しました。TVドックに反映しました。", tvmExported:"trk-tvskin を書き出しました。", tvmImported:"読み込んで、TVドックに反映しました。",
+  tvmDeleted:"削除しました。TVは家庭用テレビに戻しました。", tvmLimit:"カスタムTVスキンは30個までです。", tvmBad:"TVスキンファイルの形式が正しくありません。",
+  tvmLocked:"内蔵のTVスキンは上書き・削除できません。「＋ 新規保存」で複製してください。", tvmLoaded:"選択中のカスタムTVを読み込みました。",
+  tvmPresetLoaded:"ひな形を読み込みました。色と形を変えて「＋ 新規保存」してください。", tvmConfirmDelete:"このカスタムTVスキンを削除しますか？"
+});
+Object.assign(TEXT.en, {
+  tvmTitle:"🎨 Custom TV skin", tvmHint:"Pick colors, shape and a prop to build your own TV. Saved TVs appear in the dock's skin list as “🎨 name” (up to 30).",
+  tvmName:"Name", tvmColorHead:"Colors", tvmColorBody:"Body", tvmColorBezel:"Bezel", tvmColorScreen:"Screen", tvmColorButton:"Buttons", tvmColorAccent:"Accent", tvmColorText:"Text",
+  tvmShape:"Shape", tvmButtons:"How many buttons", tvmCols:"Columns", tvmRadius:"Corner rounding", tvmBezelW:"Screen frame",
+  tvmDeco:"Prop (physical deco)", tvmDecoNone:"None", tvmTex:"Texture", tvmGlow:"Glow (accent color)", tvmGlare:"Glass glare", tvmScan:"Scanlines",
+  tvmPreset:"Template", tvmPreview:"Preview", tvmOpen:"🎨 Make a custom TV skin",
+  tvmSaved:"Saved and applied to the TV dock.", tvmExported:"Exported a trk-tvskin file.", tvmImported:"Imported and applied to the TV dock.",
+  tvmDeleted:"Deleted. The TV is back to the Home TV.", tvmLimit:"You can have up to 30 custom TV skins.", tvmBad:"Invalid TV skin file.",
+  tvmLocked:"Built-in TV skins can't be overwritten or deleted. Use “＋ Save as new” to copy one.", tvmLoaded:"Loaded the selected custom TV.",
+  tvmPresetLoaded:"Template loaded. Tweak it and use “＋ Save as new”.", tvmConfirmDelete:"Delete this custom TV skin?"
+});
+Object.assign(TEXT.zh, {
+  tvmTitle:"🎨 自定义电视皮肤", tvmHint:"选择颜色、形状和装饰，做一台自己的电视。保存后会以“🎨 名称”出现在电视坞的皮肤列表（最多30个）。",
+  tvmName:"名称", tvmColorHead:"颜色", tvmColorBody:"机身", tvmColorBezel:"边框", tvmColorScreen:"屏幕", tvmColorButton:"按钮", tvmColorAccent:"强调色", tvmColorText:"文字",
+  tvmShape:"形状", tvmButtons:"按钮数量", tvmCols:"列数", tvmRadius:"圆角", tvmBezelW:"屏幕边框",
+  tvmDeco:"装饰（实体道具）", tvmDecoNone:"无", tvmTex:"质感", tvmGlow:"发光（强调色）", tvmGlare:"玻璃反光", tvmScan:"扫描线",
+  tvmPreset:"模板", tvmPreview:"预览", tvmOpen:"🎨 制作自定义电视皮肤",
+  tvmSaved:"已保存，并应用到电视坞。", tvmExported:"已导出 trk-tvskin 文件。", tvmImported:"已导入并应用到电视坞。",
+  tvmDeleted:"已删除。电视已恢复为家用电视。", tvmLimit:"自定义电视皮肤最多30个。", tvmBad:"电视皮肤文件格式不正确。",
+  tvmLocked:"内置电视皮肤无法覆盖或删除，请用“＋ 另存为新皮肤”复制。", tvmLoaded:"已载入当前的自定义电视。",
+  tvmPresetLoaded:"已载入模板。调整颜色和形状后请用“＋ 另存为新皮肤”。", tvmConfirmDelete:"要删除这个自定义电视皮肤吗？"
+});
+Object.assign(TEXT.ko, {
+  tvmTitle:"🎨 커스텀 TV 스킨", tvmHint:"색·모양·장식을 골라 나만의 TV를 만들 수 있습니다. 저장하면 TV 독 스킨 목록에 “🎨 이름”으로 나타납니다 (최대 30개).",
+  tvmName:"이름", tvmColorHead:"색", tvmColorBody:"본체", tvmColorBezel:"베젤", tvmColorScreen:"화면", tvmColorButton:"버튼", tvmColorAccent:"강조색", tvmColorText:"글자",
+  tvmShape:"모양", tvmButtons:"버튼 개수", tvmCols:"열 수", tvmRadius:"모서리 둥글기", tvmBezelW:"화면 테두리",
+  tvmDeco:"장식(물리 데코)", tvmDecoNone:"없음", tvmTex:"질감", tvmGlow:"발광(강조색)", tvmGlare:"유리 반사", tvmScan:"주사선",
+  tvmPreset:"템플릿", tvmPreview:"미리보기", tvmOpen:"🎨 커스텀 TV 스킨 만들기",
+  tvmSaved:"저장했습니다. TV 독에 적용했습니다.", tvmExported:"trk-tvskin 파일을 내보냈습니다.", tvmImported:"가져와 TV 독에 적용했습니다.",
+  tvmDeleted:"삭제했습니다. TV는 가정용 TV로 돌아갔습니다.", tvmLimit:"커스텀 TV 스킨은 30개까지입니다.", tvmBad:"TV 스킨 파일 형식이 올바르지 않습니다.",
+  tvmLocked:"내장 TV 스킨은 덮어쓰기·삭제할 수 없습니다. “＋ 새로 저장”으로 복사하세요.", tvmLoaded:"선택한 커스텀 TV를 불러왔습니다.",
+  tvmPresetLoaded:"템플릿을 불러왔습니다. 색과 모양을 바꾼 뒤 “＋ 새로 저장”하세요.", tvmConfirmDelete:"이 커스텀 TV 스킨을 삭제할까요?"
+});
+
+(function setupTvMaker() {
+  const gid = id => document.getElementById(id);
+  addEventListener("DOMContentLoaded", () => {
+    const maker = gid("tvMaker"), preview = gid("tvmPreview");
+    if (!maker || !preview || maker.dataset.tvMakerReady) return;   // 二重初期化の防止
+    maker.dataset.tvMakerReady = "1";
+    const nm = gid("tvmName"), decoSel = gid("tvmDeco"), presetSel = gid("tvmPreset"), fileInput = gid("tvmImportFile");
+    const cols = Object.fromEntries(TV_COLOR_KEYS.map(k => [k, gid("tvmColor_" + k)]));
+    const rng = { n:gid("tvmN"), cols:gid("tvmCols"), radius:gid("tvmRadius"), bezel:gid("tvmBezel") };
+    const val = { n:gid("tvmNVal"), cols:gid("tvmColsVal"), radius:gid("tvmRadiusVal"), bezel:gid("tvmBezelVal") };
+    const tex = { glow:gid("tvmGlow"), glare:gid("tvmGlare"), scan:gid("tvmScan") };
+    const btnLoad = gid("tvmLoadBtn"), btnNew = gid("tvmSaveNewBtn"), btnOver = gid("tvmOverwriteBtn"),
+          btnExp = gid("tvmExportBtn"), btnDel = gid("tvmDeleteBtn");
+    if (!nm || !decoSel || !presetSel || Object.values(cols).some(n => !n)) return;
+
+    /* ---- プレビュー（TVドックと同じクラス名で小さく作る） ---- */
+    const pvDev = el("div","tvDev"), pvTop = el("div","tvTop"), pvWrap = el("div","tvScreenWrap");
+    const pvScreen = el("div","tvScreen"), pvDeco = el("div","tvDeco"), pvSlots = el("div","tvSlots");
+    pvTop.append(el("i","led tvLed on"), el("div","tvLcd","COLOR ▶"));
+    pvScreen.append(el("i","tvGlare"), el("i","tvScanlines"));
+    pvWrap.append(pvScreen, el("div","tvSpeaker on"));
+    pvDev.append(pvTop, pvWrap, pvDeco, pvSlots);
+    preview.append(pvDev);
+
+    function paintPreview(def) {
+      paintTvVars(preview, def);
+      const s = def.shape;
+      pvSlots.style.setProperty("--cols", s.cols);
+      pvSlots.textContent = "";
+      const samples = tvAllPresets().filter(p => !p.off).slice(0, s.n);
+      for (let i = 0; i < s.n; i++) {
+        const b = el("button", "tvKey" + (i === 0 ? " selected" : "")); b.type = "button";
+        b.append(el("span", "num", String(i + 1)), el("span", "nm", samples[i] ? tvPresetName(samples[i]) : "…"));
+        pvSlots.append(b);
+      }
+      pvDeco.className = "tvDeco";
+      pvDeco.hidden = !s.deco;
+      pvDeco.textContent = s.deco ? "🔧 " + tvDecoLabel(s.deco) : "";
+    }
+
+    /* ---- 読み書き ---- */
+    function readDef() {
+      const colors = {}; for (const k of TV_COLOR_KEYS) colors[k] = cols[k].value;
+      return sanitizeTvDef({ name:nm.value, colors, shape:{ n:rng.n.value, cols:rng.cols.value, radius:rng.radius.value,
+        bezel:rng.bezel.value, deco:decoSel.value, glow:tex.glow.checked, glare:tex.glare.checked, scan:tex.scan.checked } });
+    }
+    function paint() {
+      const def = readDef(); if (!def) return;
+      for (const k of ["n", "cols", "radius", "bezel"]) if (val[k]) val[k].textContent = def.shape[k];
+      paintPreview(def);
+    }
+    function fillDef(raw) {
+      const d = sanitizeTvDef(raw) || sanitizeTvDef(TV_MAKER_PRESETS.standard);
+      nm.value = d.name;
+      for (const k of TV_COLOR_KEYS) cols[k].value = d.colors[k];
+      rng.n.value = d.shape.n; rng.cols.value = d.shape.cols;
+      rng.radius.value = d.shape.radius; rng.bezel.value = d.shape.bezel;
+      decoSel.value = d.shape.deco;
+      tex.glow.checked = d.shape.glow; tex.glare.checked = d.shape.glare; tex.scan.checked = d.shape.scan;
+      paint();
+    }
+    function fillSelects() {
+      const curDeco = decoSel.value;
+      decoSel.textContent = "";
+      const none = document.createElement("option"); none.value = ""; none.textContent = tr("tvmDecoNone"); decoSel.append(none);
+      for (const k of TV_DECO_KEYS) {
+        const o = document.createElement("option"); o.value = k; o.textContent = tvDecoLabel(k); decoSel.append(o);
+      }
+      decoSel.value = TV_DECO_KEYS.includes(curDeco) ? curDeco : "";
+      const curPreset = TV_MAKER_PRESETS[presetSel.value] ? presetSel.value : "standard";
+      presetSel.textContent = "";
+      for (const [id, d] of Object.entries(TV_MAKER_PRESETS)) {
+        const o = document.createElement("option"); o.value = id; o.textContent = d.name; presetSel.append(o);
+      }
+      presetSel.value = curPreset;
+    }
+    const isCustomCurrent = () => !!customTvDefs[settings.tvDockSkin];
+    const toast = (key) => { if (!maker.open) maker.open = true; setStatus("tvmStatus", key); };
+
+    /* ---- 操作 ---- */
+    const inputs = [nm, ...Object.values(cols), ...Object.values(rng), ...Object.values(tex), decoSel];
+    for (const n of inputs) { n.addEventListener("input", () => { setStatus("tvmStatus", null); paint(); }); n.addEventListener("change", paint); }
+    presetSel.addEventListener("change", () => { fillDef(TV_MAKER_PRESETS[presetSel.value]); setStatus("tvmStatus", "tvmPresetLoaded"); });
+
+    if (btnLoad) btnLoad.addEventListener("click", () => {
+      if (isCustomCurrent()) { fillDef(customTvDefs[settings.tvDockSkin]); setStatus("tvmStatus", "tvmLoaded"); }
+      else { fillDef(TV_MAKER_PRESETS[presetSel.value]); setStatus("tvmStatus", "tvmPresetLoaded"); }
+    });
+    if (btnNew) btnNew.addEventListener("click", () => {
+      if (Object.keys(customTvDefs).length >= TV_SKIN_MAX) { toast("tvmLimit"); return; }
+      const def = readDef(); if (!def) { toast("tvmBad"); return; }
+      const id = newTvSkinId(); registerTvSkin(id, def);
+      settings.tvDockSkin = id; saveUserPrefs(); emit("tvChange"); toast("tvmSaved");
+    });
+    if (btnOver) btnOver.addEventListener("click", () => {
+      if (!isCustomCurrent()) { toast("tvmLocked"); return; }
+      const def = readDef(); if (!def) { toast("tvmBad"); return; }
+      registerTvSkin(settings.tvDockSkin, def);
+      saveUserPrefs(); emit("tvChange"); toast("tvmSaved");
+    });
+    if (btnExp) btnExp.addEventListener("click", () => {
+      const def = readDef(); if (!def) { toast("tvmBad"); return; }
+      downloadJSON({ format:TV_SKIN_FORMAT, version:1, ...def }, `${safeName(def.name)}.tvskin.json`);
+      toast("tvmExported");
+    });
+    if (fileInput) fileInput.addEventListener("change", async e => {
+      const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+      let raw = null; try { raw = JSON.parse(await f.text()); } catch (_) {}
+      const def = raw && (!raw.format || raw.format === TV_SKIN_FORMAT) ? sanitizeTvDef(raw) : null;
+      if (!def) { toast("tvmBad"); return; }
+      if (Object.keys(customTvDefs).length >= TV_SKIN_MAX) { toast("tvmLimit"); return; }
+      const id = newTvSkinId(); registerTvSkin(id, def);
+      settings.tvDockSkin = id; saveUserPrefs(); emit("tvChange");
+      fillDef(def); toast("tvmImported");
+    });
+    if (btnDel) btnDel.addEventListener("click", () => {
+      if (!isCustomCurrent()) { toast("tvmLocked"); return; }
+      if (!confirm(tr("tvmConfirmDelete"))) return;
+      unregisterTvSkin(settings.tvDockSkin);
+      settings.tvDockSkin = "home"; saveUserPrefs(); emit("tvChange"); toast("tvmDeleted");
+    });
+
+    maker.addEventListener("toggle", () => { if (maker.open) { fillSelects(); paint(); } });
+    on("language", () => { fillSelects(); paint(); });
+
+    fillSelects();
+    fillDef(customTvDefs[settings.tvDockSkin] || TV_MAKER_PRESETS[presetSel.value] || TV_MAKER_PRESETS.standard);
+  });
+})();
+
 /* ============ 窓口 TrkTV ============ */
 window.TrkTV = Object.freeze({
-  version:1,
+  version:2,
   list:() => tvAllPresets().map(p => ({ id:p.id, cat:p.cat, name: tvPresetName(p), overlay: p.overlay||null, off: !!p.off })),
+  skins:() => Object.entries(TV_DOCK_SKINS).map(([id, d]) => ({ id, name: d.label[lang] || d.label.en, custom: !!d.custom, n:d.n, cols:d.cols, deco:d.deco||"" })),
+  skin:() => settings.tvDockSkin,
+  selectSkin: id => { if (!TV_DOCK_SKINS[id]) return false; settings.tvDockSkin = id; saveUserPrefs(); emit("tvChange"); return true; },
   current:() => settings.videoStyle,
   select:id => selectTv(String(id)),
   next:() => stepTv(1),

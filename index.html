@@ -39,7 +39,10 @@
     "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
     "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3.5.5/lib/three-vrm.module.min.js",
     "@pixiv/three-vrm-core": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm-core@3.5.5/lib/three-vrm-core.module.js",
-    "@pixiv/three-vrm-animation": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm-animation@3.5.5/lib/three-vrm-animation.module.js"
+    "@pixiv/three-vrm-animation": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm-animation@3.5.5/lib/three-vrm-animation.module.js",
+    "three/": "https://cdn.jsdelivr.net/npm/three@0.180.0/",
+    "@yohawing/three-mmd-loader": "https://cdn.jsdelivr.net/npm/@yohawing/three-mmd-loader@0.8.4/dist/index.js",
+    "@yohawing/three-mmd-loader/": "https://cdn.jsdelivr.net/npm/@yohawing/three-mmd-loader@0.8.4/dist/"
   }
 }
 </script>
@@ -50,6 +53,7 @@
   <canvas id="view" width="1920" height="1080"></canvas>
   <canvas id="fx" width="1920" height="1080"></canvas>
   <canvas id="vrmCanvas" hidden></canvas>
+  <canvas id="mmdCanvas" hidden></canvas>
 
   <!-- ===== プレイ中の表示 ===== -->
   <div class="topline">
@@ -110,7 +114,10 @@
           <section class="panel" id="libPanel">
             <div class="libHead">
               <h3 data-i18n="libTitle"></h3>
-              <span id="libCount" class="hint"></span>
+              <span class="libHeadRight">
+                <span id="libCount" class="hint"></span>
+                <button id="libSkinBtn" class="libSkinBtn" type="button" hidden></button>
+              </span>
             </div>
             <div class="miniActions">
               <button id="libOpenBtn" type="button" data-i18n="libOpen"></button>
@@ -136,6 +143,9 @@
               </select>
               <button id="libRandomBtn" type="button" data-i18n="libRandom"></button>
             </div>
+            <div id="libSkinBar" class="libSkinBar" hidden></div>
+            <div id="libSkinNote" class="hint libSkinNote" hidden></div>
+            <div id="libTabs" class="libTabs" role="tablist" hidden></div>
             <div id="libList"></div>
             <div id="libStatus" class="hint status"></div>
             <div class="hint" data-i18n="dropHint"></div>
@@ -323,6 +333,7 @@
                     <option value="none" data-i18n="mascotNone"></option>
                     <option value="buddy" data-i18n="mascotBuddy"></option>
                     <option value="vrm" data-i18n="mascotVrm"></option>
+              <option value="mmd" data-i18n="mascotMmd"></option>
                   </select>
                 </label>
               </div>
@@ -401,6 +412,85 @@
             </div>
             <div id="swayReducedNote" class="hint" data-i18n="swayReduced" hidden></div>
             <!-- modes.js（🪐 ORBIT）・stage.js（🎪 STAGE）・stagefx.js（🎭 演出）の設定がここに入ります -->
+
+            <!-- tv-dock.js が扱う：🎨 カスタムTVスキンのエディタ -->
+            <details id="tvMaker" class="subPanel">
+              <summary data-i18n="tvmTitle"></summary>
+              <div class="hint" data-i18n="tvmHint"></div>
+              <div class="tvMakerGrid">
+                <div>
+                  <label class="field">
+                    <span data-i18n="tvmName"></span>
+                    <input id="tvmName" type="text" maxlength="24" autocomplete="off">
+                  </label>
+                  <h3 data-i18n="tvmColorHead"></h3>
+                  <div class="colorGrid">
+                    <label><input id="tvmColor_body" type="color"><span data-i18n="tvmColorBody"></span></label>
+                    <label><input id="tvmColor_bezel" type="color"><span data-i18n="tvmColorBezel"></span></label>
+                    <label><input id="tvmColor_screen" type="color"><span data-i18n="tvmColorScreen"></span></label>
+                    <label><input id="tvmColor_button" type="color"><span data-i18n="tvmColorButton"></span></label>
+                    <label><input id="tvmColor_accent" type="color"><span data-i18n="tvmColorAccent"></span></label>
+                    <label><input id="tvmColor_text" type="color"><span data-i18n="tvmColorText"></span></label>
+                  </div>
+                  <h3 data-i18n="tvmShape"></h3>
+                  <div class="inline tight">
+                    <span data-i18n="tvmButtons"></span>
+                    <input id="tvmN" type="range" min="3" max="8" step="1">
+                    <span id="tvmNVal" class="mono"></span>
+                  </div>
+                  <div class="inline tight">
+                    <span data-i18n="tvmCols"></span>
+                    <input id="tvmCols" type="range" min="1" max="4" step="1">
+                    <span id="tvmColsVal" class="mono"></span>
+                  </div>
+                  <div class="inline tight">
+                    <span data-i18n="tvmRadius"></span>
+                    <input id="tvmRadius" type="range" min="0" max="40" step="1">
+                    <span id="tvmRadiusVal" class="mono"></span>
+                  </div>
+                  <div class="inline tight">
+                    <span data-i18n="tvmBezelW"></span>
+                    <input id="tvmBezel" type="range" min="0" max="16" step="1">
+                    <span id="tvmBezelVal" class="mono"></span>
+                  </div>
+                  <div class="makerRow two">
+                    <label class="field">
+                      <span data-i18n="tvmDeco"></span>
+                      <select id="tvmDeco"></select>
+                    </label>
+                    <label class="field">
+                      <span data-i18n="tvmPreset"></span>
+                      <select id="tvmPreset"></select>
+                    </label>
+                  </div>
+                  <h3 data-i18n="tvmTex"></h3>
+                  <label class="check"><input id="tvmGlow" type="checkbox"><span data-i18n="tvmGlow"></span></label>
+                  <label class="check"><input id="tvmGlare" type="checkbox"><span data-i18n="tvmGlare"></span></label>
+                  <label class="check"><input id="tvmScan" type="checkbox"><span data-i18n="tvmScan"></span></label>
+                </div>
+                <div>
+                  <div class="hint" data-i18n="tvmPreview"></div>
+                  <div class="tvPreviewWrap"><div id="tvmPreview"></div></div>
+                </div>
+              </div>
+              <div class="miniActions">
+                <button id="tvmLoadBtn" type="button" data-i18n="loadCurrent"></button>
+                <button id="tvmSaveNewBtn" type="button" data-i18n="saveNewSkin"></button>
+                <button id="tvmOverwriteBtn" type="button" data-i18n="overwriteSkin"></button>
+                <button id="tvmExportBtn" type="button" data-i18n="exportSkin"></button>
+                <label class="fileBtn small">
+                  <input id="tvmImportFile" type="file" accept="application/json,.json" hidden>
+                  <span data-i18n="importSkin"></span>
+                </label>
+                <button id="tvmDeleteBtn" type="button" data-i18n="deleteSkin"></button>
+              </div>
+              <div id="tvmStatus" class="hint status"></div>
+            </details>
+
+            <h3 data-i18n="libSkinHead"></h3>
+            <select id="libSkinSelect"></select>
+            <label class="check"><input id="libSkinQuickChk" type="checkbox" checked><span data-i18n="libSkinQuick"></span></label>
+            <div class="hint" data-i18n="libSkinHint"></div>
 
             <h3 data-i18n="mascotSel"></h3>
             <!-- キャラクターの選択肢は js/characters/*.js が自動で追加します -->
@@ -663,7 +753,76 @@
             <div id="seStatus" class="hint status"></div>
             <label class="check"><input id="previewEnabled" type="checkbox"><span data-i18n="previewEnabled"></span></label>
           </details>
+          <details class="panel" id="mmdPanel">
+            <summary data-i18n="mmdTitle"></summary>
+            <div class="hint" data-i18n="mmdHint"></div>
+            <label class="check"><input id="mmdAgree" type="checkbox"><span data-i18n="mmdAgree"></span></label>
+            <h3 data-i18n="mmdModelHead"></h3>
+            <div class="miniActions">
+              <label class="fileBtn small disabled" id="mmdModelFileLabel">
+                <input id="mmdModelFile" type="file" accept=".pmx,.pmd" hidden disabled>
+                <span data-i18n="mmdChooseModel"></span>
+              </label>
+              <label class="fileBtn small disabled" id="mmdFolderFileLabel">
+                <input id="mmdFolderFile" type="file" webkitdirectory multiple hidden disabled>
+                <span data-i18n="mmdChooseFolder"></span>
+              </label>
+              <button id="mmdClearModel" type="button" data-i18n="mmdClearModel"></button>
+            </div>
+            <label class="check"><input id="mmdRemember" type="checkbox"><span data-i18n="mmdRemember"></span></label>
+            <h3 data-i18n="mmdMotionHead"></h3>
+            <div class="miniActions">
+              <select id="mmdMotionSelect"></select>
+              <label class="fileBtn small disabled" id="mmdMotionFileLabel">
+                <input id="mmdMotionFile" type="file" accept=".vmd" hidden disabled>
+                <span data-i18n="mmdChooseMotion"></span>
+              </label>
+              <button id="mmdClearMotion" type="button" data-i18n="mmdClearMotion"></button>
+            </div>
+            <div class="hint" data-i18n="mmdBuiltinNote"></div>
+            <label class="field">
+              <span data-i18n="mmdBpm"></span>
+              <input id="mmdBpm" type="number" min="0" max="300" step="1">
+            </label>
+            <h3 data-i18n="mmdFitHead"></h3>
+            <div class="makerRow two">
+              <label class="field">
+                <span data-i18n="mmdSize"></span>
+                <span class="inline tight">
+                  <input id="mmdSize" type="range" min="0.5" max="1.8" step="0.05">
+                  <span id="mmdSizeVal" class="mono"></span>
+                </span>
+              </label>
+              <label class="field">
+                <span data-i18n="mmdTurn"></span>
+                <span class="inline tight">
+                  <input id="mmdTurn" type="range" min="-60" max="60" step="5">
+                  <span id="mmdTurnVal" class="mono"></span>
+                </span>
+              </label>
+            </div>
+            <label class="field">
+              <span data-i18n="mmdCreditLabel"></span>
+              <input id="mmdCredit" type="text" maxlength="120" autocomplete="off">
+            </label>
+            <div class="vrmRow">
+              <canvas id="mmdPreview" width="360" height="240"></canvas>
+              <div id="mmdInfo" class="hint vrmInfo"></div>
+            </div>
+            <div class="miniActions">
+              <button id="mmdCheckBtn" type="button" data-i18n="mmdCheck"></button>
+              <button id="mmdCopyBtn" type="button" data-i18n="mmdCopy"></button>
+            </div>
+            <div class="hint" data-i18n="mmdCheckHint"></div>
+            <div id="mmdCheckOut" class="hint mono" hidden></div>
+            <div id="mmdStatus" class="hint status"></div>
+          </details>
           <!-- fx.js がここに「🎛 サウンドエフェクト」の欄を追加します -->
+          <!-- ⭐ お気に入りのフォルダ管理（中身は js/favs.js が作ります） -->
+          <details class="panel" id="favPanel">
+            <summary id="favPanelSummary">⭐ お気に入り</summary>
+            <div id="favPanelBody"></div>
+          </details>
           <details class="panel" id="emergencyPanel">
             <summary>🛟 緊急復旧 / Emergency Recovery</summary>
             <div class="hint">
@@ -701,6 +860,24 @@
           </details>
         </div>
       </div>
+
+      <!-- 🧩 アドオン：js/addons.js が、ここに一覧と説明を描きます -->
+      <details class="panel addonPanel" id="addonPanel">
+        <summary data-i18n="addonTitle"></summary>
+        <div class="hint" data-i18n="addonHint"></div>
+        <div class="miniActions addonActions">
+          <label class="fileBtn small">
+            <input id="addonInstallFile" type="file" accept=".js,.json,.trkaddon,text/javascript,application/json" hidden>
+            <span data-i18n="addonInstall"></span>
+          </label>
+          <button id="addonSampleBtn" type="button" data-i18n="addonSample"></button>
+          <a class="fileBtn small" id="addonDocsLink" href="docs/ADDONS.md" target="_blank" rel="noopener noreferrer" data-i18n="addonDocs"></a>
+          <button id="addonReloadBtn" type="button" class="primary slim" hidden data-i18n="addonReload"></button>
+        </div>
+        <div id="addonList" class="addonList"></div>
+        <div id="addonSlots" class="addonSlots"></div>
+        <div id="addonStatus" class="hint status"></div>
+      </details>
     </div>
   </section>
 
@@ -792,11 +969,15 @@
 <script src="js/fx-dock.js"></script>
 <script src="js/tv-dock.js"></script>
 <script src="js/fx.js"></script>
+<script src="js/favs.js"></script>
 <!-- ===== 選曲・公認・入力・起動 ===== -->
 <script src="js/library.js"></script>
 <script src="js/verified.js"></script>
+<script src="js/lib-skins.js"></script>
+<script src="js/addons.js"></script>
 <script src="js/main.js"></script>
 <script src="js/speed.js"></script>
 <script src="js/vrm.js"></script>
+<script src="js/mmd.js"></script>
 </body>
 </html>

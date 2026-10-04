@@ -151,12 +151,22 @@ AUTO中か、「シークバーを表示（練習用）」をオンにしてい�
 - **スキン**：シャドウ・デイライト・ネオン・サクラ・ターミナル・クラリティ（色覚配慮）など。色を選んで**自作スキン**も作れます（JSONで共有可）。
 - **レイアウト**：横スクロール／縦・左／縦・中央／解説動画風
 - **ノーツ**：色と形（丸・ひし形・四角）を、スキンとは別に決められます。
-- **背景映像**：カラー・モノクロ・暗め・非表示に加えて、**暗さ**と**ぼかし**をスライダーで調整できます。
+- **背景映像**：カラー・モノクロ・暗め・非表示に加えて、**暗さ**と**ぼかし**をスライダーで調整できます。選曲画面の📺TVドックから、**映像フィルター45種**（レトロ・シネマ・不思議・自然など）と**TVスキン30種**（ブラウン管・ウッド・アーケード・水槽・プロジェクターなど）を切り替えられます。映像が変になったら `?safe=1` で安全な状態に戻せます。
+- **カスタムTV**：設定画面の🎨から、色6つ・形（ボタン数／列／角の丸み／画面のふち）・飾り28種・質感（光る／ガラスの反射／走査線）を選んで、自分のテレビを作れます。保存するとTVドックのスキン一覧に出て、`trk-tvskin`（JSON）で共有できます（最大30個）。
+- **📺 の物理ボタンで曲を送る**：TVドックの電源・一時停止のとなりに **◀ ▶** があります。テレビのチャンネル送りみたいに、**前の曲・次の曲**へ（リストの端は先頭／末尾へ回り込み、液晶に `♪ 曲名` が出ます）。**演奏中は、初期設定では曲が飛びません**（ゲームに集中できます）。「演奏中も ◀ ▶ で曲を変える」にチェックを入れると、演奏中でも押したその場で曲が切り替わります（その回の記録は残りません）。
+- **ならべ方**：選曲画面は **📺 TV →（お気に入り）→ 🎛 ラック →（お気に入り）→ 📺 TVくわしい → 🎛 ラックくわしい** の順。テレビの**すぐ下にラック**が来るので「テレビの下にオーディオ機器」という自然な姿になります（TVとラックの上下は「くわしい」の中で入れ替え可）。
+- **⭐ お気に入りはフォルダ分け**：ドックの下に **⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り** のチップが並びます（それぞれ個数つき）。押すとボタンの中身がそのフォルダに入れ替わり、🔒で凍結、あふれたぶんは下の行に出ます。長押し（または ⋯）で、移動・📌ピン・取り外しができます。**上限はありません**。
+- **🧩 アドオン**：本体に入れられない機能を、あとから足せます。設定画面「🧩 アドオン」→「📄 アドオンを入れる」で `.js` か `.trk-addon`（JSON）を選ぶだけ（`trk_addons_v1` に保存）。アドオンは**曲を足す**（曲リストの 🧩 タブに自動でまとまります）、**置き場所**（設定画面・曲リスト・TVのくわしい・ラックのくわしい）にUIを足す、**自分の音を本体のエフェクターに通す**（`api.fx.tapElement`）ことができます。書き方は [docs/ADDONS.md](docs/ADDONS.md) と見本の [`js/addons/example.js`](js/addons/example.js)。壊れたときは `?safe=1` で読み込まれません。
+- **📚 曲のタブ（棚）**：曲リストの上に、**曲の入り口ごとのタブ**が自動で並びます（📚すべて／📦パックごと／📁フォルダーごと／📄追加した曲／✔公認）。**曲パックを入れると、そのパックのタブが自動で増える**ので、あとから入れた曲をすぐ見つけられます。タブを選んだ中で検索・並べ替えができ、TVの ◀ ▶ も**いま開いているタブの中**で曲を送ります。タブに件数が出るので、どの棚に何曲あるかも一目で分かります。
+- **📚 棚のスキン8種**：曲タブの見た目を **🎛 タブプレーヤー／📝 ノート／🌈 シール帳／🗄 カード目録／📼 カセットラベル／🖍 黒板／🕹 レトロPC／📁 クリアファイル** から選べます。曲リストの見出しの **🎨 ボタン**で、その場でぽんぽん切り替え（`🎲 おまかせ` も）。🎨 ボタンが不要なときは、設定画面「見た目」で**隠せます**。
+- **選曲中にmp4を再生**：曲を選ぶと、TVドックの画面にそのmp4が映ります（設定でオフにもできます）。くわしく →「🖼 映像の確認」タブなら、ゲーム画面と同じ見え方でフィルター・TVスキン・暗さ・ぼかしを**再生する前に**確かめられます。
 - **ORBIT**：道の動き、ノーツの大きさ（判定の幅で表示もOK）、判定点の形6種類、周りを回る恒星
 - **STAGE**：レーンの幅・暗さ、ノーツの太さ、キービーム、補助線、盛り上がる場面で光るレーン、スポットライトなどの舞台演出
 - **判定文字**：大きさ・位置・FAST/SLOWの表示範囲、AP/FCの継続表示
 - **揺れ**：ビートやドン／カッに合わせてレーンを傾けます（初期値オフ。OSの「視差効果を減らす」がオンなら止まります）
-- **マスコット**：オレンジ相棒、初音ミク（PCL・非公式の二次創作）、**自分のVRMモデル**（VRM 1.0）。.vrma のモーションも曲のBPMに合わせて動きます。
+- **マスコット**：オレンジ相棒、初音ミク（PCL・非公式の二次創作）、**自分のVRMモデル**（VRM 1.0）、**自分のMMDモデル**（.pmx／.pmd）。VRM の .vrma も MMD の .vmd も、曲のBPMに合わせて動きます。
+- **⭐ お気に入りは、フォルダで分ける**：曲・映像フィルター・エフェクトのお気に入りを、**⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り**の4つに分けて持ち歩けます。**個数の上限はありません**（ボタンに入りきらないぶんは、下に並びます）。🧊は凍結（追加・削除を止める）、📌は「**絶対に外れない**」（🎲おまかせの候補に必ず入ります）。外したものは📤元お気に入りに残り、抽選には出てきません。📤書き出し／📥読み込み（`trk-favs`）で、別の端末にも持っていけます。
+- **🩷 MMDマスコット（持ち込み式）**：Lat式ミクやタワシ式CHAN×CO系ミクなど、**お手持ちのMMDモデル**を動かせます。テクスチャごとフォルダを選ぶだけ。内蔵モーションは trk! がコードで作る自作の3種（step／swing／turn）で、自分の `.vmd` も読み込めます。**モデルとモーションは同梱していません**（MMDの模型は再配布できないものがほとんどです）。大きさ・向き・画面下のクレジットを設定でき、チェックを入れると次に開いたときも復元します。`?safe=1` のときは読み込みません。**うまく動かないときは、同じパネルの「🔎 動作チェック」**を押すと、WebGL・CDN（three／three-mmd-loader）・モデル・モーションの状態が1か所に出ます。「📋 結果をコピー」でそのまま貼ってもらえれば、原因を切り分けられます。
 
 ---
 
@@ -257,6 +267,8 @@ osu! のスキンのように、いろいろなものを1つのファイル（`.
 | パックの読み込み | `DecompressionStream` に対応したブラウザ |
 | 公認パックの確認 | HTTPS か localhost（指紋の計算に必要です） |
 | VRM | WebGL。初回だけ three.js／three-vrm をCDNから読み込みます |
+| MMD | WebGL。初回だけ three.js／three-mmd-loader をCDNから読み込みます |
+| ⭐ お気に入り | 端末の中だけ（localStorage）。フォルダ分けも同じ |
 
 **保存について：** 設定・記録・パック・追加した曲・マイプリセットは、**このブラウザの中だけ**に保存されます（localStorage・IndexedDB）。ブラウザのデータを消すと消えるので、記録はときどきバックアップしてください。
 
@@ -289,6 +301,9 @@ trk! はMODしやすいように、機能ごとにファイルを分けていま
 
 - **自作キャラクター**：`js/characters/miku.js` を見本に `registerMascot()` を呼ぶファイルを作り、`index.html` に1行足すだけです。
 - **内蔵スキン**：`js/data.js` の `SKINS` に1項目足すと、一覧に出ます。
+- **棚スキン（曲タブの見た目）**：`js/lib-skins.js` の `LIB_SKINS` と `LIB_SKIN_ORDER` に1項目、`css/style.css` に `#libPanel[data-lib-skin="ID"] …` の見た目を足すだけです。
+- **アドオン**：`js/*.js` を触らずに機能を足せます。`TrkAddons.register({...})` を書いて、設定画面から入れるか `index.html` に1行。API は [docs/ADDONS.md](docs/ADDONS.md)、見本は `js/addons/example.js`。
+- **TVスキン**：`js/tv-dock.js` の `TV_DOCK_SKINS` に1項目、`buildDeco()` に飾り、`css/style.css` に見た目を足します。自分で作るだけなら、設定画面の🎨（`#tvMaker`）からどうぞ。
 - **サウンドエフェクト**：マイプリセット（`trk-fx` のJSON）か、`TRK_FX_PRESETS` に足す自分のファイル。
 - **翻訳**：`js/i18n.js` などの `TEXT.ja / en / zh / ko`
 - **参加のしかた**：[CONTRIBUTING.md](CONTRIBUTING.md)
@@ -317,11 +332,16 @@ trk/
 │  ├─ custom.js                  … ノーツ・スキン作成・パック
 │  ├─ truck.js  modes.js  stage.js  stagefx.js  catch.js   … 各モード・体力・称号・演出
 │  ├─ extras.js                  … オフセット測定・ゴーストなど
+│  ├─ tv-presets.js  tv-dock.js  … 映像フィルター・TVドック・カスタムTVスキン
 │  ├─ fx-presets.js  fx.js       … サウンドエフェクト
-│  ├─ library.js                 … 選曲画面・AUTO・ラジオ
+│  ├─ library.js                 … 選曲画面・AUTO・ラジオ・曲のタブ（棚）
+│  ├─ lib-skins.js               … 棚スキン8種（曲タブの見た目・🎨ボタン）
 │  ├─ verified.js                … 公認パック
+│  ├─ addons.js  addons/         … アドオン（あとから機能を足すしくみ・見本）
 │  ├─ main.js  speed.js          … 入力・起動・速度
-│  └─ vrm.js                     … VRMマスコット
+│  ├─ vrm.js                     … VRMマスコット
+│  ├─ mmd.js                     … MMDマスコット（モデル・モーションは持ち込み）
+│  └─ favs.js                    … ⭐ お気に入りのフォルダ管理（1軍／2軍／🧊／📤元）
 ├─ docs/  HANDOFF.md  verified.md  og.png
 ├─ tools/make-icons.html         … アイコンとOGP画像を作るツール
 ├─ .github/ISSUE_TEMPLATE/       … 不具合・アイデアのフォーム
@@ -370,8 +390,8 @@ trk! は、たくさんの音楽ゲームから着想をもらっています。
 | ソースコード | **GNU GPL v3.0 or later**（[LICENSE](LICENSE)） |
 | 「trk!」の名前 | ライセンスの対象外です。派生版は、別の名前で公開してください |
 | 初音ミクのマスコット（`js/characters/miku.js`） | ピアプロ・キャラクター・ライセンス（PCL）に基づく二次創作です。**GPLの対象外**で、非営利・無償の範囲でのみ使えます |
-| three.js ／ three-vrm | MIT License（VRM使用時にCDNから読み込み） |
-| 利用者が読み込む曲・VRM・パック | それぞれの作者のものです |
+| three.js ／ three-vrm ／ three-mmd-loader | MIT License（VRM・MMDの使用時にCDNから読み込み） |
+| 利用者が読み込む曲・VRM・MMDモデル・.vmd・パック | それぞれの作者のものです |
 | 公認パックの曲・譜面・作者のことば | 作者さんのものです。GPLの対象外で、trk! で遊ぶための公開です |
 
 ### 初音ミクについて
@@ -385,6 +405,7 @@ https://piapro.jp/license/pcl/summary
 ### お願い
 - 権利のない曲を、曲パックなどで配らないでください。
 - VRMモデルは、作者の利用条件を確認してから使ってください（VRChat改変モデルは、元の規約も確認してください）。
+- MMDモデル・モーションも、**同梱していません**。使うときは作者の規約（再配布の可否・MMD／MMM以外のソフトでの使用・商用の可否）を確かめて、**自分の端末から**読み込んでください。trk! は読み込んだファイルを保存も送信もしません（下の「保存」にチェックを入れたときだけ、このブラウザの中に残します）。
 
 詳しくは [NOTICE.md](NOTICE.md) をご覧ください。
 
@@ -404,7 +425,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 - 🎪 **STAGE** — 4/5/6-lane vertical play with stairs, trills and wide notes (inspired by World Dai Star: Yume no Stellarium)
 - 🚛 **CATCH** — catch falling parcels with your truck; grab nitro cans 🚀 for **Blast mode**
 
-**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, VRM 1.0 mascots, shareable `.stpack` packs, and 🎛 **sound effects** (115 EQ/FX presets, game-reactive effects, automatic latency compensation, shareable `trk-fx` JSON presets).
+**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, VRM 1.0 mascots, MMD mascots (bring your own model, with an on-device 🔎 self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), shareable `.stpack` packs, and 🎛 **sound effects** (115 EQ/FX presets, game-reactive effects, automatic latency compensation, shareable `trk-fx` JSON presets).
 
 **✔ Verified packs:** song packs whose composer/charter identity and rights have been confirmed get a ✔ badge and a short message from the creator (up to 280, like a free X post). See [docs/verified.md](docs/verified.md).
 
@@ -412,7 +433,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 
 **Feedback:** casual thoughts on X [@ttrk143](https://x.com/ttrk143) (hashtag **#trkAGRG**), bugs and ideas on [GitHub Issues](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues).
 
-**License:** code under **GPL-3.0-or-later**. The name “trk!” is not licensed — please rename forks. The Hatsune Miku mascot (`js/characters/miku.js`) is fan art under the Piapro Character License (non-commercial only) and is **not** covered by the GPL; delete that file and its `<script>` line for commercial forks. Songs, charts and messages in verified packs belong to their creators.
+**License:** code under **GPL-3.0-or-later**. The name “trk!” is not licensed — please rename forks. The Hatsune Miku mascot (`js/characters/miku.js`) is fan art under the Piapro Character License (non-commercial only) and is **not** covered by the GPL; delete that file and its `<script>` line for commercial forks. MMD models and `.vmd` motions are **never bundled** — you load your own from your device, and their authors' terms apply. Songs, charts and messages in verified packs belong to their creators.
 
 This work depicts the character “Hatsune Miku” of Crypton Future Media, INC. under the Piapro Character License.
 

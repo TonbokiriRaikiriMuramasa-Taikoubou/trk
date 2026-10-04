@@ -88,7 +88,13 @@ on("language", renderSeedTools);
 
 /* ---------- 曲リストの中身 ---------- */
 let folderSongs = [], addedSongs = [], packSongs = [], libHandle = null, libView = [];
-const allSongs = () => [...folderSongs, ...addedSongs, ...packSongs];
+/* 🧩 アドオン（js/addons.js）が足した曲。setAddonSongs() で入れ替わります */
+let addonSongs = [];
+function setAddonSongs(list) {
+  addonSongs = Array.isArray(list) ? list.slice(0, LIB_MAX) : [];
+  renderLib();
+}
+const allSongs = () => [...folderSongs, ...addedSongs, ...packSongs, ...addonSongs];
 function addedItem(file) {
   const base = baseName(file.name);
   return { key:`${file.size}|${base}`, source:"file", file, title:base, base, size:file.size };
@@ -117,15 +123,125 @@ function songInfo(it, idx) {
   return { plays, best, title:titleString(r), last:r.lastPlayed || 0 };
 }
 
+/* ============ 📚 曲のタブ（曲の入り口ごとに自動でできる棚） ============
+   ・「すべて」＋ パックごと ＋ フォルダーごと ＋ 追加した曲 ＋ 公認
+   ・パックを入れると、そのパックのタブが自動で増える（新しい曲を探しやすく）
+   ・サブフォルダは、いちばん上の階層でまとめる（例：Album/A/01.mp3 → 「Album」のタブ）
+   ・選んだタブは settings.libTab に残る。消えたタブは「すべて」を表示（設定は残すので、
+     パックを入れ直すと、またそのタブが選ばれた状態に戻る） */
+Object.assign(TEXT.ja, {
+  libTabAll:"すべて", libTabFiles:"追加した曲", libTabVerified:"公認", libTabPackNone:"曲パック", libTabFolderTop:"フォルダ（直下）", libTabAddon:"アドオン",
+  libTabGo:"この棚に {n}曲", libTabEmpty:"このタブには曲がありません。ほかのタブを見てみてください。"
+});
+Object.assign(TEXT.en, {
+  libTabAll:"All", libTabFiles:"Added", libTabVerified:"Verified", libTabPackNone:"Song pack", libTabFolderTop:"Folder (top level)", libTabAddon:"Add-on",
+  libTabGo:"{n} songs in this shelf", libTabEmpty:"No songs in this tab. Try another tab."
+});
+Object.assign(TEXT.zh, {
+  libTabAll:"全部", libTabFiles:"已添加", libTabVerified:"认证", libTabPackNone:"歌曲包", libTabFolderTop:"文件夹（顶层）", libTabAddon:"插件",
+  libTabGo:"这个架子有 {n} 首", libTabEmpty:"此标签内没有歌曲。请看看其他标签。"
+});
+Object.assign(TEXT.ko, {
+  libTabAll:"전체", libTabFiles:"추가한 곡", libTabVerified:"공인", libTabPackNone:"곡 팩", libTabFolderTop:"폴더 (최상위)", libTabAddon:"애드온",
+  libTabGo:"이 선반에 {n}곡", libTabEmpty:"이 탭에는 곡이 없습니다. 다른 탭을 봐 주세요."
+});
+const libFolderSeg = it => String(it.dir || "").split("/")[0].trim();
+/* ✔公認の判定は verified.js の窓口から（読み込まれていなければ、公認タブは作りません） */
+const libIsVerified = it => {
+  const v = window.TrkVerified;
+  return !!(v && typeof v.verifyOf === "function" && v.verifyOf(it));
+};
+const libPackKey = it => it.packId || it.packName || "";
+/* 曲 → タブのID（同じ曲でも、入り口が違えば別のタブ） */
+function libTabIdOf(it) {
+  if (it.source === "pack") return "pack:" + libPackKey(it);
+  if (it.source === "file") return "file";
+  const seg = libFolderSeg(it);
+  return seg ? "folder:" + seg : "folder";
+}
+/* ⭐ お気に入り（js/favs.js）。いま選んでいるフォルダの曲を数える */
+function libFavKeys(all) {
+  const F = window.TrkFavs;
+  if (!F) return { n:0 };
+  const g = F.activeOf("song");
+  let n = 0;
+  for (const it of all) if (F.inGroup("song", g, it.key)) n++;
+  return { n, group:g };
+}
+/* タブの一覧（順番：すべて → ⭐お気に入り → パック → フォルダー → 追加した曲 → 公認） */
+function libTabsOf(all) {
+  const tabs = [{ id:"all", icon:"📚", label:tr("libTabAll"), n:all.length }];
+  const favN = libFavKeys(all).n;
+  if (favN) tabs.push({ id:"fav", icon:"⭐", label:tr("favTab"), n:favN });
+  const packs = new Map(), folders = new Map(), addons = new Map();
+  let nFiles = 0;
+  for (const it of all) {
+    if (it.source === "pack") {
+      const key = libPackKey(it), t = packs.get(key) || { id:"pack:" + key, icon:"📦", label:it.packName || tr("libTabPackNone"), n:0 };
+      t.n++; packs.set(key, t);
+    } else if (it.source === "addon") {
+      const key = it.addonId || "", t = addons.get(key) || { id:"addon:" + key, icon:"🧩", label:it.addonName || tr("libTabAddon"), n:0 };
+      t.n++; addons.set(key, t);
+    } else if (it.source === "file") nFiles++;
+    else {
+      const seg = libFolderSeg(it), t = folders.get(seg) || { id:seg ? "folder:" + seg : "folder", icon:"📁", label:seg || tr("libTabFolderTop"), n:0 };
+      t.n++; folders.set(seg, t);
+    }
+  }
+  for (const t of packs.values()) tabs.push(t);
+  for (const t of addons.values()) tabs.push(t);          // 🧩 アドオンが足した曲
+  for (const t of folders.values()) tabs.push(t);
+  if (nFiles) tabs.push({ id:"file", icon:"📄", label:tr("libTabFiles"), n:nFiles });
+  const nv = all.filter(it => it.source === "pack" && libIsVerified(it)).length;
+  if (nv) tabs.push({ id:"verified", icon:"✔", label:tr("libTabVerified"), n:nv });
+  return tabs;
+}
+function libTabMatch(it, id) {
+  if (!id || id === "all") return true;
+  if (id === "fav") { const F = window.TrkFavs; return !!(F && F.inGroup("song", F.activeOf("song"), it.key)); }
+  if (id === "file") return it.source === "file";
+  if (id === "verified") return it.source === "pack" && libIsVerified(it);
+  if (id.startsWith("pack:")) return it.source === "pack" && "pack:" + libPackKey(it) === id;
+  if (id.startsWith("addon:")) return it.source === "addon" && "addon:" + (it.addonId || "") === id;
+  if (id.startsWith("folder:")) return it.source === "folder" && libFolderSeg(it) === id.slice(7);
+  if (id === "folder") return it.source === "folder" && !libFolderSeg(it);
+  return true;
+}
+/* タブ帯を描いて、いま選ばれているタブのIDを返す */
+function renderLibTabs(tabs) {
+  const box = $("libTabs");
+  const active = tabs.some(t => t.id === settings.libTab) ? settings.libTab : "all";
+  if (!box) return active;
+  box.textContent = "";
+  box.hidden = tabs.length < 2;
+  if (box.hidden) return active;
+  for (const t of tabs) {
+    const b = el("button", "libTab" + (t.id === active ? " on" : "")); b.type = "button";
+    b.dataset.tab = t.id;
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", String(t.id === active));
+    b.title = tr("libTabGo", { n:t.n });
+    b.append(el("span", "libTabIcon", t.icon), el("span", "libTabName", t.label), el("i", "libTabN", String(t.n)));
+    b.addEventListener("click", () => {
+      if (settings.libTab === t.id) return;
+      settings.libTab = t.id; saveUserPrefs(); renderLib();
+    });
+    box.append(b);
+  }
+  return active;
+}
+
 /* ---------- 曲リストの表示 ---------- */
 function renderLib() {
   const box = $("libList"); box.textContent = "";
   const all = allSongs();
   $("libCount").textContent = all.length ? tr("libCount", { n:all.length }) : "";
+  const tabId = renderLibTabs(libTabsOf(all));          // タブは、曲が1つも無くても片付ける
   if (!all.length) { libView = []; box.append(el("div", "libEmpty", tr("libEmptyList"))); return; }
+  const scope = all.filter(it => libTabMatch(it, tabId));
   const q = $("libSearch").value.trim().toLowerCase(), idx = {};
   for (const r of Object.values(records)) if (r && r.title != null) idx[`${r.size}|${r.title}`] = r;
-  const items = all
+  const items = scope
     .filter(it => !q || `${it.title} ${it.dir || ""} ${it.artist || ""} ${it.packName || ""}`.toLowerCase().includes(q))
     .map(it => ({ it, info:songInfo(it, idx) }));
   const v = (x, k) => (x.info ? x.info[k] : 0);
@@ -136,8 +252,16 @@ function renderLib() {
     best:(a, b) => v(b, "best") - v(a, "best")
   }[settings.libSort] || (() => 0);
   items.sort(cmp);
+  if (tabId === "fav") {
+    const F = window.TrkFavs;
+    if (F) {
+      const bar = el("div", "favChipsRow");
+      bar.append(F.chips("song", { former:true, onChange: () => renderLib() }));
+      box.append(bar);
+    }
+  }
   libView = items.map(x => x.it);
-  if (!items.length) { box.append(el("div", "libEmpty", tr("libNoMatch"))); return; }
+  if (!items.length) { box.append(el("div", "libEmpty", tr(scope.length ? "libNoMatch" : "libTabEmpty"))); return; }
   for (const { it, info } of items.slice(0, LIB_SHOW)) {
     const wrap = el("div"); wrap.style.cssText = "display:flex;gap:6px;align-items:stretch";
     const cur = currentSong && currentSong.key === it.key;
@@ -152,6 +276,24 @@ function renderLib() {
     b.append(left, meta);
     b.addEventListener("click", () => selectSong(it));
     wrap.append(b);
+    /* ⭐ お気に入り（📌は ⋯ のメニューから） */
+    const F = window.TrkFavs;
+    if (F) {
+      const inFav = F.has("song", it.key);
+      const sb = el("button", "libFav" + (inFav ? " on" : ""), inFav ? "★" : "☆");
+      sb.type = "button";
+      sb.title = tr(inFav ? "favDel" : "favAdd");
+      sb.setAttribute("aria-label", tr(inFav ? "favIn" : "favAdd") + " " + it.title);
+      sb.setAttribute("aria-pressed", String(inFav));
+      sb.addEventListener("click", e => {
+        e.stopPropagation();
+        if (inFav) { const r = F.remove("song", it.key); if (!r.ok) F.toast(F.msg(r.why, r.g)); }
+        else F.add("song", it.key, { group:"main", append:false });
+        renderLib();
+      });
+      wrap.append(sb);
+      if (inFav || F.groupOf("song", it.key)) wrap.append(F.menuButton("song", it.key, "libMenu"));
+    }
     if (it.source === "file") {
       const del = el("button", "", "✕"); del.type = "button"; del.title = tr("libRemove"); del.setAttribute("aria-label", tr("libRemove"));
       del.style.cssText = "padding:6px 12px;font-size:14px;border-radius:12px";
@@ -249,6 +391,12 @@ async function selectSong(it) {
   if (currentSong && currentSong.key === it.key) { if (videoReady) startPreview(); return; }
   currentSong = it;
   stopPreview(); renderLib(); renderBanner(); updateSpBuilder();
+  emit("songSelected", it);
+  /* 🧩 アドオンが連れてきた曲：ファイル読み込みは、アドオンに任せる（自前のプレイヤーで鳴らす） */
+  if (it.source === "addon") {
+    if (it.file) { /* file を持っていれば、ふつうの曲と同じ道（loadMedia）を通る */ }
+    else { emit("addonSelect", it); renderSeedTools(); return; }
+  }
   await setBackground(it.bgBlob || null);
   if (currentSong !== it) return;
   previewPending = true;
@@ -292,6 +440,12 @@ function nextSong() {
   const list = libView.length ? libView : allSongs(); if (!list.length) return null;
   const i = currentSong ? list.findIndex(x => x.key === currentSong.key) : -1;
   return list[(i + 1) % list.length];
+}
+/* 📺 TVドックの ◀ から使う（前の曲。端は末尾へ回り込む。曲が無いときは null） */
+function prevSong() {
+  const list = libView.length ? libView : allSongs(); if (!list.length) return null;
+  const i = currentSong ? Math.max(0, list.findIndex(x => x.key === currentSong.key)) : 0;
+  return list[(i - 1 + list.length) % list.length];
 }
 async function radioGo(next) {
   cancelRadio();
@@ -411,7 +565,19 @@ $("libReconnectBtn").addEventListener("click", async () => {
 let libSearchTimer = 0;
 $("libSearch").addEventListener("input", () => { clearTimeout(libSearchTimer); libSearchTimer = setTimeout(renderLib, 150); });
 $("libSort").addEventListener("change", e => { settings.libSort = e.target.value; saveUserPrefs(); renderLib(); });
-$("libRandomBtn").addEventListener("click", () => { if (libView.length) selectSong(libView[Math.floor(Math.random() * libView.length)]); });
+$("libRandomBtn").addEventListener("click", () => {
+  /* 🎲 おまかせ：いまの一覧 ＋ 📌ピンの曲（ほかのタブにいても、必ず候補に入る） */
+  const pool = libView.slice();
+  const F = window.TrkFavs;
+  if (F) {
+    for (const key of F.state("song").pins) {
+      if (F.groupOf("song", key) === "former") continue;
+      const it = allSongs().find(x => x.key === key);
+      if (it && !pool.includes(it)) pool.push(it);
+    }
+  }
+  if (pool.length) selectSong(pool[Math.floor(Math.random() * pool.length)]);
+});
 
 on("records", renderLib);
 on("chart", updateSpBuilder);

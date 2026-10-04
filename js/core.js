@@ -96,6 +96,9 @@ const settings = {
   seEnabled: !!prefs.seEnabled,
   seVolume: num(prefs.seVolume, 0, 1, .28),
   musicVolume: num(prefs.musicVolume, 0, 1, .7),
+  /* 🎹 シンセ演奏モード */
+  synthModeDisabled: !!prefs.synthModeDisabled,
+  synthModeFastStart: !!prefs.synthModeFastStart,
   notes: sanitizeNotes(prefs.notes ?? (prefs.skin === "clarity" ? NOTE_PRESETS.clarity : null)),
   mascot: pick(prefs.mascot, ["skin", "none", ...MASCOT_IDS], "skin"),
   fxPower: num(prefs.fxPower, 0, 3, 1.5),
@@ -174,11 +177,13 @@ function resetVideoPrefs() {
 }
 function resetAudioPrefs() {
   settings.musicVolume = 0.7; settings.seVolume = 0.28; settings.seEnabled = false;
+  settings.synthModeDisabled = false; settings.synthModeFastStart = false;
   // fx-dock / eq-dock の音まわりがあれば一緒に初期化
   if ("gameVolume" in settings) settings.gameVolume = 0.7;
   if ("eqEnabled" in settings) settings.eqEnabled = false;
   if ("eqLow" in settings) { settings.eqLow = 0; settings.eqMid = 0; settings.eqHigh = 0; }
   if ("compEnabled" in settings) settings.compEnabled = false;
+  try { if (typeof window._trkSyncSynthModeSettings === "function") window._trkSyncSynthModeSettings(); } catch (_) {}
 }
 function resetNotesPrefs() {
   try {
@@ -228,6 +233,7 @@ function exportPrefs(kind) {
     out.tvMenuPreview = settings.tvMenuPreview; out.tvMenuVideo = settings.tvMenuVideo;
   } else if (kind === "audio") {
     out.musicVolume = settings.musicVolume; out.seEnabled = settings.seEnabled; out.seVolume = settings.seVolume;
+    out.synthModeDisabled = settings.synthModeDisabled; out.synthModeFastStart = settings.synthModeFastStart;
     if ("gameVolume" in settings) out.gameVolume = settings.gameVolume;
   } else { // all
     Object.assign(out, settings);

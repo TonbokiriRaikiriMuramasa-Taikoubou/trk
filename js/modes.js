@@ -644,6 +644,7 @@ function drawOrbitField(now) {   // render.js から呼ばれます
 const ORBIT_IGNORE = new Set(["KeyP", "Escape", "Backquote", "Minus", "Equal", "Tab", "MetaLeft", "MetaRight",
   "AltLeft", "AltRight", "ControlLeft", "ControlRight", "ContextMenu", "PrintScreen"]);
 addEventListener("keydown", e => {
+  if (window._trkSynthModeOpen) return;
   if (phase !== "playing" || !isOrbit() || bindingSlot !== null || settings.autoPlay) return;
   if (ORBIT_IGNORE.has(e.code) || /^F\d{1,2}$/.test(e.code) || e.ctrlKey || e.metaKey) return;
   e.preventDefault(); e.stopImmediatePropagation();

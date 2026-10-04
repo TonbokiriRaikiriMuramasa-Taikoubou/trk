@@ -334,6 +334,7 @@ function drawCatchField(now) {
 /* ============ 入力（キーを押している間だけ動く／画面をなぞると追いかける） ============ */
 let catchBinding = null, catchPointer = false;
 addEventListener("keydown", e => {
+  if (window._trkSynthModeOpen) return;
   if (catchBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureCatchKey(e.code); return; }
   if (phase !== "playing" || !isCatch() || bindingSlot !== null || settings.autoPlay) return;
   const d = catchKeyDir(e.code); if (!d) return;

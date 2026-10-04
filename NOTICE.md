@@ -40,7 +40,7 @@ textures and `.vmd` motions: by default **trk! does not bundle, host or upload t
 You pick a model or a folder from your own device in the settings panel, and the
 MMD terms of that model's author apply (most MMD models forbid redistribution,
 use outside MMD/MMM, and commercial use).
-The built-in motions (step / swing / turn / jump / idol) are **not** someone else's
+The built-in motions (step / swing / turn / jump / idol and the 🎵 BPM series) are **not** someone else's
 work: trk! generates those `.vmd` bytes itself in `js/mmd.js`, so they are covered
 by the GPL like the rest of the code.
 

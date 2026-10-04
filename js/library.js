@@ -7,9 +7,14 @@
 
 const MEDIA_EXT = ["mp4", "m4a", "mp3", "ogg", "oga", "opus", "wav", "webm", "flac", "aac", "mov"];
 const LIB_MAX = 3000, LIB_SHOW = 300, ADDED_MAX = 50, CHART_SUFFIX = ".shadow-taiko.json";
+const LIB_DEPTH = 8;                        /* 📤 共有は「一気に全部」が売りなので、フォルダの深さも広く歩く（旧 6） */
+const SHARED_MAX = 150;                     /* 💾 端末に残す共有の曲の上限（空き容量を守るため） */
+const SHARED_BYTES = 300 * 1024 * 1024, SHARED_MB = Math.round(SHARED_BYTES / 1048576);
 const canPickDir = "showDirectoryPicker" in window && window.isSecureContext && window.self === window.top;
 const libKV = idbStore("shadow_taiko_library", "kv");
 const songDB = idbStore("shadow_taiko_songs", "files");
+/* 💾 共有した曲を端末に残すときの保存先（新しいキー。既存の保存キーは変えていません） */
+const sharedDB = idbStore("shadow_taiko_shared", "files");
 
 /* ---------- ▶ AUTO・📻 ラジオの切り替え ---------- */
 settings.radio = !!prefs.radio;
@@ -88,13 +93,28 @@ on("language", renderSeedTools);
 
 /* ---------- 曲リストの中身 ---------- */
 let folderSongs = [], addedSongs = [], packSongs = [], libHandle = null, libView = [];
+/* 📤 ミュージックフォルダを共有（許可は1回。中身のリストをぜんぶ取り込む）まわりの状態 */
+let sharedSongs = [];        /* 💾 端末に残してある共有の曲（リロード後も残る） */
+let libShared = false;       /* いまの libHandle が「📤 共有」でもらったものか（📁 開く と区別するため） */
+let shareRemembered = false; /* 共有の許可を覚えているか（まだつながっていなくても 🚫 を出せるように） */
+let lastScan = [];           /* 直近のスキャン結果（💾 をあとからオンにしたときに使う） */
+let dirInputMode = "open";   /* フォールバックの <input webkitdirectory> を 📁/📤 のどちらが開いたか */
 /* 🧩 アドオン（js/addons.js）が足した曲。setAddonSongs() で入れ替わります */
 let addonSongs = [];
 function setAddonSongs(list) {
   addonSongs = Array.isArray(list) ? list.slice(0, LIB_MAX) : [];
   renderLib();
 }
-const allSongs = () => [...folderSongs, ...addedSongs, ...packSongs, ...addonSongs];
+/* 一覧の材料。同じ曲（同じ key）が 📁フォルダ・💾共有・📄追加 で重なったときは1件だけ出します
+   （共有を端末に残すと、同じ曲がフォルダ側と端末側の両方に居るため） */
+const allSongs = () => {
+  const out = [], seen = new Set();
+  for (const it of [...folderSongs, ...sharedSongs, ...addedSongs]) {
+    if (!it || seen.has(it.key)) continue;
+    seen.add(it.key); out.push(it);
+  }
+  return [...out, ...packSongs, ...addonSongs];
+};
 function addedItem(file) {
   const base = baseName(file.name);
   return { key:`${file.size}|${base}`, source:"file", file, title:base, base, size:file.size };
@@ -270,6 +290,7 @@ function renderLib() {
     left.append(el("span", "libName", it.title + (info && info.title ? " " + info.title : "")),   // 例：曲名 🥁🐔🚚⚔🎪🚛
                 el("span", "libSub", [it.artist, srcLabel(it)].filter(Boolean).join(" · ")));
     if (it.charts) meta.append(el("i", "libTag", "📄"));
+    if (it.shared) { const st = el("i", "libTag", "📤"); st.title = tr("libKeepShared"); meta.append(st); }   /* 💾 端末に残した共有の曲 */
     if (it.chartBlobs && Object.keys(it.chartBlobs).length) meta.append(el("i", "libTag", "📦"));
     if (info && info.plays) meta.append(el("i", "libTag", tr("libPlays", { n:info.plays })));
     if (info && info.best) meta.append(el("i", "libTag", info.best.toLocaleString()));
@@ -294,10 +315,10 @@ function renderLib() {
       wrap.append(sb);
       if (inFav || F.groupOf("song", it.key)) wrap.append(F.menuButton("song", it.key, "libMenu"));
     }
-    if (it.source === "file") {
+    if (it.source === "file" || it.shared) {   /* 📄 追加した曲 ／ 💾 端末に残した共有の曲 は一覧から外せます */
       const del = el("button", "", "✕"); del.type = "button"; del.title = tr("libRemove"); del.setAttribute("aria-label", tr("libRemove"));
       del.style.cssText = "padding:6px 12px;font-size:14px;border-radius:12px";
-      del.addEventListener("click", () => removeAdded(it));
+      del.addEventListener("click", () => { if (it.shared) removeShared(it); else removeAdded(it); });
       wrap.append(del);
     }
     box.append(wrap);
@@ -493,8 +514,15 @@ async function refreshPackSongs() {
 }
 on("packsChanged", refreshPackSongs);
 
-/* ---------- ミュージックフォルダ ---------- */
-function ingestFolder(list, dirName) {
+/* ---------- ミュージックフォルダ（📁 開く ／ 📤 共有） ----------
+   📁 開く … 今までどおり。選んだフォルダの中だけを曲リストに入れる（🎬 動画フォルダなどにも）
+   📤 共有 … 端末（PC・スマホ）に**1回だけ**許可をもらって、ミュージックフォルダの中身を
+             ぜんぶ一気に取り込む。許可は libKV の "share" に覚えておくので、次回からは
+             「🔗 共有をつづける」の1タップ（ブラウザの都合で、許可は操作のたびに要ります）
+   💾 端末に残す（settings.libKeepShared）… 共有で取り込んだ曲を shadow_taiko_shared に保存して、
+             許可なしでも遊べるようにする。上限は SHARED_MAX 曲・SHARED_MB MB（空き容量を守るため）
+   ⚠ 曲は端末の外へ送りません（読むだけ。アップロードはしません） */
+function ingestFolder(list, dirName, shared, skipped) {
   folderSongs = []; const charts = {};
   for (const { file, rel } of list) {
     const dir = rel.includes("/") ? rel.slice(0, rel.lastIndexOf("/")) : "", lower = file.name.toLowerCase();
@@ -507,58 +535,180 @@ function ingestFolder(list, dirName) {
     }
   }
   for (const it of folderSongs) it.charts = charts[it.dir + "/" + it.base] || null;
-  setStatus("libStatus", folderSongs.length ? "libFound" : "libEmpty", { n:folderSongs.length, dir:dirName || "" });
+  /* 📤 共有のときは「何曲きたか」と「対象外が何件あったか」を両方出す（変なファイルも見て分かるように） */
+  if (shared) setStatus("libStatus", "libShareFound", { dir:dirName || "", n:folderSongs.length, skip:skipped || 0 });
+  else setStatus("libStatus", folderSongs.length ? "libFound" : "libEmpty", { n:folderSongs.length, dir:dirName || "" });
   renderLib();
 }
-async function scanHandle(h) {
-  const out = [];
+/* フォルダの中を歩く。読み込んだ曲数は onProgress に出す（大きなフォルダでも待てるように） */
+async function scanHandle(h, onProgress) {
+  const files = []; let skipped = 0;
   async function walk(dir, path, depth) {
-    if (depth > 6 || out.length > LIB_MAX * 2) return;
+    if (depth > LIB_DEPTH || files.length > LIB_MAX * 2) return;
     for await (const e of dir.values()) {
       if (e.kind === "file") {
         const n = e.name.toLowerCase();
-        if (MEDIA_EXT.includes(extOf(n)) || n.endsWith(CHART_SUFFIX)) out.push({ file:await e.getFile(), rel:`${path}/${e.name}` });
+        if (MEDIA_EXT.includes(extOf(n)) || n.endsWith(CHART_SUFFIX)) {
+          files.push({ file:await e.getFile(), rel:`${path}/${e.name}` });
+          if (onProgress && !(files.length % 25)) onProgress(files.length);
+        } else skipped++;                       /* 曲でも譜面でもないファイル（写真・テキストなど） */
       } else if (e.kind === "directory" && !e.name.startsWith(".")) await walk(e, `${path}/${e.name}`, depth + 1);
     }
   }
   await walk(h, h.name, 0);
-  return out;
+  return { files, skipped };
 }
-async function useHandle(h, remember) {
-  setStatus("libStatus", "libScanning");
+async function useHandle(h, remember, shared) {
+  libShared = !!shared;
+  setStatus("libStatus", shared ? "libShareScanning" : "libScanning", { n:0 });
   try {
-    const list = await scanHandle(h);
-    libHandle = h; ingestFolder(list, h.name);
-    if (remember) libKV.put("dir", h).catch(() => {});
+    const r = await scanHandle(h, n => setStatus("libStatus", shared ? "libShareScanning" : "libScanning", { n }));
+    libHandle = h; lastScan = r.files;
+    ingestFolder(r.files, h.name, libShared, r.skipped);
+    if (remember) { libKV.put(shared ? "share" : "dir", h).catch(() => {}); if (shared) shareRemembered = true; }
     $("libReconnectBtn").hidden = true; $("libRescanBtn").hidden = false;
-  } catch (e) { console.error(e); setStatus("libStatus", "libDenied"); }
+    if (shared && settings.libKeepShared) await keepSharedSongs(r.files);
+    syncShareUI();
+  } catch (e) { console.error(e); setStatus("libStatus", shared ? "libShareDenied" : "libDenied"); }
 }
 async function openFolder() {
+  dirInputMode = "open";
   if (!canPickDir) { $("libDirInput").click(); return; }
-  try { await useHandle(await showDirectoryPicker({ id:"trk-music", mode:"read", startIn:"music" }), true); }
+  try { await useHandle(await showDirectoryPicker({ id:"trk-music", mode:"read", startIn:"music" }), true, false); }
   catch (e) { if (e.name !== "AbortError") { console.error(e); $("libDirInput").click(); } }
+}
+/* 📤 ミュージックフォルダを共有：端末に1回許可してもらうと、中身のリストをぜんぶ引き受けます */
+async function shareMusicFolder() {
+  dirInputMode = "share";
+  if (!canPickDir) { setStatus("libShareStatus", "libShareUnsupported"); $("libDirInput").click(); return; }
+  try {
+    /* startIn:"music" で、端末のミュージックフォルダを最初から開きます（スマホは SAF のフォルダ選びになります） */
+    const h = await showDirectoryPicker({ id:"trk-music-share", mode:"read", startIn:"music" });
+    await useHandle(h, true, true);
+  } catch (e) {
+    if (e.name === "AbortError") { dirInputMode = "open"; return; }   /* キャンセルは何もしない */
+    console.error(e);
+    setStatus("libStatus", "libShareDenied"); setStatus("libShareStatus", "libShareUnsupported");
+    $("libDirInput").click();
+  }
+}
+/* 🚫 共有をやめる：覚えた許可と、端末に残した曲をぜんぶ消します */
+async function stopSharing() {
+  try { await libKV.del("share"); } catch (_) {}
+  shareRemembered = false;
+  await clearSharedSongs();
+  if (libShared) {
+    folderSongs = []; libHandle = null; libShared = false; lastScan = [];
+    $("libReconnectBtn").hidden = true; $("libRescanBtn").hidden = true;
+  }
+  renderLib(); syncShareUI();
+  setStatus("libShareStatus", "libShareStopped");
 }
 function showReconnect() {
   const b = $("libReconnectBtn");
-  if (libHandle && !b.hidden) b.textContent = tr("libReconnect", { name:libHandle.name });
+  if (libHandle && b && !b.hidden) b.textContent = tr(libShared ? "libShareResume" : "libReconnect", { name:libHandle.name });
 }
-$("libOpenBtn").addEventListener("click", openFolder);
-$("libRescanBtn").addEventListener("click", () => { if (libHandle) useHandle(libHandle, false); else $("libDirInput").click(); });
+
+/* ---------- 💾 共有した曲を端末に残す（settings.libKeepShared） ---------- */
+function sharedItem(r) {
+  const f = r.file instanceof File ? r.file : new File([r.file], r.name || "song"), base = baseName(f.name);
+  return { key:`${f.size}|${base}`, source:"folder", shared:true, file:f, title:base, base, size:f.size, dir:r.dir || "", charts:null };
+}
+async function loadSharedSongs() {
+  try {
+    const recs = await sharedDB.all();
+    sharedSongs = (recs || []).filter(r => r && r.file).sort((a, b) => (a.addedAt || 0) - (b.addedAt || 0)).map(sharedItem);
+  } catch (e) { console.error(e); sharedSongs = []; }
+}
+async function clearSharedSongs() {
+  try { for (const k of (await sharedDB.keys()) || []) await sharedDB.del(k); } catch (e) { console.error(e); }
+  sharedSongs = [];
+}
+async function removeShared(it) {
+  sharedSongs = sharedSongs.filter(x => x.key !== it.key);
+  try { await sharedDB.del(it.key); } catch (_) {}
+  renderLib(); syncShareUI();
+}
+/* 共有で取り込んだ曲を端末の中へ。上限（曲数・バイト数）に達したら、そこで止めて正直に出します。
+   ⚡ もう端末にある曲（key＝「サイズ|曲名」が同じ）は書き直さないので、↻ 再スキャンは軽く済みます */
+async function keepSharedSongs(list) {
+  let why = "", saved = 0, bytes = 0;
+  const have = new Map();                                            /* key → 保存してあるバイト数 */
+  try {
+    for (const k of (await sharedDB.keys()) || []) {
+      const sz = Number(String(k).split("|")[0]) || 0;
+      have.set(String(k), sz); bytes += sz;
+    }
+  } catch (_) {}
+  let n = have.size;
+  for (const { file, rel } of list || []) {
+    if (!MEDIA_EXT.includes(extOf(file.name))) continue;
+    const dir = rel.includes("/") ? rel.slice(0, rel.lastIndexOf("/")) : "", key = `${file.size}|${baseName(file.name)}`;
+    if (have.has(key)) continue;
+    if (n >= SHARED_MAX || bytes + file.size > SHARED_BYTES) { why = "full"; break; }
+    try { await sharedDB.put(key, { key, file, name:file.name, dir, addedAt:Date.now() }); }
+    catch (e) { console.error(e); why = "failed"; break; }            /* 空き容量が足りない（QuotaExceededError など） */
+    have.set(key, file.size); n++; bytes += file.size; saved++;
+    if (!(saved % 10)) setStatus("libShareStatus", "libKeepSharedSaving", { n:saved });
+  }
+  await loadSharedSongs();
+  renderLib();
+  setStatus("libShareStatus", why === "failed" ? "libKeepSharedFailed" : why === "full" ? "libKeepSharedFull" : "libKeepSharedSaved",
+    { n, max:SHARED_MAX, mb:SHARED_MB });
+  return n;
+}
+/* 設定パネル「📤 ミュージックフォルダの共有」の中身を、いまの状態に合わせます */
+function syncShareUI() {
+  const chk = $("libKeepSharedChk"), hint = $("libKeepSharedHint"), state = $("libShareState"), stop = $("libShareStopBtn");
+  if (chk) chk.checked = !!settings.libKeepShared;
+  if (hint) hint.textContent = tr("libKeepSharedHint", { max:SHARED_MAX, mb:SHARED_MB });
+  const sharing = !!libHandle && libShared;
+  if (state) state.textContent = sharing ? tr("libShareStateShared", { name:libHandle.name, n:folderSongs.length })
+    : sharedSongs.length ? tr("libKeepSharedRestored", { n:sharedSongs.length }) : tr("libShareStateNone");
+  if (stop) stop.hidden = !(sharing || shareRemembered || sharedSongs.length);
+  showReconnect();
+}
+
+/* ---------- ボタンの配線（📁 開く と 📤 共有 はならべて残します） ---------- */
+const libOpenBtn = $("libOpenBtn"); if (libOpenBtn) libOpenBtn.addEventListener("click", openFolder);
+const libShareBtn = $("libShareBtn"); if (libShareBtn) libShareBtn.addEventListener("click", shareMusicFolder);
+const libShareSettingsBtn = $("libShareSettingsBtn"); if (libShareSettingsBtn) libShareSettingsBtn.addEventListener("click", shareMusicFolder);
+const libShareStopBtn = $("libShareStopBtn"); if (libShareStopBtn) libShareStopBtn.addEventListener("click", stopSharing);
+const libKeepChk = $("libKeepSharedChk");
+if (libKeepChk) libKeepChk.addEventListener("change", async () => {
+  settings.libKeepShared = !!libKeepChk.checked; saveUserPrefs();
+  if (settings.libKeepShared) {
+    if (lastScan.length) await keepSharedSongs(lastScan);
+    else setStatus("libShareStatus", "libKeepSharedNone");            /* まだ共有していない */
+  } else {
+    await clearSharedSongs(); renderLib();
+    setStatus("libShareStatus", "libKeepSharedCleared");
+  }
+  syncShareUI();
+});
+$("libRescanBtn").addEventListener("click", () => {
+  if (libHandle) useHandle(libHandle, false, libShared);
+  else { dirInputMode = libShared ? "share" : "open"; $("libDirInput").click(); }
+});
 $("libDirInput").addEventListener("change", e => {
   const list = Array.from(e.target.files || []).map(f => ({ file:f, rel:f.webkitRelativePath || f.name }));
   e.target.value = "";
   if (!list.length) return;
-  libHandle = null; $("libRescanBtn").hidden = false;
-  ingestFolder(list, list[0].rel.split("/")[0] || "");
+  const shared = dirInputMode === "share"; dirInputMode = "open";
+  const skipped = list.filter(({ file }) => !MEDIA_EXT.includes(extOf(file.name)) && !file.name.toLowerCase().endsWith(CHART_SUFFIX)).length;
+  libShared = shared; libHandle = null; lastScan = list; $("libRescanBtn").hidden = false;
+  ingestFolder(list, list[0].rel.split("/")[0] || "", shared, skipped);
+  if (shared && settings.libKeepShared) keepSharedSongs(list);
+  syncShareUI();
 });
 $("libReconnectBtn").addEventListener("click", async () => {
   if (!libHandle) return;
   try {
     let p = await libHandle.queryPermission({ mode:"read" });
     if (p !== "granted") p = await libHandle.requestPermission({ mode:"read" });
-    if (p !== "granted") { setStatus("libStatus", "libDenied"); return; }
-    await useHandle(libHandle, false);
-  } catch (e) { console.error(e); setStatus("libStatus", "libDenied"); }
+    if (p !== "granted") { setStatus("libStatus", libShared ? "libShareDenied" : "libDenied"); return; }
+    await useHandle(libHandle, false, libShared);
+  } catch (e) { console.error(e); setStatus("libStatus", libShared ? "libShareDenied" : "libDenied"); }
 });
 
 /* ---------- 検索・並べ替え・ランダム ---------- */
@@ -581,7 +731,7 @@ $("libRandomBtn").addEventListener("click", () => {
 
 on("records", renderLib);
 on("chart", updateSpBuilder);
-on("language", () => { $("libSearch").placeholder = tr("libSearch"); showReconnect(); renderLib(); renderBanner(); });
+on("language", () => { $("libSearch").placeholder = tr("libSearch"); showReconnect(); syncShareUI(); renderLib(); renderBanner(); });
 
 /* ---------- 起動時（main.js から呼びます） ---------- */
 async function initLibrary() {
@@ -598,10 +748,21 @@ async function initLibrary() {
   await refreshPackSongs();
   if (canPickDir) {
     try {
-      const h = await libKV.get("dir");
-      if (h && h.kind === "directory") { libHandle = h; $("libReconnectBtn").hidden = false; showReconnect(); }
+      /* 📤 共有の許可があれば優先（無ければ 📁 開く で覚えたフォルダ） */
+      const hs = await libKV.get("share"), hd = hs ? null : await libKV.get("dir");
+      const h = hs || hd;
+      if (h && h.kind === "directory") {
+        libHandle = h; libShared = !!hs; shareRemembered = !!hs;
+        $("libReconnectBtn").hidden = false; showReconnect();
+      }
     } catch (_) {}
   } else setStatus("libStatus", "libFallbackNote");
+  /* 💾 端末に残した共有の曲（?safe=1 では読み戻しません） */
+  if (settings.libKeepShared && !(window.TrkSafeMode && TrkSafeMode())) {
+    await loadSharedSongs();
+    if (sharedSongs.length) setStatus("libStatus", "libKeepSharedRestored", { n:sharedSongs.length });
+  }
+  syncShareUI();
   renderLib();
 }
 /* ✅ library.js 完了 */

@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 # trk! 次回セッション用メモ（NEXT_SESSION_HANDOFF.md）
 
-> 最終更新：**2026-10-05**（📊スペクトラム **見え方16種・色8種・曲名バナーのスキン（＋で開く）・「🚫 スペクトラムを使用しない」** ＋ TVに重ねる ＋ tvMakerOpen 生キー修正）
+> 最終更新：**2026-10-05**（📊スペクトラム **見え方16種・色8種・曲名バナーのスキン（＋で開く）・「🚫 スペクトラムを使用しない」** ＋ TVに重ねる ＋ tvMakerOpen 生キー修正 ＋ 📤 **ミュージックフォルダを共有**（1回の許可で一括取り込み・🔗共有をつづける・💾端末に残す・🚫やめる／📁開くは残す））
 > このメモは、そのまま次回の最初のメッセージに貼っても再開できます。
 > リポジトリにこのファイルがあれば「`NEXT_SESSION_HANDOFF.md` を読んで現状を確認して」でOKです。
 > 詳しい仕様（ファイル間の約束・保存データ・落とし穴）は **docs/HANDOFF.md** にあります。
@@ -30,7 +30,8 @@
   | #6 | 💠Lat式ミク同梱＋内蔵モーション25種＋🎲おまかせ＋🩷選曲画面ミニ操作 |
   | #7 | 🥁 FAST/SLOW・あべこべ・でたらめ＋新ファイル棚スキン16種＋TV共有URL・確認タブ強化＋アンテナカスタマイズ＋💬Issues窓口 |
   | #8 | 📊 スペクトラム（音の見える化・**見え方16種・色8種・曲名バナーのスキン（＋で開く）・🚫使用しないスイッチ**・TVに重ねる）＋ tvMakerOpen 生キー修正 |
-- いまの作業ブランチ：**`arena/01a10848-trk`**（**PR #8 として main にマージ済み**。次回は新しいブランチで始めてください）
+  | #9 | 🎹 シンセ演奏モード（js/synth-mode.js）＋ 🎛 エフェクトチェーン編集（js/fx-synth.js） |
+- いまの作業ブランチ：**`arena/01a108ba-trk`**（📤 ミュージックフォルダを共有。PR はこれから）
 
 ### 1-1b. 今回（arena/01a107d7-trk）でやったこと
 
@@ -103,6 +104,21 @@
 - **🐛 生キーの修正**：TVドックの「🎨 カスタムTVスキンを作る」ボタンが `tvMakerOpen` という**生キー**で表示されていたのを `tvmOpen` に修正（新しく作った i18n 監査で発見）。
 - **検証**：`node --check` 全ファイルOK／jsdom ハーネス3本（`jsdom-smoke` 7/7・`jsdom-spectrum` **86/86**（16種すべてを順に描いて赤エラー0・保存の見え方が読み直しでも残る・📊曲名バナーのスキンと「＋」・色8種・初期値の移行）・`jsdom-i18n-audit` 10/10・エラー0）。翻訳キーは **1102キー × 4言語**（欠け0・二重定義0・生キー0）。
 
+### 1-1d. 今回（arena/01a108ba-trk）でやったこと
+
+- **📤 ミュージックフォルダを共有**（`js/library.js`・`index.html`・4言語。**新しいJSファイルは無し**）
+  - 「フォルダへの**許可を承認する**」に加えて、**端末（PC・スマホ）に1回だけ許可をもらって、ミュージックフォルダの中身のリストを一気に取り込む**入口を新設（曲リストの `#libShareBtn` ＋ 設定画面の `#libSharePanel`）。
+  - **📁 開く は消さずに、ならべて残した**（🎬 動画フォルダなども 📁 側で選べるように、という要望どおり）。`📤 共有` は `showDirectoryPicker({ id:"trk-music-share", startIn:"music" })` で**端末のミュージックフォルダを最初から開く**ので、許可は1タップ。
+  - 許可の覚え先を分けた：`libKV`（IndexedDB `shadow_taiko_library` の kv）の **`"share"`（📤 共有）** と **`"dir"`（📁 開く）**。起動時は share を優先し、再接続ボタンは「🔗 「Music」の**共有をつづける**」に変わる（`libShared` で出し分け）。
+  - スキャンを強化：`scanHandle()` は `{files, skipped}` を返し、深さは `LIB_DEPTH = 8`（旧 6）、**25曲ごとに進捗**（`libShareScanning`＝「📤 共有を読み込み中… {n}曲」）。終わると「📤 「Music」を共有しました：**5曲（対象外のファイル 2件はとばしました）**」＝**変な曲や動画も一緒に入ったこと**が分かる表示にした。
+  - 非対応ブラウザ（スマホの Chrome など `canPickDir` が false）は `#libDirInput`（webkitdirectory）へ落ちて、同じ取り込み道に合流（`dirInputMode` で 📁/📤 を判別）。キャンセル（AbortError）は何もしない。
+  - **💾 共有した曲を端末に残す**（`settings.libKeepShared`・**初期オフ**）：新しい IndexedDB **`shadow_taiko_shared`** に `{key, file, name, dir, addedAt}` を保存。上限 **150曲・300MB**（`SHARED_MAX` / `SHARED_BYTES`）で、達したら正直に「上限まで保存しました」、空き容量が足りなければ「{n}曲でとめました」を出す。リロード後は**許可なしで遊べる**（行に 📤 のタグと ✕＝1曲だけ外せる）。同じ曲が 📁側と💾側の両方に居るときは `allSongs()` が**1件だけ**出す。
+  - **🚫 共有をやめる**（`stopSharing()`）：kv の "share" ＋ 端末に残した曲 ＋ 共有中のリストをまとめて消す（📁 開く で入れた曲は消さない）。
+  - `?safe=1` では 💾 を読み戻さない（`enterSafeMode()` に `libKeepShared = false` ＋ `initLibrary()` が `TrkSafeMode()` を見る）。
+  - **文章キーは21個 × 4言語**（`libShare…` / `libKeepShared…` / `secShare`）。⚠ `libKeepSharedHint` は `{max}` `{mb}` が入るので **data-i18n にせず** `syncShareUI()` が書く（`applyLanguage()` は変数を渡さないため）。
+  - ついでに：README の「📚 棚のスキン11種」→ **16種** に直し、スマホの案内・動作環境の表・English も更新。`sw.js` の `CACHE` を **`trk-v2026.10.5-share1`** に。
+- **検証**：`node --check` 全ファイルOK／jsdom ハーネス3本（**`jsdom-smoke` 10/10・`jsdom-libshare` 71/71・`jsdom-i18n-audit` 32/32**、赤エラー0）。翻訳キーは **1311キー × 4言語**（欠け0・二重定義0・生キー0）。
+
 ### 1-2. 規模（数字で見る現在地）
 
 | 項目 | 数 |
@@ -112,7 +128,8 @@
 | 映像フィルター | **45**（basic/vivid/retro/cinema/effect/weird/nature） |
 | サウンドエフェクト | **115 プリセット**（fx.js・fx-presets.js は🧊凍結中） |
 | 曲リストの棚スキン | **16**（＋🎲おまかせ） |
-| 言語 | 4（ja/en/zh/ko）・**1102 キー × 4**（欠け0・生キー0・二重定義0） |
+| 言語 | 4（ja/en/zh/ko）・**1311 キー × 4**（欠け0・生キー0・二重定義0。i18n.js 以外の Object.assign 分も含む実測値） |
+| 曲の取り込み口 | 4（📤 共有／📁 開く／＋ 曲ファイル／📦 パック）＋ドラッグ＆ドロップ＋🧩 アドオン |
 | 記録 | 難易度5・速度別・称号・公認パック（✔） |
 
 ### 1-3. 機能の要点（詳細は docs/HANDOFF.md）
@@ -122,6 +139,7 @@
   - **🖼 映像確認タブの操作性向上**：再生/一時停止ボタン、シークスライダー（0〜100%）、経過時間表示（`m:ss / m:ss`）、および「▶ この設定で遊ぶ」ボタンを配備。選んだフィルターやスキンの映り方を静止画・特定シーンで確認し、そのまますぐに演奏を開始可能。
 - **◀▶ の演奏中送り**：設定 →🎛設定タブの **「▶◀ 演奏中も ◀▶ で曲を変える」**（`settings.tvSongWhilePlaying`・**初期オフ**）。
   オンのときだけ、演奏中でも押したその場で曲が切り替わる（**記録は残らない**）。**キー（←/→＝10秒スキップ）は従来のまま**。
+- **📤 ミュージックフォルダを共有（library.js）**：端末に**1回だけ許可**をもらうと、ミュージックフォルダの中身を**一気に**リストへ（深さ8階層・25曲ごとに進捗・「{n}曲（対象外 {skip}件）」表示）。許可は `libKV` の `"share"` に覚えて「🔗 共有をつづける」で再開（📁 開く の `"dir"` とは別）。設定画面 `#libSharePanel` に **💾 共有した曲を端末に残す**（`settings.libKeepShared`・初期オフ。IndexedDB `shadow_taiko_shared` に最大150曲・300MB）と **🚫 共有をやめる**。`?safe=1` では読み戻さない。**📁 開く は動画フォルダ用として残してある**。
 - **棚スキン（lib-skins.js）16種**：🎛タブプレーヤー／📝ノート／🌈シール帳／🗄カード目録／📼カセットラベル／🖍黒板／
   🕹レトロPC／📁クリアファイル／🎰ジュークボックス／📻ラジオ番組表／🚉電光掲示板 ＋ **💿レコード棚／📼レンタルビデオ／🎤カラオケ目次／🗂️図書館の書架／🍱お品書き**（全16種）。
   曲リストの 🎨 ボタンでその場で切り替え（`settings.libSkin` / `libSkinQuick`）。
@@ -133,7 +151,7 @@
 - **🧩 アドオン（addons.js）**：`.js` / `.trk-addon` を入れて、設定・曲リスト・TV/ラックのくわしい欄にUIを足す／曲を足す／
   自前の音を `api.fx.tapElement` でエフェクターに通す。`trk_addons_v1`。`?safe=1` では読み込まない。
 - **🛟 緊急復旧**：`?safe=1` / `?reset=tv|video|audio|notes|all|factory` / `?export=…`、コンソール `trkReset()` `trkExport()`。
-- キャッシュ：`sw.js` の `CACHE` は **`trk-v2026.10.5-shelf1`**（公開を更新したら必ず変える）。
+- キャッシュ：`sw.js` の `CACHE` は **`trk-v2026.10.5-share1`**（公開を更新したら必ず変える）。
 
 ---
 
@@ -182,11 +200,12 @@
 ## 3. 触るときの約束
 
 - **保存キー（変えない）**：`shadow_taiko_preferences_v2` / `_records_v1` / `_best_v1` / `_song_prefs_v1` / `_custom_skins_v1` / `trk_fx_presets_v1` / `trk_tv_skins_v1` / `trk_addons_v1` / IndexedDB `shadow_taiko_packs` `_songs` `_library` `_vrm` `_mmd`
-  - 新しく足したのは **`settings.favs` / `settings.songFav`**（＋既存キーの中の新しい項目 `tvSongWhilePlaying` `mmd*`（**`mmdMotionKind` `mmdQuickUI` `mmdMotionFavs` 含む**） `libTab` `libSkin` `libSkinQuick`）。既存キーと形式名はそのまま
+  - 新しく足したのは **`settings.libKeepShared`** と IndexedDB **`shadow_taiko_shared`**（store "files"。📤💾 共有した曲の控え。`_library` の kv には `"dir"`（📁 開く）と `"share"`（📤 共有）のハンドルが入る）
+  - その前に足したのは **`settings.favs` / `settings.songFav`**（＋既存キーの中の新しい項目 `tvSongWhilePlaying` `mmd*`（**`mmdMotionKind` `mmdQuickUI` `mmdMotionFavs` 含む**） `libTab` `libSkin` `libSkinQuick`）。既存キーと形式名はそのまま
 - **形式名（変えない）**：`shadow-taiko-pack` / `chart` / `records` / `skin` / `trk-fx` / `trk-verified` / `trk-tvskin` / **`trk-favs`**、譜面ファイル `*.shadow-taiko.json`
 - **読み込み順**：`tv-presets.js → core.js → fx-dock.js → tv-dock.js → fx.js → favs.js → library.js → verified.js → lib-skins.js → addons.js → main.js → speed.js → vrm.js → mmd.js → spectrum.js`（player.js は core の直後、mmd.js は vrm.js の直後、spectrum.js は**いちばん最後**）
 - **関数を包む方式**：包まれる側を `const` にしない（`function` 宣言のまま）— tv-dock.js が `videoFilter` と `drawVideo` を、favs.js が fx の ★ を包む
-- **新しい設定を足したときの3点セット**：①`core.js` の `enterSafeMode()` ②`resetVideoPrefs()` ③読み戻し側（`tv-dock.js` の `keepSafe`＝`?safe=1` では保存値を読み戻さない。**spectrum.js は自前で `specSafe` を見て読み戻しを止めています**）。どれか忘れると `?safe=1` が効かなくなる
+- **新しい設定を足したときの3点セット**（📤 `libKeepShared` は ①`enterSafeMode()` に入れて、③の読み戻し側＝`initLibrary()` が `TrkSafeMode()` を見ています）：①`core.js` の `enterSafeMode()` ②`resetVideoPrefs()` ③読み戻し側（`tv-dock.js` の `keepSafe`＝`?safe=1` では保存値を読み戻さない。**spectrum.js は自前で `specSafe` を見て読み戻しを止めています**）。どれか忘れると `?safe=1` が効かなくなる
 - **翻訳**：4言語すべて更新。キーは接頭辞で分ける（`tv…` / `tvm…` / `sfx…` / `vf…` / `mmd…` / `libTab…` / `libSkin…` / `fav…`）。生のキー表示は禁止（`jsdom-i18n-audit.mjs` で点検できる）
 - **音**：`createMediaElementSource` は一度だけ → `TrkFX.tap()`。アドオンは `api.fx.tapElement()`
   - 📊 スペクトラム（spectrum.js）は `TrkFX.tap(2048)` を**1つだけ使い回す**（呼ぶたびに `G.out` へぶら下がるため）。作るのは**ユーザー操作のあと＋実際に音が鳴っているときだけ**（`?safe=1` では作らない）
@@ -214,7 +233,9 @@ for f in js/*.js js/characters/*.js js/addons/*.js; do node --check "$f" || echo
 
 - 実ブラウザが使えない環境では **jsdom** で配線を拾える（`npm i jsdom` → `/home/user/browsercheck` で `for f in jsdom-*.mjs; do node "$f"; done`）
   - canvas は `getContext` をスタブする。**`createImageData` も返す**こと（TV砂嵐が `img.data` を読む）
-  - ⚠ **2026-10-05 の時点で、ハーネスは3本だけです**（サンドボックスが入れ替わったため、前回までの18本は残っていません）。作り直したのは `jsdom-smoke.mjs`（起動・赤エラー0）／`jsdom-spectrum.mjs`（📊 スペクトラム **76項目**）／`jsdom-i18n-audit.mjs`（4言語の欠け・二重定義・生キー・コードが使うキーの実在）。
+  - ⚠ **2026-10-05 の時点で、ハーネスは3本だけです**（サンドボックスが入れ替わったため、前回までの18本は残っていません）。いまあるのは `jsdom-smoke.mjs`（起動・赤エラー0・**10項目**）／`jsdom-libshare.mjs`（📤 共有・💾 端末に残す・🔗 再接続・🚫 やめる・上限・`?safe=1`・非対応ブラウザ・4言語＝**73項目**）／`jsdom-i18n-audit.mjs`（4言語の欠け・二重定義・生キー・data-i18n の `{変数}` 残り＝**32項目**）。
+    - 📊 スペクトラムの `jsdom-spectrum.mjs`（76項目）は**今回のサンドボックスには無い**ので、spectrum.js を触るときは作り直すこと。
+    - `trkenv.mjs` のコツ：**`win.eval` は別の eval の `const`/`let` を見られない**ので、スクリプトは `<script src>` として本物どおり読ませる（`runScripts:"dangerously"` ＋ `resources.interceptors` に `requestInterceptor`）。`isSecureContext` は jsdom に無いので `beforeParse` で true にする（これが無いと `canPickDir` が false になる）。**リロードをまたぐテストでは File の size を本物のバイト数にする**こと（`key` が `${size}|${base}` なので、見かけだけ size を変えると重複判定がずれる）。
     共通部分は `trkenv.mjs` にあります（**jsdom 30 は `ResourceLoader` が無い**ので `resources: { interceptors: [requestInterceptor(...)] }` を使う／canvas・AudioContext・indexedDB・matchMedia をスタブ／キャンバスの `clientWidth` は 480 を返す）。増やすときは `jsdom-smoke.mjs` を雛形に。
   - 前回までのハーネス名（記録）：`smoke` `func` `i18n` `lang-fav` `libtabs` `menu` `order2` `prev` `rack` `reload` `skinbtn` `dock` `addons` `favs` `mmd` `songwhile` `i18n-audit` `mmdpreset`
     - `jsdom-mmdpreset.mjs`（🆕）は fetch と three／three-mmd-loader を偽物に差し替えて、💠 preset.json 検出→ボタン→読み込み→credit/motion/bpm 自動設定、jump/idol のVMD生成、新キー4言語を見る。**jsdom には matchMedia が無い**ので `beforeParse` でスタブする（`TEXT`／`settings` は const/let なので `win.eval` 経由で見る）
@@ -248,6 +269,15 @@ for f in js/*.js js/characters/*.js js/addons/*.js; do node --check "$f" || echo
 - [ ] 緊急パネルでノーツ書き出し・全設定書き出し・読み込みができる
 - [ ] タイトルを5回クリックでセーフモード確認ダイアログ／右下🛟ボタンで?safe=1に遷移
 - [ ] デモ（Pulse Study）で遊べる・音が鳴る
+- [ ] 📤 共有：曲リストの「📤 ミュージックフォルダを共有」で**許可ダイアログが1回**出て、ミュージックフォルダの中身が**一気に**並ぶ（読み込み中は「📤 共有を読み込み中… n曲」）
+- [ ] 📤 共有：終わりのメッセージに「n曲（対象外のファイル m件はとばしました）」が出る／思わぬ曲や動画も入っている（🎲おまかせで引くと面白い）
+- [ ] 📤 共有：リロードすると「🔗 「Music」の共有をつづける」が出て、1タップで読み直せる（📁 開く の再接続と文章が違う）
+- [ ] 📤 共有：📁 開く も今までどおり動く（動画フォルダを選べる・`?tv` 系の挙動も変わらない）
+- [ ] 💾 端末に残す：チェックすると保存され（`libShareStatus` に「n曲を端末に保存しました」）、リロード後に**許可なしで**曲が戻る（行に 📤 のタグと ✕）
+- [ ] 💾 端末に残す：一覧が二重にならない／✕ で1曲だけ外せる／オフにすると端末の控えが消える／150曲・300MB の上限で止まる（大きなフォルダで）
+- [ ] 🚫 共有をやめる：曲リスト・端末の控え・覚えた許可がまとめて消える（📁 開く で入れた曲は残る）
+- [ ] 📤 共有：スマホ（Chrome）で試して、フォルダを選べるか／選べないときは曲を1つずつ追加できるか
+- [ ] 📤 共有：`?safe=1` では端末に残した曲を読み戻さない（💾 のチェックもオフ）／設定を変えてリロード→残っている
 - [ ] 📚 曲のタブ：パックを入れるとタブが増える／タブの中で検索・並べ替えができる／TVの◀▶がそのタブの中で動く
 - [ ] 📚 棚スキン11種：🎨 ボタンでその場で切り替わる（🎰ジュークボックス・📻ラジオ番組表・🚉電光掲示板を含む）／設定で🎨ボタンを隠せる
 - [ ] ⭐ お気に入り：ドックのチップで1軍／2軍／🧊が切り替わり、ボタンの中身が入れ替わる

@@ -121,6 +121,8 @@
             </div>
             <div class="miniActions">
               <button id="libOpenBtn" type="button" data-i18n="libOpen"></button>
+              <!-- 📤 共有：端末に1回だけ許可して、ミュージックフォルダの中身を一気に取り込む（library.js） -->
+              <button id="libShareBtn" type="button" data-i18n="libShare"></button>
               <button id="libReconnectBtn" type="button" hidden></button>
               <button id="libRescanBtn" type="button" hidden data-i18n="libRescan"></button>
               <label class="fileBtn small">
@@ -782,6 +784,21 @@
               <label class="check"><input id="packInstallToo" type="checkbox" checked><span data-i18n="packInstallToo"></span></label>
               <button id="packBuildBtn" type="button" class="primary slim" data-i18n="packBuildBtn"></button>
             </details>
+          </details>
+
+          <!-- 📤 ミュージックフォルダの共有（配線は library.js。許可は1回だけ・中身を一気に取り込む） -->
+          <details class="panel" id="libSharePanel">
+            <summary data-i18n="secShare"></summary>
+            <div class="hint" data-i18n="libShareHint"></div>
+            <div class="miniActions">
+              <button id="libShareSettingsBtn" type="button" data-i18n="libShare"></button>
+              <button id="libShareStopBtn" type="button" data-i18n="libShareStop" hidden></button>
+            </div>
+            <label class="check"><input id="libKeepSharedChk" type="checkbox"><span data-i18n="libKeepShared"></span></label>
+            <!-- 上限の数字を入れるので、このヒントだけ library.js が tr(…, {max, mb}) で書き換えます -->
+            <div id="libKeepSharedHint" class="hint"></div>
+            <div id="libShareState" class="hint"></div>
+            <div id="libShareStatus" class="hint status"></div>
           </details>
 
           <details class="panel" id="vrmPanel">

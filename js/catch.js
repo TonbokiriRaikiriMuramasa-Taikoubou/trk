@@ -1,0 +1,400 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+/* ==========================================================================
+   trk! catch.js — 🚛 CATCH（荷物を受け止めるトラック）＋ 🚀 ぶっ飛ばしモード
+   ・落ちてくる荷物を荷台で受け止める。中心ほど高評価（PERFECT✦／PERFECT／GOOD）
+   ・道の上に出るニトロ缶🚀を取ると「ぶっ飛ばしモード」（8拍）：受け止める幅2倍・移動1.6倍・派手な演出
+   ・Seed nitro／buttobi／ぶっとばし で常時ぶっ飛ばし（練習扱い）
+   ・障害物はありません（自動生成の譜面と相性が悪いため）
+   呼び出し元：game.js（判定位置）／render.js（描画・判定）
+   読み込み順：stagefx.js の後
+   ========================================================================== */
+"use strict";
+
+/* ============ 文章 ============ */
+Object.assign(TEXT.ja, {
+  catchHint:"落ちてくる荷物を荷台で受け止めます。←→（A・Dでも可）で左右に動き、画面をなぞっても動かせます。道の上のニトロ缶🚀を取ると、しばらく「ぶっ飛ばしモード」（受け止める幅2倍・移動が速くなる）になります。",
+  catchKeysTitle:"🚛 CATCHのキー", catchLeft:"左へ", catchRight:"右へ", catchKeyReset:"↺ ← ／ → に戻す",
+  catchCapture0:"「左へ」に割り当てるキーを押してください。ESCでキャンセル。",
+  catchCapture1:"「右へ」に割り当てるキーを押してください。ESCでキャンセル。",
+  catchAssigned:"CATCHのキーを設定しました。",
+  blastToast:"🚀 ぶっ飛ばし！", blastLabel:"🚀 BLAST", blastCount:"🚀 ぶっ飛ばし：{n}回",
+  eggNitro:"✦ NITRO：CATCHがずっとぶっ飛ばしモードになります（練習扱い・ハイスコア対象外）"
+});
+Object.assign(TEXT.en, {
+  catchHint:"Catch the falling parcels in your truck bed. Move with ← → (or A / D), or drag on the screen. Grab a nitro can 🚀 on the road to enter Blast mode for a while (double catch width, faster moves).",
+  catchKeysTitle:"🚛 CATCH keys", catchLeft:"Left", catchRight:"Right", catchKeyReset:"↺ Back to ← / →",
+  catchCapture0:"Press a key for “Left”. ESC cancels.", catchCapture1:"Press a key for “Right”. ESC cancels.",
+  catchAssigned:"CATCH key assigned.",
+  blastToast:"🚀 BLAST!", blastLabel:"🚀 BLAST", blastCount:"🚀 Blasts: {n}",
+  eggNitro:"✦ NITRO: CATCH stays in Blast mode the whole song (practice — no high score)"
+});
+Object.assign(TEXT.zh, {
+  catchHint:"用货斗接住落下的包裹。用 ← →（或 A・D）左右移动，也可以在画面上拖动。拿到路上的氮气罐🚀，会进入一段时间的“狂飙模式”（接取范围2倍・移动更快）。",
+  catchKeysTitle:"🚛 CATCH 按键", catchLeft:"向左", catchRight:"向右", catchKeyReset:"↺ 恢复为 ← ／ →",
+  catchCapture0:"请按下“向左”的按键。ESC取消。", catchCapture1:"请按下“向右”的按键。ESC取消。",
+  catchAssigned:"已设置CATCH按键。",
+  blastToast:"🚀 狂飙！", blastLabel:"🚀 BLAST", blastCount:"🚀 狂飙：{n}次",
+  eggNitro:"✦ NITRO：CATCH整首歌都是狂飙模式（练习・不计最高分）"
+});
+Object.assign(TEXT.ko, {
+  catchHint:"떨어지는 짐을 짐칸으로 받습니다. ← →(A・D도 가능)로 좌우로 움직이고, 화면을 드래그해도 됩니다. 길 위의 니트로 캔🚀을 먹으면 잠시 '폭주 모드'(받는 폭 2배・이동이 빨라짐)가 됩니다.",
+  catchKeysTitle:"🚛 CATCH 키", catchLeft:"왼쪽", catchRight:"오른쪽", catchKeyReset:"↺ ← ／ → 로 되돌리기",
+  catchCapture0:"'왼쪽'으로 지정할 키를 누르세요. ESC로 취소.", catchCapture1:"'오른쪽'으로 지정할 키를 누르세요. ESC로 취소.",
+  catchAssigned:"CATCH 키를 설정했습니다.",
+  blastToast:"🚀 폭주!", blastLabel:"🚀 BLAST", blastCount:"🚀 폭주: {n}회",
+  eggNitro:"✦ NITRO: CATCH가 곡 내내 폭주 모드가 됩니다 (연습 취급・최고 점수 제외)"
+});
+
+/* ============ 設定 ============ */
+const CATCH_DEFAULT_KEYS = ["ArrowLeft", "ArrowRight"], CATCH_ALT = ["KeyA", "KeyD"];
+settings.catchKeys = (Array.isArray(prefs.catchKeys) && prefs.catchKeys.length === 2 && prefs.catchKeys.every(validCode) && prefs.catchKeys[0] !== prefs.catchKeys[1])
+  ? prefs.catchKeys.slice() : CATCH_DEFAULT_KEYS.slice();
+const isCatch = () => settings.playMode === "catch";
+function catchKeyDir(code) {
+  const i = settings.catchKeys.indexOf(code); if (i >= 0) return i ? 1 : -1;
+  const j = CATCH_ALT.indexOf(code); return j >= 0 ? (j ? 1 : -1) : 0;
+}
+const catchAllKeys = () => [...settings.catchKeys, ...CATCH_ALT];   // player.js・speed.js が重なりの確認に使います
+
+/* ============ 🚀 常時ぶっ飛ばしのSeed ============ */
+const NITRO_SEEDS = ["nitro", "buttobi", "ぶっとばし"];
+for (const s of NITRO_SEEDS) EGG_KEYS[s] = "eggNitro";
+const alwaysBlast = () => NITRO_SEEDS.includes(($("seed").value || "").trim().toLowerCase());
+/* MODS に ∞BLAST を表示 */
+(() => {
+  const base = activeMods;
+  activeMods = () => { const m = base(); if (isCatch() && alwaysBlast()) m.push("∞BLAST"); return m; };
+})();
+/* 常時ぶっ飛ばしは練習扱い（resetRun のあとに付けるので、プレイ開始の合図で設定） */
+on("phase", p => { if (p === "playing" && isCatch() && alwaysBlast() && !settings.autoPlay) practice = true; });
+
+/* ============ 形（1920×1080の座標）と状態 ============ */
+const CATCH = { left:410, width:1100, topY:70, lineY:880, speed:1.5, half:.085, perfect:.05, item:.11, boost:1.6, blastBeats:8 };
+const catchX = x => CATCH.left + x * CATCH.width;
+const catchState = { x:.5, target:null, held:[false, false], last:0, blastUntil:-1e9, blastLen:1, trail:[] };
+const catchMap = { src:null, len:0, key:"", xs:new Float32Array(0), items:[] };
+const flying = [];   // ぶっ飛んでいく荷物
+const isBlast = now => alwaysBlast() || now < catchState.blastUntil;
+
+/* ============ 荷物の位置とニトロ缶を決める ============
+   ・ドンは左寄り、カッは右寄り。前の荷物から、時間内に必ず届く距離だけ動かす
+   ・ニトロ缶は、荷物と荷物の間の「通る道の上」に置くので、普通に追いかければ拾える */
+function ensureCatchMap() {
+  const key = `${$("seed").value}|${chartDiff}|${chartMeta.bpm}`;
+  if (catchMap.src === chart && catchMap.len === chart.length && catchMap.key === key) return;
+  const tier = { easy:0, normal:1, hard:2, master:3, rush:3 }[chartDiff] ?? 1;
+  const use = [.45, .65, .85, .95][tier], dens = [.06, .09, .12, .15][tier];
+  const beat = 60000 / (chartMeta.bpm || 120);
+  const rand = mulberry32(hashString(`catch|${key}|${chart.length}`));
+  const L = chart.length, xs = new Float32Array(L), items = [];
+  let x = .5, prevT = (chart.length ? chart[0].time : 0) - beat * 2;
+  for (let i = 0; i < L; i++) {
+    const n = chart[i], gap = Math.max(1, n.time - prevT);
+    const reach = Math.min(.85, gap / 1000 * CATCH.speed * .7) * use;
+    const want = (n.lane ? .68 : .32) + (rand() - .5) * .5;
+    const nx = Math.max(.07, Math.min(.93, x + Math.max(-reach, Math.min(reach, want - x))));
+    if (i > 0 && gap >= beat * 1.4 && rand() < dens && !alwaysBlast()) {
+      const mid = (x + nx) / 2 + (rand() - .5) * .06;
+      items.push({ time:prevT + gap / 2, x:Math.max(.06, Math.min(.94, mid)), done:false });
+    }
+    xs[i] = nx; x = nx; prevT = n.time;
+  }
+  Object.assign(catchMap, { src:chart, len:L, key, xs, items });
+}
+function resetCatch() {
+  Object.assign(catchState, { x:.5, target:null, held:[false, false], last:performance.now(), blastUntil:-1e9, blastLen:1, trail:[] });
+  flying.length = 0; stats.blasts = 0;
+  catchMap.src = null; ensureCatchMap();
+}
+function catchHitPos(n) {      // game.js から使います（ヒットエフェクトの位置）
+  ensureCatchMap();
+  const i = Math.max(0, chart.indexOf(n));
+  return { x:catchX(catchMap.xs[i] ?? .5), y:CATCH.lineY - 20 };
+}
+
+/* ============ 🚀 ぶっ飛ばし ============ */
+function blastSound() {
+  const ac = getAC(); if (!ac) return;
+  if (ac.state === "suspended") ac.resume();
+  const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
+  o.type = "sawtooth"; o.frequency.setValueAtTime(180, t); o.frequency.exponentialRampToValueAtTime(1400, t + .35);
+  g.gain.setValueAtTime(Math.max(.03, settings.seVolume * .5), t); g.gain.exponentialRampToValueAtTime(.0001, t + .45);
+  o.connect(g).connect(ac.destination); o.start(t); o.stop(t + .5);
+}
+function triggerBlast(now, it) {
+  const len = 60000 / (chartMeta.bpm || 120) * CATCH.blastBeats;
+  const start = Math.max(catchState.blastUntil, now);
+  catchState.blastUntil = start + len;
+  catchState.blastLen = catchState.blastUntil - now;
+  stats.blasts = (stats.blasts || 0) + 1;
+  effects.push({ x:catchX(it.x), y:CATCH.lineY - 20, c:"#ffb000", t:performance.now(), kind:"perfect", seed:Math.random() * TAU });
+  showToast(tr("blastToast")); blastSound();
+}
+
+/* ============ 動き ============ */
+function updateCatch(now) {
+  ensureCatchMap();
+  const p = performance.now(), dt = Math.min(.05, Math.max(0, (p - catchState.last) / 1000)); catchState.last = p;
+  if (phase !== "playing") return;
+  const blast = isBlast(now);
+  let tx = catchState.target;
+  if (settings.autoPlay && chart[nextIdx]) {                       // AUTO：次の荷物へ。途中のニトロ缶も拾う
+    tx = catchMap.xs[nextIdx];
+    const nt = chart[nextIdx].time;
+    for (const it of catchMap.items) {
+      if (it.done || it.time <= now || it.time >= nt) continue;
+      if (it.time - now < 500) tx = it.x;
+      break;
+    }
+  }
+  const dir = (catchState.held[1] ? 1 : 0) - (catchState.held[0] ? 1 : 0), step = CATCH.speed * dt * (blast ? CATCH.boost : 1);
+  if (dir && !settings.autoPlay) { catchState.x += dir * step; catchState.target = null; }
+  else if (tx != null) { const d = tx - catchState.x; catchState.x += Math.sign(d) * Math.min(Math.abs(d), step * (settings.autoPlay ? 1.4 : 1)); }
+  catchState.x = Math.max(.04, Math.min(.96, catchState.x));
+  for (const it of catchMap.items) {
+    if (it.done && it.time > now + 50) it.done = false;            // 巻き戻したときは元に戻す
+    if (it.done || it.time > now) continue;
+    it.done = true;                                                 // 取っても取り逃しても、通り過ぎたら消える
+    if (now - it.time > 150 || leadIn) continue;
+    if (Math.abs(it.x - catchState.x) < CATCH.item) triggerBlast(now, it);
+  }
+  if (blast) {                                                      // 残像（虹の軌跡）
+    catchState.trail.push({ x:catchState.x, t:p });
+    while (catchState.trail.length && p - catchState.trail[0].t > 260) catchState.trail.shift();
+  } else catchState.trail.length = 0;
+}
+/* render.js のループから呼ばれます（AUTOでないとき） */
+function catchJudge(now) {
+  if (settings.autoPlay) return;
+  ensureCatchMap();
+  const k = isBlast(now) ? 2 : 1;
+  for (let i = nextIdx; i < chart.length; i++) {
+    const n = chart[i]; if (n.time > now) break;
+    if (n.judged) continue;
+    const dx = Math.abs(catchMap.xs[i] - catchState.x);
+    if (dx <= CATCH.half * k) {
+      playSE(n.lane);
+      judgeNote(n, dx <= CATCH.perfect * k ? "perfect" : "good", dx <= CATCH.perfect * k * .5 ? 0 : null);
+      if (k > 1) launchParcel(catchMap.xs[i], n.lane);
+    } else judgeNote(n, "miss", null);
+    if (phase !== "playing") return;
+  }
+}
+/* AUTOでも、ぶっ飛ばし中は荷物を飛ばす */
+on("options", () => {});
+function launchParcel(x, lane) {
+  if (flying.length > 40) flying.shift();
+  flying.push({ x:catchX(x), y:CATCH.lineY - 40, vx:(Math.random() - .5) * 900, t:performance.now(), c:laneColor(lane), spin:(Math.random() - .5) * 12 });
+}
+
+/* ============ 描画（render.js から呼ばれます） ============ */
+function drawParcel(x, y, c, s, g) {
+  rr(x - s, y - s, s * 2, s * 2, 8); ctx.fillStyle = c; ctx.fill();
+  ctx.lineWidth = 3; ctx.strokeStyle = g.noteBorder; ctx.stroke();
+  ctx.fillStyle = "rgba(255,255,255,.85)";
+  ctx.fillRect(x - 3, y - s, 6, s * 2); ctx.fillRect(x - s, y - 3, s * 2, 6);
+}
+function drawNitro(x, y, p) {
+  const pulse = .5 + .5 * Math.sin(p / 120);
+  const gr = ctx.createRadialGradient(x, y, 0, x, y, 52);
+  gr.addColorStop(0, `rgba(255,176,0,${.5 + .3 * pulse})`); gr.addColorStop(1, "rgba(255,176,0,0)");
+  ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, 52, 0, TAU); ctx.fill();
+  ctx.font = `44px ${FONT_DEFAULT}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText("🚀", x, y + 2);
+}
+function drawCatchTruck(x, y, p, blast, now) {
+  const hitK = Math.max(0, 1 - (p - Math.max(avatarHit[0], avatarHit[1])) / 200);
+  ctx.save(); ctx.translate(x, y - hitK * 6);
+  ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.beginPath(); ctx.ellipse(0, 76, 112, 14, 0, 0, TAU); ctx.fill();
+  if (stats.combo >= 50 || blast) {                                  // マフラーの炎（ぶっ飛ばし中は大きく）
+    for (const s of [-1, 1]) {
+      const f = (blast ? 46 : 14) + Math.random() * (blast ? 34 : 12);
+      ctx.fillStyle = blast ? "#ff5d2a" : "#ffb000";
+      ctx.beginPath(); ctx.moveTo(s * 44 - 9, 78); ctx.lineTo(s * 44 + 9, 78); ctx.lineTo(s * 44, 78 + f); ctx.closePath(); ctx.fill();
+      if (blast) { ctx.fillStyle = "#ffe27a"; ctx.beginPath(); ctx.moveTo(s * 44 - 5, 78); ctx.lineTo(s * 44 + 5, 78); ctx.lineTo(s * 44, 78 + f * .55); ctx.closePath(); ctx.fill(); }
+    }
+  }
+  ctx.fillStyle = "#1b1b22"; rr(-102, 40, 34, 40, 8); ctx.fill(); rr(68, 40, 34, 40, 8); ctx.fill();
+  rr(-92, -40, 184, 96, 12); ctx.fillStyle = "#f4f4f8"; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = "#1b1b22"; ctx.stroke();
+  rr(-78, -30, 156, 46, 8); ctx.fillStyle = "#2b2f36"; ctx.fill();
+  const pile = Math.min(8, Math.floor(stats.combo / 8));             // 荷台に積み上がる荷物
+  for (let i = 0; i < pile; i++) {
+    const bx = -57 + (i % 4) * 38, by = -6 - Math.floor(i / 4) * 16;
+    rr(bx - 15, by - 11, 30, 22, 4); ctx.fillStyle = laneColor(i % 2); ctx.fill();
+  }
+  ctx.fillStyle = hitK > 0 ? "#ffe27a" : "#ff3b30"; rr(-88, 24, 20, 12, 4); ctx.fill(); rr(68, 24, 20, 12, 4); ctx.fill();
+  rr(-30, 26, 60, 20, 4); ctx.fillStyle = "#ffd166"; ctx.fill();
+  ctx.fillStyle = "#1b1b22"; ctx.font = `900 14px ${fontFamily()}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("trk!", 0, 37);
+  if (hitK > 0) {
+    ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = hitK * .6;
+    ctx.fillStyle = toHex(skin().ui["--ui-accent"]); rr(-92, -46, 184, 20, 10); ctx.fill();
+    ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
+  }
+  if (blast && !alwaysBlast()) {                                     // 残り時間のゲージ
+    const k = Math.max(0, Math.min(1, (catchState.blastUntil - now) / catchState.blastLen));
+    rr(-60, -66, 120, 8, 4); ctx.fillStyle = "rgba(0,0,0,.5)"; ctx.fill();
+    rr(-60, -66, 120 * k, 8, 4); ctx.fillStyle = "#ffb000"; ctx.fill();
+  }
+  ctx.restore();
+}
+function drawCatchField(now) {
+  updateCatch(now);
+  const g = skin().game, travel = travelMs(), p = performance.now(), accent = toHex(skin().ui["--ui-accent"]);
+  const Lx = CATCH.left, Wd = CATCH.width, top = CATCH.topY, ly = CATCH.lineY;
+  const still = reduceMotion.matches, blast = isBlast(now), hue = (p / 6) % 360;
+  ctx.save();
+
+  /* 道路（白線はコンボとぶっ飛ばしで速く流れる） */
+  ctx.fillStyle = g.lane; rr(Lx - 40, top - 30, Wd + 80, H - top + 60, 28); ctx.fill();
+  const edge = blast ? `hsla(${hue},90%,60%,.85)` : hexToRgba(accent, .35);
+  ctx.fillStyle = edge; ctx.fillRect(Lx - 40, top - 30, blast ? 14 : 8, H); ctx.fillRect(Lx + Wd + (blast ? 26 : 32), top - 30, blast ? 14 : 8, H);
+  const boost = Math.min(1, stats.combo / 100), speed = .45 + .35 * boost + (blast ? 1.2 : 0);
+  const off = still ? 0 : ((now * speed) % 120 + 120) % 120;
+  ctx.fillStyle = g.track;
+  for (const fx of [.25, .5, .75]) for (let y = top - 120 + off; y < H; y += 120) ctx.fillRect(Lx + fx * Wd - 4, y, 8, 60);
+  if ((boost >= .5 || blast) && !still) {                            // スピード線
+    ctx.globalAlpha = blast ? .55 : .25 * boost;
+    for (let i = 0; i < (blast ? 22 : 10); i++) {
+      const sx = (i * 211) % W, sy = (p * (blast ? 2.2 : .9) + i * 137) % H;
+      ctx.fillStyle = blast ? `hsl(${(hue + i * 30) % 360},90%,70%)` : "#fff";
+      if (sx < Lx - 40 || sx > Lx + Wd + 40) ctx.fillRect(sx, sy, 3, blast ? 160 : 90);
+    }
+    ctx.globalAlpha = 1;
+  }
+  ctx.globalAlpha = .55; ctx.fillStyle = g.ink; ctx.fillRect(Lx, ly - 3, Wd, 6); ctx.globalAlpha = 1;
+
+  /* ニトロ缶 */
+  for (const it of catchMap.items) {
+    const u = it.time - now; if (it.done || u > travel || u < -150) continue;
+    drawNitro(catchX(it.x), ly - u / travel * (ly - top), p);
+  }
+  /* 荷物 */
+  let end = nextIdx;
+  while (end < chart.length && chart[end].time - now <= travel) end++;
+  for (let i = end - 1; i >= nextIdx; i--) {
+    const n = chart[i]; if (n.judged) continue;
+    const u = n.time - now, a = noteAlpha(u); if (a <= 0) continue;
+    ctx.globalAlpha = a;
+    drawParcel(catchX(catchMap.xs[i]), ly - u / travel * (ly - top), settings.stageLaneColor === false ? accent : laneColor(n.lane), 26, g);
+    ctx.globalAlpha = 1;
+  }
+
+  /* ぶっ飛ばし：虹の残像・受け止めバー */
+  const tx = catchX(catchState.x);
+  if (blast) {
+    for (const tr0 of catchState.trail) {
+      const a = 1 - (p - tr0.t) / 260;
+      ctx.globalAlpha = .35 * a; ctx.fillStyle = `hsl(${(hue + (p - tr0.t)) % 360},90%,60%)`;
+      rr(catchX(tr0.x) - 92, ly + 10, 184, 96, 12); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    const hw = CATCH.half * 2 * Wd, gr = ctx.createLinearGradient(tx - hw, 0, tx + hw, 0);
+    for (let i = 0; i <= 6; i++) gr.addColorStop(i / 6, `hsla(${(hue + i * 60) % 360},90%,60%,.75)`);
+    rr(tx - hw, ly - 14, hw * 2, 12, 6); ctx.fillStyle = gr; ctx.fill();
+  }
+  drawCatchTruck(tx, ly + 50, p, blast, now);
+
+  /* ぶっ飛んでいく荷物 */
+  for (let i = flying.length - 1; i >= 0; i--) {
+    const f = flying[i], a = (p - f.t) / 900;
+    if (a >= 1) { flying.splice(i, 1); continue; }
+    const x = f.x + f.vx * a, y = f.y - 1300 * a + 350 * a * a;
+    ctx.save(); ctx.globalAlpha = 1 - a; ctx.translate(x, y); ctx.rotate(f.spin * a);
+    drawParcel(0, 0, f.c, 22, g); ctx.restore();
+  }
+
+  /* 表示 */
+  if (blast) {
+    ctx.font = `900 30px ${fontFamily()}`; ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    ctx.lineWidth = 6; ctx.strokeStyle = "rgba(0,0,0,.6)"; ctx.strokeText(tr("blastLabel"), Lx + Wd - 10, top + 30);
+    ctx.fillStyle = `hsl(${hue},90%,65%)`; ctx.fillText(tr("blastLabel"), Lx + Wd - 10, top + 30);
+  }
+  if (!settings.hideGameplayUI && !settings.autoPlay) {
+    ctx.font = `800 20px ${fontFamily()}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = g.ink;
+    ctx.fillText(`◀ ${formatKey(settings.catchKeys[0])} / A      D / ${formatKey(settings.catchKeys[1])} ▶`, 960, H - 30);
+  }
+  ctx.restore();
+}
+/* AUTO中も、ぶっ飛ばし中に受け止めた荷物を飛ばす（game.js の判定のあとに合図を見る） */
+(() => {
+  let lastPerfect = 0;
+  on("beforePlay", () => { lastPerfect = 0; });
+  const watch = () => {
+    requestAnimationFrame(watch);
+    if (!isCatch() || !settings.autoPlay || phase !== "playing") { lastPerfect = stats.perfect; return; }
+    if (stats.perfect > lastPerfect && isBlast(gameTime())) {
+      const i = Math.max(0, nextIdx - 1);
+      if (chart[i]) launchParcel(catchMap.xs[i] ?? .5, chart[i].lane);
+    }
+    lastPerfect = stats.perfect;
+  };
+  requestAnimationFrame(watch);
+})();
+
+/* ============ 入力（キーを押している間だけ動く／画面をなぞると追いかける） ============ */
+let catchBinding = null, catchPointer = false;
+addEventListener("keydown", e => {
+  if (catchBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureCatchKey(e.code); return; }
+  if (phase !== "playing" || !isCatch() || bindingSlot !== null || settings.autoPlay) return;
+  const d = catchKeyDir(e.code); if (!d) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  catchState.held[d > 0 ? 1 : 0] = true;
+}, true);
+addEventListener("keyup", e => { const d = catchKeyDir(e.code); if (d) catchState.held[d > 0 ? 1 : 0] = false; });
+addEventListener("blur", () => { catchState.held = [false, false]; });
+function catchTargetFrom(e) {
+  const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W;
+  catchState.target = Math.max(0, Math.min(1, (x - CATCH.left) / CATCH.width));
+}
+stage.addEventListener("pointerdown", e => {
+  if (phase !== "playing" || !isCatch() || settings.autoPlay) return;
+  if (e.target.closest("#controls, #seekBar")) return;
+  e.preventDefault(); e.stopPropagation(); catchPointer = true; catchTargetFrom(e);
+}, true);
+addEventListener("pointermove", e => { if (catchPointer && isCatch()) catchTargetFrom(e); });
+addEventListener("pointerup", () => { catchPointer = false; });
+on("chart", () => { catchMap.src = null; });
+on("screen", id => {                                                 // リザルトにぶっ飛ばした回数を出す
+  if (id === "endScreen" && isCatch() && stats.blasts) $("result").append(el("div", "best", tr("blastCount", { n:stats.blasts })));
+});
+
+/* ============ 設定画面（⌨ 操作 の中） ============ */
+let syncCatchKeyUI = () => {};
+(() => {
+  const anchor = document.querySelector('#settingsScreen [data-i18n="truckCtlHint"]'); if (!anchor) return;
+  const h3 = el("h3", "", tr("catchKeysTitle")); h3.dataset.i18n = "catchKeysTitle";
+  const rows = el("div", "keyRows"); rows.style.marginTop = "10px";
+  const reset = el("button", "", tr("catchKeyReset")); reset.type = "button"; reset.dataset.i18n = "catchKeyReset";
+  reset.style.cssText = "margin-top:8px;padding:7px 12px;font-size:14px";
+  const status = el("div", "hint status"); status.id = "catchBindStatus";
+  const hint = el("div", "hint", tr("catchHint")); hint.dataset.i18n = "catchHint";
+  anchor.after(h3, rows, reset, status, hint);
+  syncCatchKeyUI = () => {
+    rows.textContent = "";
+    ["catchLeft", "catchRight"].forEach((key, i) => {
+      const row = el("div", "keyRow"), b = el("button", "", tr("assign"));
+      b.type = "button"; b.classList.toggle("listening", catchBinding === i);
+      b.addEventListener("click", () => {
+        bindingSlot = null; updateKeyUI(); catchBinding = i; b.blur();
+        setStatus("catchBindStatus", "catchCapture" + i); syncCatchKeyUI();
+      });
+      row.append(el("strong", "", tr(key)), el("span", "keyValue", formatKey(settings.catchKeys[i])), b);
+      rows.append(row);
+    });
+  };
+  reset.addEventListener("click", () => {
+    settings.catchKeys = CATCH_DEFAULT_KEYS.slice(); catchBinding = null; saveUserPrefs();
+    syncCatchKeyUI(); setStatus("catchBindStatus", "catchAssigned");
+  });
+  on("language", syncCatchKeyUI);
+  syncCatchKeyUI();
+})();
+function captureCatchKey(code) {
+  const i = catchBinding;
+  if (code === "Escape") { catchBinding = null; setStatus("catchBindStatus", "cancelBind"); syncCatchKeyUI(); return; }
+  if (RESERVED.has(code) || (settings.speedKeys || []).includes(code)) { setStatus("catchBindStatus", "reservedKey"); return; }
+  if (settings.catchKeys[1 - i] === code) { setStatus("catchBindStatus", "duplicateKey"); return; }
+  settings.catchKeys[i] = code; catchBinding = null; saveUserPrefs();
+  setStatus("catchBindStatus", "catchAssigned"); syncCatchKeyUI();
+}
+/* ✅ catch.js 完了 */

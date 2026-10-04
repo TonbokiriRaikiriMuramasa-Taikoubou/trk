@@ -1,15 +1,22 @@
 # 手元のテスト用の素材（権利があるものだけを、意図してコミットしてください）
 *.mp3
 *.m4a
+*.aac
 *.wav
 *.flac
 *.ogg
+*.oga
+*.opus
 *.mp4
+*.mov
 *.webm
 *.vrm
 *.vrma
 *.stpack
 test-songs/
+
+# 書き出した譜面（作者さんのものなので、リポジトリには入れません）
+*.shadow-taiko.json
 
 # GitHub Pages workflow artifact staging
 _site/

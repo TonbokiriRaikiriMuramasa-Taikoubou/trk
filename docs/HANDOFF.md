@@ -365,6 +365,8 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 - **音の見かた**：`window.TrkFX.tap(2048)` が返す `AnalyserNode` を**1つだけ**使い回します（`TrkFX.tap` は呼ぶたびに `G.out` へぶら下がるので、作り直すと増えます）。`createMediaElementSource` は**呼びません**（fx.js の担当）。
   - ⚠ 使うと音が Web Audio の通り道を通ります（エフェクト未使用でも `G.ac` が作られます）。`fxDelayMs()` はコンプ／リミッターがオフなら 0 のままなので、**判定・記録には影響しません**。
   - アナライザーは**ユーザー操作のあと**（`hadGesture`）に、**実際に音が鳴っているとき**だけ作ります（ブラウザの音の制限のため）。`?safe=1` では作りません。
+- **「🚫 スペクトラムを使わない」**：設定（オプション）の 📊 スペクトラム欄と、くわしい欄の**いちばん上**にある `mkCheck("specOff", () => !settings.specOn, …)`（3つ目の引数で `specOffRow` の目印を付ける）。チェック＝`settings.specOn = false` で、バナー・くわしい欄・TVの重ね・アナライザーまでまとめて止まります（`specOffHint` で説明）。オフのあいだは `.specBox.specOff` でほかの設定をうすく見せます。
+  - ⚠ むかしの「スペクトラムを表示する」チェック（TEXT `specOn`）は**同じ設定の裏返しなので消して**、この否定形に置き換えました。保存キー `settings.specOn` はそのまま（増やしていません）。
 - **置き場所**：① 📊 曲名バナー `#songBanner`（`buildBannerSkin()`。バナーいっぱいの `canvas.specBannerCanvas` を敷き、左上に `button.specZip`＝「＋」／「−」、「＋」の隣（左上）に `div.specSkinTools`＝開いたときだけ出るクイック操作（⚠ 右上は library.js の「▶ ここから再生」ボタンなので避ける））／② 🎛 ラックの「くわしい」の中（`document.querySelector('button[data-i18n="dockMore"]')` の直前。⚠ くわしい欄は `applyOrder()` で `#fxDock` の外へ動くので `#fxDock` から辿らないこと）／③ 設定画面の `#specPanel`（fx.js の `#fxPanel` の直後）
   - バナーのキャンバスだけは `GATES`（WeakMap）で「`specSkin` がオンのときだけ描く」条件を持たせています。`DIRTY`（WeakSet）で「絵が入っているキャンバスだけ消す」ようにして、毎フレームの clearRect を避けています。
   - クイック操作は **⇄ 次の見え方**（`specNextStyle`）と**色の丸ボタン8個**だけ。**ピーク／TVに重ねるは設定（オプション）側に置いたまま**（開いたときに幅が広がりすぎないようにするため）。
@@ -379,7 +381,7 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 - **色8種（`SPEC_THEMES`。順番がチップと丸ボタンの並び順）**：`neon`／`sunset`／`mono`／`rainbow`／`trk`（**trk! のテーマ色** `--ui-accent #ff3b55` の赤 → `--ka #55aaff` の蒼）／`sakura`／`acid`／`vhs`
   - チップと丸ボタンの色見本は JS の `THEME_SWATCH` から CSS 変数 `--specSwatch` に渡します（CSS 側に色を二重に書かない）。
 - **窓口 `window.TrkSpec`（version 3）**：`styles()` `themes()` `style()` `theme()` `setStyle(id)` `setTheme(id)` `setOn(v)` `showTv(v)` `skin()` `skinOpen()` `setSkin(v)` `openSkin(v)` `cycleStyle()` `analyser()` `request()` `active()` `noAudio()` `canvases()`
-- **CSS**：`.specBox` `.specCanvas` `.specSeg`（見え方のチップは13pxで折り返し）`.specSegColor`（色の見本は `--specSwatch`）`.specLabel` `.specTvCanvas`／曲名バナー用：`.banner .specBannerCanvas` `.banner.specSkin::after`（文字の下だけ暗くする）`.banner.specOpen`（高さ320px）`.specZip` `.specSkinTools` `.specNext` `.specDots` `.specDot`（`#tvDock .tvScreen` の中・`mix-blend-mode:screen`・z-index:1 なので、走査線やグレア（z-index:2）の下）
+- **CSS**：`.specBox`（オフのときは `.specBox.specOff` で `> *:not(.specOffRow)` をうすく）`.specCanvas` `.specSeg`（見え方のチップは13pxで折り返し）`.specSegColor`（色の見本は `--specSwatch`）`.specLabel` `.specTvCanvas`／曲名バナー用：`.banner .specBannerCanvas` `.banner.specSkin::after`（文字の下だけ暗くする）`.banner.specOpen`（高さ320px）`.specZip` `.specSkinTools` `.specNext` `.specDots` `.specDot`（`#tvDock .tvScreen` の中・`mix-blend-mode:screen`・z-index:1 なので、走査線やグレア（z-index:2）の下）
 - **動きを減らす設定**：`prefers-reduced-motion: reduce` のときは本数を32本に減らし、ピークも出しません。音を見ていないときは 4fps に落として休みます。
 - 見え方の計算：40Hz〜14kHz を対数で分けたバケットの平均。`freq.length`（1024）と `wave.length`（2048）は `TrkFX.tap(2048)` の値。
 
@@ -582,9 +584,9 @@ records[指紋 "サイズ:長さ×10"] = {
 - [ ] 実機確認：◀▶ で曲が送られるか（端で回り込むか）／TVのすぐ下にラックが来て見やすいか／くわしい欄が下のほうにまとまって見やすいか
 - [x] 🎬🖼 選曲中にmp4を流す（ドックの画面＋「確認」タブ）
 - [ ] 実機確認：選曲中にTVの画面でmp4が動くか／「確認」タブの見え方がゲーム画面と同じか／音が二重にならないか
-- [x] 📊 スペクトラム（`js/spectrum.js`。**見え方16種**、**色8種**、**曲名バナーのスキン（＋で開閉）**、感度、ピーク、TVに重ねる、`?safe=1` で出さない）
+- [x] 📊 スペクトラム（`js/spectrum.js`。**見え方16種**、**色8種**、**曲名バナーのスキン（＋で開閉）**、**「🚫 スペクトラムを使わない」スイッチ**、感度、ピーク、TVに重ねる、`?safe=1` で出さない）
 - [x] ついでに直したもの：TVドックの「🎨 カスタムTVスキンを作る」ボタンが**生キー（tvMakerOpen）**で表示されていたのを `tvmOpen` に修正（i18n監査で発見）
-- [ ] 実機確認：📊 スペクトラム（音に合わせて動くか／**16種それぞれの見え方**／**曲名バナーのスキンと左上の「＋」**／TVに重ねたときの見え方／初回に音が黙らないか／モバイル幅／他のTVスキンとの相性／設定・くわしい欄の両方で動くか）
+- [ ] 実機確認：📊 スペクトラム（音に合わせて動くか／**16種それぞれの見え方**／**曲名バナーのスキンと左上の「＋」**／**「🚫 スペクトラムを使わない」で全部止まる・外すと戻る**／TVに重ねたときの見え方／初回に音が黙らないか／モバイル幅／他のTVスキンとの相性／設定・くわしい欄の両方で動くか）
 「12. 次の候補」：🎹 シンセサイザーモード。プリセットを組み上げる画面を、つまみ・スライダーで触れるシンセ風にする案です。最初のメッセージでもらったアイデアで、EQのロックとパラメーターのランダムは今回先に入れました。
 **将来の大きな作業**
 - Capacitor で APK 化：`READ_MEDIA_AUDIO` で端末の曲一覧、ラジオ中のバックグラウンド再生（Media Session・フォアグラウンドサービス）。配布は GitHub Releases から（Google Play は登録料と、テスター約12人×14日の条件がある）

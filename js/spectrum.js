@@ -8,6 +8,7 @@
        はかる：心電図／地震計／レーダー
        しごと：業績グラフ（プレゼン風）／周波数ボード（株価ボード風）
        おもしろ：ピアノロール／嘘発見器／焚き火
+   ・設定（オプション）のいちばん上に「🚫 スペクトラムを使わない」があります（その設定で全部オフ）
    ・色は8種類（ネオン／夕焼け／モノクロ／レインボー／trk（赤×蒼）／桜／毒々／VHS）
    ・📊 曲名バナー（#songBanner）をスキンにもできます。左上の「＋」で大きく開きます。
    ・置き場所は3つ
@@ -32,7 +33,8 @@
 Object.assign(TEXT.ja, {
   specTitle:"📊 スペクトラム（音の見える化）",
   specHint:"いま鳴っている音を、16種類の見え方で表示できます。TVの画面に重ねることもできます。",
-  specOn:"スペクトラムを表示する",
+  specOff:"🚫 スペクトラムを使わない",
+  specOffHint:"チェックすると、曲名バナー・くわしい欄・TVの重ねをまとめてオフにします（音の通り道も作りません）。チェックを外すと、そのまま使えます。",
   specWhere:"🎛 ラックの「くわしい設定」の中と、設定 →「🔊 サウンド」の下にあります。",
   specStyle:"見え方",
   specStyleBars:"📊 バー", specStyleMirror:"🪞 ミラー", specStyleWave:"〰 波形", specStyleRing:"⭕ リング",
@@ -63,7 +65,8 @@ Object.assign(TEXT.ja, {
 Object.assign(TEXT.en, {
   specTitle:"📊 Spectrum (see the sound)",
   specHint:"Show what is playing right now in 16 different views. You can also overlay it on the TV screen.",
-  specOn:"Show the spectrum",
+  specOff:"🚫 Don't use the spectrum",
+  specOffHint:"Checking this turns off the song banner, the detail box and the TV overlay all at once (no audio path is created either). Uncheck it to use the spectrum.",
   specWhere:"You can find it in the rack's “More settings”, and in Settings → “🔊 Sound”.",
   specStyle:"Style",
   specStyleBars:"📊 Bars", specStyleMirror:"🪞 Mirror", specStyleWave:"〰 Wave", specStyleRing:"⭕ Ring",
@@ -93,7 +96,8 @@ Object.assign(TEXT.en, {
 Object.assign(TEXT.zh, {
   specTitle:"📊 频谱（把声音可视化）",
   specHint:"可以把正在播放的声音用16种样式显示。也可以叠加在电视画面上。",
-  specOn:"显示频谱",
+  specOff:"🚫 不使用频谱",
+  specOffHint:"勾选后会一次性关闭曲名横幅、详细栏和电视叠加（也不会创建音频通道）。取消勾选即可照常使用。",
   specWhere:"位于 🎛 机架的“详细设置”中，以及 设置 →“🔊 声音”下方。",
   specStyle:"样式",
   specStyleBars:"📊 柱状", specStyleMirror:"🪞 镜像", specStyleWave:"〰 波形", specStyleRing:"⭕ 环形",
@@ -123,7 +127,8 @@ Object.assign(TEXT.zh, {
 Object.assign(TEXT.ko, {
   specTitle:"📊 스펙트럼 (소리를 보이게)",
   specHint:"지금 나오는 소리를 16가지 모양으로 볼 수 있습니다. TV 화면에 겹쳐서 표시할 수도 있습니다.",
-  specOn:"스펙트럼 표시",
+  specOff:"🚫 스펙트럼 사용 안 함",
+  specOffHint:"체크하면 곡명 배너·자세히 칸·TV 겹치기를 한꺼번에 끕니다 (오디오 경로도 만들지 않습니다). 체크를 풀면 그대로 쓸 수 있습니다.",
   specWhere:"🎛 랙의 “자세한 설정” 안과 설정 →“🔊 사운드” 아래에 있습니다.",
   specStyle:"모양",
   specStyleBars:"📊 막대", specStyleMirror:"🪞 미러", specStyleWave:"〰 파형", specStyleRing:"⭕ 링",
@@ -882,7 +887,7 @@ function frame(t) {
   const now = t || performance.now();
   const idle = !an;
   const skip = idle && now - lastIdle < 250;
-  const all = panelCanvases.filter(drawable);
+  const all = on ? panelCanvases.filter(drawable) : [];      // オフのときは1枚も描かない
   const tv = on && tvOn();
   for (const cv of panelCanvases) {
     if (!on || !drawable(cv)) {
@@ -919,8 +924,8 @@ function mkChips(pairs, get, set, cls) {
   SYNCS.push(() => { const cur = String(get()); for (const b of bs) b.classList.toggle("selected", b.dataset.specVal === cur); });
   return row;
 }
-function mkCheck(key, get, set) {
-  const lab = el("label", "check"), inp = document.createElement("input");
+function mkCheck(key, get, set, cls) {
+  const lab = el("label", "check" + (cls ? " " + cls : "")), inp = document.createElement("input");
   inp.type = "checkbox";
   lab.append(inp, tx("span", key));
   inp.addEventListener("change", () => set(inp.checked));
@@ -928,6 +933,10 @@ function mkCheck(key, get, set) {
   return lab;
 }
 function buildBox(host, withCanvas) {
+  /* いちばん上に「🚫 スペクトラムを使わない」。硬派な人が1か所で確実に切れるように。
+     オフのときは、ほかの設定をうすくして「いま効いていない」ことを見せる（.specBox.specOff） */
+  host.append(mkCheck("specOff", () => !settings.specOn, v => { settings.specOn = !v; saveUserPrefs(); syncAll(); }, "specOffRow"));
+  host.append(tx("div", "specOffHint", "hint specOffHint"));
   if (withCanvas) {
     const cv = document.createElement("canvas");
     cv.className = "specCanvas";
@@ -954,6 +963,7 @@ function buildBox(host, withCanvas) {
   host.append(tx("div", "specTvHint", "hint specTvHint"));
   host.append(mkCheck("specSkin", () => settings.specSkin, v => { settings.specSkin = v; saveUserPrefs(); syncAll(); }));
   host.append(tx("div", "specSkinHint", "hint specSkinHint"));
+  SYNCS.push(() => host.classList.toggle("specOff", !settings.specOn));
   return host;
 }
 function syncAll() {
@@ -1082,8 +1092,7 @@ addEventListener("DOMContentLoaded", () => {
   const panel = el("details", "panel"); panel.id = "specPanel";
   panel.append(tx("summary", "specTitle"));
   const spBox = el("div", "specBox");
-  spBox.append(mkCheck("specOn", () => settings.specOn, v => { settings.specOn = v; saveUserPrefs(); syncAll(); }));
-  buildBox(spBox, true);      // 設定画面でも、その場で見え方を確かめられる（開いているときだけ描く）
+  buildBox(spBox, true);      // いちばん上に「🚫 スペクトラムを使わない」。開いているときだけ描く
   const spStatus = el("div", "hint specStatus");
   statusNodes.push(spStatus);
   spBox.append(spStatus);

@@ -1,0 +1,14 @@
+{
+  "label": "Lat式ミク",
+  "files": [
+    "LatMiku_Normal.pmd",
+    "b.bmp",
+    "f.bmp",
+    "s.bmp",
+    "t.bmp"
+  ],
+  "credit": "Lat式ミク / Lat様",
+  "motion": "jump",
+  "bpm": 130,
+  "readme": "Readme_Lat.txt"
+}

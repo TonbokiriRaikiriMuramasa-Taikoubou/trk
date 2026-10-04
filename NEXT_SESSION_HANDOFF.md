@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 # trk! 次回セッション用メモ（NEXT_SESSION_HANDOFF.md）
 
-> 最終更新：**2026-10-05**（PR #4 を main にマージ済み／棚スキン11種を追加した回）
+> 最終更新：**2026-10-05**（PR #5 マージ済み／💠 MMD同梱プリセット機構＋内蔵モーション5種化の回）
 > このメモは、そのまま次回の最初のメッセージに貼っても再開できます。
 > リポジトリにこのファイルがあれば「`NEXT_SESSION_HANDOFF.md` を読んで現状を確認して」でOKです。
 > 詳しい仕様（ファイル間の約束・保存データ・落とし穴）は **docs/HANDOFF.md** にあります。
@@ -32,8 +32,25 @@
   | I | ⭐ お気に入りのフォルダ管理（上限なし・1軍/2軍/🧊/📤元） | `503d54e` |
   | J | ▶◀ 演奏中も曲を送る設定（初期オフ）＋ 🔎 MMD動作チェック | `89ba00e` |
   | — | fix: お気に入り一覧の名前がIDで出ていたのを修正 | `0975e05` |
-- これまでの PR：#2 元プロジェクト統合版 → #3 TVドック拡張＋緊急復旧 → **#4（上記）**。
-- いまの作業ブランチ：**`arena/01a106fc-trk`**（PR #5＝棚スキン11種＋ドキュメント整理）
+- これまでの PR：#2 元プロジェクト統合版 → #3 TVドック拡張＋緊急復旧 → #4（上記）→ **#5 棚スキン11種＋ドキュメント整理（`1425839` でマージ済み）**。
+- いまの作業ブランチ：**`arena/01a10781-trk`**（💠 MMD同梱プリセットの回）
+
+### 1-1b. 今回（arena/01a10781-trk）でやったこと：💠 Lat式ミク同梱の下ごしらえ
+
+- **方針決定（坂主さん確認済み）**：同梱は **Lat式ミクだけ採用**。れあどめ原文の
+  「版権元ガイドラインの範囲内であれば改変・流用を含む利用・再配布等オールOK」を根拠に、
+  **れあどめ原文ごと**同梱する。タワシ式CHAN×CO風は readme 原文が確認できるまで持ち込み式のまま
+- **💠 同梱プリセット機構（js/mmd.js）**：`assets/mmd/<dir>/preset.json` があるときだけ、
+  設定 →🩷 MMD に💠ボタンが出る。1クリックで fetch→読み込み→クレジット・モーション・基準BPMを自動設定。
+  同意チェック不要（規約ごと同梱のため）。`?safe=1` では探しにも行かない。**モデル未配置ならボタンは出ない＝従来どおり**
+- **内蔵モーションが5種に**：④ジャンプ（130BPM・バンザイして跳ぶ・派手）／⑤アイドル（128BPM・サイドステップ＋こぶし突き上げ）。
+  どちらも自作VMD（コード生成・GPL対象）。タワシ式のようなデフォルメモデルだと④が特に派手に見えるはず
+- **置き場**：`assets/mmd/README.md`（足し方と規約の条件）／`assets/mmd/lat-miku/README.md`＋`preset.json.example`。
+  **モデル実ファイルはまだ入っていない**（下の「次の候補 0.」参照）
+- **NOTICE.md に 3a 追加**：assets/mmd/ は GPL対象外・れあどめ原文同梱が条件・商用フォークは assets/mmd/ ごと削除
+- 新i18nキー：`mmdPresetBtn` `mmdPresetHint` `mmdPresetMissing` `mmdMotionJump` `mmdMotionIdol`（4言語）＋ `mmdHint` を4言語とも更新
+- `sw.js` の `CACHE`＝**`trk-v2026.10.5-mmdpreset1`**
+- 検証：`jsdom-mmdpreset.mjs`（18本目）全部OK／`node --check` 全ファイルOK
 
 ### 1-2. 規模（数字で見る現在地）
 
@@ -68,7 +85,12 @@
 
 ## 2. 未確認・次の候補
 
-0. **🩷 MMDの実機確認（最優先。2026-10-04から持ち越し）**
+0. **💠 Lat式ミクの実ファイル投入（新・最優先）**
+   - Lat式ミク Ver2.31（Normal推奨）の zip を **チャットに添付してもらう**か、`assets/mmd/lat-miku/` に手で置く
+   - 置くもの：.pmd＋テクスチャ一式＋**れあどめ原文**＋`preset.json`（`preset.json.example` をコピーして実ファイル名に合わせる）
+   - ファイル名はできれば ASCII にリネーム（GitHub Pages は大文字小文字を区別・日本語URLの事故予防）
+   - 入れたら：💠ボタン→読み込み→④ジャンプで踊るか／クレジット自動／リロード復元／`?safe=1` でボタンが出ないこと
+0b. **🩷 MMDの実機確認（持ち越し）**
    - CDNから three／three-mmd-loader が読めるか／Lat式ミク・タワシ式CHAN×CO系ミクの .pmx が動くか／
      テクスチャ付きフォルダ／自分の .vmd が曲に合うか／モバイル幅の見え方
    - **手順＝設定 →🩷 MMDマスコット →🔎 動作チェック →📋 結果をコピー → 貼って送る**（切り分けは `webgl=` → `three=NG`＋`libError` → `loader=` → `model=` の順）
@@ -112,7 +134,10 @@
   - TVドック：`TV_DOCK_SKINS` にエントリ → `buildDeco()` に分岐 → `css/style.css` にスキンCSS → 必要ならオーバーレイ
   - カスタムTVの飾り：`buildDeco()` と `TV_DECO_KEYS` の両方に
   - **棚スキン：`css/style.css` に `#libPanel[data-lib-skin="…"]` の1ブロック ＋ `js/lib-skins.js` の `LIB_SKIN_ORDER`（順番）と `LIB_SKINS`（icon ＋4言語ラベル）に1行**
-- **MMD**：**モデル・モーションをリポジトリに入れない**（持ち込み式）。内蔵モーションは自作VMDのみ。`three/addons/loaders/MMDLoader.js` を足さない（r180に無い）
+- **MMD**：モデル・モーションは**原則リポジトリに入れない**（持ち込み式）。内蔵モーションは自作VMDのみ。`three/addons/loaders/MMDLoader.js` を足さない（r180に無い）
+  - **例外＝💠同梱プリセット**：れあどめ原文で**再配布OK**を確認できたモデルだけ（いまは Lat式ミクのみ採用）。
+    足し方＝`assets/mmd/<dir>/` に「モデル一式＋**れあどめ原文**＋`preset.json`」→ `js/mmd.js` の `PRESET_DIRS` に dir を追加 → NOTICE.md 3a を確認。
+    モデル部分は **GPL対象外**（NOTICE.md 3a）。タワシ式などは readme 原文を確認できるまで入れない
 - **ライセンス**：新ファイルの先頭に SPDX（GPL-3.0-or-later）／初音ミクは `js/characters/miku.js` だけに集約（PCL）／素材は権利のあるものだけ
 - GitHub Pages は**大文字小文字を区別**する。公開を更新したら `sw.js` の `CACHE` 名を変える
 
@@ -128,7 +153,8 @@ for f in js/*.js js/characters/*.js js/addons/*.js; do node --check "$f" || echo
 
 - 実ブラウザが使えない環境では **jsdom** で配線を拾える（`npm i jsdom` → `/home/user/browsercheck` で `for f in jsdom-*.mjs; do node "$f"; done`）
   - canvas は `getContext` をスタブする。**`createImageData` も返す**こと（TV砂嵐が `img.data` を読む）
-  - ハーネスは **17本**：`smoke` `func` `i18n` `lang-fav` `libtabs` `menu` `order2` `prev` `rack` `reload` `skinbtn` `dock` `addons` `favs` `mmd` `songwhile` `i18n-audit`
+  - ハーネスは **18本**：`smoke` `func` `i18n` `lang-fav` `libtabs` `menu` `order2` `prev` `rack` `reload` `skinbtn` `dock` `addons` `favs` `mmd` `songwhile` `i18n-audit` `mmdpreset`
+    - `jsdom-mmdpreset.mjs`（🆕）は fetch と three／three-mmd-loader を偽物に差し替えて、💠 preset.json 検出→ボタン→読み込み→credit/motion/bpm 自動設定、jump/idol のVMD生成、新キー4言語を見る。**jsdom には matchMedia が無い**ので `beforeParse` でスタブする（`TEXT`／`settings` は const/let なので `win.eval` 経由で見る）
     - `jsdom-mmd.mjs` は本物のCDNに届かないので、ページ内に**偽の three／three-mmd-loader** を流し込んで `TrkMMD._injectLibs()` で差し替える
     - `jsdom-i18n-audit.mjs` は静的監査（992キー×4言語の欠け／生キー／コードが使うキーの実在）。**エラー0が正常**
   - 調査用（テスト本数に数えない）：`jsdom-dump.mjs`・`jsdom-debug*.mjs`（exit 1 が正常）、`safeprobe.mjs`（`?safe=1` の設定をJSONで出す・exit 0 が正常）、`probe-*.mjs`
@@ -164,6 +190,9 @@ for f in js/*.js js/characters/*.js js/addons/*.js; do node --check "$f" || echo
 - [ ] ⭐ お気に入り：ドックのチップで1軍／2軍／🧊が切り替わり、ボタンの中身が入れ替わる
 - [ ] ⭐ お気に入り：🔒で凍結（追加できない）→🔓で解除、📌ピンは🎲の候補に必ず入る、外したものは📤元から戻せる
 - [ ] ⭐ お気に入り：曲の行の☆★と ⭐タブ、設定の「⭐ お気に入り」で書き出し／読み込みができる
+- [ ] 💠 同梱プリセット：`assets/mmd/lat-miku/` にモデル＋preset.json を置くと💠ボタンが出る／1クリックで踊り出す／クレジット・モーション・BPMが自動で入る
+- [ ] 💠 モデル未配置なら💠ボタンも説明も出ない（赤エラーなし）／`?safe=1` では配置してあっても出ない
+- [ ] 🩷 内蔵モーション④ジャンプ・⑤アイドルが選べて、見た目が破綻しない（④はバンザイ跳び・⑤は右手突き上げ）
 - [ ] 🩷 MMD：規約同意 → モデル（単体／フォルダ）を読み込むと、マスコットが MMD になり動く
 - [ ] 🩷 MMD：内蔵モーション3種と自分の .vmd が切り替わり、曲のBPMに合う（`mmdBpm` を変えると速さが変わる）
 - [ ] 🩷 MMD：大きさ・向き・クレジットが効く／「保存」を入れておくとリロードしても残る

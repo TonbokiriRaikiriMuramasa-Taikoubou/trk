@@ -50,7 +50,8 @@ trk! の開発を再開します。docs/HANDOFF.md を貼ります。
 | 公認パックの曲・譜面・作者のことば | 作者さんのもの。GPLの対象外。曲はリポジトリに入れず、作者さんの配布ページに置く |
 | three.js / three-vrm | MIT（VRM使用時のみCDNから読み込み。three 0.180.0 / three-vrm 3.5.5） |
 | @yohawing/three-mmd-loader | MIT（MMD使用時のみCDNから読み込み。0.8.4。three非依存の独立実装） |
-| 内蔵モーション3種（step/swing/turn） | **trk! がコードで作る自作VMD**（`js/mmd.js` の `buildVmd()`）。GPLの対象 |
+| 内蔵モーション5種（step/swing/turn/jump/idol） | **trk! がコードで作る自作VMD**（`js/mmd.js` の `buildVmd()`）。GPLの対象 |
+| 💠 同梱プリセットモデル（`assets/mmd/`） | **GPL対象外**。れあどめ原文で再配布OKを確認できたモデルだけ置ける（例：Lat式ミク）。NOTICE.md の 3a 参照 |
 
 - 以前のREADMEにあった「GPLで販売禁止」「osu!と同じGPL」は**誤り**として訂正済み（GPLは販売を禁止できない／osu!のコードはMIT）。
 - PCLクレジットには「PCLによる許諾の旨・PCLのURL・キャラクター名・会社名」を表示（miku.js があるときだけ）。
@@ -352,7 +353,8 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 - 「確認」タブを開いている間は、止まっていたら音なしで再生し、閉じたら元に戻す（`pvKeepPlaying` / `pvRelease`）
 
 ### 🩷 MMDマスコット（js/mmd.js）
-- **持ち込み式**：MMDのモデル（.pmx/.pmd）とモーション（.vmd）は**同梱しない**。設定パネルの `mmdModelFile`（単体）／`mmdFolderFile`（webkitdirectory、テクスチャ込み）で、利用者の端末のファイルを読むだけ。フォルダのときは `createMmdFileIndex()` で索引を作り、`textureResolver` をローダーに渡す。上限 120MB／400ファイル（本命の .pmx はパスの浅い順）
+- **持ち込み式が基本**：MMDのモデル（.pmx/.pmd）とモーション（.vmd）は原則**同梱しない**。設定パネルの `mmdModelFile`（単体）／`mmdFolderFile`（webkitdirectory、テクスチャ込み）で、利用者の端末のファイルを読むだけ。フォルダのときは `createMmdFileIndex()` で索引を作り、`textureResolver` をローダーに渡す。上限 120MB／400ファイル（本命の .pmx はパスの浅い順）
+- **🆕 💠 同梱プリセット（例外）**：れあどめ原文で**再配布OK**と確認できたモデルだけ、`assets/mmd/<dir>/` に「モデル一式＋れあどめ原文＋`preset.json`」を置ける（対象の dir は `js/mmd.js` の `PRESET_DIRS`）。起動時に `findPresets()` が `preset.json` を fetch できたときだけ `#mmdPresetRow` に💠ボタンが出て、1クリックで fetch→File化→`doLoadModel()`→クレジット（`credit`）・内蔵モーション（`motion`）・基準BPM（`bpm`）を自動設定。規約同意チェック（`mmdAgreed`）は**不要**（規約ごと同梱のため）。`?safe=1` では探しにも行かない。ファイルが無ければボタンは出ず従来どおり
 - **内蔵モーションは trk! の自作**：`buildVmd()` がその場で VMD のバイト列を作る（30fps・3フレーム刻み・111B/フレーム・補間バイトは `[0,0,127,127]` ×16＝どの読み方でも直線・末尾 `54+n*111+20`）。`BUILTIN` は step(120BPM/4s)・swing(100BPM/6s)・turn(120BPM/4s)。ボーン名（センター／上半身／上半身2／首／左腕／右腕／左ひじ／右ひじ）は SJIS（cp932 の実測値）で埋め込む
 - **BPM同期**：`rate = chartMeta.bpm ÷ settings.mmdMotionBpm`（`mmdBpm` が0なら1）。0.25〜3 に丸める。`phase==="playing"` では `#mmdCanvas`、設定パネルを開いているときは `mmdPreview`（180×120）に描く
 - **設定（`settings`。`shadow_taiko_preferences_v2` に保存）**：`mmdAgreed`（規約同意。未同意なら3つのファイル入力が disabled）／`mmdRemember`（既定オン。IndexedDB `shadow_taiko_mmd` の "model"・"motion" に保存し、次回に復元）／`mmdScale`(0.5〜1.8)／`mmdTurn`(−60〜60)／`mmdBpm`(0〜300)／`mmdCredit`(120字。画面右下に `MMD: <クレジット>`)
@@ -361,7 +363,7 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 - **`ensureScene()` は全か無か**：途中で throw したら renderer/scene/camera/pivot を**全部 null に戻す**（半端に残すと以降ぜんぶ落ちる）。`applyModelTransform()` / `frameCamera()` / `applyRect()` は null ガード必須
 - **`?safe=1`**：ライブラリも読み込まず、保存ぶんも復元しない（`mmdSafe` を出す）。`settings.mascot === "mmd"` なら "skin" に戻す
 - **正直な限界**：three とローダーはCDNから取るので**初回はオンラインが要る**。検証環境（サンドボックス）からは jsDelivr に届かないため、テストは偽ライブラリ `TrkMMD._injectLibs()` で代用している。**本物のモデル・.vmd・CDNは実機で確かめること**
-- 動作確認：`jsdom-mmd.mjs`（VMDのバイト列とSJIS・同意ゲート・CDN不達→`mmdNetError`・モデル読み込みと保存・誤形式→`mmdVmdBad`・大きすぎ→`mmdTooBig`・フォルダ読み・BPM同期・playing/preview の描画・4言語・`?safe=1`）
+- 動作確認：`jsdom-mmd.mjs`（VMDのバイト列とSJIS・同意ゲート・CDN不達→`mmdNetError`・モデル読み込みと保存・誤形式→`mmdVmdBad`・大きすぎ→`mmdTooBig`・フォルダ読み・BPM同期・playing/preview の描画・4言語・`?safe=1`）／`jsdom-mmdpreset.mjs`（💠 preset.json 検出→ボタン→読み込み→credit/motion/bpm 自動設定・jump/idol のVMD生成・新キー4言語）
   - 落とし穴：ハーネスの `stubCanvas` が `createImageData()` を返さないと、TV砂嵐（`tv-dock.js` の `drawStaticNoise`）が `img.data` で毎フレーム jsdomError を出す。**製品側のバグではない**
 - **🆕 🔎 動作チェック（実機用の切り分け。`#mmdCheckBtn` / `#mmdCopyBtn` / `#mmdCheckOut`）**：`diagnose()` が ①WebGL（`WEBGL_debug_renderer_info` で GPU 名も）②CDN の three／three-mmd-loader（`libs()` を実際に読む）③いまのモデル・モーション・canvas・UA を調べ、`checkText(r)` が8行以下のプレーンなテキストにする。`runCheck()` が `#mmdCheckOut` に出して、`mmdCheckOk`／`mmdCheckNg` を出す。`copyText(t)` は `navigator.clipboard` → `execCommand("copy")` の順（両方だめなら `mmdCopyNg` で下の行を選ばせる）
   - 窓口：`TrkMMD.diagnose()` `check()` `checkText(r)` `lastCheck()`。`console.log("[trk! MMD check]\n" + テキスト)` も出す（実機のF12から拾える）

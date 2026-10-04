@@ -3,7 +3,8 @@
    trk! lib-skins.js — 📚 曲リストの「棚」スキン（曲タブの見た目）
    ・タブの中身（どの曲がどのタブか）は library.js が作ります。
      ここは #libPanel[data-lib-skin="…"] を付け替えて、見た目を変えるだけ。
-   ・8種類：player / note / sticker / card / cassette / blackboard / retro / clearfile
+   ・11種類：player / note / sticker / card / cassette / blackboard / retro / clearfile
+              ＋ 🎰 juke（ジュークボックス）／📻 guide（ラジオ番組表）／🚉 board（電光掲示板）
    ・曲リストの見出しの 🎨 ボタンで、その場で切り替え（settings.libSkinQuick で隠せます）
    ・設定画面「見た目」にも、スキンの選択と 🎨 ボタンの表示切り替えがあります
    読み込み順：i18n.js → core.js → … → library.js → verified.js → lib-skins.js
@@ -16,7 +17,7 @@ const L4 = (ja, en, zh, ko) => ({ ja, en, zh, ko });
 Object.assign(TEXT.ja, {
   libSkinHead:"📚 曲リストの棚（タブ）のスキン",
   libSkinQuick:"曲リストに 🎨 ボタンを出す（その場でスキンを切り替え）",
-  libSkinHint:"曲タブの見た目を、ノート・シール帳・カード目録などから選べます。タブそのものは、曲の入り口（パック・フォルダー・追加した曲）ごとに自動でできます。",
+  libSkinHint:"曲タブの見た目を、ノート・シール帳・ジュークボックス・電光掲示板などから選べます。タブそのものは、曲の入り口（パック・フォルダー・追加した曲）ごとに自動でできます。",
   libSkinBtnTitle:"🎨 棚のスキン（曲タブの見た目）",
   libSkinRand:"🎲 おまかせ",
   libSkinApplied:"棚のスキン：{name}"
@@ -24,7 +25,7 @@ Object.assign(TEXT.ja, {
 Object.assign(TEXT.en, {
   libSkinHead:"📚 Song list shelf (tab) skin",
   libSkinQuick:"Show the 🎨 button on the song list (switch skins on the spot)",
-  libSkinHint:"Pick the look of the song tabs: notebook, sticker book, card catalog and more. The tabs themselves are made automatically, one per source (pack / folder / added songs).",
+  libSkinHint:"Pick the look of the song tabs: notebook, sticker book, jukebox, departure board and more. The tabs themselves are made automatically, one per source (pack / folder / added songs).",
   libSkinBtnTitle:"🎨 Shelf skin (song tab look)",
   libSkinRand:"🎲 Surprise me",
   libSkinApplied:"Shelf skin: {name}"
@@ -32,7 +33,7 @@ Object.assign(TEXT.en, {
 Object.assign(TEXT.zh, {
   libSkinHead:"📚 歌曲列表的架子（标签）皮肤",
   libSkinQuick:"在歌曲列表显示 🎨 按钮（就地切换皮肤）",
-  libSkinHint:"歌曲标签的外观可选：笔记本、贴纸册、卡片目录等。标签本身会按来源（歌曲包／文件夹／已添加）自动生成。",
+  libSkinHint:"歌曲标签的外观可选：笔记本、贴纸册、点唱机、电子显示屏等。标签本身会按来源（歌曲包／文件夹／已添加）自动生成。",
   libSkinBtnTitle:"🎨 架子皮肤（歌曲标签外观）",
   libSkinRand:"🎲 随机",
   libSkinApplied:"架子皮肤：{name}"
@@ -40,14 +41,14 @@ Object.assign(TEXT.zh, {
 Object.assign(TEXT.ko, {
   libSkinHead:"📚 곡 목록 선반(탭) 스킨",
   libSkinQuick:"곡 목록에 🎨 버튼 표시 (그 자리에서 스킨 전환)",
-  libSkinHint:"곡 탭의 모양을 노트・스티커 앨범・카드 목록 등에서 고를 수 있습니다. 탭 자체는 곡의 입구(팩・폴더・추가한 곡)마다 자동으로 생깁니다.",
+  libSkinHint:"곡 탭의 모양을 노트・스티커 앨범・주크박스・전광판 등에서 고를 수 있습니다. 탭 자체는 곡의 입구(팩・폴더・추가한 곡)마다 자동으로 생깁니다.",
   libSkinBtnTitle:"🎨 선반 스킨 (곡 탭 모양)",
   libSkinRand:"🎲 랜덤",
   libSkinApplied:"선반 스킨: {name}"
 });
 
 /* ============ スキン8種 ============ */
-const LIB_SKIN_ORDER = ["player", "note", "sticker", "card", "cassette", "blackboard", "retro", "clearfile"];
+const LIB_SKIN_ORDER = ["player", "note", "sticker", "card", "cassette", "blackboard", "retro", "clearfile", "juke", "guide", "board"];
 const LIB_SKINS = {
   player:     { icon:"🎛", label:L4("タブプレーヤー", "Tab player", "标签播放器", "탭 플레이어") },
   note:       { icon:"📝", label:L4("ノート", "Notebook", "笔记本", "노트") },
@@ -56,7 +57,11 @@ const LIB_SKINS = {
   cassette:   { icon:"📼", label:L4("カセットラベル", "Cassette label", "磁带标签", "카세트 라벨") },
   blackboard: { icon:"🖍", label:L4("黒板", "Blackboard", "黑板", "칠판") },
   retro:      { icon:"🕹", label:L4("レトロPC", "Retro PC", "复古电脑", "레트로 PC") },
-  clearfile:  { icon:"📁", label:L4("クリアファイル", "Clear file", "透明文件夹", "클리어 파일") }
+  clearfile:  { icon:"📁", label:L4("クリアファイル", "Clear file", "透明文件夹", "클리어 파일") },
+  /* 🆕 3種（2026-10-05） */
+  juke:       { icon:"🎰", label:L4("ジュークボックス", "Jukebox", "点唱机", "주크박스") },
+  guide:      { icon:"📻", label:L4("ラジオ番組表", "Radio guide", "广播节目表", "라디오 편성표") },
+  board:      { icon:"🚉", label:L4("電光掲示板", "Departure board", "电子显示屏", "전광판") }
 };
 const skinDef = id => LIB_SKINS[id] || LIB_SKINS.player;
 const skinText = id => { const d = LIB_SKINS[id]; return d ? d.icon + " " + (d.label[lang] || d.label.en) : id; };

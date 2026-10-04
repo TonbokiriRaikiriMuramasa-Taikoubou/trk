@@ -763,7 +763,7 @@ details.panel[open]>summary{margin-bottom:14px}
 }
 
 /* ============================================================
-   📚 曲のタブ（棚）と、棚スキン8種（js/lib-skins.js / js/library.js）
+   📚 曲のタブ（棚）と、棚スキン11種（js/lib-skins.js / js/library.js）
    ・#libPanel[data-lib-skin="…"] を付け替えるだけで見た目が変わる
    ============================================================ */
 .libHeadRight{display:flex;align-items:baseline;gap:8px}
@@ -865,6 +865,45 @@ details.panel[open]>summary{margin-bottom:14px}
   border:1px solid rgba(190,230,255,.5);color:#eaf6ff;backdrop-filter:blur(2px)}
 #libPanel[data-lib-skin="clearfile"] .libTab[aria-selected="true"]{background:rgba(200,238,255,.5);color:#04222f;border-color:#d8f2ff}
 #libPanel[data-lib-skin="clearfile"] .libTab .libTabN{background:rgba(255,255,255,.35);color:#04222f}
+
+
+/* ---- 9) 🎰 ジュークボックス（クロームの丸ボタン＋ネオン） ---- */
+#libPanel[data-lib-skin="juke"] .libTabs{gap:8px;padding:10px 10px 6px;border-radius:16px 16px 4px 4px;
+  background:linear-gradient(#3d2b1b,#180f07);border:1px solid #6b4a26;border-bottom:3px solid #c98b3a;
+  box-shadow:inset 0 1px 0 rgba(255,220,150,.35),0 6px 18px rgba(0,0,0,.35)}
+#libPanel[data-lib-skin="juke"] .libTab{border-radius:999px;border:2px solid #7c5527;color:#ffe6b8;
+  background:radial-gradient(circle at 30% 20%,#6b4a26,#241708 72%);
+  box-shadow:inset 0 1px 0 rgba(255,235,190,.45),inset 0 -3px 7px rgba(0,0,0,.55),0 2px 0 #120b05}
+#libPanel[data-lib-skin="juke"] .libTab::after{content:"";position:absolute;left:10%;right:32%;top:3px;height:36%;border-radius:999px;
+  background:linear-gradient(rgba(255,255,255,.40),rgba(255,255,255,0));pointer-events:none}
+#libPanel[data-lib-skin="juke"] .libTab[aria-selected="true"]{color:#2a1600;border-color:#ffe6a8;
+  background:linear-gradient(#ffeaa8,#ffb43c);box-shadow:0 0 0 3px rgba(255,180,60,.28),0 0 22px rgba(255,170,60,.6)}
+#libPanel[data-lib-skin="juke"] .libTab .libTabN{background:rgba(0,0,0,.38);color:#ffd894}
+#libPanel[data-lib-skin="juke"] .libTab[aria-selected="true"] .libTabN{background:rgba(90,40,0,.22);color:#3a1d00}
+
+/* ---- 10) 📻 ラジオ番組表（新聞の番組欄） ---- */
+#libPanel[data-lib-skin="guide"] .libTabs{gap:0;padding:8px 8px 4px;border-radius:6px;
+  background:repeating-linear-gradient(0deg,#fdfaf0,#fdfaf0 21px,#f4eeda 21px,#f4eeda 42px);
+  border:1px solid #cdc3a6;border-top:4px solid #b3261e}
+#libPanel[data-lib-skin="guide"] .libTab{border-radius:2px;border:1px solid #ded5b8;background:transparent;color:#2a2416;
+  font-family:Georgia,"Times New Roman",serif;font-weight:700;padding:7px 12px}
+#libPanel[data-lib-skin="guide"] .libTab:hover{background:#fff8dc;filter:none}
+#libPanel[data-lib-skin="guide"] .libTab[aria-selected="true"]{background:#fff8dc;color:#111;border-color:#b3261e;
+  box-shadow:inset 3px 0 0 #b3261e}
+#libPanel[data-lib-skin="guide"] .libTab .libTabN{background:#efe7d2;color:#6b5a33;border-radius:3px}
+#libPanel[data-lib-skin="guide"] .libTab[aria-selected="true"] .libTabN{background:#f0d9a8;color:#5a2a10}
+
+/* ---- 11) 🚉 電光掲示板（アンバーのLED） ---- */
+#libPanel[data-lib-skin="board"] .libTabs{gap:5px;padding:10px 10px 6px;border-radius:8px;
+  background:linear-gradient(#0b1526,#05090f);border:1px solid #27405f;box-shadow:inset 0 0 26px rgba(0,180,255,.12)}
+#libPanel[data-lib-skin="board"] .libTab{border-radius:4px;border:1px solid #1d3350;background:rgba(255,255,255,.03);
+  color:#ffb300;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;
+  text-shadow:0 0 6px rgba(255,170,0,.55)}
+#libPanel[data-lib-skin="board"] .libTab:hover{background:rgba(255,179,0,.10);filter:none}
+#libPanel[data-lib-skin="board"] .libTab[aria-selected="true"]{background:#ffb300;color:#06101f;border-color:#ffd76a;
+  text-shadow:none;box-shadow:0 0 18px rgba(255,180,0,.55)}
+#libPanel[data-lib-skin="board"] .libTab .libTabN{background:rgba(255,179,0,.16);color:#ffd894;border-radius:3px}
+#libPanel[data-lib-skin="board"] .libTab[aria-selected="true"] .libTabN{background:rgba(6,16,31,.2);color:#06101f}
 
 /* 設定画面の「棚スキン」の行（見た目セクション） */
 #libSkinSelect{width:100%;padding:10px 12px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);

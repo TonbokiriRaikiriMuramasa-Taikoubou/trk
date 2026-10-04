@@ -50,6 +50,14 @@
   - 見た目は棚スキン8種：🎛タブプレーヤー／📝ノート／🌈シール帳／🗄カード目録／📼カセットラベル／🖍黒板／🕹レトロPC／📁クリアファイル
   - 曲リストの見出しの **🎨 ボタン**で、その場で切り替え（🎲おまかせ付き）。設定画面「見た目」で、スキンの選択と **🎨 ボタンを隠す** ができる
   - 保存：`shadow_taiko_preferences_v2` の `libTab` / `libSkin` / `libSkinQuick`（新しい保存キーは増やしていません）
+- 🆕 **🧩 アドオン（今回追加）**
+  - 本体に入れられない機能（YouTube の音をエフェクターに通す、など）を、あとから足すためのしくみ
+  - 設定画面「🧩 アドオン」→「📄 アドオンを入れる」で `.js` / `.trk-addon`（JSON）。`trk_addons_v1` に保存
+  - `TrkAddons.register({ id, name, version, apiVersion, setup(api) })`。api は `tr` `el` `$` `addStyle` `on` `emit` `slot` `say` `settings` `savePrefs` `video` `phase` `addSongs` `fx.tapElement` `log`
+  - 置き場所（slot）：settings / libPanel / tvMore / rackMore。曲を足すと曲リストの 🧩 タブに自動でまとまる
+  - `api.fx.tapElement(audio)` で、自前の `<audio>`/`<video>` を本体のEQ・エフェクターに通せる（`fx.js` に追加）
+  - `?safe=1` では読み込まない。壊れたアドオンは、そのアドオンだけ無効（本体は止まらない）
+  - 書き方：`docs/ADDONS.md`、見本：`js/addons/example.js`
 - 映像フィルター45種：
   - basic: skin, color, mono, dim, off ／ vivid: vivid, pop, pastel ／ retro: warm, cool, vintage, film, crt, vhs
   - cinema: cinema, cinemascope, noir, news, commercial ／ effect: night, security, dream, faded, poster, soft

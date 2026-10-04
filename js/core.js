@@ -158,7 +158,13 @@ function resetNotesPrefs() {
     applyNoteVars();
   } catch(_) { settings.notes = sanitizeNotes(null); }
 }
+/* セーフモードに入ったかどうか（?safe=1 / ?factory で入る）。
+   アドオン（js/addons.js）など、あとから来る機能は、これを見て「読み込まない」を決めます。
+   URLは処理のあと掃除されるので、印を残しておく必要があります。 */
+let safeModeOn = false;
+window.TrkSafeMode = () => safeModeOn;
 function enterSafeMode() {
+  safeModeOn = true;
   settings.videoStyle = "off";
   settings.bgDim = 0; settings.bgBlur = 0;
   settings.tvDockSkin = "home"; settings.tvDockFive = false;

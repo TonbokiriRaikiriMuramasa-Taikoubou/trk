@@ -86,6 +86,7 @@ trk! の開発を再開します。docs/HANDOFF.md を貼ります。
 25. **🎬🖼 選曲中にmp4を流す**：曲を選ぶと、TVドックの画面にそのmp4が映る（`tvMenuPreview` 初期オン）。「くわしく」に **🎛 設定 / 🖼 確認** のタブを足して、確認タブではゲーム画面と同じ見え方（contain）でフィルター・スキン・暗さ・ぼかしを再生前に確かめられる。音のプレビューがオフでも映像だけ流す `tvMenuVideo`（音なし）も追加
 26. **📺◀▶ 曲送りボタンと TV→ラックのならべ方**：TVドックの上段に ◀ ▶（前の曲・次の曲。端は回り込み、液晶に `♪ 曲名`）。選曲画面の並びを **TV →（お気に入り）→ ラック →（お気に入り）→ TVくわしい → ラックくわしい** に（`applyOrder()` が各ドックの `<details>` を列の下のほうへ並べ直す。壁掛けTVのときは本体だけヘッダーへ）。お気に入り行に「お気に入りn個・ボタンm個」を表示
 27. **📚 曲のタブ（棚）と棚スキン8種**：曲リストの上に、曲の入り口ごとのタブが自動でできる（すべて／パックごと／フォルダーごと＝最上位の階層／追加した曲／公認）。パックを入れるとタブが自動で増え、タブの中で検索・並べ替え（TVの◀▶も、いまのタブの中を送る）。見た目は棚スキン8種（タブプレーヤー・ノート・シール帳・カード目録・カセットラベル・黒板・レトロPC・クリアファイル）を、曲リストの 🎨 ボタンでその場で切り替え（設定で🎨ボタンを隠せる）
+28. **🧩 アドオン**：`js/addons.js`（`trk_addons_v1`）。設定画面「🧩 アドオン」から `.js` / `.trk-addon` を入れて、オン/オフ・削除・`↻ 反映`。`TrkAddons.register({id,name,version,apiVersion,setup(api)})` を書くだけで、置き場所（settings / libPanel / tvMore / rackMore）にUIを足し、`api.addSongs()` で曲を足し（曲リストの 🧩 タブに自動でまとまる）、`api.fx.tapElement(el)` で自前の音を本体のエフェクターに通せる。`index.html` に1行足す配布物向けの道もある。`?safe=1` では読み込まない。書き方は docs/ADDONS.md
 
 ---
 
@@ -290,6 +291,21 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 - 文章キーは `tvm…`（4言語）。座標や色は `paintTvVars()` に集約
 - 動作確認は jsdom でもできる（`node --check` だけでは配線ミスが出ないため）
 
+### 🧩 アドオン（js/addons.js）
+- **保存**：`trk_addons_v1`（localStorage。新しいキー。既存のキーは触らない）。1件＝`{ id, name, version, author, description, apiVersion, enabled, code, source, addedAt, error }`
+- **動かし方**：入れたコードは `(0, eval)(code)` でそのページの中で実行（サンドボックスではない）。コードは `TrkAddons.register(def)` を呼ぶ約束
+  - `collecting` を立てて実行 → register が集める → `setup(api)` を呼ぶ。`setup` が投げたら、そのアドオンだけ無効にして一覧に赤字で出す（本体は止めない）
+  - 起動（DOMContentLoaded・最後）に、enabled な保存ぶんを順に実行。`?safe=1` / `?factory` のときは読み込まない
+  - `index.html` の `<script src>` から来たアドオンは「index.html から読み込み」として一覧に出し、削除ボタンは出さない
+- **api（apiVersion 1）**：`tr` / `el` / `$` / `addStyle` / `on` / `emit` / `slot` / `say` / `settings` / `savePrefs` / `video` / `phase` / `addSongs` / `fx.available` / `fx.tapElement` / `log`
+- **置き場所**：`settings`（#addonSlots）/ `libPanel`（#libStatus の前）/ `tvMore` / `rackMore`。空のスロットは `MutationObserver` で隠す
+- **曲を足す**：`api.addSongs(list)` → `library.js` の `setAddonSongs()` に渡し、`allSongs()` の末尾に足す。`libTabsOf` が `addon:<id>` のタブを自動で作る（🧩・`libTabAddon`）
+  - `file`（Blob/File）を持つ曲は、ふつうの曲と同じ道（loadMedia → エフェクター）を通る
+  - `file` を持たない曲は、選ぶと `emit("addonSelect", it)` が流れる（アドオンが自前のプレイヤーで鳴らす）
+  - どの曲でも `emit("songSelected", it)` が流れる（selectSong の中）
+- **エフェクターへの通り道**：`fx.js` に `TrkFX.tapElement(el)` / `untapElement(el)` を追加（`G.extra` に MediaElementSource を保持し、`G.eq[0]` へつなぐ）。同じ要素は一度だけ・オフでも素通しでつながる・AudioContext が suspended なら resume
+- **正直な限界**：クロスオリジンの iframe（YouTube など）の中の音は、ブラウザの仕様で取り出せない。アドオンでも同じ（docs/ADDONS.md の 6 章に明記）
+
 ### 📚 曲のタブ（棚）と、棚スキン（library.js / lib-skins.js）
 - **タブ**：`renderLib()` の入口で `libTabsOf(all)` が入り口ごとにまとめ、`libTabMatch(it, id)` で絞ってから検索・並べ替えに流す（`libView` はこの絞ったあとの並び＝◀▶ もタブの中で動く）
   - タブID：`all` / `pack:<packId|packName>` / `folder:<最上位のフォルダ名>` / `folder`（直下）/ `file` / `verified`。`renderLibTabs()` が描画し、`settings.libTab` に残す
@@ -441,6 +457,9 @@ records[指紋 "サイズ:長さ×10"] = {
 - [x] 📺 TVドック30スキン・映像フィルター45種・🛟緊急復旧
 - [x] 🎨 カスタムTVスキン（色6・形4・飾り28・質感3、`trk-tvskin`で共有）
 - [ ] 🎨 カスタムTVスキンの実機確認（モバイル幅・壁掛け・プロジェクターとの併用）
+- [x] 🧩 アドオン（設置・オン/オフ・削除・保存、置き場所、曲を足す、エフェクターへの道、docs/ADDONS.md・見本）
+- 動作確認：`jsdom-addons.mjs`（入れる／スロット4つ／🧩タブ／addonSelect／tapElement（偽のAudioContextで配線）／オフ・削除／壊れた3種のメッセージ／setupが投げても本体は無事／?safe=1 で読み込まない／4言語）
+- [ ] 実機確認：アドオンを入れて動くか（例のサンプル）／`?safe=1` で読み込まれないか／壊れたアドオンを入れても本体が無事か
 - [x] 📚 曲のタブ（自動）と棚スキン8種（🎨 で切替・設定で隠せる）
 - [ ] 実機確認：パックを入れてタブが増えるか／タブの中で探しやすいか／8スキンの見た目（モバイル幅・縦長のタブ帯）
 - [x] 📺◀▶ 曲送りボタン（前の曲・次の曲）と、TV→ラック→くわしい×2 のならべ方

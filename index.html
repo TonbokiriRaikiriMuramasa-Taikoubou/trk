@@ -786,6 +786,24 @@
           </details>
         </div>
       </div>
+
+      <!-- 🧩 アドオン：js/addons.js が、ここに一覧と説明を描きます -->
+      <details class="panel addonPanel" id="addonPanel">
+        <summary data-i18n="addonTitle"></summary>
+        <div class="hint" data-i18n="addonHint"></div>
+        <div class="miniActions addonActions">
+          <label class="fileBtn small">
+            <input id="addonInstallFile" type="file" accept=".js,.json,.trkaddon,text/javascript,application/json" hidden>
+            <span data-i18n="addonInstall"></span>
+          </label>
+          <button id="addonSampleBtn" type="button" data-i18n="addonSample"></button>
+          <a class="fileBtn small" id="addonDocsLink" href="docs/ADDONS.md" target="_blank" rel="noopener noreferrer" data-i18n="addonDocs"></a>
+          <button id="addonReloadBtn" type="button" class="primary slim" hidden data-i18n="addonReload"></button>
+        </div>
+        <div id="addonList" class="addonList"></div>
+        <div id="addonSlots" class="addonSlots"></div>
+        <div id="addonStatus" class="hint status"></div>
+      </details>
     </div>
   </section>
 
@@ -881,6 +899,7 @@
 <script src="js/library.js"></script>
 <script src="js/verified.js"></script>
 <script src="js/lib-skins.js"></script>
+<script src="js/addons.js"></script>
 <script src="js/main.js"></script>
 <script src="js/speed.js"></script>
 <script src="js/vrm.js"></script>

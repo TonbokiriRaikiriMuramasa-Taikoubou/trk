@@ -88,7 +88,13 @@ on("language", renderSeedTools);
 
 /* ---------- 曲リストの中身 ---------- */
 let folderSongs = [], addedSongs = [], packSongs = [], libHandle = null, libView = [];
-const allSongs = () => [...folderSongs, ...addedSongs, ...packSongs];
+/* 🧩 アドオン（js/addons.js）が足した曲。setAddonSongs() で入れ替わります */
+let addonSongs = [];
+function setAddonSongs(list) {
+  addonSongs = Array.isArray(list) ? list.slice(0, LIB_MAX) : [];
+  renderLib();
+}
+const allSongs = () => [...folderSongs, ...addedSongs, ...packSongs, ...addonSongs];
 function addedItem(file) {
   const base = baseName(file.name);
   return { key:`${file.size}|${base}`, source:"file", file, title:base, base, size:file.size };
@@ -124,19 +130,19 @@ function songInfo(it, idx) {
    ・選んだタブは settings.libTab に残る。消えたタブは「すべて」を表示（設定は残すので、
      パックを入れ直すと、またそのタブが選ばれた状態に戻る） */
 Object.assign(TEXT.ja, {
-  libTabAll:"すべて", libTabFiles:"追加した曲", libTabVerified:"公認", libTabPackNone:"曲パック", libTabFolderTop:"フォルダ（直下）",
+  libTabAll:"すべて", libTabFiles:"追加した曲", libTabVerified:"公認", libTabPackNone:"曲パック", libTabFolderTop:"フォルダ（直下）", libTabAddon:"アドオン",
   libTabGo:"この棚に {n}曲", libTabEmpty:"このタブには曲がありません。ほかのタブを見てみてください。"
 });
 Object.assign(TEXT.en, {
-  libTabAll:"All", libTabFiles:"Added", libTabVerified:"Verified", libTabPackNone:"Song pack", libTabFolderTop:"Folder (top level)",
+  libTabAll:"All", libTabFiles:"Added", libTabVerified:"Verified", libTabPackNone:"Song pack", libTabFolderTop:"Folder (top level)", libTabAddon:"Add-on",
   libTabGo:"{n} songs in this shelf", libTabEmpty:"No songs in this tab. Try another tab."
 });
 Object.assign(TEXT.zh, {
-  libTabAll:"全部", libTabFiles:"已添加", libTabVerified:"认证", libTabPackNone:"歌曲包", libTabFolderTop:"文件夹（顶层）",
+  libTabAll:"全部", libTabFiles:"已添加", libTabVerified:"认证", libTabPackNone:"歌曲包", libTabFolderTop:"文件夹（顶层）", libTabAddon:"插件",
   libTabGo:"这个架子有 {n} 首", libTabEmpty:"此标签内没有歌曲。请看看其他标签。"
 });
 Object.assign(TEXT.ko, {
-  libTabAll:"전체", libTabFiles:"추가한 곡", libTabVerified:"공인", libTabPackNone:"곡 팩", libTabFolderTop:"폴더 (최상위)",
+  libTabAll:"전체", libTabFiles:"추가한 곡", libTabVerified:"공인", libTabPackNone:"곡 팩", libTabFolderTop:"폴더 (최상위)", libTabAddon:"애드온",
   libTabGo:"이 선반에 {n}곡", libTabEmpty:"이 탭에는 곡이 없습니다. 다른 탭을 봐 주세요."
 });
 const libFolderSeg = it => String(it.dir || "").split("/")[0].trim();
@@ -156,12 +162,15 @@ function libTabIdOf(it) {
 /* タブの一覧（順番：すべて → パック → フォルダー → 追加した曲 → 公認） */
 function libTabsOf(all) {
   const tabs = [{ id:"all", icon:"📚", label:tr("libTabAll"), n:all.length }];
-  const packs = new Map(), folders = new Map();
+  const packs = new Map(), folders = new Map(), addons = new Map();
   let nFiles = 0;
   for (const it of all) {
     if (it.source === "pack") {
       const key = libPackKey(it), t = packs.get(key) || { id:"pack:" + key, icon:"📦", label:it.packName || tr("libTabPackNone"), n:0 };
       t.n++; packs.set(key, t);
+    } else if (it.source === "addon") {
+      const key = it.addonId || "", t = addons.get(key) || { id:"addon:" + key, icon:"🧩", label:it.addonName || tr("libTabAddon"), n:0 };
+      t.n++; addons.set(key, t);
     } else if (it.source === "file") nFiles++;
     else {
       const seg = libFolderSeg(it), t = folders.get(seg) || { id:seg ? "folder:" + seg : "folder", icon:"📁", label:seg || tr("libTabFolderTop"), n:0 };
@@ -169,6 +178,7 @@ function libTabsOf(all) {
     }
   }
   for (const t of packs.values()) tabs.push(t);
+  for (const t of addons.values()) tabs.push(t);          // 🧩 アドオンが足した曲
   for (const t of folders.values()) tabs.push(t);
   if (nFiles) tabs.push({ id:"file", icon:"📄", label:tr("libTabFiles"), n:nFiles });
   const nv = all.filter(it => it.source === "pack" && libIsVerified(it)).length;
@@ -180,6 +190,7 @@ function libTabMatch(it, id) {
   if (id === "file") return it.source === "file";
   if (id === "verified") return it.source === "pack" && libIsVerified(it);
   if (id.startsWith("pack:")) return it.source === "pack" && "pack:" + libPackKey(it) === id;
+  if (id.startsWith("addon:")) return it.source === "addon" && "addon:" + (it.addonId || "") === id;
   if (id.startsWith("folder:")) return it.source === "folder" && libFolderSeg(it) === id.slice(7);
   if (id === "folder") return it.source === "folder" && !libFolderSeg(it);
   return true;
@@ -342,6 +353,12 @@ async function selectSong(it) {
   if (currentSong && currentSong.key === it.key) { if (videoReady) startPreview(); return; }
   currentSong = it;
   stopPreview(); renderLib(); renderBanner(); updateSpBuilder();
+  emit("songSelected", it);
+  /* 🧩 アドオンが連れてきた曲：ファイル読み込みは、アドオンに任せる（自前のプレイヤーで鳴らす） */
+  if (it.source === "addon") {
+    if (it.file) { /* file を持っていれば、ふつうの曲と同じ道（loadMedia）を通る */ }
+    else { emit("addonSelect", it); renderSeedTools(); return; }
+  }
   await setBackground(it.bgBlob || null);
   if (currentSong !== it) return;
   previewPending = true;

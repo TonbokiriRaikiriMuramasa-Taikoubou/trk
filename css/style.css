@@ -869,3 +869,24 @@ details.panel[open]>summary{margin-bottom:14px}
 /* 設定画面の「棚スキン」の行（見た目セクション） */
 #libSkinSelect{width:100%;padding:10px 12px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);
   border:1px solid var(--ui-border);font-size:16px;margin-bottom:4px}
+
+/* ============================================================
+   🧩 アドオン（js/addons.js・設定画面のいちばん下）
+   ============================================================ */
+.addonPanel{margin-top:18px}
+.addonPanel>summary{cursor:pointer}
+.addonActions{margin:10px 0 4px}
+.addonList{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.addonRow{border:1px solid var(--ui-border);border-radius:14px;padding:12px 14px;background:var(--ui-soft)}
+.addonRow.off{opacity:.62}
+.addonHead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.addonDot{width:10px;height:10px;border-radius:50%;background:#777;flex:none}
+.addonDot.on{background:#40d060;box-shadow:0 0 8px #40d060}
+.addonDot.ng{background:#e05050}
+.addonVer{font-size:12px;padding:1px 7px;border-radius:999px;background:rgba(127,127,127,.22)}
+.addonAuthor{font-size:13px;color:var(--ui-muted)}
+.addonBadge{font-size:12px;padding:1px 8px;border-radius:999px;border:1px dashed var(--ui-border)}
+.addonErr{color:#ff8a8a}
+.addonSlot{margin-top:10px}
+.addonSlots>.addonSlot:empty{display:none}
+#addonStatus.ng{color:#ff8a8a}

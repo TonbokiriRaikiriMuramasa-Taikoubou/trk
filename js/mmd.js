@@ -36,6 +36,8 @@ Object.assign(TEXT.ja, {
   mmdMotionNone:"（モーションなし）",
   mmdMotionStep:"内蔵① ステップ（120BPM）", mmdMotionSwing:"内蔵② ゆらゆら（100BPM）", mmdMotionTurn:"内蔵③ ターン（120BPM）",
   mmdMotionJump:"内蔵④ ジャンプ（130BPM・はで）", mmdMotionIdol:"内蔵⑤ アイドル（128BPM）",
+  mmdMotionAirgtr:"🎸128 エアギター（シューゲイザーむけ）", mmdMotionDreamy:"🎸128 しっとり（When You Sleepむけ）",
+  mmdMotionKneel:"🎸128 かたひざ（しずかに眺める）",
   mmdMotionIevan:"🎵120 ネギスピン（Ievan Polkkaむけ）", mmdMotionKyukura:"🎵165 くらくら（きゅうくらりんむけ）",
   mmdMotionRabbit:"🎵173 うさみみ（ラビットホールむけ・5拍子スキップ）", mmdMotionMesmer:"🎵185 すましシャッフル（メズマライザーむけ）",
   mmdMotionDune:"🎵135 こうしん（砂の惑星むけ）", mmdMotionGreen:"🎵145 ペンライト（グリーンライツむけ）",
@@ -76,6 +78,8 @@ Object.assign(TEXT.en, {
   mmdMotionNone:"(no motion)",
   mmdMotionStep:"Built-in 1: Step (120 BPM)", mmdMotionSwing:"Built-in 2: Sway (100 BPM)", mmdMotionTurn:"Built-in 3: Turn (120 BPM)",
   mmdMotionJump:"Built-in 4: Jump (130 BPM, flashy)", mmdMotionIdol:"Built-in 5: Idol pump (128 BPM)",
+  mmdMotionAirgtr:"🎸128 Air guitar (shoegaze)", mmdMotionDreamy:"🎸128 Dreamy drift (for When You Sleep)",
+  mmdMotionKneel:"🎸128 One-knee gaze (quiet)",
   mmdMotionIevan:"🎵120 Leek spin (for Ievan Polkka)", mmdMotionKyukura:"🎵165 Dizzy puppet (for Kyu-kurarin)",
   mmdMotionRabbit:"🎵173 Bunny-ear hop (for Rabbit Hole, 5-beat skip)", mmdMotionMesmer:"🎵185 Cartoon shuffle (for Mesmerizer)",
   mmdMotionDune:"🎵135 March (for Sand Planet)", mmdMotionGreen:"🎵145 Penlight (for Greenlights Serenade)",
@@ -116,6 +120,8 @@ Object.assign(TEXT.zh, {
   mmdMotionNone:"（无动作）",
   mmdMotionStep:"内置① 踏步（120BPM）", mmdMotionSwing:"内置② 摇摆（100BPM）", mmdMotionTurn:"内置③ 转身（120BPM）",
   mmdMotionJump:"内置④ 跳跃（130BPM・华丽）", mmdMotionIdol:"内置⑤ 偶像应援（128BPM）",
+  mmdMotionAirgtr:"🎸128 空气吉他（Shoegaze风）", mmdMotionDreamy:"🎸128 沉静漂浮（When You Sleep风）",
+  mmdMotionKneel:"🎸128 单膝远眺（安静）",
   mmdMotionIevan:"🎵120 甩葱旋转（Ievan Polkka风）", mmdMotionKyukura:"🎵165 晕乎乎（Kyu-kurarin风）",
   mmdMotionRabbit:"🎵173 兔耳蹦跳（Rabbit Hole风・5拍子）", mmdMotionMesmer:"🎵185 卡通摇摆（Mesmerizer风）",
   mmdMotionDune:"🎵135 行进（砂之惑星风）", mmdMotionGreen:"🎵145 荧光棒（Greenlights风）",
@@ -156,6 +162,8 @@ Object.assign(TEXT.ko, {
   mmdMotionNone:"(모션 없음)",
   mmdMotionStep:"내장① 스텝 (120BPM)", mmdMotionSwing:"내장② 흔들흔들 (100BPM)", mmdMotionTurn:"내장③ 턴 (120BPM)",
   mmdMotionJump:"내장④ 점프 (130BPM・화려)", mmdMotionIdol:"내장⑤ 아이돌 (128BPM)",
+  mmdMotionAirgtr:"🎸128 에어기타 (슈게이저풍)", mmdMotionDreamy:"🎸128 차분히 (When You Sleep풍)",
+  mmdMotionKneel:"🎸128 한쪽 무릎 (조용히 바라보기)",
   mmdMotionIevan:"🎵120 파 돌리기 (Ievan Polkka풍)", mmdMotionKyukura:"🎵165 어질어질 (큐쿠라린풍)",
   mmdMotionRabbit:"🎵173 토끼귀 폴짝 (Rabbit Hole풍・5박자)", mmdMotionMesmer:"🎵185 카툰 셔플 (메즈머라이저풍)",
   mmdMotionDune:"🎵135 행진 (모래의 행성풍)", mmdMotionGreen:"🎵145 펜라이트 (Greenlights풍)",
@@ -328,6 +336,52 @@ const BUILTIN = {
       "左ひじ":{ rot:[0, -14, 0] },
       "右腕":  { rot:[22 * Math.sin(spin), 0, 24 + 12 * Math.cos(spin)] },
       "右ひじ":{ rot:[0, 52 + 18 * Math.sin(spin + 1.2), 0] }
+    };
+  } },
+  /* ---- 🎸 シューゲイザー3部作（128BPM：Sometimes / When You Sleep あたりむけ） ---- */
+  airgtr128: { label:"mmdMotionAirgtr", bpm:128, seconds:3.75, pose:t => { // エアギター（8拍・うつむいてかき鳴らす）
+    const b = t * 128 / 60, strum = Math.sin(2 * Math.PI * b) + 0.4 * Math.sin(4 * Math.PI * b);
+    const sway = Math.sin(Math.PI * b / 4), bounce = Math.abs(Math.sin(Math.PI * b));
+    return {
+      "センター": { pos:[0.05 * sway, -0.14 - 0.05 * bounce, 0], rot:[0, -14 + 6 * sway, 0] },
+      "上半身": { rot:[14, 6 * sway, 3 * sway] },
+      "上半身2":{ rot:[8, 0, 0] },
+      "首":    { rot:[16, -4 * sway, 2 * sway] },
+      "頭":    { rot:[20, 0, 5 * sway] },                               // 靴を見つめる
+      "左腕":  { rot:[26, 24, -38] },                                   // ネックをにぎる側
+      "左ひじ":{ rot:[0, -78, 0] },
+      "右腕":  { rot:[14 + 7 * strum, 0, 52] },                         // かき鳴らす側
+      "右ひじ":{ rot:[0, 48 + 16 * strum, 0] }
+    };
+  } },
+  dreamy128: { label:"mmdMotionDreamy", bpm:128, seconds:7.5, pose:t => { // しっとり（16拍・ゆったりただよう）
+    const b = t * 128 / 60, w = Math.PI * b / 8, s = Math.sin(w), drift = Math.sin(Math.PI * b / 4);
+    return {
+      "センター": { pos:[0.16 * s, -0.04 + 0.03 * Math.sin(Math.PI * b / 2), 0], rot:[0, 15 * s, 2 * drift] },
+      "上半身": { rot:[2, 8 * s, 4 * drift] },
+      "上半身2":{ rot:[1, 4 * s, 0] },
+      "首":    { rot:[-6, -6 * s, -4 * drift] },
+      "頭":    { rot:[-9, -4 * s, 6 * drift] },                         // すこし上をむいて夢見ごこち
+      "左腕":  { rot:[4 * drift, 0, -62 + 4 * s] },
+      "右腕":  { rot:[-4 * drift, 0, 62 + 4 * s] },
+      "左ひじ":{ rot:[0, -12 - 5 * drift, 0] },
+      "右ひじ":{ rot:[0, 12 - 5 * drift, 0] }
+    };
+  } },
+  kneel128: { label:"mmdMotionKneel", bpm:128, seconds:7.5, pose:t => {  // かたひざ（16拍・しずかに眺める）
+    const b = t * 128 / 60, breathe = Math.sin(Math.PI * b / 2), look = Math.sin(Math.PI * b / 8);
+    return {
+      "センター": { pos:[0, -3.8 + 0.06 * breathe, 0.2], rot:[0, 8 * look, 0] },
+      "上半身": { rot:[10 - 2 * breathe, 4 * look, 0] },
+      "上半身2":{ rot:[4, 0, 0] },
+      "首":    { rot:[-10, 10 * look, 0] },
+      "頭":    { rot:[-14 + breathe, 12 * look, 2 * look] },            // とおくを眺める
+      "左足":  { rot:[-95, 0, 6] }, "左ひざ":{ rot:[115, 0, 0] },        // 立てひざ側
+      "右足":  { rot:[-25, 0, -8] }, "右ひざ":{ rot:[120, 0, 0] },       // 地面につく側
+      "左腕":  { rot:[32, 0, -48] },                                    // ひざにうでを乗せる
+      "左ひじ":{ rot:[0, -58, 0] },
+      "右腕":  { rot:[6, 0, 64] },                                      // だらんと支える
+      "右ひじ":{ rot:[0, 14 + 3 * breathe, 0] }
     };
   } },
   dune135: { label:"mmdMotionDune", bpm:135, seconds:3.56, pose:t => {   // こうしん（8拍）

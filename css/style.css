@@ -689,3 +689,38 @@ details.panel[open]>summary{margin-bottom:14px}
 @keyframes holoScan{0%{top:-20%}100%{top:120%}}
 
 @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+
+/* ===== 🎨 カスタムTVスキン（tv-dock.js の #tvMaker で作る） =====
+   ・色と形は CSS 変数（--tv-…）で流し込む。内蔵スキンの #tvDock[data-skin=…] とは
+     id+class（#tvDock.tvCustom）で勝つようにしている
+   ・同じ変数を設定画面のプレビュー #tvmPreview にも流すので、見た目がそのまま確かめられる */
+#tvDock.tvCustom .tvDev,#tvmPreview.tvCustom .tvDev{background:linear-gradient(var(--tv-body),var(--tv-body2));border:1px solid var(--tv-bezel);color:var(--tv-text);border-radius:var(--tv-radius)}
+#tvDock.tvCustom .tvLcd,#tvmPreview.tvCustom .tvLcd{background:var(--tv-lcd-bg);color:var(--tv-lcd-text)}
+#tvDock.tvCustom .tvKey,#tvmPreview.tvCustom .tvKey{background:var(--tv-button);border:1px solid var(--tv-bezel);color:var(--tv-text);border-radius:calc(var(--tv-radius) * .55)}
+#tvDock.tvCustom .tvKey.selected,#tvmPreview.tvCustom .tvKey.selected{background:var(--tv-accent);color:var(--tv-on-accent)}
+#tvDock.tvCustom .tvScreenWrap,#tvmPreview.tvCustom .tvScreenWrap{border:var(--tv-bezelw) solid var(--tv-bezel);border-radius:calc(var(--tv-radius) * .6);background:var(--tv-screen)}
+#tvDock.tvCustom .tvScreen,#tvmPreview.tvCustom .tvScreen{background:var(--tv-screen)}
+#tvDock.tvCustom .tvSpeaker,#tvmPreview.tvCustom .tvSpeaker{background:var(--tv-bezel)}
+#tvDock.tvCustom .tvDeco,#tvmPreview.tvCustom .tvDeco{background:rgba(0,0,0,.18);color:var(--tv-text)}
+#tvDock.tvCustom[data-glare="0"] .tvGlare,#tvmPreview.tvCustom[data-glare="0"] .tvGlare{display:none}
+#tvDock.tvCustom[data-glow="1"] .tvDev,#tvmPreview.tvCustom[data-glow="1"] .tvDev{box-shadow:0 0 22px var(--tv-accent)}
+#tvDock.tvCustom .tvScanlines,#tvmPreview.tvCustom .tvScanlines{position:absolute;inset:0;pointer-events:none;display:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.3) 0 1px,transparent 1px 3px)}
+#tvDock.tvCustom[data-scan="1"] .tvScanlines,#tvmPreview.tvCustom[data-scan="1"] .tvScanlines{display:block}
+
+/* エディタ（設定画面）のレイアウトとプレビュー */
+.tvMakerGrid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;align-items:start;margin-top:6px}
+.tvMakerGrid h3:first-child,.tvMakerGrid h3:not(:first-child){margin-top:12px}
+.tvPreviewWrap{border:1px dashed var(--ui-border);border-radius:14px;padding:10px;background:var(--ui-soft)}
+#tvmPreview .tvDev{display:flex;flex-direction:column;gap:6px;padding:8px}
+#tvmPreview .tvTop{display:flex;align-items:center;gap:6px}
+#tvmPreview .tvLcd{flex:1;min-width:0;padding:5px 9px;border-radius:6px;font-family:"Cascadia Mono",Consolas,monospace;font-weight:800;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tvmPreview .tvScreenWrap{position:relative;display:flex;gap:6px;min-height:46px;overflow:hidden;border-radius:8px;background:#000}
+#tvmPreview .tvScreen{position:relative;flex:1;min-height:42px;overflow:hidden}
+#tvmPreview .tvGlare{position:absolute;top:0;left:0;width:60%;height:100%;background:linear-gradient(105deg,rgba(255,255,255,.18),transparent 60%);pointer-events:none}
+#tvmPreview .tvSpeaker{width:16px;background:repeating-linear-gradient(#1a1a1a,#1a1a1a 2px,#000 2px,#000 4px)}
+#tvmPreview .tvDeco{min-height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+#tvmPreview .tvSlots{display:grid;grid-template-columns:repeat(var(--cols,3),1fr);gap:5px}
+#tvmPreview .tvKey{display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 4px;font-size:10px;font-weight:800;border-radius:6px;overflow:hidden}
+#tvmPreview .tvKey .num{font-size:9px;opacity:.7}
+#tvmPreview .tvKey .nm{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:900px){.tvMakerGrid{grid-template-columns:1fr}}

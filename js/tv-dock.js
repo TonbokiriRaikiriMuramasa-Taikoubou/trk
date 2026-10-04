@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ==========================================================================
    trk! tv-dock.js — 📺 映像出力のTV風ドック（メイン画面の曲リストの下）
-   ・本体のスキン8種（ボタン数がそれぞれ違う）、電源・一時停止・お気に入り登録
-   ・映像フィルター20+種類（tv-presets.js）をまとめて触れる
+   ・本体のスキン30種（ボタン数がそれぞれ違う）、電源・一時停止・お気に入り登録
+   ・映像フィルター45種類（tv-presets.js）をまとめて触れる
+   ・🆕 カスタムTVスキン：設定画面の #tvMaker で色・形・飾りを決めて作れる（trk-tvskin / trk_tv_skins_v1）
    ・TVの下にオーディオがあるのが自然なので、上下入れ替えオプション
    ・FxDockと似た構造だが、映像系（videoStyle, bgDim, bgBlur）を扱う
    読み込み順：tv-presets.js → core.js → fx-dock.js → tv-dock.js → fx.js
@@ -50,6 +51,108 @@ const TV_FAV_MAX = 40, TV_RECENT_MAX = 5, TV_TEMP_ID = "__tv_temp", TV_LONG_MS =
 const DEFAULT_TV_FAV = ["color", "vivid", "cinema", "crt", "vhs", "underwater", "thermal", "gameboy", "vaporwave", "aurora"];
 
 const idList = (v, max) => Array.isArray(v) ? [...new Set(v.filter(x => typeof x === "string" && /^[a-z0-9_]{1,40}$/.test(x)))].slice(0, max) : [];
+
+/* ============ 🎨 カスタムTVスキン（保存庫） ============
+   ・設定画面のエディタで作る。形式は trk-tvskin、保存先は trk_tv_skins_v1（新しいキー。これまでのキーは変えない）
+   ・TV_DOCK_SKINS に同じ形のエントリを足すので、render()/buildDeco() はそのまま使える
+   ・見た目は CSS 変数（--tv-…）で流し込む（css/style.css の .tvCustom） */
+const TV_SKINS_KEY = "trk_tv_skins_v1", TV_SKIN_MAX = 30, TV_SKIN_FORMAT = "trk-tvskin";
+const TV_COLOR_KEYS = ["body", "bezel", "screen", "button", "accent", "text"];
+const TV_VAR_KEYS = ["--tv-body", "--tv-body2", "--tv-bezel", "--tv-screen", "--tv-button", "--tv-accent", "--tv-text",
+  "--tv-on-accent", "--tv-radius", "--tv-bezelw", "--tv-lcd-bg", "--tv-lcd-text"];
+/* 飾り（物理デコ）に使える名前。ラベルは、それを使っている内蔵TVスキンから借りる */
+const TV_DECO_KEYS = ["home", "tube", "wood", "antenna", "paper", "dials", "wall", "holo", "screen", "phone", "arcade",
+  "laptop", "cinema", "car", "airplane", "vr", "aquarium", "scope", "cctv", "gameboy", "jumbotron", "frame",
+  "transparent", "toy", "cardboard", "window", "microwave", "videowall"];
+const tvDecoLabel = k => {
+  const hit = Object.values(TV_DOCK_SKINS).find(d => !d.custom && d.deco === k);
+  return hit ? (hit.label[lang] || hit.label.en) : k;
+};
+/* エディタの「ひな形」。ここから色と形を変えて作る */
+const TV_MAKER_PRESETS = {
+  standard: { name:"My TV", n:5, cols:5, radius:18, bezel:4, deco:"", glow:false, glare:true, scan:false,
+    colors:{ body:"#2a2a2e", bezel:"#111111", screen:"#181818", button:"#3a3a40", accent:"#ffd166", text:"#eeeeee" } },
+  crt:      { name:"My CRT", n:4, cols:4, radius:26, bezel:8, deco:"tube", glow:true, glare:true, scan:true,
+    colors:{ body:"#d8c8a8", bezel:"#3a2e22", screen:"#1e2a1e", button:"#b8a888", accent:"#7dff9b", text:"#2a2218" } },
+  wood:     { name:"My Wood", n:6, cols:3, radius:10, bezel:10, deco:"wood", glow:false, glare:false, scan:false,
+    colors:{ body:"#8b5a2b", bezel:"#4a2a14", screen:"#201a12", button:"#6a4520", accent:"#ffcf8a", text:"#ffe8c8" } },
+  future:   { name:"My Future", n:8, cols:4, radius:26, bezel:2, deco:"holo", glow:true, glare:true, scan:false,
+    colors:{ body:"#0a2a3a", bezel:"#00ffff", screen:"#001a22", button:"#123a4a", accent:"#00ffff", text:"#bbffff" } }
+};
+const customTvDefs = {};
+const tvInt = (v, lo, hi, def) => Number.isFinite(Number(v)) ? Math.min(hi, Math.max(lo, Math.round(Number(v)))) : def;
+
+/* 外から来た trk-tvskin は、決められた項目と範囲だけを受け付ける */
+function sanitizeTvDef(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const c = (raw.colors && typeof raw.colors === "object") ? raw.colors : raw;
+  const colors = {};
+  for (const k of TV_COLOR_KEYS) {
+    const v = c[k];
+    if (typeof v !== "string" || !HEX.test(v.trim())) return null;
+    colors[k] = v.trim().toLowerCase();
+  }
+  const s = (raw.shape && typeof raw.shape === "object") ? raw.shape : raw;
+  const n = tvInt(s.n, 3, 8, 5);
+  return {
+    name: String(raw.name || "").trim().slice(0, 24) || "My TV",
+    colors,
+    shape: {
+      n, cols: tvInt(s.cols, 1, 4, Math.min(n, 4)),
+      radius: tvInt(s.radius, 0, 40, 18), bezel: tvInt(s.bezel, 0, 16, 4),
+      deco: TV_DECO_KEYS.includes(s.deco) ? s.deco : "",
+      glow: !!s.glow, glare: s.glare !== false, scan: !!s.scan
+    }
+  };
+}
+function buildTvSkinEntry(def) {
+  const label = { ja:"🎨 " + def.name, en:"🎨 " + def.name, zh:"🎨 " + def.name, ko:"🎨 " + def.name };
+  return { custom:true, def, n:def.shape.n, cols:def.shape.cols, deco:def.shape.deco || "", label };
+}
+function saveTvSkins() { try { localStorage.setItem(TV_SKINS_KEY, JSON.stringify(customTvDefs)); } catch (_) {} }
+function registerTvSkin(id, def) { customTvDefs[id] = def; TV_DOCK_SKINS[id] = buildTvSkinEntry(def); saveTvSkins(); }
+function unregisterTvSkin(id) { delete customTvDefs[id]; delete TV_DOCK_SKINS[id]; saveTvSkins(); }
+(function loadTvSkins() {
+  let raw = {};
+  try { raw = JSON.parse(localStorage.getItem(TV_SKINS_KEY)) || {}; } catch (_) {}
+  for (const [id, d] of Object.entries(raw)) {
+    if (!/^custom_tv_[a-z0-9]+$/.test(id)) continue;
+    const def = sanitizeTvDef(d); if (!def) continue;
+    customTvDefs[id] = def; TV_DOCK_SKINS[id] = buildTvSkinEntry(def);
+  }
+})();
+const newTvSkinId = () => "custom_tv_" + Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36);
+
+/* 色と形を CSS 変数にして流し込む（#tvDock とエディタのプレビューの両方で使う） */
+function paintTvVars(node, def) {
+  const c = def.colors, s = def.shape, dark = luminance(c.body) < .35;
+  node.style.setProperty("--tv-body", c.body);
+  node.style.setProperty("--tv-body2", mixHex(c.body, dark ? "#000000" : "#ffffff", dark ? .45 : .18));
+  node.style.setProperty("--tv-bezel", c.bezel);
+  node.style.setProperty("--tv-screen", c.screen);
+  node.style.setProperty("--tv-button", c.button);
+  node.style.setProperty("--tv-accent", c.accent);
+  node.style.setProperty("--tv-text", c.text);
+  node.style.setProperty("--tv-on-accent", luminance(c.accent) > .45 ? "#111111" : "#ffffff");
+  node.style.setProperty("--tv-radius", s.radius + "px");
+  node.style.setProperty("--tv-bezelw", s.bezel + "px");
+  node.style.setProperty("--tv-lcd-bg", mixHex(c.screen, "#000000", .45));
+  node.style.setProperty("--tv-lcd-text", c.accent);
+  node.dataset.glare = s.glare ? "1" : "0";
+  node.dataset.scan = s.scan ? "1" : "0";
+  node.dataset.glow = s.glow ? "1" : "0";
+  node.classList.add("tvCustom");
+}
+function clearTvVars(node) {
+  TV_VAR_KEYS.forEach(k => node.style.removeProperty(k));
+  delete node.dataset.glare; delete node.dataset.scan; delete node.dataset.glow;
+  node.classList.remove("tvCustom");
+}
+function applyTvSkinVars(node, id) {
+  const e = TV_DOCK_SKINS[id];
+  if (e && e.custom && e.def) { paintTvVars(node, e.def); return; }
+  if (node.classList.contains("tvCustom")) clearTvVars(node);
+}
 
 if (typeof prefs !== "undefined") {
   if (!prefs.tvFavSeeded) {
@@ -615,7 +718,7 @@ addEventListener("DOMContentLoaded", () => {
   const screen = el("div", "tvScreen");
   const screenGlare = el("i", "tvGlare");
   const speaker = el("div", "tvSpeaker");
-  screen.append(screenGlare);
+  screen.append(screenGlare, el("i", "tvScanlines"));   // 走査線はカスタムTVスキン用（[data-scan="1"] のときだけ出る）
   screenWrap.append(screen, speaker);
   const deco = el("div", "tvDeco");
   const slots = el("div", "tvSlots");
@@ -648,6 +751,16 @@ addEventListener("DOMContentLoaded", () => {
   const skinRow = el("label","field"), skinSel = document.createElement("select");
   skinRow.append(tx("span","tvSkinLabel"), skinSel);
   skinSel.addEventListener("change", () => { settings.tvDockSkin = skinSel.value; saveUserPrefs(); render(true); });
+
+  // 🎨 カスタムTVスキンのエディタを開く
+  const makerBtn = tx("button","tvMakerOpen","fxMini slim"); makerBtn.type = "button";
+  makerBtn.addEventListener("click", () => {
+    openSettings();
+    const mk = document.getElementById("tvMaker");
+    if (!mk) return;
+    mk.open = true;
+    setTimeout(() => mk.scrollIntoView({behavior:"smooth", block:"center"}), 50);
+  });
 
   const five = (() => {
     const lab = el("label","check"), inp = document.createElement("input");
@@ -698,7 +811,7 @@ addEventListener("DOMContentLoaded", () => {
     applyOrder();
   });
 
-  body.append(tx("summary","tvMoreTitle"), quickRow, dimRow, blurRow, tx("div","tvOverlayHint","hint"), overlayCheck.lab, skinRow, five.lab, orderRow, tx("div","tvOrderHint","hint"), el("div","miniActions", moreBtn, resetBtn));
+  body.append(tx("summary","tvMoreTitle"), quickRow, dimRow, blurRow, tx("div","tvOverlayHint","hint"), overlayCheck.lab, skinRow, makerBtn, five.lab, orderRow, tx("div","tvOrderHint","hint"), el("div","miniActions", moreBtn, resetBtn));
 
   dock.append(dev, overLabel, overflow, body);
   col.append(dock);
@@ -842,7 +955,10 @@ addEventListener("DOMContentLoaded", () => {
   let lastSkin = "";
   function render(skinChanged) {
     const nm = names();
-    dock.dataset.skin = settings.tvDockSkin;
+    // 知らないスキン名（古い設定・壊れた設定ファイル）は家庭用テレビとして描く
+    const skinId = TV_DOCK_SKINS[settings.tvDockSkin] ? settings.tvDockSkin : "home";
+    dock.dataset.skin = skinId;
+    applyTvSkinVars(dock, skinId);
     dock.classList.toggle("off", settings.videoStyle === "off");
     dock.classList.toggle("playing", !video.paused && settings.videoStyle !== "off");
     if (skinChanged || lastSkin !== settings.tvDockSkin) { buildDeco(); lastSkin = settings.tvDockSkin; }
@@ -929,7 +1045,7 @@ addEventListener("DOMContentLoaded", () => {
   if (vsSel) mo.observe(vsSel, { childList:true });
   on("language", () => { update(); applyOrder(); });
   on("skin", update);
-  on("tvChange", update);
+  on("tvChange", () => { update(); applyOrder(); });
 
   render(true);
   applyOrder();
@@ -941,10 +1057,192 @@ addEventListener("DOMContentLoaded", () => {
   if (typeof view !== "undefined") view.style.filter = newVideoFilter();
 });
 
+/* ============ 🎨 カスタムTVスキンのエディタ（設定画面の #tvMaker） ============
+   ・色6つ・形4つ・飾り1つ・質感3つを触って、自分のテレビを作る（プレビューはライブで更新）
+   ・保存すると trk_tv_skins_v1 に入り、TV_DOCK_SKINS に登録されてスキン一覧に出る
+   ・作ったTVは trk-tvskin（JSON）で書き出し・読み込みできる */
+Object.assign(TEXT.ja, {
+  tvmTitle:"🎨 カスタムTVスキン", tvmHint:"色・形・飾りを決めて、自分のテレビを作れます。保存するとTVドックのスキン一覧に「🎨 名前」で出てきます（最大30個）。",
+  tvmName:"名前", tvmColorHead:"色", tvmColorBody:"筐体", tvmColorBezel:"画面の枠", tvmColorScreen:"画面", tvmColorButton:"ボタン", tvmColorAccent:"アクセント", tvmColorText:"文字",
+  tvmShape:"形", tvmButtons:"ボタンの数", tvmCols:"ならべる列", tvmRadius:"角の丸み", tvmBezelW:"画面のふち",
+  tvmDeco:"飾り（物理デコ）", tvmDecoNone:"なし", tvmTex:"質感", tvmGlow:"光らせる（アクセント色）", tvmGlare:"ガラスの反射", tvmScan:"走査線",
+  tvmPreset:"ひな形", tvmPreview:"プレビュー", tvmOpen:"🎨 カスタムTVスキンを作る",
+  tvmSaved:"保存しました。TVドックに反映しました。", tvmExported:"trk-tvskin を書き出しました。", tvmImported:"読み込んで、TVドックに反映しました。",
+  tvmDeleted:"削除しました。TVは家庭用テレビに戻しました。", tvmLimit:"カスタムTVスキンは30個までです。", tvmBad:"TVスキンファイルの形式が正しくありません。",
+  tvmLocked:"内蔵のTVスキンは上書き・削除できません。「＋ 新規保存」で複製してください。", tvmLoaded:"選択中のカスタムTVを読み込みました。",
+  tvmPresetLoaded:"ひな形を読み込みました。色と形を変えて「＋ 新規保存」してください。", tvmConfirmDelete:"このカスタムTVスキンを削除しますか？"
+});
+Object.assign(TEXT.en, {
+  tvmTitle:"🎨 Custom TV skin", tvmHint:"Pick colors, shape and a prop to build your own TV. Saved TVs appear in the dock's skin list as “🎨 name” (up to 30).",
+  tvmName:"Name", tvmColorHead:"Colors", tvmColorBody:"Body", tvmColorBezel:"Bezel", tvmColorScreen:"Screen", tvmColorButton:"Buttons", tvmColorAccent:"Accent", tvmColorText:"Text",
+  tvmShape:"Shape", tvmButtons:"How many buttons", tvmCols:"Columns", tvmRadius:"Corner rounding", tvmBezelW:"Screen frame",
+  tvmDeco:"Prop (physical deco)", tvmDecoNone:"None", tvmTex:"Texture", tvmGlow:"Glow (accent color)", tvmGlare:"Glass glare", tvmScan:"Scanlines",
+  tvmPreset:"Template", tvmPreview:"Preview", tvmOpen:"🎨 Make a custom TV skin",
+  tvmSaved:"Saved and applied to the TV dock.", tvmExported:"Exported a trk-tvskin file.", tvmImported:"Imported and applied to the TV dock.",
+  tvmDeleted:"Deleted. The TV is back to the Home TV.", tvmLimit:"You can have up to 30 custom TV skins.", tvmBad:"Invalid TV skin file.",
+  tvmLocked:"Built-in TV skins can't be overwritten or deleted. Use “＋ Save as new” to copy one.", tvmLoaded:"Loaded the selected custom TV.",
+  tvmPresetLoaded:"Template loaded. Tweak it and use “＋ Save as new”.", tvmConfirmDelete:"Delete this custom TV skin?"
+});
+Object.assign(TEXT.zh, {
+  tvmTitle:"🎨 自定义电视皮肤", tvmHint:"选择颜色、形状和装饰，做一台自己的电视。保存后会以“🎨 名称”出现在电视坞的皮肤列表（最多30个）。",
+  tvmName:"名称", tvmColorHead:"颜色", tvmColorBody:"机身", tvmColorBezel:"边框", tvmColorScreen:"屏幕", tvmColorButton:"按钮", tvmColorAccent:"强调色", tvmColorText:"文字",
+  tvmShape:"形状", tvmButtons:"按钮数量", tvmCols:"列数", tvmRadius:"圆角", tvmBezelW:"屏幕边框",
+  tvmDeco:"装饰（实体道具）", tvmDecoNone:"无", tvmTex:"质感", tvmGlow:"发光（强调色）", tvmGlare:"玻璃反光", tvmScan:"扫描线",
+  tvmPreset:"模板", tvmPreview:"预览", tvmOpen:"🎨 制作自定义电视皮肤",
+  tvmSaved:"已保存，并应用到电视坞。", tvmExported:"已导出 trk-tvskin 文件。", tvmImported:"已导入并应用到电视坞。",
+  tvmDeleted:"已删除。电视已恢复为家用电视。", tvmLimit:"自定义电视皮肤最多30个。", tvmBad:"电视皮肤文件格式不正确。",
+  tvmLocked:"内置电视皮肤无法覆盖或删除，请用“＋ 另存为新皮肤”复制。", tvmLoaded:"已载入当前的自定义电视。",
+  tvmPresetLoaded:"已载入模板。调整颜色和形状后请用“＋ 另存为新皮肤”。", tvmConfirmDelete:"要删除这个自定义电视皮肤吗？"
+});
+Object.assign(TEXT.ko, {
+  tvmTitle:"🎨 커스텀 TV 스킨", tvmHint:"색·모양·장식을 골라 나만의 TV를 만들 수 있습니다. 저장하면 TV 독 스킨 목록에 “🎨 이름”으로 나타납니다 (최대 30개).",
+  tvmName:"이름", tvmColorHead:"색", tvmColorBody:"본체", tvmColorBezel:"베젤", tvmColorScreen:"화면", tvmColorButton:"버튼", tvmColorAccent:"강조색", tvmColorText:"글자",
+  tvmShape:"모양", tvmButtons:"버튼 개수", tvmCols:"열 수", tvmRadius:"모서리 둥글기", tvmBezelW:"화면 테두리",
+  tvmDeco:"장식(물리 데코)", tvmDecoNone:"없음", tvmTex:"질감", tvmGlow:"발광(강조색)", tvmGlare:"유리 반사", tvmScan:"주사선",
+  tvmPreset:"템플릿", tvmPreview:"미리보기", tvmOpen:"🎨 커스텀 TV 스킨 만들기",
+  tvmSaved:"저장했습니다. TV 독에 적용했습니다.", tvmExported:"trk-tvskin 파일을 내보냈습니다.", tvmImported:"가져와 TV 독에 적용했습니다.",
+  tvmDeleted:"삭제했습니다. TV는 가정용 TV로 돌아갔습니다.", tvmLimit:"커스텀 TV 스킨은 30개까지입니다.", tvmBad:"TV 스킨 파일 형식이 올바르지 않습니다.",
+  tvmLocked:"내장 TV 스킨은 덮어쓰기·삭제할 수 없습니다. “＋ 새로 저장”으로 복사하세요.", tvmLoaded:"선택한 커스텀 TV를 불러왔습니다.",
+  tvmPresetLoaded:"템플릿을 불러왔습니다. 색과 모양을 바꾼 뒤 “＋ 새로 저장”하세요.", tvmConfirmDelete:"이 커스텀 TV 스킨을 삭제할까요?"
+});
+
+(function setupTvMaker() {
+  const gid = id => document.getElementById(id);
+  addEventListener("DOMContentLoaded", () => {
+    const maker = gid("tvMaker"), preview = gid("tvmPreview");
+    if (!maker || !preview || maker.dataset.tvMakerReady) return;   // 二重初期化の防止
+    maker.dataset.tvMakerReady = "1";
+    const nm = gid("tvmName"), decoSel = gid("tvmDeco"), presetSel = gid("tvmPreset"), fileInput = gid("tvmImportFile");
+    const cols = Object.fromEntries(TV_COLOR_KEYS.map(k => [k, gid("tvmColor_" + k)]));
+    const rng = { n:gid("tvmN"), cols:gid("tvmCols"), radius:gid("tvmRadius"), bezel:gid("tvmBezel") };
+    const val = { n:gid("tvmNVal"), cols:gid("tvmColsVal"), radius:gid("tvmRadiusVal"), bezel:gid("tvmBezelVal") };
+    const tex = { glow:gid("tvmGlow"), glare:gid("tvmGlare"), scan:gid("tvmScan") };
+    const btnLoad = gid("tvmLoadBtn"), btnNew = gid("tvmSaveNewBtn"), btnOver = gid("tvmOverwriteBtn"),
+          btnExp = gid("tvmExportBtn"), btnDel = gid("tvmDeleteBtn");
+    if (!nm || !decoSel || !presetSel || Object.values(cols).some(n => !n)) return;
+
+    /* ---- プレビュー（TVドックと同じクラス名で小さく作る） ---- */
+    const pvDev = el("div","tvDev"), pvTop = el("div","tvTop"), pvWrap = el("div","tvScreenWrap");
+    const pvScreen = el("div","tvScreen"), pvDeco = el("div","tvDeco"), pvSlots = el("div","tvSlots");
+    pvTop.append(el("i","led tvLed on"), el("div","tvLcd","COLOR ▶"));
+    pvScreen.append(el("i","tvGlare"), el("i","tvScanlines"));
+    pvWrap.append(pvScreen, el("div","tvSpeaker on"));
+    pvDev.append(pvTop, pvWrap, pvDeco, pvSlots);
+    preview.append(pvDev);
+
+    function paintPreview(def) {
+      paintTvVars(preview, def);
+      const s = def.shape;
+      pvSlots.style.setProperty("--cols", s.cols);
+      pvSlots.textContent = "";
+      const samples = tvAllPresets().filter(p => !p.off).slice(0, s.n);
+      for (let i = 0; i < s.n; i++) {
+        const b = el("button", "tvKey" + (i === 0 ? " selected" : "")); b.type = "button";
+        b.append(el("span", "num", String(i + 1)), el("span", "nm", samples[i] ? tvPresetName(samples[i]) : "…"));
+        pvSlots.append(b);
+      }
+      pvDeco.className = "tvDeco";
+      pvDeco.hidden = !s.deco;
+      pvDeco.textContent = s.deco ? "🔧 " + tvDecoLabel(s.deco) : "";
+    }
+
+    /* ---- 読み書き ---- */
+    function readDef() {
+      const colors = {}; for (const k of TV_COLOR_KEYS) colors[k] = cols[k].value;
+      return sanitizeTvDef({ name:nm.value, colors, shape:{ n:rng.n.value, cols:rng.cols.value, radius:rng.radius.value,
+        bezel:rng.bezel.value, deco:decoSel.value, glow:tex.glow.checked, glare:tex.glare.checked, scan:tex.scan.checked } });
+    }
+    function paint() {
+      const def = readDef(); if (!def) return;
+      for (const k of ["n", "cols", "radius", "bezel"]) if (val[k]) val[k].textContent = def.shape[k];
+      paintPreview(def);
+    }
+    function fillDef(raw) {
+      const d = sanitizeTvDef(raw) || sanitizeTvDef(TV_MAKER_PRESETS.standard);
+      nm.value = d.name;
+      for (const k of TV_COLOR_KEYS) cols[k].value = d.colors[k];
+      rng.n.value = d.shape.n; rng.cols.value = d.shape.cols;
+      rng.radius.value = d.shape.radius; rng.bezel.value = d.shape.bezel;
+      decoSel.value = d.shape.deco;
+      tex.glow.checked = d.shape.glow; tex.glare.checked = d.shape.glare; tex.scan.checked = d.shape.scan;
+      paint();
+    }
+    function fillSelects() {
+      const curDeco = decoSel.value;
+      decoSel.textContent = "";
+      const none = document.createElement("option"); none.value = ""; none.textContent = tr("tvmDecoNone"); decoSel.append(none);
+      for (const k of TV_DECO_KEYS) {
+        const o = document.createElement("option"); o.value = k; o.textContent = tvDecoLabel(k); decoSel.append(o);
+      }
+      decoSel.value = TV_DECO_KEYS.includes(curDeco) ? curDeco : "";
+      const curPreset = TV_MAKER_PRESETS[presetSel.value] ? presetSel.value : "standard";
+      presetSel.textContent = "";
+      for (const [id, d] of Object.entries(TV_MAKER_PRESETS)) {
+        const o = document.createElement("option"); o.value = id; o.textContent = d.name; presetSel.append(o);
+      }
+      presetSel.value = curPreset;
+    }
+    const isCustomCurrent = () => !!customTvDefs[settings.tvDockSkin];
+    const toast = (key) => { if (!maker.open) maker.open = true; setStatus("tvmStatus", key); };
+
+    /* ---- 操作 ---- */
+    const inputs = [nm, ...Object.values(cols), ...Object.values(rng), ...Object.values(tex), decoSel];
+    for (const n of inputs) { n.addEventListener("input", () => { setStatus("tvmStatus", null); paint(); }); n.addEventListener("change", paint); }
+    presetSel.addEventListener("change", () => { fillDef(TV_MAKER_PRESETS[presetSel.value]); setStatus("tvmStatus", "tvmPresetLoaded"); });
+
+    if (btnLoad) btnLoad.addEventListener("click", () => {
+      if (isCustomCurrent()) { fillDef(customTvDefs[settings.tvDockSkin]); setStatus("tvmStatus", "tvmLoaded"); }
+      else { fillDef(TV_MAKER_PRESETS[presetSel.value]); setStatus("tvmStatus", "tvmPresetLoaded"); }
+    });
+    if (btnNew) btnNew.addEventListener("click", () => {
+      if (Object.keys(customTvDefs).length >= TV_SKIN_MAX) { toast("tvmLimit"); return; }
+      const def = readDef(); if (!def) { toast("tvmBad"); return; }
+      const id = newTvSkinId(); registerTvSkin(id, def);
+      settings.tvDockSkin = id; saveUserPrefs(); emit("tvChange"); toast("tvmSaved");
+    });
+    if (btnOver) btnOver.addEventListener("click", () => {
+      if (!isCustomCurrent()) { toast("tvmLocked"); return; }
+      const def = readDef(); if (!def) { toast("tvmBad"); return; }
+      registerTvSkin(settings.tvDockSkin, def);
+      saveUserPrefs(); emit("tvChange"); toast("tvmSaved");
+    });
+    if (btnExp) btnExp.addEventListener("click", () => {
+      const def = readDef(); if (!def) { toast("tvmBad"); return; }
+      downloadJSON({ format:TV_SKIN_FORMAT, version:1, ...def }, `${safeName(def.name)}.tvskin.json`);
+      toast("tvmExported");
+    });
+    if (fileInput) fileInput.addEventListener("change", async e => {
+      const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+      let raw = null; try { raw = JSON.parse(await f.text()); } catch (_) {}
+      const def = raw && (!raw.format || raw.format === TV_SKIN_FORMAT) ? sanitizeTvDef(raw) : null;
+      if (!def) { toast("tvmBad"); return; }
+      if (Object.keys(customTvDefs).length >= TV_SKIN_MAX) { toast("tvmLimit"); return; }
+      const id = newTvSkinId(); registerTvSkin(id, def);
+      settings.tvDockSkin = id; saveUserPrefs(); emit("tvChange");
+      fillDef(def); toast("tvmImported");
+    });
+    if (btnDel) btnDel.addEventListener("click", () => {
+      if (!isCustomCurrent()) { toast("tvmLocked"); return; }
+      if (!confirm(tr("tvmConfirmDelete"))) return;
+      unregisterTvSkin(settings.tvDockSkin);
+      settings.tvDockSkin = "home"; saveUserPrefs(); emit("tvChange"); toast("tvmDeleted");
+    });
+
+    maker.addEventListener("toggle", () => { if (maker.open) { fillSelects(); paint(); } });
+    on("language", () => { fillSelects(); paint(); });
+
+    fillSelects();
+    fillDef(customTvDefs[settings.tvDockSkin] || TV_MAKER_PRESETS[presetSel.value] || TV_MAKER_PRESETS.standard);
+  });
+})();
+
 /* ============ 窓口 TrkTV ============ */
 window.TrkTV = Object.freeze({
-  version:1,
+  version:2,
   list:() => tvAllPresets().map(p => ({ id:p.id, cat:p.cat, name: tvPresetName(p), overlay: p.overlay||null, off: !!p.off })),
+  skins:() => Object.entries(TV_DOCK_SKINS).map(([id, d]) => ({ id, name: d.label[lang] || d.label.en, custom: !!d.custom, n:d.n, cols:d.cols, deco:d.deco||"" })),
+  skin:() => settings.tvDockSkin,
+  selectSkin: id => { if (!TV_DOCK_SKINS[id]) return false; settings.tvDockSkin = id; saveUserPrefs(); emit("tvChange"); return true; },
   current:() => settings.videoStyle,
   select:id => selectTv(String(id)),
   next:() => stepTv(1),

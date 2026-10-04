@@ -402,6 +402,80 @@
             <div id="swayReducedNote" class="hint" data-i18n="swayReduced" hidden></div>
             <!-- modes.js（🪐 ORBIT）・stage.js（🎪 STAGE）・stagefx.js（🎭 演出）の設定がここに入ります -->
 
+            <!-- tv-dock.js が扱う：🎨 カスタムTVスキンのエディタ -->
+            <details id="tvMaker" class="subPanel">
+              <summary data-i18n="tvmTitle"></summary>
+              <div class="hint" data-i18n="tvmHint"></div>
+              <div class="tvMakerGrid">
+                <div>
+                  <label class="field">
+                    <span data-i18n="tvmName"></span>
+                    <input id="tvmName" type="text" maxlength="24" autocomplete="off">
+                  </label>
+                  <h3 data-i18n="tvmColorHead"></h3>
+                  <div class="colorGrid">
+                    <label><input id="tvmColor_body" type="color"><span data-i18n="tvmColorBody"></span></label>
+                    <label><input id="tvmColor_bezel" type="color"><span data-i18n="tvmColorBezel"></span></label>
+                    <label><input id="tvmColor_screen" type="color"><span data-i18n="tvmColorScreen"></span></label>
+                    <label><input id="tvmColor_button" type="color"><span data-i18n="tvmColorButton"></span></label>
+                    <label><input id="tvmColor_accent" type="color"><span data-i18n="tvmColorAccent"></span></label>
+                    <label><input id="tvmColor_text" type="color"><span data-i18n="tvmColorText"></span></label>
+                  </div>
+                  <h3 data-i18n="tvmShape"></h3>
+                  <div class="inline tight">
+                    <span data-i18n="tvmButtons"></span>
+                    <input id="tvmN" type="range" min="3" max="8" step="1">
+                    <span id="tvmNVal" class="mono"></span>
+                  </div>
+                  <div class="inline tight">
+                    <span data-i18n="tvmCols"></span>
+                    <input id="tvmCols" type="range" min="1" max="4" step="1">
+                    <span id="tvmColsVal" class="mono"></span>
+                  </div>
+                  <div class="inline tight">
+                    <span data-i18n="tvmRadius"></span>
+                    <input id="tvmRadius" type="range" min="0" max="40" step="1">
+                    <span id="tvmRadiusVal" class="mono"></span>
+                  </div>
+                  <div class="inline tight">
+                    <span data-i18n="tvmBezelW"></span>
+                    <input id="tvmBezel" type="range" min="0" max="16" step="1">
+                    <span id="tvmBezelVal" class="mono"></span>
+                  </div>
+                  <div class="makerRow two">
+                    <label class="field">
+                      <span data-i18n="tvmDeco"></span>
+                      <select id="tvmDeco"></select>
+                    </label>
+                    <label class="field">
+                      <span data-i18n="tvmPreset"></span>
+                      <select id="tvmPreset"></select>
+                    </label>
+                  </div>
+                  <h3 data-i18n="tvmTex"></h3>
+                  <label class="check"><input id="tvmGlow" type="checkbox"><span data-i18n="tvmGlow"></span></label>
+                  <label class="check"><input id="tvmGlare" type="checkbox"><span data-i18n="tvmGlare"></span></label>
+                  <label class="check"><input id="tvmScan" type="checkbox"><span data-i18n="tvmScan"></span></label>
+                </div>
+                <div>
+                  <div class="hint" data-i18n="tvmPreview"></div>
+                  <div class="tvPreviewWrap"><div id="tvmPreview"></div></div>
+                </div>
+              </div>
+              <div class="miniActions">
+                <button id="tvmLoadBtn" type="button" data-i18n="loadCurrent"></button>
+                <button id="tvmSaveNewBtn" type="button" data-i18n="saveNewSkin"></button>
+                <button id="tvmOverwriteBtn" type="button" data-i18n="overwriteSkin"></button>
+                <button id="tvmExportBtn" type="button" data-i18n="exportSkin"></button>
+                <label class="fileBtn small">
+                  <input id="tvmImportFile" type="file" accept="application/json,.json" hidden>
+                  <span data-i18n="importSkin"></span>
+                </label>
+                <button id="tvmDeleteBtn" type="button" data-i18n="deleteSkin"></button>
+              </div>
+              <div id="tvmStatus" class="hint status"></div>
+            </details>
+
             <h3 data-i18n="mascotSel"></h3>
             <!-- キャラクターの選択肢は js/characters/*.js が自動で追加します -->
             <select id="mascotSelect" class="mascotSelect">

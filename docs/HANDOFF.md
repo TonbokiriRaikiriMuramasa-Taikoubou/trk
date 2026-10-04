@@ -80,6 +80,9 @@ trk! の開発を再開します。docs/HANDOFF.md を貼ります。
 19. **🎛 サウンドエフェクト**（fx.js）：EQ・エフェクター・ゲーム連動・マイプリセット → タイミング自動補正・譜面/記録への保存 → プリセット**115個で打ち止め** → 検索・お気に入り・最近・前後/おまかせ・元の音と比べる・`TrkFX` 窓口を足して**凍結**
 20. **✔ 公認パック**（verified.js / verified.json）：SHA-256照合、譜面作者・BPM表示、作者のことば（280まで）
 21. **index.html・README.md・HANDOFF.md を最新に整理**
+22. **📺 映像出力（TVドック）**：`tv-presets.js` に映像フィルター45種、`tv-dock.js` にTVスキン30種（物理デコ・専用CSS）・電源/一時停止・お気に入りスロット・並び替え。家庭用TVの▲▼で映像切替、壁掛けTVはヘッダーへ移動
+23. **🛟 緊急復旧**：`?safe=1`／`?reset=tv|audio|notes|all`／`?export=…`、コンソールの `trkReset`／`trkExport`、設定画面の緊急復旧パネル、隠しトリガー、フローティングボタン、バナー表示
+24. **🎨 カスタムTVスキン**（`tv-dock.js` の `#tvMaker`）：色6つ・形4つ（ボタン数/列/角の丸み/画面のふち）・物理デコ28種・質感3つ（光/反射/走査線）を触って自分のテレビを作れる。ライブプレビュー、`trk-tvskin` で書き出し/読み込み、`trk_tv_skins_v1` に最大30個
 
 ---
 
@@ -147,6 +150,7 @@ trk/
 | 2 | i18n-options.js | 🎯プレイオプションの文章 |
 | 3 | data.js | スキン、レイアウト、難易度、`registerMascot`、`EGG_KEYS`・`EGG_WORDS`（隠しSeed） |
 | 4 | characters/miku.js | 初音ミク（PCL）。消しても動く |
+| 4.5 | tv-presets.js | 📺 映像フィルターのプリセット（`TRK_TV_PRESETS`、45個。core.js が使うので core より前） |
 | 5 | core.js | `settings`、状態変数、合図 `on/emit`、`videoFilter`、`renderModsLine`、`seedEggs`、画面切り替え |
 | 6 | player.js | AUTO/練習中の10秒スキップ・区間リピート。**各モードより先にキーを取るため core の直後** |
 | 7 | media.js | 読み込み・音声解析・譜面生成・SE |
@@ -161,6 +165,7 @@ trk/
 | 16 | extras.js | オフセット測定・自動微調整・判定統計・ゴースト・背景の暗さ/ぼかし |
 | 17 | fx-presets.js 🧊 | 🎛 内蔵プリセットのデータ（`TRK_FX_PRESETS`、115個） |
 | 17.5 | fx-dock.js | 🎛 さわれる本体（スキン7種・⏻ミュート・📡アンテナ＝バックグラウンド再生・ボタン長押し登録・3種ランダム・EQロック）、Media Session
+| 17.7 | tv-dock.js | 📺 映像出力のTV風ドック（スキン30種＋🎨カスタムTVスキン、電源・お気に入り・並び順） |
 | 18 | fx.js 🧊 | 🎛 サウンドエフェクト本体（「7. 凍結中のファイル」参照） |
 | 19 | library.js | 選曲画面・AUTO/ラジオ・シード道具・プレビュー |
 | 20 | verified.js | ✔公認パック（SHA-256と verified.json の照合、作者名・BPM・作者のことば） |
@@ -250,6 +255,7 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 | stage.js | `isStage` `stageKeys` `stageMap` `ensureStageMap` `stagePress` `stageBinding` `STAGE` |
 | catch.js | `isCatch` `isBlast` `catchState` `catchAllKeys` `CATCH` `catchJudge` `resetCatch` `catchHitPos` |
 | fx.js 🧊 | `window.TrkFX`（上の表） |
+| tv-dock.js | `window.TrkTV`（version 2：`list()` `skins()` `skin()` `selectSkin(id)` `current()` `select(id)` `next()` `prev()` `random()` `off()` `on()` `toggle()` `filter()` `overlay()`）、`applyOrder()` `tvSlotCount()` `tvSlotCols()` `settings.tvDockSkin` |
 | library.js | `renderLib` `renderBanner` `refreshPackSongs` `currentSong` `libView` `LIB_SHOW` |
 | main.js | `RESERVED` `poke` `syncOptionsUI` `packsReady` `showFxPower` |
 
@@ -259,11 +265,27 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 | stage.js・catch.js | `activeMods`（RANDOM・∞BLAST を追記） |
 | stagefx.js | `showJudge`（FAST/SLOWの表示範囲） |
 | fx.js 🧊 | `gameTime`、`chartToData`、`applyChartData` |
+| tv-dock.js | `videoFilter`（映像フィルター45種＋背景の暗さ/ぼかし）、`drawVideo`（スキャン線・額縁などのオーバーレイ描画） |
 | verified.js | `installPackFile`（SHA-256を保存）、`sanitizeSong`（作者のことば）、`getPackSongs`、`renderPackList`、`renderLib`、`renderBanner` |
 
 関数を包むには、`function` 宣言か `let` で作られている必要がある（`const` は上書き不可）。
 
 ：fx-dock.js は document の visibilitychange をキャプチャ段階で先に受け取り、アンテナが立っていて続けてよい場面では stopImmediatePropagation() する（library.js・main.js より先に読む必要がある）。グローバル関数の nextSong・selectSong（library.js）を使っている。
+
+### 🎨 カスタムTVスキン（tv-dock.js）
+- 作る画面は設定画面の `#tvMaker`（index.html に素のHTML、配線は tv-dock.js の `setupTvMaker()`）。
+  TVドックの「くわしく」にある `🎨 カスタムTVスキンを作る`（キー `tvmOpen`）で開く
+- 定義 `trk-tvskin`：
+  `{ format, version, name, colors:{body,bezel,screen,button,accent,text}, shape:{n(3-8), cols(1-4), radius(0-40), bezel(0-16), deco, glow, glare, scan} }`
+- 保存先は新しいキー `trk_tv_skins_v1`（最大30個）。IDは `custom_tv_…`。
+  **TV_DOCK_SKINS に同じ形で登録する**ので、`render()`・`buildDeco()`・スロット数・スキン一覧はそのまま使える
+- 見た目は CSS 変数（`--tv-body` `--tv-bezel` `--tv-screen` `--tv-button` `--tv-accent` `--tv-text` `--tv-radius` `--tv-bezelw` など）で流し込む。
+  CSS は `#tvDock.tvCustom …` と `#tvmPreview.tvCustom …` を並べて書く（`#tvDock .tvKey` は id+class なので、クラスだけでは勝てない）
+- 飾り（deco）は `TV_DECO_KEYS`＝内蔵スキンの `buildDeco()` の分岐名。増やすときは buildDeco() と TV_DECO_KEYS の両方へ。
+  走査線は画面の中の `<i class="tvScanlines">`（`[data-scan="1"]` のときだけ出る）
+- 知らないスキンID（古い設定・壊れた設定ファイル）は「home」として描く（`render()` の `skinId`）
+- 文章キーは `tvm…`（4言語）。座標や色は `paintTvVars()` に集約
+- 動作確認は jsdom でもできる（`node --check` だけでは配線ミスが出ないため）
 
 ### キー入力の優先順位
 - `window` のキャプチャ段階で、**登録順**に受け取る：player.js → truck.js → modes.js(ORBIT) → stage.js → catch.js → extras.js(測定中) → speed.js → その後 main.js（通常段階）。
@@ -292,9 +314,10 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 | `shadow_taiko_song_prefs_v1` | 曲ごとのBPM/オフセット/Seed/プレビュー位置/最近のシード |
 | `shadow_taiko_custom_skins_v1` | カスタムスキン |
 | `trk_fx_presets_v1` | マイプリセット（形式 `trk-fx`） |
+| `trk_tv_skins_v1` | 🎨 カスタムTVスキン（形式 `trk-tvskin`、最大30個。選んでいるTVは `settings.tvDockSkin`） |
 | IndexedDB `shadow_taiko_packs` / `_songs` / `_library` / `_vrm` | パック（`sha256` 付き）・追加した曲・フォルダ・VRM |fxDockSkin fxDockFive fxDockOpen fxAntenna fxEqLock fxLockChain fxFavSeeded
 
-**形式名**：`shadow-taiko-pack`、`shadow-taiko-chart`、`shadow-taiko-records`、`skin.shadow-taiko`、`trk-fx`、`trk-verified`、譜面ファイル `*.shadow-taiko.json`
+**形式名**：`shadow-taiko-pack`、`shadow-taiko-chart`、`shadow-taiko-records`、`skin.shadow-taiko`、`trk-fx`、`trk-verified`、`trk-tvskin`（カスタムTVスキン）、譜面ファイル `*.shadow-taiko.json`
 
 ### 記録の構造（概要）
 ```
@@ -375,6 +398,9 @@ records[指紋 "サイズ:長さ×10"] = {
 - [x] README・index.html・HANDOFF・連絡先・Issueフォーム・公開用ファイル一式
 - [x] サウンドエフェクト（fx.js・fx-presets.js）完成 → 🧊 凍結
 - [x] 公認パック（verified.js・verified.json・docs/verified.md）
+- [x] 📺 TVドック30スキン・映像フィルター45種・🛟緊急復旧
+- [x] 🎨 カスタムTVスキン（色6・形4・飾り28・質感3、`trk-tvskin`で共有）
+- [ ] 🎨 カスタムTVスキンの実機確認（モバイル幅・壁掛け・プロジェクターとの併用）
 「12. 次の候補」：🎹 シンセサイザーモード。プリセットを組み上げる画面を、つまみ・スライダーで触れるシンセ風にする案です。最初のメッセージでもらったアイデアで、EQのロックとパラメーターのランダムは今回先に入れました。
 **将来の大きな作業**
 - Capacitor で APK 化：`READ_MEDIA_AUDIO` で端末の曲一覧、ラジオ中のバックグラウンド再生（Media Session・フォアグラウンドサービス）。配布は GitHub Releases から（Google Play は登録料と、テスター約12人×14日の条件がある）

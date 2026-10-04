@@ -19,7 +19,7 @@ const mmdDB = idbStore("shadow_taiko_mmd", "files");     // 🆕 新しい保存
 
 /* ============ 文章（接頭辞 mmd…） ============ */
 Object.assign(TEXT.ja, {
-  mmdTitle:"🩷 MMD（モデルは自分で用意）",
+  mmdTitle:"🩷 MMDマスコット（ミクモード・モデル追加）",
   mmdHint:"MMDのモデル（.pmx/.pmd）とモーション（.vmd）を読み込んで、ゲーム中に踊らせられます。モデルは「持ち込み」が基本です（下に💠同梱モデルのボタンがあるときは、それだけで始められます）。持ち込むときは配布元の規約（商用不可・再配布不可など）を守って、自分で用意してください。",
   mmdPresetBtn:"💠 {name} をマスコットにする（同梱）",
   mmdPresetHint:"💠 は、この trk! に「れあどめ」（配布元の規約）ごと同梱されているモデルです。規約（PCL＝非営利など）の範囲で楽しんでください。クレジットは自動で入ります。",
@@ -35,7 +35,7 @@ Object.assign(TEXT.ja, {
   mmdCheckRunning:"チェック中…（初回はCDNから読み込むので、少し待ちます）", mmdCheckOk:"✅ チェックOK（WebGL・CDN・ライブラリ）", mmdCheckNg:"❌ チェックで問題が見つかりました（下の結果を見てください）",
   mmdQuickTitle:"🩷 マスコットのうごき", mmdQuickWatch:"👀 ひとやすみ", mmdQuickAuto:"🎲 おまかせ",
   mmdQuickPick:"🎯 えらぶ", mmdQuickOff:"💤 お留守番",
-  mmdQuickUILabel:"🩷 選曲画面に「マスコットのうごき」ミニ操作を出す",
+  mmdQuickUILabel:"🩷 ミクモードをONにする（MMDデスクトップマスコット機能）",
   mmdQuickFavTip:"⭐ お気に入りに入れる／外す（えらぶの一覧で上に来ます）",
   mmdMotionNone:"（モーションなし）",
   mmdMotionAuto:"🎲 おまかせ（曲のBPMにいちばん近い🎵を自動で。設定しなおし不要）",
@@ -67,7 +67,7 @@ Object.assign(TEXT.ja, {
   mmdCreditPrefix:"MMD:"
 });
 Object.assign(TEXT.en, {
-  mmdTitle:"🩷 MMD (bring your own model)",
+  mmdTitle:"🩷 MMD Mascot (Miku mode / Add model)",
   mmdHint:"Load an MMD model (.pmx/.pmd) and motion (.vmd) and let it dance in-game. Bringing your own model is the default (when a 💠 bundled-model button appears below, that alone gets you started). If you bring one, follow the distributor's terms (usually non-commercial, no redistribution).",
   mmdPresetBtn:"💠 Use {name} as the mascot (bundled)",
   mmdPresetHint:"💠 is a model bundled with this trk! together with its original readme (the distributor's terms). Enjoy it within those terms (PCL: non-commercial etc.). The credit line is filled in automatically.",
@@ -83,7 +83,7 @@ Object.assign(TEXT.en, {
   mmdCheckRunning:"Checking… (the first run loads from the CDN, so give it a moment)", mmdCheckOk:"✅ Check OK (WebGL, CDN, libraries)", mmdCheckNg:"❌ Something is wrong (see the lines below)",
   mmdQuickTitle:"🩷 Mascot moves", mmdQuickWatch:"👀 Chill", mmdQuickAuto:"🎲 Auto",
   mmdQuickPick:"🎯 Pick", mmdQuickOff:"💤 Away",
-  mmdQuickUILabel:"🩷 Show the \"Mascot moves\" mini controls on song select",
+  mmdQuickUILabel:"🩷 Enable Miku mode (MMD desktop mascot feature)",
   mmdQuickFavTip:"⭐ Add to / remove from favorites (they come first in the Pick list)",
   mmdMotionNone:"(no motion)",
   mmdMotionAuto:"🎲 Auto (pick the 🎵 nearest to the song's BPM — set once, works everywhere)",
@@ -115,7 +115,7 @@ Object.assign(TEXT.en, {
   mmdCreditPrefix:"MMD:"
 });
 Object.assign(TEXT.zh, {
-  mmdTitle:"🩷 MMD（模型请自己准备）",
+  mmdTitle:"🩷 MMD吉祥物（初音模式・添加模型）",
   mmdHint:"可以读取MMD模型（.pmx/.pmd）和动作（.vmd），让其在游戏中跳舞。基本做法是自带模型（如果下面出现💠内置模型按钮，仅用它即可开始）。自带模型时请遵守发布方的规约（多为禁止商用、禁止再分发）。",
   mmdPresetBtn:"💠 使用 {name} 作为吉祥物（内置）",
   mmdPresetHint:"💠 是与原版「readme」（发布方规约）一同内置在本 trk! 中的模型。请在规约（PCL：非商用等）范围内使用。署名会自动填写。",
@@ -131,7 +131,7 @@ Object.assign(TEXT.zh, {
   mmdCheckRunning:"检查中…（初次会从 CDN 读取，请稍等）", mmdCheckOk:"✅ 检查通过（WebGL・CDN・库）", mmdCheckNg:"❌ 检查发现问题（请看下面的结果）",
   mmdQuickTitle:"🩷 吉祥物动作", mmdQuickWatch:"👀 休息", mmdQuickAuto:"🎲 自动",
   mmdQuickPick:"🎯 挑选", mmdQuickOff:"💤 不在家",
-  mmdQuickUILabel:"🩷 在选曲画面显示「吉祥物动作」迷你操作",
+  mmdQuickUILabel:"🩷 开启初音模式（MMD桌面吉祥物功能）",
   mmdQuickFavTip:"⭐ 加入／移出收藏（在挑选列表中会排在前面）",
   mmdMotionNone:"（无动作）",
   mmdMotionAuto:"🎲 自动（选择最接近歌曲BPM的🎵・设置一次即可）",
@@ -163,7 +163,7 @@ Object.assign(TEXT.zh, {
   mmdCreditPrefix:"MMD:"
 });
 Object.assign(TEXT.ko, {
-  mmdTitle:"🩷 MMD (모델은 직접 준비)",
+  mmdTitle:"🩷 MMD 마스코트 (미쿠 모드 / 모델 추가)",
   mmdHint:"MMD 모델(.pmx/.pmd)과 모션(.vmd)을 불러와 게임 중에 춤추게 할 수 있습니다. 기본은 모델을 직접 준비하는 것입니다(아래에 💠 동봉 모델 버튼이 있으면 그것만으로 시작할 수 있습니다). 직접 준비할 때는 배포처의 규약(비상업・재배포 금지 등)을 지켜 주세요.",
   mmdPresetBtn:"💠 {name} 을(를) 마스코트로 (동봉)",
   mmdPresetHint:"💠 는 원본 'readme'(배포처 규약)와 함께 이 trk!에 동봉된 모델입니다. 규약(PCL: 비상업 등) 범위에서 즐겨 주세요. 크레딧은 자동으로 들어갑니다.",
@@ -179,7 +179,7 @@ Object.assign(TEXT.ko, {
   mmdCheckRunning:"확인 중… (처음에는 CDN에서 읽어 오므로 조금 기다려 주세요)", mmdCheckOk:"✅ 확인 OK (WebGL·CDN·라이브러리)", mmdCheckNg:"❌ 확인에서 문제를 찾았습니다(아래 결과를 봐 주세요)",
   mmdQuickTitle:"🩷 마스코트 움직임", mmdQuickWatch:"👀 휴식", mmdQuickAuto:"🎲 자동",
   mmdQuickPick:"🎯 고르기", mmdQuickOff:"💤 자리비움",
-  mmdQuickUILabel:"🩷 선곡 화면에 '마스코트 움직임' 미니 조작 표시",
+  mmdQuickUILabel:"🩷 미쿠 모드 켜기 (MMD 데스크톱 마스코트 기능)",
   mmdQuickFavTip:"⭐ 즐겨찾기에 넣기／빼기 (고르기 목록에서 위에 옵니다)",
   mmdMotionNone:"(모션 없음)",
   mmdMotionAuto:"🎲 자동 (곡 BPM에 가장 가까운 🎵 선택・한 번만 설정하면 끝)",
@@ -695,11 +695,13 @@ async function doLoadPreset(p) {
       files.push(new File([blob], String(name).split("/").pop()));
     }
     if (p.man.credit) settings.mmdCredit = String(p.man.credit).slice(0, 120);
-    await doLoadModel(files, { save:true });
+    await doLoadModel(files, { save:true, select:true });
     if (!model) return;                              // 失敗なら doLoadModel が理由を出している
     if (p.man.motion && BUILTIN[p.man.motion]) await applyMotion(p.man.motion, { silent:true });
     if (typeof p.man.bpm === "number") settings.mmdMotionBpm = Math.max(0, Math.min(300, p.man.bpm));
-    saveUserPrefs(); syncUI();
+    settings.mascot = "mmd";
+    settings.mmdQuickUI = true;
+    saveUserPrefs(); syncUI(); renderQuick(); updateMascotUI();
   } catch (e) {
     console.error(e);
     status(e && e.key ? e.key : "mmdLoadError");
@@ -939,7 +941,8 @@ function animate(now) {
   canvas.hidden = !playing;
   const panel = $("mmdPanel");
   const previewOn = !!model && phase === "title" && screen === "settings" && !!panel && panel.open && !!prev;
-  if (!playing && !previewOn) { lastT = now; return; }
+  const quickOn = !!model && phase === "title" && screen === "select" && settings.mmdQuickUI !== false && activeMascot() === "mmd" && !!quickPreview && !safeNow();
+  if (!playing && !previewOn && !quickOn) { lastT = now; return; }
   const dt = Math.min(0.1, Math.max(0.001, (now - lastT) / 1000)); lastT = now;
   try {
     applyRect(); applyModelTransform();
@@ -951,6 +954,11 @@ function animate(now) {
       const a = canvas.width / canvas.height, dh = prev.height, dw = dh * a;
       pctx.drawImage(canvas, (prev.width - dw) / 2, 0, dw, dh);
     }
+    if (quickOn && qpctx) {
+      qpctx.clearRect(0, 0, quickPreview.width, quickPreview.height);
+      const a = canvas.width / canvas.height, dh = quickPreview.height, dw = dh * a;
+      qpctx.drawImage(canvas, (quickPreview.width - dw) / 2, 0, dw, dh);
+    }
   } catch (e) { console.error(e); }
 }
 requestAnimationFrame(animate);
@@ -959,6 +967,7 @@ requestAnimationFrame(animate);
    表のUIは4つだけ：👀ひとやすみ（BPM非依存）／🎲おまかせ／🎯えらぶ（⭐お気に入りが上に来る）／💤お留守番。
    モデルが読み込まれているときだけ出ます（設定の mmdQuickUI チェックで隠せる・?safe=1 では出ない） */
 let quickPanel = null, quickSeg = null, quickPickRow = null, quickSelect = null, quickFavBtn = null, quickName = null;
+let quickPreview = null, qpctx = null;
 let quickPickOpen = false;                           // 🎯タップでセレクトを開いたままにする
 const quickMode = () =>
   settings.mascot === "none" ? "off" :
@@ -970,7 +979,21 @@ function buildQuickPanel() {
   const head = el("div", "libHead"), title = el("h3");
   title.id = "mmdQuickTitle"; title.style.margin = "0";
   quickName = el("b", "mono"); head.append(title, quickName);
-  quickSeg = el("div", "seg"); quickSeg.id = "mmdQuickSeg"; quickSeg.style.marginTop = "8px";
+
+  const body = el("div", "mmdQuickBody");
+  const cWrap = el("div", "mmdQuickCanvasWrap");
+  quickPreview = document.createElement("canvas");
+  quickPreview.id = "mmdQuickPreview";
+  quickPreview.width = 240; quickPreview.height = 240;
+  quickPreview.title = tr("mmdQuickWatch");
+  quickPreview.addEventListener("click", () => {
+    quickTap(motionKind === "watch" ? "auto" : "watch");
+  });
+  qpctx = quickPreview.getContext("2d");
+  cWrap.append(quickPreview);
+
+  const ctrl = el("div", "mmdQuickControls");
+  quickSeg = el("div", "seg"); quickSeg.id = "mmdQuickSeg";
   for (const [mode, key] of [["watch", "mmdQuickWatch"], ["auto", "mmdQuickAuto"], ["pick", "mmdQuickPick"], ["off", "mmdQuickOff"]]) {
     const b = el("button"); b.type = "button"; b.dataset.quick = mode; b.dataset.i18n = key;
     b.addEventListener("click", () => quickTap(mode));
@@ -988,13 +1011,15 @@ function buildQuickPanel() {
     saveUserPrefs(); renderQuick();
   });
   quickPickRow.append(quickSelect, quickFavBtn);
-  quickPanel.append(head, quickSeg, quickPickRow);
+  ctrl.append(quickSeg, quickPickRow);
+  body.append(cWrap, ctrl);
+  quickPanel.append(head, body);
   ($("speedPanel") || $("playBtn")).after(quickPanel);
 }
 function quickTap(mode) {
   quickPickOpen = (mode === "pick");
-  if (mode === "off") { settings.mascot = "none"; saveUserPrefs(); updateMascotUI(); renderQuick(); return; }
-  if (settings.mascot !== "mmd" && model) { settings.mascot = "mmd"; saveUserPrefs(); updateMascotUI(); }
+  if (mode === "off") { settings.mascot = "none"; saveUserPrefs(); updateMascotUI(); syncUI(); renderQuick(); return; }
+  if (settings.mascot !== "mmd" && model) { settings.mascot = "mmd"; saveUserPrefs(); updateMascotUI(); syncUI(); }
   if (mode === "watch") {                           // 👀 連打で みてる⇔たたずむ
     loadMotionKind(motionKind === "watch" ? "stroll" : "watch");
   } else if (mode === "auto") loadMotionKind("auto");
@@ -1014,6 +1039,19 @@ function renderQuick() {
     b.classList.toggle("selected", on); b.setAttribute("aria-pressed", on);
   });
   quickName.textContent = mode === "off" ? "💤" : (motionName || tr("mmdMotionNone"));
+  if (quickPreview) {
+    quickPreview.style.opacity = mode === "off" ? "0.35" : "1";
+    if (mode === "off" && qpctx) {
+      qpctx.clearRect(0, 0, quickPreview.width, quickPreview.height);
+      qpctx.save();
+      qpctx.fillStyle = "rgba(127,127,127,0.7)";
+      qpctx.font = "bold 32px sans-serif";
+      qpctx.textAlign = "center";
+      qpctx.textBaseline = "middle";
+      qpctx.fillText("💤", quickPreview.width / 2, quickPreview.height / 2);
+      qpctx.restore();
+    }
+  }
   quickPickRow.hidden = mode !== "pick";
   if (mode === "pick") {
     const favs = (settings.mmdMotionFavs || []).filter(id => BUILTIN[id]);
@@ -1150,7 +1188,7 @@ function syncUI() {
   const mb = $("mmdBpm"); if (mb) mb.value = settings.mmdMotionBpm;
   const cr = $("mmdCredit"); if (cr && document.activeElement !== cr) cr.value = settings.mmdCredit || "";
   const rem = $("mmdRemember"); if (rem) rem.checked = settings.mmdRemember !== false;
-  const qui = $("mmdQuickUI"); if (qui) qui.checked = settings.mmdQuickUI !== false;
+  const qui = $("mmdQuickUI"); if (qui) qui.checked = settings.mmdQuickUI !== false && settings.mascot === "mmd";
   const ag = $("mmdAgree"); if (ag) ag.checked = !!settings.mmdAgreed;
   setAgreeUI(); renderMotionList();
 }
@@ -1209,7 +1247,28 @@ addEventListener("DOMContentLoaded", () => {
   });
 
   const qui = $("mmdQuickUI");
-  if (qui) qui.addEventListener("change", e => { settings.mmdQuickUI = !!e.target.checked; saveUserPrefs(); renderQuick(); });
+  if (qui) qui.addEventListener("change", async e => {
+    const on = !!e.target.checked;
+    settings.mmdQuickUI = on;
+    if (on) {
+      if (!model && presets.length) {
+        await doLoadPreset(presets[0]);
+        return;
+      }
+      if (model) {
+        settings.mascot = "mmd";
+        updateMascotUI();
+      }
+    } else {
+      if (settings.mascot === "mmd") {
+        settings.mascot = "none";
+        updateMascotUI();
+      }
+    }
+    saveUserPrefs();
+    syncUI();
+    renderQuick();
+  });
 
   $("mmdCheckBtn").addEventListener("click", () => { enqueue(runCheck); });
   $("mmdCopyBtn").addEventListener("click", () => {

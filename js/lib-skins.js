@@ -47,8 +47,8 @@ Object.assign(TEXT.ko, {
   libSkinApplied:"선반 스킨: {name}"
 });
 
-/* ============ スキン8種 ============ */
-const LIB_SKIN_ORDER = ["player", "note", "sticker", "card", "cassette", "blackboard", "retro", "clearfile", "juke", "guide", "board"];
+/* ============ スキン16種 ============ */
+const LIB_SKIN_ORDER = ["player", "note", "sticker", "card", "cassette", "blackboard", "retro", "clearfile", "juke", "guide", "board", "vinyl", "vhs", "karaoke", "archive", "menu"];
 const LIB_SKINS = {
   player:     { icon:"🎛", label:L4("タブプレーヤー", "Tab player", "标签播放器", "탭 플레이어") },
   note:       { icon:"📝", label:L4("ノート", "Notebook", "笔记本", "노트") },
@@ -61,7 +61,13 @@ const LIB_SKINS = {
   /* 🆕 3種（2026-10-05） */
   juke:       { icon:"🎰", label:L4("ジュークボックス", "Jukebox", "点唱机", "주크박스") },
   guide:      { icon:"📻", label:L4("ラジオ番組表", "Radio guide", "广播节目表", "라디오 편성표") },
-  board:      { icon:"🚉", label:L4("電光掲示板", "Departure board", "电子显示屏", "전광판") }
+  board:      { icon:"🚉", label:L4("電光掲示板", "Departure board", "电子显示屏", "전광판") },
+  /* 🆕 5種（2026-10-05 拡張） */
+  vinyl:      { icon:"💿", label:L4("レコード棚", "Vinyl record", "黑胶唱片架", "바이닐 레코드") },
+  vhs:        { icon:"📼", label:L4("レンタルビデオ", "VHS rental", "VHS录像带", "비디오 대여점") },
+  karaoke:    { icon:"🎤", label:L4("カラオケ目次", "Karaoke book", "KTV歌单", "노래방 책자") },
+  archive:    { icon:"🗂️", label:L4("図書館の書架", "Library catalog", "图书馆书架", "도서관 서가") },
+  menu:       { icon:"🍱", label:L4("お品書き", "Menu scroll", "日式菜单", "식사 메뉴판") }
 };
 const skinDef = id => LIB_SKINS[id] || LIB_SKINS.player;
 const skinText = id => { const d = LIB_SKINS[id]; return d ? d.icon + " " + (d.label[lang] || d.label.en) : id; };

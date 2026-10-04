@@ -83,6 +83,7 @@ const settings = {
   playMode: pick(prefs.playMode, PLAY_MODES, "manual"),
   autoPlay: prefs.autoPlay === true || prefs.playMode === "auto",
   difficulty: pick(prefs.difficulty, DIFF_IDS, "normal"),
+  showMasterDiff: !!prefs.showMasterDiff,
   seed: typeof prefs.seed === "string" ? prefs.seed.slice(0, 32) : "834271",   // 曲ごとの設定がない曲の初期値
   bpm: num(prefs.bpm, 60, 300, 138),
   offset: num(prefs.offset, -5000, 5000, 0),
@@ -127,6 +128,8 @@ const settings = {
   rate: num(prefs.rate, .5, 3, 1),          // 上限は speed.js が「2.0x・3.0x も使う」の設定に合わせて決め直します
   hidden: !!prefs.hidden,
   sudden: !!prefs.sudden,
+  modMirror: !!prefs.modMirror,
+  modRandom: !!prefs.modRandom,
   cover: num(prefs.cover, .2, .7, .4)
 };
 function saveUserPrefs() { try { localStorage.setItem(PREFS_KEY, JSON.stringify(settings)); } catch (_) {} }
@@ -144,7 +147,7 @@ function saveUserPrefs() { try { localStorage.setItem(PREFS_KEY, JSON.stringify(
 function resetVideoPrefs() {
   settings.videoStyle = "color";
   settings.bgDim = 0; settings.bgBlur = 0;
-  settings.tvDockSkin = "home"; settings.tvDockFive = false;
+  settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = true;
   settings.tvPowerPrev = "color"; settings.previewEnabled = true;
   settings.tvSongWhilePlaying = false;   /* ◀▶ を演奏中も効かせる設定も一緒に戻す */
@@ -178,7 +181,7 @@ function enterSafeMode() {
   safeModeOn = true;
   settings.videoStyle = "off";
   settings.bgDim = 0; settings.bgBlur = 0;
-  settings.tvDockSkin = "home"; settings.tvDockFive = false;
+  settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = false;
   settings.previewEnabled = false;
   settings.tvMenuPreview = false; settings.tvMenuVideo = false;   // セーフモードは映像を流さない
@@ -191,7 +194,7 @@ function resetAllPrefs() {
   resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs();
   settings.fxPower = 1.5; settings.hideGameplayUI = false; settings.errorMeter = true;
   settings.scroll = 1; settings.latency = 0; settings.judge = "standard"; settings.rate = 1;
-  settings.hidden = false; settings.sudden = false;
+  settings.hidden = false; settings.sudden = false; settings.modMirror = false; settings.modRandom = false; settings.showMasterDiff = false;
   settings.mascot = "skin"; settings.vrmFrame = "full";
   settings.mmdScale = 1; settings.mmdTurn = 0; settings.mmdMotionBpm = 0; settings.mmdMotionKind = "none";
   settings.mmdQuickUI = true; settings.mmdMotionFavs = [];
@@ -241,6 +244,16 @@ function exportPrefs(kind) {
       else if (hash.includes("notes")) { resetNotesPrefs(); didReset = "notes"; }
       else if (hash.includes("all")) { resetAllPrefs(); didReset = "all"; }
       else { resetVideoPrefs(); didReset = "tv"; }
+    }
+    if (!didReset) {
+      if (sp.has("tv") || sp.has("filter")) {
+        const f = sp.get("tv") || sp.get("filter");
+        if (typeof f === "string" && f.length < 50) { settings.videoStyle = f; saveUserPrefs(); }
+      }
+      if (sp.has("skin") || sp.has("tvskin")) {
+        const s = sp.get("skin") || sp.get("tvskin");
+        if (typeof s === "string" && s.length < 50) { settings.tvDockSkin = s; saveUserPrefs(); }
+      }
     }
     if (didReset || doExport) {
       saveUserPrefs();
@@ -374,6 +387,8 @@ function activeMods() {
   const m = [];
   if (settings.hidden) m.push("HD");
   if (settings.sudden) m.push("SD");
+  if (settings.modMirror) m.push("MIRROR");
+  if (settings.modRandom) m.push("RANDOM");
   if (settings.rate !== 1) m.push(settings.rate.toFixed(2) + "x");
   if (settings.judge === "strict") m.push("STRICT");
   if (settings.judge === "lenient") m.push("LENIENT");
@@ -540,10 +555,24 @@ function seedEggs(raw) {
 }
 function refreshSeedSecrets() {
   const e = seedEggs($("seed").value);
-  unlock.master = e.master; unlock.rush = e.rush; levelOverride = e.level;
-  document.querySelector('#difficultyPicker [data-mode="master"]').hidden = !unlock.master;
-  document.querySelector('#difficultyPicker [data-mode="rush"]').hidden = !unlock.rush;
-  if ((settings.difficulty === "master" && !unlock.master) || (settings.difficulty === "rush" && !unlock.rush)) settings.difficulty = "normal";
+  unlock.master = e.master || !!settings.showMasterDiff;
+  unlock.rush = e.rush || !!settings.showMasterDiff;
+  levelOverride = e.level;
+  const masterBtn = document.querySelector('#difficultyPicker [data-mode="master"]');
+  const rushBtn = document.querySelector('#difficultyPicker [data-mode="rush"]');
+  if (masterBtn) masterBtn.hidden = !unlock.master;
+  if (rushBtn) rushBtn.hidden = !unlock.rush;
+  if ((settings.difficulty === "master" && !unlock.master) || (settings.difficulty === "rush" && !unlock.rush)) {
+    settings.difficulty = "normal";
+    if (typeof syncPickers === "function") syncPickers();
+  }
+  const toggleBtn = $("expertDiffToggle");
+  if (toggleBtn) {
+    toggleBtn.classList.toggle("selected", !!settings.showMasterDiff);
+    toggleBtn.setAttribute("aria-pressed", String(!!settings.showMasterDiff));
+  }
+  const check = $("showMasterDiff");
+  if (check) check.checked = !!settings.showMasterDiff;
   setStatus("eggStatus", e.key || "secretHint", e.vars);
   $("eggStatus").classList.toggle("egg", !!e.key);
 }

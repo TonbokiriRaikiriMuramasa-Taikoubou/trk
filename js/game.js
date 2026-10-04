@@ -43,9 +43,17 @@ function finishLeadIn() {
 
 /* ---------- 進行 ---------- */
 function resetRun() {
-  chart.forEach(n => { n.judged = false; n.result = null; });
+  const rand = settings.modRandom ? mulberry32(hashString(`trkRand|${$("seed")?.value || 0}|${chartDiff}|${chart.length}`)) : null;
+  chart.forEach(n => {
+    n.judged = false; n.result = null;
+    if (n.origLane == null) n.origLane = n.lane;
+    let l = n.origLane;
+    if (settings.modMirror) l = 1 - l;
+    if (settings.modRandom && rand) l = rand() < 0.5 ? 0 : 1;
+    n.lane = l;
+  });
   nextIdx = 0;
-  stats = { perfect:0, good:0, miss:0, combo:0, maxCombo:0, star:0, crash:0, errN:0, errSum:0, errSq:0 };
+  stats = { perfect:0, good:0, miss:0, combo:0, maxCombo:0, star:0, fast:0, slow:0, goodFast:0, goodSlow:0, crash:0, errN:0, errSum:0, errSq:0 };
   practice = false; effects = []; errors = []; caption = null; lastMissT = -1e9;
   leadIn = null; goAt = 0; pausedInLeadIn = false; autoplayBlocked = false;
   resetTruck(); resetLives(); resetOrbit();
@@ -128,7 +136,9 @@ const MODE_ICON = { truck:"🚚", orbit:"🪐", stage:"🎪", catch:"🚛" };
 const modeLabel = () => tr(MODE_LABEL[settings.playMode] || "manualPlay") + (settings.autoPlay ? " · " + tr("autoPlay") : "");
 const modeIcon = m => MODE_ICON[m] || "";
 const runMods = () => [...activeMods(), ...lifeTags(),
-  ...(settings.playMode === "stage" && settings.stageMirror ? ["MIRROR"] : []), ...(settings.autoPlay ? ["AUTO"] : [])];
+  ...(settings.playMode === "stage" && settings.stageMirror && !settings.modMirror ? ["MIRROR"] : []),
+  ...(settings.playMode === "stage" && settings.stageRandom === "random" && !settings.modRandom ? ["RANDOM"] : []),
+  ...(settings.autoPlay ? ["AUTO"] : [])];
 const showStar = () => settings.perfectStar !== false;
 
 /* ---------- リザルト ---------- */
@@ -179,6 +189,10 @@ function endGame(failed = false) {
       <div class="p"><span>${esc(tr("perfect"))}</span><b>${stats.perfect}</b>${starHtml}</div>
       <div><span>${esc(tr("good"))}</span><b>${stats.good}</b></div>
       <div class="m"><span>${esc(tr("miss"))}</span><b>${stats.miss}</b></div>
+    </div>
+    <div class="fastSlowRow">
+      <div class="fsBadge fastBadge"><span class="fsLabel">FAST</span><b class="fsVal">${stats.fast || 0}</b>${stats.goodFast ? `<small class="fsSub">(${esc(tr("good"))} ${stats.goodFast})</small>` : ""}</div>
+      <div class="fsBadge slowBadge"><span class="fsLabel">SLOW</span><b class="fsVal">${stats.slow || 0}</b>${stats.goodSlow ? `<small class="fsSub">(${esc(tr("good"))} ${stats.goodSlow})</small>` : ""}</div>
     </div>${bestHtml}`;
 
   const cr = $("credits"); cr.textContent = "";
@@ -208,7 +222,15 @@ let autoJudging = false;   // AUTOの処理から判定しているときだけ 
 function showJudge(kind, delta, star) {
   const n = $("judge");
   $("judgeText").textContent = tr(kind) + (star && showStar() ? "✦" : "");
-  $("judgeSub").textContent = (kind !== "perfect" && delta != null) ? tr(delta < 0 ? "early" : "late") : "";
+  const sub = $("judgeSub");
+  if (kind !== "perfect" && delta != null) {
+    const isEarly = delta < 0;
+    sub.textContent = tr(isEarly ? "early" : "late");
+    sub.className = isEarly ? "early" : "late";
+  } else {
+    sub.textContent = "";
+    sub.className = "";
+  }
   n.className = ""; void n.offsetWidth; n.className = `show ${kind}`;
 }
 function judgeHitPos(n) {
@@ -230,6 +252,14 @@ function judgeNote(n, kind, delta) {
   } else {
     stats[kind]++; stats.combo++; stats.maxCombo = Math.max(stats.maxCombo, stats.combo);
     if (star) stats.star++;
+    if (delta != null) {
+      if (delta < -3) stats.fast = (stats.fast || 0) + 1;
+      else if (delta > 3) stats.slow = (stats.slow || 0) + 1;
+      if (kind === "good") {
+        if (delta < 0) stats.goodFast = (stats.goodFast || 0) + 1;
+        else stats.goodSlow = (stats.goodSlow || 0) + 1;
+      }
+    }
     const hp = judgeHitPos(n);
     effects.push({ x:hp.x, y:hp.y, c:laneColor(n.lane), t:performance.now(), kind, seed:Math.random() * TAU });
     avatarHit[n.lane] = performance.now();

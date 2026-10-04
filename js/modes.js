@@ -122,42 +122,96 @@ function makeColorRow(key, label, fallback) {
 }
 function hintEl(key) { const h = el("div", "hint", tr(key)); h.dataset.i18n = key; return h; }
 
-/* ============ ❤ 体力ルール ============
-   start＝開始体力（省略すると max と同じ）、max＝上限、heal＝何コンボごとに+1か（0＝回復なし）
-   MANUAL・STAGE・CATCH は同じ表、TRUCK と ORBIT はそれぞれ別の表 */
-const LIFE_RULES = {          // TRUCK
-  standard:{ max:3, heal:50 }, knight:{ start:3, max:5, heal:50 }, chicken:{ max:1, heal:0 }, none:{ max:0, heal:0 }
+/* ============ ❤ 体力ルール（ノーツ数に応じた動的スケーリング） ============
+   音ゲー（IIDX・SDVX・太鼓・osu!・チュウニズム等）のライフ／ゲージ設計を研究し、
+   譜面の総ノーツ数（chart.length）に応じて初期体力・最大上限・コンボ回復間隔を最適化：
+   ・短曲（〜100ノーツ）：初期体力を確保しつつ小刻みなコンボで回復可能にして理不尽な即死を防ぐ
+   ・標準曲（300〜600ノーツ）：適度な緊張感と達成感のあるバランス
+   ・長曲・高密度曲（1000〜2000+ノーツ）：体力の余裕と相応のコンボ継続回復を求め、持続的な緊張感を維持
+   ※ trk!（chicken）：常に1ライフ・回復なしの即死（調整なし）
+   ※ Infinite（none）：体力なし・ミスしても完走 */
+const LIFE_RULES = {          // TRUCK（基準値）
+  standard:{ start:4, max:6, heal:35 }, knight:{ start:3, max:4, heal:50 }, chicken:{ max:1, heal:0 }, none:{ max:0, heal:0 }
 };
-const MANUAL_LIFE_RULES = {   // MANUAL・STAGE・CATCH
-  standard:{ start:20, max:50, heal:10 }, knight:{ start:3, max:5, heal:50 }, chicken:{ max:1, heal:0 }, none:{ max:0, heal:0 }
+const MANUAL_LIFE_RULES = {   // MANUAL・STAGE・CATCH（基準値）
+  standard:{ start:20, max:35, heal:12 }, knight:{ start:6, max:9, heal:28 }, chicken:{ max:1, heal:0 }, none:{ max:0, heal:0 }
 };
-const ORBIT_LIFE_RULES = {
-  standard:{ max:20, heal:20 }, knight:{ max:15, heal:50 }, chicken:{ max:1, heal:0 }, none:{ max:0, heal:0 }
+const ORBIT_LIFE_RULES = {    // ORBIT（基準値）
+  standard:{ start:20, max:32, heal:16 }, knight:{ start:6, max:9, heal:32 }, chicken:{ max:1, heal:0 }, none:{ max:0, heal:0 }
 };
-function lifeRule() {
+
+function lifeRule(totalNotes) {
+  const opt = settings.lives || "standard";
+  if (opt === "none") return { start:0, max:0, heal:0 };
+  if (opt === "chicken") return { start:1, max:1, heal:0 }; // trk! 1-life sudden death (調整なし)
+
+  const n = (typeof totalNotes === "number" && totalNotes > 0)
+    ? totalNotes
+    : ((Array.isArray(chart) && chart.length > 0) ? chart.length : 350);
+  const factor = Math.max(0, Math.min(1, (n - 50) / 1150));
   const m = settings.playMode;
-  const table = m === "orbit" ? ORBIT_LIFE_RULES : m === "truck" ? LIFE_RULES : MANUAL_LIFE_RULES;
-  return table[settings.lives] || table.standard;
+
+  if (m === "truck") {
+    if (opt === "knight") {
+      const start = n <= 250 ? 2 : 3;
+      const max = n <= 250 ? 3 : (n <= 650 ? 4 : 5);
+      const heal = Math.round(35 + 25 * factor);
+      return { start, max, heal };
+    }
+    const start = n <= 250 ? 3 : (n <= 650 ? 4 : 5);
+    const max = n <= 250 ? 5 : (n <= 650 ? 6 : 8);
+    const heal = Math.round(25 + 25 * factor);
+    return { start, max, heal };
+  }
+
+  if (m === "orbit") {
+    if (opt === "knight") {
+      const start = Math.round(5 + 5 * factor);
+      const max = Math.round(7 + 6 * factor);
+      const heal = Math.round(25 + 25 * factor);
+      return { start, max, heal };
+    }
+    const start = Math.round(15 + 15 * factor);
+    const max = Math.round(20 + 25 * factor);
+    const heal = Math.round(12 + 12 * factor);
+    return { start, max, heal };
+  }
+
+  // MANUAL・STAGE・CATCH
+  if (opt === "knight") {
+    const start = Math.round(5 + 5 * factor);
+    const max = Math.round(7 + 7 * factor);
+    const heal = Math.round(20 + 25 * factor);
+    return { start, max, heal };
+  }
+  // standard
+  const start = Math.round(15 + 20 * factor);
+  const max = Math.round(25 + 35 * factor);
+  const heal = Math.round(8 + 14 * factor);
+  return { start, max, heal };
 }
+
 const LIFE_TAGS = { knight:"KNIGHT", chicken:"TRK!", none:"INF" };
-const lifeState = { hp:0, max:0, lostAt:-1e9, healAt:-1e9 };
+const lifeState = { hp:0, max:0, heal:0, lostAt:-1e9, healAt:-1e9 };
 const lifeTags = () => LIFE_TAGS[settings.lives] ? [LIFE_TAGS[settings.lives]] : [];
 
 function resetLives() {
   const r = lifeRule();
   lifeState.max = settings.autoPlay ? 0 : r.max;
   lifeState.hp = lifeState.max ? Math.min(lifeState.max, r.start ?? r.max) : 0;
+  lifeState.heal = r.heal || 0;
   lifeState.lostAt = lifeState.healAt = -1e9;
 }
 /* 判定のあとに呼ぶ。体力が0になったら true（CATCHの衝突は catch.js が直接減らします） */
 function lifeAfterJudge(kind) {
   if (!lifeState.max) return false;
-  const r = lifeRule(), p = performance.now();
+  const healInterval = lifeState.heal > 0 ? lifeState.heal : (lifeRule().heal || 0);
+  const p = performance.now();
   if (kind === "miss") {
     lifeState.hp = Math.max(0, lifeState.hp - 1); lifeState.lostAt = p;
     return lifeState.hp <= 0;
   }
-  if (r.heal > 0 && stats.combo > 0 && stats.combo % r.heal === 0 && lifeState.hp < lifeState.max) {
+  if (healInterval > 0 && stats.combo > 0 && stats.combo % healInterval === 0 && lifeState.hp < lifeState.max) {
     lifeState.hp++; lifeState.healAt = p;
     showToast(tr("lifeHeal"));
   }
@@ -344,7 +398,7 @@ on("records", renderTitles);
 
 /* ============ 🪐 ORBIT：見た目の設定（「見た目」の欄に追加） ============ */
 (() => {
-  const anchor = $("swayReducedNote"); if (!anchor) return;
+  const anchor = $("orbitSettingsAnchor") || $("swayReducedNote"); if (!anchor) return;
   const h3 = el("h3", "", tr("orbitViewTitle")); h3.dataset.i18n = "orbitViewTitle";
   anchor.after(
     h3,

@@ -37,6 +37,7 @@ settings.fxDockSkin = pick(prefs.fxDockSkin, Object.keys(DOCK_SKINS), "standard"
 settings.fxDockFive = !!prefs.fxDockFive;
 settings.fxDockOpen = prefs.fxDockOpen === true;      // くわしい欄は最初は閉じる
 settings.fxAntenna = !!prefs.fxAntenna;
+settings.fxAntennaShape = pick(prefs.fxAntennaShape, ["rod", "loop", "dish", "beam"], "rod");
 settings.fxEqLock = Array.isArray(prefs.fxEqLock) && prefs.fxEqLock.length === 5 ? prefs.fxEqLock.map(Boolean) : [false, false, false, false, false];
 settings.fxLockChain = !!prefs.fxLockChain;
 const skinDef = () => DOCK_SKINS[settings.fxDockSkin] || DOCK_SKINS.standard;
@@ -56,6 +57,8 @@ Object.assign(TEXT.ja, {
   dockEmptySlot:"空きボタン：長押しで今のエフェクトを登録", dockNeedOn:"先にエフェクトを選んでください",
   dockTempNo:"一時プリセットは登録できません（⚙設定のJSON編集で保存してください）", dockSaved:"{n}番に「{name}」を登録しました",
   dockSkinLabel:"本体のスキン", dockFive:"どのスキンでも5ボタンにする（往年の名機に5ボタン）",
+  dockAntCheckLabel:"通常のアンテナを使う（バックグラウンド再生モード）",
+  dockAntShapeLabel:"アンテナの形状", dockAntShapeRod:"伸縮ロッド（標準）", dockAntShapeLoop:"円形ループ", dockAntShapeDish:"パラボラ", dockAntShapeBeam:"サイバービーム",
   dockLockChain:"🔒 パラメーターのランダムでは、プリセットの中身を変えない（EQだけ）", dockLockHint:"🔒 を付けたEQは、ランダムでも動きません",
   dockAntHint:"アンテナを立てると、アプリを裏にしたり画面を消したりしても再生を続けます（選曲中のプレビュー・ラジオの待ち時間・AUTO中）。自分で遊んでいる最中は、記録を守るため今までどおり一時停止します。裏にしている間は、ビートに合わせて動くエフェクトと画面の動きが止まり、カウントダウンは省きます。ロック画面や通知から 再生・一時停止・次の曲 を操作できます。端末の省電力設定によっては止まることがあります。"
 });
@@ -71,6 +74,8 @@ Object.assign(TEXT.en, {
   dockEmptySlot:"Empty button: long-press to save the current effect", dockNeedOn:"Pick an effect first",
   dockTempNo:"Temporary presets can't be saved here (save them via JSON in ⚙ Settings)", dockSaved:"Saved “{name}” to button {n}",
   dockSkinLabel:"Device skin", dockFive:"Use 5 buttons on every skin (5 buttons on a classic)",
+  dockAntCheckLabel:"Use standard antenna (background playback mode)",
+  dockAntShapeLabel:"Antenna shape", dockAntShapeRod:"Telescopic rod (default)", dockAntShapeLoop:"Circular loop", dockAntShapeDish:"Satellite dish", dockAntShapeBeam:"Cyber beam",
   dockLockChain:"🔒 Parameter random keeps the preset itself (EQ only)", dockLockHint:"EQ bands marked 🔒 don't move when randomizing",
   dockAntHint:"With the antenna up, playback continues when the app is in the background or the screen is off (song previews, the radio wait, and AUTO). While you're playing yourself, it still pauses to protect your records. In the background, beat-synced effects and animations stop and the countdown is skipped. You can play/pause/skip from the lock screen or notification. Some devices' battery savers may still stop it."
 });
@@ -85,6 +90,8 @@ Object.assign(TEXT.zh, {
   dockEmptySlot:"空按钮：长按登记当前音效", dockNeedOn:"请先选择音效",
   dockTempNo:"临时预设无法登记（请在 ⚙设置 的JSON编辑中保存）", dockSaved:"已将“{name}”登记到 {n} 号",
   dockSkinLabel:"机身皮肤", dockFive:"所有皮肤都用5个按钮（给经典机型装上5键）",
+  dockAntCheckLabel:"使用标准天线（后台播放模式）",
+  dockAntShapeLabel:"天线形状", dockAntShapeRod:"伸缩拉杆（默认）", dockAntShapeLoop:"环形天线", dockAntShapeDish:"抛物面天线", dockAntShapeBeam:"赛博光束",
   dockLockChain:"🔒 参数随机时不改变预设本身（只改均衡器）", dockLockHint:"标记 🔒 的均衡器在随机时不会变化",
   dockAntHint:"竖起天线后，切到后台或关闭屏幕也会继续播放（选曲试听・电台等待・AUTO中）。自己游玩时为了保护记录，仍会照常暂停。后台期间，随节拍变化的音效和画面动画会停止，倒计时会省略。可以在锁屏或通知中播放・暂停・切到下一首。部分设备的省电设置仍可能停止播放。"
 });
@@ -99,6 +106,8 @@ Object.assign(TEXT.ko, {
   dockEmptySlot:"빈 버튼: 길게 눌러 지금 이펙트 등록", dockNeedOn:"먼저 이펙트를 골라 주세요",
   dockTempNo:"임시 프리셋은 등록할 수 없습니다 (⚙설정의 JSON 편집으로 저장하세요)", dockSaved:"{n}번에 '{name}'을(를) 등록했습니다",
   dockSkinLabel:"본체 스킨", dockFive:"모든 스킨을 5버튼으로 (명기에 5버튼 달기)",
+  dockAntCheckLabel:"일반 안테나 사용 (백그라운드 재생 모드)",
+  dockAntShapeLabel:"안테나 모양", dockAntShapeRod:"신축식 로드 (기본)", dockAntShapeLoop:"원형 루프", dockAntShapeDish:"파라볼라 안테나", dockAntShapeBeam:"사이버 빔",
   dockLockChain:"🔒 파라미터 랜덤에서 프리셋 자체는 바꾸지 않기 (EQ만)", dockLockHint:"🔒 표시한 EQ는 랜덤에서도 움직이지 않습니다",
   dockAntHint:"안테나를 세우면 앱을 백그라운드로 보내거나 화면을 꺼도 계속 재생합니다 (곡 선택 미리듣기・라디오 대기・AUTO 중). 직접 플레이하는 중에는 기록을 지키기 위해 지금처럼 일시정지합니다. 백그라운드에서는 비트에 맞춰 움직이는 이펙트와 화면 애니메이션이 멈추고, 카운트다운은 생략합니다. 잠금 화면이나 알림에서 재생・일시정지・다음 곡을 조작할 수 있습니다. 기기의 절전 설정에 따라 멈출 수도 있습니다."
 });
@@ -178,10 +187,13 @@ addEventListener("DOMContentLoaded", () => {
   /* ---- 本体 ---- */
   const dock = el("div"); dock.id = "fxDock";
   const dev = el("div", "dockDev");
-  const rod = el("i", "antRod");
+  const antWrap = el("div", "antWrap");
+  const antBody = el("div", "antBody"), antTip = el("div", "antTip"), antSignal = el("div", "antSignal");
+  antWrap.append(antBody, antTip, antSignal);
+
   const powLed = el("i", "led"), antLed = el("i", "led ledAnt");
   const pow = btn("dockKey dockPow", powLed, el("span", "", "⏻"));
-  const ant = btn("dockKey dockAnt", antLed, el("span", "", "📡"));
+  const ant = btn("dockKey dockAnt", antLed, el("span", "antIcon", "📡"), el("span", "antTxt", "ANT"));
   const lcd = el("div", "dockLcd");
   const top = el("div", "dockTop"); top.append(pow, lcd, ant);
   const deco = el("div", "dockDeco");
@@ -189,7 +201,7 @@ addEventListener("DOMContentLoaded", () => {
   const rFx = btn("dockKey"), rFav = btn("dockKey"), rPar = btn("dockKey");
   const rnd = el("div", "dockRand"); rnd.append(rFx, rFav, rPar);
   const slotHint = tx("div", "dockSlotHint", "hint dockHint");
-  dev.append(rod, top, deco, slots, rnd, slotHint);
+  dev.append(antWrap, top, deco, slots, rnd, slotHint);
 
   /* ---- ⭐ お気に入り（フォルダのチップと、ボタンに入りきらないぶん） ---- */
   const overLabel = tx("div", "dockFavLabel", "hint");
@@ -226,13 +238,42 @@ addEventListener("DOMContentLoaded", () => {
   skinRow.append(tx("span", "dockSkinLabel"), skinSel);
   skinSel.addEventListener("change", () => { settings.fxDockSkin = skinSel.value; saveUserPrefs(); render(true); });
   const five = mkCheck("fxDockFive", "dockFive");
+
+  /* 📡 アンテナの形状 & 通常アンテナを使う（バックグラウンド再生モード）チェックボックス */
+  const antShapeRow = el("label", "field antShapeField");
+  const antShapeSel = document.createElement("select");
+  const antShapes = [
+    ["rod", "dockAntShapeRod"],
+    ["loop", "dockAntShapeLoop"],
+    ["dish", "dockAntShapeDish"],
+    ["beam", "dockAntShapeBeam"]
+  ];
+  const buildAntShapes = () => {
+    antShapeSel.textContent = "";
+    for (const [k, lbl] of antShapes) {
+      const o = document.createElement("option"); o.value = k; o.textContent = tr(lbl);
+      o.dataset.i18n = lbl;
+      antShapeSel.append(o);
+    }
+    antShapeSel.value = settings.fxAntennaShape || "rod";
+  };
+  buildAntShapes();
+  antShapeSel.addEventListener("change", () => {
+    settings.fxAntennaShape = antShapeSel.value;
+    saveUserPrefs();
+    render();
+  });
+  antShapeRow.append(tx("span", "dockAntShapeLabel"), antShapeSel);
+
+  const antCheck = mkCheck("fxAntenna", "dockAntCheckLabel");
+
   const more = tx("button", "dockMore", "fxMini"); more.type = "button";
   more.addEventListener("click", () => {
     openSettings(); full.open = true;
     setTimeout(() => full.scrollIntoView({ behavior:"smooth", block:"start" }), 50);
   });
   body.append(tx("summary", "dockTitle"), quick, eqBox, tx("div", "dockLockHint", "hint"), lockChain.lab,
-    skinRow, five.lab, tx("div", "dockAntHint", "hint"), more);
+    skinRow, five.lab, antShapeRow, antCheck.lab, tx("div", "dockAntHint", "hint"), more);
 
   dock.append(dev, favChips, overLabel, overflow, body);
   col.append(dock);
@@ -242,12 +283,16 @@ addEventListener("DOMContentLoaded", () => {
   function lcdFlash(text) { flash = { text, until:Date.now() + 2000 }; render(); setTimeout(render, 2100); }
 
   /* ---- ボタンの動き ---- */
+  function toggleAntenna(forced) {
+    settings.fxAntenna = forced !== undefined ? !!forced : !settings.fxAntenna;
+    saveUserPrefs();
+    lcdFlash(tr(settings.fxAntenna ? "dockAntOn" : "dockAntOff"));
+    render();
+  }
   pow.addEventListener("click", () => { video.muted = !video.muted; render(); });
   video.addEventListener("volumechange", () => render());
-  ant.addEventListener("click", () => {
-    settings.fxAntenna = !settings.fxAntenna; saveUserPrefs();
-    lcdFlash(tr(settings.fxAntenna ? "dockAntOn" : "dockAntOff"));
-  });
+  ant.addEventListener("click", () => toggleAntenna());
+  antWrap.addEventListener("click", () => toggleAntenna());
   rFx.addEventListener("click", () => TrkFX.random());
   rFav.addEventListener("click", () => {
     const F = window.TrkFavs;
@@ -321,12 +366,17 @@ addEventListener("DOMContentLoaded", () => {
   function render(skinChanged) {
     const nm = names();
     dock.dataset.skin = settings.fxDockSkin;
+    dock.dataset.antShape = settings.fxAntennaShape || "rod";
+    antWrap.dataset.shape = settings.fxAntennaShape || "rod";
     dock.classList.toggle("ant", settings.fxAntenna);
     dock.classList.toggle("playing", !video.paused);
     if (skinChanged || lastSkin !== settings.fxDockSkin) { buildDeco(); lastSkin = settings.fxDockSkin; }
     /* 電源・アンテナ・液晶 */
     powLed.classList.toggle("on", !video.muted);
     antLed.classList.toggle("on", settings.fxAntenna);
+    ant.classList.toggle("on", settings.fxAntenna);
+    if (antCheck && antCheck.inp) antCheck.inp.checked = settings.fxAntenna;
+    if (antShapeSel) antShapeSel.value = settings.fxAntennaShape || "rod";
     pow.title = tr("dockPower"); pow.setAttribute("aria-label", pow.title); pow.setAttribute("aria-pressed", String(!video.muted));
     ant.title = tr("dockAntenna"); ant.setAttribute("aria-label", ant.title); ant.setAttribute("aria-pressed", String(settings.fxAntenna));
     lcd.textContent = flash && Date.now() < flash.until ? flash.text
@@ -387,7 +437,14 @@ addEventListener("DOMContentLoaded", () => {
 
   /* fx.js が表示を作り直したら（プリセット・お気に入り・EQ・言語の変更）こちらも更新 */
   let queued = false;
-  const update = () => { if (queued) return; queued = true; requestAnimationFrame(() => { queued = false; render(); }); };
+  const update = () => {
+    if (queued) return; queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      if (typeof buildAntShapes === "function") buildAntShapes();
+      render();
+    });
+  };
   const mo = new MutationObserver(update);
   const sel = quick.querySelector("select"); if (sel) mo.observe(sel, { childList:true });
   for (const r of mirrors) if (r.oVal) mo.observe(r.oVal, { childList:true, characterData:true, subtree:true });

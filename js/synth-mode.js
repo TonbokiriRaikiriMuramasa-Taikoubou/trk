@@ -13,6 +13,7 @@ Object.assign(TEXT.ja, {
   instSettingsTitle:"🎹 シンセモード", instSettingsHint:"⏻スピーカーを長押ししてシンセを開きます。通常は0.65秒、下の高速オプションを使うと0.2秒です。",
   instDisableOption:"🚫 シンセモードを起動しない", instFastOption:"⚡ 高速でシンセモードを起動する（起動まで0.2秒）",
   instKeyboardLockOption:"🔒 シンセモード中はキーボードを鍵盤に固定する（初期オン）", instKeyboardLockHint:"ONなら、音色名やスライダーにフォーカスがあっても、割り当てたキーは鍵盤を鳴らします。OFFで通常の入力に戻ります。",
+  instWideKeyboardOption:"↔ 鍵盤を横に広くする（大きな画面向け）", instWideKeyboardHint:"ONにすると、画面に余裕があるとき鍵盤の各キーを少し大きく表示します。スマホ向けの初期値はOFFです。",
   instTitle:"🎹 シンセモード",
   instSubtitle:"曲を聴きながら、画面の鍵盤またはパソコンのキーで演奏できます。",
   instClose:"閉じる", instEscapeClose:"ESCで閉じる", instDisplay:"📺 VIDEO / 📊 SPECTRUM",
@@ -53,6 +54,7 @@ Object.assign(TEXT.en, {
   instSettingsTitle:"🎹 Synthesizer mode", instSettingsHint:"Long-press the ⏻ speaker to open the synth. The default hold is 0.65 seconds; the fast option below uses 0.2 seconds.",
   instDisableOption:"🚫 Don't launch synth mode", instFastOption:"⚡ Fast synth launch (open after a 0.2-second hold)",
   instKeyboardLockOption:"🔒 Lock the keyboard to the piano in synth mode (on by default)", instKeyboardLockHint:"When on, mapped keys play the piano even when a sound-name field or slider has focus. Turn it off to restore normal text and control input.",
+  instWideKeyboardOption:"↔ Make the piano keys wider (for larger screens)", instWideKeyboardHint:"When on, each key is shown a little wider when there is room. It is off by default for phone-sized screens.",
   instTitle:"🎹 Synth mode",
   instSubtitle:"Play with the on-screen keys or your computer keyboard while a song is playing.",
   instClose:"Close", instEscapeClose:"Press ESC to close", instDisplay:"📺 VIDEO / 📊 SPECTRUM",
@@ -87,6 +89,7 @@ Object.assign(TEXT.zh, {
   instSettingsTitle:"🎹 合成器模式", instSettingsHint:"长按⏻扬声器打开合成器。默认长按0.65秒；启用下方快速选项后为0.2秒。",
   instDisableOption:"🚫 不启动合成器模式", instFastOption:"⚡ 快速启动合成器（长按0.2秒打开）",
   instKeyboardLockOption:"🔒 合成器模式中将键盘固定为琴键（默认开启）", instKeyboardLockHint:"开启后，即使音色名称或滑块获得焦点，已分配的按键仍会弹奏琴键。关闭后恢复普通输入。",
+  instWideKeyboardOption:"↔ 加宽屏幕键盘（适合大屏幕）", instWideKeyboardHint:"开启后，在屏幕有余量时会将每个琴键显示得稍宽一些。手机初始为关闭。",
   instTitle:"🎹 合成器模式",
   instSubtitle:"播放歌曲时，可以使用屏幕键盘或电脑键盘一起演奏。",
   instClose:"关闭", instEscapeClose:"按ESC关闭", instDisplay:"📺 画面 / 📊 频谱",
@@ -121,6 +124,7 @@ Object.assign(TEXT.ko, {
   instSettingsTitle:"🎹 신시사이저 모드", instSettingsHint:"⏻ 스피커를 길게 눌러 신시사이저를 엽니다. 기본은 0.65초이며, 아래 고속 옵션을 사용하면 0.2초입니다.",
   instDisableOption:"🚫 신시사이저 모드 시작 안 함", instFastOption:"⚡ 신시사이저 빠르게 열기 (0.2초 길게 누르기)",
   instKeyboardLockOption:"🔒 신시사이저 모드에서 키보드를 건반에 고정 (기본 켜짐)", instKeyboardLockHint:"켜면 음색 이름이나 슬라이더에 포커스가 있어도 지정된 키가 건반을 연주합니다. 끄면 일반 입력으로 돌아갑니다.",
+  instWideKeyboardOption:"↔ 화면 건반을 넓게 표시 (큰 화면용)", instWideKeyboardHint:"켜면 화면에 여유가 있을 때 건반 하나하나가 조금 더 넓게 표시됩니다. 휴대폰 기본값은 꺼짐입니다.",
   instTitle:"🎹 신시사이저 모드",
   instSubtitle:"곡을 들으면서 화면 건반이나 컴퓨터 키보드로 연주할 수 있습니다.",
   instClose:"닫기", instEscapeClose:"ESC로 닫기", instDisplay:"📺 영상 / 📊 스펙트럼",
@@ -181,7 +185,7 @@ const WAVE_TYPES = ["sine", "triangle", "sawtooth", "square"];
 const FILTER_TYPES = ["lowpass", "highpass", "bandpass", "notch"];
 const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 const WHITE_SEMIS = new Set([0, 2, 4, 5, 7, 9, 11]);
-const WHITE_W = 42, BLACK_W = 26, FIRST_MIDI = 48, LAST_MIDI = 72; // C3..C5
+const WHITE_W = 42, BLACK_W = 26, WIDE_KEY_SCALE = 1.28, FIRST_MIDI = 48, LAST_MIDI = 72; // C3..C5
 const DEFAULT_KEY_CODES = [
   "KeyZ", "KeyS", "KeyX", "KeyD", "KeyC", "KeyV", "KeyG", "KeyB", "KeyH", "KeyN", "KeyJ", "KeyM",
   "KeyQ", "Digit2", "KeyW", "Digit3", "KeyE", "KeyR", "Digit5", "KeyT", "Digit6", "KeyY", "Digit7", "KeyU", "KeyI"
@@ -352,21 +356,28 @@ addEventListener("DOMContentLoaded", () => {
   const synthFastRow = makeCheck("synthModeFastStart", "synthModeFastStart", "instFastOption");
   const synthKeyboardLockRow = makeCheck("synthModeKeyboardLock", "synthModeKeyboardLock", "instKeyboardLockOption");
   const synthKeyboardLockHint = tx("div", "instKeyboardLockHint", "hint");
-  synthSettingsPanel.append(tx("summary", "instSettingsTitle"), synthSettingsHint, synthDisableRow, synthFastRow, synthKeyboardLockRow, synthKeyboardLockHint);
+  const synthWideKeyboardRow = makeCheck("synthModeWideKeyboard", "synthModeWideKeyboard", "instWideKeyboardOption");
+  const synthWideKeyboardHint = tx("div", "instWideKeyboardHint", "hint");
+  synthSettingsPanel.append(tx("summary", "instSettingsTitle"), synthSettingsHint, synthDisableRow, synthFastRow, synthKeyboardLockRow, synthKeyboardLockHint, synthWideKeyboardRow, synthWideKeyboardHint);
   const synthSettingsAnchor = document.getElementById("specPanel") || document.getElementById("fxPanel") ||
     (document.getElementById("seEnabled") && document.getElementById("seEnabled").closest("details.panel"));
   if (synthSettingsAnchor) synthSettingsAnchor.after(synthSettingsPanel);
   const synthDisableInput = synthDisableRow.querySelector("input");
   const synthFastInput = synthFastRow.querySelector("input");
   const synthKeyboardLockInput = synthKeyboardLockRow.querySelector("input");
+  const synthWideKeyboardInput = synthWideKeyboardRow.querySelector("input");
   window._trkSyncSynthModeSettings = () => {
     synthDisableInput.checked = !!settings.synthModeDisabled;
     synthFastInput.checked = !!settings.synthModeFastStart;
     synthKeyboardLockInput.checked = settings.synthModeKeyboardLock !== false;
+    synthWideKeyboardInput.checked = !!settings.synthModeWideKeyboard;
+    renderPiano();
     updatePowerHint();
   };
   synthDisableInput.addEventListener("change", updatePowerHint);
   synthFastInput.addEventListener("change", updatePowerHint);
+  synthWideKeyboardInput.addEventListener("change", renderPiano);
+  window.addEventListener("resize", () => { if (!overlay.hidden) renderPiano(); });
 
   /* ============ 状態 ============ */
   let customPatches = loadCustomPatches();
@@ -444,8 +455,16 @@ addEventListener("DOMContentLoaded", () => {
   }
 
   /* ============ 鍵盤（QWERTYのZ列＋Q列。黒鍵を数字・中段キーに対応） ============ */
+  function pianoScale() {
+    if (!settings.synthModeWideKeyboard) return 1;
+    const viewport = Number(window.innerWidth) || Number(document.documentElement && document.documentElement.clientWidth) || 0;
+    const available = pianoScroll.clientWidth || Math.max(0, viewport - 40);
+    /* 小画面では従来の630pxを守り、余裕のある画面だけ最大806pxまで広げる。 */
+    return available ? Math.max(1, Math.min(WIDE_KEY_SCALE, available / (15 * WHITE_W))) : WIDE_KEY_SCALE;
+  }
   function renderPiano() {
     piano.textContent = "";
+    const scale = pianoScale(), whiteW = WHITE_W * scale, blackW = BLACK_W * scale;
     const whiteIndexFor = midi => {
       let n = 0;
       for (let m = FIRST_MIDI; m < midi; m++) if (WHITE_SEMIS.has(m % 12)) n++;
@@ -454,8 +473,8 @@ addEventListener("DOMContentLoaded", () => {
     for (let midi = FIRST_MIDI; midi <= LAST_MIDI; midi++) {
       const pc = midi % 12, white = WHITE_SEMIS.has(pc), whiteIndex = whiteIndexFor(midi);
       const b = document.createElement("button"); b.type = "button"; b.className = `instKey ${white ? "white" : "black"}`;
-      b.dataset.midi = String(midi); b.style.left = `${white ? whiteIndex * WHITE_W : whiteIndex * WHITE_W - BLACK_W / 2}px`;
-      if (white) b.style.width = `${WHITE_W}px`; else b.style.width = `${BLACK_W}px`;
+      b.dataset.midi = String(midi); b.style.left = `${white ? whiteIndex * whiteW : whiteIndex * whiteW - blackW / 2}px`;
+      if (white) b.style.width = `${whiteW}px`; else b.style.width = `${blackW}px`;
       b.style.setProperty("--key-index", whiteIndex);
       b.classList.toggle("assignTarget", assignMode && pendingMidi === midi);
       const note = node("span", "instNote", noteName(midi));
@@ -466,7 +485,8 @@ addEventListener("DOMContentLoaded", () => {
       if (!white) b.style.zIndex = "3";
       piano.append(b);
     }
-    piano.style.width = `${15 * WHITE_W}px`;
+    piano.style.width = `${15 * whiteW}px`;
+    piano.dataset.wide = scale > 1 ? "1" : "0";
     for (const midi of pressedMidi.keys()) updateSelectedNote(midi, true);
   }
 

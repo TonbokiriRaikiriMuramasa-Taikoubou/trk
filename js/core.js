@@ -100,6 +100,7 @@ const settings = {
   synthModeDisabled: !!prefs.synthModeDisabled,
   synthModeFastStart: !!prefs.synthModeFastStart,
   synthModeKeyboardLock: prefs.synthModeKeyboardLock !== false,
+  synthModeWideKeyboard: !!prefs.synthModeWideKeyboard,
   notes: sanitizeNotes(prefs.notes ?? (prefs.skin === "clarity" ? NOTE_PRESETS.clarity : null)),
   mascot: pick(prefs.mascot, ["skin", "none", ...MASCOT_IDS], "skin"),
   fxPower: num(prefs.fxPower, 0, 3, 1.5),
@@ -179,7 +180,7 @@ function resetVideoPrefs() {
 }
 function resetAudioPrefs() {
   settings.musicVolume = 0.7; settings.seVolume = 0.28; settings.seEnabled = false;
-  settings.synthModeDisabled = false; settings.synthModeFastStart = false; settings.synthModeKeyboardLock = true;
+  settings.synthModeDisabled = false; settings.synthModeFastStart = false; settings.synthModeKeyboardLock = true; settings.synthModeWideKeyboard = false;
   // fx-dock / eq-dock の音まわりがあれば一緒に初期化
   if ("gameVolume" in settings) settings.gameVolume = 0.7;
   if ("eqEnabled" in settings) settings.eqEnabled = false;
@@ -212,6 +213,7 @@ function enterSafeMode() {
   settings.specOn = false; settings.specTv = false;               // 📊 スペクトラムも出さない（音の通り道を作らない）
   settings.specSkin = false; settings.specSkinOpen = false;
   settings.synthModeKeyboardLock = true; // 🎹 セーフモードではシンセを開けないが、既定値は壊さない
+  settings.synthModeWideKeyboard = false;
   settings.libKeepShared = false;        // 📤 セーフモードでは、端末に残した共有の曲も読み戻さない
   settings.fxPower = 0; settings.hideGameplayUI = false;
   if (settings.mascot === "mmd") settings.mascot = "skin";     // 🩷 セーフモードでは MMD を使わない
@@ -239,6 +241,7 @@ function exportPrefs(kind) {
     out.musicVolume = settings.musicVolume; out.seEnabled = settings.seEnabled; out.seVolume = settings.seVolume;
     out.synthModeDisabled = settings.synthModeDisabled; out.synthModeFastStart = settings.synthModeFastStart;
     out.synthModeKeyboardLock = settings.synthModeKeyboardLock;
+    out.synthModeWideKeyboard = settings.synthModeWideKeyboard;
     if ("gameVolume" in settings) out.gameVolume = settings.gameVolume;
   } else { // all
     Object.assign(out, settings);

@@ -975,7 +975,7 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
 }
 
 /* ============================================================
-   📚 曲のタブ（棚）と、棚スキン11種（js/lib-skins.js / js/library.js）
+   📚 曲のタブ（棚）と、棚スキン16種（js/lib-skins.js / js/library.js）
    ・#libPanel[data-lib-skin="…"] を付け替えるだけで見た目が変わる
    ============================================================ */
 .libHeadRight{display:flex;align-items:baseline;gap:8px}

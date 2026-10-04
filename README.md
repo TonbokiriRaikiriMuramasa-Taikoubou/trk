@@ -167,7 +167,7 @@ AUTO中か、「シークバーを表示（練習用）」をオンにしてい�
 - **揺れ**：ビートやドン／カッに合わせてレーンを傾けます（初期値オフ。OSの「視差効果を減らす」がオンなら止まります）
 - **マスコット**：オレンジ相棒、初音ミク（PCL・非公式の二次創作）、**自分のVRMモデル**（VRM 1.0）、**自分のMMDモデル**（.pmx／.pmd）。VRM の .vrma も MMD の .vmd も、曲のBPMに合わせて動きます。
 - **⭐ お気に入りは、フォルダで分ける**：曲・映像フィルター・エフェクトのお気に入りを、**⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り**の4つに分けて持ち歩けます。**個数の上限はありません**（ボタンに入りきらないぶんは、下に並びます）。🧊は凍結（追加・削除を止める）、📌は「**絶対に外れない**」（🎲おまかせの候補に必ず入ります）。外したものは📤元お気に入りに残り、抽選には出てきません。📤書き出し／📥読み込み（`trk-favs`）で、別の端末にも持っていけます。
-- **🩷 MMDマスコット（持ち込み式）**：Lat式ミクやタワシ式CHAN×CO系ミクなど、**お手持ちのMMDモデル**を動かせます。テクスチャごとフォルダを選ぶだけ。内蔵モーションは trk! がコードで作る自作の3種（step／swing／turn）で、自分の `.vmd` も読み込めます。**モデルとモーションは同梱していません**（MMDの模型は再配布できないものがほとんどです）。大きさ・向き・画面下のクレジットを設定でき、チェックを入れると次に開いたときも復元します。`?safe=1` のときは読み込みません。**うまく動かないときは、同じパネルの「🔎 動作チェック」**を押すと、WebGL・CDN（three／three-mmd-loader）・モデル・モーションの状態が1か所に出ます。「📋 結果をコピー」でそのまま貼ってもらえれば、原因を切り分けられます。
+- **🩷 MMDマスコット（持ち込み式）**：Lat式ミクやタワシ式CHAN×CO系ミクなど、**お手持ちのMMDモデル**を動かせます。テクスチャごとフォルダを選ぶだけ。内蔵モーションは trk! がコードで作る自作の3種（step／swing／turn）で、自分の `.vmd` も読み込めます。**モデルとモーションは原則同梱していません**（MMDの模型は再配布できないものがほとんどです）。例外として、再配布条件と原文ReadMeを同梱できるLat式モデルを `assets/mmd/lat-miku/` に収録しています。大きさ・向き・画面下のクレジットを設定でき、チェックを入れると次に開いたときも復元します。`?safe=1` のときは読み込みません。**うまく動かないときは、同じパネルの「🔎 動作チェック」**を押すと、WebGL・CDN（three／three-mmd-loader）・モデル・モーションの状態が1か所に出ます。「📋 結果をコピー」でそのまま貼ってもらえれば、原因を切り分けられます。
 
 ---
 
@@ -252,7 +252,9 @@ osu! のスキンのように、いろいろなものを1つのファイル（`.
 - 入れ方：画面にドロップするだけです。
 
 > ⚠ パックには、**自分に再配布の権利がある素材・曲だけ**を入れてください。
-> 中身は ZIP です。形式名 `shadow-taiko-pack` は、以前のパックとの互換のためにそのまま使っています。
+> 中身は ZIP です。形式名 `shadow-taiko-pack` は、以前のパックとの互換のためにそのまま使っています。項目・上限・`pack.json` の例は [docs/pack-format.md](docs/pack-format.md) にまとめています。
+>
+> リポジトリの静的な参照・構文検査は `node tools/check-repo.mjs` で実行できます。これは実機ブラウザ確認の代わりにはなりません。
 
 ### ✔ 公認パック
 作曲家さん・譜面作者さんの**本人確認と権利の確認**が済んだ曲パックには **✔公認** が付き、作者さんの「💬 作者のことば」（Xの無料枠と同じ280まで）が表示されます。
@@ -373,16 +375,17 @@ trk/
 │  ├─ tv-presets.js  tv-dock.js  … 映像フィルター・TVドック・カスタムTVスキン
 │  ├─ fx-presets.js  fx.js       … サウンドエフェクト
 │  ├─ library.js                 … 選曲画面・AUTO・ラジオ・曲のタブ（棚）
-│  ├─ lib-skins.js               … 棚スキン8種（曲タブの見た目・🎨ボタン）
+│  ├─ lib-skins.js               … 棚スキン16種（曲タブの見た目・🎨ボタン）
 │  ├─ verified.js                … 公認パック
 │  ├─ addons.js  addons/         … アドオン（あとから機能を足すしくみ・見本）
 │  ├─ main.js  speed.js          … 入力・起動・速度
 │  ├─ vrm.js                     … VRMマスコット
-│  ├─ mmd.js                     … MMDマスコット（モデル・モーションは持ち込み）
+│  ├─ mmd.js                     … MMDマスコット（原則持ち込み。再配布条件付きLat式を同梱）
 │  ├─ favs.js                    … ⭐ お気に入りのフォルダ管理（1軍／2軍／🧊／📤元）
 │  └─ spectrum.js                … 📊 スペクトラム（音の見える化・TVの画面に重ねられる）
-├─ docs/  HANDOFF.md  verified.md  og.png
+├─ docs/  HANDOFF.md  pack-format.md  verified.md  og.png
 ├─ tools/make-icons.html         … アイコンとOGP画像を作るツール
+├─ tools/check-repo.mjs          … 依存なしの静的スモーク検査
 ├─ .github/ISSUE_TEMPLATE/       … 不具合・アイデアのフォーム
 ├─ README.md  NOTICE.md  CONTRIBUTING.md  LICENSE
 ```
@@ -444,7 +447,7 @@ https://piapro.jp/license/pcl/summary
 ### お願い
 - 権利のない曲を、曲パックなどで配らないでください。
 - VRMモデルは、作者の利用条件を確認してから使ってください（VRChat改変モデルは、元の規約も確認してください）。
-- MMDモデル・モーションも、**同梱していません**。使うときは作者の規約（再配布の可否・MMD／MMM以外のソフトでの使用・商用の可否）を確かめて、**自分の端末から**読み込んでください。trk! は読み込んだファイルを保存も送信もしません（下の「保存」にチェックを入れたときだけ、このブラウザの中に残します）。
+- MMDモデル・モーションは原則、作者の規約（再配布の可否・MMD／MMM以外のソフトでの使用・商用の可否）を確かめて、**自分の端末から**読み込んでください。例外として `assets/mmd/lat-miku/` は再配布条件のReadMeを同梱しています。trk! は利用者が読み込んだファイルを保存も送信しません（下の「保存」にチェックを入れたときだけ、このブラウザの中に残します）。
 
 詳しくは [NOTICE.md](NOTICE.md) をご覧ください。
 
@@ -472,7 +475,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 
 **Feedback:** casual thoughts on X [@ttrk143](https://x.com/ttrk143) (hashtag **#trkAGRG**), bugs and ideas on [GitHub Issues](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues).
 
-**License:** code under **GPL-3.0-or-later**. The name “trk!” is not licensed — please rename forks. The Hatsune Miku mascot (`js/characters/miku.js`) is fan art under the Piapro Character License (non-commercial only) and is **not** covered by the GPL; delete that file and its `<script>` line for commercial forks. MMD models and `.vmd` motions are **never bundled** — you load your own from your device, and their authors' terms apply. Songs, charts and messages in verified packs belong to their creators.
+**License:** code under **GPL-3.0-or-later**. The name “trk!” is not licensed — please rename forks. The Hatsune Miku mascot (`js/characters/miku.js`) is fan art under the Piapro Character License (non-commercial only) and is **not** covered by the GPL; delete that file and its `<script>` line for commercial forks. MMD models and `.vmd` motions are normally loaded from your device and their authors' terms apply; the redistributable Lat-style model under `assets/mmd/lat-miku/` includes its original terms and is not covered by the GPL. Songs, charts and messages in verified packs belong to their creators.
 
 This work depicts the character “Hatsune Miku” of Crypton Future Media, INC. under the Piapro Character License.
 

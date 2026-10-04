@@ -4,7 +4,9 @@
    ・本体のスキン30種（ボタン数がそれぞれ違う）、電源・一時停止・お気に入り登録
    ・映像フィルター45種類（tv-presets.js）をまとめて触れる
    ・🆕 カスタムTVスキン：設定画面の #tvMaker で色・形・飾りを決めて作れる（trk-tvskin / trk_tv_skins_v1）
-   ・TVの下にオーディオがあるのが自然なので、上下入れ替えオプション
+   ・🆕 ◀ ▶ の物理ボタン：前の曲・次の曲へ（選曲リストをチャンネル送りのように）
+   ・🆕 ならべ方：TV →（お気に入り）→ ラック →（お気に入り）→ TVくわしい → ラックくわしい
+     （TVとラックの上下は設定で入れ替え可。「くわしい」は、いつも下のほう）
    ・FxDockと似た構造だが、映像系（videoStyle, bgDim, bgBlur）を扱う
    読み込み順：tv-presets.js → core.js → fx-dock.js → tv-dock.js → fx.js
    ========================================================================== */
@@ -203,6 +205,8 @@ Object.assign(TEXT.ja, {
   tvTitle:"📺 テレビ（映像出力）",
   tvMoreTitle:"📺 くわしく（設定と映像の確認）",
   tvFavLabel:"⭐ ボタンに入りきらないお気に入り",
+  tvFavLabelN:"⭐ お気に入り {n}個（このTVのボタンは {m}個・ぜんぶ入っています）",
+  tvFavOverflow:"⭐ ボタンに入りきらないお気に入り（ボタンは {m}個・お気に入りは {n}個）",
   tvNoFav:"お気に入りはまだありません。ボタンを長押しすると、今の映像を登録できます。",
   tvMore:"⚙ 映像の詳しい設定",
   tvReset:"↺ テレビ設定をリセット", tvResetDone:"テレビ設定をリセットしました",
@@ -217,8 +221,8 @@ Object.assign(TEXT.ja, {
   tvNeedOn:"先に映像フィルターを選んでください（非表示以外）",
   tvSaved:"{n}番に「{name}」を登録しました",
   tvSkinLabel:"テレビ本体のスキン", tvFive:"どのスキンでも5ボタンにする",
-  tvOrderLabel:"ドックの並び順", tvOrderTvFirst:"📺 テレビが上・🎛 オーディオが下（自然）", tvOrderFxFirst:"🎛 オーディオが上・📺 テレビが下",
-  tvOrderHint:"社会的にはTVの下にオーディオ機器があるのが自然なので、デフォルトはテレビが上です。お好みで入れ替えられます。",
+  tvOrderLabel:"ドックの並び順", tvOrderTvFirst:"📺 テレビが上・🎛 ラックが下（自然）", tvOrderFxFirst:"🎛 ラックが上・📺 テレビが下",
+  tvOrderHint:"デフォルトは「テレビ →（お気に入り）→ ラック →（お気に入り）→ テレビくわしい → ラックくわしい」の順です。テレビとラックだけ入れ替えられます（くわしいは、いつも下のほう）。",
   tvOverlay:"📺 映像オーバーレイ（走査線・レターボックス・ノイズなど）を表示",
   tvOverlayHint:"CRTやVHS、シネマなどのフィルターで、走査線やフィルムグレイン、黒帯などの演出を重ねます。",
   tvQuick:"📺 映像", tvOff:"📺 OFF",
@@ -228,6 +232,7 @@ Object.assign(TEXT.ja, {
   tvDim:"背景の暗さ", tvBlur:"背景のぼかし",
   tvCurrent:"いまの映像：{name}",
   tvPrev:"前の映像", tvNext:"次の映像", tvRandom:"おまかせ",
+  tvPrevSong:"◀ 前の曲", tvNextSong:"▶ 次の曲", tvNoSongs:"曲がありません",
   /* 🆕 メニューでmp4の映像を流す・「確認」タブ */
   tvpTabSetup:"🎛 TVの設定", tvpTabPreview:"🖼 映像の確認",
   tvpPreviewHint:"いま選んでいる映像フィルター・TVスキン・暗さ・ぼかしを、この画面で確かめられます。曲を選ぶと、ここにそのmp4が流れます（ゲーム画面と同じ大きさで表示）。",
@@ -244,6 +249,8 @@ Object.assign(TEXT.en, {
   tvTitle:"📺 TV (video output)",
   tvMoreTitle:"📺 More (setup & video check)",
   tvFavLabel:"⭐ Favorites that don't fit on the buttons",
+  tvFavLabelN:"⭐ {n} favorites (this TV has {m} buttons — all of them fit)",
+  tvFavOverflow:"⭐ Favorites that don't fit on the buttons (buttons: {m}, favorites: {n})",
   tvNoFav:"No favorites yet. Long-press a button to save the current video filter.",
   tvMore:"⚙ More video settings",
   tvReset:"↺ Reset TV settings", tvResetDone:"TV settings reset",
@@ -258,8 +265,8 @@ Object.assign(TEXT.en, {
   tvNeedOn:"Pick a video filter first (not Off)",
   tvSaved:"Saved “{name}” to button {n}",
   tvSkinLabel:"TV device skin", tvFive:"Use 5 buttons on every skin",
-  tvOrderLabel:"Dock order", tvOrderTvFirst:"📺 TV on top, 🎛 Audio below (natural)", tvOrderFxFirst:"🎛 Audio on top, 📺 TV below",
-  tvOrderHint:"It's natural to have the TV above the audio system, so TV on top is the default. Swap if you like.",
+  tvOrderLabel:"Dock order", tvOrderTvFirst:"📺 TV on top, 🎛 Rack below (natural)", tvOrderFxFirst:"🎛 Rack on top, 📺 TV below",
+  tvOrderHint:"Default order: TV →(favorites)→ rack →(favorites)→ TV options → rack options. You can swap the TV and the rack (the option boxes always stay below).",
   tvOverlay:"📺 Show video overlays (scanlines, letterbox, noise…)",
   tvOverlayHint:"CRT, VHS, cinema etc. add scanlines, grain, letterbox bars for atmosphere.",
   tvQuick:"📺 Video", tvOff:"📺 OFF",
@@ -269,6 +276,7 @@ Object.assign(TEXT.en, {
   tvDim:"Background dim", tvBlur:"Background blur",
   tvCurrent:"Current: {name}",
   tvPrev:"Prev video", tvNext:"Next video", tvRandom:"Random",
+  tvPrevSong:"◀ Previous song", tvNextSong:"▶ Next song", tvNoSongs:"No songs",
   /* 🆕 menu mp4 playback + Preview tab */
   tvpTabSetup:"🎛 TV setup", tvpTabPreview:"🖼 Video check",
   tvpPreviewHint:"Check the current filter, TV skin, dim and blur right here. Pick a song and its mp4 plays in this box (same framing as in game).",
@@ -285,6 +293,8 @@ Object.assign(TEXT.zh, {
   tvTitle:"📺 电视（视频输出）",
   tvMoreTitle:"📺 详细（设置与画面确认）",
   tvFavLabel:"⭐ 按钮放不下的收藏",
+  tvFavLabelN:"⭐ 收藏 {n}个（这台电视有 {m} 个按钮，全部放得下）",
+  tvFavOverflow:"⭐ 按钮放不下的收藏（按钮 {m}个、收藏 {n}个）",
   tvNoFav:"还没有收藏。长按按钮即可登记当前视频滤镜。",
   tvMore:"⚙ 视频详细设置",
   tvReset:"↺ 重置电视设置", tvResetDone:"已重置电视设置",
@@ -299,8 +309,8 @@ Object.assign(TEXT.zh, {
   tvNeedOn:"请先选择视频滤镜（非隐藏）",
   tvSaved:"已将“{name}”登记到 {n} 号",
   tvSkinLabel:"电视机身皮肤", tvFive:"所有皮肤都用5个按钮",
-  tvOrderLabel:"Dock 顺序", tvOrderTvFirst:"📺 电视在上、🎛 音频在下（自然）", tvOrderFxFirst:"🎛 音频在上、📺 电视在下",
-  tvOrderHint:"电视在音响上面是比较自然的结构，默认电视在上。可按喜好调换。",
+  tvOrderLabel:"Dock 顺序", tvOrderTvFirst:"📺 电视在上、🎛 机架在下（自然）", tvOrderFxFirst:"🎛 机架在上、📺 电视在下",
+  tvOrderHint:"默认顺序：电视 →（收藏）→ 机架 →（收藏）→ 电视详细 → 机架详细。电视与机架可以互换（详细选项始终在下方）。",
   tvOverlay:"📺 显示视频叠加（扫描线・黑边・噪点等）",
   tvOverlayHint:"CRT、VHS、影院等滤镜会叠加扫描线、颗粒、黑边等效果。",
   tvQuick:"📺 视频", tvOff:"📺 关闭",
@@ -310,6 +320,7 @@ Object.assign(TEXT.zh, {
   tvDim:"背景暗度", tvBlur:"背景模糊",
   tvCurrent:"当前视频：{name}",
   tvPrev:"上一个视频", tvNext:"下一个视频", tvRandom:"随机",
+  tvPrevSong:"◀ 上一首", tvNextSong:"▶ 下一首", tvNoSongs:"没有歌曲",
   /* 🆕 菜单中播放mp4 + 「确认」标签页 */
   tvpTabSetup:"🎛 电视设置", tvpTabPreview:"🖼 画面确认",
   tvpPreviewHint:"可在此确认当前的滤镜、电视皮肤、暗度和模糊。选一首歌后，其mp4会在这里播放（与游戏画面相同的取景）。",
@@ -326,6 +337,8 @@ Object.assign(TEXT.ko, {
   tvTitle:"📺 TV (영상 출력)",
   tvMoreTitle:"📺 자세히 (설정과 영상 확인)",
   tvFavLabel:"⭐ 버튼에 다 들어가지 않는 즐겨찾기",
+  tvFavLabelN:"⭐ 즐겨찾기 {n}개 (이 TV 버튼은 {m}개 · 전부 들어갑니다)",
+  tvFavOverflow:"⭐ 버튼에 다 안 들어가는 즐겨찾기 (버튼 {m}개 · 즐겨찾기 {n}개)",
   tvNoFav:"아직 즐겨찾기가 없습니다. 버튼을 길게 누르면 현재 영상을 등록할 수 있습니다.",
   tvMore:"⚙ 영상 자세한 설정",
   tvReset:"↺ TV 설정 초기화", tvResetDone:"TV 설정을 초기화했습니다",
@@ -340,8 +353,8 @@ Object.assign(TEXT.ko, {
   tvNeedOn:"먼저 영상 필터를 골라 주세요 (끄기 제외)",
   tvSaved:"{n}번에 '{name}'을(를) 등록했습니다",
   tvSkinLabel:"TV 본체 스킨", tvFive:"모든 스킨을 5버튼으로",
-  tvOrderLabel:"Dock 순서", tvOrderTvFirst:"📺 TV가 위, 🎛 오디오가 아래 (자연스러움)", tvOrderFxFirst:"🎛 오디오가 위, 📺 TV가 아래",
-  tvOrderHint:"사회적으로 TV 아래에 오디오 기기가 있는 것이 자연스러워 기본은 TV가 위입니다. 취향에 따라 바꾸세요.",
+  tvOrderLabel:"Dock 순서", tvOrderTvFirst:"📺 TV가 위, 🎛 랙이 아래 (자연스러움)", tvOrderFxFirst:"🎛 랙이 위, 📺 TV가 아래",
+  tvOrderHint:"기본 순서: TV →(즐겨찾기)→ 랙 →(즐겨찾기)→ TV 자세히 → 랙 자세히. TV와 랙만 서로 바꿀 수 있습니다(자세히는 항상 아래).",
   tvOverlay:"📺 영상 오버레이 표시 (주사선・레터박스・노이즈 등)",
   tvOverlayHint:"CRT나 VHS, 시네마 등은 주사선이나 필름 그레인, 흑색 바 등을 겹쳐 분위기를 냅니다.",
   tvQuick:"📺 영상", tvOff:"📺 OFF",
@@ -351,6 +364,7 @@ Object.assign(TEXT.ko, {
   tvDim:"배경 어둡기", tvBlur:"배경 흐림",
   tvCurrent:"현재 영상: {name}",
   tvPrev:"이전 영상", tvNext:"다음 영상", tvRandom:"랜덤",
+  tvPrevSong:"◀ 이전 곡", tvNextSong:"▶ 다음 곡", tvNoSongs:"곡이 없습니다",
   /* 🆕 메뉴에서 mp4 재생 + 「확인」 탭 */
   tvpTabSetup:"🎛 TV 설정", tvpTabPreview:"🖼 영상 확인",
   tvpPreviewHint:"지금 고른 필터·TV 스킨·어둡기·흐림을 이 화면에서 확인할 수 있습니다. 곡을 고르면 그 mp4가 여기서 재생됩니다(게임 화면과 같은 구도).",
@@ -687,40 +701,46 @@ function togglePause() {
 }
 
 /* ============ 並び順の制御 ============ */
-function applyOrder() {
+function dockParts() {
   const tvDock = document.getElementById("tvDock");
   const fxDock = document.getElementById("fxDock");
   const col = document.querySelector(".songCol");
+  /* 「くわしい」（details）は、ドックの中にあることも、列の下のほうにあることもある。
+     どちらでも見つけられるようにしておく（2回目以降の整列で迷子にならないため）。 */
+  const pick = (dock, cls) => {
+    if (dock) { const inside = [...dock.children].find(c => c.tagName === "DETAILS"); if (inside) return inside; }
+    return col ? col.querySelector(":scope > details." + cls) : null;
+  };
+  return { tvDock, fxDock, col, tvMore: pick(tvDock, "tvMore"), fxMore: pick(fxDock, "dockMore") };
+}
+/* ならべ方（デフォルト）：
+     TV →（お気に入り）→ ラック →（お気に入り）→ TVくわしい → ラックくわしい
+   ・「くわしい」は、それぞれのドックの外へ出して列の下のほうに並べる
+   ・壁掛けTVのときは、本体だけヘッダーへ移す（お気に入りとくわしいは列に残す） */
+function applyOrder() {
+  const col = document.querySelector(".songCol");
   const head = document.querySelector("#selectScreen .head");
-  if (!tvDock) return;
-  // 壁掛けテレビはヘッダーに移動（タイトルの横の空きスペース）
+  const { tvDock, fxDock, tvMore, fxMore } = dockParts();
+  if (!col || tvDock !== document.getElementById("tvDock")) return;   // ドックが無い（または別物）ときは何もしない
+
   if (settings.tvDockSkin === "wall") {
-    if (head && tvDock.parentElement !== head) {
-      head.appendChild(tvDock);
-      tvDock.classList.add("wall-mounted");
-    } else if (head) {
-      tvDock.classList.add("wall-mounted");
-    }
-    return;
+    if (head && tvDock.parentElement !== head) head.appendChild(tvDock);
+    tvDock.classList.add("wall-mounted");
   } else {
     tvDock.classList.remove("wall-mounted");
-    // 通常は songCol に戻す
-    if (col && tvDock.parentElement !== col) {
-      // fxDock が col にある場合はその前に、なければ末尾に
-      if (fxDock && fxDock.parentElement === col) {
-        if (settings.tvOrder === "tv-first") col.insertBefore(tvDock, fxDock);
-        else col.appendChild(tvDock);
-      } else {
-        col.appendChild(tvDock);
-      }
-    }
-    if (!fxDock || !col) return;
-    if (settings.tvOrder === "tv-first") {
-      if (tvDock.nextSibling !== fxDock) col.insertBefore(tvDock, fxDock);
-    } else {
-      if (fxDock.nextSibling !== tvDock) col.insertBefore(fxDock, tvDock);
-    }
+    if (tvDock.parentElement !== col) col.appendChild(tvDock);   // ヘッダーから列へ戻す
   }
+
+  const tvFirst = settings.tvOrder !== "fx-first";
+  const list = [];
+  if (settings.tvDockSkin !== "wall") list.push(tvFirst ? tvDock : fxDock, tvFirst ? fxDock : tvDock);
+  else list.push(fxDock);
+  list.push(tvFirst ? tvMore : fxMore, tvFirst ? fxMore : tvMore);
+
+  const seq = list.filter(Boolean);
+  let anchor = seq[0];
+  if (!anchor || anchor.parentElement !== col) return;
+  for (let i = 1; i < seq.length; i++) { anchor.after(seq[i]); anchor = seq[i]; }   // after() は既存要素の移動になる
 }
 
 /* ============ 🎬🖼 選曲中にmp4を流す（メニュー再生・確認用の描画） ============
@@ -818,7 +838,10 @@ addEventListener("DOMContentLoaded", () => {
   const pow = btn("tvKey tvPow", powLed, el("span", "", "⏻"));
   const pauseBtn = btn("tvKey tvPause", pauseLed, el("span", "", "⏯"));
   const lcd = el("div", "tvLcd");
-  const top = el("div", "tvTop"); top.append(pow, lcd, pauseBtn);
+  /* 🆕 ◀ ▶ の物理ボタン：選曲リストの前の曲・次の曲へ（テレビのチャンネル送りみたいに） */
+  const prevSongBtn = btn("tvKey tvSong", el("span", "", "◀"));
+  const nextSongBtn = btn("tvKey tvSong", el("span", "", "▶"));
+  const top = el("div", "tvTop"); top.append(pow, prevSongBtn, lcd, nextSongBtn, pauseBtn);
   const screenWrap = el("div", "tvScreenWrap");
   const screen = el("div", "tvScreen");
   const screenGlare = el("i", "tvGlare");
@@ -1042,6 +1065,21 @@ addEventListener("DOMContentLoaded", () => {
     togglePause();
     lcdFlash(tr("tvPause"));
   });
+  /* ◀ ▶：選曲リストを前へ・次へ（ラジオのチャンネル送りみたいに）
+     曲の選び方は library.js の nextSong() / prevSong() に任せる（ラジオと同じ並び） */
+  const songStep = async dir => {
+    if (phase !== "title") return;
+    const pickSong = dir > 0 ? (typeof nextSong === "function" ? nextSong : null)
+                             : (typeof prevSong === "function" ? prevSong : null);
+    const it = pickSong ? pickSong() : null;
+    if (!it) { lcdFlash(tr("tvNoSongs")); return; }
+    if (typeof selectSong !== "function") return;
+    lcdFlash("♪ " + String(it.title || "").slice(0, 36));
+    await selectSong(it);
+    render();
+  };
+  prevSongBtn.addEventListener("click", () => songStep(-1));
+  nextSongBtn.addEventListener("click", () => songStep(1));
   video.addEventListener("play", () => render());
   video.addEventListener("pause", () => render());
   rTv.addEventListener("click", () => randomTv());
@@ -1202,6 +1240,8 @@ addEventListener("DOMContentLoaded", () => {
     pauseLed.classList.toggle("on", !video.paused && !isOff);
     pow.title = tr("tvPower"); pow.setAttribute("aria-label", pow.title); pow.setAttribute("aria-pressed", String(!isOff));
     pauseBtn.title = tr("tvPause"); pauseBtn.setAttribute("aria-label", pauseBtn.title);
+    prevSongBtn.title = tr("tvPrevSong"); prevSongBtn.setAttribute("aria-label", prevSongBtn.title);
+    nextSongBtn.title = tr("tvNextSong"); nextSongBtn.setAttribute("aria-label", nextSongBtn.title);
 
     const curName = isOff ? tr("tvOff") : (nm[settings.videoStyle] || settings.videoStyle);
     lcd.textContent = flash && Date.now() < flash.until ? flash.text : curName + (isOff ? "" : (video.paused ? " ⏸" : " ▶"));
@@ -1222,7 +1262,9 @@ addEventListener("DOMContentLoaded", () => {
 
     overflow.textContent = "";
     const rest = fav.slice(n);
-    overLabel.hidden = !rest.length && fav.length > 0;
+    /* お気に入りの数と、このTVのボタン数を出す（TVごとの持ちやすさが見える） */
+    overLabel.textContent = rest.length ? tr("tvFavOverflow", { n: fav.length, m: n }) : tr("tvFavLabelN", { n: fav.length, m: n });
+    overLabel.hidden = !fav.length;
     if (!fav.length) overflow.append(tx("div","tvNoFav","hint"));
     for (const id of rest) {
       const on = settings.videoStyle === id;

@@ -293,6 +293,12 @@ function nextSong() {
   const i = currentSong ? list.findIndex(x => x.key === currentSong.key) : -1;
   return list[(i + 1) % list.length];
 }
+/* 📺 TVドックの ◀ から使う（前の曲。端は末尾へ回り込む。曲が無いときは null） */
+function prevSong() {
+  const list = libView.length ? libView : allSongs(); if (!list.length) return null;
+  const i = currentSong ? Math.max(0, list.findIndex(x => x.key === currentSong.key)) : 0;
+  return list[(i - 1 + list.length) % list.length];
+}
 async function radioGo(next) {
   cancelRadio();
   if (phase !== "ended" || !settings.radio) return;

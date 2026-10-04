@@ -37,6 +37,13 @@
     - `tvMenuVideo`（🎬 音のプレビューがオフでも、メニューで映像を再生＝**音なし**・**初期オフ**）→ 「選曲中に曲のプレビューを再生する」がオンのときはそちら（音あり）を優先
   - 音は出さない方針：自分で再生したときだけ `video.muted` を立て、止めるときに戻す（fx-dockの⏻ミュートを壊さない）
   - 止まる場所：ゲーム開始（phase）／設定画面へ／タブやパネルを閉じる／タブが隠れた
+- 🆕 **📺◀▶ 曲送りボタンと、TV→ラックのならべ方（今回追加）**
+  - TVドックの上段：⏻ → **◀** → 液晶 → **▶** → ⏸（◀▶ は `.tvTop .tvSong`）。押すと選曲リストの前後の曲へ（端は回り込み、液晶に `♪ 曲名`）
+  - 曲の選び方は `library.js` の `nextSong()`（既存）と、**新設した `prevSong()`** に任せる（ラジオと同じ並び・副作用なし）
+  - ならべ方を変更：**TV →（お気に入り）→ ラック →（お気に入り）→ TVくわしい → ラックくわしい** がデフォルト。
+    `applyOrder()` が、それぞれの `<details>`（`.tvMore` / `.dockMore`）をドックの外＝列の下のほうへ並べ直す（TVを壁掛けにしても、くわしいは列に残る）
+  - お気に入り行に**数**を表示（`tvFavLabelN` / `tvFavOverflow`）：お気に入り7個・ボタン6個のように、TVごとの収まり具合が見える
+  - 並び順の設定はそのまま（テレビとラックの上下だけ入れ替え。くわしいは、いつも下のほう）
 - 映像フィルター45種：
   - basic: skin, color, mono, dim, off ／ vivid: vivid, pop, pastel ／ retro: warm, cool, vintage, film, crt, vhs
   - cinema: cinema, cinemascope, noir, news, commercial ／ effect: night, security, dream, faded, poster, soft

@@ -75,6 +75,19 @@ for (const [kind, ref] of refs) {
 }
 if (!missingRefs) ok(`index.html local references (${refs.length} checked)`);
 
+const privacy = read("privacy.html").replace(/<!--[\s\S]*?-->/g, "");
+let missingPrivacyRefs = 0;
+for (const match of privacy.matchAll(/(?:href|src)=["']([^"']+)["']/gi)) {
+  const ref = match[1];
+  if (/^(?:[a-z]+:)?\/\//i.test(ref) || ref.startsWith("data:") || ref.startsWith("#")) continue;
+  const rel = localPath(ref);
+  if (!exists(rel)) {
+    missingPrivacyRefs += 1;
+    fail(`privacy.html reference is missing: ${ref}`);
+  }
+}
+if (!missingPrivacyRefs) ok("privacy.html local references");
+
 // The manifest's PWA icons are easy to break when an asset is regenerated.
 try {
   const manifest = JSON.parse(read("manifest.webmanifest"));
@@ -129,13 +142,36 @@ if (!cacheMatch) fail("sw.js cache name could not be read");
 else if (!/^trk-v\d{4}\.\d{1,2}\.\d{1,2}[-\w]*$/.test(cacheMatch[1])) fail(`unexpected service-worker cache name: ${cacheMatch[1]}`);
 else ok(`service-worker cache: ${cacheMatch[1]}`);
 
-for (const rel of ["docs/HANDOFF.md", "docs/pack-format.md", "NOTICE.md", "README.md"]) {
-  if (!exists(rel)) fail(`required project document is missing: ${rel}`);
+for (const rel of [
+  "docs/HANDOFF.md",
+  "docs/pack-format.md",
+  "docs/android.md",
+  "NOTICE.md",
+  "README.md",
+  "privacy.html",
+  "css/privacy.css",
+  "package.json",
+  "capacitor.config.ts",
+  "tools/prepare-mobile-web.mjs"
+]) {
+  if (!exists(rel)) fail(`required project file is missing: ${rel}`);
 }
 if (exists("README.md") && !read("README.md").includes("docs/pack-format.md")) {
   fail("README.md does not link to docs/pack-format.md");
 } else if (exists("README.md")) {
   ok("pack format documentation is linked from README.md");
+}
+if (exists("README.md") && !read("README.md").includes("privacy.html")) fail("README.md does not link to privacy.html");
+if (exists("index.html") && !read("index.html").includes('href="privacy.html"')) fail("index.html does not link to privacy.html");
+else ok("privacy page is linked from the app");
+try {
+  const pkg = JSON.parse(read("package.json"));
+  for (const script of ["prepare:mobile", "cap:add:android", "cap:sync", "cap:build:android"]) {
+    if (!pkg.scripts || !pkg.scripts[script]) fail(`package.json is missing script: ${script}`);
+  }
+  if (pkg.scripts && pkg.scripts["prepare:mobile"] && exists("tools/prepare-mobile-web.mjs")) ok("Capacitor preparation scripts are present");
+} catch (error) {
+  fail(`package.json is not valid JSON: ${error.message}`);
 }
 
 console.log(`\nStatic check: ${failures ? "FAILED" : "passed"} · ${failures} failure(s) · ${warnings} warning(s)`);

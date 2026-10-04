@@ -597,13 +597,15 @@ records[指紋 "サイズ:長さ×10"] = {
 
 1. **最優先：実機・実ブラウザ確認を実施する**。音声、Canvas、IndexedDB、File System Access API、CDN、モバイル幅は静的検査では完了扱いにしない。下の「実機確認」項目は、実際に確認できるまで `[ ]` のまま残す。
 2. **次点：静的に繰り返せる検査を先に回す**。`node tools/check-repo.mjs` でJS構文、`index.html` のローカル参照、PWAアイコン寸法、棚スキン数、Service Workerのキャッシュ名、主要文書の存在を確認できる。これはブラウザ確認の代替ではない。
-3. **整理済み：パック作者向け仕様を固定する**。`docs/pack-format.md` に `.stpack` / `pack.json` の項目・上限・例をまとめた。実装（`js/custom.js`）を変更したら、この仕様書と `README.md` を同時に更新する。
-4. **外部設定は別枠**。GitHub Pagesの公開状態・About・Topics・Discussionsは、GitHub側で確認または判断するまで完了扱いにしない。
+3. **実装済み：APK準備の土台を作る**。`privacy.html`、`package.json`、`capacitor.config.ts`、`tools/prepare-mobile-web.mjs`、`docs/android.md` を追加した。これはAndroidプロジェクト生成とWeb資産同期の準備であり、APKの実機確認・配布完了ではない。
+4. **整理済み：パック作者向け仕様を固定する**。`docs/pack-format.md` に `.stpack` / `pack.json` の項目・上限・例をまとめた。実装（`js/custom.js`）を変更したら、この仕様書と `README.md` を同時に更新する。
+5. **外部設定は別枠**。GitHub Pagesの公開状態・About・Topics・Discussionsは、GitHub側で確認または判断するまで完了扱いにしない。
 
 > 注：この文書に残る `jsdom-*.mjs` の項目数・翻訳キー数は過去セッションの記録です。現在のcheckoutにはそのハーネスがないため、現行の検査結果として扱わず、必要なら別途再作成します。
 
 **やること**
 - [ ] ブラウザで全ファイルの動作確認（コンソールに赤いエラーがないか）
+- [x] `privacy.html` とCapacitor用Web資産同期の土台（APKの実機確認・配布は未完了）
 - [x] アイコン成果物の静的確認：`icons/icon-192.png`（192×192）・`icons/icon-512.png`（512×512）・`docs/og.png` が存在する（`node tools/check-repo.mjs` で再確認）
 - [ ] `tools/make-icons.html` の生成手順を実機ブラウザで確認し、PWAアイコンと `docs/og.png` の表示を確認する
 - [ ] GitHub Pages を公開し、About（説明・Website・Topics）を入れる
@@ -643,7 +645,7 @@ records[指紋 "サイズ:長さ×10"] = {
 - [ ] 実機確認：⏻標準650ms／高速200ms／起動禁止と短押しミュート／16音色（エレキギター・電子サックス・ZUNPET風ブラスを含む）／**鍵盤固定ONでスライダー等にキーを吸われない・OFFで通常入力に戻ること**／**大画面向け鍵盤拡張ONでキーが横に広がり、スマホ幅では従来幅を保つこと**／±8半音ピッチつまみ（初期0・保存・押鍵中にも反映）／和音・リリース／曲と動画の再生／QWERTY配列と再割り当て／タッチ鍵盤／サンプル音源のサイズ・長さ制限とローカル動作／設定保存・4言語／モバイル幅。
 「12. 次の候補」にあったエフェクトチェーン編集と🎹シンセモードは実装済みです。次は各実機確認と、下の未実装アイデアを進めてください。
 **将来の大きな作業**
-- Capacitor で APK 化：`READ_MEDIA_AUDIO` で端末の曲一覧、ラジオ中のバックグラウンド再生（Media Session・フォアグラウンドサービス）。配布は GitHub Releases から（Google Play は登録料と、テスター約12人×14日の条件がある）
+- APKのネイティブ音楽ライブラリ連携：今回CapacitorのWeb資産同期まで実装済み。残りは `READ_MEDIA_AUDIO` 等の必要性を確認し、端末の曲一覧・ラジオ中のバックグラウンド再生（Media Session・フォアグラウンドサービス）を、権限とプライバシー説明を含めて設計する。配布はGitHub Releasesから（Google Playは登録料と、テスター約12人×14日の条件がある）
 - 公認の段階2：作者さんの鍵による署名、譜面JSON単体の公認、プリセット作者の公認
 - `docs/presets.md` にみんなのマイプリセットの紹介集
 - スペクトラムの続き：ゲーム画面の背景にもうっすら重ねる／ピークの色を選べる／TVの確認タブにも出す

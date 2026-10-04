@@ -1,0 +1,25 @@
+{
+  "name": "trk-app-shell",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "trk! web assets and Capacitor Android wrapper",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "check": "node tools/check-repo.mjs",
+    "prepare:mobile": "node tools/prepare-mobile-web.mjs",
+    "cap:add:android": "npm run prepare:mobile && cap add android",
+    "cap:sync": "npm run prepare:mobile && cap sync",
+    "cap:open:android": "cap open android",
+    "cap:run:android": "cap run android",
+    "cap:build:android": "npm run cap:sync && cap build android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.2",
+    "@capacitor/core": "8.5.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.2",
+    "typescript": "7.0.2"
+  }
+}

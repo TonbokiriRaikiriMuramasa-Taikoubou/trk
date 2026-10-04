@@ -290,7 +290,8 @@ osu! のスキンのように、いろいろなものを1つのファイル（`.
 - スマホのブラウザで上のリンクを開き、「**ホーム画面に追加**」を選ぶと、アプリのように全画面で遊べます。
 - スマホでは「**📤 ミュージックフォルダを共有**」を試してください。フォルダを選べる端末（Android の Chrome など）なら、ミュージックフォルダの中身を一気に取り込めます。フォルダを選べない端末では、曲を1つずつ追加してください。
 - フォルダの許可を**覚えておく**のは、パソコンの Chrome／Edge だけです。スマホでも設定の「**💾 共有した曲を端末に残す**」をオンにすると、保存された曲（最大150曲・300MB）は許可なしで遊べます。
-- スマホの音楽フォルダを読み込めるアプリ版（APK）は、今後の予定です。
+- APK版はまだ配布していません。PWAの静的Web資産をCapacitorでAndroidアプリへ同期する準備を追加しました。初回セットアップと制限は [docs/android.md](docs/android.md) をご覧ください。
+- プライバシー方針は [privacy.html](privacy.html) です。trk! はアカウント・広告・行動分析を使わず、曲や設定を基本的に端末内で扱います。
 
 ---
 
@@ -357,7 +358,8 @@ trk! はMODしやすいように、機能ごとにファイルを分けていま
 
 ```
 trk/
-├─ index.html  manifest.webmanifest  sw.js  verified.json
+├─ index.html  privacy.html  manifest.webmanifest  sw.js  verified.json
+├─ package.json  capacitor.config.ts
 ├─ css/style.css
 ├─ icons/                        … アプリのアイコン
 ├─ js/
@@ -383,9 +385,10 @@ trk/
 │  ├─ mmd.js                     … MMDマスコット（原則持ち込み。再配布条件付きLat式を同梱）
 │  ├─ favs.js                    … ⭐ お気に入りのフォルダ管理（1軍／2軍／🧊／📤元）
 │  └─ spectrum.js                … 📊 スペクトラム（音の見える化・TVの画面に重ねられる）
-├─ docs/  HANDOFF.md  pack-format.md  verified.md  og.png
+├─ docs/  HANDOFF.md  pack-format.md  android.md  verified.md  og.png
 ├─ tools/make-icons.html         … アイコンとOGP画像を作るツール
 ├─ tools/check-repo.mjs          … 依存なしの静的スモーク検査
+├─ tools/prepare-mobile-web.mjs  … Capacitor用Web資産の同期
 ├─ .github/ISSUE_TEMPLATE/       … 不具合・アイデアのフォーム
 ├─ README.md  NOTICE.md  CONTRIBUTING.md  LICENSE
 ```

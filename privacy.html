@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>プライバシー — trk!</title>
+<meta name="description" content="trk! のプライバシーについて。アカウントや広告を使わず、曲と設定を端末内で扱います。">
+<link rel="stylesheet" href="css/privacy.css">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body>
+<header class="siteHeader">
+  <a class="brand" href="./"><span class="brandMark">trk!</span><span>All-Generation Rhythm Game</span></a>
+  <a class="backLink" href="./">ゲームへ戻る</a>
+</header>
+
+<main class="page">
+  <article class="card">
+    <p class="eyebrow">PRIVACY</p>
+    <h1>プライバシーについて</h1>
+    <p class="lead">trk! は、手持ちの曲で遊ぶための、サーバーを持たないブラウザ音ゲーです。現在のWeb版とPWA版では、アカウント登録・広告・行動分析を使いません。</p>
+    <p class="updated">最終更新：2026年10月5日</p>
+
+    <nav class="toc" aria-label="このページの項目">
+      <a href="#collect">収集する情報</a>
+      <a href="#local">端末内の保存</a>
+      <a href="#network">ネットワーク通信</a>
+      <a href="#delete">削除方法</a>
+      <a href="#apk">APK版について</a>
+      <a href="#contact">お問い合わせ</a>
+    </nav>
+
+    <section id="collect">
+      <h2>1. 収集する情報</h2>
+      <p>trk! の作者は、ゲーム内で次の情報を集めたり、利用目的のためにサーバーへ送信したりしません。</p>
+      <ul>
+        <li>氏名、メールアドレス、アカウント情報</li>
+        <li>プレイ履歴、スコア、設定、入力した曲の内容</li>
+        <li>広告用ID、アクセス解析用ID、位置情報</li>
+        <li>マイクやカメラからの録音・撮影データ</li>
+      </ul>
+      <p>曲、譜面、画像、VRM／MMDモデルなどを読み込む処理は、原則としてこのブラウザまたはアプリ内で完結します。共有機能はファイルを他者へ送る機能ではなく、端末上の曲を選曲画面へ渡す機能です。</p>
+    </section>
+
+    <section id="local">
+      <h2>2. 端末内に保存される情報</h2>
+      <p>ゲームを動かすため、次の情報がブラウザの <code>localStorage</code>、IndexedDB、またはCache Storageに保存されることがあります。これらはtrk!のサーバーには送信されません。</p>
+      <ul>
+        <li>音量、言語、スキン、キー割り当て、シンセの設定</li>
+        <li>スコア、記録、お気に入り、カスタムスキン、エフェクト設定</li>
+        <li>ユーザーが明示的に「端末に残す」を選んだ共有曲のファイルとメタデータ</li>
+        <li>PWAをオフラインで起動するためのアプリファイルのキャッシュ</li>
+      </ul>
+      <p>曲の端末保存は初期状態ではオフです。保存した曲や設定は、ゲーム内の削除操作、設定のリセット、ブラウザのサイトデータ削除で消せます。ブラウザの保存容量やOSの判断により、保存が拒否・削除されることがあります。</p>
+    </section>
+
+    <section id="permissions">
+      <h2>3. ファイルと権限</h2>
+      <p>曲やモデルを選ぶときだけ、ブラウザが提供するファイル選択機能を使います。フォルダ共有を使う場合は、ブラウザの許可ダイアログが表示されます。許可を取り消す方法はブラウザまたはOSの設定に従います。</p>
+      <p>trk! は、選択されたファイルを配布・公開・アップロードすることを前提にしていません。ユーザーが書き出し機能で作成したパックや譜面を、自分で共有する場合は、含まれる素材の権利と配布先の規約を確認してください。</p>
+    </section>
+
+    <section id="network">
+      <h2>4. ネットワーク通信と外部サービス</h2>
+      <ul>
+        <li>GitHub Pagesから、trk!のHTML、CSS、JavaScript、画像などを配信します。GitHub Pages側のアクセスログ等については、GitHubのポリシーが適用されます。</li>
+        <li>VRM／MMDマスコットを使うとき、three.jsなどのライブラリをjsDelivr CDNから読み込む場合があります。その場合、CDNへの通信が発生します。使わないときは、これらのライブラリを読み込みません。</li>
+        <li>GitHub Issues、X、その他の外部リンクを開いた場合は、そのサービスへ移動します。投稿内容は公開される可能性があるため、個人情報を含めないでください。</li>
+      </ul>
+      <p>曲の再生、譜面生成、Web Audioによる音声合成は、外部の音楽サービスへ送信せずに行います。外部CDNの提供状況やポリシーはtrk!の管理外です。</p>
+    </section>
+
+    <section id="delete">
+      <h2>5. 情報の削除</h2>
+      <p>trk!の作者がサーバー上に個人データを保管していないため、作者へ削除依頼を出す対象のユーザーデータはありません。端末に保存されたデータは、次の方法で削除できます。</p>
+      <ol>
+        <li>設定画面のデータ削除・リセット機能を使う。</li>
+        <li>「共有をやめる」や保存曲の削除操作を使う。</li>
+        <li>ブラウザのサイトデータ、またはアプリのストレージをOS設定から消去する。</li>
+      </ol>
+      <p>GitHub Issuesなど外部サービスへ本人が投稿した情報の削除は、投稿先サービスの手順に従ってください。</p>
+    </section>
+
+    <section id="apk">
+      <h2>6. APK版・アプリ版</h2>
+      <p>APK版は現在、配布していません。このリポジトリではPWAのWeb資産をCapacitorのWebViewへコピーしてAndroidプロジェクトを生成できる仕組みを整備していますが、ネイティブ版の権限や配布を開始したことを意味しません。</p>
+      <p>将来、Androidの音楽ライブラリへ直接アクセスする機能を追加する場合は、必要な権限、読み取る情報、端末内だけで扱う範囲をこのページとアプリのストア説明に追記します。現在のAPK準備では、Web版と同じくユーザーが選択したファイルを端末内で扱うことを基本とします。</p>
+    </section>
+
+    <section id="contact">
+      <h2>7. お問い合わせと変更</h2>
+      <p>このポリシーを変更した場合は、このページの更新日を変更します。質問や問題の報告は、公開情報を含めない形で <a href="https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues" target="_blank" rel="noopener noreferrer">GitHub Issues</a> へ送ってください。</p>
+      <p class="note">trk! は非営利のオープンなファンプロジェクトです。コードと第三者素材の権利については <a href="NOTICE.md">NOTICE.md</a> も確認してください。</p>
+    </section>
+  </article>
+
+  <article class="card english" lang="en">
+    <p class="eyebrow">ENGLISH SUMMARY</p>
+    <h2>Privacy summary</h2>
+    <p>trk! is a local-first browser rhythm game. The current web and PWA versions do not require an account and do not use advertising, analytics, or telemetry. User-selected songs, charts, settings, scores, favorites, and optional saved music stay in the browser or app storage and are not uploaded by trk!.</p>
+    <p>The app may request file or folder access when you choose music. VRM/MMD features may load three.js-related libraries from jsDelivr. GitHub Pages, GitHub Issues, X, jsDelivr, and other external services have their own policies when you visit them.</p>
+    <p>The APK build is not distributed yet. This repository contains a Capacitor preparation path for packaging the same web assets; any future native media permissions will be documented here before release.</p>
+    <p>See the Japanese sections above for the full current policy. Last updated: October 5, 2026.</p>
+  </article>
+</main>
+
+<footer class="siteFooter">
+  <a href="./">trk!へ戻る</a>
+  <span>·</span>
+  <a href="NOTICE.md">NOTICE</a>
+  <span>·</span>
+  <a href="https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" target="_blank" rel="noopener noreferrer">Source code</a>
+</footer>
+</body>
+</html>

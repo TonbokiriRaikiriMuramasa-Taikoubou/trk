@@ -7,14 +7,16 @@
 
 - 作業ブランチ：`arena/01a10940-trk`
 - 直近の機能コミット：`2714154 feat: add wider synth keyboard option`
-- 今回の整理対象：Handoffの優先順位、文書間の古い記載、パック仕様、依存しない静的監査
+- 今回の整理対象：Handoffの優先順位、文書間の古い記載、パック仕様、依存しない静的監査、privacy.html、APK準備
 - 公開URL：<https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/>
 - Service Workerキャッシュ：`sw.js` の `CACHE = "trk-v2026.10.5-synth2"`
 
 ## 今回整理・実装したもの
 
+- `privacy.html` と `css/privacy.css` を追加し、現在のWeb/PWAのローカル優先動作、外部通信、削除方法、APK版の未提供状態を明記。
+- `package.json`、`capacitor.config.ts`、`tools/prepare-mobile-web.mjs`、`docs/android.md` を追加し、同じWeb資産をCapacitorのAndroid WebViewへ同期する土台を整備。Androidプロジェクト・APKはまだ生成・配布していない。
 - `docs/pack-format.md` を追加し、`.stpack` / `pack.json` の形式、上限、曲パック例、権利上の注意を文書化。
-- `README.md` のパック仕様リンクと静的検査コマンドを追加。
+- `README.md` のプライバシー、APK準備、パック仕様リンクと静的検査コマンドを追加。
 - `tools/check-repo.mjs` を追加。Node.jsだけで次を監査する。
   - `js/` 全ファイルの構文
   - `index.html` のローカル script / stylesheet 参照

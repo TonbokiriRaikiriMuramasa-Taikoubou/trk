@@ -1116,7 +1116,7 @@ details.panel[open]>summary{margin-bottom:14px}
 .specSeg{margin-top:4px}
 .specSeg button{font-size:13px;padding:7px 6px}
 .specLabel{margin:10px 0 0;font-weight:800}
-/* 「🚫 スペクトラムを使わない」にチェックが入っているとき：ほかの設定をうすくする */
+/* 「🚫 スペクトラムを使用しない」にチェックが入っているとき：ほかの設定をうすくする */
 .specBox.specOff > *:not(.specOffRow){opacity:.45}
 .specBox.specOff .specOffRow{font-weight:800}
 /* 色のチップは、どの色か分かるように小さな点を付ける */

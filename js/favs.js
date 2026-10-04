@@ -290,7 +290,14 @@ function total(kind) { const st = state(kind); return st.main.length + st.sub.le
 function nameOf(kind, id) {
   try {
     if (kind === "tv") {
+      /* tv-dock.js は IIFE なので、中の関数（tvPresetById など）は外から見えない。
+         公開されている TrkTV.list() から名前を引く（中の関数が使えるなら、そちらを優先） */
       if (typeof tvPresetById === "function") { const p = tvPresetById(id); if (p) return typeof tvPresetName === "function" ? tvPresetName(p) : (p.label || id); }
+      const api = window.TrkTV;
+      if (api && typeof api.list === "function") {
+        const row = (api.list() || []).find(p => p && p.id === id);
+        if (row && row.name) return row.name;
+      }
     } else if (kind === "fx") {
       const api = window.TrkFX;
       if (api && typeof api.list === "function") {

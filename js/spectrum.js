@@ -8,9 +8,12 @@
        はかる：心電図／地震計／レーダー
        しごと：業績グラフ（プレゼン風）／周波数ボード（株価ボード風）
        おもしろ：ピアノロール／嘘発見器／焚き火
-   ・置き場所は2つ
+   ・色は8種類（ネオン／夕焼け／モノクロ／レインボー／trk（赤×蒼）／桜／毒々／VHS）
+   ・📊 曲名バナー（#songBanner）をスキンにもできます。左上の「＋」で大きく開きます。
+   ・置き場所は3つ
        ① 🎛 ラック（fx-dock）の「くわしい」の中の大きな画面
-       ② 📺 TVの画面に重ねる（settings.specTv。初期はオフ）
+       ② 📊 曲名バナー（#songBanner）をスキンにする（settings.specSkin・初期オン。左上の「＋」で開閉）
+       ③ 📺 TVの画面に重ねる（settings.specTv。初期はオフ）
      さらに、設定画面「🔊 サウンド」の下に #specPanel（くわしい設定）を足します。
    ・音は fx.js の窓口 TrkFX.tap() から見ます。createMediaElementSource は
      fx.js が一度だけ作る約束なので、こちらでは作りません（アナライザーは1つを使い回す）。
@@ -39,6 +42,11 @@ Object.assign(TEXT.ja, {
   specStyleLie:"🤥 嘘発見器", specStyleFire:"🔥 焚き火",
   specTheme:"色",
   specThemeNeon:"ネオン", specThemeSunset:"夕焼け", specThemeMono:"モノクロ", specThemeRainbow:"レインボー",
+  specThemeTrk:"trk（赤×蒼）", specThemeSakura:"桜", specThemeAcid:"毒々", specThemeVhs:"VHS",
+  specSkin:"📊 曲名バナーをスペクトラムにする",
+  specSkinHint:"曲名バナーの左上の「＋」を押すと、大きく開きます（ここでも切り替えられます）。",
+  specSkinOpenTip:"📊 スペクトラムを大きく開く", specSkinCloseTip:"📊 スペクトラムを小さく閉じる",
+  specNextStyle:"次の見え方",
   specGain:"感度",
   specPeaks:"ピーク（残像のライン）を出す",
   specTv:"📺 TVの画面にも重ねる",
@@ -65,6 +73,11 @@ Object.assign(TEXT.en, {
   specStyleLie:"🤥 Lie detector", specStyleFire:"🔥 Campfire",
   specTheme:"Color",
   specThemeNeon:"Neon", specThemeSunset:"Sunset", specThemeMono:"Mono", specThemeRainbow:"Rainbow",
+  specThemeTrk:"trk (red × blue)", specThemeSakura:"Sakura", specThemeAcid:"Acid", specThemeVhs:"VHS",
+  specSkin:"📊 Use the spectrum as the song banner",
+  specSkinHint:"Press “＋” at the top-left of the song banner to open it wider (you can also switch it here).",
+  specSkinOpenTip:"📊 Open the spectrum wider", specSkinCloseTip:"📊 Close the spectrum",
+  specNextStyle:"Next style",
   specGain:"Sensitivity",
   specPeaks:"Show peaks (falling lines)",
   specTv:"📺 Overlay it on the TV too",
@@ -90,6 +103,11 @@ Object.assign(TEXT.zh, {
   specStyleLie:"🤥 测谎仪", specStyleFire:"🔥 篝火",
   specTheme:"配色",
   specThemeNeon:"霓虹", specThemeSunset:"晚霞", specThemeMono:"黑白", specThemeRainbow:"彩虹",
+  specThemeTrk:"trk（红×蓝）", specThemeSakura:"樱花", specThemeAcid:"荧光毒", specThemeVhs:"VHS",
+  specSkin:"📊 把曲名横幅变成频谱",
+  specSkinHint:"按曲名横幅左上角的「＋」可以放大（在这里也能切换）。",
+  specSkinOpenTip:"📊 放大频谱", specSkinCloseTip:"📊 收小频谱",
+  specNextStyle:"下一个样式",
   specGain:"灵敏度",
   specPeaks:"显示峰值（余晖线）",
   specTv:"📺 也叠加到电视画面上",
@@ -115,6 +133,11 @@ Object.assign(TEXT.ko, {
   specStyleLie:"🤥 거짓말 탐지기", specStyleFire:"🔥 모닥불",
   specTheme:"색",
   specThemeNeon:"네온", specThemeSunset:"노을", specThemeMono:"모노크롬", specThemeRainbow:"무지개",
+  specThemeTrk:"trk (빨강×파랑)", specThemeSakura:"벚꽃", specThemeAcid:"애시드", specThemeVhs:"VHS",
+  specSkin:"📊 곡명 배너를 스펙트럼으로",
+  specSkinHint:"곡명 배너 왼쪽 위의 「＋」를 누르면 크게 열립니다 (여기서도 전환할 수 있습니다).",
+  specSkinOpenTip:"📊 스펙트럼 크게 열기", specSkinCloseTip:"📊 스펙트럼 작게 닫기",
+  specNextStyle:"다음 모양",
   specGain:"감도",
   specPeaks:"피크(잔상 라인) 표시",
   specTv:"📺 TV 화면에도 겹치기",
@@ -138,13 +161,29 @@ const STYLE_KEYS = {
   lie:"specStyleLie", fire:"specStyleFire"
 };
 const SPEC_STYLES = Object.keys(STYLE_KEYS);
-const SPEC_THEMES = ["neon", "sunset", "mono", "rainbow"];
+const THEME_KEYS = {
+  neon:"specThemeNeon", sunset:"specThemeSunset", mono:"specThemeMono", rainbow:"specThemeRainbow",
+  trk:"specThemeTrk", sakura:"specThemeSakura", acid:"specThemeAcid", vhs:"specThemeVhs"
+};
+const SPEC_THEMES = Object.keys(THEME_KEYS);
+/* チップや点に出す色（CSS の --specSwatch に渡す） */
+const THEME_SWATCH = {
+  neon:"linear-gradient(90deg,#22d3ee,#c084fc)", sunset:"linear-gradient(90deg,#ffb703,#ff4d9d)",
+  mono:"#e5e7eb", rainbow:"linear-gradient(90deg,#f87171,#fbbf24,#4ade80,#60a5fa,#c084fc)",
+  trk:"linear-gradient(90deg,#ff3b55,#55aaff)", sakura:"linear-gradient(90deg,#ffd1e0,#ff8fb1)",
+  acid:"linear-gradient(90deg,#b6ff00,#a259ff)", vhs:"linear-gradient(90deg,#22d3ee,#ff4fd8,#ffe066)"
+};
 const specSafe = (typeof safeModeOn !== "undefined") && safeModeOn;
 /* 🛟 セーフモードのときは、保存値を読み戻さない（core.js が入れた「表示しない」を守る） */
 if (typeof prefs !== "undefined" && !specSafe) {
   settings.specOn    = prefs.specOn !== false;                                  // 表示する（初期オン）
-  settings.specStyle = pick(prefs.specStyle, SPEC_STYLES, "bars");
-  settings.specTheme = pick(prefs.specTheme, SPEC_THEMES, "neon");
+  /* v1 の頃の初期値（bars）がそのまま残っているときだけ、新しい初期値（ring）へ一度だけ移す。
+     （v2 以降は specSkin が保存に入るので、自分で選んだ bars はそのまま残ります） */
+  const oldBars = prefs.specStyle === "bars" && !("specSkin" in prefs);
+  settings.specStyle = pick(oldBars ? "ring" : prefs.specStyle, SPEC_STYLES, "ring");   // 初期はリング
+  settings.specTheme = pick(prefs.specTheme, SPEC_THEMES, "neon");              // 初期はネオン
+  settings.specSkin  = prefs.specSkin !== false;                                // 📊 曲名バナーのスキン（初期オン）
+  settings.specSkinOpen = prefs.specSkinOpen === true;                          // 大きく開いた状態で始めるか（初期は閉じ）
   settings.specGain  = num(prefs.specGain, .4, 2.5, 1);
   settings.specPeaks = prefs.specPeaks !== false;                               // ピーク（初期オン）
   settings.specTv    = prefs.specTv === true;                                   // 📺 重ね表示（初期オフ）
@@ -152,8 +191,10 @@ if (typeof prefs !== "undefined" && !specSafe) {
 /* core.js より前に読まれたとき・?safe=1 のときの保険（知らない値は既定に戻す） */
 if (typeof settings !== "undefined") {
   settings.specOn    = settings.specOn !== false;
-  settings.specStyle = pick(settings.specStyle, SPEC_STYLES, "bars");
+  settings.specStyle = pick(settings.specStyle, SPEC_STYLES, "ring");
   settings.specTheme = pick(settings.specTheme, SPEC_THEMES, "neon");
+  settings.specSkin  = settings.specSkin !== false;
+  settings.specSkinOpen = settings.specSkinOpen === true;
   settings.specGain  = num(settings.specGain, .4, 2.5, 1);
   settings.specPeaks = settings.specPeaks !== false;
   settings.specTv    = settings.specTv === true;
@@ -190,6 +231,10 @@ function themeColor(theme, i, n, v) {
   if (theme === "sunset") return `hsl(${Math.round(40 + t * 300)}, 95%, ${Math.round(56 + v * 12)}%)`;   // 山吹 → ピンク
   if (theme === "mono") return `hsl(0, 0%, ${Math.round(68 + v * 30)}%)`;
   if (theme === "rainbow") return `hsl(${Math.round(t * 320)}, 92%, ${Math.round(58 + v * 10)}%)`;
+  if (theme === "trk") return `hsl(${Math.round(350 - t * 140)}, 100%, ${Math.round(55 + v * 12)}%)`;        // trk! の赤 → 蒼
+  if (theme === "sakura") return `hsl(${Math.round(346 - t * 26)}, ${Math.round(74 - t * 22)}%, ${Math.round(72 + v * 12)}%)`;
+  if (theme === "acid") return `hsl(${Math.round(78 + t * 214)}, 100%, ${Math.round(50 + v * 16)}%)`;
+  if (theme === "vhs") return `hsl(${Math.round((182 + t * 226) % 360)}, 96%, ${Math.round(60 + v * 12)}%)`;
   return `hsl(${Math.round(188 + t * 132)}, 100%, ${Math.round(56 + v * 12)}%)`;   // neon：シアン → マゼンタ
 }
 /* スペクトログラムの色（静か＝青 → うるさい＝赤白） */
@@ -788,7 +833,10 @@ function drawOne(cv, kind, t) {
 }
 
 /* ============ 描き続けるかどうか ============ */
-const panelCanvases = [];              // くわしい欄と設定画面のキャンバス（見えているものだけ描く）
+const panelCanvases = [];              // くわしい欄・設定画面・📊曲名バナーのキャンバス（見えているものだけ描く）
+/* キャンバスごとの「描いてよい条件」。曲名バナーのスキンは specSkin がオフなら描かない */
+const GATES = new WeakMap();
+const DIRTY = new WeakSet();           // いま絵が入っているキャンバス（消すのは1回だけ）
 let tvCanvas = null;                   // 📺 TVに重ねるキャンバス
 let raf = 0;
 
@@ -803,7 +851,8 @@ function reducedMotion() {
 const isSafe = () => (typeof safeModeOn !== "undefined" && safeModeOn) || (typeof window.TrkSafeMode === "function" && window.TrkSafeMode());
 function onSelectScreen() { return (typeof screen === "undefined" ? "" : screen) === "select"; }
 function seeable(n) { return !!n && n.isConnected && n.clientWidth > 0 && n.clientHeight > 0 && !document.hidden; }
-function panelOn() { return panelCanvases.some(seeable); }
+function drawable(n) { return seeable(n) && (!GATES.has(n) || GATES.get(n)()); }
+function panelOn() { return panelCanvases.some(drawable); }
 function tvOn() {
   if (!tvCanvas || !settings.specTv || settings.videoStyle === "off" || !onSelectScreen()) return false;
   const dock = document.getElementById("tvDock");
@@ -833,16 +882,20 @@ function frame(t) {
   const now = t || performance.now();
   const idle = !an;
   const skip = idle && now - lastIdle < 250;
-  const all = panelCanvases.filter(seeable);
+  const all = panelCanvases.filter(drawable);
   const tv = on && tvOn();
   for (const cv of panelCanvases) {
-    if (!on || !seeable(cv)) { if (cv.isConnected) clearOne(cv); continue; }
+    if (!on || !drawable(cv)) {
+      if (cv.isConnected && DIRTY.has(cv)) { clearOne(cv); DIRTY.delete(cv); }
+      continue;
+    }
     busy = true;
   }
-  if (tv) busy = true; else if (tvCanvas && tvCanvas.isConnected) clearOne(tvCanvas);
+  if (tv) busy = true;
+  else if (tvCanvas && tvCanvas.isConnected && DIRTY.has(tvCanvas)) { clearOne(tvCanvas); DIRTY.delete(tvCanvas); }
   if (!skip) {
-    for (const cv of all) drawOne(cv, "panel", now);
-    if (tv) drawOne(tvCanvas, "tv", now);
+    for (const cv of all) { drawOne(cv, "panel", now); DIRTY.add(cv); }
+    if (tv) { drawOne(tvCanvas, "tv", now); DIRTY.add(tvCanvas); }
     lastIdle = now;
   }
   if (busy && !document.hidden) raf = requestAnimationFrame(frame);
@@ -858,6 +911,7 @@ function mkChips(pairs, get, set, cls) {
   const bs = pairs.map(([v, key]) => {
     const b = tx("button", key);
     b.dataset.specVal = v;
+    if (cls && cls.includes("specSegColor") && THEME_SWATCH[v]) b.style.setProperty("--specSwatch", THEME_SWATCH[v]);
     b.addEventListener("click", () => { set(v); });
     row.append(b);
     return b;
@@ -886,7 +940,7 @@ function buildBox(host, withCanvas) {
     mkChips(SPEC_STYLES.map(v => [v, STYLE_KEYS[v]]),
       () => settings.specStyle, v => { settings.specStyle = v; saveUserPrefs(); syncAll(); }));
   host.append(tx("div", "specTheme", "hint specLabel"),
-    mkChips(SPEC_THEMES.map((v, i) => [v, ["specThemeNeon", "specThemeSunset", "specThemeMono", "specThemeRainbow"][i]]),
+    mkChips(SPEC_THEMES.map(v => [v, THEME_KEYS[v]]),
       () => settings.specTheme, v => { settings.specTheme = v; saveUserPrefs(); syncAll(); }, "specSegColor"));
   const gain = el("label", "field");
   const gr = document.createElement("input"), gv = el("span", "mono");
@@ -898,6 +952,8 @@ function buildBox(host, withCanvas) {
   host.append(mkCheck("specPeaks", () => settings.specPeaks, v => { settings.specPeaks = v; saveUserPrefs(); syncAll(); }));
   host.append(mkCheck("specTv", () => settings.specTv, v => { settings.specTv = v; saveUserPrefs(); syncAll(); }));
   host.append(tx("div", "specTvHint", "hint specTvHint"));
+  host.append(mkCheck("specSkin", () => settings.specSkin, v => { settings.specSkin = v; saveUserPrefs(); syncAll(); }));
+  host.append(tx("div", "specSkinHint", "hint specSkinHint"));
   return host;
 }
 function syncAll() {
@@ -919,6 +975,85 @@ function syncTvCanvas() {
     tvCanvas.setAttribute("aria-hidden", "true");
   }
   if (tvCanvas.parentElement !== screenEl) screenEl.append(tvCanvas);
+}
+
+/* ============ 📊 曲名バナーのスキン（左上の「＋」で大きく開く） ============
+   ・バナー（#songBanner）いっぱいにキャンバスを敷く。スキンなので映像の邪魔をしない
+     （透明な見え方＝バーの絵の上に重なる。背景を塗る見え方はそのまま画面になる）
+   ・「＋」を押すと開いて（高さが増えて）クイック操作（次の見え方・色8種）が出る。
+     ⚠ バナーの右上は library.js の「▶ ここから再生」ボタンなので、操作は＋の隣（左上）に置く
+   ・「ピークを出す」「TVの画面に重ねる」は設定（オプション）側に置いたまま。
+     開いたときの幅が広がりすぎないように、操作は小さな丸ボタンだけにしています          */
+let bannerCanvas = null, bannerHost = null, zipBtn = null, skinTools = null, styleCycleBtn = null;
+const skinDots = [];
+function buildBannerSkin() {
+  const banner = document.getElementById("songBanner");
+  if (!banner) return;
+  bannerHost = banner;
+
+  bannerCanvas = document.createElement("canvas");
+  bannerCanvas.className = "specBannerCanvas";
+  bannerCanvas.setAttribute("aria-hidden", "true");
+  banner.insertBefore(bannerCanvas, banner.firstChild);
+  panelCanvases.push(bannerCanvas);
+  GATES.set(bannerCanvas, () => settings.specSkin);
+
+  zipBtn = el("button", "specZip");            // スキンの左上の「＋」／「−」
+  zipBtn.type = "button";
+  zipBtn.textContent = "+";
+  zipBtn.addEventListener("click", () => {
+    settings.specSkinOpen = !settings.specSkinOpen;
+    if (settings.specSkinOpen) settings.specSkin = true;    // 開くときはスキンも入れる
+    saveUserPrefs(); syncAll();
+  });
+  banner.append(zipBtn);
+
+  skinTools = el("div", "specSkinTools");      // 開いたときだけ出る（幅を取らない小さな操作）
+  styleCycleBtn = el("button", "specNext");
+  styleCycleBtn.type = "button";
+  styleCycleBtn.dataset.i18n = "specNextStyle";
+  styleCycleBtn.addEventListener("click", () => {
+    const i = Math.max(0, SPEC_STYLES.indexOf(settings.specStyle));
+    settings.specStyle = SPEC_STYLES[(i + 1) % SPEC_STYLES.length];
+    saveUserPrefs(); syncAll();
+  });
+  skinTools.append(styleCycleBtn);
+  const dotRow = el("div", "specDots");
+  for (const v of SPEC_THEMES) {
+    const b = el("button", "specDot");
+    b.type = "button";
+    b.dataset.specVal = v;
+    b.style.setProperty("--specSwatch", THEME_SWATCH[v] || "currentColor");
+    b.addEventListener("click", () => { settings.specTheme = v; saveUserPrefs(); syncAll(); });
+    dotRow.append(b);
+    skinDots.push(b);
+  }
+  skinTools.append(dotRow);
+  banner.append(skinTools);
+
+  SYNCS.push(() => {
+    const live = settings.specOn && !isSafe();
+    if (bannerHost) {
+      bannerHost.classList.toggle("specSkin", !!settings.specSkin && live);
+      bannerHost.classList.toggle("specOpen", !!settings.specSkin && !!settings.specSkinOpen && live);
+    }
+    if (zipBtn) {
+      zipBtn.hidden = !live;
+      zipBtn.textContent = settings.specSkinOpen ? "−" : "+";
+      const tip = tr(settings.specSkinOpen ? "specSkinCloseTip" : "specSkinOpenTip");
+      if (zipBtn.title !== tip) { zipBtn.title = tip; zipBtn.setAttribute("aria-label", tip); }
+    }
+    if (skinTools) skinTools.hidden = !(settings.specSkin && settings.specSkinOpen && live);
+    if (styleCycleBtn) styleCycleBtn.textContent = "⇄ " + tr(STYLE_KEYS[settings.specStyle] || "specStyleBars");
+    for (const b of skinDots) {
+      const sel = b.dataset.specVal === settings.specTheme;
+      b.classList.toggle("selected", sel);
+      b.setAttribute("aria-pressed", sel ? "true" : "false");
+      const tip = tr(THEME_KEYS[b.dataset.specVal] || "specTheme");
+      if (b.title !== tip) { b.title = tip; b.setAttribute("aria-label", tip); }
+    }
+    if (bannerCanvas && !drawable(bannerCanvas) && DIRTY.has(bannerCanvas)) { clearOne(bannerCanvas); DIRTY.delete(bannerCanvas); }
+  });
 }
 
 addEventListener("DOMContentLoaded", () => {
@@ -974,16 +1109,24 @@ addEventListener("DOMContentLoaded", () => {
   addEventListener("keyup", arm, true);
   addEventListener("touchstart", arm, { capture: true, passive: true });
 
+  /* ④ 📊 曲名バナーのスキン */
+  buildBannerSkin();
+
   syncAll();
 });
 
 /* ============ 窓口（テスト・アドオン用） ============ */
 window.TrkSpec = Object.freeze({
-  version: 2,
+  version: 3,
   styles: () => SPEC_STYLES.slice(),
   themes: () => SPEC_THEMES.slice(),
   style: () => settings.specStyle,
   theme: () => settings.specTheme,
+  skin: () => !!settings.specSkin,
+  skinOpen: () => !!settings.specSkinOpen,
+  setSkin: v => { settings.specSkin = !!v; saveUserPrefs(); syncAll(); return settings.specSkin; },
+  openSkin: v => { settings.specSkinOpen = !!v; saveUserPrefs(); syncAll(); return settings.specSkinOpen; },
+  cycleStyle: () => { const i = Math.max(0, SPEC_STYLES.indexOf(settings.specStyle)); settings.specStyle = SPEC_STYLES[(i + 1) % SPEC_STYLES.length]; saveUserPrefs(); syncAll(); return settings.specStyle; },
   setStyle: id => { if (SPEC_STYLES.includes(id)) { settings.specStyle = id; saveUserPrefs(); syncAll(); return true; } return false; },
   setTheme: id => { if (SPEC_THEMES.includes(id)) { settings.specTheme = id; saveUserPrefs(); syncAll(); return true; } return false; },
   setOn: v => { settings.specOn = !!v; saveUserPrefs(); syncAll(); return settings.specOn; },

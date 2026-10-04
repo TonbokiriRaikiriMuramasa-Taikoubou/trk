@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 # trk! 次回セッション用メモ（NEXT_SESSION_HANDOFF.md）
 
-> 最終更新：**2026-10-05**（📊スペクトラム **見え方16種** ＋ TVに重ねる ＋ tvMakerOpen 生キー修正）
+> 最終更新：**2026-10-05**（📊スペクトラム **見え方16種・色8種・曲名バナーのスキン（＋で開く）** ＋ TVに重ねる ＋ tvMakerOpen 生キー修正）
 > このメモは、そのまま次回の最初のメッセージに貼っても再開できます。
 > リポジトリにこのファイルがあれば「`NEXT_SESSION_HANDOFF.md` を読んで現状を確認して」でOKです。
 > 詳しい仕様（ファイル間の約束・保存データ・落とし穴）は **docs/HANDOFF.md** にあります。
@@ -88,13 +88,16 @@
   - `TrkFX.tap(2048)` で**エフェクト後の音**を読み、**16種類の見え方**＋**4色**（ネオン／夕焼け／モノクロ／レインボー）、**感度**スライダー、**ピークの残像**を描きます。
   - 見え方16種：📊 `bars`／🪞 `mirror`／〰 `wave`／⭕ `ring`／🎚 `daw`（録音ソフトのタイムライン）／🧭 `vu`（アナログの針2本）／🔴 `led`（レベルメーター＋CLIP）／🌈 `spectro`（ヒートマップ）／💓 `ecg`（心電図＋BPM）／📉 `seismo`（地震計＋震度）／📡 `radar`（掃引とブリップ）／🎹 `piano`（ピアノロール）／📈 `slide`（業績グラフ＋達成率）／💹 `board`（株価ボード風）／🤥 `lie`（嘘発見器）／🔥 `fire`（焚き火）。
   - 追加は **① `STYLE_KEYS`＋`STYLE_DRAW` ② `TEXT` の `specStyle<名前>` を4言語 ③ `jsdom-spectrum.mjs` の `WANT_STYLES`** の3か所。`core.js` の検証は `TrkSpec.styles()` を見て、無ければ初期4種に落ちるだけ（spectrum.js が読み込み時に `prefs` から読み直します）。
+  - **色は8種**：ネオン／夕焼け／モノクロ／レインボー／**`trk`（赤×蒼＝`--ui-accent #ff3b55` → `--ka #55aaff`）**／桜`/sakura`／毒々`/acid`／VHS。色見本は JS の `THEME_SWATCH` → CSS 変数 `--specSwatch`。
+  - **📊 曲名バナーのスキン**：`#songBanner` いっぱいに `canvas.specBannerCanvas` を敷き、**左上の「＋」**（`button.specZip`）で開閉（開くと高さ320px＋「＋」の隣（左上。右上は library.js の「▶ ここから再生」ボタンなので避ける）にクイック操作 `div.specSkinTools`＝⇄次の見え方と色の丸ボタン8個）。**ピーク／TVに重ねるはオプション（#specPanel）側のまま**にして、開いたときに幅が広がらないようにしています。バナーのキャンバスだけ `GATES`（WeakMap）で `specSkin` オンのときだけ描き、`DIRTY`（WeakSet）で消しすぎないようにしています。
+  - **初期値**：⭕ リング＋ネオン。`specSkin`（バナーのスキン）は初期オン、`specSkinOpen`（最初から開く）は初期オフ。v1 の頃の `specStyle:"bars"` が残っている保存だけ、一度だけ `ring` に移します（`specSkin` キーの有無で判定）。
   - 置き場所は2つ：**🎛 ラックの「⚙ 詳しい設定」の中**（大きな画面・その場で見え方を確認）と、**設定画面「🔊 サウンド」の下の `#specPanel`**（こちらにもキャンバスあり）。
   - **📺 TVの画面に重ねられます**（`settings.specTv`・初期オフ。`mix-blend-mode:screen` で映像の上に重なる。ゲーム中は出ません）。
   - アナライザーは1つを使い回し、**ユーザー操作のあと／実際に音が鳴っているときだけ**作ります（`createMediaElementSource` は呼びません＝fx.js の担当）。音を見ていないときは 4fps に落ちて休みます。
   - **`?safe=1`** では読み戻さず、表示もせず、`tap()` もしません。`prefers-reduced-motion` では本数とピークを減らします。
   - 新しい設定：`specOn`／`specStyle`／`specTheme`／`specGain`／`specPeaks`／`specTv`（core.js の `settings`・`enterSafeMode()`・`resetVideoPrefs()` に追加済み）。窓口は **`window.TrkSpec`**（version 1）。
 - **🐛 生キーの修正**：TVドックの「🎨 カスタムTVスキンを作る」ボタンが `tvMakerOpen` という**生キー**で表示されていたのを `tvmOpen` に修正（新しく作った i18n 監査で発見）。
-- **検証**：`node --check` 全ファイルOK／jsdom ハーネス3本（`jsdom-smoke` 7/7・`jsdom-spectrum` **51/51**（16種すべてを順に描いて赤エラー0・保存の `ecg` が読み直しでも残る）・`jsdom-i18n-audit` 10/10・エラー0）。翻訳キーは **1092キー × 4言語**（欠け0・二重定義0・生キー0）。
+- **検証**：`node --check` 全ファイルOK／jsdom ハーネス3本（`jsdom-smoke` 7/7・`jsdom-spectrum` **76/76**（16種すべてを順に描いて赤エラー0・保存の見え方が読み直しでも残る・📊曲名バナーのスキンと「＋」・色8種・初期値の移行）・`jsdom-i18n-audit` 10/10・エラー0）。翻訳キーは **1101キー × 4言語**（欠け0・二重定義0・生キー0）。
 
 ### 1-2. 規模（数字で見る現在地）
 
@@ -105,7 +108,7 @@
 | 映像フィルター | **45**（basic/vivid/retro/cinema/effect/weird/nature） |
 | サウンドエフェクト | **115 プリセット**（fx.js・fx-presets.js は🧊凍結中） |
 | 曲リストの棚スキン | **16**（＋🎲おまかせ） |
-| 言語 | 4（ja/en/zh/ko）・**1092 キー × 4**（欠け0・生キー0・二重定義0） |
+| 言語 | 4（ja/en/zh/ko）・**1101 キー × 4**（欠け0・生キー0・二重定義0） |
 | 記録 | 難易度5・速度別・称号・公認パック（✔） |
 
 ### 1-3. 機能の要点（詳細は docs/HANDOFF.md）
@@ -118,7 +121,7 @@
 - **棚スキン（lib-skins.js）16種**：🎛タブプレーヤー／📝ノート／🌈シール帳／🗄カード目録／📼カセットラベル／🖍黒板／
   🕹レトロPC／📁クリアファイル／🎰ジュークボックス／📻ラジオ番組表／🚉電光掲示板 ＋ **💿レコード棚／📼レンタルビデオ／🎤カラオケ目次／🗂️図書館の書架／🍱お品書き**（全16種）。
   曲リストの 🎨 ボタンでその場で切り替え（`settings.libSkin` / `libSkinQuick`）。
-- **📊 スペクトラム（spectrum.js）**：`TrkFX.tap()` でエフェクト後の音を見て、**16種の見え方**（📊バー／🪞ミラー／〰波形／⭕リング／🎚DAW波形／🧭VUメーター／🔴LEDラダー／🌈スペクトログラム／💓心電図／📉地震計／📡レーダー／🎹ピアノロール／📈業績グラフ／💹周波数ボード／🤥嘘発見器／🔥焚き火）＋4色で描きます。置き場所は 🎛 ラックの「くわしい」の中と設定画面の `#specPanel`。**📺 TVの画面に重ねられます**（初期オフ。`settings.specTv`）。窓口は **`window.TrkSpec`**、保存は `specOn`／`specStyle`／`specTheme`／`specGain`／`specPeaks`／`specTv`。`?safe=1` では出さず、tap もしません。
+- **📊 スペクトラム（spectrum.js）**：`TrkFX.tap()` でエフェクト後の音を見て、**16種の見え方**（📊バー／🪞ミラー／〰波形／⭕リング／🎚DAW波形／🧭VUメーター／🔴LEDラダー／🌈スペクトログラム／💓心電図／📉地震計／📡レーダー／🎹ピアノロール／📈業績グラフ／💹周波数ボード／🤥嘘発見器／🔥焚き火）＋**8色**（ネオン／夕焼け／モノクロ／レインボー／trk（赤×蒼）／桜／毒々／VHS）で描きます。置き場所は**📊 曲名バナー（スキン・左上の「＋」で開閉）**、🎛 ラックの「くわしい」の中、設定画面の `#specPanel`。**📺 TVの画面に重ねられます**（初期オフ。`settings.specTv`）。窓口は **`window.TrkSpec`**（version 3）、保存は `specOn`／`specStyle`／`specTheme`／`specGain`／`specPeaks`／`specTv`／`specSkin`／`specSkinOpen`。`?safe=1` では出さず、tap もしません。
 - **⭐ お気に入り（favs.js）**：曲・映像フィルター・エフェクトの3系統を **⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り** の4フォルダで管理。
   **上限なし**、🧊＝凍結、📌＝「絶対に外れない」（🎲の候補に必ず入る）、📤元は抽選に出ない、`trk-favs` で書き出し／読み込み（足し算）。
 - **🩷 MMD（mmd.js）**：モデル（.pmx/.pmd）と .vmd は**同梱せず持ち込み**。内蔵モーション3種は自作VMD。曲のBPMに同期。
@@ -207,7 +210,7 @@ for f in js/*.js js/characters/*.js js/addons/*.js; do node --check "$f" || echo
 
 - 実ブラウザが使えない環境では **jsdom** で配線を拾える（`npm i jsdom` → `/home/user/browsercheck` で `for f in jsdom-*.mjs; do node "$f"; done`）
   - canvas は `getContext` をスタブする。**`createImageData` も返す**こと（TV砂嵐が `img.data` を読む）
-  - ⚠ **2026-10-05 の時点で、ハーネスは3本だけです**（サンドボックスが入れ替わったため、前回までの18本は残っていません）。作り直したのは `jsdom-smoke.mjs`（起動・赤エラー0）／`jsdom-spectrum.mjs`（📊 スペクトラム **51項目**）／`jsdom-i18n-audit.mjs`（4言語の欠け・二重定義・生キー・コードが使うキーの実在）。
+  - ⚠ **2026-10-05 の時点で、ハーネスは3本だけです**（サンドボックスが入れ替わったため、前回までの18本は残っていません）。作り直したのは `jsdom-smoke.mjs`（起動・赤エラー0）／`jsdom-spectrum.mjs`（📊 スペクトラム **76項目**）／`jsdom-i18n-audit.mjs`（4言語の欠け・二重定義・生キー・コードが使うキーの実在）。
     共通部分は `trkenv.mjs` にあります（**jsdom 30 は `ResourceLoader` が無い**ので `resources: { interceptors: [requestInterceptor(...)] }` を使う／canvas・AudioContext・indexedDB・matchMedia をスタブ／キャンバスの `clientWidth` は 480 を返す）。増やすときは `jsdom-smoke.mjs` を雛形に。
   - 前回までのハーネス名（記録）：`smoke` `func` `i18n` `lang-fav` `libtabs` `menu` `order2` `prev` `rack` `reload` `skinbtn` `dock` `addons` `favs` `mmd` `songwhile` `i18n-audit` `mmdpreset`
     - `jsdom-mmdpreset.mjs`（🆕）は fetch と three／three-mmd-loader を偽物に差し替えて、💠 preset.json 検出→ボタン→読み込み→credit/motion/bpm 自動設定、jump/idol のVMD生成、新キー4言語を見る。**jsdom には matchMedia が無い**ので `beforeParse` でスタブする（`TEXT`／`settings` は const/let なので `win.eval` 経由で見る）
@@ -259,6 +262,10 @@ for f in js/*.js js/characters/*.js js/addons/*.js; do node --check "$f" || echo
 - [ ] 📊 スペクトラム：**16種の見え方**（🎚DAW波形／🧭VUメーター／🔴LEDラダー／🌈スペクトログラム／💓心電図／📉地震計／📡レーダー／🎹ピアノロール／📈業績グラフ／💹周波数ボード／🤥嘘発見器／🔥焚き火 も）が、その場で切り替わって動く（設定画面側でも）
 - [ ] 📊 スペクトラム：💓心電図で上下の触れ方（音の立ち上がり）が見える／📈業績グラフで「どの帯がどれだけ出ているか」が分かる／🎚DAW波形のタイムラインが流れる
 - [ ] 📊 スペクトラム：4色・感度・ピークが、その場で切り替わる（設定画面側でも）
+- [ ] 📊 スペクトラム：**右上の曲名バナーがスペクトラムのスキン**になっていて、音に合わせて動く（曲の絵の上に重なる／背景を塗る見え方は絵が隠れる）
+- [ ] 📊 スペクトラム：バナー左上の**「＋」で大きく開く**（高さが増えて、⇄次の見え方と色の丸ボタンが出る）／「−」で戻る／リロードしても状態が残る
+- [ ] 📊 スペクトラム：**色8種**（特に **trk（赤×蒼）**・桜・毒々・VHS）が、設定側とバナー側のどちらで切り替えても合う
+- [ ] 📊 スペクトラム：**ピークとTVに重ねるはオプション（設定）側**にある／開いたバナーが横に広がりすぎない（モバイル幅でも崩れない）
 - [ ] 📊 スペクトラム：📺 TVの画面に重ねるチェックで、映像の上に重なる／オフで消える
 - [ ] 📊 スペクトラム：音が鳴っていないときは「曲を再生すると動きます。」が出て、平らな線になる
 - [ ] 📊 スペクトラム：最初に使ったときも音が黙らない（アナライザーは操作のあとに作ります）

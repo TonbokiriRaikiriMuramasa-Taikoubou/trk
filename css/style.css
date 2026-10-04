@@ -1118,11 +1118,34 @@ details.panel[open]>summary{margin-bottom:14px}
 .specLabel{margin:10px 0 0;font-weight:800}
 /* 色のチップは、どの色か分かるように小さな点を付ける */
 .specSegColor button{display:inline-flex;align-items:center;justify-content:center;gap:5px}
-.specSegColor button::before{content:"";width:10px;height:10px;border-radius:50%;background:currentColor;flex:0 0 auto}
-.specSegColor button[data-spec-val="neon"]::before{background:#22d3ee}
-.specSegColor button[data-spec-val="sunset"]::before{background:linear-gradient(90deg,#ffb703,#ff4d9d)}
-.specSegColor button[data-spec-val="mono"]::before{background:#e5e7eb}
-.specSegColor button[data-spec-val="rainbow"]::before{background:linear-gradient(90deg,#f87171,#fbbf24,#4ade80,#60a5fa,#c084fc)}
+.specSegColor button::before{content:"";width:10px;height:10px;border-radius:50%;flex:0 0 auto;
+  background:var(--specSwatch,currentColor)}
 #tvDock .specTvCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;
   mix-blend-mode:screen;opacity:var(--specTvAlpha,.92);transition:opacity .25s}
 #tvDock.off .specTvCanvas{opacity:0}
+
+/* ===== 📊 曲名バナーのスキン（js/spectrum.js が #songBanner の中に敷く） =====
+   ・左上の「＋」で開くと高さが増える（幅は広げない：操作は小さな丸ボタンだけ）
+   ・文字が読めるように、下側だけ暗くする */
+.banner .specBannerCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.banner.hasImg::before{z-index:1}
+.banner .bannerText{z-index:2}
+.banner.specSkin::after{content:"";position:absolute;left:0;right:0;bottom:0;height:46%;z-index:1;pointer-events:none;
+  background:linear-gradient(0deg,rgba(0,0,0,.72),rgba(0,0,0,0))}
+.banner.specOpen{height:320px}
+.specZip{position:absolute;top:8px;left:8px;z-index:4;width:32px;height:32px;padding:0;border-radius:50%;
+  font-size:20px;font-weight:900;line-height:1;display:inline-flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.52);border:1px solid var(--ui-border);color:#fff}
+.specZip:hover{background:var(--ui-accent);border-color:transparent;color:#fff}
+/* ⚠ バナーの右上は library.js の「▶ ここから再生」ボタン（top:12px;right:12px）なので、
+   クイック操作は「＋」の隣（左上）に置いて、重ならないように右側を空けておく */
+.specSkinTools{position:absolute;top:8px;left:48px;z-index:4;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  justify-content:flex-start;max-width:calc(100% - 150px)}
+.specNext{padding:6px 10px;border-radius:999px;font-size:13px;font-weight:800;white-space:nowrap;
+  background:rgba(0,0,0,.55);border:1px solid var(--ui-border);color:#fff}
+.specNext:hover{background:var(--ui-accent);border-color:transparent;color:#fff}
+.specDots{display:flex;flex-wrap:wrap;gap:5px}
+.specDot{width:22px;height:22px;padding:0;border-radius:50%;border:2px solid rgba(255,255,255,.35);
+  background:var(--specSwatch,currentColor)}
+.specDot:hover{border-color:#fff}
+.specDot.selected{border-color:#fff;box-shadow:0 0 0 2px rgba(0,0,0,.55)}

@@ -50,7 +50,7 @@ trk! の開発を再開します。docs/HANDOFF.md を貼ります。
 | 公認パックの曲・譜面・作者のことば | 作者さんのもの。GPLの対象外。曲はリポジトリに入れず、作者さんの配布ページに置く |
 | three.js / three-vrm | MIT（VRM使用時のみCDNから読み込み。three 0.180.0 / three-vrm 3.5.5） |
 | @yohawing/three-mmd-loader | MIT（MMD使用時のみCDNから読み込み。0.8.4。three非依存の独立実装） |
-| 内蔵モーション16種（step/swing/turn/jump/idol＋🎵BPMシリーズ11種） | **trk! がコードで作る自作VMD**（`js/mmd.js` の `buildVmd()`）。GPLの対象 |
+| 内蔵モーション20種（step/swing/turn/jump/idol＋🎵BPMシリーズ15種） | **trk! がコードで作る自作VMD**（`js/mmd.js` の `buildVmd()`）。GPLの対象 |
 | 💠 同梱プリセットモデル（`assets/mmd/`） | **GPL対象外**。れあどめ原文で再配布OKを確認できたモデルだけ置ける（例：Lat式ミク）。NOTICE.md の 3a 参照 |
 
 - 以前のREADMEにあった「GPLで販売禁止」「osu!と同じGPL」は**誤り**として訂正済み（GPLは販売を禁止できない／osu!のコードはMIT）。

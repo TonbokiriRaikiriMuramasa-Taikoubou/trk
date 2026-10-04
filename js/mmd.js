@@ -36,6 +36,8 @@ Object.assign(TEXT.ja, {
   mmdMotionNone:"（モーションなし）",
   mmdMotionStep:"内蔵① ステップ（120BPM）", mmdMotionSwing:"内蔵② ゆらゆら（100BPM）", mmdMotionTurn:"内蔵③ ターン（120BPM）",
   mmdMotionJump:"内蔵④ ジャンプ（130BPM・はで）", mmdMotionIdol:"内蔵⑤ アイドル（128BPM）",
+  mmdMotionIevan:"🎵120 ネギスピン（Ievan Polkkaむけ）", mmdMotionKyukura:"🎵165 くらくら（きゅうくらりんむけ）",
+  mmdMotionRabbit:"🎵173 うさみみ（ラビットホールむけ・5拍子スキップ）", mmdMotionMesmer:"🎵185 すましシャッフル（メズマライザーむけ）",
   mmdMotionDune:"🎵135 こうしん（砂の惑星むけ）", mmdMotionGreen:"🎵145 ペンライト（グリーンライツむけ）",
   mmdMotionMiku39:"🎵146 ねぎふり（みくみくむけ）", mmdMotionTyw:"🎵150 せかいへ（Tell Your Worldむけ）",
   mmdMotionSenbon:"🎵154 キレの和（千本桜むけ）", mmdMotionMelt:"🎵170 きゅん（メルトむけ）",
@@ -74,6 +76,8 @@ Object.assign(TEXT.en, {
   mmdMotionNone:"(no motion)",
   mmdMotionStep:"Built-in 1: Step (120 BPM)", mmdMotionSwing:"Built-in 2: Sway (100 BPM)", mmdMotionTurn:"Built-in 3: Turn (120 BPM)",
   mmdMotionJump:"Built-in 4: Jump (130 BPM, flashy)", mmdMotionIdol:"Built-in 5: Idol pump (128 BPM)",
+  mmdMotionIevan:"🎵120 Leek spin (for Ievan Polkka)", mmdMotionKyukura:"🎵165 Dizzy puppet (for Kyu-kurarin)",
+  mmdMotionRabbit:"🎵173 Bunny-ear hop (for Rabbit Hole, 5-beat skip)", mmdMotionMesmer:"🎵185 Cartoon shuffle (for Mesmerizer)",
   mmdMotionDune:"🎵135 March (for Sand Planet)", mmdMotionGreen:"🎵145 Penlight (for Greenlights Serenade)",
   mmdMotionMiku39:"🎵146 Leek wave (for Miku Miku ni…)", mmdMotionTyw:"🎵150 To the world (for Tell Your World)",
   mmdMotionSenbon:"🎵154 Sharp wa-style (for Senbonzakura)", mmdMotionMelt:"🎵170 Heart-flutter (for Melt)",
@@ -112,6 +116,8 @@ Object.assign(TEXT.zh, {
   mmdMotionNone:"（无动作）",
   mmdMotionStep:"内置① 踏步（120BPM）", mmdMotionSwing:"内置② 摇摆（100BPM）", mmdMotionTurn:"内置③ 转身（120BPM）",
   mmdMotionJump:"内置④ 跳跃（130BPM・华丽）", mmdMotionIdol:"内置⑤ 偶像应援（128BPM）",
+  mmdMotionIevan:"🎵120 甩葱旋转（Ievan Polkka风）", mmdMotionKyukura:"🎵165 晕乎乎（Kyu-kurarin风）",
+  mmdMotionRabbit:"🎵173 兔耳蹦跳（Rabbit Hole风・5拍子）", mmdMotionMesmer:"🎵185 卡通摇摆（Mesmerizer风）",
   mmdMotionDune:"🎵135 行进（砂之惑星风）", mmdMotionGreen:"🎵145 荧光棒（Greenlights风）",
   mmdMotionMiku39:"🎵146 挥葱（Miku Miku风）", mmdMotionTyw:"🎵150 向世界（Tell Your World风）",
   mmdMotionSenbon:"🎵154 和风利落（千本樱风）", mmdMotionMelt:"🎵170 心动（Melt风）",
@@ -150,6 +156,8 @@ Object.assign(TEXT.ko, {
   mmdMotionNone:"(모션 없음)",
   mmdMotionStep:"내장① 스텝 (120BPM)", mmdMotionSwing:"내장② 흔들흔들 (100BPM)", mmdMotionTurn:"내장③ 턴 (120BPM)",
   mmdMotionJump:"내장④ 점프 (130BPM・화려)", mmdMotionIdol:"내장⑤ 아이돌 (128BPM)",
+  mmdMotionIevan:"🎵120 파 돌리기 (Ievan Polkka풍)", mmdMotionKyukura:"🎵165 어질어질 (큐쿠라린풍)",
+  mmdMotionRabbit:"🎵173 토끼귀 폴짝 (Rabbit Hole풍・5박자)", mmdMotionMesmer:"🎵185 카툰 셔플 (메즈머라이저풍)",
   mmdMotionDune:"🎵135 행진 (모래의 행성풍)", mmdMotionGreen:"🎵145 펜라이트 (Greenlights풍)",
   mmdMotionMiku39:"🎵146 파 흔들기 (Miku Miku풍)", mmdMotionTyw:"🎵150 세계로 (Tell Your World풍)",
   mmdMotionSenbon:"🎵154 와풍 절도 (센본자쿠라풍)", mmdMotionMelt:"🎵170 두근 (Melt풍)",
@@ -309,6 +317,19 @@ const BUILTIN = {
   } },
   /* ---- 🎵 BPMシリーズ：人気ミク曲のテンポに合わせた振り付け（曲名は目安。モーション自体は trk! の自作VMD） ----
      基準BPM（mmdBpm）が 0 のとき、内蔵モーションはそれぞれの bpm を基準に曲へ自動シンクします。 */
+  ievan120: { label:"mmdMotionIevan", bpm:120, seconds:4, pose:t => {   // ネギスピン（8拍・はちゅね風にゆれながら回すだけ）
+    const b = t * 2, spin = 2 * Math.PI * b, sway = Math.sin(Math.PI * b / 4);
+    return {
+      "センター": { pos:[0.06 * sway, -0.03 * Math.abs(Math.sin(Math.PI * b)), 0], rot:[0, 0, 4 * sway] },
+      "上半身": { rot:[2, 5 * sway, 3 * sway] },
+      "首":    { rot:[2, -4 * sway, -8 * sway] },
+      "頭":    { rot:[-3, 0, -12 * sway] },
+      "左腕":  { rot:[0, 0, -66 + 3 * sway] },
+      "左ひじ":{ rot:[0, -14, 0] },
+      "右腕":  { rot:[22 * Math.sin(spin), 0, 24 + 12 * Math.cos(spin)] },
+      "右ひじ":{ rot:[0, 52 + 18 * Math.sin(spin + 1.2), 0] }
+    };
+  } },
   dune135: { label:"mmdMotionDune", bpm:135, seconds:3.56, pose:t => {   // こうしん（8拍）
     const b = t * 2.25, arm = Math.sin(Math.PI * b), bob = Math.abs(Math.sin(Math.PI * b));
     return {
@@ -374,6 +395,19 @@ const BUILTIN = {
       "右ひじ":{ rot:[0, 95 * Math.max(0, zig) + 10, 0] }
     };
   } },
+  kyukura165: { label:"mmdMotionKyukura", bpm:165, seconds:2.91, pose:t => { // くらくら（8拍・マリオネットみたいにゆれる）
+    const b = t * 2.75, w = Math.PI * b / 2, fast = 2 * Math.PI * b;
+    return {
+      "センター": { pos:[0.12 * Math.sin(w), 0.05 * Math.cos(w) - 0.08, 0], rot:[0, 0, 4 * Math.sin(w)] },
+      "上半身": { rot:[3 * Math.cos(w), 6 * Math.sin(w), 5 * Math.sin(w + 0.4)] },
+      "首":    { rot:[-3 * Math.cos(w + 0.5), 0, 8 * Math.sin(w + 0.5)] },
+      "頭":    { rot:[6 * Math.cos(w), 0, 12 * Math.sin(w)] },
+      "左腕":  { rot:[8 * Math.sin(fast), 0, -30 + 14 * Math.sin(fast) ] },
+      "右腕":  { rot:[-8 * Math.sin(fast + 1.2), 0, 30 - 14 * Math.sin(fast + 1.2)] },
+      "左ひじ":{ rot:[0, -42 - 26 * Math.sin(fast + 0.6), 0] },
+      "右ひじ":{ rot:[0, 42 + 26 * Math.sin(fast + 1.8), 0] }
+    };
+  } },
   melt170: { label:"mmdMotionMelt", bpm:170, seconds:2.82, pose:t => {   // きゅん（8拍・むねの前で手を合わせてゆれる）
     const b = t * 170 / 60, w = Math.PI * b / 2, s = Math.sin(w), beat = Math.max(0, Math.sin(Math.PI * b));
     return {
@@ -400,6 +434,21 @@ const BUILTIN = {
       "右ひじ":{ rot:[0, 15 + 75 * (1 - u), 0] }
     };
   } },
+  rabbit173: { label:"mmdMotionRabbit", bpm:173, seconds:3.47, pose:t => { // うさみみ（10拍＝5拍子×2・4ホップ＋1スキップ）
+    const b = t * 173 / 60, b5 = b % 5, skip = b5 >= 4;                  // 5拍目だけ2倍速のスキップ＝変拍子感
+    const hop = Math.max(0, Math.sin(Math.PI * b5 * (skip ? 2 : 1)));
+    const sway = Math.sin(Math.PI * b / 5), wig = Math.sin(2 * Math.PI * b);
+    return {
+      "センター": { pos:[0.14 * sway, 0.1 * hop * hop - 0.05, 0], rot:[0, 0, 3 * sway] },
+      "上半身": { rot:[2 * hop, 6 * sway, 2 * sway] },
+      "首":    { rot:[-3 * hop, -5 * sway, 4 * wig * (skip ? 1 : 0.3)] },
+      "頭":    { rot:[-4 * hop, 0, 6 * sway] },
+      "左腕":  { rot:[0, 0, 52 + 4 * wig] },
+      "右腕":  { rot:[0, 0, -52 - 4 * wig] },
+      "左ひじ":{ rot:[0, -112 - 8 * wig, 0] },
+      "右ひじ":{ rot:[0, 112 + 8 * wig, 0] }
+    };
+  } },
   wedh174: { label:"mmdMotionWedh", bpm:174, seconds:2.76, pose:t => {   // ダンスホール（8拍・左右交互にうでを上げる）
     const b = t * 174 / 60, s = Math.sin(Math.PI * b / 2), nod = Math.max(0, Math.sin(Math.PI * b));
     const L = Math.max(0, s), R = Math.max(0, -s);
@@ -412,6 +461,21 @@ const BUILTIN = {
       "右腕":  { rot:[0, 0, 58 - 100 * R] },
       "左ひじ":{ rot:[0, -25 + 15 * L, 0] },
       "右ひじ":{ rot:[0, 25 - 15 * R, 0] }
+    };
+  } },
+  mesmer185: { label:"mmdMotionMesmer", bpm:185, seconds:2.59, pose:t => { // すましシャッフル（8拍・レトロカートゥーンのびよんびよん）
+    const b = t * 185 / 60, beat = Math.abs(Math.sin(Math.PI * b)), alt = Math.sin(Math.PI * b / 2);
+    const pend = Math.sin(Math.PI * b);                                  // 1拍で腕がふりこ
+    return {
+      "センター": { pos:[0.22 * alt, 0.08 * beat - 0.12 + 0.06 * beat * beat, 0], rot:[0, 0, 5 * alt] },
+      "上半身": { rot:[2 * beat, 12 * alt, -4 * alt] },
+      "上半身2":{ rot:[0, 6 * alt, 0] },
+      "首":    { rot:[4 * beat, -8 * alt, 10 * alt] },
+      "頭":    { rot:[5 * beat, 0, -13 * alt] },
+      "左腕":  { rot:[38 * pend, 0, -52] },
+      "右腕":  { rot:[-38 * pend, 0, 52] },
+      "左ひじ":{ rot:[0, -22 - 14 * pend, 0] },
+      "右ひじ":{ rot:[0, 22 - 14 * pend, 0] }
     };
   } },
   rolling194: { label:"mmdMotionRolling", bpm:194, seconds:2.47, pose:t => { // ぐるぐる（8拍・からだで円をえがく）

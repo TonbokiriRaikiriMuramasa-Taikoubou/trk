@@ -33,6 +33,10 @@ Object.assign(TEXT.ja, {
   mmdCheck:"🔎 動作チェック（実機で）", mmdCopy:"📋 結果をコピー", mmdCopied:"📋 コピーしました", mmdCopyNg:"📋 コピーできませんでした（下の行を選んでコピーしてください）",
   mmdCheckHint:"うまく動かないときは、これを押すと WebGL・CDN（three／three-mmd-loader）・モデル・モーションの状態を調べて1か所に出します。うまくいかない場合は、この結果を貼ってもらえれば原因を切り分けられます。",
   mmdCheckRunning:"チェック中…（初回はCDNから読み込むので、少し待ちます）", mmdCheckOk:"✅ チェックOK（WebGL・CDN・ライブラリ）", mmdCheckNg:"❌ チェックで問題が見つかりました（下の結果を見てください）",
+  mmdQuickTitle:"🩷 マスコットのうごき", mmdQuickWatch:"👀 ひとやすみ", mmdQuickAuto:"🎲 おまかせ",
+  mmdQuickPick:"🎯 えらぶ", mmdQuickOff:"💤 お留守番",
+  mmdQuickUILabel:"🩷 選曲画面に「マスコットのうごき」ミニ操作を出す",
+  mmdQuickFavTip:"⭐ お気に入りに入れる／外す（えらぶの一覧で上に来ます）",
   mmdMotionNone:"（モーションなし）",
   mmdMotionAuto:"🎲 おまかせ（曲のBPMにいちばん近い🎵を自動で。設定しなおし不要）",
   mmdMotionWatch:"👀 みてる（こちらをじっと・BPM非依存）", mmdMotionStroll:"👀 たたずむ（見まわす・BPM非依存）",
@@ -77,6 +81,10 @@ Object.assign(TEXT.en, {
   mmdCheck:"🔎 Check (on your device)", mmdCopy:"📋 Copy the result", mmdCopied:"📋 Copied", mmdCopyNg:"📋 Could not copy (select the lines below)",
   mmdCheckHint:"If something does not work, press this: it checks WebGL, the CDN (three / three-mmd-loader), your model and your motion, and prints one block. Paste that block and we can find the cause.",
   mmdCheckRunning:"Checking… (the first run loads from the CDN, so give it a moment)", mmdCheckOk:"✅ Check OK (WebGL, CDN, libraries)", mmdCheckNg:"❌ Something is wrong (see the lines below)",
+  mmdQuickTitle:"🩷 Mascot moves", mmdQuickWatch:"👀 Chill", mmdQuickAuto:"🎲 Auto",
+  mmdQuickPick:"🎯 Pick", mmdQuickOff:"💤 Away",
+  mmdQuickUILabel:"🩷 Show the \"Mascot moves\" mini controls on song select",
+  mmdQuickFavTip:"⭐ Add to / remove from favorites (they come first in the Pick list)",
   mmdMotionNone:"(no motion)",
   mmdMotionAuto:"🎲 Auto (pick the 🎵 nearest to the song's BPM — set once, works everywhere)",
   mmdMotionWatch:"👀 Watching you (BPM-free)", mmdMotionStroll:"👀 Standing by (looking around, BPM-free)",
@@ -121,6 +129,10 @@ Object.assign(TEXT.zh, {
   mmdCheck:"🔎 运行检查（在实机上）", mmdCopy:"📋 复制结果", mmdCopied:"📋 已复制", mmdCopyNg:"📋 无法复制（请选中下面的行）",
   mmdCheckHint:"如果无法运行，按这里会检查 WebGL、CDN（three／three-mmd-loader）、模型和动作，并把结果汇总成一段。把这结果贴出来就能定位原因。",
   mmdCheckRunning:"检查中…（初次会从 CDN 读取，请稍等）", mmdCheckOk:"✅ 检查通过（WebGL・CDN・库）", mmdCheckNg:"❌ 检查发现问题（请看下面的结果）",
+  mmdQuickTitle:"🩷 吉祥物动作", mmdQuickWatch:"👀 休息", mmdQuickAuto:"🎲 自动",
+  mmdQuickPick:"🎯 挑选", mmdQuickOff:"💤 不在家",
+  mmdQuickUILabel:"🩷 在选曲画面显示「吉祥物动作」迷你操作",
+  mmdQuickFavTip:"⭐ 加入／移出收藏（在挑选列表中会排在前面）",
   mmdMotionNone:"（无动作）",
   mmdMotionAuto:"🎲 自动（选择最接近歌曲BPM的🎵・设置一次即可）",
   mmdMotionWatch:"👀 看着你（与BPM无关）", mmdMotionStroll:"👀 伫立（四处张望・与BPM无关）",
@@ -165,6 +177,10 @@ Object.assign(TEXT.ko, {
   mmdCheck:"🔎 동작 확인 (실기에서)", mmdCopy:"📋 결과 복사", mmdCopied:"📋 복사했습니다", mmdCopyNg:"📋 복사할 수 없습니다(아래 줄을 선택해 주세요)",
   mmdCheckHint:"잘 안 될 때 이걸 누르면 WebGL·CDN(three／three-mmd-loader)·모델·모션 상태를 한곳에 모아 보여 줍니다. 안 되는 경우 이 결과를 붙여 주시면 원인을 좁힐 수 있습니다.",
   mmdCheckRunning:"확인 중… (처음에는 CDN에서 읽어 오므로 조금 기다려 주세요)", mmdCheckOk:"✅ 확인 OK (WebGL·CDN·라이브러리)", mmdCheckNg:"❌ 확인에서 문제를 찾았습니다(아래 결과를 봐 주세요)",
+  mmdQuickTitle:"🩷 마스코트 움직임", mmdQuickWatch:"👀 휴식", mmdQuickAuto:"🎲 자동",
+  mmdQuickPick:"🎯 고르기", mmdQuickOff:"💤 자리비움",
+  mmdQuickUILabel:"🩷 선곡 화면에 '마스코트 움직임' 미니 조작 표시",
+  mmdQuickFavTip:"⭐ 즐겨찾기에 넣기／빼기 (고르기 목록에서 위에 옵니다)",
   mmdMotionNone:"(모션 없음)",
   mmdMotionAuto:"🎲 자동 (곡 BPM에 가장 가까운 🎵 선택・한 번만 설정하면 끝)",
   mmdMotionWatch:"👀 바라보기 (BPM 무관)", mmdMotionStroll:"👀 서성이기 (두리번・BPM 무관)",
@@ -934,6 +950,86 @@ function animate(now) {
 }
 requestAnimationFrame(animate);
 
+/* ============ 🩷 選曲画面のミニ操作（⏩速度パネルの下。裏＝設定はモデル読み込み用のまま） ============
+   表のUIは4つだけ：👀ひとやすみ（BPM非依存）／🎲おまかせ／🎯えらぶ（⭐お気に入りが上に来る）／💤お留守番。
+   モデルが読み込まれているときだけ出ます（設定の mmdQuickUI チェックで隠せる・?safe=1 では出ない） */
+let quickPanel = null, quickSeg = null, quickPickRow = null, quickSelect = null, quickFavBtn = null, quickName = null;
+let quickPickOpen = false;                           // 🎯タップでセレクトを開いたままにする
+const quickMode = () =>
+  settings.mascot === "none" ? "off" :
+  motionKind === "auto" ? "auto" :
+  (BUILTIN[motionKind] && BUILTIN[motionKind].fixed) ? "watch" : "pick";
+function buildQuickPanel() {
+  if (quickPanel || !$("playBtn")) return;
+  quickPanel = el("section", "panel"); quickPanel.id = "mmdQuickPanel"; quickPanel.hidden = true;
+  const head = el("div", "libHead"), title = el("h3");
+  title.id = "mmdQuickTitle"; title.style.margin = "0";
+  quickName = el("b", "mono"); head.append(title, quickName);
+  quickSeg = el("div", "seg"); quickSeg.id = "mmdQuickSeg"; quickSeg.style.marginTop = "8px";
+  for (const [mode, key] of [["watch", "mmdQuickWatch"], ["auto", "mmdQuickAuto"], ["pick", "mmdQuickPick"], ["off", "mmdQuickOff"]]) {
+    const b = el("button"); b.type = "button"; b.dataset.quick = mode; b.dataset.i18n = key;
+    b.addEventListener("click", () => quickTap(mode));
+    quickSeg.append(b);
+  }
+  quickPickRow = el("div", "inline tight"); quickPickRow.style.marginTop = "8px";
+  quickSelect = document.createElement("select"); quickSelect.id = "mmdQuickSelect"; quickSelect.style.flex = "1";
+  quickSelect.addEventListener("change", () => { loadMotionKind(quickSelect.value); });
+  quickFavBtn = el("button"); quickFavBtn.type = "button"; quickFavBtn.id = "mmdQuickFav";
+  quickFavBtn.addEventListener("click", () => {
+    const id = (motionKind === "auto" ? "" : motionKind);
+    if (!id || !BUILTIN[id]) return;
+    const favs = settings.mmdMotionFavs || [];
+    settings.mmdMotionFavs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id].slice(0, 50);
+    saveUserPrefs(); renderQuick();
+  });
+  quickPickRow.append(quickSelect, quickFavBtn);
+  quickPanel.append(head, quickSeg, quickPickRow);
+  ($("speedPanel") || $("playBtn")).after(quickPanel);
+}
+function quickTap(mode) {
+  quickPickOpen = (mode === "pick");
+  if (mode === "off") { settings.mascot = "none"; saveUserPrefs(); updateMascotUI(); renderQuick(); return; }
+  if (settings.mascot !== "mmd" && model) { settings.mascot = "mmd"; saveUserPrefs(); updateMascotUI(); }
+  if (mode === "watch") {                           // 👀 連打で みてる⇔たたずむ
+    loadMotionKind(motionKind === "watch" ? "stroll" : "watch");
+  } else if (mode === "auto") loadMotionKind("auto");
+  /* 🎯えらぶ はセレクトを出すだけ（いまのモーションはそのまま） */
+  renderQuick();
+}
+function renderQuick() {
+  if (!quickPanel) return;
+  const show = !!model && settings.mmdQuickUI !== false && !safeNow();
+  quickPanel.hidden = !show;
+  if (!show) return;
+  const t = quickPanel.querySelector("#mmdQuickTitle"); if (t) t.textContent = tr("mmdQuickTitle");
+  const mode = quickPickOpen ? "pick" : quickMode();
+  quickSeg.querySelectorAll("button").forEach(b => {
+    b.textContent = tr(b.dataset.i18n);
+    const on = b.dataset.quick === mode;
+    b.classList.toggle("selected", on); b.setAttribute("aria-pressed", on);
+  });
+  quickName.textContent = mode === "off" ? "💤" : (motionName || tr("mmdMotionNone"));
+  quickPickRow.hidden = mode !== "pick";
+  if (mode === "pick") {
+    const favs = (settings.mmdMotionFavs || []).filter(id => BUILTIN[id]);
+    quickSelect.textContent = "";
+    const add = (val, text, group) => { const o = document.createElement("option"); o.value = val; o.textContent = text; (group || quickSelect).append(o); };
+    if (favs.length) {
+      const g = document.createElement("optgroup"); g.label = "⭐";
+      for (const id of favs) add(id, tr(BUILTIN[id].label), g);
+      quickSelect.append(g);
+    }
+    add("none", tr("mmdMotionNone"));
+    for (const id of Object.keys(BUILTIN)) if (!favs.includes(id)) add(id, tr(BUILTIN[id].label));
+    if (motionKind === "file" || (anim && motionKind === "file")) add("file", "🎬 " + (motionName || "VMD"));
+    quickSelect.value = (motionKind === "auto" || motionKind === "file") ? (quickSelect.querySelector(`option[value="${motionKind}"]`) ? motionKind : "none") : motionKind;
+    const fav = BUILTIN[motionKind] && (settings.mmdMotionFavs || []).includes(motionKind);
+    quickFavBtn.textContent = fav ? "⭐" : "☆";
+    quickFavBtn.title = tr("mmdQuickFavTip");
+    quickFavBtn.disabled = !BUILTIN[motionKind];
+  }
+}
+
 /* ============ 画面の組み立て ============ */
 /* ---------- 🔎 動作チェック（実機で「どこまで動くか」を1か所に出す） ----------
    実機で確かめるときは、設定 → 🩷 MMDマスコット → 🔎 動作チェック を押して、
@@ -1031,6 +1127,7 @@ function renderMotionList() {
   }
   if (anim && keep === "file") { const o = document.createElement("option"); o.value = "file"; o.textContent = "🎬 " + (motionName || "VMD"); sel.append(o); }
   sel.value = (keep === "file" && !anim) ? "none" : keep;
+  renderQuick();                                     // 🩷 選曲画面のミニ操作も同じタイミングで更新
 }
 function syncUI() {
   const box = $("mmdInfo");
@@ -1048,12 +1145,14 @@ function syncUI() {
   const mb = $("mmdBpm"); if (mb) mb.value = settings.mmdMotionBpm;
   const cr = $("mmdCredit"); if (cr && document.activeElement !== cr) cr.value = settings.mmdCredit || "";
   const rem = $("mmdRemember"); if (rem) rem.checked = settings.mmdRemember !== false;
+  const qui = $("mmdQuickUI"); if (qui) qui.checked = settings.mmdQuickUI !== false;
   const ag = $("mmdAgree"); if (ag) ag.checked = !!settings.mmdAgreed;
   setAgreeUI(); renderMotionList();
 }
 
 addEventListener("DOMContentLoaded", () => {
   if (!canvas || !$("mmdPanel")) return;
+  buildQuickPanel();                                 // 🩷 選曲画面のミニ操作（モデルが来るまで hidden）
 
   $("mmdAgree").addEventListener("change", e => {
     settings.mmdAgreed = !!e.target.checked; saveUserPrefs(); setAgreeUI();
@@ -1104,13 +1203,16 @@ addEventListener("DOMContentLoaded", () => {
     if (!settings.mmdRemember) { mmdDB.del("model").catch(() => {}); mmdDB.del("motion").catch(() => {}); }
   });
 
+  const qui = $("mmdQuickUI");
+  if (qui) qui.addEventListener("change", e => { settings.mmdQuickUI = !!e.target.checked; saveUserPrefs(); renderQuick(); });
+
   $("mmdCheckBtn").addEventListener("click", () => { enqueue(runCheck); });
   $("mmdCopyBtn").addEventListener("click", () => {
     if (!lastCheck) { enqueue(async () => { await runCheck(); copyText(lastCheck); }); return; }
     copyText(lastCheck);
   });
 
-  on("language", () => { syncUI(); renderPresetRow(); });
+  on("language", () => { syncUI(); renderPresetRow(); renderQuick(); });
 
   /* 前回のモデルを戻す（覚える設定のときだけ・セーフモードでは何もしない） */
   syncUI();
@@ -1165,6 +1267,7 @@ window.TrkMMD = {
   check: () => runCheck(),
   checkText: r => checkText(r || lastCheckObj),
   lastCheck: () => lastCheck,
+  quickMode: () => quickMode(),
   isPlaying: () => playing,
   clock: () => clock,
   rate: motionRate,

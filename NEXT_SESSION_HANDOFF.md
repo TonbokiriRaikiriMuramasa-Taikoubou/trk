@@ -49,6 +49,13 @@
   👀みてる（こちらをじっと）／👀たたずむ（見まわす）＝`fixed:true` で曲のBPMに関係なく常に等速。
   🎲おまかせ＝曲のBPMにいちばん近い🎵を自動選択（曲が変わると animate() が選びなおす・曲なしなら👀みてる）。
   選んだモーションは **`settings.mmdMotionKind`（新設定キー）** に記憶され、リロード後もモデル復元と一緒に戻る（core.js の読み込み検証と resetAllPrefs に追加済み・"file" は記憶対象外）。
+- **🩷 選曲画面のモーションミニ操作（リクエスト「ミクが一番人気になるはず・毎回裏の設定は大変」対応）**：
+  ⏩再生速度パネルの直下に `#mmdQuickPanel`（mmd.js の `buildQuickPanel()`）。モデル読み込み済み＆非セーフのときだけ表示。
+  チップ4つ＝👀ひとやすみ（連打で みてる⇔たたずむ）／🎲おまかせ／🎯えらぶ（セレクト＋⭐お気に入り）／💤お留守番（`settings.mascot="none"`、他チップで復帰）。
+  モードは保存せず `mascot`＋`motionKind` から導出（`quickMode()`）。キャラの読み込み・規約同意は今までどおり裏（設定）のみ。
+  **新設定キー**：`mmdQuickUI`（既定オン。設定の🩷MMDパネルのチェック「選曲画面にミニ操作を出す」で切替）／`mmdMotionFavs`（⭐お気に入りモーションID配列・最大50。🎯の一覧で optgroup ⭐ が先頭に並ぶ）。どちらも core.js の読み込み検証＋resetAllPrefs に追加済み。
+  i18n：`mmdQuickTitle/Watch/Auto/Pick/Off/UILabel/FavTip` ×4言語。
+  💡将来候補：**曲ごとのモーション記憶**（「この楽曲はこれ！」）。⭐お気に入りは近道にすぎないので、`songFav` のような曲キー→モーションIDの対応表を足すと完成形。
   選曲元＝ニコニコ「初音ミク16周年 楽曲ランキング」TOP10（2026年の定番曲投票は見当たらず、直近の大型投票を採用）
 - **基準BPM 0＝自動シンク**：`motionRate()` が、mmdBpm が 0 のとき内蔵モーション自身の bpm を基準に曲へ自動で合わせる（持ち込みVMDは従来どおり固定）。手動で入れた基準BPMが常に優先
 - **置き場**：`assets/mmd/README.md`（足し方と規約の条件）／`assets/mmd/lat-miku/`＝**Lat式ミク Ver2.31 Normal 投入済み**
@@ -129,7 +136,7 @@
 ## 3. 触るときの約束
 
 - **保存キー（変えない）**：`shadow_taiko_preferences_v2` / `_records_v1` / `_best_v1` / `_song_prefs_v1` / `_custom_skins_v1` / `trk_fx_presets_v1` / `trk_tv_skins_v1` / `trk_addons_v1` / IndexedDB `shadow_taiko_packs` `_songs` `_library` `_vrm` `_mmd`
-  - 新しく足したのは **`settings.favs` / `settings.songFav`**（＋既存キーの中の新しい項目 `tvSongWhilePlaying` `mmd*`（**`mmdMotionKind` 含む**） `libTab` `libSkin` `libSkinQuick`）。既存キーと形式名はそのまま
+  - 新しく足したのは **`settings.favs` / `settings.songFav`**（＋既存キーの中の新しい項目 `tvSongWhilePlaying` `mmd*`（**`mmdMotionKind` `mmdQuickUI` `mmdMotionFavs` 含む**） `libTab` `libSkin` `libSkinQuick`）。既存キーと形式名はそのまま
 - **形式名（変えない）**：`shadow-taiko-pack` / `chart` / `records` / `skin` / `trk-fx` / `trk-verified` / `trk-tvskin` / **`trk-favs`**、譜面ファイル `*.shadow-taiko.json`
 - **読み込み順**：`tv-presets.js → core.js → fx-dock.js → tv-dock.js → fx.js → favs.js → library.js → verified.js → lib-skins.js → addons.js → main.js → speed.js → vrm.js → mmd.js`（player.js は core の直後、mmd.js は vrm.js の直後）
 - **関数を包む方式**：包まれる側を `const` にしない（`function` 宣言のまま）— tv-dock.js が `videoFilter` と `drawVideo` を、favs.js が fx の ★ を包む
@@ -200,6 +207,7 @@ for f in js/*.js js/characters/*.js js/addons/*.js; do node --check "$f" || echo
 - [ ] 💠 モデル未配置なら💠ボタンも説明も出ない（赤エラーなし）／`?safe=1` では配置してあっても出ない
 - [ ] 🩷 内蔵モーション④ジャンプ・⑤アイドルが選べて、見た目が破綻しない（④はバンザイ跳び・⑤は右手突き上げ）
 - [ ] 🩷 MMD：規約同意 → モデル（単体／フォルダ）を読み込むと、マスコットが MMD になり動く
+- [ ] 🩷 選曲画面ミニ操作：モデル読み込み後に⏩の下へ出る・👀連打切替・🎲・🎯⭐・💤→復帰・設定チェックで非表示
 - [ ] 🩷 MMD：内蔵モーション25種（🎵15種＋🎸3種＋👀2種含む）・🎲おまかせ・自分の .vmd が切り替わり、曲のBPMに合う（基準BPM 0 で内蔵が自動シンク・`mmdBpm` 手動入力が優先）
 - [ ] 🩷 MMD：大きさ・向き・クレジットが効く／「保存」を入れておくとリロードしても残る
 - [ ] 🩷 MMD：🔎 動作チェックで `webgl=true`・`three=<版>`・`loader=true` が出る（だめなときは 📋 でコピーして貼る）

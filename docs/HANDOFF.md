@@ -51,6 +51,7 @@ trk! の開発を再開します。docs/HANDOFF.md を貼ります。
 | three.js / three-vrm | MIT（VRM使用時のみCDNから読み込み。three 0.180.0 / three-vrm 3.5.5） |
 | @yohawing/three-mmd-loader | MIT（MMD使用時のみCDNから読み込み。0.8.4。three非依存の独立実装） |
 | 内蔵モーション25種（step/swing/turn/jump/idol＋🎵15種＋🎸3種＋👀BPM非依存2種）＋🎲おまかせ | **trk! がコードで作る自作VMD**（`js/mmd.js` の `buildVmd()`）。GPLの対象 |
+| 選曲画面のモーションミニ操作 `#mmdQuickPanel`（⏩の下。👀/🎲/🎯⭐/💤の4チップ） | `js/mmd.js` の `buildQuickPanel()`。モデル読み込み済みのときだけ表示・`mmdQuickUI` で切替 |
 | 💠 同梱プリセットモデル（`assets/mmd/`） | **GPL対象外**。れあどめ原文で再配布OKを確認できたモデルだけ置ける（例：Lat式ミク）。NOTICE.md の 3a 参照 |
 
 - 以前のREADMEにあった「GPLで販売禁止」「osu!と同じGPL」は**誤り**として訂正済み（GPLは販売を禁止できない／osu!のコードはMIT）。
@@ -357,7 +358,7 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 - **🆕 💠 同梱プリセット（例外）**：れあどめ原文で**再配布OK**と確認できたモデルだけ、`assets/mmd/<dir>/` に「モデル一式＋れあどめ原文＋`preset.json`」を置ける（対象の dir は `js/mmd.js` の `PRESET_DIRS`）。起動時に `findPresets()` が `preset.json` を fetch できたときだけ `#mmdPresetRow` に💠ボタンが出て、1クリックで fetch→File化→`doLoadModel()`→クレジット（`credit`）・内蔵モーション（`motion`）・基準BPM（`bpm`）を自動設定。規約同意チェック（`mmdAgreed`）は**不要**（規約ごと同梱のため）。`?safe=1` では探しにも行かない。ファイルが無ければボタンは出ず従来どおり
 - **内蔵モーションは trk! の自作**：`buildVmd()` がその場で VMD のバイト列を作る（30fps・3フレーム刻み・111B/フレーム・補間バイトは `[0,0,127,127]` ×16＝どの読み方でも直線・末尾 `54+n*111+20`）。`BUILTIN` は step(120BPM/4s)・swing(100BPM/6s)・turn(120BPM/4s)。ボーン名（センター／上半身／上半身2／首／左腕／右腕／左ひじ／右ひじ）は SJIS（cp932 の実測値）で埋め込む
 - **BPM同期**：`rate = chartMeta.bpm ÷ 基準BPM`。基準BPMは `settings.mmdMotionBpm`、それが0なら内蔵モーション自身の bpm（持ち込みVMDで0なら固定＝1）。0.25〜3 に丸める。`phase==="playing"` では `#mmdCanvas`、設定パネルを開いているときは `mmdPreview`（180×120）に描く
-- **設定（`settings`。`shadow_taiko_preferences_v2` に保存）**：`mmdAgreed`（規約同意。未同意なら3つのファイル入力が disabled）／`mmdRemember`（既定オン。IndexedDB `shadow_taiko_mmd` の "model"・"motion" に保存し、次回に復元）／`mmdScale`(0.5〜1.8)／`mmdTurn`(−60〜60)／`mmdBpm`(0〜300)／`mmdCredit`(120字。画面右下に `MMD: <クレジット>`)／`mmdMotionKind`(選んだ内蔵モーションの記憶。"file"は対象外)
+- **設定（`settings`。`shadow_taiko_preferences_v2` に保存）**：`mmdAgreed`（規約同意。未同意なら3つのファイル入力が disabled）／`mmdRemember`（既定オン。IndexedDB `shadow_taiko_mmd` の "model"・"motion" に保存し、次回に復元）／`mmdScale`(0.5〜1.8)／`mmdTurn`(−60〜60)／`mmdBpm`(0〜300)／`mmdCredit`(120字。画面右下に `MMD: <クレジット>`)／`mmdMotionKind`(選んだ内蔵モーションの記憶。"file"は対象外)／`mmdQuickUI`(選曲画面のミニ操作を出す・既定オン)／`mmdMotionFavs`(⭐お気に入りモーションID配列・最大50)
 - **窓口 `window.TrkMMD`（version 1）**：`builtins()` `motions()` `model()` `motion()` `setMotion()` `loadModel(files)` `loadMotion(file)` `clear()` `select()` `isPlaying()` `clock()` `rate()` `info()`。テスト用に `_injectLibs()` / `_builtin(id)` / `_sjis(s,n)` も出している
 - **importmap**：`three/`＝three@0.180.0、`@yohawing/three-mmd-loader`（jsDelivr の dist/index.js）。**three 本体の MMDLoader は r175 で削除された**ので `three/addons/loaders/MMDLoader.js` は使えない（404）
 - **`ensureScene()` は全か無か**：途中で throw したら renderer/scene/camera/pivot を**全部 null に戻す**（半端に残すと以降ぜんぶ落ちる）。`applyModelTransform()` / `frameCamera()` / `applyRect()` は null ガード必須

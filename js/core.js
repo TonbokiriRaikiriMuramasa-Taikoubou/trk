@@ -122,6 +122,7 @@ const settings = {
   libTab: typeof prefs.libTab === "string" ? prefs.libTab : "all",            // 📚 選んでいる棚（タブ）のID
   libSkin: typeof prefs.libSkin === "string" ? prefs.libSkin : "player",      // 📚 棚のスキン（js/lib-skins.js が検証）
   libSkinQuick: prefs.libSkinQuick !== false,                                 // 📚 曲リストの 🎨 ボタンを出す
+  libKeepShared: prefs.libKeepShared === true,                                // 📤💾 共有で取り込んだ曲を端末に残す（初期オフ。library.js）
   /* 📊 スペクトラム（js/spectrum.js が値と実在を検証して読み戻す） */
   specOn: prefs.specOn !== false,                                             // 表示する（初期オン）
   /* 見え方と色の一覧は spectrum.js（このあとに読み込む）が決めています。ここでは
@@ -209,6 +210,7 @@ function enterSafeMode() {
   settings.tvSongWhilePlaying = false;                            // セーフモードでは演奏中の曲送りもしない
   settings.specOn = false; settings.specTv = false;               // 📊 スペクトラムも出さない（音の通り道を作らない）
   settings.specSkin = false; settings.specSkinOpen = false;
+  settings.libKeepShared = false;        // 📤 セーフモードでは、端末に残した共有の曲も読み戻さない
   settings.fxPower = 0; settings.hideGameplayUI = false;
   if (settings.mascot === "mmd") settings.mascot = "skin";     // 🩷 セーフモードでは MMD を使わない
   if (typeof view !== "undefined" && view) { try { view.style.filter = "none"; } catch(_) {} }

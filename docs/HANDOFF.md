@@ -1,7 +1,7 @@
 # trk! 開発引き継ぎ文書（HANDOFF）
 
 > trk! is AGRG! — an All-Generation Rhythm Game
-> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン16種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り ＋ 🥁音ゲーマー向けFAST/SLOW・あべこべ・でたらめ ＋ 💬GitHub Issuesテンプレート ＋ 📊スペクトラム（音の見える化・**見え方16種・色8種・曲名バナーのスキン・🚫使用しないスイッチ**・TVに重ねられる）＋ 🎛エフェクトチェーン編集＋ 🎹曲に合わせて演奏できるシンセモード（10音色・ZUNPET風ブラス・±8半音ピッチ・起動オプション）まで）
+> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン16種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り ＋ 🥁音ゲーマー向けFAST/SLOW・あべこべ・でたらめ ＋ 💬GitHub Issuesテンプレート ＋ 📊スペクトラム（音の見える化・**見え方16種・色8種・曲名バナーのスキン・🚫使用しないスイッチ**・TVに重ねられる）＋ 🎛エフェクトチェーン編集＋ 🎹曲に合わせて演奏できるシンセモード（10音色・ZUNPET風ブラス・±8半音ピッチ・起動オプション）＋ 📤ミュージックフォルダを共有（1回の許可で一括取り込み・🔗共有をつづける・💾端末に残す・🚫やめる）まで）
 > この文書は、新しい会話で開発を再開するための参照資料です。
 
 ---
@@ -101,6 +101,8 @@ trk! の開発を再開します。docs/HANDOFF.md を貼ります。
 37. **🎛 エフェクトチェーン編集**（`js/fx-synth.js`）：17種の安全なエフェクトをノブ風スライダーで組み立て、順序変更・EQバンド編集・適用・マイプリセット保存・`trk-fx` Import/Export。`fx.js`／`fx-presets.js` は変更せず、`TrkFX.clean()` と既存の保存処理を使う。
 38. **🎹 曲に合わせて弾けるシンセモード**（`js/synth-mode.js`）：FXドックの⏻スピーカーを長押し（標準650ms。設定で起動禁止または200msへ短縮可能）。Web Audioの10基本音色（ZUNPET風ブラスを含む）・最大6音源レイヤー・端末内だけのサンプル音源（12MB／30秒まで）、C3〜C5の画面鍵盤、QWERTYキー割り当て、曲プレビュー操作、上部の動画＋スペクトラム表示に対応。音色とキー割り当ては端末内に保存し、サンプル音声自体は保存・送信しない。
 
+39. **📤 ミュージックフォルダを共有**（library.js）：「許可を承認してフォルダを開く」に加えて、**端末に1回だけ許可をもらってミュージックフォルダの中身を一気に取り込む**入口を新設。`📁 開く` は動画フォルダ用として**ならべて残す**。許可は `libKV` の `"share"`（共有）と `"dir"`（開く）に分けて覚え、次回からは「🔗 共有をつづける」の1タップ。読み込み中は曲数を出し、終わると「{n}曲（対象外のファイル {skip}件はとばしました）」＝**変な曲や動画も一緒に入る**のが分かる表示。設定画面に `#libSharePanel`（📤 共有／💾 端末に残す／🚫 共有をやめる）を追加。`💾` は新しい IndexedDB `shadow_taiko_shared` に最大150曲・300MBまで保存し、リロード後は許可なしで遊べる（`?safe=1` では読み戻さない）。
+
 ---
 
 ## 4. 着想元（どこから来たか）
@@ -185,7 +187,7 @@ trk/
 | 17.7 | tv-dock.js | 📺 映像出力のTV風ドック（スキン30種＋🎨カスタムTVスキン、電源・お気に入り・並び順） |
 | 18 | fx.js 🧊 | 🎛 サウンドエフェクト本体（「7. 凍結中のファイル」参照） |
 | 18.5 | fx-synth.js | 🎛 視覚的なエフェクトチェーン編集。`window.TrkFX` と #fxPanel の保存欄を使うため、fx.js の後。メイン画面の `.dockMore` は tv-dock.js が `.songCol` 直下へ移動したあとに探す |
-| 19 | library.js | 選曲画面・AUTO/ラジオ・シード道具・プレビュー |
+| 19 | library.js | 選曲画面・AUTO/ラジオ・シード道具・プレビュー・📁フォルダ／📤共有 |
 | 20 | verified.js | ✔公認パック（SHA-256と verified.json の照合、作者名・BPM・作者のことば） |
 | 21 | main.js | 入力・イベント・**起動処理**（`packsReady`）、サービスワーカー登録 |
 | 22 | speed.js | ⏩速度パネル・速度キー（main の後） |
@@ -323,6 +325,19 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
   - どの曲でも `emit("songSelected", it)` が流れる（selectSong の中）
 - **エフェクターへの通り道**：`fx.js` に `TrkFX.tapElement(el)` / `untapElement(el)` を追加（`G.extra` に MediaElementSource を保持し、`G.eq[0]` へつなぐ）。同じ要素は一度だけ・オフでも素通しでつながる・AudioContext が suspended なら resume
 - **正直な限界**：クロスオリジンの iframe（YouTube など）の中の音は、ブラウザの仕様で取り出せない。アドオンでも同じ（docs/ADDONS.md の 6 章に明記）
+
+### 📤 ミュージックフォルダを共有（library.js）
+- **入口は2つをならべる**：`#libOpenBtn`（📁 開く＝従来どおり。🎬 動画フォルダなども）と `#libShareBtn`（📤 共有＝端末に1回だけ許可をもらって、ミュージックフォルダの中身を**一気に**取り込む）。設定画面にも同じパネル `#libSharePanel` がある（`#libShareSettingsBtn`／`#libShareStopBtn`／`#libKeepSharedChk`／`#libKeepSharedHint`／`#libShareState`＝いまの状態／`#libShareStatus`＝直前の操作の結果）
+- **許可の覚え方を分ける**：`libKV`（IndexedDB `shadow_taiko_library` の kv）に **"share"（📤 共有）** と **"dir"（📁 開く）** を別々に保存。`initLibrary()` は **share を優先**して `libHandle` に入れ `libShared` を立てる（`shareRemembered` は「覚えているが、まだつながっていない」印）。再接続ボタンの文章は `libShared` で出し分け（`libShareResume` / `libReconnect`）。⚠ ブラウザの都合で、**許可は操作のたびに要る**（`queryPermission` → `requestPermission`）
+- **スキャン**：`scanHandle(h, onProgress)` は `{files, skipped}` を返す（旧：配列だけ）。深さは `LIB_DEPTH = 8`（旧 6）、25曲ごとに `onProgress` → `libShareScanning`（読み込み中の曲数が出る）。曲でも譜面でもないファイルは `skipped` に数えて、`ingestFolder(list, dirName, shared, skipped)` が `libShareFound`＝「{n}曲（対象外のファイル {skip}件はとばしました）」を出す
+- **非対応ブラウザ**（`canPickDir` が false ＝ スマホの Chrome など）：`dirInputMode = "share"` にして `#libDirInput`（webkitdirectory）を開き、change 側で `shared` を判定して同じ道へ合流する。`libShareUnsupported` の note を設定パネルに出す。`showDirectoryPicker` が投げたときも同じフォールバック（**AbortError＝キャンセルは何もしない**）
+- **💾 端末に残す（`settings.libKeepShared`・初期オフ）**：新しい IndexedDB **`shadow_taiko_shared`**（store "files"）に `{key, file, name, dir, addedAt}` を保存する。上限は `SHARED_MAX = 150` 曲・`SHARED_BYTES = 300MB`（`SHARED_MB`）で、`keepSharedSongs()` が上限で止めて `libKeepSharedFull`、書き込み失敗（QuotaExceededError など）は `libKeepSharedFailed` を出す
+  - 起動時は `loadSharedSongs()` が `sharedSongs` に戻し、`allSongs()` が **同じ key を1件だけ**出す（folderSongs → sharedSongs → addedSongs の順で重複をとばす。共有を端末に残すと同じ曲が両方に居るため）。行には 📤 のタグと ✕（`removeShared()`）が出る
+  - オフにすると `clearSharedSongs()`（保存を全部消す）。**🚫 共有をやめる**（`stopSharing()`）は kv の "share" ＋ 端末の曲 ＋ 共有中のリストをまとめて消す（📁 開く で入れた曲は消さない）
+  - あとから 💾 をオンにしたときに使えるよう、直近のスキャン結果を `lastScan` に取ってある。↻ 再スキャンのときは **もう端末にある曲（key＝「サイズ|曲名」が同じ）を書き直さない**ので、300MB を何度も書き込まない
+  - `?safe=1` では読み戻さない（`enterSafeMode()` が `libKeepShared = false`＋`initLibrary()` が `TrkSafeMode()` でも見る）
+- **文章キー**：`libShare…` / `libKeepShared…` / `secShare`（4言語・21キー）。⚠ `libKeepSharedHint` は `{max}` `{mb}` が入るので **data-i18n にしない**（`applyLanguage()` は変数を渡さないため）。`syncShareUI()` が `tr(…, {max, mb})` で書き、言語切り替え（`on("language")`）でも書き直す
+- 動作確認：`jsdom-libshare.mjs`（**73項目**：共有→5曲・深いフォルダ・変な曲・対象外2件・kv:share・📁Musicタブ／💾オン→保存5曲・一覧は増えない・リロードで戻る・✕で外れる・🔗再接続で重複しない・🚫で全部消える／📁開くは従来どおり／上限150曲・300MB／`?safe=1`／非対応ブラウザのフォールバック／4言語）
 
 ### 📚 曲のタブ（棚）と、棚スキン16種（library.js / lib-skins.js）
 - **タブ**：`renderLib()` の入口で `libTabsOf(all)` が入り口ごとにまとめ、`libTabMatch(it, id)` で絞ってから検索・並べ替えに流す（`libView` はこの絞ったあとの並び＝◀▶ もタブの中で動く）
@@ -489,7 +504,9 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 | `shadow_taiko_custom_skins_v1` | カスタムスキン |
 | `trk_fx_presets_v1` | マイプリセット（形式 `trk-fx`） |
 | `trk_tv_skins_v1` | 🎨 カスタムTVスキン（形式 `trk-tvskin`、最大30個。選んでいるTVは `settings.tvDockSkin`） |
-| IndexedDB `shadow_taiko_packs` / `_songs` / `_library` / `_vrm` / `_mmd` | パック（`sha256` 付き）・追加した曲・フォルダ・VRM・MMD（"model"/"motion"。持ち込みファイルの控え） |
+| IndexedDB `shadow_taiko_packs` / `_songs` / `_library` / `_vrm` / `_mmd` | パック（`sha256` 付き）・追加した曲・フォルダのハンドル（`_library` の kv：`"dir"`＝📁 開く／`"share"`＝📤 共有）・VRM・MMD（"model"/"motion"。持ち込みファイルの控え） |
+| IndexedDB `shadow_taiko_shared`（新） | 📤💾 共有して端末に残した曲（`{key, file, name, dir, addedAt}`。最大150曲・300MB。`settings.libKeepShared` がオンのときだけ書く・読む） |
+| `settings.libKeepShared`（新） | 💾 共有した曲を端末に残す（初期オフ。`shadow_taiko_preferences_v2` の中。`?safe=1` ではオフになる） |
 | `settings.specOn` `specStyle`（16種）`specTheme`（8色）`specGain` `specPeaks` `specTv` `specSkin` `specSkinOpen`（新・📊 スペクトラム） | 表示／見え方／色／感度／ピーク／TVに重ねる／曲名バナーのスキン／開いた状態。`shadow_taiko_preferences_v2` の中 |
 | `settings.songFav`（新） / `settings.favs`（新） | ⭐ 曲のお気に入り（1軍）と、3系統ぶんのフォルダ分け（`{tv,fx,song}` の `sub`／`frozen`／`former`／`pins`／`locks`／`active`）。どちらも `shadow_taiko_preferences_v2` の中 |fxDockSkin fxDockFive fxDockOpen fxAntenna fxEqLock fxLockChain fxFavSeeded
 
@@ -597,6 +614,9 @@ records[指紋 "サイズ:長さ×10"] = {
 - [x] 📚 曲のタブ（自動）と棚スキン16種（🎨 で切替・設定で隠せる。2026-10-05 に 🎰ジュークボックス／📻ラジオ番組表／🚉電光掲示板 ＋ 💿レコード棚／📼レンタルビデオ／🎤カラオケ目次／🗂️図書館の書架／🍱お品書き を追加）
 - [x] 🥁 音ゲーマー向け機能の拡充（FAST/SLOW集計・GOOD内訳・判定下ネオン表示、MIRROR/RANDOM公式MOD、Lv.1〜20連続スケール、本格トリル・ロール配置生成、達人・2000 RUSHワンタップ解禁）
 - [x] 🎬 TV映像確認タブの操作性強化 ＆ 🔗 TV設定共有URL（シークバー、再生/一時停止、時間表示、「▶ この設定で遊ぶ」ボタン、`?tv=...&skin=...` パラメータ生成と自動適用）
+- [x] 📤 ミュージックフォルダを共有（1回の許可で一括取り込み・🔗 共有をつづける・💾 端末に残す（150曲／300MB）・🚫 共有をやめる・📁 開く はならべて残す・4言語）
+- 動作確認：`jsdom-libshare.mjs`（73項目）／`jsdom-smoke.mjs`（10項目）／`jsdom-i18n-audit.mjs`（32項目・**1311キー×4言語**・欠け0・二重定義0・生キー0）
+- [ ] 実機確認：📤 共有（PC Chrome/Edge の許可ダイアログ・スマホ Chrome のフォルダ選び）／大きなフォルダ（1000曲以上）での読み込み時間と進捗／💾 端末に残す の所要時間と空き容量／🔗 共有をつづける／🚫 共有をやめる
 - [x] 📡 アンテナ機能とバックグラウンド再生の強化（4種類のアンテナ形状、シグナル波リング演出、スイッチネオングロー、「通常のアンテナを使う」チェックボックス）
 - [x] 💬 GitHub Issues フィードバック・苦情・譜面意見窓口（`feedback.yml`、`chart_feedback.yml`、リザルト画面リンク、`README.md` 更新）
 - [ ] 実機確認：パックを入れてタブが増えるか／タブの中で探しやすいか／**11スキン**の見た目（モバイル幅・縦長のタブ帯・タブが1つのとき）

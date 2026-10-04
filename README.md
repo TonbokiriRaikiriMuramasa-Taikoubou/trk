@@ -43,7 +43,7 @@ trk!（トラック）は、ブラウザだけで動く**非営利のリズム�
 ## 🚀 すぐに始める
 
 1. 上のリンクを開きます。
-2. 「📁 ミュージックフォルダを開く」か「＋ 曲ファイルを追加」で曲を読み込みます。画面に**ドラッグ＆ドロップ**しても読み込めます。
+2. 「**📤 ミュージックフォルダを共有**」を押すと、端末（PC・スマホ）に**1回だけ許可**を求めて、ミュージックフォルダの中身を**一気に**取り込みます。「📁 ミュージックフォルダを開く」（🎬 動画フォルダなど）や「＋ 曲ファイルを追加」も使えます。画面に**ドラッグ＆ドロップ**しても読み込めます。
 3. 曲を選ぶと、プレビューが流れます。
 4. プレイ方法と難易度を選んで、**▶ PLAY**！
 
@@ -157,8 +157,9 @@ AUTO中か、「シークバーを表示（練習用）」をオンにしてい�
 - **ならべ方**：選曲画面は **📺 TV →（お気に入り）→ 🎛 ラック →（お気に入り）→ 📺 TVくわしい → 🎛 ラックくわしい** の順。テレビの**すぐ下にラック**が来るので「テレビの下にオーディオ機器」という自然な姿になります（TVとラックの上下は「くわしい」の中で入れ替え可）。
 - **⭐ お気に入りはフォルダ分け**：ドックの下に **⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り** のチップが並びます（それぞれ個数つき）。押すとボタンの中身がそのフォルダに入れ替わり、🔒で凍結、あふれたぶんは下の行に出ます。長押し（または ⋯）で、移動・📌ピン・取り外しができます。**上限はありません**。
 - **🧩 アドオン**：本体に入れられない機能を、あとから足せます。設定画面「🧩 アドオン」→「📄 アドオンを入れる」で `.js` か `.trk-addon`（JSON）を選ぶだけ（`trk_addons_v1` に保存）。アドオンは**曲を足す**（曲リストの 🧩 タブに自動でまとまります）、**置き場所**（設定画面・曲リスト・TVのくわしい・ラックのくわしい）にUIを足す、**自分の音を本体のエフェクターに通す**（`api.fx.tapElement`）ことができます。書き方は [docs/ADDONS.md](docs/ADDONS.md) と見本の [`js/addons/example.js`](js/addons/example.js)。壊れたときは `?safe=1` で読み込まれません。
+- **📤 ミュージックフォルダを共有**：曲リストの「📤 ミュージックフォルダを共有」を押すと、**端末に1回だけ許可**を求めて、ミュージックフォルダの中身を**一気に**リストへ取り込みます。探していた曲以外（思わぬ曲や動画）も一緒にとびこんでくるので、🎲おまかせと相性ばつぐんです。取り込んだ曲数と、対象外だったファイルの件数も出ます。許可は覚えておくので、次回からは「**🔗 共有をつづける**」の1タップ。設定画面「📤 ミュージックフォルダの共有」では、**💾 共有した曲を端末に残す**（最大150曲・300MB。毎回許可しなくても遊べます）と**🚫 共有をやめる**（覚えた許可と端末の曲をまとめて消す）も選べます。従来の「📁 ミュージックフォルダを開く」も**ならべて残してある**ので、動画フォルダなどはそちらでどうぞ。**曲はどこにもアップロードされません**（読むだけです）。
 - **📚 曲のタブ（棚）**：曲リストの上に、**曲の入り口ごとのタブ**が自動で並びます（📚すべて／📦パックごと／📁フォルダーごと／📄追加した曲／✔公認）。**曲パックを入れると、そのパックのタブが自動で増える**ので、あとから入れた曲をすぐ見つけられます。タブを選んだ中で検索・並べ替えができ、TVの ◀ ▶ も**いま開いているタブの中**で曲を送ります。タブに件数が出るので、どの棚に何曲あるかも一目で分かります。
-- **📚 棚のスキン11種**：曲タブの見た目を **🎛 タブプレーヤー／📝 ノート／🌈 シール帳／🗄 カード目録／📼 カセットラベル／🖍 黒板／🕹 レトロPC／📁 クリアファイル／🎰 ジュークボックス／📻 ラジオ番組表／🚉 電光掲示板** から選べます。曲リストの見出しの **🎨 ボタン**で、その場でぽんぽん切り替え（`🎲 おまかせ` も）。🎨 ボタンが不要なときは、設定画面「見た目」で**隠せます**。
+- **📚 棚のスキン16種**：曲タブの見た目を **🎛 タブプレーヤー／📝 ノート／🌈 シール帳／🗄 カード目録／📼 カセットラベル／🖍 黒板／🕹 レトロPC／📁 クリアファイル／🎰 ジュークボックス／📻 ラジオ番組表／🚉 電光掲示板／💿 レコード棚／📼 レンタルビデオ／🎤 カラオケ目次／🗂 図書館の書架／🍱 お品書き** から選べます。曲リストの見出しの **🎨 ボタン**で、その場でぽんぽん切り替え（`🎲 おまかせ` も）。🎨 ボタンが不要なときは、設定画面「見た目」で**隠せます**。
 - **選曲中にmp4を再生**：曲を選ぶと、TVドックの画面にそのmp4が映ります（設定でオフにもできます）。くわしく →「🖼 映像の確認」タブなら、ゲーム画面と同じ見え方でフィルター・TVスキン・暗さ・ぼかしを**再生する前に**確かめられます。
 - **ORBIT**：道の動き、ノーツの大きさ（判定の幅で表示もOK）、判定点の形6種類、周りを回る恒星
 - **STAGE**：レーンの幅・暗さ、ノーツの太さ、キービーム、補助線、盛り上がる場面で光るレーン、スポットライトなどの舞台演出
@@ -285,7 +286,8 @@ osu! のスキンのように、いろいろなものを1つのファイル（`.
 ## 📱 スマホで遊ぶ
 
 - スマホのブラウザで上のリンクを開き、「**ホーム画面に追加**」を選ぶと、アプリのように全画面で遊べます。
-- スマホでは、曲を1つずつ選んで追加してください（フォルダをまとめて開く機能は、パソコンのChrome／Edgeだけです）。
+- スマホでは「**📤 ミュージックフォルダを共有**」を試してください。フォルダを選べる端末（Android の Chrome など）なら、ミュージックフォルダの中身を一気に取り込めます。フォルダを選べない端末では、曲を1つずつ追加してください。
+- フォルダの許可を**覚えておく**のは、パソコンの Chrome／Edge だけです。スマホでも設定の「**💾 共有した曲を端末に残す**」をオンにすると、保存された曲（最大150曲・300MB）は許可なしで遊べます。
 - スマホの音楽フォルダを読み込めるアプリ版（APK）は、今後の予定です。
 
 ---
@@ -296,7 +298,9 @@ osu! のスキンのように、いろいろなものを1つのファイル（`.
 
 | 機能 | 条件 |
 |---|---|
-| ミュージックフォルダを記憶 | パソコンの Chrome／Edge（HTTPS か localhost）。ほかのブラウザでは毎回フォルダを選びます |
+| 📁 ミュージックフォルダを記憶 | パソコンの Chrome／Edge（HTTPS か localhost）。ほかのブラウザでは毎回フォルダを選びます |
+| 📤 共有を記憶（🔗 共有をつづける） | パソコンの Chrome／Edge（HTTPS か localhost）。ほかのブラウザでは共有のたびにフォルダを選びます |
+| 💾 共有した曲を端末に残す | 設定でオンにしたときだけ（IndexedDB `shadow_taiko_shared`。最大150曲・300MB。`?safe=1` では読み戻しません） |
 | パックの読み込み | `DecompressionStream` に対応したブラウザ |
 | 公認パックの確認 | HTTPS か localhost（指紋の計算に必要です） |
 | VRM | WebGL。初回だけ three.js／three-vrm をCDNから読み込みます |
@@ -460,7 +464,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 - 🎪 **STAGE** — 4/5/6-lane vertical play with stairs, trills and wide notes (inspired by World Dai Star: Yume no Stellarium)
 - 🚛 **CATCH** — catch falling parcels with your truck; grab nitro cans 🚀 for **Blast mode**
 
-**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, VRM 1.0 mascots, MMD mascots (bring your own model, with an on-device 🔎 self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, visual effect-chain editor, automatic latency compensation and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 10 built-in sounds (including a layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
+**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, VRM 1.0 mascots, MMD mascots (bring your own model, with an on-device 🔎 self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), 📤 **share your music folder** (one permission pulls the whole folder in at once, with an optional on-device copy of up to 150 songs / 300 MB), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, visual effect-chain editor, automatic latency compensation and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 10 built-in sounds (including a layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
 
 **✔ Verified packs:** song packs whose composer/charter identity and rights have been confirmed get a ✔ badge and a short message from the creator (up to 280, like a free X post). See [docs/verified.md](docs/verified.md).
 

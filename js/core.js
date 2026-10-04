@@ -74,7 +74,7 @@ const settings = {
   language: pick(prefs.language, ["ja", "en", "zh", "ko"], guessLang()),
   skin: SKINS[prefs.skin] ? prefs.skin : ({ dark:"shadow", light:"daylight" }[prefs.skin] || "shadow"),
   layout: pick(prefs.layout ?? prefs.gameplayLayout, Object.keys(LAYOUTS), "classic"),
-  videoStyle: pick(prefs.videoStyle, ["skin", "color", "mono", "dim", "off"], "skin"),
+  videoStyle: pick(prefs.videoStyle, (typeof TRK_TV_PRESETS !== "undefined" ? TRK_TV_PRESETS.map(p=>p.id) : ["skin","color","mono","dim","off"]), "skin"),
   bgDim: num(prefs.bgDim, 0, .9, 0),
   bgBlur: num(prefs.bgBlur, 0, 12, 0),
   scroll: num(prefs.scroll, .5, 2.5, 1),
@@ -117,6 +117,143 @@ const settings = {
   cover: num(prefs.cover, .2, .7, .4)
 };
 function saveUserPrefs() { try { localStorage.setItem(PREFS_KEY, JSON.stringify(settings)); } catch (_) {} }
+
+/* ---------- URLコマンドによる緊急リセット & 設定の書き出し ----------
+   画面が触れなくなった時でもURLで復旧できるようにする。
+   例:
+     ?safe=1 / ?safe / #safe          → セーフモード（映像OFF・ぼかし無し・TVは家庭用）
+     ?reset=tv / ?reset=video         → 映像・TVまわりだけデフォルトに戻す
+     ?reset=audio / ?reset=sound      → 音量・SEをデフォルトに戻す
+     ?reset=notes                     → ノーツ色・形をデフォルトに戻す（確認あり）
+     ?reset=all / ?factory            → 全設定リセット（ノーツも含む）
+     ?export=notes / ?export=all      → 設定をJSONでダウンロード
+   ノーツ設定は細かく詰める人が多いので、tv/audioリセットでは保持される。 */
+function resetVideoPrefs() {
+  settings.videoStyle = "color";
+  settings.bgDim = 0; settings.bgBlur = 0;
+  settings.tvDockSkin = "home"; settings.tvDockFive = false;
+  settings.tvOrder = "tv-first"; settings.tvOverlay = true;
+  settings.tvPowerPrev = "color"; settings.previewEnabled = true;
+  if (typeof view !== "undefined" && view) { try { view.style.filter = videoFilter(); } catch(_) {} }
+}
+function resetAudioPrefs() {
+  settings.musicVolume = 0.7; settings.seVolume = 0.28; settings.seEnabled = false;
+  // fx-dock / eq-dock の音まわりがあれば一緒に初期化
+  if ("gameVolume" in settings) settings.gameVolume = 0.7;
+  if ("eqEnabled" in settings) settings.eqEnabled = false;
+  if ("eqLow" in settings) { settings.eqLow = 0; settings.eqMid = 0; settings.eqHigh = 0; }
+  if ("compEnabled" in settings) settings.compEnabled = false;
+}
+function resetNotesPrefs() {
+  try {
+    const def = (typeof NOTE_PRESETS !== "undefined" && NOTE_PRESETS.standard) ? NOTE_PRESETS.standard : null;
+    if (def) settings.notes = JSON.parse(JSON.stringify(def));
+    else settings.notes = sanitizeNotes(null);
+    applyNoteVars();
+  } catch(_) { settings.notes = sanitizeNotes(null); }
+}
+function enterSafeMode() {
+  settings.videoStyle = "off";
+  settings.bgDim = 0; settings.bgBlur = 0;
+  settings.tvDockSkin = "home"; settings.tvDockFive = false;
+  settings.tvOrder = "tv-first"; settings.tvOverlay = false;
+  settings.previewEnabled = false;
+  settings.fxPower = 0; settings.hideGameplayUI = false;
+  if (typeof view !== "undefined" && view) { try { view.style.filter = "none"; } catch(_) {} }
+}
+function resetAllPrefs() {
+  resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs();
+  settings.fxPower = 1.5; settings.hideGameplayUI = false; settings.errorMeter = true;
+  settings.scroll = 1; settings.latency = 0; settings.judge = "standard"; settings.rate = 1;
+  settings.hidden = false; settings.sudden = false;
+  settings.mascot = "skin"; settings.vrmFrame = "full";
+  settings.skin = "shadow"; settings.layout = "classic";
+}
+function exportPrefs(kind) {
+  const out = {};
+  if (kind === "notes") out.notes = settings.notes;
+  else if (kind === "tv" || kind === "video") {
+    out.videoStyle = settings.videoStyle; out.bgDim = settings.bgDim; out.bgBlur = settings.bgBlur;
+    out.tvDockSkin = settings.tvDockSkin; out.tvDockFive = settings.tvDockFive; out.tvOrder = settings.tvOrder;
+    out.tvOverlay = settings.tvOverlay; out.previewEnabled = settings.previewEnabled; out.fxPower = settings.fxPower;
+  } else if (kind === "audio") {
+    out.musicVolume = settings.musicVolume; out.seEnabled = settings.seEnabled; out.seVolume = settings.seVolume;
+    if ("gameVolume" in settings) out.gameVolume = settings.gameVolume;
+  } else { // all
+    Object.assign(out, settings);
+  }
+  try { downloadJSON(out, `trk-${kind || "all"}-` + new Date().toISOString().slice(0,10) + ".json"); } catch(e){ console.error(e); }
+}
+// URLパラメータを解釈して即時実行（ロード時）
+(function handleUrlCommands() {
+  try {
+    const url = new URL(location.href);
+    const sp = url.searchParams;
+    const hash = (location.hash || "").toLowerCase();
+    const get = k => sp.get(k);
+    const has = k => sp.has(k) || hash.includes(k);
+    let didReset = "";
+    let doExport = "";
+    // export は先に判定（リセットと同時も可）
+    if (has("export")) doExport = (get("export") || "all").toLowerCase();
+    else if (sp.get("export") ) doExport = sp.get("export").toLowerCase();
+    // safe / safety
+    if (has("safe") || has("safety") || get("safe") === "1" || get("safety") === "1") {
+      enterSafeMode(); didReset = "safe";
+    } else if (get("reset")) {
+      const r = get("reset").toLowerCase();
+      if (["tv","video","screen"].includes(r)) { resetVideoPrefs(); didReset = "tv"; }
+      else if (["audio","sound","volume"].includes(r)) { resetAudioPrefs(); didReset = "audio"; }
+      else if (["notes","note"].includes(r)) { resetNotesPrefs(); didReset = "notes"; }
+      else if (["all","factory","full"].includes(r)) { resetAllPrefs(); didReset = "all"; }
+    } else if (hash.includes("#reset")) {
+      // #reset 単体は tv リセット扱い
+      if (hash.includes("audio") || hash.includes("sound")) { resetAudioPrefs(); didReset = "audio"; }
+      else if (hash.includes("notes")) { resetNotesPrefs(); didReset = "notes"; }
+      else if (hash.includes("all")) { resetAllPrefs(); didReset = "all"; }
+      else { resetVideoPrefs(); didReset = "tv"; }
+    }
+    if (didReset || doExport) {
+      saveUserPrefs();
+      // URLを綺麗にする（リセットループ防止）
+      try {
+        const clean = new URL(location.href);
+        clean.searchParams.delete("reset"); clean.searchParams.delete("safe"); clean.searchParams.delete("safety"); clean.searchParams.delete("factory");
+        // export は残しても良いが、一度だけにするために削除
+        if (doExport) clean.searchParams.delete("export");
+        if (clean.hash.toLowerCase().includes("reset") || clean.hash.toLowerCase().includes("safe")) clean.hash = "";
+        history.replaceState(null, "", clean.toString());
+      } catch(_) {}
+      // バナー表示は DOM 構築後に行うため、少し遅延
+      setTimeout(() => {
+        if (doExport) exportPrefs(doExport);
+        if (!didReset) return;
+        const msg = {
+          safe: "🛟 セーフモード：映像OFF・ぼかし無し・TVを初期化しました（?safe）",
+          tv: "📺 映像・TV設定を初期化しました（?reset=tv）",
+          audio: "🔊 音量・SE設定を初期化しました（?reset=audio）",
+          notes: "🎨 ノーツ設定を初期化しました（?reset=notes）",
+          all: "♻️ 全設定を初期化しました（?reset=all）"
+        }[didReset] || `リセットしました: ${didReset}`;
+        // 既存のcaptionシステムがあれば使う、なければalert風div
+        if (typeof caption !== "undefined") { caption = { text: msg, t: performance.now() }; }
+        const b = document.createElement("div");
+        b.textContent = msg + " — ページを再読み込みせずに復旧しました。URLパラメータは自動で削除されました。";
+        b.style.cssText = "position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:99999;background:#111;color:#fff;border:2px solid #0f0;padding:10px 16px;border-radius:10px;max-width:90vw;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.6)";
+        document.body.appendChild(b);
+        setTimeout(()=> b.remove(), 6000);
+      }, 400);
+    }
+    // グローバルからも手動で呼べるように公開
+    window.trkReset = (k="tv") => {
+      k = String(k).toLowerCase();
+      if (k==="safe") enterSafeMode(); else if (["tv","video"].includes(k)) resetVideoPrefs(); else if (["audio","sound"].includes(k)) resetAudioPrefs(); else if (k==="notes") resetNotesPrefs(); else if (["all","factory"].includes(k)) resetAllPrefs(); else resetVideoPrefs();
+      saveUserPrefs(); location.reload();
+    };
+    window.trkExport = (k="all") => exportPrefs(String(k).toLowerCase());
+  } catch(e) { console.error("url command failed", e); }
+})();
+
 
 const skin = () => SKINS[settings.skin] || SKINS.shadow;
 const fontFamily = () => skin().font || FONT_DEFAULT;
@@ -414,4 +551,111 @@ function showScreen(id) {
 }
 function openSettings() { if (phase === "title") showScreen("settingsScreen"); }
 function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
+
+/* ---------- 緊急復旧パネルのボタン ---------- */
+(function setupEmergencyPanel(){
+  const bind = (id, fn) => {
+    const n = document.getElementById(id);
+    if (!n) return;
+    n.addEventListener("click", fn);
+  };
+  const setSt = (key, vars) => {
+    const n = document.getElementById("emergencyStatus");
+    if (!n) return;
+    n.textContent = key ? (typeof tr !== "undefined" ? tr(key, vars) : key) : "";
+    // also use status system
+    try { setStatus("emergencyStatus", key, vars); } catch(_) {}
+  };
+  bind("emergencySafeBtn", () => {
+    enterSafeMode(); saveUserPrefs();
+    setSt(() => "🛟 セーフモードにしました。映像OFF・ぼかし無し・TV初期化。ページを再読み込みします…");
+    setTimeout(()=> location.reload(), 800);
+  });
+  bind("emergencyTvResetBtn", () => {
+    resetVideoPrefs(); saveUserPrefs();
+    try { if (typeof view !== "undefined") view.style.filter = videoFilter(); } catch(_){}
+    setSt(() => "📺 映像・TV設定を初期化しました");
+    setTimeout(()=> { try { emit("skin"); } catch(_){} }, 100);
+  });
+  bind("emergencyAudioResetBtn", () => {
+    resetAudioPrefs(); saveUserPrefs();
+    setSt(() => "🔊 音量・SE設定を初期化しました");
+  });
+  bind("emergencyExportNotesBtn", () => { exportPrefs("notes"); setSt(() => "🎨 ノーツ設定を書き出しました"); });
+  bind("emergencyExportAllBtn", () => { exportPrefs("all"); setSt(() => "💾 全設定を書き出しました"); });
+  const imp = document.getElementById("emergencyImportFile");
+  if (imp) {
+    imp.addEventListener("change", async () => {
+      const f = imp.files && imp.files[0]; if (!f) return;
+      try {
+        const txt = await f.text(); const data = JSON.parse(txt);
+        let applied = [];
+        if (data.notes) { settings.notes = sanitizeNotes(data.notes); applied.push("notes"); }
+        if (data.videoStyle) { settings.videoStyle = data.videoStyle; applied.push("videoStyle"); }
+        if (typeof data.bgDim === "number") { settings.bgDim = data.bgDim; applied.push("bgDim"); }
+        if (typeof data.bgBlur === "number") { settings.bgBlur = data.bgBlur; applied.push("bgBlur"); }
+        if (data.tvDockSkin) { settings.tvDockSkin = data.tvDockSkin; applied.push("tvDockSkin"); }
+        if (typeof data.musicVolume === "number") { settings.musicVolume = data.musicVolume; applied.push("musicVolume"); }
+        // 全体的にマージ（知らないキーは無視せず一応入れるが、型チェックは緩め）
+        for (const k of Object.keys(data)) {
+          if (k in settings && !applied.includes(k) && k !== "notes") {
+            try { settings[k] = data[k]; applied.push(k); } catch(_){}
+          }
+        }
+        saveUserPrefs();
+        try { applyNoteVars(); if (typeof view !== "undefined") view.style.filter = videoFilter(); } catch(_){}
+        setSt(() => `📥 読み込みました: ${applied.join(", ")} — 再読み込みします`);
+        setTimeout(()=> location.reload(), 900);
+      } catch(e) {
+        console.error(e);
+        setSt(() => "読み込み失敗: " + (e.message || e));
+      } finally { imp.value = ""; }
+    });
+  }
+})();
+
+/* ---------- 隠し緊急トリガー：タイトル5回クリック / Ctrl+Shift+S ---------- */
+(function setupHiddenEmergency(){
+  try {
+    let clicks = 0, last = 0;
+    const title = document.querySelector("#selectScreen .head h1, .head h1, h1");
+    if (title) {
+      title.style.cursor = "pointer";
+      title.title = "5回クリックでセーフモード（緊急）";
+      title.addEventListener("click", () => {
+        const now = Date.now();
+        if (now - last > 2000) clicks = 0;
+        last = now; clicks++;
+        if (clicks >= 5) {
+          clicks = 0;
+          if (confirm("🛟 セーフモードに入りますか？\n映像OFF・ぼかし0・TV初期化で操作可能にします。\n\n?safe=1 と同じ効果です。")) {
+            enterSafeMode(); saveUserPrefs(); location.reload();
+          }
+        }
+      });
+    }
+    document.addEventListener("keydown", (e) => {
+      // Ctrl+Shift+S または Ctrl+Shift+? でセーフモード確認
+      if (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === "s" || e.key === "?" || e.key === "/")) {
+        e.preventDefault();
+        if (confirm("🛟 セーフモードに入りますか？ (Ctrl+Shift+S)")) {
+          enterSafeMode(); saveUserPrefs(); location.reload();
+        }
+      }
+      // Esc を3秒長押しでセーフモード（画面が真っ暗でボタン押せない時用）
+      if (e.key === "Escape") {
+        if (!window._escHold) window._escHold = 0;
+        window._escHold++;
+        if (window._escHold > 60) { // 約1秒以上押しっぱなしを想定、keydownリピートでカウント
+          window._escHold = 0;
+          if (confirm("🛟 Esc長押しを検出：セーフモードに入りますか？")) {
+            enterSafeMode(); saveUserPrefs(); location.reload();
+          }
+        }
+        setTimeout(()=>{ window._escHold = Math.max(0, (window._escHold||0)-1); }, 100);
+      }
+    });
+  } catch(_) {}
+})();
 /* ✅ core.js 完了 */
+

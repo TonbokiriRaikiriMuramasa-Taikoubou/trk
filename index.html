@@ -664,6 +664,41 @@
             <label class="check"><input id="previewEnabled" type="checkbox"><span data-i18n="previewEnabled"></span></label>
           </details>
           <!-- fx.js がここに「🎛 サウンドエフェクト」の欄を追加します -->
+          <details class="panel" id="emergencyPanel">
+            <summary>🛟 緊急復旧 / Emergency Recovery</summary>
+            <div class="hint">
+              画面が真っ暗・触れなくなった時はURLに <code>?safe=1</code> や <code>?reset=tv</code> を付けて開き直すと復旧できます。<br>
+              If the screen becomes unusable, add <code>?safe=1</code> or <code>?reset=tv</code> to the URL and reload.
+            </div>
+            <div class="miniActions" style="margin-top:10px">
+              <button id="emergencySafeBtn" type="button" class="primary slim">🛟 セーフモード (映像OFF)</button>
+              <button id="emergencyTvResetBtn" type="button">📺 映像・TVリセット</button>
+              <button id="emergencyAudioResetBtn" type="button">🔊 音リセット</button>
+            </div>
+            <div class="miniActions">
+              <button id="emergencyExportNotesBtn" type="button">🎨 ノーツ設定を書き出し</button>
+              <button id="emergencyExportAllBtn" type="button">💾 全設定を書き出し</button>
+              <label class="fileBtn small">
+                <input id="emergencyImportFile" type="file" accept="application/json,.json" hidden>
+                <span>📥 設定を読み込み</span>
+              </label>
+            </div>
+            <div class="hint" style="margin-top:8px">
+              <details>
+                <summary>URLコマンド一覧</summary>
+                <ul style="text-align:left;margin:8px 0 0 16px;line-height:1.6">
+                  <li><code>?safe=1</code> / <code>#safe</code> — セーフモード：映像OFF・ぼかし0・TV初期化</li>
+                  <li><code>?reset=tv</code> / <code>?reset=video</code> — 映像・TV・ぼかし・TVスキンをデフォルトに（ノーツは保持）</li>
+                  <li><code>?reset=audio</code> — 音量・SEをデフォルトに</li>
+                  <li><code>?reset=notes</code> — ノーツ色・形をデフォルトに</li>
+                  <li><code>?reset=all</code> / <code>?factory</code> — 全設定を工場出荷状態に</li>
+                  <li><code>?export=notes</code> / <code>?export=all</code> — 設定をJSONでダウンロード</li>
+                  <li>コンソール: <code>trkReset('tv')</code>, <code>trkExport('notes')</code></li>
+                </ul>
+              </details>
+            </div>
+            <div id="emergencyStatus" class="hint status"></div>
+          </details>
         </div>
       </div>
     </div>
@@ -705,6 +740,26 @@
   <input id="chartImportFile" type="file" accept="application/json,.json" hidden>
 </div>
 
+<button id="floatingSafeBtn" type="button" title="🛟 セーフモード (5回クリックで緊急復旧) / ?safe=1" style="position:fixed;right:8px;bottom:8px;z-index:99999;opacity:.15;width:36px;height:36px;border-radius:50%;background:#111;color:#fff;border:2px solid #0f0;font-size:18px;display:flex;align-items:center;justify-content:center;transition:opacity .2s, transform .2s;cursor:pointer">🛟</button>
+<script>
+  (function(){
+    const b = document.getElementById("floatingSafeBtn");
+    if (!b) return;
+    let over = false;
+    b.addEventListener("mouseenter", ()=>{ b.style.opacity="1"; over=true; });
+    b.addEventListener("mouseleave", ()=>{ if(!over) return; b.style.opacity=".15"; over=false; });
+    b.addEventListener("click", ()=>{
+      if (confirm("🛟 セーフモードに入りますか？\n映像OFF・ぼかし0・TV初期化で操作可能にします。\n\nURLに ?safe=1 を付けるのと同じ効果です。")) {
+        try { localStorage.setItem("trk_emergency_safe", "1"); } catch(_){}
+        const url = new URL(location.href);
+        url.searchParams.set("safe","1");
+        location.href = url.toString();
+      }
+    });
+    // 画面が真っ暗な時に目立つように、一定時間後に少しだけ光らせる
+    setTimeout(()=>{ b.style.opacity=".6"; b.style.transform="scale(1.1)"; setTimeout(()=>{ b.style.opacity=".15"; b.style.transform="scale(1)"; }, 1200); }, 3000);
+  })();
+</script>
 <video id="video" playsinline preload="auto"></video>
 
 <!-- ===== 文章 ===== -->
@@ -715,6 +770,7 @@
 <!-- ▼ キャラクター（data.js の後、core.js の前）
      初音ミク：PCL（非営利・無償のみ）。商用の派生版では、この1行とファイルを削除してください。 -->
 <script src="js/characters/miku.js"></script>
+<script src="js/tv-presets.js"></script>
 <!-- ▲ 自作キャラのMODは、この下に <script src="js/characters/○○.js"></script> を足してください -->
 <!-- ===== 土台 ===== -->
 <script src="js/core.js"></script>
@@ -734,6 +790,7 @@
 <!-- ===== サウンドエフェクト（自作プリセットのMODは fx.js より前に読み込む） ===== -->
 <script src="js/fx-presets.js"></script>
 <script src="js/fx-dock.js"></script>
+<script src="js/tv-dock.js"></script>
 <script src="js/fx.js"></script>
 <!-- ===== 選曲・公認・入力・起動 ===== -->
 <script src="js/library.js"></script>

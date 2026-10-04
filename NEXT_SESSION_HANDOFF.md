@@ -45,8 +45,8 @@
   同意チェック不要（規約ごと同梱のため）。`?safe=1` では探しにも行かない。**モデル未配置ならボタンは出ない＝従来どおり**
 - **内蔵モーションが5種に**：④ジャンプ（130BPM・バンザイして跳ぶ・派手）／⑤アイドル（128BPM・サイドステップ＋こぶし突き上げ）。
   どちらも自作VMD（コード生成・GPL対象）。タワシ式のようなデフォルメモデルだと④が特に派手に見えるはず
-- **置き場**：`assets/mmd/README.md`（足し方と規約の条件）／`assets/mmd/lat-miku/README.md`＋`preset.json.example`。
-  **モデル実ファイルはまだ入っていない**（下の「次の候補 0.」参照）
+- **置き場**：`assets/mmd/README.md`（足し方と規約の条件）／`assets/mmd/lat-miku/`＝**Lat式ミク Ver2.31 Normal 投入済み**
+  （pmd＋テクスチャ18＋ReadMe.txt原文＋preset.json、計18.6MB。jsdom実HTTP検証で22項目全部OK）
 - **NOTICE.md に 3a 追加**：assets/mmd/ は GPL対象外・れあどめ原文同梱が条件・商用フォークは assets/mmd/ ごと削除
 - 新i18nキー：`mmdPresetBtn` `mmdPresetHint` `mmdPresetMissing` `mmdMotionJump` `mmdMotionIdol`（4言語）＋ `mmdHint` を4言語とも更新
 - `sw.js` の `CACHE`＝**`trk-v2026.10.5-mmdpreset1`**
@@ -85,11 +85,11 @@
 
 ## 2. 未確認・次の候補
 
-0. **💠 Lat式ミクの実ファイル投入（新・最優先）**
-   - Lat式ミク Ver2.31（Normal推奨）の zip を **チャットに添付してもらう**か、`assets/mmd/lat-miku/` に手で置く
-   - 置くもの：.pmd＋テクスチャ一式＋**れあどめ原文**＋`preset.json`（`preset.json.example` をコピーして実ファイル名に合わせる）
-   - ファイル名はできれば ASCII にリネーム（GitHub Pages は大文字小文字を区別・日本語URLの事故予防）
-   - 入れたら：💠ボタン→読み込み→④ジャンプで踊るか／クレジット自動／リロード復元／`?safe=1` でボタンが出ないこと
+0. **💠 Lat式ミクの実機確認（新・最優先）** — モデルは**投入済み**（2026-10-05）
+   - `assets/mmd/lat-miku/` に Normal.pmd（ASCII名にリネーム・中身無改変）＋テクスチャ18＋**ReadMe.txt原文**＋`preset.json` が入っている
+   - ReadMe.txt 原文で再配布OKを確認済み（「PCL対象内外問わず、規約内であれば再配布OK。ReadMe.txt同梱と製作者・改変元の明記が条件」→ lat-miku/README.md に明記済み）
+   - 残るは**実ブラウザ**：💠ボタン→テクスチャ・toonが正しく出るか／④ジャンプの見た目／クレジット表示／リロード復元／`?safe=1`
+   - 元zipはリポジトリから削除済み（mainの履歴 `83a174b` から復元可能。White・セーラー服は未同梱）
 0b. **🩷 MMDの実機確認（持ち越し）**
    - CDNから three／three-mmd-loader が読めるか／Lat式ミク・タワシ式CHAN×CO系ミクの .pmx が動くか／
      テクスチャ付きフォルダ／自分の .vmd が曲に合うか／モバイル幅の見え方

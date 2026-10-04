@@ -18,7 +18,7 @@
 
 1. 配布元から入手した zip を展開し、モデル（.pmd/.pmx）・テクスチャ・**れあどめ原文**を
    `assets/mmd/lat-miku/` に入れる
-2. `preset.json` を書く（`lat-miku/preset.json.example` をコピーして編集）
+2. `preset.json` を書く（実例：`lat-miku/preset.json`）
 3. ブラウザで開くと、設定 → 🩷 MMDマスコット に 💠 ボタンが出る
 
 ### preset.json の形

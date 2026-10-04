@@ -509,9 +509,36 @@ details.panel[open]>summary{margin-bottom:14px}
 @keyframes tvScan{0%{top:0}100%{top:100%}}
 
 /* 🎞 プロジェクター */
-#tvDock[data-skin="projector"] .tvDev{background:linear-gradient(#2a2a2a,#0a0a0a);border:1px solid #444;color:#ddd}
-#tvDock[data-skin="projector"] .tvScreenWrap{background:#000;border:2px solid #222}
-#tvDock[data-skin="projector"] .tvScreen{background:#111}
-#tvDock[data-skin="projector"] .projBeam{position:absolute;left:50%;top:-40px;width:80px;height:40px;transform:translateX(-50%);background:linear-gradient(rgba(255,255,200,.15),transparent);clip-path:polygon(20% 0,80% 0,100% 100%,0 100%)}
-#tvDock[data-skin="projector"] .projCurtain{width:10px;background:linear-gradient(#8a0000,#4a0000);border:1px solid #000}
-#tvDock[data-skin="projector"] .projCurtain.right{transform:scaleX(-1)}
+/* 🏠 家庭用テレビ */
+#tvDock[data-skin="home"] .tvDev{background:linear-gradient(#f0f0f0,#c0c0c0);border:2px solid #999;color:#222;border-radius:14px}
+#tvDock[data-skin="home"] .tvScreenWrap{border:3px solid #333;border-radius:6px;background:#000}
+#tvDock[data-skin="home"] .tvScreen{background:#111}
+#tvDock[data-skin="home"] .homeChDisp{display:inline-flex;align-items:center;justify-content:center;width:38px;height:22px;background:#000;color:#0f0;font-family:monospace;font-size:12px;border-radius:3px;border:1px solid #0a0}
+#tvDock[data-skin="home"] .homeBtn{width:28px;height:22px;border-radius:6px;background:radial-gradient(circle,#eee,#888);border:1px solid #555;box-shadow:0 1px 0 #000;font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+#tvDock[data-skin="home"] .homeBtn:hover{filter:brightness(1.1)}
+#tvDock[data-skin="home"] .homeBtn:active{transform:translateY(1px)}
+#tvDock[data-skin="home"] .homeSpeaker{width:48px;height:8px;background:repeating-linear-gradient(90deg,#222 0 1px,#aaa 1px 3px);border-radius:2px}
+
+/* 🧱 壁掛けテレビ — タイトルの横の空きスペースに置ける */
+#tvDock[data-skin="wall"] .tvDev{background:linear-gradient(#2a2a2a,#111);border:2px solid #444;color:#eee;border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.6)}
+#tvDock[data-skin="wall"] .tvScreenWrap{border:2px solid #222;border-radius:4px}
+#tvDock[data-skin="wall"] .tvScreen{background:#000}
+#tvDock[data-skin="wall"].wall-mounted{position:absolute;top:12px;right:140px;width:360px;z-index:15}
+#tvDock[data-skin="wall"] .wallMount{width:40px;height:6px;background:linear-gradient(#666,#222);border-radius:3px;box-shadow:0 2px 4px #000}
+#tvDock[data-skin="wall"] .wallShadow{position:absolute;inset:0;top:50%;background:radial-gradient(ellipse at 50% 100%,rgba(0,0,0,.5),transparent 70%);pointer-events:none}
+
+/* 🎞 プロジェクター — 修正：明るく、画面全体が暗くならないように */
+#tvDock[data-skin="projector"] .tvDev{background:linear-gradient(#e8e8e8,#b8b8b8);border:2px solid #888;color:#222;border-radius:12px}
+#tvDock[data-skin="projector"] .tvScreenWrap{background:#f5f5f5;border:2px solid #666;box-shadow:0 0 0 4px #222, 0 8px 20px rgba(0,0,0,.4)}
+#tvDock[data-skin="projector"] .tvScreen{background:radial-gradient(ellipse at 50% 40%,#fff,#ddd);color:#222}
+#tvDock[data-skin="projector"] .projBeam{display:none} /* 以前は画面を暗くする原因になっていたので非表示に */
+#tvDock[data-skin="projector"] .projCurtain{width:12px;background:linear-gradient(#7a0000,#3a0000);border:1px solid #000;border-radius:2px;height:40px}
+#tvDock[data-skin="projector"] .projLens{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,#fff 0 30%,#88c 45%,#222 70%);border:2px solid #333;box-shadow:0 0 8px rgba(100,150,255,.6)}
+
+/* wall-mounted header positioning fix */
+#selectScreen .head{position:relative}
+#tvDock[data-skin="wall"].wall-mounted .tvScreenWrap{height:72px}
+#tvDock[data-skin="wall"].wall-mounted .tvDev{padding:6px}
+@media(max-width:900px){
+  #tvDock[data-skin="wall"].wall-mounted{position:static !important;width:100% !important;right:auto !important;top:auto !important}
+}

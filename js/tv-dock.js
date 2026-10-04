@@ -14,11 +14,13 @@
 const L4 = (ja, en, zh, ko) => ({ ja, en, zh, ko });
 const TV_DOCK_SKINS = {
   standard:  { n:5, cols:5, deco:"",        label:L4("スタンダード", "Standard", "标准", "스탠다드") },
+  home:      { n:6, cols:3, deco:"home",    label:L4("🏠 家庭用テレビ", "🏠 Home TV", "🏠 家用电视", "🏠 가정용 TV") },
   crt:       { n:4, cols:4, deco:"tube",    label:L4("📺 ブラウン管", "📺 CRT TV", "📺 显像管电视", "📺 브라운관 TV") },
   wood:      { n:6, cols:3, deco:"wood",    label:L4("🪵 ウッドテレビ", "🪵 Wood console", "🪵 木质电视", "🪵 우드 TV") },
   portable:  { n:3, cols:3, deco:"antenna", label:L4("📻 ポータブル", "📻 Portable", "📻 便携电视", "📻 포터블 TV") },
   kamishibai:{ n:5, cols:5, deco:"paper",   label:L4("📖 紙芝居", "📖 Kamishibai", "📖 纸芝居", "📖 종이 연극") },
   tube:      { n:4, cols:2, deco:"dials",   label:L4("🎛 真空管", "🎛 Vacuum tube", "🎛 电子管", "🎛 진공관") },
+  wall:      { n:5, cols:5, deco:"wall",    label:L4("🧱 壁掛けテレビ", "🧱 Wall TV", "🧱 壁挂电视", "🧱 벽걸이 TV") },
   future:    { n:8, cols:4, deco:"holo",    label:L4("🛸 未来テレビ", "🛸 Holo TV", "🛸 全息电视", "🛸 홀로 TV") },
   projector: { n:5, cols:5, deco:"screen",  label:L4("🎞 プロジェクター", "🎞 Projector", "🎞 投影仪", "🎞 프로젝터") }
 };
@@ -34,7 +36,7 @@ if (typeof prefs !== "undefined") {
   }
   // 既存の保存値を settings に反映（core.js の settings は既に存在）
   if (typeof settings !== "undefined") {
-    settings.tvDockSkin = pick(prefs.tvDockSkin, Object.keys(TV_DOCK_SKINS), "standard");
+    settings.tvDockSkin = pick(prefs.tvDockSkin, Object.keys(TV_DOCK_SKINS), "home");
     settings.tvDockFive = !!prefs.tvDockFive;
     settings.tvDockOpen = prefs.tvDockOpen === true;
     settings.tvFav = idList(prefs.tvFav, TV_FAV_MAX);
@@ -42,7 +44,7 @@ if (typeof prefs !== "undefined") {
     settings.tvOrder = pick(prefs.tvOrder, ["tv-first", "fx-first"], "tv-first");
     settings.tvPowerPrev = typeof prefs.tvPowerPrev === "string" ? prefs.tvPowerPrev : "color";
     settings.tvOverlay = prefs.tvOverlay !== false;
-    settings.tvDockSkin = settings.tvDockSkin || "standard";
+    settings.tvDockSkin = settings.tvDockSkin || "home";
     settings.tvFavSeeded = true;
   }
 } else {
@@ -52,7 +54,7 @@ if (typeof prefs !== "undefined") {
 
 // settings がまだ無い場合の保険
 if (typeof settings !== "undefined") {
-  settings.tvDockSkin = settings.tvDockSkin || "standard";
+  settings.tvDockSkin = settings.tvDockSkin || "home";
   settings.tvDockFive = !!settings.tvDockFive;
   settings.tvDockOpen = !!settings.tvDockOpen;
   settings.tvFav = settings.tvFav || DEFAULT_TV_FAV.slice();
@@ -62,7 +64,7 @@ if (typeof settings !== "undefined") {
   settings.tvOverlay = settings.tvOverlay !== false;
 }
 
-const tvSkinDef = () => TV_DOCK_SKINS[settings.tvDockSkin] || TV_DOCK_SKINS.standard;
+const tvSkinDef = () => TV_DOCK_SKINS[settings.tvDockSkin] || TV_DOCK_SKINS.home;
 const tvSlotCount = () => settings.tvDockFive ? 5 : tvSkinDef().n;
 const tvSlotCols = () => settings.tvDockFive ? 5 : tvSkinDef().cols;
 
@@ -73,6 +75,7 @@ Object.assign(TEXT.ja, {
   tvFavLabel:"⭐ ボタンに入りきらないお気に入り",
   tvNoFav:"お気に入りはまだありません。ボタンを長押しすると、今の映像を登録できます。",
   tvMore:"⚙ 映像の詳しい設定",
+  tvReset:"↺ テレビ設定をリセット", tvResetDone:"テレビ設定をリセットしました",
   tvPower:"⏻ 電源（映像オン／オフ）",
   tvPowerOn:"📺 テレビON", tvPowerOff:"📺 テレビOFF",
   tvPause:"⏯ 一時停止／再生",
@@ -102,6 +105,7 @@ Object.assign(TEXT.en, {
   tvFavLabel:"⭐ Favorites that don't fit on the buttons",
   tvNoFav:"No favorites yet. Long-press a button to save the current video filter.",
   tvMore:"⚙ More video settings",
+  tvReset:"↺ Reset TV settings", tvResetDone:"TV settings reset",
   tvPower:"⏻ Power (video on/off)",
   tvPowerOn:"📺 TV ON", tvPowerOff:"📺 TV OFF",
   tvPause:"⏯ Pause / Play",
@@ -131,6 +135,7 @@ Object.assign(TEXT.zh, {
   tvFavLabel:"⭐ 按钮放不下的收藏",
   tvNoFav:"还没有收藏。长按按钮即可登记当前视频滤镜。",
   tvMore:"⚙ 视频详细设置",
+  tvReset:"↺ 重置电视设置", tvResetDone:"已重置电视设置",
   tvPower:"⏻ 电源（视频开／关）",
   tvPowerOn:"📺 电视开", tvPowerOff:"📺 电视关",
   tvPause:"⏯ 暂停／播放",
@@ -160,6 +165,7 @@ Object.assign(TEXT.ko, {
   tvFavLabel:"⭐ 버튼에 다 들어가지 않는 즐겨찾기",
   tvNoFav:"아직 즐겨찾기가 없습니다. 버튼을 길게 누르면 현재 영상을 등록할 수 있습니다.",
   tvMore:"⚙ 영상 자세한 설정",
+  tvReset:"↺ TV 설정 초기화", tvResetDone:"TV 설정을 초기화했습니다",
   tvPower:"⏻ 전원 (영상 켜기/끄기)",
   tvPowerOn:"📺 TV 켜기", tvPowerOff:"📺 TV 끄기",
   tvPause:"⏯ 일시정지/재생",
@@ -503,11 +509,35 @@ function applyOrder() {
   const tvDock = document.getElementById("tvDock");
   const fxDock = document.getElementById("fxDock");
   const col = document.querySelector(".songCol");
-  if (!tvDock || !fxDock || !col) return;
-  if (settings.tvOrder === "tv-first") {
-    if (tvDock.nextSibling !== fxDock) col.insertBefore(tvDock, fxDock);
+  const head = document.querySelector("#selectScreen .head");
+  if (!tvDock) return;
+  // 壁掛けテレビはヘッダーに移動（タイトルの横の空きスペース）
+  if (settings.tvDockSkin === "wall") {
+    if (head && tvDock.parentElement !== head) {
+      head.appendChild(tvDock);
+      tvDock.classList.add("wall-mounted");
+    } else if (head) {
+      tvDock.classList.add("wall-mounted");
+    }
+    return;
   } else {
-    if (fxDock.nextSibling !== tvDock) col.insertBefore(fxDock, tvDock);
+    tvDock.classList.remove("wall-mounted");
+    // 通常は songCol に戻す
+    if (col && tvDock.parentElement !== col) {
+      // fxDock が col にある場合はその前に、なければ末尾に
+      if (fxDock && fxDock.parentElement === col) {
+        if (settings.tvOrder === "tv-first") col.insertBefore(tvDock, fxDock);
+        else col.appendChild(tvDock);
+      } else {
+        col.appendChild(tvDock);
+      }
+    }
+    if (!fxDock || !col) return;
+    if (settings.tvOrder === "tv-first") {
+      if (tvDock.nextSibling !== fxDock) col.insertBefore(tvDock, fxDock);
+    } else {
+      if (fxDock.nextSibling !== tvDock) col.insertBefore(fxDock, tvDock);
+    }
   }
 }
 
@@ -619,8 +649,26 @@ addEventListener("DOMContentLoaded", () => {
       setTimeout(() => vs.scrollIntoView({behavior:"smooth", block:"start"}), 50);
     }
   });
+  const resetBtn = tx("button","tvReset","fxMini"); resetBtn.type = "button";
+  resetBtn.addEventListener("click", () => {
+    settings.videoStyle = "color";
+    settings.bgDim = 0; settings.bgBlur = 0;
+    settings.tvDockSkin = "home";
+    settings.tvDockFive = false;
+    settings.tvOrder = "tv-first";
+    settings.tvOverlay = true;
+    settings.tvPowerPrev = "color";
+    if (typeof view !== "undefined") view.style.filter = newVideoFilter();
+    saveUserPrefs();
+    const vs = document.getElementById("videoStyle");
+    if (vs) vs.value = settings.videoStyle;
+    if (typeof dimInp !== "undefined") { dimInp.value = 0; blurInp.value = 0; }
+    lcdFlash(tr("tvResetDone"));
+    render(true);
+    applyOrder();
+  });
 
-  body.append(tx("summary","tvMoreTitle"), quickRow, dimRow, blurRow, tx("div","tvOverlayHint","hint"), overlayCheck.lab, skinRow, five.lab, orderRow, tx("div","tvOrderHint","hint"), moreBtn);
+  body.append(tx("summary","tvMoreTitle"), quickRow, dimRow, blurRow, tx("div","tvOverlayHint","hint"), overlayCheck.lab, skinRow, five.lab, orderRow, tx("div","tvOrderHint","hint"), el("div","miniActions", moreBtn, resetBtn));
 
   dock.append(dev, overLabel, overflow, body);
   col.append(dock);
@@ -703,10 +751,26 @@ addEventListener("DOMContentLoaded", () => {
       deco.append(el("i","paperFrame"), el("i","paperSlide"));
     } else if (d === "dials") {
       for (let k=0;k<3;k++) deco.append(el("i","dial"));
+    } else if (d === "home") {
+      // 家庭用テレビ：チャンネル表示と物理ボタン（チャンネル切替＝横に映像切替）
+      const chDisp = el("i","homeChDisp"); chDisp.textContent = settings.videoStyle === "off" ? "--" : settings.videoStyle.toUpperCase().slice(0,4);
+      const chUp = el("button","homeBtn"); chUp.type="button"; chUp.textContent="▲"; chUp.title=tr("tvNext");
+      const chDown = el("button","homeBtn"); chDown.type="button"; chDown.textContent="▼"; chDown.title=tr("tvPrev");
+      chUp.addEventListener("click", ()=>{ stepTv(1); });
+      chDown.addEventListener("click", ()=>{ stepTv(-1); });
+      const volUp = el("button","homeBtn"); volUp.type="button"; volUp.textContent="＋"; volUp.title="Volume";
+      const volDown = el("button","homeBtn"); volDown.type="button"; volDown.textContent="－";
+      volUp.addEventListener("click", ()=>{ settings.musicVolume = Math.min(1, settings.musicVolume+0.05); if (typeof video!=="undefined") video.volume = settings.musicVolume; const v=document.getElementById("volume"); if(v) v.value=settings.musicVolume; saveUserPrefs(); });
+      volDown.addEventListener("click", ()=>{ settings.musicVolume = Math.max(0, settings.musicVolume-0.05); if (typeof video!=="undefined") video.volume = settings.musicVolume; const v=document.getElementById("volume"); if(v) v.value=settings.musicVolume; saveUserPrefs(); });
+      deco.append(chDisp, chUp, chDown, volUp, volDown, el("i","homeSpeaker"));
+    } else if (d === "wall") {
+      // 壁掛け：壁の質感と固定金具
+      deco.append(el("i","wallMount"), el("i","wallShadow"));
     } else if (d === "holo") {
       deco.append(el("i","holoRing"), el("i","holoRing"), el("i","holoScan"));
     } else if (d === "screen") {
-      deco.append(el("i","projBeam"), el("i","projCurtain"), el("i","projCurtain right"));
+      // プロジェクター：カーテンは装飾のみ、画面は明るく
+      deco.append(el("i","projBeam"), el("i","projCurtain"), el("i","projCurtain right"), el("i","projLens"));
     }
   }
 

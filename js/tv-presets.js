@@ -200,6 +200,167 @@ const TRK_TV_PRESETS = [
     desc:{ja:"やわらかくぼかしたような", en:"Soft focus", zh:"柔焦", ko:"부드러운 포커스"},
     filter:"brightness(1.06) contrast(.94) saturate(.92) sepia(.06)",
     overlay:"soft"
+  },
+  // ===== 追加：人が思いつかなそうな面白いフィルター20種 =====
+  {
+    id:"underwater",
+    cat:"weird",
+    label:{ja:"🌊 水中", en:"🌊 Underwater", zh:"🌊 水下", ko:"🌊 수중"},
+    desc:{ja:"水の中から見たような青く揺らぐ", en:"Blue wobble as if underwater", zh:"水下摇晃的蓝色", ko:"물속에서 보는 듯한 푸른 흔들림"},
+    filter:"hue-rotate(190deg) saturate(1.4) brightness(.85) contrast(1.2) sepia(.2)",
+    overlay:"bloom"
+  },
+  {
+    id:"thermal",
+    cat:"weird",
+    label:{ja:"🌡️ サーモグラフィ", en:"🌡️ Thermal", zh:"🌡️ 热成像", ko:"🌡️ 열화상"},
+    desc:{ja:"温度で色が変わるサーモカメラ", en:"Thermal camera heat map", zh:"热成像仪", ko:"온도에 따라 색이 변하는 열화상"},
+    filter:"hue-rotate(280deg) saturate(3) contrast(1.6) brightness(.9) invert(.1)",
+    overlay:"scan"
+  },
+  {
+    id:"xray",
+    cat:"weird",
+    label:{ja:"🦴 レントゲン", en:"🦴 X-Ray", zh:"🦴 X光", ko:"🦴 엑스레이"},
+    desc:{ja:"骨が透けるレントゲン風", en:"X-ray see-through", zh:"X光透视", ko:"뼈가 비치는 엑스레이"},
+    filter:"grayscale(1) invert(1) contrast(1.8) brightness(1.1)",
+    overlay:"vignette"
+  },
+  {
+    id:"nightvision",
+    cat:"weird",
+    label:{ja:"🔭 暗視ゴーグル", en:"🔭 Night vision", zh:"🔭 夜视仪", ko:"🔭 야간 투시경"},
+    desc:{ja:"緑一色の暗視ゴーグル", en:"Green night vision goggles", zh:"绿色夜视仪", ko:"녹색 야간 투시경"},
+    filter:"sepia(1) hue-rotate(60deg) saturate(2.5) contrast(1.4) brightness(.9)",
+    overlay:"scan"
+  },
+  {
+    id:"gameboy",
+    cat:"weird",
+    label:{ja:"👾 ゲームボーイ", en:"👾 GameBoy", zh:"👾 掌机", ko:"👾 게임보이"},
+    desc:{ja:"4階調の緑・ドット感", en:"4-shade green dot matrix", zh:"四阶绿点阵", ko:"4계조 녹색 도트"},
+    filter:"sepia(.8) hue-rotate(60deg) saturate(1.8) contrast(1.5) brightness(.9) grayscale(.2)",
+    overlay:"crt"
+  },
+  {
+    id:"dot",
+    cat:"weird",
+    label:{ja:"🔳 ドット絵", en:"🔳 Dot matrix", zh:"🔳 点阵", ko:"🔳 도트"},
+    desc:{ja:"粗いドット絵・8bit風", en:"Coarse 8-bit pixels", zh:"粗糙8位像素", ko:"거친 8비트 도트"},
+    filter:"contrast(1.6) saturate(1.8) brightness(1.05)",
+    overlay:"scan"
+  },
+  {
+    id:"newspaper",
+    cat:"weird",
+    label:{ja:"📰 新聞", en:"📰 Newspaper", zh:"📰 报纸", ko:"📰 신문"},
+    desc:{ja:"白黒の新聞ハーフトーン", en:"B&W halftone newspaper", zh:"黑白报纸半调", ko:"흑백 신문 하프톤"},
+    filter:"grayscale(1) contrast(1.9) brightness(1.15)",
+    overlay:"grain"
+  },
+  {
+    id:"blueprint",
+    cat:"weird",
+    label:{ja:"📐 青焼き", en:"📐 Blueprint", zh:"📐 蓝图", ko:"📐 청사진"},
+    desc:{ja:"青い設計図のような反転", en:"Inverted blueprint cyan", zh:"蓝色蓝图反转", ko:"파란 설계도 반전"},
+    filter:"invert(1) sepia(1) hue-rotate(180deg) saturate(2) contrast(1.3) brightness(.9)",
+    overlay:"grid"
+  },
+  {
+    id:"comic",
+    cat:"weird",
+    label:{ja:"💥 アメコミ", en:"💥 Comic", zh:"💥 美漫", ko:"💥 코믹"},
+    desc:{ja:"はっきりした線とベタ塗り・漫画", en:"Bold lines flat colors comic", zh:"粗线平涂漫画", ko:"굵은 선과 단색 만화"},
+    filter:"contrast(1.9) saturate(2.2) brightness(1.08) sepia(.08)",
+    overlay:"bloom"
+  },
+  {
+    id:"invert",
+    cat:"weird",
+    label:{ja:"🎞 ネガフィルム", en:"🎞 Negative", zh:"🎞 负片", ko:"🎞 네거티브"},
+    desc:{ja:"色が反転したネガ", en:"Inverted negative film", zh:"反色负片", ko:"색이 반전된 네거"},
+    filter:"invert(1) hue-rotate(180deg)",
+    overlay:"vignette"
+  },
+  {
+    id:"acid",
+    cat:"weird",
+    label:{ja:"🌈 アシッド", en:"🌈 Acid", zh:"🌈 迷幻", ko:"🌈 애시드"},
+    desc:{ja:"色がぐるぐる変わるサイケ", en:"Psychedelic hue swirl", zh:"迷幻色相旋转", ko:"색이 빙빙 도는 사이키"},
+    filter:"hue-rotate(90deg) saturate(3) contrast(1.4) brightness(1.1)",
+    overlay:"bloom"
+  },
+  {
+    id:"vaporwave",
+    cat:"weird",
+    label:{ja:"🌸 ヴェイパーウェイブ", en:"🌸 Vaporwave", zh:"🌸 蒸汽波", ko:"🌸 베이퍼웨이브"},
+    desc:{ja:"ピンクと水色の80s夢", en:"Pink cyan 80s dream", zh:"粉蓝80年代梦", ko:"핑크와 하늘색 80년대 꿈"},
+    filter:"hue-rotate(300deg) saturate(1.6) brightness(1.12) contrast(1.05) sepia(.15)",
+    overlay:"soft"
+  },
+  {
+    id:"cyberpunk",
+    cat:"weird",
+    label:{ja:"🌃 サイバーパンク", en:"🌃 Cyberpunk", zh:"🌃 赛博朋克", ko:"🌃 사이버펑크"},
+    desc:{ja:"ネオン街・紫と青の夜", en:"Neon street purple blue night", zh:"霓虹街紫蓝夜", ko:"네온 거리 보라 파랑 밤"},
+    filter:"hue-rotate(260deg) saturate(1.9) contrast(1.35) brightness(.88)",
+    overlay:"vignette"
+  },
+  {
+    id:"matrix",
+    cat:"weird",
+    label:{ja:"💻 マトリックス", en:"💻 Matrix", zh:"💻 黑客帝国", ko:"💻 매트릭스"},
+    desc:{ja:"緑のコードが流れる", en:"Green code rain", zh:"绿色代码雨", ko:"녹색 코드가 흐르는"},
+    filter:"sepia(1) hue-rotate(70deg) saturate(2.8) contrast(1.3) brightness(.85)",
+    overlay:"scan"
+  },
+  {
+    id:"sunset",
+    cat:"nature",
+    label:{ja:"🌅 夕焼け", en:"🌅 Sunset", zh:"🌅 日落", ko:"🌅 노을"},
+    desc:{ja:"オレンジに染まる夕日", en:"Orange dyed sunset", zh:"橙色夕阳", ko:"주황으로 물든 석양"},
+    filter:"sepia(.6) saturate(1.6) hue-rotate(-20deg) brightness(.95) contrast(1.15)",
+    overlay:"bloom"
+  },
+  {
+    id:"moonlight",
+    cat:"nature",
+    label:{ja:"🌙 月光", en:"🌙 Moonlight", zh:"🌙 月光", ko:"🌙 달빛"},
+    desc:{ja:"青白い月明かり", en:"Bluish moonlight", zh:"青白月光", ko:"푸르스름한 달빛"},
+    filter:"grayscale(.5) hue-rotate(200deg) saturate(.6) brightness(.8) contrast(1.2) sepia(.2)",
+    overlay:"vignette"
+  },
+  {
+    id:"aurora",
+    cat:"nature",
+    label:{ja:"✨ オーロラ", en:"✨ Aurora", zh:"✨ 极光", ko:"✨ 오로라"},
+    desc:{ja:"緑と紫が揺らめく空", en:"Green purple shimmering sky", zh:"绿紫闪烁天空", ko:"초록 보라가 아른거리는 하늘"},
+    filter:"hue-rotate(120deg) saturate(1.7) brightness(1.05) contrast(1.1) sepia(.1)",
+    overlay:"bloom"
+  },
+  {
+    id:"lava",
+    cat:"nature",
+    label:{ja:"🌋 溶岩", en:"🌋 Lava", zh:"🌋 熔岩", ko:"🌋 용암"},
+    desc:{ja:"赤く燃える溶岩", en:"Red burning lava", zh:"红色燃烧熔岩", ko:"붉게 타오르는 용암"},
+    filter:"sepia(.8) hue-rotate(-30deg) saturate(2.2) contrast(1.4) brightness(.9)",
+    overlay:"vignette"
+  },
+  {
+    id:"ice",
+    cat:"nature",
+    label:{ja:"🧊 氷", en:"🧊 Ice", zh:"🧊 冰", ko:"🧊 얼음"},
+    desc:{ja:"キンと冷えた氷の世界", en:"Freezing ice world", zh:"冰冻世界", ko:"꽁꽁 언 얼음 세계"},
+    filter:"hue-rotate(180deg) saturate(.7) brightness(1.15) contrast(1.1) sepia(.1)",
+    overlay:"soft"
+  },
+  {
+    id:"kaleido",
+    cat:"weird",
+    label:{ja:"🔮 万華鏡", en:"🔮 Kaleidoscope", zh:"🔮 万花筒", ko:"🔮 만화경"},
+    desc:{ja:"色がくるくる変わる万華鏡", en:"Color swirling kaleidoscope", zh:"色彩旋转万花筒", ko:"색이 빙글빙글 만화경"},
+    filter:"hue-rotate(90deg) saturate(2.5) contrast(1.3) brightness(1.1)",
+    overlay:"bloom"
   }
 ];
 /* ✅ tv-presets.js 完了 */

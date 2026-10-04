@@ -13,6 +13,7 @@
 /* ============ 設定の初期化（fx-dock.js と同じく prefs から読む） ============ */
 const L4 = (ja, en, zh, ko) => ({ ja, en, zh, ko });
 const TV_DOCK_SKINS = {
+  // 王道
   standard:  { n:5, cols:5, deco:"",        label:L4("スタンダード", "Standard", "标准", "스탠다드") },
   home:      { n:6, cols:3, deco:"home",    label:L4("🏠 家庭用テレビ", "🏠 Home TV", "🏠 家用电视", "🏠 가정용 TV") },
   crt:       { n:4, cols:4, deco:"tube",    label:L4("📺 ブラウン管", "📺 CRT TV", "📺 显像管电视", "📺 브라운관 TV") },
@@ -22,10 +23,31 @@ const TV_DOCK_SKINS = {
   tube:      { n:4, cols:2, deco:"dials",   label:L4("🎛 真空管", "🎛 Vacuum tube", "🎛 电子管", "🎛 진공관") },
   wall:      { n:5, cols:5, deco:"wall",    label:L4("🧱 壁掛けテレビ", "🧱 Wall TV", "🧱 壁挂电视", "🧱 벽걸이 TV") },
   future:    { n:8, cols:4, deco:"holo",    label:L4("🛸 未来テレビ", "🛸 Holo TV", "🛸 全息电视", "🛸 홀로 TV") },
-  projector: { n:5, cols:5, deco:"screen",  label:L4("🎞 プロジェクター", "🎞 Projector", "🎞 投影仪", "🎞 프로젝터") }
+  projector: { n:5, cols:5, deco:"screen",  label:L4("🎞 プロジェクター", "🎞 Projector", "🎞 投影仪", "🎞 프로젝터") },
+  // 追加：人が思いつかなそうな面白いやつから王道まで 20種
+  phone:     { n:4, cols:2, deco:"phone",   label:L4("📱 スマホ縦持ち", "📱 Phone vertical", "📱 竖屏手机", "📱 세로 스마트폰") },
+  arcade:    { n:8, cols:4, deco:"arcade",  label:L4("🕹️ アーケード筐体", "🕹️ Arcade cabinet", "🕹️ 街机", "🕹️ 아케이드") },
+  laptop:    { n:5, cols:5, deco:"laptop",  label:L4("💻 ノートPC", "💻 Laptop", "💻 笔记本", "💻 노트북") },
+  cinema:    { n:6, cols:3, deco:"cinema",  label:L4("🎬 映画館スクリーン", "🎬 Cinema screen", "🎬 电影银幕", "🎬 영화관 스크린") },
+  car:       { n:3, cols:3, deco:"car",     label:L4("🚗 カーナビ", "🚗 Car nav", "🚗 车载导航", "🚗 카 내비") },
+  airplane:  { n:4, cols:2, deco:"airplane",label:L4("✈️ 機内モニター", "✈️ Seatback", "✈️ 机舱屏幕", "✈️ 기내 모니터") },
+  vr:        { n:5, cols:5, deco:"vr",      label:L4("🥽 VRゴーグル", "🥽 VR headset", "🥽 VR头显", "🥽 VR 고글") },
+  aquarium:  { n:5, cols:5, deco:"aquarium",label:L4("🐠 水槽テレビ", "🐠 Aquarium TV", "🐠 鱼缸电视", "🐠 수조 TV") },
+  scope:     { n:3, cols:3, deco:"scope",   label:L4("📟 オシロスコープ", "📟 Oscilloscope", "📟 示波器", "📟 오실로스코프") },
+  cctv:      { n:6, cols:3, deco:"cctv",    label:L4("📹 監視モニター", "📹 CCTV wall", "📹 监控墙", "📹 CCTV") },
+  gameboy:   { n:4, cols:2, deco:"gameboy", label:L4("👾 ゲームボーイ", "👾 GameBoy", "👾 掌机", "👾 게임보이") },
+  jumbotron: { n:8, cols:4, deco:"jumbotron",label:L4("🏟️ 大型ビジョン", "🏟️ Jumbotron", "🏟️ 巨屏", "🏟️ 전광판") },
+  frame:     { n:5, cols:5, deco:"frame",   label:L4("🖼️ 額縁テレビ", "🖼️ Picture frame", "🖼️ 相框电视", "🖼️ 액자 TV") },
+  transparent:{ n:5, cols:5, deco:"transparent",label:L4("🫧 透明ディスプレイ", "🫧 Transparent", "🫧 透明显示", "🫧 투명 디스플레이") },
+  toy:       { n:6, cols:3, deco:"toy",     label:L4("🧸 おもちゃテレビ", "🧸 Toy TV", "🧸 玩具电视", "🧸 장난감 TV") },
+  cardboard: { n:4, cols:4, deco:"cardboard",label:L4("📦 ダンボールTV", "📦 Cardboard TV", "📦 纸箱电视", "📦 박스 TV") },
+  window:    { n:5, cols:5, deco:"window",  label:L4("🪟 窓ガラスTV", "🪟 Window TV", "🪟 窗户电视", "🪟 창문 TV") },
+  microwave: { n:4, cols:2, deco:"microwave",label:L4("🍳 電子レンジテレビ", "🍳 Microwave TV", "🍳 微波炉电视", "🍳 전자레인지 TV") },
+  videowall: { n:8, cols:4, deco:"videowall",label:L4("🧱 ビデオウォール", "🧱 Video wall", "🧱 电视墙", "🧱 비디오월") },
+  hologram:  { n:6, cols:3, deco:"hologram",label:L4("🔮 ホログラム", "🔮 Hologram", "🔮 全息投影", "🔮 홀로그램") }
 };
 const TV_FAV_MAX = 40, TV_RECENT_MAX = 5, TV_TEMP_ID = "__tv_temp", TV_LONG_MS = 600;
-const DEFAULT_TV_FAV = ["color", "mono", "vivid", "cinema", "crt", "vhs", "noir"];
+const DEFAULT_TV_FAV = ["color", "vivid", "cinema", "crt", "vhs", "underwater", "thermal", "gameboy", "vaporwave", "aurora"];
 
 const idList = (v, max) => Array.isArray(v) ? [...new Set(v.filter(x => typeof x === "string" && /^[a-z0-9_]{1,40}$/.test(x)))].slice(0, max) : [];
 
@@ -92,7 +114,7 @@ Object.assign(TEXT.ja, {
   tvOverlay:"📺 映像オーバーレイ（走査線・レターボックス・ノイズなど）を表示",
   tvOverlayHint:"CRTやVHS、シネマなどのフィルターで、走査線やフィルムグレイン、黒帯などの演出を重ねます。",
   tvQuick:"📺 映像", tvOff:"📺 OFF",
-  tvCatBasic:"基本", tvCatVivid:"ビビッド", tvCatRetro:"レトロ", tvCatCinema:"シネマ", tvCatEffect:"エフェクト",
+  tvCatBasic:"基本", tvCatVivid:"ビビッド", tvCatRetro:"レトロ", tvCatCinema:"シネマ", tvCatEffect:"エフェクト", tvCatWeird:"不思議", tvCatNature:"自然",
   tvCatFav:"★ お気に入り", tvCatRecent:"🕘 最近使った",
   tvSearch:"🔍 映像フィルターを探す", tvNoMatch:"見つかりません。", tvHits:"{n}個見つかりました",
   tvDim:"背景の暗さ", tvBlur:"背景のぼかし",
@@ -122,7 +144,7 @@ Object.assign(TEXT.en, {
   tvOverlay:"📺 Show video overlays (scanlines, letterbox, noise…)",
   tvOverlayHint:"CRT, VHS, cinema etc. add scanlines, grain, letterbox bars for atmosphere.",
   tvQuick:"📺 Video", tvOff:"📺 OFF",
-  tvCatBasic:"Basic", tvCatVivid:"Vivid", tvCatRetro:"Retro", tvCatCinema:"Cinema", tvCatEffect:"Effect",
+  tvCatBasic:"Basic", tvCatVivid:"Vivid", tvCatRetro:"Retro", tvCatCinema:"Cinema", tvCatEffect:"Effect", tvCatWeird:"Weird", tvCatNature:"Nature",
   tvCatFav:"★ Favorites", tvCatRecent:"🕘 Recent",
   tvSearch:"🔍 Search video filters", tvNoMatch:"No matches.", tvHits:"{n} found",
   tvDim:"Background dim", tvBlur:"Background blur",
@@ -152,7 +174,7 @@ Object.assign(TEXT.zh, {
   tvOverlay:"📺 显示视频叠加（扫描线・黑边・噪点等）",
   tvOverlayHint:"CRT、VHS、影院等滤镜会叠加扫描线、颗粒、黑边等效果。",
   tvQuick:"📺 视频", tvOff:"📺 关闭",
-  tvCatBasic:"基本", tvCatVivid:"鲜艳", tvCatRetro:"复古", tvCatCinema:"影院", tvCatEffect:"特效",
+  tvCatBasic:"基本", tvCatVivid:"鲜艳", tvCatRetro:"复古", tvCatCinema:"影院", tvCatEffect:"特效", tvCatWeird:"奇异", tvCatNature:"自然",
   tvCatFav:"★ 收藏", tvCatRecent:"🕘 最近使用",
   tvSearch:"🔍 搜索视频滤镜", tvNoMatch:"没有结果。", tvHits:"找到{n}个",
   tvDim:"背景暗度", tvBlur:"背景模糊",
@@ -182,7 +204,7 @@ Object.assign(TEXT.ko, {
   tvOverlay:"📺 영상 오버레이 표시 (주사선・레터박스・노이즈 등)",
   tvOverlayHint:"CRT나 VHS, 시네마 등은 주사선이나 필름 그레인, 흑색 바 등을 겹쳐 분위기를 냅니다.",
   tvQuick:"📺 영상", tvOff:"📺 OFF",
-  tvCatBasic:"기본", tvCatVivid:"비비드", tvCatRetro:"레트로", tvCatCinema:"시네마", tvCatEffect:"이펙트",
+  tvCatBasic:"기본", tvCatVivid:"비비드", tvCatRetro:"레트로", tvCatCinema:"시네마", tvCatEffect:"이펙트", tvCatWeird:"기묘", tvCatNature:"자연",
   tvCatFav:"★ 즐겨찾기", tvCatRecent:"🕘 최근 사용",
   tvSearch:"🔍 영상 필터 검색", tvNoMatch:"결과가 없습니다.", tvHits:"{n}개 찾음",
   tvDim:"배경 어둡기", tvBlur:"배경 흐림",
@@ -204,8 +226,8 @@ function tvPresetDesc(p) {
   const d = p.desc;
   return typeof d === "string" ? d : (d && (d[lang] || d.en || d.ja)) || "";
 }
-const TV_CAT_KEY = { basic:"tvCatBasic", vivid:"tvCatVivid", retro:"tvCatRetro", cinema:"tvCatCinema", effect:"tvCatEffect", fav:"tvCatFav", recent:"tvCatRecent" };
-const TV_GROUPS = ["fav", "recent", "basic", "vivid", "retro", "cinema", "effect"];
+const TV_CAT_KEY = { basic:"tvCatBasic", vivid:"tvCatVivid", retro:"tvCatRetro", cinema:"tvCatCinema", effect:"tvCatEffect", weird:"tvCatWeird", nature:"tvCatNature", fav:"tvCatFav", recent:"tvCatRecent" };
+const TV_GROUPS = ["fav", "recent", "basic", "vivid", "retro", "cinema", "effect", "weird", "nature"];
 
 function tvPresetsOf(cat) {
   if (cat === "fav") return (settings.tvFav || []).map(tvPresetById).filter(Boolean);
@@ -752,7 +774,6 @@ addEventListener("DOMContentLoaded", () => {
     } else if (d === "dials") {
       for (let k=0;k<3;k++) deco.append(el("i","dial"));
     } else if (d === "home") {
-      // 家庭用テレビ：チャンネル表示と物理ボタン（チャンネル切替＝横に映像切替）
       const chDisp = el("i","homeChDisp"); chDisp.textContent = settings.videoStyle === "off" ? "--" : settings.videoStyle.toUpperCase().slice(0,4);
       const chUp = el("button","homeBtn"); chUp.type="button"; chUp.textContent="▲"; chUp.title=tr("tvNext");
       const chDown = el("button","homeBtn"); chDown.type="button"; chDown.textContent="▼"; chDown.title=tr("tvPrev");
@@ -764,13 +785,49 @@ addEventListener("DOMContentLoaded", () => {
       volDown.addEventListener("click", ()=>{ settings.musicVolume = Math.max(0, settings.musicVolume-0.05); if (typeof video!=="undefined") video.volume = settings.musicVolume; const v=document.getElementById("volume"); if(v) v.value=settings.musicVolume; saveUserPrefs(); });
       deco.append(chDisp, chUp, chDown, volUp, volDown, el("i","homeSpeaker"));
     } else if (d === "wall") {
-      // 壁掛け：壁の質感と固定金具
       deco.append(el("i","wallMount"), el("i","wallShadow"));
-    } else if (d === "holo") {
-      deco.append(el("i","holoRing"), el("i","holoRing"), el("i","holoScan"));
+    } else if (d === "holo" || d === "hologram") {
+      deco.append(el("i","holoRing"), el("i","holoRing"), el("i","holoScan"), el("i","holoFloat"));
     } else if (d === "screen") {
-      // プロジェクター：カーテンは装飾のみ、画面は明るく
       deco.append(el("i","projBeam"), el("i","projCurtain"), el("i","projCurtain right"), el("i","projLens"));
+    } else if (d === "phone") {
+      deco.append(el("i","phoneNotch"), el("i","phoneSpeaker"), el("i","phoneHome"));
+    } else if (d === "arcade") {
+      deco.append(el("i","arcadeMarquee"), el("i","arcadeStick"), el("i","arcadeBtn"), el("i","arcadeBtn"), el("i","arcadeCoin"));
+    } else if (d === "laptop") {
+      deco.append(el("i","laptopHinge"), el("i","laptopKeys"), el("i","laptopTrack"));
+    } else if (d === "cinema") {
+      deco.append(el("i","cinemaCurtain left"), el("i","cinemaCurtain right"), el("i","cinemaSeats"));
+    } else if (d === "car") {
+      deco.append(el("i","carDash"), el("i","carVent"), el("i","carWheel"));
+    } else if (d === "airplane") {
+      deco.append(el("i","planeTray"), el("i","planeBelt"), el("i","planeWindow"));
+    } else if (d === "vr") {
+      deco.append(el("i","vrStrap"), el("i","vrLens"), el("i","vrLens right"), el("i","vrSensor"));
+    } else if (d === "aquarium") {
+      deco.append(el("i","aquaBubble"), el("i","aquaBubble b2"), el("i","aquaBubble b3"), el("i","aquaFish"), el("i","aquaSand"));
+    } else if (d === "scope") {
+      deco.append(el("i","scopeGrid"), el("i","scopeKnob"), el("i","scopeGlow"));
+    } else if (d === "cctv") {
+      deco.append(el("i","cctvRec"), el("i","cctvTime"), el("i","cctvScan"));
+    } else if (d === "gameboy") {
+      deco.append(el("i","gbDpad"), el("i","gbBtnA"), el("i","gbBtnB"), el("i","gbSpeaker"));
+    } else if (d === "jumbotron") {
+      deco.append(el("i","jumboBolt"), el("i","jumboBolt"), el("i","jumboBolt"), el("i","jumboGlare"));
+    } else if (d === "frame") {
+      deco.append(el("i","frameMount"), el("i","frameShadow"));
+    } else if (d === "transparent") {
+      deco.append(el("i","transEdge"), el("i","transShine"));
+    } else if (d === "toy") {
+      deco.append(el("i","toyBow"), el("i","toyHeart"), el("i","toyStar"));
+    } else if (d === "cardboard") {
+      deco.append(el("i","cardTape"), el("i","cardScribble"));
+    } else if (d === "window") {
+      deco.append(el("i","winHandle"), el("i","winRain"), el("i","winBlind"));
+    } else if (d === "microwave") {
+      deco.append(el("i","mwTimer"), el("i","mwDoor"), el("i","mwPlate"));
+    } else if (d === "videowall") {
+      deco.append(el("i","vwBezH"), el("i","vwBezV"), el("i","vwSeam"));
     }
   }
 

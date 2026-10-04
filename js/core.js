@@ -102,6 +102,13 @@ const settings = {
   vrmTurn: num(prefs.vrmTurn, -60, 60, -20),
   vrmRemember: prefs.vrmRemember !== false,
   vrmMotionBpm: num(prefs.vrmMotionBpm, 0, 300, 0),
+  /* 🩷 MMD（モデルは同梱しません。読み込んだものは端末内だけに保存） */
+  mmdAgreed: !!prefs.mmdAgreed,
+  mmdRemember: prefs.mmdRemember !== false,
+  mmdScale: num(prefs.mmdScale, .5, 1.8, 1),
+  mmdTurn: num(prefs.mmdTurn, -60, 60, 0),
+  mmdMotionBpm: num(prefs.mmdMotionBpm, 0, 300, 0),
+  mmdCredit: typeof prefs.mmdCredit === "string" ? prefs.mmdCredit.slice(0, 120) : "",
   activePack: typeof prefs.activePack === "string" ? prefs.activePack : null,
   previewEnabled: prefs.previewEnabled !== false,
   libSort: pick(prefs.libSort, ["name", "plays", "recent", "best"], "name"),
@@ -172,6 +179,7 @@ function enterSafeMode() {
   settings.previewEnabled = false;
   settings.tvMenuPreview = false; settings.tvMenuVideo = false;   // セーフモードは映像を流さない
   settings.fxPower = 0; settings.hideGameplayUI = false;
+  if (settings.mascot === "mmd") settings.mascot = "skin";     // 🩷 セーフモードでは MMD を使わない
   if (typeof view !== "undefined" && view) { try { view.style.filter = "none"; } catch(_) {} }
 }
 function resetAllPrefs() {
@@ -180,6 +188,7 @@ function resetAllPrefs() {
   settings.scroll = 1; settings.latency = 0; settings.judge = "standard"; settings.rate = 1;
   settings.hidden = false; settings.sudden = false;
   settings.mascot = "skin"; settings.vrmFrame = "full";
+  settings.mmdScale = 1; settings.mmdTurn = 0; settings.mmdMotionBpm = 0;
   settings.skin = "shadow"; settings.layout = "classic";
 }
 function exportPrefs(kind) {

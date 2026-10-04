@@ -3,6 +3,7 @@
 
 > 作成：2026-10-04（PR #3「feat(tv): 30 TV skins, 45 video filters, emergency recovery via URL」の続き）
 > 更新：2026-10-04（🎨 カスタムTVスキン → 🎬🖼 選曲中のmp4再生と「確認」タブを追加した回）
+> 更新：2026-10-04（**PR #4**：🎨 カスタムTVスキン／🎬🖼 mp4再生／📺◀▶／📚 曲のタブと棚スキン8種／🧩 アドオン／**🩷 MMDマスコット** をまとめた回）
 > このメモは、そのまま次回の最初のメッセージに貼っても再開できます。
 > リポジトリにこのファイルがあれば「`NEXT_SESSION_HANDOFF.md` を読んで現状を確認して」でOKです。
 
@@ -58,6 +59,17 @@
   - `api.fx.tapElement(audio)` で、自前の `<audio>`/`<video>` を本体のEQ・エフェクターに通せる（`fx.js` に追加）
   - `?safe=1` では読み込まない。壊れたアドオンは、そのアドオンだけ無効（本体は止まらない）
   - 書き方：`docs/ADDONS.md`、見本：`js/addons/example.js`
+- 🆕 **🩷 MMDマスコット（今回追加。PR #4）**
+  - 設定画面「🩷 MMDマスコット」で、**自分のMMDモデル**（.pmx/.pmd）と `.vmd` を読み込んで動かせる。**モデルとモーションは同梱していない**
+    - MMDの模型は「再配布禁止・MMD/MMM以外での使用禁止・商用不可」がほとんどなので、利用者が自分の端末から持ち込む方式にした（Lat式ミクの「再配布OK」は古いれあどめ由来で、現行の一般規約と衝突するため安全側に倒した）
+    - 内蔵モーション3種（step 120BPM／swing 100BPM／turn 120BPM）は **trk! がコードで作る自作VMD**（`js/mmd.js` の `buildVmd()`。30fps・3フレーム刻み・111B/フレーム・SJISのボーン名）
+  - 規約同意チェック（`mmdAgreed`）→ ファイル入力が有効になる。単体ファイル or **テクスチャごとフォルダ**（`webkitdirectory`）。上限 120MB／400ファイル
+  - 曲のBPMに合わせて速さが変わる：`rate = chartMeta.bpm ÷ mmdBpm`（`mmdBpm` が0なら等速、0.25〜3）。自分の `.vmd` も同じ
+  - つまみ：大きさ `mmdScale`(0.5〜1.8)／向き `mmdTurn`(−60〜60)／合成BPM `mmdBpm`(0〜300)／クレジット `mmdCredit`（画面右下に `MMD: …`）
+  - 保存：`mmdRemember`（既定オン）で IndexedDB `shadow_taiko_mmd` の "model"/"motion" に控え、次回に復元
+  - 読み込み元：three@0.180.0 と **@yohawing/three-mmd-loader 0.8.4**（importmap・CDN。three本体のMMDLoaderは**r175で削除**されたので使えない）
+  - `?safe=1` では読み込まない・復元しない（マスコットが mmd なら skin に戻す）
+  - 検証：`jsdom-mmd.mjs`（偽ライブラリを注入して配線だけ確認）。**CDN・本物のモデル/.vmd は実機でしか試せない**
 - 映像フィルター45種：
   - basic: skin, color, mono, dim, off ／ vivid: vivid, pop, pastel ／ retro: warm, cool, vintage, film, crt, vhs
   - cinema: cinema, cinemascope, noir, news, commercial ／ effect: night, security, dream, faded, poster, soft
@@ -67,10 +79,13 @@
 - 緊急復旧：
   - URLコマンド：`?safe=1` / `#safe` → セーフモード（映像OFF・ぼかし0・TV初期化・fxPower0）、`?reset=tv` / `video` / `audio` / `notes` / `all` / `factory`、`?export=notes|all|tv|audio`
   - コンソール：`trkReset('tv')`, `trkExport('notes')`／設定画面に `🛟 緊急復旧` パネル／隠しトリガー（タイトル5回クリック、Ctrl+Shift+S、Esc長押し）／フローティング🛟ボタン／バナー表示（6秒）
-- キャッシュ：`sw.js` CACHE `trk-v2026.10.4-tvmk1`（**今回の更新で変更済み**）
-- 前回PR：#2 元プロジェクト統合版採用、#3 TVドック拡張＋緊急復旧
+- キャッシュ：`sw.js` CACHE `trk-v2026.10.4-mmd1`（**今回の更新で変更済み**）
+- PR：#2 元プロジェクト統合版採用、#3 TVドック拡張＋緊急復旧、**#4 🎨カスタムTV／🎬mp4／📚曲タブ・棚スキン／📺◀▶／🧩アドオン／🩷MMD（OPEN）**
+  - 出荷 commit：#4 の D=96f048d、E=1f90656、F=347e863、G=57fc3b1、H=（MMD。このメモの更新時点）
 
 ## 2. 未確認・次の候補
+0. **🩷 MMDの実機確認（最優先）**：CDNから three／three-mmd-loader が読めるか／Lat式ミク・タワシ式CHAN×CO系ミクの .pmx が動くか／テクスチャ付きフォルダ／自分の .vmd が曲に合うか／モバイル幅の見え方
+   - 未回答のままの質問：**お気に入りに上限をかけるか**／**演奏中も◀▶を有効にするか**
 1. 実ブラウザで全30スキン＋カスタムTV・45フィルターの見た目確認（特に新20スキンのモバイル表示、`#tvMaker` の900px以下の1列表示、🎬ドックの画面に映る映像の見え方）
 2. カスタムTVの実機確認：壁掛け→自作TVに戻ったときヘッダーから曲リストへ戻るか（jsdomでは確認済み）、プロジェクター/透明スキンと併用したときの見え方
 3. `?safe=1` 後の壁掛けTV位置がヘッダーで被らないか微調整（right:140px → headToolsとの兼ね合い）
@@ -93,13 +108,14 @@
 - やるなら「選曲画面に 📺 YouTube タブ → 公式埋め込み＋映像フィルター＋公式APIの再生速度/音量」まで。やるかどうかは次回決める
 
 ## 3. 触るときの約束
-- 保存キー：shadow_taiko_preferences_v2, _records_v1, _best_v1, _song_prefs_v1, _custom_skins_v1, trk_fx_presets_v1, **trk_tv_skins_v1（新）**, IndexedDB shadow_taiko_packs/_songs/_library/_vrm
+- 保存キー：shadow_taiko_preferences_v2, _records_v1, _best_v1, _song_prefs_v1, _custom_skins_v1, trk_fx_presets_v1, trk_tv_skins_v1, trk_addons_v1, IndexedDB shadow_taiko_packs/_songs/_library/_vrm/**（新）_mmd**
 - 形式名：shadow-taiko-pack / chart / records / skin.shadow-taiko / trk-fx / trk-verified / **trk-tvskin**, 譜面ファイル *.shadow-taiko.json
-- 読み込み順：tv-presets.js → core.js → fx-dock.js → tv-dock.js → fx.js → library.js … player.jsはcore直後
+- 読み込み順：tv-presets.js → core.js → fx-dock.js → tv-dock.js → fx.js → library.js … player.jsはcore直後、**mmd.jsはvrm.jsの直後**
 - 関数を包む方式：包まれる側をconstにしない（function宣言のまま）— tv-dock.js は `videoFilter` と `drawVideo` を包む
-- 翻訳：4言語すべて、キーは接頭辞分け（tv… / **tvm…（カスタムTV）** / sfx… / vf…）、tr()は未定義キーをそのまま表示
+- 翻訳：4言語すべて、キーは接頭辞分け（tv… / tvm…（カスタムTV） / sfx… / vf… / **mmd…（MMD）** / **libTab…（曲のタブ）**）、tr()は未定義キーをそのまま表示
 - 音：createMediaElementSourceは一度だけ、TrkFX.tap()を使う
-- 公開更新したらsw.jsのCACHE名を変える — 今回 `trk-v2026.10.4-tvmk1`
+- 公開更新したらsw.jsのCACHE名を変える — 今回 `trk-v2026.10.4-mmd1`
+- MMD：**モデル・モーションをリポジトリに入れない**（持ち込み式）。内蔵モーションは自作VMDのみ。`three/addons/loaders/MMDLoader.js` を足さない（r180に無い）
 - ライセンス：新ファイル先頭に SPDX／初音ミク：js/characters/miku.jsだけに集約／素材：権利のあるものだけ
 - GitHub Pagesは大文字小文字区別
 - TVドックに内蔵スキンを足すとき：TV_DOCK_SKINSにエントリ → buildDeco()に分岐 → css/style.cssにスキンCSS → 必要ならオーバーレイ追加
@@ -118,7 +134,10 @@ for f in js/*.js js/characters/*.js; do node --check "$f" || echo "NG: $f"; done
 ```
 - 実ブラウザが使えない環境では **jsdom** でも配線ミスを拾える（読み込みエラー0・新規保存・上書き・読み込み・削除・再読み込みの復元・翻訳キーの抜け）
   - 例：`npm i jsdom` して、index.html の script を `vm.runInContext` で順に流し、DOMContentLoaded を発火 → コンソールエラーと DOM を見る
-  - canvas は `getContext` をスタブする（無いと render.js で落ちる）
+  - canvas は `getContext` をスタブする（無いと render.js で落ちる）。**`createImageData` も返す**こと（TV砂嵐が `img.data` を読む。忘れると毎フレーム jsdomError が出て、製品側のバグに見える）
+  - ハーネスは12本＋`jsdom-mmd.mjs`（Task H）。`cd` して `for f in jsdom-*.mjs; do node "$f"; done`。
+    - MMDのハーネスは本物のCDNに届かないので、ページ内に**偽の three／three-mmd-loader** を流し込んで `TrkMMD._injectLibs()` で差し替える
+    - 確認していること：VMDのバイト列とSJIS・同意ゲート・CDN不達→`mmdNetError`・モデル読み込みとIndexedDB保存・誤形式→`mmdVmdBad`・大きすぎ→`mmdTooBig`・フォルダ読み・BPM同期・playing/previewの描画・4言語・`?safe=1`
 
 ## 5. 手動チェックリスト
 - [ ] F12 Consoleに赤いエラーが出ていない
@@ -143,6 +162,10 @@ for f in js/*.js js/characters/*.js; do node --check "$f" || echo "NG: $f"; done
 - [ ] 緊急パネルでノーツ書き出し・全設定書き出し・読み込みができる
 - [ ] タイトルを5回クリックでセーフモード確認ダイアログ／右下🛟ボタンで?safe=1に遷移
 - [ ] デモ（Pulse Study）で遊べる・音が鳴る
-- [ ] 言語4種切り替えで生キーが出ない（カスタムTVの画面も）
+- [ ] 🩷 MMD：規約同意 → モデル（単体／フォルダ）を読み込むと、マスコットが MMD になり動く
+- [ ] 🩷 MMD：内蔵モーション3種と自分の .vmd が切り替わり、曲のBPMに合う（`mmdBpm` を変えると速さが変わる）
+- [ ] 🩷 MMD：大きさ・向き・クレジットが効く／「保存」を入れておくとリロードしても残る
+- [ ] 🩷 MMD：`?safe=1` では読み込まれず、マスコットが「オレンジ相棒」に戻る（赤エラーが出ない）
+- [ ] 言語4種切り替えで生キーが出ない（カスタムTV・MMDの画面も）
 - [ ] 設定を変えてリロード→残っている
 - [ ] PWA：インストールできる／オフラインで再読み込みできる

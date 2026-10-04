@@ -46,9 +46,11 @@ trk! の開発を再開します。docs/HANDOFF.md を貼ります。
 | ソースコード | **GPL-3.0-or-later**（LICENSE は全文） |
 | 「trk!」の名前 | ライセンス対象外。派生版は別の名前にしてもらう（osu!と同じ考え方） |
 | 初音ミク | **`js/characters/miku.js` だけ**に集約。PCL（非営利・無償）。商用派生ではこのファイルと読み込み1行を消すだけで動く |
-| 利用者の曲・パック・VRM | 作者のもの。リポジトリに入れない（`.gitignore` で防ぐ） |
+| 利用者の曲・パック・VRM・MMDモデル・.vmd | 作者のもの。リポジトリに入れない（`.gitignore` で防ぐ）。MMDは再配布・MMD以外のソフトでの使用・商用を禁じる規約がほとんどなので、**同梱はしない**（持ち込み式） |
 | 公認パックの曲・譜面・作者のことば | 作者さんのもの。GPLの対象外。曲はリポジトリに入れず、作者さんの配布ページに置く |
 | three.js / three-vrm | MIT（VRM使用時のみCDNから読み込み。three 0.180.0 / three-vrm 3.5.5） |
+| @yohawing/three-mmd-loader | MIT（MMD使用時のみCDNから読み込み。0.8.4。three非依存の独立実装） |
+| 内蔵モーション3種（step/swing/turn） | **trk! がコードで作る自作VMD**（`js/mmd.js` の `buildVmd()`）。GPLの対象 |
 
 - 以前のREADMEにあった「GPLで販売禁止」「osu!と同じGPL」は**誤り**として訂正済み（GPLは販売を禁止できない／osu!のコードはMIT）。
 - PCLクレジットには「PCLによる許諾の旨・PCLのURL・キャラクター名・会社名」を表示（miku.js があるときだけ）。
@@ -176,6 +178,7 @@ trk/
 | 21 | main.js | 入力・イベント・**起動処理**（`packsReady`）、サービスワーカー登録 |
 | 22 | speed.js | ⏩速度パネル・速度キー（main の後） |
 | 23 | vrm.js | 🧍VRM（`packsReady` を待つ） |
+| 24 | mmd.js | 🩷MMD（持ち込みモデル・自作VMD。`packsReady` を待つ） |
 🧊＝凍結中（しばらく触らない。会話に貼らなくてよい）
 
 ---
@@ -343,6 +346,19 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
   画面名が要るときは `screenName()`（モジュール先頭で定義）を使う
 - 「確認」タブを開いている間は、止まっていたら音なしで再生し、閉じたら元に戻す（`pvKeepPlaying` / `pvRelease`）
 
+### 🩷 MMDマスコット（js/mmd.js）
+- **持ち込み式**：MMDのモデル（.pmx/.pmd）とモーション（.vmd）は**同梱しない**。設定パネルの `mmdModelFile`（単体）／`mmdFolderFile`（webkitdirectory、テクスチャ込み）で、利用者の端末のファイルを読むだけ。フォルダのときは `createMmdFileIndex()` で索引を作り、`textureResolver` をローダーに渡す。上限 120MB／400ファイル（本命の .pmx はパスの浅い順）
+- **内蔵モーションは trk! の自作**：`buildVmd()` がその場で VMD のバイト列を作る（30fps・3フレーム刻み・111B/フレーム・補間バイトは `[0,0,127,127]` ×16＝どの読み方でも直線・末尾 `54+n*111+20`）。`BUILTIN` は step(120BPM/4s)・swing(100BPM/6s)・turn(120BPM/4s)。ボーン名（センター／上半身／上半身2／首／左腕／右腕／左ひじ／右ひじ）は SJIS（cp932 の実測値）で埋め込む
+- **BPM同期**：`rate = chartMeta.bpm ÷ settings.mmdMotionBpm`（`mmdBpm` が0なら1）。0.25〜3 に丸める。`phase==="playing"` では `#mmdCanvas`、設定パネルを開いているときは `mmdPreview`（180×120）に描く
+- **設定（`settings`。`shadow_taiko_preferences_v2` に保存）**：`mmdAgreed`（規約同意。未同意なら3つのファイル入力が disabled）／`mmdRemember`（既定オン。IndexedDB `shadow_taiko_mmd` の "model"・"motion" に保存し、次回に復元）／`mmdScale`(0.5〜1.8)／`mmdTurn`(−60〜60)／`mmdBpm`(0〜300)／`mmdCredit`(120字。画面右下に `MMD: <クレジット>`)
+- **窓口 `window.TrkMMD`（version 1）**：`builtins()` `motions()` `model()` `motion()` `setMotion()` `loadModel(files)` `loadMotion(file)` `clear()` `select()` `isPlaying()` `clock()` `rate()` `info()`。テスト用に `_injectLibs()` / `_builtin(id)` / `_sjis(s,n)` も出している
+- **importmap**：`three/`＝three@0.180.0、`@yohawing/three-mmd-loader`（jsDelivr の dist/index.js）。**three 本体の MMDLoader は r175 で削除された**ので `three/addons/loaders/MMDLoader.js` は使えない（404）
+- **`ensureScene()` は全か無か**：途中で throw したら renderer/scene/camera/pivot を**全部 null に戻す**（半端に残すと以降ぜんぶ落ちる）。`applyModelTransform()` / `frameCamera()` / `applyRect()` は null ガード必須
+- **`?safe=1`**：ライブラリも読み込まず、保存ぶんも復元しない（`mmdSafe` を出す）。`settings.mascot === "mmd"` なら "skin" に戻す
+- **正直な限界**：three とローダーはCDNから取るので**初回はオンラインが要る**。検証環境（サンドボックス）からは jsDelivr に届かないため、テストは偽ライブラリ `TrkMMD._injectLibs()` で代用している。**本物のモデル・.vmd・CDNは実機で確かめること**
+- 動作確認：`jsdom-mmd.mjs`（VMDのバイト列とSJIS・同意ゲート・CDN不達→`mmdNetError`・モデル読み込みと保存・誤形式→`mmdVmdBad`・大きすぎ→`mmdTooBig`・フォルダ読み・BPM同期・playing/preview の描画・4言語・`?safe=1`）
+  - 落とし穴：ハーネスの `stubCanvas` が `createImageData()` を返さないと、TV砂嵐（`tv-dock.js` の `drawStaticNoise`）が `img.data` で毎フレーム jsdomError を出す。**製品側のバグではない**
+
 ### キー入力の優先順位
 - `window` のキャプチャ段階で、**登録順**に受け取る：player.js → truck.js → modes.js(ORBIT) → stage.js → catch.js → extras.js(測定中) → speed.js → その後 main.js（通常段階）。
 - AUTO中：各モードはキーで判定しない。←/→・R は player.js が使う。
@@ -371,7 +387,7 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 | `shadow_taiko_custom_skins_v1` | カスタムスキン |
 | `trk_fx_presets_v1` | マイプリセット（形式 `trk-fx`） |
 | `trk_tv_skins_v1` | 🎨 カスタムTVスキン（形式 `trk-tvskin`、最大30個。選んでいるTVは `settings.tvDockSkin`） |
-| IndexedDB `shadow_taiko_packs` / `_songs` / `_library` / `_vrm` | パック（`sha256` 付き）・追加した曲・フォルダ・VRM |fxDockSkin fxDockFive fxDockOpen fxAntenna fxEqLock fxLockChain fxFavSeeded
+| IndexedDB `shadow_taiko_packs` / `_songs` / `_library` / `_vrm` / `_mmd` | パック（`sha256` 付き）・追加した曲・フォルダ・VRM・MMD（"model"/"motion"。持ち込みファイルの控え） |fxDockSkin fxDockFive fxDockOpen fxAntenna fxEqLock fxLockChain fxFavSeeded
 
 **形式名**：`shadow-taiko-pack`、`shadow-taiko-chart`、`shadow-taiko-records`、`skin.shadow-taiko`、`trk-fx`、`trk-verified`、`trk-tvskin`（カスタムTVスキン）、譜面ファイル `*.shadow-taiko.json`
 
@@ -436,6 +452,7 @@ records[指紋 "サイズ:長さ×10"] = {
 - 速度変更は `video.playbackRate`（`preservesPitch`）。0.5x〜3.0x。
 - ZIP展開は `DecompressionStream("deflate-raw")`。
 - VRM：three@0.180.0、@pixiv/three-vrm 3.5.5（importmap）。VRM 1.0 のみ。
+- MMD：同じ three@0.180.0 ＋ @yohawing/three-mmd-loader 0.8.4（importmap）。PMX/PMD/VMD、物理・IK・モーフつき。three 本体の MMDLoader は r175 で消えたので同梱しない（r0.170 まで）
 - フォルダ記憶は File System Access API（パソコンの Chrome/Edge、HTTPSかlocalhost）。Androidの Chrome では使えない。
 - PWA：`manifest.webmanifest`（全画面・横向き）、`sw.js`（ネット優先・同じサイトのファイルだけキャッシュ）。**公開を更新したら sw.js の `CACHE` 名を変える**（例：`trk-v2026.10` → `trk-v2026.11`）。新旧のJSが混ざるときは `<script src="…?v=2026.10.1">` のように版番号を付ける。
 - Xの文字数：半角1・全角2・絵文字2、上限280（verified.js の `postLength`）。
@@ -460,6 +477,8 @@ records[指紋 "サイズ:長さ×10"] = {
 - [x] 🧩 アドオン（設置・オン/オフ・削除・保存、置き場所、曲を足す、エフェクターへの道、docs/ADDONS.md・見本）
 - 動作確認：`jsdom-addons.mjs`（入れる／スロット4つ／🧩タブ／addonSelect／tapElement（偽のAudioContextで配線）／オフ・削除／壊れた3種のメッセージ／setupが投げても本体は無事／?safe=1 で読み込まない／4言語）
 - [ ] 実機確認：アドオンを入れて動くか（例のサンプル）／`?safe=1` で読み込まれないか／壊れたアドオンを入れても本体が無事か
+- [x] 🩷 MMDマスコット（持ち込み式・自作VMD3種・曲BPM同期・大きさ/向き/クレジット・保存と復元・4言語・`?safe=1` で切る）
+- [ ] 実機確認：CDNから three／three-mmd-loader が読めるか／Lat式ミクやタワシ式CHAN×CO系ミクの .pmx が動くか／テクスチャ付きフォルダ／自分の .vmd が曲に合うか／モバイル幅での見え方
 - [x] 📚 曲のタブ（自動）と棚スキン8種（🎨 で切替・設定で隠せる）
 - [ ] 実機確認：パックを入れてタブが増えるか／タブの中で探しやすいか／8スキンの見た目（モバイル幅・縦長のタブ帯）
 - [x] 📺◀▶ 曲送りボタン（前の曲・次の曲）と、TV→ラック→くわしい×2 のならべ方

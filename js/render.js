@@ -381,9 +381,21 @@ function drawVrmOverlay() {
   if (vrmState.credit) drawCornerCredit(vrmState.credit);
   ctx.restore();
 }
+/* 🩷 MMD：3Dは #mmdCanvas が描くので、ここは吹き出しとクレジットだけ */
+function drawMmdOverlay() {
+  const info = window.TrkMMD && window.TrkMMD.model && window.TrkMMD.model();
+  if (!info) return;
+  const R = VRM_RECT[settings.layout] || VRM_RECT.classic, talking = !!caption && performance.now() - caption.t < CAPTION_MS;
+  ctx.save();
+  if (talking && settings.layout !== "commentary") drawBubble(R.x + 40, R.y + 50, 640, skin().ui["--ui-accent"], true);
+  const credit = String(settings.mmdCredit || "").trim();
+  if (credit) drawCornerCredit(tr("mmdCreditPrefix") + " " + credit);
+  ctx.restore();
+}
 function drawMascot() {
   const m = activeMascot(); if (!m) return;
   if (m === "vrm") { drawVrmOverlay(); return; }
+  if (m === "mmd") { drawMmdOverlay(); return; }
   const def = m === "buddy" ? BUDDY_DEF : MASCOT_DEFS[m];
   if (!def) return;
   const P = MASCOT_POS[settings.layout] || MASCOT_POS.classic, p = performance.now();

@@ -62,7 +62,7 @@ const TEXT = {
     confirmDelete:"このカスタムスキンを削除しますか？", customTag:"CUSTOM", remix:"リミックス",
 
     /* マスコット（キャラクターの名前は js/characters/*.js が追加します） */
-    mascotSel:"マスコット", mascotSkin:"スキン標準", mascotNone:"なし", mascotBuddy:"オレンジ相棒", mascotVrm:"VRMモデル（自分のモデル）",
+    mascotSel:"マスコット", mascotSkin:"スキン標準", mascotNone:"なし", mascotBuddy:"オレンジ相棒", mascotVrm:"VRMモデル（自分のモデル）", mascotMmd:"MMDモデル（自分のモデル）",
     mascotHint:"マスコットはプレイ中に画面の隅で応援してくれます。「VRMモデル」を選ぶと、自分のモデルも使えます。",
     capStart:"はい、よーいスタート。", capCombo:"{n}コンボ達成。いい感じですね。", capBreak:"あっ…コンボが途切れました（痛恨）",
     speakerA:"解説", speakerB:"実況",
@@ -238,7 +238,7 @@ const TEXT = {
     builtinLocked:"Built-in skins can't be edited or deleted. Use “Save as new” to copy one.", skinLimit:"You can have up to 20 custom skins.",
     confirmDelete:"Delete this custom skin?", customTag:"CUSTOM", remix:"Remix",
 
-    mascotSel:"Mascot", mascotSkin:"Skin default", mascotNone:"None", mascotBuddy:"Orange Buddy", mascotVrm:"VRM model (your own)",
+    mascotSel:"Mascot", mascotSkin:"Skin default", mascotNone:"None", mascotBuddy:"Orange Buddy", mascotVrm:"VRM model (your own)", mascotMmd:"MMD model (your own)",
     mascotHint:"Mascots cheer you on from the corner during play. Choose “VRM model” to use your own model.",
     capStart:"Alright, timer starts now.", capCombo:"{n} combo. Looking clean.", capBreak:"Oof… combo dropped.",
     speakerA:"Narrator", speakerB:"Player",
@@ -407,7 +407,7 @@ const TEXT = {
     builtinLocked:"内置皮肤无法修改或删除，请用“另存为新皮肤”复制。", skinLimit:"自定义皮肤最多20个。",
     confirmDelete:"要删除这个自定义皮肤吗？", customTag:"CUSTOM", remix:"混搭",
 
-    mascotSel:"吉祥物", mascotSkin:"皮肤默认", mascotNone:"无", mascotBuddy:"橙色搭档", mascotVrm:"VRM模型（自己的模型）",
+    mascotSel:"吉祥物", mascotSkin:"皮肤默认", mascotNone:"无", mascotBuddy:"橙色搭档", mascotVrm:"VRM模型（自己的模型）", mascotMmd:"MMD模型（自己的模型）",
     mascotHint:"吉祥物会在游戏中于画面角落为你加油。选择“VRM模型”即可使用自己的模型。",
     capStart:"好，计时开始。", capCombo:"{n}连击达成，状态不错。", capBreak:"啊…连击断了（痛恨）",
     speakerA:"解说", speakerB:"实况",
@@ -575,7 +575,7 @@ const TEXT = {
     builtinLocked:"내장 스킨은 수정・삭제할 수 없습니다. '새로 저장'으로 복제하세요.", skinLimit:"커스텀 스킨은 최대 20개입니다.",
     confirmDelete:"이 커스텀 스킨을 삭제할까요?", customTag:"CUSTOM", remix:"리믹스",
 
-    mascotSel:"마스코트", mascotSkin:"스킨 기본", mascotNone:"없음", mascotBuddy:"오렌지 버디", mascotVrm:"VRM 모델 (내 모델)",
+    mascotSel:"마스코트", mascotSkin:"스킨 기본", mascotNone:"없음", mascotBuddy:"오렌지 버디", mascotVrm:"VRM 모델 (내 모델)", mascotMmd:"MMD 모델 (내 모델)",
     mascotHint:"마스코트가 플레이 중 화면 구석에서 응원해 줍니다. 'VRM 모델'을 고르면 내 모델도 쓸 수 있어요.",
     capStart:"자, 타이머 시작합니다.", capCombo:"{n} 콤보 달성. 순조롭네요.", capBreak:"앗… 콤보가 끊겼습니다(통한).",
     speakerA:"해설", speakerB:"실황",

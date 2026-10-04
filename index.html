@@ -39,7 +39,10 @@
     "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
     "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3.5.5/lib/three-vrm.module.min.js",
     "@pixiv/three-vrm-core": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm-core@3.5.5/lib/three-vrm-core.module.js",
-    "@pixiv/three-vrm-animation": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm-animation@3.5.5/lib/three-vrm-animation.module.js"
+    "@pixiv/three-vrm-animation": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm-animation@3.5.5/lib/three-vrm-animation.module.js",
+    "three/": "https://cdn.jsdelivr.net/npm/three@0.180.0/",
+    "@yohawing/three-mmd-loader": "https://cdn.jsdelivr.net/npm/@yohawing/three-mmd-loader@0.8.4/dist/index.js",
+    "@yohawing/three-mmd-loader/": "https://cdn.jsdelivr.net/npm/@yohawing/three-mmd-loader@0.8.4/dist/"
   }
 }
 </script>
@@ -50,6 +53,7 @@
   <canvas id="view" width="1920" height="1080"></canvas>
   <canvas id="fx" width="1920" height="1080"></canvas>
   <canvas id="vrmCanvas" hidden></canvas>
+  <canvas id="mmdCanvas" hidden></canvas>
 
   <!-- ===== プレイ中の表示 ===== -->
   <div class="topline">
@@ -329,6 +333,7 @@
                     <option value="none" data-i18n="mascotNone"></option>
                     <option value="buddy" data-i18n="mascotBuddy"></option>
                     <option value="vrm" data-i18n="mascotVrm"></option>
+              <option value="mmd" data-i18n="mascotMmd"></option>
                   </select>
                 </label>
               </div>
@@ -748,6 +753,64 @@
             <div id="seStatus" class="hint status"></div>
             <label class="check"><input id="previewEnabled" type="checkbox"><span data-i18n="previewEnabled"></span></label>
           </details>
+          <details class="panel" id="mmdPanel">
+            <summary data-i18n="mmdTitle"></summary>
+            <div class="hint" data-i18n="mmdHint"></div>
+            <label class="check"><input id="mmdAgree" type="checkbox"><span data-i18n="mmdAgree"></span></label>
+            <h3 data-i18n="mmdModelHead"></h3>
+            <div class="miniActions">
+              <label class="fileBtn small disabled" id="mmdModelFileLabel">
+                <input id="mmdModelFile" type="file" accept=".pmx,.pmd" hidden disabled>
+                <span data-i18n="mmdChooseModel"></span>
+              </label>
+              <label class="fileBtn small disabled" id="mmdFolderFileLabel">
+                <input id="mmdFolderFile" type="file" webkitdirectory multiple hidden disabled>
+                <span data-i18n="mmdChooseFolder"></span>
+              </label>
+              <button id="mmdClearModel" type="button" data-i18n="mmdClearModel"></button>
+            </div>
+            <label class="check"><input id="mmdRemember" type="checkbox"><span data-i18n="mmdRemember"></span></label>
+            <h3 data-i18n="mmdMotionHead"></h3>
+            <div class="miniActions">
+              <select id="mmdMotionSelect"></select>
+              <label class="fileBtn small disabled" id="mmdMotionFileLabel">
+                <input id="mmdMotionFile" type="file" accept=".vmd" hidden disabled>
+                <span data-i18n="mmdChooseMotion"></span>
+              </label>
+              <button id="mmdClearMotion" type="button" data-i18n="mmdClearMotion"></button>
+            </div>
+            <div class="hint" data-i18n="mmdBuiltinNote"></div>
+            <label class="field">
+              <span data-i18n="mmdBpm"></span>
+              <input id="mmdBpm" type="number" min="0" max="300" step="1">
+            </label>
+            <h3 data-i18n="mmdFitHead"></h3>
+            <div class="makerRow two">
+              <label class="field">
+                <span data-i18n="mmdSize"></span>
+                <span class="inline tight">
+                  <input id="mmdSize" type="range" min="0.5" max="1.8" step="0.05">
+                  <span id="mmdSizeVal" class="mono"></span>
+                </span>
+              </label>
+              <label class="field">
+                <span data-i18n="mmdTurn"></span>
+                <span class="inline tight">
+                  <input id="mmdTurn" type="range" min="-60" max="60" step="5">
+                  <span id="mmdTurnVal" class="mono"></span>
+                </span>
+              </label>
+            </div>
+            <label class="field">
+              <span data-i18n="mmdCreditLabel"></span>
+              <input id="mmdCredit" type="text" maxlength="120" autocomplete="off">
+            </label>
+            <div class="vrmRow">
+              <canvas id="mmdPreview" width="360" height="240"></canvas>
+              <div id="mmdInfo" class="hint vrmInfo"></div>
+            </div>
+            <div id="mmdStatus" class="hint status"></div>
+          </details>
           <!-- fx.js がここに「🎛 サウンドエフェクト」の欄を追加します -->
           <details class="panel" id="emergencyPanel">
             <summary>🛟 緊急復旧 / Emergency Recovery</summary>
@@ -903,5 +966,6 @@
 <script src="js/main.js"></script>
 <script src="js/speed.js"></script>
 <script src="js/vrm.js"></script>
+<script src="js/mmd.js"></script>
 </body>
 </html>

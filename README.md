@@ -164,7 +164,8 @@ AUTO中か、「シークバーを表示（練習用）」をオンにしてい�
 - **STAGE**：レーンの幅・暗さ、ノーツの太さ、キービーム、補助線、盛り上がる場面で光るレーン、スポットライトなどの舞台演出
 - **判定文字**：大きさ・位置・FAST/SLOWの表示範囲、AP/FCの継続表示
 - **揺れ**：ビートやドン／カッに合わせてレーンを傾けます（初期値オフ。OSの「視差効果を減らす」がオンなら止まります）
-- **マスコット**：オレンジ相棒、初音ミク（PCL・非公式の二次創作）、**自分のVRMモデル**（VRM 1.0）。.vrma のモーションも曲のBPMに合わせて動きます。
+- **マスコット**：オレンジ相棒、初音ミク（PCL・非公式の二次創作）、**自分のVRMモデル**（VRM 1.0）、**自分のMMDモデル**（.pmx／.pmd）。VRM の .vrma も MMD の .vmd も、曲のBPMに合わせて動きます。
+- **🩷 MMDマスコット（持ち込み式）**：Lat式ミクやタワシ式CHAN×CO系ミクなど、**お手持ちのMMDモデル**を動かせます。テクスチャごとフォルダを選ぶだけ。内蔵モーションは trk! がコードで作る自作の3種（step／swing／turn）で、自分の `.vmd` も読み込めます。**モデルとモーションは同梱していません**（MMDの模型は再配布できないものがほとんどです）。大きさ・向き・画面下のクレジットを設定でき、チェックを入れると次に開いたときも復元します。`?safe=1` のときは読み込みません。
 
 ---
 
@@ -265,6 +266,7 @@ osu! のスキンのように、いろいろなものを1つのファイル（`.
 | パックの読み込み | `DecompressionStream` に対応したブラウザ |
 | 公認パックの確認 | HTTPS か localhost（指紋の計算に必要です） |
 | VRM | WebGL。初回だけ three.js／three-vrm をCDNから読み込みます |
+| MMD | WebGL。初回だけ three.js／three-mmd-loader をCDNから読み込みます |
 
 **保存について：** 設定・記録・パック・追加した曲・マイプリセットは、**このブラウザの中だけ**に保存されます（localStorage・IndexedDB）。ブラウザのデータを消すと消えるので、記録はときどきバックアップしてください。
 
@@ -335,7 +337,8 @@ trk/
 │  ├─ verified.js                … 公認パック
 │  ├─ addons.js  addons/         … アドオン（あとから機能を足すしくみ・見本）
 │  ├─ main.js  speed.js          … 入力・起動・速度
-│  └─ vrm.js                     … VRMマスコット
+│  ├─ vrm.js                     … VRMマスコット
+│  └─ mmd.js                     … MMDマスコット（モデル・モーションは持ち込み）
 ├─ docs/  HANDOFF.md  verified.md  og.png
 ├─ tools/make-icons.html         … アイコンとOGP画像を作るツール
 ├─ .github/ISSUE_TEMPLATE/       … 不具合・アイデアのフォーム
@@ -384,8 +387,8 @@ trk! は、たくさんの音楽ゲームから着想をもらっています。
 | ソースコード | **GNU GPL v3.0 or later**（[LICENSE](LICENSE)） |
 | 「trk!」の名前 | ライセンスの対象外です。派生版は、別の名前で公開してください |
 | 初音ミクのマスコット（`js/characters/miku.js`） | ピアプロ・キャラクター・ライセンス（PCL）に基づく二次創作です。**GPLの対象外**で、非営利・無償の範囲でのみ使えます |
-| three.js ／ three-vrm | MIT License（VRM使用時にCDNから読み込み） |
-| 利用者が読み込む曲・VRM・パック | それぞれの作者のものです |
+| three.js ／ three-vrm ／ three-mmd-loader | MIT License（VRM・MMDの使用時にCDNから読み込み） |
+| 利用者が読み込む曲・VRM・MMDモデル・.vmd・パック | それぞれの作者のものです |
 | 公認パックの曲・譜面・作者のことば | 作者さんのものです。GPLの対象外で、trk! で遊ぶための公開です |
 
 ### 初音ミクについて
@@ -399,6 +402,7 @@ https://piapro.jp/license/pcl/summary
 ### お願い
 - 権利のない曲を、曲パックなどで配らないでください。
 - VRMモデルは、作者の利用条件を確認してから使ってください（VRChat改変モデルは、元の規約も確認してください）。
+- MMDモデル・モーションも、**同梱していません**。使うときは作者の規約（再配布の可否・MMD／MMM以外のソフトでの使用・商用の可否）を確かめて、**自分の端末から**読み込んでください。trk! は読み込んだファイルを保存も送信もしません（下の「保存」にチェックを入れたときだけ、このブラウザの中に残します）。
 
 詳しくは [NOTICE.md](NOTICE.md) をご覧ください。
 
@@ -418,7 +422,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 - 🎪 **STAGE** — 4/5/6-lane vertical play with stairs, trills and wide notes (inspired by World Dai Star: Yume no Stellarium)
 - 🚛 **CATCH** — catch falling parcels with your truck; grab nitro cans 🚀 for **Blast mode**
 
-**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, VRM 1.0 mascots, shareable `.stpack` packs, and 🎛 **sound effects** (115 EQ/FX presets, game-reactive effects, automatic latency compensation, shareable `trk-fx` JSON presets).
+**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, VRM 1.0 mascots, MMD mascots (bring your own model), shareable `.stpack` packs, and 🎛 **sound effects** (115 EQ/FX presets, game-reactive effects, automatic latency compensation, shareable `trk-fx` JSON presets).
 
 **✔ Verified packs:** song packs whose composer/charter identity and rights have been confirmed get a ✔ badge and a short message from the creator (up to 280, like a free X post). See [docs/verified.md](docs/verified.md).
 
@@ -426,7 +430,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 
 **Feedback:** casual thoughts on X [@ttrk143](https://x.com/ttrk143) (hashtag **#trkAGRG**), bugs and ideas on [GitHub Issues](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues).
 
-**License:** code under **GPL-3.0-or-later**. The name “trk!” is not licensed — please rename forks. The Hatsune Miku mascot (`js/characters/miku.js`) is fan art under the Piapro Character License (non-commercial only) and is **not** covered by the GPL; delete that file and its `<script>` line for commercial forks. Songs, charts and messages in verified packs belong to their creators.
+**License:** code under **GPL-3.0-or-later**. The name “trk!” is not licensed — please rename forks. The Hatsune Miku mascot (`js/characters/miku.js`) is fan art under the Piapro Character License (non-commercial only) and is **not** covered by the GPL; delete that file and its `<script>` line for commercial forks. MMD models and `.vmd` motions are **never bundled** — you load your own from your device, and their authors' terms apply. Songs, charts and messages in verified packs belong to their creators.
 
 This work depicts the character “Hatsune Miku” of Crypton Future Media, INC. under the Piapro Character License.
 

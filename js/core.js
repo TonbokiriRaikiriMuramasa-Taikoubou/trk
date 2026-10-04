@@ -121,7 +121,10 @@ const settings = {
   libSkinQuick: prefs.libSkinQuick !== false,                                 // 📚 曲リストの 🎨 ボタンを出す
   /* 📊 スペクトラム（js/spectrum.js が値と実在を検証して読み戻す） */
   specOn: prefs.specOn !== false,                                             // 表示する（初期オン）
-  specStyle: pick(prefs.specStyle, ["bars", "mirror", "wave", "ring"], "bars"),
+  /* 見え方の一覧は spectrum.js（このあとに読み込む）が決めています。ここでは
+     TrkSpec があればその一覧、なければ初期4種で検証し、spectrum.js の読み込み時に
+     もう一度 prefs から読み直して 16 種ぶんに広げます（core.js 側の直し忘れを防ぐ）。 */
+  specStyle: pick(prefs.specStyle, (window.TrkSpec && TrkSpec.styles()) || ["bars", "mirror", "wave", "ring"], "bars"),
   specTheme: pick(prefs.specTheme, ["neon", "sunset", "mono", "rainbow"], "neon"),
   specGain: num(prefs.specGain, .4, 2.5, 1),
   specPeaks: prefs.specPeaks !== false,

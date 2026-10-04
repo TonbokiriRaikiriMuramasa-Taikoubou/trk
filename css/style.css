@@ -1114,8 +1114,15 @@ details.panel[open]>summary{margin-bottom:14px}
 .specCanvas{display:block;width:100%;height:132px;margin-top:8px;border-radius:12px;border:1px solid var(--ui-border);
   background:radial-gradient(ellipse at 50% 130%,rgba(56,189,248,.20),rgba(0,0,0,.34) 72%),rgba(0,0,0,.18)}
 .specSeg{margin-top:4px}
-.specSeg button{font-size:14px;padding:8px 6px}
+.specSeg button{font-size:13px;padding:7px 6px}
 .specLabel{margin:10px 0 0;font-weight:800}
+/* 色のチップは、どの色か分かるように小さな点を付ける */
+.specSegColor button{display:inline-flex;align-items:center;justify-content:center;gap:5px}
+.specSegColor button::before{content:"";width:10px;height:10px;border-radius:50%;background:currentColor;flex:0 0 auto}
+.specSegColor button[data-spec-val="neon"]::before{background:#22d3ee}
+.specSegColor button[data-spec-val="sunset"]::before{background:linear-gradient(90deg,#ffb703,#ff4d9d)}
+.specSegColor button[data-spec-val="mono"]::before{background:#e5e7eb}
+.specSegColor button[data-spec-val="rainbow"]::before{background:linear-gradient(90deg,#f87171,#fbbf24,#4ade80,#60a5fa,#c084fc)}
 #tvDock .specTvCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;
-  mix-blend-mode:screen;opacity:.92;transition:opacity .25s}
+  mix-blend-mode:screen;opacity:var(--specTvAlpha,.92);transition:opacity .25s}
 #tvDock.off .specTvCanvas{opacity:0}

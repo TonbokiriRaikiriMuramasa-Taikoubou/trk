@@ -1,7 +1,7 @@
 # trk! 開発引き継ぎ文書（HANDOFF）
 
 > trk! is AGRG! — an All-Generation Rhythm Game
-> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン16種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り ＋ 🥁音ゲーマー向けFAST/SLOW・あべこべ・でたらめ ＋ 💬GitHub Issuesテンプレート ＋ 📊スペクトラム（音の見える化・**見え方16種・色8種・曲名バナーのスキン・🚫使用しないスイッチ**・TVに重ねられる）＋ 🎛エフェクトチェーン編集＋ 🎹曲に合わせて演奏できるシンセモード（16音色・エレキギター／電子サックス／ZUNPET風ブラス・±8半音ピッチ・鍵盤固定オプション初期オン・大画面向け鍵盤拡張オプション・起動オプション）＋ 📤ミュージックフォルダを共有（1回の許可で一括取り込み・🔗共有をつづける・💾端末に残す・🚫やめる）まで）
+> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン16種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り ＋ 🥁音ゲーマー向けFAST/SLOW・あべこべ・でたらめ ＋ 💬GitHub Issuesテンプレート ＋ 📊スペクトラム（音の見える化・**見え方16種・色8種・曲名バナーのスキン・🚫使用しないスイッチ**・TVに重ねられる）＋ 🎛エフェクトチェーン編集＋ 🎹曲に合わせて演奏できるシンセモード（16音色・エレキギター／電子サックス／ZUNPET風ブラス・±8半音ピッチ・鍵盤固定オプション初期オン・大画面向け鍵盤拡張オプション・起動オプション）＋ 📤ミュージックフォルダを共有（1回の許可で一括取り込み・🔗共有をつづける・💾端末に残す・🚫やめる）＋ privacy.html ＋ Capacitor Android準備 ＋ 権利とクレジット図鑑まで）
 > この文書は、新しい会話で開発を再開するための参照資料です。
 
 ---
@@ -46,10 +46,12 @@ trk! の開発を再開します。docs/HANDOFF.md を貼ります。
 | ソースコード | **GPL-3.0-or-later**（LICENSE は全文） |
 | 「trk!」の名前 | ライセンス対象外。派生版は別の名前にしてもらう（osu!と同じ考え方） |
 | 初音ミク | **`js/characters/miku.js` だけ**に集約。PCL（非営利・無償）。商用派生ではこのファイルと読み込み1行を消すだけで動く |
-| 利用者の曲・パック・VRM・MMDモデル・.vmd | 作者のもの。リポジトリに入れない（`.gitignore` で防ぐ）。MMDは再配布・MMD以外のソフトでの使用・商用を禁じる規約がほとんどなので、**同梱はしない**（持ち込み式） |
+| 利用者の曲・パック・VRM・MMDモデル・.vmd | 作者のもの。原則リポジトリに入れない（`.gitignore` で防ぐ）。MMDは再配布・MMD以外のソフトでの使用・商用を禁じる規約がほとんどなので持ち込み式。例外として、再配布OKの原文ReadMeを同梱した `assets/mmd/lat-miku/` を収録 |
 | 公認パックの曲・譜面・作者のことば | 作者さんのもの。GPLの対象外。曲はリポジトリに入れず、作者さんの配布ページに置く |
-| three.js / three-vrm | MIT（VRM使用時のみCDNから読み込み。three 0.180.0 / three-vrm 3.5.5） |
+| three.js / three-vrm / three-vrm-animation | MIT（VRM使用時のみCDNから読み込み。three 0.180.0 / three-vrm 3.5.5） |
 | @yohawing/three-mmd-loader | MIT（MMD使用時のみCDNから読み込み。0.8.4。three非依存の独立実装） |
+| Capacitor Core / Android | MIT（任意のAPKラッパーを生成したときだけ使用） |
+| Capacitor CLI / TypeScript | MIT / Apache-2.0（APK生成用の開発ツール） |
 | 内蔵モーション25種（step/swing/turn/jump/idol＋🎵15種＋🎸3種＋👀BPM非依存2種）＋🎲おまかせ | **trk! がコードで作る自作VMD**（`js/mmd.js` の `buildVmd()`）。GPLの対象 |
 | 選曲画面のモーションミニ操作 `#mmdQuickPanel`（⏩の下。👀/🎲/🎯⭐/💤の4チップ） | `js/mmd.js` の `buildQuickPanel()`。モデル読み込み済みのときだけ表示・`mmdQuickUI` で切替 |
 | 💠 同梱プリセットモデル（`assets/mmd/`） | **GPL対象外**。れあどめ原文で再配布OKを確認できたモデルだけ置ける（例：Lat式ミク）。NOTICE.md の 3a 参照 |
@@ -153,10 +155,11 @@ trk! の開発を再開します。docs/HANDOFF.md を貼ります。
 
 ```
 trk/
-├─ index.html  manifest.webmanifest  sw.js  verified.json  .nojekyll  .gitignore
+├─ index.html  privacy.html  credits.html  manifest.webmanifest  sw.js  verified.json  .nojekyll  .gitignore
+├─ package.json  capacitor.config.ts
 ├─ README.md  NOTICE.md  CONTRIBUTING.md  LICENSE
 ├─ css/style.css   icons/（icon.svg・icon-192.png・icon-512.png）   tools/make-icons.html
-├─ docs/  HANDOFF.md  verified.md  og.png
+├─ docs/  HANDOFF.md  pack-format.md  android.md  verified.md  og.png
 ├─ .github/ISSUE_TEMPLATE/  bug_report.yml  feature_request.yml  config.yml
 └─ js/
 ```
@@ -606,6 +609,7 @@ records[指紋 "サイズ:長さ×10"] = {
 **やること**
 - [ ] ブラウザで全ファイルの動作確認（コンソールに赤いエラーがないか）
 - [x] `privacy.html` とCapacitor用Web資産同期の土台（APKの実機確認・配布は未完了）
+- [x] `credits.html` の権利とクレジット図鑑、NOTICE / README / Handoffの第三者ライブラリ記載を同期
 - [x] アイコン成果物の静的確認：`icons/icon-192.png`（192×192）・`icons/icon-512.png`（512×512）・`docs/og.png` が存在する（`node tools/check-repo.mjs` で再確認）
 - [ ] `tools/make-icons.html` の生成手順を実機ブラウザで確認し、PWAアイコンと `docs/og.png` の表示を確認する
 - [ ] GitHub Pages を公開し、About（説明・Website・Topics）を入れる

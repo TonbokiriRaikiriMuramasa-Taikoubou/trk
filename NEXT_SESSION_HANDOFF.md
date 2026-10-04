@@ -14,6 +14,7 @@
 ## 今回整理・実装したもの
 
 - `privacy.html` と `css/privacy.css` を追加し、現在のWeb/PWAのローカル優先動作、外部通信、削除方法、APK版の未提供状態を明記。
+- `credits.html` を追加し、コード、PCL、Lat式ミク、第三者ライブラリ、Capacitor、ユーザーコンテンツの権利をカード形式で確認できるようにした。`NOTICE.md` / README / Handoffの第三者ライブラリ記載も同期。
 - `package.json`、`capacitor.config.ts`、`tools/prepare-mobile-web.mjs`、`docs/android.md` を追加し、同じWeb資産をCapacitorのAndroid WebViewへ同期する土台を整備。Androidプロジェクト・APKはまだ生成・配布していない。
 - `docs/pack-format.md` を追加し、`.stpack` / `pack.json` の形式、上限、曲パック例、権利上の注意を文書化。
 - `README.md` のプライバシー、APK準備、パック仕様リンクと静的検査コマンドを追加。

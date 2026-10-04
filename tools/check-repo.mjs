@@ -88,6 +88,19 @@ for (const match of privacy.matchAll(/(?:href|src)=["']([^"']+)["']/gi)) {
 }
 if (!missingPrivacyRefs) ok("privacy.html local references");
 
+const credits = read("credits.html").replace(/<!--[\s\S]*?-->/g, "");
+let missingCreditsRefs = 0;
+for (const match of credits.matchAll(/(?:href|src)=["']([^"']+)["']/gi)) {
+  const ref = match[1];
+  if (/^(?:[a-z]+:)?\/\//i.test(ref) || ref.startsWith("data:") || ref.startsWith("#")) continue;
+  const rel = localPath(ref);
+  if (!exists(rel)) {
+    missingCreditsRefs += 1;
+    fail(`credits.html reference is missing: ${ref}`);
+  }
+}
+if (!missingCreditsRefs) ok("credits.html local references");
+
 // The manifest's PWA icons are easy to break when an asset is regenerated.
 try {
   const manifest = JSON.parse(read("manifest.webmanifest"));
@@ -149,6 +162,7 @@ for (const rel of [
   "NOTICE.md",
   "README.md",
   "privacy.html",
+  "credits.html",
   "css/privacy.css",
   "package.json",
   "capacitor.config.ts",
@@ -162,8 +176,10 @@ if (exists("README.md") && !read("README.md").includes("docs/pack-format.md")) {
   ok("pack format documentation is linked from README.md");
 }
 if (exists("README.md") && !read("README.md").includes("privacy.html")) fail("README.md does not link to privacy.html");
+if (exists("README.md") && !read("README.md").includes("credits.html")) fail("README.md does not link to credits.html");
 if (exists("index.html") && !read("index.html").includes('href="privacy.html"')) fail("index.html does not link to privacy.html");
-else ok("privacy page is linked from the app");
+if (exists("index.html") && !read("index.html").includes('href="credits.html"')) fail("index.html does not link to credits.html");
+else ok("privacy and credits pages are linked from the app");
 try {
   const pkg = JSON.parse(read("package.json"));
   for (const script of ["prepare:mobile", "cap:add:android", "cap:sync", "cap:build:android"]) {

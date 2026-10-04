@@ -292,6 +292,7 @@ osu! のスキンのように、いろいろなものを1つのファイル（`.
 - フォルダの許可を**覚えておく**のは、パソコンの Chrome／Edge だけです。スマホでも設定の「**💾 共有した曲を端末に残す**」をオンにすると、保存された曲（最大150曲・300MB）は許可なしで遊べます。
 - APK版はまだ配布していません。PWAの静的Web資産をCapacitorでAndroidアプリへ同期する準備を追加しました。初回セットアップと制限は [docs/android.md](docs/android.md) をご覧ください。
 - プライバシー方針は [privacy.html](privacy.html) です。trk! はアカウント・広告・行動分析を使わず、曲や設定を基本的に端末内で扱います。
+- コード・ミク・同梱モデル・第三者ライブラリのクレジットは [credits.html](credits.html) の「権利とクレジット図鑑」にまとめています。正式な注意書きは [NOTICE.md](NOTICE.md) です。
 
 ---
 
@@ -358,7 +359,7 @@ trk! はMODしやすいように、機能ごとにファイルを分けていま
 
 ```
 trk/
-├─ index.html  privacy.html  manifest.webmanifest  sw.js  verified.json
+├─ index.html  privacy.html  credits.html  manifest.webmanifest  sw.js  verified.json
 ├─ package.json  capacitor.config.ts
 ├─ css/style.css
 ├─ icons/                        … アプリのアイコン
@@ -435,7 +436,9 @@ trk! は、たくさんの音楽ゲームから着想をもらっています。
 | ソースコード | **GNU GPL v3.0 or later**（[LICENSE](LICENSE)） |
 | 「trk!」の名前 | ライセンスの対象外です。派生版は、別の名前で公開してください |
 | 初音ミクのマスコット（`js/characters/miku.js`） | ピアプロ・キャラクター・ライセンス（PCL）に基づく二次創作です。**GPLの対象外**で、非営利・無償の範囲でのみ使えます |
-| three.js ／ three-vrm ／ three-mmd-loader | MIT License（VRM・MMDの使用時にCDNから読み込み） |
+| three.js ／ three-vrm ／ three-vrm-animation ／ three-mmd-loader | MIT License（VRM・MMDの使用時にCDNから読み込み） |
+| Capacitor Core ／ Android | MIT License（任意のAndroidラッパーを生成したときだけ使用） |
+| Capacitor CLI ／ TypeScript | MIT ／ Apache-2.0（APK生成用の開発ツール。アプリ実行時には含めない） |
 | 利用者が読み込む曲・VRM・MMDモデル・.vmd・パック | それぞれの作者のものです |
 | 公認パックの曲・譜面・作者のことば | 作者さんのものです。GPLの対象外で、trk! で遊ぶための公開です |
 

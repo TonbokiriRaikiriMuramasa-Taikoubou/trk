@@ -13,19 +13,23 @@ const out = path.join(root, "mobile-web");
 const files = [
   "index.html",
   "privacy.html",
+  "credits.html",
   "manifest.webmanifest",
   "sw.js",
   "verified.json",
-  "NOTICE.md"
+  "NOTICE.md",
+  "LICENSE"
 ];
-const directories = ["assets", "css", "icons", "js"];
+const directories = ["assets", "css", "docs", "icons", "js"];
 
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
 for (const rel of files) {
   const source = path.join(root, rel);
   if (!fs.existsSync(source)) throw new Error(`Missing web file: ${rel}`);
-  fs.copyFileSync(source, path.join(out, rel));
+  const destination = path.join(out, rel);
+  fs.mkdirSync(path.dirname(destination), { recursive: true });
+  fs.copyFileSync(source, destination);
 }
 for (const rel of directories) {
   const source = path.join(root, rel);

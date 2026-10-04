@@ -169,6 +169,9 @@ if (typeof prefs !== "undefined") {
     settings.tvOrder = pick(prefs.tvOrder, ["tv-first", "fx-first"], "tv-first");
     settings.tvPowerPrev = typeof prefs.tvPowerPrev === "string" ? prefs.tvPowerPrev : "color";
     settings.tvOverlay = prefs.tvOverlay !== false;
+    /* 🆕 メニューでmp4の映像を流す（選曲中） */
+    settings.tvMenuPreview = prefs.tvMenuPreview !== false;   // 選曲中のTVに映像を映す（初期オン）
+    settings.tvMenuVideo = prefs.tvMenuVideo === true;        // 音のプレビューがオフでも映像を流す（初期オフ）
     settings.tvDockSkin = settings.tvDockSkin || "home";
     settings.tvFavSeeded = true;
   }
@@ -187,6 +190,8 @@ if (typeof settings !== "undefined") {
   settings.tvOrder = settings.tvOrder || "tv-first";
   settings.tvPowerPrev = settings.tvPowerPrev || "color";
   settings.tvOverlay = settings.tvOverlay !== false;
+  settings.tvMenuPreview = settings.tvMenuPreview !== false;
+  settings.tvMenuVideo = settings.tvMenuVideo === true;
 }
 
 const tvSkinDef = () => TV_DOCK_SKINS[settings.tvDockSkin] || TV_DOCK_SKINS.home;
@@ -196,7 +201,7 @@ const tvSlotCols = () => settings.tvDockFive ? 5 : tvSkinDef().cols;
 /* ============ 文章（接頭辞 tv…） ============ */
 Object.assign(TEXT.ja, {
   tvTitle:"📺 テレビ（映像出力）",
-  tvMoreTitle:"📺 くわしく（映像・TVスキン・並び順）",
+  tvMoreTitle:"📺 くわしく（設定と映像の確認）",
   tvFavLabel:"⭐ ボタンに入りきらないお気に入り",
   tvNoFav:"お気に入りはまだありません。ボタンを長押しすると、今の映像を登録できます。",
   tvMore:"⚙ 映像の詳しい設定",
@@ -222,11 +227,22 @@ Object.assign(TEXT.ja, {
   tvSearch:"🔍 映像フィルターを探す", tvNoMatch:"見つかりません。", tvHits:"{n}個見つかりました",
   tvDim:"背景の暗さ", tvBlur:"背景のぼかし",
   tvCurrent:"いまの映像：{name}",
-  tvPrev:"前の映像", tvNext:"次の映像", tvRandom:"おまかせ"
+  tvPrev:"前の映像", tvNext:"次の映像", tvRandom:"おまかせ",
+  /* 🆕 メニューでmp4の映像を流す・「確認」タブ */
+  tvpTabSetup:"🎛 TVの設定", tvpTabPreview:"🖼 映像の確認",
+  tvpPreviewHint:"いま選んでいる映像フィルター・TVスキン・暗さ・ぼかしを、この画面で確かめられます。曲を選ぶと、ここにそのmp4が流れます（ゲーム画面と同じ大きさで表示）。",
+  tvpNoVideo:"まだ映像がありません。曲を選ぶと、ここに流れます。",
+  tvpOff:"映像はOFFです（⏻ か、フィルターで「非表示」を選ぶと戻ります）。",
+  tvpNow:"いまの映像：{name}",
+  tvpMenuPreview:"🖼 選曲中のTVに映像を映す",
+  tvpMenuPreviewHint:"選曲画面のTV（下のドック）の画面に、流れているmp4を映します。動きが気になるときはオフに。",
+  tvpMenuVideo:"🎬 音のプレビューがオフでも、メニューで映像を再生する（音は出しません）",
+  tvpMenuVideoHint:"設定の「選曲中に曲のプレビューを再生する」がオンのときは、そちら（音あり）を優先します。",
+  tvpPower:"⏻ 映像のON/OFF"
 });
 Object.assign(TEXT.en, {
   tvTitle:"📺 TV (video output)",
-  tvMoreTitle:"📺 More (video, TV skin, order)",
+  tvMoreTitle:"📺 More (setup & video check)",
   tvFavLabel:"⭐ Favorites that don't fit on the buttons",
   tvNoFav:"No favorites yet. Long-press a button to save the current video filter.",
   tvMore:"⚙ More video settings",
@@ -252,11 +268,22 @@ Object.assign(TEXT.en, {
   tvSearch:"🔍 Search video filters", tvNoMatch:"No matches.", tvHits:"{n} found",
   tvDim:"Background dim", tvBlur:"Background blur",
   tvCurrent:"Current: {name}",
-  tvPrev:"Prev video", tvNext:"Next video", tvRandom:"Random"
+  tvPrev:"Prev video", tvNext:"Next video", tvRandom:"Random",
+  /* 🆕 menu mp4 playback + Preview tab */
+  tvpTabSetup:"🎛 TV setup", tvpTabPreview:"🖼 Video check",
+  tvpPreviewHint:"Check the current filter, TV skin, dim and blur right here. Pick a song and its mp4 plays in this box (same framing as in game).",
+  tvpNoVideo:"No video yet. Pick a song and it plays here.",
+  tvpOff:"Video is off (use ⏻ or choose “Off” in the filter list).",
+  tvpNow:"Now showing: {name}",
+  tvpMenuPreview:"🖼 Show the video on the TV in song select",
+  tvpMenuPreviewHint:"Plays the current mp4 inside the TV dock's screen. Turn off if the motion bothers you.",
+  tvpMenuVideo:"🎬 Play video in the menu even when sound previews are off (muted)",
+  tvpMenuVideoHint:"When “Play song previews in song select” is on, that one (with sound) takes priority.",
+  tvpPower:"⏻ Video on/off"
 });
 Object.assign(TEXT.zh, {
   tvTitle:"📺 电视（视频输出）",
-  tvMoreTitle:"📺 详细（视频・电视皮肤・顺序）",
+  tvMoreTitle:"📺 详细（设置与画面确认）",
   tvFavLabel:"⭐ 按钮放不下的收藏",
   tvNoFav:"还没有收藏。长按按钮即可登记当前视频滤镜。",
   tvMore:"⚙ 视频详细设置",
@@ -282,11 +309,22 @@ Object.assign(TEXT.zh, {
   tvSearch:"🔍 搜索视频滤镜", tvNoMatch:"没有结果。", tvHits:"找到{n}个",
   tvDim:"背景暗度", tvBlur:"背景模糊",
   tvCurrent:"当前视频：{name}",
-  tvPrev:"上一个视频", tvNext:"下一个视频", tvRandom:"随机"
+  tvPrev:"上一个视频", tvNext:"下一个视频", tvRandom:"随机",
+  /* 🆕 菜单中播放mp4 + 「确认」标签页 */
+  tvpTabSetup:"🎛 电视设置", tvpTabPreview:"🖼 画面确认",
+  tvpPreviewHint:"可在此确认当前的滤镜、电视皮肤、暗度和模糊。选一首歌后，其mp4会在这里播放（与游戏画面相同的取景）。",
+  tvpNoVideo:"还没有画面。选一首歌后就会在这里播放。",
+  tvpOff:"画面已关闭（用⏻ 或在滤镜中选“隐藏”即可恢复）。",
+  tvpNow:"当前画面：{name}",
+  tvpMenuPreview:"🖼 在选曲画面把视频映到电视上",
+  tvpMenuPreviewHint:"把正在播放的mp4映到选曲画面下方电视坞的屏幕上。觉得晃眼时可关闭。",
+  tvpMenuVideo:"🎬 即使关闭试听，也在菜单中播放视频（无声）",
+  tvpMenuVideoHint:"当设置里的“选曲时播放歌曲试听”开启时，优先使用那个（有声音）。",
+  tvpPower:"⏻ 画面开/关"
 });
 Object.assign(TEXT.ko, {
   tvTitle:"📺 TV (영상 출력)",
-  tvMoreTitle:"📺 자세히 (영상・TV 스킨・순서)",
+  tvMoreTitle:"📺 자세히 (설정과 영상 확인)",
   tvFavLabel:"⭐ 버튼에 다 들어가지 않는 즐겨찾기",
   tvNoFav:"아직 즐겨찾기가 없습니다. 버튼을 길게 누르면 현재 영상을 등록할 수 있습니다.",
   tvMore:"⚙ 영상 자세한 설정",
@@ -312,7 +350,18 @@ Object.assign(TEXT.ko, {
   tvSearch:"🔍 영상 필터 검색", tvNoMatch:"결과가 없습니다.", tvHits:"{n}개 찾음",
   tvDim:"배경 어둡기", tvBlur:"배경 흐림",
   tvCurrent:"현재 영상: {name}",
-  tvPrev:"이전 영상", tvNext:"다음 영상", tvRandom:"랜덤"
+  tvPrev:"이전 영상", tvNext:"다음 영상", tvRandom:"랜덤",
+  /* 🆕 메뉴에서 mp4 재생 + 「확인」 탭 */
+  tvpTabSetup:"🎛 TV 설정", tvpTabPreview:"🖼 영상 확인",
+  tvpPreviewHint:"지금 고른 필터·TV 스킨·어둡기·흐림을 이 화면에서 확인할 수 있습니다. 곡을 고르면 그 mp4가 여기서 재생됩니다(게임 화면과 같은 구도).",
+  tvpNoVideo:"아직 영상이 없습니다. 곡을 고르면 여기서 재생됩니다.",
+  tvpOff:"영상이 꺼져 있습니다(⏻ 또는 필터에서 “숨기기”를 고르면 돌아옵니다).",
+  tvpNow:"지금 영상: {name}",
+  tvpMenuPreview:"🖼 곡 선택 화면의 TV에 영상 비추기",
+  tvpMenuPreviewHint:"재생 중인 mp4를 곡 선택 화면 아래 TV 독 화면에 비춥니다. 움직임이 신경 쓰이면 끄세요.",
+  tvpMenuVideo:"🎬 미리듣기가 꺼져 있어도 메뉴에서 영상을 재생합니다(무음)",
+  tvpMenuVideoHint:"설정의 “곡 선택 중 미리듣기 재생”이 켜져 있으면 그쪽(소리 있음)을 우선합니다.",
+  tvpPower:"⏻ 영상 켜기/끄기"
 });
 
 /* ============ 映像フィルターの取得 ============ */
@@ -674,6 +723,62 @@ function applyOrder() {
   }
 }
 
+/* ============ 🎬🖼 選曲中にmp4を流す（メニュー再生・確認用の描画） ============
+   注意：ドックを組み立てている中のスコープでは const screen（TV画面のdiv）が
+   core.js の画面名（"select" / "settings"）を隠してしまうので、画面名はこの関数で読む */
+const screenName = () => (typeof screen === "string" ? screen : "");
+
+/* ・音は出さない。音ありのプレビュー（settings.previewEnabled）がオンのときは、そちらを優先する
+   ・fit:"contain" はゲーム画面と同じ（黒帯つきで全体を映す）／fit:"cover" はTVの画面いっぱい（はみ出しは切る） */
+function paintVideoFrame(ctx, W, H, fit) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.filter = "none";
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, W, H);
+  if (!videoReady || !video.videoWidth || settings.videoStyle === "off") return false;
+  const vw = video.videoWidth, vh = video.videoHeight;
+  const s = (fit === "cover" ? Math.max : Math.min)(W / vw, H / vh);
+  const dw = vw * s, dh = vh * s;
+  try { ctx.filter = newVideoFilter(); } catch (_) {}
+  try { ctx.drawImage(video, (W - dw) / 2, (H - dh) / 2, dw, dh); } catch (_) { return false; }
+  ctx.filter = "none";
+  const preset = currentTvPreset();
+  drawTvOverlay(ctx, W, H, (preset && preset.overlay) || tvFilterBase().overlay || null);
+  return true;
+}
+
+/* 「🎬 音のプレビューがオフでも、メニューで映像を再生する」の中身 */
+let menuMutedByUs = false, menuPlayingByUs = false;
+function menuVideoWanted() {
+  return settings.tvMenuVideo === true && settings.previewEnabled !== true &&
+    phase === "title" && screen === "select" && !document.hidden && videoReady && !!video.src;
+}
+function menuVideoTick() {
+  if (!menuVideoWanted()) {
+    if (menuPlayingByUs) { try { video.pause(); } catch (_) {} menuPlayingByUs = false; }
+    if (menuMutedByUs) { video.muted = false; menuMutedByUs = false; }
+    return;
+  }
+  if (video.paused) {
+    if (!video.muted) { video.muted = true; menuMutedByUs = true; }
+    video.play().then(() => { menuPlayingByUs = true; }).catch(() => {});
+  } else {
+    menuPlayingByUs = false;   // 誰かが再生している場合は、止めるときも触らない
+  }
+}
+video.addEventListener("ended", () => {
+  if (!menuVideoWanted()) return;
+  try { video.currentTime = (typeof previewStartFor === "function") ? previewStartFor() : 0; } catch (_) {}
+  video.play().catch(() => {});
+});
+document.addEventListener("visibilitychange", menuVideoTick);
+on("screen", menuVideoTick);
+on("phase", menuVideoTick);
+video.addEventListener("canplay", menuVideoTick);
+video.addEventListener("loadeddata", menuVideoTick);
+video.addEventListener("play", menuVideoTick);   // 「pause」は見ない（⏯で止めたものを勝手に戻さないため）
+
 /* ============ 画面の組み立て ============ */
 addEventListener("DOMContentLoaded", () => {
   const col = document.querySelector(".songCol");
@@ -718,7 +823,9 @@ addEventListener("DOMContentLoaded", () => {
   const screen = el("div", "tvScreen");
   const screenGlare = el("i", "tvGlare");
   const speaker = el("div", "tvSpeaker");
-  screen.append(screenGlare, el("i", "tvScanlines"));   // 走査線はカスタムTVスキン用（[data-scan="1"] のときだけ出る）
+  /* 🆕 選曲中は、この画面に流れているmp4を映す（paintVideoFrame が描く） */
+  const liveCanvas = document.createElement("canvas"); liveCanvas.className = "tvLive";
+  screen.append(liveCanvas, screenGlare, el("i", "tvScanlines"));   // 走査線はカスタムTVスキン用（[data-scan="1"] のときだけ出る）
   screenWrap.append(screen, speaker);
   const deco = el("div", "tvDeco");
   const slots = el("div", "tvSlots");
@@ -801,8 +908,10 @@ addEventListener("DOMContentLoaded", () => {
     settings.tvOrder = "tv-first";
     settings.tvOverlay = true;
     settings.tvPowerPrev = "color";
+    settings.tvMenuPreview = true; settings.tvMenuVideo = false;
     if (typeof view !== "undefined") view.style.filter = newVideoFilter();
     saveUserPrefs();
+    menuVideoTick();
     const vs = document.getElementById("videoStyle");
     if (vs) vs.value = settings.videoStyle;
     if (typeof dimInp !== "undefined") { dimInp.value = 0; blurInp.value = 0; }
@@ -811,7 +920,112 @@ addEventListener("DOMContentLoaded", () => {
     applyOrder();
   });
 
-  body.append(tx("summary","tvMoreTitle"), quickRow, dimRow, blurRow, tx("div","tvOverlayHint","hint"), overlayCheck.lab, skinRow, makerBtn, five.lab, orderRow, tx("div","tvOrderHint","hint"), el("div","miniActions", moreBtn, resetBtn));
+  /* ---- 🎛 設定 / 🖼 確認 のタブと中身 ---- */
+  const tabsBar = el("div", "seg tvTabs");
+  const tabSetup = btn("");
+  const tabPrev = btn("");
+  const setLabel = (node, key) => { node.textContent = tr(key); node.dataset.i18n = key; };
+  setLabel(tabSetup, "tvpTabSetup"); setLabel(tabPrev, "tvpTabPreview");
+  tabsBar.append(tabSetup, tabPrev);
+
+  const paneSetup = el("div", "tvPane");
+  paneSetup.append(tx("div","tvOverlayHint","hint"), overlayCheck.lab, five.lab, orderRow,
+    tx("div","tvOrderHint","hint"), el("div","miniActions", makerBtn, moreBtn, resetBtn));
+
+  const pvWrap = el("div", "tvpWrap");
+  const pvCanvas = document.createElement("canvas"); pvCanvas.className = "tvpCanvas";
+  pvCanvas.width = 1920; pvCanvas.height = 1080;
+  const pvChip = el("div", "tvpChip");
+  pvWrap.append(pvCanvas, pvChip);
+
+  const menuPrevCheck = (() => {
+    const lab = el("label","check"), inp = document.createElement("input");
+    inp.type = "checkbox"; lab.append(inp, tx("span","tvpMenuPreview"));
+    inp.addEventListener("change", () => { settings.tvMenuPreview = inp.checked; saveUserPrefs(); render(); });
+    return { lab, inp };
+  })();
+  const menuVidCheck = (() => {
+    const lab = el("label","check"), inp = document.createElement("input");
+    inp.type = "checkbox"; lab.append(inp, tx("span","tvpMenuVideo"));
+    inp.addEventListener("change", () => { settings.tvMenuVideo = inp.checked; saveUserPrefs(); menuVideoTick(); render(); });
+    return { lab, inp };
+  })();
+  const pvPower = btn("fxMini", tr("tvpPower")); pvPower.dataset.i18n = "tvpPower";
+  pvPower.addEventListener("click", () => { togglePower(); render(); });
+
+  const panePreview = el("div", "tvPane");
+  panePreview.append(pvWrap, tx("div","tvpPreviewHint","hint"), menuPrevCheck.lab, tx("div","tvpMenuPreviewHint","hint"),
+    menuVidCheck.lab, tx("div","tvpMenuVideoHint","hint"), el("div","miniActions", pvPower, moreBtn));
+
+  let tab = "setup", pvRaf = 0, pvMutedByUs = false, pvPlayedByUs = false;
+  const previewOn = () => tab === "preview" && !panePreview.hidden && body.open && !document.hidden &&
+    phase === "title" && screenName() === "select";
+  function pvChipText() {
+    if (settings.videoStyle === "off") { pvChip.textContent = tr("tvOff"); return; }
+    pvChip.textContent = tr("tvpNow", { name: names()[settings.videoStyle] || settings.videoStyle });
+  }
+  function pvPlaceholder(ctx, text) {
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.filter = "none"; ctx.globalAlpha = 1;
+    ctx.fillStyle = "#000"; ctx.fillRect(0, 0, 1920, 1080);
+    ctx.fillStyle = "rgba(255,255,255,.82)";
+    ctx.font = `600 56px ${FONT_DEFAULT}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(text, 960, 540);
+  }
+  function pvFrame() {
+    pvRaf = requestAnimationFrame(pvFrame);
+    const ctx = pvCanvas.getContext("2d"); if (!ctx) return;
+    if (settings.videoStyle === "off") { pvPlaceholder(ctx, tr("tvpOff")); return; }
+    if (!paintVideoFrame(ctx, 1920, 1080, "contain")) pvPlaceholder(ctx, tr("tvpNoVideo"));
+  }
+  /* 「確認」タブを開いている間は、止まっていたら（音なしで）動かす */
+  function pvKeepPlaying() {
+    if (!previewOn() || settings.previewEnabled) return;
+    if (video.paused && videoReady) {
+      if (!video.muted) { video.muted = true; pvMutedByUs = true; }
+      video.play().then(() => { pvPlayedByUs = true; }).catch(() => {});
+    }
+  }
+  function pvRelease() {
+    if (settings.tvMenuVideo === true) return;   // メニュー再生が続くので触らない
+    if (pvPlayedByUs) { try { video.pause(); } catch (_) {} pvPlayedByUs = false; }
+    if (pvMutedByUs) { video.muted = false; pvMutedByUs = false; }
+  }
+  function previewTick() {
+    pvChipText();
+    if (previewOn()) {
+      if (!pvRaf) pvRaf = requestAnimationFrame(pvFrame);
+      pvKeepPlaying();
+    } else {
+      if (pvRaf) { cancelAnimationFrame(pvRaf); pvRaf = 0; }
+      pvRelease();
+    }
+  }
+  function showTab(which) {
+    tab = which === "preview" ? "preview" : "setup";
+    paneSetup.hidden = tab !== "setup";
+    panePreview.hidden = tab !== "preview";
+    tabSetup.classList.toggle("selected", tab === "setup");
+    tabPrev.classList.toggle("selected", tab === "preview");
+    tabSetup.setAttribute("aria-pressed", String(tab === "setup"));
+    tabPrev.setAttribute("aria-pressed", String(tab === "preview"));
+    previewTick();
+  }
+  tabSetup.addEventListener("click", () => showTab("setup"));
+  tabPrev.addEventListener("click", () => showTab("preview"));
+  body.addEventListener("toggle", previewTick);
+  video.addEventListener("ended", () => {
+    if (!previewOn() || !pvPlayedByUs) return;   // 音ありプレビューが動かしている場合は library.js に任せる
+    try { video.currentTime = (typeof previewStartFor === "function") ? previewStartFor() : 0; } catch (_) {}
+    video.play().catch(() => {});
+  });
+  document.addEventListener("visibilitychange", previewTick);
+  video.addEventListener("play", previewTick);
+  video.addEventListener("pause", previewTick);
+  video.addEventListener("canplay", previewTick);
+  showTab("setup");
+
+  body.append(tx("summary","tvMoreTitle"), quickRow, skinRow, dimRow, blurRow, tabsBar, paneSetup, panePreview);
 
   dock.append(dev, overLabel, overflow, body);
   col.append(dock);
@@ -952,6 +1166,21 @@ addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /* ---- ドックの画面に映像を映す（実際の大きさに合わせて描く） ---- */
+  let liveRaf = 0;
+  function liveFrame() {
+    liveRaf = requestAnimationFrame(liveFrame);
+    const w = liveCanvas.clientWidth, h = liveCanvas.clientHeight;
+    if (!w || !h) return;
+    const dpr = Math.min(2, (typeof devicePixelRatio === "number" ? devicePixelRatio : 1));
+    const W = Math.max(2, Math.round(w * dpr)), H = Math.max(2, Math.round(h * dpr));
+    if (liveCanvas.width !== W || liveCanvas.height !== H) { liveCanvas.width = W; liveCanvas.height = H; }
+    const ctx = liveCanvas.getContext("2d"); if (!ctx) return;
+    paintVideoFrame(ctx, W, H, "cover");
+  }
+  function startLive() { if (!liveRaf) liveRaf = requestAnimationFrame(liveFrame); }
+  function stopLive() { if (liveRaf) { cancelAnimationFrame(liveRaf); liveRaf = 0; } }
+
   let lastSkin = "";
   function render(skinChanged) {
     const nm = names();
@@ -964,6 +1193,11 @@ addEventListener("DOMContentLoaded", () => {
     if (skinChanged || lastSkin !== settings.tvDockSkin) { buildDeco(); lastSkin = settings.tvDockSkin; }
 
     const isOff = settings.videoStyle === "off";
+    /* 🖼 選曲中のTVに映像を映す（動いているときだけ） */
+    const liveOn = settings.tvMenuPreview !== false && !isOff && videoReady && !video.paused &&
+      phase === "title" && screenName() === "select";
+    screen.dataset.live = liveOn ? "1" : "0";
+    if (liveOn) startLive(); else stopLive();
     powLed.classList.toggle("on", !isOff);
     pauseLed.classList.toggle("on", !video.paused && !isOff);
     pow.title = tr("tvPower"); pow.setAttribute("aria-label", pow.title); pow.setAttribute("aria-pressed", String(!isOff));
@@ -1022,6 +1256,8 @@ addEventListener("DOMContentLoaded", () => {
     five.inp.checked = settings.tvDockFive;
     orderSel.value = settings.tvOrder;
     overlayCheck.inp.checked = settings.tvOverlay;
+    menuPrevCheck.inp.checked = settings.tvMenuPreview !== false;
+    menuVidCheck.inp.checked = settings.tvMenuVideo === true;
 
     // スクリーンの見た目
     const curPreset = tvPresetById(settings.videoStyle);
@@ -1043,9 +1279,11 @@ addEventListener("DOMContentLoaded", () => {
   const update = () => { if (queued) return; queued=true; requestAnimationFrame(()=>{ queued=false; render(); }); };
   const mo = new MutationObserver(update);
   if (vsSel) mo.observe(vsSel, { childList:true });
-  on("language", () => { update(); applyOrder(); });
+  on("language", () => { update(); applyOrder(); previewTick(); pvChipText(); });
   on("skin", update);
-  on("tvChange", () => { update(); applyOrder(); });
+  on("tvChange", () => { update(); applyOrder(); menuVideoTick(); previewTick(); });
+  on("phase", update);
+  on("screen", update);
 
   render(true);
   applyOrder();

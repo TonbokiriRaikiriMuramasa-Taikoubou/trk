@@ -134,7 +134,10 @@ function resetVideoPrefs() {
   settings.tvDockSkin = "home"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = true;
   settings.tvPowerPrev = "color"; settings.previewEnabled = true;
+  /* tv-dock.js の「選曲中に映像を流す」も一緒に戻す */
+  settings.tvMenuPreview = true; settings.tvMenuVideo = false;
   if (typeof view !== "undefined" && view) { try { view.style.filter = videoFilter(); } catch(_) {} }
+  if (typeof menuVideoTick === "function") { try { menuVideoTick(); } catch(_) {} }
 }
 function resetAudioPrefs() {
   settings.musicVolume = 0.7; settings.seVolume = 0.28; settings.seEnabled = false;
@@ -158,6 +161,7 @@ function enterSafeMode() {
   settings.tvDockSkin = "home"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = false;
   settings.previewEnabled = false;
+  settings.tvMenuPreview = false; settings.tvMenuVideo = false;   // セーフモードは映像を流さない
   settings.fxPower = 0; settings.hideGameplayUI = false;
   if (typeof view !== "undefined" && view) { try { view.style.filter = "none"; } catch(_) {} }
 }
@@ -176,6 +180,7 @@ function exportPrefs(kind) {
     out.videoStyle = settings.videoStyle; out.bgDim = settings.bgDim; out.bgBlur = settings.bgBlur;
     out.tvDockSkin = settings.tvDockSkin; out.tvDockFive = settings.tvDockFive; out.tvOrder = settings.tvOrder;
     out.tvOverlay = settings.tvOverlay; out.previewEnabled = settings.previewEnabled; out.fxPower = settings.fxPower;
+    out.tvMenuPreview = settings.tvMenuPreview; out.tvMenuVideo = settings.tvMenuVideo;
   } else if (kind === "audio") {
     out.musicVolume = settings.musicVolume; out.seEnabled = settings.seEnabled; out.seVolume = settings.seVolume;
     if ("gameVolume" in settings) out.gameVolume = settings.gameVolume;

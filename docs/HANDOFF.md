@@ -83,6 +83,7 @@ trk! の開発を再開します。docs/HANDOFF.md を貼ります。
 22. **📺 映像出力（TVドック）**：`tv-presets.js` に映像フィルター45種、`tv-dock.js` にTVスキン30種（物理デコ・専用CSS）・電源/一時停止・お気に入りスロット・並び替え。家庭用TVの▲▼で映像切替、壁掛けTVはヘッダーへ移動
 23. **🛟 緊急復旧**：`?safe=1`／`?reset=tv|audio|notes|all`／`?export=…`、コンソールの `trkReset`／`trkExport`、設定画面の緊急復旧パネル、隠しトリガー、フローティングボタン、バナー表示
 24. **🎨 カスタムTVスキン**（`tv-dock.js` の `#tvMaker`）：色6つ・形4つ（ボタン数/列/角の丸み/画面のふち）・物理デコ28種・質感3つ（光/反射/走査線）を触って自分のテレビを作れる。ライブプレビュー、`trk-tvskin` で書き出し/読み込み、`trk_tv_skins_v1` に最大30個
+25. **🎬🖼 選曲中にmp4を流す**：曲を選ぶと、TVドックの画面にそのmp4が映る（`tvMenuPreview` 初期オン）。「くわしく」に **🎛 設定 / 🖼 確認** のタブを足して、確認タブではゲーム画面と同じ見え方（contain）でフィルター・スキン・暗さ・ぼかしを再生前に確かめられる。音のプレビューがオフでも映像だけ流す `tvMenuVideo`（音なし）も追加
 
 ---
 
@@ -287,6 +288,20 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 - 文章キーは `tvm…`（4言語）。座標や色は `paintTvVars()` に集約
 - 動作確認は jsdom でもできる（`node --check` だけでは配線ミスが出ないため）
 
+### 🎬🖼 選曲中にmp4を流す（tv-dock.js）
+- **ドックの画面**：`#tvDock .tvScreen` の中の `<canvas class="tvLive">` に、流れているmp4を `paintVideoFrame(ctx,W,H,"cover")` で描く。
+  動いているときだけ `screen.dataset.live="1"`（CSSで出す／`render()` が判定）。ゲーム画面と同じフィルター（`newVideoFilter()`）とオーバーレイもかかる
+- **確認タブ**：`#tvDock .tvpCanvas`（1920×1080）に `paintVideoFrame(...,"contain")` で描く。
+  contain は**ゲーム画面の drawVideo と同じ**（`Math.min`＝黒帯つきで全体）。cover はTVの画面いっぱい
+- **設定**（`settings`。`shadow_taiko_preferences_v2` に保存）：
+  `tvMenuPreview`（🖼 選曲中のTVに映像を映す・初期オン）／`tvMenuVideo`（🎬 音のプレビューがオフでもメニューで映像を再生＝音なし・初期オフ）
+- **音の扱い**：`tv-dock.js` は**音を出さない**。`settings.previewEnabled`（音ありプレビュー）がオンなら、そちらを優先して何もしない。
+  自分で再生したときだけ `video.muted` を立て、止めるときに戻す（`menuMutedByUs` / `pvMutedByUs`。fx-dock の⏻ミュートを壊さないため）
+- **止める場所**：`phase !== "title"` / 選曲画面以外 / タブを閉じた / パネルを閉じた / タブが隠れた（visibilitychange）
+- ⚠ **`screen` の名前かぶり**：ドックを組み立てているスコープでは `const screen`（TV画面のdiv）が core.js の画面名を隠す。
+  画面名が要るときは `screenName()`（モジュール先頭で定義）を使う
+- 「確認」タブを開いている間は、止まっていたら音なしで再生し、閉じたら元に戻す（`pvKeepPlaying` / `pvRelease`）
+
 ### キー入力の優先順位
 - `window` のキャプチャ段階で、**登録順**に受け取る：player.js → truck.js → modes.js(ORBIT) → stage.js → catch.js → extras.js(測定中) → speed.js → その後 main.js（通常段階）。
 - AUTO中：各モードはキーで判定しない。←/→・R は player.js が使う。
@@ -401,6 +416,8 @@ records[指紋 "サイズ:長さ×10"] = {
 - [x] 📺 TVドック30スキン・映像フィルター45種・🛟緊急復旧
 - [x] 🎨 カスタムTVスキン（色6・形4・飾り28・質感3、`trk-tvskin`で共有）
 - [ ] 🎨 カスタムTVスキンの実機確認（モバイル幅・壁掛け・プロジェクターとの併用）
+- [x] 🎬🖼 選曲中にmp4を流す（ドックの画面＋「確認」タブ）
+- [ ] 実機確認：選曲中にTVの画面でmp4が動くか／「確認」タブの見え方がゲーム画面と同じか／音が二重にならないか
 「12. 次の候補」：🎹 シンセサイザーモード。プリセットを組み上げる画面を、つまみ・スライダーで触れるシンセ風にする案です。最初のメッセージでもらったアイデアで、EQのロックとパラメーターのランダムは今回先に入れました。
 **将来の大きな作業**
 - Capacitor で APK 化：`READ_MEDIA_AUDIO` で端末の曲一覧、ラジオ中のバックグラウンド再生（Media Session・フォアグラウンドサービス）。配布は GitHub Releases から（Google Play は登録料と、テスター約12人×14日の条件がある）

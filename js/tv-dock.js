@@ -251,7 +251,12 @@ Object.assign(TEXT.ja, {
   tvpMenuPreviewHint:"選曲画面のTV（下のドック）の画面に、流れているmp4を映します。動きが気になるときはオフに。",
   tvpMenuVideo:"🎬 音のプレビューがオフでも、メニューで映像を再生する（音は出しません）",
   tvpMenuVideoHint:"設定の「選曲中に曲のプレビューを再生する」がオンのときは、そちら（音あり）を優先します。",
-  tvpPower:"⏻ 映像のON/OFF"
+  tvpPower:"⏻ 映像のON/OFF",
+  tvShareBtn:"共有URL",
+  tvShareHint:"現在のTVスキンとフィルターの共有リンクをコピー",
+  tvShareCopied:"🔗 共有リンクをコピーしました",
+  tvSharePrompt:"この共有リンクをコピーしてください：",
+  tvpPlayGame:"▶ この設定で遊ぶ"
 });
 Object.assign(TEXT.en, {
   tvTitle:"📺 TV (video output)",
@@ -300,7 +305,12 @@ Object.assign(TEXT.en, {
   tvpMenuPreviewHint:"Plays the current mp4 inside the TV dock's screen. Turn off if the motion bothers you.",
   tvpMenuVideo:"🎬 Play video in the menu even when sound previews are off (muted)",
   tvpMenuVideoHint:"When “Play song previews in song select” is on, that one (with sound) takes priority.",
-  tvpPower:"⏻ Video on/off"
+  tvpPower:"⏻ Video on/off",
+  tvShareBtn:"Share URL",
+  tvShareHint:"Copy a shareable link for this TV skin and filter",
+  tvShareCopied:"🔗 Share link copied to clipboard",
+  tvSharePrompt:"Copy this share link:",
+  tvpPlayGame:"▶ Play with this setup"
 });
 Object.assign(TEXT.zh, {
   tvTitle:"📺 电视（视频输出）",
@@ -349,7 +359,12 @@ Object.assign(TEXT.zh, {
   tvpMenuPreviewHint:"把正在播放的mp4映到选曲画面下方电视坞的屏幕上。觉得晃眼时可关闭。",
   tvpMenuVideo:"🎬 即使关闭试听，也在菜单中播放视频（无声）",
   tvpMenuVideoHint:"当设置里的“选曲时播放歌曲试听”开启时，优先使用那个（有声音）。",
-  tvpPower:"⏻ 画面开/关"
+  tvpPower:"⏻ 画面开/关",
+  tvShareBtn:"分享链接",
+  tvShareHint:"复制当前TV皮肤与滤镜的分享链接",
+  tvShareCopied:"🔗 分享链接已复制到剪贴板",
+  tvSharePrompt:"请复制此分享链接：",
+  tvpPlayGame:"▶ 使用此配置游玩"
 });
 Object.assign(TEXT.ko, {
   tvTitle:"📺 TV (영상 출력)",
@@ -398,7 +413,12 @@ Object.assign(TEXT.ko, {
   tvpMenuPreviewHint:"재생 중인 mp4를 곡 선택 화면 아래 TV 독 화면에 비춥니다. 움직임이 신경 쓰이면 끄세요.",
   tvpMenuVideo:"🎬 미리듣기가 꺼져 있어도 메뉴에서 영상을 재생합니다(무음)",
   tvpMenuVideoHint:"설정의 “곡 선택 중 미리듣기 재생”이 켜져 있으면 그쪽(소리 있음)을 우선합니다.",
-  tvpPower:"⏻ 영상 켜기/끄기"
+  tvpPower:"⏻ 영상 켜기/끄기",
+  tvShareBtn:"공유 URL",
+  tvShareHint:"현재 TV 스킨과 필터의 공유 링크 복사",
+  tvShareCopied:"🔗 공유 링크가 복사되었습니다",
+  tvSharePrompt:"이 공유 링크를 복사하세요:",
+  tvpPlayGame:"▶ 이 설정으로 플레이"
 });
 
 /* ============ 映像フィルターの取得 ============ */
@@ -991,15 +1011,81 @@ addEventListener("DOMContentLoaded", () => {
   tabsBar.append(tabSetup, tabPrev);
 
   const paneSetup = el("div", "tvPane");
+  const shareBtn = btn("fxMini", "🔗 " + tr("tvShareBtn"));
+  shareBtn.dataset.i18n = "tvShareBtn";
+  shareBtn.title = tr("tvShareHint");
+  shareBtn.addEventListener("click", () => {
+    try {
+      const u = new URL(location.href);
+      u.searchParams.set("tv", settings.videoStyle);
+      u.searchParams.set("skin", settings.tvDockSkin);
+      const text = u.toString();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          if (typeof showToast === "function") showToast(tr("tvShareCopied"));
+          else alert(tr("tvShareCopied"));
+        }).catch(() => prompt(tr("tvSharePrompt"), text));
+      } else {
+        prompt(tr("tvSharePrompt"), text);
+      }
+    } catch (_) {}
+  });
   paneSetup.append(tx("div","tvOverlayHint","hint"), overlayCheck.lab, five.lab, orderRow,
     tx("div","tvOrderHint","hint"), songPlayCheck.lab, tx("div","tvSongPlayHint","hint"),
-    el("div","miniActions", makerBtn, moreBtn, resetBtn));
+    el("div","miniActions", makerBtn, shareBtn, moreBtn, resetBtn));
 
   const pvWrap = el("div", "tvpWrap");
   const pvCanvas = document.createElement("canvas"); pvCanvas.className = "tvpCanvas";
   pvCanvas.width = 1920; pvCanvas.height = 1080;
   const pvChip = el("div", "tvpChip");
   pvWrap.append(pvCanvas, pvChip);
+
+  const pvControls = el("div", "inline", { style:"gap:8px;margin:8px 0 10px;width:100%" });
+  const pvPlayPause = btn("fxMini", "▶");
+  const pvSeek = document.createElement("input");
+  pvSeek.type = "range"; pvSeek.min = "0"; pvSeek.max = "100"; pvSeek.step = "0.1"; pvSeek.value = "0";
+  pvSeek.style.flex = "1";
+  const pvTime = el("span", "mono", "0:00 / 0:00");
+  pvTime.style.fontSize = "12px";
+  pvControls.append(pvPlayPause, pvSeek, pvTime);
+
+  const pvPlayBtn = btn("primary slim", tr("tvpPlayGame"));
+  pvPlayBtn.dataset.i18n = "tvpPlayGame";
+  pvPlayBtn.style.marginTop = "4px";
+  pvPlayBtn.addEventListener("click", () => {
+    if (videoReady && chart.length && typeof startGame === "function") startGame();
+  });
+
+  const fmtTime = sec => {
+    if (!sec || isNaN(sec)) return "0:00";
+    const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
+    return `${m}:${s < 10 ? "0" : ""}${s}`;
+  };
+
+  pvPlayPause.addEventListener("click", () => {
+    if (!videoReady) return;
+    if (video.paused) {
+      video.play().then(() => { pvPlayPause.textContent = "⏸"; }).catch(() => {});
+    } else {
+      video.pause();
+      pvPlayPause.textContent = "▶";
+    }
+  });
+
+  let pvSeeking = false;
+  pvSeek.addEventListener("input", () => {
+    pvSeeking = true;
+    if (video.duration) {
+      const t = (Number(pvSeek.value) / 100) * video.duration;
+      pvTime.textContent = `${fmtTime(t)} / ${fmtTime(video.duration)}`;
+    }
+  });
+  pvSeek.addEventListener("change", () => {
+    if (video.duration) {
+      video.currentTime = (Number(pvSeek.value) / 100) * video.duration;
+    }
+    pvSeeking = false;
+  });
 
   const menuPrevCheck = (() => {
     const lab = el("label","check"), inp = document.createElement("input");
@@ -1017,8 +1103,8 @@ addEventListener("DOMContentLoaded", () => {
   pvPower.addEventListener("click", () => { togglePower(); render(); });
 
   const panePreview = el("div", "tvPane");
-  panePreview.append(pvWrap, tx("div","tvpPreviewHint","hint"), menuPrevCheck.lab, tx("div","tvpMenuPreviewHint","hint"),
-    menuVidCheck.lab, tx("div","tvpMenuVideoHint","hint"), el("div","miniActions", pvPower, moreBtn));
+  panePreview.append(pvWrap, pvControls, tx("div","tvpPreviewHint","hint"), menuPrevCheck.lab, tx("div","tvpMenuPreviewHint","hint"),
+    menuVidCheck.lab, tx("div","tvpMenuVideoHint","hint"), el("div","miniActions", pvPlayBtn, pvPower, moreBtn));
 
   let tab = "setup", pvRaf = 0, pvMutedByUs = false, pvPlayedByUs = false;
   const previewOn = () => tab === "preview" && !panePreview.hidden && body.open && !document.hidden &&
@@ -1040,6 +1126,11 @@ addEventListener("DOMContentLoaded", () => {
     const ctx = pvCanvas.getContext("2d"); if (!ctx) return;
     if (settings.videoStyle === "off") { pvPlaceholder(ctx, tr("tvpOff")); return; }
     if (!paintVideoFrame(ctx, 1920, 1080, "contain")) pvPlaceholder(ctx, tr("tvpNoVideo"));
+    if (!pvSeeking && video.duration) {
+      pvSeek.value = ((video.currentTime / video.duration) * 100).toFixed(1);
+      pvTime.textContent = `${fmtTime(video.currentTime)} / ${fmtTime(video.duration)}`;
+      pvPlayPause.textContent = video.paused ? "▶" : "⏸";
+    }
   }
   /* 「確認」タブを開いている間は、止まっていたら（音なしで）動かす */
   function pvKeepPlaying() {

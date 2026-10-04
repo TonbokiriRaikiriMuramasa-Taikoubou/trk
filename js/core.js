@@ -245,6 +245,16 @@ function exportPrefs(kind) {
       else if (hash.includes("all")) { resetAllPrefs(); didReset = "all"; }
       else { resetVideoPrefs(); didReset = "tv"; }
     }
+    if (!didReset) {
+      if (sp.has("tv") || sp.has("filter")) {
+        const f = sp.get("tv") || sp.get("filter");
+        if (typeof f === "string" && f.length < 50) { settings.videoStyle = f; saveUserPrefs(); }
+      }
+      if (sp.has("skin") || sp.has("tvskin")) {
+        const s = sp.get("skin") || sp.get("tvskin");
+        if (typeof s === "string" && s.length < 50) { settings.tvDockSkin = s; saveUserPrefs(); }
+      }
+    }
     if (didReset || doExport) {
       saveUserPrefs();
       // URLを綺麗にする（リセットループ防止）

@@ -1,7 +1,7 @@
 # trk! 開発引き継ぎ文書（HANDOFF）
 
 > trk! is AGRG! — an All-Generation Rhythm Game
-> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン11種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り まで）
+> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン16種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り ＋ 🥁音ゲーマー向けFAST/SLOW・あべこべ・でたらめ ＋ 💬GitHub Issuesテンプレート まで）
 > この文書は、新しい会話で開発を再開するための参照資料です。
 
 ---
@@ -312,7 +312,7 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 - **エフェクターへの通り道**：`fx.js` に `TrkFX.tapElement(el)` / `untapElement(el)` を追加（`G.extra` に MediaElementSource を保持し、`G.eq[0]` へつなぐ）。同じ要素は一度だけ・オフでも素通しでつながる・AudioContext が suspended なら resume
 - **正直な限界**：クロスオリジンの iframe（YouTube など）の中の音は、ブラウザの仕様で取り出せない。アドオンでも同じ（docs/ADDONS.md の 6 章に明記）
 
-### 📚 曲のタブ（棚）と、棚スキン11種（library.js / lib-skins.js）
+### 📚 曲のタブ（棚）と、棚スキン16種（library.js / lib-skins.js）
 - **タブ**：`renderLib()` の入口で `libTabsOf(all)` が入り口ごとにまとめ、`libTabMatch(it, id)` で絞ってから検索・並べ替えに流す（`libView` はこの絞ったあとの並び＝◀▶ もタブの中で動く）
   - タブID：`all` / `pack:<packId|packName>` / `folder:<最上位のフォルダ名>` / `folder`（直下）/ `file` / `verified`。`renderLibTabs()` が描画し、`settings.libTab` に残す
   - サブフォルダは最上位の階層でまとめる（`libFolderSeg`：`Album/A/01.mp3` → 「Album」）。パックは `packId` ごと（無ければパック名）
@@ -320,9 +320,9 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
   - 公認の判定は `window.TrkVerified.verifyOf`（verified.js の窓口。IIFEの内側なので、外から見えるように足した）。無ければ公認タブは作らない
   - タブが1つ（＝すべてだけ）のときは、タブ帯ごと隠す。曲が0件のタブは `libTabEmpty` を出す
 - **棚スキン**：`js/lib-skins.js`。`#libPanel[data-lib-skin="…"]` を付け替えるだけ（タブの中身は library.js が作る）
-  - `LIB_SKIN_ORDER` ＋ `LIB_SKINS`（icon と 4言語の label）が定義。CSS は `css/style.css` の「📚 曲のタブ（棚）と、棚スキン11種」の節（スキンは `.libTabs` / `.libTab` / `.libTabN` に `#libPanel[data-lib-skin="…"]` を前置するだけ。新しいスキンの足し方＝CSSを1ブロック＋`LIB_SKIN_ORDER` と `LIB_SKINS` に1行）
+  - `LIB_SKIN_ORDER` ＋ `LIB_SKINS`（icon と 4言語の label）が定義（全16種：player / note / sticker / card / cassette / blackboard / retro / clearfile / juke / guide / board / vinyl / vhs / karaoke / archive / menu）。CSS は `css/style.css` に集約。
   - `settings.libSkin`（既定 `player`）／`settings.libSkinQuick`（🎨 ボタンを出す・既定オン）。知らないIDは `player` に落とす
-  - 🎨 ボタン → `#libSkinBar`（チップ8個＋🎲おまかせ）を開閉。外をクリック／Escape で閉じる。設定画面「見た目」にセレクトと、🎨ボタンの表示チェック
+  - 🎨 ボタン → `#libSkinBar`（チップ＋🎲おまかせ）を開閉。外をクリック／Escape で閉じる。設定画面「見た目」にセレクトと、🎨ボタンの表示チェック
   - 窓口 `window.TrkLibSkins`（`skins()` `skin()` `selectSkin(id)` `random()` `open()` `barOpen()`）
 
 ### 📺◀▶ 曲送りボタンと、TV→ラックのならべ方（tv-dock.js）

@@ -923,6 +923,58 @@ details.panel[open]>summary{margin-bottom:14px}
 #libPanel[data-lib-skin="board"] .libTab .libTabN{background:rgba(255,179,0,.16);color:#ffd894;border-radius:3px}
 #libPanel[data-lib-skin="board"] .libTab[aria-selected="true"] .libTabN{background:rgba(6,16,31,.2);color:#06101f}
 
+/* 💿 レコード棚（vinyl） */
+#libPanel[data-lib-skin="vinyl"] .libTabs{gap:8px;padding:12px 14px 8px;border-radius:12px;
+  background:linear-gradient(#221813,#140d09);border:1px solid #4a3424;box-shadow:inset 0 3px 12px rgba(0,0,0,.6)}
+#libPanel[data-lib-skin="vinyl"] .libTab{border-radius:24px 8px 8px 24px;border:1px solid #332218;background:radial-gradient(circle at 18px 50%, #2a2a2a 0%, #151515 70%);
+  color:#dfd5c6;padding-left:14px}
+#libPanel[data-lib-skin="vinyl"] .libTab::before{content:"◎";color:#d9534f;font-size:14px;margin-right:4px}
+#libPanel[data-lib-skin="vinyl"] .libTab[aria-selected="true"]{background:radial-gradient(circle at 20px 50%, #b33939 0%, #1a1a1a 80%);
+  color:#fff;border-color:#e17055;box-shadow:0 0 16px rgba(225,112,85,.4)}
+#libPanel[data-lib-skin="vinyl"] .libTab .libTabN{background:rgba(255,255,255,.14);color:#eed}
+#libPanel[data-lib-skin="vinyl"] .libTab[aria-selected="true"] .libTabN{background:#e17055;color:#fff}
+
+/* 📼 レンタルビデオ（vhs） */
+#libPanel[data-lib-skin="vhs"] .libTabs{gap:6px;padding:8px 10px 6px;border-radius:6px;
+  background:linear-gradient(#151922,#0b0e14);border:2px solid #2d3748}
+#libPanel[data-lib-skin="vhs"] .libTab{border-radius:3px;border:1px solid #4a5568;background:#edf2f7;color:#1a202c;
+  font-family:Impact,sans-serif;letter-spacing:.05em}
+#libPanel[data-lib-skin="vhs"] .libTab[aria-selected="true"]{background:#f6e05e;color:#744210;border-color:#d69e2e;
+  box-shadow:0 2px 8px rgba(246,224,94,.5)}
+#libPanel[data-lib-skin="vhs"] .libTab .libTabN{background:#cbd5e0;color:#2d3748;border-radius:2px}
+#libPanel[data-lib-skin="vhs"] .libTab[aria-selected="true"] .libTabN{background:#b7791f;color:#fff}
+
+/* 🎤 カラオケ目次（karaoke） */
+#libPanel[data-lib-skin="karaoke"] .libTabs{gap:7px;padding:10px 12px 6px;border-radius:18px;
+  background:linear-gradient(135deg,#241038,#11071c);border:1px solid #6b21a8;box-shadow:0 0 20px rgba(168,85,247,.2)}
+#libPanel[data-lib-skin="karaoke"] .libTab{border-radius:999px;border:1px solid #a855f7;background:rgba(168,85,247,.12);
+  color:#f3e8ff;font-weight:700}
+#libPanel[data-lib-skin="karaoke"] .libTab:hover{background:rgba(236,72,153,.25)}
+#libPanel[data-lib-skin="karaoke"] .libTab[aria-selected="true"]{background:linear-gradient(90deg,#ec4899,#a855f7);
+  color:#fff;border-color:#f472b6;box-shadow:0 0 16px rgba(236,72,153,.6)}
+#libPanel[data-lib-skin="karaoke"] .libTab .libTabN{background:rgba(0,0,0,.35);color:#fbcfe8}
+#libPanel[data-lib-skin="karaoke"] .libTab[aria-selected="true"] .libTabN{background:rgba(255,255,255,.25);color:#fff}
+
+/* 🗂️ 図書館の書架（archive） */
+#libPanel[data-lib-skin="archive"] .libTabs{gap:6px;padding:10px 12px 6px;border-radius:8px;
+  background:linear-gradient(#2b1a11,#170c06);border:1px solid #5a3821}
+#libPanel[data-lib-skin="archive"] .libTab{border-radius:5px 5px 2px 2px;border:1px solid #8c6d48;
+  background:linear-gradient(#3a2418,#28180e);color:#e6cfa8;font-family:Georgia,serif}
+#libPanel[data-lib-skin="archive"] .libTab[aria-selected="true"]{background:linear-gradient(#fcf8ed,#eee2ca);
+  color:#2c1808;border-color:#c4a46a;box-shadow:0 0 14px rgba(196,164,106,.4)}
+#libPanel[data-lib-skin="archive"] .libTab .libTabN{background:rgba(140,109,72,.3);color:#e6cfa8}
+#libPanel[data-lib-skin="archive"] .libTab[aria-selected="true"] .libTabN{background:#b8860b;color:#fff}
+
+/* 🍱 お品書き（menu） */
+#libPanel[data-lib-skin="menu"] .libTabs{gap:6px;padding:10px 12px 6px;border-radius:10px;
+  background:linear-gradient(#1f1b14,#12100b);border:1px solid #4a3e2a}
+#libPanel[data-lib-skin="menu"] .libTab{border-radius:2px;border:1px solid #c8b998;
+  background:linear-gradient(#fdfbf7,#f4edd9);color:#2a241a;font-family:"Hiragino Mincho ProN",serif}
+#libPanel[data-lib-skin="menu"] .libTab[aria-selected="true"]{background:#fffef9;color:#8b0000;
+  border:2px solid #b22222;box-shadow:0 0 12px rgba(178,34,34,.35)}
+#libPanel[data-lib-skin="menu"] .libTab .libTabN{background:#ded5be;color:#4a3f2c}
+#libPanel[data-lib-skin="menu"] .libTab[aria-selected="true"] .libTabN{background:#b22222;color:#fff}
+
 /* 設定画面の「棚スキン」の行（見た目セクション） */
 #libSkinSelect{width:100%;padding:10px 12px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);
   border:1px solid var(--ui-border);font-size:16px;margin-bottom:4px}

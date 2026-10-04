@@ -20,7 +20,10 @@ const mmdDB = idbStore("shadow_taiko_mmd", "files");     // 🆕 新しい保存
 /* ============ 文章（接頭辞 mmd…） ============ */
 Object.assign(TEXT.ja, {
   mmdTitle:"🩷 MMD（モデルは自分で用意）",
-  mmdHint:"MMDのモデル（.pmx/.pmd）とモーション（.vmd）を読み込んで、ゲーム中に踊らせられます。モデルは同梱していません。配布元の規約（商用不可・再配布不可など）を守って、自分で用意してください。",
+  mmdHint:"MMDのモデル（.pmx/.pmd）とモーション（.vmd）を読み込んで、ゲーム中に踊らせられます。モデルは「持ち込み」が基本です（下に💠同梱モデルのボタンがあるときは、それだけで始められます）。持ち込むときは配布元の規約（商用不可・再配布不可など）を守って、自分で用意してください。",
+  mmdPresetBtn:"💠 {name} をマスコットにする（同梱）",
+  mmdPresetHint:"💠 は、この trk! に「れあどめ」（配布元の規約）ごと同梱されているモデルです。規約（PCL＝非営利など）の範囲で楽しんでください。クレジットは自動で入ります。",
+  mmdPresetMissing:"同梱モデルのファイルが見つかりませんでした（この配布には入っていないようです）。",
   mmdAgree:"配布元の規約を確認し、自分で用意したモデルを使います（三次配布・商用利用はしません）",
   mmdChooseModel:"📦 モデル（.pmx/.pmd）", mmdChooseFolder:"📁 モデルのフォルダ（テクスチャも一緒に）",
   mmdChooseMotion:"🎬 モーション（.vmd）", mmdClearModel:"モデルを外す", mmdClearMotion:"モーションを外す",
@@ -30,10 +33,27 @@ Object.assign(TEXT.ja, {
   mmdCheck:"🔎 動作チェック（実機で）", mmdCopy:"📋 結果をコピー", mmdCopied:"📋 コピーしました", mmdCopyNg:"📋 コピーできませんでした（下の行を選んでコピーしてください）",
   mmdCheckHint:"うまく動かないときは、これを押すと WebGL・CDN（three／three-mmd-loader）・モデル・モーションの状態を調べて1か所に出します。うまくいかない場合は、この結果を貼ってもらえれば原因を切り分けられます。",
   mmdCheckRunning:"チェック中…（初回はCDNから読み込むので、少し待ちます）", mmdCheckOk:"✅ チェックOK（WebGL・CDN・ライブラリ）", mmdCheckNg:"❌ チェックで問題が見つかりました（下の結果を見てください）",
+  mmdQuickTitle:"🩷 マスコットのうごき", mmdQuickWatch:"👀 ひとやすみ", mmdQuickAuto:"🎲 おまかせ",
+  mmdQuickPick:"🎯 えらぶ", mmdQuickOff:"💤 お留守番",
+  mmdQuickUILabel:"🩷 選曲画面に「マスコットのうごき」ミニ操作を出す",
+  mmdQuickFavTip:"⭐ お気に入りに入れる／外す（えらぶの一覧で上に来ます）",
   mmdMotionNone:"（モーションなし）",
+  mmdMotionAuto:"🎲 おまかせ（曲のBPMにいちばん近い🎵を自動で。設定しなおし不要）",
+  mmdMotionWatch:"👀 みてる（こちらをじっと・BPM非依存）", mmdMotionStroll:"👀 たたずむ（見まわす・BPM非依存）",
   mmdMotionStep:"内蔵① ステップ（120BPM）", mmdMotionSwing:"内蔵② ゆらゆら（100BPM）", mmdMotionTurn:"内蔵③ ターン（120BPM）",
-  mmdBuiltinNote:"内蔵モーションは trk! がコードで作った VMD です（権利は trk! のもの）。曲のBPMに合わせて速さを変えられます。",
-  mmdBpm:"モーションの基準BPM（曲に合わせる・0で固定）",
+  mmdMotionJump:"内蔵④ ジャンプ（130BPM・はで）", mmdMotionIdol:"内蔵⑤ アイドル（128BPM）",
+  mmdMotionAirgtr:"🎸128 エアギター（シューゲイザーむけ）", mmdMotionDreamy:"🎸128 しっとり（When You Sleepむけ）",
+  mmdMotionKneel:"🎸128 かたひざ（しずかに眺める）",
+  mmdMotionIevan:"🎵120 ネギスピン（Ievan Polkkaむけ）", mmdMotionKyukura:"🎵165 くらくら（きゅうくらりんむけ）",
+  mmdMotionRabbit:"🎵173 うさみみ（ラビットホールむけ・5拍子スキップ）", mmdMotionMesmer:"🎵185 すましシャッフル（メズマライザーむけ）",
+  mmdMotionDune:"🎵135 こうしん（砂の惑星むけ）", mmdMotionGreen:"🎵145 ペンライト（グリーンライツむけ）",
+  mmdMotionMikumiku:"🎵160 してやんよ（みくみくにしてあげる♪むけ）", mmdMotionTyw:"🎵150 せかいへ（Tell Your Worldむけ）",
+  mmdMotionSenbon:"🎵154 キレの和（千本桜むけ）", mmdMotionMelt:"🎵170 きゅん（メルトむけ）",
+  mmdMotionUmg:"🎵170 つたえる（アンノウン・マザーグースむけ）", mmdMotionWedh:"🎵174 ダンスホール（ワールズエンドむけ）",
+  mmdMotionRolling:"🎵194 ぐるぐる（ローリンガールむけ）", mmdMotionUraomote:"🎵196 うらおもて（裏表ラバーズむけ）",
+  mmdMotionVanish:"🎵240 こうそく（消失むけ）",
+  mmdBuiltinNote:"内蔵モーションは trk! がコードで作った VMD です（権利は trk! のもの）。🎵 は人気ミク曲のテンポに合わせた振り付け（曲名は目安です）。基準BPMが 0 のとき、内蔵モーションはそれぞれの基準BPMで曲に自動シンクします。",
+  mmdBpm:"モーションの基準BPM（0＝内蔵は自動シンク・持ち込みVMDは固定）",
   mmdLoading:"モデルを読み込んでいます…", mmdLoadingPct:"モデルを読み込んでいます… {n}%",
   mmdLoaded:"モデル「{name}」を読み込みました。", mmdRestored:"前回のモデルを戻しました。",
   mmdNotMmd:"MMDのモデル（.pmx/.pmd）ではありません。", mmdTooBig:"大きすぎます（モデルは{n}MB、モーションは{m}MBまで）。",
@@ -48,7 +68,10 @@ Object.assign(TEXT.ja, {
 });
 Object.assign(TEXT.en, {
   mmdTitle:"🩷 MMD (bring your own model)",
-  mmdHint:"Load an MMD model (.pmx/.pmd) and motion (.vmd) and let it dance in-game. No models are bundled — get your own and follow the distributor's terms (usually non-commercial, no redistribution).",
+  mmdHint:"Load an MMD model (.pmx/.pmd) and motion (.vmd) and let it dance in-game. Bringing your own model is the default (when a 💠 bundled-model button appears below, that alone gets you started). If you bring one, follow the distributor's terms (usually non-commercial, no redistribution).",
+  mmdPresetBtn:"💠 Use {name} as the mascot (bundled)",
+  mmdPresetHint:"💠 is a model bundled with this trk! together with its original readme (the distributor's terms). Enjoy it within those terms (PCL: non-commercial etc.). The credit line is filled in automatically.",
+  mmdPresetMissing:"Could not find the bundled model files (this copy may not include them).",
   mmdAgree:"I'll use a model I obtained myself, following its terms (no re-distribution, no commercial use)",
   mmdChooseModel:"📦 Model (.pmx/.pmd)", mmdChooseFolder:"📁 Model folder (with textures)",
   mmdChooseMotion:"🎬 Motion (.vmd)", mmdClearModel:"Remove model", mmdClearMotion:"Remove motion",
@@ -58,10 +81,27 @@ Object.assign(TEXT.en, {
   mmdCheck:"🔎 Check (on your device)", mmdCopy:"📋 Copy the result", mmdCopied:"📋 Copied", mmdCopyNg:"📋 Could not copy (select the lines below)",
   mmdCheckHint:"If something does not work, press this: it checks WebGL, the CDN (three / three-mmd-loader), your model and your motion, and prints one block. Paste that block and we can find the cause.",
   mmdCheckRunning:"Checking… (the first run loads from the CDN, so give it a moment)", mmdCheckOk:"✅ Check OK (WebGL, CDN, libraries)", mmdCheckNg:"❌ Something is wrong (see the lines below)",
+  mmdQuickTitle:"🩷 Mascot moves", mmdQuickWatch:"👀 Chill", mmdQuickAuto:"🎲 Auto",
+  mmdQuickPick:"🎯 Pick", mmdQuickOff:"💤 Away",
+  mmdQuickUILabel:"🩷 Show the \"Mascot moves\" mini controls on song select",
+  mmdQuickFavTip:"⭐ Add to / remove from favorites (they come first in the Pick list)",
   mmdMotionNone:"(no motion)",
+  mmdMotionAuto:"🎲 Auto (pick the 🎵 nearest to the song's BPM — set once, works everywhere)",
+  mmdMotionWatch:"👀 Watching you (BPM-free)", mmdMotionStroll:"👀 Standing by (looking around, BPM-free)",
   mmdMotionStep:"Built-in 1: Step (120 BPM)", mmdMotionSwing:"Built-in 2: Sway (100 BPM)", mmdMotionTurn:"Built-in 3: Turn (120 BPM)",
-  mmdBuiltinNote:"The built-in motions are VMD data generated by trk!'s own code. They can speed up or slow down to the song's BPM.",
-  mmdBpm:"Motion base BPM (follow the song; 0 = fixed)",
+  mmdMotionJump:"Built-in 4: Jump (130 BPM, flashy)", mmdMotionIdol:"Built-in 5: Idol pump (128 BPM)",
+  mmdMotionAirgtr:"🎸128 Air guitar (shoegaze)", mmdMotionDreamy:"🎸128 Dreamy drift (for When You Sleep)",
+  mmdMotionKneel:"🎸128 One-knee gaze (quiet)",
+  mmdMotionIevan:"🎵120 Leek spin (for Ievan Polkka)", mmdMotionKyukura:"🎵165 Dizzy puppet (for Kyu-kurarin)",
+  mmdMotionRabbit:"🎵173 Bunny-ear hop (for Rabbit Hole, 5-beat skip)", mmdMotionMesmer:"🎵185 Cartoon shuffle (for Mesmerizer)",
+  mmdMotionDune:"🎵135 March (for Sand Planet)", mmdMotionGreen:"🎵145 Penlight (for Greenlights Serenade)",
+  mmdMotionMikumiku:"🎵160 Shite-yan-yo! (for Miku Miku ni Shite Ageru)", mmdMotionTyw:"🎵150 To the world (for Tell Your World)",
+  mmdMotionSenbon:"🎵154 Sharp wa-style (for Senbonzakura)", mmdMotionMelt:"🎵170 Heart-flutter (for Melt)",
+  mmdMotionUmg:"🎵170 Reaching out (for Unknown Mother Goose)", mmdMotionWedh:"🎵174 Dancehall (for World's End Dancehall)",
+  mmdMotionRolling:"🎵194 Rolling (for Rolling Girl)", mmdMotionUraomote:"🎵196 Flip-flop (for Ura-Omote Lovers)",
+  mmdMotionVanish:"🎵240 Hyper rush (for The Disappearance)",
+  mmdBuiltinNote:"The built-in motions are VMD data generated by trk!'s own code. 🎵 ones are choreographed to the tempo of popular Miku songs (titles are a guide). When the base BPM is 0, built-in motions auto-sync to the song using their own base BPM.",
+  mmdBpm:"Motion base BPM (0 = built-ins auto-sync; your own VMD stays fixed)",
   mmdLoading:"Loading the model…", mmdLoadingPct:"Loading the model… {n}%",
   mmdLoaded:"Loaded the model “{name}”.", mmdRestored:"Restored your previous model.",
   mmdNotMmd:"That is not an MMD model (.pmx/.pmd).", mmdTooBig:"Too big (models up to {n}MB, motions up to {m}MB).",
@@ -76,7 +116,10 @@ Object.assign(TEXT.en, {
 });
 Object.assign(TEXT.zh, {
   mmdTitle:"🩷 MMD（模型请自己准备）",
-  mmdHint:"可以读取MMD模型（.pmx/.pmd）和动作（.vmd），让其在游戏中跳舞。本应用不附带模型，请遵守发布方的规约，自行准备（多为禁止商用、禁止再分发）。",
+  mmdHint:"可以读取MMD模型（.pmx/.pmd）和动作（.vmd），让其在游戏中跳舞。基本做法是自带模型（如果下面出现💠内置模型按钮，仅用它即可开始）。自带模型时请遵守发布方的规约（多为禁止商用、禁止再分发）。",
+  mmdPresetBtn:"💠 使用 {name} 作为吉祥物（内置）",
+  mmdPresetHint:"💠 是与原版「readme」（发布方规约）一同内置在本 trk! 中的模型。请在规约（PCL：非商用等）范围内使用。署名会自动填写。",
+  mmdPresetMissing:"找不到内置模型的文件（此版本可能未附带）。",
   mmdAgree:"我会遵守发布方的规约，使用自己准备的模型（不再分发、不商用）",
   mmdChooseModel:"📦 模型（.pmx/.pmd）", mmdChooseFolder:"📁 模型文件夹（含贴图）",
   mmdChooseMotion:"🎬 动作（.vmd）", mmdClearModel:"移除模型", mmdClearMotion:"移除动作",
@@ -86,10 +129,27 @@ Object.assign(TEXT.zh, {
   mmdCheck:"🔎 运行检查（在实机上）", mmdCopy:"📋 复制结果", mmdCopied:"📋 已复制", mmdCopyNg:"📋 无法复制（请选中下面的行）",
   mmdCheckHint:"如果无法运行，按这里会检查 WebGL、CDN（three／three-mmd-loader）、模型和动作，并把结果汇总成一段。把这结果贴出来就能定位原因。",
   mmdCheckRunning:"检查中…（初次会从 CDN 读取，请稍等）", mmdCheckOk:"✅ 检查通过（WebGL・CDN・库）", mmdCheckNg:"❌ 检查发现问题（请看下面的结果）",
+  mmdQuickTitle:"🩷 吉祥物动作", mmdQuickWatch:"👀 休息", mmdQuickAuto:"🎲 自动",
+  mmdQuickPick:"🎯 挑选", mmdQuickOff:"💤 不在家",
+  mmdQuickUILabel:"🩷 在选曲画面显示「吉祥物动作」迷你操作",
+  mmdQuickFavTip:"⭐ 加入／移出收藏（在挑选列表中会排在前面）",
   mmdMotionNone:"（无动作）",
+  mmdMotionAuto:"🎲 自动（选择最接近歌曲BPM的🎵・设置一次即可）",
+  mmdMotionWatch:"👀 看着你（与BPM无关）", mmdMotionStroll:"👀 伫立（四处张望・与BPM无关）",
   mmdMotionStep:"内置① 踏步（120BPM）", mmdMotionSwing:"内置② 摇摆（100BPM）", mmdMotionTurn:"内置③ 转身（120BPM）",
-  mmdBuiltinNote:"内置动作是由 trk! 自行用代码生成的 VMD。可按歌曲的BPM改变速度。",
-  mmdBpm:"动作基准BPM（跟随歌曲・0 为固定）",
+  mmdMotionJump:"内置④ 跳跃（130BPM・华丽）", mmdMotionIdol:"内置⑤ 偶像应援（128BPM）",
+  mmdMotionAirgtr:"🎸128 空气吉他（Shoegaze风）", mmdMotionDreamy:"🎸128 沉静漂浮（When You Sleep风）",
+  mmdMotionKneel:"🎸128 单膝远眺（安静）",
+  mmdMotionIevan:"🎵120 甩葱旋转（Ievan Polkka风）", mmdMotionKyukura:"🎵165 晕乎乎（Kyu-kurarin风）",
+  mmdMotionRabbit:"🎵173 兔耳蹦跳（Rabbit Hole风・5拍子）", mmdMotionMesmer:"🎵185 卡通摇摆（Mesmerizer风）",
+  mmdMotionDune:"🎵135 行进（砂之惑星风）", mmdMotionGreen:"🎵145 荧光棒（Greenlights风）",
+  mmdMotionMikumiku:"🎵160 做给你看！（把你MikuMiku掉♪风）", mmdMotionTyw:"🎵150 向世界（Tell Your World风）",
+  mmdMotionSenbon:"🎵154 和风利落（千本樱风）", mmdMotionMelt:"🎵170 心动（Melt风）",
+  mmdMotionUmg:"🎵170 倾诉（Unknown Mother Goose风）", mmdMotionWedh:"🎵174 舞厅（World's End Dancehall风）",
+  mmdMotionRolling:"🎵194 转圈（Rolling Girl风）", mmdMotionUraomote:"🎵196 里表翻转（里表Lovers风）",
+  mmdMotionVanish:"🎵240 高速（消失风）",
+  mmdBuiltinNote:"内置动作是由 trk! 自行用代码生成的 VMD。🎵 系列按人气Miku歌曲的节奏编舞（曲名仅作参考）。基准BPM为 0 时，内置动作会按各自的基准BPM自动同步到歌曲。",
+  mmdBpm:"动作基准BPM（0＝内置自动同步・自带VMD保持固定）",
   mmdLoading:"正在读取模型…", mmdLoadingPct:"正在读取模型… {n}%",
   mmdLoaded:"已读取模型「{name}」。", mmdRestored:"已恢复上次的模型。",
   mmdNotMmd:"这不是MMD模型（.pmx/.pmd）。", mmdTooBig:"太大（模型上限 {n}MB，动作上限 {m}MB）。",
@@ -104,7 +164,10 @@ Object.assign(TEXT.zh, {
 });
 Object.assign(TEXT.ko, {
   mmdTitle:"🩷 MMD (모델은 직접 준비)",
-  mmdHint:"MMD 모델(.pmx/.pmd)과 모션(.vmd)을 불러와 게임 중에 춤추게 할 수 있습니다. 모델은 동봉하지 않습니다. 배포처의 규약(비상업・재배포 금지 등)을 지켜 직접 준비해 주세요.",
+  mmdHint:"MMD 모델(.pmx/.pmd)과 모션(.vmd)을 불러와 게임 중에 춤추게 할 수 있습니다. 기본은 모델을 직접 준비하는 것입니다(아래에 💠 동봉 모델 버튼이 있으면 그것만으로 시작할 수 있습니다). 직접 준비할 때는 배포처의 규약(비상업・재배포 금지 등)을 지켜 주세요.",
+  mmdPresetBtn:"💠 {name} 을(를) 마스코트로 (동봉)",
+  mmdPresetHint:"💠 는 원본 'readme'(배포처 규약)와 함께 이 trk!에 동봉된 모델입니다. 규약(PCL: 비상업 등) 범위에서 즐겨 주세요. 크레딧은 자동으로 들어갑니다.",
+  mmdPresetMissing:"동봉 모델 파일을 찾지 못했습니다(이 배포판에는 없는 것 같습니다).",
   mmdAgree:"배포처의 규약을 확인하고, 직접 준비한 모델을 사용합니다 (재배포・상업 이용 안 함)",
   mmdChooseModel:"📦 모델 (.pmx/.pmd)", mmdChooseFolder:"📁 모델 폴더 (텍스처 포함)",
   mmdChooseMotion:"🎬 모션 (.vmd)", mmdClearModel:"모델 빼기", mmdClearMotion:"모션 빼기",
@@ -114,10 +177,27 @@ Object.assign(TEXT.ko, {
   mmdCheck:"🔎 동작 확인 (실기에서)", mmdCopy:"📋 결과 복사", mmdCopied:"📋 복사했습니다", mmdCopyNg:"📋 복사할 수 없습니다(아래 줄을 선택해 주세요)",
   mmdCheckHint:"잘 안 될 때 이걸 누르면 WebGL·CDN(three／three-mmd-loader)·모델·모션 상태를 한곳에 모아 보여 줍니다. 안 되는 경우 이 결과를 붙여 주시면 원인을 좁힐 수 있습니다.",
   mmdCheckRunning:"확인 중… (처음에는 CDN에서 읽어 오므로 조금 기다려 주세요)", mmdCheckOk:"✅ 확인 OK (WebGL·CDN·라이브러리)", mmdCheckNg:"❌ 확인에서 문제를 찾았습니다(아래 결과를 봐 주세요)",
+  mmdQuickTitle:"🩷 마스코트 움직임", mmdQuickWatch:"👀 휴식", mmdQuickAuto:"🎲 자동",
+  mmdQuickPick:"🎯 고르기", mmdQuickOff:"💤 자리비움",
+  mmdQuickUILabel:"🩷 선곡 화면에 '마스코트 움직임' 미니 조작 표시",
+  mmdQuickFavTip:"⭐ 즐겨찾기에 넣기／빼기 (고르기 목록에서 위에 옵니다)",
   mmdMotionNone:"(모션 없음)",
+  mmdMotionAuto:"🎲 자동 (곡 BPM에 가장 가까운 🎵 선택・한 번만 설정하면 끝)",
+  mmdMotionWatch:"👀 바라보기 (BPM 무관)", mmdMotionStroll:"👀 서성이기 (두리번・BPM 무관)",
   mmdMotionStep:"내장① 스텝 (120BPM)", mmdMotionSwing:"내장② 흔들흔들 (100BPM)", mmdMotionTurn:"내장③ 턴 (120BPM)",
-  mmdBuiltinNote:"내장 모션은 trk!가 코드로 만든 VMD입니다. 곡의 BPM에 맞춰 속도를 바꿀 수 있습니다.",
-  mmdBpm:"모션 기준 BPM (곡에 맞춤・0이면 고정)",
+  mmdMotionJump:"내장④ 점프 (130BPM・화려)", mmdMotionIdol:"내장⑤ 아이돌 (128BPM)",
+  mmdMotionAirgtr:"🎸128 에어기타 (슈게이저풍)", mmdMotionDreamy:"🎸128 차분히 (When You Sleep풍)",
+  mmdMotionKneel:"🎸128 한쪽 무릎 (조용히 바라보기)",
+  mmdMotionIevan:"🎵120 파 돌리기 (Ievan Polkka풍)", mmdMotionKyukura:"🎵165 어질어질 (큐쿠라린풍)",
+  mmdMotionRabbit:"🎵173 토끼귀 폴짝 (Rabbit Hole풍・5박자)", mmdMotionMesmer:"🎵185 카툰 셔플 (메즈머라이저풍)",
+  mmdMotionDune:"🎵135 행진 (모래의 행성풍)", mmdMotionGreen:"🎵145 펜라이트 (Greenlights풍)",
+  mmdMotionMikumiku:"🎵160 시테얀요! (미쿠미쿠하게 해줄게♪풍)", mmdMotionTyw:"🎵150 세계로 (Tell Your World풍)",
+  mmdMotionSenbon:"🎵154 와풍 절도 (센본자쿠라풍)", mmdMotionMelt:"🎵170 두근 (Melt풍)",
+  mmdMotionUmg:"🎵170 전하기 (Unknown Mother Goose풍)", mmdMotionWedh:"🎵174 댄스홀 (World's End Dancehall풍)",
+  mmdMotionRolling:"🎵194 빙글빙글 (Rolling Girl풍)", mmdMotionUraomote:"🎵196 안팎 뒤집기 (우라오모테 Lovers풍)",
+  mmdMotionVanish:"🎵240 고속 (소실풍)",
+  mmdBuiltinNote:"내장 모션은 trk!가 코드로 만든 VMD입니다. 🎵 는 인기 미쿠 곡의 템포에 맞춘 안무입니다(곡명은 참고용). 기준 BPM이 0이면 내장 모션은 각자의 기준 BPM으로 곡에 자동 동기화됩니다.",
+  mmdBpm:"모션 기준 BPM (0＝내장은 자동 동기화・직접 가져온 VMD는 고정)",
   mmdLoading:"모델을 불러오는 중…", mmdLoadingPct:"모델을 불러오는 중… {n}%",
   mmdLoaded:"모델 '{name}'을(를) 불러왔습니다.", mmdRestored:"지난번 모델을 되돌렸습니다.",
   mmdNotMmd:"MMD 모델(.pmx/.pmd)이 아닙니다.", mmdTooBig:"너무 큽니다 (모델 {n}MB, 모션 {m}MB까지).",
@@ -235,6 +315,318 @@ const BUILTIN = {
       "右腕":  { rot:[0, 0, 78 * rise + 10] },
       "左ひじ":{ rot:[0, -10, 0] }, "右ひじ":{ rot:[0, 10, 0] }
     };
+  } },
+  /* ④ ジャンプ：バンザイしながら跳ぶ。Lat式でかわいく、デフォルメ系（タワシ式など）だと派手に見える */
+  jump: { label:"mmdMotionJump", bpm:130, seconds:4, pose:t => {
+    const w = 2 * Math.PI * t, up = Math.max(0, Math.sin(w)), dip = Math.max(0, -Math.sin(w));
+    const alt = Math.sin(Math.PI * t / 2);           // 4秒かけて重心がゆっくり左右へ
+    return {
+      "センター": { pos:[0.12 * alt, 0.85 * up * up - 0.22 * dip, 0], rot:[0, 0, 2 * alt] },
+      "上半身": { rot:[-7 * up + 3 * dip, 0, -2 * alt] },
+      "首":    { rot:[-6 * up, 0, 0] },
+      "頭":    { rot:[-5 * up + 3 * Math.sin(w * 2), 0, 0] },
+      "左腕":  { rot:[0, 0, -72 + 117 * up] },
+      "右腕":  { rot:[0, 0, 72 - 117 * up] },
+      "左ひじ":{ rot:[0, -24 + 14 * up, 0] },
+      "右ひじ":{ rot:[0, 24 - 14 * up, 0] }
+    };
+  } },
+  /* ⑤ アイドル：サイドステップしながら右手でこぶしを突き上げる */
+  idol: { label:"mmdMotionIdol", bpm:128, seconds:6, pose:t => {
+    const w = 2 * Math.PI * t / 1.5, sway = Math.sin(w), hop = Math.max(0, Math.sin(2 * w));
+    const pump = Math.max(0, Math.sin(2 * w - 0.4));
+    return {
+      "センター": { pos:[0.4 * sway, 0.12 * hop - 0.1, 0], rot:[0, 0, 3 * sway] },
+      "上半身": { rot:[0, 10 * Math.sin(w / 2), 4 * sway] },
+      "上半身2":{ rot:[0, 5 * sway, 0] },
+      "首":    { rot:[2 * hop, -7 * sway, 0] },
+      "頭":    { rot:[-4 * pump, 5 * sway, 0] },
+      "左腕":  { rot:[0, 0, -58 - 10 * sway] },
+      "右腕":  { rot:[0, 0, 62 - 147 * pump] },
+      "左ひじ":{ rot:[0, -28, 0] },
+      "右ひじ":{ rot:[0, 30 + 25 * pump, 0] }
+    };
+  } },
+  /* ---- 🎵 BPMシリーズ：人気ミク曲のテンポに合わせた振り付け（曲名は目安。モーション自体は trk! の自作VMD） ----
+     基準BPM（mmdBpm）が 0 のとき、内蔵モーションはそれぞれの bpm を基準に曲へ自動シンクします。 */
+  ievan120: { label:"mmdMotionIevan", bpm:120, seconds:4, pose:t => {   // ネギスピン（8拍・はちゅね風にゆれながら回すだけ）
+    const b = t * 2, spin = 2 * Math.PI * b, sway = Math.sin(Math.PI * b / 4);
+    return {
+      "センター": { pos:[0.06 * sway, -0.03 * Math.abs(Math.sin(Math.PI * b)), 0], rot:[0, 0, 4 * sway] },
+      "上半身": { rot:[2, 5 * sway, 3 * sway] },
+      "首":    { rot:[2, -4 * sway, -8 * sway] },
+      "頭":    { rot:[-3, 0, -12 * sway] },
+      "左腕":  { rot:[0, 0, -66 + 3 * sway] },
+      "左ひじ":{ rot:[0, -14, 0] },
+      "右腕":  { rot:[22 * Math.sin(spin), 0, 24 + 12 * Math.cos(spin)] },
+      "右ひじ":{ rot:[0, 52 + 18 * Math.sin(spin + 1.2), 0] }
+    };
+  } },
+  /* ---- 👀 汎用（BPM非依存。fixed:true＝曲のテンポに関係なく、いつも同じ速さ） ---- */
+  watch: { label:"mmdMotionWatch", bpm:0, fixed:true, seconds:12, pose:t => { // みてる（こちらをじっと・呼吸と小さな首かしげだけ）
+    const breathe = Math.sin(Math.PI * t / 2);                        // 4秒でひと呼吸
+    const tilt = Math.sin(Math.PI * t / 6), shift = Math.sin(Math.PI * t / 12);
+    return {
+      "センター": { pos:[0.04 * shift, 0.02 * breathe, 0], rot:[0, 3 * shift, 0.6 * shift] },
+      "上半身": { rot:[1 - 0.8 * breathe, -2 * shift, 0.6 * tilt] },
+      "上半身2":{ rot:[0.6 * breathe, 0, 0] },
+      "首":    { rot:[-2, -2 * shift, -2 * tilt] },
+      "頭":    { rot:[-3 + 0.6 * breathe, -1.5 * shift, 5 * tilt] },  // ちょっと首をかしげてこちらを見る
+      "左腕":  { rot:[1.5 * breathe, 0, -66] },
+      "右腕":  { rot:[1.5 * breathe, 0, 66] },
+      "左ひじ":{ rot:[0, -10, 0] }, "右ひじ":{ rot:[0, 10, 0] }
+    };
+  } },
+  stroll: { label:"mmdMotionStroll", bpm:0, fixed:true, seconds:16, pose:t => { // たたずむ（手をうしろに・あたりを見まわす）
+    const breathe = Math.sin(Math.PI * t / 2), look = Math.sin(Math.PI * t / 8), lean = Math.sin(Math.PI * t / 16);
+    return {
+      "センター": { pos:[0.08 * lean, 0.02 * breathe, 0], rot:[0, 10 * lean, 1.2 * lean] },
+      "上半身": { rot:[2 - breathe, 5 * lean, 1.5 * lean] },
+      "首":    { rot:[-3, 8 * look, -2 * lean] },
+      "頭":    { rot:[-5 + 0.8 * breathe, 10 * look, 2 * look] },     // きょろきょろと見まわす
+      "左腕":  { rot:[-22, -16, -58] },                               // 手をうしろで組む
+      "右腕":  { rot:[-22, 16, 58] },
+      "左ひじ":{ rot:[0, -52, 0] }, "右ひじ":{ rot:[0, 52, 0] }
+    };
+  } },
+  /* ---- 🎸 シューゲイザー3部作（128BPM：Sometimes / When You Sleep あたりむけ） ---- */
+  airgtr128: { label:"mmdMotionAirgtr", bpm:128, seconds:3.75, pose:t => { // エアギター（8拍・うつむいてかき鳴らす）
+    const b = t * 128 / 60, strum = Math.sin(2 * Math.PI * b) + 0.4 * Math.sin(4 * Math.PI * b);
+    const sway = Math.sin(Math.PI * b / 4), bounce = Math.abs(Math.sin(Math.PI * b));
+    return {
+      "センター": { pos:[0.05 * sway, -0.14 - 0.05 * bounce, 0], rot:[0, -14 + 6 * sway, 0] },
+      "上半身": { rot:[14, 6 * sway, 3 * sway] },
+      "上半身2":{ rot:[8, 0, 0] },
+      "首":    { rot:[16, -4 * sway, 2 * sway] },
+      "頭":    { rot:[20, 0, 5 * sway] },                               // 靴を見つめる
+      "左腕":  { rot:[26, 24, -38] },                                   // ネックをにぎる側
+      "左ひじ":{ rot:[0, -78, 0] },
+      "右腕":  { rot:[14 + 7 * strum, 0, 52] },                         // かき鳴らす側
+      "右ひじ":{ rot:[0, 48 + 16 * strum, 0] }
+    };
+  } },
+  dreamy128: { label:"mmdMotionDreamy", bpm:128, seconds:7.5, pose:t => { // しっとり（16拍・ゆったりただよう）
+    const b = t * 128 / 60, w = Math.PI * b / 8, s = Math.sin(w), drift = Math.sin(Math.PI * b / 4);
+    return {
+      "センター": { pos:[0.16 * s, -0.04 + 0.03 * Math.sin(Math.PI * b / 2), 0], rot:[0, 15 * s, 2 * drift] },
+      "上半身": { rot:[2, 8 * s, 4 * drift] },
+      "上半身2":{ rot:[1, 4 * s, 0] },
+      "首":    { rot:[-6, -6 * s, -4 * drift] },
+      "頭":    { rot:[-9, -4 * s, 6 * drift] },                         // すこし上をむいて夢見ごこち
+      "左腕":  { rot:[4 * drift, 0, -62 + 4 * s] },
+      "右腕":  { rot:[-4 * drift, 0, 62 + 4 * s] },
+      "左ひじ":{ rot:[0, -12 - 5 * drift, 0] },
+      "右ひじ":{ rot:[0, 12 - 5 * drift, 0] }
+    };
+  } },
+  kneel128: { label:"mmdMotionKneel", bpm:128, seconds:7.5, pose:t => {  // かたひざ（16拍・しずかに眺める）
+    const b = t * 128 / 60, breathe = Math.sin(Math.PI * b / 2), look = Math.sin(Math.PI * b / 8);
+    return {
+      "センター": { pos:[0, -3.8 + 0.06 * breathe, 0.2], rot:[0, 8 * look, 0] },
+      "上半身": { rot:[10 - 2 * breathe, 4 * look, 0] },
+      "上半身2":{ rot:[4, 0, 0] },
+      "首":    { rot:[-10, 10 * look, 0] },
+      "頭":    { rot:[-14 + breathe, 12 * look, 2 * look] },            // とおくを眺める
+      "左足":  { rot:[-95, 0, 6] }, "左ひざ":{ rot:[115, 0, 0] },        // 立てひざ側
+      "右足":  { rot:[-25, 0, -8] }, "右ひざ":{ rot:[120, 0, 0] },       // 地面につく側
+      "左腕":  { rot:[32, 0, -48] },                                    // ひざにうでを乗せる
+      "左ひじ":{ rot:[0, -58, 0] },
+      "右腕":  { rot:[6, 0, 64] },                                      // だらんと支える
+      "右ひじ":{ rot:[0, 14 + 3 * breathe, 0] }
+    };
+  } },
+  dune135: { label:"mmdMotionDune", bpm:135, seconds:3.56, pose:t => {   // こうしん（8拍）
+    const b = t * 2.25, arm = Math.sin(Math.PI * b), bob = Math.abs(Math.sin(Math.PI * b));
+    return {
+      "センター": { pos:[0, -0.22 + 0.16 * bob, 0], rot:[0, 6 * Math.sin(Math.PI * b / 4), 0] },
+      "上半身": { rot:[3, 4 * arm, 0] },
+      "首":    { rot:[-3 * bob, -4 * arm, 0] },
+      "頭":    { rot:[4 * bob, 0, 0] },
+      "左腕":  { rot:[30 * arm, 0, -62] },
+      "右腕":  { rot:[-30 * arm, 0, 62] },
+      "左ひじ":{ rot:[0, -45 - 15 * arm, 0] },
+      "右ひじ":{ rot:[0, 45 - 15 * arm, 0] }
+    };
+  } },
+  green145: { label:"mmdMotionGreen", bpm:145, seconds:3.31, pose:t => { // ペンライト（8拍）
+    const b = t * 145 / 60, w = Math.PI * b / 2, s = Math.sin(w);
+    return {
+      "センター": { pos:[0.22 * s, -0.08 * Math.abs(Math.cos(w)), 0], rot:[0, 0, 3 * s] },
+      "上半身": { rot:[0, 5 * s, 4 * s] },
+      "首":    { rot:[-4, -5 * s, -3 * s] },
+      "頭":    { rot:[-5, 0, 4 * s] },
+      "左腕":  { rot:[0, 0, 38 + 20 * s] },
+      "右腕":  { rot:[0, 0, -38 + 20 * s] },
+      "左ひじ":{ rot:[0, -12, 0] }, "右ひじ":{ rot:[0, 12, 0] }
+    };
+  } },
+  tyw150: { label:"mmdMotionTyw", bpm:150, seconds:3.2, pose:t => {      // せかいへ（8拍：むね→ひろげる）
+    const b = t * 2.5, u = (Math.sin(Math.PI * b / 2 - Math.PI / 2) + 1) / 2, sway = Math.sin(Math.PI * b / 4);
+    return {
+      "センター": { pos:[0, -0.05 + 0.08 * u, 0], rot:[0, 10 * sway, 0] },
+      "上半身": { rot:[-5 * u, 6 * sway, 0] },
+      "上半身2":{ rot:[-3 * u, 0, 0] },
+      "首":    { rot:[-6 * u, -5 * sway, 0] },
+      "頭":    { rot:[-6 * u, 0, 0] },
+      "左腕":  { rot:[12 * (1 - u), 0, -58 + 78 * u] },
+      "右腕":  { rot:[12 * (1 - u), 0, 58 - 78 * u] },
+      "左ひじ":{ rot:[0, -82 * (1 - u) - 6, 0] },
+      "右ひじ":{ rot:[0, 82 * (1 - u) + 6, 0] }
+    };
+  } },
+  senbon154: { label:"mmdMotionSenbon", bpm:154, seconds:3.12, pose:t => { // キレの和（8拍・ジグザグでキビキビ）
+    const b = t * 154 / 60, zig = Math.asin(Math.sin(Math.PI * b / 2)) * 2 / Math.PI, snap = Math.asin(Math.sin(Math.PI * b)) * 2 / Math.PI;
+    return {
+      "センター": { pos:[0.1 * zig, -0.1 + 0.05 * Math.abs(snap), 0], rot:[0, 0, 2 * zig] },
+      "上半身": { rot:[0, 18 * zig, 3 * zig] },
+      "首":    { rot:[0, -16 * zig, 0] },
+      "頭":    { rot:[3 * Math.abs(snap), -6 * zig, 0] },
+      "左腕":  { rot:[0, 0, -15 - 40 * Math.max(0, zig)] },
+      "右腕":  { rot:[0, 0, 15 + 40 * Math.max(0, -zig)] },
+      "左ひじ":{ rot:[0, -95 * Math.max(0, -zig) - 10, 0] },
+      "右ひじ":{ rot:[0, 95 * Math.max(0, zig) + 10, 0] }
+    };
+  } },
+  mikumiku160: { label:"mmdMotionMikumiku", bpm:160, seconds:3.0, pose:t => { // してやんよ（8拍：右で びしっ→左で びしっ）
+    const b = t * 160 / 60;
+    const half = (b % 8) < 4;                                 // 前半＝右手の番・後半＝左手の番
+    const u = Math.sin(Math.PI * ((b % 4) / 4));              // 0→1→0 で腕を出して戻す
+    const hop = Math.abs(Math.sin(Math.PI * b));              // 拍ごとのはずみ
+    const nod = Math.sin(2 * Math.PI * b);
+    const R = half ? u : 0, L = half ? 0 : u;                 // R/L＝その手を出す量
+    return {
+      "センター": { pos:[0.12 * (R - L), 0.12 * hop * hop - 0.05, 0], rot:[0, -14 * R + 14 * L, 0] },
+      "上半身": { rot:[-3 * (R + L), -8 * R + 8 * L, 2 * (R - L)] },
+      "首":    { rot:[2 * nod, 5 * R - 5 * L, -4 * (R - L)] },
+      "頭":    { rot:[-5 * (R + L), 6 * R - 6 * L, 7 * (R - L)] },  // 「してやんよ！」のドヤ首かしげ
+      "左腕":  { rot:[0, 20 * L, 42 - 100 * L] },                   // 出すときは横へ びしっ
+      "右腕":  { rot:[0, -20 * R, -42 + 100 * R] },
+      "左ひじ":{ rot:[0, -65 + 55 * L, 0] },                        // 出し切ると ほぼ伸びる
+      "右ひじ":{ rot:[0, 65 - 55 * R, 0] }
+    };
+  } },
+  kyukura165: { label:"mmdMotionKyukura", bpm:165, seconds:2.91, pose:t => { // くらくら（8拍・マリオネットみたいにゆれる）
+    const b = t * 2.75, w = Math.PI * b / 2, fast = 2 * Math.PI * b;
+    return {
+      "センター": { pos:[0.12 * Math.sin(w), 0.05 * Math.cos(w) - 0.08, 0], rot:[0, 0, 4 * Math.sin(w)] },
+      "上半身": { rot:[3 * Math.cos(w), 6 * Math.sin(w), 5 * Math.sin(w + 0.4)] },
+      "首":    { rot:[-3 * Math.cos(w + 0.5), 0, 8 * Math.sin(w + 0.5)] },
+      "頭":    { rot:[6 * Math.cos(w), 0, 12 * Math.sin(w)] },
+      "左腕":  { rot:[8 * Math.sin(fast), 0, -30 + 14 * Math.sin(fast) ] },
+      "右腕":  { rot:[-8 * Math.sin(fast + 1.2), 0, 30 - 14 * Math.sin(fast + 1.2)] },
+      "左ひじ":{ rot:[0, -42 - 26 * Math.sin(fast + 0.6), 0] },
+      "右ひじ":{ rot:[0, 42 + 26 * Math.sin(fast + 1.8), 0] }
+    };
+  } },
+  melt170: { label:"mmdMotionMelt", bpm:170, seconds:2.82, pose:t => {   // きゅん（8拍・むねの前で手を合わせてゆれる）
+    const b = t * 170 / 60, w = Math.PI * b / 2, s = Math.sin(w), beat = Math.max(0, Math.sin(Math.PI * b));
+    return {
+      "センター": { pos:[0.1 * s, -0.04 * beat, 0], rot:[0, 0, 5 * s] },
+      "上半身": { rot:[2, 7 * s, 3 * s] },
+      "首":    { rot:[3, -6 * s, -6 * s] },
+      "頭":    { rot:[-4 + 2 * beat, 0, 8 * s] },
+      "左腕":  { rot:[18, 0, -48] },
+      "右腕":  { rot:[18, 0, 48] },
+      "左ひじ":{ rot:[0, -98, 0] },
+      "右ひじ":{ rot:[0, 98, 0] }
+    };
+  } },
+  umg170: { label:"mmdMotionUmg", bpm:170, seconds:5.65, pose:t => {     // つたえる（16拍・かた手をのばして→むねへ）
+    const b = t * 170 / 60, u = (Math.sin(Math.PI * b / 8 - Math.PI / 2) + 1) / 2, s = Math.sin(Math.PI * b / 4);
+    return {
+      "センター": { pos:[0.08 * s, -0.03, 0], rot:[0, -8 * u, 0] },
+      "上半身": { rot:[-3 * u, -6 * u, 2 * s] },
+      "首":    { rot:[-4 * u, 5 * u, -3 * s] },
+      "頭":    { rot:[-5 * u, 4 * u, 0] },
+      "左腕":  { rot:[0, 0, -55 + 5 * s] },
+      "右腕":  { rot:[-35 * u, 20 * u, 30 - 55 * u] },
+      "左ひじ":{ rot:[0, -20, 0] },
+      "右ひじ":{ rot:[0, 15 + 75 * (1 - u), 0] }
+    };
+  } },
+  rabbit173: { label:"mmdMotionRabbit", bpm:173, seconds:3.47, pose:t => { // うさみみ（10拍＝5拍子×2・4ホップ＋1スキップ）
+    const b = t * 173 / 60, b5 = b % 5, skip = b5 >= 4;                  // 5拍目だけ2倍速のスキップ＝変拍子感
+    const hop = Math.max(0, Math.sin(Math.PI * b5 * (skip ? 2 : 1)));
+    const sway = Math.sin(Math.PI * b / 5), wig = Math.sin(2 * Math.PI * b);
+    return {
+      "センター": { pos:[0.14 * sway, 0.1 * hop * hop - 0.05, 0], rot:[0, 0, 3 * sway] },
+      "上半身": { rot:[2 * hop, 6 * sway, 2 * sway] },
+      "首":    { rot:[-3 * hop, -5 * sway, 4 * wig * (skip ? 1 : 0.3)] },
+      "頭":    { rot:[-4 * hop, 0, 6 * sway] },
+      "左腕":  { rot:[0, 0, 52 + 4 * wig] },
+      "右腕":  { rot:[0, 0, -52 - 4 * wig] },
+      "左ひじ":{ rot:[0, -112 - 8 * wig, 0] },
+      "右ひじ":{ rot:[0, 112 + 8 * wig, 0] }
+    };
+  } },
+  wedh174: { label:"mmdMotionWedh", bpm:174, seconds:2.76, pose:t => {   // ダンスホール（8拍・左右交互にうでを上げる）
+    const b = t * 174 / 60, s = Math.sin(Math.PI * b / 2), nod = Math.max(0, Math.sin(Math.PI * b));
+    const L = Math.max(0, s), R = Math.max(0, -s);
+    return {
+      "センター": { pos:[0.3 * s, 0.07 * nod - 0.1, 0], rot:[0, 0, 4 * s] },
+      "上半身": { rot:[0, 9 * s, 5 * s] },
+      "首":    { rot:[4 * nod, -8 * s, -4 * s] },
+      "頭":    { rot:[6 * nod, 0, 0] },
+      "左腕":  { rot:[0, 0, -58 + 100 * L] },
+      "右腕":  { rot:[0, 0, 58 - 100 * R] },
+      "左ひじ":{ rot:[0, -25 + 15 * L, 0] },
+      "右ひじ":{ rot:[0, 25 - 15 * R, 0] }
+    };
+  } },
+  mesmer185: { label:"mmdMotionMesmer", bpm:185, seconds:2.59, pose:t => { // すましシャッフル（8拍・レトロカートゥーンのびよんびよん）
+    const b = t * 185 / 60, beat = Math.abs(Math.sin(Math.PI * b)), alt = Math.sin(Math.PI * b / 2);
+    const pend = Math.sin(Math.PI * b);                                  // 1拍で腕がふりこ
+    return {
+      "センター": { pos:[0.22 * alt, 0.08 * beat - 0.12 + 0.06 * beat * beat, 0], rot:[0, 0, 5 * alt] },
+      "上半身": { rot:[2 * beat, 12 * alt, -4 * alt] },
+      "上半身2":{ rot:[0, 6 * alt, 0] },
+      "首":    { rot:[4 * beat, -8 * alt, 10 * alt] },
+      "頭":    { rot:[5 * beat, 0, -13 * alt] },
+      "左腕":  { rot:[38 * pend, 0, -52] },
+      "右腕":  { rot:[-38 * pend, 0, 52] },
+      "左ひじ":{ rot:[0, -22 - 14 * pend, 0] },
+      "右ひじ":{ rot:[0, 22 - 14 * pend, 0] }
+    };
+  } },
+  rolling194: { label:"mmdMotionRolling", bpm:194, seconds:2.47, pose:t => { // ぐるぐる（8拍・からだで円をえがく）
+    const b = t * 194 / 60, w = Math.PI * b / 2;
+    return {
+      "センター": { pos:[0.25 * Math.sin(w), 0.1 * Math.cos(w) - 0.12, 0], rot:[0, 0, 7 * Math.sin(w)] },
+      "上半身": { rot:[5 * Math.cos(w), 0, 8 * Math.sin(w)] },
+      "首":    { rot:[-4 * Math.cos(w), 0, 9 * Math.sin(w + 0.7)] },
+      "頭":    { rot:[-5 * Math.cos(w + 0.5), 0, 10 * Math.sin(w + 1)] },
+      "左腕":  { rot:[14 * Math.sin(w), 0, -68] },
+      "右腕":  { rot:[-14 * Math.sin(w), 0, 68] },
+      "左ひじ":{ rot:[0, -14, 0] }, "右ひじ":{ rot:[0, 14, 0] }
+    };
+  } },
+  uraomote196: { label:"mmdMotionUraomote", bpm:196, seconds:2.45, pose:t => { // うらおもて（8拍・くるっと左右へ向きかえ）
+    const b = t * 196 / 60, flip = Math.sin(Math.PI * b / 2), nod = Math.max(0, Math.sin(2 * Math.PI * b));
+    const x = Math.abs(flip);
+    return {
+      "センター": { pos:[0, -0.06 * nod, 0], rot:[0, 70 * flip, 0] },
+      "上半身": { rot:[0, 14 * flip, 0] },
+      "首":    { rot:[5 * nod, -10 * flip, 0] },
+      "頭":    { rot:[7 * nod, -8 * flip, 0] },
+      "左腕":  { rot:[20 * x, 0, -42 - 14 * x] },
+      "右腕":  { rot:[20 * x, 0, 42 + 14 * x] },
+      "左ひじ":{ rot:[0, -70 - 20 * flip, 0] },
+      "右ひじ":{ rot:[0, 70 - 20 * flip, 0] }
+    };
+  } },
+  vanish240: { label:"mmdMotionVanish", bpm:240, seconds:4, pose:t => {  // こうそく（16拍・いそがしく跳ねる）
+    const b = t * 4, up = Math.pow(Math.max(0, Math.sin(Math.PI * b)), 2), fast = Math.sin(2 * Math.PI * b);
+    const alt = Math.sin(Math.PI * b / 8);
+    return {
+      "センター": { pos:[0.08 * alt, 0.22 * up - 0.08, 0], rot:[0, 0, 2 * alt] },
+      "上半身": { rot:[7, 5 * fast, -2 * alt] },
+      "首":    { rot:[-4 * up, 3 * fast, 0] },
+      "頭":    { rot:[-3 * up, 4 * fast, 0] },
+      "左腕":  { rot:[0, 0, -55 + 26 * up] },
+      "右腕":  { rot:[0, 0, 55 - 26 * up] },
+      "左ひじ":{ rot:[0, -55 - 16 * fast, 0] },
+      "右ひじ":{ rot:[0, 55 - 16 * fast, 0] }
+    };
   } }
 };
 const builtinBytes = id => {
@@ -250,6 +642,69 @@ const builtinBytes = id => {
   }
   return buildVmd(frames, "trk-builtin-" + id);
 };
+
+/* ============ 💠 同梱プリセットモデル（assets/mmd/<dir>/preset.json があるときだけ出る） ============
+   モデル本体はふだんリポジトリに入れません。**再配布OKを「れあどめ」原文で確認できたモデルだけ**、
+   れあどめ原文ごと assets/mmd/<dir>/ に置き、preset.json を書くと、設定にワンクリックのボタンが出ます。
+   （例：Lat式ミク＝「版権元ガイドラインの範囲内であれば改変・流用を含む利用・再配布等オールOK」）
+   preset.json の形：
+     { "label":"Lat式ミク", "files":["LatMiku.pmd","tex/body.bmp", …],
+       "credit":"Lat式ミク / Lat様", "motion":"jump", "bpm":130, "readme":"readme_lat.txt" }
+   ・files は dir からの相対パス。テクスチャも全部列挙する（GitHub Pages は大文字小文字を区別）
+   ・readme は規約の原文ファイル（必ず同じフォルダに置く） */
+const PRESET_BASE = "assets/mmd/", PRESET_DIRS = ["lat-miku"];
+let presets = [];                                    // 読めた preset.json の一覧 [{dir, man}]
+async function findPresets() {
+  presets = [];                                      // 何度呼ばれても重複しない
+  for (const dir of PRESET_DIRS) {
+    try {
+      const res = await fetch(PRESET_BASE + dir + "/preset.json", { cache:"no-cache" });
+      if (!res || !res.ok) continue;
+      const man = await res.json();
+      if (man && man.label && Array.isArray(man.files) && man.files.length) presets.push({ dir, man });
+    } catch (_) { /* 無ければ出さないだけ（持ち込み式のまま） */ }
+  }
+  renderPresetRow();
+}
+function renderPresetRow() {
+  const row = $("mmdPresetRow"), hint = $("mmdPresetHint");
+  if (!row) return;
+  row.textContent = "";
+  for (const p of presets) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = tr("mmdPresetBtn", { name:p.man.label });
+    b.addEventListener("click", () => {
+      if (safeNow()) { status("mmdSafe"); return; }
+      enqueue(() => doLoadPreset(p));
+    });
+    row.append(b);
+  }
+  row.hidden = !presets.length;
+  if (hint) hint.hidden = !presets.length;
+}
+async function doLoadPreset(p) {
+  status("mmdLoading");
+  try {
+    const files = [];
+    for (const name of p.man.files) {
+      const path = PRESET_BASE + p.dir + "/" + String(name).split("/").map(encodeURIComponent).join("/");
+      const res = await fetch(path);
+      if (!res || !res.ok) throw fail("mmdPresetMissing");
+      const blob = await res.blob();
+      files.push(new File([blob], String(name).split("/").pop()));
+    }
+    if (p.man.credit) settings.mmdCredit = String(p.man.credit).slice(0, 120);
+    await doLoadModel(files, { save:true });
+    if (!model) return;                              // 失敗なら doLoadModel が理由を出している
+    if (p.man.motion && BUILTIN[p.man.motion]) await applyMotion(p.man.motion, { silent:true });
+    if (typeof p.man.bpm === "number") settings.mmdMotionBpm = Math.max(0, Math.min(300, p.man.bpm));
+    saveUserPrefs(); syncUI();
+  } catch (e) {
+    console.error(e);
+    status(e && e.key ? e.key : "mmdLoadError");
+  }
+}
 
 /* ============ 状態 ============ */
 const canvas = $("mmdCanvas"), prev = $("mmdPreview"), pctx = prev && prev.getContext("2d");
@@ -397,6 +852,13 @@ async function applyMotion(kind, { silent = false, fromRestore = false } = {}) {
   if (!model) return;
   try {
     if (motionKind === "none") { anim = null; motionDur = 0; motionName = ""; }
+    else if (motionKind === "auto") {                 // 🎲 曲のBPMにいちばん近い🎵を選ぶ（曲がなければ👀みてる）
+      autoBpmUsed = songBpm();
+      autoId = pickAuto(autoBpmUsed);
+      const bytes = builtinBytes(autoId);
+      anim = await newAnimLoader().loadAnimation(bytes);
+      motionDur = BUILTIN[autoId].seconds; motionName = "🎲 " + tr(BUILTIN[autoId].label);
+    }
     else if (BUILTIN[motionKind]) {
       const bytes = builtinBytes(motionKind);
       anim = await newAnimLoader().loadAnimation(bytes);
@@ -411,6 +873,7 @@ async function applyMotion(kind, { silent = false, fromRestore = false } = {}) {
       motionDur = Math.max(0.5, frames / FPS); motionName = String(file.name).replace(/\.vmd$/i, "").slice(0, 60);
     }
     if (anim && model.setAnimation) model.setAnimation(anim);
+    if (!fromRestore && motionKind !== "file") { settings.mmdMotionKind = motionKind; saveUserPrefs(); }  // 選択を記憶（次回も同じモーション）
     if (!fromRestore && !silent && motionKind === "file") status("mmdVmdLoaded", { name:motionName });
   } catch (e) {
     console.error(e);
@@ -435,10 +898,28 @@ async function doLoadMotion(file, { restored = false } = {}) {
 const loadMotionFile = (file, opts) => enqueue(() => doLoadMotion(file, opts));
 
 /* ============ 姿勢とBPM（毎フレーム） ============ */
-/* モーションの速さ：曲のBPM ÷ モーションの基準BPM（どちらかが0なら 1） */
+/* モーションの速さ：曲のBPM ÷ モーションの基準BPM。
+   基準BPM（mmdBpm）が 0 のときは、内蔵モーションは自分の bpm で曲に自動シンク（持ち込みVMDは固定のまま）。
+   👀 fixed:true のモーションと、🎲おまかせで選ばれた fixed は、いつも等速 */
+const songBpm = () => (typeof chartMeta !== "undefined" && chartMeta && chartMeta.bpm) || 0;
 function motionRate() {
-  const mb = settings.mmdMotionBpm || 0, sb = (typeof chartMeta !== "undefined" && chartMeta && chartMeta.bpm) || 0;
+  const cur = BUILTIN[motionKind === "auto" ? autoId : motionKind];
+  if (cur && cur.fixed) return 1;
+  const own = (cur && cur.bpm) || 0;
+  const mb = settings.mmdMotionBpm || own, sb = songBpm();
   return (mb && sb) ? Math.min(3, Math.max(0.25, sb / mb)) : 1;
+}
+/* 🎲 おまかせ：曲のBPMにいちばん近い🎵（bpm持ちの内蔵）を選ぶ。曲のBPMが不明なら 👀みてる */
+let autoId = "watch", autoBpmUsed = -1;
+function pickAuto(bpm) {
+  if (!bpm) return "watch";
+  let best = "step", d = Infinity;
+  for (const [id, m] of Object.entries(BUILTIN)) {
+    if (!m.bpm || m.fixed) continue;
+    const dd = Math.abs(bpm - m.bpm);
+    if (dd < d) { d = dd; best = id; }
+  }
+  return best;
 }
 function pose(time) {
   if (!model) return;
@@ -450,6 +931,10 @@ function pose(time) {
 /* ============ 描画ループ（必要なときだけ描く） ============ */
 function animate(now) {
   requestAnimationFrame(animate);
+  if (model && motionKind === "auto" && songBpm() !== autoBpmUsed) {  // 🎲 曲が変わったら選びなおす（画面に出ていなくても）
+    autoBpmUsed = songBpm();
+    enqueue(() => applyMotion("auto", { silent:true, fromRestore:true }));
+  }
   playing = !!model && phase !== "title" && activeMascot() === "mmd";
   canvas.hidden = !playing;
   const panel = $("mmdPanel");
@@ -469,6 +954,86 @@ function animate(now) {
   } catch (e) { console.error(e); }
 }
 requestAnimationFrame(animate);
+
+/* ============ 🩷 選曲画面のミニ操作（⏩速度パネルの下。裏＝設定はモデル読み込み用のまま） ============
+   表のUIは4つだけ：👀ひとやすみ（BPM非依存）／🎲おまかせ／🎯えらぶ（⭐お気に入りが上に来る）／💤お留守番。
+   モデルが読み込まれているときだけ出ます（設定の mmdQuickUI チェックで隠せる・?safe=1 では出ない） */
+let quickPanel = null, quickSeg = null, quickPickRow = null, quickSelect = null, quickFavBtn = null, quickName = null;
+let quickPickOpen = false;                           // 🎯タップでセレクトを開いたままにする
+const quickMode = () =>
+  settings.mascot === "none" ? "off" :
+  motionKind === "auto" ? "auto" :
+  (BUILTIN[motionKind] && BUILTIN[motionKind].fixed) ? "watch" : "pick";
+function buildQuickPanel() {
+  if (quickPanel || !$("playBtn")) return;
+  quickPanel = el("section", "panel"); quickPanel.id = "mmdQuickPanel"; quickPanel.hidden = true;
+  const head = el("div", "libHead"), title = el("h3");
+  title.id = "mmdQuickTitle"; title.style.margin = "0";
+  quickName = el("b", "mono"); head.append(title, quickName);
+  quickSeg = el("div", "seg"); quickSeg.id = "mmdQuickSeg"; quickSeg.style.marginTop = "8px";
+  for (const [mode, key] of [["watch", "mmdQuickWatch"], ["auto", "mmdQuickAuto"], ["pick", "mmdQuickPick"], ["off", "mmdQuickOff"]]) {
+    const b = el("button"); b.type = "button"; b.dataset.quick = mode; b.dataset.i18n = key;
+    b.addEventListener("click", () => quickTap(mode));
+    quickSeg.append(b);
+  }
+  quickPickRow = el("div", "inline tight"); quickPickRow.style.marginTop = "8px";
+  quickSelect = document.createElement("select"); quickSelect.id = "mmdQuickSelect"; quickSelect.style.flex = "1";
+  quickSelect.addEventListener("change", () => { loadMotionKind(quickSelect.value); });
+  quickFavBtn = el("button"); quickFavBtn.type = "button"; quickFavBtn.id = "mmdQuickFav";
+  quickFavBtn.addEventListener("click", () => {
+    const id = (motionKind === "auto" ? "" : motionKind);
+    if (!id || !BUILTIN[id]) return;
+    const favs = settings.mmdMotionFavs || [];
+    settings.mmdMotionFavs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id].slice(0, 50);
+    saveUserPrefs(); renderQuick();
+  });
+  quickPickRow.append(quickSelect, quickFavBtn);
+  quickPanel.append(head, quickSeg, quickPickRow);
+  ($("speedPanel") || $("playBtn")).after(quickPanel);
+}
+function quickTap(mode) {
+  quickPickOpen = (mode === "pick");
+  if (mode === "off") { settings.mascot = "none"; saveUserPrefs(); updateMascotUI(); renderQuick(); return; }
+  if (settings.mascot !== "mmd" && model) { settings.mascot = "mmd"; saveUserPrefs(); updateMascotUI(); }
+  if (mode === "watch") {                           // 👀 連打で みてる⇔たたずむ
+    loadMotionKind(motionKind === "watch" ? "stroll" : "watch");
+  } else if (mode === "auto") loadMotionKind("auto");
+  /* 🎯えらぶ はセレクトを出すだけ（いまのモーションはそのまま） */
+  renderQuick();
+}
+function renderQuick() {
+  if (!quickPanel) return;
+  const show = !!model && settings.mmdQuickUI !== false && !safeNow();
+  quickPanel.hidden = !show;
+  if (!show) return;
+  const t = quickPanel.querySelector("#mmdQuickTitle"); if (t) t.textContent = tr("mmdQuickTitle");
+  const mode = quickPickOpen ? "pick" : quickMode();
+  quickSeg.querySelectorAll("button").forEach(b => {
+    b.textContent = tr(b.dataset.i18n);
+    const on = b.dataset.quick === mode;
+    b.classList.toggle("selected", on); b.setAttribute("aria-pressed", on);
+  });
+  quickName.textContent = mode === "off" ? "💤" : (motionName || tr("mmdMotionNone"));
+  quickPickRow.hidden = mode !== "pick";
+  if (mode === "pick") {
+    const favs = (settings.mmdMotionFavs || []).filter(id => BUILTIN[id]);
+    quickSelect.textContent = "";
+    const add = (val, text, group) => { const o = document.createElement("option"); o.value = val; o.textContent = text; (group || quickSelect).append(o); };
+    if (favs.length) {
+      const g = document.createElement("optgroup"); g.label = "⭐";
+      for (const id of favs) add(id, tr(BUILTIN[id].label), g);
+      quickSelect.append(g);
+    }
+    add("none", tr("mmdMotionNone"));
+    for (const id of Object.keys(BUILTIN)) if (!favs.includes(id)) add(id, tr(BUILTIN[id].label));
+    if (motionKind === "file" || (anim && motionKind === "file")) add("file", "🎬 " + (motionName || "VMD"));
+    quickSelect.value = (motionKind === "auto" || motionKind === "file") ? (quickSelect.querySelector(`option[value="${motionKind}"]`) ? motionKind : "none") : motionKind;
+    const fav = BUILTIN[motionKind] && (settings.mmdMotionFavs || []).includes(motionKind);
+    quickFavBtn.textContent = fav ? "⭐" : "☆";
+    quickFavBtn.title = tr("mmdQuickFavTip");
+    quickFavBtn.disabled = !BUILTIN[motionKind];
+  }
+}
 
 /* ============ 画面の組み立て ============ */
 /* ---------- 🔎 動作チェック（実機で「どこまで動くか」を1か所に出す） ----------
@@ -561,11 +1126,13 @@ function renderMotionList() {
   const keep = motionKind;
   sel.textContent = "";
   const opt = document.createElement("option"); opt.value = "none"; opt.textContent = tr("mmdMotionNone"); sel.append(opt);
+  const oa = document.createElement("option"); oa.value = "auto"; oa.textContent = tr("mmdMotionAuto"); sel.append(oa);
   for (const id of Object.keys(BUILTIN)) {
     const o = document.createElement("option"); o.value = id; o.textContent = tr(BUILTIN[id].label); o.dataset.builtin = "1"; sel.append(o);
   }
   if (anim && keep === "file") { const o = document.createElement("option"); o.value = "file"; o.textContent = "🎬 " + (motionName || "VMD"); sel.append(o); }
   sel.value = (keep === "file" && !anim) ? "none" : keep;
+  renderQuick();                                     // 🩷 選曲画面のミニ操作も同じタイミングで更新
 }
 function syncUI() {
   const box = $("mmdInfo");
@@ -583,12 +1150,14 @@ function syncUI() {
   const mb = $("mmdBpm"); if (mb) mb.value = settings.mmdMotionBpm;
   const cr = $("mmdCredit"); if (cr && document.activeElement !== cr) cr.value = settings.mmdCredit || "";
   const rem = $("mmdRemember"); if (rem) rem.checked = settings.mmdRemember !== false;
+  const qui = $("mmdQuickUI"); if (qui) qui.checked = settings.mmdQuickUI !== false;
   const ag = $("mmdAgree"); if (ag) ag.checked = !!settings.mmdAgreed;
   setAgreeUI(); renderMotionList();
 }
 
 addEventListener("DOMContentLoaded", () => {
   if (!canvas || !$("mmdPanel")) return;
+  buildQuickPanel();                                 // 🩷 選曲画面のミニ操作（モデルが来るまで hidden）
 
   $("mmdAgree").addEventListener("change", e => {
     settings.mmdAgreed = !!e.target.checked; saveUserPrefs(); setAgreeUI();
@@ -639,22 +1208,28 @@ addEventListener("DOMContentLoaded", () => {
     if (!settings.mmdRemember) { mmdDB.del("model").catch(() => {}); mmdDB.del("motion").catch(() => {}); }
   });
 
+  const qui = $("mmdQuickUI");
+  if (qui) qui.addEventListener("change", e => { settings.mmdQuickUI = !!e.target.checked; saveUserPrefs(); renderQuick(); });
+
   $("mmdCheckBtn").addEventListener("click", () => { enqueue(runCheck); });
   $("mmdCopyBtn").addEventListener("click", () => {
     if (!lastCheck) { enqueue(async () => { await runCheck(); copyText(lastCheck); }); return; }
     copyText(lastCheck);
   });
 
-  on("language", () => { syncUI(); });
+  on("language", () => { syncUI(); renderPresetRow(); renderQuick(); });
 
   /* 前回のモデルを戻す（覚える設定のときだけ・セーフモードでは何もしない） */
   syncUI();
   if (safeNow()) { status("mmdSafe"); return; }
+  enqueue(findPresets);                              // 💠 同梱モデルがあればボタンを出す（無ければ何もしない）
   if (settings.mmdRemember) enqueue(async () => {
     try {
       const rec = await mmdDB.get("model");
       if (rec && rec.files && rec.files.length) {
         settings.mmdAgreed = true; syncUI();
+        const keep = settings.mmdMotionKind;                           // 記憶したモーション（none/auto/内蔵）
+        if (keep && (keep === "auto" || BUILTIN[keep])) motionKind = keep;
         await doLoadModel(rec.files, { restored:true, select:false, save:false });
         const m = await mmdDB.get("motion");
         if (m && m.file) await doLoadMotion(m.file, { restored:true });
@@ -683,6 +1258,9 @@ window.TrkMMD = {
   _sjis: (s, n) => Array.from(sjisFix(s, n)),
   builtins: () => Object.keys(BUILTIN),
   motions: () => Object.entries(BUILTIN).map(([id, m]) => ({ id, bpm:m.bpm, seconds:m.seconds })),
+  presets: () => presets.map(p => ({ dir:p.dir, label:p.man.label })),
+  findPresets: () => enqueue(findPresets),
+  loadPreset: dir => { const p = presets.find(x => x.dir === dir); if (p) enqueue(() => doLoadPreset(p)); },
   model: () => model ? { name:modelName, files:modelFiles.length } : null,
   motion: () => ({ kind:motionKind, name:motionName, duration:motionDur, anim:!!anim }),
   setMotion: kind => loadMotionKind(kind),
@@ -694,6 +1272,7 @@ window.TrkMMD = {
   check: () => runCheck(),
   checkText: r => checkText(r || lastCheckObj),
   lastCheck: () => lastCheck,
+  quickMode: () => quickMode(),
   isPlaying: () => playing,
   clock: () => clock,
   rate: motionRate,

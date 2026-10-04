@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 # trk! 次回セッション用メモ（NEXT_SESSION_HANDOFF.md）
 
-> 最終更新：**2026-10-05**（PR #4 を main にマージ済み／棚スキン11種を追加した回）
+> 最終更新：**2026-10-05**（💠Lat式ミク同梱＋🎵🎸👀内蔵モーション25種＋🎲おまかせ＋🩷選曲画面ミニ操作の回。この回の分は PR #6 でマージ）
 > このメモは、そのまま次回の最初のメッセージに貼っても再開できます。
 > リポジトリにこのファイルがあれば「`NEXT_SESSION_HANDOFF.md` を読んで現状を確認して」でOKです。
 > 詳しい仕様（ファイル間の約束・保存データ・落とし穴）は **docs/HANDOFF.md** にあります。
@@ -32,8 +32,38 @@
   | I | ⭐ お気に入りのフォルダ管理（上限なし・1軍/2軍/🧊/📤元） | `503d54e` |
   | J | ▶◀ 演奏中も曲を送る設定（初期オフ）＋ 🔎 MMD動作チェック | `89ba00e` |
   | — | fix: お気に入り一覧の名前がIDで出ていたのを修正 | `0975e05` |
-- これまでの PR：#2 元プロジェクト統合版 → #3 TVドック拡張＋緊急復旧 → **#4（上記）**。
-- いまの作業ブランチ：**`arena/01a106fc-trk`**（PR #5＝棚スキン11種＋ドキュメント整理）
+- これまでの PR：#2 元プロジェクト統合版 → #3 TVドック拡張＋緊急復旧 → #4（上記）→ **#5 棚スキン11種＋ドキュメント整理（`1425839` でマージ済み）**。
+- いまの作業ブランチ：**`arena/01a10781-trk`**（💠 MMD同梱プリセットの回）
+
+### 1-1b. 今回（arena/01a10781-trk）でやったこと：💠 Lat式ミク同梱の下ごしらえ
+
+- **方針決定（坂主さん確認済み）**：同梱は **Lat式ミクだけ採用**。れあどめ原文の
+  「版権元ガイドラインの範囲内であれば改変・流用を含む利用・再配布等オールOK」を根拠に、
+  **れあどめ原文ごと**同梱する。タワシ式CHAN×CO風は readme 原文が確認できるまで持ち込み式のまま
+- **💠 同梱プリセット機構（js/mmd.js）**：`assets/mmd/<dir>/preset.json` があるときだけ、
+  設定 →🩷 MMD に💠ボタンが出る。1クリックで fetch→読み込み→クレジット・モーション・基準BPMを自動設定。
+  同意チェック不要（規約ごと同梱のため）。`?safe=1` では探しにも行かない。**モデル未配置ならボタンは出ない＝従来どおり**
+- **内蔵モーションが25種に**：④ジャンプ（130BPM・派手）／⑤アイドル（128BPM）＋ **🎵BPMシリーズ15種＋🎸シューゲイザー3部作（128BPM）**（人気ミク曲のテンポに合わせた振り付け。曲名は目安・全部自作VMD）：
+  🎵**120 Ievan Polkka（ネギスピン・リクエスト）**／135砂の惑星／145グリーンライツ／**160してやんよ（みくみくにしてあげる♪・ミクの代名詞曲。びしっと指さし⇔ドヤ首かしげ。当初146で入れたが実BPM160に修正・IDも `mikumiku160` に改名）**／**150 Tell Your World（リクエスト）**／154千本桜／**165きゅうくらりん（リクエスト）**／170メルト／170アンノウン・マザーグース／**173ラビットホール（リクエスト・5拍子スキップ入り）**／174ワールズエンド／**185メズマライザー**／194ローリンガール／196裏表ラバーズ／**240消失**。🎸＝**エアギター（うつむいてかき鳴らす）・しっとり・かたひざで眺める**（Sometimes / When You Sleep むけ・リクエスト）。かたひざは センターを-3.8下げ＋足/ひざFK（IKが効く機種ではしゃがみに化ける＝実機要確認）。
+- **👀 BPM非依存2種＋🎲おまかせ＋モーション記憶（リクエスト「毎曲設定しなおすのは大変」対応）**：
+  👀みてる（こちらをじっと）／👀たたずむ（見まわす）＝`fixed:true` で曲のBPMに関係なく常に等速。
+  🎲おまかせ＝曲のBPMにいちばん近い🎵を自動選択（曲が変わると animate() が選びなおす・曲なしなら👀みてる）。
+  選んだモーションは **`settings.mmdMotionKind`（新設定キー）** に記憶され、リロード後もモデル復元と一緒に戻る（core.js の読み込み検証と resetAllPrefs に追加済み・"file" は記憶対象外）。
+- **🩷 選曲画面のモーションミニ操作（リクエスト「ミクが一番人気になるはず・毎回裏の設定は大変」対応）**：
+  ⏩再生速度パネルの直下に `#mmdQuickPanel`（mmd.js の `buildQuickPanel()`）。モデル読み込み済み＆非セーフのときだけ表示。
+  チップ4つ＝👀ひとやすみ（連打で みてる⇔たたずむ）／🎲おまかせ／🎯えらぶ（セレクト＋⭐お気に入り）／💤お留守番（`settings.mascot="none"`、他チップで復帰）。
+  モードは保存せず `mascot`＋`motionKind` から導出（`quickMode()`）。キャラの読み込み・規約同意は今までどおり裏（設定）のみ。
+  **新設定キー**：`mmdQuickUI`（既定オン。設定の🩷MMDパネルのチェック「選曲画面にミニ操作を出す」で切替）／`mmdMotionFavs`（⭐お気に入りモーションID配列・最大50。🎯の一覧で optgroup ⭐ が先頭に並ぶ）。どちらも core.js の読み込み検証＋resetAllPrefs に追加済み。
+  i18n：`mmdQuickTitle/Watch/Auto/Pick/Off/UILabel/FavTip` ×4言語。
+  💡将来候補：**曲ごとのモーション記憶**（「この楽曲はこれ！」）。⭐お気に入りは近道にすぎないので、`songFav` のような曲キー→モーションIDの対応表を足すと完成形。
+  選曲元＝ニコニコ「初音ミク16周年 楽曲ランキング」TOP10（2026年の定番曲投票は見当たらず、直近の大型投票を採用）
+- **基準BPM 0＝自動シンク**：`motionRate()` が、mmdBpm が 0 のとき内蔵モーション自身の bpm を基準に曲へ自動で合わせる（持ち込みVMDは従来どおり固定）。手動で入れた基準BPMが常に優先
+- **置き場**：`assets/mmd/README.md`（足し方と規約の条件）／`assets/mmd/lat-miku/`＝**Lat式ミク Ver2.31 Normal 投入済み**
+  （pmd＋テクスチャ18＋ReadMe.txt原文＋preset.json、計18.6MB。jsdom実HTTP検証で22項目全部OK）
+- **NOTICE.md に 3a 追加**：assets/mmd/ は GPL対象外・れあどめ原文同梱が条件・商用フォークは assets/mmd/ ごと削除
+- 新i18nキー：`mmdPresetBtn` `mmdPresetHint` `mmdPresetMissing` `mmdMotionJump` `mmdMotionIdol`（4言語）＋ `mmdHint` を4言語とも更新
+- `sw.js` の `CACHE`＝**`trk-v2026.10.5-mikumiku1`**
+- 検証：`jsdom-mmdpreset.mjs`（18本目）全部OK／`node --check` 全ファイルOK
 
 ### 1-2. 規模（数字で見る現在地）
 
@@ -68,7 +98,12 @@
 
 ## 2. 未確認・次の候補
 
-0. **🩷 MMDの実機確認（最優先。2026-10-04から持ち越し）**
+0. **💠 Lat式ミクの実機確認（新・最優先）** — モデルは**投入済み**（2026-10-05）
+   - `assets/mmd/lat-miku/` に Normal.pmd（ASCII名にリネーム・中身無改変）＋テクスチャ18＋**ReadMe.txt原文**＋`preset.json` が入っている
+   - ReadMe.txt 原文で再配布OKを確認済み（「PCL対象内外問わず、規約内であれば再配布OK。ReadMe.txt同梱と製作者・改変元の明記が条件」→ lat-miku/README.md に明記済み）
+   - 残るは**実ブラウザ**：💠ボタン→テクスチャ・toonが正しく出るか／④ジャンプの見た目／クレジット表示／リロード復元／`?safe=1`
+   - 元zipはリポジトリから削除済み（mainの履歴 `83a174b` から復元可能。White・セーラー服は未同梱）
+0b. **🩷 MMDの実機確認（持ち越し）**
    - CDNから three／three-mmd-loader が読めるか／Lat式ミク・タワシ式CHAN×CO系ミクの .pmx が動くか／
      テクスチャ付きフォルダ／自分の .vmd が曲に合うか／モバイル幅の見え方
    - **手順＝設定 →🩷 MMDマスコット →🔎 動作チェック →📋 結果をコピー → 貼って送る**（切り分けは `webgl=` → `three=NG`＋`libError` → `loader=` → `model=` の順）
@@ -101,7 +136,7 @@
 ## 3. 触るときの約束
 
 - **保存キー（変えない）**：`shadow_taiko_preferences_v2` / `_records_v1` / `_best_v1` / `_song_prefs_v1` / `_custom_skins_v1` / `trk_fx_presets_v1` / `trk_tv_skins_v1` / `trk_addons_v1` / IndexedDB `shadow_taiko_packs` `_songs` `_library` `_vrm` `_mmd`
-  - 新しく足したのは **`settings.favs` / `settings.songFav`**（＋既存キーの中の新しい項目 `tvSongWhilePlaying` `mmd*` `libTab` `libSkin` `libSkinQuick`）。既存キーと形式名はそのまま
+  - 新しく足したのは **`settings.favs` / `settings.songFav`**（＋既存キーの中の新しい項目 `tvSongWhilePlaying` `mmd*`（**`mmdMotionKind` `mmdQuickUI` `mmdMotionFavs` 含む**） `libTab` `libSkin` `libSkinQuick`）。既存キーと形式名はそのまま
 - **形式名（変えない）**：`shadow-taiko-pack` / `chart` / `records` / `skin` / `trk-fx` / `trk-verified` / `trk-tvskin` / **`trk-favs`**、譜面ファイル `*.shadow-taiko.json`
 - **読み込み順**：`tv-presets.js → core.js → fx-dock.js → tv-dock.js → fx.js → favs.js → library.js → verified.js → lib-skins.js → addons.js → main.js → speed.js → vrm.js → mmd.js`（player.js は core の直後、mmd.js は vrm.js の直後）
 - **関数を包む方式**：包まれる側を `const` にしない（`function` 宣言のまま）— tv-dock.js が `videoFilter` と `drawVideo` を、favs.js が fx の ★ を包む
@@ -112,7 +147,10 @@
   - TVドック：`TV_DOCK_SKINS` にエントリ → `buildDeco()` に分岐 → `css/style.css` にスキンCSS → 必要ならオーバーレイ
   - カスタムTVの飾り：`buildDeco()` と `TV_DECO_KEYS` の両方に
   - **棚スキン：`css/style.css` に `#libPanel[data-lib-skin="…"]` の1ブロック ＋ `js/lib-skins.js` の `LIB_SKIN_ORDER`（順番）と `LIB_SKINS`（icon ＋4言語ラベル）に1行**
-- **MMD**：**モデル・モーションをリポジトリに入れない**（持ち込み式）。内蔵モーションは自作VMDのみ。`three/addons/loaders/MMDLoader.js` を足さない（r180に無い）
+- **MMD**：モデル・モーションは**原則リポジトリに入れない**（持ち込み式）。内蔵モーションは自作VMDのみ。`three/addons/loaders/MMDLoader.js` を足さない（r180に無い）
+  - **例外＝💠同梱プリセット**：れあどめ原文で**再配布OK**を確認できたモデルだけ（いまは Lat式ミクのみ採用）。
+    足し方＝`assets/mmd/<dir>/` に「モデル一式＋**れあどめ原文**＋`preset.json`」→ `js/mmd.js` の `PRESET_DIRS` に dir を追加 → NOTICE.md 3a を確認。
+    モデル部分は **GPL対象外**（NOTICE.md 3a）。タワシ式などは readme 原文を確認できるまで入れない
 - **ライセンス**：新ファイルの先頭に SPDX（GPL-3.0-or-later）／初音ミクは `js/characters/miku.js` だけに集約（PCL）／素材は権利のあるものだけ
 - GitHub Pages は**大文字小文字を区別**する。公開を更新したら `sw.js` の `CACHE` 名を変える
 
@@ -128,7 +166,8 @@ for f in js/*.js js/characters/*.js js/addons/*.js; do node --check "$f" || echo
 
 - 実ブラウザが使えない環境では **jsdom** で配線を拾える（`npm i jsdom` → `/home/user/browsercheck` で `for f in jsdom-*.mjs; do node "$f"; done`）
   - canvas は `getContext` をスタブする。**`createImageData` も返す**こと（TV砂嵐が `img.data` を読む）
-  - ハーネスは **17本**：`smoke` `func` `i18n` `lang-fav` `libtabs` `menu` `order2` `prev` `rack` `reload` `skinbtn` `dock` `addons` `favs` `mmd` `songwhile` `i18n-audit`
+  - ハーネスは **18本**：`smoke` `func` `i18n` `lang-fav` `libtabs` `menu` `order2` `prev` `rack` `reload` `skinbtn` `dock` `addons` `favs` `mmd` `songwhile` `i18n-audit` `mmdpreset`
+    - `jsdom-mmdpreset.mjs`（🆕）は fetch と three／three-mmd-loader を偽物に差し替えて、💠 preset.json 検出→ボタン→読み込み→credit/motion/bpm 自動設定、jump/idol のVMD生成、新キー4言語を見る。**jsdom には matchMedia が無い**ので `beforeParse` でスタブする（`TEXT`／`settings` は const/let なので `win.eval` 経由で見る）
     - `jsdom-mmd.mjs` は本物のCDNに届かないので、ページ内に**偽の three／three-mmd-loader** を流し込んで `TrkMMD._injectLibs()` で差し替える
     - `jsdom-i18n-audit.mjs` は静的監査（992キー×4言語の欠け／生キー／コードが使うキーの実在）。**エラー0が正常**
   - 調査用（テスト本数に数えない）：`jsdom-dump.mjs`・`jsdom-debug*.mjs`（exit 1 が正常）、`safeprobe.mjs`（`?safe=1` の設定をJSONで出す・exit 0 が正常）、`probe-*.mjs`
@@ -164,8 +203,12 @@ for f in js/*.js js/characters/*.js js/addons/*.js; do node --check "$f" || echo
 - [ ] ⭐ お気に入り：ドックのチップで1軍／2軍／🧊が切り替わり、ボタンの中身が入れ替わる
 - [ ] ⭐ お気に入り：🔒で凍結（追加できない）→🔓で解除、📌ピンは🎲の候補に必ず入る、外したものは📤元から戻せる
 - [ ] ⭐ お気に入り：曲の行の☆★と ⭐タブ、設定の「⭐ お気に入り」で書き出し／読み込みができる
+- [ ] 💠 同梱プリセット：`assets/mmd/lat-miku/` にモデル＋preset.json を置くと💠ボタンが出る／1クリックで踊り出す／クレジット・モーション・BPMが自動で入る
+- [ ] 💠 モデル未配置なら💠ボタンも説明も出ない（赤エラーなし）／`?safe=1` では配置してあっても出ない
+- [ ] 🩷 内蔵モーション④ジャンプ・⑤アイドルが選べて、見た目が破綻しない（④はバンザイ跳び・⑤は右手突き上げ）
 - [ ] 🩷 MMD：規約同意 → モデル（単体／フォルダ）を読み込むと、マスコットが MMD になり動く
-- [ ] 🩷 MMD：内蔵モーション3種と自分の .vmd が切り替わり、曲のBPMに合う（`mmdBpm` を変えると速さが変わる）
+- [ ] 🩷 選曲画面ミニ操作：モデル読み込み後に⏩の下へ出る・👀連打切替・🎲・🎯⭐・💤→復帰・設定チェックで非表示
+- [ ] 🩷 MMD：内蔵モーション25種（🎵15種＋🎸3種＋👀2種含む）・🎲おまかせ・自分の .vmd が切り替わり、曲のBPMに合う（基準BPM 0 で内蔵が自動シンク・`mmdBpm` 手動入力が優先）
 - [ ] 🩷 MMD：大きさ・向き・クレジットが効く／「保存」を入れておくとリロードしても残る
 - [ ] 🩷 MMD：🔎 動作チェックで `webgl=true`・`three=<版>`・`loader=true` が出る（だめなときは 📋 でコピーして貼る）
 - [ ] 🩷 MMD：`?safe=1` では読み込まれず、マスコットが「オレンジ相棒」に戻る（赤エラーが出ない）

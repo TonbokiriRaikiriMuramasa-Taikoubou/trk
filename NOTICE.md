@@ -36,14 +36,25 @@ under the Piapro Character License (PCL). https://piapro.jp/license/pcl/summary
 ## 3. User content
 Songs, charts, skins, `.stpack` packs, VRM models, motions and character mods are
 owned by their creators. The same goes for MMD models (`.pmx`/`.pmd`), their
-textures and `.vmd` motions: **trk! never bundles, hosts or uploads them.**
+textures and `.vmd` motions: by default **trk! does not bundle, host or upload them.**
 You pick a model or a folder from your own device in the settings panel, and the
 MMD terms of that model's author apply (most MMD models forbid redistribution,
 use outside MMD/MMM, and commercial use).
-The three built-in motions (step / swing / turn) are **not** someone else's work:
-trk! generates those `.vmd` bytes itself in `js/mmd.js`, so they are covered by
-the GPL like the rest of the code. They are not part of trk! and are not covered by the GPL
-unless their creators say so. trk! never bundles or uploads them.
+The built-in motions (step / swing / turn / jump / idol and the 🎵 BPM series) are **not** someone else's
+work: trk! generates those `.vmd` bytes itself in `js/mmd.js`, so they are covered
+by the GPL like the rest of the code.
+
+### 3a. Bundled MMD models (`assets/mmd/`)
+A model may be bundled under `assets/mmd/` ONLY when its own readme explicitly
+allows redistribution. Example — Lat-style Miku's readme states that, within the
+rights holder's guidelines (Crypton's PCL), any use including modification and
+redistribution is OK. For every bundled model:
+- the author's **original readme is included in the same folder** and its terms apply;
+- the model, textures and readme are **NOT covered by the GPL** — they are not ours to license;
+- character rights (Hatsune Miku etc.) remain with Crypton Future Media, INC. under
+  the PCL: non-commercial and free of charge only.
+**To make a commercial fork:** delete the `assets/mmd/` folder entirely
+(together with `js/characters/miku.js`, see section 2).
 
 ## 4. Third-party libraries
 Loaded from jsDelivr only when the VRM or MMD mascot is used:

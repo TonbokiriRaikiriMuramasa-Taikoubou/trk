@@ -28,11 +28,12 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Assemble static site
+        # リポジトリのルートをそのまま公開します（ビルド不要）。
+        # 開発用のファイルだけを除くので、css/ js/ icons/ docs/ にファイルを足しても
+        # このワークフローを直す必要はありません。
         run: |
-          mkdir -p _site/icons _site/docs
-          cp index.html style.css app.js manifest.webmanifest sw.js README.md CONTRIBUTING.md LICENSE _site/
-          cp icons/icon.svg _site/icons/
-          cp docs/HANDOFF.md _site/docs/
+          mkdir -p _site
+          rsync -a --exclude '.git' --exclude '.github' --exclude '_site' ./ _site/
           touch _site/.nojekyll
       - name: Upload static site
         uses: actions/upload-pages-artifact@v3

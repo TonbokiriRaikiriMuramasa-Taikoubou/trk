@@ -1,0 +1,426 @@
+/* ==========================================================================
+   trk! style.css
+   【目次】
+     1. 色と書体（CSS変数）        2. 土台               3. ステージ
+     4. プレイ中のHUD              5. ボタン・入力        6. 画面とカード
+     7. フォーム部品               8. 選曲画面            9. プレイ記録
+    10. スキン・ノーツ             11. 操作・サウンド      12. パック
+    13. VRM                       14. リザルト           15. 統合版で追加したもの
+    16. 感想・要望のリンク         17. ✔ 公認パック        18. 🎛 サウンドエフェクト
+    19. 動きを減らす設定
+   色はスキン（core.js の applySkin）が CSS変数を書き換えて変えます。
+   ========================================================================== */
+
+/* ===== 1. 色と書体（CSS変数） ===== */
+:root{
+  --ui-bg:#07080d;--ui-panel:rgba(14,16,24,.96);--ui-soft:rgba(255,255,255,.05);
+  --ui-text:#f4f4f8;--ui-muted:#a9abb8;--ui-border:rgba(255,255,255,.16);
+  --ui-button:#1a1d29;--ui-button-hover:#262b3b;--ui-field:#0f111a;
+  --ui-accent:#ff3b55;--ui-on-accent:#fff;--ui-gold:#ffd166;
+  --ui-shadow:0 24px 80px rgba(0,0,0,.55);--ui-glow:rgba(255,59,85,.14);
+  --don:#ff3b55;--ka:#55aaff;--stage-bg:#050505;--hud-text:#fff;--hud-shadow:rgba(0,0,0,.85);
+  --j-perfect:#ffd166;--j-good:#fff;--j-miss:#9aa0aa;
+  --font:system-ui,-apple-system,"Segoe UI","Noto Sans JP","Noto Sans SC","Noto Sans KR",sans-serif;
+}
+
+/* ===== 2. 土台 ===== */
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:var(--ui-text);font-family:var(--font)}
+button,input,select,textarea{font:inherit;color:inherit}
+
+/* ===== 3. ステージ（1920×1080 を画面に合わせて縮小） ===== */
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform:translate(-50%,-50%);
+  overflow:hidden;background:var(--stage-bg);user-select:none;-webkit-user-select:none}
+#view,#fx{position:absolute;inset:0;width:1920px;height:1080px}
+#fx{z-index:3;pointer-events:none}
+#vrmCanvas{position:absolute;z-index:2;pointer-events:none}
+#video{position:fixed;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none}
+
+/* ===== 4. プレイ中のHUD ===== */
+.topline{position:absolute;z-index:5;top:34px;left:70px;right:70px;display:flex;justify-content:space-between;
+  font-size:22px;letter-spacing:.16em;color:var(--hud-text);text-shadow:0 2px 8px var(--hud-shadow)}
+.topline strong{color:var(--ui-accent)}
+#songTitle{margin-left:14px;font-size:17px;letter-spacing:.04em;opacity:.8;display:inline-block;max-width:560px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
+#clock{font-variant-numeric:tabular-nums}
+#hud{position:absolute;z-index:5;top:86px;left:70px;display:flex;gap:16px;align-items:baseline;font-size:18px;
+  letter-spacing:.12em;color:var(--hud-text);text-shadow:0 2px 8px var(--hud-shadow);transition:opacity .2s}
+#hud b{color:var(--ui-gold);font-size:30px;font-variant-numeric:tabular-nums;margin-right:18px}
+/* 縦・左レイアウトはレーンが左にあるので右へずらす。画面の中央を使うモードはずらさない */
+#stage[data-layout="vertical"] #hud{left:760px}
+#stage[data-layout="vertical"][data-mode="orbit"] #hud,
+#stage[data-layout="vertical"][data-mode="stage"] #hud,
+#stage[data-layout="vertical"][data-mode="catch"] #hud{left:70px}
+#stage[data-phase="title"] #hud,#stage[data-phase="title"] .topline{opacity:0}
+
+#judge{position:absolute;z-index:7;top:150px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;
+  align-items:center;font-size:64px;font-weight:900;letter-spacing:.1em;text-shadow:0 3px 14px rgba(0,0,0,.8);
+  opacity:0;pointer-events:none}
+#judge small{font-size:22px;letter-spacing:.2em;min-height:1em}
+#stage[data-layout="vertical"] #judge{left:360px;top:560px}
+#stage[data-layout="center"] #judge{top:430px}
+#stage[data-layout="commentary"] #judge{top:560px}
+/* ORBIT・STAGE・CATCH の位置は stagefx.js が style で決めます */
+#judge.show{animation:judgePop .45s ease-out}
+#judge.perfect{color:var(--j-perfect)}#judge.good{color:var(--j-good)}#judge.miss{color:var(--j-miss)}
+@keyframes judgePop{0%{opacity:0;transform:translate(-50%,12px) scale(.8)}25%{opacity:1;transform:translate(-50%,0) scale(1.08)}100%{opacity:0;transform:translate(-50%,-30px) scale(1)}}
+
+#progress{position:absolute;z-index:8;left:0;bottom:0;height:7px;width:0;
+  background:linear-gradient(90deg,var(--ka),var(--ui-gold),var(--don))}
+#seekBar{display:none;position:absolute;z-index:22;left:80px;bottom:84px;width:calc(100% - 160px);accent-color:var(--ui-accent);cursor:pointer}
+#seekBar.on{display:block}
+
+#touchKeys{position:absolute;inset:0;z-index:9;display:none}
+#touchKeys.on{display:flex}
+#touchKeys button{flex:1;height:100%;border:none;border-radius:0;background:transparent;padding:0 0 150px;display:flex;
+  align-items:flex-end;justify-content:center;touch-action:none;-webkit-tap-highlight-color:transparent;box-shadow:none}
+#touchKeys button:hover{background:transparent;color:inherit;border:none}
+#touchKeys button span{min-width:230px;padding:20px 30px;border-radius:24px;border:4px solid var(--c);background:rgba(0,0,0,.45);
+  color:#fff;font-size:32px;font-weight:900;transition:background .06s}
+#touchKeys button.down span{background:var(--c)}
+
+#controls{position:absolute;z-index:21;left:50%;bottom:22px;transform:translateX(-50%);display:flex;align-items:center;gap:14px;
+  padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.35);transition:opacity .3s}
+#stage[data-phase="title"] #controls{display:none}
+#stage:not([data-phase="playing"]) #pauseBtn{display:none}
+#stage.playing.idle #controls,#stage.playing.idle #seekBar{opacity:0;pointer-events:none}
+#stage.playing.idle{cursor:none}
+#controls .vol{display:flex;align-items:center;gap:8px;color:#fff;font-size:16px;text-shadow:0 2px 6px #000}
+#volume{width:130px;accent-color:var(--ui-accent)}
+
+/* ===== 5. ボタン・入力 ===== */
+button{padding:11px 20px;border-radius:999px;border:1px solid var(--ui-border);background:var(--ui-button);color:var(--ui-text);
+  font-size:17px;font-weight:750;cursor:pointer;transition:color .15s,border-color .15s,background .15s,transform .1s}
+button:hover{background:var(--ui-button-hover);border-color:var(--ui-accent);color:var(--ui-accent)}
+button:active{transform:scale(.97)}
+button:disabled{opacity:.4;cursor:default;transform:none}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--ui-accent);outline-offset:3px}
+input[type=range]{accent-color:var(--ui-accent)}
+input[type=color]{width:52px;height:34px;padding:2px;border:1px solid var(--ui-border);border-radius:8px;background:var(--ui-field);cursor:pointer}
+.numField{width:110px;padding:8px;border-radius:10px;background:var(--ui-field);border:1px solid var(--ui-border)}
+
+/* ===== 6. 画面とカード ===== */
+.screen{position:absolute;z-index:20;inset:0;display:flex;align-items:center;justify-content:center;padding:30px;
+  background:radial-gradient(ellipse at 50% 28%,var(--ui-glow),transparent 62%),var(--ui-bg)}
+.screen.dim{background:rgba(0,0,0,.55);backdrop-filter:blur(6px)}
+.card{width:1260px;max-height:1020px;overflow:auto;padding:30px 36px;border:1px solid var(--ui-border);border-radius:28px;
+  background:var(--ui-panel);box-shadow:var(--ui-shadow);color:var(--ui-text);font-size:18px}
+.card.wide{width:1820px}
+.card.small{width:860px;text-align:center}
+.head{display:flex;justify-content:space-between;align-items:center;gap:20px}
+.brand h1{margin:0;font-size:58px;letter-spacing:.08em;line-height:1}
+.brand h1 span{color:var(--ui-accent)}
+.brand p{margin:8px 0 0;color:var(--ui-muted);font-size:18px}
+.headTools{display:flex;gap:12px;align-items:flex-end}
+.grid{display:grid;grid-template-columns:1.1fr 1fr;gap:24px;margin-top:20px;align-items:start}
+.col{display:flex;flex-direction:column;gap:16px}
+.panel{border:1px solid var(--ui-border);border-radius:18px;background:var(--ui-soft);padding:16px 20px}
+.panel h3{margin:0 0 10px;font-size:14px;letter-spacing:.16em;color:var(--ui-muted)}
+.panel h3:not(:first-child){margin-top:16px}
+details.panel>summary{cursor:pointer;font-weight:800;font-size:19px;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.panel>summary::-webkit-details-marker{display:none}
+details.panel>summary::after{content:"＋";color:var(--ui-muted)}
+details.panel[open]>summary::after{content:"－"}
+details.panel[open]>summary{margin-bottom:14px}
+.subPanel{margin-top:12px;border:1px dashed var(--ui-border);border-radius:14px;padding:10px 14px;background:var(--ui-soft)}
+.subPanel>summary{cursor:pointer;font-weight:800;font-size:16px;color:var(--ui-accent)}
+.subPanel[open]>summary{margin-bottom:10px}
+
+/* ===== 7. フォーム部品 ===== */
+.field{display:flex;flex-direction:column;gap:6px;text-align:left;font-size:14px;color:var(--ui-muted);font-weight:650;margin-top:8px}
+.field input,.field select{width:100%;padding:10px 12px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);
+  border:1px solid var(--ui-border);font-size:18px}
+.field input[type=range]{padding:0;background:none;border:none}
+.field input[type=file]{padding:6px;font-size:13px}
+.field textarea{width:100%;padding:10px 12px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);
+  border:1px solid var(--ui-border);font-size:16px;resize:vertical}
+.fields{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.fields .field{margin-top:0}
+.fields2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.fileBtn{display:inline-flex;align-items:center;gap:6px;padding:12px 20px;border-radius:999px;cursor:pointer;font-weight:800;
+  background:var(--ui-accent);color:var(--ui-on-accent);white-space:nowrap}
+.fileBtn.small{padding:8px 14px;font-size:15px;background:var(--ui-button);color:var(--ui-text);border:1px solid var(--ui-border)}
+.fileBtn.small:hover{border-color:var(--ui-accent);color:var(--ui-accent)}
+.fileBtn.disabled{opacity:.45;cursor:not-allowed}
+.hint{color:var(--ui-muted);font-size:14px;margin:6px 0;line-height:1.5}
+.status{color:var(--ui-gold);font-weight:700}
+.center{text-align:center}
+#eggStatus.egg{color:var(--ui-accent);font-weight:800}
+.seg{display:flex;flex-wrap:wrap;gap:6px;padding:5px;border-radius:16px;background:var(--ui-field);border:1px solid var(--ui-border)}
+.seg button{flex:1 1 0;border:none;border-radius:12px;background:transparent;padding:11px 12px;font-size:16px;white-space:nowrap}
+.seg button:hover{background:var(--ui-button-hover);border:none}
+.seg button.selected{background:var(--ui-accent);color:var(--ui-on-accent)}
+.primary{width:100%;padding:18px;font-size:26px;font-weight:900;background:var(--ui-accent);color:var(--ui-on-accent);border-color:transparent}
+.primary:hover{background:var(--ui-accent);color:var(--ui-on-accent);filter:brightness(1.1)}
+.primary.slim{width:auto;padding:12px 26px;font-size:18px}
+.actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.miniActions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.miniActions button,.miniActions .fileBtn{padding:7px 12px;font-size:14px}
+.check{display:flex;align-items:center;gap:10px;margin:10px 0;text-align:left;font-size:17px;cursor:pointer}
+.check input{width:20px;height:20px;accent-color:var(--ui-accent);flex:none}
+.inline{display:flex;align-items:center;gap:12px;margin:10px 0;font-size:16px}
+.inline.tight{margin:4px 0}
+.inline>span:first-child{min-width:150px;color:var(--ui-muted);font-weight:650}
+.inline input[type=range]{flex:1}
+.mono{font-variant-numeric:tabular-nums;min-width:56px;text-align:right;font-weight:800}
+
+/* ===== 8. 選曲画面 ===== */
+.selectGrid{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;margin-top:20px;align-items:start}
+.songCol,.detailCol{display:flex;flex-direction:column;gap:14px;min-width:0}
+.libHead{display:flex;justify-content:space-between;align-items:baseline}
+.libHead h3{margin:0}
+.libTools{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:10px}
+.libTools input,.libTools select{padding:9px 12px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border);font-size:16px}
+.libTools button{padding:8px 14px;font-size:16px}
+#libList{display:flex;flex-direction:column;gap:5px;margin-top:10px;height:640px;overflow:auto;padding-right:4px}
+.libRow{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;padding:11px 16px;border-radius:12px;
+  text-align:left;font-size:17px;border-left:5px solid transparent}
+.libRow.cur{border-color:var(--ui-accent);color:var(--ui-accent);background:var(--ui-button-hover)}
+.libRow.src-pack{border-left-color:var(--ui-gold)}
+.libRow.src-file{border-left-color:var(--ka)}
+.libLeft{min-width:0;display:flex;flex-direction:column}
+.libName{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.libSub{font-size:12px;color:var(--ui-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.libMeta{display:flex;gap:5px;flex:none}
+.libTag{font-style:normal;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;background:var(--ui-field);border:1px solid var(--ui-border)}
+.libEmpty{padding:40px 10px;text-align:center;color:var(--ui-muted)}
+.banner{position:relative;height:190px;border-radius:18px;overflow:hidden;border:1px solid var(--ui-border);
+  background:linear-gradient(135deg,var(--ui-glow),transparent),var(--ui-field);background-size:cover;background-position:center}
+.banner.hasImg::before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.75),rgba(0,0,0,.05) 70%)}
+.bannerText{position:absolute;left:20px;right:20px;bottom:14px}
+.bannerTitle{font-size:32px;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.banner.hasImg .bannerTitle,.banner.hasImg .bannerSub{color:#fff}
+.bannerSub{font-size:14px;color:var(--ui-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ===== 9. プレイ記録 ===== */
+.recTop{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.recTop div{padding:8px 10px;border-radius:12px;background:var(--ui-field);border:1px solid var(--ui-border)}
+.recTop span{display:block;font-size:12px;color:var(--ui-muted)}
+.recTop b{font-size:20px;font-variant-numeric:tabular-nums}
+.recTable{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.recTable th{text-align:left;color:var(--ui-muted);font-weight:700;padding:4px 6px;border-bottom:1px solid var(--ui-border)}
+.recTable td{padding:5px 6px;border-bottom:1px solid var(--ui-border)}
+.recTable tr.cur td{color:var(--ui-accent);font-weight:800}
+#recHistory{max-height:220px;overflow:auto;font-size:13px;font-variant-numeric:tabular-nums}
+.histRow{padding:4px 0;border-bottom:1px dashed var(--ui-border)}
+.histRow.auto{opacity:.6}
+
+/* ===== 10. スキン・ノーツ ===== */
+#skinGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.skinCard{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:11px 13px;border-radius:14px;text-align:left;
+  border:2px solid var(--sk-border);background:var(--sk-bg);color:var(--sk-text)}
+.skinCard:hover{background:var(--sk-bg);color:var(--sk-text);border-color:var(--ui-accent)}
+.skinCard b{font-size:16px}
+.skinCard small{opacity:.75;font-size:12px;font-weight:500;line-height:1.3}
+.skinCard.selected{border-color:var(--ui-accent);box-shadow:0 0 0 3px var(--ui-glow)}
+.skinTag{position:absolute;top:6px;right:8px;font-size:10px;font-weight:900;letter-spacing:.08em;padding:2px 7px;border-radius:999px;background:var(--ui-accent);color:var(--ui-on-accent)}
+.dots{display:flex;gap:7px;margin-bottom:2px}
+.dot{width:16px;height:16px;border-radius:50%;display:inline-block}
+.dot.diamond{border-radius:2px;transform:rotate(45deg) scale(.82)}
+.dot.square{border-radius:3px}
+.dot.big{width:26px;height:26px;flex:none;border:3px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.45)}
+.colorGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:10px 0}
+.colorGrid label{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--ui-muted);font-weight:650;text-align:center}
+.makerRow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.makerRow.two{grid-template-columns:1fr 1.4fr}
+.makerRow .field select{font-size:15px;padding:8px}
+.noteRows{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.noteRow{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--ui-soft);border:1px solid var(--ui-border)}
+.noteRow strong{flex:1}
+.noteRow select{padding:6px 8px;border-radius:8px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border);font-size:14px}
+#notePresets{margin-top:10px}
+.mascotSelect{width:100%;padding:10px 12px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border);font-size:16px}
+.pclCredit a{color:var(--ui-accent);word-break:break-all}
+
+/* ===== 11. 操作・サウンド ===== */
+.keyRows{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.keyRow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:12px;background:var(--ui-soft);border:1px solid var(--ui-border)}
+.keyValue{min-width:56px;padding:4px 10px;border-radius:8px;background:var(--ui-field);color:var(--ui-gold);font-weight:900;text-align:center}
+.keyRow button{padding:7px 12px;font-size:14px}
+.keyRow button.listening{background:var(--ui-accent);color:var(--ui-on-accent)}
+.seButtons{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.seButtons button{padding:8px 14px;font-size:15px}
+
+/* ===== 12. パック ===== */
+#packList{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.packCard{border:1px solid var(--ui-border);border-radius:14px;padding:10px 12px;background:var(--ui-soft)}
+.packCard.active{border-color:var(--ui-accent);box-shadow:0 0 0 3px var(--ui-glow)}
+.packHead{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.packHead b{font-size:17px}
+.packBy{color:var(--ui-muted);font-size:13px}
+.packBadges{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
+.packBadge{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;background:var(--ui-field);border:1px solid var(--ui-border)}
+.packCard details{font-size:13px;color:var(--ui-muted);margin-top:4px;word-break:break-all}
+.packCard details a{color:var(--ui-accent)}
+.incList{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.incList .check{font-size:15px;margin:6px 0}
+
+/* ===== 13. VRM ===== */
+.vrmBox{display:flex;gap:12px;align-items:flex-start;margin-top:10px}
+#vrmPreview{width:150px;height:200px;flex:none;border-radius:12px;border:1px solid var(--ui-border);
+  background:repeating-conic-gradient(var(--ui-soft) 0 25%,transparent 0 50%) 0 0/20px 20px}
+#vrmInfo{min-width:0;margin:0}
+#vrmInfo div{margin:2px 0;word-break:break-all}
+.vrmWarn{color:var(--ui-accent);font-weight:800}
+.vrmNote{opacity:.8}
+
+/* ===== 14. 一時停止・リザルト ===== */
+.screen h2{margin:0 0 14px;font-size:54px;color:var(--ui-gold)}
+.screen .setTitle{margin:0;font-size:44px}   /* 設定画面の見出しは、上の大きさに負けないように */
+.screen p{color:var(--ui-muted);font-size:19px}
+.gradeRow{display:flex;align-items:center;justify-content:center;gap:34px;margin:6px 0 18px}
+.grade{font-size:140px;font-weight:900;line-height:1;color:var(--ui-gold);text-shadow:0 0 30px var(--ui-glow)}
+.bigScore{font-size:58px;font-weight:900;font-variant-numeric:tabular-nums}
+.badges{display:flex;gap:8px;justify-content:flex-start;margin-top:8px;flex-wrap:wrap}
+.badge{padding:5px 12px;border-radius:999px;background:var(--ui-accent);color:var(--ui-on-accent);font-weight:900;font-size:15px;letter-spacing:.08em}
+.statGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:8px 0 14px}
+.statGrid div{padding:12px;border-radius:14px;background:var(--ui-soft);border:1px solid var(--ui-border)}
+.statGrid span{display:block;font-size:13px;color:var(--ui-muted);letter-spacing:.1em}
+.statGrid b{font-size:28px;font-variant-numeric:tabular-nums}
+.statGrid .p b{color:var(--j-perfect)}.statGrid .m b{color:var(--j-miss)}
+.best{color:var(--ui-muted)}.best.new{color:var(--ui-accent);font-weight:900}
+#credits{margin-top:14px;color:var(--ui-muted);font-size:14px;line-height:1.7}
+
+/* ===== 15. 統合版で追加したもの ===== */
+/* プレイ方法（5モード）：2段になっても揃って見えるように */
+#modePicker button{flex:1 1 30%}
+/* ▶ AUTO・📻 ラジオの切り替え（library.js） */
+#autoToggle,#radioToggle{width:100%;margin-top:8px;padding:10px 14px;border-radius:14px;font-size:16px}
+#autoToggle.selected,#radioToggle.selected{background:var(--ui-accent);color:var(--ui-on-accent);border-color:transparent}
+/* ⏩ 再生速度パネル（speed.js） */
+#speedPanel{padding:12px 18px}
+#speedPanel .libHead b{color:var(--ui-gold);font-size:20px}
+/* シードを探す道具・小さいボタンの並び */
+.miniActions .hint{margin:0}
+.miniActions button.selected{border-color:var(--ui-accent);color:var(--ui-accent)}
+/* 🔁 区間リピート：再生バーの上に範囲を表示（player.js が --ab-a / --ab-b を設定） */
+#seekBar.ab{background:linear-gradient(90deg,transparent var(--ab-a),rgba(255,209,102,.35) var(--ab-a),rgba(255,209,102,.35) var(--ab-b),transparent var(--ab-b));border-radius:999px}
+/* 🎯 オフセット測定のタップボタン（extras.js） */
+.subPanel .primary{font-size:22px;padding:22px}
+/* 一時停止画面の速度・区間リピートの表示 */
+#pauseScreen .hint.status{margin:8px 0}
+
+/* ===== 16. 感想・要望のリンク（選曲画面のいちばん下） ===== */
+.contactLine a{color:var(--ui-accent);font-weight:700;text-decoration:none}
+.contactLine a:hover{text-decoration:underline}
+
+/* ===== 17. ✔ 公認パック（verified.js） ===== */
+.vfBadge{display:inline-block;color:var(--ui-gold);font-weight:900}
+.vfBadge.big{padding:3px 10px;border-radius:999px;background:var(--ui-gold);color:#1b1b22;font-size:14px;margin-right:8px}
+.vfBox{display:flex;flex-direction:column;gap:6px;text-align:left}
+.vfHead{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.vfCreator a{color:var(--ui-accent);text-decoration:none;font-weight:700}
+.vfLabel{font-size:13px;color:var(--ui-muted);font-weight:700;margin-top:4px}
+.vfComment{white-space:pre-wrap;word-break:break-word;padding:10px 14px;border-radius:12px;border-left:4px solid var(--ui-gold);background:var(--ui-field);font-size:16px;line-height:1.6}
+.vfNotice{font-size:12px}
+.vfResult{margin-bottom:10px}
+.vfHash{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px}
+.vfCount.over{color:#ff5d5d;font-weight:800}
+
+/* ===== 18. 🎛 サウンドエフェクト（fx.js・凍結中） ===== */
+.fxSearch{width:100%;padding:9px 12px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border);font-size:15px;margin-bottom:6px}
+.fxCat{margin:6px 0;border:1px solid var(--ui-border);border-radius:12px;padding:6px 10px;background:var(--ui-soft)}
+.fxCat>summary{cursor:pointer;font-weight:800;font-size:14px;color:var(--ui-muted)}
+.fxCat[open]>summary{margin-bottom:6px}
+.fxSeg{margin-bottom:6px}
+.fxSeg button{flex:1 1 auto;font-size:14px;padding:8px 10px}
+.fxMini{padding:6px 12px;font-size:14px;border-radius:12px}
+.fxCompare.selected{background:var(--ui-gold);color:#1b1b22;border-color:transparent}
+.fxQuickSelect{flex:1;min-width:0;padding:8px 10px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border);font-size:15px}
+.fxQuickCompare{margin-top:6px;padding:6px 12px;font-size:13px}
+#fxQuickPanel select optgroup{color:var(--ui-muted)}
+.fxEditor{width:100%;min-height:200px;font-family:monospace;font-size:13px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border);border-radius:10px;padding:8px}
+
+/* ===== 19. 動きを減らす設定（OSの「視差効果を減らす」） ===== */
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition:none!important}}
+/* ✅ style.css 完了 */
+
+/* メイン画面の欄（fx-dock.js）：さわれる本体 */
+#fxDock{display:flex;flex-direction:column;gap:8px}
+#libList{height:440px}
+.dockDev{position:relative;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;border:1px solid var(--ui-border);background:var(--ui-soft);color:var(--ui-text)}
+.dockTop{display:flex;align-items:center;gap:10px}
+.dockLcd{flex:1;min-width:0;padding:7px 12px;border-radius:8px;font-family:"Cascadia Mono",Consolas,monospace;font-weight:800;font-size:15px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#0d1a10;color:#7dff9b;box-shadow:inset 0 2px 6px rgba(0,0,0,.6)}
+#fxDock .dockKey{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;
+  padding:9px 8px;border-radius:10px;font-size:14px;font-weight:800;line-height:1.15;color:inherit;background:var(--ui-button);
+  border:1px solid var(--ui-border);box-shadow:0 4px 0 rgba(0,0,0,.45);transition:transform .05s,box-shadow .05s,filter .1s}
+#fxDock .dockKey:hover{filter:brightness(1.1);color:inherit}
+#fxDock .dockKey:active,#fxDock .dockKey.selected{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.45)}
+#fxDock .dockKey.selected{background:var(--ui-accent);color:var(--ui-on-accent)}
+.dockKey .num{font-size:11px;opacity:.7}
+.dockKey .nm{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+#fxDock .dockKey.empty{opacity:.5}
+#fxDock .dockPow,#fxDock .dockAnt{flex-direction:row;width:56px;height:44px;border-radius:12px;gap:6px}
+.led{width:8px;height:8px;border-radius:50%;background:#3a1010;box-shadow:inset 0 0 2px #000;flex:none}
+.led.on{background:#ff4040;box-shadow:0 0 8px #ff4040}
+.ledAnt.on{background:#40ff80;box-shadow:0 0 8px #40ff80}
+.antRod{position:absolute;right:38px;top:6px;width:4px;height:8px;border-radius:2px;background:linear-gradient(#eee,#888);transition:height .35s,top .35s}
+#fxDock.ant .antRod{height:46px;top:-40px}
+.dockSlots{display:grid;grid-template-columns:repeat(var(--cols,5),1fr);gap:8px}
+.dockRand{display:flex;gap:6px}
+#fxDock .dockRand .dockKey{flex:1;font-size:13px;padding:7px 6px}
+.dockHint{margin:0;font-size:12px}
+.dockDeco{display:flex;justify-content:center;align-items:center;gap:56px;min-height:64px;border-radius:10px;overflow:hidden;position:relative}
+.dockLock{padding:2px 8px!important;font-size:13px!important}
+#fxQuickPanel.inDock{padding:0;border:none;background:none}
+.fxDockEq{margin-top:8px}
+.fxDockEq .inline>span:first-child{min-width:60px}
+.fxFavRow{display:flex;flex-wrap:wrap;gap:6px}
+.fxFavRow button{padding:7px 12px;font-size:14px;border-radius:999px}
+.fxFavRow button.selected{background:var(--ui-accent);color:var(--ui-on-accent);border-color:transparent}
+.fxFavRow .hint{margin:0}
+@keyframes dockSpin{to{transform:rotate(360deg)}}
+@keyframes dockScan{0%{transform:translateX(-120%)}100%{transform:translateX(420%)}}
+@keyframes dockFloat{0%{transform:translateY(40px);opacity:0}30%{opacity:.8}100%{transform:translateY(-60px);opacity:0}}
+
+/* 📼 ラジカセ：ピアノキーとリール */
+#fxDock[data-skin="cassette"] .dockDev{background:linear-gradient(#cfc8ba,#8e877a);border:2px solid #4b463e;color:#2a2620}
+#fxDock[data-skin="cassette"] .dockDeco{background:#2b2722;box-shadow:inset 0 3px 8px #000}
+#fxDock[data-skin="cassette"] .reel{width:46px;height:46px;border-radius:50%;border:5px solid #eee;background:repeating-conic-gradient(#ddd 0 20deg,#555 20deg 60deg)}
+#fxDock.playing[data-skin="cassette"] .reel{animation:dockSpin 2.2s linear infinite}
+#fxDock[data-skin="cassette"] .slot{background:linear-gradient(#f4f4f4,#bdbdbd);color:#222;border:1px solid #666;border-radius:4px;padding:18px 6px 10px;box-shadow:0 7px 0 #555}
+#fxDock[data-skin="cassette"] .slot.selected{transform:translateY(6px);box-shadow:0 1px 0 #555;background:linear-gradient(#ffd166,#c99a2e);color:#222}
+
+/* 💿 CDプレーヤー：銀の本体と虹色のディスク */
+#fxDock[data-skin="cd"] .dockDev{background:linear-gradient(135deg,#eef0f3,#9aa3ad);color:#20242a;border:1px solid #777}
+#fxDock[data-skin="cd"] .disc{width:76px;height:76px;border-radius:50%;box-shadow:0 0 0 2px #888,0 4px 10px #0004;
+  background:radial-gradient(circle,#ccc 0 9px,#333 9px 11px,transparent 11px),conic-gradient(#f0f0ff,#ffd6f0,#d6fff4,#fff7d6,#e0e6ff,#f0f0ff)}
+#fxDock.playing[data-skin="cd"] .disc{animation:dockSpin 1.2s linear infinite}
+#fxDock[data-skin="cd"] .dockKey{background:linear-gradient(#fafafa,#c9ced4);color:#20242a;border:1px solid #888;border-radius:999px}
+#fxDock[data-skin="cd"] .dockKey.selected{background:linear-gradient(#9fd2ff,#3d8fd6);color:#fff}
+
+/* 🎧 MDプレーヤー：青いメタルとオレンジの液晶 */
+#fxDock[data-skin="md"] .dockDev{background:linear-gradient(160deg,#4a80c4,#1b3a66);color:#e6f0ff;border:1px solid #0d2140;max-width:420px}
+#fxDock[data-skin="md"] .dockLcd{background:#241a08;color:#ffb347}
+#fxDock[data-skin="md"] .disc{width:52px;height:52px;border-radius:50%;background:radial-gradient(circle,#999 0 7px,#222 7px 9px,#5a6b80 9px);box-shadow:0 0 0 3px #0d2140}
+#fxDock.playing[data-skin="md"] .disc{animation:dockSpin 1.6s linear infinite}
+#fxDock[data-skin="md"] .dockKey{background:linear-gradient(#d9e4f2,#8aa0bd);color:#0d2140;border-radius:8px}
+#fxDock[data-skin="md"] .dockKey.selected{background:linear-gradient(#ffcf7a,#e08a1e);color:#241a08}
+
+/* ⌨ 左手キーパッド：黒いキーキャップ */
+#fxDock[data-skin="keypad"] .dockDev{background:#1a1b20;color:#ddd;border:1px solid #000}
+#fxDock[data-skin="keypad"] .slot{background:linear-gradient(#3a3d46,#262830);color:#e6e6e6;border:1px solid #0b0b0e;border-radius:8px;box-shadow:0 5px 0 #0b0b0e;aspect-ratio:1.3}
+#fxDock[data-skin="keypad"] .slot.selected{background:linear-gradient(#3a3d46,#262830);color:#fff;box-shadow:0 1px 0 #0b0b0e,0 0 14px var(--ui-accent);border-color:var(--ui-accent)}
+
+/* 🛸 未来端末：六角形のネオンパッド */
+#fxDock[data-skin="future"] .dockDev{background:radial-gradient(circle at 30% 0,#0a2a3a,#05070f 70%);border:1px solid #0ff5;color:#bff;box-shadow:0 0 20px #0ff2 inset}
+#fxDock[data-skin="future"] .dockLcd{background:#001018;color:#0ff;text-shadow:0 0 6px #0ff}
+#fxDock[data-skin="future"] .dockDeco{min-height:10px;background:#001018}
+#fxDock[data-skin="future"] .scanbar{position:absolute;left:0;top:0;width:25%;height:100%;background:linear-gradient(90deg,transparent,#0ff8,transparent);animation:dockScan 2.4s linear infinite}
+#fxDock[data-skin="future"] .slot{clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:#0b2a33;color:#9ff;border:none;box-shadow:none;padding:14px 10px}
+#fxDock[data-skin="future"] .slot:active,#fxDock[data-skin="future"] .slot.selected{transform:scale(.94);background:#0ff;color:#022}
+
+/* 🫧 Frutiger Aero：空と水とつやつやの泡 */
+#fxDock[data-skin="aero"] .dockDev{background:linear-gradient(#c9efff,#6cc8f0 60%,#3fae8a);border:1px solid #fffa;color:#04324a;border-radius:26px;box-shadow:inset 0 1px 0 #fff,0 6px 16px #0003}
+#fxDock[data-skin="aero"] .dockLcd{background:linear-gradient(#ffffffcc,#d8f4ffcc);color:#04324a;border-radius:999px}
+#fxDock[data-skin="aero"] .dockDeco{min-height:44px}
+#fxDock[data-skin="aero"] .bubble{position:absolute;bottom:0;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#fff4 40%,#9fe3ff44);border:1px solid #fff9;animation:dockFloat 4s ease-in infinite}
+#fxDock[data-skin="aero"] .bubble:nth-child(1){left:12%}#fxDock[data-skin="aero"] .bubble:nth-child(2){left:38%;animation-delay:1s}
+#fxDock[data-skin="aero"] .bubble:nth-child(3){left:63%;animation-delay:2s}#fxDock[data-skin="aero"] .bubble:nth-child(4){left:86%;animation-delay:3s}
+#fxDock[data-skin="aero"] .dockKey{background:radial-gradient(circle at 50% 22%,#fff 0 16%,transparent 42%),linear-gradient(#9fe3ff,#2a9fd6);
+  color:#03304a;border:1px solid #fff;border-radius:999px;box-shadow:0 3px 8px #0003}
+#fxDock[data-skin="aero"] .dockKey.selected{background:radial-gradient(circle at 50% 22%,#fff 0 16%,transparent 42%),linear-gradient(#c6ffb8,#3dbb5a);color:#063015}
+
+@media (prefers-reduced-motion:reduce){#fxDock *{animation:none!important}}

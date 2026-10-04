@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 感想・プレイ動画（X / #trkAGRG）
+    url: https://x.com/ttrk143
+    about: 気軽な感想やスクリーンショットは X へ。ハッシュタグ #trkAGRG を付けると見つけやすいです。
+  - name: 📖 開発の引き継ぎ文書（HANDOFF）
+    url: https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/blob/main/docs/HANDOFF.md
+    about: 設計の考え方、ファイルのつながり、保存キーの約束がまとまっています。
+  - name: ✔ 曲の公認パックの手順
+    url: https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/blob/main/docs/verified.md
+    about: 作曲家さん・譜面作者さんからの公認の申し込みと、権利の確認について。

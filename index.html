@@ -1,248 +1,745 @@
-<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#090a10">
-  <meta name="description" content="好きな曲を読み込んで、すぐ遊べる。音楽とリズムゲームへのリスペクトから生まれた、オープンなブラウザ音ゲー trk!">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="trk! — All-Generation Rhythm Game">
-  <meta property="og:description" content="いつもの一曲が、あなたの譜面になる。ブラウザで遊べるオープンな音楽ゲーム。">
-  <title>trk! — All-Generation Rhythm Game</title>
-  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./style.css">
-  <script src="./app.js" defer></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>trk! — All-Generation Rhythm Game</title>
+<meta name="description" content="trk! is AGRG! — an All-Generation Rhythm Game. Play a rhythm game in your browser with your own music: hit it, drive a truck, orbit with one button, take the STAGE, or catch parcels.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta property="og:title" content="trk! — All-Generation Rhythm Game">
+<meta property="og:description" content="手持ちの曲で、すぐ遊べるブラウザ音ゲー">
+<meta property="og:image" content="https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/docs/og.png">
+<meta property="og:url" content="https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- SNSで共有したときのカード（画像は https:// から始まる完全なURLにする） -->
+<meta property="og:title" content="trk! — All-Generation Rhythm Game">
+<meta property="og:description" content="ブラウザだけで遊べる音ゲー。手持ちの曲で譜面を自動生成。叩く・走る・回る・舞台・荷物運びの5モード。">
+<meta property="og:url" content="https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/">
+<meta property="og:image" content="https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/docs/og.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@ttrk143">
+
+<!-- アイコン・ホーム画面に追加 -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="theme-color" content="#07080d">
+
+<!-- VRMを使うときだけ読み込む3Dの部品（three-vrm 3.5.5 は three 0.180 に対応） -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
+    "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3.5.5/lib/three-vrm.module.min.js",
+    "@pixiv/three-vrm-core": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm-core@3.5.5/lib/three-vrm-core.module.js",
+    "@pixiv/three-vrm-animation": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm-animation@3.5.5/lib/three-vrm-animation.module.js"
+  }
+}
+</script>
 </head>
+
 <body>
-  <div class="site-shell">
-    <header class="topbar">
-      <a class="brand" href="./" aria-label="trk! ホーム" data-i18n-aria="homeLabel">
-        <span class="brand-mark">trk<span>!</span></span>
-        <span class="brand-caption">ALL-GENERATION<br>RHYTHM GAME</span>
-      </a>
-      <div class="topbar-right">
-        <div class="privacy-pill"><span class="privacy-dot"></span><span data-i18n="localOnly">この端末だけで再生・曲はアップロードされません</span></div>
-        <label class="language-picker">
-          <span class="sr-only" data-i18n="languageLabel">表示言語</span>
-          <select id="language-select" aria-label="表示言語" data-i18n-aria="languageLabel">
-            <option value="ja">日本語</option>
-            <option value="en">English</option>
-            <option value="zh">中文</option>
-            <option value="ko">한국어</option>
-          </select>
-          <svg aria-hidden="true" viewBox="0 0 16 16"><path d="m4 6 4 4 4-4"/></svg>
-        </label>
-        <a class="github-link" href="https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" target="_blank" rel="noreferrer" aria-label="GitHub">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 19c-4.3 1.3-4.3-2.3-6-2.8M15 21v-3.5a3 3 0 0 0-.8-2.3c2.7-.3 5.5-1.3 5.5-6A4.7 4.7 0 0 0 18.4 6a4.3 4.3 0 0 0-.1-3s-1-.3-3.3 1.3a11.5 11.5 0 0 0-6 0C6.7 2.7 5.7 3 5.7 3A4.3 4.3 0 0 0 5.6 6a4.7 4.7 0 0 0-1.3 3.2c0 4.7 2.8 5.7 5.5 6A3 3 0 0 0 9 17.5V21"/></svg>
-        </a>
-      </div>
-    </header>
+<div id="stage" data-layout="classic" data-phase="title">
+  <canvas id="view" width="1920" height="1080"></canvas>
+  <canvas id="fx" width="1920" height="1080"></canvas>
+  <canvas id="vrmCanvas" hidden></canvas>
 
-    <main>
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="hero-copy">
-          <p class="eyebrow"><span class="eyebrow-dash"></span><span data-i18n="heroEyebrow">音楽へのリスペクトから生まれた、自由な遊び場</span></p>
-          <h1 id="hero-title"><span data-i18n="heroLine1">音で、遊びを</span><br><span class="hero-title-accent" data-i18n="heroLine2">つくろう。</span></h1>
-          <p class="hero-description" data-i18n="heroDescription">好きな曲が、あなただけの譜面になる。ジャンルも世代も飛び越えて、リズムを自由に楽しもう。</p>
-          <div class="hero-actions">
-            <a class="button button-primary" href="#play"><span data-i18n="heroCta">プレイをはじめる</span><span class="button-arrow" aria-hidden="true">↘</span></a>
-            <a class="text-link" href="#how-to-play"><span data-i18n="howItWorks">遊びかたを見る</span><span aria-hidden="true">→</span></a>
-          </div>
-          <div class="hero-index"><span>01</span><i></i><span data-i18n="heroFootnote">あなたの音楽、あなたのリズム。</span></div>
-        </div>
-
-        <div class="hero-art" aria-hidden="true">
-          <div class="art-orbit art-orbit-outer"></div>
-          <div class="art-orbit art-orbit-inner"></div>
-          <div class="art-crosshair art-crosshair-one"></div>
-          <div class="art-crosshair art-crosshair-two"></div>
-          <div class="art-panel">
-            <div class="art-panel-top"><span>TRK / PLAYGROUND</span><span class="art-live"><i></i> LIVE</span></div>
-            <div class="art-brand">trk<span>!</span></div>
-            <div class="art-subtitle">ALL GENERATIONS<br><b>ONE RHYTHM.</b></div>
-            <div class="art-lanes">
-              <i class="lane-line"></i><i class="lane-line"></i><i class="lane-line"></i><i class="lane-line"></i>
-              <span class="art-note note-cyan"></span><span class="art-note note-red"></span><span class="art-note note-yellow"></span><span class="art-note note-purple"></span><span class="art-note note-white"></span>
-              <span class="art-hit-line"></span>
-            </div>
-            <div class="art-panel-bottom"><span>LISTEN</span><span>MAKE</span><span>PLAY AGAIN</span></div>
-          </div>
-          <div class="art-sticker sticker-top">NO<br>GATEKEEPING</div>
-          <div class="art-sticker sticker-bottom">YOUR SONG<br><b>YOUR RULES</b></div>
-          <div class="art-coordinates">35° 39' N<br>139° 42' E</div>
-        </div>
-      </section>
-
-      <section class="play-section section-shell" id="play" aria-labelledby="play-heading">
-        <div class="section-heading">
-          <div>
-            <p class="section-kicker">01 <span>/</span> PLAY</p>
-            <h2 id="play-heading" data-i18n="playHeading">まずは一曲、鳴らそう。</h2>
-          </div>
-          <div class="section-heading-side">
-            <p class="section-intro" data-i18n="playIntro">デモですぐ試すか、端末の音源を読み込んで自分だけのプレイを。</p>
-            <label class="density-picker"><span data-i18n="densityLabel">譜面の密度</span><select id="difficulty-select" aria-label="譜面の密度"><option value="easy" data-i18n="densityEasy">ゆったり</option><option value="normal" selected data-i18n="densityStandard">スタンダード</option><option value="hard" data-i18n="densityHard">高密度</option></select></label>
-          </div>
-        </div>
-
-        <div class="launcher-grid">
-          <article class="demo-card">
-            <div class="card-overline"><span class="demo-dot"></span><span data-i18n="demoOverline">TRK! ORIGINAL / SYNTH DEMO</span><span class="card-serial">NO. 001</span></div>
-            <div class="demo-visual" aria-hidden="true">
-              <div class="demo-disc"><span>trk<br><b>!</b></span></div>
-              <div class="demo-wave wave-one"></div><div class="demo-wave wave-two"></div><div class="demo-wave wave-three"></div>
-              <div class="demo-coordinates">PULSE<br>STUDY<br><small>120 BPM</small></div>
-              <div class="demo-visual-footer"><span>GENERATED IN YOUR BROWSER</span><span>◎ 01</span></div>
-            </div>
-            <div class="demo-info">
-              <div>
-                <p class="track-type" data-i18n="demoTrackType">オリジナル・シンセサウンド</p>
-                <h3>Pulse Study <span>01</span></h3>
-              </div>
-              <div class="demo-meta"><span><b>120</b><small>BPM</small></span><i></i><span><b>4</b><small>KEY</small></span><i></i><span><b>32</b><small data-i18n="secondsUnit">秒</small></span></div>
-            </div>
-            <p class="demo-description" data-i18n="demoDescription">音源ファイルなしで遊べる、trk! のための小さなデモトラック。</p>
-            <button class="button button-primary button-full" id="play-demo" type="button"><span data-i18n="playDemo">デモで遊ぶ</span><span class="button-arrow" aria-hidden="true">↗</span></button>
-          </article>
-
-          <div class="upload-column">
-            <div class="upload-card" id="drop-zone" aria-describedby="privacy-note accepted-formats">
-              <div class="upload-card-top"><span class="section-kicker">02 <span>/</span> YOUR MUSIC</span><span class="upload-corner">+ ADD TRACK</span></div>
-              <div class="upload-icon" aria-hidden="true">
-                <svg viewBox="0 0 48 48"><path d="M24 32V8m0 0-9 9m9-9 9 9M10 29v9a3 3 0 0 0 3 3h22a3 3 0 0 0 3-3v-9"/></svg>
-              </div>
-              <p class="upload-eyebrow" data-i18n="uploadEyebrow">BRING YOUR OWN BEAT</p>
-              <h3 data-i18n="uploadHeading">手持ちの曲で遊ぶ</h3>
-              <p class="upload-description" data-i18n-html="uploadDescription">音源をここにドロップ<br>またはファイルを選択</p>
-              <input class="sr-only" type="file" id="audio-file" accept="audio/*,.mp3,.m4a,.wav,.flac,.ogg,.opus,.aac">
-              <button class="button button-secondary" id="choose-file" type="button"><span data-i18n="chooseFile">音源を選ぶ</span><span aria-hidden="true">＋</span></button>
-              <p class="privacy-note" id="privacy-note"><svg aria-hidden="true" viewBox="0 0 16 16"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg><span data-i18n="privacyNote">音源はこの端末だけで処理され、アップロードされません。</span></p>
-              <p class="accepted-formats" id="accepted-formats">MP3 <i>·</i> WAV <i>·</i> OGG <i>·</i> FLAC <i>·</i> AAC</p>
-              <div class="drop-glow" aria-hidden="true"></div>
-            </div>
-            <div class="upload-footnote"><span class="footnote-mark">i</span><span data-i18n="uploadFootnote">譜面とBPMは曲の音量変化から自動で推定する実験機能です。</span></div>
-          </div>
-        </div>
-
-        <div class="load-status" id="load-status" role="status" aria-live="polite" hidden>
-          <span class="loader" aria-hidden="true"></span><span id="load-status-text"></span>
-        </div>
-
-        <article class="loaded-track" id="loaded-track" aria-live="polite" hidden>
-          <div class="loaded-art" aria-hidden="true"><span class="loaded-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="loaded-note">♫</span></div>
-          <div class="loaded-copy">
-            <p class="track-type" data-i18n="trackReady">TRACK READY</p>
-            <h3 id="loaded-title"></h3>
-            <p class="loaded-detail"><span id="loaded-duration"></span><i></i><span id="loaded-bpm"></span><i></i><span id="loaded-notes"></span></p>
-          </div>
-          <div class="loaded-actions">
-            <button class="button button-primary" id="play-loaded" type="button"><span data-i18n="playTrack">この曲でプレイ</span><span class="button-arrow" aria-hidden="true">↗</span></button>
-            <button class="loaded-clear" id="clear-loaded" type="button" data-i18n="removeTrack">曲を解除</button>
-          </div>
-        </article>
-      </section>
-
-      <section class="how-section section-shell" id="how-to-play" aria-labelledby="how-heading">
-        <div class="section-heading">
-          <div>
-            <p class="section-kicker">02 <span>/</span> THE BASICS</p>
-            <h2 id="how-heading" data-i18n="howHeading">ルールは、リズムだけ。</h2>
-          </div>
-          <p class="section-intro" data-i18n="howIntro">譜面は自動生成。あとは流れてくるノートに合わせて叩くだけ。</p>
-        </div>
-        <div class="how-grid">
-          <div class="keys-card">
-            <div class="keys-card-top"><span data-i18n="keyLayout">4-KEY LAYOUT</span><span>← YOUR HANDS →</span></div>
-            <div class="keys-visual" aria-label="D F J K">
-              <div class="keycap keycap-cyan"><span>D</span><i></i></div>
-              <div class="keycap keycap-red"><span>F</span><i></i></div>
-              <div class="keycap keycap-yellow"><span>J</span><i></i></div>
-              <div class="keycap keycap-purple"><span>K</span><i></i></div>
-            </div>
-            <div class="keys-card-bottom"><span><i class="sync-dot"></i><span data-i18n="tapHint">キーボード / タップ対応</span></span><span>D <b>F</b> <b>J</b> <b>K</b></span></div>
-          </div>
-          <div class="steps-card">
-            <article class="step-row"><span class="step-number">01</span><div><h3 data-i18n="stepOneTitle">曲を選ぶ</h3><p data-i18n="stepOneText">デモを鳴らすか、手元の音源を読み込もう。</p></div><span class="step-icon">↗</span></article>
-            <article class="step-row"><span class="step-number">02</span><div><h3 data-i18n="stepTwoTitle">リズムをつかむ</h3><p data-i18n="stepTwoText">曲に合わせて流れてくるノートを見よう。</p></div><span class="step-icon">⌁</span></article>
-            <article class="step-row"><span class="step-number">03</span><div><h3 data-i18n="stepThreeTitle">叩いて、楽しむ</h3><p data-i18n="stepThreeText">D・F・J・K、または画面のキーをタイミングよく。</p></div><span class="step-icon">✳</span></article>
-          </div>
-        </div>
-      </section>
-
-      <section class="manifesto section-shell" aria-labelledby="manifesto-heading">
-        <div class="manifesto-mark" aria-hidden="true">trk<span>!</span></div>
-        <div class="manifesto-copy">
-          <p class="section-kicker">A GAME MADE OF LOVE</p>
-          <h2 id="manifesto-heading" data-i18n-html="manifestoHeading">好きなものへのリスペクトを、<br>次の遊び場へ。</h2>
-          <p data-i18n="manifestoText">trk! は音楽と、たくさんのリズムゲームへの敬意から生まれた非営利のオープンプロジェクトです。特定の作品を再現するのではなく、みんなの「好き」を持ち寄れる遊び場を目指しています。</p>
-          <a class="text-link manifesto-link" href="https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" target="_blank" rel="noreferrer"><span data-i18n="manifestoLink">プロジェクトをのぞく</span><span aria-hidden="true">↗</span></a>
-        </div>
-        <div class="manifesto-stamp" aria-hidden="true"><span>OPEN<br>BY<br>DESIGN</span><i>✳</i></div>
-      </section>
-    </main>
-
-    <footer class="footer">
-      <a class="footer-brand" href="./">trk<span>!</span></a>
-      <p data-i18n="footerCopy">音楽への敬意を、遊びにしよう。曲の権利は、それぞれの作者へ。</p>
-      <div class="footer-links"><span>GPL-3.0-or-later</span><a href="CONTRIBUTING.md" data-i18n="contributeLink">参加する</a><a href="https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues" target="_blank" rel="noreferrer">GitHub Issues ↗</a></div>
-      <span class="footer-year">© trk! <span id="year">2026</span></span>
-    </footer>
+  <!-- ===== プレイ中の表示 ===== -->
+  <div class="topline">
+    <div><strong>trk!</strong><span id="songTitle"></span></div>
+    <div id="clock">0:00</div>
   </div>
 
-  <div class="game-screen" id="game-screen" hidden aria-hidden="true">
-    <div class="game-shell">
-      <header class="game-topbar">
-        <span class="game-brand" id="game-brand">trk<span>!</span></span>
-        <div class="game-track-title"><span class="game-track-label" data-i18n="nowPlaying">NOW PLAYING</span><strong id="game-track-name"></strong></div>
-        <div class="game-top-actions">
-          <button class="game-icon-button" id="pause-game" type="button" aria-label="一時停止" title="一時停止" data-i18n-aria="pause" data-i18n-title="pause"><span class="pause-symbol"><i></i><i></i></span><span class="game-button-label" data-i18n="pause">一時停止</span></button>
-          <button class="game-icon-button game-exit" id="exit-game" type="button" aria-label="終了" data-i18n-aria="exit"><span aria-hidden="true">×</span><span class="game-button-label" data-i18n="exit">終了</span></button>
+  <div id="hud">
+    <span data-i18n="score">SCORE</span><b id="scoreVal">0</b>
+    <span data-i18n="combo">COMBO</span><b id="comboVal">0</b>
+    <span data-i18n="accuracy">ACC</span><b id="accVal">100.00%</b>
+  </div>
+
+  <div id="judge"><span id="judgeText"></span><small id="judgeSub"></small></div>
+  <div id="progress"></div>
+  <input id="seekBar" type="range" min="0" max="1000" value="0" aria-label="Seek">
+
+  <div id="touchKeys">
+    <button type="button" data-slot="0"><span></span></button>
+    <button type="button" data-slot="1"><span></span></button>
+  </div>
+
+  <div id="controls">
+    <button id="pauseBtn" type="button" data-i18n="pause">Ⅱ Pause</button>
+    <button id="fullBtn" type="button" data-i18n="fullscreen">⛶ Fullscreen</button>
+    <label class="vol">
+      <span data-i18n="musicVolume">Music</span>
+      <input id="volume" type="range" min="0" max="1" step="0.01" value="0.7">
+    </label>
+  </div>
+
+  <!-- ===== 選曲画面 ===== -->
+  <section id="selectScreen" class="screen">
+    <div class="card wide">
+      <header class="head">
+        <div class="brand">
+          <h1>trk<span>!</span></h1>
+          <p data-i18n="tagline"></p>
+        </div>
+        <div class="headTools">
+          <label class="field">
+            <span data-i18n="language">Language</span>
+            <select id="language">
+              <option value="ja">日本語</option>
+              <option value="en">English</option>
+              <option value="zh">简体中文</option>
+              <option value="ko">한국어</option>
+            </select>
+          </label>
+          <button id="openSettingsBtn" type="button" data-i18n="openSettings"></button>
+          <button id="fullBtnTitle" type="button" aria-label="Fullscreen">⛶</button>
         </div>
       </header>
 
-      <div class="game-hud">
-        <div class="hud-stat"><span class="hud-label" data-i18n="scoreLabel">SCORE</span><strong id="score-value">00000000</strong></div>
-        <div class="hud-center"><span class="hud-label" data-i18n="comboLabel">COMBO</span><strong><span id="combo-value">0</span><small>×</small></strong></div>
-        <div class="hud-stat hud-stat-right"><span class="hud-label" data-i18n="accuracyLabel">ACCURACY</span><strong id="accuracy-value">100.00%</strong></div>
-      </div>
-
-      <div class="playfield-wrap">
-        <canvas id="game-canvas" aria-label="リズムゲームの譜面" data-i18n-aria="canvasLabel"></canvas>
-        <div class="playfield-topline"><span id="game-bpm">120 BPM</span><span class="difficulty-badge" id="game-difficulty">STANDARD</span><span id="game-time">00:00</span></div>
-        <div class="lane-letters" aria-hidden="true"><span>D</span><span>F</span><span>J</span><span>K</span></div>
-        <div class="judgement" id="judgement" aria-live="polite"></div>
-        <div class="count-in" id="count-in" hidden><span id="count-in-number"></span><small data-i18n="getReady">GET READY</small></div>
-        <div class="game-overlay" id="pause-overlay" hidden>
-          <div class="overlay-card"><p class="section-kicker" data-i18n="pausedKicker">PAUSED</p><h2 data-i18n="pausedTitle">ひと休み。</h2><p data-i18n="pausedText">準備ができたら、リズムに戻ろう。</p><button class="button button-primary" id="resume-game" type="button"><span data-i18n="resume">再開する</span><span class="button-arrow">↗</span></button></div>
+      <div class="selectGrid">
+        <!-- 左：曲リスト -->
+        <div class="songCol">
+          <section class="panel" id="libPanel">
+            <div class="libHead">
+              <h3 data-i18n="libTitle"></h3>
+              <span id="libCount" class="hint"></span>
+            </div>
+            <div class="miniActions">
+              <button id="libOpenBtn" type="button" data-i18n="libOpen"></button>
+              <button id="libReconnectBtn" type="button" hidden></button>
+              <button id="libRescanBtn" type="button" hidden data-i18n="libRescan"></button>
+              <label class="fileBtn small">
+                <input id="mediaFile" type="file" accept="video/*,audio/*" multiple hidden>
+                <span data-i18n="libAddFile"></span>
+              </label>
+              <label class="fileBtn small">
+                <input id="songPackFile" type="file" accept=".stpack,.zip" hidden>
+                <span data-i18n="libAddPack"></span>
+              </label>
+            </div>
+            <input id="libDirInput" type="file" webkitdirectory multiple hidden>
+            <div class="libTools">
+              <input id="libSearch" type="search" autocomplete="off">
+              <select id="libSort">
+                <option value="name" data-i18n="sortName"></option>
+                <option value="plays" data-i18n="sortPlays"></option>
+                <option value="recent" data-i18n="sortRecent"></option>
+                <option value="best" data-i18n="sortBest"></option>
+              </select>
+              <button id="libRandomBtn" type="button" data-i18n="libRandom"></button>
+            </div>
+            <div id="libList"></div>
+            <div id="libStatus" class="hint status"></div>
+            <div class="hint" data-i18n="dropHint"></div>
+          </section>
         </div>
-        <div class="game-overlay" id="result-overlay" hidden>
-          <div class="overlay-card result-card">
-            <p class="section-kicker" data-i18n="resultEyebrow">SESSION COMPLETE</p>
-            <div class="result-grade" id="result-grade">A</div>
-            <h2 data-i18n="resultTitle">いいリズム！</h2>
-            <p class="result-track-name" id="result-track-name"></p>
-            <div class="result-stats"><div><span data-i18n="scoreLabel">SCORE</span><b id="result-score">00000000</b></div><div><span data-i18n="accuracyLabel">ACCURACY</span><b id="result-accuracy">100.00%</b></div><div><span data-i18n="bestCombo">BEST COMBO</span><b id="result-combo">0</b></div></div>
-            <div class="result-actions"><button class="button button-primary" id="play-again" type="button"><span data-i18n="playAgain">もう一度遊ぶ</span><span class="button-arrow">↻</span></button><button class="button button-secondary" id="back-home" type="button" data-i18n="backHome">曲選択に戻る</button></div>
+
+        <!-- 右：選択中の曲 -->
+        <div class="detailCol">
+          <section id="songBanner" class="banner">
+            <div class="bannerText">
+              <div id="songTitleBig" class="bannerTitle"></div>
+              <div id="songSub" class="bannerSub"></div>
+              <div id="loadStatus" class="hint status"></div>
+            </div>
+          </section>
+          <!-- verified.js がここに「✔公認・譜面作者・BPM・💬 作者のことば」の欄を追加します -->
+
+          <section class="panel">
+            <div class="fields">
+              <label class="field">
+                <span data-i18n="bpm">BPM</span>
+                <input id="bpm" type="number" min="60" max="300" step="0.1">
+              </label>
+              <label class="field">
+                <span data-i18n="offset">Offset</span>
+                <input id="offset" type="number" step="10">
+              </label>
+              <label class="field">
+                <span data-i18n="seed">Seed</span>
+                <input id="seed" type="text" maxlength="32" autocomplete="off">
+              </label>
+            </div>
+            <div id="songPrefsStatus" class="hint"></div>
+            <!-- library.js がここに「🎲 シードを引く」と最近のシードを追加します -->
+            <div id="eggStatus" class="hint"></div>
+          </section>
+
+          <section class="panel">
+            <h3 data-i18n="playStyle"></h3>
+            <div class="seg" id="modePicker">
+              <button type="button" data-playmode="manual" data-i18n="manual">MANUAL</button>
+              <button type="button" data-playmode="truck" data-i18n="truck">TRUCK</button>
+              <button type="button" data-playmode="orbit" data-i18n="orbit">ORBIT</button>
+              <button type="button" data-playmode="stage" data-i18n="stage">STAGE</button>
+              <button type="button" data-playmode="catch" data-i18n="catch">CATCH</button>
+            </div>
+            <!-- library.js がここに「▶ AUTO」と「📻 ラジオ」の切り替えを追加します -->
+
+            <h3 data-i18n="difficulty"></h3>
+            <div class="seg" id="difficultyPicker">
+              <button type="button" data-mode="easy" data-i18n="easy">Easy</button>
+              <button type="button" data-mode="normal" data-i18n="normal">Normal</button>
+              <button type="button" data-mode="hard" data-i18n="hard">Hard</button>
+              <button type="button" data-mode="master" data-i18n="master" hidden>MASTER</button>
+              <button type="button" data-mode="rush" data-i18n="rush" hidden>2000 RUSH</button>
+            </div>
+            <div id="chartStatus" class="hint status"></div>
+            <div id="modsLine" class="hint status"></div>
+          </section>
+
+          <button id="playBtn" class="primary" type="button" disabled data-i18n="playStart">▶ PLAY</button>
+          <!-- speed.js（⏩ 速度パネル）・fx.js（🎛 エフェクトのメニュー）がここに入ります -->
+
+          <div class="actions">
+            <button id="importChartBtn" type="button" disabled data-i18n="importChart"></button>
+            <button id="regenerateChartBtn" type="button" hidden data-i18n="regenerate"></button>
+            <button id="exportSelectBtn" type="button" disabled data-i18n="export"></button>
           </div>
-        </div>
-      </div>
+          <div id="importStatus" class="hint status center"></div>
 
-      <div class="game-footer">
-        <div class="game-progress" role="progressbar" aria-label="再生位置" data-i18n-aria="progressLabel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="progress-fill"></span></div>
-        <div class="game-footer-row"><span id="game-chart-count">0 NOTES</span><span data-i18n="gameFooterHint">ノートが判定ラインに来たら、同じ色のキーを叩こう。</span><span id="game-elapsed">00:00 / 00:00</span></div>
-      </div>
-      <div class="touch-keys" id="touch-keys" aria-label="タップ用レーンキー" data-i18n-aria="touchKeysLabel">
-        <button type="button" class="touch-key touch-cyan" data-lane="0"><span>D</span></button>
-        <button type="button" class="touch-key touch-red" data-lane="1"><span>F</span></button>
-        <button type="button" class="touch-key touch-yellow" data-lane="2"><span>J</span></button>
-        <button type="button" class="touch-key touch-purple" data-lane="3"><span>K</span></button>
+          <section class="panel" id="recPanel" hidden>
+            <h3 data-i18n="recTitle"></h3>
+            <div id="recSummary"></div>
+            <details class="subPanel">
+              <summary data-i18n="recHistory"></summary>
+              <div id="recHistory"></div>
+            </details>
+            <div class="miniActions">
+              <button id="recExportBtn" type="button" data-i18n="recExport"></button>
+              <label class="fileBtn small">
+                <input id="recImportFile" type="file" accept="application/json,.json" hidden>
+                <span data-i18n="recImport"></span>
+              </label>
+              <button id="recResetBtn" type="button" data-i18n="recReset"></button>
+            </div>
+            <div id="recStatus" class="hint status"></div>
+          </section>
+
+          <details class="panel" id="songPackBuilder" hidden>
+            <summary data-i18n="spTitle"></summary>
+            <div class="hint" data-i18n="spHint"></div>
+            <div class="fields2">
+              <label class="field">
+                <span data-i18n="spArtist"></span>
+                <input id="spArtist" type="text" maxlength="60">
+              </label>
+              <label class="field">
+                <span data-i18n="spCharter"></span>
+                <input id="spCharter" type="text" maxlength="40">
+              </label>
+            </div>
+            <label class="field">
+              <span data-i18n="spLicense"></span>
+              <input id="spLicense" type="text" maxlength="400">
+            </label>
+            <!-- verified.js がここに「💬 作者のことば」（280まで）を追加します -->
+            <label class="field">
+              <span data-i18n="spBg"></span>
+              <input id="spBg" type="file" accept="image/png,image/webp,image/jpeg">
+            </label>
+            <label class="check"><input id="spIncGenerated" type="checkbox" checked><span data-i18n="spIncGenerated"></span></label>
+            <label class="check"><input id="spIncCurrent" type="checkbox" checked><span data-i18n="spIncCurrent"></span></label>
+            <label class="check"><input id="spRightsOk" type="checkbox"><span data-i18n="spRightsOk"></span></label>
+            <button id="spBuildBtn" type="button" class="primary slim" data-i18n="spBuildBtn"></button>
+            <div id="spStatus" class="hint status"></div>
+          </details>
+
+          <div class="hint center" data-i18n="controlsHint"></div>
+          <div class="hint center" data-i18n="quickRetryHint"></div>
+          <div class="hint center contactLine">
+            <span data-i18n="feedbackLabel"></span>
+            <a href="https://x.com/ttrk143" target="_blank" rel="noopener noreferrer">X @ttrk143</a> ／
+            <a href="https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues" target="_blank" rel="noopener noreferrer">GitHub Issues</a>
+          </div>
+          <div class="hint pclCredit center" hidden></div>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="toast-region" id="toast-region" role="status" aria-live="polite"></div>
-  <noscript><p class="noscript-message">trk! を遊ぶには JavaScript を有効にしてください。 / Please enable JavaScript to play trk!.</p></noscript>
+  <!-- ===== 設定画面 ===== -->
+  <section id="settingsScreen" class="screen" hidden>
+    <div class="card wide">
+      <header class="head">
+        <h2 class="setTitle" data-i18n="settingsTitle"></h2>
+        <button id="closeSettingsBtn" type="button" class="primary slim" data-i18n="closeSettings"></button>
+      </header>
+
+      <div class="grid">
+        <!-- 左：見た目 -->
+        <div class="col">
+          <details class="panel" open>
+            <summary data-i18n="secDisplay"></summary>
+            <h3 data-i18n="skin"></h3>
+            <div id="skinGrid"></div>
+
+            <details id="skinMaker" class="subPanel">
+              <summary data-i18n="addSkin"></summary>
+              <div class="hint" data-i18n="makerHint"></div>
+              <label class="field">
+                <span data-i18n="skinName"></span>
+                <input id="makerName" type="text" maxlength="24" autocomplete="off">
+              </label>
+              <div class="colorGrid">
+                <label><input id="makerColor_bg" type="color"><span data-i18n="cBg"></span></label>
+                <label><input id="makerColor_panel" type="color"><span data-i18n="cPanel"></span></label>
+                <label><input id="makerColor_text" type="color"><span data-i18n="cText"></span></label>
+                <label><input id="makerColor_accent" type="color"><span data-i18n="cAccent"></span></label>
+                <label><input id="makerColor_gold" type="color"><span data-i18n="cGold"></span></label>
+              </div>
+              <div class="makerRow">
+                <label class="field">
+                  <span data-i18n="skinFont"></span>
+                  <select id="makerFont">
+                    <option value="default" data-i18n="fontDefault"></option>
+                    <option value="mono" data-i18n="fontMono"></option>
+                    <option value="rounded" data-i18n="fontRounded"></option>
+                    <option value="serif" data-i18n="fontSerif"></option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span data-i18n="skinVideo"></span>
+                  <select id="makerVideo">
+                    <option value="mono" data-i18n="vfMono"></option>
+                    <option value="color" data-i18n="vfColor"></option>
+                    <option value="dim" data-i18n="vfDim"></option>
+                    <option value="warm" data-i18n="vfWarm"></option>
+                    <option value="cool" data-i18n="vfCool"></option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span data-i18n="skinMascot"></span>
+                  <!-- キャラクターの選択肢は js/characters/*.js が自動で追加します -->
+                  <select id="makerMascot">
+                    <option value="none" data-i18n="mascotNone"></option>
+                    <option value="buddy" data-i18n="mascotBuddy"></option>
+                    <option value="vrm" data-i18n="mascotVrm"></option>
+                  </select>
+                </label>
+              </div>
+              <label class="check"><input id="makerGlow" type="checkbox"><span data-i18n="skinGlow"></span></label>
+              <label class="check"><input id="makerScan" type="checkbox"><span data-i18n="skinScan"></span></label>
+              <div class="miniActions">
+                <button id="makerLoadBtn" type="button" data-i18n="loadCurrent"></button>
+                <button id="makerSaveNewBtn" type="button" data-i18n="saveNewSkin"></button>
+                <button id="makerOverwriteBtn" type="button" data-i18n="overwriteSkin"></button>
+                <button id="makerExportBtn" type="button" data-i18n="exportSkin"></button>
+                <label class="fileBtn small">
+                  <input id="makerImportFile" type="file" accept="application/json,.json" hidden>
+                  <span data-i18n="importSkin"></span>
+                </label>
+                <button id="makerDeleteBtn" type="button" data-i18n="deleteSkin"></button>
+              </div>
+              <div id="makerStatus" class="hint status"></div>
+            </details>
+
+            <h3 data-i18n="gameLayout"></h3>
+            <div class="seg" id="layoutPicker">
+              <button type="button" data-layout="classic" data-i18n="layoutClassic"></button>
+              <button type="button" data-layout="vertical" data-i18n="layoutVertical"></button>
+              <button type="button" data-layout="center" data-i18n="layoutCenter"></button>
+              <button type="button" data-layout="commentary" data-i18n="layoutCommentary"></button>
+            </div>
+
+            <div class="fields2">
+              <label class="field">
+                <span data-i18n="videoStyle"></span>
+                <select id="videoStyle">
+                  <option value="skin" data-i18n="videoSkin"></option>
+                  <option value="color" data-i18n="videoColor"></option>
+                  <option value="mono" data-i18n="videoMono"></option>
+                  <option value="dim" data-i18n="videoDim"></option>
+                  <option value="off" data-i18n="videoOff"></option>
+                </select>
+              </label>
+              <label class="field">
+                <span data-i18n="scrollSpeed"></span>
+                <span class="inline tight">
+                  <input id="scroll" type="range" min="0.5" max="2.5" step="0.1">
+                  <span id="scrollVal" class="mono"></span>
+                </span>
+              </label>
+            </div>
+            <!-- extras.js がここに「背景の暗さ・ぼかし」を追加します -->
+
+            <div class="inline">
+              <span data-i18n="fxPower"></span>
+              <input id="fxPower" type="range" min="0" max="3" step="0.1">
+              <span id="fxPowerVal" class="mono"></span>
+            </div>
+            <label class="check"><input id="hideGameplayUI" type="checkbox"><span data-i18n="hideUI"></span></label>
+            <label class="check"><input id="errorMeter" type="checkbox"><span data-i18n="errorMeter"></span></label>
+            <!-- extras.js がここに「👻 ゴースト」を追加します -->
+            <label class="check"><input id="playerMode" type="checkbox"><span data-i18n="playerMode"></span></label>
+            <div class="hint" data-i18n="hideHint"></div>
+
+            <h3 data-i18n="secTruck"></h3>
+            <div class="hint" data-i18n="truckHint"></div>
+            <div class="inline">
+              <span data-i18n="laneTint"></span>
+              <input id="laneTint" type="range" min="0" max="0.5" step="0.01">
+              <span id="laneTintVal" class="mono"></span>
+            </div>
+            <label class="check"><input id="truckBounce" type="checkbox"><span data-i18n="truckBounce"></span></label>
+
+            <h3 data-i18n="swayTitle"></h3>
+            <label class="check"><input id="swayBeat" type="checkbox"><span data-i18n="swayBeat"></span></label>
+            <label class="check"><input id="swayHit" type="checkbox"><span data-i18n="swayHit"></span></label>
+            <div class="inline">
+              <span data-i18n="swayPower"></span>
+              <input id="swayPower" type="range" min="0.2" max="2" step="0.1">
+              <span id="swayPowerVal" class="mono"></span>
+            </div>
+            <div id="swayReducedNote" class="hint" data-i18n="swayReduced" hidden></div>
+            <!-- modes.js（🪐 ORBIT）・stage.js（🎪 STAGE）・stagefx.js（🎭 演出）の設定がここに入ります -->
+
+            <h3 data-i18n="mascotSel"></h3>
+            <!-- キャラクターの選択肢は js/characters/*.js が自動で追加します -->
+            <select id="mascotSelect" class="mascotSelect">
+              <option value="skin" data-i18n="mascotSkin"></option>
+              <option value="none" data-i18n="mascotNone"></option>
+              <option value="buddy" data-i18n="mascotBuddy"></option>
+              <option value="vrm" data-i18n="mascotVrm"></option>
+            </select>
+            <div class="hint" data-i18n="mascotHint"></div>
+
+            <h3 data-i18n="noteStyle"></h3>
+            <div class="noteRows">
+              <div class="noteRow">
+                <i id="notePrev0" class="dot big"></i>
+                <strong data-i18n="donNote"></strong>
+                <input id="noteColor0" type="color">
+                <select id="noteShape0">
+                  <option value="circle" data-i18n="shapeCircle"></option>
+                  <option value="diamond" data-i18n="shapeDiamond"></option>
+                  <option value="square" data-i18n="shapeSquare"></option>
+                </select>
+              </div>
+              <div class="noteRow">
+                <i id="notePrev1" class="dot big"></i>
+                <strong data-i18n="kaNote"></strong>
+                <input id="noteColor1" type="color">
+                <select id="noteShape1">
+                  <option value="circle" data-i18n="shapeCircle"></option>
+                  <option value="diamond" data-i18n="shapeDiamond"></option>
+                  <option value="square" data-i18n="shapeSquare"></option>
+                </select>
+              </div>
+            </div>
+            <div class="seg" id="notePresets">
+              <button type="button" data-preset="classic" data-i18n="presetClassic"></button>
+              <button type="button" data-preset="clarity" data-i18n="presetClarity"></button>
+              <button type="button" data-preset="skin" data-i18n="presetSkin"></button>
+            </div>
+            <div class="hint" data-i18n="noteHint"></div>
+          </details>
+        </div>
+
+        <!-- 右：プレイオプション・操作・パック・VRM・サウンド・エフェクト -->
+        <div class="col">
+          <details class="panel" open>
+            <summary data-i18n="secOptions"></summary>
+
+            <h3 data-i18n="secLives"></h3>
+            <div class="seg" id="livesPicker">
+              <button type="button" data-lives="standard" data-i18n="livesStandard"></button>
+              <button type="button" data-lives="knight" data-i18n="livesKnight"></button>
+              <button type="button" data-lives="chicken" data-i18n="livesChicken"></button>
+              <button type="button" data-lives="none" data-i18n="livesNone"></button>
+            </div>
+            <div class="hint" data-i18n="livesHint"></div>
+            <label class="check"><input id="lifeNumber" type="checkbox"><span data-i18n="lifeNumber"></span></label>
+            <!-- modes.js がここに「体力の表示スタイル」を追加します -->
+
+            <label class="check"><input id="countdown" type="checkbox"><span data-i18n="countdown"></span></label>
+            <label class="check"><input id="countdownSE" type="checkbox"><span data-i18n="countdownSE"></span></label>
+            <label class="check"><input id="resumeCountdown" type="checkbox"><span data-i18n="resumeCountdown"></span></label>
+            <div class="hint" data-i18n="countdownHint"></div>
+
+            <h3 data-i18n="judgeLevel"></h3>
+            <div class="seg" id="judgePicker">
+              <button type="button" data-judge="lenient" data-i18n="judgeLenient"></button>
+              <button type="button" data-judge="standard" data-i18n="judgeStandard"></button>
+              <button type="button" data-judge="strict" data-i18n="judgeStrict"></button>
+            </div>
+            <div class="hint" data-i18n="judgeHint"></div>
+
+            <div class="inline">
+              <span data-i18n="rate"></span>
+              <input id="rate" type="range" min="0.5" max="3" step="0.01">
+              <span id="rateVal" class="mono"></span>
+            </div>
+            <div class="hint" data-i18n="rateHint"></div>
+            <!-- speed.js がここに「速度パネルの表示」を追加します -->
+
+            <label class="check"><input id="optHidden" type="checkbox"><span data-i18n="hidden"></span></label>
+            <label class="check"><input id="optSudden" type="checkbox"><span data-i18n="sudden"></span></label>
+            <div class="inline">
+              <span data-i18n="coverAmount"></span>
+              <input id="cover" type="range" min="0.2" max="0.7" step="0.05">
+              <span id="coverVal" class="mono"></span>
+            </div>
+          </details>
+
+          <details class="panel" open>
+            <summary data-i18n="secControls"></summary>
+            <div class="keyRows">
+              <div class="keyRow">
+                <strong data-i18n="leftKey"></strong><span class="keyValue" id="keyValue0"></span>
+                <button type="button" data-bind="0" data-i18n="assign"></button>
+              </div>
+              <div class="keyRow">
+                <strong data-i18n="rightKey"></strong><span class="keyValue" id="keyValue1"></span>
+                <button type="button" data-bind="1" data-i18n="assign"></button>
+              </div>
+              <div class="keyRow">
+                <strong data-i18n="leftSub"></strong><span class="keyValue" id="keyValue2"></span>
+                <button type="button" data-bind="2" data-i18n="assign"></button>
+              </div>
+              <div class="keyRow">
+                <strong data-i18n="rightSub"></strong><span class="keyValue" id="keyValue3"></span>
+                <button type="button" data-bind="3" data-i18n="assign"></button>
+              </div>
+            </div>
+            <div class="seg" id="keyPresets" style="margin-top:10px">
+              <button type="button" data-keypreset="standard" data-i18n="keyPresetDefault"></button>
+              <button type="button" data-keypreset="taiko" data-i18n="keyPresetTaiko"></button>
+            </div>
+            <label class="check"><input id="reverseHands" type="checkbox"><span data-i18n="reverseHands"></span></label>
+            <div id="keyPreview" class="hint"></div>
+            <div id="bindStatus" class="hint status"></div>
+
+            <div class="inline">
+              <span data-i18n="latency"></span>
+              <input id="latency" class="numField" type="number" min="-300" max="500" step="5">
+            </div>
+            <div class="hint" data-i18n="latencyHint"></div>
+            <!-- extras.js がここに「🎯 オフセットを測る」と自動微調整を追加します -->
+            <div class="hint" data-i18n="quickRetryHint"></div>
+            <!-- player.js がここに「⏯ 再生の操作」と区間リピートを追加します -->
+
+            <h3 data-i18n="truckCtlTitle"></h3>
+            <div class="seg" id="truckKeyPresets">
+              <button type="button" data-truckpreset="layout" data-i18n="truckPresetLayout"></button>
+              <button type="button" data-truckpreset="ud" data-i18n="truckPresetUD"></button>
+              <button type="button" data-truckpreset="lr" data-i18n="truckPresetLR"></button>
+            </div>
+            <div class="keyRows" style="margin-top:10px">
+              <div class="keyRow">
+                <strong data-i18n="truckLane0"></strong><span class="keyValue" id="truckKeyValue0"></span>
+                <button type="button" data-truckbind="0" data-i18n="assign"></button>
+              </div>
+              <div class="keyRow">
+                <strong data-i18n="truckLane1"></strong><span class="keyValue" id="truckKeyValue1"></span>
+                <button type="button" data-truckbind="1" data-i18n="assign"></button>
+              </div>
+              <div class="keyRow">
+                <strong data-i18n="truckToggle"></strong><span class="keyValue" id="truckKeyValue2"></span>
+                <button type="button" data-truckbind="2" data-i18n="assign"></button>
+              </div>
+            </div>
+            <label class="check"><input id="truckHitKeys" type="checkbox"><span data-i18n="truckHitKeys"></span></label>
+            <div id="truckKeyPreview" class="hint"></div>
+            <div id="truckBindStatus" class="hint status"></div>
+            <div class="hint" data-i18n="truckCtlHint"></div>
+            <!-- stage.js（🎪）・catch.js（🚛）・speed.js（⏩）のキー設定がここに入ります -->
+          </details>
+
+          <details class="panel" id="packPanel">
+            <summary data-i18n="secPacks"></summary>
+            <div class="hint" data-i18n="packHint"></div>
+            <div class="miniActions">
+              <label class="fileBtn small">
+                <input id="packFile" type="file" accept=".stpack,.zip" hidden>
+                <span data-i18n="packChoose"></span>
+              </label>
+              <button id="packOffBtn" type="button" data-i18n="packOff"></button>
+            </div>
+            <!-- verified.js が各パックに「✔公認・指紋・📋 公認リスト用にコピー」を追加します -->
+            <div id="packList"></div>
+            <div id="packStatus" class="hint status"></div>
+
+            <details id="packBuilder" class="subPanel">
+              <summary data-i18n="packBuild"></summary>
+              <div class="hint" data-i18n="packBuildHint"></div>
+              <div class="fields2">
+                <label class="field"><span data-i18n="packName"></span><input id="packName" type="text" maxlength="40"></label>
+                <label class="field"><span data-i18n="packAuthor"></span><input id="packAuthor" type="text" maxlength="40"></label>
+              </div>
+              <label class="field"><span data-i18n="packDesc"></span><input id="packDesc" type="text" maxlength="200"></label>
+              <label class="field"><span data-i18n="packLicense"></span><input id="packLicense" type="text" maxlength="400"></label>
+              <label class="field"><span data-i18n="packUrl"></span><input id="packUrl" type="url" maxlength="200" placeholder="https://"></label>
+              <div class="incList">
+                <label class="check"><input id="incSkin" type="checkbox" checked><span data-i18n="incSkin"></span></label>
+                <label class="check"><input id="incNotes" type="checkbox" checked><span data-i18n="incNotes"></span></label>
+                <label class="check"><input id="incSounds" type="checkbox"><span data-i18n="incSounds"></span></label>
+                <label class="check"><input id="incVrm" type="checkbox"><span data-i18n="incVrm"></span></label>
+                <label class="check"><input id="incMotion" type="checkbox"><span data-i18n="incMotion"></span></label>
+                <label class="check"><input id="incCaptions" type="checkbox"><span data-i18n="incCaptions"></span></label>
+              </div>
+              <div class="fields2">
+                <label class="field"><span data-i18n="noteImgDon"></span><input id="packDonImg" type="file" accept="image/png,image/webp,image/jpeg"></label>
+                <label class="field"><span data-i18n="noteImgKa"></span><input id="packKaImg" type="file" accept="image/png,image/webp,image/jpeg"></label>
+              </div>
+              <label class="field"><span data-i18n="capStartTxt"></span><input id="capStartTxt" type="text" maxlength="60"></label>
+              <label class="field"><span data-i18n="capComboTxt"></span><input id="capComboTxt" type="text" maxlength="60"></label>
+              <label class="field"><span data-i18n="capBreakTxt"></span><input id="capBreakTxt" type="text" maxlength="60"></label>
+              <label class="check"><input id="packVrmOk" type="checkbox"><span data-i18n="packVrmOk"></span></label>
+              <label class="check"><input id="packInstallToo" type="checkbox" checked><span data-i18n="packInstallToo"></span></label>
+              <button id="packBuildBtn" type="button" class="primary slim" data-i18n="packBuildBtn"></button>
+            </details>
+          </details>
+
+          <details class="panel" id="vrmPanel">
+            <summary data-i18n="vrmTitle"></summary>
+            <div class="hint" data-i18n="vrmHint"></div>
+            <label class="check"><input id="vrmAgree" type="checkbox"><span data-i18n="vrmAgree"></span></label>
+            <div class="miniActions">
+              <label class="fileBtn small disabled" id="vrmFileLabel">
+                <input id="vrmFile" type="file" accept=".vrm" hidden disabled>
+                <span data-i18n="vrmChoose"></span>
+              </label>
+              <button id="vrmClearBtn" type="button" data-i18n="vrmClear"></button>
+            </div>
+            <label class="check"><input id="vrmRemember" type="checkbox"><span data-i18n="vrmRemember"></span></label>
+            <div class="makerRow two">
+              <label class="field">
+                <span data-i18n="vrmFrame"></span>
+                <select id="vrmFrame">
+                  <option value="full" data-i18n="frameFull"></option>
+                  <option value="upper" data-i18n="frameUpper"></option>
+                  <option value="face" data-i18n="frameFace"></option>
+                </select>
+              </label>
+              <label class="field">
+                <span data-i18n="vrmTurn"></span>
+                <span class="inline tight">
+                  <input id="vrmTurn" type="range" min="-60" max="60" step="5">
+                  <span id="vrmTurnVal" class="mono"></span>
+                </span>
+              </label>
+            </div>
+            <h3 data-i18n="vrmMotion"></h3>
+            <div class="miniActions">
+              <label class="fileBtn small">
+                <input id="vrmaFile" type="file" accept=".vrma" hidden>
+                <span data-i18n="vrmMotionChoose"></span>
+              </label>
+              <button id="vrmaClearBtn" type="button" data-i18n="vrmMotionClear"></button>
+            </div>
+            <label class="field">
+              <span data-i18n="vrmMotionBpm"></span>
+              <input id="vrmMotionBpm" type="number" min="40" max="300" step="0.1" placeholder="120">
+            </label>
+            <div class="vrmBox">
+              <canvas id="vrmPreview" width="240" height="320"></canvas>
+              <div id="vrmInfo" class="hint"></div>
+            </div>
+            <div id="vrmStatus" class="hint status"></div>
+          </details>
+
+          <details class="panel">
+            <summary data-i18n="secSound"></summary>
+            <label class="check"><input id="seEnabled" type="checkbox"><span data-i18n="enableSE"></span></label>
+            <div class="inline">
+              <span data-i18n="seVolume"></span>
+              <input id="seVolume" type="range" min="0" max="1" step="0.01">
+            </div>
+            <div class="seButtons">
+              <label class="fileBtn small">📁 <input id="donSeFile" type="file" accept="audio/*" hidden><span data-i18n="donSE"></span></label>
+              <button id="previewDonBtn" type="button" data-i18n="previewDon"></button>
+              <label class="fileBtn small">📁 <input id="kaSeFile" type="file" accept="audio/*" hidden><span data-i18n="kaSE"></span></label>
+              <button id="previewKaBtn" type="button" data-i18n="previewKa"></button>
+            </div>
+            <div id="seStatus" class="hint status"></div>
+            <label class="check"><input id="previewEnabled" type="checkbox"><span data-i18n="previewEnabled"></span></label>
+          </details>
+          <!-- fx.js がここに「🎛 サウンドエフェクト」の欄を追加します -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 一時停止 ===== -->
+  <section id="pauseScreen" class="screen dim" hidden>
+    <div class="card small">
+      <h2 data-i18n="paused"></h2>
+      <p data-i18n="pauseText"></p>
+      <!-- speed.js（速度）・player.js（区間リピート）の表示がここに入ります -->
+      <div class="actions">
+        <button id="resumeBtn" type="button" data-i18n="resume"></button>
+        <button id="retryBtn" type="button" data-i18n="retry"></button>
+        <button id="exportPauseBtn" type="button" data-i18n="export"></button>
+        <button id="returnTitleBtn" type="button" data-i18n="title"></button>
+      </div>
+      <div id="pauseStatus" class="hint status"></div>
+    </div>
+  </section>
+
+  <!-- ===== リザルト ===== -->
+  <section id="endScreen" class="screen dim" hidden>
+    <div class="card small">
+      <h2 data-i18n="finished"></h2>
+      <div id="result"></div>
+      <div class="actions">
+        <button id="replayBtn" type="button" data-i18n="replay"></button>
+        <button id="exportEndBtn" type="button" data-i18n="export"></button>
+        <button id="endTitleBtn" type="button" data-i18n="title"></button>
+      </div>
+      <div id="endStatus" class="hint status"></div>
+      <!-- verified.js が公認曲のとき「✔公認・💬 作者のことば」をクレジットの先頭に入れます -->
+      <div id="credits"></div>
+      <div class="hint pclCredit" hidden></div>
+    </div>
+  </section>
+
+  <input id="chartImportFile" type="file" accept="application/json,.json" hidden>
+</div>
+
+<video id="video" playsinline preload="auto"></video>
+
+<!-- ===== 文章 ===== -->
+<script src="js/i18n.js"></script>
+<script src="js/i18n-options.js"></script>
+<!-- ===== データ ===== -->
+<script src="js/data.js"></script>
+<!-- ▼ キャラクター（data.js の後、core.js の前）
+     初音ミク：PCL（非営利・無償のみ）。商用の派生版では、この1行とファイルを削除してください。 -->
+<script src="js/characters/miku.js"></script>
+<!-- ▲ 自作キャラのMODは、この下に <script src="js/characters/○○.js"></script> を足してください -->
+<!-- ===== 土台 ===== -->
+<script src="js/core.js"></script>
+<!-- player.js：AUTO・練習中の再生操作。各モードより先にキーを受け取るため、core.js のすぐ後 -->
+<script src="js/player.js"></script>
+<script src="js/media.js"></script>
+<script src="js/game.js"></script>
+<script src="js/render.js"></script>
+<script src="js/custom.js"></script>
+<!-- ===== モード ===== -->
+<script src="js/truck.js"></script>
+<script src="js/modes.js"></script>
+<script src="js/stage.js"></script>
+<script src="js/stagefx.js"></script>
+<script src="js/catch.js"></script>
+<script src="js/extras.js"></script>
+<!-- ===== サウンドエフェクト（自作プリセットのMODは fx.js より前に読み込む） ===== -->
+<script src="js/fx-presets.js"></script>
+<script src="js/fx-dock.js"></script>
+<script src="js/fx.js"></script>
+<!-- ===== 選曲・公認・入力・起動 ===== -->
+<script src="js/library.js"></script>
+<script src="js/verified.js"></script>
+<script src="js/main.js"></script>
+<script src="js/speed.js"></script>
+<script src="js/vrm.js"></script>
 </body>
 </html>

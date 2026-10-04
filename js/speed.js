@@ -182,6 +182,7 @@ function captureSpeedKey(code) {
   setStatus("speedBindStatus", "speedAssigned"); syncSpeedKeyUI(); renderSpeed();
 }
 addEventListener("keydown", e => {
+  if (window._trkSynthModeOpen) return;
   if (speedBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureSpeedKey(e.code); return; }
   if (bindingSlot !== null || truckBinding !== null || stageBinding !== null) return;
   const i = settings.speedKeys.indexOf(e.code); if (i < 0) return;

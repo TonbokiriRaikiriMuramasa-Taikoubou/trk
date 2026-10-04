@@ -350,9 +350,167 @@ details.panel[open]>summary{margin-bottom:14px}
 #fxQuickPanel select optgroup{color:var(--ui-muted)}
 .fxEditor{width:100%;min-height:200px;font-family:monospace;font-size:13px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border);border-radius:10px;padding:8px}
 
+/* 🎛 エフェクトチェーン編集（fx-synth.js）：安全な trk-fx 視覚エディター */
+.fxSynth{margin-top:8px;padding:8px 10px;border:1px solid var(--ui-border);border-radius:12px;background:rgba(0,0,0,.12)}
+.fxSynth>summary{cursor:pointer;font-weight:850;color:var(--ui-text)}
+.fxSynth[open]>summary{margin-bottom:8px}
+.fxSynthHint,.fxSynthSaveHint,.fxSynthAddHint{font-size:12px;line-height:1.5}
+.fxSynthName{margin:8px 0}
+.fxSynthName input,.fxSynthTypePicker,.fxSynthEffectType,.fxSynthChoice select{min-width:0;padding:7px 9px;border-radius:9px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border)}
+.fxSynthMaster{padding:8px;border:1px solid var(--ui-border);border-radius:10px;background:rgba(0,0,0,.1)}
+.fxSynthMaster h3{margin:0 0 4px;font-size:14px}
+.fxSynthMaster .fxSynthParams{grid-template-columns:repeat(2,minmax(96px,1fr))}
+.fxSynthMasterHint{margin:0 0 6px;font-size:11px}
+.fxSynthActions{display:flex;flex-wrap:wrap;gap:6px}
+.fxSynthActions>*{flex:1 1 145px;justify-content:center}
+.fxSynthActions button{font-size:13px;padding:7px 9px}
+.fxSynthFile{justify-content:center}
+.fxSynthAddRow{display:flex;align-items:center;gap:7px;margin:8px 0 4px}
+.fxSynthTypePicker{flex:1}
+.fxSynthChain{display:grid;gap:9px;margin:9px 0}
+.fxSynthEmpty{padding:12px;text-align:center;border:1px dashed var(--ui-border);border-radius:10px}
+.fxSynthEffect{min-width:0;padding:9px;border:1px solid var(--ui-border);border-radius:12px;background:var(--ui-soft);box-shadow:inset 0 1px rgba(255,255,255,.035)}
+.fxSynthEffectHead{display:grid;grid-template-columns:auto minmax(100px,1fr) auto;align-items:center;gap:7px;margin-bottom:9px}
+.fxSynthStep{font-size:11px;font-weight:800;color:var(--ui-muted);white-space:nowrap}
+.fxSynthEffectType{width:100%;font-weight:750}
+.fxSynthEffectTools{display:flex;gap:4px}
+.fxSynthIcon{min-width:34px;padding:4px 7px!important;font-size:15px!important;line-height:1.2}
+.fxSynthIcon:disabled,.fxSynthAddBand:disabled{opacity:.4;cursor:not-allowed}
+.fxSynthEffectBody{min-width:0}
+.fxSynthParams{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:6px}
+.fxSynthControl{display:grid;grid-template-rows:auto 52px auto;align-items:center;justify-items:center;min-width:0;padding:6px 5px;border:1px solid rgba(255,255,255,.075);border-radius:9px;background:rgba(0,0,0,.13)}
+.fxSynthControlLabel{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:750;text-align:center;color:var(--ui-muted)}
+.fxSynthDial{--fx-pct:0%;position:relative;display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:conic-gradient(from 225deg,var(--ui-accent) 0 var(--fx-pct),rgba(255,255,255,.16) var(--fx-pct) 75%,transparent 75% 100%);filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+.fxSynthDial::before{content:"";position:absolute;inset:5px;border:1px solid rgba(255,255,255,.16);border-radius:50%;background:var(--ui-field,#11151e)}
+.fxSynthDialValue{position:relative;z-index:1;max-width:42px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace;font-size:10px;font-weight:850;text-align:center;color:var(--ui-text)}
+.fxSynthRange{width:100%;max-width:120px;margin:5px 0 0;accent-color:var(--ui-accent);touch-action:pan-y}
+.fxSynthChoice{min-width:0;padding:7px;border:1px solid rgba(255,255,255,.075);border-radius:9px;background:rgba(0,0,0,.13)}
+.fxSynthChoice>span{font-size:11px;font-weight:750;color:var(--ui-muted)}
+.fxSynthChoice select{width:100%;font-size:12px}
+.fxSynthBands{display:grid;gap:7px}
+.fxSynthBand{min-width:0;padding:8px;border:1px solid rgba(255,255,255,.075);border-radius:9px;background:rgba(0,0,0,.12)}
+.fxSynthBandHead{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
+.fxSynthBandHead strong{font-size:11px;color:var(--ui-muted)}
+.fxSynthBandType{margin-bottom:6px}
+.fxSynthBandType select{max-width:100%}
+.fxSynthAddBand{margin-top:7px;padding:5px 9px!important;font-size:12px!important}
+.fxSynthLimit{margin:5px 0 0;font-size:11px}
+.fxSynthStatus{min-height:1em;margin:5px 0 0}
+@media(max-width:520px){
+  .fxSynth{padding:7px}
+  .fxSynthEffect{padding:7px}
+  .fxSynthEffectHead{grid-template-columns:auto minmax(0,1fr)}
+  .fxSynthEffectTools{grid-column:1/-1;justify-content:flex-end}
+  .fxSynthParams{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .fxSynthActions>*{flex:1 1 100%}
+  .fxSynthDial{width:44px;height:44px}
+}
+
 /* ===== 19. 動きを減らす設定（OSの「視差効果を減らす」） ===== */
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition:none!important}}
-/* ✅ style.css 完了 */
+/* 🎹 シンセサイザーモード（synth-mode.js） */
+body.instOpen{overflow:hidden;overscroll-behavior:none}
+.instOverlay[hidden]{display:none!important}
+.instOverlay{position:fixed;inset:0;z-index:50000;display:grid;place-items:center;padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));background:rgba(3,5,12,.78);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.instBackdrop{position:absolute;inset:0}
+.instDialog{position:relative;display:flex;flex-direction:column;width:min(1080px,100%);max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);overflow:hidden;border:1px solid rgba(120,220,255,.32);border-radius:20px;background:linear-gradient(155deg,rgba(20,29,47,.98),rgba(7,10,20,.99) 58%);color:var(--ui-text);box-shadow:0 28px 90px rgba(0,0,0,.72),0 0 40px rgba(0,190,255,.12)}
+.instHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 18px 10px;border-bottom:1px solid rgba(255,255,255,.09)}
+.instHeader h2{margin:0;font-size:clamp(20px,3vw,28px);letter-spacing:.02em}
+.instSubtitle{margin:3px 0 0;color:var(--ui-muted);font-size:13px;line-height:1.45}
+.instClose{flex:none;min-width:42px;padding:8px 12px;border-radius:12px;font-size:14px}
+.instDisplay{position:relative;height:clamp(92px,16vh,142px);min-height:86px;overflow:hidden;background:#071018;border-bottom:1px solid rgba(120,220,255,.2)}
+.instScope{position:absolute;inset:0;width:100%;height:100%;display:block}
+.instDisplayTint{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(2,8,14,.78),transparent 60%),linear-gradient(0deg,rgba(2,8,14,.35),transparent 55%)}
+.instDisplayInfo{position:absolute;left:16px;right:16px;top:12px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;pointer-events:none;text-shadow:0 2px 8px #000}
+.instDisplayMode{font-size:10px;font-weight:900;letter-spacing:.15em;color:#9feeff}
+.instDisplayTrack{max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.instSongRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.16)}
+.instSongBtn{flex:none;padding:7px 11px;border-radius:10px;font-size:12px}
+.instSongBtn:disabled{opacity:.48;cursor:not-allowed}
+.instSongName{flex:1 1 150px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ui-muted);font-size:12px}
+.instSongVolume{display:flex;align-items:center;gap:6px;min-width:150px;font-size:11px;color:var(--ui-muted)}
+.instSongVolume input{width:100px;accent-color:#49d9ff}
+.instBody{overflow-y:auto;min-height:0;padding:10px 14px 14px;overscroll-behavior:contain}
+.instPanel{min-width:0;padding:12px;border:1px solid rgba(255,255,255,.10);border-radius:14px;background:rgba(255,255,255,.035)}
+.instPatchBar{display:flex;align-items:end;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.instPatchBar label{flex:1 1 180px;min-width:130px}
+.instPatchBar .instPatchNameField{flex:1 1 150px}
+.instPatchBar input,.instSelect{width:100%;min-width:0;padding:7px 9px;border-radius:9px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border)}
+.instPatchBar label>span,.instControlName{display:block;margin-bottom:4px;color:var(--ui-muted);font-size:11px;font-weight:750}
+.instSmallBtn{padding:7px 10px!important;border-radius:9px!important;font-size:12px!important;white-space:nowrap}
+.instSmallBtn.selected,.instMapBtn.selected{background:linear-gradient(130deg,#4ae4ff,#5e8bff);border-color:transparent;color:#03101a}
+.instDeletePatch{background:rgba(255,70,90,.12);border-color:rgba(255,70,90,.35)}
+.instColumns{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:10px;margin-bottom:10px}
+.instPanel h3{margin:0 0 7px;font-size:14px}
+.instHint{margin:4px 0 8px;color:var(--ui-muted);font-size:11px;line-height:1.45}
+.instSources{display:grid;gap:7px}
+.instEmptySources{padding:10px;text-align:center;border:1px dashed var(--ui-border);border-radius:10px;color:var(--ui-muted);font-size:12px}
+.instSource{padding:8px;border:1px solid rgba(255,255,255,.09);border-radius:10px;background:rgba(0,0,0,.17)}
+.instSourceHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;font-size:12px}
+.instSourceHead strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.instRemoveSourceBtn{min-width:32px;padding:3px 8px!important;font-size:11px!important;border-radius:8px!important}
+.instSourceGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.instSourceGrid .instControl{margin:0}
+.instSourceActions{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.instSourceActions>*{flex:1 1 130px;justify-content:center}
+.instSampleBtn{font-size:12px}
+.instSampleBtn span{font-size:12px}
+.instSampleHint{margin:0 0 5px}
+.instControl{display:grid;align-content:center;min-width:0;padding:7px;border:1px solid rgba(255,255,255,.07);border-radius:9px;background:rgba(0,0,0,.12)}
+.instControlHead{display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0;margin-bottom:5px}
+.instControlName{margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.instControlValue{flex:none;font:11px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#a7edff}
+.instControl input[type="range"]{width:100%;margin:2px 0;accent-color:#4bdcff;touch-action:pan-y}
+.instSelectControl>span{display:block}
+.instSelectControl select{width:100%;padding:6px}
+.instControls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.instMasterControl{grid-column:1/-1}
+.instPitchControl{border-color:rgba(255,209,102,.28)}
+.instPitchControl .instControlValue{color:#ffe49b}
+.instPitchControl input[type="range"]{accent-color:#ffd166}
+.instPitchHint{grid-column:1/-1;margin:-2px 0 2px!important}
+.instEnvHead{margin-top:12px!important;padding-top:9px;border-top:1px solid rgba(255,255,255,.08)}
+.instPianoPanel{padding-bottom:10px}
+.instPianoHeader{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+.instPianoHeader h3{flex:1 1 200px;margin:0}
+.instMapHint{margin:6px 0}
+.instPianoScroll{overflow-x:auto;overflow-y:hidden;padding:6px 2px 8px;overscroll-behavior-inline:contain;scrollbar-color:rgba(95,210,255,.5) rgba(255,255,255,.06);touch-action:pan-x}
+.instPiano{position:relative;height:164px;min-width:630px;user-select:none;-webkit-user-select:none;touch-action:pan-x}
+.instKey{position:absolute;top:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;height:158px;margin:0;padding:0 1px 5px;border-radius:0 0 8px 8px;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;transition:filter .08s,transform .05s,background .08s}
+.instKey.white{z-index:1;background:linear-gradient(180deg,#fff,#dae0ea);border:1px solid #697586;border-top:0;color:#141a25;box-shadow:0 4px 0 #56606e}
+.instKey.black{z-index:3;height:102px;background:linear-gradient(120deg,#2e3542,#060910 75%);border:1px solid #02040a;color:#eaf5ff;box-shadow:0 4px 0 #000,0 1px 5px #0009}
+.instKey .instNote{font-size:9px;font-weight:800;line-height:1}
+.instKey kbd{min-width:17px;padding:2px 3px;border-radius:4px;font:10px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-align:center;background:rgba(0,0,0,.12)}
+.instKey.black kbd{background:rgba(255,255,255,.12)}
+.instKey.white.pressed{transform:translateY(3px);background:linear-gradient(#a5f3ff,#4fc8ff);box-shadow:0 1px 0 #276884}
+.instKey.black.pressed{transform:translateY(3px);background:linear-gradient(#8df1ff,#136fa5);box-shadow:0 1px 0 #064668}
+.instKey.assignTarget{outline:3px solid #ffe16b;outline-offset:2px;z-index:5;filter:brightness(1.12)}
+.instKey:focus-visible{outline:3px solid #fff;outline-offset:2px;z-index:6}
+.instStatus{min-height:1.4em;margin:5px 0 0;font-size:12px}
+.instFooter{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:7px 14px;border-top:1px solid rgba(255,255,255,.08);color:var(--ui-muted);font-size:10px}
+.instKeyHint{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#b9eaff}
+.instCloseTip{max-width:55%;text-align:right}
+.instOverlay button:focus-visible,.instOverlay [role="button"]:focus-visible,.instOverlay select:focus-visible,.instOverlay input:focus-visible{outline:2px solid #75e4ff;outline-offset:2px}
+@media(max-width:680px){
+  .instOverlay{padding:0}
+  .instDialog{width:100%;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;border-radius:0;border-left:0;border-right:0}
+  .instHeader{padding:12px max(12px,env(safe-area-inset-right)) 9px max(12px,env(safe-area-inset-left))}
+  .instSubtitle{font-size:12px}
+  .instDisplay{height:104px;min-height:86px}
+  .instSongRow{padding:8px 10px;gap:6px}
+  .instSongName{order:3;flex-basis:100%}
+  .instSongVolume{flex:1 1 130px;min-width:120px}
+  .instSongVolume input{flex:1;width:auto}
+  .instBody{padding:8px 9px 10px}
+  .instPatchBar{gap:6px;padding:9px}
+  .instPatchBar label{flex-basis:calc(50% - 6px)}
+  .instPatchBar .instSmallBtn{flex:1 1 calc(33% - 6px)}
+  .instColumns{grid-template-columns:1fr;gap:8px}
+  .instPanel{padding:9px}
+  .instCloseTip{max-width:none;text-align:left}
+  .instFooter{padding-bottom:max(8px,env(safe-area-inset-bottom))}
+}
+@media(prefers-reduced-motion:reduce){.instOverlay *{scroll-behavior:auto!important;transition:none!important}}
 
 /* メイン画面の欄（fx-dock.js）：さわれる本体 */
 #fxDock{display:flex;flex-direction:column;gap:8px}
@@ -1152,3 +1310,8 @@ details.panel[open]>summary{margin-bottom:14px}
   background:var(--specSwatch,currentColor)}
 .specDot:hover{border-color:#fff}
 .specDot.selected{border-color:#fff;box-shadow:0 0 0 2px rgba(0,0,0,.55)}
+
+/* ⏻からシンセを開けることを示すバッジ */
+#fxDock .dockPow{overflow:visible}
+.instPowerBadge{position:absolute;right:-5px;bottom:-5px;z-index:6;display:grid;place-items:center;width:19px;height:19px;border:1px solid rgba(120,220,255,.65);border-radius:50%;background:#071725;color:#b7f4ff;font-size:11px;line-height:1;box-shadow:0 0 10px rgba(55,210,255,.4);pointer-events:none}
+/* ✅ style.css 完了 */

@@ -108,6 +108,7 @@ const settings = {
   mmdScale: num(prefs.mmdScale, .5, 1.8, 1),
   mmdTurn: num(prefs.mmdTurn, -60, 60, 0),
   mmdMotionBpm: num(prefs.mmdMotionBpm, 0, 300, 0),
+  mmdMotionKind: typeof prefs.mmdMotionKind === "string" && prefs.mmdMotionKind !== "file" ? prefs.mmdMotionKind : "none",  // 🩷 選んだ内蔵モーション（mmd.js が実在を検証）
   mmdCredit: typeof prefs.mmdCredit === "string" ? prefs.mmdCredit.slice(0, 120) : "",
   activePack: typeof prefs.activePack === "string" ? prefs.activePack : null,
   previewEnabled: prefs.previewEnabled !== false,
@@ -190,7 +191,7 @@ function resetAllPrefs() {
   settings.scroll = 1; settings.latency = 0; settings.judge = "standard"; settings.rate = 1;
   settings.hidden = false; settings.sudden = false;
   settings.mascot = "skin"; settings.vrmFrame = "full";
-  settings.mmdScale = 1; settings.mmdTurn = 0; settings.mmdMotionBpm = 0;
+  settings.mmdScale = 1; settings.mmdTurn = 0; settings.mmdMotionBpm = 0; settings.mmdMotionKind = "none";
   settings.skin = "shadow"; settings.layout = "classic";
 }
 function exportPrefs(kind) {

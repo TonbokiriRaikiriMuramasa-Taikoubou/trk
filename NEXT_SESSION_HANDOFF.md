@@ -1,122 +1,94 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 # trk! 次回セッション用メモ（NEXT_SESSION_HANDOFF.md）
 
-> 作成：2026-10-04（PR #3「feat(tv): 30 TV skins, 45 video filters, emergency recovery via URL」の続き）
-> 更新：2026-10-04（🎨 カスタムTVスキン → 🎬🖼 選曲中のmp4再生と「確認」タブを追加した回）
-> 更新：2026-10-04（**PR #4**：🎨 カスタムTVスキン／🎬🖼 mp4再生／📺◀▶／📚 曲のタブと棚スキン8種／🧩 アドオン／🩷 MMDマスコット／⭐ お気に入りのフォルダ管理／**▶◀ 演奏中の曲送り設定と 🔎 MMD動作チェック** をまとめた回）
+> 最終更新：**2026-10-05**（PR #4 を main にマージ済み／棚スキン11種を追加した回）
 > このメモは、そのまま次回の最初のメッセージに貼っても再開できます。
 > リポジトリにこのファイルがあれば「`NEXT_SESSION_HANDOFF.md` を読んで現状を確認して」でOKです。
+> 詳しい仕様（ファイル間の約束・保存データ・落とし穴）は **docs/HANDOFF.md** にあります。
 
 ## 0. 次回、最初にやること（5分）
-1. `git fetch origin && git log --oneline -5 origin/main && git status`
-2. `docs/HANDOFF.md` と `NEXT_SESSION_HANDOFF.md` を読む
-3. 実ブラウザで `python3 -m http.server 8000 --bind 0.0.0.0` → F12 Consoleに赤エラーがないか、TVドック30種＋カスタムTV・映像45種が動くか、`?safe=1` が効くか確認
-4. 作業ツリーを壊さない（`git clean` / `git reset --hard` は使わない）
 
-## 1. いまの状態（2026-10-04 時点）
-- 構成：ルートに `index.html` ＋ `css/` ＋ `js/`（tv-presets.js, tv-dock.js, core.js など）＋ `icons/` ＋ `docs/` ＋ `tools/` ＋ `verified.json`
-- モード5（manual/truck/orbit/stage/catch）、スキン9＋TVドック30、レイアウト4、難易度5、画面4、翻訳4言語、SE 115プリセット、**映像フィルター45種**
-- TVドック（`js/tv-dock.js` / `js/tv-presets.js`）：
-  - スキン30種：standard, home(初期), crt, wood, portable, kamishibai, tube, wall, future, projector, phone, arcade, laptop, cinema, car, airplane, vr, aquarium, scope, cctv, gameboy, jumbotron, frame, transparent, toy, cardboard, window, microwave, videowall, hologram
-  - 各スキンに物理デコ（`buildDeco()`）と専用CSS（`css/style.css`）
-  - 家庭用TVはCH表示＋▲▼で映像横切替、＋－で音量／壁掛けTVは `#selectScreen .head` に `wall-mounted` として絶対配置
-  - リセットボタン：映像・TV設定を初期化
-- 🆕 **🎨 カスタムTVスキン（今回追加）**
-  - 設定画面の `#tvMaker`（index.html に素のHTML／配線は `setupTvMaker()`）で色6つ（筐体・画面の枠・画面・ボタン・アクセント・文字）・形4つ（ボタン数3-8／列1-4／角の丸み0-40／画面のふち0-16）・飾り28種・質感3つ（光る／ガラスの反射／走査線）を選べる
-  - ライブプレビュー（`#tvmPreview`。TVドックと同じクラス名で作ってある）、ひな形4つ（standard/crt/wood/future）
-  - 保存：`trk_tv_skins_v1`（最大30個・IDは `custom_tv_…`）、TVドックのスキン一覧に「🎨 名前（n）」で出る
-  - 共有：`trk-tvskin`（JSON）で書き出し／読み込み。読み込むとそのままTVに反映
-  - 見た目は CSS 変数 `--tv-…`（`paintTvVars()`）。CSSは `#tvDock.tvCustom …` と `#tvmPreview.tvCustom …` の2本立て
-  - TVドックの窓口 `window.TrkTV` が version 2 に（`skins()` `skin()` `selectSkin(id)` が増えた）
-- 🆕 **🎬🖼 選曲中にmp4を流す（今回追加）**
-  - 曲を選ぶと、**TVドックの画面にそのmp4が映る**（動いているときだけ。TVスキンの枠・デコ・カスタムTVの色もそのまま）
-  - 「くわしく」のパネルが **🎛 TVの設定 / 🖼 映像の確認** のタブに分かれた
-  - 🖼 確認タブ：`#tvDock .tvpCanvas`（1920×1080）に、**ゲーム画面と同じ見え方**（contain＝黒帯つきで全体）で映像＋フィルター＋オーバーレイを描く。
-    フィルター・TVスキン・暗さ・ぼかし・⏻ をその場で変えて、**再生する前に**確かめられる（止まっていたら音なしで再生を始める）
-  - 設定（2つ）：
-    - `tvMenuPreview`（🖼 選曲中のTVに映像を映す・**初期オン**）→ ドックの画面に映すかどうか
-    - `tvMenuVideo`（🎬 音のプレビューがオフでも、メニューで映像を再生＝**音なし**・**初期オフ**）→ 「選曲中に曲のプレビューを再生する」がオンのときはそちら（音あり）を優先
-  - 音は出さない方針：自分で再生したときだけ `video.muted` を立て、止めるときに戻す（fx-dockの⏻ミュートを壊さない）
-  - 止まる場所：ゲーム開始（phase）／設定画面へ／タブやパネルを閉じる／タブが隠れた
-- 🆕 **📺◀▶ 曲送りボタンと、TV→ラックのならべ方（今回追加）**
-  - TVドックの上段：⏻ → **◀** → 液晶 → **▶** → ⏸（◀▶ は `.tvTop .tvSong`）。押すと選曲リストの前後の曲へ（端は回り込み、液晶に `♪ 曲名`）
-  - 曲の選び方は `library.js` の `nextSong()`（既存）と、**新設した `prevSong()`** に任せる（ラジオと同じ並び・副作用なし）
-  - ならべ方を変更：**TV →（お気に入り）→ ラック →（お気に入り）→ TVくわしい → ラックくわしい** がデフォルト。
-    `applyOrder()` が、それぞれの `<details>`（`.tvMore` / `.dockMore`）をドックの外＝列の下のほうへ並べ直す（TVを壁掛けにしても、くわしいは列に残る）
-  - お気に入り行に**数**を表示（`tvFavLabelN` / `tvFavOverflow`）：お気に入り7個・ボタン6個のように、TVごとの収まり具合が見える
-  - 並び順の設定はそのまま（テレビとラックの上下だけ入れ替え。くわしいは、いつも下のほう）
-- 🆕 **📚 曲のタブ（棚）と、棚スキン8種（今回追加）**
-  - 曲リストの上に、曲の入り口ごとのタブが自動でできる：📚すべて／📦パックごと／📁フォルダーごと（最上位の階層）／📄追加した曲／✔公認
-  - **パックを入れると、そのパックのタブが自動で増える**（新しい曲を探しやすく）。タブの中で検索・並べ替え、TVの◀▶も、いま開いているタブの中を送る
-  - 見た目は棚スキン8種：🎛タブプレーヤー／📝ノート／🌈シール帳／🗄カード目録／📼カセットラベル／🖍黒板／🕹レトロPC／📁クリアファイル
-  - 曲リストの見出しの **🎨 ボタン**で、その場で切り替え（🎲おまかせ付き）。設定画面「見た目」で、スキンの選択と **🎨 ボタンを隠す** ができる
-  - 保存：`shadow_taiko_preferences_v2` の `libTab` / `libSkin` / `libSkinQuick`（新しい保存キーは増やしていません）
-- 🆕 **🧩 アドオン（今回追加）**
-  - 本体に入れられない機能（YouTube の音をエフェクターに通す、など）を、あとから足すためのしくみ
-  - 設定画面「🧩 アドオン」→「📄 アドオンを入れる」で `.js` / `.trk-addon`（JSON）。`trk_addons_v1` に保存
-  - `TrkAddons.register({ id, name, version, apiVersion, setup(api) })`。api は `tr` `el` `$` `addStyle` `on` `emit` `slot` `say` `settings` `savePrefs` `video` `phase` `addSongs` `fx.tapElement` `log`
-  - 置き場所（slot）：settings / libPanel / tvMore / rackMore。曲を足すと曲リストの 🧩 タブに自動でまとまる
-  - `api.fx.tapElement(audio)` で、自前の `<audio>`/`<video>` を本体のEQ・エフェクターに通せる（`fx.js` に追加）
-  - `?safe=1` では読み込まない。壊れたアドオンは、そのアドオンだけ無効（本体は止まらない）
-  - 書き方：`docs/ADDONS.md`、見本：`js/addons/example.js`
-- 🆕 **🩷 MMDマスコット（今回追加。PR #4）**
-  - 設定画面「🩷 MMDマスコット」で、**自分のMMDモデル**（.pmx/.pmd）と `.vmd` を読み込んで動かせる。**モデルとモーションは同梱していない**
-    - MMDの模型は「再配布禁止・MMD/MMM以外での使用禁止・商用不可」がほとんどなので、利用者が自分の端末から持ち込む方式にした（Lat式ミクの「再配布OK」は古いれあどめ由来で、現行の一般規約と衝突するため安全側に倒した）
-    - 内蔵モーション3種（step 120BPM／swing 100BPM／turn 120BPM）は **trk! がコードで作る自作VMD**（`js/mmd.js` の `buildVmd()`。30fps・3フレーム刻み・111B/フレーム・SJISのボーン名）
-  - 規約同意チェック（`mmdAgreed`）→ ファイル入力が有効になる。単体ファイル or **テクスチャごとフォルダ**（`webkitdirectory`）。上限 120MB／400ファイル
-  - 曲のBPMに合わせて速さが変わる：`rate = chartMeta.bpm ÷ mmdBpm`（`mmdBpm` が0なら等速、0.25〜3）。自分の `.vmd` も同じ
-  - つまみ：大きさ `mmdScale`(0.5〜1.8)／向き `mmdTurn`(−60〜60)／合成BPM `mmdBpm`(0〜300)／クレジット `mmdCredit`（画面右下に `MMD: …`）
-  - 保存：`mmdRemember`（既定オン）で IndexedDB `shadow_taiko_mmd` の "model"/"motion" に控え、次回に復元
-  - 読み込み元：three@0.180.0 と **@yohawing/three-mmd-loader 0.8.4**（importmap・CDN。three本体のMMDLoaderは**r175で削除**されたので使えない）
-  - `?safe=1` では読み込まない・復元しない（マスコットが mmd なら skin に戻す）
-  - 検証：`jsdom-mmd.mjs`（偽ライブラリを注入して配線だけ確認）。**CDN・本物のモデル/.vmd は実機でしか試せない**
-- 🆕 **⭐ お気に入りのフォルダ管理（今回追加。PR #4）**
-  - **上限をかけない**方針にした（前回の宿題「お気に入りに上限をかけるか」への回答）。曲・映像フィルター・エフェクトのお気に入りを、**⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り**の4つに分ける
-  - 1軍はこれまでの保存場所のまま（`settings.tvFav` / `fxFav` ＋ 新しい `songFav`）。2軍〜元・ピン・ロックは `settings.favs` に足すだけ（**既存の保存キー・形式は不変**）
-  - 🧊＝フォルダの凍結（🔒中は追加・削除・移動を断る。既定でフリーズだけ凍結。🔓で解除）／📌＝「絶対に外れない」（🎲おまかせの候補に必ず入る。外すにはピンを外す）
-  - 📤元お気に入り＝外したものの置き場。**抽選（🎲）には出ない**。↩で1軍に戻す／🗑で空にする
-  - 曲：曲リストの各行に ☆★ と ⋯、曲タブに **⭐お気に入り**（フォルダのチップ付き）／ドック：チップ＋🔒＋あふれ行の長押しメニュー／設定：**⭐ お気に入り**パネル（一覧・移動・ピン・凍結・📤書き出し・📥読み込み・📋コピー）
-  - 書き出し形式：**`trk-favs`**（JSON。読み込みは足し算＝消さない）
-  - 検証：`jsdom-favs.mjs`（45個でも上限なし／保存と復元／フォルダ切替／凍結／ピン／元お気に入り／書き出し・読み込み／fxの★／曲の⭐タブ／4言語／?safe=1／**コンソールエラー0**）
-- 🆕 **▶◀ 演奏中も◀▶で曲を変える設定（今回追加。PR #4）**
-  - 設定 →🎛設定タブの **「▶◀ 演奏中も ◀▶ で曲を変える」**（`settings.tvSongWhilePlaying`・**初期オフ**）。オンのときだけ、演奏中に TVドックの ◀▶ が効く（`toTitle()` でプレイを閉じて `selectSong()`。記録は残らない）
-  - **キー操作（←/→＝10秒スキップ）は今までどおり**。ゲーム中にキーで曲が飛ぶことはない（初期挙動のまま）
-  - `?safe=1` と「リセット（映像）」では false に戻る
-- 🆕 **🔎 MMDの動作チェック（今回追加。PR #4）**
-  - 設定 →🩷 MMDマスコットの **「🔎 動作チェック（実機で）」** を押すと、WebGL（GPU名つき）・CDN（three／three-mmd-loader）・モデル・モーション・canvas・UA を調べて **1か所に出す**。**「📋 結果をコピー」**で、そのまま貼って聞ける
-  - うまくいかないときの切り分け順：`webgl=false`（環境）→ `three=NG`＋`libError`（CDN）→ `loader=false`（ライブラリ）→ `model=(none)`（読み込み）。`window.TrkMMD.diagnose()` / `check()` / `checkText()` / `lastCheck()` からも取れる
-  - 検証：`jsdom-mmd.mjs` に、ボタン→`#mmdCheckOut` の表示・コピー3経路（clipboard成功／失敗／execCommandなし）・4言語・`?safe=1` を追加
-- 映像フィルター45種：
-  - basic: skin, color, mono, dim, off ／ vivid: vivid, pop, pastel ／ retro: warm, cool, vintage, film, crt, vhs
-  - cinema: cinema, cinemascope, noir, news, commercial ／ effect: night, security, dream, faded, poster, soft
-  - weird: underwater, thermal, xray, nightvision, gameboy, dot, newspaper, blueprint(grid overlay), comic, invert, acid, vaporwave, cyberpunk, matrix, kaleido
-  - nature: sunset, moonlight, aurora, lava, ice
-  - オーバーレイ対応：vignette, grain, crt, vhs, letterbox, scope, scan, bloom, soft, grid
-- 緊急復旧：
-  - URLコマンド：`?safe=1` / `#safe` → セーフモード（映像OFF・ぼかし0・TV初期化・fxPower0）、`?reset=tv` / `video` / `audio` / `notes` / `all` / `factory`、`?export=notes|all|tv|audio`
-  - コンソール：`trkReset('tv')`, `trkExport('notes')`／設定画面に `🛟 緊急復旧` パネル／隠しトリガー（タイトル5回クリック、Ctrl+Shift+S、Esc長押し）／フローティング🛟ボタン／バナー表示（6秒）
-- キャッシュ：`sw.js` CACHE `trk-v2026.10.4-j1`（**今回の更新で変更済み**）
-- PR：#2 元プロジェクト統合版採用、#3 TVドック拡張＋緊急復旧、**#4 🎨カスタムTV／🎬mp4／📚曲タブ・棚スキン／📺◀▶／🧩アドオン／🩷MMD（OPEN）**
-  - 出荷 commit：#4 の D=96f048d、E=1f90656、F=347e863、G=57fc3b1、H=99eb003、I=503d54e、J=（▶◀設定＋🔎動作チェック）
+1. `git fetch origin && git log --oneline -5 origin/main && git status`
+2. **docs/HANDOFF.md** と このメモを読む
+3. 実ブラウザで `python3 -m http.server 8000 --bind 0.0.0.0` → F12 Console に赤エラーがないか、
+   選曲画面（TVドック・曲タブ）／⭐お気に入り／🩷MMD／`?safe=1` をひととおり見る
+4. 作業ツリーを壊さない（**`git clean` / `git reset --hard` は使わない**）
+
+---
+
+## 1. いまの状態（2026-10-05）
+
+### 1-1. main に入っているもの
+
+- **PR #4 をマージ済み**（`0fb3157`、2026-10-04）。Task C〜J が全部 main に入っています：
+  | Task | 内容 | commit |
+  |---|---|---|
+  | C | 🎨 カスタムTVスキンエディタ ＋ `trk-tvskin` 共有 | `7d186d4` |
+  | D | 🎬🖼 選曲中にmp4を流す（ドックの画面＋「映像の確認」タブ） | `96f048d` |
+  | E | 📺◀▶ 曲送りボタンと、TV→ラック→くわしい×2 のならべ方 | `1f90656` |
+  | F | 📚 曲のタブ（棚）と、棚スキン | `347e863` |
+  | G | 🧩 アドオン（あとから機能を足すしくみ） | `57fc3b1` |
+  | H | 🩷 MMDマスコット（モデル・モーションは持ち込み式） | `99eb003` |
+  | I | ⭐ お気に入りのフォルダ管理（上限なし・1軍/2軍/🧊/📤元） | `503d54e` |
+  | J | ▶◀ 演奏中も曲を送る設定（初期オフ）＋ 🔎 MMD動作チェック | `89ba00e` |
+  | — | fix: お気に入り一覧の名前がIDで出ていたのを修正 | `0975e05` |
+- これまでの PR：#2 元プロジェクト統合版 → #3 TVドック拡張＋緊急復旧 → **#4（上記）**。
+- いまの作業ブランチ：**`arena/01a106fc-trk`**（PR #5＝棚スキン11種＋ドキュメント整理）
+
+### 1-2. 規模（数字で見る現在地）
+
+| 項目 | 数 |
+|---|---|
+| モード | 5（manual / truck / orbit / stage / catch）＋ AUTO・ラジオ・練習 |
+| スキン | 9（ノーツの見た目）／TVドック **30**（＋カスタム最大30） |
+| 映像フィルター | **45**（basic/vivid/retro/cinema/effect/weird/nature） |
+| サウンドエフェクト | **115 プリセット**（fx.js・fx-presets.js は🧊凍結中） |
+| 曲リストの棚スキン | **11**（＋🎲おまかせ） |
+| 言語 | 4（ja/en/zh/ko）・**992 キー × 4**（欠け0・生キー0） |
+| 記録 | 難易度5・速度別・称号・公認パック（✔） |
+
+### 1-3. 機能の要点（詳細は docs/HANDOFF.md）
+
+- **TVドック（tv-dock.js）**：スキン30種＋カスタムTV。◀▶ で曲送り、家庭用TVの▲▼で映像横切替、選曲中は画面にmp4。
+- **◀▶ の演奏中送り**：設定 →🎛設定タブの **「▶◀ 演奏中も ◀▶ で曲を変える」**（`settings.tvSongWhilePlaying`・**初期オフ**）。
+  オンのときだけ、演奏中でも押したその場で曲が切り替わる（**記録は残らない**）。**キー（←/→＝10秒スキップ）は従来のまま**。
+- **棚スキン（lib-skins.js）11種**：🎛タブプレーヤー／📝ノート／🌈シール帳／🗄カード目録／📼カセットラベル／🖍黒板／
+  🕹レトロPC／📁クリアファイル／**🎰ジュークボックス／📻ラジオ番組表／🚉電光掲示板**（2026-10-05 追加）。
+  曲リストの 🎨 ボタンでその場で切り替え（`settings.libSkin` / `libSkinQuick`）。
+- **⭐ お気に入り（favs.js）**：曲・映像フィルター・エフェクトの3系統を **⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り** の4フォルダで管理。
+  **上限なし**、🧊＝凍結、📌＝「絶対に外れない」（🎲の候補に必ず入る）、📤元は抽選に出ない、`trk-favs` で書き出し／読み込み（足し算）。
+- **🩷 MMD（mmd.js）**：モデル（.pmx/.pmd）と .vmd は**同梱せず持ち込み**。内蔵モーション3種は自作VMD。曲のBPMに同期。
+  **🔎 動作チェック**（設定 →🩷 MMDマスコット）で、WebGL・CDN・モデル・モーションの状態を1か所に出せる（📋 結果をコピー）。
+- **🧩 アドオン（addons.js）**：`.js` / `.trk-addon` を入れて、設定・曲リスト・TV/ラックのくわしい欄にUIを足す／曲を足す／
+  自前の音を `api.fx.tapElement` でエフェクターに通す。`trk_addons_v1`。`?safe=1` では読み込まない。
+- **🛟 緊急復旧**：`?safe=1` / `?reset=tv|video|audio|notes|all|factory` / `?export=…`、コンソール `trkReset()` `trkExport()`。
+- キャッシュ：`sw.js` の `CACHE` は **`trk-v2026.10.5-shelf1`**（公開を更新したら必ず変える）。
+
+---
 
 ## 2. 未確認・次の候補
-0. **🩷 MMDの実機確認（最優先）**：CDNから three／three-mmd-loader が読めるか／Lat式ミク・タワシ式CHAN×CO系ミクの .pmx が動くか／テクスチャ付きフォルダ／自分の .vmd が曲に合うか／モバイル幅の見え方
-   - **確認の手順＝設定 →🩷 MMDマスコット →🔎 動作チェック →📋 結果をコピー → 貼って送ってもらう**（これで切り分ける）
-   - 前回までの未回答の質問は、どちらも回答済み：お気に入りの上限＝**かけない**（Task I）／演奏中も◀▶＝**設定でオンにできる（初期オフ）**（Task J）
-1. 実ブラウザで全30スキン＋カスタムTV・45フィルターの見た目確認（特に新20スキンのモバイル表示、`#tvMaker` の900px以下の1列表示、🎬ドックの画面に映る映像の見え方）
-2. カスタムTVの実機確認：壁掛け→自作TVに戻ったときヘッダーから曲リストへ戻るか（jsdomでは確認済み）、プロジェクター/透明スキンと併用したときの見え方
-3. `?safe=1` 後の壁掛けTV位置がヘッダーで被らないか微調整（right:140px → headToolsとの兼ね合い）
-4. カスタムTVのオーバーレイ（grid）の見た目をもう少し派手に／他にrainbowやdots追加？
-5. TVスキンごとのお気に入りスロット数（n）のバランス調整（8は多い？）
-6. 映像フィルターの共有URL：`?tv=underwater&skin=arcade` のような共有リンク生成（カスタムTVのIDも載せられる）
-6.5. 🎬 続きの候補：確認タブの映像を**一時停止・シーク**できるようにする／`tvpWrap` の下に「この設定で遊ぶ」ボタン／TVの画面の映像に**音量メーターやスペクトラム**を重ねる（`TrkFX.tap()` は音声エフェクト用なので映像には使えない点に注意）
-7. TV画面に音声スペクトラム表示（`TrkFX.tap()` 使用）
-8. カスタムTVスキンの追加機能：柄（グラデーション/木目/ドット）・LCDの色・スキンの複製ボタン・サムネイル一覧
-9. 選曲画面のTVドックとFXドックの並び順をドラッグで入れ替え
-10. Pagesデプロイ確認（og.png, icons）／スマホ実機確認
-11. About / NOTICE / README のライセンス表記を最新に
 
-### 💭 YouTube連携について（今回の会話の結論・未実装）
+0. **🩷 MMDの実機確認（最優先。2026-10-04から持ち越し）**
+   - CDNから three／three-mmd-loader が読めるか／Lat式ミク・タワシ式CHAN×CO系ミクの .pmx が動くか／
+     テクスチャ付きフォルダ／自分の .vmd が曲に合うか／モバイル幅の見え方
+   - **手順＝設定 →🩷 MMDマスコット →🔎 動作チェック →📋 結果をコピー → 貼って送る**（切り分けは `webgl=` → `three=NG`＋`libError` → `loader=` → `model=` の順）
+1. **🎰📻🚉 新しい棚スキン3種の実機の見た目**（モバイル幅・長い曲名のタブ・タブが1つのとき）
+2. 実ブラウザで全30スキン＋カスタムTV・45フィルターの見た目（特に新20スキンのモバイル表示、`#tvMaker` の900px以下の1列表示、🎬ドックの画面に映る映像の見え方）
+3. カスタムTVの実機確認：壁掛け→自作TVに戻ったときヘッダーから曲リストへ戻るか（jsdomでは確認済み）、プロジェクター/透明スキンと併用したときの見え方
+4. `?safe=1` 後の壁掛けTV位置がヘッダーで被らないか微調整（right:140px → headToolsとの兼ね合い）
+5. カスタムTVのオーバーレイ（grid）の見た目をもう少し派手に／他に rainbow や dots を足す？
+6. TVスキンごとのお気に入りスロット数（n）のバランス調整（8は多い？）
+7. 映像フィルターの共有URL：`?tv=underwater&skin=arcade` のような共有リンク生成
+8. 🎬 続きの候補：確認タブの映像を**一時停止・シーク**できるようにする／`tvpWrap` の下に「この設定で遊ぶ」ボタン／TVの画面に**スペクトラム**を重ねる
+9. カスタムTVスキンの追加機能：柄（グラデーション/木目/ドット）・LCDの色・スキンの複製ボタン・サムネイル一覧
+10. 選曲画面のTVドックとFXドックの並び順をドラッグで入れ替え
+11. Pagesデプロイ確認（og.png, icons）／スマホ実機確認／About・NOTICE・README のライセンス表記を最新に
+12. 曲管理の続き（アイデア）：💿レコード棚／📼レンタルビデオ屋／🎤カラオケ目次／🗂️図書館の書架／🍱お品書き など
+
+**前回までの未回答の質問は、どちらも回答済み**：お気に入りの上限＝**かけない**（Task I）／演奏中も◀▶＝**設定でオンにできる（初期オフ）**（Task J）
+
+### 💭 YouTube連携について（結論・未実装）
+
 - **ストリームのダウンロード／抽出はNG**。YouTube利用規約 5.1.8（アクセス・複製・ダウンロード・配信などの禁止）に明確に反する。私的利用でも規約違反で、再配布は著作権法上もNG。非営利で公開しているtrk!には入れない方針
 - **公式の埋め込みプレーヤー（IFrame Player API）なら規約内**。ただし：
   - 音はクロスオリジンのiframeなので **Web Audio に取れない** → fx.js のエフェクト（EQ・空間系など）は**かけられない**
@@ -124,41 +96,48 @@
   - 音が取れない＝**譜面の自動生成には使えない**（プレイヤーとして見るだけ）
 - やるなら「選曲画面に 📺 YouTube タブ → 公式埋め込み＋映像フィルター＋公式APIの再生速度/音量」まで。やるかどうかは次回決める
 
+---
+
 ## 3. 触るときの約束
-- 保存キー：shadow_taiko_preferences_v2, _records_v1, _best_v1, _song_prefs_v1, _custom_skins_v1, trk_fx_presets_v1, trk_tv_skins_v1, trk_addons_v1, IndexedDB shadow_taiko_packs/_songs/_library/_vrm/**（新）_mmd**
-- 形式名：shadow-taiko-pack / chart / records / skin.shadow-taiko / trk-fx / trk-verified / **trk-tvskin**, 譜面ファイル *.shadow-taiko.json
-- 読み込み順：tv-presets.js → core.js → fx-dock.js → tv-dock.js → fx.js → library.js … player.jsはcore直後、**mmd.jsはvrm.jsの直後**
-- 関数を包む方式：包まれる側をconstにしない（function宣言のまま）— tv-dock.js は `videoFilter` と `drawVideo` を包む
-- 翻訳：4言語すべて、キーは接頭辞分け（tv… / tvm…（カスタムTV） / sfx… / vf… / **mmd…（MMD）** / **libTab…（曲のタブ）**）、tr()は未定義キーをそのまま表示
-- 音：createMediaElementSourceは一度だけ、TrkFX.tap()を使う
-- 公開更新したらsw.jsのCACHE名を変える — 今回 `trk-v2026.10.4-j1`
+
+- **保存キー（変えない）**：`shadow_taiko_preferences_v2` / `_records_v1` / `_best_v1` / `_song_prefs_v1` / `_custom_skins_v1` / `trk_fx_presets_v1` / `trk_tv_skins_v1` / `trk_addons_v1` / IndexedDB `shadow_taiko_packs` `_songs` `_library` `_vrm` `_mmd`
+  - 新しく足したのは **`settings.favs` / `settings.songFav`**（＋既存キーの中の新しい項目 `tvSongWhilePlaying` `mmd*` `libTab` `libSkin` `libSkinQuick`）。既存キーと形式名はそのまま
+- **形式名（変えない）**：`shadow-taiko-pack` / `chart` / `records` / `skin` / `trk-fx` / `trk-verified` / `trk-tvskin` / **`trk-favs`**、譜面ファイル `*.shadow-taiko.json`
+- **読み込み順**：`tv-presets.js → core.js → fx-dock.js → tv-dock.js → fx.js → favs.js → library.js → verified.js → lib-skins.js → addons.js → main.js → speed.js → vrm.js → mmd.js`（player.js は core の直後、mmd.js は vrm.js の直後）
+- **関数を包む方式**：包まれる側を `const` にしない（`function` 宣言のまま）— tv-dock.js が `videoFilter` と `drawVideo` を、favs.js が fx の ★ を包む
 - **新しい設定を足したときの3点セット**：①`core.js` の `enterSafeMode()` ②`resetVideoPrefs()` ③読み戻し側（`tv-dock.js` の `keepSafe`＝`?safe=1` では保存値を読み戻さない）。どれか忘れると `?safe=1` が効かなくなる
-- MMD：**モデル・モーションをリポジトリに入れない**（持ち込み式）。内蔵モーションは自作VMDのみ。`three/addons/loaders/MMDLoader.js` を足さない（r180に無い）
-- ライセンス：新ファイル先頭に SPDX／初音ミク：js/characters/miku.jsだけに集約／素材：権利のあるものだけ
-- GitHub Pagesは大文字小文字区別
-- TVドックに内蔵スキンを足すとき：TV_DOCK_SKINSにエントリ → buildDeco()に分岐 → css/style.cssにスキンCSS → 必要ならオーバーレイ追加
-- カスタムTVの飾り（deco）を足すとき：`buildDeco()` と `TV_DECO_KEYS` の両方に（ラベルは内蔵スキンから借りる）
+- **翻訳**：4言語すべて更新。キーは接頭辞で分ける（`tv…` / `tvm…` / `sfx…` / `vf…` / `mmd…` / `libTab…` / `libSkin…` / `fav…`）。生のキー表示は禁止（`jsdom-i18n-audit.mjs` で点検できる）
+- **音**：`createMediaElementSource` は一度だけ → `TrkFX.tap()`。アドオンは `api.fx.tapElement()`
+- **スキンの足し方**：
+  - TVドック：`TV_DOCK_SKINS` にエントリ → `buildDeco()` に分岐 → `css/style.css` にスキンCSS → 必要ならオーバーレイ
+  - カスタムTVの飾り：`buildDeco()` と `TV_DECO_KEYS` の両方に
+  - **棚スキン：`css/style.css` に `#libPanel[data-lib-skin="…"]` の1ブロック ＋ `js/lib-skins.js` の `LIB_SKIN_ORDER`（順番）と `LIB_SKINS`（icon ＋4言語ラベル）に1行**
+- **MMD**：**モデル・モーションをリポジトリに入れない**（持ち込み式）。内蔵モーションは自作VMDのみ。`three/addons/loaders/MMDLoader.js` を足さない（r180に無い）
+- **ライセンス**：新ファイルの先頭に SPDX（GPL-3.0-or-later）／初音ミクは `js/characters/miku.js` だけに集約（PCL）／素材は権利のあるものだけ
+- GitHub Pages は**大文字小文字を区別**する。公開を更新したら `sw.js` の `CACHE` 名を変える
+
+---
 
 ## 4. 検証のしかた
+
 ```sh
 python3 -m http.server 8000 --bind 0.0.0.0
 # 別ターミナル
-for f in js/*.js js/characters/*.js; do node --check "$f" || echo "NG: $f"; done
-# ブラウザで
-# - http://localhost:8000/?safe=1 → セーフモードバナー
-# - http://localhost:8000/?reset=tv → 映像リセットバナー／?export=notes → JSONダウンロード
-# - 設定 → 🖼 表示 → 🎨 カスタムTVスキン：色を変えてプレビューが変わるか、「＋ 新規保存」でTVドックに反映されるか
-# - TVドック30種切り替え、家庭用TVの▲▼、gridオーバーレイ（青焼き）、右下🛟ボタン
+for f in js/*.js js/characters/*.js js/addons/*.js; do node --check "$f" || echo "NG: $f"; done
 ```
-- 実ブラウザが使えない環境では **jsdom** でも配線ミスを拾える（読み込みエラー0・新規保存・上書き・読み込み・削除・再読み込みの復元・翻訳キーの抜け）
-  - 例：`npm i jsdom` して、index.html の script を `vm.runInContext` で順に流し、DOMContentLoaded を発火 → コンソールエラーと DOM を見る
-  - canvas は `getContext` をスタブする（無いと render.js で落ちる）。**`createImageData` も返す**こと（TV砂嵐が `img.data` を読む。忘れると毎フレーム jsdomError が出て、製品側のバグに見える）
-  - ハーネスは12本＋`jsdom-mmd.mjs`（Task H）。`cd` して `for f in jsdom-*.mjs; do node "$f"; done`。
-    - MMDのハーネスは本物のCDNに届かないので、ページ内に**偽の three／three-mmd-loader** を流し込んで `TrkMMD._injectLibs()` で差し替える
-    - 確認していること：VMDのバイト列とSJIS・同意ゲート・CDN不達→`mmdNetError`・モデル読み込みとIndexedDB保存・誤形式→`mmdVmdBad`・大きすぎ→`mmdTooBig`・フォルダ読み・BPM同期・playing/previewの描画・4言語・`?safe=1`
+
+- 実ブラウザが使えない環境では **jsdom** で配線を拾える（`npm i jsdom` → `/home/user/browsercheck` で `for f in jsdom-*.mjs; do node "$f"; done`）
+  - canvas は `getContext` をスタブする。**`createImageData` も返す**こと（TV砂嵐が `img.data` を読む）
+  - ハーネスは **17本**：`smoke` `func` `i18n` `lang-fav` `libtabs` `menu` `order2` `prev` `rack` `reload` `skinbtn` `dock` `addons` `favs` `mmd` `songwhile` `i18n-audit`
+    - `jsdom-mmd.mjs` は本物のCDNに届かないので、ページ内に**偽の three／three-mmd-loader** を流し込んで `TrkMMD._injectLibs()` で差し替える
+    - `jsdom-i18n-audit.mjs` は静的監査（992キー×4言語の欠け／生キー／コードが使うキーの実在）。**エラー0が正常**
+  - 調査用（テスト本数に数えない）：`jsdom-dump.mjs`・`jsdom-debug*.mjs`（exit 1 が正常）、`safeprobe.mjs`（`?safe=1` の設定をJSONで出す・exit 0 が正常）、`probe-*.mjs`
+
+---
 
 ## 5. 手動チェックリスト
-- [ ] F12 Consoleに赤いエラーが出ていない
+
+- [ ] F12 Console に赤いエラーが出ていない
 - [ ] 選曲画面のTVドックが表示され、30スキン切り替えできる
 - [ ] 家庭用TVの▲▼で映像が横に切り替わる、＋－で音量変わる
 - [ ] 壁掛けTV選択時、ヘッダー右上に移動し、他スキン（自作TV含む）に戻すとsongColに戻る
@@ -180,15 +159,18 @@ for f in js/*.js js/characters/*.js; do node --check "$f" || echo "NG: $f"; done
 - [ ] 緊急パネルでノーツ書き出し・全設定書き出し・読み込みができる
 - [ ] タイトルを5回クリックでセーフモード確認ダイアログ／右下🛟ボタンで?safe=1に遷移
 - [ ] デモ（Pulse Study）で遊べる・音が鳴る
+- [ ] 📚 曲のタブ：パックを入れるとタブが増える／タブの中で検索・並べ替えができる／TVの◀▶がそのタブの中で動く
+- [ ] 📚 棚スキン11種：🎨 ボタンでその場で切り替わる（🎰ジュークボックス・📻ラジオ番組表・🚉電光掲示板を含む）／設定で🎨ボタンを隠せる
 - [ ] ⭐ お気に入り：ドックのチップで1軍／2軍／🧊が切り替わり、ボタンの中身が入れ替わる
 - [ ] ⭐ お気に入り：🔒で凍結（追加できない）→🔓で解除、📌ピンは🎲の候補に必ず入る、外したものは📤元から戻せる
 - [ ] ⭐ お気に入り：曲の行の☆★と ⭐タブ、設定の「⭐ お気に入り」で書き出し／読み込みができる
 - [ ] 🩷 MMD：規約同意 → モデル（単体／フォルダ）を読み込むと、マスコットが MMD になり動く
 - [ ] 🩷 MMD：内蔵モーション3種と自分の .vmd が切り替わり、曲のBPMに合う（`mmdBpm` を変えると速さが変わる）
 - [ ] 🩷 MMD：大きさ・向き・クレジットが効く／「保存」を入れておくとリロードしても残る
-- [ ] 🩷 MMD：`?safe=1` では読み込まれず、マスコットが「オレンジ相棒」に戻る（赤エラーが出ない）
 - [ ] 🩷 MMD：🔎 動作チェックで `webgl=true`・`three=<版>`・`loader=true` が出る（だめなときは 📋 でコピーして貼る）
+- [ ] 🩷 MMD：`?safe=1` では読み込まれず、マスコットが「オレンジ相棒」に戻る（赤エラーが出ない）
 - [ ] ▶◀ 設定「演奏中も ◀▶ で曲を変える」：オフなら演奏中は何も起きず、オンなら押した曲に切り替わる（記録は残らない）
-- [ ] 言語4種切り替えで生キーが出ない（カスタムTV・MMDの画面も）
+- [ ] 🧩 アドオン：`js/addons/example.js` を入れてボタンが出る（`?safe=1` で入らなくなる）
+- [ ] 言語4種切り替えで生キーが出ない（カスタムTV・MMD・お気に入り・棚スキンの画面も）
 - [ ] 設定を変えてリロード→残っている
 - [ ] PWA：インストールできる／オフラインで再読み込みできる

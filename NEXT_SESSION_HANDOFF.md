@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 # trk! 次回セッション用メモ（NEXT_SESSION_HANDOFF.md）
 
-> 最終更新：**2026-10-05**（音ゲー機能強化＋FAST/SLOW・あべこべ・でたらめ＋棚スキン16種＋TV共有URL・確認タブ強化＋アンテナカスタマイズ＋GitHub Issuesテンプレートの回）
+> 最終更新：**2026-10-05**（📊スペクトラム（音の見える化＋TVに重ねる）の回 ＋ tvMakerOpen 生キー修正）
 > このメモは、そのまま次回の最初のメッセージに貼っても再開できます。
 > リポジトリにこのファイルがあれば「`NEXT_SESSION_HANDOFF.md` を読んで現状を確認して」でOKです。
 > 詳しい仕様（ファイル間の約束・保存データ・落とし穴）は **docs/HANDOFF.md** にあります。
@@ -82,6 +82,18 @@
   - 選曲画面（フッター）だけでなく、演奏終了後のリザルト画面（`#endScreen`）下部にも直接投稿リンク（`feedbackLink`, `chartFeedbackLink`、4言語対応）を配備。
 - 検証：`jsdom-mmdpreset.mjs`（18本目）全部OK／`node --check` 全ファイルOK
 
+### 1-1c. 今回（arena/01a10848-trk）でやったこと
+
+- **📊 スペクトラム（音の見える化）**：新ファイル `js/spectrum.js`
+  - `TrkFX.tap(2048)` で**エフェクト後の音**を読み、**バー／ミラー／波形／リング**の4つの見え方＋**4色**（ネオン／夕焼け／モノクロ／レインボー）、**感度**スライダー、**ピークの残像**を描きます。
+  - 置き場所は2つ：**🎛 ラックの「⚙ 詳しい設定」の中**（大きな画面・その場で見え方を確認）と、**設定画面「🔊 サウンド」の下の `#specPanel`**（こちらにもキャンバスあり）。
+  - **📺 TVの画面に重ねられます**（`settings.specTv`・初期オフ。`mix-blend-mode:screen` で映像の上に重なる。ゲーム中は出ません）。
+  - アナライザーは1つを使い回し、**ユーザー操作のあと／実際に音が鳴っているときだけ**作ります（`createMediaElementSource` は呼びません＝fx.js の担当）。音を見ていないときは 4fps に落ちて休みます。
+  - **`?safe=1`** では読み戻さず、表示もせず、`tap()` もしません。`prefers-reduced-motion` では本数とピークを減らします。
+  - 新しい設定：`specOn`／`specStyle`／`specTheme`／`specGain`／`specPeaks`／`specTv`（core.js の `settings`・`enterSafeMode()`・`resetVideoPrefs()` に追加済み）。窓口は **`window.TrkSpec`**（version 1）。
+- **🐛 生キーの修正**：TVドックの「🎨 カスタムTVスキンを作る」ボタンが `tvMakerOpen` という**生キー**で表示されていたのを `tvmOpen` に修正（新しく作った i18n 監査で発見）。
+- **検証**：`node --check` 全ファイルOK／jsdom ハーネス3本（`jsdom-smoke` 7/7・`jsdom-spectrum` 43/43・`jsdom-i18n-audit` 10/10・エラー0）。翻訳キーは **1067キー × 4言語**（欠け0・二重定義0・生キー0）。
+
 ### 1-2. 規模（数字で見る現在地）
 
 | 項目 | 数 |
@@ -91,7 +103,7 @@
 | 映像フィルター | **45**（basic/vivid/retro/cinema/effect/weird/nature） |
 | サウンドエフェクト | **115 プリセット**（fx.js・fx-presets.js は🧊凍結中） |
 | 曲リストの棚スキン | **16**（＋🎲おまかせ） |
-| 言語 | 4（ja/en/zh/ko）・**992+ キー × 4**（欠け0・生キー0） |
+| 言語 | 4（ja/en/zh/ko）・**1067 キー × 4**（欠け0・生キー0・二重定義0） |
 | 記録 | 難易度5・速度別・称号・公認パック（✔） |
 
 ### 1-3. 機能の要点（詳細は docs/HANDOFF.md）
@@ -104,6 +116,7 @@
 - **棚スキン（lib-skins.js）16種**：🎛タブプレーヤー／📝ノート／🌈シール帳／🗄カード目録／📼カセットラベル／🖍黒板／
   🕹レトロPC／📁クリアファイル／🎰ジュークボックス／📻ラジオ番組表／🚉電光掲示板 ＋ **💿レコード棚／📼レンタルビデオ／🎤カラオケ目次／🗂️図書館の書架／🍱お品書き**（全16種）。
   曲リストの 🎨 ボタンでその場で切り替え（`settings.libSkin` / `libSkinQuick`）。
+- **📊 スペクトラム（spectrum.js）**：`TrkFX.tap()` でエフェクト後の音を見て、バー／ミラー／波形／リング＋4色で描きます。置き場所は 🎛 ラックの「くわしい」の中と設定画面の `#specPanel`。**📺 TVの画面に重ねられます**（初期オフ。`settings.specTv`）。窓口は **`window.TrkSpec`**、保存は `specOn`／`specStyle`／`specTheme`／`specGain`／`specPeaks`／`specTv`。`?safe=1` では出さず、tap もしません。
 - **⭐ お気に入り（favs.js）**：曲・映像フィルター・エフェクトの3系統を **⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り** の4フォルダで管理。
   **上限なし**、🧊＝凍結、📌＝「絶対に外れない」（🎲の候補に必ず入る）、📤元は抽選に出ない、`trk-favs` で書き出し／読み込み（足し算）。
 - **🩷 MMD（mmd.js）**：モデル（.pmx/.pmd）と .vmd は**同梱せず持ち込み**。内蔵モーション3種は自作VMD。曲のBPMに同期。
@@ -126,6 +139,11 @@
    - CDNから three／three-mmd-loader が読めるか／Lat式ミク・タワシ式CHAN×CO系ミクの .pmx が動くか／
      テクスチャ付きフォルダ／自分の .vmd が曲に合うか／モバイル幅の見え方
    - **手順＝設定 →🩷 MMDマスコット →🔎 動作チェック →📋 結果をコピー → 貼って送る**（切り分けは `webgl=` → `three=NG`＋`libError` → `loader=` → `model=` の順）
+0c. **📊 スペクトラムの実機確認（新）**
+   - 音に合わせて動くか（バー／ミラー／波形／リング）／色と感度・ピークが効くか
+   - **最初に使ったときに音が黙らないか**（アナライザーは操作のあとに作る作り。もし黙ったら教えてください＝作りを変えます）
+   - 📺 TVに重ねたときの見え方（家庭用TV・映画館・ゲームボーイ・プロジェクターなどとの相性）
+   - モバイル幅／設定画面とラックの「くわしい」の両方／`?safe=1` で出ないこと／エフェクトをオンにしたときの見え方
 1. **🎰📻🚉 新しい棚スキン3種の実機の見た目**（モバイル幅・長い曲名のタブ・タブが1つのとき）
 2. 実ブラウザで全30スキン＋カスタムTV・45フィルターの見た目（特に新20スキンのモバイル表示、`#tvMaker` の900px以下の1列表示、🎬ドックの画面に映る映像の見え方）
 3. カスタムTVの実機確認：壁掛け→自作TVに戻ったときヘッダーから曲リストへ戻るか（jsdomでは確認済み）、プロジェクター/透明スキンと併用したときの見え方
@@ -133,7 +151,7 @@
 5. カスタムTVのオーバーレイ（grid）の見た目をもう少し派手に／他に rainbow や dots を足す？
 6. TVスキンごとのお気に入りスロット数（n）のバランス調整（8は多い？）
 7. 映像フィルターの共有URL：`?tv=underwater&skin=arcade` のような共有リンク生成
-8. 🎬 続きの候補：確認タブの映像を**一時停止・シーク**できるようにする／`tvpWrap` の下に「この設定で遊ぶ」ボタン／TVの画面に**スペクトラム**を重ねる
+8. 🎬 続きの候補：確認タブの映像を**一時停止・シーク**できるようにする／`tvpWrap` の下に「この設定で遊ぶ」ボタン（→ どちらも 2026-10-05 に入りました）／TVの画面に**スペクトラム**を重ねる（→ **実装済み**・0c の実機確認へ）
 9. カスタムTVスキンの追加機能：柄（グラデーション/木目/ドット）・LCDの色・スキンの複製ボタン・サムネイル一覧
 10. 選曲画面のTVドックとFXドックの並び順をドラッグで入れ替え
 11. Pagesデプロイ確認（og.png, icons）／スマホ実機確認／About・NOTICE・README のライセンス表記を最新に
@@ -157,11 +175,13 @@
 - **保存キー（変えない）**：`shadow_taiko_preferences_v2` / `_records_v1` / `_best_v1` / `_song_prefs_v1` / `_custom_skins_v1` / `trk_fx_presets_v1` / `trk_tv_skins_v1` / `trk_addons_v1` / IndexedDB `shadow_taiko_packs` `_songs` `_library` `_vrm` `_mmd`
   - 新しく足したのは **`settings.favs` / `settings.songFav`**（＋既存キーの中の新しい項目 `tvSongWhilePlaying` `mmd*`（**`mmdMotionKind` `mmdQuickUI` `mmdMotionFavs` 含む**） `libTab` `libSkin` `libSkinQuick`）。既存キーと形式名はそのまま
 - **形式名（変えない）**：`shadow-taiko-pack` / `chart` / `records` / `skin` / `trk-fx` / `trk-verified` / `trk-tvskin` / **`trk-favs`**、譜面ファイル `*.shadow-taiko.json`
-- **読み込み順**：`tv-presets.js → core.js → fx-dock.js → tv-dock.js → fx.js → favs.js → library.js → verified.js → lib-skins.js → addons.js → main.js → speed.js → vrm.js → mmd.js`（player.js は core の直後、mmd.js は vrm.js の直後）
+- **読み込み順**：`tv-presets.js → core.js → fx-dock.js → tv-dock.js → fx.js → favs.js → library.js → verified.js → lib-skins.js → addons.js → main.js → speed.js → vrm.js → mmd.js → spectrum.js`（player.js は core の直後、mmd.js は vrm.js の直後、spectrum.js は**いちばん最後**）
 - **関数を包む方式**：包まれる側を `const` にしない（`function` 宣言のまま）— tv-dock.js が `videoFilter` と `drawVideo` を、favs.js が fx の ★ を包む
-- **新しい設定を足したときの3点セット**：①`core.js` の `enterSafeMode()` ②`resetVideoPrefs()` ③読み戻し側（`tv-dock.js` の `keepSafe`＝`?safe=1` では保存値を読み戻さない）。どれか忘れると `?safe=1` が効かなくなる
+- **新しい設定を足したときの3点セット**：①`core.js` の `enterSafeMode()` ②`resetVideoPrefs()` ③読み戻し側（`tv-dock.js` の `keepSafe`＝`?safe=1` では保存値を読み戻さない。**spectrum.js は自前で `specSafe` を見て読み戻しを止めています**）。どれか忘れると `?safe=1` が効かなくなる
 - **翻訳**：4言語すべて更新。キーは接頭辞で分ける（`tv…` / `tvm…` / `sfx…` / `vf…` / `mmd…` / `libTab…` / `libSkin…` / `fav…`）。生のキー表示は禁止（`jsdom-i18n-audit.mjs` で点検できる）
 - **音**：`createMediaElementSource` は一度だけ → `TrkFX.tap()`。アドオンは `api.fx.tapElement()`
+  - 📊 スペクトラム（spectrum.js）は `TrkFX.tap(2048)` を**1つだけ使い回す**（呼ぶたびに `G.out` へぶら下がるため）。作るのは**ユーザー操作のあと＋実際に音が鳴っているときだけ**（`?safe=1` では作らない）
+  - ⚠ 使うと音が Web Audio を通ります（エフェクト未使用でも `G.ac` ができます）。`fxDelayMs()` はコンプ／リミッターがオフなら 0 のままなので判定・記録には影響しません
 - **スキンの足し方**：
   - TVドック：`TV_DOCK_SKINS` にエントリ → `buildDeco()` に分岐 → `css/style.css` にスキンCSS → 必要ならオーバーレイ
   - カスタムTVの飾り：`buildDeco()` と `TV_DECO_KEYS` の両方に
@@ -185,7 +205,9 @@ for f in js/*.js js/characters/*.js js/addons/*.js; do node --check "$f" || echo
 
 - 実ブラウザが使えない環境では **jsdom** で配線を拾える（`npm i jsdom` → `/home/user/browsercheck` で `for f in jsdom-*.mjs; do node "$f"; done`）
   - canvas は `getContext` をスタブする。**`createImageData` も返す**こと（TV砂嵐が `img.data` を読む）
-  - ハーネスは **18本**：`smoke` `func` `i18n` `lang-fav` `libtabs` `menu` `order2` `prev` `rack` `reload` `skinbtn` `dock` `addons` `favs` `mmd` `songwhile` `i18n-audit` `mmdpreset`
+  - ⚠ **2026-10-05 の時点で、ハーネスは3本だけです**（サンドボックスが入れ替わったため、前回までの18本は残っていません）。作り直したのは `jsdom-smoke.mjs`（起動・赤エラー0）／`jsdom-spectrum.mjs`（📊 スペクトラム 43項目）／`jsdom-i18n-audit.mjs`（4言語の欠け・二重定義・生キー・コードが使うキーの実在）。
+    共通部分は `trkenv.mjs` にあります（**jsdom 30 は `ResourceLoader` が無い**ので `resources: { interceptors: [requestInterceptor(...)] }` を使う／canvas・AudioContext・indexedDB・matchMedia をスタブ／キャンバスの `clientWidth` は 480 を返す）。増やすときは `jsdom-smoke.mjs` を雛形に。
+  - 前回までのハーネス名（記録）：`smoke` `func` `i18n` `lang-fav` `libtabs` `menu` `order2` `prev` `rack` `reload` `skinbtn` `dock` `addons` `favs` `mmd` `songwhile` `i18n-audit` `mmdpreset`
     - `jsdom-mmdpreset.mjs`（🆕）は fetch と three／three-mmd-loader を偽物に差し替えて、💠 preset.json 検出→ボタン→読み込み→credit/motion/bpm 自動設定、jump/idol のVMD生成、新キー4言語を見る。**jsdom には matchMedia が無い**ので `beforeParse` でスタブする（`TEXT`／`settings` は const/let なので `win.eval` 経由で見る）
     - `jsdom-mmd.mjs` は本物のCDNに届かないので、ページ内に**偽の three／three-mmd-loader** を流し込んで `TrkMMD._injectLibs()` で差し替える
     - `jsdom-i18n-audit.mjs` は静的監査（992キー×4言語の欠け／生キー／コードが使うキーの実在）。**エラー0が正常**
@@ -231,6 +253,12 @@ for f in js/*.js js/characters/*.js js/addons/*.js; do node --check "$f" || echo
 - [ ] 🩷 MMD：大きさ・向き・クレジットが効く／「保存」を入れておくとリロードしても残る
 - [ ] 🩷 MMD：🔎 動作チェックで `webgl=true`・`three=<版>`・`loader=true` が出る（だめなときは 📋 でコピーして貼る）
 - [ ] 🩷 MMD：`?safe=1` では読み込まれず、マスコットが「オレンジ相棒」に戻る（赤エラーが出ない）
+- [ ] 📊 スペクトラム：🎛 ラックの「⚙ 詳しい設定」を開くと画面が出る／音に合わせてバーが動く
+- [ ] 📊 スペクトラム：バー／ミラー／波形／リング・4色・感度・ピークが、その場で切り替わる（設定画面側でも）
+- [ ] 📊 スペクトラム：📺 TVの画面に重ねるチェックで、映像の上に重なる／オフで消える
+- [ ] 📊 スペクトラム：音が鳴っていないときは「曲を再生すると動きます。」が出て、平らな線になる
+- [ ] 📊 スペクトラム：最初に使ったときも音が黙らない（アナライザーは操作のあとに作ります）
+- [ ] 📊 スペクトラム：`?safe=1` では表示されない／設定を変えてリロード→残っている
 - [ ] ▶◀ 設定「演奏中も ◀▶ で曲を変える」：オフなら演奏中は何も起きず、オンなら押した曲に切り替わる（記録は残らない）
 - [ ] 🧩 アドオン：`js/addons/example.js` を入れてボタンが出る（`?safe=1` で入らなくなる）
 - [ ] 言語4種切り替えで生キーが出ない（カスタムTV・MMD・お気に入り・棚スキンの画面も）

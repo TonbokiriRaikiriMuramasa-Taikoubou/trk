@@ -1,7 +1,7 @@
 # trk! 開発引き継ぎ文書（HANDOFF）
 
 > trk! is AGRG! — an All-Generation Rhythm Game
-> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン16種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り ＋ 🥁音ゲーマー向けFAST/SLOW・あべこべ・でたらめ ＋ 💬GitHub Issuesテンプレート まで）
+> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン16種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り ＋ 🥁音ゲーマー向けFAST/SLOW・あべこべ・でたらめ ＋ 💬GitHub Issuesテンプレート ＋ 📊スペクトラム（音の見える化・TVに重ねられる） まで）
 > この文書は、新しい会話で開発を再開するための参照資料です。
 
 ---
@@ -96,7 +96,8 @@ trk! の開発を再開します。docs/HANDOFF.md を貼ります。
 31. **🔥 達人・エキスパート配置生成 ＆ 推定Lv.1〜20への拡張**：16分音符の3連・5連ロール、交互トリル、小節頭ドン固定による本格音ゲーの叩き心地、Lv.1〜20連続スケール、全年齢向けUIとワンタップ解放（達人・2000 RUSH）。
 32. **🥁 音ゲーマー向けFAST/SLOW・あべこべ・でたらめ**：リザルト画面での FAST/SLOW および GOOD 内訳の精密表示、判定下のリアルタイムネオンカラー表示、公式MODとしてのあべこべ（MIRROR）・でたらめ（RANDOM）の実装（`mulberry32` による決定論的再現性）。
 33. **🎬 TV映像確認タブ強化・共有URL ＆ 📡 アンテナ機能**：確認タブ直下にシークバー・再生一時停止・「▶ この設定で遊ぶ」ボタン、TVスキン＆フィルターの共有URL生成（`?tv=...&skin=...`）、4種類のアンテナ形状切り替えと「通常のアンテナを使う（バックグラウンド再生モード）」チェックボックスの新設。
-34. **💬 GitHub Issues 窓口の整備**：感想・苦情・ご意見フォーム（`feedback.yml`）、譜面・難易度バランス意見フォーム（`chart_feedback.yml`）の新設、リザルト画面下部への投稿リンク配備。
+35. **📊 スペクトラム（音の見える化）**：`js/spectrum.js`（新ファイル）。`TrkFX.tap()` で**エフェクト後の音**を見て、バー／ミラー／波形／リングの4つの見え方と4色（ネオン・夕焼け・モノクロ・レインボー）、感度、ピークの残像を描きます。置き場所は 🎛 ラックの「くわしい」の中と、設定画面「🔊 サウンド」の下の `#specPanel`。**📺 TVの画面に重ねる**こともできます（`settings.specTv`・初期オフ）。`?safe=1` では読み戻さず出しません。
+36. **💬 GitHub Issues 窓口の整備**：感想・苦情・ご意見フォーム（`feedback.yml`）、譜面・難易度バランス意見フォーム（`chart_feedback.yml`）の新設、リザルト画面下部への投稿リンク配備。
 
 ---
 
@@ -188,6 +189,7 @@ trk/
 | 23 | vrm.js | 🧍VRM（`packsReady` を待つ） |
 | 24 | mmd.js | 🩷MMD（持ち込みモデル・自作VMD。`packsReady` を待つ） |
 | 25 | favs.js | ⭐ お気に入りのフォルダ管理（1軍／2軍／🧊／📤元。tv・fx・song の3系統） |
+| 26 | spectrum.js | 📊 スペクトラム（音の見える化）。`TrkFX.tap()` でエフェクト後の音を見る。TVの画面に重ねられる。**いちばん最後に読む**（fx.js・tv-dock.js の後） |
 🧊＝凍結中（しばらく触らない。会話に貼らなくてよい）
 
 ---
@@ -359,6 +361,18 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
   画面名が要るときは `screenName()`（モジュール先頭で定義）を使う
 - 「確認」タブを開いている間は、止まっていたら音なしで再生し、閉じたら元に戻す（`pvKeepPlaying` / `pvRelease`）
 
+### 📊 スペクトラム（js/spectrum.js）
+- **音の見かた**：`window.TrkFX.tap(2048)` が返す `AnalyserNode` を**1つだけ**使い回します（`TrkFX.tap` は呼ぶたびに `G.out` へぶら下がるので、作り直すと増えます）。`createMediaElementSource` は**呼びません**（fx.js の担当）。
+  - ⚠ 使うと音が Web Audio の通り道を通ります（エフェクト未使用でも `G.ac` が作られます）。`fxDelayMs()` はコンプ／リミッターがオフなら 0 のままなので、**判定・記録には影響しません**。
+  - アナライザーは**ユーザー操作のあと**（`hadGesture`）に、**実際に音が鳴っているとき**だけ作ります（ブラウザの音の制限のため）。`?safe=1` では作りません。
+- **置き場所**：① 🎛 ラックの「くわしい」の中（`document.querySelector('button[data-i18n="dockMore"]')` の直前。⚠ くわしい欄は `applyOrder()` で `#fxDock` の外へ動くので `#fxDock` から辿らないこと）／② 設定画面の `#specPanel`（fx.js の `#fxPanel` の直後）
+- **保存（`settings`。`shadow_taiko_preferences_v2`）**：`specOn`（表示・初期オン）／`specStyle`（bars・mirror・wave・ring）／`specTheme`（neon・sunset・mono・rainbow）／`specGain`（0.4〜2.5）／`specPeaks`（初期オン）／`specTv`（📺重ね・初期オフ）
+  - 新しい設定の3点セット＝`core.js` の `settings`・`enterSafeMode()`（表示オフ）・`resetVideoPrefs()`（既定に戻す）に**足してあります**。spectrum.js 側も `?safe=1` では読み戻しません。
+- **窓口 `window.TrkSpec`（version 1）**：`styles()` `themes()` `style()` `theme()` `setStyle(id)` `setTheme(id)` `setOn(v)` `showTv(v)` `analyser()` `request()` `active()` `noAudio()` `canvases()`
+- **CSS**：`.specBox` `.specCanvas` `.specSeg` `.specLabel` `.specTvCanvas`（`#tvDock .tvScreen` の中・`mix-blend-mode:screen`・z-index:1 なので、走査線やグレア（z-index:2）の下）
+- **動きを減らす設定**：`prefers-reduced-motion: reduce` のときは本数を32本に減らし、ピークも出しません。音を見ていないときは 4fps に落として休みます。
+- 見え方の計算：40Hz〜14kHz を対数で分けたバケットの平均。`freq.length`（1024）と `wave.length`（2048）は `TrkFX.tap(2048)` の値。
+
 ### 🩷 MMDマスコット（js/mmd.js）
 - **持ち込み式が基本**：MMDのモデル（.pmx/.pmd）とモーション（.vmd）は原則**同梱しない**。設定パネルの `mmdModelFile`（単体）／`mmdFolderFile`（webkitdirectory、テクスチャ込み）で、利用者の端末のファイルを読むだけ。フォルダのときは `createMmdFileIndex()` で索引を作り、`textureResolver` をローダーに渡す。上限 120MB／400ファイル（本命の .pmx はパスの浅い順）
 - **🆕 💠 同梱プリセット（例外）**：れあどめ原文で**再配布OK**と確認できたモデルだけ、`assets/mmd/<dir>/` に「モデル一式＋れあどめ原文＋`preset.json`」を置ける（対象の dir は `js/mmd.js` の `PRESET_DIRS`）。起動時に `findPresets()` が `preset.json` を fetch できたときだけ `#mmdPresetRow` に💠ボタンが出て、1クリックで fetch→File化→`doLoadModel()`→クレジット（`credit`）・内蔵モーション（`motion`）・基準BPM（`bpm`）を自動設定。規約同意チェック（`mmdAgreed`）は**不要**（規約ごと同梱のため）。`?safe=1` では探しにも行かない。ファイルが無ければボタンは出ず従来どおり
@@ -444,6 +458,7 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 | `trk_fx_presets_v1` | マイプリセット（形式 `trk-fx`） |
 | `trk_tv_skins_v1` | 🎨 カスタムTVスキン（形式 `trk-tvskin`、最大30個。選んでいるTVは `settings.tvDockSkin`） |
 | IndexedDB `shadow_taiko_packs` / `_songs` / `_library` / `_vrm` / `_mmd` | パック（`sha256` 付き）・追加した曲・フォルダ・VRM・MMD（"model"/"motion"。持ち込みファイルの控え） |
+| `settings.specOn` `specStyle` `specTheme` `specGain` `specPeaks` `specTv`（新・📊 スペクトラム） | 表示／見え方／色／感度／ピーク／TVに重ねる。`shadow_taiko_preferences_v2` の中 |
 | `settings.songFav`（新） / `settings.favs`（新） | ⭐ 曲のお気に入り（1軍）と、3系統ぶんのフォルダ分け（`{tv,fx,song}` の `sub`／`frozen`／`former`／`pins`／`locks`／`active`）。どちらも `shadow_taiko_preferences_v2` の中 |fxDockSkin fxDockFive fxDockOpen fxAntenna fxEqLock fxLockChain fxFavSeeded
 
 **形式名**：`shadow-taiko-pack`、`shadow-taiko-chart`、`shadow-taiko-records`、`skin.shadow-taiko`、`trk-fx`、`trk-verified`、`trk-tvskin`（カスタムTVスキン）、譜面ファイル `*.shadow-taiko.json`
@@ -557,12 +572,15 @@ records[指紋 "サイズ:長さ×10"] = {
 - [ ] 実機確認：◀▶ で曲が送られるか（端で回り込むか）／TVのすぐ下にラックが来て見やすいか／くわしい欄が下のほうにまとまって見やすいか
 - [x] 🎬🖼 選曲中にmp4を流す（ドックの画面＋「確認」タブ）
 - [ ] 実機確認：選曲中にTVの画面でmp4が動くか／「確認」タブの見え方がゲーム画面と同じか／音が二重にならないか
+- [x] 📊 スペクトラム（`js/spectrum.js`。バー／ミラー／波形／リング、4色、感度、ピーク、TVに重ねる、`?safe=1` で出さない）
+- [x] ついでに直したもの：TVドックの「🎨 カスタムTVスキンを作る」ボタンが**生キー（tvMakerOpen）**で表示されていたのを `tvmOpen` に修正（i18n監査で発見）
+- [ ] 実機確認：📊 スペクトラム（音に合わせて動くか／TVに重ねたときの見え方／初回に音が黙らないか／モバイル幅／他のTVスキンとの相性／設定・くわしい欄の両方で動くか）
 「12. 次の候補」：🎹 シンセサイザーモード。プリセットを組み上げる画面を、つまみ・スライダーで触れるシンセ風にする案です。最初のメッセージでもらったアイデアで、EQのロックとパラメーターのランダムは今回先に入れました。
 **将来の大きな作業**
 - Capacitor で APK 化：`READ_MEDIA_AUDIO` で端末の曲一覧、ラジオ中のバックグラウンド再生（Media Session・フォアグラウンドサービス）。配布は GitHub Releases から（Google Play は登録料と、テスター約12人×14日の条件がある）
 - 公認の段階2：作者さんの鍵による署名、譜面JSON単体の公認、プリセット作者の公認
 - `docs/presets.md` にみんなのマイプリセットの紹介集
-- 波形・スペクトラム表示（`TrkFX.tap()` を使う）
+- スペクトラムの続き：ゲーム画面の背景にもうっすら重ねる／ピークの色を選べる／TVの確認タブにも出す
 
 **アイデア（未実装）**
 - TRUCKにもニトロ缶🚀

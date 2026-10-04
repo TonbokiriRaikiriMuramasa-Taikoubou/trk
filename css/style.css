@@ -761,3 +761,111 @@ details.panel[open]>summary{margin-bottom:14px}
   #tvDock .tvPow,#tvDock .tvPause{width:46px;height:40px}
   #tvDock .tvTop .tvSong{width:38px;height:40px;font-size:13px}
 }
+
+/* ============================================================
+   📚 曲のタブ（棚）と、棚スキン8種（js/lib-skins.js / js/library.js）
+   ・#libPanel[data-lib-skin="…"] を付け替えるだけで見た目が変わる
+   ============================================================ */
+.libHeadRight{display:flex;align-items:baseline;gap:8px}
+.libSkinBtn{padding:4px 10px;font-size:15px;line-height:1.1;border-radius:10px;opacity:.9}
+.libSkinBtn:hover{opacity:1}
+.libSkinBar{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding:10px;border-radius:14px;
+  border:1px dashed var(--ui-border);background:var(--ui-soft)}
+.libSkinChip{padding:6px 12px;font-size:14px;font-weight:700;border-radius:999px;
+  background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border)}
+.libSkinChip:hover{filter:brightness(1.15)}
+.libSkinChip.on{background:var(--ui-accent);color:var(--ui-on-accent);border-color:var(--ui-accent)}
+.libSkinNote{margin-top:6px}
+.libTabs{display:flex;align-items:flex-end;gap:6px;margin-top:14px;padding:0 2px 2px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.libTabs[hidden]{display:none}
+.libTab{position:relative;display:inline-flex;align-items:center;gap:6px;flex:none;max-width:240px;
+  padding:8px 13px;font-size:15px;font-weight:700;white-space:nowrap;cursor:pointer;
+  border-radius:12px 12px 0 0;border:1px solid var(--ui-border);border-bottom:none;
+  background:var(--ui-button);color:var(--ui-text)}
+.libTab:hover{filter:brightness(1.14)}
+.libTab .libTabName{overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.libTab .libTabN{font-style:normal;font-size:12px;font-weight:800;padding:1px 7px;border-radius:999px;background:rgba(127,127,127,.25)}
+.libTab[aria-selected="true"]{background:var(--ui-accent);color:var(--ui-on-accent);border-color:var(--ui-accent)}
+.libTab[aria-selected="true"] .libTabN{background:rgba(0,0,0,.24)}
+@media(max-width:520px){.libTab{max-width:170px;padding:7px 10px;font-size:14px}.libTab .libTabName{max-width:110px}}
+
+/* ---- 1) 🎛 タブプレーヤー（金属のタブ＋光るインジケータ） ---- */
+#libPanel[data-lib-skin="player"] .libTabs{border-bottom:2px solid #3b4150}
+#libPanel[data-lib-skin="player"] .libTab{background:linear-gradient(#2f333c,#1a1d23);border:1px solid #4a505e;
+  color:#dfe6f2;box-shadow:inset 0 1px 0 rgba(255,255,255,.14)}
+#libPanel[data-lib-skin="player"] .libTab[aria-selected="true"]{background:linear-gradient(#46506a,#28303f);color:#eafaff;
+  border-color:#7ad7ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 0 12px rgba(122,215,255,.35)}
+#libPanel[data-lib-skin="player"] .libTab[aria-selected="true"]::after{content:"";position:absolute;left:10px;right:10px;bottom:-2px;height:3px;
+  border-radius:2px;background:#7ad7ff;box-shadow:0 0 8px #7ad7ff}
+
+/* ---- 2) 📝 ノート（紙の見出し・リング穴） ---- */
+#libPanel[data-lib-skin="note"] .libTabs{gap:5px;padding-left:22px;background:
+  radial-gradient(circle at 10px 50%,rgba(255,255,255,.55) 2px,rgba(0,0,0,.25) 3px,rgba(0,0,0,0) 4px) 0 0/22px 26px no-repeat,
+  linear-gradient(#fbf6e6,#f2ead2);border-radius:10px 10px 0 0;box-shadow:inset 0 -2px 0 #d9cfae}
+#libPanel[data-lib-skin="note"] .libTab{background:linear-gradient(#fffdf3,#eee5c9);color:#3c3423;border:1px solid #c8bb95;
+  border-radius:8px 8px 0 0;font-family:"Hiragino Maru Gothic ProN","Yu Gothic","Segoe UI",sans-serif}
+#libPanel[data-lib-skin="note"] .libTab[aria-selected="true"]{background:linear-gradient(#fffef9,#fff3c9);color:#1f1a0c;
+  border-color:#a8925f;box-shadow:0 -2px 0 #e8b84b inset}
+
+/* ---- 3) 🌈 シール帳（白フチのステッカー・少し傾く） ---- */
+#libPanel[data-lib-skin="sticker"] .libTabs{gap:9px}
+#libPanel[data-lib-skin="sticker"] .libTab{border:3px solid #fff;border-radius:14px;transform:rotate(-1.4deg);
+  box-shadow:0 3px 0 rgba(0,0,0,.35);color:#12303a}
+#libPanel[data-lib-skin="sticker"] .libTab:nth-child(2n){transform:rotate(1.2deg)}
+#libPanel[data-lib-skin="sticker"] .libTab:nth-child(3n){background:linear-gradient(#ffe9a3,#ffd166)}
+#libPanel[data-lib-skin="sticker"] .libTab:nth-child(3n+1){background:linear-gradient(#bff0ff,#7bdff2)}
+#libPanel[data-lib-skin="sticker"] .libTab:nth-child(3n+2){background:linear-gradient(#ffd7e6,#ffb3c7)}
+#libPanel[data-lib-skin="sticker"] .libTab[aria-selected="true"]{transform:rotate(0) scale(1.05);
+  outline:3px solid rgba(255,255,255,.9);color:#111}
+
+/* ---- 4) 🗄 カード目録（木の引き出し＋アイボリーのカード＋真鍮の取っ手） ---- */
+#libPanel[data-lib-skin="card"] .libTabs{gap:6px;padding:8px 8px 6px;border-radius:10px;
+  background:repeating-linear-gradient(90deg,#5b3c22,#5b3c22 12px,#4c311b 12px,#4c311b 24px);
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.55)}
+#libPanel[data-lib-skin="card"] .libTab{gap:8px;border-radius:6px 6px 2px 2px;background:linear-gradient(#fffdf6,#eee5cf);
+  color:#33291b;border:1px solid #b9a682;box-shadow:0 2px 0 rgba(0,0,0,.35)}
+#libPanel[data-lib-skin="card"] .libTab::before{content:"";width:10px;height:10px;border-radius:50%;flex:none;
+  background:radial-gradient(circle at 35% 30%,#ffeeb0,#8a6a1f);box-shadow:0 1px 0 rgba(0,0,0,.45)}
+#libPanel[data-lib-skin="card"] .libTab[aria-selected="true"]{background:linear-gradient(#fffefb,#fdf5df);color:#1a1206;
+  border-color:#e0cf9f;transform:translateY(-3px);box-shadow:0 5px 0 rgba(0,0,0,.35)}
+#libPanel[data-lib-skin="card"] .libTab .libTabN{background:#e6d9b8;color:#4a3b21}
+
+/* ---- 5) 📼 カセットラベル（手書き風・クリーム色のラベル） ---- */
+#libPanel[data-lib-skin="cassette"] .libTabs{gap:10px}
+#libPanel[data-lib-skin="cassette"] .libTab{border-radius:4px;background:linear-gradient(#f8f2dd,#e9dfc0);color:#2b2417;
+  border:1px solid #b8a985;box-shadow:inset 0 0 0 3px rgba(255,255,255,.55),0 2px 0 rgba(0,0,0,.3);
+  font-family:"Segoe Print","Bradley Hand","Hiragino Maru Gothic ProN",cursive,sans-serif}
+#libPanel[data-lib-skin="cassette"] .libTab::before{content:"◉";font-size:11px;color:#b03a2e;line-height:1}
+#libPanel[data-lib-skin="cassette"] .libTab[aria-selected="true"]{background:linear-gradient(#fffaea,#f4e7c6);color:#7a1d1d;
+  border-color:#c0392b;box-shadow:inset 0 0 0 3px rgba(255,255,255,.7),0 0 0 1px rgba(192,57,43,.5)}
+
+/* ---- 6) 🖍 黒板（チョークの枠） ---- */
+#libPanel[data-lib-skin="blackboard"] .libTabs{gap:8px;padding:12px 12px 8px;border-radius:8px;
+  background:#1e2b25;border:6px solid #6b4a2a;box-shadow:inset 0 0 34px rgba(0,0,0,.65)}
+#libPanel[data-lib-skin="blackboard"] .libTab{background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.4);
+  color:#eaf7ee;border-radius:6px;font-family:"Hiragino Maru Gothic ProN","Yu Gothic",sans-serif}
+#libPanel[data-lib-skin="blackboard"] .libTab[aria-selected="true"]{background:rgba(255,255,255,.12);border:1px solid #fff;
+  color:#fff;text-shadow:0 0 7px rgba(255,255,255,.55)}
+#libPanel[data-lib-skin="blackboard"] .libTab .libTabN{background:rgba(255,255,255,.18)}
+
+/* ---- 7) 🕹 レトロPC（黄色い四角のタブ） ---- */
+#libPanel[data-lib-skin="retro"] .libTabs{gap:3px;padding:6px 6px 0;border-radius:3px;background:#141414;border-bottom:3px solid #4a4a4a}
+#libPanel[data-lib-skin="retro"] .libTab{border-radius:2px 2px 0 0;background:#d5d5d5;color:#101010;border:2px solid #000;
+  font-family:"Cascadia Mono",Consolas,"Courier New",monospace;letter-spacing:.02em}
+#libPanel[data-lib-skin="retro"] .libTab[aria-selected="true"]{background:#ffd400;color:#000;
+  box-shadow:inset -2px -2px 0 #b89a00}
+#libPanel[data-lib-skin="retro"] .libTab .libTabN{background:#000;color:#ffd400}
+
+/* ---- 8) 📁 クリアファイル（半透明のインデックス） ---- */
+#libPanel[data-lib-skin="clearfile"] .libTabs{gap:8px;padding:10px;border-radius:12px;
+  background:linear-gradient(160deg,rgba(120,190,255,.18),rgba(120,190,255,.04));
+  border:1px solid rgba(140,200,255,.35);box-shadow:inset 0 0 22px rgba(150,205,255,.12)}
+#libPanel[data-lib-skin="clearfile"] .libTab{border-radius:9px;background:rgba(160,215,255,.20);
+  border:1px solid rgba(190,230,255,.5);color:#eaf6ff;backdrop-filter:blur(2px)}
+#libPanel[data-lib-skin="clearfile"] .libTab[aria-selected="true"]{background:rgba(200,238,255,.5);color:#04222f;border-color:#d8f2ff}
+#libPanel[data-lib-skin="clearfile"] .libTab .libTabN{background:rgba(255,255,255,.35);color:#04222f}
+
+/* 設定画面の「棚スキン」の行（見た目セクション） */
+#libSkinSelect{width:100%;padding:10px 12px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);
+  border:1px solid var(--ui-border);font-size:16px;margin-bottom:4px}

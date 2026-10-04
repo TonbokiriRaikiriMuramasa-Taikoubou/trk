@@ -110,7 +110,10 @@
           <section class="panel" id="libPanel">
             <div class="libHead">
               <h3 data-i18n="libTitle"></h3>
-              <span id="libCount" class="hint"></span>
+              <span class="libHeadRight">
+                <span id="libCount" class="hint"></span>
+                <button id="libSkinBtn" class="libSkinBtn" type="button" hidden></button>
+              </span>
             </div>
             <div class="miniActions">
               <button id="libOpenBtn" type="button" data-i18n="libOpen"></button>
@@ -136,6 +139,9 @@
               </select>
               <button id="libRandomBtn" type="button" data-i18n="libRandom"></button>
             </div>
+            <div id="libSkinBar" class="libSkinBar" hidden></div>
+            <div id="libSkinNote" class="hint libSkinNote" hidden></div>
+            <div id="libTabs" class="libTabs" role="tablist" hidden></div>
             <div id="libList"></div>
             <div id="libStatus" class="hint status"></div>
             <div class="hint" data-i18n="dropHint"></div>
@@ -475,6 +481,11 @@
               </div>
               <div id="tvmStatus" class="hint status"></div>
             </details>
+
+            <h3 data-i18n="libSkinHead"></h3>
+            <select id="libSkinSelect"></select>
+            <label class="check"><input id="libSkinQuickChk" type="checkbox" checked><span data-i18n="libSkinQuick"></span></label>
+            <div class="hint" data-i18n="libSkinHint"></div>
 
             <h3 data-i18n="mascotSel"></h3>
             <!-- キャラクターの選択肢は js/characters/*.js が自動で追加します -->
@@ -869,6 +880,7 @@
 <!-- ===== 選曲・公認・入力・起動 ===== -->
 <script src="js/library.js"></script>
 <script src="js/verified.js"></script>
+<script src="js/lib-skins.js"></script>
 <script src="js/main.js"></script>
 <script src="js/speed.js"></script>
 <script src="js/vrm.js"></script>

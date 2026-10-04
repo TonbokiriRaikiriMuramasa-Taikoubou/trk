@@ -44,6 +44,12 @@
     `applyOrder()` が、それぞれの `<details>`（`.tvMore` / `.dockMore`）をドックの外＝列の下のほうへ並べ直す（TVを壁掛けにしても、くわしいは列に残る）
   - お気に入り行に**数**を表示（`tvFavLabelN` / `tvFavOverflow`）：お気に入り7個・ボタン6個のように、TVごとの収まり具合が見える
   - 並び順の設定はそのまま（テレビとラックの上下だけ入れ替え。くわしいは、いつも下のほう）
+- 🆕 **📚 曲のタブ（棚）と、棚スキン8種（今回追加）**
+  - 曲リストの上に、曲の入り口ごとのタブが自動でできる：📚すべて／📦パックごと／📁フォルダーごと（最上位の階層）／📄追加した曲／✔公認
+  - **パックを入れると、そのパックのタブが自動で増える**（新しい曲を探しやすく）。タブの中で検索・並べ替え、TVの◀▶も、いま開いているタブの中を送る
+  - 見た目は棚スキン8種：🎛タブプレーヤー／📝ノート／🌈シール帳／🗄カード目録／📼カセットラベル／🖍黒板／🕹レトロPC／📁クリアファイル
+  - 曲リストの見出しの **🎨 ボタン**で、その場で切り替え（🎲おまかせ付き）。設定画面「見た目」で、スキンの選択と **🎨 ボタンを隠す** ができる
+  - 保存：`shadow_taiko_preferences_v2` の `libTab` / `libSkin` / `libSkinQuick`（新しい保存キーは増やしていません）
 - 映像フィルター45種：
   - basic: skin, color, mono, dim, off ／ vivid: vivid, pop, pastel ／ retro: warm, cool, vintage, film, crt, vhs
   - cinema: cinema, cinemascope, noir, news, commercial ／ effect: night, security, dream, faded, poster, soft

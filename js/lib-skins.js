@@ -1,0 +1,180 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+/* ==========================================================================
+   trk! lib-skins.js — 📚 曲リストの「棚」スキン（曲タブの見た目）
+   ・タブの中身（どの曲がどのタブか）は library.js が作ります。
+     ここは #libPanel[data-lib-skin="…"] を付け替えて、見た目を変えるだけ。
+   ・8種類：player / note / sticker / card / cassette / blackboard / retro / clearfile
+   ・曲リストの見出しの 🎨 ボタンで、その場で切り替え（settings.libSkinQuick で隠せます）
+   ・設定画面「見た目」にも、スキンの選択と 🎨 ボタンの表示切り替えがあります
+   読み込み順：i18n.js → core.js → … → library.js → verified.js → lib-skins.js
+   ========================================================================== */
+"use strict";
+(() => {
+
+/* ============ 文章（接頭辞 libSkin…） ============ */
+const L4 = (ja, en, zh, ko) => ({ ja, en, zh, ko });
+Object.assign(TEXT.ja, {
+  libSkinHead:"📚 曲リストの棚（タブ）のスキン",
+  libSkinQuick:"曲リストに 🎨 ボタンを出す（その場でスキンを切り替え）",
+  libSkinHint:"曲タブの見た目を、ノート・シール帳・カード目録などから選べます。タブそのものは、曲の入り口（パック・フォルダー・追加した曲）ごとに自動でできます。",
+  libSkinBtnTitle:"🎨 棚のスキン（曲タブの見た目）",
+  libSkinRand:"🎲 おまかせ",
+  libSkinApplied:"棚のスキン：{name}"
+});
+Object.assign(TEXT.en, {
+  libSkinHead:"📚 Song list shelf (tab) skin",
+  libSkinQuick:"Show the 🎨 button on the song list (switch skins on the spot)",
+  libSkinHint:"Pick the look of the song tabs: notebook, sticker book, card catalog and more. The tabs themselves are made automatically, one per source (pack / folder / added songs).",
+  libSkinBtnTitle:"🎨 Shelf skin (song tab look)",
+  libSkinRand:"🎲 Surprise me",
+  libSkinApplied:"Shelf skin: {name}"
+});
+Object.assign(TEXT.zh, {
+  libSkinHead:"📚 歌曲列表的架子（标签）皮肤",
+  libSkinQuick:"在歌曲列表显示 🎨 按钮（就地切换皮肤）",
+  libSkinHint:"歌曲标签的外观可选：笔记本、贴纸册、卡片目录等。标签本身会按来源（歌曲包／文件夹／已添加）自动生成。",
+  libSkinBtnTitle:"🎨 架子皮肤（歌曲标签外观）",
+  libSkinRand:"🎲 随机",
+  libSkinApplied:"架子皮肤：{name}"
+});
+Object.assign(TEXT.ko, {
+  libSkinHead:"📚 곡 목록 선반(탭) 스킨",
+  libSkinQuick:"곡 목록에 🎨 버튼 표시 (그 자리에서 스킨 전환)",
+  libSkinHint:"곡 탭의 모양을 노트・스티커 앨범・카드 목록 등에서 고를 수 있습니다. 탭 자체는 곡의 입구(팩・폴더・추가한 곡)마다 자동으로 생깁니다.",
+  libSkinBtnTitle:"🎨 선반 스킨 (곡 탭 모양)",
+  libSkinRand:"🎲 랜덤",
+  libSkinApplied:"선반 스킨: {name}"
+});
+
+/* ============ スキン8種 ============ */
+const LIB_SKIN_ORDER = ["player", "note", "sticker", "card", "cassette", "blackboard", "retro", "clearfile"];
+const LIB_SKINS = {
+  player:     { icon:"🎛", label:L4("タブプレーヤー", "Tab player", "标签播放器", "탭 플레이어") },
+  note:       { icon:"📝", label:L4("ノート", "Notebook", "笔记本", "노트") },
+  sticker:    { icon:"🌈", label:L4("シール帳", "Sticker book", "贴纸册", "스티커 앨범") },
+  card:       { icon:"🗄", label:L4("カード目録", "Card catalog", "卡片目录", "카드 목록") },
+  cassette:   { icon:"📼", label:L4("カセットラベル", "Cassette label", "磁带标签", "카세트 라벨") },
+  blackboard: { icon:"🖍", label:L4("黒板", "Blackboard", "黑板", "칠판") },
+  retro:      { icon:"🕹", label:L4("レトロPC", "Retro PC", "复古电脑", "레트로 PC") },
+  clearfile:  { icon:"📁", label:L4("クリアファイル", "Clear file", "透明文件夹", "클리어 파일") }
+};
+const skinDef = id => LIB_SKINS[id] || LIB_SKINS.player;
+const skinText = id => { const d = LIB_SKINS[id]; return d ? d.icon + " " + (d.label[lang] || d.label.en) : id; };
+const skinIds = () => LIB_SKIN_ORDER.slice();
+
+/* ============ 適用 ============ */
+function applyLibSkin(id, opts) {
+  const save = !opts || opts.save !== false;
+  if (!LIB_SKINS[id]) id = "player";
+  settings.libSkin = id;
+  const panel = $("libPanel");
+  if (panel) panel.dataset.libSkin = id;
+  document.querySelectorAll("#libSkinBar .libSkinChip").forEach(c => {
+    const on = c.dataset.skin === id;
+    c.classList.toggle("on", on); c.setAttribute("aria-pressed", String(on));
+  });
+  const sel = $("libSkinSelect");
+  if (sel) sel.value = id;
+  if (save) saveUserPrefs();
+  return id;
+}
+function randomLibSkin() { return applyLibSkin(LIB_SKIN_ORDER[Math.floor(Math.random() * LIB_SKIN_ORDER.length)]); }
+
+/* ============ 🎨 ボタンと、スキン選びの帯 ============ */
+function barOpen() { const bar = $("libSkinBar"); return !!bar && !bar.hidden; }
+function openBar(on) {
+  const bar = $("libSkinBar"), b = $("libSkinBtn");
+  if (!bar) return;
+  const want = (on === undefined) ? bar.hidden : !!on;
+  if (want && settings.libSkinQuick === false) return;     // ボタンを隠す設定のときは開かない
+  bar.hidden = !want;
+  if (b) b.setAttribute("aria-expanded", String(want));
+}
+function buildBar() {
+  const bar = $("libSkinBar"); if (!bar) return;
+  bar.textContent = "";
+  for (const id of LIB_SKIN_ORDER) {
+    const b = el("button", "libSkinChip"); b.type = "button"; b.dataset.skin = id;
+    b.textContent = skinText(id);
+    b.classList.toggle("on", id === settings.libSkin);
+    b.setAttribute("aria-pressed", String(id === settings.libSkin));
+    b.addEventListener("click", () => { applyLibSkin(id); flashSkin(skinText(id)); });
+    bar.append(b);
+  }
+  const rnd = el("button", "libSkinChip libSkinRand", tr("libSkinRand")); rnd.type = "button";
+  rnd.addEventListener("click", () => { randomLibSkin(); flashSkin(skinText(settings.libSkin)); });
+  bar.append(rnd);
+}
+function buildSelect() {
+  const sel = $("libSkinSelect"); if (!sel) return;
+  sel.textContent = "";
+  for (const id of LIB_SKIN_ORDER) {
+    const o = document.createElement("option"); o.value = id; o.textContent = skinText(id);
+    sel.append(o);
+  }
+  sel.value = LIB_SKINS[settings.libSkin] ? settings.libSkin : "player";
+}
+function applyQuick() {
+  const b = $("libSkinBtn");
+  const on = settings.libSkinQuick !== false;
+  if (b) b.hidden = !on;
+  if (!on) openBar(false);
+  const chk = $("libSkinQuickChk"); if (chk) chk.checked = on;
+}
+let flashTimer = 0;
+function flashSkin(name) {
+  const box = $("libSkinNote");
+  if (!box) return;
+  box.textContent = tr("libSkinApplied", { name });
+  box.hidden = false;
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(() => { box.hidden = true; }, 2200);
+}
+
+/* ============ 画面の組み立て（全部のファイルを読み終えてから） ============ */
+addEventListener("DOMContentLoaded", () => {
+  /* 知らないスキン名（古い設定・壊れた設定ファイル）は player として扱う */
+  applyLibSkin(LIB_SKINS[settings.libSkin] ? settings.libSkin : "player", { save:false });
+  buildBar(); buildSelect(); applyQuick();
+
+  const b = $("libSkinBtn");
+  if (b) {
+    b.textContent = "🎨";
+    b.title = tr("libSkinBtnTitle"); b.setAttribute("aria-label", b.title);
+    b.setAttribute("aria-haspopup", "true");
+    b.addEventListener("click", () => openBar());
+  }
+  const sel = $("libSkinSelect");
+  if (sel) sel.addEventListener("change", e => applyLibSkin(e.target.value));
+  const chk = $("libSkinQuickChk");
+  if (chk) chk.addEventListener("change", e => {
+    settings.libSkinQuick = !!e.target.checked; saveUserPrefs(); applyQuick();
+    if (e.target.checked) openBar(true);
+  });
+
+  /* 帯の外を押したら閉じる（開きっぱなしにしない） */
+  document.addEventListener("click", e => {
+    if (!barOpen()) return;
+    if (e.target.closest("#libSkinBar") || e.target.closest("#libSkinBtn")) return;
+    openBar(false);
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") openBar(false); });
+
+  on("language", () => {
+    buildBar(); buildSelect(); applyQuick();
+    if (b) { b.title = tr("libSkinBtnTitle"); b.setAttribute("aria-label", b.title); }
+  });
+});
+
+/* ============ 窓口（テスト・コンソールから叩けるように） ============ */
+window.TrkLibSkins = {
+  version: 1,
+  skins: skinIds,
+  skin: () => settings.libSkin,
+  selectSkin: id => applyLibSkin(id),
+  random: randomLibSkin,
+  open: openBar,
+  barOpen
+};
+})();
+/* ✅ lib-skins.js 完了 */

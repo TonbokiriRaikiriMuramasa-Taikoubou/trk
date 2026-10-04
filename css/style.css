@@ -338,7 +338,7 @@ details.panel[open]>summary{margin-bottom:14px}
 
 /* メイン画面の欄（fx-dock.js）：さわれる本体 */
 #fxDock{display:flex;flex-direction:column;gap:8px}
-#libList{height:440px}
+#libList{height:320px}
 .dockDev{position:relative;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;border:1px solid var(--ui-border);background:var(--ui-soft);color:var(--ui-text)}
 .dockTop{display:flex;align-items:center;gap:10px}
 .dockLcd{flex:1;min-width:0;padding:7px 12px;border-radius:8px;font-family:"Cascadia Mono",Consolas,monospace;font-weight:800;font-size:15px;
@@ -424,3 +424,94 @@ details.panel[open]>summary{margin-bottom:14px}
 #fxDock[data-skin="aero"] .dockKey.selected{background:radial-gradient(circle at 50% 22%,#fff 0 16%,transparent 42%),linear-gradient(#c6ffb8,#3dbb5a);color:#063015}
 
 @media (prefers-reduced-motion:reduce){#fxDock *{animation:none!important}}
+
+/* ===== TVドック（tv-dock.js） ===== */
+#tvDock{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.tvDev{position:relative;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;border:1px solid var(--ui-border);background:var(--ui-soft);color:var(--ui-text)}
+.tvTop{display:flex;align-items:center;gap:10px}
+.tvLcd{flex:1;min-width:0;padding:7px 12px;border-radius:8px;font-family:"Cascadia Mono",Consolas,monospace;font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#101410;color:#7dff9b;box-shadow:inset 0 2px 6px rgba(0,0,0,.6)}
+#tvDock.off .tvLcd{background:#0a0a0a;color:#555}
+#tvDock .tvKey{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;padding:9px 8px;border-radius:10px;font-size:14px;font-weight:800;line-height:1.15;color:inherit;background:var(--ui-button);border:1px solid var(--ui-border);box-shadow:0 4px 0 rgba(0,0,0,.45);transition:transform .05s,box-shadow .05s,filter .1s}
+#tvDock .tvKey:hover{filter:brightness(1.1);color:inherit}
+#tvDock .tvKey:active,#tvDock .tvKey.selected{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.45)}
+#tvDock .tvKey.selected{background:var(--ui-accent);color:var(--ui-on-accent)}
+#tvDock .tvKey.empty{opacity:.5}
+#tvDock .tvPow,#tvDock .tvPause{flex-direction:row;width:56px;height:44px;border-radius:12px;gap:6px}
+.tvLed{width:8px;height:8px;border-radius:50%;background:#3a1010;box-shadow:inset 0 0 2px #000;flex:none}
+.tvLed.on{background:#40ff40;box-shadow:0 0 8px #40ff40}
+.tvPauseLed.on{background:#ffd166;box-shadow:0 0 8px #ffd166}
+.tvScreenWrap{position:relative;display:flex;gap:8px;align-items:stretch;min-height:64px;border-radius:12px;overflow:hidden;background:#000;border:1px solid #222}
+.tvScreen{position:relative;flex:1;min-height:58px;background:radial-gradient(ellipse at 50% 40%,#222,#000);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tvScreen::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.04) 50%,transparent 100%);opacity:.5}
+.tvScreen[data-off="1"]{background:#0a0a0a}
+.tvScreen[data-off="1"]::after{content:"📺 OFF";color:#444;font-weight:900;letter-spacing:.1em}
+.tvGlare{position:absolute;top:0;left:0;width:60%;height:100%;background:linear-gradient(105deg,rgba(255,255,255,.18),transparent 60%);pointer-events:none}
+.tvSpeaker{width:44px;background:repeating-linear-gradient(#1a1a1a,#1a1a1a 2px,#000 2px,#000 4px);border-left:1px solid #222;position:relative}
+.tvSpeaker.on::after{content:"";position:absolute;left:50%;top:50%;width:6px;height:6px;transform:translate(-50%,-50%);border-radius:50%;background:#40ff40;box-shadow:0 0 6px #40ff40}
+.tvSlots{display:grid;grid-template-columns:repeat(var(--cols,5),1fr);gap:8px}
+.tvRand{display:flex;gap:6px}
+#tvDock .tvRand .tvKey{flex:1;font-size:13px;padding:7px 6px}
+.tvHint{margin:0;font-size:12px}
+.tvDeco{display:flex;justify-content:center;align-items:center;gap:18px;min-height:44px;border-radius:10px;overflow:hidden;position:relative;background:rgba(0,0,0,.2)}
+.tvFavRow{display:flex;flex-wrap:wrap;gap:6px}
+.tvFavRow button{padding:7px 12px;font-size:14px;border-radius:999px}
+.tvFavRow button.selected{background:var(--ui-accent);color:var(--ui-on-accent);border-color:transparent}
+.tvQuickSelect{flex:1;min-width:0;padding:8px 10px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border);font-size:15px}
+#tvDock .tvKey .num{font-size:11px;opacity:.7}
+#tvDock .tvKey .nm{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+
+/* TVスキン：スタンダード（フラット） */
+#tvDock[data-skin="standard"] .tvDev{background:linear-gradient(#2a2a2e,#111);border:1px solid #333;color:#eee}
+#tvDock[data-skin="standard"] .tvScreenWrap{border:2px solid #111}
+#tvDock[data-skin="standard"] .tvSpeaker{background:#111}
+
+/* 📺 ブラウン管 */
+#tvDock[data-skin="crt"] .tvDev{background:linear-gradient(#d8c8a8,#8a7a5a);border:2px solid #5a4a3a;color:#2a2218;border-radius:20px}
+#tvDock[data-skin="crt"] .tvScreenWrap{border-radius:18px;border:4px solid #3a2e22;box-shadow:inset 0 0 20px #000}
+#tvDock[data-skin="crt"] .tvScreen{border-radius:14px;background:radial-gradient(ellipse at 50% 50%,#2a3a2a,#0a0a0a)}
+#tvDock[data-skin="crt"] .tubeGlow{position:absolute;inset:0;border-radius:14px;box-shadow:inset 0 0 30px rgba(100,255,150,.15);pointer-events:none}
+#tvDock[data-skin="crt"] .tubeKnob{width:18px;height:18px;border-radius:50%;background:radial-gradient(circle,#ddd,#666);border:2px solid #222;box-shadow:0 2px 0 #000}
+#tvDock.playing[data-skin="crt"] .tvScreen::before{animation:tvFlicker .12s infinite}
+@keyframes tvFlicker{0%{opacity:.4}50%{opacity:.6}100%{opacity:.45}}
+
+/* 🪵 ウッドテレビ */
+#tvDock[data-skin="wood"] .tvDev{background:linear-gradient(#8b5a2b,#5a3418);border:2px solid #3a2010;color:#ffe8c8}
+#tvDock[data-skin="wood"] .tvScreenWrap{border:6px solid #4a2a14;border-radius:8px}
+#tvDock[data-skin="wood"] .woodGrain{position:absolute;inset:0;opacity:.25;background:repeating-linear-gradient(90deg,#000 0 2px,transparent 2px 20px)}
+#tvDock[data-skin="wood"] .woodSpeaker{width:60px;height:12px;background:repeating-linear-gradient(90deg,#000 0 1px,#8b5a2b 1px 4px);border-radius:2px}
+
+/* 📻 ポータブル */
+#tvDock[data-skin="portable"] .tvDev{background:linear-gradient(#e8e0d0,#a8a090);border:2px solid #6a645a;color:#222;max-width:460px}
+#tvDock[data-skin="portable"] .tvScreenWrap{border-radius:12px}
+#tvDock[data-skin="portable"] .tvAnt{position:absolute;right:20px;top:-22px;width:3px;height:22px;background:linear-gradient(#eee,#888);transform-origin:bottom;transform:rotate(18deg);transition:height .3s}
+#tvDock.playing[data-skin="portable"] .tvAnt{height:38px}
+#tvDock[data-skin="portable"] .tvAnt.on{box-shadow:0 0 4px #fff}
+
+/* 📖 紙芝居 */
+#tvDock[data-skin="kamishibai"] .tvDev{background:linear-gradient(#f5e6c8,#d8b87a);border:3px solid #8a6a3a;color:#4a3010;border-radius:6px}
+#tvDock[data-skin="kamishibai"] .tvScreenWrap{border:8px solid #6a4a1a;border-left-width:14px;border-right-width:14px;background:#fff8e0}
+#tvDock[data-skin="kamishibai"] .tvScreen{background:#fffaf0;box-shadow:inset 0 0 0 2px #000}
+#tvDock[data-skin="kamishibai"] .paperFrame{position:absolute;inset:0;border:12px solid #4a3010;pointer-events:none;opacity:.6}
+#tvDock[data-skin="kamishibai"] .paperSlide{position:absolute;right:8px;top:50%;width:10px;height:60%;transform:translateY(-50%);background:linear-gradient(#fff,#ccc);border:1px solid #888;border-radius:2px}
+
+/* 🎛 真空管 */
+#tvDock[data-skin="tube"] .tvDev{background:linear-gradient(#3a3a3a,#1a1a1a);border:2px solid #000;color:#ddd}
+#tvDock[data-skin="tube"] .dial{width:28px;height:28px;border-radius:50%;background:radial-gradient(circle,#eee 0 35%,#666 40%,#222 100%);border:2px solid #111;box-shadow:0 2px 0 #000, inset 0 0 4px #000}
+#tvDock[data-skin="tube"] .tvScreen{border-radius:50% / 20%;background:radial-gradient(ellipse at 50% 50%,#1a2a1a,#000)}
+
+/* 🛸 未来テレビ */
+#tvDock[data-skin="future"] .tvDev{background:radial-gradient(circle at 30% 0,#0a2a3a,#05070f 70%);border:1px solid #0ff5;color:#bff;box-shadow:0 0 20px #0ff2 inset}
+#tvDock[data-skin="future"] .tvLcd{background:#001018;color:#0ff;text-shadow:0 0 6px #0ff}
+#tvDock[data-skin="future"] .tvScreen{background:radial-gradient(ellipse at 50% 50%,#001a22,#000);border:1px solid #0ff3}
+#tvDock[data-skin="future"] .holoRing{width:36px;height:36px;border-radius:50%;border:2px solid #0ff6;box-shadow:0 0 10px #0ff}
+#tvDock.playing[data-skin="future"] .holoRing{animation:dockSpin 2s linear infinite}
+#tvDock[data-skin="future"] .holoScan{position:absolute;left:0;top:0;width:100%;height:3px;background:#0ff;box-shadow:0 0 8px #0ff;animation:tvScan 2.2s linear infinite}
+@keyframes tvScan{0%{top:0}100%{top:100%}}
+
+/* 🎞 プロジェクター */
+#tvDock[data-skin="projector"] .tvDev{background:linear-gradient(#2a2a2a,#0a0a0a);border:1px solid #444;color:#ddd}
+#tvDock[data-skin="projector"] .tvScreenWrap{background:#000;border:2px solid #222}
+#tvDock[data-skin="projector"] .tvScreen{background:#111}
+#tvDock[data-skin="projector"] .projBeam{position:absolute;left:50%;top:-40px;width:80px;height:40px;transform:translateX(-50%);background:linear-gradient(rgba(255,255,200,.15),transparent);clip-path:polygon(20% 0,80% 0,100% 100%,0 100%)}
+#tvDock[data-skin="projector"] .projCurtain{width:10px;background:linear-gradient(#8a0000,#4a0000);border:1px solid #000}
+#tvDock[data-skin="projector"] .projCurtain.right{transform:scaleX(-1)}

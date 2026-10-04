@@ -613,5 +613,49 @@ function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
     });
   }
 })();
+
+/* ---------- 隠し緊急トリガー：タイトル5回クリック / Ctrl+Shift+S ---------- */
+(function setupHiddenEmergency(){
+  try {
+    let clicks = 0, last = 0;
+    const title = document.querySelector("#selectScreen .head h1, .head h1, h1");
+    if (title) {
+      title.style.cursor = "pointer";
+      title.title = "5回クリックでセーフモード（緊急）";
+      title.addEventListener("click", () => {
+        const now = Date.now();
+        if (now - last > 2000) clicks = 0;
+        last = now; clicks++;
+        if (clicks >= 5) {
+          clicks = 0;
+          if (confirm("🛟 セーフモードに入りますか？\n映像OFF・ぼかし0・TV初期化で操作可能にします。\n\n?safe=1 と同じ効果です。")) {
+            enterSafeMode(); saveUserPrefs(); location.reload();
+          }
+        }
+      });
+    }
+    document.addEventListener("keydown", (e) => {
+      // Ctrl+Shift+S または Ctrl+Shift+? でセーフモード確認
+      if (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === "s" || e.key === "?" || e.key === "/")) {
+        e.preventDefault();
+        if (confirm("🛟 セーフモードに入りますか？ (Ctrl+Shift+S)")) {
+          enterSafeMode(); saveUserPrefs(); location.reload();
+        }
+      }
+      // Esc を3秒長押しでセーフモード（画面が真っ暗でボタン押せない時用）
+      if (e.key === "Escape") {
+        if (!window._escHold) window._escHold = 0;
+        window._escHold++;
+        if (window._escHold > 60) { // 約1秒以上押しっぱなしを想定、keydownリピートでカウント
+          window._escHold = 0;
+          if (confirm("🛟 Esc長押しを検出：セーフモードに入りますか？")) {
+            enterSafeMode(); saveUserPrefs(); location.reload();
+          }
+        }
+        setTimeout(()=>{ window._escHold = Math.max(0, (window._escHold||0)-1); }, 100);
+      }
+    });
+  } catch(_) {}
+})();
 /* ✅ core.js 完了 */
 

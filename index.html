@@ -740,6 +740,26 @@
   <input id="chartImportFile" type="file" accept="application/json,.json" hidden>
 </div>
 
+<button id="floatingSafeBtn" type="button" title="🛟 セーフモード (5回クリックで緊急復旧) / ?safe=1" style="position:fixed;right:8px;bottom:8px;z-index:99999;opacity:.15;width:36px;height:36px;border-radius:50%;background:#111;color:#fff;border:2px solid #0f0;font-size:18px;display:flex;align-items:center;justify-content:center;transition:opacity .2s, transform .2s;cursor:pointer">🛟</button>
+<script>
+  (function(){
+    const b = document.getElementById("floatingSafeBtn");
+    if (!b) return;
+    let over = false;
+    b.addEventListener("mouseenter", ()=>{ b.style.opacity="1"; over=true; });
+    b.addEventListener("mouseleave", ()=>{ if(!over) return; b.style.opacity=".15"; over=false; });
+    b.addEventListener("click", ()=>{
+      if (confirm("🛟 セーフモードに入りますか？\n映像OFF・ぼかし0・TV初期化で操作可能にします。\n\nURLに ?safe=1 を付けるのと同じ効果です。")) {
+        try { localStorage.setItem("trk_emergency_safe", "1"); } catch(_){}
+        const url = new URL(location.href);
+        url.searchParams.set("safe","1");
+        location.href = url.toString();
+      }
+    });
+    // 画面が真っ暗な時に目立つように、一定時間後に少しだけ光らせる
+    setTimeout(()=>{ b.style.opacity=".6"; b.style.transform="scale(1.1)"; setTimeout(()=>{ b.style.opacity=".15"; b.style.transform="scale(1)"; }, 1200); }, 3000);
+  })();
+</script>
 <video id="video" playsinline preload="auto"></video>
 
 <!-- ===== 文章 ===== -->

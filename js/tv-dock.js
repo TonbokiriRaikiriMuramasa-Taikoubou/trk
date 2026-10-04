@@ -402,6 +402,14 @@ function drawTvOverlay(vctx, W, H, overlay) {
       vctx.fillRect(0,0,W,H);
       break;
     }
+    case "grid": {
+      vctx.strokeStyle = "rgba(0,200,255,0.15)";
+      vctx.lineWidth = 1;
+      const step = 24;
+      for (let x=0;x<W;x+=step) { vctx.beginPath(); vctx.moveTo(x,0); vctx.lineTo(x,H); vctx.stroke(); }
+      for (let y=0;y<H;y+=step) { vctx.beginPath(); vctx.moveTo(0,y); vctx.lineTo(W,y); vctx.stroke(); }
+      break;
+    }
   }
   vctx.restore();
 }
@@ -847,6 +855,11 @@ addEventListener("DOMContentLoaded", () => {
 
     const curName = isOff ? tr("tvOff") : (nm[settings.videoStyle] || settings.videoStyle);
     lcd.textContent = flash && Date.now() < flash.until ? flash.text : curName + (isOff ? "" : (video.paused ? " ⏸" : " ▶"));
+    // 家庭用TVのCH表示をリアルタイム更新
+    try {
+      const chDisp = deco.querySelector(".homeChDisp");
+      if (chDisp) chDisp.textContent = isOff ? "--" : (settings.videoStyle || "").toUpperCase().slice(0,4);
+    } catch(_) {}
 
     rTv.textContent = tr("tvRand"); rFav.textContent = tr("tvRandFav"); rPar.textContent = tr("tvRandParam");
 

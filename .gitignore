@@ -1,0 +1,18 @@
+# 手元のテスト用の素材（権利があるものだけを、意図してコミットしてください）
+*.mp3
+*.m4a
+*.wav
+*.flac
+*.ogg
+*.mp4
+*.webm
+*.vrm
+*.vrma
+*.stpack
+test-songs/
+
+# OS・エディタ
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

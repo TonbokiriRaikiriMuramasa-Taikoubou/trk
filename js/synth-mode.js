@@ -866,6 +866,7 @@ addEventListener("DOMContentLoaded", () => {
     cancelAnimationFrame(visualRaf); visualRaf = 0;
     if (restoreFocus) power.focus();
   }
+  window._trkCloseSynth = closeSynth;
   // Let controls and text fields keep their native keyboard behavior, but do not
   // let those events bubble back into the rhythm-game hotkeys behind the modal.
   overlay.addEventListener("keydown", e => {

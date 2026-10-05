@@ -327,7 +327,7 @@ function drawStageField(now) {
 /* ============ 入力（キー：main.js より先／タッチ：レーンを直接タップ、複数指OK） ============ */
 let stageBinding = null;
 addEventListener("keydown", e => {
-  if (window._trkSynthModeOpen) return;
+  if (window._trkSynthModeOpen || window._trkMediaPlayerOpen) return;
   if (stageBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureStageKey(e.code); return; }
   if (phase !== "playing" || !isStage() || bindingSlot !== null || settings.autoPlay) return;
   const i = stageKeys().indexOf(e.code); if (i < 0) return;

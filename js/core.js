@@ -150,7 +150,11 @@ const settings = {
   modMirror: !!prefs.modMirror,
   modRandom: !!prefs.modRandom,
   cover: num(prefs.cover, .2, .7, .4),
-  catchNitroBonus: prefs.catchNitroBonus !== false
+  catchNitroBonus: prefs.catchNitroBonus !== false,
+  /* ▶ メディアプレーヤー（TV電源長押し） */
+  mediaRepeat: pick(prefs.mediaRepeat, ["off", "one", "all"], "off"),
+  mediaShuffle: prefs.mediaShuffle === true,
+  mediaRate: num(prefs.mediaRate, .5, 2, 1)
 };
 function saveUserPrefs() { try { localStorage.setItem(PREFS_KEY, JSON.stringify(settings)); } catch (_) {} }
 /* プレイ中の追加演出だけをまとめて抑える。音声エフェクターの設定とは別です。 */
@@ -228,7 +232,8 @@ function resetAllPrefs() {
   resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs();
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
-  settings.catchNitroBonus = true; settings.judge = "standard"; settings.rate = 1;
+  settings.catchNitroBonus = true; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1;
+  settings.judge = "standard"; settings.rate = 1;
   settings.hidden = false; settings.sudden = false; settings.modMirror = false; settings.modRandom = false; settings.showMasterDiff = false;
   settings.mascot = "skin"; settings.vrmFrame = "full";
   settings.mmdScale = 1; settings.mmdTurn = 0; settings.mmdMotionBpm = 0; settings.mmdMotionKind = "none";

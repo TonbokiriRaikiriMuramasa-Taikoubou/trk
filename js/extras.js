@@ -100,7 +100,7 @@ function owFinish() {
   owApply.hidden = false;
 }
 addEventListener("keydown", e => {                   // 測定中は、どのキーでもタップ
-  if (window._trkSynthModeOpen || !ow.running || e.repeat) return;
+  if (window._trkSynthModeOpen || window._trkMediaPlayerOpen || !ow.running || e.repeat) return;
   e.preventDefault(); e.stopImmediatePropagation(); owTap(e.timeStamp);
 }, true);
 (() => {

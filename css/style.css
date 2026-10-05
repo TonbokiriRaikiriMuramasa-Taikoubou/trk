@@ -1342,3 +1342,40 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
 #fxDock .dockPow{overflow:visible}
 .instPowerBadge{position:absolute;right:-5px;bottom:-5px;z-index:6;display:grid;place-items:center;width:19px;height:19px;border:1px solid rgba(120,220,255,.65);border-radius:50%;background:#071725;color:#b7f4ff;font-size:11px;line-height:1;box-shadow:0 0 10px rgba(55,210,255,.4);pointer-events:none}
 /* ✅ style.css 完了 */
+
+/* ▶ メディアプレーヤーモード（TV電源長押し） */
+.mediaDialog{width:min(920px,100%);border-color:rgba(255,209,102,.32);background:linear-gradient(155deg,rgba(33,29,22,.98),rgba(10,12,20,.99) 60%)}
+.mediaDisplay{position:relative;display:flex;flex-direction:column;justify-content:center;gap:7px;min-height:116px;padding:18px 22px;overflow:hidden;border-bottom:1px solid rgba(255,209,102,.18);background:radial-gradient(circle at 75% 20%,rgba(255,209,102,.2),transparent 32%),linear-gradient(120deg,#101a25,#211a16 55%,#0a1119);text-shadow:0 2px 10px #000}
+.mediaDisplay::before{content:"♪  ♫  ♪  ♫  ♪";position:absolute;right:18px;bottom:-12px;color:rgba(255,209,102,.12);font-size:64px;letter-spacing:12px;white-space:nowrap;pointer-events:none}
+.mediaDisplayTitle{position:relative;z-index:1;max-width:78%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff3c4;font-size:clamp(18px,3vw,28px)}
+.mediaDisplaySub{position:relative;z-index:1;max-width:80%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#b8c5d0;font-size:12px}
+.mediaStatus{position:absolute;right:20px;top:18px;color:#ffd166;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.mediaControls{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 14px 4px}
+.mediaControlBtn{min-width:86px;padding:10px 14px;border-radius:12px;font-weight:800}
+.mediaPlayBtn{min-width:124px;background:linear-gradient(135deg,#ffd166,#ff9f43);border-color:transparent;color:#19130b}
+.mediaProgressRow{display:flex;align-items:center;gap:10px;padding:4px 18px 10px}
+.mediaProgress{flex:1;min-width:0;accent-color:#ffd166;touch-action:pan-y}
+.mediaTime{min-width:92px;text-align:right;font-size:12px;color:#ffe6a3}
+.mediaOptions{display:grid;grid-template-columns:minmax(160px,1.5fr) repeat(5,minmax(92px,1fr));align-items:end;gap:8px;padding:10px 14px;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.14)}
+.mediaOption{display:flex;flex-direction:column;gap:5px;min-width:0;color:var(--ui-muted);font-size:11px;font-weight:750}
+.mediaOption>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mediaOption input[type=range]{width:100%;accent-color:#ffd166}
+.mediaOption select{width:100%;min-width:0;padding:6px 7px}
+.mediaVolumeRow{flex-direction:row;align-items:center;gap:8px}.mediaVolumeRow>span{flex:none}.mediaVolumeRow input{min-width:50px}
+.mediaSmallBtn{padding:7px 10px!important;border-radius:9px!important;font-size:12px!important;white-space:nowrap}
+.mediaSmallBtn.selected{background:linear-gradient(130deg,#4ae4ff,#5e8bff);border-color:transparent;color:#03101a}
+.mediaQueuePanel{display:flex;flex-direction:column;min-height:130px;margin:10px 14px 0;padding:11px;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.035)}
+.mediaQueueHead{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.mediaQueueHead h3{margin:0;font-size:15px}.mediaQueueHead p{margin:0;max-width:65%;font-size:11px;line-height:1.4}
+.mediaSearch{width:100%;margin:8px 0;padding:8px 10px;border:1px solid var(--ui-border);border-radius:9px;background:var(--ui-field);color:var(--ui-text)}
+.mediaQueueList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;max-height:250px;overflow-y:auto;padding-right:2px;overscroll-behavior:contain}
+.mediaQueueItem{display:flex;flex-direction:column;align-items:flex-start;min-width:0;padding:8px 10px;border:1px solid rgba(255,255,255,.09);border-radius:9px;background:rgba(0,0,0,.15);text-align:left}
+.mediaQueueItem:hover,.mediaQueueItem.selected{border-color:#ffd166;background:rgba(255,209,102,.13)}
+.mediaQueueName{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}.mediaQueueMeta{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ui-muted);font-size:10px}
+.mediaEmpty{padding:18px;text-align:center;color:var(--ui-muted);font-size:12px}.mediaFooter{margin-top:10px}
+@media(max-width:680px){
+  .mediaDialog{width:100%;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;border-radius:0;border-left:0;border-right:0}
+  .mediaDisplay{min-height:104px;padding:14px}.mediaStatus{right:14px;top:14px}.mediaDisplayTitle{max-width:100%}.mediaDisplaySub{max-width:100%}
+  .mediaOptions{grid-template-columns:repeat(2,minmax(0,1fr))}.mediaVolumeRow{grid-column:1/-1}.mediaQueueList{grid-template-columns:1fr;max-height:none}.mediaQueueHead{display:block}.mediaQueueHead p{max-width:none;margin-top:4px}.mediaFooter{display:block}.mediaFooter>*{display:block;margin:3px 0}.mediaKeyboard{white-space:normal}
+}
+@media(prefers-reduced-motion:reduce){.mediaDisplay::before{display:none}}
+body.mediaOpen{overflow:hidden;overscroll-behavior:none}

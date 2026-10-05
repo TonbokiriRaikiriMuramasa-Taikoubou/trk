@@ -134,7 +134,7 @@ function truckJudge(now) {
 let truckBinding = null;   // 0＝レーン1、1＝レーン2、2＝切り替えキー
 const TRUCK_RESERVED = new Set(["KeyP", "Tab", "F5", "F11", "F12", "MetaLeft", "MetaRight", "Backquote", "Minus", "Equal", "Backspace"]);
 addEventListener("keydown", e => {
-  if (window._trkSynthModeOpen) return;
+  if (window._trkSynthModeOpen || window._trkMediaPlayerOpen) return;
   if (truckBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureTruckKey(e.code); return; }
   if (phase !== "playing" || !isTruck() || bindingSlot !== null || settings.autoPlay) return;   // AUTO中は自動で動く
   if (settings.truckToggleKey && e.code === settings.truckToggleKey) {

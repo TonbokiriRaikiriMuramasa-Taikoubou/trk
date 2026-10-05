@@ -143,6 +143,7 @@ const settings = {
   libSort: pick(prefs.libSort, ["name", "plays", "recent", "best"], "name"),
   libTab: typeof prefs.libTab === "string" ? prefs.libTab : "all",            // 📚 選んでいる棚（タブ）のID
   playlists: (Array.isArray(prefs.playlists) ? prefs.playlists : []).filter(p => p && typeof p === "object").slice(0, 24),   // 🎧 ユーザー定義プレイリスト（library.js が読み込み時に検証）
+  plFolders: (Array.isArray(prefs.plFolders) ? prefs.plFolders : []).filter(f => f && typeof f === "object").slice(0, 12),  // 📁 プレイリストフォルダ（ネスト可。library.js が検証）
   playlistDelMode: prefs.playlistDelMode === "three" ? "three" : "one",       // 🎧 タブの中クリック削除を3回にするモード
   libSkin: typeof prefs.libSkin === "string" ? prefs.libSkin : "player",      // 📚 棚のスキン（js/lib-skins.js が検証）
   libSkinQuick: prefs.libSkinQuick !== false,                                 // 📚 曲リストの 🎨 ボタンを出す
@@ -258,7 +259,7 @@ function enterSafeMode() {
 }
 function resetAllPrefs() {
   resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs();
-  settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.playlistDelMode = "one"; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
+  settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
   settings.catchNitroBonus = true; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();
   settings.judge = "standard"; settings.rate = 1;

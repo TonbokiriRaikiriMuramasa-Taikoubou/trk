@@ -1103,6 +1103,10 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
 .plShareRow.miss{opacity:.55}
 .plShareRow b{font-size:14px;color:var(--ui-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .plShareState{position:absolute;top:8px;right:10px;font-size:13px}
+/* 📁 フォルダの中身チップ・ネストタブ・曲ごとの🔗 */
+.plChipsRow{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.libTab.plNested{border-style:dashed;opacity:.95}
+.plLinkMini{position:absolute;right:32px;top:6px;padding:2px 8px;font-size:12px;border-radius:8px}
 
 /* ---- 1) 🎛 タブプレーヤー（金属のタブ＋光るインジケータ） ---- */
 #libPanel[data-lib-skin="player"] .libTabs{border-bottom:2px solid #3b4150}

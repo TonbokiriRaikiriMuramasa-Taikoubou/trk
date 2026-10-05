@@ -321,6 +321,42 @@ Object.assign(TEXT.ko, {
   plLinkWarn:"이 링크는 재생목록 만든 사람이 설정한 것이에요. trk!는 내용을 보증하지 않아요.",
   plAutoMark:"▶AUTO"
 });
+Object.assign(TEXT.ja, {
+  plNewFolder:"📁 新規フォルダ", plDefaultFolderName:"フォルダ", plFolderSettings:"フォルダの設定",
+  plFolderOf:"入れ物", plFolderRoot:"（なし・並びのトップ）",
+  plFolderDel:"🗑 このフォルダを削除（中身は消えません）",
+  plFolderCreated:"📁 フォルダ「{name}」を作成しました", plFolderDeleted:"🗑 フォルダを削除しました（中身は上の階層へ）",
+  fldTabHint:"このフォルダは空です。プレイリストの長押し → 設定の「入れ物」で、このフォルダへ移動できます。",
+  plTags:"タグ（検索用）", plTagsPh:"esports 名場面 …（スペース区切り・5個まで）",
+  plProfileUrl:"入手先リンク（https://・共有に添付）", plLinkBad:"❌ リンクは https:// ではじめてください"
+});
+Object.assign(TEXT.en, {
+  plNewFolder:"📁 New folder", plDefaultFolderName:"Folder", plFolderSettings:"Folder settings",
+  plFolderOf:"Location", plFolderRoot:"(none — top level)",
+  plFolderDel:"🗑 Delete this folder (contents are kept)",
+  plFolderCreated:"📁 Folder “{name}” created", plFolderDeleted:"🗑 Folder deleted (contents moved up)",
+  fldTabHint:"This folder is empty. Move playlists here from their long-press settings (“Location”).",
+  plTags:"Tags (for search)", plTagsPh:"esports highlights … (space-separated, up to 5)",
+  plProfileUrl:"Source link (https://, attached when shared)", plLinkBad:"❌ Links must start with https://"
+});
+Object.assign(TEXT.zh, {
+  plNewFolder:"📁 新建文件夹", plDefaultFolderName:"文件夹", plFolderSettings:"文件夹设置",
+  plFolderOf:"所属位置", plFolderRoot:"（无・顶层）",
+  plFolderDel:"🗑 删除此文件夹（内容不会消失）",
+  plFolderCreated:"📁 已创建文件夹「{name}」", plFolderDeleted:"🗑 已删除文件夹（内容移到上一层）",
+  fldTabHint:"此文件夹为空。在播放列表的长按设置「所属位置」中即可移入。",
+  plTags:"标签（搜索用）", plTagsPh:"esports 名场面 …（空格分隔・最多5个）",
+  plProfileUrl:"入手链接（https://・共享时附带）", plLinkBad:"❌ 链接必须以 https:// 开头"
+});
+Object.assign(TEXT.ko, {
+  plNewFolder:"📁 새 폴더", plDefaultFolderName:"폴더", plFolderSettings:"폴더 설정",
+  plFolderOf:"소속", plFolderRoot:"(없음・최상위)",
+  plFolderDel:"🗑 이 폴더 삭제(내용은 지워지지 않아요)",
+  plFolderCreated:"📁 폴더 '{name}'을(를) 만들었어요", plFolderDeleted:"🗑 폴더를 삭제했어요(내용은 위 계층으로)",
+  fldTabHint:"이 폴더는 비어 있어요. 재생목록 길게 누른 설정의 '소속'에서 이 폴더로 옮길 수 있어요.",
+  plTags:"태그(검색용)", plTagsPh:"esports 명장면 …(공백 구분・최대 5개)",
+  plProfileUrl:"입수처 링크(https://・공유 시 첨부)", plLinkBad:"❌ 링크는 https:// 로 시작해야 해요"
+});
 
 
 const libFolderSeg = it => String(it.dir || "").split("/")[0].trim();
@@ -352,7 +388,12 @@ function libTabsOf(all) {
   const favN = libFavKeys(all).n;
   if (favN) tabs.push({ id:"fav", icon:"⭐", label:tr("favTab"), n:favN });
   const plKeys = new Set(all.map(x => x.key));
-  for (const p of settings.playlists) tabs.push({ id:"pl:" + p.id, icon: plIcon(p), label: p.name, n: plCount(p, plKeys), pl: p });   /* 🎧 ユーザー定義プレイリスト */
+  for (const f of settings.plFolders) if (!f.parent) tabs.push({ id:"fld:" + f.id, icon: f.icon || "📁", label: f.name, n: [...plFolderUnionKeys(f.id)].filter(k => plKeys.has(k)).length, fld: f });   /* 📁 フォルダ（中のプレイリストの曲をぜんぶ） */
+  for (const p of settings.playlists) if (!p.folder) tabs.push({ id:"pl:" + p.id, icon: plIcon(p), label: p.name, n: plCount(p, plKeys), pl: p });   /* 🎧 フォルダに入っていないプレイリスト */
+  if (settings.libTab.startsWith("pl:")) {   /* フォルダの中のプレイリストを見ているときは、そのタブも出す（戻れるように） */
+    const cp = plById(settings.libTab.slice(3));
+    if (cp && cp.folder && !tabs.some(t => t.id === settings.libTab)) tabs.push({ id:"pl:" + cp.id, icon: plIcon(cp), label: cp.name, n: plCount(cp, plKeys), pl: cp, nested: true });
+  }
   const packs = new Map(), folders = new Map(), addons = new Map();
   let nFiles = 0;
   for (const it of all) {
@@ -380,6 +421,7 @@ function libTabMatch(it, id) {
   if (!id || id === "all") return true;
   if (id === "fav") { const F = window.TrkFavs; return !!(F && F.inGroup("song", F.activeOf("song"), it.key)); }
   if (id.startsWith("pl:")) { const p = plById(id.slice(3)); return !!p && p.songs.includes(it.key); }
+  if (id.startsWith("fld:")) return plFolderUnionKeys(id.slice(4)).has(it.key);   /* 📁 フォルダ＝中のプレイリストの曲ぜんぶ */
   if (id === "file") return it.source === "file";
   if (id === "verified") return it.source === "pack" && libIsVerified(it);
   if (id.startsWith("pack:")) return it.source === "pack" && "pack:" + libPackKey(it) === id;
@@ -408,6 +450,38 @@ function songMetaSave() { try { localStorage.setItem(SONG_META_KEY, JSON.stringi
 function metaOf(key) { const m = SONG_META[key]; return (m && typeof m === "object") ? m : null; }
 
 /* 保存されていたプレイリスト1つの検証（読み込み時に全部に通す） */
+/* 📁 プレイリストフォルダ（ネスト可・深さは3階層まで） */
+function plFolderSanitize(raw) {
+  if (!raw || typeof raw !== "object" || typeof raw.id !== "string" || !raw.id) return null;
+  return { id: raw.id.slice(0, 24), name: String(raw.name || "").trim().slice(0, 24) || "Folder",
+    icon: typeof raw.icon === "string" ? raw.icon.slice(0, 4) : "",
+    color: /^[a-z]{3,12}$/.test(raw.color || "") && PL_COLORS[raw.color] != null ? raw.color : "none",
+    parent: typeof raw.parent === "string" ? raw.parent.slice(0, 24) : "",
+    createdAt: (typeof raw.createdAt === "number" && raw.createdAt > 0 && raw.createdAt < 9e15) ? raw.createdAt : 0 };
+}
+function plFolderById(id) { return settings.plFolders.find(f => f.id === id) || null; }
+function plDepthOfFolder(id) {   /* 深さ（トップ=0）。循環データでも止まる */
+  let d = 0, cur = plFolderById(id); const seen = new Set();
+  while (cur && cur.parent && !seen.has(cur.id)) { seen.add(cur.id); d++; cur = plFolderById(cur.parent); }
+  return d;
+}
+function plIsDescendantFolder(id, ancestorId) {   /* id が ancestorId の中（子孫）なら真。循環データでも止まる */
+  let cur = plFolderById(id); const seen = new Set();
+  while (cur && cur.parent && !seen.has(cur.id)) { seen.add(cur.id); if (cur.parent === ancestorId) return true; cur = plFolderById(cur.parent); }
+  return false;
+}
+function plFolderUnionKeys(fldId, out = new Set(), seen = new Set()) {   /* フォルダの中の曲（子フォルダも再帰） */
+  if (seen.has(fldId)) return out; seen.add(fldId);
+  for (const p of settings.playlists) if (p.folder === fldId) for (const k of p.songs) out.add(k);
+  for (const f of settings.plFolders) if (f.parent === fldId) plFolderUnionKeys(f.id, out, seen);
+  return out;
+}
+function plFolderContext() {   /* いま見ている場所のフォルダ（新規作成の初期値） */
+  if (settings.libTab.startsWith("fld:")) { const f = plFolderById(settings.libTab.slice(4)); return f ? f.id : ""; }
+  if (settings.libTab.startsWith("pl:")) { const p = plById(settings.libTab.slice(3)); return (p && p.folder) || ""; }
+  return "";
+}
+
 function plSanitize(raw) {
   if (!raw || typeof raw !== "object" || typeof raw.id !== "string" || !raw.id) return null;
   const songs = [];
@@ -419,9 +493,18 @@ function plSanitize(raw) {
     icon: typeof raw.icon === "string" ? raw.icon.slice(0, 4) : "",
     color: /^[a-z]{3,12}$/.test(raw.color || "") && PL_COLORS[raw.color] != null ? raw.color : "none",
     frozen: !!raw.frozen, locked: !!raw.locked, songs,
+    folder: typeof raw.folder === "string" ? raw.folder.slice(0, 24) : "",
+    tags: (Array.isArray(raw.tags) ? raw.tags : []).filter(t => typeof t === "string").map(t => t.trim().slice(0, 16)).filter(Boolean).slice(0, 5),
     createdAt: (typeof raw.createdAt === "number" && raw.createdAt > 0 && raw.createdAt < 9e15) ? raw.createdAt : 0 };
 }
-(function plTighten() { settings.playlists = (settings.playlists || []).map(plSanitize).filter(Boolean).slice(0, 24); })();
+(function plTighten() {
+  settings.playlists = (settings.playlists || []).map(plSanitize).filter(Boolean).slice(0, 24);
+  settings.plFolders = (settings.plFolders || []).map(plFolderSanitize).filter(Boolean).slice(0, 12);
+  const fids = new Set(settings.plFolders.map(f => f.id));
+  for (const p of settings.playlists) if (p.folder && !fids.has(p.folder)) p.folder = "";
+  for (const f of settings.plFolders) if (f.parent && (!fids.has(f.parent) || f.parent === f.id)) f.parent = "";
+  for (const f of settings.plFolders) if (plIsDescendantFolder(f.id, f.id)) f.parent = "";   /* 循環を断つ */
+})();
 
 function plById(id) { return settings.playlists.find(p => p.id === id) || null; }
 function plIcon(p) { if (p.icon) return p.icon; if (p.frozen && p.locked) return "🧩"; if (p.frozen) return "🧊"; if (p.locked) return "🔒"; return "🎧"; }
@@ -496,7 +579,7 @@ function plCreate() {
   const save = el("button", "plBtn", tr("plSave")); save.type = "button";
   save.addEventListener("click", () => {
     const p = plSanitize({ id: "pl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      name: name.value || tr("plDefaultName", { n: settings.playlists.length + 1 }), icon: icon.value, color: color.value, frozen: false, locked: false, createdAt: Date.now(), songs: [] });
+      name: name.value || tr("plDefaultName", { n: settings.playlists.length + 1 }), icon: icon.value, color: color.value, frozen: false, locked: false, folder: plFolderContext(), createdAt: Date.now(), songs: [] });
     settings.playlists.push(p); saveUserPrefs();
     settings.libTab = "pl:" + p.id;
     d.close(); renderLib();
@@ -512,11 +595,17 @@ function plMenu(p) {
   const name = el("input", "plInput"); name.type = "text"; name.maxLength = 24; name.value = p.name;
   const icon = el("input", "plInput"); icon.type = "text"; icon.maxLength = 4; icon.value = p.icon; icon.placeholder = tr("plIconPh");
   const color = plColorSwatches(p.color);
+  const fldSel = el("select", "plInput");
+  fldSel.append(new Option(tr("plFolderRoot"), ""));
+  for (const f of settings.plFolders) fldSel.append(new Option("　".repeat(plDepthOfFolder(f.id)) + (f.icon || "📁") + " " + f.name, f.id));
+  fldSel.value = p.folder && settings.plFolders.some(f => f.id === p.folder) ? p.folder : "";
+  const tags = el("input", "plInput"); tags.type = "text"; tags.maxLength = 80; tags.value = (p.tags || []).join(" "); tags.placeholder = tr("plTagsPh");
   const fz = el("input"); fz.type = "checkbox"; fz.checked = !!p.frozen;
   const lk = el("input"); lk.type = "checkbox"; lk.checked = !!p.locked;
   const save = el("button", "plBtn", tr("plSave")); save.type = "button";
   save.addEventListener("click", () => {
-    const t = plSanitize({ id: p.id, name: name.value || p.name, icon: icon.value, color: color.value, frozen: fz.checked, locked: lk.checked, songs: p.songs });
+    const t = plSanitize({ id: p.id, name: name.value || p.name, icon: icon.value, color: color.value, frozen: fz.checked, locked: lk.checked, songs: p.songs,
+      folder: fldSel.value, tags: tags.value.split(/[\s、，,]+/).map(x => x.trim().slice(0, 16)).filter(Boolean).slice(0, 5) });
     if (t) Object.assign(p, t);   /* 同じオブジェクトを直す（タブのIDは不変） */
     saveUserPrefs(); d.close(); renderLib();
   });
@@ -527,10 +616,68 @@ function plMenu(p) {
   del.addEventListener("click", () => plDelete(p, d.close));
   lk.addEventListener("change", () => { del.disabled = lk.checked; del.title = lk.checked ? tr("plLockedNo") : ""; });
   d.card.append(plRow(tr("plName"), name), plRow(tr("plIcon"), icon), plRow(tr("plColor"), color),
+    plRow(tr("plFolderOf"), fldSel), plRow(tr("plTags"), tags),
     plRow(tr("plFrozenCheck"), fz), plRow(tr("plLockedCheck"), lk),
     el("div", "plHint", tr("plSongsNow", { n: p.songs.length })),
     save, share, del);
   name.focus(); name.select();
+}
+
+/* 📁 フォルダの新規作成 */
+function plFolderCreate(defaultParent = "") {
+  const d = plDialog(tr("plNewFolder"));
+  const name = el("input", "plInput"); name.type = "text"; name.maxLength = 24; name.value = tr("plDefaultFolderName");
+  const icon = el("input", "plInput"); icon.type = "text"; icon.maxLength = 4; icon.placeholder = tr("plIconPh");
+  const color = plColorSwatches("none");
+  const save = el("button", "plBtn", tr("plSave")); save.type = "button";
+  save.addEventListener("click", () => {
+    const f = plFolderSanitize({ id: "fl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      name: name.value || tr("plDefaultFolderName"), icon: icon.value, color: color.value,
+      parent: plFolderById(defaultParent) ? defaultParent : "", createdAt: Date.now() });
+    settings.plFolders.push(f); saveUserPrefs();
+    d.close(); renderLib();
+    plToast(tr("plFolderCreated", { name: f.name }));
+  });
+  d.card.append(plRow(tr("plName"), name), plRow(tr("plIcon"), icon), plRow(tr("plColor"), color), save);
+  name.focus(); name.select();
+}
+
+/* 📁 フォルダの設定（フォルダタブの長押し） */
+function plFolderMenu(f) {
+  const d = plDialog(tr("plFolderSettings") + "：" + f.name);
+  const name = el("input", "plInput"); name.type = "text"; name.maxLength = 24; name.value = f.name;
+  const icon = el("input", "plInput"); icon.type = "text"; icon.maxLength = 4; icon.value = f.icon; icon.placeholder = tr("plIconPh");
+  const color = plColorSwatches(f.color);
+  const parent = el("select", "plInput");
+  parent.append(new Option(tr("plFolderRoot"), ""));
+  for (const x of settings.plFolders) {
+    if (x.id === f.id || plIsDescendantFolder(x.id, f.id) || plDepthOfFolder(x.id) >= 3) continue;   /* 自分と子孫・深すぎは選べない */
+    parent.append(new Option("　".repeat(plDepthOfFolder(x.id)) + (x.icon || "📁") + " " + x.name, x.id));
+  }
+  parent.value = f.parent && settings.plFolders.some(x => x.id === f.parent) ? f.parent : "";
+  const save = el("button", "plBtn", tr("plSave")); save.type = "button";
+  save.addEventListener("click", () => {
+    const t = plFolderSanitize({ id: f.id, name: name.value || f.name, icon: icon.value, color: color.value, parent: parent.value, createdAt: f.createdAt });
+    if (t) Object.assign(f, t);
+    saveUserPrefs(); d.close(); renderLib();
+  });
+  const del = el("button", "plBtnDanger", tr("plFolderDel")); del.type = "button";
+  del.addEventListener("click", () => plFolderDelete(f, d.close));
+  d.card.append(plRow(tr("plName"), name), plRow(tr("plIcon"), icon), plRow(tr("plColor"), color),
+    plRow(tr("plFolderOf"), parent), save, del);
+  name.focus(); name.select();
+}
+
+/* 🗑 フォルダの削除（中身は消さない。子は上の階層へ） */
+function plFolderDelete(f, onClose) {
+  settings.plFolders = settings.plFolders.filter(x => x !== f);
+  for (const p of settings.playlists) if (p.folder === f.id) p.folder = f.parent;
+  for (const x of settings.plFolders) if (x.parent === f.id) x.parent = f.parent;
+  if (settings.libTab === "fld:" + f.id) settings.libTab = f.parent ? "fld:" + f.parent : "all";
+  saveUserPrefs();
+  if (onClose) onClose();
+  renderLib();
+  plToast(tr("plFolderDeleted"));
 }
 
 /* 🗑 削除（曲はライブラリに残る。🔒中は断る） */
@@ -569,11 +716,13 @@ function plGlobalMenu() {
   make.addEventListener("click", () => { d.close(); plCreate(); });
   const imp = el("button", "plBtn", tr("plImport")); imp.type = "button";
   imp.addEventListener("click", () => { d.close(); plImportPick(); });
+  const mkfld = el("button", "plBtn", tr("plNewFolder")); mkfld.type = "button";
+  mkfld.addEventListener("click", () => { d.close(); plFolderCreate(plFolderContext()); });
   const one = el("input"); one.type = "radio"; one.name = "plDelMode"; one.checked = settings.playlistDelMode !== "three";
   const three = el("input"); three.type = "radio"; three.name = "plDelMode"; three.checked = settings.playlistDelMode === "three";
   const saveMode = () => { settings.playlistDelMode = three.checked ? "three" : "one"; saveUserPrefs(); };
   one.addEventListener("change", saveMode); three.addEventListener("change", saveMode);
-  d.card.append(make, imp, el("div", "plSep"),
+  d.card.append(make, imp, mkfld, el("div", "plSep"),
     plRow(tr("plDelOne"), one), plRow(tr("plDelThree"), three),
     el("div", "plHint", tr("plDelModeHint")));
 }
@@ -598,8 +747,8 @@ function songProfile(it) {
   const m = metaOf(it.key) || {};
   const d = plDialog(tr("plProfileTitle"));
   const f = {};
-  for (const [id, key] of [["title", "plTitle"], ["artist", "plArtist"], ["album", "plAlbum"], ["composer", "plComposer"]]) {
-    const inp = el("input", "plInput"); inp.type = "text"; inp.maxLength = 100; inp.value = m[id] || "";
+  for (const [id, key] of [["title", "plTitle"], ["artist", "plArtist"], ["album", "plAlbum"], ["composer", "plComposer"], ["srcUrl", "plProfileUrl"]]) {
+    const inp = el("input", "plInput"); inp.type = "text"; inp.maxLength = id === "srcUrl" ? 300 : 100; inp.value = m[id] || "";
     if (id === "title") inp.placeholder = it.title;
     f[id] = inp;
     d.card.append(plRow(tr(key), inp));
@@ -622,8 +771,10 @@ function songProfile(it) {
   const save = el("button", "plBtn", tr("plProfileSave")); save.type = "button";
   save.addEventListener("click", () => {
     const nm = {}; let any = false;
-    for (const id of ["title", "artist", "album", "composer"]) {
-      const v = f[id].value.trim().slice(0, 100);
+    for (const id of ["title", "artist", "album", "composer", "srcUrl"]) {
+      let v = f[id].value.trim().slice(0, id === "srcUrl" ? 300 : 100);
+      if (id === "srcUrl" && v && !/^https:\/\//i.test(v) && /^[a-z0-9.-]+\//i.test(v)) v = "https://" + v;   /* https:// を補う */
+      if (id === "srcUrl" && v && !/^https:\/\/\S+$/i.test(v)) { plToast(tr("plLinkBad")); return; }
       if (v) { nm[id] = v; any = true; }
     }
     if (any) SONG_META[it.key] = nm; else delete SONG_META[it.key];
@@ -679,6 +830,7 @@ function plShareData(p, opts) {
   const songs = plLocalSongs(p).map(it => {
     const m = metaOf(it.key) || {}, pr = plProof(it, idx);
     return { title: m.title || it.title, artist: m.artist || it.artist || "", album: m.album || "", composer: m.composer || "",
+      srcUrl: /^https:\/\/\S+$/i.test(m.srcUrl || "") ? String(m.srcUrl).slice(0, 300) : "",   /* 曲ごとの入手先（YouTubeなど） */
       key: it.key, size: it.size || 0,
       badges: opts.badges && pr.info ? pr.info.title : "",
       best: opts.score && pr.info ? pr.info.best : 0,
@@ -690,7 +842,7 @@ function plShareData(p, opts) {
   if (opts.url && /^https:\/\/\S+$/i.test(opts.url)) src.url = String(opts.url).slice(0, 300);   /* 書き出しの境界でも https を確認 */
   return { format: "trk-playlist", version: 1, name: p.name, icon: plIcon(p), color: p.color,
     count: songs.length, createdAt: new Date(p.createdAt || Date.now()).toISOString(),
-    comment: opts.comment || "", source: (src.note || src.url) ? src : undefined, songs };
+    comment: opts.comment || "", tags: opts.tags || [], source: (src.note || src.url) ? src : undefined, songs };
 }
 function plCopyText(text) {
   const done = () => plToast(tr("plShareCopied"));
@@ -711,11 +863,13 @@ function plShareText(v) {
     if (s.auto) bits.push(tr("plAutoMark"));
     else if (s.best) bits.push(s.best.toLocaleString());
     lines.push("♪ " + bits.join(" "));
+    if (s.srcUrl) lines.push(s.srcUrl);   /* 曲ごとの入手先（Esports名場面集など） */
   }
   if (v.songs.length > 20) lines.push(`… +${v.songs.length - 20}`);
   if (v.comment) lines.push(`📝 ${v.comment}`);
   if (v.source && v.source.note) lines.push(`🔗 ${v.source.note}`);
   if (v.source && v.source.url) lines.push(v.source.url);
+  if (v.tags && v.tags.length) lines.push(v.tags.map(t => "#" + t.replace(/[\s、，,#]/g, "")).filter(Boolean).join(" "));
   return lines.join("\n");
 }
 /* 共有ダイアログ（書き出し条件をその場で確認） */
@@ -724,11 +878,13 @@ function plShare(p) {
   const comment = el("input", "plInput"); comment.type = "text"; comment.maxLength = 140; comment.placeholder = tr("plShareComment");
   const note = el("input", "plInput"); note.type = "text"; note.maxLength = 60; note.placeholder = tr("plShareSourceNote");
   const url = el("input", "plInput"); url.type = "text"; url.maxLength = 300; url.placeholder = "https://…";
+  const tags = el("input", "plInput"); tags.type = "text"; tags.maxLength = 80; tags.value = (p.tags || []).join(" "); tags.placeholder = tr("plTagsPh");
   const sc = el("input"); sc.type = "checkbox"; sc.checked = true;
   const bd = el("input"); bd.type = "checkbox"; bd.checked = true;
   const status = el("div", "plHint");
   const opts = () => ({ comment: comment.value.trim().slice(0, 140), note: note.value.trim().slice(0, 60),
-    url: /^https:\/\/\S+$/i.test(url.value.trim()) ? url.value.trim() : "", badges: bd.checked, score: sc.checked });
+    url: /^https:\/\/\S+$/i.test(url.value.trim()) ? url.value.trim() : "", badges: bd.checked, score: sc.checked,
+    tags: tags.value.split(/[\s、，,]+/).map(x => x.trim().slice(0, 16)).filter(Boolean).slice(0, 5) });
   const check = () => {
     const songs = plLocalSongs(p);
     if (songs.length < PL_SHARE_MIN) { status.textContent = tr("plShareNeed9", { n: songs.length }); return false; }
@@ -745,8 +901,9 @@ function plShare(p) {
   const exportBtn = el("button", "plBtn", tr("plShareExport")); exportBtn.type = "button";
   exportBtn.addEventListener("click", () => {
     if (!check()) return;
-    downloadJSON(plShareData(p, opts()), `trk-playlist-${safeName(p.name)}.json`);
-    p.createdAt = p.createdAt || Date.now(); saveUserPrefs();
+    const o = opts();
+    downloadJSON(plShareData(p, o), `trk-playlist-${safeName(p.name)}.json`);
+    p.createdAt = p.createdAt || Date.now(); p.tags = o.tags; saveUserPrefs();
     plToast(tr("plShareExported"));
   });
   const copyBtn = el("button", "plBtn", tr("plShareCopy")); copyBtn.type = "button";
@@ -756,6 +913,7 @@ function plShare(p) {
     plRow(tr("plShareComment"), comment),
     plRow(tr("plShareSourceNote"), note),
     plRow(tr("plShareSourceUrl"), url),
+    plRow(tr("plTags"), tags),
     plRow(tr("plShareScore"), sc), plRow(tr("plShareBadges"), bd),
     status, exportBtn, copyBtn);
 }
@@ -766,6 +924,7 @@ function plSanitizeShared(raw) {
   const songs = raw.songs.slice(0, 1000).map(s => (s && typeof s === "object") ? {
     title: String(s.title || "").trim().slice(0, 120), artist: String(s.artist || "").trim().slice(0, 100),
     album: String(s.album || "").trim().slice(0, 100), composer: String(s.composer || "").trim().slice(0, 100),
+    srcUrl: /^https:\/\/\S+$/i.test(String(s.srcUrl || "")) ? String(s.srcUrl).trim().slice(0, 300) : "",
     key: typeof s.key === "string" ? s.key.slice(0, 128) : "", size: Number(s.size) || 0,
     badges: String(s.badges || "").slice(0, 40),
     best: Math.max(0, Math.floor(Number(s.best) || 0)), plays: Math.max(0, Math.floor(Number(s.plays) || 0)),
@@ -778,6 +937,7 @@ function plSanitizeShared(raw) {
   return { name: String(raw.name || "Playlist").slice(0, 24), icon: String(raw.icon || "🎧").slice(0, 4),
     color: /^[a-z]{3,12}$/.test(raw.color || "") ? raw.color : "none",
     count: songs.length, comment: String(raw.comment || "").slice(0, 140),
+    tags: (Array.isArray(raw.tags) ? raw.tags : []).map(t => String(t).trim().slice(0, 16)).filter(Boolean).slice(0, 5),
     createdAt: String(raw.createdAt || "").slice(0, 30),
     source: (note || url) ? { note, url } : null, songs };
 }
@@ -807,6 +967,11 @@ function plViewer(v) {
   d.card.append(el("b", "plCardTitle", `${v.icon} ${v.name}`));
   d.card.append(el("div", "plHint", [v.createdAt ? v.createdAt.slice(0, 10) : "", tr("plSongsNow", { n: v.songs.length })].filter(Boolean).join(" · ")));
   if (v.comment) d.card.append(el("div", "plShareComment", "📝 " + v.comment));
+  if (v.tags && v.tags.length) {
+    const row = el("div", "plChipsRow");
+    for (const t of v.tags) row.append(el("span", "skinChip on", "#" + t));
+    d.card.append(row);
+  }
   if (v.source) {
     const src = el("div", "plShareSrc");
     if (v.source.note) src.append(el("div", "plHint", "🔗 " + v.source.note));
@@ -827,6 +992,11 @@ function plViewer(v) {
     const sub = [s.artist, s.album].filter(Boolean).join(" · ");
     const marks = [s.badges, s.auto ? tr("plAutoMark") : (s.best ? s.best.toLocaleString() : "")].filter(Boolean).join(" ");
     row.append(el("div", "plHint", [sub, marks].filter(Boolean).join("　")));
+    if (s.srcUrl) {
+      const lb = el("button", "plLinkMini", "🔗"); lb.type = "button"; lb.title = tr("plLinkOpen");
+      lb.addEventListener("click", () => plOpenLink(s.srcUrl));
+      row.append(lb);
+    }
     row.append(el("span", "plShareState", it ? "✅" : "❌"));
     list.append(row);
   }
@@ -835,7 +1005,7 @@ function plViewer(v) {
   take.disabled = !matched.length;
   take.addEventListener("click", () => {
     const p = plSanitize({ id: "pl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      name: v.name, icon: "📥", color: v.color, frozen: false, locked: false, songs: matched.map(x => x.key) });
+      name: v.name, icon: "📥", color: v.color, frozen: false, locked: false, songs: matched.map(x => x.key), tags: v.tags });
     p.createdAt = Date.now();
     settings.playlists.push(p); saveUserPrefs();
     settings.libTab = "pl:" + p.id;
@@ -876,6 +1046,12 @@ function renderLibTabs(tabs) {
       const c = PL_COLORS[t.pl.color];
       if (c) { b.style.background = c; b.style.borderColor = c; b.classList.add("plCol"); }
     }
+    if (t.fld) {
+      b.dataset.fld = t.fld.id;
+      const c = PL_COLORS[t.fld.color];
+      if (c) { b.style.background = c; b.style.borderColor = c; b.classList.add("plCol"); }
+    }
+    if (t.nested) b.classList.add("plNested");   /* フォルダの中のプレイリスト（いま見ているぶん） */
     b.append(el("span", "libTabIcon", t.icon), el("span", "libTabName", t.label), el("i", "libTabN", String(t.n)));
     b.addEventListener("click", () => {
       if (plSuppressClick()) return;
@@ -888,7 +1064,7 @@ function renderLibTabs(tabs) {
       if (t.id === "all") plCreate();            /* 📚すべて の中クリック＝新規プレイリスト */
       else if (t.pl) plDeleteGesture(t.pl, b);   /* プレイリストタブの中クリック＝削除 */
     });
-    onLongPress(b, () => { if (t.pl) plMenu(t.pl); else plGlobalMenu(); });   /* 長押し＝設定（スマホ・PC共通） */
+    onLongPress(b, () => { if (t.pl) plMenu(t.pl); else if (t.fld) plFolderMenu(t.fld); else plGlobalMenu(); });   /* 長押し＝設定（スマホ・PC共通） */
     if (t.pl) {   /* 曲をドラッグして乗せると追加 */
       b.addEventListener("dragover", e => { e.preventDefault(); b.classList.add("dragOver"); });
       b.addEventListener("dragleave", () => b.classList.remove("dragOver"));
@@ -937,8 +1113,22 @@ function renderLib() {
       box.append(bar);
     }
   }
+  if (tabId.startsWith("fld:")) {   /* 📁 フォルダの中身（子フォルダとプレイリスト）へのチップ */
+    const fid = tabId.slice(4), bar = el("div", "plChipsRow");
+    for (const f of settings.plFolders) if (f.parent === fid) {
+      const c = el("button", "skinChip"); c.type = "button"; c.textContent = (f.icon || "📁") + " " + f.name;
+      c.addEventListener("click", () => { settings.libTab = "fld:" + f.id; saveUserPrefs(); renderLib(); });
+      bar.append(c);
+    }
+    for (const p of settings.playlists) if (p.folder === fid) {
+      const c = el("button", "skinChip"); c.type = "button"; c.textContent = `${plIcon(p)} ${p.name}（${plCount(p, new Set(all.map(x => x.key)))}）`;
+      c.addEventListener("click", () => { settings.libTab = "pl:" + p.id; saveUserPrefs(); renderLib(); });
+      bar.append(c);
+    }
+    if (bar.childElementCount) box.append(bar);
+  }
   libView = items.map(x => x.it);
-  if (!items.length) { box.append(el("div", "libEmpty", tr(scope.length ? "libNoMatch" : (tabId.startsWith("pl:") ? "plTabHint" : "libTabEmpty")))); return; }
+  if (!items.length) { box.append(el("div", "libEmpty", tr(scope.length ? "libNoMatch" : (tabId.startsWith("pl:") ? "plTabHint" : tabId.startsWith("fld:") ? "fldTabHint" : "libTabEmpty")))); return; }
   for (const { it, info } of items.slice(0, LIB_SHOW)) {
     const wrap = el("div"); wrap.style.cssText = "display:flex;gap:6px;align-items:stretch";
     const cur = currentSong && currentSong.key === it.key;

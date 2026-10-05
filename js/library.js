@@ -379,7 +379,7 @@ function fadeTo(target, ms) {
   fadeRaf = requestAnimationFrame(step);
 }
 function startPreview() {
-  if (!settings.previewEnabled || phase !== "title" || !currentSong || !video.src || !isFinite(video.duration)) return;
+  if (window._trkMediaPlayerMode || !settings.previewEnabled || phase !== "title" || !currentSong || !video.src || !isFinite(video.duration)) return;
   if (!video.paused) return;
   cancelAnimationFrame(fadeRaf);
   try { video.currentTime = previewStartFor(); } catch (_) {}
@@ -392,7 +392,7 @@ function stopPreview() {
 }
 video.addEventListener("canplay", () => { if (previewPending) { previewPending = false; startPreview(); } });
 video.addEventListener("ended", () => {
-  if (phase !== "title" || !currentSong || !settings.previewEnabled) return;
+  if (window._trkMediaPlayerMode || phase !== "title" || !currentSong || !settings.previewEnabled) return;
   try { video.currentTime = previewStartFor(); } catch (_) {}
   video.play().catch(() => {});
 });

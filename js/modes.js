@@ -535,7 +535,7 @@ function drawOrbitNote(n, isNext, c, g) {
 }
 function drawOrbitCore(ax, ay, now, g) {
   const c = orbitCoreColor(), type = settings.orbitCore, pulse = beatPulse(now);
-  const age = performance.now() - pressH.t, flash = age < 120 ? Math.min(1, .5 * settings.fxPower) * (1 - age / 120) : 0;
+  const age = performance.now() - pressH.t, flash = age < 120 ? Math.min(1, .5 * gameplayFxPower()) * (1 - age / 120) : 0;
   if (type === "planet") {
     if (flash) { ctx.globalAlpha = flash; ctx.fillStyle = c; ctx.beginPath(); ctx.arc(ax, ay, 44, 0, TAU); ctx.fill(); ctx.globalAlpha = 1; }
     ctx.globalAlpha = .9; ctx.lineWidth = 5; ctx.strokeStyle = g.ink;
@@ -644,7 +644,7 @@ function drawOrbitField(now) {   // render.js から呼ばれます
 const ORBIT_IGNORE = new Set(["KeyP", "Escape", "Backquote", "Minus", "Equal", "Tab", "MetaLeft", "MetaRight",
   "AltLeft", "AltRight", "ControlLeft", "ControlRight", "ContextMenu", "PrintScreen"]);
 addEventListener("keydown", e => {
-  if (window._trkSynthModeOpen) return;
+  if (window._trkSynthModeOpen || window._trkMediaPlayerOpen) return;
   if (phase !== "playing" || !isOrbit() || bindingSlot !== null || settings.autoPlay) return;
   if (ORBIT_IGNORE.has(e.code) || /^F\d{1,2}$/.test(e.code) || e.ctrlKey || e.metaKey) return;
   e.preventDefault(); e.stopImmediatePropagation();

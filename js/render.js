@@ -66,12 +66,15 @@ function drawVideo() {
   vctx.clearRect(0, 0, W, H);
   if (!videoReady || settings.videoStyle === "off") return;
   const a = ownField() ? { x:0, y:0, w:W, h:H } : layout().video;
+  const zoom = Math.max(.5, Math.min(3, Number(settings.videoZoom) || 1));
   if (video.videoWidth && video.readyState >= 2) {
-    const s = Math.min(a.w / video.videoWidth, a.h / video.videoHeight);
+    const s = Math.min(a.w / video.videoWidth, a.h / video.videoHeight) * zoom;
     const w = video.videoWidth * s, h = video.videoHeight * s;
+    vctx.save(); vctx.beginPath(); vctx.rect(a.x, a.y, a.w, a.h); vctx.clip();
     vctx.drawImage(video, a.x + (a.w - w) / 2, a.y + (a.h - h) / 2, w, h);
+    vctx.restore();
   } else if (bgImage && bgImage.naturalWidth) {
-    const s = Math.max(a.w / bgImage.naturalWidth, a.h / bgImage.naturalHeight);
+    const s = Math.max(a.w / bgImage.naturalWidth, a.h / bgImage.naturalHeight) * zoom;
     const w = bgImage.naturalWidth * s, h = bgImage.naturalHeight * s;
     vctx.save(); vctx.beginPath(); vctx.rect(a.x, a.y, a.w, a.h); vctx.clip();
     vctx.drawImage(bgImage, a.x + (a.w - w) / 2, a.y + (a.h - h) / 2, w, h);
@@ -96,7 +99,7 @@ function drawHorizontalField(L, now) {
   ctx.fillStyle = g.track; rr(L.hitX, y - 5, L.endX - L.hitX, 10, 5); ctx.fill();
   const age = p - pressH.t;
   if (age < 120) {
-    ctx.globalAlpha = Math.min(1, .5 * settings.fxPower) * (1 - age / 120); ctx.fillStyle = laneColor(pressH.lane);
+    ctx.globalAlpha = Math.min(1, .5 * gameplayFxPower()) * (1 - age / 120); ctx.fillStyle = laneColor(pressH.lane);
     ctx.beginPath(); ctx.arc(L.hitX, y, 64, 0, TAU); ctx.fill(); ctx.globalAlpha = 1;
   }
   ctx.strokeStyle = g.ink;
@@ -114,7 +117,7 @@ function drawVerticalField(L, now) {
     const age = p - pressFlash[col];
     if (age < 160) {
       const gr = ctx.createLinearGradient(0, L.hitY, 0, L.hitY - 460);
-      gr.addColorStop(0, hexToRgba(c, Math.min(.95, .6 * settings.fxPower) * (1 - age / 160))); gr.addColorStop(1, hexToRgba(c, 0));
+      gr.addColorStop(0, hexToRgba(c, Math.min(.95, .6 * gameplayFxPower()) * (1 - age / 160))); gr.addColorStop(1, hexToRgba(c, 0));
       ctx.fillStyle = gr; ctx.fillRect(x - lw / 2, L.hitY - 460, lw, 460);
     }
   }
@@ -214,7 +217,7 @@ function drawCommentaryPanel() {
 
 /* ---------- ヒットエフェクト ---------- */
 function drawEffects() {
-  const k = settings.fxPower, p = performance.now(), g = skin().game;
+  const k = gameplayFxPower(), p = performance.now(), g = skin().game;
   const life = 380 * (0.85 + 0.25 * Math.min(k, 2));
   effects = effects.filter(e => p - e.t < life);
   if (k <= 0) return;

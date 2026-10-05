@@ -1390,7 +1390,7 @@ addEventListener("DOMContentLoaded", () => {
     if (liveOn) startLive(); else stopLive();
     powLed.classList.toggle("on", !isOff);
     pauseLed.classList.toggle("on", !video.paused && !isOff);
-    pow.title = tr("tvPower"); pow.setAttribute("aria-label", pow.title); pow.setAttribute("aria-pressed", String(!isOff));
+    pow.title = `${tr("tvPower")} · ${tr("tvMediaHoldHint")}`; pow.setAttribute("aria-label", pow.title); pow.setAttribute("aria-pressed", String(!isOff));
     pauseBtn.title = tr("tvPause"); pauseBtn.setAttribute("aria-label", pauseBtn.title);
     prevSongBtn.title = tr("tvPrevSong"); prevSongBtn.setAttribute("aria-label", prevSongBtn.title);
     nextSongBtn.title = tr("tvNextSong"); nextSongBtn.setAttribute("aria-label", nextSongBtn.title);

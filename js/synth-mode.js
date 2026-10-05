@@ -12,6 +12,8 @@ Object.assign(TEXT.ja, {
   instHoldHint:"長押しでシンセを開く", instFastHoldHint:"0.2秒長押しでシンセを開く", instHoldDisabledHint:"設定でシンセモードが無効です。",
   instSettingsTitle:"🎹 シンセモード", instSettingsHint:"⏻スピーカーを長押ししてシンセを開きます。通常は0.65秒、下の高速オプションを使うと0.2秒です。",
   instDisableOption:"🚫 シンセモードを起動しない", instFastOption:"⚡ 高速でシンセモードを起動する（起動まで0.2秒）",
+  instKeyboardLockOption:"🔒 シンセモード中はキーボードを鍵盤に固定する（初期オン）", instKeyboardLockHint:"ONなら、音色名やスライダーにフォーカスがあっても、割り当てたキーは鍵盤を鳴らします。OFFで通常の入力に戻ります。",
+  instWideKeyboardOption:"↔ 鍵盤を横に広くする（大きな画面向け）", instWideKeyboardHint:"ONにすると、画面に余裕があるとき鍵盤の各キーを少し大きく表示します。スマホ向けの初期値はOFFです。",
   instTitle:"🎹 シンセモード",
   instSubtitle:"曲を聴きながら、画面の鍵盤またはパソコンのキーで演奏できます。",
   instClose:"閉じる", instEscapeClose:"ESCで閉じる", instDisplay:"📺 VIDEO / 📊 SPECTRUM",
@@ -44,12 +46,15 @@ Object.assign(TEXT.ja, {
   instPatchDeleted:"カスタム音色を削除しました。", instDeleteConfirm:"このカスタム音色を削除しますか？",
   instSavedSourcesOnly:"サンプルファイルはプリセットに含まれません。オシレーター設定だけを保存しました。",
   instStop:"■ 音を止める", instPresetSine:"サイン・キー", instPresetSquare:"スクエア・リード", instPresetSaw:"ソー・リード",
-  instPresetPad:"ウォーム・パッド", instPresetPluck:"プラック", instPresetBass:"サブベース", instPresetOrgan:"オルガン", instPresetBell:"ベル", instPresetSuper:"スーパーソー", instPresetZunpet:"ZUNPET風ブラス"
+  instPresetPad:"ウォーム・パッド", instPresetPluck:"プラック", instPresetBass:"サブベース", instPresetOrgan:"オルガン", instPresetBell:"ベル", instPresetSuper:"スーパーソー", instPresetZunpet:"ZUNPET風ブラス",
+  instPresetGuitar:"エレキギター", instPresetESax:"電子サックス", instPresetEPiano:"FMエレピ", instPresetStrings:"シンセストリングス", instPresetChip:"8ビットチップ", instPresetVocal:"ボコーダーボイス"
 });
 Object.assign(TEXT.en, {
   instHoldHint:"Long-press to open the synthesizer", instFastHoldHint:"Hold for 0.2 seconds to open synth", instHoldDisabledHint:"Synth mode is disabled in Settings",
   instSettingsTitle:"🎹 Synthesizer mode", instSettingsHint:"Long-press the ⏻ speaker to open the synth. The default hold is 0.65 seconds; the fast option below uses 0.2 seconds.",
   instDisableOption:"🚫 Don't launch synth mode", instFastOption:"⚡ Fast synth launch (open after a 0.2-second hold)",
+  instKeyboardLockOption:"🔒 Lock the keyboard to the piano in synth mode (on by default)", instKeyboardLockHint:"When on, mapped keys play the piano even when a sound-name field or slider has focus. Turn it off to restore normal text and control input.",
+  instWideKeyboardOption:"↔ Make the piano keys wider (for larger screens)", instWideKeyboardHint:"When on, each key is shown a little wider when there is room. It is off by default for phone-sized screens.",
   instTitle:"🎹 Synth mode",
   instSubtitle:"Play with the on-screen keys or your computer keyboard while a song is playing.",
   instClose:"Close", instEscapeClose:"Press ESC to close", instDisplay:"📺 VIDEO / 📊 SPECTRUM",
@@ -83,6 +88,8 @@ Object.assign(TEXT.zh, {
   instHoldHint:"长按打开合成器", instFastHoldHint:"长按0.2秒打开合成器", instHoldDisabledHint:"合成器模式已在设置中禁用",
   instSettingsTitle:"🎹 合成器模式", instSettingsHint:"长按⏻扬声器打开合成器。默认长按0.65秒；启用下方快速选项后为0.2秒。",
   instDisableOption:"🚫 不启动合成器模式", instFastOption:"⚡ 快速启动合成器（长按0.2秒打开）",
+  instKeyboardLockOption:"🔒 合成器模式中将键盘固定为琴键（默认开启）", instKeyboardLockHint:"开启后，即使音色名称或滑块获得焦点，已分配的按键仍会弹奏琴键。关闭后恢复普通输入。",
+  instWideKeyboardOption:"↔ 加宽屏幕键盘（适合大屏幕）", instWideKeyboardHint:"开启后，在屏幕有余量时会将每个琴键显示得稍宽一些。手机初始为关闭。",
   instTitle:"🎹 合成器模式",
   instSubtitle:"播放歌曲时，可以使用屏幕键盘或电脑键盘一起演奏。",
   instClose:"关闭", instEscapeClose:"按ESC关闭", instDisplay:"📺 画面 / 📊 频谱",
@@ -109,12 +116,15 @@ Object.assign(TEXT.zh, {
   instPatchNoOsc:"没有可保存的振荡器音源，请先添加振荡器。", instPatchDeleted:"已删除自定义音色。",
   instDeleteConfirm:"要删除此自定义音色吗？", instSavedSourcesOnly:"预设不包含采样文件，仅保存振荡器设置。",
   instStop:"■ 停止发声", instPresetSine:"正弦键盘", instPresetSquare:"方波主音", instPresetSaw:"锯齿主音",
-  instPresetPad:"暖音铺底", instPresetPluck:"拨弦", instPresetBass:"低音贝斯", instPresetOrgan:"管风琴", instPresetBell:"钟声", instPresetSuper:"超级锯齿", instPresetZunpet:"ZUNPET风格铜管"
+  instPresetPad:"暖音铺底", instPresetPluck:"拨弦", instPresetBass:"低音贝斯", instPresetOrgan:"管风琴", instPresetBell:"钟声", instPresetSuper:"超级锯齿", instPresetZunpet:"ZUNPET风格铜管",
+  instPresetGuitar:"电吉他", instPresetESax:"电子萨克斯", instPresetEPiano:"FM电钢琴", instPresetStrings:"合成弦乐", instPresetChip:"8位芯片", instPresetVocal:"人声编码器"
 });
 Object.assign(TEXT.ko, {
   instHoldHint:"길게 눌러 신시사이저 열기", instFastHoldHint:"0.2초 길게 눌러 신시사이저 열기", instHoldDisabledHint:"설정에서 신시사이저 모드가 비활성화되었습니다",
   instSettingsTitle:"🎹 신시사이저 모드", instSettingsHint:"⏻ 스피커를 길게 눌러 신시사이저를 엽니다. 기본은 0.65초이며, 아래 고속 옵션을 사용하면 0.2초입니다.",
   instDisableOption:"🚫 신시사이저 모드 시작 안 함", instFastOption:"⚡ 신시사이저 빠르게 열기 (0.2초 길게 누르기)",
+  instKeyboardLockOption:"🔒 신시사이저 모드에서 키보드를 건반에 고정 (기본 켜짐)", instKeyboardLockHint:"켜면 음색 이름이나 슬라이더에 포커스가 있어도 지정된 키가 건반을 연주합니다. 끄면 일반 입력으로 돌아갑니다.",
+  instWideKeyboardOption:"↔ 화면 건반을 넓게 표시 (큰 화면용)", instWideKeyboardHint:"켜면 화면에 여유가 있을 때 건반 하나하나가 조금 더 넓게 표시됩니다. 휴대폰 기본값은 꺼짐입니다.",
   instTitle:"🎹 신시사이저 모드",
   instSubtitle:"곡을 들으면서 화면 건반이나 컴퓨터 키보드로 연주할 수 있습니다.",
   instClose:"닫기", instEscapeClose:"ESC로 닫기", instDisplay:"📺 영상 / 📊 스펙트럼",
@@ -142,7 +152,8 @@ Object.assign(TEXT.ko, {
   instPatchDeleted:"사용자 음색을 삭제했습니다.", instDeleteConfirm:"이 사용자 음색을 삭제할까요?",
   instSavedSourcesOnly:"프리셋에는 샘플 파일이 포함되지 않습니다. 오실레이터 설정만 저장했습니다.",
   instStop:"■ 음 멈추기", instPresetSine:"사인 키", instPresetSquare:"스퀘어 리드", instPresetSaw:"쏘 리드",
-  instPresetPad:"웜 패드", instPresetPluck:"플럭", instPresetBass:"서브베이스", instPresetOrgan:"오르간", instPresetBell:"벨", instPresetSuper:"슈퍼쏘", instPresetZunpet:"ZUNPET 스타일 브라스"
+  instPresetPad:"웜 패드", instPresetPluck:"플럭", instPresetBass:"서브베이스", instPresetOrgan:"오르간", instPresetBell:"벨", instPresetSuper:"슈퍼쏘", instPresetZunpet:"ZUNPET 스타일 브라스",
+  instPresetGuitar:"일렉트릭 기타", instPresetESax:"전자 색소폰", instPresetEPiano:"FM 일렉트릭 피아노", instPresetStrings:"신스 스트링", instPresetChip:"8비트 칩", instPresetVocal:"보코더 보이스"
 });
 
 /* ============ 音色（基本波形を重ねた、編集可能なスターター） ============ */
@@ -157,7 +168,15 @@ const PRESETS = [
   { id:"organ", nameKey:"instPresetOrgan", sources:[src("organ-square", "square", 0, 0, .26), src("organ-sine", "sine", 0, 0, .28), src("organ-upper", "square", 1, 0, .09)], filter:{ type:"lowpass", cutoff:7800, q:.7 }, env:{ attack:.008, decay:.08, sustain:.88, release:.09 } },
   { id:"bell", nameKey:"instPresetBell", sources:[src("bell-fund", "sine", 0, 0, .38), src("bell-oct", "sine", 1, 0, .23), src("bell-high", "sine", 2, 0, .1)], filter:{ type:"lowpass", cutoff:16000, q:.7 }, env:{ attack:.003, decay:.72, sustain:.008, release:.55 } },
   { id:"supersaw", nameKey:"instPresetSuper", sources:[src("super-a", "sawtooth", 0, -14, .2), src("super-b", "sawtooth", 0, 0, .2), src("super-c", "sawtooth", 0, 14, .2)], filter:{ type:"lowpass", cutoff:5600, q:1 }, env:{ attack:.02, decay:.28, sustain:.62, release:.38 } },
-  { id:"zunpet", nameKey:"instPresetZunpet", sources:[src("zunpet-brass", "sawtooth", 0, -5, .27), src("zunpet-edge", "square", 0, 5, .14), src("zunpet-octave", "triangle", 1, 0, .08)], filter:{ type:"lowpass", cutoff:5200, q:1.7 }, env:{ attack:.012, decay:.16, sustain:.72, release:.18 } }
+  { id:"zunpet", nameKey:"instPresetZunpet", sources:[src("zunpet-brass", "sawtooth", 0, -5, .27), src("zunpet-edge", "square", 0, 5, .14), src("zunpet-octave", "triangle", 1, 0, .08)], filter:{ type:"lowpass", cutoff:5200, q:1.7 }, env:{ attack:.012, decay:.16, sustain:.72, release:.18 } },
+  /* プラック感のある中域＋胴鳴りで、エレキギターらしい立ち上がりを作る */
+  { id:"guitar", nameKey:"instPresetGuitar", sources:[src("guitar-pick", "sawtooth", 0, -7, .23), src("guitar-string", "square", 0, 7, .09), src("guitar-body", "triangle", -1, 0, .22), src("guitar-harmonic", "sine", 1, 0, .06)], filter:{ type:"lowpass", cutoff:4300, q:1.8 }, env:{ attack:.002, decay:.48, sustain:.18, release:.28 } },
+  /* リード波形＋矩形波のリードを軽く混ぜ、電子サックスの息のような明るさを出す */
+  { id:"esax", nameKey:"instPresetESax", sources:[src("esax-body", "sawtooth", 0, -5, .18), src("esax-reed", "square", 0, 5, .1), src("esax-air", "triangle", 1, 0, .06), src("esax-sub", "triangle", -1, 0, .08)], filter:{ type:"lowpass", cutoff:3600, q:2.3 }, env:{ attack:.045, decay:.18, sustain:.72, release:.24 } },
+  { id:"epiano", nameKey:"instPresetEPiano", sources:[src("epiano-fund", "sine", 0, 0, .38), src("epiano-tine", "triangle", 1, 0, .18), src("epiano-shimmer", "sine", 2, 0, .07)], filter:{ type:"lowpass", cutoff:7000, q:1 }, env:{ attack:.004, decay:.65, sustain:.15, release:.5 } },
+  { id:"strings", nameKey:"instPresetStrings", sources:[src("strings-a", "sawtooth", 0, -11, .16), src("strings-b", "sawtooth", 0, 11, .16), src("strings-body", "triangle", -1, 0, .13)], filter:{ type:"lowpass", cutoff:4200, q:.9 }, env:{ attack:.24, decay:.42, sustain:.65, release:.8 } },
+  { id:"chip", nameKey:"instPresetChip", sources:[src("chip-lead", "square", 0, 0, .28), src("chip-sub", "triangle", -1, 0, .16), src("chip-oct", "square", 1, 0, .08)], filter:{ type:"lowpass", cutoff:11000, q:.7 }, env:{ attack:.002, decay:.16, sustain:.5, release:.08 } },
+  { id:"vocal", nameKey:"instPresetVocal", sources:[src("vocal-formant", "sawtooth", 0, -4, .15), src("vocal-core", "triangle", 0, 4, .18), src("vocal-octave", "sine", 1, 0, .06)], filter:{ type:"lowpass", cutoff:2800, q:2.2 }, env:{ attack:.05, decay:.2, sustain:.7, release:.25 } }
 ];
 const PRESET_BY_ID = Object.fromEntries(PRESETS.map(p => [p.id, p]));
 const STATE_KEY = "trk_synth_mode_v1", PATCH_KEY = "trk_synth_patches_v1";
@@ -166,7 +185,7 @@ const WAVE_TYPES = ["sine", "triangle", "sawtooth", "square"];
 const FILTER_TYPES = ["lowpass", "highpass", "bandpass", "notch"];
 const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 const WHITE_SEMIS = new Set([0, 2, 4, 5, 7, 9, 11]);
-const WHITE_W = 42, BLACK_W = 26, FIRST_MIDI = 48, LAST_MIDI = 72; // C3..C5
+const WHITE_W = 42, BLACK_W = 26, WIDE_KEY_SCALE = 1.28, FIRST_MIDI = 48, LAST_MIDI = 72; // C3..C5
 const DEFAULT_KEY_CODES = [
   "KeyZ", "KeyS", "KeyX", "KeyD", "KeyC", "KeyV", "KeyG", "KeyB", "KeyH", "KeyN", "KeyJ", "KeyM",
   "KeyQ", "Digit2", "KeyW", "Digit3", "KeyE", "KeyR", "Digit5", "KeyT", "Digit6", "KeyY", "Digit7", "KeyU", "KeyI"
@@ -335,19 +354,30 @@ addEventListener("DOMContentLoaded", () => {
   const synthSettingsHint = tx("div", "instSettingsHint", "hint");
   const synthDisableRow = makeCheck("synthModeDisabled", "synthModeDisabled", "instDisableOption");
   const synthFastRow = makeCheck("synthModeFastStart", "synthModeFastStart", "instFastOption");
-  synthSettingsPanel.append(tx("summary", "instSettingsTitle"), synthSettingsHint, synthDisableRow, synthFastRow);
+  const synthKeyboardLockRow = makeCheck("synthModeKeyboardLock", "synthModeKeyboardLock", "instKeyboardLockOption");
+  const synthKeyboardLockHint = tx("div", "instKeyboardLockHint", "hint");
+  const synthWideKeyboardRow = makeCheck("synthModeWideKeyboard", "synthModeWideKeyboard", "instWideKeyboardOption");
+  const synthWideKeyboardHint = tx("div", "instWideKeyboardHint", "hint");
+  synthSettingsPanel.append(tx("summary", "instSettingsTitle"), synthSettingsHint, synthDisableRow, synthFastRow, synthKeyboardLockRow, synthKeyboardLockHint, synthWideKeyboardRow, synthWideKeyboardHint);
   const synthSettingsAnchor = document.getElementById("specPanel") || document.getElementById("fxPanel") ||
     (document.getElementById("seEnabled") && document.getElementById("seEnabled").closest("details.panel"));
   if (synthSettingsAnchor) synthSettingsAnchor.after(synthSettingsPanel);
   const synthDisableInput = synthDisableRow.querySelector("input");
   const synthFastInput = synthFastRow.querySelector("input");
+  const synthKeyboardLockInput = synthKeyboardLockRow.querySelector("input");
+  const synthWideKeyboardInput = synthWideKeyboardRow.querySelector("input");
   window._trkSyncSynthModeSettings = () => {
     synthDisableInput.checked = !!settings.synthModeDisabled;
     synthFastInput.checked = !!settings.synthModeFastStart;
+    synthKeyboardLockInput.checked = settings.synthModeKeyboardLock !== false;
+    synthWideKeyboardInput.checked = !!settings.synthModeWideKeyboard;
+    renderPiano();
     updatePowerHint();
   };
   synthDisableInput.addEventListener("change", updatePowerHint);
   synthFastInput.addEventListener("change", updatePowerHint);
+  synthWideKeyboardInput.addEventListener("change", renderPiano);
+  window.addEventListener("resize", () => { if (!overlay.hidden) renderPiano(); });
 
   /* ============ 状態 ============ */
   let customPatches = loadCustomPatches();
@@ -425,8 +455,16 @@ addEventListener("DOMContentLoaded", () => {
   }
 
   /* ============ 鍵盤（QWERTYのZ列＋Q列。黒鍵を数字・中段キーに対応） ============ */
+  function pianoScale() {
+    if (!settings.synthModeWideKeyboard) return 1;
+    const viewport = Number(window.innerWidth) || Number(document.documentElement && document.documentElement.clientWidth) || 0;
+    const available = pianoScroll.clientWidth || Math.max(0, viewport - 40);
+    /* 小画面では従来の630pxを守り、余裕のある画面だけ最大806pxまで広げる。 */
+    return available ? Math.max(1, Math.min(WIDE_KEY_SCALE, available / (15 * WHITE_W))) : WIDE_KEY_SCALE;
+  }
   function renderPiano() {
     piano.textContent = "";
+    const scale = pianoScale(), whiteW = WHITE_W * scale, blackW = BLACK_W * scale;
     const whiteIndexFor = midi => {
       let n = 0;
       for (let m = FIRST_MIDI; m < midi; m++) if (WHITE_SEMIS.has(m % 12)) n++;
@@ -435,8 +473,8 @@ addEventListener("DOMContentLoaded", () => {
     for (let midi = FIRST_MIDI; midi <= LAST_MIDI; midi++) {
       const pc = midi % 12, white = WHITE_SEMIS.has(pc), whiteIndex = whiteIndexFor(midi);
       const b = document.createElement("button"); b.type = "button"; b.className = `instKey ${white ? "white" : "black"}`;
-      b.dataset.midi = String(midi); b.style.left = `${white ? whiteIndex * WHITE_W : whiteIndex * WHITE_W - BLACK_W / 2}px`;
-      if (white) b.style.width = `${WHITE_W}px`; else b.style.width = `${BLACK_W}px`;
+      b.dataset.midi = String(midi); b.style.left = `${white ? whiteIndex * whiteW : whiteIndex * whiteW - blackW / 2}px`;
+      if (white) b.style.width = `${whiteW}px`; else b.style.width = `${blackW}px`;
       b.style.setProperty("--key-index", whiteIndex);
       b.classList.toggle("assignTarget", assignMode && pendingMidi === midi);
       const note = node("span", "instNote", noteName(midi));
@@ -447,7 +485,8 @@ addEventListener("DOMContentLoaded", () => {
       if (!white) b.style.zIndex = "3";
       piano.append(b);
     }
-    piano.style.width = `${15 * WHITE_W}px`;
+    piano.style.width = `${15 * whiteW}px`;
+    piano.dataset.wide = scale > 1 ? "1" : "0";
     for (const midi of pressedMidi.keys()) updateSelectedNote(midi, true);
   }
 
@@ -827,6 +866,7 @@ addEventListener("DOMContentLoaded", () => {
     cancelAnimationFrame(visualRaf); visualRaf = 0;
     if (restoreFocus) power.focus();
   }
+  window._trkCloseSynth = closeSynth;
   // Let controls and text fields keep their native keyboard behavior, but do not
   // let those events bubble back into the rhythm-game hotkeys behind the modal.
   overlay.addEventListener("keydown", e => {
@@ -928,7 +968,8 @@ addEventListener("DOMContentLoaded", () => {
       if (assignMode) setAssign(false); else closeSynth();
       return;
     }
-    if (assignMode && isTyping(e.target)) return; // typing into fields should remain ordinary text editing
+    const mappedIndex = keyMap.indexOf(e.code);
+    if (assignMode && isTyping(e.target) && !settings.synthModeKeyboardLock) return; // OFFなら文字入力を優先
     if (assignMode) {
       const activeAction = e.target && e.target.closest && e.target.closest("button,[role='button']");
       if (pendingMidi == null && activeAction && ["Enter", "Space"].includes(e.code)) return; // keep focused controls operable
@@ -936,10 +977,17 @@ addEventListener("DOMContentLoaded", () => {
       if (!e.repeat) assignPhysicalKey(e.code);
       return;
     }
+    /* ON（初期値）では、フォーカスがスライダーやステータス欄にあっても
+       割り当て済みのキーを先に奪い、鍵盤へ固定する。repeatも毎回止めるので
+       range inputがキーリピートで動くこともない。 */
+    if (settings.synthModeKeyboardLock && mappedIndex >= 0) {
+      e.preventDefault(); e.stopImmediatePropagation();
+      if (!e.repeat) noteOn(`key-${e.code}`, FIRST_MIDI + mappedIndex);
+      return;
+    }
     if (isTyping(e.target)) return;
     if (e.repeat) return;
-    const i = keyMap.indexOf(e.code);
-    if (i >= 0) { e.preventDefault(); e.stopImmediatePropagation(); noteOn(`key-${e.code}`, FIRST_MIDI + i); return; }
+    if (mappedIndex >= 0) { e.preventDefault(); e.stopImmediatePropagation(); noteOn(`key-${e.code}`, FIRST_MIDI + mappedIndex); return; }
     const activeButton = e.target && e.target.closest && e.target.closest("button,[role='button']");
     if ((e.code === "Enter" || e.code === "Space") && activeButton) return;
     if (["ShiftLeft", "ShiftRight", "ControlLeft", "ControlRight", "AltLeft", "AltRight", "MetaLeft", "MetaRight"].includes(e.code)) return;
@@ -948,6 +996,13 @@ addEventListener("DOMContentLoaded", () => {
   window.addEventListener("keyup", e => {
     if (overlay.hidden) return;
     const token = `key-${e.code}`;
+    /* keydownと同じ優先順位でkeyupも止める。これでフォーカス中のrange/selectへ
+       リリース時のキーイベントが流れず、押鍵の開始と終了が必ず対になる。 */
+    if (settings.synthModeKeyboardLock && keyMap.indexOf(e.code) >= 0) {
+      e.preventDefault(); e.stopImmediatePropagation();
+      if (voices.has(token)) noteOff(token);
+      return;
+    }
     if (voices.has(token)) { e.preventDefault(); e.stopImmediatePropagation(); noteOff(token); return; }
     if (!isTyping(e.target) && e.code !== "Tab" && !e.ctrlKey && !e.metaKey && !e.altKey) e.stopImmediatePropagation();
   }, true);

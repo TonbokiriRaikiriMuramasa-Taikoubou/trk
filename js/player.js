@@ -134,7 +134,7 @@ on("language", renderAb);
 /* ---------- キー（ほかのモードより先に受け取る） ---------- */
 let skipBinding = null;
 addEventListener("keydown", e => {
-  if (window._trkSynthModeOpen) return;
+  if (window._trkSynthModeOpen || window._trkMediaPlayerOpen) return;
   if (skipBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureSkip(e.code); return; }
   if (!canSkip()) return;
   if (!settings.autoPlay && usedByMode(e.code)) return;

@@ -75,11 +75,11 @@ Object.assign(TEXT.ko, {
 });
 
 /* ---------- 設定（初期値：色付けはほんのり、揺れと跳ねはオフ、操作はレイアウトに合わせる） ---------- */
-settings.laneTint = num(prefs.laneTint, 0, .5, .08);
-settings.truckBounce = !!prefs.truckBounce;
-settings.swayBeat = !!prefs.swayBeat;
-settings.swayHit = !!prefs.swayHit;
-settings.swayPower = num(prefs.swayPower, .2, 2, 1);
+settings.laneTint = num(prefs.laneTint, 0, .5, .12);
+settings.truckBounce = prefs.truckBounce !== false;
+settings.swayBeat = prefs.swayBeat !== false;
+settings.swayHit = prefs.swayHit !== false;
+settings.swayPower = num(prefs.swayPower, .2, 2, 1.1);
 const TRUCK_PRESETS = { ud:["ArrowUp", "ArrowDown"], lr:["ArrowLeft", "ArrowRight"] };
 settings.truckKeyMode = pick(prefs.truckKeyMode, ["layout", "custom"], "layout");
 settings.truckKeys = (Array.isArray(prefs.truckKeys) && prefs.truckKeys.length === 2 && prefs.truckKeys.every(validCode) && prefs.truckKeys[0] !== prefs.truckKeys[1])
@@ -104,11 +104,14 @@ function truckKeysLabel(pos) {   // プレイ中のキー案内（render.js か�
 
 /* ---------- トラックの状態 ---------- */
 const TRUCK_ROW = 42;   // 横スクロールで、ドン／カッの段を上下にずらす量
-const truckState = { lane:0, vis:0, last:0 };
-function resetTruck() { truckState.lane = 0; truckState.vis = laneCol(0); truckState.last = performance.now(); }
+const truckState = { lane:0, vis:0, last:0, dash:-1e9 };
+function resetTruck() { truckState.lane = 0; truckState.vis = laneCol(0); truckState.last = performance.now(); truckState.dash = -1e9; }
 function steerTruck(lane) {
+  const changed = lane !== truckState.lane;
   truckState.lane = lane;
-  pressFlash[laneCol(lane)] = performance.now();
+  const p = performance.now();
+  if (changed) truckState.dash = p;
+  pressFlash[laneCol(lane)] = p;
 }
 const truckRowY = (L, lane) => L.laneY + (laneCol(lane) ? 1 : -1) * TRUCK_ROW;
 
@@ -131,7 +134,7 @@ function truckJudge(now) {
 let truckBinding = null;   // 0＝レーン1、1＝レーン2、2＝切り替えキー
 const TRUCK_RESERVED = new Set(["KeyP", "Tab", "F5", "F11", "F12", "MetaLeft", "MetaRight", "Backquote", "Minus", "Equal", "Backspace"]);
 addEventListener("keydown", e => {
-  if (window._trkSynthModeOpen) return;
+  if (window._trkSynthModeOpen || window._trkMediaPlayerOpen) return;
   if (truckBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureTruckKey(e.code); return; }
   if (phase !== "playing" || !isTruck() || bindingSlot !== null || settings.autoPlay) return;   // AUTO中は自動で動く
   if (settings.truckToggleKey && e.code === settings.truckToggleKey) {
@@ -225,7 +228,7 @@ function lanePivot(L) {
 }
 function laneTilt(now) {
   if (reduceMotion.matches) return 0;
-  const D = Math.PI / 180, k = settings.swayPower, p = performance.now();
+  const D = Math.PI / 180, k = settings.swayPower * gameplayFxMultiplier(), p = performance.now();
   let a = 0;
   if (settings.swayBeat && chartMeta.bpm) a += Math.sin(Math.PI * (now - chartMeta.offset) / (60000 / chartMeta.bpm)) * 1.4 * D * k;
   if (settings.swayHit) {
@@ -243,7 +246,7 @@ function drawTruck(L, now) {
   truckState.vis += (col - truckState.vis) * Math.min(1, dt * 16);
   const v = truckState.vis, lean = (col - v) * .35;
   const hitK = Math.max(0, 1 - (p - Math.max(avatarHit[0], avatarHit[1])) / 180);
-  const bounce = settings.truckBounce && !reduceMotion.matches ? hitK * 9 + beatPulse(now) * 3 : 0;
+  const bounce = settings.truckBounce && !reduceMotion.matches ? (hitK * 9 + beatPulse(now) * 3) * gameplayFxMultiplier() : 0;
   ctx.save();
   if (L.vertical) {
     ctx.translate(L.centers[0] + (L.centers[1] - L.centers[0]) * v, L.hitY);
@@ -254,6 +257,13 @@ function drawTruck(L, now) {
   }
   ctx.rotate(lean);
   const cab = laneColor(truckState.lane), ink = "#1b1b22";
+  const dashAge = p - truckState.dash;
+  if (dashAge >= 0 && dashAge < 260 && gameplayFxPower() > 0) {
+    ctx.save(); ctx.globalAlpha = (1 - dashAge / 260) * Math.min(1, gameplayFxPower());
+    ctx.strokeStyle = cab; ctx.lineWidth = 5; ctx.lineCap = "round";
+    for (const y of [-18, 0, 18]) { ctx.beginPath(); ctx.moveTo(-142, y); ctx.lineTo(-94, y + lean * 18); ctx.stroke(); }
+    ctx.restore();
+  }
   ctx.lineJoin = "round";
   ctx.fillStyle = "rgba(0,0,0,.28)"; ctx.beginPath(); ctx.ellipse(-35, 36, 70, 8, 0, 0, TAU); ctx.fill();   // 影
   rr(-100, -30, 82, 52, 7); ctx.fillStyle = "#f4f4f8"; ctx.fill();                                          // 荷台
@@ -264,10 +274,10 @@ function drawTruck(L, now) {
   rr(-16, -18, 44, 40, 9); ctx.fillStyle = cab; ctx.fill(); ctx.stroke();                                  // 運転席（今のレーンの色）
   rr(6, -12, 17, 14, 4); ctx.fillStyle = "#cfeaff"; ctx.fill();
   ctx.fillStyle = "#ffe27a"; ctx.beginPath(); ctx.arc(27, 12, 4 + hitK * 2, 0, TAU); ctx.fill();            // ヘッドライト
-  if (hitK > 0 && settings.fxPower > 0) {
+  if (hitK > 0 && gameplayFxPower() > 0) {
     ctx.globalCompositeOperation = "lighter";
     const gr = ctx.createRadialGradient(30, 12, 0, 30, 12, 44);
-    gr.addColorStop(0, `rgba(255,226,122,${Math.min(.8, .4 * settings.fxPower) * hitK})`); gr.addColorStop(1, "rgba(255,226,122,0)");
+    gr.addColorStop(0, `rgba(255,226,122,${Math.min(.8, .4 * gameplayFxPower()) * hitK})`); gr.addColorStop(1, "rgba(255,226,122,0)");
     ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(30, 12, 44, 0, TAU); ctx.fill();
     ctx.globalCompositeOperation = "source-over";
   }

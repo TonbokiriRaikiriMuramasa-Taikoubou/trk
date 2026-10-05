@@ -3,20 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>trk! — All-Generation Rhythm Game</title>
+<title>trk! — AGRG</title>
 <meta name="description" content="trk! is AGRG! — an All-Generation Rhythm Game. Play a rhythm game in your browser with your own music: hit it, drive a truck, orbit with one button, take the STAGE, or catch parcels.">
 <link rel="stylesheet" href="css/style.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<meta property="og:title" content="trk! — All-Generation Rhythm Game">
+<meta property="og:title" content="trk! — AGRG">
 <meta property="og:description" content="手持ちの曲で、すぐ遊べるブラウザ音ゲー">
 <meta property="og:image" content="https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/docs/og.png">
 <meta property="og:url" content="https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/">
 <meta name="twitter:card" content="summary_large_image">
 
 <!-- SNSで共有したときのカード（画像は https:// から始まる完全なURLにする） -->
-<meta property="og:title" content="trk! — All-Generation Rhythm Game">
+<meta property="og:title" content="trk! — AGRG">
 <meta property="og:description" content="ブラウザだけで遊べる音ゲー。手持ちの曲で譜面を自動生成。叩く・走る・回る・舞台・荷物運びの5モード。">
 <meta property="og:url" content="https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/">
 <meta property="og:image" content="https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/docs/og.png">
@@ -107,6 +107,17 @@
           <button id="fullBtnTitle" type="button" aria-label="Fullscreen">⛶</button>
         </div>
       </header>
+
+      <details id="quickGuide" class="panel quickGuide" open>
+        <summary data-i18n="guideTitle"></summary>
+        <p class="hint" data-i18n="guideHint"></p>
+        <div class="guideGrid">
+          <div class="guideStep"><b data-i18n="guideSongTitle"></b><span data-i18n="guideSong"></span></div>
+          <div class="guideStep"><b data-i18n="guideLookTitle"></b><span data-i18n="guideLook"></span></div>
+          <div class="guideStep"><b data-i18n="guideTruckTitle"></b><span data-i18n="guideTruck"></span></div>
+          <div class="guideStep"><b data-i18n="guideSafeTitle"></b><span data-i18n="guideSafe"></span></div>
+        </div>
+      </details>
 
       <div class="selectGrid">
         <!-- 左：曲リスト -->
@@ -264,6 +275,7 @@
             <label class="check"><input id="spIncGenerated" type="checkbox" checked><span data-i18n="spIncGenerated"></span></label>
             <label class="check"><input id="spIncCurrent" type="checkbox" checked><span data-i18n="spIncCurrent"></span></label>
             <label class="check"><input id="spRightsOk" type="checkbox"><span data-i18n="spRightsOk"></span></label>
+            <label class="check"><input id="spCreditCard" type="checkbox" checked><span data-i18n="spCreditCard"></span></label>
             <button id="spBuildBtn" type="button" class="primary slim" data-i18n="spBuildBtn"></button>
             <div id="spStatus" class="hint status"></div>
           </details>
@@ -273,7 +285,9 @@
           <div class="hint center contactLine">
             <span data-i18n="feedbackLabel"></span>
             <a href="https://x.com/ttrk143" target="_blank" rel="noopener noreferrer">X @ttrk143</a> ／
-            <a href="https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues" target="_blank" rel="noopener noreferrer">GitHub Issues</a>
+            <a href="https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues" target="_blank" rel="noopener noreferrer">GitHub Issues</a> ／
+            <a href="privacy.html">Privacy / プライバシー</a> ／
+            <a href="credits.html">Credits / 権利</a>
           </div>
           <div class="hint pclCredit center" hidden></div>
         </div>
@@ -447,6 +461,13 @@
                 </select>
               </label>
               <label class="field">
+                <span data-i18n="videoZoom"></span>
+                <span class="inline tight">
+                  <input id="videoZoom" type="range" min="0.5" max="3" step="0.1">
+                  <span id="videoZoomVal" class="mono"></span>
+                </span>
+              </label>
+              <label class="field">
                 <span data-i18n="scrollSpeed"></span>
                 <span class="inline tight">
                   <input id="scroll" type="range" min="0.5" max="2.5" step="0.1">
@@ -461,6 +482,15 @@
               <input id="fxPower" type="range" min="0" max="3" step="0.1">
               <span id="fxPowerVal" class="mono"></span>
             </div>
+            <label class="field">
+              <span data-i18n="gameFxMode"></span>
+              <select id="gameFxMode">
+                <option value="full" data-i18n="gameFxFull"></option>
+                <option value="soft" data-i18n="gameFxSoft"></option>
+                <option value="off" data-i18n="gameFxOff"></option>
+              </select>
+            </label>
+            <div class="hint" data-i18n="gameFxHint"></div>
             <label class="check"><input id="hideGameplayUI" type="checkbox"><span data-i18n="hideUI"></span></label>
             <label class="check"><input id="errorMeter" type="checkbox"><span data-i18n="errorMeter"></span></label>
             <!-- extras.js がここに「👻 ゴースト」を追加します -->
@@ -710,6 +740,26 @@
             <div class="hint" data-i18n="quickRetryHint"></div>
             <!-- player.js がここに「⏯ 再生の操作」と区間リピートを追加します -->
 
+            <details id="navigationKeysPanel" class="subPanel">
+              <summary data-i18n="navKeysTitle"></summary>
+              <div class="keyRows">
+                <div class="keyRow">
+                  <strong data-i18n="menuReturnKey"></strong><span class="keyValue" id="menuReturnKeyValue"></span>
+                  <button id="menuReturnKeyAssign" type="button" data-i18n="assign"></button>
+                </div>
+                <div class="keyRow">
+                  <strong data-i18n="mediaExitKey"></strong><span class="keyValue" id="mediaExitKeyValue"></span>
+                  <button id="mediaExitKeyAssign" type="button" data-i18n="assign"></button>
+                </div>
+              </div>
+              <label class="check"><input id="menuReturnConfirmCheck" type="checkbox"><span data-i18n="menuReturnConfirmToggle"></span></label>
+              <label class="check"><input id="mediaExitConfirmCheck" type="checkbox"><span data-i18n="mediaExitConfirmToggle"></span></label>
+              <div class="hint" data-i18n="navKeysHint"></div>
+            </details>
+
+            <label class="check"><input id="helpText" type="checkbox"><span data-i18n="helpText"></span></label>
+            <div class="hint" data-i18n="helpTextHint"></div>
+
             <!-- 🚚🎪🚛 各モードの操作キー（TRUCK・STAGE・CATCH・速度） -->
             <details id="modeControlsPanel" class="subPanel">
               <summary data-i18n="modeKeysTitle"></summary>
@@ -762,9 +812,12 @@
                 <label class="field"><span data-i18n="packName"></span><input id="packName" type="text" maxlength="40"></label>
                 <label class="field"><span data-i18n="packAuthor"></span><input id="packAuthor" type="text" maxlength="40"></label>
               </div>
+              <label class="field"><span data-i18n="packRole"></span><input id="packRole" type="text" maxlength="80"></label>
               <label class="field"><span data-i18n="packDesc"></span><input id="packDesc" type="text" maxlength="200"></label>
               <label class="field"><span data-i18n="packLicense"></span><input id="packLicense" type="text" maxlength="400"></label>
+              <label class="field"><span data-i18n="packRights"></span><input id="packRights" type="text" maxlength="240"></label>
               <label class="field"><span data-i18n="packUrl"></span><input id="packUrl" type="url" maxlength="200" placeholder="https://"></label>
+              <label class="check"><input id="packCreditCard" type="checkbox" checked><span data-i18n="packCreditCard"></span></label>
               <div class="incList">
                 <label class="check"><input id="incSkin" type="checkbox" checked><span data-i18n="incSkin"></span></label>
                 <label class="check"><input id="incNotes" type="checkbox" checked><span data-i18n="incNotes"></span></label>
@@ -961,7 +1014,9 @@
       <div class="hint pclCredit" hidden></div>
       <div class="hint center contactLine" style="margin-top:14px">
         <a href="https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues/new?template=feedback.yml" target="_blank" rel="noopener noreferrer" data-i18n="feedbackLink"></a> ／
-        <a href="https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues/new?template=chart_feedback.yml" target="_blank" rel="noopener noreferrer" data-i18n="chartFeedbackLink"></a>
+        <a href="https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues/new?template=chart_feedback.yml" target="_blank" rel="noopener noreferrer" data-i18n="chartFeedbackLink"></a> ／
+        <a href="privacy.html">Privacy / プライバシー</a> ／
+        <a href="credits.html">Credits / 権利</a>
       </div>
     </div>
   </section>
@@ -1035,5 +1090,6 @@
 <!-- ===== 📊 スペクトラム → 🎹 シンセ演奏モード（TrkFX.tap() を使うため末尾） ===== -->
 <script src="js/spectrum.js"></script>
 <script src="js/synth-mode.js"></script>
+<script src="js/media-player-mode.js"></script>
 </body>
 </html>

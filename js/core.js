@@ -63,6 +63,11 @@ const KEY_PRESETS = {
   taiko:   { label:"keyPresetTaiko",   keys:["KeyF", "KeyD"],  sub:["KeyJ", "KeyK"] }
 };
 const validCode = k => typeof k === "string" && /^[A-Za-z0-9]{1,24}$/.test(k);
+const VIDEO_KEY_DEFAULTS = ["NumpadAdd", "NumpadSubtract", "NumpadMultiply", "NumpadDivide", "Numpad0", "Numpad9", "Numpad8", "Numpad7"];
+const savedVideoKeys = Array.isArray(prefs.videoKeys) && prefs.videoKeys.length === VIDEO_KEY_DEFAULTS.length &&
+  prefs.videoKeys.every(validCode) && new Set(prefs.videoKeys).size === VIDEO_KEY_DEFAULTS.length ? prefs.videoKeys.slice()
+  : Array.isArray(prefs.videoKeys) && [5, 7].includes(prefs.videoKeys.length) && prefs.videoKeys.every(validCode) && new Set(prefs.videoKeys).size === prefs.videoKeys.length
+    ? [...prefs.videoKeys, ...VIDEO_KEY_DEFAULTS.slice(prefs.videoKeys.length)] : VIDEO_KEY_DEFAULTS.slice();
 const bootKeys = (Array.isArray(prefs.keys) && prefs.keys.length === 2 && prefs.keys.every(validCode) && prefs.keys[0] !== prefs.keys[1])
   ? prefs.keys.slice() : KEY_PRESETS.standard.keys.slice();
 const bootSub = [0, 1].map(i => { const k = Array.isArray(prefs.subKeys) ? prefs.subKeys[i] : ""; return validCode(k) && !bootKeys.includes(k) ? k : ""; });
@@ -75,9 +80,12 @@ const settings = {
   skin: SKINS[prefs.skin] ? prefs.skin : ({ dark:"shadow", light:"daylight" }[prefs.skin] || "shadow"),
   layout: pick(prefs.layout ?? prefs.gameplayLayout, Object.keys(LAYOUTS), "classic"),
   videoStyle: pick(prefs.videoStyle, (typeof TRK_TV_PRESETS !== "undefined" ? TRK_TV_PRESETS.map(p=>p.id) : ["skin","color","mono","dim","off"]), "skin"),
+  videoZoom: num(prefs.videoZoom, .5, 3, 1),
+  videoKeys: savedVideoKeys,
+  castPolicy: pick(prefs.castPolicy, ["off", "antenna"], "off"),
   bgDim: num(prefs.bgDim, 0, .9, 0),
   bgBlur: num(prefs.bgBlur, 0, 12, 0),
-  scroll: num(prefs.scroll, .5, 2.5, 1),
+  scroll: num(prefs.scroll, .5, 2.5, 1.2),
   latency: num(prefs.latency, -300, 500, 0),
   /* プレイ方法：以前の「AUTO」モードは「MANUAL＋AUTOオン」に引き継ぐ */
   playMode: pick(prefs.playMode, PLAY_MODES, "manual"),
@@ -90,6 +98,11 @@ const settings = {
   reverseHands: !!prefs.reverseHands,
   hideGameplayUI: !!prefs.hideGameplayUI,
   playerMode: !!prefs.playerMode,
+  helpText: prefs.helpText !== false,
+  menuKey: validCode(prefs.menuKey) ? prefs.menuKey : "KeyM",
+  menuConfirm: prefs.menuConfirm !== false,
+  mediaExitKey: validCode(prefs.mediaExitKey) ? prefs.mediaExitKey : "Escape",
+  mediaExitConfirm: prefs.mediaExitConfirm !== false,
   errorMeter: prefs.errorMeter !== false,
   keys: bootKeys,
   subKeys: bootSub,
@@ -99,9 +112,12 @@ const settings = {
   /* 🎹 シンセ演奏モード */
   synthModeDisabled: !!prefs.synthModeDisabled,
   synthModeFastStart: !!prefs.synthModeFastStart,
+  synthModeKeyboardLock: prefs.synthModeKeyboardLock !== false,
+  synthModeWideKeyboard: !!prefs.synthModeWideKeyboard,
   notes: sanitizeNotes(prefs.notes ?? (prefs.skin === "clarity" ? NOTE_PRESETS.clarity : null)),
   mascot: pick(prefs.mascot, ["skin", "none", ...MASCOT_IDS], "skin"),
   fxPower: num(prefs.fxPower, 0, 3, 1.5),
+  gameFxMode: pick(prefs.gameFxMode, ["full", "soft", "off"], "full"),
   vrmFrame: pick(prefs.vrmFrame, ["full", "upper", "face"], "full"),
   vrmTurn: num(prefs.vrmTurn, -60, 60, -20),
   vrmRemember: prefs.vrmRemember !== false,
@@ -146,9 +162,22 @@ const settings = {
   sudden: !!prefs.sudden,
   modMirror: !!prefs.modMirror,
   modRandom: !!prefs.modRandom,
-  cover: num(prefs.cover, .2, .7, .4)
+  cover: num(prefs.cover, .2, .7, .4),
+  catchNitroBonus: prefs.catchNitroBonus !== false,
+  /* ▶ メディアプレーヤー（TV電源長押し） */
+  mediaRepeat: pick(prefs.mediaRepeat, ["off", "one", "all"], "off"),
+  mediaShuffle: prefs.mediaShuffle === true,
+  mediaRate: num(prefs.mediaRate, .5, 2, 1),
+  mediaLoopTrigger: pick(prefs.mediaLoopTrigger, ["toggle", "hold"], "toggle"),
+  mediaWallTrigger: pick(prefs.mediaWallTrigger, ["toggle", "hold"], "toggle"),
+  mediaWallStyle: pick(prefs.mediaWallStyle, ["midnight", "aurora", "paper", "custom"], "midnight"),
+  mediaWallClock: prefs.mediaWallClock !== false,
+  mediaWallStopsVideo: prefs.mediaWallStopsVideo !== false
 };
 function saveUserPrefs() { try { localStorage.setItem(PREFS_KEY, JSON.stringify(settings)); } catch (_) {} }
+/* プレイ中の追加演出だけをまとめて抑える。音声エフェクターの設定とは別です。 */
+const gameplayFxMultiplier = () => settings.gameFxMode === "off" ? 0 : settings.gameFxMode === "soft" ? .42 : 1;
+const gameplayFxPower = () => settings.fxPower * gameplayFxMultiplier();
 
 /* ---------- URLコマンドによる緊急リセット & 設定の書き出し ----------
    画面が触れなくなった時でもURLで復旧できるようにする。
@@ -162,6 +191,7 @@ function saveUserPrefs() { try { localStorage.setItem(PREFS_KEY, JSON.stringify(
    ノーツ設定は細かく詰める人が多いので、tv/audioリセットでは保持される。 */
 function resetVideoPrefs() {
   settings.videoStyle = "color";
+  settings.videoZoom = 1; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.castPolicy = "off"; settings.fxAntenna = false; settings.mediaLoopTrigger = "toggle"; settings.mediaWallTrigger = "toggle"; settings.mediaWallStyle = "midnight"; settings.mediaWallClock = true; settings.mediaWallStopsVideo = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true;
   settings.bgDim = 0; settings.bgBlur = 0;
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = true;
@@ -178,7 +208,7 @@ function resetVideoPrefs() {
 }
 function resetAudioPrefs() {
   settings.musicVolume = 0.7; settings.seVolume = 0.28; settings.seEnabled = false;
-  settings.synthModeDisabled = false; settings.synthModeFastStart = false;
+  settings.synthModeDisabled = false; settings.synthModeFastStart = false; settings.synthModeKeyboardLock = true; settings.synthModeWideKeyboard = false;
   // fx-dock / eq-dock の音まわりがあれば一緒に初期化
   if ("gameVolume" in settings) settings.gameVolume = 0.7;
   if ("eqEnabled" in settings) settings.eqEnabled = false;
@@ -202,6 +232,7 @@ window.TrkSafeMode = () => safeModeOn;
 function enterSafeMode() {
   safeModeOn = true;
   settings.videoStyle = "off";
+  settings.videoZoom = 1; settings.castPolicy = "off"; settings.fxAntenna = false;
   settings.bgDim = 0; settings.bgBlur = 0;
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = false;
@@ -210,15 +241,19 @@ function enterSafeMode() {
   settings.tvSongWhilePlaying = false;                            // セーフモードでは演奏中の曲送りもしない
   settings.specOn = false; settings.specTv = false;               // 📊 スペクトラムも出さない（音の通り道を作らない）
   settings.specSkin = false; settings.specSkinOpen = false;
+  settings.synthModeKeyboardLock = true; // 🎹 セーフモードではシンセを開けないが、既定値は壊さない
+  settings.synthModeWideKeyboard = false;
   settings.libKeepShared = false;        // 📤 セーフモードでは、端末に残した共有の曲も読み戻さない
-  settings.fxPower = 0; settings.hideGameplayUI = false;
+  settings.fxPower = 0; settings.gameFxMode = "off"; settings.hideGameplayUI = false;
   if (settings.mascot === "mmd") settings.mascot = "skin";     // 🩷 セーフモードでは MMD を使わない
   if (typeof view !== "undefined" && view) { try { view.style.filter = "none"; } catch(_) {} }
 }
 function resetAllPrefs() {
   resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs();
-  settings.fxPower = 1.5; settings.hideGameplayUI = false; settings.errorMeter = true;
-  settings.scroll = 1; settings.latency = 0; settings.judge = "standard"; settings.rate = 1;
+  settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
+  settings.scroll = 1.2; settings.latency = 0;
+  settings.catchNitroBonus = true; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();
+  settings.judge = "standard"; settings.rate = 1;
   settings.hidden = false; settings.sudden = false; settings.modMirror = false; settings.modRandom = false; settings.showMasterDiff = false;
   settings.mascot = "skin"; settings.vrmFrame = "full";
   settings.mmdScale = 1; settings.mmdTurn = 0; settings.mmdMotionBpm = 0; settings.mmdMotionKind = "none";
@@ -236,6 +271,8 @@ function exportPrefs(kind) {
   } else if (kind === "audio") {
     out.musicVolume = settings.musicVolume; out.seEnabled = settings.seEnabled; out.seVolume = settings.seVolume;
     out.synthModeDisabled = settings.synthModeDisabled; out.synthModeFastStart = settings.synthModeFastStart;
+    out.synthModeKeyboardLock = settings.synthModeKeyboardLock;
+    out.synthModeWideKeyboard = settings.synthModeWideKeyboard;
     if ("gameVolume" in settings) out.gameVolume = settings.gameVolume;
   } else { // all
     Object.assign(out, settings);

@@ -255,7 +255,7 @@ function drawStageField(now) {
   if (settings.stageBeam) {
     for (let l = 0; l < N; l++) {
       const age = p - stagePress[l]; if (age > 180) continue;
-      const a = Math.min(.9, .5 * settings.fxPower) * (1 - age / 180);
+      const a = Math.min(.9, .5 * gameplayFxPower()) * (1 - age / 180);
       const gr = ctx.createLinearGradient(0, STAGE.hitY, 0, STAGE.topY);
       gr.addColorStop(0, hexToRgba(accent, a)); gr.addColorStop(1, hexToRgba(accent, 0));
       stageQuad(tl + l * topW / N, tl + (l + 1) * topW / N, bl + l * botW / N, bl + (l + 1) * botW / N, STAGE.hitY);
@@ -270,7 +270,7 @@ function drawStageField(now) {
     if (!edge && !settings.stageGuides && !hype) continue;
     ctx.beginPath(); ctx.moveTo(tl + l * topW / N, STAGE.topY); ctx.lineTo(bl + l * botW / N, yb);
     if (hype && !edge) {
-      ctx.shadowColor = accent; ctx.shadowBlur = 14 * settings.fxPower;
+      ctx.shadowColor = accent; ctx.shadowBlur = 14 * gameplayFxPower();
       ctx.strokeStyle = hexToRgba(accent, .55 + .35 * pulse); ctx.lineWidth = 3;
     } else { ctx.strokeStyle = g.track; ctx.lineWidth = 2; ctx.globalAlpha = edge ? .9 : .45; }
     ctx.stroke(); ctx.shadowBlur = 0; ctx.globalAlpha = 1;
@@ -289,7 +289,7 @@ function drawStageField(now) {
   }
 
   /* 判定ライン */
-  ctx.shadowColor = accent; ctx.shadowBlur = 18 * settings.fxPower;
+  ctx.shadowColor = accent; ctx.shadowBlur = 18 * gameplayFxPower();
   ctx.fillStyle = g.ink; ctx.globalAlpha = .75 + .25 * pulse;
   rr(bl - 8, STAGE.hitY - 5, botW + 16, 10, 5); ctx.fill();
   ctx.shadowBlur = 0; ctx.globalAlpha = 1;
@@ -327,7 +327,7 @@ function drawStageField(now) {
 /* ============ 入力（キー：main.js より先／タッチ：レーンを直接タップ、複数指OK） ============ */
 let stageBinding = null;
 addEventListener("keydown", e => {
-  if (window._trkSynthModeOpen) return;
+  if (window._trkSynthModeOpen || window._trkMediaPlayerOpen) return;
   if (stageBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureStageKey(e.code); return; }
   if (phase !== "playing" || !isStage() || bindingSlot !== null || settings.autoPlay) return;
   const i = stageKeys().indexOf(e.code); if (i < 0) return;

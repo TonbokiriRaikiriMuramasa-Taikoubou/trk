@@ -57,12 +57,36 @@ redistribution is OK. For every bundled model:
 (together with `js/characters/miku.js`, see section 2).
 
 ## 4. Third-party libraries
+
+### 4a. Web runtime libraries
+
 Loaded from jsDelivr only when the VRM or MMD mascot is used:
 - three.js — MIT License — https://github.com/mrdoob/three.js
 - @pixiv/three-vrm, @pixiv/three-vrm-animation — MIT License — https://github.com/pixiv/three-vrm
 - @yohawing/three-mmd-loader — MIT License — https://github.com/yohawing/three-mmd-loader
   (PMX/PMD/VMD loading; MMD is a trademark of Yu Higuchi / MikuMikuDance, and this
   loader is an independent, unaffiliated implementation)
+
+These libraries are not bundled into the normal page as local source; the Web app
+loads them from jsDelivr only when the corresponding 3D feature is used. Their
+copyright and license terms remain with their respective authors.
+
+### 4b. Optional Android wrapper
+
+The repository includes an optional Capacitor build path. If an Android project
+is generated with `docs/android.md`, the following Capacitor runtime packages are
+used in the generated app:
+- `@capacitor/core` — MIT License — https://github.com/ionic-team/capacitor
+- `@capacitor/android` — MIT License — https://github.com/ionic-team/capacitor
+
+The following are build-time tools, not trk!'s Web runtime:
+- `@capacitor/cli` — MIT License — https://github.com/ionic-team/capacitor
+- TypeScript — Apache License 2.0 — https://github.com/microsoft/TypeScript
+
+`package-lock.json` records transitive npm packages used by the optional build
+toolchain. Each package keeps its own license and copyright notices; the generated
+Android project and its release process must preserve the notices required by
+those packages. This file does not grant GPL rights to third-party software.
 
 ## 5. Not affiliated
 trk! is an independent fan project. It is not affiliated with or endorsed by

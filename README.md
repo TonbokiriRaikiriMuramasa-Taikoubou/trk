@@ -1,4 +1,4 @@
-# trk!
+# trk! — AGRG
 
 > **trk! is AGRG!** — an **A**ll-**G**eneration **R**hythm **G**ame
 > 手持ちの曲ひとつで、叩いても、走っても、回っても、舞台に立っても、荷物を運んでもOK🚚
@@ -47,6 +47,10 @@ trk!（トラック）は、ブラウザだけで動く**非営利のリズム�
 3. 曲を選ぶと、プレビューが流れます。
 4. プレイ方法と難易度を選んで、**▶ PLAY**！
 
+画面上部の **🧭 まずは3分チュートリアル** を開くと、スキン・サウンドエフェクト・TRUCK／CATCHの遊び方を確認できます。
+
+TVドックの **⏻ 電源を長押し**すると、ゲームを始めずに聴けるメディアプレーヤーへ切り替わります。再生キュー、曲送り、リピート、シャッフル、再生速度、前回位置の復元、スリープタイマー、Media Sessionに対応しています。逆再生（対応環境では音声も反転）とA-B区間ループも使えます。**Loop Lab**では、現在位置から5／10／20秒の区間ループ、ランダムな短区間、曲ごとのA-Bプリセット保存・呼び出し・個別削除・全消去ができます。プリセットは曲識別子とA/B秒数だけを端末内に保存し、音源の切り取り・変換・書き出し・アップロードは行いません。動画を一時的に壁紙／スクリーンセーバーで隠すこともでき、時計表示、動画を止める／続ける、トグル／長押し、端末から選んだ画像（セッション中のみ）に対応します。外部出力は初期オフで、対応ブラウザーだけがアンテナ操作から選択画面を開けます。
+
 **対応している形式：** MP4・MP3・M4A・OGG・OPUS・WAV・WebM・FLAC・AAC・MOV（ブラウザが再生できるもの）
 
 ### 自分のPCで動かす
@@ -69,7 +73,7 @@ python -m http.server 8000
 | 🚚 **TRUCK** | トラックでレーンを移動します。トラックが踏んだノーツは自動で判定されます。全世代向けのやさしいモードです | ↑↓ または ←→（レイアウトに合わせて自動）。切り替えキー1つでも遊べます |
 | 🪐 **ORBIT** | うねる1本の道が、四方八方から画面中央の判定点へ流れ込みます。**どのキーでもOK**のワンボタンモードです | どのキーでも／画面タップ |
 | 🎪 **STAGE** | 奥から手前へ流れる縦レーン（4／5／6レーン）。階段・トリル・2レーン幅のワイドノーツが出ます | D F J K など（レーン数ごとに設定）／レーンを直接タップ |
-| 🚛 **CATCH** | 落ちてくる荷物を、トラックの荷台で受け止めます。道の上の**ニトロ缶🚀**を取ると、しばらく「**ぶっ飛ばしモード**」（受け止める幅2倍・移動が速くなる）になります | ←→ または A・D／画面をなぞる |
+| 🚛 **CATCH** | 落ちてくる荷物を、トラックの荷台で受け止めます。道の上の**ニトロ缶🚀**を取ると、しばらく「**ぶっ飛ばしモード**」（受け止める幅2倍・移動が速くなる）になります。設定でニトロ中の得点を **1.1倍** にできます | ←→ または A・D／画面をなぞる |
 
 - 譜面は、BPM・譜面ずらし・**Seed**から自動で作られます。Seedを変えると譜面も変わります。
 - 難易度：初級・中級・上級（隠し難易度もあります）。
@@ -95,13 +99,17 @@ python -m http.server 8000
 | ❤ **体力モード** | Standard／Knight／**trk!**（1ミスで終了🐔）／Infinite。表示は、ハート・ゲージ・バッテリー・絵文字など7種類から選べます |
 | **3・2・1・GO!** | 曲のBPMに合わせたカウントダウン。一時停止から戻るときもカウントできます |
 | **判定の厳しさ** | ゆるめ（練習扱い）／標準／きびしめ |
-| ⏩ **再生速度** | 0.5x〜2.0x（設定で3.0xまで）。音程は変わりません。**1.05x以上は速度ごとに別のハイスコア**と「🏁 最高クリア速度」が残ります |
+| ⏩ **再生速度** | 0.5x〜2.0x（設定で3.0xまで）。初期値は少し速めの **1.2x**。音程は変わりません。**1.05x以上は速度ごとに別のハイスコア**と「🏁 最高クリア速度」が残ります |
 | **HIDDEN／SUDDEN** | ノーツが途中で消える／途中から現れる |
 | 🎲 **RANDOM／ANTI-ROLL**（STAGE） | レーンの並びを入れ替える／同じレーンの連打を避けて1ノーツずつ入れ替える。Seedで決まるので記録の対象です |
 | **ミラー**（STAGE） | 左右反転 |
 | **キー設定** | メイン・サブキー、プリセット（A／Space、osu!taiko風 F・J／D・K）、左右反転（左利き用） |
+| **動画操作** | 動画の拡大・縮小（0.5〜3x）、逆再生、A-B区間ループ、メディアプレーヤーの再生速度・一時停止をキーアサインできます。区間ループはトグル／長押し中だけを選べます |
+| **ナビゲーション** | メニューへ戻るキー、プレーヤー終了キー、各操作の確認表示、説明文の表示／非表示を設定できます |
+| **追加演出** | 「全部見せる／控えめ／追加演出オフ」。画面の光・揺れ・ヒット演出だけを抑え、音声エフェクターは別に設定できます |
 | 🎯 **オフセット測定** | カチッという音に合わせて16回タップすると、ちょうどよいタイミング補正を提案します |
 | **自動微調整** | プレイ後に「早い／遅い」の偏りから、補正値を少しずつ直します（初期値オフ） |
+| ▶ **メディアプレーヤー** | TVドックの電源長押しで起動。ゲームを始めずに再生キュー、前後の曲、リピート、シャッフル、0.5〜2x速度、逆再生、A-B区間ループ、壁紙／スクリーンセーバー、15／30／60分スリープタイマー、前回位置の復元を使えます。**Loop Lab**で5／10／20秒・ランダム区間を作り、曲ごとのA-Bプリセットを端末内に保存・呼び出し・削除できます。ファイルの切り取り／変換／書き出しはしません。A点・B点を置き、割り当てキーのトグル／長押しで気軽に解除できます。Mキーでメニューへ戻る、ESCでプレーヤー終了（確認はオフに変更可能）も設定できます。外部出力は明示的に許可したときだけ |
 
 ---
 
@@ -167,7 +175,7 @@ AUTO中か、「シークバーを表示（練習用）」をオンにしてい�
 - **揺れ**：ビートやドン／カッに合わせてレーンを傾けます（初期値オフ。OSの「視差効果を減らす」がオンなら止まります）
 - **マスコット**：オレンジ相棒、初音ミク（PCL・非公式の二次創作）、**自分のVRMモデル**（VRM 1.0）、**自分のMMDモデル**（.pmx／.pmd）。VRM の .vrma も MMD の .vmd も、曲のBPMに合わせて動きます。
 - **⭐ お気に入りは、フォルダで分ける**：曲・映像フィルター・エフェクトのお気に入りを、**⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り**の4つに分けて持ち歩けます。**個数の上限はありません**（ボタンに入りきらないぶんは、下に並びます）。🧊は凍結（追加・削除を止める）、📌は「**絶対に外れない**」（🎲おまかせの候補に必ず入ります）。外したものは📤元お気に入りに残り、抽選には出てきません。📤書き出し／📥読み込み（`trk-favs`）で、別の端末にも持っていけます。
-- **🩷 MMDマスコット（持ち込み式）**：Lat式ミクやタワシ式CHAN×CO系ミクなど、**お手持ちのMMDモデル**を動かせます。テクスチャごとフォルダを選ぶだけ。内蔵モーションは trk! がコードで作る自作の3種（step／swing／turn）で、自分の `.vmd` も読み込めます。**モデルとモーションは同梱していません**（MMDの模型は再配布できないものがほとんどです）。大きさ・向き・画面下のクレジットを設定でき、チェックを入れると次に開いたときも復元します。`?safe=1` のときは読み込みません。**うまく動かないときは、同じパネルの「🔎 動作チェック」**を押すと、WebGL・CDN（three／three-mmd-loader）・モデル・モーションの状態が1か所に出ます。「📋 結果をコピー」でそのまま貼ってもらえれば、原因を切り分けられます。
+- **🩷 MMDマスコット（持ち込み式）**：Lat式ミクやタワシ式CHAN×CO系ミクなど、**お手持ちのMMDモデル**を動かせます。テクスチャごとフォルダを選ぶだけ。内蔵モーションは trk! がコードで作る自作の3種（step／swing／turn）で、自分の `.vmd` も読み込めます。**モデルとモーションは原則同梱していません**（MMDの模型は再配布できないものがほとんどです）。例外として、再配布条件と原文ReadMeを同梱できるLat式モデルを `assets/mmd/lat-miku/` に収録しています。大きさ・向き・画面下のクレジットを設定でき、チェックを入れると次に開いたときも復元します。`?safe=1` のときは読み込みません。**うまく動かないときは、同じパネルの「🔎 動作チェック」**を押すと、WebGL・CDN（three／three-mmd-loader）・モデル・モーションの状態が1か所に出ます。「📋 結果をコピー」でそのまま貼ってもらえれば、原因を切り分けられます。
 
 ---
 
@@ -191,7 +199,7 @@ trk! は、音楽プレイヤーとしても楽しめます。設定画面の「
 - ⏱ **タイミング自動補正**：エフェクトで音が遅れる分を、ノーツの判定で自動的に補正します（微調整あり）。
 - 📄 **譜面に記録**：Exportした譜面にエフェクトも入るので、受け取った人も同じ音で遊べます。
 - 🎛 **エフェクトチェーン編集**：17種のエフェクトを視覚的につなぎ、順序を入れ替え、EQ・音量を調整。すぐ試す・マイプリセット保存・`trk-fx` JSONの読み込み／書き出しに対応。
-- 🎹 **シンセ演奏モード**：ラックの⏻スピーカーを長押し（標準0.65秒。設定で無効化または0.2秒に短縮可能）。10種の基本音色（ZUNPET風ブラスを追加）、ピッチ移調つまみ（−8〜＋8半音、初期値0・保存・押鍵中も反映）、最大6音源レイヤー（オシレーターを重ねたり、端末内の短いサンプルを加えたりできます）、2オクターブ鍵盤とキーアサインで、曲のプレビューに合わせて演奏できます。上部は動画＋スペクトラム表示。
+- 🎹 **シンセ演奏モード**：ラックの⏻スピーカーを長押し（標準0.65秒。設定で無効化または0.2秒に短縮可能）。16種の基本音色（エレキギター、電子サックス、ZUNPET風ブラスなど）を収録し、ピッチ移調つまみ（−8〜＋8半音、初期値0・保存・押鍵中も反映）、最大6音源レイヤー（オシレーターを重ねたり、端末内の短いサンプルを加えたりできます）、2オクターブ鍵盤とキーアサインで、曲のプレビューに合わせて演奏できます。シンセ中は割り当てキーを鍵盤へ固定する設定が初期オンで、設定から鍵盤を横に広くすることもでき、上部は動画＋スペクトラム表示。
 
 ### 🧩 マイプリセット（MOD）
 「⇩ 今の設定をJSONで書き出す」で書き出したファイルを編集して読み込むと、自分のプリセットになります（形式 `trk-fx`）。
@@ -250,9 +258,12 @@ osu! のスキンのように、いろいろなものを1つのファイル（`.
 - **曲パック**：音源・譜面・背景画像・BPM・譜面作者の名前・作者のことば（1パック50曲まで）
 - 作り方：設定画面の「＋ 今の設定からパックを作る」、選曲画面の「📦 この曲を曲パックにする」
 - 入れ方：画面にドロップするだけです。
+- `pack.json` の任意の `creditCard` で、作者名・肩書き・権利メモ・利用条件を名刺のように表示できます。`contributors` で最大12人の共同制作者も表示でき、パック内には `CREDITS.md` が自動生成されます。パック一覧から共有用SVG名刺もダウンロードできます。画像を使わないテキスト形式なので、配布先でも扱いやすい設計です。
 
 > ⚠ パックには、**自分に再配布の権利がある素材・曲だけ**を入れてください。
-> 中身は ZIP です。形式名 `shadow-taiko-pack` は、以前のパックとの互換のためにそのまま使っています。
+> 中身は ZIP です。形式名 `shadow-taiko-pack` は、以前のパックとの互換のためにそのまま使っています。項目・上限・`pack.json` の例は [docs/pack-format.md](docs/pack-format.md) にまとめています。
+>
+> リポジトリの静的な参照・構文検査は `node tools/check-repo.mjs` で実行できます。これは実機ブラウザ確認の代わりにはなりません。
 
 ### ✔ 公認パック
 作曲家さん・譜面作者さんの**本人確認と権利の確認**が済んだ曲パックには **✔公認** が付き、作者さんの「💬 作者のことば」（Xの無料枠と同じ280まで）が表示されます。
@@ -288,7 +299,9 @@ osu! のスキンのように、いろいろなものを1つのファイル（`.
 - スマホのブラウザで上のリンクを開き、「**ホーム画面に追加**」を選ぶと、アプリのように全画面で遊べます。
 - スマホでは「**📤 ミュージックフォルダを共有**」を試してください。フォルダを選べる端末（Android の Chrome など）なら、ミュージックフォルダの中身を一気に取り込めます。フォルダを選べない端末では、曲を1つずつ追加してください。
 - フォルダの許可を**覚えておく**のは、パソコンの Chrome／Edge だけです。スマホでも設定の「**💾 共有した曲を端末に残す**」をオンにすると、保存された曲（最大150曲・300MB）は許可なしで遊べます。
-- スマホの音楽フォルダを読み込めるアプリ版（APK）は、今後の予定です。
+- APK版はまだ配布していません。PWAの静的Web資産をCapacitorでAndroidアプリへ同期する準備を追加しました。初回セットアップと制限は [docs/android.md](docs/android.md) をご覧ください。
+- プライバシー方針は [privacy.html](privacy.html) です。trk! はアカウント・広告・行動分析を使わず、曲や設定を基本的に端末内で扱います。
+- コード・ミク・同梱モデル・第三者ライブラリのクレジットは [credits.html](credits.html) の「権利とクレジット図鑑」にまとめています。正式な注意書きは [NOTICE.md](NOTICE.md) です。
 
 ---
 
@@ -355,7 +368,8 @@ trk! はMODしやすいように、機能ごとにファイルを分けていま
 
 ```
 trk/
-├─ index.html  manifest.webmanifest  sw.js  verified.json
+├─ index.html  privacy.html  credits.html  manifest.webmanifest  sw.js  verified.json
+├─ package.json  capacitor.config.ts
 ├─ css/style.css
 ├─ icons/                        … アプリのアイコン
 ├─ js/
@@ -373,16 +387,18 @@ trk/
 │  ├─ tv-presets.js  tv-dock.js  … 映像フィルター・TVドック・カスタムTVスキン
 │  ├─ fx-presets.js  fx.js       … サウンドエフェクト
 │  ├─ library.js                 … 選曲画面・AUTO・ラジオ・曲のタブ（棚）
-│  ├─ lib-skins.js               … 棚スキン8種（曲タブの見た目・🎨ボタン）
+│  ├─ lib-skins.js               … 棚スキン16種（曲タブの見た目・🎨ボタン）
 │  ├─ verified.js                … 公認パック
 │  ├─ addons.js  addons/         … アドオン（あとから機能を足すしくみ・見本）
 │  ├─ main.js  speed.js          … 入力・起動・速度
 │  ├─ vrm.js                     … VRMマスコット
-│  ├─ mmd.js                     … MMDマスコット（モデル・モーションは持ち込み）
+│  ├─ mmd.js                     … MMDマスコット（原則持ち込み。再配布条件付きLat式を同梱）
 │  ├─ favs.js                    … ⭐ お気に入りのフォルダ管理（1軍／2軍／🧊／📤元）
 │  └─ spectrum.js                … 📊 スペクトラム（音の見える化・TVの画面に重ねられる）
-├─ docs/  HANDOFF.md  verified.md  og.png
+├─ docs/  HANDOFF.md  pack-format.md  android.md  verified.md  og.png
 ├─ tools/make-icons.html         … アイコンとOGP画像を作るツール
+├─ tools/check-repo.mjs          … 依存なしの静的スモーク検査
+├─ tools/prepare-mobile-web.mjs  … Capacitor用Web資産の同期
 ├─ .github/ISSUE_TEMPLATE/       … 不具合・アイデアのフォーム
 ├─ README.md  NOTICE.md  CONTRIBUTING.md  LICENSE
 ```
@@ -429,7 +445,9 @@ trk! は、たくさんの音楽ゲームから着想をもらっています。
 | ソースコード | **GNU GPL v3.0 or later**（[LICENSE](LICENSE)） |
 | 「trk!」の名前 | ライセンスの対象外です。派生版は、別の名前で公開してください |
 | 初音ミクのマスコット（`js/characters/miku.js`） | ピアプロ・キャラクター・ライセンス（PCL）に基づく二次創作です。**GPLの対象外**で、非営利・無償の範囲でのみ使えます |
-| three.js ／ three-vrm ／ three-mmd-loader | MIT License（VRM・MMDの使用時にCDNから読み込み） |
+| three.js ／ three-vrm ／ three-vrm-animation ／ three-mmd-loader | MIT License（VRM・MMDの使用時にCDNから読み込み） |
+| Capacitor Core ／ Android | MIT License（任意のAndroidラッパーを生成したときだけ使用） |
+| Capacitor CLI ／ TypeScript | MIT ／ Apache-2.0（APK生成用の開発ツール。アプリ実行時には含めない） |
 | 利用者が読み込む曲・VRM・MMDモデル・.vmd・パック | それぞれの作者のものです |
 | 公認パックの曲・譜面・作者のことば | 作者さんのものです。GPLの対象外で、trk! で遊ぶための公開です |
 
@@ -444,7 +462,7 @@ https://piapro.jp/license/pcl/summary
 ### お願い
 - 権利のない曲を、曲パックなどで配らないでください。
 - VRMモデルは、作者の利用条件を確認してから使ってください（VRChat改変モデルは、元の規約も確認してください）。
-- MMDモデル・モーションも、**同梱していません**。使うときは作者の規約（再配布の可否・MMD／MMM以外のソフトでの使用・商用の可否）を確かめて、**自分の端末から**読み込んでください。trk! は読み込んだファイルを保存も送信もしません（下の「保存」にチェックを入れたときだけ、このブラウザの中に残します）。
+- MMDモデル・モーションは原則、作者の規約（再配布の可否・MMD／MMM以外のソフトでの使用・商用の可否）を確かめて、**自分の端末から**読み込んでください。例外として `assets/mmd/lat-miku/` は再配布条件のReadMeを同梱しています。trk! は利用者が読み込んだファイルを保存も送信しません（下の「保存」にチェックを入れたときだけ、このブラウザの中に残します）。
 
 詳しくは [NOTICE.md](NOTICE.md) をご覧ください。
 
@@ -464,7 +482,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 - 🎪 **STAGE** — 4/5/6-lane vertical play with stairs, trills and wide notes (inspired by World Dai Star: Yume no Stellarium)
 - 🚛 **CATCH** — catch falling parcels with your truck; grab nitro cans 🚀 for **Blast mode**
 
-**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, VRM 1.0 mascots, MMD mascots (bring your own model, with an on-device 🔎 self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), 📤 **share your music folder** (one permission pulls the whole folder in at once, with an optional on-device copy of up to 150 songs / 300 MB), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, visual effect-chain editor, automatic latency compensation and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 10 built-in sounds (including a layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
+**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, VRM 1.0 mascots, MMD mascots (bring your own model, with an on-device 🔎 self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), 📤 **share your music folder** (one permission pulls the whole folder in at once, with an optional on-device copy of up to 150 songs / 300 MB), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, visual effect-chain editor, automatic latency compensation and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 16 built-in sounds (including electric guitar, electronic sax, and layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, a default option to lock mapped keys to the piano while synth mode is open, an optional wider on-screen keyboard for larger displays, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
 
 **✔ Verified packs:** song packs whose composer/charter identity and rights have been confirmed get a ✔ badge and a short message from the creator (up to 280, like a free X post). See [docs/verified.md](docs/verified.md).
 
@@ -472,7 +490,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 
 **Feedback:** casual thoughts on X [@ttrk143](https://x.com/ttrk143) (hashtag **#trkAGRG**), bugs and ideas on [GitHub Issues](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues).
 
-**License:** code under **GPL-3.0-or-later**. The name “trk!” is not licensed — please rename forks. The Hatsune Miku mascot (`js/characters/miku.js`) is fan art under the Piapro Character License (non-commercial only) and is **not** covered by the GPL; delete that file and its `<script>` line for commercial forks. MMD models and `.vmd` motions are **never bundled** — you load your own from your device, and their authors' terms apply. Songs, charts and messages in verified packs belong to their creators.
+**License:** code under **GPL-3.0-or-later**. The name “trk!” is not licensed — please rename forks. The Hatsune Miku mascot (`js/characters/miku.js`) is fan art under the Piapro Character License (non-commercial only) and is **not** covered by the GPL; delete that file and its `<script>` line for commercial forks. MMD models and `.vmd` motions are normally loaded from your device and their authors' terms apply; the redistributable Lat-style model under `assets/mmd/lat-miku/` includes its original terms and is not covered by the GPL. Songs, charts and messages in verified packs belong to their creators.
 
 This work depicts the character “Hatsune Miku” of Crypton Future Media, INC. under the Piapro Character License.
 

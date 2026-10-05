@@ -3,8 +3,9 @@
    trk! lib-skins.js — 📚 曲リストの「棚」スキン（曲タブの見た目）
    ・タブの中身（どの曲がどのタブか）は library.js が作ります。
      ここは #libPanel[data-lib-skin="…"] を付け替えて、見た目を変えるだけ。
-   ・11種類：player / note / sticker / card / cassette / blackboard / retro / clearfile
+   ・16種類：player / note / sticker / card / cassette / blackboard / retro / clearfile
               ＋ 🎰 juke（ジュークボックス）／📻 guide（ラジオ番組表）／🚉 board（電光掲示板）
+              ＋ 💿 vinyl（レコード棚）／📼 vhs（レンタルビデオ）／🎤 karaoke（カラオケ目次）／🗂️ archive（図書館の書架）／🍱 menu（お品書き）
    ・曲リストの見出しの 🎨 ボタンで、その場で切り替え（settings.libSkinQuick で隠せます）
    ・設定画面「見た目」にも、スキンの選択と 🎨 ボタンの表示切り替えがあります
    読み込み順：i18n.js → core.js → … → library.js → verified.js → lib-skins.js

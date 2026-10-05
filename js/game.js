@@ -53,7 +53,7 @@ function resetRun() {
     n.lane = l;
   });
   nextIdx = 0;
-  stats = { perfect:0, good:0, miss:0, combo:0, maxCombo:0, star:0, fast:0, slow:0, goodFast:0, goodSlow:0, crash:0, errN:0, errSum:0, errSq:0 };
+  stats = { perfect:0, good:0, miss:0, combo:0, maxCombo:0, star:0, fast:0, slow:0, goodFast:0, goodSlow:0, crash:0, errN:0, errSum:0, errSq:0, blastBonus:0 };
   practice = false; effects = []; errors = []; caption = null; lastMissT = -1e9;
   leadIn = null; goAt = 0; pausedInLeadIn = false; autoplayBlocked = false;
   resetTruck(); resetLives(); resetOrbit();
@@ -124,7 +124,7 @@ function failGame() {
 }
 
 /* ---------- スコア ---------- */
-function currentScore() { const total = chart.length || 1; return Math.min(1e6, Math.round(1e6 * (stats.perfect + stats.good * .5) / total)); }
+function currentScore() { const total = chart.length || 1, points = stats.perfect + stats.good * .5, bonus = (stats.blastBonus || 0) * .1; return Math.min(1e6, Math.round(1e6 * (points + bonus) / total)); }
 function currentAcc() { const j = stats.perfect + stats.good + stats.miss; return j ? (stats.perfect + stats.good * .5) / j * 100 : 100; }
 function updateHud() {
   $("scoreVal").textContent = currentScore().toLocaleString();
@@ -136,6 +136,7 @@ const MODE_ICON = { truck:"🚚", orbit:"🪐", stage:"🎪", catch:"🚛" };
 const modeLabel = () => tr(MODE_LABEL[settings.playMode] || "manualPlay") + (settings.autoPlay ? " · " + tr("autoPlay") : "");
 const modeIcon = m => MODE_ICON[m] || "";
 const runMods = () => [...activeMods(), ...lifeTags(),
+  ...(settings.playMode === "catch" && settings.catchNitroBonus && stats.blastBonus > 0 ? ["NITRO×1.1"] : []),
   ...(settings.playMode === "stage" && settings.stageMirror && !settings.modMirror ? ["MIRROR"] : []),
   ...(settings.playMode === "stage" && settings.stageRandom === "random" && !settings.modRandom ? ["RANDOM"] : []),
   ...(settings.autoPlay ? ["AUTO"] : [])];

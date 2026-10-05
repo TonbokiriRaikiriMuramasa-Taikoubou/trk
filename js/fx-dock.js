@@ -36,7 +36,8 @@ const FAV_MAX = 0, TEMP_ID = "__chart", LONG_MS = 600;   /* 0＝上限なし（�
 settings.fxDockSkin = pick(prefs.fxDockSkin, Object.keys(DOCK_SKINS), "standard");
 settings.fxDockFive = !!prefs.fxDockFive;
 settings.fxDockOpen = prefs.fxDockOpen === true;      // くわしい欄は最初は閉じる
-settings.fxAntenna = !!prefs.fxAntenna;
+settings.castPolicy = pick(settings.castPolicy, ["off", "antenna"], "off");
+settings.fxAntenna = settings.castPolicy === "off" ? false : !!prefs.fxAntenna;
 settings.fxAntennaShape = pick(prefs.fxAntennaShape, ["rod", "loop", "dish", "beam"], "rod");
 settings.fxEqLock = Array.isArray(prefs.fxEqLock) && prefs.fxEqLock.length === 5 ? prefs.fxEqLock.map(Boolean) : [false, false, false, false, false];
 settings.fxLockChain = !!prefs.fxLockChain;
@@ -230,7 +231,10 @@ addEventListener("DOMContentLoaded", () => {
   const mkCheck = (key, label) => {
     const lab = el("label", "check"), inp = document.createElement("input");
     inp.type = "checkbox"; lab.append(inp, tx("span", label));
-    inp.addEventListener("change", () => { settings[key] = inp.checked; saveUserPrefs(); render(); });
+    inp.addEventListener("change", () => {
+      if (key === "fxAntenna") { toggleAntenna(inp.checked); return; }
+      settings[key] = inp.checked; saveUserPrefs(); render();
+    });
     return { lab, inp };
   };
   const lockChain = mkCheck("fxLockChain", "dockLockChain");
@@ -265,6 +269,18 @@ addEventListener("DOMContentLoaded", () => {
   });
   antShapeRow.append(tx("span", "dockAntShapeLabel"), antShapeSel);
 
+  const castRow = el("label", "field"), castSel = document.createElement("select");
+  castRow.append(tx("span", "dockCastPolicy"), castSel);
+  for (const [value, key] of [["off", "dockCastOff"], ["antenna", "dockCastAntenna"]]) {
+    const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); castSel.append(o);
+  }
+  castSel.value = settings.castPolicy;
+  const castHint = tx("div", "dockCastHint", "hint");
+  castSel.addEventListener("change", () => {
+    settings.castPolicy = castSel.value === "antenna" ? "antenna" : "off";
+    if (settings.castPolicy === "off") { settings.fxAntenna = false; disconnectExternalPlayback(); }
+    saveUserPrefs(); render();
+  });
   const antCheck = mkCheck("fxAntenna", "dockAntCheckLabel");
 
   const more = tx("button", "dockMore", "fxMini"); more.type = "button";
@@ -273,7 +289,7 @@ addEventListener("DOMContentLoaded", () => {
     setTimeout(() => full.scrollIntoView({ behavior:"smooth", block:"start" }), 50);
   });
   body.append(tx("summary", "dockTitle"), quick, eqBox, tx("div", "dockLockHint", "hint"), lockChain.lab,
-    skinRow, five.lab, antShapeRow, antCheck.lab, tx("div", "dockAntHint", "hint"), more);
+    skinRow, five.lab, castRow, castHint, antShapeRow, antCheck.lab, tx("div", "dockAntHint", "hint"), more);
 
   dock.append(dev, favChips, overLabel, overflow, body);
   col.append(dock);
@@ -283,11 +299,38 @@ addEventListener("DOMContentLoaded", () => {
   function lcdFlash(text) { flash = { text, until:Date.now() + 2000 }; render(); setTimeout(render, 2100); }
 
   /* ---- ボタンの動き ---- */
+  function disconnectExternalPlayback() {
+    try {
+      if (video.remote && video.remote.state === "connected" && typeof video.remote.disconnect === "function") video.remote.disconnect();
+    } catch (_) {}
+  }
+  async function requestExternalPlayback() {
+    if (settings.castPolicy !== "antenna") return;
+    try {
+      if (video.remote && typeof video.remote.prompt === "function") {
+        await video.remote.prompt();
+        return;
+      }
+      if (typeof video.webkitShowPlaybackTargetPicker === "function") {
+        video.webkitShowPlaybackTargetPicker();
+        return;
+      }
+      lcdFlash(tr("dockCastUnsupported"));
+    } catch (_) { lcdFlash(tr("dockCastFailed")); }
+  }
   function toggleAntenna(forced) {
+    if (settings.castPolicy !== "antenna") {
+      settings.fxAntenna = false; saveUserPrefs(); lcdFlash(tr("dockCastOff")); render(); return;
+    }
     settings.fxAntenna = forced !== undefined ? !!forced : !settings.fxAntenna;
-    saveUserPrefs();
-    lcdFlash(tr(settings.fxAntenna ? "dockAntOn" : "dockAntOff"));
-    render();
+    if (settings.fxAntenna) {
+      lcdFlash(tr("dockCastOn"));
+      requestExternalPlayback();
+    } else {
+      disconnectExternalPlayback();
+      lcdFlash(tr("dockCastOffDone"));
+    }
+    saveUserPrefs(); render();
   }
   pow.addEventListener("click", () => { video.muted = !video.muted; render(); });
   video.addEventListener("volumechange", () => render());
@@ -375,10 +418,13 @@ addEventListener("DOMContentLoaded", () => {
     powLed.classList.toggle("on", !video.muted);
     antLed.classList.toggle("on", settings.fxAntenna);
     ant.classList.toggle("on", settings.fxAntenna);
-    if (antCheck && antCheck.inp) antCheck.inp.checked = settings.fxAntenna;
+    const antennaAllowed = settings.castPolicy === "antenna";
+    if (castSel) castSel.value = settings.castPolicy || "off";
+    ant.hidden = !antennaAllowed; antWrap.hidden = !antennaAllowed;
+    if (antCheck) { antCheck.lab.hidden = !antennaAllowed; antCheck.inp.checked = settings.fxAntenna; antCheck.inp.disabled = !antennaAllowed; }
     if (antShapeSel) antShapeSel.value = settings.fxAntennaShape || "rod";
     pow.title = tr("dockPower"); pow.setAttribute("aria-label", pow.title); pow.setAttribute("aria-pressed", String(!video.muted));
-    ant.title = tr("dockAntenna"); ant.setAttribute("aria-label", ant.title); ant.setAttribute("aria-pressed", String(settings.fxAntenna));
+    ant.title = settings.castPolicy === "off" ? tr("dockCastOff") : tr("dockAntenna"); ant.setAttribute("aria-label", ant.title); ant.setAttribute("aria-pressed", String(settings.fxAntenna));
     lcd.textContent = flash && Date.now() < flash.until ? flash.text
       : (video.muted ? tr("dockMute") + " · " : "") + (settings.fxOn ? (nm[settings.fxPreset] || "FX") : tr("dockFxOff")) + (settings.fxAntenna ? " 📡" : "");
     /* ランダム */

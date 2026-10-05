@@ -60,6 +60,7 @@ trk! の開発を再開します。docs/HANDOFF.md を貼ります。
 - PCLクレジットには「PCLによる許諾の旨・PCLのURL・キャラクター名・会社名」を表示（miku.js があるときだけ）。
 - **譜面の方針：既存ゲームの譜面・名前・画像・キャラクターは使わない。** 内蔵の譜面は自動生成のみ。**作曲家さん・譜面作者さん本人が作った／認めた譜面は配ってよい**（公認パック）。
 - 公認の権利チェック（ボカロ曲・東方アレンジなど）は `docs/verified.md`。
+- **✨ フレーム補完は trk! の自前コード**（古典的 MEMC をシェーダーで実装。外部モデル・外部コード・外部通信なし）。検討した RIFE（Practical-RIFE。**コードもモデルも MIT**）は採用せず、Lossless Scaling／SVP は**プロプライエタリ（GPL非互換）**のため使用していない。
 
 ---
 
@@ -122,6 +123,8 @@ trk! の開発を再開します。docs/HANDOFF.md を貼ります。
 52. **🖥 動画の全画面表示（最大化ビューア）**（video-max.js【新規】/ tv-dock.js / media-player-mode.js / index.html / style.css）：選曲画面の「**次の曲 ▶** の右」にあった一時停止ボタンはほとんど使われていないため、**動画を全画面で表示する ⛶ ボタンに置き換え**た（`btn("tvKey tvPause tvMax", pauseLed, "⛶")`。**見た目は従来どおりスキンの点灯LEDアイコンのまま**で、全画面表示中に点灯する）。メディアプレーヤーでは**「逆再生」の右＝「全画面で表示」**、その右へ**壁紙がひとつずれる**（`controls.append(prev, playNode, next, reverseNode, maxNode, wallNode, restart)`）。新規 `js/video-max.js` が `#videoMaxView`（`position:fixed;inset:0;z-index:60000`）を `document.body` に1枚だけ作り、`requestAnimationFrame` で `video` を**縦横比を保ったまま画面いっぱい**に描画（音声だけの曲は曲パックの背景画像を表示）。`window.TrkVideoMax = { open, close, toggle, isOpen, onChange }`。操作は **動画クリック＝再生／一時停止**、**←→＝10秒移動**、**⛶＝ブラウザーの全画面**（`requestFullscreen` 非対応・iframeで拒否されてもアプリ内の全画面はそのまま使える）、**ESC／✕／黒いところのクリック＝閉じる**。キーは `capture:true` で受け取り、`stopImmediatePropagation()` でメディアプレーヤー側のESC・Space・←→と重複しないようにした。開いたときに止まっていた場合だけ再生し、閉じると元の状態へ戻す（自分で ▶⏸ を押したあとは勝手に止めない）。**ゲームが始まったら自動で閉じる**（`on("phase")`）ほか、メディアプレーヤーを閉じたとき・壁紙を出したときも閉じる。TVドックのLEDとメディアプレーヤーのボタンは `TrkVideoMax.onChange()` で同期（ボタン名は「全画面で表示」⇔「全画面を閉じる」）。文章は4言語（ja/en/zh/ko）で `tvVideoMax*`／`mediaVideoMax*`／`videoMax*` を追加。静的検査（新規チェック「full-screen video viewer is wired」を含む）とJSDOMスモークで、TVドックのボタン並び・LED点灯・ESCで閉じる・動画クリック再生切替・ゲーム開始で閉じる・メディアプレーヤーの並び（逆再生→全画面→壁紙）・4言語表示を確認（エラー0件）。実ブラウザでの実描画（Canvas）・Fullscreen API・実機確認は未実施。Service Workerキャッシュを `trk-v2026.10.5-ux2` に更新。
 
 53. **🌀 レーンの揺れ：既定を 🚚TRUCK／🪐ORBIT だけに ＋ 個別オフ ＋ ❓謎設定**（truck.js / modes.js / main.js / i18n-options.js / index.html / check-repo.mjs）：以前のセッションで「全ゲームモード共通」になっていた揺れを、**既定では 🚚トラックと 🪐ORBIT だけが揺れる**ように変更（`laneTilt()` の先頭に純粋関数 `swayModeOn(mode)` を導入。`reduceMotion.matches`（OSの「視差効果を減らす」）も従来どおり最優先で止める）。**トラック**（`settings.swayTruck`／`#swayTruck`、「🚚 トラックモードでレーンを揺らす（オフ＝揺れを止める）」）と**ORBIT**（`settings.swayOrbit`／`#swayOrbit`、modes.js の ORBIT 見た目欄に `makeCheck` で追加）に**個別のオフ**を用意（どちらも既定ON）。**🎯 プレイオプションの「🔥 高難易度（エキスパート）」の下に「❓ 謎設定（不具合の再現）」**を追加し、**「全ゲームモードで揺れをオンにする（酔います）」**（`settings.swayAllModes`／`#swayAllModes`）のチェックボックスを配置。このチェックは**各モードの「揺らさない」より優先**され、ONなら MANUAL・STAGE・CATCH でも揺れる（不具合として起きていた動きを設定として残したもの）。見た目の揺れ欄の見出しは「🌀 レーンの揺れ（TRUCK／ORBIT）」に変更し、優先順位を説明するヒント `swayModeHint` を追加。文章は4言語（ja/en/zh/ko）。静的検査（新規チェック「lane sway defaults to TRUCK / ORBIT …」）とJSDOMスモークで、既定値（manual/stage/catch＝false・truck/orbit＝true）・個別オフ・❓謎設定での全モードON・チェックボックスの保存・❓欄が🔥の下にあること・4言語表示を確認（エラー0件）。実機での揺れの見え心地（特にORBIT）は未確認。Service Workerキャッシュを `trk-v2026.10.5-ux3` に更新。
+
+54. **✨ フレーム補完（動き補償・光学フロー／WebGL2）**（frame-interp.js【新規】/ media-player-mode.js / video-max.js / core.js / index.html / style.css / sw.js / check-repo.mjs）：メディアプレーヤーの**区間ループのすぐ上**に「**✨ フレーム補完（綺麗になりますが、動画の読み込みが遅くなります）**」を追加（`mediaInterpTitle`。**オフ／なめらか（ブレンド）／高品質（動き補償・光学フロー）**＋「動き補償の強さ」スライダー ＝ `settings.frameInterp`／`settings.frameInterpStrength`。**既定はオフ**）。調査の結論として、**RIFE（Practical-RIFE / ECCV2022）はコードも学習済みモデルも MIT**（README に「モデルのリンクも同じ MIT」と明記）だが、実行には PyTorch/ONNX の重み（数MB〜）を同梱・初回DLする必要があり、WASM 実行は 5〜15倍遅くて 720p リアルタイムは無理、WebGPU 実行も ONNX Runtime Web の重み配布が前提になるため**軽さとオフライン方針で不利**と判断。**Lossless Scaling／SVP (Smooth Video Project) はプロプライエタリ（GPL非互換）でそのまま使えない**。よって**古典的 MEMC（ピラミッド型ブロックマッチングの光学フロー＋動き補償）を自前実装**した（参考にしたのは一般的な考え方だけ —— Sundaram らの forward/backward consistency、粗→細ブロックマッチング、時間方向シード、ゼロベクトルバイアス —— で、**コードの借用はなし**）。新規 `js/frame-interp.js`（`window.TrkFrameInterp`）は **WebGL2 だけで完結**（`EXT_color_buffer_float` があれば RG16F、無ければ RGBA8 に符号化して ±64px を保持）。1つのシェーダーで前方・後方を MRT 出力し、**5×5 の平均SAD ＋ λ0.010×変位**のペナルティ、種の周りを最粗レベル±2px・以降±1px、小数の山登り（±1→±0.5）、3×3 メジアン、前のペアを種にする時間シード、後方ベクトルは −前方 を9通り検証、前後一致が崩れた所はクロスフェードへ逃がし、32×18 の輝度差でシーンチェンジを検出する（しきい値34）。表示は `A を uv−vf·t`・`B を uv+vf·(1−t)` からサンプルして混ぜる毎フレームの軽いパスで、**必ず1ソースフレームぶん遅れる**（説明文にも「約1フレーム（30fpsで約33ミリ秒）遅れます」と明記）。プレーヤーに**映像エリア（`.mediaStage`）**を足して効果がその場で見えるようにし、**⛶ 全画面表示（video-max.js）も同じ補完**を使う（表示先が2つ同時でも1フレーム1回にまとめる）。取り込みループは**表示中だけ**回し、重いときは**自動で軽くする**（出力fpsが45未満 → 処理幅 1152→768→512 → それでも足りなければ「なめらか」へ自動切替＋通知。**裏のタブでは測らない**）。別サイトの**保護された動画**は canvas が汚染されて読めないため、例外を投げ続けずに検出して「使えない」旨を表示。**外部モデル・外部コード・外部通信はゼロ**（`fetch` も Worker も使わない＝静的検査で固定）。検証は、静的検査（新規「frame interpolation is opt-in, WebGL2-only, offline, above the A-B loop box, in four languages」）・**シェーダー6本の GLSL ES 3.00 構文解析**・**CPUに写した数値検証**（平行移動する合成映像でエッジ部MAEが単純ブレンド比 **1.7〜7.0倍改善**。例：鋭いエッジ6px/フレーム 20.70→2.96、全体MAE 3.96→0.59）・**JSDOM統合スモーク**（本物と同じ順序で `<script>` を実行・偽WebGL2あり／なしの2通りで、区間ループの直上・設定保存・取り込み→フロー→表示まで到達・閉じると停止・4言語・非対応時の案内・**エラー0件**）を通過。**実ブラウザ／実機での滑らかさと重さは未確認**。Service Workerキャッシュを `trk-v2026.10.5-ux4` に更新。
 
 ---
 
@@ -206,6 +209,7 @@ trk/
 | 17 | fx-presets.js 🧊 | 🎛 内蔵プリセットのデータ（`TRK_FX_PRESETS`、115個） |
 | 17.5 | fx-dock.js | 🎛 さわれる本体（スキン7種・⏻ミュート・📡アンテナ＝バックグラウンド再生・ボタン長押し登録・3種ランダム・EQロック）、Media Session
 | 17.7 | tv-dock.js | 📺 映像出力のTV風ドック（スキン30種＋🎨カスタムTVスキン、電源・お気に入り・並び順） |
+| 17.9 | video-max.js | 🖥 動画の全画面ビューア（`window.TrkVideoMax`。メディアプレーヤーの ⛶ と選曲画面の ⛶ から開く） |
 | 18 | fx.js 🧊 | 🎛 サウンドエフェクト本体（「7. 凍結中のファイル」参照） |
 | 18.5 | fx-synth.js | 🎛 視覚的なエフェクトチェーン編集。`window.TrkFX` と #fxPanel の保存欄を使うため、fx.js の後。メイン画面の `.dockMore` は tv-dock.js が `.songCol` 直下へ移動したあとに探す |
 | 18.7 | catalog.js | 🛒 公式カタログのデータ（`TRK_CATALOG`・シリーズ5つ。MODはこれより**前**に読んで push）。library.js の前 |
@@ -218,6 +222,8 @@ trk/
 | 25 | favs.js | ⭐ お気に入りのフォルダ管理（1軍／2軍／🧊／📤元。tv・fx・song の3系統） |
 | 26 | spectrum.js | 📊 スペクトラム（音の見える化）。`TrkFX.tap()` でエフェクト後の音を見る。TVの画面に重ねられる。fx.js・tv-dock.js の後 |
 | 27 | synth-mode.js | 🎹 曲に合わせて演奏するWeb Audioシンセ。FXドックの電源ボタンを長押し。音声分析に `TrkFX.tap()` を使うため spectrum.js の後に読む |
+| 28 | frame-interp.js | ✨ フレーム補完（`window.TrkFrameInterp`）。WebGL2だけで動く・外部モデルなし。`media-player-mode.js` より**前**に読む |
+| 28.5 | media-player-mode.js | ▶ メディアプレーヤーモード（TVドックの⏻長押し。`window.TrkMediaPlayer`）。`video-max.js`・`frame-interp.js` を使う |
 🧊＝凍結中（しばらく触らない。会話に貼らなくてよい）
 
 ---
@@ -304,6 +310,9 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 | tv-dock.js | `window.TrkTV`（version 2：`list()` `skins()` `skin()` `selectSkin(id)` `current()` `select(id)` `next()` `prev()` `random()` `off()` `on()` `toggle()` `filter()` `overlay()`）、`applyOrder()` `tvSlotCount()` `tvSlotCols()` `settings.tvDockSkin` |
 | library.js | `renderLib` `renderBanner` `refreshPackSongs` `currentSong` `libView` `LIB_SHOW` |
 | main.js | `RESERVED` `poke` `syncOptionsUI` `packsReady` `showFxPower` |
+| video-max.js | `window.TrkVideoMax`（`open` `close` `toggle` `isOpen` `onChange`） |
+| frame-interp.js | `window.TrkFrameInterp`（`mode` `setMode` `supported` `attach` `detach` `drawTo` `stats` `reset` `onChange` `blockedReason`） |
+| media-player-mode.js | `window.TrkMediaPlayer`（`open` `close` `isOpen`） |
 
 ### 関数を包んで機能を足しているところ（上書きの順番に注意）
 | 包むファイル | 包まれる関数 |
@@ -332,6 +341,16 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 - 知らないスキンID（古い設定・壊れた設定ファイル）は「home」として描く（`render()` の `skinId`）
 - 文章キーは `tvm…`（4言語）。座標や色は `paintTvVars()` に集約
 - 動作確認は jsdom でもできる（`node --check` だけでは配線ミスが出ないため）
+
+### ✨ フレーム補完（frame-interp.js）
+- 目的：24〜30fps の動画をなめらかに見せる。**既定はオフ**（`settings.frameInterp`＝`off`／`blend`／`flow`、`settings.frameInterpStrength`＝0〜1）。
+- **守ること**：外部モデル・外部ライブラリ・外部通信を使わない（`fetch` も Worker も禁止。`tools/check-repo.mjs` が固定）。処理は端末のGPU（WebGL2）の中だけ。`EXT_color_buffer_float` が無くても動くよう RGBA8 に符号化する。
+- 使い方：`TrkFrameInterp.attach(名前, canvas)` で「いま表示している」ことを伝える（複数可）。`drawTo(ctx, w, h)` を `requestAnimationFrame` から毎回呼ぶと、中間フレームを描く。`detach(名前)` で外すと、表示が無くなった時点で取り込みループが止まる（裏でGPUを使い続けない）。
+- `drawTo()` が false のときは、呼び出し側が「普通の映像」を描く（プレーヤーの `.mediaStage` と video-max.js はその作り）。
+- **1ソースフレームぶん遅れる**のは仕様（次のフレームを待って中間を作るため）。設定の説明文にも書いてある。
+- 自動軽量化：`outFps < 45` が2.5秒続いたら処理幅を 1152→768→512 と落とし、`quality` が最小でも足りなければ「なめらか（ブレンド）」へ自動切替＋トースト。**`document.hidden` の間は測らない**。
+- 保護された動画（別サイトの映像）は canvas が汚染されて読めない → 例外を投げ続けず `blockedReason()` が真になり、プレーヤーは案内を出す。
+- 合図：`beforeLoad`／`mediaReady` で作り直し、`language` で文章を更新。
 
 ### 🧩 アドオン（js/addons.js）
 - **保存**：`trk_addons_v1`（localStorage。新しいキー。既存のキーは触らない）。1件＝`{ id, name, version, author, description, apiVersion, enabled, code, source, addedAt, error }`
@@ -665,6 +684,7 @@ records[指紋 "サイズ:長さ×10"] = {
 - フォルダ記憶は File System Access API（パソコンの Chrome/Edge、HTTPSかlocalhost）。Androidの Chrome では使えない。
 - PWA：`manifest.webmanifest`（全画面・横向き）、`sw.js`（ネット優先・同じサイトのファイルだけキャッシュ）。**公開を更新したら sw.js の `CACHE` 名を変える**（例：`trk-v2026.10` → `trk-v2026.11`）。新旧のJSが混ざるときは `<script src="…?v=2026.10.1">` のように版番号を付ける。
 - Xの文字数：半角1・全角2・絵文字2、上限280（verified.js の `postLength`）。
+- ✨ フレーム補完：作業解像度は幅 1152／768／512（品質3段階・偶数に丸め）、輝度ピラミッドのレベル0は作業解像度の1/2で最大5段、flow は ±64px を保持（λ0.010・5×5 SAD）、フローは動画の新フレームごとに1回だけ計算し、表示は `requestAnimationFrame` から軽いパスだけ回す。
 
 ---
 
@@ -746,6 +766,10 @@ records[指紋 "サイズ:長さ×10"] = {
 - [ ] 実機確認：📡アンテナの置き場（「バックグラウンド再生アンテナ」を「右上に置く（言語の左・コンパクト）」に→ドックのアンテナと📡ANTボタンが消えて、右上の言語選択の左にコンパクトな📡が出る／タップでON・OFF、ONのとき傾きと電波リング／「ドックにアンテナを表示」に戻すと右上が消えてドックへ戻る／「表示しない」ではバックグラウンド再生も無効の文言／右上アンテナONのままタブを裏にしても再生が続くか／キャストを「キャストしない」にしても再生用アンテナが消えない／設定チェックボックス「通常のアンテナを使う」は corner でも使える／4言語）。
 - [x] 🎹 曲に合わせて演奏するシンセモード（`js/synth-mode.js`）：16音色（エレキギター／電子サックス／ZUNPET風ブラスを含む）・最大6音源レイヤー・±8半音ピッチ・ローカルサンプル・25鍵画面鍵盤・キーアサイン・**鍵盤固定オプション初期オン**・曲プレビュー操作・動画＋スペクトラム表示。
 - [ ] 実機確認：⏻標準650ms／高速200ms／起動禁止と短押しミュート／16音色（エレキギター・電子サックス・ZUNPET風ブラスを含む）／**鍵盤固定ONでスライダー等にキーを吸われない・OFFで通常入力に戻ること**／**大画面向け鍵盤拡張ONでキーが横に広がり、スマホ幅では従来幅を保つこと**／±8半音ピッチつまみ（初期0・保存・押鍵中にも反映）／和音・リリース／曲と動画の再生／QWERTY配列と再割り当て／タッチ鍵盤／サンプル音源のサイズ・長さ制限とローカル動作／設定保存・4言語／モバイル幅。
+- [x] 🖥 動画の全画面表示（`js/video-max.js`）：選曲画面の「次の曲 ▶」の右と、メディアプレーヤーの「逆再生」の右（壁紙はひとつ右へ）に ⛶。動画クリック＝再生／一時停止、←→＝10秒、⛶＝ブラウザー全画面、ESC／✕／黒い所＝閉じる。ゲームが始まると自動で閉じる。
+- [ ] 実機確認：🖥動画の全画面表示（Canvasの実描画・Fullscreen APIの許可／拒否・音声だけの曲で曲パックの背景が出るか・LEDの点灯・ESCと✕で閉じる・メディアプレーヤーとの並び（逆再生→全画面→壁紙）・4言語）
+- [x] ✨ フレーム補完（`js/frame-interp.js`）：区間ループのすぐ上に「オフ／なめらか（ブレンド）／高品質（動き補償・光学フロー）」＋強さスライダー（既定オフ）。WebGL2 だけで動く MEMC を自前実装（5×5 SAD＋λ0.010、粗→細、時間シード、前後一致でブレンドへ、シーンチェンジ検出）。プレーヤーに映像エリア、⛶全画面も同じ補完、重いときは自動で軽くする。
+- [ ] 実機確認：✨フレーム補完（オフ／なめらか／高品質の見え方の違い・24fps→60Hzでなめらかになるか・重さと発熱・映像エリアと⛶全画面の両方・音とのずれが気にならないか・オフに戻すと元どおりか・重い端末で自動的に軽くなること・別サイトの動画で案内が出ること・4言語）
 「12. 次の候補」にあったエフェクトチェーン編集と🎹シンセモードは実装済みです。次は各実機確認と、下の未実装アイデアを進めてください。
 **将来の大きな作業**
 - APKのネイティブ音楽ライブラリ連携：今回CapacitorのWeb資産同期まで実装済み。残りは `READ_MEDIA_AUDIO` 等の必要性を確認し、端末の曲一覧・ラジオ中のバックグラウンド再生（Media Session・フォアグラウンドサービス）を、権限とプライバシー説明を含めて設計する。配布はGitHub Releasesから（Google Playは登録料と、テスター約12人×14日の条件がある）
@@ -761,37 +785,6 @@ records[指紋 "サイズ:長さ×10"] = {
 - 1.25x以上でノーミスした称号に🏁
 - Gitaroo Man の防御パート風の「方向で色分けする道」モード
 - `docs/pack-format.md`（パック作者向け仕様書）
-
----
-
-## 54. 2026-10-06 ✨ フレーム補完（動き補償・光学フロー／WebGL2）
-
-**要望**：メディアプレーヤーが思ったより良いので、RIFE や Lossless Scaling のようなフレーム補間を「オプションで」試せるようにしたい。説明として「フレーム補完（綺麗になりますが、動画の読み込みが遅くなります）」を付け、著作権・軽さ・滑らかさを調べて検討する。設置場所は**区間ループの上**。
-
-**調査した結論（採用理由）**
-- **RIFE（Practical-RIFE / ECCV2022, Megvii）**：コードも**学習済みモデルも MIT**（README に「モデルのリンクはプロジェクトと同じ MIT」と明記・LICENSE は `Copyright (c) 2021 hzwer`）。ただし実行には PyTorch/ONNX の重み（数MB〜）を配る必要があり、ブラウザでは ONNX Runtime Web の WebGPU 実行が現実的。CPU(WASM) は 5〜15倍遅く、720p リアルタイムは無理。**重みを同梱するとリポジトリが数MB増え、初回DLも必要**で、オフライン方針・軽さの両面から不利と判断。
-- **Lossless Scaling / Smooth Video Project (SVP)**：共に**プロプライエタリ（GPL非互換）**でライセンス上そのまま使えない。
-- **採用：古典的 MEMC（ピラミッド型ブロックマッチングの光学フロー＋動き補償）を自前実装**。フラグメントシェーダーだけで完結し、**外部ライブラリ・モデル・通信はゼロ**（すべて端末内の GPU で処理）。参考にしたのは一般的な考え方のみ（Sundaram らの forward/backward consistency、粗→細ブロックマッチング、時間方向シード、ゼロベクトルバイアス）で、コードは借用していません。
-
-**実装**
-- 新規 `js/frame-interp.js`（`window.TrkFrameInterp`）。WebGL2（`EXT_color_buffer_float` があれば RG16F、無ければ RGBA8 に符号化して ±64px を保持）。1つのシェーダーで前方・後方を MRT 出力。
-- パイプライン：①動画フレームを作業解像度へ落として取り込み（`requestVideoFrameCallback`、無ければ `getVideoPlaybackQuality`／`currentTime`）②輝度ピラミッド（レベル0＝作業解像度の1/2、最大5段）③粗→細のブロックマッチング（**5×5 平均SAD＋λ0.010×変位**、種の周りを最粗2px・以降±1px、小数山登り±1→±0.5、3×3メジアン）④後方ベクトルは −前方 を9通り検証⑤前後一致が崩れた所はクロスフェードへ⑥32×18の輝度差でシーンチェンジを検出して切り替え。
-- 表示（毎フレーム・軽い方）：`A を uv−vf·t`、`B を uv+vf·(1−t)` からサンプルして混ぜる。**必ず1ソースフレームぶん遅れる**（仕様）。
-- 設定（🎯プレイオプションの**区間ループの上**、`mediaInterpTitle`）：**オフ／なめらか（ブレンド）／高品質（動き補償・光学フロー）**＋「動き補償の強さ」スライダー。説明文に「綺麗になりますが、動画の読み込みが遅くなります」「表示は約1フレーム遅れます」「映像酔いしやすい方はオフ推奨」を明記（4言語）。既定は**オフ**。
-- プレーヤーに**映像エリア**（`.mediaStage`）を追加（フレーム補完の効果がその場で見える）。全画面表示（⛶ / `js/video-max.js`）も同じ補完を使います。表示中だけ取り込みループを回し、閉じると止めます（裏でGPUを使い続けない）。
-- 重いときは自動で軽くする：アウトプットfpsが45未満なら処理幅を段階的に落とし（1152→768→512）、それでも足りなければ「なめらか（ブレンド）」へ自動切替＋通知。**タブが隠れている間は判定しない**（裏のタブでの誤判定を防ぐ）。
-- 保護された動画（別サイトの映像など）でキャンバスが汚染されて読めない場合は、補完を止めて「使えない」旨を表示（例外を投げ続けない）。
-
-**著作権まわり**
-- 外部モデル・外部コード・外部通信なし。`fetch` も Worker も使わない（静的検査で固定）。既存の GPL-3.0-or-later のみ。
-- 参考にした RIFE のライセンス（MIT）と FlowFrames / SVP / Lossless Scaling の扱い（不採用理由）をこのメモに記録。
-
-**検証（2026-10-06）**
-- `npm run check`：合格（新規の静的検査「frame interpolation is opt-in, WebGL2-only, offline, above the A-B loop box, in four languages」を追加）。
-- シェーダー6本（VS/FS_PACK/FS_DOWN/FS_FLOW/FS_MEDIAN/FS_WARP）を `@shaderfrog/glsl-parser` で GLSL ES 3.00 として構文解析 → 全6本OK。
-- **アルゴリズムの数値検証**（同じ処理をCPUに写して合成し、真値と比較）：平行移動する合成映像で、エッジ部MAEが単純ブレンド比 **1.7〜7.0倍改善**（柔らかいエッジ 3px/フレーム：5.17→2.78、鋭いエッジ 6px/フレーム：20.70→2.96／全体MAEも 3.96→0.59）。λ（ゼロベクトルバイアス）と探索半径を掃引して決定。シーンチェンジ検出は連続フレーム6.5／別シーン52.8（しきい値34）で分離できることを確認。
-- JSDOM 統合スモーク（本物と同じ順序で `<script>` を実行・偽WebGL2あり／なしの2通り）：区間ループの直上に設定がある（compareDocumentPosition=4）、設定と保存、シーン無しでも落ちない、**取り込み→フロー→表示まで到達**（640×360・4レベル・描画59回・「Preparing…」→fps表示）、プレーヤーを閉じると描画停止、4言語の文字列、WebGL2非対応時は案内を出して無効化、**エラー0件**。
-- 実ブラウザでの見た目・実機の重さ・実際の滑らかさ（特に60Hz端末での 24→60fps）は**未確認**。要実機確認。
 
 ---
 

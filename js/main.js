@@ -327,6 +327,7 @@ function syncOptionsUI() {
   if ($("optMirror")) $("optMirror").checked = !!settings.modMirror;
   if ($("optRandom")) $("optRandom").checked = !!settings.modRandom;
   if ($("showMasterDiff")) $("showMasterDiff").checked = !!settings.showMasterDiff;
+  if ($("swayAllModes")) $("swayAllModes").checked = !!settings.swayAllModes;
   $("rate").value = settings.rate;
   $("rateVal").textContent = settings.rate.toFixed(2) + "x";
   $("cover").value = settings.cover;
@@ -336,7 +337,8 @@ function syncOptionsUI() {
 }
 function optionsChanged() { saveUserPrefs(); syncOptionsUI(); emit("options"); }
 [["countdown", "countdown"], ["countdownSE", "countdownSE"], ["resumeCountdown", "resumeCountdown"],
- ["optHidden", "hidden"], ["optSudden", "sudden"], ["optMirror", "modMirror"], ["optRandom", "modRandom"]].forEach(([id, key]) => {
+ ["optHidden", "hidden"], ["optSudden", "sudden"], ["optMirror", "modMirror"], ["optRandom", "modRandom"],
+ ["swayAllModes", "swayAllModes"]].forEach(([id, key]) => {
   const el = $(id);
   if (el) el.addEventListener("change", e => { settings[key] = e.target.checked; optionsChanged(); });
 });

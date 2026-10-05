@@ -353,6 +353,32 @@ if (!read("js/main.js").includes("guideEggKind") ||
   }
 }
 
+// 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own
+// "don't sway" option, plus the ❓ mystery switch that outranks both.
+{
+  const truck = read("js/truck.js");
+  const modes = read("js/modes.js");
+  const options = read("js/i18n-options.js");
+  const main = read("js/main.js");
+  const html = read("index.html");
+  const swayOk = truck.includes("function swayModeOn(mode)") &&
+    truck.includes('if (settings.swayAllModes) return true;') &&
+    truck.includes('if (m === "truck") return settings.swayTruck !== false;') &&
+    truck.includes('if (m === "orbit") return settings.swayOrbit !== false;') &&
+    truck.includes("if (reduceMotion.matches || !swayModeOn()) return 0;") &&
+    truck.includes('settings.swayTruck = prefs.swayTruck !== false;') &&
+    truck.includes('settings.swayOrbit = prefs.swayOrbit !== false;') &&
+    truck.includes("settings.swayAllModes = prefs.swayAllModes === true;");
+  const uiOk = html.includes('id="swayTruck"') && html.includes('id="swayAllModes"') &&
+    modes.includes('makeCheck("swayOrbit", "swayOrbit", "swayOrbit")') &&
+    main.includes('["swayAllModes", "swayAllModes"]') &&
+    ["ja", "en", "zh", "ko"].every(l => options.includes(`swayAllModes:"`)) &&
+    (options.match(/swayAllModes:"/g) || []).length >= 4;
+  if (!swayOk) fail("lane sway gating (TRUCK / ORBIT by default, mystery override) is broken");
+  else if (!uiOk) fail("lane sway options (TRUCK / ORBIT checkboxes + ❓ mystery switch) are missing");
+  else ok("lane sway defaults to TRUCK / ORBIT with per-mode off switches; ❓ mystery switch overrides all modes");
+}
+
 // A cache name is deliberately checked for existence, not for a guessed
 // date, because the service worker is manually bumped for every release.
 const sw = read("sw.js");

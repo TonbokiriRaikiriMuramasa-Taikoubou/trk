@@ -21,7 +21,8 @@ Object.assign(TEXT.ja, {
   orbitCoreColor:"判定点の色", orbitMoonColor:"恒星の色", colorReset:"↺ スキンの色",
   orbitMoonLabel:"恒星（周りを回る星）", orbitMoonSong:"曲の終わりで1周（進み具合）", orbitMoonBeat:"1拍で1周", orbitMoonOff:"表示しない",
   orbitMoonShapeLabel:"恒星の形", orbitMoonOrb:"● 玉", orbitMoonStar:"★ 星", orbitMoonComet:"☄ ほうき星",
-  orbitViewHint:"ノーツは道に乗って画面中央の判定点へ流れてきます。道の細い線は1拍、太い線は1小節です。"
+  orbitViewHint:"ノーツは道に乗って画面中央の判定点へ流れてきます。道の細い線は1拍、太い線は1小節です。",
+  swayOrbit:"🪐 ORBITでレーンを揺らす（オフ＝揺れを止める）"
 });
 Object.assign(TEXT.en, {
   orbitAnyKey:"Any key works! Press when a note reaches the target",
@@ -35,7 +36,8 @@ Object.assign(TEXT.en, {
   orbitCoreColor:"Target color", orbitMoonColor:"Star color", colorReset:"↺ Skin color",
   orbitMoonLabel:"Orbiting star", orbitMoonSong:"One lap per song (progress)", orbitMoonBeat:"One lap per beat", orbitMoonOff:"Hidden",
   orbitMoonShapeLabel:"Star shape", orbitMoonOrb:"● Orb", orbitMoonStar:"★ Star", orbitMoonComet:"☄ Comet",
-  orbitViewHint:"Notes ride the path into the target at the center of the screen. Thin marks are beats, thick marks are bars."
+  orbitViewHint:"Notes ride the path into the target at the center of the screen. Thin marks are beats, thick marks are bars.",
+  swayOrbit:"🪐 Sway the lane in ORBIT (off = keep it still)"
 });
 Object.assign(TEXT.zh, {
   orbitAnyKey:"任意键都可以！音符到达判定点时按下",
@@ -49,7 +51,8 @@ Object.assign(TEXT.zh, {
   orbitCoreColor:"判定点颜色", orbitMoonColor:"恒星颜色", colorReset:"↺ 皮肤颜色",
   orbitMoonLabel:"恒星（绕行的星）", orbitMoonSong:"整首歌绕一圈（进度）", orbitMoonBeat:"每拍绕一圈", orbitMoonOff:"不显示",
   orbitMoonShapeLabel:"恒星形状", orbitMoonOrb:"● 圆球", orbitMoonStar:"★ 星星", orbitMoonComet:"☄ 彗星",
-  orbitViewHint:"音符沿着道路流向画面中央的判定点。细线是拍，粗线是小节。"
+  orbitViewHint:"音符沿着道路流向画面中央的判定点。细线是拍，粗线是小节。",
+  swayOrbit:"🪐 ORBIT 模式下摇摆车道（关闭＝不摇）"
 });
 Object.assign(TEXT.ko, {
   orbitAnyKey:"아무 키나 OK! 노트가 판정점에 겹치면 누르세요",
@@ -63,7 +66,8 @@ Object.assign(TEXT.ko, {
   orbitCoreColor:"판정점 색", orbitMoonColor:"항성 색", colorReset:"↺ 스킨 색",
   orbitMoonLabel:"항성 (주위를 도는 별)", orbitMoonSong:"곡 끝에서 한 바퀴 (진행도)", orbitMoonBeat:"1박에 한 바퀴", orbitMoonOff:"표시 안 함",
   orbitMoonShapeLabel:"항성 모양", orbitMoonOrb:"● 구슬", orbitMoonStar:"★ 별", orbitMoonComet:"☄ 혜성",
-  orbitViewHint:"노트가 길을 타고 화면 중앙의 판정점으로 흘러옵니다. 가는 선은 1박, 굵은 선은 1마디입니다."
+  orbitViewHint:"노트가 길을 타고 화면 중앙의 판정점으로 흘러옵니다. 가는 선은 1박, 굵은 선은 1마디입니다.",
+  swayOrbit:"🪐 ORBIT에서 레인 흔들기 (끄면 흔들리지 않음)"
 });
 
 /* ============ 設定 ============ */
@@ -418,6 +422,7 @@ on("records", renderTitles);
     hintEl("orbitMoonShapeLabel"),
     makeSeg("orbitMoonShapePicker", "orbitMoonShape", [["orb", "orbitMoonOrb"], ["star", "orbitMoonStar"], ["comet", "orbitMoonComet"]]),
     makeColorRow("orbitMoonColor", "orbitMoonColor", () => toHex(skin().game.perfect)),
+    makeCheck("swayOrbit", "swayOrbit", "swayOrbit"),
     hintEl("orbitViewHint")
   );
 })();

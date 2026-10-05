@@ -121,6 +121,8 @@ trk! の開発を再開します。docs/HANDOFF.md を貼ります。
 
 52. **🖥 動画の全画面表示（最大化ビューア）**（video-max.js【新規】/ tv-dock.js / media-player-mode.js / index.html / style.css）：選曲画面の「**次の曲 ▶** の右」にあった一時停止ボタンはほとんど使われていないため、**動画を全画面で表示する ⛶ ボタンに置き換え**た（`btn("tvKey tvPause tvMax", pauseLed, "⛶")`。**見た目は従来どおりスキンの点灯LEDアイコンのまま**で、全画面表示中に点灯する）。メディアプレーヤーでは**「逆再生」の右＝「全画面で表示」**、その右へ**壁紙がひとつずれる**（`controls.append(prev, playNode, next, reverseNode, maxNode, wallNode, restart)`）。新規 `js/video-max.js` が `#videoMaxView`（`position:fixed;inset:0;z-index:60000`）を `document.body` に1枚だけ作り、`requestAnimationFrame` で `video` を**縦横比を保ったまま画面いっぱい**に描画（音声だけの曲は曲パックの背景画像を表示）。`window.TrkVideoMax = { open, close, toggle, isOpen, onChange }`。操作は **動画クリック＝再生／一時停止**、**←→＝10秒移動**、**⛶＝ブラウザーの全画面**（`requestFullscreen` 非対応・iframeで拒否されてもアプリ内の全画面はそのまま使える）、**ESC／✕／黒いところのクリック＝閉じる**。キーは `capture:true` で受け取り、`stopImmediatePropagation()` でメディアプレーヤー側のESC・Space・←→と重複しないようにした。開いたときに止まっていた場合だけ再生し、閉じると元の状態へ戻す（自分で ▶⏸ を押したあとは勝手に止めない）。**ゲームが始まったら自動で閉じる**（`on("phase")`）ほか、メディアプレーヤーを閉じたとき・壁紙を出したときも閉じる。TVドックのLEDとメディアプレーヤーのボタンは `TrkVideoMax.onChange()` で同期（ボタン名は「全画面で表示」⇔「全画面を閉じる」）。文章は4言語（ja/en/zh/ko）で `tvVideoMax*`／`mediaVideoMax*`／`videoMax*` を追加。静的検査（新規チェック「full-screen video viewer is wired」を含む）とJSDOMスモークで、TVドックのボタン並び・LED点灯・ESCで閉じる・動画クリック再生切替・ゲーム開始で閉じる・メディアプレーヤーの並び（逆再生→全画面→壁紙）・4言語表示を確認（エラー0件）。実ブラウザでの実描画（Canvas）・Fullscreen API・実機確認は未実施。Service Workerキャッシュを `trk-v2026.10.5-ux2` に更新。
 
+53. **🌀 レーンの揺れ：既定を 🚚TRUCK／🪐ORBIT だけに ＋ 個別オフ ＋ ❓謎設定**（truck.js / modes.js / main.js / i18n-options.js / index.html / check-repo.mjs）：以前のセッションで「全ゲームモード共通」になっていた揺れを、**既定では 🚚トラックと 🪐ORBIT だけが揺れる**ように変更（`laneTilt()` の先頭に純粋関数 `swayModeOn(mode)` を導入。`reduceMotion.matches`（OSの「視差効果を減らす」）も従来どおり最優先で止める）。**トラック**（`settings.swayTruck`／`#swayTruck`、「🚚 トラックモードでレーンを揺らす（オフ＝揺れを止める）」）と**ORBIT**（`settings.swayOrbit`／`#swayOrbit`、modes.js の ORBIT 見た目欄に `makeCheck` で追加）に**個別のオフ**を用意（どちらも既定ON）。**🎯 プレイオプションの「🔥 高難易度（エキスパート）」の下に「❓ 謎設定（不具合の再現）」**を追加し、**「全ゲームモードで揺れをオンにする（酔います）」**（`settings.swayAllModes`／`#swayAllModes`）のチェックボックスを配置。このチェックは**各モードの「揺らさない」より優先**され、ONなら MANUAL・STAGE・CATCH でも揺れる（不具合として起きていた動きを設定として残したもの）。見た目の揺れ欄の見出しは「🌀 レーンの揺れ（TRUCK／ORBIT）」に変更し、優先順位を説明するヒント `swayModeHint` を追加。文章は4言語（ja/en/zh/ko）。静的検査（新規チェック「lane sway defaults to TRUCK / ORBIT …」）とJSDOMスモークで、既定値（manual/stage/catch＝false・truck/orbit＝true）・個別オフ・❓謎設定での全モードON・チェックボックスの保存・❓欄が🔥の下にあること・4言語表示を確認（エラー0件）。実機での揺れの見え心地（特にORBIT）は未確認。Service Workerキャッシュを `trk-v2026.10.5-ux3` に更新。
+
 ---
 
 ## 4. 着想元（どこから来たか）
@@ -766,7 +768,7 @@ records[指紋 "サイズ:長さ×10"] = {
 
 - `trk!.zip`（元プロジェクト一式）をこのリポジトリに展開して採用しました。プロトタイプ版の `app.js` / `style.css` は削除しています（履歴には残っています）。
 - **`feedbackLabel` を4言語ぶん追加**（`js/i18n.js`）。12章のチェックは「✅ 入っている」になっていましたが、実際は抜けていて、選曲画面の連絡先リンクの前に `feedbackLabel` という生の文字列が出ていました。
-- **サービスワーカーの登録を `js/main.js` の末尾に追加**。6章の読み込み順の表には「main.js＝サービスワーカー登録」とありましたが、コードには入っていませんでした。当時のキャッシュ名は `trk-v2026.10.2`。現在の値は `sw.js` の `CACHE = "trk-v2026.10.5-ux2"` です。
+- **サービスワーカーの登録を `js/main.js` の末尾に追加**。6章の読み込み順の表には「main.js＝サービスワーカー登録」とありましたが、コードには入っていませんでした。当時のキャッシュ名は `trk-v2026.10.2`。現在の値は `sw.js` の `CACHE = "trk-v2026.10.5-ux3"` です。
 - `manifest.webmanifest`（全画面・横向き）・`verified.json`（空の雛形）・`.github/ISSUE_TEMPLATE/`（bug_report・feature_request・config）を新規作成しました。
 - OGP画像は `tools/make-icons.html` の指示どおり **`docs/og.png`** に置きました（zip では `icons/og.png` になっていました）。`index.html` の `og:image` はそのままで合っています。
 - **`.github/workflows/pages.yml` を変更**：ファイル名を並べてコピーする方式だと、新しいファイルを足すたびに公開が壊れるので、ルートを丸ごと公開する方式（`.git`・`.github`・`_site` だけ除外）にしました。`css/` や `js/` にファイルを足しても、もう直す必要はありません。

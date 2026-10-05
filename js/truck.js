@@ -9,8 +9,10 @@ Object.assign(TEXT.ja, {
   secTruck:"🚚 トラックモード",
   truckHint:"操作キーでレーンを移動し、トラックが踏んだノーツは自動で判定されます（キーは「⌨ 操作」で設定）。記録はMANUALとは別に残ります。",
   laneTint:"レーンの色の濃さ", truckBounce:"トラックを跳ねさせる",
-  swayTitle:"🌀 レーンの揺れ（全モード共通）", swayBeat:"ビートに合わせて左右に傾ける", swayHit:"ドンで左、カッで右に傾ける",
+  swayTitle:"🌀 レーンの揺れ（TRUCK／ORBIT）", swayBeat:"ビートに合わせて左右に傾ける", swayHit:"ドンで左、カッで右に傾ける",
   swayPower:"揺れの強さ", swayReduced:"OSの「視差効果を減らす」がオンのため、揺れと跳ねは止めています。",
+  swayModeHint:"🚚トラックと🪐ORBITは既定で揺れます（それぞれのモードの設定で止められます）。ほかのモードは揺れません。❓謎設定の「全ゲームモードで揺れをオンにする」がいちばん優先されます。",
+  swayTruck:"🚚 トラックモードでレーンを揺らす（オフ＝揺れを止める）",
   truckCtlTitle:"🚚 トラックモードの操作",
   truckPresetLayout:"レイアウトに合わせる", truckPresetUD:"↑／↓ に固定", truckPresetLR:"←／→ に固定",
   truckLane0:"レーン1（上／左）", truckLane1:"レーン2（下／右）", truckToggle:"切り替えキー（任意）",
@@ -26,8 +28,10 @@ Object.assign(TEXT.en, {
   secTruck:"🚚 Truck mode",
   truckHint:"Change lanes with your truck keys; notes your truck drives over are judged automatically (set keys in “⌨ Controls”). Records are kept separately from MANUAL.",
   laneTint:"Lane tint strength", truckBounce:"Make the truck bounce",
-  swayTitle:"🌀 Lane sway (all modes)", swayBeat:"Tilt left/right with the beat", swayHit:"Tilt left on Don, right on Ka",
+  swayTitle:"🌀 Lane sway (TRUCK / ORBIT)", swayBeat:"Tilt left/right with the beat", swayHit:"Tilt left on Don, right on Ka",
   swayPower:"Sway strength", swayReduced:"Sway and bounce are off because your system's “reduce motion” setting is on.",
+  swayModeHint:"🚚 Truck and 🪐 ORBIT sway by default (each mode can turn it off). Other modes stay still. The ❓ mystery option “Sway in every game mode” wins over both.",
+  swayTruck:"🚚 Sway the lane in Truck mode (off = keep it still)",
   truckCtlTitle:"🚚 Truck mode controls",
   truckPresetLayout:"Follow layout", truckPresetUD:"Fixed ↑ / ↓", truckPresetLR:"Fixed ← / →",
   truckLane0:"Lane 1 (top / left)", truckLane1:"Lane 2 (bottom / right)", truckToggle:"Toggle key (optional)",
@@ -43,8 +47,10 @@ Object.assign(TEXT.zh, {
   secTruck:"🚚 卡车模式",
   truckHint:"用操作键切换车道，卡车压过的音符会自动判定（按键在“⌨ 操作”中设置）。记录与MANUAL分开保存。",
   laneTint:"车道染色浓度", truckBounce:"让卡车弹跳",
-  swayTitle:"🌀 车道摇摆（所有模式）", swayBeat:"随节拍左右倾斜", swayHit:"咚向左、咔向右倾斜",
+  swayTitle:"🌀 车道摇摆（TRUCK／ORBIT）", swayBeat:"随节拍左右倾斜", swayHit:"咚向左、咔向右倾斜",
   swayPower:"摇摆强度", swayReduced:"系统已开启“减弱动态效果”，摇摆和弹跳已关闭。",
+  swayModeHint:"🚚卡车与🪐ORBIT 默认摇摆（可在各自模式设置中关闭）。其他模式不摇摆。❓谜之设定中的“所有游戏模式都摇摆”优先级最高。",
+  swayTruck:"🚚 卡车模式下摇摆车道（关闭＝不摇）",
   truckCtlTitle:"🚚 卡车模式操作",
   truckPresetLayout:"跟随布局", truckPresetUD:"固定 ↑／↓", truckPresetLR:"固定 ←／→",
   truckLane0:"车道1（上／左）", truckLane1:"车道2（下／右）", truckToggle:"切换键（可选）",
@@ -60,8 +66,10 @@ Object.assign(TEXT.ko, {
   secTruck:"🚚 트럭 모드",
   truckHint:"조작 키로 레인을 옮기면 트럭이 밟은 노트가 자동으로 판정됩니다 (키는 '⌨ 조작'에서 설정). 기록은 MANUAL과 따로 남습니다.",
   laneTint:"레인 색 농도", truckBounce:"트럭 통통 튀기기",
-  swayTitle:"🌀 레인 흔들림 (모든 모드)", swayBeat:"비트에 맞춰 좌우로 기울이기", swayHit:"쿵은 왼쪽, 딱은 오른쪽으로 기울이기",
+  swayTitle:"🌀 레인 흔들림 (TRUCK／ORBIT)", swayBeat:"비트에 맞춰 좌우로 기울이기", swayHit:"쿵은 왼쪽, 딱은 오른쪽으로 기울이기",
   swayPower:"흔들림 강도", swayReduced:"시스템의 '동작 줄이기'가 켜져 있어 흔들림과 튀기기를 껐습니다.",
+  swayModeHint:"🚚트럭과 🪐ORBIT는 기본적으로 흔들립니다(각 모드 설정에서 끌 수 있음). 다른 모드는 흔들리지 않습니다. ❓ 수수께끼 설정의 '모든 게임 모드에서 흔들기'가 가장 우선합니다.",
+  swayTruck:"🚚 트럭 모드에서 레인 흔들기 (끄면 흔들리지 않음)",
   truckCtlTitle:"🚚 트럭 모드 조작",
   truckPresetLayout:"레이아웃에 맞추기", truckPresetUD:"↑／↓ 고정", truckPresetLR:"←／→ 고정",
   truckLane0:"레인 1 (위／왼쪽)", truckLane1:"레인 2 (아래／오른쪽)", truckToggle:"전환 키 (선택)",
@@ -80,6 +88,12 @@ settings.truckBounce = prefs.truckBounce !== false;
 settings.swayBeat = prefs.swayBeat !== false;
 settings.swayHit = prefs.swayHit !== false;
 settings.swayPower = num(prefs.swayPower, .2, 2, 1.1);
+/* 🌀 揺れるモード：既定は 🚚TRUCK と 🪐ORBIT だけ。それぞれのモードで止められます。
+   （🪐ORBIT のチェックボックスは modes.js が作ります）
+   ❓謎設定の swayAllModes は「揺らさない」設定より優先して、全モードで揺らします。 */
+settings.swayTruck = prefs.swayTruck !== false;
+settings.swayOrbit = prefs.swayOrbit !== false;
+settings.swayAllModes = prefs.swayAllModes === true;
 const TRUCK_PRESETS = { ud:["ArrowUp", "ArrowDown"], lr:["ArrowLeft", "ArrowRight"] };
 settings.truckKeyMode = pick(prefs.truckKeyMode, ["layout", "custom"], "layout");
 settings.truckKeys = (Array.isArray(prefs.truckKeys) && prefs.truckKeys.length === 2 && prefs.truckKeys.every(validCode) && prefs.truckKeys[0] !== prefs.truckKeys[1])
@@ -226,8 +240,18 @@ function drawLaneTint(L) {
 function lanePivot(L) {
   return L.vertical ? { x:(L.centers[0] + L.centers[1]) / 2, y:L.hitY } : { x:L.hitX, y:L.laneY };
 }
+/* いまのモードで揺らすか（純粋関数・テストしやすいように分離） */
+/* 既定で揺れるモード（🚚トラック／🪐ORBIT） */
+const SWAY_DEFAULT_MODES = ["truck", "orbit"];
+function swayModeOn(mode) {
+  if (settings.swayAllModes) return true;                 // ❓謎設定が最優先
+  const m = mode || settings.playMode;
+  if (m === "truck") return settings.swayTruck !== false;
+  if (m === "orbit") return settings.swayOrbit !== false;
+  return false;                                          // ほかのモード（MANUAL・STAGE・CATCH）は既定で揺れない
+}
 function laneTilt(now) {
-  if (reduceMotion.matches) return 0;
+  if (reduceMotion.matches || !swayModeOn()) return 0;
   const D = Math.PI / 180, k = settings.swayPower * gameplayFxMultiplier(), p = performance.now();
   let a = 0;
   if (settings.swayBeat && chartMeta.bpm) a += Math.sin(Math.PI * (now - chartMeta.offset) / (60000 / chartMeta.bpm)) * 1.4 * D * k;
@@ -300,10 +324,11 @@ $("swayPower").value = settings.swayPower;
 $("truckBounce").checked = settings.truckBounce;
 $("swayBeat").checked = settings.swayBeat;
 $("swayHit").checked = settings.swayHit;
+$("swayTruck").checked = settings.swayTruck;
 showTruckVals();
 $("laneTint").addEventListener("input", e => { settings.laneTint = Number(e.target.value); showTruckVals(); saveUserPrefs(); });
 $("swayPower").addEventListener("input", e => { settings.swayPower = Number(e.target.value); showTruckVals(); saveUserPrefs(); });
-for (const id of ["truckBounce", "swayBeat", "swayHit"]) {
+for (const id of ["truckBounce", "swayTruck", "swayBeat", "swayHit"]) {
   $(id).addEventListener("change", e => { settings[id] = e.target.checked; saveUserPrefs(); });
 }
 const syncReducedNote = () => { $("swayReducedNote").hidden = !reduceMotion.matches; };

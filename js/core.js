@@ -52,6 +52,21 @@ try { prefs = JSON.parse(localStorage.getItem(PREFS_KEY)) || JSON.parse(localSto
 if (!prefs || typeof prefs !== "object") prefs = {};
 const pick = (v, list, def) => list.includes(v) ? v : def;
 const num = (v, lo, hi, def) => (typeof v === "number" && isFinite(v)) ? Math.min(hi, Math.max(lo, v)) : def;
+const clampTvDim = v => Number((Math.round(num(v, 0, .9, 0) * 20) / 20).toFixed(2));
+const clampTvBlur = v => Math.round(num(v, 0, 12, 0));
+const TV_PARAM_FAV_MAX = 8;
+function cleanTvParamFavorites(v) {
+  if (!Array.isArray(v)) return [];
+  const out = [], seen = new Set();
+  for (const item of v) {
+    if (!item || typeof item !== "object" || !Number.isFinite(item.dim) || !Number.isFinite(item.blur)) continue;
+    const dim = clampTvDim(item.dim), blur = clampTvBlur(item.blur), key = `${dim.toFixed(2)}:${blur}`;
+    if (seen.has(key)) continue;
+    seen.add(key); out.push({ dim, blur });
+    if (out.length >= TV_PARAM_FAV_MAX) break;
+  }
+  return out;
+}
 function guessLang() {
   const l = (navigator.language || "en").toLowerCase();
   return l.startsWith("ja") ? "ja" : l.startsWith("zh") ? "zh" : l.startsWith("ko") ? "ko" : "en";
@@ -86,8 +101,9 @@ const settings = {
   videoKeys: savedVideoKeys,
   castPolicy: pick(prefs.castPolicy, ["off", "antenna"], "off"),
   backgroundPolicy: pick(prefs.backgroundPolicy, ["off", "antenna", "corner"], prefs.castPolicy === "antenna" ? "antenna" : "off"),
-  bgDim: num(prefs.bgDim, 0, .9, 0),
-  bgBlur: num(prefs.bgBlur, 0, 12, 0),
+  bgDim: clampTvDim(prefs.bgDim),
+  bgBlur: clampTvBlur(prefs.bgBlur),
+  tvParamFavs: cleanTvParamFavorites(prefs.tvParamFavs),
   scroll: num(prefs.scroll, .5, 2.5, 1.2),
   latency: num(prefs.latency, -300, 500, 0),
   /* プレイ方法：以前の「AUTO」モードは「MANUAL＋AUTOオン」に引き継ぐ */
@@ -214,6 +230,7 @@ function resetVideoPrefs() {
   settings.videoStyle = "color";
   settings.videoZoom = 1; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.castPolicy = "off"; settings.backgroundPolicy = "off"; settings.fxAntenna = false; settings.fxAntennaShape = "rod"; settings.fxAntennaCustomOn = ""; settings.fxAntennaCustomOff = ""; settings.mediaLoopTrigger = "toggle"; settings.mediaWallTrigger = "toggle"; settings.mediaWallStyle = "midnight"; settings.mediaWallClock = true; settings.mediaWallStopsVideo = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true;
   settings.bgDim = 0; settings.bgBlur = 0;
+  settings.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs); // user bookmarks survive a TV-only reset
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = true;
   settings.tvPowerPrev = "color"; settings.previewEnabled = true;
@@ -255,6 +272,7 @@ function enterSafeMode() {
   settings.videoStyle = "off";
   settings.videoZoom = 1; settings.castPolicy = "off"; settings.backgroundPolicy = "off"; settings.fxAntenna = false;
   settings.bgDim = 0; settings.bgBlur = 0;
+  settings.tvParamFavs = []; // safe mode starts with no saved TV adjustment pairs
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = false;
   settings.previewEnabled = false;
@@ -271,6 +289,7 @@ function enterSafeMode() {
 }
 function resetAllPrefs() {
   resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs();
+  settings.tvParamFavs = []; // a factory reset clears the separately preserved TV bookmarks too
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
   settings.catchNitroBonus = true; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();
@@ -286,6 +305,7 @@ function exportPrefs(kind) {
   if (kind === "notes") out.notes = settings.notes;
   else if (kind === "tv" || kind === "video") {
     out.videoStyle = settings.videoStyle; out.bgDim = settings.bgDim; out.bgBlur = settings.bgBlur;
+    out.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs);
     out.tvDockSkin = settings.tvDockSkin; out.tvDockFive = settings.tvDockFive; out.tvOrder = settings.tvOrder;
     out.tvOverlay = settings.tvOverlay; out.previewEnabled = settings.previewEnabled; out.fxPower = settings.fxPower;
     out.tvMenuPreview = settings.tvMenuPreview; out.tvMenuVideo = settings.tvMenuVideo;
@@ -605,8 +625,9 @@ function videoFilter() {
   if (settings.videoStyle === "off") return "none";
   const base = { color:"none", mono:"grayscale(1) contrast(1.6)", dim:"brightness(.42) saturate(.85)" }[settings.videoStyle] ?? (skin().video || "none");
   const parts = base && base !== "none" ? [base] : [];
-  if (settings.bgDim > 0) parts.push(`brightness(${(1 - settings.bgDim).toFixed(2)})`);
-  if (settings.bgBlur > 0) parts.push(`blur(${settings.bgBlur}px)`);
+  const dim = clampTvDim(settings.bgDim), blur = clampTvBlur(settings.bgBlur);
+  if (dim > 0) parts.push(`brightness(${(1 - dim).toFixed(2)})`);
+  if (blur > 0) parts.push(`blur(${blur}px)`);
   return parts.join(" ") || "none";
 }
 function applyNoteVars() {
@@ -776,8 +797,9 @@ function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
         let applied = [];
         if (data.notes) { settings.notes = sanitizeNotes(data.notes); applied.push("notes"); }
         if (data.videoStyle) { settings.videoStyle = data.videoStyle; applied.push("videoStyle"); }
-        if (typeof data.bgDim === "number") { settings.bgDim = data.bgDim; applied.push("bgDim"); }
-        if (typeof data.bgBlur === "number") { settings.bgBlur = data.bgBlur; applied.push("bgBlur"); }
+        if (typeof data.bgDim === "number") { settings.bgDim = clampTvDim(data.bgDim); applied.push("bgDim"); }
+        if (typeof data.bgBlur === "number") { settings.bgBlur = clampTvBlur(data.bgBlur); applied.push("bgBlur"); }
+        if ("tvParamFavs" in data) { settings.tvParamFavs = cleanTvParamFavorites(data.tvParamFavs); applied.push("tvParamFavs"); }
         if (data.tvDockSkin) { settings.tvDockSkin = data.tvDockSkin; applied.push("tvDockSkin"); }
         if (typeof data.musicVolume === "number") { settings.musicVolume = data.musicVolume; applied.push("musicVolume"); }
         // 全体的にマージ（知らないキーは無視せず一応入れるが、型チェックは緩め）

@@ -75,6 +75,24 @@ redistribution is OK. For every bundled model:
 **To make a commercial fork:** delete the `assets/mmd/` folder entirely
 (together with `js/characters/miku.js`, see section 2).
 
+### 3b. TV/video looks (original effects)
+
+The built-in TV color looks in `js/tv-presets.js` use standard browser CSS filter
+functions. New portrait, anime/cel, texture and studio/quality looks were written
+for trk!; Canvas overlays (soft light, grain, paper fibers and halftone dots) are
+drawn procedurally by `js/tv-dock.js`.
+
+- No third-party LUTs, preset files, footage, texture images, or effect code are
+  bundled or copied for these looks. The general color-grading concepts are not
+  proprietary; the filter combinations and drawing logic here are original.
+- “Portrait” and skin-tone descriptions mean **global image color adjustments**.
+  They do not detect faces or isolate/correct skin independently of the rest of
+  the frame.
+- Glow, contrast and texture overlays change appearance only. They do not increase
+  source resolution, sharpen recovered detail, or restore clipped image information.
+- No proprietary TV, film, camera, or grading-product branding is used for these
+  presets; descriptive labels are not product endorsements.
+
 ## 4. Third-party libraries
 
 ### 4a. Web runtime libraries

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ==========================================================================
-   trk! tv-presets.js — 📺 映像フィルターのプリセット（20+種類）
+   trk! tv-presets.js — 📺 映像フィルターのプリセット（65種類）
+   ・定番45種＋人物／アニメ・セル／質感／スタジオ・品質の新作20種
    ・各プリセットは CSS filter 文字列と、任意の overlay タイプを持つ
    ・overlay は tv-dock.js が render で描画する（scanlines, letterbox, vhs など）
    ・形式は fx-presets と似せるが、独立（映像は記録に影響しない）
@@ -361,6 +362,165 @@ const TRK_TV_PRESETS = [
     desc:{ja:"色がくるくる変わる万華鏡", en:"Color swirling kaleidoscope", zh:"色彩旋转万花筒", ko:"색이 빙글빙글 만화경"},
     filter:"hue-rotate(90deg) saturate(2.5) contrast(1.3) brightness(1.1)",
     overlay:"bloom"
+  },
+
+  // 人物・肌色を含む映像向けの穏やかなグレード（顔や肌の自動検出は行わない）
+  {
+    id:"portrait_natural",
+    cat:"portrait",
+    label:{ja:"👤 ナチュラルポートレート", en:"👤 Natural portrait", zh:"👤 自然人像", ko:"👤 내추럴 인물"},
+    desc:{ja:"彩度を控えめにし、肌を含む中間色を自然に見せる全体調整", en:"A restrained global grade for natural-looking midtones and skin-inclusive scenes", zh:"整体轻柔调整，让中间调与肤色更自然", ko:"피부를 포함한 중간톤을 자연스럽게 보이는 절제된 전체 보정"},
+    filter:"brightness(1.02) contrast(1.02) saturate(.97) sepia(.025)"
+  },
+  {
+    id:"portrait_soft",
+    cat:"portrait",
+    label:{ja:"🫧 やわらかポートレート", en:"🫧 Soft portrait", zh:"🫧 柔和人像", ko:"🫧 소프트 인물"},
+    desc:{ja:"少し明るく、コントラストを抑えた柔らかな全体トーン", en:"A slightly brighter, gentler global contrast", zh:"稍微提亮并柔和整体对比", ko:"조금 밝고 전체 대비를 부드럽게"},
+    filter:"brightness(1.04) contrast(.94) saturate(.95) sepia(.025)",
+    overlay:"portraitGlow"
+  },
+  {
+    id:"portrait_warm",
+    cat:"portrait",
+    label:{ja:"🌤 あたたかい肌色", en:"🌤 Warm portrait", zh:"🌤 暖调人像", ko:"🌤 따뜻한 인물"},
+    desc:{ja:"赤みを強くしすぎない、控えめな暖色寄りの全体調整", en:"A restrained warm global tint without pushing reds too hard", zh:"克制地偏暖，不会过度增强红色", ko:"붉은색을 과하게 밀지 않는 은은한 웜톤 전체 보정"},
+    filter:"brightness(1.03) contrast(1.03) saturate(1.02) sepia(.08) hue-rotate(-2deg)"
+  },
+  {
+    id:"portrait_matte",
+    cat:"portrait",
+    label:{ja:"🎞 マットポートレート", en:"🎞 Matte portrait", zh:"🎞 柔哑人像", ko:"🎞 매트 인물"},
+    desc:{ja:"強い黒つぶれを避ける、低コントラストの落ち着いた色", en:"A calm, lower-contrast look that avoids crushing dark areas", zh:"低对比的沉静色调，减少暗部压黑", ko:"암부를 지나치게 뭉개지 않는 차분한 저대비 톤"},
+    filter:"brightness(1.04) contrast(.92) saturate(.92) sepia(.045)",
+    overlay:"soft"
+  },
+  {
+    id:"portrait_studio",
+    cat:"portrait",
+    label:{ja:"💡 ソフトボックス", en:"💡 Softbox light", zh:"💡 柔光箱", ko:"💡 소프트박스"},
+    desc:{ja:"白い柔らかな光をうっすら重ねるスタジオ風", en:"A subtle studio-like wash of soft, neutral light", zh:"叠加轻柔的中性柔光，营造棚拍感", ko:"중성적인 부드러운 빛을 은은하게 더하는 스튜디오 느낌"},
+    filter:"brightness(1.035) contrast(1.01) saturate(.98)",
+    overlay:"softbox"
+  },
+
+  // アニメ・セル塗り向け：輪郭と色面をグローバルなコントラストで見やすくする
+  {
+    id:"anime_clear",
+    cat:"anime",
+    label:{ja:"🎨 アニメ・クリア", en:"🎨 Anime clear", zh:"🎨 动画清晰", ko:"🎨 애니 클리어"},
+    desc:{ja:"彩度とコントラストを画面全体で調整。線の抽出や描き足しはしない", en:"A mild global saturation and contrast grade; it does not extract or invent outlines", zh:"整体轻微调整饱和度与对比度；不会提取或绘制轮廓线", ko:"채도와 대비를 화면 전체에 은은하게 적용하며 윤곽선을 추출하거나 그려 넣지 않음"},
+    filter:"contrast(1.08) saturate(1.12) brightness(1.02)"
+  },
+  {
+    id:"anime_cel",
+    cat:"anime",
+    label:{ja:"🖌 セルカラー", en:"🖌 Cel color", zh:"🖌 赛璐珞色块", ko:"🖌 셀 컬러"},
+    desc:{ja:"色の面を少し引き締める、くっきりした配色", en:"A crisp global grade for flat-color animation", zh:"让平涂动画色块更利落的整体调色", ko:"평면 채색 애니메이션의 색면을 또렷하게 하는 전체 보정"},
+    filter:"contrast(1.16) saturate(1.08) brightness(1.01)"
+  },
+  {
+    id:"anime_pastel",
+    cat:"anime",
+    label:{ja:"🌸 パステルセル", en:"🌸 Pastel cel", zh:"🌸 粉彩赛璐珞", ko:"🌸 파스텔 셀"},
+    desc:{ja:"明るく淡い、やさしいアニメカラー", en:"A light, gentle pastel animation grade", zh:"明亮柔和的粉彩动画色调", ko:"밝고 부드러운 파스텔 애니메이션 톤"},
+    filter:"contrast(1.03) saturate(.91) brightness(1.07) sepia(.025)"
+  },
+  {
+    id:"anime_night",
+    cat:"anime",
+    label:{ja:"🌙 アニメ夜景", en:"🌙 Anime night", zh:"🌙 动画夜景", ko:"🌙 애니 나이트"},
+    desc:{ja:"明るさを抑え、青紫寄りの夜の色へ", en:"A darker, gently blue-violet night palette", zh:"压低亮度并转为柔和的蓝紫夜色", ko:"밝기를 낮추고 은은한 청보라 야간 색감으로"},
+    filter:"contrast(1.1) saturate(1.05) brightness(.94) hue-rotate(7deg)"
+  },
+  {
+    id:"anime_print",
+    cat:"anime",
+    label:{ja:"📰 アニメ印刷", en:"📰 Anime print", zh:"📰 动画印刷网点", ko:"📰 애니 인쇄"},
+    desc:{ja:"低密度の網点を重ねた印刷物風", en:"An original, light halftone-print texture", zh:"叠加原创的轻微网点印刷质感", ko:"직접 그리는 은은한 하프톤 인쇄 질감"},
+    filter:"contrast(1.09) saturate(1.04) brightness(1.02)",
+    overlay:"halftone"
+  },
+
+  // 外部のテクスチャ画像を使わず、Canvasで描くオリジナル質感
+  {
+    id:"texture_finegrain",
+    cat:"texture",
+    label:{ja:"🎞 きめ細かいフィルム粒子", en:"🎞 Fine film grain", zh:"🎞 细腻胶片颗粒", ko:"🎞 고운 필름 그레인"},
+    desc:{ja:"控えめな粒子を重ねて映像に微細な質感を足す", en:"A subtle, locally generated grain texture", zh:"叠加轻微颗粒，为画面增加细腻质感", ko:"은은하게 직접 생성한 입자로 미세한 질감을 더함"},
+    filter:"contrast(1.03) saturate(.96) brightness(1.005)",
+    overlay:"finegrain"
+  },
+  {
+    id:"texture_paper",
+    cat:"texture",
+    label:{ja:"📜 紙焼き", en:"📜 Paper print", zh:"📜 纸面印刷", ko:"📜 종이 인화"},
+    desc:{ja:"淡い紙色と手描きの繊維を重ねる", en:"A faint paper tint with locally drawn fibers", zh:"叠加淡淡纸色与本地绘制的纤维", ko:"옅은 종이빛과 직접 그린 섬유 결을 더함"},
+    filter:"contrast(1.04) saturate(.88) brightness(1.025) sepia(.07)",
+    overlay:"paper"
+  },
+  {
+    id:"texture_halftone",
+    cat:"texture",
+    label:{ja:"🔘 ハーフトーン", en:"🔘 Halftone", zh:"🔘 半调网点", ko:"🔘 하프톤"},
+    desc:{ja:"小さな規則的ドットを重ねるレトロ印刷風", en:"A fine, regular dot-screen print texture", zh:"叠加细密规则网点的复古印刷感", ko:"작고 규칙적인 도트를 겹치는 레트로 인쇄 느낌"},
+    filter:"contrast(1.07) saturate(.96) brightness(1.01)",
+    overlay:"halftone"
+  },
+  {
+    id:"texture_softglow",
+    cat:"texture",
+    label:{ja:"✨ ソフトグロウ", en:"✨ Soft glow", zh:"✨ 柔光", ko:"✨ 소프트 글로우"},
+    desc:{ja:"画面の端から柔らかな光を重ねる（解像度補完ではありません）", en:"A soft edge-light overlay (not resolution enhancement)", zh:"从画面边缘叠加柔光（不会提升分辨率）", ko:"화면 가장자리에 부드러운 빛을 더함 (해상도 보정은 아님)"},
+    filter:"brightness(1.035) contrast(.97) saturate(1.01)",
+    overlay:"softbox"
+  },
+  {
+    id:"texture_velvet",
+    cat:"texture",
+    label:{ja:"🪻 ベルベット", en:"🪻 Velvet", zh:"🪻 天鹅绒", ko:"🪻 벨벳"},
+    desc:{ja:"彩度と周辺光量を落ち着かせた深い色", en:"Deep color with restrained saturation and a gentle vignette", zh:"降低饱和度并柔和压暗边缘的深色调", ko:"채도를 절제하고 가장자리를 부드럽게 눌러주는 깊은 색감"},
+    filter:"contrast(1.1) saturate(.91) brightness(.97) sepia(.025)",
+    overlay:"vignette"
+  },
+
+  // 品質重視の穏やかな調整。強い加工より階調・色の見やすさを優先
+  {
+    id:"quality_balanced",
+    cat:"quality",
+    label:{ja:"✨ スタジオ・バランス", en:"✨ Studio balance", zh:"✨ 影棚均衡", ko:"✨ 스튜디오 밸런스"},
+    desc:{ja:"彩度・明るさを控えめに整える自然な全体グレード", en:"A restrained, balanced global color grade", zh:"克制地平衡亮度与饱和度", ko:"밝기와 채도를 절제해 균형을 잡는 전체 색 보정"},
+    filter:"contrast(1.04) saturate(1.02) brightness(1.015)"
+  },
+  {
+    id:"quality_clean",
+    cat:"quality",
+    label:{ja:"📡 放送クリーン", en:"📡 Clean broadcast", zh:"📡 清爽播出", ko:"📡 클린 방송"},
+    desc:{ja:"やや明るく、色と輪郭の見分けやすさを整える", en:"A slightly brighter grade with modest global separation", zh:"略微提亮并适度拉开整体层次", ko:"조금 밝게 하고 전체적인 색과 윤곽의 구분을 정돈"},
+    filter:"contrast(1.08) saturate(1.06) brightness(1.03)"
+  },
+  {
+    id:"quality_highlight",
+    cat:"quality",
+    label:{ja:"☀ ソフト全体トーン", en:"☀ Soft global tone", zh:"☀ 柔和整体色调", ko:"☀ 부드러운 전체 톤"},
+    desc:{ja:"画面全体を穏やかに調整（ハイライトだけの保護・白飛びの復元はしません）", en:"A gentle global tone; it cannot selectively protect or recover clipped highlights", zh:"柔和的整体色调；无法单独保护或恢复原片中已过曝的高光", ko:"화면 전체를 부드럽게 조정하며 하이라이트만 선택해 보호하거나 날아간 부분을 복구하지 않음"},
+    filter:"brightness(1.035) contrast(.97) saturate(.98)",
+    overlay:"portraitGlow"
+  },
+  {
+    id:"quality_open",
+    cat:"quality",
+    label:{ja:"🌤 シャドウ・オープン", en:"🌤 Open shadows", zh:"🌤 打开暗部", ko:"🌤 섀도 오픈"},
+    desc:{ja:"画面全体を少し持ち上げ、暗い映像を見やすくする", en:"Lifts the whole frame slightly for darker footage; not a shadow-only recovery", zh:"整体稍微提亮，帮助观看较暗的素材（并非只提暗部）", ko:"어두운 영상을 보기 쉽게 전체 화면을 조금 밝힘 (암부만 복구하지는 않음)"},
+    filter:"brightness(1.08) contrast(.94) saturate(1.02)"
+  },
+  {
+    id:"quality_cinema",
+    cat:"quality",
+    label:{ja:"🎬 シネマ・フォーカス", en:"🎬 Cinema focus", zh:"🎬 电影焦点", ko:"🎬 시네마 포커스"},
+    desc:{ja:"落ち着いた彩度と穏やかな周辺減光で視線を中央へ", en:"Restrained color and a gentle vignette draw the eye inward", zh:"克制色彩并轻柔压暗边缘，让视线回到画面中央", ko:"절제된 색감과 은은한 주변광 감소로 시선을 중앙에 모음"},
+    filter:"contrast(1.1) brightness(.99) saturate(1.03) sepia(.025)",
+    overlay:"vignette"
   }
 ];
 /* ✅ tv-presets.js 完了 */

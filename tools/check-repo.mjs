@@ -83,6 +83,44 @@ const duplicateIds = [...idCounts].filter(([, count]) => count > 1).map(([id, co
 if (duplicateIds.length) fail(`index.html contains duplicate IDs: ${duplicateIds.join(", ")}`);
 else ok(`index.html static IDs are unique (${indexIds.length} checked)`);
 
+// 📺 TV picture looks and brightness/blur favorites: keep the documented
+// preset count, four localized groups, safe long-press resets and bounded data.
+{
+  const presetSource = read("js/tv-presets.js");
+  const tv = read("js/tv-dock.js");
+  const core = read("js/core.js");
+  const style = read("css/style.css");
+  const notice = read("NOTICE.md");
+  const ids = [...presetSource.matchAll(/\bid:"([^"]+)"/g)].map(m => m[1]);
+  const catCounts = Object.fromEntries(["portrait", "anime", "texture", "quality"].map(cat =>
+    [cat, (presetSource.match(new RegExp(`cat:"${cat}"`, "g")) || []).length]));
+  const uniqueIds = new Set(ids).size === ids.length;
+  const langsOk = ["tvCatPortrait", "tvCatAnime", "tvCatTexture", "tvCatQuality", "tvParamRandHint", "tvParamHint"]
+    .every(key => (tv.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4);
+  const presetsOk = ids.length === 65 && uniqueIds && Object.values(catCounts).every(n => n === 5);
+  const resetOk = tv.includes('bindLongPressReset(rPar, () => applyParamValues(0, 0, "tvParamDefaultDone"))') &&
+    tv.includes('bindLongPressReset(dimInp, () => applyParamValues(0, settings.bgBlur, "tvDimResetDone")') &&
+    tv.includes('bindLongPressReset(blurInp, () => applyParamValues(settings.bgDim, 0, "tvBlurResetDone")') &&
+    tv.includes('tvParamRandHint:"(長押しでデフォルトに戻します。)"') &&
+    tv.includes('paramResetBtn.addEventListener("click"');
+  const favoritesOk = core.includes("TV_PARAM_FAV_MAX = 8") && core.includes("cleanTvParamFavorites(prefs.tvParamFavs)") &&
+    core.includes("settings.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs)") &&
+    core.includes("settings.tvParamFavs = []") && tv.includes("cleanTvParamFavorites(prefs.tvParamFavs)") &&
+    tv.includes("settings.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs)");
+  const overlaysOk = ["portraitGlow", "softbox", "finegrain", "paper", "halftone"]
+    .every(name => presetSource.includes(`overlay:"${name}"`) && tv.includes(`case "${name}"`));
+  const canvasOriginalOk = tv.includes("function tvTextureRandom(seed)") && !tv.includes("fetch(") &&
+    tv.includes("CanvasRenderingContext2D.filter is unavailable") && tv.includes("ctx.canvas.style.filter = filter") &&
+    notice.includes("No third-party LUTs") && notice.includes("do not detect faces") && notice.includes("do not increase");
+  const favoriteStyleOk = style.includes(".tvParamFavList") && style.includes(".tvParamTools");
+  if (!presetsOk) fail(`TV preset catalog should contain 65 unique filters, five in each new category (found ${ids.length}; ${JSON.stringify(catCounts)})`);
+  else if (!langsOk) fail("TV portrait/anime/texture/quality groups or parameter reset help are missing from one of the four languages");
+  else if (!resetOk) fail("TV random button and brightness/blur sliders need their long-press reset paths and explicit reset control");
+  else if (!favoritesOk) fail("brightness/blur favorites must be bounded, validated, persisted and safe-mode aware");
+  else if (!overlaysOk || !canvasOriginalOk || !favoriteStyleOk) fail("original Canvas TV overlays, documented rights/scope, CSS-filter fallback, or parameter-favorite styling are missing");
+  else ok("TV catalog (65 presets), localized picture categories, long-press resets, and bounded brightness/blur favorites are wired");
+}
+
 const privacy = read("privacy.html").replace(/<!--[\s\S]*?-->/g, "");
 let missingPrivacyRefs = 0;
 for (const match of privacy.matchAll(/(?:href|src)=["']([^"']+)["']/gi)) {

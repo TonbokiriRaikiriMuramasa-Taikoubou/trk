@@ -2,7 +2,7 @@
 /* ==========================================================================
    trk! tv-dock.js — 📺 映像出力のTV風ドック（メイン画面の曲リストの下）
    ・本体のスキン30種（ボタン数がそれぞれ違う）、電源・一時停止・お気に入り登録
-   ・映像フィルター45種類（tv-presets.js）をまとめて触れる
+   ・映像フィルター65種類（tv-presets.js）をまとめて触れる
    ・🆕 カスタムTVスキン：設定画面の #tvMaker で色・形・飾りを決めて作れる（trk-tvskin / trk_tv_skins_v1）
    ・🆕 ◀ ▶ の物理ボタン：前の曲・次の曲へ（選曲リストをチャンネル送りのように）
    ・🆕 ならべ方：TV →（お気に入り）→ ラック →（お気に入り）→ TVくわしい → ラックくわしい
@@ -169,6 +169,7 @@ if (typeof prefs !== "undefined") {
     settings.tvDockFive = !!prefs.tvDockFive;
     settings.tvDockOpen = prefs.tvDockOpen === true;
     settings.tvFav = idList(prefs.tvFav, TV_FAV_MAX);   // TV_FAV_MAX=0＝上限なし
+    settings.tvParamFavs = cleanTvParamFavorites(prefs.tvParamFavs);
     settings.tvRecent = idList(prefs.tvRecent, TV_RECENT_MAX);
     settings.tvOrder = pick(prefs.tvOrder, ["tv-first", "fx-first"], "tv-first");
     settings.tvPowerPrev = typeof prefs.tvPowerPrev === "string" ? prefs.tvPowerPrev : "color";
@@ -197,6 +198,9 @@ if (typeof settings !== "undefined") {
   settings.tvOverlay = settings.tvOverlay !== false;
   settings.tvMenuPreview = settings.tvMenuPreview !== false;
   settings.tvMenuVideo = settings.tvMenuVideo === true;
+  settings.bgDim = clampTvDim(settings.bgDim);
+  settings.bgBlur = clampTvBlur(settings.bgBlur);
+  settings.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs);
 }
 
 const tvSkinDef = () => TV_DOCK_SKINS[settings.tvDockSkin] || TV_DOCK_SKINS.cinema;
@@ -228,6 +232,17 @@ Object.assign(TEXT.ja, {
   tvVideoMaxNeed:"まだ動画がありません。曲を選んでから押してください",
   tvRand: "🎲 映像", tvRandFav:"⭐🎲 お気に入りから", tvRandParam:"🎛🎲 明るさ・ぼかし",
   tvParamDone:"明るさ・ぼかしをランダムにしました",
+  tvParamRandHint:"(長押しでデフォルトに戻します。)",
+  tvParamHint:"明るさ・ぼかしのスライダーを長押しすると、その値だけ初期値の0に戻ります。下に組み合わせをお気に入り保存できます。",
+  tvParamReset:"↺ 明るさ・ぼかしを0に戻す", tvParamSave:"☆ 現在の値をお気に入りへ",
+  tvParamFavTitle:"⭐ 明るさ・ぼかしのお気に入り（最大8組）",
+  tvParamFavEmpty:"まだありません。現在の組み合わせを☆で保存できます。",
+  tvParamFull:"お気に入りは最大8組です。不要な組を×で削除してください。",
+  tvParamSaved:"明るさ・ぼかしの組み合わせを保存しました", tvParamExists:"この組み合わせは保存済みです",
+  tvParamApplied:"お気に入りの明るさ・ぼかしを適用しました", tvParamRemoved:"明るさ・ぼかしのお気に入りを削除しました",
+  tvParamDefaultDone:"明るさ・ぼかしを初期値の0に戻しました",
+  tvDimResetDone:"背景の暗さを0に戻しました", tvBlurResetDone:"背景のぼかしを0に戻しました",
+  tvParamPair:"暗さ {dim}% ／ ぼかし {blur}px", tvParamRemove:"「{name}」を削除",
   tvSlotHint:"ボタンを長押し：今の映像を登録（もとの登録は1つ後ろへ）",
   tvEmptySlot:"空きボタン：長押しで今の映像を登録",
   tvNeedOn:"先に映像フィルターを選んでください（非表示以外）",
@@ -236,9 +251,10 @@ Object.assign(TEXT.ja, {
   tvOrderLabel:"ドックの並び順", tvOrderTvFirst:"📺 テレビが上・🎛 ラックが下（自然）", tvOrderFxFirst:"🎛 ラックが上・📺 テレビが下",
   tvOrderHint:"デフォルトは「テレビ →（お気に入り）→ ラック →（お気に入り）→ テレビくわしい → ラックくわしい」の順です。テレビとラックだけ入れ替えられます（くわしいは、いつも下のほう）。",
   tvOverlay:"📺 映像オーバーレイ（走査線・レターボックス・ノイズなど）を表示",
-  tvOverlayHint:"CRTやVHS、シネマなどのフィルターで、走査線やフィルムグレイン、黒帯などの演出を重ねます。",
+  tvOverlayHint:"CRT・VHS・質感系などで、走査線・Canvasで描く粒子や網点・黒帯を重ねます。素材の解像度や細部を増やす機能ではありません。",
   tvQuick:"📺 映像", tvOff:"📺 OFF",
   tvCatBasic:"基本", tvCatVivid:"ビビッド", tvCatRetro:"レトロ", tvCatCinema:"シネマ", tvCatEffect:"エフェクト", tvCatWeird:"不思議", tvCatNature:"自然",
+  tvCatPortrait:"人物・肌色", tvCatAnime:"アニメ・セル", tvCatTexture:"質感", tvCatQuality:"スタジオ・高画質",
   tvCatFav:"★ お気に入り", tvCatRecent:"🕘 最近使った",
   tvSearch:"🔍 映像フィルターを探す", tvNoMatch:"見つかりません。", tvHits:"{n}個見つかりました",
   tvDim:"背景の暗さ", tvBlur:"背景のぼかし",
@@ -286,6 +302,17 @@ Object.assign(TEXT.en, {
   tvVideoMaxNeed:"No video yet — pick a song first",
   tvRand:"🎲 Video", tvRandFav:"⭐🎲 From favorites", tvRandParam:"🎛🎲 Brightness / blur",
   tvParamDone:"Brightness / blur randomized",
+  tvParamRandHint:"(Long-press to restore defaults.)",
+  tvParamHint:"Long-press either brightness or blur slider to reset just that value to 0. Save pairs below as favorites for quick recall.",
+  tvParamReset:"↺ Reset brightness / blur to 0", tvParamSave:"☆ Save current values",
+  tvParamFavTitle:"⭐ Brightness / blur favorites (up to 8 pairs)",
+  tvParamFavEmpty:"No saved pairs yet. Use ☆ to save the current combination.",
+  tvParamFull:"Favorites are limited to 8 pairs. Remove one with × to make room.",
+  tvParamSaved:"Brightness / blur pair saved", tvParamExists:"This pair is already saved",
+  tvParamApplied:"Favorite brightness / blur applied", tvParamRemoved:"Brightness / blur favorite removed",
+  tvParamDefaultDone:"Brightness and blur restored to 0",
+  tvDimResetDone:"Background dim restored to 0", tvBlurResetDone:"Background blur restored to 0",
+  tvParamPair:"Dim {dim}% / blur {blur}px", tvParamRemove:"Remove “{name}”",
   tvSlotHint:"Long-press a button: save current video (old one moves back)",
   tvEmptySlot:"Empty: long-press to save current video",
   tvNeedOn:"Pick a video filter first (not Off)",
@@ -294,9 +321,10 @@ Object.assign(TEXT.en, {
   tvOrderLabel:"Dock order", tvOrderTvFirst:"📺 TV on top, 🎛 Rack below (natural)", tvOrderFxFirst:"🎛 Rack on top, 📺 TV below",
   tvOrderHint:"Default order: TV →(favorites)→ rack →(favorites)→ TV options → rack options. You can swap the TV and the rack (the option boxes always stay below).",
   tvOverlay:"📺 Show video overlays (scanlines, letterbox, noise…)",
-  tvOverlayHint:"CRT, VHS, cinema etc. add scanlines, grain, letterbox bars for atmosphere.",
+  tvOverlayHint:"CRT, VHS and texture looks can add scanlines, Canvas-drawn grain or dots, and letterbox bars. These do not add source resolution or recover detail.",
   tvQuick:"📺 Video", tvOff:"📺 OFF",
   tvCatBasic:"Basic", tvCatVivid:"Vivid", tvCatRetro:"Retro", tvCatCinema:"Cinema", tvCatEffect:"Effect", tvCatWeird:"Weird", tvCatNature:"Nature",
+  tvCatPortrait:"Portrait / skin tones", tvCatAnime:"Anime / cel", tvCatTexture:"Texture", tvCatQuality:"Studio / quality",
   tvCatFav:"★ Favorites", tvCatRecent:"🕘 Recent",
   tvSearch:"🔍 Search video filters", tvNoMatch:"No matches.", tvHits:"{n} found",
   tvDim:"Background dim", tvBlur:"Background blur",
@@ -344,6 +372,17 @@ Object.assign(TEXT.zh, {
   tvVideoMaxNeed:"还没有视频，请先选择歌曲",
   tvRand:"🎲 视频", tvRandFav:"⭐🎲 从收藏", tvRandParam:"🎛🎲 亮度・模糊",
   tvParamDone:"已随机调整亮度・模糊",
+  tvParamRandHint:"(长按可恢复默认值。)",
+  tvParamHint:"长按亮度或模糊滑块，可只将该项恢复为0。也可将亮度与模糊的组合保存到下方收藏，方便再次使用。",
+  tvParamReset:"↺ 将亮度・模糊重置为0", tvParamSave:"☆ 收藏当前数值",
+  tvParamFavTitle:"⭐ 亮度・模糊收藏（最多8组）",
+  tvParamFavEmpty:"还没有收藏。点击☆即可保存当前组合。",
+  tvParamFull:"最多保存8组。点击×删除一组后即可继续添加。",
+  tvParamSaved:"已收藏亮度・模糊组合", tvParamExists:"该组合已经收藏",
+  tvParamApplied:"已应用收藏的亮度・模糊", tvParamRemoved:"已删除亮度・模糊收藏",
+  tvParamDefaultDone:"亮度与模糊已恢复为0",
+  tvDimResetDone:"背景暗度已恢复为0", tvBlurResetDone:"背景模糊已恢复为0",
+  tvParamPair:"暗度 {dim}% / 模糊 {blur}px", tvParamRemove:"删除“{name}”",
   tvSlotHint:"长按按钮：登记当前视频（原来的往后挪一位）",
   tvEmptySlot:"空按钮：长按登记当前视频",
   tvNeedOn:"请先选择视频滤镜（非隐藏）",
@@ -352,9 +391,10 @@ Object.assign(TEXT.zh, {
   tvOrderLabel:"Dock 顺序", tvOrderTvFirst:"📺 电视在上、🎛 机架在下（自然）", tvOrderFxFirst:"🎛 机架在上、📺 电视在下",
   tvOrderHint:"默认顺序：电视 →（收藏）→ 机架 →（收藏）→ 电视详细 → 机架详细。电视与机架可以互换（详细选项始终在下方）。",
   tvOverlay:"📺 显示视频叠加（扫描线・黑边・噪点等）",
-  tvOverlayHint:"CRT、VHS、影院等滤镜会叠加扫描线、颗粒、黑边等效果。",
+  tvOverlayHint:"CRT、VHS与质感滤镜会叠加扫描线、Canvas绘制的颗粒或网点、黑边；不会提升原片分辨率或恢复细节。",
   tvQuick:"📺 视频", tvOff:"📺 关闭",
   tvCatBasic:"基本", tvCatVivid:"鲜艳", tvCatRetro:"复古", tvCatCinema:"影院", tvCatEffect:"特效", tvCatWeird:"奇异", tvCatNature:"自然",
+  tvCatPortrait:"人像・肤色", tvCatAnime:"动画・赛璐珞", tvCatTexture:"质感", tvCatQuality:"影棚・画质",
   tvCatFav:"★ 收藏", tvCatRecent:"🕘 最近使用",
   tvSearch:"🔍 搜索视频滤镜", tvNoMatch:"没有结果。", tvHits:"找到{n}个",
   tvDim:"背景暗度", tvBlur:"背景模糊",
@@ -402,6 +442,17 @@ Object.assign(TEXT.ko, {
   tvVideoMaxNeed:"아직 영상이 없습니다. 곡을 먼저 고르세요",
   tvRand:"🎲 영상", tvRandFav:"⭐🎲 즐겨찾기에서", tvRandParam:"🎛🎲 밝기・흐림",
   tvParamDone:"밝기・흐림을 랜덤으로 바꿨습니다",
+  tvParamRandHint:"(길게 누르면 기본값으로 돌아갑니다.)",
+  tvParamHint:"밝기 또는 흐림 슬라이더를 길게 누르면 해당 값만 0으로 돌아갑니다. 밝기・흐림 조합을 아래 즐겨찾기에 저장해 빠르게 다시 적용할 수 있습니다.",
+  tvParamReset:"↺ 밝기・흐림을 0으로 초기화", tvParamSave:"☆ 현재 값을 즐겨찾기에 저장",
+  tvParamFavTitle:"⭐ 밝기・흐림 즐겨찾기 (최대 8개)",
+  tvParamFavEmpty:"저장된 조합이 없습니다. ☆를 눌러 현재 조합을 저장하세요.",
+  tvParamFull:"즐겨찾기는 최대 8개까지 저장할 수 있습니다. ×로 하나를 삭제한 뒤 추가하세요.",
+  tvParamSaved:"밝기・흐림 조합을 저장했습니다", tvParamExists:"이미 저장된 조합입니다",
+  tvParamApplied:"즐겨찾기 밝기・흐림을 적용했습니다", tvParamRemoved:"밝기・흐림 즐겨찾기를 삭제했습니다",
+  tvParamDefaultDone:"밝기와 흐림을 0으로 되돌렸습니다",
+  tvDimResetDone:"배경 어둡기를 0으로 되돌렸습니다", tvBlurResetDone:"배경 흐림을 0으로 되돌렸습니다",
+  tvParamPair:"어둡기 {dim}% / 흐림 {blur}px", tvParamRemove:"‘{name}’ 삭제",
   tvSlotHint:"버튼 길게 누르기: 현재 영상 등록 (원래 것은 한 칸 뒤로)",
   tvEmptySlot:"빈 버튼: 길게 눌러 현재 영상 등록",
   tvNeedOn:"먼저 영상 필터를 골라 주세요 (끄기 제외)",
@@ -410,9 +461,10 @@ Object.assign(TEXT.ko, {
   tvOrderLabel:"Dock 순서", tvOrderTvFirst:"📺 TV가 위, 🎛 랙이 아래 (자연스러움)", tvOrderFxFirst:"🎛 랙이 위, 📺 TV가 아래",
   tvOrderHint:"기본 순서: TV →(즐겨찾기)→ 랙 →(즐겨찾기)→ TV 자세히 → 랙 자세히. TV와 랙만 서로 바꿀 수 있습니다(자세히는 항상 아래).",
   tvOverlay:"📺 영상 오버레이 표시 (주사선・레터박스・노이즈 등)",
-  tvOverlayHint:"CRT나 VHS, 시네마 등은 주사선이나 필름 그레인, 흑색 바 등을 겹쳐 분위기를 냅니다.",
+  tvOverlayHint:"CRT・VHS・질감 필터는 주사선, Canvas로 그린 입자나 도트, 레터박스를 더합니다. 원본 해상도를 높이거나 세부 묘사를 복구하지 않습니다.",
   tvQuick:"📺 영상", tvOff:"📺 OFF",
   tvCatBasic:"기본", tvCatVivid:"비비드", tvCatRetro:"레트로", tvCatCinema:"시네마", tvCatEffect:"이펙트", tvCatWeird:"기묘", tvCatNature:"자연",
+  tvCatPortrait:"인물・피부 톤", tvCatAnime:"애니・셀", tvCatTexture:"질감", tvCatQuality:"스튜디오・화질",
   tvCatFav:"★ 즐겨찾기", tvCatRecent:"🕘 최근 사용",
   tvSearch:"🔍 영상 필터 검색", tvNoMatch:"결과가 없습니다.", tvHits:"{n}개 찾음",
   tvDim:"배경 어둡기", tvBlur:"배경 흐림",
@@ -451,8 +503,8 @@ function tvPresetDesc(p) {
   const d = p.desc;
   return typeof d === "string" ? d : (d && (d[lang] || d.en || d.ja)) || "";
 }
-const TV_CAT_KEY = { basic:"tvCatBasic", vivid:"tvCatVivid", retro:"tvCatRetro", cinema:"tvCatCinema", effect:"tvCatEffect", weird:"tvCatWeird", nature:"tvCatNature", fav:"tvCatFav", recent:"tvCatRecent" };
-const TV_GROUPS = ["fav", "recent", "basic", "vivid", "retro", "cinema", "effect", "weird", "nature"];
+const TV_CAT_KEY = { basic:"tvCatBasic", vivid:"tvCatVivid", retro:"tvCatRetro", cinema:"tvCatCinema", effect:"tvCatEffect", weird:"tvCatWeird", nature:"tvCatNature", portrait:"tvCatPortrait", anime:"tvCatAnime", texture:"tvCatTexture", quality:"tvCatQuality", fav:"tvCatFav", recent:"tvCatRecent" };
+const TV_GROUPS = ["fav", "recent", "basic", "vivid", "retro", "cinema", "portrait", "anime", "texture", "quality", "effect", "weird", "nature"];
 
 function tvPresetsOf(cat) {
   if (cat === "fav") return (settings.tvFav || []).map(tvPresetById).filter(Boolean);
@@ -499,8 +551,9 @@ function newVideoFilter() {
   if (base.off) return "none";
   const parts = [];
   if (base.filter && base.filter !== "none") parts.push(base.filter);
-  if (settings.bgDim > 0) parts.push(`brightness(${(1 - settings.bgDim).toFixed(2)})`);
-  if (settings.bgBlur > 0) parts.push(`blur(${settings.bgBlur}px)`);
+  const dim = clampTvDim(settings.bgDim), blur = clampTvBlur(settings.bgBlur);
+  if (dim > 0) parts.push(`brightness(${(1 - dim).toFixed(2)})`);
+  if (blur > 0) parts.push(`blur(${blur}px)`);
   return parts.join(" ") || "none";
 }
 
@@ -512,6 +565,44 @@ if (typeof window !== "undefined") {
 }
 
 /* ============ drawVideo を包んでオーバーレイを描く ============ */
+// Textures are drawn locally with Canvas; no image assets, LUTs or vendor presets are loaded.
+const TV_PATTERN_CACHE = new WeakMap();
+function tvOverlayPattern(ctx, kind) {
+  if (!ctx || typeof ctx.createPattern !== "function") return null;
+  let cache = TV_PATTERN_CACHE.get(ctx);
+  if (!cache) { cache = new Map(); TV_PATTERN_CACHE.set(ctx, cache); }
+  if (cache.has(kind)) return cache.get(kind);
+  const tile = document.createElement("canvas");
+  const size = kind === "halftone" ? 12 : 64;
+  tile.width = size; tile.height = size;
+  const g = tile.getContext("2d");
+  if (!g) return null;
+  if (kind === "halftone") {
+    g.fillStyle = "rgba(20,18,24,.62)";
+    g.beginPath(); g.arc(3, 3, 1.35, 0, Math.PI * 2); g.arc(9, 9, 1.35, 0, Math.PI * 2); g.fill();
+  } else if (kind === "finegrain") {
+    const rand = tvTextureRandom(0x6f31a9);
+    for (let i = 0; i < 120; i++) {
+      g.fillStyle = rand() > .5 ? "rgba(255,255,255,.7)" : "rgba(28,22,27,.65)";
+      const dot = .5 + rand() * 1.1;
+      g.fillRect(rand() * size, rand() * size, dot, dot);
+    }
+  } else if (kind === "paper") {
+    const rand = tvTextureRandom(0x2da591);
+    g.strokeStyle = "rgba(89,65,39,.34)"; g.lineWidth = .65;
+    for (let i = 0; i < 18; i++) {
+      const x = rand() * size, y = rand() * size, len = 3 + rand() * 14;
+      g.beginPath(); g.moveTo(x, y); g.lineTo(x + (rand() - .5) * 2, y + len); g.stroke();
+    }
+  }
+  const pattern = ctx.createPattern(tile, "repeat");
+  if (pattern) cache.set(kind, pattern);
+  return pattern;
+}
+function tvTextureRandom(seed) {
+  let state = seed >>> 0;
+  return () => { state = (Math.imul(state, 1664525) + 1013904223) >>> 0; return state / 4294967296; };
+}
 let baseDrawVideo = null;
 if (typeof drawVideo === "function") baseDrawVideo = drawVideo;
 
@@ -633,6 +724,47 @@ function drawTvOverlay(vctx, W, H, overlay) {
       const step = 24;
       for (let x=0;x<W;x+=step) { vctx.beginPath(); vctx.moveTo(x,0); vctx.lineTo(x,H); vctx.stroke(); }
       for (let y=0;y<H;y+=step) { vctx.beginPath(); vctx.moveTo(0,y); vctx.lineTo(W,y); vctx.stroke(); }
+      break;
+    }
+    case "portraitGlow": {
+      const g = vctx.createRadialGradient(W * .5, H * .23, 0, W * .5, H * .23, Math.max(W, H) * .72);
+      g.addColorStop(0, "rgba(255,244,230,.19)");
+      g.addColorStop(.48, "rgba(255,236,222,.08)");
+      g.addColorStop(1, "rgba(255,236,222,0)");
+      vctx.globalCompositeOperation = "screen"; vctx.fillStyle = g; vctx.fillRect(0, 0, W, H);
+      break;
+    }
+    case "softbox": {
+      const g = vctx.createRadialGradient(W * .12, H * .06, 0, W * .28, H * .12, Math.max(W, H) * .92);
+      g.addColorStop(0, "rgba(255,250,239,.18)");
+      g.addColorStop(.45, "rgba(255,247,232,.075)");
+      g.addColorStop(1, "rgba(255,247,232,0)");
+      vctx.globalCompositeOperation = "screen"; vctx.fillStyle = g; vctx.fillRect(0, 0, W, H);
+      break;
+    }
+    case "finegrain": {
+      const pattern = tvOverlayPattern(vctx, "finegrain");
+      if (pattern) {
+        vctx.globalCompositeOperation = "soft-light"; vctx.globalAlpha = .1;
+        vctx.fillStyle = pattern; vctx.fillRect(0, 0, W, H);
+      }
+      break;
+    }
+    case "paper": {
+      vctx.globalCompositeOperation = "soft-light";
+      vctx.fillStyle = "rgba(238,220,179,.15)"; vctx.fillRect(0, 0, W, H);
+      const pattern = tvOverlayPattern(vctx, "paper");
+      if (pattern) {
+        vctx.globalAlpha = .55; vctx.fillStyle = pattern; vctx.fillRect(0, 0, W, H);
+      }
+      break;
+    }
+    case "halftone": {
+      const pattern = tvOverlayPattern(vctx, "halftone");
+      if (pattern) {
+        vctx.globalCompositeOperation = "multiply"; vctx.globalAlpha = .16;
+        vctx.fillStyle = pattern; vctx.fillRect(0, 0, W, H);
+      }
       break;
     }
   }
@@ -811,7 +943,9 @@ const screenName = () => (typeof screen === "string" ? screen : "");
    ・fit:"contain" はゲーム画面と同じ（黒帯つきで全体を映す）／fit:"cover" はTVの画面いっぱい（はみ出しは切る） */
 function paintVideoFrame(ctx, W, H, fit) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.filter = "none";
+  const canvasFilter = "filter" in ctx;
+  if (ctx.canvas && ctx.canvas.style) ctx.canvas.style.filter = "none";
+  if (canvasFilter) { try { ctx.filter = "none"; } catch (_) {} }
   ctx.globalAlpha = 1;
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, W, H);
@@ -819,9 +953,11 @@ function paintVideoFrame(ctx, W, H, fit) {
   const vw = video.videoWidth, vh = video.videoHeight;
   const s = (fit === "cover" ? Math.max : Math.min)(W / vw, H / vh);
   const dw = vw * s, dh = vh * s;
-  try { ctx.filter = newVideoFilter(); } catch (_) {}
+  const filter = newVideoFilter();
+  if (canvasFilter) { try { ctx.filter = filter; } catch (_) {} }
+  else if (ctx.canvas && ctx.canvas.style) ctx.canvas.style.filter = filter; // CSS-filter fallback where CanvasRenderingContext2D.filter is unavailable
   try { ctx.drawImage(video, (W - dw) / 2, (H - dh) / 2, dw, dh); } catch (_) { return false; }
-  ctx.filter = "none";
+  if (canvasFilter) { try { ctx.filter = "none"; } catch (_) {} }
   const preset = currentTvPreset();
   drawTvOverlay(ctx, W, H, (preset && preset.overlay) || tvFilterBase().overlay || null);
   return true;
@@ -915,8 +1051,9 @@ addEventListener("DOMContentLoaded", () => {
   const slots = el("div", "tvSlots");
   const rTv = btn("tvKey"), rFav = btn("tvKey"), rPar = btn("tvKey");
   const rnd = el("div", "tvRand"); rnd.append(rTv, rFav, rPar);
+  const paramRandHint = tx("div", "tvParamRandHint", "hint tvParamRandHint");
   const slotHint = tx("div", "tvSlotHint", "hint tvHint");
-  dev.append(top, screenWrap, deco, slots, rnd, slotHint);
+  dev.append(top, screenWrap, deco, slots, rnd, paramRandHint, slotHint);
 
   const overLabel = tx("div", "tvFavLabel", "hint");
   const overflow = el("div", "tvFavRow");
@@ -930,16 +1067,100 @@ addEventListener("DOMContentLoaded", () => {
   const quickSel = document.createElement("select"); quickSel.className = "tvQuickSelect";
   quickSel.addEventListener("change", () => { if (quickSel.value) selectTv(quickSel.value); });
   const quickRow = el("div", "inline tight"); quickRow.append(tx("span","tvQuick"), quickSel);
-  const dimRow = el("div", "inline"), blurRow = el("div", "inline");
+  const dimRow = el("div", "inline tvParamRow"), blurRow = el("div", "inline tvParamRow");
   const dimLab = tx("span","tvDim"), blurLab = tx("span","tvBlur");
   const dimInp = document.createElement("input"), blurInp = document.createElement("input");
   const dimVal = el("span","mono"), blurVal = el("span","mono");
   dimInp.type = "range"; dimInp.min = 0; dimInp.max = 0.9; dimInp.step = 0.05;
   blurInp.type = "range"; blurInp.min = 0; blurInp.max = 12; blurInp.step = 1;
-  dimInp.addEventListener("input", () => { settings.bgDim = Number(dimInp.value); saveUserPrefs(); if (typeof view !== "undefined") view.style.filter = newVideoFilter(); render(); });
-  blurInp.addEventListener("input", () => { settings.bgBlur = Number(blurInp.value); saveUserPrefs(); if (typeof view !== "undefined") view.style.filter = newVideoFilter(); render(); });
+  dimInp.setAttribute("aria-label", tr("tvDim")); blurInp.setAttribute("aria-label", tr("tvBlur"));
+  dimInp.title = tr("tvParamHint"); blurInp.title = tr("tvParamHint");
   dimRow.append(dimLab, dimInp, dimVal);
   blurRow.append(blurLab, blurInp, blurVal);
+
+  const paramHint = tx("div", "tvParamHint", "hint tvParamHint");
+  const paramTools = el("div", "tvParamTools");
+  const paramResetBtn = tx("button", "tvParamReset", "fxMini"); paramResetBtn.type = "button";
+  const paramSaveBtn = tx("button", "tvParamSave", "fxMini"); paramSaveBtn.type = "button";
+  paramTools.append(paramResetBtn, paramSaveBtn);
+  const paramFavWrap = el("div", "tvParamFavs");
+  const paramFavTitle = tx("div", "tvParamFavTitle", "tvParamFavTitle");
+  const paramFavList = el("div", "tvParamFavList");
+  paramFavWrap.append(paramFavTitle, paramFavList);
+
+  function applyParamValues(dim, blur, messageKey) {
+    settings.bgDim = clampTvDim(Number(dim));
+    settings.bgBlur = clampTvBlur(Number(blur));
+    dimInp.value = String(settings.bgDim); blurInp.value = String(settings.bgBlur);
+    if (typeof view !== "undefined" && view) view.style.filter = newVideoFilter();
+    saveUserPrefs();
+    render();
+    if (messageKey) lcdFlash(tr(messageKey));
+  }
+  function bindLongPressReset(node, onReset, tolerance = 10) {
+    let timer = 0, pointerId = null, startX = 0, startY = 0, long = false;
+    node.addEventListener("pointerdown", e => {
+      if (e.isPrimary === false || (typeof e.button === "number" && e.button !== 0)) return;
+      clearTimeout(timer); long = false; pointerId = e.pointerId; startX = e.clientX; startY = e.clientY;
+      timer = setTimeout(() => {
+        if (pointerId !== e.pointerId) return;
+        timer = 0; long = true; onReset();
+      }, TV_LONG_MS);
+    });
+    node.addEventListener("pointermove", e => {
+      if (pointerId !== e.pointerId || Math.hypot(e.clientX - startX, e.clientY - startY) <= tolerance) return;
+      clearTimeout(timer); timer = 0;
+    });
+    const finish = e => {
+      if (pointerId !== e.pointerId) return;
+      clearTimeout(timer); timer = 0; pointerId = null;
+    };
+    for (const ev of ["pointerup", "pointerleave", "pointercancel"]) node.addEventListener(ev, finish);
+    node.addEventListener("click", e => {
+      if (!long) return;
+      e.preventDefault(); e.stopImmediatePropagation(); long = false;
+    }, true);
+    node.addEventListener("contextmenu", e => e.preventDefault());
+  }
+  bindLongPressReset(rPar, () => applyParamValues(0, 0, "tvParamDefaultDone"));
+  bindLongPressReset(dimInp, () => applyParamValues(0, settings.bgBlur, "tvDimResetDone"), 9);
+  bindLongPressReset(blurInp, () => applyParamValues(settings.bgDim, 0, "tvBlurResetDone"), 9);
+  dimInp.addEventListener("input", () => applyParamValues(dimInp.value, settings.bgBlur));
+  blurInp.addEventListener("input", () => applyParamValues(settings.bgDim, blurInp.value));
+
+  function paramPairName(pair) {
+    return tr("tvParamPair", { dim: Math.round(pair.dim * 100), blur: pair.blur });
+  }
+  function renderParamFavorites() {
+    settings.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs);
+    paramFavList.textContent = "";
+    if (!settings.tvParamFavs.length) {
+      paramFavList.append(tx("div", "tvParamFavEmpty", "hint"));
+      return;
+    }
+    for (const pair of settings.tvParamFavs) {
+      const name = paramPairName(pair), row = el("div", "tvParamFavItem");
+      const applyBtn = btn("fxMini tvParamFavApply", "⭐ " + name);
+      applyBtn.title = tr("tvParamApplied"); applyBtn.setAttribute("aria-label", name);
+      applyBtn.addEventListener("click", () => applyParamValues(pair.dim, pair.blur, "tvParamApplied"));
+      const removeBtn = btn("fxMini tvParamFavRemove", "×");
+      removeBtn.title = tr("tvParamRemove", { name }); removeBtn.setAttribute("aria-label", removeBtn.title);
+      removeBtn.addEventListener("click", () => {
+        settings.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs.filter(p => p.dim !== pair.dim || p.blur !== pair.blur));
+        saveUserPrefs(); renderParamFavorites(); lcdFlash(tr("tvParamRemoved"));
+      });
+      row.append(applyBtn, removeBtn); paramFavList.append(row);
+    }
+  }
+  paramResetBtn.addEventListener("click", () => applyParamValues(0, 0, "tvParamDefaultDone"));
+  paramSaveBtn.addEventListener("click", () => {
+    const pair = { dim: clampTvDim(settings.bgDim), blur: clampTvBlur(settings.bgBlur) };
+    const exists = settings.tvParamFavs.some(p => p.dim === pair.dim && p.blur === pair.blur);
+    if (exists) { lcdFlash(tr("tvParamExists")); return; }
+    if (settings.tvParamFavs.length >= TV_PARAM_FAV_MAX) { lcdFlash(tr("tvParamFull")); return; }
+    settings.tvParamFavs = cleanTvParamFavorites([pair, ...settings.tvParamFavs]);
+    saveUserPrefs(); renderParamFavorites(); lcdFlash(tr("tvParamSaved"));
+  });
 
   const skinRow = el("label","field"), skinSel = document.createElement("select");
   skinRow.append(tx("span","tvSkinLabel"), skinSel);
@@ -1133,7 +1354,9 @@ addEventListener("DOMContentLoaded", () => {
   }
   function pvPlaceholder(ctx, text) {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.filter = "none"; ctx.globalAlpha = 1;
+    if (ctx.canvas && ctx.canvas.style) ctx.canvas.style.filter = "none";
+    if ("filter" in ctx) { try { ctx.filter = "none"; } catch (_) {} }
+    ctx.globalAlpha = 1;
     ctx.fillStyle = "#000"; ctx.fillRect(0, 0, 1920, 1080);
     ctx.fillStyle = "rgba(255,255,255,.82)";
     ctx.font = `600 56px ${FONT_DEFAULT}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
@@ -1197,7 +1420,7 @@ addEventListener("DOMContentLoaded", () => {
   video.addEventListener("canplay", previewTick);
   showTab("setup");
 
-  body.append(tx("summary","tvMoreTitle"), quickRow, skinRow, dimRow, blurRow, tabsBar, paneSetup, panePreview);
+  body.append(tx("summary","tvMoreTitle"), quickRow, skinRow, dimRow, blurRow, paramHint, paramTools, paramFavWrap, tabsBar, paneSetup, panePreview);
 
   dock.append(dev, favChips, overLabel, overflow, body);
   col.append(dock);
@@ -1252,13 +1475,10 @@ addEventListener("DOMContentLoaded", () => {
     else lcdFlash(tr("tvNoFavShort"));
   });
   rPar.addEventListener("click", () => {
-    const dim = Math.round(Math.random()*18)/20; // 0-0.9
-    const blur = Math.floor(Math.random()*9); // 0-8
-    settings.bgDim = dim; settings.bgBlur = blur;
-    saveUserPrefs();
-    if (typeof view !== "undefined") view.style.filter = newVideoFilter();
+    const dim = Math.round(Math.random()*18)/20; // 0-0.9, in 0.05 steps
+    const blur = Math.floor(Math.random()*9); // 0-8px
+    applyParamValues(dim, blur);
     lcdFlash("🎛🎲 " + tr("tvParamDone"));
-    render();
   });
 
   function assign(i) {
@@ -1430,6 +1650,8 @@ addEventListener("DOMContentLoaded", () => {
     } catch(_) {}
 
     rTv.textContent = tr("tvRand"); rFav.textContent = tr("tvRandFav"); rPar.textContent = tr("tvRandParam");
+    rPar.title = tr("tvRandParam") + " " + tr("tvParamRandHint");
+    rPar.setAttribute("aria-label", rPar.title);
 
     // スロット（⭐いまのフォルダの中身。1軍＝これまでの settings.tvFav）
     const F = window.TrkFavs;
@@ -1487,8 +1709,13 @@ addEventListener("DOMContentLoaded", () => {
     }
     quickSel.value = isOff ? "off" : settings.videoStyle;
 
+    settings.bgDim = clampTvDim(settings.bgDim); settings.bgBlur = clampTvBlur(settings.bgBlur);
+    settings.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs);
     dimInp.value = settings.bgDim; dimVal.textContent = Math.round(settings.bgDim*100)+"%";
     blurInp.value = settings.bgBlur; blurVal.textContent = settings.bgBlur+"px";
+    dimInp.setAttribute("aria-label", tr("tvDim")); blurInp.setAttribute("aria-label", tr("tvBlur"));
+    dimInp.title = tr("tvParamHint"); blurInp.title = tr("tvParamHint");
+    renderParamFavorites();
 
     skinSel.textContent = "";
     for (const [id, d] of Object.entries(TV_DOCK_SKINS)) {

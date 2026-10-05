@@ -9,7 +9,7 @@
 
 Object.assign(TEXT.ja, {
   tvMediaHoldHint:"電源長押しでメディアプレーヤー",
-  dockCastPolicy:"外部出力（キャスト）", dockCastOff:"キャストしない（アンテナも無効）", dockCastAntenna:"アンテナを立てて許可", dockCastHint:"「アンテナを立てて許可」にすると、アンテナのクリックから対応ブラウザーのキャスト選択を開きます。自動接続はしません。", dockCastUnsupported:"このブラウザーは外部出力選択に対応していません。アンテナはバックグラウンド再生用です。", dockCastOn:"📡 アンテナON：外部出力を選択できます", dockCastOffDone:"📡 アンテナOFF：外部出力を切断しました", dockCastFailed:"外部出力を開始できませんでした。",
+  dockCastPolicy:"キャストアンテナ", dockCastOff:"キャストしない（キャストアンテナを隠す）", dockCastAntenna:"キャストアンテナを表示", dockCastHint:"キャストアンテナはバックグラウンド再生アンテナと別に表示します。自動接続はせず、クリックしたときだけ対応ブラウザーの選択画面を開きます。", dockCastUnsupported:"このブラウザは外部出力選択に対応していません。", dockCastOn:"📡 キャスト先の選択を開きました", dockCastOffDone:"📡 キャストを切断しました", dockCastFailed:"外部出力を開始できませんでした。", dockCastButton:"キャスト", dockBackgroundPolicy:"バックグラウンド再生アンテナ", dockBackgroundOff:"表示しない（アンテナを隠す）", dockBackgroundAntenna:"アンテナを表示", dockBackgroundHint:"キャストとは別に、バックグラウンド再生だけを許可できます。アンテナが表示され、ONにすると裏でも再生を続けます。",
   mediaTitle:"▶ メディアプレーヤー",
   mediaSubtitle:"ゲームを始めずに、曲を聴くための再生画面です。曲送り・リピート・シャッフル・速度・スリープタイマーを使えます。",
   mediaClose:"閉じる", mediaNoTrack:"曲を選ぶと、ここでフル再生できます。",
@@ -33,7 +33,7 @@ Object.assign(TEXT.ja, {
 });
 Object.assign(TEXT.en, {
   tvMediaHoldHint:"Long-press power for media player",
-  dockCastPolicy:"External output (cast)", dockCastOff:"No casting (antenna disabled)", dockCastAntenna:"Allow via antenna", dockCastHint:"When allowed, clicking the antenna opens this browser's cast picker if supported. It never connects automatically.", dockCastUnsupported:"This browser has no external-output picker. The antenna still enables background playback.", dockCastOn:"📡 Antenna ON: external output is allowed", dockCastOffDone:"📡 Antenna OFF: external output disconnected", dockCastFailed:"Couldn't start external output.",
+  dockCastPolicy:"Cast antenna", dockCastOff:"Don't cast (hide the cast antenna)", dockCastAntenna:"Show the cast antenna", dockCastHint:"The cast antenna is shown separately from the background playback antenna. It never auto-connects; clicking it opens the picker on supported browsers only.", dockCastUnsupported:"This browser doesn't support the external playback picker.", dockCastOn:"📡 Opened the cast picker", dockCastOffDone:"📡 Cast disconnected", dockCastFailed:"Couldn't start external playback.", dockCastButton:"Cast", dockBackgroundPolicy:"Background playback antenna", dockBackgroundOff:"Hide (hide the antenna)", dockBackgroundAntenna:"Show the antenna", dockBackgroundHint:"Background playback can be allowed separately from casting. The antenna appears, and turning it on keeps playback going in the background.",
   mediaTitle:"▶ Media player",
   mediaSubtitle:"Listen without starting a game. Use track controls, repeat, shuffle, playback speed, and a sleep timer.",
   mediaClose:"Close", mediaNoTrack:"Choose a song to play it here in full.",
@@ -57,7 +57,7 @@ Object.assign(TEXT.en, {
 });
 Object.assign(TEXT.zh, {
   tvMediaHoldHint:"长按电源打开媒体播放器",
-  dockCastPolicy:"外部输出（投放）", dockCastOff:"不使用投放（天线也禁用）", dockCastAntenna:"允许通过天线", dockCastHint:"允许后，点击天线会在支持的浏览器中打开外部输出选择。不会自动连接。", dockCastUnsupported:"此浏览器没有外部输出选择器。天线仍可用于后台播放。", dockCastOn:"📡 天线开启：允许外部输出", dockCastOffDone:"📡 天线关闭：已断开外部输出", dockCastFailed:"无法启动外部输出。",
+  dockCastPolicy:"投放天线", dockCastOff:"不投放（隐藏投放天线）", dockCastAntenna:"显示投放天线", dockCastHint:"投放天线与后台播放天线分开显示。不会自动连接，只在点击时于支持的浏览器打开选择画面。", dockCastUnsupported:"此浏览器不支持外部输出选择。", dockCastOn:"📡 已打开投放选择", dockCastOffDone:"📡 已断开投放", dockCastFailed:"无法开始外部输出。", dockCastButton:"投放", dockBackgroundPolicy:"后台播放天线", dockBackgroundOff:"不显示（隐藏天线）", dockBackgroundAntenna:"显示天线", dockBackgroundHint:"可以与投放分开，仅允许后台播放。天线会显示出来，开启后在后台也继续播放。",
   mediaTitle:"▶ 媒体播放器", mediaSubtitle:"不开始游戏也能听歌。支持切歌、循环、随机、播放速度和睡眠定时器。",
   mediaClose:"关闭", mediaNoTrack:"选择歌曲后，就能在这里完整播放。", mediaNow:"正在播放", mediaPaused:"已暂停", mediaEnded:"播放结束",
   mediaPrev:"上一首", mediaNext:"下一首", mediaPlay:"播放", mediaPause:"暂停", mediaRestart:"从头播放",
@@ -79,7 +79,7 @@ Object.assign(TEXT.zh, {
 });
 Object.assign(TEXT.ko, {
   tvMediaHoldHint:"전원 길게 눌러 미디어 플레이어",
-  dockCastPolicy:"외부 출력(캐스트)", dockCastOff:"캐스트 안 함 (안테나도 끔)", dockCastAntenna:"안테나로 허용", dockCastHint:"허용하면 안테나를 눌렀을 때 지원 브라우저의 외부 출력 선택을 엽니다. 자동 연결은 하지 않습니다.", dockCastUnsupported:"이 브라우저는 외부 출력 선택을 지원하지 않습니다. 안테나는 백그라운드 재생에 사용할 수 있습니다.", dockCastOn:"📡 안테나 ON: 외부 출력을 허용함", dockCastOffDone:"📡 안테나 OFF: 외부 출력을 끊었습니다", dockCastFailed:"외부 출력을 시작하지 못했습니다.",
+  dockCastPolicy:"캐스트 안테나", dockCastOff:"캐스트 안 함 (캐스트 안테나 숨기기)", dockCastAntenna:"캐스트 안테나 표시", dockCastHint:"캐스트 안테나는 백그라운드 재생 안테나와 별도로 표시됩니다. 자동 연결 없이 클릭할 때만 지원 브라우저의 선택기를 엽니다.", dockCastUnsupported:"이 브라우저는 외부 출력 선택을 지원하지 않습니다.", dockCastOn:"📡 캐스트 선택을 열었습니다", dockCastOffDone:"📡 캐스트 연결을 끊었습니다", dockCastFailed:"외부 출력을 시작하지 못했습니다.", dockCastButton:"캐스트", dockBackgroundPolicy:"백그라운드 재생 안테나", dockBackgroundOff:"표시하지 않기 (안테나 숨기기)", dockBackgroundAntenna:"안테나 표시", dockBackgroundHint:"캐스트와 별도로 백그라운드 재생을 허용할 수 있습니다. 안테나가 이 권한을 표시하며 재생을 켜고 끌 수 있습니다.",
   mediaTitle:"▶ 미디어 플레이어", mediaSubtitle:"게임을 시작하지 않고 음악을 듣습니다. 곡 넘기기・반복・셔플・재생 속도・취침 타이머를 지원합니다.",
   mediaClose:"닫기", mediaNoTrack:"곡을 고르면 여기서 전체 재생할 수 있습니다.", mediaNow:"재생 중", mediaPaused:"일시정지", mediaEnded:"재생 완료",
   mediaPrev:"이전 곡", mediaNext:"다음 곡", mediaPlay:"재생", mediaPause:"일시정지", mediaRestart:"처음부터",

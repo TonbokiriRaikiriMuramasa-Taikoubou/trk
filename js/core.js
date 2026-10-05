@@ -83,6 +83,7 @@ const settings = {
   videoZoom: num(prefs.videoZoom, .5, 3, 1),
   videoKeys: savedVideoKeys,
   castPolicy: pick(prefs.castPolicy, ["off", "antenna"], "off"),
+  backgroundPolicy: pick(prefs.backgroundPolicy, ["off", "antenna"], prefs.castPolicy === "antenna" ? "antenna" : "off"),
   bgDim: num(prefs.bgDim, 0, .9, 0),
   bgBlur: num(prefs.bgBlur, 0, 12, 0),
   scroll: num(prefs.scroll, .5, 2.5, 1.2),
@@ -191,7 +192,7 @@ const gameplayFxPower = () => settings.fxPower * gameplayFxMultiplier();
    ノーツ設定は細かく詰める人が多いので、tv/audioリセットでは保持される。 */
 function resetVideoPrefs() {
   settings.videoStyle = "color";
-  settings.videoZoom = 1; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.castPolicy = "off"; settings.fxAntenna = false; settings.mediaLoopTrigger = "toggle"; settings.mediaWallTrigger = "toggle"; settings.mediaWallStyle = "midnight"; settings.mediaWallClock = true; settings.mediaWallStopsVideo = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true;
+  settings.videoZoom = 1; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.castPolicy = "off"; settings.backgroundPolicy = "off"; settings.fxAntenna = false; settings.mediaLoopTrigger = "toggle"; settings.mediaWallTrigger = "toggle"; settings.mediaWallStyle = "midnight"; settings.mediaWallClock = true; settings.mediaWallStopsVideo = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true;
   settings.bgDim = 0; settings.bgBlur = 0;
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = true;
@@ -232,7 +233,7 @@ window.TrkSafeMode = () => safeModeOn;
 function enterSafeMode() {
   safeModeOn = true;
   settings.videoStyle = "off";
-  settings.videoZoom = 1; settings.castPolicy = "off"; settings.fxAntenna = false;
+  settings.videoZoom = 1; settings.castPolicy = "off"; settings.backgroundPolicy = "off"; settings.fxAntenna = false;
   settings.bgDim = 0; settings.bgBlur = 0;
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = false;

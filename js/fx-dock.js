@@ -2,7 +2,7 @@
 /* ==========================================================================
    trk! fx-dock.js — 🎛 さわれるエフェクト本体（メイン画面の曲リストの下）
    ・本体のスキン7種（ボタン数がそれぞれ違う）、「5ボタンにそろえる」
-   ・⏻ 電源＝ミュート、📡 アンテナ＝バックグラウンド再生、ボタン長押し＝今のエフェクトを登録
+   ・⏻ 電源＝ミュート、📡 アンテナ＝バックグラウンド再生、📺 キャスト＝外部出力選択、ボタン長押し＝今のエフェクトを登録
    ・🎲 エフェクト／⭐🎲 お気に入りから／🎛🎲 パラメーター（EQの🔒ロック、中身ロック）
    ・ボタンに入りきらないお気に入りは本体の下に ⭐○○ と並べる
    ・Media Session（ロック画面・通知の 再生／一時停止／次の曲）
@@ -37,7 +37,8 @@ settings.fxDockSkin = pick(prefs.fxDockSkin, Object.keys(DOCK_SKINS), "standard"
 settings.fxDockFive = !!prefs.fxDockFive;
 settings.fxDockOpen = prefs.fxDockOpen === true;      // くわしい欄は最初は閉じる
 settings.castPolicy = pick(settings.castPolicy, ["off", "antenna"], "off");
-settings.fxAntenna = settings.castPolicy === "off" ? false : !!prefs.fxAntenna;
+settings.backgroundPolicy = pick(settings.backgroundPolicy, ["off", "antenna"], settings.castPolicy === "antenna" ? "antenna" : "off");
+settings.fxAntenna = settings.backgroundPolicy === "off" ? false : !!prefs.fxAntenna;
 settings.fxAntennaShape = pick(prefs.fxAntennaShape, ["rod", "loop", "dish", "beam"], "rod");
 settings.fxEqLock = Array.isArray(prefs.fxEqLock) && prefs.fxEqLock.length === 5 ? prefs.fxEqLock.map(Boolean) : [false, false, false, false, false];
 settings.fxLockChain = !!prefs.fxLockChain;
@@ -51,8 +52,10 @@ Object.assign(TEXT.ja, {
   dockNoFavShort:"⭐ お気に入りがありません",
   dockNoFav:"お気に入りはまだありません。ボタンを長押しすると、今のエフェクトを登録できます。",
   dockMore:"⚙ 詳しい設定（ゲーム連動・マイプリセットなど）",
-  dockPower:"⏻ 電源（ミュート）", dockAntenna:"📡 アンテナ（バックグラウンド再生）",
-  dockAntOn:"📡 アンテナON：裏にしても再生を続けます", dockAntOff:"📡 アンテナOFF", dockMute:"🔇 MUTE", dockFxOff:"FX OFF",
+  dockPower:"⏻ 電源（ミュート）", dockAntenna:"📡 アンテナ（バックグラウンド再生）", dockCastButton:"キャスト",
+  dockAntOn:"📡 バックグラウンド再生ON：裏にしても再生を続けます", dockAntOff:"📡 バックグラウンド再生OFF", dockMute:"🔇 MUTE", dockFxOff:"FX OFF", dockCastOn:"📡 キャスト先の選択を開きました", dockCastOffDone:"📡 キャストを切断しました", dockCastFailed:"外部出力を開始できませんでした。", dockCastUnsupported:"このブラウザは外部出力選択に対応していません。",
+  dockBackgroundPolicy:"バックグラウンド再生アンテナ", dockBackgroundOff:"表示しない（アンテナを隠す）", dockBackgroundAntenna:"アンテナを表示", dockBackgroundHint:"キャストとは別に、バックグラウンド再生だけを許可できます。アンテナが表示され、ONにすると裏でも再生を続けます。",
+  dockCastPolicy:"キャストアンテナ", dockCastOff:"キャストしない（キャストアンテナを隠す）", dockCastAntenna:"キャストアンテナを表示", dockCastHint:"キャストアンテナはバックグラウンド再生アンテナと別に表示します。自動接続はせず、クリックしたときだけ対応ブラウザーの選択画面を開きます。",
   dockRandFx:"🎲 エフェクト", dockRandFav:"⭐🎲 お気に入りから", dockRandParam:"🎛🎲 パラメーター",
   dockParamDone:"パラメーターをランダムにしました", dockSlotHint:"ボタンを長押し：今のエフェクトを登録（もとの登録は1つ後ろへ）",
   dockEmptySlot:"空きボタン：長押しで今のエフェクトを登録", dockNeedOn:"先にエフェクトを選んでください",
@@ -68,8 +71,10 @@ Object.assign(TEXT.en, {
   dockNoFavShort:"⭐ No favorites yet",
   dockNoFav:"No favorites yet. Long-press a button to save the current effect there.",
   dockMore:"⚙ More settings (game-reactive, my presets, …)",
-  dockPower:"⏻ Power (mute)", dockAntenna:"📡 Antenna (background playback)",
-  dockAntOn:"📡 Antenna ON: keeps playing in the background", dockAntOff:"📡 Antenna OFF", dockMute:"🔇 MUTE", dockFxOff:"FX OFF",
+  dockPower:"⏻ Power (mute)", dockAntenna:"📡 Antenna (background playback)", dockCastButton:"Cast",
+  dockAntOn:"📡 Background playback ON: keeps playing in the background", dockAntOff:"📡 Background playback OFF", dockMute:"🔇 MUTE", dockFxOff:"FX OFF", dockCastOn:"📡 Opened the cast picker", dockCastOffDone:"📡 Cast disconnected", dockCastFailed:"Couldn't start external playback.", dockCastUnsupported:"This browser doesn't support the external playback picker.",
+  dockBackgroundPolicy:"Background playback antenna", dockBackgroundOff:"Hide (hide the antenna)", dockBackgroundAntenna:"Show the antenna", dockBackgroundHint:"Background playback can be allowed separately from casting. The antenna appears and turns background playback on and off.",
+  dockCastPolicy:"Cast antenna", dockCastOff:"Don't cast (hide the cast antenna)", dockCastAntenna:"Show the cast antenna", dockCastHint:"The cast antenna is shown separately from the background playback antenna. It never auto-connects; clicking it opens the picker on supported browsers only.",
   dockRandFx:"🎲 Effect", dockRandFav:"⭐🎲 From favorites", dockRandParam:"🎛🎲 Parameters",
   dockParamDone:"Parameters randomized", dockSlotHint:"Long-press a button: save the current effect (the old one moves back one slot)",
   dockEmptySlot:"Empty button: long-press to save the current effect", dockNeedOn:"Pick an effect first",
@@ -84,8 +89,10 @@ Object.assign(TEXT.zh, {
   dockTitle:"🎛 详细（均衡器・皮肤・菜单）", dockFavLabel:"⭐ 按钮放不下的收藏",
   dockNoFavShort:"⭐ 还没有收藏",
   dockNoFav:"还没有收藏。长按按钮即可登记当前音效。", dockMore:"⚙ 详细设置（游戏联动・我的预设等）",
-  dockPower:"⏻ 电源（静音）", dockAntenna:"📡 天线（后台播放）",
-  dockAntOn:"📡 天线开启：切到后台也继续播放", dockAntOff:"📡 天线关闭", dockMute:"🔇 MUTE", dockFxOff:"FX OFF",
+  dockPower:"⏻ 电源（静音）", dockAntenna:"📡 天线（后台播放）", dockCastButton:"投放",
+  dockAntOn:"📡 后台播放开启：切到后台也继续播放", dockAntOff:"📡 后台播放关闭", dockMute:"🔇 MUTE", dockFxOff:"FX OFF", dockCastOn:"📡 已打开投放选择", dockCastOffDone:"📡 已断开投放", dockCastFailed:"无法开始外部输出。", dockCastUnsupported:"此浏览器不支持外部输出选择。",
+  dockBackgroundPolicy:"后台播放天线", dockBackgroundOff:"不显示（隐藏天线）", dockBackgroundAntenna:"显示天线", dockBackgroundHint:"可以与投放分开，仅允许后台播放。天线会显示出来，开启后在后台也继续播放。",
+  dockCastPolicy:"投放天线", dockCastOff:"不投放（隐藏投放天线）", dockCastAntenna:"显示投放天线", dockCastHint:"投放天线与后台播放天线分开显示。不会自动连接，只在点击时于支持的浏览器打开选择画面。",
   dockRandFx:"🎲 音效", dockRandFav:"⭐🎲 从收藏", dockRandParam:"🎛🎲 参数",
   dockParamDone:"已随机调整参数", dockSlotHint:"长按按钮：登记当前音效（原来的往后挪一位）",
   dockEmptySlot:"空按钮：长按登记当前音效", dockNeedOn:"请先选择音效",
@@ -100,8 +107,10 @@ Object.assign(TEXT.ko, {
   dockTitle:"🎛 자세히 (EQ・스킨・메뉴)", dockFavLabel:"⭐ 버튼에 다 들어가지 않는 즐겨찾기",
   dockNoFavShort:"⭐ 즐겨찾기가 없습니다",
   dockNoFav:"아직 즐겨찾기가 없습니다. 버튼을 길게 누르면 지금 이펙트를 등록할 수 있습니다.", dockMore:"⚙ 자세한 설정 (게임 연동・내 프리셋 등)",
-  dockPower:"⏻ 전원 (음소거)", dockAntenna:"📡 안테나 (백그라운드 재생)",
-  dockAntOn:"📡 안테나 ON: 백그라운드에서도 계속 재생", dockAntOff:"📡 안테나 OFF", dockMute:"🔇 MUTE", dockFxOff:"FX OFF",
+  dockPower:"⏻ 전원 (음소거)", dockAntenna:"📡 안테나 (백그라운드 재생)", dockCastButton:"캐스트",
+  dockAntOn:"📡 백그라운드 재생 ON: 백그라운드에서도 계속 재생", dockAntOff:"📡 백그라운드 재생 OFF", dockMute:"🔇 MUTE", dockFxOff:"FX OFF", dockCastOn:"📡 캐스트 선택을 열었습니다", dockCastOffDone:"📡 캐스트 연결을 끊었습니다", dockCastFailed:"외부 출력을 시작하지 못했습니다.", dockCastUnsupported:"이 브라우저는 외부 출력 선택을 지원하지 않습니다.",
+  dockBackgroundPolicy:"백그라운드 재생 안테나", dockBackgroundOff:"표시하지 않기 (안테나 숨기기)", dockBackgroundAntenna:"안테나 표시", dockBackgroundHint:"캐스트와 별도로 백그라운드 재생을 허용할 수 있습니다. 안테나가 이 권한을 표시하며 재생을 켜고 끌 수 있습니다.",
+  dockCastPolicy:"캐스트 안테나", dockCastOff:"캐스트 안 함 (캐스트 안테나 숨기기)", dockCastAntenna:"캐스트 안테나 표시", dockCastHint:"캐스트 안테나는 백그라운드 재생 안테나와 별도로 표시됩니다. 자동 연결 없이 클릭할 때만 지원 브라우저의 선택기를 엽니다.",
   dockRandFx:"🎲 이펙트", dockRandFav:"⭐🎲 즐겨찾기에서", dockRandParam:"🎛🎲 파라미터",
   dockParamDone:"파라미터를 랜덤으로 바꿨습니다", dockSlotHint:"버튼 길게 누르기: 지금 이펙트 등록 (원래 것은 한 칸 뒤로)",
   dockEmptySlot:"빈 버튼: 길게 눌러 지금 이펙트 등록", dockNeedOn:"먼저 이펙트를 골라 주세요",
@@ -195,8 +204,9 @@ addEventListener("DOMContentLoaded", () => {
   const powLed = el("i", "led"), antLed = el("i", "led ledAnt");
   const pow = btn("dockKey dockPow", powLed, el("span", "", "⏻"));
   const ant = btn("dockKey dockAnt", antLed, el("span", "antIcon", "📡"), el("span", "antTxt", "ANT"));
+  const castTxt = el("span", "castTxt"), castAnt = btn("dockKey dockCast", castTxt);
   const lcd = el("div", "dockLcd");
-  const top = el("div", "dockTop"); top.append(pow, lcd, ant);
+  const top = el("div", "dockTop"); top.append(pow, lcd, ant, castAnt);
   const deco = el("div", "dockDeco");
   const slots = el("div", "dockSlots");
   const rFx = btn("dockKey"), rFav = btn("dockKey"), rPar = btn("dockKey");
@@ -269,6 +279,18 @@ addEventListener("DOMContentLoaded", () => {
   });
   antShapeRow.append(tx("span", "dockAntShapeLabel"), antShapeSel);
 
+  const backgroundRow = el("label", "field"), backgroundSel = document.createElement("select");
+  backgroundRow.append(tx("span", "dockBackgroundPolicy"), backgroundSel);
+  for (const [value, key] of [["off", "dockBackgroundOff"], ["antenna", "dockBackgroundAntenna"]]) {
+    const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); backgroundSel.append(o);
+  }
+  backgroundSel.value = settings.backgroundPolicy;
+  const backgroundHint = tx("div", "dockBackgroundHint", "hint");
+  backgroundSel.addEventListener("change", () => {
+    settings.backgroundPolicy = backgroundSel.value === "antenna" ? "antenna" : "off";
+    if (settings.backgroundPolicy === "off") settings.fxAntenna = false;
+    saveUserPrefs(); render();
+  });
   const castRow = el("label", "field"), castSel = document.createElement("select");
   castRow.append(tx("span", "dockCastPolicy"), castSel);
   for (const [value, key] of [["off", "dockCastOff"], ["antenna", "dockCastAntenna"]]) {
@@ -278,7 +300,7 @@ addEventListener("DOMContentLoaded", () => {
   const castHint = tx("div", "dockCastHint", "hint");
   castSel.addEventListener("change", () => {
     settings.castPolicy = castSel.value === "antenna" ? "antenna" : "off";
-    if (settings.castPolicy === "off") { settings.fxAntenna = false; disconnectExternalPlayback(); }
+    if (settings.castPolicy === "off") disconnectExternalPlayback();
     saveUserPrefs(); render();
   });
   const antCheck = mkCheck("fxAntenna", "dockAntCheckLabel");
@@ -289,7 +311,7 @@ addEventListener("DOMContentLoaded", () => {
     setTimeout(() => full.scrollIntoView({ behavior:"smooth", block:"start" }), 50);
   });
   body.append(tx("summary", "dockTitle"), quick, eqBox, tx("div", "dockLockHint", "hint"), lockChain.lab,
-    skinRow, five.lab, castRow, castHint, antShapeRow, antCheck.lab, tx("div", "dockAntHint", "hint"), more);
+    skinRow, five.lab, backgroundRow, backgroundHint, castRow, castHint, antShapeRow, antCheck.lab, tx("div", "dockAntHint", "hint"), more);
 
   dock.append(dev, favChips, overLabel, overflow, body);
   col.append(dock);
@@ -309,33 +331,35 @@ addEventListener("DOMContentLoaded", () => {
     try {
       if (video.remote && typeof video.remote.prompt === "function") {
         await video.remote.prompt();
-        return;
+        lcdFlash(tr("dockCastOn")); render(); return;
       }
       if (typeof video.webkitShowPlaybackTargetPicker === "function") {
         video.webkitShowPlaybackTargetPicker();
-        return;
+        lcdFlash(tr("dockCastOn")); render(); return;
       }
       lcdFlash(tr("dockCastUnsupported"));
     } catch (_) { lcdFlash(tr("dockCastFailed")); }
   }
+  function castConnected() { return !!(video.remote && video.remote.state === "connected"); }
+  function openCastPicker() {
+    if (settings.castPolicy !== "antenna") return;
+    if (castConnected()) { disconnectExternalPlayback(); lcdFlash(tr("dockCastOffDone")); render(); return; }
+    requestExternalPlayback();
+  }
   function toggleAntenna(forced) {
-    if (settings.castPolicy !== "antenna") {
-      settings.fxAntenna = false; saveUserPrefs(); lcdFlash(tr("dockCastOff")); render(); return;
+    if (settings.backgroundPolicy !== "antenna") {
+      settings.fxAntenna = false; saveUserPrefs(); lcdFlash(tr("dockBackgroundOff")); render(); return;
     }
     settings.fxAntenna = forced !== undefined ? !!forced : !settings.fxAntenna;
-    if (settings.fxAntenna) {
-      lcdFlash(tr("dockCastOn"));
-      requestExternalPlayback();
-    } else {
-      disconnectExternalPlayback();
-      lcdFlash(tr("dockCastOffDone"));
-    }
-    saveUserPrefs(); render();
+    saveUserPrefs();
+    lcdFlash(tr(settings.fxAntenna ? "dockAntOn" : "dockAntOff"));
+    render();
   }
   pow.addEventListener("click", () => { video.muted = !video.muted; render(); });
   video.addEventListener("volumechange", () => render());
   ant.addEventListener("click", () => toggleAntenna());
   antWrap.addEventListener("click", () => toggleAntenna());
+  castAnt.addEventListener("click", () => openCastPicker());
   rFx.addEventListener("click", () => TrkFX.random());
   rFav.addEventListener("click", () => {
     const F = window.TrkFavs;
@@ -418,13 +442,19 @@ addEventListener("DOMContentLoaded", () => {
     powLed.classList.toggle("on", !video.muted);
     antLed.classList.toggle("on", settings.fxAntenna);
     ant.classList.toggle("on", settings.fxAntenna);
-    const antennaAllowed = settings.castPolicy === "antenna";
+    const backgroundAllowed = settings.backgroundPolicy === "antenna";
     if (castSel) castSel.value = settings.castPolicy || "off";
-    ant.hidden = !antennaAllowed; antWrap.hidden = !antennaAllowed;
-    if (antCheck) { antCheck.lab.hidden = !antennaAllowed; antCheck.inp.checked = settings.fxAntenna; antCheck.inp.disabled = !antennaAllowed; }
+    if (backgroundSel) backgroundSel.value = settings.backgroundPolicy || "off";
+    ant.hidden = !backgroundAllowed; antWrap.hidden = !backgroundAllowed;
+    if (antCheck) { antCheck.lab.hidden = !backgroundAllowed; antCheck.inp.checked = settings.fxAntenna; antCheck.inp.disabled = !backgroundAllowed; }
     if (antShapeSel) antShapeSel.value = settings.fxAntennaShape || "rod";
     pow.title = tr("dockPower"); pow.setAttribute("aria-label", pow.title); pow.setAttribute("aria-pressed", String(!video.muted));
-    ant.title = settings.castPolicy === "off" ? tr("dockCastOff") : tr("dockAntenna"); ant.setAttribute("aria-label", ant.title); ant.setAttribute("aria-pressed", String(settings.fxAntenna));
+    ant.title = tr("dockAntenna"); ant.setAttribute("aria-label", ant.title); ant.setAttribute("aria-pressed", String(settings.fxAntenna));
+    castAnt.hidden = settings.castPolicy !== "antenna";
+    castAnt.classList.toggle("selected", castConnected());
+    castAnt.title = castConnected() ? tr("dockCastOffDone") : tr("dockCastButton");
+    castAnt.setAttribute("aria-label", castAnt.title); castAnt.setAttribute("aria-pressed", String(castConnected()));
+    castTxt.textContent = tr("dockCastButton");
     lcd.textContent = flash && Date.now() < flash.until ? flash.text
       : (video.muted ? tr("dockMute") + " · " : "") + (settings.fxOn ? (nm[settings.fxPreset] || "FX") : tr("dockFxOff")) + (settings.fxAntenna ? " 📡" : "");
     /* ランダム */

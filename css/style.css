@@ -553,7 +553,11 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
 .dockKey .num{font-size:11px;opacity:.7}
 .dockKey .nm{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
 #fxDock .dockKey.empty{opacity:.5}
-#fxDock .dockPow,#fxDock .dockAnt{flex-direction:row;width:56px;height:44px;border-radius:12px;gap:6px}
+#fxDock .dockPow,#fxDock .dockAnt,#fxDock .dockCast{flex-direction:row;width:56px;height:44px;border-radius:12px;gap:6px}
+#fxDock .dockCast{font-size:12px}
+#fxDock .dockCast.selected{background:rgba(168,85,247,.2);border-color:#c084fc;box-shadow:0 0 12px rgba(168,85,247,.42)}
+#fxDock .dockCast .castTxt{font-size:10px;font-weight:900;letter-spacing:.04em;color:var(--ui-muted)}
+#fxDock .dockCast.selected .castTxt{color:#d8b4fe}
 .led{width:8px;height:8px;border-radius:50%;background:#3a1010;box-shadow:inset 0 0 2px #000;flex:none}
 .led.on{background:#ff4040;box-shadow:0 0 8px #ff4040}
 .ledAnt.on{background:#40ff80;box-shadow:0 0 8px #40ff80}

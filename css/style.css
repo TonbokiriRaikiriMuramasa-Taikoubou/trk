@@ -1095,6 +1095,14 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
 .plBtnDanger:disabled{opacity:.5}
 .plHint{font-size:12.5px;color:var(--ui-muted);line-height:1.5}
 .plSep{border-top:1px solid var(--ui-border);margin:4px 0}
+/* 📤 共有プレイリスト（ビューア） */
+.plShareComment{font-size:13.5px;color:var(--ui-text);line-height:1.5}
+.plShareSrc{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.plShareList{display:flex;flex-direction:column;gap:6px;max-height:42vh;overflow:auto;padding-right:4px}
+.plShareRow{position:relative;display:flex;flex-direction:column;gap:2px;padding:8px 34px 8px 10px;border:1px solid var(--ui-border);border-radius:10px}
+.plShareRow.miss{opacity:.55}
+.plShareRow b{font-size:14px;color:var(--ui-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.plShareState{position:absolute;top:8px;right:10px;font-size:13px}
 
 /* ---- 1) 🎛 タブプレーヤー（金属のタブ＋光るインジケータ） ---- */
 #libPanel[data-lib-skin="player"] .libTabs{border-bottom:2px solid #3b4150}

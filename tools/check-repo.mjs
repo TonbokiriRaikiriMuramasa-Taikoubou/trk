@@ -167,10 +167,12 @@ if (skinsStart < 0 || skinsEnd < 0) {
 // 🎧 Playlist tabs: user playlists in library.js, delete-mode setting in core.js, song profile storage.
 if (!read("js/library.js").includes('startsWith("pl:")') ||
     !read("js/library.js").includes('SONG_META_KEY = "shadow_taiko_songmeta_v1"') ||
+    !read("js/library.js").includes('PLAYED_KEY = "shadow_taiko_played_v1"') ||
+    !read("js/library.js").includes('format: "trk-playlist"') ||
     !read("js/core.js").includes("playlistDelMode")) {
   fail("playlist tab plumbing is missing");
 } else {
-  ok("playlist tabs and song profiles are wired");
+  ok("playlist tabs, profiles and sharing are wired");
 }
 
 // A cache name is deliberately checked for existence, not for a guessed

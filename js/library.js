@@ -233,6 +233,95 @@ Object.assign(TEXT.ko, {
   plInLists:"재생목록에 넣기", plProfileSave:"💾 저장", plProfileSaved:"🎶 곡 프로필을 저장했어요",
   plTabHint:"이 재생목록은 비어 있어요. 곡을 길게 눌러 '재생목록에 넣기'하거나, 곡을 탭으로 드래그해 넣을 수 있어요."
 });
+Object.assign(TEXT.ja, {
+  plShare:"📤 共有", plShareTitle:"📤 プレイリストを共有",
+  plShareRule:"📄 楽曲ファイルは含みません（譜面も入りません）。9曲以上＋すべての曲をクリアか視聴済みなら共有できます（AUTO・📻ラジオ・倍速も視聴と数えます。AUTO視聴だけの曲には ▶AUTO が付きます・隠せません）",
+  plShareNeed9:"⚠ 9曲以上で共有できます（いま {n} 曲）",
+  plShareUnplayed:"⚠ 未クリア・未視聴の曲があります：{list}",
+  plShareReady:"✅ 共有できます（{n} 曲・全曲プレイ済み）",
+  plShareScore:"スコアを載せる", plShareBadges:"モードの称号（🥁🚛など）を載せる",
+  plShareComment:"ひとことコメント（140字まで）",
+  plShareSourceNote:"入手先の説明（例：□□さんのBOOTH）",
+  plShareSourceUrl:"入手先リンク（https:// から）",
+  plShareExport:"📤 ファイルに書き出し", plShareCopy:"📋 テキストをコピー",
+  plShareExported:"📤 書き出しました", plShareCopied:"📋 コピーしました",
+  plShareTextHead:"trk!プレイリスト",
+  plImport:"📥 共有プレイリストを読み込む", plImportTitle:"📥 共有プレイリスト",
+  plImportBad:"❌ trk!の共有プレイリストではありません",
+  plImportFound:"ライブラリに {n}／{m} 曲ありました",
+  plImportTake:"📁 ある {n} 曲をプレイリストに取り込む",
+  plImportTaken:"📁 取り込みました（{name}）",
+  plLinkOpen:"🔗 入手先を開く", plLinkCancel:"やめる",
+  plLinkWarn:"このリンクはプレイリストの作成者が設定したものです。trk!はリンク先の内容を保証しません。",
+  plAutoMark:"▶AUTO"
+});
+Object.assign(TEXT.en, {
+  plShare:"📤 Share", plShareTitle:"📤 Share this playlist",
+  plShareRule:"📄 No song files (or charts) are included. You can share once you have 9+ songs and have cleared or listened to every one (AUTO, 📻 radio and speed changes count as listening; songs only heard via AUTO always get a ▶AUTO mark you can't hide).",
+  plShareNeed9:"⚠ Sharing needs 9+ songs (you have {n})",
+  plShareUnplayed:"⚠ Some songs are neither cleared nor listened to: {list}",
+  plShareReady:"✅ Ready to share ({n} songs, all played)",
+  plShareScore:"Include scores", plShareBadges:"Include mode titles (🥁🚛…)",
+  plShareComment:"A short comment (up to 140 chars)",
+  plShareSourceNote:"Where to get the songs (e.g. ○○'s BOOTH)",
+  plShareSourceUrl:"Acquisition link (starts with https://)",
+  plShareExport:"📤 Export as file", plShareCopy:"📋 Copy as text",
+  plShareExported:"📤 Exported", plShareCopied:"📋 Copied",
+  plShareTextHead:"trk! playlist",
+  plImport:"📥 Load a shared playlist", plImportTitle:"📥 Shared playlist",
+  plImportBad:"❌ Not a trk! shared playlist",
+  plImportFound:"{n} of {m} songs are in your library",
+  plImportTake:"📁 Import the {n} found songs as a playlist",
+  plImportTaken:"📁 Imported ({name})",
+  plLinkOpen:"🔗 Open the link", plLinkCancel:"Cancel",
+  plLinkWarn:"This link was set by the playlist's author. trk! cannot guarantee its content.",
+  plAutoMark:"▶AUTO"
+});
+Object.assign(TEXT.zh, {
+  plShare:"📤 共享", plShareTitle:"📤 共享此播放列表",
+  plShareRule:"📄 不包含歌曲文件（也不含谱面）。拥有9曲以上且每首都已通关或收听过即可共享（AUTO、📻电台、倍速也算收听。仅用AUTO收听的歌曲会带上无法隐藏的 ▶AUTO 标记）",
+  plShareNeed9:"⚠ 需要9曲以上才能共享（当前 {n} 曲）",
+  plShareUnplayed:"⚠ 有未通关且未收听的歌曲：{list}",
+  plShareReady:"✅ 可以共享（{n} 曲・全部播放过）",
+  plShareScore:"附上分数", plShareBadges:"附上模式称号（🥁🚛等）",
+  plShareComment:"一句话评论（最多140字）",
+  plShareSourceNote:"入手说明（例：○○的BOOTH）",
+  plShareSourceUrl:"入手链接（https:// 开头）",
+  plShareExport:"📤 导出为文件", plShareCopy:"📋 复制为文本",
+  plShareExported:"📤 已导出", plShareCopied:"📋 已复制",
+  plShareTextHead:"trk!播放列表",
+  plImport:"📥 读取共享播放列表", plImportTitle:"📥 共享播放列表",
+  plImportBad:"❌ 不是trk!的共享播放列表",
+  plImportFound:"库中有 {n}／{m} 曲",
+  plImportTake:"📁 将找到的 {n} 曲导入为播放列表",
+  plImportTaken:"📁 已导入（{name}）",
+  plLinkOpen:"🔗 打开链接", plLinkCancel:"取消",
+  plLinkWarn:"此链接由播放列表作者设置，trk!不保证其内容安全。",
+  plAutoMark:"▶AUTO"
+});
+Object.assign(TEXT.ko, {
+  plShare:"📤 공유", plShareTitle:"📤 재생목록 공유",
+  plShareRule:"📄 곡 파일(채보 포함)은 담기지 않아요. 9곡 이상이고 모든 곡을 클리어했거나 들었으면 공유할 수 있어요(AUTO・📻라디오・배속도 시청으로 셉니다. AUTO로만 들은 곡에는 숨길 수 없는 ▶AUTO 표시가 붙어요).",
+  plShareNeed9:"⚠ 9곡 이상부터 공유할 수 있어요(현재 {n}곡)",
+  plShareUnplayed:"⚠ 클리어하지도 듣지도 않은 곡이 있어요: {list}",
+  plShareReady:"✅ 공유할 수 있어요({n}곡・전곡 플레이함)",
+  plShareScore:"점수 실기", plShareBadges:"모드 칭호(🥁🚛 등) 실기",
+  plShareComment:"한줄 코멘트(140자까지)",
+  plShareSourceNote:"입수처 설명(예: ○○님의 BOOTH)",
+  plShareSourceUrl:"입수처 링크(https:// 로 시작)",
+  plShareExport:"📤 파일로 내보내기", plShareCopy:"📋 텍스트 복사",
+  plShareExported:"📤 내보냈어요", plShareCopied:"📋 복사했어요",
+  plShareTextHead:"trk! 재생목록",
+  plImport:"📥 공유 재생목록 불러오기", plImportTitle:"📥 공유 재생목록",
+  plImportBad:"❌ trk! 공유 재생목록이 아니에요",
+  plImportFound:"라이브러리에 {n}／{m}곡이 있어요",
+  plImportTake:"📁 있는 {n}곡을 재생목록으로 가져오기",
+  plImportTaken:"📁 가져왔어요({name})",
+  plLinkOpen:"🔗 링크 열기", plLinkCancel:"취소",
+  plLinkWarn:"이 링크는 재생목록 만든 사람이 설정한 것이에요. trk!는 내용을 보증하지 않아요.",
+  plAutoMark:"▶AUTO"
+});
+
 
 const libFolderSeg = it => String(it.dir || "").split("/")[0].trim();
 /* ✔公認の判定は verified.js の窓口から（読み込まれていなければ、公認タブは作りません） */
@@ -329,7 +418,8 @@ function plSanitize(raw) {
   return { id: raw.id.slice(0, 24), name: String(raw.name || "").trim().slice(0, 24) || "Playlist",
     icon: typeof raw.icon === "string" ? raw.icon.slice(0, 4) : "",
     color: /^[a-z]{3,12}$/.test(raw.color || "") && PL_COLORS[raw.color] != null ? raw.color : "none",
-    frozen: !!raw.frozen, locked: !!raw.locked, songs };
+    frozen: !!raw.frozen, locked: !!raw.locked, songs,
+    createdAt: (typeof raw.createdAt === "number" && raw.createdAt > 0 && raw.createdAt < 9e15) ? raw.createdAt : 0 };
 }
 (function plTighten() { settings.playlists = (settings.playlists || []).map(plSanitize).filter(Boolean).slice(0, 24); })();
 
@@ -406,7 +496,7 @@ function plCreate() {
   const save = el("button", "plBtn", tr("plSave")); save.type = "button";
   save.addEventListener("click", () => {
     const p = plSanitize({ id: "pl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      name: name.value || tr("plDefaultName", { n: settings.playlists.length + 1 }), icon: icon.value, color: color.value, frozen: false, locked: false, songs: [] });
+      name: name.value || tr("plDefaultName", { n: settings.playlists.length + 1 }), icon: icon.value, color: color.value, frozen: false, locked: false, createdAt: Date.now(), songs: [] });
     settings.playlists.push(p); saveUserPrefs();
     settings.libTab = "pl:" + p.id;
     d.close(); renderLib();
@@ -430,6 +520,8 @@ function plMenu(p) {
     if (t) Object.assign(p, t);   /* 同じオブジェクトを直す（タブのIDは不変） */
     saveUserPrefs(); d.close(); renderLib();
   });
+  const share = el("button", "plBtn", tr("plShare")); share.type = "button";
+  share.addEventListener("click", () => { d.close(); plShare(p); });
   const del = el("button", "plBtnDanger", tr("plDelete")); del.type = "button";
   del.disabled = !!p.locked; del.title = p.locked ? tr("plLockedNo") : "";
   del.addEventListener("click", () => plDelete(p, d.close));
@@ -437,7 +529,7 @@ function plMenu(p) {
   d.card.append(plRow(tr("plName"), name), plRow(tr("plIcon"), icon), plRow(tr("plColor"), color),
     plRow(tr("plFrozenCheck"), fz), plRow(tr("plLockedCheck"), lk),
     el("div", "plHint", tr("plSongsNow", { n: p.songs.length })),
-    save, del);
+    save, share, del);
   name.focus(); name.select();
 }
 
@@ -475,11 +567,13 @@ function plGlobalMenu() {
   const d = plDialog(tr("plGlobalTitle"));
   const make = el("button", "plBtn", tr("plNewTab")); make.type = "button";
   make.addEventListener("click", () => { d.close(); plCreate(); });
+  const imp = el("button", "plBtn", tr("plImport")); imp.type = "button";
+  imp.addEventListener("click", () => { d.close(); plImportPick(); });
   const one = el("input"); one.type = "radio"; one.name = "plDelMode"; one.checked = settings.playlistDelMode !== "three";
   const three = el("input"); three.type = "radio"; three.name = "plDelMode"; three.checked = settings.playlistDelMode === "three";
   const saveMode = () => { settings.playlistDelMode = three.checked ? "three" : "one"; saveUserPrefs(); };
   one.addEventListener("change", saveMode); three.addEventListener("change", saveMode);
-  d.card.append(make, el("div", "plSep"),
+  d.card.append(make, imp, el("div", "plSep"),
     plRow(tr("plDelOne"), one), plRow(tr("plDelThree"), three),
     el("div", "plHint", tr("plDelModeHint")));
 }
@@ -538,6 +632,230 @@ function songProfile(it) {
     plToast(tr("plProfileSaved"));
   });
   d.card.append(el("div", "plSep"), save);
+}
+
+/* ---------- 📤 プレイリストの共有（trk-playlist v1） ----------
+   ・楽曲ファイル・譜面は含まない（曲名などの見出しと、プレイの証明だけ）
+   ・マリオメーカー方式：9曲以上＋すべての曲をクリアか視聴済みでないと書き出せない。
+     AUTO・📻ラジオ・倍速も「視聴」として数えるが、AUTO視聴だけの曲には ▶AUTO が必ず付く（隠せない）
+   ・リンクは https:// 限定。開く前に確認ダイアログ（作成者が設定したもので、trk!は内容を保証しない） */
+const PL_SHARE_MIN = 9;
+const PLAYED_KEY = "shadow_taiko_played_v1";
+let PLAYED = {};
+try { PLAYED = JSON.parse(localStorage.getItem(PLAYED_KEY)) || {}; } catch (_) { PLAYED = {}; }
+if (!PLAYED || typeof PLAYED !== "object" || Array.isArray(PLAYED)) PLAYED = {};
+function playedSave() { try { localStorage.setItem(PLAYED_KEY, JSON.stringify(PLAYED)); } catch (_) {} }
+function notePlayed(key, auto) {   /* リザルトまで行った曲＝クリア or 視聴の証明 */
+  if (!key) return;
+  const e = (PLAYED[key] ||= { last: 0, auto: 0, manual: 0 });
+  e.last = Date.now();
+  if (auto) e.auto++; else e.manual++;
+  playedSave();
+}
+on("screen", id => {
+  if (id !== "endScreen") return;
+  if (currentSong && currentSong.key) notePlayed(currentSong.key, !!settings.autoPlay);
+});
+
+/* 証明：ランク対象のプレイ記録（クリア）か、視聴記録（AUTO・ラジオ・倍速でもOK） */
+function plRecordsIdx() {
+  const idx = {};
+  for (const r of Object.values(records)) if (r && r.title != null) idx[`${r.size}|${r.title}`] = r;
+  return idx;
+}
+function plProof(it, idx) {
+  const info = songInfo(it, idx);
+  const played = PLAYED[it.key];
+  if (info && info.plays > 0) return { ok: true, auto: false, info };
+  if (played && played.manual + played.auto > 0) return { ok: true, auto: played.manual === 0, info: null };
+  return { ok: false, auto: false, info: null };
+}
+function plLocalSongs(p) {
+  const byKey = new Map(allSongs().map(x => [x.key, x]));
+  return p.songs.map(k => byKey.get(k)).filter(Boolean);   /* 端末から消えた曲は対象外 */
+}
+function plShareData(p, opts) {
+  const idx = plRecordsIdx();
+  const songs = plLocalSongs(p).map(it => {
+    const m = metaOf(it.key) || {}, pr = plProof(it, idx);
+    return { title: m.title || it.title, artist: m.artist || it.artist || "", album: m.album || "", composer: m.composer || "",
+      key: it.key, size: it.size || 0,
+      badges: opts.badges && pr.info ? pr.info.title : "",
+      best: opts.score && pr.info ? pr.info.best : 0,
+      plays: pr.info ? pr.info.plays : 0,
+      auto: pr.auto };   /* ▶AUTO は opts に関係なく必ず入る（記載必須） */
+  });
+  const src = {};
+  if (opts.note) src.note = String(opts.note).slice(0, 60);
+  if (opts.url && /^https:\/\/\S+$/i.test(opts.url)) src.url = String(opts.url).slice(0, 300);   /* 書き出しの境界でも https を確認 */
+  return { format: "trk-playlist", version: 1, name: p.name, icon: plIcon(p), color: p.color,
+    count: songs.length, createdAt: new Date(p.createdAt || Date.now()).toISOString(),
+    comment: opts.comment || "", source: (src.note || src.url) ? src : undefined, songs };
+}
+function plCopyText(text) {
+  const done = () => plToast(tr("plShareCopied"));
+  const fallback = () => {
+    const ta = el("textarea"); ta.value = text; ta.style.cssText = "position:fixed;left:-999px";
+    document.body.append(ta); ta.select();
+    try { document.execCommand("copy"); } catch (_) {}
+    ta.remove();
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, () => { fallback(); done(); });
+  else { fallback(); done(); }
+}
+function plShareText(v) {
+  const lines = [`${v.icon || "🎧"} ${tr("plShareTextHead")}「${v.name}」（${v.count}曲）`];
+  for (const s of v.songs.slice(0, 20)) {
+    const bits = [s.title];
+    if (s.badges) bits.push(s.badges);
+    if (s.auto) bits.push(tr("plAutoMark"));
+    else if (s.best) bits.push(s.best.toLocaleString());
+    lines.push("♪ " + bits.join(" "));
+  }
+  if (v.songs.length > 20) lines.push(`… +${v.songs.length - 20}`);
+  if (v.comment) lines.push(`📝 ${v.comment}`);
+  if (v.source && v.source.note) lines.push(`🔗 ${v.source.note}`);
+  if (v.source && v.source.url) lines.push(v.source.url);
+  return lines.join("\n");
+}
+/* 共有ダイアログ（書き出し条件をその場で確認） */
+function plShare(p) {
+  const d = plDialog(tr("plShareTitle") + "：" + p.name);
+  const comment = el("input", "plInput"); comment.type = "text"; comment.maxLength = 140; comment.placeholder = tr("plShareComment");
+  const note = el("input", "plInput"); note.type = "text"; note.maxLength = 60; note.placeholder = tr("plShareSourceNote");
+  const url = el("input", "plInput"); url.type = "text"; url.maxLength = 300; url.placeholder = "https://…";
+  const sc = el("input"); sc.type = "checkbox"; sc.checked = true;
+  const bd = el("input"); bd.type = "checkbox"; bd.checked = true;
+  const status = el("div", "plHint");
+  const opts = () => ({ comment: comment.value.trim().slice(0, 140), note: note.value.trim().slice(0, 60),
+    url: /^https:\/\/\S+$/i.test(url.value.trim()) ? url.value.trim() : "", badges: bd.checked, score: sc.checked });
+  const check = () => {
+    const songs = plLocalSongs(p);
+    if (songs.length < PL_SHARE_MIN) { status.textContent = tr("plShareNeed9", { n: songs.length }); return false; }
+    const idx = plRecordsIdx();
+    const unplayed = songs.filter(it => !plProof(it, idx).ok).map(it => (metaOf(it.key) || {}).title || it.title);
+    if (unplayed.length) {
+      status.textContent = tr("plShareUnplayed", { list: unplayed.slice(0, 3).join(" / ") + (unplayed.length > 3 ? " …" : "") });
+      return false;
+    }
+    status.textContent = tr("plShareReady", { n: songs.length });
+    return true;
+  };
+  check();
+  const exportBtn = el("button", "plBtn", tr("plShareExport")); exportBtn.type = "button";
+  exportBtn.addEventListener("click", () => {
+    if (!check()) return;
+    downloadJSON(plShareData(p, opts()), `trk-playlist-${safeName(p.name)}.json`);
+    p.createdAt = p.createdAt || Date.now(); saveUserPrefs();
+    plToast(tr("plShareExported"));
+  });
+  const copyBtn = el("button", "plBtn", tr("plShareCopy")); copyBtn.type = "button";
+  copyBtn.addEventListener("click", () => { if (check()) plCopyText(plShareText(plShareData(p, opts()))); });
+  d.card.append(
+    el("div", "plHint", tr("plShareRule")),
+    plRow(tr("plShareComment"), comment),
+    plRow(tr("plShareSourceNote"), note),
+    plRow(tr("plShareSourceUrl"), url),
+    plRow(tr("plShareScore"), sc), plRow(tr("plShareBadges"), bd),
+    status, exportBtn, copyBtn);
+}
+
+/* ---------- 📥 読み込み（ビューア → ある曲だけ取り込む） ---------- */
+function plSanitizeShared(raw) {
+  if (!raw || typeof raw !== "object" || raw.format !== "trk-playlist" || !Array.isArray(raw.songs)) return null;
+  const songs = raw.songs.slice(0, 1000).map(s => (s && typeof s === "object") ? {
+    title: String(s.title || "").trim().slice(0, 120), artist: String(s.artist || "").trim().slice(0, 100),
+    album: String(s.album || "").trim().slice(0, 100), composer: String(s.composer || "").trim().slice(0, 100),
+    key: typeof s.key === "string" ? s.key.slice(0, 128) : "", size: Number(s.size) || 0,
+    badges: String(s.badges || "").slice(0, 40),
+    best: Math.max(0, Math.floor(Number(s.best) || 0)), plays: Math.max(0, Math.floor(Number(s.plays) || 0)),
+    auto: !!s.auto
+  } : null).filter(s => s && s.title);
+  if (!songs.length) return null;
+  const note = String((raw.source && raw.source.note) || "").trim().slice(0, 60);
+  const urlRaw = String((raw.source && raw.source.url) || "").trim();
+  const url = /^https:\/\/\S+$/i.test(urlRaw) ? urlRaw.slice(0, 300) : "";
+  return { name: String(raw.name || "Playlist").slice(0, 24), icon: String(raw.icon || "🎧").slice(0, 4),
+    color: /^[a-z]{3,12}$/.test(raw.color || "") ? raw.color : "none",
+    count: songs.length, comment: String(raw.comment || "").slice(0, 140),
+    createdAt: String(raw.createdAt || "").slice(0, 30),
+    source: (note || url) ? { note, url } : null, songs };
+}
+function plMatchByTitle(s, all) {
+  const t = s.title.trim().toLowerCase();
+  let fallback = null;
+  for (const it of all) {
+    if (String((metaOf(it.key) || {}).title || it.title).trim().toLowerCase() !== t) continue;
+    if (!fallback) fallback = it;
+    if (!s.size || !it.size || s.size === it.size) return it;
+  }
+  return fallback;
+}
+function plOpenLink(url) {   /* https限定＋開く前に確認（osu!の「入手先を明示」流・trk!は内容を保証しない） */
+  const d = plDialog(tr("plLinkOpen"));
+  d.card.append(el("div", "plHint", url), el("div", "plHint", tr("plLinkWarn")));
+  const open = el("button", "plBtn", tr("plLinkOpen")); open.type = "button";
+  open.addEventListener("click", () => { d.close(); try { const w = window.open(url, "_blank", "noopener,noreferrer"); if (w) w.opener = null; } catch (_) {} });
+  const no = el("button", "plBtnDanger", tr("plLinkCancel")); no.type = "button";
+  no.addEventListener("click", d.close);
+  d.card.append(open, no);
+}
+function plViewer(v) {
+  const d = plDialog(tr("plImportTitle"));
+  const all = allSongs(), byKey = new Map(all.map(x => [x.key, x]));
+  const matched = [];
+  d.card.append(el("b", "plCardTitle", `${v.icon} ${v.name}`));
+  d.card.append(el("div", "plHint", [v.createdAt ? v.createdAt.slice(0, 10) : "", tr("plSongsNow", { n: v.songs.length })].filter(Boolean).join(" · ")));
+  if (v.comment) d.card.append(el("div", "plShareComment", "📝 " + v.comment));
+  if (v.source) {
+    const src = el("div", "plShareSrc");
+    if (v.source.note) src.append(el("div", "plHint", "🔗 " + v.source.note));
+    if (v.source.url) {
+      const btn = el("button", "plBtn", tr("plLinkOpen")); btn.type = "button";
+      btn.addEventListener("click", () => plOpenLink(v.source.url));
+      src.append(btn, el("div", "plHint", v.source.url));
+    }
+    d.card.append(src);
+  }
+  d.card.append(el("div", "plSep"));
+  const list = el("div", "plShareList");
+  for (const s of v.songs) {
+    const it = (s.key && byKey.get(s.key)) || plMatchByTitle(s, all);
+    if (it) matched.push(it);
+    const row = el("div", "plShareRow" + (it ? "" : " miss"));
+    row.append(el("b", "", s.title));
+    const sub = [s.artist, s.album].filter(Boolean).join(" · ");
+    const marks = [s.badges, s.auto ? tr("plAutoMark") : (s.best ? s.best.toLocaleString() : "")].filter(Boolean).join(" ");
+    row.append(el("div", "plHint", [sub, marks].filter(Boolean).join("　")));
+    row.append(el("span", "plShareState", it ? "✅" : "❌"));
+    list.append(row);
+  }
+  d.card.append(list);
+  const take = el("button", "plBtn", tr("plImportTake", { n: matched.length })); take.type = "button";
+  take.disabled = !matched.length;
+  take.addEventListener("click", () => {
+    const p = plSanitize({ id: "pl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      name: v.name, icon: "📥", color: v.color, frozen: false, locked: false, songs: matched.map(x => x.key) });
+    p.createdAt = Date.now();
+    settings.playlists.push(p); saveUserPrefs();
+    settings.libTab = "pl:" + p.id;
+    d.close(); renderLib();
+    plToast(tr("plImportTaken", { name: p.name }));
+  });
+  d.card.append(el("div", "plSep"), el("div", "plHint", tr("plImportFound", { n: matched.length, m: v.songs.length })), take);
+}
+function plImportPick() {
+  const inp = el("input"); inp.type = "file"; inp.accept = "application/json,.json";
+  inp.addEventListener("change", async () => {
+    const f = inp.files && inp.files[0]; inp.value = "";
+    if (!f) return;
+    let raw = null;
+    try { raw = JSON.parse(await f.text()); } catch (_) {}
+    const v = plSanitizeShared(raw);
+    if (!v) { plToast(tr("plImportBad")); return; }
+    plViewer(v);
+  });
+  inp.click();
 }
 
 /* タブ帯を描いて、いま選ばれているタブのIDを返す */

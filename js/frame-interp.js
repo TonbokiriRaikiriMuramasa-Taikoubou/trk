@@ -106,6 +106,7 @@ let havePair = false, cutFlag = false, lastCapAt = 0, pairAt = 0, pairInterval =
 let lastFrames = -1, lastCT = -1, rvfPending = false;
 let quality = 2, degraded = false;
 let outStamps = [], lastTune = 0, srcFps = 0, outFps = 0;
+let lastRenderKey = -1, lastStampAt = 0;   // 表示先が複数でも1フレーム1回にまとめる
 const surfaces = new Map();
 const watchers = new Set();
 
@@ -438,7 +439,7 @@ function ensureSizes() {
   let h = Math.max(90, Math.round((w * vh) / vw / 2) * 2);
   if (w === W && h === H && pyrTex.length) return true;
   releaseSizes();
-  W = w; H = h;
+  W = w; H = h; lastRenderKey = -1;
   glc.width = W; glc.height = H;
   capCv.width = W; capCv.height = H;
   const fl = floatTex();
@@ -720,13 +721,15 @@ function drawTo(ctx, w, h) {
   const now = performance.now();
   let t = (now - pairAt) / Math.max(8, pairInterval);
   t = Math.min(1, Math.max(0, t));
-  renderWarp(t);
+  /* プレーヤーの映像エリアと全画面表示が同時に出ていても、同じフレームなら描き直さない */
+  const key = Math.round(now / 8);
+  if (key !== lastRenderKey) { lastRenderKey = key; renderWarp(t); }
   try {
     const s = Math.min(w / W, h / H);
     const dw = W * s, dh = H * s;
     ctx.drawImage(glc, (w - dw) / 2, (h - dh) / 2, dw, dh);
   } catch (_) { return false; }
-  outStamps.push(now);
+  if (now - lastStampAt > 5) { lastStampAt = now; outStamps.push(now); }
   if (outStamps.length > 240) outStamps.shift();
   return true;
 }

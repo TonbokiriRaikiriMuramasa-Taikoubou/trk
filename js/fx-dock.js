@@ -39,7 +39,70 @@ settings.fxDockOpen = prefs.fxDockOpen === true;      // くわしい欄は最�
 settings.castPolicy = pick(settings.castPolicy, ["off", "antenna"], "off");
 settings.backgroundPolicy = pick(settings.backgroundPolicy, ["off", "antenna", "corner"], settings.castPolicy === "antenna" ? "antenna" : "off");
 settings.fxAntenna = settings.backgroundPolicy === "off" ? false : !!prefs.fxAntenna;
-settings.fxAntennaShape = pick(prefs.fxAntennaShape, ["rod", "loop", "dish", "beam"], "rod");
+settings.fxAntennaShape = pick(prefs.fxAntennaShape, ["rod", "loop", "dish", "beam", "truck", "robot", "cat", "slime", "ghost", "miko", "custom"], "rod");
+/* 🖼 自分のイラスト2枚（ON／OFF）の検証（純粋関数・テスト対象） */
+function antCustomOk(u) { return typeof u === "string" && u.startsWith("data:image/") && u.length <= 400000; }
+settings.fxAntennaCustomOn = antCustomOk(prefs.fxAntennaCustomOn) ? prefs.fxAntennaCustomOn : "";
+settings.fxAntennaCustomOff = antCustomOk(prefs.fxAntennaCustomOff) ? prefs.fxAntennaCustomOff : "";
+/* ---- 📡 アンテナのドットキャラ（16×16・全部trk!の描きおろし。巫女の権利メモは NOTICE.md） ---- */
+const ANT_CHARS = {
+  truck: {
+    pal: {"k": "#37474f", "r": "#ef5350", "R": "#b71c1c", "w": "#eceff1", "W": "#81d4fa", "y": "#ffee58", "o": "#546e7a", "O": "#b0bec5", "c": "#4dd0e1", "z": "#cfd8dc", ".": null},
+    on: [["................", "................", "................", ".....kkkkkk.....", "....kwwwwwwk....", "....kWWkWWWk....", "....kwwwwwwk....", "..kkkkkkkkkkkk..", ".krrrrrrrrrrrrk.", ".krrrrrrrrrrryk.", ".kRRRRRRRRRRRRk.", ".krrrrrrrrrrrrk.", "..kkkkkkkkkkkk..", "...kkk....kkk...", "...kOok...kOok..", "....kk....kk...."], ["................", "................", "................", ".....kkkkkk.....", "....kwwwwwwk....", "....kWWWkWWk....", "....kwwwwwwk....", "c.kkkkkkkkkkkk..", "c.krrrrrrrrrrrk.", "..krrrrrrrrrryk.", "c.kRRRRRRRRRRRk.", "..krrrrrrrrrrrk.", "..kkkkkkkkkkkk..", "...kkk....kkk...", "...koOk...koOk..", "....kk....kk...."]],
+    off: [["...........zz...", "..........z.....", "................", "................", ".....kkkkkk.....", "....kwwwwwwk....", "....kkkkkkkk....", "....kwwwwwwk....", "..kkkkkkkkkkkk..", ".krrrrrrrrrrrrk.", ".krrrrrrrrrrrrk.", ".kRRRRRRRRRRRRk.", ".krrrrrrrrrrrrk.", "..kkkkkkkkkkkk..", "...kkk....kkk...", "...kOok...kOok.."], ["..........zzz...", ".........z..z...", "................", "................", ".....kkkkkk.....", "....kwwwwwwk....", "....kkkkkkkk....", "....kwwwwwwk....", "..kkkkkkkkkkkk..", ".krrrrrrrrrrrrk.", ".krrrrrrrrrrrrk.", ".kRRRRRRRRRRRRk.", ".krrrrrrrrrrrrk.", "..kkkkkkkkkkkk..", "...kkk....kkk...", "...kOok...kOok.."]]
+  },
+  robot: {
+    pal: {"k": "#37474f", "b": "#b0bec5", "B": "#78909c", "i": "#4dd0e1", "I": "#00e5ff", "a": "#ff7043", "A": "#ffca28", "z": "#cfd8dc", ".": null},
+    on: [[".......A........", ".......k........", ".....kkkkk......", "....kbbbbbk.....", "....kibbbik.....", "....kbbbbbk.....", "...kkBBBBBkk....", "..kbbkbbbkbbk...", "..kbbkbbbkbbk...", "..kbbkkkkkbbk...", "....kbbbbbk.....", "....kbkbkbk.....", "....kbk.kbk.....", "....kkk.kkk.....", "................", "................"], [".......a........", ".......k........", ".....kkkkk......", "....kbbbbbk.....", "....kIbbbik.....", "....kbbbbbk.....", "...kkBBBBBkk....", "..kBbkbbbkbbk...", "..kbbkbbbkbBk...", "..kbbkkkkkbbk...", "....kbbbbbk.....", "....kbbkbbk.....", "....kbk.kbk.....", "....kkk.kkk.....", "................", "................"]],
+    off: [["...........z.z..", "............z...", "................", "................", "................", "................", "..k.k..k.k......", "..k.k..k.k......", "..kkk..kkk......", "..kkkkkkkkkk....", "..kbbbbbbibk....", "..kbBBBBBBbk....", "..kbBBBBBBbk....", "..kkkkkkkkkk....", "..aa............", "................"], ["..........z.z...", "...........z....", "................", "................", "................", "................", "..k.k...k.k.....", "..k.k...k.k.....", "..kkk...kkk.....", "..kkkkkkkkkk....", "..kbbbbbbibk....", "..kbBBBBBBbk....", "..kbBBBBBBbk....", "..kkkkkkkkkk....", "..aa............", "................"]]
+  },
+  cat: {
+    pal: {"k": "#37474f", "o": "#ffb74d", "O": "#f57c00", "w": "#fff8e1", "p": "#f48fb1", "z": "#cfd8dc", ".": null},
+    on: [["................", "..........k..k..", "..........kokok.", "..........kooook", ".........koooook", ".........kokOook", "........koooooo.", "kk......kooooo..", "kok.....kppko...", ".kok...koooooo..", "..kok.kooooooo..", "...kookooooooo..", "....kooooooo....", "....ko.ok.o.....", "....kO.k.O......", "................"], ["................", "..........k..k..", "..........kokok.", "..........kooook", ".........koooook", ".........kokOook", "........koooooo.", ".k......kooooo..", "kok.....kppko...", "..ok...koooooo..", "..ok.kooooooo...", "...kookooooooo..", "....kooooooo....", "...ko..ok..o....", "...kO..k..O.....", "................"]],
+    off: [["................", "................", "................", "................", "................", "................", "................", "................", "................", "................", "....kkkkkk......", "..kkoooooookk...", ".koooOOOOooook..", ".koookkkkooook..", ".koooooooook....", "..kkkkkkkkk....."], [".............z..", "..........z.....", "................", "................", "................", "................", "................", "................", "................", "................", "....kkkkkk......", "..kkoooooookk...", ".koooOOOOooook..", ".koookkkkooook..", ".koooooooook....", "..kkkkkkkkk....."]]
+  },
+  slime: {
+    pal: {"k": "#1b5e20", "g": "#66bb6a", "G": "#43a047", "w": "#ffffff", "b": "#b2dfdb", "z": "#e0f2f1", ".": null},
+    on: [["................", "................", "................", "................", ".....kkkkkk.....", "...kkggggggkk...", "..kgggggggggk...", "..kggwggwgggk...", "..kggkgggkggk...", ".kgggggggggggk..", ".kggggggggggGk..", ".kgggkkkkggGGk..", ".kgggggggggGGk..", "..kGGGGGGGGGk...", "...kkkkkkkkk....", "................"], ["................", "................", "................", "................", "................", "......kkkk......", "....kkggggkk....", "...kggggggggk...", "..kggwggwgggk...", ".kggkgggkggggk..", "kgggggggggggggk.", "kgggkkkkkgggGGk.", "kggggggggggGGGk.", "kGGGGGGGGGGGGGk.", ".kkkkkkkkkkkkk..", "................"]],
+    off: [["................", "................", "................", "................", "................", "................", "................", "................", "................", ".....kkkkk......", "...kkkggggkk.b..", "..kgggggggggk...", ".kggkkggkkggGk..", "kggggggggggGGk..", "kGGGGGGGGGGGGk..", ".kkkkkkkkkkkk..."], ["................", "..........b.....", ".........bbb....", "................", "................", "................", "................", "................", "................", ".....kkkkk......", "...kkkggggkk....", "..kgggggggggk...", ".kggkkggkkggGk..", "kggggggggggGGk..", "kGGGGGGGGGGGGk..", ".kkkkkkkkkkkk..."]]
+  },
+  ghost: {
+    pal: {"k": "#455a64", "w": "#eceff1", "W": "#b0bec5", "p": "#f8bbd0", "z": "#cfd8dc", ".": null},
+    on: [["................", ".....kkkkk......", "...kkwwwwwkk....", "..kwwwwwwwwwk...", "..kwwkwwwkwwk...", "..kwwkwwwkwwk...", "..kwwwwwwwwwk...", "..kwwwpppwwwk...", "..kwwwwwwwwwk...", "kkwwwwwwwwwkk...", "kwwkwwwwwwkwk...", "kwwkkwwwwkkwk...", ".kww.kww.kwwk...", ".kw..kw..kwk....", "................", "................"], ["................", "......kkkkk.....", "....kkwwwwwkk...", "...kwwwwwwwwwk..", "...kwwkwwwkwwk..", "...kwwkwwwkwwk..", "...kwwwwwwwwwk..", "...kwwwpppwwwk..", "...kwwwwwwwwwk..", "...kwwwwwwwwwkk.", "...kwwwwwwwwkwk.", "...kwwwwwwwkkwk.", "...kww.kww.kwwk.", "....kw..kw..kwk.", "................", "................"]],
+    off: [["................", "................", "................", "................", "................", "................", "................", "................", "....kkkkkkk.....", "...kwwwwwwwk....", "..kwwkwwwkwwk...", ".kwwwwwwwwwwwk..", ".kwwWwwWwwWwwk..", ".kwwWwwWwwWwwk..", ".kWWWWWWWWWWWk..", "..kkkkkkkkkkk..."], [".............z..", "..........z.z...", "................", "................", "................", "................", "................", "................", "....kkkkkkk.....", "...kwwwwwwwk....", "..kwwkwwwkwwk...", ".kwwwwwwwwwwwk..", ".kwwWwwWwwWwwk..", ".kwwWwwWwwWwwk..", ".kWWWWWWWWWWWk..", "..kkkkkkkkkkk..."]]
+  },
+  miko: {
+    pal: {"k": "#263238", "h": "#4e342e", "s": "#ffcc80", "r": "#e53935", "R": "#b71c1c", "w": "#fafafa", "b": "#ff8a80", "z": "#cfd8dc", ".": null},
+    on: [["................", ".....kkkkk......", "....khhhhhk.....", "...khhhhhhhk....", "..khhsssshhk....", "..khsksskshk....", "..khsssssshk....", "...ksskkssk.....", "bb.kkkkkkk..b...", "bbkwwwwwwwkkb...", "..kwrrrrrwk.....", "..krrrrrrrk.....", "..krrrrrrrk.....", "..kRr..rRk......", "..kk....kk......", "................"], ["................", ".....kkkkk......", "....khhhhhk.....", "...khhhhhhhk....", "..khhsssshhk....", "..khsksskshk....", "..khsssssshk....", "...ksskkssk.....", "bbbkkkkkkkk.b...", "bbkwwwwwwwkkb...", "..kwrrrrrwk.....", "..krrrrrrrrk....", "..krrrrrrrk.....", "..kRr...rRk.....", "..kk.....kk.....", "................"]],
+    off: [["................", "................", "................", "................", "....kkkkk.......", "...khhhhhk......", "..khhssshhk.....", "..khskksshk.....", "..khssssshk.....", "...ksskkssk.....", "..kkkkkkkkk.....", ".kwwrrrrrwwk....", ".kwrrrrrrrwk....", ".krrRRRRrrrk....", ".krrrrrrrrrk....", ".kkkkkkkkkkk...."], ["...........zz...", "..........z.....", "................", "................", "....kkkkk.......", "...khhhhhk......", "..khhssshhk.....", "..khskksshk.....", "..khssssshk.....", "...ksskkssk.....", "..kkkkkkkkk.....", ".kwwrrrrrwwk....", ".kwrrrrrrrwk....", ".krrRRRRrrrk....", ".krrrrrrrrrk....", ".kkkkkkkkkkk...."]]
+  }
+};
+const CHAR_SHAPE_IDS = Object.keys(ANT_CHARS);
+const isCharShape = s => !!ANT_CHARS[s] || s === "custom";
+/* フレーム選び（純粋関数・テスト対象）：ON＝起きる・歩く／OFF＝倒れる・眠る */
+function antCharFrame(shape, on, t, ms) {
+  const c = ANT_CHARS[shape];
+  if (!c) return null;
+  const frames = on ? c.on : c.off;
+  return frames[Math.floor((t || 0) / (ms || 480)) % frames.length];
+}
+/* 1フレームを描く（純粋関数・テスト対象）：描いたドット数を返す */
+function drawAntCharMatrix(g, chr, frame, px) {
+  if (!chr || !frame) return 0;
+  let n = 0;
+  for (let y = 0; y < frame.length; y++) {
+    const row = frame[y];
+    for (let x = 0; x < row.length; x++) {
+      const col = chr.pal[row[x]];
+      if (!col) continue;
+      g.fillStyle = col;
+      g.fillRect(x * px, y * px, px, px);
+      n++;
+    }
+  }
+  return n;
+}
+
 /* 📡 アンテナの置き場（純粋関数・テスト対象）：off＝許さない / antenna＝ドックの上 / corner＝右上（言語の左） */
 function bgAntennaView(policy) {
   const p = policy === "antenna" || policy === "corner" ? policy : "off";
@@ -68,6 +131,11 @@ Object.assign(TEXT.ja, {
   dockSkinLabel:"本体のスキン", dockFive:"どのスキンでも5ボタンにする（往年の名機に5ボタン）",
   dockAntCheckLabel:"通常のアンテナを使う（バックグラウンド再生モード）",
   dockAntShapeLabel:"アンテナの形状", dockAntShapeRod:"伸縮ロッド（標準）", dockAntShapeLoop:"円形ループ", dockAntShapeDish:"パラボラ", dockAntShapeBeam:"サイバービーム",
+  dockAntGroupChar:"ドットキャラ（ON＝起きる／OFF＝眠る）",
+  dockAntCharTruck:"🚚 トラック", dockAntCharRobot:"🤖 ロボット", dockAntCharCat:"🐱 ネコ", dockAntCharSlime:"🫧 スライム", dockAntCharGhost:"👻 オバケ", dockAntCharMiko:"⛩ 巫女（東方Projectの二次創作）", dockAntCharCustom:"🖼 自分のイラスト2枚（ON／OFF）",
+  dockAntCharHint:"ドットキャラはONで起きて動き、OFFで倒れて眠ります。どれもtrk!の描きおろしドット絵です（巫女は東方Projectの二次創作。公式ガイドラインに従い無料のブラウザゲームとして提供しています。公式の素材ではありません）。",
+  dockAntCustomOn:"ONの画像", dockAntCustomOff:"OFFの画像", dockAntCustomClear:"画像を消す", dockAntCustomNg:"画像を読み込めませんでした", dockAntCustomCleared:"ON／OFFの画像を消しました",
+  dockAntCustomHint:"2枚の画像は端末内にだけ保存されます（設定を初期化すると消えます）。ONの画像＝アンテナが立っているとき、OFFの画像＝眠っているとき。大きい画像は自動で小さくします。",
   dockLockChain:"🔒 パラメーターのランダムでは、プリセットの中身を変えない（EQだけ）", dockLockHint:"🔒 を付けたEQは、ランダムでも動きません",
   dockAntHint:"アンテナを立てると、アプリを裏にしたり画面を消したりしても再生を続けます（選曲中のプレビュー・ラジオの待ち時間・AUTO中）。自分で遊んでいる最中は、記録を守るため今までどおり一時停止します。裏にしている間は、ビートに合わせて動くエフェクトと画面の動きが止まり、カウントダウンは省きます。ロック画面や通知から 再生・一時停止・次の曲 を操作できます。端末の省電力設定によっては止まることがあります。"
 });
@@ -87,6 +155,11 @@ Object.assign(TEXT.en, {
   dockSkinLabel:"Device skin", dockFive:"Use 5 buttons on every skin (5 buttons on a classic)",
   dockAntCheckLabel:"Use standard antenna (background playback mode)",
   dockAntShapeLabel:"Antenna shape", dockAntShapeRod:"Telescopic rod (default)", dockAntShapeLoop:"Circular loop", dockAntShapeDish:"Satellite dish", dockAntShapeBeam:"Cyber beam",
+  dockAntGroupChar:"Dot characters (ON = awake / OFF = asleep)",
+  dockAntCharTruck:"🚚 Truck", dockAntCharRobot:"🤖 Robot", dockAntCharCat:"🐱 Cat", dockAntCharSlime:"🫧 Slime", dockAntCharGhost:"👻 Ghost", dockAntCharMiko:"⛩ Shrine maiden (Touhou fan art)", dockAntCharCustom:"🖼 Your own two images (ON / OFF)",
+  dockAntCharHint:"Dot characters wake up and move when ON, and fall asleep when OFF. All are original pixel art drawn for trk! (the shrine maiden is a Touhou Project fan work following the official guidelines, shipped as a free browser game; not official assets).",
+  dockAntCustomOn:"ON image", dockAntCustomOff:"OFF image", dockAntCustomClear:"Remove images", dockAntCustomNg:"Couldn't load that image", dockAntCustomCleared:"ON/OFF images removed",
+  dockAntCustomHint:"The two images are stored on your device only (cleared when settings are reset). ON image = antenna up, OFF image = asleep. Larger images are scaled down automatically.",
   dockLockChain:"🔒 Parameter random keeps the preset itself (EQ only)", dockLockHint:"EQ bands marked 🔒 don't move when randomizing",
   dockAntHint:"With the antenna up, playback continues when the app is in the background or the screen is off (song previews, the radio wait, and AUTO). While you're playing yourself, it still pauses to protect your records. In the background, beat-synced effects and animations stop and the countdown is skipped. You can play/pause/skip from the lock screen or notification. Some devices' battery savers may still stop it."
 });
@@ -105,6 +178,11 @@ Object.assign(TEXT.zh, {
   dockSkinLabel:"机身皮肤", dockFive:"所有皮肤都用5个按钮（给经典机型装上5键）",
   dockAntCheckLabel:"使用标准天线（后台播放模式）",
   dockAntShapeLabel:"天线形状", dockAntShapeRod:"伸缩拉杆（默认）", dockAntShapeLoop:"环形天线", dockAntShapeDish:"抛物面天线", dockAntShapeBeam:"赛博光束",
+  dockAntGroupChar:"点阵角色（ON＝醒来／OFF＝睡着）",
+  dockAntCharTruck:"🚚 卡车", dockAntCharRobot:"🤖 机器人", dockAntCharCat:"🐱 猫", dockAntCharSlime:"🫧 果冻", dockAntCharGhost:"👻 幽灵", dockAntCharMiko:"⛩ 巫女（东方Project二次创作）", dockAntCharCustom:"🖼 自己的两张图（ON／OFF）",
+  dockAntCharHint:"点阵角色在ON时醒来活动，OFF时倒下睡着。全部是trk!原创点绘（巫女为东方Project的二次创作，遵循官方指南、以免费浏览器游戏形式提供，并非官方素材）。",
+  dockAntCustomOn:"ON的图片", dockAntCustomOff:"OFF的图片", dockAntCustomClear:"删除图片", dockAntCustomNg:"无法读取该图片", dockAntCustomCleared:"已删除ON／OFF图片",
+  dockAntCustomHint:"两张图片只保存在设备内（初始化设置后会消失）。ON图＝天线立起时，OFF图＝睡着时。过大的图片会自动缩小。",
   dockLockChain:"🔒 参数随机时不改变预设本身（只改均衡器）", dockLockHint:"标记 🔒 的均衡器在随机时不会变化",
   dockAntHint:"竖起天线后，切到后台或关闭屏幕也会继续播放（选曲试听・电台等待・AUTO中）。自己游玩时为了保护记录，仍会照常暂停。后台期间，随节拍变化的音效和画面动画会停止，倒计时会省略。可以在锁屏或通知中播放・暂停・切到下一首。部分设备的省电设置仍可能停止播放。"
 });
@@ -123,6 +201,11 @@ Object.assign(TEXT.ko, {
   dockSkinLabel:"본체 스킨", dockFive:"모든 스킨을 5버튼으로 (명기에 5버튼 달기)",
   dockAntCheckLabel:"일반 안테나 사용 (백그라운드 재생 모드)",
   dockAntShapeLabel:"안테나 모양", dockAntShapeRod:"신축식 로드 (기본)", dockAntShapeLoop:"원형 루프", dockAntShapeDish:"파라볼라 안테나", dockAntShapeBeam:"사이버 빔",
+  dockAntGroupChar:"도트 캐릭터 (ON = 깨어남 / OFF = 잠듦)",
+  dockAntCharTruck:"🚚 트럭", dockAntCharRobot:"🤖 로봇", dockAntCharCat:"🐱 고양이", dockAntCharSlime:"🫧 슬라임", dockAntCharGhost:"👻 유령", dockAntCharMiko:"⛩ 무녀 (동방프로젝트 2차 창작)", dockAntCharCustom:"🖼 직접 고른 이미지 2장 (ON/OFF)",
+  dockAntCharHint:"도트 캐릭터는 ON일 때 깨어서 움직이고 OFF일 때 쓰러져 잠듭니다. 모두 trk!의 오리지널 도트 그림입니다 (무녀는 동방프로젝트 2차 창작으로, 공식 가이드라인에 따라 무료 브라우저 게임으로 제공하며 공식 소재가 아닙니다).",
+  dockAntCustomOn:"ON 이미지", dockAntCustomOff:"OFF 이미지", dockAntCustomClear:"이미지 삭제", dockAntCustomNg:"이미지를 읽지 못했습니다", dockAntCustomCleared:"ON/OFF 이미지를 삭제했습니다",
+  dockAntCustomHint:"두 장의 이미지는 기기에만 저장됩니다(설정 초기화로 사라집니다). ON 이미지 = 안테나가 서 있을 때, OFF 이미지 = 잠들어 있을 때. 큰 이미지는 자동으로 줄입니다.",
   dockLockChain:"🔒 파라미터 랜덤에서 프리셋 자체는 바꾸지 않기 (EQ만)", dockLockHint:"🔒 표시한 EQ는 랜덤에서도 움직이지 않습니다",
   dockAntHint:"안테나를 세우면 앱을 백그라운드로 보내거나 화면을 꺼도 계속 재생합니다 (곡 선택 미리듣기・라디오 대기・AUTO 중). 직접 플레이하는 중에는 기록을 지키기 위해 지금처럼 일시정지합니다. 백그라운드에서는 비트에 맞춰 움직이는 이펙트와 화면 애니메이션이 멈추고, 카운트다운은 생략합니다. 잠금 화면이나 알림에서 재생・일시정지・다음 곡을 조작할 수 있습니다. 기기의 절전 설정에 따라 멈출 수도 있습니다."
 });
@@ -204,7 +287,8 @@ addEventListener("DOMContentLoaded", () => {
   const dev = el("div", "dockDev");
   const antWrap = el("div", "antWrap");
   const antBody = el("div", "antBody"), antTip = el("div", "antTip"), antSignal = el("div", "antSignal");
-  antWrap.append(antBody, antTip, antSignal);
+  const dockCharCv = el("canvas", "antChar"); dockCharCv.width = 48; dockCharCv.height = 48;
+  antWrap.append(antBody, antTip, antSignal, dockCharCv);
 
   const powLed = el("i", "led"), antLed = el("i", "led ledAnt");
   const pow = btn("dockKey dockPow", powLed, el("span", "", "⏻"));
@@ -221,6 +305,8 @@ addEventListener("DOMContentLoaded", () => {
 
   /* 📡 右上（言語選択の左）のコンパクトなアンテナ。backgroundPolicy="corner"のときだけ出る */
   const cornerAnt = btn("cornerAnt", el("span", "caIcon", "📡"), el("i", "caSignal"));
+  const cornerCharCv = el("canvas", "caCanvas"); cornerCharCv.width = 48; cornerCharCv.height = 48;
+  cornerAnt.append(cornerCharCv);
   const headTools = document.querySelector(".headTools");
   if (headTools) headTools.prepend(cornerAnt);   /* 言語選択の左＝headTools の先頭 */
 
@@ -272,13 +358,30 @@ addEventListener("DOMContentLoaded", () => {
     ["dish", "dockAntShapeDish"],
     ["beam", "dockAntShapeBeam"]
   ];
+  /* 🎭 キャラ肌：ON＝起きる・歩く／OFF＝倒れる・眠る（描きおろしドット絵＋自分のイラスト2枚） */
+  const antChars = [
+    ["truck", "dockAntCharTruck"],
+    ["robot", "dockAntCharRobot"],
+    ["cat", "dockAntCharCat"],
+    ["slime", "dockAntCharSlime"],
+    ["ghost", "dockAntCharGhost"],
+    ["miko", "dockAntCharMiko"],
+    ["custom", "dockAntCharCustom"]
+  ];
   const buildAntShapes = () => {
     antShapeSel.textContent = "";
+    const g1 = document.createElement("optgroup"); g1.label = tr("dockAntShapeLabel");
     for (const [k, lbl] of antShapes) {
-      const o = document.createElement("option"); o.value = k; o.textContent = tr(lbl);
-      o.dataset.i18n = lbl;
-      antShapeSel.append(o);
+      const o = document.createElement("option"); o.value = k; o.textContent = tr(lbl); o.dataset.i18n = lbl;
+      g1.append(o);
     }
+    /* optgroupの見出しは label 属性（data-i18n を付けると適用時の textContent 書き換えで子optionが消えるので使わない） */
+    const g2 = document.createElement("optgroup"); g2.label = tr("dockAntGroupChar");
+    for (const [k, lbl] of antChars) {
+      const o = document.createElement("option"); o.value = k; o.textContent = tr(lbl); o.dataset.i18n = lbl;
+      g2.append(o);
+    }
+    antShapeSel.append(g1, g2);
     antShapeSel.value = settings.fxAntennaShape || "rod";
   };
   buildAntShapes();
@@ -288,6 +391,52 @@ addEventListener("DOMContentLoaded", () => {
     render();
   });
   antShapeRow.append(tx("span", "dockAntShapeLabel"), antShapeSel);
+
+  /* 🖼 自分のイラスト2枚（ON／OFF）— 端末内にだけ保存 */
+  const antCustomRow = el("div", "antCustomRow");
+  function fileToAntImage(file, cb) {
+    if (!file || !/^image\//.test(file.type)) { cb(""); return; }
+    const r = new FileReader();
+    r.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 96;   /* 大きい画像はこの寸法に収まるまで小さくする */
+        const s = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight));
+        const w = Math.max(1, Math.round(img.naturalWidth * s)), h = Math.max(1, Math.round(img.naturalHeight * s));
+        const c = document.createElement("canvas"); c.width = w; c.height = h;
+        const g = c.getContext("2d");
+        if (!g) { cb(""); return; }
+        g.drawImage(img, 0, 0, w, h);
+        cb(c.toDataURL("image/png"));
+      };
+      img.onerror = () => cb("");
+      img.src = String(r.result);
+    };
+    r.onerror = () => cb("");
+    r.readAsDataURL(file);
+  }
+  const mkAntUpload = (which, labelKey) => {
+    const lab = el("label", "antUploadLab"), inp = document.createElement("input");
+    inp.type = "file"; inp.accept = "image/*";
+    lab.append(tx("span", labelKey), inp);
+    inp.addEventListener("change", () => {
+      fileToAntImage(inp.files && inp.files[0], url => {
+        if (antCustomOk(url)) {
+          settings["fxAntennaCustom" + (which === "on" ? "On" : "Off")] = url;
+          saveUserPrefs(); render();
+        } else lcdFlash(tr("dockAntCustomNg"));
+        inp.value = "";
+      });
+    });
+    return lab;
+  };
+  const antCustomClear = tx("button", "dockAntCustomClear", "fxMini"); antCustomClear.type = "button";
+  antCustomClear.addEventListener("click", () => {
+    settings.fxAntennaCustomOn = ""; settings.fxAntennaCustomOff = "";
+    saveUserPrefs(); lcdFlash(tr("dockAntCustomCleared")); render();
+  });
+  antCustomRow.append(mkAntUpload("on", "dockAntCustomOn"), mkAntUpload("off", "dockAntCustomOff"),
+    antCustomClear, tx("div", "dockAntCustomHint", "hint"));
 
   const backgroundRow = el("label", "field"), backgroundSel = document.createElement("select");
   backgroundRow.append(tx("span", "dockBackgroundPolicy"), backgroundSel);
@@ -321,7 +470,7 @@ addEventListener("DOMContentLoaded", () => {
     setTimeout(() => full.scrollIntoView({ behavior:"smooth", block:"start" }), 50);
   });
   body.append(tx("summary", "dockTitle"), quick, eqBox, tx("div", "dockLockHint", "hint"), lockChain.lab,
-    skinRow, five.lab, backgroundRow, backgroundHint, castRow, castHint, antShapeRow, antCheck.lab, tx("div", "dockAntHint", "hint"), more);
+    skinRow, five.lab, backgroundRow, backgroundHint, castRow, castHint, antShapeRow, antCustomRow, tx("div", "dockAntCharHint", "hint"), antCheck.lab, tx("div", "dockAntHint", "hint"), more);
 
   dock.append(dev, favChips, overLabel, overflow, body);
   col.append(dock);
@@ -370,6 +519,43 @@ addEventListener("DOMContentLoaded", () => {
   ant.addEventListener("click", () => toggleAntenna());
   antWrap.addEventListener("click", () => toggleAntenna());
   cornerAnt.addEventListener("click", () => toggleAntenna());
+
+  /* 📡 ドットキャラを描き続ける（キャラ肌のときだけ絵を更新。置き場は render() が教える） */
+  const charWhere = { dock: false, corner: false };
+  const customImgs = { on: null, onSrc: "", off: null, offSrc: "" };
+  function customImgOf(which) {
+    const src = which === "on" ? settings.fxAntennaCustomOn : settings.fxAntennaCustomOff;
+    if (!src) return null;
+    if (customImgs[which + "Src"] !== src) {
+      const img = new Image();
+      img.src = src;
+      customImgs[which] = img; customImgs[which + "Src"] = src;
+    }
+    const img = customImgs[which];
+    return img && img.complete && img.naturalWidth > 0 ? img : null;
+  }
+  function drawAntChar(cv, on, t) {
+    const g = cv.getContext("2d"); if (!g) return;
+    g.clearRect(0, 0, cv.width, cv.height);
+    const shape = settings.fxAntennaShape;
+    if (shape === "custom") {
+      const img = customImgOf(on ? "on" : "off");
+      if (!img) { g.font = "18px sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("📡", cv.width / 2, cv.height / 2 + 2); return; }
+      const s = Math.min(cv.width / img.naturalWidth, cv.height / img.naturalHeight);
+      const w = img.naturalWidth * s, h = img.naturalHeight * s;
+      g.drawImage(img, (cv.width - w) / 2, (cv.height - h) / 2, w, h);
+      return;
+    }
+    const c = ANT_CHARS[shape]; if (!c) return;
+    drawAntCharMatrix(g, c, antCharFrame(shape, on, t), cv.width / 16);
+  }
+  function antCharTick(ts) {
+    requestAnimationFrame(antCharTick);
+    if (!isCharShape(settings.fxAntennaShape) || document.hidden) return;
+    if (charWhere.dock && dockCharCv.isConnected) drawAntChar(dockCharCv, settings.fxAntenna, ts || 0);
+    if (charWhere.corner && cornerCharCv.isConnected) drawAntChar(cornerCharCv, settings.fxAntenna, ts || 0);
+  }
+  requestAnimationFrame(antCharTick);
   castAnt.addEventListener("click", () => openCastPicker());
   rFx.addEventListener("click", () => TrkFX.random());
   rFav.addEventListener("click", () => {
@@ -446,6 +632,10 @@ addEventListener("DOMContentLoaded", () => {
     dock.dataset.skin = settings.fxDockSkin;
     dock.dataset.antShape = settings.fxAntennaShape || "rod";
     antWrap.dataset.shape = settings.fxAntennaShape || "rod";
+    const charShape = isCharShape(settings.fxAntennaShape);
+    antWrap.classList.toggle("char", charShape);
+    cornerAnt.classList.toggle("char", charShape);
+    if (antCustomRow) antCustomRow.hidden = settings.fxAntennaShape !== "custom";
     dock.classList.toggle("ant", settings.fxAntenna);
     dock.classList.toggle("playing", !video.paused);
     if (skinChanged || lastSkin !== settings.fxDockSkin) { buildDeco(); lastSkin = settings.fxDockSkin; }
@@ -458,6 +648,7 @@ addEventListener("DOMContentLoaded", () => {
     if (backgroundSel) backgroundSel.value = settings.backgroundPolicy || "off";
     ant.hidden = !bgView.dock; antWrap.hidden = !bgView.dock;
     cornerAnt.hidden = !bgView.corner;                         /* 右上のコンパクト版（言語の左） */
+    charWhere.dock = bgView.dock; charWhere.corner = bgView.corner;   /* 📡 ドットキャラを描く場所 */
     cornerAnt.classList.toggle("on", settings.fxAntenna);
     cornerAnt.title = tr(settings.fxAntenna ? "dockAntOn" : "dockAntOff");
     cornerAnt.setAttribute("aria-label", cornerAnt.title);

@@ -284,6 +284,26 @@ if (!read("js/main.js").includes("guideEggKind") ||
   }
 }
 
+// 🎭 Antenna character skins: original dot characters (ON = awake / OFF = asleep)
+// plus a custom two-image option. The Touhou fan-work credit must stay in NOTICE.
+{
+  const fx = read("js/fx-dock.js");
+  const chars = ["truck", "robot", "cat", "slime", "ghost", "miko"];
+  const hasAll = chars.every(c => fx.includes(`"${c}", "dockAntChar${c[0].toUpperCase() + c.slice(1)}"`));
+  if (!fx.includes("const ANT_CHARS") || !fx.includes("function antCharFrame") ||
+      !fx.includes("function drawAntCharMatrix") || !fx.includes("function antCustomOk") ||
+      !fx.includes("antCustomRow") || !hasAll ||
+      !fx.includes('["rod", "loop", "dish", "beam", "truck", "robot", "cat", "slime", "ghost", "miko", "custom"]') ||
+      !read("js/core.js").includes('settings.fxAntennaShape = "rod";') ||
+      !read("css/style.css").includes(".antChar") ||
+      !read("NOTICE.md").includes("Touhou Project fan work") ||
+      !read("NOTICE.md").includes("touhou-project.news/guideline/")) {
+    fail("antenna character skins (ON=awake / OFF=asleep + custom 2 images) are missing");
+  } else {
+    ok("antenna character skins (6 dot characters + custom 2-image ON/OFF) are wired, Touhou credit in NOTICE");
+  }
+}
+
 // A cache name is deliberately checked for existence, not for a guessed
 // date, because the service worker is manually bumped for every release.
 const sw = read("sw.js");

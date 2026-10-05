@@ -33,6 +33,23 @@ under the Piapro Character License (PCL). https://piapro.jp/license/pcl/summary
 - "Winter Miku", "Spring Miku" and "Chibi Miku" in trk! are original arrangements.
   They are NOT the official derivative characters (Snow Miku, Sakura Miku, Mikudayo).
 
+## 2b. Touhou Project fan work (antenna character skin)
+アンテナのキャラ肌「⛩ 巫女」は、東方Project（著作権：上海アリス幻樂団／ZUN）を題材にした
+trk! の描きおろしドット絵（二次創作）です。公式ゲームの素材は一切使っていません。
+The "⛩ Shrine maiden" antenna character skin is an original pixel drawing by trk!,
+a fan work based on the Touhou Project (© Team Shanghai Alice / ZUN).
+No assets from the official games are used.
+
+- 東方Project二次創作ガイドライン（https://touhou-project.news/guideline/）に従い、
+  無料のブラウザゲームとして提供しています（ガイドラインは、無料のアプリであること・
+  スクリーンショット等以外のゲーム素材の使用・公開をしないこと・二次創作である旨の明記
+  を求めています。いずれも満たしています）。
+- The character rights belong to Team Shanghai Alice (ZUN) and are not ours, so the
+  GPL cannot grant them.
+- **To make a Touhou-free build:** remove the `miko` entry from `ANT_CHARS` in
+  `js/fx-dock.js` and the `dockAntCharMiko` label keys (4 languages). Nothing else
+  needs to change.
+
 ## 3. User content
 Songs, charts, skins, `.stpack` packs, VRM models, motions and character mods are
 owned by their creators. The same goes for MMD models (`.pmx`/`.pmd`), their

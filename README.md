@@ -49,7 +49,7 @@ trk!（トラック）は、ブラウザだけで動く**非営利のリズム�
 
 画面上部の **🧭 まずは3分チュートリアル** を開くと、スキン・サウンドエフェクト・TRUCK／CATCHの遊び方を5つの短い手順で確認できます。手順を実際に試すたびに**スタンプ**が押されていき、Seed欄へ `trk!` と入力した**瞬間**にチュートリアル完了で案内が消えます（不要な人は**スキップ**できます。設定の「見た目」から**もう一度**表示もできます）。5つのスタンプを集めると、ごほうびスキン **🎓グラデュエーション** が解禁されます。Seed欄への特定の入力にも、こっそり反応します🥚
 
-TVドックの **⏻ 電源を長押し**すると、ゲームを始めずに聴けるメディアプレーヤーへ切り替わります。再生キュー、曲送り、リピート、シャッフル、再生速度、前回位置の復元、スリープタイマー、Media Sessionに対応しています。逆再生（対応環境では音声も反転）とA-B区間ループも使えます。**Loop Lab**では、現在位置から5／10／20秒の区間ループ、ランダムな短区間、曲ごとのA-Bプリセット保存・呼び出し・個別削除・全消去ができます。プリセットは曲識別子とA/B秒数だけを端末内に保存し、音源の切り取り・変換・書き出し・アップロードは行いません。動画を一時的に壁紙／スクリーンセーバーで隠すこともでき、時計表示、動画を止める／続ける、トグル／長押し、端末から選んだ画像（セッション中のみ）に対応します。キャストアンテナとバックグラウンド再生アンテナは個別に設定できます。バックグラウンド再生のアンテナはドックの上だけでなく、**右上（言語選択の左）にコンパクトに置く**こともできます（ドックのアンテナを隠しても、バックグラウンド再生は使えます）。キャストは初期オフで、対応ブラウザーだけがキャストアンテナから選択画面を開きます（キャストを隠しても、再生用のアンテナは消えません）。
+TVドックの **⏻ 電源を長押し**すると、ゲームを始めずに聴けるメディアプレーヤーへ切り替わります。再生キュー、曲送り、リピート、シャッフル、再生速度、前回位置の復元、スリープタイマー、Media Sessionに対応しています。逆再生（対応環境では音声も反転）とA-B区間ループも使えます。**Loop Lab**では、現在位置から5／10／20秒の区間ループ、ランダムな短区間、曲ごとのA-Bプリセット保存・呼び出し・個別削除・全消去ができます。プリセットは曲識別子とA/B秒数だけを端末内に保存し、音源の切り取り・変換・書き出し・アップロードは行いません。動画を一時的に壁紙／スクリーンセーバーで隠すこともでき、時計表示、動画を止める／続ける、トグル／長押し、端末から選んだ画像（セッション中のみ）に対応します。キャストアンテナとバックグラウンド再生アンテナは個別に設定できます。バックグラウンド再生のアンテナはドックの上だけでなく、**右上（言語選択の左）にコンパクトに置く**こともできます（ドックのアンテナを隠しても、バックグラウンド再生は使えます）。キャストは初期オフで、対応ブラウザだけがキャストアンテナから選択画面を開きます（キャストを隠しても、再生用のアンテナは消えません）。アンテナの見た目は、伸縮ロッド／円形ループ／パラボラ／サイバービームの4形状に加えて、**ドットキャラ6体**（🚚トラック・🤖ロボット・🐱ネコ・🫧スライム・👻オバケ・⛩巫女）を選べます。キャラは **ONで起きて歩き、OFFで倒れて眠ります**。どれもtrk!の描きおろしで、巫女は東方Projectの二次創作ドット絵です（公式ガイドラインに従い、無料のブラウザゲームとして提供。公式の素材ではありません）。**自分のイラスト2枚**（ON用・OFF用）を選ぶこともでき、画像は端末内にだけ保存されます（設定の初期化で消えます）。
 
 **対応している形式：** MP4・MP3・M4A・OGG・OPUS・WAV・WebM・FLAC・AAC・MOV（ブラウザが再生できるもの）
 
@@ -161,6 +161,7 @@ AUTO中か、「シークバーを表示（練習用）」をオンにしてい�
 - **ノーツ**：色と形（丸・ひし形・四角）を、スキンとは別に決められます。
 - **背景映像**：カラー・モノクロ・暗め・非表示に加えて、**暗さ**と**ぼかし**をスライダーで調整できます。選曲画面の📺TVドックから、**映像フィルター45種**（レトロ・シネマ・不思議・自然など）と**TVスキン30種**（ブラウン管・ウッド・アーケード・水槽・プロジェクターなど）を切り替えられます。映像が変になったら `?safe=1` で安全な状態に戻せます。
 - **カスタムTV**：設定画面の🎨から、色6つ・形（ボタン数／列／角の丸み／画面のふち）・飾り28種・質感（光る／ガラスの反射／走査線）を選んで、自分のテレビを作れます。保存するとTVドックのスキン一覧に出て、`trk-tvskin`（JSON）で共有できます（最大30個）。
+- **📡 アンテナのキャラ肌**：バックグラウンド再生アンテナの見た目を、4形状に加えて**ドットキャラ6体**（🚚トラック・🤖ロボット・🐱ネコ・🫧スライム・👻オバケ・⛩巫女。**ON＝起きる・歩く／OFF＝倒れる・眠る** の2フレームアニメ）や**自分のイラスト2枚**（ON用・OFF用。端末内だけに保存）に変えられます。右上のコンパクトアンテナでも同じキャラが出ます。巫女は東方Projectの二次創作ドット絵（公式素材は不使用）。
 - **📺 の物理ボタンで曲を送る**：TVドックの電源・一時停止のとなりに **◀ ▶** があります。テレビのチャンネル送りみたいに、**前の曲・次の曲**へ（リストの端は先頭／末尾へ回り込み、液晶に `♪ 曲名` が出ます）。**演奏中は、初期設定では曲が飛びません**（ゲームに集中できます）。「演奏中も ◀ ▶ で曲を変える」にチェックを入れると、演奏中でも押したその場で曲が切り替わります（その回の記録は残りません）。
 - **ならべ方**：選曲画面は **📺 TV →（お気に入り）→ 🎛 ラック →（お気に入り）→ 📺 TVくわしい → 🎛 ラックくわしい** の順。テレビの**すぐ下にラック**が来るので「テレビの下にオーディオ機器」という自然な姿になります（TVとラックの上下は「くわしい」の中で入れ替え可）。
 - **⭐ お気に入りはフォルダ分け**：ドックの下に **⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り** のチップが並びます（それぞれ個数つき）。押すとボタンの中身がそのフォルダに入れ替わり、🔒で凍結、あふれたぶんは下の行に出ます。長押し（または ⋯）で、移動・📌ピン・取り外しができます。**上限はありません**。
@@ -442,6 +443,7 @@ trk! は、たくさんの音楽ゲームから着想をもらっています。
 | 自動微調整・ゴースト | beatmania IIDX |
 | RANDOM／ANTI-ROLL | EZ2ON |
 | 📻 ラジオ | DJMAX |
+| 📡 アンテナのキャラ肌「巫女」 | 東方Project（二次創作ドット絵。公式素材は不使用） |
 
 <details>
 <summary>🤫 隠しSeed（ネタバレ注意）</summary>
@@ -466,6 +468,7 @@ trk! は、たくさんの音楽ゲームから着想をもらっています。
 | ソースコード | **GNU GPL v3.0 or later**（[LICENSE](LICENSE)） |
 | 「trk!」の名前 | ライセンスの対象外です。派生版は、別の名前で公開してください |
 | 初音ミクのマスコット（`js/characters/miku.js`） | ピアプロ・キャラクター・ライセンス（PCL）に基づく二次創作です。**GPLの対象外**で、非営利・無償の範囲でのみ使えます |
+| アンテナのキャラ肌「巫女」（`js/fx-dock.js` の `ANT_CHARS`） | 東方Project（© 上海アリス幻樂団）を題材にした二次創作ドット絵です。**GPLの対象外**。[公式ガイドライン](https://touhou-project.news/guideline/)に従い無料で提供しています（公式のゲーム素材は不使用） |
 | three.js ／ three-vrm ／ three-vrm-animation ／ three-mmd-loader | MIT License（VRM・MMDの使用時にCDNから読み込み） |
 | Capacitor Core ／ Android | MIT License（任意のAndroidラッパーを生成したときだけ使用） |
 | Capacitor CLI ／ TypeScript | MIT ／ Apache-2.0（APK生成用の開発ツール。アプリ実行時には含めない） |
@@ -503,7 +506,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 - 🎪 **STAGE** — 4/5/6-lane vertical play with stairs, trills and wide notes (inspired by World Dai Star: Yume no Stellarium)
 - 🚛 **CATCH** — catch falling parcels with your truck; grab nitro cans 🚀 for **Blast mode**
 
-**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, VRM 1.0 mascots, MMD mascots (bring your own model, with an on-device 🔎 self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), 📤 **share your music folder** (one permission pulls the whole folder in at once, with an optional on-device copy of up to 150 songs / 300 MB), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, visual effect-chain editor, automatic latency compensation and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 16 built-in sounds (including electric guitar, electronic sax, and layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, a default option to lock mapped keys to the piano while synth mode is open, an optional wider on-screen keyboard for larger displays, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
+**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, antenna character skins (six original dot characters that wake up and walk when ON and fall asleep when OFF, plus your own two ON/OFF images stored on your device only; the shrine maiden is an original Touhou Project fan work drawn for trk!, following the official fan-work guidelines), VRM 1.0 mascots, MMD mascots (bring your own model, with an on-device 🔎 self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), 📤 **share your music folder** (one permission pulls the whole folder in at once, with an optional on-device copy of up to 150 songs / 300 MB), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, visual effect-chain editor, automatic latency compensation and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 16 built-in sounds (including electric guitar, electronic sax, and layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, a default option to lock mapped keys to the piano while synth mode is open, an optional wider on-screen keyboard for larger displays, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
 
 **✔ Verified packs:** song packs whose composer/charter identity and rights have been confirmed get a ✔ badge and a short message from the creator (up to 280, like a free X post). See [docs/verified.md](docs/verified.md).
 
@@ -511,7 +514,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 
 **Feedback:** casual thoughts on X [@ttrk143](https://x.com/ttrk143) (hashtag **#trkAGRG**), bugs and ideas on [GitHub Issues](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues).
 
-**License:** code under **GPL-3.0-or-later**. The name “trk!” is not licensed — please rename forks. The Hatsune Miku mascot (`js/characters/miku.js`) is fan art under the Piapro Character License (non-commercial only) and is **not** covered by the GPL; delete that file and its `<script>` line for commercial forks. MMD models and `.vmd` motions are normally loaded from your device and their authors' terms apply; the redistributable Lat-style model under `assets/mmd/lat-miku/` includes its original terms and is not covered by the GPL. Songs, charts and messages in verified packs belong to their creators.
+**License:** code under **GPL-3.0-or-later**. The name “trk!” is not licensed — please rename forks. The Hatsune Miku mascot (`js/characters/miku.js`) is fan art under the Piapro Character License (non-commercial only) and is **not** covered by the GPL; delete that file and its `<script>` line for commercial forks. The shrine-maiden antenna character skin (`ANT_CHARS` in `js/fx-dock.js`) is an original Touhou Project fan work (© Team Shanghai Alice / ZUN) following the official fan-work guidelines — no assets from the official games are used; remove its `miko` entry for a Touhou-free build. MMD models and `.vmd` motions are normally loaded from your device and their authors' terms apply; the redistributable Lat-style model under `assets/mmd/lat-miku/` includes its original terms and is not covered by the GPL. Songs, charts and messages in verified packs belong to their creators.
 
 This work depicts the character “Hatsune Miku” of Crypton Future Media, INC. under the Piapro Character License.
 

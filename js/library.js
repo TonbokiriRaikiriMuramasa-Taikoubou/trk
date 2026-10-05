@@ -333,7 +333,16 @@ Object.assign(TEXT.ja, {
   plCatalogHint:"プレイリストの「欲しい曲リスト」を取り込めます。音源ファイルは一切同梱されません。公式の入手先から自分で入手して 📁 Musicフォルダ に入れると、同じ曲名の曲が自動でプレイリストに加わります（未入手の曲は薄く表示されます）。",
   plCatalogTake:"📥 取り込む（{n}曲）", plCatalogTaken:"📥 取り込みました（{name}）。曲を入手してMusicフォルダに入れると自動で追加されます",
   plCatalogDup:"すでに取り込んでいます（{name}）", plWishHead:"📡 未入手（{n}）— 入手してMusicフォルダに入れると自動で追加",
-  plWishTag:"未入手", plGuideTitle:"📥 このプレイリストの入手先"
+  plWishTag:"未入手", plGuideTitle:"📥 このプレイリストの入手先",
+  plAuthorTools:"👥 投稿者ツール（共有プレイリストをたくさん受け取る人向け）",
+  plAuthorNamePh:"例：たぬき（共有ファイルに添わる名前）",
+  plAuthorBtn:"👥 投稿者（検索・ブロック・お気に入り）", plAuthorTitle:"👥 投稿者",
+  plAuthorSearchPh:"🔍 投稿者名でしぼりこむ", plAuthorOnly:"⭐を付けた投稿者だけ表示する",
+  plAuthorFavAdd:"⭐ お気に入り投稿者にする", plAuthorFavDel:"☆ お気に入りから外す",
+  plAuthorBlock:"🚫 この投稿者をブロック（プレイリストを隠します）", plAuthorUnblock:"🚫 ブロックを解除",
+  plAuthorNone:"投稿者の付いたプレイリストはまだありません。共有プレイリストを読み込むと「👤 投稿者」付きで入ります。",
+  plAuthorHidden:"🚫 非表示 {n} 件（ブロック中または絞り込み中）", plAuthorBy:"投稿者",
+  plAuthorBlockedView:"ブロック中の投稿者です"
 });
 Object.assign(TEXT.en, {
   plNewFolder:"📁 New folder", plDefaultFolderName:"Folder", plFolderSettings:"Folder settings",
@@ -347,7 +356,16 @@ Object.assign(TEXT.en, {
   plCatalogHint:"Import curated playlists as a “wanted songs” list. No audio files are included. Get the music from the official sources, drop it into your 📁 Music folder, and matching songs join the playlist automatically (missing songs appear dimmed).",
   plCatalogTake:"📥 Import ({n} songs)", plCatalogTaken:"📥 Imported ({name}). Add the music to your Music folder and it joins automatically.",
   plCatalogDup:"Already imported ({name})", plWishHead:"📡 Not yet in your library ({n}) — they join automatically once added to the Music folder",
-  plWishTag:"missing", plGuideTitle:"📥 How to get this music"
+  plWishTag:"missing", plGuideTitle:"📥 How to get this music",
+  plAuthorTools:"👥 Author tools (for people who receive lots of shared playlists)",
+  plAuthorNamePh:"e.g. tanuki (name attached to your shared files)",
+  plAuthorBtn:"👥 Authors (search / block / favorites)", plAuthorTitle:"👥 Authors",
+  plAuthorSearchPh:"🔍 Filter by author name", plAuthorOnly:"Show only favorite authors",
+  plAuthorFavAdd:"⭐ Mark as favorite author", plAuthorFavDel:"☆ Remove from favorites",
+  plAuthorBlock:"🚫 Block this author (hides their playlists)", plAuthorUnblock:"🚫 Unblock",
+  plAuthorNone:"No playlists with an author yet. Imported shared playlists carry a “👤 author”.",
+  plAuthorHidden:"🚫 {n} hidden (blocked or filtered out)", plAuthorBy:"Author",
+  plAuthorBlockedView:"This author is blocked"
 });
 Object.assign(TEXT.zh, {
   plNewFolder:"📁 新建文件夹", plDefaultFolderName:"文件夹", plFolderSettings:"文件夹设置",
@@ -361,7 +379,16 @@ Object.assign(TEXT.zh, {
   plCatalogHint:"导入精选播放列表的“想要的歌曲”清单。不包含任何音频文件。请从官方渠道自行获取音乐并放入 📁 Music文件夹，同名歌曲会自动加入播放列表（未获取的歌曲会以浅色显示）。",
   plCatalogTake:"📥 导入（{n}曲）", plCatalogTaken:"📥 已导入（{name}）。把音乐放进Music文件夹后会自动加入。",
   plCatalogDup:"已经导入过了（{name}）", plWishHead:"📡 尚未入库（{n}）— 获取并放入Music文件夹后会自动加入",
-  plWishTag:"未入库", plGuideTitle:"📥 这个播放列表的获取方式"
+  plWishTag:"未入库", plGuideTitle:"📥 这个播放列表的获取方式",
+  plAuthorTools:"👥 投稿者工具（适合接收大量共享播放列表的人）",
+  plAuthorNamePh:"例如：狸猫（会附在你共享的文件上）",
+  plAuthorBtn:"👥 投稿者（搜索／屏蔽／收藏）", plAuthorTitle:"👥 投稿者",
+  plAuthorSearchPh:"🔍 按投稿者名筛选", plAuthorOnly:"只显示收藏的投稿者",
+  plAuthorFavAdd:"⭐ 收藏该投稿者", plAuthorFavDel:"☆ 取消收藏",
+  plAuthorBlock:"🚫 屏蔽该投稿者（隐藏其播放列表）", plAuthorUnblock:"🚫 取消屏蔽",
+  plAuthorNone:"还没有带投稿者的播放列表。读入共享播放列表时会带上「👤 投稿者」。",
+  plAuthorHidden:"🚫 已隐藏 {n} 件（屏蔽中或筛选中）", plAuthorBy:"投稿者",
+  plAuthorBlockedView:"该投稿者已被屏蔽"
 });
 Object.assign(TEXT.ko, {
   plNewFolder:"📁 새 폴더", plDefaultFolderName:"폴더", plFolderSettings:"폴더 설정",
@@ -375,7 +402,16 @@ Object.assign(TEXT.ko, {
   plCatalogHint:"엄선 플레이리스트를 '원하는 곡 목록'으로 가져와요. 오디오 파일은 하나도 포함되지 않아요. 공식 입수처에서 직접 구해 📁 Music 폴더에 넣으면 같은 제목의 곡이 자동으로 플레이리스트에 들어와요 (미입수 곡은 연하게 표시돼요).",
   plCatalogTake:"📥 가져오기 ({n}곡)", plCatalogTaken:"📥 가져왔어요 ({name}). 음악을 Music 폴더에 넣으면 자동으로 추가돼요.",
   plCatalogDup:"이미 가져왔어요 ({name})", plWishHead:"📡 아직 없는 곡 ({n}곡) — Music 폴더에 넣으면 자동으로 추가돼요",
-  plWishTag:"미입수", plGuideTitle:"📥 이 플레이리스트 입수처"
+  plWishTag:"미입수", plGuideTitle:"📥 이 플레이리스트 입수처",
+  plAuthorTools:"👥 올린이 도구(공유 플레이리스트를 많이 받는 사람용)",
+  plAuthorNamePh:"예: 너구리(공유 파일에 붙는 이름)",
+  plAuthorBtn:"👥 올린이(검색・차단・즐겨찾기)", plAuthorTitle:"👥 올린이",
+  plAuthorSearchPh:"🔍 올린이 이름으로 찾기", plAuthorOnly:"⭐ 즐겨찾기 올린이만 보기",
+  plAuthorFavAdd:"⭐ 즐겨찾기 올린이로 등록", plAuthorFavDel:"☆ 즐겨찾기에서 빼기",
+  plAuthorBlock:"🚫 이 올린이 차단(플레이리스트 숨김)", plAuthorUnblock:"🚫 차단 해제",
+  plAuthorNone:"올린이가 붙은 플레이리스트가 아직 없어요. 공유 플레이리스트를 가져오면 '👤 올린이'가 붙어요.",
+  plAuthorHidden:"🚫 숨김 {n}건(차단 중 또는 필터 중)", plAuthorBy:"올린이",
+  plAuthorBlockedView:"차단 중인 올린이예요"
 });
 
 
@@ -409,10 +445,10 @@ function libTabsOf(all) {
   if (favN) tabs.push({ id:"fav", icon:"⭐", label:tr("favTab"), n:favN });
   const plKeys = new Set(all.map(x => x.key));
   for (const f of settings.plFolders) if (!f.parent) tabs.push({ id:"fld:" + f.id, icon: f.icon || "📁", label: f.name, n: [...plFolderUnionKeys(f.id)].filter(k => plKeys.has(k)).length, fld: f });   /* 📁 フォルダ（中のプレイリストの曲をぜんぶ） */
-  for (const p of settings.playlists) if (!p.folder) tabs.push({ id:"pl:" + p.id, icon: plIcon(p), label: p.name, n: plCount(p, plKeys), pl: p });   /* 🎧 フォルダに入っていないプレイリスト */
+  for (const p of settings.playlists) if (!p.folder && plVisible(p)) tabs.push({ id:"pl:" + p.id, icon: plIcon(p), label: p.name, n: plCount(p, plKeys), pl: p });   /* 🎧 フォルダに入っていないプレイリスト（👥投稿者で絞る） */
   if (settings.libTab.startsWith("pl:")) {   /* フォルダの中のプレイリストを見ているときは、そのタブも出す（戻れるように） */
     const cp = plById(settings.libTab.slice(3));
-    if (cp && cp.folder && !tabs.some(t => t.id === settings.libTab)) tabs.push({ id:"pl:" + cp.id, icon: plIcon(cp), label: cp.name, n: plCount(cp, plKeys), pl: cp, nested: true });
+    if (cp && cp.folder && plVisible(cp) && !tabs.some(t => t.id === settings.libTab)) tabs.push({ id:"pl:" + cp.id, icon: plIcon(cp), label: cp.name, n: plCount(cp, plKeys), pl: cp, nested: true });
   }
   const packs = new Map(), folders = new Map(), addons = new Map();
   let nFiles = 0;
@@ -492,7 +528,7 @@ function plIsDescendantFolder(id, ancestorId) {   /* id が ancestorId の中（
 }
 function plFolderUnionKeys(fldId, out = new Set(), seen = new Set()) {   /* フォルダの中の曲（子フォルダも再帰） */
   if (seen.has(fldId)) return out; seen.add(fldId);
-  for (const p of settings.playlists) if (p.folder === fldId) for (const k of p.songs) out.add(k);
+  for (const p of settings.playlists) if (p.folder === fldId && plVisible(p)) for (const k of p.songs) out.add(k);   /* 👥 ブロック中の投稿者は数えない */
   for (const f of settings.plFolders) if (f.parent === fldId) plFolderUnionKeys(f.id, out, seen);
   return out;
 }
@@ -557,6 +593,7 @@ function plSanitize(raw) {
     guide: (raw.guide && typeof raw.guide === "object") ? { note: String(raw.guide.note || "").trim().slice(0, 80),
       url: /^https:\/\/\S+$/i.test(raw.guide.url || "") ? String(raw.guide.url).slice(0, 300) : "" } : null,
     cat: typeof raw.cat === "string" && /^[a-z0-9:-]{1,40}$/i.test(raw.cat) ? raw.cat : "",
+    by: typeof raw.by === "string" ? raw.by.trim().slice(0, 24) : "",   /* 👤 投稿者（共有プレイリスト由来） */
     createdAt: (typeof raw.createdAt === "number" && raw.createdAt > 0 && raw.createdAt < 9e15) ? raw.createdAt : 0 };
 }
 (function plTighten() {
@@ -827,6 +864,65 @@ function plCatalogTake(s, pl) {
   plToast(tr("plCatalogTaken", { name: p.name }));
 }
 
+/* ---------- 👥 投稿者ツール（初期オフ。共有プレイリストをたくさん受け取る人向け） ---------- */
+function plVisible(p) {   /* 🚫ブロック中／⭐絞り込み中の投稿者のプレイリストは隠す（自分のには投稿者がない＝隠れない） */
+  if (!settings.plAuthorTools || !p || !p.by) return true;
+  if (settings.plAuthorBlock.includes(p.by)) return false;
+  if (settings.plAuthorOnly && !settings.plAuthorFav.includes(p.by)) return false;
+  return true;
+}
+function plAuthorMenu() {
+  const d = plDialog(tr("plAuthorTitle"));
+  const search = el("input", "plInput"); search.type = "text"; search.maxLength = 24; search.placeholder = tr("plAuthorSearchPh");
+  const only = el("input"); only.type = "checkbox"; only.checked = settings.plAuthorOnly === true;
+  only.addEventListener("change", () => { settings.plAuthorOnly = only.checked; saveUserPrefs(); render(); renderLib(); });
+  const list = el("div", "plShareList");
+  const hint = el("div", "plHint", "");
+  const render = () => {
+    list.textContent = "";
+    const q = search.value.trim().toLowerCase();
+    const authors = new Map();
+    for (const p of settings.playlists) if (p.by) { if (!authors.has(p.by)) authors.set(p.by, []); authors.get(p.by).push(p); }
+    for (const n of settings.plAuthorBlock) if (!authors.has(n)) authors.set(n, []);   /* プレイリストが無くなってもブロック解除できるように */
+    const names = [...authors.keys()].filter(n => !q || n.toLowerCase().includes(q)).sort((a, b) => a.localeCompare(b));
+    if (!names.length) { list.append(el("div", "libEmpty", tr("plAuthorNone"))); hint.textContent = ""; return; }
+    let hidden = 0;
+    for (const name of names) {
+      const pls = authors.get(name);
+      const blocked = settings.plAuthorBlock.includes(name), fav = settings.plAuthorFav.includes(name);
+      const row = el("div", "plShareRow" + (blocked ? " miss" : ""));
+      row.append(el("b", "", "👤 " + name));
+      const fb = el("button", "plLinkMini" + (fav ? " on" : "")); fb.type = "button"; fb.title = tr(fav ? "plAuthorFavDel" : "plAuthorFavAdd"); fb.textContent = fav ? "⭐" : "☆";
+      fb.addEventListener("click", () => {
+        settings.plAuthorFav = fav ? settings.plAuthorFav.filter(x => x !== name) : [...settings.plAuthorFav, name].slice(0, 100);
+        saveUserPrefs(); render(); renderLib();
+      });
+      const bb = el("button", "plLinkMini" + (blocked ? " on" : "")); bb.type = "button"; bb.title = tr(blocked ? "plAuthorUnblock" : "plAuthorBlock"); bb.textContent = "🚫";
+      bb.addEventListener("click", () => {
+        settings.plAuthorBlock = blocked ? settings.plAuthorBlock.filter(x => x !== name) : [...settings.plAuthorBlock, name].slice(0, 100);
+        saveUserPrefs(); render(); renderLib();
+      });
+      row.append(fb, bb);
+      list.append(row);
+      const vis = pls.filter(plVisible);
+      hidden += pls.length - vis.length;
+      if (vis.length) {
+        const chips = el("div", "plAuthorChips");
+        for (const p of vis) {
+          const c = el("button", "skinChip", `${plIcon(p)} ${p.name}（${p.songs.length}）`); c.type = "button";
+          c.addEventListener("click", () => { settings.libTab = "pl:" + p.id; saveUserPrefs(); d.close(); renderLib(); });
+          chips.append(c);
+        }
+        list.append(chips);
+      }
+    }
+    hint.textContent = hidden ? tr("plAuthorHidden", { n: hidden }) : "";
+  };
+  search.addEventListener("input", render);
+  d.card.append(search, plRow(tr("plAuthorOnly"), only), el("div", "plSep"), list, hint);
+  render();
+}
+
 function plGlobalMenu() {
   const d = plDialog(tr("plGlobalTitle"));
   const make = el("button", "plBtn", tr("plNewTab")); make.type = "button";
@@ -841,9 +937,18 @@ function plGlobalMenu() {
   const three = el("input"); three.type = "radio"; three.name = "plDelMode"; three.checked = settings.playlistDelMode === "three";
   const saveMode = () => { settings.playlistDelMode = three.checked ? "three" : "one"; saveUserPrefs(); };
   one.addEventListener("change", saveMode); three.addEventListener("change", saveMode);
+  /* 👥 投稿者ツール（初期オフ。共有プレイリストをたくさん受け取る人向け。基本のUIに出さない） */
+  const at = el("input"); at.type = "checkbox"; at.checked = settings.plAuthorTools === true;
+  const an = el("input", "plInput"); an.type = "text"; an.maxLength = 24; an.placeholder = tr("plAuthorNamePh"); an.value = settings.plAuthorName || "";
+  an.addEventListener("change", () => { settings.plAuthorName = an.value.trim().slice(0, 24); saveUserPrefs(); });
+  const nameRow = plRow(tr("plAuthorBy"), an); nameRow.hidden = !settings.plAuthorTools;
+  const abtn = el("button", "plBtn", tr("plAuthorBtn")); abtn.type = "button"; abtn.hidden = !settings.plAuthorTools;
+  abtn.addEventListener("click", () => { d.close(); plAuthorMenu(); });
+  at.addEventListener("change", () => { settings.plAuthorTools = at.checked; saveUserPrefs(); nameRow.hidden = !at.checked; abtn.hidden = !at.checked; renderLib(); });
   d.card.append(make, imp, mkfld, catb, el("div", "plSep"),
     plRow(tr("plDelOne"), one), plRow(tr("plDelThree"), three),
-    el("div", "plHint", tr("plDelModeHint")));
+    el("div", "plHint", tr("plDelModeHint")),
+    el("div", "plSep"), plRow(tr("plAuthorTools"), at), nameRow, abtn);
 }
 
 /* 曲の追加・取り外し（🧊フリーズ中は断る） */
@@ -960,6 +1065,7 @@ function plShareData(p, opts) {
   if (opts.note) src.note = String(opts.note).slice(0, 60);
   if (opts.url && /^https:\/\/\S+$/i.test(opts.url)) src.url = String(opts.url).slice(0, 300);   /* 書き出しの境界でも https を確認 */
   return { format: "trk-playlist", version: 1, name: p.name, icon: plIcon(p), color: p.color,
+    author: String(settings.plAuthorName || "").trim().slice(0, 24) || undefined,   /* 👤 投稿者名（受取側の👥投稿者ツールで検索・ブロックできる） */
     count: songs.length, createdAt: new Date(p.createdAt || Date.now()).toISOString(),
     comment: opts.comment || "", tags: opts.tags || [], source: (src.note || src.url) ? src : undefined, songs };
 }
@@ -976,6 +1082,7 @@ function plCopyText(text) {
 }
 function plShareText(v) {
   const lines = [`${v.icon || "🎧"} ${tr("plShareTextHead")}「${v.name}」（${v.count}曲）`];
+  if (v.author) lines.push("👤 " + v.author);   /* 👀 投稿者（共有ファイルから） */
   for (const s of v.songs.slice(0, 20)) {
     const bits = [s.title];
     if (s.badges) bits.push(s.badges);
@@ -1055,6 +1162,7 @@ function plSanitizeShared(raw) {
   const url = /^https:\/\/\S+$/i.test(urlRaw) ? urlRaw.slice(0, 300) : "";
   return { name: String(raw.name || "Playlist").slice(0, 24), icon: String(raw.icon || "🎧").slice(0, 4),
     color: /^[a-z]{3,12}$/.test(raw.color || "") ? raw.color : "none",
+    author: typeof raw.author === "string" ? raw.author.trim().slice(0, 24) : "",   /* 👤 投稿者名（任意・古い共有ファイルには無い） */
     count: songs.length, comment: String(raw.comment || "").slice(0, 140),
     tags: (Array.isArray(raw.tags) ? raw.tags : []).map(t => String(t).trim().slice(0, 16)).filter(Boolean).slice(0, 5),
     createdAt: String(raw.createdAt || "").slice(0, 30),
@@ -1085,6 +1193,10 @@ function plViewer(v) {
   const matched = [];
   d.card.append(el("b", "plCardTitle", `${v.icon} ${v.name}`));
   d.card.append(el("div", "plHint", [v.createdAt ? v.createdAt.slice(0, 10) : "", tr("plSongsNow", { n: v.songs.length })].filter(Boolean).join(" · ")));
+  if (v.author) {   /* 👤 投稿者（ブロック中なら 🚫 を出す。取り込むかどうかは自分で決められる） */
+    const abad = settings.plAuthorTools && settings.plAuthorBlock.includes(v.author);
+    d.card.append(el("div", "plHint", (abad ? "🚫 " : "👤 ") + tr("plAuthorBy") + "：" + v.author + (abad ? " ・ " + tr("plAuthorBlockedView") : "")));
+  }
   if (v.comment) d.card.append(el("div", "plShareComment", "📝 " + v.comment));
   if (v.tags && v.tags.length) {
     const row = el("div", "plChipsRow");
@@ -1124,7 +1236,7 @@ function plViewer(v) {
   take.disabled = !matched.length;
   take.addEventListener("click", () => {
     const p = plSanitize({ id: "pl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      name: v.name, icon: "📥", color: v.color, frozen: false, locked: false, songs: matched.map(x => x.key), tags: v.tags });
+      name: v.name, icon: "📥", color: v.color, frozen: false, locked: false, songs: matched.map(x => x.key), tags: v.tags, by: v.author || "" });
     p.createdAt = Date.now();
     settings.playlists.push(p); saveUserPrefs();
     settings.libTab = "pl:" + p.id;
@@ -1245,7 +1357,7 @@ function renderLib() {
       c.addEventListener("click", () => { settings.libTab = "fld:" + f.id; saveUserPrefs(); renderLib(); });
       bar.append(c);
     }
-    for (const p of settings.playlists) if (p.folder === fid) {
+    for (const p of settings.playlists) if (p.folder === fid && plVisible(p)) {
       const c = el("button", "skinChip"); c.type = "button"; c.textContent = `${plIcon(p)} ${p.name}（${plCount(p, new Set(all.map(x => x.key)))}）`;
       c.addEventListener("click", () => { settings.libTab = "pl:" + p.id; saveUserPrefs(); renderLib(); });
       bar.append(c);

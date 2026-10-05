@@ -201,6 +201,16 @@ if (!exists("js/catalog.js") ||
   ok("official catalog (wishlist auto-match, no bundled audio) is wired");
 }
 
+// 👥 Author tools for shared playlists (off by default; search/block/favorite).
+if (!read("js/library.js").includes("plAuthorMenu") ||
+    !read("js/library.js").includes("plVisible") ||
+    !read("js/core.js").includes("plAuthorTools") ||
+    !read("js/library.js").includes('author: String(settings.plAuthorName')) {
+  fail("shared-playlist author tools are missing");
+} else {
+  ok("author tools (search / block / favorites, default off) are wired");
+}
+
 // A cache name is deliberately checked for existence, not for a guessed
 // date, because the service worker is manually bumped for every release.
 const sw = read("sw.js");

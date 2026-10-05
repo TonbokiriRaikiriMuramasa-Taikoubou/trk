@@ -201,12 +201,25 @@ function sanitizeSong(r, i) {
   }
   return s;
 }
+function sanitizeCreditCard(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const name = pstr(raw.name, 60); if (!name) return null;
+  const card = { version:1, name };
+  const role = langText(raw.role, 80); if (role) card.role = role;
+  const tagline = langText(raw.tagline, 160); if (tagline) card.tagline = tagline;
+  const rights = langText(raw.rights, 240); if (rights) card.rights = rights;
+  const license = pstr(raw.license, 200); if (license) card.license = license;
+  const handle = pstr(raw.handle, 80); if (handle) card.handle = handle;
+  const url = pstr(raw.url, 200); if (/^https:\/\/[^\s"'<>]+$/.test(url)) card.url = url;
+  return card;
+}
 function sanitizeManifest(raw) {
   if (!raw || typeof raw !== "object" || raw.format !== PACK_FORMAT) return null;
   const name = pstr(raw.name, 40); if (!name) return null;
   const url = pstr(raw.url, 200);
   const m = { format:PACK_FORMAT, version:1, name, author:pstr(raw.author, 40), description:pstr(raw.description, 200),
               license:pstr(raw.license, 400), url:/^https:\/\/[^\s"'<>]+$/.test(url) ? url : "" };
+  const creditCard = sanitizeCreditCard(raw.creditCard); if (creditCard) m.creditCard = creditCard;
   if (raw.skin && typeof raw.skin === "object") { const d = sanitizeSkinDef({ ...raw.skin, name }); if (d) m.skin = d; }
   if (raw.notes && typeof raw.notes === "object") {
     const notes = {};
@@ -408,6 +421,7 @@ https://github.com/  (← 配布するときは、リポジトリのURLに書き
 ・曲：MP3／M4A／OGG／OPUS／WAV／FLAC／AAC／MP4／WebM（250MBまで）、譜面JSON（2MBまで）、1パック50曲まで
 ・譜面は MANUAL／TRUCK／ORBIT／STAGE／CATCH のどのモードでも共通で使われます。
 ・VRM：VRM 1.0 のみ（200MBまで）／モーション：.vrma（30MBまで）
+・pack.json の creditCard で、作者名・肩書き・権利メモ・利用条件を名刺のように表示できます（画像は含めません）。
 ・自分に再配布の権利がある素材・曲だけを入れてください。
 ・trk! の画面にドロップするだけで追加できます。
 
@@ -420,6 +434,7 @@ https://github.com/  (← 配布するときは、リポジトリのURLに書き
 - Songs: MP3/M4A/OGG/OPUS/WAV/FLAC/AAC/MP4/WebM (max 250 MB), chart JSON (max 2 MB), up to 50 songs per pack
 - Charts are shared by every mode: MANUAL / TRUCK / ORBIT / STAGE / CATCH.
 - VRM: VRM 1.0 only (max 200 MB) / Motion: .vrma (max 30 MB)
+- Use optional creditCard in pack.json to show the creator, role, rights note and terms like a name card (text only; no image asset).
 - Only include assets and songs you have the right to redistribute.
 - Drop the file onto the trk! window to install.
 `;
@@ -434,6 +449,10 @@ async function buildPack() {
   if (!name) { setStatus("packStatus", "packNeedName"); return; }
   const man = { format:PACK_FORMAT, version:1, name, author:$("packAuthor").value, description:$("packDesc").value,
                 license:$("packLicense").value, url:$("packUrl").value.trim() };
+  if ($("packCreditCard").checked) {
+    man.creditCard = { name:$("packAuthor").value.trim() || name, role:$("packRole").value, tagline:$("packDesc").value,
+                       license:$("packLicense").value, rights:$("packRights").value, url:$("packUrl").value.trim() };
+  }
   const files = {}, vf = window.ShadowTaikoVRM ? window.ShadowTaikoVRM.getFiles() : {};
   if ($("incSkin").checked) { man.skin = defFromSkin(settings.skin); man.fx = { power:settings.fxPower }; }
   if ($("incNotes").checked) {
@@ -520,8 +539,14 @@ async function buildSongPack() {
     audio:`${dir}/audio.${audioExt}`, bpm, offset, charts };
   if (bgPath) s.background = bgPath;
   if (song.previewStart != null) s.previewStart = song.previewStart;
-  const man = sanitizeManifest({ format:PACK_FORMAT, version:1, name:title.slice(0, 40), author:$("spCharter").value,
-    description:$("spArtist").value, license:$("spLicense").value, songs:[s] });
+  const rawMan = { format:PACK_FORMAT, version:1, name:title.slice(0, 40), author:$("spCharter").value,
+    description:$("spArtist").value, license:$("spLicense").value, songs:[s] };
+  if ($("spCreditCard").checked) {
+    const artist = $("spArtist").value.trim(), charter = $("spCharter").value.trim(), terms = $("spLicense").value.trim();
+    rawMan.creditCard = { name:artist || title, role:charter ? `Charter: ${charter}` : "Song creator", tagline:title,
+                          rights:terms, license:terms };
+  }
+  const man = sanitizeManifest(rawMan);
   if (!man) { setStatus("spStatus", "packBadManifest"); return; }
   const out = {}; for (const { path } of manifestPaths(man)) if (files[path]) out[path] = files[path];
   downloadBlob(await packToZip(man, out), `${safeName(title)}.stpack`);
@@ -529,6 +554,25 @@ async function buildSongPack() {
 }
 
 /* ============ パック一覧（中身はすべて textContent で表示） ============ */
+function creditCardText(value) {
+  if (typeof value === "string") return value;
+  if (!value || typeof value !== "object") return "";
+  return value[lang] || value.en || value.ja || value.zh || value.ko || "";
+}
+function appendPackCreditCard(parent, card) {
+  if (!card || !card.name) return;
+  const d = el("details", "packCreditCardBox");
+  d.append(el("summary", "", tr("packCreditTitle")));
+  const body = el("div", "packCreditCardInner");
+  body.append(el("strong", "packCreditName", card.name));
+  const role = creditCardText(card.role); if (role) body.append(el("div", "packCreditRole", role));
+  const tagline = creditCardText(card.tagline); if (tagline) body.append(el("p", "packCreditTagline", tagline));
+  const rights = creditCardText(card.rights); if (rights) body.append(el("p", "packCreditRights", "⚖ " + rights));
+  if (card.license) body.append(el("p", "packCreditLicense", "▣ " + card.license));
+  if (card.handle) body.append(el("p", "packCreditHandle", "@" + card.handle));
+  if (card.url) { const a = el("a", "packCreditUrl", card.url); a.href = card.url; a.target = "_blank"; a.rel = "noopener noreferrer"; body.append(a); }
+  d.append(body); parent.append(d);
+}
 async function renderPackList() {
   const box = $("packList"); let recs = [];
   try { recs = await packDB.all(); } catch (_) {}
@@ -547,7 +591,9 @@ async function renderPackList() {
      [m.mascot && m.mascot.motion, "badgeMotion"], [m.mascot && m.mascot.captions, "badgeCaptions"]]
       .forEach(([v, k]) => { if (v) badges.append(el("span", "packBadge", tr(k))); });
     if (m.songs) badges.append(el("span", "packBadge", tr("badgeSongs", { n:m.songs.length })));
+    if (m.creditCard) badges.append(el("span", "packBadge", tr("badgeCreditCard")));
     card.append(badges);
+    appendPackCreditCard(card, m.creditCard);
     if (m.license || m.url) {
       const d = el("details"); d.append(el("summary", "", tr("packLicenseLabel")));
       if (m.license) d.append(el("div", "", m.license));

@@ -260,6 +260,14 @@ details.panel[open]>summary{margin-bottom:14px}
 .packBadge{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;background:var(--ui-field);border:1px solid var(--ui-border)}
 .packCard details{font-size:13px;color:var(--ui-muted);margin-top:4px;word-break:break-all}
 .packCard details a{color:var(--ui-accent)}
+.packCreditCardBox{margin-top:8px;padding:8px 10px;border:1px solid rgba(255,209,102,.35);border-radius:10px;background:linear-gradient(135deg,rgba(255,209,102,.10),rgba(255,255,255,.025))}
+.packCreditCardBox summary{color:#ffe39a;font-weight:800;cursor:pointer}
+.packCreditCardInner{margin-top:8px;padding:9px;border-left:3px solid #ffd166;background:rgba(0,0,0,.14)}
+.packCreditName{display:block;color:#fff;font-size:16px}
+.packCreditRole{color:#ffd166;font-size:12px;font-weight:750}
+.packCreditTagline,.packCreditRights,.packCreditLicense,.packCreditHandle{margin:4px 0;font-size:12px;line-height:1.45;white-space:pre-wrap}
+.packCreditRights{color:#b8f0d0}.packCreditLicense{color:#bfe8ff}.packCreditHandle{color:#d7c1ff}
+.packCreditUrl{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .incList{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
 .incList .check{font-size:15px;margin:6px 0}
 

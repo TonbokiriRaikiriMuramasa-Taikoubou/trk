@@ -61,6 +61,37 @@ VRMはVRM 1.0を想定しています。MMDモデル（`.pmx` / `.pmd`）や `.v
 | `license` | string | 曲・素材の利用条件やクレジット、400文字まで |
 | `url` | string | `https://` のURL、200文字まで |
 
+### 権利カード（`creditCard`）
+
+`creditCard` は任意の「権利カード／名刺」欄です。パック一覧で折りたたみ表示され、作者名・肩書き・ひとこと・権利メモ・利用条件・配布ページを一つにまとめられます。画像を持たないテキスト形式なので、カード自体に別の素材ライセンスは発生しません。
+
+```json
+{
+  "creditCard": {
+    "version": 1,
+    "name": "Example P",
+    "role": "Composer / charter",
+    "tagline": "Original songs and charts for trk!",
+    "rights": "Redistribution allowed with credit",
+    "license": "CC BY 4.0",
+    "handle": "example_p",
+    "url": "https://example.com/example_p"
+  }
+}
+```
+
+| 項目 | 型 | 内容 |
+|---|---|---|
+| `name` | string | 必須。表示名、60文字まで |
+| `role` | string または言語オブジェクト | 肩書き、80文字まで |
+| `tagline` | string または言語オブジェクト | ひとこと、160文字まで |
+| `rights` | string または言語オブジェクト | 再配布条件など、240文字まで |
+| `license` | string | ライセンス名や利用条件、200文字まで |
+| `handle` | string | SNS等の表示用ハンドル、80文字まで。自動リンクはしません |
+| `url` | string | `https://` の配布ページ、200文字まで |
+
+言語オブジェクトは `{"ja":"日本語", "en":"English"}` のように書きます。表示言語に該当する値がなければ英語、次に日本語などへフォールバックします。`creditCard` は権利の証明そのものではないため、必要な原文ReadMeや正式なライセンス文書はパック内または配布ページに残してください。
+
 ### 見た目
 
 - `skin`：trk!のスキン定義。設定画面から書き出したスキンJSONを元にできます。

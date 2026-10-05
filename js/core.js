@@ -78,11 +78,14 @@ const savedSkinAtBoot = typeof prefs.skin === "string" ? prefs.skin : "";   // �
 const settings = {
   language: pick(prefs.language, ["ja", "en", "zh", "ko"], guessLang()),
   skin: SKINS[prefs.skin] ? prefs.skin : ({ dark:"shadow", light:"daylight" }[prefs.skin] || "shadow"),
+  skinShelfOpen: prefs.skinShelfOpen !== false,      // 🖼 スキンの棚の開閉（30種＋カスタムでも設定画面が膨らまないように）
+  skinShelfCat: pick(prefs.skinShelfCat, ["all","basic","miku","dark","light","grad","fun","custom"], "all"),
   layout: pick(prefs.layout ?? prefs.gameplayLayout, Object.keys(LAYOUTS), "classic"),
   videoStyle: pick(prefs.videoStyle, (typeof TRK_TV_PRESETS !== "undefined" ? TRK_TV_PRESETS.map(p=>p.id) : ["skin","color","mono","dim","off"]), "skin"),
   videoZoom: num(prefs.videoZoom, .5, 3, 1),
   videoKeys: savedVideoKeys,
   castPolicy: pick(prefs.castPolicy, ["off", "antenna"], "off"),
+  backgroundPolicy: pick(prefs.backgroundPolicy, ["off", "antenna", "corner"], prefs.castPolicy === "antenna" ? "antenna" : "off"),
   bgDim: num(prefs.bgDim, 0, .9, 0),
   bgBlur: num(prefs.bgBlur, 0, 12, 0),
   scroll: num(prefs.scroll, .5, 2.5, 1.2),
@@ -99,6 +102,9 @@ const settings = {
   hideGameplayUI: !!prefs.hideGameplayUI,
   playerMode: !!prefs.playerMode,
   helpText: prefs.helpText !== false,
+  tutorialDone: prefs.tutorialDone === true,
+  tutorialStamps: (Array.isArray(prefs.tutorialStamps) ? prefs.tutorialStamps : []).filter(x => ["song", "look", "play", "safe", "seed"].includes(x)),   /* 🧭 スタンプラリー（順番自由・5つでごほうび） */
+  skinGradUnlocked: prefs.skinGradUnlocked === true,
   menuKey: validCode(prefs.menuKey) ? prefs.menuKey : "KeyM",
   menuConfirm: prefs.menuConfirm !== false,
   mediaExitKey: validCode(prefs.mediaExitKey) ? prefs.mediaExitKey : "Escape",
@@ -109,6 +115,8 @@ const settings = {
   seEnabled: !!prefs.seEnabled,
   seVolume: num(prefs.seVolume, 0, 1, .28),
   musicVolume: num(prefs.musicVolume, 0, 1, .7),
+  bannerPause: prefs.bannerPause === true,                                   // ⏯ 右上の曲名バナーをタップで一時停止（初期オフ）
+  bannerSongBtns: prefs.bannerSongBtns !== false,                            // ◀▶ バナー左右の曲送りボタン（初期オン）
   /* 🎹 シンセ演奏モード */
   synthModeDisabled: !!prefs.synthModeDisabled,
   synthModeFastStart: !!prefs.synthModeFastStart,
@@ -135,7 +143,17 @@ const settings = {
   activePack: typeof prefs.activePack === "string" ? prefs.activePack : null,
   previewEnabled: prefs.previewEnabled !== false,
   libSort: pick(prefs.libSort, ["name", "plays", "recent", "best"], "name"),
+  shortMode: pick(prefs.shortMode, ["off", "90", "120", "180"], "off"),      // 🕹️ ショートプレイ（後半だけ遊ぶ・初期オフ）
+  shortMode: pick(prefs.shortMode, ["off", "90", "120", "180"], "off"),      // 🕹️ ショートプレイ（後半だけ遊ぶ・初期オフ）
   libTab: typeof prefs.libTab === "string" ? prefs.libTab : "all",            // 📚 選んでいる棚（タブ）のID
+  playlists: (Array.isArray(prefs.playlists) ? prefs.playlists : []).filter(p => p && typeof p === "object").slice(0, 24),   // 🎧 ユーザー定義プレイリスト（library.js が読み込み時に検証）
+  plFolders: (Array.isArray(prefs.plFolders) ? prefs.plFolders : []).filter(f => f && typeof f === "object").slice(0, 12),  // 📁 プレイリストフォルダ（ネスト可。library.js が検証）
+  playlistDelMode: prefs.playlistDelMode === "three" ? "three" : "one",       // 🎧 タブの中クリック削除を3回にするモード
+  plAuthorTools: prefs.plAuthorTools === true,                                // 👥 投稿者ツール（初期オフ。library.js）
+  plAuthorName: typeof prefs.plAuthorName === "string" ? prefs.plAuthorName.slice(0, 24) : "",   // 👤 共有ファイルに添える投稿者名
+  plAuthorBlock: (Array.isArray(prefs.plAuthorBlock) ? prefs.plAuthorBlock : []).map(x => String(x).slice(0, 24)).filter(Boolean).slice(0, 100),   // 🚫 ブロックした投稿者
+  plAuthorFav: (Array.isArray(prefs.plAuthorFav) ? prefs.plAuthorFav : []).map(x => String(x).slice(0, 24)).filter(Boolean).slice(0, 100),        // ⭐ お気に入り投稿者
+  plAuthorOnly: prefs.plAuthorOnly === true,                                  // 👥 ⭐のお気に入り投稿者だけ表示
   libSkin: typeof prefs.libSkin === "string" ? prefs.libSkin : "player",      // 📚 棚のスキン（js/lib-skins.js が検証）
   libSkinQuick: prefs.libSkinQuick !== false,                                 // 📚 曲リストの 🎨 ボタンを出す
   libKeepShared: prefs.libKeepShared === true,                                // 📤💾 共有で取り込んだ曲を端末に残す（初期オフ。library.js）
@@ -191,7 +209,7 @@ const gameplayFxPower = () => settings.fxPower * gameplayFxMultiplier();
    ノーツ設定は細かく詰める人が多いので、tv/audioリセットでは保持される。 */
 function resetVideoPrefs() {
   settings.videoStyle = "color";
-  settings.videoZoom = 1; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.castPolicy = "off"; settings.fxAntenna = false; settings.mediaLoopTrigger = "toggle"; settings.mediaWallTrigger = "toggle"; settings.mediaWallStyle = "midnight"; settings.mediaWallClock = true; settings.mediaWallStopsVideo = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true;
+  settings.videoZoom = 1; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.castPolicy = "off"; settings.backgroundPolicy = "off"; settings.fxAntenna = false; settings.fxAntennaShape = "rod"; settings.fxAntennaCustomOn = ""; settings.fxAntennaCustomOff = ""; settings.mediaLoopTrigger = "toggle"; settings.mediaWallTrigger = "toggle"; settings.mediaWallStyle = "midnight"; settings.mediaWallClock = true; settings.mediaWallStopsVideo = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true;
   settings.bgDim = 0; settings.bgBlur = 0;
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = true;
@@ -207,7 +225,7 @@ function resetVideoPrefs() {
   if (typeof menuVideoTick === "function") { try { menuVideoTick(); } catch(_) {} }
 }
 function resetAudioPrefs() {
-  settings.musicVolume = 0.7; settings.seVolume = 0.28; settings.seEnabled = false;
+  settings.musicVolume = 0.7; settings.seVolume = 0.28; settings.seEnabled = false; settings.bannerPause = false; settings.bannerSongBtns = true;
   settings.synthModeDisabled = false; settings.synthModeFastStart = false; settings.synthModeKeyboardLock = true; settings.synthModeWideKeyboard = false;
   // fx-dock / eq-dock の音まわりがあれば一緒に初期化
   if ("gameVolume" in settings) settings.gameVolume = 0.7;
@@ -232,7 +250,7 @@ window.TrkSafeMode = () => safeModeOn;
 function enterSafeMode() {
   safeModeOn = true;
   settings.videoStyle = "off";
-  settings.videoZoom = 1; settings.castPolicy = "off"; settings.fxAntenna = false;
+  settings.videoZoom = 1; settings.castPolicy = "off"; settings.backgroundPolicy = "off"; settings.fxAntenna = false;
   settings.bgDim = 0; settings.bgBlur = 0;
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = false;
@@ -250,10 +268,10 @@ function enterSafeMode() {
 }
 function resetAllPrefs() {
   resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs();
-  settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
+  settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
   settings.catchNitroBonus = true; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();
-  settings.judge = "standard"; settings.rate = 1;
+  settings.judge = "standard"; settings.rate = 1; settings.shortMode = "off"; settings.shortMode = "off";
   settings.hidden = false; settings.sudden = false; settings.modMirror = false; settings.modRandom = false; settings.showMasterDiff = false;
   settings.mascot = "skin"; settings.vrmFrame = "full";
   settings.mmdScale = 1; settings.mmdTurn = 0; settings.mmdMotionBpm = 0; settings.mmdMotionKind = "none";
@@ -523,9 +541,49 @@ function applyLanguage(code) {
 }
 
 /* ---------- スキン ---------- */
+const SKIN_CATS = [["all","catAll"],["basic","catBasic"],["miku","catMiku"],["dark","catDark"],["light","catLight"],["grad","catGrad"],["fun","catFun"],["custom","catCustom"]];
+const skinCatList = s => (s.custom || s.pack) ? ["custom"] : (Array.isArray(s.cat) && s.cat.length ? s.cat : ["basic"]);
+/* 今 使っているスキン（棚を閉じていても見える）。押すと棚が開く */
+function buildSkinNow() {
+  const now = $("skinNow"); if (!now) return;
+  const s = skin(); now.textContent = "";
+  const b = el("button", "skinCard"); b.type = "button";
+  b.style.setProperty("--sk-bg", s.game.stage); b.style.setProperty("--sk-text", s.ui["--ui-text"]);
+  b.style.setProperty("--sk-border", s.ui["--ui-border"]);
+  if (s.font) b.style.fontFamily = s.font;
+  const dots = el("span", "dots");
+  for (const c of [s.ui["--ui-accent"], s.ui["--ui-gold"], s.ui["--ui-text"]]) { const d = el("i", "dot square"); d.style.background = c; dots.append(d); }
+  b.append(dots, el("b", "", s.label[lang] || s.label.en), el("small", "", (s.desc && (s.desc[lang] || s.desc.en)) || ""));
+  b.title = tr("skinShelf"); b.setAttribute("aria-label", tr("skinShelf"));
+  b.addEventListener("click", () => { const shelf = $("skinShelf"); if (shelf) shelf.open = true; });
+  now.append(b);
+}
 function buildSkinGrid() {
-  const grid = $("skinGrid"); grid.textContent = "";
+  const grid = $("skinGrid"); if (!grid) return;
+  grid.textContent = "";
+  /* 棚のチップ（そのカテゴリーに属するスキンがないときはチップ自体を出さない） */
+  const cats = new Set(); for (const s of Object.values(SKINS)) skinCatList(s).forEach(c => cats.add(c));
+  const cat = settings.skinShelfCat !== "all" && cats.has(settings.skinShelfCat) ? settings.skinShelfCat : "all";
+  const chips = $("skinChips");
+  if (chips) {
+    chips.textContent = "";
+    for (const [id, key] of SKIN_CATS) {
+      if (id !== "all" && !cats.has(id)) continue;
+      const c = el("button", "skinChip"); c.type = "button"; c.textContent = tr(key);
+      c.classList.toggle("on", id === cat); c.setAttribute("aria-pressed", String(id === cat));
+      c.addEventListener("click", () => { settings.skinShelfCat = id; saveUserPrefs(); buildSkinGrid(); });
+      chips.append(c);
+    }
+  }
+  const count = $("skinShelfCount"); if (count) count.textContent = `（${Object.keys(SKINS).length}）`;
   for (const [id, s] of Object.entries(SKINS)) {
+    if (cat !== "all" && !skinCatList(s).includes(cat)) continue;
+    if (s.locked && !settings.skinGradUnlocked) {   /* ❓ ごほうびスキン（スタンプ5つで解禁）は、正体不明カードで出す */
+      const q = el("button", "skinCard locked"); q.type = "button"; q.disabled = true; q.title = tr("skinLockedHint");
+      q.style.setProperty("--sk-bg", "#10142a"); q.style.setProperty("--sk-text", "var(--ui-muted)"); q.style.setProperty("--sk-border", "var(--ui-border)");
+      q.append(el("b", "", "❓ ？？？"), el("small", "", tr("skinLockedHint")));
+      grid.append(q); continue;
+    }
     const b = el("button", "skinCard"); b.type = "button"; b.dataset.skin = id;
     b.style.setProperty("--sk-bg", s.game.stage); b.style.setProperty("--sk-text", s.ui["--ui-text"]);
     b.style.setProperty("--sk-border", s.ui["--ui-border"]);
@@ -553,6 +611,7 @@ function applyNoteVars() {
   root.setProperty("--don", settings.notes[0].color); root.setProperty("--ka", settings.notes[1].color);
 }
 function applySkin(id, persist = true) {
+  if (SKINS[id] && SKINS[id].locked && !settings.skinGradUnlocked) id = "shadow";   /* 🔒 ごほうびスキンは、スタンプ5つで解禁されるまで当てられない */
   settings.skin = SKINS[id] ? id : "shadow";
   const s = skin(), root = document.documentElement.style;
   for (const [k, v] of Object.entries(s.ui)) root.setProperty(k, v);
@@ -564,6 +623,7 @@ function applySkin(id, persist = true) {
   document.querySelectorAll("#skinGrid .skinCard").forEach(b => {
     b.classList.toggle("selected", b.dataset.skin === settings.skin); b.setAttribute("aria-pressed", b.dataset.skin === settings.skin);
   });
+  buildSkinNow();
   view.style.filter = videoFilter();
   updateTouchKeys();
   if (persist) saveUserPrefs();
@@ -670,7 +730,7 @@ function showScreen(id) {
   stage.dataset.screen = id || "none";
   emit("screen", id);
 }
-function openSettings() { if (phase === "title") showScreen("settingsScreen"); }
+function openSettings() { if (phase === "title") { showScreen("settingsScreen"); emit("settings"); } }   /* 🧭 スタンプ「設定を見た」の検知 */
 function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
 
 /* ---------- 緊急復旧パネルのボタン ---------- */

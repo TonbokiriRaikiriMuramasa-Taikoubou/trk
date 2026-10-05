@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：データ（スキン・レイアウト・難易度・マスコット登録） ============
    内蔵スキンを増やすときは SKINS に1項目足すだけで、設定画面の一覧に出ます。
-     ui     : メニュー画面の色（CSS変数）
+     ui     : メニュー画面の色（CSS変数）。--ui-bg は linear-gradient(…) も可（グラデーション）
+     cat    : （任意）スキンの棚での絞り込み用タグ（basic / miku / dark / light / grad / fun の配列）
      game   : プレイ画面の色
      shapes : [ドン, カッ] の「おすすめ」ノーツ形状（circle / diamond / square）
      video  : 背景映像に掛けるCSSフィルター
@@ -42,6 +43,7 @@ function mixHex(a, b, t) {
 /* ---------- 内蔵スキン（キャラクターに依存しないもの） ---------- */
 const SKINS = {
   shadow: {
+    cat:["basic"],
     label:{ja:"シャドウ",en:"Shadow",zh:"暗影",ko:"섀도우"},
     desc:{ja:"白黒シルエットの原点",en:"The original monochrome silhouette",zh:"原版黑白剪影",ko:"오리지널 흑백 실루엣"},
     ui:{"--ui-bg":"#07080d","--ui-panel":"rgba(14,16,24,.96)","--ui-soft":"rgba(255,255,255,.05)","--ui-text":"#f4f4f8",
@@ -53,6 +55,7 @@ const SKINS = {
     shapes:["circle","circle"], video:"grayscale(1) contrast(1.7)"
   },
   daylight: {
+    cat:["basic"],
     label:{ja:"デイライト",en:"Daylight",zh:"日光",ko:"데이라이트"},
     desc:{ja:"明るく見やすいライトテーマ",en:"Clean, bright light theme",zh:"明亮清爽的浅色主题",ko:"밝고 깔끔한 라이트 테마"},
     ui:{"--ui-bg":"#eef1f6","--ui-panel":"rgba(255,255,255,.97)","--ui-soft":"rgba(20,30,50,.045)","--ui-text":"#1f2433",
@@ -64,6 +67,7 @@ const SKINS = {
     shapes:["circle","circle"], video:"grayscale(1) contrast(1.25) brightness(1.12)"
   },
   neon: {
+    cat:["basic"],
     label:{ja:"ネオンアーケード",en:"Neon Arcade",zh:"霓虹街机",ko:"네온 아케이드"},
     desc:{ja:"シンセウェーブ風の発光",en:"Synthwave glow",zh:"合成波霓虹光效",ko:"신스웨이브 네온"},
     ui:{"--ui-bg":"#0b0418","--ui-panel":"rgba(20,8,40,.95)","--ui-soft":"rgba(255,43,214,.06)","--ui-text":"#fbefff",
@@ -76,6 +80,7 @@ const SKINS = {
     font:'"Trebuchet MS","Avenir Next",system-ui,sans-serif'
   },
   sakura: {
+    cat:["basic"],
     label:{ja:"サクラ",en:"Sakura",zh:"樱花",ko:"사쿠라"},
     desc:{ja:"やわらかい桜色",en:"Soft cherry-blossom pastel",zh:"柔和樱花色",ko:"부드러운 벚꽃 파스텔"},
     ui:{"--ui-bg":"#fff0f4","--ui-panel":"rgba(255,250,252,.97)","--ui-soft":"rgba(214,77,128,.06)","--ui-text":"#3a2330",
@@ -87,6 +92,7 @@ const SKINS = {
     shapes:["circle","circle"], video:"sepia(.25) saturate(1.15) brightness(1.06)"
   },
   terminal: {
+    cat:["basic"],
     label:{ja:"ターミナル",en:"Terminal",zh:"终端",ko:"터미널"},
     desc:{ja:"レトロCRT・走査線",en:"Retro CRT with scanlines",zh:"复古CRT扫描线",ko:"레트로 CRT 주사선"},
     ui:{"--ui-bg":"#020a04","--ui-panel":"rgba(3,14,6,.96)","--ui-soft":"rgba(57,255,20,.05)","--ui-text":"#b8ffb0",
@@ -99,6 +105,7 @@ const SKINS = {
     font:'"Cascadia Mono","Consolas","Menlo","Noto Sans Mono",monospace'
   },
   clarity: {
+    cat:["basic"],
     label:{ja:"クラリティ",en:"Clarity",zh:"清晰",ko:"클래리티"},
     desc:{ja:"色覚多様性に配慮・形でも区別",en:"Colorblind-safe, shape-coded",zh:"色觉友好·形状区分",ko:"색각 친화 · 모양으로 구분"},
     ui:{"--ui-bg":"#000000","--ui-panel":"#0d0d0d","--ui-soft":"rgba(255,255,255,.06)","--ui-text":"#ffffff",
@@ -110,6 +117,7 @@ const SKINS = {
     shapes:["circle","diamond"], video:"grayscale(1) brightness(.55)"
   },
   buddy: {
+    cat:["basic"],
     label:{ja:"オレンジ相棒",en:"Orange Buddy",zh:"橙色搭档",ko:"오렌지 버디"},
     desc:{ja:"AIあるあるミームで応援",en:"Cheers you on with AI-assistant memes",zh:"用AI助手梗为你加油",ko:"AI 어시스턴트 밈으로 응원"},
     ui:{"--ui-bg":"#17110d","--ui-panel":"rgba(34,24,18,.96)","--ui-soft":"rgba(255,140,60,.06)","--ui-text":"#fff3e6",
@@ -122,6 +130,7 @@ const SKINS = {
     font:'"Trebuchet MS","Avenir Next",system-ui,sans-serif', mascot:"buddy"
   },
   snowfield: {   // 標準マスコット（冬服ミク）は characters/miku.js があるときだけ設定されます
+    cat:["basic"],
     label:{ja:"スノーフィールド",en:"Snowfield",zh:"雪原",ko:"스노필드"},
     desc:{ja:"雪景色のライトテーマ",en:"Snowy light theme",zh:"雪景浅色主题",ko:"눈 풍경 라이트 테마"},
     ui:{"--ui-bg":"#eef5fb","--ui-panel":"rgba(255,255,255,.96)","--ui-soft":"rgba(40,90,140,.05)","--ui-text":"#1d3550",
@@ -131,6 +140,241 @@ const SKINS = {
     game:{don:"#ff5d7a",ka:"#3a9be0",stage:"#e8f1f8",lane:"rgba(255,255,255,.82)",track:"rgba(40,90,140,.22)",ink:"#1d3550",
       inkShadow:"rgba(255,255,255,.9)",noteBorder:"#ffffff",panel:"rgba(244,249,253,.96)",perfect:"#c2477e",good:"#1d3550",miss:"#8aa0b6",glow:false},
     shapes:["circle","circle"], video:"grayscale(.6) brightness(1.1) contrast(1.1) hue-rotate(180deg) saturate(.6)"
+  },
+  /* ---------- 追加プリセット（2026-10 スキンの棚と同時に追加。グラデは --ui-bg / game.stage へ直書き） ---------- */
+  garden: {
+    cat:["light"],
+    label:{ja:"ミントガーデン",en:"Mint Garden",zh:"薄荷花园",ko:"민트 가든"},
+    desc:{ja:"緑と白のすっきりテーマ",en:"Crisp green and white",zh:"绿与白的清爽主题",ko:"그린과 화이트의 산뜻한 테마"},
+    ui:{"--ui-bg":"#eef6ef","--ui-panel":"rgba(255,255,255,.97)","--ui-soft":"rgba(30,110,70,.05)","--ui-text":"#1e3527",
+      "--ui-muted":"#5f7d6a","--ui-border":"rgba(30,110,70,.22)","--ui-button":"#e2f0e5","--ui-button-hover":"#d0e8d6",
+      "--ui-field":"#ffffff","--ui-accent":"#2e9e5b","--ui-on-accent":"#ffffff","--ui-gold":"#e0853a",
+      "--ui-shadow":"0 24px 70px rgba(30,80,50,.14)","--ui-glow":"rgba(46,158,91,.12)"},
+    game:{don:"#ff5d7a",ka:"#2e9e5b",stage:"#edf6ee",lane:"rgba(255,255,255,.84)",track:"rgba(46,158,91,.24)",ink:"#1e3527",
+      inkShadow:"rgba(255,255,255,.9)",noteBorder:"#ffffff",panel:"rgba(246,250,246,.96)",perfect:"#e0853a",good:"#1e3527",miss:"#93ac9c",glow:false},
+    shapes:["circle","circle"], video:"saturate(1.05) brightness(1.05)"
+  },
+  strawberry: {
+    cat:["light","grad"],
+    label:{ja:"ストロベリーホイップ",en:"Strawberry Whip",zh:"草莓奶昔",ko:"스트로베리 휩"},
+    desc:{ja:"いちごミルクのやさしいグラデ",en:"A gentle strawberry-milk gradient",zh:"草莓牛奶般的柔和渐变",ko:"딸기우유 같은 부드러운 그라데이션"},
+    ui:{"--ui-bg":"linear-gradient(180deg,#fff8f4,#ffe9f0)","--ui-panel":"rgba(255,251,248,.97)","--ui-soft":"rgba(224,86,120,.06)","--ui-text":"#40222e",
+      "--ui-muted":"#8d6272","--ui-border":"rgba(224,86,120,.26)","--ui-button":"#ffeef2","--ui-button-hover":"#ffdfe8",
+      "--ui-field":"#fffdfa","--ui-accent":"#e0568a","--ui-on-accent":"#ffffff","--ui-gold":"#d9782a",
+      "--ui-shadow":"0 24px 70px rgba(160,60,100,.14)","--ui-glow":"rgba(224,86,120,.13)"},
+    game:{don:"#e0568a",ka:"#5a9ec9",stage:"linear-gradient(180deg,#fff3ec,#ffdee9)",lane:"rgba(255,246,242,.84)",track:"rgba(224,86,120,.26)",ink:"#40222e",
+      inkShadow:"rgba(255,255,255,.9)",noteBorder:"#ffffff",panel:"rgba(255,247,244,.96)",perfect:"#d9782a",good:"#40222e",miss:"#ab8b96",glow:false},
+    shapes:["circle","circle"], video:"sepia(.15) saturate(1.1) brightness(1.05)"
+  },
+  melonberry: {
+    cat:["light","grad","fun"],
+    label:{ja:"メロンベリー",en:"Melon Berry",zh:"蜜瓜莓果",ko:"멜론베리"},
+    desc:{ja:"緑×ピンクのポップな横グラデ",en:"A pop green-and-pink side gradient",zh:"绿×粉的流行横向渐变",ko:"그린×핑크 팝한 가로 그라데이션"},
+    ui:{"--ui-bg":"linear-gradient(90deg,#eaf8ee,#ffeef5)","--ui-panel":"rgba(255,255,255,.96)","--ui-soft":"rgba(255,107,157,.06)","--ui-text":"#263428",
+      "--ui-muted":"#6b7f70","--ui-border":"rgba(46,158,91,.24)","--ui-button":"#eaf5ee","--ui-button-hover":"#ddeee4",
+      "--ui-field":"#fefffe","--ui-accent":"#ff6b9d","--ui-on-accent":"#ffffff","--ui-gold":"#2e9e5b",
+      "--ui-shadow":"0 24px 70px rgba(60,110,80,.13)","--ui-glow":"rgba(255,107,157,.12)"},
+    game:{don:"#ff6b9d",ka:"#2e9e5b",stage:"linear-gradient(90deg,#e6f7ea,#ffe8f2)",lane:"rgba(255,255,255,.82)",track:"rgba(255,107,157,.26)",ink:"#263428",
+      inkShadow:"rgba(255,255,255,.9)",noteBorder:"#ffffff",panel:"rgba(250,253,251,.96)",perfect:"#2e9e5b",good:"#263428",miss:"#9aab9f",glow:false},
+    shapes:["circle","circle"], video:"saturate(1.1) brightness(1.06)"
+  },
+  dusk: {
+    cat:["dark","grad"],
+    label:{ja:"宵闇",en:"Duskfall",zh:"暮色",ko:"황혼"},
+    desc:{ja:"紫の夜に沈むグラデ",en:"Sinking into a purple night",zh:"沉入紫色夜幕的渐变",ko:"보라빛 밤으로 가라앉는 그라데이션"},
+    ui:{"--ui-bg":"linear-gradient(180deg,#241b4d,#0e1430)","--ui-panel":"rgba(20,17,44,.95)","--ui-soft":"rgba(157,140,255,.06)","--ui-text":"#eef0ff",
+      "--ui-muted":"#a5a8cc","--ui-border":"rgba(150,140,255,.30)","--ui-button":"#1c1940","--ui-button-hover":"#282356",
+      "--ui-field":"#131030","--ui-accent":"#9d8cff","--ui-on-accent":"#141033","--ui-gold":"#ffb84d",
+      "--ui-shadow":"0 0 60px rgba(120,100,255,.20)","--ui-glow":"rgba(157,140,255,.16)"},
+    game:{don:"#ff6b8f",ka:"#9d8cff",stage:"linear-gradient(180deg,#1a1438,#0a0f26)",lane:"rgba(12,10,30,.66)",track:"rgba(157,140,255,.30)",ink:"#eef0ff",
+      inkShadow:"rgba(0,0,0,.85)",noteBorder:"#ffffff",panel:"rgba(18,15,40,.95)",perfect:"#ffb84d",good:"#eef0ff",miss:"#6f7396",glow:true},
+    shapes:["circle","circle"], video:"grayscale(1) contrast(1.4) sepia(1) hue-rotate(220deg) saturate(1.8) brightness(.7)"
+  },
+  abyss: {
+    cat:["dark","grad"],
+    label:{ja:"深海",en:"Deep Sea",zh:"深海",ko:"심해"},
+    desc:{ja:"青緑の深い海の底",en:"The teal depths of the ocean",zh:"青绿色的深海之底",ko:"청록빛 깊은 바다 밑바닥"},
+    ui:{"--ui-bg":"linear-gradient(180deg,#062a33,#010a10)","--ui-panel":"rgba(6,32,40,.95)","--ui-soft":"rgba(62,230,200,.06)","--ui-text":"#e6fbff",
+      "--ui-muted":"#8fb8c1","--ui-border":"rgba(64,220,220,.28)","--ui-button":"#0a3540","--ui-button-hover":"#0f4753",
+      "--ui-field":"#052028","--ui-accent":"#3ee6c8","--ui-on-accent":"#032a24","--ui-gold":"#ffd166",
+      "--ui-shadow":"0 0 60px rgba(62,230,200,.16)","--ui-glow":"rgba(62,230,200,.14)"},
+    game:{don:"#ff7a6b",ka:"#3ee6c8",stage:"linear-gradient(180deg,#052028,#000609)",lane:"rgba(2,16,22,.68)",track:"rgba(62,230,200,.30)",ink:"#e6fbff",
+      inkShadow:"rgba(0,0,0,.85)",noteBorder:"#ffffff",panel:"rgba(5,26,33,.95)",perfect:"#ffd166",good:"#e6fbff",miss:"#5c8188",glow:true},
+    shapes:["circle","circle"], video:"grayscale(.7) hue-rotate(160deg) saturate(1.3) brightness(.55) contrast(1.2)"
+  },
+  ember: {
+    cat:["dark","grad"],
+    label:{ja:"残炎",en:"Embers",zh:"余烬",ko:"잔불"},
+    desc:{ja:"燃えさかる赤と灰の煙",en:"Smoldering red with a wisp of ash",zh:"燃烧的赤红与灰烟",ko:"타오르는 붉은빛과 재의 연기"},
+    ui:{"--ui-bg":"linear-gradient(180deg,#3a0f0a,#120303)","--ui-panel":"rgba(40,14,10,.95)","--ui-soft":"rgba(255,106,61,.07)","--ui-text":"#fff1ea",
+      "--ui-muted":"#c39a8c","--ui-border":"rgba(255,110,60,.30)","--ui-button":"#2e0f0a","--ui-button-hover":"#3f150d",
+      "--ui-field":"#200806","--ui-accent":"#ff6a3d","--ui-on-accent":"#2a0b04","--ui-gold":"#ffc861",
+      "--ui-shadow":"0 0 60px rgba(255,106,61,.18)","--ui-glow":"rgba(255,106,61,.15)"},
+    game:{don:"#ff5a2e",ka:"#9fc3e0",stage:"linear-gradient(180deg,#2a0b07,#0c0202)",lane:"rgba(24,8,6,.68)",track:"rgba(255,106,61,.30)",ink:"#fff1ea",
+      inkShadow:"rgba(0,0,0,.85)",noteBorder:"#ffffff",panel:"rgba(32,11,8,.95)",perfect:"#ffd166",good:"#fff1ea",miss:"#8a6a5e",glow:true},
+    shapes:["circle","circle"], video:"sepia(.6) saturate(1.5) hue-rotate(-15deg) brightness(.6) contrast(1.25)"
+  },
+  dawn: {
+    cat:["light","grad"],
+    label:{ja:"朝焼け",en:"Daybreak",zh:"朝霞",ko:"새벽빛"},
+    desc:{ja:"白から桃色にひろがる朝",en:"White melting into peach morning light",zh:"从纯白铺开到桃色的清晨",ko:"흰색에서 복숭아빛으로 퍼지는 아침"},
+    ui:{"--ui-bg":"linear-gradient(180deg,#fdfbf7,#ffe3d3)","--ui-panel":"rgba(255,253,250,.96)","--ui-soft":"rgba(224,106,74,.06)","--ui-text":"#3a2c28",
+      "--ui-muted":"#8a7168","--ui-border":"rgba(224,120,80,.24)","--ui-button":"#fbf0e8","--ui-button-hover":"#f6e3d6",
+      "--ui-field":"#fffdfa","--ui-accent":"#e06a4a","--ui-on-accent":"#ffffff","--ui-gold":"#c47f2a",
+      "--ui-shadow":"0 24px 70px rgba(160,90,60,.14)","--ui-glow":"rgba(224,106,74,.12)"},
+    game:{don:"#e06a4a",ka:"#5a9ec9",stage:"linear-gradient(180deg,#fdf6ee,#ffdcc7)",lane:"rgba(255,250,244,.82)",track:"rgba(224,106,74,.22)",ink:"#3a2c28",
+      inkShadow:"rgba(255,255,255,.9)",noteBorder:"#ffffff",panel:"rgba(254,249,244,.96)",perfect:"#c47f2a",good:"#3a2c28",miss:"#a8907f",glow:false},
+    shapes:["circle","circle"], video:"sepia(.2) saturate(1.15) brightness(1.08)"
+  },
+  midnightsun: {
+    cat:["light","grad"],
+    label:{ja:"白夜",en:"Midnight Sun",zh:"白夜",ko:"백야"},
+    desc:{ja:"地平線の金色の光",en:"Gold light on the horizon",zh:"地平线上的金色光芒",ko:"지평선의 금빛"},
+    ui:{"--ui-bg":"linear-gradient(0deg,#fff7df,#fdfdfa)","--ui-panel":"rgba(255,255,250,.96)","--ui-soft":"rgba(184,145,46,.06)","--ui-text":"#33301f",
+      "--ui-muted":"#7d7660","--ui-border":"rgba(160,130,50,.26)","--ui-button":"#faf5e4","--ui-button-hover":"#f3ecd4",
+      "--ui-field":"#fffdf6","--ui-accent":"#b8912e","--ui-on-accent":"#ffffff","--ui-gold":"#e07a4a",
+      "--ui-shadow":"0 24px 70px rgba(140,110,40,.14)","--ui-glow":"rgba(184,145,46,.13)"},
+    game:{don:"#e07a4a",ka:"#4a7fa8",stage:"linear-gradient(0deg,#fdf3d8,#ffffff)",lane:"rgba(255,255,248,.82)",track:"rgba(184,145,46,.24)",ink:"#33301f",
+      inkShadow:"rgba(255,255,255,.9)",noteBorder:"#ffffff",panel:"rgba(254,252,244,.96)",perfect:"#b8912e",good:"#33301f",miss:"#9a9179",glow:false},
+    shapes:["circle","circle"], video:"brightness(1.1) saturate(.9) contrast(1.02)"
+  },
+  pastelloop: {
+    cat:["light","grad","fun"],
+    label:{ja:"パステルループ",en:"Pastel Loop",zh:"粉彩循环",ko:"파스텔 루프"},
+    desc:{ja:"ぴかぴかの3色パステル",en:"Three pastels in a soft loop",zh:"三色粉彩的柔和循环",ko:"삼색 파스텔의 부드러운 순환"},
+    ui:{"--ui-bg":"linear-gradient(180deg,#ffeef5,#eefaf1,#eef0fb)","--ui-panel":"rgba(255,255,255,.95)","--ui-soft":"rgba(183,139,224,.06)","--ui-text":"#3a3346",
+      "--ui-muted":"#837c96","--ui-border":"rgba(150,130,200,.24)","--ui-button":"#f6f2fb","--ui-button-hover":"#ede6f7",
+      "--ui-field":"#ffffff","--ui-accent":"#b78be0","--ui-on-accent":"#ffffff","--ui-gold":"#f2a3c0",
+      "--ui-shadow":"0 24px 70px rgba(120,100,160,.12)","--ui-glow":"rgba(183,139,224,.13)"},
+    game:{don:"#f27ba5",ka:"#7ecbb0",stage:"linear-gradient(180deg,#fff0f6,#eefaf3,#eef1fc)",lane:"rgba(255,255,255,.84)",track:"rgba(183,139,224,.26)",ink:"#3a3346",
+      inkShadow:"rgba(255,255,255,.9)",noteBorder:"#ffffff",panel:"rgba(253,252,255,.96)",perfect:"#f2a3c0",good:"#3a3346",miss:"#a49db5",glow:false},
+    shapes:["circle","circle"], video:"brightness(1.06) saturate(1.05)"
+  },
+  prism: {
+    cat:["grad","fun"],
+    label:{ja:"プリズム",en:"Prism",zh:"棱镜",ko:"프리즘"},
+    desc:{ja:"横に走る宝石色の虹",en:"A jewel-tone rainbow across the screen",zh:"横贯屏幕的宝石色彩虹",ko:"가로지르는 보석빛 무지개"},
+    ui:{"--ui-bg":"linear-gradient(90deg,#241539,#123041,#153829,#38300f,#3b1526)","--ui-panel":"rgba(18,16,32,.94)","--ui-soft":"rgba(255,255,255,.05)","--ui-text":"#f4f2ff",
+      "--ui-muted":"#b0aecb","--ui-border":"rgba(255,255,255,.22)","--ui-button":"#201a35","--ui-button-hover":"#2c2450",
+      "--ui-field":"#151126","--ui-accent":"#f0eeff","--ui-on-accent":"#241a3a","--ui-gold":"#ffd166",
+      "--ui-shadow":"0 24px 80px rgba(0,0,0,.55)","--ui-glow":"rgba(240,238,255,.12)"},
+    game:{don:"#ff5d8f",ka:"#5ad0e8",stage:"linear-gradient(90deg,#1a0f2e,#0e2233,#0e2e22,#2e2a0c,#33101f)",lane:"rgba(10,8,22,.72)",track:"rgba(255,255,255,.26)",ink:"#f4f2ff",
+      inkShadow:"rgba(0,0,0,.85)",noteBorder:"#ffffff",panel:"rgba(16,14,30,.95)",perfect:"#ffd166",good:"#f4f2ff",miss:"#6f6d8c",glow:true},
+    shapes:["circle","diamond"], video:"saturate(1.4) contrast(1.2) brightness(.75)"
+  },
+  laser: {
+    cat:["dark","grad","fun"],
+    label:{ja:"レーザーナイト",en:"Laser Night",zh:"激光之夜",ko:"레이저 나이트"},
+    desc:{ja:"闇に走る光の帯",en:"Beams of light through the dark",zh:"划破黑暗的光带",ko:"어둠을 가르는 빛의 띠"},
+    ui:{"--ui-bg":"linear-gradient(270deg,#06131f,#0a0616)","--ui-panel":"rgba(8,14,24,.95)","--ui-soft":"rgba(61,240,255,.06)","--ui-text":"#eafaff",
+      "--ui-muted":"#8fa8bb","--ui-border":"rgba(61,240,255,.28)","--ui-button":"#0b1826","--ui-button-hover":"#102436",
+      "--ui-field":"#060e18","--ui-accent":"#3df0ff","--ui-on-accent":"#032027","--ui-gold":"#ff3df0",
+      "--ui-shadow":"0 0 60px rgba(61,240,255,.18)","--ui-glow":"rgba(61,240,255,.14)"},
+    game:{don:"#ff3df0",ka:"#3df0ff",stage:"linear-gradient(270deg,#050e18,#080512)",lane:"rgba(4,10,18,.70)",track:"rgba(61,240,255,.30)",ink:"#eafaff",
+      inkShadow:"rgba(0,0,0,.85)",noteBorder:"#ffffff",panel:"rgba(7,13,22,.95)",perfect:"#ffe94d",good:"#eafaff",miss:"#5f7484",glow:true},
+    shapes:["circle","circle"], video:"grayscale(.5) hue-rotate(180deg) saturate(1.6) brightness(.6) contrast(1.3)"
+  },
+  aurora: {
+    cat:["dark","grad","fun"],
+    label:{ja:"オーロラ",en:"Aurora",zh:"极光",ko:"오로라"},
+    desc:{ja:"緑から紫への夜空の幕",en:"A curtain from green to violet",zh:"从绿到紫的夜空帷幕",ko:"초록에서 보라로 이어지는 밤하늘 장막"},
+    ui:{"--ui-bg":"linear-gradient(0deg,#0e3a2c,#101d44)","--ui-panel":"rgba(10,26,30,.95)","--ui-soft":"rgba(80,255,190,.06)","--ui-text":"#eafff8",
+      "--ui-muted":"#93c0b4","--ui-border":"rgba(80,255,190,.30)","--ui-button":"#0c2e2c","--ui-button-hover":"#124238",
+      "--ui-field":"#082020","--ui-accent":"#50ffbe","--ui-on-accent":"#032119","--ui-gold":"#c89bff",
+      "--ui-shadow":"0 0 60px rgba(80,255,190,.16)","--ui-glow":"rgba(80,255,190,.13)"},
+    game:{don:"#ff8abf",ka:"#50ffbe",stage:"linear-gradient(0deg,#0b2f24,#0c1a38)",lane:"rgba(4,18,20,.66)",track:"rgba(80,255,190,.30)",ink:"#eafff8",
+      inkShadow:"rgba(0,0,0,.85)",noteBorder:"#ffffff",panel:"rgba(9,24,28,.95)",perfect:"#c89bff",good:"#eafff8",miss:"#5f8a80",glow:true},
+    shapes:["circle","circle"], video:"grayscale(.6) hue-rotate(120deg) saturate(1.4) brightness(.65) contrast(1.2)"
+  },
+  wagara: {
+    cat:["light"],
+    label:{ja:"和モダン",en:"Wa Modern",zh:"和风现代",ko:"화모던"},
+    desc:{ja:"和紙と墨と朱色",en:"Washi paper, ink, and vermillion",zh:"和纸・墨与朱红",ko:"와시 종이, 먹, 주홍"},
+    ui:{"--ui-bg":"#f7f2e8","--ui-panel":"rgba(252,248,240,.97)","--ui-soft":"rgba(199,62,58,.05)","--ui-text":"#2e2a24",
+      "--ui-muted":"#77705f","--ui-border":"rgba(60,50,40,.22)","--ui-button":"#f0e9db","--ui-button-hover":"#e8dfcb",
+      "--ui-field":"#fdfaf3","--ui-accent":"#c73e3a","--ui-on-accent":"#ffffff","--ui-gold":"#a8842c",
+      "--ui-shadow":"0 24px 70px rgba(80,60,30,.14)","--ui-glow":"rgba(199,62,58,.11)"},
+    game:{don:"#c73e3a",ka:"#2c5f7c",stage:"#f5efe2",lane:"rgba(250,246,236,.84)",track:"rgba(199,62,58,.22)",ink:"#2e2a24",
+      inkShadow:"rgba(255,255,255,.9)",noteBorder:"#ffffff",panel:"rgba(250,246,238,.96)",perfect:"#a8842c",good:"#2e2a24",miss:"#a09880",glow:false},
+    shapes:["circle","circle"], video:"sepia(.3) contrast(1.05) brightness(1.02)",
+    font:'Georgia,"Noto Serif JP","Noto Serif SC",serif'
+  },
+  showacafe: {
+    cat:["light","fun"],
+    label:{ja:"昭和喫茶",en:"Showa Cafe",zh:"昭和咖啡厅",ko:"쇼와 카페"},
+    desc:{ja:"なつかしい喫茶店の皿",en:"A nostalgic coffee-shop plate",zh:"令人怀念的咖啡厅瓷盘",ko:"그리운 찻집의 접시"},
+    ui:{"--ui-bg":"#f2e8d8","--ui-panel":"rgba(250,243,230,.97)","--ui-soft":"rgba(212,85,46,.06)","--ui-text":"#3a2e22",
+      "--ui-muted":"#8a7660","--ui-border":"rgba(120,80,40,.24)","--ui-button":"#eadcc4","--ui-button-hover":"#e0cdb0",
+      "--ui-field":"#faf4e8","--ui-accent":"#d4552e","--ui-on-accent":"#ffffff","--ui-gold":"#2e8b8b",
+      "--ui-shadow":"0 24px 70px rgba(100,70,30,.15)","--ui-glow":"rgba(212,85,46,.12)"},
+    game:{don:"#d4552e",ka:"#2e8b8b",stage:"#efe2cc",lane:"rgba(250,242,228,.84)",track:"rgba(212,85,46,.22)",ink:"#3a2e22",
+      inkShadow:"rgba(255,255,255,.9)",noteBorder:"#ffffff",panel:"rgba(249,241,228,.96)",perfect:"#2e8b8b",good:"#3a2e22",miss:"#a6947c",glow:false},
+    shapes:["circle","circle"], video:"sepia(.4) saturate(1.1) brightness(.98)"
+  },
+  blueprint: {
+    cat:["dark"],
+    label:{ja:"青写真",en:"Blueprint",zh:"蓝图",ko:"청사진"},
+    desc:{ja:"製図用紙の青と白い線",en:"Drafting-paper blue with white lines",zh:"绘图纸的蓝与白线",ko:"제도지의 파랑과 흰 선"},
+    ui:{"--ui-bg":"#103055","--ui-panel":"rgba(16,42,74,.95)","--ui-soft":"rgba(126,194,255,.06)","--ui-text":"#eaf3ff",
+      "--ui-muted":"#9db8d8","--ui-border":"rgba(160,200,255,.34)","--ui-button":"#143a66","--ui-button-hover":"#1b4a7e",
+      "--ui-field":"#0c2544","--ui-accent":"#7ec2ff","--ui-on-accent":"#0a1e38","--ui-gold":"#ffd166",
+      "--ui-shadow":"0 24px 80px rgba(0,10,30,.55)","--ui-glow":"rgba(126,194,255,.14)"},
+    game:{don:"#ffffff",ka:"#7ec2ff",stage:"#0e2c50",lane:"rgba(8,20,40,.60)",track:"rgba(255,255,255,.30)",ink:"#eaf3ff",
+      inkShadow:"rgba(0,0,0,.85)",noteBorder:"#7ec2ff",panel:"rgba(14,36,64,.95)",perfect:"#ffd166",good:"#eaf3ff",miss:"#5f7796",glow:false},
+    shapes:["circle","square"], video:"grayscale(1) contrast(1.5) sepia(1) hue-rotate(190deg) saturate(2) brightness(.6)",
+    font:'"Cascadia Mono","Consolas","Menlo","Noto Sans Mono",monospace'
+  },
+  planetarium: {
+    cat:["dark"],
+    label:{ja:"天体観測",en:"Planetarium",zh:"天象仪",ko:"천체 관측"},
+    desc:{ja:"星図と黄金の線",en:"Star charts and golden lines",zh:"星图与金线",ko:"별자리 지도와 황금선"},
+    ui:{"--ui-bg":"#0a0e1e","--ui-panel":"rgba(12,16,34,.95)","--ui-soft":"rgba(212,175,55,.05)","--ui-text":"#f0ecdc",
+      "--ui-muted":"#b3ac93","--ui-border":"rgba(212,175,55,.30)","--ui-button":"#10152c","--ui-button-hover":"#181f3e",
+      "--ui-field":"#080c1a","--ui-accent":"#d4af37","--ui-on-accent":"#1a1405","--ui-gold":"#9fd0ff",
+      "--ui-shadow":"0 0 60px rgba(212,175,55,.14)","--ui-glow":"rgba(212,175,55,.12)"},
+    game:{don:"#ff8a5c",ka:"#a8ccf0",stage:"#080b18",lane:"rgba(6,8,20,.68)",track:"rgba(212,175,55,.26)",ink:"#f0ecdc",
+      inkShadow:"rgba(0,0,0,.85)",noteBorder:"#ffffff",panel:"rgba(10,14,30,.95)",perfect:"#d4af37",good:"#f0ecdc",miss:"#6b6858",glow:true},
+    shapes:["circle","diamond"], video:"grayscale(1) contrast(1.6) brightness(.5)"
+  },
+  silverprint: {
+    cat:["light"],
+    label:{ja:"モノクロ印画",en:"Silver Print",zh:"黑白照片",ko:"모노크롬 인화"},
+    desc:{ja:"印画紙の白と黒",en:"Photographic paper in black and white",zh:"相纸的黑与白",ko:"인화지의 흑과 백"},
+    ui:{"--ui-bg":"#ececec","--ui-panel":"rgba(250,250,250,.97)","--ui-soft":"rgba(40,40,40,.05)","--ui-text":"#1c1c1c",
+      "--ui-muted":"#6a6a6a","--ui-border":"rgba(40,40,40,.24)","--ui-button":"#e2e2e2","--ui-button-hover":"#d6d6d6",
+      "--ui-field":"#f8f8f8","--ui-accent":"#1c1c1c","--ui-on-accent":"#ffffff","--ui-gold":"#6e6e6e",
+      "--ui-shadow":"0 24px 70px rgba(40,40,40,.16)","--ui-glow":"rgba(60,60,60,.10)"},
+    game:{don:"#262626",ka:"#8c8c8c",stage:"#e8e8e8",lane:"rgba(255,255,255,.86)",track:"rgba(40,40,40,.24)",ink:"#1c1c1c",
+      inkShadow:"rgba(255,255,255,.9)",noteBorder:"#ffffff",panel:"rgba(246,246,246,.96)",perfect:"#6e6e6e",good:"#1c1c1c",miss:"#b0b0b0",glow:false},
+    shapes:["circle","circle"], video:"grayscale(1) contrast(1.15) brightness(1.1)"
+  },
+  nessun: {
+    cat:["dark","grad","fun"],
+    label:{ja:"ネッスン・ドルマ",en:"Nessun Dorma",zh:"今夜无人入睡",ko:"네순 도르마"},
+    desc:{ja:"夜空と黄金のグランドオペラ",en:"A grand opera of night and gold",zh:"夜空与黄金的宏大歌剧",ko:"밤하늘과 황금의 그랜드 오페라"},
+    ui:{"--ui-bg":"linear-gradient(0deg,#2a1a3e,#0c1026)","--ui-panel":"rgba(20,16,44,.95)","--ui-soft":"rgba(242,193,78,.06)","--ui-text":"#fdf6e3",
+      "--ui-muted":"#c5b8d8","--ui-border":"rgba(242,193,78,.32)","--ui-button":"#1c1638","--ui-button-hover":"#29204e",
+      "--ui-field":"#130f2c","--ui-accent":"#f2c14e","--ui-on-accent":"#241a04","--ui-gold":"#fff1c4",
+      "--ui-shadow":"0 0 70px rgba(242,193,78,.18)","--ui-glow":"rgba(242,193,78,.14)"},
+    game:{don:"#f2c14e",ka:"#6fa8ff",stage:"linear-gradient(0deg,#231540,#0a0d22)",lane:"rgba(10,8,28,.66)",track:"rgba(242,193,78,.30)",ink:"#fdf6e3",
+      inkShadow:"rgba(0,0,0,.85)",noteBorder:"#ffffff",panel:"rgba(18,14,40,.95)",perfect:"#fff1c4",good:"#fdf6e3",miss:"#7d7296",glow:true},
+    shapes:["circle","circle"], video:"grayscale(1) contrast(1.45) sepia(1) hue-rotate(200deg) saturate(1.6) brightness(.6)",
+    font:'Georgia,"Noto Serif JP","Noto Serif SC",serif'
+  },
+
+  /* 🎓 ごほうびスキン：チュートリアルのスタンプを5つ集めると解禁（core.js で鍵を管理）。
+     それまではスキンの棚に「❓ ？？？」の正体不明カードとして並びます */
+  graduation: {
+    cat:["grad","fun"], locked:true,
+    label:{ja:"グラデュエーション",en:"Graduation",zh:"毕业典礼",ko:"졸업"},
+    desc:{ja:"🎓 卒業おめでとう！夜明けの金色へ",en:"🎓 Congrats, graduate! Into the golden dawn",zh:"🎓 毕业快乐！迈向金色黎明",ko:"🎓 졸업 축하! 금빛 새벽으로"},
+    ui:{"--ui-bg":"linear-gradient(180deg,#0b1030 0%,#2c2160 52%,#c99a2e 100%)","--ui-panel":"rgba(17,14,40,.96)","--ui-soft":"rgba(255,209,102,.06)","--ui-text":"#fdf6e3",
+      "--ui-muted":"#cabfe0","--ui-border":"rgba(255,209,102,.34)","--ui-button":"#191437","--ui-button-hover":"#241c4e",
+      "--ui-field":"#120e2c","--ui-accent":"#ffd166","--ui-on-accent":"#241a04","--ui-gold":"#ffe9a8",
+      "--ui-shadow":"0 24px 80px rgba(0,0,0,.55)","--ui-glow":"rgba(255,209,102,.16)"},
+    game:{don:"#ffd166",ka:"#6fa8ff",stage:"linear-gradient(180deg,#0a0e28 0%,#241b52 55%,#b8892a 100%)",lane:"rgba(8,6,24,.62)",track:"rgba(255,209,102,.32)",ink:"#fdf6e3",
+      inkShadow:"rgba(0,0,0,.85)",noteBorder:"#ffffff",panel:"rgba(15,12,36,.95)",perfect:"#ffe9a8",good:"#fdf6e3",miss:"#8d84a8",glow:true},
+    shapes:["circle","circle"], video:"grayscale(1) contrast(1.5) sepia(1) hue-rotate(18deg) saturate(1.4) brightness(.55)"
   }
 };
 
@@ -176,6 +420,18 @@ const VIDEO_PRESETS = {
   mono:"grayscale(1) contrast(1.6)", color:"none", dim:"brightness(.45) saturate(.85)",
   warm:"sepia(.45) saturate(1.3) brightness(.85)", cool:"grayscale(.4) hue-rotate(180deg) saturate(1.4) brightness(.8)"
 };
+/* ---------- 背景グラデーション（プリセットとカスタム両方で使う） ---------- */
+const GRAD_DIRS = ["none", "down", "up", "left", "right"];
+const GRAD_ANGLE = { down:"180deg", up:"0deg", right:"90deg", left:"270deg" };
+/* "linear-gradient(180deg,#a,#b)" から {from,to,dir} を読む（スキンのリミックス用。読めなければ null） */
+function parseGrad(v) {
+  if (typeof v !== "string" || !v.includes("gradient")) return null;
+  const hex = [...v.matchAll(/#[0-9a-f]{6}/gi)].map(m => m[0].toLowerCase());
+  if (hex.length < 2) return null;
+  const deg = v.match(/(-?\d+(?:\.\d+)?)deg/i);
+  const dir = deg ? { 0:"up", 90:"right", 180:"down", 270:"left" }[String(Math.round((+deg[1] % 360 + 360) % 360))] || "down" : "down";
+  return { from:hex[0], to:hex[hex.length - 1], dir };
+}
 function sanitizeSkinDef(raw) {
   if (!raw || typeof raw !== "object" || !raw.colors || typeof raw.colors !== "object") return null;
   const colors = {};
@@ -184,9 +440,11 @@ function sanitizeSkinDef(raw) {
     if (typeof v !== "string" || !HEX.test(v)) return null;
     colors[k] = v.toLowerCase();
   }
+  colors.bg2 = typeof raw.colors.bg2 === "string" && HEX.test(raw.colors.bg2) ? raw.colors.bg2.toLowerCase() : "";   // グラデ先用（任意）
   return {
     name: String(raw.name || "").trim().slice(0, 24) || "Custom",
     colors, glow: !!raw.glow, scanlines: !!raw.scanlines,
+    gradDir: GRAD_DIRS.includes(raw.gradDir) ? raw.gradDir : "none",
     font: has(FONT_PRESETS, raw.font) ? raw.font : "default",
     video: has(VIDEO_PRESETS, raw.video) ? raw.video : "mono",
     mascot: MASCOT_IDS.includes(raw.mascot) ? raw.mascot : "none"
@@ -194,18 +452,19 @@ function sanitizeSkinDef(raw) {
 }
 function buildCustomSkin(def) {
   const c = def.colors, dark = luminance(c.bg) < .35;
+  const grad = c.bg2 && def.gradDir && def.gradDir !== "none" ? `linear-gradient(${GRAD_ANGLE[def.gradDir]}, ${c.bg}, ${c.bg2})` : null;   // --ui-bg と game.stage はそのまま CSS background へ
   return {
     custom:true,
     label:{ en:def.name },
     desc:{ ja:"カスタムスキン", en:"Custom skin", zh:"自定义皮肤", ko:"커스텀 스킨" },
-    ui:{ "--ui-bg":c.bg, "--ui-panel":hexToRgba(c.panel, .96), "--ui-soft":hexToRgba(c.text, .05), "--ui-text":c.text,
+    ui:{ "--ui-bg":grad || c.bg, "--ui-panel":hexToRgba(c.panel, .96), "--ui-soft":hexToRgba(c.text, .05), "--ui-text":c.text,
       "--ui-muted":mixHex(c.text, c.panel, .38), "--ui-border":hexToRgba(c.text, .18),
       "--ui-button":mixHex(c.panel, c.text, .06), "--ui-button-hover":mixHex(c.panel, c.text, .13),
       "--ui-field":mixHex(c.bg, c.panel, .5), "--ui-accent":c.accent,
       "--ui-on-accent":luminance(c.accent) > .45 ? "#111111" : "#ffffff", "--ui-gold":c.gold,
       "--ui-shadow":dark ? "0 24px 80px rgba(0,0,0,.55)" : "0 24px 70px rgba(30,40,60,.16)",
       "--ui-glow":hexToRgba(c.accent, .14) },
-    game:{ don:c.accent, ka:c.gold, stage:c.bg, lane:hexToRgba(c.panel, dark ? .6 : .82), track:hexToRgba(c.text, .24),
+    game:{ don:c.accent, ka:c.gold, stage:grad || c.bg, lane:hexToRgba(c.panel, dark ? .6 : .82), track:hexToRgba(c.text, .24),
       ink:c.text, inkShadow:dark ? "rgba(0,0,0,.85)" : "rgba(255,255,255,.9)", noteBorder:"#ffffff",
       panel:hexToRgba(c.panel, .95), perfect:c.gold, good:c.text, miss:mixHex(c.text, c.bg, .45),
       glow:def.glow, scanlines:def.scanlines },

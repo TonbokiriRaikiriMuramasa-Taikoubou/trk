@@ -109,15 +109,24 @@
       </header>
 
       <details id="quickGuide" class="panel quickGuide" open>
-        <summary data-i18n="guideTitle"></summary>
+        <summary><span data-i18n="guideTitle"></span> <span id="guideProgress" class="guideProgress"></span></summary>
         <p class="hint" data-i18n="guideHint"></p>
         <div class="guideGrid">
-          <div class="guideStep"><b data-i18n="guideSongTitle"></b><span data-i18n="guideSong"></span></div>
-          <div class="guideStep"><b data-i18n="guideLookTitle"></b><span data-i18n="guideLook"></span></div>
-          <div class="guideStep"><b data-i18n="guideTruckTitle"></b><span data-i18n="guideTruck"></span></div>
-          <div class="guideStep"><b data-i18n="guideSafeTitle"></b><span data-i18n="guideSafe"></span></div>
+          <div class="guideStep" data-mission="song"><i class="guideStamp"></i><b data-i18n="guideSongTitle"></b><span data-i18n="guideSong"></span></div>
+          <div class="guideStep" data-mission="look"><i class="guideStamp"></i><b data-i18n="guideLookTitle"></b><span data-i18n="guideLook"></span></div>
+          <div class="guideStep" data-mission="play"><i class="guideStamp"></i><b data-i18n="guideTruckTitle"></b><span data-i18n="guideTruck"></span></div>
+          <div class="guideStep" data-mission="safe"><i class="guideStamp"></i><b data-i18n="guideSafeTitle"></b><span data-i18n="guideSafe"></span></div>
+          <div class="guideStep" data-mission="seed"><i class="guideStamp"></i><b data-i18n="guideSeedTitle"></b><span data-i18n="guideSeed"></span></div>
+        </div>
+        <div class="guideFoot">
+          <span id="guideNote" class="guideNote" hidden></span>
+          <button id="guideSkip" class="guideSkip" type="button" data-i18n="guideSkip"></button>
         </div>
       </details>
+
+      <div id="guideCelebrate" hidden>
+        <div class="guideCelebCard"><b id="guideCelebTitle"></b><span id="guideCelebMsg"></span></div>
+      </div>
 
       <div class="selectGrid">
         <!-- 左：曲リスト -->
@@ -309,7 +318,12 @@
           <details class="panel" open>
             <summary data-i18n="secDisplay"></summary>
             <h3 data-i18n="skin"></h3>
-            <div id="skinGrid"></div>
+            <div id="skinNow"></div>
+            <details id="skinShelf" class="subPanel" open>
+              <summary><span data-i18n="skinShelf"></span> <span id="skinShelfCount"></span></summary>
+              <div id="skinChips"></div>
+              <div id="skinGrid"></div>
+            </details>
 
             <details id="skinMaker" class="subPanel">
               <summary data-i18n="addSkin"></summary>
@@ -320,6 +334,7 @@
               </label>
               <div class="colorGrid">
                 <label><input id="makerColor_bg" type="color"><span data-i18n="cBg"></span></label>
+                <label><input id="makerColor_bg2" type="color"><span data-i18n="cBg2"></span></label>
                 <label><input id="makerColor_panel" type="color"><span data-i18n="cPanel"></span></label>
                 <label><input id="makerColor_text" type="color"><span data-i18n="cText"></span></label>
                 <label><input id="makerColor_accent" type="color"><span data-i18n="cAccent"></span></label>
@@ -353,6 +368,16 @@
                     <option value="buddy" data-i18n="mascotBuddy"></option>
                     <option value="vrm" data-i18n="mascotVrm"></option>
               <option value="mmd" data-i18n="mascotMmd"></option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span data-i18n="gradDir"></span>
+                  <select id="makerGradDir">
+                    <option value="none" data-i18n="gradNone"></option>
+                    <option value="down" data-i18n="gradDown"></option>
+                    <option value="up" data-i18n="gradUp"></option>
+                    <option value="left" data-i18n="gradLeft"></option>
+                    <option value="right" data-i18n="gradRight"></option>
                   </select>
                 </label>
               </div>
@@ -670,6 +695,26 @@
             <label class="check"><input id="countdown" type="checkbox"><span data-i18n="countdown"></span></label>
             <label class="check"><input id="countdownSE" type="checkbox"><span data-i18n="countdownSE"></span></label>
             <label class="check"><input id="resumeCountdown" type="checkbox"><span data-i18n="resumeCountdown"></span></label>
+            <div class="inline">
+              <span data-i18n="shortMode"></span>
+              <select id="shortMode">
+                <option value="off" data-i18n="shortOff"></option>
+                <option value="90" data-i18n="short90"></option>
+                <option value="120" data-i18n="short120"></option>
+                <option value="180" data-i18n="short180"></option>
+              </select>
+            </div>
+            <div class="hint" data-i18n="shortHint"></div>
+            <div class="inline">
+              <span data-i18n="shortMode"></span>
+              <select id="shortMode">
+                <option value="off" data-i18n="shortOff"></option>
+                <option value="90" data-i18n="short90"></option>
+                <option value="120" data-i18n="short120"></option>
+                <option value="180" data-i18n="short180"></option>
+              </select>
+            </div>
+            <div class="hint" data-i18n="shortHint"></div>
             <div class="hint" data-i18n="countdownHint"></div>
 
             <h3 data-i18n="judgeLevel"></h3>
@@ -759,6 +804,7 @@
 
             <label class="check"><input id="helpText" type="checkbox"><span data-i18n="helpText"></span></label>
             <div class="hint" data-i18n="helpTextHint"></div>
+            <div class="hint"><button id="tutorialReplayBtn" type="button" data-i18n="tutorialReplay"></button></div>
 
             <!-- 🚚🎪🚛 各モードの操作キー（TRUCK・STAGE・CATCH・速度） -->
             <details id="modeControlsPanel" class="subPanel">
@@ -917,6 +963,8 @@
             </div>
             <div id="seStatus" class="hint status"></div>
             <label class="check"><input id="previewEnabled" type="checkbox"><span data-i18n="previewEnabled"></span></label>
+            <label class="check"><input id="bannerPause" type="checkbox"><span data-i18n="bannerPause"></span></label>
+            <label class="check"><input id="bannerSongBtns" type="checkbox"><span data-i18n="bannerSongBtns"></span></label>
           </details>
           <!-- fx.js がここに「🎛 サウンドエフェクト」の欄を追加します -->
           <!-- ⭐ お気に入りのフォルダ管理（中身は js/favs.js が作ります） -->
@@ -1079,6 +1127,8 @@
 <script src="js/fx-synth.js"></script>
 <script src="js/favs.js"></script>
 <!-- ===== 選曲・公認・入力・起動 ===== -->
+<!-- ===== 🛒 公式カタログ（音源同梱なし・MODは catalog.js より前に読む） ===== -->
+<script src="js/catalog.js"></script>
 <script src="js/library.js"></script>
 <script src="js/verified.js"></script>
 <script src="js/lib-skins.js"></script>

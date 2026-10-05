@@ -47,9 +47,9 @@ trk!（トラック）は、ブラウザだけで動く**非営利のリズム�
 3. 曲を選ぶと、プレビューが流れます。
 4. プレイ方法と難易度を選んで、**▶ PLAY**！
 
-画面上部の **🧭 まずは3分チュートリアル** を開くと、スキン・サウンドエフェクト・TRUCK／CATCHの遊び方を確認できます。
+画面上部の **🧭 まずは3分チュートリアル** を開くと、スキン・サウンドエフェクト・TRUCK／CATCHの遊び方を5つの短い手順で確認できます。手順を実際に試すたびに**スタンプ**が押されていき、Seed欄へ `trk!` と入力した**瞬間**にチュートリアル完了で案内が消えます（不要な人は**スキップ**できます。設定の「見た目」から**もう一度**表示もできます）。5つのスタンプを集めると、ごほうびスキン **🎓グラデュエーション** が解禁されます。Seed欄への特定の入力にも、こっそり反応します🥚
 
-TVドックの **⏻ 電源を長押し**すると、ゲームを始めずに聴けるメディアプレーヤーへ切り替わります。再生キュー、曲送り、リピート、シャッフル、再生速度、前回位置の復元、スリープタイマー、Media Sessionに対応しています。逆再生（対応環境では音声も反転）とA-B区間ループも使えます。**Loop Lab**では、現在位置から5／10／20秒の区間ループ、ランダムな短区間、曲ごとのA-Bプリセット保存・呼び出し・個別削除・全消去ができます。プリセットは曲識別子とA/B秒数だけを端末内に保存し、音源の切り取り・変換・書き出し・アップロードは行いません。動画を一時的に壁紙／スクリーンセーバーで隠すこともでき、時計表示、動画を止める／続ける、トグル／長押し、端末から選んだ画像（セッション中のみ）に対応します。外部出力は初期オフで、対応ブラウザーだけがアンテナ操作から選択画面を開けます。
+TVドックの **⏻ 電源を長押し**すると、ゲームを始めずに聴けるメディアプレーヤーへ切り替わります。再生キュー、曲送り、リピート、シャッフル、再生速度、前回位置の復元、スリープタイマー、Media Sessionに対応しています。逆再生（対応環境では音声も反転）とA-B区間ループも使えます。**Loop Lab**では、現在位置から5／10／20秒の区間ループ、ランダムな短区間、曲ごとのA-Bプリセット保存・呼び出し・個別削除・全消去ができます。プリセットは曲識別子とA/B秒数だけを端末内に保存し、音源の切り取り・変換・書き出し・アップロードは行いません。動画を一時的に壁紙／スクリーンセーバーで隠すこともでき、時計表示、動画を止める／続ける、トグル／長押し、端末から選んだ画像（セッション中のみ）に対応します。キャストアンテナとバックグラウンド再生アンテナは個別に設定できます。バックグラウンド再生のアンテナはドックの上だけでなく、**右上（言語選択の左）にコンパクトに置く**こともできます（ドックのアンテナを隠しても、バックグラウンド再生は使えます）。キャストは初期オフで、対応ブラウザだけがキャストアンテナから選択画面を開きます（キャストを隠しても、再生用のアンテナは消えません）。アンテナの見た目は、伸縮ロッド／円形ループ／パラボラ／サイバービームの4形状に加えて、**ドットキャラ10体**（🚚トラック・🤖ロボット・🐱ネコ・🫧スライム・👻オバケ、そして東方Projectから⛩霊夢・🧹魔理沙・❄チルノ・🦇フランドール・🗡妖夢）を選べます。キャラは **ONで起きて歩き、OFFで倒れて眠ります**。どれもtrk!の描きおろしで、東方Projectのキャラは二次創作ドット絵です（公式ガイドラインに従い、無料のブラウザゲームとして提供。公式の素材ではありません）。**自分のイラスト2枚**（ON用・OFF用）を選ぶこともでき、画像は端末内にだけ保存されます（設定の初期化で消えます）。
 
 **対応している形式：** MP4・MP3・M4A・OGG・OPUS・WAV・WebM・FLAC・AAC・MOV（ブラウザが再生できるもの）
 
@@ -109,7 +109,7 @@ python -m http.server 8000
 | **追加演出** | 「全部見せる／控えめ／追加演出オフ」。画面の光・揺れ・ヒット演出だけを抑え、音声エフェクターは別に設定できます |
 | 🎯 **オフセット測定** | カチッという音に合わせて16回タップすると、ちょうどよいタイミング補正を提案します |
 | **自動微調整** | プレイ後に「早い／遅い」の偏りから、補正値を少しずつ直します（初期値オフ） |
-| ▶ **メディアプレーヤー** | TVドックの電源長押しで起動。ゲームを始めずに再生キュー、前後の曲、リピート、シャッフル、0.5〜2x速度、逆再生、A-B区間ループ、壁紙／スクリーンセーバー、15／30／60分スリープタイマー、前回位置の復元を使えます。**Loop Lab**で5／10／20秒・ランダム区間を作り、曲ごとのA-Bプリセットを端末内に保存・呼び出し・削除できます。ファイルの切り取り／変換／書き出しはしません。A点・B点を置き、割り当てキーのトグル／長押しで気軽に解除できます。Mキーでメニューへ戻る、ESCでプレーヤー終了（確認はオフに変更可能）も設定できます。外部出力は明示的に許可したときだけ |
+| ▶ **メディアプレーヤー** | TVドックの電源長押しで起動。ゲームを始めずに再生キュー、前後の曲、リピート、シャッフル、0.5〜2x速度、逆再生、A-B区間ループ、壁紙／スクリーンセーバー、15／30／60分スリープタイマー、前回位置の復元を使えます。**Loop Lab**で5／10／20秒・ランダム区間を作り、曲ごとのA-Bプリセットを端末内に保存・呼び出し・削除できます。ファイルの切り取り／変換／書き出しはしません。A点・B点を置き、割り当てキーのトグル／長押しで気軽に解除できます。Mキーでメニューへ戻る、ESCでプレーヤー終了（確認はオフに変更可能）も設定できます。キャストアンテナとバックグラウンド再生アンテナは個別に設定できます |
 
 ---
 
@@ -156,11 +156,12 @@ AUTO中か、「シークバーを表示（練習用）」をオンにしてい�
 
 ## 🎨 見た目のカスタマイズ
 
-- **スキン**：シャドウ・デイライト・ネオン・サクラ・ターミナル・クラリティ（色覚配慮）など。色を選んで**自作スキン**も作れます（JSONで共有可）。
+- **スキン**：シャドウ・デイライト・ネオン・サクラ・ターミナル・クラリティ（色覚配慮）・ミク系（PCL二次創作）・グラデーション系など**31種**（うち1種は🧭チュートリアルのスタンプ5つで解禁されるごほうびスキン🎓）。設定画面の **🖼 スキンの棚** では、定番／ミク／ダーク／ライト／グラデ／遊び心のチップで絞り込めます。色を選んで**自作スキン**も作れます（背景は2色＋上下左右のグラデ対応、JSONで共有可）。
 - **レイアウト**：横スクロール／縦・左／縦・中央／解説動画風
 - **ノーツ**：色と形（丸・ひし形・四角）を、スキンとは別に決められます。
 - **背景映像**：カラー・モノクロ・暗め・非表示に加えて、**暗さ**と**ぼかし**をスライダーで調整できます。選曲画面の📺TVドックから、**映像フィルター45種**（レトロ・シネマ・不思議・自然など）と**TVスキン30種**（ブラウン管・ウッド・アーケード・水槽・プロジェクターなど）を切り替えられます。映像が変になったら `?safe=1` で安全な状態に戻せます。
 - **カスタムTV**：設定画面の🎨から、色6つ・形（ボタン数／列／角の丸み／画面のふち）・飾り28種・質感（光る／ガラスの反射／走査線）を選んで、自分のテレビを作れます。保存するとTVドックのスキン一覧に出て、`trk-tvskin`（JSON）で共有できます（最大30個）。
+- **📡 アンテナのキャラ肌**：バックグラウンド再生アンテナの見た目を、4形状に加えて**ドットキャラ10体**（🚚トラック・🤖ロボット・🐱ネコ・🫧スライム・👻オバケ＋東方Projectの⛩霊夢・🧹魔理沙・❄チルノ・🦇フランドール・🗡妖夢。**ON＝起きる・歩く／OFF＝倒れる・眠る** の2フレームアニメ）や**自分のイラスト2枚**（ON用・OFF用。端末内だけに保存）に変えられます。右上のコンパクトアンテナでも同じキャラが出ます。東方Projectのキャラは二次創作ドット絵（公式素材は不使用）。
 - **📺 の物理ボタンで曲を送る**：TVドックの電源・一時停止のとなりに **◀ ▶** があります。テレビのチャンネル送りみたいに、**前の曲・次の曲**へ（リストの端は先頭／末尾へ回り込み、液晶に `♪ 曲名` が出ます）。**演奏中は、初期設定では曲が飛びません**（ゲームに集中できます）。「演奏中も ◀ ▶ で曲を変える」にチェックを入れると、演奏中でも押したその場で曲が切り替わります（その回の記録は残りません）。
 - **ならべ方**：選曲画面は **📺 TV →（お気に入り）→ 🎛 ラック →（お気に入り）→ 📺 TVくわしい → 🎛 ラックくわしい** の順。テレビの**すぐ下にラック**が来るので「テレビの下にオーディオ機器」という自然な姿になります（TVとラックの上下は「くわしい」の中で入れ替え可）。
 - **⭐ お気に入りはフォルダ分け**：ドックの下に **⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り** のチップが並びます（それぞれ個数つき）。押すとボタンの中身がそのフォルダに入れ替わり、🔒で凍結、あふれたぶんは下の行に出ます。長押し（または ⋯）で、移動・📌ピン・取り外しができます。**上限はありません**。
@@ -175,6 +176,11 @@ AUTO中か、「シークバーを表示（練習用）」をオンにしてい�
 - **揺れ**：ビートやドン／カッに合わせてレーンを傾けます（初期値オフ。OSの「視差効果を減らす」がオンなら止まります）
 - **マスコット**：オレンジ相棒、初音ミク（PCL・非公式の二次創作）、**自分のVRMモデル**（VRM 1.0）、**自分のMMDモデル**（.pmx／.pmd）。VRM の .vrma も MMD の .vmd も、曲のBPMに合わせて動きます。
 - **⭐ お気に入りは、フォルダで分ける**：曲・映像フィルター・エフェクトのお気に入りを、**⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り**の4つに分けて持ち歩けます。**個数の上限はありません**（ボタンに入りきらないぶんは、下に並びます）。🧊は凍結（追加・削除を止める）、📌は「**絶対に外れない**」（🎲おまかせの候補に必ず入ります）。外したものは📤元お気に入りに残り、抽選には出てきません。📤書き出し／📥読み込み（`trk-favs`）で、別の端末にも持っていけます。
+- **🎧 プレイリストタブ（自分だけの棚）**：タブ帯の**＋**、または **📚すべての中クリック／長押し**で新しいプレイリストを作れます。タブの**長押し**で名前・アイコン・色の設定（🧊フリーズ＝誤追加防止／🔒ロック＝誤削除防止、両方で🧩。アイコンは自由記入、色は9色）。**中クリックで削除**（設定で「同じタブ3回」モードに変更可。スマホは長押し → 削除）。プレイリストは曲の**参照リスト**なので、消しても曲はライブラリに残ります。曲の**長押し**でプロフィール（タイトル・アーティスト・アルバム・作曲者・**入手先リンク**）を編集してプレイリストへ追加・取り外し、PCでは曲の**ドラッグ＆ドロップ**でも入れられます。プレイリストは**📁フォルダ**に入れられます（📚すべての長押し →「📁新規フォルダ」。3階層までネスト可。フォルダタブは中のプレイリストの曲をぜんぶ表示し、フォルダの削除で中身は上の階層へ移るだけで曲は消えません）。プレイリストには**🏷タグ**（5個まで）も付けられて、共有ファイルとクリップボード要約に #ハッシュタグ として付いていきます。タブ長押し設定の **📤共有** で、**楽曲ファイルを含まない**共有ファイルを書き出せます（**9曲以上＋全曲クリア／視聴済み**が条件。AUTO・📻ラジオ・倍速も視聴と数えますが、AUTO視聴だけの曲には **▶AUTO** が必ず付きます。スコアとモード称号の非掲載は自由）。コメント（140字）・作成日時・**入手先リンク**（https限定・開く前に確認ダイアログ）・曲ごとの入手先（プロフィールの🔗。Esports名場面集のようなYouTubeリンク集に）・**🏷タグ**（#ハッシュタグになる）を添えられて、読み込んだ側はビューアで中身を見てから手持ちの曲だけ取り込めます。
+- **🛒 公式プレイリストカタログ**：📚すべて長押し →「🛒公式カタログ」で、**音源を一切同梱しない**キュレーションプレイリスト（🎒ブルーアーカイブ／🩺アークナイツ／⚔️LoL Sessions: Vi／🎯VALORANT／⭐東方Project／⚡NoCopyrightSounds／🎼Kevin MacLeod／❄原神／🍊100% Orange Juice／🌟学園アイドルマスター）を取り込めます。中身は「欲しい曲リスト」で、未入手の曲は**薄く表示**（曲名をタップすると公式の入手先リンク。アークナイツは曲ごとにMonster-Sirenのページへ🔗）。**入手した音源をMusicフォルダに入れるだけで、同じ曲名の曲が自動でプレイリストに加わります**（🧊フリーズ中は自動追加しません）。取り込むと「ソーシャルゲーム → アークナイツ」のような**カテゴリ→シリーズのフォルダ**も自動で作り、タブ長押しの設定に入手先ガイドが出ます。楽曲・シリーズの権利は各権利者にあります（trk!は非公認・リンク先の内容は保証しません）。カタログ本体は `js/catalog.js` の `TRK_CATALOG` で、MODでシリーズを追加できます。
+- **👥 投稿者ツール（共有プレイリストをたくさん受け取る人向け・初期オフ）**：共有プレイリストには**投稿者名**を添えられます（設定で名前を決めるだけ。相手側のビューアに 👤 として表示）。📚すべて長押しの設定で「👥 投稿者ツール」をONにすると、**投稿者名で検索**・**🚫ブロック**（その人のプレイリストをタブ・フォルダから隠す）・**⭐お気に入り投稿者だけ表示**が使えるようになります。スパム的な大量投稿をさばくための道具で、使わない人は基本のUIに出てきません（投稿者名はファイルに書かれた値をそのまま表示するもので、なりすましは防げません）。
+- **🕹️ ショートプレイ（長い曲の後半だけ）**：上級者向け設定の「🕹️ ショートプレイ」で**後半90秒／120秒／180秒**を選べます。楽曲の終わりからさかのぼって開始し、**終盤に長い無音がある曲は自動で検知して、音が実際に止まった位置で終了**します（8秒くらい余白のある曲も大丈夫）。クリア判定・グレード・FC/APは通常どおり出ますが、記録は**フルプレイと完全に分けて保存**（フルのベストや視聴証明を汚しません）。称号まわりはモードを問わず一律 **🕹️** で統一。AUTOは従来どおりフル再生です。
+- **⏯🔊 曲名バナーが反応する**：右上の曲名バナーの**右下に音量つまみ 🔊**が付きました（設定の「曲音量」と同じもの。スライダーを出して調整・0で🔇）。さらに設定の「**右上の曲名をタップで一時停止／再生**」（**デフォルトはオフ**）をONにすると、バナーをタップするだけで**プレイ中は一時停止／再開、選曲中はプレビューの再生／停止**ができます（バナーの中のボタンや🎚エフェクト欄の操作は今までどおり）。
 - **🩷 MMDマスコット（持ち込み式）**：Lat式ミクやタワシ式CHAN×CO系ミクなど、**お手持ちのMMDモデル**を動かせます。テクスチャごとフォルダを選ぶだけ。内蔵モーションは trk! がコードで作る自作の3種（step／swing／turn）で、自分の `.vmd` も読み込めます。**モデルとモーションは原則同梱していません**（MMDの模型は再配布できないものがほとんどです）。例外として、再配布条件と原文ReadMeを同梱できるLat式モデルを `assets/mmd/lat-miku/` に収録しています。大きさ・向き・画面下のクレジットを設定でき、チェックを入れると次に開いたときも復元します。`?safe=1` のときは読み込みません。**うまく動かないときは、同じパネルの「🔎 動作チェック」**を押すと、WebGL・CDN（three／three-mmd-loader）・モデル・モーションの状態が1か所に出ます。「📋 結果をコピー」でそのまま貼ってもらえれば、原因を切り分けられます。
 
 ---
@@ -182,6 +188,8 @@ AUTO中か、「シークバーを表示（練習用）」をオンにしてい�
 ## 🎛 サウンドエフェクト
 
 trk! は、音楽プレイヤーとしても楽しめます。設定画面の「🎛 サウンドエフェクト」か、選曲画面のメニューで切り替えます。記録には影響しません。
+
+その下の **🎚 エフェクターラック** では、ポータブルアンプを多段に積むように、エフェクターを**段にして重ねられます**（最大8段。プリセットの後に効いて、マイプリセット保存・書き出しにも入ります）。並べられるのは **🚪ノイズゲート**（しきい値を下回ると閉じる）／**🧹ノイズ消し**（再生中の静かな部分で「🔇 いまの音をノイズとして覚える」を押すと、そのスペクトルを2秒間学習して消します。Audacity・ReaFir・Bertom Denoiser Classic の概念を自前実装）／**🎚 ダイナミックEQ**（その帯域が大きい時だけ減らす。TDR Nova・Ozone 流）／**✨エキサイター**（高域に倍音を足す）／**🧲コンプレッサー**／**📢音量**。ノイズ消しは音が約20ms遅れて聞こえるぶん、ノーツのタイミング自動補正が引き受けてくれます。
 
 | 分類 | 数 | 例 |
 |---|---|---|
@@ -221,7 +229,7 @@ trk! は、音楽プレイヤーとしても楽しめます。設定画面の「
 
 いま鳴っている音を、選曲画面で見られます。**エフェクトを通したあとの音**を読むので、EQや効果のかかり方も目で確かめられます。
 
-- **見え方は16種類**（下の表）、**色は8種類**（ネオン／夕焼け／モノクロ／レインボー／**trk（赤×蒼）**／桜／毒々／VHS）。初期は **⭕ リング × ネオン**。
+- **見え方は30種類**（下の表）、**色は16色**（ネオン／夕焼け／モノクロ／レインボー／**trk（赤×蒼）**／桜／毒々／VHS／ゴールド／氷／森林／キャンディ／溶岩／海／ゲームボーイ風／シンセウェイブ）。初期は **⭕ リング × ネオン**。
 - **感度**スライダーと**ピーク（残像の線）**つき。設定はふつうの設定と同じ場所（`shadow_taiko_preferences_v2`）に残ります。
 
 | 見え方 | なにが見える？ |
@@ -239,10 +247,24 @@ trk! は、音楽プレイヤーとしても楽しめます。設定画面の「
 | 💹 周波数ボード | 株価ボード風。低音〜高音の4段を数値と▲▼で出します。 |
 | 🤥 嘘発見器 | 脈拍・呼吸・発汗の3本の記録紙。大きな音に「ウソ」スタンプ。 |
 | 🔥 焚き火 | 音の大きさで炎が育ち、火の粉が舞います。 |
+| 🔵 ドットグリッド | 帯ごとに光るドットの塔。LEDパネルの集合体。 |
+| 🏙 シティーライト | 夜のビル街。窓が音で灯ってゆきます。 |
+| 🫧 あわ | 帯のぶんだけ泡がわいて、上がっていきます。 |
+| 🏔 山脈 | 低音・中音・高音の三連の尾根。 |
+| 🎸 弦 | 帯ごとに張った弦が、震えます。 |
+| 🌸 フラワー | 花びらが音で開く、ゆっくり回る花。 |
+| 🌀 万華鏡 | 8分割ミラーの万華鏡。 |
+| ✨ 星空 | 音の明るさで瞬く、ちりばめた星。 |
+| 🟢 マトリックス | 音速で落ちてくる文字雨。 |
+| 🎆 花火 | 音の跳ねで打ち上がる花火。 |
+| 🌊 うねり | 三層でうねる波。 |
+| 🐚 スパイラル | 渦を巻いて伸びる、光の線。 |
+| 🌬 風車 | 羽の長さが音、風で回る風車。 |
+| ⚡ 稲妻 | 跳ねた音で走る稲妻と、地上の明かり。 |
 
 - いらない人は、**設定 →「📊 スペクトラム」のいちばん上の「🚫 スペクトラムを使用しない」**にチェックするだけで、まとめてオフにできます（バナー・くわしい欄・TVの重ね・音の通り道まで全部。チェックを外せばそのまま戻ります）。
 - 置き場所は3つ：**📊 曲名バナー（右上の曲名のところ）**／**🎛 ラックの「⚙ 詳しい設定」の中**／**設定画面の「📊 スペクトラム」**。
-  - 曲名バナーは**スキン**になっていて、**左上の「＋」**を押すと大きく開きます（開くとその場で「⇄ 次の見え方」と色の丸ボタンが出ます）。もう一度押すと元に戻ります。
+  - 曲名バナーは**スキン**になっていて、**左上の「＋」**を押すと大きく開きます（開くとその場で「⇄ 次の見え方」と色の丸ボタンが出ます）。もう一度押すと元に戻ります。**「＋」の長押し**で、設定画面の📊スペクトラム欄へジャンプします。バナーの左右端には**◀▶曲送りボタン**（いまのタブの中を送る・設定でオフにできます）もあります。
   - 「ピークを出す」「📺 TVに重ねる」などは**設定（オプション）側**にまとめてあります。
 - **📺 TVの画面にも重ねられます**（初期はオフ）。映像の上に重なるので、選曲中ずっと眺めていられます。ゲーム中は出ません。
 - ⚠ 表示すると、音は**エフェクターと同じ通り道（Web Audio）**を通ります。エフェクトを一度も使っていないときも、オンにすると通り道が作られます（**判定の記録には影響しません**）。`?safe=1` では出ません。
@@ -351,7 +373,7 @@ trk! は、遊んでくれる人の声で育っていくゲームです。どん
 trk! はMODしやすいように、機能ごとにファイルを分けています。
 
 - **自作キャラクター**：`js/characters/miku.js` を見本に `registerMascot()` を呼ぶファイルを作り、`index.html` に1行足すだけです。
-- **内蔵スキン**：`js/data.js` の `SKINS` に1項目足すと、一覧に出ます。
+- **内蔵スキン**：`js/data.js` の `SKINS` に1項目足すと、一覧に出ます（`cat` タグで棚の絞り込み、`--ui-bg`／`game.stage` には `linear-gradient(…)` も書けます。`locked:true` を付けると解禁フラグ `settings.skinGradUnlocked` が立つまで鍵がかかり、棚では「❓ ？？？」カードになります。実例：ごほうびのグラデュエーション🎓）。ミク系は `js/characters/miku.js` に登録します。
 - **棚スキン（曲タブの見た目）**：`js/lib-skins.js` の `LIB_SKINS` と `LIB_SKIN_ORDER` に1項目、`css/style.css` に `#libPanel[data-lib-skin="ID"] …` の見た目を足すだけです。
 - **アドオン**：`js/*.js` を触らずに機能を足せます。`TrkAddons.register({...})` を書いて、設定画面から入れるか `index.html` に1行。API は [docs/ADDONS.md](docs/ADDONS.md)、見本は `js/addons/example.js`。
 - **TVスキン**：`js/tv-dock.js` の `TV_DOCK_SKINS` に1項目、`buildDeco()` に飾り、`css/style.css` に見た目を足します。自分で作るだけなら、設定画面の🎨（`#tvMaker`）からどうぞ。
@@ -421,6 +443,7 @@ trk! は、たくさんの音楽ゲームから着想をもらっています。
 | 自動微調整・ゴースト | beatmania IIDX |
 | RANDOM／ANTI-ROLL | EZ2ON |
 | 📻 ラジオ | DJMAX |
+| 📡 アンテナのキャラ肌（霊夢・魔理沙・チルノ・フランドール・妖夢） | 東方Project（二次創作ドット絵。公式素材は不使用） |
 
 <details>
 <summary>🤫 隠しSeed（ネタバレ注意）</summary>
@@ -445,6 +468,7 @@ trk! は、たくさんの音楽ゲームから着想をもらっています。
 | ソースコード | **GNU GPL v3.0 or later**（[LICENSE](LICENSE)） |
 | 「trk!」の名前 | ライセンスの対象外です。派生版は、別の名前で公開してください |
 | 初音ミクのマスコット（`js/characters/miku.js`） | ピアプロ・キャラクター・ライセンス（PCL）に基づく二次創作です。**GPLの対象外**で、非営利・無償の範囲でのみ使えます |
+| アンテナの東方キャラ肌5体（`js/fx-dock.js` の `ANT_CHARS`：霊夢・魔理沙・チルノ・フランドール・妖夢） | 東方Project（© 上海アリス幻樂団）を題材にした二次創作ドット絵です。**GPLの対象外**。[公式ガイドライン](https://touhou-project.news/guideline/)に従い無料で提供しています（公式のゲーム素材は不使用） |
 | three.js ／ three-vrm ／ three-vrm-animation ／ three-mmd-loader | MIT License（VRM・MMDの使用時にCDNから読み込み） |
 | Capacitor Core ／ Android | MIT License（任意のAndroidラッパーを生成したときだけ使用） |
 | Capacitor CLI ／ TypeScript | MIT ／ Apache-2.0（APK生成用の開発ツール。アプリ実行時には含めない） |
@@ -482,7 +506,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 - 🎪 **STAGE** — 4/5/6-lane vertical play with stairs, trills and wide notes (inspired by World Dai Star: Yume no Stellarium)
 - 🚛 **CATCH** — catch falling parcels with your truck; grab nitro cans 🚀 for **Blast mode**
 
-**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, VRM 1.0 mascots, MMD mascots (bring your own model, with an on-device 🔎 self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), 📤 **share your music folder** (one permission pulls the whole folder in at once, with an optional on-device copy of up to 150 songs / 300 MB), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, visual effect-chain editor, automatic latency compensation and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 16 built-in sounds (including electric guitar, electronic sax, and layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, a default option to lock mapped keys to the piano while synth mode is open, an optional wider on-screen keyboard for larger displays, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
+**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, antenna character skins (ten original dot characters that wake up and walk when ON and fall asleep when OFF, plus your own two ON/OFF images stored on your device only; Reimu, Marisa, Cirno, Flandre and Youmu are original Touhou Project fan art drawn for trk!, following the official fan-work guidelines), VRM 1.0 mascots, MMD mascots (bring your own model, with an on-device 🔎 self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), 📤 **share your music folder** (one permission pulls the whole folder in at once, with an optional on-device copy of up to 150 songs / 300 MB), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, visual effect-chain editor, automatic latency compensation and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 16 built-in sounds (including electric guitar, electronic sax, and layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, a default option to lock mapped keys to the piano while synth mode is open, an optional wider on-screen keyboard for larger displays, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
 
 **✔ Verified packs:** song packs whose composer/charter identity and rights have been confirmed get a ✔ badge and a short message from the creator (up to 280, like a free X post). See [docs/verified.md](docs/verified.md).
 
@@ -490,7 +514,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 
 **Feedback:** casual thoughts on X [@ttrk143](https://x.com/ttrk143) (hashtag **#trkAGRG**), bugs and ideas on [GitHub Issues](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues).
 
-**License:** code under **GPL-3.0-or-later**. The name “trk!” is not licensed — please rename forks. The Hatsune Miku mascot (`js/characters/miku.js`) is fan art under the Piapro Character License (non-commercial only) and is **not** covered by the GPL; delete that file and its `<script>` line for commercial forks. MMD models and `.vmd` motions are normally loaded from your device and their authors' terms apply; the redistributable Lat-style model under `assets/mmd/lat-miku/` includes its original terms and is not covered by the GPL. Songs, charts and messages in verified packs belong to their creators.
+**License:** code under **GPL-3.0-or-later**. The name “trk!” is not licensed — please rename forks. The Hatsune Miku mascot (`js/characters/miku.js`) is fan art under the Piapro Character License (non-commercial only) and is **not** covered by the GPL; delete that file and its `<script>` line for commercial forks. The Touhou Project antenna character skins (Reimu, Marisa, Cirno, Flandre and Youmu in `ANT_CHARS` of `js/fx-dock.js`) are original fan works (© Team Shanghai Alice / ZUN) following the official fan-work guidelines — no assets from the official games are used; remove their entries for a Touhou-free build. MMD models and `.vmd` motions are normally loaded from your device and their authors' terms apply; the redistributable Lat-style model under `assets/mmd/lat-miku/` includes its original terms and is not covered by the GPL. Songs, charts and messages in verified packs belong to their creators.
 
 This work depicts the character “Hatsune Miku” of Crypton Future Media, INC. under the Piapro Character License.
 

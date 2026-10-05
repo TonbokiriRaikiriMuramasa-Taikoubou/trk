@@ -42,9 +42,16 @@ Object.assign(TEXT.ja, {
   specStyleEcg:"💓 心電図", specStyleSeismo:"📉 地震計", specStyleRadar:"📡 レーダー",
   specStylePiano:"🎹 ピアノロール", specStyleSlide:"📈 業績グラフ", specStyleBoard:"💹 周波数ボード",
   specStyleLie:"🤥 嘘発見器", specStyleFire:"🔥 焚き火",
+  specStyleDotgrid:"🔵 ドットグリッド", specStyleCity:"🏙 シティーライト", specStyleBubbles:"🫧 あわ", specStyleTerrain:"🏔 山脈",
+  specStyleStrings:"🎸 弦", specStyleFlower:"🌸 フラワー", specStyleKaleido:"🌀 万華鏡", specStyleStarfield:"✨ 星空",
+  specStyleMatrix:"🟢 マトリックス", specStyleFireworks:"🎆 花火", specStyleOcean:"🌊 うねり", specStyleSpiral:"🐚 スパイラル",
+  specStyleWindmill:"🌬 風車", specStyleLightning:"⚡ 稲妻",
   specTheme:"色",
   specThemeNeon:"ネオン", specThemeSunset:"夕焼け", specThemeMono:"モノクロ", specThemeRainbow:"レインボー",
   specThemeTrk:"trk（赤×蒼）", specThemeSakura:"桜", specThemeAcid:"毒々", specThemeVhs:"VHS",
+  specThemeGold:"ゴールド", specThemeIce:"氷", specThemeForest:"森林", specThemeCandy:"キャンディ",
+  specThemeVolcano:"溶岩", specThemeMarine:"海", specThemeGameboy:"ゲームボーイ風", specThemeSynth:"シンセウェイブ",
+  specSettingsTip:"長押しでスペクトラムの設定を開く",
   specSkin:"📊 曲名バナーをスペクトラムにする",
   specSkinHint:"曲名バナーの左上の「＋」を押すと、大きく開きます（ここでも切り替えられます）。",
   specSkinOpenTip:"📊 スペクトラムを大きく開く", specSkinCloseTip:"📊 スペクトラムを小さく閉じる",
@@ -74,9 +81,16 @@ Object.assign(TEXT.en, {
   specStyleEcg:"💓 ECG", specStyleSeismo:"📉 Seismograph", specStyleRadar:"📡 Radar",
   specStylePiano:"🎹 Piano roll", specStyleSlide:"📈 Results chart", specStyleBoard:"💹 Frequency board",
   specStyleLie:"🤥 Lie detector", specStyleFire:"🔥 Campfire",
+  specStyleDotgrid:"🔵 Dot grid", specStyleCity:"🏙 City lights", specStyleBubbles:"🫧 Bubbles", specStyleTerrain:"🏔 Mountains",
+  specStyleStrings:"🎸 Strings", specStyleFlower:"🌸 Flower", specStyleKaleido:"🌀 Kaleidoscope", specStyleStarfield:"✨ Starfield",
+  specStyleMatrix:"🟢 Matrix", specStyleFireworks:"🎆 Fireworks", specStyleOcean:"🌊 Swells", specStyleSpiral:"🐚 Spiral",
+  specStyleWindmill:"🌬 Windmill", specStyleLightning:"⚡ Lightning",
   specTheme:"Color",
   specThemeNeon:"Neon", specThemeSunset:"Sunset", specThemeMono:"Mono", specThemeRainbow:"Rainbow",
   specThemeTrk:"trk (red × blue)", specThemeSakura:"Sakura", specThemeAcid:"Acid", specThemeVhs:"VHS",
+  specThemeGold:"Gold", specThemeIce:"Ice", specThemeForest:"Forest", specThemeCandy:"Candy",
+  specThemeVolcano:"Lava", specThemeMarine:"Marine", specThemeGameboy:"Game Boy", specThemeSynth:"Synthwave",
+  specSettingsTip:"Long-press to open spectrum settings",
   specSkin:"📊 Use the spectrum as the song banner",
   specSkinHint:"Press “＋” at the top-left of the song banner to open it wider (you can also switch it here).",
   specSkinOpenTip:"📊 Open the spectrum wider", specSkinCloseTip:"📊 Close the spectrum",
@@ -105,9 +119,16 @@ Object.assign(TEXT.zh, {
   specStyleEcg:"💓 心电图", specStyleSeismo:"📉 地震仪", specStyleRadar:"📡 雷达",
   specStylePiano:"🎹 钢琴卷帘", specStyleSlide:"📈 业绩图表", specStyleBoard:"💹 频率看板",
   specStyleLie:"🤥 测谎仪", specStyleFire:"🔥 篝火",
+  specStyleDotgrid:"🔵 点阵", specStyleCity:"🏙 城市灯光", specStyleBubbles:"🫧 气泡", specStyleTerrain:"🏔 山脉",
+  specStyleStrings:"🎸 琴弦", specStyleFlower:"🌸 花朵", specStyleKaleido:"🌀 万花筒", specStyleStarfield:"✨ 星空",
+  specStyleMatrix:"🟢 矩阵", specStyleFireworks:"🎆 烟花", specStyleOcean:"🌊 波涛", specStyleSpiral:"🐚 螺旋",
+  specStyleWindmill:"🌬 风车", specStyleLightning:"⚡ 闪电",
   specTheme:"配色",
   specThemeNeon:"霓虹", specThemeSunset:"晚霞", specThemeMono:"黑白", specThemeRainbow:"彩虹",
   specThemeTrk:"trk（红×蓝）", specThemeSakura:"樱花", specThemeAcid:"荧光毒", specThemeVhs:"VHS",
+  specThemeGold:"黄金", specThemeIce:"冰", specThemeForest:"森林", specThemeCandy:"糖果",
+  specThemeVolcano:"熔岩", specThemeMarine:"海洋", specThemeGameboy:"掌机风", specThemeSynth:"合成器浪潮",
+  specSettingsTip:"长按打开频谱设置",
   specSkin:"📊 把曲名横幅变成频谱",
   specSkinHint:"按曲名横幅左上角的「＋」可以放大（在这里也能切换）。",
   specSkinOpenTip:"📊 放大频谱", specSkinCloseTip:"📊 收小频谱",
@@ -136,9 +157,16 @@ Object.assign(TEXT.ko, {
   specStyleEcg:"💓 심전도", specStyleSeismo:"📉 지진계", specStyleRadar:"📡 레이더",
   specStylePiano:"🎹 피아노 롤", specStyleSlide:"📈 실적 그래프", specStyleBoard:"💹 주파수 보드",
   specStyleLie:"🤥 거짓말 탐지기", specStyleFire:"🔥 모닥불",
+  specStyleDotgrid:"🔵 도트 그리드", specStyleCity:"🏙 시티 라이트", specStyleBubbles:"🫧 물방울", specStyleTerrain:"🏔 산맥",
+  specStyleStrings:"🎸 현", specStyleFlower:"🌸 플라워", specStyleKaleido:"🌀 만화경", specStyleStarfield:"✨ 별하늘",
+  specStyleMatrix:"🟢 매트릭스", specStyleFireworks:"🎆 불꽃놀이", specStyleOcean:"🌊 파도", specStyleSpiral:"🐚 나선",
+  specStyleWindmill:"🌬 풍차", specStyleLightning:"⚡ 번개",
   specTheme:"색",
   specThemeNeon:"네온", specThemeSunset:"노을", specThemeMono:"모노크롬", specThemeRainbow:"무지개",
   specThemeTrk:"trk (빨강×파랑)", specThemeSakura:"벚꽃", specThemeAcid:"애시드", specThemeVhs:"VHS",
+  specThemeGold:"골드", specThemeIce:"얼음", specThemeForest:"숲", specThemeCandy:"캔디",
+  specThemeVolcano:"용암", specThemeMarine:"바다", specThemeGameboy:"게임보이풍", specThemeSynth:"신스웨이브",
+  specSettingsTip:"길게 누르면 스펙트럼 설정 열기",
   specSkin:"📊 곡명 배너를 스펙트럼으로",
   specSkinHint:"곡명 배너 왼쪽 위의 「＋」를 누르면 크게 열립니다 (여기서도 전환할 수 있습니다).",
   specSkinOpenTip:"📊 스펙트럼 크게 열기", specSkinCloseTip:"📊 스펙트럼 작게 닫기",
@@ -163,12 +191,18 @@ const STYLE_KEYS = {
   daw:"specStyleDaw", vu:"specStyleVu", led:"specStyleLed", spectro:"specStyleSpectro",
   ecg:"specStyleEcg", seismo:"specStyleSeismo", radar:"specStyleRadar",
   piano:"specStylePiano", slide:"specStyleSlide", board:"specStyleBoard",
-  lie:"specStyleLie", fire:"specStyleFire"
+  lie:"specStyleLie", fire:"specStyleFire",
+  dotgrid:"specStyleDotgrid", city:"specStyleCity", bubbles:"specStyleBubbles", terrain:"specStyleTerrain",
+  strings:"specStyleStrings", flower:"specStyleFlower", kaleido:"specStyleKaleido", starfield:"specStyleStarfield",
+  matrix:"specStyleMatrix", fireworks:"specStyleFireworks", ocean:"specStyleOcean", spiral:"specStyleSpiral",
+  windmill:"specStyleWindmill", lightning:"specStyleLightning"
 };
 const SPEC_STYLES = Object.keys(STYLE_KEYS);
 const THEME_KEYS = {
   neon:"specThemeNeon", sunset:"specThemeSunset", mono:"specThemeMono", rainbow:"specThemeRainbow",
-  trk:"specThemeTrk", sakura:"specThemeSakura", acid:"specThemeAcid", vhs:"specThemeVhs"
+  trk:"specThemeTrk", sakura:"specThemeSakura", acid:"specThemeAcid", vhs:"specThemeVhs",
+  gold:"specThemeGold", ice:"specThemeIce", forest:"specThemeForest", candy:"specThemeCandy",
+  volcano:"specThemeVolcano", marine:"specThemeMarine", gameboy:"specThemeGameboy", synth:"specThemeSynth"
 };
 const SPEC_THEMES = Object.keys(THEME_KEYS);
 /* チップや点に出す色（CSS の --specSwatch に渡す） */
@@ -176,7 +210,11 @@ const THEME_SWATCH = {
   neon:"linear-gradient(90deg,#22d3ee,#c084fc)", sunset:"linear-gradient(90deg,#ffb703,#ff4d9d)",
   mono:"#e5e7eb", rainbow:"linear-gradient(90deg,#f87171,#fbbf24,#4ade80,#60a5fa,#c084fc)",
   trk:"linear-gradient(90deg,#ff3b55,#55aaff)", sakura:"linear-gradient(90deg,#ffd1e0,#ff8fb1)",
-  acid:"linear-gradient(90deg,#b6ff00,#a259ff)", vhs:"linear-gradient(90deg,#22d3ee,#ff4fd8,#ffe066)"
+  acid:"linear-gradient(90deg,#b6ff00,#a259ff)", vhs:"linear-gradient(90deg,#22d3ee,#ff4fd8,#ffe066)",
+  gold:"linear-gradient(90deg,#ffd700,#ff9d3f)", ice:"linear-gradient(90deg,#a5f3fc,#e0f2fe)",
+  forest:"linear-gradient(90deg,#4ade80,#166534)", candy:"linear-gradient(90deg,#ff9ecd,#a7f3d0)",
+  volcano:"linear-gradient(90deg,#ff3d00,#ff9100)", marine:"linear-gradient(90deg,#0ea5e9,#065f7a)",
+  gameboy:"linear-gradient(90deg,#9bbc0f,#0f380f)", synth:"linear-gradient(90deg,#ff2d95,#7c3aed,#ff9e00)"
 };
 const specSafe = (typeof safeModeOn !== "undefined") && safeModeOn;
 /* 🛟 セーフモードのときは、保存値を読み戻さない（core.js が入れた「表示しない」を守る） */
@@ -240,6 +278,14 @@ function themeColor(theme, i, n, v) {
   if (theme === "sakura") return `hsl(${Math.round(346 - t * 26)}, ${Math.round(74 - t * 22)}%, ${Math.round(72 + v * 12)}%)`;
   if (theme === "acid") return `hsl(${Math.round(78 + t * 214)}, 100%, ${Math.round(50 + v * 16)}%)`;
   if (theme === "vhs") return `hsl(${Math.round((182 + t * 226) % 360)}, 96%, ${Math.round(60 + v * 12)}%)`;
+  if (theme === "gold") return `hsl(${Math.round(38 + t * 18)}, ${Math.round(80 - t * 22)}%, ${Math.round(48 + v * 26)}%)`;        // 金 → 山吹
+  if (theme === "ice") return `hsl(${Math.round(196 + t * 24)}, ${Math.round(88 - t * 26)}%, ${Math.round(58 + v * 32)}%)`;        // 氷青 → 白
+  if (theme === "forest") return `hsl(${Math.round(96 + t * 72)}, ${Math.round(52 - t * 16)}%, ${Math.round(38 + v * 26)}%)`;      // 若葉 → 深緑
+  if (theme === "candy") return `hsl(${Math.round((320 + t * 90) % 360)}, ${Math.round(84 - t * 22)}%, ${Math.round(70 + v * 18)}%)`;  // 桃 → ミント
+  if (theme === "volcano") return `hsl(${Math.round(8 + t * 34)}, ${Math.round(96 - t * 18)}%, ${Math.round(46 + v * 22)}%)`;      // 溶岩の赤 → 橙
+  if (theme === "marine") return `hsl(${Math.round(214 + t * 26)}, ${Math.round(82 - t * 24)}%, ${Math.round(48 + v * 28)}%)`;     // 深海 → 浅瀬
+  if (theme === "gameboy") return `hsl(${Math.round(96 + t * 16)}, 46%, ${[16, 32, 48, 66][Math.max(0, Math.min(3, Math.floor(v * 4 + .5)))]}%)`;  // 4階調グリーン
+  if (theme === "synth") return `hsl(${Math.round((312 + t * 66) % 360)}, ${Math.round(94 - t * 12)}%, ${Math.round(58 + v * 14)}%)`;     // マゼンタ → 橙（夕景。360°を巻き戻す）
   return `hsl(${Math.round(188 + t * 132)}, 100%, ${Math.round(56 + v * 12)}%)`;   // neon：シアン → マゼンタ
 }
 /* スペクトログラムの色（静か＝青 → うるさい＝赤白） */
@@ -286,7 +332,7 @@ function needleStep(st, key, target) {
   return st[key];
 }
 
-/* ============ 見え方（16種） ============
+/* ============ 見え方（30種） ============
    どの関数も (S, g, W, H) を受け取ります。
    S = { vals, wave, live, theme, peaks, reduced, cv, st, kind, t, n }
      vals … 40Hz〜14kHz を対数で分けた帯の強さ（0..1）
@@ -557,6 +603,255 @@ function drawSeismo(S, g, W, H) {
   g.font = FONT(H * .15, "700");
   g.fillText(`${tr("specSeismoUnit")} ${mag < .05 ? "0.0" : mag.toFixed(1)}`, 7, 4);
 }
+
+/* ---- 🔵 ドットグリッド：バンドごとに光るドットの塔 ---- */
+function drawDotgrid(S, g, W, H) {
+  const n = S.n, step = W / n, cols = Math.max(6, Math.round(H / Math.max(6, step * 1.3)));
+  const r = Math.max(1.4, Math.min(step * .32, H / cols * .34));
+  for (let i = 0; i < n; i++) {
+    const lit = Math.round(S.vals[i] * cols);
+    for (let j = 0; j < cols; j++) {
+      g.fillStyle = j < lit ? themeColor(S.theme, i, n, S.vals[i]) : "rgba(255,255,255,.08)";
+      g.beginPath();
+      g.arc(i * step + step / 2, H - r * 2.2 - j * (H / cols), r, 0, Math.PI * 2);
+      g.fill();
+    }
+  }
+}
+/* ---- 🏙 シティーライト：ビルの窓が音で灯る夜景 ---- */
+function drawCity(S, g, W, H) {
+  const n = S.n, step = W / n;
+  g.fillStyle = "rgba(8,10,26,.94)"; g.fillRect(0, 0, W, H);
+  g.fillStyle = "rgba(255,244,214,.92)"; g.beginPath(); g.arc(W * .85, H * .2, H * .06, 0, Math.PI * 2); g.fill();
+  for (let i = 0; i < n; i++) {
+    const v = S.vals[i], bw = step * .84, bh = Math.max(H * .05, v * H * .82);
+    const x = i * step + step * .08, y = H - bh;
+    g.fillStyle = themeColor(S.theme, i, n, v * .7 + .12);
+    rr2(g, x, y, bw, bh);
+    const wn = Math.max(1, Math.round(bw / Math.max(3, step * .3))), rows = Math.max(1, Math.round(bh / Math.max(4, H * .1)));
+    g.fillStyle = "rgba(10,14,32,.6)";
+    for (let r2 = 0; r2 < rows; r2++) for (let c = 0; c < wn; c++) {
+      if ((i * 31 + r2 * 7 + c * 13) % 10 < v * 9 + .6)
+        g.fillRect(x + 2 + c * (bw - 4) / wn, y + 3 + r2 * (bh - 6) / rows, Math.max(1, (bw - 4) / wn - 1.5), Math.max(1, (bh - 6) / rows - 2));
+    }
+  }
+}
+/* ---- 🫧 あわ：バンドのぶんだけ泡がわく ---- */
+function drawBubbles(S, g, W, H) {
+  const st = S.st, ps = st.bub || (st.bub = []), n = S.n;
+  for (let i = 0; i < n; i++) {
+    const v = S.vals[i];
+    if (v > .12 && !S.reduced && Math.random() < v * .26)
+      ps.push({ x: (i + .5) / n, r: 2 + Math.random() * v * H * .14, y: H + 8, s: .5 + Math.random() * 1.4, b: i / n });
+  }
+  for (let k = ps.length - 1; k >= 0; k--) {
+    const p = ps[k], bi = Math.min(n - 1, Math.floor(p.b * n));
+    p.y -= p.s * H * .012 * (.4 + S.vals[bi] * 2.2);
+    if (p.y < -20) { ps.splice(k, 1); continue; }
+    g.strokeStyle = themeColor(S.theme, bi, n, .55);
+    g.lineWidth = Math.max(1, p.r * .12);
+    g.beginPath(); g.arc(p.x * W + Math.sin(p.y * .04) * 4, p.y, p.r, 0, Math.PI * 2); g.stroke();
+  }
+  if (ps.length > 150) ps.splice(0, ps.length - 150);
+}
+/* ---- 🏔 山脈：低音〜高音の三連の尾根 ---- */
+function drawTerrain(S, g, W, H) {
+  const st = S.st, n = S.n, len = Math.max(64, Math.round(W));
+  const layers = [[.04, .38, .9], [.02, .58, .5], [0, .82, .2]];
+  for (let L = layers.length - 1; L >= 0; L--) {
+    const [f, hgt] = layers[L];
+    ringPush(st, "ter" + L, len, avgRange(S.vals, f, f + .3) * hgt);
+    g.beginPath(); g.moveTo(0, H);
+    for (let x = 0; x < W; x++) {
+      const a = ringAt(st, "ter" + L, Math.min(len - 1, Math.floor(x / W * len)));
+      g.lineTo(x, H * (.96 - a * .72) - Math.sin(x * .012 + L * 5) * H * .018);
+    }
+    g.lineTo(W, H); g.closePath();
+    g.fillStyle = themeColor(S.theme, L, 3, .3 + L * .2);
+    g.globalAlpha = 1 - L * .2; g.fill(); g.globalAlpha = 1;
+  }
+}
+/* ---- 🎸 弦：バンドごとに震える弦 ---- */
+function drawStrings(S, g, W, H) {
+  const n = S.n, step = H / n;
+  for (let i = 0; i < n; i++) {
+    const v = S.vals[i], y = (i + .5) * step;
+    g.strokeStyle = themeColor(S.theme, i, n, .3 + v * .7);
+    g.lineWidth = Math.max(1, step * .24);
+    const amp = v * H * .13 * (S.live ? 1 : .25), ph = (S.t * .004 + i) % (Math.PI * 2);
+    g.beginPath();
+    for (let x = 0; x <= W; x += 8) {
+      const yy = y + Math.sin(x / W * Math.PI * (1 + i % 3) + ph) * amp * Math.sin(x / W * Math.PI);
+      if (x === 0) g.moveTo(x, yy); else g.lineTo(x, yy);
+    }
+    g.stroke();
+  }
+}
+/* ---- 🌸 フラワー：花びらが音で開く ---- */
+function drawFlower(S, g, W, H) {
+  const n = S.n, cx = W / 2, cy = H / 2, R = Math.min(W, H) * .46, rot = S.t * .0006;
+  for (let i = 0; i < n; i++) {
+    const v = S.vals[i], a0 = rot + i / n * Math.PI * 2, a1 = a0 + Math.PI * 2 / n * .82;
+    const r0 = R * .18, r1 = R * (.28 + v * .85);
+    g.fillStyle = themeColor(S.theme, i, n, .3 + v * .6);
+    g.beginPath();
+    g.moveTo(cx + Math.cos(a0) * r0, cy + Math.sin(a0) * r0);
+    g.quadraticCurveTo(cx + Math.cos((a0 + a1) / 2) * r1, cy + Math.sin((a0 + a1) / 2) * r1, cx + Math.cos(a1) * r0, cy + Math.sin(a1) * r0);
+    g.closePath(); g.fill();
+  }
+  g.fillStyle = themeColor(S.theme, 0, 1, .9);
+  g.beginPath(); g.arc(cx, cy, R * .11, 0, Math.PI * 2); g.fill();
+}
+/* ---- 🌀 万華鏡：放射状に8分割ミラー ---- */
+function drawKaleido(S, g, W, H) {
+  const n = S.n, cx = W / 2, cy = H / 2, R = Math.max(W, H) * .62, seg = 8, rot = S.t * .0004;
+  for (let s = 0; s < seg; s++) {
+    g.save(); g.translate(cx, cy); g.rotate(rot + s * Math.PI * 2 / seg); g.scale(s % 2 ? -1 : 1, 1);
+    const w = Math.PI * 2 / seg / n * .92;
+    for (let i = 0; i < n; i++) {
+      g.fillStyle = themeColor(S.theme, i, n, S.vals[i]);
+      g.beginPath(); g.moveTo(0, 0);
+      g.arc(0, 0, R * (.16 + S.vals[i] * .92), i * w, (i + 1) * w);
+      g.closePath(); g.fill();
+    }
+    g.restore();
+  }
+}
+/* ---- ✨ 星空：音の明るさで瞬く星 ---- */
+function drawStarfield(S, g, W, H) {
+  const st = S.st, stars = st.stars || (st.stars = []), n = S.n;
+  g.fillStyle = "rgba(4,6,18,.5)"; g.fillRect(0, 0, W, H);
+  while (stars.length < 90) stars.push({ x: Math.random(), y: Math.random(), s: Math.random(), b: Math.random() });
+  for (const p of stars) {
+    const bi = Math.min(n - 1, Math.floor(p.b * n)), v = S.vals[bi];
+    const tw = .25 + .75 * Math.abs(Math.sin(S.t * .003 * (1 + p.s * 2) + p.b * 9));
+    g.fillStyle = themeColor(S.theme, bi, n, .5 + v * .5);
+    g.beginPath(); g.arc(p.x * W, p.y * H, Math.max(.5, (0.6 + p.s * 1.8) * (0.5 + v * 2.2) * tw), 0, Math.PI * 2); g.fill();
+  }
+}
+/* ---- 🟢 マトリックス：音速で落ちる文字雨 ---- */
+function drawMatrix(S, g, W, H) {
+  const st = S.st, n = S.n, cols = st.mtx || (st.mtx = []);
+  const cn = Math.max(10, Math.round(W / Math.max(9, H * .06))), fs = Math.max(9, H * .062);
+  g.fillStyle = "rgba(0,4,3,.32)"; g.fillRect(0, 0, W, H);
+  g.font = MONO(fs); g.textAlign = "center"; g.textBaseline = "middle";
+  for (let c = 0; c < cn; c++) {
+    if (!cols[c]) cols[c] = { y: Math.random() * H };
+    const bi = Math.min(n - 1, Math.floor(c / cn * n)), v = S.vals[bi];
+    cols[c].y += (.5 + v * 4) * (S.reduced ? .5 : 1);
+    if (cols[c].y > H + fs * 12) cols[c].y = -Math.random() * H * .5;
+    for (let k = 0; k < 12; k++) {
+      const y = cols[c].y - k * fs;
+      if (y < -fs || y > H + fs) continue;
+      g.globalAlpha = k === 0 ? 1 : Math.max(0, .9 - k * .09);
+      g.fillStyle = k === 0 ? "#eafff2" : themeColor(S.theme, bi, n, .8);
+      g.fillText(String.fromCharCode(0x30a0 + ((c * 31 + k * 7 + Math.floor(S.t * .01)) % 60)), (c + .5) / cn * W, y);
+    }
+  }
+  g.globalAlpha = 1;
+}
+/* ---- 🎆 花火：音の跳ねで打ち上がる ---- */
+function drawFireworks(S, g, W, H) {
+  const st = S.st, ps = st.fw || (st.fw = []), n = S.n;
+  g.fillStyle = "rgba(6,8,22,.4)"; g.fillRect(0, 0, W, H);
+  const e = avgRange(S.vals, 0, 1), pk = peakOf(S.cv, 1);
+  const beat = e > pk[0] + .17 && e > .3;
+  pk[0] = Math.max(e, pk[0] - .015);
+  if ((beat && !S.reduced) || (S.live && ps.length < 2 && !S.reduced && Math.random() < .006)) {
+    const col = themeColor(S.theme, Math.floor(Math.random() * n), n, .9);
+    const cx = (.15 + Math.random() * .7) * W, cy = (.12 + Math.random() * .4) * H;
+    for (let k = 0; k < 24; k++) {
+      const a = Math.random() * Math.PI * 2, sp = (.4 + Math.random()) * H * .05;
+      ps.push({ x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, c: col, life: 1 });
+    }
+  }
+  for (let k = ps.length - 1; k >= 0; k--) {
+    const p = ps[k];
+    p.x += p.vx; p.y += p.vy; p.vy += H * .0012; p.life -= .016;
+    if (p.life <= 0) { ps.splice(k, 1); continue; }
+    g.globalAlpha = Math.max(0, p.life);
+    g.fillStyle = p.c;
+    g.beginPath(); g.arc(p.x, p.y, Math.max(1, H * .012 * p.life), 0, Math.PI * 2); g.fill();
+  }
+  g.globalAlpha = 1;
+  if (ps.length > 480) ps.splice(0, ps.length - 480);
+}
+/* ---- 🌊 うねり：低・中・高音の三層の波 ---- */
+function drawOcean(S, g, W, H) {
+  const st = S.st, len = Math.max(64, Math.round(W));
+  g.fillStyle = "rgba(5,12,30,.9)"; g.fillRect(0, 0, W, H);
+  const bands = [[0, .14], [.14, .4], [.4, 1]];
+  for (let L = 0; L < 3; L++) {
+    ringPush(st, "oc" + L, len, avgRange(S.vals, bands[L][0], bands[L][1]));
+    g.beginPath(); g.moveTo(0, H);
+    for (let x = 0; x <= W; x += 4) {
+      const a = ringAt(st, "oc" + L, Math.min(len - 1, Math.floor(x / W * len)));
+      const y = H * (.42 + L * .18) - a * H * .24 + Math.sin(x * .02 + L * 2 + S.t * .002) * H * .03;
+      g.lineTo(x, y);
+    }
+    g.lineTo(W, H); g.closePath();
+    g.fillStyle = themeColor(S.theme, L, 3, .3 + L * .16);
+    g.globalAlpha = .5 + L * .22; g.fill(); g.globalAlpha = 1;
+  }
+}
+/* ---- 🐚 スパイラル：渦を巻いて伸びる線 ---- */
+function drawSpiral(S, g, W, H) {
+  const n = S.n, cx = W / 2, cy = H / 2, R = Math.min(W, H) * .48, TOT = Math.PI * 8;
+  g.beginPath();
+  for (let a = 0; a < TOT; a += .07) {
+    const bi = Math.min(n - 1, Math.floor(a / TOT * n)), v = S.live ? S.vals[bi] : .25;
+    const r = R * (a / TOT) * (.5 + v * .95);
+    const x = cx + Math.cos(a + S.t * .0009) * r, y = cy + Math.sin(a + S.t * .0009) * r;
+    if (a === 0) g.moveTo(x, y); else g.lineTo(x, y);
+  }
+  g.strokeStyle = themeColor(S.theme, 0, 1, .9);
+  g.lineWidth = Math.max(1.5, H * .02);
+  g.shadowColor = g.strokeStyle; g.shadowBlur = Math.max(2, H * .08);
+  g.stroke(); g.shadowBlur = 0;
+}
+/* ---- 🌬 風車：羽の長さが音、風で回る ---- */
+function drawWindmill(S, g, W, H) {
+  const n = S.n, cx = W / 2, cy = H / 2, R = Math.min(W, H) * .46;
+  const blades = Math.max(3, Math.min(8, Math.round(n / 6)));
+  const spin = S.t * .001 * (.4 + avgRange(S.vals, 0, 1) * 2.4);
+  for (let b = 0; b < blades; b++) {
+    const bi = Math.min(n - 1, Math.floor(b / blades * n)), v = S.vals[bi];
+    g.save(); g.translate(cx, cy); g.rotate(spin + b * Math.PI * 2 / blades);
+    const len = R * (.38 + v * .95);
+    g.fillStyle = themeColor(S.theme, b, blades, .3 + v * .7);
+    g.beginPath(); g.moveTo(0, 0);
+    g.quadraticCurveTo(len * .5, -len * .12, len, 0);
+    g.quadraticCurveTo(len * .5, len * .12, 0, 0);
+    g.closePath(); g.fill();
+    g.restore();
+  }
+  g.fillStyle = themeColor(S.theme, 0, 1, .85);
+  g.beginPath(); g.arc(cx, cy, R * .08, 0, Math.PI * 2); g.fill();
+}
+/* ---- ⚡ 稲妻：跳ねた音で走る稲妻と地上の明かり ---- */
+function drawLightning(S, g, W, H) {
+  const st = S.st, n = S.n;
+  const e = avgRange(S.vals, 0, .5), pk = peakOf(S.cv, 1);
+  const bolt = e > pk[0] + .2 && e > .34;
+  pk[0] = Math.max(e, pk[0] - .02);
+  g.fillStyle = "rgba(8,10,24,.5)"; g.fillRect(0, 0, W, H);
+  if (bolt) st.boltT = 6;
+  if (st.boltT > 0) {
+    st.boltT--;
+    let x = W * (.2 + Math.random() * .6), y = 0;
+    g.strokeStyle = "#fff"; g.lineWidth = Math.max(1.5, H * .022); g.lineJoin = "round";
+    g.shadowColor = themeColor(S.theme, 0, 1, .9); g.shadowBlur = H * .22;
+    g.beginPath(); g.moveTo(x, y);
+    while (y < H * .78) { x += (Math.random() - .5) * W * .1; y += H * .12; g.lineTo(x, y); }
+    g.stroke(); g.shadowBlur = 0;
+  }
+  for (let i = 0; i < n; i++) {
+    const v = S.vals[i], hh = Math.max(2, v * H * .16);
+    g.fillStyle = themeColor(S.theme, i, n, v);
+    rr2(g, i * (W / n), H - hh, Math.max(2, W / n * .7), hh);
+  }
+}
+
 /* ---- 📡 レーダー：掃引とブリップ（残像つき） ---- */
 function drawRadar(S, g, W, H) {
   const st = S.st;
@@ -765,7 +1060,11 @@ const STYLE_DRAW = {
   wave: drawWave, ring: drawRing,
   daw: drawDaw, vu: drawVu, led: drawLed, spectro: drawSpectro,
   ecg: drawEcg, seismo: drawSeismo, radar: drawRadar,
-  piano: drawPiano, slide: drawSlide, board: drawBoard, lie: drawLie, fire: drawFire
+  piano: drawPiano, slide: drawSlide, board: drawBoard, lie: drawLie, fire: drawFire,
+  dotgrid: drawDotgrid, city: drawCity, bubbles: drawBubbles, terrain: drawTerrain,
+  strings: drawStrings, flower: drawFlower, kaleido: drawKaleido, starfield: drawStarfield,
+  matrix: drawMatrix, fireworks: drawFireworks, ocean: drawOcean, spiral: drawSpiral,
+  windmill: drawWindmill, lightning: drawLightning
 };
 const IDLE_LINE = { bars: 1, mirror: 1, wave: 1 };              // 音が無いときの平らな線を出す見え方
 
@@ -846,7 +1145,8 @@ let tvCanvas = null;                   // 📺 TVに重ねるキャンバス
 let raf = 0;
 
 /* 📺 重ねるときの濃さ：全面に背景を塗る見え方は薄くして、映像が透けるようにする */
-const TV_ALPHA = { daw:.58, vu:.7, led:.7, spectro:.72, ecg:.7, seismo:.55, radar:.82, piano:.68, slide:.5, board:.68, lie:.55, fire:.85 };
+const TV_ALPHA = { daw:.58, vu:.7, led:.7, spectro:.72, ecg:.7, seismo:.55, radar:.82, piano:.68, slide:.5, board:.68, lie:.55, fire:.85,
+  city:.6, matrix:.72, starfield:.75, fireworks:.72, ocean:.62, kaleido:.88, lightning:.7 };
 
 /* 動きを減らす設定の人には、本数を減らしてピークの残像も出さない */
 function reducedMotion() {
@@ -1016,6 +1316,16 @@ function buildBannerSkin() {
     if (settings.specSkinOpen) settings.specSkin = true;    // 開くときはスキンも入れる
     saveUserPrefs(); syncAll();
   });
+  /* ⚙ 長押しで、設定画面のスペクトラム欄を開いてスクロール */
+  onLongPress(zipBtn, () => {
+    if (typeof openSettings === "function") openSettings();
+    setTimeout(() => {
+      const p = document.getElementById("specPanel");
+      if (!p) return;
+      p.open = true;
+      if (typeof p.scrollIntoView === "function") { try { p.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (_) {} }
+    }, 160);
+  });
   banner.append(zipBtn);
 
   skinTools = el("div", "specSkinTools");      // 開いたときだけ出る（幅を取らない小さな操作）
@@ -1050,7 +1360,7 @@ function buildBannerSkin() {
     if (zipBtn) {
       zipBtn.hidden = !live;
       zipBtn.textContent = settings.specSkinOpen ? "−" : "+";
-      const tip = tr(settings.specSkinOpen ? "specSkinCloseTip" : "specSkinOpenTip");
+      const tip = tr(settings.specSkinOpen ? "specSkinCloseTip" : "specSkinOpenTip") + " · " + tr("specSettingsTip");
       if (zipBtn.title !== tip) { zipBtn.title = tip; zipBtn.setAttribute("aria-label", tip); }
     }
     if (skinTools) skinTools.hidden = !(settings.specSkin && settings.specSkinOpen && live);

@@ -147,6 +147,163 @@ if (/棚スキン11種|・11種類/.test(read("css/style.css") + skins)) {
   fail("stale shelf skin count (11) remains in source comments");
 }
 
+// Overall look skins: 27 presets in data.js (incl. the locked 🎓 reward skin) + 4 Miku skins = 31.
+const dataJs = read("js/data.js");
+const skinsStart = dataJs.indexOf("const SKINS = {");
+const skinsEnd = dataJs.indexOf("\n};", skinsStart);
+if (skinsStart < 0 || skinsEnd < 0) {
+  fail("SKINS block could not be read in js/data.js");
+} else {
+  const presetCount = (dataJs.slice(skinsStart, skinsEnd).match(/label:\{ja:/g) || []).length;
+  const mikuCount = (read("js/characters/miku.js").match(/^ {2}SKINS\.[A-Za-z0-9]+ = \{/gm) || []).length;
+  if (presetCount + mikuCount !== 31) fail(`expected 31 overall skins, found ${presetCount + mikuCount}`);
+  else ok("overall skin count is 31");
+  /* 🎓 ごほうびスキン（グラデュエーション）は、スタンプ5つで解禁まで鍵がかかっていること */
+  if (!/graduation:\s*\{[\s\S]*?locked:\s*true/.test(dataJs.slice(skinsStart, skinsEnd)) ||
+      !read("js/core.js").includes("SKINS[id].locked && !settings.skinGradUnlocked")) fail("graduation reward-skin lock is missing");
+  else ok("graduation reward skin stays locked until stamps");
+}
+
+// 🎧 Playlist tabs: user playlists in library.js, delete-mode setting in core.js, song profile storage.
+if (!read("js/library.js").includes('startsWith("pl:")') ||
+    !read("js/library.js").includes('SONG_META_KEY = "shadow_taiko_songmeta_v1"') ||
+    !read("js/library.js").includes('PLAYED_KEY = "shadow_taiko_played_v1"') ||
+    !read("js/library.js").includes('format: "trk-playlist"') ||
+    !read("js/library.js").includes("plFolderSanitize") ||
+    !read("js/core.js").includes("playlistDelMode") ||
+    !read("js/core.js").includes("plFolders")) {
+  fail("playlist tab plumbing is missing");
+} else {
+  ok("playlist tabs, profiles and sharing are wired");
+}
+
+// 🎚 Pro-audio effects: worklet processors + rack plumbing in fx.js.
+if (!exists("js/fx-worklet.js") ||
+    !read("js/fx-worklet.js").includes("trk-denoise") ||
+    !read("js/fx-worklet.js").includes("trk-dyneq") ||
+    !read("js/fx-worklet.js").includes("trk-gate") ||
+    !read("js/fx.js").includes("settings.fxRack") ||
+    !read("js/fx.js").includes("fxRackOn")) {
+  fail("pro-audio effect plumbing is missing");
+} else {
+  ok("pro-audio effects (gate / denoise / dynamic EQ) and rack are wired");
+}
+
+// 🛒 Official-source catalog: no-audio curated playlists with wishlist matching.
+if (!exists("js/catalog.js") ||
+    !read("js/catalog.js").includes("TRK_CATALOG") ||
+    !read("js/library.js").includes("plCatalogMenu") ||
+    !read("js/library.js").includes("plWishMatch") ||
+    !read("js/library.js").includes("plWishRows") ||
+    !read("index.html").includes('src="js/catalog.js"')) {
+  fail("official catalog plumbing is missing");
+} else {
+  ok("official catalog (wishlist auto-match, no bundled audio) is wired");
+}
+
+// 👥 Author tools for shared playlists (off by default; search/block/favorite).
+if (!read("js/library.js").includes("plAuthorMenu") ||
+    !read("js/library.js").includes("plVisible") ||
+    !read("js/core.js").includes("plAuthorTools") ||
+    !read("js/library.js").includes('author: String(settings.plAuthorName')) {
+  fail("shared-playlist author tools are missing");
+} else {
+  ok("author tools (search / block / favorites, default off) are wired");
+}
+
+// ⏯🔊 Song banner: tap-to-pause (default off) + bottom-right volume knob.
+if (!read("js/library.js").includes("bannerPauseAction") ||
+    !read("js/library.js").includes("bannerVolSlider") ||
+    !read("index.html").includes('id="bannerPause"') ||
+    !read("js/core.js").includes("bannerPause")) {
+  fail("song-banner tap-pause / volume controls are missing");
+} else {
+  ok("song-banner tap-pause (default off) and volume knob are wired");
+}
+
+// 🕹️ Short play mode (last 90/120/180s, silence-aware end, separate records).
+if (!read("js/game.js").includes("shortLenActive") ||
+    !read("js/game.js").includes("shortSilenceWatch") ||
+    !read("js/game.js").includes("c.short") ||
+    !read("index.html").includes('id="shortMode"') ||
+    !read("js/core.js").includes("shortMode")) {
+  fail("short play mode (last 90/120/180s) is missing");
+} else {
+  ok("short play mode (last 90/120/180s, silence-aware) is wired");
+}
+
+// 🥚 Tutorial easter eggs (skip / cheat / god mode in the Seed field).
+if (!read("js/main.js").includes("guideEggKind") ||
+    !read("js/main.js").includes("GUIDE_EGGS") ||
+    !read("css/style.css").includes("eggSkipK") ||
+    !read("css/style.css").includes("eggCheatK") ||
+    !read("css/style.css").includes("eggGodK")) {
+  fail("tutorial easter eggs (skip/cheat/god mode) are missing");
+} else {
+  ok("tutorial easter eggs (skip / cheat / god mode) are wired");
+}
+
+// 📊 Spectrum expansion (30 styles / 16 themes) + banner song buttons.
+{
+  const spec = read("js/spectrum.js");
+  const blockCount = (head, tag) => {
+    const a = spec.indexOf(head);
+    if (a < 0) return 0;
+    const b = spec.indexOf("};", a);
+    return (spec.slice(a, b).match(new RegExp(':"' + tag, "g")) || []).length;
+  };
+  const styleCount = blockCount("const STYLE_KEYS", "specStyle");
+  const themeCount = blockCount("const THEME_KEYS", "specTheme");
+  if (styleCount < 30 || themeCount < 16 ||
+      !spec.includes("drawDotgrid") || !spec.includes("drawMatrix") || !spec.includes("drawLightning") ||
+      !spec.includes("drawFireworks") || !spec.includes('theme === "synth"') ||
+      !spec.includes('onLongPress(zipBtn') ||
+      !read("js/library.js").includes("bannerSongStep") ||
+      !read("index.html").includes('id="bannerSongBtns"')) {
+    fail("spectrum expansion (30 styles / 16 themes) or banner song buttons are missing");
+  } else {
+    ok(`spectrum has ${styleCount} style labels / ${themeCount} theme labels, long-press settings, banner song buttons`);
+  }
+}
+
+// 📡 Background antenna placement: dock / top-right corner (left of Language).
+// Hiding the dock antenna must not kill background playback, and hiding the
+// cast antenna must never hide the playback antenna.
+{
+  const fx = read("js/fx-dock.js");
+  if (!fx.includes("bgAntennaView") || !fx.includes('["off", "antenna", "corner"]') ||
+      !fx.includes('cornerAnt.addEventListener("click", () => toggleAntenna())') ||
+      !fx.includes("headTools.prepend(cornerAnt)") ||
+      !fx.includes('dockBackgroundCorner:"') ||
+      !read("js/media-player-mode.js").includes('dockBackgroundCorner:"') ||
+      !read("js/core.js").includes('["off", "antenna", "corner"]') ||
+      !read("css/style.css").includes(".cornerAnt")) {
+    fail("background antenna corner option (top-right, left of Language) is missing");
+  } else {
+    ok("background antenna can sit in the top-right corner; cast hide never hides the playback antenna");
+  }
+}
+
+// 🎭 Antenna character skins: original dot characters (ON = awake / OFF = asleep)
+// plus a custom two-image option. The Touhou fan-work credit must stay in NOTICE.
+{
+  const fx = read("js/fx-dock.js");
+  const chars = ["truck", "robot", "cat", "slime", "ghost", "reimu", "marisa", "cirno", "flandre", "youmu"];
+  const hasAll = chars.every(c => fx.includes(`"${c}", "dockAntChar${c[0].toUpperCase() + c.slice(1)}"`));
+  if (!fx.includes("const ANT_CHARS") || !fx.includes("function antCharFrame") ||
+      !fx.includes("function drawAntCharMatrix") || !fx.includes("function antCustomOk") ||
+      !fx.includes("antCustomRow") || !hasAll || !fx.includes("antTouhou") ||
+      !fx.includes('["rod", "loop", "dish", "beam", "truck", "robot", "cat", "slime", "ghost", "reimu", "marisa", "cirno", "flandre", "youmu", "custom"]') ||
+      !read("js/core.js").includes('settings.fxAntennaShape = "rod";') ||
+      !read("css/style.css").includes(".antChar") ||
+      !read("NOTICE.md").includes("Touhou Project fan work") ||
+      !read("NOTICE.md").includes("touhou-project.news/guideline/")) {
+    fail("antenna character skins (ON=awake / OFF=asleep + custom 2 images) are missing");
+  } else {
+    ok("antenna character skins (10 dot characters incl. 5 Touhou fan works + custom 2-image ON/OFF) are wired, Touhou credit in NOTICE");
+  }
+}
+
 // A cache name is deliberately checked for existence, not for a guessed
 // date, because the service worker is manually bumped for every release.
 const sw = read("sw.js");

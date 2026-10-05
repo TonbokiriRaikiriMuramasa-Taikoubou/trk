@@ -10,7 +10,7 @@
       1) このファイルを削除し、
       2) index.html の <script src="js/characters/miku.js"></script> を1行消してください。
     ほかのファイルは直さなくても、そのまま動きます。
-  ・「冬服ミク」「春ミク」「ちびミク」はオリジナルのアレンジです。雪ミク・桜ミク・ミクダヨーではありません。
+  ・「冬服ミク」「春ミク」「ちびミク」「黒衣装ミク」「アイドル服ミク」はオリジナルのアレンジです。雪ミク・桜ミク・ミクダヨーではありません。
   ・Canvas で一から描いた二次創作です。公式画像は使っていません。
 
   【MOD作者の方へ】
@@ -21,6 +21,7 @@
   Object.assign(TEXT.ja, {
     mascotMiku:"初音ミク", mascotMikuNT:"初音ミク NT風アレンジ", mascotMikuWinter:"冬服ミク（オリジナル衣装・雪）",
     mascotMikuSakura:"春ミク（桜かんざし）", mascotMikuChibi:"ちびミク（デフォルメ）",
+    mascotMikuNoir:"黒衣装ミク（オリジナル衣装）", mascotMikuIdol:"アイドル服ミク（オリジナル衣装・星）",
     mascotHint:"マスコットはプレイ中に画面の隅で応援してくれます。初音ミクのマスコットは、ピアプロ・キャラクター・ライセンス（PCL）に基づく非公式の二次創作です。非営利・無償の範囲でお楽しみください（収益化している配信ではオフにしてください）。",
     pclCredit:"この作品はピアプロ・キャラクター・ライセンスに基づいてクリプトン・フューチャー・メディア株式会社のキャラクター「初音ミク」を描いたものです。",
     pclShort:"初音ミク：PCLに基づく二次創作（非公式）"
@@ -28,6 +29,7 @@
   Object.assign(TEXT.en, {
     mascotMiku:"Hatsune Miku", mascotMikuNT:"Hatsune Miku (NT-inspired)", mascotMikuWinter:"Winter Miku (original outfit, snow)",
     mascotMikuSakura:"Spring Miku (sakura hairpin)", mascotMikuChibi:"Chibi Miku",
+    mascotMikuNoir:"Miku in black (original outfit)", mascotMikuIdol:"Idol Miku (original outfit, stars)",
     mascotHint:"Mascots cheer you on from the corner during play. The Hatsune Miku mascots are unofficial fan art under the Piapro Character License (PCL): non-commercial, free use only (please turn them off on monetized streams).",
     pclCredit:"This work depicts the character “Hatsune Miku” of Crypton Future Media, INC. under the Piapro Character License.",
     pclShort:"Hatsune Miku: fan art under PCL (unofficial)"
@@ -35,6 +37,7 @@
   Object.assign(TEXT.zh, {
     mascotMiku:"初音未来", mascotMikuNT:"初音未来 NT风改编", mascotMikuWinter:"冬装初音（原创服装・雪）",
     mascotMikuSakura:"春日初音（樱花发簪）", mascotMikuChibi:"Q版初音",
+    mascotMikuNoir:"黑衣初音（原创服装）", mascotMikuIdol:"偶像服初音（原创服装・星星）",
     mascotHint:"吉祥物会在游戏中于画面角落为你加油。初音未来吉祥物是基于Piapro角色许可（PCL）的非官方二次创作，仅限非营利、免费使用（营利直播请关闭）。",
     pclCredit:"本作品依据Piapro角色许可，描绘了Crypton Future Media株式会社的角色「初音未来」。",
     pclShort:"初音未来：基于PCL的二次创作（非官方）"
@@ -42,6 +45,7 @@
   Object.assign(TEXT.ko, {
     mascotMiku:"하츠네 미쿠", mascotMikuNT:"하츠네 미쿠 NT풍 어레인지", mascotMikuWinter:"겨울옷 미쿠 (오리지널 의상・눈)",
     mascotMikuSakura:"봄 미쿠 (벚꽃 비녀)", mascotMikuChibi:"꼬마 미쿠",
+    mascotMikuNoir:"검은 옷 미쿠 (오리지널 의상)", mascotMikuIdol:"아이돌 옷 미쿠 (오리지널 의상・별)",
     mascotHint:"마스코트가 플레이 중 화면 구석에서 응원해 줍니다. 하츠네 미쿠 마스코트는 피아프로 캐릭터 라이선스(PCL)에 따른 비공식 2차 창작이며, 비영리・무상으로만 사용할 수 있습니다 (수익화 방송에서는 꺼 주세요).",
     pclCredit:"이 작품은 피아프로 캐릭터 라이선스에 따라 크립톤 퓨처 미디어 주식회사의 캐릭터 '하츠네 미쿠'를 그린 것입니다.",
     pclShort:"하츠네 미쿠: PCL에 따른 2차 창작 (비공식)"
@@ -55,9 +59,11 @@
     mikuNT:     { ...BASE, shirt:"#f3f5f6", sleeves:"#f3f5f6", skirt:"#22303a", legs:"#22303a", tie:"#22303a", tie2:"#39c5bb" },
     mikuWinter: { ...BASE, shirt:"#f6f9ff", sleeves:"#dde8f6", skirt:"#8fb0d6", legs:"#e6edf6", scarf:"#4f9fe0", extra:"snow" },
     mikuSakura: { ...BASE, tie:"#f28fb0", tie2:"#f7a8c4", extra:"sakura" },
+    mikuNoir:   { ...BASE, shirt:"#16161c", sleeves:"#101014", skirt:"#0c0c10", legs:"#101014", tie:"#39c5bb", tie2:"#ff5d8f", headset:"#23232c" },
+    mikuIdol:   { ...BASE, shirt:"#ffffff", sleeves:"#ffb9d2", skirt:"#ff8abf", legs:"#ffe1ec", tie:"#ff5d9e", tie2:"#ffe08a", extra:"star" },
     mikuChibi:  { ...BASE, headScale:1.35 }
   };
-  const LABEL_KEYS = { miku:"mascotMiku", mikuNT:"mascotMikuNT", mikuWinter:"mascotMikuWinter", mikuSakura:"mascotMikuSakura", mikuChibi:"mascotMikuChibi" };
+  const LABEL_KEYS = { miku:"mascotMiku", mikuNT:"mascotMikuNT", mikuWinter:"mascotMikuWinter", mikuSakura:"mascotMikuSakura", mikuNoir:"mascotMikuNoir", mikuIdol:"mascotMikuIdol", mikuChibi:"mascotMikuChibi" };
 
   /* ---------- 描画（rr・ctx・TAU はゲーム本体の関数・変数。プレイ中にだけ呼ばれます） ---------- */
   function drawMiku(x, y, v, st) {
@@ -72,6 +78,17 @@
         if (v.extra === "snow") {
           ctx.fillStyle = "#ffffff"; ctx.strokeStyle = "rgba(80,130,180,.5)"; ctx.lineWidth = 1;
           ctx.beginPath(); ctx.arc(px, py, 2 + (i % 3), 0, TAU); ctx.fill(); ctx.stroke();
+        } else if (v.extra === "star") {
+          ctx.save(); ctx.translate(px, py); ctx.rotate(p / 700 + i);
+          ctx.globalAlpha = .55 + .4 * Math.sin(p / 260 + i * 1.7);      // きらきら
+          ctx.fillStyle = i % 2 ? "#ffe08a" : "#ffffff";
+          ctx.beginPath();
+          for (let k = 0; k < 4; k++) {
+            const a = k * Math.PI / 2;
+            ctx.lineTo(Math.cos(a) * 6, Math.sin(a) * 6);
+            ctx.lineTo(Math.cos(a + Math.PI / 4) * 2.2, Math.sin(a + Math.PI / 4) * 2.2);
+          }
+          ctx.closePath(); ctx.fill(); ctx.restore();
         } else {
           ctx.save(); ctx.translate(px, py); ctx.rotate(p / 500 + i);
           ctx.fillStyle = "#f7a8c4"; ctx.beginPath(); ctx.ellipse(0, 0, 5, 3, 0, 0, TAU); ctx.fill(); ctx.restore();
@@ -164,8 +181,9 @@
     capBreak:{ja:"どんまい！次いこっ！",en:"Don't worry! On to the next one!",zh:"没关系！继续加油！",ko:"괜찮아! 다음 가자!"}
   };
 
-  /* ---------- スキン：ミク・ティール／スノーフィールドの標準マスコット ---------- */
+  /* ---------- スキン：ミク・ティール／ノワール／クラシック／アイドル（＋スノーフィールドの標準マスコット） ---------- */
   SKINS.miku39 = {
+    cat:["basic","miku"],
     label:{ja:"ミク・ティール",en:"Miku Teal",zh:"初音青",ko:"미쿠 틸"},
     desc:{ja:"初音ミク二次創作（PCL・非公式）",en:"Hatsune Miku fan art (PCL, unofficial)",zh:"初音未来二次创作（PCL・非官方）",ko:"하츠네 미쿠 2차 창작 (PCL・비공식)"},
     ui:{"--ui-bg":"#071a1a","--ui-panel":"rgba(10,32,33,.96)","--ui-soft":"rgba(57,197,187,.07)","--ui-text":"#e9fffd",
@@ -178,6 +196,46 @@
     font:'"Trebuchet MS","Avenir Next",system-ui,sans-serif', mascot:"miku"
   };
   if (SKINS.snowfield) SKINS.snowfield.mascot = "mikuWinter";
+
+  SKINS.mikuNoir = {
+    cat:["miku","dark"],
+    label:{ja:"ミク・ノワール",en:"Miku Noir",zh:"初音・黑",ko:"미쿠 누아르"},
+    desc:{ja:"黒い衣装のミク（二次創作・PCL・非公式）",en:"Miku in black (fan art, PCL, unofficial)",zh:"黑衣初音（二次创作・PCL・非官方）",ko:"검은 옷 미쿠 (2차 창작・PCL・비공식)"},
+    ui:{"--ui-bg":"#06070c","--ui-panel":"rgba(12,14,22,.96)","--ui-soft":"rgba(57,197,187,.07)","--ui-text":"#f2f6ff",
+      "--ui-muted":"#a3adc4","--ui-border":"rgba(57,197,187,.28)","--ui-button":"#131726","--ui-button-hover":"#1b2136",
+      "--ui-field":"#0a0d16","--ui-accent":"#39c5bb","--ui-on-accent":"#04201e","--ui-gold":"#ff5d8f",
+      "--ui-shadow":"0 0 60px rgba(57,197,187,.16)","--ui-glow":"rgba(57,197,187,.16)"},
+    game:{don:"#ff5d8f",ka:"#39c5bb",stage:"#05070b",lane:"rgba(4,8,16,.66)",track:"rgba(57,197,187,.30)",ink:"#f2f6ff",
+      inkShadow:"rgba(0,0,0,.85)",noteBorder:"#ffffff",panel:"rgba(9,11,19,.95)",perfect:"#ff9ec4",good:"#f2f6ff",miss:"#5d6a85",glow:true},
+    shapes:["circle","circle"], video:"grayscale(1) contrast(1.5) brightness(.65)",
+    font:'"Trebuchet MS","Avenir Next",system-ui,sans-serif', mascot:"mikuNoir"
+  };
+  SKINS.mikuClassic = {
+    cat:["miku","light"],
+    label:{ja:"ミク・クラシック",en:"Miku Classic",zh:"初音・经典",ko:"미쿠 클래식"},
+    desc:{ja:"初期配色を思わせるミク（二次創作・PCL・非公式）",en:"Early-coloring Miku (fan art, PCL, unofficial)",zh:"令人想起初期配色的初音（二次创作・PCL・非官方）",ko:"초기 배색을 떠올리게 하는 미쿠 (2차 창작・PCL・비공식)"},
+    ui:{"--ui-bg":"#eef3f3","--ui-panel":"rgba(255,255,255,.97)","--ui-soft":"rgba(31,158,148,.06)","--ui-text":"#23343a",
+      "--ui-muted":"#5d7680","--ui-border":"rgba(35,90,100,.20)","--ui-button":"#e5eeee","--ui-button-hover":"#d7e5e6",
+      "--ui-field":"#ffffff","--ui-accent":"#1f9e94","--ui-on-accent":"#ffffff","--ui-gold":"#e8457c",
+      "--ui-shadow":"0 24px 70px rgba(40,90,95,.14)","--ui-glow":"rgba(31,158,148,.12)"},
+    game:{don:"#e8457c",ka:"#1f9e94",stage:"#ecf3f3",lane:"rgba(255,255,255,.84)",track:"rgba(31,158,148,.26)",ink:"#23343a",
+      inkShadow:"rgba(255,255,255,.9)",noteBorder:"#ffffff",panel:"rgba(248,253,253,.96)",perfect:"#d9782a",good:"#23343a",miss:"#93a5ab",glow:false},
+    shapes:["circle","circle"], video:"grayscale(.25) brightness(1.08) contrast(1.05)",
+    font:'"Trebuchet MS","Avenir Next",system-ui,sans-serif', mascot:"miku"
+  };
+  SKINS.mikuIdol = {
+    cat:["miku","dark","grad"],
+    label:{ja:"ミク・アイドル",en:"Miku Idol",zh:"初音・偶像",ko:"미쿠 아이돌"},
+    desc:{ja:"星降る夜のアイドル服ミク（二次創作・PCL・非公式）",en:"Idol-outfit Miku under falling stars (fan art, PCL, unofficial)",zh:"星夜偶像服初音（二次创作・PCL・非官方）",ko:"별이 쏟아지는 밤의 아이돌 옷 미쿠 (2차 창작・PCL・비공식)"},
+    ui:{"--ui-bg":"linear-gradient(180deg,#170a24,#33133f)","--ui-panel":"rgba(26,12,38,.96)","--ui-soft":"rgba(255,138,190,.07)","--ui-text":"#fff0fa",
+      "--ui-muted":"#c9a8cf","--ui-border":"rgba(255,138,190,.32)","--ui-button":"#241031","--ui-button-hover":"#321944",
+      "--ui-field":"#170a24","--ui-accent":"#ff8abf","--ui-on-accent":"#2a0a1c","--ui-gold":"#ffe08a",
+      "--ui-shadow":"0 0 60px rgba(255,138,190,.18)","--ui-glow":"rgba(255,138,190,.15)"},
+    game:{don:"#ff8abf",ka:"#8fd0ff",stage:"linear-gradient(180deg,#120818,#241030)",lane:"rgba(18,8,26,.62)",track:"rgba(255,138,190,.30)",ink:"#fff0fa",
+      inkShadow:"rgba(0,0,0,.85)",noteBorder:"#ffffff",panel:"rgba(22,10,32,.95)",perfect:"#ffe08a",good:"#fff0fa",miss:"#8f719c",glow:true},
+    shapes:["circle","circle"], video:"grayscale(1) contrast(1.35) sepia(1) hue-rotate(280deg) saturate(1.5) brightness(.7)",
+    font:'"Trebuchet MS","Avenir Next",system-ui,sans-serif', mascot:"mikuIdol"
+  };
 
   /* ---------- 設定画面の選択肢を追加（index.html に書かなくてよいように） ---------- */
   for (const selId of ["mascotSelect", "makerMascot"]) {

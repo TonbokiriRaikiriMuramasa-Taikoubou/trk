@@ -1,7 +1,7 @@
 # trk! 開発引き継ぎ文書（HANDOFF）
 
 > trk! is AGRG! — an All-Generation Rhythm Game
-> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン16種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り ＋ 🥁音ゲーマー向けFAST/SLOW・あべこべ・でたらめ ＋ 💬GitHub Issuesテンプレート ＋ 📊スペクトラム（音の見える化・**見え方16種・色8種・曲名バナーのスキン・🚫使用しないスイッチ**・TVに重ねられる）＋ 🎛エフェクトチェーン編集＋ 🎹曲に合わせて演奏できるシンセモード（16音色・エレキギター／電子サックス／ZUNPET風ブラス・±8半音ピッチ・鍵盤固定オプション初期オン・大画面向け鍵盤拡張オプション・起動オプション）＋ 📤ミュージックフォルダを共有（1回の許可で一括取り込み・🔗共有をつづける・💾端末に残す・🚫やめる）＋ privacy.html ＋ Capacitor Android準備 ＋ 権利とクレジット図鑑 ＋ パック権利カード（名刺）＋ 🧭 3分チュートリアル・プレイ演出設定・CATCHニトロ得点ボーナス・▶メディアプレーヤー・🎛Loop Lab（クイック／ランダム区間・曲別プリセット）・📡外部出力ポリシー・動画キー操作まで）
+> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン16種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り ＋ 🥁音ゲーマー向けFAST/SLOW・あべこべ・でたらめ ＋ 💬GitHub Issuesテンプレート ＋ 📊スペクトラム（音の見える化・**見え方30種・色16色・曲名バナーのスキン・🚫使用しないスイッチ**・TVに重ねられる）＋ 🎛エフェクトチェーン編集＋ 🎹曲に合わせて演奏できるシンセモード（16音色・エレキギター／電子サックス／ZUNPET風ブラス・±8半音ピッチ・鍵盤固定オプション初期オン・大画面向け鍵盤拡張オプション・起動オプション）＋ 📤ミュージックフォルダを共有（1回の許可で一括取り込み・🔗共有をつづける・💾端末に残す・🚫やめる）＋ privacy.html ＋ Capacitor Android準備 ＋ 権利とクレジット図鑑 ＋ パック権利カード（名刺）＋ 🧭 3分チュートリアル・プレイ演出設定・CATCHニトロ得点ボーナス・▶メディアプレーヤー・🎛Loop Lab（クイック／ランダム区間・曲別プリセット）・📡キャスト／バックグラウンド再生の個別アンテナ・🖼スキンの棚（プリセット31種・グラデ対応・ごほうびスキン🎓）・🧭スタンプラリーチュートリアル（trk!入力で即完了・スキップ／もう一度・スタンプ5つでごほうび解禁）・🎧プレイリストタブ（自由なアイコンと色・🧊／🔒・中クリック削除／3回モード・曲プロフィール・📤共有：9曲以上＋全曲クリア／視聴済み・AUTO必須表示・https確認リンク）・動画キー操作・🛒公式プレイリストカタログ（音源同梱なし・公式入手先への案内・Musicフォルダで自動マッチ・未入手は薄く表示）・👥投稿者ツール（共有プレイリストの投稿者検索・ブロック・お気に入り絞り込み・初期オフ）・⏯曲名バナーのタップ一時停止（初期オフ）と🔊右下の音量つまみ・🛒カタログ8シリーズ化（NCS・Kevin MacLeod・原神を追加）・🕹️ショートプレイ（後半90/120/180秒・無音検知終了・記録はフルと分離）、🛒カタログ10シリーズ化（100%OJ・学マス）＋ 📊スペクトラム拡張（見え方30種・色16色・「＋」長押しで設定へ）と ⏯バナー左右の◀▶曲送り（初期オン）＋ 📡アンテナの置き場オプション（右上・言語の左）＋ 🎭アンテナのキャラ肌（描きおろしドットキャラ10体＋自分のイラスト2枚・東方Project二次創作5体（霊夢・魔理沙・チルノ・フランドール・妖夢）・旧「巫女」は霊夢に改名）まで）
 > この文書は、新しい会話で開発を再開するための参照資料です。
 
 ---
@@ -104,6 +104,19 @@ trk! の開発を再開します。docs/HANDOFF.md を貼ります。
 38. **🎹 曲に合わせて弾けるシンセモード**（`js/synth-mode.js`）：FXドックの⏻スピーカーを長押し（標準650ms。設定で起動禁止または200msへ短縮可能）。Web Audioの16基本音色（エレキギター、電子サックス、FMエレピ、シンセストリングス、8ビットチップ、ボコーダーボイス、ZUNPET風ブラスを含む）・最大6音源レイヤー・端末内だけのサンプル音源（12MB／30秒まで）、C3〜C5の画面鍵盤、QWERTYキー割り当て、曲プレビュー操作、上部の動画＋スペクトラム表示に対応。`synthModeKeyboardLock`（初期オン）で、フォーカス中のステータス欄やスライダーに割り当てキーを吸われず、鍵盤へ固定できます。`synthModeWideKeyboard`（初期オフ）をオンにすると、大きな画面では鍵盤を最大約1.28倍に広げて表示します。音色とキー割り当ては端末内に保存し、サンプル音声自体は保存・送信しない。
 
 39. **📤 ミュージックフォルダを共有**（library.js）：「許可を承認してフォルダを開く」に加えて、**端末に1回だけ許可をもらってミュージックフォルダの中身を一気に取り込む**入口を新設。`📁 開く` は動画フォルダ用として**ならべて残す**。許可は `libKV` の `"share"`（共有）と `"dir"`（開く）に分けて覚え、次回からは「🔗 共有をつづける」の1タップ。読み込み中は曲数を出し、終わると「{n}曲（対象外のファイル {skip}件はとばしました）」＝**変な曲や動画も一緒に入る**のが分かる表示。設定画面に `#libSharePanel`（📤 共有／💾 端末に残す／🚫 共有をやめる）を追加。`💾` は新しい IndexedDB `shadow_taiko_shared` に最大150曲・300MBまで保存し、リロード後は許可なしで遊べる（`?safe=1` では読み戻さない）。
+40. **🛒 公式プレイリストカタログ**（`js/catalog.js` ＋ library.js）：音源を**同梱しない**キュレーションプレイリスト（ブルーアーカイブ／アークナイツ／LoL Sessions: Vi／VALORANT／東方Project）。取り込むと「欲しい曲リスト（wish）＋入手先ガイド（guide）」付きのプレイリストになり、Musicフォルダに同じ曲名のファイルが入ると**自動でプレイリストに加わる**（曲名は正規化して照合・🧊フリーズ中は尊重）。未入手の曲は**薄い破線の行**で並び、タップで公式の入手先を開く（https限定・確認ダイアログ）。取り込み時に「カテゴリ（ソーシャルゲーム／PCゲーム／同人ゲーム）→ シリーズ」のフォルダを自動作成。
+41. **👥 投稿者ツール**（library.js / core.js）：共有プレイリスト（trk-playlist v1）に**任意の `author`（投稿者名・24字まで）**を添えられるようになった（後方互換・古いファイルには無い）。📚長押しの設定で「👥 投稿者ツール」をON（**初期オフ**。投稿者名の設定欄と「👥 投稿者」ボタンも出る）にすると、投稿者一覧ダイアログ（🔍検索・⭐お気に入り・🚫ブロック・プレイリストへのジャンプチップ・非表示件数）が使え、**ブロック中の投稿者のプレイリストはタブ・フォルダチップ・フォルダの曲集計から隠れる**（plVisible。自分のプレイリスト＝投稿者なしなので隠れない。設定をOFFにすれば全部見える）。
+42. **⏯🔊 曲名バナーのタップ一時停止と音量つまみ**（library.js / core.js）：バナー（#songBanner）の右下に**音量 🔊**（`settings.musicVolume` と同じもの。プレビューのフェードは止めて即反映・設定画面のスライダーと同期・0で🔇）。設定「右上の曲名をタップで一時停止／再生」（`settings.bannerPause`・**初期オフ**・#previewEnabled の下のチェック）をONにすると、バネルのタップで **プレイ中＝pauseGame/resumeGame、選曲中＝プレビューの再生／停止**（`bannerPauseAction()` が判定。中のボタンは `closest()` で無視。メディアプレーヤーモードでは無効）。
+43. **🛒 カタログ8シリーズ化**（catalog.js）：⚡NoCopyrightSounds（ncs.io・無料DL）／🎼Kevin MacLeod（incompetech・CC BY 4.0）を**新しいカテゴリ「フリー音源」**に、❄原神 HOYO-MiX（公式チャンネル視聴・サブスク購入。**フリー配布ではない**ことをガイドに明記）を「PCゲーム」に追加。韓国は「著名曲＋公式＋フリー」の組み合わせが確認できなかったため見送り（브금저장소は著作権フリーではない回収サイト）。
+44. **🕹️ ショートプレイ**（game.js）：上級者向け設定の「🕹️ ショートプレイ」で**後半90／120／180秒**を選ぶと、楽曲の終わりからその秒数だけさかのぼって開始。窓の外のノーツはスキップ（判定・スコアの分母から除外）、**終盤14秒は無音を監視**して2.2秒続いたら音楽が実際に止まった位置で終了（fxオフならファイル終端まで）。クリア判定は通常どおり、記録はチャート毎の `c.short[90/120/180]` スロットに**独立保存**（フルの plays・perfectTotal・ベスト・maxRate・共有の視聴証明を汚さない）。称号表示は一律 🕹️。AUTOは常にフル。
+45. **🛒 カタログ10シリーズ化**（catalog.js）：🍊100% Orange Juice（BGMの大半がロイヤリティフリー。公式Wikiのサントラページ https://orangejuice.wiki/wiki/100%25_Orange_Juice!_(Soundtrack) に元曲名と作曲者の一覧。dear Dragon＝Mus Mus／Pluto＝Cyber-Rainforce など11曲）を「フリー音源」に、🌟学園アイドルマスター（レーベル公式サイトがインスト音源を公式Google Driveで継続配布・利用ガイドラインあり。Fighting My Way／Luna say maybe／標 など10曲）を「ソーシャルゲーム」に追加。
+46. **🥚 チュートリアルのイースターエッグ**（main.js / style.css）：Seed欄に **skip／cheat／god mode**（godmodeも可。大文字小文字・空白は無視・完全一致のみ）と打つと、`trk!` と同じくチュートリアル完了＆**バーがこだわりの消え方で消える**——skip＝左へ跳ねて消える（eggSkipK）／cheat＝溶けるように消える（eggCheatK・下基点のscaleY＋skew＋blur）／god mode＝金色の光とともに昇天（eggGodK）。お祝いポップアップの代わりに一報のトースト（4言語）。スタンプ・🎓ごほうびは `trk!` と同一扱い（ごまかしには使えない）。`prefers-reduced-motion` では0.35秒に短縮。
+47. **📊 スペクトラム拡張・⏯ バナーの◀▶曲送り**（spectrum.js / library.js / core.js / index.html）：見え方を **16→30種**（🔵ドットグリッド／🏙シティーライト／🫧あわ／🏔山脈／🎸弦／🌸フラワー／🌀万華鏡／✨星空／🟢マトリックス／🎆花火／🌊うねり／🐚スパイラル／🌬風車／⚡稲妻を追加）、色を **8→16色**（ゴールド／氷／森林／キャンディ／溶岩／海／🟩ゲームボーイ風＝明るさ4階調の緑に量子化／シンセウェイブ＝マゼンタ→360°を巻いて橙 の8つを追加）した。**バナーの「＋」を長押し**すると `openSettings()` → 160ms後に `#specPanel` を展開・スクロール（`onLongPress(zipBtn, …)`。ツールチップにも `specSettingsTip` で案内）。バナーの左右中央に **◀▶曲送りボタン**（`.bannerSongBtn`・`settings.bannerSongBtns`＝**初期オン**・設定は #bannerPause のすぐ下のチェック）。TVドックの◀▶と同じ `prevSong()／nextSong()`（いまのタブの中を送る・端で回り込む）＋`selectSong()`。`bannerSongStep(dir)` はタイトル画面以外では何もしない。`bannerSongBtnsSync()` が「設定オン ＆ 曲が1曲以上 ＆ タイトル画面」のときだけ表示し、`renderBanner()` からも呼ぶ。`TV_ALPHA` に背景を塗る新見え方7種（city・matrix・starfield・fireworks・ocean・kaleido・lightning）の濃さを追加。動作確認：`python3 /home/user/patches/build_spec_tests.py && node /tmp/test_spec.js`（**791項目**）
+48. **📡 アンテナの置き場オプション（右上・言語の左）とキャスト文言の明確化**（fx-dock.js / media-player-mode.js / core.js）：`backgroundPolicy` に3つ目の値 **`corner`** を追加。「バックグラウンド再生アンテナ」の選択肢が「表示しない（バックグラウンド再生なし）／ドックにアンテナを表示／**右上に置く（言語の左・コンパクト）**」になった。`corner` ではドックのアンテナ（`.antWrap`・📡ANTボタン）を隠したまま、**右上の言語選択の左**（`.headTools` の先頭に `prepend`）にコンパクトな📡ボタン（`.cornerAnt`・ONで傾き＋電波リング）が出て、クリックでバックグラウンド再生をON/OFF。置き場の判定は純粋関数 `bgAntennaView(policy)`（off／antenna／corner → allowed・dock・corner）にまとめ、`toggleAntenna` は `off` 以外で許可。`fxAntenna` の保存値は `antenna`／`corner` どちらでも引き継ぐ。キャスト側はヒントを4言語で書き直し「**ここで消しても、曲の再生用のアンテナは消えません**」と明記（fx-dock.js と media-player-mode.js の両TEXTに同じ文章を入れた——後から読まれる media-player 側の `Object.assign` が勝つため）。動作確認：`python3 /home/user/patches/build_bgant_tests.py && node /tmp/test_bgant.js`（**48項目**）
+
+49. **🎭 アンテナのキャラ肌（描きおろしドットキャラ6体＋自分のイラスト2枚）**（fx-dock.js / core.js / style.css / NOTICE.md）：`settings.fxAntennaShape` の選択肢に **truck／robot／cat／slime／ghost／miko／custom** を追加（従来の rod／loop／dish／beam と共存。セレクトは2つの `optgroup`＝「アンテナの形状」＋「ドットキャラ」に）。キャラは全部 **trk! の描きおろし16×16ドット絵**（`ANT_CHARS`。**ON＝起きる・歩く／OFF＝倒れる・眠る** の2フレーム×480ms）。`antCharFrame(shape,on,t,ms)`（フレーム選び）と `drawAntCharMatrix(g,chr,frame,px)`（1フレーム描画・描画ドット数を返す）は純粋関数。ドック（`.antChar` 48×48・ON中は `antCharBob` で上下に歩く）と右上コンパクト（`.caCanvas` 22×22）の両方へ `antCharTick`（`requestAnimationFrame`。`isCharShape` ＋ `!document.hidden` ＋ `charWhere{dock,corner}` のときだけ描く）で表示。**巫女は東方Project（© 上海アリス幻樂団）の二次創作**：[公式二次創作ガイドライン](https://touhou-project.news/guideline/)（無料アプリのみ可・ゲーム素材の使用禁止・二次創作の明記）に従い、クレジットは NOTICE.md **2b節**に明記（権利はZUN氏でGPL対象外。`ANT_CHARS` の `miko` エントリ＋4言語の `dockAntCharMiko` を消すだけで Touhou-free ビルドになる）。`custom` では**自分のイラスト2枚**（ON用・OFF用。`fileToAntImage` が最大96pxに収まるよう縮小してPNG dataURL化・`antCustomOk` が「data:image/ かつ400KB以下」を検証・`fxAntennaCustomOn/Off` に保存＝**端末内だけ・どこにも送らない**。設定の `resetVideoPrefs` で消える）。画像が読めなければ📡絵文字にフォールバック。第三者のスプライトは権利を確認して同梱できるものがなかったため**ゼロから描いた**（Kenney「Pixel Platformer」はCC0だが睡眠ポーズの保証がなく断念）。動作確認：`python3 /home/user/patches/build_antchar_tests.py && node /tmp/test_antchar.js`（**314項目**）
+
+50. **⛩🧹❄🦇🗡 東方Projectキャラ肌5体（霊夢・魔理沙・チルノ・フランドール・妖夢）と選択肢の整理**（fx-dock.js / NOTICE.md / check-repo.mjs）：Round 13の「巫女」を **`reimu`（霊夢）に改名**し、**魔理沙**（🧹 とんがり帽＋白リボン。ON＝ホウキに乗る・まばたき／OFF＝ホウキを抱いてzZz）・**チルノ**（❄ 氷の羽。ON＝羽ばたき＋氷の瞬き／OFF＝氷塊のベッドでzZz）・**フランドール**（🦇 カラフルな結晶の羽。ON＝結晶が揺れる／OFF＝座ってzZz・結晶が横に転がる）・**妖夢**（🗡 白髪＋緑のベスト＋ミョン＋刀。ON＝ミョンがふわふわ／OFF＝ミョンを枕にzZz）の4体を追加（全部16×16描きおろし・ON/OFF各2フレーム）。選択肢は **3つのoptgroup**（「アンテナの形状」4種／「ドットキャラ」5体＋🖼自分のイラスト／「東方Project（二次創作）」5体）に整理。旧保存値 `"miko"` は `antShapePref` で `"reimu"` に自動移行。NOTICE.md 2b節は5体ぶんのクレジットとTouhou-freeビルド手順に更新。動作確認：`python3 /home/user/patches/build_antchar_tests.py && node /tmp/test_antchar.js`（**490項目**）
 
 ---
 
@@ -190,6 +203,7 @@ trk/
 | 17.7 | tv-dock.js | 📺 映像出力のTV風ドック（スキン30種＋🎨カスタムTVスキン、電源・お気に入り・並び順） |
 | 18 | fx.js 🧊 | 🎛 サウンドエフェクト本体（「7. 凍結中のファイル」参照） |
 | 18.5 | fx-synth.js | 🎛 視覚的なエフェクトチェーン編集。`window.TrkFX` と #fxPanel の保存欄を使うため、fx.js の後。メイン画面の `.dockMore` は tv-dock.js が `.songCol` 直下へ移動したあとに探す |
+| 18.7 | catalog.js | 🛒 公式カタログのデータ（`TRK_CATALOG`・シリーズ5つ。MODはこれより**前**に読んで push）。library.js の前 |
 | 19 | library.js | 選曲画面・AUTO/ラジオ・シード道具・プレビュー・📁フォルダ／📤共有 |
 | 20 | verified.js | ✔公認パック（SHA-256と verified.json の照合、作者名・BPM・作者のことば） |
 | 21 | main.js | 入力・イベント・**起動処理**（`packsReady`）、サービスワーカー登録 |
@@ -348,12 +362,27 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
   - サブフォルダは最上位の階層でまとめる（`libFolderSeg`：`Album/A/01.mp3` → 「Album」）。パックは `packId` ごと（無ければパック名）
   - **消えたタブ**（パックを外した等）は「すべて」を表示するだけで、`settings.libTab` は消さない（入れ直すと、またそのタブに戻る）
   - 公認の判定は `window.TrkVerified.verifyOf`（verified.js の窓口。IIFEの内側なので、外から見えるように足した）。無ければ公認タブは作らない
-  - タブが1つ（＝すべてだけ）のときは、タブ帯ごと隠す。曲が0件のタブは `libTabEmpty` を出す
+  - タブ帯は常時表示（右端の＋でプレイリストを新規作成）。曲が0件のタブは `libTabEmpty`（プレイリストは `plTabHint`）を出す
 - **棚スキン**：`js/lib-skins.js`。`#libPanel[data-lib-skin="…"]` を付け替えるだけ（タブの中身は library.js が作る）
   - `LIB_SKIN_ORDER` ＋ `LIB_SKINS`（icon と 4言語の label）が定義（全16種：player / note / sticker / card / cassette / blackboard / retro / clearfile / juke / guide / board / vinyl / vhs / karaoke / archive / menu）。CSS は `css/style.css` に集約。
   - `settings.libSkin`（既定 `player`）／`settings.libSkinQuick`（🎨 ボタンを出す・既定オン）。知らないIDは `player` に落とす
   - 🎨 ボタン → `#libSkinBar`（チップ＋🎲おまかせ）を開閉。外をクリック／Escape で閉じる。設定画面「見た目」にセレクトと、🎨ボタンの表示チェック
   - 窓口 `window.TrkLibSkins`（`skins()` `skin()` `selectSkin(id)` `random()` `open()` `barOpen()`）
+
+### 🖼 全体見た目スキン31種と「スキンの棚」（data.js / characters/miku.js / core.js）
+- **プリセット31種**：`js/data.js` の `SKINS` に定番8種＋追加18種（ミントガーデン／ストロベリーホイップ／メロンベリー／宵闇／深海／残炎／朝焼け／白夜／パステルループ／プリズム／レーザーナイト／オーロラ／和モダン／昭和喫茶／青写真／天体観測／モノクロ印画／ネッスン・ドルマ）＋ごほうびスキン「🎓グラデュエーション」（`locked:true`）。`js/characters/miku.js` にミク系4種（ミク・ティール／ノワール／クラシック／アイドル）
+  - 各スキンの `cat` タグ（`basic` / `miku` / `dark` / `light` / `grad` / `fun` の配列）で、棚のチップから絞り込み。カスタム／パックスキンは自動で `custom` 行き
+  - **グラデーション**：`--ui-bg` と `game.stage` には `linear-gradient(180deg,#a,#b)` を直接書ける（上→下＝`180deg`、下→上＝`0deg`、右→左＝`270deg`、左→右＝`90deg`）。`parseGrad()` が2色と向きを読み返すので、スキン作成の「リミックス」もグラデを引き継ぐ
+- **スキンの棚（設定画面「見た目」）**：`#skinNow`（今のスキン。押すと棚が開く）＋ `#skinShelf`（開閉できるdetails。`settings.skinShelfOpen` で記憶）＋ `#skinChips`（絞り込み。`settings.skinShelfCat`）。31種＋カスタムでも設定画面が縦に伸びすぎないための仕組み
+- **スキン作成（skinMaker）のグラデ対応**：`colors.bg2`（グラデ先の色）＋ `gradDir`（none/down/up/left/right）。`sanitizeSkinDef()` が検証、`buildCustomSkin()` が `--ui-bg` と `game.stage` にグラデを流し込む。古い形式（bg2なし）は単色のまま動く
+- **ミクの新衣装（マスコット）**：黒衣装ミク（`mikuNoir`）とアイドル服ミク（`mikuIdol`・`extra:"star"` のきらきらパーティクル）。PCL二次創作・オリジナルアレンジ（`characters/miku.js` 冒頭の注意を参照）
+- `tools/check-repo.mjs` が全体スキン数31（data.js 27＋miku.js 4）と、ごほうびスキンの鍵（`locked:true` と `applySkin` のガード）を検査する
+
+### 🧭 スタンプラリーチュートリアル（main.js / core.js / data.js）
+- **trk! で即完了・取り逃しなし**：Seed欄への入力は `input` イベントで**打ち込んだ瞬間**に反応し `settings.tutorialDone` が立って案内が消える。ガイドのフッタには**スキップ**ボタン（`#guideSkip`）、⚙設定の「見た目」（helpText の下）には**🧭もう一度**ボタン（`#tutorialReplayBtn`。押すと `tutorialDone=false` にして設定を閉じ、ガイドを開き直す。**スタンプは消さない**）
+- **スタンプ5つ**（`settings.tutorialStamps`。順番自由・重複なし・スキップ後も蓄積）：`song`（`songSelected` イベント＝曲を選ぶ／追加直後の自動選曲）、`look`（`applySkin()` を `persist` 時だけ包む ＋ `TrkFX.select`／`TrkFX.random` を包む）、`play`（`phase` イベントが `playing`）、`safe`（`openSettings()` が `emit("settings")`）、`seed`（trk! 入力）。ガイドの手順カード（`.guideStep[data-mission]`）に✓スタンプが付き、サマリーに `（n/5）` 進捗
+- **ごほうび**：5つ揃うと `unlockRewardSkin()` が `settings.skinGradUnlocked` を立て、スキンの棚を再構築してお祝いポップアップ（`#guideCelebrate`。✦きらきらアニメ・4.5秒で自動で閉じる。**プレイ中に揃ったら選曲へ戻った瞬間**に表示）。trk! だけで完了したときは「スタンプを5つ集めると、なにかもらえるかも…？」と予告だけ出る
+- **ごほうびスキン「🎓グラデュエーション」**（`data.js` の `graduation`・`locked:true`）：未解禁のあいだ棚では「❓ ？？？」の無効カード（`.skinCard.locked`）。`applySkin()` は鍵付きスキンをシャドウへフォールバック（ブート復元でも安全）。`settings.tutorialStamps`／`skinGradUnlocked` は設定リセットで初期化
 
 ### 📺◀▶ 曲送りボタンと、TV→ラックのならべ方（tv-dock.js）
 - **◀ ▶**：`.tvTop` の中の `.tvSong`（⏻ と ⏸ の間）。`songStep(dir)` は **library.js の `nextSong()` / `prevSong()`** に任せる（ラジオと同じ並び。`libView` → 無ければ `allSongs()`）。
@@ -391,16 +420,17 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
   - ⚠ むかしの「スペクトラムを表示する」チェック（TEXT `specOn`）は**同じ設定の裏返しなので消して**、この否定形に置き換えました。保存キー `settings.specOn` はそのまま（増やしていません）。
 - **置き場所**：① 📊 曲名バナー `#songBanner`（`buildBannerSkin()`。バナーいっぱいの `canvas.specBannerCanvas` を敷き、左上に `button.specZip`＝「＋」／「−」、「＋」の隣（左上）に `div.specSkinTools`＝開いたときだけ出るクイック操作（⚠ 右上は library.js の「▶ ここから再生」ボタンなので避ける））／② 🎛 ラックの「くわしい」の中（`document.querySelector('button[data-i18n="dockMore"]')` の直前。⚠ くわしい欄は `applyOrder()` で `#fxDock` の外へ動くので `#fxDock` から辿らないこと）／③ 設定画面の `#specPanel`（fx.js の `#fxPanel` の直後）
   - バナーのキャンバスだけは `GATES`（WeakMap）で「`specSkin` がオンのときだけ描く」条件を持たせています。`DIRTY`（WeakSet）で「絵が入っているキャンバスだけ消す」ようにして、毎フレームの clearRect を避けています。
-  - クイック操作は **⇄ 次の見え方**（`specNextStyle`）と**色の丸ボタン8個**だけ。**ピーク／TVに重ねるは設定（オプション）側に置いたまま**（開いたときに幅が広がりすぎないようにするため）。
-- **保存（`settings`。`shadow_taiko_preferences_v2`）**：`specOn`（表示・初期オン）／`specStyle`（下の16種・初期 **ring**）／`specTheme`（下の8色・初期 **neon**）／`specGain`（0.4〜2.5）／`specPeaks`（初期オン）／`specTv`（📺重ね・初期オフ）／`specSkin`（📊 曲名バナーのスキン・初期オン）／`specSkinOpen`（最初から大きく開くか・初期オフ）
+  - クイック操作は **⇄ 次の見え方**（`specNextStyle`）と**色の丸ボタン16個**（`.specDots` は `flex-wrap` で折り返し）だけ。**「＋」を長押し**すると設定画面を開いて `#specPanel` を展開・スクロールします（`specSettingsTip`）。**ピーク／TVに重ねるは設定（オプション）側に置いたまま**（開いたときに幅が広がりすぎないようにするため）。
+- **保存（`settings`。`shadow_taiko_preferences_v2`）**：`specOn`（表示・初期オン）／`specStyle`（下の30種・初期 **ring**）／`specTheme`（下の16色・初期 **neon**）／`specGain`（0.4〜2.5）／`specPeaks`（初期オン）／`specTv`（📺重ね・初期オフ）／`specSkin`（📊 曲名バナーのスキン・初期オン）／`specSkinOpen`（最初から大きく開くか・初期オフ）
   - 一度だけの移行：`prefs.specStyle === "bars"` かつ `prefs.specSkin` が無い（＝v1 の頃の初期値のまま）ときだけ `ring` に移します。それ以外の保存値はそのまま。
   - 新しい設定の3点セット＝`core.js` の `settings`・`enterSafeMode()`（表示オフ）・`resetVideoPrefs()`（既定に戻す）に**足してあります**。spectrum.js 側も `?safe=1` では読み戻しません。
-- **見え方16種（`SPEC_STYLES`。順番がチップの並び順）**：
-  `bars`📊／`mirror`🪞／`wave`〰／`ring`⭕／`daw`🎚／`vu`🧭／`led`🔴／`spectro`🌈／`ecg`💓／`seismo`📉／`radar`📡／`piano`🎹／`slide`📈／`board`💹／`lie`🤥／`fire`🔥
+- **見え方30種（`SPEC_STYLES`。順番がチップの並び順）**：
+  `bars`📊／`mirror`🪞／`wave`〰／`ring`⭕／`daw`🎚／`vu`🧭／`led`🔴／`spectro`🌈／`ecg`💓／`seismo`📉／`radar`📡／`piano`🎹／`slide`📈／`board`💹／`lie`🤥／`fire`🔥／
+  `dotgrid`🔵／`city`🏙／`bubbles`🫧／`terrain`🏔／`strings`🎸／`flower`🌸／`kaleido`🌀／`starfield`✨／`matrix`🟢／`fireworks`🎆／`ocean`🌊／`spiral`🐚／`windmill`🌬／`lightning`⚡
   - 描く関数は `STYLE_DRAW`（`(S, g, W, H)`。`S` に `vals`＝対数バケット／`wave`＝時間波形／`live`＝読めているか／`theme`／`peaks`／`st`＝キャンバスごとの状態（ピーク・履歴・針・粒子）／`mirror` が入ります）。
-  - 追加するときは **① `STYLE_KEYS`＋`SPEC_STYLES` と `STYLE_DRAW` ② `TEXT` の `specStyle<名前>` を4言語 ③ `jsdom-spectrum.mjs` の `WANT_STYLES`** の3か所。`core.js` の検証は `TrkSpec.styles()` を見て、無ければ初期4種に落ちるだけなので直さなくて大丈夫（spectrum.js が読み込み時に `prefs` から読み直します）。
+  - 追加するときは **① `STYLE_KEYS`＋`SPEC_STYLES` と `STYLE_DRAW` ② `TEXT` の `specStyle<名前>` を4言語 ③ `patches/build_spec_tests.py`（台帳 `STYLES`／`THEMES`）** の3か所。`core.js` の検証は `TrkSpec.styles()` を見て、無ければ初期4種に落ちるだけなので直さなくて大丈夫（spectrum.js が読み込み時に `prefs` から読み直します）。
   - 絵の中の文字も4言語：`specEcgBpm`／`specSeismoUnit`／`specDawRec`／`specSlide…`／`specBoard…`／`specLie…`。
-- **色8種（`SPEC_THEMES`。順番がチップと丸ボタンの並び順）**：`neon`／`sunset`／`mono`／`rainbow`／`trk`（**trk! のテーマ色** `--ui-accent #ff3b55` の赤 → `--ka #55aaff` の蒼）／`sakura`／`acid`／`vhs`
+- **色16色（`SPEC_THEMES`。順番がチップと丸ボタンの並び順）**：`neon`／`sunset`／`mono`／`rainbow`／`trk`（**trk! のテーマ色** `--ui-accent #ff3b55` の赤 → `--ka #55aaff` の蒼）／`sakura`／`acid`／`vhs`／`gold`／`ice`／`forest`／`candy`／`volcano`／`marine`／`gameboy`（明るさ4階調の緑に量子化）／`synth`（マゼンタ→360°を巻いて橙）
   - チップと丸ボタンの色見本は JS の `THEME_SWATCH` から CSS 変数 `--specSwatch` に渡します（CSS 側に色を二重に書かない）。
 - **窓口 `window.TrkSpec`（version 3）**：`styles()` `themes()` `style()` `theme()` `setStyle(id)` `setTheme(id)` `setOn(v)` `showTv(v)` `skin()` `skinOpen()` `setSkin(v)` `openSkin(v)` `cycleStyle()` `analyser()` `request()` `active()` `noAudio()` `canvases()`
 - **CSS**：`.specBox`（オフのときは `.specBox.specOff` で `> *:not(.specOffRow)` をうすく）`.specCanvas` `.specSeg`（見え方のチップは13pxで折り返し）`.specSegColor`（色の見本は `--specSwatch`）`.specLabel` `.specTvCanvas`／曲名バナー用：`.banner .specBannerCanvas` `.banner.specSkin::after`（文字の下だけ暗くする）`.banner.specOpen`（高さ320px）`.specZip` `.specSkinTools` `.specNext` `.specDots` `.specDot`（`#tvDock .tvScreen` の中・`mix-blend-mode:screen`・z-index:1 なので、走査線やグレア（z-index:2）の下）
@@ -440,6 +470,30 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
   - 窓口：`TrkMMD.diagnose()` `check()` `checkText(r)` `lastCheck()`。`console.log("[trk! MMD check]\n" + テキスト)` も出す（実機のF12から拾える）
   - 環境が悪いときの見え方：CDN 不可 → `three=NG  loader=false` ＋ `libError=…`／セーフモード → `safe=true`／WebGL 不可 → `webgl=false`（この順で切り分ける）
 
+### 🎧 プレイリストタブと曲プロフィール（library.js / core.js）
+- **プレイリスト**：`settings.playlists`（最大24個。`{id,name,icon,color,frozen,locked,songs}`）。曲のキーだけを持つ**参照リスト**なので、プレイリストを消しても曲はライブラリに残る（整合性を保つ・既定の挙動）。読み込み時に `plSanitize()` が検証（名前24字・アイコン4字・色は `PL_COLORS` の9色＋なし・曲1000個まで・重複除去）
+- **並び順**：すべて → ⭐お気に入り → **🎧プレイリスト** → パック → アドオン → フォルダー → 追加した曲 → 公認。タブIDは `pl:<id>`（`libTabMatch()` が絞る）。消えた曲のぶんは `plCount()` に数えない（実在するキーだけ）
+- **操作**（PC・スマホ共通は長押し `onLongPress()`＝480ms。開いた直後の click は `plSuppressClick()` が1回だけ止める）：
+  - タブ帯の右端 **＋** ／ **📚すべての中クリック** ／ すべての長押し → 新規作成（`plCreate()`）
+  - **プレイリストタブの長押し** → 設定（`plMenu()`）：名前・アイコン（空なら状態で自動：🎧→🧊→🔒→🧩）・色・🧊フリーズ（追加防止）・🔒ロック（削除防止）・削除。すべて／自動タブの長押しは全体設定（`plGlobalMenu()`：新規作成と削除モード）
+  - **プレイリストタブの中クリック** → 削除（`plDeleteGesture()`）。`settings.playlistDelMode` が `three` なら同じタブ3回（1.6秒以内。`plDelCount` が残り回数を知らせる）。🔒中は断る
+  - **曲の長押し** → プロフィール（`songProfile()`）：タイトル上書き・アーティスト・アルバム・作曲者の編集と、プレイリストへの追加・取り外し（🧊は無効表示）。保存で曲リスト・バナーに反映
+  - **曲のドラッグ＆ドロップ**（PC）→ タブへ乗せると追加（`plDragKey` ＋ `dataTransfer`。増えたときだけ再描画してスクロール位置を守る）
+- **曲プロフィール**：`localStorage` の **`shadow_taiko_songmeta_v1`**（`{曲キー:{title,artist,album,composer}}`、各100字まで。`songMetaSave()`）。曲リストの2行目・選曲バナー・検索に反映
+- **UI**：`plDialog()`（中央の小ダイアログ）＋ `plToast()`（下中央の一時メッセージ）。色付きタブは `.libTab.plCol`、ドロップ先は `[data-pl]`（`.dragOver`）
+- **📤 共有（trk-playlist v1）**：プレイリストタブ長押しの設定から「📤共有」。**楽曲ファイル・譜面は含まない**（見出しとプレイの証明だけ・非常に軽い）
+  - **マリオメーカー方式の書き出し条件**：9曲以上（`PL_SHARE_MIN`）＋全曲がクリア（ランク対象のプレイ記録）か視聴済み。満たさないときは理由（曲数不足／未クリア・未視聴の曲名）を出して書き出させない
+  - **視聴記録** `shadow_taiko_played_v1`（曲キー → `{last,auto,manual}`）：リザルト画面（`on("screen")` の `endScreen`）まで行った曲を `notePlayed()` で記録。**AUTO・📻ラジオ・倍速も視聴と数える**（AUTOは記録・称号の対象外なので別枠。導入以前のAUTO分は遡らない）。設定リセットでは消さない（記録と同じ扱い）
+  - **▶AUTO は記載必須**：AUTO視聴だけの曲（手動のプレイ記録なし）には `auto:true` が付き、スコア／称号の非掲載オプションでは隠せない。スコア・モード称号（🥁🚛）の非掲載は自由（easyクリアでも証明にはなる）
+  - **内容**：名前・アイコン・色・作成日時（`createdAt`。PCの時計をずらせば偽装できる＝クライアント側の限界）・コメント140字まで・入手先（説明テキスト＋リンク）
+  - **受け渡し**：`trk-playlist-*.json` ファイル（`downloadJSON()`）＋ 📋テキスト要約（クリップボード。ヘッダー＋曲ごとの1行＋コメント＋入手先）。読み込みは 📚すべて長押しの「📥共有プレイリストを読み込む」→ **ビューア**（作成日時・コメント・入手先・曲ごとの称号/AUTO/スコアと ✅ある／❌ない）→「あるN曲をプレイリストに取り込む」（📥アイコンの新プレイリスト）。曲の照合は `key` → タイトル＋サイズ（`plMatchByTitle()`）
+  - **リンク安全**（osu!の「入手先を明示」流）：`https://` 限定（`plShareData()` と `plSanitizeShared()` の両境界で検証。`javascript:` 等は拒否）。開く前に確認ダイアログ（URL全文＋「trk!はリンク先の内容を保証しません」）→ `window.open(url, "_blank", "noopener,noreferrer")`
+- `tools/check-repo.mjs` が配管（`pl:` プレフィックス・`SONG_META_KEY`・`PLAYED_KEY`・`trk-playlist` 形式・`playlistDelMode`）を検査する
+- **🛒 公式カタログ（catalog.js / library.js）**：`TRK_CATALOG`（シリーズ5つ・MOD push可。**音源・http://リンクは禁止**＝テストで検証）。プレイリストは `wish`（欲しい曲・100個まで）＋`guide`（入手先ノート80字＋URL）＋`cat`（カタログID）を持ち、`plSanitize()` が検証（wish各120/80字・URLはhttps限定・catは `[a-z0-9:-]` 40字）。`renderLib()` が `plNormTitle()`（小文字・空白1つに正規化）で `plWishMatch()`（同名複数はアルバム→アーティストで当たり付け→先頭）→ 見つかれば `p.songs` へ自動追加して保存（🧊フリーズ中はスキップ）。未入手は `plWishRows()` で薄い破線行（`.plWishRow`・クリックで入手先）。入口は📚すべて長押し →「🛒公式カタログ」（`plCatalogMenu()`）→ 取り込み（`plCatalogTake()`・二重取り込み防止は `cat` 照合・フォルダ自動作成は `plCatalogFolder()`＝既存再利用）。共有ファイル（trk-playlist v1）に wish/guide は**乗せない**（形式を変えない）。動作確認：`python3 /home/user/patches/build_catalog_tests.py && node /tmp/test_catalog.js`（**187項目**）
+- **👥 投稿者ツール（library.js / core.js・初期オフ）**：共有ファイルの任意項目 `author`（24字まで・`plSanitizeShared()` が検証）を、取り込み時にプレイリストの `by` として保持（`plSanitize()` が検証）。書き出しは `settings.plAuthorName`（空なら項目自体を書かない）。投稿者は**自己申告**なのでなりすましは防げない（ビューアにも「投稿者：◯◯」と出るだけ）。設定キーは `plAuthorTools`（初期false）／`plAuthorName`／`plAuthorBlock`（100人まで）／`plAuthorFav`／`plAuthorOnly`。絞り込みは `plVisible(p)`：ツールONのとき 🚪ブロック済み投稿者と、「⭐だけ表示」中のお気に入り以外投稿者を隠す（投稿者のない**自分のプレイリストは常に表示**）。`libTabsOf()`／フォルダチップ／`plFolderUnionKeys()` が参照。ビューアはブロック中の投稿者に 🚫 警告を出すが取り込むかは本人判断。動作確認：`python3 /home/user/patches/build_author_tests.py && node /tmp/test_author.js`（**32項目**）
+- **⏯🔊 曲名バナー（library.js のプレビュー節の直後）**：`settings.bannerPause`（初期オフ・core.js が保存）がONのときだけ `#songBanner` のクリックが効く。判定は `bannerPauseAction({enabled, mediaMode, target, phase, hasSong})`（純粋関数・テスト対象）→ pause/resume/preview/null。`e.target.closest("button, input, a, label")` があれば無視（スペクトラムの「＋」・プレビュー設定・音量つまみを保護）。音量は `.bannerVolBtn`（右下）→ `.bannerVolPanel` のスライダー＝`settings.musicVolume` を直接動かす（`fadeRaf` を止める・`$("volume")` と同期・`bannerVolClamp()` で0〜1にクランプ）。`.bannerText` は `padding-right:56px` でつまみのぶんを空けてある。動作確認：`python3 /home/user/patches/build_banner_tests.py && node /tmp/test_banner.js`（**60項目**・カタログ10シリーズの検証を含む）
+- **🕹️ ショートプレイ（game.js）**：`settings.shortMode`（off/90/120/180・初期off・core.jsが保存）。`shortLenActive()` は**AUTO時は常に0**（AUTOはフル）。`resetRun()` が `runShort` を決めて、窓より前のノーツを `judged=true, result="skip"` で飛ばし `nextIdx` を進める（`runNoteTotal`＝窓内ノーツ数が `currentScore()` の分母）。開始位置は `startGame()` の `video.currentTime = runShort ? shortStart(runShort) : 0`（カウントダウン分岐も同じ）。`tickClock()` が `shortSilenceWatch()` を呼び、終盤14秒だけ `TrkFX.tap(512)` の解析ノード（**1回だけ作り runShort 中は使い回す・終わったら disconnect**）で無音を見張る（平均バイト値≤4 が2.2秒続いたら `endGame(false)`。fxが無効なら検知なし＝ファイル終端まで）。`recordPlay()` は `r.short` があると `c.short[秒]` の独立スロットにだけ記録（`s.plays`／`MODE_PLAYS`／`perfectTotal`／`base.maxRate` に触れない）。**視聴証明（notePlayed）はスキップ**（library.js が `!runShort` を見る）。表示はリザルトの meta・ベスト・履歴とも一律 🕹️。動作確認：`python3 /home/user/patches/build_short_tests.py && node /tmp/test_short.js`（**121項目**）
+
 ### ⭐ お気に入りのフォルダ管理（js/favs.js）
 - **3系統**：`tv`（映像フィルター。1軍＝`settings.tvFav`）／`fx`（エフェクト。1軍＝`settings.fxFav`）／`song`（曲。1軍＝`settings.songFav`＝新規）。**1軍はこれまでの保存場所のまま**、2軍〜元お気に入り・ピン・ロック・選択中フォルダだけ `settings.favs` に足す（既存キー・形式は不変）
 - **4つの固定フォルダ**：`main`（⭐1軍＝ボタンに並ぶ）／`sub`（⭐2軍＝控え。チップで切り替えるとボタンに出る）／`frozen`（🧊フリーズ。**既定で🔒**）／`former`（📤元お気に入り。外したものが自動で入り、🎲の候補には出ない）
@@ -459,17 +513,21 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 - 予約キー：P / Esc（一時停止）、` （リトライ）、- / = （オフセット）、R（区間リピート）、[ ]（速度、変更可）。
 
 ### 📡 アンテナ機能とバックグラウンド再生（fx-dock.js）
-- **外部出力ポリシー（`settings.castPolicy`）**：初期値は `off`。設定で `antenna` を選んだときだけアンテナUIを有効にし、クリック時のユーザー操作で Remote Playback API の `prompt()` または Safari の `webkitShowPlaybackTargetPicker()` を呼ぶ。自動キャストはしない。未対応ブラウザーではバックグラウンド再生アンテナとしてだけ案内する。
-- **バックグラウンド再生（`settings.fxAntenna`）**：
+- **キャストアンテナ（`settings.castPolicy`）**：初期値は `off`。設定で `antenna` を選んだときだけ📺キャストボタン（`.dockCast`）を表示し、クリック時のユーザー操作で Remote Playback API の `prompt()` または Safari の `webkitShowPlaybackTargetPicker()` を呼ぶ。自動キャストはしない。未対応ブラウザーでは `dockCastUnsupported` を表示するだけ。
+- **バックグラウンド再生アンテナ（`settings.backgroundPolicy`＋`settings.fxAntenna`）**：
+  - `backgroundPolicy` は3値：`antenna`（ドックの上に📡アンテナUI）／`corner`（**右上・言語選択の左**にコンパクトアンテナ `.cornerAnt`。ドックのアンテナは隠れるがバックグラウンド再生は生きる）／`off`（隠す＝バックグラウンド再生もなし）。`fxAntenna` でON/OFFする。置き場の判定は `bgAntennaView(policy)`（純粋関数）。「キャスト無効＋バックグラウンド再生許可」のような組み合わせも可能（キャストとバックグラウンド再生は別ポリシー。キャストを隠しても再生用アンテナは消えない）。
   - アンテナを立てると（ON）、ブラウザのタブを切り替えたり画面をオフにしても、曲のプレビュー、ラジオ待ち受け、AUTO演奏が途切れることなくバックグラウンドで継続（`keepAlive()`）。
   - 自分でプレイ中の場合は記録保護のため通常どおり一時停止。
   - MediaSession APIと連動し、端末のロック画面や通知バーから 再生・一時停止・曲送り が可能。
 - **アンテナ形状のカスタマイズ（`settings.fxAntennaShape`）**：
   - 伸縮ロッド（`rod`・標準）、円形ループ（`loop`）、パラボラ（`dish`）、サイバービーム（`beam`）の4種から選択可能。
   - アンテナON時に各形状に応じた伸長・発光・ティルト・電波シグナルリング（`signalPulse` アニメーション）が作動。
-  - ドック本体のアンテナ（`.antWrap`）をクリックしても、アンテナスイッチ（`.dockAnt`）をクリックしても即座に切り替え可能。
+  - ドック本体のアンテナ（`.antWrap`）をクリックしても、アンテナスイッチ（`.dockAnt`）をクリックしても即座に切り替え可能（`corner` のときは右上の `.cornerAnt` でも切り替え）。
+  - **🎭 キャラ肌（truck／robot／cat／slime／ghost／reimu／marisa／cirno／flandre／youmu／custom）**：16×16の描きおろしドット絵10体＋自分のイラスト2枚。**ON＝起きる・歩く／OFF＝倒れる・眠る** の2フレームアニメ（480ms）。東方Project5体（霊夢・魔理沙・チルノ・フランドール・妖夢）は二次創作（NOTICE.md 2b節・公式ガイドライン準拠・旧保存値 `"miko"` は `"reimu"` に自動移行）。自分のイラストは96pxに縮小したPNG dataURLを `fxAntennaCustomOn/Off` に保存（**端末内だけ**。初期化で消える）。
 - **スキン選択欄直下の明示的チェックボックス**：
   - スキン選択の直下に **「通常のアンテナを使う（バックグラウンド再生モード）」** チェックボックスを配置し、初見のプレイヤーでも便利なバックグラウンド再生機能の存在に自然と気付けるよう配慮。
+  - キャストは別の`.dockCast`ボタンから操作する（このチェックボックスとは無関係）。
+- **設定画面の個別ポリシー**：ドックの「くわしい」欄で「バックグラウンド再生アンテナ」は `off`／`antenna`／`corner`（右上・言語の左）から、「キャストアンテナ」は `off`／`antenna` から選べる。旧バージョンの `castPolicy=antenna` 設定は `backgroundPolicy=antenna` として引き継ぐ。
 
 ### 🥁 音ゲーマー向け機能・MOD・判定分析
 - **FAST / SLOW（Early / Late）の判定統計**：
@@ -505,14 +563,24 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 | `shadow_taiko_records_v1` | 記録 |
 | `shadow_taiko_best_v1` | v7以前の自己ベスト（引き継ぎ用） |
 | `shadow_taiko_song_prefs_v1` | 曲ごとのBPM/オフセット/Seed/プレビュー位置/最近のシード |
-| `shadow_taiko_custom_skins_v1` | カスタムスキン |
+| `shadow_taiko_custom_skins_v1` | カスタムスキン（`skin.shadow-taiko`。`bg2`＋`gradDir` で背景グラデ対応） |
 | `trk_fx_presets_v1` | マイプリセット（形式 `trk-fx`） |
 | `trk_tv_skins_v1` | 🎨 カスタムTVスキン（形式 `trk-tvskin`、最大30個。選んでいるTVは `settings.tvDockSkin`） |
 | IndexedDB `shadow_taiko_packs` / `_songs` / `_library` / `_vrm` / `_mmd` | パック（`sha256` 付き）・追加した曲・フォルダのハンドル（`_library` の kv：`"dir"`＝📁 開く／`"share"`＝📤 共有）・VRM・MMD（"model"/"motion"。持ち込みファイルの控え） |
 | IndexedDB `shadow_taiko_shared`（新） | 📤💾 共有して端末に残した曲（`{key, file, name, dir, addedAt}`。最大150曲・300MB。`settings.libKeepShared` がオンのときだけ書く・読む） |
 | `settings.libKeepShared`（新） | 💾 共有した曲を端末に残す（初期オフ。`shadow_taiko_preferences_v2` の中。`?safe=1` ではオフになる） |
 | `settings.specOn` `specStyle`（16種）`specTheme`（8色）`specGain` `specPeaks` `specTv` `specSkin` `specSkinOpen`（新・📊 スペクトラム） | 表示／見え方／色／感度／ピーク／TVに重ねる／曲名バナーのスキン／開いた状態。`shadow_taiko_preferences_v2` の中 |
-| `settings.songFav`（新） / `settings.favs`（新） | ⭐ 曲のお気に入り（1軍）と、3系統ぶんのフォルダ分け（`{tv,fx,song}` の `sub`／`frozen`／`former`／`pins`／`locks`／`active`）。どちらも `shadow_taiko_preferences_v2` の中 |fxDockSkin fxDockFive fxDockOpen fxAntenna fxEqLock fxLockChain fxFavSeeded
+| `settings.songFav`（新） / `settings.favs`（新） | ⭐ 曲のお気に入り（1軍）と、3系統ぶんのフォルダ分け（`{tv,fx,song}` の `sub`／`frozen`／`former`／`pins`／`locks`／`active`）。どちらも `shadow_taiko_preferences_v2` の中 |
+| `settings.playlists`（新） / `settings.playlistDelMode`（新） | 🎧 ユーザー定義プレイリスト（`{id,name,icon,color,frozen,locked,songs}` の配列。読み込み時に `plSanitize()` が検証）と、中クリック削除のモード（`one`／`three`）。`shadow_taiko_preferences_v2` の中 |
+| `shadow_taiko_songmeta_v1`（新・localStorage） | 🎶 曲プロフィール（曲キー → `{title,artist,album,composer}`）。設定とは別枠で保存（`library.js` の `songMetaSave()` |
+| `shadow_taiko_played_v1`（新・localStorage） | 📤 共有の証明用 視聴記録（曲キー → `{last,auto,manual}`）。リザルトまで行った曲を記録（AUTO判別付き）。設定リセットでは消さない |
+| `settings.castPolicy`（初期 `off`） | 📺 キャストアンテナのポリシー（`off`／`antenna`）。`antenna` のときだけ `.dockCast` ボタンを表示し、クリックで Remote Playback の選択画面を開く（自動接続なし）。`shadow_taiko_preferences_v2` の中 |
+| `settings.backgroundPolicy`（初期 `off`） / `settings.fxAntenna` | 📡 バックグラウンド再生アンテナのポリシー（`off`／`antenna`）とON/OFF。旧 `castPolicy=antenna` は `backgroundPolicy=antenna` に引き継ぐ。`shadow_taiko_preferences_v2` の中 |
+| `settings.fxDockSkin` `fxDockFive` `fxDockOpen` `fxAntennaShape` `fxAntennaCustomOn` `fxAntennaCustomOff` `fxEqLock` `fxLockChain` `fxFavSeeded` | 🎛 fxドックのスキン・5ボタン統一・開閉状態・アンテナ形状（キャラ10体＝東方5体含む・自分のイラストを含む）・イラスト2枚（dataURL・端末内だけ）・EQロック・ロック連鎖・初期お気に入り投入済みフラグ。`shadow_taiko_preferences_v2` の中 |
+| `settings.tutorialDone`（新） | 🧭 チュートリアル完了フラグ。Seed欄に `trk!` と入力した瞬間、またはガイドのスキップで `true` になり案内が消える（設定「見た目」の🧭もう一度で `false` に戻る）。設定リセットでも `false`。`shadow_taiko_preferences_v2` の中 |
+| `settings.tutorialStamps`（新） | 🧭 スタンプラリーの実績（`song`/`look`/`play`/`safe`/`seed` の配列。順番自由・スキップ後も蓄積）。5つ揃うとごほうびスキンが解禁。設定リセットで空になる |
+| `settings.skinGradUnlocked`（新） | 🎓 ごほうびスキン「グラデュエーション」の解禁フラグ（スタンプ5つで `true`）。設定リセットで `false` |
+| `settings.skinShelfOpen`（新） / `settings.skinShelfCat`（新） | 🖼 スキンの棚の開閉と、絞り込みカテゴリー（all／basic／miku／dark／light／grad／fun／custom）。`shadow_taiko_preferences_v2` の中 |
 
 **形式名**：`shadow-taiko-pack`、`shadow-taiko-chart`、`shadow-taiko-records`、`skin.shadow-taiko`、`trk-fx`、`trk-verified`、`trk-tvskin`（カスタムTVスキン）、譜面ファイル `*.shadow-taiko.json`
 
@@ -613,9 +681,9 @@ records[指紋 "サイズ:長さ×10"] = {
 - [x] `credits.html` の権利とクレジット図鑑、NOTICE / README / Handoffの第三者ライブラリ記載を同期
 - [x] `.stpack` の `creditCard`（権利カード／名刺）を追加。パック作成UI・曲パック作成UIから出力し、パック一覧で折りたたみ表示
 - [x] `creditCard.contributors`（最大12人）の表示、パック内 `CREDITS.md` 自動生成、共有用SVG名刺ダウンロードを追加。カードは作者申告の要約で、原文ライセンス／ReadMeを優先する
-- [x] 🧭 3分チュートリアル、初期スクロール速度1.2x、ゲーム演出（全部／控えめ／オフ）、TRUCKの初期演出強化、CATCHの任意ニトロ得点1.1倍を追加
+- [x] 🧭 3分チュートリアルを5段階に拡張し、最後のSeed欄に `trk!` と入力するとチュートリアル完了（`settings.tutorialDone`）になって案内が消えるようにした。初期スクロール速度1.2x、ゲーム演出（全部／控えめ／オフ）、TRUCKの初期演出強化、CATCHの任意ニトロ得点1.1倍も追加
 - [x] ▶ TVドックの電源長押しでメディアプレーヤーモードを開く。再生キュー、曲送り、リピート／シャッフル、0.5〜2x速度、前回位置復元、スリープタイマー、Media Sessionを実装。ゲーム開始・記録には影響しない
-- [x] 📡 外部出力を「キャストしない（アンテナも無効）／アンテナを立てて許可」に分離。Remote Playback API／SafariのPlayback Target Pickerがある環境だけ、アンテナ操作から選択画面を開く（自動接続なし）。動画ズーム0.5〜3x、速度・一時停止をキーアサイン可能にした
+- [x] 📡 外部出力を「キャストアンテナ」と「バックグラウンド再生アンテナ」の2本に分離。Remote Playback API／SafariのPlayback Target Pickerがある環境だけ、キャストアンテナ（`.dockCast`ボタン）から選択画面を開く（自動接続なし）。バックグラウンド再生は📡アンテナで個別にON/OFFでき、初期は両方ともオフ。動画ズーム0.5〜3x、速度・一時停止をキーアサイン可能にした
 - [x] ⏪ メディアプレーヤーに逆再生を追加。Web Audioで曲ファイルをセッション中だけ反転した音声バッファとして再生し、映像は手動シークで同期する。音声の準備ができないブラウザーでは映像フレームのみの逆再生にフォールバックする
 - [x] 🔁 メディアプレーヤーにA-B区間ループを追加。A点・B点ボタンまたは割り当てキーで範囲を作り、トグル（A→B／開始→解除）と長押し中だけの操作を選べる。曲を変えると範囲は解除する
 - [x] 🎛 Loop Labを追加。現在位置から5／10／20秒のクイック区間、4〜12秒のランダム区間、曲識別子とA/B秒数だけを端末内に保存する曲別プリセット（呼び出し、個別削除、全消去、最大8件）を提供する。現在適用中のプリセットは強調表示する。音源ファイルの切り取り・変換・書き出し・外部アップロードは行わない
@@ -639,6 +707,14 @@ records[指紋 "サイズ:長さ×10"] = {
 - [x] 🩷 MMDマスコット（持ち込み式・自作VMD3種・曲BPM同期・大きさ/向き/クレジット・保存と復元・4言語・`?safe=1` で切る）
 - [ ] 実機確認：CDNから three／three-mmd-loader が読めるか／Lat式ミクやタワシ式CHAN×CO系ミクの .pmx が動くか／テクスチャ付きフォルダ／自分の .vmd が曲に合うか／モバイル幅での見え方
 - [x] 📚 曲のタブ（自動）と棚スキン16種（🎨 で切替・設定で隠せる。2026-10-05 に 🎰ジュークボックス／📻ラジオ番組表／🚉電光掲示板 ＋ 💿レコード棚／📼レンタルビデオ／🎤カラオケ目次／🗂️図書館の書架／🍱お品書き を追加）
+- [x] 🖼 スキンの棚と全体見た目プリセット30種（2026-10-05：グラデーション対応（上下左右）、ミク新衣装2種、カテゴリー絞り込みチップ、`#skinNow` 現在スキン表示、`tools/check-repo.mjs` に30種検査）
+- [x] 🧭 チュートリアルをスタンプラリー化（2026-10-05：trk!入力で即完了・取り逃しなし、スキップ／もう一度ボタン、実際の行動を検知するスタンプ5つ、5つ揃いでごほうびスキン「🎓グラデュエーション」解禁（棚では❓カード）、お祝いポップアップ（プレイ中は選曲復帰時に表示）、check-repoに31種＋鍵検査）
+- [x] 🎧 プレイリストタブと曲プロフィール（2026-10-05：＋／すべての中クリック／長押しで作成、名前・アイコン・色・🧊フリーズ／🔒ロック、中クリック削除1回／3回モード、曲の長押しでプロフィール編集とプレイリスト追加、ドラッグ＆ドロップ、削除しても曲は残る、check-repoに配管検査）
+- [x] 📤 プレイリスト共有（2026-10-05：trk-playlist v1、9曲以上＋全曲クリア／視聴済みの書き出し条件（マリオメーカー方式）、AUTO視聴の▶AUTO必須表示、視聴記録ストア shadow_taiko_played_v1、コメント140字＋作成日時＋入手先httpsリンク、JSON書き出し＋クリップボード要約、読み込みビューア＋「ある曲だけ取り込む」、リンク確認ダイアログ）
+- [ ] 実機確認：スキンの棚の開閉とチップ絞り込み、グラデの見え方（上下左右）、スキン作成のグラデ（保存・書き出し・読み込み・リミックス）、ミク新衣装ときらきらパーティクル
+- [ ] 実機確認：スタンプラリー（曲選択・スキン／エフェクト変更・1曲プレイ・設定を開くの各検知と進捗表示、trk!即完了、スキップ、もう一度、スタンプ5つで🎓解禁と❓カードの変化、お祝いポップアップ）
+- [ ] 実機確認：プレイリスト（＋／中クリック／長押しの各操作、🧊／🔒の効き、色とアイコン、3回中クリックモード、ドラッグ＆ドロップ、曲プロフィールの表示・検索・バナー、スマホの長押し）
+- [ ] 実機確認：プレイリスト共有（AUTO／手動で視聴記録が正しく付く、9曲未満と未視聴の拒否表示、▶AUTOの必須表示、スコア／称号オフ、書き出しJSONの中身、クリップボード要約、読み込みビューアの ✅／❌ と取り込み、入手先リンクの確認ダイアログ、AUTO+📻ラジオ+3倍速での回し）
 - [x] 🥁 音ゲーマー向け機能の拡充（FAST/SLOW集計・GOOD内訳・判定下ネオン表示、MIRROR/RANDOM公式MOD、Lv.1〜20連続スケール、本格トリル・ロール配置生成、達人・2000 RUSHワンタップ解禁）
 - [x] 🎬 TV映像確認タブの操作性強化 ＆ 🔗 TV設定共有URL（シークバー、再生/一時停止、時間表示、「▶ この設定で遊ぶ」ボタン、`?tv=...&skin=...` パラメータ生成と自動適用）
 - [x] 📤 ミュージックフォルダを共有（1回の許可で一括取り込み・🔗 共有をつづける・💾 端末に残す（150曲／300MB）・🚫 共有をやめる・📁 開く はならべて残す・4言語）→ **PR #11 として main にマージ済み**（2026-10-05）
@@ -656,6 +732,13 @@ records[指紋 "サイズ:長さ×10"] = {
 - [ ] 実機確認：📊 スペクトラム（音に合わせて動くか／**16種それぞれの見え方**／**曲名バナーのスキンと左上の「＋」**／**「🚫 スペクトラムを使用しない」で全部止まる・外すと戻る**／TVに重ねたときの見え方／初回に音が黙らないか／モバイル幅／他のTVスキンとの相性／設定・くわしい欄の両方で動くか）
 - [x] 🎛 エフェクトチェーン編集（`js/fx-synth.js`）：17種の安全なエフェクトを組み立て、順序変更・EQバンド編集・ノブ風スライダー・一時適用・マイプリセット保存・trk-fx Import/Export（4言語）。🧊 `fx.js`／`fx-presets.js` は変更なし。
 - [ ] 実機確認：エフェクト編集UIで追加・変更・並べ替え・削除／EQと音量の適用／保存後の再読み込み／trk-fxのImport/Export／4言語／モバイル幅。
+- [ ] 実機確認：🛒公式カタログ（📚長押し→🛒→取り込み→カテゴリ／シリーズのフォルダができる・未入手の薄い破線行と🔗リンク（アークナイツは曲ごとのMonster-Sirenページ）・Musicフォルダに同名ファイルを入れて**自動追加**される・🧊中は追加されない・二重取り込みは断られる・タブ長押し設定に入手先ガイド・4言語・モバイル幅）。
+- [ ] 実機確認：👥投稿者ツール（初期オフで何も出ない・設定ONで投稿者名欄と👥ボタンが出る・投稿者付き共有を読み込むとビューアに👤・ブロックするとタブとフォルダから消えて👥ダイアログに非表示件数・⭐だけ表示・🔍検索・ブロック解除で戻る・設定OFFで全部見える・4言語）。
+- [ ] 実機確認：⏯🔊バナー（右下の🔊→スライダー→音量が変わる・0で🔇・設定画面のスライダーと一致・長い曲名がつまみに重ならない／設定ONでバナータップ→プレイ中一時停止・再開、選曲中プレビュー停止・再生／中のボタンは誤作動しない／設定OFFではバナータップ無反応・4言語）。
+- [ ] 実機確認：🕹️ショートプレイ（後半90秒で曲の終わりから開始する・窓より前のノーツは出ない・スコアが窓内ノーツで100万点満点になる・終盤無音の曲は音が止まった所で終わる（fxオフならファイル終端）・リザルトに🕹️後半90秒・クリア判定とFC/APは出る・フルプレイのベストとプレイ回数が変わらない・共有の視聴証明が付かない・AUTOはフルのまま・カウントダウンも後半位置から・4言語）。
+- [ ] 実機確認：🥚チュートリアルイースターエッグ（未完了状態でSeedに skip→左へ跳ねて消える＋トースト／cheat→溶ける／god mode・godmode→昇天／SKIP・God Mode など大文字小文字空白もOK／skipping・god 単体では反応しない／完了後は二度と出ない／trk! の通常完了・🎓スタンプ報酬は影響なし／4言語・reduced-motion）。動作確認：`python3 /home/user/patches/build_egg_tests.py && node /tmp/test_egg.js`（**31項目**）
+- [ ] 実機確認：📊スペクトラム拡張（新しい見え方14種——🔵ドットグリッド／🏙シティーライト／🫧あわ／🏔山脈／🎸弦／🌸フラワー／🌀万華鏡／✨星空／🟢マトリックス／🎆花火／🌊うねり／🐚スパイラル／🌬風車／⚡稲妻——が音で動くか／新しい色8種（ゴールド・氷・森林・キャンディ・溶岩・海・ゲームボーイ風・シンセウェイブ）の濃淡／🟩ゲームボーイ風が緑の4階調になっているか／バナーの「＋」**長押し**で設定画面が開いて📊スペクトラム欄が展開・スクロールするか（ツールチップに案内が出るか）／⏯バナー左右の◀▶で**いまのタブの中**の曲が送れるか（端で回り込むか・空のタブでは隠れるか・設定オフで消えるか・プレイ中は反応しないか・「タップ一時停止」との誤作動がないか）／色の丸ボタン16個が折り返して収まるか／`prefers-reduced-motion` でも例外なし／4言語・`?safe=1`）。
+- [ ] 実機確認：📡アンテナの置き場（「バックグラウンド再生アンテナ」を「右上に置く（言語の左・コンパクト）」に→ドックのアンテナと📡ANTボタンが消えて、右上の言語選択の左にコンパクトな📡が出る／タップでON・OFF、ONのとき傾きと電波リング／「ドックにアンテナを表示」に戻すと右上が消えてドックへ戻る／「表示しない」ではバックグラウンド再生も無効の文言／右上アンテナONのままタブを裏にしても再生が続くか／キャストを「キャストしない」にしても再生用アンテナが消えない／設定チェックボックス「通常のアンテナを使う」は corner でも使える／4言語）。
 - [x] 🎹 曲に合わせて演奏するシンセモード（`js/synth-mode.js`）：16音色（エレキギター／電子サックス／ZUNPET風ブラスを含む）・最大6音源レイヤー・±8半音ピッチ・ローカルサンプル・25鍵画面鍵盤・キーアサイン・**鍵盤固定オプション初期オン**・曲プレビュー操作・動画＋スペクトラム表示。
 - [ ] 実機確認：⏻標準650ms／高速200ms／起動禁止と短押しミュート／16音色（エレキギター・電子サックス・ZUNPET風ブラスを含む）／**鍵盤固定ONでスライダー等にキーを吸われない・OFFで通常入力に戻ること**／**大画面向け鍵盤拡張ONでキーが横に広がり、スマホ幅では従来幅を保つこと**／±8半音ピッチつまみ（初期0・保存・押鍵中にも反映）／和音・リリース／曲と動画の再生／QWERTY配列と再割り当て／タッチ鍵盤／サンプル音源のサイズ・長さ制限とローカル動作／設定保存・4言語／モバイル幅。
 「12. 次の候補」にあったエフェクトチェーン編集と🎹シンセモードは実装済みです。次は各実機確認と、下の未実装アイデアを進めてください。
@@ -680,7 +763,7 @@ records[指紋 "サイズ:長さ×10"] = {
 
 - `trk!.zip`（元プロジェクト一式）をこのリポジトリに展開して採用しました。プロトタイプ版の `app.js` / `style.css` は削除しています（履歴には残っています）。
 - **`feedbackLabel` を4言語ぶん追加**（`js/i18n.js`）。12章のチェックは「✅ 入っている」になっていましたが、実際は抜けていて、選曲画面の連絡先リンクの前に `feedbackLabel` という生の文字列が出ていました。
-- **サービスワーカーの登録を `js/main.js` の末尾に追加**。6章の読み込み順の表には「main.js＝サービスワーカー登録」とありましたが、コードには入っていませんでした。当時のキャッシュ名は `trk-v2026.10.2`。現在の値は `sw.js` の `CACHE = "trk-v2026.10.5-synth3"` です。
+- **サービスワーカーの登録を `js/main.js` の末尾に追加**。6章の読み込み順の表には「main.js＝サービスワーカー登録」とありましたが、コードには入っていませんでした。当時のキャッシュ名は `trk-v2026.10.2`。現在の値は `sw.js` の `CACHE = "trk-v2026.10.5-synth9"` です。
 - `manifest.webmanifest`（全画面・横向き）・`verified.json`（空の雛形）・`.github/ISSUE_TEMPLATE/`（bug_report・feature_request・config）を新規作成しました。
 - OGP画像は `tools/make-icons.html` の指示どおり **`docs/og.png`** に置きました（zip では `icons/og.png` になっていました）。`index.html` の `og:image` はそのままで合っています。
 - **`.github/workflows/pages.yml` を変更**：ファイル名を並べてコピーする方式だと、新しいファイルを足すたびに公開が壊れるので、ルートを丸ごと公開する方式（`.git`・`.github`・`_site` だけ除外）にしました。`css/` や `js/` にファイルを足しても、もう直す必要はありません。

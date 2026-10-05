@@ -49,29 +49,31 @@ on("skin", updateMascotUI);
 on("language", updateMascotUI);
 
 /* ============ スキン作成・編集 ============ */
-const MAKER_COLORS = ["bg", "panel", "text", "accent", "gold"];
+const MAKER_COLORS = ["bg", "bg2", "panel", "text", "accent", "gold"];
 function defFromSkin(id) {
   if (customSkinDefs[id]) return JSON.parse(JSON.stringify(customSkinDefs[id]));
   const s = SKINS[id] || SKINS.shadow, u = s.ui;
   const font = !s.font ? "default" : /mono|consolas/i.test(s.font) ? "mono" : /serif/i.test(s.font) && !/sans/i.test(s.font) ? "serif" : "rounded";
+  const g = parseGrad(u["--ui-bg"]);   // グラデーションのスキンをリミックスしたら、2色と向きをそのまま持ってくる
   return {
     name:`${s.label[lang] || s.label.en} ${tr("remix")}`.slice(0, 24),
-    colors:{ bg:toHex(u["--ui-bg"]), panel:toHex(u["--ui-panel"]), text:toHex(u["--ui-text"]), accent:toHex(u["--ui-accent"]), gold:toHex(u["--ui-gold"]) },
-    glow:!!s.game.glow, scanlines:!!s.game.scanlines, font, video:"mono",
+    colors:{ bg:g ? g.from : toHex(u["--ui-bg"]), bg2:g ? g.to : "", panel:toHex(u["--ui-panel"]), text:toHex(u["--ui-text"]), accent:toHex(u["--ui-accent"]), gold:toHex(u["--ui-gold"]) },
+    glow:!!s.game.glow, scanlines:!!s.game.scanlines, gradDir:g ? g.dir : "none", font, video:"mono",
     mascot:MASCOT_IDS.includes(s.mascot) ? s.mascot : "none"
   };
 }
 function fillSkinMaker(id) {
   const d = defFromSkin(id);
   $("makerName").value = d.name;
-  for (const k of MAKER_COLORS) $("makerColor_" + k).value = d.colors[k];
+  for (const k of MAKER_COLORS) $("makerColor_" + k).value = d.colors[k] || d.colors.bg;   // bg2 が空のときは bg と同色で立たせておく
+  $("makerGradDir").value = d.gradDir || "none";
   $("makerGlow").checked = d.glow; $("makerScan").checked = d.scanlines;
   $("makerFont").value = d.font; $("makerVideo").value = d.video; $("makerMascot").value = d.mascot;
 }
 function readSkinMaker() {
   const colors = {};
   for (const k of MAKER_COLORS) colors[k] = $("makerColor_" + k).value;
-  return sanitizeSkinDef({ name:$("makerName").value, colors, glow:$("makerGlow").checked, scanlines:$("makerScan").checked,
+  return sanitizeSkinDef({ name:$("makerName").value, colors, glow:$("makerGlow").checked, scanlines:$("makerScan").checked, gradDir:$("makerGradDir").value,
     font:$("makerFont").value, video:$("makerVideo").value, mascot:$("makerMascot").value });
 }
 function storeCustomSkin(id, def) {
@@ -79,6 +81,11 @@ function storeCustomSkin(id, def) {
   saveCustomSkins(); buildSkinGrid(); applySkin(id);
 }
 const newSkinId = () => "custom_" + Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36);
+const skinShelf = $("skinShelf");
+if (skinShelf) {
+  skinShelf.open = settings.skinShelfOpen !== false;      // 前回の開閉を復元
+  skinShelf.addEventListener("toggle", () => { settings.skinShelfOpen = skinShelf.open; saveUserPrefs(); });
+}
 $("skinMaker").addEventListener("toggle", () => { if ($("skinMaker").open) fillSkinMaker(settings.skin); });
 $("makerLoadBtn").addEventListener("click", () => { fillSkinMaker(settings.skin); setStatus("makerStatus", null); });
 $("makerSaveNewBtn").addEventListener("click", () => {

@@ -33,6 +33,25 @@ under the Piapro Character License (PCL). https://piapro.jp/license/pcl/summary
 - "Winter Miku", "Spring Miku" and "Chibi Miku" in trk! are original arrangements.
   They are NOT the official derivative characters (Snow Miku, Sakura Miku, Mikudayo).
 
+## 2b. Touhou Project fan works (antenna character skins)
+アンテナの東方キャラ肌（⛩霊夢・🧹魔理沙・❄チルノ・🦇フランドール・🗡妖夢）は、
+東方Project（著作権：上海アリス幻樂団／ZUN）を題材にした trk! の描きおろしドット絵
+（二次創作）です。公式ゲームの素材は一切使っていません。
+The Touhou Project antenna character skins (Reimu, Marisa, Cirno, Flandre and Youmu)
+are original pixel drawings by trk!, fan works based on the Touhou Project
+(© Team Shanghai Alice / ZUN). No assets from the official games are used.
+
+- 東方Project二次創作ガイドライン（https://touhou-project.news/guideline/）に従い、
+  無料のブラウザゲームとして提供しています（ガイドラインは、無料のアプリであること・
+  スクリーンショット等以外のゲーム素材の使用・公開をしないこと・二次創作である旨の明記
+  を求めています。いずれも満たしています）。
+- The character rights belong to Team Shanghai Alice (ZUN) and are not ours, so the
+  GPL cannot grant them.
+- **To make a Touhou-free build:** remove the `reimu`, `marisa`, `cirno`,
+  `flandre` and `youmu` entries from `ANT_CHARS` in `js/fx-dock.js`, the
+  `antTouhou` list, and the `dockAntCharReimu/Marisa/Cirno/Flandre/Youmu` and
+  `dockAntGroupTouhou` label keys (4 languages). Nothing else needs to change.
+
 ## 3. User content
 Songs, charts, skins, `.stpack` packs, VRM models, motions and character mods are
 owned by their creators. The same goes for MMD models (`.pmx`/`.pmd`), their
@@ -88,7 +107,44 @@ toolchain. Each package keeps its own license and copyright notices; the generat
 Android project and its release process must preserve the notices required by
 those packages. This file does not grant GPL rights to third-party software.
 
+### 4c. Pro-audio effect concepts (original implementations)
+
+The 🚪 noise gate, 🧹 spectral noise reduction, 🎚 dynamic EQ and ✨ exciter in
+js/fx-worklet.js and js/fx.js are original implementations written for trk!.
+Their *concepts* are inspired by well-known pro-audio tools — noise reduction
+in Audacity, ReaFir (Cockos), Bertom Denoiser Classic, and the dynamic EQ /
+exciter ideas popularized by TDR Nova and iZotope Ozone. No code, UI assets,
+preset data, or product names from those tools are used; the DSP (radix-2 FFT,
+RBJ biquad formulas, spectral subtraction) is built from textbook algorithms.
+Product names are mentioned here and in the README for explanation only, and
+trk! is not affiliated with or endorsed by their authors.
+
+### 4d. Official-source playlist catalog (trademarks, factual listings)
+
+js/catalog.js (`TRK_CATALOG`) contains curated playlists for Blue Archive,
+Arknights, League of Legends "Sessions: Vi", VALORANT, Touhou Project,
+NoCopyrightSounds, Kevin MacLeod (incompetech), Genshin Impact,
+100% Orange Juice and Gakuen iDOLM@STER.
+It bundles **no audio files, charts, or copyrighted works** — only factual
+metadata (track / artist / album names, which are facts) and links that point
+exclusively to official sources (bluearchive.jp, Monster-Siren Records,
+riotgames.com creator-safe guidelines, ZUN's official site). Series names,
+logos, characters and trademarks belong to their respective owners
+(Nexon/Yostar, Hypergravity/Hypergryph, Riot Games, Team Shanghai Alice);
+they are used here for factual reference only, without permission, and their
+inclusion does not imply any affiliation with or endorsement of trk!.
+Riot Games music is displayed under Riot's fan-content / creator-safe policy
+(keep it free, don't imply official affiliation); see
+https://www.riotgames.com/en/legal — "Courtesy of Riot Games".
+Per the same principle, trk! never implies that any of these publishers
+officially distribute, endorse, or bundle anything with this app, and users
+are directed to obtain the music themselves from the linked official stores.
+
 ## 5. Not affiliated
 trk! is an independent fan project. It is not affiliated with or endorsed by
 ppy Pty Ltd (osu!), Bandai Namco (Taiko no Tatsujin), Crypton Future Media, INC.,
-VRChat Inc., or pixiv Inc.
+VRChat Inc., pixiv Inc., Nexon Games / Yostar (Blue Archive), Hypergravity /
+Hypergryph (Arknights / Monster-Siren Records), Riot Games (League of Legends,
+VALORANT), Team Shanghai Alice / ZUN (Touhou Project), miHoYo / HOYO-MiX
+(Genshin Impact), Orange-Juice / Fruitbat Factory (100% Orange Juice), or
+Bandai Namco Entertainment (Gakuen iDOLM@STER / THE iDOLM@STER).

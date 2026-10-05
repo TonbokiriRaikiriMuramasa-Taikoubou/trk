@@ -41,6 +41,35 @@ function finishLeadIn() {
   video.play().catch(() => { autoplayBlocked = true; pauseGame(); });
 }
 
+/* ---------- 🕹️ ショートプレイ（長い曲の後半だけ遊ぶ。クリア判定は通常どおり出す） ---------- */
+const SHORT_LENS = { "90": 90, "120": 120, "180": 180 };
+let runShort = 0, runNoteTotal = 0, shortAn = null, shortSilenceSince = 0;
+function shortLenActive() {   /* AUTOのときはフルプレイ（AUTOはseed探しなので） */
+  return !settings.autoPlay && SHORT_LENS[settings.shortMode] ? SHORT_LENS[settings.shortMode] : 0;
+}
+function shortStart(len) {   /* 後半◯秒の開始位置（曲が短ければ頭から） */
+  const d = isFinite(video.duration) ? video.duration : len;
+  return Math.max(0, Math.min(d - len, d));
+}
+function shortSilenceWatch() {   /* 終盤の無音を検知したらそこで終了（8秒くらい余白のある曲がある） */
+  if (!runShort || phase !== "playing" || !isFinite(video.duration)) return;
+  if (video.duration - video.currentTime > 14) { shortSilenceSince = 0; return; }   /* 見るのは終盤だけ */
+  if (!shortAn && window.TrkFX && TrkFX.tap) shortAn = TrkFX.tap(512);   /* 1回だけ作って使い回す（fxが無効なら検知なし） */
+  if (!shortAn) return;
+  const buf = new Uint8Array(shortAn.frequencyBinCount);
+  shortAn.getByteFrequencyData(buf);
+  let sum = 0; for (let i = 0; i < buf.length; i++) sum += buf[i];
+  if (sum > buf.length * 4) { shortSilenceSince = 0; return; }   /* 音がある */
+  const now = performance.now();
+  if (!shortSilenceSince) { shortSilenceSince = now; return; }
+  if (now - shortSilenceSince > 2200 && video.currentTime > 10) {   /* 2.2秒ずっと無音＝曲の終わり */
+    shortSilenceSince = 0;
+    video.pause();
+    endGame(false);
+  }
+}
+function shortCleanup() { if (shortAn) { try { shortAn.disconnect(); } catch (_) {} shortAn = null; } shortSilenceSince = 0; }
+
 /* ---------- 進行 ---------- */
 function resetRun() {
   const rand = settings.modRandom ? mulberry32(hashString(`trkRand|${$("seed")?.value || 0}|${chartDiff}|${chart.length}`)) : null;
@@ -53,6 +82,12 @@ function resetRun() {
     n.lane = l;
   });
   nextIdx = 0;
+  runShort = shortLenActive(); runNoteTotal = chart.length; shortCleanup();
+  if (runShort) {   /* 🕹️ 窓より前のノーツはスキップ（スコアの分母にも入れない） */
+    const st = shortStart(runShort) * 1000 - settings.latency;
+    while (nextIdx < chart.length && chart[nextIdx].time < st) { chart[nextIdx].judged = true; chart[nextIdx].result = "skip"; nextIdx++; }
+    runNoteTotal = chart.length - nextIdx;
+  }
   stats = { perfect:0, good:0, miss:0, combo:0, maxCombo:0, star:0, fast:0, slow:0, goodFast:0, goodSlow:0, crash:0, errN:0, errSum:0, errSq:0, blastBonus:0 };
   practice = false; effects = []; errors = []; caption = null; lastMissT = -1e9;
   leadIn = null; goAt = 0; pausedInLeadIn = false; autoplayBlocked = false;
@@ -69,13 +104,13 @@ async function startGame() {
   if (phase === "playing" || phase === "paused") video.pause();
   resetRun();
   video.playbackRate = settings.rate;
-  try { video.currentTime = 0; } catch (_) {}
+  try { video.currentTime = runShort ? shortStart(runShort) : 0; } catch (_) {}
   if (document.activeElement) document.activeElement.blur();
   $("endScreen").querySelector("h2").textContent = tr("finished");
   if (settings.countdown) {
     video.volume = 0;
     try { await video.play(); video.pause(); } catch (_) {}
-    try { video.currentTime = 0; } catch (_) {}
+    try { video.currentTime = runShort ? shortStart(runShort) : 0; } catch (_) {}
     video.volume = settings.musicVolume;
     showScreen(null); setPhase("playing");
     beginLeadIn(false);
@@ -124,7 +159,7 @@ function failGame() {
 }
 
 /* ---------- スコア ---------- */
-function currentScore() { const total = chart.length || 1, points = stats.perfect + stats.good * .5, bonus = (stats.blastBonus || 0) * .1; return Math.min(1e6, Math.round(1e6 * (points + bonus) / total)); }
+function currentScore() { const total = runNoteTotal || chart.length || 1, points = stats.perfect + stats.good * .5, bonus = (stats.blastBonus || 0) * .1; return Math.min(1e6, Math.round(1e6 * (points + bonus) / total)); }   /* 🕹️ ショートは窓内のノーツ数で割る */
 function currentAcc() { const j = stats.perfect + stats.good + stats.miss; return j ? (stats.perfect + stats.good * .5) / j * 100 : 100; }
 function updateHud() {
   $("scoreVal").textContent = currentScore().toLocaleString();
@@ -146,6 +181,7 @@ const showStar = () => settings.perfectStar !== false;
 function endGame(failed = false) {
   if (phase !== "playing") return;
   for (const n of chart) if (!n.judged) { n.judged = true; n.result = "miss"; stats.miss++; }
+  shortCleanup();
   setPhase("ended");
   video.playbackRate = 1;
   const mode = settings.playMode, icon = modeIcon(mode);
@@ -154,17 +190,19 @@ function endGame(failed = false) {
   const fc = clean && stats.miss === 0 && stats.perfect + stats.good > 0;
   const grade = failed ? "F" : ap ? "SS" : acc >= 95 ? "S" : acc >= 90 ? "A" : acc >= 80 ? "B" : acc >= 70 ? "C" : "D";
 
-  const rec = recordPlay({ score, acc, grade, ap, fc, failed });
+  const rec = recordPlay({ score, acc, grade, ap, fc, failed, short: runShort || 0 });
+  const shTag = runShort ? ` 🕹️${runShort}s` : "";
   let bestHtml = "";
   if (rec.chart) {
     const star = rec.chart.ap ? ` ${icon}⭐` : "";
     const rk = rateKey() ? ` (${rateKey()}x)` : "";
-    if (rec.isNew) bestHtml = `<div class="best new">${esc(tr("newBest"))}${rk}${star}</div>`;
-    else if (rec.prev) bestHtml = `<div class="best">${esc(tr("best"))}${rk}: ${Number(rec.prev.score).toLocaleString()} · ${Number(rec.prev.acc).toFixed(2)}%${star}</div>`;
+    if (rec.isNew) bestHtml = `<div class="best new">${esc(tr("newBest"))}${rk}${star}${shTag}</div>`;
+    else if (rec.prev) bestHtml = `<div class="best">${esc(tr("best"))}${rk}${shTag}: ${Number(rec.prev.score).toLocaleString()} · ${Number(rec.prev.acc).toFixed(2)}%${star}</div>`;
     if (rec.newSpeed) bestHtml += `<div class="best new">${esc(tr("newSpeed", { r:settings.rate.toFixed(2) + "x" }))}</div>`;
     bestHtml += `<div class="best">${esc(tr("recPlayCount", { n:rec.plays }))}</div>`;
   }
   const meta = [modeLabel(), tr(chartDiff), `${tr("level")}${currentLevel} ${tr("estimate")}`];
+  if (runShort) meta.push(tr("shortTag", { n: runShort }));   /* 🕹️ 称号はモードを問わずこの絵文字で統一 */
   const mods = runMods();
   if (mods.length) meta.push(`${tr("modsLabel")}: ${mods.join(" ")}`);
   if (failed) meta.push(tr("failedNote"));
@@ -353,6 +391,7 @@ function seekTo(sec) {
 
 /* ---------- 時計 ---------- */
 function tickClock() {
+  if (runShort && !leadIn) shortSilenceWatch();   /* 🕹️ 終盤の無音検知 */
   const p = performance.now();
   if (leadIn && phase === "playing") {
     if (leadIn.resume) clock = { t:video.currentTime * 1000, perf:p, lastCt:-1 };
@@ -407,10 +446,11 @@ function recordPlay(r) {
   const c = s.charts[ck] || (s.charts[ck] = { diff:chartDiff, level:currentLevel, ...newSlot() });
   c.diff = chartDiff; c.level = currentLevel;
   const base = MODE_PLAYS[mode] ? (c[mode] ||= newSlot()) : c;
-  const slot = rk && settings.rate > 1 ? ((base.rates ||= {})[rk] ||= newSlot()) : base;
+  let slot = rk && settings.rate > 1 ? ((base.rates ||= {})[rk] ||= newSlot()) : base;
+  if (r.short) slot = ((c.short ||= {})[r.short] ||= newSlot());   /* 🕹️ ショートプレイは独立の記録に */
   const entry = { t:Date.now(), diff:chartDiff, score:r.score, acc:+r.acc.toFixed(2), grade:r.grade,
     perfect:stats.perfect, star:stats.star || 0, good:stats.good, miss:stats.miss, crash:stats.crash || 0, maxCombo:stats.maxCombo,
-    mode, auto, truck:mode === "truck", orbit:mode === "orbit", stage:mode === "stage", catch:mode === "catch",
+    mode, auto, short:r.short || 0, truck:mode === "truck", orbit:mode === "orbit", stage:mode === "stage", catch:mode === "catch",
     failed:!!r.failed, rate:settings.rate, practice:practice || rateUnranked(), ap:r.ap, fc:r.fc, mods:runMods() };
   s.history.unshift(entry); if (s.history.length > HIST_MAX) s.history.length = HIST_MAX;
   s.lastPlayed = entry.t;
@@ -419,7 +459,8 @@ function recordPlay(r) {
   let out = {};
   if (!auto) {
     slot.plays = (slot.plays || 0) + 1;
-    if (MODE_PLAYS[mode]) s[MODE_PLAYS[mode]] = (s[MODE_PLAYS[mode]] || 0) + 1;
+    if (r.short) { /* 🕹️ ショートは曲全体のプレイ回数・フルのベストには混ぜない */ }
+    else if (MODE_PLAYS[mode]) s[MODE_PLAYS[mode]] = (s[MODE_PLAYS[mode]] || 0) + 1;
     else { s.plays = (s.plays || 0) + 1; s.perfectTotal = (s.perfectTotal || 0) + stats.perfect; }
     let prev = slot.best, isNew = false, newSpeed = false;
     if (!prev && mode === "manual" && slot === c) {
@@ -434,7 +475,7 @@ function recordPlay(r) {
           maxCombo:stats.maxCombo, date:entry.t, mods:entry.mods, rate:settings.rate };
         isNew = true;
       }
-      if (settings.rate > (base.maxRate || 1)) { base.maxRate = settings.rate; newSpeed = true; }
+      if (!r.short && settings.rate > (base.maxRate || 1)) { base.maxRate = settings.rate; newSpeed = true; }
     }
     out = { isNew, prev, plays:slot.plays, chart:slot, mode, newSpeed };
   }
@@ -479,7 +520,7 @@ function renderRecords() {
   sum.append(tbl);
   const lines = [];
   for (const [, c] of charts) {
-    for (const [slot, icon] of [[c, "🥁"], ...SLOT_COLS.map(([m, i]) => [c[m], i])]) {
+    for (const [slot, icon] of [[c, "🥁"], ...SLOT_COLS.map(([m, i]) => [c[m], i]), ...Object.entries(c.short || {}).map(([l, sl]) => [sl, `🕹️${l}s`])]) {
       if (!slot) continue;
       const parts = Object.entries(slot.rates || {}).sort((a, b) => +a[0] - +b[0]).filter(([, x]) => x.best)
         .map(([k, x]) => `${k}x ${Number(x.best.score).toLocaleString()}${x.ap ? " ⭐" : x.fc ? " FC" : ""}`);
@@ -494,7 +535,7 @@ function renderRecords() {
   sum.append(el("div", "hint", tr("recStarHint")));
   for (const h of s.history) {
     const icon = MODE_ICON[h.mode] || "";
-    const mark = h.failed ? tr("recFailed") : h.auto ? icon : h.ap ? `${icon}⭐` : h.fc ? `${icon} FC`.trim() : icon;
+    const mark = (h.short ? `🕹️${h.short}s ` : "") + (h.failed ? tr("recFailed") : h.auto ? icon : h.ap ? `${icon}⭐` : h.fc ? `${icon} FC`.trim() : icon);
     const mods = Array.isArray(h.mods) && h.mods.length ? h.mods.filter(m => m !== "AUTO").join(" ") : "";
     const star = h.star ? ` ✦${h.star}` : "", crash = h.crash ? ` 💥${h.crash}` : "";
     const tags = [mark, mods, h.auto ? tr("recAuto") : "", h.practice && !h.failed && !h.auto ? tr("recPractice") : ""].filter(Boolean).join(" · ");

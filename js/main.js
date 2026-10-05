@@ -48,6 +48,114 @@ function requestMenuReturn() {
   else if (wasPlaying) resumeGame();
 }
 
+/* ---------- 🧭 チュートリアル（trk!で完了 ＋ スタンプラリー） ----------
+   Seed欄に trk! を打ち込んだ瞬間に完了（取り逃しなし・スキップも自由）。
+   スタンプは「おまけの実績」で、曲を選ぶ・見た目を変える・1曲遊ぶ・設定を開く＋trk! の
+   5つを揃えると、ごほうびスキン「🎓グラデュエーション」が解禁されます（順番自由）。 */
+const GUIDE_STAMPS = ["song", "look", "play", "safe", "seed"];
+let guideNoteTimer = 0, guideCelebTimer = 0, guideCelebPending = null;
+function syncTutorialUI() {
+  const g = $("quickGuide");
+  g.hidden = settings.tutorialDone === true;
+  renderGuideStamps();
+}
+function guideStampsDone() { return GUIDE_STAMPS.every(id => settings.tutorialStamps.includes(id)); }
+function renderGuideStamps() {
+  const g = $("quickGuide"); if (!g) return;
+  const prog = $("guideProgress");
+  if (prog) prog.textContent = settings.tutorialDone ? "" : `（${settings.tutorialStamps.length}/${GUIDE_STAMPS.length}）`;
+  g.querySelectorAll(".guideStep[data-mission]").forEach(st => {
+    st.classList.toggle("stamped", settings.tutorialStamps.includes(st.dataset.mission));
+  });
+}
+function guideNote(key) {   /* ガイドの下に小さく知らせる（2.6秒で消える） */
+  const note = $("guideNote"); if (!note) return;
+  note.textContent = tr(key);
+  note.hidden = false;
+  clearTimeout(guideNoteTimer);
+  guideNoteTimer = setTimeout(() => { note.hidden = true; }, 2600);
+}
+function guideStamp(id, messageKey) {   /* スタンプを1つ押す（重複なし・順番自由・スキップ後も集められる） */
+  if (!GUIDE_STAMPS.includes(id) || settings.tutorialStamps.includes(id)) return;
+  settings.tutorialStamps.push(id);
+  saveUserPrefs();
+  renderGuideStamps();
+  if (messageKey && !settings.tutorialDone) guideNote(messageKey);
+  if (guideStampsDone()) unlockRewardSkin();
+}
+function unlockRewardSkin() {   /* 🎓 5つ揃った！ごほうびスキンを解禁してお祝い */
+  if (settings.skinGradUnlocked) return;
+  settings.skinGradUnlocked = true;
+  saveUserPrefs();
+  if (typeof buildSkinGrid === "function") { buildSkinGrid(); if (typeof buildSkinNow === "function") buildSkinNow(); }
+  celebrateGuide("guideReward", "guideRewardMsg");
+}
+/* 🥚 「チュートリアルを即終わらせたい人」がまず打ち込みそうな言葉 → こだわりの消え方で応える */
+const GUIDE_EGGS = { skip:"eggSkip", cheat:"eggCheat", "god mode":"eggGod", godmode:"eggGod" };
+function guideEggKind(v) {
+  const k = String(v || "").trim().toLowerCase().replace(/\s+/g, " ");
+  return GUIDE_EGGS[k] || null;
+}
+function guideEggPlay(kind) {   /* チュートリアルバーを跳ね飛ばす／溶かす／昇天させる */
+  const g = $("quickGuide");
+  const finish = () => {
+    if (g) g.classList.remove("eggSkip", "eggCheat", "eggGod");
+    syncTutorialUI();
+    plToast(tr({ eggSkip:"guideEggSkip", eggCheat:"guideEggCheat", eggGod:"guideEggGod" }[kind]));
+  };
+  if (!g) { syncTutorialUI(); return; }
+  g.classList.add(kind);
+  setTimeout(finish, 2000);   /* 演出が終わってから普通に隠す（進行度もここで更新） */
+}
+function completeTutorialFromSeed() {   /* Seed欄に trk! → 打ち込んだ瞬間に完了。skip/cheat/god mode はお楽しみ */
+  if (settings.tutorialDone) return;
+  const v = $("seed").value.trim().toLowerCase();
+  const egg = guideEggKind(v);
+  if (v !== "trk!" && !egg) return;
+  settings.tutorialDone = true;
+  const unlocked = settings.skinGradUnlocked;
+  guideStamp("seed", "");   /* 5つ目なら、ここでごほうび解禁のお祝いが出る */
+  saveUserPrefs();
+  if (egg) { guideEggPlay(egg); return; }   /* 🥚 演出付きで消える（お祝いポップアップの代わりに一報） */
+  syncTutorialUI();
+  if (settings.skinGradUnlocked === unlocked) celebrateGuide("guideDone", guideStampsDone() ? "" : "guideDoneMsg");
+}
+function celebrateGuide(titleKey, msgKey) {   /* 🎉 お祝いポップアップ（プレイ中なら選曲へ戻ってから） */
+  if (phase === "playing" || phase === "paused") { guideCelebPending = [titleKey, msgKey]; return; }
+  const box = $("guideCelebrate"); if (!box) return;
+  $("guideCelebTitle").textContent = tr(titleKey);
+  const msg = $("guideCelebMsg");
+  msg.textContent = msgKey ? tr(msgKey) : ""; msg.hidden = !msgKey;
+  box.hidden = false;
+  box.classList.remove("play"); void box.offsetWidth;   /* アニメを最初からやり直す */
+  box.classList.add("play");
+  clearTimeout(guideCelebTimer);
+  guideCelebTimer = setTimeout(() => { box.hidden = true; box.classList.remove("play"); }, 4500);
+}
+/* スタンプの検知：曲を選ぶ／1曲遊ぶ／設定を開く */
+on("songSelected", () => guideStamp("song", "guideStampSong"));
+on("phase", p => {
+  if (p === "playing") guideStamp("play", "guideStampPlay");
+  if (p === "title" && guideCelebPending) { const c = guideCelebPending; guideCelebPending = null; celebrateGuide(c[0], c[1]); }
+});
+on("settings", () => guideStamp("safe", "guideStampSafe"));
+/* スタンプの検知：見た目を変える（スキンは保存するときだけ・エフェクトは選んだ瞬間） */
+{
+  const applySkinOrig = applySkin;
+  applySkin = (id, persist) => { const r = applySkinOrig(id, persist); if (persist !== false) guideStamp("look", "guideStampLook"); return r; };
+  if (window.TrkFX) for (const name of ["select", "random"]) {
+    const orig = window.TrkFX[name];
+    if (typeof orig === "function") window.TrkFX[name] = (...a) => { const r = orig(...a); guideStamp("look", "guideStampLook"); return r; };
+  }
+}
+/* スキップ（もう知っている人へ）ともう一度（⚙設定の見た目から） */
+$("guideSkip").addEventListener("click", () => { settings.tutorialDone = true; saveUserPrefs(); syncTutorialUI(); });
+$("tutorialReplayBtn").addEventListener("click", () => {
+  settings.tutorialDone = false; saveUserPrefs(); syncTutorialUI();
+  const g = $("quickGuide"); if (g) g.open = true;
+  if (typeof closeSettings === "function") closeSettings();
+});
+
 /* ---------- 全画面 ---------- */
 const fullscreenSupported = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
 function toggleFullscreen() {
@@ -145,6 +253,7 @@ $("offset").addEventListener("change", () => {
 let seedTimer = 0;
 $("seed").addEventListener("input", () => {
   if (!saveSongPrefs()) { settings.seed = $("seed").value.slice(0, 32); saveUserPrefs(); }
+  completeTutorialFromSeed();
   refreshSeedSecrets(); syncPickers();
   clearTimeout(seedTimer);
   seedTimer = setTimeout(() => {
@@ -196,6 +305,11 @@ $("playerMode").addEventListener("change", e => { settings.playerMode = e.target
 /* ---------- 設定画面：プレイオプション ---------- */
 function syncOptionsUI() {
   $("countdown").checked = settings.countdown;
+  $("shortMode").value = settings.shortMode;   /* 🕹️ ショートプレイ（後半だけ遊ぶ） */
+  $("shortMode").addEventListener("change", e => {
+    settings.shortMode = ["off", "90", "120", "180"].includes(e.target.value) ? e.target.value : "off";
+    saveUserPrefs();
+  });
   $("countdownSE").checked = settings.countdownSE;
   $("resumeCountdown").checked = settings.resumeCountdown;
   $("optHidden").checked = settings.hidden;
@@ -351,6 +465,7 @@ if (!fullscreenSupported) { $("fullBtn").hidden = true; $("fullBtnTitle").hidden
 
 applySkin(settings.skin, false);
 applyLanguage(settings.language);
+syncTutorialUI();
 syncNoteUI(); showFxPower(); updateMascotUI(); syncOptionsUI();
 setStatus("seStatus", settings.seEnabled ? "seOn" : "seDefault");
 setStatus("songPrefsStatus", "songPrefsHint");

@@ -1546,3 +1546,28 @@ body.helpTextOff .instSubtitle,
 body.helpTextOff .mediaQueueHead p,
 body.helpTextOff .mediaLoopBox>.hint,
 body.helpTextOff .mediaWallHintText{display:none!important}
+
+/* ▶ 動画の全画面表示（js/video-max.js ／ TVドックの⛶・メディアプレーヤーの「全画面で表示」） */
+#videoMaxView[hidden]{display:none!important}
+#videoMaxView{position:fixed;inset:0;z-index:60000;display:flex;flex-direction:column;background:#000;color:#fff;
+  transition:opacity .2s}
+.videoMaxTop{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;
+  background:linear-gradient(180deg,rgba(0,0,0,.72),rgba(0,0,0,0));transition:opacity .25s}
+.videoMaxTitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(13px,2vw,19px);
+  text-shadow:0 2px 8px #000}
+.videoMaxTools{display:flex;gap:8px;flex:none}
+.videoMaxBtn{padding:7px 12px;border-radius:10px;font-size:13px;font-weight:800;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);color:#fff}
+.videoMaxBtn:hover{background:rgba(255,255,255,.22);border-color:#ffd166;color:#ffd166}
+.videoMaxBtn.selected{background:#ffd166;border-color:#ffd166;color:#19130b}
+.videoMaxStage{position:relative;flex:1;min-height:0}
+.videoMaxCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;background:#000;cursor:pointer}
+.videoMaxNote{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;max-width:80%;
+  text-align:center;color:rgba(255,255,255,.78)}
+.videoMaxHint{margin:0;padding:8px 14px 12px;text-align:center;color:rgba(255,255,255,.62);font-size:11px;
+  transition:opacity .25s}
+#videoMaxView.idle .videoMaxTop,#videoMaxView.idle .videoMaxHint{opacity:0;pointer-events:none}
+#videoMaxView.idle{cursor:none}
+body.videoMaxOpen{overflow:hidden;overscroll-behavior:none}
+@media(prefers-reduced-motion:reduce){#videoMaxView,.videoMaxTop,.videoMaxHint{transition:none}}
+body.helpTextOff .videoMaxHint{display:none!important}

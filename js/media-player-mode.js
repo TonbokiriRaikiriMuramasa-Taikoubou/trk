@@ -25,6 +25,7 @@ Object.assign(TEXT.ja, {
   mediaVideoKeysTitle:"🎬 動画プレーヤーのキー", mediaWallKey:"壁紙／スクリーンセーバー", mediaReverse:"逆再生", mediaReverseStart:"逆再生を開始", mediaForward:"順再生に戻す", mediaReverseLoading:"逆再生を準備中…", mediaReverseUnavailable:"この曲の逆再生用音声を準備できませんでした。映像のみで試します。", mediaReverseDone:"曲の先頭まで逆再生しました。",
   mediaLoop:"区間ループ", mediaLoopSetA:"A点を設定", mediaLoopSetB:"B点を設定", mediaLoopClear:"解除", mediaLoopMode:"区間ループの操作", mediaLoopToggle:"トグル", mediaLoopHold:"長押し中だけ", mediaLoopHint:"A点・B点を設定すると、範囲をくり返します。割り当てキーはA点 → B点／開始 → 解除を順に操作できます。", mediaLoopNone:"区間ループ：なし", mediaLoopOnlyA:"A点 {a} — B点を設定してください", mediaLoopRange:"{a} – {b} をくり返し中", mediaLoopNeedRange:"先にA点とB点を設定してください。", mediaLoopLabTitle:"🎛 ループ・ラボ", mediaLoopQuickHint:"5秒・10秒・20秒の区間をすぐ作れます。保存した区間は曲ごとに端末内へ記録します。", mediaLoopQuick5:"5秒", mediaLoopQuick10:"10秒", mediaLoopQuick20:"20秒", mediaLoopRandom:"🎲 ランダム区間", mediaLoopSave:"この区間を保存", mediaLoopPresets:"保存した区間", mediaLoopNoPresets:"保存した区間はまだありません。", mediaLoopDelete:"この区間を削除", mediaLoopClearPresets:"保存を消去", mediaLoopSaved:"区間を保存しました",
   mediaWall:"壁紙／スクリーンセーバー", mediaWallShow:"壁紙を表示", mediaWallHide:"壁紙を閉じる", mediaWallHint:"人目を避けたいときに動画を壁紙で隠します。ESCまたは同じキーで戻れます。", mediaWallStyle:"壁紙", mediaWallMidnight:"ミッドナイト", mediaWallAurora:"オーロラ", mediaWallPaper:"紙", mediaWallCustom:"アップロード画像", mediaWallUpload:"画像を選ぶ", mediaWallUploadHint:"画像はこのセッションの端末内だけで使います。外部へ送信しません。", mediaWallResetImage:"アップロード画像を外す", mediaWallNoImage:"画像を選ぶとここに表示します。", mediaWallClock:"時計を表示", mediaWallPlayback:"壁紙中の動画", mediaWallStopVideo:"動画を止める", mediaWallContinueVideo:"動画を続ける", mediaWallTrigger:"壁紙キーの操作", mediaWallToggle:"トグル", mediaWallHold:"長押し中だけ",
+  mediaVideoMax:"全画面で表示", mediaVideoMaxClose:"全画面を閉じる",
   mediaVideoZoomIn:"動画を拡大", mediaVideoZoomOut:"動画を縮小", mediaVideoFaster:"再生速度を上げる", mediaVideoSlower:"再生速度を下げる", mediaVideoPause:"再生／一時停止",
   mediaVideoKeysHint:"メディアプレーヤー中の動画操作、逆再生、区間ループと、ゲーム中の背景動画の拡大・縮小をキーに割り当てます。ゲームの判定や記録は変わりません。",
   mediaVideoKeysReset:"↺ 動画キーを初期値に戻す", mediaVideoCapture0:"「動画を拡大」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture1:"「動画を縮小」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture2:"「再生速度を上げる」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture3:"「再生速度を下げる」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture4:"「再生／一時停止」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture5:"「逆再生」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture6:"「区間ループ」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture7:"「壁紙／スクリーンセーバー」に割り当てるキーを押してください。ESCでキャンセル。",
@@ -49,6 +50,7 @@ Object.assign(TEXT.en, {
   mediaVideoKeysTitle:"🎬 Video player keys", mediaWallKey:"Wallpaper / screen saver", mediaReverse:"Reverse", mediaReverseStart:"Start reverse", mediaForward:"Return to forward", mediaReverseLoading:"Preparing reverse playback…", mediaReverseUnavailable:"Could not prepare reverse audio for this track. Trying video frames only.", mediaReverseDone:"Reverse playback reached the beginning.",
   mediaLoop:"A-B loop", mediaLoopSetA:"Set A", mediaLoopSetB:"Set B", mediaLoopClear:"Clear", mediaLoopMode:"A-B loop control", mediaLoopToggle:"Toggle", mediaLoopHold:"While held", mediaLoopHint:"Set A and B to repeat a range. The assigned key cycles A → B / start → clear.", mediaLoopNone:"A-B loop: off", mediaLoopOnlyA:"A at {a} — set B", mediaLoopRange:"Repeating {a} – {b}", mediaLoopNeedRange:"Set both A and B first.", mediaLoopLabTitle:"🎛 Loop lab", mediaLoopQuickHint:"Make a 5, 10, or 20 second loop instantly. Saved ranges stay on this device per song.", mediaLoopQuick5:"5 sec", mediaLoopQuick10:"10 sec", mediaLoopQuick20:"20 sec", mediaLoopRandom:"🎲 Random range", mediaLoopSave:"Save this range", mediaLoopPresets:"Saved ranges", mediaLoopNoPresets:"No saved ranges yet.", mediaLoopDelete:"Delete this range", mediaLoopClearPresets:"Clear saved", mediaLoopSaved:"Range saved",
   mediaWall:"Wallpaper / screen saver", mediaWallShow:"Show wallpaper", mediaWallHide:"Close wallpaper", mediaWallHint:"Hide the video behind a wallpaper when you need privacy. Press ESC or the same key to return.", mediaWallStyle:"Wallpaper", mediaWallMidnight:"Midnight", mediaWallAurora:"Aurora", mediaWallPaper:"Paper", mediaWallCustom:"Uploaded image", mediaWallUpload:"Choose image", mediaWallUploadHint:"The image stays on this device for this session and is never uploaded.", mediaWallResetImage:"Remove uploaded image", mediaWallNoImage:"Choose an image to show it here.", mediaWallClock:"Show clock", mediaWallPlayback:"Video while wallpaper is shown", mediaWallStopVideo:"Stop video", mediaWallContinueVideo:"Keep video playing", mediaWallTrigger:"Wallpaper key behavior", mediaWallToggle:"Toggle", mediaWallHold:"While held",
+  mediaVideoMax:"Full screen", mediaVideoMaxClose:"Close full screen",
   mediaVideoZoomIn:"Zoom in", mediaVideoZoomOut:"Zoom out", mediaVideoFaster:"Speed up", mediaVideoSlower:"Slow down", mediaVideoPause:"Play / pause",
   mediaVideoKeysHint:"Assign keys for video zoom, reverse playback, A-B looping, and media-player controls. Game judgment and records are not changed.",
   mediaVideoKeysReset:"↺ Reset video keys", mediaVideoCapture0:"Press a key for “Zoom in”. ESC cancels.", mediaVideoCapture1:"Press a key for “Zoom out”. ESC cancels.", mediaVideoCapture2:"Press a key for “Speed up”. ESC cancels.", mediaVideoCapture3:"Press a key for “Slow down”. ESC cancels.", mediaVideoCapture4:"Press a key for “Play / pause”. ESC cancels.", mediaVideoCapture5:"Press a key for “Reverse”. ESC cancels.", mediaVideoCapture6:"Press a key for “A-B loop”. ESC cancels.", mediaVideoCapture7:"Press a key for “Wallpaper / screen saver”. ESC cancels.",
@@ -71,6 +73,7 @@ Object.assign(TEXT.zh, {
   mediaVideoKeysTitle:"🎬 视频播放器按键", mediaWallKey:"壁纸／屏幕保护", mediaReverse:"倒放", mediaReverseStart:"开始倒放", mediaForward:"恢复正放", mediaReverseLoading:"正在准备倒放…", mediaReverseUnavailable:"无法准备这首歌的倒放音频，将尝试仅倒放画面。", mediaReverseDone:"倒放已到达开头。",
   mediaLoop:"区间循环", mediaLoopSetA:"设为A点", mediaLoopSetB:"设为B点", mediaLoopClear:"解除", mediaLoopMode:"区间循环操作", mediaLoopToggle:"切换", mediaLoopHold:"按住时循环", mediaLoopHint:"设置A点和B点后重复区间。分配的按键会依次执行A点 → B点／开始 → 解除。", mediaLoopNone:"区间循环：关闭", mediaLoopOnlyA:"A点 {a} — 请设置B点", mediaLoopRange:"重复 {a} – {b}", mediaLoopNeedRange:"请先设置A点和B点。", mediaLoopLabTitle:"🎛 循环实验室", mediaLoopQuickHint:"可立即创建5秒、10秒或20秒区间。保存的区间会按歌曲保存在设备中。", mediaLoopQuick5:"5秒", mediaLoopQuick10:"10秒", mediaLoopQuick20:"20秒", mediaLoopRandom:"🎲 随机区间", mediaLoopSave:"保存此区间", mediaLoopPresets:"已保存区间", mediaLoopNoPresets:"还没有保存的区间。", mediaLoopDelete:"删除此区间", mediaLoopClearPresets:"清除保存", mediaLoopSaved:"区间已保存",
   mediaWall:"壁纸／屏幕保护", mediaWallShow:"显示壁纸", mediaWallHide:"关闭壁纸", mediaWallHint:"需要隐私时，用壁纸遮住视频。按ESC或同一个按键返回。", mediaWallStyle:"壁纸", mediaWallMidnight:"午夜", mediaWallAurora:"极光", mediaWallPaper:"纸张", mediaWallCustom:"上传的图片", mediaWallUpload:"选择图片", mediaWallUploadHint:"图片仅在本次会话中保留在设备上，不会上传到外部。", mediaWallResetImage:"移除上传图片", mediaWallNoImage:"选择图片后会显示在这里。", mediaWallClock:"显示时钟", mediaWallPlayback:"显示壁纸时的视频", mediaWallStopVideo:"停止视频", mediaWallContinueVideo:"继续播放视频", mediaWallTrigger:"壁纸按键操作", mediaWallToggle:"切换", mediaWallHold:"按住时显示",
+  mediaVideoMax:"全屏显示", mediaVideoMaxClose:"关闭全屏",
   mediaVideoZoomIn:"放大视频", mediaVideoZoomOut:"缩小视频", mediaVideoFaster:"提高速度", mediaVideoSlower:"降低速度", mediaVideoPause:"播放／暂停",
   mediaVideoKeysHint:"为视频缩放、倒放、区间循环和媒体播放器操作分配按键。不会改变游戏判定或记录。",
   mediaVideoKeysReset:"↺ 恢复视频按键", mediaVideoCapture0:"请按下“放大视频”的按键。ESC取消。", mediaVideoCapture1:"请按下“缩小视频”的按键。ESC取消。", mediaVideoCapture2:"请按下“提高速度”的按键。ESC取消。", mediaVideoCapture3:"请按下“降低速度”的按键。ESC取消。", mediaVideoCapture4:"请按下“播放／暂停”的按键。ESC取消。", mediaVideoCapture5:"请按下“倒放”的按键。ESC取消。", mediaVideoCapture6:"请按下“区间循环”的按键。ESC取消。", mediaVideoCapture7:"请按下“壁纸／屏幕保护”的按键。ESC取消。",
@@ -93,6 +96,7 @@ Object.assign(TEXT.ko, {
   mediaVideoKeysTitle:"🎬 동영상 플레이어 키", mediaWallKey:"배경／스크린세이버", mediaReverse:"역재생", mediaReverseStart:"역재생 시작", mediaForward:"정재생으로", mediaReverseLoading:"역재생 준비 중…", mediaReverseUnavailable:"이 곡의 역재생 오디오를 준비하지 못했습니다. 영상 프레임만 시도합니다.", mediaReverseDone:"역재생이 처음에 도달했습니다.",
   mediaLoop:"구간 반복", mediaLoopSetA:"A점 설정", mediaLoopSetB:"B점 설정", mediaLoopClear:"해제", mediaLoopMode:"구간 반복 조작", mediaLoopToggle:"토글", mediaLoopHold:"누르는 동안", mediaLoopHint:"A점과 B점을 설정하면 구간을 반복합니다. 지정한 키는 A점 → B점／시작 → 해제를 차례로 실행합니다.", mediaLoopNone:"구간 반복: 없음", mediaLoopOnlyA:"A점 {a} — B점을 정해 주세요", mediaLoopRange:"{a} – {b} 반복 중", mediaLoopNeedRange:"먼저 A점과 B점을 설정하세요.", mediaLoopLabTitle:"🎛 반복 실험실", mediaLoopQuickHint:"5초・10초・20초 구간을 바로 만들 수 있습니다. 저장한 구간은 곡별로 이 기기에 기록됩니다.", mediaLoopQuick5:"5초", mediaLoopQuick10:"10초", mediaLoopQuick20:"20초", mediaLoopRandom:"🎲 랜덤 구간", mediaLoopSave:"이 구간 저장", mediaLoopPresets:"저장한 구간", mediaLoopNoPresets:"저장한 구간이 없습니다.", mediaLoopDelete:"이 구간 삭제", mediaLoopClearPresets:"저장 지우기", mediaLoopSaved:"구간을 저장했습니다",
   mediaWall:"배경／스크린세이버", mediaWallShow:"배경 표시", mediaWallHide:"배경 닫기", mediaWallHint:"사생활이 필요할 때 배경으로 영상을 가립니다. ESC 또는 같은 키로 돌아갑니다.", mediaWallStyle:"배경", mediaWallMidnight:"미드나이트", mediaWallAurora:"오로라", mediaWallPaper:"종이", mediaWallCustom:"업로드한 이미지", mediaWallUpload:"이미지 선택", mediaWallUploadHint:"이미지는 이번 세션 동안 이 기기에만 보관되며 외부로 업로드되지 않습니다.", mediaWallResetImage:"업로드한 이미지 제거", mediaWallNoImage:"이미지를 선택하면 여기에 표시됩니다.", mediaWallClock:"시계 표시", mediaWallPlayback:"배경 표시 중 동영상", mediaWallStopVideo:"동영상 멈추기", mediaWallContinueVideo:"동영상 계속 재생", mediaWallTrigger:"배경 키 동작", mediaWallToggle:"토글", mediaWallHold:"누르는 동안 표시",
+  mediaVideoMax:"전체 화면으로 보기", mediaVideoMaxClose:"전체 화면 닫기",
   mediaVideoZoomIn:"동영상 확대", mediaVideoZoomOut:"동영상 축소", mediaVideoFaster:"재생 속도 높이기", mediaVideoSlower:"재생 속도 낮추기", mediaVideoPause:"재생／일시정지",
   mediaVideoKeysHint:"동영상 확대·축소, 역재생, 구간 반복과 미디어 플레이어 조작 키를 지정합니다. 게임 판정과 기록은 바뀌지 않습니다.",
   mediaVideoKeysReset:"↺ 동영상 키 초기화", mediaVideoCapture0:"'동영상 확대'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture1:"'동영상 축소'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture2:"'재생 속도 높이기'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture3:"'재생 속도 낮추기'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture4:"'재생／일시정지'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture5:"'역재생'으로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture6:"'구간 반복'으로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture7:"'배경／스크린세이버'로 지정할 키를 누르세요. ESC로 취소.",
@@ -112,6 +116,7 @@ let reverseBuffer = null, reverseBufferKey = "", reverseVideoMuted = false, reve
 let loopTimer = 0;
 let loopA = null, loopB = null, loopActive = false, loopKeyDown = false;
 let wallOverlay, wallClockNode, wallDateNode, wallNode, wallStyleNode, wallClockCheck, wallPlaybackNode, wallTriggerNode, wallFileNode, wallResetNode;
+let maxNode = null;   /* 🖥 「全画面で表示」（js/video-max.js） */
 let wallActive = false, wallKeyDown = false, wallTimer = 0, wallWasPlaying = false, wallCustomURL = "";
 let mediaExitBinding = null;
 const VIDEO_KEY_LABELS = ["mediaVideoZoomIn", "mediaVideoZoomOut", "mediaVideoFaster", "mediaVideoSlower", "mediaVideoPause", "mediaReverse", "mediaLoop", "mediaWallKey"];
@@ -372,6 +377,7 @@ function renderWall() {
 }
 function activateWall() {
   if (!mediaActive() || wallActive) return;
+  if (window.TrkVideoMax && window.TrkVideoMax.isOpen()) window.TrkVideoMax.close();   /* 🖥 壁紙の上に残さない */
   wallActive = true; wallKeyDown = false;
   wallWasPlaying = !!(reverseActive || reverseLoading || (videoReady && !video.paused && !video.ended));
   if (settings.mediaWallStopsVideo) { stopReverse(false, true); video.pause(); }
@@ -633,6 +639,14 @@ function renderMedia() {
     playNode.textContent = tr(playKey); playNode.dataset.i18n = playKey;
   }
   if (reverseNode) { reverseNode.textContent = tr(reverseActive || reverseLoading ? "mediaForward" : "mediaReverseStart"); reverseNode.dataset.i18n = reverseActive || reverseLoading ? "mediaForward" : "mediaReverseStart"; reverseNode.disabled = !ready; reverseNode.classList.toggle("selected", reverseActive || reverseLoading); reverseNode.setAttribute("aria-pressed", String(reverseActive || reverseLoading)); }
+  if (maxNode) {
+    const maxOn = !!(window.TrkVideoMax && window.TrkVideoMax.isOpen());
+    const key = maxOn ? "mediaVideoMaxClose" : "mediaVideoMax";
+    maxNode.textContent = tr(key); maxNode.dataset.i18n = key;
+    maxNode.disabled = !ready;
+    maxNode.classList.toggle("selected", maxOn);
+    maxNode.setAttribute("aria-pressed", String(maxOn));
+  }
   if (volumeNode) volumeNode.value = String(settings.musicVolume);
   if (muteNode) { const isMuted = reverseActive || reverseLoading ? reverseVideoMuted : video.muted; muteNode.textContent = isMuted ? tr("mediaUnmute") : tr("mediaMute"); muteNode.dataset.i18n = isMuted ? "mediaUnmute" : "mediaMute"; }
   if (shuffleNode) { shuffleNode.classList.toggle("selected", shuffle); shuffleNode.setAttribute("aria-pressed", String(shuffle)); }
@@ -650,6 +664,7 @@ function renderMedia() {
 }
 function closeMedia(restore = true) {
   if (!mediaOpen) return;
+  if (window.TrkVideoMax && window.TrkVideoMax.isOpen()) window.TrkVideoMax.close();   /* 🖥 全画面表示も一緒に閉じる */
   deactivateWall(false);
   mediaOpen = false; window._trkMediaPlayerOpen = false; window._trkMediaPlayerMode = false;
   clearInterval(tickTimer); tickTimer = 0; stopSleepTimer(true); seeking = false;
@@ -694,11 +709,15 @@ function buildMedia() {
   playNode = makeButton("mediaPlay", "mediaControlBtn mediaPlayBtn");
   const next = makeButton("mediaNext", "mediaControlBtn");
   reverseNode = makeButton("mediaReverseStart", "mediaSmallBtn");
+  /* 🖥 逆再生の右＝「全画面で表示」（壁紙はひとつ右へずれます） */
+  maxNode = makeButton("mediaVideoMax", "mediaSmallBtn");
   wallNode = makeButton("mediaWallShow", "mediaSmallBtn");
   const restart = makeButton("mediaRestart", "mediaSmallBtn");
   prev.addEventListener("click", () => stepMedia(-1)); playNode.addEventListener("click", playPause); next.addEventListener("click", () => stepMedia(1)); reverseNode.addEventListener("click", toggleReverse); wallNode.addEventListener("click", toggleWall);
   restart.addEventListener("click", () => { if (videoReady) { if (reverseActive || reverseLoading) stopReverse(false, true); saveMediaPosition(true); video.currentTime = 0; video.play().catch(() => {}); } });
-  controls.append(prev, playNode, next, reverseNode, wallNode, restart);
+  maxNode.addEventListener("click", () => { if (window.TrkVideoMax) window.TrkVideoMax.toggle(); });
+  if (window.TrkVideoMax) window.TrkVideoMax.onChange(() => renderMedia());
+  controls.append(prev, playNode, next, reverseNode, maxNode, wallNode, restart);
 
   const progressRow = el("div", "mediaProgressRow");
   progressNode = document.createElement("input"); progressNode.type = "range"; progressNode.min = "0"; progressNode.step = "0.1"; progressNode.value = "0"; progressNode.className = "mediaProgress"; progressNode.setAttribute("aria-label", tr("mediaSeek"));

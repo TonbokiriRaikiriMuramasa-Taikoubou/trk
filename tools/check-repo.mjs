@@ -75,6 +75,14 @@ for (const [kind, ref] of refs) {
 }
 if (!missingRefs) ok(`index.html local references (${refs.length} checked)`);
 
+// Duplicate static IDs can silently wire event handlers to the wrong control.
+const indexIds = [...index.matchAll(/\bid=["']([^"']+)["']/gi)].map(match => match[1]);
+const idCounts = new Map();
+for (const id of indexIds) idCounts.set(id, (idCounts.get(id) || 0) + 1);
+const duplicateIds = [...idCounts].filter(([, count]) => count > 1).map(([id, count]) => `${id} (${count})`);
+if (duplicateIds.length) fail(`index.html contains duplicate IDs: ${duplicateIds.join(", ")}`);
+else ok(`index.html static IDs are unique (${indexIds.length} checked)`);
+
 const privacy = read("privacy.html").replace(/<!--[\s\S]*?-->/g, "");
 let missingPrivacyRefs = 0;
 for (const match of privacy.matchAll(/(?:href|src)=["']([^"']+)["']/gi)) {
@@ -301,6 +309,47 @@ if (!read("js/main.js").includes("guideEggKind") ||
     fail("antenna character skins (ON=awake / OFF=asleep + custom 2 images) are missing");
   } else {
     ok("antenna character skins (10 dot characters incl. 5 Touhou fan works + custom 2-image ON/OFF) are wired, Touhou credit in NOTICE");
+  }
+}
+
+// The FX API is intentionally frozen. A strict-mode mutation here aborts the
+// remainder of main.js and leaves every primary selection-screen control inert.
+{
+  const main = read("js/main.js");
+  const requiredWiring = [
+    '$("language").addEventListener("change"',
+    '$("mediaFile").addEventListener("change"',
+    '$("openSettingsBtn").addEventListener("click"',
+    '$("modePicker").addEventListener("click"'
+  ];
+  if (requiredWiring.some(fragment => !main.includes(fragment)) ||
+      /window\.TrkFX\s*\[[^\]]+\]\s*=/.test(main) ||
+      !main.includes('target.closest("#fxPanel .fxGrid .fxSeg button")')) {
+    fail("selection-screen startup wiring or immutable TrkFX integration is broken");
+  } else {
+    ok("language / settings / play-mode / media-file handlers stay wired; frozen TrkFX is not mutated");
+  }
+}
+
+// 🖥 Full-screen video: the TV dock key right of "next song" and the media
+// player button right of "reverse" (wallpaper shifts one step to the right).
+{
+  const videoMax = read("js/video-max.js");
+  const tv = read("js/tv-dock.js");
+  const media = read("js/media-player-mode.js");
+  if (!videoMax.includes("window.TrkVideoMax = Object.freeze(") || !videoMax.includes("function toggleMax()") ||
+      !read("index.html").includes('<script src="js/video-max.js"></script>') ||
+      !read("css/style.css").includes("#videoMaxView")) {
+    fail("full-screen video viewer (js/video-max.js) is not wired");
+  } else if (!tv.includes('btn("tvKey tvPause tvMax"') || !tv.includes("window.TrkVideoMax.toggle()") ||
+             !tv.includes('tvVideoMax:"') || !/top\.append\(pow, prevSongBtn, lcd, nextSongBtn, pauseBtn\)/.test(tv)) {
+    fail("TV dock video-maximize key (right of the next-song key) is missing");
+  } else if (!media.includes("maxNode = makeButton(\"mediaVideoMax\"") ||
+             !media.includes("controls.append(prev, playNode, next, reverseNode, maxNode, wallNode, restart)") ||
+             !media.includes('mediaVideoMax:"')) {
+    fail("media player full-screen button (right of reverse, wallpaper shifted right) is missing");
+  } else {
+    ok("full-screen video viewer is wired (TV dock ⛶ + media player, wallpaper stays one step right)");
   }
 }
 

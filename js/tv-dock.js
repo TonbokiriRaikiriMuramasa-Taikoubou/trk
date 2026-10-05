@@ -222,6 +222,10 @@ Object.assign(TEXT.ja, {
   tvPowerOn:"📺 テレビON", tvPowerOff:"📺 テレビOFF",
   tvPause:"⏯ 一時停止／再生",
   tvPauseHint:"選曲中のプレビューや再生中の映像を一時停止します",
+  /* 🖥 動画の全画面表示（このボタン） */
+  tvVideoMax:"⛶ 動画を全画面で表示（もう一度押すと閉じます）",
+  tvVideoMaxOn:"🖥 全画面で表示しました", tvVideoMaxOff:"🖥 全画面を閉じました",
+  tvVideoMaxNeed:"まだ動画がありません。曲を選んでから押してください",
   tvRand: "🎲 映像", tvRandFav:"⭐🎲 お気に入りから", tvRandParam:"🎛🎲 明るさ・ぼかし",
   tvParamDone:"明るさ・ぼかしをランダムにしました",
   tvSlotHint:"ボタンを長押し：今の映像を登録（もとの登録は1つ後ろへ）",
@@ -276,6 +280,10 @@ Object.assign(TEXT.en, {
   tvPowerOn:"📺 TV ON", tvPowerOff:"📺 TV OFF",
   tvPause:"⏯ Pause / Play",
   tvPauseHint:"Pause the preview or current video",
+  /* 🖥 Full-screen video (this button) */
+  tvVideoMax:"⛶ Show the video full screen (press again to close)",
+  tvVideoMaxOn:"🖥 Full screen", tvVideoMaxOff:"🖥 Closed full screen",
+  tvVideoMaxNeed:"No video yet — pick a song first",
   tvRand:"🎲 Video", tvRandFav:"⭐🎲 From favorites", tvRandParam:"🎛🎲 Brightness / blur",
   tvParamDone:"Brightness / blur randomized",
   tvSlotHint:"Long-press a button: save current video (old one moves back)",
@@ -330,6 +338,10 @@ Object.assign(TEXT.zh, {
   tvPowerOn:"📺 电视开", tvPowerOff:"📺 电视关",
   tvPause:"⏯ 暂停／播放",
   tvPauseHint:"暂停选曲预览或当前视频",
+  /* 🖥 视频全屏显示（此按钮） */
+  tvVideoMax:"⛶ 全屏显示视频（再按一次关闭）",
+  tvVideoMaxOn:"🖥 已全屏显示", tvVideoMaxOff:"🖥 已关闭全屏",
+  tvVideoMaxNeed:"还没有视频，请先选择歌曲",
   tvRand:"🎲 视频", tvRandFav:"⭐🎲 从收藏", tvRandParam:"🎛🎲 亮度・模糊",
   tvParamDone:"已随机调整亮度・模糊",
   tvSlotHint:"长按按钮：登记当前视频（原来的往后挪一位）",
@@ -384,6 +396,10 @@ Object.assign(TEXT.ko, {
   tvPowerOn:"📺 TV 켜기", tvPowerOff:"📺 TV 끄기",
   tvPause:"⏯ 일시정지/재생",
   tvPauseHint:"선택 중 미리듣기나 현재 영상을 일시정지합니다",
+  /* 🖥 영상 전체 화면(이 버튼) */
+  tvVideoMax:"⛶ 영상을 전체 화면으로 보기 (다시 누르면 닫힘)",
+  tvVideoMaxOn:"🖥 전체 화면으로 표시", tvVideoMaxOff:"🖥 전체 화면을 닫음",
+  tvVideoMaxNeed:"아직 영상이 없습니다. 곡을 먼저 고르세요",
   tvRand:"🎲 영상", tvRandFav:"⭐🎲 즐겨찾기에서", tvRandParam:"🎛🎲 밝기・흐림",
   tvParamDone:"밝기・흐림을 랜덤으로 바꿨습니다",
   tvSlotHint:"버튼 길게 누르기: 현재 영상 등록 (원래 것은 한 칸 뒤로)",
@@ -879,7 +895,9 @@ addEventListener("DOMContentLoaded", () => {
   const powLed = el("i", "led tvLed");
   const pauseLed = el("i", "led tvPauseLed");
   const pow = btn("tvKey tvPow", powLed, el("span", "", "⏻"));
-  const pauseBtn = btn("tvKey tvPause", pauseLed, el("span", "", "⏯"));
+  /* 🖥 「次の曲 ▶」の右のボタン：動画の全画面表示（js/video-max.js）。
+     見た目はこれまでの一時停止ボタンと同じ（点灯するLEDアイコンのまま） */
+  const pauseBtn = btn("tvKey tvPause tvMax", pauseLed, el("span", "", "⛶"));
   const lcd = el("div", "tvLcd");
   /* 🆕 ◀ ▶ の物理ボタン：選曲リストの前の曲・次の曲へ（テレビのチャンネル送りみたいに） */
   const prevSongBtn = btn("tvKey tvSong", el("span", "", "◀"));
@@ -1192,10 +1210,15 @@ addEventListener("DOMContentLoaded", () => {
     togglePower();
     lcdFlash(tr(settings.videoStyle === "off" ? "tvPowerOff" : "tvPowerOn"));
   });
+  /* 🖥 動画を全画面で表示（もう一度押すと閉じる）。一時停止は全画面の中の ▶ ボタンでできます */
   pauseBtn.addEventListener("click", () => {
-    togglePause();
-    lcdFlash(tr("tvPause"));
+    if (!window.TrkVideoMax) { togglePause(); lcdFlash(tr("tvPause")); return; }
+    const opening = !window.TrkVideoMax.isOpen();
+    if (opening && !videoReady) { lcdFlash(tr("tvVideoMaxNeed")); return; }
+    window.TrkVideoMax.toggle();
+    lcdFlash(tr(opening ? "tvVideoMaxOn" : "tvVideoMaxOff"));
   });
+  if (window.TrkVideoMax) window.TrkVideoMax.onChange(() => render());
   /* ◀ ▶：選曲リストを前へ・次へ（ラジオのチャンネル送りみたいに）
      曲の選び方は library.js の nextSong() / prevSong() に任せる（ラジオと同じ並び） */
   const songStep = async dir => {
@@ -1389,9 +1412,12 @@ addEventListener("DOMContentLoaded", () => {
     screen.dataset.live = liveOn ? "1" : "0";
     if (liveOn) startLive(); else stopLive();
     powLed.classList.toggle("on", !isOff);
-    pauseLed.classList.toggle("on", !video.paused && !isOff);
+    /* 🖥 全画面表示のときに点灯（スキンの点灯アイコンの見た目はそのまま） */
+    pauseLed.classList.toggle("on", !!(window.TrkVideoMax && window.TrkVideoMax.isOpen()));
+    pauseBtn.classList.toggle("selected", !!(window.TrkVideoMax && window.TrkVideoMax.isOpen()));
     pow.title = `${tr("tvPower")} · ${tr("tvMediaHoldHint")}`; pow.setAttribute("aria-label", pow.title); pow.setAttribute("aria-pressed", String(!isOff));
-    pauseBtn.title = tr("tvPause"); pauseBtn.setAttribute("aria-label", pauseBtn.title);
+    pauseBtn.title = tr("tvVideoMax"); pauseBtn.setAttribute("aria-label", pauseBtn.title);
+    pauseBtn.setAttribute("aria-pressed", String(!!(window.TrkVideoMax && window.TrkVideoMax.isOpen())));
     prevSongBtn.title = tr("tvPrevSong"); prevSongBtn.setAttribute("aria-label", prevSongBtn.title);
     nextSongBtn.title = tr("tvNextSong"); nextSongBtn.setAttribute("aria-label", nextSongBtn.title);
 

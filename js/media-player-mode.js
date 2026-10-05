@@ -23,7 +23,7 @@ Object.assign(TEXT.ja, {
   mediaSleepSet:"{n}分後に再生を止めます。", mediaSleepDone:"スリープタイマーで停止しました。", mediaLoaded:"読み込み中…", mediaLoadFailed:"この曲を読み込めませんでした。",
   mediaKeyboard:"Space：再生／一時停止　←→：10秒　N：次の曲　P：前の曲　Esc：閉じる　逆再生・区間ループ・壁紙は設定で割り当て",
   mediaVideoKeysTitle:"🎬 動画プレーヤーのキー", mediaWallKey:"壁紙／スクリーンセーバー", mediaReverse:"逆再生", mediaReverseStart:"逆再生を開始", mediaForward:"順再生に戻す", mediaReverseLoading:"逆再生を準備中…", mediaReverseUnavailable:"この曲の逆再生用音声を準備できませんでした。映像のみで試します。", mediaReverseDone:"曲の先頭まで逆再生しました。",
-  mediaLoop:"区間ループ", mediaLoopSetA:"A点を設定", mediaLoopSetB:"B点を設定", mediaLoopClear:"解除", mediaLoopMode:"区間ループの操作", mediaLoopToggle:"トグル", mediaLoopHold:"長押し中だけ", mediaLoopHint:"A点・B点を設定すると、範囲をくり返します。割り当てキーはA点 → B点／開始 → 解除を順に操作できます。", mediaLoopNone:"区間ループ：なし", mediaLoopOnlyA:"A点 {a} — B点を設定してください", mediaLoopRange:"{a} – {b} をくり返し中", mediaLoopNeedRange:"先にA点とB点を設定してください。",
+  mediaLoop:"区間ループ", mediaLoopSetA:"A点を設定", mediaLoopSetB:"B点を設定", mediaLoopClear:"解除", mediaLoopMode:"区間ループの操作", mediaLoopToggle:"トグル", mediaLoopHold:"長押し中だけ", mediaLoopHint:"A点・B点を設定すると、範囲をくり返します。割り当てキーはA点 → B点／開始 → 解除を順に操作できます。", mediaLoopNone:"区間ループ：なし", mediaLoopOnlyA:"A点 {a} — B点を設定してください", mediaLoopRange:"{a} – {b} をくり返し中", mediaLoopNeedRange:"先にA点とB点を設定してください。", mediaLoopLabTitle:"🎛 ループ・ラボ", mediaLoopQuickHint:"5秒・10秒・20秒の区間をすぐ作れます。保存した区間は曲ごとに端末内へ記録します。", mediaLoopQuick5:"5秒", mediaLoopQuick10:"10秒", mediaLoopQuick20:"20秒", mediaLoopRandom:"🎲 ランダム区間", mediaLoopSave:"この区間を保存", mediaLoopPresets:"保存した区間", mediaLoopNoPresets:"保存した区間はまだありません。", mediaLoopDelete:"この区間を削除", mediaLoopClearPresets:"保存を消去", mediaLoopSaved:"区間を保存しました",
   mediaWall:"壁紙／スクリーンセーバー", mediaWallShow:"壁紙を表示", mediaWallHide:"壁紙を閉じる", mediaWallHint:"人目を避けたいときに動画を壁紙で隠します。ESCまたは同じキーで戻れます。", mediaWallStyle:"壁紙", mediaWallMidnight:"ミッドナイト", mediaWallAurora:"オーロラ", mediaWallPaper:"紙", mediaWallCustom:"アップロード画像", mediaWallUpload:"画像を選ぶ", mediaWallUploadHint:"画像はこのセッションの端末内だけで使います。外部へ送信しません。", mediaWallResetImage:"アップロード画像を外す", mediaWallNoImage:"画像を選ぶとここに表示します。", mediaWallClock:"時計を表示", mediaWallPlayback:"壁紙中の動画", mediaWallStopVideo:"動画を止める", mediaWallContinueVideo:"動画を続ける", mediaWallTrigger:"壁紙キーの操作", mediaWallToggle:"トグル", mediaWallHold:"長押し中だけ",
   mediaVideoZoomIn:"動画を拡大", mediaVideoZoomOut:"動画を縮小", mediaVideoFaster:"再生速度を上げる", mediaVideoSlower:"再生速度を下げる", mediaVideoPause:"再生／一時停止",
   mediaVideoKeysHint:"メディアプレーヤー中の動画操作、逆再生、区間ループと、ゲーム中の背景動画の拡大・縮小をキーに割り当てます。ゲームの判定や記録は変わりません。",
@@ -47,7 +47,7 @@ Object.assign(TEXT.en, {
   mediaSleepSet:"Playback will stop in {n} minutes.", mediaSleepDone:"Sleep timer stopped playback.", mediaLoaded:"Loading…", mediaLoadFailed:"This track could not be loaded.",
   mediaKeyboard:"Space: play/pause   ←→: 10 seconds   N: next   P: previous   Esc: close   Assign reverse / A-B loop / wallpaper in Settings",
   mediaVideoKeysTitle:"🎬 Video player keys", mediaWallKey:"Wallpaper / screen saver", mediaReverse:"Reverse", mediaReverseStart:"Start reverse", mediaForward:"Return to forward", mediaReverseLoading:"Preparing reverse playback…", mediaReverseUnavailable:"Could not prepare reverse audio for this track. Trying video frames only.", mediaReverseDone:"Reverse playback reached the beginning.",
-  mediaLoop:"A-B loop", mediaLoopSetA:"Set A", mediaLoopSetB:"Set B", mediaLoopClear:"Clear", mediaLoopMode:"A-B loop control", mediaLoopToggle:"Toggle", mediaLoopHold:"While held", mediaLoopHint:"Set A and B to repeat a range. The assigned key cycles A → B / start → clear.", mediaLoopNone:"A-B loop: off", mediaLoopOnlyA:"A at {a} — set B", mediaLoopRange:"Repeating {a} – {b}", mediaLoopNeedRange:"Set both A and B first.",
+  mediaLoop:"A-B loop", mediaLoopSetA:"Set A", mediaLoopSetB:"Set B", mediaLoopClear:"Clear", mediaLoopMode:"A-B loop control", mediaLoopToggle:"Toggle", mediaLoopHold:"While held", mediaLoopHint:"Set A and B to repeat a range. The assigned key cycles A → B / start → clear.", mediaLoopNone:"A-B loop: off", mediaLoopOnlyA:"A at {a} — set B", mediaLoopRange:"Repeating {a} – {b}", mediaLoopNeedRange:"Set both A and B first.", mediaLoopLabTitle:"🎛 Loop lab", mediaLoopQuickHint:"Make a 5, 10, or 20 second loop instantly. Saved ranges stay on this device per song.", mediaLoopQuick5:"5 sec", mediaLoopQuick10:"10 sec", mediaLoopQuick20:"20 sec", mediaLoopRandom:"🎲 Random range", mediaLoopSave:"Save this range", mediaLoopPresets:"Saved ranges", mediaLoopNoPresets:"No saved ranges yet.", mediaLoopDelete:"Delete this range", mediaLoopClearPresets:"Clear saved", mediaLoopSaved:"Range saved",
   mediaWall:"Wallpaper / screen saver", mediaWallShow:"Show wallpaper", mediaWallHide:"Close wallpaper", mediaWallHint:"Hide the video behind a wallpaper when you need privacy. Press ESC or the same key to return.", mediaWallStyle:"Wallpaper", mediaWallMidnight:"Midnight", mediaWallAurora:"Aurora", mediaWallPaper:"Paper", mediaWallCustom:"Uploaded image", mediaWallUpload:"Choose image", mediaWallUploadHint:"The image stays on this device for this session and is never uploaded.", mediaWallResetImage:"Remove uploaded image", mediaWallNoImage:"Choose an image to show it here.", mediaWallClock:"Show clock", mediaWallPlayback:"Video while wallpaper is shown", mediaWallStopVideo:"Stop video", mediaWallContinueVideo:"Keep video playing", mediaWallTrigger:"Wallpaper key behavior", mediaWallToggle:"Toggle", mediaWallHold:"While held",
   mediaVideoZoomIn:"Zoom in", mediaVideoZoomOut:"Zoom out", mediaVideoFaster:"Speed up", mediaVideoSlower:"Slow down", mediaVideoPause:"Play / pause",
   mediaVideoKeysHint:"Assign keys for video zoom, reverse playback, A-B looping, and media-player controls. Game judgment and records are not changed.",
@@ -69,7 +69,7 @@ Object.assign(TEXT.zh, {
   mediaSleepSet:"将在{n}分钟后停止播放。", mediaSleepDone:"睡眠定时器已停止播放。", mediaLoaded:"正在读取…", mediaLoadFailed:"无法读取这首歌。",
   mediaKeyboard:"空格：播放／暂停　←→：10秒　N：下一首　P：上一首　Esc：关闭　倒放／区间循环／壁纸可在设置中分配",
   mediaVideoKeysTitle:"🎬 视频播放器按键", mediaWallKey:"壁纸／屏幕保护", mediaReverse:"倒放", mediaReverseStart:"开始倒放", mediaForward:"恢复正放", mediaReverseLoading:"正在准备倒放…", mediaReverseUnavailable:"无法准备这首歌的倒放音频，将尝试仅倒放画面。", mediaReverseDone:"倒放已到达开头。",
-  mediaLoop:"区间循环", mediaLoopSetA:"设为A点", mediaLoopSetB:"设为B点", mediaLoopClear:"解除", mediaLoopMode:"区间循环操作", mediaLoopToggle:"切换", mediaLoopHold:"按住时循环", mediaLoopHint:"设置A点和B点后重复区间。分配的按键会依次执行A点 → B点／开始 → 解除。", mediaLoopNone:"区间循环：关闭", mediaLoopOnlyA:"A点 {a} — 请设置B点", mediaLoopRange:"重复 {a} – {b}", mediaLoopNeedRange:"请先设置A点和B点。",
+  mediaLoop:"区间循环", mediaLoopSetA:"设为A点", mediaLoopSetB:"设为B点", mediaLoopClear:"解除", mediaLoopMode:"区间循环操作", mediaLoopToggle:"切换", mediaLoopHold:"按住时循环", mediaLoopHint:"设置A点和B点后重复区间。分配的按键会依次执行A点 → B点／开始 → 解除。", mediaLoopNone:"区间循环：关闭", mediaLoopOnlyA:"A点 {a} — 请设置B点", mediaLoopRange:"重复 {a} – {b}", mediaLoopNeedRange:"请先设置A点和B点。", mediaLoopLabTitle:"🎛 循环实验室", mediaLoopQuickHint:"可立即创建5秒、10秒或20秒区间。保存的区间会按歌曲保存在设备中。", mediaLoopQuick5:"5秒", mediaLoopQuick10:"10秒", mediaLoopQuick20:"20秒", mediaLoopRandom:"🎲 随机区间", mediaLoopSave:"保存此区间", mediaLoopPresets:"已保存区间", mediaLoopNoPresets:"还没有保存的区间。", mediaLoopDelete:"删除此区间", mediaLoopClearPresets:"清除保存", mediaLoopSaved:"区间已保存",
   mediaWall:"壁纸／屏幕保护", mediaWallShow:"显示壁纸", mediaWallHide:"关闭壁纸", mediaWallHint:"需要隐私时，用壁纸遮住视频。按ESC或同一个按键返回。", mediaWallStyle:"壁纸", mediaWallMidnight:"午夜", mediaWallAurora:"极光", mediaWallPaper:"纸张", mediaWallCustom:"上传的图片", mediaWallUpload:"选择图片", mediaWallUploadHint:"图片仅在本次会话中保留在设备上，不会上传到外部。", mediaWallResetImage:"移除上传图片", mediaWallNoImage:"选择图片后会显示在这里。", mediaWallClock:"显示时钟", mediaWallPlayback:"显示壁纸时的视频", mediaWallStopVideo:"停止视频", mediaWallContinueVideo:"继续播放视频", mediaWallTrigger:"壁纸按键操作", mediaWallToggle:"切换", mediaWallHold:"按住时显示",
   mediaVideoZoomIn:"放大视频", mediaVideoZoomOut:"缩小视频", mediaVideoFaster:"提高速度", mediaVideoSlower:"降低速度", mediaVideoPause:"播放／暂停",
   mediaVideoKeysHint:"为视频缩放、倒放、区间循环和媒体播放器操作分配按键。不会改变游戏判定或记录。",
@@ -91,7 +91,7 @@ Object.assign(TEXT.ko, {
   mediaSleepSet:"{n}분 후 재생을 멈춥니다.", mediaSleepDone:"취침 타이머로 재생을 멈췄습니다.", mediaLoaded:"불러오는 중…", mediaLoadFailed:"이 곡을 불러오지 못했습니다.",
   mediaKeyboard:"Space: 재생／일시정지   ←→: 10초   N: 다음   P: 이전   Esc: 닫기   역재생／구간 반복／배경은 설정에서 지정",
   mediaVideoKeysTitle:"🎬 동영상 플레이어 키", mediaWallKey:"배경／스크린세이버", mediaReverse:"역재생", mediaReverseStart:"역재생 시작", mediaForward:"정재생으로", mediaReverseLoading:"역재생 준비 중…", mediaReverseUnavailable:"이 곡의 역재생 오디오를 준비하지 못했습니다. 영상 프레임만 시도합니다.", mediaReverseDone:"역재생이 처음에 도달했습니다.",
-  mediaLoop:"구간 반복", mediaLoopSetA:"A점 설정", mediaLoopSetB:"B점 설정", mediaLoopClear:"해제", mediaLoopMode:"구간 반복 조작", mediaLoopToggle:"토글", mediaLoopHold:"누르는 동안", mediaLoopHint:"A점과 B점을 설정하면 구간을 반복합니다. 지정한 키는 A점 → B점／시작 → 해제를 차례로 실행합니다.", mediaLoopNone:"구간 반복: 없음", mediaLoopOnlyA:"A점 {a} — B점을 정해 주세요", mediaLoopRange:"{a} – {b} 반복 중", mediaLoopNeedRange:"먼저 A점과 B점을 설정하세요.",
+  mediaLoop:"구간 반복", mediaLoopSetA:"A점 설정", mediaLoopSetB:"B점 설정", mediaLoopClear:"해제", mediaLoopMode:"구간 반복 조작", mediaLoopToggle:"토글", mediaLoopHold:"누르는 동안", mediaLoopHint:"A점과 B점을 설정하면 구간을 반복합니다. 지정한 키는 A점 → B점／시작 → 해제를 차례로 실행합니다.", mediaLoopNone:"구간 반복: 없음", mediaLoopOnlyA:"A점 {a} — B점을 정해 주세요", mediaLoopRange:"{a} – {b} 반복 중", mediaLoopNeedRange:"먼저 A점과 B점을 설정하세요.", mediaLoopLabTitle:"🎛 반복 실험실", mediaLoopQuickHint:"5초・10초・20초 구간을 바로 만들 수 있습니다. 저장한 구간은 곡별로 이 기기에 기록됩니다.", mediaLoopQuick5:"5초", mediaLoopQuick10:"10초", mediaLoopQuick20:"20초", mediaLoopRandom:"🎲 랜덤 구간", mediaLoopSave:"이 구간 저장", mediaLoopPresets:"저장한 구간", mediaLoopNoPresets:"저장한 구간이 없습니다.", mediaLoopDelete:"이 구간 삭제", mediaLoopClearPresets:"저장 지우기", mediaLoopSaved:"구간을 저장했습니다",
   mediaWall:"배경／스크린세이버", mediaWallShow:"배경 표시", mediaWallHide:"배경 닫기", mediaWallHint:"사생활이 필요할 때 배경으로 영상을 가립니다. ESC 또는 같은 키로 돌아갑니다.", mediaWallStyle:"배경", mediaWallMidnight:"미드나이트", mediaWallAurora:"오로라", mediaWallPaper:"종이", mediaWallCustom:"업로드한 이미지", mediaWallUpload:"이미지 선택", mediaWallUploadHint:"이미지는 이번 세션 동안 이 기기에만 보관되며 외부로 업로드되지 않습니다.", mediaWallResetImage:"업로드한 이미지 제거", mediaWallNoImage:"이미지를 선택하면 여기에 표시됩니다.", mediaWallClock:"시계 표시", mediaWallPlayback:"배경 표시 중 동영상", mediaWallStopVideo:"동영상 멈추기", mediaWallContinueVideo:"동영상 계속 재생", mediaWallTrigger:"배경 키 동작", mediaWallToggle:"토글", mediaWallHold:"누르는 동안 표시",
   mediaVideoZoomIn:"동영상 확대", mediaVideoZoomOut:"동영상 축소", mediaVideoFaster:"재생 속도 높이기", mediaVideoSlower:"재생 속도 낮추기", mediaVideoPause:"재생／일시정지",
   mediaVideoKeysHint:"동영상 확대·축소, 역재생, 구간 반복과 미디어 플레이어 조작 키를 지정합니다. 게임 판정과 기록은 바뀌지 않습니다.",
@@ -117,9 +117,13 @@ let mediaExitBinding = null;
 const VIDEO_KEY_LABELS = ["mediaVideoZoomIn", "mediaVideoZoomOut", "mediaVideoFaster", "mediaVideoSlower", "mediaVideoPause", "mediaReverse", "mediaLoop", "mediaWallKey"];
 const REVERSE_KEY_INDEX = 5, LOOP_KEY_INDEX = 6, WALL_KEY_INDEX = 7;
 const VIDEO_KEY_BAD = ["Escape", "Tab", "F5", "F11", "F12", "MetaLeft", "MetaRight", "Backquote", "Backspace"];
-const MEDIA_POS_KEY = "trk_media_positions_v1";
-let mediaPositions = {};
+const MEDIA_POS_KEY = "trk_media_positions_v1", MEDIA_LOOP_KEY = "trk_media_loop_presets_v1";
+let mediaPositions = {}, mediaLoopPresets = {};
 try { mediaPositions = JSON.parse(localStorage.getItem(MEDIA_POS_KEY)) || {}; } catch (_) { mediaPositions = {}; }
+try { mediaLoopPresets = JSON.parse(localStorage.getItem(MEDIA_LOOP_KEY)) || {}; } catch (_) { mediaLoopPresets = {}; }
+function mediaLoopStoreKey() { return (currentSong && currentSong.key) || fingerprint || ""; }
+function storedMediaLoops() { const list = mediaLoopPresets[mediaLoopStoreKey()]; return Array.isArray(list) ? list.filter(x => x && Number.isFinite(x.a) && Number.isFinite(x.b) && x.b > x.a).slice(0, 8) : []; }
+function saveMediaLoopStore() { try { localStorage.setItem(MEDIA_LOOP_KEY, JSON.stringify(mediaLoopPresets)); } catch (_) {} }
 function mediaPositionKey() { return fingerprint || (currentSong && currentSong.key) || ""; }
 function savedMediaPosition() {
   const p = Number(mediaPositions[mediaPositionKey()]);
@@ -137,12 +141,78 @@ function loopStatusText() {
   if (!Number.isFinite(loopB)) return tr("mediaLoopOnlyA", { a:mpFmt(loopA) });
   return loopActive ? tr("mediaLoopRange", { a:mpFmt(loopA), b:mpFmt(loopB) }) : tr("mediaLoop", {});
 }
+function setMediaLoopRange(a, b, active = true) {
+  if (!videoReady || !Number.isFinite(video.duration) || video.duration <= 0) return false;
+  const duration = video.duration;
+  loopA = Math.max(0, Math.min(duration, Number(a) || 0));
+  loopB = Math.max(0, Math.min(duration, Number(b) || loopA + .1));
+  if (loopB - loopA < .1) {
+    if (loopA >= duration - .1) { loopB = duration; loopA = Math.max(0, duration - .1); }
+    else loopB = Math.min(duration, loopA + .1);
+  }
+  loopActive = loopB > loopA && active; loopKeyDown = false;
+  try { video.currentTime = loopA; } catch (_) {}
+  renderLoopUI(); return loopHasRange();
+}
+function setQuickMediaLoop(seconds) {
+  if (!videoReady || !Number.isFinite(video.duration)) return;
+  const len = Math.min(Number(seconds) || 5, video.duration), cur = Math.max(0, video.currentTime || 0);
+  const start = Math.max(0, Math.min(cur, video.duration - len));
+  setMediaLoopRange(start, start + len, true);
+}
+function setRandomMediaLoop() {
+  if (!videoReady || !Number.isFinite(video.duration)) return;
+  const len = Math.min(video.duration, 4 + Math.floor(Math.random() * 9));
+  const start = Math.random() * Math.max(0, video.duration - len);
+  setMediaLoopRange(start, start + len, true);
+}
+function saveMediaLoopPreset() {
+  if (!loopHasRange()) { if (typeof showToast === "function") showToast(tr("mediaLoopNeedRange")); return; }
+  const key = mediaLoopStoreKey(); if (!key) return;
+  const list = storedMediaLoops().filter(x => Math.abs(x.a - loopA) > .1 || Math.abs(x.b - loopB) > .1);
+  list.unshift({ a:Math.round(loopA * 10) / 10, b:Math.round(loopB * 10) / 10 });
+  mediaLoopPresets[key] = list.slice(0, 8); saveMediaLoopStore();
+  if (typeof showToast === "function") showToast(tr("mediaLoopSaved"));
+  renderLoopUI();
+}
+function clearMediaLoopPresets() {
+  const key = mediaLoopStoreKey(); if (!key) return;
+  delete mediaLoopPresets[key]; saveMediaLoopStore(); renderLoopUI();
+}
+function deleteMediaLoopPreset(index) {
+  const key = mediaLoopStoreKey(); if (!key) return;
+  const list = storedMediaLoops().filter((_, i) => i !== index);
+  if (list.length) mediaLoopPresets[key] = list; else delete mediaLoopPresets[key];
+  saveMediaLoopStore(); renderLoopUI();
+}
+function renderLoopPresets() {
+  if (!loopPresetListNode) return;
+  const key = mediaLoopStoreKey(), list = storedMediaLoops(), sig = list.map(x => `${x.a}:${x.b}`).join("|");
+  if (loopPresetRenderKey === key && loopPresetRenderSig === sig) {
+    if (loopSaveNode) loopSaveNode.disabled = !loopHasRange();
+    if (loopClearPresetsNode) loopClearPresetsNode.disabled = !list.length;
+    return;
+  }
+  loopPresetRenderKey = key; loopPresetRenderSig = sig; loopPresetListNode.textContent = "";
+  if (!list.length) loopPresetListNode.append(el("span", "hint", tr("mediaLoopNoPresets")));
+  else list.forEach((x, i) => {
+    const row = el("div", "mediaLoopPresetRow");
+    const b = el("button", "mediaLoopPreset", `${mpFmt(x.a)} – ${mpFmt(x.b)}`); b.type = "button"; b.title = tr("mediaLoopRange", { a:mpFmt(x.a), b:mpFmt(x.b) });
+    b.addEventListener("click", () => setMediaLoopRange(x.a, x.b, true));
+    const del = el("button", "mediaLoopPresetDelete", "×"); del.type = "button"; del.title = tr("mediaLoopDelete"); del.setAttribute("aria-label", tr("mediaLoopDelete")); del.addEventListener("click", () => deleteMediaLoopPreset(i));
+    row.append(b, del); loopPresetListNode.append(row);
+  });
+  if (loopSaveNode) loopSaveNode.disabled = !loopHasRange();
+  if (loopClearPresetsNode) loopClearPresetsNode.disabled = !list.length;
+}
 function renderLoopUI() {
   if (loopStatusNode) loopStatusNode.textContent = loopStatusText();
   if (loopSetANode) loopSetANode.disabled = !videoReady;
   if (loopSetBNode) loopSetBNode.disabled = !videoReady || !Number.isFinite(loopA);
   if (loopClearNode) loopClearNode.disabled = !Number.isFinite(loopA);
+  loopQuickNodes.forEach(n => { n.disabled = !videoReady; });
   if (loopModeNode) loopModeNode.value = settings.mediaLoopTrigger || "toggle";
+  renderLoopPresets();
 }
 function clearMediaLoop(silent = false) {
   loopA = loopB = null; loopActive = false; loopKeyDown = false;
@@ -509,7 +579,8 @@ function installMediaSession() {
 }
 
 let statusNode, queueNode, progressNode, playNode, timeNode, titleNode, subNode, volumeNode, muteNode, shuffleNode, repeatNode, rateNode, sleepNode, searchNode;
-let reverseNode, loopStatusNode, loopSetANode, loopSetBNode, loopClearNode, loopModeNode;
+let reverseNode, loopStatusNode, loopSetANode, loopSetBNode, loopClearNode, loopModeNode, loopPresetListNode, loopSaveNode, loopClearPresetsNode;
+let loopPresetRenderKey = null, loopPresetRenderSig = null, loopQuickNodes = [];
 function tx(tag, key, cls) { const n = el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; }
 function makeButton(key, cls = "mediaSmallBtn") { const b = el("button", cls, tr(key)); b.type = "button"; b.dataset.i18n = key; return b; }
 function updateTrackText() {
@@ -640,7 +711,14 @@ function buildMedia() {
   loopModeNode = document.createElement("select");
   for (const [value, key] of [["toggle", "mediaLoopToggle"], ["hold", "mediaLoopHold"]]) { const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); loopModeNode.append(o); }
   loopModeLabel.append(loopModeNode); loopModeNode.addEventListener("change", () => { settings.mediaLoopTrigger = loopModeNode.value; saveUserPrefs(); if (settings.mediaLoopTrigger !== "hold") loopActive = loopHasRange(); renderLoopUI(); });
-  loopBox.append(loopHeading, loopStatusNode, loopHint, loopButtons, loopModeLabel);
+  const loopLabHeading = tx("h4", "mediaLoopLabTitle");
+  const loopQuickHint = tx("p", "mediaLoopQuickHint", "hint");
+  const loopQuickButtons = el("div", "miniActions"); loopQuickNodes = [];
+  for (const [seconds, key] of [[5, "mediaLoopQuick5"], [10, "mediaLoopQuick10"], [20, "mediaLoopQuick20"]]) { const b = makeButton(key, "mediaSmallBtn"); b.addEventListener("click", () => setQuickMediaLoop(seconds)); loopQuickButtons.append(b); loopQuickNodes.push(b); }
+  const randomLoop = makeButton("mediaLoopRandom", "mediaSmallBtn"); randomLoop.addEventListener("click", setRandomMediaLoop); loopQuickButtons.append(randomLoop); loopQuickNodes.push(randomLoop);
+  const loopSaveRow = el("div", "miniActions"); loopSaveNode = makeButton("mediaLoopSave", "mediaSmallBtn"); loopSaveNode.addEventListener("click", saveMediaLoopPreset); loopClearPresetsNode = makeButton("mediaLoopClearPresets", "mediaSmallBtn"); loopClearPresetsNode.addEventListener("click", clearMediaLoopPresets); loopSaveRow.append(loopSaveNode, loopClearPresetsNode);
+  const loopPresetHeading = tx("div", "mediaLoopPresets", "mediaLoopPresetHeading"); loopPresetListNode = el("div", "mediaLoopPresetList");
+  loopBox.append(loopHeading, loopStatusNode, loopHint, loopButtons, loopModeLabel, loopLabHeading, loopQuickHint, loopQuickButtons, loopSaveRow, loopPresetHeading, loopPresetListNode);
 
   const options = el("div", "mediaOptions");
   const volumeRow = el("label", "mediaOption mediaVolumeRow"); volumeRow.append(tx("span", "mediaVolume"));
@@ -728,6 +806,7 @@ function buildMedia() {
   on("beforeLoad", () => { stopReverse(false, true); clearMediaLoop(true); reverseBuffer = null; reverseBufferKey = ""; });
   on("songSelected", renderMedia); on("mediaReady", () => { if (mediaOpen) renderMedia(); updateMediaSession(); });
   on("records", renderQueue); on("packsChanged", renderQueue); on("language", () => {
+    loopPresetRenderKey = loopPresetRenderSig = null;
     if (searchNode) searchNode.placeholder = tr("mediaSearch");
     if (progressNode) progressNode.setAttribute("aria-label", tr("mediaSeek"));
     if (wallOverlay) wallOverlay.setAttribute("aria-label", tr("mediaWall"));

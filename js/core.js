@@ -63,6 +63,9 @@ const KEY_PRESETS = {
   taiko:   { label:"keyPresetTaiko",   keys:["KeyF", "KeyD"],  sub:["KeyJ", "KeyK"] }
 };
 const validCode = k => typeof k === "string" && /^[A-Za-z0-9]{1,24}$/.test(k);
+const VIDEO_KEY_DEFAULTS = ["NumpadAdd", "NumpadSubtract", "NumpadMultiply", "NumpadDivide", "Numpad0"];
+const savedVideoKeys = Array.isArray(prefs.videoKeys) && prefs.videoKeys.length === VIDEO_KEY_DEFAULTS.length &&
+  prefs.videoKeys.every(validCode) && new Set(prefs.videoKeys).size === VIDEO_KEY_DEFAULTS.length ? prefs.videoKeys.slice() : VIDEO_KEY_DEFAULTS.slice();
 const bootKeys = (Array.isArray(prefs.keys) && prefs.keys.length === 2 && prefs.keys.every(validCode) && prefs.keys[0] !== prefs.keys[1])
   ? prefs.keys.slice() : KEY_PRESETS.standard.keys.slice();
 const bootSub = [0, 1].map(i => { const k = Array.isArray(prefs.subKeys) ? prefs.subKeys[i] : ""; return validCode(k) && !bootKeys.includes(k) ? k : ""; });
@@ -75,6 +78,9 @@ const settings = {
   skin: SKINS[prefs.skin] ? prefs.skin : ({ dark:"shadow", light:"daylight" }[prefs.skin] || "shadow"),
   layout: pick(prefs.layout ?? prefs.gameplayLayout, Object.keys(LAYOUTS), "classic"),
   videoStyle: pick(prefs.videoStyle, (typeof TRK_TV_PRESETS !== "undefined" ? TRK_TV_PRESETS.map(p=>p.id) : ["skin","color","mono","dim","off"]), "skin"),
+  videoZoom: num(prefs.videoZoom, .5, 3, 1),
+  videoKeys: savedVideoKeys,
+  castPolicy: pick(prefs.castPolicy, ["off", "antenna"], "off"),
   bgDim: num(prefs.bgDim, 0, .9, 0),
   bgBlur: num(prefs.bgBlur, 0, 12, 0),
   scroll: num(prefs.scroll, .5, 2.5, 1.2),
@@ -173,6 +179,7 @@ const gameplayFxPower = () => settings.fxPower * gameplayFxMultiplier();
    ノーツ設定は細かく詰める人が多いので、tv/audioリセットでは保持される。 */
 function resetVideoPrefs() {
   settings.videoStyle = "color";
+  settings.videoZoom = 1; settings.castPolicy = "off"; settings.fxAntenna = false;
   settings.bgDim = 0; settings.bgBlur = 0;
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = true;
@@ -213,6 +220,7 @@ window.TrkSafeMode = () => safeModeOn;
 function enterSafeMode() {
   safeModeOn = true;
   settings.videoStyle = "off";
+  settings.videoZoom = 1; settings.castPolicy = "off"; settings.fxAntenna = false;
   settings.bgDim = 0; settings.bgBlur = 0;
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = false;

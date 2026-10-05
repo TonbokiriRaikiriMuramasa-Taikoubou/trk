@@ -9,6 +9,7 @@
 
 Object.assign(TEXT.ja, {
   tvMediaHoldHint:"電源長押しでメディアプレーヤー",
+  dockCastPolicy:"外部出力（キャスト）", dockCastOff:"キャストしない（アンテナも無効）", dockCastAntenna:"アンテナを立てて許可", dockCastHint:"「アンテナを立てて許可」にすると、アンテナのクリックから対応ブラウザーのキャスト選択を開きます。自動接続はしません。", dockCastUnsupported:"このブラウザーは外部出力選択に対応していません。アンテナはバックグラウンド再生用です。", dockCastOn:"📡 アンテナON：外部出力を選択できます", dockCastOffDone:"📡 アンテナOFF：外部出力を切断しました", dockCastFailed:"外部出力を開始できませんでした。",
   mediaTitle:"▶ メディアプレーヤー",
   mediaSubtitle:"ゲームを始めずに、曲を聴くための再生画面です。曲送り・リピート・シャッフル・速度・スリープタイマーを使えます。",
   mediaClose:"閉じる", mediaNoTrack:"曲を選ぶと、ここでフル再生できます。",
@@ -21,10 +22,16 @@ Object.assign(TEXT.ja, {
   mediaSearch:"キューを検索…", mediaNoSongs:"まだ曲がありません。選曲画面から音源を追加してください。", mediaNoMatch:"一致する曲がありません。",
   mediaSleepSet:"{n}分後に再生を止めます。", mediaSleepDone:"スリープタイマーで停止しました。", mediaLoaded:"読み込み中…", mediaLoadFailed:"この曲を読み込めませんでした。",
   mediaKeyboard:"Space：再生／一時停止　←→：10秒　N：次の曲　P：前の曲　Esc：閉じる",
+  mediaVideoKeysTitle:"🎬 動画プレーヤーのキー",
+  mediaVideoZoomIn:"動画を拡大", mediaVideoZoomOut:"動画を縮小", mediaVideoFaster:"再生速度を上げる", mediaVideoSlower:"再生速度を下げる", mediaVideoPause:"再生／一時停止",
+  mediaVideoKeysHint:"メディアプレーヤー中の動画操作と、ゲーム中の背景動画の拡大・縮小をキーに割り当てます。ゲームの判定や記録は変わりません。",
+  mediaVideoKeysReset:"↺ 動画キーを初期値に戻す", mediaVideoCapture0:"「動画を拡大」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture1:"「動画を縮小」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture2:"「再生速度を上げる」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture3:"「再生速度を下げる」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture4:"「再生／一時停止」に割り当てるキーを押してください。ESCでキャンセル。",
+  mediaVideoToastZoom:"動画ズーム {n}x", mediaVideoToastRate:"再生速度 {n}x",
   mediaModeStatus:"メディアプレーヤー中（ゲームの記録には影響しません）"
 });
 Object.assign(TEXT.en, {
   tvMediaHoldHint:"Long-press power for media player",
+  dockCastPolicy:"External output (cast)", dockCastOff:"No casting (antenna disabled)", dockCastAntenna:"Allow via antenna", dockCastHint:"When allowed, clicking the antenna opens this browser's cast picker if supported. It never connects automatically.", dockCastUnsupported:"This browser has no external-output picker. The antenna still enables background playback.", dockCastOn:"📡 Antenna ON: external output is allowed", dockCastOffDone:"📡 Antenna OFF: external output disconnected", dockCastFailed:"Couldn't start external output.",
   mediaTitle:"▶ Media player",
   mediaSubtitle:"Listen without starting a game. Use track controls, repeat, shuffle, playback speed, and a sleep timer.",
   mediaClose:"Close", mediaNoTrack:"Choose a song to play it here in full.",
@@ -37,10 +44,16 @@ Object.assign(TEXT.en, {
   mediaSearch:"Search queue…", mediaNoSongs:"No songs yet. Add audio from song select.", mediaNoMatch:"No matching songs.",
   mediaSleepSet:"Playback will stop in {n} minutes.", mediaSleepDone:"Sleep timer stopped playback.", mediaLoaded:"Loading…", mediaLoadFailed:"This track could not be loaded.",
   mediaKeyboard:"Space: play/pause   ←→: 10 seconds   N: next   P: previous   Esc: close",
+  mediaVideoKeysTitle:"🎬 Video player keys",
+  mediaVideoZoomIn:"Zoom in", mediaVideoZoomOut:"Zoom out", mediaVideoFaster:"Speed up", mediaVideoSlower:"Slow down", mediaVideoPause:"Play / pause",
+  mediaVideoKeysHint:"Assign keys for video zoom and media-player controls. Game judgment and records are not changed.",
+  mediaVideoKeysReset:"↺ Reset video keys", mediaVideoCapture0:"Press a key for “Zoom in”. ESC cancels.", mediaVideoCapture1:"Press a key for “Zoom out”. ESC cancels.", mediaVideoCapture2:"Press a key for “Speed up”. ESC cancels.", mediaVideoCapture3:"Press a key for “Slow down”. ESC cancels.", mediaVideoCapture4:"Press a key for “Play / pause”. ESC cancels.",
+  mediaVideoToastZoom:"Video zoom {n}x", mediaVideoToastRate:"Playback speed {n}x",
   mediaModeStatus:"Media player (does not affect game records)"
 });
 Object.assign(TEXT.zh, {
   tvMediaHoldHint:"长按电源打开媒体播放器",
+  dockCastPolicy:"外部输出（投放）", dockCastOff:"不使用投放（天线也禁用）", dockCastAntenna:"允许通过天线", dockCastHint:"允许后，点击天线会在支持的浏览器中打开外部输出选择。不会自动连接。", dockCastUnsupported:"此浏览器没有外部输出选择器。天线仍可用于后台播放。", dockCastOn:"📡 天线开启：允许外部输出", dockCastOffDone:"📡 天线关闭：已断开外部输出", dockCastFailed:"无法启动外部输出。",
   mediaTitle:"▶ 媒体播放器", mediaSubtitle:"不开始游戏也能听歌。支持切歌、循环、随机、播放速度和睡眠定时器。",
   mediaClose:"关闭", mediaNoTrack:"选择歌曲后，就能在这里完整播放。", mediaNow:"正在播放", mediaPaused:"已暂停", mediaEnded:"播放结束",
   mediaPrev:"上一首", mediaNext:"下一首", mediaPlay:"播放", mediaPause:"暂停", mediaRestart:"从头播放",
@@ -51,10 +64,16 @@ Object.assign(TEXT.zh, {
   mediaSearch:"搜索队列…", mediaNoSongs:"还没有歌曲。请先在选曲画面添加音频。", mediaNoMatch:"没有匹配的歌曲。",
   mediaSleepSet:"将在{n}分钟后停止播放。", mediaSleepDone:"睡眠定时器已停止播放。", mediaLoaded:"正在读取…", mediaLoadFailed:"无法读取这首歌。",
   mediaKeyboard:"空格：播放／暂停　←→：10秒　N：下一首　P：上一首　Esc：关闭",
+  mediaVideoKeysTitle:"🎬 视频播放器按键",
+  mediaVideoZoomIn:"放大视频", mediaVideoZoomOut:"缩小视频", mediaVideoFaster:"提高速度", mediaVideoSlower:"降低速度", mediaVideoPause:"播放／暂停",
+  mediaVideoKeysHint:"为视频缩放和媒体播放器操作分配按键。不会改变游戏判定或记录。",
+  mediaVideoKeysReset:"↺ 恢复视频按键", mediaVideoCapture0:"请按下“放大视频”的按键。ESC取消。", mediaVideoCapture1:"请按下“缩小视频”的按键。ESC取消。", mediaVideoCapture2:"请按下“提高速度”的按键。ESC取消。", mediaVideoCapture3:"请按下“降低速度”的按键。ESC取消。", mediaVideoCapture4:"请按下“播放／暂停”的按键。ESC取消。",
+  mediaVideoToastZoom:"视频缩放 {n}x", mediaVideoToastRate:"播放速度 {n}x",
   mediaModeStatus:"媒体播放器中（不影响游戏记录）"
 });
 Object.assign(TEXT.ko, {
   tvMediaHoldHint:"전원 길게 눌러 미디어 플레이어",
+  dockCastPolicy:"외부 출력(캐스트)", dockCastOff:"캐스트 안 함 (안테나도 끔)", dockCastAntenna:"안테나로 허용", dockCastHint:"허용하면 안테나를 눌렀을 때 지원 브라우저의 외부 출력 선택을 엽니다. 자동 연결은 하지 않습니다.", dockCastUnsupported:"이 브라우저는 외부 출력 선택을 지원하지 않습니다. 안테나는 백그라운드 재생에 사용할 수 있습니다.", dockCastOn:"📡 안테나 ON: 외부 출력을 허용함", dockCastOffDone:"📡 안테나 OFF: 외부 출력을 끊었습니다", dockCastFailed:"외부 출력을 시작하지 못했습니다.",
   mediaTitle:"▶ 미디어 플레이어", mediaSubtitle:"게임을 시작하지 않고 음악을 듣습니다. 곡 넘기기・반복・셔플・재생 속도・취침 타이머를 지원합니다.",
   mediaClose:"닫기", mediaNoTrack:"곡을 고르면 여기서 전체 재생할 수 있습니다.", mediaNow:"재생 중", mediaPaused:"일시정지", mediaEnded:"재생 완료",
   mediaPrev:"이전 곡", mediaNext:"다음 곡", mediaPlay:"재생", mediaPause:"일시정지", mediaRestart:"처음부터",
@@ -65,15 +84,23 @@ Object.assign(TEXT.ko, {
   mediaSearch:"큐 검색…", mediaNoSongs:"아직 곡이 없습니다. 곡 선택 화면에서 음원을 추가하세요.", mediaNoMatch:"일치하는 곡이 없습니다.",
   mediaSleepSet:"{n}분 후 재생을 멈춥니다.", mediaSleepDone:"취침 타이머로 재생을 멈췄습니다.", mediaLoaded:"불러오는 중…", mediaLoadFailed:"이 곡을 불러오지 못했습니다.",
   mediaKeyboard:"Space: 재생／일시정지   ←→: 10초   N: 다음   P: 이전   Esc: 닫기",
+  mediaVideoKeysTitle:"🎬 동영상 플레이어 키",
+  mediaVideoZoomIn:"동영상 확대", mediaVideoZoomOut:"동영상 축소", mediaVideoFaster:"재생 속도 높이기", mediaVideoSlower:"재생 속도 낮추기", mediaVideoPause:"재생／일시정지",
+  mediaVideoKeysHint:"동영상 확대·축소와 미디어 플레이어 조작 키를 지정합니다. 게임 판정과 기록은 바뀌지 않습니다.",
+  mediaVideoKeysReset:"↺ 동영상 키 초기화", mediaVideoCapture0:"'동영상 확대'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture1:"'동영상 축소'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture2:"'재생 속도 높이기'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture3:"'재생 속도 낮추기'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture4:"'재생／일시정지'로 지정할 키를 누르세요. ESC로 취소.",
+  mediaVideoToastZoom:"동영상 확대 {n}x", mediaVideoToastRate:"재생 속도 {n}x",
   mediaModeStatus:"미디어 플레이어 중 (게임 기록에 영향 없음)"
 });
 
 const HOLD_MS = 650;
+if (!Array.isArray(settings.videoKeys) || settings.videoKeys.length !== VIDEO_KEY_DEFAULTS.length || settings.videoKeys.some(k => !validCode(k)) || new Set(settings.videoKeys).size !== VIDEO_KEY_DEFAULTS.length) settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();
 let overlay, dialog, powerButton;
 let mediaOpen = false, holdTimer = 0, longPressed = false;
 let repeatMode = settings.mediaRepeat || "off", shuffle = !!settings.mediaShuffle;
 let mediaRate = Number(settings.mediaRate) || 1, sleepTimer = 0, sleepUntil = 0, tickTimer = 0;
-let seeking = false, queueFilter = "";
+let seeking = false, queueFilter = "", videoBinding = null;
+const VIDEO_KEY_LABELS = ["mediaVideoZoomIn", "mediaVideoZoomOut", "mediaVideoFaster", "mediaVideoSlower", "mediaVideoPause"];
+const VIDEO_KEY_BAD = ["Escape", "Tab", "F5", "F11", "F12", "MetaLeft", "MetaRight", "Backquote", "Backspace"];
 const MEDIA_POS_KEY = "trk_media_positions_v1";
 let mediaPositions = {};
 try { mediaPositions = JSON.parse(localStorage.getItem(MEDIA_POS_KEY)) || {}; } catch (_) { mediaPositions = {}; }
@@ -88,6 +115,32 @@ function saveMediaPosition(clear = false) {
   else mediaPositions[key] = Math.round(video.currentTime * 10) / 10;
   try { localStorage.setItem(MEDIA_POS_KEY, JSON.stringify(mediaPositions)); } catch (_) {}
 }
+function videoAction(action) {
+  if (action === 0 || action === 1) {
+    settings.videoZoom = Math.max(.5, Math.min(3, (Number(settings.videoZoom) || 1) + (action === 0 ? .1 : -.1)));
+    const z = document.getElementById("videoZoom"); if (z) z.value = settings.videoZoom;
+    const zv = document.getElementById("videoZoomVal"); if (zv) zv.textContent = settings.videoZoom.toFixed(1) + "x";
+    saveUserPrefs();
+    if (typeof showToast === "function") showToast(tr("mediaVideoToastZoom", { n:settings.videoZoom.toFixed(1) }));
+    return;
+  }
+  if (!mediaActive()) return;
+  if (action === 2 || action === 3) {
+    const next = Math.max(.5, Math.min(2, (Number(mediaRate) || 1) + (action === 2 ? .25 : -.25)));
+    setRate(next); renderMedia();
+    if (typeof showToast === "function") showToast(tr("mediaVideoToastRate", { n:next.toFixed(2) }));
+  } else if (action === 4) playPause();
+}
+function captureVideoKey(code) {
+  const i = videoBinding;
+  if (code === "Escape") { videoBinding = null; syncVideoKeysUI(); return; }
+  if (VIDEO_KEY_BAD.includes(code) || ((settings.videoKeys || []).includes(code) && settings.videoKeys[i] !== code)) {
+    if (typeof showToast === "function") showToast(tr("reservedKey"));
+    return;
+  }
+  settings.videoKeys[i] = code; videoBinding = null; saveUserPrefs(); syncVideoKeysUI();
+}
+let syncVideoKeysUI = () => {};
 
 const mpFmt = sec => {
   if (!Number.isFinite(sec) || sec < 0) return "0:00";
@@ -383,6 +436,14 @@ function buildMedia() {
   overlay.addEventListener("keyup", e => e.stopPropagation());
   const isTyping = t => t && ["INPUT", "SELECT", "TEXTAREA"].includes(t.tagName);
   addEventListener("keydown", e => {
+    if (videoBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureVideoKey(e.code); return; }
+    if (window._trkSynthModeOpen) return;
+    const videoKey = (settings.videoKeys || []).indexOf(e.code);
+    if (videoKey >= 0 && (mediaActive() || phase === "title" || phase === "paused")) {
+      e.preventDefault(); e.stopImmediatePropagation();
+      if (!e.repeat) videoAction(videoKey);
+      return;
+    }
     if (!mediaOpen) return;
     if (e.code === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); closeMedia(); return; }
     if (isTyping(e.target)) return;
@@ -420,6 +481,31 @@ function buildMedia() {
   }, true);
   powerButton.addEventListener("contextmenu", e => e.preventDefault());
 
+  function buildVideoKeysUI() {
+    const anchor = document.querySelector('#settingsScreen [data-i18n="playerMode"]')?.closest("label");
+    if (!anchor || document.getElementById("mediaVideoKeysPanel")) return;
+    const panel = el("details", "subPanel"); panel.id = "mediaVideoKeysPanel";
+    const heading = tx("summary", "mediaVideoKeysTitle");
+    const hint = tx("div", "mediaVideoKeysHint", "hint");
+    const rows = el("div", "keyRows"); rows.style.marginTop = "10px";
+    const reset = tx("button", "mediaVideoKeysReset"); reset.type = "button"; reset.style.marginTop = "8px";
+    syncVideoKeysUI = () => {
+      rows.textContent = "";
+      VIDEO_KEY_LABELS.forEach((key, i) => {
+        const row = el("div", "keyRow"), b = el("button", "", tr("assign"));
+        b.type = "button"; b.classList.toggle("listening", videoBinding === i);
+        b.addEventListener("click", () => { bindingSlot = null; updateKeyUI(); videoBinding = i; syncVideoKeysUI(); });
+        row.append(el("strong", "", tr(key)), el("span", "keyValue", formatKey(settings.videoKeys[i])), b);
+        rows.append(row);
+      });
+    };
+    reset.addEventListener("click", () => { settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); videoBinding = null; saveUserPrefs(); syncVideoKeysUI(); });
+    panel.append(heading, hint, rows, reset);
+    anchor.after(panel);
+    on("language", syncVideoKeysUI);
+    syncVideoKeysUI();
+  }
+  buildVideoKeysUI();
   installMediaSession();
   return true;
 }

@@ -154,6 +154,8 @@ $("layoutPicker").addEventListener("click", e => {
   settings.layout = b.dataset.layout; syncPickers(); saveUserPrefs();
 });
 $("videoStyle").addEventListener("change", () => { settings.videoStyle = $("videoStyle").value; view.style.filter = videoFilter(); saveUserPrefs(); });
+function showVideoZoom() { $("videoZoomVal").textContent = settings.videoZoom.toFixed(1) + "x"; }
+$("videoZoom").addEventListener("input", e => { settings.videoZoom = Number(e.target.value) || 1; showVideoZoom(); saveUserPrefs(); });
 $("scroll").addEventListener("input", () => {
   settings.scroll = Number($("scroll").value) || 1;
   $("scrollVal").textContent = settings.scroll.toFixed(1) + "x"; saveUserPrefs();
@@ -307,6 +309,8 @@ $("scroll").value = settings.scroll;
 $("scrollVal").textContent = settings.scroll.toFixed(1) + "x";
 $("latency").value = settings.latency;
 $("videoStyle").value = settings.videoStyle;
+$("videoZoom").value = settings.videoZoom;
+showVideoZoom();
 $("fxPower").value = settings.fxPower;
 $("gameFxMode").value = settings.gameFxMode;
 video.volume = settings.musicVolume;

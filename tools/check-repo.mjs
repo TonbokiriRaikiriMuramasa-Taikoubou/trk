@@ -147,6 +147,19 @@ if (/棚スキン11種|・11種類/.test(read("css/style.css") + skins)) {
   fail("stale shelf skin count (11) remains in source comments");
 }
 
+// Overall look skins: 26 presets in data.js + 4 Miku skins in characters/miku.js = 30.
+const dataJs = read("js/data.js");
+const skinsStart = dataJs.indexOf("const SKINS = {");
+const skinsEnd = dataJs.indexOf("\n};", skinsStart);
+if (skinsStart < 0 || skinsEnd < 0) {
+  fail("SKINS block could not be read in js/data.js");
+} else {
+  const presetCount = (dataJs.slice(skinsStart, skinsEnd).match(/label:\{ja:/g) || []).length;
+  const mikuCount = (read("js/characters/miku.js").match(/^ {2}SKINS\.[A-Za-z0-9]+ = \{/gm) || []).length;
+  if (presetCount + mikuCount !== 30) fail(`expected 30 overall skins, found ${presetCount + mikuCount}`);
+  else ok("overall skin count is 30");
+}
+
 // A cache name is deliberately checked for existence, not for a guessed
 // date, because the service worker is manually bumped for every release.
 const sw = read("sw.js");

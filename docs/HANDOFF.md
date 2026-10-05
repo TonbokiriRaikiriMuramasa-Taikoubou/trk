@@ -1,7 +1,7 @@
 # trk! 開発引き継ぎ文書（HANDOFF）
 
 > trk! is AGRG! — an All-Generation Rhythm Game
-> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン16種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り ＋ 🥁音ゲーマー向けFAST/SLOW・あべこべ・でたらめ ＋ 💬GitHub Issuesテンプレート ＋ 📊スペクトラム（音の見える化・**見え方16種・色8種・曲名バナーのスキン・🚫使用しないスイッチ**・TVに重ねられる）＋ 🎛エフェクトチェーン編集＋ 🎹曲に合わせて演奏できるシンセモード（16音色・エレキギター／電子サックス／ZUNPET風ブラス・±8半音ピッチ・鍵盤固定オプション初期オン・大画面向け鍵盤拡張オプション・起動オプション）＋ 📤ミュージックフォルダを共有（1回の許可で一括取り込み・🔗共有をつづける・💾端末に残す・🚫やめる）＋ privacy.html ＋ Capacitor Android準備 ＋ 権利とクレジット図鑑 ＋ パック権利カード（名刺）＋ 🧭 3分チュートリアル・プレイ演出設定・CATCHニトロ得点ボーナス・▶メディアプレーヤー・🎛Loop Lab（クイック／ランダム区間・曲別プリセット）・📡外部出力ポリシー・動画キー操作まで）
+> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン16種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り ＋ 🥁音ゲーマー向けFAST/SLOW・あべこべ・でたらめ ＋ 💬GitHub Issuesテンプレート ＋ 📊スペクトラム（音の見える化・**見え方16種・色8種・曲名バナーのスキン・🚫使用しないスイッチ**・TVに重ねられる）＋ 🎛エフェクトチェーン編集＋ 🎹曲に合わせて演奏できるシンセモード（16音色・エレキギター／電子サックス／ZUNPET風ブラス・±8半音ピッチ・鍵盤固定オプション初期オン・大画面向け鍵盤拡張オプション・起動オプション）＋ 📤ミュージックフォルダを共有（1回の許可で一括取り込み・🔗共有をつづける・💾端末に残す・🚫やめる）＋ privacy.html ＋ Capacitor Android準備 ＋ 権利とクレジット図鑑 ＋ パック権利カード（名刺）＋ 🧭 3分チュートリアル・プレイ演出設定・CATCHニトロ得点ボーナス・▶メディアプレーヤー・🎛Loop Lab（クイック／ランダム区間・曲別プリセット）・📡キャスト／バックグラウンド再生の個別アンテナ・動画キー操作まで）
 > この文書は、新しい会話で開発を再開するための参照資料です。
 
 ---
@@ -459,8 +459,9 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 - 予約キー：P / Esc（一時停止）、` （リトライ）、- / = （オフセット）、R（区間リピート）、[ ]（速度、変更可）。
 
 ### 📡 アンテナ機能とバックグラウンド再生（fx-dock.js）
-- **外部出力ポリシー（`settings.castPolicy`）**：初期値は `off`。設定で `antenna` を選んだときだけアンテナUIを有効にし、クリック時のユーザー操作で Remote Playback API の `prompt()` または Safari の `webkitShowPlaybackTargetPicker()` を呼ぶ。自動キャストはしない。未対応ブラウザーではバックグラウンド再生アンテナとしてだけ案内する。
-- **バックグラウンド再生（`settings.fxAntenna`）**：
+- **キャストアンテナ（`settings.castPolicy`）**：初期値は `off`。設定で `antenna` を選んだときだけ📺キャストボタン（`.dockCast`）を表示し、クリック時のユーザー操作で Remote Playback API の `prompt()` または Safari の `webkitShowPlaybackTargetPicker()` を呼ぶ。自動キャストはしない。未対応ブラウザーでは `dockCastUnsupported` を表示するだけ。
+- **バックグラウンド再生アンテナ（`settings.backgroundPolicy`＋`settings.fxAntenna`）**：
+  - `backgroundPolicy` が `antenna` のときだけ📡アンテナUIを表示し、`fxAntenna` でON/OFFする。たとえば「キャスト無効＋バックグラウンド再生許可」のような組み合わせも可能（キャストとバックグラウンド再生は別ポリシー）。
   - アンテナを立てると（ON）、ブラウザのタブを切り替えたり画面をオフにしても、曲のプレビュー、ラジオ待ち受け、AUTO演奏が途切れることなくバックグラウンドで継続（`keepAlive()`）。
   - 自分でプレイ中の場合は記録保護のため通常どおり一時停止。
   - MediaSession APIと連動し、端末のロック画面や通知バーから 再生・一時停止・曲送り が可能。
@@ -470,6 +471,8 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
   - ドック本体のアンテナ（`.antWrap`）をクリックしても、アンテナスイッチ（`.dockAnt`）をクリックしても即座に切り替え可能。
 - **スキン選択欄直下の明示的チェックボックス**：
   - スキン選択の直下に **「通常のアンテナを使う（バックグラウンド再生モード）」** チェックボックスを配置し、初見のプレイヤーでも便利なバックグラウンド再生機能の存在に自然と気付けるよう配慮。
+  - キャストは別の`.dockCast`ボタンから操作する（このチェックボックスとは無関係）。
+- **設定画面の個別ポリシー**：ドックの「くわしい」欄で「バックグラウンド再生アンテナ」と「キャストアンテナ」をそれぞれ `off`／`antenna` から選べる。旧バージョンの `castPolicy=antenna` 設定は `backgroundPolicy=antenna` として引き継ぐ。
 
 ### 🥁 音ゲーマー向け機能・MOD・判定分析
 - **FAST / SLOW（Early / Late）の判定統計**：
@@ -512,7 +515,10 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 | IndexedDB `shadow_taiko_shared`（新） | 📤💾 共有して端末に残した曲（`{key, file, name, dir, addedAt}`。最大150曲・300MB。`settings.libKeepShared` がオンのときだけ書く・読む） |
 | `settings.libKeepShared`（新） | 💾 共有した曲を端末に残す（初期オフ。`shadow_taiko_preferences_v2` の中。`?safe=1` ではオフになる） |
 | `settings.specOn` `specStyle`（16種）`specTheme`（8色）`specGain` `specPeaks` `specTv` `specSkin` `specSkinOpen`（新・📊 スペクトラム） | 表示／見え方／色／感度／ピーク／TVに重ねる／曲名バナーのスキン／開いた状態。`shadow_taiko_preferences_v2` の中 |
-| `settings.songFav`（新） / `settings.favs`（新） | ⭐ 曲のお気に入り（1軍）と、3系統ぶんのフォルダ分け（`{tv,fx,song}` の `sub`／`frozen`／`former`／`pins`／`locks`／`active`）。どちらも `shadow_taiko_preferences_v2` の中 |fxDockSkin fxDockFive fxDockOpen fxAntenna fxEqLock fxLockChain fxFavSeeded
+| `settings.songFav`（新） / `settings.favs`（新） | ⭐ 曲のお気に入り（1軍）と、3系統ぶんのフォルダ分け（`{tv,fx,song}` の `sub`／`frozen`／`former`／`pins`／`locks`／`active`）。どちらも `shadow_taiko_preferences_v2` の中 |
+| `settings.castPolicy`（初期 `off`） | 📺 キャストアンテナのポリシー（`off`／`antenna`）。`antenna` のときだけ `.dockCast` ボタンを表示し、クリックで Remote Playback の選択画面を開く（自動接続なし）。`shadow_taiko_preferences_v2` の中 |
+| `settings.backgroundPolicy`（初期 `off`） / `settings.fxAntenna` | 📡 バックグラウンド再生アンテナのポリシー（`off`／`antenna`）とON/OFF。旧 `castPolicy=antenna` は `backgroundPolicy=antenna` に引き継ぐ。`shadow_taiko_preferences_v2` の中 |
+| `settings.fxDockSkin` `fxDockFive` `fxDockOpen` `fxAntennaShape` `fxEqLock` `fxLockChain` `fxFavSeeded` | 🎛 fxドックのスキン・5ボタン統一・開閉状態・アンテナ形状・EQロック・ロック連鎖・初期お気に入り投入済みフラグ。`shadow_taiko_preferences_v2` の中 |
 
 **形式名**：`shadow-taiko-pack`、`shadow-taiko-chart`、`shadow-taiko-records`、`skin.shadow-taiko`、`trk-fx`、`trk-verified`、`trk-tvskin`（カスタムTVスキン）、譜面ファイル `*.shadow-taiko.json`
 
@@ -615,7 +621,7 @@ records[指紋 "サイズ:長さ×10"] = {
 - [x] `creditCard.contributors`（最大12人）の表示、パック内 `CREDITS.md` 自動生成、共有用SVG名刺ダウンロードを追加。カードは作者申告の要約で、原文ライセンス／ReadMeを優先する
 - [x] 🧭 3分チュートリアル、初期スクロール速度1.2x、ゲーム演出（全部／控えめ／オフ）、TRUCKの初期演出強化、CATCHの任意ニトロ得点1.1倍を追加
 - [x] ▶ TVドックの電源長押しでメディアプレーヤーモードを開く。再生キュー、曲送り、リピート／シャッフル、0.5〜2x速度、前回位置復元、スリープタイマー、Media Sessionを実装。ゲーム開始・記録には影響しない
-- [x] 📡 外部出力を「キャストしない（アンテナも無効）／アンテナを立てて許可」に分離。Remote Playback API／SafariのPlayback Target Pickerがある環境だけ、アンテナ操作から選択画面を開く（自動接続なし）。動画ズーム0.5〜3x、速度・一時停止をキーアサイン可能にした
+- [x] 📡 外部出力を「キャストアンテナ」と「バックグラウンド再生アンテナ」の2本に分離。Remote Playback API／SafariのPlayback Target Pickerがある環境だけ、キャストアンテナ（`.dockCast`ボタン）から選択画面を開く（自動接続なし）。バックグラウンド再生は📡アンテナで個別にON/OFFでき、初期は両方ともオフ。動画ズーム0.5〜3x、速度・一時停止をキーアサイン可能にした
 - [x] ⏪ メディアプレーヤーに逆再生を追加。Web Audioで曲ファイルをセッション中だけ反転した音声バッファとして再生し、映像は手動シークで同期する。音声の準備ができないブラウザーでは映像フレームのみの逆再生にフォールバックする
 - [x] 🔁 メディアプレーヤーにA-B区間ループを追加。A点・B点ボタンまたは割り当てキーで範囲を作り、トグル（A→B／開始→解除）と長押し中だけの操作を選べる。曲を変えると範囲は解除する
 - [x] 🎛 Loop Labを追加。現在位置から5／10／20秒のクイック区間、4〜12秒のランダム区間、曲識別子とA/B秒数だけを端末内に保存する曲別プリセット（呼び出し、個別削除、全消去、最大8件）を提供する。現在適用中のプリセットは強調表示する。音源ファイルの切り取り・変換・書き出し・外部アップロードは行わない

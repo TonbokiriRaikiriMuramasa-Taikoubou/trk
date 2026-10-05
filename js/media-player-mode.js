@@ -113,6 +113,7 @@ let loopTimer = 0;
 let loopA = null, loopB = null, loopActive = false, loopKeyDown = false;
 let wallOverlay, wallClockNode, wallDateNode, wallNode, wallStyleNode, wallClockCheck, wallPlaybackNode, wallTriggerNode, wallFileNode, wallResetNode;
 let wallActive = false, wallKeyDown = false, wallTimer = 0, wallWasPlaying = false, wallCustomURL = "";
+let mediaExitBinding = null;
 const VIDEO_KEY_LABELS = ["mediaVideoZoomIn", "mediaVideoZoomOut", "mediaVideoFaster", "mediaVideoSlower", "mediaVideoPause", "mediaReverse", "mediaLoop", "mediaWallKey"];
 const REVERSE_KEY_INDEX = 5, LOOP_KEY_INDEX = 6, WALL_KEY_INDEX = 7;
 const VIDEO_KEY_BAD = ["Escape", "Tab", "F5", "F11", "F12", "MetaLeft", "MetaRight", "Backquote", "Backspace"];
@@ -329,6 +330,23 @@ function videoAction(action) {
   else if (action === REVERSE_KEY_INDEX) toggleReverse();
   else if (action === LOOP_KEY_INDEX) settings.mediaLoopTrigger === "hold" ? activateHeldLoop() : cycleMediaLoop();
   else if (action === WALL_KEY_INDEX) settings.mediaWallTrigger === "hold" ? (activateWall(), wallKeyDown = true) : toggleWall();
+}
+function syncMediaExitUI() {
+  const value = document.getElementById("mediaExitKeyValue"), button = document.getElementById("mediaExitKeyAssign"), check = document.getElementById("mediaExitConfirmCheck");
+  if (value) value.textContent = formatKey(settings.mediaExitKey);
+  if (button) button.classList.toggle("listening", mediaExitBinding !== null);
+  if (check) check.checked = settings.mediaExitConfirm !== false;
+}
+function captureMediaExitKey(code) {
+  if (mediaExitBinding === null) return;
+  if (code === "Escape") { mediaExitBinding = null; syncMediaExitUI(); return; }
+  const used = [...(settings.videoKeys || []), settings.menuKey, settings.mediaExitKey, "Space", "ArrowLeft", "ArrowRight", "KeyN", "KeyP"];
+  if (VIDEO_KEY_BAD.includes(code) || (used.includes(code) && code !== settings.mediaExitKey)) return;
+  settings.mediaExitKey = code; mediaExitBinding = null; saveUserPrefs(); syncMediaExitUI();
+}
+function requestMediaExit() {
+  const go = () => closeMedia();
+  if (settings.mediaExitConfirm === false || typeof confirm !== "function" || confirm(tr("mediaExitConfirm"))) go();
 }
 function captureVideoKey(code) {
   const i = videoBinding;
@@ -672,6 +690,7 @@ function buildMedia() {
   overlay.addEventListener("keyup", e => e.stopPropagation());
   const isTyping = t => t && ["INPUT", "SELECT", "TEXTAREA"].includes(t.tagName);
   addEventListener("keydown", e => {
+    if (mediaExitBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureMediaExitKey(e.code); return; }
     if (videoBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureVideoKey(e.code); return; }
     if (window._trkSynthModeOpen) return;
     const videoKey = (settings.videoKeys || []).indexOf(e.code);
@@ -681,7 +700,8 @@ function buildMedia() {
       return;
     }
     if (!mediaOpen) return;
-    if (e.code === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); if (wallActive) deactivateWall(true); else closeMedia(); return; }
+    if (wallActive && e.code === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); deactivateWall(true); return; }
+    if (e.code === settings.mediaExitKey || e.code === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat) requestMediaExit(); return; }
     if (wallActive) { e.preventDefault(); e.stopImmediatePropagation(); return; }
     if (isTyping(e.target)) return;
     if (e.code === "Space") { e.preventDefault(); e.stopImmediatePropagation(); playPause(); }
@@ -691,7 +711,7 @@ function buildMedia() {
     else if (e.code === "KeyP") { e.preventDefault(); e.stopImmediatePropagation(); stepMedia(-1); }
   }, true);
   addEventListener("keyup", e => {
-    if (videoBinding !== null || window._trkSynthModeOpen || !mediaActive()) return;
+    if (mediaExitBinding !== null || videoBinding !== null || window._trkSynthModeOpen || !mediaActive()) return;
     if (settings.mediaLoopTrigger === "hold" && (settings.videoKeys || [])[LOOP_KEY_INDEX] === e.code) {
       e.preventDefault(); e.stopImmediatePropagation(); releaseHeldLoop();
     }
@@ -776,6 +796,11 @@ function buildMedia() {
     on("language", () => { syncVideoKeysUI(); syncWallSettingsUI(); });
     syncVideoKeysUI(); syncWallSettingsUI();
   }
+  const mediaExitAssign = document.getElementById("mediaExitKeyAssign"), mediaExitConfirmCheck = document.getElementById("mediaExitConfirmCheck");
+  if (mediaExitAssign) mediaExitAssign.addEventListener("click", () => { mediaExitBinding = 0; syncMediaExitUI(); });
+  if (mediaExitConfirmCheck) mediaExitConfirmCheck.addEventListener("change", e => { settings.mediaExitConfirm = e.target.checked; saveUserPrefs(); });
+  on("language", syncMediaExitUI);
+  syncMediaExitUI();
   buildVideoKeysUI();
   installMediaSession();
   return true;

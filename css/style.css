@@ -1382,3 +1382,10 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
 }
 @media(prefers-reduced-motion:reduce){.mediaDisplay::before{display:none}}
 body.mediaOpen{overflow:hidden;overscroll-behavior:none}
+/* 説明を減らしたい人向け。状態表示・ボタン名・曲情報は残す */
+body.helpTextOff #quickGuide,
+body.helpTextOff .hint:not(.status),
+body.helpTextOff .instSubtitle,
+body.helpTextOff .mediaQueueHead p,
+body.helpTextOff .mediaLoopBox>.hint,
+body.helpTextOff .mediaWallHintText{display:none!important}

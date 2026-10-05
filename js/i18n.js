@@ -9,13 +9,13 @@ const TEXT = {
   /* ==================== 日本語 ==================== */
   ja: {
     /* 選曲画面 */
-    tagline:"trk! is AGRG! — 全世代のためのリズムゲーム。音源ひとつで、叩いても、走っても、回っても、運んでもOK🚚",
+    tagline:"trk! — AGRG",
     guideTitle:"🧭 まずは3分チュートリアル", guideHint:"曲を1つ選んだら、見た目と音を変えて、TRUCKかCATCHで爽快に遊んでみましょう。",
     guideSongTitle:"1. 曲を入れる", guideSong:"＋曲ファイル／フォルダ共有／曲パックから、自分に権利のある音源を選びます。",
     guideLookTitle:"2. スキンと音", guideLook:"⚙設定の見た目でスキン、🎛サウンドエフェクトで音を変えられます。",
     guideTruckTitle:"3. 走る", guideTruck:"TRUCKは↑↓でレーン移動。CATCHは荷物を受け、🚀ニトロで一気に加速します。",
     guideSafeTitle:"4. 無理なく遊ぶ", guideSafe:"演出は「控えめ」や「追加演出オフ」にできます。音ズレはオフセットで調整します。",
-    language:"言語 / Language", openSettings:"⚙ 設定", settingsTitle:"⚙ 設定", closeSettings:"← 選曲に戻る",
+    language:"言語 / Language", openSettings:"⚙ 設定", settingsTitle:"⚙ 設定", closeSettings:"← 選曲に戻る", navKeysTitle:"⌨ 移動キー", menuReturnKey:"メニュー画面へ戻る", mediaExitKey:"プレーヤーを終了", menuReturnConfirmToggle:"メニューへ戻る前に確認する", mediaExitConfirmToggle:"プレーヤー終了前に確認する", navKeysHint:"メニューへ戻るキーの初期値は M、プレーヤー終了キーの初期値は ESCです。確認はオフにもできます。", menuReturnConfirm:"メニュー画面に戻りますか？プレイ中の記録は保存されません。", mediaExitConfirm:"メディアプレーヤーを終了しますか？", helpText:"ヘルプ・説明文を表示", helpTextHint:"オフにすると、チュートリアルや補足説明を隠して、ボタンと曲リスト中心の画面にします。",
     dropHint:"曲・.stpack・.vrm・.vrma・譜面JSONは、画面にドラッグ＆ドロップしても読み込めます。",
     libTitle:"🎵 曲リスト", libOpen:"📁 ミュージックフォルダを開く", libReconnect:"🔗 「{name}」に再接続", libRescan:"↻ 再スキャン",
     libAddFile:"＋ 曲ファイルを追加", libAddPack:"📦 パックを追加", libRandom:"🎲",
@@ -215,13 +215,13 @@ const TEXT = {
 
   /* ==================== English ==================== */
   en: {
-    tagline:"trk! is AGRG! — an All-Generation Rhythm Game. One audio file: hit it, drive it, orbit it, stage it or catch it 🚚",
+    tagline:"trk! — AGRG",
     guideTitle:"🧭 3-minute quick guide", guideHint:"Pick one song, change the look and sound, then try TRUCK or CATCH for a burst of momentum.",
     guideSongTitle:"1. Add a song", guideSong:"Choose your own file, share a music folder, or import a song pack you have rights to use.",
     guideLookTitle:"2. Change the vibe", guideLook:"Use ⚙ Settings for skins and 🎛 Sound effects for the audio chain.",
     guideTruckTitle:"3. Hit the road", guideTruck:"Use ↑↓ in TRUCK. In CATCH, grab parcels and collect 🚀 Nitro for a burst of speed.",
     guideSafeTitle:"4. Tune it to you", guideSafe:"Choose Soft or Extra effects off if you want less motion. Use the offset tool when timing feels late.",
-    language:"Language", openSettings:"⚙ Settings", settingsTitle:"⚙ Settings", closeSettings:"← Back to song select",
+    language:"Language", openSettings:"⚙ Settings", settingsTitle:"⚙ Settings", closeSettings:"← Back to song select", navKeysTitle:"⌨ Navigation keys", menuReturnKey:"Return to menu", mediaExitKey:"Exit player", menuReturnConfirmToggle:"Confirm before returning to menu", mediaExitConfirmToggle:"Confirm before exiting player", navKeysHint:"The default menu key is M and the default player-exit key is ESC. Confirmation can be turned off.", menuReturnConfirm:"Return to the menu? The current play will not be saved.", mediaExitConfirm:"Exit the media player?", helpText:"Show help and descriptions", helpTextHint:"Turn this off to hide tutorials and supporting text, leaving a cleaner song-and-button view.",
     dropHint:"You can also drag & drop songs, .stpack, .vrm, .vrma and chart JSON onto the window.",
     libTitle:"🎵 Songs", libOpen:"📁 Open music folder", libReconnect:"🔗 Reconnect “{name}”", libRescan:"↻ Rescan",
     libAddFile:"＋ Add song file", libAddPack:"📦 Add pack", libRandom:"🎲",
@@ -412,13 +412,13 @@ const TEXT = {
 
   /* ==================== 简体中文 ==================== */
   zh: {
-    tagline:"trk! is AGRG! — 全年龄节奏游戏。只需一个音源：敲、开车、绕轨、上舞台、接货都可以🚚",
+    tagline:"trk! — AGRG",
     guideTitle:"🧭 3分钟快速指南", guideHint:"选一首歌曲，改变外观和声音，再试试TRUCK或CATCH的爽快节奏。",
     guideSongTitle:"1. 加入歌曲", guideSong:"选择自己的音频、共享音乐文件夹，或导入有权使用的歌曲包。",
     guideLookTitle:"2. 改变风格", guideLook:"在⚙设置中更换皮肤，在🎛音效中改变声音链。",
     guideTruckTitle:"3. 上路", guideTruck:"TRUCK使用↑↓换道。CATCH接住包裹，收集🚀氮气获得加速。",
     guideSafeTitle:"4. 按自己的方式玩", guideSafe:"想减少动态效果时选择“柔和”或关闭额外演出；感觉延迟时使用偏移测量。",
-    language:"语言", openSettings:"⚙ 设置", settingsTitle:"⚙ 设置", closeSettings:"← 返回选曲",
+    language:"语言", openSettings:"⚙ 设置", settingsTitle:"⚙ 设置", closeSettings:"← 返回选曲", navKeysTitle:"⌨ 导航按键", menuReturnKey:"返回菜单", mediaExitKey:"退出播放器", menuReturnConfirmToggle:"返回菜单前确认", mediaExitConfirmToggle:"退出播放器前确认", navKeysHint:"菜单按键默认为 M，播放器退出按键默认为 ESC。可以关闭确认。", menuReturnConfirm:"要返回菜单吗？当前游玩不会保存。", mediaExitConfirm:"要退出媒体播放器吗？", helpText:"显示帮助和说明", helpTextHint:"关闭后隐藏教程和补充说明，让画面更简洁，只保留歌曲和按钮。",
     dropHint:"歌曲、.stpack、.vrm、.vrma和谱面JSON也可以直接拖放到窗口中。",
     libTitle:"🎵 歌曲列表", libOpen:"📁 打开音乐文件夹", libReconnect:"🔗 重新连接「{name}」", libRescan:"↻ 重新扫描",
     libAddFile:"＋ 添加歌曲文件", libAddPack:"📦 添加资源包", libRandom:"🎲",
@@ -608,13 +608,13 @@ const TEXT = {
 
   /* ==================== 한국어 ==================== */
   ko: {
-    tagline:"trk! is AGRG! — 모든 세대를 위한 리듬 게임. 음원 하나로 두드리고, 달리고, 돌고, 무대에 서고, 받아 내요🚚",
+    tagline:"trk! — AGRG",
     guideTitle:"🧭 3분 빠른 안내", guideHint:"곡을 하나 고르고, 모양과 소리를 바꾼 뒤 TRUCK이나 CATCH의 속도감을 즐겨 보세요.",
     guideSongTitle:"1. 곡 넣기", guideSong:"내 파일, 음악 폴더 공유, 또는 사용 권리가 있는 곡 팩을 선택합니다.",
     guideLookTitle:"2. 분위기 바꾸기", guideLook:"⚙ 설정에서 스킨을, 🎛 사운드 이펙트에서 소리를 바꿉니다.",
     guideTruckTitle:"3. 출발", guideTruck:"TRUCK은 ↑↓로 레인을 이동합니다. CATCH는 짐을 받고 🚀 니트로로 가속합니다.",
     guideSafeTitle:"4. 편하게 조절하기", guideSafe:"움직임을 줄이려면 ‘약하게’ 또는 추가 연출 끄기를 선택하고, 타이밍은 오프셋으로 맞춥니다.",
-    language:"언어", openSettings:"⚙ 설정", settingsTitle:"⚙ 설정", closeSettings:"← 곡 선택으로",
+    language:"언어", openSettings:"⚙ 설정", settingsTitle:"⚙ 설정", closeSettings:"← 곡 선택으로", navKeysTitle:"⌨ 이동 키", menuReturnKey:"메뉴로 돌아가기", mediaExitKey:"플레이어 종료", menuReturnConfirmToggle:"메뉴로 돌아가기 전에 확인", mediaExitConfirmToggle:"플레이어 종료 전에 확인", navKeysHint:"메뉴 키 기본값은 M, 플레이어 종료 키 기본값은 ESC입니다. 확인은 끌 수 있습니다.", menuReturnConfirm:"메뉴로 돌아갈까요? 현재 플레이는 저장되지 않습니다.", mediaExitConfirm:"미디어 플레이어를 종료할까요?", helpText:"도움말과 설명 표시", helpTextHint:"끄면 튜토리얼과 보충 설명을 숨겨 곡과 버튼 중심의 깔끔한 화면으로 만듭니다.",
     dropHint:"곡・.stpack・.vrm・.vrma・채보 JSON은 창에 드래그 앤 드롭해도 불러올 수 있습니다.",
     libTitle:"🎵 곡 목록", libOpen:"📁 음악 폴더 열기", libReconnect:"🔗 '{name}'에 다시 연결", libRescan:"↻ 다시 스캔",
     libAddFile:"＋ 곡 파일 추가", libAddPack:"📦 팩 추가", libRandom:"🎲",

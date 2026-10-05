@@ -24,6 +24,29 @@ function captureKey(code) {
   setStatus("bindStatus", sub ? "assignedSub" : idx ? "assignedRight" : "assignedLeft");
   updateKeyUI(); updateTouchKeys();
 }
+let menuBinding = null;
+function syncMenuKeyUI() {
+  const value = $("menuReturnKeyValue"), button = $("menuReturnKeyAssign"), confirmCheck = $("menuReturnConfirmCheck");
+  if (value) value.textContent = formatKey(settings.menuKey);
+  if (button) button.classList.toggle("listening", menuBinding !== null);
+  if (confirmCheck) confirmCheck.checked = settings.menuConfirm !== false;
+}
+function captureMenuKey(code) {
+  if (menuBinding === null) return;
+  if (code === "Escape") { menuBinding = null; syncMenuKeyUI(); return; }
+  const used = [...(settings.keys || []), ...(settings.subKeys || []), ...(settings.videoKeys || []), settings.menuKey, settings.mediaExitKey];
+  if (RESERVED.has(code) || (used.includes(code) && code !== settings.menuKey)) return;
+  settings.menuKey = code; menuBinding = null; saveUserPrefs(); syncMenuKeyUI();
+}
+function requestMenuReturn() {
+  if (phase === "title" && screen === "select") return;
+  const go = () => { if (typeof toTitle === "function") toTitle(); else if (typeof closeSettings === "function") closeSettings(); };
+  if (settings.menuConfirm === false || typeof confirm !== "function") { go(); return; }
+  const wasPlaying = phase === "playing";
+  if (wasPlaying) pauseGame();
+  if (confirm(tr("menuReturnConfirm"))) go();
+  else if (wasPlaying) resumeGame();
+}
 
 /* ---------- 全画面 ---------- */
 const fullscreenSupported = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
@@ -56,6 +79,7 @@ function nudgeLatency(d) {
 /* ---------- キーボード ---------- */
 addEventListener("keydown", e => {
   if (window._trkSynthModeOpen || window._trkMediaPlayerOpen) return;
+  if (menuBinding !== null) { e.preventDefault(); captureMenuKey(e.code); return; }
   if (bindingSlot !== null) { e.preventDefault(); captureKey(e.code); return; }
   if (phase === "playing") {
     const slot = slotOfKey(e.code);
@@ -69,6 +93,7 @@ addEventListener("keydown", e => {
   const typing = t && (t.tagName === "TEXTAREA" || t.tagName === "SELECT" ||
     (t.tagName === "INPUT" && !["range", "checkbox", "file", "button", "color"].includes(t.type)));
   if (typing) return;
+  if (e.code === settings.menuKey) { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat) requestMenuReturn(); return; }
   if (e.code === "KeyP" || e.code === "Escape") {
     if (phase === "playing") { e.preventDefault(); pauseGame(); }
     else if (phase === "paused") { e.preventDefault(); resumeGame(); }
@@ -164,6 +189,7 @@ function showFxPower() { $("fxPowerVal").textContent = Math.round(settings.fxPow
 $("fxPower").addEventListener("input", e => { settings.fxPower = Number(e.target.value); showFxPower(); saveUserPrefs(); });
 $("gameFxMode").addEventListener("change", e => { settings.gameFxMode = e.target.value; saveUserPrefs(); emit("options"); });
 $("hideGameplayUI").addEventListener("change", e => { settings.hideGameplayUI = e.target.checked; saveUserPrefs(); });
+$("helpText").addEventListener("change", e => { settings.helpText = e.target.checked; document.body.classList.toggle("helpTextOff", !settings.helpText); saveUserPrefs(); });
 $("errorMeter").addEventListener("change", e => { settings.errorMeter = e.target.checked; saveUserPrefs(); });
 $("playerMode").addEventListener("change", e => { settings.playerMode = e.target.checked; setPhase(phase); saveUserPrefs(); });
 
@@ -222,6 +248,11 @@ $("cover").addEventListener("input", e => {
 
 /* ---------- 設定画面：操作 ---------- */
 $("reverseHands").addEventListener("change", e => { settings.reverseHands = e.target.checked; updateKeyUI(); updateTouchKeys(); saveUserPrefs(); });
+$("menuReturnKeyAssign").addEventListener("click", () => { menuBinding = 0; syncMenuKeyUI(); });
+$("menuReturnConfirmCheck").addEventListener("change", e => { settings.menuConfirm = e.target.checked; saveUserPrefs(); });
+$("helpText").checked = settings.helpText !== false;
+$("helpText").dispatchEvent(new Event("change"));
+syncMenuKeyUI();
 $("latency").addEventListener("change", () => {
   const v = Number($("latency").value);
   settings.latency = isFinite(v) ? Math.max(-300, Math.min(500, Math.round(v))) : 0;

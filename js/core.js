@@ -98,6 +98,11 @@ const settings = {
   reverseHands: !!prefs.reverseHands,
   hideGameplayUI: !!prefs.hideGameplayUI,
   playerMode: !!prefs.playerMode,
+  helpText: prefs.helpText !== false,
+  menuKey: validCode(prefs.menuKey) ? prefs.menuKey : "KeyM",
+  menuConfirm: prefs.menuConfirm !== false,
+  mediaExitKey: validCode(prefs.mediaExitKey) ? prefs.mediaExitKey : "Escape",
+  mediaExitConfirm: prefs.mediaExitConfirm !== false,
   errorMeter: prefs.errorMeter !== false,
   keys: bootKeys,
   subKeys: bootSub,
@@ -186,7 +191,7 @@ const gameplayFxPower = () => settings.fxPower * gameplayFxMultiplier();
    ノーツ設定は細かく詰める人が多いので、tv/audioリセットでは保持される。 */
 function resetVideoPrefs() {
   settings.videoStyle = "color";
-  settings.videoZoom = 1; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.castPolicy = "off"; settings.fxAntenna = false; settings.mediaLoopTrigger = "toggle"; settings.mediaWallTrigger = "toggle"; settings.mediaWallStyle = "midnight"; settings.mediaWallClock = true; settings.mediaWallStopsVideo = true;
+  settings.videoZoom = 1; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.castPolicy = "off"; settings.fxAntenna = false; settings.mediaLoopTrigger = "toggle"; settings.mediaWallTrigger = "toggle"; settings.mediaWallStyle = "midnight"; settings.mediaWallClock = true; settings.mediaWallStopsVideo = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true;
   settings.bgDim = 0; settings.bgBlur = 0;
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = true;
@@ -245,7 +250,7 @@ function enterSafeMode() {
 }
 function resetAllPrefs() {
   resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs();
-  settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.errorMeter = true;
+  settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
   settings.catchNitroBonus = true; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();
   settings.judge = "standard"; settings.rate = 1;

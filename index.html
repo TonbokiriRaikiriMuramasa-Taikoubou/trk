@@ -740,6 +740,26 @@
             <div class="hint" data-i18n="quickRetryHint"></div>
             <!-- player.js がここに「⏯ 再生の操作」と区間リピートを追加します -->
 
+            <details id="navigationKeysPanel" class="subPanel">
+              <summary data-i18n="navKeysTitle"></summary>
+              <div class="keyRows">
+                <div class="keyRow">
+                  <strong data-i18n="menuReturnKey"></strong><span class="keyValue" id="menuReturnKeyValue"></span>
+                  <button id="menuReturnKeyAssign" type="button" data-i18n="assign"></button>
+                </div>
+                <div class="keyRow">
+                  <strong data-i18n="mediaExitKey"></strong><span class="keyValue" id="mediaExitKeyValue"></span>
+                  <button id="mediaExitKeyAssign" type="button" data-i18n="assign"></button>
+                </div>
+              </div>
+              <label class="check"><input id="menuReturnConfirmCheck" type="checkbox"><span data-i18n="menuReturnConfirmToggle"></span></label>
+              <label class="check"><input id="mediaExitConfirmCheck" type="checkbox"><span data-i18n="mediaExitConfirmToggle"></span></label>
+              <div class="hint" data-i18n="navKeysHint"></div>
+            </details>
+
+            <label class="check"><input id="helpText" type="checkbox"><span data-i18n="helpText"></span></label>
+            <div class="hint" data-i18n="helpTextHint"></div>
+
             <!-- 🚚🎪🚛 各モードの操作キー（TRUCK・STAGE・CATCH・速度） -->
             <details id="modeControlsPanel" class="subPanel">
               <summary data-i18n="modeKeysTitle"></summary>

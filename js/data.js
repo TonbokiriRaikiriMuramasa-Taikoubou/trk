@@ -360,6 +360,21 @@ const SKINS = {
       inkShadow:"rgba(0,0,0,.85)",noteBorder:"#ffffff",panel:"rgba(18,14,40,.95)",perfect:"#fff1c4",good:"#fdf6e3",miss:"#7d7296",glow:true},
     shapes:["circle","circle"], video:"grayscale(1) contrast(1.45) sepia(1) hue-rotate(200deg) saturate(1.6) brightness(.6)",
     font:'Georgia,"Noto Serif JP","Noto Serif SC",serif'
+  },
+
+  /* 🎓 ごほうびスキン：チュートリアルのスタンプを5つ集めると解禁（core.js で鍵を管理）。
+     それまではスキンの棚に「❓ ？？？」の正体不明カードとして並びます */
+  graduation: {
+    cat:["grad","fun"], locked:true,
+    label:{ja:"グラデュエーション",en:"Graduation",zh:"毕业典礼",ko:"졸업"},
+    desc:{ja:"🎓 卒業おめでとう！夜明けの金色へ",en:"🎓 Congrats, graduate! Into the golden dawn",zh:"🎓 毕业快乐！迈向金色黎明",ko:"🎓 졸업 축하! 금빛 새벽으로"},
+    ui:{"--ui-bg":"linear-gradient(180deg,#0b1030 0%,#2c2160 52%,#c99a2e 100%)","--ui-panel":"rgba(17,14,40,.96)","--ui-soft":"rgba(255,209,102,.06)","--ui-text":"#fdf6e3",
+      "--ui-muted":"#cabfe0","--ui-border":"rgba(255,209,102,.34)","--ui-button":"#191437","--ui-button-hover":"#241c4e",
+      "--ui-field":"#120e2c","--ui-accent":"#ffd166","--ui-on-accent":"#241a04","--ui-gold":"#ffe9a8",
+      "--ui-shadow":"0 24px 80px rgba(0,0,0,.55)","--ui-glow":"rgba(255,209,102,.16)"},
+    game:{don:"#ffd166",ka:"#6fa8ff",stage:"linear-gradient(180deg,#0a0e28 0%,#241b52 55%,#b8892a 100%)",lane:"rgba(8,6,24,.62)",track:"rgba(255,209,102,.32)",ink:"#fdf6e3",
+      inkShadow:"rgba(0,0,0,.85)",noteBorder:"#ffffff",panel:"rgba(15,12,36,.95)",perfect:"#ffe9a8",good:"#fdf6e3",miss:"#8d84a8",glow:true},
+    shapes:["circle","circle"], video:"grayscale(1) contrast(1.5) sepia(1) hue-rotate(18deg) saturate(1.4) brightness(.55)"
   }
 };
 

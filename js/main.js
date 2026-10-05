@@ -48,17 +48,93 @@ function requestMenuReturn() {
   else if (wasPlaying) resumeGame();
 }
 
-/* ---------- チュートリアル完了（Seed欄に trk! ） ---------- */
+/* ---------- 🧭 チュートリアル（trk!で完了 ＋ スタンプラリー） ----------
+   Seed欄に trk! を打ち込んだ瞬間に完了（取り逃しなし・スキップも自由）。
+   スタンプは「おまけの実績」で、曲を選ぶ・見た目を変える・1曲遊ぶ・設定を開く＋trk! の
+   5つを揃えると、ごほうびスキン「🎓グラデュエーション」が解禁されます（順番自由）。 */
+const GUIDE_STAMPS = ["song", "look", "play", "safe", "seed"];
+let guideNoteTimer = 0, guideCelebTimer = 0, guideCelebPending = null;
 function syncTutorialUI() {
-  $("quickGuide").hidden = settings.tutorialDone === true;
+  const g = $("quickGuide");
+  g.hidden = settings.tutorialDone === true;
+  renderGuideStamps();
 }
-function completeTutorialFromSeed() {
+function guideStampsDone() { return GUIDE_STAMPS.every(id => settings.tutorialStamps.includes(id)); }
+function renderGuideStamps() {
+  const g = $("quickGuide"); if (!g) return;
+  const prog = $("guideProgress");
+  if (prog) prog.textContent = settings.tutorialDone ? "" : `（${settings.tutorialStamps.length}/${GUIDE_STAMPS.length}）`;
+  g.querySelectorAll(".guideStep[data-mission]").forEach(st => {
+    st.classList.toggle("stamped", settings.tutorialStamps.includes(st.dataset.mission));
+  });
+}
+function guideNote(key) {   /* ガイドの下に小さく知らせる（2.6秒で消える） */
+  const note = $("guideNote"); if (!note) return;
+  note.textContent = tr(key);
+  note.hidden = false;
+  clearTimeout(guideNoteTimer);
+  guideNoteTimer = setTimeout(() => { note.hidden = true; }, 2600);
+}
+function guideStamp(id, messageKey) {   /* スタンプを1つ押す（重複なし・順番自由・スキップ後も集められる） */
+  if (!GUIDE_STAMPS.includes(id) || settings.tutorialStamps.includes(id)) return;
+  settings.tutorialStamps.push(id);
+  saveUserPrefs();
+  renderGuideStamps();
+  if (messageKey && !settings.tutorialDone) guideNote(messageKey);
+  if (guideStampsDone()) unlockRewardSkin();
+}
+function unlockRewardSkin() {   /* 🎓 5つ揃った！ごほうびスキンを解禁してお祝い */
+  if (settings.skinGradUnlocked) return;
+  settings.skinGradUnlocked = true;
+  saveUserPrefs();
+  if (typeof buildSkinGrid === "function") { buildSkinGrid(); if (typeof buildSkinNow === "function") buildSkinNow(); }
+  celebrateGuide("guideReward", "guideRewardMsg");
+}
+function completeTutorialFromSeed() {   /* Seed欄に trk! → 打ち込んだ瞬間に完了 */
   if (settings.tutorialDone) return;
   if ($("seed").value.trim().toLowerCase() !== "trk!") return;
   settings.tutorialDone = true;
+  const unlocked = settings.skinGradUnlocked;
+  guideStamp("seed", "");   /* 5つ目なら、ここでごほうび解禁のお祝いが出る */
   saveUserPrefs();
   syncTutorialUI();
+  if (settings.skinGradUnlocked === unlocked) celebrateGuide("guideDone", guideStampsDone() ? "" : "guideDoneMsg");
 }
+function celebrateGuide(titleKey, msgKey) {   /* 🎉 お祝いポップアップ（プレイ中なら選曲へ戻ってから） */
+  if (phase === "playing" || phase === "paused") { guideCelebPending = [titleKey, msgKey]; return; }
+  const box = $("guideCelebrate"); if (!box) return;
+  $("guideCelebTitle").textContent = tr(titleKey);
+  const msg = $("guideCelebMsg");
+  msg.textContent = msgKey ? tr(msgKey) : ""; msg.hidden = !msgKey;
+  box.hidden = false;
+  box.classList.remove("play"); void box.offsetWidth;   /* アニメを最初からやり直す */
+  box.classList.add("play");
+  clearTimeout(guideCelebTimer);
+  guideCelebTimer = setTimeout(() => { box.hidden = true; box.classList.remove("play"); }, 4500);
+}
+/* スタンプの検知：曲を選ぶ／1曲遊ぶ／設定を開く */
+on("songSelected", () => guideStamp("song", "guideStampSong"));
+on("phase", p => {
+  if (p === "playing") guideStamp("play", "guideStampPlay");
+  if (p === "title" && guideCelebPending) { const c = guideCelebPending; guideCelebPending = null; celebrateGuide(c[0], c[1]); }
+});
+on("settings", () => guideStamp("safe", "guideStampSafe"));
+/* スタンプの検知：見た目を変える（スキンは保存するときだけ・エフェクトは選んだ瞬間） */
+{
+  const applySkinOrig = applySkin;
+  applySkin = (id, persist) => { const r = applySkinOrig(id, persist); if (persist !== false) guideStamp("look", "guideStampLook"); return r; };
+  if (window.TrkFX) for (const name of ["select", "random"]) {
+    const orig = window.TrkFX[name];
+    if (typeof orig === "function") window.TrkFX[name] = (...a) => { const r = orig(...a); guideStamp("look", "guideStampLook"); return r; };
+  }
+}
+/* スキップ（もう知っている人へ）ともう一度（⚙設定の見た目から） */
+$("guideSkip").addEventListener("click", () => { settings.tutorialDone = true; saveUserPrefs(); syncTutorialUI(); });
+$("tutorialReplayBtn").addEventListener("click", () => {
+  settings.tutorialDone = false; saveUserPrefs(); syncTutorialUI();
+  const g = $("quickGuide"); if (g) g.open = true;
+  if (typeof closeSettings === "function") closeSettings();
+});
 
 /* ---------- 全画面 ---------- */
 const fullscreenSupported = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);

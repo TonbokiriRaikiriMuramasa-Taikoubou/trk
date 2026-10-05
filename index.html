@@ -109,16 +109,24 @@
       </header>
 
       <details id="quickGuide" class="panel quickGuide" open>
-        <summary data-i18n="guideTitle"></summary>
+        <summary><span data-i18n="guideTitle"></span> <span id="guideProgress" class="guideProgress"></span></summary>
         <p class="hint" data-i18n="guideHint"></p>
         <div class="guideGrid">
-          <div class="guideStep"><b data-i18n="guideSongTitle"></b><span data-i18n="guideSong"></span></div>
-          <div class="guideStep"><b data-i18n="guideLookTitle"></b><span data-i18n="guideLook"></span></div>
-          <div class="guideStep"><b data-i18n="guideTruckTitle"></b><span data-i18n="guideTruck"></span></div>
-          <div class="guideStep"><b data-i18n="guideSafeTitle"></b><span data-i18n="guideSafe"></span></div>
-          <div class="guideStep"><b data-i18n="guideSeedTitle"></b><span data-i18n="guideSeed"></span></div>
+          <div class="guideStep" data-mission="song"><i class="guideStamp"></i><b data-i18n="guideSongTitle"></b><span data-i18n="guideSong"></span></div>
+          <div class="guideStep" data-mission="look"><i class="guideStamp"></i><b data-i18n="guideLookTitle"></b><span data-i18n="guideLook"></span></div>
+          <div class="guideStep" data-mission="play"><i class="guideStamp"></i><b data-i18n="guideTruckTitle"></b><span data-i18n="guideTruck"></span></div>
+          <div class="guideStep" data-mission="safe"><i class="guideStamp"></i><b data-i18n="guideSafeTitle"></b><span data-i18n="guideSafe"></span></div>
+          <div class="guideStep" data-mission="seed"><i class="guideStamp"></i><b data-i18n="guideSeedTitle"></b><span data-i18n="guideSeed"></span></div>
+        </div>
+        <div class="guideFoot">
+          <span id="guideNote" class="guideNote" hidden></span>
+          <button id="guideSkip" class="guideSkip" type="button" data-i18n="guideSkip"></button>
         </div>
       </details>
+
+      <div id="guideCelebrate" hidden>
+        <div class="guideCelebCard"><b id="guideCelebTitle"></b><span id="guideCelebMsg"></span></div>
+      </div>
 
       <div class="selectGrid">
         <!-- 左：曲リスト -->
@@ -776,6 +784,7 @@
 
             <label class="check"><input id="helpText" type="checkbox"><span data-i18n="helpText"></span></label>
             <div class="hint" data-i18n="helpTextHint"></div>
+            <div class="hint"><button id="tutorialReplayBtn" type="button" data-i18n="tutorialReplay"></button></div>
 
             <!-- 🚚🎪🚛 各モードの操作キー（TRUCK・STAGE・CATCH・速度） -->
             <details id="modeControlsPanel" class="subPanel">

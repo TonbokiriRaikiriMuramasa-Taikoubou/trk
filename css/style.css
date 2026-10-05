@@ -121,6 +121,34 @@ input[type=color]{width:52px;height:34px;padding:2px;border:1px solid var(--ui-b
 .guideGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px}
 .guideStep{display:flex;flex-direction:column;gap:4px;padding:10px;border:1px solid var(--ui-border);border-radius:12px;background:rgba(0,0,0,.12);font-size:13px;line-height:1.45}
 .guideStep b{color:var(--ui-text);font-size:14px}.guideStep span{color:var(--ui-muted)}
+/* 🧭 チュートリアルのスタンプラリー（試した瞬間にスタンプが押される） */
+.guideProgress{font-size:12px;opacity:.75;font-weight:600}
+.guideStep{position:relative}
+.guideStep .guideStamp{position:absolute;top:9px;right:10px;width:20px;height:20px;border:1.5px solid var(--ui-border);border-radius:50%;pointer-events:none}
+.guideStep.stamped{border-color:var(--ui-gold);background:rgba(255,209,102,.07)}
+.guideStep.stamped .guideStamp{border-color:var(--ui-gold);background:var(--ui-gold);animation:guideStampPop .45s ease}
+.guideStep.stamped .guideStamp::before{content:"✓";display:block;font-size:11px;font-weight:900;line-height:17px;text-align:center;color:var(--ui-on-accent,#111)}
+@keyframes guideStampPop{0%{transform:scale(.2) rotate(-30deg)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+.guideFoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;min-height:30px}
+.guideNote{font-size:12.5px;color:var(--ui-gold);font-weight:700;animation:guideNoteIn .3s ease}
+@keyframes guideNoteIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.guideSkip{padding:6px 14px;font-size:12.5px;opacity:.85}
+/* 🎉 チュートリアル完了／ごほうび解禁のお祝い */
+#guideCelebrate{position:fixed;inset:0;z-index:90;display:grid;place-items:center;pointer-events:none;background:rgba(0,0,0,.35);opacity:0;transition:opacity .25s}
+#guideCelebrate[hidden]{display:none}
+#guideCelebrate.play{opacity:1}
+.guideCelebCard{position:relative;display:flex;flex-direction:column;gap:8px;align-items:center;padding:26px 44px;border:1px solid var(--ui-gold);border-radius:18px;background:linear-gradient(160deg,rgba(20,18,40,.97),rgba(10,10,24,.97));box-shadow:0 0 60px rgba(255,209,102,.35),inset 0 0 30px rgba(255,209,102,.08);text-align:center}
+#guideCelebrate.play .guideCelebCard{animation:guideCelebIn .55s cubic-bezier(.2,1.4,.4,1)}
+.guideCelebCard b{font-size:21px;color:var(--ui-gold)}
+.guideCelebCard span{font-size:14px;color:var(--ui-text);max-width:340px;line-height:1.5}
+.guideCelebCard::before,.guideCelebCard::after{content:"✦";position:absolute;color:var(--ui-gold);font-size:18px;opacity:0}
+#guideCelebrate.play .guideCelebCard::before{left:14px;top:12px;animation:guideSparkle 1.1s ease infinite .2s}
+#guideCelebrate.play .guideCelebCard::after{right:16px;bottom:14px;animation:guideSparkle 1.3s ease infinite .5s}
+@keyframes guideCelebIn{0%{transform:scale(.5);opacity:0}65%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+@keyframes guideSparkle{0%,100%{transform:scale(.6) rotate(0);opacity:.4}50%{transform:scale(1.25) rotate(20deg);opacity:1}}
+/* 🔒 ごほうびスキンの謎カード（スタンプ5つで解禁） */
+.skinCard.locked{opacity:.7;cursor:default;filter:saturate(.35)}
+.skinCard.locked:hover{background:var(--ui-button);border-color:var(--ui-border);color:var(--ui-muted)}
 .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:24px;margin-top:20px;align-items:start}
 .col{display:flex;flex-direction:column;gap:16px}
 .panel{border:1px solid var(--ui-border);border-radius:18px;background:var(--ui-soft);padding:16px 20px}

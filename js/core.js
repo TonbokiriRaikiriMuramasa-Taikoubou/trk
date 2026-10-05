@@ -103,6 +103,8 @@ const settings = {
   playerMode: !!prefs.playerMode,
   helpText: prefs.helpText !== false,
   tutorialDone: prefs.tutorialDone === true,
+  tutorialStamps: (Array.isArray(prefs.tutorialStamps) ? prefs.tutorialStamps : []).filter(x => ["song", "look", "play", "safe", "seed"].includes(x)),   /* 🧭 スタンプラリー（順番自由・5つでごほうび） */
+  skinGradUnlocked: prefs.skinGradUnlocked === true,
   menuKey: validCode(prefs.menuKey) ? prefs.menuKey : "KeyM",
   menuConfirm: prefs.menuConfirm !== false,
   mediaExitKey: validCode(prefs.mediaExitKey) ? prefs.mediaExitKey : "Escape",
@@ -254,7 +256,7 @@ function enterSafeMode() {
 }
 function resetAllPrefs() {
   resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs();
-  settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
+  settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
   settings.catchNitroBonus = true; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();
   settings.judge = "standard"; settings.rate = 1;
@@ -564,6 +566,12 @@ function buildSkinGrid() {
   const count = $("skinShelfCount"); if (count) count.textContent = `（${Object.keys(SKINS).length}）`;
   for (const [id, s] of Object.entries(SKINS)) {
     if (cat !== "all" && !skinCatList(s).includes(cat)) continue;
+    if (s.locked && !settings.skinGradUnlocked) {   /* ❓ ごほうびスキン（スタンプ5つで解禁）は、正体不明カードで出す */
+      const q = el("button", "skinCard locked"); q.type = "button"; q.disabled = true; q.title = tr("skinLockedHint");
+      q.style.setProperty("--sk-bg", "#10142a"); q.style.setProperty("--sk-text", "var(--ui-muted)"); q.style.setProperty("--sk-border", "var(--ui-border)");
+      q.append(el("b", "", "❓ ？？？"), el("small", "", tr("skinLockedHint")));
+      grid.append(q); continue;
+    }
     const b = el("button", "skinCard"); b.type = "button"; b.dataset.skin = id;
     b.style.setProperty("--sk-bg", s.game.stage); b.style.setProperty("--sk-text", s.ui["--ui-text"]);
     b.style.setProperty("--sk-border", s.ui["--ui-border"]);
@@ -591,6 +599,7 @@ function applyNoteVars() {
   root.setProperty("--don", settings.notes[0].color); root.setProperty("--ka", settings.notes[1].color);
 }
 function applySkin(id, persist = true) {
+  if (SKINS[id] && SKINS[id].locked && !settings.skinGradUnlocked) id = "shadow";   /* 🔒 ごほうびスキンは、スタンプ5つで解禁されるまで当てられない */
   settings.skin = SKINS[id] ? id : "shadow";
   const s = skin(), root = document.documentElement.style;
   for (const [k, v] of Object.entries(s.ui)) root.setProperty(k, v);
@@ -709,7 +718,7 @@ function showScreen(id) {
   stage.dataset.screen = id || "none";
   emit("screen", id);
 }
-function openSettings() { if (phase === "title") showScreen("settingsScreen"); }
+function openSettings() { if (phase === "title") { showScreen("settingsScreen"); emit("settings"); } }   /* 🧭 スタンプ「設定を見た」の検知 */
 function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
 
 /* ---------- 緊急復旧パネルのボタン ---------- */

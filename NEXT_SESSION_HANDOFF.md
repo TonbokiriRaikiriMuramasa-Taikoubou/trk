@@ -6,7 +6,7 @@
 ## 現在地
 
 - 作業ブランチ：`arena/01a10940-trk`
-- 直近の機能コミット：`4bdc263 docs: update session handoff`
+- 直近の機能コミット：`0f22243 feat: add Loop Lab media presets`
 - 今回の追加対象：メディアプレーヤーのLoop Lab（クイック／ランダム区間、曲別A-Bプリセット）
 - Loop Labの変更対象：`js/media-player-mode.js`、`css/style.css`、`README.md`、`docs/HANDOFF.md`。切り取り・変換・書き出し・外部アップロードは実装しない
 - 公開URL：<https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/>

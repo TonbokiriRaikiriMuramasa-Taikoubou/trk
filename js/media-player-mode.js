@@ -185,13 +185,21 @@ function deleteMediaLoopPreset(index) {
   if (list.length) mediaLoopPresets[key] = list; else delete mediaLoopPresets[key];
   saveMediaLoopStore(); renderLoopUI();
 }
+function syncLoopPresetSelection() {
+  if (!loopPresetListNode) return;
+  const list = storedMediaLoops();
+  loopPresetListNode.querySelectorAll(".mediaLoopPreset").forEach((button, i) => {
+    const x = list[i], selected = !!x && loopHasRange() && Math.abs(x.a - loopA) < .11 && Math.abs(x.b - loopB) < .11;
+    button.classList.toggle("selected", selected); button.setAttribute("aria-pressed", String(selected));
+  });
+}
 function renderLoopPresets() {
   if (!loopPresetListNode) return;
   const key = mediaLoopStoreKey(), list = storedMediaLoops(), sig = list.map(x => `${x.a}:${x.b}`).join("|");
   if (loopPresetRenderKey === key && loopPresetRenderSig === sig) {
     if (loopSaveNode) loopSaveNode.disabled = !loopHasRange();
     if (loopClearPresetsNode) loopClearPresetsNode.disabled = !list.length;
-    return;
+    syncLoopPresetSelection(); return;
   }
   loopPresetRenderKey = key; loopPresetRenderSig = sig; loopPresetListNode.textContent = "";
   if (!list.length) loopPresetListNode.append(el("span", "hint", tr("mediaLoopNoPresets")));
@@ -204,6 +212,7 @@ function renderLoopPresets() {
   });
   if (loopSaveNode) loopSaveNode.disabled = !loopHasRange();
   if (loopClearPresetsNode) loopClearPresetsNode.disabled = !list.length;
+  syncLoopPresetSelection();
 }
 function renderLoopUI() {
   if (loopStatusNode) loopStatusNode.textContent = loopStatusText();

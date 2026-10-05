@@ -268,6 +268,16 @@ details.panel[open]>summary{margin-bottom:14px}
 .packCreditTagline,.packCreditRights,.packCreditLicense,.packCreditHandle{margin:4px 0;font-size:12px;line-height:1.45;white-space:pre-wrap}
 .packCreditRights{color:#b8f0d0}.packCreditLicense{color:#bfe8ff}.packCreditHandle{color:#d7c1ff}
 .packCreditUrl{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.packCreditDisclaimer{margin:8px 0 0;color:var(--ui-muted);font-size:11px;line-height:1.45}
+.packContributorsTitle{margin:10px 0 4px;color:var(--ui-text);font-size:13px}
+.packContributors{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.packContributor{padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.035);font-size:12px;line-height:1.45}
+.packContributorHead{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.packContributorName{color:var(--ui-text)}
+.packContributorRole{color:#ffd166;font-size:11px}
+.packContributorRights{color:#b8f0d0}.packContributorLicense{color:#bfe8ff}.packContributorHandle{color:#d7c1ff}
+.packContributorUrl{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ui-accent)}
+.packCreditDownload{margin-top:10px;padding:6px 9px;font-size:12px}
 .incList{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
 .incList .check{font-size:15px;margin:6px 0}
 

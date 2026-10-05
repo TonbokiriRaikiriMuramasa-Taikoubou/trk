@@ -63,7 +63,7 @@ VRMはVRM 1.0を想定しています。MMDモデル（`.pmx` / `.pmd`）や `.v
 
 ### 権利カード（`creditCard`）
 
-`creditCard` は任意の「権利カード／名刺」欄です。パック一覧で折りたたみ表示され、作者名・肩書き・ひとこと・権利メモ・利用条件・配布ページを一つにまとめられます。画像を持たないテキスト形式なので、カード自体に別の素材ライセンスは発生しません。
+`creditCard` は任意の「権利カード／名刺」欄です。パック一覧で折りたたみ表示され、作者名・肩書き・ひとこと・権利メモ・利用条件・配布ページを一つにまとめられます。`contributors` を使うと、役割や権利メモの異なる共同制作者を最大12人まで記載できます。画像を持たないテキスト形式なので、カード自体に別の素材ライセンスは発生しません。
 
 ```json
 {
@@ -75,7 +75,17 @@ VRMはVRM 1.0を想定しています。MMDモデル（`.pmx` / `.pmd`）や `.v
     "rights": "Redistribution allowed with credit",
     "license": "CC BY 4.0",
     "handle": "example_p",
-    "url": "https://example.com/example_p"
+    "url": "https://example.com/example_p",
+    "contributors": [
+      {
+        "name": "Example Q",
+        "role": "Illustrator",
+        "rights": "Artwork may be shared with this pack",
+        "license": "CC BY 4.0",
+        "handle": "example_q",
+        "url": "https://example.com/example_q"
+      }
+    ]
   }
 }
 ```
@@ -89,8 +99,15 @@ VRMはVRM 1.0を想定しています。MMDモデル（`.pmx` / `.pmd`）や `.v
 | `license` | string | ライセンス名や利用条件、200文字まで |
 | `handle` | string | SNS等の表示用ハンドル、80文字まで。自動リンクはしません |
 | `url` | string | `https://` の配布ページ、200文字まで |
+| `contributors` | array | 共同制作者、最大12件。各要素は `name` 必須で、`role` / `rights` / `license` / `handle` / `url` を持てます |
 
 言語オブジェクトは `{"ja":"日本語", "en":"English"}` のように書きます。表示言語に該当する値がなければ英語、次に日本語などへフォールバックします。`creditCard` は権利の証明そのものではないため、必要な原文ReadMeや正式なライセンス文書はパック内または配布ページに残してください。
+
+### 自動生成ファイル
+
+trk! の書き出し機能は、`pack.json` と `README.txt` に加えて、`creditCard` の内容をまとめた `CREDITS.md` をパックのルートに自動生成します。共同制作者ごとに名前、役割、権利メモ、ライセンス、ハンドル、URLを記載します。これは作者申告の要約であり、原文ライセンスや同梱ReadMeの代わりにはなりません。インポート時は `pack.json` の宣言と実ファイルを正本として扱い、`CREDITS.md` は再エクスポート時にも生成し直されます。
+
+パック一覧で権利カードを開くと、contributors を確認でき、パック名と作者名を含むテキストのみのSVG名刺をダウンロードできます。SVGは外部画像や外部リソースを参照しません。
 
 ### 見た目
 

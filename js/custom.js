@@ -201,6 +201,17 @@ function sanitizeSong(r, i) {
   }
   return s;
 }
+function sanitizeCreditPerson(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const name = pstr(raw.name, 60); if (!name) return null;
+  const person = { name };
+  const role = langText(raw.role, 80); if (role) person.role = role;
+  const rights = langText(raw.rights, 240); if (rights) person.rights = rights;
+  const license = pstr(raw.license, 200); if (license) person.license = license;
+  const handle = pstr(raw.handle, 80); if (handle) person.handle = handle;
+  const url = pstr(raw.url, 200); if (/^https:\/\/[^\s"'<>]+$/.test(url)) person.url = url;
+  return person;
+}
 function sanitizeCreditCard(raw) {
   if (!raw || typeof raw !== "object") return null;
   const name = pstr(raw.name, 60); if (!name) return null;
@@ -211,6 +222,9 @@ function sanitizeCreditCard(raw) {
   const license = pstr(raw.license, 200); if (license) card.license = license;
   const handle = pstr(raw.handle, 80); if (handle) card.handle = handle;
   const url = pstr(raw.url, 200); if (/^https:\/\/[^\s"'<>]+$/.test(url)) card.url = url;
+  const contributors = (Array.isArray(raw.contributors) ? raw.contributors : []).slice(0, 12)
+    .map(sanitizeCreditPerson).filter(Boolean);
+  if (contributors.length) card.contributors = contributors;
   return card;
 }
 function sanitizeManifest(raw) {
@@ -421,7 +435,8 @@ https://github.com/  (← 配布するときは、リポジトリのURLに書き
 ・曲：MP3／M4A／OGG／OPUS／WAV／FLAC／AAC／MP4／WebM（250MBまで）、譜面JSON（2MBまで）、1パック50曲まで
 ・譜面は MANUAL／TRUCK／ORBIT／STAGE／CATCH のどのモードでも共通で使われます。
 ・VRM：VRM 1.0 のみ（200MBまで）／モーション：.vrma（30MBまで）
-・pack.json の creditCard で、作者名・肩書き・権利メモ・利用条件を名刺のように表示できます（画像は含めません）。
+・pack.json の creditCard で、作者名・肩書き・権利メモ・利用条件を名刺のように表示できます。contributors で最大12人の共同制作者も記載できます（画像は含めません）。
+・書き出したパックには、creditCard から自動生成した CREDITS.md も入ります。trk! の一覧から共有用SVG名刺をダウンロードできます。
 ・自分に再配布の権利がある素材・曲だけを入れてください。
 ・trk! の画面にドロップするだけで追加できます。
 
@@ -434,13 +449,15 @@ https://github.com/  (← 配布するときは、リポジトリのURLに書き
 - Songs: MP3/M4A/OGG/OPUS/WAV/FLAC/AAC/MP4/WebM (max 250 MB), chart JSON (max 2 MB), up to 50 songs per pack
 - Charts are shared by every mode: MANUAL / TRUCK / ORBIT / STAGE / CATCH.
 - VRM: VRM 1.0 only (max 200 MB) / Motion: .vrma (max 30 MB)
-- Use optional creditCard in pack.json to show the creator, role, rights note and terms like a name card (text only; no image asset).
+- Use optional creditCard in pack.json to show the creator, role, rights note and terms like a name card. Add up to 12 contributors for co-creators (text only; no image asset).
+- Exported packs include a generated CREDITS.md; the pack list can also download a shareable SVG card.
 - Only include assets and songs you have the right to redistribute.
 - Drop the file onto the trk! window to install.
 `;
 function packToZip(man, files) {
   const entries = [{ name:"pack.json", blob:new Blob([JSON.stringify(man, null, 2)], { type:"application/json" }) },
-                   { name:"README.txt", blob:new Blob([PACK_README], { type:"text/plain" }) }];
+                   { name:"README.txt", blob:new Blob([PACK_README], { type:"text/plain" }) },
+                   { name:"CREDITS.md", blob:new Blob([creditCardMarkdown(man)], { type:"text/markdown;charset=utf-8" }) }];
   for (const [p, b] of Object.entries(files)) entries.push({ name:p, blob:b });
   return writeZip(entries);
 }
@@ -559,7 +576,38 @@ function creditCardText(value) {
   if (!value || typeof value !== "object") return "";
   return value[lang] || value.en || value.ja || value.zh || value.ko || "";
 }
-function appendPackCreditCard(parent, card) {
+function creditCardXml(value) {
+  return String(value || "").replace(/[&<>\"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '\"':"&quot;", "'":"&apos;" }[c]));
+}
+function creditCardMarkdownText(value) {
+  return String(value || "").replace(/[\r\n]+/g, " ").trim();
+}
+function creditCardSvg(card, packName = "") {
+  const lines = [card.name, creditCardText(card.role), creditCardText(card.tagline), card.license, creditCardText(card.rights), card.url]
+    .filter(Boolean).concat((card.contributors || []).map(p => `${p.name}${creditCardText(p.role) ? " · " + creditCardText(p.role) : ""}`));
+  const text = lines.slice(0, 14).map((line, i) => `<text x="64" y="${126 + i * 23}" class="${i === 0 ? "name" : i === 1 ? "role" : "line"}">${creditCardXml(line)}</text>`).join("");
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520" role="img" aria-label="trk! rights card"><defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#ff4c67"/><stop offset="1" stop-color="#67c8ff"/></linearGradient></defs><rect width="900" height="520" rx="36" fill="#101521"/><rect x="18" y="18" width="864" height="484" rx="28" fill="none" stroke="url(#g)" stroke-width="4"/><circle cx="790" cy="92" r="58" fill="#ff4c67" opacity=".16"/><circle cx="790" cy="92" r="34" fill="#67c8ff" opacity=".12"/><text x="64" y="72" class="eyebrow">TRK! RIGHTS CARD</text><text x="64" y="100" class="pack">${creditCardXml(packName || "trk! pack")}</text>${text}<text x="64" y="474" class="foot">Text-only credit card · keep the original license / ReadMe with the pack</text><style>.eyebrow{font:800 15px system-ui;letter-spacing:4px;fill:#8dd8ff}.pack{font:900 30px system-ui;fill:#fff}.name{font:800 25px system-ui;fill:#fff}.role{font:700 16px system-ui;fill:#ffd166}.line{font:500 16px system-ui;fill:#b9c8df}.foot{font:500 12px system-ui;fill:#71809a}</style></svg>`;
+}
+function creditCardMarkdown(man) {
+  const c = man.creditCard;
+  if (!c) return "# Credits\n\nNo credit card was supplied for this pack.\n";
+  const lines = [`# Credits — ${creditCardMarkdownText(man.name)}`, "", `- Name: ${creditCardMarkdownText(c.name)}`];
+  const add = (label, value) => { const text = creditCardMarkdownText(value); if (text) lines.push(`- ${label}: ${text}`); };
+  add("Role", creditCardText(c.role)); add("Tagline", creditCardText(c.tagline)); add("Rights", creditCardText(c.rights));
+  add("License", c.license); add("Handle", c.handle); add("URL", c.url);
+  if (c.contributors && c.contributors.length) {
+    lines.push("", "## Contributors");
+    for (const p of c.contributors) {
+      lines.push("", `### ${creditCardMarkdownText(p.name)}`);
+      const personAdd = (label, value) => { const text = creditCardMarkdownText(value); if (text) lines.push(`- ${label}: ${text}`); };
+      personAdd("Role", creditCardText(p.role)); personAdd("Rights", creditCardText(p.rights));
+      personAdd("License", p.license); personAdd("Handle", p.handle); personAdd("URL", p.url);
+    }
+  }
+  lines.push("", "> This card is a creator-provided summary, not a substitute for the original license or ReadMe.");
+  return lines.join("\n") + "\n";
+}
+function appendPackCreditCard(parent, card, packName = "") {
   if (!card || !card.name) return;
   const d = el("details", "packCreditCardBox");
   d.append(el("summary", "", tr("packCreditTitle")));
@@ -569,8 +617,29 @@ function appendPackCreditCard(parent, card) {
   const tagline = creditCardText(card.tagline); if (tagline) body.append(el("p", "packCreditTagline", tagline));
   const rights = creditCardText(card.rights); if (rights) body.append(el("p", "packCreditRights", "⚖ " + rights));
   if (card.license) body.append(el("p", "packCreditLicense", "▣ " + card.license));
-  if (card.handle) body.append(el("p", "packCreditHandle", "@" + card.handle));
+  if (card.handle) body.append(el("p", "packCreditHandle", (card.handle.startsWith("@") ? card.handle : "@" + card.handle)));
   if (card.url) { const a = el("a", "packCreditUrl", card.url); a.href = card.url; a.target = "_blank"; a.rel = "noopener noreferrer"; body.append(a); }
+  body.append(el("p", "packCreditDisclaimer", tr("packCreditDisclaimer")));
+  const contributors = card.contributors || [];
+  if (contributors.length) {
+    body.append(el("h4", "packContributorsTitle", tr("packContributors", { n:contributors.length })));
+    const list = el("ul", "packContributors");
+    for (const person of contributors) {
+      const item = el("li", "packContributor");
+      const head = el("div", "packContributorHead"); head.append(el("strong", "packContributorName", person.name));
+      const personRole = creditCardText(person.role); if (personRole) head.append(el("span", "packContributorRole", personRole));
+      item.append(head);
+      const personRights = creditCardText(person.rights); if (personRights) item.append(el("div", "packContributorRights", "⚖ " + personRights));
+      if (person.license) item.append(el("div", "packContributorLicense", "▣ " + person.license));
+      if (person.handle) item.append(el("div", "packContributorHandle", person.handle.startsWith("@") ? person.handle : "@" + person.handle));
+      if (person.url) { const a = el("a", "packContributorUrl", person.url); a.href = person.url; a.target = "_blank"; a.rel = "noopener noreferrer"; item.append(a); }
+      list.append(item);
+    }
+    body.append(list);
+  }
+  const download = el("button", "packCreditDownload", tr("packCreditDownload")); download.type = "button";
+  download.addEventListener("click", () => downloadBlob(new Blob([creditCardSvg(card, packName)], { type:"image/svg+xml;charset=utf-8" }), `${safeName(packName || card.name)}-rights-card.svg`));
+  body.append(download);
   d.append(body); parent.append(d);
 }
 async function renderPackList() {
@@ -593,7 +662,7 @@ async function renderPackList() {
     if (m.songs) badges.append(el("span", "packBadge", tr("badgeSongs", { n:m.songs.length })));
     if (m.creditCard) badges.append(el("span", "packBadge", tr("badgeCreditCard")));
     card.append(badges);
-    appendPackCreditCard(card, m.creditCard);
+    appendPackCreditCard(card, m.creditCard, m.name);
     if (m.license || m.url) {
       const d = el("details"); d.append(el("summary", "", tr("packLicenseLabel")));
       if (m.license) d.append(el("div", "", m.license));

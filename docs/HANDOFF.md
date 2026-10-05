@@ -611,6 +611,7 @@ records[指紋 "サイズ:長さ×10"] = {
 - [x] `privacy.html` とCapacitor用Web資産同期の土台（APKの実機確認・配布は未完了）
 - [x] `credits.html` の権利とクレジット図鑑、NOTICE / README / Handoffの第三者ライブラリ記載を同期
 - [x] `.stpack` の `creditCard`（権利カード／名刺）を追加。パック作成UI・曲パック作成UIから出力し、パック一覧で折りたたみ表示
+- [x] `creditCard.contributors`（最大12人）の表示、パック内 `CREDITS.md` 自動生成、共有用SVG名刺ダウンロードを追加。カードは作者申告の要約で、原文ライセンス／ReadMeを優先する
 - [x] アイコン成果物の静的確認：`icons/icon-192.png`（192×192）・`icons/icon-512.png`（512×512）・`docs/og.png` が存在する（`node tools/check-repo.mjs` で再確認）
 - [ ] `tools/make-icons.html` の生成手順を実機ブラウザで確認し、PWAアイコンと `docs/og.png` の表示を確認する
 - [ ] GitHub Pages を公開し、About（説明・Website・Topics）を入れる

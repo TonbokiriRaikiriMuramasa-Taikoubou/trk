@@ -140,7 +140,7 @@ const TEXT = {
     packVrmNoRedist:"このVRMは再配布が許可されていない可能性があります。確認のチェックが必要です。",
     packImgBad:"ノーツ画像は PNG／WebP／JPG（4MBまで）にしてください。",
     badgeSkin:"スキン", badgeNotes:"ノーツ", badgeSounds:"SE", badgeVrm:"VRM", badgeMotion:"モーション", badgeCaptions:"セリフ",
-    badgeSongs:"曲 {n}", badgeCreditCard:"💳 権利カード", packCreditTitle:"💳 権利カード（名刺）", packLicenseLabel:"利用条件",
+    badgeSongs:"曲 {n}", badgeCreditCard:"💳 権利カード", packCreditTitle:"💳 権利カード（名刺）", packContributors:"共同制作者（{n}人）", packCreditDownload:"名刺SVGをダウンロード", packCreditDisclaimer:"作者申告の要約です。正式なライセンス／ReadMeを優先してください。", packLicenseLabel:"利用条件",
 
     /* 曲パック */
     spTitle:"📦 この曲を曲パックにする",
@@ -337,7 +337,7 @@ const TEXT = {
     packVrmNoRedist:"This VRM may not allow redistribution. Please tick the confirmation.",
     packImgBad:"Note images must be PNG/WebP/JPG (max 4 MB).",
     badgeSkin:"Skin", badgeNotes:"Notes", badgeSounds:"SE", badgeVrm:"VRM", badgeMotion:"Motion", badgeCaptions:"Lines",
-    badgeSongs:"{n} songs", badgeCreditCard:"💳 Rights card", packCreditTitle:"💳 Rights card / name card", packLicenseLabel:"Terms",
+    badgeSongs:"{n} songs", badgeCreditCard:"💳 Rights card", packCreditTitle:"💳 Rights card / name card", packContributors:"Contributors ({n})", packCreditDownload:"Download shareable SVG card", packCreditDisclaimer:"Creator-provided summary; keep and follow the original license / ReadMe.", packLicenseLabel:"Terms",
 
     spTitle:"📦 Make a song pack from this song",
     spHint:"Bundles the audio, charts, background image and BPM into a .stpack. Only do this for songs you have the right to redistribute (your own music or assets that allow it).",
@@ -529,7 +529,7 @@ const TEXT = {
     packVrmNoRedist:"此VRM可能不允许再分发，请勾选确认。",
     packImgBad:"音符图片须为PNG/WebP/JPG（最大4MB）。",
     badgeSkin:"皮肤", badgeNotes:"音符", badgeSounds:"音效", badgeVrm:"VRM", badgeMotion:"动作", badgeCaptions:"台词",
-    badgeSongs:"歌曲 {n}", badgeCreditCard:"💳 权利卡片", packCreditTitle:"💳 权利卡片／名片", packLicenseLabel:"使用条款",
+    badgeSongs:"歌曲 {n}", badgeCreditCard:"💳 权利卡片", packCreditTitle:"💳 权利卡片／名片", packContributors:"共同创作者（{n}人）", packCreditDownload:"下载可分享的 SVG 名片", packCreditDisclaimer:"这是作者提供的摘要；请保留并遵守原始许可证／ReadMe。", packLicenseLabel:"使用条款",
 
     spTitle:"📦 把这首歌做成歌曲包",
     spHint:"将音源、谱面、背景图和BPM打包成.stpack。请只对您有权再分发的歌曲使用（原创曲或允许分发的素材）。",
@@ -720,7 +720,7 @@ const TEXT = {
     packVrmNoRedist:"이 VRM은 재배포가 허용되지 않을 수 있습니다. 확인에 체크해 주세요.",
     packImgBad:"노트 이미지는 PNG/WebP/JPG (최대 4MB)여야 합니다.",
     badgeSkin:"스킨", badgeNotes:"노트", badgeSounds:"효과음", badgeVrm:"VRM", badgeMotion:"모션", badgeCaptions:"대사",
-    badgeSongs:"곡 {n}", badgeCreditCard:"💳 권리 카드", packCreditTitle:"💳 권리 카드／명함", packLicenseLabel:"이용 조건",
+    badgeSongs:"곡 {n}", badgeCreditCard:"💳 권리 카드", packCreditTitle:"💳 권리 카드／명함", packContributors:"공동 제작자 ({n}명)", packCreditDownload:"공유용 SVG 명함 다운로드", packCreditDisclaimer:"제작자가 제공한 요약입니다. 원본 라이선스／ReadMe를 보관하고 따르세요.", packLicenseLabel:"이용 조건",
 
     spTitle:"📦 이 곡을 곡 팩으로 만들기",
     spHint:"음원・채보・배경 이미지・BPM을 .stpack으로 묶습니다. 재배포 권리가 있는 곡(자작곡이나 배포가 허용된 소재)만 사용하세요.",

@@ -18,6 +18,7 @@
 - `package.json`、`capacitor.config.ts`、`tools/prepare-mobile-web.mjs`、`docs/android.md` を追加し、同じWeb資産をCapacitorのAndroid WebViewへ同期する土台を整備。Androidプロジェクト・APKはまだ生成・配布していない。
 - `docs/pack-format.md` を追加し、`.stpack` / `pack.json` の形式、上限、`creditCard`（権利カード／名刺）形式、曲パック例、権利上の注意を文書化。
 - パック作成UIと曲パック作成UIから、作者名・肩書き・ひとこと・権利メモ・利用条件・URLを権利カードとして出力し、パック一覧で表示するようにした。
+- `creditCard.contributors`（最大12人）を後方互換のまま表示でき、書き出し時に `CREDITS.md` を自動生成し、パック一覧から共有用SVG名刺をダウンロードできるようにした。作者申告の要約であり、原文ライセンス／ReadMeの代替ではない。
 - `README.md` のプライバシー、APK準備、パック仕様、権利カードリンクと静的検査コマンドを追加。
 - `tools/check-repo.mjs` を追加。Node.jsだけで次を監査する。
   - `js/` 全ファイルの構文

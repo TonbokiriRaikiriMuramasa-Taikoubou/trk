@@ -21,11 +21,12 @@ Object.assign(TEXT.ja, {
   mediaQueue:"再生キュー", mediaQueueHint:"曲を選ぶと、この画面を閉じずに再生します。曲リストに追加した音源・共有フォルダ・曲パックをまとめて扱えます。",
   mediaSearch:"キューを検索…", mediaNoSongs:"まだ曲がありません。選曲画面から音源を追加してください。", mediaNoMatch:"一致する曲がありません。",
   mediaSleepSet:"{n}分後に再生を止めます。", mediaSleepDone:"スリープタイマーで停止しました。", mediaLoaded:"読み込み中…", mediaLoadFailed:"この曲を読み込めませんでした。",
-  mediaKeyboard:"Space：再生／一時停止　←→：10秒　N：次の曲　P：前の曲　Esc：閉じる",
-  mediaVideoKeysTitle:"🎬 動画プレーヤーのキー",
+  mediaKeyboard:"Space：再生／一時停止　←→：10秒　N：次の曲　P：前の曲　Esc：閉じる　逆再生・区間ループは設定で割り当て",
+  mediaVideoKeysTitle:"🎬 動画プレーヤーのキー", mediaReverse:"逆再生", mediaReverseStart:"逆再生を開始", mediaForward:"順再生に戻す", mediaReverseLoading:"逆再生を準備中…", mediaReverseUnavailable:"この曲の逆再生用音声を準備できませんでした。映像のみで試します。", mediaReverseDone:"曲の先頭まで逆再生しました。",
+  mediaLoop:"区間ループ", mediaLoopSetA:"A点を設定", mediaLoopSetB:"B点を設定", mediaLoopClear:"解除", mediaLoopMode:"区間ループの操作", mediaLoopToggle:"トグル", mediaLoopHold:"長押し中だけ", mediaLoopHint:"A点・B点を設定すると、範囲をくり返します。割り当てキーはA点 → B点／開始 → 解除を順に操作できます。", mediaLoopNone:"区間ループ：なし", mediaLoopOnlyA:"A点 {a} — B点を設定してください", mediaLoopRange:"{a} – {b} をくり返し中", mediaLoopNeedRange:"先にA点とB点を設定してください。",
   mediaVideoZoomIn:"動画を拡大", mediaVideoZoomOut:"動画を縮小", mediaVideoFaster:"再生速度を上げる", mediaVideoSlower:"再生速度を下げる", mediaVideoPause:"再生／一時停止",
-  mediaVideoKeysHint:"メディアプレーヤー中の動画操作と、ゲーム中の背景動画の拡大・縮小をキーに割り当てます。ゲームの判定や記録は変わりません。",
-  mediaVideoKeysReset:"↺ 動画キーを初期値に戻す", mediaVideoCapture0:"「動画を拡大」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture1:"「動画を縮小」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture2:"「再生速度を上げる」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture3:"「再生速度を下げる」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture4:"「再生／一時停止」に割り当てるキーを押してください。ESCでキャンセル。",
+  mediaVideoKeysHint:"メディアプレーヤー中の動画操作、逆再生、区間ループと、ゲーム中の背景動画の拡大・縮小をキーに割り当てます。ゲームの判定や記録は変わりません。",
+  mediaVideoKeysReset:"↺ 動画キーを初期値に戻す", mediaVideoCapture0:"「動画を拡大」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture1:"「動画を縮小」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture2:"「再生速度を上げる」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture3:"「再生速度を下げる」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture4:"「再生／一時停止」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture5:"「逆再生」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture6:"「区間ループ」に割り当てるキーを押してください。ESCでキャンセル。",
   mediaVideoToastZoom:"動画ズーム {n}x", mediaVideoToastRate:"再生速度 {n}x",
   mediaModeStatus:"メディアプレーヤー中（ゲームの記録には影響しません）"
 });
@@ -43,11 +44,12 @@ Object.assign(TEXT.en, {
   mediaQueue:"Queue", mediaQueueHint:"Choose a track to play it without closing this screen. Added files, shared folders, and song packs appear together.",
   mediaSearch:"Search queue…", mediaNoSongs:"No songs yet. Add audio from song select.", mediaNoMatch:"No matching songs.",
   mediaSleepSet:"Playback will stop in {n} minutes.", mediaSleepDone:"Sleep timer stopped playback.", mediaLoaded:"Loading…", mediaLoadFailed:"This track could not be loaded.",
-  mediaKeyboard:"Space: play/pause   ←→: 10 seconds   N: next   P: previous   Esc: close",
-  mediaVideoKeysTitle:"🎬 Video player keys",
+  mediaKeyboard:"Space: play/pause   ←→: 10 seconds   N: next   P: previous   Esc: close   Assign reverse / A-B loop in Settings",
+  mediaVideoKeysTitle:"🎬 Video player keys", mediaReverse:"Reverse", mediaReverseStart:"Start reverse", mediaForward:"Return to forward", mediaReverseLoading:"Preparing reverse playback…", mediaReverseUnavailable:"Could not prepare reverse audio for this track. Trying video frames only.", mediaReverseDone:"Reverse playback reached the beginning.",
+  mediaLoop:"A-B loop", mediaLoopSetA:"Set A", mediaLoopSetB:"Set B", mediaLoopClear:"Clear", mediaLoopMode:"A-B loop control", mediaLoopToggle:"Toggle", mediaLoopHold:"While held", mediaLoopHint:"Set A and B to repeat a range. The assigned key cycles A → B / start → clear.", mediaLoopNone:"A-B loop: off", mediaLoopOnlyA:"A at {a} — set B", mediaLoopRange:"Repeating {a} – {b}", mediaLoopNeedRange:"Set both A and B first.",
   mediaVideoZoomIn:"Zoom in", mediaVideoZoomOut:"Zoom out", mediaVideoFaster:"Speed up", mediaVideoSlower:"Slow down", mediaVideoPause:"Play / pause",
-  mediaVideoKeysHint:"Assign keys for video zoom and media-player controls. Game judgment and records are not changed.",
-  mediaVideoKeysReset:"↺ Reset video keys", mediaVideoCapture0:"Press a key for “Zoom in”. ESC cancels.", mediaVideoCapture1:"Press a key for “Zoom out”. ESC cancels.", mediaVideoCapture2:"Press a key for “Speed up”. ESC cancels.", mediaVideoCapture3:"Press a key for “Slow down”. ESC cancels.", mediaVideoCapture4:"Press a key for “Play / pause”. ESC cancels.",
+  mediaVideoKeysHint:"Assign keys for video zoom, reverse playback, A-B looping, and media-player controls. Game judgment and records are not changed.",
+  mediaVideoKeysReset:"↺ Reset video keys", mediaVideoCapture0:"Press a key for “Zoom in”. ESC cancels.", mediaVideoCapture1:"Press a key for “Zoom out”. ESC cancels.", mediaVideoCapture2:"Press a key for “Speed up”. ESC cancels.", mediaVideoCapture3:"Press a key for “Slow down”. ESC cancels.", mediaVideoCapture4:"Press a key for “Play / pause”. ESC cancels.", mediaVideoCapture5:"Press a key for “Reverse”. ESC cancels.", mediaVideoCapture6:"Press a key for “A-B loop”. ESC cancels.",
   mediaVideoToastZoom:"Video zoom {n}x", mediaVideoToastRate:"Playback speed {n}x",
   mediaModeStatus:"Media player (does not affect game records)"
 });
@@ -63,11 +65,12 @@ Object.assign(TEXT.zh, {
   mediaQueue:"播放队列", mediaQueueHint:"选择歌曲后会在此画面中播放。添加的文件、共享文件夹和歌曲包会合并显示。",
   mediaSearch:"搜索队列…", mediaNoSongs:"还没有歌曲。请先在选曲画面添加音频。", mediaNoMatch:"没有匹配的歌曲。",
   mediaSleepSet:"将在{n}分钟后停止播放。", mediaSleepDone:"睡眠定时器已停止播放。", mediaLoaded:"正在读取…", mediaLoadFailed:"无法读取这首歌。",
-  mediaKeyboard:"空格：播放／暂停　←→：10秒　N：下一首　P：上一首　Esc：关闭",
-  mediaVideoKeysTitle:"🎬 视频播放器按键",
+  mediaKeyboard:"空格：播放／暂停　←→：10秒　N：下一首　P：上一首　Esc：关闭　倒放／区间循环可在设置中分配",
+  mediaVideoKeysTitle:"🎬 视频播放器按键", mediaReverse:"倒放", mediaReverseStart:"开始倒放", mediaForward:"恢复正放", mediaReverseLoading:"正在准备倒放…", mediaReverseUnavailable:"无法准备这首歌的倒放音频，将尝试仅倒放画面。", mediaReverseDone:"倒放已到达开头。",
+  mediaLoop:"区间循环", mediaLoopSetA:"设为A点", mediaLoopSetB:"设为B点", mediaLoopClear:"解除", mediaLoopMode:"区间循环操作", mediaLoopToggle:"切换", mediaLoopHold:"按住时循环", mediaLoopHint:"设置A点和B点后重复区间。分配的按键会依次执行A点 → B点／开始 → 解除。", mediaLoopNone:"区间循环：关闭", mediaLoopOnlyA:"A点 {a} — 请设置B点", mediaLoopRange:"重复 {a} – {b}", mediaLoopNeedRange:"请先设置A点和B点。",
   mediaVideoZoomIn:"放大视频", mediaVideoZoomOut:"缩小视频", mediaVideoFaster:"提高速度", mediaVideoSlower:"降低速度", mediaVideoPause:"播放／暂停",
-  mediaVideoKeysHint:"为视频缩放和媒体播放器操作分配按键。不会改变游戏判定或记录。",
-  mediaVideoKeysReset:"↺ 恢复视频按键", mediaVideoCapture0:"请按下“放大视频”的按键。ESC取消。", mediaVideoCapture1:"请按下“缩小视频”的按键。ESC取消。", mediaVideoCapture2:"请按下“提高速度”的按键。ESC取消。", mediaVideoCapture3:"请按下“降低速度”的按键。ESC取消。", mediaVideoCapture4:"请按下“播放／暂停”的按键。ESC取消。",
+  mediaVideoKeysHint:"为视频缩放、倒放、区间循环和媒体播放器操作分配按键。不会改变游戏判定或记录。",
+  mediaVideoKeysReset:"↺ 恢复视频按键", mediaVideoCapture0:"请按下“放大视频”的按键。ESC取消。", mediaVideoCapture1:"请按下“缩小视频”的按键。ESC取消。", mediaVideoCapture2:"请按下“提高速度”的按键。ESC取消。", mediaVideoCapture3:"请按下“降低速度”的按键。ESC取消。", mediaVideoCapture4:"请按下“播放／暂停”的按键。ESC取消。", mediaVideoCapture5:"请按下“倒放”的按键。ESC取消。", mediaVideoCapture6:"请按下“区间循环”的按键。ESC取消。",
   mediaVideoToastZoom:"视频缩放 {n}x", mediaVideoToastRate:"播放速度 {n}x",
   mediaModeStatus:"媒体播放器中（不影响游戏记录）"
 });
@@ -83,11 +86,12 @@ Object.assign(TEXT.ko, {
   mediaQueue:"재생 큐", mediaQueueHint:"곡을 고르면 이 화면을 닫지 않고 재생합니다. 추가한 파일・공유 폴더・곡 팩을 함께 표시합니다.",
   mediaSearch:"큐 검색…", mediaNoSongs:"아직 곡이 없습니다. 곡 선택 화면에서 음원을 추가하세요.", mediaNoMatch:"일치하는 곡이 없습니다.",
   mediaSleepSet:"{n}분 후 재생을 멈춥니다.", mediaSleepDone:"취침 타이머로 재생을 멈췄습니다.", mediaLoaded:"불러오는 중…", mediaLoadFailed:"이 곡을 불러오지 못했습니다.",
-  mediaKeyboard:"Space: 재생／일시정지   ←→: 10초   N: 다음   P: 이전   Esc: 닫기",
-  mediaVideoKeysTitle:"🎬 동영상 플레이어 키",
+  mediaKeyboard:"Space: 재생／일시정지   ←→: 10초   N: 다음   P: 이전   Esc: 닫기   역재생／구간 반복은 설정에서 지정",
+  mediaVideoKeysTitle:"🎬 동영상 플레이어 키", mediaReverse:"역재생", mediaReverseStart:"역재생 시작", mediaForward:"정재생으로", mediaReverseLoading:"역재생 준비 중…", mediaReverseUnavailable:"이 곡의 역재생 오디오를 준비하지 못했습니다. 영상 프레임만 시도합니다.", mediaReverseDone:"역재생이 처음에 도달했습니다.",
+  mediaLoop:"구간 반복", mediaLoopSetA:"A점 설정", mediaLoopSetB:"B점 설정", mediaLoopClear:"해제", mediaLoopMode:"구간 반복 조작", mediaLoopToggle:"토글", mediaLoopHold:"누르는 동안", mediaLoopHint:"A점과 B점을 설정하면 구간을 반복합니다. 지정한 키는 A점 → B점／시작 → 해제를 차례로 실행합니다.", mediaLoopNone:"구간 반복: 없음", mediaLoopOnlyA:"A점 {a} — B점을 정해 주세요", mediaLoopRange:"{a} – {b} 반복 중", mediaLoopNeedRange:"먼저 A점과 B점을 설정하세요.",
   mediaVideoZoomIn:"동영상 확대", mediaVideoZoomOut:"동영상 축소", mediaVideoFaster:"재생 속도 높이기", mediaVideoSlower:"재생 속도 낮추기", mediaVideoPause:"재생／일시정지",
-  mediaVideoKeysHint:"동영상 확대·축소와 미디어 플레이어 조작 키를 지정합니다. 게임 판정과 기록은 바뀌지 않습니다.",
-  mediaVideoKeysReset:"↺ 동영상 키 초기화", mediaVideoCapture0:"'동영상 확대'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture1:"'동영상 축소'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture2:"'재생 속도 높이기'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture3:"'재생 속도 낮추기'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture4:"'재생／일시정지'로 지정할 키를 누르세요. ESC로 취소.",
+  mediaVideoKeysHint:"동영상 확대·축소, 역재생, 구간 반복과 미디어 플레이어 조작 키를 지정합니다. 게임 판정과 기록은 바뀌지 않습니다.",
+  mediaVideoKeysReset:"↺ 동영상 키 초기화", mediaVideoCapture0:"'동영상 확대'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture1:"'동영상 축소'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture2:"'재생 속도 높이기'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture3:"'재생 속도 낮추기'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture4:"'재생／일시정지'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture5:"'역재생'으로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture6:"'구간 반복'으로 지정할 키를 누르세요. ESC로 취소.",
   mediaVideoToastZoom:"동영상 확대 {n}x", mediaVideoToastRate:"재생 속도 {n}x",
   mediaModeStatus:"미디어 플레이어 중 (게임 기록에 영향 없음)"
 });
@@ -99,7 +103,12 @@ let mediaOpen = false, holdTimer = 0, longPressed = false;
 let repeatMode = settings.mediaRepeat || "off", shuffle = !!settings.mediaShuffle;
 let mediaRate = Number(settings.mediaRate) || 1, sleepTimer = 0, sleepUntil = 0, tickTimer = 0;
 let seeking = false, queueFilter = "", videoBinding = null;
-const VIDEO_KEY_LABELS = ["mediaVideoZoomIn", "mediaVideoZoomOut", "mediaVideoFaster", "mediaVideoSlower", "mediaVideoPause"];
+let reverseActive = false, reverseLoading = false, reverseTimer = 0, reverseSource = null, reverseGain = null;
+let reverseBuffer = null, reverseBufferKey = "", reverseVideoMuted = false, reverseStartAt = 0, reverseClockAt = 0;
+let loopTimer = 0;
+let loopA = null, loopB = null, loopActive = false, loopKeyDown = false;
+const VIDEO_KEY_LABELS = ["mediaVideoZoomIn", "mediaVideoZoomOut", "mediaVideoFaster", "mediaVideoSlower", "mediaVideoPause", "mediaReverse", "mediaLoop"];
+const REVERSE_KEY_INDEX = 5, LOOP_KEY_INDEX = 6;
 const VIDEO_KEY_BAD = ["Escape", "Tab", "F5", "F11", "F12", "MetaLeft", "MetaRight", "Backquote", "Backspace"];
 const MEDIA_POS_KEY = "trk_media_positions_v1";
 let mediaPositions = {};
@@ -114,6 +123,149 @@ function saveMediaPosition(clear = false) {
   if (clear || video.ended || !Number.isFinite(video.currentTime) || video.currentTime < 5 || video.currentTime >= (video.duration || Infinity) - 5) delete mediaPositions[key];
   else mediaPositions[key] = Math.round(video.currentTime * 10) / 10;
   try { localStorage.setItem(MEDIA_POS_KEY, JSON.stringify(mediaPositions)); } catch (_) {}
+}
+function loopHasRange() { return Number.isFinite(loopA) && Number.isFinite(loopB) && loopB > loopA; }
+function loopStatusText() {
+  if (!Number.isFinite(loopA)) return tr("mediaLoopNone");
+  if (!Number.isFinite(loopB)) return tr("mediaLoopOnlyA", { a:mpFmt(loopA) });
+  return loopActive ? tr("mediaLoopRange", { a:mpFmt(loopA), b:mpFmt(loopB) }) : tr("mediaLoop", {});
+}
+function renderLoopUI() {
+  if (loopStatusNode) loopStatusNode.textContent = loopStatusText();
+  if (loopSetANode) loopSetANode.disabled = !videoReady;
+  if (loopSetBNode) loopSetBNode.disabled = !videoReady || !Number.isFinite(loopA);
+  if (loopClearNode) loopClearNode.disabled = !Number.isFinite(loopA);
+  if (loopModeNode) loopModeNode.value = settings.mediaLoopTrigger || "toggle";
+}
+function clearMediaLoop(silent = false) {
+  loopA = loopB = null; loopActive = false; loopKeyDown = false;
+  if (!silent && typeof showToast === "function") showToast(tr("mediaLoopClear"));
+  renderLoopUI();
+}
+function setMediaLoopPoint(which) {
+  if (!videoReady || !Number.isFinite(video.duration)) return;
+  const t = Math.max(0, Math.min(video.duration, video.currentTime || 0));
+  if (which === "a") {
+    loopA = t; loopB = null; loopActive = false;
+  } else if (Number.isFinite(loopA)) {
+    if (Math.abs(t - loopA) < .1) return;
+    if (t < loopA) [loopA, loopB] = [t, loopA]; else loopB = t;
+    loopActive = true;
+    if (settings.mediaLoopTrigger === "hold") loopActive = false;
+  }
+  renderLoopUI();
+}
+function cycleMediaLoop() {
+  if (!videoReady) return;
+  if (!Number.isFinite(loopA)) setMediaLoopPoint("a");
+  else if (!Number.isFinite(loopB)) setMediaLoopPoint("b");
+  else clearMediaLoop();
+}
+function activateHeldLoop() {
+  if (!Number.isFinite(loopA)) { setMediaLoopPoint("a"); return; }
+  if (!Number.isFinite(loopB)) { setMediaLoopPoint("b"); if (loopHasRange()) { loopActive = true; loopKeyDown = true; renderLoopUI(); } return; }
+  loopActive = true; loopKeyDown = true; renderLoopUI();
+}
+function releaseHeldLoop() {
+  if (settings.mediaLoopTrigger === "hold" && loopKeyDown) { loopActive = false; loopKeyDown = false; renderLoopUI(); }
+}
+function stopReverseAudio() {
+  if (reverseSource) { reverseSource.onended = null; try { reverseSource.stop(); } catch (_) {} reverseSource = null; }
+  if (reverseGain) { try { reverseGain.disconnect(); } catch (_) {} reverseGain = null; }
+}
+function stopReverse(resume = false, silent = true) {
+  if (!reverseActive && !reverseLoading) return;
+  reverseActive = false; reverseLoading = false; clearInterval(reverseTimer); reverseTimer = 0;
+  stopReverseAudio();
+  video.muted = reverseVideoMuted; video.playbackRate = mediaRate;
+  if (resume && videoReady) video.play().catch(() => {});
+  if (!silent && typeof showToast === "function") showToast(tr("mediaForward"));
+  renderMedia();
+}
+async function reverseAudioForCurrentSong() {
+  const key = (currentSong && currentSong.key) || mediaPositionKey();
+  if (reverseBuffer && reverseBufferKey === key) return reverseBuffer;
+  if (!currentSong || !currentSong.file || typeof decodeAudio !== "function" || typeof getAC !== "function") throw new Error("reverse audio unavailable");
+  const decoded = await decodeAudio(await currentSong.file.arrayBuffer());
+  const ac = getAC(); if (!ac) throw new Error("audio context unavailable");
+  const reversed = ac.createBuffer(decoded.numberOfChannels, decoded.length, decoded.sampleRate);
+  for (let ch = 0; ch < decoded.numberOfChannels; ch++) {
+    const from = decoded.getChannelData(ch), to = reversed.getChannelData(ch);
+    for (let i = 0, n = from.length; i < n; i++) to[i] = from[n - i - 1];
+  }
+  reverseBuffer = reversed; reverseBufferKey = key;
+  return reversed;
+}
+function reverseClockSeconds() {
+  if (reverseHasAudio && typeof audioCtx !== "undefined" && audioCtx) return audioCtx.currentTime;
+  return performance.now() / 1000;
+}
+let reverseHasAudio = false, reverseBoundaryBusy = false;
+function reverseTick() {
+  if (!reverseActive || reverseLoading || !videoReady) return;
+  const elapsed = Math.max(0, reverseClockSeconds() - reverseClockAt) * Math.abs(mediaRate || 1);
+  const t = reverseStartAt - elapsed;
+  if (loopActive && loopHasRange() && t <= loopA) {
+    if (reverseBoundaryBusy) return;
+    reverseBoundaryBusy = true;
+    video.currentTime = loopB;
+    startReverseAt(loopB, true).finally(() => { reverseBoundaryBusy = false; });
+    return;
+  }
+  if (t <= .02) {
+    video.currentTime = 0; stopReverse(false, true);
+    if (typeof showToast === "function") showToast(tr("mediaReverseDone"));
+    return;
+  }
+  try { video.currentTime = t; } catch (_) {}
+  renderMedia();
+}
+async function startReverseAt(position, restart = false) {
+  if (!videoReady || !Number.isFinite(video.duration) || video.duration <= 0) return;
+  if (reverseLoading && !restart) return;
+  if (!reverseActive) { reverseVideoMuted = !!video.muted; reverseActive = true; }
+  reverseLoading = true; clearInterval(reverseTimer); reverseTimer = 0; stopReverseAudio();
+  video.pause(); video.muted = true;
+  let start = Math.max(0, Math.min(video.duration, Number(position) || 0));
+  if (!restart && start <= .02) start = video.duration;
+  try { video.currentTime = start; } catch (_) {}
+  if (typeof showToast === "function" && !restart) showToast(tr("mediaReverseLoading"));
+  let buffer = null;
+  try { const gestureAC = typeof getAC === "function" ? getAC() : null; if (gestureAC && gestureAC.state === "suspended") gestureAC.resume().catch(() => {}); } catch (_) {}
+  try { buffer = await reverseAudioForCurrentSong(); } catch (_) {
+    reverseBuffer = null; reverseBufferKey = "";
+    if (typeof showToast === "function" && !restart) showToast(tr("mediaReverseUnavailable"));
+  }
+  if (!reverseActive || !videoReady) return;
+  reverseHasAudio = false;
+  const ac = buffer && typeof getAC === "function" ? getAC() : null;
+  if (buffer && ac) {
+    try {
+      if (ac.state === "suspended") await ac.resume();
+      const src = ac.createBufferSource(), gain = ac.createGain();
+      src.buffer = buffer; src.playbackRate.value = Math.max(.05, Math.abs(mediaRate || 1));
+      gain.gain.value = reverseVideoMuted ? 0 : Math.max(0, Math.min(1, Number(settings.musicVolume) || 0));
+      src.connect(gain); gain.connect(ac.destination);
+      const offset = Math.max(0, Math.min(buffer.duration - .001, buffer.duration * (1 - start / video.duration)));
+      reverseSource = src; reverseGain = gain; reverseHasAudio = true;
+      src.onended = () => { if (reverseActive && reverseSource === src) reverseTick(); };
+      src.start(0, offset);
+    } catch (_) { reverseHasAudio = false; stopReverseAudio(); }
+  }
+  reverseStartAt = start; reverseClockAt = reverseClockSeconds(); reverseLoading = false;
+  reverseTimer = setInterval(reverseTick, 25);
+  renderMedia();
+}
+function toggleReverse() {
+  if (!mediaActive() || !videoReady) return;
+  if (reverseActive || reverseLoading) stopReverse(true, false);
+  else startReverseAt(video.currentTime || 0);
+}
+function checkMediaLoop() {
+  if (!mediaActive() || !loopActive || !loopHasRange() || !videoReady || reverseActive || video.paused) return;
+  if ((video.currentTime || 0) >= loopB - .02) {
+    try { video.currentTime = loopA; } catch (_) {}
+  }
 }
 function videoAction(action) {
   if (action === 0 || action === 1) {
@@ -130,6 +282,8 @@ function videoAction(action) {
     setRate(next); renderMedia();
     if (typeof showToast === "function") showToast(tr("mediaVideoToastRate", { n:next.toFixed(2) }));
   } else if (action === 4) playPause();
+  else if (action === REVERSE_KEY_INDEX) toggleReverse();
+  else if (action === LOOP_KEY_INDEX) settings.mediaLoopTrigger === "hold" ? activateHeldLoop() : cycleMediaLoop();
 }
 function captureVideoKey(code) {
   const i = videoBinding;
@@ -158,6 +312,7 @@ function setRate(value) {
   settings.mediaRate = mediaRate;
   if (video) video.playbackRate = mediaRate;
   saveUserPrefs();
+  if (reverseActive && !reverseLoading) startReverseAt(video.currentTime || 0, true);
 }
 function setRepeat(value) {
   repeatMode = ["off", "one", "all"].includes(value) ? value : "off";
@@ -206,6 +361,8 @@ function nextMediaSong(dir = 1) {
 }
 async function playSong(it, fromStart = true) {
   if (!it || typeof selectSong !== "function") return;
+  if (reverseActive || reverseLoading) stopReverse(false, true);
+  clearMediaLoop(true);
   if (phase !== "title") {
     if (typeof toTitle === "function") toTitle();
     else return;
@@ -225,6 +382,7 @@ async function playSong(it, fromStart = true) {
 }
 function playPause() {
   if (!videoReady) return;
+  if (reverseActive || reverseLoading) { stopReverse(true, false); renderMedia(); return; }
   if (video.paused || video.ended) {
     if (video.ended) { try { video.currentTime = 0; } catch (_) {} }
     video.muted = false; video.volume = settings.musicVolume; video.play().catch(() => showMediaStatus("mediaLoadFailed"));
@@ -238,6 +396,7 @@ async function stepMedia(dir) {
 }
 function seekBy(delta) {
   if (!videoReady || !Number.isFinite(video.duration)) return;
+  if (reverseActive || reverseLoading) stopReverse(false, true);
   video.currentTime = Math.max(0, Math.min(video.duration, (video.currentTime || 0) + delta));
   renderMedia();
 }
@@ -283,10 +442,11 @@ function installMediaSession() {
   act("nexttrack", () => mediaActive() ? stepMedia(1) : sessionSong(1));
   act("seekbackward", d => seekBy(-(d && d.seekOffset || 10)));
   act("seekforward", d => seekBy(d && d.seekOffset || 10));
-  act("seekto", d => { if (Number.isFinite(d && d.seekTime) && videoReady) video.currentTime = Math.max(0, Math.min(video.duration || 0, d.seekTime)); });
+  act("seekto", d => { if (Number.isFinite(d && d.seekTime) && videoReady) { if (reverseActive || reverseLoading) stopReverse(false, true); video.currentTime = Math.max(0, Math.min(video.duration || 0, d.seekTime)); } });
 }
 
 let statusNode, queueNode, progressNode, playNode, timeNode, titleNode, subNode, volumeNode, muteNode, shuffleNode, repeatNode, rateNode, sleepNode, searchNode;
+let reverseNode, loopStatusNode, loopSetANode, loopSetBNode, loopClearNode, loopModeNode;
 function tx(tag, key, cls) { const n = el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; }
 function makeButton(key, cls = "mediaSmallBtn") { const b = el("button", cls, tr(key)); b.type = "button"; b.dataset.i18n = key; return b; }
 function updateTrackText() {
@@ -325,17 +485,22 @@ function renderMedia() {
     progressNode.setAttribute("aria-valuetext", `${mpFmt(cur)} / ${mpFmt(dur)}`);
   }
   if (timeNode) timeNode.textContent = `${mpFmt(cur)} / ${mpFmt(dur)}`;
-  if (playNode) { playNode.textContent = video.paused || !ready ? tr(video.ended ? "mediaRestart" : "mediaPlay") : tr("mediaPause"); playNode.dataset.i18n = video.ended ? "mediaRestart" : (video.paused || !ready ? "mediaPlay" : "mediaPause"); }
+  if (playNode) {
+    const playKey = reverseActive || reverseLoading ? "mediaForward" : (video.ended ? "mediaRestart" : (video.paused || !ready ? "mediaPlay" : "mediaPause"));
+    playNode.textContent = tr(playKey); playNode.dataset.i18n = playKey;
+  }
+  if (reverseNode) { reverseNode.textContent = tr(reverseActive || reverseLoading ? "mediaForward" : "mediaReverseStart"); reverseNode.dataset.i18n = reverseActive || reverseLoading ? "mediaForward" : "mediaReverseStart"; reverseNode.disabled = !ready; reverseNode.classList.toggle("selected", reverseActive || reverseLoading); reverseNode.setAttribute("aria-pressed", String(reverseActive || reverseLoading)); }
   if (volumeNode) volumeNode.value = String(settings.musicVolume);
-  if (muteNode) { muteNode.textContent = video.muted ? tr("mediaUnmute") : tr("mediaMute"); muteNode.dataset.i18n = video.muted ? "mediaUnmute" : "mediaMute"; }
+  if (muteNode) { const isMuted = reverseActive || reverseLoading ? reverseVideoMuted : video.muted; muteNode.textContent = isMuted ? tr("mediaUnmute") : tr("mediaMute"); muteNode.dataset.i18n = isMuted ? "mediaUnmute" : "mediaMute"; }
   if (shuffleNode) { shuffleNode.classList.toggle("selected", shuffle); shuffleNode.setAttribute("aria-pressed", String(shuffle)); }
   if (repeatNode) { repeatNode.value = repeatMode; }
   if (rateNode) rateNode.value = String(mediaRate);
   if (sleepNode) sleepNode.value = sleepUntil ? String(Math.max(1, Math.round((sleepUntil - Date.now()) / 60000))) : "0";
   if (statusNode) {
-    statusNode.textContent = videoReady && currentSong ? (video.ended ? tr("mediaEnded") : video.paused ? tr("mediaPaused") : tr("mediaNow")) : tr("mediaNoTrack");
-    statusNode.dataset.i18n = "";
+    const statusKey = reverseLoading ? "mediaReverseLoading" : reverseActive ? "mediaReverse" : videoReady && currentSong ? (video.ended ? "mediaEnded" : video.paused ? "mediaPaused" : "mediaNow") : "mediaNoTrack";
+    statusNode.textContent = tr(statusKey); statusNode.dataset.i18n = "";
   }
+  renderLoopUI();
   renderQueue();
   updateMediaSession();
 }
@@ -343,6 +508,7 @@ function closeMedia(restore = true) {
   if (!mediaOpen) return;
   mediaOpen = false; window._trkMediaPlayerOpen = false; window._trkMediaPlayerMode = false;
   clearInterval(tickTimer); tickTimer = 0; stopSleepTimer(true); seeking = false;
+  clearInterval(loopTimer); loopTimer = 0; stopReverse(false, true); clearMediaLoop(true);
   saveMediaPosition(); video.pause(); video.playbackRate = 1;
   overlay.hidden = true; document.body.classList.remove("mediaOpen");
   if (restore && phase === "title" && settings.previewEnabled && typeof startPreview === "function") setTimeout(startPreview, 50);
@@ -355,7 +521,7 @@ function openMedia() {
   overlay.hidden = false; document.body.classList.add("mediaOpen");
   if (videoReady) { video.muted = false; video.volume = settings.musicVolume; setRate(mediaRate); }
   if (currentSong && videoReady) { try { video.currentTime = savedMediaPosition(); } catch (_) {} }
-  tickTimer = setInterval(renderMedia, 250);
+  tickTimer = setInterval(renderMedia, 250); loopTimer = setInterval(checkMediaLoop, 40);
   renderMedia(); updateMediaSession();
   const focus = playNode || closeNode; if (focus) focus.focus();
 }
@@ -382,9 +548,11 @@ function buildMedia() {
   const prev = makeButton("mediaPrev", "mediaControlBtn");
   playNode = makeButton("mediaPlay", "mediaControlBtn mediaPlayBtn");
   const next = makeButton("mediaNext", "mediaControlBtn");
+  reverseNode = makeButton("mediaReverseStart", "mediaSmallBtn");
   const restart = makeButton("mediaRestart", "mediaSmallBtn");
-  prev.addEventListener("click", () => stepMedia(-1)); playNode.addEventListener("click", playPause); next.addEventListener("click", () => stepMedia(1)); restart.addEventListener("click", () => { if (videoReady) { saveMediaPosition(true); video.currentTime = 0; video.play().catch(() => {}); } });
-  controls.append(prev, playNode, next, restart);
+  prev.addEventListener("click", () => stepMedia(-1)); playNode.addEventListener("click", playPause); next.addEventListener("click", () => stepMedia(1)); reverseNode.addEventListener("click", toggleReverse);
+  restart.addEventListener("click", () => { if (videoReady) { if (reverseActive || reverseLoading) stopReverse(false, true); saveMediaPosition(true); video.currentTime = 0; video.play().catch(() => {}); } });
+  controls.append(prev, playNode, next, reverseNode, restart);
 
   const progressRow = el("div", "mediaProgressRow");
   progressNode = document.createElement("input"); progressNode.type = "range"; progressNode.min = "0"; progressNode.step = "0.1"; progressNode.value = "0"; progressNode.className = "mediaProgress"; progressNode.setAttribute("aria-label", tr("mediaSeek"));
@@ -392,13 +560,27 @@ function buildMedia() {
   progressRow.append(progressNode, timeNode);
   progressNode.addEventListener("pointerdown", () => { seeking = true; });
   progressNode.addEventListener("pointerup", () => { seeking = false; });
-  progressNode.addEventListener("input", () => { if (videoReady && video.duration) { video.currentTime = Number(progressNode.value); timeNode.textContent = `${mpFmt(video.currentTime)} / ${mpFmt(video.duration)}`; } });
+  progressNode.addEventListener("input", () => { if (videoReady && video.duration) { if (reverseActive || reverseLoading) stopReverse(false, true); video.currentTime = Number(progressNode.value); timeNode.textContent = `${mpFmt(video.currentTime)} / ${mpFmt(video.duration)}`; } });
+
+  const loopBox = el("section", "mediaLoopBox");
+  const loopHeading = tx("h3", "mediaLoop");
+  loopStatusNode = el("div", "hint", tr("mediaLoopNone"));
+  const loopHint = tx("p", "mediaLoopHint", "hint");
+  const loopButtons = el("div", "miniActions");
+  loopSetANode = makeButton("mediaLoopSetA"); loopSetBNode = makeButton("mediaLoopSetB"); loopClearNode = makeButton("mediaLoopClear");
+  loopSetANode.addEventListener("click", () => setMediaLoopPoint("a")); loopSetBNode.addEventListener("click", () => setMediaLoopPoint("b")); loopClearNode.addEventListener("click", () => clearMediaLoop());
+  loopButtons.append(loopSetANode, loopSetBNode, loopClearNode);
+  const loopModeLabel = el("label", "mediaOption"); loopModeLabel.append(tx("span", "mediaLoopMode"));
+  loopModeNode = document.createElement("select");
+  for (const [value, key] of [["toggle", "mediaLoopToggle"], ["hold", "mediaLoopHold"]]) { const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); loopModeNode.append(o); }
+  loopModeLabel.append(loopModeNode); loopModeNode.addEventListener("change", () => { settings.mediaLoopTrigger = loopModeNode.value; saveUserPrefs(); if (settings.mediaLoopTrigger !== "hold") loopActive = loopHasRange(); renderLoopUI(); });
+  loopBox.append(loopHeading, loopStatusNode, loopHint, loopButtons, loopModeLabel);
 
   const options = el("div", "mediaOptions");
   const volumeRow = el("label", "mediaOption mediaVolumeRow"); volumeRow.append(tx("span", "mediaVolume"));
   volumeNode = document.createElement("input"); volumeNode.type = "range"; volumeNode.min = "0"; volumeNode.max = "1"; volumeNode.step = "0.01"; volumeRow.append(volumeNode);
-  volumeNode.addEventListener("input", () => { settings.musicVolume = Number(volumeNode.value); video.volume = settings.musicVolume; saveUserPrefs(); });
-  muteNode = makeButton("mediaMute", "mediaSmallBtn"); muteNode.addEventListener("click", () => { video.muted = !video.muted; renderMedia(); });
+  volumeNode.addEventListener("input", () => { settings.musicVolume = Number(volumeNode.value); video.volume = settings.musicVolume; if (reverseGain) reverseGain.gain.value = settings.musicVolume; saveUserPrefs(); });
+  muteNode = makeButton("mediaMute", "mediaSmallBtn"); muteNode.addEventListener("click", () => { if (reverseActive || reverseLoading) { reverseVideoMuted = !reverseVideoMuted; if (reverseGain) reverseGain.gain.value = reverseVideoMuted ? 0 : settings.musicVolume; } else video.muted = !video.muted; renderMedia(); });
   shuffleNode = makeButton("mediaShuffle", "mediaSmallBtn"); shuffleNode.addEventListener("click", () => setShuffle(!shuffle));
   const repeatLabel = el("label", "mediaOption"); repeatLabel.append(tx("span", "mediaRepeat"));
   repeatNode = document.createElement("select");
@@ -418,7 +600,7 @@ function buildMedia() {
   queueNode = el("div", "mediaQueueList"); queuePanel.append(qhead, searchNode, queueNode);
 
   const footer = el("footer", "instFooter mediaFooter"); footer.append(tx("span", "mediaModeStatus"), tx("span", "mediaKeyboard", "instKeyHint"));
-  dialog.append(header, display, controls, progressRow, options, queuePanel, footer);
+  dialog.append(header, display, controls, progressRow, loopBox, options, queuePanel, footer);
   overlay.append(backdrop, dialog); document.body.append(overlay);
 
   backdrop.addEventListener("click", () => closeMedia());
@@ -453,12 +635,19 @@ function buildMedia() {
     else if (e.code === "KeyN") { e.preventDefault(); e.stopImmediatePropagation(); stepMedia(1); }
     else if (e.code === "KeyP") { e.preventDefault(); e.stopImmediatePropagation(); stepMedia(-1); }
   }, true);
+  addEventListener("keyup", e => {
+    if (videoBinding !== null || window._trkSynthModeOpen || !mediaActive()) return;
+    if (settings.mediaLoopTrigger === "hold" && (settings.videoKeys || [])[LOOP_KEY_INDEX] === e.code) {
+      e.preventDefault(); e.stopImmediatePropagation(); releaseHeldLoop();
+    }
+  }, true);
 
   let lastPositionSave = 0;
   for (const type of ["play", "pause", "timeupdate", "loadedmetadata", "durationchange", "volumechange", "ratechange", "ended", "loadeddata"]) video.addEventListener(type, () => {
     if (type === "timeupdate" && Date.now() - lastPositionSave > 2000) { lastPositionSave = Date.now(); saveMediaPosition(); }
     if (type === "ended") endedMedia(); else renderMedia();
   });
+  on("beforeLoad", () => { stopReverse(false, true); clearMediaLoop(true); reverseBuffer = null; reverseBufferKey = ""; });
   on("songSelected", renderMedia); on("mediaReady", () => { if (mediaOpen) renderMedia(); updateMediaSession(); });
   on("records", renderQueue); on("packsChanged", renderQueue); on("language", () => {
     if (searchNode) searchNode.placeholder = tr("mediaSearch");
@@ -466,7 +655,7 @@ function buildMedia() {
     if (mediaOpen) renderMedia();
   });
   on("phase", p => { if (p !== "title" && mediaOpen) closeMedia(false); });
-  document.addEventListener("visibilitychange", () => { if (document.hidden && mediaOpen) video.pause(); });
+  document.addEventListener("visibilitychange", () => { if (document.hidden && mediaOpen) { releaseHeldLoop(); stopReverse(false, true); video.pause(); } });
 
   let pointerTimer = 0;
   powerButton.addEventListener("pointerdown", e => {

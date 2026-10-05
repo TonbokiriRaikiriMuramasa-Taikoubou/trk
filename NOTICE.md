@@ -100,7 +100,28 @@ RBJ biquad formulas, spectral subtraction) is built from textbook algorithms.
 Product names are mentioned here and in the README for explanation only, and
 trk! is not affiliated with or endorsed by their authors.
 
+### 4d. Official-source playlist catalog (trademarks, factual listings)
+
+js/catalog.js (`TRK_CATALOG`) contains curated playlists for Blue Archive,
+Arknights, League of Legends "Sessions: Vi", VALORANT and Touhou Project.
+It bundles **no audio files, charts, or copyrighted works** — only factual
+metadata (track / artist / album names, which are facts) and links that point
+exclusively to official sources (bluearchive.jp, Monster-Siren Records,
+riotgames.com creator-safe guidelines, ZUN's official site). Series names,
+logos, characters and trademarks belong to their respective owners
+(Nexon/Yostar, Hypergravity/Hypergryph, Riot Games, Team Shanghai Alice);
+they are used here for factual reference only, without permission, and their
+inclusion does not imply any affiliation with or endorsement of trk!.
+Riot Games music is displayed under Riot's fan-content / creator-safe policy
+(keep it free, don't imply official affiliation); see
+https://www.riotgames.com/en/legal — "Courtesy of Riot Games".
+Per the same principle, trk! never implies that any of these publishers
+officially distribute, endorse, or bundle anything with this app, and users
+are directed to obtain the music themselves from the linked official stores.
+
 ## 5. Not affiliated
 trk! is an independent fan project. It is not affiliated with or endorsed by
 ppy Pty Ltd (osu!), Bandai Namco (Taiko no Tatsujin), Crypton Future Media, INC.,
-VRChat Inc., or pixiv Inc.
+VRChat Inc., pixiv Inc., Nexon Games / Yostar (Blue Archive), Hypergravity /
+Hypergryph (Arknights / Monster-Siren Records), Riot Games (League of Legends,
+VALORANT), or Team Shanghai Alice / ZUN (Touhou Project).

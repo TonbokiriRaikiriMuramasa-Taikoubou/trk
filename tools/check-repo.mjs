@@ -232,6 +232,17 @@ if (!read("js/game.js").includes("shortLenActive") ||
   ok("short play mode (last 90/120/180s, silence-aware) is wired");
 }
 
+// 🥚 Tutorial easter eggs (skip / cheat / god mode in the Seed field).
+if (!read("js/main.js").includes("guideEggKind") ||
+    !read("js/main.js").includes("GUIDE_EGGS") ||
+    !read("css/style.css").includes("eggSkipK") ||
+    !read("css/style.css").includes("eggCheatK") ||
+    !read("css/style.css").includes("eggGodK")) {
+  fail("tutorial easter eggs (skip/cheat/god mode) are missing");
+} else {
+  ok("tutorial easter eggs (skip / cheat / god mode) are wired");
+}
+
 // A cache name is deliberately checked for existence, not for a guessed
 // date, because the service worker is manually bumped for every release.
 const sw = read("sw.js");

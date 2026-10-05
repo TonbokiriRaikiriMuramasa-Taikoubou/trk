@@ -90,13 +90,33 @@ function unlockRewardSkin() {   /* 🎓 5つ揃った！ごほうびスキンを
   if (typeof buildSkinGrid === "function") { buildSkinGrid(); if (typeof buildSkinNow === "function") buildSkinNow(); }
   celebrateGuide("guideReward", "guideRewardMsg");
 }
-function completeTutorialFromSeed() {   /* Seed欄に trk! → 打ち込んだ瞬間に完了 */
+/* 🥚 「チュートリアルを即終わらせたい人」がまず打ち込みそうな言葉 → こだわりの消え方で応える */
+const GUIDE_EGGS = { skip:"eggSkip", cheat:"eggCheat", "god mode":"eggGod", godmode:"eggGod" };
+function guideEggKind(v) {
+  const k = String(v || "").trim().toLowerCase().replace(/\s+/g, " ");
+  return GUIDE_EGGS[k] || null;
+}
+function guideEggPlay(kind) {   /* チュートリアルバーを跳ね飛ばす／溶かす／昇天させる */
+  const g = $("quickGuide");
+  const finish = () => {
+    if (g) g.classList.remove("eggSkip", "eggCheat", "eggGod");
+    syncTutorialUI();
+    plToast(tr({ eggSkip:"guideEggSkip", eggCheat:"guideEggCheat", eggGod:"guideEggGod" }[kind]));
+  };
+  if (!g) { syncTutorialUI(); return; }
+  g.classList.add(kind);
+  setTimeout(finish, 2000);   /* 演出が終わってから普通に隠す（進行度もここで更新） */
+}
+function completeTutorialFromSeed() {   /* Seed欄に trk! → 打ち込んだ瞬間に完了。skip/cheat/god mode はお楽しみ */
   if (settings.tutorialDone) return;
-  if ($("seed").value.trim().toLowerCase() !== "trk!") return;
+  const v = $("seed").value.trim().toLowerCase();
+  const egg = guideEggKind(v);
+  if (v !== "trk!" && !egg) return;
   settings.tutorialDone = true;
   const unlocked = settings.skinGradUnlocked;
   guideStamp("seed", "");   /* 5つ目なら、ここでごほうび解禁のお祝いが出る */
   saveUserPrefs();
+  if (egg) { guideEggPlay(egg); return; }   /* 🥚 演出付きで消える（お祝いポップアップの代わりに一報） */
   syncTutorialUI();
   if (settings.skinGradUnlocked === unlocked) celebrateGuide("guideDone", guideStampsDone() ? "" : "guideDoneMsg");
 }

@@ -1029,7 +1029,7 @@ function notePlayed(key, auto) {   /* リザルトまで行った曲＝クリア
 }
 on("screen", id => {
   if (id !== "endScreen") return;
-  if (currentSong && currentSong.key) notePlayed(currentSong.key, !!settings.autoPlay);
+  if (currentSong && currentSong.key && !runShort) notePlayed(currentSong.key, !!settings.autoPlay);   /* 🕹️ ショートプレイは視聴証明にしない */
 });
 
 /* 証明：ランク対象のプレイ記録（クリア）か、視聴記録（AUTO・ラジオ・倍速でもOK） */

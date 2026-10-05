@@ -221,6 +221,17 @@ if (!read("js/library.js").includes("bannerPauseAction") ||
   ok("song-banner tap-pause (default off) and volume knob are wired");
 }
 
+// 🕹️ Short play mode (last 90/120/180s, silence-aware end, separate records).
+if (!read("js/game.js").includes("shortLenActive") ||
+    !read("js/game.js").includes("shortSilenceWatch") ||
+    !read("js/game.js").includes("c.short") ||
+    !read("index.html").includes('id="shortMode"') ||
+    !read("js/core.js").includes("shortMode")) {
+  fail("short play mode (last 90/120/180s) is missing");
+} else {
+  ok("short play mode (last 90/120/180s, silence-aware) is wired");
+}
+
 // A cache name is deliberately checked for existence, not for a guessed
 // date, because the service worker is manually bumped for every release.
 const sw = read("sw.js");

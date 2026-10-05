@@ -285,6 +285,11 @@ $("playerMode").addEventListener("change", e => { settings.playerMode = e.target
 /* ---------- 設定画面：プレイオプション ---------- */
 function syncOptionsUI() {
   $("countdown").checked = settings.countdown;
+  $("shortMode").value = settings.shortMode;   /* 🕹️ ショートプレイ（後半だけ遊ぶ） */
+  $("shortMode").addEventListener("change", e => {
+    settings.shortMode = ["off", "90", "120", "180"].includes(e.target.value) ? e.target.value : "off";
+    saveUserPrefs();
+  });
   $("countdownSE").checked = settings.countdownSE;
   $("resumeCountdown").checked = settings.resumeCountdown;
   $("optHidden").checked = settings.hidden;

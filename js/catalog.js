@@ -115,6 +115,43 @@ S("genshin", "原神（Genshin Impact）", "❄", "purple", "PCゲーム", "🕹
      T("Say My Name", "City of Winds and Idylls", "Yu-Peng Chen / HOYO-MiX"),
      T("Moonlike Smile", "The Wind and the Star Traveler", "Yu-Peng Chen / HOYO-MiX"),
      T("Snow-Buried Tales", "Vortex of Legends", "Yu-Peng Chen / HOYO-MiX")])]);
+/* ================= 🍊 100% Orange Juice（Orange-Juice / Fruitbat Factory） =================
+   ゲーム内BGMの大半はロイヤリティフリー音源（作曲者さんのサイトなどで公式配布）。
+   公式Wikiのサントラページに、元の曲名と作曲者の一覧があります。 */
+S("oj", "100% Orange Juice", "🍊", "amber", "フリー音源", "🎁",
+  "ゲーム内BGMの大半はロイヤリティフリー音源。公式Wikiのサントラページに元の曲名と作曲者がまとまっています（音源は各作曲者さんの公式サイトから入手してください）。",
+  "https://orangejuice.wiki/wiki/100%25_Orange_Juice!_(Soundtrack)",
+  [PL("oj-bgm", "100%OJ BGM 厳選", "🍊", "amber", ["100%OJ", "ボードゲーム"],
+    [T("Sincere", "", "SAM Free Music"),
+     T("Photo shot", "", "煉獄小僧"),
+     T("Friendly", "", "SAM Free Music"),
+     T("Sound to tell the truth", "", "Shiho+"),
+     T("Sunrise", "", "かずち"),
+     T("Catastrophe", "", "NaruIDEA"),
+     T("the Lord", "", "ISAo."),
+     T("The other side of the end", "", "煉獄小僧"),
+     T("Morning Visit", "", "まんぼう二等兵"),
+     T("dear Dragon", "", "Mus Mus"),
+     T("Pluto", "", "Cyber-Rainforce")])]);
+
+/* ================= 🌟 学園アイドルマスター（Bandai Namco Entertainment） =================
+   レーベル公式サイトが、楽曲ごとのインスト音源データを継続して公開中
+   （公式Google Driveからダウンロード。インスト音源利用ガイドラインあり）。 */
+S("gakumas", "学園アイドルマスター", "🌟", "pink", "ソーシャルゲーム", "🎮",
+  "レーベル公式サイトのNEWSで、楽曲ごとのインスト音源データを継続公開中（公式Google Driveからダウンロードできます。利用ガイドラインも確認してくださいね）。",
+  "https://gakuen-label.idolmaster-official.jp/",
+  [PL("gm-inst", "学マス インスト厳選", "🌟", "pink", ["学マス", "アイマス"],
+    [T("Fighting My Way", "学マス インスト音源", "花海咲季"),
+     T("Luna say maybe", "学マス インスト音源", "月村手毬"),
+     T("世界一可愛い私", "学マス インスト音源", "藤田ことね"),
+     T("Fluorite", "学マス インスト音源", "有村麻央"),
+     T("白線", "学マス インスト音源", "葛城リーリヤ"),
+     T("Wonder Scale", "学マス インスト音源", "倉本千奈"),
+     T("Tame-Lie-One-Step", "学マス インスト音源", "紫雲清夏"),
+     T("光景", "学マス インスト音源", "篠澤広"),
+     T("clumsy trick", "学マス インスト音源", "姫崎莉波"),
+     T("標", "学マス インスト音源", "初星学園")])]);
+
 /* ================= ⭐ 東方Project（上海アリス幻樂団） ================= */
 S("touhou", "東方Project", "⭐", "red", "同人ゲーム", "🏮",
   "ZUNさん（上海アリス幻樂団）の公式サイト。作品と音楽CDの情報はここで。ゲームの体験版もダウンロードできます（体験版にもBGMが入っています）。",

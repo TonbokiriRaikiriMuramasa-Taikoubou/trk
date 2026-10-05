@@ -126,7 +126,10 @@ function paint() {
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, W, H);
   let drew = false;
-  if (hasFrames()) {
+  /* ✨ フレーム補完（js/frame-interp.js）：設定がオンのときは、作った中間フレームを映す */
+  const fi = (typeof settings !== "undefined" && settings.frameInterp !== "off" && window.TrkFrameInterp) ? window.TrkFrameInterp : null;
+  if (fi) { try { drew = fi.drawTo(ctx, W, H); } catch (_) { drew = false; } }
+  if (!drew && hasFrames()) {
     const s = Math.min(W / videoEl.videoWidth, H / videoEl.videoHeight);   /* 全体を映す（切らない） */
     const dw = videoEl.videoWidth * s, dh = videoEl.videoHeight * s;
     try { ctx.drawImage(videoEl, (W - dw) / 2, (H - dh) / 2, dw, dh); drew = true; } catch (_) {}
@@ -157,6 +160,7 @@ function openMax() {
   if (!root || isOn) return false;
   if (window.TrkSafeMode && TrkSafeMode()) return false;
   isOn = true; playedByUs = false;
+  if (window.TrkFrameInterp) { try { window.TrkFrameInterp.attach("max", canvas); } catch (_) {} }
   root.hidden = false;
   document.body.classList.add("videoMaxOpen");
   try {
@@ -171,6 +175,7 @@ function openMax() {
 function closeMax() {
   if (!isOn) return;
   isOn = false;
+  if (window.TrkFrameInterp) { try { window.TrkFrameInterp.detach("max"); } catch (_) {} }
   stopLoop();
   clearTimeout(idleTimer);
   if (root) { root.hidden = true; root.classList.remove("idle"); }

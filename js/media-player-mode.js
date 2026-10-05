@@ -117,6 +117,11 @@ let loopTimer = 0;
 let loopA = null, loopB = null, loopActive = false, loopKeyDown = false;
 let wallOverlay, wallClockNode, wallDateNode, wallNode, wallStyleNode, wallClockCheck, wallPlaybackNode, wallTriggerNode, wallFileNode, wallResetNode;
 let maxNode = null;   /* 🖥 「全画面で表示」（js/video-max.js） */
+/* ✨ フレーム補完（js/frame-interp.js）：区間ループのすぐ上に置く設定と、映像エリア */
+let interpBox = null, interpModeNode = null, interpStrengthNode = null, interpStrengthVal = null;
+let interpStatusNode = null, interpHintNode = null, interpUnsupported = null;
+let stageWrap = null, stageCanvas = null, stageCtx = null, stageNote = null;
+let stageRaf = 0;
 let wallActive = false, wallKeyDown = false, wallTimer = 0, wallWasPlaying = false, wallCustomURL = "";
 let mediaExitBinding = null;
 const VIDEO_KEY_LABELS = ["mediaVideoZoomIn", "mediaVideoZoomOut", "mediaVideoFaster", "mediaVideoSlower", "mediaVideoPause", "mediaReverse", "mediaLoop", "mediaWallKey"];
@@ -624,6 +629,85 @@ function renderQueue() {
   }
   if (all.length > 300) queueNode.append(el("div", "hint", `+ ${all.length - 300}`));
 }
+/* ================= ✨ フレーム補完（js/frame-interp.js） =================
+   ・設定は区間ループのすぐ上。効果は上の映像エリアで見られます。
+   ・重い処理なので、表示しているときだけ取り込みを動かします。 */
+const interpStrengthValue = () => Math.max(0, Math.min(1, Number(settings.frameInterpStrength)));
+function hasVideoFrames() { return !!(videoReady && video && video.videoWidth > 0); }
+function renderInterp() {
+  const FI = window.TrkFrameInterp;
+  if (!interpBox) return;
+  const supported = !!(FI && FI.supported());
+  const m = settings.frameInterp || "off";
+  if (interpModeNode) {
+    interpModeNode.value = m;
+    interpModeNode.disabled = !supported;
+  }
+  if (interpStrengthNode) {
+    interpStrengthNode.value = String(interpStrengthValue());
+    interpStrengthNode.disabled = !supported || m !== "flow";
+  }
+  if (interpStrengthVal) interpStrengthVal.textContent = Math.round(interpStrengthValue() * 100) + "%";
+  if (interpUnsupported) {
+    const st0 = FI ? FI.stats() : null;
+    interpUnsupported.textContent = st0 && st0.blocked ? tr("mediaInterpBlocked") : tr("mediaInterpUnsupported");
+    interpUnsupported.hidden = supported;
+  }
+  if (interpHintNode) interpHintNode.hidden = !supported;
+  if (interpStatusNode) {
+    if (!supported || m === "off") interpStatusNode.textContent = "";
+    else {
+      const st = FI.stats();
+      interpStatusNode.textContent = !st.ready ? tr("mediaInterpWarmup")
+        : tr("mediaInterpStat", { src: st.srcFps || "-", out: st.outFps || "-", w: st.w, h: st.h }) +
+          (st.degraded ? " · " + tr("mediaInterpDegraded") : "");
+    }
+  }
+}
+function drawMediaStage() {
+  if (!stageCanvas || !stageCtx) return;
+  const w = stageCanvas.width, h = stageCanvas.height;
+  if (!w || !h) return;
+  let drew = false;
+  const FI = window.TrkFrameInterp;
+  if (FI && settings.frameInterp !== "off") { try { drew = FI.drawTo(stageCtx, w, h); } catch (_) { drew = false; } }
+  if (!drew) {
+    stageCtx.fillStyle = "#000";
+    stageCtx.fillRect(0, 0, w, h);
+    if (hasVideoFrames()) {
+      const s = Math.min(w / video.videoWidth, h / video.videoHeight);
+      const dw = video.videoWidth * s, dh = video.videoHeight * s;
+      stageCtx.drawImage(video, (w - dw) / 2, (h - dh) / 2, dw, dh);
+    }
+  }
+}
+function mediaStageTick() {
+  stageRaf = requestAnimationFrame(mediaStageTick);
+  if (!mediaOpen || !stageWrap || stageWrap.hidden) return;
+  if (!stageCtx) { try { stageCtx = stageCanvas.getContext("2d", { alpha: false }); } catch (_) { return; } }
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const cw = Math.max(2, Math.round((stageCanvas.clientWidth || 480) * dpr));
+  const ch = Math.max(2, Math.round((stageCanvas.clientHeight || 270) * dpr));
+  if (stageCanvas.width !== cw || stageCanvas.height !== ch) { stageCanvas.width = cw; stageCanvas.height = ch; }
+  drawMediaStage();
+}
+function syncMediaStage() {
+  if (!stageWrap || !stageCanvas) return;
+  const FI = window.TrkFrameInterp;
+  const frames = hasVideoFrames();
+  const show = mediaOpen;                       // 枠はプレーヤーを開いているときだけ
+  stageWrap.hidden = !show;
+  stageCanvas.hidden = !frames;                 // 映像が無い曲では注記だけ出す
+  if (show && frames) {
+    if (FI && settings.frameInterp !== "off") FI.attach("media", stageCanvas);
+    if (!stageRaf) stageRaf = requestAnimationFrame(mediaStageTick);
+  } else {
+    if (FI) FI.detach("media");
+    if (stageRaf) { cancelAnimationFrame(stageRaf); stageRaf = 0; }
+  }
+  if (stageNote) stageNote.hidden = frames;
+}
+
 function renderMedia() {
   if (!mediaOpen || !overlay) return;
   updateTrackText();
@@ -660,6 +744,8 @@ function renderMedia() {
   renderLoopUI();
   renderWall();
   renderQueue();
+  syncMediaStage();
+  renderInterp();
   updateMediaSession();
 }
 function closeMedia(restore = true) {
@@ -670,6 +756,9 @@ function closeMedia(restore = true) {
   clearInterval(tickTimer); tickTimer = 0; stopSleepTimer(true); seeking = false;
   clearInterval(loopTimer); loopTimer = 0; stopReverse(false, true); clearMediaLoop(true);
   saveMediaPosition(); video.pause(); video.playbackRate = 1;
+  if (stageRaf) { cancelAnimationFrame(stageRaf); stageRaf = 0; }
+  if (window.TrkFrameInterp) window.TrkFrameInterp.detach("media");
+  if (stageWrap) stageWrap.hidden = true;
   overlay.hidden = true; document.body.classList.remove("mediaOpen");
   if (restore && phase === "title" && settings.previewEnabled && typeof startPreview === "function") setTimeout(startPreview, 50);
   if (powerButton) powerButton.focus();
@@ -682,7 +771,7 @@ function openMedia() {
   if (videoReady) { video.muted = false; video.volume = settings.musicVolume; setRate(mediaRate); }
   if (currentSong && videoReady) { try { video.currentTime = savedMediaPosition(); } catch (_) {} }
   tickTimer = setInterval(renderMedia, 250); loopTimer = setInterval(checkMediaLoop, 40);
-  renderMedia(); updateMediaSession();
+  renderMedia(); updateMediaSession(); syncMediaStage();
   const focus = playNode || closeNode; if (focus) focus.focus();
 }
 let closeNode;
@@ -703,6 +792,12 @@ function buildMedia() {
   subNode = el("span", "mediaDisplaySub", tr("mediaModeStatus"));
   statusNode = el("span", "mediaStatus", tr("mediaPaused"));
   display.append(titleNode, subNode, statusNode);
+
+  /* ✨ 映像エリア（フレーム補完の効果をここで見られます） */
+  stageWrap = el("div", "mediaStage"); stageWrap.hidden = true;
+  stageCanvas = document.createElement("canvas"); stageCanvas.className = "mediaStageCanvas"; stageCanvas.hidden = true;
+  stageNote = el("div", "mediaStageNote hint", tr("mediaStageNoVideo")); stageNote.dataset.i18n = "mediaStageNoVideo";
+  stageWrap.append(stageCanvas, stageNote);
 
   const controls = el("div", "mediaControls");
   const prev = makeButton("mediaPrev", "mediaControlBtn");
@@ -726,6 +821,36 @@ function buildMedia() {
   progressNode.addEventListener("pointerdown", () => { seeking = true; });
   progressNode.addEventListener("pointerup", () => { seeking = false; });
   progressNode.addEventListener("input", () => { if (videoReady && video.duration) { if (reverseActive || reverseLoading) stopReverse(false, true); video.currentTime = Number(progressNode.value); timeNode.textContent = `${mpFmt(video.currentTime)} / ${mpFmt(video.duration)}`; } });
+
+  /* ✨ フレーム補完の設定（区間ループのすぐ上） */
+  const FI = window.TrkFrameInterp;
+  interpBox = el("section", "mediaInterpBox");
+  const fiHead = tx("h3", "mediaInterpTitle");
+  const fiRow = el("label", "mediaOption mediaInterpRow");
+  fiRow.append(tx("span", "mediaInterpMode"));
+  interpModeNode = document.createElement("select");
+  for (const [value, key] of [["off", "mediaInterpOff"], ["blend", "mediaInterpBlend"], ["flow", "mediaInterpFlow"]]) {
+    const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); interpModeNode.append(o);
+  }
+  fiRow.append(interpModeNode);
+  const fiStrengthRow = el("label", "mediaOption mediaInterpRow");
+  fiStrengthRow.append(tx("span", "mediaInterpStrength"));
+  interpStrengthNode = document.createElement("input");
+  interpStrengthNode.type = "range"; interpStrengthNode.min = "0"; interpStrengthNode.max = "1"; interpStrengthNode.step = "0.05";
+  interpStrengthVal = el("span", "mono");
+  fiStrengthRow.append(interpStrengthNode, interpStrengthVal);
+  interpStatusNode = el("div", "hint mediaInterpStatus", "");
+  interpHintNode = tx("p", "mediaInterpHint", "hint");
+  interpUnsupported = tx("p", "mediaInterpUnsupported", "hint status");
+  interpUnsupported.hidden = true;
+  interpBox.append(fiHead, fiRow, fiStrengthRow, interpStatusNode, interpHintNode, interpUnsupported);
+  interpModeNode.addEventListener("change", () => { if (FI) FI.setMode(interpModeNode.value); renderInterp(); renderMedia(); });
+  interpStrengthNode.addEventListener("input", () => {
+    settings.frameInterpStrength = Number(interpStrengthNode.value);
+    interpStrengthVal.textContent = Math.round(settings.frameInterpStrength * 100) + "%";
+    saveUserPrefs();
+  });
+  if (FI) FI.onChange(renderInterp);
 
   const loopBox = el("section", "mediaLoopBox");
   const loopHeading = tx("h3", "mediaLoop");
@@ -772,7 +897,7 @@ function buildMedia() {
   queueNode = el("div", "mediaQueueList"); queuePanel.append(qhead, searchNode, queueNode);
 
   const footer = el("footer", "instFooter mediaFooter"); footer.append(tx("span", "mediaModeStatus"), tx("span", "mediaKeyboard", "instKeyHint"));
-  dialog.append(header, display, controls, progressRow, loopBox, options, queuePanel, footer);
+  dialog.append(header, display, stageWrap, controls, progressRow, interpBox, loopBox, options, queuePanel, footer);
   wallOverlay = el("section", "mediaWall"); wallOverlay.hidden = true; wallOverlay.setAttribute("role", "dialog"); wallOverlay.setAttribute("aria-modal", "true"); wallOverlay.setAttribute("aria-label", tr("mediaWall"));
   const wallTop = el("div", "mediaWallTop"); wallTop.append(tx("strong", "mediaWall"));
   const wallClose = makeButton("mediaWallHide", "mediaWallClose"); wallClose.addEventListener("click", () => deactivateWall(true)); wallTop.append(wallClose);
@@ -834,6 +959,8 @@ function buildMedia() {
   on("beforeLoad", () => { stopReverse(false, true); clearMediaLoop(true); reverseBuffer = null; reverseBufferKey = ""; });
   on("songSelected", renderMedia); on("mediaReady", () => { if (mediaOpen) renderMedia(); updateMediaSession(); });
   on("records", renderQueue); on("packsChanged", renderQueue); on("language", () => {
+    if (stageNote) { stageNote.textContent = tr("mediaStageNoVideo"); stageNote.dataset.i18n = "mediaStageNoVideo"; }
+    renderInterp();
     loopPresetRenderKey = loopPresetRenderSig = null;
     if (searchNode) searchNode.placeholder = tr("mediaSearch");
     if (progressNode) progressNode.setAttribute("aria-label", tr("mediaSeek"));
@@ -910,6 +1037,8 @@ function buildMedia() {
   syncMediaExitUI();
   buildVideoKeysUI();
   installMediaSession();
+  renderInterp();
+  syncMediaStage();
   return true;
 }
 

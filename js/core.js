@@ -190,7 +190,10 @@ const settings = {
   mediaWallTrigger: pick(prefs.mediaWallTrigger, ["toggle", "hold"], "toggle"),
   mediaWallStyle: pick(prefs.mediaWallStyle, ["midnight", "aurora", "paper", "custom"], "midnight"),
   mediaWallClock: prefs.mediaWallClock !== false,
-  mediaWallStopsVideo: prefs.mediaWallStopsVideo !== false
+  mediaWallStopsVideo: prefs.mediaWallStopsVideo !== false,
+  /* ✨ フレーム補完（js/frame-interp.js）。既定はオフ（重いので） */
+  frameInterp: pick(prefs.frameInterp, ["off", "blend", "flow"], "off"),
+  frameInterpStrength: num(prefs.frameInterpStrength, 0, 1, .85)
 };
 function saveUserPrefs() { try { localStorage.setItem(PREFS_KEY, JSON.stringify(settings)); } catch (_) {} }
 /* プレイ中の追加演出だけをまとめて抑える。音声エフェクターの設定とは別です。 */

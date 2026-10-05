@@ -379,6 +379,47 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else ok("lane sway defaults to TRUCK / ORBIT with per-mode off switches; ❓ mystery switch overrides all modes");
 }
 
+// ✨ Frame interpolation (js/frame-interp.js): opt-in motion-compensated
+// interpolation for the media player and the full-screen viewer. WebGL2 only,
+// fully offline, and the settings must sit directly above the A-B loop box.
+{
+  const fi = read("js/frame-interp.js");
+  const player = read("js/media-player-mode.js");
+  const core = read("js/core.js");
+  const html = read("index.html");
+  const max = read("js/video-max.js");
+  const settingsOk =
+    core.includes('frameInterp: pick(prefs.frameInterp, ["off", "blend", "flow"], "off")') &&
+    core.includes("frameInterpStrength: num(prefs.frameInterpStrength, 0, 1, .85)") &&
+    fi.includes('const MODES = ["off", "blend", "flow"];') &&
+    fi.includes("const FLOW_LAMBDA = 0.010;") &&
+    fi.includes("const FLOW_RANGE = 64;") &&
+    fi.includes("settings.frameInterp = next;") && fi.includes("saveUserPrefs();");
+  const glOk =
+    fi.includes('getContext("webgl2"') &&
+    fi.includes('getExtension("EXT_color_buffer_float")') &&
+    fi.includes("gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1])") &&
+    fi.includes("gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)") &&
+    fi.includes("requestVideoFrameCallback") &&
+    fi.includes("float costF(") && fi.includes("float costB(");
+  const offlineOk = !fi.includes("fetch(") && !fi.includes("import ") && !fi.includes("Worker(");
+  const uiOk = html.includes('<script src="js/frame-interp.js"></script>') &&
+    player.includes("const FI = window.TrkFrameInterp;") &&
+    player.includes("dialog.append(header, display, stageWrap, controls, progressRow, interpBox, loopBox, options, queuePanel, footer)") &&
+    player.includes('FI.attach("media", stageCanvas)') && player.includes('FI.detach("media")') &&
+    max.includes('window.TrkFrameInterp.attach("max", canvas)') && max.includes('window.TrkFrameInterp.detach("max")');
+  const langOk = (fi.match(/mediaInterpTitle:/g) || []).length === 4 &&
+    (fi.match(/mediaInterpHint:/g) || []).length === 4 &&
+    (fi.match(/mediaInterpFlow:/g) || []).length === 4 &&
+    (fi.match(/mediaInterpBlocked:/g) || []).length === 4;
+  if (!settingsOk) fail("frame interpolation settings / flow constants are missing");
+  else if (!glOk) fail("frame interpolation must run on WebGL2 (MRT flow passes, video frame callbacks)");
+  else if (!offlineOk) fail("frame interpolation must stay offline (no fetch, imports or workers)");
+  else if (!uiOk) fail("frame interpolation must be wired into the media player above the A-B loop box");
+  else if (!langOk) fail("frame interpolation strings are missing from one of the four languages");
+  else ok("frame interpolation is opt-in, WebGL2-only, offline, above the A-B loop box, in four languages");
+}
+
 // A cache name is deliberately checked for existence, not for a guessed
 // date, because the service worker is manually bumped for every release.
 const sw = read("sw.js");

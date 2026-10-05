@@ -88,6 +88,18 @@ toolchain. Each package keeps its own license and copyright notices; the generat
 Android project and its release process must preserve the notices required by
 those packages. This file does not grant GPL rights to third-party software.
 
+### 4c. Pro-audio effect concepts (original implementations)
+
+The 🚪 noise gate, 🧹 spectral noise reduction, 🎚 dynamic EQ and ✨ exciter in
+js/fx-worklet.js and js/fx.js are original implementations written for trk!.
+Their *concepts* are inspired by well-known pro-audio tools — noise reduction
+in Audacity, ReaFir (Cockos), Bertom Denoiser Classic, and the dynamic EQ /
+exciter ideas popularized by TDR Nova and iZotope Ozone. No code, UI assets,
+preset data, or product names from those tools are used; the DSP (radix-2 FFT,
+RBJ biquad formulas, spectral subtraction) is built from textbook algorithms.
+Product names are mentioned here and in the README for explanation only, and
+trk! is not affiliated with or endorsed by their authors.
+
 ## 5. Not affiliated
 trk! is an independent fan project. It is not affiliated with or endorsed by
 ppy Pty Ltd (osu!), Bandai Namco (Taiko no Tatsujin), Crypton Future Media, INC.,

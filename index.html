@@ -523,6 +523,7 @@
             <div class="hint" data-i18n="hideHint"></div>
 
             <h3 data-i18n="swayTitle"></h3>
+            <div class="hint" data-i18n="swayModeHint"></div>
             <label class="check"><input id="swayBeat" type="checkbox"><span data-i18n="swayBeat"></span></label>
             <label class="check"><input id="swayHit" type="checkbox"><span data-i18n="swayHit"></span></label>
             <div class="inline">
@@ -543,6 +544,7 @@
                 <span id="laneTintVal" class="mono"></span>
               </div>
               <label class="check"><input id="truckBounce" type="checkbox"><span data-i18n="truckBounce"></span></label>
+              <label class="check"><input id="swayTruck" type="checkbox"><span data-i18n="swayTruck"></span></label>
 
               <!-- modes.js（🪐 ORBIT）の挿入位置 -->
               <div id="orbitSettingsAnchor"></div>
@@ -705,16 +707,6 @@
               </select>
             </div>
             <div class="hint" data-i18n="shortHint"></div>
-            <div class="inline">
-              <span data-i18n="shortMode"></span>
-              <select id="shortMode">
-                <option value="off" data-i18n="shortOff"></option>
-                <option value="90" data-i18n="short90"></option>
-                <option value="120" data-i18n="short120"></option>
-                <option value="180" data-i18n="short180"></option>
-              </select>
-            </div>
-            <div class="hint" data-i18n="shortHint"></div>
             <div class="hint" data-i18n="countdownHint"></div>
 
             <h3 data-i18n="judgeLevel"></h3>
@@ -746,6 +738,10 @@
             <h3 data-i18n="secExpert"></h3>
             <label class="check"><input id="showMasterDiff" type="checkbox"><span data-i18n="showMasterDiff"></span></label>
             <div class="hint" data-i18n="showMasterDiffHint"></div>
+
+            <h3 data-i18n="secMystery"></h3>
+            <label class="check"><input id="swayAllModes" type="checkbox"><span data-i18n="swayAllModes"></span></label>
+            <div class="hint" data-i18n="swayAllModesHint"></div>
           </details>
 
           <details class="panel" open>
@@ -1123,6 +1119,8 @@
 <script src="js/fx-presets.js"></script>
 <script src="js/fx-dock.js"></script>
 <script src="js/tv-dock.js"></script>
+<!-- 🖥 動画の全画面表示（TVドックの⛶とメディアプレーヤーの「全画面で表示」で使います） -->
+<script src="js/video-max.js"></script>
 <script src="js/fx.js"></script>
 <script src="js/fx-synth.js"></script>
 <script src="js/favs.js"></script>
@@ -1140,6 +1138,8 @@
 <!-- ===== 📊 スペクトラム → 🎹 シンセ演奏モード（TrkFX.tap() を使うため末尾） ===== -->
 <script src="js/spectrum.js"></script>
 <script src="js/synth-mode.js"></script>
+<!-- ✨ フレーム補完（動き補償・光学フロー／WebGL2） -->
+<script src="js/frame-interp.js"></script>
 <script src="js/media-player-mode.js"></script>
 </body>
 </html>

@@ -143,10 +143,20 @@ on("settings", () => guideStamp("safe", "guideStampSafe"));
 {
   const applySkinOrig = applySkin;
   applySkin = (id, persist) => { const r = applySkinOrig(id, persist); if (persist !== false) guideStamp("look", "guideStampLook"); return r; };
-  if (window.TrkFX) for (const name of ["select", "random"]) {
-    const orig = window.TrkFX[name];
-    if (typeof orig === "function") window.TrkFX[name] = (...a) => { const r = orig(...a); guideStamp("look", "guideStampLook"); return r; };
-  }
+
+  /* TrkFX は fx.js が Object.freeze した公開API。関数を上書きせず、UI操作を委譲で検知する。 */
+  document.addEventListener("click", e => {
+    const target = e.target;
+    if (!target || typeof target.closest !== "function") return;
+    const preset = target.closest("#fxPanel .fxGrid .fxSeg button");
+    const quickAction = target.closest("#fxQuickPanel .inline .fxMini");
+    const dockAction = target.closest("#fxDock .dockSlots .dockKey:not(.empty), #fxDock .dockRand .dockKey, #fxDock .fxFavRow button");
+    if (preset || quickAction || dockAction) guideStamp("look", "guideStampLook");
+  });
+  document.addEventListener("change", e => {
+    if (e.target && e.target.matches && e.target.matches("#fxQuickPanel select.fxQuickSelect"))
+      guideStamp("look", "guideStampLook");
+  });
 }
 /* スキップ（もう知っている人へ）ともう一度（⚙設定の見た目から） */
 $("guideSkip").addEventListener("click", () => { settings.tutorialDone = true; saveUserPrefs(); syncTutorialUI(); });
@@ -317,6 +327,7 @@ function syncOptionsUI() {
   if ($("optMirror")) $("optMirror").checked = !!settings.modMirror;
   if ($("optRandom")) $("optRandom").checked = !!settings.modRandom;
   if ($("showMasterDiff")) $("showMasterDiff").checked = !!settings.showMasterDiff;
+  if ($("swayAllModes")) $("swayAllModes").checked = !!settings.swayAllModes;
   $("rate").value = settings.rate;
   $("rateVal").textContent = settings.rate.toFixed(2) + "x";
   $("cover").value = settings.cover;
@@ -326,7 +337,8 @@ function syncOptionsUI() {
 }
 function optionsChanged() { saveUserPrefs(); syncOptionsUI(); emit("options"); }
 [["countdown", "countdown"], ["countdownSE", "countdownSE"], ["resumeCountdown", "resumeCountdown"],
- ["optHidden", "hidden"], ["optSudden", "sudden"], ["optMirror", "modMirror"], ["optRandom", "modRandom"]].forEach(([id, key]) => {
+ ["optHidden", "hidden"], ["optSudden", "sudden"], ["optMirror", "modMirror"], ["optRandom", "modRandom"],
+ ["swayAllModes", "swayAllModes"]].forEach(([id, key]) => {
   const el = $(id);
   if (el) el.addEventListener("change", e => { settings[key] = e.target.checked; optionsChanged(); });
 });

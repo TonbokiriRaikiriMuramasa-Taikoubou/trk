@@ -35,6 +35,10 @@ Object.assign(TEXT.ja, {
   showMasterDiff:"高難易度（MASTER・2000 RUSH）を表示する",
   showMasterDiffHint:"音ゲー経験者向けに、高速ストリーム・トリル・高密度配置の MASTER および 2000 RUSH を解禁します。全年齢向けとして初期状態では隠されています。",
   expertUnlocked:"🔥 MASTER・2000 RUSH 解禁！",
+  /* ❓ 謎設定（不具合の再現） */
+  secMystery:"❓ 謎設定（不具合の再現）",
+  swayAllModes:"全ゲームモードで揺れをオンにする（酔います）",
+  swayAllModesHint:"🚚トラック／🪐ORBIT 以外のモードでもレーンを揺らします。もともと不具合として起きていた動きを、設定として残したものです。各モードの「揺らさない」設定より、こちらのチェックのほうが優先されます。三半規管が弱い方はご注意ください。",
   /* サブキー・プリセット */
   leftSub:"左キー（サブ）", rightSub:"右キー（サブ）", unset:"未設定",
   keyPresetDefault:"↺ A／Space（標準）", keyPresetTaiko:"osu!taiko風（F・J／D・K）", keysPresetDone:"キー設定を「{name}」にしました。",
@@ -72,6 +76,10 @@ Object.assign(TEXT.en, {
   showMasterDiff:"Show expert difficulties (MASTER / 2000 RUSH)",
   showMasterDiffHint:"Unlocks MASTER and 2000 RUSH with high-speed streams, trills, and dense note patterns for experienced rhythm gamers. Kept hidden by default for all-ages comfort.",
   expertUnlocked:"🔥 MASTER & 2000 RUSH Unlocked!",
+  /* ❓ Mystery settings (bug reproductions) */
+  secMystery:"❓ Mystery settings (bug reproductions)",
+  swayAllModes:"Sway in every game mode (may cause motion sickness)",
+  swayAllModesHint:"Sways the lane in modes other than 🚚 Truck and 🪐 ORBIT. This keeps a movement that originally happened as a bug, now as a setting. It overrides each mode's \u201cdon't sway\u201d option. Take care if you get motion sickness easily.",
   leftSub:"Left key (sub)", rightSub:"Right key (sub)", unset:"Not set",
   keyPresetDefault:"↺ A / Space (default)", keyPresetTaiko:"osu!taiko style (F·J / D·K)", keysPresetDone:"Keys set to “{name}”.",
   captureSubLeft:"Press a key for the left sub key. Backspace clears, ESC cancels.",
@@ -107,6 +115,10 @@ Object.assign(TEXT.zh, {
   showMasterDiff:"显示高难度（MASTER・2000 RUSH）",
   showMasterDiffHint:"为音游经验者解锁具备高速连打、颤音（Trill）与高密度配置的 MASTER 与 2000 RUSH。作为全年龄体验默认隐藏。",
   expertUnlocked:"🔥 MASTER 与 2000 RUSH 已解锁！",
+  /* ❓ 谜之设定（重现异常） */
+  secMystery:"❓ 谜之设定（重现异常）",
+  swayAllModes:"所有游戏模式都开启摇摆（会晕）",
+  swayAllModesHint:"在 🚚卡车／🪐ORBIT 以外的模式也会摇摆车道。这原本是异常导致的动作，现在作为设定保留下来。优先级高于各模式的“不摇摆”。容易晕动的人请注意。",
   leftSub:"左键位（副）", rightSub:"右键位（副）", unset:"未设置",
   keyPresetDefault:"↺ A／Space（标准）", keyPresetTaiko:"osu!taiko风（F・J／D・K）", keysPresetDone:"已将按键设为“{name}”。",
   captureSubLeft:"请按下左键位（副）的按键。Backspace解除，ESC取消。",
@@ -142,6 +154,10 @@ Object.assign(TEXT.ko, {
   showMasterDiff:"고난이도 (MASTER・2000 RUSH) 표시",
   showMasterDiffHint:"리듬 게임 유저를 위해 고속 스트림, 트릴, 고밀도 패턴의 MASTER 및 2000 RUSH를 해금합니다. 전체이용가 환경을 위해 기본적으로는 숨겨져 있습니다.",
   expertUnlocked:"🔥 MASTER・2000 RUSH 해금!",
+  /* ❓ 수수께끼 설정 (버그 재현) */
+  secMystery:"❓ 수수께끼 설정 (버그 재현)",
+  swayAllModes:"모든 게임 모드에서 흔들기 (멀미 주의)",
+  swayAllModesHint:"🚚트럭／🪐ORBIT 이외의 모드에서도 레인을 흔듭니다. 원래 버그로 일어났던 움직임을 설정으로 남긴 것입니다. 각 모드의 ‘흔들지 않음’ 설정보다 이 체크가 우선합니다. 멀미가 쉬운 분은 주의하세요.",
   leftSub:"왼쪽 키 (서브)", rightSub:"오른쪽 키 (서브)", unset:"미설정",
   keyPresetDefault:"↺ A／Space (기본)", keyPresetTaiko:"osu!taiko 스타일 (F・J／D・K)", keysPresetDone:"키 설정을 '{name}'(으)로 바꿨습니다.",
   captureSubLeft:"왼쪽 서브 키로 지정할 키를 누르세요. Backspace로 해제, ESC로 취소.",

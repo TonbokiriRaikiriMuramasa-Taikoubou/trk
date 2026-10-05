@@ -75,6 +75,14 @@ for (const [kind, ref] of refs) {
 }
 if (!missingRefs) ok(`index.html local references (${refs.length} checked)`);
 
+// Duplicate static IDs can silently wire event handlers to the wrong control.
+const indexIds = [...index.matchAll(/\bid=["']([^"']+)["']/gi)].map(match => match[1]);
+const idCounts = new Map();
+for (const id of indexIds) idCounts.set(id, (idCounts.get(id) || 0) + 1);
+const duplicateIds = [...idCounts].filter(([, count]) => count > 1).map(([id, count]) => `${id} (${count})`);
+if (duplicateIds.length) fail(`index.html contains duplicate IDs: ${duplicateIds.join(", ")}`);
+else ok(`index.html static IDs are unique (${indexIds.length} checked)`);
+
 const privacy = read("privacy.html").replace(/<!--[\s\S]*?-->/g, "");
 let missingPrivacyRefs = 0;
 for (const match of privacy.matchAll(/(?:href|src)=["']([^"']+)["']/gi)) {
@@ -302,6 +310,114 @@ if (!read("js/main.js").includes("guideEggKind") ||
   } else {
     ok("antenna character skins (10 dot characters incl. 5 Touhou fan works + custom 2-image ON/OFF) are wired, Touhou credit in NOTICE");
   }
+}
+
+// The FX API is intentionally frozen. A strict-mode mutation here aborts the
+// remainder of main.js and leaves every primary selection-screen control inert.
+{
+  const main = read("js/main.js");
+  const requiredWiring = [
+    '$("language").addEventListener("change"',
+    '$("mediaFile").addEventListener("change"',
+    '$("openSettingsBtn").addEventListener("click"',
+    '$("modePicker").addEventListener("click"'
+  ];
+  if (requiredWiring.some(fragment => !main.includes(fragment)) ||
+      /window\.TrkFX\s*\[[^\]]+\]\s*=/.test(main) ||
+      !main.includes('target.closest("#fxPanel .fxGrid .fxSeg button")')) {
+    fail("selection-screen startup wiring or immutable TrkFX integration is broken");
+  } else {
+    ok("language / settings / play-mode / media-file handlers stay wired; frozen TrkFX is not mutated");
+  }
+}
+
+// 🖥 Full-screen video: the TV dock key right of "next song" and the media
+// player button right of "reverse" (wallpaper shifts one step to the right).
+{
+  const videoMax = read("js/video-max.js");
+  const tv = read("js/tv-dock.js");
+  const media = read("js/media-player-mode.js");
+  if (!videoMax.includes("window.TrkVideoMax = Object.freeze(") || !videoMax.includes("function toggleMax()") ||
+      !read("index.html").includes('<script src="js/video-max.js"></script>') ||
+      !read("css/style.css").includes("#videoMaxView")) {
+    fail("full-screen video viewer (js/video-max.js) is not wired");
+  } else if (!tv.includes('btn("tvKey tvPause tvMax"') || !tv.includes("window.TrkVideoMax.toggle()") ||
+             !tv.includes('tvVideoMax:"') || !/top\.append\(pow, prevSongBtn, lcd, nextSongBtn, pauseBtn\)/.test(tv)) {
+    fail("TV dock video-maximize key (right of the next-song key) is missing");
+  } else if (!media.includes("maxNode = makeButton(\"mediaVideoMax\"") ||
+             !media.includes("controls.append(prev, playNode, next, reverseNode, maxNode, wallNode, restart)") ||
+             !media.includes('mediaVideoMax:"')) {
+    fail("media player full-screen button (right of reverse, wallpaper shifted right) is missing");
+  } else {
+    ok("full-screen video viewer is wired (TV dock ⛶ + media player, wallpaper stays one step right)");
+  }
+}
+
+// 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own
+// "don't sway" option, plus the ❓ mystery switch that outranks both.
+{
+  const truck = read("js/truck.js");
+  const modes = read("js/modes.js");
+  const options = read("js/i18n-options.js");
+  const main = read("js/main.js");
+  const html = read("index.html");
+  const swayOk = truck.includes("function swayModeOn(mode)") &&
+    truck.includes('if (settings.swayAllModes) return true;') &&
+    truck.includes('if (m === "truck") return settings.swayTruck !== false;') &&
+    truck.includes('if (m === "orbit") return settings.swayOrbit !== false;') &&
+    truck.includes("if (reduceMotion.matches || !swayModeOn()) return 0;") &&
+    truck.includes('settings.swayTruck = prefs.swayTruck !== false;') &&
+    truck.includes('settings.swayOrbit = prefs.swayOrbit !== false;') &&
+    truck.includes("settings.swayAllModes = prefs.swayAllModes === true;");
+  const uiOk = html.includes('id="swayTruck"') && html.includes('id="swayAllModes"') &&
+    modes.includes('makeCheck("swayOrbit", "swayOrbit", "swayOrbit")') &&
+    main.includes('["swayAllModes", "swayAllModes"]') &&
+    ["ja", "en", "zh", "ko"].every(l => options.includes(`swayAllModes:"`)) &&
+    (options.match(/swayAllModes:"/g) || []).length >= 4;
+  if (!swayOk) fail("lane sway gating (TRUCK / ORBIT by default, mystery override) is broken");
+  else if (!uiOk) fail("lane sway options (TRUCK / ORBIT checkboxes + ❓ mystery switch) are missing");
+  else ok("lane sway defaults to TRUCK / ORBIT with per-mode off switches; ❓ mystery switch overrides all modes");
+}
+
+// ✨ Frame interpolation (js/frame-interp.js): opt-in motion-compensated
+// interpolation for the media player and the full-screen viewer. WebGL2 only,
+// fully offline, and the settings must sit directly above the A-B loop box.
+{
+  const fi = read("js/frame-interp.js");
+  const player = read("js/media-player-mode.js");
+  const core = read("js/core.js");
+  const html = read("index.html");
+  const max = read("js/video-max.js");
+  const settingsOk =
+    core.includes('frameInterp: pick(prefs.frameInterp, ["off", "blend", "flow"], "off")') &&
+    core.includes("frameInterpStrength: num(prefs.frameInterpStrength, 0, 1, .85)") &&
+    fi.includes('const MODES = ["off", "blend", "flow"];') &&
+    fi.includes("const FLOW_LAMBDA = 0.010;") &&
+    fi.includes("const FLOW_RANGE = 64;") &&
+    fi.includes("settings.frameInterp = next;") && fi.includes("saveUserPrefs();");
+  const glOk =
+    fi.includes('getContext("webgl2"') &&
+    fi.includes('getExtension("EXT_color_buffer_float")') &&
+    fi.includes("gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1])") &&
+    fi.includes("gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true)") &&
+    fi.includes("requestVideoFrameCallback") &&
+    fi.includes("float costF(") && fi.includes("float costB(");
+  const offlineOk = !fi.includes("fetch(") && !fi.includes("import ") && !fi.includes("Worker(");
+  const uiOk = html.includes('<script src="js/frame-interp.js"></script>') &&
+    player.includes("const FI = window.TrkFrameInterp;") &&
+    player.includes("dialog.append(header, display, stageWrap, controls, progressRow, interpBox, loopBox, options, queuePanel, footer)") &&
+    player.includes('FI.attach("media", stageCanvas)') && player.includes('FI.detach("media")') &&
+    max.includes('window.TrkFrameInterp.attach("max", canvas)') && max.includes('window.TrkFrameInterp.detach("max")');
+  const langOk = (fi.match(/mediaInterpTitle:/g) || []).length === 4 &&
+    (fi.match(/mediaInterpHint:/g) || []).length === 4 &&
+    (fi.match(/mediaInterpFlow:/g) || []).length === 4 &&
+    (fi.match(/mediaInterpBlocked:/g) || []).length === 4;
+  if (!settingsOk) fail("frame interpolation settings / flow constants are missing");
+  else if (!glOk) fail("frame interpolation must run on WebGL2 (MRT flow passes, video frame callbacks)");
+  else if (!offlineOk) fail("frame interpolation must stay offline (no fetch, imports or workers)");
+  else if (!uiOk) fail("frame interpolation must be wired into the media player above the A-B loop box");
+  else if (!langOk) fail("frame interpolation strings are missing from one of the four languages");
+  else ok("frame interpolation is opt-in, WebGL2-only, offline, above the A-B loop box, in four languages");
 }
 
 // A cache name is deliberately checked for existence, not for a guessed

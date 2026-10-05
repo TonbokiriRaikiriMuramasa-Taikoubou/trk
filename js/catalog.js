@@ -1,0 +1,94 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+/* ==========================================================================
+   trk! catalog.js — 🛒 公式カタログ（音源は同梱しないプレイリスト集）
+
+   【考え方】
+   ・音源ファイル・譜面は一切ここに入れない。曲名などの「見出し」と公式の入手先だけ
+   ・取り込むと「欲しい曲リスト（wish）」付きのプレイリストになる。未入手の曲は
+     ライブラリでは薄く表示され、Musicフォルダに同じ曲名のファイルが入ると自動で追加される
+   ・リンク先はすべて公式サイト（https限定）。trk! は内容を保証しない
+   ・楽曲名・アルバム名は事実情報（著作権で保護されない）だが、シリーズ名などの
+     商標はそれぞれの権利者さんのもの（NOTICE.md 参照。無関係・非公認です）
+   ・MOD：自分のファイルで TRK_CATALOG.push({...}) しても追加できる（catalog.js より前に読む）
+     S = シリーズ、PL = プレイリスト、T = 曲（t:曲名 / al:アルバム / ar:アーティスト / u:入手先URL）
+
+   読み込み順：library.js の直前
+   ========================================================================== */
+"use strict";
+const TRK_CATALOG = [];
+(() => {
+const S = (id, name, icon, color, catName, catIcon, note, url, playlists) =>
+  TRK_CATALOG.push({ id, name, icon, color, catName, catIcon, note, url, playlists });
+const PL = (id, name, icon, color, tags, songs) => ({ id, name, icon, color, tags, songs });
+const T = (t, al, ar, u) => ({ t, al: al || "", ar: ar || "", u: u || "" });
+
+/* ================= 🎒 ブルーアーカイブ（Nexon / Yostar） ================= */
+S("bluearchive", "ブルーアーカイブ", "🎒", "blue", "ソーシャルゲーム", "🎮",
+  "公式サウンドトラック（Vol.1〜Vol.4）は各種サブスク・ストアで配信中。公式YouTubeチャンネルでも聴けます。音源はご自身で入手してMusicフォルダへ。",
+  "https://bluearchive.jp/",
+  [PL("ba-ost", "ブルアカ OST 厳選", "🎧", "blue", ["ブルアカ", "ゲーム"],
+    [T("Unwelcome School", "Blue Archive Original Soundtrack Vol.4", "Mitsukiyo"),
+     T("Constant Moderato", "Blue Archive Original Soundtrack Vol.1", "Mitsukiyo"),
+     T("青春のアーカイブ", "", "")])]);
+
+/* ================= 🩺 アークナイツ（Hypergravity / Yostar） =================
+   公式レーベル「Monster-Siren Records（塞壬唱片）」は全楽曲を公式サイトで公開・販売。
+   曲名をタップすると公式の楽曲ページが開きます（開く前に確認が出ます）。 */
+S("arknights", "アークナイツ", "🩺", "amber", "ソーシャルゲーム", "🎮",
+  "公式音楽レーベル「Monster-Siren Records」のサイトで全楽曲を試聴・購入できます（中国語サイト・要ログインの場合あり）。",
+  "https://monster-siren.hypergryph.com/",
+  [PL("ak-msr", "アークナイツ MSR 厳選", "🎼", "amber", ["アークナイツ", "ゲーム"],
+    [T("Still the Same", "", "", "https://monster-siren.hypergryph.com/music/461129"),
+     T("Final Embrace", "", "", "https://monster-siren.hypergryph.com/music/125053"),
+     T("Il Signore del Carnevale", "揭幕者们 / I Portatori dei Velluti OST", "", "https://monster-siren.hypergryph.com/music/048783"),
+     T("Don't Waste the Joke", "揭幕者们 / I Portatori dei Velluti OST", "", "https://monster-siren.hypergryph.com/music/461135"),
+     T("Boiling Blood", "明日方舟 Sound Track", "Cristina Vee"),
+     T("Battleplan Arclight", "Contingency Contract Battleplan Pyrolysis OST", "")])]);
+
+/* ================= ⚔️ League of Legends（Riot Games） =================
+   Riot Games Music の「Sessions」シリーズは、クリエイターが安心して使える
+   （Creator-Safe）楽曲として無料公開されている。SoundCloud の公式ページから
+   ファイルをダウンロードできる曲もある。 */
+S("lol", "League of Legends", "⚔️", "aqua", "PCゲーム", "🕹️",
+  "Riot Games Music「Sessions」シリーズはクリエイター向けに無料公開（Creator-Safe）。SoundCloudの公式ページからダウンロードできる曲もあります。ガイドラインも確認してくださいね。",
+  "https://www.riotgames.com/en/riot-music-creator-safe-guidelines",
+  [PL("lol-svi", "Sessions: Vi 厳選", "🥊", "aqua", ["LoL", "Lo-Fi"],
+    [T("Passengers.", "Sessions: Vi", "chromonicci"),
+     T("Sage", "Sessions: Vi", "junior state"),
+     T("Hollow", "Sessions: Vi", "Hanz"),
+     T("Geode", "Sessions: Vi", "Gemp, Sinnr"),
+     T("Reading Night", "Sessions: Vi", "xander."),
+     T("In Circles", "Sessions: Vi", "Tennyson"),
+     T("Swing", "Sessions: Vi", "SwuM"),
+     T("Take Your Time", "Sessions: Vi", "Engelwood"),
+     T("Home Is Where My Heart Is", "Sessions: Vi", "Kupla"),
+     T("Iota", "Sessions: Vi", "Laxcity"),
+     T("Golden", "Sessions: Vi", "Idealism"),
+     T("Daffodil", "Sessions: Vi", "Tennyson"),
+     T("Afterglow", "Sessions: Vi", "Kupla"),
+     T("First Light", "Sessions: Vi", "goosetaf")])]);
+
+/* ================= 🎯 VALORANT（Riot Games） ================= */
+S("valorant", "VALORANT", "🎯", "red", "PCゲーム", "🕹️",
+  "VALORANTのオフィシャル楽曲は公式YouTubeチャンネル・ストアで公開。RiotのCreator-Safeガイドラインも参照してください。",
+  "https://www.riotgames.com/en/riot-music-creator-safe-guidelines",
+  [PL("val-themes", "VALORANT テーマ厳選", "🎯", "red", ["VALORANT"],
+    [T("Die For You", "VALORANT Champions 2021", "Grabbitz"),
+     T("Entertain Me", "VALORANT OST", "Ylona Garcia"),
+     T("On My Level", "VALORANT OST", "Ashley Warren")])]);
+
+/* ================= ⭐ 東方Project（上海アリス幻樂団） ================= */
+S("touhou", "東方Project", "⭐", "red", "同人ゲーム", "🏮",
+  "ZUNさん（上海アリス幻樂団）の公式サイト。作品と音楽CDの情報はここで。ゲームの体験版もダウンロードできます（体験版にもBGMが入っています）。",
+  "https://www16.big.or.jp/~zun/",
+  [PL("th-classics", "東方 原曲クラシック", "⭐", "red", ["東方", "原曲"],
+    [T("U.N.オーエンは彼女なのか?", "東方紅魔郷", "ZUN"),
+     T("亡き王女の為のセプテット", "東方紅魔郷", "ZUN"),
+     T("月まで届け、不死の煙", "東方紅魔郷", "ZUN"),
+     T("幽雅に咲かせ、墨染の桜 ～ Border of Life", "東方妖々夢", "ZUN"),
+     T("千年幻想郷 ～ History of the Moon", "東方永夜抄", "ZUN"),
+     T("ハルトマンの妖怪少女", "東方地霊殿", "ZUN"),
+     T("神々が恋した幻想郷", "東方風神録", "ZUN"),
+     T("ネイティブフェイス", "東方風神録", "ZUN")])]);
+})();
+/* ✅ catalog.js 完了（シリーズ5・プレイリスト5。MODで TRK_CATALOG.push して追加できます） */

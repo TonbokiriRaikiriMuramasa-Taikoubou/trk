@@ -189,6 +189,18 @@ if (!exists("js/fx-worklet.js") ||
   ok("pro-audio effects (gate / denoise / dynamic EQ) and rack are wired");
 }
 
+// 🛒 Official-source catalog: no-audio curated playlists with wishlist matching.
+if (!exists("js/catalog.js") ||
+    !read("js/catalog.js").includes("TRK_CATALOG") ||
+    !read("js/library.js").includes("plCatalogMenu") ||
+    !read("js/library.js").includes("plWishMatch") ||
+    !read("js/library.js").includes("plWishRows") ||
+    !read("index.html").includes('src="js/catalog.js"')) {
+  fail("official catalog plumbing is missing");
+} else {
+  ok("official catalog (wishlist auto-match, no bundled audio) is wired");
+}
+
 // A cache name is deliberately checked for existence, not for a guessed
 // date, because the service worker is manually bumped for every release.
 const sw = read("sw.js");

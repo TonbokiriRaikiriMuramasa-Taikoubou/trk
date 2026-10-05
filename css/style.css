@@ -1112,6 +1112,8 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
 /* 📁 フォルダの中身チップ・ネストタブ・曲ごとの🔗 */
 .plChipsRow{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
 .libTab.plNested{border-style:dashed;opacity:.95}
+/* 🛒 カタログの未入手曲（薄く・破線） */
+.plWishRow{opacity:.55;border-style:dashed}
 .plLinkMini{position:absolute;right:32px;top:6px;padding:2px 8px;font-size:12px;border-radius:8px}
 
 /* ---- 1) 🎛 タブプレーヤー（金属のタブ＋光るインジケータ） ---- */

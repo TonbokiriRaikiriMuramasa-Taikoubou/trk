@@ -328,7 +328,12 @@ Object.assign(TEXT.ja, {
   plFolderCreated:"📁 フォルダ「{name}」を作成しました", plFolderDeleted:"🗑 フォルダを削除しました（中身は上の階層へ）",
   fldTabHint:"このフォルダは空です。プレイリストの長押し → 設定の「入れ物」で、このフォルダへ移動できます。",
   plTags:"タグ（検索用）", plTagsPh:"esports 名場面 …（スペース区切り・5個まで）",
-  plProfileUrl:"入手先リンク（https://・共有に添付）", plLinkBad:"❌ リンクは https:// ではじめてください"
+  plProfileUrl:"入手先リンク（https://・共有に添付）", plLinkBad:"❌ リンクは https:// ではじめてください",
+  plCatalogBtn:"🛒 公式カタログ", plCatalogTitle:"🛒 公式カタログ（音源は同梱しません）",
+  plCatalogHint:"プレイリストの「欲しい曲リスト」を取り込めます。音源ファイルは一切同梱されません。公式の入手先から自分で入手して 📁 Musicフォルダ に入れると、同じ曲名の曲が自動でプレイリストに加わります（未入手の曲は薄く表示されます）。",
+  plCatalogTake:"📥 取り込む（{n}曲）", plCatalogTaken:"📥 取り込みました（{name}）。曲を入手してMusicフォルダに入れると自動で追加されます",
+  plCatalogDup:"すでに取り込んでいます（{name}）", plWishHead:"📡 未入手（{n}）— 入手してMusicフォルダに入れると自動で追加",
+  plWishTag:"未入手", plGuideTitle:"📥 このプレイリストの入手先"
 });
 Object.assign(TEXT.en, {
   plNewFolder:"📁 New folder", plDefaultFolderName:"Folder", plFolderSettings:"Folder settings",
@@ -337,7 +342,12 @@ Object.assign(TEXT.en, {
   plFolderCreated:"📁 Folder “{name}” created", plFolderDeleted:"🗑 Folder deleted (contents moved up)",
   fldTabHint:"This folder is empty. Move playlists here from their long-press settings (“Location”).",
   plTags:"Tags (for search)", plTagsPh:"esports highlights … (space-separated, up to 5)",
-  plProfileUrl:"Source link (https://, attached when shared)", plLinkBad:"❌ Links must start with https://"
+  plProfileUrl:"Source link (https://, attached when shared)", plLinkBad:"❌ Links must start with https://",
+  plCatalogBtn:"🛒 Official catalog", plCatalogTitle:"🛒 Official catalog (no audio bundled)",
+  plCatalogHint:"Import curated playlists as a “wanted songs” list. No audio files are included. Get the music from the official sources, drop it into your 📁 Music folder, and matching songs join the playlist automatically (missing songs appear dimmed).",
+  plCatalogTake:"📥 Import ({n} songs)", plCatalogTaken:"📥 Imported ({name}). Add the music to your Music folder and it joins automatically.",
+  plCatalogDup:"Already imported ({name})", plWishHead:"📡 Not yet in your library ({n}) — they join automatically once added to the Music folder",
+  plWishTag:"missing", plGuideTitle:"📥 How to get this music"
 });
 Object.assign(TEXT.zh, {
   plNewFolder:"📁 新建文件夹", plDefaultFolderName:"文件夹", plFolderSettings:"文件夹设置",
@@ -346,7 +356,12 @@ Object.assign(TEXT.zh, {
   plFolderCreated:"📁 已创建文件夹「{name}」", plFolderDeleted:"🗑 已删除文件夹（内容移到上一层）",
   fldTabHint:"此文件夹为空。在播放列表的长按设置「所属位置」中即可移入。",
   plTags:"标签（搜索用）", plTagsPh:"esports 名场面 …（空格分隔・最多5个）",
-  plProfileUrl:"入手链接（https://・共享时附带）", plLinkBad:"❌ 链接必须以 https:// 开头"
+  plProfileUrl:"入手链接（https://・共享时附带）", plLinkBad:"❌ 链接必须以 https:// 开头",
+  plCatalogBtn:"🛒 官方目录", plCatalogTitle:"🛒 官方目录（不包含音源）",
+  plCatalogHint:"导入精选播放列表的“想要的歌曲”清单。不包含任何音频文件。请从官方渠道自行获取音乐并放入 📁 Music文件夹，同名歌曲会自动加入播放列表（未获取的歌曲会以浅色显示）。",
+  plCatalogTake:"📥 导入（{n}曲）", plCatalogTaken:"📥 已导入（{name}）。把音乐放进Music文件夹后会自动加入。",
+  plCatalogDup:"已经导入过了（{name}）", plWishHead:"📡 尚未入库（{n}）— 获取并放入Music文件夹后会自动加入",
+  plWishTag:"未入库", plGuideTitle:"📥 这个播放列表的获取方式"
 });
 Object.assign(TEXT.ko, {
   plNewFolder:"📁 새 폴더", plDefaultFolderName:"폴더", plFolderSettings:"폴더 설정",
@@ -355,7 +370,12 @@ Object.assign(TEXT.ko, {
   plFolderCreated:"📁 폴더 '{name}'을(를) 만들었어요", plFolderDeleted:"🗑 폴더를 삭제했어요(내용은 위 계층으로)",
   fldTabHint:"이 폴더는 비어 있어요. 재생목록 길게 누른 설정의 '소속'에서 이 폴더로 옮길 수 있어요.",
   plTags:"태그(검색용)", plTagsPh:"esports 명장면 …(공백 구분・최대 5개)",
-  plProfileUrl:"입수처 링크(https://・공유 시 첨부)", plLinkBad:"❌ 링크는 https:// 로 시작해야 해요"
+  plProfileUrl:"입수처 링크(https://・공유 시 첨부)", plLinkBad:"❌ 링크는 https:// 로 시작해야 해요",
+  plCatalogBtn:"🛒 공식 카탈로그", plCatalogTitle:"🛒 공식 카탈로그 (음원 미포함)",
+  plCatalogHint:"엄선 플레이리스트를 '원하는 곡 목록'으로 가져와요. 오디오 파일은 하나도 포함되지 않아요. 공식 입수처에서 직접 구해 📁 Music 폴더에 넣으면 같은 제목의 곡이 자동으로 플레이리스트에 들어와요 (미입수 곡은 연하게 표시돼요).",
+  plCatalogTake:"📥 가져오기 ({n}곡)", plCatalogTaken:"📥 가져왔어요 ({name}). 음악을 Music 폴더에 넣으면 자동으로 추가돼요.",
+  plCatalogDup:"이미 가져왔어요 ({name})", plWishHead:"📡 아직 없는 곡 ({n}곡) — Music 폴더에 넣으면 자동으로 추가돼요",
+  plWishTag:"미입수", plGuideTitle:"📥 이 플레이리스트 입수처"
 });
 
 
@@ -481,6 +501,42 @@ function plFolderContext() {   /* いま見ている場所のフォルダ（新�
   if (settings.libTab.startsWith("pl:")) { const p = plById(settings.libTab.slice(3)); return (p && p.folder) || ""; }
   return "";
 }
+/* 🛒 カタログの「欲しい曲」（wish）を曲名で探す。見つかればプレイリストに自動追加 */
+const plNormTitle = t => String(t || "").trim().toLowerCase().replace(/\s+/g, " ");
+function plWishMatch(w, byTitle) {
+  const cands = byTitle.get(plNormTitle(w.t));
+  if (!cands || !cands.length) return null;
+  if (cands.length === 1) return cands[0];
+  const al = plNormTitle(w.al), ar = plNormTitle(w.ar);   /* 同名が複数ならアルバム→アーティストで当たりをつける */
+  if (al) { const hit = cands.find(it => plNormTitle((metaOf(it.key) || {}).album) === al); if (hit) return hit; }
+  if (ar) { const hit = cands.find(it => plNormTitle((metaOf(it.key) || {}).artist || it.artist) === ar); if (hit) return hit; }
+  return cands[0];
+}
+function plSyncWishes(p, byTitle) {
+  let ch = false;
+  for (const w of p.wish) {
+    const it = plWishMatch(w, byTitle);
+    if (it && !p.songs.includes(it.key)) { p.songs.push(it.key); ch = true; }
+  }
+  return ch;
+}
+/* 📡 未入手の曲（薄く表示。クリックで入手先を開く） */
+function plWishRows(box, wish) {
+  box.append(el("div", "libEmpty", tr("plWishHead", { n: wish.length })));
+  for (const w of wish.slice(0, 60)) {
+    const r = el("button", "libRow plWishRow"); r.type = "button";
+    r.append(el("span", "libLeft",
+      el("span", "libName", "🛒 " + w.t),
+      el("span", "libSub", [w.ar, w.al, tr("plWishTag")].filter(Boolean).join(" · "))));
+    if (w.u) {
+      r.addEventListener("click", () => plOpenLink(w.u));
+      r.append(el("i", "libTag", "🔗"));
+    }
+    box.append(r);
+  }
+}
+
+
 
 function plSanitize(raw) {
   if (!raw || typeof raw !== "object" || typeof raw.id !== "string" || !raw.id) return null;
@@ -495,6 +551,12 @@ function plSanitize(raw) {
     frozen: !!raw.frozen, locked: !!raw.locked, songs,
     folder: typeof raw.folder === "string" ? raw.folder.slice(0, 24) : "",
     tags: (Array.isArray(raw.tags) ? raw.tags : []).filter(t => typeof t === "string").map(t => t.trim().slice(0, 16)).filter(Boolean).slice(0, 5),
+    wish: (Array.isArray(raw.wish) ? raw.wish : []).filter(w => w && typeof w === "object" && w.t).slice(0, 100).map(w => ({
+      t: String(w.t).trim().slice(0, 120), al: String(w.al || "").trim().slice(0, 80), ar: String(w.ar || "").trim().slice(0, 80),
+      u: /^https:\/\/\S+$/i.test(w.u || "") ? String(w.u).slice(0, 300) : "" })),   /* 🛒 未入手の欲しい曲 */
+    guide: (raw.guide && typeof raw.guide === "object") ? { note: String(raw.guide.note || "").trim().slice(0, 80),
+      url: /^https:\/\/\S+$/i.test(raw.guide.url || "") ? String(raw.guide.url).slice(0, 300) : "" } : null,
+    cat: typeof raw.cat === "string" && /^[a-z0-9:-]{1,40}$/i.test(raw.cat) ? raw.cat : "",
     createdAt: (typeof raw.createdAt === "number" && raw.createdAt > 0 && raw.createdAt < 9e15) ? raw.createdAt : 0 };
 }
 (function plTighten() {
@@ -615,6 +677,15 @@ function plMenu(p) {
   del.disabled = !!p.locked; del.title = p.locked ? tr("plLockedNo") : "";
   del.addEventListener("click", () => plDelete(p, d.close));
   lk.addEventListener("change", () => { del.disabled = lk.checked; del.title = lk.checked ? tr("plLockedNo") : ""; });
+  if (p.guide && (p.guide.note || p.guide.url)) {   /* 🛒 公式カタログから取り込んだ入手先 */
+    d.card.append(el("div", "plSep"), el("b", "plCardTitle", tr("plGuideTitle")));
+    if (p.guide.note) d.card.append(el("div", "plHint", "📄 " + p.guide.note));
+    if (p.guide.url) {
+      const gb = el("button", "plBtn", tr("plLinkOpen")); gb.type = "button";
+      gb.addEventListener("click", () => plOpenLink(p.guide.url));
+      d.card.append(gb);
+    }
+  }
   d.card.append(plRow(tr("plName"), name), plRow(tr("plIcon"), icon), plRow(tr("plColor"), color),
     plRow(tr("plFolderOf"), fldSel), plRow(tr("plTags"), tags),
     plRow(tr("plFrozenCheck"), fz), plRow(tr("plLockedCheck"), lk),
@@ -710,6 +781,52 @@ function plDeleteGesture(p, btn) {
 }
 
 /* 📚すべて／自動タブの長押し＝プレイリスト全体の設定 */
+/* ---------- 🛒 公式カタログ（音源は同梱しない。公式の入手先を案内するだけ） ---------- */
+function plCatalogFolder(s) {   /* シリーズのフォルダ（親カテゴリ → シリーズ。無ければ作る） */
+  let parent = settings.plFolders.find(f => !f.parent && f.name === s.catName);
+  if (!parent) { parent = plFolderSanitize({ id: "fl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    name: s.catName, icon: s.catIcon || "🎮", color: "none", parent: "", createdAt: Date.now() }); settings.plFolders.push(parent); }
+  let fld = settings.plFolders.find(f => f.parent === parent.id && f.name === s.name);
+  if (!fld) { fld = plFolderSanitize({ id: "fl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    name: s.name, icon: s.icon, color: s.color, parent: parent.id, createdAt: Date.now() }); settings.plFolders.push(fld); }
+  return fld.id;
+}
+function plCatalogMenu() {
+  const d = plDialog(tr("plCatalogTitle"));
+  d.card.append(el("div", "plHint", tr("plCatalogHint")));
+  const cat = window.TRK_CATALOG || [];
+  if (!cat.length) d.card.append(el("div", "plSep"), el("div", "plHint", tr("plImportBad")));
+  for (const s of cat) {
+    d.card.append(el("div", "plSep"), el("b", "plCardTitle", `${s.icon} ${s.name}`));
+    if (s.note) d.card.append(el("div", "plHint", "📄 " + s.note));
+    if (s.url) {
+      const b = el("button", "plBtn", tr("plLinkOpen")); b.type = "button";
+      b.addEventListener("click", () => plOpenLink(s.url));
+      d.card.append(b);
+    }
+    for (const pl of s.playlists) {
+      const row = el("div"); row.style.cssText = "display:flex;gap:8px;align-items:center;margin:4px 0;flex-wrap:wrap";
+      const btn = el("button", "plBtn", tr("plCatalogTake", { n: pl.songs.length })); btn.type = "button";
+      btn.addEventListener("click", () => { d.close(); plCatalogTake(s, pl); });
+      row.append(el("span", "", `${pl.icon} ${pl.name}`), btn);
+      d.card.append(row);
+    }
+  }
+}
+function plCatalogTake(s, pl) {
+  const cat = s.id + ":" + pl.id;
+  if (settings.playlists.some(p => p.cat === cat)) { plToast(tr("plCatalogDup", { name: pl.name })); return; }
+  const fldId = plCatalogFolder(s);
+  const p = plSanitize({ id: "pl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    name: pl.name, icon: pl.icon, color: pl.color, frozen: false, locked: false, folder: fldId, tags: pl.tags,
+    cat, wish: pl.songs, guide: { note: s.note, url: s.url }, songs: [] });
+  p.createdAt = Date.now();
+  settings.playlists.push(p); saveUserPrefs();
+  settings.libTab = "pl:" + p.id;
+  renderLib();
+  plToast(tr("plCatalogTaken", { name: p.name }));
+}
+
 function plGlobalMenu() {
   const d = plDialog(tr("plGlobalTitle"));
   const make = el("button", "plBtn", tr("plNewTab")); make.type = "button";
@@ -718,11 +835,13 @@ function plGlobalMenu() {
   imp.addEventListener("click", () => { d.close(); plImportPick(); });
   const mkfld = el("button", "plBtn", tr("plNewFolder")); mkfld.type = "button";
   mkfld.addEventListener("click", () => { d.close(); plFolderCreate(plFolderContext()); });
+  const catb = el("button", "plBtn", tr("plCatalogBtn")); catb.type = "button";
+  catb.addEventListener("click", () => { d.close(); plCatalogMenu(); });
   const one = el("input"); one.type = "radio"; one.name = "plDelMode"; one.checked = settings.playlistDelMode !== "three";
   const three = el("input"); three.type = "radio"; three.name = "plDelMode"; three.checked = settings.playlistDelMode === "three";
   const saveMode = () => { settings.playlistDelMode = three.checked ? "three" : "one"; saveUserPrefs(); };
   one.addEventListener("change", saveMode); three.addEventListener("change", saveMode);
-  d.card.append(make, imp, mkfld, el("div", "plSep"),
+  d.card.append(make, imp, mkfld, catb, el("div", "plSep"),
     plRow(tr("plDelOne"), one), plRow(tr("plDelThree"), three),
     el("div", "plHint", tr("plDelModeHint")));
 }
@@ -1088,6 +1207,12 @@ function renderLib() {
   const box = $("libList"); box.textContent = "";
   const all = allSongs();
   $("libCount").textContent = all.length ? tr("libCount", { n:all.length }) : "";
+  const byTitle = new Map();   /* 🛒 カタログ照合用（正規化した曲名 → 曲のリスト） */
+  for (const it of all) { const k = plNormTitle((metaOf(it.key) || {}).title || it.title); if (!byTitle.has(k)) byTitle.set(k, []); byTitle.get(k).push(it); }
+  {   /* Musicフォルダに「欲しい曲」が届いていたら自動でプレイリストへ（🧊フリーズ中は尊重） */
+    const wishers = settings.playlists.filter(p => p.wish && p.wish.length && !p.frozen);
+    if (wishers.length && all.length) { let ch = false; for (const p of wishers) if (plSyncWishes(p, byTitle)) ch = true; if (ch) saveUserPrefs(); }
+  }
   const tabId = renderLibTabs(libTabsOf(all));          // タブは、曲が1つも無くても片付ける
   if (!all.length) { libView = []; box.append(el("div", "libEmpty", tr("libEmptyList"))); return; }
   const scope = all.filter(it => libTabMatch(it, tabId));
@@ -1128,7 +1253,18 @@ function renderLib() {
     if (bar.childElementCount) box.append(bar);
   }
   libView = items.map(x => x.it);
-  if (!items.length) { box.append(el("div", "libEmpty", tr(scope.length ? "libNoMatch" : (tabId.startsWith("pl:") ? "plTabHint" : tabId.startsWith("fld:") ? "fldTabHint" : "libTabEmpty")))); return; }
+  const wishLeft = [];   /* 🛒 まだライブラリに無い曲（薄く表示） */
+  if (tabId.startsWith("pl:")) {
+    const wp = plById(tabId.slice(3));
+    if (wp && wp.wish && wp.wish.length) for (const w of wp.wish) {
+      const it = plWishMatch(w, byTitle);
+      if (!it || !wp.songs.includes(it.key)) wishLeft.push(w);
+    }
+  }
+  if (!items.length) {
+    if (wishLeft.length) { plWishRows(box, wishLeft); return; }
+    box.append(el("div", "libEmpty", tr(scope.length ? "libNoMatch" : (tabId.startsWith("pl:") ? "plTabHint" : tabId.startsWith("fld:") ? "fldTabHint" : "libTabEmpty")))); return;
+  }
   for (const { it, info } of items.slice(0, LIB_SHOW)) {
     const wrap = el("div"); wrap.style.cssText = "display:flex;gap:6px;align-items:stretch";
     const cur = currentSong && currentSong.key === it.key;
@@ -1176,6 +1312,7 @@ function renderLib() {
     box.append(wrap);
   }
   if (items.length > LIB_SHOW) box.append(el("div", "hint", tr("libMore", { n:items.length - LIB_SHOW })));
+  if (wishLeft.length) plWishRows(box, wishLeft);   /* 🛒 持っている曲の下に、未入手の曲を薄く並べる */
 }
 
 /* ---------- 選曲画面の曲名の欄 ---------- */

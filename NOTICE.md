@@ -103,7 +103,9 @@ trk! is not affiliated with or endorsed by their authors.
 ### 4d. Official-source playlist catalog (trademarks, factual listings)
 
 js/catalog.js (`TRK_CATALOG`) contains curated playlists for Blue Archive,
-Arknights, League of Legends "Sessions: Vi", VALORANT and Touhou Project.
+Arknights, League of Legends "Sessions: Vi", VALORANT, Touhou Project,
+NoCopyrightSounds, Kevin MacLeod (incompetech), Genshin Impact,
+100% Orange Juice and Gakuen iDOLM@STER.
 It bundles **no audio files, charts, or copyrighted works** — only factual
 metadata (track / artist / album names, which are facts) and links that point
 exclusively to official sources (bluearchive.jp, Monster-Siren Records,
@@ -124,4 +126,6 @@ trk! is an independent fan project. It is not affiliated with or endorsed by
 ppy Pty Ltd (osu!), Bandai Namco (Taiko no Tatsujin), Crypton Future Media, INC.,
 VRChat Inc., pixiv Inc., Nexon Games / Yostar (Blue Archive), Hypergravity /
 Hypergryph (Arknights / Monster-Siren Records), Riot Games (League of Legends,
-VALORANT), or Team Shanghai Alice / ZUN (Touhou Project).
+VALORANT), Team Shanghai Alice / ZUN (Touhou Project), miHoYo / HOYO-MiX
+(Genshin Impact), Orange-Juice / Fruitbat Factory (100% Orange Juice), or
+Bandai Namco Entertainment (Gakuen iDOLM@STER / THE iDOLM@STER).

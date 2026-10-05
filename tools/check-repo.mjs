@@ -243,6 +243,29 @@ if (!read("js/main.js").includes("guideEggKind") ||
   ok("tutorial easter eggs (skip / cheat / god mode) are wired");
 }
 
+// 📊 Spectrum expansion (30 styles / 16 themes) + banner song buttons.
+{
+  const spec = read("js/spectrum.js");
+  const blockCount = (head, tag) => {
+    const a = spec.indexOf(head);
+    if (a < 0) return 0;
+    const b = spec.indexOf("};", a);
+    return (spec.slice(a, b).match(new RegExp(':"' + tag, "g")) || []).length;
+  };
+  const styleCount = blockCount("const STYLE_KEYS", "specStyle");
+  const themeCount = blockCount("const THEME_KEYS", "specTheme");
+  if (styleCount < 30 || themeCount < 16 ||
+      !spec.includes("drawDotgrid") || !spec.includes("drawMatrix") || !spec.includes("drawLightning") ||
+      !spec.includes("drawFireworks") || !spec.includes('theme === "synth"') ||
+      !spec.includes('onLongPress(zipBtn') ||
+      !read("js/library.js").includes("bannerSongStep") ||
+      !read("index.html").includes('id="bannerSongBtns"')) {
+    fail("spectrum expansion (30 styles / 16 themes) or banner song buttons are missing");
+  } else {
+    ok(`spectrum has ${styleCount} style labels / ${themeCount} theme labels, long-press settings, banner song buttons`);
+  }
+}
+
 // A cache name is deliberately checked for existence, not for a guessed
 // date, because the service worker is manually bumped for every release.
 const sw = read("sw.js");

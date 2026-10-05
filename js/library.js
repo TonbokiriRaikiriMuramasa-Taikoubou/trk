@@ -1447,6 +1447,7 @@ function renderBanner() {
   }
   previewSetBtn.textContent = tr("previewSet");
   previewSetBtn.hidden = !(s && videoReady);
+  if (typeof bannerSongBtnsSync === "function") bannerSongBtnsSync();
 }
 function updateSpBuilder() {
   $("songPackBuilder").hidden = !(currentSong && videoReady);
@@ -1551,6 +1552,28 @@ bannerVolSlider.addEventListener("input", () => {
   const sv = $("volume"); if (sv) sv.value = settings.musicVolume;   /* 設定画面のスライダーも合わせる */
   saveUserPrefs(); bannerVolSync();
 });
+/* ◀▶ バナーの左右中央で曲送り（TVドックの◀▶と同じ仕組み。いま開いているタブの中を送る） */
+const bannerPrevBtn = el("button", "bannerSongBtn", "◀"); bannerPrevBtn.type = "button"; bannerPrevBtn.style.left = "10px";
+const bannerNextBtn = el("button", "bannerSongBtn", "▶"); bannerNextBtn.type = "button"; bannerNextBtn.style.right = "10px";
+$("songBanner").append(bannerPrevBtn, bannerNextBtn);
+function bannerSongBtnsSync() {
+  const on = settings.bannerSongBtns !== false && allSongs().length > 0 && phase === "title";
+  bannerPrevBtn.hidden = bannerNextBtn.hidden = !on;
+  const t1 = tr("tvPrevSong"), t2 = tr("tvNextSong");
+  for (const [b, t] of [[bannerPrevBtn, t1], [bannerNextBtn, t2]]) { b.title = t; b.setAttribute("aria-label", t); }
+}
+async function bannerSongStep(dir) {
+  if (phase !== "title") return;
+  const it = dir < 0 ? prevSong() : nextSong();
+  if (it) await selectSong(it);
+}
+bannerPrevBtn.addEventListener("click", () => bannerSongStep(-1));
+bannerNextBtn.addEventListener("click", () => bannerSongStep(1));
+$("bannerSongBtns").addEventListener("change", e => {
+  settings.bannerSongBtns = e.target.checked; saveUserPrefs(); bannerSongBtnsSync();
+});
+$("bannerSongBtns").checked = settings.bannerSongBtns !== false;
+bannerSongBtnsSync();   /* 初回の表示あわせ（renderBanner が先に走っていた場合の保険） */
 
 
 /* ---------- 曲を選ぶ ---------- */

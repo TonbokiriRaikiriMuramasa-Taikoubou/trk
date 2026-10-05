@@ -116,6 +116,7 @@ const settings = {
   seVolume: num(prefs.seVolume, 0, 1, .28),
   musicVolume: num(prefs.musicVolume, 0, 1, .7),
   bannerPause: prefs.bannerPause === true,                                   // ⏯ 右上の曲名バナーをタップで一時停止（初期オフ）
+  bannerSongBtns: prefs.bannerSongBtns !== false,                            // ◀▶ バナー左右の曲送りボタン（初期オン）
   /* 🎹 シンセ演奏モード */
   synthModeDisabled: !!prefs.synthModeDisabled,
   synthModeFastStart: !!prefs.synthModeFastStart,
@@ -224,7 +225,7 @@ function resetVideoPrefs() {
   if (typeof menuVideoTick === "function") { try { menuVideoTick(); } catch(_) {} }
 }
 function resetAudioPrefs() {
-  settings.musicVolume = 0.7; settings.seVolume = 0.28; settings.seEnabled = false; settings.bannerPause = false;
+  settings.musicVolume = 0.7; settings.seVolume = 0.28; settings.seEnabled = false; settings.bannerPause = false; settings.bannerSongBtns = true;
   settings.synthModeDisabled = false; settings.synthModeFastStart = false; settings.synthModeKeyboardLock = true; settings.synthModeWideKeyboard = false;
   // fx-dock / eq-dock の音まわりがあれば一緒に初期化
   if ("gameVolume" in settings) settings.gameVolume = 0.7;

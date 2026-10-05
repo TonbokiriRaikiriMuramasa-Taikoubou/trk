@@ -270,6 +270,10 @@ details.panel[open]>summary{margin-bottom:14px}
   padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.28)}
 .bannerVolPanel[hidden]{display:none}
 .bannerVolPanel input{width:120px}
+/* ◀▶ バナー左右中央の曲送り */
+.bannerSongBtn{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:34px;height:46px;padding:0;
+  font-size:17px;line-height:1;border-radius:10px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.25);color:inherit}
+.bannerSongBtn:hover{background:rgba(0,0,0,.6)}
 
 /* ===== 9. プレイ記録 ===== */
 .recTop{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}

@@ -1,7 +1,7 @@
 # trk! 開発引き継ぎ文書（HANDOFF）
 
 > trk! is AGRG! — an All-Generation Rhythm Game
-> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン16種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り ＋ 🥁音ゲーマー向けFAST/SLOW・あべこべ・でたらめ ＋ 💬GitHub Issuesテンプレート ＋ 📊スペクトラム（音の見える化・**見え方16種・色8種・曲名バナーのスキン・🚫使用しないスイッチ**・TVに重ねられる）＋ 🎛エフェクトチェーン編集＋ 🎹曲に合わせて演奏できるシンセモード（16音色・エレキギター／電子サックス／ZUNPET風ブラス・±8半音ピッチ・鍵盤固定オプション初期オン・大画面向け鍵盤拡張オプション・起動オプション）＋ 📤ミュージックフォルダを共有（1回の許可で一括取り込み・🔗共有をつづける・💾端末に残す・🚫やめる）＋ privacy.html ＋ Capacitor Android準備 ＋ 権利とクレジット図鑑 ＋ パック権利カード（名刺）＋ 🧭 3分チュートリアル・プレイ演出設定・CATCHニトロ得点ボーナス・▶メディアプレーヤー・🎛Loop Lab（クイック／ランダム区間・曲別プリセット）・📡キャスト／バックグラウンド再生の個別アンテナ・🖼スキンの棚（プリセット31種・グラデ対応・ごほうびスキン🎓）・🧭スタンプラリーチュートリアル（trk!入力で即完了・スキップ／もう一度・スタンプ5つでごほうび解禁）・動画キー操作まで）
+> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン16種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り ＋ 🥁音ゲーマー向けFAST/SLOW・あべこべ・でたらめ ＋ 💬GitHub Issuesテンプレート ＋ 📊スペクトラム（音の見える化・**見え方16種・色8種・曲名バナーのスキン・🚫使用しないスイッチ**・TVに重ねられる）＋ 🎛エフェクトチェーン編集＋ 🎹曲に合わせて演奏できるシンセモード（16音色・エレキギター／電子サックス／ZUNPET風ブラス・±8半音ピッチ・鍵盤固定オプション初期オン・大画面向け鍵盤拡張オプション・起動オプション）＋ 📤ミュージックフォルダを共有（1回の許可で一括取り込み・🔗共有をつづける・💾端末に残す・🚫やめる）＋ privacy.html ＋ Capacitor Android準備 ＋ 権利とクレジット図鑑 ＋ パック権利カード（名刺）＋ 🧭 3分チュートリアル・プレイ演出設定・CATCHニトロ得点ボーナス・▶メディアプレーヤー・🎛Loop Lab（クイック／ランダム区間・曲別プリセット）・📡キャスト／バックグラウンド再生の個別アンテナ・🖼スキンの棚（プリセット31種・グラデ対応・ごほうびスキン🎓）・🧭スタンプラリーチュートリアル（trk!入力で即完了・スキップ／もう一度・スタンプ5つでごほうび解禁）・🎧プレイリストタブ（自由なアイコンと色・🧊フリーズ／🔒ロック・中クリック削除／3回モード・曲プロフィール）・動画キー操作まで）
 > この文書は、新しい会話で開発を再開するための参照資料です。
 
 ---
@@ -348,7 +348,7 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
   - サブフォルダは最上位の階層でまとめる（`libFolderSeg`：`Album/A/01.mp3` → 「Album」）。パックは `packId` ごと（無ければパック名）
   - **消えたタブ**（パックを外した等）は「すべて」を表示するだけで、`settings.libTab` は消さない（入れ直すと、またそのタブに戻る）
   - 公認の判定は `window.TrkVerified.verifyOf`（verified.js の窓口。IIFEの内側なので、外から見えるように足した）。無ければ公認タブは作らない
-  - タブが1つ（＝すべてだけ）のときは、タブ帯ごと隠す。曲が0件のタブは `libTabEmpty` を出す
+  - タブ帯は常時表示（右端の＋でプレイリストを新規作成）。曲が0件のタブは `libTabEmpty`（プレイリストは `plTabHint`）を出す
 - **棚スキン**：`js/lib-skins.js`。`#libPanel[data-lib-skin="…"]` を付け替えるだけ（タブの中身は library.js が作る）
   - `LIB_SKIN_ORDER` ＋ `LIB_SKINS`（icon と 4言語の label）が定義（全16種：player / note / sticker / card / cassette / blackboard / retro / clearfile / juke / guide / board / vinyl / vhs / karaoke / archive / menu）。CSS は `css/style.css` に集約。
   - `settings.libSkin`（既定 `player`）／`settings.libSkinQuick`（🎨 ボタンを出す・既定オン）。知らないIDは `player` に落とす
@@ -455,6 +455,19 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
   - 窓口：`TrkMMD.diagnose()` `check()` `checkText(r)` `lastCheck()`。`console.log("[trk! MMD check]\n" + テキスト)` も出す（実機のF12から拾える）
   - 環境が悪いときの見え方：CDN 不可 → `three=NG  loader=false` ＋ `libError=…`／セーフモード → `safe=true`／WebGL 不可 → `webgl=false`（この順で切り分ける）
 
+### 🎧 プレイリストタブと曲プロフィール（library.js / core.js）
+- **プレイリスト**：`settings.playlists`（最大24個。`{id,name,icon,color,frozen,locked,songs}`）。曲のキーだけを持つ**参照リスト**なので、プレイリストを消しても曲はライブラリに残る（整合性を保つ・既定の挙動）。読み込み時に `plSanitize()` が検証（名前24字・アイコン4字・色は `PL_COLORS` の9色＋なし・曲1000個まで・重複除去）
+- **並び順**：すべて → ⭐お気に入り → **🎧プレイリスト** → パック → アドオン → フォルダー → 追加した曲 → 公認。タブIDは `pl:<id>`（`libTabMatch()` が絞る）。消えた曲のぶんは `plCount()` に数えない（実在するキーだけ）
+- **操作**（PC・スマホ共通は長押し `onLongPress()`＝480ms。開いた直後の click は `plSuppressClick()` が1回だけ止める）：
+  - タブ帯の右端 **＋** ／ **📚すべての中クリック** ／ すべての長押し → 新規作成（`plCreate()`）
+  - **プレイリストタブの長押し** → 設定（`plMenu()`）：名前・アイコン（空なら状態で自動：🎧→🧊→🔒→🧩）・色・🧊フリーズ（追加防止）・🔒ロック（削除防止）・削除。すべて／自動タブの長押しは全体設定（`plGlobalMenu()`：新規作成と削除モード）
+  - **プレイリストタブの中クリック** → 削除（`plDeleteGesture()`）。`settings.playlistDelMode` が `three` なら同じタブ3回（1.6秒以内。`plDelCount` が残り回数を知らせる）。🔒中は断る
+  - **曲の長押し** → プロフィール（`songProfile()`）：タイトル上書き・アーティスト・アルバム・作曲者の編集と、プレイリストへの追加・取り外し（🧊は無効表示）。保存で曲リスト・バナーに反映
+  - **曲のドラッグ＆ドロップ**（PC）→ タブへ乗せると追加（`plDragKey` ＋ `dataTransfer`。増えたときだけ再描画してスクロール位置を守る）
+- **曲プロフィール**：`localStorage` の **`shadow_taiko_songmeta_v1`**（`{曲キー:{title,artist,album,composer}}`、各100字まで。`songMetaSave()`）。曲リストの2行目・選曲バナー・検索に反映
+- **UI**：`plDialog()`（中央の小ダイアログ）＋ `plToast()`（下中央の一時メッセージ）。色付きタブは `.libTab.plCol`、ドロップ先は `[data-pl]`（`.dragOver`）
+- `tools/check-repo.mjs` が配管（`pl:` プレフィックス・`SONG_META_KEY`・`playlistDelMode`）を検査する
+
 ### ⭐ お気に入りのフォルダ管理（js/favs.js）
 - **3系統**：`tv`（映像フィルター。1軍＝`settings.tvFav`）／`fx`（エフェクト。1軍＝`settings.fxFav`）／`song`（曲。1軍＝`settings.songFav`＝新規）。**1軍はこれまでの保存場所のまま**、2軍〜元お気に入り・ピン・ロック・選択中フォルダだけ `settings.favs` に足す（既存キー・形式は不変）
 - **4つの固定フォルダ**：`main`（⭐1軍＝ボタンに並ぶ）／`sub`（⭐2軍＝控え。チップで切り替えるとボタンに出る）／`frozen`（🧊フリーズ。**既定で🔒**）／`former`（📤元お気に入り。外したものが自動で入り、🎲の候補には出ない）
@@ -531,6 +544,8 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 | `settings.libKeepShared`（新） | 💾 共有した曲を端末に残す（初期オフ。`shadow_taiko_preferences_v2` の中。`?safe=1` ではオフになる） |
 | `settings.specOn` `specStyle`（16種）`specTheme`（8色）`specGain` `specPeaks` `specTv` `specSkin` `specSkinOpen`（新・📊 スペクトラム） | 表示／見え方／色／感度／ピーク／TVに重ねる／曲名バナーのスキン／開いた状態。`shadow_taiko_preferences_v2` の中 |
 | `settings.songFav`（新） / `settings.favs`（新） | ⭐ 曲のお気に入り（1軍）と、3系統ぶんのフォルダ分け（`{tv,fx,song}` の `sub`／`frozen`／`former`／`pins`／`locks`／`active`）。どちらも `shadow_taiko_preferences_v2` の中 |
+| `settings.playlists`（新） / `settings.playlistDelMode`（新） | 🎧 ユーザー定義プレイリスト（`{id,name,icon,color,frozen,locked,songs}` の配列。読み込み時に `plSanitize()` が検証）と、中クリック削除のモード（`one`／`three`）。`shadow_taiko_preferences_v2` の中 |
+| `shadow_taiko_songmeta_v1`（新・localStorage） | 🎶 曲プロフィール（曲キー → `{title,artist,album,composer}`）。設定とは別枠で保存（`library.js` の `songMetaSave()`） |
 | `settings.castPolicy`（初期 `off`） | 📺 キャストアンテナのポリシー（`off`／`antenna`）。`antenna` のときだけ `.dockCast` ボタンを表示し、クリックで Remote Playback の選択画面を開く（自動接続なし）。`shadow_taiko_preferences_v2` の中 |
 | `settings.backgroundPolicy`（初期 `off`） / `settings.fxAntenna` | 📡 バックグラウンド再生アンテナのポリシー（`off`／`antenna`）とON/OFF。旧 `castPolicy=antenna` は `backgroundPolicy=antenna` に引き継ぐ。`shadow_taiko_preferences_v2` の中 |
 | `settings.fxDockSkin` `fxDockFive` `fxDockOpen` `fxAntennaShape` `fxEqLock` `fxLockChain` `fxFavSeeded` | 🎛 fxドックのスキン・5ボタン統一・開閉状態・アンテナ形状・EQロック・ロック連鎖・初期お気に入り投入済みフラグ。`shadow_taiko_preferences_v2` の中 |
@@ -666,8 +681,10 @@ records[指紋 "サイズ:長さ×10"] = {
 - [x] 📚 曲のタブ（自動）と棚スキン16種（🎨 で切替・設定で隠せる。2026-10-05 に 🎰ジュークボックス／📻ラジオ番組表／🚉電光掲示板 ＋ 💿レコード棚／📼レンタルビデオ／🎤カラオケ目次／🗂️図書館の書架／🍱お品書き を追加）
 - [x] 🖼 スキンの棚と全体見た目プリセット30種（2026-10-05：グラデーション対応（上下左右）、ミク新衣装2種、カテゴリー絞り込みチップ、`#skinNow` 現在スキン表示、`tools/check-repo.mjs` に30種検査）
 - [x] 🧭 チュートリアルをスタンプラリー化（2026-10-05：trk!入力で即完了・取り逃しなし、スキップ／もう一度ボタン、実際の行動を検知するスタンプ5つ、5つ揃いでごほうびスキン「🎓グラデュエーション」解禁（棚では❓カード）、お祝いポップアップ（プレイ中は選曲復帰時に表示）、check-repoに31種＋鍵検査）
+- [x] 🎧 プレイリストタブと曲プロフィール（2026-10-05：＋／すべての中クリック／長押しで作成、名前・アイコン・色・🧊フリーズ／🔒ロック、中クリック削除1回／3回モード、曲の長押しでプロフィール編集とプレイリスト追加、ドラッグ＆ドロップ、削除しても曲は残る、check-repoに配管検査）
 - [ ] 実機確認：スキンの棚の開閉とチップ絞り込み、グラデの見え方（上下左右）、スキン作成のグラデ（保存・書き出し・読み込み・リミックス）、ミク新衣装ときらきらパーティクル
 - [ ] 実機確認：スタンプラリー（曲選択・スキン／エフェクト変更・1曲プレイ・設定を開くの各検知と進捗表示、trk!即完了、スキップ、もう一度、スタンプ5つで🎓解禁と❓カードの変化、お祝いポップアップ）
+- [ ] 実機確認：プレイリスト（＋／中クリック／長押しの各操作、🧊／🔒の効き、色とアイコン、3回中クリックモード、ドラッグ＆ドロップ、曲プロフィールの表示・検索・バナー、スマホの長押し）
 - [x] 🥁 音ゲーマー向け機能の拡充（FAST/SLOW集計・GOOD内訳・判定下ネオン表示、MIRROR/RANDOM公式MOD、Lv.1〜20連続スケール、本格トリル・ロール配置生成、達人・2000 RUSHワンタップ解禁）
 - [x] 🎬 TV映像確認タブの操作性強化 ＆ 🔗 TV設定共有URL（シークバー、再生/一時停止、時間表示、「▶ この設定で遊ぶ」ボタン、`?tv=...&skin=...` パラメータ生成と自動適用）
 - [x] 📤 ミュージックフォルダを共有（1回の許可で一括取り込み・🔗 共有をつづける・💾 端末に残す（150曲／300MB）・🚫 共有をやめる・📁 開く はならべて残す・4言語）→ **PR #11 として main にマージ済み**（2026-10-05）
@@ -709,7 +726,7 @@ records[指紋 "サイズ:長さ×10"] = {
 
 - `trk!.zip`（元プロジェクト一式）をこのリポジトリに展開して採用しました。プロトタイプ版の `app.js` / `style.css` は削除しています（履歴には残っています）。
 - **`feedbackLabel` を4言語ぶん追加**（`js/i18n.js`）。12章のチェックは「✅ 入っている」になっていましたが、実際は抜けていて、選曲画面の連絡先リンクの前に `feedbackLabel` という生の文字列が出ていました。
-- **サービスワーカーの登録を `js/main.js` の末尾に追加**。6章の読み込み順の表には「main.js＝サービスワーカー登録」とありましたが、コードには入っていませんでした。当時のキャッシュ名は `trk-v2026.10.2`。現在の値は `sw.js` の `CACHE = "trk-v2026.10.5-synth7"` です。
+- **サービスワーカーの登録を `js/main.js` の末尾に追加**。6章の読み込み順の表には「main.js＝サービスワーカー登録」とありましたが、コードには入っていませんでした。当時のキャッシュ名は `trk-v2026.10.2`。現在の値は `sw.js` の `CACHE = "trk-v2026.10.5-synth8"` です。
 - `manifest.webmanifest`（全画面・横向き）・`verified.json`（空の雛形）・`.github/ISSUE_TEMPLATE/`（bug_report・feature_request・config）を新規作成しました。
 - OGP画像は `tools/make-icons.html` の指示どおり **`docs/og.png`** に置きました（zip では `icons/og.png` になっていました）。`index.html` の `og:image` はそのままで合っています。
 - **`.github/workflows/pages.yml` を変更**：ファイル名を並べてコピーする方式だと、新しいファイルを足すたびに公開が壊れるので、ルートを丸ごと公開する方式（`.git`・`.github`・`_site` だけ除外）にしました。`css/` や `js/` にファイルを足しても、もう直す必要はありません。

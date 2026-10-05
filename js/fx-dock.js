@@ -45,7 +45,7 @@ settings.fxAntennaShape = pick(antShapePref, ["rod", "loop", "dish", "beam", "tr
 function antCustomOk(u) { return typeof u === "string" && u.startsWith("data:image/") && u.length <= 400000; }
 settings.fxAntennaCustomOn = antCustomOk(prefs.fxAntennaCustomOn) ? prefs.fxAntennaCustomOn : "";
 settings.fxAntennaCustomOff = antCustomOk(prefs.fxAntennaCustomOff) ? prefs.fxAntennaCustomOff : "";
-/* ---- 📡 アンテナのドットキャラ（16×16・全部trk!の描きおろし。巫女の権利メモは NOTICE.md） ---- */
+/* ---- 📡 アンテナのドットキャラ（16×16・全部trk!の描きおろし。東方キャラ5体の権利メモは NOTICE.md 2b節） ---- */
 const ANT_CHARS = {
   truck: {
     pal: {"k": "#37474f", "r": "#ef5350", "R": "#b71c1c", "w": "#eceff1", "W": "#81d4fa", "y": "#ffee58", "o": "#546e7a", "O": "#b0bec5", "c": "#4dd0e1", "z": "#cfd8dc", ".": null},

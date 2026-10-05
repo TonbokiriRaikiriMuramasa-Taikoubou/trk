@@ -1507,6 +1507,51 @@ $("previewEnabled").addEventListener("change", e => {
   settings.previewEnabled = e.target.checked; saveUserPrefs();
   if (settings.previewEnabled) startPreview(); else stopPreview();
 });
+/* ---------- ⏯ 曲名バナーをタップで一時停止（設定でON）＋ 🔊 右下の音量 ---------- */
+function bannerPauseAction(st) {   /* 純粋関数（テストで確認）→ null / "pause" / "resume" / "preview" */
+  if (!st.enabled || st.mediaMode || st.target) return null;
+  if (st.phase === "playing") return "pause";
+  if (st.phase === "paused") return "resume";
+  if (st.phase === "title" && st.hasSong) return "preview";
+  return null;
+}
+const bannerVolClamp = v => Math.max(0, Math.min(1, Number(v) || 0));
+function bannerPauseSync() { $("songBanner").classList.toggle("tapPause", !!settings.bannerPause); }
+$("bannerPause").addEventListener("change", e => {
+  settings.bannerPause = e.target.checked; saveUserPrefs(); bannerPauseSync();
+});
+$("bannerPause").checked = settings.bannerPause;
+bannerPauseSync();
+$("songBanner").addEventListener("click", e => {
+  const act = bannerPauseAction({ enabled: settings.bannerPause, mediaMode: window._trkMediaPlayerMode,
+    target: !!e.target.closest("button, input, a, label"), phase, hasSong: !!(currentSong && video.src) });
+  if (act === "pause") pauseGame();
+  else if (act === "resume") resumeGame();
+  else if (act === "preview") { if (video.paused) video.play().catch(() => {}); else video.pause(); }   /* 選曲中のプレビュー */
+});
+/* 🔊 音量（設定の musicVolume と同じもの。バナーの右下の小さなつまみ） */
+const bannerVolBtn = el("button", "bannerVolBtn", "🔊"); bannerVolBtn.type = "button";
+bannerVolBtn.title = tr("musicVolume");
+bannerVolBtn.setAttribute("aria-label", tr("musicVolume"));
+const bannerVolSlider = el("input", "bannerVolSlider"); bannerVolSlider.type = "range";
+bannerVolSlider.min = "0"; bannerVolSlider.max = "1"; bannerVolSlider.step = "0.01";
+const bannerVolPanel = el("div", "bannerVolPanel"); bannerVolPanel.hidden = true;
+bannerVolPanel.append(bannerVolSlider);
+$("songBanner").append(bannerVolPanel, bannerVolBtn);
+function bannerVolSync() {
+  bannerVolSlider.value = settings.musicVolume;
+  bannerVolBtn.textContent = settings.musicVolume > 0 ? "🔊" : "🔇";
+}
+bannerVolSync();
+bannerVolBtn.addEventListener("click", () => { bannerVolPanel.hidden = !bannerVolPanel.hidden; bannerVolSync(); });
+bannerVolSlider.addEventListener("input", () => {
+  settings.musicVolume = bannerVolClamp(bannerVolSlider.value);
+  cancelAnimationFrame(fadeRaf);   /* プレビューのフェードインと取り合いにならないように */
+  video.volume = settings.musicVolume;
+  const sv = $("volume"); if (sv) sv.value = settings.musicVolume;   /* 設定画面のスライダーも合わせる */
+  saveUserPrefs(); bannerVolSync();
+});
+
 
 /* ---------- 曲を選ぶ ---------- */
 async function selectSong(it) {

@@ -77,6 +77,44 @@ S("valorant", "VALORANT", "🎯", "red", "PCゲーム", "🕹️",
      T("Entertain Me", "VALORANT OST", "Ylona Garcia"),
      T("On My Level", "VALORANT OST", "Ashley Warren")])]);
 
+/* ================= ⚡ NoCopyrightSounds（イギリス発・世界的なフリーDLレーベル） =================
+   NCSはクリエイター向けに楽曲を無料配布するレーベル。公式サイトの各曲ページから
+   無料でダウンロードできる（クレジット表記などのルールは各曲ページで確認）。 */
+S("ncs", "NoCopyrightSounds", "⚡", "aqua", "フリー音源", "🎁",
+  "クリエイター向けに楽曲を無料配布するレーベル。公式サイトの各曲ページから無料でダウンロードできます（クレジット表記のルールは各曲ページで確認）。",
+  "https://ncs.io/",
+  [PL("ncs-top", "NCS 定番", "⚡", "aqua", ["NCS", "エレクトロニック"],
+    [T("Fade", "NCS Release", "Alan Walker", "https://ncs.io/fade"),
+     T("Spectre", "NCS Release", "Alan Walker"),
+     T("Force", "NCS Release", "Alan Walker"),
+     T("Blank", "NCS Release", "Disfigure"),
+     T("My Heart", "NCS Release", "Different Heaven & EH!DE"),
+     T("On & On", "NCS Release", "Cartoon feat. Daniel Levi")])]);
+
+/* ================= 🎼 Kevin MacLeod / incompetech（米国・CC BY） ================= */
+S("macleod", "Kevin MacLeod", "🎼", "green", "フリー音源", "🎁",
+  "米国の作曲家Kevin MacLeodさんのロイヤリティフリー音楽ライブラリ。CC BY 4.0（クレジット表記で無料・ダウンロード自由）。",
+  "https://incompetech.com/",
+  [PL("km-top", "incompetech 定番", "🎼", "green", ["BGM", "フリー"],
+    [T("Mechanolith", "incompetech", "Kevin MacLeod"),
+     T("Sneaky Snitch", "incompetech", "Kevin MacLeod"),
+     T("Fluffing a Duck", "incompetech", "Kevin MacLeod"),
+     T("Carefree", "incompetech", "Kevin MacLeod"),
+     T("Cipher", "incompetech", "Kevin MacLeod")])]);
+
+/* ================= ❄ 原神 Genshin Impact（miHoYo / HOYO-MiX・中国） =================
+   ※フリー配布ではなく、公式YouTubeチャンネルでの視聴とサブスク・CDでの入手が案内先 */
+S("genshin", "原神（Genshin Impact）", "❄", "purple", "PCゲーム", "🕹️",
+  "HOYO-MiXによるOSTは公式YouTubeチャンネルで全曲を視聴でき、Spotify・Apple Musicでも配信中。※フリー配布ではないので、音源ファイルはサブスク・CDで。",
+  "https://genshin.hoyoverse.com/",
+  [PL("gi-top", "原神 OST 厳選", "❄", "purple", ["原神", "ゲーム"],
+    [T("Liyue", "Jade Moon Upon a Sea of Clouds", "Yu-Peng Chen / HOYO-MiX"),
+     T("Good Night, Liyue", "Jade Moon Upon a Sea of Clouds", "Yu-Peng Chen / HOYO-MiX"),
+     T("Clear Sky over Liyue", "Jade Moon Upon a Sea of Clouds", "Yu-Peng Chen / HOYO-MiX"),
+     T("Before Dawn, at the Winery", "City of Winds and Idylls", "Yu-Peng Chen / HOYO-MiX"),
+     T("Say My Name", "City of Winds and Idylls", "Yu-Peng Chen / HOYO-MiX"),
+     T("Moonlike Smile", "The Wind and the Star Traveler", "Yu-Peng Chen / HOYO-MiX"),
+     T("Snow-Buried Tales", "Vortex of Legends", "Yu-Peng Chen / HOYO-MiX")])]);
 /* ================= ⭐ 東方Project（上海アリス幻樂団） ================= */
 S("touhou", "東方Project", "⭐", "red", "同人ゲーム", "🏮",
   "ZUNさん（上海アリス幻樂団）の公式サイト。作品と音楽CDの情報はここで。ゲームの体験版もダウンロードできます（体験版にもBGMが入っています）。",

@@ -211,6 +211,16 @@ if (!read("js/library.js").includes("plAuthorMenu") ||
   ok("author tools (search / block / favorites, default off) are wired");
 }
 
+// ⏯🔊 Song banner: tap-to-pause (default off) + bottom-right volume knob.
+if (!read("js/library.js").includes("bannerPauseAction") ||
+    !read("js/library.js").includes("bannerVolSlider") ||
+    !read("index.html").includes('id="bannerPause"') ||
+    !read("js/core.js").includes("bannerPause")) {
+  fail("song-banner tap-pause / volume controls are missing");
+} else {
+  ok("song-banner tap-pause (default off) and volume knob are wired");
+}
+
 // A cache name is deliberately checked for existence, not for a guessed
 // date, because the service worker is manually bumped for every release.
 const sw = read("sw.js");

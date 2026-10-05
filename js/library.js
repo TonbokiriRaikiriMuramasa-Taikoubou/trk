@@ -165,6 +165,75 @@ Object.assign(TEXT.ko, {
   libTabAll:"전체", libTabFiles:"추가한 곡", libTabVerified:"공인", libTabPackNone:"곡 팩", libTabFolderTop:"폴더 (최상위)", libTabAddon:"애드온",
   libTabGo:"이 선반에 {n}곡", libTabEmpty:"이 탭에는 곡이 없습니다. 다른 탭을 봐 주세요."
 });
+Object.assign(TEXT.ja, {
+  plNewTab:"📁 新規プレイリスト", plDefaultName:"プレイリスト{n}", plGlobalTitle:"📚 プレイリスト",
+  plSettings:"プレイリストの設定", plName:"名前", plIcon:"アイコン（空で自動）", plIconPh:"🎧 / 🧊 / 🔒 / 楽2 など",
+  plColor:"色", plColorNone:"標準の色",
+  plFrozenCheck:"🧊 フリーズ（曲の追加を防ぐ）", plLockedCheck:"🔒 ロック（削除を防ぐ）",
+  plSongsNow:"現在 {n} 曲", plSave:"💾 保存", plDelete:"🗑 このプレイリストを削除",
+  plDeleted:"🗑 プレイリストを削除しました（曲はライブラリに残ります）", plCreated:"📁 {name} を作成しました",
+  plLockedNo:"🔒 ロック中は削除できません（長押しの設定で 🔒 を外してください）",
+  plFrozenNo:"🧊 {name} はフリーズ中です（追加できません）",
+  plDelOne:"中クリック1回で削除する", plDelThree:"同じタブを3回中クリックして削除する",
+  plDelModeHint:"🗑 プレイリストを消しても、曲はライブラリに残ります。スマホでは長押し →「🗑 このプレイリストを削除」からも消せます。",
+  plDelCount:"あと {n} 回の中クリックで削除（やめるときはそのまま）",
+  plAdded:"➕ {name} へ追加しました", plRemovedFrom:"➖ {name} から外しました",
+  plProfileTitle:"🎶 曲のプロフィール", plTitle:"タイトル（上書き）", plArtist:"アーティスト", plAlbum:"アルバム", plComposer:"作曲者",
+  plInLists:"プレイリストに入れる", plProfileSave:"💾 保存", plProfileSaved:"🎶 曲のプロフィールを保存しました",
+  plTabHint:"このプレイリストは空です。曲を長押し →「プレイリストに入れる」、または曲をタブへドラッグして追加できます。"
+});
+Object.assign(TEXT.en, {
+  plNewTab:"📁 New playlist", plDefaultName:"Playlist {n}", plGlobalTitle:"📚 Playlists",
+  plSettings:"Playlist settings", plName:"Name", plIcon:"Icon (blank = auto)", plIconPh:"🎧 / 🧊 / 🔒 / P2…",
+  plColor:"Color", plColorNone:"Default color",
+  plFrozenCheck:"🧊 Freeze (blocks adding songs)", plLockedCheck:"🔒 Lock (blocks deleting)",
+  plSongsNow:"{n} songs", plSave:"💾 Save", plDelete:"🗑 Delete this playlist",
+  plDeleted:"🗑 Playlist deleted (songs stay in your library)", plCreated:"📁 Created {name}",
+  plLockedNo:"🔒 Locked — can't delete (uncheck 🔒 in long-press settings)",
+  plFrozenNo:"🧊 {name} is frozen (can't add songs)",
+  plDelOne:"Middle-click once to delete", plDelThree:"Middle-click the same tab 3 times to delete",
+  plDelModeHint:"🗑 Deleting a playlist never removes the songs. On touch screens, use long-press → “🗑 Delete this playlist”.",
+  plDelCount:"{n} more middle-clicks to delete (just stop to cancel)",
+  plAdded:"➕ Added to {name}", plRemovedFrom:"➖ Removed from {name}",
+  plProfileTitle:"🎶 Song profile", plTitle:"Title (override)", plArtist:"Artist", plAlbum:"Album", plComposer:"Composer",
+  plInLists:"Add to playlists", plProfileSave:"💾 Save", plProfileSaved:"🎶 Song profile saved",
+  plTabHint:"This playlist is empty. Long-press a song → “Add to playlists”, or drag a song onto the tab."
+});
+Object.assign(TEXT.zh, {
+  plNewTab:"📁 新建播放列表", plDefaultName:"播放列表{n}", plGlobalTitle:"📚 播放列表",
+  plSettings:"播放列表设置", plName:"名称", plIcon:"图标（留空＝自动）", plIconPh:"🎧 / 🧊 / 🔒 / 表2…",
+  plColor:"颜色", plColorNone:"默认颜色",
+  plFrozenCheck:"🧊 冻结（防止添加歌曲）", plLockedCheck:"🔒 锁定（防止删除）",
+  plSongsNow:"当前 {n} 首", plSave:"💾 保存", plDelete:"🗑 删除此播放列表",
+  plDeleted:"🗑 已删除播放列表（歌曲仍保留在库中）", plCreated:"📁 已创建 {name}",
+  plLockedNo:"🔒 锁定中无法删除（请在长按设置中取消 🔒）",
+  plFrozenNo:"🧊 {name} 已冻结（无法添加歌曲）",
+  plDelOne:"中键点击1次即删除", plDelThree:"同一标签中键点击3次才删除",
+  plDelModeHint:"🗑 删除播放列表不会删除歌曲。触屏设备请长按 →「🗑 删除此播放列表」。",
+  plDelCount:"再中键点击 {n} 次即删除（松手即取消）",
+  plAdded:"➕ 已添加到 {name}", plRemovedFrom:"➖ 已从 {name} 移除",
+  plProfileTitle:"🎶 歌曲资料", plTitle:"标题（覆盖）", plArtist:"艺术家", plAlbum:"专辑", plComposer:"作曲者",
+  plInLists:"加入播放列表", plProfileSave:"💾 保存", plProfileSaved:"🎶 歌曲资料已保存",
+  plTabHint:"此播放列表为空。长按歌曲 →「加入播放列表」，或将歌曲拖到标签上即可添加。"
+});
+Object.assign(TEXT.ko, {
+  plNewTab:"📁 새 재생목록", plDefaultName:"재생목록 {n}", plGlobalTitle:"📚 재생목록",
+  plSettings:"재생목록 설정", plName:"이름", plIcon:"아이콘(비우면 자동)", plIconPh:"🎧 / 🧊 / 🔒 / 플2…",
+  plColor:"색", plColorNone:"기본 색",
+  plFrozenCheck:"🧊 프리즈(곡 추가 막기)", plLockedCheck:"🔒 잠금(삭제 막기)",
+  plSongsNow:"현재 {n}곡", plSave:"💾 저장", plDelete:"🗑 이 재생목록 삭제",
+  plDeleted:"🗑 재생목록을 삭제했습니다(곡은 라이브러리에 남습니다)", plCreated:"📁 {name}을(를) 만들었습니다",
+  plLockedNo:"🔒 잠금 중에는 삭제할 수 없어요(길게 누른 설정에서 🔒를 해제하세요)",
+  plFrozenNo:"🧊 {name}은(는) 프리즈 중입니다(추가할 수 없어요)",
+  plDelOne:"가운데 클릭 1회로 삭제", plDelThree:"같은 탭을 3번 가운데 클릭해 삭제",
+  plDelModeHint:"🗑 재생목록을 지워도 곡은 라이브러리에 남습니다. 터치 화면에서는 길게 누르기 → '🗑 이 재생목록 삭제'를 사용하세요.",
+  plDelCount:"{n}번 더 가운데 클릭하면 삭제됩니다(멈추면 취소)",
+  plAdded:"➕ {name}에 추가했어요", plRemovedFrom:"➖ {name}에서 뺐어요",
+  plProfileTitle:"🎶 곡 프로필", plTitle:"제목(덮어쓰기)", plArtist:"아티스트", plAlbum:"앨범", plComposer:"작곡가",
+  plInLists:"재생목록에 넣기", plProfileSave:"💾 저장", plProfileSaved:"🎶 곡 프로필을 저장했어요",
+  plTabHint:"이 재생목록은 비어 있어요. 곡을 길게 눌러 '재생목록에 넣기'하거나, 곡을 탭으로 드래그해 넣을 수 있어요."
+});
+
 const libFolderSeg = it => String(it.dir || "").split("/")[0].trim();
 /* ✔公認の判定は verified.js の窓口から（読み込まれていなければ、公認タブは作りません） */
 const libIsVerified = it => {
@@ -193,6 +262,8 @@ function libTabsOf(all) {
   const tabs = [{ id:"all", icon:"📚", label:tr("libTabAll"), n:all.length }];
   const favN = libFavKeys(all).n;
   if (favN) tabs.push({ id:"fav", icon:"⭐", label:tr("favTab"), n:favN });
+  const plKeys = new Set(all.map(x => x.key));
+  for (const p of settings.playlists) tabs.push({ id:"pl:" + p.id, icon: plIcon(p), label: p.name, n: plCount(p, plKeys), pl: p });   /* 🎧 ユーザー定義プレイリスト */
   const packs = new Map(), folders = new Map(), addons = new Map();
   let nFiles = 0;
   for (const it of all) {
@@ -219,6 +290,7 @@ function libTabsOf(all) {
 function libTabMatch(it, id) {
   if (!id || id === "all") return true;
   if (id === "fav") { const F = window.TrkFavs; return !!(F && F.inGroup("song", F.activeOf("song"), it.key)); }
+  if (id.startsWith("pl:")) { const p = plById(id.slice(3)); return !!p && p.songs.includes(it.key); }
   if (id === "file") return it.source === "file";
   if (id === "verified") return it.source === "pack" && libIsVerified(it);
   if (id.startsWith("pack:")) return it.source === "pack" && "pack:" + libPackKey(it) === id;
@@ -227,27 +299,293 @@ function libTabMatch(it, id) {
   if (id === "folder") return it.source === "folder" && !libFolderSeg(it);
   return true;
 }
+
+/* ---------- 🎧 プレイリスト（ユーザー定義の曲タブ） ----------
+   ・保存は settings.playlists（shadow_taiko_preferences_v2）。曲のキーだけを持つ参照リストなので、
+     プレイリストを消しても曲はライブラリに残ります（整合性を保つ・既定の挙動）
+   ・🧊フリーズ＝曲の追加を防ぐ ／ 🔒ロック＝タブの削除を防ぐ（両方ならアイコンは 🧩）
+     アイコンと色は自由に設定できるので、🧊今だけ／🔒あ／楽2（色で状態を示す）といった使い方ができます
+   ・操作：タブの長押し＝設定（PC・スマホ共通）／タブの中クリック＝削除（📚すべての中クリック＝新規作成。
+     削除は設定で「3回」モードに変えられる）／タブ帯の右端の「＋」＝新規作成
+   ・曲のプロフィール（上書きタイトル・アーティスト・アルバム・作曲者）は、localStorage の
+     shadow_taiko_songmeta_v1 に別枠で保存（曲の長押しから編集） */
+const PL_COLORS = { none:"", aqua:"#0e6e6e", green:"#1d6b3c", amber:"#8a5a12", red:"#8a2b35",
+  purple:"#5b2d8e", blue:"#1f4f8f", pink:"#8e2d64", gray:"#4a4f5a" };
+const SONG_META_KEY = "shadow_taiko_songmeta_v1";
+let SONG_META = {};
+try { SONG_META = JSON.parse(localStorage.getItem(SONG_META_KEY)) || {}; } catch (_) { SONG_META = {}; }
+if (!SONG_META || typeof SONG_META !== "object" || Array.isArray(SONG_META)) SONG_META = {};
+function songMetaSave() { try { localStorage.setItem(SONG_META_KEY, JSON.stringify(SONG_META)); } catch (_) {} }
+function metaOf(key) { const m = SONG_META[key]; return (m && typeof m === "object") ? m : null; }
+
+/* 保存されていたプレイリスト1つの検証（読み込み時に全部に通す） */
+function plSanitize(raw) {
+  if (!raw || typeof raw !== "object" || typeof raw.id !== "string" || !raw.id) return null;
+  const songs = [];
+  if (Array.isArray(raw.songs)) for (const k of raw.songs) {
+    if (typeof k === "string" && k.length <= 128 && !songs.includes(k)) songs.push(k);
+    if (songs.length >= 1000) break;
+  }
+  return { id: raw.id.slice(0, 24), name: String(raw.name || "").trim().slice(0, 24) || "Playlist",
+    icon: typeof raw.icon === "string" ? raw.icon.slice(0, 4) : "",
+    color: /^[a-z]{3,12}$/.test(raw.color || "") && PL_COLORS[raw.color] != null ? raw.color : "none",
+    frozen: !!raw.frozen, locked: !!raw.locked, songs };
+}
+(function plTighten() { settings.playlists = (settings.playlists || []).map(plSanitize).filter(Boolean).slice(0, 24); })();
+
+function plById(id) { return settings.playlists.find(p => p.id === id) || null; }
+function plIcon(p) { if (p.icon) return p.icon; if (p.frozen && p.locked) return "🧩"; if (p.frozen) return "🧊"; if (p.locked) return "🔒"; return "🎧"; }
+function plCount(p, keySet) { let n = 0; for (const k of p.songs) if (keySet.has(k)) n++; return n; }
+
+let plToastTimer = 0, plDragKey = "";
+function plToast(msg) {
+  let t = document.querySelector(".plToast");
+  if (!t) { t = el("div", "plToast"); document.body.append(t); }
+  t.textContent = msg; t.classList.add("on");
+  clearTimeout(plToastTimer);
+  plToastTimer = setTimeout(() => t.classList.remove("on"), 2400);
+}
+
+/* 長押し（PCのマウス押しっぱなし ＋ スマホ）。開いたあとの click は1回だけ止める */
+let plSuppressUntil = 0, plLastPointer = "mouse";
+function plSuppressClick() { return Date.now() < plSuppressUntil; }
+function onLongPress(elm, open) {
+  let t = 0, sx = 0, sy = 0;
+  elm.addEventListener("pointerdown", e => {
+    plLastPointer = e.pointerType || "mouse";
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    sx = e.clientX; sy = e.clientY;
+    clearTimeout(t);
+    t = setTimeout(() => { t = 0; plSuppressUntil = Date.now() + 700; open(); }, 480);
+  });
+  const cancel = () => { clearTimeout(t); t = 0; };
+  elm.addEventListener("pointerup", cancel);
+  elm.addEventListener("pointercancel", cancel);
+  elm.addEventListener("pointermove", e => { if (t && Math.hypot(e.clientX - sx, e.clientY - sy) > 10) cancel(); });
+  elm.addEventListener("contextmenu", e => { if (plLastPointer === "touch") e.preventDefault(); });   /* スマホ長押しのメニュー防止 */
+}
+
+/* 中央に出す小さいダイアログ（プレイリスト設定・曲プロフィールで使う） */
+function plDialog(title) {
+  document.querySelectorAll(".plOverlay").forEach(x => x.remove());
+  const ov = el("div", "plOverlay"), card = el("div", "plCard");
+  const esc = e => { if (e.key === "Escape") close(); };
+  const close = () => { document.removeEventListener("keydown", esc); ov.remove(); };
+  document.addEventListener("keydown", esc);
+  ov.addEventListener("click", e => { if (e.target === ov) close(); });
+  card.append(el("b", "plCardTitle", title));
+  ov.append(card); document.body.append(ov);
+  return { card, close };
+}
+function plRow(labelText, node) { const r = el("label", "plRow"); r.append(el("span", "plRowLabel", labelText), node); return r; }
+
+/* 色の見本（クリックで選ぶ。box.value に選んだキーが入る） */
+function plColorSwatches(initial) {
+  const box = el("div", "plSwatches");
+  box.value = PL_COLORS[initial] != null ? initial : "none";
+  for (const [key, hex] of Object.entries(PL_COLORS)) {
+    const s = el("button", "plSwatch" + (key === box.value ? " on" : "")); s.type = "button";
+    s.title = key === "none" ? tr("plColorNone") : key;
+    if (hex) s.style.background = hex; else s.textContent = "✕";
+    s.addEventListener("click", () => {
+      box.value = key;
+      box.querySelectorAll(".plSwatch").forEach(x => x.classList.remove("on"));
+      s.classList.add("on");
+    });
+    box.append(s);
+  }
+  return box;
+}
+
+/* 📁 新規プレイリスト */
+function plCreate() {
+  const d = plDialog(tr("plNewTab"));
+  const name = el("input", "plInput"); name.type = "text"; name.maxLength = 24; name.value = tr("plDefaultName", { n: settings.playlists.length + 1 });
+  const icon = el("input", "plInput"); icon.type = "text"; icon.maxLength = 4; icon.placeholder = tr("plIconPh");
+  const color = plColorSwatches("none");
+  const save = el("button", "plBtn", tr("plSave")); save.type = "button";
+  save.addEventListener("click", () => {
+    const p = plSanitize({ id: "pl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      name: name.value || tr("plDefaultName", { n: settings.playlists.length + 1 }), icon: icon.value, color: color.value, frozen: false, locked: false, songs: [] });
+    settings.playlists.push(p); saveUserPrefs();
+    settings.libTab = "pl:" + p.id;
+    d.close(); renderLib();
+    plToast(tr("plCreated", { name: p.name }));
+  });
+  d.card.append(plRow(tr("plName"), name), plRow(tr("plIcon"), icon), plRow(tr("plColor"), color), save);
+  name.focus(); name.select();
+}
+
+/* プレイリスト1つの設定（タブの長押しで開く） */
+function plMenu(p) {
+  const d = plDialog(tr("plSettings") + "：" + p.name);
+  const name = el("input", "plInput"); name.type = "text"; name.maxLength = 24; name.value = p.name;
+  const icon = el("input", "plInput"); icon.type = "text"; icon.maxLength = 4; icon.value = p.icon; icon.placeholder = tr("plIconPh");
+  const color = plColorSwatches(p.color);
+  const fz = el("input"); fz.type = "checkbox"; fz.checked = !!p.frozen;
+  const lk = el("input"); lk.type = "checkbox"; lk.checked = !!p.locked;
+  const save = el("button", "plBtn", tr("plSave")); save.type = "button";
+  save.addEventListener("click", () => {
+    const t = plSanitize({ id: p.id, name: name.value || p.name, icon: icon.value, color: color.value, frozen: fz.checked, locked: lk.checked, songs: p.songs });
+    if (t) Object.assign(p, t);   /* 同じオブジェクトを直す（タブのIDは不変） */
+    saveUserPrefs(); d.close(); renderLib();
+  });
+  const del = el("button", "plBtnDanger", tr("plDelete")); del.type = "button";
+  del.disabled = !!p.locked; del.title = p.locked ? tr("plLockedNo") : "";
+  del.addEventListener("click", () => plDelete(p, d.close));
+  lk.addEventListener("change", () => { del.disabled = lk.checked; del.title = lk.checked ? tr("plLockedNo") : ""; });
+  d.card.append(plRow(tr("plName"), name), plRow(tr("plIcon"), icon), plRow(tr("plColor"), color),
+    plRow(tr("plFrozenCheck"), fz), plRow(tr("plLockedCheck"), lk),
+    el("div", "plHint", tr("plSongsNow", { n: p.songs.length })),
+    save, del);
+  name.focus(); name.select();
+}
+
+/* 🗑 削除（曲はライブラリに残る。🔒中は断る） */
+function plDelete(p, onClose) {
+  if (p.locked) { plToast(tr("plLockedNo")); return; }
+  settings.playlists = settings.playlists.filter(x => x !== p);
+  if (settings.libTab === "pl:" + p.id) settings.libTab = "all";
+  saveUserPrefs();
+  if (onClose) onClose();
+  renderLib();
+  plToast(tr("plDeleted"));
+}
+
+/* 中クリックでの削除（設定で「同じタブ3回」モードにできる） */
+let plDelArm = { id: "", n: 0, t: 0 };
+function plDeleteGesture(p, btn) {
+  if (p.locked) { plToast(tr("plLockedNo")); return; }
+  if (settings.playlistDelMode === "three") {
+    const now = Date.now();
+    if (plDelArm.id !== p.id || now - plDelArm.t > 1600) plDelArm = { id: p.id, n: 0, t: now };
+    plDelArm.n++; plDelArm.t = now;
+    if (plDelArm.n < 3) {
+      btn.classList.add("plArm");
+      setTimeout(() => btn.classList.remove("plArm"), 1600);
+      plToast(tr("plDelCount", { n: 3 - plDelArm.n }));
+      return;
+    }
+  }
+  plDelete(p);
+}
+
+/* 📚すべて／自動タブの長押し＝プレイリスト全体の設定 */
+function plGlobalMenu() {
+  const d = plDialog(tr("plGlobalTitle"));
+  const make = el("button", "plBtn", tr("plNewTab")); make.type = "button";
+  make.addEventListener("click", () => { d.close(); plCreate(); });
+  const one = el("input"); one.type = "radio"; one.name = "plDelMode"; one.checked = settings.playlistDelMode !== "three";
+  const three = el("input"); three.type = "radio"; three.name = "plDelMode"; three.checked = settings.playlistDelMode === "three";
+  const saveMode = () => { settings.playlistDelMode = three.checked ? "three" : "one"; saveUserPrefs(); };
+  one.addEventListener("change", saveMode); three.addEventListener("change", saveMode);
+  d.card.append(make, el("div", "plSep"),
+    plRow(tr("plDelOne"), one), plRow(tr("plDelThree"), three),
+    el("div", "plHint", tr("plDelModeHint")));
+}
+
+/* 曲の追加・取り外し（🧊フリーズ中は断る） */
+function plAddSong(p, key) {
+  if (p.frozen) { plToast(tr("plFrozenNo", { name: p.name })); return false; }
+  if (p.songs.includes(key)) return true;
+  p.songs.push(key); saveUserPrefs();
+  plToast(tr("plAdded", { name: p.name }));
+  return true;
+}
+function plRemoveSong(p, key) {
+  if (p.frozen) { plToast(tr("plFrozenNo", { name: p.name })); return false; }
+  p.songs = p.songs.filter(k => k !== key); saveUserPrefs();
+  plToast(tr("plRemovedFrom", { name: p.name }));
+  return true;
+}
+
+/* 🎶 曲のプロフィール（曲の長押し）。情報の編集と、プレイリストへの追加・取り外し */
+function songProfile(it) {
+  const m = metaOf(it.key) || {};
+  const d = plDialog(tr("plProfileTitle"));
+  const f = {};
+  for (const [id, key] of [["title", "plTitle"], ["artist", "plArtist"], ["album", "plAlbum"], ["composer", "plComposer"]]) {
+    const inp = el("input", "plInput"); inp.type = "text"; inp.maxLength = 100; inp.value = m[id] || "";
+    if (id === "title") inp.placeholder = it.title;
+    f[id] = inp;
+    d.card.append(plRow(tr(key), inp));
+  }
+  if (settings.playlists.length) {
+    d.card.append(el("div", "plSep"), el("b", "plCardTitle", tr("plInLists")));
+    for (const p of settings.playlists) {
+      const c = el("input"); c.type = "checkbox"; c.checked = p.songs.includes(it.key); c.disabled = !!p.frozen;
+      c.addEventListener("change", () => {
+        const n = p.songs.length;
+        if (c.checked) { if (!plAddSong(p, it.key)) c.checked = false; }
+        else { if (!plRemoveSong(p, it.key)) c.checked = true; }
+        if (p.songs.length !== n) renderLib();
+      });
+      const r = plRow(plIcon(p) + " " + p.name, c);
+      if (p.frozen) r.classList.add("plRowDim");
+      d.card.append(r);
+    }
+  }
+  const save = el("button", "plBtn", tr("plProfileSave")); save.type = "button";
+  save.addEventListener("click", () => {
+    const nm = {}; let any = false;
+    for (const id of ["title", "artist", "album", "composer"]) {
+      const v = f[id].value.trim().slice(0, 100);
+      if (v) { nm[id] = v; any = true; }
+    }
+    if (any) SONG_META[it.key] = nm; else delete SONG_META[it.key];
+    songMetaSave();
+    d.close(); renderLib(); renderBanner();
+    plToast(tr("plProfileSaved"));
+  });
+  d.card.append(el("div", "plSep"), save);
+}
+
 /* タブ帯を描いて、いま選ばれているタブのIDを返す */
 function renderLibTabs(tabs) {
   const box = $("libTabs");
   const active = tabs.some(t => t.id === settings.libTab) ? settings.libTab : "all";
   if (!box) return active;
   box.textContent = "";
-  box.hidden = tabs.length < 2;
-  if (box.hidden) return active;
+  box.hidden = false;   /* 🎧 「＋」（新規プレイリスト）があるので、タブが1つでも帯は出す */
   for (const t of tabs) {
     const b = el("button", "libTab" + (t.id === active ? " on" : "")); b.type = "button";
     b.dataset.tab = t.id;
     b.setAttribute("role", "tab");
     b.setAttribute("aria-selected", String(t.id === active));
-    b.title = tr("libTabGo", { n:t.n });
+    b.title = tr("libTabGo", { n:t.n }) + (t.pl ? (t.pl.frozen ? " · 🧊" : "") + (t.pl.locked ? " · 🔒" : "") : "");
+    if (t.pl) {
+      b.dataset.pl = t.pl.id;
+      const c = PL_COLORS[t.pl.color];
+      if (c) { b.style.background = c; b.style.borderColor = c; b.classList.add("plCol"); }
+    }
     b.append(el("span", "libTabIcon", t.icon), el("span", "libTabName", t.label), el("i", "libTabN", String(t.n)));
     b.addEventListener("click", () => {
+      if (plSuppressClick()) return;
       if (settings.libTab === t.id) return;
       settings.libTab = t.id; saveUserPrefs(); renderLib();
     });
+    b.addEventListener("mousedown", e => { if (e.button === 1) e.preventDefault(); });   /* 中クリックのオートスクロールを止める */
+    b.addEventListener("auxclick", e => {
+      if (e.button !== 1) return;
+      if (t.id === "all") plCreate();            /* 📚すべて の中クリック＝新規プレイリスト */
+      else if (t.pl) plDeleteGesture(t.pl, b);   /* プレイリストタブの中クリック＝削除 */
+    });
+    onLongPress(b, () => { if (t.pl) plMenu(t.pl); else plGlobalMenu(); });   /* 長押し＝設定（スマホ・PC共通） */
+    if (t.pl) {   /* 曲をドラッグして乗せると追加 */
+      b.addEventListener("dragover", e => { e.preventDefault(); b.classList.add("dragOver"); });
+      b.addEventListener("dragleave", () => b.classList.remove("dragOver"));
+      b.addEventListener("drop", e => {
+        e.preventDefault(); b.classList.remove("dragOver");
+        const key = e.dataTransfer.getData("text/plain") || plDragKey;
+        if (key) { const n = t.pl.songs.length; plAddSong(t.pl, key); if (t.pl.songs.length !== n) renderLib(); }
+      });
+    }
     box.append(b);
   }
+  const plus = el("button", "libTab plPlus", "＋"); plus.type = "button";
+  plus.title = tr("plNewTab"); plus.setAttribute("aria-label", tr("plNewTab")); plus.setAttribute("role", "presentation");
+  plus.addEventListener("click", () => { if (!plSuppressClick()) plCreate(); });
+  box.append(plus);
   return active;
 }
 
@@ -262,7 +600,8 @@ function renderLib() {
   const q = $("libSearch").value.trim().toLowerCase(), idx = {};
   for (const r of Object.values(records)) if (r && r.title != null) idx[`${r.size}|${r.title}`] = r;
   const items = scope
-    .filter(it => !q || `${it.title} ${it.dir || ""} ${it.artist || ""} ${it.packName || ""}`.toLowerCase().includes(q))
+    .filter(it => { if (!q) return true; const m = metaOf(it.key) || {};   /* 🎶 プロフィール情報も検索対象 */
+      return `${m.title || it.title} ${it.dir || ""} ${m.artist || it.artist || ""} ${m.album || ""} ${it.packName || ""}`.toLowerCase().includes(q); })
     .map(it => ({ it, info:songInfo(it, idx) }));
   const v = (x, k) => (x.info ? x.info[k] : 0);
   const cmp = {
@@ -281,21 +620,26 @@ function renderLib() {
     }
   }
   libView = items.map(x => x.it);
-  if (!items.length) { box.append(el("div", "libEmpty", tr(scope.length ? "libNoMatch" : "libTabEmpty"))); return; }
+  if (!items.length) { box.append(el("div", "libEmpty", tr(scope.length ? "libNoMatch" : (tabId.startsWith("pl:") ? "plTabHint" : "libTabEmpty")))); return; }
   for (const { it, info } of items.slice(0, LIB_SHOW)) {
     const wrap = el("div"); wrap.style.cssText = "display:flex;gap:6px;align-items:stretch";
     const cur = currentSong && currentSong.key === it.key;
     const b = el("button", `libRow src-${it.source}` + (cur ? " cur" : "")); b.type = "button"; b.style.flex = "1"; b.style.minWidth = "0";
     const left = el("span", "libLeft"), meta = el("span", "libMeta");
-    left.append(el("span", "libName", it.title + (info && info.title ? " " + info.title : "")),   // 例：曲名 🥁🐔🚚⚔🎪🚛
-                el("span", "libSub", [it.artist, srcLabel(it)].filter(Boolean).join(" · ")));
+    const m = metaOf(it.key) || {};   /* 🎶 曲プロフィール（長押しで編集） */
+    left.append(el("span", "libName", (m.title || it.title) + (info && info.title ? " " + info.title : "")),   // 例：曲名 🥁🐔🚚⚔🎪🚛
+                el("span", "libSub", [m.artist || it.artist, m.album, srcLabel(it)].filter(Boolean).join(" · ")));
     if (it.charts) meta.append(el("i", "libTag", "📄"));
     if (it.shared) { const st = el("i", "libTag", "📤"); st.title = tr("libKeepShared"); meta.append(st); }   /* 💾 端末に残した共有の曲 */
     if (it.chartBlobs && Object.keys(it.chartBlobs).length) meta.append(el("i", "libTag", "📦"));
     if (info && info.plays) meta.append(el("i", "libTag", tr("libPlays", { n:info.plays })));
     if (info && info.best) meta.append(el("i", "libTag", info.best.toLocaleString()));
     b.append(left, meta);
-    b.addEventListener("click", () => selectSong(it));
+    b.addEventListener("click", () => { if (!plSuppressClick()) selectSong(it); });
+    b.draggable = true;   /* 🎧 プレイリストタブへドラッグして追加 */
+    b.addEventListener("dragstart", e => { plDragKey = it.key; try { e.dataTransfer.setData("text/plain", it.key); e.dataTransfer.effectAllowed = "copy"; } catch (_) {} document.body.classList.add("plDragging"); });
+    b.addEventListener("dragend", () => { plDragKey = ""; document.body.classList.remove("plDragging"); });
+    onLongPress(b, () => songProfile(it));   /* 🎶 長押しでプロフィール＆プレイリスト */
     wrap.append(b);
     /* ⭐ お気に入り（📌は ⋯ のメニューから） */
     const F = window.TrkFavs;
@@ -339,8 +683,9 @@ function renderBanner() {
   if (!s) {
     $("songTitleBig").textContent = tr("songNone"); $("songSub").textContent = tr("songNoneSub");
   } else {
-    $("songTitleBig").textContent = s.title;
-    $("songSub").textContent = [s.artist, s.charter ? `${tr("chartBy")}: ${s.charter}` : "", srcLabel(s)].filter(Boolean).join(" · ");
+    const m = metaOf(s.key) || {};   /* 🎶 曲プロフィール */
+    $("songTitleBig").textContent = m.title || s.title;
+    $("songSub").textContent = [m.artist || s.artist, m.album, m.composer ? `${tr("plComposer")}: ${m.composer}` : "", s.charter ? `${tr("chartBy")}: ${s.charter}` : "", srcLabel(s)].filter(Boolean).join(" · ");
     if (s.bgBlob) { bannerUrl = URL.createObjectURL(s.bgBlob); b.style.backgroundImage = `url("${bannerUrl}")`; b.classList.add("hasImg"); }
   }
   previewSetBtn.textContent = tr("previewSet");

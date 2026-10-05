@@ -519,6 +519,7 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 | `settings.castPolicy`（初期 `off`） | 📺 キャストアンテナのポリシー（`off`／`antenna`）。`antenna` のときだけ `.dockCast` ボタンを表示し、クリックで Remote Playback の選択画面を開く（自動接続なし）。`shadow_taiko_preferences_v2` の中 |
 | `settings.backgroundPolicy`（初期 `off`） / `settings.fxAntenna` | 📡 バックグラウンド再生アンテナのポリシー（`off`／`antenna`）とON/OFF。旧 `castPolicy=antenna` は `backgroundPolicy=antenna` に引き継ぐ。`shadow_taiko_preferences_v2` の中 |
 | `settings.fxDockSkin` `fxDockFive` `fxDockOpen` `fxAntennaShape` `fxEqLock` `fxLockChain` `fxFavSeeded` | 🎛 fxドックのスキン・5ボタン統一・開閉状態・アンテナ形状・EQロック・ロック連鎖・初期お気に入り投入済みフラグ。`shadow_taiko_preferences_v2` の中 |
+| `settings.tutorialDone`（新） | 🧭 チュートリアル完了フラグ。Seed欄に `trk!` と入力すると `true` になり、選曲画面のチュートリアル案内を非表示にする（`js/main.js` の `syncTutorialUI()`）。設定リセットで `false` に戻る。`shadow_taiko_preferences_v2` の中 |
 
 **形式名**：`shadow-taiko-pack`、`shadow-taiko-chart`、`shadow-taiko-records`、`skin.shadow-taiko`、`trk-fx`、`trk-verified`、`trk-tvskin`（カスタムTVスキン）、譜面ファイル `*.shadow-taiko.json`
 
@@ -619,7 +620,7 @@ records[指紋 "サイズ:長さ×10"] = {
 - [x] `credits.html` の権利とクレジット図鑑、NOTICE / README / Handoffの第三者ライブラリ記載を同期
 - [x] `.stpack` の `creditCard`（権利カード／名刺）を追加。パック作成UI・曲パック作成UIから出力し、パック一覧で折りたたみ表示
 - [x] `creditCard.contributors`（最大12人）の表示、パック内 `CREDITS.md` 自動生成、共有用SVG名刺ダウンロードを追加。カードは作者申告の要約で、原文ライセンス／ReadMeを優先する
-- [x] 🧭 3分チュートリアル、初期スクロール速度1.2x、ゲーム演出（全部／控えめ／オフ）、TRUCKの初期演出強化、CATCHの任意ニトロ得点1.1倍を追加
+- [x] 🧭 3分チュートリアルを5段階に拡張し、最後のSeed欄に `trk!` と入力するとチュートリアル完了（`settings.tutorialDone`）になって案内が消えるようにした。初期スクロール速度1.2x、ゲーム演出（全部／控えめ／オフ）、TRUCKの初期演出強化、CATCHの任意ニトロ得点1.1倍も追加
 - [x] ▶ TVドックの電源長押しでメディアプレーヤーモードを開く。再生キュー、曲送り、リピート／シャッフル、0.5〜2x速度、前回位置復元、スリープタイマー、Media Sessionを実装。ゲーム開始・記録には影響しない
 - [x] 📡 外部出力を「キャストアンテナ」と「バックグラウンド再生アンテナ」の2本に分離。Remote Playback API／SafariのPlayback Target Pickerがある環境だけ、キャストアンテナ（`.dockCast`ボタン）から選択画面を開く（自動接続なし）。バックグラウンド再生は📡アンテナで個別にON/OFFでき、初期は両方ともオフ。動画ズーム0.5〜3x、速度・一時停止をキーアサイン可能にした
 - [x] ⏪ メディアプレーヤーに逆再生を追加。Web Audioで曲ファイルをセッション中だけ反転した音声バッファとして再生し、映像は手動シークで同期する。音声の準備ができないブラウザーでは映像フレームのみの逆再生にフォールバックする
@@ -686,7 +687,7 @@ records[指紋 "サイズ:長さ×10"] = {
 
 - `trk!.zip`（元プロジェクト一式）をこのリポジトリに展開して採用しました。プロトタイプ版の `app.js` / `style.css` は削除しています（履歴には残っています）。
 - **`feedbackLabel` を4言語ぶん追加**（`js/i18n.js`）。12章のチェックは「✅ 入っている」になっていましたが、実際は抜けていて、選曲画面の連絡先リンクの前に `feedbackLabel` という生の文字列が出ていました。
-- **サービスワーカーの登録を `js/main.js` の末尾に追加**。6章の読み込み順の表には「main.js＝サービスワーカー登録」とありましたが、コードには入っていませんでした。当時のキャッシュ名は `trk-v2026.10.2`。現在の値は `sw.js` の `CACHE = "trk-v2026.10.5-synth3"` です。
+- **サービスワーカーの登録を `js/main.js` の末尾に追加**。6章の読み込み順の表には「main.js＝サービスワーカー登録」とありましたが、コードには入っていませんでした。当時のキャッシュ名は `trk-v2026.10.2`。現在の値は `sw.js` の `CACHE = "trk-v2026.10.5-synth5"` です。
 - `manifest.webmanifest`（全画面・横向き）・`verified.json`（空の雛形）・`.github/ISSUE_TEMPLATE/`（bug_report・feature_request・config）を新規作成しました。
 - OGP画像は `tools/make-icons.html` の指示どおり **`docs/og.png`** に置きました（zip では `icons/og.png` になっていました）。`index.html` の `og:image` はそのままで合っています。
 - **`.github/workflows/pages.yml` を変更**：ファイル名を並べてコピーする方式だと、新しいファイルを足すたびに公開が壊れるので、ルートを丸ごと公開する方式（`.git`・`.github`・`_site` だけ除外）にしました。`css/` や `js/` にファイルを足しても、もう直す必要はありません。

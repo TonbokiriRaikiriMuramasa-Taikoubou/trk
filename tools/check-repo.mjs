@@ -83,6 +83,44 @@ const duplicateIds = [...idCounts].filter(([, count]) => count > 1).map(([id, co
 if (duplicateIds.length) fail(`index.html contains duplicate IDs: ${duplicateIds.join(", ")}`);
 else ok(`index.html static IDs are unique (${indexIds.length} checked)`);
 
+// 📺 TV picture looks and brightness/blur favorites: keep the documented
+// preset count, four localized groups, safe long-press resets and bounded data.
+{
+  const presetSource = read("js/tv-presets.js");
+  const tv = read("js/tv-dock.js");
+  const core = read("js/core.js");
+  const style = read("css/style.css");
+  const notice = read("NOTICE.md");
+  const ids = [...presetSource.matchAll(/\bid:"([^"]+)"/g)].map(m => m[1]);
+  const catCounts = Object.fromEntries(["portrait", "anime", "texture", "quality"].map(cat =>
+    [cat, (presetSource.match(new RegExp(`cat:"${cat}"`, "g")) || []).length]));
+  const uniqueIds = new Set(ids).size === ids.length;
+  const langsOk = ["tvCatPortrait", "tvCatAnime", "tvCatTexture", "tvCatQuality", "tvParamRandHint", "tvParamHint"]
+    .every(key => (tv.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4);
+  const presetsOk = ids.length === 65 && uniqueIds && Object.values(catCounts).every(n => n === 5);
+  const resetOk = tv.includes('bindLongPressReset(rPar, () => applyParamValues(0, 0, "tvParamDefaultDone"))') &&
+    tv.includes('bindLongPressReset(dimInp, () => applyParamValues(0, settings.bgBlur, "tvDimResetDone")') &&
+    tv.includes('bindLongPressReset(blurInp, () => applyParamValues(settings.bgDim, 0, "tvBlurResetDone")') &&
+    tv.includes('tvParamRandHint:"(長押しでデフォルトに戻します。)"') &&
+    tv.includes('paramResetBtn.addEventListener("click"');
+  const favoritesOk = core.includes("TV_PARAM_FAV_MAX = 8") && core.includes("cleanTvParamFavorites(prefs.tvParamFavs)") &&
+    core.includes("settings.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs)") &&
+    core.includes("settings.tvParamFavs = []") && tv.includes("cleanTvParamFavorites(prefs.tvParamFavs)") &&
+    tv.includes("settings.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs)");
+  const overlaysOk = ["portraitGlow", "softbox", "finegrain", "paper", "halftone"]
+    .every(name => presetSource.includes(`overlay:"${name}"`) && tv.includes(`case "${name}"`));
+  const canvasOriginalOk = tv.includes("function tvTextureRandom(seed)") && !tv.includes("fetch(") &&
+    tv.includes("CanvasRenderingContext2D.filter is unavailable") && tv.includes("ctx.canvas.style.filter = filter") &&
+    notice.includes("No third-party LUTs") && notice.includes("do not detect faces") && notice.includes("do not increase");
+  const favoriteStyleOk = style.includes(".tvParamFavList") && style.includes(".tvParamTools");
+  if (!presetsOk) fail(`TV preset catalog should contain 65 unique filters, five in each new category (found ${ids.length}; ${JSON.stringify(catCounts)})`);
+  else if (!langsOk) fail("TV portrait/anime/texture/quality groups or parameter reset help are missing from one of the four languages");
+  else if (!resetOk) fail("TV random button and brightness/blur sliders need their long-press reset paths and explicit reset control");
+  else if (!favoritesOk) fail("brightness/blur favorites must be bounded, validated, persisted and safe-mode aware");
+  else if (!overlaysOk || !canvasOriginalOk || !favoriteStyleOk) fail("original Canvas TV overlays, documented rights/scope, CSS-filter fallback, or parameter-favorite styling are missing");
+  else ok("TV catalog (65 presets), localized picture categories, long-press resets, and bounded brightness/blur favorites are wired");
+}
+
 const privacy = read("privacy.html").replace(/<!--[\s\S]*?-->/g, "");
 let missingPrivacyRefs = 0;
 for (const match of privacy.matchAll(/(?:href|src)=["']([^"']+)["']/gi)) {
@@ -219,14 +257,61 @@ if (!read("js/library.js").includes("plAuthorMenu") ||
   ok("author tools (search / block / favorites, default off) are wired");
 }
 
-// ⏯🔊 Song banner: tap-to-pause (default off) + bottom-right volume knob.
-if (!read("js/library.js").includes("bannerPauseAction") ||
-    !read("js/library.js").includes("bannerVolSlider") ||
-    !read("index.html").includes('id="bannerPause"') ||
-    !read("js/core.js").includes("bannerPause")) {
-  fail("song-banner tap-pause / volume controls are missing");
-} else {
-  ok("song-banner tap-pause (default off) and volume knob are wired");
+// ⏯🔊 Song banner: tap-to-pause (default off) + short-tap slider / long-press mute.
+{
+  const library = read("js/library.js");
+  const i18n = read("js/i18n.js");
+  const longPressOk = library.includes('bannerVolBtn.addEventListener("pointerdown"') &&
+    library.includes("}, 650);") && library.includes("bannerVolLongPressAction()") &&
+    library.includes("setBannerMusicVolume(0)") && library.includes("bannerVolRestore") &&
+    library.includes("rememberMusicVolume(bannerVolRestore)") && library.includes("bannerVolLongPressed") &&
+    library.includes('bannerVolPanel.hidden = !bannerVolPanel.hidden') &&
+    read("js/core.js").includes("musicVolumeRestore") && read("js/core.js").includes("out.musicVolumeRestore") &&
+    read("js/main.js").includes("rememberMusicVolume(settings.musicVolume)");
+  const tipCount = (i18n.match(/bannerVolTip:/g) || []).length;
+  if (!library.includes("bannerPauseAction") || !library.includes("bannerVolSlider") ||
+      !longPressOk || tipCount !== 4 || !read("index.html").includes('id="bannerPause"') ||
+      !read("js/core.js").includes("bannerPause")) {
+    fail("song-banner tap-pause / short-tap slider / long-press mute-and-restore wiring is incomplete");
+  } else {
+    ok("song-banner tap-pause, short-tap slider, and four-language long-press mute/restore are wired");
+  }
+}
+
+// 🩷 MMD: defaults, grouped 60-motion chooser, facial morphs and original procedural VMD.
+{
+  const mmd = read("js/mmd.js");
+  const core = read("js/core.js");
+  const preset = JSON.parse(read("assets/mmd/lat-miku/preset.json"));
+  const labelKeys = [
+    "mmdMotionWalk", "mmdMotionRun", "mmdMotionSit", "mmdMotionDance", "mmdMotionLegacy",
+    "mmdGroupDaily", "mmdGroupDance", "mmdGroupSongs", "mmdGroupMiku", "mmdGroupFaces",
+    "mmdMotionFaceSmile", "mmdMotionFaceWink", "mmdMotionFaceShy", "mmdMotionFaceAngry", "mmdMotionFaceConfused",
+    "mmdMotionFaceSurprise", "mmdMotionFaceSleepy", "mmdMotionFacePout", "mmdMotionFaceLaugh", "mmdMotionFaceSing",
+    "mmdMotionPrincess", "mmdMotionLeekShake", "mmdMotionPopipo", "mmdMotionTriple", "mmdMotionNyan", "mmdMotionSalute",
+    "mmdMotionDoubleHeart", "mmdMotionPoint", "mmdMotionEncore", "mmdMotionDramatic", "mmdMotionVictory", "mmdMotionPenlight",
+    "mmdMotionChibi", "mmdMotionSpin", "mmdMotionGroove", "mmdMotionStepTouch", "mmdMotionShoulderPop", "mmdMotionArmWave",
+    "mmdMotionCrossStep", "mmdMotionSoftBow", "mmdMotionMarionette"
+  ];
+  const labelsOk = labelKeys.every(key => (mmd.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4);
+  const defaultOk = preset.motion === "dreamy128" && preset.bpm === 128 &&
+    core.includes('prefs.mmdMotionKind : "dreamy128"') && core.includes('settings.mmdMotionKind = "dreamy128"');
+  const chooserOk = mmd.includes('const MOTION_GROUPS = [') && mmd.includes('const MOTION_MENU_IDS = MOTION_GROUPS.flatMap(group => group.ids)') &&
+    mmd.includes("const MOTION_MENU_SET = new Set(MOTION_MENU_IDS)") && mmd.includes('visibleMotions: () => MOTION_MENU_IDS.slice()') &&
+    mmd.includes('motionGroups: () => MOTION_GROUPS.map') && mmd.includes("for (const group of MOTION_GROUPS)") &&
+    mmd.includes("if (BUILTIN[keep] && !MOTION_MENU_SET.has(keep))");
+  const motionOk = ["walk112", "run152", "sit10", "dance128", "dreamy128", "airgtr128", "melt170", "wedh174", "faceSmile", "faceSing", "mikuPrincess152", "mikuLeek120"]
+    .every(id => mmd.includes(`${id}: {`) || mmd.includes(`${id}: makeGesture(`));
+  const morphOk = mmd.includes("const FACE_MORPHS = [") && mmd.includes("dv.setUint32(at, morphCount, true)") &&
+    mmd.includes('buildVmd(frames, "trk-builtin-" + id, morphFrames)');
+  const docsOk = read("README.md").includes("内蔵モーション60種") &&
+    read("docs/HANDOFF.md").includes("60種をすべて選択可能") &&
+    read("NOTICE.md").includes("third-party VMD or choreography file is bundled");
+  if (!labelsOk || !defaultOk || !chooserOk || !motionOk || !morphOk || !docsOk) {
+    fail("MMD defaults, grouped 60-motion chooser, facial morph tracks, original VMD definitions, or rights note is missing");
+  } else {
+    ok("MMD 60-motion chooser, Lat morph tracks, four-language labels and dreamy128 default are wired");
+  }
 }
 
 // 🕹️ Short play mode (last 90/120/180s, silence-aware end, separate records).
@@ -439,7 +524,8 @@ for (const rel of [
   "css/privacy.css",
   "package.json",
   "capacitor.config.ts",
-  "tools/prepare-mobile-web.mjs"
+  "tools/prepare-mobile-web.mjs",
+  "tools/check-mmd-motion-data.mjs"
 ]) {
   if (!exists(rel)) fail(`required project file is missing: ${rel}`);
 }

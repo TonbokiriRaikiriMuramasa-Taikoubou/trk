@@ -407,7 +407,7 @@ $("donSeFile").addEventListener("change", e => { const f = e.target.files[0]; e.
 $("kaSeFile").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; loadSE(f, 1); });
 $("previewDonBtn").addEventListener("click", () => playSE(0, true));
 $("previewKaBtn").addEventListener("click", () => playSE(1, true));
-$("volume").addEventListener("input", e => { settings.musicVolume = Number(e.target.value); video.volume = settings.musicVolume; saveUserPrefs(); });
+$("volume").addEventListener("input", e => { settings.musicVolume = Number(e.target.value); if (settings.musicVolume > 0) rememberMusicVolume(settings.musicVolume); video.volume = settings.musicVolume; saveUserPrefs(); });
 
 /* ---------- プレイ中・一時停止・リザルト ---------- */
 $("pauseBtn").addEventListener("click", pauseGame);

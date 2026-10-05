@@ -265,7 +265,8 @@ details.panel[open]>summary{margin-bottom:14px}
 .banner.tapPause{cursor:pointer}
 .banner.tapPause .bannerText{-webkit-user-select:none;user-select:none}
 .bannerVolBtn{position:absolute;right:10px;bottom:10px;z-index:2;padding:4px 9px;font-size:15px;line-height:1.4;
-  border-radius:9px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.28);color:inherit}
+  border-radius:9px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.28);color:inherit;
+  touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .bannerVolPanel{position:absolute;right:10px;bottom:46px;z-index:2;display:flex;align-items:center;gap:6px;
   padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.28)}
 .bannerVolPanel[hidden]{display:none}
@@ -801,6 +802,19 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
 .tvSlots{display:grid;grid-template-columns:repeat(var(--cols,5),1fr);gap:8px}
 .tvRand{display:flex;gap:6px}
 #tvDock .tvRand .tvKey{flex:1;font-size:13px;padding:7px 6px}
+.tvParamRandHint{margin:2px 0 0;text-align:center;font-size:11px;line-height:1.35}
+.tvMore .tvParamRow{gap:8px}
+.tvMore .tvParamRow>span:first-child{min-width:132px}
+.tvParamHint{margin:3px 0 7px;font-size:12px}
+.tvParamTools{display:flex;flex-wrap:wrap;gap:7px;margin:6px 0 10px}
+.tvParamTools button{flex:1 1 190px}
+.tvParamFavs{margin:8px 0 12px;padding:9px 10px;border:1px dashed var(--ui-border);border-radius:12px;background:rgba(0,0,0,.08)}
+.tvParamFavTitle{font-size:13px;font-weight:800;color:var(--ui-muted)}
+.tvParamFavList{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tvParamFavItem{display:flex;align-items:center;gap:3px;max-width:100%}
+.tvParamFavApply{padding:6px 9px;font-size:13px;border-radius:999px}
+.tvParamFavRemove{min-width:32px;padding:5px 8px!important;color:#ffaaa0;border-color:rgba(255,120,120,.4)}
+.tvParamFavRemove:hover{color:#ffd2ce;border-color:#ff8b80}
 .tvHint{margin:0;font-size:12px}
 .tvDeco{display:flex;justify-content:center;align-items:center;gap:18px;min-height:44px;border-radius:10px;overflow:hidden;position:relative;background:rgba(0,0,0,.2)}
 .tvFavRow{display:flex;flex-wrap:wrap;gap:6px}
@@ -1112,6 +1126,8 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
   #tvDock .tvTop{gap:6px}
   #tvDock .tvPow,#tvDock .tvPause{width:46px;height:40px}
   #tvDock .tvTop .tvSong{width:38px;height:40px;font-size:13px}
+  .tvMore .tvParamRow>span:first-child{min-width:104px;font-size:14px}
+  .tvParamTools button{flex-basis:100%}
 }
 
 /* ============================================================

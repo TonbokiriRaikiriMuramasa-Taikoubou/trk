@@ -59,9 +59,18 @@ textures and `.vmd` motions: by default **trk! does not bundle, host or upload t
 You pick a model or a folder from your own device in the settings panel, and the
 MMD terms of that model's author apply (most MMD models forbid redistribution,
 use outside MMD/MMM, and commercial use).
-The built-in motions (step / swing / turn / jump / idol and the 🎵 BPM series) are **not** someone else's
-work: trk! generates those `.vmd` bytes itself in `js/mmd.js`, so they are covered
-by the GPL like the rest of the code.
+The 60 built-in motion choices (daily actions, dances, Miku-inspired gestures,
+and expression acting) are **original code-generated routines**. `js/mmd.js`
+creates their `.vmd` bytes at runtime from pose and facial-weight formulas; no
+third-party VMD or choreography file is bundled. The facial tracks refer to
+existing morph names in the redistributable Lat-style PMD; they do not include
+new model geometry, and they animate only on models with matching morph names.
+The motion-generation code is covered by the GPL like the rest of the source.
+Song names and “inspired” labels are tempo/mood references, not claims that an
+original song choreography is reproduced. A motion being free to download or
+available on a hosting page is not, by itself, permission to redistribute its
+VMD; no third-party VMD is added unless the redistribution terms for the actual
+file are clear.
 
 ### 3a. Bundled MMD models (`assets/mmd/`)
 A model may be bundled under `assets/mmd/` ONLY when its own readme explicitly
@@ -74,6 +83,24 @@ redistribution is OK. For every bundled model:
   the PCL: non-commercial and free of charge only.
 **To make a commercial fork:** delete the `assets/mmd/` folder entirely
 (together with `js/characters/miku.js`, see section 2).
+
+### 3b. TV/video looks (original effects)
+
+The built-in TV color looks in `js/tv-presets.js` use standard browser CSS filter
+functions. New portrait, anime/cel, texture and studio/quality looks were written
+for trk!; Canvas overlays (soft light, grain, paper fibers and halftone dots) are
+drawn procedurally by `js/tv-dock.js`.
+
+- No third-party LUTs, preset files, footage, texture images, or effect code are
+  bundled or copied for these looks. The general color-grading concepts are not
+  proprietary; the filter combinations and drawing logic here are original.
+- “Portrait” and skin-tone descriptions mean **global image color adjustments**.
+  They do not detect faces or isolate/correct skin independently of the rest of
+  the frame.
+- Glow, contrast and texture overlays change appearance only. They do not increase
+  source resolution, sharpen recovered detail, or restore clipped image information.
+- No proprietary TV, film, camera, or grading-product branding is used for these
+  presets; descriptive labels are not product endorsements.
 
 ## 4. Third-party libraries
 

@@ -876,7 +876,7 @@ function buildMedia() {
   const options = el("div", "mediaOptions");
   const volumeRow = el("label", "mediaOption mediaVolumeRow"); volumeRow.append(tx("span", "mediaVolume"));
   volumeNode = document.createElement("input"); volumeNode.type = "range"; volumeNode.min = "0"; volumeNode.max = "1"; volumeNode.step = "0.01"; volumeRow.append(volumeNode);
-  volumeNode.addEventListener("input", () => { settings.musicVolume = Number(volumeNode.value); video.volume = settings.musicVolume; if (reverseGain) reverseGain.gain.value = settings.musicVolume; saveUserPrefs(); });
+  volumeNode.addEventListener("input", () => { settings.musicVolume = Number(volumeNode.value); if (settings.musicVolume > 0) rememberMusicVolume(settings.musicVolume); video.volume = settings.musicVolume; if (reverseGain) reverseGain.gain.value = settings.musicVolume; saveUserPrefs(); });
   muteNode = makeButton("mediaMute", "mediaSmallBtn"); muteNode.addEventListener("click", () => { if (reverseActive || reverseLoading) { reverseVideoMuted = !reverseVideoMuted; if (reverseGain) reverseGain.gain.value = reverseVideoMuted ? 0 : settings.musicVolume; } else video.muted = !video.muted; renderMedia(); });
   shuffleNode = makeButton("mediaShuffle", "mediaSmallBtn"); shuffleNode.addEventListener("click", () => setShuffle(!shuffle));
   const repeatLabel = el("label", "mediaOption"); repeatLabel.append(tx("span", "mediaRepeat"));

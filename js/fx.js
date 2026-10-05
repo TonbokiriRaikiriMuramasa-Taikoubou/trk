@@ -39,13 +39,13 @@ Object.assign(TEXT.ja, {
   sfxFavAdd:"☆ お気に入りに追加", sfxFavRemove:"★ お気に入りから外す",
   sfxPrev:"前のプリセット", sfxNext:"次のプリセット", sfxRandom:"おまかせ（ランダム）",
   sfxCompare:"👂 押している間だけ元の音", sfxCompareHint:"押している間だけ、エフェクトなしの音になります",
-  sfxEqLabel:"かんたんEQ（プリセットに重ねてかかります）", sfxEqReset:"↺ EQをリセット", sfxVolume:"エフェクト後の音量", sfxLimiter:"音割れを防ぐ（リミッター）",
+  sfxEqLabel:"かんたんEQ（プリセットとラックに重ねてかかります）", sfxEqReset:"↺ EQをリセット", sfxVolume:"エフェクト後の音量", sfxLimiter:"音割れを防ぐ（リミッター）",
   sfxGameTitle:"🎮 ゲーム連動エフェクト（プレイ中だけ）", sfxGameMiss:"ミスすると一瞬こもる", sfxGameCombo:"コンボが続くと音が華やかになる",
   sfxGamePinch:"体力が少ないと、こもって心音のように揺れる", sfxGameBlast:"🚀 ぶっ飛ばし中は音が明るく派手になる（CATCH）",
   sfxGamePan:"トラックの位置に合わせて左右に動く（CATCH）",
   sfxSyncTitle:"⏱ タイミングと記録", sfxComp:"エフェクトによる音の遅れを、ノーツのタイミングで自動補正する",
   sfxCompExtra:"補正の微調整", sfxCompNow:"いまの自動補正：約 {n}ms",
-  sfxCompHint:"Web Audioを通る分と、コンプレッサー・リミッター（1つにつき約6ms）の遅れを足して補正します。目安の値なので、ずれを感じたら微調整してください。「⌨ 操作」のタイミング補正とは別に足されます。",
+  sfxCompHint:"Web Audioを通る分と、コンプレッサー・リミッター（1つにつき約6ms）・ノイズ消し（1つにつき約20ms）の遅れを足して補正します。目安の値なので、ずれを感じたら微調整してください。「⌨ 操作」のタイミング補正とは別に足されます。",
   sfxRecord:"譜面を書き出すとき、使っているエフェクトも記録する", sfxChartLoad:"譜面に記録されたエフェクトを読み込んで使う",
   sfxChartApplied:"📄 譜面に記録されたエフェクト「{name}」を使っています", sfxResult:"🎛 エフェクト：{name}",
   sfxRecent:"🎛 この曲で最近使ったエフェクト：{name}", sfxUseThis:"このエフェクトを使う", sfxApplied:"エフェクトを「{name}」にしました。",
@@ -55,7 +55,21 @@ Object.assign(TEXT.ja, {
   sfxEditor:"上級者向け：JSONを直接編集", sfxApply:"✓ 適用して保存", sfxBy:"作者：{name}",
   sfxSaved:"マイプリセット「{name}」を保存しました。", sfxBad:"エフェクトのJSONが正しくありません。", sfxDeleted:"マイプリセットを消しました。",
   sfxLimit:"マイプリセットは30個までです。", sfxExported:"エフェクトのJSONを書き出しました。", sfxUnsupported:"このブラウザではエフェクトを使えません。",
-  sfxConfirmDelete:"このマイプリセットを消しますか？", sfxQuick:"🎛 エフェクト", sfxOff:"オフ"
+  sfxConfirmDelete:"このマイプリセットを消しますか？", sfxQuick:"🎛 エフェクト", sfxOff:"オフ",
+  sfxRackTitle:"🎚 エフェクターラック（段で重ねる）", sfxRackOn:"ラックを使う（プリセットのあとに重なります）",
+  sfxRackHint:"ポータブルアンプを多段に積むように、エフェクターを段にして重ねられます（最大8段）。プリセットと「かんたんEQ」の間に入ります。書き出し・マイプリセット保存にも段ごと入ります。",
+  sfxRackAdd:"＋ 段を追加", sfxRackSave:"💾 今の音をマイプリセットに保存", sfxRackFull:"ラックは8段までです。",
+  sfxRackEmpty:"まだ段がありません。下の＋で追加できます。", sfxRackPresetName:"マイラック{n}",
+  sfxRackUp:"ひとつ上へ", sfxRackDown:"ひとつ下へ", sfxRackRemove:"この段を外す",
+  sfxTypeGate:"🚪 ノイズゲート", sfxTypeDenoise:"🧹 ノイズ消し", sfxTypeDynEQ:"🎚 ダイナミックEQ", sfxTypeExciter:"✨ エキサイター",
+  sfxTypeComp:"🧲 コンプレッサー", sfxTypeGain:"📢 音量",
+  sfxPThreshold:"しきい値", sfxPFloor:"閉じた時の落ち込み", sfxPAttackMs:"立上り（ms）", sfxPReleaseMs:"戻り（ms）",
+  sfxPAttackSec:"立上り（秒）", sfxPReleaseSec:"戻り（秒）", sfxPFreq:"周波数", sfxPQ:"鋭さ（Q）", sfxPRange:"効かせ量",
+  sfxPAmount:"強さ", sfxPMix:"混ぜる量", sfxPRatio:"圧縮比", sfxPKnee:"なじませ", sfxPMakeup:"埋め合わせ", sfxPDb:"音量",
+  sfxLearn:"🔇 いまの音をノイズとして覚える（静かな部分で）", sfxLearning:"🔇 2秒間、ノイズを覚えています…",
+  sfxLearned:"✅ ノイズを覚えました（このセッションの間）", sfxLearnFail:"⚠ 取れませんでした。曲を再生しながら、静かな部分でもう一度。",
+  sfxLearnNeedOn:"⚠ エフェクトをオンにしてから押してください。", sfxDenoiseHint:"先に再生中の静かな部分でノイズを覚えてください。覚えるまでは素通しです。",
+  sfxWorkletWait:"⏳ 高精度モードを準備中です。少したってからもう一度。", sfxWorkletNo:"⚠ このブラウザでは🚪🧹🎚は使えません（✨🧲📢の段は効きます）。"
 });
 Object.assign(TEXT.en, {
   sfxTitle:"🎛 Sound effects (EQ & effects)", sfxOn:"Use sound effects",
@@ -67,13 +81,13 @@ Object.assign(TEXT.en, {
   sfxFavAdd:"☆ Add to favorites", sfxFavRemove:"★ Remove from favorites",
   sfxPrev:"Previous preset", sfxNext:"Next preset", sfxRandom:"Surprise me (random)",
   sfxCompare:"👂 Hold to hear the original", sfxCompareHint:"While held, you hear the song without effects",
-  sfxEqLabel:"Quick EQ (applied on top of the preset)", sfxEqReset:"↺ Reset EQ", sfxVolume:"Output volume", sfxLimiter:"Prevent clipping (limiter)",
+  sfxEqLabel:"Quick EQ (applied on top of the preset and rack)", sfxEqReset:"↺ Reset EQ", sfxVolume:"Output volume", sfxLimiter:"Prevent clipping (limiter)",
   sfxGameTitle:"🎮 Game-reactive effects (during play only)", sfxGameMiss:"Muffle briefly on a miss", sfxGameCombo:"Get brighter as your combo grows",
   sfxGamePinch:"Muffle and pulse like a heartbeat when lives are low", sfxGameBlast:"🚀 Brighter and bolder during Blast mode (CATCH)",
   sfxGamePan:"Pan with the truck's position (CATCH)",
   sfxSyncTitle:"⏱ Timing & records", sfxComp:"Auto-compensate note timing for effect latency",
   sfxCompExtra:"Fine-tune", sfxCompNow:"Current compensation: about {n} ms",
-  sfxCompHint:"Adds the Web Audio path latency plus about 6 ms per compressor/limiter. It's an estimate, so fine-tune it if timing feels off. This is added on top of the latency setting in “⌨ Controls”.",
+  sfxCompHint:"Adds the Web Audio path latency plus about 6 ms per compressor/limiter and about 20 ms per noise reduction. It's an estimate, so fine-tune it if timing feels off. This is added on top of the latency setting in “⌨ Controls”.",
   sfxRecord:"Save the current effect when exporting charts", sfxChartLoad:"Use effects saved in charts",
   sfxChartApplied:"📄 Using the chart's effect “{name}”", sfxResult:"🎛 Effect: {name}",
   sfxRecent:"🎛 Recently used on this song: {name}", sfxUseThis:"Use this effect", sfxApplied:"Effect set to “{name}”.",
@@ -83,7 +97,21 @@ Object.assign(TEXT.en, {
   sfxEditor:"Advanced: edit JSON directly", sfxApply:"✓ Apply & save", sfxBy:"by {name}",
   sfxSaved:"Saved “{name}”.", sfxBad:"Invalid effect JSON.", sfxDeleted:"Preset deleted.",
   sfxLimit:"You can have up to 30 presets.", sfxExported:"Effect JSON exported.", sfxUnsupported:"Sound effects aren't available in this browser.",
-  sfxConfirmDelete:"Delete this preset?", sfxQuick:"🎛 Sound", sfxOff:"Off"
+  sfxConfirmDelete:"Delete this preset?", sfxQuick:"🎛 Sound", sfxOff:"Off",
+  sfxRackTitle:"🎚 Effect rack (stack your own)", sfxRackOn:"Use rack (stacks after the preset)",
+  sfxRackHint:"Like stacking portable amps, chain effects as stages (up to 8). They sit between the preset and the Quick EQ, and are included in exports and saved presets.",
+  sfxRackAdd:"＋ Add stage", sfxRackSave:"💾 Save current sound as my preset", sfxRackFull:"The rack holds up to 8 stages.",
+  sfxRackEmpty:"No stages yet — add one below.", sfxRackPresetName:"My rack {n}",
+  sfxRackUp:"Move up", sfxRackDown:"Move down", sfxRackRemove:"Remove this stage",
+  sfxTypeGate:"🚪 Noise gate", sfxTypeDenoise:"🧹 Noise reduction", sfxTypeDynEQ:"🎚 Dynamic EQ", sfxTypeExciter:"✨ Exciter",
+  sfxTypeComp:"🧲 Compressor", sfxTypeGain:"📢 Volume",
+  sfxPThreshold:"Threshold", sfxPFloor:"Closed level", sfxPAttackMs:"Attack (ms)", sfxPReleaseMs:"Release (ms)",
+  sfxPAttackSec:"Attack (s)", sfxPReleaseSec:"Release (s)", sfxPFreq:"Frequency", sfxPQ:"Sharpness (Q)", sfxPRange:"Amount",
+  sfxPAmount:"Strength", sfxPMix:"Mix", sfxPRatio:"Ratio", sfxPKnee:"Knee", sfxPMakeup:"Makeup", sfxPDb:"Level",
+  sfxLearn:"🔇 Learn current audio as noise (during a quiet part)", sfxLearning:"🔇 Learning the noise for 2 s…",
+  sfxLearned:"✅ Noise learned (for this session)", sfxLearnFail:"⚠ Couldn't capture. Play the song and press during a quiet part.",
+  sfxLearnNeedOn:"⚠ Turn effects on first.", sfxDenoiseHint:"First learn the noise during a quiet part. Until then it passes through.",
+  sfxWorkletWait:"⏳ Preparing the high-precision engine — try again in a moment.", sfxWorkletNo:"⚠ 🚪🧹🎚 aren't available in this browser (✨🧲📢 stages still work)."
 });
 Object.assign(TEXT.zh, {
   sfxTitle:"🎛 音效（均衡器・效果器）", sfxOn:"使用音效",
@@ -95,13 +123,13 @@ Object.assign(TEXT.zh, {
   sfxFavAdd:"☆ 加入收藏", sfxFavRemove:"★ 取消收藏",
   sfxPrev:"上一个预设", sfxNext:"下一个预设", sfxRandom:"随机",
   sfxCompare:"👂 按住听原声", sfxCompareHint:"按住期间播放没有音效的原声",
-  sfxEqLabel:"简易均衡器（叠加在预设上）", sfxEqReset:"↺ 重置均衡器", sfxVolume:"输出音量", sfxLimiter:"防止破音（限幅器）",
+  sfxEqLabel:"简易均衡器（叠加在预设和机架上）", sfxEqReset:"↺ 重置均衡器", sfxVolume:"输出音量", sfxLimiter:"防止破音（限幅器）",
   sfxGameTitle:"🎮 游戏联动音效（仅游戏中）", sfxGameMiss:"失误时声音短暂变闷", sfxGameCombo:"连击越多声音越华丽",
   sfxGamePinch:"体力低时声音变闷并像心跳一样起伏", sfxGameBlast:"🚀 狂飙中声音更明亮（CATCH）",
   sfxGamePan:"声音随卡车位置左右移动（CATCH）",
   sfxSyncTitle:"⏱ 时机与记录", sfxComp:"自动补偿音效造成的声音延迟（调整音符时机）",
   sfxCompExtra:"微调", sfxCompNow:"当前自动补偿：约 {n}ms",
-  sfxCompHint:"补偿经过Web Audio的延迟，以及每个压缩器・限幅器约6ms的延迟。这是估计值，感觉有偏差时请微调。会在“⌨ 操作”的延迟补偿之外另行叠加。",
+  sfxCompHint:"补偿经过Web Audio的延迟，以及每个压缩器・限幅器约6ms・降噪约20ms的延迟。这是估计值，感觉有偏差时请微调。会在“⌨ 操作”的延迟补偿之外另行叠加。",
   sfxRecord:"导出谱面时一并记录当前音效", sfxChartLoad:"读取并使用谱面中记录的音效",
   sfxChartApplied:"📄 正在使用谱面记录的音效“{name}”", sfxResult:"🎛 音效：{name}",
   sfxRecent:"🎛 本曲最近使用的音效：{name}", sfxUseThis:"使用此音效", sfxApplied:"已切换为音效“{name}”。",
@@ -111,7 +139,21 @@ Object.assign(TEXT.zh, {
   sfxEditor:"进阶：直接编辑JSON", sfxApply:"✓ 应用并保存", sfxBy:"作者：{name}",
   sfxSaved:"已保存“{name}”。", sfxBad:"音效JSON格式不正确。", sfxDeleted:"已删除预设。",
   sfxLimit:"我的预设最多30个。", sfxExported:"已导出音效JSON。", sfxUnsupported:"此浏览器无法使用音效。",
-  sfxConfirmDelete:"要删除此预设吗？", sfxQuick:"🎛 音效", sfxOff:"关闭"
+  sfxConfirmDelete:"要删除此预设吗？", sfxQuick:"🎛 音效", sfxOff:"关闭",
+  sfxRackTitle:"🎚 效果器机架（分段叠加）", sfxRackOn:"使用机架（叠加在预设之后）",
+  sfxRackHint:"像多段便携功放一样，把效果器当作一段段叠起来（最多8段）。位于预设和简易均衡器之间，导出与保存预设时也会一并记录。",
+  sfxRackAdd:"＋ 添加一段", sfxRackSave:"💾 把当前声音保存为我的预设", sfxRackFull:"机架最多8段。",
+  sfxRackEmpty:"还没有段。在下面添加。", sfxRackPresetName:"我的机架{n}",
+  sfxRackUp:"上移", sfxRackDown:"下移", sfxRackRemove:"移除这段",
+  sfxTypeGate:"🚪 噪声门", sfxTypeDenoise:"🧹 降噪", sfxTypeDynEQ:"🎚 动态EQ", sfxTypeExciter:"✨ 激励器",
+  sfxTypeComp:"🧲 压缩器", sfxTypeGain:"📢 音量",
+  sfxPThreshold:"阈值", sfxPFloor:"关闭时的衰减", sfxPAttackMs:"启动（ms）", sfxPReleaseMs:"恢复（ms）",
+  sfxPAttackSec:"启动（秒）", sfxPReleaseSec:"恢复（秒）", sfxPFreq:"频率", sfxPQ:"锐度（Q）", sfxPRange:"作用量",
+  sfxPAmount:"强度", sfxPMix:"混合量", sfxPRatio:"压缩比", sfxPKnee:"软拐点", sfxPMakeup:"补偿", sfxPDb:"音量",
+  sfxLearn:"🔇 把现在的声音记为噪声（在安静部分）", sfxLearning:"🔇 正在用2秒学习噪声…",
+  sfxLearned:"✅ 已记住噪声（本次会话有效）", sfxLearnFail:"⚠ 没能采集到。请一边播放一边在安静部分重试。",
+  sfxLearnNeedOn:"⚠ 请先打开音效。", sfxDenoiseHint:"请先在播放中的安静部分学习噪声。学习前为直通。",
+  sfxWorkletWait:"⏳ 正在准备高精度模式，稍后再试。", sfxWorkletNo:"⚠ 此浏览器不支持🚪🧹🎚（✨🧲📢的段仍可用）。"
 });
 Object.assign(TEXT.ko, {
   sfxTitle:"🎛 사운드 이펙트 (EQ・이펙터)", sfxOn:"이펙트 사용",
@@ -123,13 +165,13 @@ Object.assign(TEXT.ko, {
   sfxFavAdd:"☆ 즐겨찾기에 추가", sfxFavRemove:"★ 즐겨찾기에서 빼기",
   sfxPrev:"이전 프리셋", sfxNext:"다음 프리셋", sfxRandom:"랜덤",
   sfxCompare:"👂 누르는 동안 원음", sfxCompareHint:"누르고 있는 동안 이펙트 없는 소리가 납니다",
-  sfxEqLabel:"간단 EQ (프리셋 위에 겹쳐 적용)", sfxEqReset:"↺ EQ 초기화", sfxVolume:"출력 음량", sfxLimiter:"소리 깨짐 방지 (리미터)",
+  sfxEqLabel:"간단 EQ (프리셋과 랙 위에 겹쳐 적용)", sfxEqReset:"↺ EQ 초기화", sfxVolume:"출력 음량", sfxLimiter:"소리 깨짐 방지 (리미터)",
   sfxGameTitle:"🎮 게임 연동 이펙트 (플레이 중에만)", sfxGameMiss:"미스하면 잠깐 소리가 먹먹해짐", sfxGameCombo:"콤보가 이어지면 소리가 화려해짐",
   sfxGamePinch:"체력이 적으면 먹먹해지고 심장 소리처럼 울림", sfxGameBlast:"🚀 폭주 중에는 소리가 밝고 화려해짐 (CATCH)",
   sfxGamePan:"트럭 위치에 맞춰 좌우로 이동 (CATCH)",
   sfxSyncTitle:"⏱ 타이밍과 기록", sfxComp:"이펙트로 인한 소리 지연을 노트 타이밍에서 자동 보정",
   sfxCompExtra:"미세 조정", sfxCompNow:"현재 자동 보정: 약 {n}ms",
-  sfxCompHint:"Web Audio를 거치는 지연과, 컴프레서・리미터 하나당 약 6ms의 지연을 더해 보정합니다. 추정값이므로 어긋남이 느껴지면 미세 조정하세요. '⌨ 조작'의 지연 보정과는 별도로 더해집니다.",
+  sfxCompHint:"Web Audio를 거치는 지연과, 컴프레서・리미터 하나당 약 6ms・노이즈 제거 하나당 약 20ms의 지연을 더해 보정합니다. 추정값이므로 어긋남이 느껴지면 미세 조정하세요. '⌨ 조작'의 지연 보정과는 별도로 더해집니다.",
   sfxRecord:"채보를 내보낼 때 사용 중인 이펙트도 기록", sfxChartLoad:"채보에 기록된 이펙트를 불러와 사용",
   sfxChartApplied:"📄 채보에 기록된 이펙트 '{name}' 사용 중", sfxResult:"🎛 이펙트: {name}",
   sfxRecent:"🎛 이 곡에서 최근 사용한 이펙트: {name}", sfxUseThis:"이 이펙트 사용", sfxApplied:"이펙트를 '{name}'(으)로 바꿨습니다.",
@@ -139,11 +181,25 @@ Object.assign(TEXT.ko, {
   sfxEditor:"고급: JSON 직접 편집", sfxApply:"✓ 적용하고 저장", sfxBy:"제작: {name}",
   sfxSaved:"'{name}'을(를) 저장했습니다.", sfxBad:"이펙트 JSON 형식이 올바르지 않습니다.", sfxDeleted:"프리셋을 삭제했습니다.",
   sfxLimit:"내 프리셋은 최대 30개입니다.", sfxExported:"이펙트 JSON을 내보냈습니다.", sfxUnsupported:"이 브라우저에서는 이펙트를 사용할 수 없습니다.",
-  sfxConfirmDelete:"이 프리셋을 삭제할까요?", sfxQuick:"🎛 사운드", sfxOff:"끄기"
+  sfxConfirmDelete:"이 프리셋을 삭제할까요?", sfxQuick:"🎛 사운드", sfxOff:"끄기",
+  sfxRackTitle:"🎚 이펙터 랙 (단으로 쌓기)", sfxRackOn:"랙 사용 (프리셋 뒤에 겹쳐짐)",
+  sfxRackHint:"휴대용 앰프를 여러 단 쌓듯이, 이펙터를 단으로 쌓을 수 있어요 (최대 8단). 프리셋과 간단 EQ 사이에 들어가고, 내보내기・프리셋 저장에도 포함돼요.",
+  sfxRackAdd:"＋ 단 추가", sfxRackSave:"💾 지금 소리를 내 프리셋으로 저장", sfxRackFull:"랙은 최대 8단이에요.",
+  sfxRackEmpty:"아직 단이 없어요. 아래에서 추가하세요.", sfxRackPresetName:"내 랙 {n}",
+  sfxRackUp:"위로", sfxRackDown:"아래로", sfxRackRemove:"이 단 빼기",
+  sfxTypeGate:"🚪 노이즈 게이트", sfxTypeDenoise:"🧹 노이즈 제거", sfxTypeDynEQ:"🎚 다이내믹 EQ", sfxTypeExciter:"✨ 엑사이터",
+  sfxTypeComp:"🧲 컴프레서", sfxTypeGain:"📢 음량",
+  sfxPThreshold:"임계값", sfxPFloor:"닫힐 때 감쇠", sfxPAttackMs:"어택 (ms)", sfxPReleaseMs:"릴리스 (ms)",
+  sfxPAttackSec:"어택 (초)", sfxPReleaseSec:"릴리스 (초)", sfxPFreq:"주파수", sfxPQ:"날카로움 (Q)", sfxPRange:"작용량",
+  sfxPAmount:"세기", sfxPMix:"섞는 양", sfxPRatio:"압축비", sfxPKnee:"니", sfxPMakeup:"보상", sfxPDb:"음량",
+  sfxLearn:"🔇 지금 소리를 노이즈로 기억하기 (조용한 부분에서)", sfxLearning:"🔇 2초간 노이즈를 기억하는 중…",
+  sfxLearned:"✅ 노이즈를 기억했어요 (이 세션 동안)", sfxLearnFail:"⚠ 못 가져왔어요. 재생하면서 조용한 부분에서 다시.",
+  sfxLearnNeedOn:"⚠ 먼저 이펙트를 켜주세요.", sfxDenoiseHint:"먼저 재생 중인 조용한 부분에서 노이즈를 기억하세요. 그 전까지는 그냥 통과해요.",
+  sfxWorkletWait:"⏳ 고정밀 모드 준비 중이에요. 잠시 후 다시.", sfxWorkletNo:"⚠ 이 브라우저에서는 🚪🧹🎚를 쓸 수 없어요 (✨🧲📢 단은 작동해요)."
 });
 
 /* ============ ② 設定 ============ */
-const FX_STORE = "trk_fx_presets_v1", FX_MAX = 30, TEMP_ID = "__chart", RECENT_MAX = 5, FAV_MAX = 40;
+const FX_STORE = "trk_fx_presets_v1", FX_MAX = 30, TEMP_ID = "__chart", RECENT_MAX = 5, FAV_MAX = 40, RACK_MAX = 8;
 const GAME_DEF = { miss:true, combo:true, pinch:false, blast:true, pan:false };
 const EQ_BANDS = [["lowshelf", 60, "60Hz"], ["peaking", 250, "250Hz"], ["peaking", 1000, "1kHz"], ["peaking", 4000, "4kHz"], ["highshelf", 12000, "12kHz"]];
 const idList = (v, max) => Array.isArray(v) ? [...new Set(v.filter(x => typeof x === "string" && /^[a-z0-9_]{1,40}$/.test(x)))].slice(0, max) : [];
@@ -159,6 +215,8 @@ settings.fxRecord = prefs.fxRecord !== false;
 settings.fxChartLoad = prefs.fxChartLoad !== false;
 settings.fxFav = idList(prefs.fxFav, FAV_MAX);
 settings.fxRecent = idList(prefs.fxRecent, RECENT_MAX);
+settings.fxRackOn = !!prefs.fxRackOn;
+settings.fxRack = (Array.isArray(prefs.fxRack) ? prefs.fxRack : []).map(cleanFx).filter(Boolean).slice(0, RACK_MAX);   /* 🎚 段の並び */
 settings.fxGame = {};
 for (const k of Object.keys(GAME_DEF)) settings.fxGame[k] = prefs.fxGame && typeof prefs.fxGame[k] === "boolean" ? prefs.fxGame[k] : GAME_DEF[k];
 
@@ -200,6 +258,12 @@ function cleanFx(f) {
     }
     case "noise": return { type:"noise", kind:NOISES.includes(f.kind) ? f.kind : "pink", level:R(f.level, -60, -6, -30) };
     case "crossfeed": return { type:"crossfeed", amount:R(f.amount, 0, .6, .3) };
+    case "gate": return { type:"gate", threshold:R(f.threshold, -90, -10, -50), floor:R(f.floor, -48, 0, -30),
+      attack:R(f.attack, .5, 50, 2), release:R(f.release, 10, 500, 120) };   /* attack/release は ms */
+    case "denoise": return { type:"denoise", amount:R(f.amount, 0, 24, 10) };
+    case "dynEQ": return { type:"dynEQ", freq:R(f.freq, 20, 12000, 5000), q:R(f.q, .1, 18, 3),
+      threshold:R(f.threshold, -60, 0, -30), range:R(f.range, 0, 24, 8), attack:R(f.attack, .5, 50, 3), release:R(f.release, 10, 500, 120) };
+    case "exciter": return { type:"exciter", freq:R(f.freq, 800, 12000, 3000), amount:R(f.amount, 0, 1, .4), mix:R(f.mix, 0, 1, .5) };
   }
   return null;
 }
@@ -215,6 +279,25 @@ function cleanPreset(raw) {
   return out;
 }
 const copy = o => o == null ? o : JSON.parse(JSON.stringify(o));
+/* 🎚 ラックに並べられる効果（🚪🧹🎚✨ がPro Audio系の追加。🧲📢 は昔からある効果の単体版） */
+const RACK_META = [
+  { type:"gate",    icon:"🚪", key:"sfxTypeGate" },
+  { type:"denoise", icon:"🧹", key:"sfxTypeDenoise" },
+  { type:"dynEQ",   icon:"🎚", key:"sfxTypeDynEQ" },
+  { type:"exciter", icon:"✨", key:"sfxTypeExciter" },
+  { type:"comp",    icon:"🧲", key:"sfxTypeComp" },
+  { type:"gain",    icon:"📢", key:"sfxTypeGain" },
+];
+const RACK_PARAMS = {
+  gate:[["threshold","sfxPThreshold",-90,-10,1,"dB"],["floor","sfxPFloor",-48,0,1,"dB"],["attack","sfxPAttackMs",.5,50,.5,"ms"],["release","sfxPReleaseMs",10,500,5,"ms"]],
+  denoise:[["amount","sfxPAmount",0,24,1,"dB"]],
+  dynEQ:[["freq","sfxPFreq",20,12000,50,"Hz"],["q","sfxPQ",.1,18,.1,""],["threshold","sfxPThreshold",-60,0,1,"dB"],["range","sfxPRange",0,24,1,"dB"],["attack","sfxPAttackMs",.5,50,.5,"ms"],["release","sfxPReleaseMs",10,500,5,"ms"]],
+  exciter:[["freq","sfxPFreq",800,12000,100,"Hz"],["amount","sfxPAmount",0,1,.05,""],["mix","sfxPMix",0,1,.05,""]],
+  comp:[["threshold","sfxPThreshold",-60,0,1,"dB"],["ratio","sfxPRatio",1,20,.5,":1"],["attack","sfxPAttackSec",0,1,.01,"s"],["release","sfxPReleaseSec",.01,1,.01,"s"],["knee","sfxPKnee",0,40,1,"dB"],["makeup","sfxPMakeup",0,24,.5,"dB"]],
+  gain:[["db","sfxPDb",-24,12,.5,"dB"]],
+};
+const FX_DEFAULTS = { gate:{ type:"gate" }, denoise:{ type:"denoise" }, dynEQ:{ type:"dynEQ" }, exciter:{ type:"exciter" },
+  comp:{ type:"comp", threshold:-24, ratio:3, attack:.01, release:.25, knee:10, makeup:0 }, gain:{ type:"gain", db:0 } };
 
 /* ============ ④ プリセット（内蔵は fx-presets.js、マイプリセットは localStorage） ============ */
 const CATS = ["basic", "genre", "scene", "space", "game", "fun", "weird", "custom"];
@@ -263,7 +346,8 @@ function matches(p, q) {
 }
 
 /* ============ ⑤ 音の部品 ============ */
-const G = { ac:null, src:null, ok:true, made:[], ticks:[], comps:0, eq:[], game:null, vol:null, lim:null, out:null, noise:{}, ir:new Map(), extra:new Map() };
+const G = { ac:null, src:null, ok:true, made:[], ticks:[], comps:0, eq:[], game:null, vol:null, lim:null, out:null, noise:{}, ir:new Map(), extra:new Map(),
+  spectral:0, wk:null, wkLoad:null, denoiseNodes:new Set(), denoisePow:null, denoiseLearned:false, learnNode:null, rackNodes:[] };   /* 🎚 追加分 */
 let cur = null;                                       // 作り直すときに消すノードの一覧（rebuild 中だけ）
 let bypass = false;                                   // 👂 元の音と比べている間だけ true
 const active = () => settings.fxOn && !bypass;
@@ -283,7 +367,7 @@ function matrix(ac, a, b) {                           // L' = a·L + b·R、R' =
 function parallel(ac, mix, wetIn, wetOut, dryLevel = 1) {   // 元の音（dry）に響き（wet）を重ねる
   const inp = gainN(ac, 1), out = gainN(ac, 1), dry = gainN(ac, dryLevel), wet = gainN(ac, mix);
   inp.connect(dry); dry.connect(out); inp.connect(wetIn); wetOut.connect(wet); wet.connect(out);
-  return { input:inp, output:out };
+  return { input:inp, output:out, wetG:wet, dryG:dry };
 }
 /* リバーブの響き（同じ大きさ・減衰なら使い回す。最大24種類） */
 function impulse(ac, size, decay) {
@@ -339,7 +423,71 @@ function beatInfo() {
   return { beatSec:beatMs / 1000 / (video.playbackRate || 1), pos:((video.currentTime || 0) * 1000 - (chartMeta.offset || 0)) / beatMs, playing:!video.paused };
 }
 
-/* ============ ⑥ エフェクトを作る（{ input, output, tick? } を返す。tick は毎フレーム呼ばれる） ============ */
+/* ✨ エキサイターのカーブ（低域は通さないので、マイルドな飽和で十分） */
+function exciteCurve(k) {
+  const n = 2048, c = new Float32Array(n), a = 1 + k * 3;
+  for (let i = 0; i < n; i++) { const x = i / (n - 1) * 2 - 1; c[i] = Math.tanh(a * x) / Math.tanh(a); }
+  return c;
+}
+/* AudioWorklet（🚪🧹🎚 の本体）を読み込む。読めたら音の通り道を作り直す */
+function ensureWorklet() {
+  if (G.wk !== null) return;
+  const ac = getAC();
+  if (!ac || !ac.audioWorklet) { G.wk = false; return; }
+  G.wkLoad = ac.audioWorklet.addModule("js/fx-worklet.js").then(() => { G.wk = true; },
+    e => { console.error(e); G.wk = false; });
+  G.wkLoad.then(() => { if (G.src) { rebuild(); syncUI(); } });
+}
+/* 🔇 いまの音をノイズとして覚える（学習専用の素通しノードで受け取って、全ノードに配る） */
+function ensureLearnTap() {
+  if (!G.src || G.wk !== true) return null;
+  if (!G.learnNode) {
+    try {
+      const node = new AudioWorkletNode(G.ac, "trk-denoise", { numberOfInputs:1, numberOfOutputs:1, outputChannelCount:[2] });
+      node.parameters.get("amount").value = 0;
+      const mute = G.ac.createGain(); mute.gain.value = 0;      // 音は出さない（見るだけ）
+      G.src.connect(node); node.connect(mute); mute.connect(G.ac.destination);
+      node.port.onmessage = e => { if (e.data && e.data.type === "profile") setNoiseProfile(e.data.pow, e.data.frames); };
+      G.learnNode = node;
+    } catch (e) { console.error(e); return null; }
+  }
+  return G.learnNode;
+}
+function setNoiseProfile(pow, frames) {
+  if (!pow || !frames) { if (learnStat) learnStat.textContent = tr("sfxLearnFail"); return; }
+  G.denoisePow = new Float32Array(pow); G.denoiseLearned = true;
+  for (const n of G.denoiseNodes) { try { n.port.postMessage({ type:"profile", pow:G.denoisePow }); } catch (_) {} }
+  if (learnStat) learnStat.textContent = tr("sfxLearned");
+  renderRack();
+}
+function startLearn() {
+  if (!settings.fxOn || !G.src) { learnStat.textContent = tr("sfxLearnNeedOn"); return; }
+  if (G.wk !== true) { ensureWorklet(); learnStat.textContent = tr("sfxWorkletWait"); return; }
+  const node = ensureLearnTap();
+  if (!node) { learnStat.textContent = tr("sfxUnsupported"); return; }
+  node.port.postMessage({ type:"learn", ms:2000 });
+  learnStat.textContent = tr("sfxLearning");
+}
+/* 🚪🧹🎚 を作る（本体がまだ読み込めていなければ null＝その段はとばし、読めたら作り直す） */
+const WK_PARAM = {
+  gate: f => ({ threshold:f.threshold, floor:f.floor, attack:f.attack, release:f.release }),
+  denoise: f => ({ amount:f.amount }),
+  dynEQ: f => ({ freq:f.freq, q:f.q, threshold:f.threshold, range:f.range, attack:f.attack, release:f.release }),
+};
+function workletFx(ac, f) {
+  if (G.wk !== true) { ensureWorklet(); return null; }
+  try {
+    const node = T(new AudioWorkletNode(ac, "trk-" + f.type, { numberOfInputs:1, numberOfOutputs:1, outputChannelCount:[2] }));
+    for (const [k, v] of Object.entries(WK_PARAM[f.type](f))) { const p = node.parameters.get(k); if (p) p.value = v; }
+    if (f.type === "denoise") {
+      if (G.denoisePow) node.port.postMessage({ type:"profile", pow:G.denoisePow });
+      G.denoiseNodes.add(node);
+    }
+    return { input:node, output:node, set:(k, v) => { const p = node.parameters.get(k); if (p) p.value = v; } };
+  } catch (e) { console.error(e); return null; }
+}
+
+/* ============ ⑥ エフェクトを作る（{ input, output, tick?, set? } を返す。tick は毎フレーム、set はパラメータ変更） ============ */
 function mk(ac, f) {
   const now = () => ac.currentTime;
   switch (f.type) {
@@ -352,9 +500,12 @@ function mk(ac, f) {
       const c = T(ac.createDynamicsCompressor());
       c.threshold.value = f.threshold; c.ratio.value = f.ratio; c.attack.value = f.attack; c.release.value = f.release; c.knee.value = f.knee;
       const g = gainN(ac, dbToGain(f.makeup)); c.connect(g);
-      return { input:c, output:g };
+      return { input:c, output:g, set:(k, v) => {
+        if (k === "makeup") g.gain.setTargetAtTime(dbToGain(v), now(), .02);
+        else if (c[k]) c[k].setTargetAtTime(v, now(), .02);
+      } };
     }
-    case "gain": { const g = gainN(ac, dbToGain(f.db)); return { input:g, output:g }; }
+    case "gain": { const g = gainN(ac, dbToGain(f.db)); return { input:g, output:g, set:(k, v) => g.gain.setTargetAtTime(dbToGain(v), now(), .02) }; }
     case "width": return matrix(ac, (1 + f.amount) / 2, (1 - f.amount) / 2);
     case "vocalCut": {
       const inp = stereoIn(ac), out = gainN(ac, 1), m = matrix(ac, 1, -f.amount);
@@ -426,6 +577,19 @@ function mk(ac, f) {
       src.buffer = noiseBuffer(ac, f.kind); src.loop = true; src.connect(g); g.connect(pass); src.start();
       return { input:pass, output:pass, tick:bi => g.gain.setTargetAtTime(bi.playing ? lv : 0, now(), .08) };
     }
+    case "exciter": {                                  // ✨ 高域に倍音を足して華やかに（プロ用の「音質向上」流）
+      const hp = biq(ac, "highpass", f.freq, .7), ws = T(ac.createWaveShaper());
+      ws.curve = exciteCurve(f.amount); ws.oversample = "2x";
+      const lvl = gainN(ac, .8); hp.connect(ws); ws.connect(lvl);
+      const nd = parallel(ac, f.mix, lvl, lvl);
+      return { input:nd.input, output:nd.output, set:(k, v) => {
+        if (k === "freq") hp.frequency.setTargetAtTime(v, now(), .02);
+        else if (k === "amount") ws.curve = exciteCurve(v);
+        else if (k === "mix") { nd.wetG.gain.setTargetAtTime(v, now(), .02); nd.dryG.gain.setTargetAtTime(1 - v, now(), .02); }
+      } };
+    }
+    case "gate": case "denoise": case "dynEQ":         // 🚪🧹🎚 AudioWorklet の本体（fx-worklet.js）
+      return workletFx(ac, f);
     case "crossfeed": {                                 // 反対側の低めの音を少し混ぜる
       const inp = stereoIn(ac), sp = T(ac.createChannelSplitter(2)), mg = T(ac.createChannelMerger(2));
       const lpL = biq(ac, "lowpass", 700, .7), lpR = biq(ac, "lowpass", 700, .7);
@@ -445,7 +609,7 @@ function ensureGraph() {
   if (!G.ok) return false;
   const ac = getAC(); if (!ac) { G.ok = false; return false; }
   try { G.src = ac.createMediaElementSource(video); } catch (e) { console.error(e); G.ok = false; return false; }
-  G.ac = ac; cur = null;
+  G.ac = ac; cur = null; ensureWorklet();   /* 🎚 高精度エフェクトの本体も先に読み始める */
   /* かんたんEQ */
   G.eq = EQ_BANDS.map(([t, f]) => biq(ac, t, f, .9));
   for (let i = 1; i < G.eq.length; i++) G.eq[i - 1].connect(G.eq[i]);
@@ -471,21 +635,25 @@ function rebuild() {
   og.cancelScheduledValues(t); og.setValueAtTime(0, t); og.linearRampToValueAtTime(1, t + .06);
   try { G.src.disconnect(); } catch (_) {}
   for (const n of G.made) { try { if (n.stop) n.stop(); } catch (_) {} try { n.disconnect(); } catch (_) {} }
-  G.made = []; G.ticks = []; G.comps = 0;
+  G.made = []; G.ticks = []; G.comps = 0; G.spectral = 0; G.denoiseNodes.clear(); G.rackNodes = [];
   let last = G.src;
   if (active()) {
     cur = G.made;
-    for (const f of curPreset().chain) {
+    const preset = curPreset().chain, all = preset.concat(settings.fxRackOn ? settings.fxRack : []);
+    for (let i = 0; i < all.length; i++) {           /* 🎚 ラックはプリセットの後に段として重なる */
       try {
-        const nd = mk(G.ac, f); if (!nd) continue;
+        const f = all[i], nd = mk(G.ac, f); if (!nd) continue;
         last.connect(nd.input); last = nd.output;
         if (nd.tick) G.ticks.push(nd.tick);
         if (f.type === "comp") G.comps++;
+        if (f.type === "denoise") G.spectral++;      /* 遅れの自動補正に数える */
+        if (i >= preset.length) G.rackNodes[i - preset.length] = nd;
       } catch (e) { console.error(e); }
     }
     cur = null;
   }
   last.connect(G.eq[0]);
+  if (G.learnNode) { try { G.src.connect(G.learnNode); } catch (_) {} }   /* 🔇 学習用の素通しもつなぎ直す */
   syncEq();
 }
 function syncEq() {
@@ -549,7 +717,7 @@ function tap(fftSize = 2048) {
 function fxDelayMs() {
   if (!G.src || !settings.fxComp) return 0;
   let ms = (G.ac.baseLatency || 0) * 1000;
-  if (active()) ms += 6 * (G.comps + (settings.fxLimiter ? 1 : 0));
+  if (active()) ms += 6 * (G.comps + (settings.fxLimiter ? 1 : 0)) + G.spectral * (1024 / G.ac.sampleRate * 1000);   /* 🧹 1つにつき1024サンプル */
   return ms + settings.fxCompExtra;
 }
 const baseGameTime = gameTime;
@@ -641,7 +809,7 @@ function exportObj() {
   const o = { format:"trk-fx", version:1, name:presetName(p).slice(0, 24) };
   if (p.author) o.author = p.author;
   if (p.url) o.url = p.url;
-  Object.assign(o, { chain:copy(p.chain), eq:settings.fxEq.slice(), volume:settings.fxVolume });
+  Object.assign(o, { chain:copy(p.chain.concat(settings.fxRackOn ? settings.fxRack : [])), eq:settings.fxEq.slice(), volume:settings.fxVolume });   /* 🎚 ラックも一緒に */
   if (!p.custom && !p.temp) o.id = p.id;
   return o;
 }
@@ -760,6 +928,67 @@ const grid = el("div", "fxGrid"), desc = el("div", "hint status");
 const favBtn = el("button", "fxMini"); favBtn.type = "button"; favBtn.addEventListener("click", toggleFav);
 const toolRow = el("div", "miniActions"); toolRow.append(favBtn, compareBtn());
 add(onCk.lab, tx("div", "sfxHint", "hint"), tx("h3", "sfxPresetLabel"), search, hits, grid, desc, toolRow);
+/* 🎚 エフェクターラック（段で重ねる。アンプの多段構成みたいに） */
+add(tx("h3", "sfxRackTitle"));
+const rackCk = check("sfxRackOn", v => { settings.fxRackOn = v; if (v && !settings.fxOn) setOn(true); else refresh(); });
+const rackBox = el("div", "fxRack");
+const rackSel = document.createElement("select"); rackSel.className = "fxQuickSelect";
+const rackAdd = tx("button", "sfxRackAdd"); rackAdd.type = "button"; rackAdd.style.cssText = "padding:8px 12px;font-size:14px";
+rackAdd.addEventListener("click", () => {
+  if (settings.fxRack.length >= RACK_MAX) { setStatus("sfxStatus", "sfxRackFull"); return; }
+  settings.fxRack.push(cleanFx({ ...FX_DEFAULTS[rackSel.value] }));
+  settings.fxRackOn = true;
+  refresh();
+});
+const rackSave = tx("button", "sfxRackSave"); rackSave.type = "button"; rackSave.style.cssText = "padding:8px 12px;font-size:14px";
+rackSave.addEventListener("click", () => {
+  const o = exportForFile();
+  o.name = tr("sfxRackPresetName", { n: Object.keys(custom).length + 1 });
+  storePreset(o);
+});
+const rackRow = el("div", "miniActions"); rackRow.append(rackSel, rackAdd, rackSave);
+const learnBtn = tx("button", "sfxLearn"); learnBtn.type = "button";
+learnBtn.addEventListener("click", startLearn);
+const learnStat = el("div", "hint");
+add(rackCk.lab, tx("div", "sfxRackHint", "hint"), rackBox, rackRow, learnBtn, learnStat);
+const rackFmt = (v, unit) => unit === "Hz" ? (v >= 1000 ? (v / 1000).toFixed(1) + "kHz" : String(Math.round(v)))
+  : (v > 0 && unit === "dB" ? "+" : "") + String(Math.round(v * 100) / 100) + unit;
+function renderRack() {
+  rackBox.textContent = "";
+  rackSel.textContent = "";
+  for (const m of RACK_META) rackSel.append(new Option(m.icon + " " + tr(m.key), m.type));
+  learnBtn.hidden = learnStat.hidden = !settings.fxRack.some(f => f.type === "denoise");
+  if (!learnBtn.hidden) learnStat.textContent = G.denoiseLearned ? tr("sfxLearned") : tr("sfxDenoiseHint");
+  if (G.wk === false && settings.fxRack.some(f => f.type === "gate" || f.type === "denoise" || f.type === "dynEQ"))
+    rackBox.append(el("div", "hint", tr("sfxWorkletNo")));
+  settings.fxRack.forEach((f, i) => {
+    const meta = RACK_META.find(m => m.type === f.type); if (!meta) return;
+    const card = el("div", "fxStage");
+    const head = el("div", "fxStageHead");
+    head.append(el("span", "fxStageNum", String(i + 1)), el("b", "", meta.icon + " " + tr(meta.key)));
+    const up = smallBtn("↑", "sfxRackUp", () => { if (i > 0) { const [x] = settings.fxRack.splice(i, 1); settings.fxRack.splice(i - 1, 0, x); refresh(); } });
+    const dn = smallBtn("↓", "sfxRackDown", () => { if (i < settings.fxRack.length - 1) { const [x] = settings.fxRack.splice(i, 1); settings.fxRack.splice(i + 1, 0, x); refresh(); } });
+    const rm = smallBtn("✕", "sfxRackRemove", () => { settings.fxRack.splice(i, 1); refresh(); });
+    up.disabled = i === 0; dn.disabled = i === settings.fxRack.length - 1;
+    head.append(up, dn, rm);
+    card.append(head);
+    for (const [key, labKey, min, max, step, unit] of RACK_PARAMS[f.type] || []) {
+      const r = range(el("span", "", tr(labKey)), min, max, step, v => {
+        f[key] = v;
+        const nd = G.rackNodes[i];                       /* つなぎ直さずに生で反映 */
+        if (nd && nd.set) nd.set(key, v);
+        saveUserPrefs();
+        r.val.textContent = rackFmt(v, unit);
+      });
+      r.inp.value = f[key]; r.val.textContent = rackFmt(f[key], unit);
+      card.append(r.row);
+    }
+    rackBox.append(card);
+  });
+  if (!settings.fxRack.length) rackBox.append(el("div", "hint", tr("sfxRackEmpty")));
+}
+
+
 
 /* かんたんEQ・音量・リミッター（スライダーは数字だけ更新して軽くする） */
 add(tx("h3", "sfxEqLabel"));
@@ -912,6 +1141,8 @@ function syncUI() {
   renderGrid(); renderQuick(); renderDesc(p); syncValues();
   limCk.inp.checked = settings.fxLimiter;
   for (const [k, inp] of gameCks) inp.checked = !!settings.fxGame[k];
+  rackCk.inp.checked = settings.fxRackOn;
+  renderRack();
   compCk.inp.checked = settings.fxComp; recCk.inp.checked = settings.fxRecord; loadCk.inp.checked = settings.fxChartLoad;
   delBtn.hidden = !p.custom;
 }

@@ -177,6 +177,18 @@ if (!read("js/library.js").includes('startsWith("pl:")') ||
   ok("playlist tabs, profiles and sharing are wired");
 }
 
+// 🎚 Pro-audio effects: worklet processors + rack plumbing in fx.js.
+if (!exists("js/fx-worklet.js") ||
+    !read("js/fx-worklet.js").includes("trk-denoise") ||
+    !read("js/fx-worklet.js").includes("trk-dyneq") ||
+    !read("js/fx-worklet.js").includes("trk-gate") ||
+    !read("js/fx.js").includes("settings.fxRack") ||
+    !read("js/fx.js").includes("fxRackOn")) {
+  fail("pro-audio effect plumbing is missing");
+} else {
+  ok("pro-audio effects (gate / denoise / dynamic EQ) and rack are wired");
+}
+
 // A cache name is deliberately checked for existence, not for a guessed
 // date, because the service worker is manually bumped for every release.
 const sw = read("sw.js");

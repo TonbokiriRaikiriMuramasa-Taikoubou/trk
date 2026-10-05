@@ -6,7 +6,7 @@
 ## 現在地
 
 - 作業ブランチ：`arena/01a10940-trk`
-- 直近の機能コミット：`2bbc026 feat: add privacy wallpaper screen saver`
+- 直近の機能コミット：`6700969 feat: add navigation keys and compact help mode`
 - 今回の整理対象：メディアプレーヤーの逆再生・A-Bループ、Handoffの優先順位、文書間の古い記載、パック仕様、依存しない静的監査、privacy.html、APK準備
 - 公開URL：<https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/>
 - Service Workerキャッシュ：`sw.js` の `CACHE = "trk-v2026.10.5-synth2"`

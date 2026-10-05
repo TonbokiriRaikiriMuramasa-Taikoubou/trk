@@ -18,7 +18,8 @@ Object.assign(TEXT.ja, {
   catchCapture1:"「右へ」に割り当てるキーを押してください。ESCでキャンセル。",
   catchAssigned:"CATCHのキーを設定しました。",
   blastToast:"🚀 ぶっ飛ばし！", blastLabel:"🚀 BLAST", blastCount:"🚀 ぶっ飛ばし：{n}回",
-  eggNitro:"✦ NITRO：CATCHがずっとぶっ飛ばしモードになります（練習扱い・ハイスコア対象外）"
+  eggNitro:"✦ NITRO：CATCHがずっとぶっ飛ばしモードになります（練習扱い・ハイスコア対象外）",
+  catchNitroBonus:"🚀 ニトロ中は得点1.1倍", catchNitroBonusHint:"オンにすると、ニトロ中に受け止めたノーツの得点が少し上がります。",
 });
 Object.assign(TEXT.en, {
   catchHint:"Catch the falling parcels in your truck bed. Move with ← → (or A / D), or drag on the screen. Grab a nitro can 🚀 on the road to enter Blast mode for a while (double catch width, faster moves).",
@@ -26,7 +27,8 @@ Object.assign(TEXT.en, {
   catchCapture0:"Press a key for “Left”. ESC cancels.", catchCapture1:"Press a key for “Right”. ESC cancels.",
   catchAssigned:"CATCH key assigned.",
   blastToast:"🚀 BLAST!", blastLabel:"🚀 BLAST", blastCount:"🚀 Blasts: {n}",
-  eggNitro:"✦ NITRO: CATCH stays in Blast mode the whole song (practice — no high score)"
+  eggNitro:"✦ NITRO: CATCH stays in Blast mode the whole song (practice — no high score)",
+  catchNitroBonus:"🚀 Score x1.1 during Nitro", catchNitroBonusHint:"When on, notes caught during Nitro give a small score bonus.",
 });
 Object.assign(TEXT.zh, {
   catchHint:"用货斗接住落下的包裹。用 ← →（或 A・D）左右移动，也可以在画面上拖动。拿到路上的氮气罐🚀，会进入一段时间的“狂飙模式”（接取范围2倍・移动更快）。",
@@ -34,7 +36,8 @@ Object.assign(TEXT.zh, {
   catchCapture0:"请按下“向左”的按键。ESC取消。", catchCapture1:"请按下“向右”的按键。ESC取消。",
   catchAssigned:"已设置CATCH按键。",
   blastToast:"🚀 狂飙！", blastLabel:"🚀 BLAST", blastCount:"🚀 狂飙：{n}次",
-  eggNitro:"✦ NITRO：CATCH整首歌都是狂飙模式（练习・不计最高分）"
+  eggNitro:"✦ NITRO：CATCH整首歌都是狂飙模式（练习・不计最高分）",
+  catchNitroBonus:"🚀 氮气中得分×1.1", catchNitroBonusHint:"开启后，在氮气期间接住音符会获得少量分数加成。",
 });
 Object.assign(TEXT.ko, {
   catchHint:"떨어지는 짐을 짐칸으로 받습니다. ← →(A・D도 가능)로 좌우로 움직이고, 화면을 드래그해도 됩니다. 길 위의 니트로 캔🚀을 먹으면 잠시 '폭주 모드'(받는 폭 2배・이동이 빨라짐)가 됩니다.",
@@ -42,7 +45,8 @@ Object.assign(TEXT.ko, {
   catchCapture0:"'왼쪽'으로 지정할 키를 누르세요. ESC로 취소.", catchCapture1:"'오른쪽'으로 지정할 키를 누르세요. ESC로 취소.",
   catchAssigned:"CATCH 키를 설정했습니다.",
   blastToast:"🚀 폭주!", blastLabel:"🚀 BLAST", blastCount:"🚀 폭주: {n}회",
-  eggNitro:"✦ NITRO: CATCH가 곡 내내 폭주 모드가 됩니다 (연습 취급・최고 점수 제외)"
+  eggNitro:"✦ NITRO: CATCH가 곡 내내 폭주 모드가 됩니다 (연습 취급・최고 점수 제외)",
+  catchNitroBonus:"🚀 니트로 중 점수×1.1", catchNitroBonusHint:"켜면 니트로 중 받은 노트에 작은 점수 보너스가 붙습니다.",
 });
 
 /* ============ 設定 ============ */
@@ -167,14 +171,16 @@ function updateCatch(now) {
 function catchJudge(now) {
   if (settings.autoPlay) return;
   ensureCatchMap();
-  const k = isBlast(now) ? 2 : 1;
+  const k = isBlast(now) ? 2 : 1, bonus = settings.catchNitroBonus && k > 1;
   for (let i = nextIdx; i < chart.length; i++) {
     const n = chart[i]; if (n.time > now) break;
     if (n.judged) continue;
     const dx = Math.abs(catchMap.xs[i] - catchState.x);
     if (dx <= CATCH.half * k) {
+      const kind = dx <= CATCH.perfect * k ? "perfect" : "good";
+      if (bonus) stats.blastBonus = (stats.blastBonus || 0) + (kind === "perfect" ? 1 : .5);
       playSE(n.lane);
-      judgeNote(n, dx <= CATCH.perfect * k ? "perfect" : "good", dx <= CATCH.perfect * k * .5 ? 0 : null);
+      judgeNote(n, kind, dx <= CATCH.perfect * k * .5 ? 0 : null);
       if (k > 1) launchParcel(catchMap.xs[i], n.lane);
     } else judgeNote(n, "miss", null);
     if (phase !== "playing") return;
@@ -206,7 +212,7 @@ function drawCatchTruck(x, y, p, blast, now) {
   const hitK = Math.max(0, 1 - (p - Math.max(avatarHit[0], avatarHit[1])) / 200);
   ctx.save(); ctx.translate(x, y - hitK * 6);
   ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.beginPath(); ctx.ellipse(0, 76, 112, 14, 0, 0, TAU); ctx.fill();
-  if (stats.combo >= 50 || blast) {                                  // マフラーの炎（ぶっ飛ばし中は大きく）
+  if ((stats.combo >= 50 && gameplayFxPower() > 0) || blast) {       // マフラーの炎（ぶっ飛ばし中は大きく）
     for (const s of [-1, 1]) {
       const f = (blast ? 46 : 14) + Math.random() * (blast ? 34 : 12);
       ctx.fillStyle = blast ? "#ff5d2a" : "#ffb000";
@@ -241,23 +247,23 @@ function drawCatchField(now) {
   updateCatch(now);
   const g = skin().game, travel = travelMs(), p = performance.now(), accent = toHex(skin().ui["--ui-accent"]);
   const Lx = CATCH.left, Wd = CATCH.width, top = CATCH.topY, ly = CATCH.lineY;
-  const still = reduceMotion.matches, blast = isBlast(now), hue = (p / 6) % 360;
+  const still = reduceMotion.matches, blast = isBlast(now), blastVisual = blast && gameplayFxMultiplier() > 0, hue = (p / 6) % 360;
   ctx.save();
 
   /* 道路（白線はコンボとぶっ飛ばしで速く流れる） */
   ctx.fillStyle = g.lane; rr(Lx - 40, top - 30, Wd + 80, H - top + 60, 28); ctx.fill();
-  const edge = blast ? `hsla(${hue},90%,60%,.85)` : hexToRgba(accent, .35);
-  ctx.fillStyle = edge; ctx.fillRect(Lx - 40, top - 30, blast ? 14 : 8, H); ctx.fillRect(Lx + Wd + (blast ? 26 : 32), top - 30, blast ? 14 : 8, H);
-  const boost = Math.min(1, stats.combo / 100), speed = .45 + .35 * boost + (blast ? 1.2 : 0);
+  const edge = blastVisual ? `hsla(${hue},90%,60%,.85)` : hexToRgba(accent, .35);
+  ctx.fillStyle = edge; ctx.fillRect(Lx - 40, top - 30, blastVisual ? 14 : 8, H); ctx.fillRect(Lx + Wd + (blastVisual ? 26 : 32), top - 30, blastVisual ? 14 : 8, H);
+  const boost = Math.min(1, stats.combo / 100), speed = .45 + .35 * boost + (blastVisual ? 1.2 : 0);
   const off = still ? 0 : ((now * speed) % 120 + 120) % 120;
   ctx.fillStyle = g.track;
   for (const fx of [.25, .5, .75]) for (let y = top - 120 + off; y < H; y += 120) ctx.fillRect(Lx + fx * Wd - 4, y, 8, 60);
-  if ((boost >= .5 || blast) && !still) {                            // スピード線
-    ctx.globalAlpha = blast ? .55 : .25 * boost;
-    for (let i = 0; i < (blast ? 22 : 10); i++) {
-      const sx = (i * 211) % W, sy = (p * (blast ? 2.2 : .9) + i * 137) % H;
-      ctx.fillStyle = blast ? `hsl(${(hue + i * 30) % 360},90%,70%)` : "#fff";
-      if (sx < Lx - 40 || sx > Lx + Wd + 40) ctx.fillRect(sx, sy, 3, blast ? 160 : 90);
+  if ((boost >= .5 || blastVisual) && !still) {                            // スピード線
+    ctx.globalAlpha = blastVisual ? .55 : .25 * boost;
+    for (let i = 0; i < (blastVisual ? 22 : 10); i++) {
+      const sx = (i * 211) % W, sy = (p * (blastVisual ? 2.2 : .9) + i * 137) % H;
+      ctx.fillStyle = blastVisual ? `hsl(${(hue + i * 30) % 360},90%,70%)` : "#fff";
+      if (sx < Lx - 40 || sx > Lx + Wd + 40) ctx.fillRect(sx, sy, 3, blastVisual ? 160 : 90);
     }
     ctx.globalAlpha = 1;
   }
@@ -281,7 +287,7 @@ function drawCatchField(now) {
 
   /* ぶっ飛ばし：虹の残像・受け止めバー */
   const tx = catchX(catchState.x);
-  if (blast) {
+  if (blastVisual) {
     for (const tr0 of catchState.trail) {
       const a = 1 - (p - tr0.t) / 260;
       ctx.globalAlpha = .35 * a; ctx.fillStyle = `hsl(${(hue + (p - tr0.t)) % 360},90%,60%)`;
@@ -292,7 +298,7 @@ function drawCatchField(now) {
     for (let i = 0; i <= 6; i++) gr.addColorStop(i / 6, `hsla(${(hue + i * 60) % 360},90%,60%,.75)`);
     rr(tx - hw, ly - 14, hw * 2, 12, 6); ctx.fillStyle = gr; ctx.fill();
   }
-  drawCatchTruck(tx, ly + 50, p, blast, now);
+  drawCatchTruck(tx, ly + 50, p, blastVisual, now);
 
   /* ぶっ飛んでいく荷物 */
   for (let i = flying.length - 1; i >= 0; i--) {
@@ -304,7 +310,7 @@ function drawCatchField(now) {
   }
 
   /* 表示 */
-  if (blast) {
+  if (blastVisual) {
     ctx.font = `900 30px ${fontFamily()}`; ctx.textAlign = "right"; ctx.textBaseline = "middle";
     ctx.lineWidth = 6; ctx.strokeStyle = "rgba(0,0,0,.6)"; ctx.strokeText(tr("blastLabel"), Lx + Wd - 10, top + 30);
     ctx.fillStyle = `hsl(${hue},90%,65%)`; ctx.fillText(tr("blastLabel"), Lx + Wd - 10, top + 30);
@@ -369,8 +375,15 @@ let syncCatchKeyUI = () => {};
   reset.style.cssText = "margin-top:8px;padding:7px 12px;font-size:14px";
   const status = el("div", "hint status"); status.id = "catchBindStatus";
   const hint = el("div", "hint", tr("catchHint")); hint.dataset.i18n = "catchHint";
-  anchor.after(h3, rows, reset, status, hint);
+  const bonus = el("label", "check");
+  const bonusInput = document.createElement("input"); bonusInput.type = "checkbox"; bonusInput.id = "catchNitroBonus"; bonusInput.checked = settings.catchNitroBonus;
+  const bonusText = el("span", "", tr("catchNitroBonus")); bonusText.dataset.i18n = "catchNitroBonus";
+  bonus.append(bonusInput, bonusText);
+  const bonusHint = el("div", "hint", tr("catchNitroBonusHint")); bonusHint.dataset.i18n = "catchNitroBonusHint";
+  anchor.after(h3, rows, reset, status, hint, bonus, bonusHint);
+  bonusInput.addEventListener("change", () => { settings.catchNitroBonus = bonusInput.checked; saveUserPrefs(); });
   syncCatchKeyUI = () => {
+    bonusInput.checked = settings.catchNitroBonus;
     rows.textContent = "";
     ["catchLeft", "catchRight"].forEach((key, i) => {
       const row = el("div", "keyRow"), b = el("button", "", tr("assign"));

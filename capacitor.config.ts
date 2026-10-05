@@ -3,7 +3,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
   appId: "com.trk.agrg",
-  appName: "trk!",
+  appName: "trk! — AGRG",
   webDir: "mobile-web",
   bundledWebRuntime: false,
   server: {

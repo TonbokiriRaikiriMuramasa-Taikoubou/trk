@@ -159,6 +159,7 @@ $("scroll").addEventListener("input", () => {
 });
 function showFxPower() { $("fxPowerVal").textContent = Math.round(settings.fxPower * 100) + "%"; }
 $("fxPower").addEventListener("input", e => { settings.fxPower = Number(e.target.value); showFxPower(); saveUserPrefs(); });
+$("gameFxMode").addEventListener("change", e => { settings.gameFxMode = e.target.value; saveUserPrefs(); emit("options"); });
 $("hideGameplayUI").addEventListener("change", e => { settings.hideGameplayUI = e.target.checked; saveUserPrefs(); });
 $("errorMeter").addEventListener("change", e => { settings.errorMeter = e.target.checked; saveUserPrefs(); });
 $("playerMode").addEventListener("change", e => { settings.playerMode = e.target.checked; setPhase(phase); saveUserPrefs(); });
@@ -177,6 +178,7 @@ function syncOptionsUI() {
   $("rateVal").textContent = settings.rate.toFixed(2) + "x";
   $("cover").value = settings.cover;
   $("coverVal").textContent = Math.round(settings.cover * 100) + "%";
+  if ($("gameFxMode")) $("gameFxMode").value = settings.gameFxMode;
   syncPickers();
 }
 function optionsChanged() { saveUserPrefs(); syncOptionsUI(); emit("options"); }
@@ -305,6 +307,7 @@ $("scrollVal").textContent = settings.scroll.toFixed(1) + "x";
 $("latency").value = settings.latency;
 $("videoStyle").value = settings.videoStyle;
 $("fxPower").value = settings.fxPower;
+$("gameFxMode").value = settings.gameFxMode;
 video.volume = settings.musicVolume;
 /* 再生速度を変えても音程を保つ（初期値でもオンですが、念のため） */
 video.preservesPitch = true; video.mozPreservesPitch = true; video.webkitPreservesPitch = true;

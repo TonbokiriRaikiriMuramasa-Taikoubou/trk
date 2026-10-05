@@ -115,6 +115,12 @@ input[type=color]{width:52px;height:34px;padding:2px;border:1px solid var(--ui-b
 .brand h1 span{color:var(--ui-accent)}
 .brand p{margin:8px 0 0;color:var(--ui-muted);font-size:18px}
 .headTools{display:flex;gap:12px;align-items:flex-end}
+.quickGuide{margin-top:18px;padding:12px 16px;background:linear-gradient(135deg,rgba(255,209,102,.08),rgba(103,200,255,.06))}
+.quickGuide summary{cursor:pointer;color:var(--ui-gold);font-weight:850}
+.quickGuide>p{margin:8px 0 0}
+.guideGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.guideStep{display:flex;flex-direction:column;gap:4px;padding:10px;border:1px solid var(--ui-border);border-radius:12px;background:rgba(0,0,0,.12);font-size:13px;line-height:1.45}
+.guideStep b{color:var(--ui-text);font-size:14px}.guideStep span{color:var(--ui-muted)}
 .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:24px;margin-top:20px;align-items:start}
 .col{display:flex;flex-direction:column;gap:16px}
 .panel{border:1px solid var(--ui-border);border-radius:18px;background:var(--ui-soft);padding:16px 20px}
@@ -415,6 +421,7 @@ details.panel[open]>summary{margin-bottom:14px}
 .fxSynthLimit{margin:5px 0 0;font-size:11px}
 .fxSynthStatus{min-height:1em;margin:5px 0 0}
 @media(max-width:520px){
+  .guideGrid{grid-template-columns:1fr}
   .fxSynth{padding:7px}
   .fxSynthEffect{padding:7px}
   .fxSynthEffectHead{grid-template-columns:auto minmax(0,1fr)}
@@ -770,6 +777,8 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
 #tvDock[data-skin="wall"].wall-mounted .tvScreenWrap{height:72px}
 #tvDock[data-skin="wall"].wall-mounted .tvDev{padding:6px}
 @media(max-width:900px){
+  .guideGrid{grid-template-columns:1fr 1fr}
+
   #tvDock[data-skin="wall"].wall-mounted{position:static !important;width:100% !important;right:auto !important;top:auto !important}
 }
 

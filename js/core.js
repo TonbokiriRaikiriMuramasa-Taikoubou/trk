@@ -77,7 +77,7 @@ const settings = {
   videoStyle: pick(prefs.videoStyle, (typeof TRK_TV_PRESETS !== "undefined" ? TRK_TV_PRESETS.map(p=>p.id) : ["skin","color","mono","dim","off"]), "skin"),
   bgDim: num(prefs.bgDim, 0, .9, 0),
   bgBlur: num(prefs.bgBlur, 0, 12, 0),
-  scroll: num(prefs.scroll, .5, 2.5, 1),
+  scroll: num(prefs.scroll, .5, 2.5, 1.2),
   latency: num(prefs.latency, -300, 500, 0),
   /* プレイ方法：以前の「AUTO」モードは「MANUAL＋AUTOオン」に引き継ぐ */
   playMode: pick(prefs.playMode, PLAY_MODES, "manual"),
@@ -104,6 +104,7 @@ const settings = {
   notes: sanitizeNotes(prefs.notes ?? (prefs.skin === "clarity" ? NOTE_PRESETS.clarity : null)),
   mascot: pick(prefs.mascot, ["skin", "none", ...MASCOT_IDS], "skin"),
   fxPower: num(prefs.fxPower, 0, 3, 1.5),
+  gameFxMode: pick(prefs.gameFxMode, ["full", "soft", "off"], "full"),
   vrmFrame: pick(prefs.vrmFrame, ["full", "upper", "face"], "full"),
   vrmTurn: num(prefs.vrmTurn, -60, 60, -20),
   vrmRemember: prefs.vrmRemember !== false,
@@ -148,9 +149,13 @@ const settings = {
   sudden: !!prefs.sudden,
   modMirror: !!prefs.modMirror,
   modRandom: !!prefs.modRandom,
-  cover: num(prefs.cover, .2, .7, .4)
+  cover: num(prefs.cover, .2, .7, .4),
+  catchNitroBonus: prefs.catchNitroBonus !== false
 };
 function saveUserPrefs() { try { localStorage.setItem(PREFS_KEY, JSON.stringify(settings)); } catch (_) {} }
+/* プレイ中の追加演出だけをまとめて抑える。音声エフェクターの設定とは別です。 */
+const gameplayFxMultiplier = () => settings.gameFxMode === "off" ? 0 : settings.gameFxMode === "soft" ? .42 : 1;
+const gameplayFxPower = () => settings.fxPower * gameplayFxMultiplier();
 
 /* ---------- URLコマンドによる緊急リセット & 設定の書き出し ----------
    画面が触れなくなった時でもURLで復旧できるようにする。
@@ -215,14 +220,15 @@ function enterSafeMode() {
   settings.synthModeKeyboardLock = true; // 🎹 セーフモードではシンセを開けないが、既定値は壊さない
   settings.synthModeWideKeyboard = false;
   settings.libKeepShared = false;        // 📤 セーフモードでは、端末に残した共有の曲も読み戻さない
-  settings.fxPower = 0; settings.hideGameplayUI = false;
+  settings.fxPower = 0; settings.gameFxMode = "off"; settings.hideGameplayUI = false;
   if (settings.mascot === "mmd") settings.mascot = "skin";     // 🩷 セーフモードでは MMD を使わない
   if (typeof view !== "undefined" && view) { try { view.style.filter = "none"; } catch(_) {} }
 }
 function resetAllPrefs() {
   resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs();
-  settings.fxPower = 1.5; settings.hideGameplayUI = false; settings.errorMeter = true;
-  settings.scroll = 1; settings.latency = 0; settings.judge = "standard"; settings.rate = 1;
+  settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.errorMeter = true;
+  settings.scroll = 1.2; settings.latency = 0;
+  settings.catchNitroBonus = true; settings.judge = "standard"; settings.rate = 1;
   settings.hidden = false; settings.sudden = false; settings.modMirror = false; settings.modRandom = false; settings.showMasterDiff = false;
   settings.mascot = "skin"; settings.vrmFrame = "full";
   settings.mmdScale = 1; settings.mmdTurn = 0; settings.mmdMotionBpm = 0; settings.mmdMotionKind = "none";

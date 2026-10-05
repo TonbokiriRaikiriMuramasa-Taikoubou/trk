@@ -10,6 +10,11 @@ const TEXT = {
   ja: {
     /* 選曲画面 */
     tagline:"trk! is AGRG! — 全世代のためのリズムゲーム。音源ひとつで、叩いても、走っても、回っても、運んでもOK🚚",
+    guideTitle:"🧭 まずは3分チュートリアル", guideHint:"曲を1つ選んだら、見た目と音を変えて、TRUCKかCATCHで爽快に遊んでみましょう。",
+    guideSongTitle:"1. 曲を入れる", guideSong:"＋曲ファイル／フォルダ共有／曲パックから、自分に権利のある音源を選びます。",
+    guideLookTitle:"2. スキンと音", guideLook:"⚙設定の見た目でスキン、🎛サウンドエフェクトで音を変えられます。",
+    guideTruckTitle:"3. 走る", guideTruck:"TRUCKは↑↓でレーン移動。CATCHは荷物を受け、🚀ニトロで一気に加速します。",
+    guideSafeTitle:"4. 無理なく遊ぶ", guideSafe:"演出は「控えめ」や「追加演出オフ」にできます。音ズレはオフセットで調整します。",
     language:"言語 / Language", openSettings:"⚙ 設定", settingsTitle:"⚙ 設定", closeSettings:"← 選曲に戻る",
     dropHint:"曲・.stpack・.vrm・.vrma・譜面JSONは、画面にドラッグ＆ドロップしても読み込めます。",
     libTitle:"🎵 曲リスト", libOpen:"📁 ミュージックフォルダを開く", libReconnect:"🔗 「{name}」に再接続", libRescan:"↻ 再スキャン",
@@ -63,7 +68,7 @@ const TEXT = {
     modeKeysTitle:"🚚🎪🚛 各モードの操作キー（TRUCK・STAGE・CATCH・速度）",
     layoutClassic:"横スクロール", layoutVertical:"縦・左レーン", layoutCenter:"縦・中央レーン", layoutCommentary:"解説動画風",
     videoStyle:"背景映像", videoSkin:"スキン標準", videoColor:"オリジナル（カラー）", videoMono:"モノクロ", videoDim:"暗め", videoOff:"非表示",
-    scrollSpeed:"スクロール速度", fxPower:"ヒットエフェクトの強さ", hideUI:"プレイ中のドン／カッ文字を隠す",
+    scrollSpeed:"スクロール速度", fxPower:"ヒットエフェクトの強さ", gameFxMode:"プレイ中の追加演出", gameFxFull:"全部見せる", gameFxSoft:"控えめ", gameFxOff:"追加演出オフ", gameFxHint:"音声エフェクターとは別の、画面・揺れ・光の演出だけを調整します。", hideUI:"プレイ中のドン／カッ文字を隠す",
     hideHint:"文字ガイドだけを隠します。色・形のノーツとタッチ操作は残ります。",
     playerMode:"シークバーを表示（練習用・自己ベスト対象外）", errorMeter:"タイミングメーターを表示",
     noteStyle:"🥁 ノーツの見た目（全スキン共通）", donNote:"ドン", kaNote:"カッ",
@@ -211,6 +216,11 @@ const TEXT = {
   /* ==================== English ==================== */
   en: {
     tagline:"trk! is AGRG! — an All-Generation Rhythm Game. One audio file: hit it, drive it, orbit it, stage it or catch it 🚚",
+    guideTitle:"🧭 3-minute quick guide", guideHint:"Pick one song, change the look and sound, then try TRUCK or CATCH for a burst of momentum.",
+    guideSongTitle:"1. Add a song", guideSong:"Choose your own file, share a music folder, or import a song pack you have rights to use.",
+    guideLookTitle:"2. Change the vibe", guideLook:"Use ⚙ Settings for skins and 🎛 Sound effects for the audio chain.",
+    guideTruckTitle:"3. Hit the road", guideTruck:"Use ↑↓ in TRUCK. In CATCH, grab parcels and collect 🚀 Nitro for a burst of speed.",
+    guideSafeTitle:"4. Tune it to you", guideSafe:"Choose Soft or Extra effects off if you want less motion. Use the offset tool when timing feels late.",
     language:"Language", openSettings:"⚙ Settings", settingsTitle:"⚙ Settings", closeSettings:"← Back to song select",
     dropHint:"You can also drag & drop songs, .stpack, .vrm, .vrma and chart JSON onto the window.",
     libTitle:"🎵 Songs", libOpen:"📁 Open music folder", libReconnect:"🔗 Reconnect “{name}”", libRescan:"↻ Rescan",
@@ -263,7 +273,7 @@ const TEXT = {
     modeKeysTitle:"🚚🎪🚛 Mode keys (TRUCK / STAGE / CATCH / Speed)",
     layoutClassic:"Horizontal", layoutVertical:"Vertical · left", layoutCenter:"Vertical · center", layoutCommentary:"Commentary",
     videoStyle:"Background video", videoSkin:"Skin default", videoColor:"Original color", videoMono:"Monochrome", videoDim:"Dimmed", videoOff:"Off",
-    scrollSpeed:"Scroll speed", fxPower:"Hit effect intensity", hideUI:"Hide Don/Ka text during play",
+    scrollSpeed:"Scroll speed", fxPower:"Hit effect intensity", gameFxMode:"Extra gameplay effects", gameFxFull:"Full", gameFxSoft:"Soft", gameFxOff:"Extra effects off", gameFxHint:"Controls visual hits, sway and glow only. Sound effects are separate.", hideUI:"Hide Don/Ka text during play",
     hideHint:"Only text guides are hidden; colored/shaped notes and touch controls remain.",
     playerMode:"Show seek bar (practice — no personal best)", errorMeter:"Show hit-error meter",
     noteStyle:"🥁 Note style (shared by all skins)", donNote:"Don", kaNote:"Ka",
@@ -403,6 +413,11 @@ const TEXT = {
   /* ==================== 简体中文 ==================== */
   zh: {
     tagline:"trk! is AGRG! — 全年龄节奏游戏。只需一个音源：敲、开车、绕轨、上舞台、接货都可以🚚",
+    guideTitle:"🧭 3分钟快速指南", guideHint:"选一首歌曲，改变外观和声音，再试试TRUCK或CATCH的爽快节奏。",
+    guideSongTitle:"1. 加入歌曲", guideSong:"选择自己的音频、共享音乐文件夹，或导入有权使用的歌曲包。",
+    guideLookTitle:"2. 改变风格", guideLook:"在⚙设置中更换皮肤，在🎛音效中改变声音链。",
+    guideTruckTitle:"3. 上路", guideTruck:"TRUCK使用↑↓换道。CATCH接住包裹，收集🚀氮气获得加速。",
+    guideSafeTitle:"4. 按自己的方式玩", guideSafe:"想减少动态效果时选择“柔和”或关闭额外演出；感觉延迟时使用偏移测量。",
     language:"语言", openSettings:"⚙ 设置", settingsTitle:"⚙ 设置", closeSettings:"← 返回选曲",
     dropHint:"歌曲、.stpack、.vrm、.vrma和谱面JSON也可以直接拖放到窗口中。",
     libTitle:"🎵 歌曲列表", libOpen:"📁 打开音乐文件夹", libReconnect:"🔗 重新连接「{name}」", libRescan:"↻ 重新扫描",
@@ -455,7 +470,7 @@ const TEXT = {
     modeKeysTitle:"🚚🎪🚛 各模式按键（TRUCK・STAGE・CATCH・速度）",
     layoutClassic:"横向", layoutVertical:"纵向·左侧", layoutCenter:"纵向·居中", layoutCommentary:"解说视频风",
     videoStyle:"背景视频", videoSkin:"皮肤默认", videoColor:"原色", videoMono:"黑白", videoDim:"调暗", videoOff:"隐藏",
-    scrollSpeed:"滚动速度", fxPower:"打击特效强度", hideUI:"游戏中隐藏Don/Ka文字",
+    scrollSpeed:"滚动速度", fxPower:"打击特效强度", gameFxMode:"游戏额外演出", gameFxFull:"完整", gameFxSoft:"柔和", gameFxOff:"关闭额外演出", gameFxHint:"只调整打击画面、摇摆和光效；声音效果器另行设置。", hideUI:"游戏中隐藏Don/Ka文字",
     hideHint:"仅隐藏文字提示；彩色/形状音符和触屏按钮保留。",
     playerMode:"显示进度条（练习用·不计个人最佳）", errorMeter:"显示判定偏差条",
     noteStyle:"🥁 音符外观（所有皮肤通用）", donNote:"咚", kaNote:"咔",
@@ -594,6 +609,11 @@ const TEXT = {
   /* ==================== 한국어 ==================== */
   ko: {
     tagline:"trk! is AGRG! — 모든 세대를 위한 리듬 게임. 음원 하나로 두드리고, 달리고, 돌고, 무대에 서고, 받아 내요🚚",
+    guideTitle:"🧭 3분 빠른 안내", guideHint:"곡을 하나 고르고, 모양과 소리를 바꾼 뒤 TRUCK이나 CATCH의 속도감을 즐겨 보세요.",
+    guideSongTitle:"1. 곡 넣기", guideSong:"내 파일, 음악 폴더 공유, 또는 사용 권리가 있는 곡 팩을 선택합니다.",
+    guideLookTitle:"2. 분위기 바꾸기", guideLook:"⚙ 설정에서 스킨을, 🎛 사운드 이펙트에서 소리를 바꿉니다.",
+    guideTruckTitle:"3. 출발", guideTruck:"TRUCK은 ↑↓로 레인을 이동합니다. CATCH는 짐을 받고 🚀 니트로로 가속합니다.",
+    guideSafeTitle:"4. 편하게 조절하기", guideSafe:"움직임을 줄이려면 ‘약하게’ 또는 추가 연출 끄기를 선택하고, 타이밍은 오프셋으로 맞춥니다.",
     language:"언어", openSettings:"⚙ 설정", settingsTitle:"⚙ 설정", closeSettings:"← 곡 선택으로",
     dropHint:"곡・.stpack・.vrm・.vrma・채보 JSON은 창에 드래그 앤 드롭해도 불러올 수 있습니다.",
     libTitle:"🎵 곡 목록", libOpen:"📁 음악 폴더 열기", libReconnect:"🔗 '{name}'에 다시 연결", libRescan:"↻ 다시 스캔",
@@ -646,7 +666,7 @@ const TEXT = {
     modeKeysTitle:"🚚🎪🚛 각 모드 조작 키 (TRUCK・STAGE・CATCH・속도)",
     layoutClassic:"가로", layoutVertical:"세로 · 왼쪽", layoutCenter:"세로 · 중앙", layoutCommentary:"해설 영상풍",
     videoStyle:"배경 영상", videoSkin:"스킨 기본", videoColor:"원본 컬러", videoMono:"흑백", videoDim:"어둡게", videoOff:"숨기기",
-    scrollSpeed:"스크롤 속도", fxPower:"히트 이펙트 강도", hideUI:"플레이 중 Don/Ka 글자 숨기기",
+    scrollSpeed:"스크롤 속도", fxPower:"히트 이펙트 강도", gameFxMode:"플레이 추가 연출", gameFxFull:"전체", gameFxSoft:"약하게", gameFxOff:"추가 연출 끄기", gameFxHint:"타격 화면·흔들림·빛만 조절합니다. 사운드 이펙트는 별도입니다.", hideUI:"플레이 중 Don/Ka 글자 숨기기",
     hideHint:"문자 안내만 숨깁니다. 색상·모양 노트와 터치 조작은 유지됩니다.",
     playerMode:"시크바 표시 (연습용 · 개인 최고 기록 제외)", errorMeter:"타이밍 미터 표시",
     noteStyle:"🥁 노트 모양 (모든 스킨 공통)", donNote:"쿵", kaNote:"딱",

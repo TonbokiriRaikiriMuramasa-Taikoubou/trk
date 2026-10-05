@@ -3,20 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>trk! — All-Generation Rhythm Game</title>
+<title>trk! — AGRG</title>
 <meta name="description" content="trk! is AGRG! — an All-Generation Rhythm Game. Play a rhythm game in your browser with your own music: hit it, drive a truck, orbit with one button, take the STAGE, or catch parcels.">
 <link rel="stylesheet" href="css/style.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<meta property="og:title" content="trk! — All-Generation Rhythm Game">
+<meta property="og:title" content="trk! — AGRG">
 <meta property="og:description" content="手持ちの曲で、すぐ遊べるブラウザ音ゲー">
 <meta property="og:image" content="https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/docs/og.png">
 <meta property="og:url" content="https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/">
 <meta name="twitter:card" content="summary_large_image">
 
 <!-- SNSで共有したときのカード（画像は https:// から始まる完全なURLにする） -->
-<meta property="og:title" content="trk! — All-Generation Rhythm Game">
+<meta property="og:title" content="trk! — AGRG">
 <meta property="og:description" content="ブラウザだけで遊べる音ゲー。手持ちの曲で譜面を自動生成。叩く・走る・回る・舞台・荷物運びの5モード。">
 <meta property="og:url" content="https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/">
 <meta property="og:image" content="https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/docs/og.png">
@@ -107,6 +107,17 @@
           <button id="fullBtnTitle" type="button" aria-label="Fullscreen">⛶</button>
         </div>
       </header>
+
+      <details id="quickGuide" class="panel quickGuide" open>
+        <summary data-i18n="guideTitle"></summary>
+        <p class="hint" data-i18n="guideHint"></p>
+        <div class="guideGrid">
+          <div class="guideStep"><b data-i18n="guideSongTitle"></b><span data-i18n="guideSong"></span></div>
+          <div class="guideStep"><b data-i18n="guideLookTitle"></b><span data-i18n="guideLook"></span></div>
+          <div class="guideStep"><b data-i18n="guideTruckTitle"></b><span data-i18n="guideTruck"></span></div>
+          <div class="guideStep"><b data-i18n="guideSafeTitle"></b><span data-i18n="guideSafe"></span></div>
+        </div>
+      </details>
 
       <div class="selectGrid">
         <!-- 左：曲リスト -->
@@ -464,6 +475,15 @@
               <input id="fxPower" type="range" min="0" max="3" step="0.1">
               <span id="fxPowerVal" class="mono"></span>
             </div>
+            <label class="field">
+              <span data-i18n="gameFxMode"></span>
+              <select id="gameFxMode">
+                <option value="full" data-i18n="gameFxFull"></option>
+                <option value="soft" data-i18n="gameFxSoft"></option>
+                <option value="off" data-i18n="gameFxOff"></option>
+              </select>
+            </label>
+            <div class="hint" data-i18n="gameFxHint"></div>
             <label class="check"><input id="hideGameplayUI" type="checkbox"><span data-i18n="hideUI"></span></label>
             <label class="check"><input id="errorMeter" type="checkbox"><span data-i18n="errorMeter"></span></label>
             <!-- extras.js がここに「👻 ゴースト」を追加します -->

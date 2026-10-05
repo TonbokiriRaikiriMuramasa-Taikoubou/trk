@@ -100,6 +100,7 @@ const settings = {
   hideGameplayUI: !!prefs.hideGameplayUI,
   playerMode: !!prefs.playerMode,
   helpText: prefs.helpText !== false,
+  tutorialDone: prefs.tutorialDone === true,
   menuKey: validCode(prefs.menuKey) ? prefs.menuKey : "KeyM",
   menuConfirm: prefs.menuConfirm !== false,
   mediaExitKey: validCode(prefs.mediaExitKey) ? prefs.mediaExitKey : "Escape",
@@ -251,7 +252,7 @@ function enterSafeMode() {
 }
 function resetAllPrefs() {
   resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs();
-  settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
+  settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
   settings.catchNitroBonus = true; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();
   settings.judge = "standard"; settings.rate = 1;

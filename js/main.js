@@ -48,6 +48,18 @@ function requestMenuReturn() {
   else if (wasPlaying) resumeGame();
 }
 
+/* ---------- チュートリアル完了（Seed欄に trk! ） ---------- */
+function syncTutorialUI() {
+  $("quickGuide").hidden = settings.tutorialDone === true;
+}
+function completeTutorialFromSeed() {
+  if (settings.tutorialDone) return;
+  if ($("seed").value.trim().toLowerCase() !== "trk!") return;
+  settings.tutorialDone = true;
+  saveUserPrefs();
+  syncTutorialUI();
+}
+
 /* ---------- 全画面 ---------- */
 const fullscreenSupported = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
 function toggleFullscreen() {
@@ -145,6 +157,7 @@ $("offset").addEventListener("change", () => {
 let seedTimer = 0;
 $("seed").addEventListener("input", () => {
   if (!saveSongPrefs()) { settings.seed = $("seed").value.slice(0, 32); saveUserPrefs(); }
+  completeTutorialFromSeed();
   refreshSeedSecrets(); syncPickers();
   clearTimeout(seedTimer);
   seedTimer = setTimeout(() => {
@@ -351,6 +364,7 @@ if (!fullscreenSupported) { $("fullBtn").hidden = true; $("fullBtnTitle").hidden
 
 applySkin(settings.skin, false);
 applyLanguage(settings.language);
+syncTutorialUI();
 syncNoteUI(); showFxPower(); updateMascotUI(); syncOptionsUI();
 setStatus("seStatus", settings.seEnabled ? "seOn" : "seDefault");
 setStatus("songPrefsStatus", "songPrefsHint");

@@ -21,12 +21,13 @@ Object.assign(TEXT.ja, {
   mediaQueue:"再生キュー", mediaQueueHint:"曲を選ぶと、この画面を閉じずに再生します。曲リストに追加した音源・共有フォルダ・曲パックをまとめて扱えます。",
   mediaSearch:"キューを検索…", mediaNoSongs:"まだ曲がありません。選曲画面から音源を追加してください。", mediaNoMatch:"一致する曲がありません。",
   mediaSleepSet:"{n}分後に再生を止めます。", mediaSleepDone:"スリープタイマーで停止しました。", mediaLoaded:"読み込み中…", mediaLoadFailed:"この曲を読み込めませんでした。",
-  mediaKeyboard:"Space：再生／一時停止　←→：10秒　N：次の曲　P：前の曲　Esc：閉じる　逆再生・区間ループは設定で割り当て",
-  mediaVideoKeysTitle:"🎬 動画プレーヤーのキー", mediaReverse:"逆再生", mediaReverseStart:"逆再生を開始", mediaForward:"順再生に戻す", mediaReverseLoading:"逆再生を準備中…", mediaReverseUnavailable:"この曲の逆再生用音声を準備できませんでした。映像のみで試します。", mediaReverseDone:"曲の先頭まで逆再生しました。",
+  mediaKeyboard:"Space：再生／一時停止　←→：10秒　N：次の曲　P：前の曲　Esc：閉じる　逆再生・区間ループ・壁紙は設定で割り当て",
+  mediaVideoKeysTitle:"🎬 動画プレーヤーのキー", mediaWallKey:"壁紙／スクリーンセーバー", mediaReverse:"逆再生", mediaReverseStart:"逆再生を開始", mediaForward:"順再生に戻す", mediaReverseLoading:"逆再生を準備中…", mediaReverseUnavailable:"この曲の逆再生用音声を準備できませんでした。映像のみで試します。", mediaReverseDone:"曲の先頭まで逆再生しました。",
   mediaLoop:"区間ループ", mediaLoopSetA:"A点を設定", mediaLoopSetB:"B点を設定", mediaLoopClear:"解除", mediaLoopMode:"区間ループの操作", mediaLoopToggle:"トグル", mediaLoopHold:"長押し中だけ", mediaLoopHint:"A点・B点を設定すると、範囲をくり返します。割り当てキーはA点 → B点／開始 → 解除を順に操作できます。", mediaLoopNone:"区間ループ：なし", mediaLoopOnlyA:"A点 {a} — B点を設定してください", mediaLoopRange:"{a} – {b} をくり返し中", mediaLoopNeedRange:"先にA点とB点を設定してください。",
+  mediaWall:"壁紙／スクリーンセーバー", mediaWallShow:"壁紙を表示", mediaWallHide:"壁紙を閉じる", mediaWallHint:"人目を避けたいときに動画を壁紙で隠します。ESCまたは同じキーで戻れます。", mediaWallStyle:"壁紙", mediaWallMidnight:"ミッドナイト", mediaWallAurora:"オーロラ", mediaWallPaper:"紙", mediaWallCustom:"アップロード画像", mediaWallUpload:"画像を選ぶ", mediaWallUploadHint:"画像はこのセッションの端末内だけで使います。外部へ送信しません。", mediaWallResetImage:"アップロード画像を外す", mediaWallNoImage:"画像を選ぶとここに表示します。", mediaWallClock:"時計を表示", mediaWallPlayback:"壁紙中の動画", mediaWallStopVideo:"動画を止める", mediaWallContinueVideo:"動画を続ける", mediaWallTrigger:"壁紙キーの操作", mediaWallToggle:"トグル", mediaWallHold:"長押し中だけ",
   mediaVideoZoomIn:"動画を拡大", mediaVideoZoomOut:"動画を縮小", mediaVideoFaster:"再生速度を上げる", mediaVideoSlower:"再生速度を下げる", mediaVideoPause:"再生／一時停止",
   mediaVideoKeysHint:"メディアプレーヤー中の動画操作、逆再生、区間ループと、ゲーム中の背景動画の拡大・縮小をキーに割り当てます。ゲームの判定や記録は変わりません。",
-  mediaVideoKeysReset:"↺ 動画キーを初期値に戻す", mediaVideoCapture0:"「動画を拡大」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture1:"「動画を縮小」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture2:"「再生速度を上げる」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture3:"「再生速度を下げる」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture4:"「再生／一時停止」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture5:"「逆再生」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture6:"「区間ループ」に割り当てるキーを押してください。ESCでキャンセル。",
+  mediaVideoKeysReset:"↺ 動画キーを初期値に戻す", mediaVideoCapture0:"「動画を拡大」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture1:"「動画を縮小」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture2:"「再生速度を上げる」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture3:"「再生速度を下げる」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture4:"「再生／一時停止」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture5:"「逆再生」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture6:"「区間ループ」に割り当てるキーを押してください。ESCでキャンセル。", mediaVideoCapture7:"「壁紙／スクリーンセーバー」に割り当てるキーを押してください。ESCでキャンセル。",
   mediaVideoToastZoom:"動画ズーム {n}x", mediaVideoToastRate:"再生速度 {n}x",
   mediaModeStatus:"メディアプレーヤー中（ゲームの記録には影響しません）"
 });
@@ -44,12 +45,13 @@ Object.assign(TEXT.en, {
   mediaQueue:"Queue", mediaQueueHint:"Choose a track to play it without closing this screen. Added files, shared folders, and song packs appear together.",
   mediaSearch:"Search queue…", mediaNoSongs:"No songs yet. Add audio from song select.", mediaNoMatch:"No matching songs.",
   mediaSleepSet:"Playback will stop in {n} minutes.", mediaSleepDone:"Sleep timer stopped playback.", mediaLoaded:"Loading…", mediaLoadFailed:"This track could not be loaded.",
-  mediaKeyboard:"Space: play/pause   ←→: 10 seconds   N: next   P: previous   Esc: close   Assign reverse / A-B loop in Settings",
-  mediaVideoKeysTitle:"🎬 Video player keys", mediaReverse:"Reverse", mediaReverseStart:"Start reverse", mediaForward:"Return to forward", mediaReverseLoading:"Preparing reverse playback…", mediaReverseUnavailable:"Could not prepare reverse audio for this track. Trying video frames only.", mediaReverseDone:"Reverse playback reached the beginning.",
+  mediaKeyboard:"Space: play/pause   ←→: 10 seconds   N: next   P: previous   Esc: close   Assign reverse / A-B loop / wallpaper in Settings",
+  mediaVideoKeysTitle:"🎬 Video player keys", mediaWallKey:"Wallpaper / screen saver", mediaReverse:"Reverse", mediaReverseStart:"Start reverse", mediaForward:"Return to forward", mediaReverseLoading:"Preparing reverse playback…", mediaReverseUnavailable:"Could not prepare reverse audio for this track. Trying video frames only.", mediaReverseDone:"Reverse playback reached the beginning.",
   mediaLoop:"A-B loop", mediaLoopSetA:"Set A", mediaLoopSetB:"Set B", mediaLoopClear:"Clear", mediaLoopMode:"A-B loop control", mediaLoopToggle:"Toggle", mediaLoopHold:"While held", mediaLoopHint:"Set A and B to repeat a range. The assigned key cycles A → B / start → clear.", mediaLoopNone:"A-B loop: off", mediaLoopOnlyA:"A at {a} — set B", mediaLoopRange:"Repeating {a} – {b}", mediaLoopNeedRange:"Set both A and B first.",
+  mediaWall:"Wallpaper / screen saver", mediaWallShow:"Show wallpaper", mediaWallHide:"Close wallpaper", mediaWallHint:"Hide the video behind a wallpaper when you need privacy. Press ESC or the same key to return.", mediaWallStyle:"Wallpaper", mediaWallMidnight:"Midnight", mediaWallAurora:"Aurora", mediaWallPaper:"Paper", mediaWallCustom:"Uploaded image", mediaWallUpload:"Choose image", mediaWallUploadHint:"The image stays on this device for this session and is never uploaded.", mediaWallResetImage:"Remove uploaded image", mediaWallNoImage:"Choose an image to show it here.", mediaWallClock:"Show clock", mediaWallPlayback:"Video while wallpaper is shown", mediaWallStopVideo:"Stop video", mediaWallContinueVideo:"Keep video playing", mediaWallTrigger:"Wallpaper key behavior", mediaWallToggle:"Toggle", mediaWallHold:"While held",
   mediaVideoZoomIn:"Zoom in", mediaVideoZoomOut:"Zoom out", mediaVideoFaster:"Speed up", mediaVideoSlower:"Slow down", mediaVideoPause:"Play / pause",
   mediaVideoKeysHint:"Assign keys for video zoom, reverse playback, A-B looping, and media-player controls. Game judgment and records are not changed.",
-  mediaVideoKeysReset:"↺ Reset video keys", mediaVideoCapture0:"Press a key for “Zoom in”. ESC cancels.", mediaVideoCapture1:"Press a key for “Zoom out”. ESC cancels.", mediaVideoCapture2:"Press a key for “Speed up”. ESC cancels.", mediaVideoCapture3:"Press a key for “Slow down”. ESC cancels.", mediaVideoCapture4:"Press a key for “Play / pause”. ESC cancels.", mediaVideoCapture5:"Press a key for “Reverse”. ESC cancels.", mediaVideoCapture6:"Press a key for “A-B loop”. ESC cancels.",
+  mediaVideoKeysReset:"↺ Reset video keys", mediaVideoCapture0:"Press a key for “Zoom in”. ESC cancels.", mediaVideoCapture1:"Press a key for “Zoom out”. ESC cancels.", mediaVideoCapture2:"Press a key for “Speed up”. ESC cancels.", mediaVideoCapture3:"Press a key for “Slow down”. ESC cancels.", mediaVideoCapture4:"Press a key for “Play / pause”. ESC cancels.", mediaVideoCapture5:"Press a key for “Reverse”. ESC cancels.", mediaVideoCapture6:"Press a key for “A-B loop”. ESC cancels.", mediaVideoCapture7:"Press a key for “Wallpaper / screen saver”. ESC cancels.",
   mediaVideoToastZoom:"Video zoom {n}x", mediaVideoToastRate:"Playback speed {n}x",
   mediaModeStatus:"Media player (does not affect game records)"
 });
@@ -65,12 +67,13 @@ Object.assign(TEXT.zh, {
   mediaQueue:"播放队列", mediaQueueHint:"选择歌曲后会在此画面中播放。添加的文件、共享文件夹和歌曲包会合并显示。",
   mediaSearch:"搜索队列…", mediaNoSongs:"还没有歌曲。请先在选曲画面添加音频。", mediaNoMatch:"没有匹配的歌曲。",
   mediaSleepSet:"将在{n}分钟后停止播放。", mediaSleepDone:"睡眠定时器已停止播放。", mediaLoaded:"正在读取…", mediaLoadFailed:"无法读取这首歌。",
-  mediaKeyboard:"空格：播放／暂停　←→：10秒　N：下一首　P：上一首　Esc：关闭　倒放／区间循环可在设置中分配",
-  mediaVideoKeysTitle:"🎬 视频播放器按键", mediaReverse:"倒放", mediaReverseStart:"开始倒放", mediaForward:"恢复正放", mediaReverseLoading:"正在准备倒放…", mediaReverseUnavailable:"无法准备这首歌的倒放音频，将尝试仅倒放画面。", mediaReverseDone:"倒放已到达开头。",
+  mediaKeyboard:"空格：播放／暂停　←→：10秒　N：下一首　P：上一首　Esc：关闭　倒放／区间循环／壁纸可在设置中分配",
+  mediaVideoKeysTitle:"🎬 视频播放器按键", mediaWallKey:"壁纸／屏幕保护", mediaReverse:"倒放", mediaReverseStart:"开始倒放", mediaForward:"恢复正放", mediaReverseLoading:"正在准备倒放…", mediaReverseUnavailable:"无法准备这首歌的倒放音频，将尝试仅倒放画面。", mediaReverseDone:"倒放已到达开头。",
   mediaLoop:"区间循环", mediaLoopSetA:"设为A点", mediaLoopSetB:"设为B点", mediaLoopClear:"解除", mediaLoopMode:"区间循环操作", mediaLoopToggle:"切换", mediaLoopHold:"按住时循环", mediaLoopHint:"设置A点和B点后重复区间。分配的按键会依次执行A点 → B点／开始 → 解除。", mediaLoopNone:"区间循环：关闭", mediaLoopOnlyA:"A点 {a} — 请设置B点", mediaLoopRange:"重复 {a} – {b}", mediaLoopNeedRange:"请先设置A点和B点。",
+  mediaWall:"壁纸／屏幕保护", mediaWallShow:"显示壁纸", mediaWallHide:"关闭壁纸", mediaWallHint:"需要隐私时，用壁纸遮住视频。按ESC或同一个按键返回。", mediaWallStyle:"壁纸", mediaWallMidnight:"午夜", mediaWallAurora:"极光", mediaWallPaper:"纸张", mediaWallCustom:"上传的图片", mediaWallUpload:"选择图片", mediaWallUploadHint:"图片仅在本次会话中保留在设备上，不会上传到外部。", mediaWallResetImage:"移除上传图片", mediaWallNoImage:"选择图片后会显示在这里。", mediaWallClock:"显示时钟", mediaWallPlayback:"显示壁纸时的视频", mediaWallStopVideo:"停止视频", mediaWallContinueVideo:"继续播放视频", mediaWallTrigger:"壁纸按键操作", mediaWallToggle:"切换", mediaWallHold:"按住时显示",
   mediaVideoZoomIn:"放大视频", mediaVideoZoomOut:"缩小视频", mediaVideoFaster:"提高速度", mediaVideoSlower:"降低速度", mediaVideoPause:"播放／暂停",
   mediaVideoKeysHint:"为视频缩放、倒放、区间循环和媒体播放器操作分配按键。不会改变游戏判定或记录。",
-  mediaVideoKeysReset:"↺ 恢复视频按键", mediaVideoCapture0:"请按下“放大视频”的按键。ESC取消。", mediaVideoCapture1:"请按下“缩小视频”的按键。ESC取消。", mediaVideoCapture2:"请按下“提高速度”的按键。ESC取消。", mediaVideoCapture3:"请按下“降低速度”的按键。ESC取消。", mediaVideoCapture4:"请按下“播放／暂停”的按键。ESC取消。", mediaVideoCapture5:"请按下“倒放”的按键。ESC取消。", mediaVideoCapture6:"请按下“区间循环”的按键。ESC取消。",
+  mediaVideoKeysReset:"↺ 恢复视频按键", mediaVideoCapture0:"请按下“放大视频”的按键。ESC取消。", mediaVideoCapture1:"请按下“缩小视频”的按键。ESC取消。", mediaVideoCapture2:"请按下“提高速度”的按键。ESC取消。", mediaVideoCapture3:"请按下“降低速度”的按键。ESC取消。", mediaVideoCapture4:"请按下“播放／暂停”的按键。ESC取消。", mediaVideoCapture5:"请按下“倒放”的按键。ESC取消。", mediaVideoCapture6:"请按下“区间循环”的按键。ESC取消。", mediaVideoCapture7:"请按下“壁纸／屏幕保护”的按键。ESC取消。",
   mediaVideoToastZoom:"视频缩放 {n}x", mediaVideoToastRate:"播放速度 {n}x",
   mediaModeStatus:"媒体播放器中（不影响游戏记录）"
 });
@@ -86,12 +89,13 @@ Object.assign(TEXT.ko, {
   mediaQueue:"재생 큐", mediaQueueHint:"곡을 고르면 이 화면을 닫지 않고 재생합니다. 추가한 파일・공유 폴더・곡 팩을 함께 표시합니다.",
   mediaSearch:"큐 검색…", mediaNoSongs:"아직 곡이 없습니다. 곡 선택 화면에서 음원을 추가하세요.", mediaNoMatch:"일치하는 곡이 없습니다.",
   mediaSleepSet:"{n}분 후 재생을 멈춥니다.", mediaSleepDone:"취침 타이머로 재생을 멈췄습니다.", mediaLoaded:"불러오는 중…", mediaLoadFailed:"이 곡을 불러오지 못했습니다.",
-  mediaKeyboard:"Space: 재생／일시정지   ←→: 10초   N: 다음   P: 이전   Esc: 닫기   역재생／구간 반복은 설정에서 지정",
-  mediaVideoKeysTitle:"🎬 동영상 플레이어 키", mediaReverse:"역재생", mediaReverseStart:"역재생 시작", mediaForward:"정재생으로", mediaReverseLoading:"역재생 준비 중…", mediaReverseUnavailable:"이 곡의 역재생 오디오를 준비하지 못했습니다. 영상 프레임만 시도합니다.", mediaReverseDone:"역재생이 처음에 도달했습니다.",
+  mediaKeyboard:"Space: 재생／일시정지   ←→: 10초   N: 다음   P: 이전   Esc: 닫기   역재생／구간 반복／배경은 설정에서 지정",
+  mediaVideoKeysTitle:"🎬 동영상 플레이어 키", mediaWallKey:"배경／스크린세이버", mediaReverse:"역재생", mediaReverseStart:"역재생 시작", mediaForward:"정재생으로", mediaReverseLoading:"역재생 준비 중…", mediaReverseUnavailable:"이 곡의 역재생 오디오를 준비하지 못했습니다. 영상 프레임만 시도합니다.", mediaReverseDone:"역재생이 처음에 도달했습니다.",
   mediaLoop:"구간 반복", mediaLoopSetA:"A점 설정", mediaLoopSetB:"B점 설정", mediaLoopClear:"해제", mediaLoopMode:"구간 반복 조작", mediaLoopToggle:"토글", mediaLoopHold:"누르는 동안", mediaLoopHint:"A점과 B점을 설정하면 구간을 반복합니다. 지정한 키는 A점 → B점／시작 → 해제를 차례로 실행합니다.", mediaLoopNone:"구간 반복: 없음", mediaLoopOnlyA:"A점 {a} — B점을 정해 주세요", mediaLoopRange:"{a} – {b} 반복 중", mediaLoopNeedRange:"먼저 A점과 B점을 설정하세요.",
+  mediaWall:"배경／스크린세이버", mediaWallShow:"배경 표시", mediaWallHide:"배경 닫기", mediaWallHint:"사생활이 필요할 때 배경으로 영상을 가립니다. ESC 또는 같은 키로 돌아갑니다.", mediaWallStyle:"배경", mediaWallMidnight:"미드나이트", mediaWallAurora:"오로라", mediaWallPaper:"종이", mediaWallCustom:"업로드한 이미지", mediaWallUpload:"이미지 선택", mediaWallUploadHint:"이미지는 이번 세션 동안 이 기기에만 보관되며 외부로 업로드되지 않습니다.", mediaWallResetImage:"업로드한 이미지 제거", mediaWallNoImage:"이미지를 선택하면 여기에 표시됩니다.", mediaWallClock:"시계 표시", mediaWallPlayback:"배경 표시 중 동영상", mediaWallStopVideo:"동영상 멈추기", mediaWallContinueVideo:"동영상 계속 재생", mediaWallTrigger:"배경 키 동작", mediaWallToggle:"토글", mediaWallHold:"누르는 동안 표시",
   mediaVideoZoomIn:"동영상 확대", mediaVideoZoomOut:"동영상 축소", mediaVideoFaster:"재생 속도 높이기", mediaVideoSlower:"재생 속도 낮추기", mediaVideoPause:"재생／일시정지",
   mediaVideoKeysHint:"동영상 확대·축소, 역재생, 구간 반복과 미디어 플레이어 조작 키를 지정합니다. 게임 판정과 기록은 바뀌지 않습니다.",
-  mediaVideoKeysReset:"↺ 동영상 키 초기화", mediaVideoCapture0:"'동영상 확대'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture1:"'동영상 축소'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture2:"'재생 속도 높이기'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture3:"'재생 속도 낮추기'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture4:"'재생／일시정지'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture5:"'역재생'으로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture6:"'구간 반복'으로 지정할 키를 누르세요. ESC로 취소.",
+  mediaVideoKeysReset:"↺ 동영상 키 초기화", mediaVideoCapture0:"'동영상 확대'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture1:"'동영상 축소'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture2:"'재생 속도 높이기'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture3:"'재생 속도 낮추기'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture4:"'재생／일시정지'로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture5:"'역재생'으로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture6:"'구간 반복'으로 지정할 키를 누르세요. ESC로 취소.", mediaVideoCapture7:"'배경／스크린세이버'로 지정할 키를 누르세요. ESC로 취소.",
   mediaVideoToastZoom:"동영상 확대 {n}x", mediaVideoToastRate:"재생 속도 {n}x",
   mediaModeStatus:"미디어 플레이어 중 (게임 기록에 영향 없음)"
 });
@@ -107,8 +111,10 @@ let reverseActive = false, reverseLoading = false, reverseTimer = 0, reverseSour
 let reverseBuffer = null, reverseBufferKey = "", reverseVideoMuted = false, reverseStartAt = 0, reverseClockAt = 0;
 let loopTimer = 0;
 let loopA = null, loopB = null, loopActive = false, loopKeyDown = false;
-const VIDEO_KEY_LABELS = ["mediaVideoZoomIn", "mediaVideoZoomOut", "mediaVideoFaster", "mediaVideoSlower", "mediaVideoPause", "mediaReverse", "mediaLoop"];
-const REVERSE_KEY_INDEX = 5, LOOP_KEY_INDEX = 6;
+let wallOverlay, wallClockNode, wallDateNode, wallNode, wallStyleNode, wallClockCheck, wallPlaybackNode, wallTriggerNode, wallFileNode, wallResetNode;
+let wallActive = false, wallKeyDown = false, wallTimer = 0, wallWasPlaying = false, wallCustomURL = "";
+const VIDEO_KEY_LABELS = ["mediaVideoZoomIn", "mediaVideoZoomOut", "mediaVideoFaster", "mediaVideoSlower", "mediaVideoPause", "mediaReverse", "mediaLoop", "mediaWallKey"];
+const REVERSE_KEY_INDEX = 5, LOOP_KEY_INDEX = 6, WALL_KEY_INDEX = 7;
 const VIDEO_KEY_BAD = ["Escape", "Tab", "F5", "F11", "F12", "MetaLeft", "MetaRight", "Backquote", "Backspace"];
 const MEDIA_POS_KEY = "trk_media_positions_v1";
 let mediaPositions = {};
@@ -267,6 +273,44 @@ function checkMediaLoop() {
     try { video.currentTime = loopA; } catch (_) {}
   }
 }
+function renderWall() {
+  if (!wallOverlay) return;
+  const configuredStyle = settings.mediaWallStyle || "midnight";
+  const style = configuredStyle === "custom" && !wallCustomURL ? "midnight" : configuredStyle;
+  wallOverlay.dataset.style = style;
+  wallOverlay.style.backgroundImage = configuredStyle === "custom" && wallCustomURL ? `url("${wallCustomURL}")` : "";
+  if (wallClockNode) wallClockNode.hidden = !settings.mediaWallClock;
+  if (wallDateNode) wallDateNode.hidden = !settings.mediaWallClock;
+  if (wallDateNode) {
+    const now = new Date();
+    try {
+      wallClockNode.textContent = now.toLocaleTimeString(settings.language || undefined, { hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false });
+      wallDateNode.textContent = now.toLocaleDateString(settings.language || undefined, { weekday:"short", year:"numeric", month:"short", day:"numeric" });
+    } catch (_) { wallClockNode.textContent = now.toLocaleTimeString(); wallDateNode.textContent = now.toLocaleDateString(); }
+  }
+  if (wallNode) { wallNode.textContent = tr(wallActive ? "mediaWallHide" : "mediaWallShow"); wallNode.dataset.i18n = wallActive ? "mediaWallHide" : "mediaWallShow"; wallNode.setAttribute("aria-pressed", String(wallActive)); }
+}
+function activateWall() {
+  if (!mediaActive() || wallActive) return;
+  wallActive = true; wallKeyDown = false;
+  wallWasPlaying = !!(reverseActive || reverseLoading || (videoReady && !video.paused && !video.ended));
+  if (settings.mediaWallStopsVideo) { stopReverse(false, true); video.pause(); }
+  wallOverlay.hidden = false; document.body.classList.add("mediaWallOpen");
+  clearInterval(wallTimer); wallTimer = setInterval(renderWall, 1000); renderWall();
+}
+function deactivateWall(resume = true) {
+  if (!wallActive) return;
+  wallActive = false; wallKeyDown = false; clearInterval(wallTimer); wallTimer = 0;
+  wallOverlay.hidden = true; document.body.classList.remove("mediaWallOpen");
+  const shouldResume = resume && settings.mediaWallStopsVideo && wallWasPlaying && videoReady && !document.hidden;
+  wallWasPlaying = false;
+  if (shouldResume) video.play().catch(() => {});
+  renderMedia();
+}
+function toggleWall() {
+  if (!mediaActive()) return;
+  if (wallActive) deactivateWall(true); else activateWall();
+}
 function videoAction(action) {
   if (action === 0 || action === 1) {
     settings.videoZoom = Math.max(.5, Math.min(3, (Number(settings.videoZoom) || 1) + (action === 0 ? .1 : -.1)));
@@ -284,6 +328,7 @@ function videoAction(action) {
   } else if (action === 4) playPause();
   else if (action === REVERSE_KEY_INDEX) toggleReverse();
   else if (action === LOOP_KEY_INDEX) settings.mediaLoopTrigger === "hold" ? activateHeldLoop() : cycleMediaLoop();
+  else if (action === WALL_KEY_INDEX) settings.mediaWallTrigger === "hold" ? (activateWall(), wallKeyDown = true) : toggleWall();
 }
 function captureVideoKey(code) {
   const i = videoBinding;
@@ -501,11 +546,13 @@ function renderMedia() {
     statusNode.textContent = tr(statusKey); statusNode.dataset.i18n = "";
   }
   renderLoopUI();
+  renderWall();
   renderQueue();
   updateMediaSession();
 }
 function closeMedia(restore = true) {
   if (!mediaOpen) return;
+  deactivateWall(false);
   mediaOpen = false; window._trkMediaPlayerOpen = false; window._trkMediaPlayerMode = false;
   clearInterval(tickTimer); tickTimer = 0; stopSleepTimer(true); seeking = false;
   clearInterval(loopTimer); loopTimer = 0; stopReverse(false, true); clearMediaLoop(true);
@@ -549,10 +596,11 @@ function buildMedia() {
   playNode = makeButton("mediaPlay", "mediaControlBtn mediaPlayBtn");
   const next = makeButton("mediaNext", "mediaControlBtn");
   reverseNode = makeButton("mediaReverseStart", "mediaSmallBtn");
+  wallNode = makeButton("mediaWallShow", "mediaSmallBtn");
   const restart = makeButton("mediaRestart", "mediaSmallBtn");
-  prev.addEventListener("click", () => stepMedia(-1)); playNode.addEventListener("click", playPause); next.addEventListener("click", () => stepMedia(1)); reverseNode.addEventListener("click", toggleReverse);
+  prev.addEventListener("click", () => stepMedia(-1)); playNode.addEventListener("click", playPause); next.addEventListener("click", () => stepMedia(1)); reverseNode.addEventListener("click", toggleReverse); wallNode.addEventListener("click", toggleWall);
   restart.addEventListener("click", () => { if (videoReady) { if (reverseActive || reverseLoading) stopReverse(false, true); saveMediaPosition(true); video.currentTime = 0; video.play().catch(() => {}); } });
-  controls.append(prev, playNode, next, reverseNode, restart);
+  controls.append(prev, playNode, next, reverseNode, wallNode, restart);
 
   const progressRow = el("div", "mediaProgressRow");
   progressNode = document.createElement("input"); progressNode.type = "range"; progressNode.min = "0"; progressNode.step = "0.1"; progressNode.value = "0"; progressNode.className = "mediaProgress"; progressNode.setAttribute("aria-label", tr("mediaSeek"));
@@ -601,7 +649,13 @@ function buildMedia() {
 
   const footer = el("footer", "instFooter mediaFooter"); footer.append(tx("span", "mediaModeStatus"), tx("span", "mediaKeyboard", "instKeyHint"));
   dialog.append(header, display, controls, progressRow, loopBox, options, queuePanel, footer);
-  overlay.append(backdrop, dialog); document.body.append(overlay);
+  wallOverlay = el("section", "mediaWall"); wallOverlay.hidden = true; wallOverlay.setAttribute("role", "dialog"); wallOverlay.setAttribute("aria-modal", "true"); wallOverlay.setAttribute("aria-label", tr("mediaWall"));
+  const wallTop = el("div", "mediaWallTop"); wallTop.append(tx("strong", "mediaWall"));
+  const wallClose = makeButton("mediaWallHide", "mediaWallClose"); wallClose.addEventListener("click", () => deactivateWall(true)); wallTop.append(wallClose);
+  const wallCenter = el("div", "mediaWallCenter"); wallClockNode = el("div", "mediaWallClock", "00:00:00"); wallDateNode = el("div", "mediaWallDate", ""); wallCenter.append(wallClockNode, wallDateNode);
+  const wallHint = tx("div", "mediaWallHint", "mediaWallHintText");
+  wallOverlay.append(wallTop, wallCenter, wallHint);
+  overlay.append(backdrop, dialog, wallOverlay); document.body.append(overlay);
 
   backdrop.addEventListener("click", () => closeMedia());
   overlay.addEventListener("click", e => { if (e.target === overlay) closeMedia(); });
@@ -623,11 +677,12 @@ function buildMedia() {
     const videoKey = (settings.videoKeys || []).indexOf(e.code);
     if (videoKey >= 0 && (mediaActive() || phase === "title" || phase === "paused")) {
       e.preventDefault(); e.stopImmediatePropagation();
-      if (!e.repeat) videoAction(videoKey);
+      if (!e.repeat && (!wallActive || videoKey === WALL_KEY_INDEX)) videoAction(videoKey);
       return;
     }
     if (!mediaOpen) return;
-    if (e.code === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); closeMedia(); return; }
+    if (e.code === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); if (wallActive) deactivateWall(true); else closeMedia(); return; }
+    if (wallActive) { e.preventDefault(); e.stopImmediatePropagation(); return; }
     if (isTyping(e.target)) return;
     if (e.code === "Space") { e.preventDefault(); e.stopImmediatePropagation(); playPause(); }
     else if (e.code === "ArrowLeft") { e.preventDefault(); e.stopImmediatePropagation(); seekBy(-10); }
@@ -639,6 +694,9 @@ function buildMedia() {
     if (videoBinding !== null || window._trkSynthModeOpen || !mediaActive()) return;
     if (settings.mediaLoopTrigger === "hold" && (settings.videoKeys || [])[LOOP_KEY_INDEX] === e.code) {
       e.preventDefault(); e.stopImmediatePropagation(); releaseHeldLoop();
+    }
+    if (settings.mediaWallTrigger === "hold" && (settings.videoKeys || [])[WALL_KEY_INDEX] === e.code && wallKeyDown) {
+      e.preventDefault(); e.stopImmediatePropagation(); deactivateWall(true);
     }
   }, true);
 
@@ -652,6 +710,7 @@ function buildMedia() {
   on("records", renderQueue); on("packsChanged", renderQueue); on("language", () => {
     if (searchNode) searchNode.placeholder = tr("mediaSearch");
     if (progressNode) progressNode.setAttribute("aria-label", tr("mediaSeek"));
+    if (wallOverlay) wallOverlay.setAttribute("aria-label", tr("mediaWall"));
     if (mediaOpen) renderMedia();
   });
   on("phase", p => { if (p !== "title" && mediaOpen) closeMedia(false); });
@@ -690,9 +749,32 @@ function buildMedia() {
     };
     reset.addEventListener("click", () => { settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); videoBinding = null; saveUserPrefs(); syncVideoKeysUI(); });
     panel.append(heading, hint, rows, reset);
-    anchor.after(panel);
-    on("language", syncVideoKeysUI);
-    syncVideoKeysUI();
+    const wallPanel = el("details", "subPanel mediaWallSettingsPanel"); wallPanel.id = "mediaWallSettingsPanel";
+    const wallHeading = tx("summary", "mediaWall");
+    const wallHint = tx("div", "mediaWallHint", "hint");
+    const wallStyleLabel = el("label", "mediaOption"); wallStyleLabel.append(tx("span", "mediaWallStyle"));
+    wallStyleNode = document.createElement("select");
+    for (const [value, key] of [["midnight", "mediaWallMidnight"], ["aurora", "mediaWallAurora"], ["paper", "mediaWallPaper"], ["custom", "mediaWallCustom"]]) { const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); wallStyleNode.append(o); }
+    wallStyleLabel.append(wallStyleNode);
+    const wallClockLabel = el("label", "checkLine"); wallClockCheck = document.createElement("input"); wallClockCheck.type = "checkbox"; wallClockLabel.append(wallClockCheck, tx("span", "mediaWallClock"));
+    const wallPlaybackLabel = el("label", "mediaOption"); wallPlaybackLabel.append(tx("span", "mediaWallPlayback"));
+    wallPlaybackNode = document.createElement("select"); for (const [value, key] of [["stop", "mediaWallStopVideo"], ["continue", "mediaWallContinueVideo"]]) { const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); wallPlaybackNode.append(o); } wallPlaybackLabel.append(wallPlaybackNode);
+    const wallTriggerLabel = el("label", "mediaOption"); wallTriggerLabel.append(tx("span", "mediaWallTrigger"));
+    wallTriggerNode = document.createElement("select"); for (const [value, key] of [["toggle", "mediaWallToggle"], ["hold", "mediaWallHold"]]) { const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); wallTriggerNode.append(o); } wallTriggerLabel.append(wallTriggerNode);
+    const wallUploadRow = el("label", "mediaWallUploadRow"); wallUploadRow.append(tx("span", "mediaWallUpload")); wallFileNode = document.createElement("input"); wallFileNode.type = "file"; wallFileNode.accept = "image/*"; wallUploadRow.append(wallFileNode);
+    wallResetNode = tx("button", "mediaWallResetImage", "mediaSmallBtn"); wallResetNode.type = "button";
+    const wallUploadHint = tx("div", "mediaWallUploadHint", "hint");
+    const syncWallSettingsUI = () => { wallStyleNode.value = settings.mediaWallStyle || "midnight"; wallClockCheck.checked = settings.mediaWallClock !== false; wallPlaybackNode.value = settings.mediaWallStopsVideo === false ? "continue" : "stop"; wallTriggerNode.value = settings.mediaWallTrigger || "toggle"; renderWall(); };
+    wallStyleNode.addEventListener("change", () => { settings.mediaWallStyle = wallStyleNode.value; saveUserPrefs(); renderWall(); });
+    wallClockCheck.addEventListener("change", () => { settings.mediaWallClock = wallClockCheck.checked; saveUserPrefs(); renderWall(); });
+    wallPlaybackNode.addEventListener("change", () => { settings.mediaWallStopsVideo = wallPlaybackNode.value !== "continue"; saveUserPrefs(); });
+    wallTriggerNode.addEventListener("change", () => { settings.mediaWallTrigger = wallTriggerNode.value; saveUserPrefs(); });
+    wallFileNode.addEventListener("change", () => { const f = wallFileNode.files && wallFileNode.files[0]; if (!f || !f.type.startsWith("image/")) return; if (wallCustomURL) URL.revokeObjectURL(wallCustomURL); wallCustomURL = URL.createObjectURL(f); settings.mediaWallStyle = "custom"; saveUserPrefs(); syncWallSettingsUI(); });
+    wallResetNode.addEventListener("click", () => { if (wallCustomURL) URL.revokeObjectURL(wallCustomURL); wallCustomURL = ""; settings.mediaWallStyle = "midnight"; wallFileNode.value = ""; saveUserPrefs(); syncWallSettingsUI(); });
+    wallPanel.append(wallHeading, wallHint, wallStyleLabel, wallClockLabel, wallPlaybackLabel, wallTriggerLabel, wallUploadRow, wallUploadHint, wallResetNode);
+    anchor.after(panel, wallPanel);
+    on("language", () => { syncVideoKeysUI(); syncWallSettingsUI(); });
+    syncVideoKeysUI(); syncWallSettingsUI();
   }
   buildVideoKeysUI();
   installMediaSession();

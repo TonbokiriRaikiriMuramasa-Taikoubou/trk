@@ -288,19 +288,19 @@ if (!read("js/main.js").includes("guideEggKind") ||
 // plus a custom two-image option. The Touhou fan-work credit must stay in NOTICE.
 {
   const fx = read("js/fx-dock.js");
-  const chars = ["truck", "robot", "cat", "slime", "ghost", "miko"];
+  const chars = ["truck", "robot", "cat", "slime", "ghost", "reimu", "marisa", "cirno", "flandre", "youmu"];
   const hasAll = chars.every(c => fx.includes(`"${c}", "dockAntChar${c[0].toUpperCase() + c.slice(1)}"`));
   if (!fx.includes("const ANT_CHARS") || !fx.includes("function antCharFrame") ||
       !fx.includes("function drawAntCharMatrix") || !fx.includes("function antCustomOk") ||
-      !fx.includes("antCustomRow") || !hasAll ||
-      !fx.includes('["rod", "loop", "dish", "beam", "truck", "robot", "cat", "slime", "ghost", "miko", "custom"]') ||
+      !fx.includes("antCustomRow") || !hasAll || !fx.includes("antTouhou") ||
+      !fx.includes('["rod", "loop", "dish", "beam", "truck", "robot", "cat", "slime", "ghost", "reimu", "marisa", "cirno", "flandre", "youmu", "custom"]') ||
       !read("js/core.js").includes('settings.fxAntennaShape = "rod";') ||
       !read("css/style.css").includes(".antChar") ||
       !read("NOTICE.md").includes("Touhou Project fan work") ||
       !read("NOTICE.md").includes("touhou-project.news/guideline/")) {
     fail("antenna character skins (ON=awake / OFF=asleep + custom 2 images) are missing");
   } else {
-    ok("antenna character skins (6 dot characters + custom 2-image ON/OFF) are wired, Touhou credit in NOTICE");
+    ok("antenna character skins (10 dot characters incl. 5 Touhou fan works + custom 2-image ON/OFF) are wired, Touhou credit in NOTICE");
   }
 }
 

@@ -221,6 +221,14 @@ details.panel[open]>summary{margin-bottom:14px}
 
 /* ===== 10. スキン・ノーツ ===== */
 #skinGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#skinNow{margin-bottom:10px}
+#skinNow .skinCard{width:100%;background:var(--ui-soft)}
+.skinChips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px}
+.skinChip{padding:5px 12px;font-size:13px;font-weight:700;border-radius:999px;
+  background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border)}
+.skinChip:hover{filter:brightness(1.15)}
+.skinChip.on{background:var(--ui-accent);color:var(--ui-on-accent);border-color:var(--ui-accent)}
+#skinShelfCount{opacity:.6;font-weight:600}
 .skinCard{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:11px 13px;border-radius:14px;text-align:left;
   border:2px solid var(--sk-border);background:var(--sk-bg);color:var(--sk-text)}
 .skinCard:hover{background:var(--sk-bg);color:var(--sk-text);border-color:var(--ui-accent)}

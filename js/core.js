@@ -78,6 +78,8 @@ const savedSkinAtBoot = typeof prefs.skin === "string" ? prefs.skin : "";   // �
 const settings = {
   language: pick(prefs.language, ["ja", "en", "zh", "ko"], guessLang()),
   skin: SKINS[prefs.skin] ? prefs.skin : ({ dark:"shadow", light:"daylight" }[prefs.skin] || "shadow"),
+  skinShelfOpen: prefs.skinShelfOpen !== false,      // 🖼 スキンの棚の開閉（30種＋カスタムでも設定画面が膨らまないように）
+  skinShelfCat: pick(prefs.skinShelfCat, ["all","basic","miku","dark","light","grad","fun","custom"], "all"),
   layout: pick(prefs.layout ?? prefs.gameplayLayout, Object.keys(LAYOUTS), "classic"),
   videoStyle: pick(prefs.videoStyle, (typeof TRK_TV_PRESETS !== "undefined" ? TRK_TV_PRESETS.map(p=>p.id) : ["skin","color","mono","dim","off"]), "skin"),
   videoZoom: num(prefs.videoZoom, .5, 3, 1),
@@ -525,9 +527,43 @@ function applyLanguage(code) {
 }
 
 /* ---------- スキン ---------- */
+const SKIN_CATS = [["all","catAll"],["basic","catBasic"],["miku","catMiku"],["dark","catDark"],["light","catLight"],["grad","catGrad"],["fun","catFun"],["custom","catCustom"]];
+const skinCatList = s => (s.custom || s.pack) ? ["custom"] : (Array.isArray(s.cat) && s.cat.length ? s.cat : ["basic"]);
+/* 今 使っているスキン（棚を閉じていても見える）。押すと棚が開く */
+function buildSkinNow() {
+  const now = $("skinNow"); if (!now) return;
+  const s = skin(); now.textContent = "";
+  const b = el("button", "skinCard"); b.type = "button";
+  b.style.setProperty("--sk-bg", s.game.stage); b.style.setProperty("--sk-text", s.ui["--ui-text"]);
+  b.style.setProperty("--sk-border", s.ui["--ui-border"]);
+  if (s.font) b.style.fontFamily = s.font;
+  const dots = el("span", "dots");
+  for (const c of [s.ui["--ui-accent"], s.ui["--ui-gold"], s.ui["--ui-text"]]) { const d = el("i", "dot square"); d.style.background = c; dots.append(d); }
+  b.append(dots, el("b", "", s.label[lang] || s.label.en), el("small", "", (s.desc && (s.desc[lang] || s.desc.en)) || ""));
+  b.title = tr("skinShelf"); b.setAttribute("aria-label", tr("skinShelf"));
+  b.addEventListener("click", () => { const shelf = $("skinShelf"); if (shelf) shelf.open = true; });
+  now.append(b);
+}
 function buildSkinGrid() {
-  const grid = $("skinGrid"); grid.textContent = "";
+  const grid = $("skinGrid"); if (!grid) return;
+  grid.textContent = "";
+  /* 棚のチップ（そのカテゴリーに属するスキンがないときはチップ自体を出さない） */
+  const cats = new Set(); for (const s of Object.values(SKINS)) skinCatList(s).forEach(c => cats.add(c));
+  const cat = settings.skinShelfCat !== "all" && cats.has(settings.skinShelfCat) ? settings.skinShelfCat : "all";
+  const chips = $("skinChips");
+  if (chips) {
+    chips.textContent = "";
+    for (const [id, key] of SKIN_CATS) {
+      if (id !== "all" && !cats.has(id)) continue;
+      const c = el("button", "skinChip"); c.type = "button"; c.textContent = tr(key);
+      c.classList.toggle("on", id === cat); c.setAttribute("aria-pressed", String(id === cat));
+      c.addEventListener("click", () => { settings.skinShelfCat = id; saveUserPrefs(); buildSkinGrid(); });
+      chips.append(c);
+    }
+  }
+  const count = $("skinShelfCount"); if (count) count.textContent = `（${Object.keys(SKINS).length}）`;
   for (const [id, s] of Object.entries(SKINS)) {
+    if (cat !== "all" && !skinCatList(s).includes(cat)) continue;
     const b = el("button", "skinCard"); b.type = "button"; b.dataset.skin = id;
     b.style.setProperty("--sk-bg", s.game.stage); b.style.setProperty("--sk-text", s.ui["--ui-text"]);
     b.style.setProperty("--sk-border", s.ui["--ui-border"]);
@@ -566,6 +602,7 @@ function applySkin(id, persist = true) {
   document.querySelectorAll("#skinGrid .skinCard").forEach(b => {
     b.classList.toggle("selected", b.dataset.skin === settings.skin); b.setAttribute("aria-pressed", b.dataset.skin === settings.skin);
   });
+  buildSkinNow();
   view.style.filter = videoFilter();
   updateTouchKeys();
   if (persist) saveUserPrefs();

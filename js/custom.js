@@ -81,6 +81,11 @@ function storeCustomSkin(id, def) {
   saveCustomSkins(); buildSkinGrid(); applySkin(id);
 }
 const newSkinId = () => "custom_" + Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36);
+const skinShelf = $("skinShelf");
+if (skinShelf) {
+  skinShelf.open = settings.skinShelfOpen !== false;      // 前回の開閉を復元
+  skinShelf.addEventListener("toggle", () => { settings.skinShelfOpen = skinShelf.open; saveUserPrefs(); });
+}
 $("skinMaker").addEventListener("toggle", () => { if ($("skinMaker").open) fillSkinMaker(settings.skin); });
 $("makerLoadBtn").addEventListener("click", () => { fillSkinMaker(settings.skin); setStatus("makerStatus", null); });
 $("makerSaveNewBtn").addEventListener("click", () => {

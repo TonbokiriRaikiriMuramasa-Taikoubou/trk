@@ -1,7 +1,7 @@
 # trk! 開発引き継ぎ文書（HANDOFF）
 
 > trk! is AGRG! — an All-Generation Rhythm Game
-> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン16種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り ＋ 🥁音ゲーマー向けFAST/SLOW・あべこべ・でたらめ ＋ 💬GitHub Issuesテンプレート ＋ 📊スペクトラム（音の見える化・**見え方16種・色8種・曲名バナーのスキン・🚫使用しないスイッチ**・TVに重ねられる）＋ 🎛エフェクトチェーン編集＋ 🎹曲に合わせて演奏できるシンセモード（16音色・エレキギター／電子サックス／ZUNPET風ブラス・±8半音ピッチ・鍵盤固定オプション初期オン・大画面向け鍵盤拡張オプション・起動オプション）＋ 📤ミュージックフォルダを共有（1回の許可で一括取り込み・🔗共有をつづける・💾端末に残す・🚫やめる）＋ privacy.html ＋ Capacitor Android準備 ＋ 権利とクレジット図鑑 ＋ パック権利カード（名刺）＋ 🧭 3分チュートリアル・プレイ演出設定・CATCHニトロ得点ボーナス・▶メディアプレーヤー・🎛Loop Lab（クイック／ランダム区間・曲別プリセット）・📡キャスト／バックグラウンド再生の個別アンテナ・🖼スキンの棚（プリセット30種・グラデ対応）・動画キー操作まで）
+> 最終更新：2026-10-05（統合版 ＋ 公認パック ＋ 🛟緊急復旧 ＋ 🎨カスタムTV ＋ 🎬mp4 ＋ 📺◀▶ ＋ 📚棚スキン16種 ＋ 🧩アドオン ＋ 🩷MMD（💠Lat式ミク同梱・内蔵モーション25種・🎲おまかせ・選曲画面ミニ操作）＋ ⭐お気に入り ＋ ▶◀演奏中の曲送り ＋ 🥁音ゲーマー向けFAST/SLOW・あべこべ・でたらめ ＋ 💬GitHub Issuesテンプレート ＋ 📊スペクトラム（音の見える化・**見え方16種・色8種・曲名バナーのスキン・🚫使用しないスイッチ**・TVに重ねられる）＋ 🎛エフェクトチェーン編集＋ 🎹曲に合わせて演奏できるシンセモード（16音色・エレキギター／電子サックス／ZUNPET風ブラス・±8半音ピッチ・鍵盤固定オプション初期オン・大画面向け鍵盤拡張オプション・起動オプション）＋ 📤ミュージックフォルダを共有（1回の許可で一括取り込み・🔗共有をつづける・💾端末に残す・🚫やめる）＋ privacy.html ＋ Capacitor Android準備 ＋ 権利とクレジット図鑑 ＋ パック権利カード（名刺）＋ 🧭 3分チュートリアル・プレイ演出設定・CATCHニトロ得点ボーナス・▶メディアプレーヤー・🎛Loop Lab（クイック／ランダム区間・曲別プリセット）・📡キャスト／バックグラウンド再生の個別アンテナ・🖼スキンの棚（プリセット31種・グラデ対応・ごほうびスキン🎓）・🧭スタンプラリーチュートリアル（trk!入力で即完了・スキップ／もう一度・スタンプ5つでごほうび解禁）・動画キー操作まで）
 > この文書は、新しい会話で開発を再開するための参照資料です。
 
 ---
@@ -355,14 +355,20 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
   - 🎨 ボタン → `#libSkinBar`（チップ＋🎲おまかせ）を開閉。外をクリック／Escape で閉じる。設定画面「見た目」にセレクトと、🎨ボタンの表示チェック
   - 窓口 `window.TrkLibSkins`（`skins()` `skin()` `selectSkin(id)` `random()` `open()` `barOpen()`）
 
-### 🖼 全体見た目スキン30種と「スキンの棚」（data.js / characters/miku.js / core.js）
-- **プリセット30種**：`js/data.js` の `SKINS` に定番8種＋追加18種（ミントガーデン／ストロベリーホイップ／メロンベリー／宵闇／深海／残炎／朝焼け／白夜／パステルループ／プリズム／レーザーナイト／オーロラ／和モダン／昭和喫茶／青写真／天体観測／モノクロ印画／ネッスン・ドルマ）。`js/characters/miku.js` にミク系4種（ミク・ティール／ノワール／クラシック／アイドル）
+### 🖼 全体見た目スキン31種と「スキンの棚」（data.js / characters/miku.js / core.js）
+- **プリセット31種**：`js/data.js` の `SKINS` に定番8種＋追加18種（ミントガーデン／ストロベリーホイップ／メロンベリー／宵闇／深海／残炎／朝焼け／白夜／パステルループ／プリズム／レーザーナイト／オーロラ／和モダン／昭和喫茶／青写真／天体観測／モノクロ印画／ネッスン・ドルマ）＋ごほうびスキン「🎓グラデュエーション」（`locked:true`）。`js/characters/miku.js` にミク系4種（ミク・ティール／ノワール／クラシック／アイドル）
   - 各スキンの `cat` タグ（`basic` / `miku` / `dark` / `light` / `grad` / `fun` の配列）で、棚のチップから絞り込み。カスタム／パックスキンは自動で `custom` 行き
   - **グラデーション**：`--ui-bg` と `game.stage` には `linear-gradient(180deg,#a,#b)` を直接書ける（上→下＝`180deg`、下→上＝`0deg`、右→左＝`270deg`、左→右＝`90deg`）。`parseGrad()` が2色と向きを読み返すので、スキン作成の「リミックス」もグラデを引き継ぐ
-- **スキンの棚（設定画面「見た目」）**：`#skinNow`（今のスキン。押すと棚が開く）＋ `#skinShelf`（開閉できるdetails。`settings.skinShelfOpen` で記憶）＋ `#skinChips`（絞り込み。`settings.skinShelfCat`）。30種＋カスタムでも設定画面が縦に伸びすぎないための仕組み
+- **スキンの棚（設定画面「見た目」）**：`#skinNow`（今のスキン。押すと棚が開く）＋ `#skinShelf`（開閉できるdetails。`settings.skinShelfOpen` で記憶）＋ `#skinChips`（絞り込み。`settings.skinShelfCat`）。31種＋カスタムでも設定画面が縦に伸びすぎないための仕組み
 - **スキン作成（skinMaker）のグラデ対応**：`colors.bg2`（グラデ先の色）＋ `gradDir`（none/down/up/left/right）。`sanitizeSkinDef()` が検証、`buildCustomSkin()` が `--ui-bg` と `game.stage` にグラデを流し込む。古い形式（bg2なし）は単色のまま動く
 - **ミクの新衣装（マスコット）**：黒衣装ミク（`mikuNoir`）とアイドル服ミク（`mikuIdol`・`extra:"star"` のきらきらパーティクル）。PCL二次創作・オリジナルアレンジ（`characters/miku.js` 冒頭の注意を参照）
-- `tools/check-repo.mjs` が全体スキン数30（data.js 26＋miku.js 4）を検査する
+- `tools/check-repo.mjs` が全体スキン数31（data.js 27＋miku.js 4）と、ごほうびスキンの鍵（`locked:true` と `applySkin` のガード）を検査する
+
+### 🧭 スタンプラリーチュートリアル（main.js / core.js / data.js）
+- **trk! で即完了・取り逃しなし**：Seed欄への入力は `input` イベントで**打ち込んだ瞬間**に反応し `settings.tutorialDone` が立って案内が消える。ガイドのフッタには**スキップ**ボタン（`#guideSkip`）、⚙設定の「見た目」（helpText の下）には**🧭もう一度**ボタン（`#tutorialReplayBtn`。押すと `tutorialDone=false` にして設定を閉じ、ガイドを開き直す。**スタンプは消さない**）
+- **スタンプ5つ**（`settings.tutorialStamps`。順番自由・重複なし・スキップ後も蓄積）：`song`（`songSelected` イベント＝曲を選ぶ／追加直後の自動選曲）、`look`（`applySkin()` を `persist` 時だけ包む ＋ `TrkFX.select`／`TrkFX.random` を包む）、`play`（`phase` イベントが `playing`）、`safe`（`openSettings()` が `emit("settings")`）、`seed`（trk! 入力）。ガイドの手順カード（`.guideStep[data-mission]`）に✓スタンプが付き、サマリーに `（n/5）` 進捗
+- **ごほうび**：5つ揃うと `unlockRewardSkin()` が `settings.skinGradUnlocked` を立て、スキンの棚を再構築してお祝いポップアップ（`#guideCelebrate`。✦きらきらアニメ・4.5秒で自動で閉じる。**プレイ中に揃ったら選曲へ戻った瞬間**に表示）。trk! だけで完了したときは「スタンプを5つ集めると、なにかもらえるかも…？」と予告だけ出る
+- **ごほうびスキン「🎓グラデュエーション」**（`data.js` の `graduation`・`locked:true`）：未解禁のあいだ棚では「❓ ？？？」の無効カード（`.skinCard.locked`）。`applySkin()` は鍵付きスキンをシャドウへフォールバック（ブート復元でも安全）。`settings.tutorialStamps`／`skinGradUnlocked` は設定リセットで初期化
 
 ### 📺◀▶ 曲送りボタンと、TV→ラックのならべ方（tv-dock.js）
 - **◀ ▶**：`.tvTop` の中の `.tvSong`（⏻ と ⏸ の間）。`songStep(dir)` は **library.js の `nextSong()` / `prevSong()`** に任せる（ラジオと同じ並び。`libView` → 無ければ `allSongs()`）。
@@ -528,7 +534,9 @@ video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動
 | `settings.castPolicy`（初期 `off`） | 📺 キャストアンテナのポリシー（`off`／`antenna`）。`antenna` のときだけ `.dockCast` ボタンを表示し、クリックで Remote Playback の選択画面を開く（自動接続なし）。`shadow_taiko_preferences_v2` の中 |
 | `settings.backgroundPolicy`（初期 `off`） / `settings.fxAntenna` | 📡 バックグラウンド再生アンテナのポリシー（`off`／`antenna`）とON/OFF。旧 `castPolicy=antenna` は `backgroundPolicy=antenna` に引き継ぐ。`shadow_taiko_preferences_v2` の中 |
 | `settings.fxDockSkin` `fxDockFive` `fxDockOpen` `fxAntennaShape` `fxEqLock` `fxLockChain` `fxFavSeeded` | 🎛 fxドックのスキン・5ボタン統一・開閉状態・アンテナ形状・EQロック・ロック連鎖・初期お気に入り投入済みフラグ。`shadow_taiko_preferences_v2` の中 |
-| `settings.tutorialDone`（新） | 🧭 チュートリアル完了フラグ。Seed欄に `trk!` と入力すると `true` になり、選曲画面のチュートリアル案内を非表示にする（`js/main.js` の `syncTutorialUI()`）。設定リセットで `false` に戻る。`shadow_taiko_preferences_v2` の中 |
+| `settings.tutorialDone`（新） | 🧭 チュートリアル完了フラグ。Seed欄に `trk!` と入力した瞬間、またはガイドのスキップで `true` になり案内が消える（設定「見た目」の🧭もう一度で `false` に戻る）。設定リセットでも `false`。`shadow_taiko_preferences_v2` の中 |
+| `settings.tutorialStamps`（新） | 🧭 スタンプラリーの実績（`song`/`look`/`play`/`safe`/`seed` の配列。順番自由・スキップ後も蓄積）。5つ揃うとごほうびスキンが解禁。設定リセットで空になる |
+| `settings.skinGradUnlocked`（新） | 🎓 ごほうびスキン「グラデュエーション」の解禁フラグ（スタンプ5つで `true`）。設定リセットで `false` |
 | `settings.skinShelfOpen`（新） / `settings.skinShelfCat`（新） | 🖼 スキンの棚の開閉と、絞り込みカテゴリー（all／basic／miku／dark／light／grad／fun／custom）。`shadow_taiko_preferences_v2` の中 |
 
 **形式名**：`shadow-taiko-pack`、`shadow-taiko-chart`、`shadow-taiko-records`、`skin.shadow-taiko`、`trk-fx`、`trk-verified`、`trk-tvskin`（カスタムTVスキン）、譜面ファイル `*.shadow-taiko.json`
@@ -657,7 +665,9 @@ records[指紋 "サイズ:長さ×10"] = {
 - [ ] 実機確認：CDNから three／three-mmd-loader が読めるか／Lat式ミクやタワシ式CHAN×CO系ミクの .pmx が動くか／テクスチャ付きフォルダ／自分の .vmd が曲に合うか／モバイル幅での見え方
 - [x] 📚 曲のタブ（自動）と棚スキン16種（🎨 で切替・設定で隠せる。2026-10-05 に 🎰ジュークボックス／📻ラジオ番組表／🚉電光掲示板 ＋ 💿レコード棚／📼レンタルビデオ／🎤カラオケ目次／🗂️図書館の書架／🍱お品書き を追加）
 - [x] 🖼 スキンの棚と全体見た目プリセット30種（2026-10-05：グラデーション対応（上下左右）、ミク新衣装2種、カテゴリー絞り込みチップ、`#skinNow` 現在スキン表示、`tools/check-repo.mjs` に30種検査）
+- [x] 🧭 チュートリアルをスタンプラリー化（2026-10-05：trk!入力で即完了・取り逃しなし、スキップ／もう一度ボタン、実際の行動を検知するスタンプ5つ、5つ揃いでごほうびスキン「🎓グラデュエーション」解禁（棚では❓カード）、お祝いポップアップ（プレイ中は選曲復帰時に表示）、check-repoに31種＋鍵検査）
 - [ ] 実機確認：スキンの棚の開閉とチップ絞り込み、グラデの見え方（上下左右）、スキン作成のグラデ（保存・書き出し・読み込み・リミックス）、ミク新衣装ときらきらパーティクル
+- [ ] 実機確認：スタンプラリー（曲選択・スキン／エフェクト変更・1曲プレイ・設定を開くの各検知と進捗表示、trk!即完了、スキップ、もう一度、スタンプ5つで🎓解禁と❓カードの変化、お祝いポップアップ）
 - [x] 🥁 音ゲーマー向け機能の拡充（FAST/SLOW集計・GOOD内訳・判定下ネオン表示、MIRROR/RANDOM公式MOD、Lv.1〜20連続スケール、本格トリル・ロール配置生成、達人・2000 RUSHワンタップ解禁）
 - [x] 🎬 TV映像確認タブの操作性強化 ＆ 🔗 TV設定共有URL（シークバー、再生/一時停止、時間表示、「▶ この設定で遊ぶ」ボタン、`?tv=...&skin=...` パラメータ生成と自動適用）
 - [x] 📤 ミュージックフォルダを共有（1回の許可で一括取り込み・🔗 共有をつづける・💾 端末に残す（150曲／300MB）・🚫 共有をやめる・📁 開く はならべて残す・4言語）→ **PR #11 として main にマージ済み**（2026-10-05）
@@ -699,7 +709,7 @@ records[指紋 "サイズ:長さ×10"] = {
 
 - `trk!.zip`（元プロジェクト一式）をこのリポジトリに展開して採用しました。プロトタイプ版の `app.js` / `style.css` は削除しています（履歴には残っています）。
 - **`feedbackLabel` を4言語ぶん追加**（`js/i18n.js`）。12章のチェックは「✅ 入っている」になっていましたが、実際は抜けていて、選曲画面の連絡先リンクの前に `feedbackLabel` という生の文字列が出ていました。
-- **サービスワーカーの登録を `js/main.js` の末尾に追加**。6章の読み込み順の表には「main.js＝サービスワーカー登録」とありましたが、コードには入っていませんでした。当時のキャッシュ名は `trk-v2026.10.2`。現在の値は `sw.js` の `CACHE = "trk-v2026.10.5-synth6"` です。
+- **サービスワーカーの登録を `js/main.js` の末尾に追加**。6章の読み込み順の表には「main.js＝サービスワーカー登録」とありましたが、コードには入っていませんでした。当時のキャッシュ名は `trk-v2026.10.2`。現在の値は `sw.js` の `CACHE = "trk-v2026.10.5-synth7"` です。
 - `manifest.webmanifest`（全画面・横向き）・`verified.json`（空の雛形）・`.github/ISSUE_TEMPLATE/`（bug_report・feature_request・config）を新規作成しました。
 - OGP画像は `tools/make-icons.html` の指示どおり **`docs/og.png`** に置きました（zip では `icons/og.png` になっていました）。`index.html` の `og:image` はそのままで合っています。
 - **`.github/workflows/pages.yml` を変更**：ファイル名を並べてコピーする方式だと、新しいファイルを足すたびに公開が壊れるので、ルートを丸ごと公開する方式（`.git`・`.github`・`_site` だけ除外）にしました。`css/` や `js/` にファイルを足しても、もう直す必要はありません。

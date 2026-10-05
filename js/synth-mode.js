@@ -916,7 +916,7 @@ addEventListener("DOMContentLoaded", () => {
     const v = Number(songVolume.value); settings.musicVolume = v;
     const mainVolume = document.getElementById("volume");
     if (mainVolume) { mainVolume.value = String(v); mainVolume.dispatchEvent(new Event("input", { bubbles:true })); }
-    else { video.volume = v; saveUserPrefs(); }
+    else { if (v > 0) rememberMusicVolume(v); video.volume = v; saveUserPrefs(); }
   });
   let lastPianoPointer = 0;
   piano.addEventListener("pointerdown", e => {

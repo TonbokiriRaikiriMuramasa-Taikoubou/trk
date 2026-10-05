@@ -1549,8 +1549,8 @@ addEventListener("DOMContentLoaded", () => {
       chDown.addEventListener("click", ()=>{ stepTv(-1); });
       const volUp = el("button","homeBtn"); volUp.type="button"; volUp.textContent="＋"; volUp.title="Volume";
       const volDown = el("button","homeBtn"); volDown.type="button"; volDown.textContent="－";
-      volUp.addEventListener("click", ()=>{ settings.musicVolume = Math.min(1, settings.musicVolume+0.05); if (typeof video!=="undefined") video.volume = settings.musicVolume; const v=document.getElementById("volume"); if(v) v.value=settings.musicVolume; saveUserPrefs(); });
-      volDown.addEventListener("click", ()=>{ settings.musicVolume = Math.max(0, settings.musicVolume-0.05); if (typeof video!=="undefined") video.volume = settings.musicVolume; const v=document.getElementById("volume"); if(v) v.value=settings.musicVolume; saveUserPrefs(); });
+      volUp.addEventListener("click", ()=>{ settings.musicVolume = Math.min(1, settings.musicVolume+0.05); if (settings.musicVolume > 0) rememberMusicVolume(settings.musicVolume); if (typeof video!=="undefined") video.volume = settings.musicVolume; const v=document.getElementById("volume"); if(v) v.value=settings.musicVolume; saveUserPrefs(); });
+      volDown.addEventListener("click", ()=>{ settings.musicVolume = Math.max(0, settings.musicVolume-0.05); if (settings.musicVolume > 0) rememberMusicVolume(settings.musicVolume); if (typeof video!=="undefined") video.volume = settings.musicVolume; const v=document.getElementById("volume"); if(v) v.value=settings.musicVolume; saveUserPrefs(); });
       deco.append(chDisp, chUp, chDown, volUp, volDown, el("i","homeSpeaker"));
     } else if (d === "wall") {
       deco.append(el("i","wallMount"), el("i","wallShadow"));

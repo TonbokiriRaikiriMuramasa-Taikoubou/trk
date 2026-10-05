@@ -265,7 +265,8 @@ details.panel[open]>summary{margin-bottom:14px}
 .banner.tapPause{cursor:pointer}
 .banner.tapPause .bannerText{-webkit-user-select:none;user-select:none}
 .bannerVolBtn{position:absolute;right:10px;bottom:10px;z-index:2;padding:4px 9px;font-size:15px;line-height:1.4;
-  border-radius:9px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.28);color:inherit}
+  border-radius:9px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.28);color:inherit;
+  touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .bannerVolPanel{position:absolute;right:10px;bottom:46px;z-index:2;display:flex;align-items:center;gap:6px;
   padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.28)}
 .bannerVolPanel[hidden]{display:none}

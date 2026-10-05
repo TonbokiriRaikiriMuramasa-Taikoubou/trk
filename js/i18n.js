@@ -182,7 +182,7 @@ const TEXT = {
     seLoadError:"音声を読み込めませんでした。別の形式をお試しください。", seUnavailable:"このブラウザはWeb Audioに対応していません。",
 
     /* プレイ中・一時停止・リザルト */
-    musicVolume:"曲音量", pause:"Ⅱ 一時停止", fullscreen:"⛶ 全画面",
+    musicVolume:"曲音量", bannerVolTip:"短押し：スライダーを表示／長押し：ミュート・音量を復元", pause:"Ⅱ 一時停止", fullscreen:"⛶ 全画面",
     paused:"一時停止中", pauseText:"再開・やり直し・譜面Export・選曲へ戻るを選べます。",
     resume:"▶ つづきから", retry:"↻ 最初から", title:"⌂ 選曲へ", finished:"FINISH!", replay:"↻ もう一度",
     score:"SCORE", combo:"COMBO", accuracy:"ACC", perfect:"PERFECT", good:"GOOD", miss:"MISS", early:"EARLY", late:"LATE",
@@ -391,7 +391,7 @@ const TEXT = {
     seLoadedDon:"Don SE loaded.", seLoadedKa:"Ka SE loaded.",
     seLoadError:"Could not decode this audio. Try another format.", seUnavailable:"Web Audio is not available in this browser.",
 
-    musicVolume:"Music", pause:"Ⅱ Pause", fullscreen:"⛶ Fullscreen",
+    musicVolume:"Music", bannerVolTip:"Tap: show slider · Hold: mute or restore volume", pause:"Ⅱ Pause", fullscreen:"⛶ Fullscreen",
     paused:"PAUSED", pauseText:"Resume, restart, export the chart, or return to song select.",
     resume:"▶ Resume", retry:"↻ Restart", title:"⌂ Song select", finished:"FINISH!", replay:"↻ Play again",
     score:"SCORE", combo:"COMBO", accuracy:"ACC", perfect:"PERFECT", good:"GOOD", miss:"MISS", early:"EARLY", late:"LATE",
@@ -598,7 +598,7 @@ const TEXT = {
     seLoadedDon:"已加载Don音效。", seLoadedKa:"已加载Ka音效。",
     seLoadError:"无法解码该音频，请尝试其他格式。", seUnavailable:"此浏览器不支持Web Audio。",
 
-    musicVolume:"音乐", pause:"Ⅱ 暂停", fullscreen:"⛶ 全屏",
+    musicVolume:"音乐", bannerVolTip:"短按：显示滑块 · 长按：静音／恢复音量", pause:"Ⅱ 暂停", fullscreen:"⛶ 全屏",
     paused:"已暂停", pauseText:"可以继续、重新开始、导出谱面或返回选曲。",
     resume:"▶ 继续", retry:"↻ 重新开始", title:"⌂ 选曲", finished:"完成！", replay:"↻ 再玩一次",
     score:"得分", combo:"连击", accuracy:"准确率", perfect:"完美", good:"良好", miss:"失误", early:"偏早", late:"偏晚",
@@ -804,7 +804,7 @@ const TEXT = {
     seLoadedDon:"Don 효과음을 불러왔습니다.", seLoadedKa:"Ka 효과음을 불러왔습니다.",
     seLoadError:"오디오를 해독할 수 없습니다. 다른 형식을 시도하세요.", seUnavailable:"이 브라우저는 Web Audio를 지원하지 않습니다.",
 
-    musicVolume:"음악", pause:"Ⅱ 일시정지", fullscreen:"⛶ 전체 화면",
+    musicVolume:"음악", bannerVolTip:"짧게 누르기: 슬라이더 · 길게 누르기: 음소거/복원", pause:"Ⅱ 일시정지", fullscreen:"⛶ 전체 화면",
     paused:"일시정지", pauseText:"계속하기, 다시 시작, 채보 내보내기, 곡 선택으로 돌아가기를 고를 수 있습니다.",
     resume:"▶ 계속하기", retry:"↻ 다시 시작", title:"⌂ 곡 선택", finished:"완료!", replay:"↻ 한 번 더",
     score:"점수", combo:"콤보", accuracy:"정확도", perfect:"PERFECT", good:"GOOD", miss:"MISS", early:"EARLY", late:"LATE",

@@ -1532,26 +1532,80 @@ $("songBanner").addEventListener("click", e => {
 });
 /* 🔊 音量（設定の musicVolume と同じもの。バナーの右下の小さなつまみ） */
 const bannerVolBtn = el("button", "bannerVolBtn", "🔊"); bannerVolBtn.type = "button";
-bannerVolBtn.title = tr("musicVolume");
-bannerVolBtn.setAttribute("aria-label", tr("musicVolume"));
+const bannerVolTip = () => tr("bannerVolTip");
+bannerVolBtn.title = bannerVolTip();
+bannerVolBtn.setAttribute("aria-label", `${tr("musicVolume")}. ${bannerVolTip()}`);
 const bannerVolSlider = el("input", "bannerVolSlider"); bannerVolSlider.type = "range";
 bannerVolSlider.min = "0"; bannerVolSlider.max = "1"; bannerVolSlider.step = "0.01";
 const bannerVolPanel = el("div", "bannerVolPanel"); bannerVolPanel.hidden = true;
 bannerVolPanel.append(bannerVolSlider);
 $("songBanner").append(bannerVolPanel, bannerVolBtn);
+let bannerVolRestore = settings.musicVolume > 0 ? bannerVolClamp(settings.musicVolume) : bannerVolClamp(settings.musicVolumeRestore || 0.7);
+let bannerVolPressTimer = 0, bannerVolLongPressed = false, bannerVolPointer = null;
+let bannerVolDownX = 0, bannerVolDownY = 0;
 function bannerVolSync() {
-  bannerVolSlider.value = settings.musicVolume;
-  bannerVolBtn.textContent = settings.musicVolume > 0 ? "🔊" : "🔇";
+  const volume = bannerVolClamp(settings.musicVolume);
+  if (volume > 0) { bannerVolRestore = volume; rememberMusicVolume(volume); }
+  bannerVolSlider.value = String(volume);
+  bannerVolBtn.textContent = volume > 0 ? "🔊" : "🔇";
+  bannerVolBtn.title = bannerVolTip();
+  bannerVolBtn.setAttribute("aria-label", `${tr("musicVolume")}. ${bannerVolTip()}`);
+}
+function setBannerMusicVolume(value) {
+  const volume = bannerVolClamp(value);
+  if (volume > 0) { bannerVolRestore = volume; rememberMusicVolume(volume); }
+  settings.musicVolume = volume;
+  cancelAnimationFrame(fadeRaf);   /* プレビューのフェードインと取り合いにならないように */
+  video.volume = volume;
+  const sv = $("volume"); if (sv) sv.value = String(volume);   /* 設定画面のスライダーも合わせる */
+  saveUserPrefs(); bannerVolSync();
+}
+function bannerVolLongPressAction() {
+  if (settings.musicVolume > 0) {
+    bannerVolRestore = bannerVolClamp(settings.musicVolume);
+    rememberMusicVolume(bannerVolRestore);
+    setBannerMusicVolume(0);
+  } else {
+    bannerVolRestore = bannerVolClamp(settings.musicVolumeRestore || bannerVolRestore || 0.7);
+    setBannerMusicVolume(bannerVolRestore);
+  }
+}
+function bannerVolCancelPress() {
+  if (bannerVolPressTimer) clearTimeout(bannerVolPressTimer);
+  bannerVolPressTimer = 0; bannerVolPointer = null;
 }
 bannerVolSync();
-bannerVolBtn.addEventListener("click", () => { bannerVolPanel.hidden = !bannerVolPanel.hidden; bannerVolSync(); });
-bannerVolSlider.addEventListener("input", () => {
-  settings.musicVolume = bannerVolClamp(bannerVolSlider.value);
-  cancelAnimationFrame(fadeRaf);   /* プレビューのフェードインと取り合いにならないように */
-  video.volume = settings.musicVolume;
-  const sv = $("volume"); if (sv) sv.value = settings.musicVolume;   /* 設定画面のスライダーも合わせる */
-  saveUserPrefs(); bannerVolSync();
+on("language", bannerVolSync);
+bannerVolBtn.addEventListener("pointerdown", e => {
+  if (e.pointerType === "mouse" && e.button !== 0) return;
+  bannerVolCancelPress(); bannerVolLongPressed = false;
+  bannerVolPointer = e.pointerId; bannerVolDownX = e.clientX; bannerVolDownY = e.clientY;
+  try { bannerVolBtn.setPointerCapture(e.pointerId); } catch (_) {}
+  bannerVolPressTimer = setTimeout(() => {
+    bannerVolPressTimer = 0; bannerVolLongPressed = true;
+    bannerVolLongPressAction();
+  }, 650);
 });
+bannerVolBtn.addEventListener("pointermove", e => {
+  if (bannerVolPointer !== e.pointerId) return;
+  if (Math.hypot(e.clientX - bannerVolDownX, e.clientY - bannerVolDownY) > 12) bannerVolCancelPress();
+});
+bannerVolBtn.addEventListener("pointerup", e => {
+  if (bannerVolPointer === e.pointerId) bannerVolCancelPress();
+});
+bannerVolBtn.addEventListener("pointercancel", e => {
+  if (bannerVolPointer === e.pointerId) bannerVolCancelPress();
+});
+bannerVolBtn.addEventListener("contextmenu", e => e.preventDefault());
+bannerVolBtn.addEventListener("click", e => {
+  if (bannerVolLongPressed) {
+    bannerVolLongPressed = false;
+    e.preventDefault(); e.stopImmediatePropagation();
+    return;
+  }
+  bannerVolPanel.hidden = !bannerVolPanel.hidden; bannerVolSync();
+});
+bannerVolSlider.addEventListener("input", () => setBannerMusicVolume(bannerVolSlider.value));
 /* ◀▶ バナーの左右中央で曲送り（TVドックの◀▶と同じ仕組み。いま開いているタブの中を送る） */
 const bannerPrevBtn = el("button", "bannerSongBtn", "◀"); bannerPrevBtn.type = "button"; bannerPrevBtn.style.left = "10px";
 const bannerNextBtn = el("button", "bannerSongBtn", "▶"); bannerNextBtn.type = "button"; bannerNextBtn.style.right = "10px";

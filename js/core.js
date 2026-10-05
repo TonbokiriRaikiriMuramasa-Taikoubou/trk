@@ -131,6 +131,8 @@ const settings = {
   seEnabled: !!prefs.seEnabled,
   seVolume: num(prefs.seVolume, 0, 1, .28),
   musicVolume: num(prefs.musicVolume, 0, 1, .7),
+  musicVolumeRestore: num(prefs.musicVolumeRestore, .01, 1,
+    typeof prefs.musicVolume === "number" && prefs.musicVolume > 0 ? prefs.musicVolume : .7),
   bannerPause: prefs.bannerPause === true,                                   // ⏯ 右上の曲名バナーをタップで一時停止（初期オフ）
   bannerSongBtns: prefs.bannerSongBtns !== false,                            // ◀▶ バナー左右の曲送りボタン（初期オン）
   /* 🎹 シンセ演奏モード */
@@ -152,7 +154,7 @@ const settings = {
   mmdScale: num(prefs.mmdScale, .5, 1.8, 1),
   mmdTurn: num(prefs.mmdTurn, -60, 60, 0),
   mmdMotionBpm: num(prefs.mmdMotionBpm, 0, 300, 0),
-  mmdMotionKind: typeof prefs.mmdMotionKind === "string" && prefs.mmdMotionKind !== "file" ? prefs.mmdMotionKind : "none",  // 🩷 選んだ内蔵モーション（mmd.js が実在を検証）
+  mmdMotionKind: typeof prefs.mmdMotionKind === "string" && prefs.mmdMotionKind !== "file" ? prefs.mmdMotionKind : "dreamy128",  // 🩷 選んだ内蔵モーション（mmd.js が実在を検証）
   mmdQuickUI: prefs.mmdQuickUI !== false,                                                     // 🩷 選曲画面のモーションミニ操作
   mmdMotionFavs: Array.isArray(prefs.mmdMotionFavs) ? prefs.mmdMotionFavs.filter(x => typeof x === "string").slice(0, 50) : [],  // 🩷 ⭐お気に入りモーション
   mmdCredit: typeof prefs.mmdCredit === "string" ? prefs.mmdCredit.slice(0, 120) : "",
@@ -212,6 +214,10 @@ const settings = {
   frameInterpStrength: num(prefs.frameInterpStrength, 0, 1, .85)
 };
 function saveUserPrefs() { try { localStorage.setItem(PREFS_KEY, JSON.stringify(settings)); } catch (_) {} }
+function rememberMusicVolume(value) {
+  const volume = Number(value);
+  if (Number.isFinite(volume) && volume > 0) settings.musicVolumeRestore = Math.min(1, Math.max(.01, volume));
+}
 /* プレイ中の追加演出だけをまとめて抑える。音声エフェクターの設定とは別です。 */
 const gameplayFxMultiplier = () => settings.gameFxMode === "off" ? 0 : settings.gameFxMode === "soft" ? .42 : 1;
 const gameplayFxPower = () => settings.fxPower * gameplayFxMultiplier();
@@ -245,7 +251,7 @@ function resetVideoPrefs() {
   if (typeof menuVideoTick === "function") { try { menuVideoTick(); } catch(_) {} }
 }
 function resetAudioPrefs() {
-  settings.musicVolume = 0.7; settings.seVolume = 0.28; settings.seEnabled = false; settings.bannerPause = false; settings.bannerSongBtns = true;
+  settings.musicVolume = 0.7; settings.musicVolumeRestore = 0.7; settings.seVolume = 0.28; settings.seEnabled = false; settings.bannerPause = false; settings.bannerSongBtns = true;
   settings.synthModeDisabled = false; settings.synthModeFastStart = false; settings.synthModeKeyboardLock = true; settings.synthModeWideKeyboard = false;
   // fx-dock / eq-dock の音まわりがあれば一緒に初期化
   if ("gameVolume" in settings) settings.gameVolume = 0.7;
@@ -296,7 +302,7 @@ function resetAllPrefs() {
   settings.judge = "standard"; settings.rate = 1; settings.shortMode = "off"; settings.shortMode = "off";
   settings.hidden = false; settings.sudden = false; settings.modMirror = false; settings.modRandom = false; settings.showMasterDiff = false;
   settings.mascot = "skin"; settings.vrmFrame = "full";
-  settings.mmdScale = 1; settings.mmdTurn = 0; settings.mmdMotionBpm = 0; settings.mmdMotionKind = "none";
+  settings.mmdScale = 1; settings.mmdTurn = 0; settings.mmdMotionBpm = 0; settings.mmdMotionKind = "dreamy128";
   settings.mmdQuickUI = true; settings.mmdMotionFavs = [];
   settings.skin = "shadow"; settings.layout = "classic";
 }
@@ -310,7 +316,7 @@ function exportPrefs(kind) {
     out.tvOverlay = settings.tvOverlay; out.previewEnabled = settings.previewEnabled; out.fxPower = settings.fxPower;
     out.tvMenuPreview = settings.tvMenuPreview; out.tvMenuVideo = settings.tvMenuVideo;
   } else if (kind === "audio") {
-    out.musicVolume = settings.musicVolume; out.seEnabled = settings.seEnabled; out.seVolume = settings.seVolume;
+    out.musicVolume = settings.musicVolume; out.musicVolumeRestore = settings.musicVolumeRestore; out.seEnabled = settings.seEnabled; out.seVolume = settings.seVolume;
     out.synthModeDisabled = settings.synthModeDisabled; out.synthModeFastStart = settings.synthModeFastStart;
     out.synthModeKeyboardLock = settings.synthModeKeyboardLock;
     out.synthModeWideKeyboard = settings.synthModeWideKeyboard;
@@ -801,7 +807,15 @@ function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
         if (typeof data.bgBlur === "number") { settings.bgBlur = clampTvBlur(data.bgBlur); applied.push("bgBlur"); }
         if ("tvParamFavs" in data) { settings.tvParamFavs = cleanTvParamFavorites(data.tvParamFavs); applied.push("tvParamFavs"); }
         if (data.tvDockSkin) { settings.tvDockSkin = data.tvDockSkin; applied.push("tvDockSkin"); }
-        if (typeof data.musicVolume === "number") { settings.musicVolume = data.musicVolume; applied.push("musicVolume"); }
+        if (typeof data.musicVolume === "number") {
+          settings.musicVolume = num(data.musicVolume, 0, 1, settings.musicVolume);
+          if (settings.musicVolume > 0) rememberMusicVolume(settings.musicVolume);
+          applied.push("musicVolume");
+        }
+        if (typeof data.musicVolumeRestore === "number") {
+          settings.musicVolumeRestore = num(data.musicVolumeRestore, .01, 1, settings.musicVolumeRestore);
+          applied.push("musicVolumeRestore");
+        }
         // 全体的にマージ（知らないキーは無視せず一応入れるが、型チェックは緩め）
         for (const k of Object.keys(data)) {
           if (k in settings && !applied.includes(k) && k !== "notes") {

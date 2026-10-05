@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：データ（スキン・レイアウト・難易度・マスコット登録） ============
    内蔵スキンを増やすときは SKINS に1項目足すだけで、設定画面の一覧に出ます。
-     ui     : メニュー画面の色（CSS変数）
+     ui     : メニュー画面の色（CSS変数）。--ui-bg は linear-gradient(…) も可（グラデーション）
+     cat    : （任意）スキンの棚での絞り込み用タグ（basic / miku / dark / light / grad / fun の配列）
      game   : プレイ画面の色
      shapes : [ドン, カッ] の「おすすめ」ノーツ形状（circle / diamond / square）
      video  : 背景映像に掛けるCSSフィルター
@@ -176,6 +177,18 @@ const VIDEO_PRESETS = {
   mono:"grayscale(1) contrast(1.6)", color:"none", dim:"brightness(.45) saturate(.85)",
   warm:"sepia(.45) saturate(1.3) brightness(.85)", cool:"grayscale(.4) hue-rotate(180deg) saturate(1.4) brightness(.8)"
 };
+/* ---------- 背景グラデーション（プリセットとカスタム両方で使う） ---------- */
+const GRAD_DIRS = ["none", "down", "up", "left", "right"];
+const GRAD_ANGLE = { down:"180deg", up:"0deg", right:"90deg", left:"270deg" };
+/* "linear-gradient(180deg,#a,#b)" から {from,to,dir} を読む（スキンのリミックス用。読めなければ null） */
+function parseGrad(v) {
+  if (typeof v !== "string" || !v.includes("gradient")) return null;
+  const hex = [...v.matchAll(/#[0-9a-f]{6}/gi)].map(m => m[0].toLowerCase());
+  if (hex.length < 2) return null;
+  const deg = v.match(/(-?\d+(?:\.\d+)?)deg/i);
+  const dir = deg ? { 0:"up", 90:"right", 180:"down", 270:"left" }[String(Math.round((+deg[1] % 360 + 360) % 360))] || "down" : "down";
+  return { from:hex[0], to:hex[hex.length - 1], dir };
+}
 function sanitizeSkinDef(raw) {
   if (!raw || typeof raw !== "object" || !raw.colors || typeof raw.colors !== "object") return null;
   const colors = {};
@@ -184,9 +197,11 @@ function sanitizeSkinDef(raw) {
     if (typeof v !== "string" || !HEX.test(v)) return null;
     colors[k] = v.toLowerCase();
   }
+  colors.bg2 = typeof raw.colors.bg2 === "string" && HEX.test(raw.colors.bg2) ? raw.colors.bg2.toLowerCase() : "";   // グラデ先用（任意）
   return {
     name: String(raw.name || "").trim().slice(0, 24) || "Custom",
     colors, glow: !!raw.glow, scanlines: !!raw.scanlines,
+    gradDir: GRAD_DIRS.includes(raw.gradDir) ? raw.gradDir : "none",
     font: has(FONT_PRESETS, raw.font) ? raw.font : "default",
     video: has(VIDEO_PRESETS, raw.video) ? raw.video : "mono",
     mascot: MASCOT_IDS.includes(raw.mascot) ? raw.mascot : "none"
@@ -194,18 +209,19 @@ function sanitizeSkinDef(raw) {
 }
 function buildCustomSkin(def) {
   const c = def.colors, dark = luminance(c.bg) < .35;
+  const grad = c.bg2 && def.gradDir && def.gradDir !== "none" ? `linear-gradient(${GRAD_ANGLE[def.gradDir]}, ${c.bg}, ${c.bg2})` : null;   // --ui-bg と game.stage はそのまま CSS background へ
   return {
     custom:true,
     label:{ en:def.name },
     desc:{ ja:"カスタムスキン", en:"Custom skin", zh:"自定义皮肤", ko:"커스텀 스킨" },
-    ui:{ "--ui-bg":c.bg, "--ui-panel":hexToRgba(c.panel, .96), "--ui-soft":hexToRgba(c.text, .05), "--ui-text":c.text,
+    ui:{ "--ui-bg":grad || c.bg, "--ui-panel":hexToRgba(c.panel, .96), "--ui-soft":hexToRgba(c.text, .05), "--ui-text":c.text,
       "--ui-muted":mixHex(c.text, c.panel, .38), "--ui-border":hexToRgba(c.text, .18),
       "--ui-button":mixHex(c.panel, c.text, .06), "--ui-button-hover":mixHex(c.panel, c.text, .13),
       "--ui-field":mixHex(c.bg, c.panel, .5), "--ui-accent":c.accent,
       "--ui-on-accent":luminance(c.accent) > .45 ? "#111111" : "#ffffff", "--ui-gold":c.gold,
       "--ui-shadow":dark ? "0 24px 80px rgba(0,0,0,.55)" : "0 24px 70px rgba(30,40,60,.16)",
       "--ui-glow":hexToRgba(c.accent, .14) },
-    game:{ don:c.accent, ka:c.gold, stage:c.bg, lane:hexToRgba(c.panel, dark ? .6 : .82), track:hexToRgba(c.text, .24),
+    game:{ don:c.accent, ka:c.gold, stage:grad || c.bg, lane:hexToRgba(c.panel, dark ? .6 : .82), track:hexToRgba(c.text, .24),
       ink:c.text, inkShadow:dark ? "rgba(0,0,0,.85)" : "rgba(255,255,255,.9)", noteBorder:"#ffffff",
       panel:hexToRgba(c.panel, .95), perfect:c.gold, good:c.text, miss:mixHex(c.text, c.bg, .45),
       glow:def.glow, scanlines:def.scanlines },

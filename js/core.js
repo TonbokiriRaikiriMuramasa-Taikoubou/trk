@@ -85,7 +85,7 @@ const settings = {
   videoZoom: num(prefs.videoZoom, .5, 3, 1),
   videoKeys: savedVideoKeys,
   castPolicy: pick(prefs.castPolicy, ["off", "antenna"], "off"),
-  backgroundPolicy: pick(prefs.backgroundPolicy, ["off", "antenna"], prefs.castPolicy === "antenna" ? "antenna" : "off"),
+  backgroundPolicy: pick(prefs.backgroundPolicy, ["off", "antenna", "corner"], prefs.castPolicy === "antenna" ? "antenna" : "off"),
   bgDim: num(prefs.bgDim, 0, .9, 0),
   bgBlur: num(prefs.bgBlur, 0, 12, 0),
   scroll: num(prefs.scroll, .5, 2.5, 1.2),

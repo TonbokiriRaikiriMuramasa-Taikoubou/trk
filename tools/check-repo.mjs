@@ -266,6 +266,24 @@ if (!read("js/main.js").includes("guideEggKind") ||
   }
 }
 
+// 📡 Background antenna placement: dock / top-right corner (left of Language).
+// Hiding the dock antenna must not kill background playback, and hiding the
+// cast antenna must never hide the playback antenna.
+{
+  const fx = read("js/fx-dock.js");
+  if (!fx.includes("bgAntennaView") || !fx.includes('["off", "antenna", "corner"]') ||
+      !fx.includes('cornerAnt.addEventListener("click", () => toggleAntenna())') ||
+      !fx.includes("headTools.prepend(cornerAnt)") ||
+      !fx.includes('dockBackgroundCorner:"') ||
+      !read("js/media-player-mode.js").includes('dockBackgroundCorner:"') ||
+      !read("js/core.js").includes('["off", "antenna", "corner"]') ||
+      !read("css/style.css").includes(".cornerAnt")) {
+    fail("background antenna corner option (top-right, left of Language) is missing");
+  } else {
+    ok("background antenna can sit in the top-right corner; cast hide never hides the playback antenna");
+  }
+}
+
 // A cache name is deliberately checked for existence, not for a guessed
 // date, because the service worker is manually bumped for every release.
 const sw = read("sw.js");

@@ -680,6 +680,19 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
 #fxDock .dockAnt.on,#fxDock.ant .dockAnt{background:rgba(56,189,248,.18);border-color:#38bdf8;box-shadow:0 0 12px rgba(56,189,248,.45)}
 #fxDock .dockAnt .antTxt{font-size:10px;font-weight:900;letter-spacing:.05em;color:var(--ui-muted)}
 #fxDock.ant .dockAnt .antTxt{color:#38bdf8}
+
+/* 📡 右上のコンパクトアンテナ（backgroundPolicy=corner。言語選択の左） */
+.cornerAnt{position:relative;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;
+  font-size:17px;line-height:1;border-radius:10px;cursor:pointer;background:rgba(0,0,0,.22);
+  border:1px solid rgba(255,255,255,.22);transition:transform .2s,box-shadow .2s,background .2s,border-color .2s}
+.cornerAnt:hover{transform:scale(1.08)}
+.cornerAnt:active{transform:scale(.95)}
+.cornerAnt .caIcon{display:inline-block;transition:transform .35s cubic-bezier(0.34,1.56,0.64,1)}
+.cornerAnt.on{background:rgba(56,189,248,.16);border-color:#38bdf8;box-shadow:0 0 12px rgba(56,189,248,.45)}
+.cornerAnt.on .caIcon{transform:rotate(-22deg)}
+.cornerAnt .caSignal{position:absolute;inset:-4px;border-radius:12px;border:2px solid #38bdf8;opacity:0;pointer-events:none}
+.cornerAnt.on .caSignal{animation:caSignalPulse 1.6s ease-out infinite}
+@keyframes caSignalPulse{0%{transform:scale(.75);opacity:.85}100%{transform:scale(1.45);opacity:0}}
 #fxDock .antSettingsRow{display:flex;flex-direction:column;gap:6px;margin-top:4px}
 .antRod{display:none}
 .dockSlots{display:grid;grid-template-columns:repeat(var(--cols,5),1fr);gap:8px}

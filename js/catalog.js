@@ -168,9 +168,9 @@ S("bluearchive", "ブルーアーカイブ", "🎒", "blue", "ソーシャルゲ
   "公式サウンドトラック（Vol.1〜Vol.4）は各種サブスク・ストアで配信中。公式YouTubeチャンネルでも聴けます。音源はご自身で入手してMusicフォルダへ。",
   "https://bluearchive.jp/",
   [PL("ba-ost", "ブルアカ OST 厳選", "🎧", "blue", ["Game","Blue Archive","OST","Mitsukiyo"],
-    [T("Unwelcome School", "Blue Archive Original Soundtrack Vol.4", "Mitsukiyo"),
-     T("Constant Moderato", "Blue Archive Original Soundtrack Vol.1", "Mitsukiyo"),
-     T("青春のアーカイブ", "", "")])]);
+    [T("Unwelcome School", "Blue Archive Original Soundtrack Vol.4", "Mitsukiyo", "https://bluearchive.fandom.com/wiki/Blue_Archive_Original_Soundtrack_Vol.4"),
+     T("Constant Moderato", "Blue Archive Original Soundtrack Vol.1", "Mitsukiyo", "https://bluearchive.fandom.com/wiki/Blue_Archive_Original_Soundtrack_Vol.1"),
+     T("青春のアーカイブ", "Blue Archive OST", "Nor", "https://bluearchive.jp/")])]);
 
 /* ================= 🩺 アークナイツ（Hypergravity / Yostar） =================
    公式レーベル「Monster-Siren Records（塞壬唱片）」は全楽曲を公式サイトで公開・販売。

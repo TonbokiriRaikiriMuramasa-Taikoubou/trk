@@ -714,6 +714,7 @@ function ensureTrkFolder() {
   ensureTrkSubfolder("trk-touhou", "Touhou", "⛩️");
   ensureTrkSubfolder("trk-arknights", "Arknights", "🎮");
   ensureTrkSubfolder("trk-gakumas", "Gakum@s", "🎤");
+  ensureTrkSubfolder("trk-endfield", "Endfield", "🛰️");
   return settings.plFolders.find(x => x.id === TRK_FOLDER_ID) || f || null;
 }
 function trkWishesFromCatalog() {
@@ -800,7 +801,7 @@ function trkOrderedPlaylists(list) {
 }
 function trkMovePlaylist(id, dir) {
   let order = (settings.playlistOrder||[]).slice();
-  const ids = trkOrderedPlaylists(settings.playlists.filter(p=> p.folder===TRK_FOLDER_ID || p.folder==="trk-classic" || p.folder==="trk-ba" || p.folder==="trk-touhou" || p.folder==="trk-arknights" || p.folder==="trk-gakumas" || settings.plFolders.some(f=> f.id===p.folder && f.parent===TRK_FOLDER_ID) )).map(p=>p.id);
+  const ids = trkOrderedPlaylists(settings.playlists.filter(p=> p.folder===TRK_FOLDER_ID || p.folder==="trk-classic" || p.folder==="trk-ba" || p.folder==="trk-touhou" || p.folder==="trk-arknights" || p.folder==="trk-gakumas" || p.folder==="trk-endfield" || settings.plFolders.some(f=> f.id===p.folder && f.parent===TRK_FOLDER_ID) )).map(p=>p.id);
   // ensure order contains all ids
   for (const pid of ids) if (!order.includes(pid)) order.push(pid);
   const i = order.indexOf(id);
@@ -831,7 +832,7 @@ function trkWishesForSeries(seriesId) {
 function ensureTrkDistributionPlaylists() {
   ensureTrkFolder();
   const cat = window.TRK_CATALOG || [];
-  const folderMap = { bluearchive: "trk-ba", touhou: "trk-touhou", arknights: "trk-arknights", gakumas: "trk-gakumas" };
+  const folderMap = { bluearchive: "trk-ba", touhou: "trk-touhou", arknights: "trk-arknights", gakumas: "trk-gakumas", endfield: "trk-endfield" };
   let changed = false;
   for (const s of cat) {
     const folder = folderMap[s.id];
@@ -1056,8 +1057,8 @@ function plFolderMenu(f) {
   d.card.append(plRow(tr("plName"), name), plRow(tr("plIcon"), icon), plRow(tr("plColor"), color),
     plRow(tr("plFolderOf"), parent), save, del);
   // 🐔 trk folder special: show inner playlists (Game Vol.1, Classic Vol.1, BlueArchive etc.) for quick open
-  if (f.id === TRK_FOLDER_ID || f.id === "trk-classic" || f.id === "trk-ba" || f.id === "trk-touhou" || f.id === "trk-arknights" || f.id === "trk-gakumas") {
-    const innerIds = f.id === TRK_FOLDER_ID ? [TRK_FOLDER_ID, "trk-classic", "trk-ba", "trk-touhou", "trk-arknights", "trk-gakumas"] : [f.id];
+  if (f.id === TRK_FOLDER_ID || f.id === "trk-classic" || f.id === "trk-ba" || f.id === "trk-touhou" || f.id === "trk-arknights" || f.id === "trk-gakumas" || f.id === "trk-endfield") {
+    const innerIds = f.id === TRK_FOLDER_ID ? [TRK_FOLDER_ID, "trk-classic", "trk-ba", "trk-touhou", "trk-arknights", "trk-gakumas", "trk-endfield"] : [f.id];
     const allInner = settings.playlists.filter(p => innerIds.includes(p.folder) || (f.id===TRK_FOLDER_ID && settings.plFolders.some(ff=> innerIds.includes(ff.id) && ff.id===p.folder)) );
     if (allInner.length) {
       d.card.append(el("div", "plSep"));
@@ -2410,7 +2411,7 @@ function renderTrkSettings() {
   const box = $("trkOrderList");
   if (!box) return;
   box.replaceChildren();
-  const innerIds = [TRK_FOLDER_ID, "trk-classic", "trk-ba", "trk-touhou", "trk-arknights", "trk-gakumas"];
+  const innerIds = [TRK_FOLDER_ID, "trk-classic", "trk-ba", "trk-touhou", "trk-arknights", "trk-gakumas", "trk-endfield"];
   const list = settings.playlists.filter(p => innerIds.includes(p.folder) || settings.plFolders.some(f=> f.parent===TRK_FOLDER_ID && f.id===p.folder && innerIds.includes(f.id)) || innerIds.includes(p.folder));
   // also include playlists whose folder is a direct trk subfolder
   const trkList = settings.playlists.filter(p => {

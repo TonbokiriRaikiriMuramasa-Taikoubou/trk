@@ -253,7 +253,47 @@ S("arknights", "アークナイツ", "🩺", "amber", "ソーシャルゲーム"
      T("Chronicles", "Maria Nearl", "塞壬唱片-MSR", "https://monster-siren.hypergryph.com/")]),
    PL("ak-wolumonde", "アークナイツ — Twilight of Wolumonde", "🌲", "green", ["Game","Arknights","MSR","Twilight of Wolumonde"],
     [T("Twilight of Wolumonde", "Twilight of Wolumonde OST", "塞壬唱片-MSR", "https://monster-siren.hypergryph.com/"),
-     T("Wolumonde's Lullaby", "Twilight of Wolumonde", "塞壬唱片-MSR", "https://monster-siren.hypergryph.com/")])]);
+     T("Wolumonde's Lullaby", "Twilight of Wolumonde", "塞壬唱片-MSR", "https://monster-siren.hypergryph.com/")]),
+   PL("ak-babel", "アークナイツ — Babel", "🗼", "blue", ["Game","Arknights","MSR","Babel"],
+    [T("Storyteller", "Babel OST", "吳瀟Mia", "https://monster-siren.hypergryph.com/"),
+     T("Fire's Embrace", "Babel OST", "Alex Roe", "https://monster-siren.hypergryph.com/"),
+     T("The Opening", "Babel OST", "", "https://monster-siren.hypergryph.com/"),
+     T("Founding Stone", "Babel OST", "Sara Barone", "https://monster-siren.hypergryph.com/"),
+     T("Silent Tales", "Babel OST", "Sara Barone", "https://monster-siren.hypergryph.com/")]),
+   PL("ak-hen", "アークナイツ — 痕", "🩹", "red", ["Game","Arknights","MSR","痕"],
+    [T("痕 — Wounds", "痕 OST", "塞壬唱片-MSR", "https://monster-siren.hypergryph.com/"),
+     T("Scars of the Past", "痕 OST", "塞壬唱片-MSR", "https://monster-siren.hypergryph.com/"),
+     T("Remnants", "痕 OST", "塞壬唱片-MSR", "https://monster-siren.hypergryph.com/"),
+     T("Echoes of Terra", "痕 OST", "塞壬唱片-MSR", "https://monster-siren.hypergryph.com/")])]);
+
+/* ================= 🛰️ アークナイツ：エンドフィールド（Hypergryph / Gryphline） =================
+   音楽レーベル「Metal Scar Radio（鐵痕電台）」は Arknights: Endfield の公式レーベル。
+   Monster Siren Records と同じ Hypergryph による運営で、YouTube 公式アートトラックで試聴・配信中。 */
+S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber", "ソーシャルゲーム", "🎮",
+  "音楽レーベル「Metal Scar Radio（鐵痕電台）」の公式配信曲。YouTube 公式アートトラックや各種サブスクで試聴できます。ツール https://github.com/2t3/endfield-ost-download はタイトル確認に便利です（本カタログは音源を同梱せず、曲名の事実情報と公式入手先のみ）。",
+  "https://endfield.hypergryph.com/",
+  [PL("ef-blurring", "Endfield — Blurring", "🌫️", "gray", ["Game","Endfield","Metal Scar Radio","MSR Endfield"],
+    [T("Blurring", "Blurring", "Metal Scar Radio", "https://www.youtube.com/@ArknightsEndfield"),
+     T("Blurring (Instrumental)", "Blurring", "Metal Scar Radio", "https://endfield.hypergryph.com/")]),
+   PL("ef-ashen", "Endfield — ASHEN REMAINS", "🔥", "red", ["Game","Endfield","Metal Scar Radio","Levatein"],
+    [T("ASHEN REMAINS", "ASHEN REMAINS — Levatein OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2027624810168390017"),
+     T("ASHEN REMAINS (Instrumental)", "ASHEN REMAINS", "Metal Scar Radio", "https://endfield.hypergryph.com/")]),
+   PL("ef-floaty", "Endfield — The Floaty Envelope", "✉️", "blue", ["Game","Endfield","Metal Scar Radio","Gilberta"],
+    [T("The Floaty Envelope", "The Floaty Envelope — Gilberta OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2027624810168390017"),
+     T("The Floaty Envelope (Instrumental)", "The Floaty Envelope", "Metal Scar Radio", "https://endfield.hypergryph.com/")]),
+   PL("ef-makers", "Endfield — MAKER'S LUV", "💖", "pink", ["Game","Endfield","Metal Scar Radio","Yvonne"],
+    [T("MAKER'S LUV", "MAKER'S LUV — Yvonne OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2027624810168390017")]),
+   PL("ef-firstorder", "Endfield — 初号指令 OST", "📜", "amber", ["Game","Endfield","Metal Scar Radio","First Order"],
+    [T("初号指令 OST 上 — Part 1", "初号指令 OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2022928866638205084"),
+     T("初号指令 OST 上 — Part 2", "初号指令 OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2022928866638205084"),
+     T("初号指令 OST 下 — Part 1", "初号指令 OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2022928866638205084"),
+     T("初号指令 OST 下 — Part 2", "初号指令 OST", "https://x.com/AKEndfieldJP/status/2022928866638205084")]),
+   PL("ef-signal", "Endfield — The Signal Is Still Pulsing", "📡", "green", ["Game","Endfield","Metal Scar Radio","Signal"],
+    [T("The Signal Is Still Pulsing", "Metal Scar Radio #01", "Metal Scar Radio", "https://endfield.wiki.gg/wiki/Metal_Scar_Radio"),
+     T("The Magic Radio", "Metal Scar Radio #02", "Metal Scar Radio", "https://endfield.wiki.gg/wiki/Metal_Scar_Radio"),
+     T("Guided by Echoes", "Endfield OST", "Metal Scar Radio / Sephid", "https://www.youtube.com/watch?v=SA-aD5duoVQ"),
+     T("Rekindled", "Contingency Contract: Re-Ignition", "Metal Scar Radio / Alec Justice", "https://www.youtube.com/watch?v=3mu9Uz1dOcU"),
+     T("REAPER", "Endfield OST", "Metal Scar Radio", "https://github.com/2t3/endfield-ost-download")])]);
 
 /* ================= ⚔️ League of Legends（Riot Games） =================
    Riot Games Music の「Sessions」シリーズは、クリエイターが安心して使える

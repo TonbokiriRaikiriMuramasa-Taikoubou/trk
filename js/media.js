@@ -114,6 +114,7 @@ function ratioAt(t) {
 }
 
 /* ---------- 譜面 ---------- */
+const CHART_FILE_MAX = 2 * 1024 * 1024;   // docs/pack-format.md の譜面JSON上限に合わせる
 function estimateLevel(notes) {
   if (levelOverride) return levelOverride;
   if (!notes || !notes.length) return 1;
@@ -150,7 +151,7 @@ function estimateLevel(notes) {
 }
 /* ゲームの状態を変えずに譜面だけを作る（曲パックの書き出しでも使う） */
 function generateNotes(diff, bpm, offset, seed) {
-  if (!videoReady || !(bpm >= 60 && bpm <= 300) || !DIFFS[diff]) return [];
+  if (!videoReady || !(bpm >= 60 && bpm <= 300) || !DIFF_IDS.includes(diff)) return [];
   const d = DIFFS[diff], durMs = video.duration * 1000;
   const rand = mulberry32(hashString(`${String(seed).trim()}|${diff}|${bpm}|${offset}`));
   const step = 60000 / bpm / d.div;
@@ -321,17 +322,25 @@ function exportChart(statusId) {
   setStatus(statusId, "exportDone");
 }
 function parseNote(n) {
-  if (Array.isArray(n)) return { time:Number(n[0]), lane:Number(n[1]) };
-  if (n && typeof n === "object") {
-    let lane = n.lane ?? n.l;
-    if (lane === undefined && typeof n.type === "string") lane = n.type === "ka" ? 1 : 0;
-    return { time:Number(n.time ?? n.t), lane:Number(lane) };
+  let time, lane;
+  if (Array.isArray(n) && n.length >= 2) {
+    [time, lane] = n;
+  } else if (n && typeof n === "object" && !Array.isArray(n)) {
+    time = n.time ?? n.t;
+    lane = n.lane ?? n.l;
+    if (lane === undefined && (n.type === "ka" || n.type === "don")) lane = n.type === "ka" ? 1 : 0;
   }
-  return { time:NaN, lane:NaN };
+  return {
+    time:typeof time === "number" ? time : NaN,
+    lane:typeof lane === "number" ? lane : NaN
+  };
 }
 /* 譜面データを確認する。問題があれば { key }、OKなら { notes } を返す */
 function validateChartData(data, checkFingerprint = true) {
   if (!data || typeof data !== "object" || (data.format && !String(data.format).startsWith("shadow-taiko"))) return { key:"importBad" };
+  const has = key => Object.prototype.hasOwnProperty.call(data, key);
+  if ((has("bpm") && (typeof data.bpm !== "number" || !Number.isFinite(data.bpm))) ||
+      (has("offset") && (typeof data.offset !== "number" || !Number.isFinite(data.offset)))) return { key:"importInvalid" };
   if (!Array.isArray(data.notes) || data.notes.length > 50000) return { key:"importInvalid" };
   const notes = data.notes.map(parseNote);
   if (notes.some(n => !isFinite(n.time) || n.time < 0 || (n.lane !== 0 && n.lane !== 1))) return { key:"importInvalid" };
@@ -348,8 +357,11 @@ function applyChartData(data, mode = "imported", sid = "importStatus", checkFing
   if (v.key) { setStatus(sid, v.key); return false; }
   chart = v.notes.map(n => ({ time:Math.round(n.time), lane:n.lane, judged:false, result:null }));
   chartMode = mode;
-  chartDiff = DIFFS[data.difficulty] ? data.difficulty : settings.difficulty;
-  chartMeta = { bpm:Number(data.bpm) || 0, offset:Number(data.offset) || 0 };
+  chartDiff = DIFF_IDS.includes(data.difficulty) ? data.difficulty : settings.difficulty;
+  chartMeta = {
+    bpm:typeof data.bpm === "number" && Number.isFinite(data.bpm) ? data.bpm : 0,
+    offset:typeof data.offset === "number" && Number.isFinite(data.offset) ? data.offset : 0
+  };
   currentLevel = estimateLevel(chart);
   setStatus("chartStatus", () => chartSummary());
   if (mode === "imported") setStatus(sid, "importSuccess");
@@ -357,6 +369,10 @@ function applyChartData(data, mode = "imported", sid = "importStatus", checkFing
   return true;
 }
 async function importChartFile(file, sid = "importStatus") {
+  if (!file || typeof file.size !== "number" || !Number.isFinite(file.size) || file.size < 0 ||
+      file.size > CHART_FILE_MAX || typeof file.text !== "function") {
+    setStatus(sid, "importInvalid"); return false;
+  }
   let data = null;
   try { data = JSON.parse(await file.text()); } catch (_) { setStatus(sid, "importBad"); return false; }
   return applyChartData(data, "imported", sid, true);

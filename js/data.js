@@ -443,7 +443,7 @@ function sanitizeSkinDef(raw) {
   colors.bg2 = typeof raw.colors.bg2 === "string" && HEX.test(raw.colors.bg2) ? raw.colors.bg2.toLowerCase() : "";   // グラデ先用（任意）
   return {
     name: String(raw.name || "").trim().slice(0, 24) || "Custom",
-    colors, glow: !!raw.glow, scanlines: !!raw.scanlines,
+    colors, glow: raw.glow === true, scanlines: raw.scanlines === true,
     gradDir: GRAD_DIRS.includes(raw.gradDir) ? raw.gradDir : "none",
     font: has(FONT_PRESETS, raw.font) ? raw.font : "default",
     video: has(VIDEO_PRESETS, raw.video) ? raw.video : "mono",

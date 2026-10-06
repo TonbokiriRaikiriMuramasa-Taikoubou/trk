@@ -47,10 +47,14 @@ function saveCustomSkins() { try { localStorage.setItem(CUSTOM_SKINS_KEY, JSON.s
    保存場所の名前（shadow_taiko_…）は、これまでのデータを引き継ぐため変えていません。
    各モードの細かい設定（ORBITの見た目・STAGEの譜面・CATCHのキーなど）は、それぞれのファイルが追加します。 */
 const PREFS_KEY = "shadow_taiko_preferences_v2", OLD_PREFS_KEY = "shadow_taiko_preferences_v1", BEST_KEY = "shadow_taiko_best_v1";
+const PREFS_IMPORT_MAX = 2 * 1024 * 1024;
 let prefs = {};
 try { prefs = JSON.parse(localStorage.getItem(PREFS_KEY)) || JSON.parse(localStorage.getItem(OLD_PREFS_KEY)) || {}; } catch (_) { prefs = {}; }
 if (!prefs || typeof prefs !== "object") prefs = {};
 const pick = (v, list, def) => list.includes(v) ? v : def;
+const VIDEO_STYLE_IDS = typeof TRK_TV_PRESETS !== "undefined" && Array.isArray(TRK_TV_PRESETS)
+  ? TRK_TV_PRESETS.map(p => p && p.id).filter(id => typeof id === "string")
+  : ["skin", "color", "mono", "dim", "off"];
 const num = (v, lo, hi, def) => (typeof v === "number" && isFinite(v)) ? Math.min(hi, Math.max(lo, v)) : def;
 const clampTvDim = v => Number((Math.round(num(v, 0, .9, 0) * 20) / 20).toFixed(2));
 const clampTvBlur = v => Math.round(num(v, 0, 12, 0));
@@ -108,11 +112,11 @@ const PLAY_MODES = ["manual", "truck", "orbit", "stage", "catch"];
 const savedSkinAtBoot = typeof prefs.skin === "string" ? prefs.skin : "";   // パックのスキンは後から復元
 const settings = {
   language: pick(prefs.language, ["ja", "en", "zh", "ko"], guessLang()),
-  skin: SKINS[prefs.skin] ? prefs.skin : ({ dark:"shadow", light:"daylight" }[prefs.skin] || "shadow"),
+  skin: has(SKINS, prefs.skin) ? prefs.skin : (prefs.skin === "dark" ? "shadow" : prefs.skin === "light" ? "daylight" : "shadow"),
   skinShelfOpen: prefs.skinShelfOpen !== false,      // 🖼 スキンの棚の開閉（30種＋カスタムでも設定画面が膨らまないように）
   skinShelfCat: pick(prefs.skinShelfCat, ["all","basic","miku","dark","light","grad","fun","custom"], "all"),
   layout: pick(prefs.layout ?? prefs.gameplayLayout, Object.keys(LAYOUTS), "classic"),
-  videoStyle: pick(prefs.videoStyle, (typeof TRK_TV_PRESETS !== "undefined" ? TRK_TV_PRESETS.map(p=>p.id) : ["skin","color","mono","dim","off"]), "skin"),
+  videoStyle: pick(prefs.videoStyle, VIDEO_STYLE_IDS, "skin"),
   videoZoom: num(prefs.videoZoom, .5, 3, 1),
   videoKeys: savedVideoKeys,
   castPolicy: pick(prefs.castPolicy, ["off", "antenna"], "off"),
@@ -498,11 +502,16 @@ function exportPrefs(kind) {
     if (!didReset) {
       if (sp.has("tv") || sp.has("filter")) {
         const f = sp.get("tv") || sp.get("filter");
-        if (typeof f === "string" && f.length < 50) { settings.videoStyle = f; saveUserPrefs(); }
+        if (typeof f === "string" && f.length < 50 && VIDEO_STYLE_IDS.includes(f)) {
+          settings.videoStyle = f;
+          saveUserPrefs();
+        }
       }
       if (sp.has("skin") || sp.has("tvskin")) {
+        /* tv-dock.js loads its saved custom skins after core.js. Hand the requested ID over
+           for validation against that complete allowlist there; never persist raw URL text. */
         const s = sp.get("skin") || sp.get("tvskin");
-        if (typeof s === "string" && s.length < 50) { settings.tvDockSkin = s; saveUserPrefs(); }
+        if (typeof s === "string" && s.length < 50) window.__trkPendingTvDockSkin = s;
       }
     }
     if (didReset || doExport || pendingFactory) {
@@ -573,7 +582,7 @@ function exportPrefs(kind) {
 })();
 
 
-const skin = () => SKINS[settings.skin] || SKINS.shadow;
+const skin = () => has(SKINS, settings.skin) ? SKINS[settings.skin] : SKINS.shadow;
 const fontFamily = () => skin().font || FONT_DEFAULT;
 function activeMascot() {
   const m = settings.mascot === "skin" ? skin().mascot : settings.mascot;
@@ -696,7 +705,8 @@ const travelMs = () => 1700 / settings.scroll;
 /* 判定幅（難易度 × 判定の厳しさ） */
 const JUDGE_SCALE = { lenient:1.3, standard:1, strict:.75 };
 const windows = () => {
-  const d = DIFFS[chartDiff] || DIFFS.normal, k = JUDGE_SCALE[settings.judge] || 1;
+  const d = DIFF_IDS.includes(chartDiff) ? DIFFS[chartDiff] : DIFFS.normal;
+  const k = Object.prototype.hasOwnProperty.call(JUDGE_SCALE, settings.judge) ? JUDGE_SCALE[settings.judge] : 1;
   return { perfect:d.perfect * k, good:d.good * k };
 };
 
@@ -717,7 +727,8 @@ const modsUnranked = () => settings.judge === "lenient" || settings.rate < 1;
 const LIVES_TAG = { knight:"🛡 KNIGHT", chicken:"🐔 trk!", none:"♾ INFINITE" };
 function renderModsLine() {
   const n = $("modsLine"); if (!n) return;
-  const mods = [...activeMods(), ...(LIVES_TAG[settings.lives] ? [LIVES_TAG[settings.lives]] : []), ...(settings.autoPlay ? ["▶ AUTO"] : [])];
+  const lifeTag = Object.prototype.hasOwnProperty.call(LIVES_TAG, settings.lives) ? LIVES_TAG[settings.lives] : "";
+  const mods = [...activeMods(), ...(lifeTag ? [lifeTag] : []), ...(settings.autoPlay ? ["▶ AUTO"] : [])];
   if (!mods.length) { n.textContent = ""; return; }
   const note = settings.autoPlay ? "" : modsUnranked() ? tr("unrankedNote") : settings.rate > 1 ? tr("rateRecordNote") : "";
   n.textContent = `${tr("modsLabel")}: ${mods.join(" · ")}${note ? " " + note : ""}`;
@@ -840,7 +851,9 @@ function buildSkinGrid() {
 /* 背景映像のフィルター：スキン／表示スタイルの色味 → 暗さ → ぼかし の順に重ねる */
 function videoFilter() {
   if (settings.videoStyle === "off") return "none";
-  const base = { color:"none", mono:"grayscale(1) contrast(1.6)", dim:"brightness(.42) saturate(.85)" }[settings.videoStyle] ?? (skin().video || "none");
+  const baseMap = { color:"none", mono:"grayscale(1) contrast(1.6)", dim:"brightness(.42) saturate(.85)" };
+  const base = Object.prototype.hasOwnProperty.call(baseMap, settings.videoStyle)
+    ? baseMap[settings.videoStyle] : (skin().video || "none");
   const parts = base && base !== "none" ? [base] : [];
   const dim = clampTvDim(settings.bgDim), blur = clampTvBlur(settings.bgBlur);
   /* 🪶 軽量化モード中は、いちばん重い「ぼかし」を2pxまでに抑える（設定そのものは変えません） */
@@ -855,8 +868,8 @@ function applyNoteVars() {
   root.setProperty("--don", settings.notes[0].color); root.setProperty("--ka", settings.notes[1].color);
 }
 function applySkin(id, persist = true) {
-  if (SKINS[id] && SKINS[id].locked && !settings.skinGradUnlocked) id = "shadow";   /* 🔒 ごほうびスキンは、スタンプ5つで解禁されるまで当てられない */
-  settings.skin = SKINS[id] ? id : "shadow";
+  if (has(SKINS, id) && SKINS[id].locked && !settings.skinGradUnlocked) id = "shadow";   /* 🔒 ごほうびスキンは、スタンプ5つで解禁されるまで当てられない */
+  settings.skin = has(SKINS, id) ? id : "shadow";
   const s = skin(), root = document.documentElement.style;
   for (const [k, v] of Object.entries(s.ui)) root.setProperty(k, v);
   root.setProperty("--stage-bg", s.game.stage); root.setProperty("--hud-text", s.game.ink);
@@ -1013,29 +1026,42 @@ function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
     imp.addEventListener("change", async () => {
       const f = imp.files && imp.files[0]; if (!f) return;
       try {
+        if (typeof f.size !== "number" || !Number.isFinite(f.size) || f.size < 0 || f.size > PREFS_IMPORT_MAX) {
+          throw new Error("設定ファイルは2 MiBまでです");
+        }
         const txt = await f.text(); const data = JSON.parse(txt);
+        if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("設定JSONはオブジェクト形式にしてください");
         let applied = [];
-        if (data.notes) { settings.notes = sanitizeNotes(data.notes); applied.push("notes"); }
-        if (data.videoStyle) { settings.videoStyle = data.videoStyle; applied.push("videoStyle"); }
-        if (typeof data.bgDim === "number") { settings.bgDim = clampTvDim(data.bgDim); applied.push("bgDim"); }
-        if (typeof data.bgBlur === "number") { settings.bgBlur = clampTvBlur(data.bgBlur); applied.push("bgBlur"); }
-        if ("tvParamFavs" in data) { settings.tvParamFavs = cleanTvParamFavorites(data.tvParamFavs); applied.push("tvParamFavs"); }
-        if (data.tvDockSkin) { settings.tvDockSkin = data.tvDockSkin; applied.push("tvDockSkin"); }
-        if (typeof data.musicVolume === "number") {
+        const hasImported = key => Object.prototype.hasOwnProperty.call(data, key);
+        if (hasImported("notes")) { settings.notes = sanitizeNotes(data.notes); applied.push("notes"); }
+        const importedVideoStyle = hasImported("videoStyle") ? pick(data.videoStyle, VIDEO_STYLE_IDS, "") : "";
+        if (importedVideoStyle) { settings.videoStyle = importedVideoStyle; applied.push("videoStyle"); }
+        if (hasImported("bgDim") && typeof data.bgDim === "number") { settings.bgDim = clampTvDim(data.bgDim); applied.push("bgDim"); }
+        if (hasImported("bgBlur") && typeof data.bgBlur === "number") { settings.bgBlur = clampTvBlur(data.bgBlur); applied.push("bgBlur"); }
+        if (hasImported("tvParamFavs")) { settings.tvParamFavs = cleanTvParamFavorites(data.tvParamFavs); applied.push("tvParamFavs"); }
+        const importedTvDockSkin = hasImported("tvDockSkin") && typeof data.tvDockSkin === "string" && window.TrkTV && typeof window.TrkTV.skins === "function" &&
+          window.TrkTV.skins().some(item => item && item.id === data.tvDockSkin) ? data.tvDockSkin : "";
+        if (importedTvDockSkin) { settings.tvDockSkin = importedTvDockSkin; applied.push("tvDockSkin"); }
+        if (hasImported("musicVolume") && typeof data.musicVolume === "number") {
           settings.musicVolume = num(data.musicVolume, 0, 1, settings.musicVolume);
           if (settings.musicVolume > 0) rememberMusicVolume(settings.musicVolume);
           applied.push("musicVolume");
         }
-        if (typeof data.musicVolumeRestore === "number") {
+        if (hasImported("musicVolumeRestore") && typeof data.musicVolumeRestore === "number") {
           settings.musicVolumeRestore = num(data.musicVolumeRestore, .01, 1, settings.musicVolumeRestore);
           applied.push("musicVolumeRestore");
         }
-        // 全体的にマージ（知らないキーは無視せず一応入れるが、型チェックは緩め）
+        // 既知キーだけを取り込み、型も保存済み設定と合わせる（列挙型などは次回起動時にも個別検証）。
         for (const k of Object.keys(data)) {
-          if (UNSAFE_KEYS.has(k) || k === "notes" || applied.includes(k)) continue;   /* 🛡 __proto__ / constructor / prototype は入れない */
-          if (Object.prototype.hasOwnProperty.call(settings, k)) {
-            try { settings[k] = data[k]; applied.push(k); } catch(_){}
-          }
+          if (UNSAFE_KEYS.has(k) || ["notes", "videoStyle", "tvDockSkin", "bgDim", "bgBlur", "tvParamFavs", "musicVolume", "musicVolumeRestore"].includes(k) || applied.includes(k)) continue;
+          if (!Object.prototype.hasOwnProperty.call(settings, k)) continue;
+          const current = settings[k], incoming = data[k];
+          const sameShape = Array.isArray(current) ? Array.isArray(incoming)
+            : current === null ? (incoming === null || typeof incoming === "string")
+            : current && typeof current === "object" ? !!incoming && typeof incoming === "object" && !Array.isArray(incoming)
+            : typeof incoming === typeof current && (typeof incoming !== "number" || Number.isFinite(incoming));
+          if (!sameShape) continue;
+          try { settings[k] = incoming; applied.push(k); } catch(_){}
         }
         saveUserPrefs();
         try { applyNoteVars(); if (typeof view !== "undefined") view.style.filter = videoFilter(); } catch(_){}

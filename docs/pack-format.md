@@ -17,15 +17,15 @@
 
 | 種類 | 上限 |
 |---|---:|
-| パック全体 | 500 MB |
+| パック全体 | 500 MiB |
 | 1パックの曲数 | 50曲 |
-| ノーツ画像（PNG / WebP / JPG） | 4 MB |
-| 背景画像 | 8 MB |
-| ドン／カッのヒット音（WAV / MP3 / OGG / M4A） | 5 MB |
-| 曲の音源・動画（MP3 / M4A / OGG / OGA / OPUS / WAV / FLAC / AAC / MP4 / WebM） | 250 MB |
-| 譜面JSON | 2 MB |
-| VRM | 200 MB |
-| VRMAモーション | 30 MB |
+| ノーツ画像（PNG / WebP / JPG） | 4 MiB |
+| 背景画像 | 8 MiB |
+| ドン／カッのヒット音（WAV / MP3 / OGG / M4A） | 5 MiB |
+| 曲の音源・動画（MP3 / M4A / OGG / OGA / OPUS / WAV / FLAC / AAC / MP4 / WebM） | 250 MiB |
+| 譜面JSON | 2 MiB |
+| VRM | 200 MiB |
+| VRMAモーション | 30 MiB |
 
 VRMはVRM 1.0を想定しています。MMDモデル（`.pmx` / `.pmd`）や `.vmd` は、このパック形式では扱いません。
 

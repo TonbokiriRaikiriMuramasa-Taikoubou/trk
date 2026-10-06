@@ -50,9 +50,10 @@ on("language", updateMascotUI);
 
 /* ============ スキン作成・編集 ============ */
 const MAKER_COLORS = ["bg", "bg2", "panel", "text", "accent", "gold"];
+const CUSTOM_SKIN_FILE_MAX = 256 * 1024;
 function defFromSkin(id) {
-  if (customSkinDefs[id]) return JSON.parse(JSON.stringify(customSkinDefs[id]));
-  const s = SKINS[id] || SKINS.shadow, u = s.ui;
+  if (Object.prototype.hasOwnProperty.call(customSkinDefs, id)) return JSON.parse(JSON.stringify(customSkinDefs[id]));
+  const s = has(SKINS, id) ? SKINS[id] : SKINS.shadow, u = s.ui;
   const font = !s.font ? "default" : /mono|consolas/i.test(s.font) ? "mono" : /serif/i.test(s.font) && !/sans/i.test(s.font) ? "serif" : "rounded";
   const g = parseGrad(u["--ui-bg"]);   // グラデーションのスキンをリミックスしたら、2色と向きをそのまま持ってくる
   return {
@@ -94,7 +95,7 @@ $("makerSaveNewBtn").addEventListener("click", () => {
   storeCustomSkin(newSkinId(), def); setStatus("makerStatus", "skinSaved");
 });
 $("makerOverwriteBtn").addEventListener("click", () => {
-  if (!customSkinDefs[settings.skin]) { setStatus("makerStatus", "builtinLocked"); return; }
+  if (!Object.prototype.hasOwnProperty.call(customSkinDefs, settings.skin)) { setStatus("makerStatus", "builtinLocked"); return; }
   const def = readSkinMaker(); if (!def) { setStatus("makerStatus", "skinBad"); return; }
   storeCustomSkin(settings.skin, def); setStatus("makerStatus", "skinSaved");
 });
@@ -105,6 +106,9 @@ $("makerExportBtn").addEventListener("click", () => {
 });
 $("makerImportFile").addEventListener("change", async e => {
   const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  if (typeof f.size !== "number" || !Number.isFinite(f.size) || f.size < 0 || f.size > CUSTOM_SKIN_FILE_MAX) {
+    setStatus("makerStatus", "skinBad"); return;
+  }
   let raw = null; try { raw = JSON.parse(await f.text()); } catch (_) {}
   const def = raw && (!raw.format || raw.format === SKIN_FORMAT) ? sanitizeSkinDef(raw) : null;
   if (!def) { setStatus("makerStatus", "skinBad"); return; }
@@ -113,7 +117,7 @@ $("makerImportFile").addEventListener("change", async e => {
 });
 $("makerDeleteBtn").addEventListener("click", () => {
   const id = settings.skin;
-  if (!customSkinDefs[id]) { setStatus("makerStatus", "builtinLocked"); return; }
+  if (!Object.prototype.hasOwnProperty.call(customSkinDefs, id)) { setStatus("makerStatus", "builtinLocked"); return; }
   if (!confirm(tr("confirmDelete"))) return;
   delete customSkinDefs[id]; delete SKINS[id]; saveCustomSkins();
   buildSkinGrid(); applySkin("shadow"); fillSkinMaker("shadow"); setStatus("makerStatus", "skinDeleted");

@@ -135,7 +135,7 @@ function bgAntennaView(policy) {
 }
 settings.fxEqLock = Array.isArray(prefs.fxEqLock) && prefs.fxEqLock.length === 5 ? prefs.fxEqLock.map(Boolean) : [false, false, false, false, false];
 settings.fxLockChain = !!prefs.fxLockChain;
-const skinDef = () => DOCK_SKINS[settings.fxDockSkin] || DOCK_SKINS.standard;
+const skinDef = () => Object.prototype.hasOwnProperty.call(DOCK_SKINS, settings.fxDockSkin) ? DOCK_SKINS[settings.fxDockSkin] : DOCK_SKINS.standard;
 const slotCount = () => settings.fxDockFive ? 5 : skinDef().n;
 const slotCols = () => settings.fxDockFive ? 5 : skinDef().cols;
 

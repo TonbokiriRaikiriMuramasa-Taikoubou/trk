@@ -110,6 +110,17 @@ if (bootSub[0] && bootSub[0] === bootSub[1]) bootSub[1] = "";
 
 const PLAY_MODES = ["manual", "truck", "orbit", "stage", "catch"];
 const savedSkinAtBoot = typeof prefs.skin === "string" ? prefs.skin : "";   // パックのスキンは後から復元
+/* 🪶 軽量化の許可リスト。ここで決め打ちできるので、辞書の読み込み状況に左右されない。
+   ⚠ js/lite.js はこの値を { "60":60, … }[settings.liteFps] || 30 の形で数値へ写す。
+     未知の文字列（継承キーの "constructor" など）が入ると Object 関数が truthy で返り、
+     || 30 の保険が効かずにゲート間隔が NaN になる＝軽量化が一瞬効かなくなる（M-02）。 */
+const LITE_ENUM_VALUES = {
+  liteMode: ["off", "auto", "on"],
+  liteFps: ["60", "30", "20"],
+  liteMascot: ["60", "30", "15", "off"],
+  liteScale: ["device", "1.5", "1"]
+};
+
 const settings = {
   language: pick(prefs.language, ["ja", "en", "zh", "ko"], guessLang()),
   skin: has(SKINS, prefs.skin) ? prefs.skin : (prefs.skin === "dark" ? "shadow" : prefs.skin === "light" ? "daylight" : "shadow"),
@@ -166,10 +177,10 @@ const settings = {
   bannerRandomBtn: prefs.bannerRandomBtn !== false,                          // 🎲 バナー右端のおまかせボタン（初期オン）
   bannerRandomTap: prefs.bannerRandomTap === true,                           // 🎲 タップだけで変える（初期オフ＝長押し）
   /* 🪶 軽量化（スマホ・タブレット・アプリ向け。読み込みは js/lite.js） */
-  liteMode: pick(prefs.liteMode, ["off", "auto", "on"], "auto"),             // 自動＝端末・省データ・電池を見て決める
-  liteFps: pick(prefs.liteFps, ["60", "30", "20"], "30"),                    // 描画のフレームレート上限
-  liteMascot: pick(prefs.liteMascot, ["60", "30", "15", "off"], "30"),       // 🩷 3Dマスコット（MMD／VRM）の描画レート
-  liteScale: pick(prefs.liteScale, ["device", "1.5", "1"], "1.5"),           // 描画解像度（devicePixelRatio）の上限
+  liteMode: pick(prefs.liteMode, LITE_ENUM_VALUES.liteMode, "auto"),         // 自動＝端末・省データ・電池を見て決める
+  liteFps: pick(prefs.liteFps, LITE_ENUM_VALUES.liteFps, "30"),              // 描画のフレームレート上限
+  liteMascot: pick(prefs.liteMascot, LITE_ENUM_VALUES.liteMascot, "30"),     // 🩷 3Dマスコット（MMD／VRM）の描画レート
+  liteScale: pick(prefs.liteScale, LITE_ENUM_VALUES.liteScale, "1.5"),       // 描画解像度（devicePixelRatio）の上限
   liteSpectrumOff: prefs.liteSpectrumOff !== false,                          // 📊 軽量化モード中はスペクトラムを止める
   liteFx: prefs.liteFx !== false,                                            // 軽量化モード中はぼかし・すりガラスを減らす
   liteBlur: prefs.liteBlur !== false,                                        // 軽量化モード中は映像のぼかしを最大2pxに
@@ -269,7 +280,9 @@ const gameplayFxPower = () => settings.fxPower * gameplayFxMultiplier();
      ?reset=audio / ?reset=sound      → 音量・SEをデフォルトに戻す
      ?reset=notes                     → ノーツ色・形をデフォルトに戻す（確認あり）
      ?reset=amp / ?reset=rack         → 🔥 TRKアンプ（🎚 エフェクターラック）を空に戻す
-     ?reset=all / ?factory            → 全設定リセット（ノーツも含む）。実行前に確認します（&force=1 で確認を飛ばす）
+     ?reset=all                      → 全設定リセット（ノーツも含む）。実行前に確認します（&force=1 で確認を飛ばす）
+     ?reset=factory / ?reset=full     → 上と同じ（別名）
+     ?factory                        → セーフモード（?safe=1 と同じ。全リセットではない。js/addons.js も同じ解釈）
      ?export=notes / ?export=all      → 設定をJSONでダウンロード
    ノーツ設定は細かく詰める人が多いので、tv/audioリセットでは保持される。 */
 /* ♻️ 全設定リセットの確認ダイアログ。
@@ -459,7 +472,11 @@ function exportPrefs(kind) {
   try { downloadJSON(out, `trk-${kind || "all"}-` + new Date().toISOString().slice(0,10) + ".json"); } catch(e){ console.error(e); }
 }
 function parseHashParams(hash) {
-  return new URLSearchParams(String(hash || "").replace(/^#/, "").toLowerCase());
+  /* ⚠ 小文字にするのは**キーだけ**（値まで小文字にすると、将来ケースを区別する値を
+     hash に足したときに静かに壊れる）。URLSearchParams の形は保つ（検査もそのまま通る）。 */
+  const out = new URLSearchParams();
+  for (const [k, v] of new URLSearchParams(String(hash || "").replace(/^#/, ""))) out.append(k.toLowerCase(), v);
+  return out;
 }
 // URLパラメータを解釈して即時実行（ロード時）
 (function handleUrlCommands() {
@@ -475,7 +492,11 @@ function parseHashParams(hash) {
     // export は先に判定（リセットと同時も可）
     if (has("export")) doExport = ((sp.has("export") ? get("export") : hashParams.get("export")) || "all").toLowerCase();
     // safe / safety
-    if (has("safe") || has("safety")) {
+    /* ⚠ ?factory 単体は**全リセットではなくセーフモードの合図**（?safe=1 と同じ）。
+       js/addons.js の safeNow() が昔から sp.has("factory") をセーフ扱いにしており、
+       core.js の「?factory で入る」というコメントとも一致する。壊す動作にしないのが安全側。
+       全リセットは ?reset=all / ?reset=factory / #reset=all（いずれも確認ダイアログ）。 */
+    if (has("safe") || has("safety") || sp.has("factory")) {
       enterSafeMode(); didReset = "safe";
     } else if (get("reset")) {
       const r = get("reset").toLowerCase();
@@ -747,14 +768,43 @@ function downloadBlob(blob, name) {
 }
 function downloadJSON(obj, name) { downloadBlob(new Blob([JSON.stringify(obj, null, 2)], { type:"application/json" }), name); }
 
-/* ブラウザ内保存（IndexedDB）。データベース名はこれまでと同じものを使います */
-function idbStore(dbName, store = "kv") {
+/* ブラウザ内保存（IndexedDB）。データベース名はこれまでと同じものを使います。
+   opts（省略可）：
+     sizeKey … レコードのサイズを入れているキー名。これを渡すと**そのキーに index を張り**、
+               合計を「index のキー（数値）だけ」で数えられるようになる（レコード本体＝Blob を復元しない）。
+     sizeOf  … sizeKey が無い古いレコードからサイズを計算する関数（index への移行と、数え直しの両方で使う）。 */
+const IDB_VERSION = 2;   /* v2＝サイズ index。v1→v2 の移行で size を持たない古いレコードへ書き戻す */
+function idbStore(dbName, store = "kv", opts = null) {
+  const opt = opts || {};
+  const sizeKey = opt.sizeKey || "";
+  const sizeOf = typeof opt.sizeOf === "function" ? opt.sizeOf
+    : (rec => (rec && Number.isFinite(rec[sizeKey]) ? rec[sizeKey] : 0));
   let p = null;
   const open = () => p || (p = new Promise((res, rej) => {
-    const r = indexedDB.open(dbName, 1);
-    r.onupgradeneeded = () => { if (!r.result.objectStoreNames.contains(store)) r.result.createObjectStore(store); };
+    const r = indexedDB.open(dbName, IDB_VERSION);
+    r.onupgradeneeded = () => {
+      const db = r.result;
+      if (!db.objectStoreNames.contains(store)) db.createObjectStore(store);
+      const os = r.transaction.objectStore(store);
+      if (!sizeKey || os.indexNames.contains(sizeKey)) return;
+      os.createIndex(sizeKey, sizeKey);
+      /* ⚠ 移行を省くと「size を持たないレコード」が index に載らず、**合計が過小**になって
+         上限を素通しする（＝危険な方向）。なので v1→v2 の一度きりで size を書き戻す。 */
+      const cur = os.openCursor();
+      cur.onsuccess = () => {
+        const c = cur.result; if (!c) return;
+        const rec = c.value;
+        if (rec && typeof rec === "object" && !Array.isArray(rec) && !Number.isFinite(rec[sizeKey])) {
+          try { c.update(Object.assign({}, rec, { [sizeKey]: sizeOf(rec) })); } catch (_) {}
+        }
+        c.continue();
+      };
+    };
     r.onsuccess = () => res(r.result);
     r.onerror = () => { p = null; rej(r.error); };
+    /* ⚠ バージョンを上げたので、古いタブが v1 を掴んでいるとブロックされる。
+       onblocked を貼らないと onsuccess も onerror も来ず、**保存が永遠に固まる**。 */
+    r.onblocked = () => { p = null; rej(new Error("idb-blocked")); };
   }));
   const run = async (mode, fn) => {
     const db = await open();
@@ -764,19 +814,67 @@ function idbStore(dbName, store = "kv") {
       tx.onerror = tx.onabort = () => rej(tx.error);
     });
   };
+  /* 合計を index のキー（数値）だけで組み立てる。レコード本体（Blob）を復元しない。
+     ⚠ **件数と食い違ったら null を返す**。それは「size を持たないレコードがある」ということで、
+        合計が過小＝上限を素通しする危険な向きなので、呼び出し側で全件を数え直させる。 */
+  const statsFromKeys = (keys, count, prev) => {
+    if (!Array.isArray(keys) || !Number.isFinite(count) || keys.length !== count) return null;
+    let stored = 0;
+    for (const k of keys) {
+      /* 数値でないキー＝壊れた size（文字列など）を持ち込まれた状態。0 として足すと**過小**になるので、
+         ここも null を返して全件を数え直させる（安全側＝数え直しに倒す）。 */
+      if (!Number.isFinite(k) || k < 0) return null;
+      stored += k;
+    }
+    return { stored, replacing: prev == null ? 0 : sizeOf(prev), count, fast: true };
+  };
+  /* 全レコードを読む、遅いが確実な経路（index が使えない／件数が食い違ったとき） */
+  const statsFromAll = (os, replacingId, cb) => {
+    const req = os.getAll();
+    req.onsuccess = () => {
+      const list = req.result || [];
+      cb({
+        stored: list.reduce((a, r) => a + sizeOf(r), 0),
+        replacing: list.reduce((a, r) => a + (r && replacingId != null && r.id === replacingId ? sizeOf(r) : 0), 0),
+        count: list.length, fast: false
+      });
+    };
+  };
+  /* stats を取る共通部分。replacingId を渡すと「置き換えられる分」も一緒に返す。 */
+  const readStats = (os, replacingId, cb) => {
+    const idx = sizeKey && os.indexNames.contains(sizeKey) ? os.index(sizeKey) : null;
+    if (!idx) { statsFromAll(os, replacingId, cb); return; }
+    let keys = null, count = null, prev = replacingId == null ? null : undefined, out = null;
+    const maybe = () => {
+      if (out || keys === null || count === null || prev === undefined) return;
+      out = statsFromKeys(keys, count, prev);
+      if (out) cb(out); else statsFromAll(os, replacingId, s => { out = s; cb(s); });
+    };
+    idx.getAllKeys().onsuccess = e => { keys = e.target.result || []; maybe(); };
+    os.count().onsuccess = e => { count = e.target.result || 0; maybe(); };
+    if (replacingId == null) prev = null;
+    else os.get(replacingId).onsuccess = e => { prev = e.target.result == null ? null : e.target.result; maybe(); };
+  };
   return {
     get: k => run("readonly", s => s.get(k)),
     put: (k, v) => run("readwrite", s => s.put(v, k)),
+    /* 合計だけを知りたいとき（Blob を復元しない。件数が食い違えば自動で全件を数え直す） */
+    usage: () => open().then(db => new Promise((res, rej) => {
+      const tx = db.transaction(store, "readonly"), os = tx.objectStore(store);
+      readStats(os, null, res);
+      tx.onerror = tx.onabort = () => rej(tx.error || new Error("IndexedDB usage read failed"));
+    })),
+    /* 上限の判定と put を**同じ readwrite トランザクション内**で一体化する（複数タブ間の競合を防ぐ）。
+       predicate には全レコードではなく**集計値** { stored, replacing, count, fast } を渡す。 */
     putIf: (k, v, predicate) => open().then(db => new Promise((res, rej) => {
-      const tx = db.transaction(store, "readwrite"), objectStore = tx.objectStore(store);
+      const tx = db.transaction(store, "readwrite"), os = tx.objectStore(store);
       let permitted = false, checkError = null;
-      const req = objectStore.getAll();
-      req.onsuccess = () => {
+      readStats(os, v && v.id, stats => {
         try {
-          permitted = predicate(req.result) === true;
-          if (permitted) objectStore.put(v, k);
+          permitted = predicate(stats) === true;
+          if (permitted) os.put(v, k);
         } catch (e) { checkError = e; tx.abort(); }
-      };
+      });
       tx.oncomplete = () => res(permitted);
       tx.onerror = tx.onabort = () => rej(checkError || tx.error || new Error("IndexedDB transaction aborted"));
     })),
@@ -1006,9 +1104,18 @@ function showScreen(id) {
 function openSettings() { if (phase === "title") { showScreen("settingsScreen"); emit("settings"); } }   /* 🧭 スタンプ「設定を見た」の検知 */
 function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
 
-/* Emergency settings imports validate enum IDs at the boundary, before live settings are changed. */
+/* Emergency settings imports validate enum IDs at the boundary, before live settings are changed.
+   列挙IDの検証対象（増やしたら tools/check-security.mjs も更新）。
+   ⚠ 辞書が要るもの（TrkSpec/TrkMMD/TrkFX）は、その辞書が読めていないと fail-closed で落ちる。
+      🪶 軽量化のように core.js で決め打ちできるものは LITE_ENUM_VALUES へ寄せる（読み込み順に左右されない）。 */
+const SETTING_ENUM_KEYS = ["specStyle", "specTheme", "mmdMotionKind", "fxPreset",
+  "liteMode", "liteFps", "liteMascot", "liteScale"];
+/* Importで弾いた理由（対応が変わるので、表示では区別して出す） */
+const SKIP_WHY = { enum:"prefSkipWhyId", type:"prefSkipWhyType", unknown:"prefSkipWhyUnknown", failed:"prefSkipWhyType" };
 function validImportedSettingEnum(key, value) {
   if (typeof value !== "string") return false;
+  const staticList = LITE_ENUM_VALUES[key];
+  if (staticList) return staticList.includes(value);
   try {
     if (key === "specStyle") return !!window.TrkSpec && window.TrkSpec.styles().includes(value);
     if (key === "specTheme") return !!window.TrkSpec && window.TrkSpec.themes().includes(value);
@@ -1065,7 +1172,7 @@ function validImportedSettingEnum(key, value) {
         }
         const txt = await f.text(); const data = JSON.parse(txt);
         if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("設定JSONはオブジェクト形式にしてください");
-        let applied = [];
+        let applied = [], rejected = [];
         const hasImported = key => Object.prototype.hasOwnProperty.call(data, key);
         if (hasImported("notes")) { settings.notes = sanitizeNotes(data.notes); applied.push("notes"); }
         const importedVideoStyle = hasImported("videoStyle") ? pick(data.videoStyle, VIDEO_STYLE_IDS, "") : "";
@@ -1085,23 +1192,43 @@ function validImportedSettingEnum(key, value) {
           settings.musicVolumeRestore = num(data.musicVolumeRestore, .01, 1, settings.musicVolumeRestore);
           applied.push("musicVolumeRestore");
         }
+        /* 理由つきで記録する（「この端末に無いID」と「型が違う」では利用者の対応が変わる）。
+           ⚠ rejected に入るのは**表示用の文字列**なので、重複よけは別に生のキーで持つ。 */
+        const rejectedKeys = new Set();
+        const reject = (k, why) => {
+          if (rejectedKeys.has(k)) return;
+          rejectedKeys.add(k);
+          rejected.push(tr(SKIP_WHY[why] || SKIP_WHY.unknown, { k }));
+        };
         // 既知キーだけを取り込み、型と列挙IDは代入前に検証する。
+        // ⚠ 弾いたキーは黙って捨てない（「読み込みました」なのに反映されない事故を防ぐ）。最後にまとめて報告する。
         for (const k of Object.keys(data)) {
           if (UNSAFE_KEYS.has(k) || ["notes", "videoStyle", "tvDockSkin", "bgDim", "bgBlur", "tvParamFavs", "musicVolume", "musicVolumeRestore"].includes(k) || applied.includes(k)) continue;
-          if (!Object.prototype.hasOwnProperty.call(settings, k)) continue;
+          if (!Object.prototype.hasOwnProperty.call(settings, k)) { reject(k, "unknown"); continue; }
           const current = settings[k], incoming = data[k];
           const sameShape = Array.isArray(current) ? Array.isArray(incoming)
             : current === null ? (incoming === null || typeof incoming === "string")
             : current && typeof current === "object" ? !!incoming && typeof incoming === "object" && !Array.isArray(incoming)
             : typeof incoming === typeof current && (typeof incoming !== "number" || Number.isFinite(incoming));
-          if (!sameShape) continue;
-          if (["specStyle", "specTheme", "mmdMotionKind", "fxPreset"].includes(k) && !validImportedSettingEnum(k, incoming)) continue;
-          try { settings[k] = incoming; applied.push(k); } catch(_){}
+          if (!sameShape) { reject(k, "type"); continue; }
+          if (SETTING_ENUM_KEYS.includes(k) && !validImportedSettingEnum(k, incoming)) { reject(k, "enum"); continue; }
+          try { settings[k] = incoming; applied.push(k); } catch(_){ reject(k, "failed"); }
+        }
+        /* 上の個別処理で黙って落としたキーも同じように報告する。
+           理由は落とし方ごとに決まる：videoStyle／tvDockSkin は許可リスト不一致、
+           それ以外（bgDim／bgBlur／musicVolume など）は型が合わなかったときだけ残る。 */
+        for (const k of Object.keys(data)) {
+          if (applied.includes(k) || rejectedKeys.has(k) || UNSAFE_KEYS.has(k)) continue;
+          reject(k, ["videoStyle", "tvDockSkin"].includes(k) ? "enum" : "type");
         }
         saveUserPrefs();
         try { applyNoteVars(); if (typeof view !== "undefined") view.style.filter = videoFilter(); } catch(_){}
-        setSt(() => `📥 読み込みました: ${applied.join(", ")} — 再読み込みします`);
-        setTimeout(()=> location.reload(), 900);
+        /* 長くなりすぎないよう先頭12件まで表示し、残りは件数だけ添える（表示は言語を選ばない記号のみ） */
+        const keyList = keys => keys.slice(0, 12).join(", ") + (keys.length > 12 ? ` …+${keys.length - 12}` : "");
+        if (rejected.length) setSt("prefImportedPartial", { list:keyList(applied), skipped:keyList(rejected) });
+        else setSt("prefImported", { list:keyList(applied) });
+        /* 未適用の告知は読む時間が要るので、そのときだけ再読み込みを遅らせる */
+        setTimeout(()=> location.reload(), rejected.length ? 2600 : 900);
       } catch(e) {
         console.error(e);
         setSt(() => "読み込み失敗: " + (e.message || e));

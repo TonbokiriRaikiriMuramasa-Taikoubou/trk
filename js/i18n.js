@@ -180,6 +180,7 @@ const TEXT = {
     packStoreLimit:"保存済みパックの合計は{max} MiBまでです。不要なパックを削除してから読み込んでください。",
     packStorageQuota:"端末の保存容量が足りません。不要なパックを削除するか、空き容量を増やして再試行してください。",
     packStorageCheckFailed:"保存済みパックの容量を確認できませんでした。ページを再読み込みしてから、もう一度お試しください。",
+    packDbBlocked:"他のタブで trk! が開いているため保存できません。他のタブを閉じてから、もう一度お試しください。",
     packUnsupported:"このブラウザはパックの展開に対応していません。最新のブラウザをお使いください。",
     packConfirm:"このパックにはVRMモデルが含まれています。作者の利用条件を確認してから使ってください。\n\n利用条件：",
     confirmDeletePack:"このパックを削除しますか？（入っていた曲も曲リストから消えます）",
@@ -280,6 +281,9 @@ const TEXT = {
     recStarHint:"称号：🥁MANUAL／🚚TRUCK／🪐ORBIT／🎪STAGE／🚛CATCH＝クリア、⚔＝Sランク以上、🐔＝ノーミス（曲ごとに上の段階で上書き）　⭐＝ALL PERFECT　FC＝フルコンボ　🏁＝最高クリア速度（AUTO・途中終了・練習扱いは対象外）",
     recExport:"⇩ 記録をバックアップ", recImport:"⇧ バックアップを読み込む", recReset:"🗑 この曲の記録を消す",
     recConfirmReset:"この曲の記録をすべて消しますか？", recExported:"記録を書き出しました。", recImported:"記録を読み込みました（{n}曲）。",
+    prefImported:"📥 読み込みました: {list} — 再読み込みします",
+    prefImportedPartial:"📥 読み込みました: {list} — 再読み込みします（未適用: {skipped}）",
+    prefSkipWhyId:"{k}（この端末に無いID）", prefSkipWhyType:"{k}（型が違う）", prefSkipWhyUnknown:"{k}（この設定に無いキー）",
     recBad:"記録ファイルの形式が正しくありません。", recCleared:"この曲の記録を消しました。"
   },
 
@@ -452,6 +456,7 @@ const TEXT = {
     packStoreLimit:"Installed packs are limited to {max} MiB total. Delete packs you no longer need, then try again.",
     packStorageQuota:"There isn't enough browser storage available. Delete packs you no longer need or free up space, then try again.",
     packStorageCheckFailed:"Couldn't check stored pack usage. Reload the page and try again.",
+    packDbBlocked:"Can't save because trk! is open in another tab. Close the other tabs and try again.",
     packUnsupported:"This browser can't unpack packs. Please use an up-to-date browser.",
     packConfirm:"This pack contains a VRM model. Please check the author's terms before using it.\n\nTerms: ",
     confirmDeletePack:"Delete this pack? (Its songs will also be removed from the song list.)",
@@ -547,6 +552,9 @@ const TEXT = {
     recStarHint:"Titles: 🥁 MANUAL / 🚚 TRUCK / 🪐 ORBIT / 🎪 STAGE / 🚛 CATCH = clear, ⚔ = rank S or better, 🐔 = no miss (per song, upgraded automatically)   ⭐ = ALL PERFECT   FC = Full combo   🏁 = best clear speed (AUTO, failed and practice runs don't count)",
     recExport:"⇩ Back up records", recImport:"⇧ Restore backup", recReset:"🗑 Clear this song's records",
     recConfirmReset:"Clear all records for this song?", recExported:"Records exported.", recImported:"Records restored ({n} songs).",
+    prefImported:"📥 Imported: {list} — reloading",
+    prefImportedPartial:"📥 Imported: {list} — reloading (not applied: {skipped})",
+    prefSkipWhyId:"{k} (ID not available on this device)", prefSkipWhyType:"{k} (wrong type)", prefSkipWhyUnknown:"{k} (unknown setting)",
     recBad:"Invalid records file.", recCleared:"Records for this song cleared."
   },
 
@@ -719,6 +727,7 @@ const TEXT = {
     packStoreLimit:"已安装资源包总量上限为{max} MiB。请删除不需要的资源包后重试。",
     packStorageQuota:"浏览器可用存储空间不足。请删除不需要的资源包或释放空间后重试。",
     packStorageCheckFailed:"无法检查已保存资源包的容量。请重新加载页面后再试。",
+    packDbBlocked:"其他标签页正在运行 trk!，无法保存。请关闭其他标签页后重试。",
     packUnsupported:"此浏览器无法解压资源包，请使用最新浏览器。",
     packConfirm:"此资源包包含VRM模型。使用前请确认作者的使用条款。\n\n使用条款：",
     confirmDeletePack:"要删除此资源包吗？（其中的歌曲也会从列表中移除）",
@@ -813,6 +822,9 @@ const TEXT = {
     recStarHint:"称号：🥁MANUAL／🚚TRUCK／🪐ORBIT／🎪STAGE／🚛CATCH＝通关，⚔＝S评级以上，🐔＝无失误（按歌曲记录，自动升级）　⭐＝ALL PERFECT　FC＝全连　🏁＝最高通关速度（AUTO・中途结束・练习不计）",
     recExport:"⇩ 备份记录", recImport:"⇧ 读取备份", recReset:"🗑 清除本曲记录",
     recConfirmReset:"要清除本曲的所有记录吗？", recExported:"已导出记录。", recImported:"已读取记录（{n}首）。",
+    prefImported:"📥 已读取：{list} — 正在重新加载",
+    prefImportedPartial:"📥 已读取：{list} — 正在重新加载（未应用：{skipped}）",
+    prefSkipWhyId:"{k}（此设备不存在的ID）", prefSkipWhyType:"{k}（类型不符）", prefSkipWhyUnknown:"{k}（未知的设置项）",
     recBad:"记录文件格式不正确。", recCleared:"已清除本曲记录。"
   },
 
@@ -985,6 +997,7 @@ const TEXT = {
     packStoreLimit:"설치된 팩의 총 용량은 {max} MiB까지입니다. 필요 없는 팩을 삭제한 뒤 다시 시도하세요.",
     packStorageQuota:"브라우저 저장 공간이 부족합니다. 필요 없는 팩을 삭제하거나 공간을 확보한 뒤 다시 시도하세요.",
     packStorageCheckFailed:"저장된 팩 용량을 확인하지 못했습니다. 페이지를 새로고침한 뒤 다시 시도하세요.",
+    packDbBlocked:"다른 탭에서 trk!가 열려 있어 저장할 수 없습니다. 다른 탭을 닫은 뒤 다시 시도하세요.",
     packUnsupported:"이 브라우저는 팩 압축 해제를 지원하지 않습니다. 최신 브라우저를 사용하세요.",
     packConfirm:"이 팩에는 VRM 모델이 들어 있습니다. 사용 전에 제작자의 이용 조건을 확인하세요.\n\n이용 조건: ",
     confirmDeletePack:"이 팩을 삭제할까요? (들어 있던 곡도 목록에서 사라집니다)",
@@ -1079,6 +1092,9 @@ const TEXT = {
     recStarHint:"칭호: 🥁MANUAL／🚚TRUCK／🪐ORBIT／🎪STAGE／🚛CATCH＝클리어, ⚔＝S랭크 이상, 🐔＝노미스 (곡마다 위 단계로 자동 갱신)　⭐＝ALL PERFECT　FC＝풀콤보　🏁＝최고 클리어 속도 (AUTO・중도 종료・연습은 제외)",
     recExport:"⇩ 기록 백업", recImport:"⇧ 백업 불러오기", recReset:"🗑 이 곡의 기록 삭제",
     recConfirmReset:"이 곡의 기록을 모두 삭제할까요?", recExported:"기록을 내보냈습니다.", recImported:"기록을 불러왔습니다 ({n}곡).",
+    prefImported:"📥 불러왔습니다: {list} — 다시 불러옵니다",
+    prefImportedPartial:"📥 불러왔습니다: {list} — 다시 불러옵니다 (미적용: {skipped})",
+    prefSkipWhyId:"{k} (이 기기에 없는 ID)", prefSkipWhyType:"{k} (형식이 다름)", prefSkipWhyUnknown:"{k} (알 수 없는 항목)",
     recBad:"기록 파일 형식이 올바르지 않습니다.", recCleared:"이 곡의 기록을 삭제했습니다."
   }
 };

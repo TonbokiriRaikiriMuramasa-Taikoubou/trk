@@ -1188,6 +1188,7 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
 .libSkinNote{margin-top:6px}
 .libTabs{display:flex;align-items:flex-end;gap:6px;margin-top:14px;padding:0 2px 2px;
   overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.libTabsList{display:contents}   /* role=tablist 用の入れ物。箱を作らないので並びは今までどおり */
 .libTabs[hidden]{display:none}
 .libTab{position:relative;display:inline-flex;align-items:center;gap:6px;flex:none;max-width:240px;
   padding:8px 13px;font-size:15px;font-weight:700;white-space:nowrap;cursor:pointer;

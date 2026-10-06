@@ -113,9 +113,11 @@ function makeCheck(id, key, label) {
   inp.addEventListener("change", () => { settings[key] = inp.checked; saveUserPrefs(); });
   return lab;
 }
+let colorRowSeq = 0;
 function makeColorRow(key, label, fallback) {
   const row = el("div", "inline"), lab = el("span", "", tr(label)), inp = document.createElement("input"), reset = el("button", "", tr("colorReset"));
   lab.dataset.i18n = label; inp.type = "color";
+  lab.id = "colorRowLab" + (++colorRowSeq); inp.setAttribute("aria-labelledby", lab.id);
   reset.type = "button"; reset.dataset.i18n = "colorReset"; reset.style.cssText = "padding:6px 12px;font-size:14px";
   const sync = () => { inp.value = settings[key] || fallback(); reset.disabled = !settings[key]; };
   inp.addEventListener("input", () => { settings[key] = inp.value.toLowerCase(); saveUserPrefs(); sync(); });

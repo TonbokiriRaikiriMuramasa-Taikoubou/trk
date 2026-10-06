@@ -1708,7 +1708,7 @@ function studyCloseRoom() {
   studyRoom.hidden = true; document.body.classList.remove("study-room-open");
   studyTVToken++; studyRestoreVideoHome();
   studyClearImage($("studyTvArt")); studyTVArtUrl = ""; studyTVArtSong = "";
-  const title = document.querySelector("#libPanel .libHead h3"); if (title) title.focus({ preventScroll:true });
+  const title = document.querySelector("#libPanel .libHead .study-launch-title"); if (title) title.focus({ preventScroll:true });
 }
 async function studyToggleFullscreen() {
   if (!studyCurrentBook || studyCurrentBook.kind !== "image") return;
@@ -1851,10 +1851,9 @@ on("language", () => {
 });
 
 /* 起動の長押し（曲リストの見出し） */
-const studyLaunchTitle = document.querySelector("#libPanel .libHead h3");
+const studyLaunchTitle = document.querySelector("#libPanel .libHead .study-launch-title");
 if (studyLaunchTitle) {
-  studyLaunchTitle.classList.add("study-launch-title"); studyLaunchTitle.tabIndex = 0;
-  studyLaunchTitle.setAttribute("role", "button"); studyLaunchTitle.setAttribute("aria-haspopup", "dialog");
+  /* 見出し(h3)の中の本物の <button>。role も tabindex も要らず、読み上げでは「ボタン」と分かります */
   studyLaunchTitle.title = tr("studyLaunchHint"); studyLaunchTitle.setAttribute("aria-label", `${tr("libTitle")}. ${tr("studyLaunchHint")}`);
   studyLaunchTitle.addEventListener("pointerdown", event => {
     if (event.button != null && event.button !== 0) return;

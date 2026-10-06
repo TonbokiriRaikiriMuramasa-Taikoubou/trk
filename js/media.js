@@ -55,7 +55,7 @@ async function loadMedia(file, opts = {}) {
   if (!ok || !isFinite(video.duration) || video.duration <= 0) { setStatus("loadStatus", "loadError"); updateChartButtons(); return false; }
   videoReady = true; fingerprint = `${file.size}:${Math.round(video.duration * 10)}`;
   setStatus("loadStatus", "analyzing"); updateChartButtons();
-  await new Promise(r => setTimeout(r, 30));
+  await new Promise(r => { setTimeout(r, 30); });
   const tooBig = (Number(file.size) || 0) > ANALYZE_MAX;
   if (tooBig) analysis = null;
   else { try { analysis = await analyzeAudio(file); } catch (_) { analysis = null; } }

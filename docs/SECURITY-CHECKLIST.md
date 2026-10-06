@@ -50,7 +50,8 @@
 2. **（済）`?reset=all` の確認ダイアログ**：2026-10-06 完了（F-20。確認を飛ばす非常口は `&force=1`）
 3. **（済）アドオン同意の記録**：2026-10-06 完了（F-21。**同意するまでコードを実行しない**＋同意日時とコード指紋を端末内に記録、一覧に ✅／⚠ を表示）
 4. **残っている小さな宿題**：**GitHub Actions の SHA 固定**／**`mobile-web/` から開発文書を除外**（どちらも配布物まわりで、遊びには影響しません）
-5. **このチェックリストの定期実行**：バージョンを上げたら `npm run check`、第三者ライブラリを上げたら `npm run vendor:update` ＋ `npm run check:vendor:npm`、新しいファイル形式を足したら該当する検証関数と `tools/check-*.mjs` をセットで更新（`docs/HANDOFF.md` の決まりごと）
+5. **（済）堅牢性・読みやすさの素振り（2026-10-06）**：外部ツール（html-validate・axe-core・ESLint・css-tree・Manifest）で一度かけ、読み上げ名の不足・タブの入れ子・見出しに `role="button"`・重複キーなどを修正。毎回は `tools/check-a11y.mjs`（依存パッケージ不要）で見張り、手順と「直さないと決めたもの＋理由」は `docs/QUALITY-CHECKS.md`（色のコントラストと実画面の見た目は実ブラウザでのみ確認可）
+6. **このチェックリストの定期実行**：バージョンを上げたら `npm run check`、第三者ライブラリを上げたら `npm run vendor:update` ＋ `npm run check:vendor:npm`、新しいファイル形式を足したら該当する検証関数と `tools/check-*.mjs` をセットで更新（`docs/HANDOFF.md` の決まりごと）
 
 ---
 

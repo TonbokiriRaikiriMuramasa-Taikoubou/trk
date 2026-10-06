@@ -345,9 +345,11 @@ stage.addEventListener("pointerdown", e => {
 on("chart", () => { stageMap.src = null; });
 
 /* ============ 設定画面：見た目と譜面（「マスコット」の見出しの上） ============ */
+let stageRangeSeq = 0;
 function makeRange(key, label, min, max, step) {
   const row = el("div", "inline"), lab = el("span", "", tr(label)), inp = document.createElement("input"), val = el("span", "mono");
   lab.dataset.i18n = label; inp.type = "range"; inp.min = min; inp.max = max; inp.step = step;
+  lab.id = "stageRangeLab" + (++stageRangeSeq); inp.setAttribute("aria-labelledby", lab.id);
   const sync = () => { inp.value = settings[key]; val.textContent = Math.round(settings[key] * 100) + "%"; };
   inp.addEventListener("input", () => { settings[key] = Number(inp.value); saveUserPrefs(); sync(); });
   sync(); row.append(lab, inp, val);

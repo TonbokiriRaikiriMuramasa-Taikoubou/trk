@@ -2,9 +2,9 @@
 /* 📚 書斎 — 端末内の画像・文章リーダー。本棚・リーダー・TV・検索・しおりの見た目。 */
 
 /* ===== 起動（曲リストの見出しを長押し） ===== */
-#libPanel .libHead h3.study-launch-title{cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}
-#libPanel .libHead h3.study-launch-title::after{content:"　♫";font-size:.72em;color:var(--ui-muted);opacity:.65}
-#libPanel .libHead h3.study-launch-title:focus-visible{outline:2px solid var(--ui-accent);outline-offset:4px;border-radius:4px}
+#libPanel .libHead .study-launch-title{all:unset;cursor:pointer;font:inherit;color:inherit;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+#libPanel .libHead .study-launch-title::after{content:"　♫";font-size:.72em;color:var(--ui-muted);opacity:.65}
+#libPanel .libHead .study-launch-title:focus-visible{outline:2px solid var(--ui-accent);outline-offset:4px;border-radius:4px}
 
 /* ===== 全体 ===== */
 .study-room[hidden],.study-room [hidden]{display:none!important}

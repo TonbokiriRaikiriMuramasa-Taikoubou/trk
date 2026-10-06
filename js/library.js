@@ -1292,6 +1292,9 @@ function renderLibTabs(tabs) {
   if (!box) return active;
   box.textContent = "";
   box.hidden = false;   /* 🎧 「＋」（新規プレイリスト）があるので、タブが1つでも帯は出す */
+  /* role=tablist は「タブだけ」を子に持たせ、＋ボタンはその外に置く（入れ子の規則を守る）。
+     見た目は display:contents なので、これまでと同じ並び・同じスキンのまま */
+  const tabList = el("div", "libTabsList"); tabList.setAttribute("role", "tablist"); tabList.setAttribute("aria-label", tr("libTitle"));
   for (const t of tabs) {
     const b = el("button", "libTab" + (t.id === active ? " on" : "")); b.type = "button";
     b.dataset.tab = t.id;
@@ -1331,10 +1334,11 @@ function renderLibTabs(tabs) {
         if (key) { const n = t.pl.songs.length; plAddSong(t.pl, key); if (t.pl.songs.length !== n) renderLib(); }
       });
     }
-    box.append(b);
+    tabList.append(b);
   }
+  box.append(tabList);
   const plus = el("button", "libTab plPlus", "＋"); plus.type = "button";
-  plus.title = tr("plNewTab"); plus.setAttribute("aria-label", tr("plNewTab")); plus.setAttribute("role", "presentation");
+  plus.title = tr("plNewTab"); plus.setAttribute("aria-label", tr("plNewTab"));
   plus.addEventListener("click", () => { if (!plSuppressClick()) plCreate(); });
   box.append(plus);
   return active;

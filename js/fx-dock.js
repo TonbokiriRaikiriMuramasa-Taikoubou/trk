@@ -11,6 +11,9 @@
      （お気に入りの初期値を fx.js が読む前に入れる／visibilitychange を library.js・main.js より先に受け取る）
    ========================================================================== */
 "use strict";
+
+/* 読み上げ名を結びつけるための連番（作り直しても id が重ならないように） */
+let eqDockLabelSeq = 0;
 (() => {
 
 /* ============ 最初のお気に入り（fx.js より先に prefs へ入れる。1回だけ） ============ */
@@ -170,7 +173,7 @@ Object.assign(TEXT.ja, {
   ampStackTrk:"🔥 TRKアンプ（標準）", ampStackWarm:"🍯 あたたか", ampStackRadio:"📻 ラジカセ", ampStackClean:"🧹 クリーン",
   ampStackSet:"🔥 {name}：{n}段を組みました", ampOnMsg:"🔥 TRKアンプ ON（{n}段）", ampOffMsg:"🔥 TRKアンプ OFF（段はそのまま）",
   ampCleared:"段を全部外しました", ampFull:"ラックは8段までです。",
-  ampStageAdd:"＋ 段を追加", ampClear:"✕ 全部外す",
+  ampStageAdd:"＋ 段を追加", ampStagePick:"追加する段", ampClear:"✕ 全部外す",
   ampMore:"🎛 段をくわしく調整（設定を開く）",
   ampAdjustHint:"段のつまみ（しきい値・周波数など）は、設定の「🎚 エフェクターラック（段で重ねる）」で調整できます。アンプを切っても、プリセットの音はそのまま残ります。"
 });
@@ -207,7 +210,7 @@ Object.assign(TEXT.en, {
   ampStackTrk:"🔥 TRK amp (standard)", ampStackWarm:"🍯 Warm", ampStackRadio:"📻 Boombox", ampStackClean:"🧹 Clean",
   ampStackSet:"🔥 {name}: {n} stages built", ampOnMsg:"🔥 TRK amp ON ({n} stages)", ampOffMsg:"🔥 TRK amp OFF (stages kept)",
   ampCleared:"Removed every stage", ampFull:"The rack holds up to 8 stages.",
-  ampStageAdd:"＋ Add stage", ampClear:"✕ Remove all",
+  ampStageAdd:"＋ Add stage", ampStagePick:"Stage to add", ampClear:"✕ Remove all",
   ampMore:"🎛 Fine-tune the stages (open settings)",
   ampAdjustHint:"Stage knobs (thresholds, frequencies…) live in Settings → 🎚 Effect rack (stack your own). Turning the amp off keeps your preset sound."
 });
@@ -243,7 +246,7 @@ Object.assign(TEXT.zh, {
   ampStackTrk:"🔥 TRK 功放（标准）", ampStackWarm:"🍯 温暖", ampStackRadio:"📻 收录机", ampStackClean:"🧹 清爽",
   ampStackSet:"🔥 {name}：已组 {n} 段", ampOnMsg:"🔥 TRK 功放 开（{n} 段）", ampOffMsg:"🔥 TRK 功放 关（段保留）",
   ampCleared:"已移除全部段", ampFull:"机架最多8段。",
-  ampStageAdd:"＋ 添加一段", ampClear:"✕ 全部移除",
+  ampStageAdd:"＋ 添加一段", ampStagePick:"要添加的段", ampClear:"✕ 全部移除",
   ampMore:"🎛 细致调整段（打开设置）",
   ampAdjustHint:"段的旋钮（阈值、频率等）在设置的“🎚 效果器机架（分段叠加）”里调整。关闭功放不会改变预设的音色。"
 });
@@ -279,7 +282,7 @@ Object.assign(TEXT.ko, {
   ampStackTrk:"🔥 TRK 앰프 (표준)", ampStackWarm:"🍯 따뜻하게", ampStackRadio:"📻 카세트 라디오", ampStackClean:"🧹 클린",
   ampStackSet:"🔥 {name}: {n}단을 구성했어요", ampOnMsg:"🔥 TRK 앰프 ON ({n}단)", ampOffMsg:"🔥 TRK 앰프 OFF (단은 그대로)",
   ampCleared:"모든 단을 뺐어요", ampFull:"랙은 최대 8단이에요.",
-  ampStageAdd:"＋ 단 추가", ampClear:"✕ 전부 빼기",
+  ampStageAdd:"＋ 단 추가", ampStagePick:"추가할 단", ampClear:"✕ 전부 빼기",
   ampMore:"🎛 단을 자세히 조정 (설정 열기)",
   ampAdjustHint:"단의 노브(임계값・주파수 등)는 설정의 ‘🎚 이펙터 랙 (단으로 쌓기)’에서 조정해요. 앰프를 꺼도 프리셋 소리는 그대로예요."
 });
@@ -402,7 +405,9 @@ addEventListener("DOMContentLoaded", () => {
     m.addEventListener("input", () => { o.value = m.value; o.dispatchEvent(new Event("input", { bubbles:true })); });
     const lock = btn("fxMini dockLock");
     lock.addEventListener("click", () => { settings.fxEqLock[i] = !settings.fxEqLock[i]; saveUserPrefs(); render(); });
-    row.append(el("span", "", ["60Hz", "250Hz", "1kHz", "4kHz", "12kHz"][i]), m, val, lock);
+    const nameSpan = el("span", "", ["60Hz", "250Hz", "1kHz", "4kHz", "12kHz"][i]);
+    nameSpan.id = "fxDockEqLab" + (++eqDockLabelSeq); m.setAttribute("aria-labelledby", nameSpan.id);
+    row.append(nameSpan, m, val, lock);
     eqBox.append(row);
     return { o, m, val, lock, oVal:o.parentElement.querySelector(".mono") };
   });
@@ -592,6 +597,7 @@ addEventListener("DOMContentLoaded", () => {
   const ampStages = el("div", "ampStages");
   const ampRow = el("div", "miniActions");
   const ampSel = document.createElement("select"); ampSel.className = "fxQuickSelect";
+  ampSel.setAttribute("aria-label", tr("ampStagePick"));
   const ampAdd = tx("button", "ampStageAdd", "fxMini"); ampAdd.type = "button";
   const ampClearBtn = tx("button", "ampClear", "fxMini"); ampClearBtn.type = "button";
   const ampMore = tx("button", "ampMore", "fxMini"); ampMore.type = "button";

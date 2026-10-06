@@ -58,7 +58,7 @@ Object.assign(TEXT.ja, {
   sfxConfirmDelete:"このマイプリセットを消しますか？", sfxQuick:"🎛 エフェクト", sfxOff:"オフ",
   sfxRackTitle:"🎚 エフェクターラック（段で重ねる）", sfxRackOn:"ラックを使う（プリセットのあとに重なります）",
   sfxRackHint:"ポータブルアンプを多段に積むように、エフェクターを段にして重ねられます（最大8段）。プリセットと「かんたんEQ」の間に入ります。書き出し・マイプリセット保存にも段ごと入ります。",
-  sfxRackAdd:"＋ 段を追加", sfxRackSave:"💾 今の音をマイプリセットに保存", sfxRackFull:"ラックは8段までです。",
+  sfxRackAdd:"＋ 段を追加", sfxRackPick:"追加するエフェクト", sfxRackSave:"💾 今の音をマイプリセットに保存", sfxRackFull:"ラックは8段までです。",
   sfxRackEmpty:"まだ段がありません。下の＋で追加できます。", sfxRackPresetName:"マイラック{n}",
   sfxRackUp:"ひとつ上へ", sfxRackDown:"ひとつ下へ", sfxRackRemove:"この段を外す",
   sfxTypeGate:"🚪 ノイズゲート", sfxTypeDenoise:"🧹 ノイズ消し", sfxTypeDynEQ:"🎚 ダイナミックEQ", sfxTypeExciter:"✨ エキサイター",
@@ -100,7 +100,7 @@ Object.assign(TEXT.en, {
   sfxConfirmDelete:"Delete this preset?", sfxQuick:"🎛 Sound", sfxOff:"Off",
   sfxRackTitle:"🎚 Effect rack (stack your own)", sfxRackOn:"Use rack (stacks after the preset)",
   sfxRackHint:"Like stacking portable amps, chain effects as stages (up to 8). They sit between the preset and the Quick EQ, and are included in exports and saved presets.",
-  sfxRackAdd:"＋ Add stage", sfxRackSave:"💾 Save current sound as my preset", sfxRackFull:"The rack holds up to 8 stages.",
+  sfxRackAdd:"＋ Add stage", sfxRackPick:"Effect to add", sfxRackSave:"💾 Save current sound as my preset", sfxRackFull:"The rack holds up to 8 stages.",
   sfxRackEmpty:"No stages yet — add one below.", sfxRackPresetName:"My rack {n}",
   sfxRackUp:"Move up", sfxRackDown:"Move down", sfxRackRemove:"Remove this stage",
   sfxTypeGate:"🚪 Noise gate", sfxTypeDenoise:"🧹 Noise reduction", sfxTypeDynEQ:"🎚 Dynamic EQ", sfxTypeExciter:"✨ Exciter",
@@ -142,7 +142,7 @@ Object.assign(TEXT.zh, {
   sfxConfirmDelete:"要删除此预设吗？", sfxQuick:"🎛 音效", sfxOff:"关闭",
   sfxRackTitle:"🎚 效果器机架（分段叠加）", sfxRackOn:"使用机架（叠加在预设之后）",
   sfxRackHint:"像多段便携功放一样，把效果器当作一段段叠起来（最多8段）。位于预设和简易均衡器之间，导出与保存预设时也会一并记录。",
-  sfxRackAdd:"＋ 添加一段", sfxRackSave:"💾 把当前声音保存为我的预设", sfxRackFull:"机架最多8段。",
+  sfxRackAdd:"＋ 添加一段", sfxRackPick:"要添加的效果", sfxRackSave:"💾 把当前声音保存为我的预设", sfxRackFull:"机架最多8段。",
   sfxRackEmpty:"还没有段。在下面添加。", sfxRackPresetName:"我的机架{n}",
   sfxRackUp:"上移", sfxRackDown:"下移", sfxRackRemove:"移除这段",
   sfxTypeGate:"🚪 噪声门", sfxTypeDenoise:"🧹 降噪", sfxTypeDynEQ:"🎚 动态EQ", sfxTypeExciter:"✨ 激励器",
@@ -184,7 +184,7 @@ Object.assign(TEXT.ko, {
   sfxConfirmDelete:"이 프리셋을 삭제할까요?", sfxQuick:"🎛 사운드", sfxOff:"끄기",
   sfxRackTitle:"🎚 이펙터 랙 (단으로 쌓기)", sfxRackOn:"랙 사용 (프리셋 뒤에 겹쳐짐)",
   sfxRackHint:"휴대용 앰프를 여러 단 쌓듯이, 이펙터를 단으로 쌓을 수 있어요 (최대 8단). 프리셋과 간단 EQ 사이에 들어가고, 내보내기・프리셋 저장에도 포함돼요.",
-  sfxRackAdd:"＋ 단 추가", sfxRackSave:"💾 지금 소리를 내 프리셋으로 저장", sfxRackFull:"랙은 최대 8단이에요.",
+  sfxRackAdd:"＋ 단 추가", sfxRackPick:"추가할 효과", sfxRackSave:"💾 지금 소리를 내 프리셋으로 저장", sfxRackFull:"랙은 최대 8단이에요.",
   sfxRackEmpty:"아직 단이 없어요. 아래에서 추가하세요.", sfxRackPresetName:"내 랙 {n}",
   sfxRackUp:"위로", sfxRackDown:"아래로", sfxRackRemove:"이 단 빼기",
   sfxTypeGate:"🚪 노이즈 게이트", sfxTypeDenoise:"🧹 노이즈 제거", sfxTypeDynEQ:"🎚 다이내믹 EQ", sfxTypeExciter:"✨ 엑사이터",
@@ -921,9 +921,15 @@ function check(label, onChange) {
   inp.addEventListener("change", () => onChange(inp.checked));
   return { lab, inp };
 }
+let fxRangeSeq = 0;
 function range(labelNode, min, max, step, onInput) {
   const row = el("div", "inline"), inp = document.createElement("input"), val = el("span", "mono");
   inp.type = "range"; inp.min = min; inp.max = max; inp.step = step;
+  /* 読み上げ名：隣に出している見出しをそのまま名前にする（見た目は変えずに、名前だけ結びつける） */
+  if (labelNode && labelNode.nodeType === 1) {
+    if (!labelNode.id) labelNode.id = "fxRangeLab" + (++fxRangeSeq);
+    inp.setAttribute("aria-labelledby", labelNode.id);
+  }
   inp.addEventListener("input", () => onInput(Number(inp.value)));
   row.append(labelNode, inp, val);
   return { row, inp, val };
@@ -949,6 +955,7 @@ add(tx("h3", "sfxRackTitle"));
 const rackCk = check("sfxRackOn", v => { settings.fxRackOn = v; if (v && !settings.fxOn) setOn(true); else refresh(); });
 const rackBox = el("div", "fxRack");
 const rackSel = document.createElement("select"); rackSel.className = "fxQuickSelect";
+rackSel.setAttribute("aria-label", tr("sfxRackPick"));   // 読み上げ名（隣の「＋ 段を追加」ボタンと対）
 const rackAdd = tx("button", "sfxRackAdd"); rackAdd.type = "button"; rackAdd.style.cssText = "padding:8px 12px;font-size:14px";
 rackAdd.addEventListener("click", () => {
   if (settings.fxRack.length >= RACK_MAX) { setStatus("sfxStatus", "sfxRackFull"); return; }
@@ -1055,7 +1062,7 @@ delBtn.addEventListener("click", () => {
 acts.append(expBtn, impLab, delBtn);
 const editor = el("details", "subPanel"), area = document.createElement("textarea"), apply = tx("button", "sfxApply");
 editor.append(tx("summary", "sfxEditor"), area, apply);
-area.spellcheck = false; area.className = "fxEditor";
+area.spellcheck = false; area.className = "fxEditor"; area.setAttribute("aria-label", tr("sfxEditor"));
 apply.type = "button"; apply.style.marginTop = "8px";
 editor.addEventListener("toggle", () => { if (editor.open) area.value = JSON.stringify(exportForFile(), null, 2); });
 apply.addEventListener("click", () => {

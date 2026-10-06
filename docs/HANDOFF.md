@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ（短縮版）
 
-> 最終更新：2026-10-06（**🛡 セキュリティ点検（5回・F-1〜F-21）＋🌐 CDNをやめて自前ホスティング（`assets/vendor/`）＋🔐 守りの追加（`?reset=all` の確認・アドオン同意）＋♿ 堅牢性／読みやすさの点検（`tools/check-a11y.mjs`）** ＝PR #18。追補F-22〜F-29（アドオン指紋・譜面／設定Import上限・スキン参照／容量など）はPR #19で反映済み。F-30〜F-32（設定enumの許可リスト／hashリセット確認／パック累積容量）はIssue #21・#22・#24・#25を受けた対応で、PR #26をmainへの統合・追跡先とする。以下はそれ以前からの状態：🎮 キーコンフィング（**ゲームパッド・音ゲーム用コントローラー・TVリモコン**）＝設定 ⌨ 操作の中に新設・ボタン／軸の直接割り当て・メニュー移動／🪶 軽量化（スマホ・アプリ向け）＝設定の右下に新設・自動判定／**プリセット（🎯 ゲーム優先＝ノーツと反応は下げず、他だけ軽く）**／フレームレート上限／3Dマスコットの描画レート／描画解像度／スペクトラム・ぼかしの節約／🎛 曲名バナーの曲操作を右端の [◀][🎲][▶] に集約／📚 書斎 v2／🩷 MMDモーション改修）
+> 最終更新：2026-10-07（**🛡 セキュリティ点検（5回・F-1〜F-21）＋🌐 CDNをやめて自前ホスティング（`assets/vendor/`）＋🔐 守りの追加（`?reset=all` の確認・アドオン同意）＋♿ 堅牢性／読みやすさの点検（`tools/check-a11y.mjs`）** ＝PR #18。追補F-22〜F-29はPR #19、F-30〜F-32はPR #26で反映済み。**2026-10-07 追補：🐔 trk 階層プレイリスト（`trk` フォルダ長押しで Vol 一覧・100制限は Vol.2 自動分割・配布形態で分類：Game Vol.1 / Classic Vol.1/Vol.2 / BlueArchive アルバム別 Vol.1-8 / Touhou タイトル別 15作品 / Arknights アルバム別 10＋痕/Babel / Gakum@s キャラ別 34曲 / Endfield Metal Scar Radio 6PL）＋カタログ大幅増量（62PL/345曲）＋設定 ABC順/自由並べ替え** ＝ `arena/7ded006c-trk`（6b85e95→4e2c251）で PR 準備中。以下はそれ以前からの状態：🎮 キーコンフィング／🪶 軽量化／🎛 バナー右端集約／📚 書斎 v2／🩷 MMD改修）
 > 目的：次の開発作業に必要な現在の設計・権利上の制約・検証方法をひと目で確認する。詳細な機能紹介は `README.md`、権利条件は `NOTICE.md`、実装の正は各ソースコードとする。
 
 ---
@@ -55,7 +55,7 @@
     - 🧪 **IndexedDB を実走させるハーネス（2026-10-07・リポジトリ外で実施）**：パック容量の v2 化は「本当に Blob を復元していないか」「移行が効いているか」を確かめる必要があるため、**最小限のフェイク IndexedDB** を書いて `idbStore()` をそのまま動かした（`vm` で `js/core.js` の `const IDB_VERSION` から `idbStore` までを切り出し、`indexedDB` をスタブとして渡す）。落とし穴は2つ：①`idbStore()` は**遅延オープン**なので、メソッドを1つ呼ぶまで `open()`（＝移行）が走らない ②フェイク側は**未処理リクエストが 0 になるまでトランザクションを完了させない**（早く `oncomplete` を呼ぶと `putIf` が常に false になり「保存されない」と誤判定する）。`getAll` を呼んだかどうかを `log` に記録して「Blob を復元していない」ことを直接確かめた。
     - ✅ **検査のほうが本体の穴を見つけた実例（2026-10-07）**：`size` index の検査を書くとき「数値でないキーは過小計上になる」と気づいて `null`（＝全件数え直し）を期待したところ、実装は `keys.length !== count` しか見ておらず **`Number.isFinite(k) ? k : 0` で 0 に落として通していた**。つまり `size:"900"` のような壊れたレコードがあると合計が過小になり、上限を素通しする。→ **実装側を直した**（数値でない／負のキーは `null` を返す）。検査を先に厳しく書くと、実装の穴が見つかる。
   - **♿ 読みやすさ**：外部ツール（html-validate・axe-core・ESLint・css-tree・Manifest）を一度かけた記録が `docs/QUALITY-CHECKS.md`（**再点検で axe violation 0**）。見つけた実害（読み上げ名の不足23か所＋つまみ60か所・`role="tablist"` に「＋」が混ざっていた・見出しに `role="button"`・重複キー29件）はすべて修正済み。**残したものと理由も同文書**（見出しの飛び h1→h3 は WARN だけ、色のコントラストは実機で、動画の字幕は該当なし など）。
-- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-sec33`。公開ファイルを変更したら必ず更新する。
+- `sw.js` の現在のキャッシュ名は `trk-v2026.10.7-trk12`（`arena/7ded006c-trk` 時点）。公開ファイルを変更したら必ず更新する。
 - このcheckoutで `npm run check` はコード・データの自動検査を行うが、MMDの実描画・タッチ操作・音声の実機確認は別途必要。
 - **Issue #21〜#25 の再調査・残件（2026-10-06）**：
   - **#21**：不正な `specStyle`／`specTheme` を設定Import時点で拒否し、Spectrum辞書もnull-prototype化済み。GitHub本文の再現手順どおりの実ブラウザ確認はまだなので、画面・コンソール確認を残す。
@@ -250,6 +250,7 @@ JSDOM の実挙動ハーネス（**コミットしていない・消えたら作
   - **PR #26（2026-10-06・squash merge）**：セキュリティ追補 F-30〜F-32＝設定Importの enum 許可リスト、reset の `force=1` 完全一致、`.stpack` の累積1 GiB上限・quota 事前確認・容量と put の一体化。詳細は §2 と `docs/SECURITY.md`。
   - **PR #27（2026-10-07・`arena/cfdfdfd5-trk`）**：**外部検収（PR #26 への指摘）を受けた仕上げと大型修正**。①緊急設定Importが弾いたキーを**理由つき**で報告（4言語・重複なし・表示は先頭12件）②回帰検査を **55項目**へ（spectrum の ID 辞書6個すべて／lite-mode 4キー／tv-rich の実在ID／`?factory` の文書ドリフト）③**パック容量の集計を `size` index 化（DB v2）**＝Blob を復元せず合計を出し、移行と件数食い違いで過小計上を防ぐ。⚠ 版数を上げたので**他タブがあると `onblocked` で止まる**（`packDbBlocked` を4言語で案内）。詳細は §2、`docs/SECURITY.md`、このPRの本文。
 - **PR #28（`arena/96a5eaad-trk`）**：🌐 three.js の `three.core.js` と `BufferGeometryUtils.js` の取り込み漏れを修正し、vendor 更新道具／検査を両引用符対応に。逆テストで旧検査の見逃しも再現した。実ブラウザのMMD／VRM表示確認は未完了（上の最優先項目）。
+- **`arena/7ded006c-trk`（2026-10-07・6b85e95→4e2c251・次PR）**：🐔 **trk 階層プレイリスト**（`trk` フォルダ長押しで Vol 一覧・`trk-classic/ba/touhou/arknights/gakumas/endfield` サブフォルダ・Game Vol.1 / Classic Vol.1/Vol.2 / BlueArchive Vol.1-8 / Touhou 15作品 / Arknights 10＋痕/Babel / Gakum@s 34曲 / Endfield 6PL・100超は Vol.2 自動分割）＋**カタログ大幅増量**（62PL/345曲、事実情報のみ・https公式・非営利ガイド）＋**設定 ABC順/自由並べ替え**（`trkSortABC`/`playlistOrder`・`plFolderMenu` 内でも ↑↓）＋ Arknights `痕`/`Babel` と Endfield `Metal Scar Radio`（`Blurring`/`ASHEN REMAINS`/`The Floaty Envelope`/`MAKER'S LUV`/`初号指令`/`Signal`）。`sw.js` は `trk-v2026.10.7-trk12`。`npm run check` / `node --check` 通過、曲に触る機会を増やす実装として Issues での「○○が無い」抑止を狙う。
 - 以前の統合元ブランチ：`arena/01a109eb-trk`（Part 1–17・コミット35+・`main` へマージ済み）、`arena/01a10c69-trk`（PR #14）。
 - 公開URL：<https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/>
 

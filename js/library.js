@@ -342,7 +342,21 @@ Object.assign(TEXT.ja, {
   plAuthorBlock:"🚫 この投稿者をブロック（プレイリストを隠します）", plAuthorUnblock:"🚫 ブロックを解除",
   plAuthorNone:"投稿者の付いたプレイリストはまだありません。共有プレイリストを読み込むと「👤 投稿者」付きで入ります。",
   plAuthorHidden:"🚫 非表示 {n} 件（ブロック中または絞り込み中）", plAuthorBy:"投稿者",
-  plAuthorBlockedView:"ブロック中の投稿者です"
+  plAuthorBlockedView:"ブロック中の投稿者です",
+  trkPlaylistTitle:"🐔 trk's playlist", trkPlaylistHint:"ゲーム音楽の紹介プレイリスト（非営利・音源は同梱しません。公式の入手先からどうぞ）",
+  trkPlaylistToggle:"🐔 trk's playlist タブを表示", trkPlaylistNote:"右端に出るゲーム音楽の紹介タブです。OFFで隠せます。チュートリアルを終えると自動で追加されます。",
+  trkOpen:"🐔 開く", trkAdded:"🐔 trk's playlist を追加しました（{n}曲）— 右端のタブをどうぞ",
+  trkDup:"🐔 trk's playlist はすでに入っています", trkShow:"🐔 trk's playlist を表示", trkHide:"🐔 trk's playlist を非表示",
+  trkPanelTitle:"🐔 trk's playlist", trkPanelHint:"チュートリアルを終えると右端に現れるゲーム音楽の紹介（非営利・音源なし）。",
+  trkCatalogBtn:"🐔 trk's playlist", trkCatalogTitle:"🐔 trk's playlist（非営利の紹介プレイリスト）",
+  trkCatalogHint:"最初の10曲はSAM Free Music — 100% Orange Juice! で出会える曲です。東方・ブルアカ・アークナイツも収録！音源は同梱しません。（著作権は放棄されていません）",
+  trkTab:"🐔 trk's playlist",
+  trkClassicTitle:"🎻 trk classic", trkClassicHint:"クラシック名盤100選（版権切れの名演をMusopenのPublic Domain録音で紹介）",
+  trkClassicToggle:"🎻 trk classic タブを表示", trkClassicNote:"右端に出るクラシックの紹介タブです。OFFで隠せます。チュートリアルを終えると自動で追加されます。",
+  trkClassicAdded:"🎻 trk classic を追加しました（{n}曲）— 右端のタブをどうぞ",
+  trkClassicDup:"🎻 trk classic はすでに入っています", trkClassicShow:"🎻 trk classic を表示", trkClassicHide:"🎻 trk classic を非表示",
+  trkClassicPanelTitle:"🎻 trk classic", trkClassicPanelHint:"チュートリアルを終えると右端に現れるクラシック名盤（版権切れ・音源なし）。Princess Tutuでも聴ける名曲も収録。",
+  trkClassicBtn:"🎻 trk classic", trkClassicTab:"🎻 trk classic"
 });
 Object.assign(TEXT.en, {
   plNewFolder:"📁 New folder", plDefaultFolderName:"Folder", plFolderSettings:"Folder settings",
@@ -365,7 +379,21 @@ Object.assign(TEXT.en, {
   plAuthorBlock:"🚫 Block this author (hides their playlists)", plAuthorUnblock:"🚫 Unblock",
   plAuthorNone:"No playlists with an author yet. Imported shared playlists carry a “👤 author”.",
   plAuthorHidden:"🚫 {n} hidden (blocked or filtered out)", plAuthorBy:"Author",
-  plAuthorBlockedView:"This author is blocked"
+  plAuthorBlockedView:"This author is blocked",
+  trkPlaylistTitle:"🐔 trk's playlist", trkPlaylistHint:"A curated game-music intro playlist (non-commercial, no audio bundled — get it from official sources).",
+  trkPlaylistToggle:"Show 🐔 trk's playlist tab", trkPlaylistNote:"Game-music intro tab at the far right. Turn off to hide. Added automatically after the tutorial.",
+  trkOpen:"🐔 Open", trkAdded:"Added 🐔 trk's playlist ({n} songs) — find it at the far right",
+  trkDup:"🐔 trk's playlist is already there", trkShow:"Show 🐔 trk's playlist", trkHide:"Hide 🐔 trk's playlist",
+  trkPanelTitle:"🐔 trk's playlist", trkPanelHint:"Appears at the far right after the tutorial (non-commercial, no audio).",
+  trkCatalogBtn:"🐔 trk's playlist", trkCatalogTitle:"🐔 trk's playlist (non-commercial intro)",
+  trkCatalogHint:"First 10 are SAM Free Music — tracks from 100% Orange Juice! Touhou, Blue Archive, Arknights and more inside! No audio bundled. (Copyright not waived.)",
+  trkTab:"🐔 trk's playlist",
+  trkClassicTitle:"🎻 trk classic", trkClassicHint:"100 Classical masterpieces (public-domain recordings via Musopen)",
+  trkClassicToggle:"Show 🎻 trk classic tab", trkClassicNote:"Classical intro tab at the far right. Turn off to hide. Added automatically after the tutorial.",
+  trkClassicAdded:"Added 🎻 trk classic ({n} songs) — find it at the far right",
+  trkClassicDup:"🎻 trk classic is already there", trkClassicShow:"Show 🎻 trk classic", trkClassicHide:"Hide 🎻 trk classic",
+  trkClassicPanelTitle:"🎻 trk classic", trkClassicPanelHint:"Appears at the far right after the tutorial (public-domain, no audio). Gems from Princess Tutu too.",
+  trkClassicBtn:"🎻 trk classic", trkClassicTab:"🎻 trk classic"
 });
 Object.assign(TEXT.zh, {
   plNewFolder:"📁 新建文件夹", plDefaultFolderName:"文件夹", plFolderSettings:"文件夹设置",
@@ -388,7 +416,21 @@ Object.assign(TEXT.zh, {
   plAuthorBlock:"🚫 屏蔽该投稿者（隐藏其播放列表）", plAuthorUnblock:"🚫 取消屏蔽",
   plAuthorNone:"还没有带投稿者的播放列表。读入共享播放列表时会带上「👤 投稿者」。",
   plAuthorHidden:"🚫 已隐藏 {n} 件（屏蔽中或筛选中）", plAuthorBy:"投稿者",
-  plAuthorBlockedView:"该投稿者已被屏蔽"
+  plAuthorBlockedView:"该投稿者已被屏蔽",
+  trkPlaylistTitle:"🐔 trk's playlist", trkPlaylistHint:"游戏音乐介绍播放列表（非营利、不含音源，请从官方渠道获取）。",
+  trkPlaylistToggle:"显示 🐔 trk's playlist 标签", trkPlaylistNote:"位于最右侧的游戏音乐介绍标签。关闭可隐藏，完成教程后自动添加。",
+  trkOpen:"🐔 打开", trkAdded:"已添加 🐔 trk's playlist（{n}首）— 请到最右侧查看",
+  trkDup:"🐔 trk's playlist 已在列表中", trkShow:"显示 🐔 trk's playlist", trkHide:"隐藏 🐔 trk's playlist",
+  trkPanelTitle:"🐔 trk's playlist", trkPanelHint:"完成教程后出现在最右侧的游戏音乐介绍（非营利、不含音源）。",
+  trkCatalogBtn:"🐔 trk's playlist", trkCatalogTitle:"🐔 trk's playlist（非营利介绍）",
+  trkCatalogHint:"前10首是SAM Free Music — 在100% Orange Juice! 中相遇的曲目。东方、碧蓝档案、明日方舟也有收录！不含音源。（版权未放弃）",
+  trkTab:"🐔 trk's playlist",
+  trkClassicTitle:"🎻 trk classic", trkClassicHint:"经典名盘100首（通过Musopen公共领域录音介绍）",
+  trkClassicToggle:"显示 🎻 trk classic 标签", trkClassicNote:"位于最右侧的经典介绍标签。关闭可隐藏，完成教程后自动添加。",
+  trkClassicAdded:"已添加 🎻 trk classic（{n}首）— 请到最右侧查看",
+  trkClassicDup:"🎻 trk classic 已在列表中", trkClassicShow:"显示 🎻 trk classic", trkClassicHide:"隐藏 🎻 trk classic",
+  trkClassicPanelTitle:"🎻 trk classic", trkClassicPanelHint:"完成教程后出现在最右侧的经典名盘（公共领域、不含音源）。",
+  trkClassicBtn:"🎻 trk classic", trkClassicTab:"🎻 trk classic"
 });
 Object.assign(TEXT.ko, {
   plNewFolder:"📁 새 폴더", plDefaultFolderName:"폴더", plFolderSettings:"폴더 설정",
@@ -411,7 +453,21 @@ Object.assign(TEXT.ko, {
   plAuthorBlock:"🚫 이 올린이 차단(플레이리스트 숨김)", plAuthorUnblock:"🚫 차단 해제",
   plAuthorNone:"올린이가 붙은 플레이리스트가 아직 없어요. 공유 플레이리스트를 가져오면 '👤 올린이'가 붙어요.",
   plAuthorHidden:"🚫 숨김 {n}건(차단 중 또는 필터 중)", plAuthorBy:"올린이",
-  plAuthorBlockedView:"차단 중인 올린이예요"
+  plAuthorBlockedView:"차단 중인 올린이예요",
+  trkPlaylistTitle:"🐔 trk's playlist", trkPlaylistHint:"게임 음악 소개 플레이리스트(비영리・음원 미포함, 공식 입수처에서 받아 주세요).",
+  trkPlaylistToggle:"🐔 trk's playlist 탭 표시", trkPlaylistNote:"맨 오른쪽에 나타나는 게임 음악 소개 탭이에요. 끄면 숨길 수 있고, 튜토리얼을 마치면 자동으로 추가돼요.",
+  trkOpen:"🐔 열기", trkAdded:"🐔 trk's playlist를 추가했어요({n}곡) — 맨 오른쪽 탭을 확인해 주세요",
+  trkDup:"🐔 trk's playlist는 이미 있어요", trkShow:"🐔 trk's playlist 표시", trkHide:"🐔 trk's playlist 숨기기",
+  trkPanelTitle:"🐔 trk's playlist", trkPanelHint:"튜토리얼을 마치면 맨 오른쪽에 나타나는 게임 음악 소개(비영리・음원 없음).",
+  trkCatalogBtn:"🐔 trk's playlist", trkCatalogTitle:"🐔 trk's playlist(비영리 소개 플레이리스트)",
+  trkCatalogHint:"처음 10곡은 SAM Free Music — 100% Orange Juice! 에서 만난 곡들이에요. 동방·블루 아카이브·명일방주도 들어 있어요! 음원은 들어 있지 않아요. (저작권 포기 아님)",
+  trkTab:"🐔 trk's playlist",
+  trkClassicTitle:"🎻 trk classic", trkClassicHint:"클래식 명반 100곡(공공 영역 음원은 Musopen으로 소개)",
+  trkClassicToggle:"🎻 trk classic 탭 표시", trkClassicNote:"맨 오른쪽에 나타나는 클래식 소개 탭이에요. 꺼면 숨길 수 있고, 튜토리얼을 마치면 자동으로 추가돼요.",
+  trkClassicAdded:"🎻 trk classic를 추가했어요({n}곡) — 맨 오른쪽 탭을 확인해 주세요",
+  trkClassicDup:"🎻 trk classic는 이미 있어요", trkClassicShow:"🎻 trk classic 표시", trkClassicHide:"🎻 trk classic 숨기기",
+  trkClassicPanelTitle:"🎻 trk classic", trkClassicPanelHint:"튜토리얼을 마치면 맨 오른쪽에 나타나는 클래식 명반(공공 영역・음원 없음).",
+  trkClassicBtn:"🎻 trk classic", trkClassicTab:"🎻 trk classic"
 });
 
 
@@ -445,7 +501,7 @@ function libTabsOf(all) {
   if (favN) tabs.push({ id:"fav", icon:"⭐", label:tr("favTab"), n:favN });
   const plKeys = new Set(all.map(x => x.key));
   for (const f of settings.plFolders) if (!f.parent) tabs.push({ id:"fld:" + f.id, icon: f.icon || "📁", label: f.name, n: [...plFolderUnionKeys(f.id)].filter(k => plKeys.has(k)).length, fld: f });   /* 📁 フォルダ（中のプレイリストの曲をぜんぶ） */
-  for (const p of settings.playlists) if (!p.folder && plVisible(p)) tabs.push({ id:"pl:" + p.id, icon: plIcon(p), label: p.name, n: plCount(p, plKeys), pl: p });   /* 🎧 フォルダに入っていないプレイリスト（👥投稿者で絞る） */
+  for (const p of settings.playlists) if (!p.folder && plVisible(p) && p.id !== "trk-playlist" && p.id !== "trk-classic") tabs.push({ id:"pl:" + p.id, icon: plIcon(p), label: p.name, n: plCount(p, plKeys), pl: p });   /* 🎧 フォルダに入っていないプレイリスト（👥投稿者で絞る。🐔🎻は右端に出すため除外） */
   if (settings.libTab.startsWith("pl:")) {   /* フォルダの中のプレイリストを見ているときは、そのタブも出す（戻れるように） */
     const cp = plById(settings.libTab.slice(3));
     if (cp && cp.folder && plVisible(cp) && !tabs.some(t => t.id === settings.libTab)) tabs.push({ id:"pl:" + cp.id, icon: plIcon(cp), label: cp.name, n: plCount(cp, plKeys), pl: cp, nested: true });
@@ -471,6 +527,23 @@ function libTabsOf(all) {
   if (nFiles) tabs.push({ id:"file", icon:"📄", label:tr("libTabFiles"), n:nFiles });
   const nv = all.filter(it => it.source === "pack" && libIsVerified(it)).length;
   if (nv) tabs.push({ id:"verified", icon:"✔", label:tr("libTabVerified"), n:nv });
+  // 🐔 trk's playlist — フォルダを右端に1つ。長押しで中の Vol 一覧が開く。場所を取らずに沢山収容
+  const trkFolder = settings.plFolders.find(f => f.id === TRK_FOLDER_ID);
+  if (trkFolder) {
+    const keys = plFolderUnionKeys(TRK_FOLDER_ID);
+    const n = [...keys].filter(k => plKeys.has(k)).length;
+    if (!tabs.some(x => x.id === "fld:" + TRK_FOLDER_ID)) tabs.push({ id:"fld:" + TRK_FOLDER_ID, icon: trkFolder.icon || "🐔", label: trkFolder.name, n, fld: trkFolder, trk: true });
+  } else if (settings.trkPlaylist !== false || settings.trkClassic !== false) {
+    // フォルダがまだ無い場合のフォールバック（旧来の2タブ）
+    if (settings.trkPlaylist !== false) {
+      const tp = settings.playlists.find(p => p.id === "trk-playlist");
+      if (tp && plVisible(tp) && !tabs.some(x => x.id === "pl:trk-playlist")) tabs.push({ id:"pl:trk-playlist", icon: plIcon(tp), label: tp.name, n: plCount(tp, plKeys), pl: tp, trk: true });
+    }
+    if (settings.trkClassic !== false) {
+      const tc = settings.playlists.find(p => p.id === "trk-classic");
+      if (tc && plVisible(tc) && !tabs.some(x => x.id === "pl:trk-classic")) tabs.push({ id:"pl:trk-classic", icon: plIcon(tc), label: tc.name, n: plCount(tc, plKeys), pl: tc, trk: true });
+    }
+  }
   return tabs;
 }
 function libTabMatch(it, id) {
@@ -618,6 +691,194 @@ function plSanitize(raw) {
     by: typeof raw.by === "string" ? raw.by.trim().slice(0, 24) : "",   /* 👤 投稿者（共有プレイリスト由来） */
     createdAt: (typeof raw.createdAt === "number" && raw.createdAt > 0 && raw.createdAt < 9e15) ? raw.createdAt : 0 };
 }
+const TRK_PLAYLIST_ID = "trk-playlist";
+const TRK_FOLDER_ID = "trk";
+const TRK_CLASSIC_ID = "trk-classic";
+function ensureTrkSubfolder(id, name, icon) {
+  let f = settings.plFolders.find(x => x.id === id);
+  if (f) return f;
+  f = plFolderSanitize({ id, name, icon, color: "none", parent: TRK_FOLDER_ID });
+  if (!f) return null;
+  settings.plFolders.push(f);
+  saveUserPrefs();
+  return f;
+}
+function ensureTrkFolder() {
+  let f = settings.plFolders.find(x => x.id === TRK_FOLDER_ID);
+  if (!f) {
+    f = plFolderSanitize({ id: TRK_FOLDER_ID, name: "🐔 trk's playlist", icon: "🐔", color: "none", parent: "" });
+    if (f) { settings.plFolders.push(f); saveUserPrefs(); }
+  }
+  ensureTrkSubfolder("trk-classic", "Classic", "🎻");
+  ensureTrkSubfolder("trk-ba", "Blue Archive", "🎮");
+  ensureTrkSubfolder("trk-touhou", "Touhou", "⛩️");
+  ensureTrkSubfolder("trk-arknights", "Arknights", "🎮");
+  ensureTrkSubfolder("trk-gakumas", "Gakum@s", "🎤");
+  ensureTrkSubfolder("trk-endfield", "Endfield", "🛰️");
+  return settings.plFolders.find(x => x.id === TRK_FOLDER_ID) || f || null;
+}
+function trkWishesFromCatalog() {
+  const cat = window.TRK_CATALOG || [];
+  const out = [];
+  for (const s of cat) {
+    if (s.id === "classical") continue; // 🎻 classicは別枠 trk classicへ
+    for (const pl of (s.playlists || [])) {
+      for (const tt of (pl.songs || [])) {
+        out.push({ t: tt.t, al: tt.al || "", ar: tt.ar || "", u: tt.u || "" });
+        if (out.length >= 100) return out;
+      }
+      if (out.length >= 100) return out;
+    }
+    if (out.length >= 100) return out;
+  }
+  return out;
+}
+function trkClassicWishesFromCatalog() {
+  const cat = window.TRK_CATALOG || [];
+  const out = [];
+  for (const s of cat) {
+    if (s.id !== "classical") continue;
+    for (const pl of (s.playlists || [])) {
+      for (const tt of (pl.songs || [])) {
+        out.push({ t: tt.t, al: tt.al || "", ar: tt.ar || "", u: tt.u || "" });
+        if (out.length >= 100) return out;
+      }
+      if (out.length >= 100) return out;
+    }
+    if (out.length >= 100) return out;
+  }
+  return out;
+}
+function ensureTrkPlaylist(opts) {
+  const o = opts || {};
+  const doToast = o.toast !== false;
+  const go = !!o.go;
+  if (settings.trkPlaylist === false) return false;
+  if (settings.playlists.some(function(p){ return p.id === TRK_PLAYLIST_ID; })) return false;
+  ensureTrkFolder();
+  const wishes = trkWishesFromCatalog();
+  if (!wishes.length) return false;
+  const p = plSanitize({ id: TRK_PLAYLIST_ID, name: "Game Vol.1", icon: "\uD83D\uDC14", color: "none", folder: TRK_FOLDER_ID, tags: ["Game","Vol.1"], wish: wishes, songs: [], guide: { note: "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8\u3002\u97F3\u6E90\u306F\u540C\u68B1\u3057\u307E\u305B\u3093\u3002\u516C\u5F0F\u306E\u5165\u624B\u5148\u304B\u3089\u3069\u3046\u305E\u3002", url: "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" }, cat: "trk:all", createdAt: Date.now() });
+  if (!p) return false;
+  settings.playlists.push(p);
+  saveUserPrefs();
+  if (doToast) try { plToast(tr("trkAdded", { n: wishes.length })); } catch(_){}
+  if (go) { settings.libTab = "pl:" + TRK_PLAYLIST_ID; saveUserPrefs(); try { renderLib(); } catch(_){} }
+  return true;
+}
+function ensureTrkClassicPlaylist(opts) {
+  const o = opts || {};
+  const doToast = o.toast !== false;
+  const go = !!o.go;
+  if (settings.trkClassic === false) return false;
+  if (settings.playlists.some(function(p){ return p.id === TRK_CLASSIC_ID; })) return false;
+  ensureTrkFolder();
+  const wishes = trkClassicWishesFromCatalog();
+  if (!wishes.length) return false;
+  const p = plSanitize({ id: TRK_CLASSIC_ID, name: "Classic Vol.1", icon: "\uD83C\uDFBB", color: "none", folder: "trk-classic", tags: ["Classic","Vol.1"], wish: wishes, songs: [], guide: { note: "\u7248\u6A29\u5207\u308C\u306E\u540D\u6F14\u3092Musopen\u306E\u516C\u958B\u9332\u97F3\u3067\u7D39\u4ECB\u3002\u97F3\u6E90\u306F\u540C\u68B1\u3057\u307E\u305B\u3093\u3002", url: "https://musopen.org/" }, cat: "trk:classic", createdAt: Date.now() });
+  if (!p) return false;
+  settings.playlists.push(p);
+  saveUserPrefs();
+  if (doToast) try { plToast(tr("trkClassicAdded", { n: wishes.length })); } catch(_){}
+  if (go) { settings.libTab = "pl:" + TRK_CLASSIC_ID; saveUserPrefs(); try { renderLib(); } catch(_){} }
+  return true;
+}
+window.TrkEnsureTrkPlaylist = ensureTrkPlaylist;
+window.TrkTrkPlaylistId = TRK_PLAYLIST_ID;
+window.TrkEnsureTrkClassicPlaylist = ensureTrkClassicPlaylist;
+window.TrkClassicId = TRK_CLASSIC_ID;
+function trkOrderedPlaylists(list) {
+  if (settings.trkSortABC) return list.slice().sort((a,b) => a.name.localeCompare(b.name, 'ja'));
+  const order = settings.playlistOrder || [];
+  if (!order.length) return list.slice().sort((a,b) => (a.createdAt||0)-(b.createdAt||0));
+  const idx = new Map(order.map((id,i)=>[id,i]));
+  return list.slice().sort((a,b) => {
+    const ai = idx.has(a.id) ? idx.get(a.id) : 1e9;
+    const bi = idx.has(b.id) ? idx.get(b.id) : 1e9;
+    if (ai !== bi) return ai - bi;
+    return (a.createdAt||0)-(b.createdAt||0);
+  });
+}
+function trkMovePlaylist(id, dir) {
+  let order = (settings.playlistOrder||[]).slice();
+  const ids = trkOrderedPlaylists(settings.playlists.filter(p=> p.folder===TRK_FOLDER_ID || p.folder==="trk-classic" || p.folder==="trk-ba" || p.folder==="trk-touhou" || p.folder==="trk-arknights" || p.folder==="trk-gakumas" || p.folder==="trk-endfield" || settings.plFolders.some(f=> f.id===p.folder && f.parent===TRK_FOLDER_ID) )).map(p=>p.id);
+  // ensure order contains all ids
+  for (const pid of ids) if (!order.includes(pid)) order.push(pid);
+  const i = order.indexOf(id);
+  if (i < 0) return;
+  const j = i + dir;
+  if (j < 0 || j >= order.length) return;
+  [order[i], order[j]] = [order[j], order[i]];
+  settings.playlistOrder = order.slice(0,200);
+  saveUserPrefs();
+  renderLib();
+  try { if (typeof renderTrkSettings === "function") renderTrkSettings(); } catch(_){}
+}
+window.ensureTrkDistributionPlaylists = ensureTrkDistributionPlaylists;
+
+function trkWishesForSeries(seriesId) {
+  const cat = window.TRK_CATALOG || [];
+  const out = [];
+  for (const s of cat) {
+    if (s.id !== seriesId) continue;
+    for (const pl of (s.playlists || [])) {
+      for (const tt of (pl.songs || [])) {
+        out.push({ t: tt.t, al: tt.al || "", ar: tt.ar || "", u: tt.u || "" });
+      }
+    }
+  }
+  return out;
+}
+function ensureTrkDistributionPlaylists() {
+  ensureTrkFolder();
+  const cat = window.TRK_CATALOG || [];
+  const folderMap = { bluearchive: "trk-ba", touhou: "trk-touhou", arknights: "trk-arknights", gakumas: "trk-gakumas", endfield: "trk-endfield" };
+  let changed = false;
+  for (const s of cat) {
+    const folder = folderMap[s.id];
+    if (!folder) continue;
+    for (const pl of (s.playlists || [])) {
+      const baseId = "trk-" + pl.id;
+      // if already exists, skip
+      if (settings.playlists.some(p => p.id === baseId)) continue;
+      const wishes = (pl.songs || []).map(tt => ({ t: tt.t, al: tt.al || "", ar: tt.ar || "", u: tt.u || "" }));
+      if (!wishes.length) continue;
+      // respect 100 limit per Vol, split if needed into Vol.1 / Vol.2 etc.
+      const total = wishes.length;
+      const vols = Math.ceil(total / 100) || 1;
+      for (let v = 0; v < vols; v++) {
+        const vid = vols === 1 ? baseId : baseId + "-v" + (v+1);
+        if (settings.playlists.some(p => p.id === vid)) continue;
+        const slice = wishes.slice(v*100, (v+1)*100);
+        const vTag = vols === 1 ? [] : ["Vol."+(v+1)];
+        const vName = vols === 1 ? pl.name : pl.name + " Vol." + (v+1);
+        const p = plSanitize({ id: vid, name: vName, icon: pl.icon || s.icon, color: pl.color || s.color, folder, tags: (pl.tags || []).concat(vTag).slice(0,5), wish: slice, songs: [], guide: { note: "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8\u3002" + s.name + " の配布形態別フォルダに収容。", url: s.url || "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" }, cat: "trk:" + s.id + ":" + pl.id, createdAt: Date.now() + v });
+        if (p) { settings.playlists.push(p); changed = true; }
+      }
+    }
+  }
+  // legacy: ensure old 4 generic still migrate if missing (for existing users)
+  const legacy = [
+    { id: "trk-ba-v1", folder: "trk-ba", series: "bluearchive" },
+    { id: "trk-touhou-v1", folder: "trk-touhou", series: "touhou" },
+    { id: "trk-arknights-v1", folder: "trk-arknights", series: "arknights" },
+    { id: "trk-gakumas-v1", folder: "trk-gakumas", series: "gakumas" },
+  ];
+  for (const d of legacy) {
+    if (settings.playlists.some(p => p.id === d.id)) continue;
+    const s = cat.find(x=> x.id===d.series);
+    if (!s) continue;
+    // if new per-PL already cover, skip legacy creation
+    if (s.playlists && s.playlists.some(pl=> settings.playlists.some(p=> p.id==="trk-"+pl.id))) continue;
+    const wishesAll = trkWishesForSeries(d.series);
+    if (!wishesAll.length) continue;
+    const slice = wishesAll.slice(0,100);
+    const p = plSanitize({ id: d.id, name: s.name + " Vol.1", icon: s.icon, color: s.color, folder: d.folder, tags: ["Game", s.name, "Vol.1"], wish: slice, songs: [], guide: { note: "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8\u3002", url: s.url || "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" }, cat: "trk:" + d.series, createdAt: Date.now() });
+    if (p) { settings.playlists.push(p); changed = true; }
+  }
+  if (changed) saveUserPrefs();
+}
+
 (function plTighten() {
   settings.playlists = (settings.playlists || []).map(plSanitize).filter(Boolean).slice(0, 24);
   settings.plFolders = (settings.plFolders || []).map(plFolderSanitize).filter(Boolean).slice(0, 12);
@@ -795,6 +1056,29 @@ function plFolderMenu(f) {
   del.addEventListener("click", () => plFolderDelete(f, d.close));
   d.card.append(plRow(tr("plName"), name), plRow(tr("plIcon"), icon), plRow(tr("plColor"), color),
     plRow(tr("plFolderOf"), parent), save, del);
+  // 🐔 trk folder special: show inner playlists (Game Vol.1, Classic Vol.1, BlueArchive etc.) for quick open
+  if (f.id === TRK_FOLDER_ID || f.id === "trk-classic" || f.id === "trk-ba" || f.id === "trk-touhou" || f.id === "trk-arknights" || f.id === "trk-gakumas" || f.id === "trk-endfield") {
+    const innerIds = f.id === TRK_FOLDER_ID ? [TRK_FOLDER_ID, "trk-classic", "trk-ba", "trk-touhou", "trk-arknights", "trk-gakumas", "trk-endfield"] : [f.id];
+    const allInner = settings.playlists.filter(p => innerIds.includes(p.folder) || (f.id===TRK_FOLDER_ID && settings.plFolders.some(ff=> innerIds.includes(ff.id) && ff.id===p.folder)) );
+    if (allInner.length) {
+      d.card.append(el("div", "plSep"));
+      d.card.append(el("b", "plCardTitle", tr("plFolderContents") || "中のプレイリスト"));
+      const ordered = trkOrderedPlaylists(allInner);
+      for (const p of ordered) {
+        const row = el("div"); row.style.cssText = "display:flex;gap:8px;align-items:center;margin:4px 0;flex-wrap:wrap";
+        const open = el("button", "plBtn", (p.icon||"🎧")+" "+p.name+" ("+plCount(p, new Set((window.__libAll||[]).map(x=>x.key)))+")"); open.type="button";
+        open.addEventListener("click", () => { d.close(); settings.libTab="pl:"+p.id; renderLib(); });
+        const up = el("button", "plBtn small", "↑"); up.type="button"; up.title="上へ";
+        const down = el("button", "plBtn small", "↓"); down.type="button"; down.title="下へ";
+        if (settings.trkSortABC) { up.disabled=true; down.disabled=true; up.style.opacity=".45"; down.style.opacity=".45"; }
+        up.addEventListener("click", () => trkMovePlaylist(p.id, -1));
+        down.addEventListener("click", () => trkMovePlaylist(p.id, 1));
+        row.append(open, up, down);
+        d.card.append(row);
+      }
+      if (settings.trkSortABC) d.card.append(el("div", "plHint", "🔤 ABC順がオンのため、手動並べ替えは無効です。設定でオフにしてください。"));
+    }
+  }
   name.focus(); name.select();
 }
 
@@ -953,7 +1237,25 @@ function plGlobalMenu() {
   imp.addEventListener("click", () => { d.close(); plImportPick(); });
   const mkfld = el("button", "plBtn", tr("plNewFolder")); mkfld.type = "button";
   mkfld.addEventListener("click", () => { d.close(); plFolderCreate(plFolderContext()); });
-  const catb = el("button", "plBtn", tr("plCatalogBtn")); catb.type = "button";
+  // 🐔 trk's playlist — 📚すべて長押しの『公式カタログ』部分を置き換え（認定者が出たら 🏅認定カタログ として復活予定）
+  const trkb = el("button", "plBtn", tr("trkCatalogBtn")); trkb.type = "button";
+  trkb.addEventListener("click", () => {
+    d.close();
+    const created = ensureTrkPlaylist({ toast: true });
+    if (!created && settings.playlists.some(function(p){ return p.id === TRK_PLAYLIST_ID; })) {
+      // 既にあるならそのタブへ
+      settings.libTab = "pl:" + TRK_PLAYLIST_ID; saveUserPrefs(); renderLib();
+      plToast(tr("trkDup"));
+    } else if (!created) {
+      // まだ無くて作れなかった（カタログが無い等）は従来のカタログを表示
+      plCatalogMenu();
+      return;
+    } else {
+      settings.libTab = "pl:" + TRK_PLAYLIST_ID; saveUserPrefs(); renderLib();
+    }
+  });
+  // 旧公式カタログは一旦隠す（🏅認定カタログで復活）— 内部の plCatalogMenu() は残す
+  const catb = el("button", "plBtn", tr("plCatalogBtn")); catb.type = "button"; catb.hidden = true;
   catb.addEventListener("click", () => { d.close(); plCatalogMenu(); });
   const one = el("input"); one.type = "radio"; one.name = "plDelMode"; one.checked = settings.playlistDelMode !== "three";
   const three = el("input"); three.type = "radio"; three.name = "plDelMode"; three.checked = settings.playlistDelMode === "three";
@@ -967,7 +1269,7 @@ function plGlobalMenu() {
   const abtn = el("button", "plBtn", tr("plAuthorBtn")); abtn.type = "button"; abtn.hidden = !settings.plAuthorTools;
   abtn.addEventListener("click", () => { d.close(); plAuthorMenu(); });
   at.addEventListener("change", () => { settings.plAuthorTools = at.checked; saveUserPrefs(); nameRow.hidden = !at.checked; abtn.hidden = !at.checked; renderLib(); });
-  d.card.append(make, imp, mkfld, catb, el("div", "plSep"),
+  d.card.append(make, imp, mkfld, trkb, catb, el("div", "plSep"),
     plRow(tr("plDelOne"), one), plRow(tr("plDelThree"), three),
     el("div", "plHint", tr("plDelModeHint")),
     el("div", "plSep"), plRow(tr("plAuthorTools"), at), nameRow, abtn);
@@ -2082,12 +2384,107 @@ function syncShareUI() {
   if (stop) stop.hidden = !(sharing || shareRemembered || sharedSongs.length);
   showReconnect();
 }
+function syncTrkUI() {
+  const chk = $("trkPlaylistChk");
+  if (chk) chk.checked = settings.trkPlaylist !== false;
+  const st = $("trkStatus");
+  if (st) {
+    const tp = settings.playlists.find(function(p){ return p.id === TRK_PLAYLIST_ID; });
+    if (settings.trkPlaylist === false) st.textContent = tr("trkHide") + " \u2014 " + tr("trkPanelHint");
+    else if (tp) st.textContent = tr("trkPlaylistTitle") + " \u00B7 " + tr("plSongsNow", { n: (tp.songs.length + (tp.wish ? tp.wish.length : 0)) });
+    else st.textContent = tr("trkPlaylistHint");
+  }
+  const chkC = $("trkClassicChk");
+  if (chkC) chkC.checked = settings.trkClassic !== false;
+  const stC = $("trkClassicStatus");
+  if (stC) {
+    const tc = settings.playlists.find(function(p){ return p.id === TRK_CLASSIC_ID; });
+    if (settings.trkClassic === false) stC.textContent = tr("trkClassicHide") + " \u2014 " + tr("trkClassicPanelHint");
+    else if (tc) stC.textContent = tr("trkClassicTitle") + " \u00B7 " + tr("plSongsNow", { n: (tc.songs.length + (tc.wish ? tc.wish.length : 0)) });
+    else stC.textContent = tr("trkClassicHint");
+  }
+  const chkAbc = $("trkSortAbcChk");
+  if (chkAbc) chkAbc.checked = !!settings.trkSortABC;
+  try { renderTrkSettings(); } catch(_){}
+}
+function renderTrkSettings() {
+  const box = $("trkOrderList");
+  if (!box) return;
+  box.replaceChildren();
+  const innerIds = [TRK_FOLDER_ID, "trk-classic", "trk-ba", "trk-touhou", "trk-arknights", "trk-gakumas", "trk-endfield"];
+  const list = settings.playlists.filter(p => innerIds.includes(p.folder) || settings.plFolders.some(f=> f.parent===TRK_FOLDER_ID && f.id===p.folder && innerIds.includes(f.id)) || innerIds.includes(p.folder));
+  // also include playlists whose folder is a direct trk subfolder
+  const trkList = settings.playlists.filter(p => {
+    if (p.id===TRK_PLAYLIST_ID || p.id===TRK_CLASSIC_ID) return true;
+    if (innerIds.includes(p.folder)) return true;
+    const f = settings.plFolders.find(x=> x.id===p.folder);
+    return f && f.parent===TRK_FOLDER_ID;
+  });
+  if (!trkList.length) { box.append(el("div","hint","（まだプレイリストがありません。チュートリアルを完了すると自動作成されます）")); return; }
+  const ordered = trkOrderedPlaylists(trkList);
+  for (let i=0;i<ordered.length;i++) {
+    const p = ordered[i];
+    const row = el("div"); row.style.cssText="display:flex;gap:8px;align-items:center;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;padding:6px 8px";
+    const name = el("span","", (p.icon||"🎧")+" "+p.name); name.style.cssText="flex:1;min-width:120px";
+    const open = el("button","plBtn small","開く"); open.type="button";
+    open.addEventListener("click", ()=>{ settings.libTab="pl:"+p.id; saveUserPrefs(); renderLib(); });
+    const up = el("button","plBtn small","↑"); up.type="button"; up.title="上へ";
+    const down = el("button","plBtn small","↓"); down.type="button"; down.title="下へ";
+    if (settings.trkSortABC) { up.disabled=true; down.disabled=true; up.style.opacity=".45"; down.style.opacity=".45"; }
+    up.addEventListener("click", ()=> trkMovePlaylist(p.id, -1));
+    down.addEventListener("click", ()=> trkMovePlaylist(p.id, 1));
+    row.append(name, open, up, down);
+    box.append(row);
+  }
+  if (settings.trkSortABC) box.append(el("div","hint","🔤 ABC順がオンのため、手動の ↑↓ は無効です。"));
+}
+
 
 /* ---------- ボタンの配線（📁 開く と 📤 共有 はならべて残します） ---------- */
 const libOpenBtn = $("libOpenBtn"); if (libOpenBtn) libOpenBtn.addEventListener("click", openFolder);
 const libShareBtn = $("libShareBtn"); if (libShareBtn) libShareBtn.addEventListener("click", shareMusicFolder);
 const libShareSettingsBtn = $("libShareSettingsBtn"); if (libShareSettingsBtn) libShareSettingsBtn.addEventListener("click", shareMusicFolder);
 const libShareStopBtn = $("libShareStopBtn"); if (libShareStopBtn) libShareStopBtn.addEventListener("click", stopSharing);
+const trkChk = $("trkPlaylistChk");
+if (trkChk) trkChk.addEventListener("change", function(){
+  settings.trkPlaylist = !!trkChk.checked; saveUserPrefs();
+  if (settings.trkPlaylist) try { ensureTrkPlaylist({ toast: false }); } catch(_){}
+  syncTrkUI(); renderLib();
+  setStatus("trkStatus", settings.trkPlaylist ? "trkShow" : "trkHide");
+});
+const trkAbcChk = $("trkSortAbcChk");
+if (trkAbcChk) trkAbcChk.addEventListener("change", function(){
+  settings.trkSortABC = !!trkAbcChk.checked; saveUserPrefs();
+  syncTrkUI(); renderLib();
+});
+const trkOpenBtn = $("trkOpenBtn");
+if (trkOpenBtn) trkOpenBtn.addEventListener("click", function(){
+  const created = ensureTrkPlaylist({ toast: true });
+  settings.libTab = "pl:" + TRK_PLAYLIST_ID; saveUserPrefs(); renderLib();
+  if (!created) plToast(tr("trkDup"));
+});
+const trkHideBtn = $("trkHideBtn");
+if (trkHideBtn) trkHideBtn.addEventListener("click", function(){
+  settings.trkPlaylist = false; saveUserPrefs(); syncTrkUI(); renderLib(); plToast(tr("trkHide"));
+});
+const trkClassicChk = $("trkClassicChk");
+if (trkClassicChk) trkClassicChk.addEventListener("change", function(){
+  settings.trkClassic = !!trkClassicChk.checked; saveUserPrefs();
+  if (settings.trkClassic) try { ensureTrkClassicPlaylist({ toast: false }); } catch(_){}
+  syncTrkUI(); renderLib();
+  setStatus("trkClassicStatus", settings.trkClassic ? "trkClassicShow" : "trkClassicHide");
+});
+const trkClassicOpenBtn = $("trkClassicOpenBtn");
+if (trkClassicOpenBtn) trkClassicOpenBtn.addEventListener("click", function(){
+  const created = ensureTrkClassicPlaylist({ toast: true });
+  settings.libTab = "pl:" + TRK_CLASSIC_ID; saveUserPrefs(); renderLib();
+  if (!created) plToast(tr("trkClassicDup"));
+});
+const trkClassicHideBtn = $("trkClassicHideBtn");
+if (trkClassicHideBtn) trkClassicHideBtn.addEventListener("click", function(){
+  settings.trkClassic = false; saveUserPrefs(); syncTrkUI(); renderLib(); plToast(tr("trkClassicHide"));
+});
+if (typeof on === "function") on("language", syncTrkUI);
 const libKeepChk = $("libKeepSharedChk");
 if (libKeepChk) libKeepChk.addEventListener("change", async () => {
   settings.libKeepShared = !!libKeepChk.checked; saveUserPrefs();
@@ -2146,7 +2543,7 @@ on("studyCoverChanged", key => {
     if (currentSong === song) return setBackground(blob || song.bgBlob || null);
   }).catch(() => {});
 });
-on("language", () => { $("libSearch").placeholder = tr("libSearch"); showReconnect(); syncShareUI(); renderLib(); renderBanner(); syncVideoButton(); });
+on("language", () => { $("libSearch").placeholder = tr("libSearch"); showReconnect(); syncShareUI(); syncTrkUI(); renderLib(); renderBanner(); syncVideoButton(); });
 /* 🎬 「動画を読み込む」の説明（通常より時間がかかります）をボタンに付ける */
 function syncVideoButton() { const label = $("libVideoLabel"); if (label) label.title = tr("libAddVideoHint"); }
 
@@ -2181,6 +2578,19 @@ async function initLibrary() {
     if (sharedSongs.length) setStatus("libStatus", "libKeepSharedRestored", { n:sharedSongs.length });
   }
   syncShareUI();
+  // 🐔 trk's playlist — チュートリアル済みなら初回だけ自動で1タブ追加（設定で非表示なら作らない・トーストなし）
+  if (settings.tutorialDone && settings.trkPlaylist !== false) {
+    try { ensureTrkPlaylist({ toast: false }); } catch(_){}
+  }
+  // 🎻 trk classic — 同上。ゲームとは別枠で100曲。設定で非表示なら作らない
+  if (settings.tutorialDone && settings.trkClassic !== false) {
+    try { ensureTrkClassicPlaylist({ toast: false }); } catch(_){}
+  }
+  // 配布形態で分類: 各タイトル別 Vol を作る（長押しで開くリスト）
+  if (settings.tutorialDone) {
+    try { ensureTrkDistributionPlaylists(); } catch(_){}
+  }
+  syncTrkUI();
   renderLib();
 }
 /* ✅ library.js 完了 */

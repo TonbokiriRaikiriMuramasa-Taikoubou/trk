@@ -54,8 +54,24 @@
 const ADDONS_KEY = "trk_addons_v1";       // 新しい保存キー（既存のキーは触りません）
 const ADDON_FORMAT = "trk-addon";         // 配布ファイルの形式名
 const API_VERSION = 1;                    // このファイルが提供するAPIの版
-const MAX_CODE = 512 * 1024;              // 1つのアドオンの上限（512KB）
+const MAX_CODE = 512 * 1024;              // 1つのアドオンコードの上限（512KiB）
+const MAX_ADDON_FILE = 4 * 1024 * 1024;   // JSONラッパーを含む入力ファイルの上限（4MiB）
 const SAMPLE_URL = "js/addons/example.js";
+function exceedsUtf8Limit(value, limit) {
+  const text = String(value);
+  if (text.length > limit) return true;    // UTF-8はASCIIでも最低1 byte／UTF-16 code unit
+  let bytes = 0;
+  for (let i = 0; i < text.length; i++) {
+    const c = text.charCodeAt(i);
+    if (c <= 0x7f) bytes++;
+    else if (c <= 0x7ff) bytes += 2;
+    else if (c >= 0xd800 && c <= 0xdbff && i + 1 < text.length &&
+        text.charCodeAt(i + 1) >= 0xdc00 && text.charCodeAt(i + 1) <= 0xdfff) { bytes += 4; i++; }
+    else bytes += 3;                       // BMP / unpaired surrogate (TextEncoder replacement)
+    if (bytes > limit) return true;
+  }
+  return false;
+}
 
 /* ============ 文章（接頭辞 addon…） ============ */
 Object.assign(TEXT.ja, {
@@ -80,6 +96,7 @@ Object.assign(TEXT.ja, {
   addonConsentBtn:"✅ 同意を記録する", addonConsentHint:"同意の記録は端末内にだけ保存されます（外部へは送りません）。",
   addonSampleSaved:"サンプルを保存しました。中身を見て、自分のアドオンを作ってみてください。",
   addonSampleFail:"サンプルを取ってこられませんでした。docs/ADDONS.md を見てください。",
+  addonFileTooBig:"ファイルが大きすぎます（{n}KB まで）。",
   addonTooBig:"大きすぎます（{n}KB まで）。"
 });
 Object.assign(TEXT.en, {
@@ -104,6 +121,7 @@ Object.assign(TEXT.en, {
   addonConsentBtn:"✅ Record my consent", addonConsentHint:"The consent record is stored on this device only (never uploaded).",
   addonSampleSaved:"Sample saved. Open it and try making your own add-on.",
   addonSampleFail:"Could not fetch the sample. See docs/ADDONS.md.",
+  addonFileTooBig:"File is too large (up to {n}KB).",
   addonTooBig:"Too big (up to {n}KB)."
 });
 Object.assign(TEXT.zh, {
@@ -128,6 +146,7 @@ Object.assign(TEXT.zh, {
   addonConsentBtn:"✅ 记录同意", addonConsentHint:"同意记录只保存在本机（不会上传）。",
   addonSampleSaved:"已保存示例。请打开看看，试着自己做一个插件。",
   addonSampleFail:"取不到示例。请看 docs/ADDONS.md。",
+  addonFileTooBig:"文件太大（最大 {n}KB）。",
   addonTooBig:"太大了（最大 {n}KB）。"
 });
 Object.assign(TEXT.ko, {
@@ -152,6 +171,7 @@ Object.assign(TEXT.ko, {
   addonConsentBtn:"✅ 동의 기록하기", addonConsentHint:"동의 기록은 이 기기에만 저장됩니다 (업로드하지 않습니다).",
   addonSampleSaved:"샘플을 저장했습니다. 열어 보고 자기만의 애드온을 만들어 보세요.",
   addonSampleFail:"샘플을 가져오지 못했습니다. docs/ADDONS.md를 봐 주세요.",
+  addonFileTooBig:"파일이 너무 큽니다 ({n}KB까지).",
   addonTooBig:"너무 큽니다 ({n}KB까지)."
 });
 
@@ -172,8 +192,10 @@ const runtime = new Map();      // id → { def, api }
 const fileAddons = [];          // index.html の <script> から来たアドオン
 const songsByAddon = new Map(); // id → 曲の配列
 const slots = new Map();        // 置き場所
+const consentStateCache = new WeakMap();
 let collecting = null;          // いま走っているコードが register() したぶん
 let pendingReload = false;
+let bootPromise = Promise.resolve();
 
 /* ============ 画面まわり ============ */
 function say(text, isError) {
@@ -324,18 +346,31 @@ function syncSongs() {
 }
 
 /* ============ 入れる／外す ============ */
-function parseAddonFile(text) {
-  const t = String(text || "");
-  if (/^\s*[{[]/.test(t)) {
-    try {
-      const j = JSON.parse(t);
-      if (j && typeof j.code === "string") {
-        return { code:j.code, meta:{ name:j.name, author:j.author, description:j.description, version:j.version, apiVersion:j.apiVersion, format:j.format } };
-      }
-      if (j && j.format === ADDON_FORMAT) return { code:"", meta:j, why:"code がありません" };
-    } catch (e) { return { code:t, meta:{}, why:"JSON として読めませんでした：" + e.message }; }
+function parseAddonFile(text, filename = "", allowRawCode = false) {
+  const t = text == null ? "" : String(text);
+  const name = String(filename || "");
+  const isJsFile = /\.js$/i.test(name);
+  const isJsonFile = /\.(?:json|trkaddon|trk-addon)$/i.test(name);
+  const looksJson = /^\s*[{[]/.test(t);
+  /* .js は明示的なコード。JSON形式の拡張子／JSON風の文字列は、壊れていてもJSへ流さない。 */
+  if (isJsFile) return { code:t, meta:{} };
+  if (isJsonFile || looksJson) {
+    let j;
+    try { j = JSON.parse(t); }
+    catch (e) {
+      if (allowRawCode && !isJsonFile) return { code:t, meta:{} };   /* プログラムAPIのみ明示コードとして扱う */
+      return { code:"", meta:{}, why:"JSON として読めませんでした：" + e.message };
+    }
+    if (j && typeof j === "object" && !Array.isArray(j) && typeof j.code === "string") {
+      if (j.format != null && j.format !== ADDON_FORMAT) return { code:"", meta:j, why:"format が対応していません" };
+      return { code:j.code, meta:{ name:j.name, author:j.author, description:j.description, version:j.version, apiVersion:j.apiVersion, format:j.format } };
+    }
+    if (isJsonFile || !allowRawCode) return { code:"", meta:j && typeof j === "object" ? j : {}, why:"code がありません" };
+    return { code:t, meta:{} };
   }
-  return { code:t, meta:{} };
+  /* TrkAddons.install() は既存のプログラム向け文字列API。ファイル選択では raw code を許さない。 */
+  if (allowRawCode) return { code:t, meta:{} };
+  return { code:"", meta:{}, why:"対応拡張子は .js / .json / .trkaddon です" };
 }
 /* ---------- ✅ 同意の記録 ----------
    アドオンはページのフル権限で動くので、「入れる前に一度だけ同意してもらう」ようにしました。
@@ -343,15 +378,43 @@ function parseAddonFile(text) {
    ・コードの指紋（短いハッシュ）も一緒に記録し、あとで中身が変わっていたら ⚠ を出します
    ・コードの実行（runCode）は同意の後。同意しなければ、そのファイルは動かしません
    ・この記録より前に導入したアドオンは ⚠ を出すだけで、勝手に止めたりはしません */
-function codeShaSync(code) {
+function codeShaLegacy(code) {
   const text = String(code || "");
-  let h1 = 0x811c9dc5, h2 = 0x01000193;   /* FNV-1a を2系統（衝突しにくい短い指紋） */
+  let h1 = 0x811c9dc5, h2 = 0x01000193;   /* 旧版のFNV系指紋。既存レコードの互換確認だけに使う */
   for (let i = 0; i < text.length; i++) {
     const c = text.charCodeAt(i);
     h1 = Math.imul(h1 ^ c, 16777619) >>> 0;
     h2 = Math.imul(h2 ^ ((c << 5) | (c >>> 3)), 2654435761) >>> 0;
   }
   return (h1.toString(16).padStart(8, "0") + h2.toString(16).padStart(8, "0")).slice(0, 16);
+}
+function hasSha256() {
+  return typeof crypto !== "undefined" && !!crypto.subtle && typeof TextEncoder === "function";
+}
+async function codeFingerprint(code) {
+  const text = String(code || "");
+  if (!hasSha256()) return "fnv64:" + codeShaLegacy(text);   /* file:// 等の互換用。署名ではない */
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return "sha256:" + [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+async function verifyConsent(entry) {
+  if (!entry || typeof entry !== "object" || !entry.consentAt) return "none";
+  if (typeof entry.code !== "string" || exceedsUtf8Limit(entry.code, MAX_CODE) || typeof entry.consentSha !== "string") return "stale";
+  const saved = entry.consentSha.toLowerCase();
+  try {
+    if (/^sha256:[0-9a-f]{64}$/.test(saved)) {
+      if (!hasSha256()) return "stale";
+      return (await codeFingerprint(entry.code)) === saved ? "ok" : "stale";
+    }
+    if (/^fnv64:[0-9a-f]{16}$/.test(saved)) return saved === "fnv64:" + codeShaLegacy(entry.code) ? "ok" : "stale";
+    /* 2026-10-06 以前の16桁指紋。新しいインストールではSHA-256へ移行する */
+    if (/^[0-9a-f]{16}$/.test(saved)) return saved === codeShaLegacy(entry.code) ? "ok" : "stale";
+  } catch (_) {}
+  return "stale";
+}
+function consentState(entry) {
+  if (!entry || typeof entry !== "object" || !entry.consentAt) return "none";
+  return consentStateCache.get(entry) || "stale";   /* 検証前は安全側に倒す */
 }
 function askConsent(name, onYes, onNo) {
   const wrap = document.createElement("div");
@@ -393,20 +456,27 @@ function askConsent(name, onYes, onNo) {
   try { no.focus(); } catch (_) {}
 }
 /* 同意 → 実行 → 保存（installText は同意の後にだけ呼ぶ） */
-function installWithConsent(text, filename) {
-  const parsed = parseAddonFile(text);
-  const code = String(parsed.code || text || "");
+function installWithConsent(text, filename, allowRawCode = false) {
+  const rawText = text == null ? "" : String(text);
+  const filenameText = String(filename || "(text)");
+  if (exceedsUtf8Limit(rawText, MAX_ADDON_FILE)) return { ok:false, why:tr("addonFileTooBig", { n:MAX_ADDON_FILE / 1024 }) };
+  const parsed = parseAddonFile(rawText, filenameText, allowRawCode);
+  const code = String(parsed.code || "");
   if (!code.trim()) return { ok:false, why:parsed.why || tr("addonNoRegister") };
-  if (code.length > MAX_CODE) return { ok:false, why:tr("addonTooBig", { n:Math.floor(MAX_CODE / 1024) }) };
-  const shown = parsed.meta && parsed.meta.name ? `${parsed.meta.name} (${filename})` : filename;
+  if (exceedsUtf8Limit(code, MAX_CODE)) return { ok:false, why:tr("addonTooBig", { n:Math.floor(MAX_CODE / 1024) }) };
+  const shown = parsed.meta && parsed.meta.name ? `${parsed.meta.name} (${filenameText})` : filenameText;
   askConsent(shown,
-    () => {
-      const res = installText(text, filename);
-      if (res.ok) {
-        const e = store[res.id] || {};
-        say(tr("addonConsentRecorded", { name:e.name || res.id, date:stamp(e.consentAt) }));
-        pendingReload = true; renderList(); updateReload();
-      } else say(tr("addonBadFile", { why:res.why }), true);
+    async () => {
+      try {
+        await bootPromise;
+        const fingerprint = await codeFingerprint(code);
+        const res = installText(rawText, filenameText, fingerprint, allowRawCode);
+        if (res.ok) {
+          const e = store[res.id] || {};
+          say(tr("addonConsentRecorded", { name:e.name || res.id, date:stamp(e.consentAt) }));
+          pendingReload = true; renderList(); updateReload();
+        } else say(tr("addonBadFile", { why:res.why }), true);
+      } catch (e) { say(tr("addonBadFile", { why:(e && e.message) || e }), true); }
     },
     () => say(tr("addonConsentCanceled")));
   return { ok:true, pending:true };
@@ -415,17 +485,12 @@ function stamp(ms) {
   if (!ms) return "-";
   try { return new Date(ms).toLocaleDateString(); } catch (_) { return "-"; }
 }
-function consentState(entry) {
-  if (!entry.consentAt) return "none";                       /* 記録を始める前のアドオン */
-  if (entry.consentSha && entry.consentSha !== codeShaSync(entry.code || "")) return "stale";
-  return "ok";
-}
-function installText(text, filename) {
+function installText(text, filename, fingerprint, allowRawCode = false) {
   const filename2 = String(filename || "(text)");
-  const parsed = parseAddonFile(text);
+  const parsed = parseAddonFile(text, filename, allowRawCode);
   const code = parsed.code;
   if (!code || !code.trim()) return { ok:false, why:parsed.why || "中身が空です" };
-  if (code.length > MAX_CODE) return { ok:false, why:tr("addonTooBig", { n:Math.floor(MAX_CODE / 1024) }) };
+  if (exceedsUtf8Limit(code, MAX_CODE)) return { ok:false, why:tr("addonTooBig", { n:Math.floor(MAX_CODE / 1024) }) };
   let defs;
   try { defs = runCode(code); }
   catch (e) { return { ok:false, why:"コードが動きませんでした：" + ((e && e.message) || e) }; }
@@ -447,7 +512,8 @@ function installText(text, filename) {
     error: ""
   };
   entry.consentAt = Date.now();          /* ✅ 同意の記録（この時刻に、この中身へ同意した） */
-  entry.consentSha = codeShaSync(code);  /* 中身の指紋（短いハッシュ）。コードが変われば気づける */
+  entry.consentSha = fingerprint;         /* SHA-256（Web Crypto対応時）。旧版指紋は読み込み互換だけ */
+  consentStateCache.set(entry, "ok");
   store[def.id] = entry;
   saveStore();
   if (entry.enabled) startAddon(def, entry);
@@ -507,14 +573,19 @@ function row(entry) {
     line.textContent = state === "ok" ? tr("addonConsentBadge", { date:stamp(entry.consentAt) })
       : state === "stale" ? tr("addonConsentStale") : tr("addonConsentNone");
     box.append(line);
-    if (state !== "ok") {
+    if (state === "none" && typeof entry.code === "string" && !exceedsUtf8Limit(entry.code, MAX_CODE)) {
       const acts0 = el("div", "miniActions");
       const agree = el("button", "", tr("addonConsentBtn")); agree.type = "button";
-      agree.addEventListener("click", () => {
-        const e2 = store[entry.id]; if (!e2) return;
-        e2.consentAt = Date.now(); e2.consentSha = codeShaSync(e2.code || "");
-        saveStore(); renderList();
-        say(tr("addonConsentRecorded", { name:e2.name || e2.id, date:stamp(e2.consentAt) }));
+      agree.addEventListener("click", async () => {
+        const e2 = store[entry.id];
+        if (!e2 || typeof e2.code !== "string" || exceedsUtf8Limit(e2.code, MAX_CODE)) return;
+        try {
+          e2.consentSha = await codeFingerprint(e2.code);
+          e2.consentAt = Date.now();
+          consentStateCache.set(e2, "ok");
+          saveStore(); renderList();
+          say(tr("addonConsentRecorded", { name:e2.name || e2.id, date:stamp(e2.consentAt) }));
+        } catch (err) { say(tr("addonBadFile", { why:(err && err.message) || err }), true); }
       });
       acts0.append(agree);
       box.append(acts0);
@@ -545,10 +616,26 @@ function updateReload() {
 }
 
 /* ============ 起動 ============ */
-function boot() {
+async function boot() {
   if (safeNow()) { say(tr("addonSafe")); return; }
-  for (const entry of Object.values(store)) {
-    if (!entry.enabled || !entry.code) continue;
+  const entries = Object.values(store).filter(entry => entry && typeof entry === "object" && !Array.isArray(entry));
+  /* 指紋確認をすべて終えてから、どのアドオンのコードも評価する。 */
+  const states = await Promise.all(entries.map(async entry => {
+    try {
+      const state = await verifyConsent(entry);
+      consentStateCache.set(entry, state);
+      return state;
+    } catch (_) {
+      consentStateCache.set(entry, "stale");
+      return "stale";
+    }
+  }));
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i], state = states[i];
+    if (entry.enabled !== true) continue;
+    if (typeof entry.code !== "string" || !entry.code.trim()) { entry.error = tr("addonNoRegister"); continue; }
+    if (exceedsUtf8Limit(entry.code, MAX_CODE)) { entry.error = tr("addonTooBig", { n:Math.floor(MAX_CODE / 1024) }); continue; }
+    if (state === "stale") { entry.error = tr("addonConsentStale"); continue; }
     let defs;
     try { defs = runCode(entry.code); }
     catch (e) { entry.error = tr("addonBroken", { why:(e && e.message) || String(e) }); continue; }
@@ -569,6 +656,10 @@ addEventListener("DOMContentLoaded", () => {
     const f = e.target.files && e.target.files[0];
     e.target.value = "";
     if (!f) return;
+    if (typeof f.size !== "number" || !Number.isFinite(f.size) || f.size < 0 || f.size > MAX_ADDON_FILE) {
+      say(tr("addonBadFile", { why:tr("addonFileTooBig", { n:MAX_ADDON_FILE / 1024 }) }), true);
+      return;
+    }
     let text = "";
     try { text = await f.text(); } catch (err) { say(tr("addonBadFile", { why:(err && err.message) || err }), true); return; }
     /* ✅ 同意を取ってから実行する（同意しなければ、そのコードは動かさない） */
@@ -585,9 +676,10 @@ addEventListener("DOMContentLoaded", () => {
   });
   const reload = $("addonReloadBtn");
   if (reload) reload.addEventListener("click", () => location.reload());
-  renderList(); updateReload();
-  boot();
   on("language", () => { renderList(); updateReload(); });
+  bootPromise = boot()
+    .catch(e => { console.error("[addons] boot failed", e); say(tr("addonBroken", { why:(e && e.message) || e }), true); })
+    .then(() => { renderList(); updateReload(); });
 });
 
 /* ============ 窓口 ============ */
@@ -604,7 +696,7 @@ window.TrkAddons = Object.freeze({
     consent: { state:consentState(e), at:e.consentAt || 0, sha:e.consentSha || "" }
   })),
   active: () => [...runtime.keys()],
-  install: (text, name) => installWithConsent(text, name || "(text)"),   /* ✅ 同意を取ってから（同意なしでは動かさない） */
+  install: (text, name) => installWithConsent(text, name || "(text)", true),   /* ✅ 同意を取ってから（同意なしでは動かさない） */
   setEnabled, remove: removeAddon,
   slots: () => [...slots.keys()],
   songs: id => (songsByAddon.get(id) || []).slice(),

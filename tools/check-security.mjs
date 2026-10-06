@@ -6,7 +6,7 @@
  * `npm run check` の一部として走る、静的な「守りが残っているか」の見張り番。
  * ここが見ているのは、過去に洗い出して塞いだ穴が **戻ってこないこと**（回帰よけ）:
  *
- *   1. コード実行につながる書き方（eval / new Function / document.write / srcdoc / 素の innerHTML）
+ *   1. 動的コード評価は同意フローのアドオン実行器1か所だけ（ほかに new Function / document.write / srcdoc / 素の innerHTML がない）
  *   2. 外から来た文字列を <a href> にするときに、https の関所（safeHttpUrl / safeLink）を通しているか
  *   3. 共有ファイル（パック・譜面・スキン・TVスキン・エフェクト・公認リスト）の検証関数が残っているか
  *   4. 設定の読み込みが __proto__ / constructor / prototype を踏まないか
@@ -39,14 +39,18 @@ const occurrences = (text, re) => [...text.matchAll(re)];
 
 /* ---------- 1. コード実行につながる書き方 ---------- */
 {
-  const bad = [];
+  const bad = [], indirectEval = [];
   for (const [file, text] of allJs) {
     for (const re of [/\beval\s*\(/g, /new\s+Function\s*\(/g, /document\.write\s*\(/g, /\bsrcdoc\b/g,
       /createContextualFragment\s*\(/g, /set(?:Timeout|Interval)\s*\(\s*["'`]/g]) {
       for (const m of occurrences(text, re)) bad.push(`${file}: ${m[0].trim()}`);
     }
+    for (const m of occurrences(text, /\(\s*0\s*,\s*eval\s*\)\s*\(/g)) indirectEval.push({ file, call:m[0] });
   }
-  rule(bad.length === 0, "no dynamic code-execution sinks in js/", bad.slice(0, 3).join(" · "));
+  const addonRunner = indirectEval.length === 1 && indirectEval[0].file === "js/addons.js" &&
+    /function runCode\(code\)[\s\S]{0,220}\(0, eval\)\(code\)/.test(js["js/addons.js"]);
+  rule(bad.length === 0 && addonRunner, "dynamic evaluation is confined to the single indirect-eval add-on runner",
+    [...bad.slice(0, 2), ...indirectEval.map(x => x.file + ": " + x.call)].join(" · "));
 
   /* innerHTML は、ゲーム結果画面の1か所だけ（すべて esc() を通した文字列）。増えたら気づけるようにする。 */
   const inner = [];
@@ -170,8 +174,13 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   const addons = js["js/addons.js"];
   const safeGate = addons.includes("const safeNow = () => {") && addons.includes('window.TrkSafeMode') &&
     addons.includes('sp.has("safe")') && addons.includes('sp.has("factory")') && addons.includes("if (safeNow())");
-  const codeCap = addons.includes("MAX_CODE = 512 * 1024") && addons.includes("code.length > MAX_CODE");
-  rule(safeGate && codeCap, "add-ons stay off in safe mode and have a code size cap");
+  const codeCap = addons.includes("MAX_CODE = 512 * 1024") && addons.includes("function exceedsUtf8Limit(value, limit)") &&
+    addons.includes("bytes += 4; i++") && addons.includes("bytes += 3") && addons.includes("if (bytes > limit) return true") &&
+    addons.includes("exceedsUtf8Limit(rawText, MAX_ADDON_FILE)") && addons.includes("exceedsUtf8Limit(code, MAX_CODE)") &&
+    addons.includes("exceedsUtf8Limit(entry.code, MAX_CODE)");
+  const fileSizeCap = addons.includes("MAX_ADDON_FILE = 4 * 1024 * 1024") && addons.includes("f.size > MAX_ADDON_FILE") &&
+    addons.indexOf("f.size > MAX_ADDON_FILE") < addons.indexOf("await f.text()");
+  rule(safeGate && codeCap && fileSizeCap, "add-ons stay off in safe mode and have code/file size caps before file.text()");
 
   const sample = (addons.match(/const SAMPLE_URL = "([^"]+)"/) || [])[1] || "";
   const remoteFetches = [];
@@ -225,14 +234,76 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   rule(media.includes("const ANALYZE_MAX = 96 * 1024 * 1024") && media.includes('tooBig ? "analysisSkipped"') &&
     !/file\.arrayBuffer\(\)[^\n]*\n[^\n]*ANALYZE/ .test(media),
     "huge media is never read into memory: audio analysis is skipped above ANALYZE_MAX (a 2GB file used to be loaded whole)");
-  const addons = js["js/addons.js"];
-  rule(addons.includes("function installWithConsent(") && addons.includes("function askConsent(") &&
-    addons.includes("function codeShaSync(") && addons.includes("function consentState(") &&
-    addons.includes("entry.consentAt = Date.now()") && addons.includes("entry.consentSha = codeShaSync(code)") &&
-    addons.indexOf("installWithConsent(text, f.name)") > 0 && !/const res = installText\(text, f\.name\)/.test(addons),
-    "add-ons ask for consent before their code runs and record it (with a code fingerprint) in the add-on store");
+  const chartCap = media.includes("const CHART_FILE_MAX = 2 * 1024 * 1024") &&
+    media.includes("file.size > CHART_FILE_MAX") && media.indexOf("file.size > CHART_FILE_MAX") < media.indexOf("file.text()") &&
+    media.includes("!Number.isFinite(file.size)") && media.includes('typeof time === "number"') && media.includes('typeof lane === "number"') &&
+    media.includes("DIFF_IDS.includes(data.difficulty)") && media.includes("!DIFF_IDS.includes(diff)") && media.includes('typeof data.bpm === "number"') &&
+    media.includes('has("bpm")') && media.includes('has("offset")') && media.includes("!Number.isFinite(data.offset)");
+  rule(chartCap, "standalone chart JSON is size-capped and note values must be numeric JSON values");
 
-  const core = js["js/core.js"];
+  const core = js["js/core.js"], tv = js["js/tv-dock.js"];
+  const safeUrlSettings = core.includes("VIDEO_STYLE_IDS.includes(f)") && core.includes("pick(data.videoStyle, VIDEO_STYLE_IDS, \"\")") &&
+    core.includes("window.TrkTV.skins().some") && core.includes('window.__trkPendingTvDockSkin = s') &&
+    tv.includes("hasTvSkin(requestedTvSkin)") && tv.includes("Object.prototype.hasOwnProperty.call(TV_DOCK_SKINS, id)") &&
+    core.includes("Object.prototype.hasOwnProperty.call(baseMap, settings.videoStyle)");
+  rule(safeUrlSettings, "URL/import video and TV skin values are allowlisted before persistence or map lookup");
+  const skinMapSafe = js["js/data.js"].includes("const has = (o, k) => !!o && Object.prototype.hasOwnProperty.call(o, k)") &&
+    core.includes("has(SKINS, prefs.skin)") && core.includes("has(SKINS, settings.skin)") && core.includes("has(SKINS, id)") &&
+    js["js/custom.js"].includes("has(SKINS, id) ? SKINS[id] : SKINS.shadow") &&
+    js["js/lib-skins.js"].includes("Object.prototype.hasOwnProperty.call(LIB_SKINS, id)") &&
+    js["js/fx-dock.js"].includes("Object.prototype.hasOwnProperty.call(DOCK_SKINS, settings.fxDockSkin)");
+  rule(skinMapSafe, "built-in/custom skin selection rejects inherited object properties such as __proto__");
+  const customSkin = js["js/custom.js"], skinFilesSafe = customSkin.includes("CUSTOM_SKIN_FILE_MAX = 256 * 1024") &&
+    customSkin.includes("f.size > CUSTOM_SKIN_FILE_MAX") && customSkin.indexOf("f.size > CUSTOM_SKIN_FILE_MAX") < customSkin.indexOf("await f.text()") &&
+    customSkin.includes("Object.prototype.hasOwnProperty.call(customSkinDefs, settings.skin)") &&
+    js["js/data.js"].includes("glow: raw.glow === true, scanlines: raw.scanlines === true") &&
+    tv.includes("TV_SKIN_FILE_MAX = 256 * 1024") && tv.includes("f.size > TV_SKIN_FILE_MAX") &&
+    tv.indexOf("f.size > TV_SKIN_FILE_MAX") < tv.indexOf("await f.text()") && tv.includes('typeof v === "number" && Number.isFinite(v)') &&
+    tv.includes("tvMakerPreset = id => Object.prototype.hasOwnProperty.call(TV_MAKER_PRESETS, id)");
+  rule(skinFilesSafe, "custom skin files are capped before parsing; skin maps and imported TV numeric values are validated");
+  const prefsImportCap = core.includes("PREFS_IMPORT_MAX = 2 * 1024 * 1024") && core.includes("f.size > PREFS_IMPORT_MAX") &&
+    core.indexOf("f.size > PREFS_IMPORT_MAX") < core.indexOf("await f.text()") && core.includes("Array.isArray(data)") &&
+    core.includes("typeof incoming === typeof current") && core.includes("UNSAFE_KEYS.has(k)") &&
+    core.includes("const hasImported = key => Object.prototype.hasOwnProperty.call(data, key)");
+  rule(prefsImportCap, "emergency preferences import has a pre-read size cap, object root and prototype/type guards");
+  const enumMapSafe = media.includes("!DIFF_IDS.includes(diff)") && core.includes("DIFF_IDS.includes(chartDiff)") &&
+    core.includes("Object.prototype.hasOwnProperty.call(JUDGE_SCALE, settings.judge)") &&
+    core.includes("Object.prototype.hasOwnProperty.call(LIVES_TAG, settings.lives)") &&
+    js["js/modes.js"].includes("Object.prototype.hasOwnProperty.call(LIFE_TAGS, settings.lives)");
+  rule(enumMapSafe, "settings-imported difficulty, judge and life IDs cannot select inherited dictionary properties");
+
+  const addons = js["js/addons.js"];
+  const installAt = addons.indexOf("function installWithConsent(");
+  const consentAt = addons.indexOf("askConsent(shown,", installAt);
+  const installTextAt = addons.indexOf("function installText(", installAt);
+  const installEvalAt = addons.indexOf("runCode(code)", installTextAt);
+  const consentFlow = installAt >= 0 && consentAt > installAt && installTextAt > consentAt && installEvalAt > installTextAt &&
+    addons.includes("entry.consentAt = Date.now()") && addons.includes("entry.consentSha = fingerprint") &&
+    addons.includes("await codeFingerprint(code)") && addons.indexOf("installWithConsent(text, f.name)") > 0;
+  rule(consentFlow, "file-installed add-on code is evaluated only from the post-consent path and gets a fingerprint");
+
+  const bootAt = addons.indexOf("async function boot()");
+  const bootRunAt = addons.indexOf("runCode(entry.code)", bootAt);
+  const staleGuardAt = addons.indexOf('if (state === "stale")', bootAt);
+  const bootCapAt = addons.indexOf("if (exceedsUtf8Limit(entry.code, MAX_CODE))", bootAt);
+  const staleBootGuard = bootAt >= 0 && bootRunAt > bootAt && staleGuardAt > bootAt && staleGuardAt < bootRunAt &&
+    bootCapAt > bootAt && bootCapAt < bootRunAt && addons.includes("await Promise.all(entries.map");
+  rule(staleBootGuard, "changed/oversize stored add-ons are rejected before boot evaluates their code");
+
+  const parserAt = addons.indexOf("function parseAddonFile(");
+  const parserEnd = addons.indexOf("/* ---------- ✅ 同意の記録", parserAt);
+  const parser = addons.slice(parserAt, parserEnd);
+  const jsonFailClosed = parser.includes("const isJsonFile =") && parser.includes("if (isJsFile)") &&
+    parser.includes("if (allowRawCode && !isJsonFile) return { code:t, meta:{} }") &&
+    parser.includes("if (isJsonFile || !allowRawCode)") && parser.includes("対応拡張子は .js / .json / .trkaddon") &&
+    parser.includes('why:"JSON として読めませんでした：" + e.message') &&
+    !/catch \(e\) \{ return \{ code:t/.test(parser);
+  rule(jsonFailClosed, "malformed JSON add-on files are rejected instead of falling back to JavaScript");
+
+  const strongFingerprint = addons.includes('crypto.subtle.digest("SHA-256"') && addons.includes('return "sha256:"') &&
+    addons.includes("codeShaLegacy(entry.code)");
+  rule(strongFingerprint, "new add-on consent fingerprints use SHA-256 where Web Crypto is available (legacy hashes remain compatible)");
+
   const factoryGuard = core.includes("function askFactoryReset(") && core.includes("let pendingFactory = false") &&
     core.includes('if (sp.get("force") === "1")') && core.includes("if (!pendingFactory) saveUserPrefs()") &&
     core.includes('askFactoryReset(') && !/else if \(\["all","factory","full"\]\.includes\(r\)\) \{ resetAllPrefs\(\)/.test(core);
@@ -291,7 +362,7 @@ function onlyIf(cond, text) { return cond ? text : ""; }
   rule(doc, "docs/SECURITY.md exists and is linked from README / HANDOFF");
 
   const i18n = read("js/i18n.js") + read("js/addons.js");
-  const textsAllLangs = ["factoryAskTitle", "factoryAskYes", "addonConsentTitle", "addonConsentYes", "addonConsentBadge"]
+  const textsAllLangs = ["factoryAskTitle", "factoryAskYes", "addonConsentTitle", "addonConsentYes", "addonConsentBadge", "addonFileTooBig"]
     .every(key => (i18n.match(new RegExp(`\\b${key}:`, "g")) || []).length === 4);
   rule(textsAllLangs, "the reset-confirmation and add-on consent texts exist in all four languages");
 

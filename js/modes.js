@@ -199,7 +199,7 @@ function lifeRule(totalNotes) {
 
 const LIFE_TAGS = { knight:"KNIGHT", chicken:"TRK!", none:"INF" };
 const lifeState = { hp:0, max:0, heal:0, lostAt:-1e9, healAt:-1e9 };
-const lifeTags = () => LIFE_TAGS[settings.lives] ? [LIFE_TAGS[settings.lives]] : [];
+const lifeTags = () => Object.prototype.hasOwnProperty.call(LIFE_TAGS, settings.lives) ? [LIFE_TAGS[settings.lives]] : [];
 
 function resetLives() {
   const r = lifeRule();

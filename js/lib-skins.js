@@ -70,14 +70,15 @@ const LIB_SKINS = {
   archive:    { icon:"🗂️", label:L4("図書館の書架", "Library catalog", "图书馆书架", "도서관 서가") },
   menu:       { icon:"🍱", label:L4("お品書き", "Menu scroll", "日式菜单", "식사 메뉴판") }
 };
-const skinDef = id => LIB_SKINS[id] || LIB_SKINS.player;
-const skinText = id => { const d = LIB_SKINS[id]; return d ? d.icon + " " + (d.label[lang] || d.label.en) : id; };
+const hasLibSkin = id => Object.prototype.hasOwnProperty.call(LIB_SKINS, id);
+const skinDef = id => hasLibSkin(id) ? LIB_SKINS[id] : LIB_SKINS.player;
+const skinText = id => { const d = hasLibSkin(id) ? LIB_SKINS[id] : null; return d ? d.icon + " " + (d.label[lang] || d.label.en) : String(id); };
 const skinIds = () => LIB_SKIN_ORDER.slice();
 
 /* ============ 適用 ============ */
 function applyLibSkin(id, opts) {
   const save = !opts || opts.save !== false;
-  if (!LIB_SKINS[id]) id = "player";
+  if (!hasLibSkin(id)) id = "player";
   settings.libSkin = id;
   const panel = $("libPanel");
   if (panel) panel.dataset.libSkin = id;
@@ -124,7 +125,7 @@ function buildSelect() {
     const o = document.createElement("option"); o.value = id; o.textContent = skinText(id);
     sel.append(o);
   }
-  sel.value = LIB_SKINS[settings.libSkin] ? settings.libSkin : "player";
+  sel.value = hasLibSkin(settings.libSkin) ? settings.libSkin : "player";
 }
 function applyQuick() {
   const b = $("libSkinBtn");
@@ -146,7 +147,7 @@ function flashSkin(name) {
 /* ============ 画面の組み立て（全部のファイルを読み終えてから） ============ */
 addEventListener("DOMContentLoaded", () => {
   /* 知らないスキン名（古い設定・壊れた設定ファイル）は player として扱う */
-  applyLibSkin(LIB_SKINS[settings.libSkin] ? settings.libSkin : "player", { save:false });
+  applyLibSkin(hasLibSkin(settings.libSkin) ? settings.libSkin : "player", { save:false });
   buildBar(); buildSelect(); applyQuick();
 
   const b = $("libSkinBtn");

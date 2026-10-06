@@ -554,12 +554,18 @@ if (!read("js/main.js").includes("guideEggKind") ||
   const vrm = read("js/vrm.js");
   const media = read("js/media-player-mode.js");
   const tv = read("js/tv-dock.js");
-  const ids = ["litePanel", "liteMode", "liteFps", "liteMascot", "liteScale", "liteSpecOff", "liteFx", "liteBlur", "liteState", "liteDevice", "liteRecheckBtn"];
-  const settingsKeys = ["liteMode", "liteFps", "liteMascot", "liteScale", "liteSpectrumOff", "liteFx", "liteBlur"];
+  const ids = ["litePanel", "liteMode", "liteFps", "liteMascot", "liteScale", "liteSpecOff", "liteFx", "liteBlur", "liteState", "liteDevice", "liteRecheckBtn", "litePreset", "liteGameFull"];
+  const settingsKeys = ["liteMode", "liteFps", "liteMascot", "liteScale", "liteSpectrumOff", "liteFx", "liteBlur", "liteGameFull"];
   const wiringOk = ["window.TrkLite = Object.freeze({", "function liteActive()", "function liteProbe()", "liteBatteryProbe",
     "navigator.connection", "deviceMemory", "liteGate(", "function litePixelRatio(", "liteBlurCap", "liteSpecBlocked",
     "liteMascotAllow", "classList.toggle(\"trkLite\"", "classList.toggle(\"trkLiteFx\"", "classList.toggle(\"trkNoMascot\""]
     .every(token => lite.includes(token));
+  /* 🎯 プリセット（ゲーム優先＝ノーツ・反応はそのまま、他だけ軽くする） */
+  const presetOk = lite.includes("const LITE_PRESETS = [") && ["balanced", "game", "max", "off"].every(id => lite.includes(`id:"${id}"`)) &&
+    lite.includes("function litePresetId()") && lite.includes("function liteApplyPreset(id)") && lite.includes("allowGame: liteAllowGame") &&
+    lite.includes("function liteAllowGame(now)") && lite.includes("settings.liteGameFull === true") &&
+    html.includes('<option value="game" data-i18n="litePresetGame">') && html.includes('id="liteGameFull"') &&
+    core.includes("liteGameFull: prefs.liteGameFull === true");
   const uiOk = ids.every(id => html.includes(`id="${id}"`) && (id === "litePanel" || lite.includes(`"${id}"`))) &&
     html.includes('<script src="js/lite.js"></script>') &&
     html.indexOf('<script src="js/lite.js"></script>') > html.indexOf('<script src="js/core.js"></script>') &&
@@ -569,7 +575,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
     core.includes("TrkLite.blurCap") && tv.includes("TrkLite.blurCap") &&
     css.includes("body.trkLiteFx") && css.includes("body.trkNoMascot #mmdCanvas") && css.includes("#litePanel.liteOn");
   /* 判定・時計（tickClock／sweepMisses）は 🪶 ゲートより前にあること */
-  const gateAt = render.indexOf('TrkLite.allow("game"');
+  const gateAt = render.indexOf("TrkLite.allowGame(");
   const gateOk = gateAt > 0 && gateAt > render.indexOf("tickClock();") && gateAt > render.indexOf("sweepMisses(now)") &&
     gateAt > render.indexOf("truckJudge(now)") &&
     spectrum.includes('TrkLite.allow("spec"') && spectrum.includes("const specLive = () => settings.specOn && !isSafe() && !liteOff();") &&
@@ -582,13 +588,16 @@ if (!read("js/main.js").includes("guideEggKind") ||
     "liteMascotOffNote", "liteScale", "liteScaleDevice", "liteScale15", "liteScale10", "liteSpecOff", "liteFx", "liteBlur",
     "liteStateOn", "liteStateOff", "liteDevice", "liteCores", "liteMem", "liteApp", "liteBrowser", "liteBattery",
     "liteWhyManual", "liteWhyOff", "liteWhySaveData", "liteWhyBattery", "liteWhyMotion", "liteWhyLow", "liteWhyAutoOff",
-    "liteWhyDesktop", "liteRecheck", "liteNowOn", "liteNowOff", "liteFpsSet", "liteMascotSet", "liteToast", "specLiteOff"];
+    "liteWhyDesktop", "liteRecheck", "liteNowOn", "liteNowOff", "liteFpsSet", "liteMascotSet", "liteToast", "specLiteOff",
+    "litePreset", "litePresetBalanced", "litePresetGame", "litePresetMax", "litePresetOff", "litePresetCustom", "litePresetSet",
+    "liteGameFull", "liteGameFullNote", "liteGameFullOn", "liteGameFullOff"];
   const langOk = langKeys.every(key => (i18n.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4);
   if (!wiringOk) fail("lite mode module (js/lite.js) is missing its probe / gates / body classes");
   else if (!uiOk) fail("lite-mode settings panel, script order, defaults or reset path is incomplete");
+  else if (!presetOk) fail("lite-mode presets (balanced / game-first / maximum saving / off) are incomplete");
   else if (!gateOk) fail("lite-mode draw gates are missing (or the game clock/judging slipped behind the gate)");
   else if (!langOk) fail("lite-mode strings are missing from one of the four languages");
-  else ok("lite mode (phones/apps): auto probe, bottom-right panel, draw-only gates in 4 languages");
+  else ok("lite mode (phones/apps): auto probe, presets incl. game-first, draw-only gates in 4 languages");
 }
 
 // A cache name is deliberately checked for existence, not for a guessed

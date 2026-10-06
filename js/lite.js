@@ -92,6 +92,12 @@ function liteGate(key, fps, now) {
 }
 /* 🎮 ゲーム・📊 スペクトラム・🎬 映像などの描画（呼ぶ側は「描く直前に false なら戻る」だけ） */
 function liteAllow(key, now) { return !liteActive() || liteGate(key, liteFpsValue(), now); }
+/* 🎯 ゲーム中（ノーツ・映像・エフェクト）の描画：ゲーム優先のときは上限をかけない。
+   判定と反応はもともと軽量化の影響を受けません（音声の時計で判定するため） */
+function liteAllowGame(now) {
+  if (!liteActive() || settings.liteGameFull === true) return true;
+  return liteGate("game", liteFpsValue(), now);
+}
 /* 🩷 3Dマスコット（MMD／VRM）：描画レートを下げる／「描画しない」 */
 const liteNoMascot = id => liteActive() && settings.liteMascot === "off" && (id === "mmd" || id === "vrm");
 function liteMascotAllow(id, now) { return !liteNoMascot(id) && (!liteActive() || liteGate("mascot:" + id, liteMascotFpsValue(), now)); }
@@ -104,6 +110,37 @@ function litePixelRatio(max) {
   const raw = Math.min(Number(max) || 2, typeof devicePixelRatio === "number" && devicePixelRatio > 0 ? devicePixelRatio : 1);
   const cap = liteActive() ? liteScaleValue() : 0;
   return cap ? Math.min(raw, cap) : raw;
+}
+
+/* ---------- プリセット（大まかな設定。下の項目をまとめて変えます） ----------
+   ・「カスタム」はここでは何も変えません（下の項目で調整した状態）              */
+const LITE_PRESET_KEYS = { balanced:"litePresetBalanced", game:"litePresetGame", max:"litePresetMax", off:"litePresetOff", custom:"litePresetCustom" };
+const LITE_PRESETS = [
+  /* 🪶 バランス：どこもほどほどに軽くする（初期値と同じ） */
+  { id:"balanced", values:{ liteFps:"30", liteMascot:"30", liteScale:"1.5", liteSpectrumOff:true, liteFx:true, liteBlur:true, liteGameFull:false } },
+  /* 🎯 ゲーム優先：ノーツ・映像はそのまま。メニュー・スペクトラム・マスコット・解像度だけ軽くする */
+  { id:"game", values:{ liteFps:"30", liteMascot:"15", liteScale:"1.5", liteSpectrumOff:true, liteFx:true, liteBlur:true, liteGameFull:true } },
+  /* 🔋 最大節約：いちばん軽い（ゲーム中も20fps・マスコットなし・解像度1.0倍） */
+  { id:"max", values:{ liteFps:"20", liteMascot:"off", liteScale:"1", liteSpectrumOff:true, liteFx:true, liteBlur:true, liteGameFull:false } },
+  /* ✨ 軽量化しない：見た目はそのまま（軽量化モードをオフにする） */
+  { id:"off", mode:"off", values:{ liteFps:"60", liteMascot:"60", liteScale:"device", liteSpectrumOff:false, liteFx:false, liteBlur:false, liteGameFull:false } }
+];
+const liteValueOf = key => (key === "liteSpectrumOff" || key === "liteFx" || key === "liteBlur") ? settings[key] !== false : settings[key];
+function litePresetId() {
+  for (const preset of LITE_PRESETS) {
+    if (preset.mode === "off" ? liteModeValue() !== "off" : liteModeValue() === "off") continue;
+    if (Object.entries(preset.values).every(([key, value]) => liteValueOf(key) === value)) return preset.id;
+  }
+  return "custom";
+}
+const litePresetName = id => tr(LITE_PRESET_KEYS[id] || LITE_PRESET_KEYS.custom);
+function liteApplyPreset(id) {
+  const preset = LITE_PRESETS.find(p => p.id === id);
+  if (!preset) { liteSyncUI(); return; }        // カスタム：下の項目で調整するので何も変えない
+  for (const [key, value] of Object.entries(preset.values)) settings[key] = value;
+  if (preset.mode) settings.liteMode = preset.mode;
+  saveUserPrefs(); liteSyncUI();
+  liteSay(tr("litePresetSet", { name:litePresetName(id) }));
 }
 
 /* ---------- 反映（bodyクラス＋設定画面） ---------- */
@@ -135,6 +172,7 @@ function liteSyncUI() {
   const on = liteActive();
   const sel = (id, v) => { const n = $(id); if (n && n.value !== v) n.value = v; };
   const chk = (id, v) => { const n = $(id); if (n) n.checked = !!v; };
+  sel("litePreset", litePresetId());
   sel("liteMode", liteModeValue());
   sel("liteFps", String(liteFpsValue()));
   sel("liteMascot", String(settings.liteMascot === "off" ? "off" : liteMascotFpsValue()));
@@ -142,6 +180,7 @@ function liteSyncUI() {
   chk("liteSpecOff", settings.liteSpectrumOff !== false);
   chk("liteFx", settings.liteFx !== false);
   chk("liteBlur", settings.liteBlur !== false);
+  chk("liteGameFull", settings.liteGameFull === true);
   const panel = $("litePanel");
   if (panel) panel.classList.toggle("liteOn", on);
   liteApply();
@@ -156,6 +195,11 @@ function liteSay(text) {
 /* ---------- 起動時（設定画面の配線・初回の案内） ---------- */
 function liteInit() {
   liteProbe();
+  $("litePreset").addEventListener("change", e => liteApplyPreset(e.target.value));
+  $("liteGameFull").addEventListener("change", e => {
+    settings.liteGameFull = e.target.checked; saveUserPrefs(); liteSyncUI();
+    liteSay(tr(settings.liteGameFull ? "liteGameFullOn" : "liteGameFullOff"));
+  });
   $("liteMode").addEventListener("change", e => {
     settings.liteMode = ["on", "off"].includes(e.target.value) ? e.target.value : "auto";
     saveUserPrefs(); liteSyncUI();
@@ -201,7 +245,8 @@ function liteInit() {
 liteInit();
 
 window.TrkLite = Object.freeze({
-  active: liteActive, reasons: liteReasons, allow: liteAllow, mascotAllow: liteMascotAllow,
+  active: liteActive, reasons: liteReasons, allow: liteAllow, allowGame: liteAllowGame, mascotAllow: liteMascotAllow,
+  preset: litePresetId, presetName: litePresetName, applyPreset: liteApplyPreset,
   noMascot: liteNoMascot, specBlocked: liteSpecBlocked, blurCap: liteBlurCap, pixelRatio: litePixelRatio,
   fps: liteFpsValue, mascotFps: liteMascotFpsValue, scale: liteScaleValue,
   info: () => ({ ...liteInfo }), probe: liteProbe, sync: liteSyncUI

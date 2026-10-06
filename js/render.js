@@ -478,8 +478,9 @@ function loop() {
     else if (settings.playMode === "catch") catchJudge(now);
   }
   if (phase === "playing") sweepMisses(now);   // AUTOの自動判定もここから（game.js）。ORBIT・STAGEは入力で判定
-  /* 🪶 軽量化：ここから下（描くところ）だけを間引く。判定は音声の時計なので、描く回数を減らしてもズレません */
-  if (typeof TrkLite === "object" && !TrkLite.allow("game", performance.now())) return;
+  /* 🪶 軽量化：ここから下（描くところ）だけを間引く。判定は音声の時計なので、描く回数を減らしてもズレません。
+     🎯「ゲーム優先」（settings.liteGameFull）のときは、ここで止めずに今までどおりのフレームレートで描きます */
+  if (typeof TrkLite === "object" && !TrkLite.allowGame(performance.now())) return;
   drawVideo(); drawGame(now); updateProgress();
 }
 /* ✅ render.js 完了 */

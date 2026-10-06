@@ -146,6 +146,7 @@ const settings = {
   liteFx: prefs.liteFx !== false,                                            // 軽量化モード中はぼかし・すりガラスを減らす
   liteBlur: prefs.liteBlur !== false,                                        // 軽量化モード中は映像のぼかしを最大2pxに
   liteSeen: prefs.liteSeen === true,                                         // 📱 スマホ向けの初回案内を出したか
+  liteGameFull: prefs.liteGameFull === true,                                 // 🎯 ゲーム中は描画を軽くしない（ゲーム優先・初期オフ）
   /* 🎹 シンセ演奏モード */
   synthModeDisabled: !!prefs.synthModeDisabled,
   synthModeFastStart: !!prefs.synthModeFastStart,
@@ -275,7 +276,7 @@ function resetAudioPrefs() {
 function resetLitePrefs() {
   /* 🪶 軽量化（js/lite.js）。?reset=lite と trkReset('lite') から呼びます */
   settings.liteMode = "auto"; settings.liteFps = "30"; settings.liteMascot = "30"; settings.liteScale = "1.5";
-  settings.liteSpectrumOff = true; settings.liteFx = true; settings.liteBlur = true;
+  settings.liteSpectrumOff = true; settings.liteFx = true; settings.liteBlur = true; settings.liteGameFull = false;
   if (typeof liteSyncUI === "function") { try { liteSyncUI(); } catch (_) {} }
 }
 function resetNotesPrefs() {

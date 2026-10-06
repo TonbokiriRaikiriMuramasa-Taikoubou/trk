@@ -59,8 +59,9 @@ textures and `.vmd` motions: by default **trk! does not bundle, host or upload t
 You pick a model or a folder from your own device in the settings panel, and the
 MMD terms of that model's author apply (most MMD models forbid redistribution,
 use outside MMD/MMM, and commercial use).
-The 60 built-in motion choices (daily actions, dances, Miku-inspired gestures,
-and expression acting) are **original code-generated routines**. `js/mmd.js`
+The 65 built-in motion choices (daily actions, dances, Miku-inspired gestures,
+expression acting and singing/lip-sync routines) are **original code-generated
+routines**. `js/mmd.js`
 creates their `.vmd` bytes at runtime from pose and facial-weight formulas; no
 third-party VMD or choreography file is bundled. The facial tracks refer to
 existing morph names in the redistributable Lat-style PMD; they do not include

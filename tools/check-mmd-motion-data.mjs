@@ -27,8 +27,8 @@ const data = context.__mmdCheck;
 const fail = message => { throw new Error(message); };
 const decoder = new TextDecoder("shift_jis");
 const ids = Object.keys(data.BUILTIN);
-const expectedMotionCount = 60;
-const required = ["walk112", "run152", "sit10", "dance128", "dreamy128", "airgtr128", "melt170", "wedh174", "faceSmile", "faceWink", "faceSing", "mikuPrincess152", "mikuLeek120", "mikuPopipo150", "mikuNyan160"];
+const expectedMotionCount = 65;
+const required = ["walk112", "run152", "sit10", "dance128", "dreamy128", "melt170", "wedh174", "faceSmile", "faceWink", "faceSing", "songMic", "songLong", "songUp", "songHum", "songWhisper", "songCall", "mikuPrincess152", "mikuLeek120", "mikuPopipo150", "mikuNyan160"];
 const retained = ["step", "swing", "turn", "jump", "idol", "stroll", "dune135", "kyukura165", "tyw150", "rolling194", "vanish240"];
 
 if (ids.length !== expectedMotionCount) fail(`Expected ${expectedMotionCount} built-in motions, found ${ids.length}`);
@@ -175,22 +175,23 @@ if (skirtFront.some((n, i) => n !== expectedFront[i]) || skirtBack.some((n, i) =
 
 const translatedKeys = [
   "mmdMotionWalk", "mmdMotionRun", "mmdMotionSit", "mmdMotionDance", "mmdMotionLegacy",
-  "mmdGroupDaily", "mmdGroupDance", "mmdGroupSongs", "mmdGroupMiku", "mmdGroupFaces",
+  "mmdGroupDaily", "mmdGroupDance", "mmdGroupSongs", "mmdGroupMiku", "mmdGroupFaces", "mmdGroupVoice",
   "mmdMotionFaceSmile", "mmdMotionFaceWink", "mmdMotionFaceShy", "mmdMotionFaceAngry", "mmdMotionFaceConfused",
   "mmdMotionFaceSurprise", "mmdMotionFaceSleepy", "mmdMotionFacePout", "mmdMotionFaceLaugh", "mmdMotionFaceSing",
   "mmdMotionPrincess", "mmdMotionLeekShake", "mmdMotionPopipo", "mmdMotionTriple", "mmdMotionNyan", "mmdMotionSalute",
   "mmdMotionDoubleHeart", "mmdMotionPoint", "mmdMotionEncore", "mmdMotionDramatic", "mmdMotionVictory", "mmdMotionPenlight",
   "mmdMotionChibi", "mmdMotionSpin", "mmdMotionGroove", "mmdMotionStepTouch", "mmdMotionShoulderPop", "mmdMotionArmWave",
-  "mmdMotionCrossStep", "mmdMotionSoftBow", "mmdMotionMarionette"
+  "mmdMotionCrossStep", "mmdMotionSoftBow", "mmdMotionMarionette",
+  "mmdMotionSongMic", "mmdMotionSongLong", "mmdMotionSongUp", "mmdMotionSongHum", "mmdMotionSongWhisper", "mmdMotionSongCall"
 ];
 for (const key of translatedKeys) {
   const count = (source.match(new RegExp(`\\b${key}:`, "g")) || []).length;
   if (count !== 4) fail(`${key} must have four translations (found ${count})`);
 }
 const core = fs.readFileSync(path.join(root, "js/core.js"), "utf8");
-if (preset.motion !== "dreamy128" || preset.bpm !== 128) fail("Bundled Lat-style Miku preset must start with dreamy128 at 128 BPM");
-if (!core.includes('prefs.mmdMotionKind : "dreamy128"') || !core.includes('settings.mmdMotionKind = "dreamy128"')) {
-  fail("Missing-preference and reset defaults must use dreamy128");
+if (preset.motion !== "faceSing" || preset.bpm !== 0) fail("Bundled Lat-style Miku preset must start with the BPM-free faceSing mouth loop");
+if (!core.includes('prefs.mmdMotionKind : "faceSing"') || !core.includes('settings.mmdMotionKind = "faceSing"')) {
+  fail("Missing-preference and reset defaults must use faceSing");
 }
 if (!source.includes('settings.mmdMotionKind === "none"') || !source.includes("visibleMotions: () => MOTION_MENU_IDS.slice()")) {
   fail("Saved no-motion choice or chooser API is not preserved/exposed");

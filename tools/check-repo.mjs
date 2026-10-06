@@ -313,7 +313,8 @@ if (!exists("js/fx-worklet.js") ||
     library.includes("if (!all.length && !entries.length) {") &&
     library.includes("if (!row.it) { box.append(plWishRow(row.w)); continue; }") &&
     library.includes("function trkFolderIdSet() { return plWishFolderIds(TRK_FOLDER_ID); }") &&
-    library.includes("const haveAll = entries.filter(e => e.it).length, totalAll = entries.length;") &&
+    library.includes("const haveAll = usedKeys.size, totalAll = entries.length;") &&
+    library.includes("const usedKeys = new Set();") &&
     !library.includes("const wishLeft = []") &&   /* 下部の 📡 ブロックは行内の灰色行に置き換えた */
     /plWishRow\{[^}]*opacity/.test(css) && css.includes(".plWishHint{");
   /* 4言語ぶんの文言（ja/en/zh/ko で各4回）。行をまとめて書き換えたときに片方を消した事故を止める */

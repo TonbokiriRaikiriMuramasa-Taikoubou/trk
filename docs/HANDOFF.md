@@ -63,7 +63,7 @@
   - 設定欄（`#trkPanel`）は **🎻 trk classic（`#trkClassicPanel`）を中の `subPanel` に収納**し、🔤 ABC順（`#trkSortAbcChk`）と自由並べ替えの一覧（`#trkOrderList`）も trk パネル側へ移した。並べ替え・表示名は 4言語（`trkTabName*`／`trkMenu*`／`trkSortAbc*` ほか）。
   - ⚠ **`window.TRK_CATALOG` を使わない**（`js/catalog.js` の `const` はグローバルオブジェクトに載らない＝常に `undefined`）。`trkCatalog()` が素の `TRK_CATALOG` を `typeof` ガードつきで読む。以前はこれで `trkWishesFromCatalog()` が常に空になり、**Vol プレイリストが1つも作られていなかった**（フォルダだけができて 🐔 タブが空だった）。
   - 🛒 **「集める棚」（未入手の曲を開いた瞬間に灰色で並べる）**：wish（カタログの曲リスト）つきプレイリスト、またはそれを含むフォルダのタブを開くと、**カタログ順のまま全曲が行として並ぶ**。持っている曲＝黒い普通の行、まだの曲＝**灰色の `.libRow.plWishRow`**（🛒・`ar · al · 未入手`・🔗＝入手先があれば確認ダイアログ／無ければ 📡 とトースト案内）。つまり**空のライブラリでも「曲が1つもない」とは言わない**（`renderLib` は `entries` を見てから空判定する）。曲を Music フォルダへ入れると `plSyncWishes()` が照合して `songs` に入り、**次に開いたとき黒くなって遊べる**（＝集める過程がそのままゲーム体験）。
-    - 行の材料は `plCollectionEntries(tabId, byTitle)`＝`[{w, it}]`（`it:null`＝未入手）。`plWishFolderIds(fid)` がフォルダ＋子孫の id 集合（`trkFolderIdSet()` もこれを使う）。重複曲（Vol・シリーズをまたぐ同名）は曲名＋アルバム＋アーティストのキーで1行にまとめる。
+    - 行の材料は `plCollectionEntries(tabId, byTitle)`＝`[{w, it}]`（`it:null`＝未入手）。`plWishFolderIds(fid)` がフォルダ＋子孫の id 集合（`trkFolderIdSet()` もこれを使う）。重複曲（Vol・シリーズをまたぐ同名）は曲名＋アルバム＋アーティストのキーで1行にまとめ、**別表記の2つの wish が同じ音源に当たっても黒い行は1回だけ**（`usedKeys`）にする。
     - 照合は `plTitleKeys(t)` の候補を厳しい順に試す（そのまま → 区切り `._-/・／` と拡張子を空白に → 先頭の番号 `08 ` を外す）。**`08_sometimes.fla` のようなファイル名でもカタログの `08 sometimes` に当たる**。`byTitle` は候補キーすべてに曲を登録する。
     - 上部の案内は1曲も無ければ `plWishHead`（📡 まだ持っていない曲（n））、途中までなら `plWishHint`（🛒 have/total 曲を入手済み）。全部そろえば何も出ない。検索（`#libSearch`）は灰色の行にも効き、0件なら普通の「見つかりません」。
     - ⚠ 旧・下部の「📡 未入手（n）」ブロックは廃止した（行内の灰色行に統合）。`plWishRows()` も削除済み。
@@ -217,8 +217,8 @@ JSDOM の実挙動ハーネス（**コミットしていない・消えたら作
 | `study.mjs` | 書斎のUI経路（偽装ファイルの取り込み〜表示・ルビ・速度） | 20/20 |
 | `video.mjs` | 🎬判定・記録・一覧・全画面・2GBで `arrayBuffer` を呼ばない | 16/16 |
 | `sw.mjs`（偽SW環境） | セーフモードのクライアントにキャッシュを配らない | 6/6 |
-| `guards.mjs` | `?reset=all` の確認（やめる／同意／`force=1`）とアドオン同意（キャンセル・同意・旧アドオン・コード差し替え検知） | 24/24 |
-| `wish.mjs`（2026-10-07 追加・セッション内ハーネス） | 🛒 集める棚：空ライブラリでも灰色の一覧が出る（＝「何も入っていない」と言わない）／🐔 フォルダは全シリーズを重複なく灰色で並べる／入手すると黒くなり `plsongs` にも自動で入る／`08_sometimes.fla` の区切り・拡張子ゆれでも当たる／🔗 は確認ダイアログ・📡 はトースト／検索・0件表示／wish の無い普通のプレイリストは従来どおり | 24/24 |
+| `guards.mjs` | `?reset=all` の確認（やめる／同意／`force=1`）とアドオン同意（キャンセル・同意・旧アドオン・コード差し替え検知） | 27/27 |
+| `wish.mjs`（2026-10-07 追加・セッション内ハーネス） | 🛒 集める棚：空ライブラリでも灰色の一覧が出る（＝「何も入っていない」と言わない）／🐔 フォルダは全シリーズを重複なく灰色で並べる／入手すると黒くなり `plsongs` にも自動で入る／`08_sometimes.fla` の区切り・拡張子ゆれでも当たる／🔗 は確認ダイアログ・📡 はトースト／検索・0件表示／wish の無い普通のプレイリストは従来どおり | 27/27 |
 | `trk.mjs`（2026-10-07 追加） | 🐔 trk's playlist のタブ表示（アイコン＋名前の二重表示なし・3種類の表示名・読み上げ名）、読み込み時の正規化、長押し＝階層（プロフィール編集に吸われない）、階層の中身（サブフォルダ／Vol／⚙）、設定欄の収納と並べ替え、4言語 | 30/30 |
 
 `html-validate`／`axe-core` は**起動後の DOM** に当てる（`data-i18n` で文字が入るのは起動後。ソースだけ見ると「空の見出し」が大量に出る）。axe は隠れた要素を飛ばすので、**設定画面・書斎などを開いた状態**にしてから回す。
@@ -269,7 +269,7 @@ JSDOM の実挙動ハーネス（**コミットしていない・消えたら作
 - **PR #28（`arena/96a5eaad-trk`）**：🌐 three.js の `three.core.js` と `BufferGeometryUtils.js` の取り込み漏れを修正し、vendor 更新道具／検査を両引用符対応に。逆テストで旧検査の見逃しも再現した。実ブラウザのMMD／VRM表示確認は未完了（上の最優先項目）。
 - **`arena/7ded006c-trk`（2026-10-07・6b85e95→4e2c251・次PR）**：🐔 **trk 階層プレイリスト**（`trk` フォルダ長押しで Vol 一覧・`trk-classic/ba/touhou/arknights/gakumas/endfield` サブフォルダ・Game Vol.1 / Classic Vol.1/Vol.2 / BlueArchive Vol.1-8 / Touhou 15作品 / Arknights 10＋痕/Babel / Gakum@s 34曲 / Endfield 6PL・100超は Vol.2 自動分割）＋**カタログ大幅増量**（62PL/345曲、事実情報のみ・https公式・非営利ガイド）＋**設定 ABC順/自由並べ替え**（`trkSortABC`/`playlistOrder`・`plFolderMenu` 内でも ↑↓）＋ Arknights `痕`/`Babel` と Endfield `Metal Scar Radio`（`Blurring`/`ASHEN REMAINS`/`The Floaty Envelope`/`MAKER'S LUV`/`初号指令`/`Signal`）。`sw.js` は `trk-v2026.10.7-trk12`。`npm run check` / `node --check` 通過、曲に触る機会を増やす実装として Issues での「○○が無い」抑止を狙う。
 - **`arena/9cd7f9ab-trk`（2026-10-07・次PR・🐔 trk's playlist の仕上げ）**：① **`🐔🐔trk's playlist` の二重表示を修正**（`TRK_FOLDER_NAME` を絵文字なしに。既存データは `trkFolderNormalize()` が読み込み時に直す）② **名前・アイコン・色を編集不可**に（長押しでプロフィール編集を開かせない）③ **長押し＝階層（`plTrkMenu`）に固定**（タブの長押し／`plFolderMenu` の両方から trk フォルダは階層へ）④ 設定欄で **🎻 trk classic を 🐔 trk's playlist の中に収納**（`#trkPanel` 内の `subPanel`。🔤 並べ替えと一覧も trk 側へ）⑤ タブの表示名を3種類（`trk's playlist`／`trk's`／アイコンのみ）から選ぶ新設定 **`trkTabName`**（`TRK_ENUM_VALUES`・`SETTING_ENUM_KEYS`・4言語・`?reset=all`）。**さらに、PR #29 の 🐔 が実は一度も Vol を作れていなかったバグ**（`window.TRK_CATALOG` は常に `undefined`）を `trkCatalog()` で修正。JSDOM ハーネス `trk.mjs` 30/30、逆テスト14種で新検査が FAIL することを確認。
-- **`arena/9cd7f9ab-trk`（2026-10-07 追補・🛒 集める棚）**：wish つきプレイリスト／フォルダを開くと**カタログ全曲が最初から並ぶ**（未入手は灰色、入手すると黒＝プレイ可能）。照合に `plTitleKeys()` を入れ、`08_sometimes.fla` のような区切り・拡張子ゆれでも当たるようにした。旧「📡 未入手（n）」の下部ブロックは行内へ統合して廃止。ついでに **`el(tag, cls, text)` の取り違え**（旧 wish 行に `[object HTMLSpanElement]`、TV ペインに `[object HTMLButtonElement]` が出てボタンが消えていた）を修正し、`tools/check-repo.mjs` に静的な見張りを追加。JSDOM ハーネス `wish.mjs` 24/24（既存 `trk.mjs` 37/37 と併走）。`sw.js` は `trk-v2026.10.7-trk14`。
+- **`arena/9cd7f9ab-trk`（2026-10-07 追補・🛒 集める棚）**：wish つきプレイリスト／フォルダを開くと**カタログ全曲が最初から並ぶ**（未入手は灰色、入手すると黒＝プレイ可能）。照合に `plTitleKeys()` を入れ、`08_sometimes.fla` のような区切り・拡張子ゆれでも当たるようにした。旧「📡 未入手（n）」の下部ブロックは行内へ統合して廃止。ついでに **`el(tag, cls, text)` の取り違え**（旧 wish 行に `[object HTMLSpanElement]`、TV ペインに `[object HTMLButtonElement]` が出てボタンが消えていた）を修正し、`tools/check-repo.mjs` に静的な見張りを追加。JSDOM ハーネス `wish.mjs` 27/27（既存 `trk.mjs` 37/37 と併走）。`sw.js` は `trk-v2026.10.7-trk14`。
 - 以前の統合元ブランチ：`arena/01a109eb-trk`（Part 1–17・コミット35+・`main` へマージ済み）、`arena/01a10c69-trk`（PR #14）。
 - 公開URL：<https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/>
 

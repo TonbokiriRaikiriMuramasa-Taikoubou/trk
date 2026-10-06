@@ -1886,14 +1886,19 @@ function renderLib() {
   /* 並び順：集める棚はカタログ順のまま（持っている＝黒／まだ＝灰色）。それ以外は今までどおり */
   const infoByKey = new Map(items.map(x => [x.it.key, x]));
   const wishHit = q ? e => e.it ? infoByKey.has(e.it.key) : `${e.w.t} ${e.w.al || ""} ${e.w.ar || ""}`.toLowerCase().includes(q) : () => true;
-  const shownWishes = entries.filter(wishHit);
-  const matched = new Set(shownWishes.map(e => e.it && e.it.key).filter(Boolean));
+  const usedKeys = new Set();   /* 1曲が2つの wish に当たっても、黒い行は1回だけ */
+  const shownWishes = entries.filter(wishHit).filter(e => {
+    if (!e.it) return true;
+    if (usedKeys.has(e.it.key)) return false;
+    usedKeys.add(e.it.key);
+    return true;
+  });
   const rows = entries.length
     ? [...shownWishes.map(e => ({ it: e.it, info: e.it ? infoByKey.get(e.it.key) : null, w: e.w })),
-       ...items.filter(x => !matched.has(x.it.key)).map(x => ({ it: x.it, info: x.info, w: null }))]
+       ...items.filter(x => !usedKeys.has(x.it.key)).map(x => ({ it: x.it, info: x.info, w: null }))]
     : items.map(x => ({ it: x.it, info: x.info, w: null }));
   libView = rows.filter(r => r.it).map(r => r.it);
-  const haveAll = entries.filter(e => e.it).length, totalAll = entries.length;
+  const haveAll = usedKeys.size, totalAll = entries.length;   /* have は実際に黒くなった曲数 */
   if (totalAll && haveAll < totalAll) {
     /* 1曲も持っていないときは「集める棚」の説明、途中なら「いま何曲目まで」を出す */
     box.append(el("div", "hint plWishHint", haveAll ? tr("plWishHint", { have: haveAll, total: totalAll })

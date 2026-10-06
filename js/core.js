@@ -273,6 +273,8 @@ function resetVideoPrefs() {
   settings.videoStyle = "color";
   settings.videoZoom = 1; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.castPolicy = "off"; settings.backgroundPolicy = "off"; settings.fxAntenna = false; settings.fxAntennaShape = "rod"; settings.fxAntennaCustomOn = ""; settings.fxAntennaCustomOff = ""; settings.mediaLoopTrigger = "toggle"; settings.mediaWallTrigger = "toggle"; settings.mediaWallStyle = "midnight"; settings.mediaWallClock = true; settings.mediaWallStopsVideo = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true;
   settings.bgDim = 0; settings.bgBlur = 0;
+  /* ✨ TRKエフェクト（リッチ映像。js/tv-rich.js）の記憶も一緒に戻す */
+  settings.tvRichId = "portrait_natural"; settings.tvRichPrev = ""; settings.tvRichCat = "portrait"; settings.tvRichOpen = false;
   settings.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs); // user bookmarks survive a TV-only reset
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = true;
@@ -389,6 +391,8 @@ function exportPrefs(kind) {
   if (kind === "notes") out.notes = settings.notes;
   else if (kind === "tv" || kind === "video") {
     out.videoStyle = settings.videoStyle; out.bgDim = settings.bgDim; out.bgBlur = settings.bgBlur;
+    /* ✨ TRKエフェクト（リッチ映像）の記憶も、映像の書き出しに一緒に乗せる */
+    out.tvRichId = settings.tvRichId; out.tvRichPrev = settings.tvRichPrev; out.tvRichCat = settings.tvRichCat; out.tvRichOpen = settings.tvRichOpen;
     out.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs);
     out.tvDockSkin = settings.tvDockSkin; out.tvDockFive = settings.tvDockFive; out.tvOrder = settings.tvOrder;
     out.tvOverlay = settings.tvOverlay; out.previewEnabled = settings.previewEnabled; out.fxPower = settings.fxPower;

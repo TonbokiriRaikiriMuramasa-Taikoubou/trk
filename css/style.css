@@ -1155,6 +1155,14 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
 #ampPanel .ampStage button{padding:2px 7px;font-size:12px;border-radius:8px}
 #ampPanel .ampStacks button{font-size:14px}
 
+/* ✨ TRKエフェクトを使う（左下・リッチ映像の独立カテゴリー。チップと分類タブ） */
+#richPanel .richCats{margin:6px 0}
+#richPanel .richCats button{font-size:14px;padding:8px 10px;display:flex;align-items:center;justify-content:center;gap:4px}
+#richPanel .richCatIcon{font-size:15px}
+#richPanel .richChips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+#richPanel .richChips button{padding:7px 11px;font-size:14px;border-radius:10px;text-align:left}
+#richPanel .richChips button.selected{border-color:var(--ui-gold);background:rgba(255,209,102,.16);color:var(--ui-gold)}
+
 /* 狭い画面：◀ ▶ とボタンを少し小さくして、液晶の幅を確保する */
 @media(max-width:520px){
   #tvDock .tvTop{gap:6px}

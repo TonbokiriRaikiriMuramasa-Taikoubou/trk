@@ -271,6 +271,32 @@ if (!exists("js/fx-worklet.js") ||
   else ok("TRK amp: independent bottom-left category (below 🎛 More) with 4 stacks, stage chips and rack API in 4 languages");
 }
 
+// ✨ TRK effects: the independent bottom-left category right below 🔥 TRK amp,
+// surfacing the "rich" video grades (portrait / anime / texture / studio) that
+// tv-presets.js added. It only drives settings.videoStyle through TrkTV, so the
+// TV's own video-filter list and this panel can never drift apart.
+{
+  const rich = read("js/tv-rich.js");
+  const html = read("index.html");
+  const css = read("css/style.css");
+  const core = read("js/core.js");
+  const keys = ["richTitle", "richHint", "richUse", "richOn", "richOff", "richSafe", "richPrevLabel",
+    "richNextLabel", "richRandom", "richReset", "richRandomed", "richRestored", "richMore", "richNote", "richNoPreset"];
+  const apiOk = rich.includes('panel.id = "richPanel"') && rich.includes('el("details", "panel dockRich")') &&
+    rich.includes('const RICH_CATS = ["portrait", "anime", "texture", "quality"]') &&
+    rich.includes("window.TrkTV") && rich.includes("TrkTV.list()") && rich.includes("TrkTV.select(") &&
+    rich.includes("TrkTV.current()") && rich.includes('on("tvChange"') && rich.includes("const placeRich = () =>") &&
+    rich.includes("settings.tvRichId") && rich.includes("settings.tvRichPrev") && rich.includes('typeof settings[key] === "string"');
+  const wireOk = html.includes('<script src="js/tv-rich.js"></script>') && css.includes("#richPanel .richChips") &&
+    css.includes("#richPanel .richCats") && core.includes('settings.tvRichId = "portrait_natural"') &&
+    core.includes("out.tvRichId = settings.tvRichId");
+  const langOk = keys.every(k => (rich.match(new RegExp("\\b" + k + ":", "g")) || []).length === 4);
+  if (!apiOk) fail("TRK effects (rich video) panel is not wired to the video filter (TrkTV / videoStyle)");
+  else if (!wireOk) fail("TRK effects (rich video) is missing the script tag, styles, or the video reset/export keys");
+  else if (!langOk) fail("TRK effects (rich video) strings are missing from one of the four languages");
+  else ok("TRK effects: rich video grades as an independent bottom-left category (below 🔥 TRK amp) in 4 languages");
+}
+
 // 🛒 Official-source catalog: no-audio curated playlists with wishlist matching.
 if (!exists("js/catalog.js") ||
     !read("js/catalog.js").includes("TRK_CATALOG") ||

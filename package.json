@@ -6,7 +6,7 @@
   "description": "trk! web assets and Capacitor Android wrapper",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "check": "node tools/check-repo.mjs && node tools/check-mmd-motion-data.mjs && node tools/check-study-room.mjs",
+    "check": "node tools/check-repo.mjs && node tools/check-security.mjs && node tools/check-mmd-motion-data.mjs && node tools/check-study-room.mjs",
     "prepare:mobile": "node tools/prepare-mobile-web.mjs",
     "cap:add:android": "npm run prepare:mobile && cap add android",
     "cap:sync": "npm run prepare:mobile && cap sync",

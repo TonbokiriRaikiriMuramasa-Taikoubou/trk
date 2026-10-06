@@ -1134,7 +1134,7 @@ function renderDesc(p) {
   const d = presetDesc(p);
   desc.append(pText(p.label) + (d ? " — " + d : ""));
   if (p.url) {
-    const a = el("a", "", p.url); a.href = p.url; a.target = "_blank"; a.rel = "noopener noreferrer";
+    const a = safeLink("", p.url);   /* 🛡 https 以外はリンクにしない（共有プリセット対策） */
     a.style.cssText = "margin-left:8px;color:var(--ui-accent);word-break:break-all";
     desc.append(a);
   }

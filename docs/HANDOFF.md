@@ -37,7 +37,7 @@
 - 書斎を開いている間は `window._trkStudyRoomOpen` でゲーム側のキー操作を止める（`player.js`／`main.js`／`modes.js`／`stage.js`／`truck.js`／`catch.js`／`speed.js`／`extras.js`／`video-max.js`／`media-player-mode.js`／`synth-mode.js`）。書斎自身のキー（←→・PageUp/Down・Space/Enter・Esc・B/M/T/F・`+`/`-`/`0`・`?`・Ctrl+F）は capture で先に受け取る。ただし入力欄・セレクトでは書斎のキーを止め、ボタンに焦点があるときの Space／Enter はそのボタンに譲る。書斎を閉じる・`phase` が `title` 以外へ進む・曲が切り替わるときは、TVペインへ移した `<video>` を元の親と `style` へ戻す（元の親が差し替わっていても `document.body` へ逃がす）。
 - 🔥 TRKアンプ（`js/fx-dock.js` の左下カテゴリー＋`js/fx.js` のラック）：`settings.fxRack`（段の配列・最大8。`cleanFx` で検証）／`settings.fxRackOn`（初期オフ）／`settings.ampOpen`（欄の開閉・**初期開き**。触って閉じた人の `false` は尊重。`?reset=amp`／`?reset=all` は初期の開へ戻し、`?safe=1` だけは閉じたまま）。段は**プリセットの後・かんたんEQの前**に効き、`exportObj`（マイプリセット書き出し）と `exportPrefs("all")`（設定の書き出し）にそのまま入る。リセットは `?reset=amp`（別名 `rack`）＝空に／`?reset=all`＝空に／`?safe=1`＝**段は残して止める**だけ。`core.js` の `resetAmpPrefs()` は fx.js より先に走るため、一度きりの合図 `takeAmpReset()`（sessionStorage `trk_amp_reset_once`）を置き、`js/fx.js` が読み込み時に拾って消す。⚠ `js/fx.js` は凍結扱いだが、この機能のために**追加のみ**の窓口（`TrkFX.rack`／`rackTypes`／`rackOn`／`rackSet`／`rackAdd`／`rackClear`）と `refresh()` の `emit("fxRack")` を足した（DSP・保存形式は不変）。
 - ✨ TRKエフェクト（`js/tv-rich.js` の左下カテゴリー）：`js/tv-presets.js` の `portrait|anime|texture|quality`（各5種＝20）をまとめた**独立カテゴリー**（`details.panel.dockRich#richPanel`）。🔥 TRKアンプの直下に `placeRich()`＋MutationObserver で再配置。**中身は映像フィルターそのもの**で、適用は必ず `TrkTV.select()`（`settings.videoStyle`）を通す＝TVドックと二重がけにならない。設定キーは `tvRichId`（初期 `portrait_natural`）／`tvRichPrev`（切ったとき戻る先）／`tvRichCat`（開いているタブ・初期 `portrait`）／`tvRichOpen`（欄の開閉・**初期開き**。触って閉じた人の `false` は尊重。`?reset=tv`／`?reset=all` は開へ戻し、`?safe=1` は閉じたまま）。`resetVideoPrefs()`（`?reset=tv`）で4つとも初期化し、`exportPrefs("all")` にも入る。`?safe=1` はスイッチとチップを無効化して記憶は残す。⚠ `TrkTV.list()` に説明文は無いので、説明は `TRK_TV_PRESETS` から読む。⚠ 読み込み時は `settings` 側の値を優先する（`?reset=tv` は core.js が先に走って settings へ既定値を書くため）。
-- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux16`。公開ファイルを変更したら必ず更新する。
+- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux17`。公開ファイルを変更したら必ず更新する。
 - このcheckoutで `npm run check` はコード・データの自動検査を行うが、MMDの実描画・タッチ操作・音声の実機確認は別途必要。
 
 ---
@@ -69,6 +69,7 @@
 | 33–36 | `main.js` → **`pad.js`** → `speed.js` → `vrm.js` | 起動・イベント、🎮 パッド・コントローラー・TVリモコン（`main.js` の直後。Gamepad API の見張りと設定欄の配線）、速度操作、遅延VRM機能 |
 | 37 | `mmd.js` | 遅延MMD機能・コード生成VMD |
 | 38–41 | `spectrum.js` → `synth-mode.js` → `frame-interp.js` → `media-player-mode.js` | スペクトラム、演奏シンセ、映像補完、メディアプレーヤー |
+| — | `tools/check-security.mjs` | 🛡 静的なセキュリティ検査（危ない書き方・href の関所・共有ファイルの検証・`__proto__` よけ・ZIP の上限・アドオン・通信先・読み取り専用）。`npm run check` に含む |
 | 42–43 | `study-room-utils.js` → `study-room.js` | 📚 書斎。純データ処理（文字コード・並べ替え・ルビ）とUI／IndexedDB。書斎は `#libPanel .libHead h3` を長押しして開く |
 
 上記は `index.html` の実順。依存を追加・移動する場合はscriptタグと `tools/check-repo.mjs` の両方を確認する。
@@ -90,6 +91,11 @@
 - `js/fx.js` と `js/fx-presets.js` は **凍結扱い**。変更が本当に必要な場合は、依存するfx-dock／fx-synthと `window.TrkFX` APIの利用者を一緒に確認する。2026-10-06 の 🔥 TRKアンプ追加では、**DSPに触れず**に (1) `TrkFX.rack*` の追加、(2) `refresh()` の `emit("fxRack")`、(3) 検証用の定数（`R`／`str`／`BIQUAD`／`SWEEP_F`／`NOISES`）を `settings.fxRack` を `cleanFx` で読む行より前へ移動（**それまでは、段を保存した人が次回の読み込みで参照エラーで落ちていた**）、(4) ラックの段セレクトの絵文字が二重に出ていたのを修正、だけを行った。この4点は戻さないこと（check-repo.mjs が見張っている）。
 - 後から読み込まれる機能が関数を包む場合、対象は `function` 宣言か `let` である必要がある。`const` 化・引数変更はラッパー側を先に検索する。
 - `?safe=1` は保存ファイルやCDN機能の読み込みを抑える非常用モード。安全モードを迂回しない。
+- 🛡 セキュリティ：`docs/SECURITY.md` が洗い出しの記録、`tools/check-security.mjs` が回帰よけ（`npm run check` に含む）。守るべき決まりは4つ。
+  - **外から来た文字列を `<a href>` にするときは `safeLink()`／`safeHttpUrl()`（`js/core.js`）を通す**（https 以外はリンクにせず文字だけ出す）。共有ファイル（パックの名刺・配布ページ・エフェクトのプリセット）と公認リストの作者リンクが対象。`href` への直代入は check-security が FAIL にする。
+  - **設定の緊急インポートは `UNSAFE_KEYS`（`__proto__`／`constructor`／`prototype`）を飛ばし、`hasOwnProperty` で自分のキーだけ入れる**（プロトタイプ汚染よけ）。
+  - **`.stpack` の展開は `inflateEntry(entry, limit, path)` のとおり上限を渡す**。ZIP の `usize` は作り手が自由に書けるので信用しない（展開しながら数えて止める＝圧縮爆弾よけ）。
+  - **`eval`／`new Function`／`document.write`／`srcdoc` を使わない**。`innerHTML` は `js/game.js` の結果画面（全部 `esc()` 済み）だけ。アドオンは仕様としてページ内フル権限なので、**遠隔からコードを取りに行かない**（同梱の `js/addons/example.js` のみ）・安全モードでは読まない、を維持する。
 - UI追加時は4言語の文言を同時に追加し、設定項目は初期値・リセット・Import/Export・セーフモード経路を確認する。
 - GitHub Pagesはファイル名の大文字小文字を区別する。相対パスとService Workerキャッシュも確認する。
 

@@ -549,6 +549,28 @@ const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls)
 const extOf = p => String(p).split(".").pop().toLowerCase();
 const baseName = n => String(n).replace(/\.[^.]+$/, "");
 const safeName = s => String(s).replace(/[\\/:*?"<>|]+/g, "_").slice(0, 60) || "file";
+/* 外から来た文字列を <a href> にする前の関所（🛡 セキュリティ）。
+   javascript: / data: / vbscript: / blob: などはリンクにしない＝クリックでコードが動く経路を作らない。
+   共有パックの名刺・プレゼントの入手先・イベントの作者リンクなど、他人が作った文字列は必ずここを通す。
+   読めれば用は足りるので、危ない URL は「リンクにせず、ただの文字」として出す（情報は消さない）。 */
+function safeHttpUrl(v) {
+  const s = typeof v === "string" ? v.trim() : "";
+  if (!s || s.length > 300) return "";
+  try {
+    const u = new URL(s, location.href);
+    return u.protocol === "https:" && u.hostname ? u.href : "";
+  } catch (_) { return ""; }
+}
+function safeLink(cls, url, text) {
+  const label = text != null ? String(text) : String(url == null ? "" : url);
+  const href = safeHttpUrl(url);
+  const n = href ? el("a", cls, label) : el("span", cls, label);
+  if (href) { n.href = href; n.target = "_blank"; n.rel = "noopener noreferrer"; }
+  return n;
+}
+/* 設定の読み込みなどで、オブジェクトを丸ごと書き戻すときに踏んではいけないキー
+   （__proto__ を代入すると、そのオブジェクトの継承先ごと入れ替わってしまう） */
+const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
 function fmtTime(s) { s = Math.max(0, Math.floor(s || 0)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }
 function fmtDate(t) {
   try { return new Date(t).toLocaleString(document.documentElement.lang || undefined, { month:"numeric", day:"numeric", hour:"2-digit", minute:"2-digit" }); }
@@ -934,7 +956,8 @@ function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
         }
         // 全体的にマージ（知らないキーは無視せず一応入れるが、型チェックは緩め）
         for (const k of Object.keys(data)) {
-          if (k in settings && !applied.includes(k) && k !== "notes") {
+          if (UNSAFE_KEYS.has(k) || k === "notes" || applied.includes(k)) continue;   /* 🛡 __proto__ / constructor / prototype は入れない */
+          if (Object.prototype.hasOwnProperty.call(settings, k)) {
             try { settings[k] = data[k]; applied.push(k); } catch(_){}
           }
         }

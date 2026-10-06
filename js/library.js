@@ -527,18 +527,21 @@ function libTabsOf(all) {
   if (nFiles) tabs.push({ id:"file", icon:"📄", label:tr("libTabFiles"), n:nFiles });
   const nv = all.filter(it => it.source === "pack" && libIsVerified(it)).length;
   if (nv) tabs.push({ id:"verified", icon:"✔", label:tr("libTabVerified"), n:nv });
-  // 🐔 trk's playlist — 右端に1つ。設定で非表示可。既存の他のタブの後ろに置く（認定カタログ🏅が来たらその前でも良いが、今は最右端）
-  if (settings.trkPlaylist !== false) {
-    const tp = settings.playlists.find(p => p.id === "trk-playlist");
-    if (tp && plVisible(tp)) {
-      if (!tabs.some(x => x.id === "pl:trk-playlist")) tabs.push({ id:"pl:trk-playlist", icon: plIcon(tp), label: tp.name, n: plCount(tp, plKeys), pl: tp, trk: true });
+  // 🐔 trk's playlist — フォルダを右端に1つ。長押しで中の Vol 一覧が開く。場所を取らずに沢山収容
+  const trkFolder = settings.plFolders.find(f => f.id === TRK_FOLDER_ID);
+  if (trkFolder) {
+    const keys = plFolderUnionKeys(TRK_FOLDER_ID);
+    const n = [...keys].filter(k => plKeys.has(k)).length;
+    if (!tabs.some(x => x.id === "fld:" + TRK_FOLDER_ID)) tabs.push({ id:"fld:" + TRK_FOLDER_ID, icon: trkFolder.icon || "🐔", label: trkFolder.name, n, fld: trkFolder, trk: true });
+  } else if (settings.trkPlaylist !== false || settings.trkClassic !== false) {
+    // フォルダがまだ無い場合のフォールバック（旧来の2タブ）
+    if (settings.trkPlaylist !== false) {
+      const tp = settings.playlists.find(p => p.id === "trk-playlist");
+      if (tp && plVisible(tp) && !tabs.some(x => x.id === "pl:trk-playlist")) tabs.push({ id:"pl:trk-playlist", icon: plIcon(tp), label: tp.name, n: plCount(tp, plKeys), pl: tp, trk: true });
     }
-  }
-  // 🎻 trk classic — 右端に1つ。ゲームとは別枠で100曲。設定で非表示可。最右端のさらに右に置く（Princess Tutuでも聴ける名盤）
-  if (settings.trkClassic !== false) {
-    const tc = settings.playlists.find(p => p.id === "trk-classic");
-    if (tc && plVisible(tc)) {
-      if (!tabs.some(x => x.id === "pl:trk-classic")) tabs.push({ id:"pl:trk-classic", icon: plIcon(tc), label: tc.name, n: plCount(tc, plKeys), pl: tc, trk: true });
+    if (settings.trkClassic !== false) {
+      const tc = settings.playlists.find(p => p.id === "trk-classic");
+      if (tc && plVisible(tc) && !tabs.some(x => x.id === "pl:trk-classic")) tabs.push({ id:"pl:trk-classic", icon: plIcon(tc), label: tc.name, n: plCount(tc, plKeys), pl: tc, trk: true });
     }
   }
   return tabs;
@@ -689,7 +692,30 @@ function plSanitize(raw) {
     createdAt: (typeof raw.createdAt === "number" && raw.createdAt > 0 && raw.createdAt < 9e15) ? raw.createdAt : 0 };
 }
 const TRK_PLAYLIST_ID = "trk-playlist";
+const TRK_FOLDER_ID = "trk";
 const TRK_CLASSIC_ID = "trk-classic";
+function ensureTrkSubfolder(id, name, icon) {
+  let f = settings.plFolders.find(x => x.id === id);
+  if (f) return f;
+  f = plFolderSanitize({ id, name, icon, color: "none", parent: TRK_FOLDER_ID });
+  if (!f) return null;
+  settings.plFolders.push(f);
+  saveUserPrefs();
+  return f;
+}
+function ensureTrkFolder() {
+  let f = settings.plFolders.find(x => x.id === TRK_FOLDER_ID);
+  if (!f) {
+    f = plFolderSanitize({ id: TRK_FOLDER_ID, name: "🐔 trk's playlist", icon: "🐔", color: "none", parent: "" });
+    if (f) { settings.plFolders.push(f); saveUserPrefs(); }
+  }
+  ensureTrkSubfolder("trk-classic", "Classic", "🎻");
+  ensureTrkSubfolder("trk-ba", "Blue Archive", "🎮");
+  ensureTrkSubfolder("trk-touhou", "Touhou", "⛩️");
+  ensureTrkSubfolder("trk-arknights", "Arknights", "🎮");
+  ensureTrkSubfolder("trk-gakumas", "Gakum@s", "🎤");
+  return settings.plFolders.find(x => x.id === TRK_FOLDER_ID) || f || null;
+}
 function trkWishesFromCatalog() {
   const cat = window.TRK_CATALOG || [];
   const out = [];
@@ -728,9 +754,10 @@ function ensureTrkPlaylist(opts) {
   const go = !!o.go;
   if (settings.trkPlaylist === false) return false;
   if (settings.playlists.some(function(p){ return p.id === TRK_PLAYLIST_ID; })) return false;
+  ensureTrkFolder();
   const wishes = trkWishesFromCatalog();
   if (!wishes.length) return false;
-  const p = plSanitize({ id: TRK_PLAYLIST_ID, name: "\uD83D\uDC14 trk\'s playlist", icon: "\uD83D\uDC14", color: "none", folder: "", tags: ["trk"], wish: wishes, songs: [], guide: { note: "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8\u3002\u97F3\u6E90\u306F\u540C\u68B1\u3057\u307E\u305B\u3093\u3002\u516C\u5F0F\u306E\u5165\u624B\u5148\u304B\u3089\u3069\u3046\u305E\u3002", url: "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" }, cat: "trk:all", createdAt: Date.now() });
+  const p = plSanitize({ id: TRK_PLAYLIST_ID, name: "Game Vol.1", icon: "\uD83D\uDC14", color: "none", folder: TRK_FOLDER_ID, tags: ["Game","Vol.1"], wish: wishes, songs: [], guide: { note: "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8\u3002\u97F3\u6E90\u306F\u540C\u68B1\u3057\u307E\u305B\u3093\u3002\u516C\u5F0F\u306E\u5165\u624B\u5148\u304B\u3089\u3069\u3046\u305E\u3002", url: "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" }, cat: "trk:all", createdAt: Date.now() });
   if (!p) return false;
   settings.playlists.push(p);
   saveUserPrefs();
@@ -744,9 +771,10 @@ function ensureTrkClassicPlaylist(opts) {
   const go = !!o.go;
   if (settings.trkClassic === false) return false;
   if (settings.playlists.some(function(p){ return p.id === TRK_CLASSIC_ID; })) return false;
+  ensureTrkFolder();
   const wishes = trkClassicWishesFromCatalog();
   if (!wishes.length) return false;
-  const p = plSanitize({ id: TRK_CLASSIC_ID, name: "\uD83C\uDFBB trk classic", icon: "\uD83C\uDFBB", color: "none", folder: "", tags: ["classic"], wish: wishes, songs: [], guide: { note: "\u7248\u6A29\u5207\u308C\u306E\u540D\u6F14\u3092Musopen\u306E\u516C\u958B\u9332\u97F3\u3067\u7D39\u4ECB\u3002\u97F3\u6E90\u306F\u540C\u68B1\u3057\u307E\u305B\u3093\u3002", url: "https://musopen.org/" }, cat: "trk:classic", createdAt: Date.now() });
+  const p = plSanitize({ id: TRK_CLASSIC_ID, name: "Classic Vol.1", icon: "\uD83C\uDFBB", color: "none", folder: "trk-classic", tags: ["Classic","Vol.1"], wish: wishes, songs: [], guide: { note: "\u7248\u6A29\u5207\u308C\u306E\u540D\u6F14\u3092Musopen\u306E\u516C\u958B\u9332\u97F3\u3067\u7D39\u4ECB\u3002\u97F3\u6E90\u306F\u540C\u68B1\u3057\u307E\u305B\u3093\u3002", url: "https://musopen.org/" }, cat: "trk:classic", createdAt: Date.now() });
   if (!p) return false;
   settings.playlists.push(p);
   saveUserPrefs();
@@ -758,6 +786,51 @@ window.TrkEnsureTrkPlaylist = ensureTrkPlaylist;
 window.TrkTrkPlaylistId = TRK_PLAYLIST_ID;
 window.TrkEnsureTrkClassicPlaylist = ensureTrkClassicPlaylist;
 window.TrkClassicId = TRK_CLASSIC_ID;
+window.ensureTrkDistributionPlaylists = ensureTrkDistributionPlaylists;
+
+function trkWishesForSeries(seriesId) {
+  const cat = window.TRK_CATALOG || [];
+  const out = [];
+  for (const s of cat) {
+    if (s.id !== seriesId) continue;
+    for (const pl of (s.playlists || [])) {
+      for (const tt of (pl.songs || [])) {
+        out.push({ t: tt.t, al: tt.al || "", ar: tt.ar || "", u: tt.u || "" });
+      }
+    }
+  }
+  return out;
+}
+function ensureTrkDistributionPlaylists() {
+  ensureTrkFolder();
+  const distros = [
+    { id: "trk-ba-v1", name: "Blue Archive Vol.1", icon: "🎒", color: "blue", folder: "trk-ba", series: "bluearchive", tags: ["Game","Blue Archive","Vol.1"] },
+    { id: "trk-touhou-v1", name: "Touhou Vol.1", icon: "⭐", color: "red", folder: "trk-touhou", series: "touhou", tags: ["Game","Touhou","Vol.1"] },
+    { id: "trk-arknights-v1", name: "Arknights Vol.1", icon: "🩺", color: "amber", folder: "trk-arknights", series: "arknights", tags: ["Game","Arknights","Vol.1"] },
+    { id: "trk-gakumas-v1", name: "Gakum@s Vol.1", icon: "🌟", color: "pink", folder: "trk-gakumas", series: "gakumas", tags: ["Game","Gakumas","Vol.1"] },
+  ];
+  for (const d of distros) {
+    if (settings.playlists.some(p => p.id === d.id)) continue;
+    // respect 100 limit per Vol, split if needed
+    const wishesAll = trkWishesForSeries(d.series);
+    if (!wishesAll.length) continue;
+    // For now, only Vol.1 per distro (up to 100). If over 100, create Vol.2 etc.
+    const slice = wishesAll.slice(0, 100);
+    const p = plSanitize({ id: d.id, name: d.name, icon: d.icon, color: d.color, folder: d.folder, tags: d.tags, wish: slice, songs: [], guide: { note: "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8\u3002", url: "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" }, cat: "trk:" + d.series, createdAt: Date.now() });
+    if (p) settings.playlists.push(p);
+    // If over 100, create Vol.2
+    if (wishesAll.length > 100) {
+      const id2 = d.id.replace("v1", "v2");
+      if (!settings.playlists.some(p => p.id === id2)) {
+        const slice2 = wishesAll.slice(100, 200);
+        const name2 = d.name.replace("Vol.1", "Vol.2");
+        const p2 = plSanitize({ id: id2, name: name2, icon: d.icon, color: d.color, folder: d.folder, tags: [d.tags[0], d.tags[1], "Vol.2"], wish: slice2, songs: [], guide: { note: "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8\u3002", url: "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" }, cat: "trk:" + d.series, createdAt: Date.now() + 1 });
+        if (p2) settings.playlists.push(p2);
+      }
+    }
+  }
+  saveUserPrefs();
+}
 
 (function plTighten() {
   settings.playlists = (settings.playlists || []).map(plSanitize).filter(Boolean).slice(0, 24);
@@ -2403,6 +2476,10 @@ async function initLibrary() {
   // 🎻 trk classic — 同上。ゲームとは別枠で100曲。設定で非表示なら作らない
   if (settings.tutorialDone && settings.trkClassic !== false) {
     try { ensureTrkClassicPlaylist({ toast: false }); } catch(_){}
+  }
+  // 配布形態で分類: 各タイトル別 Vol を作る（長押しで開くリスト）
+  if (settings.tutorialDone) {
+    try { ensureTrkDistributionPlaylists(); } catch(_){}
   }
   syncTrkUI();
   renderLib();

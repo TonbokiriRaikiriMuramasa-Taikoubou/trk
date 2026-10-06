@@ -73,6 +73,9 @@ function maybeAddTrkPlaylist() {
         setTimeout(function(){ try { if (window.TrkClassicId && typeof renderLib === "function") { settings.libTab = "pl:" + window.TrkClassicId; saveUserPrefs(); renderLib(); } } catch(_){} }, 1300);
       }
     }
+    if (window.ensureTrkDistributionPlaylists && settings.tutorialDone) {
+      try { window.ensureTrkDistributionPlaylists(); } catch(_){}
+    }
   } catch(_){}
 }
 function guideStampsDone() { return GUIDE_STAMPS.every(id => settings.tutorialStamps.includes(id)); }

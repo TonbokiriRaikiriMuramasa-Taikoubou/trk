@@ -830,33 +830,52 @@ function trkWishesForSeries(seriesId) {
 }
 function ensureTrkDistributionPlaylists() {
   ensureTrkFolder();
-  const distros = [
-    { id: "trk-ba-v1", name: "Blue Archive Vol.1", icon: "🎒", color: "blue", folder: "trk-ba", series: "bluearchive", tags: ["Game","Blue Archive","Vol.1"] },
-    { id: "trk-touhou-v1", name: "Touhou Vol.1", icon: "⭐", color: "red", folder: "trk-touhou", series: "touhou", tags: ["Game","Touhou","Vol.1"] },
-    { id: "trk-arknights-v1", name: "Arknights Vol.1", icon: "🩺", color: "amber", folder: "trk-arknights", series: "arknights", tags: ["Game","Arknights","Vol.1"] },
-    { id: "trk-gakumas-v1", name: "Gakum@s Vol.1", icon: "🌟", color: "pink", folder: "trk-gakumas", series: "gakumas", tags: ["Game","Gakumas","Vol.1"] },
-  ];
-  for (const d of distros) {
-    if (settings.playlists.some(p => p.id === d.id)) continue;
-    // respect 100 limit per Vol, split if needed
-    const wishesAll = trkWishesForSeries(d.series);
-    if (!wishesAll.length) continue;
-    // For now, only Vol.1 per distro (up to 100). If over 100, create Vol.2 etc.
-    const slice = wishesAll.slice(0, 100);
-    const p = plSanitize({ id: d.id, name: d.name, icon: d.icon, color: d.color, folder: d.folder, tags: d.tags, wish: slice, songs: [], guide: { note: "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8\u3002", url: "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" }, cat: "trk:" + d.series, createdAt: Date.now() });
-    if (p) settings.playlists.push(p);
-    // If over 100, create Vol.2
-    if (wishesAll.length > 100) {
-      const id2 = d.id.replace("v1", "v2");
-      if (!settings.playlists.some(p => p.id === id2)) {
-        const slice2 = wishesAll.slice(100, 200);
-        const name2 = d.name.replace("Vol.1", "Vol.2");
-        const p2 = plSanitize({ id: id2, name: name2, icon: d.icon, color: d.color, folder: d.folder, tags: [d.tags[0], d.tags[1], "Vol.2"], wish: slice2, songs: [], guide: { note: "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8\u3002", url: "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" }, cat: "trk:" + d.series, createdAt: Date.now() + 1 });
-        if (p2) settings.playlists.push(p2);
+  const cat = window.TRK_CATALOG || [];
+  const folderMap = { bluearchive: "trk-ba", touhou: "trk-touhou", arknights: "trk-arknights", gakumas: "trk-gakumas" };
+  let changed = false;
+  for (const s of cat) {
+    const folder = folderMap[s.id];
+    if (!folder) continue;
+    for (const pl of (s.playlists || [])) {
+      const baseId = "trk-" + pl.id;
+      // if already exists, skip
+      if (settings.playlists.some(p => p.id === baseId)) continue;
+      const wishes = (pl.songs || []).map(tt => ({ t: tt.t, al: tt.al || "", ar: tt.ar || "", u: tt.u || "" }));
+      if (!wishes.length) continue;
+      // respect 100 limit per Vol, split if needed into Vol.1 / Vol.2 etc.
+      const total = wishes.length;
+      const vols = Math.ceil(total / 100) || 1;
+      for (let v = 0; v < vols; v++) {
+        const vid = vols === 1 ? baseId : baseId + "-v" + (v+1);
+        if (settings.playlists.some(p => p.id === vid)) continue;
+        const slice = wishes.slice(v*100, (v+1)*100);
+        const vTag = vols === 1 ? [] : ["Vol."+(v+1)];
+        const vName = vols === 1 ? pl.name : pl.name + " Vol." + (v+1);
+        const p = plSanitize({ id: vid, name: vName, icon: pl.icon || s.icon, color: pl.color || s.color, folder, tags: (pl.tags || []).concat(vTag).slice(0,5), wish: slice, songs: [], guide: { note: "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8\u3002" + s.name + " の配布形態別フォルダに収容。", url: s.url || "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" }, cat: "trk:" + s.id + ":" + pl.id, createdAt: Date.now() + v });
+        if (p) { settings.playlists.push(p); changed = true; }
       }
     }
   }
-  saveUserPrefs();
+  // legacy: ensure old 4 generic still migrate if missing (for existing users)
+  const legacy = [
+    { id: "trk-ba-v1", folder: "trk-ba", series: "bluearchive" },
+    { id: "trk-touhou-v1", folder: "trk-touhou", series: "touhou" },
+    { id: "trk-arknights-v1", folder: "trk-arknights", series: "arknights" },
+    { id: "trk-gakumas-v1", folder: "trk-gakumas", series: "gakumas" },
+  ];
+  for (const d of legacy) {
+    if (settings.playlists.some(p => p.id === d.id)) continue;
+    const s = cat.find(x=> x.id===d.series);
+    if (!s) continue;
+    // if new per-PL already cover, skip legacy creation
+    if (s.playlists && s.playlists.some(pl=> settings.playlists.some(p=> p.id==="trk-"+pl.id))) continue;
+    const wishesAll = trkWishesForSeries(d.series);
+    if (!wishesAll.length) continue;
+    const slice = wishesAll.slice(0,100);
+    const p = plSanitize({ id: d.id, name: s.name + " Vol.1", icon: s.icon, color: s.color, folder: d.folder, tags: ["Game", s.name, "Vol.1"], wish: slice, songs: [], guide: { note: "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8\u3002", url: s.url || "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" }, cat: "trk:" + d.series, createdAt: Date.now() });
+    if (p) { settings.playlists.push(p); changed = true; }
+  }
+  if (changed) saveUserPrefs();
 }
 
 (function plTighten() {

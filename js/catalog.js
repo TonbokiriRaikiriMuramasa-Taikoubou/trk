@@ -165,26 +165,40 @@ S("classical", "クラシック名盤 — 版権切れの名演", "🎻", "purpl
 
 /* ================= 🎒 ブルーアーカイブ（Nexon / Yostar） ================= */
 S("bluearchive", "ブルーアーカイブ", "🎒", "blue", "ソーシャルゲーム", "🎮",
-  "公式サウンドトラック（Vol.1〜Vol.4）は各種サブスク・ストアで配信中。公式YouTubeチャンネルでも聴けます。音源はご自身で入手してMusicフォルダへ。",
+  "公式サウンドトラック（Vol.1〜Vol.4）は各種サブスク・ストアで配信中。公式YouTubeチャンネルでも聴けます。音源はご自身で入手してMusicフォルダへ。Vol.ごとにフォルダ分けして収容（100超は Vol.2 自動作成）。",
   "https://bluearchive.jp/",
-  [PL("ba-ost", "ブルアカ OST 厳選", "🎧", "blue", ["Game","Blue Archive","OST","Mitsukiyo"],
+  [PL("ba-v1", "ブルアカ OST Vol.1", "💿", "blue", ["Game","Blue Archive","OST","Vol.1","Mitsukiyo"],
+    [T("Constant Moderato", "Blue Archive Original Soundtrack Vol.1", "Mitsukiyo", "https://bluearchive.fandom.com/wiki/Blue_Archive_Original_Soundtrack_Vol.1"),
+     T("Vol.1 - Discovery", "Vol.1", "Mitsukiyo", "https://bluearchive.fandom.com/wiki/Blue_Archive_Original_Soundtrack_Vol.1"),
+     T("Vol.1 - Courage", "Vol.1", "Karut", "https://bluearchive.fandom.com/wiki/Blue_Archive_Original_Soundtrack_Vol.1"),
+     T("青春のアーカイブ", "Blue Archive OST", "Nor", "https://bluearchive.jp/")]),
+   PL("ba-v2", "ブルアカ OST Vol.2", "💿", "blue", ["Game","Blue Archive","OST","Vol.2","Mitsukiyo"],
+    [T("Vol.2 - Search", "Blue Archive Original Soundtrack Vol.2", "Mitsukiyo", "https://bluearchive.fandom.com/wiki/Blue_Archive_Original_Soundtrack_Vol.2"),
+     T("Vol.2 - Future", "Vol.2", "KARUT", "https://bluearchive.fandom.com/wiki/Blue_Archive_Original_Soundtrack_Vol.2")]),
+   PL("ba-v3", "ブルアカ OST Vol.3", "💿", "blue", ["Game","Blue Archive","OST","Vol.3","Mitsukiyo"],
+    [T("Vol.3 - To the Sky", "Blue Archive Original Soundtrack Vol.3", "Mitsukiyo", "https://bluearchive.fandom.com/wiki/Blue_Archive_Original_Soundtrack_Vol.3")]),
+   PL("ba-v4", "ブルアカ OST Vol.4", "💿", "blue", ["Game","Blue Archive","OST","Vol.4","Mitsukiyo"],
     [T("Unwelcome School", "Blue Archive Original Soundtrack Vol.4", "Mitsukiyo", "https://bluearchive.fandom.com/wiki/Blue_Archive_Original_Soundtrack_Vol.4"),
-     T("Constant Moderato", "Blue Archive Original Soundtrack Vol.1", "Mitsukiyo", "https://bluearchive.fandom.com/wiki/Blue_Archive_Original_Soundtrack_Vol.1"),
-     T("青春のアーカイブ", "Blue Archive OST", "Nor", "https://bluearchive.jp/")])]);
+     T("Aoharu", "Vol.4", "Mitsukiyo", "https://bluearchive.fandom.com/wiki/Blue_Archive_Original_Soundtrack_Vol.4"),
+     T("Future Breeze", "Vol.4", "Nor", "https://bluearchive.fandom.com/wiki/Blue_Archive_Original_Soundtrack_Vol.4")])]);
 
 /* ================= 🩺 アークナイツ（Hypergravity / Yostar） =================
    公式レーベル「Monster-Siren Records（塞壬唱片）」は全楽曲を公式サイトで公開・販売。
    曲名をタップすると公式の楽曲ページが開きます（開く前に確認が出ます）。 */
 S("arknights", "アークナイツ", "🩺", "amber", "ソーシャルゲーム", "🎮",
-  "公式音楽レーベル「Monster-Siren Records」のサイトで全楽曲を試聴・購入できます（中国語サイト・要ログインの場合あり）。",
+  "公式音楽レーベル「Monster-Siren Records」のサイトで全楽曲を試聴・購入できます（中国語サイト・要ログインの場合あり）。アルバム別フォルダで収容（100超は Vol.2 自動作成）。",
   "https://monster-siren.hypergryph.com/",
   [PL("ak-msr", "アークナイツ MSR 厳選", "🎼", "amber", ["Game","Arknights","MSR","Monster Siren"],
     [T("Still the Same", "", "", "https://monster-siren.hypergryph.com/music/461129"),
      T("Final Embrace", "", "", "https://monster-siren.hypergryph.com/music/125053"),
      T("Il Signore del Carnevale", "揭幕者们 / I Portatori dei Velluti OST", "", "https://monster-siren.hypergryph.com/music/048783"),
-     T("Don't Waste the Joke", "揭幕者们 / I Portatori dei Velluti OST", "", "https://monster-siren.hypergryph.com/music/461135"),
-     T("Boiling Blood", "明日方舟 Sound Track", "Cristina Vee"),
-     T("Battleplan Arclight", "Contingency Contract Battleplan Pyrolysis OST", "")])]);
+     T("Don't Waste the Joke", "揭幕者们 / I Portatori dei Velluti OST", "", "https://monster-siren.hypergryph.com/music/461135")]),
+   PL("ak-blood", "アークナイツ — Boiling Blood", "🔥", "red", ["Game","Arknights","MSR","Boiling Blood"],
+    [T("Boiling Blood", "明日方舟 Sound Track", "Cristina Vee", "https://monster-siren.hypergryph.com/"),
+     T("Arclight", "明日方舟 Sound Track", "", "https://monster-siren.hypergryph.com/")]),
+   PL("ak-contingency", "アークナイツ — Contingency Contract", "🛡️", "amber", ["Game","Arknights","MSR","Contingency Contract"],
+    [T("Battleplan Arclight", "Contingency Contract Battleplan Pyrolysis OST", "", "https://monster-siren.hypergryph.com/"),
+     T("Battleplan Pyrolysis", "Contingency Contract", "", "https://monster-siren.hypergryph.com/")])]);
 
 /* ================= ⚔️ League of Legends（Riot Games） =================
    Riot Games Music の「Sessions」シリーズは、クリエイターが安心して使える
@@ -279,32 +293,39 @@ S("oj", "100% Orange Juice", "🍊", "amber", "フリー音源", "🎁",
    レーベル公式サイトが、楽曲ごとのインスト音源データを継続して公開中
    （公式Google Driveからダウンロード。インスト音源利用ガイドラインあり）。 */
 S("gakumas", "学園アイドルマスター", "🌟", "pink", "ソーシャルゲーム", "🎮",
-  "レーベル公式サイトのNEWSで、楽曲ごとのインスト音源データを継続公開中（公式Google Driveからダウンロードできます。利用ガイドラインも確認してくださいね）。",
+  "レーベル公式サイトのNEWSで、楽曲ごとのインスト音源データを継続公開中（公式Google Driveからダウンロードできます。利用ガイドラインも確認してくださいね）。キャラクター別に収容（100超は Vol.2 自動作成）。",
   "https://gakuen-label.idolmaster-official.jp/",
-  [PL("gm-inst", "学マス インスト厳選", "🌟", "pink", ["Game","Gakumas","Idolmaster","Bandai Namco"],
-    [T("Fighting My Way", "学マス インスト音源", "花海咲季"),
-     T("Luna say maybe", "学マス インスト音源", "月村手毬"),
-     T("世界一可愛い私", "学マス インスト音源", "藤田ことね"),
-     T("Fluorite", "学マス インスト音源", "有村麻央"),
-     T("白線", "学マス インスト音源", "葛城リーリヤ"),
-     T("Wonder Scale", "学マス インスト音源", "倉本千奈"),
-     T("Tame-Lie-One-Step", "学マス インスト音源", "紫雲清夏"),
-     T("光景", "学マス インスト音源", "篠澤広"),
-     T("clumsy trick", "学マス インスト音源", "姫崎莉波"),
-     T("標", "学マス インスト音源", "初星学園")])]);
+  [PL("gm-inst", "学マス インスト厳選 — キャラ別", "🌟", "pink", ["Game","Gakumas","Idolmaster","Bandai Namco"],
+    [T("Fighting My Way — 花海咲季", "学マス インスト音源", "花海咲季", "https://gakuen-label.idolmaster-official.jp/"),
+     T("Luna say maybe — 月村手毬", "学マス インスト音源", "月村手毬", "https://gakuen-label.idolmaster-official.jp/"),
+     T("世界一可愛い私 — 藤田ことね", "学マス インスト音源", "藤田ことね", "https://gakuen-label.idolmaster-official.jp/"),
+     T("Fluorite — 有村麻央", "学マス インスト音源", "有村麻央", "https://gakuen-label.idolmaster-official.jp/"),
+     T("白線 — 葛城リーリヤ", "学マス インスト音源", "葛城リーリヤ", "https://gakuen-label.idolmaster-official.jp/"),
+     T("Wonder Scale — 倉本千奈", "学マス インスト音源", "倉本千奈", "https://gakuen-label.idolmaster-official.jp/"),
+     T("Tame-Lie-One-Step — 紫雲清夏", "学マス インスト音源", "紫雲清夏", "https://gakuen-label.idolmaster-official.jp/"),
+     T("光景 — 篠澤広", "学マス インスト音源", "篠澤広", "https://gakuen-label.idolmaster-official.jp/"),
+     T("clumsy trick — 姫崎莉波", "学マス インスト音源", "姫崎莉波", "https://gakuen-label.idolmaster-official.jp/"),
+     T("標 — 初星学園", "学マス インスト音源", "初星学園", "https://gakuen-label.idolmaster-official.jp/")])]);
 
 /* ================= ⭐ 東方Project（上海アリス幻樂団） ================= */
 S("touhou", "東方Project", "⭐", "red", "同人ゲーム", "🏮",
-  "ZUNさん（上海アリス幻樂団）の公式サイト。作品と音楽CDの情報はここで。ゲームの体験版もダウンロードできます（体験版にもBGMが入っています）。",
+  "ZUNさん（上海アリス幻樂団）の公式サイト。作品と音楽CDの情報はここで。ゲームの体験版もダウンロードできます（体験版にもBGMが入っています）。タイトル別フォルダで収容（100超は Vol.2 自動作成）。",
   "https://www16.big.or.jp/~zun/",
-  [PL("th-classics", "東方 原曲クラシック", "⭐", "red", ["Game","Touhou","ZUN","Shanghai Alice"],
-    [T("U.N.オーエンは彼女なのか?", "東方紅魔郷", "ZUN"),
-     T("亡き王女の為のセプテット", "東方紅魔郷", "ZUN"),
-     T("月まで届け、不死の煙", "東方紅魔郷", "ZUN"),
-     T("幽雅に咲かせ、墨染の桜 ～ Border of Life", "東方妖々夢", "ZUN"),
-     T("千年幻想郷 ～ History of the Moon", "東方永夜抄", "ZUN"),
-     T("ハルトマンの妖怪少女", "東方地霊殿", "ZUN"),
-     T("神々が恋した幻想郷", "東方風神録", "ZUN"),
-     T("ネイティブフェイス", "東方風神録", "ZUN")])]);
+  [PL("th-koumakyou", "東方紅魔郷", "🌹", "red", ["Game","Touhou","紅魔郷","ZUN"],
+    [T("U.N.オーエンは彼女なのか?", "東方紅魔郷", "ZUN", "https://www16.big.or.jp/~zun/html/th06.html"),
+     T("亡き王女の為のセプテット", "東方紅魔郷", "ZUN", "https://www16.big.or.jp/~zun/html/th06.html"),
+     T("月まで届け、不死の煙", "東方紅魔郷", "ZUN", "https://www16.big.or.jp/~zun/html/th06.html")]),
+   PL("th-youyoumu", "東方妖々夢", "🌸", "pink", ["Game","Touhou","妖々夢","ZUN"],
+    [T("幽雅に咲かせ、墨染の桜 ～ Border of Life", "東方妖々夢", "ZUN", "https://www16.big.or.jp/~zun/html/th07.html"),
+     T("ネクロファンタジア", "東方妖々夢", "ZUN", "https://www16.big.or.jp/~zun/html/th07.html")]),
+   PL("th-eiyasyou", "東方永夜抄", "🌙", "purple", ["Game","Touhou","永夜抄","ZUN"],
+    [T("千年幻想郷 ～ History of the Moon", "東方永夜抄", "ZUN", "https://www16.big.or.jp/~zun/html/th08.html"),
+     T("竹取飛翔 ～ Lunatic Princess", "東方永夜抄", "ZUN", "https://www16.big.or.jp/~zun/html/th08.html")]),
+   PL("th-fuujinroku", "東方風神録", "⛩️", "green", ["Game","Touhou","風神録","ZUN"],
+    [T("神々が恋した幻想郷", "東方風神録", "ZUN", "https://www16.big.or.jp/~zun/html/th10.html"),
+     T("ネイティブフェイス", "東方風神録", "ZUN", "https://www16.big.or.jp/~zun/html/th10.html")]),
+   PL("th-chireiden", "東方地霊殿", "🔮", "amber", ["Game","Touhou","地霊殿","ZUN"],
+    [T("ハルトマンの妖怪少女", "東方地霊殿", "ZUN", "https://www16.big.or.jp/~zun/html/th11.html"),
+     T("霊知の太陽信仰 ～ Nuclear Fusion", "東方地霊殿", "ZUN", "https://www16.big.or.jp/~zun/html/th11.html")])]);
 })();
 /* ✅ catalog.js 完了（シリーズ5・プレイリスト5。MODで TRK_CATALOG.push して追加できます） */

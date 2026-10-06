@@ -280,13 +280,15 @@ trk! は音楽ゲームですが、**自分の端末の中身をゆっくり眺�
 
 取り込んだ画像・テキスト・栞・メモ・ジャケットの割り当ては、**IndexedDB `trk_study_room_v1`** に、**この端末の中だけ**保存します（アップロードも通信もしません。元のファイルは変更しません。`?safe=1` では書斎を開かず、保存領域にも触りません）。
 
-- **🗂 本棚**：画像フォルダは**1フォルダ＝1冊のアルバム**、テキストは1ファイル＝1冊として並びます（本棚は最大500冊・タイトルやフォルダ名で検索できます）。同じフォルダを取り込み直すと内容が更新され、✎で名前の変更、×で1冊ずつの削除ができます。
-- **🖼 画像**：フォルダを選ぶだけで、中の画像を名前順（数字は数として）に並べます（アルバム最大3000枚・合計600MB・1ファイル100MBまで。`jpg/png/webp/gif/avif/bmp`）。並べ方は **1枚ずつ／見開き（右が1ページ目）／縦読み漫画** の3通りと、左右と順序を反転する **🇺🇸アメリカン**。**画像の左側をタップ／←で次へ、右側／→で前へ**、スワイプでも送れます。
-- **📄 文章**：テキストは1ファイルずつでも、フォルダごとでも取り込めます（1ファイル12MB・一度に200ファイルまで。TXT・MD・JSON・CSV・ログなど）。文字コードは **UTF-8／UTF-16（BOM付き）／Shift_JIS** を自動判定し、青空文庫の `｜《》` ルビも組み立てて表示します。スキンは **普通／ダーク／ネオン／ルーズリーフ／作文用紙（縦書き・右から）** の5種。
-- **🔖 栞と進捗**：Enter長押しで栞、Space長押しで**ページ移動スライダー**（画像）。閉じても次のページから開けます。
+- **🗂 本棚**：画像フォルダは**1フォルダ＝1冊のアルバム**（入れ子フォルダは「フォルダごとに分ける／まとめて1冊」を選べます）、テキストは1ファイル＝1冊として並びます（本棚は最大500冊）。タイトル・パス・本文の抜粋で検索でき、**更新が新しい順／追加が古い順／名前順／種類別／大きい順**に並べ替えられます。栞の付いた本には 🔖 が付き、✎で名前の変更、×で1冊ずつの削除。本棚の足元には冊数・画像枚数・使用量（端末の空き容量が取れるブラウザでは空きも）を表示します。
+- **📥 取り込み**：進行バーと**中止**ボタン付き。中止しても、すでに入った本はそのまま残ります。同名の本があるときは「中身を置き換える／新しい本として残す」を選べます。大きすぎるファイルなどは理由を表示して飛ばし、最後に「追加・維持・失敗」の件数をまとめて知らせます。
+- **🖼 画像**：フォルダを選ぶだけで、中の画像を名前順（数字は数として）に並べます（アルバム最大3000枚・合計600MB・1ファイル100MBまで。`jpg/png/webp/gif/avif/bmp`）。並べ方は **1枚ずつ／見開き（右が1ページ目）／縦読み漫画** の3通り、左右と順序を反転する **🇺🇸アメリカン**、読み進める向きを逆にする **画像順の反転**。**画像の左側をタップ／←で次へ、右側／→で前へ**、スワイプでも送れます。**拡大**はボタン・`Ctrl+ホイール`・ピンチ・`+`/`-`/`0` で0.5〜4倍、拡大中はドラッグで見回せます（縦読みでは見えているページだけ読み込むので、長い本でも軽いままです）。
+- **📄 文章**：テキストは1ファイルずつでも、フォルダごとでも取り込めます（1ファイル12MB・一度に200ファイルまで。TXT・MD・JSON・CSV・ログなど）。文字コードは **UTF-8／UTF-16（BOM付き）／Shift_JIS** を自動判定し、青空文庫の `｜《》` ルビも組み立てて表示します。スキンは **普通／ダーク／ネオン／ルーズリーフ／作文用紙（縦書き・右から）** の5種で、**文字サイズ・行間・余白**をそれぞれ3段階で調整できます（作文用紙は横に流れます）。**本文検索**（`Ctrl+F` か 🔍、`Enter`/`Shift+Enter` で前後の一致へ、見つけた語はハイライト）。
+- **🔖 栞と進捗**：`Enter` 長押しで栞、`M` で**栞一覧**（その位置から開く・外す）。`Space` 長押しで**ページ移動スライダー**（画像）、`Home`/`End` で最初／最後へ。閉じても次のページから開けます。
+- **❓ キーの説明**：初回に自動で表示され、右上の「❓ キーの説明」か `?` でいつでも再表示できます。
 - **✎ メモ帳と書き出し**：上級者向け設定をONにすると、本文をメモ帳として編集できます。編集するのは**書斎の中のコピーだけ**で、元のファイルは変更しません。書き出しはテキストとして保存できます。
-- **📺 TVとジャケット**：書斎の中にTV（**上／下／非表示**）を置けます。音声だけの曲でも、画像を**長押し（680ms）**するか「🖼 このページを曲のジャケットに」で、その曲のジャケットとして選曲画面の背景・TVドックに映せます。割り当ては曲ごとに書斎の中へ保存され、同じ操作で消せます。
-- 書斎を開いている間、ゲーム側のキー操作（モードのキー・スキップ・速度など）は止まります。
+- **📺 TVとジャケット**：書斎の中にTV（**上／下／非表示**）を置けます。**見た目は6種**（普通／ブラウン管／木枠／アーケード／プロジェクター／水槽）、**大きさ3段階**、**縦横比**（16:9／4:3／21:9／1:1）、**曲名の表示ON/OFF**。動画を再生しているときはその映像を、音声だけの曲ではジャケットを映します。ジャケットは画像を**長押し（680ms）**するか「🖼 このページを曲のジャケットに」で割り当て、選曲画面の背景・TVドックに反映されます（曲ごとに書斎の中へ保存、同じ操作で消せます）。書斎を閉じる・曲が始まる・曲が変わるときは、動画を**必ず元の場所へ戻します**。
+- 書斎を開いている間、ゲーム側のキー操作（モードのキー・スキップ・速度など）は止まります。中断した取り込みで残った読み込み専用の画像は、次に開いたときに自動で掃除されます。
 
 ---
 
@@ -359,7 +361,7 @@ osu! のスキンのように、いろいろなものを1つのファイル（`.
 | VRM | WebGL。初回だけ three.js／three-vrm をCDNから読み込みます |
 | MMD | WebGL。初回だけ three.js／three-mmd-loader をCDNから読み込みます |
 | ⭐ お気に入り | 端末の中だけ（localStorage）。フォルダ分けも同じ |
-| 📚 書斎 | 端末の中だけ（IndexedDB `trk_study_room_v1`）。アルバム最大3000枚・600MB／文章1ファイル12MB／本棚500冊。`?safe=1` では開きません |
+| 📚 書斎 | 端末の中だけ（IndexedDB `trk_study_room_v1` の books／pages／covers／settings）。アルバム最大3000枚・600MB／文章1ファイル12MB／本棚500冊。栞・メモのコピー・ジャケット・表示設定も同じ場所。`?safe=1` では開きません |
 
 **保存について：** 設定・記録・パック・追加した曲・マイプリセットは、**このブラウザの中だけ**に保存されます（localStorage・IndexedDB）。ブラウザのデータを消すと消えるので、記録はときどきバックアップしてください。
 
@@ -529,7 +531,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 
 **Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), a song-banner volume button (tap for the slider, hold to mute/restore), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, antenna character skins (ten original dot characters that wake up and walk when ON and fall asleep when OFF, plus your own two ON/OFF images stored on your device only; Reimu, Marisa, Cirno, Flandre and Youmu are original Touhou Project fan art drawn for trk!, following the official fan-work guidelines), VRM 1.0 mascots, MMD mascots (60 original procedural choices grouped by daily movement, dance, Miku references, and expressions; Lat morph tracks; dreamy idle for new installs / the bundled Lat preset; saved choices are kept, bring your own model with an on-device self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), 📤 **share your music folder** (one permission pulls the whole folder in at once, with an optional on-device copy of up to 150 songs / 300 MB), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, visual effect-chain editor, automatic latency compensation and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 16 built-in sounds (including electric guitar, electronic sax, and layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, a default option to lock mapped keys to the piano while synth mode is open, an optional wider on-screen keyboard for larger displays, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
 
-**Study Room:** long-press the song-list title (or focus it and press Enter/Space) to open a local-only reader. Image folders become albums (single/spread/vertical, plus an American-style flip; up to 3,000 images and 600 MB per album), text files open as books with UTF-8 / UTF-16 / Shift_JIS detection and Aozora-style ruby (up to 12 MB each), and you can keep bookmarks, edit an in-app copy as a memo, or assign a page as the current song's jacket. Everything stays in this browser (IndexedDB `trk_study_room_v1`); nothing is uploaded, and `?safe=1` keeps it closed.
+**Study Room:** long-press the song-list title (or focus it and press Enter/Space) to open a local-only reader. Image folders become albums (single/spread/vertical, an American-style flip, reversed image order, zoom from 0.5× to 4× by buttons, Ctrl+wheel or pinch; up to 3,000 images / 600 MB per album), text files open as books with UTF-8 / UTF-16 / Shift_JIS detection and Aozora-style ruby (up to 12 MB each) with five reading skins, text size / line-height / margin tuning and in-book search. The shelf sorts (updated / added / title / type / size), searches titles, paths and excerpts, shows a bookmark list and a storage footer, and reports import progress with a cancel button. A TV pane (position, six looks, three sizes, aspect ratio, optional song title) shows the playing video or the song's jacket — assigned by a 680 ms long-press, and always handed back when the room closes or a song finishes. Everything stays in this browser (IndexedDB `trk_study_room_v1`); nothing is uploaded, and `?safe=1` keeps it closed.
 
 **✔ Verified packs:** song packs whose composer/charter identity and rights have been confirmed get a ✔ badge and a short message from the creator (up to 280, like a free X post). See [docs/verified.md](docs/verified.md).
 

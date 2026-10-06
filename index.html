@@ -1090,6 +1090,7 @@
           <input id="studyTextFolderInput" type="file" webkitdirectory multiple accept=".txt,.md,.markdown,.json,.csv,.log,.html,.htm,.xml,.yaml,.yml,.ini,.css,.js,.ts,text/plain,application/json" hidden>
           <span data-i18n="studyImportTextFolder">📄 テキストフォルダを取り込む</span>
         </label>
+        <button id="studyHelpBtn" type="button" class="study-close-btn" data-i18n="studyHelp">❓ キーの説明</button>
         <button id="studyCloseBtn" type="button" class="study-close-btn" data-i18n="studyClose">✕ 書斎を閉じる</button>
       </div>
     </header>
@@ -1098,10 +1099,33 @@
       <aside class="study-shelf" aria-label="Study shelf">
         <div class="study-shelf-heading">
           <strong data-i18n="studyShelf">本棚</strong>
-          <span id="studyBookCount" class="study-count"></span>
+          <div class="study-shelf-btns">
+            <button id="studyBookmarksBtn" type="button" class="study-icon-btn" aria-pressed="false" data-i18n="studyBookmarks">🔖 栞一覧</button>
+            <span id="studyBookmarkCount" class="study-badge" hidden>0</span>
+            <span id="studyBookCount" class="study-count"></span>
+          </div>
         </div>
         <input id="studySearch" class="study-search" type="search" autocomplete="off" placeholder="タイトル・フォルダを検索…">
+        <div class="study-shelf-filter">
+          <label for="studyShelfSort" data-i18n="studySortLabel">並べ替え</label>
+          <select id="studyShelfSort">
+            <option value="updated" data-i18n="studySortUpdated">更新が新しい順</option>
+            <option value="added" data-i18n="studySortAdded">追加が古い順</option>
+            <option value="title" data-i18n="studySortTitle">名前順</option>
+            <option value="type" data-i18n="studySortType">種類別（画像→テキスト）</option>
+            <option value="size" data-i18n="studySortSize">大きい順</option>
+          </select>
+        </div>
         <div id="studyShelfList" class="study-shelf-list"></div>
+        <div id="studyBookmarkPanel" class="study-bookmark-list" hidden></div>
+        <div id="studyImportWrap" class="study-import-wrap" hidden>
+          <div class="study-import-row">
+            <span id="studyImportLabel"></span>
+            <button id="studyImportCancelBtn" type="button" class="study-import-cancel" data-i18n="studyImportCancel">中止</button>
+          </div>
+          <div class="study-import-track"><i id="studyImportFill" class="study-import-fill"></i></div>
+        </div>
+        <div id="studyShelfFoot" class="study-shelf-foot"></div>
       </aside>
 
       <main class="study-main">
@@ -1111,6 +1135,7 @@
           <p data-i18n="studyWelcomeHint">画像はフォルダ単位、テキストはファイルごとに端末内へ保存します。外へアップロードしません。</p>
           <p class="study-supported" data-i18n="studySupported">画像: JPG / PNG / WebP / GIF / AVIF / BMP · 文章: TXT / MD / JSON / CSV など</p>
           <p class="study-shortcuts" data-i18n="studyTapHint">画像: 左側／←で次へ、右側／→で前へ。Space / Enterで次へ、Enter長押しで栞、Space長押しでページ移動、Escで終了。</p>
+          <p class="study-shortcuts" data-i18n="studyWelcomeHelp">操作が分からなくなったら、右上の「❓ キーの説明」を開いてください。</p>
         </div>
 
         <section id="studyBookView" class="study-book-view" hidden>
@@ -1132,10 +1157,23 @@
                 <option value="vertical" data-i18n="studyModeVertical">縦読み漫画</option>
               </select>
             </label>
+            <label id="studyImageOrderRow" class="study-option">
+              <span data-i18n="studyImageOrderLabel">ページの順序</span>
+              <select id="studyImageOrder">
+                <option value="natural" data-i18n="studyImageOrderNatural">ファイル名順</option>
+                <option value="reverse" data-i18n="studyImageOrderReverse">逆順（右綴じ向け）</option>
+              </select>
+            </label>
             <label id="studyAmericanRow" class="study-check-option">
               <input id="studyAmerican" type="checkbox">
               <span data-i18n="studyAmerican">🇺🇸 アメリカン（左右・順序反転）</span>
             </label>
+            <span id="studyZoomGroup" class="study-zoom-group" role="group" aria-label="Zoom">
+              <button id="studyZoomOut" type="button" class="study-small-btn" aria-label="Zoom out">−</button>
+              <span id="studyZoomLabel" class="study-zoom-label">100%</span>
+              <button id="studyZoomIn" type="button" class="study-small-btn" aria-label="Zoom in">＋</button>
+              <button id="studyZoomFit" type="button" class="study-small-btn" data-i18n="studyZoomFit">フィット</button>
+            </span>
             <label id="studyThemeRow" class="study-option">
               <span data-i18n="studyThemeLabel">文字のスキン</span>
               <select id="studyTheme">
@@ -1146,17 +1184,67 @@
                 <option value="genko" data-i18n="studyThemeGenko">作文用紙（縦書き・右から）</option>
               </select>
             </label>
+            <span id="studyTextTuneRow" class="study-option">
+              <span data-i18n="studyTextTuneLabel">文字</span>
+              <select id="studyTextSize" aria-label="Text size">
+                <option value="small" data-i18n="studyTextSizeSmall">小</option>
+                <option value="normal" data-i18n="studyTextSizeNormal">普通</option>
+                <option value="large" data-i18n="studyTextSizeLarge">大</option>
+                <option value="huge" data-i18n="studyTextSizeHuge">特大</option>
+              </select>
+              <select id="studyTextSpacing" aria-label="Line spacing">
+                <option value="tight" data-i18n="studyTextSpacingTight">詰める</option>
+                <option value="normal" data-i18n="studyTextSpacingNormal">行間ふつう</option>
+                <option value="loose" data-i18n="studyTextSpacingLoose">行間広め</option>
+              </select>
+              <select id="studyTextWidth" aria-label="Margins">
+                <option value="narrow" data-i18n="studyTextWidthNarrow">余白せまい</option>
+                <option value="normal" data-i18n="studyTextWidthNormal">余白ふつう</option>
+                <option value="wide" data-i18n="studyTextWidthWide">余白広い</option>
+              </select>
+            </span>
             <label class="study-check-option study-tv-check">
               <input id="studyTvCheck" type="checkbox">
               <span data-i18n="studyTvToggle">TVを流し見する</span>
             </label>
-            <label class="study-option study-tv-position-row">
+            <label class="study-option">
               <span data-i18n="studyTvPosLabel">TVの位置</span>
               <select id="studyTvPosition">
                 <option value="top" data-i18n="studyTvTop">上</option>
                 <option value="bottom" data-i18n="studyTvBottom">下</option>
                 <option value="off" data-i18n="studyTvHidden">表示しない</option>
               </select>
+            </label>
+            <label class="study-option">
+              <span data-i18n="studyTvLookLabel">TVの見た目</span>
+              <select id="studyTvLook">
+                <option value="plain" data-i18n="studyTvLookPlain">素の画面</option>
+                <option value="crt" data-i18n="studyTvLookCrt">ブラウン管</option>
+                <option value="wood" data-i18n="studyTvLookWood">木枠</option>
+                <option value="arcade" data-i18n="studyTvLookArcade">アーケード</option>
+                <option value="projector" data-i18n="studyTvLookProjector">プロジェクター</option>
+                <option value="aquarium" data-i18n="studyTvLookAquarium">水槽</option>
+              </select>
+            </label>
+            <label class="study-option">
+              <span data-i18n="studyTvSizeLabel">大きさ</span>
+              <select id="studyTvSize">
+                <option value="small" data-i18n="studyTvSizeSmall">小</option>
+                <option value="medium" data-i18n="studyTvSizeMedium">中</option>
+                <option value="large" data-i18n="studyTvSizeLarge">大</option>
+              </select>
+            </label>
+            <label class="study-option">
+              <span data-i18n="studyTvRatioLabel">画面比</span>
+              <select id="studyTvRatio">
+                <option value="16:9" data-i18n="studyTvRatio169">16:9</option>
+                <option value="4:3" data-i18n="studyTvRatio43">4:3</option>
+                <option value="21:9" data-i18n="studyTvRatio219">21:9</option>
+              </select>
+            </label>
+            <label class="study-check-option">
+              <input id="studyTvLabelOn" type="checkbox">
+              <span data-i18n="studyTvNameToggle">曲名を表示</span>
             </label>
             <button id="studyBookmarkBtn" type="button" class="study-small-btn" data-i18n="studyBookmark">🔖 栞を挟む</button>
             <details class="study-advanced">
@@ -1166,7 +1254,23 @@
                 <span data-i18n="studyMemoToggle">テキストをメモ帳として編集可能にする</span>
               </label>
               <p class="study-advanced-hint" data-i18n="studyMemoHint">編集は書斎内のコピーに保存し、元ファイルは変更しません。</p>
+              <div class="study-advanced-row">
+                <span data-i18n="studyAlbumNestingLabel">アルバムの分け方</span>
+                <select id="studyAlbumNesting">
+                  <option value="split" data-i18n="studyAlbumNestingSplit">サブフォルダごとに1冊</option>
+                  <option value="flat" data-i18n="studyAlbumNestingFlat">フォルダ全体で1冊</option>
+                </select>
+              </div>
+              <p class="study-advanced-hint" data-i18n="studyAlbumNestingHint">次の取り込みから反映します。</p>
             </details>
+          </div>
+
+          <div id="studyFindRow" class="study-find-row" hidden>
+            <input id="studyFindInput" class="study-find" type="search" autocomplete="off" placeholder="本文を検索…">
+            <span id="studyFindCount" class="study-find-count"></span>
+            <button id="studyFindPrev" type="button" class="study-small-btn" title="前の一致">▲</button>
+            <button id="studyFindNext" type="button" class="study-small-btn" title="次の一致">▼</button>
+            <button id="studyFindClear" type="button" class="study-small-btn" data-i18n="studyBookSearchClear">✕ 検索を終了</button>
           </div>
 
           <div id="studyPanels" class="study-panels">
@@ -1176,10 +1280,13 @@
                 <div id="studyTvEmpty" class="study-tv-empty" data-i18n="studyTvEmpty">動画または曲のジャケットがここに表示されます。</div>
                 <div id="studyTvLabel" class="study-tv-label"></div>
               </div>
-              <div class="study-tv-caption" data-i18n="studyTvCaption">今の曲・動画を表示します。別の音声を重ねて再生しません。</div>
+              <div class="study-tv-caption">
+                <span data-i18n="studyTvCaption">今の曲・動画を表示します。別の音声を重ねて再生しません。</span>
+                <span class="study-tv-hint" data-i18n="studyTvHint">（画像を長押しすると、この曲のジャケットにできます）</span>
+              </div>
             </section>
             <section id="studyContentPane" class="study-content-pane">
-              <div id="studyImageStage" class="study-image-stage" role="region" tabindex="0" aria-label="Image reader" hidden>
+              <div id="studyImageStage" class="study-image-stage" role="region" tabindex="0" aria-label="Image reader" hidden data-mode="single">
                 <div id="studySingleWrap" class="study-single-wrap">
                   <img id="studyPageSingle" class="study-page-image study-page-single" alt="" draggable="false" hidden>
                 </div>
@@ -1190,10 +1297,11 @@
                 <div id="studyVerticalPages" class="study-vertical-pages" hidden></div>
                 <div class="study-hit study-hit-left" aria-hidden="true"><span>‹</span></div>
                 <div class="study-hit study-hit-right" aria-hidden="true"><span>›</span></div>
+                <div id="studyZoomChip" class="study-zoom-chip"></div>
                 <div id="studyImageHint" class="study-image-hint" data-i18n="studyTapHint">左側／←で次へ · 右側／→で前へ · Space / Enterで次へ</div>
               </div>
               <div id="studyTextStage" class="study-text-stage" hidden>
-                <article id="studyTextPage" class="study-text-page" tabindex="0"></article>
+                <article id="studyTextPage" class="study-text-page" tabindex="0" data-search=""></article>
                 <textarea id="studyMemoEditor" class="study-memo-editor" spellcheck="false" hidden></textarea>
               </div>
             </section>
@@ -1207,13 +1315,34 @@
               <button id="studyProgressDoneBtn" type="button" class="study-progress-done" data-i18n="studyProgressDone">完了</button>
             </div>
             <span id="studyTextProgress" class="study-page-count" hidden></span>
+            <span id="studyTextStats" class="study-text-stats" hidden></span>
             <button id="studyPrevBtn" type="button" class="study-small-btn" data-i18n="studyPrevious">前へ ▶</button>
             <button id="studyAssignCoverBtn" type="button" class="study-small-btn" data-i18n="studyAssignCover" hidden>🖼 このページを曲のジャケットに</button>
+            <button id="studyClearCoverBtn" type="button" class="study-small-btn study-danger-btn" data-i18n="studyClearCover" hidden>🗑 ジャケットを外す</button>
             <button id="studyMemoBtn" type="button" class="study-small-btn" hidden data-i18n="studyMemoEdit">✎ メモ帳で編集</button>
             <button id="studyMemoExportBtn" type="button" class="study-small-btn" hidden data-i18n="studyExportText">⇩ テキストを書き出す</button>
           </footer>
         </section>
       </main>
+    </div>
+  </div>
+
+  <div id="studyHelp" class="study-help" hidden role="dialog" aria-modal="true" aria-labelledby="studyHelpTitle">
+    <div class="study-help-card">
+      <h3 id="studyHelpTitle" data-i18n="studyHelpTitle">書斎のキー操作</h3>
+      <dl class="study-help-list">
+        <dt>← → ／ 画面タップ</dt><dd data-i18n="studyHelpNav"></dd>
+        <dt>Space / Enter</dt><dd data-i18n="studyHelpSpace"></dd>
+        <dt>PageUp / PageDown</dt><dd data-i18n="studyHelpPg"></dd>
+        <dt>＋ − 0</dt><dd data-i18n="studyHelpZoom"></dd>
+        <dt>/ または Ctrl+F</dt><dd data-i18n="studyHelpSearch"></dd>
+        <dt>B ／ M</dt><dd data-i18n="studyHelpBookmark"></dd>
+        <dt>T ／ F</dt><dd data-i18n="studyHelpTv"></dd>
+        <dt>? ／ Esc</dt><dd data-i18n="studyHelpEsc"></dd>
+      </dl>
+      <div class="study-help-foot">
+        <button id="studyHelpCloseBtn" type="button" class="study-small-btn" data-i18n="studyHelpClose">閉じる</button>
+      </div>
     </div>
   </div>
 </section>

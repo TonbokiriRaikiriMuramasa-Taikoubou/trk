@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* trk! offline shell: network first, cached same-origin app files as a fallback. */
-const CACHE = "trk-v2026.10.6-ux23";
+const CACHE = "trk-v2026.10.6-ux24";
 const CACHE_PREFIX = "trk-";
 const SCOPE = new URL(self.registration.scope);
 

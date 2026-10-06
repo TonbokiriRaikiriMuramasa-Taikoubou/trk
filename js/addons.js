@@ -71,6 +71,13 @@ Object.assign(TEXT.ja, {
   addonNeedReload:"（いま入れたアドオンは、読み込み直すと もっと確実に動きます）",
   addonSongs:"このアドオンが足した曲：{n}曲", addonBroken:"エラー：{why}",
   addonSafe:"🛟 セーフモード中は、アドオンを読み込みません（?safe=1 を外して開き直してください）。",
+  addonConsentTitle:"🧩 このアドオンを追加しますか？", addonConsentFile:"ファイル：{name}",
+  addonConsentBody:"アドオンは trk! と同じ権限（同じページの中）で動きます。設定・スコア・📚 書斎の本や画像・覚えているフォルダのハンドルを読める立場になり、外部へ送ることも技術的には可能です。\n**信頼できるものだけ**追加してください（あとからオフ・削除できます）。",
+  addonConsentYes:"✅ 同意して追加する", addonConsentNo:"やめる",
+  addonConsentRecorded:"✅ 「{name}」の同意を記録しました（{date}）。", addonConsentCanceled:"追加をやめました。",
+  addonConsentBadge:"✅ 同意 {date}", addonConsentNone:"⚠ 同意の記録がありません（この記録を始める前に追加したアドオンです）",
+  addonConsentStale:"⚠ コードが同意したときと変わっています（自分で入れ直したのでなければ外してください）",
+  addonConsentBtn:"✅ 同意を記録する", addonConsentHint:"同意の記録は端末内にだけ保存されます（外部へは送りません）。",
   addonSampleSaved:"サンプルを保存しました。中身を見て、自分のアドオンを作ってみてください。",
   addonSampleFail:"サンプルを取ってこられませんでした。docs/ADDONS.md を見てください。",
   addonTooBig:"大きすぎます（{n}KB まで）。"
@@ -88,6 +95,13 @@ Object.assign(TEXT.en, {
   addonNeedReload:"(A reload makes a freshly installed add-on work more reliably.)",
   addonSongs:"Songs added by this add-on: {n}", addonBroken:"Error: {why}",
   addonSafe:"🛟 Add-ons are not loaded in safe mode (open again without ?safe=1).",
+  addonConsentTitle:"🧩 Add this add-on?", addonConsentFile:"File: {name}",
+  addonConsentBody:"Add-ons run with the same privileges as trk! itself (inside the same page). They can read your settings, scores, 📚 Study books and images, remembered folder handles, and could technically send data out.\nPlease add only add-ons you trust (you can turn them off or delete them later).",
+  addonConsentYes:"✅ I agree - add it", addonConsentNo:"Cancel",
+  addonConsentRecorded:"✅ Recorded your consent for \"{name}\" ({date}).", addonConsentCanceled:"Cancelled - nothing was added.",
+  addonConsentBadge:"✅ Agreed {date}", addonConsentNone:"⚠ No consent on record (this add-on was installed before the record existed)",
+  addonConsentStale:"⚠ The code differs from what you agreed to (remove it unless you replaced it yourself)",
+  addonConsentBtn:"✅ Record my consent", addonConsentHint:"The consent record is stored on this device only (never uploaded).",
   addonSampleSaved:"Sample saved. Open it and try making your own add-on.",
   addonSampleFail:"Could not fetch the sample. See docs/ADDONS.md.",
   addonTooBig:"Too big (up to {n}KB)."
@@ -105,6 +119,13 @@ Object.assign(TEXT.zh, {
   addonNeedReload:"（重新加载后，刚安装的插件会更可靠地运行。）",
   addonSongs:"此插件添加的歌曲：{n}首", addonBroken:"错误：{why}",
   addonSafe:"🛟 安全模式下不会读取插件（请去掉 ?safe=1 后重新打开）。",
+  addonConsentTitle:"🧩 要添加这个插件吗？", addonConsentFile:"文件：{name}",
+  addonConsentBody:"插件以与 trk! 相同的权限运行（同一个页面内）。它可以读取设置、成绩、📚 书房的书籍与图片、记住的文件夹句柄，技术上也可能把数据发到外部。\n请只添加**信得过的**插件（之后可以关闭或删除）。",
+  addonConsentYes:"✅ 同意并添加", addonConsentNo:"取消",
+  addonConsentRecorded:"✅ 已记录对「{name}」的同意（{date}）。", addonConsentCanceled:"已取消，没有添加。",
+  addonConsentBadge:"✅ 已同意 {date}", addonConsentNone:"⚠ 没有同意记录（这是在开始记录之前添加的插件）",
+  addonConsentStale:"⚠ 代码与同意时不同（如果不是自己重新安装的，请移除）",
+  addonConsentBtn:"✅ 记录同意", addonConsentHint:"同意记录只保存在本机（不会上传）。",
   addonSampleSaved:"已保存示例。请打开看看，试着自己做一个插件。",
   addonSampleFail:"取不到示例。请看 docs/ADDONS.md。",
   addonTooBig:"太大了（最大 {n}KB）。"
@@ -122,6 +143,13 @@ Object.assign(TEXT.ko, {
   addonNeedReload:"(새로고침하면 방금 넣은 애드온이 더 확실히 동작합니다.)",
   addonSongs:"이 애드온이 더한 곡: {n}곡", addonBroken:"오류: {why}",
   addonSafe:"🛟 안전 모드에서는 애드온을 읽지 않습니다 (?safe=1을 빼고 다시 열어 주세요).",
+  addonConsentTitle:"🧩 이 애드온을 추가할까요?", addonConsentFile:"파일: {name}",
+  addonConsentBody:"애드온은 trk! 와 같은 권한(같은 페이지 안)으로 동작합니다. 설정·점수·📚 서재의 책과 이미지·기억해 둔 폴더 핸들을 읽을 수 있고, 기술적으로는 외부로 보낼 수도 있습니다.\n**믿을 수 있는 것만** 추가해 주세요 (나중에 끄거나 삭제할 수 있습니다).",
+  addonConsentYes:"✅ 동의하고 추가", addonConsentNo:"취소",
+  addonConsentRecorded:"✅ 「{name}」에 대한 동의를 기록했습니다 ({date}).", addonConsentCanceled:"취소했습니다. 추가하지 않았습니다.",
+  addonConsentBadge:"✅ 동의 {date}", addonConsentNone:"⚠ 동의 기록이 없습니다 (기록을 시작하기 전에 추가한 애드온입니다)",
+  addonConsentStale:"⚠ 코드가 동의했을 때와 다릅니다 (직접 다시 설치한 것이 아니라면 삭제해 주세요)",
+  addonConsentBtn:"✅ 동의 기록하기", addonConsentHint:"동의 기록은 이 기기에만 저장됩니다 (업로드하지 않습니다).",
   addonSampleSaved:"샘플을 저장했습니다. 열어 보고 자기만의 애드온을 만들어 보세요.",
   addonSampleFail:"샘플을 가져오지 못했습니다. docs/ADDONS.md를 봐 주세요.",
   addonTooBig:"너무 큽니다 ({n}KB까지)."
@@ -309,6 +337,89 @@ function parseAddonFile(text) {
   }
   return { code:t, meta:{} };
 }
+/* ---------- ✅ 同意の記録 ----------
+   アドオンはページのフル権限で動くので、「入れる前に一度だけ同意してもらう」ようにしました。
+   ・同意は端末内（この保存領域）にだけ記録します（外部へは送りません）
+   ・コードの指紋（短いハッシュ）も一緒に記録し、あとで中身が変わっていたら ⚠ を出します
+   ・コードの実行（runCode）は同意の後。同意しなければ、そのファイルは動かしません
+   ・この記録より前に導入したアドオンは ⚠ を出すだけで、勝手に止めたりはしません */
+function codeShaSync(code) {
+  const text = String(code || "");
+  let h1 = 0x811c9dc5, h2 = 0x01000193;   /* FNV-1a を2系統（衝突しにくい短い指紋） */
+  for (let i = 0; i < text.length; i++) {
+    const c = text.charCodeAt(i);
+    h1 = Math.imul(h1 ^ c, 16777619) >>> 0;
+    h2 = Math.imul(h2 ^ ((c << 5) | (c >>> 3)), 2654435761) >>> 0;
+  }
+  return (h1.toString(16).padStart(8, "0") + h2.toString(16).padStart(8, "0")).slice(0, 16);
+}
+function askConsent(name, onYes, onNo) {
+  const wrap = document.createElement("div");
+  wrap.setAttribute("role", "dialog");
+  wrap.setAttribute("aria-modal", "true");
+  wrap.dataset.trkAsk = "consent";   /* 見つけやすさのために印を付ける（テスト・支援技術） */
+  wrap.style.cssText = "position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px";
+  const card = document.createElement("div");
+  card.style.cssText = "max-width:min(92vw,500px);background:#16181d;color:#f2f3f5;border:2px solid #ffb020;border-radius:14px;padding:16px 18px;box-shadow:0 10px 40px rgba(0,0,0,.6);font:15px/1.65 system-ui,sans-serif";
+  const title = document.createElement("b");
+  title.textContent = tr("addonConsentTitle"); title.style.cssText = "font-size:17px";
+  const file = document.createElement("div");
+  file.textContent = tr("addonConsentFile", { name: name || "(text)" });
+  file.style.cssText = "opacity:.8;font-size:13px;margin-top:4px;word-break:break-all";
+  const body = document.createElement("div");
+  body.textContent = String(tr("addonConsentBody")).replace(/\*\*/g, "");
+  body.style.cssText = "margin:10px 0 4px;white-space:pre-line";
+  const hint = document.createElement("div");
+  hint.textContent = tr("addonConsentHint");
+  hint.style.cssText = "opacity:.65;font-size:12px;margin-bottom:12px";
+  const rowBox = document.createElement("div");
+  rowBox.style.cssText = "display:flex;gap:10px;flex-wrap:wrap";
+  const yes = document.createElement("button");
+  yes.type = "button"; yes.textContent = tr("addonConsentYes");
+  yes.style.cssText = "flex:1 1 auto;min-height:44px;padding:10px 14px;border-radius:10px;border:0;background:#ffb020;color:#1a1a1a;font-weight:700;font-size:15px;cursor:pointer";
+  const no = document.createElement("button");
+  no.type = "button"; no.textContent = tr("addonConsentNo");
+  no.style.cssText = "flex:1 1 auto;min-height:44px;padding:10px 14px;border-radius:10px;border:1px solid #555;background:#22252b;color:#f2f3f5;font-size:15px;cursor:pointer";
+  const close = () => { document.removeEventListener("keydown", onKey); wrap.remove(); };
+  const onKey = e => { if (e.key === "Escape") { close(); if (typeof onNo === "function") onNo(); } };
+  yes.addEventListener("click", () => { close(); if (typeof onYes === "function") onYes(); });
+  no.addEventListener("click", () => { close(); if (typeof onNo === "function") onNo(); });
+  wrap.addEventListener("click", e => { if (e.target === wrap) { close(); if (typeof onNo === "function") onNo(); } });
+  document.addEventListener("keydown", onKey);
+  rowBox.append(yes, no);
+  card.append(title, file, body, hint, rowBox);
+  wrap.append(card);
+  (document.body || document.documentElement).append(wrap);
+  try { no.focus(); } catch (_) {}
+}
+/* 同意 → 実行 → 保存（installText は同意の後にだけ呼ぶ） */
+function installWithConsent(text, filename) {
+  const parsed = parseAddonFile(text);
+  const code = String(parsed.code || text || "");
+  if (!code.trim()) return { ok:false, why:parsed.why || tr("addonNoRegister") };
+  if (code.length > MAX_CODE) return { ok:false, why:tr("addonTooBig", { n:Math.floor(MAX_CODE / 1024) }) };
+  const shown = parsed.meta && parsed.meta.name ? `${parsed.meta.name} (${filename})` : filename;
+  askConsent(shown,
+    () => {
+      const res = installText(text, filename);
+      if (res.ok) {
+        const e = store[res.id] || {};
+        say(tr("addonConsentRecorded", { name:e.name || res.id, date:stamp(e.consentAt) }));
+        pendingReload = true; renderList(); updateReload();
+      } else say(tr("addonBadFile", { why:res.why }), true);
+    },
+    () => say(tr("addonConsentCanceled")));
+  return { ok:true, pending:true };
+}
+function stamp(ms) {
+  if (!ms) return "-";
+  try { return new Date(ms).toLocaleDateString(); } catch (_) { return "-"; }
+}
+function consentState(entry) {
+  if (!entry.consentAt) return "none";                       /* 記録を始める前のアドオン */
+  if (entry.consentSha && entry.consentSha !== codeShaSync(entry.code || "")) return "stale";
+  return "ok";
+}
 function installText(text, filename) {
   const filename2 = String(filename || "(text)");
   const parsed = parseAddonFile(text);
@@ -335,6 +446,8 @@ function installText(text, filename) {
     addedAt: (old && old.addedAt) || Date.now(),
     error: ""
   };
+  entry.consentAt = Date.now();          /* ✅ 同意の記録（この時刻に、この中身へ同意した） */
+  entry.consentSha = codeShaSync(code);  /* 中身の指紋（短いハッシュ）。コードが変われば気づける */
   store[def.id] = entry;
   saveStore();
   if (entry.enabled) startAddon(def, entry);
@@ -387,6 +500,26 @@ function row(entry) {
     box.append(el("div", "hint", tr("addonSongs", { n:songsByAddon.get(entry.id).length })));
   }
   if (entry.error) box.append(el("div", "hint addonErr", tr("addonBroken", { why:entry.error })));
+  /* ✅ 同意の記録（この記録を始める前に導入したアドオンは「記録なし」、中身が変わっていれば「⚠」） */
+  if (entry.source !== "file" && entry.id) {
+    const state = consentState(entry);
+    const line = el("div", "hint" + (state === "ok" ? " addonConsentOk" : " addonConsentWarn"));
+    line.textContent = state === "ok" ? tr("addonConsentBadge", { date:stamp(entry.consentAt) })
+      : state === "stale" ? tr("addonConsentStale") : tr("addonConsentNone");
+    box.append(line);
+    if (state !== "ok") {
+      const acts0 = el("div", "miniActions");
+      const agree = el("button", "", tr("addonConsentBtn")); agree.type = "button";
+      agree.addEventListener("click", () => {
+        const e2 = store[entry.id]; if (!e2) return;
+        e2.consentAt = Date.now(); e2.consentSha = codeShaSync(e2.code || "");
+        saveStore(); renderList();
+        say(tr("addonConsentRecorded", { name:e2.name || e2.id, date:stamp(e2.consentAt) }));
+      });
+      acts0.append(agree);
+      box.append(acts0);
+    }
+  }
   if (entry.source !== "file") {
     const acts = el("div", "miniActions");
     const tg = el("button", "", tr(on ? "addonOff" : "addonOn")); tg.type = "button";
@@ -438,7 +571,8 @@ addEventListener("DOMContentLoaded", () => {
     if (!f) return;
     let text = "";
     try { text = await f.text(); } catch (err) { say(tr("addonBadFile", { why:(err && err.message) || err }), true); return; }
-    const res = installText(text, f.name);
+    /* ✅ 同意を取ってから実行する（同意しなければ、そのコードは動かさない） */
+    const res = installWithConsent(text, f.name);
     if (!res.ok) say(tr("addonBadFile", { why:res.why }), true);
   });
   const sample = $("addonSampleBtn");
@@ -465,10 +599,12 @@ window.TrkAddons = Object.freeze({
   register,
   list: () => Object.entries(store).map(([id, e]) => ({
     id, name:e.name, version:e.version, author:e.author, description:e.description,
-    enabled:!!e.enabled, error:e.error || "", source:e.source || "installed"
+    enabled:!!e.enabled, error:e.error || "", source:e.source || "installed",
+    /* ✅ 同意の記録（"ok" / "stale" / "none"）と、その時刻・指紋 */
+    consent: { state:consentState(e), at:e.consentAt || 0, sha:e.consentSha || "" }
   })),
   active: () => [...runtime.keys()],
-  install: (text, name) => installText(text, name || "(text)"),
+  install: (text, name) => installWithConsent(text, name || "(text)"),   /* ✅ 同意を取ってから（同意なしでは動かさない） */
   setEnabled, remove: removeAddon,
   slots: () => [...slots.keys()],
   songs: id => (songsByAddon.get(id) || []).slice(),

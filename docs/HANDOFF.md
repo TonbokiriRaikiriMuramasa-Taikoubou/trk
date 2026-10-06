@@ -37,7 +37,7 @@
 - 書斎を開いている間は `window._trkStudyRoomOpen` でゲーム側のキー操作を止める（`player.js`／`main.js`／`modes.js`／`stage.js`／`truck.js`／`catch.js`／`speed.js`／`extras.js`／`video-max.js`／`media-player-mode.js`／`synth-mode.js`）。書斎自身のキー（←→・PageUp/Down・Space/Enter・Esc・B/M/T/F・`+`/`-`/`0`・`?`・Ctrl+F）は capture で先に受け取る。ただし入力欄・セレクトでは書斎のキーを止め、ボタンに焦点があるときの Space／Enter はそのボタンに譲る。書斎を閉じる・`phase` が `title` 以外へ進む・曲が切り替わるときは、TVペインへ移した `<video>` を元の親と `style` へ戻す（元の親が差し替わっていても `document.body` へ逃がす）。
 - 🔥 TRKアンプ（`js/fx-dock.js` の左下カテゴリー＋`js/fx.js` のラック）：`settings.fxRack`（段の配列・最大8。`cleanFx` で検証）／`settings.fxRackOn`（初期オフ）／`settings.ampOpen`（欄の開閉・**初期開き**。触って閉じた人の `false` は尊重。`?reset=amp`／`?reset=all` は初期の開へ戻し、`?safe=1` だけは閉じたまま）。段は**プリセットの後・かんたんEQの前**に効き、`exportObj`（マイプリセット書き出し）と `exportPrefs("all")`（設定の書き出し）にそのまま入る。リセットは `?reset=amp`（別名 `rack`）＝空に／`?reset=all`＝空に／`?safe=1`＝**段は残して止める**だけ。`core.js` の `resetAmpPrefs()` は fx.js より先に走るため、一度きりの合図 `takeAmpReset()`（sessionStorage `trk_amp_reset_once`）を置き、`js/fx.js` が読み込み時に拾って消す。⚠ `js/fx.js` は凍結扱いだが、この機能のために**追加のみ**の窓口（`TrkFX.rack`／`rackTypes`／`rackOn`／`rackSet`／`rackAdd`／`rackClear`）と `refresh()` の `emit("fxRack")` を足した（DSP・保存形式は不変）。
 - ✨ TRKエフェクト（`js/tv-rich.js` の左下カテゴリー）：`js/tv-presets.js` の `portrait|anime|texture|quality`（各5種＝20）をまとめた**独立カテゴリー**（`details.panel.dockRich#richPanel`）。🔥 TRKアンプの直下に `placeRich()`＋MutationObserver で再配置。**中身は映像フィルターそのもの**で、適用は必ず `TrkTV.select()`（`settings.videoStyle`）を通す＝TVドックと二重がけにならない。設定キーは `tvRichId`（初期 `portrait_natural`）／`tvRichPrev`（切ったとき戻る先）／`tvRichCat`（開いているタブ・初期 `portrait`）／`tvRichOpen`（欄の開閉・**初期開き**。触って閉じた人の `false` は尊重。`?reset=tv`／`?reset=all` は開へ戻し、`?safe=1` は閉じたまま）。`resetVideoPrefs()`（`?reset=tv`）で4つとも初期化し、`exportPrefs("all")` にも入る。`?safe=1` はスイッチとチップを無効化して記憶は残す。⚠ `TrkTV.list()` に説明文は無いので、説明は `TRK_TV_PRESETS` から読む。⚠ 読み込み時は `settings` 側の値を優先する（`?reset=tv` は core.js が先に走って settings へ既定値を書くため）。
-- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux23`。公開ファイルを変更したら必ず更新する。
+- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux24`。公開ファイルを変更したら必ず更新する。
 - このcheckoutで `npm run check` はコード・データの自動検査を行うが、MMDの実描画・タッチ操作・音声の実機確認は別途必要。
 
 ---
@@ -156,7 +156,7 @@ npm run check
 git diff --check
 ```
 
-`npm run check` は `tools/check-repo.mjs`（構文・ローカル参照・設定／翻訳・重要機能。🪶 軽量化は**描画ゲートの位置と判定がゲートの前にあること**まで検査する）、`tools/check-mmd-motion-data.mjs`（VMD生成データ／Lat PMD）、`tools/check-study-room.mjs`（書斎の純データ処理・4言語の網羅・`index.html` のID照合・通信／`innerHTML` を使わないこと・TV／ジャケット連携・キー譲渡）を実行する。依存パッケージのインストールは不要。失敗したら、まず最初のエラーを直してから再実行する。
+`npm run check` は `tools/check-security.mjs`（**34項目**。うちアドオン同意が「実行より前」であること、`?reset=all` の確認、同意／確認ダイアログの4言語文言、vendor ロック、import map に第三者オリジンが無いこと、セーフモードのキャッシュ規則、この文書の存在を検査）、`tools/check-vendor.mjs`（`assets/vendor/` の欠落・改変・import map の網羅。`--source=npm` で上流と突き合わせ）、`tools/check-repo.mjs`（構文・ローカル参照・設定／翻訳・重要機能。🪶 軽量化は**描画ゲートの位置と判定がゲートの前にあること**まで検査する）、`tools/check-mmd-motion-data.mjs`（VMD生成データ／Lat PMD）、`tools/check-study-room.mjs`（書斎の純データ処理・4言語の網羅・`index.html` のID照合・通信／`innerHTML` を使わないこと・TV／ジャケット連携・キー譲渡）を実行する。依存パッケージのインストールは不要。失敗したら、まず最初のエラーを直してから再実行する。
 
 ### 未確認の実機項目
 
@@ -168,6 +168,7 @@ git diff --check
 - 📚 書斎：実ブラウザでのフォルダ取り込み（数千枚のAlbum・入れ子フォルダ）、Shift_JISの実書籍、IndexedDBの容量超過時の挙動、長押し（650msで起動／680msでジャケット割り当て）とスワイプの取り違え、モバイル幅・フルスクリーンAPI、TVペインで動画を移したあとの復帰。
 - 📚 書斎 v2：本棚の並べ替え／検索／栞一覧／冊数・使用量の表示、取り込みの進捗・中止・置き換え確認と保存容量超過（`QuotaExceededError`）時の表示、縦読みの遅延読み込みと長い本のスクロール、拡大（Ctrl+ホイール・ピンチ）と拡大中のドラッグ、本文検索のハイライトと前後移動、文字組み（サイズ・行間・余白）と作文用紙の横スクロール、TVペイン（見た目6種・大きさ・縦横比・曲名）と動画の受け渡し／復帰、❓キーの説明と初回表示。JSDOMスモークでは fake IndexedDB のため `jsdom` の Blob を往復できず、画像表示は実ブラウザでのみ確認できる（テストは Node の `Blob`/`File` を注入している）。
 - 前セッションからの持ち越し（要約）：初回起動・コンソールエラー・PWAアイコン・横画面、🎭キャラ肌10体と自分のイラスト2枚（端末内のみ・初期化で消える）、📡アンテナ分離と置き場、🕹️ショートプレイ（90/120/180秒・無音検知）、📊スペクトラム（30種×16色）、🛒カタログと👥投稿者ツール（初期オフ）、⏯バナーの曲送りとタップ一時停止、🎧プレイリストと📤共有の条件、🎚ラックとPro Audio系（AudioWorklet非対応時のフォールバック）、メディアプレーヤー（逆再生音声・A-Bループ・Loop Lab・壁紙）、✨フレーム補完（滑らかさ・重さ・`swayAllModes` 併用）。
+- 🔐 守りの2つ（**2026-10-06 追加**）：`?reset=all` の確認ダイアログ（日本語の見た目・ESC／背景クリックで「やめる」・キーボード操作・モバイル幅・`&force=1`）、アドオンの同意ダイアログと一覧の ✅／⚠ 表示（`.trkaddon` と `.js` の両方、同意の記録し直しボタン、端末内の時刻表記）。いずれも JSDOM（`guards.mjs`・24項目）で通してあるが、**実際の見た目と読みやすさは実ブラウザで確認する**。
 - WebGL・IndexedDB・端末のフォルダ選択など環境依存機能。静的検査通過を実機確認済みと表現しない。
 
 ---
@@ -175,7 +176,7 @@ git diff --check
 ## 8. 変更時の短いチェックリスト
 
 - [ ] `git status` と差分を読んで、既存のユーザー変更を保持したか
-- [ ] 4言語、初期値、リセット、Import/Export、`?safe=1` を確認したか
+- [ ] 4言語、初期値、リセット、Import/Export、`?safe=1` を確認したか（**確認ダイアログ絡み**：`?reset=all` は「やめる」で何も消えない／`&force=1` は即実行、アドオンは同意するまでコードが動かない・同意の記録が一覧に出る）
 - [ ] 保存キー／Export形式を不用意に変更していないか
 - [ ] 第三者素材の実際の利用・改変・再配布条件を確認したか
 - [ ] 関連テストと `npm run check`、`git diff --check` を通したか

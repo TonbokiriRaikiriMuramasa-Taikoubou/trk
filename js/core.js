@@ -266,9 +266,54 @@ const gameplayFxPower = () => settings.fxPower * gameplayFxMultiplier();
      ?reset=audio / ?reset=sound      → 音量・SEをデフォルトに戻す
      ?reset=notes                     → ノーツ色・形をデフォルトに戻す（確認あり）
      ?reset=amp / ?reset=rack         → 🔥 TRKアンプ（🎚 エフェクターラック）を空に戻す
-     ?reset=all / ?factory            → 全設定リセット（ノーツも含む）
+     ?reset=all / ?factory            → 全設定リセット（ノーツも含む）。実行前に確認します（&force=1 で確認を飛ばす）
      ?export=notes / ?export=all      → 設定をJSONでダウンロード
    ノーツ設定は細かく詰める人が多いので、tv/audioリセットでは保持される。 */
+/* ♻️ 全設定リセットの確認ダイアログ。
+   ?reset=all はリンクを踏むだけで（ノーツ・音量・映像・キー・プレイリストまで）消えるため、
+   実行前にここで一度止めます。&force=1 を付けたときだけ、そのまま実行します。
+   ダイアログは素のDOMで作るので、ほかの機能が壊れていても出せます（ESC・外側クリック＝やめる）。 */
+function askFactoryReset(onYes, onNo) {
+  const wrap = document.createElement("div");
+  wrap.setAttribute("role", "dialog");
+  wrap.setAttribute("aria-modal", "true");
+  wrap.dataset.trkAsk = "factory";   /* 見つけやすさのために印を付ける（テスト・支援技術） */
+  wrap.style.cssText = "position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px";
+  const card = document.createElement("div");
+  card.style.cssText = "max-width:min(92vw,470px);background:#16181d;color:#f2f3f5;border:2px solid #ff3d7f;border-radius:14px;padding:16px 18px;box-shadow:0 10px 40px rgba(0,0,0,.6);font:15px/1.65 system-ui,sans-serif";
+  const title = document.createElement("b");
+  title.textContent = "♻️ " + tr("factoryAskTitle");
+  title.style.cssText = "font-size:17px";
+  const body = document.createElement("div");
+  body.textContent = tr("factoryAskBody");
+  body.style.cssText = "margin:8px 0 4px;white-space:pre-line";
+  const hint = document.createElement("div");
+  hint.textContent = tr("factoryForceHint");
+  hint.style.cssText = "opacity:.65;font-size:12px;margin-bottom:12px";
+  const rowBox = document.createElement("div");
+  rowBox.style.cssText = "display:flex;gap:10px;flex-wrap:wrap";
+  const yes = document.createElement("button");
+  yes.type = "button"; yes.textContent = tr("factoryAskYes");
+  yes.style.cssText = "flex:1 1 auto;min-height:44px;padding:10px 14px;border-radius:10px;border:0;background:#ff3d7f;color:#fff;font-weight:700;font-size:15px;cursor:pointer";
+  const no = document.createElement("button");
+  no.type = "button"; no.textContent = tr("factoryAskNo");
+  no.style.cssText = "flex:1 1 auto;min-height:44px;padding:10px 14px;border-radius:10px;border:1px solid #555;background:#22252b;color:#f2f3f5;font-size:15px;cursor:pointer";
+  const close = () => { document.removeEventListener("keydown", onKey); wrap.remove(); };
+  const onKey = e => {
+    if (e.key !== "Escape") return;
+    close();
+    if (typeof onNo === "function") onNo();
+  };
+  yes.addEventListener("click", () => { close(); if (typeof onYes === "function") onYes(); });
+  no.addEventListener("click", () => { close(); if (typeof onNo === "function") onNo(); });
+  wrap.addEventListener("click", e => { if (e.target === wrap) { close(); if (typeof onNo === "function") onNo(); } });
+  document.addEventListener("keydown", onKey);
+  rowBox.append(yes, no);
+  card.append(title, body, hint, rowBox);
+  wrap.append(card);
+  (document.body || document.documentElement).append(wrap);
+  try { no.focus(); } catch (_) {}
+}
 function resetVideoPrefs() {
   settings.videoStyle = "color";
   settings.videoZoom = 1; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.castPolicy = "off"; settings.backgroundPolicy = "off"; settings.fxAntenna = false; settings.fxAntennaShape = "rod"; settings.fxAntennaCustomOn = ""; settings.fxAntennaCustomOff = ""; settings.mediaLoopTrigger = "toggle"; settings.mediaWallTrigger = "toggle"; settings.mediaWallStyle = "midnight"; settings.mediaWallClock = true; settings.mediaWallStopsVideo = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true;
@@ -420,6 +465,7 @@ function exportPrefs(kind) {
     const has = k => sp.has(k) || hash.includes(k);
     let didReset = "";
     let doExport = "";
+    let pendingFactory = false;   /* ♻️ 確認待ちの ?reset=all */
     // export は先に判定（リセットと同時も可）
     if (has("export")) doExport = (get("export") || "all").toLowerCase();
     else if (sp.get("export") ) doExport = sp.get("export").toLowerCase();
@@ -434,7 +480,10 @@ function exportPrefs(kind) {
       else if (["lite","light"].includes(r)) { resetLitePrefs(); didReset = "lite"; }
       else if (["keys","key","pad","controller","input"].includes(r)) { resetKeysPrefs(); didReset = "keys"; }
       else if (["amp","rack"].includes(r)) { resetAmpPrefs(); didReset = "amp"; }
-      else if (["all","factory","full"].includes(r)) { resetAllPrefs(); didReset = "all"; }
+      else if (["all","factory","full"].includes(r)) {
+        /* ♻️ いちばん危ないリセット。リンクを踏んだだけで消えないよう、確認を挟む（&force=1 で省略） */
+        if (sp.get("force") === "1") { resetAllPrefs(); didReset = "all"; } else pendingFactory = true;
+      }
     } else if (hash.includes("#reset")) {
       // #reset 単体は tv リセット扱い
       if (hash.includes("audio") || hash.includes("sound")) { resetAudioPrefs(); didReset = "audio"; }
@@ -442,7 +491,9 @@ function exportPrefs(kind) {
       else if (hash.includes("lite")) { resetLitePrefs(); didReset = "lite"; }
       else if (hash.includes("keys") || hash.includes("pad")) { resetKeysPrefs(); didReset = "keys"; }
       else if (hash.includes("amp") || hash.includes("rack")) { resetAmpPrefs(); didReset = "amp"; }
-      else if (hash.includes("all")) { resetAllPrefs(); didReset = "all"; }
+      else if (hash.includes("all")) {
+        if (hash.includes("force")) { resetAllPrefs(); didReset = "all"; } else pendingFactory = true;
+      }
       else { resetVideoPrefs(); didReset = "tv"; }
     }
     if (!didReset) {
@@ -455,17 +506,35 @@ function exportPrefs(kind) {
         if (typeof s === "string" && s.length < 50) { settings.tvDockSkin = s; saveUserPrefs(); }
       }
     }
-    if (didReset || doExport) {
-      saveUserPrefs();
+    if (didReset || doExport || pendingFactory) {
+      if (!pendingFactory) saveUserPrefs();   /* 確認待ちの間は、まだ何も保存し直さない */
       // URLを綺麗にする（リセットループ防止）
       try {
         const clean = new URL(location.href);
-        clean.searchParams.delete("reset"); clean.searchParams.delete("safe"); clean.searchParams.delete("safety"); clean.searchParams.delete("factory");
+        clean.searchParams.delete("reset"); clean.searchParams.delete("safe"); clean.searchParams.delete("safety"); clean.searchParams.delete("factory"); clean.searchParams.delete("force");
         // export は残しても良いが、一度だけにするために削除
         if (doExport) clean.searchParams.delete("export");
         if (clean.hash.toLowerCase().includes("reset") || clean.hash.toLowerCase().includes("safe")) clean.hash = "";
         history.replaceState(null, "", clean.toString());
       } catch(_) {}
+      if (pendingFactory) {
+        /* ♻️ 実行するかどうかを聞く。はい＝リセットして再読み込み（全部を確実に適用するため）、
+           いいえ＝何もしない。URLはもう綺麗にしてあるので、聞き直しにはなりません。 */
+        setTimeout(() => {
+          const toast = text => {
+            if (typeof caption !== "undefined") caption = { text, t: performance.now() };
+            const b = document.createElement("div");
+            b.textContent = text;
+            b.style.cssText = "position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:99999;background:#111;color:#fff;border:2px solid #ff3d7f;padding:10px 16px;border-radius:10px;max-width:90vw;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.6)";
+            document.body.appendChild(b);
+            setTimeout(() => b.remove(), 5000);
+          };
+          askFactoryReset(
+            () => { resetAllPrefs(); saveUserPrefs(); toast("♻️ " + tr("factoryAskYes")); setTimeout(() => location.reload(), 400); },
+            () => toast(tr("factoryAskCanceled"))
+          );
+        }, 300);
+      }
       // バナー表示は DOM 構築後に行うため、少し遅延
       setTimeout(() => {
         if (doExport) exportPrefs(doExport);
@@ -492,7 +561,12 @@ function exportPrefs(kind) {
     // グローバルからも手動で呼べるように公開
     window.trkReset = (k="tv") => {
       k = String(k).toLowerCase();
-      if (k==="safe") enterSafeMode(); else if (["tv","video"].includes(k)) resetVideoPrefs(); else if (["audio","sound"].includes(k)) resetAudioPrefs(); else if (k==="notes") resetNotesPrefs(); else if (["lite","light"].includes(k)) resetLitePrefs(); else if (["keys","key","pad","controller","input"].includes(k)) resetKeysPrefs(); else if (["amp","rack"].includes(k)) resetAmpPrefs(); else if (["all","factory"].includes(k)) resetAllPrefs(); else resetVideoPrefs();
+      if (["all","factory"].includes(k)) {
+        /* ♻️ コンソールからの trkReset("all") も、消す前に確認する */
+        askFactoryReset(() => { resetAllPrefs(); saveUserPrefs(); location.reload(); }, () => {});
+        return;
+      }
+      if (k==="safe") enterSafeMode(); else if (["tv","video"].includes(k)) resetVideoPrefs(); else if (["audio","sound"].includes(k)) resetAudioPrefs(); else if (k==="notes") resetNotesPrefs(); else if (["lite","light"].includes(k)) resetLitePrefs(); else if (["keys","key","pad","controller","input"].includes(k)) resetKeysPrefs(); else if (["amp","rack"].includes(k)) resetAmpPrefs(); else resetVideoPrefs();
       saveUserPrefs(); location.reload();
     };
     window.trkExport = (k="all") => exportPrefs(String(k).toLowerCase());

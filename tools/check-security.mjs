@@ -225,6 +225,19 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   rule(media.includes("const ANALYZE_MAX = 96 * 1024 * 1024") && media.includes('tooBig ? "analysisSkipped"') &&
     !/file\.arrayBuffer\(\)[^\n]*\n[^\n]*ANALYZE/ .test(media),
     "huge media is never read into memory: audio analysis is skipped above ANALYZE_MAX (a 2GB file used to be loaded whole)");
+  const addons = js["js/addons.js"];
+  rule(addons.includes("function installWithConsent(") && addons.includes("function askConsent(") &&
+    addons.includes("function codeShaSync(") && addons.includes("function consentState(") &&
+    addons.includes("entry.consentAt = Date.now()") && addons.includes("entry.consentSha = codeShaSync(code)") &&
+    addons.indexOf("installWithConsent(text, f.name)") > 0 && !/const res = installText\(text, f\.name\)/.test(addons),
+    "add-ons ask for consent before their code runs and record it (with a code fingerprint) in the add-on store");
+
+  const core = js["js/core.js"];
+  const factoryGuard = core.includes("function askFactoryReset(") && core.includes("let pendingFactory = false") &&
+    core.includes('if (sp.get("force") === "1")') && core.includes("if (!pendingFactory) saveUserPrefs()") &&
+    core.includes('askFactoryReset(') && !/else if \(\["all","factory","full"\]\.includes\(r\)\) \{ resetAllPrefs\(\)/.test(core);
+  rule(factoryGuard, "?reset=all asks for confirmation before wiping every setting (&force=1 skips it)");
+
   rule(library.includes("async function addVideoFiles") && library.includes("function probeVideoFile") &&
     library.includes("el.videoWidth > 0 && el.videoHeight > 0") && library.includes("videoReady"),
     "the 🎬 video import waits for a real first frame before marking an item as video, then opens the viewer");
@@ -276,6 +289,11 @@ function onlyIf(cond, text) { return cond ? text : ""; }
   const doc = exists("docs/SECURITY.md") && read("README.md").includes("docs/SECURITY.md") &&
     read("docs/HANDOFF.md").includes("check-security.mjs");
   rule(doc, "docs/SECURITY.md exists and is linked from README / HANDOFF");
+
+  const i18n = read("js/i18n.js") + read("js/addons.js");
+  const textsAllLangs = ["factoryAskTitle", "factoryAskYes", "addonConsentTitle", "addonConsentYes", "addonConsentBadge"]
+    .every(key => (i18n.match(new RegExp(`\\b${key}:`, "g")) || []).length === 4);
+  rule(textsAllLangs, "the reset-confirmation and add-on consent texts exist in all four languages");
 
   const checklist = exists("docs/SECURITY-CHECKLIST.md") && read("docs/SECURITY-CHECKLIST.md").includes("OWASP") &&
     read("docs/SECURITY-CHECKLIST.md").includes("CWE") && read("README.md").includes("SECURITY-CHECKLIST.md") &&

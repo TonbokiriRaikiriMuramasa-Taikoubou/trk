@@ -271,10 +271,24 @@ details.panel[open]>summary{margin-bottom:14px}
   padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.28)}
 .bannerVolPanel[hidden]{display:none}
 .bannerVolPanel input{width:120px}
-/* ◀▶ バナー左右中央の曲送り */
-.bannerSongBtn{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:34px;height:46px;padding:0;
-  font-size:17px;line-height:1;border-radius:10px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.25);color:inherit}
+/* ◀🎲▶ バナー右端の曲送り（左端に置くと曲名の頭に重なるので、右端にまとめる） */
+.bannerSongBar{position:absolute;top:50%;right:10px;transform:translateY(-50%);z-index:3;
+  display:flex;align-items:center;gap:6px}
+.bannerSongBar[hidden]{display:none}
+.bannerSongBtn{width:34px;height:46px;padding:0;
+  font-size:17px;line-height:1;border-radius:10px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.25);color:inherit;
+  /* 長押し（🎲）で文字選択・コールアウトが出ないように、音量ボタンと同じ扱いにする */
+  touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.bannerSongBtn[hidden]{display:none}
 .bannerSongBtn:hover{background:rgba(0,0,0,.6)}
+.bannerRandomBtn{font-size:16px}
+/* 曲名の右側を、曲送りボタン🎲と音量つまみのぶん空ける（曲名と重ならないように） */
+.banner.hasSongBtns .bannerText{padding-right:124px}
+@media(max-width:520px){
+  .banner.hasSongBtns .bannerText{padding-right:112px}
+  .bannerSongBar{gap:5px}
+  .bannerSongBtn{width:30px;height:42px;font-size:15px}
+}
 
 /* ===== 9. プレイ記録 ===== */
 .recTop{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}

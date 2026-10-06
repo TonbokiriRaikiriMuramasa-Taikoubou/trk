@@ -1606,27 +1606,110 @@ bannerVolBtn.addEventListener("click", e => {
   bannerVolPanel.hidden = !bannerVolPanel.hidden; bannerVolSync();
 });
 bannerVolSlider.addEventListener("input", () => setBannerMusicVolume(bannerVolSlider.value));
-/* ◀▶ バナーの左右中央で曲送り（TVドックの◀▶と同じ仕組み。いま開いているタブの中を送る） */
-const bannerPrevBtn = el("button", "bannerSongBtn", "◀"); bannerPrevBtn.type = "button"; bannerPrevBtn.style.left = "10px";
-const bannerNextBtn = el("button", "bannerSongBtn", "▶"); bannerNextBtn.type = "button"; bannerNextBtn.style.right = "10px";
-$("songBanner").append(bannerPrevBtn, bannerNextBtn);
+/* ◀🎲▶ バナーの右端にまとめて曲送り（TVドックの◀▶と同じ仕組み。いま開いているタブの中を送る）
+   ・左端に置くと曲名の頭に重なるので、曲の操作は右端の [◀][🎲][▶] に集める
+   ・🎲 は誤操作を防ぐため、既定では長押し（650ms）で変える。設定でタップだけにも、🎲 自体を隠すこともできる */
+const bannerSongBar = el("div", "bannerSongBar");
+const bannerPrevBtn = el("button", "bannerSongBtn", "◀"); bannerPrevBtn.type = "button";
+const bannerRandomBtn = el("button", "bannerSongBtn bannerRandomBtn", "🎲"); bannerRandomBtn.type = "button";
+const bannerNextBtn = el("button", "bannerSongBtn", "▶"); bannerNextBtn.type = "button";
+bannerSongBar.append(bannerPrevBtn, bannerRandomBtn, bannerNextBtn);
+$("songBanner").append(bannerSongBar);
+
+/* 🎲 おまかせの候補：いまの一覧 ＋ 📌ピンの曲（ほかのタブにいても、必ず候補に入る） */
+function randomSongPool() {
+  const pool = libView.slice();
+  const F = window.TrkFavs;
+  if (F) {
+    for (const key of F.state("song").pins) {
+      if (F.groupOf("song", key) === "former") continue;
+      const it = allSongs().find(x => x.key === key);
+      if (it && !pool.includes(it)) pool.push(it);
+    }
+  }
+  return pool;
+}
+function randomSongPick() {
+  const pool = randomSongPool();
+  return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
+}
+const bannerRandomTapMode = () => settings.bannerRandomTap === true;   /* タップだけで変える（初期オフ＝長押し） */
+
 function bannerSongBtnsSync() {
   const on = settings.bannerSongBtns !== false && allSongs().length > 0 && phase === "title";
+  const rand = on && settings.bannerRandomBtn !== false;
+  bannerSongBar.hidden = !on;
   bannerPrevBtn.hidden = bannerNextBtn.hidden = !on;
+  bannerRandomBtn.hidden = !rand;
+  $("songBanner").classList.toggle("hasSongBtns", on);   /* 曲名の右側を空けて、右端のボタンと重ならないようにする */
   const t1 = tr("tvPrevSong"), t2 = tr("tvNextSong");
   for (const [b, t] of [[bannerPrevBtn, t1], [bannerNextBtn, t2]]) { b.title = t; b.setAttribute("aria-label", t); }
+  const tip = tr(bannerRandomTapMode() ? "bannerRandomTapTip" : "bannerRandomHoldTip");
+  if (bannerRandomBtn.title !== tip) { bannerRandomBtn.title = tip; bannerRandomBtn.setAttribute("aria-label", tip); }
 }
 async function bannerSongStep(dir) {
   if (phase !== "title") return;
   const it = dir < 0 ? prevSong() : nextSong();
   if (it) await selectSong(it);
 }
+async function bannerSongRandom() {
+  if (phase !== "title") return;
+  const it = randomSongPick();
+  if (it) await selectSong(it);
+}
 bannerPrevBtn.addEventListener("click", () => bannerSongStep(-1));
 bannerNextBtn.addEventListener("click", () => bannerSongStep(1));
+/* 🎲：既定は長押しでおまかせ。タップだけで変える設定とキーボード操作（click の detail が 0）は、その場で変える */
+let bannerRandTimer = 0, bannerRandLongPressed = false, bannerRandPointer = null, bannerRandDownX = 0, bannerRandDownY = 0;
+function bannerRandCancelPress() {
+  if (bannerRandTimer) clearTimeout(bannerRandTimer);
+  bannerRandTimer = 0; bannerRandPointer = null;
+}
+bannerRandomBtn.addEventListener("pointerdown", e => {
+  if (e.pointerType === "mouse" && e.button !== 0) return;
+  bannerRandCancelPress(); bannerRandLongPressed = false;
+  if (bannerRandomTapMode()) return;   /* タップだけで変える設定：クリックに任せる */
+  bannerRandPointer = e.pointerId; bannerRandDownX = e.clientX; bannerRandDownY = e.clientY;
+  try { bannerRandomBtn.setPointerCapture(e.pointerId); } catch (_) {}
+  bannerRandTimer = setTimeout(() => {
+    bannerRandTimer = 0; bannerRandLongPressed = true;
+    bannerSongRandom();
+  }, 650);
+});
+bannerRandomBtn.addEventListener("pointermove", e => {
+  if (bannerRandPointer !== e.pointerId) return;
+  if (Math.hypot(e.clientX - bannerRandDownX, e.clientY - bannerRandDownY) > 12) bannerRandCancelPress();
+});
+bannerRandomBtn.addEventListener("pointerup", e => { if (bannerRandPointer === e.pointerId) bannerRandCancelPress(); });
+bannerRandomBtn.addEventListener("pointercancel", e => { if (bannerRandPointer === e.pointerId) bannerRandCancelPress(); });
+bannerRandomBtn.addEventListener("contextmenu", e => e.preventDefault());
+bannerRandomBtn.addEventListener("click", e => {
+  if (bannerRandLongPressed) {
+    bannerRandLongPressed = false;
+    e.preventDefault(); e.stopImmediatePropagation();
+    return;
+  }
+  if (e.detail === 0 || bannerRandomTapMode()) { bannerSongRandom(); return; }
+  plToast(tr("bannerRandomHold"));   /* 誤操作防止：短押しでは変えず、押し方だけ案内する */
+});
+function bannerRandomSyncPrefs() {
+  const show = settings.bannerRandomBtn !== false;
+  $("bannerRandomBtn").checked = show;
+  $("bannerRandomTap").checked = settings.bannerRandomTap === true;
+  $("bannerRandomTap").disabled = !show;   /* 🎲 を隠しているときは、押し方の設定は関係ない */
+}
 $("bannerSongBtns").addEventListener("change", e => {
   settings.bannerSongBtns = e.target.checked; saveUserPrefs(); bannerSongBtnsSync();
 });
+$("bannerRandomBtn").addEventListener("change", e => {
+  settings.bannerRandomBtn = e.target.checked; saveUserPrefs(); bannerRandomSyncPrefs(); bannerSongBtnsSync();
+});
+$("bannerRandomTap").addEventListener("change", e => {
+  settings.bannerRandomTap = e.target.checked; saveUserPrefs(); bannerSongBtnsSync();
+});
 $("bannerSongBtns").checked = settings.bannerSongBtns !== false;
+bannerRandomSyncPrefs();
+on("settings", bannerRandomSyncPrefs);   /* 音リセットなどで設定が変わっても、開いたときに合わせる */
 bannerSongBtnsSync();   /* 初回の表示あわせ（renderBanner が先に走っていた場合の保険） */
 
 
@@ -1943,17 +2026,10 @@ let libSearchTimer = 0;
 $("libSearch").addEventListener("input", () => { clearTimeout(libSearchTimer); libSearchTimer = setTimeout(renderLib, 150); });
 $("libSort").addEventListener("change", e => { settings.libSort = e.target.value; saveUserPrefs(); renderLib(); });
 $("libRandomBtn").addEventListener("click", () => {
-  /* 🎲 おまかせ：いまの一覧 ＋ 📌ピンの曲（ほかのタブにいても、必ず候補に入る） */
-  const pool = libView.slice();
-  const F = window.TrkFavs;
-  if (F) {
-    for (const key of F.state("song").pins) {
-      if (F.groupOf("song", key) === "former") continue;
-      const it = allSongs().find(x => x.key === key);
-      if (it && !pool.includes(it)) pool.push(it);
-    }
-  }
-  if (pool.length) selectSong(pool[Math.floor(Math.random() * pool.length)]);
+  /* 🎲 おまかせ：いまの一覧 ＋ 📌ピンの曲（ほかのタブにいても、必ず候補に入る）
+     ＝ 曲名バナーの🎲（長押し／タップ）と同じ抽選を使う */
+  const it = randomSongPick();
+  if (it) selectSong(it);
 });
 
 on("records", renderLib);

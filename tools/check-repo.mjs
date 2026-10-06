@@ -278,6 +278,38 @@ if (!read("js/library.js").includes("plAuthorMenu") ||
   }
 }
 
+// ◀🎲▶ Song banner: the song controls ([◀][🎲][▶]) sit together at the right edge
+// so the left ◀ no longer covers the song title. 🎲 is long-press by default
+// (mis-tap safety) with an on/off switch and a tap-only option for people who
+// like random, and a short tap only shows a hint.
+{
+  const library = read("js/library.js");
+  const html = read("index.html");
+  const css = read("css/style.css");
+  const core = read("js/core.js");
+  const i18n = read("js/i18n.js");
+  const layoutOk = library.includes('const bannerSongBar = el("div", "bannerSongBar")') &&
+    library.includes("bannerSongBar.append(bannerPrevBtn, bannerRandomBtn, bannerNextBtn)") &&
+    !library.includes("bannerPrevBtn.style.left") &&
+    css.includes(".bannerSongBar{position:absolute;top:50%;right:10px") &&
+    css.includes(".banner.hasSongBtns .bannerText{padding-right:") &&
+    library.includes('classList.toggle("hasSongBtns", on)');
+  const randomOk = library.includes("function randomSongPick()") &&
+    library.includes("function bannerSongRandom()") && library.includes("bannerRandomTapMode") &&
+    library.includes("bannerRandLongPressed") && library.includes("}, 650);") &&
+    library.includes('plToast(tr("bannerRandomHold"))') &&
+    core.includes("bannerRandomBtn: prefs.bannerRandomBtn !== false") &&
+    core.includes("bannerRandomTap: prefs.bannerRandomTap === true") &&
+    core.includes("settings.bannerRandomBtn = true; settings.bannerRandomTap = false;");
+  const uiOk = html.includes('id="bannerRandomBtn"') && html.includes('id="bannerRandomTap"') &&
+    ["bannerRandomBtn", "bannerRandomTap", "bannerRandomHoldTip", "bannerRandomTapTip", "bannerRandomHold"]
+      .every(key => (i18n.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4);
+  if (!layoutOk) fail("banner song controls should sit together at the right edge so they do not cover the song title");
+  else if (!randomOk) fail("banner random button (default long press / tap-only option / on-off) is incomplete");
+  else if (!uiOk) fail("banner random button UI (checkboxes + four-language strings) is incomplete");
+  else ok("banner ◀🎲▶ controls sit at the right edge; 🎲 is long-press by default with on/off and tap-only options");
+}
+
 // 🩷 MMD: defaults, grouped 60-motion chooser, facial morphs and original procedural VMD.
 {
   const mmd = read("js/mmd.js");

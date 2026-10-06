@@ -134,7 +134,9 @@ const settings = {
   musicVolumeRestore: num(prefs.musicVolumeRestore, .01, 1,
     typeof prefs.musicVolume === "number" && prefs.musicVolume > 0 ? prefs.musicVolume : .7),
   bannerPause: prefs.bannerPause === true,                                   // ⏯ 右上の曲名バナーをタップで一時停止（初期オフ）
-  bannerSongBtns: prefs.bannerSongBtns !== false,                            // ◀▶ バナー左右の曲送りボタン（初期オン）
+  bannerSongBtns: prefs.bannerSongBtns !== false,                            // ◀▶ バナー右端の曲送りボタン（初期オン）
+  bannerRandomBtn: prefs.bannerRandomBtn !== false,                          // 🎲 バナー右端のおまかせボタン（初期オン）
+  bannerRandomTap: prefs.bannerRandomTap === true,                           // 🎲 タップだけで変える（初期オフ＝長押し）
   /* 🎹 シンセ演奏モード */
   synthModeDisabled: !!prefs.synthModeDisabled,
   synthModeFastStart: !!prefs.synthModeFastStart,
@@ -252,6 +254,7 @@ function resetVideoPrefs() {
 }
 function resetAudioPrefs() {
   settings.musicVolume = 0.7; settings.musicVolumeRestore = 0.7; settings.seVolume = 0.28; settings.seEnabled = false; settings.bannerPause = false; settings.bannerSongBtns = true;
+  settings.bannerRandomBtn = true; settings.bannerRandomTap = false;
   settings.synthModeDisabled = false; settings.synthModeFastStart = false; settings.synthModeKeyboardLock = true; settings.synthModeWideKeyboard = false;
   // fx-dock / eq-dock の音まわりがあれば一緒に初期化
   if ("gameVolume" in settings) settings.gameVolume = 0.7;

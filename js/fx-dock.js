@@ -36,7 +36,7 @@ const FAV_MAX = 0, TEMP_ID = "__chart", LONG_MS = 600;   /* 0＝上限なし（�
 settings.fxDockSkin = pick(prefs.fxDockSkin, Object.keys(DOCK_SKINS), "standard");
 settings.fxDockFive = !!prefs.fxDockFive;
 settings.fxDockOpen = prefs.fxDockOpen === true;      // くわしい欄は最初は閉じる
-settings.ampOpen = prefs.ampOpen === true;            // 🔥 TRKアンプの欄も最初は閉じる
+settings.ampOpen = typeof prefs.ampOpen === "boolean" ? prefs.ampOpen : true;   // 🔥 TRKアンプの欄は最初から開いておく（「なんだこれ！」と気づいてもらう。触って閉じた人の記憶は残す）
 settings.castPolicy = pick(settings.castPolicy, ["off", "antenna"], "off");
 settings.backgroundPolicy = pick(settings.backgroundPolicy, ["off", "antenna", "corner"], settings.castPolicy === "antenna" ? "antenna" : "off");
 settings.fxAntenna = settings.backgroundPolicy === "off" ? false : !!prefs.fxAntenna;

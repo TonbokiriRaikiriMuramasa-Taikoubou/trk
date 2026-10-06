@@ -274,7 +274,7 @@ function resetVideoPrefs() {
   settings.videoZoom = 1; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.castPolicy = "off"; settings.backgroundPolicy = "off"; settings.fxAntenna = false; settings.fxAntennaShape = "rod"; settings.fxAntennaCustomOn = ""; settings.fxAntennaCustomOff = ""; settings.mediaLoopTrigger = "toggle"; settings.mediaWallTrigger = "toggle"; settings.mediaWallStyle = "midnight"; settings.mediaWallClock = true; settings.mediaWallStopsVideo = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true;
   settings.bgDim = 0; settings.bgBlur = 0;
   /* ✨ TRKエフェクト（リッチ映像。js/tv-rich.js）の記憶も一緒に戻す */
-  settings.tvRichId = "portrait_natural"; settings.tvRichPrev = ""; settings.tvRichCat = "portrait"; settings.tvRichOpen = false;
+  settings.tvRichId = "portrait_natural"; settings.tvRichPrev = ""; settings.tvRichCat = "portrait"; settings.tvRichOpen = true;   /* 初期状態に戻す＝欄は開いておく */
   settings.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs); // user bookmarks survive a TV-only reset
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = true;
@@ -330,7 +330,7 @@ function takeAmpReset() {
 function resetAmpPrefs() {
   if ("fxRack" in settings) settings.fxRack = [];
   if ("fxRackOn" in settings) settings.fxRackOn = false;
-  settings.ampOpen = false;
+  settings.ampOpen = true;   /* 初期状態に戻す＝欄は開いておく（?safe=1 だけは閉じたまま＝下の enterSafeMode） */
   markAmpReset("clear");
   try { if (window.TrkFX && typeof TrkFX.rackClear === "function") { TrkFX.rackClear(); TrkFX.rackOn(false); } } catch (_) {}
 }
@@ -360,6 +360,7 @@ function enterSafeMode() {
   /* 🔥 TRKアンプも安全側へ（段は消さず、止めるだけ。fx.js が読み込み時に拾う） */
   if ("fxRackOn" in settings) settings.fxRackOn = false;
   markAmpReset("off");
+  settings.tvRichOpen = false;   /* ✨ TRKエフェクトの欄も安全側では閉じておく */
   if (settings.mascot === "mmd") settings.mascot = "skin";     // 🩷 セーフモードでは MMD を使わない
   if (typeof view !== "undefined" && view) { try { view.style.filter = "none"; } catch(_) {} }
 }

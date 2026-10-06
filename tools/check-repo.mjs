@@ -260,7 +260,9 @@ if (!exists("js/fx-worklet.js") ||
     ["trk", "warm", "radio", "clean"].every(id => dock.includes(id + ":")) && dock.includes("data-ampstack") &&
     dock.includes('dock.append(dev, favChips, overLabel, overflow, body);') && dock.includes("const placeAmp = () =>") &&
     dock.includes('on("fxRack", renderAmp)') && dock.includes("const AMP_MAX = 8") &&
-    dock.includes("settings.ampOpen = prefs.ampOpen === true") && dock.includes('data-i18n="sfxRackTitle"') &&
+    dock.includes('settings.ampOpen = typeof prefs.ampOpen === "boolean" ? prefs.ampOpen : true') &&
+    core.includes("settings.ampOpen = true;") && core.includes("settings.tvRichOpen = false;") &&
+    fx.includes("settings.ampOpen = ampReset === \"clear\";") && dock.includes('data-i18n="sfxRackTitle"') &&
     ["TrkFX.rackSet(", "TrkFX.rackOn(true)", "TrkFX.rackAdd(", "TrkFX.rackClear()"].every(t => dock.includes(t)) &&
     css.includes("#ampPanel .ampStage") && css.includes("#ampPanel .ampStages");
   const langOk = ampKeys.every(k => (dock.match(new RegExp("\\b" + k + ":", "g")) || []).length === 4);
@@ -268,7 +270,7 @@ if (!exists("js/fx-worklet.js") ||
   else if (!resetOk) fail("TRK amp reset plumbing (?reset=amp / ?reset=all / ?safe=1) is missing");
   else if (!uiOk) fail("TRK amp category (bottom-left, below 🎛 More) is not wired to the rack");
   else if (!langOk) fail("TRK amp strings are missing from one of the four languages");
-  else ok("TRK amp: independent bottom-left category (below 🎛 More) with 4 stacks, stage chips and rack API in 4 languages");
+  else ok("TRK amp: independent bottom-left category (below 🎛 More), open on arrival, with 4 stacks, stage chips and rack API in 4 languages");
 }
 
 // ✨ TRK effects: the independent bottom-left category right below 🔥 TRK amp,
@@ -286,7 +288,8 @@ if (!exists("js/fx-worklet.js") ||
     rich.includes('const RICH_CATS = ["portrait", "anime", "texture", "quality"]') &&
     rich.includes("window.TrkTV") && rich.includes("TrkTV.list()") && rich.includes("TrkTV.select(") &&
     rich.includes("TrkTV.current()") && rich.includes('on("tvChange"') && rich.includes("const placeRich = () =>") &&
-    rich.includes("settings.tvRichId") && rich.includes("settings.tvRichPrev") && rich.includes('typeof settings[key] === "string"');
+    rich.includes("settings.tvRichId") && rich.includes("settings.tvRichPrev") && rich.includes('typeof settings[key] === "string"') &&
+    rich.includes("prefs.tvRichOpen !== false") && core.includes("settings.tvRichOpen = true;");
   const wireOk = html.includes('<script src="js/tv-rich.js"></script>') && css.includes("#richPanel .richChips") &&
     css.includes("#richPanel .richCats") && core.includes('settings.tvRichId = "portrait_natural"') &&
     core.includes("out.tvRichId = settings.tvRichId");
@@ -294,7 +297,7 @@ if (!exists("js/fx-worklet.js") ||
   if (!apiOk) fail("TRK effects (rich video) panel is not wired to the video filter (TrkTV / videoStyle)");
   else if (!wireOk) fail("TRK effects (rich video) is missing the script tag, styles, or the video reset/export keys");
   else if (!langOk) fail("TRK effects (rich video) strings are missing from one of the four languages");
-  else ok("TRK effects: rich video grades as an independent bottom-left category (below 🔥 TRK amp) in 4 languages");
+  else ok("TRK effects: rich video grades as an independent bottom-left category (below 🔥 TRK amp), open on arrival, in 4 languages");
 }
 
 // 🛒 Official-source catalog: no-audio curated playlists with wishlist matching.

@@ -232,7 +232,7 @@ settings.fxRack = (Array.isArray(prefs.fxRack) ? prefs.fxRack : []).map(cleanFx)
   if (ampReset) {
     if (ampReset === "clear") settings.fxRack = [];
     settings.fxRackOn = false;
-    settings.ampOpen = false;
+    settings.ampOpen = ampReset === "clear";   /* リセットは初期状態（開く）へ。セーフモードは閉じたまま */
     try { saveUserPrefs(); } catch (_) {}
   }
 }

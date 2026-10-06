@@ -80,7 +80,7 @@ const pickRich = (key, ok, def) => {
 settings.tvRichId = pickRich("tvRichId", idOk, RICH_DEFAULT_ID);
 settings.tvRichPrev = pickRich("tvRichPrev", idOk, "");
 settings.tvRichCat = pickRich("tvRichCat", v => RICH_CATS.includes(v), RICH_CATS[0]);
-settings.tvRichOpen = typeof settings.tvRichOpen === "boolean" ? settings.tvRichOpen : prefs.tvRichOpen === true;   /* 欄は最初は閉じる（🔥 TRKアンプと同じ） */
+settings.tvRichOpen = typeof settings.tvRichOpen === "boolean" ? settings.tvRichOpen : prefs.tvRichOpen !== false;   /* 欄は最初から開いておく（🔥 TRKアンプとおそろい。触って閉じた人の記憶は残す） */
 
 /* ============ 画面の組み立て（ほかのファイルを読み終えてから） ============ */
 addEventListener("DOMContentLoaded", () => {

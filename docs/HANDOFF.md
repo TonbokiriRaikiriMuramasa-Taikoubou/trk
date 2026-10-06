@@ -249,6 +249,7 @@ JSDOM の実挙動ハーネス（**コミットしていない・消えたら作
   - **PR #19（2026-10-06・squash merge）**：セキュリティ追補 F-22〜F-29 と回帰検査・関連文書の更新。詳細と互換性の注意は §2 および `docs/SECURITY.md`。
   - **PR #26（2026-10-06・squash merge）**：セキュリティ追補 F-30〜F-32＝設定Importの enum 許可リスト、reset の `force=1` 完全一致、`.stpack` の累積1 GiB上限・quota 事前確認・容量と put の一体化。詳細は §2 と `docs/SECURITY.md`。
   - **PR #27（2026-10-07・`arena/cfdfdfd5-trk`）**：**外部検収（PR #26 への指摘）を受けた仕上げと大型修正**。①緊急設定Importが弾いたキーを**理由つき**で報告（4言語・重複なし・表示は先頭12件）②回帰検査を **55項目**へ（spectrum の ID 辞書6個すべて／lite-mode 4キー／tv-rich の実在ID／`?factory` の文書ドリフト）③**パック容量の集計を `size` index 化（DB v2）**＝Blob を復元せず合計を出し、移行と件数食い違いで過小計上を防ぐ。⚠ 版数を上げたので**他タブがあると `onblocked` で止まる**（`packDbBlocked` を4言語で案内）。詳細は §2、`docs/SECURITY.md`、このPRの本文。
+- **レビュー中（PR #28・`arena/96a5eaad-trk`）**：🌐 three.js の `three.core.js` と `BufferGeometryUtils.js` の取り込み漏れを修正し、vendor 更新道具／検査を両引用符対応に。逆テストで旧検査の見逃しも再現した。実ブラウザのMMD／VRM表示確認は未完了（上の最優先項目）。
 - 以前の統合元ブランチ：`arena/01a109eb-trk`（Part 1–17・コミット35+・`main` へマージ済み）、`arena/01a10c69-trk`（PR #14）。
 - 公開URL：<https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/>
 

@@ -499,10 +499,32 @@ function libTabMatch(it, id) {
 const PL_COLORS = { none:"", aqua:"#0e6e6e", green:"#1d6b3c", amber:"#8a5a12", red:"#8a2b35",
   purple:"#5b2d8e", blue:"#1f4f8f", pink:"#8e2d64", gray:"#4a4f5a" };
 const SONG_META_KEY = "shadow_taiko_songmeta_v1";
-let SONG_META = {};
-try { SONG_META = JSON.parse(localStorage.getItem(SONG_META_KEY)) || {}; } catch (_) { SONG_META = {}; }
-if (!SONG_META || typeof SONG_META !== "object" || Array.isArray(SONG_META)) SONG_META = {};
-function songMetaSave() { try { localStorage.setItem(SONG_META_KEY, JSON.stringify(SONG_META)); } catch (_) {} }
+const SONG_META_MAX = 3000;   /* 🛡 曲プロフィールの上限（共有プレイリストの取り込みで増えても、ここで頭打ち） */
+function songMetaClean(raw) {   /* 1件ぶんの検証：文字列だけ・長さ上限・入手先は https のみ */
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const out = {};
+  for (const [k, n] of [["title", 120], ["artist", 100], ["album", 100], ["composer", 100]]) {
+    if (typeof raw[k] === "string" && raw[k].trim()) out[k] = raw[k].trim().slice(0, n);
+  }
+  const url = typeof raw.srcUrl === "string" ? raw.srcUrl.trim() : "";
+  if (url && /^https:\/\/\S+$/i.test(url)) out.srcUrl = url.slice(0, 300);   /* javascript: などは捨てる */
+  return Object.keys(out).length ? out : null;
+}
+function songMetaCleanAll(obj) {
+  const out = {};
+  if (!obj || typeof obj !== "object" || Array.isArray(obj)) return out;
+  for (const k of Object.keys(obj).slice(0, SONG_META_MAX)) {
+    if (typeof k !== "string" || k.length > 128) continue;
+    const m = songMetaClean(obj[k]);
+    if (m) out[k] = m;
+  }
+  return out;
+}
+let SONG_META = songMetaCleanAll((() => { try { return JSON.parse(localStorage.getItem(SONG_META_KEY)) || {}; } catch (_) { return {}; } })());
+function songMetaSave() {
+  if (Object.keys(SONG_META).length > SONG_META_MAX) SONG_META = songMetaCleanAll(SONG_META);
+  try { localStorage.setItem(SONG_META_KEY, JSON.stringify(SONG_META)); } catch (_) {}
+}
 function metaOf(key) { const m = SONG_META[key]; return (m && typeof m === "object") ? m : null; }
 
 /* 保存されていたプレイリスト1つの検証（読み込み時に全部に通す） */
@@ -1179,6 +1201,10 @@ function plMatchByTitle(s, all) {
   return fallback;
 }
 function plOpenLink(url) {   /* https限定＋開く前に確認（osu!の「入手先を明示」流・trk!は内容を保証しない） */
+  /* 🛡 呼び出し側でも https を確かめているが、開く瞬間にもう一度通す。
+     古い保存データ・手で書き換えた localStorage・将来の呼び出しが javascript: を渡しても開かない。 */
+  url = safeHttpUrl(url);
+  if (!url) return;
   const d = plDialog(tr("plLinkOpen"));
   d.card.append(el("div", "plHint", url), el("div", "plHint", tr("plLinkWarn")));
   const open = el("button", "plBtn", tr("plLinkOpen")); open.type = "button";
@@ -1904,7 +1930,12 @@ async function shareMusicFolder() {
 }
 /* 🚫 共有をやめる：覚えた許可と、端末に残した曲をぜんぶ消します */
 async function stopSharing() {
+  /* 🛡 覚えてあるフォルダの鍵（📤 共有の "share" と 📁 開くの "dir"）を、両方とも IndexedDB から消す。
+     ページ内で動くコード（アドオン等）が、許可の生きているうちに再利用できないようにするため。
+     ⚠ handle.remove() は呼ばない：あれは「本物のファイル／フォルダを消す」API。
+       権限の取り消しはブラウザの設定（サイトデータ）側で行うもので、こちらからは触らない。 */
   try { await libKV.del("share"); } catch (_) {}
+  try { await libKV.del("dir"); } catch (_) {}
   shareRemembered = false;
   await clearSharedSongs();
   if (libShared) {

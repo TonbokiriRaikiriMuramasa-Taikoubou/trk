@@ -142,6 +142,29 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   rule(capped, "pack entries are inflated with a streaming size cap (a lying usize cannot exhaust memory)");
 }
 
+/* ---------- 5b. 共有プレイリスト（他人から受け取るファイル） ---------- */
+{
+  const lib = js["js/library.js"];
+  const openGuard = lib.includes("function plOpenLink(url)") && lib.includes("url = safeHttpUrl(url);") &&
+    lib.includes("if (!url) return;");
+  rule(openGuard, "plOpenLink re-validates https at the moment it opens (not only at import)", "");
+
+  const metaGuard = lib.includes("function songMetaClean(raw)") && lib.includes("function songMetaCleanAll(obj)") &&
+    lib.includes("let SONG_META = songMetaCleanAll(") && lib.includes("const SONG_META_MAX = 3000") &&
+    lib.includes("/^https:\\/\\/\\S+$/i.test(url)");
+  rule(metaGuard, "per-song profiles (SONG_META) are sanitised on load, https-only, and capped");
+
+  /* コメント（「handle.remove() は呼ばない」という注意書き）を外してから、実行される呼び出しだけを見る */
+  const libCode = lib.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  const shareClean = lib.includes('await libKV.del("share")') && lib.includes('await libKV.del("dir")') &&
+    !/[\w.]*handle\.remove\s*\(/.test(libCode);
+  rule(shareClean, "🚫 共有をやめる drops both remembered folder handles and never calls handle.remove() (which would delete the real folder)");
+
+  const sharedOk = lib.includes('raw.format !== "trk-playlist"') && lib.includes("https:\\/\\/\\S+$/i.test(String(s.srcUrl") &&
+    lib.includes("slice(0, 1000)") && lib.includes("slice(0, 24)");
+  rule(sharedOk, "shared playlist files are format-checked with song/tag/length caps (no media, no code)");
+}
+
 /* ---------- 6. アドオン ---------- */
 {
   const addons = js["js/addons.js"];

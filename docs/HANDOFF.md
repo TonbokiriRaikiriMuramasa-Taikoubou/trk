@@ -37,7 +37,7 @@
 - 書斎を開いている間は `window._trkStudyRoomOpen` でゲーム側のキー操作を止める（`player.js`／`main.js`／`modes.js`／`stage.js`／`truck.js`／`catch.js`／`speed.js`／`extras.js`／`video-max.js`／`media-player-mode.js`／`synth-mode.js`）。書斎自身のキー（←→・PageUp/Down・Space/Enter・Esc・B/M/T/F・`+`/`-`/`0`・`?`・Ctrl+F）は capture で先に受け取る。ただし入力欄・セレクトでは書斎のキーを止め、ボタンに焦点があるときの Space／Enter はそのボタンに譲る。書斎を閉じる・`phase` が `title` 以外へ進む・曲が切り替わるときは、TVペインへ移した `<video>` を元の親と `style` へ戻す（元の親が差し替わっていても `document.body` へ逃がす）。
 - 🔥 TRKアンプ（`js/fx-dock.js` の左下カテゴリー＋`js/fx.js` のラック）：`settings.fxRack`（段の配列・最大8。`cleanFx` で検証）／`settings.fxRackOn`（初期オフ）／`settings.ampOpen`（欄の開閉・**初期開き**。触って閉じた人の `false` は尊重。`?reset=amp`／`?reset=all` は初期の開へ戻し、`?safe=1` だけは閉じたまま）。段は**プリセットの後・かんたんEQの前**に効き、`exportObj`（マイプリセット書き出し）と `exportPrefs("all")`（設定の書き出し）にそのまま入る。リセットは `?reset=amp`（別名 `rack`）＝空に／`?reset=all`＝空に／`?safe=1`＝**段は残して止める**だけ。`core.js` の `resetAmpPrefs()` は fx.js より先に走るため、一度きりの合図 `takeAmpReset()`（sessionStorage `trk_amp_reset_once`）を置き、`js/fx.js` が読み込み時に拾って消す。⚠ `js/fx.js` は凍結扱いだが、この機能のために**追加のみ**の窓口（`TrkFX.rack`／`rackTypes`／`rackOn`／`rackSet`／`rackAdd`／`rackClear`）と `refresh()` の `emit("fxRack")` を足した（DSP・保存形式は不変）。
 - ✨ TRKエフェクト（`js/tv-rich.js` の左下カテゴリー）：`js/tv-presets.js` の `portrait|anime|texture|quality`（各5種＝20）をまとめた**独立カテゴリー**（`details.panel.dockRich#richPanel`）。🔥 TRKアンプの直下に `placeRich()`＋MutationObserver で再配置。**中身は映像フィルターそのもの**で、適用は必ず `TrkTV.select()`（`settings.videoStyle`）を通す＝TVドックと二重がけにならない。設定キーは `tvRichId`（初期 `portrait_natural`）／`tvRichPrev`（切ったとき戻る先）／`tvRichCat`（開いているタブ・初期 `portrait`）／`tvRichOpen`（欄の開閉・**初期開き**。触って閉じた人の `false` は尊重。`?reset=tv`／`?reset=all` は開へ戻し、`?safe=1` は閉じたまま）。`resetVideoPrefs()`（`?reset=tv`）で4つとも初期化し、`exportPrefs("all")` にも入る。`?safe=1` はスイッチとチップを無効化して記憶は残す。⚠ `TrkTV.list()` に説明文は無いので、説明は `TRK_TV_PRESETS` から読む。⚠ 読み込み時は `settings` 側の値を優先する（`?reset=tv` は core.js が先に走って settings へ既定値を書くため）。
-- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux17`。公開ファイルを変更したら必ず更新する。
+- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux18`。公開ファイルを変更したら必ず更新する。
 - このcheckoutで `npm run check` はコード・データの自動検査を行うが、MMDの実描画・タッチ操作・音声の実機確認は別途必要。
 
 ---
@@ -95,6 +95,8 @@
   - **外から来た文字列を `<a href>` にするときは `safeLink()`／`safeHttpUrl()`（`js/core.js`）を通す**（https 以外はリンクにせず文字だけ出す）。共有ファイル（パックの名刺・配布ページ・エフェクトのプリセット）と公認リストの作者リンクが対象。`href` への直代入は check-security が FAIL にする。
   - **設定の緊急インポートは `UNSAFE_KEYS`（`__proto__`／`constructor`／`prototype`）を飛ばし、`hasOwnProperty` で自分のキーだけ入れる**（プロトタイプ汚染よけ）。
   - **`.stpack` の展開は `inflateEntry(entry, limit, path)` のとおり上限を渡す**。ZIP の `usize` は作り手が自由に書けるので信用しない（展開しながら数えて止める＝圧縮爆弾よけ）。
+  - **共有プレイリストのリンクは `plOpenLink()` を通し、その先頭で `safeHttpUrl()` を再確認する**（取り込み時の検証だけに頼らない）。曲プロフィール（`SONG_META`）は読み込み時に `songMetaCleanAll()` で1件ずつ整える（https のみ・長さ・3000件上限）。
+  - **📁 開く／📤 共有で覚えたフォルダのハンドルは、「🚫 共有をやめる」で `share` と `dir` の両方を消す**。⚠ `FileSystemHandle.remove()` は**本物のファイル／フォルダを消す API** なので絶対に呼ばない（check-security が見張っている）。
   - **`eval`／`new Function`／`document.write`／`srcdoc` を使わない**。`innerHTML` は `js/game.js` の結果画面（全部 `esc()` 済み）だけ。アドオンは仕様としてページ内フル権限なので、**遠隔からコードを取りに行かない**（同梱の `js/addons/example.js` のみ）・安全モードでは読まない、を維持する。
 - UI追加時は4言語の文言を同時に追加し、設定項目は初期値・リセット・Import/Export・セーフモード経路を確認する。
 - GitHub Pagesはファイル名の大文字小文字を区別する。相対パスとService Workerキャッシュも確認する。

@@ -59,6 +59,22 @@ function syncTutorialUI() {
   g.hidden = settings.tutorialDone === true;
   renderGuideStamps();
 }
+function maybeAddTrkPlaylist() {
+  try {
+    if (window.TrkEnsureTrkPlaylist && settings.tutorialDone) {
+      const created = window.TrkEnsureTrkPlaylist({ toast: true, go: false });
+      if (created) {
+        setTimeout(function(){ try { if (window.TrkTrkPlaylistId && typeof renderLib === "function") { settings.libTab = "pl:" + window.TrkTrkPlaylistId; saveUserPrefs(); renderLib(); } } catch(_){} }, 900);
+      }
+    }
+    if (window.TrkEnsureTrkClassicPlaylist && settings.tutorialDone) {
+      const createdC = window.TrkEnsureTrkClassicPlaylist({ toast: true, go: false });
+      if (createdC) {
+        setTimeout(function(){ try { if (window.TrkClassicId && typeof renderLib === "function") { settings.libTab = "pl:" + window.TrkClassicId; saveUserPrefs(); renderLib(); } } catch(_){} }, 1300);
+      }
+    }
+  } catch(_){}
+}
 function guideStampsDone() { return GUIDE_STAMPS.every(id => settings.tutorialStamps.includes(id)); }
 function renderGuideStamps() {
   const g = $("quickGuide"); if (!g) return;
@@ -116,8 +132,9 @@ function completeTutorialFromSeed() {   /* Seed欄に trk! → 打ち込んだ�
   const unlocked = settings.skinGradUnlocked;
   guideStamp("seed", "");   /* 5つ目なら、ここでごほうび解禁のお祝いが出る */
   saveUserPrefs();
-  if (egg) { guideEggPlay(egg); return; }   /* 🥚 演出付きで消える（お祝いポップアップの代わりに一報） */
+  if (egg) { guideEggPlay(egg); maybeAddTrkPlaylist(); return; }   /* 🥚 演出付きで消える（お祝いポップアップの代わりに一報） */
   syncTutorialUI();
+  maybeAddTrkPlaylist();
   if (settings.skinGradUnlocked === unlocked) celebrateGuide("guideDone", guideStampsDone() ? "" : "guideDoneMsg");
 }
 function celebrateGuide(titleKey, msgKey) {   /* 🎉 お祝いポップアップ（プレイ中なら選曲へ戻ってから） */
@@ -159,7 +176,7 @@ on("settings", () => guideStamp("safe", "guideStampSafe"));
   });
 }
 /* スキップ（もう知っている人へ）ともう一度（⚙設定の見た目から） */
-$("guideSkip").addEventListener("click", () => { settings.tutorialDone = true; saveUserPrefs(); syncTutorialUI(); });
+$("guideSkip").addEventListener("click", () => { settings.tutorialDone = true; saveUserPrefs(); syncTutorialUI(); maybeAddTrkPlaylist(); });
 $("tutorialReplayBtn").addEventListener("click", () => {
   settings.tutorialDone = false; saveUserPrefs(); syncTutorialUI();
   const g = $("quickGuide"); if (g) g.open = true;

@@ -115,9 +115,9 @@ const allSongs = () => {
   }
   return [...out, ...packSongs, ...addonSongs];
 };
-function addedItem(file) {
+function addedItem(file, video) {
   const base = baseName(file.name);
-  return { key:`${file.size}|${base}`, source:"file", file, title:base, base, size:file.size };
+  return { key:`${file.size}|${base}`, source:"file", file, title:base, base, size:file.size, video:!!video };
 }
 function packItem(s) {
   const ext = extOf(s.audio), file = new File([s.audioBlob], `${safeName(s.title)}.${ext}`, { type:s.audioBlob.type || "" });
@@ -1409,7 +1409,7 @@ function renderLib() {
     const b = el("button", `libRow src-${it.source}` + (cur ? " cur" : "")); b.type = "button"; b.style.flex = "1"; b.style.minWidth = "0";
     const left = el("span", "libLeft"), meta = el("span", "libMeta");
     const m = metaOf(it.key) || {};   /* 🎶 曲プロフィール（長押しで編集） */
-    left.append(el("span", "libName", (m.title || it.title) + (info && info.title ? " " + info.title : "")),   // 例：曲名 🥁🐔🚚⚔🎪🚛
+    left.append(el("span", "libName", (it.video ? "🎬 " : "") + (m.title || it.title) + (info && info.title ? " " + info.title : "")),   // 例：🎬 動画 / 曲名 🥁🐔🚚⚔🎪🚛
                 el("span", "libSub", [m.artist || it.artist, m.album, srcLabel(it)].filter(Boolean).join(" · ")));
     if (it.charts) meta.append(el("i", "libTag", "📄"));
     if (it.shared) { const st = el("i", "libTag", "📤"); st.title = tr("libKeepShared"); meta.append(st); }   /* 💾 端末に残した共有の曲 */
@@ -1837,6 +1837,75 @@ async function addSongFiles(list) {
   renderLib();
   if (first) selectSong(first);
 }
+/* ---------- 🎬 動画ファイルとして読み込む ----------
+   ふつうの「＋ 曲ファイルを追加」は音も映像も同じ道を通るため、大きな動画だと
+   ・音声解析でファイルを丸ごとメモリに載せる（2GBなどは失敗・待たされる）
+   ・映像が間に合わず、音楽ファイルのように見えてしまう
+   ことがあります。こちらは「映像つき」として読み込みます：
+   ① <video> で最初のフレームまで待ち、videoWidth > 0 を確かめる（＝動画だと正確に分かる。ここが時間のかかる所）
+   ② 確かめられたものだけ 🎬 として記録する（大きいファイルの音声解析は media.js 側で省略）
+   ③ 読み込み後、そのまま全画面ビューア（🖥）で流す
+   ※ 端末が映像を解釈できない形式なら「音として読み込みました」と出します（無理に動かさない）。 */
+const VIDEO_EXT = ["mp4", "m4v", "mov", "webm", "mkv", "avi", "ogv", "3gp"];
+const VIDEO_PROBE_MS = 15000;   /* 最初のフレームを待つ上限 */
+function probeVideoFile(file) {
+  return new Promise(resolve => {
+    const el = document.createElement("video");
+    let url = "", done = false, timer = 0;
+    el.preload = "auto"; el.muted = true; el.setAttribute("playsinline", "");
+    const finish = ok => {
+      if (done) return; done = true;
+      clearTimeout(timer);
+      try { el.removeAttribute("src"); el.load(); } catch (_) {}
+      if (url) URL.revokeObjectURL(url);
+      resolve(!!ok);
+    };
+    const check = () => { if (el.videoWidth > 0 && el.videoHeight > 0) finish(true); };
+    const looksLikeAudio = !VIDEO_EXT.includes(extOf(file.name)) && !/^video\//i.test(file.type || "");
+    const meta = () => {   /* 映像が無いと分かる形（音声ファイル）なら、待たずに終える */
+      check();
+      if (!done && looksLikeAudio && el.videoWidth === 0 && el.readyState >= 1) finish(false);
+    };
+    el.addEventListener("loadedmetadata", meta);
+    el.addEventListener("loadeddata", check);
+    el.addEventListener("canplay", check);
+    el.addEventListener("playing", () => { try { el.pause(); } catch (_) {} check(); });
+    el.addEventListener("error", () => finish(false));
+    timer = setTimeout(() => finish(el.videoWidth > 0), VIDEO_PROBE_MS);
+    try { url = URL.createObjectURL(file); el.src = url; el.load(); } catch (_) { finish(false); }
+  });
+}
+async function addVideoFiles(list) {
+  const files = Array.from(list || []).filter(f => f && (VIDEO_EXT.includes(extOf(f.name)) || /^video\//i.test(f.type || "") || MEDIA_EXT.includes(extOf(f.name))));
+  if (!files.length) return;
+  let first = null;
+  setStatus("libStatus", "libVideoProbe");
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i], isVideo = await probeVideoFile(f);
+    if (files.length > 1) setStatus("libStatus", "libVideoProbeN", { i:i + 1, n:files.length, name:f.name });
+    const it = addedItem(f, isVideo), at = addedSongs.findIndex(x => x.key === it.key);
+    if (at >= 0) addedSongs.splice(at, 1);
+    addedSongs.unshift(it); first = first || it;
+    songDB.put(it.key, { key:it.key, file:f, name:f.name, addedAt:Date.now(), video:isVideo }).catch(() => {});
+    setStatus("libStatus", isVideo ? "libVideoYes" : "libVideoNo", { name:f.name });
+  }
+  while (addedSongs.length > ADDED_MAX) { const x = addedSongs.pop(); songDB.del(x.key).catch(() => {}); }
+  renderLib();
+  if (!first) return;
+  selectSong(first);
+  if (!first.video) return;
+  /* 映像の準備ができたら、そのまま全画面ビューアを開く（見たかった映画をすぐ見られるように） */
+  let waited = 0;
+  const openWhenReady = () => {
+    if (!window.TrkVideoMax || typeof window.TrkVideoMax.open !== "function") return;
+    if (typeof videoReady !== "undefined" && (videoReady || waited >= 8000)) {
+      try { if (window.TrkVideoMax.open()) setStatus("libStatus", "libVideoWatch"); } catch (_) {}
+      return;
+    }
+    waited += 300; setTimeout(openWhenReady, 300);
+  };
+  setTimeout(openWhenReady, 300);
+}
 function removeAdded(it) {
   addedSongs = addedSongs.filter(x => x.key !== it.key);
   songDB.del(it.key).catch(() => {});
@@ -2073,19 +2142,22 @@ on("studyCoverChanged", key => {
     if (currentSong === song) return setBackground(blob || song.bgBlob || null);
   }).catch(() => {});
 });
-on("language", () => { $("libSearch").placeholder = tr("libSearch"); showReconnect(); syncShareUI(); renderLib(); renderBanner(); });
+on("language", () => { $("libSearch").placeholder = tr("libSearch"); showReconnect(); syncShareUI(); renderLib(); renderBanner(); syncVideoButton(); });
+/* 🎬 「動画を読み込む」の説明（通常より時間がかかります）をボタンに付ける */
+function syncVideoButton() { const label = $("libVideoLabel"); if (label) label.title = tr("libAddVideoHint"); }
 
 /* ---------- 起動時（main.js から呼びます） ---------- */
 async function initLibrary() {
   $("libSort").value = settings.libSort;
   $("previewEnabled").checked = settings.previewEnabled;
   $("libSearch").placeholder = tr("libSearch");
+  syncVideoButton();
   renderBanner(); renderSeedTools();
   try {
     const recs = await songDB.all();
     addedSongs = recs.filter(r => r && r.file)
       .sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0))
-      .map(r => addedItem(r.file instanceof File ? r.file : new File([r.file], r.name || "song")));
+      .map(r => addedItem(r.file instanceof File ? r.file : new File([r.file], r.name || "song"), r.video));
   } catch (_) {}
   await refreshPackSongs();
   if (canPickDir) {

@@ -149,6 +149,11 @@
                 <input id="mediaFile" type="file" accept="video/*,audio/*" multiple hidden>
                 <span data-i18n="libAddFile"></span>
               </label>
+              <!-- 🎬 動画を読み込む：最初のフレームまで確かめて「映像つき」として記録し、そのまま全画面で流す -->
+              <label class="fileBtn small" id="libVideoLabel">
+                <input id="videoFile" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.mkv,.avi" multiple hidden>
+                <span data-i18n="libAddVideo"></span>
+              </label>
               <label class="fileBtn small">
                 <input id="songPackFile" type="file" accept=".stpack,.zip" hidden>
                 <span data-i18n="libAddPack"></span>

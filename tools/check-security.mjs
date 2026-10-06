@@ -221,6 +221,14 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   const swGuards = sw.includes("url.origin !== SCOPE.origin") && sw.includes('response.type === "basic"') &&
     sw.includes('request.method !== "GET"');
   rule(swGuards, "the service worker caches only same-origin, basic, GET responses");
+
+  const media = js["js/media.js"], library = js["js/library.js"];
+  rule(media.includes("const ANALYZE_MAX = 96 * 1024 * 1024") && media.includes('tooBig ? "analysisSkipped"') &&
+    !/file\.arrayBuffer\(\)[^\n]*\n[^\n]*ANALYZE/ .test(media),
+    "huge media is never read into memory: audio analysis is skipped above ANALYZE_MAX (a 2GB file used to be loaded whole)");
+  rule(library.includes("async function addVideoFiles") && library.includes("function probeVideoFile") &&
+    library.includes("el.videoWidth > 0 && el.videoHeight > 0") && library.includes("videoReady"),
+    "the 🎬 video import waits for a real first frame before marking an item as video, then opens the viewer");
 }
 
 /* ---------- 8. ファイルは読み取りだけ ---------- */

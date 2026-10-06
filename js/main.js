@@ -249,6 +249,8 @@ addEventListener("pointerdown", poke);
 /* ---------- 選曲画面 ---------- */
 $("language").addEventListener("change", () => { applyLanguage($("language").value); saveUserPrefs(); });
 $("mediaFile").addEventListener("change", e => { const fs = Array.from(e.target.files || []); e.target.value = ""; addSongFiles(fs); });
+/* 🎬 動画を読み込む：映像つきかどうかを確かめてから記録し、そのまま全画面で流す（library.js） */
+$("videoFile").addEventListener("change", e => { const fs = Array.from(e.target.files || []); e.target.value = ""; addVideoFiles(fs); });
 $("openSettingsBtn").addEventListener("click", openSettings);
 $("closeSettingsBtn").addEventListener("click", closeSettings);
 

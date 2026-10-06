@@ -1154,6 +1154,9 @@ function reducedMotion() {
 }
 
 const isSafe = () => (typeof safeModeOn !== "undefined" && safeModeOn) || (typeof window.TrkSafeMode === "function" && window.TrkSafeMode());
+/* 🪶 軽量化モード中は、音を見るアナライザーも描画も止める（設定の liteSpectrumOff で戻せます） */
+const liteOff = () => typeof TrkLite === "object" && TrkLite.specBlocked();
+const specLive = () => settings.specOn && !isSafe() && !liteOff();
 function onSelectScreen() { return (typeof screen === "undefined" ? "" : screen) === "select"; }
 function seeable(n) { return !!n && n.isConnected && n.clientWidth > 0 && n.clientHeight > 0 && !document.hidden; }
 function drawable(n) { return seeable(n) && (!GATES.has(n) || GATES.get(n)()); }
@@ -1165,13 +1168,13 @@ function tvOn() {
   return seeable(tvCanvas);
 }
 /* 表示したい場所があるか（アナライザーを作る判断にも使う） */
-function wantLive() { return settings.specOn && !isSafe() && (panelOn() || (tvCanvas && settings.specTv && onSelectScreen())); }
+function wantLive() { return specLive() && (panelOn() || (tvCanvas && settings.specTv && onSelectScreen())); }
 function clearOne(cv) { const g = cv.getContext && cv.getContext("2d"); if (g) { try { g.clearRect(0, 0, cv.width, cv.height); } catch (_) {} } }
 
 /* 「曲を再生すると動きます」／「このブラウザでは音を見られません」の1行 */
 const statusNodes = [];
 function updateStatus() {
-  const msg = !settings.specOn ? "" : specNoAudio ? tr("specNoAudio") : (an ? "" : tr("specIdle"));
+  const msg = !settings.specOn ? "" : liteOff() ? tr("specLiteOff") : specNoAudio ? tr("specNoAudio") : (an ? "" : tr("specIdle"));
   for (const n of statusNodes) if (n.textContent !== msg) n.textContent = msg;
 }
 
@@ -1179,7 +1182,7 @@ let lastIdle = 0;
 function frame(t) {
   raf = 0;
   let busy = false;
-  const on = settings.specOn && !isSafe();
+  const on = specLive();
   /* アナライザーは、ページで一度でも操作されたあと（ブラウザの音の制限）に、
      実際に音が鳴っているときだけ作る */
   if (on && !an && !specNoAudio && hadGesture && !video.paused) ensureAnalyser();
@@ -1198,7 +1201,9 @@ function frame(t) {
   }
   if (tv) busy = true;
   else if (tvCanvas && tvCanvas.isConnected && DIRTY.has(tvCanvas)) { clearOne(tvCanvas); DIRTY.delete(tvCanvas); }
-  if (!skip) {
+  /* 🪶 軽量化：描く回数も減らす（アナライザーは読み取るだけなので、音そのものには影響しません） */
+  const drawNow = !skip && (typeof TrkLite !== "object" || TrkLite.allow("spec", now));
+  if (drawNow) {
     for (const cv of all) { drawOne(cv, "panel", now); DIRTY.add(cv); }
     if (tv) { drawOne(tvCanvas, "tv", now); DIRTY.add(tvCanvas); }
     lastIdle = now;
@@ -1277,7 +1282,7 @@ function syncAll() {
 /* 📺 TVの画面に重ねるキャンバス（要るときだけ DOM に出す） */
 function syncTvCanvas() {
   const screenEl = document.querySelector("#tvDock .tvScreen");
-  const want = !!screenEl && settings.specOn && settings.specTv && !isSafe();
+  const want = !!screenEl && specLive() && settings.specTv;
   if (!want) { if (tvCanvas && tvCanvas.parentElement) tvCanvas.parentElement.removeChild(tvCanvas); return; }
   if (!tvCanvas) {
     tvCanvas = document.createElement("canvas");
@@ -1352,7 +1357,7 @@ function buildBannerSkin() {
   banner.append(skinTools);
 
   SYNCS.push(() => {
-    const live = settings.specOn && !isSafe();
+    const live = specLive();
     if (bannerHost) {
       bannerHost.classList.toggle("specSkin", !!settings.specSkin && live);
       bannerHost.classList.toggle("specOpen", !!settings.specSkin && !!settings.specSkinOpen && live);
@@ -1418,6 +1423,7 @@ addEventListener("DOMContentLoaded", () => {
   on("screen", () => syncAll());
   on("phase", () => syncAll());
   on("language", () => syncAll());
+  on("lite", () => syncAll());   /* 🪶 軽量化モードの切り替えで、バナーのスキンとアナライザーを合わせ直す */
   on("chart", () => syncAll());
   addEventListener("resize", kick);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) kick(); });
@@ -1452,7 +1458,7 @@ window.TrkSpec = Object.freeze({
   showTv: v => { settings.specTv = !!v; saveUserPrefs(); syncAll(); return settings.specTv; },
   analyser: () => an,
   request: () => ensureAnalyser(),
-  active: () => !!(settings.specOn && !isSafe() && (panelOn() || tvOn())),
+  active: () => !!(specLive() && (panelOn() || tvOn())),
   noAudio: () => specNoAudio,
   canvases: () => ({ panel: panelCanvases.slice(), tv: tvCanvas })
 });

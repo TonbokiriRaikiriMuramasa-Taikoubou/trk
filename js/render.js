@@ -471,13 +471,15 @@ function updateProgress() {
 function loop() {
   requestAnimationFrame(loop);
   if (phase === "title") return;
-  tickClock(); drawVideo();
+  tickClock();                                   // 🕹️ 無音検知・カウントダウンは毎フレーム動かす
   const now = gameTime();
   if (phase === "playing" && !settings.autoPlay) {
     if (settings.playMode === "truck") truckJudge(now);
     else if (settings.playMode === "catch") catchJudge(now);
   }
   if (phase === "playing") sweepMisses(now);   // AUTOの自動判定もここから（game.js）。ORBIT・STAGEは入力で判定
-  drawGame(now); updateProgress();
+  /* 🪶 軽量化：ここから下（描くところ）だけを間引く。判定は音声の時計なので、描く回数を減らしてもズレません */
+  if (typeof TrkLite === "object" && !TrkLite.allow("game", performance.now())) return;
+  drawVideo(); drawGame(now); updateProgress();
 }
 /* ✅ render.js 完了 */

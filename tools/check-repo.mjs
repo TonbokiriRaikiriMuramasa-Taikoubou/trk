@@ -539,6 +539,58 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else ok("frame interpolation is opt-in, WebGL2-only, offline, above the A-B loop box, in four languages");
 }
 
+// 🪶 Lite mode for phones / tablets / apps (js/lite.js): the settings panel in
+// the bottom-right of ⚙ settings, the auto probe, and the draw-only gates. The
+// important contract is that judging and the clock stay OUTSIDE the gate.
+{
+  const lite = read("js/lite.js");
+  const html = read("index.html");
+  const core = read("js/core.js");
+  const css = read("css/style.css");
+  const i18n = read("js/i18n.js");
+  const render = read("js/render.js");
+  const spectrum = read("js/spectrum.js");
+  const mmd = read("js/mmd.js");
+  const vrm = read("js/vrm.js");
+  const media = read("js/media-player-mode.js");
+  const tv = read("js/tv-dock.js");
+  const ids = ["litePanel", "liteMode", "liteFps", "liteMascot", "liteScale", "liteSpecOff", "liteFx", "liteBlur", "liteState", "liteDevice", "liteRecheckBtn"];
+  const settingsKeys = ["liteMode", "liteFps", "liteMascot", "liteScale", "liteSpectrumOff", "liteFx", "liteBlur"];
+  const wiringOk = ["window.TrkLite = Object.freeze({", "function liteActive()", "function liteProbe()", "liteBatteryProbe",
+    "navigator.connection", "deviceMemory", "liteGate(", "function litePixelRatio(", "liteBlurCap", "liteSpecBlocked",
+    "liteMascotAllow", "classList.toggle(\"trkLite\"", "classList.toggle(\"trkLiteFx\"", "classList.toggle(\"trkNoMascot\""]
+    .every(token => lite.includes(token));
+  const uiOk = ids.every(id => html.includes(`id="${id}"`) && (id === "litePanel" || lite.includes(`"${id}"`))) &&
+    html.includes('<script src="js/lite.js"></script>') &&
+    html.indexOf('<script src="js/lite.js"></script>') > html.indexOf('<script src="js/core.js"></script>') &&
+    settingsKeys.every(key => core.includes(`lite${key.slice(4)}: `) || core.includes(`${key}: `)) &&
+    core.includes("function resetLitePrefs()") && core.includes('["lite","light"].includes(r)') &&
+    core.includes('["lite","light"].includes(k)') && core.includes("resetLitePrefs();") &&
+    core.includes("TrkLite.blurCap") && tv.includes("TrkLite.blurCap") &&
+    css.includes("body.trkLiteFx") && css.includes("body.trkNoMascot #mmdCanvas") && css.includes("#litePanel.liteOn");
+  /* 判定・時計（tickClock／sweepMisses）は 🪶 ゲートより前にあること */
+  const gateAt = render.indexOf('TrkLite.allow("game"');
+  const gateOk = gateAt > 0 && gateAt > render.indexOf("tickClock();") && gateAt > render.indexOf("sweepMisses(now)") &&
+    gateAt > render.indexOf("truckJudge(now)") &&
+    spectrum.includes('TrkLite.allow("spec"') && spectrum.includes("const specLive = () => settings.specOn && !isSafe() && !liteOff();") &&
+    mmd.includes('TrkLite.mascotAllow("mmd"') && mmd.includes('TrkLite.noMascot("mmd")') &&
+    vrm.includes('TrkLite.mascotAllow("vrm"') && vrm.includes('TrkLite.noMascot("vrm")') &&
+    media.includes('TrkLite.allow("media"') && tv.includes('TrkLite.allow("tv"') && tv.includes('TrkLite.allow("tvCheck"') &&
+    read("js/video-max.js").includes("TrkLite.pixelRatio(2)") && read("js/synth-mode.js").includes("TrkLite.pixelRatio(2)");
+  const langKeys = ["secLite", "liteHint", "liteNote", "liteMode", "liteModeAuto", "liteModeOn", "liteModeOff", "liteFps",
+    "liteFps60", "liteFps30", "liteFps20", "liteMascot", "liteMascot60", "liteMascot30", "liteMascot15", "liteMascotOff",
+    "liteMascotOffNote", "liteScale", "liteScaleDevice", "liteScale15", "liteScale10", "liteSpecOff", "liteFx", "liteBlur",
+    "liteStateOn", "liteStateOff", "liteDevice", "liteCores", "liteMem", "liteApp", "liteBrowser", "liteBattery",
+    "liteWhyManual", "liteWhyOff", "liteWhySaveData", "liteWhyBattery", "liteWhyMotion", "liteWhyLow", "liteWhyAutoOff",
+    "liteWhyDesktop", "liteRecheck", "liteNowOn", "liteNowOff", "liteFpsSet", "liteMascotSet", "liteToast", "specLiteOff"];
+  const langOk = langKeys.every(key => (i18n.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4);
+  if (!wiringOk) fail("lite mode module (js/lite.js) is missing its probe / gates / body classes");
+  else if (!uiOk) fail("lite-mode settings panel, script order, defaults or reset path is incomplete");
+  else if (!gateOk) fail("lite-mode draw gates are missing (or the game clock/judging slipped behind the gate)");
+  else if (!langOk) fail("lite-mode strings are missing from one of the four languages");
+  else ok("lite mode (phones/apps): auto probe, bottom-right panel, draw-only gates in 4 languages");
+}
+
 // A cache name is deliberately checked for existence, not for a guessed
 // date, because the service worker is manually bumped for every release.
 const sw = read("sw.js");

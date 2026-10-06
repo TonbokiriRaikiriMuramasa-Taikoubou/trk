@@ -684,8 +684,10 @@ function drawMediaStage() {
 function mediaStageTick() {
   stageRaf = requestAnimationFrame(mediaStageTick);
   if (!mediaOpen || !stageWrap || stageWrap.hidden) return;
+  /* 🪶 軽量化：映像ステージを描く回数を減らす（音・再生位置・操作はそのまま） */
+  if (typeof TrkLite === "object" && !TrkLite.allow("media", performance.now())) return;
   if (!stageCtx) { try { stageCtx = stageCanvas.getContext("2d", { alpha: false }); } catch (_) { return; } }
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const dpr = typeof TrkLite === "object" ? TrkLite.pixelRatio(2) : Math.min(2, window.devicePixelRatio || 1);
   const cw = Math.max(2, Math.round((stageCanvas.clientWidth || 480) * dpr));
   const ch = Math.max(2, Math.round((stageCanvas.clientHeight || 270) * dpr));
   if (stageCanvas.width !== cw || stageCanvas.height !== ch) { stageCanvas.width = cw; stageCanvas.height = ch; }

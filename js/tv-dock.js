@@ -552,8 +552,11 @@ function newVideoFilter() {
   const parts = [];
   if (base.filter && base.filter !== "none") parts.push(base.filter);
   const dim = clampTvDim(settings.bgDim), blur = clampTvBlur(settings.bgBlur);
+  /* 🪶 軽量化モード中は、いちばん重い「ぼかし」を2pxまでに抑える（設定そのものは変えません） */
+  const cap = (typeof TrkLite === "object" && typeof TrkLite.blurCap === "function") ? TrkLite.blurCap() : 0;
+  const useBlur = cap ? Math.min(blur, cap) : blur;
   if (dim > 0) parts.push(`brightness(${(1 - dim).toFixed(2)})`);
-  if (blur > 0) parts.push(`blur(${blur}px)`);
+  if (useBlur > 0) parts.push(`blur(${useBlur}px)`);
   return parts.join(" ") || "none";
 }
 
@@ -1366,6 +1369,8 @@ addEventListener("DOMContentLoaded", () => {
   }
   function pvFrame() {
     pvRaf = requestAnimationFrame(pvFrame);
+    /* 🪶 軽量化：確認タブ（1920×1080の確認画面）も描く回数を減らす */
+    if (typeof TrkLite === "object" && !TrkLite.allow("tvCheck", performance.now())) return;
     const ctx = pvCanvas.getContext("2d"); if (!ctx) return;
     if (settings.videoStyle === "off") { pvPlaceholder(ctx, tr("tvpOff")); return; }
     if (!paintVideoFrame(ctx, 1920, 1080, "contain")) pvPlaceholder(ctx, tr("tvpNoVideo"));
@@ -1607,7 +1612,9 @@ addEventListener("DOMContentLoaded", () => {
     liveRaf = requestAnimationFrame(liveFrame);
     const w = liveCanvas.clientWidth, h = liveCanvas.clientHeight;
     if (!w || !h) return;
-    const dpr = Math.min(2, (typeof devicePixelRatio === "number" ? devicePixelRatio : 1));
+    /* 🪶 軽量化：ドックの画面を描く回数を減らす／描画解像度も抑える */
+    if (typeof TrkLite === "object" && !TrkLite.allow("tv", performance.now())) return;
+    const dpr = typeof TrkLite === "object" ? TrkLite.pixelRatio(2) : Math.min(2, (typeof devicePixelRatio === "number" ? devicePixelRatio : 1));
     const W = Math.max(2, Math.round(w * dpr)), H = Math.max(2, Math.round(h * dpr));
     if (liveCanvas.width !== W || liveCanvas.height !== H) { liveCanvas.width = W; liveCanvas.height = H; }
     const ctx = liveCanvas.getContext("2d"); if (!ctx) return;

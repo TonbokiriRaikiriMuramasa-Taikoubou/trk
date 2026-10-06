@@ -75,7 +75,7 @@ function frameCamera() {
 }
 function applyRect() {
   const R = vrmRect(), sc = Math.min(innerWidth / 1920, innerHeight / 1080);
-  const pr = Math.min(2, Math.max(0.5, (devicePixelRatio || 1) * sc));
+  const pr = Math.min(typeof TrkLite === "object" ? TrkLite.pixelRatio(2) : 2, Math.max(0.5, (devicePixelRatio || 1) * sc));   // 🪶 軽量化は描画解像度の上限
   const key = `${R.x},${R.y},${R.w},${R.h},${pr.toFixed(2)},${settings.vrmFrame}`;
   if (key === curKey) return;
   curKey = key;
@@ -259,10 +259,13 @@ function pose(now, dt) {
 /* ---------- 描画ループ（必要なときだけ描く） ---------- */
 function animate(now) {
   requestAnimationFrame(animate);
-  const playing = !!vrm && phase !== "title" && activeMascot() === "vrm";
+  /* 🪶 軽量化：3Dマスコットの描画レートを下げる／「描画しない」ときは何も描かない */
+  const mascotOff = typeof TrkLite === "object" && TrkLite.noMascot("vrm");
+  const playing = !!vrm && phase !== "title" && activeMascot() === "vrm" && !mascotOff;
   canvas.hidden = !playing;
-  const previewOn = !!vrm && phase === "title" && screen === "settings" && $("vrmPanel").open;
+  const previewOn = !!vrm && !mascotOff && phase === "title" && screen === "settings" && $("vrmPanel").open;
   if (!playing && !previewOn) { lastT = now; return; }
+  if (typeof TrkLite === "object" && !TrkLite.mascotAllow("vrm", now)) return;
   const dt = Math.min(0.1, Math.max(0.001, (now - lastT) / 1000)); lastT = now;
   applyRect(); pose(now, dt);
   renderer.render(scene, camera);

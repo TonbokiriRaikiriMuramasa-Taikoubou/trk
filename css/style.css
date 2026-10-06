@@ -290,6 +290,17 @@ details.panel[open]>summary{margin-bottom:14px}
   .bannerSongBtn{width:30px;height:42px;font-size:15px}
 }
 
+/* ===== 🪶 軽量化（スマホ・タブレット・アプリ向け。js/lite.js が body に付けます） =====
+   ・body.trkLite       … 軽量化モードが動いている（設定画面の目印・マスコットの描画レートなど）
+   ・body.trkLiteFx     … ぼかし・すりガラス（backdrop-filter）を使わない＝スマホのGPUで重いところ
+   ・body.trkNoMascot   … 3Dマスコットを描かないとき（MMD／VRMのキャンバスを隠す）            */
+body.trkLiteFx *,body.trkLiteFx *::before,body.trkLiteFx *::after{
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+body.trkNoMascot #mmdCanvas,body.trkNoMascot #mmdPreview,body.trkNoMascot #mmdQuickPreview,
+body.trkNoMascot #vrmCanvas,body.trkNoMascot #vrmPreview{display:none!important}
+#litePanel.liteOn>summary::after{content:"🪶 ON";margin-left:8px;font-size:12px;font-weight:800;color:var(--ui-accent)}
+.liteState{font-weight:800}
+
 /* ===== 9. プレイ記録 ===== */
 .recTop{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
 .recTop div{padding:8px 10px;border-radius:12px;background:var(--ui-field);border:1px solid var(--ui-border)}

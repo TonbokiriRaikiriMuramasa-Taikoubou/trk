@@ -971,6 +971,57 @@
             <summary id="favPanelSummary">⭐ お気に入り</summary>
             <div id="favPanelBody"></div>
           </details>
+          <!-- 🪶 軽量化（スマホ・タブレット・アプリ向け）: 配線は js/lite.js が行います -->
+          <details class="panel" id="litePanel">
+            <summary data-i18n="secLite"></summary>
+            <div class="hint" data-i18n="liteHint"></div>
+            <label class="field">
+              <span data-i18n="liteMode"></span>
+              <select id="liteMode">
+                <option value="auto" data-i18n="liteModeAuto"></option>
+                <option value="on" data-i18n="liteModeOn"></option>
+                <option value="off" data-i18n="liteModeOff"></option>
+              </select>
+            </label>
+            <div class="fields2">
+              <label class="field">
+                <span data-i18n="liteFps"></span>
+                <select id="liteFps">
+                  <option value="60" data-i18n="liteFps60"></option>
+                  <option value="30" data-i18n="liteFps30"></option>
+                  <option value="20" data-i18n="liteFps20"></option>
+                </select>
+              </label>
+              <label class="field">
+                <span data-i18n="liteMascot"></span>
+                <select id="liteMascot">
+                  <option value="60" data-i18n="liteMascot60"></option>
+                  <option value="30" data-i18n="liteMascot30"></option>
+                  <option value="15" data-i18n="liteMascot15"></option>
+                  <option value="off" data-i18n="liteMascotOff"></option>
+                </select>
+              </label>
+            </div>
+            <label class="field">
+              <span data-i18n="liteScale"></span>
+              <select id="liteScale">
+                <option value="device" data-i18n="liteScaleDevice"></option>
+                <option value="1.5" data-i18n="liteScale15"></option>
+                <option value="1" data-i18n="liteScale10"></option>
+              </select>
+            </label>
+            <label class="check"><input id="liteSpecOff" type="checkbox"><span data-i18n="liteSpecOff"></span></label>
+            <label class="check"><input id="liteFx" type="checkbox"><span data-i18n="liteFx"></span></label>
+            <label class="check"><input id="liteBlur" type="checkbox"><span data-i18n="liteBlur"></span></label>
+            <div class="hint" data-i18n="liteMascotOffNote"></div>
+            <div id="liteState" class="hint liteState"></div>
+            <div id="liteDevice" class="hint"></div>
+            <div class="miniActions">
+              <button id="liteRecheckBtn" type="button" data-i18n="liteRecheck"></button>
+            </div>
+            <div class="hint" data-i18n="liteNote"></div>
+          </details>
+
           <details class="panel" id="emergencyPanel">
             <summary>🛟 緊急復旧 / Emergency Recovery</summary>
             <div class="hint">
@@ -998,6 +1049,7 @@
                   <li><code>?reset=tv</code> / <code>?reset=video</code> — 映像・TV・ぼかし・TVスキンをデフォルトに（ノーツは保持）</li>
                   <li><code>?reset=audio</code> — 音量・SEをデフォルトに</li>
                   <li><code>?reset=notes</code> — ノーツ色・形をデフォルトに</li>
+                  <li><code>?reset=lite</code> — 🪶 軽量化の設定をデフォルトに</li>
                   <li><code>?reset=all</code> / <code>?factory</code> — 全設定を工場出荷状態に</li>
                   <li><code>?export=notes</code> / <code>?export=all</code> — 設定をJSONでダウンロード</li>
                   <li>コンソール: <code>trkReset('tv')</code>, <code>trkExport('notes')</code></li>
@@ -1383,6 +1435,8 @@
 <!-- ▲ 自作キャラのMODは、この下に <script src="js/characters/○○.js"></script> を足してください -->
 <!-- ===== 土台 ===== -->
 <script src="js/core.js"></script>
+<!-- 🪶 軽量化（スマホ・低出力端末向け。描画する側より前に読みます） -->
+<script src="js/lite.js"></script>
 <!-- player.js：AUTO・練習中の再生操作。各モードより先にキーを受け取るため、core.js のすぐ後 -->
 <script src="js/player.js"></script>
 <script src="js/media.js"></script>

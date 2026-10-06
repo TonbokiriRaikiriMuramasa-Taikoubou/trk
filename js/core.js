@@ -137,6 +137,15 @@ const settings = {
   bannerSongBtns: prefs.bannerSongBtns !== false,                            // ◀▶ バナー右端の曲送りボタン（初期オン）
   bannerRandomBtn: prefs.bannerRandomBtn !== false,                          // 🎲 バナー右端のおまかせボタン（初期オン）
   bannerRandomTap: prefs.bannerRandomTap === true,                           // 🎲 タップだけで変える（初期オフ＝長押し）
+  /* 🪶 軽量化（スマホ・タブレット・アプリ向け。読み込みは js/lite.js） */
+  liteMode: pick(prefs.liteMode, ["off", "auto", "on"], "auto"),             // 自動＝端末・省データ・電池を見て決める
+  liteFps: pick(prefs.liteFps, ["60", "30", "20"], "30"),                    // 描画のフレームレート上限
+  liteMascot: pick(prefs.liteMascot, ["60", "30", "15", "off"], "30"),       // 🩷 3Dマスコット（MMD／VRM）の描画レート
+  liteScale: pick(prefs.liteScale, ["device", "1.5", "1"], "1.5"),           // 描画解像度（devicePixelRatio）の上限
+  liteSpectrumOff: prefs.liteSpectrumOff !== false,                          // 📊 軽量化モード中はスペクトラムを止める
+  liteFx: prefs.liteFx !== false,                                            // 軽量化モード中はぼかし・すりガラスを減らす
+  liteBlur: prefs.liteBlur !== false,                                        // 軽量化モード中は映像のぼかしを最大2pxに
+  liteSeen: prefs.liteSeen === true,                                         // 📱 スマホ向けの初回案内を出したか
   /* 🎹 シンセ演奏モード */
   synthModeDisabled: !!prefs.synthModeDisabled,
   synthModeFastStart: !!prefs.synthModeFastStart,
@@ -263,6 +272,12 @@ function resetAudioPrefs() {
   if ("compEnabled" in settings) settings.compEnabled = false;
   try { if (typeof window._trkSyncSynthModeSettings === "function") window._trkSyncSynthModeSettings(); } catch (_) {}
 }
+function resetLitePrefs() {
+  /* 🪶 軽量化（js/lite.js）。?reset=lite と trkReset('lite') から呼びます */
+  settings.liteMode = "auto"; settings.liteFps = "30"; settings.liteMascot = "30"; settings.liteScale = "1.5";
+  settings.liteSpectrumOff = true; settings.liteFx = true; settings.liteBlur = true;
+  if (typeof liteSyncUI === "function") { try { liteSyncUI(); } catch (_) {} }
+}
 function resetNotesPrefs() {
   try {
     const def = (typeof NOTE_PRESETS !== "undefined" && NOTE_PRESETS.standard) ? NOTE_PRESETS.standard : null;
@@ -297,7 +312,8 @@ function enterSafeMode() {
   if (typeof view !== "undefined" && view) { try { view.style.filter = "none"; } catch(_) {} }
 }
 function resetAllPrefs() {
-  resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs();
+  resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs(); resetLitePrefs();
+  settings.liteSeen = false;   // 🪶 工場出荷状態では、スマホ向けの初回案内もやり直す
   settings.tvParamFavs = []; // a factory reset clears the separately preserved TV bookmarks too
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
@@ -350,11 +366,13 @@ function exportPrefs(kind) {
       if (["tv","video","screen"].includes(r)) { resetVideoPrefs(); didReset = "tv"; }
       else if (["audio","sound","volume"].includes(r)) { resetAudioPrefs(); didReset = "audio"; }
       else if (["notes","note"].includes(r)) { resetNotesPrefs(); didReset = "notes"; }
+      else if (["lite","light"].includes(r)) { resetLitePrefs(); didReset = "lite"; }
       else if (["all","factory","full"].includes(r)) { resetAllPrefs(); didReset = "all"; }
     } else if (hash.includes("#reset")) {
       // #reset 単体は tv リセット扱い
       if (hash.includes("audio") || hash.includes("sound")) { resetAudioPrefs(); didReset = "audio"; }
       else if (hash.includes("notes")) { resetNotesPrefs(); didReset = "notes"; }
+      else if (hash.includes("lite")) { resetLitePrefs(); didReset = "lite"; }
       else if (hash.includes("all")) { resetAllPrefs(); didReset = "all"; }
       else { resetVideoPrefs(); didReset = "tv"; }
     }
@@ -388,6 +406,7 @@ function exportPrefs(kind) {
           tv: "📺 映像・TV設定を初期化しました（?reset=tv）",
           audio: "🔊 音量・SE設定を初期化しました（?reset=audio）",
           notes: "🎨 ノーツ設定を初期化しました（?reset=notes）",
+          lite: "🪶 軽量化の設定を初期化しました（?reset=lite）",
           all: "♻️ 全設定を初期化しました（?reset=all）"
         }[didReset] || `リセットしました: ${didReset}`;
         // 既存のcaptionシステムがあれば使う、なければalert風div
@@ -402,7 +421,7 @@ function exportPrefs(kind) {
     // グローバルからも手動で呼べるように公開
     window.trkReset = (k="tv") => {
       k = String(k).toLowerCase();
-      if (k==="safe") enterSafeMode(); else if (["tv","video"].includes(k)) resetVideoPrefs(); else if (["audio","sound"].includes(k)) resetAudioPrefs(); else if (k==="notes") resetNotesPrefs(); else if (["all","factory"].includes(k)) resetAllPrefs(); else resetVideoPrefs();
+      if (k==="safe") enterSafeMode(); else if (["tv","video"].includes(k)) resetVideoPrefs(); else if (["audio","sound"].includes(k)) resetAudioPrefs(); else if (k==="notes") resetNotesPrefs(); else if (["lite","light"].includes(k)) resetLitePrefs(); else if (["all","factory"].includes(k)) resetAllPrefs(); else resetVideoPrefs();
       saveUserPrefs(); location.reload();
     };
     window.trkExport = (k="all") => exportPrefs(String(k).toLowerCase());
@@ -635,8 +654,11 @@ function videoFilter() {
   const base = { color:"none", mono:"grayscale(1) contrast(1.6)", dim:"brightness(.42) saturate(.85)" }[settings.videoStyle] ?? (skin().video || "none");
   const parts = base && base !== "none" ? [base] : [];
   const dim = clampTvDim(settings.bgDim), blur = clampTvBlur(settings.bgBlur);
+  /* 🪶 軽量化モード中は、いちばん重い「ぼかし」を2pxまでに抑える（設定そのものは変えません） */
+  const cap = (typeof window.TrkLite === "object" && window.TrkLite && typeof window.TrkLite.blurCap === "function") ? window.TrkLite.blurCap() : 0;
+  const useBlur = cap ? Math.min(blur, cap) : blur;
   if (dim > 0) parts.push(`brightness(${(1 - dim).toFixed(2)})`);
-  if (blur > 0) parts.push(`blur(${blur}px)`);
+  if (useBlur > 0) parts.push(`blur(${useBlur}px)`);
   return parts.join(" ") || "none";
 }
 function applyNoteVars() {

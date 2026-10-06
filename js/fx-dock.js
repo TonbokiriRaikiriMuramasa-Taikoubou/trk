@@ -36,6 +36,7 @@ const FAV_MAX = 0, TEMP_ID = "__chart", LONG_MS = 600;   /* 0＝上限なし（�
 settings.fxDockSkin = pick(prefs.fxDockSkin, Object.keys(DOCK_SKINS), "standard");
 settings.fxDockFive = !!prefs.fxDockFive;
 settings.fxDockOpen = prefs.fxDockOpen === true;      // くわしい欄は最初は閉じる
+settings.ampOpen = prefs.ampOpen === true;            // 🔥 TRKアンプの欄も最初は閉じる
 settings.castPolicy = pick(settings.castPolicy, ["off", "antenna"], "off");
 settings.backgroundPolicy = pick(settings.backgroundPolicy, ["off", "antenna", "corner"], settings.castPolicy === "antenna" ? "antenna" : "off");
 settings.fxAntenna = settings.backgroundPolicy === "off" ? false : !!prefs.fxAntenna;
@@ -158,7 +159,20 @@ Object.assign(TEXT.ja, {
   dockAntCustomOn:"ONの画像", dockAntCustomOff:"OFFの画像", dockAntCustomClear:"画像を消す", dockAntCustomNg:"画像を読み込めませんでした", dockAntCustomCleared:"ON／OFFの画像を消しました",
   dockAntCustomHint:"2枚の画像は端末内にだけ保存されます（設定を初期化すると消えます）。ONの画像＝アンテナが立っているとき、OFFの画像＝眠っているとき。大きい画像は自動で小さくします。",
   dockLockChain:"🔒 パラメーターのランダムでは、プリセットの中身を変えない（EQだけ）", dockLockHint:"🔒 を付けたEQは、ランダムでも動きません",
-  dockAntHint:"アンテナを立てると、アプリを裏にしたり画面を消したりしても再生を続けます（選曲中のプレビュー・ラジオの待ち時間・AUTO中）。自分で遊んでいる最中は、記録を守るため今までどおり一時停止します。裏にしている間は、ビートに合わせて動くエフェクトと画面の動きが止まり、カウントダウンは省きます。ロック画面や通知から 再生・一時停止・次の曲 を操作できます。端末の省電力設定によっては止まることがあります。"
+  dockAntHint:"アンテナを立てると、アプリを裏にしたり画面を消したりしても再生を続けます（選曲中のプレビュー・ラジオの待ち時間・AUTO中）。自分で遊んでいる最中は、記録を守るため今までどおり一時停止します。裏にしている間は、ビートに合わせて動くエフェクトと画面の動きが止まり、カウントダウンは省きます。ロック画面や通知から 再生・一時停止・次の曲 を操作できます。端末の省電力設定によっては止まることがあります。",
+  /* 🔥 TRKアンプ（エフェクターラックを、左下から直接さわる） */
+  ampTitle:"🔥 TRKアンプを使う",
+  ampHint:"ポータブルアンプを段で積む「エフェクターラック」を、ここから直接さわれます（最大8段）。段はプリセットの後ろに重なります。",
+  ampUse:"TRKアンプを使う（段を重ねる）",
+  ampStateOn:"🔥 オン・{n}段", ampStateOff:"オフ・{n}段（段はそのまま残ります）",
+  ampEmpty:"まだ段がありません。「TRKアンプを使う」を入れると標準の段を組みます。",
+  ampStacksLabel:"ワンタップで段を組む",
+  ampStackTrk:"🔥 TRKアンプ（標準）", ampStackWarm:"🍯 あたたか", ampStackRadio:"📻 ラジカセ", ampStackClean:"🧹 クリーン",
+  ampStackSet:"🔥 {name}：{n}段を組みました", ampOnMsg:"🔥 TRKアンプ ON（{n}段）", ampOffMsg:"🔥 TRKアンプ OFF（段はそのまま）",
+  ampCleared:"段を全部外しました", ampFull:"ラックは8段までです。",
+  ampStageAdd:"＋ 段を追加", ampClear:"✕ 全部外す",
+  ampMore:"🎛 段をくわしく調整（設定を開く）",
+  ampAdjustHint:"段のつまみ（しきい値・周波数など）は、設定の「🎚 エフェクターラック（段で重ねる）」で調整できます。アンプを切っても、プリセットの音はそのまま残ります。"
 });
 Object.assign(TEXT.en, {
   dockTitle:"🎛 More (EQ, skin, menu)", dockFavLabel:"⭐ Favorites that don't fit on the buttons",
@@ -182,7 +196,20 @@ Object.assign(TEXT.en, {
   dockAntCustomOn:"ON image", dockAntCustomOff:"OFF image", dockAntCustomClear:"Remove images", dockAntCustomNg:"Couldn't load that image", dockAntCustomCleared:"ON/OFF images removed",
   dockAntCustomHint:"The two images are stored on your device only (cleared when settings are reset). ON image = antenna up, OFF image = asleep. Larger images are scaled down automatically.",
   dockLockChain:"🔒 Parameter random keeps the preset itself (EQ only)", dockLockHint:"EQ bands marked 🔒 don't move when randomizing",
-  dockAntHint:"With the antenna up, playback continues when the app is in the background or the screen is off (song previews, the radio wait, and AUTO). While you're playing yourself, it still pauses to protect your records. In the background, beat-synced effects and animations stop and the countdown is skipped. You can play/pause/skip from the lock screen or notification. Some devices' battery savers may still stop it."
+  dockAntHint:"With the antenna up, playback continues when the app is in the background or the screen is off (song previews, the radio wait, and AUTO). While you're playing yourself, it still pauses to protect your records. In the background, beat-synced effects and animations stop and the countdown is skipped. You can play/pause/skip from the lock screen or notification. Some devices' battery savers may still stop it.",
+  /* 🔥 TRK amp (reach the effect rack right from the bottom-left) */
+  ampTitle:"🔥 Use the TRK amp",
+  ampHint:"The layered “effect rack” — stacking stages like a portable amp — is right here (up to 8 stages). The stages stack after the preset.",
+  ampUse:"Use the TRK amp (stack stages)",
+  ampStateOn:"🔥 On · {n} stages", ampStateOff:"Off · {n} stages (kept as they are)",
+  ampEmpty:"No stages yet. Turning the TRK amp on builds the standard stack.",
+  ampStacksLabel:"Build a stack in one tap",
+  ampStackTrk:"🔥 TRK amp (standard)", ampStackWarm:"🍯 Warm", ampStackRadio:"📻 Boombox", ampStackClean:"🧹 Clean",
+  ampStackSet:"🔥 {name}: {n} stages built", ampOnMsg:"🔥 TRK amp ON ({n} stages)", ampOffMsg:"🔥 TRK amp OFF (stages kept)",
+  ampCleared:"Removed every stage", ampFull:"The rack holds up to 8 stages.",
+  ampStageAdd:"＋ Add stage", ampClear:"✕ Remove all",
+  ampMore:"🎛 Fine-tune the stages (open settings)",
+  ampAdjustHint:"Stage knobs (thresholds, frequencies…) live in Settings → 🎚 Effect rack (stack your own). Turning the amp off keeps your preset sound."
 });
 Object.assign(TEXT.zh, {
   dockTitle:"🎛 详细（均衡器・皮肤・菜单）", dockFavLabel:"⭐ 按钮放不下的收藏",
@@ -205,7 +232,20 @@ Object.assign(TEXT.zh, {
   dockAntCustomOn:"ON的图片", dockAntCustomOff:"OFF的图片", dockAntCustomClear:"删除图片", dockAntCustomNg:"无法读取该图片", dockAntCustomCleared:"已删除ON／OFF图片",
   dockAntCustomHint:"两张图片只保存在设备内（初始化设置后会消失）。ON图＝天线立起时，OFF图＝睡着时。过大的图片会自动缩小。",
   dockLockChain:"🔒 参数随机时不改变预设本身（只改均衡器）", dockLockHint:"标记 🔒 的均衡器在随机时不会变化",
-  dockAntHint:"竖起天线后，切到后台或关闭屏幕也会继续播放（选曲试听・电台等待・AUTO中）。自己游玩时为了保护记录，仍会照常暂停。后台期间，随节拍变化的音效和画面动画会停止，倒计时会省略。可以在锁屏或通知中播放・暂停・切到下一首。部分设备的省电设置仍可能停止播放。"
+  dockAntHint:"竖起天线后，切到后台或关闭屏幕也会继续播放（选曲试听・电台等待・AUTO中）。自己游玩时为了保护记录，仍会照常暂停。后台期间，随节拍变化的音效和画面动画会停止，倒计时会省略。可以在锁屏或通知中播放・暂停・切到下一首。部分设备的省电设置仍可能停止播放。",
+  /* 🔥 TRK 功放（在左下角直接操作效果机架） */
+  ampTitle:"🔥 使用 TRK 功放",
+  ampHint:"在这里直接操作“像多段便携功放一样叠段”的效果机架（最多8段）。段会叠加在预设之后。",
+  ampUse:"使用 TRK 功放（叠加段）",
+  ampStateOn:"🔥 开 · {n} 段", ampStateOff:"关 · {n} 段（段会保留）",
+  ampEmpty:"还没有段。打开“使用 TRK 功放”会组好标准段。",
+  ampStacksLabel:"一键组段",
+  ampStackTrk:"🔥 TRK 功放（标准）", ampStackWarm:"🍯 温暖", ampStackRadio:"📻 收录机", ampStackClean:"🧹 清爽",
+  ampStackSet:"🔥 {name}：已组 {n} 段", ampOnMsg:"🔥 TRK 功放 开（{n} 段）", ampOffMsg:"🔥 TRK 功放 关（段保留）",
+  ampCleared:"已移除全部段", ampFull:"机架最多8段。",
+  ampStageAdd:"＋ 添加一段", ampClear:"✕ 全部移除",
+  ampMore:"🎛 细致调整段（打开设置）",
+  ampAdjustHint:"段的旋钮（阈值、频率等）在设置的“🎚 效果器机架（分段叠加）”里调整。关闭功放不会改变预设的音色。"
 });
 Object.assign(TEXT.ko, {
   dockTitle:"🎛 자세히 (EQ・스킨・메뉴)", dockFavLabel:"⭐ 버튼에 다 들어가지 않는 즐겨찾기",
@@ -228,7 +268,20 @@ Object.assign(TEXT.ko, {
   dockAntCustomOn:"ON 이미지", dockAntCustomOff:"OFF 이미지", dockAntCustomClear:"이미지 삭제", dockAntCustomNg:"이미지를 읽지 못했습니다", dockAntCustomCleared:"ON/OFF 이미지를 삭제했습니다",
   dockAntCustomHint:"두 장의 이미지는 기기에만 저장됩니다(설정 초기화로 사라집니다). ON 이미지 = 안테나가 서 있을 때, OFF 이미지 = 잠들어 있을 때. 큰 이미지는 자동으로 줄입니다.",
   dockLockChain:"🔒 파라미터 랜덤에서 프리셋 자체는 바꾸지 않기 (EQ만)", dockLockHint:"🔒 표시한 EQ는 랜덤에서도 움직이지 않습니다",
-  dockAntHint:"안테나를 세우면 앱을 백그라운드로 보내거나 화면을 꺼도 계속 재생합니다 (곡 선택 미리듣기・라디오 대기・AUTO 중). 직접 플레이하는 중에는 기록을 지키기 위해 지금처럼 일시정지합니다. 백그라운드에서는 비트에 맞춰 움직이는 이펙트와 화면 애니메이션이 멈추고, 카운트다운은 생략합니다. 잠금 화면이나 알림에서 재생・일시정지・다음 곡을 조작할 수 있습니다. 기기의 절전 설정에 따라 멈출 수도 있습니다."
+  dockAntHint:"안테나를 세우면 앱을 백그라운드로 보내거나 화면을 꺼도 계속 재생합니다 (곡 선택 미리듣기・라디오 대기・AUTO 중). 직접 플레이하는 중에는 기록을 지키기 위해 지금처럼 일시정지합니다. 백그라운드에서는 비트에 맞춰 움직이는 이펙트와 화면 애니메이션이 멈추고, 카운트다운은 생략합니다. 잠금 화면이나 알림에서 재생・일시정지・다음 곡을 조작할 수 있습니다. 기기의 절전 설정에 따라 멈출 수도 있습니다.",
+  /* 🔥 TRK 앰프 (왼쪽 아래에서 이펙터 랙을 바로 만지기) */
+  ampTitle:"🔥 TRK 앰프 사용",
+  ampHint:"휴대용 앰프처럼 단을 쌓는 ‘이펙터 랙’을 여기서 바로 만질 수 있어요 (최대 8단). 단은 프리셋 뒤에 겹쳐져요.",
+  ampUse:"TRK 앰프 사용 (단 쌓기)",
+  ampStateOn:"🔥 켜짐 · {n}단", ampStateOff:"꺼짐 · {n}단 (단은 그대로)",
+  ampEmpty:"아직 단이 없어요. ‘TRK 앰프 사용’을 켜면 표준 단을 만들어요.",
+  ampStacksLabel:"한 번에 단 구성하기",
+  ampStackTrk:"🔥 TRK 앰프 (표준)", ampStackWarm:"🍯 따뜻하게", ampStackRadio:"📻 카세트 라디오", ampStackClean:"🧹 클린",
+  ampStackSet:"🔥 {name}: {n}단을 구성했어요", ampOnMsg:"🔥 TRK 앰프 ON ({n}단)", ampOffMsg:"🔥 TRK 앰프 OFF (단은 그대로)",
+  ampCleared:"모든 단을 뺐어요", ampFull:"랙은 최대 8단이에요.",
+  ampStageAdd:"＋ 단 추가", ampClear:"✕ 전부 빼기",
+  ampMore:"🎛 단을 자세히 조정 (설정 열기)",
+  ampAdjustHint:"단의 노브(임계값・주파수 등)는 설정의 ‘🎚 이펙터 랙 (단으로 쌓기)’에서 조정해요. 앰프를 꺼도 프리셋 소리는 그대로예요."
 });
 
 /* ============ 📡 アンテナ：バックグラウンド再生 ============
@@ -505,8 +558,156 @@ addEventListener("DOMContentLoaded", () => {
   body.append(tx("summary", "dockTitle"), quick, eqBox, tx("div", "dockLockHint", "hint"), lockChain.lab,
     skinRow, five.lab, backgroundRow, backgroundHint, castRow, castHint, antShapeRow, antCustomRow, tx("div", "dockAntCharHint", "hint"), antCheck.lab, tx("div", "dockAntHint", "hint"), more);
 
+  /* ============ 🔥 TRKアンプ（左下・「くわしく」の下の独立カテゴリー） ============
+     ポータブルアンプを段で積むエフェクターラック（fx.js）を、ここから直接さわる。
+     ここはオン／オフ・組み方・並べ替え。つまみ（しきい値など）は設定の
+     「🎚 エフェクターラック（段で重ねる）」＝#fxPanel で調整する。 */
+  const AMP_MAX = 8;                                  /* fx.js の RACK_MAX と合わせる */
+  const AMP_STACKS = {
+    trk:   { label:"ampStackTrk",   stages:[
+      { type:"gate", threshold:-58, floor:-34, attack:2, release:120 },
+      { type:"exciter", freq:3200, amount:.28, mix:.4 },
+      { type:"comp", threshold:-20, ratio:2.5, attack:.015, release:.3, knee:14, makeup:3 },
+      { type:"gain", db:-1 }] },
+    warm:  { label:"ampStackWarm",  stages:[
+      { type:"exciter", freq:2600, amount:.32, mix:.45 },
+      { type:"comp", threshold:-22, ratio:2.5, attack:.02, release:.3, knee:14, makeup:2.5 },
+      { type:"gain", db:-1 }] },
+    radio: { label:"ampStackRadio", stages:[
+      { type:"comp", threshold:-30, ratio:6, attack:.005, release:.2, knee:8, makeup:4 },
+      { type:"dynEQ", freq:3200, q:1.1, threshold:-38, range:7, attack:2, release:120 },
+      { type:"gain", db:-2.5 }] },
+    clean: { label:"ampStackClean", stages:[
+      { type:"gate", threshold:-52, floor:-28, attack:1.5, release:120 },
+      { type:"denoise", amount:10 },
+      { type:"comp", threshold:-20, ratio:3, attack:.01, release:.25, knee:10, makeup:2 }] }
+  };
+  const amp = el("details", "panel dockAmp"); amp.id = "ampPanel";
+  amp.open = settings.ampOpen;
+  amp.addEventListener("toggle", () => { settings.ampOpen = amp.open; saveUserPrefs(); if (amp.open) renderAmp(); });
+  const ampUseLab = el("label", "check"), ampUseInp = document.createElement("input");
+  ampUseInp.type = "checkbox"; ampUseLab.append(ampUseInp, tx("span", "ampUse"));
+  const ampState = el("div", "hint status"); ampState.id = "ampState";
+  const ampStacks = el("div", "seg ampStacks"); ampStacks.id = "ampStacks";
+  const ampStages = el("div", "ampStages");
+  const ampRow = el("div", "miniActions");
+  const ampSel = document.createElement("select"); ampSel.className = "fxQuickSelect";
+  const ampAdd = tx("button", "ampStageAdd", "fxMini"); ampAdd.type = "button";
+  const ampClearBtn = tx("button", "ampClear", "fxMini"); ampClearBtn.type = "button";
+  const ampMore = tx("button", "ampMore", "fxMini"); ampMore.type = "button";
+  ampRow.append(ampSel, ampAdd, ampClearBtn);
+  amp.append(tx("summary", "ampTitle"), tx("div", "ampHint", "hint"), ampUseLab, ampState,
+    tx("div", "ampStacksLabel", "hint"), ampStacks, ampStages, ampRow, ampMore, tx("div", "ampAdjustHint", "hint"));
+  for (const [id, st] of Object.entries(AMP_STACKS)) {
+    const b = tx("button", st.label); b.type = "button"; b.dataset.ampstack = id; ampStacks.append(b);
+  }
+  const ampMini = (txt, fn) => {
+    const b = el("button", "fxMini"); b.type = "button"; b.textContent = txt;
+    b.addEventListener("click", fn); return b;
+  };
+  const ampTypeList = () => (window.TrkFX && typeof TrkFX.rackTypes === "function" ? TrkFX.rackTypes() : []);
+  const ampMetaOf = type => ampTypeList().find(t => t.type === type) || { icon:"🎚", name:type };
+  /* 名前（sfxType…）には絵文字が入っているので、二重にしない */
+  const ampLabel = m => (m.name && m.icon && m.name.indexOf(m.icon) >= 0) ? m.name : (m.icon + " " + m.name);
+  function ampBuildTypes() {
+    ampSel.textContent = "";
+    for (const t of ampTypeList()) ampSel.append(new Option(ampLabel(t), t.type));
+  }
+  function renderAmp() {
+    const F = window.TrkFX;
+    if (!F || typeof F.rack !== "function") { amp.hidden = true; return; }
+    const info = F.rack(), list = Array.isArray(info.list) ? info.list : [];
+    ampUseInp.checked = !!info.on;
+    ampState.textContent = list.length ? tr(info.on ? "ampStateOn" : "ampStateOff", { n:list.length }) : tr("ampEmpty");
+    ampState.classList.toggle("on", !!info.on && list.length > 0);
+    ampStages.textContent = "";
+    const types = list.map(f => f.type).join();
+    list.forEach((f, i) => {
+      const meta = ampMetaOf(f.type);
+      const chip = el("div", "ampStage");
+      chip.append(el("span", "ampName", ampLabel(meta)));
+      const up = ampMini("↑", () => ampMove(i, -1));
+      const dn = ampMini("↓", () => ampMove(i, 1));
+      const rm = ampMini("✕", () => {
+        F.rackSet(list.filter((_, j) => j !== i));
+        ampFlash(F.rack().list.length ? "ampStateOn" : "ampCleared", F);
+        renderAmp();
+      });
+      up.title = tr("sfxRackUp"); dn.title = tr("sfxRackDown"); rm.title = tr("sfxRackRemove");
+      up.disabled = i === 0; dn.disabled = i === list.length - 1;
+      chip.append(up, dn, rm);
+      ampStages.append(chip);
+    });
+    for (const b of ampStacks.querySelectorAll("button[data-ampstack]")) {
+      const st = AMP_STACKS[b.dataset.ampstack];
+      b.classList.toggle("selected", !!st && st.stages.map(x => x.type).join() === types);
+    }
+    ampAdd.disabled = list.length >= AMP_MAX;
+  }
+  const ampFlash = (key, F, vars) => {
+    const n = F && F.rack ? F.rack().list.length : 0;
+    lcdFlash(tr(key, { n, ...(vars || {}) }));
+  };
+  function ampMove(i, dir) {
+    const list = TrkFX.rack().list.slice(), j = i + dir;
+    if (j < 0 || j >= list.length) return;
+    const [x] = list.splice(i, 1); list.splice(j, 0, x);
+    TrkFX.rackSet(list); renderAmp();
+  }
+  ampUseInp.addEventListener("change", () => {
+    const F = TrkFX;
+    if (ampUseInp.checked && !F.rack().list.length) {
+      F.rackSet(AMP_STACKS.trk.stages.map(x => ({ ...x })));      // 空なら標準の段を組む
+      F.rackOn(true);
+      ampFlash("ampOnMsg", F);
+    } else {
+      F.rackOn(ampUseInp.checked);
+      ampFlash(ampUseInp.checked ? "ampOnMsg" : "ampOffMsg", F);
+    }
+    renderAmp(); render();
+  });
+  for (const b of ampStacks.querySelectorAll("button[data-ampstack]")) b.addEventListener("click", () => {
+    const st = AMP_STACKS[b.dataset.ampstack]; if (!st) return;
+    TrkFX.rackSet(st.stages.map(x => ({ ...x })));
+    TrkFX.rackOn(true);
+    lcdFlash(tr("ampStackSet", { name:tr(st.label), n:TrkFX.rack().list.length }));
+    renderAmp(); render();
+  });
+  ampAdd.addEventListener("click", () => {
+    const n = TrkFX.rackAdd(ampSel.value);
+    if (n < 0) { lcdFlash(tr("ampFull")); return; }
+    TrkFX.rackOn(true);
+    ampFlash("ampOnMsg", TrkFX);
+    renderAmp(); render();
+  });
+  ampClearBtn.addEventListener("click", () => { TrkFX.rackClear(); lcdFlash(tr("ampCleared")); renderAmp(); render(); });
+  ampMore.addEventListener("click", () => {
+    openSettings(); full.open = true;
+    const head = full.querySelector('[data-i18n="sfxRackTitle"]');
+    setTimeout(() => { try { (head || full).scrollIntoView({ behavior:"smooth", block:"center" }); } catch (_) {} }, 60);
+  });
+  ampBuildTypes(); renderAmp();
+  if (typeof on === "function") { on("fxRack", renderAmp); on("language", () => { ampBuildTypes(); renderAmp(); }); }
+
   dock.append(dev, favChips, overLabel, overflow, body);
   col.append(dock);
+
+  /* 🔥 TRKアンプは「くわし」の直下（列のいちばん下）に置く独立カテゴリー。
+     tv-dock.js が .songCol を並べ替える（くわしを列の下へ出す）ので、
+     置き場所は「くわしの次の要素」を守り続ける：組み立て直後・次のタスク・
+     列の並べ替え（MutationObserver）の3回そろえて合わせる。 */
+  const ampOwner = () => col.querySelector(":scope > details.dockMore");
+  const placeAmp = () => {
+    const owner = ampOwner();
+    if (owner && owner.nextElementSibling !== amp) owner.after(amp);
+    else if (!owner && amp.parentElement !== col) col.append(amp);
+  };
+  if (!amp.parentElement) col.append(amp);
+  placeAmp();
+  setTimeout(placeAmp, 0);
+  if (typeof MutationObserver === "function") {
+    try { new MutationObserver(placeAmp).observe(col, { childList:true }); } catch (_) {}
+  }
 
   /* ---- 液晶の一時メッセージ ---- */
   let flash = null;

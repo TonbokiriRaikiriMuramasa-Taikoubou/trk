@@ -265,6 +265,7 @@ const gameplayFxPower = () => settings.fxPower * gameplayFxMultiplier();
      ?reset=tv / ?reset=video         → 映像・TVまわりだけデフォルトに戻す
      ?reset=audio / ?reset=sound      → 音量・SEをデフォルトに戻す
      ?reset=notes                     → ノーツ色・形をデフォルトに戻す（確認あり）
+     ?reset=amp / ?reset=rack         → 🔥 TRKアンプ（🎚 エフェクターラック）を空に戻す
      ?reset=all / ?factory            → 全設定リセット（ノーツも含む）
      ?export=notes / ?export=all      → 設定をJSONでダウンロード
    ノーツ設定は細かく詰める人が多いので、tv/audioリセットでは保持される。 */
@@ -311,6 +312,27 @@ function resetNotesPrefs() {
     applyNoteVars();
   } catch(_) { settings.notes = sanitizeNotes(null); }
 }
+/* 🔥 TRKアンプ（🎚 エフェクターラック・js/fx.js。左下の独立カテゴリー）のリセット。
+   fx.js は core.js よりあとに読み込まれるので、読み込み時点では settings.fx… がまだ無い。
+   そのため一度きりの合図を残し、fx.js が読み込み時に拾って片づける
+   （"clear"＝段を空にする／"off"＝段はそのまま止める）。すでに読み込まれているときは、その場でも外す。 */
+const AMP_RESET_KEY = "trk_amp_reset_once";
+function markAmpReset(mode) { try { sessionStorage.setItem(AMP_RESET_KEY, mode); } catch (_) {} }
+function takeAmpReset() {
+  try {
+    const m = sessionStorage.getItem(AMP_RESET_KEY);
+    sessionStorage.removeItem(AMP_RESET_KEY);
+    return m === "clear" || m === "off" ? m : "";
+  } catch (_) { return ""; }
+}
+function resetAmpPrefs() {
+  if ("fxRack" in settings) settings.fxRack = [];
+  if ("fxRackOn" in settings) settings.fxRackOn = false;
+  settings.ampOpen = false;
+  markAmpReset("clear");
+  try { if (window.TrkFX && typeof TrkFX.rackClear === "function") { TrkFX.rackClear(); TrkFX.rackOn(false); } } catch (_) {}
+}
+
 /* セーフモードに入ったかどうか（?safe=1 / ?factory で入る）。
    アドオン（js/addons.js）など、あとから来る機能は、これを見て「読み込まない」を決めます。
    URLは処理のあと掃除されるので、印を残しておく必要があります。 */
@@ -333,6 +355,9 @@ function enterSafeMode() {
   settings.synthModeWideKeyboard = false;
   settings.libKeepShared = false;        // 📤 セーフモードでは、端末に残した共有の曲も読み戻さない
   settings.fxPower = 0; settings.gameFxMode = "off"; settings.hideGameplayUI = false;
+  /* 🔥 TRKアンプも安全側へ（段は消さず、止めるだけ。fx.js が読み込み時に拾う） */
+  if ("fxRackOn" in settings) settings.fxRackOn = false;
+  markAmpReset("off");
   if (settings.mascot === "mmd") settings.mascot = "skin";     // 🩷 セーフモードでは MMD を使わない
   if (typeof view !== "undefined" && view) { try { view.style.filter = "none"; } catch(_) {} }
 }
@@ -346,7 +371,7 @@ function resetKeysPrefs() {
   settings.padConfirm = PAD_DEFAULTS.confirm; settings.padBack = PAD_DEFAULTS.back; settings.padPause = PAD_DEFAULTS.pause;
 }
 function resetAllPrefs() {
-  resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs(); resetLitePrefs(); resetKeysPrefs();
+  resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs(); resetLitePrefs(); resetKeysPrefs(); resetAmpPrefs();
   settings.liteSeen = false;   // 🪶 工場出荷状態では、スマホ向けの初回案内もやり直す
   settings.tvParamFavs = []; // a factory reset clears the separately preserved TV bookmarks too
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
@@ -402,6 +427,7 @@ function exportPrefs(kind) {
       else if (["notes","note"].includes(r)) { resetNotesPrefs(); didReset = "notes"; }
       else if (["lite","light"].includes(r)) { resetLitePrefs(); didReset = "lite"; }
       else if (["keys","key","pad","controller","input"].includes(r)) { resetKeysPrefs(); didReset = "keys"; }
+      else if (["amp","rack"].includes(r)) { resetAmpPrefs(); didReset = "amp"; }
       else if (["all","factory","full"].includes(r)) { resetAllPrefs(); didReset = "all"; }
     } else if (hash.includes("#reset")) {
       // #reset 単体は tv リセット扱い
@@ -409,6 +435,7 @@ function exportPrefs(kind) {
       else if (hash.includes("notes")) { resetNotesPrefs(); didReset = "notes"; }
       else if (hash.includes("lite")) { resetLitePrefs(); didReset = "lite"; }
       else if (hash.includes("keys") || hash.includes("pad")) { resetKeysPrefs(); didReset = "keys"; }
+      else if (hash.includes("amp") || hash.includes("rack")) { resetAmpPrefs(); didReset = "amp"; }
       else if (hash.includes("all")) { resetAllPrefs(); didReset = "all"; }
       else { resetVideoPrefs(); didReset = "tv"; }
     }
@@ -444,6 +471,7 @@ function exportPrefs(kind) {
           notes: "🎨 ノーツ設定を初期化しました（?reset=notes）",
           lite: "🪶 軽量化の設定を初期化しました（?reset=lite）",
           keys: "🎮 キー割り当て（パッド・リモコン含む）を初期化しました（?reset=keys）",
+          amp: "🔥 TRKアンプ（エフェクターラック）を空に戻しました（?reset=amp）",
           all: "♻️ 全設定を初期化しました（?reset=all）"
         }[didReset] || `リセットしました: ${didReset}`;
         // 既存のcaptionシステムがあれば使う、なければalert風div
@@ -458,7 +486,7 @@ function exportPrefs(kind) {
     // グローバルからも手動で呼べるように公開
     window.trkReset = (k="tv") => {
       k = String(k).toLowerCase();
-      if (k==="safe") enterSafeMode(); else if (["tv","video"].includes(k)) resetVideoPrefs(); else if (["audio","sound"].includes(k)) resetAudioPrefs(); else if (k==="notes") resetNotesPrefs(); else if (["lite","light"].includes(k)) resetLitePrefs(); else if (["keys","key","pad","controller","input"].includes(k)) resetKeysPrefs(); else if (["all","factory"].includes(k)) resetAllPrefs(); else resetVideoPrefs();
+      if (k==="safe") enterSafeMode(); else if (["tv","video"].includes(k)) resetVideoPrefs(); else if (["audio","sound"].includes(k)) resetAudioPrefs(); else if (k==="notes") resetNotesPrefs(); else if (["lite","light"].includes(k)) resetLitePrefs(); else if (["keys","key","pad","controller","input"].includes(k)) resetKeysPrefs(); else if (["amp","rack"].includes(k)) resetAmpPrefs(); else if (["all","factory"].includes(k)) resetAllPrefs(); else resetVideoPrefs();
       saveUserPrefs(); location.reload();
     };
     window.trkExport = (k="all") => exportPrefs(String(k).toLowerCase());

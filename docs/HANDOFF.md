@@ -35,7 +35,8 @@
   - 保存はいつもの `shadow_taiko_preferences_v2`（localStorage のキーは増やしていない）。リセットは `resetLitePrefs()`＝`?reset=lite`・`trkReset('lite')`・工場出荷（`resetAllPrefs` は `liteSeen` も戻す）。`?safe=1` とも併用可。
 - 📚 書斎（Study Room, v2）：曲リスト見出しの長押し（650ms）／Enter・Spaceで開く、**端末内だけ**の画像・文章ビューア。**本棚**＝最大500冊（1ページ60冊＋「さらに表示」）、タイトル・パス・抜粋の検索、更新順／追加順／名前順／種類別／大きい順の並べ替え、栞の付いた本の🔖、冊数・画像枚数・使用量（`navigator.storage.estimate()` があれば空き容量も）。**取り込み**＝進捗バー・中止・結果要約（追加／維持／失敗）・同名本の一括置き換え確認、入れ子は `albumNesting` で「本ごと／まとめて1冊」。**画像**＝1フォルダ＝1アルバム（最大3000枚・600MB・1ファイル100MB）、1枚ずつ／見開き／縦読み＋🇺🇸アメリカン、画像順の反転（`imageOrder`）、拡大0.5〜4倍（ボタン／Ctrl+ホイール／ピンチ／`+`-`0`）と拡大中のドラッグ、見えているページだけ `URL.createObjectURL` して離れたら `revokeObjectURL`。**文章**＝UTF-8／UTF-16 BOM／Shift_JISの自動判定と青空文庫ルビ、5スキン＋文字サイズ・行間・余白、本文検索（Ctrl+F／`<mark class="study-search-hit">`／1500件上限）、栞＋**栞一覧**（M）、メモ帳（上級者向け・書斎内コピーのみ）、❓キーの説明（初回自動・`studyPrefs.helpSeen`）。**TVペイン**＝位置（上／下／非表示）・見た目6種・大きさ3段階・縦横比・曲名ON/OFF、動画が再生中なら映像、音声だけならジャケット（画像長押し680msで割り当て）。保存は**IndexedDB `trk_study_room_v1`**（books／pages／covers／settings。表示設定は `settings` ストアの `"ui"` に `studyPrefs` 1件）。ジャケットは `covers` ストアに入り、選曲画面の背景とTVドックへ `studyCoverChanged` で反映する。取り込みが中断して残った孤立ページは `studySweepOrphans()`（60秒スロットル・起動時と開いたときに実行）で掃除する。`?safe=1` では開かず、保存領域にも触らない。実装は `js/study-room.js`／`js/study-room-utils.js`／`css/study-room.css`、公開APIは `window.TrkStudyRoom`（`open`／`close`／`toggle`／`isOpen`／`refreshTV`／`assignCover`／`sweepOrphans`／`getSongCoverBlob|Info`／`clearSongCover`／`books`／`stats`）。
 - 書斎を開いている間は `window._trkStudyRoomOpen` でゲーム側のキー操作を止める（`player.js`／`main.js`／`modes.js`／`stage.js`／`truck.js`／`catch.js`／`speed.js`／`extras.js`／`video-max.js`／`media-player-mode.js`／`synth-mode.js`）。書斎自身のキー（←→・PageUp/Down・Space/Enter・Esc・B/M/T/F・`+`/`-`/`0`・`?`・Ctrl+F）は capture で先に受け取る。ただし入力欄・セレクトでは書斎のキーを止め、ボタンに焦点があるときの Space／Enter はそのボタンに譲る。書斎を閉じる・`phase` が `title` 以外へ進む・曲が切り替わるときは、TVペインへ移した `<video>` を元の親と `style` へ戻す（元の親が差し替わっていても `document.body` へ逃がす）。
-- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux13`。公開ファイルを変更したら必ず更新する。
+- 🔥 TRKアンプ（`js/fx-dock.js` の左下カテゴリー＋`js/fx.js` のラック）：`settings.fxRack`（段の配列・最大8。`cleanFx` で検証）／`settings.fxRackOn`（初期オフ）／`settings.ampOpen`（欄の開閉・初期閉じ）。段は**プリセットの後・かんたんEQの前**に効き、`exportObj`（マイプリセット書き出し）と `exportPrefs("all")`（設定の書き出し）にそのまま入る。リセットは `?reset=amp`（別名 `rack`）＝空に／`?reset=all`＝空に／`?safe=1`＝**段は残して止める**だけ。`core.js` の `resetAmpPrefs()` は fx.js より先に走るため、一度きりの合図 `takeAmpReset()`（sessionStorage `trk_amp_reset_once`）を置き、`js/fx.js` が読み込み時に拾って消す。⚠ `js/fx.js` は凍結扱いだが、この機能のために**追加のみ**の窓口（`TrkFX.rack`／`rackTypes`／`rackOn`／`rackSet`／`rackAdd`／`rackClear`）と `refresh()` の `emit("fxRack")` を足した（DSP・保存形式は不変）。
+- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux14`。公開ファイルを変更したら必ず更新する。
 - このcheckoutで `npm run check` はコード・データの自動検査を行うが、MMDの実描画・タッチ操作・音声の実機確認は別途必要。
 
 ---
@@ -62,7 +63,7 @@
 | 7 | `core.js` | 共通状態と保存、設定の既定値、`videoFilter()` |
 | 8 | `lite.js` | 🪶 軽量化（端末の判定・描画のゲート・設定欄の配線）。設定を読んだすぐあと、描画する側より前に置く |
 | 9–20 | `player.js` → `media.js` → `game.js` → `render.js` → `custom.js` → `truck.js` → `modes.js` → `stage.js` → `stagefx.js` → `catch.js` → `extras.js` | 再生・音源・ゲーム進行・描画、各ゲームモードと補助機能 |
-| 21–26 | `fx-presets.js` → `fx-dock.js` → `tv-dock.js` → `video-max.js` → `fx.js` → `fx-synth.js` | 音響／映像ドック。`fx.js` と `fx-presets.js` は凍結扱い |
+| 21–26 | `fx-presets.js` → `fx-dock.js` → `tv-dock.js` → `video-max.js` → `fx.js` → `fx-synth.js` | 音響／映像ドック。`fx.js` と `fx-presets.js` は凍結扱い。**fx-dock.js は先に読み込まれる**ので、🔥 TRKアンプは `TrkFX.rack*` を読み込み時に見つけられない→DOMContentLoaded で組み、`on("fxRack")` で同期する |
 | 27–32 | `favs.js` → `catalog.js` → `library.js` → `verified.js` → `lib-skins.js` → `addons.js` | お気に入り、曲カタログ／選曲、公認パック、棚スキン、アドオン |
 | 33–36 | `main.js` → **`pad.js`** → `speed.js` → `vrm.js` | 起動・イベント、🎮 パッド・コントローラー・TVリモコン（`main.js` の直後。Gamepad API の見張りと設定欄の配線）、速度操作、遅延VRM機能 |
 | 37 | `mmd.js` | 遅延MMD機能・コード生成VMD |
@@ -85,7 +86,7 @@
 ### 音声・イベント・安全モード
 
 - `createMediaElementSource(video)` は一度だけ。波形・スペクトラムなど音を観察する機能は `TrkFX.tap()` を使い、独自に音源を再接続しない。
-- `js/fx.js` と `js/fx-presets.js` は **凍結扱い**。変更が本当に必要な場合は、依存するfx-dock／fx-synthと `window.TrkFX` APIの利用者を一緒に確認する。
+- `js/fx.js` と `js/fx-presets.js` は **凍結扱い**。変更が本当に必要な場合は、依存するfx-dock／fx-synthと `window.TrkFX` APIの利用者を一緒に確認する。2026-10-06 の 🔥 TRKアンプ追加では、**DSPに触れず**に (1) `TrkFX.rack*` の追加、(2) `refresh()` の `emit("fxRack")`、(3) 検証用の定数（`R`／`str`／`BIQUAD`／`SWEEP_F`／`NOISES`）を `settings.fxRack` を `cleanFx` で読む行より前へ移動（**それまでは、段を保存した人が次回の読み込みで参照エラーで落ちていた**）、(4) ラックの段セレクトの絵文字が二重に出ていたのを修正、だけを行った。この4点は戻さないこと（check-repo.mjs が見張っている）。
 - 後から読み込まれる機能が関数を包む場合、対象は `function` 宣言か `let` である必要がある。`const` 化・引数変更はラッパー側を先に検索する。
 - `?safe=1` は保存ファイルやCDN機能の読み込みを抑える非常用モード。安全モードを迂回しない。
 - UI追加時は4言語の文言を同時に追加し、設定項目は初期値・リセット・Import/Export・セーフモード経路を確認する。

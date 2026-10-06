@@ -203,6 +203,14 @@ const FX_STORE = "trk_fx_presets_v1", FX_MAX = 30, TEMP_ID = "__chart", RECENT_M
 const GAME_DEF = { miss:true, combo:true, pinch:false, blast:true, pan:false };
 const EQ_BANDS = [["lowshelf", 60, "60Hz"], ["peaking", 250, "250Hz"], ["peaking", 1000, "1kHz"], ["peaking", 4000, "4kHz"], ["highshelf", 12000, "12kHz"]];
 const idList = (v, max) => Array.isArray(v) ? [...new Set(v.filter(x => typeof x === "string" && /^[a-z0-9_]{1,40}$/.test(x)))].slice(0, max) : [];
+/* 🎚 ラック（settings.fxRack）はこの下ですぐ cleanFx で検証するので、
+   検証で使う定数・短縮形は先に用意しておく（あとに置くと読み込み時に参照エラーになる）。 */
+const R = (v, lo, hi, d) => num(Number(v), lo, hi, d);
+const str = (v, n) => typeof v === "string" ? v.trim().slice(0, n) : "";
+const HTTPS = /^https:\/\/[^\s"'<>]+$/;
+const BIQUAD = ["lowshelf", "highshelf", "peaking", "lowpass", "highpass", "bandpass", "notch"];
+const SWEEP_F = ["lowpass", "highpass", "bandpass"];
+const NOISES = ["pink", "vinyl", "tape", "rain", "wind", "fire", "crowd"];
 settings.fxOn = !!prefs.fxOn;
 settings.fxPreset = typeof prefs.fxPreset === "string" ? prefs.fxPreset.slice(0, 40) : "flat";
 if (settings.fxPreset === TEMP_ID) settings.fxPreset = "flat";   // 一時プリセットは保存しないので、起動時はフラットに戻す
@@ -217,16 +225,22 @@ settings.fxFav = idList(prefs.fxFav, FAV_MAX);
 settings.fxRecent = idList(prefs.fxRecent, RECENT_MAX);
 settings.fxRackOn = !!prefs.fxRackOn;
 settings.fxRack = (Array.isArray(prefs.fxRack) ? prefs.fxRack : []).map(cleanFx).filter(Boolean).slice(0, RACK_MAX);   /* 🎚 段の並び */
+/* 🔥 TRKアンプ：core.js のリセット／セーフモード（core.js は先に読み込まれる）を受け取る。
+   "clear"＝空にする（?reset=amp・?reset=all）／"off"＝段は残して止める（?safe=1） */
+{
+  const ampReset = typeof takeAmpReset === "function" ? takeAmpReset() : "";
+  if (ampReset) {
+    if (ampReset === "clear") settings.fxRack = [];
+    settings.fxRackOn = false;
+    settings.ampOpen = false;
+    try { saveUserPrefs(); } catch (_) {}
+  }
+}
 settings.fxGame = {};
 for (const k of Object.keys(GAME_DEF)) settings.fxGame[k] = prefs.fxGame && typeof prefs.fxGame[k] === "boolean" ? prefs.fxGame[k] : GAME_DEF[k];
 
-/* ============ ③ エフェクトの検証（決められた種類と範囲だけ） ============ */
-const R = (v, lo, hi, d) => num(Number(v), lo, hi, d);
-const str = (v, n) => typeof v === "string" ? v.trim().slice(0, n) : "";
-const HTTPS = /^https:\/\/[^\s"'<>]+$/;
-const BIQUAD = ["lowshelf", "highshelf", "peaking", "lowpass", "highpass", "bandpass", "notch"];
-const SWEEP_F = ["lowpass", "highpass", "bandpass"];
-const NOISES = ["pink", "vinyl", "tape", "rain", "wind", "fire", "crowd"];
+/* ============ ③ エフェクトの検証（決められた種類と範囲だけ）
+   R / str / BIQUAD / SWEEP_F / NOISES は ② の先頭に置いてある（settings.fxRack の検証で先に要るため） ============ */
 function cleanFx(f) {
   if (!f || typeof f !== "object") return null;
   switch (f.type) {
@@ -772,6 +786,7 @@ function refresh() {
   if (!settings.fxOn) bypass = false;
   if (G.src) { rebuild(); applyOut(); }
   saveUserPrefs(); syncUI();
+  emit("fxRack");            /* 🔥 TRKアンプ（js/fx-dock.js）の段表示を同期 */
 }
 function setOn(v) { settings.fxOn = !!v; refresh(); }
 function pushRecent(id) {
@@ -957,7 +972,7 @@ const rackFmt = (v, unit) => unit === "Hz" ? (v >= 1000 ? (v / 1000).toFixed(1) 
 function renderRack() {
   rackBox.textContent = "";
   rackSel.textContent = "";
-  for (const m of RACK_META) rackSel.append(new Option(m.icon + " " + tr(m.key), m.type));
+  for (const m of RACK_META) rackSel.append(new Option(tr(m.key), m.type));   /* 名前（sfxType…）に絵文字が入っているので二重にしない */
   learnBtn.hidden = learnStat.hidden = !settings.fxRack.some(f => f.type === "denoise");
   if (!learnBtn.hidden) learnStat.textContent = G.denoiseLearned ? tr("sfxLearned") : tr("sfxDenoiseHint");
   if (G.wk === false && settings.fxRack.some(f => f.type === "gate" || f.type === "denoise" || f.type === "dynEQ"))
@@ -1160,7 +1175,14 @@ on("language", syncUI);
    TrkFX.delayMs()     → 今の自動補正（ms）
    TrkFX.tap(fftSize)  → エフェクト後の音を見る AnalyserNode（使えなければ null）。使い終わったら disconnect()
    TrkFX.tapElement(el)   → アドオンなど、ほかの <audio>/<video> を同じエフェクターに通す（MediaElementSource。同じ要素は一度だけ）
-   TrkFX.untapElement(el) → その通り道を外す（true / false） */
+   TrkFX.untapElement(el) → その通り道を外す（true / false）
+   🎚 ラック（🔥 TRKアンプ／js/fx-dock.js から段を積む。DSP とつまみは今までどおり）
+   TrkFX.rack()        → { on, list:[…段…] }（コピー。書き換えても本体は変わらない）
+   TrkFX.rackTypes()   → [{ type, icon, name }]（積める段の種類）
+   TrkFX.rackOn(v)     → ラックのオン／オフ（オンにするときはエフェクトも入れる）
+   TrkFX.rackSet(list) → 段を丸ごと入れ替える（cleanFx で検証・最大 RACK_MAX 段）
+   TrkFX.rackAdd(type) → 段を1つ足す（いっぱいなら -1）
+   TrkFX.rackClear()   → 段を全部外す */
 window.TrkFX = Object.freeze({
   version:3,
   list:() => CATS.flatMap(c => presetsOf(c).map(p => ({ id:p.id, cat:p.cat, name:presetName(p) }))),
@@ -1173,6 +1195,18 @@ window.TrkFX = Object.freeze({
   off:() => setOn(false),
   clean:json => copy(cleanPreset(json)),
   delayMs:() => fxDelayMs(),
+  rack:() => ({ on:!!settings.fxRackOn, list:settings.fxRack.map(copy) }),
+  rackTypes:() => RACK_META.map(m => ({ type:m.type, icon:m.icon, name:tr(m.key) })),
+  rackOn:v => { settings.fxRackOn = !!v; if (settings.fxRackOn && !settings.fxOn) setOn(true); else refresh(); return settings.fxRackOn; },
+  rackSet:list => {
+    settings.fxRack = (Array.isArray(list) ? list : []).map(cleanFx).filter(Boolean).slice(0, RACK_MAX);
+    refresh(); return settings.fxRack.length;
+  },
+  rackAdd:type => {
+    const d = FX_DEFAULTS[type]; if (!d || settings.fxRack.length >= RACK_MAX) return -1;
+    settings.fxRack.push(cleanFx({ ...d })); refresh(); return settings.fxRack.length;
+  },
+  rackClear:() => { settings.fxRack = []; refresh(); return 0; },
   tap,
   tapElement,
   untapElement

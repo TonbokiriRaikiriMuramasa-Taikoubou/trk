@@ -235,6 +235,42 @@ if (!exists("js/fx-worklet.js") ||
   ok("pro-audio effects (gate / denoise / dynamic EQ) and rack are wired");
 }
 
+// 🔥 TRK amp: the independent category right below "🎛 More (EQ / skin / menu)"
+// at the bottom-left of the song column, driving the layered effect rack
+// through the small rack API that fx.js exposes (the DSP itself is untouched).
+{
+  const fx = read("js/fx.js");
+  const dock = read("js/fx-dock.js");
+  const core = read("js/core.js");
+  const css = read("css/style.css");
+  const ampKeys = ["ampTitle", "ampHint", "ampUse", "ampStateOn", "ampStateOff", "ampEmpty", "ampStacksLabel",
+    "ampStackTrk", "ampStackWarm", "ampStackRadio", "ampStackClean", "ampStackSet", "ampOnMsg", "ampOffMsg",
+    "ampCleared", "ampFull", "ampStageAdd", "ampClear", "ampMore", "ampAdjustHint"];
+  const apiOk = ['rack:() => ({ on:!!settings.fxRackOn, list:settings.fxRack.map(copy) })', "rackTypes:() => RACK_META.map",
+    "rackOn:v =>", "rackSet:list =>", "rackAdd:type =>", "rackClear:() =>", 'emit("fxRack")'].every(t => fx.includes(t)) &&
+    fx.includes("function cleanFx") && fx.includes("RACK_MAX = 8") &&
+    /* 検証の定数（R / BIQUAD …）は、settings.fxRack を cleanFx で読む行より前に無いと
+       保存済みの段がある人の読み込みで落ちる（参照エラー）ので、順番も見張る */
+    fx.indexOf("const R = (v, lo, hi, d)") >= 0 &&
+    fx.indexOf("const R = (v, lo, hi, d)") < fx.indexOf("settings.fxRack = (Array.isArray(prefs.fxRack)");
+  const resetOk = ["function resetAmpPrefs()", 'markAmpReset("clear")', 'markAmpReset("off")',
+    "function takeAmpReset()", '["amp","rack"].includes(r)'].every(t => core.includes(t)) &&
+    fx.includes("takeAmpReset()") && fx.includes("if (ampReset === \"clear\") settings.fxRack = []");
+  const uiOk = dock.includes('amp.id = "ampPanel"') && dock.includes("const AMP_STACKS") &&
+    ["trk", "warm", "radio", "clean"].every(id => dock.includes(id + ":")) && dock.includes("data-ampstack") &&
+    dock.includes('dock.append(dev, favChips, overLabel, overflow, body);') && dock.includes("const placeAmp = () =>") &&
+    dock.includes('on("fxRack", renderAmp)') && dock.includes("const AMP_MAX = 8") &&
+    dock.includes("settings.ampOpen = prefs.ampOpen === true") && dock.includes('data-i18n="sfxRackTitle"') &&
+    ["TrkFX.rackSet(", "TrkFX.rackOn(true)", "TrkFX.rackAdd(", "TrkFX.rackClear()"].every(t => dock.includes(t)) &&
+    css.includes("#ampPanel .ampStage") && css.includes("#ampPanel .ampStages");
+  const langOk = ampKeys.every(k => (dock.match(new RegExp("\\b" + k + ":", "g")) || []).length === 4);
+  if (!apiOk) fail("TRK amp rack API (fx.js) is missing: rack / rackTypes / rackOn / rackSet / rackAdd / rackClear (or the validators moved below the saved-rack load)");
+  else if (!resetOk) fail("TRK amp reset plumbing (?reset=amp / ?reset=all / ?safe=1) is missing");
+  else if (!uiOk) fail("TRK amp category (bottom-left, below 🎛 More) is not wired to the rack");
+  else if (!langOk) fail("TRK amp strings are missing from one of the four languages");
+  else ok("TRK amp: independent bottom-left category (below 🎛 More) with 4 stacks, stage chips and rack API in 4 languages");
+}
+
 // 🛒 Official-source catalog: no-audio curated playlists with wishlist matching.
 if (!exists("js/catalog.js") ||
     !read("js/catalog.js").includes("TRK_CATALOG") ||

@@ -196,6 +196,17 @@ trk! は、音楽プレイヤーとしても楽しめます。設定画面の「
 
 その下の **🎚 エフェクターラック** では、ポータブルアンプを多段に積むように、エフェクターを**段にして重ねられます**（最大8段。プリセットの後に効いて、マイプリセット保存・書き出しにも入ります）。並べられるのは **🚪ノイズゲート**（しきい値を下回ると閉じる）／**🧹ノイズ消し**（再生中の静かな部分で「🔇 いまの音をノイズとして覚える」を押すと、そのスペクトルを2秒間学習して消します。Audacity・ReaFir・Bertom Denoiser Classic の概念を自前実装）／**🎚 ダイナミックEQ**（その帯域が大きい時だけ減らす。TDR Nova・Ozone 流）／**✨エキサイター**（高域に倍音を足す）／**🧲コンプレッサー**／**📢音量**。ノイズ消しは音が約20ms遅れて聞こえるぶん、ノーツのタイミング自動補正が引き受けてくれます。
 
+#### 🔥 TRKアンプを使う（左下の独立カテゴリー）
+
+選曲画面の左下、**「🎛 くわしく（EQ・スキン・メニュー）」のすぐ下**に **🔥 TRKアンプを使う** があります。これは、上の **🎚 エフェクターラック**（段で重ねる仕組み）を、**わざわざ設定を開かなくてもその場で使える**ようにした入り口です（中身は同じラック。設定の「🎚 エフェクターラック」とその場で同期します）。
+
+- **TRKアンプを使う**（スイッチ）＝ラックをオンにします。段が空のときは、**🚪ノイズゲート → ✨エキサイター → 🧲コンプレッサー → 📢音量** の標準の4段を組んでから始めます。
+- **ワンタップで段を組む**：**🔥 TRKアンプ（標準）／🍯 あたたか／📻 ラジカセ／🧹 クリーン** の4つ。押すとその構成で組み直し、すぐ鳴ります。
+- **段はチップで並びます**：`🚪 ノイズゲート` のように名前が出て、**↑ ↓** で並べ替え、**✕** で1段だけ外せます。**＋ 段を追加** で好きな段を足せます（最大8段）。
+- **🎛 段をくわしく調整**：つまみ（しきい値・周波数・レシオなど）は**設定の「🎚 エフェクターラック」**で詰めます。ここは「組む・並べる・止める」のための入り口です。
+- **切っても段は残ります**（オフ＝素の音。消したいときだけ ✕ 全部外す）。
+- リセットは **`?reset=amp`**（段を空に）／**`?reset=all`**（工場出荷。段も空に）／**`?safe=1`**（段は残して、アンプだけ止めて安全側に）。書き出し（設定のJSON・マイプリセット）には段もそのまま入ります。
+
 | 分類 | 数 | 例 |
 |---|---|---|
 | 基本 | 10 | ドンシャリ／夜間モード／クリア／ミックス確認：スマホ |
@@ -449,7 +460,7 @@ trk/
 │  ├─ truck.js  modes.js  stage.js  stagefx.js  catch.js   … 各モード・体力・称号・演出
 │  ├─ extras.js                  … オフセット測定・ゴーストなど
 │  ├─ tv-presets.js  tv-dock.js  … 映像フィルター・TVドック・カスタムTVスキン
-│  ├─ fx-presets.js  fx.js       … サウンドエフェクト
+│  ├─ fx-presets.js  fx.js  fx-dock.js   … サウンドエフェクトと、左下の 🔥 TRKアンプ
 │  ├─ library.js                 … 選曲画面・AUTO・ラジオ・曲のタブ（棚）
 │  ├─ lib-skins.js               … 棚スキン16種（曲タブの見た目・🎨ボタン）
 │  ├─ verified.js                … 公認パック
@@ -550,7 +561,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 - 🎪 **STAGE** — 4/5/6-lane vertical play with stairs, trills and wide notes (inspired by World Dai Star: Yume no Stellarium)
 - 🚛 **CATCH** — catch falling parcels with your truck; grab nitro cans 🚀 for **Blast mode**
 
-**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), a song-banner volume button (tap for the slider, hold to mute/restore), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, antenna character skins (ten original dot characters that wake up and walk when ON and fall asleep when OFF, plus your own two ON/OFF images stored on your device only; Reimu, Marisa, Cirno, Flandre and Youmu are original Touhou Project fan art drawn for trk!, following the official fan-work guidelines), VRM 1.0 mascots, MMD mascots (65 original procedural choices grouped by daily movement, dance, Miku references, expressions, and singing/lip-sync; Lat morph tracks; the A-I-U-O mouth cycle with no audio sync is the default for new installs and the bundled Lat preset; saved choices are kept, bring your own model with an on-device self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), 📤 **share your music folder** (one permission pulls the whole folder in at once, with an optional on-device copy of up to 150 songs / 300 MB), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, visual effect-chain editor, automatic latency compensation and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 16 built-in sounds (including electric guitar, electronic sax, and layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, a default option to lock mapped keys to the piano while synth mode is open, an optional wider on-screen keyboard for larger displays, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
+**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), a song-banner volume button (tap for the slider, hold to mute/restore), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, antenna character skins (ten original dot characters that wake up and walk when ON and fall asleep when OFF, plus your own two ON/OFF images stored on your device only; Reimu, Marisa, Cirno, Flandre and Youmu are original Touhou Project fan art drawn for trk!, following the official fan-work guidelines), VRM 1.0 mascots, MMD mascots (65 original procedural choices grouped by daily movement, dance, Miku references, expressions, and singing/lip-sync; Lat morph tracks; the A-I-U-O mouth cycle with no audio sync is the default for new installs and the bundled Lat preset; saved choices are kept, bring your own model with an on-device self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), 📤 **share your music folder** (one permission pulls the whole folder in at once, with an optional on-device copy of up to 150 songs / 300 MB), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, a visual effect-chain editor, a bottom-left 🔥 **TRK amp** panel that builds/reorders/switches the layered effect rack in one tap — `?reset=amp` — automatic latency compensation and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 16 built-in sounds (including electric guitar, electronic sax, and layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, a default option to lock mapped keys to the piano while synth mode is open, an optional wider on-screen keyboard for larger displays, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
 
 **Study Room:** long-press the song-list title (or focus it and press Enter/Space) to open a local-only reader. Image folders become albums (single/spread/vertical, an American-style flip, reversed image order, zoom from 0.5× to 4× by buttons, Ctrl+wheel or pinch; up to 3,000 images / 600 MB per album), text files open as books with UTF-8 / UTF-16 / Shift_JIS detection and Aozora-style ruby (up to 12 MB each) with five reading skins, text size / line-height / margin tuning and in-book search. The shelf sorts (updated / added / title / type / size), searches titles, paths and excerpts, shows a bookmark list and a storage footer, and reports import progress with a cancel button. A TV pane (position, six looks, three sizes, aspect ratio, optional song title) shows the playing video or the song's jacket — assigned by a 680 ms long-press, and always handed back when the room closes or a song finishes. Everything stays in this browser (IndexedDB `trk_study_room_v1`); nothing is uploaded, and `?safe=1` keeps it closed.
 

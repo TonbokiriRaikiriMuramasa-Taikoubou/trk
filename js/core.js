@@ -110,6 +110,17 @@ if (bootSub[0] && bootSub[0] === bootSub[1]) bootSub[1] = "";
 
 const PLAY_MODES = ["manual", "truck", "orbit", "stage", "catch"];
 const savedSkinAtBoot = typeof prefs.skin === "string" ? prefs.skin : "";   // パックのスキンは後から復元
+/* 🪶 軽量化の許可リスト。ここで決め打ちできるので、辞書の読み込み状況に左右されない。
+   ⚠ js/lite.js はこの値を { "60":60, … }[settings.liteFps] || 30 の形で数値へ写す。
+     未知の文字列（継承キーの "constructor" など）が入ると Object 関数が truthy で返り、
+     || 30 の保険が効かずにゲート間隔が NaN になる＝軽量化が一瞬効かなくなる（M-02）。 */
+const LITE_ENUM_VALUES = {
+  liteMode: ["off", "auto", "on"],
+  liteFps: ["60", "30", "20"],
+  liteMascot: ["60", "30", "15", "off"],
+  liteScale: ["device", "1.5", "1"]
+};
+
 const settings = {
   language: pick(prefs.language, ["ja", "en", "zh", "ko"], guessLang()),
   skin: has(SKINS, prefs.skin) ? prefs.skin : (prefs.skin === "dark" ? "shadow" : prefs.skin === "light" ? "daylight" : "shadow"),
@@ -166,10 +177,10 @@ const settings = {
   bannerRandomBtn: prefs.bannerRandomBtn !== false,                          // 🎲 バナー右端のおまかせボタン（初期オン）
   bannerRandomTap: prefs.bannerRandomTap === true,                           // 🎲 タップだけで変える（初期オフ＝長押し）
   /* 🪶 軽量化（スマホ・タブレット・アプリ向け。読み込みは js/lite.js） */
-  liteMode: pick(prefs.liteMode, ["off", "auto", "on"], "auto"),             // 自動＝端末・省データ・電池を見て決める
-  liteFps: pick(prefs.liteFps, ["60", "30", "20"], "30"),                    // 描画のフレームレート上限
-  liteMascot: pick(prefs.liteMascot, ["60", "30", "15", "off"], "30"),       // 🩷 3Dマスコット（MMD／VRM）の描画レート
-  liteScale: pick(prefs.liteScale, ["device", "1.5", "1"], "1.5"),           // 描画解像度（devicePixelRatio）の上限
+  liteMode: pick(prefs.liteMode, LITE_ENUM_VALUES.liteMode, "auto"),         // 自動＝端末・省データ・電池を見て決める
+  liteFps: pick(prefs.liteFps, LITE_ENUM_VALUES.liteFps, "30"),              // 描画のフレームレート上限
+  liteMascot: pick(prefs.liteMascot, LITE_ENUM_VALUES.liteMascot, "30"),     // 🩷 3Dマスコット（MMD／VRM）の描画レート
+  liteScale: pick(prefs.liteScale, LITE_ENUM_VALUES.liteScale, "1.5"),       // 描画解像度（devicePixelRatio）の上限
   liteSpectrumOff: prefs.liteSpectrumOff !== false,                          // 📊 軽量化モード中はスペクトラムを止める
   liteFx: prefs.liteFx !== false,                                            // 軽量化モード中はぼかし・すりガラスを減らす
   liteBlur: prefs.liteBlur !== false,                                        // 軽量化モード中は映像のぼかしを最大2pxに
@@ -269,7 +280,9 @@ const gameplayFxPower = () => settings.fxPower * gameplayFxMultiplier();
      ?reset=audio / ?reset=sound      → 音量・SEをデフォルトに戻す
      ?reset=notes                     → ノーツ色・形をデフォルトに戻す（確認あり）
      ?reset=amp / ?reset=rack         → 🔥 TRKアンプ（🎚 エフェクターラック）を空に戻す
-     ?reset=all / ?factory            → 全設定リセット（ノーツも含む）。実行前に確認します（&force=1 で確認を飛ばす）
+     ?reset=all                      → 全設定リセット（ノーツも含む）。実行前に確認します（&force=1 で確認を飛ばす）
+     ?reset=factory / ?reset=full     → 上と同じ（別名）
+     ?factory                        → セーフモード（?safe=1 と同じ。全リセットではない。js/addons.js も同じ解釈）
      ?export=notes / ?export=all      → 設定をJSONでダウンロード
    ノーツ設定は細かく詰める人が多いので、tv/audioリセットでは保持される。 */
 /* ♻️ 全設定リセットの確認ダイアログ。
@@ -459,7 +472,11 @@ function exportPrefs(kind) {
   try { downloadJSON(out, `trk-${kind || "all"}-` + new Date().toISOString().slice(0,10) + ".json"); } catch(e){ console.error(e); }
 }
 function parseHashParams(hash) {
-  return new URLSearchParams(String(hash || "").replace(/^#/, "").toLowerCase());
+  /* ⚠ 小文字にするのは**キーだけ**（値まで小文字にすると、将来ケースを区別する値を
+     hash に足したときに静かに壊れる）。URLSearchParams の形は保つ（検査もそのまま通る）。 */
+  const out = new URLSearchParams();
+  for (const [k, v] of new URLSearchParams(String(hash || "").replace(/^#/, ""))) out.append(k.toLowerCase(), v);
+  return out;
 }
 // URLパラメータを解釈して即時実行（ロード時）
 (function handleUrlCommands() {
@@ -475,7 +492,11 @@ function parseHashParams(hash) {
     // export は先に判定（リセットと同時も可）
     if (has("export")) doExport = ((sp.has("export") ? get("export") : hashParams.get("export")) || "all").toLowerCase();
     // safe / safety
-    if (has("safe") || has("safety")) {
+    /* ⚠ ?factory 単体は**全リセットではなくセーフモードの合図**（?safe=1 と同じ）。
+       js/addons.js の safeNow() が昔から sp.has("factory") をセーフ扱いにしており、
+       core.js の「?factory で入る」というコメントとも一致する。壊す動作にしないのが安全側。
+       全リセットは ?reset=all / ?reset=factory / #reset=all（いずれも確認ダイアログ）。 */
+    if (has("safe") || has("safety") || sp.has("factory")) {
       enterSafeMode(); didReset = "safe";
     } else if (get("reset")) {
       const r = get("reset").toLowerCase();
@@ -1006,11 +1027,18 @@ function showScreen(id) {
 function openSettings() { if (phase === "title") { showScreen("settingsScreen"); emit("settings"); } }   /* 🧭 スタンプ「設定を見た」の検知 */
 function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
 
-/* Emergency settings imports validate enum IDs at the boundary, before live settings are changed. */
-/* 列挙IDの検証対象（許可リストが引ける辞書を持つキーだけ。増やしたら check-security.mjs も更新） */
-const SETTING_ENUM_KEYS = ["specStyle", "specTheme", "mmdMotionKind", "fxPreset"];
+/* Emergency settings imports validate enum IDs at the boundary, before live settings are changed.
+   列挙IDの検証対象（増やしたら tools/check-security.mjs も更新）。
+   ⚠ 辞書が要るもの（TrkSpec/TrkMMD/TrkFX）は、その辞書が読めていないと fail-closed で落ちる。
+      🪶 軽量化のように core.js で決め打ちできるものは LITE_ENUM_VALUES へ寄せる（読み込み順に左右されない）。 */
+const SETTING_ENUM_KEYS = ["specStyle", "specTheme", "mmdMotionKind", "fxPreset",
+  "liteMode", "liteFps", "liteMascot", "liteScale"];
+/* Importで弾いた理由（対応が変わるので、表示では区別して出す） */
+const SKIP_WHY = { enum:"prefSkipWhyId", type:"prefSkipWhyType", unknown:"prefSkipWhyUnknown", failed:"prefSkipWhyType" };
 function validImportedSettingEnum(key, value) {
   if (typeof value !== "string") return false;
+  const staticList = LITE_ENUM_VALUES[key];
+  if (staticList) return staticList.includes(value);
   try {
     if (key === "specStyle") return !!window.TrkSpec && window.TrkSpec.styles().includes(value);
     if (key === "specTheme") return !!window.TrkSpec && window.TrkSpec.themes().includes(value);
@@ -1087,24 +1115,34 @@ function validImportedSettingEnum(key, value) {
           settings.musicVolumeRestore = num(data.musicVolumeRestore, .01, 1, settings.musicVolumeRestore);
           applied.push("musicVolumeRestore");
         }
+        /* 理由つきで記録する（「この端末に無いID」と「型が違う」では利用者の対応が変わる）。
+           ⚠ rejected に入るのは**表示用の文字列**なので、重複よけは別に生のキーで持つ。 */
+        const rejectedKeys = new Set();
+        const reject = (k, why) => {
+          if (rejectedKeys.has(k)) return;
+          rejectedKeys.add(k);
+          rejected.push(tr(SKIP_WHY[why] || SKIP_WHY.unknown, { k }));
+        };
         // 既知キーだけを取り込み、型と列挙IDは代入前に検証する。
         // ⚠ 弾いたキーは黙って捨てない（「読み込みました」なのに反映されない事故を防ぐ）。最後にまとめて報告する。
         for (const k of Object.keys(data)) {
           if (UNSAFE_KEYS.has(k) || ["notes", "videoStyle", "tvDockSkin", "bgDim", "bgBlur", "tvParamFavs", "musicVolume", "musicVolumeRestore"].includes(k) || applied.includes(k)) continue;
-          if (!Object.prototype.hasOwnProperty.call(settings, k)) { rejected.push(k); continue; }
+          if (!Object.prototype.hasOwnProperty.call(settings, k)) { reject(k, "unknown"); continue; }
           const current = settings[k], incoming = data[k];
           const sameShape = Array.isArray(current) ? Array.isArray(incoming)
             : current === null ? (incoming === null || typeof incoming === "string")
             : current && typeof current === "object" ? !!incoming && typeof incoming === "object" && !Array.isArray(incoming)
             : typeof incoming === typeof current && (typeof incoming !== "number" || Number.isFinite(incoming));
-          if (!sameShape) { rejected.push(k); continue; }
-          if (SETTING_ENUM_KEYS.includes(k) && !validImportedSettingEnum(k, incoming)) { rejected.push(k); continue; }
-          try { settings[k] = incoming; applied.push(k); } catch(_){ rejected.push(k); }
+          if (!sameShape) { reject(k, "type"); continue; }
+          if (SETTING_ENUM_KEYS.includes(k) && !validImportedSettingEnum(k, incoming)) { reject(k, "enum"); continue; }
+          try { settings[k] = incoming; applied.push(k); } catch(_){ reject(k, "failed"); }
         }
-        /* 上の個別処理で弾いたキー（未対応IDの videoStyle／tvDockSkin など）も同じように報告する */
+        /* 上の個別処理で黙って落としたキーも同じように報告する。
+           理由は落とし方ごとに決まる：videoStyle／tvDockSkin は許可リスト不一致、
+           それ以外（bgDim／bgBlur／musicVolume など）は型が合わなかったときだけ残る。 */
         for (const k of Object.keys(data)) {
-          if (applied.includes(k) || rejected.includes(k) || UNSAFE_KEYS.has(k)) continue;
-          rejected.push(k);
+          if (applied.includes(k) || rejectedKeys.has(k) || UNSAFE_KEYS.has(k)) continue;
+          reject(k, ["videoStyle", "tvDockSkin"].includes(k) ? "enum" : "type");
         }
         saveUserPrefs();
         try { applyNoteVars(); if (typeof view !== "undefined") view.style.filter = videoFilter(); } catch(_){}

@@ -6,7 +6,7 @@
   - **OWASP Top 10 Client-Side Security Risks**（ブラウザ側コード向け・OWASP プロジェクト）<https://owasp.org/projects/top-10-client-side-security-risks>
   - **CWE Top 25 Most Dangerous Software Weaknesses（2025）**（MITRE）<https://cwe.mitre.org/top25/>
   - 補助：OWASP Top 10（2021）の項目名（該当する物だけ）
-- 確認の方法：`npm run check`（`tools/check-security.mjs` **48項目**＋同梱ライブラリ検証8項目ほか）／`npm run check:vendor:npm`（npm上流との照合）／jsdom の動的テスト（リポジトリ外の検証用ハーネス）／手動の実機確認
+- 確認の方法：`npm run check`（`tools/check-security.mjs` **51項目**＋同梱ライブラリ検証8項目ほか）／`npm run check:vendor:npm`（npm上流との照合）／jsdom の動的テスト（リポジトリ外の検証用ハーネス）／手動の実機確認
 - 凡例：✅ 確認済み・🟡 仕様として残した（理由あり）・🔶 未実施の推奨・➖ このアプリには当てはまらない
 
 ---

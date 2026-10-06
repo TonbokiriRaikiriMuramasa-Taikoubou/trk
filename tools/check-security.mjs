@@ -131,29 +131,82 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   const enumFn = enumFnStart >= 0 && enumFnEnd >= 0 ? core.slice(enumFnStart, enumFnEnd + 2) : "";
   let enumBehavior = false;
   try {
+    /* 🪶 軽量化の許可リストは core.js 側の定数なので、実物を取り出して同じもので検証する */
+    const liteSrc = /const LITE_ENUM_VALUES = \{[\s\S]*?\n\};/.exec(core);
+    const LITE_ENUM_VALUES = liteSrc ? vm.runInNewContext(`(()=>{${liteSrc[0]}; return LITE_ENUM_VALUES;})()`) : null;
     const validate = vm.runInNewContext(`(${enumFn})`, { window:{
       TrkSpec:{ styles:() => ["bars"], themes:() => ["neon"] },
       TrkMMD:{ builtins:() => ["faceSing"] },
       TrkFX:{ list:() => [{ id:"flat" }, { id:"my_test" }] }
-    }});
+    }, LITE_ENUM_VALUES });
     enumBehavior = validate("specStyle", "bars") && !validate("specStyle", "constructor") &&
       validate("specTheme", "neon") && !validate("specTheme", "__proto__") &&
       validate("mmdMotionKind", "faceSing") && validate("mmdMotionKind", "auto") && validate("mmdMotionKind", "none") &&
       !validate("mmdMotionKind", "file") && !validate("mmdMotionKind", "constructor") &&
-      validate("fxPreset", "flat") && validate("fxPreset", "my_test") && !validate("fxPreset", "constructor");
+      validate("fxPreset", "flat") && validate("fxPreset", "my_test") && !validate("fxPreset", "constructor") &&
+      /* 🪶 M-02：{ "60":60, … }[settings.liteFps] || 30 に継承キーが入ると Object 関数が truthy で返り、
+         || 30 の保険が効かずゲート間隔が NaN になる（軽量化が一瞬効かなくなる）。Import時点で弾く。 */
+      validate("liteFps", "30") && validate("liteFps", "60") && validate("liteFps", "20") &&
+      !validate("liteFps", "constructor") && !validate("liteFps", "__proto__") && !validate("liteFps", "999") &&
+      validate("liteMascot", "30") && validate("liteMascot", "off") &&
+      !validate("liteMascot", "constructor") && !validate("liteMascot", "toString") &&
+      validate("liteScale", "device") && validate("liteScale", "1.5") &&
+      !validate("liteScale", "constructor") && !validate("liteScale", "9") &&
+      validate("liteMode", "auto") && !validate("liteMode", "constructor");
   } catch (_) {}
   rule(!!enumFn && enumBehavior && core.includes('!validImportedSettingEnum(k, incoming)'),
-    "emergency settings import allowlists spectrum, MMD and FX enum IDs before assignment");
+    "emergency settings import allowlists spectrum, MMD, FX and lite-mode enum IDs before assignment");
 
-  /* 緊急Importで弾いたキーは黙って捨てない（「読み込みました」なのに反映されない事故を防ぐ） */
+  /* 緊急Importで弾いたキーは黙って捨てない（「読み込みました」なのに反映されない事故を防ぐ）。
+     理由（この端末に無いID／型が違う／この設定に無いキー）でも対応が変わるので、区別して出す。 */
   const importFeedback = core.includes("let applied = [], rejected = []") &&
-    core.includes("rejected.push(k)") &&
-    core.includes("if (applied.includes(k) || rejected.includes(k) || UNSAFE_KEYS.has(k)) continue;") &&
+    core.includes("const reject = (k, why) =>") && core.includes("const SKIP_WHY = {") &&
+    core.includes('reject(k, "enum")') && core.includes('reject(k, "type")') && core.includes('reject(k, "unknown")') &&
+    /* ⚠ rejected は**表示用の文字列**が入るので、重複よけは生のキーで持たないと二重に出る */
+    core.includes("const rejectedKeys = new Set()") && core.includes("if (rejectedKeys.has(k)) return;") &&
+    core.includes("if (applied.includes(k) || rejectedKeys.has(k) || UNSAFE_KEYS.has(k)) continue;") &&
     core.includes('if (rejected.length) setSt("prefImportedPartial"') &&
     core.includes('else setSt("prefImported"') &&
     core.includes("SETTING_ENUM_KEYS.includes(k)") &&
-    ["prefImported", "prefImportedPartial"].every(key => read("js/i18n.js").split(`${key}:`).length - 1 === 4);
-  rule(importFeedback, "the emergency settings import reports every key it refused, in all four languages");
+    ["prefImported", "prefImportedPartial", "prefSkipWhyId", "prefSkipWhyType", "prefSkipWhyUnknown"]
+      .every(key => read("js/i18n.js").split(`${key}:`).length - 1 === 4);
+  rule(importFeedback, "the emergency settings import reports every key it refused, with a reason, in all four languages");
+
+  /* ✨ M-03（tv-rich.js）：tvRichId／tvRichPrev を実在IDで検証する。
+     ⚠ 二つは行き先が違う（tvRichId＝リッチ20種／tvRichPrev＝元の映像フィルター全65種）。
+       同じ許可リストにすると保存済みの「戻る先」が毎回リセットされるので、別々に検証する。 */
+  /* ⚠ 関数を直接呼ぶだけでは「配線が外れていても通る」。実際に保存値を入れて settings の結果を見る。 */
+  const richSrc = js["js/tv-rich.js"];
+  let richBehavior = false;
+  try {
+    const i18nScript = new vm.Script(read("js/i18n.js"));
+    const presetScript = new vm.Script(read("js/tv-presets.js"));
+    const headSrc = richSrc.slice(0, richSrc.indexOf('addEventListener("DOMContentLoaded"'));
+    /* 保存済みの値 v を入れたとき、settings に何が残るか */
+    const probe = v => {
+      const ctx = { console, document:{ addEventListener(){} }, addEventListener(){} };
+      ctx.window = {}; ctx.globalThis = ctx;
+      vm.createContext(ctx);
+      i18nScript.runInContext(ctx);
+      presetScript.runInContext(ctx);
+      vm.runInContext("window.TrkTV = { list: () => TRK_TV_PRESETS.map(p => ({ id:p.id, cat:p.cat, off:!!p.off })) };", ctx);
+      const src = `var prefs = { tvRichId: ${JSON.stringify(v)}, tvRichPrev: ${JSON.stringify(v)} }; var settings = {};\n` + headSrc;
+      new vm.Script(src, { filename: "tv-rich-probe.js" }).runInContext(ctx);
+      return vm.runInContext("({ id: settings.tvRichId, prev: settings.tvRichPrev })", ctx);
+    };
+    const DEFAULT_ID = "portrait_natural";
+    const poisoned = probe("constructor");        // 継承キー → 両方はじかれる
+    const plain = probe("skin");                  // リッチではない元の映像フィルター → tvRichPrev だけ残る
+    const rich = probe("anime_clear");            // リッチ20種 → 両方残る
+    const bogus = probe("my_custom");             // 存在しないID → 両方はじかれる
+    richBehavior = poisoned.id === DEFAULT_ID && poisoned.prev === "" &&
+      plain.id === DEFAULT_ID && plain.prev === "skin" &&
+      rich.id === "anime_clear" && rich.prev === "anime_clear" &&
+      bogus.id === DEFAULT_ID && bogus.prev === "" &&
+      /* 配線（pickRich に検証関数が渡っていること）も見る */
+      richSrc.includes('pickRich("tvRichId", richIdOk') && richSrc.includes('pickRich("tvRichPrev", videoIdOk');
+  } catch (_) {}
+  rule(richBehavior, "tvRichId and tvRichPrev are checked against real preset IDs (separate lists: rich vs. any video filter)");
 
   /* spectrum.js の ID 辞書は「増えたらこの検査も更新」する前提で、名前と個数の両方で見張る */
   const spectrumSrc = js["js/spectrum.js"];
@@ -389,7 +442,10 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     hashForceExact = parseHashParams("#reset=all&force=1").get("force") === "1" &&
       parseHashParams("#reset=all&force=0").get("force") !== "1" &&
       parseHashParams("#reset=all&forcely=1").get("force") !== "1" &&
-      parseHashParams("#RESET=ALL&FORCE=1").get("force") === "1";
+      parseHashParams("#RESET=ALL&FORCE=1").get("force") === "1" &&
+      /* 小文字にするのは**キーだけ**。値まで小文字にすると将来ケースを区別する値が静かに壊れる */
+      parseHashParams("#RESET=ALL").get("reset") === "ALL" &&
+      parseHashParams("#skin=MySkin").get("skin") === "MySkin";
   } catch (_) {}
   const factoryGuard = core.includes("function askFactoryReset(") && core.includes("let pendingFactory = false") &&
     core.includes('if (sp.get("force") === "1")') && core.includes('if (hashParams.get("force") === "1")') &&
@@ -397,6 +453,17 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     core.includes("hashParams.has(\"reset\")") && !core.includes('hash.includes("force")') && hashForceExact && core.includes("if (!pendingFactory) saveUserPrefs()") &&
     core.includes('askFactoryReset(') && !/else if \(\["all","factory","full"\]\.includes\(r\)\) \{ resetAllPrefs\(\)/.test(core);
   rule(factoryGuard, "query/hash factory reset asks for confirmation unless the exact force=1 parameter is present");
+
+  /* ?factory 単体は**セーフモード**（壊す動作にしない）。js/addons.js の safeNow() と同じ解釈。 */
+  const factorySafe = core.includes('if (has("safe") || has("safety") || sp.has("factory"))') &&
+    js["js/addons.js"].includes('sp.has("factory")');
+  rule(factorySafe, "?factory alone enters safe mode, matching js/addons.js (never a destructive reset)");
+
+  /* 文書ドリスト：実装はセーフモードなのに「?factory で全リセット」と書いてあったら FAIL にする */
+  const factoryDrift = ["docs/HANDOFF.md", "docs/SECURITY.md", "js/core.js", "README.md"]
+    .filter(f => { try { return /`\?reset=all`\s*[／/]\s*`\?factory`/.test(read(f)) || /\?factory\s*→\s*全設定リセット/.test(read(f)); } catch (_) { return false; } });
+  rule(factoryDrift.length === 0, "no documentation claims ?factory resets every setting (it is a safe-mode alias)",
+    factoryDrift.length ? `still claims it: ${factoryDrift.join(", ")}` : "");
 
   rule(library.includes("async function addVideoFiles") && library.includes("function probeVideoFile") &&
     library.includes("el.videoWidth > 0 && el.videoHeight > 0") && library.includes("videoReady"),

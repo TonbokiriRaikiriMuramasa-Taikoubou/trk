@@ -282,6 +282,7 @@ const TEXT = {
     recConfirmReset:"この曲の記録をすべて消しますか？", recExported:"記録を書き出しました。", recImported:"記録を読み込みました（{n}曲）。",
     prefImported:"📥 読み込みました: {list} — 再読み込みします",
     prefImportedPartial:"📥 読み込みました: {list} — 再読み込みします（未適用: {skipped}）",
+    prefSkipWhyId:"{k}（この端末に無いID）", prefSkipWhyType:"{k}（型が違う）", prefSkipWhyUnknown:"{k}（この設定に無いキー）",
     recBad:"記録ファイルの形式が正しくありません。", recCleared:"この曲の記録を消しました。"
   },
 
@@ -551,6 +552,7 @@ const TEXT = {
     recConfirmReset:"Clear all records for this song?", recExported:"Records exported.", recImported:"Records restored ({n} songs).",
     prefImported:"📥 Imported: {list} — reloading",
     prefImportedPartial:"📥 Imported: {list} — reloading (not applied: {skipped})",
+    prefSkipWhyId:"{k} (ID not available on this device)", prefSkipWhyType:"{k} (wrong type)", prefSkipWhyUnknown:"{k} (unknown setting)",
     recBad:"Invalid records file.", recCleared:"Records for this song cleared."
   },
 
@@ -819,6 +821,7 @@ const TEXT = {
     recConfirmReset:"要清除本曲的所有记录吗？", recExported:"已导出记录。", recImported:"已读取记录（{n}首）。",
     prefImported:"📥 已读取：{list} — 正在重新加载",
     prefImportedPartial:"📥 已读取：{list} — 正在重新加载（未应用：{skipped}）",
+    prefSkipWhyId:"{k}（此设备不存在的ID）", prefSkipWhyType:"{k}（类型不符）", prefSkipWhyUnknown:"{k}（未知的设置项）",
     recBad:"记录文件格式不正确。", recCleared:"已清除本曲记录。"
   },
 
@@ -1087,6 +1090,7 @@ const TEXT = {
     recConfirmReset:"이 곡의 기록을 모두 삭제할까요?", recExported:"기록을 내보냈습니다.", recImported:"기록을 불러왔습니다 ({n}곡).",
     prefImported:"📥 불러왔습니다: {list} — 다시 불러옵니다",
     prefImportedPartial:"📥 불러왔습니다: {list} — 다시 불러옵니다 (미적용: {skipped})",
+    prefSkipWhyId:"{k} (이 기기에 없는 ID)", prefSkipWhyType:"{k} (형식이 다름)", prefSkipWhyUnknown:"{k} (알 수 없는 항목)",
     recBad:"기록 파일 형식이 올바르지 않습니다.", recCleared:"이 곡의 기록을 삭제했습니다."
   }
 };

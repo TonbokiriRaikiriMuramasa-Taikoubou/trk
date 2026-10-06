@@ -73,12 +73,39 @@ const RICH_FALLBACK_ID = "skin";                 /* 元に戻すときの行き�
    ただし ?reset=tv / ?reset=all のときは、core.js の resetVideoPrefs() が
    先に settings 側へ既定値を書いている（core.js のほうが先に走る）ので、そちらを優先する。 */
 const idOk = v => typeof v === "string" && /^[a-z0-9_]{1,40}$/.test(v);
+/* ⚠ idOk は**書式だけ**なので "constructor" も "__proto__" も通る（全部小文字＋_で40字以内）。
+   いまは実害ゼロ＝3キーとも行き先が配列の .find()／.includes() だけで、継承キーは配列検索に効かない
+   （M-03 検収済み）。ただ F-30 の教訓は「辞書を足すときに継承キーを踏む」なので、
+   将来ここに辞書参照を足した瞬間の種を残さないよう、実在IDでも検証する。
+   ⚠ 二つのキーは**行き先が違う**ので同じ許可リストにしてはいけない：
+     ・tvRichId   ＝選べるリッチプリセット（portrait/anime/texture/quality の20種）
+     ・tvRichPrev ＝リッチではない元の映像フィルター（skin／vivid／off など**全65種**）
+     tvRichPrev をリッチ20種で検証すると、保存済みの「戻る先」が毎回リセットされる。
+   一覧が読めないときは従来どおり書式だけ（保存値を勝手に捨てない＝fail-open）。 */
+const richIds = () => {
+  try {
+    if (typeof TRK_TV_PRESETS === "undefined") return null;
+    const ids = TRK_TV_PRESETS.filter(p => p && RICH_CATS.includes(p.cat) && !p.off).map(p => p.id);
+    return ids.length ? ids : null;
+  } catch (_) { return null; }
+};
+const videoIds = () => {
+  try {
+    const L = (typeof window !== "undefined" && window.TrkTV && typeof window.TrkTV.list === "function") ? window.TrkTV.list()
+      : (typeof TrkTV !== "undefined" && typeof TrkTV.list === "function" ? TrkTV.list() : null);
+    if (!Array.isArray(L)) return null;
+    const ids = L.map(p => p && p.id).filter(id => typeof id === "string");
+    return ids.length ? ids : null;
+  } catch (_) { return null; }
+};
+const richIdOk = v => { if (!idOk(v)) return false; const ids = richIds(); return !ids || ids.includes(v); };
+const videoIdOk = v => { if (!idOk(v)) return false; const ids = videoIds(); return !ids || ids.includes(v); };
 const pickRich = (key, ok, def) => {
   const v = typeof settings[key] === "string" ? settings[key] : prefs[key];
   return ok(v) ? v : def;
 };
-settings.tvRichId = pickRich("tvRichId", idOk, RICH_DEFAULT_ID);
-settings.tvRichPrev = pickRich("tvRichPrev", idOk, "");
+settings.tvRichId = pickRich("tvRichId", richIdOk, RICH_DEFAULT_ID);
+settings.tvRichPrev = pickRich("tvRichPrev", videoIdOk, "");
 settings.tvRichCat = pickRich("tvRichCat", v => RICH_CATS.includes(v), RICH_CATS[0]);
 settings.tvRichOpen = typeof settings.tvRichOpen === "boolean" ? settings.tvRichOpen : prefs.tvRichOpen !== false;   /* 欄は最初から開いておく（🔥 TRKアンプとおそろい。触って閉じた人の記憶は残す） */
 

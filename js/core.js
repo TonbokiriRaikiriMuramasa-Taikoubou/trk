@@ -362,6 +362,7 @@ function enterSafeMode() {
   markAmpReset("off");
   settings.tvRichOpen = false;   /* ✨ TRKエフェクトの欄も安全側では閉じておく */
   if (settings.mascot === "mmd") settings.mascot = "skin";     // 🩷 セーフモードでは MMD を使わない
+  if (settings.mascot === "vrm") settings.mascot = "skin";     // 🧍 同じ理由で VRM も使わない（CDNのライブラリを読まない）
   if (typeof view !== "undefined" && view) { try { view.style.filter = "none"; } catch(_) {} }
 }
 function resetKeysPrefs() {

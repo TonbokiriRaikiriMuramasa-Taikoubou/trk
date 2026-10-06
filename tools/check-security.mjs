@@ -192,6 +192,32 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   rule(origins.length > 0 && badOrigins.length === 0, "third-party code comes only from the allow-listed CDN (import map)",
     origins.join(", "));
 
+  /* 版は「完全固定」か（範囲・latest を許さない）。CDN は jsDelivr だけ（既存の検査）。 */
+  const mapUrls = [...mapBlock.matchAll(/https:\/\/cdn\.jsdelivr\.net\/npm\/((?:@[^/]+\/)?[^/@"]+)@([^/"]+)\//g)];
+  const loose = mapUrls.filter(m => !/^\d+\.\d+\.\d+$/.test(m[2]));
+  rule(mapUrls.length >= 5 && loose.length === 0, "every CDN import is pinned to an exact version (no ranges, no latest)",
+    loose.map(m => `${m[1]}@${m[2]}`).join(" · "));
+
+  let lock = null;
+  try { lock = JSON.parse(fs.readFileSync(new URL("../tools/cdn-lock.json", import.meta.url), "utf8")); } catch (_) {}
+  const lockUrls = Object.keys((lock && lock.entries) || {});
+  const pkgs = [...new Set(mapUrls.map(m => m[1]))];
+  const uncovered = pkgs.filter(p => !lockUrls.some(u => u.includes(`/npm/${p}@`)));
+  rule(!!lock && lockUrls.length >= 20 && uncovered.length === 0,
+    `tools/cdn-lock.json covers every pinned package (${lockUrls.length} modules)`);
+
+  const dyn = [];
+  for (const [name, text] of Object.entries(js))
+    for (const m of text.matchAll(/\bimport\s*\(\s*"([^"]+)"/g)) dyn.push([name, m[1]]);
+  const lazyOk = dyn.length > 0 && dyn.every(([name, spec]) =>
+    ["js/vrm.js", "js/mmd.js"].includes(name) && (/^(three|@pixiv\/three-vrm)/.test(spec) || spec.startsWith("three/addons/") || spec.startsWith("@yohawing/")));
+  rule(lazyOk, "CDN modules are imported lazily and only from the VRM / MMD files",
+    dyn.map(d => `${d[0]}: ${d[1]}`).join(" · "));
+
+  const safeVrm = js["js/core.js"].includes('settings.mascot === "vrm") settings.mascot = "skin"') &&
+    js["js/core.js"].includes('settings.mascot === "mmd") settings.mascot = "skin"');
+  rule(safeVrm, "safe mode steps back from both VRM and MMD (so it never loads CDN code)");
+
   const swGuards = sw.includes("url.origin !== SCOPE.origin") && sw.includes('response.type === "basic"') &&
     sw.includes('request.method !== "GET"');
   rule(swGuards, "the service worker caches only same-origin, basic, GET responses");

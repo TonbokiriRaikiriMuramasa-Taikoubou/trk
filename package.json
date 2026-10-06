@@ -12,7 +12,9 @@
     "cap:sync": "npm run prepare:mobile && cap sync",
     "cap:open:android": "cap open android",
     "cap:run:android": "cap run android",
-    "cap:build:android": "npm run cap:sync && cap build android"
+    "cap:build:android": "npm run cap:sync && cap build android",
+    "check:cdn": "node tools/check-cdn.mjs",
+    "check:cdn:npm": "node tools/check-cdn.mjs --source=npm"
   },
   "dependencies": {
     "@capacitor/android": "8.5.2",

@@ -312,6 +312,48 @@ if (!exists("js/catalog.js") ||
   ok("official catalog (wishlist auto-match, no bundled audio) is wired");
 }
 
+// 🐔 trk's playlist tab: fixed 🐔 icon + three label choices, no profile editing, long-press = hierarchy.
+{
+  const library = read("js/library.js");
+  const core = read("js/core.js");
+  const html = read("index.html");
+  const i18n = library;
+  /* 名前・アイコン・色は固定（保存データ側も読み込み時にそろえる）。フォルダ名に絵文字を戻すと 🐔🐔 になる */
+  const fixedOk = library.includes('const TRK_FOLDER_NAME = "trk\'s playlist"') && library.includes("function trkFolderNormalize(") &&
+    library.includes("if (f.name !== TRK_FOLDER_NAME) { f.name = TRK_FOLDER_NAME; ch = true; }") &&
+    library.includes("trkFolderNormalize();   /* 旧データの") &&
+    !/id: TRK_FOLDER_ID,\s*name: "🐔/.test(library);
+  /* カタログは catalog.js の const。⚠ window.TRK_CATALOG は undefined で、Vol が1つも作られない */
+  const catalogOk = library.includes("function trkCatalog(") &&
+    library.includes("typeof TRK_CATALOG !== \"undefined\"") && !library.includes("window.TRK_CATALOG");
+  /* 表示名の3種類（許可リストは core.js の TRK_ENUM_VALUES＝設定Importでも検証する） */
+  const labelOk = library.includes("function trkTabLabel(") && library.includes("trkTabNameShort") && library.includes("trkTabNameFull") &&
+    library.includes("f.id !== TRK_FOLDER_ID) tabs.push({ id:\"fld:\" + f.id") &&
+    library.includes("if (!tabs.some(x => x.id === \"fld:\" + TRK_FOLDER_ID)) tabs.push({ id:\"fld:\" + TRK_FOLDER_ID, icon: TRK_TAB_ICON, label: trkTabLabel()") &&
+    /* 🐔 タブを OFF にしたらタブは消える。ただし 🎻 classic が生きていれば、そのタブだけは出す（行き止まりにしない） */
+    library.includes("if (trkFolder && settings.trkPlaylist !== false)") &&
+    core.includes('trkTabName: ["full", "short", "icon"]') && core.includes('trkTabName: pick(prefs.trkTabName') &&
+    core.includes('settings.trkTabName = "full"') && core.includes('"liteMode", "liteFps", "liteMascot", "liteScale", "trkTabName"');
+  /* 長押し＝階層。プロフィール編集（plMenu／plFolderMenu）へは行かせない */
+  const pressOk = library.includes("if (t.trk) plTrkMenu(); else if (t.pl) plMenu(t.pl); else if (t.fld) plFolderMenu(t.fld); else plGlobalMenu();") &&
+    library.includes("if (f && f.id === TRK_FOLDER_ID) { plTrkMenu(); return; }") && library.includes("function plTrkMenu(");
+  /* 設定欄：3種類の選択と、🎻 trk classic の収納（trkPanel の中の subPanel） */
+  const panelOk = html.includes('id="trkTabNameSel"') && html.includes('<option value="short" data-i18n="trkTabNameShort">') &&
+    html.includes('<option value="icon" data-i18n="trkTabNameIcon">') &&
+    /<details class="panel" id="trkPanel">[\s\S]*<details class="subPanel" id="trkClassicPanel">[\s\S]*?<\/details>\s*<\/details>/.test(html) &&
+    html.includes('id="trkSortAbcChk"') && html.includes('id="trkOrderList"');
+  const keys = ["trkTabNameLabel", "trkTabNameFull", "trkTabNameShort", "trkTabNameIcon", "trkTabNameNote",
+    "trkMenuTitle", "trkMenuHint", "trkMenuOpenFolder", "trkOpenItem", "trkMoveUp", "trkMoveDown", "trkOrderEmpty", "trkOrderAbcOff"];
+  const langOk = keys.every(k => (i18n.match(new RegExp("\\b" + k + ":", "g")) || []).length === 4);
+  if (!fixedOk) fail("trk's playlist name/icon/colour are not pinned (a 🐔 name brings back the double 🐔 tab)");
+  else if (!catalogOk) fail("trk wish lists read window.TRK_CATALOG, which is always undefined — the Vol tabs are never created");
+  else if (!labelOk) fail("the trk tab label (full / short / icon) or its allowlist is not wired");
+  else if (!pressOk) fail("long-press on the trk tab must open the hierarchy, not the profile editor");
+  else if (!panelOk) fail("the trk settings panel is missing the label select or the nested trk classic panel");
+  else if (!langOk) fail("trk tab/menu strings are missing from one of the four languages");
+  else ok("🐔 trk's playlist: fixed name/icon, three labels, long-press opens the hierarchy, trk classic nested in settings");
+}
+
 // 👥 Author tools for shared playlists (off by default; search/block/favorite).
 if (!read("js/library.js").includes("plAuthorMenu") ||
     !read("js/library.js").includes("plVisible") ||

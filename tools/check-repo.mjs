@@ -301,15 +301,70 @@ if (!exists("js/fx-worklet.js") ||
 }
 
 // 🛒 Official-source catalog: no-audio curated playlists with wishlist matching.
-if (!exists("js/catalog.js") ||
-    !read("js/catalog.js").includes("TRK_CATALOG") ||
-    !read("js/library.js").includes("plCatalogMenu") ||
-    !read("js/library.js").includes("plWishMatch") ||
-    !read("js/library.js").includes("plWishRows") ||
-    !read("index.html").includes('src="js/catalog.js"')) {
-  fail("official catalog plumbing is missing");
-} else {
-  ok("official catalog (wishlist auto-match, no bundled audio) is wired");
+{
+  const library = read("js/library.js");
+  const css = read("css/style.css");
+  /* 📡 「集める棚」：未入手の曲を開いた瞬間から灰色で並べ、入手したら黒くなる */
+  const collectionOk = library.includes("function plTitleKeys(") &&
+    /function plWishMatch\(w, byTitle\) \{\s*for \(const k of plTitleKeys\(w\.t\)\)/.test(library) &&
+    library.includes("function plCollectionEntries(") && library.includes("function plWishFolderIds(") &&
+    library.includes("for (const k of plTitleKeys((metaOf(it.key) || {}).title || it.title)) byTitleAdd(k, it);") &&
+    library.includes("const entries = plCollectionEntries(tabId, byTitle);") &&
+    library.includes("if (!all.length && !entries.length) {") &&
+    library.includes("if (!row.it) { box.append(plWishRow(row.w)); continue; }") &&
+    library.includes("function trkFolderIdSet() { return plWishFolderIds(TRK_FOLDER_ID); }") &&
+    library.includes("const haveAll = entries.filter(e => e.it).length, totalAll = entries.length;") &&
+    !library.includes("const wishLeft = []") &&   /* 下部の 📡 ブロックは行内の灰色行に置き換えた */
+    /plWishRow\{[^}]*opacity/.test(css) && css.includes(".plWishHint{");
+  /* 4言語ぶんの文言（ja/en/zh/ko で各4回）。行をまとめて書き換えたときに片方を消した事故を止める */
+  const stringsOk = ["plWishHead", "plWishTag", "plWishHint", "plWishOpen", "plWishNoLink",
+    "plCatalogBtn", "plCatalogHint", "plCatalogTake", "plCatalogTaken", "plCatalogDup"]
+    .every(k => library.split(k + ':\"').length - 1 === 4);
+  if (!exists("js/catalog.js") ||
+      !read("js/catalog.js").includes("TRK_CATALOG") ||
+      !library.includes("plCatalogMenu") ||
+      !library.includes("plWishMatch") ||
+      !library.includes("function plWishRow(") ||
+      !read("index.html").includes('src="js/catalog.js"')) {
+    fail("official catalog plumbing is missing");
+  } else if (!collectionOk || !stringsOk) {
+    fail("the collection shelf (grey unowned rows inline, turning black on arrival) is not wired");
+  } else {
+    ok("official catalog (wishlist auto-match, no bundled audio) is wired");
+  }
+}
+
+// ⚠ el(tag, cls, text) は文字を1つしか入れられない（入れ子を渡すと "[object ...]" になる）。
+// 引数4つ以上／第3引数がオブジェクト literal は取り違えなので、静的に止める。
+{
+  const bad = [];
+  for (const ent of fs.readdirSync(path.join(root, "js"))) {
+    if (!ent.endsWith(".js")) continue;
+    const src = read("js/" + ent);
+    for (const m of src.matchAll(/(?<![\w.])el\(/g)) {
+      const start = m.index + m[0].length;
+      let depth = 1, i = start;
+      while (i < src.length && depth) {
+        if (src[i] === "(") depth += 1;
+        else if (src[i] === ")") depth -= 1;
+        i += 1;
+      }
+      const inner = src.slice(start, i - 1);
+      const parts = []; let d = 0, cur = "";
+      for (const c of inner) {
+        if ("([{".includes(c)) d += 1;
+        else if (")]}".includes(c)) d -= 1;
+        if (c === "," && d === 0) { parts.push(cur); cur = ""; } else cur += c;
+      }
+      parts.push(cur);
+      const args = parts.map(p => p.trim());
+      const line = src.slice(0, m.index).split("\n").length;
+      if (args.length > 3) bad.push(`js/${ent}:${line} (el() に引数 ${args.length} 個)`);
+      else if (args.length === 3 && args[2].startsWith("{")) bad.push(`js/${ent}:${line} (el() の文字にオブジェクト)`);
+    }
+  }
+  if (bad.length) fail("el(tag, cls, text) misuse (children/objects passed as text): " + bad.join(", "));
+  else ok("el(tag, cls, text) is only ever given one text node (no [object HTML…] rows)");
 }
 
 // 🐔 trk's playlist tab: fixed 🐔 icon + three label choices, no profile editing, long-press = hierarchy.

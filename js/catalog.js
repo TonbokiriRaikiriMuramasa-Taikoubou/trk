@@ -287,7 +287,7 @@ S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber
     [T("初号指令 OST 上 — Part 1", "初号指令 OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2022928866638205084"),
      T("初号指令 OST 上 — Part 2", "初号指令 OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2022928866638205084"),
      T("初号指令 OST 下 — Part 1", "初号指令 OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2022928866638205084"),
-     T("初号指令 OST 下 — Part 2", "初号指令 OST", "https://x.com/AKEndfieldJP/status/2022928866638205084")]),
+     T("初号指令 OST 下 — Part 2", "初号指令 OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2022928866638205084")]),
    PL("ef-signal", "Endfield — The Signal Is Still Pulsing", "📡", "green", ["Game","Endfield","Metal Scar Radio","Signal"],
     [T("The Signal Is Still Pulsing", "Metal Scar Radio #01", "Metal Scar Radio", "https://endfield.wiki.gg/wiki/Metal_Scar_Radio"),
      T("The Magic Radio", "Metal Scar Radio #02", "Metal Scar Radio", "https://endfield.wiki.gg/wiki/Metal_Scar_Radio"),

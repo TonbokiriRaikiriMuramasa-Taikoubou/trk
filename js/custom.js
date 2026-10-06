@@ -199,7 +199,7 @@ async function writeZip(entries) {          // 無圧縮で書き出し（PNG・
 }
 
 /* ============ pack.json の検証（決められた項目と形式だけを受け付ける） ============ */
-const PACK_FORMAT = "shadow-taiko-pack", PACK_MB = 1048576, PACK_MAX = 500 * PACK_MB, PACK_SONG_MAX = 50;
+const PACK_FORMAT = "shadow-taiko-pack", PACK_MB = 1048576, PACK_MAX = 500 * PACK_MB, PACK_STORE_MAX = 1024 * PACK_MB, PACK_SONG_MAX = 50;
 const IMG_EXT = ["png", "webp", "jpg", "jpeg"], SND_EXT = ["wav", "mp3", "ogg", "m4a"];
 const SONG_EXT = ["mp3", "m4a", "ogg", "oga", "opus", "wav", "flac", "aac", "mp4", "webm"];
 const PACK_LIMIT = { image:4, bg:8, sound:5, vrm:200, vrma:30, audio:250, chart:2 };
@@ -325,8 +325,48 @@ const hasLook = m => !!(m.skin || m.notes || m.sounds || m.fx || m.mascot);
 const packDB = idbStore("shadow_taiko_packs", "packs");
 const packRuntime = { id:null, captions:null, noteImages:[null, null], urls:[], skinId:null, hadSounds:false };
 const noteImage = lane => { const im = packRuntime.noteImages[lane]; return im && im.complete && im.naturalWidth ? im : null; };
+function packRecordBytes(record) {
+  const files = record && record.files;
+  if (!files || typeof files !== "object") return 0;
+  return Object.keys(files).reduce((sum, key) => {
+    const file = files[key];
+    return sum + (file && Number.isFinite(file.size) && file.size > 0 ? file.size : 0);
+  }, 0);
+}
+function projectedPackStoreSize(records, id, incoming) {
+  let stored = 0, replacing = 0;
+  for (const record of records || []) {
+    const size = packRecordBytes(record);
+    stored += size;
+    if (record && record.id === id) replacing += size;
+  }
+  return { stored, replacing, projected:stored - replacing + incoming };
+}
+async function checkPackStorageCapacity(id, incoming) {
+  let records;
+  try { records = await packDB.all(); }
+  catch (_) { throw new PackError("packStorageCheckFailed"); }
+  const sizes = projectedPackStoreSize(records, id, incoming);
+  if (sizes.projected > PACK_STORE_MAX) throw new PackError("packStoreLimit", { max:PACK_STORE_MAX / PACK_MB });
+  try {
+    const storage = typeof navigator !== "undefined" && navigator.storage;
+    if (storage && typeof storage.estimate === "function") {
+      const estimate = await storage.estimate();
+      if (Number.isFinite(estimate.quota) && Number.isFinite(estimate.usage)) {
+        const available = Math.max(0, estimate.quota - estimate.usage) + sizes.replacing;
+        if (incoming > available) throw new PackError("packStorageQuota");
+      }
+    }
+  } catch (e) { if (e instanceof PackError) throw e; }  // estimate() is advisory; IndexedDB remains the final authority
+}
 
-async function installPackFile(file) {
+let packInstallQueue = Promise.resolve();
+function installPackFile(file) {
+  const task = packInstallQueue.then(() => installPackFileSerial(file));
+  packInstallQueue = task.then(() => undefined, () => undefined);
+  return task;
+}
+async function installPackFileSerial(file) {
   setStatus("packStatus", "packReading");
   try {
     if (file.size > PACK_MAX) throw new PackError("packTooBig");
@@ -350,14 +390,18 @@ async function installPackFile(file) {
       files[path] = new Blob([blob], { type:MIME[extOf(path)] || "" });
     }
     const id = "p" + hashString(`${man.name}|${man.author}`).toString(36);
-    await packDB.put(id, { id, manifest:man, files, size:total, installedAt:Date.now() });
+    await checkPackStorageCapacity(id, total);
+    const record = { id, manifest:man, files, size:total, installedAt:Date.now() };
+    const stored = await packDB.putIf(id, record, records => projectedPackStoreSize(records, id, total).projected <= PACK_STORE_MAX);
+    if (!stored) throw new PackError("packStoreLimit", { max:PACK_STORE_MAX / PACK_MB });
     setStatus("packStatus", "packInstalled", { name:man.name });
     await renderPackList();
     if (man.songs) emit("packsChanged");
     return { id, man };
   } catch (e) {
     console.error(e);
-    setStatus("packStatus", e instanceof PackError ? e.key : "packBadZip", e && e.vars);
+    const quotaError = e && (e.name === "QuotaExceededError" || e.code === 22 || e.code === 1014);
+    setStatus("packStatus", e instanceof PackError ? e.key : quotaError ? "packStorageQuota" : "packBadZip", e && e.vars);
     return null;
   }
 }

@@ -27,6 +27,9 @@ const data = context.__mmdCheck;
 const fail = message => { throw new Error(message); };
 const decoder = new TextDecoder("shift_jis");
 const ids = Object.keys(data.BUILTIN);
+if (Object.getPrototypeOf(data.BUILTIN) !== null || ["constructor", "__proto__", "prototype", "toString"].some(id => data.BUILTIN[id] !== undefined)) {
+  fail("MMD builtin motion lookup must not expose inherited object properties");
+}
 const expectedMotionCount = 65;
 const required = ["walk112", "run152", "sit10", "dance128", "dreamy128", "melt170", "wedh174", "faceSmile", "faceWink", "faceSing", "songMic", "songLong", "songUp", "songHum", "songWhisper", "songCall", "mikuPrincess152", "mikuLeek120", "mikuPopipo150", "mikuNyan160"];
 const retained = ["step", "swing", "turn", "jump", "idol", "stroll", "dune135", "kyukura165", "tyw150", "rolling194", "vanish240"];
@@ -236,4 +239,4 @@ if (!source.includes("for (const group of MOTION_GROUPS)") || !source.includes("
   fail("Grouped select/quick motion lists are not wired");
 }
 
-console.log(`MMD motion smoke check passed · ${ids.length} built-ins/choices · ${data.FACE_MORPHS.length} Lat morph tracks · VMD/CP932/poses + walk/run swing valid`);
+console.log(`MMD motion smoke check passed · ${ids.length} built-ins/choices · prototype-safe lookup · ${data.FACE_MORPHS.length} Lat morph tracks · VMD/CP932/poses + walk/run swing valid`);

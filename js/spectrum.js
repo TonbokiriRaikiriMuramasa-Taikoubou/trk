@@ -186,7 +186,7 @@ Object.assign(TEXT.ko, {
 
 /* ============ 設定（core.js の settings に足す） ============ */
 /* 見え方（順番がチップの並び順） */
-const STYLE_KEYS = {
+const STYLE_KEYS = Object.assign(Object.create(null), {
   bars:"specStyleBars", mirror:"specStyleMirror", wave:"specStyleWave", ring:"specStyleRing",
   daw:"specStyleDaw", vu:"specStyleVu", led:"specStyleLed", spectro:"specStyleSpectro",
   ecg:"specStyleEcg", seismo:"specStyleSeismo", radar:"specStyleRadar",
@@ -196,17 +196,17 @@ const STYLE_KEYS = {
   strings:"specStyleStrings", flower:"specStyleFlower", kaleido:"specStyleKaleido", starfield:"specStyleStarfield",
   matrix:"specStyleMatrix", fireworks:"specStyleFireworks", ocean:"specStyleOcean", spiral:"specStyleSpiral",
   windmill:"specStyleWindmill", lightning:"specStyleLightning"
-};
+});
 const SPEC_STYLES = Object.keys(STYLE_KEYS);
-const THEME_KEYS = {
+const THEME_KEYS = Object.assign(Object.create(null), {
   neon:"specThemeNeon", sunset:"specThemeSunset", mono:"specThemeMono", rainbow:"specThemeRainbow",
   trk:"specThemeTrk", sakura:"specThemeSakura", acid:"specThemeAcid", vhs:"specThemeVhs",
   gold:"specThemeGold", ice:"specThemeIce", forest:"specThemeForest", candy:"specThemeCandy",
   volcano:"specThemeVolcano", marine:"specThemeMarine", gameboy:"specThemeGameboy", synth:"specThemeSynth"
-};
+});
 const SPEC_THEMES = Object.keys(THEME_KEYS);
 /* チップや点に出す色（CSS の --specSwatch に渡す） */
-const THEME_SWATCH = {
+const THEME_SWATCH = Object.assign(Object.create(null), {
   neon:"linear-gradient(90deg,#22d3ee,#c084fc)", sunset:"linear-gradient(90deg,#ffb703,#ff4d9d)",
   mono:"#e5e7eb", rainbow:"linear-gradient(90deg,#f87171,#fbbf24,#4ade80,#60a5fa,#c084fc)",
   trk:"linear-gradient(90deg,#ff3b55,#55aaff)", sakura:"linear-gradient(90deg,#ffd1e0,#ff8fb1)",
@@ -215,7 +215,7 @@ const THEME_SWATCH = {
   forest:"linear-gradient(90deg,#4ade80,#166534)", candy:"linear-gradient(90deg,#ff9ecd,#a7f3d0)",
   volcano:"linear-gradient(90deg,#ff3d00,#ff9100)", marine:"linear-gradient(90deg,#0ea5e9,#065f7a)",
   gameboy:"linear-gradient(90deg,#9bbc0f,#0f380f)", synth:"linear-gradient(90deg,#ff2d95,#7c3aed,#ff9e00)"
-};
+});
 const specSafe = (typeof safeModeOn !== "undefined") && safeModeOn;
 /* 🛟 セーフモードのときは、保存値を読み戻さない（core.js が入れた「表示しない」を守る） */
 if (typeof prefs !== "undefined" && !specSafe) {
@@ -1054,7 +1054,7 @@ function drawFire(S, g, W, H) {
     g.fillRect(e.x, e.y, 2, 2);
   }
 }
-const STYLE_DRAW = {
+const STYLE_DRAW = Object.assign(Object.create(null), {
   bars: (S, g, W, H) => drawBars(S, g, W, H),
   mirror: (S, g, W, H) => drawBars(S, g, W, H),
   wave: drawWave, ring: drawRing,
@@ -1065,8 +1065,8 @@ const STYLE_DRAW = {
   strings: drawStrings, flower: drawFlower, kaleido: drawKaleido, starfield: drawStarfield,
   matrix: drawMatrix, fireworks: drawFireworks, ocean: drawOcean, spiral: drawSpiral,
   windmill: drawWindmill, lightning: drawLightning
-};
-const IDLE_LINE = { bars: 1, mirror: 1, wave: 1 };              // 音が無いときの平らな線を出す見え方
+});
+const IDLE_LINE = Object.assign(Object.create(null), { bars: 1, mirror: 1, wave: 1 }); // 音が無いときの平らな線を出す見え方
 
 /* ---- キャンバス1枚ぶんの状態（ピーク・履歴・針・粒子） ---- */
 const STATES = new WeakMap();
@@ -1145,8 +1145,8 @@ let tvCanvas = null;                   // 📺 TVに重ねるキャンバス
 let raf = 0;
 
 /* 📺 重ねるときの濃さ：全面に背景を塗る見え方は薄くして、映像が透けるようにする */
-const TV_ALPHA = { daw:.58, vu:.7, led:.7, spectro:.72, ecg:.7, seismo:.55, radar:.82, piano:.68, slide:.5, board:.68, lie:.55, fire:.85,
-  city:.6, matrix:.72, starfield:.75, fireworks:.72, ocean:.62, kaleido:.88, lightning:.7 };
+const TV_ALPHA = Object.assign(Object.create(null), { daw:.58, vu:.7, led:.7, spectro:.72, ecg:.7, seismo:.55, radar:.82, piano:.68, slide:.5, board:.68, lie:.55, fire:.85,
+  city:.6, matrix:.72, starfield:.75, fireworks:.72, ocean:.62, kaleido:.88, lightning:.7 });
 
 /* 動きを減らす設定の人には、本数を減らしてピークの残像も出さない */
 function reducedMotion() {

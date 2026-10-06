@@ -458,22 +458,24 @@ function exportPrefs(kind) {
   }
   try { downloadJSON(out, `trk-${kind || "all"}-` + new Date().toISOString().slice(0,10) + ".json"); } catch(e){ console.error(e); }
 }
+function parseHashParams(hash) {
+  return new URLSearchParams(String(hash || "").replace(/^#/, "").toLowerCase());
+}
 // URLパラメータを解釈して即時実行（ロード時）
 (function handleUrlCommands() {
   try {
     const url = new URL(location.href);
     const sp = url.searchParams;
-    const hash = (location.hash || "").toLowerCase();
+    const hashParams = parseHashParams(location.hash);
     const get = k => sp.get(k);
-    const has = k => sp.has(k) || hash.includes(k);
+    const has = k => sp.has(k) || hashParams.has(k);
     let didReset = "";
     let doExport = "";
-    let pendingFactory = false;   /* ♻️ 確認待ちの ?reset=all */
+    let pendingFactory = false;   /* ♻️ 確認待ちの ?reset=all / #reset=all */
     // export は先に判定（リセットと同時も可）
-    if (has("export")) doExport = (get("export") || "all").toLowerCase();
-    else if (sp.get("export") ) doExport = sp.get("export").toLowerCase();
+    if (has("export")) doExport = ((sp.has("export") ? get("export") : hashParams.get("export")) || "all").toLowerCase();
     // safe / safety
-    if (has("safe") || has("safety") || get("safe") === "1" || get("safety") === "1") {
+    if (has("safe") || has("safety")) {
       enterSafeMode(); didReset = "safe";
     } else if (get("reset")) {
       const r = get("reset").toLowerCase();
@@ -487,15 +489,15 @@ function exportPrefs(kind) {
         /* ♻️ いちばん危ないリセット。リンクを踏んだだけで消えないよう、確認を挟む（&force=1 で省略） */
         if (sp.get("force") === "1") { resetAllPrefs(); didReset = "all"; } else pendingFactory = true;
       }
-    } else if (hash.includes("#reset")) {
-      // #reset 単体は tv リセット扱い
-      if (hash.includes("audio") || hash.includes("sound")) { resetAudioPrefs(); didReset = "audio"; }
-      else if (hash.includes("notes")) { resetNotesPrefs(); didReset = "notes"; }
-      else if (hash.includes("lite")) { resetLitePrefs(); didReset = "lite"; }
-      else if (hash.includes("keys") || hash.includes("pad")) { resetKeysPrefs(); didReset = "keys"; }
-      else if (hash.includes("amp") || hash.includes("rack")) { resetAmpPrefs(); didReset = "amp"; }
-      else if (hash.includes("all")) {
-        if (hash.includes("force")) { resetAllPrefs(); didReset = "all"; } else pendingFactory = true;
+    } else if (hashParams.has("reset")) {
+      const r = (hashParams.get("reset") || "").toLowerCase();
+      if (["audio","sound","volume"].includes(r)) { resetAudioPrefs(); didReset = "audio"; }
+      else if (["notes","note"].includes(r)) { resetNotesPrefs(); didReset = "notes"; }
+      else if (["lite","light"].includes(r)) { resetLitePrefs(); didReset = "lite"; }
+      else if (["keys","key","pad","controller","input"].includes(r)) { resetKeysPrefs(); didReset = "keys"; }
+      else if (["amp","rack"].includes(r)) { resetAmpPrefs(); didReset = "amp"; }
+      else if (["all","factory","full"].includes(r)) {
+        if (hashParams.get("force") === "1") { resetAllPrefs(); didReset = "all"; } else pendingFactory = true;
       }
       else { resetVideoPrefs(); didReset = "tv"; }
     }
@@ -522,7 +524,8 @@ function exportPrefs(kind) {
         clean.searchParams.delete("reset"); clean.searchParams.delete("safe"); clean.searchParams.delete("safety"); clean.searchParams.delete("factory"); clean.searchParams.delete("force");
         // export は残しても良いが、一度だけにするために削除
         if (doExport) clean.searchParams.delete("export");
-        if (clean.hash.toLowerCase().includes("reset") || clean.hash.toLowerCase().includes("safe")) clean.hash = "";
+        const cleanHash = parseHashParams(clean.hash);
+        if (["reset", "safe", "safety", ...(doExport ? ["export"] : [])].some(k => cleanHash.has(k))) clean.hash = "";
         history.replaceState(null, "", clean.toString());
       } catch(_) {}
       if (pendingFactory) {
@@ -764,6 +767,19 @@ function idbStore(dbName, store = "kv") {
   return {
     get: k => run("readonly", s => s.get(k)),
     put: (k, v) => run("readwrite", s => s.put(v, k)),
+    putIf: (k, v, predicate) => open().then(db => new Promise((res, rej) => {
+      const tx = db.transaction(store, "readwrite"), objectStore = tx.objectStore(store);
+      let permitted = false, checkError = null;
+      const req = objectStore.getAll();
+      req.onsuccess = () => {
+        try {
+          permitted = predicate(req.result) === true;
+          if (permitted) objectStore.put(v, k);
+        } catch (e) { checkError = e; tx.abort(); }
+      };
+      tx.oncomplete = () => res(permitted);
+      tx.onerror = tx.onabort = () => rej(checkError || tx.error || new Error("IndexedDB transaction aborted"));
+    })),
     del: k => run("readwrite", s => s.delete(k)),
     all: () => run("readonly", s => s.getAll()),
     keys: () => run("readonly", s => s.getAllKeys())
@@ -990,6 +1006,24 @@ function showScreen(id) {
 function openSettings() { if (phase === "title") { showScreen("settingsScreen"); emit("settings"); } }   /* 🧭 スタンプ「設定を見た」の検知 */
 function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
 
+/* Emergency settings imports validate enum IDs at the boundary, before live settings are changed. */
+function validImportedSettingEnum(key, value) {
+  if (typeof value !== "string") return false;
+  try {
+    if (key === "specStyle") return !!window.TrkSpec && window.TrkSpec.styles().includes(value);
+    if (key === "specTheme") return !!window.TrkSpec && window.TrkSpec.themes().includes(value);
+    if (key === "mmdMotionKind") {
+      const ids = window.TrkMMD && window.TrkMMD.builtins();
+      return Array.isArray(ids) && (ids.includes(value) || ["auto", "none"].includes(value));
+    }
+    if (key === "fxPreset") {
+      const presets = window.TrkFX && window.TrkFX.list();
+      return Array.isArray(presets) && presets.some(p => p && p.id === value);
+    }
+  } catch (_) {}
+  return false;
+}
+
 /* ---------- 緊急復旧パネルのボタン ---------- */
 (function setupEmergencyPanel(){
   const bind = (id, fn) => {
@@ -1051,7 +1085,7 @@ function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
           settings.musicVolumeRestore = num(data.musicVolumeRestore, .01, 1, settings.musicVolumeRestore);
           applied.push("musicVolumeRestore");
         }
-        // 既知キーだけを取り込み、型も保存済み設定と合わせる（列挙型などは次回起動時にも個別検証）。
+        // 既知キーだけを取り込み、型と列挙IDは代入前に検証する。
         for (const k of Object.keys(data)) {
           if (UNSAFE_KEYS.has(k) || ["notes", "videoStyle", "tvDockSkin", "bgDim", "bgBlur", "tvParamFavs", "musicVolume", "musicVolumeRestore"].includes(k) || applied.includes(k)) continue;
           if (!Object.prototype.hasOwnProperty.call(settings, k)) continue;
@@ -1061,6 +1095,7 @@ function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
             : current && typeof current === "object" ? !!incoming && typeof incoming === "object" && !Array.isArray(incoming)
             : typeof incoming === typeof current && (typeof incoming !== "number" || Number.isFinite(incoming));
           if (!sameShape) continue;
+          if (["specStyle", "specTheme", "mmdMotionKind", "fxPreset"].includes(k) && !validImportedSettingEnum(k, incoming)) continue;
           try { settings[k] = incoming; applied.push(k); } catch(_){}
         }
         saveUserPrefs();

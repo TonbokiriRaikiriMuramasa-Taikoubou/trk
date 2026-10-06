@@ -325,7 +325,7 @@ for (const p of (typeof TRK_FX_PRESETS !== "undefined" ? TRK_FX_PRESETS : [])) {
 }
 if (!BUILTIN.some(p => p.id === "flat")) BUILTIN.unshift({ id:"flat", cat:"basic", label:{ ja:"フラット", en:"Flat" }, desc:"", chain:[] });
 
-let custom = {}, tempPreset = null;   // tempPreset：譜面・記録から読み込んだ一時的なエフェクト（保存しない）
+let custom = Object.create(null), tempPreset = null;   // ID辞書に継承キーを持たせない。tempPreset は譜面・記録の一時エフェクト。
 try {
   const raw = JSON.parse(localStorage.getItem(FX_STORE)) || {};
   for (const [id, v] of Object.entries(raw)) { const c = /^my_[a-z0-9]+$/.test(id) && cleanPreset(v); if (c) custom[id] = c; }

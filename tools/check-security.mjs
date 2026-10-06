@@ -19,6 +19,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -125,6 +126,32 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     core.includes("UNSAFE_KEYS.has(k)") && core.includes("Object.prototype.hasOwnProperty.call(settings, k)");
   rule(guard, "the settings import skips __proto__ / constructor / prototype and inherited keys");
 
+  const enumFnStart = core.indexOf("function validImportedSettingEnum(");
+  const enumFnEnd = core.indexOf("\n}", enumFnStart);
+  const enumFn = enumFnStart >= 0 && enumFnEnd >= 0 ? core.slice(enumFnStart, enumFnEnd + 2) : "";
+  let enumBehavior = false;
+  try {
+    const validate = vm.runInNewContext(`(${enumFn})`, { window:{
+      TrkSpec:{ styles:() => ["bars"], themes:() => ["neon"] },
+      TrkMMD:{ builtins:() => ["faceSing"] },
+      TrkFX:{ list:() => [{ id:"flat" }, { id:"my_test" }] }
+    }});
+    enumBehavior = validate("specStyle", "bars") && !validate("specStyle", "constructor") &&
+      validate("specTheme", "neon") && !validate("specTheme", "__proto__") &&
+      validate("mmdMotionKind", "faceSing") && validate("mmdMotionKind", "auto") && validate("mmdMotionKind", "none") &&
+      !validate("mmdMotionKind", "file") && !validate("mmdMotionKind", "constructor") &&
+      validate("fxPreset", "flat") && validate("fxPreset", "my_test") && !validate("fxPreset", "constructor");
+  } catch (_) {}
+  rule(!!enumFn && enumBehavior && core.includes('!validImportedSettingEnum(k, incoming)'),
+    "emergency settings import allowlists spectrum, MMD and FX enum IDs before assignment");
+
+  const prototypeSafeMaps = js["js/mmd.js"].includes("Object.assign(Object.create(null), {") &&
+    js["js/fx.js"].includes("let custom = Object.create(null)") &&
+    js["js/spectrum.js"].includes("const STYLE_DRAW = Object.assign(Object.create(null), {") &&
+    js["js/spectrum.js"].includes("const TV_ALPHA = Object.assign(Object.create(null), {") &&
+    js["js/spectrum.js"].includes("const STYLE_KEYS = Object.assign(Object.create(null), {");
+  rule(prototypeSafeMaps, "MMD, FX and spectrum ID dictionaries have no inherited property lookups");
+
   /* ほかに「外から来たオブジェクトを settings へ丸ごと代入」する形がないか */
   const loose = [];
   for (const [file, text] of allJs) {
@@ -144,6 +171,31 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     custom.includes("if (size > limit) throw new PackError(\"packFileTooBig\"") &&
     custom.includes("await inflateEntry(ent, lim, path)") && custom.includes("await inflateEntry(entries[mf], PACK_MB, mf)");
   rule(capped, "pack entries are inflated with a streaming size cap (a lying usize cannot exhaust memory)");
+
+  const recordStart = custom.indexOf("function packRecordBytes(");
+  const recordEnd = custom.indexOf("\nasync function checkPackStorageCapacity", recordStart);
+  const budgetSource = recordStart >= 0 && recordEnd >= 0 ? custom.slice(recordStart, recordEnd) : "";
+  let budgetBehavior = false;
+  try {
+    const projectedSize = vm.runInNewContext(`(()=>{${budgetSource}; return projectedPackStoreSize;})()`);
+    const sizes = projectedSize([
+      { id:"replace", files:{ audio:{ size:120 }, chart:{ size:30 } } },
+      { id:"keep", files:{ audio:{ size:70 } } }
+    ], "replace", 50);
+    budgetBehavior = sizes.stored === 220 && sizes.replacing === 150 && sizes.projected === 120 &&
+      projectedSize([], "new", 10).projected === 10;
+  } catch (_) {}
+  const storeCap = custom.includes("PACK_STORE_MAX = 1024 * PACK_MB") &&
+    custom.includes("await checkPackStorageCapacity(id, total)") && custom.includes("storage.estimate()") &&
+    custom.includes("packDB.putIf(id, record") && js["js/core.js"].includes("putIf: (k, v, predicate)") &&
+    custom.includes("let packInstallQueue = Promise.resolve()") && budgetBehavior;
+  rule(storeCap, "pack imports serialize and enforce a net 1 GiB installed-pack budget plus browser quota preflight");
+
+  const storageErrors = custom.includes('e.name === "QuotaExceededError"') &&
+    custom.includes('"packStorageQuota"') && custom.includes('"packStorageCheckFailed"') &&
+    ["packStoreLimit", "packStorageQuota", "packStorageCheckFailed"].every(key =>
+      read("js/i18n.js").split(`${key}:`).length - 1 === 4);
+  rule(storageErrors, "pack size/quota failures have actionable status text in all four languages");
 }
 
 /* ---------- 5b. 共有プレイリスト（他人から受け取るファイル） ---------- */
@@ -304,10 +356,23 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     addons.includes("codeShaLegacy(entry.code)");
   rule(strongFingerprint, "new add-on consent fingerprints use SHA-256 where Web Crypto is available (legacy hashes remain compatible)");
 
+  const hashParserStart = core.indexOf("function parseHashParams(");
+  const hashParserEnd = core.indexOf("\n}", hashParserStart);
+  const hashParserSource = hashParserStart >= 0 && hashParserEnd >= 0 ? core.slice(hashParserStart, hashParserEnd + 2) : "";
+  let hashForceExact = false;
+  try {
+    const parseHashParams = vm.runInNewContext(`(${hashParserSource})`, { URLSearchParams });
+    hashForceExact = parseHashParams("#reset=all&force=1").get("force") === "1" &&
+      parseHashParams("#reset=all&force=0").get("force") !== "1" &&
+      parseHashParams("#reset=all&forcely=1").get("force") !== "1" &&
+      parseHashParams("#RESET=ALL&FORCE=1").get("force") === "1";
+  } catch (_) {}
   const factoryGuard = core.includes("function askFactoryReset(") && core.includes("let pendingFactory = false") &&
-    core.includes('if (sp.get("force") === "1")') && core.includes("if (!pendingFactory) saveUserPrefs()") &&
+    core.includes('if (sp.get("force") === "1")') && core.includes('if (hashParams.get("force") === "1")') &&
+    core.includes("const hashParams = parseHashParams(location.hash)") && core.includes("const get = k => sp.get(k)") &&
+    core.includes("hashParams.has(\"reset\")") && !core.includes('hash.includes("force")') && hashForceExact && core.includes("if (!pendingFactory) saveUserPrefs()") &&
     core.includes('askFactoryReset(') && !/else if \(\["all","factory","full"\]\.includes\(r\)\) \{ resetAllPrefs\(\)/.test(core);
-  rule(factoryGuard, "?reset=all asks for confirmation before wiping every setting (&force=1 skips it)");
+  rule(factoryGuard, "query/hash factory reset asks for confirmation unless the exact force=1 parameter is present");
 
   rule(library.includes("async function addVideoFiles") && library.includes("function probeVideoFile") &&
     library.includes("el.videoWidth > 0 && el.videoHeight > 0") && library.includes("videoReady"),

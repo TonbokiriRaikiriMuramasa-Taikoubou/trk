@@ -6,7 +6,7 @@
   - **OWASP Top 10 Client-Side Security Risks**（ブラウザ側コード向け・OWASP プロジェクト）<https://owasp.org/projects/top-10-client-side-security-risks>
   - **CWE Top 25 Most Dangerous Software Weaknesses（2025）**（MITRE）<https://cwe.mitre.org/top25/>
   - 補助：OWASP Top 10（2021）の項目名（該当する物だけ）
-- 確認の方法：`npm run check`（静的検査 **32項目**）／`npm run check:cdn`（CDNの94モジュール）／jsdom の動的テスト（リポジトリ外 `tools/` ではなく検証用ハーネス）／手動の実機確認
+- 確認の方法：`npm run check`（静的検査 **31項目**＋**同梱ライブラリ検証8項目**）／`npm run check:cdn`（CDNの94モジュール）／jsdom の動的テスト（リポジトリ外 `tools/` ではなく検証用ハーネス）／手動の実機確認
 - 凡例：✅ 確認済み・🟡 仕様として残した（理由あり）・🔶 未実施の推奨・➖ このアプリには当てはまらない
 
 ---
@@ -18,12 +18,12 @@
 | 1 | **Broken Client-side Access Control** | 🟡 | サーバもアカウントも無いので「他人のデータに触る」経路はありません。ページ内でコードが動ける唯一の穴は**アドオン**で、**入れた人の責任**（明示インストール・共有ファイルから自動では入らない・512KB上限・オフ／削除可・`?safe=1` で停止）。端末のファイルは**読み取り専用**、フォルダは「🚫 共有をやめる」でハンドルを両方削除 |
 | 2 | **DOM-based XSS** | ✅ | `innerHTML` は結果画面の1か所だけで**すべて `esc()` 済み**（`js/game.js`）。書斎の本文は `createTextNode`/`textContent` のみ（`.html`/`.js`/`.md` もソースのまま表示）。`javascript:` は `safeHttpUrl()` で弾き、共有URLは `safeLink()` が**文字にするだけ**。`eval`/`new Function`/`document.write` はアドオン（仕様）以外に無し |
 | 3 | **Sensitive Data Leakage**（トラッカー・ピクセル） | ✅ | 外部通信は**同一オリジンの取得**と、VRM／MMD を使うときの jsDelivr のみ（`privacy.html` と一致）。解析・広告・ピクセルなし。実測でも起動時にページ内から外部へ出ません |
-| 4 | **Vulnerable and Outdated Components** | 🟡 | CDNは**完全固定**（`three@0.180.0` 等）で、**94ファイル・3.60MB の SHA-384 を `tools/cdn-lock.json` に記録**し `npm run check:cdn` で検証可。import map は **SRI が使えない**のが残る弱点 → 自前ホスティング推奨（§C-1） |
-| 5 | **Lack of Third-party Origin Control** | 🟡 | 第三者コードは**許可リスト1ホスト（cdn.jsdelivr.net）だけ**で、動的 `import()` も `js/vrm.js`・`js/mmd.js` の許可リストのみ（`check-security` が検査）。Service Worker は**クロスオリジンをキャッシュしない**。**CSP は未設定**（inline の import map があるため段階導入が必要 → §C-2） |
-| 6 | **JavaScript Drift**（読み込むコードが知らぬ間に変わる） | ✅ | CDNの全モジュールのハッシュを記録し、`check:cdn` で「変わった／増えた／消えた」を検出（npm レジストリとの突き合わせは `check:cdn:npm`）。自分のコードは git 管理下でPRレビュー |
+| 4 | **Vulnerable and Outdated Components** | ✅ | 第三者ライブラリ（three.js・three-vrm・three-mmd-loader）は **`assets/vendor/` に同梱**（98ファイル・3.60MB）。**`tools/vendor-lock.json` に SHA-384 を記録し、`npm run check` が毎回オフラインで検証**（`npm run check:vendor`）。版の更新は `npm run vendor:update` で差分がPRに残る |
+| 5 | **Lack of Third-party Origin Control** | ✅ | **import map に第三者オリジンがありません**（全部 `./assets/vendor/...`＝同一オリジン。`check-security` が検査）。動的 `import()` も `js/vrm.js`・`js/mmd.js` だけ。Service Worker はクロスオリジンをキャッシュしません（CSP の扱いは §C-1） |
+| 6 | **JavaScript Drift**（読み込むコードが知らぬ間に変わる） | ✅ | 第三者コードは**リポジトリに入っている**ので、変われば git の差分として必ず見えます。加えて `check-vendor` がハッシュ・相対importの解決・import map の被覆を毎回検査（来歴の確認は `check:vendor:npm`） |
 | 7 | **Sensitive Data Stored Client-Side** | ✅ | 保存するのは設定・スコア・プレイリスト・パック・書斎の本・VRM/MMDモデル・フォルダのハンドル。**パスワード・トークン・APIキー・個人情報は保存しません**（そもそも持ちません）。端末を触れる人はブラウザのストレージから読める、が正直なところで `privacy.html` に明記 |
 | 8 | **Client-side Security Logging and Monitoring Failures** | 🟡 | 送信型のログ・監視は**ありません**（オフラインで完結するゲームなので、送る先が無い＝プライバシー優先）。異常は画面の表示とコンソールで確認。監視が要るなら有料の外部サービスが必要になるため、意図的に持たない選択 |
-| 9 | **Not Using Standard Browser Security Controls** | 🔶 | 使っている：同一オリジン限定のService Worker（ネットワーク優先）・読み取り専用のファイル選択・`noopener noreferrer`・`safeHttpUrl`・`?safe=1`。**未使用：CSP（Subresource Integrity は import map では不可）** → §C-2 の推奨 |
+| 9 | **Not Using Standard Browser Security Controls** | 🟡 | 使っている：同一オリジン限定のService Worker（ネットワーク優先）・読み取り専用のファイル選択・`noopener noreferrer`・`safeHttpUrl`・`?safe=1`。**CSP は入れない方針**（§C-1：ビルド無しのHTML/JS・inline import map・blobメディアのため、開発と実機検証が壊れやすい。**安定版リリース時のみ**実機テスト付きで検討）。第三者オリジンがゼロになったことで、CSP を入れる場合の設定もずっと簡単になりました |
 | 10 | **Including Proprietary Information on the Client-Side** | ✅ | trk! は GPL-3.0-or-later のオープンソースで、クライアントに秘密は置いていません（APIキー・認証情報・内部エンドポイントなし）。隠し要素は「遊び」であって機密ではありません |
 
 ## B. CWE Top 25（2025）から、ブラウザアプリに関係するもの
@@ -45,10 +45,10 @@
 
 ## C. 残っている宿題（推奨・未実施）
 
-1. **CDN の自前ホスティング（vendor 化）**：実測 **94ファイル・3.60MB**。CDN改ざん・オフライン・版消滅が同時に解決（当面は `check:cdn` 運用）
-2. **CSP（Content Security Policy）**：inline の import map を外部ファイル化＋ハッシュ化してから段階導入。`script-src`／`media-src blob:`／`worker-src` の検証が必要で、壊すと全機能が止まるため**実機テスト付きで**（`docs/SECURITY.md` §6 に案）
-3. **`?reset=all` の確認ダイアログ**（リンクを踏むだけで設定が初期化される）／**アドオン同意の記録**／**GitHub Actions のSHA固定**／**`mobile-web/` から開発文書を除外**
-4. **このチェックリストの定期実行**：バージョンを上げたら `npm run check` と `npm run check:cdn`、新しいファイル形式を足したら該当する検証関数と `tools/check-*.mjs` をセットで更新（`docs/HANDOFF.md` の決まりごと）
+0. **（済）CDN の自前ホスティング（vendor 化）**：2026-10-06 完了（**98ファイル・3.60MB**・`tools/vendor-lock.json`・`npm run check` で毎回オフライン検証）
+1. **CSP は「基本は入れない」方針**（ユーザー判断）：ビルド無しのHTML/JS・inline の import map・blob のメディアを使うため、入れると開発／実機検証が壊れやすい。**安定版としてリリースするときだけ**、外部化＋ハッシュ＋`media-src blob:` を実機テスト付きで検討する（今は `<meta http-equiv>` も置かない）。第三者オリジンがゼロになったので、必要になったときの設定は簡単になっている
+2. **残っている小さな宿題**：`?reset=all` の確認ダイアログ（※対応中）／アドオン同意の記録（※対応中）／**GitHub Actions のSHA固定**／**`mobile-web/` から開発文書を除外**
+3. **このチェックリストの定期実行**：バージョンを上げたら `npm run check`、第三者ライブラリを上げたら `npm run vendor:update` ＋ `npm run check:vendor:npm`、新しいファイル形式を足したら該当する検証関数と `tools/check-*.mjs` をセットで更新（`docs/HANDOFF.md` の決まりごと）
 
 ---
 

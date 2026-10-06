@@ -186,37 +186,31 @@ const occurrences = (text, re) => [...text.matchAll(re)];
 {
   const mapStart = indexHtml.indexOf('type="importmap"');
   const mapBlock = mapStart < 0 ? "" : indexHtml.slice(mapStart, indexHtml.indexOf("</script>", mapStart) + 9);
-  const origins = [...new Set(occurrences(mapBlock, /https:\/\/([a-z0-9.-]+)/gi).map(m => m[1].toLowerCase()))];
-  const allowed = new Set(["cdn.jsdelivr.net"]);
-  const badOrigins = origins.filter(o => !allowed.has(o));
-  rule(origins.length > 0 && badOrigins.length === 0, "third-party code comes only from the allow-listed CDN (import map)",
-    origins.join(", "));
-
-  /* 版は「完全固定」か（範囲・latest を許さない）。CDN は jsDelivr だけ（既存の検査）。 */
-  const mapUrls = [...mapBlock.matchAll(/https:\/\/cdn\.jsdelivr\.net\/npm\/((?:@[^/]+\/)?[^/@"]+)@([^/"]+)\//g)];
-  const loose = mapUrls.filter(m => !/^\d+\.\d+\.\d+$/.test(m[2]));
-  rule(mapUrls.length >= 5 && loose.length === 0, "every CDN import is pinned to an exact version (no ranges, no latest)",
-    loose.map(m => `${m[1]}@${m[2]}`).join(" · "));
+  /* 第三者コードは CDN から読まず、assets/vendor に同梱したコピー（ハッシュ固定）を使う。
+     tools/check-vendor.mjs が「lockとの一致・相対importの解決・import mapの被覆」を検査する。 */
+  const remoteMap = [...mapBlock.matchAll(/https?:\/\//g)];
+  rule(remoteMap.length === 0, "the import map has no third-party origin left (the code is vendored)",
+    remoteMap.length ? `${remoteMap.length} remote url(s)` : "local only");
 
   let lock = null;
-  try { lock = JSON.parse(fs.readFileSync(new URL("../tools/cdn-lock.json", import.meta.url), "utf8")); } catch (_) {}
-  const lockUrls = Object.keys((lock && lock.entries) || {});
-  const pkgs = [...new Set(mapUrls.map(m => m[1]))];
-  const uncovered = pkgs.filter(p => !lockUrls.some(u => u.includes(`/npm/${p}@`)));
-  rule(!!lock && lockUrls.length >= 20 && uncovered.length === 0,
-    `tools/cdn-lock.json covers every pinned package (${lockUrls.length} modules)`);
+  try { lock = JSON.parse(fs.readFileSync(new URL("../tools/vendor-lock.json", import.meta.url), "utf8")); } catch (_) {}
+  const lockEntries = Object.entries((lock && lock.entries) || {});
+  const badLocal = lockEntries.filter(([, e]) => typeof e.local !== "string" || !e.local.startsWith("assets/vendor/") ||
+    !/^[A-Za-z0-9+/=]{40,}$/.test(String(e.sha384 || "")));
+  rule(lockEntries.length >= 20 && badLocal.length === 0,
+    `tools/vendor-lock.json pins every vendored module by SHA-384 (${lockEntries.length} modules)`);
 
   const dyn = [];
   for (const [name, text] of Object.entries(js))
     for (const m of text.matchAll(/\bimport\s*\(\s*"([^"]+)"/g)) dyn.push([name, m[1]]);
   const lazyOk = dyn.length > 0 && dyn.every(([name, spec]) =>
     ["js/vrm.js", "js/mmd.js"].includes(name) && (/^(three|@pixiv\/three-vrm)/.test(spec) || spec.startsWith("three/addons/") || spec.startsWith("@yohawing/")));
-  rule(lazyOk, "CDN modules are imported lazily and only from the VRM / MMD files",
+  rule(lazyOk, "the 3D modules are imported lazily and only from the VRM / MMD files",
     dyn.map(d => `${d[0]}: ${d[1]}`).join(" · "));
 
   const safeVrm = js["js/core.js"].includes('settings.mascot === "vrm") settings.mascot = "skin"') &&
     js["js/core.js"].includes('settings.mascot === "mmd") settings.mascot = "skin"');
-  rule(safeVrm, "safe mode steps back from both VRM and MMD (so it never loads CDN code)");
+  rule(safeVrm, "safe mode steps back from both VRM and MMD (so it never loads the 3D code)");
 
   const swGuards = sw.includes("url.origin !== SCOPE.origin") && sw.includes('response.type === "basic"') &&
     sw.includes('request.method !== "GET"');

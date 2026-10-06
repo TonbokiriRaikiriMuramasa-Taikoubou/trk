@@ -10,7 +10,7 @@
 1. まずこの文書と `git status --short`、`git diff` を確認する。未コミットの作業を勝手に破棄しない。
 2. 作業ブランチはセッションごとに指定される（このリポジトリでは `arena/…-trk`）。指定されたブランチから切り替えず、pushもそのブランチだけに行い、`main` への反映はPR経由で行う。
 3. 開発はリポジトリ内の実コードを編集し、最後に最低限 `npm run check` と `git diff --check` を実行する。
-4. 実ブラウザ・タッチ端末・CDN依存の確認は静的検査で代用せず、未確認なら未確認のまま記録する。
+4. 実ブラウザ・タッチ端末・3D（WebGL）の確認は静的検査で代用せず、未確認なら未確認のまま記録する。第三者ライブラリは同梱（`assets/vendor/`）なので、オフラインでも動く。
 
 このプロジェクトは通常のWebアセットで、バンドラーはありません。`index.html` をローカルのHTTPサーバーまたはGitHub Pagesから開きます。開発前には `docs/HANDOFF.md` を読み、コードの変更後は必要な文書・テスト・Service Workerのキャッシュ名も同期してください。
 
@@ -37,7 +37,7 @@
 - 書斎を開いている間は `window._trkStudyRoomOpen` でゲーム側のキー操作を止める（`player.js`／`main.js`／`modes.js`／`stage.js`／`truck.js`／`catch.js`／`speed.js`／`extras.js`／`video-max.js`／`media-player-mode.js`／`synth-mode.js`）。書斎自身のキー（←→・PageUp/Down・Space/Enter・Esc・B/M/T/F・`+`/`-`/`0`・`?`・Ctrl+F）は capture で先に受け取る。ただし入力欄・セレクトでは書斎のキーを止め、ボタンに焦点があるときの Space／Enter はそのボタンに譲る。書斎を閉じる・`phase` が `title` 以外へ進む・曲が切り替わるときは、TVペインへ移した `<video>` を元の親と `style` へ戻す（元の親が差し替わっていても `document.body` へ逃がす）。
 - 🔥 TRKアンプ（`js/fx-dock.js` の左下カテゴリー＋`js/fx.js` のラック）：`settings.fxRack`（段の配列・最大8。`cleanFx` で検証）／`settings.fxRackOn`（初期オフ）／`settings.ampOpen`（欄の開閉・**初期開き**。触って閉じた人の `false` は尊重。`?reset=amp`／`?reset=all` は初期の開へ戻し、`?safe=1` だけは閉じたまま）。段は**プリセットの後・かんたんEQの前**に効き、`exportObj`（マイプリセット書き出し）と `exportPrefs("all")`（設定の書き出し）にそのまま入る。リセットは `?reset=amp`（別名 `rack`）＝空に／`?reset=all`＝空に／`?safe=1`＝**段は残して止める**だけ。`core.js` の `resetAmpPrefs()` は fx.js より先に走るため、一度きりの合図 `takeAmpReset()`（sessionStorage `trk_amp_reset_once`）を置き、`js/fx.js` が読み込み時に拾って消す。⚠ `js/fx.js` は凍結扱いだが、この機能のために**追加のみ**の窓口（`TrkFX.rack`／`rackTypes`／`rackOn`／`rackSet`／`rackAdd`／`rackClear`）と `refresh()` の `emit("fxRack")` を足した（DSP・保存形式は不変）。
 - ✨ TRKエフェクト（`js/tv-rich.js` の左下カテゴリー）：`js/tv-presets.js` の `portrait|anime|texture|quality`（各5種＝20）をまとめた**独立カテゴリー**（`details.panel.dockRich#richPanel`）。🔥 TRKアンプの直下に `placeRich()`＋MutationObserver で再配置。**中身は映像フィルターそのもの**で、適用は必ず `TrkTV.select()`（`settings.videoStyle`）を通す＝TVドックと二重がけにならない。設定キーは `tvRichId`（初期 `portrait_natural`）／`tvRichPrev`（切ったとき戻る先）／`tvRichCat`（開いているタブ・初期 `portrait`）／`tvRichOpen`（欄の開閉・**初期開き**。触って閉じた人の `false` は尊重。`?reset=tv`／`?reset=all` は開へ戻し、`?safe=1` は閉じたまま）。`resetVideoPrefs()`（`?reset=tv`）で4つとも初期化し、`exportPrefs("all")` にも入る。`?safe=1` はスイッチとチップを無効化して記憶は残す。⚠ `TrkTV.list()` に説明文は無いので、説明は `TRK_TV_PRESETS` から読む。⚠ 読み込み時は `settings` 側の値を優先する（`?reset=tv` は core.js が先に走って settings へ既定値を書くため）。
-- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux22`。公開ファイルを変更したら必ず更新する。
+- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux23`。公開ファイルを変更したら必ず更新する。
 - このcheckoutで `npm run check` はコード・データの自動検査を行うが、MMDの実描画・タッチ操作・音声の実機確認は別途必要。
 
 ---
@@ -99,7 +99,7 @@
   - **📁 開く／📤 共有で覚えたフォルダのハンドルは、「🚫 共有をやめる」で `share` と `dir` の両方を消す**。⚠ `FileSystemHandle.remove()` は**本物のファイル／フォルダを消す API** なので絶対に呼ばない（check-security が見張っている）。
   - **大きいメディアを丸ごとメモリに載せない**：`js/media.js` の `ANALYZE_MAX`（96MB）を超えるファイルは音声解析を省略する（`analysis` を使う所は全部 `if (analysis)` で守る）。動画は「🎬 動画を読み込む」＝`addVideoFiles`／`probeVideoFile` を通し、**最初のフレーム（videoWidth > 0）まで確かめてから** 🎬 として記録する（勝手に「動画」と決めつけない）。
   - **`?safe=1` の判定は core.js の `handleUrlCommands()`（＝起動直後）より後ろに動かさない**。コードを実行しうるもの（アドオンの `boot()` 等）は、必ずセーフモードの判定**後**に置き、先頭で `safeNow()` を見る。SW は**セーフモードのクライアントにキャッシュを配らない**（`safeClients`／`safeWanted`）＝オフラインでも汚染されたコピーを実行しない。
-  - **CDN（three.js／three-vrm／MMDローダ）の版を上げたら `npm run check:cdn -- --update` で `tools/cdn-lock.json` を作り直し、差分を確認する**（`--source=npm` なら npm のタール玉と突き合わせ）。CDN の URL は**完全固定**（`@x.y.z`）のみ。範囲指定・`latest` は使わない。**起動時に CDN を読まない**こと（動的 import は `js/vrm.js` と `js/mmd.js` だけ）。
+  - **第三者ライブラリは CDN から読まない**（`assets/vendor/` に同梱）。import map は相対パス `./assets/vendor/...` のみ。**同梱ファイルは手で編集しない**：版を上げるときは `npm run vendor:update` → `git diff` で差分を確認 → `npm run check`（`npm run check:vendor` がハッシュ・相対import・import map の被覆をオフラインで検証。来歴は `npm run check:vendor:npm`）。**起動時に3Dライブラリを読まない**こと（動的 import は `js/vrm.js` と `js/mmd.js` だけ）。
   - **📚 書斎の本文は「文字」としてしか描かない**（`createTextNode` / `textContent`。`innerHTML` での本文組み立ては禁止。マークダウンのレンダラも無し）。`.html`／`.js`／`.md` もソースのまま見せます。
   - **青空文庫ルビの解析（`js/study-room-utils.js` の `aozoraSegments`）は線形走査を維持する**。後戻りのある正規表現（`/｜([^《\n]+)《…/`）に戻すと、**漢字だけが続く本文や閉じない`《`でタブが固まる**（実測: 1MBで数分）。`tools/check-study-room.mjs` が速度、`tools/check-security.mjs` が正規表現への逆戻りを見張っている。
   - **`eval`／`new Function`／`document.write`／`srcdoc` を使わない**。`innerHTML` は `js/game.js` の結果画面（全部 `esc()` 済み）だけ。アドオンは仕様としてページ内フル権限なので、**遠隔からコードを取りに行かない**（同梱の `js/addons/example.js` のみ）・安全モードでは読まない、を維持する。
@@ -142,7 +142,7 @@
 ### 検査と未保証
 
 - テスト：`tools/check-mmd-motion-data.mjs` が全65種のポーズ値・VMD構造・CP932・Lat式PMDのボーン／モーフ名・モーフフレームに加え、歩行／走行の前後振り（左右が逆相・同じ側の脚と逆相・肘の前折り・足ＩＫが左右交互に上がる）を検査する。
-- ブラウザ上の描画・VMDローダー実行・髪／衣装／スカートの貫通は、このNode検査だけでは保証しない。three.jsと `@yohawing/three-mmd-loader` はMMD使用時にCDNから読み込む。
+- ブラウザ上の描画・VMDローダー実行・髪／衣装／スカートの貫通は、このNode検査だけでは保証しない。three.jsと `@yohawing/three-mmd-loader` は同梱（`assets/vendor/`）で、MMDを使い始めたときに読み込む。
 
 ---
 
@@ -160,7 +160,7 @@ git diff --check
 
 ### 未確認の実機項目
 
-- Lat式ミクの表示・表情モーフ・65種の動き、特に左右の腕／顔／裾の見え方。CDN利用を含むため実ブラウザで確認する。
+- Lat式ミクの表示・表情モーフ・65種の動き、特に左右の腕／顔／裾の見え方。同梱ライブラリ（`assets/vendor/`）の読み込みを含むため実ブラウザで確認する。
 - 🚶歩行／🏃走行の「その場足踏み」：足が上がって（歩き0.7／走り1.1ユニット）、ひざが前へ出て、腕が前後に振れているか。**🎤6種**：口の動きが見えるか、手が口や体に被らないか、マイク持ち（`songMic`）がそれらしく見えるか。
 - 曲名バナー音量ボタンの短押し・650ms長押し、ドラッグ時の誤発火防止、タッチ端末でのミュート／復元。
 - 🪶 軽量化：実機（Android Chrome／PWA／APK）での `getBattery()` の有無、省データ設定・電池残量での自動オン、30／20fpsでのプレイ感と発熱・電池のもち、MMD／VRMの「描画しない」、描画解像度1.0倍の見え方、`body.trkLiteFx` で `backdrop-filter` が消えること。バナー右端の [◀][🎲][▶]：🎲 の長押し／タップ／設定オフ、◀▶ の回り込み、曲名との重なり（実ブラウザ・タッチ端末）。

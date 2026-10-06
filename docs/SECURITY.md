@@ -19,7 +19,7 @@ trk! は **サーバーを持たない** ブラウザ音ゲーです。アカウ
 |---|---|
 | 配布 | 静的ファイル（GitHub Pages）。ビルド無し。Android は Capacitor の WebView に入れた同じ一式 |
 | 保存 | `localStorage`（設定・記録・お気に入り・アドオン）+ IndexedDB（パック・曲・VRM/MMD・書斎の本） |
-| 外部通信 | **同一オリジンの取得のみ**＋VRM/MMD を使うときだけ jsDelivr CDN（three.js 系） |
+| 外部通信 | **同一オリジンの取得のみ**（VRM/MMD のライブラリも `assets/vendor/` に同梱。外部オリジンへは出ません） |
 | サーバー | 無し。trk! へ送信する処理は無い（送る機能を作らない） |
 | 守るべきもの | ①端末内の私物（書斎の本・画像・曲・スコア・設定）②「入れたつもりの無いコード」を動かさないこと ③壊れないこと（データ消失・フリーズ） |
 
@@ -59,7 +59,7 @@ trk! は **サーバーを持たない** ブラウザ音ゲーです。アカウ
 | F-18 | **中** | **大きいファイルを丸ごとメモリに載せていた**：曲の音声解析（`analyzeAudio`）が `file.arrayBuffer()` でファイル全体を読み込むため、**2GBの動画などでメモリを圧迫**し、解析に失敗するか端末が固まり得た（ユーザー報告：2GB・6分の mp4 が映像ではなく音楽として扱われた） | **修正**（`ANALYZE_MAX = 96MB` を超えるファイルは解析を省略し、状態に理由を表示。解析が無くても譜面はBPMグリッドから作れる＝ゲームは遊べる。動画は `<video>` がストリーム再生するので丸読み不要）＋ **🎬 動画として読み込む**導線を追加（最初のフレームまで確かめて映像つきを判定し、そのまま全画面ビューアで再生） |
 | F-19 | **中** | **Service Worker のオフライン用キャッシュは `?safe=1` を知らなかった**：キャッシュはページ内のコード（アドオン等）からも書けるため、汚染されたコピーを**セーフモードでも配ってしまう**経路があり得た（通信があるときはネットワーク優先なので、影響するのはオフライン時） | **修正**（セーフモードで開いたページ＝そのクライアントは、SW が**キャッシュを一切使わない**。オフラインなら「キャッシュを使いません」と 503 を返す。ほかのタブの動きとキャッシュの中身は変えない）。`sw.mjs` の検証で6/6 |
 | F-4 | 中 | アドオンは「入れた時点でコードが動く＝ページ内のフル権限」。同意の文言はあるが確認ダイアログや指紋の記録は無い | **仕様として維持**（§5 に明記。同意強化は §6 の推奨） |
-| F-5 | 中 | three.js 系を jsDelivr から読む（バージョン固定は有り）。**import map は SRI が使えない**ため、CDN 側が汚染されると trk! のページで任意コードが動く | **仕様として維持**（§6 に自前ホスティング推奨） |
+| F-5 | 中 | three.js 系を jsDelivr から読む（バージョン固定は有り）。**import map は SRI が使えない**ため、CDN 側が汚染されると trk! のページで任意コードが動く | **修正（自前ホスティング）**：`assets/vendor/` に同梱し、import map を相対パスにしました（§8）。第三者オリジンはゼロ、中身は `tools/vendor-lock.json`（SHA-384・98ファイル・3.60MB）で固定し、`npm run check` の中で毎回オフライン検証します |
 | F-6 | 低 | `?reset=all` / `#reset=all` は**確認なし**で設定（プレイリスト・TVお気に入り含む）を初期化。リンクを踏むだけで消せる | 文書化（§6 に確認ダイアログ推奨） |
 | F-7 | 低 | GitHub Pages では `frame-ancestors` / `X-Frame-Options` を付けられず、**どこかのページに iframe で埋め込める**（クリックジャッキング）。ただしフォルダ共有は `window.self === window.top` で iframe 内では無効、削除系は `confirm` 有り | 文書化（§6） |
 | F-8 | 低 | `?tv=` `?skin=` はリンクだけで見た目を書き換え、**保存までする**（値はプリセットIDに解決されるので、任意CSSの注入にはならない） | 文書化（必要なら「URL経由は保存しない」に変更可） |
@@ -76,7 +76,7 @@ trk! は **サーバーを持たない** ブラウザ音ゲーです。アカウ
 | 📚 書斎の**パス・トラバーサル**（`../` で端末のファイルを読む／書く） | `relativePath` → `stableId` → IndexedDB の流れを追い、書斎が**ファイルシステムや URL に path を渡す箇所が無い**ことを確認（唯一の `img.src` は許可リスト画像のブロブ URL）。`../../../../etc/passwd.txt` を実際に取り込み | **問題なし**。path は「本の見出し・検索対象」と IndexedDB のキー（ハッシュID）にしか使われない。書き込みはメモの書き出しだけで、ファイル名からは `\ / : * ? " < > \|` を除去。実測で外部への読み書きも発生しない |
 | 書斎の**ファイル偽装**（`.txt` の中身が HTML/JS で、HTML として描画される） | 本文の描画経路を追い、`.html` / `.js` / `.md` / `.csv` / `.json` を実際に取り込んで開いた | **問題なし**。本文は `createTextNode` / `textContent` だけで組み立てられ、**マークダウンのレンダラも HTML 解釈も存在しない**（ソースがそのまま文字として見える）。`<script>`・`onerror`・`javascript:` リンクは実行も生成もされない |
 | 書斎の本文に**スクリプトが混ざる**（青空文庫ルビ経由） | ルビ解析の出力を全部 DOM へ通す箇所を確認 | **問題なし**。`{ruby, reading, text}` はすべてテキストノード（`<rt>` も `textContent`）。HTML として解釈される経路は無い |
-| **CDN のサプライチェーン**（three.js / three-vrm / three-mmd-loader を jsDelivr から読む） | import map の URL・`import()` の呼び出し箇所・Service Worker のキャッシュ条件を確認し、**モジュールグラフ全体（94ファイル・3.60MB）の SHA-384 を記録**して検証する道具を作った（`npm run check:cdn`）。あわせて npm の公開タール玉と突き合わせる `npm run check:cdn:npm` も用意 | **固定は完全**（`@0.180.0`／`@3.5.5`／`@0.8.4` のような完全固定のみ。範囲指定・`latest` は無し）。**起動時には一切読まない**（VRM／MMD を使い始めたときだけ動的 import。`?safe=1` では VRM・MMD とも `skin` に戻すので CDN を触らない）。Service Worker は**クロスオリジンをキャッシュしない**ので、汚染が端末に残る経路も無し。未使用だった `@pixiv/three-vrm-core` の import map 項目を削除（1つぶん供給網が縮小） |
+| **第三者ライブラリの供給網**（three.js / three-vrm / three-mmd-loader） | import map・`import()` の呼び出し箇所・Service Worker のキャッシュ条件を確認し、**モジュールグラフ全体の SHA-384 を記録**して検証する道具を作った（`npm run check:vendor`＝オフライン、`npm run check:vendor:npm`＝npm と突き合わせ） | **修正（自前ホスティング）**：`assets/vendor/` に同梱（98ファイル・3.60MB）し、**import map から第三者オリジンが消えました**。**起動時には読みません**（VRM／MMD を使い始めたときだけ動的 import。`?safe=1` では VRM・MMD とも `skin` に戻すので読みません）。中身の固定はロック＋毎回の検査（`npm run check` の一部・ネットワーク不要）。版の更新は `npm run vendor:update` の1コマンドで、差分がPRに残ります |
 | 書斎の**画像**が HTML／SVG だった場合 | 許可リストと描画先を確認 | **問題なし**。許可リストは `jpg/jpeg/png/webp/gif/avif/bmp` のみ（**SVG は除外**、check-study-room が見張り）、描画は `<img src=blob:>` だけ（`<iframe>`／`<object>` は不使用） |
 
 ### 逆に、すでに固かったところ（回帰させない）
@@ -109,8 +109,8 @@ trk! は **サーバーを持たない** ブラウザ音ゲーです。アカウ
 1. **CSP（Content-Security-Policy）を meta で入れる**：`index.html` の先頭に、例えば
    `default-src 'self'; script-src 'self' blob: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net; img-src 'self' blob: data:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'`
    → ただし inline の `<script type="importmap">` とアドオンの `blob:` 読み込みがあるため、**import map を外部ファイル化＋ハッシュ/nonce 化**してからが安全です（壊すリスクがあるので段階的に）。
-2. **three.js 系の自前ホスティング（vendor 化）**：`assets/vendor/` に固定版を置き、import map を相対パスに。CDN 障害・改ざん・オフラインの3つが同時に解決します（サイズ増とのトレードオフ）。**実測の大きさ：モジュールグラフ全体で 94ファイル・3.60MB**（MMDローダ＋アセット約3.0MB、three.js 本体 0.60MB＋GLTFLoader 0.11MB、three-vrm 一式 約0.5MB）。
-   当面はこの順序を推奨：① 版を上げるときは必ず `npm run check:cdn`（§8）② 気になるときは `npm run check:cdn:npm` で npm 側とも突き合わせる ③ 腰を据えて移すなら自前ホスティング。
+2. **（済）three.js 系の自前ホスティング**：2026-10-06 に完了しました（§8）。**実測の大きさ：98ファイル・3.60MB**（three-mmd-loader＋アセット 2.42MB、three.js 本体 0.60MB＋GLTFLoader 0.11MB、three-vrm 一式 0.50MB、各LICENSE）。版を上げるときは `npm run vendor:update` → 差分を確認 → `npm run check`。
+3. **CSP（Content Security Policy）は「基本は入れない」方針**：trk! は**ビルド無しのHTML/JS**で、inline の import map と blob のメディアを多用します。CSP を入れると開発中（ローカルファイル・`file://`・Capacitor）の検証が止まりやすく、壊れたときの切り分けも難しくなります。**安定版をリリースするときだけ**、外部化した import map＋ハッシュ＋`media-src blob:` を実機テスト付きで検討します（今は `<meta http-equiv>` も付けません）。
 3. **破壊的リセットの確認**：`?reset=all` / `#reset=all` は「もう一度で確定」方式にする（緊急時でも2タップ）。
 4. **アドオン同意の強化**：インストール時にコードの先頭をプレビュー＋「実行されます」確認、指紋（SHA-256）を保存して次回読み込み時に照合。
 5. **`mobile-web/` から開発用文書を除外**（`docs/HANDOFF.md` など）。
@@ -122,18 +122,18 @@ trk! は **サーバーを持たない** ブラウザ音ゲーです。アカウ
 - **公開の Issue でよいもの**：[GitHub Issues](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues)（再現手順つきで）。
 - **悪用できる詳細・個人情報を含むもの**：GitHub の **Security Advisories（非公開）** から。すぐには直せない場合でも、内容を確認してこの文書に記録します。
 
-## 8. CDN の中身を自分で確かめる（`tools/cdn-lock.json`）
+## 8. 同梱した第三者コードを確かめる（`assets/vendor` と `tools/vendor-lock.json`）
 
-trk! が CDN から読むモジュールは**94ファイル**あり、その全部の **SHA-384** を `tools/cdn-lock.json` に記録してあります。入口の `import()` から `import` の連鎖を辿り、WASM やテクスチャのような**実行時アセット**（`new URL("…", import.meta.url)`）まで含みます。
+three.js／three-vrm／three-mmd-loader は **`assets/vendor/<package>@<version>/…` に同梱**してあります（98ファイル・3.60MB）。入口の `import()` から `import` の連鎖を辿り、WASM やテクスチャのような**実行時アセット**（`new URL("…", import.meta.url)`）まで含めたコピーです。
 
 ```
-node tools/check-cdn.mjs               # CDN のいまの中身が記録と一致するか（ネットワークが要ります）
-node tools/check-cdn.mjs --source=npm  # 同じグラフを npm レジストリのタール玉から読んで突き合わせる
-node tools/check-cdn.mjs --list        # 何を読む予定かの一覧（サイズ付き）
-node tools/check-cdn.mjs --update      # 版を上げるときだけ lock を作り直す
+node tools/check-vendor.mjs               # オフライン検証：記録とのハッシュ一致・相対importの解決・import mapの被覆
+node tools/check-vendor.mjs --source=npm  # 同じグラフを npm レジストリのタール玉から読んで突き合わせる（来歴の確認）
+node tools/check-vendor.mjs --list        # 同梱物の一覧（出どころのURL・サイズ付き）
+npm run vendor:update                     # 版を上げるとき：取得し直して import map と lock を書き換える
 ```
 
-`CHANGED` が出たら、**版を上げた覚えが無い限り**その CDN の中身は信用しないでください。VRM／MMD を使わなければ、アプリのほかの部分は影響を受けません（起動時に読むことはありません）。`npm run check` は**ネットワークを使わない**ままにしたいので、この確認は別コマンド（`npm run check:cdn`）にしてあります。
+オフライン検証は **`npm run check` の中に入っています**（ネットワーク不要）。`--source=npm` は npm に届く環境で来歴を確認するためのものです。同梱ファイルは**手で編集しない**でください（編集した瞬間に検査が落ちます）。
 
 ## 9. この文書の更新ルール
 

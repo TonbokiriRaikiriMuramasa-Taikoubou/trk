@@ -598,7 +598,7 @@ function makeGesture(label, bpm, beats, style, expression, { phase = 0, auto = f
   };
 }
 /* モーションの台本：t（秒）→ 各ボーンの回転・位置と顔モーフ。振り付けもVMDも実行時に生成 */
-const BUILTIN = {
+const BUILTIN = Object.assign(Object.create(null), {
   step: { label:"mmdMotionStep", bpm:120, seconds:4, pose:t => {
     const w = 2 * Math.PI * t * 2, slow = 2 * Math.PI * t;
     return {
@@ -1084,7 +1084,7 @@ const BUILTIN = {
   crossStep128: makeGesture("mmdMotionCrossStep", 128, 8, "crossStep", "proud"),
   softBow: makeGesture("mmdMotionSoftBow", 0, 8, "bow", "soft", { fixed:true, seconds:8 }),
   marionette120: makeGesture("mmdMotionMarionette", 120, 8, "marionette", "confused")
-};
+});
 const EXISTING_EXPRESSIONS = {
   step:"smile", swing:"calm", turn:"proud", jump:"joy", idol:"joy",
   walk112:"soft", run152:"joy", sit10:"calm", dance128:"joy", dreamy128:"soft",

@@ -768,6 +768,8 @@
             <div class="seg" id="keyPresets" style="margin-top:10px">
               <button type="button" data-keypreset="standard" data-i18n="keyPresetDefault"></button>
               <button type="button" data-keypreset="taiko" data-i18n="keyPresetTaiko"></button>
+              <button type="button" data-keypreset="arcade" data-i18n="keyPresetArcade"></button>
+              <button type="button" data-keypreset="remote" data-i18n="keyPresetRemote"></button>
             </div>
             <label class="check"><input id="reverseHands" type="checkbox"><span data-i18n="reverseHands"></span></label>
             <div id="keyPreview" class="hint"></div>
@@ -831,6 +833,44 @@
               <div id="truckBindStatus" class="hint status"></div>
               <div class="hint" data-i18n="truckCtlHint"></div>
               <!-- stage.js（🎪）・catch.js（🚛）・speed.js（⏩）のキー設定がここに入ります -->
+            </details>
+
+            <!-- 🎮 ゲームパッド・コントローラー・TVリモコン（js/pad.js） -->
+            <details id="padPanel" class="subPanel">
+              <summary data-i18n="padPanelTitle"></summary>
+              <div class="hint" data-i18n="padHint"></div>
+              <label class="check"><input id="padEnabled" type="checkbox"><span data-i18n="padEnable"></span></label>
+              <div id="padStatus" class="hint status"></div>
+              <div class="seg" id="padPresets">
+                <button type="button" data-padpreset="ab" data-i18n="padPresetAB"></button>
+                <button type="button" data-padpreset="dpad" data-i18n="padPresetDpad"></button>
+                <button type="button" data-padpreset="stick" data-i18n="padPresetStick"></button>
+              </div>
+              <div class="keyRows" style="margin-top:10px">
+                <div class="keyRow">
+                  <strong data-i18n="padActLeft"></strong><span class="keyValue" data-padvalue="left"></span>
+                  <button type="button" data-padbind="left" data-i18n="assign"></button>
+                </div>
+                <div class="keyRow">
+                  <strong data-i18n="padActRight"></strong><span class="keyValue" data-padvalue="right"></span>
+                  <button type="button" data-padbind="right" data-i18n="assign"></button>
+                </div>
+                <div class="keyRow">
+                  <strong data-i18n="padActConfirm"></strong><span class="keyValue" data-padvalue="confirm"></span>
+                  <button type="button" data-padbind="confirm" data-i18n="assign"></button>
+                </div>
+                <div class="keyRow">
+                  <strong data-i18n="padActBack"></strong><span class="keyValue" data-padvalue="back"></span>
+                  <button type="button" data-padbind="back" data-i18n="assign"></button>
+                </div>
+                <div class="keyRow">
+                  <strong data-i18n="padActPause"></strong><span class="keyValue" data-padvalue="pause"></span>
+                  <button type="button" data-padbind="pause" data-i18n="assign"></button>
+                </div>
+              </div>
+              <label class="check"><input id="padMenuNav" type="checkbox"><span data-i18n="padMenuNav"></span></label>
+              <div class="hint" data-i18n="padMenuNavHint"></div>
+              <div class="hint" data-i18n="padRemoteHint"></div>
             </details>
           </details>
 
@@ -1479,6 +1519,7 @@
 <script src="js/lib-skins.js"></script>
 <script src="js/addons.js"></script>
 <script src="js/main.js"></script>
+<script src="js/pad.js"></script>
 <script src="js/speed.js"></script>
 <script src="js/vrm.js"></script>
 <script src="js/mmd.js"></script>

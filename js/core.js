@@ -75,9 +75,25 @@ function guessLang() {
 /* キー：メイン2つ（左・右）＋サブ2つ。初期設定は A（ドン）／Space（カッ） */
 const KEY_PRESETS = {
   standard:{ label:"keyPresetDefault", keys:["KeyA", "Space"], sub:["", ""] },
-  taiko:   { label:"keyPresetTaiko",   keys:["KeyF", "KeyD"],  sub:["KeyJ", "KeyK"] }
+  taiko:   { label:"keyPresetTaiko",   keys:["KeyF", "KeyD"],  sub:["KeyJ", "KeyK"] },
+  /* 🕹 アーケード筐体・自作コントローラー（1・2ボタン）／📺 TVリモコン（← →） */
+  arcade:  { label:"keyPresetArcade",  keys:["Digit1", "Digit2"], sub:["", ""] },
+  remote:  { label:"keyPresetRemote",  keys:["ArrowLeft", "ArrowRight"], sub:["", ""] }
 };
 const validCode = k => typeof k === "string" && /^[A-Za-z0-9]{1,24}$/.test(k);
+/* 🎮 パッドの割り当て（js/pad.js）：ボタン＝"b0"、軸＝"a0+"（＋方向）／"a0-"（−方向）。
+   スティック・D-pad（軸で届く機種）・アケコンのレバーも、この1つの形で表します。 */
+const validPadBind = b => typeof b === "string" && /^[ba]\d{1,2}[+-]?$/.test(b) && !(b[0] === "b" && /[+-]$/.test(b));
+const padBindOr = (v, d) => (validPadBind(v) ? v : d);
+const PAD_DEFAULTS = { left:"b0", right:"b1", confirm:"b0", back:"b1", pause:"b9" };
+/* TVリモコン・メディアキーは e.code が空で e.key だけ届くことがあります（逆に e.code が名前の機種も）。
+   ノーツや移動キーの割り当ては、この関数の値で判定します。 */
+function keyCodeOf(e) {
+  if (!e) return "";
+  if (e.code) return e.code;
+  const k = e.key || "";
+  return /^[A-Za-z0-9]{1,24}$/.test(k) ? k : "";
+}
 const VIDEO_KEY_DEFAULTS = ["NumpadAdd", "NumpadSubtract", "NumpadMultiply", "NumpadDivide", "Numpad0", "Numpad9", "Numpad8", "Numpad7"];
 const savedVideoKeys = Array.isArray(prefs.videoKeys) && prefs.videoKeys.length === VIDEO_KEY_DEFAULTS.length &&
   prefs.videoKeys.every(validCode) && new Set(prefs.videoKeys).size === VIDEO_KEY_DEFAULTS.length ? prefs.videoKeys.slice()
@@ -128,6 +144,14 @@ const settings = {
   errorMeter: prefs.errorMeter !== false,
   keys: bootKeys,
   subKeys: bootSub,
+  /* 🎮 ゲームパッド・コントローラー（読み込みは js/pad.js） */
+  padEnabled: prefs.padEnabled !== false,
+  padMenuNav: prefs.padMenuNav !== false,
+  padLeft: padBindOr(prefs.padLeft, PAD_DEFAULTS.left),
+  padRight: padBindOr(prefs.padRight, PAD_DEFAULTS.right),
+  padConfirm: padBindOr(prefs.padConfirm, PAD_DEFAULTS.confirm),
+  padBack: padBindOr(prefs.padBack, PAD_DEFAULTS.back),
+  padPause: padBindOr(prefs.padPause, PAD_DEFAULTS.pause),
   seEnabled: !!prefs.seEnabled,
   seVolume: num(prefs.seVolume, 0, 1, .28),
   musicVolume: num(prefs.musicVolume, 0, 1, .7),
@@ -312,8 +336,17 @@ function enterSafeMode() {
   if (settings.mascot === "mmd") settings.mascot = "skin";     // 🩷 セーフモードでは MMD を使わない
   if (typeof view !== "undefined" && view) { try { view.style.filter = "none"; } catch(_) {} }
 }
+function resetKeysPrefs() {
+  /* ⌨ キー割り当て（🎮 パッド含む）。?reset=keys と trkReset('keys') から呼びます */
+  settings.keys = KEY_PRESETS.standard.keys.slice();
+  settings.subKeys = KEY_PRESETS.standard.sub.slice();
+  settings.menuKey = "KeyM"; settings.mediaExitKey = "Escape";
+  settings.padEnabled = true; settings.padMenuNav = true;
+  settings.padLeft = PAD_DEFAULTS.left; settings.padRight = PAD_DEFAULTS.right;
+  settings.padConfirm = PAD_DEFAULTS.confirm; settings.padBack = PAD_DEFAULTS.back; settings.padPause = PAD_DEFAULTS.pause;
+}
 function resetAllPrefs() {
-  resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs(); resetLitePrefs();
+  resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs(); resetLitePrefs(); resetKeysPrefs();
   settings.liteSeen = false;   // 🪶 工場出荷状態では、スマホ向けの初回案内もやり直す
   settings.tvParamFavs = []; // a factory reset clears the separately preserved TV bookmarks too
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
@@ -368,12 +401,14 @@ function exportPrefs(kind) {
       else if (["audio","sound","volume"].includes(r)) { resetAudioPrefs(); didReset = "audio"; }
       else if (["notes","note"].includes(r)) { resetNotesPrefs(); didReset = "notes"; }
       else if (["lite","light"].includes(r)) { resetLitePrefs(); didReset = "lite"; }
+      else if (["keys","key","pad","controller","input"].includes(r)) { resetKeysPrefs(); didReset = "keys"; }
       else if (["all","factory","full"].includes(r)) { resetAllPrefs(); didReset = "all"; }
     } else if (hash.includes("#reset")) {
       // #reset 単体は tv リセット扱い
       if (hash.includes("audio") || hash.includes("sound")) { resetAudioPrefs(); didReset = "audio"; }
       else if (hash.includes("notes")) { resetNotesPrefs(); didReset = "notes"; }
       else if (hash.includes("lite")) { resetLitePrefs(); didReset = "lite"; }
+      else if (hash.includes("keys") || hash.includes("pad")) { resetKeysPrefs(); didReset = "keys"; }
       else if (hash.includes("all")) { resetAllPrefs(); didReset = "all"; }
       else { resetVideoPrefs(); didReset = "tv"; }
     }
@@ -408,6 +443,7 @@ function exportPrefs(kind) {
           audio: "🔊 音量・SE設定を初期化しました（?reset=audio）",
           notes: "🎨 ノーツ設定を初期化しました（?reset=notes）",
           lite: "🪶 軽量化の設定を初期化しました（?reset=lite）",
+          keys: "🎮 キー割り当て（パッド・リモコン含む）を初期化しました（?reset=keys）",
           all: "♻️ 全設定を初期化しました（?reset=all）"
         }[didReset] || `リセットしました: ${didReset}`;
         // 既存のcaptionシステムがあれば使う、なければalert風div
@@ -422,7 +458,7 @@ function exportPrefs(kind) {
     // グローバルからも手動で呼べるように公開
     window.trkReset = (k="tv") => {
       k = String(k).toLowerCase();
-      if (k==="safe") enterSafeMode(); else if (["tv","video"].includes(k)) resetVideoPrefs(); else if (["audio","sound"].includes(k)) resetAudioPrefs(); else if (k==="notes") resetNotesPrefs(); else if (["lite","light"].includes(k)) resetLitePrefs(); else if (["all","factory"].includes(k)) resetAllPrefs(); else resetVideoPrefs();
+      if (k==="safe") enterSafeMode(); else if (["tv","video"].includes(k)) resetVideoPrefs(); else if (["audio","sound"].includes(k)) resetAudioPrefs(); else if (k==="notes") resetNotesPrefs(); else if (["lite","light"].includes(k)) resetLitePrefs(); else if (["keys","key","pad","controller","input"].includes(k)) resetKeysPrefs(); else if (["all","factory"].includes(k)) resetAllPrefs(); else resetVideoPrefs();
       saveUserPrefs(); location.reload();
     };
     window.trkExport = (k="all") => exportPrefs(String(k).toLowerCase());
@@ -491,8 +527,28 @@ function formatKey(code) {
   if (code.startsWith("Digit")) return code.slice(5);
   const map = { ArrowLeft:"←", ArrowRight:"→", ArrowUp:"↑", ArrowDown:"↓", Space:"Space", ShiftLeft:"L-Shift", ShiftRight:"R-Shift",
     ControlLeft:"L-Ctrl", ControlRight:"R-Ctrl", AltLeft:"L-Alt", AltRight:"R-Alt", Semicolon:";", Comma:",", Period:".", Slash:"/",
-    BracketLeft:"[", BracketRight:"]", Quote:"'", Backslash:"\\", Minus:"-", Equal:"=", Backquote:"`", Enter:"Enter", Backspace:"BS" };
+    BracketLeft:"[", BracketRight:"]", Quote:"'", Backslash:"\\", Minus:"-", Equal:"=", Backquote:"`", Enter:"Enter", Backspace:"BS",
+    PageUp:"PgUp", PageDown:"PgDn", Insert:"Ins", Delete:"Del", Tab:"Tab", ContextMenu:"Menu", CapsLock:"Caps",
+    MediaPlayPause:"⏯", MediaPlay:"▶", MediaPause:"⏸", MediaStop:"⏹", MediaTrackNext:"⏭", MediaTrackPrevious:"⏮",
+    VolumeUp:"Vol+", VolumeDown:"Vol−", VolumeMute:"🔇", ChannelUp:"CH+", ChannelDown:"CH−",
+    BrowserBack:"←戻る", GoBack:"←戻る", ColorF0Red:"🔴", ColorF1Green:"🟢", ColorF2Yellow:"🟡", ColorF3Blue:"🔵" };
   return map[code] || code.replace(/^Numpad/, "Num ");
+}
+/* 🎮 パッドの割り当てを表示用に（ボタン0 → 「ボタン0・A／×」） */
+const PAD_BUTTON_NAMES = { 0:"A／×", 1:"B／○", 2:"X／□", 3:"Y／△", 4:"LB／L1", 5:"RB／R1", 6:"LT／L2", 7:"RT／R2",
+  8:"Back／Share", 9:"Start／Options", 10:"L3", 11:"R3", 12:"↑", 13:"↓", 14:"←", 15:"→", 16:"Home／PS" };
+/* 軸の名前は、どの言語でも読める short 表記（L-Stick ← など）にする */
+const PAD_AXIS_NAMES = { 0:["L-Stick ←", "L-Stick →"], 1:["L-Stick ↑", "L-Stick ↓"],
+  2:["LT", "RT"], 3:["R-Stick ←", "R-Stick →"], 4:["R-Stick ↑", "R-Stick ↓"],
+  9:["D-pad ←", "D-pad →"], 10:["D-pad ↑", "D-pad ↓"] };
+function formatPadBind(bind) {
+  if (!validPadBind(bind)) return tr("unset");
+  if (bind[0] === "b") {
+    const n = +bind.slice(1), name = PAD_BUTTON_NAMES[n];
+    return tr("padBtn", { n, name: name ? "・" + name : "" });
+  }
+  const axis = +bind.slice(1, -1), dir = bind.endsWith("+") ? 1 : 0, name = PAD_AXIS_NAMES[axis];
+  return tr("padAxis", { n:axis, dir: name ? name[dir] : (bind.endsWith("+") ? "＋" : "−") });
 }
 /* 押されたキーが左右どちらの枠か（メイン・サブ両方を見る）。なければ -1 */
 function slotOfKey(code) {
@@ -589,6 +645,7 @@ function applyLanguage(code) {
   document.documentElement.lang = { ja:"ja", en:"en", zh:"zh-CN", ko:"ko" }[lang];
   document.querySelectorAll("[data-i18n]").forEach(n => { n.textContent = tr(n.dataset.i18n); });
   buildSkinGrid(); updateKeyUI(); updateTouchKeys(); refreshSeedSecrets(); syncPickers(); renderAllStatuses();
+  if (typeof updatePadUI === "function") updatePadUI();   // 🎮 pad.js（読み込み前は何もしない）
   emit("language");
 }
 

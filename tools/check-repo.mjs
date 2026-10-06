@@ -600,6 +600,46 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else ok("lite mode (phones/apps): auto probe, presets incl. game-first, draw-only gates in 4 languages");
 }
 
+// 🎮 Gamepads, controllers and TV remotes (js/pad.js): the ⚙ → ⌨ Controls
+// sub-panel, button/axis bindings, menu focus and the keyboard-side extras
+// (media keys / remote "back" keys) that make a remote usable.
+{
+  const pad = read("js/pad.js");
+  const html = read("index.html");
+  const core = read("js/core.js");
+  const main = read("js/main.js");
+  const media = read("js/media-player-mode.js");
+  const i18n = read("js/i18n.js");
+  const actions = ["left", "right", "confirm", "back", "pause"];
+  const wiringOk = ["window.TrkPad = Object.freeze({", "function updatePadUI()", "getGamepads", "function padRawEdges(",
+    "function padAssign(", "function padMoveFocus(", "function padActivate()", "function padTap(", "function padPressed(",
+    "requestAnimationFrame(padTick)", "window._trkStudyRoomOpen", "catchState", "stageInput", "handleInput("]
+    .every(token => pad.includes(token)) &&
+    ["function keyCodeOf(e)", "const validPadBind =", "const PAD_DEFAULTS =", "function formatPadBind(",
+     "function resetKeysPrefs()", "if (typeof updatePadUI === \"function\") updatePadUI();"]
+    .every(token => core.includes(token));
+  const uiOk = ["padPanel", "padEnabled", "padMenuNav", "padStatus", "padPresets"].every(id => html.includes(`id="${id}"`)) &&
+    actions.every(a => html.includes(`data-padbind="${a}"`) && html.includes(`data-padvalue="${a}"`)) &&
+    ["ab", "dpad", "stick"].every(p => html.includes(`data-padpreset="${p}"`)) &&
+    ["standard", "taiko", "arcade", "remote"].every(p => html.includes(`data-keypreset="${p}"`)) &&
+    html.includes('<script src="js/pad.js"></script>') &&
+    html.indexOf('<script src="js/pad.js"></script>') > html.indexOf('<script src="js/main.js"></script>') &&
+    core.includes("padEnabled: prefs.padEnabled !== false") && core.includes('arcade:  { label:"keyPresetArcade"') &&
+    core.includes('remote:  { label:"keyPresetRemote"') && core.includes("resetKeysPrefs();") &&
+    core.includes('["keys","key","pad","controller","input"].includes(r)') && core.includes('["keys","key","pad","controller","input"].includes(k)') &&
+    main.includes("const code = keyCodeOf(e);") && main.includes("captureKey(code)") && main.includes("captureMenuKey(code)") &&
+    main.includes('code === "BrowserBack"') && media.includes("captureMediaExitKey(code)") && media.includes("keyCodeOf(e)");
+  const langKeys = ["keyPresetArcade", "keyPresetRemote", "padPanelTitle", "padHint", "padEnable", "padEnableOn", "padEnableOff",
+    "padMenuNav", "padMenuNavHint", "padMenuNavOn", "padMenuNavOff", "padPresetAB", "padPresetDpad", "padPresetStick", "padPresetSet",
+    "padActLeft", "padActRight", "padActConfirm", "padActBack", "padActPause", "padConnected", "padNone", "padCapture",
+    "padBindSet", "padConnectedToast", "padGoneToast", "padRemoteHint", "padBtn", "padAxis"];
+  const langOk = langKeys.every(key => (i18n.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4);
+  if (!wiringOk) fail("gamepad module (js/pad.js) is missing its probe, bindings or play/menu helpers");
+  else if (!uiOk) fail("gamepad / TV-remote settings panel, presets, script order or reset path is incomplete");
+  else if (!langOk) fail("gamepad / TV-remote strings are missing from one of the four languages");
+  else ok("gamepads and TV remotes: button+axis key config, menu focus, media keys, four languages");
+}
+
 // A cache name is deliberately checked for existence, not for a guessed
 // date, because the service worker is manually bumped for every release.
 const sw = read("sw.js");

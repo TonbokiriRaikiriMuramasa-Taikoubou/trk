@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ（短縮版）
 
-> 最終更新：2026-10-06（🪶 軽量化（スマホ・アプリ向け）＝設定の右下に新設・自動判定／**プリセット（🎯 ゲーム優先＝ノーツと反応は下げず、他だけ軽く）**／フレームレート上限／3Dマスコットの描画レート／描画解像度／スペクトラム・ぼかしの節約／🎛 曲名バナーの曲操作を右端の [◀][🎲][▶] に集約／📚 書斎 v2／🩷 MMDモーション改修）
+> 最終更新：2026-10-06（🎮 キーコンフィング（**ゲームパッド・音ゲーム用コントローラー・TVリモコン**）＝設定 ⌨ 操作の中に新設・ボタン／軸の直接割り当て・メニュー移動／🪶 軽量化（スマホ・アプリ向け）＝設定の右下に新設・自動判定／**プリセット（🎯 ゲーム優先＝ノーツと反応は下げず、他だけ軽く）**／フレームレート上限／3Dマスコットの描画レート／描画解像度／スペクトラム・ぼかしの節約／🎛 曲名バナーの曲操作を右端の [◀][🎲][▶] に集約／📚 書斎 v2／🩷 MMDモーション改修）
 > 目的：次の開発作業に必要な現在の設計・権利上の制約・検証方法をひと目で確認する。詳細な機能紹介は `README.md`、権利条件は `NOTICE.md`、実装の正は各ソースコードとする。
 
 ---
@@ -24,6 +24,9 @@
 - 曲名バナー音量ボタン：短押しは従来のスライダー表示切替、650ms長押しはミュート／直前の非ゼロ音量への復元。
 - 曲名バナーの曲操作は**右端に [◀][🎲][▶]**（`div.bannerSongBar`。左端に置いていた◀が曲名の頭に重なるため、`js/library.js` で右端へ集約）。◀▶ は `bannerSongBtns`（初期オン）で表示、番号の選択は今までどおり**いま開いているタブの中**（`prevSong()`／`nextSong()`）。🎲 は `bannerRandomBtn`（初期オン）で表示、`bannerRandomTap`（初期オフ）でタップだけに。**既定は650msの長押し**で、短押しは曲を変えず `bannerRandomHold` のトースト案内だけを出す（移動12px超でキャンセル・長押し直後の click は1回だけ止める。音量ボタンと同じ作り）。抽選は選曲画面の🎲と同じ `randomSongPick()`（`libView` ＋ 📌ピンの曲）。表示中は `#songBanner` に `hasSongBtns` が付き、曲名の右側を空ける。
 - ⚠ `bannerSongStep` の文字列と `index.html` の `id="bannerSongBtns"` は `tools/check-repo.mjs` が検査しているので、改名には同ファイルの更新が必要。
+- 🎮 キーコンフィング（`js/pad.js`・設定 ⌨ **操作** → 「🎮 コントローラー・パッド・リモコン」）：`settings.padEnabled`（初期オン）／`padMenuNav`（初期オン）／`padLeft`・`padRight`・`padConfirm`・`padBack`・`padPause`（初期 `"b0"`／`"b1"`／`"b0"`／`"b1"`／`"b9"`）。割り当ての値は**パッドの生の入力**で、`"b<番号>"`＝ボタン、`"a<軸>+"`／`"a<軸>-"`＝軸の＋／−方向（スティック・D-padが軸で届く機種・アケコンのレバーを同じ形で扱う。`validPadBind()` で検証、既定は `PAD_DEFAULTS`）。**同じ入力の兼用が前提の設計**（既定では「左ノーツ」と「決定」が同じ b0）で、プレイ中はノーツ・一時停止、それ以外は決定＝いま選んでいるボタンを押す／戻る＝ESC を送る／D-pad・スティック＝`padMoveFocus()`（座標があれば方向つき、無ければDOM順。押しっぱなしで連続移動）。`TrkLite` と同じく描画は触らず、判定は `handleInput(lane, performance.now())`（STAGE は `stageInput`、CATCH は `catchState.held` を140msだけ倒す）。**Gamepad API はボタンを1回押すまでパッドを返さない**ので、未接続の案内を出す。公開は `window.TrkPad`（`tick`／`moveFocus`／`format`／`defaults`／`presets` ほか）。⚠ パッドの読み取りは `requestAnimationFrame` の見張りだけで、書斎・メディアプレーヤー・シンセが開いている間（`window._trkStudyRoomOpen` など）はメニュー移動をしない。
+- ⌨ TVリモコン・メディアキー：`keyCodeOf(e)`（`js/core.js`）＝`e.code` が空のとき `e.key` を使う（リモコンのメディアキーは `code=""` で届く）。`js/main.js` のノーツ・メニューキー・割り当ての取り込みと、`js/media-player-mode.js` の終了キー・`videoKeys`・区間ループ／壁紙の長押しがこれを使う。**戻る**は Escape に加えて `BrowserBack`／`GoBack` も同じ扱い（`Backspace` は入力欄のために除外）。`formatKey()` にメディアキー・リモコンの表示を追加。キーのプリセットは `KEY_PRESETS` に **`arcade`（Digit1／Digit2）** と **`remote`（ArrowLeft／ArrowRight）** を追加。
+- ⌨ キー割り当てのリセットは `resetKeysPrefs()`（`?reset=keys`・`trkReset('keys')`・`?reset=all`／工場出荷に含む）＝キー・サブキー・メニューキー・プレーヤー終了キー・パッドの割り当てを既定へ。
 - 🪶 軽量化（`js/lite.js`・設定の**右下**「🪶 軽量化（スマホ向け）」）：`settings.liteMode`（`auto`／`on`／`off`・初期 `auto`）／`liteFps`（60・30・20fps・初期30）／`liteMascot`（60・30・15・`off`・初期30）／`liteScale`（`device`／`1.5`／`1`・初期1.5）／`liteSpectrumOff`／`liteFx`／`liteBlur`（すべて初期オン）／`liteGameFull`（**🎯 ゲーム優先＝プレイ中の描画に上限をかけない**・初期オフ）／`liteSeen`。**自動**は「モバイル判定（`pointer:coarse` ＋ UA）＋（コア4以下 or メモリ2GB以下）」「`navigator.connection.saveData`」「`getBattery()` で20%以下かつ非充電」「`prefers-reduced-motion`」のどれかで働く。
   - **プリセット**（`LITE_PRESETS`・`litePresetId()`／`liteApplyPreset()`）＝🪶 バランス／**🎯 ゲーム優先**（`liteGameFull:true`・マスコット15fps）／🔋 最大節約（20fps・マスコット `off`・1.0倍・`liteGameFull:false`）／✨ 軽量化しない（`liteMode:"off"`）。下の項目を変えると選択は自動で `custom` になる（値から毎回判定し、保存はしない）。
   - 軽くする方法は**描画だけを間引く**こと。ゲーム中は `TrkLite.allowGame(now)` を使う（`settings.liteGameFull` が真なら無条件に描く＝ノーツと反応はそのまま）。`TrkLite.allow(key, now)`（60Hzの画面で目標fpsに届くよう1.5msだけ緩める）を `render.js` の `loop`（`allowGame`）／`spectrum.js` の `frame`（`"spec"`）／`media-player-mode.js` の `mediaStageTick`（`"media"`）／`tv-dock.js` の `liveFrame`・`pvFrame`（`"tv"`・`"tvCheck"`）、`TrkLite.mascotAllow(id, now)` を `mmd.js`／`vrm.js` の `animate` に置く。
@@ -32,7 +35,7 @@
   - 保存はいつもの `shadow_taiko_preferences_v2`（localStorage のキーは増やしていない）。リセットは `resetLitePrefs()`＝`?reset=lite`・`trkReset('lite')`・工場出荷（`resetAllPrefs` は `liteSeen` も戻す）。`?safe=1` とも併用可。
 - 📚 書斎（Study Room, v2）：曲リスト見出しの長押し（650ms）／Enter・Spaceで開く、**端末内だけ**の画像・文章ビューア。**本棚**＝最大500冊（1ページ60冊＋「さらに表示」）、タイトル・パス・抜粋の検索、更新順／追加順／名前順／種類別／大きい順の並べ替え、栞の付いた本の🔖、冊数・画像枚数・使用量（`navigator.storage.estimate()` があれば空き容量も）。**取り込み**＝進捗バー・中止・結果要約（追加／維持／失敗）・同名本の一括置き換え確認、入れ子は `albumNesting` で「本ごと／まとめて1冊」。**画像**＝1フォルダ＝1アルバム（最大3000枚・600MB・1ファイル100MB）、1枚ずつ／見開き／縦読み＋🇺🇸アメリカン、画像順の反転（`imageOrder`）、拡大0.5〜4倍（ボタン／Ctrl+ホイール／ピンチ／`+`-`0`）と拡大中のドラッグ、見えているページだけ `URL.createObjectURL` して離れたら `revokeObjectURL`。**文章**＝UTF-8／UTF-16 BOM／Shift_JISの自動判定と青空文庫ルビ、5スキン＋文字サイズ・行間・余白、本文検索（Ctrl+F／`<mark class="study-search-hit">`／1500件上限）、栞＋**栞一覧**（M）、メモ帳（上級者向け・書斎内コピーのみ）、❓キーの説明（初回自動・`studyPrefs.helpSeen`）。**TVペイン**＝位置（上／下／非表示）・見た目6種・大きさ3段階・縦横比・曲名ON/OFF、動画が再生中なら映像、音声だけならジャケット（画像長押し680msで割り当て）。保存は**IndexedDB `trk_study_room_v1`**（books／pages／covers／settings。表示設定は `settings` ストアの `"ui"` に `studyPrefs` 1件）。ジャケットは `covers` ストアに入り、選曲画面の背景とTVドックへ `studyCoverChanged` で反映する。取り込みが中断して残った孤立ページは `studySweepOrphans()`（60秒スロットル・起動時と開いたときに実行）で掃除する。`?safe=1` では開かず、保存領域にも触らない。実装は `js/study-room.js`／`js/study-room-utils.js`／`css/study-room.css`、公開APIは `window.TrkStudyRoom`（`open`／`close`／`toggle`／`isOpen`／`refreshTV`／`assignCover`／`sweepOrphans`／`getSongCoverBlob|Info`／`clearSongCover`／`books`／`stats`）。
 - 書斎を開いている間は `window._trkStudyRoomOpen` でゲーム側のキー操作を止める（`player.js`／`main.js`／`modes.js`／`stage.js`／`truck.js`／`catch.js`／`speed.js`／`extras.js`／`video-max.js`／`media-player-mode.js`／`synth-mode.js`）。書斎自身のキー（←→・PageUp/Down・Space/Enter・Esc・B/M/T/F・`+`/`-`/`0`・`?`・Ctrl+F）は capture で先に受け取る。ただし入力欄・セレクトでは書斎のキーを止め、ボタンに焦点があるときの Space／Enter はそのボタンに譲る。書斎を閉じる・`phase` が `title` 以外へ進む・曲が切り替わるときは、TVペインへ移した `<video>` を元の親と `style` へ戻す（元の親が差し替わっていても `document.body` へ逃がす）。
-- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux12`。公開ファイルを変更したら必ず更新する。
+- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux13`。公開ファイルを変更したら必ず更新する。
 - このcheckoutで `npm run check` はコード・データの自動検査を行うが、MMDの実描画・タッチ操作・音声の実機確認は別途必要。
 
 ---
@@ -61,13 +64,13 @@
 | 9–20 | `player.js` → `media.js` → `game.js` → `render.js` → `custom.js` → `truck.js` → `modes.js` → `stage.js` → `stagefx.js` → `catch.js` → `extras.js` | 再生・音源・ゲーム進行・描画、各ゲームモードと補助機能 |
 | 21–26 | `fx-presets.js` → `fx-dock.js` → `tv-dock.js` → `video-max.js` → `fx.js` → `fx-synth.js` | 音響／映像ドック。`fx.js` と `fx-presets.js` は凍結扱い |
 | 27–32 | `favs.js` → `catalog.js` → `library.js` → `verified.js` → `lib-skins.js` → `addons.js` | お気に入り、曲カタログ／選曲、公認パック、棚スキン、アドオン |
-| 33–35 | `main.js` → `speed.js` → `vrm.js` | 起動・イベント、速度操作、遅延VRM機能 |
-| 36 | `mmd.js` | 遅延MMD機能・コード生成VMD |
-| 37–40 | `spectrum.js` → `synth-mode.js` → `frame-interp.js` → `media-player-mode.js` | スペクトラム、演奏シンセ、映像補完、メディアプレーヤー |
-| 41–42 | `study-room-utils.js` → `study-room.js` | 📚 書斎。純データ処理（文字コード・並べ替え・ルビ）とUI／IndexedDB。書斎は `#libPanel .libHead h3` を長押しして開く |
+| 33–36 | `main.js` → **`pad.js`** → `speed.js` → `vrm.js` | 起動・イベント、🎮 パッド・コントローラー・TVリモコン（`main.js` の直後。Gamepad API の見張りと設定欄の配線）、速度操作、遅延VRM機能 |
+| 37 | `mmd.js` | 遅延MMD機能・コード生成VMD |
+| 38–41 | `spectrum.js` → `synth-mode.js` → `frame-interp.js` → `media-player-mode.js` | スペクトラム、演奏シンセ、映像補完、メディアプレーヤー |
+| 42–43 | `study-room-utils.js` → `study-room.js` | 📚 書斎。純データ処理（文字コード・並べ替え・ルビ）とUI／IndexedDB。書斎は `#libPanel .libHead h3` を長押しして開く |
 
 上記は `index.html` の実順。依存を追加・移動する場合はscriptタグと `tools/check-repo.mjs` の両方を確認する。
-主なファイル：`index.html`（UIと読込順）／`css/style.css`・`css/study-room.css`／`js/core.js`（設定・保存）／`js/main.js`（初期化）／`js/library.js`（選曲）／`js/lite.js`（🪶 軽量化）／`js/study-room.js`・`js/study-room-utils.js`（書斎）／`js/mmd.js`（MMD）／`sw.js`（オフラインキャッシュ）／`README.md`／`NOTICE.md`。
+主なファイル：`index.html`（UIと読込順）／`css/style.css`・`css/study-room.css`／`js/core.js`（設定・保存）／`js/main.js`（初期化）／`js/pad.js`（🎮 パッド・リモコン）／`js/library.js`（選曲）／`js/lite.js`（🪶 軽量化）／`js/study-room.js`・`js/study-room-utils.js`（書斎）／`js/mmd.js`（MMD）／`sw.js`（オフラインキャッシュ）／`README.md`／`NOTICE.md`。
 
 ---
 

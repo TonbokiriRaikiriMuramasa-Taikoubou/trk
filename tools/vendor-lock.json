@@ -482,6 +482,11 @@
       "sha384": "YNsuLyd5utIGRg8x+dm9fQ6K3pcK5dQ3GooSZrlFnCUO8O/1hYiAjathJ56yE3HN",
       "bytes": 1081
     },
+    "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.core.js": {
+      "local": "assets/vendor/three@0.180.0/build/three.core.js",
+      "sha384": "r1q8Si7xFBrvMv3Q4yjQkKhkYZ2lp+wn/bPPzNZTsc8DY4uPJmm2vheuz1Yn+8m8",
+      "bytes": 1403455
+    },
     "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js": {
       "local": "assets/vendor/three@0.180.0/build/three.module.js",
       "sha384": "wyxAlyAVVsyc7KN24a4+m1tMTC2BwrjQyLgLStDaUBDmwK+gWUMULWHSS0NRoZKv",
@@ -491,6 +496,11 @@
       "local": "assets/vendor/three@0.180.0/examples/jsm/loaders/GLTFLoader.js",
       "sha384": "s7nILfbc478eUC319/oD77M04rFg5QqywtMJEVMtUrlMIoGoUDSJ0gPPnLlw+bBy",
       "bytes": 114739
+    },
+    "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/utils/BufferGeometryUtils.js": {
+      "local": "assets/vendor/three@0.180.0/examples/jsm/utils/BufferGeometryUtils.js",
+      "sha384": "Qy9m6qi71cTFsL476nB1aK+wPxxPgU6H6pn/++8gOgy4/vTtkDuFBfPo22hBhx36",
+      "bytes": 35539
     }
   }
 }

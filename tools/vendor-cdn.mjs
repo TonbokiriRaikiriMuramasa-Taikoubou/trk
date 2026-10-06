@@ -20,8 +20,9 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import zlib from "node:zlib";
+import { fileURLToPath } from "node:url";
 
-const root = path.resolve(new URL("..", import.meta.url).pathname);
+const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const args = process.argv.slice(2);
 const value = (name, fallback) => {
   const hit = args.find(a => a.startsWith(`${name}=`));
@@ -31,17 +32,34 @@ const source = value("--source", "npm");
 if (!["cdn", "npm"].includes(source)) { console.error(`unknown --source=${source}`); process.exit(1); }
 
 const CDN = "https://cdn.jsdelivr.net";
+const NPM_CDN_PREFIX = `${CDN}/npm/`;
 const REGISTRY = "https://registry.npmjs.org";
 const VENDOR = path.join(root, "assets", "vendor");
 const MAX_FILES = 400;
 const read = rel => fs.readFileSync(path.join(root, rel), "utf8");
+
+// The import map is local after the first run. Normalize its entries back to
+// canonical jsDelivr URLs before walking the graph, so rerunning vendor:update
+// is idempotent instead of handing relative paths to new URL().
+function toCdnUrl(value) {
+  if (typeof value !== "string") return value;
+  if (value.startsWith(NPM_CDN_PREFIX)) return value;
+  if (value.startsWith("./assets/vendor/")) return `${NPM_CDN_PREFIX}${value.slice("./assets/vendor/".length)}`;
+  if (value.startsWith("assets/vendor/")) return `${NPM_CDN_PREFIX}${value.slice("assets/vendor/".length)}`;
+  return value;
+}
+function localOf(url) {
+  if (!url.startsWith(NPM_CDN_PREFIX)) throw new Error(`cannot map non-npm URL into assets/vendor: ${url}`);
+  return `assets/vendor/${url.slice(NPM_CDN_PREFIX.length)}`;
+}
 
 /* ---------- import map ---------- */
 const htmlPath = path.join(root, "index.html");
 const html = fs.readFileSync(htmlPath, "utf8");
 const mapMatch = html.match(/<script type="importmap">([\s\S]*?)<\/script>/);
 if (!mapMatch) { console.error("no import map found in index.html"); process.exit(1); }
-const importMap = JSON.parse(mapMatch[1]).imports || {};
+const rawImportMap = JSON.parse(mapMatch[1]).imports || {};
+const importMap = Object.fromEntries(Object.entries(rawImportMap).map(([key, value]) => [key, toCdnUrl(value)]));
 
 function resolveSpecifier(spec, baseUrl) {
   if (spec.startsWith("./") || spec.startsWith("../") || spec.startsWith("/")) return new URL(spec, baseUrl).href;
@@ -56,11 +74,13 @@ for (const file of fs.readdirSync(path.join(root, "js"))) {
   if (!file.endsWith(".js")) continue;
   const text = fs.readFileSync(path.join(root, "js", file), "utf8");
   appSource.push(text);
-  for (const m of text.matchAll(/\bimport\s*\(\s*"([^"]+)"\s*\)/g)) specifiers.add(m[1]);
+  for (const m of text.matchAll(/\bimport\s*\(\s*(["'])([^"'\n]+)\1\s*\)/g)) specifiers.add(m[2]);
 }
 for (const key of Object.keys(importMap)) {
   if (key.endsWith("/")) continue;
-  if (appSource.some(t => t.includes(`"${key}"`))) specifiers.add(key);
+  const quotedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const use = new RegExp(`(["'])${quotedKey}\\1`);
+  if (appSource.some(text => use.test(text))) specifiers.add(key);
 }
 
 /* ---------- fetch from npm tarballs or the CDN ---------- */
@@ -106,8 +126,8 @@ async function fetchBytes(url) {
 }
 
 /* ---------- walk the graph ---------- */
-const IMPORT_RE = /(?:^|[^\w$])(?:import|export)\s*(?:[\s\S]{0,4000}?\bfrom\s*)?"([^"]+)"|import\s*\(\s*"([^"]+)"\s*\)|import\s*\(\s*'([^']+)'\s*\)/g;
-const ASSET_RE = /new\s+URL\s*\(\s*"([^"]+)"\s*,\s*import\.meta\.url\s*\)/g;
+const IMPORT_RE = /(?:^|[^\w$])(?:import|export)\s*(?:[\s\S]{0,4000}?\bfrom\s*)?(["'])([^"'\n]+)\1|import\s*\(\s*(["'])([^"'\n]+)\3\s*\)/g;
+const ASSET_RE = /new\s+URL\s*\(\s*(["'])([^"'\n]+)\1\s*,\s*import\.meta\.url\s*\)/g;
 const graph = new Map();   // cdn url -> { bytes, sha384 }
 const licenses = new Set();
 const queue = [...specifiers].map(s => resolveSpecifier(s, `${CDN}/`));
@@ -120,12 +140,14 @@ while (queue.length) {
   graph.set(url, { bytes, sha384: crypto.createHash("sha384").update(bytes).digest("base64") });
   const text = bytes.toString("utf8");
   for (const m of text.matchAll(IMPORT_RE)) {
-    const spec = m[1] || m[2] || m[3];
-    if (spec.startsWith("node:")) continue;
+    const spec = m[2] || m[4];
+    if (!spec || spec.startsWith("node:")) continue;
     const next = resolveSpecifier(spec, url);
     if (next) queue.push(next);
   }
-  for (const m of text.matchAll(ASSET_RE)) queue.push(new URL(m[1], url).href);
+  // new URL(..., import.meta.url) constructs a runtime asset URL, not a module
+  // import; resolve it against this file's URL while walking the vendored graph.
+  for (const m of text.matchAll(ASSET_RE)) queue.push(new URL(m[2], url).href);
 }
 /* each package LICENSE (we are redistributing these files, so keep their notices) */
 for (const url of [...graph.keys()]) {
@@ -140,7 +162,6 @@ for (const [url, entry] of graph) entry.sha384 ||= crypto.createHash("sha384").u
 /* ---------- write assets/vendor ---------- */
 const urls = [...graph.keys()].sort();
 let written = 0, total = 0;
-const localOf = url => "assets/vendor/" + url.slice(`${CDN}/npm/`.length);
 for (const url of urls) {
   const target = path.join(root, localOf(url));
   fs.mkdirSync(path.dirname(target), { recursive: true });

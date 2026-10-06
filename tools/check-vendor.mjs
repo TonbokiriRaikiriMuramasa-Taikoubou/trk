@@ -11,7 +11,7 @@
  * Checks (all offline unless a --source is given):
  *   1. every file in tools/vendor-lock.json exists and its SHA-384 matches
  *   2. no extra files in assets/vendor (except README.md) that the lock does not know
- *   3. every relative import inside the vendored code resolves to a vendored file
+ *   3. every relative import and file-relative runtime asset resolves to a vendored file
  *   4. every bare import resolves through the import map in index.html
  *   5. index.html has no third-party CDN origin left in the import map
  * With --source it also re-downloads the same graph and compares the digests (provenance).
@@ -20,8 +20,9 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import zlib from "node:zlib";
+import { fileURLToPath } from "node:url";
 
-const root = path.resolve(new URL("..", import.meta.url).pathname);
+const root = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const args = process.argv.slice(2);
 const value = (name, fallback) => {
   const hit = args.find(a => a.startsWith(`${name}=`));
@@ -88,8 +89,9 @@ for (const [key, value] of localMap) {
   if (!fs.existsSync(path.join(root, target))) { failed++; console.log(`FAIL  import map target missing: ${key} -> ${value}`); }
 }
 
-/* ---------- imports inside the vendored code ---------- */
-const SPEC_RE = /(?:^|[^\w$])(?:import|export)\s*(?:[\s\S]{0,4000}?\bfrom\s*)?"([^"]+)"|import\s*\(\s*"([^"]+)"\s*\)|import\s*\(\s*'([^']+)'\s*\)|new\s+URL\s*\(\s*"([^"]+)"\s*,\s*import\.meta\.url\s*\)/g;
+/* ---------- imports and runtime assets inside the vendored code ---------- */
+const IMPORT_RE = /(?:^|[^\w$])(?:import|export)\s*(?:[\s\S]{0,4000}?\bfrom\s*)?(["'])([^"'\n]+)\1|import\s*\(\s*(["'])([^"'\n]+)\3\s*\)/g;
+const ASSET_RE = /new\s+URL\s*\(\s*(["'])([^"'\n]+)\1\s*,\s*import\.meta\.url\s*\)/g;
 function resolve(spec, fromFile) {
   if (spec.startsWith("./") || spec.startsWith("../")) {
     const resolved = path.normalize(path.join(path.dirname(fromFile), spec));
@@ -101,19 +103,28 @@ function resolve(spec, fromFile) {
   if (prefix) return { kind: "bare", resolved: path.normalize(path.join(importMap[prefix].replace(/^\.\//, ""), spec.slice(prefix.length))) };
   return { kind: "unmapped", resolved: spec };
 }
-const missing = [], unmapped = [];
+function resolveAsset(spec, fromFile) {
+  // URL strings passed to new URL(..., import.meta.url) are file-relative
+  // asset paths, not module specifiers (and must not use the import map).
+  if (/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(spec)) return { kind: "external", resolved: spec };
+  const filePath = spec.split(/[?#]/, 1)[0];
+  if (filePath.startsWith("/")) return { kind: "relative", resolved: filePath.slice(1) };
+  return { kind: "relative", resolved: path.normalize(path.join(path.dirname(fromFile), filePath)) };
+}
+const missing = new Set(), unmapped = new Set();
+const checkReference = (spec, rel, resolver) => {
+  if (!spec || spec.startsWith("node:") || spec.startsWith("data:") || /^https?:/i.test(spec)) return;
+  const r = resolver(spec, rel);
+  if (r.kind === "unmapped") unmapped.add(`${rel} -> ${spec}`);
+  else if (r.kind !== "external" && !fs.existsSync(path.join(root, r.resolved))) missing.add(`${rel} -> ${spec} (${r.resolved})`);
+};
 for (const rel of [...known].filter(p => p.endsWith(".js")).sort()) {
   const text = fs.readFileSync(path.join(root, rel), "utf8");
-  for (const m of text.matchAll(SPEC_RE)) {
-    const spec = m[1] || m[2] || m[3] || m[4];
-    if (!spec || spec.startsWith("node:") || spec.startsWith("data:") || spec.startsWith("http")) continue;
-    const r = resolve(spec, rel);
-    if (r.kind === "unmapped") unmapped.push(`${rel} -> ${spec}`);
-    else if (!fs.existsSync(path.join(root, r.resolved))) missing.push(`${rel} -> ${spec} (${r.resolved})`);
-  }
+  for (const m of text.matchAll(IMPORT_RE)) checkReference(m[2] || m[4], rel, resolve);
+  for (const m of text.matchAll(ASSET_RE)) checkReference(m[2], rel, resolveAsset);
 }
-ok(missing.length === 0, "every relative / asset import inside the vendored code resolves", missing.slice(0, 3).join(" · "));
-ok(unmapped.length === 0, "every bare import is covered by the import map", unmapped.slice(0, 3).join(" · "));
+ok(missing.size === 0, "every relative import and file-relative runtime asset resolves", [...missing].slice(0, 3).join(" · "));
+ok(unmapped.size === 0, "every bare import is covered by the import map", [...unmapped].slice(0, 3).join(" · "));
 
 /* ---------- optional: compare with upstream ---------- */
 if (source) {

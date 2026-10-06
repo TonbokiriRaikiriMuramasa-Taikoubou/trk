@@ -18,7 +18,7 @@
 | 1 | **Broken Client-side Access Control** | 🟡 | サーバもアカウントも無いので「他人のデータに触る」経路はありません。ページ内でコードが動ける唯一の穴は**アドオン**で、**入れた人の責任**（明示インストール・共有ファイルから自動では入らない・512KiB上限・オフ／削除可・`?safe=1` で停止）。端末のファイルは**読み取り専用**、フォルダは「🚫 共有をやめる」でハンドルを両方削除 |
 | 2 | **DOM-based XSS** | ✅ | `innerHTML` は結果画面の1か所だけで**すべて `esc()` 済み**（`js/game.js`）。書斎の本文は `createTextNode`/`textContent` のみ（`.html`/`.js`/`.md` もソースのまま表示）。`javascript:` は `safeHttpUrl()` で弾き、共有URLは `safeLink()` が**文字にするだけ**。動的評価は同意後アドオンの間接 `eval` 1か所だけ。`new Function`/`document.write`/`srcdoc` は無し |
 | 3 | **Sensitive Data Leakage**（トラッカー・ピクセル） | ✅ | 外部通信は**同一オリジンの取得のみ**（VRM／MMDライブラリも `assets/vendor/` に同梱）。解析・広告・ピクセルなし。実測でも起動時にページ内から外部へ出ません |
-| 4 | **Vulnerable and Outdated Components** | ✅ | 第三者ライブラリ（three.js・three-vrm・three-mmd-loader）は **`assets/vendor/` に同梱**（98ファイル・3.60MB）。**`tools/vendor-lock.json` に SHA-384 を記録し、`npm run check` が毎回オフラインで検証**（`npm run check:vendor`）。版の更新は `npm run vendor:update` で差分がPRに残る |
+| 4 | **Vulnerable and Outdated Components** | ✅ | 第三者ライブラリ（three.js・three-vrm・three-mmd-loader）は **`assets/vendor/` に同梱**（100ファイル・4.98MB）。**`tools/vendor-lock.json` に SHA-384 を記録し、`npm run check` が毎回オフラインで検証**（`npm run check:vendor`）。版の更新は `npm run vendor:update` で差分がPRに残る |
 | 5 | **Lack of Third-party Origin Control** | ✅ | **import map に第三者オリジンがありません**（全部 `./assets/vendor/...`＝同一オリジン。`check-security` が検査）。動的 `import()` も `js/vrm.js`・`js/mmd.js` だけ。Service Worker はクロスオリジンをキャッシュしません（CSP の扱いは §C-1） |
 | 6 | **JavaScript Drift**（読み込むコードが知らぬ間に変わる） | ✅ | 第三者コードは**リポジトリに入っている**ので、変われば git の差分として必ず見えます。加えて `check-vendor` がハッシュ・相対importの解決・import map の被覆を毎回検査（来歴の確認は `check:vendor:npm`） |
 | 7 | **Sensitive Data Stored Client-Side** | ✅ | 保存するのは設定・スコア・プレイリスト・パック・書斎の本・VRM/MMDモデル・フォルダのハンドル。**パスワード・トークン・APIキー・個人情報は保存しません**（そもそも持ちません）。端末を触れる人はブラウザのストレージから読める、が正直なところで `privacy.html` に明記 |
@@ -45,7 +45,7 @@
 
 ## C. 残っている宿題（推奨・未実施）
 
-0. **（済）CDN の自前ホスティング（vendor 化）**：2026-10-06 完了（**98ファイル・3.60MB**・`tools/vendor-lock.json`・`npm run check` で毎回オフライン検証）
+0. **（済）CDN の自前ホスティング（vendor 化）**：2026-10-06 完了・再点検（**100ファイル・4.98MB**・`tools/vendor-lock.json`・`npm run check` で毎回オフライン検証。single/double quote の import と file-relative runtime asset を検査し、欠落を逆テストで検出）
 1. **CSP は「基本は入れない」方針**（ユーザー判断）：ビルド無しのHTML/JS・inline の import map・blob のメディアを使うため、入れると開発／実機検証が壊れやすい。さらにアドオン実行の間接 `eval` は `script-src 'self'` で停止し、`'unsafe-eval'` を足すとXSS防御を弱める。**安定版としてリリースするときだけ**、アドオンをどう扱うか決めたうえで、外部化＋ハッシュ＋`media-src blob:` を実機テスト付きで検討する（今は `<meta http-equiv>` も置かない）。第三者オリジンがゼロになったので、必要になったときの設定は簡単になっている
 2. **（済）`?reset=all`／`#reset=all` の確認ダイアログ**：2026-10-06 完了（F-20／F-31。確認を飛ばす非常口は `force=1` の完全一致のみ）
 3. **（済）アドオン同意・起動検査**：2026-10-06 完了（F-21〜F-23・F-26。新規は同意後に実行、SHA-256指紋を保存し起動時に不一致を止める、入力ファイル4MiB／コード512KiB、壊れたJSONをコードとして扱わない。記録なしの旧アドオンは互換実行する。記録はlocalStorage内なので署名・sandboxではない）

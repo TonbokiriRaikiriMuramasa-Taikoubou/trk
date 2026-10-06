@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ（短縮版）
 
-> 最終更新：2026-10-06（MMDモーション60種・表情モーフ対応／曲名バナー音量長押し／Hand-off再編）
+> 最終更新：2026-10-06（MMDモーション60種・表情モーフ対応／曲名バナー音量長押し／📚 書斎（端末内ビューア）／Hand-off再編）
 > 目的：次の開発作業に必要な現在の設計・権利上の制約・検証方法をひと目で確認する。詳細な機能紹介は `README.md`、権利条件は `NOTICE.md`、実装の正は各ソースコードとする。
 
 ---
@@ -8,7 +8,7 @@
 ## 1. 作業を再開するとき
 
 1. まずこの文書と `git status --short`、`git diff` を確認する。未コミットの作業を勝手に破棄しない。
-2. このセッションの作業ブランチは **`arena/01a10d01-trk` 固定**。ブランチを切り替えず、pushもこのブランチだけに行う。
+2. このセッションの作業ブランチは **`arena/872022dd-trk` 固定**。ブランチを切り替えず、pushもこのブランチだけに行う。
 3. 開発はリポジトリ内の実コードを編集し、最後に最低限 `npm run check` と `git diff --check` を実行する。
 4. 実ブラウザ・タッチ端末・CDN依存の確認は静的検査で代用せず、未確認なら未確認のまま記録する。
 
@@ -22,7 +22,9 @@
 - VMDは `js/mmd.js` のコードから使用時に生成する。第三者のVMDや振付データは同梱しない。Lat式ミクのPMDで確認した**26種類の既存表情モーフ名**を使い、笑顔・ウィンク・照れ・怒り・困り顔・口パクなどの表情トラックも生成する。
 - Lat式プリセットと新規／欠損／リセット時のモーションは `dreamy128`（128 BPM）。保存済みの有効な選択（`none`を含む）は上書きしない。エアギター、`melt170`（きゅん）、`wedh174`（ダンスホール）も残す。
 - 曲名バナー音量ボタン：短押しは従来のスライダー表示切替、650ms長押しはミュート／直前の非ゼロ音量への復元。
-- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux2`。公開ファイルを変更したら必ず更新する。
+- 📚 書斎（Study Room）：曲リスト見出しの長押し／Enter・Spaceで開く、**端末内だけ**の画像・文章ビューア。画像フォルダ＝アルバム（最大3000枚・600MB・1ファイル100MB）、テキスト（1ファイル12MB・一度に200ファイル）、本棚は最大500冊。文字コードはUTF-8／UTF-16 BOM／Shift_JISを自動判定し、青空文庫ルビを組み立てる。保存は**IndexedDB `trk_study_room_v1`**（books／pages／covers／settings）。曲へのジャケット割り当ては `covers` ストアに入り、選曲画面の背景とTVドックへ `studyCoverChanged` で反映する。`?safe=1` では開かず、保存領域にも触らない。実装は `js/study-room.js`／`js/study-room-utils.js`／`css/study-room.css`。
+- 書斎を開いている間は `window._trkStudyRoomOpen` でゲーム側のキー操作を止める（`player.js`／`main.js`／`modes.js`／`stage.js`／`truck.js`／`catch.js`／`speed.js`／`extras.js`／`video-max.js`／`media-player-mode.js`／`synth-mode.js`）。書斎自身のキー（←→・PageUp/Down・Space/Enter・Esc）は capture で先に受け取る。
+- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux7`。公開ファイルを変更したら必ず更新する。
 - このcheckoutで `npm run check` はコード・データの自動検査を行うが、MMDの実描画・タッチ操作・音声の実機確認は別途必要。
 
 ---
@@ -52,9 +54,10 @@
 | 31–33 | `main.js` → `speed.js` → `vrm.js` | 起動・イベント、速度操作、遅延VRM機能 |
 | 34 | `mmd.js` | 遅延MMD機能・コード生成VMD |
 | 35–38 | `spectrum.js` → `synth-mode.js` → `frame-interp.js` → `media-player-mode.js` | スペクトラム、演奏シンセ、映像補完、メディアプレーヤー |
+| 39–40 | `study-room-utils.js` → `study-room.js` | 📚 書斎。純データ処理（文字コード・並べ替え・ルビ）とUI／IndexedDB。書斎は `#libPanel .libHead h3` を長押しして開く |
 
 上記は `index.html` の実順。依存を追加・移動する場合はscriptタグと `tools/check-repo.mjs` の両方を確認する。
-主なファイル：`index.html`（UIと読込順）／`css/style.css`／`js/core.js`（設定・保存）／`js/main.js`（初期化）／`js/library.js`（選曲）／`js/mmd.js`（MMD）／`sw.js`（オフラインキャッシュ）／`README.md`／`NOTICE.md`。
+主なファイル：`index.html`（UIと読込順）／`css/style.css`・`css/study-room.css`／`js/core.js`（設定・保存）／`js/main.js`（初期化）／`js/library.js`（選曲）／`js/study-room.js`・`js/study-room-utils.js`（書斎）／`js/mmd.js`（MMD）／`sw.js`（オフラインキャッシュ）／`README.md`／`NOTICE.md`。
 
 ---
 
@@ -63,7 +66,7 @@
 ### 保存・形式
 
 - 既存のlocalStorage／IndexedDBキーやファイル形式名を理由なく改名しない。変更が必要なら移行処理と後方互換テストを追加する。
-- 主な保存先：`shadow_taiko_preferences_v2`（設定）、`shadow_taiko_records_v1`（記録）、`shadow_taiko_song_prefs_v1`（曲別設定）、IndexedDB `shadow_taiko_packs`／`shadow_taiko_songs`／`shadow_taiko_library`／`shadow_taiko_vrm`／`shadow_taiko_mmd`／`shadow_taiko_shared`。
+- 主な保存先：`shadow_taiko_preferences_v2`（設定）、`shadow_taiko_records_v1`（記録）、`shadow_taiko_song_prefs_v1`（曲別設定）、IndexedDB `shadow_taiko_packs`／`shadow_taiko_songs`／`shadow_taiko_library`／`shadow_taiko_vrm`／`shadow_taiko_mmd`／`shadow_taiko_shared`／`trk_study_room_v1`（書斎。books／pages／covers／settings。削除操作は書斎内の「×」とブラウザのサイトデータ削除）。
 - 共有・Export形式：`shadow-taiko-pack`、`shadow-taiko-chart`、`shadow-taiko-records`、`skin.shadow-taiko`、`trk-fx`、`trk-verified`、`trk-tvskin`、`trk-playlist`。外部JSONは項目と範囲を検証し、コードとして実行しない。
 
 ### 音声・イベント・安全モード
@@ -99,13 +102,14 @@ npm run check
 git diff --check
 ```
 
-`npm run check` は `tools/check-repo.mjs`（構文・ローカル参照・設定／翻訳・重要機能）と `tools/check-mmd-motion-data.mjs`（VMD生成データ／Lat PMD）を実行する。依存パッケージのインストールは不要。失敗したら、まず最初のエラーを直してから再実行する。
+`npm run check` は `tools/check-repo.mjs`（構文・ローカル参照・設定／翻訳・重要機能）、`tools/check-mmd-motion-data.mjs`（VMD生成データ／Lat PMD）、`tools/check-study-room.mjs`（書斎の純データ処理・4言語の網羅・`index.html` のID照合・通信／`innerHTML` を使わないこと・TV／ジャケット連携・キー譲渡）を実行する。依存パッケージのインストールは不要。失敗したら、まず最初のエラーを直してから再実行する。
 
 ### 未確認の実機項目
 
 - Lat式ミクの表示・表情モーフ・60種の動き、特に左右の腕／顔／裾の見え方。CDN利用を含むため実ブラウザで確認する。
 - 曲名バナー音量ボタンの短押し・650ms長押し、ドラッグ時の誤発火防止、タッチ端末でのミュート／復元。
 - TV／スペクトラム／メディアプレーヤー／シンセの実映像・音声、モバイル幅・発熱・操作感。
+- 📚 書斎：実ブラウザでのフォルダ取り込み（数千枚のAlbum・入れ子フォルダ）、Shift_JISの実書籍、IndexedDBの容量超過時の挙動、長押し（650msで起動／680msでジャケット割り当て）とスワイプの取り違え、モバイル幅・フルスクリーンAPI、TVペインで動画を移したあとの復帰。
 - WebGL・IndexedDB・端末のフォルダ選択など環境依存機能。静的検査通過を実機確認済みと表現しない。
 
 ---

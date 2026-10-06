@@ -923,7 +923,7 @@ function buildMedia() {
   addEventListener("keydown", e => {
     if (mediaExitBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureMediaExitKey(e.code); return; }
     if (videoBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureVideoKey(e.code); return; }
-    if (window._trkSynthModeOpen) return;
+    if (window._trkSynthModeOpen || window._trkStudyRoomOpen) return;
     const videoKey = (settings.videoKeys || []).indexOf(e.code);
     if (videoKey >= 0 && (mediaActive() || phase === "title" || phase === "paused")) {
       e.preventDefault(); e.stopImmediatePropagation();
@@ -942,7 +942,7 @@ function buildMedia() {
     else if (e.code === "KeyP") { e.preventDefault(); e.stopImmediatePropagation(); stepMedia(-1); }
   }, true);
   addEventListener("keyup", e => {
-    if (mediaExitBinding !== null || videoBinding !== null || window._trkSynthModeOpen || !mediaActive()) return;
+    if (mediaExitBinding !== null || videoBinding !== null || window._trkSynthModeOpen || window._trkStudyRoomOpen || !mediaActive()) return;
     if (settings.mediaLoopTrigger === "hold" && (settings.videoKeys || [])[LOOP_KEY_INDEX] === e.code) {
       e.preventDefault(); e.stopImmediatePropagation(); releaseHeldLoop();
     }

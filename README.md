@@ -27,6 +27,7 @@ trk!（トラック）は、ブラウザだけで動く**非営利のリズム�
 - [記録と称号](#-記録と称号)
 - [見た目のカスタマイズ](#-見た目のカスタマイズ)
 - [サウンドエフェクト](#-サウンドエフェクト)
+- [📚 書斎（画像・文章ビューア）](#-書斎画像文章ビューア)
 - [パックと公認パック](#-パックと公認パック)
 - [キー操作](#-キー操作)
 - [スマホで遊ぶ](#-スマホで遊ぶ)
@@ -273,6 +274,22 @@ trk! は、音楽プレイヤーとしても楽しめます。設定画面の「
 
 ---
 
+## 📚 書斎（画像・文章ビューア）
+
+trk! は音楽ゲームですが、**自分の端末の中身をゆっくり眺める場所**としても使えます。曲リストの見出し（画面左上の「trk! …」）を**長押し**するか、見出しにフォーカスして **Enter／Space** を押すと書斎が開きます。Escで閉じます。
+
+取り込んだ画像・テキスト・栞・メモ・ジャケットの割り当ては、**IndexedDB `trk_study_room_v1`** に、**この端末の中だけ**保存します（アップロードも通信もしません。元のファイルは変更しません。`?safe=1` では書斎を開かず、保存領域にも触りません）。
+
+- **🗂 本棚**：画像フォルダは**1フォルダ＝1冊のアルバム**、テキストは1ファイル＝1冊として並びます（本棚は最大500冊・タイトルやフォルダ名で検索できます）。同じフォルダを取り込み直すと内容が更新され、✎で名前の変更、×で1冊ずつの削除ができます。
+- **🖼 画像**：フォルダを選ぶだけで、中の画像を名前順（数字は数として）に並べます（アルバム最大3000枚・合計600MB・1ファイル100MBまで。`jpg/png/webp/gif/avif/bmp`）。並べ方は **1枚ずつ／見開き（右が1ページ目）／縦読み漫画** の3通りと、左右と順序を反転する **🇺🇸アメリカン**。**画像の左側をタップ／←で次へ、右側／→で前へ**、スワイプでも送れます。
+- **📄 文章**：テキストは1ファイルずつでも、フォルダごとでも取り込めます（1ファイル12MB・一度に200ファイルまで。TXT・MD・JSON・CSV・ログなど）。文字コードは **UTF-8／UTF-16（BOM付き）／Shift_JIS** を自動判定し、青空文庫の `｜《》` ルビも組み立てて表示します。スキンは **普通／ダーク／ネオン／ルーズリーフ／作文用紙（縦書き・右から）** の5種。
+- **🔖 栞と進捗**：Enter長押しで栞、Space長押しで**ページ移動スライダー**（画像）。閉じても次のページから開けます。
+- **✎ メモ帳と書き出し**：上級者向け設定をONにすると、本文をメモ帳として編集できます。編集するのは**書斎の中のコピーだけ**で、元のファイルは変更しません。書き出しはテキストとして保存できます。
+- **📺 TVとジャケット**：書斎の中にTV（**上／下／非表示**）を置けます。音声だけの曲でも、画像を**長押し（680ms）**するか「🖼 このページを曲のジャケットに」で、その曲のジャケットとして選曲画面の背景・TVドックに映せます。割り当ては曲ごとに書斎の中へ保存され、同じ操作で消せます。
+- 書斎を開いている間、ゲーム側のキー操作（モードのキー・スキップ・速度など）は止まります。
+
+---
+
 ## 📦 パックと公認パック
 
 osu! のスキンのように、いろいろなものを1つのファイル（`.stpack`）にまとめて配れます。サーバーはないので、Discordやクラウドストレージなどで共有してください。
@@ -342,6 +359,7 @@ osu! のスキンのように、いろいろなものを1つのファイル（`.
 | VRM | WebGL。初回だけ three.js／three-vrm をCDNから読み込みます |
 | MMD | WebGL。初回だけ three.js／three-mmd-loader をCDNから読み込みます |
 | ⭐ お気に入り | 端末の中だけ（localStorage）。フォルダ分けも同じ |
+| 📚 書斎 | 端末の中だけ（IndexedDB `trk_study_room_v1`）。アルバム最大3000枚・600MB／文章1ファイル12MB／本棚500冊。`?safe=1` では開きません |
 
 **保存について：** 設定・記録・パック・追加した曲・マイプリセットは、**このブラウザの中だけ**に保存されます（localStorage・IndexedDB）。ブラウザのデータを消すと消えるので、記録はときどきバックアップしてください。
 
@@ -393,7 +411,7 @@ trk! はMODしやすいように、機能ごとにファイルを分けていま
 trk/
 ├─ index.html  privacy.html  credits.html  manifest.webmanifest  sw.js  verified.json
 ├─ package.json  capacitor.config.ts
-├─ css/style.css
+├─ css/style.css  css/study-room.css  … 書斎の見た目（本棚・リーダー・TV）
 ├─ icons/                        … アプリのアイコン
 ├─ js/
 │  ├─ i18n.js  i18n-options.js   … 4言語の文章
@@ -417,10 +435,12 @@ trk/
 │  ├─ vrm.js                     … VRMマスコット
 │  ├─ mmd.js                     … MMDマスコット（原則持ち込み。再配布条件付きLat式を同梱）
 │  ├─ favs.js                    … ⭐ お気に入りのフォルダ管理（1軍／2軍／🧊／📤元）
-│  └─ spectrum.js                … 📊 スペクトラム（音の見える化・TVの画面に重ねられる）
+│  ├─ spectrum.js                … 📊 スペクトラム（音の見える化・TVの画面に重ねられる）
+│  └─ study-room.js  study-room-utils.js  … 📚 書斎（端末内の画像・文章ビューア）
 ├─ docs/  HANDOFF.md  pack-format.md  android.md  verified.md  og.png
 ├─ tools/make-icons.html         … アイコンとOGP画像を作るツール
 ├─ tools/check-repo.mjs          … 依存なしの静的スモーク検査
+├─ tools/check-study-room.mjs    … 📚 書斎の読み込み・文字コード・安全側の静的検査
 ├─ tools/prepare-mobile-web.mjs  … Capacitor用Web資産の同期
 ├─ .github/ISSUE_TEMPLATE/       … 不具合・アイデアのフォーム
 ├─ README.md  NOTICE.md  CONTRIBUTING.md  LICENSE
@@ -508,6 +528,8 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 - 🚛 **CATCH** — catch falling parcels with your truck; grab nitro cans 🚀 for **Blast mode**
 
 **Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), a song-banner volume button (tap for the slider, hold to mute/restore), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, antenna character skins (ten original dot characters that wake up and walk when ON and fall asleep when OFF, plus your own two ON/OFF images stored on your device only; Reimu, Marisa, Cirno, Flandre and Youmu are original Touhou Project fan art drawn for trk!, following the official fan-work guidelines), VRM 1.0 mascots, MMD mascots (60 original procedural choices grouped by daily movement, dance, Miku references, and expressions; Lat morph tracks; dreamy idle for new installs / the bundled Lat preset; saved choices are kept, bring your own model with an on-device self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), 📤 **share your music folder** (one permission pulls the whole folder in at once, with an optional on-device copy of up to 150 songs / 300 MB), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, visual effect-chain editor, automatic latency compensation and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 16 built-in sounds (including electric guitar, electronic sax, and layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, a default option to lock mapped keys to the piano while synth mode is open, an optional wider on-screen keyboard for larger displays, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
+
+**Study Room:** long-press the song-list title (or focus it and press Enter/Space) to open a local-only reader. Image folders become albums (single/spread/vertical, plus an American-style flip; up to 3,000 images and 600 MB per album), text files open as books with UTF-8 / UTF-16 / Shift_JIS detection and Aozora-style ruby (up to 12 MB each), and you can keep bookmarks, edit an in-app copy as a memo, or assign a page as the current song's jacket. Everything stays in this browser (IndexedDB `trk_study_room_v1`); nothing is uploaded, and `?safe=1` keeps it closed.
 
 **✔ Verified packs:** song packs whose composer/charter identity and rights have been confirmed get a ✔ badge and a short message from the creator (up to 280, like a free X post). See [docs/verified.md](docs/verified.md).
 

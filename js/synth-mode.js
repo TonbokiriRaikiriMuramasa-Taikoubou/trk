@@ -960,7 +960,7 @@ addEventListener("DOMContentLoaded", () => {
     setStatus(previous >= 0 && previous !== midi - FIRST_MIDI ? "instKeyMoved" : "instAssigned", { note:noteName(midi), key:keyCodeLabel(code) });
   }
   window.addEventListener("keydown", e => {
-    if (overlay.hidden) return;
+    if (overlay.hidden || window._trkStudyRoomOpen) return;
     if (e.code === "Tab") return; // keep the modal keyboard-navigable
     if (e.ctrlKey || e.metaKey || e.altKey) return; // retain browser/system shortcuts
     if (e.code === "Escape") {
@@ -994,7 +994,7 @@ addEventListener("DOMContentLoaded", () => {
     e.preventDefault(); e.stopImmediatePropagation(); // keep game hotkeys from leaking through the open instrument
   }, true);
   window.addEventListener("keyup", e => {
-    if (overlay.hidden) return;
+    if (overlay.hidden || window._trkStudyRoomOpen) return;
     const token = `key-${e.code}`;
     /* keydownと同じ優先順位でkeyupも止める。これでフォーカス中のrange/selectへ
        リリース時のキーイベントが流れず、押鍵の開始と終了が必ず対になる。 */

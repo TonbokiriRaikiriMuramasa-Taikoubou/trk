@@ -6,6 +6,7 @@
 <title>trk! — AGRG</title>
 <meta name="description" content="trk! is AGRG! — an All-Generation Rhythm Game. Play a rhythm game in your browser with your own music: hit it, drive a truck, orbit with one button, take the STAGE, or catch parcels.">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/study-room.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -1068,6 +1069,155 @@
   <input id="chartImportFile" type="file" accept="application/json,.json" hidden>
 </div>
 
+<!-- ===== 📚 書斎（端末内の画像・文章リーダー） ===== -->
+<section id="studyRoom" class="study-room" hidden role="dialog" aria-modal="true" aria-labelledby="studyRoomTitle">
+  <div class="study-shell">
+    <header class="study-header">
+      <div class="study-brand">
+        <h2 id="studyRoomTitle" data-i18n="studyTitle">📚 書斎</h2>
+        <div id="studyStatus" class="study-status" aria-live="polite"></div>
+      </div>
+      <div class="study-import-actions">
+        <label class="study-file-btn">
+          <input id="studyImageFolderInput" type="file" webkitdirectory multiple accept="image/*" hidden>
+          <span data-i18n="studyImportImages">🖼 画像フォルダを取り込む</span>
+        </label>
+        <label class="study-file-btn">
+          <input id="studyTextFilesInput" type="file" multiple accept=".txt,.md,.markdown,.json,.csv,.log,.html,.htm,.xml,.yaml,.yml,.ini,.css,.js,.ts,text/plain,application/json" hidden>
+          <span data-i18n="studyImportTextFiles">＋ テキストを追加</span>
+        </label>
+        <label class="study-file-btn">
+          <input id="studyTextFolderInput" type="file" webkitdirectory multiple accept=".txt,.md,.markdown,.json,.csv,.log,.html,.htm,.xml,.yaml,.yml,.ini,.css,.js,.ts,text/plain,application/json" hidden>
+          <span data-i18n="studyImportTextFolder">📄 テキストフォルダを取り込む</span>
+        </label>
+        <button id="studyCloseBtn" type="button" class="study-close-btn" data-i18n="studyClose">✕ 書斎を閉じる</button>
+      </div>
+    </header>
+
+    <div class="study-workspace">
+      <aside class="study-shelf" aria-label="Study shelf">
+        <div class="study-shelf-heading">
+          <strong data-i18n="studyShelf">本棚</strong>
+          <span id="studyBookCount" class="study-count"></span>
+        </div>
+        <input id="studySearch" class="study-search" type="search" autocomplete="off" placeholder="タイトル・フォルダを検索…">
+        <div id="studyShelfList" class="study-shelf-list"></div>
+      </aside>
+
+      <main class="study-main">
+        <div id="studyWelcome" class="study-welcome">
+          <div class="study-welcome-mark" aria-hidden="true">♫</div>
+          <h3 data-i18n="studyWelcomeTitle">読みたいものを選ぶ</h3>
+          <p data-i18n="studyWelcomeHint">画像はフォルダ単位、テキストはファイルごとに端末内へ保存します。外へアップロードしません。</p>
+          <p class="study-supported" data-i18n="studySupported">画像: JPG / PNG / WebP / GIF / AVIF / BMP · 文章: TXT / MD / JSON / CSV など</p>
+          <p class="study-shortcuts" data-i18n="studyTapHint">画像: 左側／←で次へ、右側／→で前へ。Space / Enterで次へ、Enter長押しで栞、Space長押しでページ移動、Escで終了。</p>
+        </div>
+
+        <section id="studyBookView" class="study-book-view" hidden>
+          <header class="study-book-heading">
+            <button id="studyBackBtn" type="button" class="study-small-btn" data-i18n="studyBack">← 本棚</button>
+            <div class="study-book-heading-text">
+              <h3 id="studyCurrentTitle"></h3>
+              <div id="studyCurrentMeta" class="study-current-meta"></div>
+            </div>
+            <button id="studyFullscreenBtn" type="button" class="study-small-btn" data-i18n="studyFullscreen">⛶ 画像を全画面化</button>
+          </header>
+
+          <div class="study-toolbar">
+            <label id="studyImageModeRow" class="study-option">
+              <span data-i18n="studyModeLabel">画像の並べ方</span>
+              <select id="studyImageMode">
+                <option value="single" data-i18n="studyModeSingle">一枚ずつ（中央）</option>
+                <option value="spread" data-i18n="studyModeSpread">見開き（右が1ページ目）</option>
+                <option value="vertical" data-i18n="studyModeVertical">縦読み漫画</option>
+              </select>
+            </label>
+            <label id="studyAmericanRow" class="study-check-option">
+              <input id="studyAmerican" type="checkbox">
+              <span data-i18n="studyAmerican">🇺🇸 アメリカン（左右・順序反転）</span>
+            </label>
+            <label id="studyThemeRow" class="study-option">
+              <span data-i18n="studyThemeLabel">文字のスキン</span>
+              <select id="studyTheme">
+                <option value="plain" data-i18n="studyThemePlain">普通のテキスト</option>
+                <option value="dark" data-i18n="studyThemeDark">ダークモード</option>
+                <option value="neon" data-i18n="studyThemeNeon">ネオン</option>
+                <option value="lined" data-i18n="studyThemeLined">ルーズリーフ</option>
+                <option value="genko" data-i18n="studyThemeGenko">作文用紙（縦書き・右から）</option>
+              </select>
+            </label>
+            <label class="study-check-option study-tv-check">
+              <input id="studyTvCheck" type="checkbox">
+              <span data-i18n="studyTvToggle">TVを流し見する</span>
+            </label>
+            <label class="study-option study-tv-position-row">
+              <span data-i18n="studyTvPosLabel">TVの位置</span>
+              <select id="studyTvPosition">
+                <option value="top" data-i18n="studyTvTop">上</option>
+                <option value="bottom" data-i18n="studyTvBottom">下</option>
+                <option value="off" data-i18n="studyTvHidden">表示しない</option>
+              </select>
+            </label>
+            <button id="studyBookmarkBtn" type="button" class="study-small-btn" data-i18n="studyBookmark">🔖 栞を挟む</button>
+            <details class="study-advanced">
+              <summary data-i18n="studyAdvanced">⚙ 上級者向け</summary>
+              <label class="study-check-option">
+                <input id="studyMemoEnabled" type="checkbox">
+                <span data-i18n="studyMemoToggle">テキストをメモ帳として編集可能にする</span>
+              </label>
+              <p class="study-advanced-hint" data-i18n="studyMemoHint">編集は書斎内のコピーに保存し、元ファイルは変更しません。</p>
+            </details>
+          </div>
+
+          <div id="studyPanels" class="study-panels">
+            <section id="studyTvPane" class="study-tv-pane" hidden aria-label="TV">
+              <div id="studyTvScreen" class="study-tv-screen">
+                <img id="studyTvArt" class="study-tv-art" alt="" hidden>
+                <div id="studyTvEmpty" class="study-tv-empty" data-i18n="studyTvEmpty">動画または曲のジャケットがここに表示されます。</div>
+                <div id="studyTvLabel" class="study-tv-label"></div>
+              </div>
+              <div class="study-tv-caption" data-i18n="studyTvCaption">今の曲・動画を表示します。別の音声を重ねて再生しません。</div>
+            </section>
+            <section id="studyContentPane" class="study-content-pane">
+              <div id="studyImageStage" class="study-image-stage" role="region" tabindex="0" aria-label="Image reader" hidden>
+                <div id="studySingleWrap" class="study-single-wrap">
+                  <img id="studyPageSingle" class="study-page-image study-page-single" alt="" draggable="false" hidden>
+                </div>
+                <div id="studySpreadWrap" class="study-spread-wrap" hidden>
+                  <div class="study-spread-page study-spread-left"><img id="studyPageLeft" class="study-page-image" alt="" draggable="false" hidden></div>
+                  <div class="study-spread-page study-spread-right"><img id="studyPageRight" class="study-page-image" alt="" draggable="false" hidden></div>
+                </div>
+                <div id="studyVerticalPages" class="study-vertical-pages" hidden></div>
+                <div class="study-hit study-hit-left" aria-hidden="true"><span>‹</span></div>
+                <div class="study-hit study-hit-right" aria-hidden="true"><span>›</span></div>
+                <div id="studyImageHint" class="study-image-hint" data-i18n="studyTapHint">左側／←で次へ · 右側／→で前へ · Space / Enterで次へ</div>
+              </div>
+              <div id="studyTextStage" class="study-text-stage" hidden>
+                <article id="studyTextPage" class="study-text-page" tabindex="0"></article>
+                <textarea id="studyMemoEditor" class="study-memo-editor" spellcheck="false" hidden></textarea>
+              </div>
+            </section>
+          </div>
+
+          <footer class="study-reader-footer">
+            <button id="studyNextBtn" type="button" class="study-small-btn" data-i18n="studyNext">◀ 次へ</button>
+            <div id="studyProgressWrap" class="study-progress-wrap" hidden>
+              <input id="studyProgress" type="range" min="0" max="0" step="1" aria-label="Page">
+              <span id="studyPageCount" class="study-page-count"></span>
+              <button id="studyProgressDoneBtn" type="button" class="study-progress-done" data-i18n="studyProgressDone">完了</button>
+            </div>
+            <span id="studyTextProgress" class="study-page-count" hidden></span>
+            <button id="studyPrevBtn" type="button" class="study-small-btn" data-i18n="studyPrevious">前へ ▶</button>
+            <button id="studyAssignCoverBtn" type="button" class="study-small-btn" data-i18n="studyAssignCover" hidden>🖼 このページを曲のジャケットに</button>
+            <button id="studyMemoBtn" type="button" class="study-small-btn" hidden data-i18n="studyMemoEdit">✎ メモ帳で編集</button>
+            <button id="studyMemoExportBtn" type="button" class="study-small-btn" hidden data-i18n="studyExportText">⇩ テキストを書き出す</button>
+          </footer>
+        </section>
+      </main>
+    </div>
+  </div>
+</section>
+
 <button id="floatingSafeBtn" type="button" title="🛟 セーフモード (5回クリックで緊急復旧) / ?safe=1" style="position:fixed;right:8px;bottom:8px;z-index:99999;opacity:.15;width:36px;height:36px;border-radius:50%;background:#111;color:#fff;border:2px solid #0f0;font-size:18px;display:flex;align-items:center;justify-content:center;transition:opacity .2s, transform .2s;cursor:pointer">🛟</button>
 <script>
   (function(){
@@ -1141,5 +1291,8 @@
 <!-- ✨ フレーム補完（動き補償・光学フロー／WebGL2） -->
 <script src="js/frame-interp.js"></script>
 <script src="js/media-player-mode.js"></script>
+<!-- 📚 端末内の画像・テキスト閲覧モード（外部ライブラリ／アップロードなし） -->
+<script src="js/study-room-utils.js"></script>
+<script src="js/study-room.js"></script>
 </body>
 </html>

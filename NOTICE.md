@@ -71,6 +71,11 @@ original song choreography is reproduced. A motion being free to download or
 available on a hosting page is not, by itself, permission to redistribute its
 VMD; no third-party VMD is added unless the redistribution terms for the actual
 file are clear.
+The 📚 Study Room (書斎) reads the image folders and text files **you** choose and
+keeps its own copies inside this browser only (IndexedDB `trk_study_room_v1`);
+nothing is uploaded or shared, the original files are never modified, and the
+rights in imported books and images stay with their authors. The reader, its
+text decoding and its display styles are original trk! code under the GPL.
 
 ### 3a. Bundled MMD models (`assets/mmd/`)
 A model may be bundled under `assets/mmd/` ONLY when its own readme explicitly

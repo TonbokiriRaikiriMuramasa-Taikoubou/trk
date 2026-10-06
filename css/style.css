@@ -1097,6 +1097,8 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
 #tvDock .tvLive{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .25s;z-index:0;pointer-events:none}
 #tvDock .tvScreen[data-live="1"] .tvLive{opacity:1}
 #tvDock.off .tvLive{opacity:0}
+/* 書斎で曲に割り当てたジャケット（音声だけの曲でもTVの画面を飾る） */
+#tvDock .tvCover{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:0;pointer-events:none}
 #tvDock .tvScreen::before{z-index:1}
 #tvDock .tvGlare,#tvDock .tvScanlines{z-index:2}
 

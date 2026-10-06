@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* trk! offline shell: network first, cached same-origin app files as a fallback. */
-const CACHE = "trk-v2026.10.6-ux21";
+const CACHE = "trk-v2026.10.6-ux22";
 const CACHE_PREFIX = "trk-";
 const SCOPE = new URL(self.registration.scope);
 
@@ -16,12 +16,25 @@ self.addEventListener("activate", event => {
   })());
 });
 
+/* 🛡 セーフモード（?safe=1）のページでは、キャッシュしたアプリの殻を使いません。
+   キャッシュはページ内で動くコード（アドオンなど）からも書けるため、汚染されたコピーを
+   セーフモードで実行してしまわないようにするためです。通信できるときは今までどおりネットワーク優先、
+   オフラインのときだけ「キャッシュを見ない」ぶん、安全側に倒します（§docs/SECURITY.md）。 */
+const safeClients = new Set();
+function safeWanted(url) {
+  const params = new URLSearchParams(url.search);
+  return params.has("safe") || params.has("safety") || String(url.hash || "").toLowerCase().includes("safe");
+}
+
 self.addEventListener("fetch", event => {
   const request = event.request;
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
   if (url.origin !== SCOPE.origin || !url.pathname.startsWith(SCOPE.pathname)) return;
+
+  if (request.mode === "navigate" && safeWanted(url)) safeClients.add(event.clientId);
+  const safeClient = safeClients.has(event.clientId);
 
   event.respondWith((async () => {
     try {
@@ -34,6 +47,12 @@ self.addEventListener("fetch", event => {
       }
       return response;
     } catch {
+      if (safeClient) {
+        return new Response("trk! is offline. Safe mode does not use the cached copy -- reconnect and reload.", {
+          status: 503,
+          headers: { "Content-Type": "text/plain; charset=utf-8" }
+        });
+      }
       const cached = await caches.match(request);
       if (cached) return cached;
       if (request.mode === "navigate") {

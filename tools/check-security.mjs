@@ -222,6 +222,11 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     sw.includes('request.method !== "GET"');
   rule(swGuards, "the service worker caches only same-origin, basic, GET responses");
 
+  const swSafe = sw.includes("const safeClients") && sw.includes("function safeWanted") &&
+    sw.includes('params.has("safe")') && sw.includes("if (safeClient)") &&
+    sw.indexOf("safeClients.add") < sw.indexOf("caches.match");
+  rule(swSafe, "the service worker never serves cached copies to a ?safe=1 client (no cache poisoning bypass)");
+
   const media = js["js/media.js"], library = js["js/library.js"];
   rule(media.includes("const ANALYZE_MAX = 96 * 1024 * 1024") && media.includes('tooBig ? "analysisSkipped"') &&
     !/file\.arrayBuffer\(\)[^\n]*\n[^\n]*ANALYZE/ .test(media),
@@ -277,6 +282,11 @@ function onlyIf(cond, text) { return cond ? text : ""; }
   const doc = exists("docs/SECURITY.md") && read("README.md").includes("docs/SECURITY.md") &&
     read("docs/HANDOFF.md").includes("check-security.mjs");
   rule(doc, "docs/SECURITY.md exists and is linked from README / HANDOFF");
+
+  const checklist = exists("docs/SECURITY-CHECKLIST.md") && read("docs/SECURITY-CHECKLIST.md").includes("OWASP") &&
+    read("docs/SECURITY-CHECKLIST.md").includes("CWE") && read("README.md").includes("SECURITY-CHECKLIST.md") &&
+    read("docs/SECURITY.md").includes("SECURITY-CHECKLIST.md");
+  rule(checklist, "docs/SECURITY-CHECKLIST.md maps the OWASP client-side list and the CWE Top 25, and is linked");
 }
 
 console.log("");

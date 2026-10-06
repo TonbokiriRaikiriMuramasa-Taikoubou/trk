@@ -58,6 +58,30 @@ assert.equal(U.normalizeText("a\r\nb\fc"), "a\nb\n\nc");
 const ruby = U.aozoraSegments("｜漢字《かんじ》と山《やま》\n");
 assert.deepEqual(Array.from(ruby, part => part.ruby ? [part.ruby, part.reading] : part.text), [["漢字", "かんじ"], "と", ["山", "やま"], "\n"]);
 assert.equal(U.aozoraSegments("［＃改ページ］").map(part => part.text).join(""), "\n\n");
+/* ルビの細かい約束（ルビにしないものを、そのまま文字として残す） */
+const plainRuby = s => U.aozoraSegments(s).map(p => p.ruby ? `[${p.ruby}:${p.reading}]` : p.text).join("");
+assert.equal(plainRuby("｜《》"), "｜《》", "an empty base/reading stays text");
+assert.equal(plainRuby("漢《》"), "漢《》", "an empty reading stays text");
+assert.equal(plainRuby("漢《かん"), "漢《かん", "an unclosed opening bracket stays text");
+assert.equal(plainRuby("漢《かん》じ"), "[漢:かん]じ", "an implicit ruby still works");
+assert.equal(plainRuby("｜あい《ai》"), "[あい:ai]", "the explicit form takes everything up to 《");
+assert.equal(plainRuby("｜漢《かん》と山《やま》"), "[漢:かん]と[山:やま]", "two rubies in one line");
+assert.equal(plainRuby("｜漢《かん\nじ》"), "｜漢《かん\nじ》", "ruby never crosses a line break");
+assert.equal(plainRuby("漢《a》b《c》"), "[漢:a]b《c》", "a reading without a kanji run stays text");
+/* 🛡 細工した本文で固まらない（以前は正規表現の後戻りで、1MBの漢字だけで数分かかっていた） */
+const worst = [
+  ["kanji only, no 《", "漢".repeat(300000)],
+  ["many ｜ without 《", ("｜" + "あ".repeat(80)).repeat(2000)],
+  ["many unclosed 《", "《".repeat(150000)],
+  ["｜ then a long run then 《", "｜" + "あ".repeat(300000) + "《"]
+];
+for (const [name, text] of worst) {
+  const started = Date.now();
+  const parts = U.aozoraSegments(text);
+  const ms = Date.now() - started;
+  assert.ok(parts.length >= 1, `aozoraSegments survives ${name}`);
+  assert.ok(ms < 1500, `aozoraSegments stays linear on ${name} (${ms}ms)`);
+}
 
 /* ---------- 検索・抜粋・文字数 ---------- */
 assert.deepEqual(Array.from(U.findMatches("abcABCabc", "ABC")), [0, 3, 6], "case-insensitive matches keep their offsets");

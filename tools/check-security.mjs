@@ -214,6 +214,30 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     writes.slice(0, 3).join(" · "));
 }
 
+/* ---------- 8b. 📚 書斎（本文はすべて文字として描く・細工した本文で固まらない） ---------- */
+{
+  const study = js["js/study-room.js"], util = js["js/study-room-utils.js"];
+  const textOnly = !/\.innerHTML\s*=/.test(study) && !/\.outerHTML\s*=/.test(study) &&
+    !study.includes("insertAdjacentHTML") && !study.includes("document.write");
+  const oneSrc = occurrences(study, /(?:[\w$.\[\]]*\.)src\s*=\s*[^;]+/g)
+    .every(m => m[0].startsWith("img.src = url"));   /* 唯一の代入は、許可リストの画像ブロブだけ */
+  rule(textOnly && oneSrc, "the study reader renders text only as text nodes (no HTML, no markdown, one blob img.src)",
+    onlyIf(!textOnly, "innerHTML/HTML sink found") + onlyIf(!oneSrc, "unexpected .src assignment"));
+
+  /* ルビは線形走査。後戻りのある正規表現に戻っていないか（1MBの漢字だけで数分固まっていた原因） */
+  const linear = util.includes("function aozoraSegments(input)") && util.includes("const closeAfter = at =>") &&
+    util.includes("const sameLine = p =>") && util.includes("const KANJI_LIKE =") && !util.includes("rubyPattern");
+  rule(linear, "the Aozora ruby parser is a single forward scan (no backtracking regex)");
+
+  const noTests = /\/\*[\s\S]*?\*\//g;
+  const utilCode = util.replace(noTests, "");
+  const risky = [...utilCode.matchAll(/\/[^\/\n]*(?:\[\^[^\]]*\]|\.)[+*][^\/\n]*\/[gimsuy]*/g)]
+    .filter(m => /\[\^[^\]]*\]\+|\[\.\]\+/.test(m[0]))
+    .map(m => m[0]);
+  rule(risky.length === 0, "no backtracking-prone text-matching regex left in the study utils", risky.slice(0, 2).join(" · "));
+}
+function onlyIf(cond, text) { return cond ? text : ""; }
+
 /* ---------- 9. 説明が残っているか ---------- */
 {
   const doc = exists("docs/SECURITY.md") && read("README.md").includes("docs/SECURITY.md") &&

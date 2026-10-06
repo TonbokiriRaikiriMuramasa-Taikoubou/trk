@@ -173,6 +173,37 @@ if (skirtFront.some((n, i) => n !== expectedFront[i]) || skirtBack.some((n, i) =
   fail("Lat-style skirt bone names do not encode as CP932");
 }
 
+/* 🚶 歩行／🏃 走行：腕の前後振りが脚と逆相で出ているか、肘を前に折っているか、足ＩＫで足を持ち上げているか。
+   2026-10 の「腕が横にしか動かない」の再発防止（前後は rot[0]、足はＩＫの position.y、肘は左＝+Y／右＝-Y） */
+for (const { id, arm, lift, elbowAxis, elbowMin, elbowMirrored } of [
+  { id: "walk112", arm: 25, lift: 0.5, elbowAxis: 0, elbowMin: 20, elbowMirrored: false },
+  { id: "run152", arm: 40, lift: 0.8, elbowAxis: 0, elbowMin: 45, elbowMirrored: false }
+]) {
+  const motion = data.BUILTIN[id];
+  if (!motion) fail(`Swing check needs the ${id} motion`);
+  const samples = 24, armShots = [], armLegShots = [];
+  let armMin = Infinity, armMax = -Infinity, diffMin = Infinity, diffMax = -Infinity, elbowMax = 0, liftL = 0, liftR = 0, bothUp = 0;
+  for (let i = 0; i < samples; i++) {
+    const pose = motion.pose(motion.seconds * i / samples);
+    const left = pose["左腕"], right = pose["右腕"], leg = pose["左足"], elbowL = pose["左ひじ"], elbowR = pose["右ひじ"],
+          ikL = pose["左足ＩＫ"], ikR = pose["右足ＩＫ"];
+    if (!left || !right || !leg || !elbowL || !elbowR || !ikL || !ikR) fail(`${id}: the swing check needs 腕・ひじ・足・足ＩＫ in every frame`);
+    const l = left.rot[0], r = right.rot[0];
+    armMin = Math.min(armMin, l); armMax = Math.max(armMax, l);
+    diffMin = Math.min(diffMin, l - r); diffMax = Math.max(diffMax, l - r);
+    armShots.push(l); armLegShots.push(l * leg.rot[0]);
+    elbowMax = Math.max(elbowMax, elbowL.rot[elbowAxis], elbowMirrored ? -elbowR.rot[elbowAxis] : elbowR.rot[elbowAxis]);
+    liftL = Math.max(liftL, ikL.pos[1]); liftR = Math.max(liftR, ikR.pos[1]);
+    if (ikL.pos[1] > lift * 0.3 && ikR.pos[1] > lift * 0.3) bothUp++;
+  }
+  if (armMax - armMin < arm * 2) fail(`${id}: the arms must swing fore/aft by ±${arm}° (found ${((armMax - armMin) / 2).toFixed(1)}°)`);
+  if (diffMax - diffMin < arm * 2) fail(`${id}: the two arms must swing in opposite directions (found ${((diffMax - diffMin) / 2).toFixed(1)}°)`);
+  if (armLegShots.some(v => v > 0.5)) fail(`${id}: the arm must swing opposite to the leg on the same side`);
+  if (elbowMax < elbowMin) fail(`${id}: the elbow must fold forward by at least ${elbowMin}° (found ${elbowMax.toFixed(1)}°)`);
+  if (liftL < lift || liftR < lift) fail(`${id}: each foot must lift by at least ${lift} (found ${liftL.toFixed(2)} / ${liftR.toFixed(2)})`);
+  if (bothUp > 1) fail(`${id}: the feet must lift alternately, not together`);
+}
+
 const translatedKeys = [
   "mmdMotionWalk", "mmdMotionRun", "mmdMotionSit", "mmdMotionDance", "mmdMotionLegacy",
   "mmdGroupDaily", "mmdGroupDance", "mmdGroupSongs", "mmdGroupMiku", "mmdGroupFaces", "mmdGroupVoice",
@@ -205,4 +236,4 @@ if (!source.includes("for (const group of MOTION_GROUPS)") || !source.includes("
   fail("Grouped select/quick motion lists are not wired");
 }
 
-console.log(`MMD motion smoke check passed · ${ids.length} built-ins/choices · ${data.FACE_MORPHS.length} Lat morph tracks · VMD/CP932/poses valid`);
+console.log(`MMD motion smoke check passed · ${ids.length} built-ins/choices · ${data.FACE_MORPHS.length} Lat morph tracks · VMD/CP932/poses + walk/run swing valid`);

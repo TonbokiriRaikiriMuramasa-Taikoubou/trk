@@ -582,7 +582,8 @@ function gesturePose(style, t, bpm, beats, seconds, phase = 0) {
       ...base, "センター":center([0.05 * sway, -0.02 + 0.05 * hop, 0], [0, -4, 2 * sway]),
       "上半身":poseBone([-4 * hop, 6 * sway, 2 * sway]), "首":poseBone([-6 - 3 * hop, -4 * sway, 0]),
       "頭":poseBone([-7 - 4 * hop, 0, -3 * sway]),
-      ...arms([14, 8, -78 + 46 * L], [4, -6, 34 + 14 * R], [0, 22, 0], [0, -40, 0], [-12 * L, 10 * R]),
+      /* 左＝大きく外へ上げる（+Z＝体側から上へ）／右＝体の横で手を胸に添える */
+      ...arms([10 + 6 * L, 0, 26 + 20 * L], [4, -6, 34 + 14 * R], [14, 10, 0], [18, -40, 0], [-12 * L, 10 * R]),
       ...feet(-3 * alt, 3 * alt, 3 * hop)
     };
     default: return base;
@@ -694,7 +695,7 @@ const BUILTIN = {
     const beat = t * 152 / 60, stride = Math.sin(Math.PI * beat);
     const liftL = Math.max(0, -Math.cos(Math.PI * beat)), liftR = Math.max(0, Math.cos(Math.PI * beat));
     const bounce = Math.max(0, Math.sin(Math.PI * beat)), land = Math.abs(Math.cos(Math.PI * beat));
-    const swing = 54 * stride, elbowL = 46 + 18 * liftL, elbowR = 46 + 18 * liftR;
+    const swing = 54 * stride, elbowL = 64 + 16 * liftL, elbowR = 64 + 16 * liftR;
     return {
       "センター": { pos:[0.05 * stride, -0.11 + 0.16 * bounce - 0.02 * land, 0], rot:[4, -3 * stride, 2 * stride] },
       "上半身": { rot:[4 - 2 * bounce, 4 * stride, 2 * stride] },
@@ -706,8 +707,9 @@ const BUILTIN = {
       /* 足ＩＫ＝足のIKターゲット。走りなので、歩きより大きく上げて前へ */
       "左足ＩＫ":{ rot:[0, 0, 0], pos:[0, 1.1 * liftL, -0.7 * liftL] },
       "右足ＩＫ":{ rot:[0, 0, 0], pos:[0, 1.1 * liftR, -0.7 * liftR] },
-      "左腕":  { rot:[4 + swing, 0, -52 + 5 * liftR] }, "右腕":  { rot:[4 - swing, 0, 52 - 5 * liftL] },
-      "左ひじ":{ rot:[0, elbowL, 16] }, "右ひじ":{ rot:[0, -elbowR, -16] },
+      "左腕":  { rot:[6 + swing, 0, -50 + 5 * liftR] }, "右腕":  { rot:[6 - swing, 0, 50 - 5 * liftL] },
+      /* ひじは「前へ折る」＝rot[0]（前後）。rot[1] は手を体の前へ寄せる向き（左右で逆符号） */
+      "左ひじ":{ rot:[elbowL, 10, 0] }, "右ひじ":{ rot:[elbowR, -10, 0] },
       "左手首":{ rot:[0, 0, -8] }, "右手首":{ rot:[0, 0, 8] },
       "左ｽｶｰﾄ前":{ rot:[-4 * liftL, 0, -3 * stride] }, "右ｽｶｰﾄ前":{ rot:[-4 * liftR, 0, 3 * stride] },
       "左ｽｶｰﾄ後":{ rot:[3 * liftL, 0, -1.5 * stride] }, "右ｽｶｰﾄ後":{ rot:[3 * liftR, 0, 1.5 * stride] }

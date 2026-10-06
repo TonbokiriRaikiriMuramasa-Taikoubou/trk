@@ -1227,6 +1227,11 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
 .plBtnDanger:disabled{opacity:.5}
 .plHint{font-size:12.5px;color:var(--ui-muted);line-height:1.5}
 .plSep{border-top:1px solid var(--ui-border);margin:4px 0}
+/* 🐔 trk's playlist の階層（長押しで開く Vol 一覧）と、設定欄の並べ替えリスト */
+.plTrkList{display:flex;flex-direction:column;gap:6px}
+.plTrkRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.plTrkRow>span{flex:1;min-width:120px}
+.plTrkGroup{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 /* 📤 共有プレイリスト（ビューア） */
 .plShareComment{font-size:13.5px;color:var(--ui-text);line-height:1.5}
 .plShareSrc{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
@@ -1238,8 +1243,11 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
 /* 📁 フォルダの中身チップ・ネストタブ・曲ごとの🔗 */
 .plChipsRow{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
 .libTab.plNested{border-style:dashed;opacity:.95}
-/* 🛒 カタログの未入手曲（薄く・破線） */
-.plWishRow{opacity:.55;border-style:dashed}
+/* 🛒 カタログの未入手曲（灰色・破線。入手すると普通の黒い行になる） */
+/* 🛒 まだ持っていない曲（集める棚の灰色の行）。Music フォルダに入れると黒い行になる */
+.plWishRow{opacity:.6;border-style:dashed}
+.plWishRow:hover,.plWishRow:focus-visible{opacity:.9}
+.plWishHint{margin:0 0 8px}
 /* 👥 投稿者ツール */
 .plAuthorChips{display:flex;flex-wrap:wrap;gap:4px;margin:2px 0 10px}
 .plLinkMini.on{box-shadow:inset 0 0 0 2px rgba(212,160,23,.65)}

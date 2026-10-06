@@ -131,14 +131,16 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   const enumFn = enumFnStart >= 0 && enumFnEnd >= 0 ? core.slice(enumFnStart, enumFnEnd + 2) : "";
   let enumBehavior = false;
   try {
-    /* 🪶 軽量化の許可リストは core.js 側の定数なので、実物を取り出して同じもので検証する */
+    /* 🪶 軽量化と 🐔 trk タブ表示名の許可リストは core.js 側の定数なので、実物を取り出して同じもので検証する */
     const liteSrc = /const LITE_ENUM_VALUES = \{[\s\S]*?\n\};/.exec(core);
     const LITE_ENUM_VALUES = liteSrc ? vm.runInNewContext(`(()=>{${liteSrc[0]}; return LITE_ENUM_VALUES;})()`) : null;
+    const trkSrc = /const TRK_ENUM_VALUES = \{[\s\S]*?\n\};/.exec(core);
+    const TRK_ENUM_VALUES = trkSrc ? vm.runInNewContext(`(()=>{${trkSrc[0]}; return TRK_ENUM_VALUES;})()`) : null;
     const validate = vm.runInNewContext(`(${enumFn})`, { window:{
       TrkSpec:{ styles:() => ["bars"], themes:() => ["neon"] },
       TrkMMD:{ builtins:() => ["faceSing"] },
       TrkFX:{ list:() => [{ id:"flat" }, { id:"my_test" }] }
-    }, LITE_ENUM_VALUES });
+    }, LITE_ENUM_VALUES, TRK_ENUM_VALUES });
     enumBehavior = validate("specStyle", "bars") && !validate("specStyle", "constructor") &&
       validate("specTheme", "neon") && !validate("specTheme", "__proto__") &&
       validate("mmdMotionKind", "faceSing") && validate("mmdMotionKind", "auto") && validate("mmdMotionKind", "none") &&
@@ -152,10 +154,18 @@ const occurrences = (text, re) => [...text.matchAll(re)];
       !validate("liteMascot", "constructor") && !validate("liteMascot", "toString") &&
       validate("liteScale", "device") && validate("liteScale", "1.5") &&
       !validate("liteScale", "constructor") && !validate("liteScale", "9") &&
-      validate("liteMode", "auto") && !validate("liteMode", "constructor");
+      validate("liteMode", "auto") && !validate("liteMode", "constructor") &&
+      /* 🐔 trk's playlist のタブ表示名：3種類だけを通す。"" や継承キーで「アイコンだけ」に化けないよう弾く */
+      validate("trkTabName", "full") && validate("trkTabName", "short") && validate("trkTabName", "icon") &&
+      !validate("trkTabName", "constructor") && !validate("trkTabName", "__proto__") && !validate("trkTabName", "") &&
+      !validate("trkTabName", "icon ") && !validate("trkTabName", "bogus") &&
+      /* 一覧そのものも3種類ちょうど（あとから値を足すと「表示名」が増える＝UIの選択肢とずれる） */
+      JSON.stringify(TRK_ENUM_VALUES.trkTabName) === JSON.stringify(["full", "short", "icon"]);
   } catch (_) {}
-  rule(!!enumFn && enumBehavior && core.includes('!validImportedSettingEnum(k, incoming)'),
-    "emergency settings import allowlists spectrum, MMD, FX and lite-mode enum IDs before assignment");
+  /* 許可リストに載っていても SETTING_ENUM_KEYS から外れていたら関門を通らない（両方そろって初めて効く） */
+  const enumKeyListed = /const SETTING_ENUM_KEYS = \[[\s\S]*?"trkTabName"[\s\S]*?\]/.test(core);
+  rule(!!enumFn && enumBehavior && enumKeyListed && core.includes('!validImportedSettingEnum(k, incoming)'),
+    "emergency settings import allowlists spectrum, MMD, FX, lite-mode and trk-tab enum IDs before assignment");
 
   /* 緊急Importで弾いたキーは黙って捨てない（「読み込みました」なのに反映されない事故を防ぐ）。
      理由（この端末に無いID／型が違う／この設定に無いキー）でも対応が変わるので、区別して出す。 */

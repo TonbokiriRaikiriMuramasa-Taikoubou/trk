@@ -120,6 +120,11 @@ const LITE_ENUM_VALUES = {
   liteMascot: ["60", "30", "15", "off"],
   liteScale: ["device", "1.5", "1"]
 };
+/* 🐔 trk's playlist のタブ表示名（3種類）。名前が長いのを嫌う人向けに短くできる。
+   "icon" は文字を出さない（🐔 のアイコンだけ）。名前と色は固定なので、ここで選べるのは表示名だけ。 */
+const TRK_ENUM_VALUES = {
+  trkTabName: ["full", "short", "icon"]
+};
 
 const settings = {
   language: pick(prefs.language, ["ja", "en", "zh", "ko"], guessLang()),
@@ -228,6 +233,7 @@ const settings = {
   trkPlaylist: prefs.trkPlaylist !== false,                               // 🐔 trk's playlist（右端のタブ。チュートリアル後に自動追加。設定で非表示可）
   trkClassic: prefs.trkClassic !== false,                                // 🎻 trk classic（クラシック名盤。ゲームとは別枠で100曲。設定で非表示可）
   trkSortABC: prefs.trkSortABC === true,                                 // 🔤 trk フォルダ内をABC順で並べる（初期オフ）
+  trkTabName: pick(prefs.trkTabName, TRK_ENUM_VALUES.trkTabName, "full"), // 🐔 タブの表示名（full=trk's playlist／short=trk's／icon=🐔 だけ）
   playlistOrder: (Array.isArray(prefs.playlistOrder) ? prefs.playlistOrder : []).map(x => String(x).slice(0, 48)).filter(Boolean).slice(0, 200), // ↕ 自由並べ替え（初期は作成順）
   /* 📊 スペクトラム（js/spectrum.js が値と実在を検証して読み戻す） */
   specOn: prefs.specOn !== false,                                             // 表示する（初期オン）
@@ -445,7 +451,7 @@ function resetAllPrefs() {
   settings.tvParamFavs = []; // a factory reset clears the separately preserved TV bookmarks too
   settings.trkPlaylist = true; // 🐔 trk's playlistも初期状態に戻す（再表示）
   settings.trkClassic = true;  // 🎻 trk classic も初期状態に戻す
-  settings.trkSortABC = false; settings.playlistOrder = [];
+  settings.trkSortABC = false; settings.playlistOrder = []; settings.trkTabName = "full";
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
   settings.catchNitroBonus = true; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();
@@ -1114,14 +1120,15 @@ function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
 /* Emergency settings imports validate enum IDs at the boundary, before live settings are changed.
    列挙IDの検証対象（増やしたら tools/check-security.mjs も更新）。
    ⚠ 辞書が要るもの（TrkSpec/TrkMMD/TrkFX）は、その辞書が読めていないと fail-closed で落ちる。
-      🪶 軽量化のように core.js で決め打ちできるものは LITE_ENUM_VALUES へ寄せる（読み込み順に左右されない）。 */
+      🪶 軽量化のように core.js で決め打ちできるものは LITE_ENUM_VALUES へ、
+      🐔 タブ表示名のように UI 側の定数と対になるものは TRK_ENUM_VALUES へ寄せる（読み込み順に左右されない）。 */
 const SETTING_ENUM_KEYS = ["specStyle", "specTheme", "mmdMotionKind", "fxPreset",
-  "liteMode", "liteFps", "liteMascot", "liteScale"];
+  "liteMode", "liteFps", "liteMascot", "liteScale", "trkTabName"];
 /* Importで弾いた理由（対応が変わるので、表示では区別して出す） */
 const SKIP_WHY = { enum:"prefSkipWhyId", type:"prefSkipWhyType", unknown:"prefSkipWhyUnknown", failed:"prefSkipWhyType" };
 function validImportedSettingEnum(key, value) {
   if (typeof value !== "string") return false;
-  const staticList = LITE_ENUM_VALUES[key];
+  const staticList = LITE_ENUM_VALUES[key] || TRK_ENUM_VALUES[key];
   if (staticList) return staticList.includes(value);
   try {
     if (key === "specStyle") return !!window.TrkSpec && window.TrkSpec.styles().includes(value);

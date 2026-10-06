@@ -943,7 +943,7 @@
             <div id="libShareStatus" class="hint status"></div>
           </details>
 
-                    <!-- 🐔 trk's playlist（ゲーム音楽の紹介。右端のタブ。📚すべて長押しの公式カタログは現在こちらに置き換え） -->
+          <!-- 🐔 trk's playlist（ゲーム音楽の紹介。右端のタブ。🎻 trk classic もこの中に収納） -->
           <details class="panel" id="trkPanel">
             <summary data-i18n="trkPanelTitle"></summary>
             <div class="hint" data-i18n="trkPanelHint"></div>
@@ -955,24 +955,37 @@
               <button id="trkHideBtn" type="button" data-i18n="trkHide"></button>
             </div>
             <div id="trkStatus" class="hint status"></div>
-          </details>
 
-          <!-- 🎻 trk classic（クラシック名盤100選。ゲームとは別枠） -->
-          <details class="panel" id="trkClassicPanel">
-            <summary data-i18n="trkClassicPanelTitle"></summary>
-            <div class="hint" data-i18n="trkClassicPanelHint"></div>
-            <div class="hint" data-i18n="trkClassicHint"></div>
-            <label class="check"><input id="trkClassicChk" type="checkbox"><span data-i18n="trkClassicToggle"></span></label>
-            <div class="hint" data-i18n="trkClassicNote"></div>
-            <div class="miniActions">
-              <button id="trkClassicOpenBtn" type="button" data-i18n="trkClassicBtn"></button>
-              <button id="trkClassicHideBtn" type="button" data-i18n="trkClassicHide"></button>
-            </div>
-            <div id="trkClassicStatus" class="hint status"></div>
+            <!-- 🐔 タブの表示名（3種類）。アイコンは固定で、名前と色は編集できません -->
+            <label class="field">
+              <span data-i18n="trkTabNameLabel"></span>
+              <select id="trkTabNameSel" data-i18n-aria="trkTabNameLabel">
+                <option value="full" data-i18n="trkTabNameFull"></option>
+                <option value="short" data-i18n="trkTabNameShort"></option>
+                <option value="icon" data-i18n="trkTabNameIcon"></option>
+              </select>
+            </label>
+            <div class="hint" data-i18n="trkTabNameNote"></div>
+
+            <!-- 🔤 並び順（trk's playlist の階層に入れた Vol ぜんぶ） -->
             <div class="plSep"></div>
-            <label class="check"><input id="trkSortAbcChk" type="checkbox"><span>🔤 ABC順に並べる</span></label>
-            <div class="hint">オフのときは下のリストで ↕ 自由に並べ替えできます。長押しで開く 🐔 フォルダ内の一覧にも反映されます。</div>
+            <label class="check"><input id="trkSortAbcChk" type="checkbox"><span data-i18n="trkSortAbc"></span></label>
+            <div class="hint" data-i18n="trkSortAbcHint"></div>
             <div id="trkOrderList" class="miniActions" style="flex-direction:column;align-items:stretch;gap:6px"></div>
+
+            <!-- 🎻 trk classic（ゲームとは別枠・クラシック名盤100選）＝ 🐔 trk's playlist の中に収納 -->
+            <details class="subPanel" id="trkClassicPanel">
+              <summary data-i18n="trkClassicPanelTitle"></summary>
+              <div class="hint" data-i18n="trkClassicPanelHint"></div>
+              <div class="hint" data-i18n="trkClassicHint"></div>
+              <label class="check"><input id="trkClassicChk" type="checkbox"><span data-i18n="trkClassicToggle"></span></label>
+              <div class="hint" data-i18n="trkClassicNote"></div>
+              <div class="miniActions">
+                <button id="trkClassicOpenBtn" type="button" data-i18n="trkClassicBtn"></button>
+                <button id="trkClassicHideBtn" type="button" data-i18n="trkClassicHide"></button>
+              </div>
+              <div id="trkClassicStatus" class="hint status"></div>
+            </details>
           </details>
 
           <details class="panel" id="vrmPanel">

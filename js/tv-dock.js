@@ -1290,9 +1290,13 @@ addEventListener("DOMContentLoaded", () => {
       }
     } catch (_) {}
   });
+  /* ⚠ el(tag, cls, text) は文字を1つしか入れられない。ボタンを並べるなら append で足す
+     （以前は text 扱いで "[object HTMLButtonElement]" になり、4つのボタンが消えていた） */
+  const paneSetupActions = el("div", "miniActions");
+  paneSetupActions.append(makerBtn, shareBtn, moreBtn, resetBtn);
   paneSetup.append(tx("div","tvOverlayHint","hint"), overlayCheck.lab, five.lab, orderRow,
     tx("div","tvOrderHint","hint"), songPlayCheck.lab, tx("div","tvSongPlayHint","hint"),
-    el("div","miniActions", makerBtn, shareBtn, moreBtn, resetBtn));
+    paneSetupActions);
 
   const pvWrap = el("div", "tvpWrap");
   const pvCanvas = document.createElement("canvas"); pvCanvas.className = "tvpCanvas";
@@ -1300,7 +1304,8 @@ addEventListener("DOMContentLoaded", () => {
   const pvChip = el("div", "tvpChip");
   pvWrap.append(pvCanvas, pvChip);
 
-  const pvControls = el("div", "inline", { style:"gap:8px;margin:8px 0 10px;width:100%" });
+  const pvControls = el("div", "inline");   /* ⚠ ここも文字のつもりで object を渡していたので style が効いていなかった */
+  pvControls.style.cssText = "gap:8px;margin:8px 0 10px;width:100%";
   const pvPlayPause = btn("fxMini", "▶");
   const pvSeek = document.createElement("input");
   pvSeek.type = "range"; pvSeek.min = "0"; pvSeek.max = "100"; pvSeek.step = "0.1"; pvSeek.value = "0";
@@ -1363,8 +1368,10 @@ addEventListener("DOMContentLoaded", () => {
   pvPower.addEventListener("click", () => { togglePower(); render(); });
 
   const panePreview = el("div", "tvPane");
+  const panePreviewActions = el("div", "miniActions");   /* ⚠ 同じ理由（el の第3引数は文字だけ）で、ここもボタンが消えていた */
+  panePreviewActions.append(pvPlayBtn, pvPower, moreBtn);
   panePreview.append(pvWrap, pvControls, tx("div","tvpPreviewHint","hint"), menuPrevCheck.lab, tx("div","tvpMenuPreviewHint","hint"),
-    menuVidCheck.lab, tx("div","tvpMenuVideoHint","hint"), el("div","miniActions", pvPlayBtn, pvPower, moreBtn));
+    menuVidCheck.lab, tx("div","tvpMenuVideoHint","hint"), panePreviewActions);
 
   let tab = "setup", pvRaf = 0, pvMutedByUs = false, pvPlayedByUs = false;
   const previewOn = () => tab === "preview" && !panePreview.hidden && body.open && !document.hidden &&

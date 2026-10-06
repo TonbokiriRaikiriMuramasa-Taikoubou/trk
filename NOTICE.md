@@ -181,6 +181,16 @@ Per the same principle, trk! never implies that any of these publishers
 officially distribute, endorse, or bundle anything with this app, and users
 are directed to obtain the music themselves from the linked official stores.
 
+The 🎻 trk classic series in the same catalog lists only factual metadata
+(composer, work/piece title) for compositions whose copyright has expired,
+and points to public-domain recordings hosted by Musopen
+(https://musopen.org/, CC-PD / public-domain recordings), IMSLP and
+archive.org. It bundles no audio, no scores and no recordings either.
+Musopen and the performing ensembles are credited as the sources users are
+sent to; they do not endorse this project. The rightmost 🐔 trk's playlist
+and 🎻 trk classic tabs in the song library are only views onto this catalog
+(names of tracks and links), displayed non-commercially.
+
 ## 5. Not affiliated
 trk! is an independent fan project. It is not affiliated with or endorsed by
 ppy Pty Ltd (osu!), Bandai Namco (Taiko no Tatsujin), Crypton Future Media, INC.,

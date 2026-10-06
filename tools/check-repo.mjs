@@ -301,15 +301,113 @@ if (!exists("js/fx-worklet.js") ||
 }
 
 // 🛒 Official-source catalog: no-audio curated playlists with wishlist matching.
-if (!exists("js/catalog.js") ||
-    !read("js/catalog.js").includes("TRK_CATALOG") ||
-    !read("js/library.js").includes("plCatalogMenu") ||
-    !read("js/library.js").includes("plWishMatch") ||
-    !read("js/library.js").includes("plWishRows") ||
-    !read("index.html").includes('src="js/catalog.js"')) {
-  fail("official catalog plumbing is missing");
-} else {
-  ok("official catalog (wishlist auto-match, no bundled audio) is wired");
+{
+  const library = read("js/library.js");
+  const css = read("css/style.css");
+  /* 📡 「集める棚」：未入手の曲を開いた瞬間から灰色で並べ、入手したら黒くなる */
+  const collectionOk = library.includes("function plTitleKeys(") &&
+    /function plWishMatch\(w, byTitle\) \{\s*for \(const k of plTitleKeys\(w\.t\)\)/.test(library) &&
+    library.includes("function plCollectionEntries(") && library.includes("function plWishFolderIds(") &&
+    library.includes("for (const k of plTitleKeys((metaOf(it.key) || {}).title || it.title)) byTitleAdd(k, it);") &&
+    library.includes("const entries = plCollectionEntries(tabId, byTitle);") &&
+    library.includes("if (!all.length && !entries.length) {") &&
+    library.includes("if (!row.it) { box.append(plWishRow(row.w)); continue; }") &&
+    library.includes("function trkFolderIdSet() { return plWishFolderIds(TRK_FOLDER_ID); }") &&
+    library.includes("const haveAll = usedKeys.size, totalAll = entries.length;") &&
+    library.includes("const usedKeys = new Set();") &&
+    !library.includes("const wishLeft = []") &&   /* 下部の 📡 ブロックは行内の灰色行に置き換えた */
+    /plWishRow\{[^}]*opacity/.test(css) && css.includes(".plWishHint{");
+  /* 4言語ぶんの文言（ja/en/zh/ko で各4回）。行をまとめて書き換えたときに片方を消した事故を止める */
+  const stringsOk = ["plWishHead", "plWishTag", "plWishHint", "plWishOpen", "plWishNoLink",
+    "plCatalogBtn", "plCatalogHint", "plCatalogTake", "plCatalogTaken", "plCatalogDup"]
+    .every(k => library.split(k + ':\"').length - 1 === 4);
+  if (!exists("js/catalog.js") ||
+      !read("js/catalog.js").includes("TRK_CATALOG") ||
+      !library.includes("plCatalogMenu") ||
+      !library.includes("plWishMatch") ||
+      !library.includes("function plWishRow(") ||
+      !read("index.html").includes('src="js/catalog.js"')) {
+    fail("official catalog plumbing is missing");
+  } else if (!collectionOk || !stringsOk) {
+    fail("the collection shelf (grey unowned rows inline, turning black on arrival) is not wired");
+  } else {
+    ok("official catalog (wishlist auto-match, no bundled audio) is wired");
+  }
+}
+
+// ⚠ el(tag, cls, text) は文字を1つしか入れられない（入れ子を渡すと "[object ...]" になる）。
+// 引数4つ以上／第3引数がオブジェクト literal は取り違えなので、静的に止める。
+{
+  const bad = [];
+  for (const ent of fs.readdirSync(path.join(root, "js"))) {
+    if (!ent.endsWith(".js")) continue;
+    const src = read("js/" + ent);
+    for (const m of src.matchAll(/(?<![\w.])el\(/g)) {
+      const start = m.index + m[0].length;
+      let depth = 1, i = start;
+      while (i < src.length && depth) {
+        if (src[i] === "(") depth += 1;
+        else if (src[i] === ")") depth -= 1;
+        i += 1;
+      }
+      const inner = src.slice(start, i - 1);
+      const parts = []; let d = 0, cur = "";
+      for (const c of inner) {
+        if ("([{".includes(c)) d += 1;
+        else if (")]}".includes(c)) d -= 1;
+        if (c === "," && d === 0) { parts.push(cur); cur = ""; } else cur += c;
+      }
+      parts.push(cur);
+      const args = parts.map(p => p.trim());
+      const line = src.slice(0, m.index).split("\n").length;
+      if (args.length > 3) bad.push(`js/${ent}:${line} (el() に引数 ${args.length} 個)`);
+      else if (args.length === 3 && args[2].startsWith("{")) bad.push(`js/${ent}:${line} (el() の文字にオブジェクト)`);
+    }
+  }
+  if (bad.length) fail("el(tag, cls, text) misuse (children/objects passed as text): " + bad.join(", "));
+  else ok("el(tag, cls, text) is only ever given one text node (no [object HTML…] rows)");
+}
+
+// 🐔 trk's playlist tab: fixed 🐔 icon + three label choices, no profile editing, long-press = hierarchy.
+{
+  const library = read("js/library.js");
+  const core = read("js/core.js");
+  const html = read("index.html");
+  const i18n = library;
+  /* 名前・アイコン・色は固定（保存データ側も読み込み時にそろえる）。フォルダ名に絵文字を戻すと 🐔🐔 になる */
+  const fixedOk = library.includes('const TRK_FOLDER_NAME = "trk\'s playlist"') && library.includes("function trkFolderNormalize(") &&
+    library.includes("if (f.name !== TRK_FOLDER_NAME) { f.name = TRK_FOLDER_NAME; ch = true; }") &&
+    library.includes("trkFolderNormalize();   /* 旧データの") &&
+    !/id: TRK_FOLDER_ID,\s*name: "🐔/.test(library);
+  /* カタログは catalog.js の const。⚠ window.TRK_CATALOG は undefined で、Vol が1つも作られない */
+  const catalogOk = library.includes("function trkCatalog(") &&
+    library.includes("typeof TRK_CATALOG !== \"undefined\"") && !library.includes("window.TRK_CATALOG");
+  /* 表示名の3種類（許可リストは core.js の TRK_ENUM_VALUES＝設定Importでも検証する） */
+  const labelOk = library.includes("function trkTabLabel(") && library.includes("trkTabNameShort") && library.includes("trkTabNameFull") &&
+    library.includes("f.id !== TRK_FOLDER_ID) tabs.push({ id:\"fld:\" + f.id") &&
+    library.includes("if (!tabs.some(x => x.id === \"fld:\" + TRK_FOLDER_ID)) tabs.push({ id:\"fld:\" + TRK_FOLDER_ID, icon: TRK_TAB_ICON, label: trkTabLabel()") &&
+    /* 🐔 タブを OFF にしたらタブは消える。ただし 🎻 classic が生きていれば、そのタブだけは出す（行き止まりにしない） */
+    library.includes("if (trkFolder && settings.trkPlaylist !== false)") &&
+    core.includes('trkTabName: ["full", "short", "icon"]') && core.includes('trkTabName: pick(prefs.trkTabName') &&
+    core.includes('settings.trkTabName = "full"') && core.includes('"liteMode", "liteFps", "liteMascot", "liteScale", "trkTabName"');
+  /* 長押し＝階層。プロフィール編集（plMenu／plFolderMenu）へは行かせない */
+  const pressOk = library.includes("if (t.trk) plTrkMenu(); else if (t.pl) plMenu(t.pl); else if (t.fld) plFolderMenu(t.fld); else plGlobalMenu();") &&
+    library.includes("if (f && f.id === TRK_FOLDER_ID) { plTrkMenu(); return; }") && library.includes("function plTrkMenu(");
+  /* 設定欄：3種類の選択と、🎻 trk classic の収納（trkPanel の中の subPanel） */
+  const panelOk = html.includes('id="trkTabNameSel"') && html.includes('<option value="short" data-i18n="trkTabNameShort">') &&
+    html.includes('<option value="icon" data-i18n="trkTabNameIcon">') &&
+    /<details class="panel" id="trkPanel">[\s\S]*<details class="subPanel" id="trkClassicPanel">[\s\S]*?<\/details>\s*<\/details>/.test(html) &&
+    html.includes('id="trkSortAbcChk"') && html.includes('id="trkOrderList"');
+  const keys = ["trkTabNameLabel", "trkTabNameFull", "trkTabNameShort", "trkTabNameIcon", "trkTabNameNote",
+    "trkMenuTitle", "trkMenuHint", "trkMenuOpenFolder", "trkOpenItem", "trkMoveUp", "trkMoveDown", "trkOrderEmpty", "trkOrderAbcOff"];
+  const langOk = keys.every(k => (i18n.match(new RegExp("\\b" + k + ":", "g")) || []).length === 4);
+  if (!fixedOk) fail("trk's playlist name/icon/colour are not pinned (a 🐔 name brings back the double 🐔 tab)");
+  else if (!catalogOk) fail("trk wish lists read window.TRK_CATALOG, which is always undefined — the Vol tabs are never created");
+  else if (!labelOk) fail("the trk tab label (full / short / icon) or its allowlist is not wired");
+  else if (!pressOk) fail("long-press on the trk tab must open the hierarchy, not the profile editor");
+  else if (!panelOk) fail("the trk settings panel is missing the label select or the nested trk classic panel");
+  else if (!langOk) fail("trk tab/menu strings are missing from one of the four languages");
+  else ok("🐔 trk's playlist: fixed name/icon, three labels, long-press opens the hierarchy, trk classic nested in settings");
 }
 
 // 👥 Author tools for shared playlists (off by default; search/block/favorite).

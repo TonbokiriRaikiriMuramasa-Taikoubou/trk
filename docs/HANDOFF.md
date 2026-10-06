@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ（短縮版）
 
-> 最終更新：2026-10-06（🎮 キーコンフィング（**ゲームパッド・音ゲーム用コントローラー・TVリモコン**）＝設定 ⌨ 操作の中に新設・ボタン／軸の直接割り当て・メニュー移動／🪶 軽量化（スマホ・アプリ向け）＝設定の右下に新設・自動判定／**プリセット（🎯 ゲーム優先＝ノーツと反応は下げず、他だけ軽く）**／フレームレート上限／3Dマスコットの描画レート／描画解像度／スペクトラム・ぼかしの節約／🎛 曲名バナーの曲操作を右端の [◀][🎲][▶] に集約／📚 書斎 v2／🩷 MMDモーション改修）
+> 最終更新：2026-10-06（**🛡 セキュリティ点検（5回・F-1〜F-21）＋🌐 CDNをやめて自前ホスティング（`assets/vendor/`）＋🔐 守りの追加（`?reset=all` の確認・アドオンの同意記録）＋♿ 堅牢性／読みやすさの点検（`tools/check-a11y.mjs`）** ＝PR #18。以下はそれ以前からの状態：🎮 キーコンフィング（**ゲームパッド・音ゲーム用コントローラー・TVリモコン**）＝設定 ⌨ 操作の中に新設・ボタン／軸の直接割り当て・メニュー移動／🪶 軽量化（スマホ・アプリ向け）＝設定の右下に新設・自動判定／**プリセット（🎯 ゲーム優先＝ノーツと反応は下げず、他だけ軽く）**／フレームレート上限／3Dマスコットの描画レート／描画解像度／スペクトラム・ぼかしの節約／🎛 曲名バナーの曲操作を右端の [◀][🎲][▶] に集約／📚 書斎 v2／🩷 MMDモーション改修）
 > 目的：次の開発作業に必要な現在の設計・権利上の制約・検証方法をひと目で確認する。詳細な機能紹介は `README.md`、権利条件は `NOTICE.md`、実装の正は各ソースコードとする。
 
 ---
@@ -37,7 +37,13 @@
 - 書斎を開いている間は `window._trkStudyRoomOpen` でゲーム側のキー操作を止める（`player.js`／`main.js`／`modes.js`／`stage.js`／`truck.js`／`catch.js`／`speed.js`／`extras.js`／`video-max.js`／`media-player-mode.js`／`synth-mode.js`）。書斎自身のキー（←→・PageUp/Down・Space/Enter・Esc・B/M/T/F・`+`/`-`/`0`・`?`・Ctrl+F）は capture で先に受け取る。ただし入力欄・セレクトでは書斎のキーを止め、ボタンに焦点があるときの Space／Enter はそのボタンに譲る。書斎を閉じる・`phase` が `title` 以外へ進む・曲が切り替わるときは、TVペインへ移した `<video>` を元の親と `style` へ戻す（元の親が差し替わっていても `document.body` へ逃がす）。
 - 🔥 TRKアンプ（`js/fx-dock.js` の左下カテゴリー＋`js/fx.js` のラック）：`settings.fxRack`（段の配列・最大8。`cleanFx` で検証）／`settings.fxRackOn`（初期オフ）／`settings.ampOpen`（欄の開閉・**初期開き**。触って閉じた人の `false` は尊重。`?reset=amp`／`?reset=all` は初期の開へ戻し、`?safe=1` だけは閉じたまま）。段は**プリセットの後・かんたんEQの前**に効き、`exportObj`（マイプリセット書き出し）と `exportPrefs("all")`（設定の書き出し）にそのまま入る。リセットは `?reset=amp`（別名 `rack`）＝空に／`?reset=all`＝空に／`?safe=1`＝**段は残して止める**だけ。`core.js` の `resetAmpPrefs()` は fx.js より先に走るため、一度きりの合図 `takeAmpReset()`（sessionStorage `trk_amp_reset_once`）を置き、`js/fx.js` が読み込み時に拾って消す。⚠ `js/fx.js` は凍結扱いだが、この機能のために**追加のみ**の窓口（`TrkFX.rack`／`rackTypes`／`rackOn`／`rackSet`／`rackAdd`／`rackClear`）と `refresh()` の `emit("fxRack")` を足した（DSP・保存形式は不変）。
 - ✨ TRKエフェクト（`js/tv-rich.js` の左下カテゴリー）：`js/tv-presets.js` の `portrait|anime|texture|quality`（各5種＝20）をまとめた**独立カテゴリー**（`details.panel.dockRich#richPanel`）。🔥 TRKアンプの直下に `placeRich()`＋MutationObserver で再配置。**中身は映像フィルターそのもの**で、適用は必ず `TrkTV.select()`（`settings.videoStyle`）を通す＝TVドックと二重がけにならない。設定キーは `tvRichId`（初期 `portrait_natural`）／`tvRichPrev`（切ったとき戻る先）／`tvRichCat`（開いているタブ・初期 `portrait`）／`tvRichOpen`（欄の開閉・**初期開き**。触って閉じた人の `false` は尊重。`?reset=tv`／`?reset=all` は開へ戻し、`?safe=1` は閉じたまま）。`resetVideoPrefs()`（`?reset=tv`）で4つとも初期化し、`exportPrefs("all")` にも入る。`?safe=1` はスイッチとチップを無効化して記憶は残す。⚠ `TrkTV.list()` に説明文は無いので、説明は `TRK_TV_PRESETS` から読む。⚠ 読み込み時は `settings` 側の値を優先する（`?reset=tv` は core.js が先に走って settings へ既定値を書くため）。
-- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux25`。公開ファイルを変更したら必ず更新する。
+- 🛡 **点検・守りの現在地（2026-10-06・PR #18 で追加）**。以下5つは「一度洗い出して、直して、戻らないよう見張る」体制になっている。
+  - **洗い出しの記録**：`docs/SECURITY.md`（F-1〜F-21。直した穴も消さずに残す）＋ `docs/SECURITY-CHECKLIST.md`（OWASP Top 10 Client-Side Security Risks と CWE Top 25（2025）に1項目ずつ当てた表。✅／🟡仕様／🔶未実施／➖対象外、根拠つき）。見つけ方・直し方・残した理由はこの2つが正。
+  - **毎回の見張り番**：`tools/check-security.mjs`（**34項目**）＋ `tools/check-a11y.mjs`（**6項目・WARN 1**）＋ `tools/check-vendor.mjs`（8項目）。すべて `npm run check` に含まれ、**依存パッケージ不要**。
+  - **第三者ライブラリは同梱**：`assets/vendor/`（three.js・three-vrm 一式・three-mmd-loader＋WASM＋トゥーン素材＝**98ファイル・3.60MB**、各LICENSEつき）。import map は**相対パスだけ＝外部オリジンゼロ**。ロックは `tools/vendor-lock.json`（SHA-384・バイト数・取得元URL）、更新は `npm run vendor:update`、上流との突き合わせは `npm run check:vendor:npm`。**起動時には読まず**、VRM／MMD を使い始めたときだけ動的 import（`?safe=1` では読まない）。
+  - **壊す操作の前に1回止まる**：`?reset=all`／`?factory` は**確認ダイアログ**（`&force=1` でこれまで通り即実行＝非常口は残す）。アドオンは**同意するまでコードを実行しない**（同意したら日時と**コードの指紋**を `trk_addons_v1` に記録。一覧に ✅同意／⚠記録なし（この機能より前のアドオン＝**止めない**）／⚠コードが変わっています を出す）。`?reset=tv|audio|notes|lite|keys|amp` と `?safe=1` は**ワンタップの非常口のまま**。
+  - **♿ 読みやすさ**：外部ツール（html-validate・axe-core・ESLint・css-tree・Manifest）を一度かけた記録が `docs/QUALITY-CHECKS.md`（**再点検で axe violation 0**）。見つけた実害（読み上げ名の不足23か所＋つまみ60か所・`role="tablist"` に「＋」が混ざっていた・見出しに `role="button"`・重複キー29件）はすべて修正済み。**残したものと理由も同文書**（見出しの飛び h1→h3 は WARN だけ、色のコントラストは実機で、動画の字幕は該当なし など）。
+- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-ux26`。公開ファイルを変更したら必ず更新する。
 - このcheckoutで `npm run check` はコード・データの自動検査を行うが、MMDの実描画・タッチ操作・音声の実機確認は別途必要。
 
 ---
@@ -69,11 +75,15 @@
 | 33–36 | `main.js` → **`pad.js`** → `speed.js` → `vrm.js` | 起動・イベント、🎮 パッド・コントローラー・TVリモコン（`main.js` の直後。Gamepad API の見張りと設定欄の配線）、速度操作、遅延VRM機能 |
 | 37 | `mmd.js` | 遅延MMD機能・コード生成VMD |
 | 38–41 | `spectrum.js` → `synth-mode.js` → `frame-interp.js` → `media-player-mode.js` | スペクトラム、演奏シンセ、映像補完、メディアプレーヤー |
-| — | `tools/check-security.mjs` | 🛡 静的なセキュリティ検査（危ない書き方・href の関所・共有ファイルの検証・`__proto__` よけ・ZIP の上限・アドオン・通信先・読み取り専用）。`npm run check` に含む |
-| 42–43 | `study-room-utils.js` → `study-room.js` | 📚 書斎。純データ処理（文字コード・並べ替え・ルビ）とUI／IndexedDB。書斎は `#libPanel .libHead h3` を長押しして開く |
+| — | `assets/vendor/` | 🌐 同梱した第三者ライブラリ（three.js・three-vrm・three-mmd-loader＋WASM＋素材。**98ファイル・3.60MB**）。`index.html` の import map から `./assets/vendor/...` として参照。**手で編集しない**（`npm run vendor:update`） |
+| — | `tools/check-security.mjs` | 🛡 静的なセキュリティ検査（危ない書き方・href の関所・共有ファイルの検証・`__proto__` よけ・ZIP の上限・アドオン・通信先・読み取り専用・セーフモードのSW規則・**アドオン同意が実行より前**・**`?reset=all` の確認**）。`npm run check` に含む |
+| — | `tools/check-a11y.mjs` | ♿ 静的な読みやすさの検査（id の重複・入力欄の読み上げ名・`alt`・押せるものの role・`role="tablist"` の中身・点検記録の存在）。**見出しの飛びは WARN だけ**。`npm run check` に含む |
+| — | `tools/check-vendor.mjs` / `tools/vendor-cdn.mjs` | 🌐 同梱ライブラリの検証（8項目・オフライン）と更新（`--source=npm`）。`npm run check` に含む |
+| — | `docs/SECURITY.md` / `docs/SECURITY-CHECKLIST.md` / `docs/QUALITY-CHECKS.md` | 点検の記録（穴の一覧／標準リストとの突き合わせ／外部ツールでの手順と結果） |
+| 42–43 | `study-room-utils.js` → `study-room.js` | 📚 書斎。純データ処理（文字コード・並べ替え・ルビ）とUI／IndexedDB。書斎は `#libPanel .libHead .study-launch-title`（＝見出し `h3` の中の**本物の `button`**）を長押し／Enter で開く。**見出しに `role="button"` を付け直さない**（読み上げの規則） |
 
 上記は `index.html` の実順。依存を追加・移動する場合はscriptタグと `tools/check-repo.mjs` の両方を確認する。
-主なファイル：`index.html`（UIと読込順）／`css/style.css`・`css/study-room.css`／`js/core.js`（設定・保存）／`js/main.js`（初期化）／`js/pad.js`（🎮 パッド・リモコン）／`js/library.js`（選曲）／`js/lite.js`（🪶 軽量化）／`js/study-room.js`・`js/study-room-utils.js`（書斎）／`js/mmd.js`（MMD）／`sw.js`（オフラインキャッシュ）／`README.md`／`NOTICE.md`。
+主なファイル：`index.html`（UIと読込順）／`css/style.css`・`css/study-room.css`／`js/core.js`（設定・保存）／`js/main.js`（初期化）／`js/pad.js`（🎮 パッド・リモコン）／`js/library.js`（選曲）／`js/lite.js`（🪶 軽量化）／`js/study-room.js`・`js/study-room-utils.js`（書斎）／`js/mmd.js`（MMD）／`js/addons.js`（🧩 同意と指紋）／`sw.js`（オフラインキャッシュ）／`assets/vendor/`（同梱ライブラリ）／`tools/check-*.mjs`（見張り番）／`README.md`／`NOTICE.md`／`docs/`（点検の記録）。
 
 ---
 
@@ -103,6 +113,9 @@
   - **📚 書斎の本文は「文字」としてしか描かない**（`createTextNode` / `textContent`。`innerHTML` での本文組み立ては禁止。マークダウンのレンダラも無し）。`.html`／`.js`／`.md` もソースのまま見せます。
   - **青空文庫ルビの解析（`js/study-room-utils.js` の `aozoraSegments`）は線形走査を維持する**。後戻りのある正規表現（`/｜([^《\n]+)《…/`）に戻すと、**漢字だけが続く本文や閉じない`《`でタブが固まる**（実測: 1MBで数分）。`tools/check-study-room.mjs` が速度、`tools/check-security.mjs` が正規表現への逆戻りを見張っている。
   - **`eval`／`new Function`／`document.write`／`srcdoc` を使わない**。`innerHTML` は `js/game.js` の結果画面（全部 `esc()` 済み）だけ。アドオンは仕様としてページ内フル権限なので、**遠隔からコードを取りに行かない**（同梱の `js/addons/example.js` のみ）・安全モードでは読まない、を維持する。
+- **壊す操作の前には1回止まる（非常口は残す）**：`?reset=all`／`?factory` は `js/core.js` の `askFactoryReset()` で**確認ダイアログ**を出し、同意したときだけ実行する（`&force=1` は確認を飛ばして即実行＝非常口。`trkReset("all")` も同じ関門を通る）。**URL のパラメータは確認を出す前に消す**（リロードループ防止）。確認を足す／文言を変えるときは `?reset=all` の4言語文言と `tools/check-security.mjs` の規則をセットで更新する。`?reset=tv|audio|notes|lite|keys|amp` と `?safe=1` は**ワンタップのまま**（逃げ道を遠くしない）。
+- **アドオンは「同意 → 実行」の順を崩さない**（`js/addons.js`）：ファイルを選んだら同意ダイアログ → 同意で `installText` → `consentAt`（時刻）と `consentSha`（**コードの指紋**・FNV-1a 2レーン16桁）を `trk_addons_v1` に記録。**同意しなければコードを実行しない・保存もしない**。`TrkAddons.list()` の各要素は `consent:{state:"ok"|"stale"|"none", at, sha}` を返し、一覧は ✅／⚠ を出す。**この機能より前のアドオン（`none`）は動かしたまま警告だけ**（黙って止めない）。指紋は「変化に気づくための短いハッシュ」であり、署名ではない（そう説明する）。⚠ 保存キーと形（`trk_addons_v1`）は変えない。
+- **読み上げ名（aria）の付け方**：見える文言をそのまま名前にしたいときは、その要素に `id` を付けて `aria-labelledby` で結ぶ（新しい翻訳文が要らず、言語を切り替えても付いてくる）。辞書から名前を入れたい `<select>` などは **`data-i18n-aria="キー"`**（`js/core.js` の `applyLanguage` が `aria-label` に入れる。🔤 キーは4言語そろえる）。つまみを作るときは `fx.js` の `range()`／`stage.js` の `makeRange()`／`modes.js` の `makeColorRow()`／`stagefx.js`／`extras.js` と同じく**隣の見出しと結ぶ**。⚠ **押せるものから role を消さない**（`role="presentation"`／`"none"` を button に付けない）。`role="tablist"` の中は**タブだけ**にし、＋などのボタンは入れ物の外へ（`js/library.js` の `.libTabsList`＝`display:contents` はスキンの見た目を変えずにこれを満たす工夫なので、`.libTabs` の見た目を触るときはここも確認する）。書斎を開く見出しは `h3` の中の `<button>` のままにする。
 - UI追加時は4言語の文言を同時に追加し、設定項目は初期値・リセット・Import/Export・セーフモード経路を確認する。
 - GitHub Pagesはファイル名の大文字小文字を区別する。相対パスとService Workerキャッシュも確認する。
 
@@ -158,6 +171,20 @@ git diff --check
 
 `npm run check` は `tools/check-a11y.mjs`（**読みやすさの見張り番**：id の重複・入力欄の読み上げ名・`<img>` の `alt`・押せるものの role を消していないか・`role="tablist"` の中がタブだけか。**見出しの飛びは WARN だけ**＝左の列の見出しが h3 のため既知。外部ツールでの点検手順は `docs/QUALITY-CHECKS.md`）、`tools/check-security.mjs`（**34項目**。うちアドオン同意が「実行より前」であること、`?reset=all` の確認、同意／確認ダイアログの4言語文言、vendor ロック、import map に第三者オリジンが無いこと、セーフモードのキャッシュ規則、この文書の存在を検査）、`tools/check-vendor.mjs`（`assets/vendor/` の欠落・改変・import map の網羅。`--source=npm` で上流と突き合わせ）、`tools/check-repo.mjs`（構文・ローカル参照・設定／翻訳・重要機能。🪶 軽量化は**描画ゲートの位置と判定がゲートの前にあること**まで検査する）、`tools/check-mmd-motion-data.mjs`（VMD生成データ／Lat PMD）、`tools/check-study-room.mjs`（書斎の純データ処理・4言語の網羅・`index.html` のID照合・通信／`innerHTML` を使わないこと・TV／ジャケット連携・キー譲渡）を実行する。依存パッケージのインストールは不要。失敗したら、まず最初のエラーを直してから再実行する。
 
+外部ツールでの点検（**毎回ではなく、必要になったとき**）は `docs/QUALITY-CHECKS.md` の手順どおり。リポジトリの外（`/tmp/validate` など）に `html-validate`／`axe-core`／`jsdom`＋`fake-indexeddb`／`css-tree`／`eslint` を入れて回し、**リポジトリには依存を増やさない**。
+
+JSDOM の実挙動ハーネス（**コミットしていない・消えたら作り直す**。`npm i jsdom fake-indexeddb` が要る）は `/tmp/shot/` に置いて使った。記録として残すのは**期待値**：
+
+| ハーネス | 見ていること | 結果 |
+|---|---|---|
+| `security.mjs` | 危険なURL・プロトタイプ汚染・ZIP爆弾・汚れた保存データ・共有プレイリスト・セーフモード・アドオン | 51/51・スクリプトエラー0 |
+| `study.mjs` | 書斎のUI経路（偽装ファイルの取り込み〜表示・ルビ・速度） | 20/20 |
+| `video.mjs` | 🎬判定・記録・一覧・全画面・2GBで `arrayBuffer` を呼ばない | 16/16 |
+| `sw.mjs`（偽SW環境） | セーフモードのクライアントにキャッシュを配らない | 6/6 |
+| `guards.mjs` | `?reset=all` の確認（やめる／同意／`force=1`）とアドオン同意（キャンセル・同意・旧アドオン・コード差し替え検知） | 24/24 |
+
+`html-validate`／`axe-core` は**起動後の DOM** に当てる（`data-i18n` で文字が入るのは起動後。ソースだけ見ると「空の見出し」が大量に出る）。axe は隠れた要素を飛ばすので、**設定画面・書斎などを開いた状態**にしてから回す。
+
 ### 未確認の実機項目
 
 - Lat式ミクの表示・表情モーフ・65種の動き、特に左右の腕／顔／裾の見え方。同梱ライブラリ（`assets/vendor/`）の読み込みを含むため実ブラウザで確認する。
@@ -194,6 +221,7 @@ git diff --check
   - **PR #13**：📡キャスト／バックグラウンド再生の分離（`castPolicy`／`backgroundPolicy`、置き場は右上（言語の左）も可）、🖼スキンの棚（プリセット31種・グラデ対応・ごほうびスキン🎓）、🧭スタンプラリーチュートリアル（`trk!` 入力で即完了）、🎧プレイリスト（🧊／🔒・中クリック削除・曲プロフィール・フォルダ・タグ・曲別入手先）、📤共有（9曲以上＋全曲クリア／視聴済み・AUTO必須表示・https確認リンク）、🛒公式プレイリストカタログ（10シリーズ・**音源同梱なし**・Musicフォルダ自動マッチ）、👥投稿者ツール（**初期オフ**）、📊スペクトラム（見え方30種・色16色）、⏯バナーの◀▶曲送り（初期オン）とタップ一時停止（初期オフ）、🕹️ショートプレイ（後半90/120/180秒・無音検知終了・記録はフルと分離）、🎭アンテナのキャラ肌（ドット絵10体＋自分のイラスト2枚＝**端末内のみ**。旧設定値 `"miko"` は `"reimu"` へ自動移行）。
   - **PR #14**：🛠 UI操作不能の復旧（`main.js` が凍結済みの `window.TrkFX` を上書きして strict-mode の `TypeError` を起こし、以降の初期化が止まっていた。FX APIは変更せず、UIイベント委譲でスタンプを検知するよう修正）、🖥 動画を全画面で表示（`js/video-max.js`）、🌀 レーンの揺れ（既定は 🚚TRUCK と 🪐ORBIT のみ＋❓謎設定で全モード揺れ）、✨ フレーム補完（既定オフ・自前MEMC・`js/frame-interp.js`）。
   - **PR #16／#17（書斎・MMD）**：`arena/872022dd-trk` で開発し `main` へマージ。PR #17 は本棚の並べ替え・検索、栞一覧、本文検索、拡大／見開き、文字組み、TVペインの見た目、取り込みの進捗・中止・入れ子設定、❓キーの説明、孤立ページの掃除（詳細は §2）に加えて、**MMDモーションの改修**＝🎤 歌・口パクの6種と第6グループ、既定を `faceSing` へ、🚶／🏃の前後振りと足ＩＫの足踏み、エアギターの一旦削除（詳細は §6）を追加。
+  - **PR #18（`arena/ba7b73c1-trk`・2026-10-06・16コミット）**：7つのまとまった仕事が入った。順に、①🎛 曲名バナーの曲操作を右端の `[◀][🎲][▶]` に集約（🎲は既定で長押し・設定で🎲オフ／タップだけ）／②🪶 軽量化（設定の右下・自動判定・プリセット4種＝**🎯 ゲーム優先はノーツと反応を下げない**・フレームレート上限・マスコット描画レート・描画解像度・スペクトラム／ぼかしの節約）／③🎮 キーコンフィング（ゲームパッド・音ゲーム用コントローラー・TVリモコン。ボタン／軸の直接割り当て・メニュー移動・プリセット `arcade`／`remote`）／④🔥 TRKアンプ と ⑤✨ TRKエフェクト を左下の独立カテゴリーに（どちらも**初期は開**・触って閉じた人の `false` は尊重）／⑥🛡 **セキュリティ点検（5回）**＝共有ファイル、書斎（ルビの ReDoS を線形走査に修正）、CDN（→ 自前ホスティング）、セーフモード（SWキャッシュの穴を修正）、🎬 大きい動画の扱い（`ANALYZE_MAX` と最初のフレーム判定）。記録は `docs/SECURITY.md`（F-1〜F-21）と `docs/SECURITY-CHECKLIST.md`／⑦🌐 **CDN をやめて `assets/vendor/` に同梱**（98ファイル・3.60MB・SHA-384 ロック・`npm run vendor:update`）＋🔐 **守りの追加**（`?reset=all` の確認・アドオンの同意記録）＋♿ **堅牢性／読みやすさの点検**（`tools/check-a11y.mjs`・`docs/QUALITY-CHECKS.md`）。**詳細は §2 の「点検・守りの現在地」と各節、利用者向けは `README.md`。**
 - 以前の統合元ブランチ：`arena/01a109eb-trk`（Part 1–17・コミット35+・`main` へマージ済み）、`arena/01a10c69-trk`（PR #14）。
 - 公開URL：<https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/>
 
@@ -211,6 +239,9 @@ git diff --check
 - **称号システム**：チュートリアル突破などの実績で、ユーザー名の affix／suffix（称号）を設定できるようにしたい（運用の参考：Limbus Company のプロフィールカスタマイズ）。
 - **trk! スピードチャレンジ**：「もう一度」から10秒以内に `trk!` を入力したら特別な何かを（称号システムと組み合わせる想定）。
 - **TVスキン・fxドックへの連想ゲーム系スキン**（前々回からの持ち越し）。
+- **♿ 読みやすさの残り**（`docs/QUALITY-CHECKS.md` §3 に理由つき）：左の列の見出しを `h3` → `h2` に上げる（スキンの見た目の確認が要る）、`<main>` ランドマーク、実ブラウザでの**色のコントラスト**確認、`aria-label` の英語（`Zoom`／`Seek` など）の日本語化。**JS が作るボタンの `type="button"`**（97か所。いま `<form>` が無いので実害ゼロだが、フォームを足すときは要対応）。
+- **CSP は「基本は入れない」方針**（ユーザー判断・2026-10-06）。入れるのは**安定版としてリリースするときだけ**で、そのときは inline の import map の外部化＋ハッシュ＋`media-src blob:` を実機テスト付きで（`docs/SECURITY.md` §6-1）。第三者オリジンがゼロになったので設定自体は簡単になっている。
+- **配布物まわり**：GitHub Actions の SHA 固定、`mobile-web/` から開発用文書（`docs/HANDOFF.md` など）を除外、配信側のヘッダ（`frame-ancestors` など）。
 
 ---
 

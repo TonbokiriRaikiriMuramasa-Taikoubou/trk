@@ -1007,6 +1007,8 @@ function openSettings() { if (phase === "title") { showScreen("settingsScreen");
 function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
 
 /* Emergency settings imports validate enum IDs at the boundary, before live settings are changed. */
+/* 列挙IDの検証対象（許可リストが引ける辞書を持つキーだけ。増やしたら check-security.mjs も更新） */
+const SETTING_ENUM_KEYS = ["specStyle", "specTheme", "mmdMotionKind", "fxPreset"];
 function validImportedSettingEnum(key, value) {
   if (typeof value !== "string") return false;
   try {
@@ -1065,7 +1067,7 @@ function validImportedSettingEnum(key, value) {
         }
         const txt = await f.text(); const data = JSON.parse(txt);
         if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("設定JSONはオブジェクト形式にしてください");
-        let applied = [];
+        let applied = [], rejected = [];
         const hasImported = key => Object.prototype.hasOwnProperty.call(data, key);
         if (hasImported("notes")) { settings.notes = sanitizeNotes(data.notes); applied.push("notes"); }
         const importedVideoStyle = hasImported("videoStyle") ? pick(data.videoStyle, VIDEO_STYLE_IDS, "") : "";
@@ -1086,22 +1088,32 @@ function validImportedSettingEnum(key, value) {
           applied.push("musicVolumeRestore");
         }
         // 既知キーだけを取り込み、型と列挙IDは代入前に検証する。
+        // ⚠ 弾いたキーは黙って捨てない（「読み込みました」なのに反映されない事故を防ぐ）。最後にまとめて報告する。
         for (const k of Object.keys(data)) {
           if (UNSAFE_KEYS.has(k) || ["notes", "videoStyle", "tvDockSkin", "bgDim", "bgBlur", "tvParamFavs", "musicVolume", "musicVolumeRestore"].includes(k) || applied.includes(k)) continue;
-          if (!Object.prototype.hasOwnProperty.call(settings, k)) continue;
+          if (!Object.prototype.hasOwnProperty.call(settings, k)) { rejected.push(k); continue; }
           const current = settings[k], incoming = data[k];
           const sameShape = Array.isArray(current) ? Array.isArray(incoming)
             : current === null ? (incoming === null || typeof incoming === "string")
             : current && typeof current === "object" ? !!incoming && typeof incoming === "object" && !Array.isArray(incoming)
             : typeof incoming === typeof current && (typeof incoming !== "number" || Number.isFinite(incoming));
-          if (!sameShape) continue;
-          if (["specStyle", "specTheme", "mmdMotionKind", "fxPreset"].includes(k) && !validImportedSettingEnum(k, incoming)) continue;
-          try { settings[k] = incoming; applied.push(k); } catch(_){}
+          if (!sameShape) { rejected.push(k); continue; }
+          if (SETTING_ENUM_KEYS.includes(k) && !validImportedSettingEnum(k, incoming)) { rejected.push(k); continue; }
+          try { settings[k] = incoming; applied.push(k); } catch(_){ rejected.push(k); }
+        }
+        /* 上の個別処理で弾いたキー（未対応IDの videoStyle／tvDockSkin など）も同じように報告する */
+        for (const k of Object.keys(data)) {
+          if (applied.includes(k) || rejected.includes(k) || UNSAFE_KEYS.has(k)) continue;
+          rejected.push(k);
         }
         saveUserPrefs();
         try { applyNoteVars(); if (typeof view !== "undefined") view.style.filter = videoFilter(); } catch(_){}
-        setSt(() => `📥 読み込みました: ${applied.join(", ")} — 再読み込みします`);
-        setTimeout(()=> location.reload(), 900);
+        /* 長くなりすぎないよう先頭12件まで表示し、残りは件数だけ添える（表示は言語を選ばない記号のみ） */
+        const keyList = keys => keys.slice(0, 12).join(", ") + (keys.length > 12 ? ` …+${keys.length - 12}` : "");
+        if (rejected.length) setSt("prefImportedPartial", { list:keyList(applied), skipped:keyList(rejected) });
+        else setSt("prefImported", { list:keyList(applied) });
+        /* 未適用の告知は読む時間が要るので、そのときだけ再読み込みを遅らせる */
+        setTimeout(()=> location.reload(), rejected.length ? 2600 : 900);
       } catch(e) {
         console.error(e);
         setSt(() => "読み込み失敗: " + (e.message || e));

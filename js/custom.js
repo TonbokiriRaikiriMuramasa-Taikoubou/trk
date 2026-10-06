@@ -326,7 +326,10 @@ const packDB = idbStore("shadow_taiko_packs", "packs");
 const packRuntime = { id:null, captions:null, noteImages:[null, null], urls:[], skinId:null, hadSounds:false };
 const noteImage = lane => { const im = packRuntime.noteImages[lane]; return im && im.complete && im.naturalWidth ? im : null; };
 function packRecordBytes(record) {
-  const files = record && record.files;
+  if (!record || typeof record !== "object") return 0;
+  /* 新しいレコードは合計を size に持っているので、それを優先する（files を数え直さない） */
+  if (Number.isFinite(record.size) && record.size >= 0) return record.size;
+  const files = record.files;
   if (!files || typeof files !== "object") return 0;
   return Object.keys(files).reduce((sum, key) => {
     const file = files[key];

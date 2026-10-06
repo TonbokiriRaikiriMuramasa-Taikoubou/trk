@@ -145,12 +145,29 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   rule(!!enumFn && enumBehavior && core.includes('!validImportedSettingEnum(k, incoming)'),
     "emergency settings import allowlists spectrum, MMD and FX enum IDs before assignment");
 
+  /* 緊急Importで弾いたキーは黙って捨てない（「読み込みました」なのに反映されない事故を防ぐ） */
+  const importFeedback = core.includes("let applied = [], rejected = []") &&
+    core.includes("rejected.push(k)") &&
+    core.includes("if (applied.includes(k) || rejected.includes(k) || UNSAFE_KEYS.has(k)) continue;") &&
+    core.includes('if (rejected.length) setSt("prefImportedPartial"') &&
+    core.includes('else setSt("prefImported"') &&
+    core.includes("SETTING_ENUM_KEYS.includes(k)") &&
+    ["prefImported", "prefImportedPartial"].every(key => read("js/i18n.js").split(`${key}:`).length - 1 === 4);
+  rule(importFeedback, "the emergency settings import reports every key it refused, in all four languages");
+
+  /* spectrum.js の ID 辞書は「増えたらこの検査も更新」する前提で、名前と個数の両方で見張る */
+  const spectrumSrc = js["js/spectrum.js"];
+  const SPECTRUM_ID_MAPS = ["STYLE_KEYS", "THEME_KEYS", "THEME_SWATCH", "STYLE_DRAW", "IDLE_LINE", "TV_ALPHA"];
+  const nullProto = name => new RegExp(`(?:const|let|var)\\s+${name}\\s*=\\s*Object\\.assign\\(Object\\.create\\(null\\)`).test(spectrumSrc);
+  const missingMaps = SPECTRUM_ID_MAPS.filter(name => !nullProto(name));
+  const spectrumMapCount = (spectrumSrc.match(/Object\.create\(null\)/g) || []).length;
   const prototypeSafeMaps = js["js/mmd.js"].includes("Object.assign(Object.create(null), {") &&
     js["js/fx.js"].includes("let custom = Object.create(null)") &&
-    js["js/spectrum.js"].includes("const STYLE_DRAW = Object.assign(Object.create(null), {") &&
-    js["js/spectrum.js"].includes("const TV_ALPHA = Object.assign(Object.create(null), {") &&
-    js["js/spectrum.js"].includes("const STYLE_KEYS = Object.assign(Object.create(null), {");
-  rule(prototypeSafeMaps, "MMD, FX and spectrum ID dictionaries have no inherited property lookups");
+    missingMaps.length === 0 && spectrumMapCount === SPECTRUM_ID_MAPS.length;
+  rule(prototypeSafeMaps, "MMD, FX and spectrum ID dictionaries have no inherited property lookups",
+    missingMaps.length ? `not null-prototype: ${missingMaps.join(", ")}` :
+      spectrumMapCount === SPECTRUM_ID_MAPS.length ? "" :
+        `spectrum has ${spectrumMapCount} null-prototype maps but this check lists ${SPECTRUM_ID_MAPS.length} — update SPECTRUM_ID_MAPS`);
 
   /* ほかに「外から来たオブジェクトを settings へ丸ごと代入」する形がないか */
   const loose = [];
@@ -182,8 +199,15 @@ const occurrences = (text, re) => [...text.matchAll(re)];
       { id:"replace", files:{ audio:{ size:120 }, chart:{ size:30 } } },
       { id:"keep", files:{ audio:{ size:70 } } }
     ], "replace", 50);
+    /* 新しいレコードは size を優先し、古い/壊れたレコードだけ files を数え直す */
+    const mixed = projectedSize([
+      { id:"newer", size:200, files:{ audio:{ size:10 } } },
+      { id:"legacy", files:{ audio:{ size:40 } } },
+      { id:"broken", size:Number.NaN, files:{ audio:{ size:5 } } }
+    ], "newer", 0);
     budgetBehavior = sizes.stored === 220 && sizes.replacing === 150 && sizes.projected === 120 &&
-      projectedSize([], "new", 10).projected === 10;
+      projectedSize([], "new", 10).projected === 10 &&
+      mixed.stored === 245 && mixed.replacing === 200 && mixed.projected === 45;
   } catch (_) {}
   const storeCap = custom.includes("PACK_STORE_MAX = 1024 * PACK_MB") &&
     custom.includes("await checkPackStorageCapacity(id, total)") && custom.includes("storage.estimate()") &&

@@ -280,6 +280,8 @@ const TEXT = {
     recStarHint:"称号：🥁MANUAL／🚚TRUCK／🪐ORBIT／🎪STAGE／🚛CATCH＝クリア、⚔＝Sランク以上、🐔＝ノーミス（曲ごとに上の段階で上書き）　⭐＝ALL PERFECT　FC＝フルコンボ　🏁＝最高クリア速度（AUTO・途中終了・練習扱いは対象外）",
     recExport:"⇩ 記録をバックアップ", recImport:"⇧ バックアップを読み込む", recReset:"🗑 この曲の記録を消す",
     recConfirmReset:"この曲の記録をすべて消しますか？", recExported:"記録を書き出しました。", recImported:"記録を読み込みました（{n}曲）。",
+    prefImported:"📥 読み込みました: {list} — 再読み込みします",
+    prefImportedPartial:"📥 読み込みました: {list} — 再読み込みします（未適用: {skipped}）",
     recBad:"記録ファイルの形式が正しくありません。", recCleared:"この曲の記録を消しました。"
   },
 
@@ -547,6 +549,8 @@ const TEXT = {
     recStarHint:"Titles: 🥁 MANUAL / 🚚 TRUCK / 🪐 ORBIT / 🎪 STAGE / 🚛 CATCH = clear, ⚔ = rank S or better, 🐔 = no miss (per song, upgraded automatically)   ⭐ = ALL PERFECT   FC = Full combo   🏁 = best clear speed (AUTO, failed and practice runs don't count)",
     recExport:"⇩ Back up records", recImport:"⇧ Restore backup", recReset:"🗑 Clear this song's records",
     recConfirmReset:"Clear all records for this song?", recExported:"Records exported.", recImported:"Records restored ({n} songs).",
+    prefImported:"📥 Imported: {list} — reloading",
+    prefImportedPartial:"📥 Imported: {list} — reloading (not applied: {skipped})",
     recBad:"Invalid records file.", recCleared:"Records for this song cleared."
   },
 
@@ -813,6 +817,8 @@ const TEXT = {
     recStarHint:"称号：🥁MANUAL／🚚TRUCK／🪐ORBIT／🎪STAGE／🚛CATCH＝通关，⚔＝S评级以上，🐔＝无失误（按歌曲记录，自动升级）　⭐＝ALL PERFECT　FC＝全连　🏁＝最高通关速度（AUTO・中途结束・练习不计）",
     recExport:"⇩ 备份记录", recImport:"⇧ 读取备份", recReset:"🗑 清除本曲记录",
     recConfirmReset:"要清除本曲的所有记录吗？", recExported:"已导出记录。", recImported:"已读取记录（{n}首）。",
+    prefImported:"📥 已读取：{list} — 正在重新加载",
+    prefImportedPartial:"📥 已读取：{list} — 正在重新加载（未应用：{skipped}）",
     recBad:"记录文件格式不正确。", recCleared:"已清除本曲记录。"
   },
 
@@ -1079,6 +1085,8 @@ const TEXT = {
     recStarHint:"칭호: 🥁MANUAL／🚚TRUCK／🪐ORBIT／🎪STAGE／🚛CATCH＝클리어, ⚔＝S랭크 이상, 🐔＝노미스 (곡마다 위 단계로 자동 갱신)　⭐＝ALL PERFECT　FC＝풀콤보　🏁＝최고 클리어 속도 (AUTO・중도 종료・연습은 제외)",
     recExport:"⇩ 기록 백업", recImport:"⇧ 백업 불러오기", recReset:"🗑 이 곡의 기록 삭제",
     recConfirmReset:"이 곡의 기록을 모두 삭제할까요?", recExported:"기록을 내보냈습니다.", recImported:"기록을 불러왔습니다 ({n}곡).",
+    prefImported:"📥 불러왔습니다: {list} — 다시 불러옵니다",
+    prefImportedPartial:"📥 불러왔습니다: {list} — 다시 불러옵니다 (미적용: {skipped})",
     recBad:"기록 파일 형식이 올바르지 않습니다.", recCleared:"이 곡의 기록을 삭제했습니다."
   }
 };

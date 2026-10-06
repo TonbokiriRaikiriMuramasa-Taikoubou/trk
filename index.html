@@ -36,14 +36,13 @@
 <script type="importmap">
 {
   "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
-    "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3.5.5/lib/three-vrm.module.min.js",
-    "@pixiv/three-vrm-core": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm-core@3.5.5/lib/three-vrm-core.module.js",
-    "@pixiv/three-vrm-animation": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm-animation@3.5.5/lib/three-vrm-animation.module.js",
-    "three/": "https://cdn.jsdelivr.net/npm/three@0.180.0/",
-    "@yohawing/three-mmd-loader": "https://cdn.jsdelivr.net/npm/@yohawing/three-mmd-loader@0.8.4/dist/index.js",
-    "@yohawing/three-mmd-loader/": "https://cdn.jsdelivr.net/npm/@yohawing/three-mmd-loader@0.8.4/dist/"
+    "three": "./assets/vendor/three@0.180.0/build/three.module.js",
+    "three/addons/": "./assets/vendor/three@0.180.0/examples/jsm/",
+    "@pixiv/three-vrm": "./assets/vendor/@pixiv/three-vrm@3.5.5/lib/three-vrm.module.min.js",
+    "@pixiv/three-vrm-animation": "./assets/vendor/@pixiv/three-vrm-animation@3.5.5/lib/three-vrm-animation.module.js",
+    "three/": "./assets/vendor/three@0.180.0/",
+    "@yohawing/three-mmd-loader": "./assets/vendor/@yohawing/three-mmd-loader@0.8.4/dist/index.js",
+    "@yohawing/three-mmd-loader/": "./assets/vendor/@yohawing/three-mmd-loader@0.8.4/dist/"
   }
 }
 </script>
@@ -134,7 +133,7 @@
         <div class="songCol">
           <section class="panel" id="libPanel">
             <div class="libHead">
-              <h3 data-i18n="libTitle"></h3>
+              <h3><button type="button" class="study-launch-title" data-i18n="libTitle" aria-haspopup="dialog"></button></h3>
               <span class="libHeadRight">
                 <span id="libCount" class="hint"></span>
                 <button id="libSkinBtn" class="libSkinBtn" type="button" hidden></button>
@@ -150,6 +149,11 @@
                 <input id="mediaFile" type="file" accept="video/*,audio/*" multiple hidden>
                 <span data-i18n="libAddFile"></span>
               </label>
+              <!-- 🎬 動画を読み込む：最初のフレームまで確かめて「映像つき」として記録し、そのまま全画面で流す -->
+              <label class="fileBtn small" id="libVideoLabel">
+                <input id="videoFile" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.mkv,.avi" multiple hidden>
+                <span data-i18n="libAddVideo"></span>
+              </label>
               <label class="fileBtn small">
                 <input id="songPackFile" type="file" accept=".stpack,.zip" hidden>
                 <span data-i18n="libAddPack"></span>
@@ -157,8 +161,8 @@
             </div>
             <input id="libDirInput" type="file" webkitdirectory multiple hidden>
             <div class="libTools">
-              <input id="libSearch" type="search" autocomplete="off">
-              <select id="libSort">
+              <input id="libSearch" type="search" autocomplete="off" data-i18n-aria="libSearch">
+              <select id="libSort" data-i18n-aria="libSortLabel">
                 <option value="name" data-i18n="sortName"></option>
                 <option value="plays" data-i18n="sortPlays"></option>
                 <option value="recent" data-i18n="sortRecent"></option>
@@ -168,7 +172,7 @@
             </div>
             <div id="libSkinBar" class="libSkinBar" hidden></div>
             <div id="libSkinNote" class="hint libSkinNote" hidden></div>
-            <div id="libTabs" class="libTabs" role="tablist" hidden></div>
+            <div id="libTabs" class="libTabs" hidden></div>
             <div id="libList"></div>
             <div id="libStatus" class="hint status"></div>
             <div class="hint" data-i18n="dropHint"></div>
@@ -419,9 +423,9 @@
                 <button id="mmdClearModel" type="button" data-i18n="mmdClearModel"></button>
               </div>
               <label class="check"><input id="mmdRemember" type="checkbox"><span data-i18n="mmdRemember"></span></label>
-              <h3 data-i18n="mmdMotionHead"></h3>
+              <h3 id="mmdMotionHeadLabel" data-i18n="mmdMotionHead"></h3>
               <div class="miniActions">
-                <select id="mmdMotionSelect"></select>
+                <select id="mmdMotionSelect" aria-labelledby="mmdMotionHeadLabel"></select>
                 <label class="fileBtn small disabled" id="mmdMotionFileLabel">
                   <input id="mmdMotionFile" type="file" accept=".vmd" hidden disabled>
                   <span data-i18n="mmdChooseMotion"></span>
@@ -504,8 +508,8 @@
             <!-- extras.js がここに「背景の暗さ・ぼかし」を追加します -->
 
             <div class="inline">
-              <span data-i18n="fxPower"></span>
-              <input id="fxPower" type="range" min="0" max="3" step="0.1">
+              <span data-i18n="fxPower" id="fxPowerLabel"></span>
+              <input id="fxPower" type="range" min="0" max="3" step="0.1" aria-labelledby="fxPowerLabel">
               <span id="fxPowerVal" class="mono"></span>
             </div>
             <label class="field">
@@ -528,8 +532,8 @@
             <label class="check"><input id="swayBeat" type="checkbox"><span data-i18n="swayBeat"></span></label>
             <label class="check"><input id="swayHit" type="checkbox"><span data-i18n="swayHit"></span></label>
             <div class="inline">
-              <span data-i18n="swayPower"></span>
-              <input id="swayPower" type="range" min="0.2" max="2" step="0.1">
+              <span data-i18n="swayPower" id="swayPowerLabel"></span>
+              <input id="swayPower" type="range" min="0.2" max="2" step="0.1" aria-labelledby="swayPowerLabel">
               <span id="swayPowerVal" class="mono"></span>
             </div>
             <div id="swayReducedNote" class="hint" data-i18n="swayReduced" hidden></div>
@@ -540,8 +544,8 @@
               <h3 data-i18n="secTruck"></h3>
               <div class="hint" data-i18n="truckHint"></div>
               <div class="inline">
-                <span data-i18n="laneTint"></span>
-                <input id="laneTint" type="range" min="0" max="0.5" step="0.01">
+                <span data-i18n="laneTint" id="laneTintLabel"></span>
+                <input id="laneTint" type="range" min="0" max="0.5" step="0.01" aria-labelledby="laneTintLabel">
                 <span id="laneTintVal" class="mono"></span>
               </div>
               <label class="check"><input id="truckBounce" type="checkbox"><span data-i18n="truckBounce"></span></label>
@@ -575,23 +579,23 @@
                   </div>
                   <h3 data-i18n="tvmShape"></h3>
                   <div class="inline tight">
-                    <span data-i18n="tvmButtons"></span>
-                    <input id="tvmN" type="range" min="3" max="8" step="1">
+                    <span data-i18n="tvmButtons" id="tvmNLabel"></span>
+                    <input id="tvmN" type="range" min="3" max="8" step="1" aria-labelledby="tvmNLabel">
                     <span id="tvmNVal" class="mono"></span>
                   </div>
                   <div class="inline tight">
-                    <span data-i18n="tvmCols"></span>
-                    <input id="tvmCols" type="range" min="1" max="4" step="1">
+                    <span data-i18n="tvmCols" id="tvmColsLabel"></span>
+                    <input id="tvmCols" type="range" min="1" max="4" step="1" aria-labelledby="tvmColsLabel">
                     <span id="tvmColsVal" class="mono"></span>
                   </div>
                   <div class="inline tight">
-                    <span data-i18n="tvmRadius"></span>
-                    <input id="tvmRadius" type="range" min="0" max="40" step="1">
+                    <span data-i18n="tvmRadius" id="tvmRadiusLabel"></span>
+                    <input id="tvmRadius" type="range" min="0" max="40" step="1" aria-labelledby="tvmRadiusLabel">
                     <span id="tvmRadiusVal" class="mono"></span>
                   </div>
                   <div class="inline tight">
-                    <span data-i18n="tvmBezelW"></span>
-                    <input id="tvmBezel" type="range" min="0" max="16" step="1">
+                    <span data-i18n="tvmBezelW" id="tvmBezelLabel"></span>
+                    <input id="tvmBezel" type="range" min="0" max="16" step="1" aria-labelledby="tvmBezelLabel">
                     <span id="tvmBezelVal" class="mono"></span>
                   </div>
                   <div class="makerRow two">
@@ -628,14 +632,14 @@
               <div id="tvmStatus" class="hint status"></div>
             </details>
 
-            <h3 data-i18n="libSkinHead"></h3>
-            <select id="libSkinSelect"></select>
+            <h3 id="libSkinHeadLabel" data-i18n="libSkinHead"></h3>
+            <select id="libSkinSelect" aria-labelledby="libSkinHeadLabel"></select>
             <label class="check"><input id="libSkinQuickChk" type="checkbox" checked><span data-i18n="libSkinQuick"></span></label>
             <div class="hint" data-i18n="libSkinHint"></div>
 
-            <h3 data-i18n="mascotSel"></h3>
+            <h3 id="mascotSelLabel" data-i18n="mascotSel"></h3>
             <!-- キャラクターの選択肢は js/characters/*.js が自動で追加します -->
-            <select id="mascotSelect" class="mascotSelect">
+            <select id="mascotSelect" class="mascotSelect" aria-labelledby="mascotSelLabel">
               <option value="skin" data-i18n="mascotSkin"></option>
               <option value="none" data-i18n="mascotNone"></option>
               <option value="buddy" data-i18n="mascotBuddy"></option>
@@ -648,11 +652,13 @@
             <details id="noteStylePanel" class="subPanel">
               <summary data-i18n="noteStyle"></summary>
               <div class="noteRows">
+                <span id="noteColorLabel" data-i18n="noteColorAria" style="display:none"></span>
+                <span id="noteShapeLabel" data-i18n="noteShapeAria" style="display:none"></span>
                 <div class="noteRow">
                   <i id="notePrev0" class="dot big"></i>
-                  <strong data-i18n="donNote"></strong>
-                  <input id="noteColor0" type="color">
-                  <select id="noteShape0">
+                  <strong id="noteKindLabel0" data-i18n="donNote"></strong>
+                  <input id="noteColor0" type="color" aria-labelledby="noteKindLabel0 noteColorLabel">
+                  <select id="noteShape0" aria-labelledby="noteKindLabel0 noteShapeLabel">
                     <option value="circle" data-i18n="shapeCircle"></option>
                     <option value="diamond" data-i18n="shapeDiamond"></option>
                     <option value="square" data-i18n="shapeSquare"></option>
@@ -660,9 +666,9 @@
                 </div>
                 <div class="noteRow">
                   <i id="notePrev1" class="dot big"></i>
-                  <strong data-i18n="kaNote"></strong>
-                  <input id="noteColor1" type="color">
-                  <select id="noteShape1">
+                  <strong id="noteKindLabel1" data-i18n="kaNote"></strong>
+                  <input id="noteColor1" type="color" aria-labelledby="noteKindLabel1 noteColorLabel">
+                  <select id="noteShape1" aria-labelledby="noteKindLabel1 noteShapeLabel">
                     <option value="circle" data-i18n="shapeCircle"></option>
                     <option value="diamond" data-i18n="shapeDiamond"></option>
                     <option value="square" data-i18n="shapeSquare"></option>
@@ -699,8 +705,8 @@
             <label class="check"><input id="countdownSE" type="checkbox"><span data-i18n="countdownSE"></span></label>
             <label class="check"><input id="resumeCountdown" type="checkbox"><span data-i18n="resumeCountdown"></span></label>
             <div class="inline">
-              <span data-i18n="shortMode"></span>
-              <select id="shortMode">
+              <span data-i18n="shortMode" id="shortModeLabel"></span>
+              <select id="shortMode" aria-labelledby="shortModeLabel">
                 <option value="off" data-i18n="shortOff"></option>
                 <option value="90" data-i18n="short90"></option>
                 <option value="120" data-i18n="short120"></option>
@@ -719,8 +725,8 @@
             <div class="hint" data-i18n="judgeHint"></div>
 
             <div class="inline">
-              <span data-i18n="rate"></span>
-              <input id="rate" type="range" min="0.5" max="3" step="0.01">
+              <span data-i18n="rate" id="rateLabel"></span>
+              <input id="rate" type="range" min="0.5" max="3" step="0.01" aria-labelledby="rateLabel">
               <span id="rateVal" class="mono"></span>
             </div>
             <div class="hint" data-i18n="rateHint"></div>
@@ -729,8 +735,8 @@
             <label class="check"><input id="optHidden" type="checkbox"><span data-i18n="hidden"></span></label>
             <label class="check"><input id="optSudden" type="checkbox"><span data-i18n="sudden"></span></label>
             <div class="inline">
-              <span data-i18n="coverAmount"></span>
-              <input id="cover" type="range" min="0.2" max="0.7" step="0.05">
+              <span data-i18n="coverAmount" id="coverLabel"></span>
+              <input id="cover" type="range" min="0.2" max="0.7" step="0.05" aria-labelledby="coverLabel">
               <span id="coverVal" class="mono"></span>
             </div>
             <label class="check"><input id="optMirror" type="checkbox"><span data-i18n="modMirror"></span></label>
@@ -768,14 +774,16 @@
             <div class="seg" id="keyPresets" style="margin-top:10px">
               <button type="button" data-keypreset="standard" data-i18n="keyPresetDefault"></button>
               <button type="button" data-keypreset="taiko" data-i18n="keyPresetTaiko"></button>
+              <button type="button" data-keypreset="arcade" data-i18n="keyPresetArcade"></button>
+              <button type="button" data-keypreset="remote" data-i18n="keyPresetRemote"></button>
             </div>
             <label class="check"><input id="reverseHands" type="checkbox"><span data-i18n="reverseHands"></span></label>
             <div id="keyPreview" class="hint"></div>
             <div id="bindStatus" class="hint status"></div>
 
             <div class="inline">
-              <span data-i18n="latency"></span>
-              <input id="latency" class="numField" type="number" min="-300" max="500" step="5">
+              <span data-i18n="latency" id="latencyLabel"></span>
+              <input id="latency" class="numField" type="number" min="-300" max="500" step="5" aria-labelledby="latencyLabel">
             </div>
             <div class="hint" data-i18n="latencyHint"></div>
             <!-- extras.js がここに「🎯 オフセットを測る」と自動微調整を追加します -->
@@ -831,6 +839,44 @@
               <div id="truckBindStatus" class="hint status"></div>
               <div class="hint" data-i18n="truckCtlHint"></div>
               <!-- stage.js（🎪）・catch.js（🚛）・speed.js（⏩）のキー設定がここに入ります -->
+            </details>
+
+            <!-- 🎮 ゲームパッド・コントローラー・TVリモコン（js/pad.js） -->
+            <details id="padPanel" class="subPanel">
+              <summary data-i18n="padPanelTitle"></summary>
+              <div class="hint" data-i18n="padHint"></div>
+              <label class="check"><input id="padEnabled" type="checkbox"><span data-i18n="padEnable"></span></label>
+              <div id="padStatus" class="hint status"></div>
+              <div class="seg" id="padPresets">
+                <button type="button" data-padpreset="ab" data-i18n="padPresetAB"></button>
+                <button type="button" data-padpreset="dpad" data-i18n="padPresetDpad"></button>
+                <button type="button" data-padpreset="stick" data-i18n="padPresetStick"></button>
+              </div>
+              <div class="keyRows" style="margin-top:10px">
+                <div class="keyRow">
+                  <strong data-i18n="padActLeft"></strong><span class="keyValue" data-padvalue="left"></span>
+                  <button type="button" data-padbind="left" data-i18n="assign"></button>
+                </div>
+                <div class="keyRow">
+                  <strong data-i18n="padActRight"></strong><span class="keyValue" data-padvalue="right"></span>
+                  <button type="button" data-padbind="right" data-i18n="assign"></button>
+                </div>
+                <div class="keyRow">
+                  <strong data-i18n="padActConfirm"></strong><span class="keyValue" data-padvalue="confirm"></span>
+                  <button type="button" data-padbind="confirm" data-i18n="assign"></button>
+                </div>
+                <div class="keyRow">
+                  <strong data-i18n="padActBack"></strong><span class="keyValue" data-padvalue="back"></span>
+                  <button type="button" data-padbind="back" data-i18n="assign"></button>
+                </div>
+                <div class="keyRow">
+                  <strong data-i18n="padActPause"></strong><span class="keyValue" data-padvalue="pause"></span>
+                  <button type="button" data-padbind="pause" data-i18n="assign"></button>
+                </div>
+              </div>
+              <label class="check"><input id="padMenuNav" type="checkbox"><span data-i18n="padMenuNav"></span></label>
+              <div class="hint" data-i18n="padMenuNavHint"></div>
+              <div class="hint" data-i18n="padRemoteHint"></div>
             </details>
           </details>
 
@@ -949,8 +995,8 @@
             <summary data-i18n="secSound"></summary>
             <label class="check"><input id="seEnabled" type="checkbox"><span data-i18n="enableSE"></span></label>
             <div class="inline">
-              <span data-i18n="seVolume"></span>
-              <input id="seVolume" type="range" min="0" max="1" step="0.01">
+              <span data-i18n="seVolume" id="seVolumeLabel"></span>
+              <input id="seVolume" type="range" min="0" max="1" step="0.01" aria-labelledby="seVolumeLabel">
             </div>
             <div class="seButtons">
               <label class="fileBtn small">📁 <input id="donSeFile" type="file" accept="audio/*" hidden><span data-i18n="donSE"></span></label>
@@ -962,6 +1008,8 @@
             <label class="check"><input id="previewEnabled" type="checkbox"><span data-i18n="previewEnabled"></span></label>
             <label class="check"><input id="bannerPause" type="checkbox"><span data-i18n="bannerPause"></span></label>
             <label class="check"><input id="bannerSongBtns" type="checkbox"><span data-i18n="bannerSongBtns"></span></label>
+            <label class="check"><input id="bannerRandomBtn" type="checkbox"><span data-i18n="bannerRandomBtn"></span></label>
+            <label class="check"><input id="bannerRandomTap" type="checkbox"><span data-i18n="bannerRandomTap"></span></label>
           </details>
           <!-- fx.js がここに「🎛 サウンドエフェクト」の欄を追加します -->
           <!-- ⭐ お気に入りのフォルダ管理（中身は js/favs.js が作ります） -->
@@ -969,6 +1017,69 @@
             <summary id="favPanelSummary">⭐ お気に入り</summary>
             <div id="favPanelBody"></div>
           </details>
+          <!-- 🪶 軽量化（スマホ・タブレット・アプリ向け）: 配線は js/lite.js が行います -->
+          <details class="panel" id="litePanel">
+            <summary data-i18n="secLite"></summary>
+            <div class="hint" data-i18n="liteHint"></div>
+            <label class="field">
+              <span data-i18n="litePreset"></span>
+              <select id="litePreset">
+                <option value="balanced" data-i18n="litePresetBalanced"></option>
+                <option value="game" data-i18n="litePresetGame"></option>
+                <option value="max" data-i18n="litePresetMax"></option>
+                <option value="off" data-i18n="litePresetOff"></option>
+                <option value="custom" data-i18n="litePresetCustom"></option>
+              </select>
+            </label>
+            <label class="check"><input id="liteGameFull" type="checkbox"><span data-i18n="liteGameFull"></span></label>
+            <div class="hint" data-i18n="liteGameFullNote"></div>
+            <label class="field">
+              <span data-i18n="liteMode"></span>
+              <select id="liteMode">
+                <option value="auto" data-i18n="liteModeAuto"></option>
+                <option value="on" data-i18n="liteModeOn"></option>
+                <option value="off" data-i18n="liteModeOff"></option>
+              </select>
+            </label>
+            <div class="fields2">
+              <label class="field">
+                <span data-i18n="liteFps"></span>
+                <select id="liteFps">
+                  <option value="60" data-i18n="liteFps60"></option>
+                  <option value="30" data-i18n="liteFps30"></option>
+                  <option value="20" data-i18n="liteFps20"></option>
+                </select>
+              </label>
+              <label class="field">
+                <span data-i18n="liteMascot"></span>
+                <select id="liteMascot">
+                  <option value="60" data-i18n="liteMascot60"></option>
+                  <option value="30" data-i18n="liteMascot30"></option>
+                  <option value="15" data-i18n="liteMascot15"></option>
+                  <option value="off" data-i18n="liteMascotOff"></option>
+                </select>
+              </label>
+            </div>
+            <label class="field">
+              <span data-i18n="liteScale"></span>
+              <select id="liteScale">
+                <option value="device" data-i18n="liteScaleDevice"></option>
+                <option value="1.5" data-i18n="liteScale15"></option>
+                <option value="1" data-i18n="liteScale10"></option>
+              </select>
+            </label>
+            <label class="check"><input id="liteSpecOff" type="checkbox"><span data-i18n="liteSpecOff"></span></label>
+            <label class="check"><input id="liteFx" type="checkbox"><span data-i18n="liteFx"></span></label>
+            <label class="check"><input id="liteBlur" type="checkbox"><span data-i18n="liteBlur"></span></label>
+            <div class="hint" data-i18n="liteMascotOffNote"></div>
+            <div id="liteState" class="hint liteState"></div>
+            <div id="liteDevice" class="hint"></div>
+            <div class="miniActions">
+              <button id="liteRecheckBtn" type="button" data-i18n="liteRecheck"></button>
+            </div>
+            <div class="hint" data-i18n="liteNote"></div>
+          </details>
+
           <details class="panel" id="emergencyPanel">
             <summary>🛟 緊急復旧 / Emergency Recovery</summary>
             <div class="hint">
@@ -996,6 +1107,7 @@
                   <li><code>?reset=tv</code> / <code>?reset=video</code> — 映像・TV・ぼかし・TVスキンをデフォルトに（ノーツは保持）</li>
                   <li><code>?reset=audio</code> — 音量・SEをデフォルトに</li>
                   <li><code>?reset=notes</code> — ノーツ色・形をデフォルトに</li>
+                  <li><code>?reset=lite</code> — 🪶 軽量化の設定をデフォルトに</li>
                   <li><code>?reset=all</code> / <code>?factory</code> — 全設定を工場出荷状態に</li>
                   <li><code>?export=notes</code> / <code>?export=all</code> — 設定をJSONでダウンロード</li>
                   <li>コンソール: <code>trkReset('tv')</code>, <code>trkExport('notes')</code></li>
@@ -1105,7 +1217,7 @@
             <span id="studyBookCount" class="study-count"></span>
           </div>
         </div>
-        <input id="studySearch" class="study-search" type="search" autocomplete="off" placeholder="タイトル・フォルダを検索…">
+        <input id="studySearch" class="study-search" type="search" autocomplete="off" placeholder="タイトル・フォルダを検索…" data-i18n-aria="studySearch">
         <div class="study-shelf-filter">
           <label for="studyShelfSort" data-i18n="studySortLabel">並べ替え</label>
           <select id="studyShelfSort">
@@ -1255,8 +1367,8 @@
               </label>
               <p class="study-advanced-hint" data-i18n="studyMemoHint">編集は書斎内のコピーに保存し、元ファイルは変更しません。</p>
               <div class="study-advanced-row">
-                <span data-i18n="studyAlbumNestingLabel">アルバムの分け方</span>
-                <select id="studyAlbumNesting">
+                <span data-i18n="studyAlbumNestingLabel" id="studyAlbumNestingLabel">アルバムの分け方</span>
+                <select id="studyAlbumNesting" aria-labelledby="studyAlbumNestingLabel">
                   <option value="split" data-i18n="studyAlbumNestingSplit">サブフォルダごとに1冊</option>
                   <option value="flat" data-i18n="studyAlbumNestingFlat">フォルダ全体で1冊</option>
                 </select>
@@ -1266,7 +1378,7 @@
           </div>
 
           <div id="studyFindRow" class="study-find-row" hidden>
-            <input id="studyFindInput" class="study-find" type="search" autocomplete="off" placeholder="本文を検索…">
+            <input id="studyFindInput" class="study-find" type="search" autocomplete="off" placeholder="本文を検索…" data-i18n-aria="studyBookSearchPlaceholder">
             <span id="studyFindCount" class="study-find-count"></span>
             <button id="studyFindPrev" type="button" class="study-small-btn" title="前の一致">▲</button>
             <button id="studyFindNext" type="button" class="study-small-btn" title="次の一致">▼</button>
@@ -1381,6 +1493,8 @@
 <!-- ▲ 自作キャラのMODは、この下に <script src="js/characters/○○.js"></script> を足してください -->
 <!-- ===== 土台 ===== -->
 <script src="js/core.js"></script>
+<!-- 🪶 軽量化（スマホ・低出力端末向け。描画する側より前に読みます） -->
+<script src="js/lite.js"></script>
 <!-- player.js：AUTO・練習中の再生操作。各モードより先にキーを受け取るため、core.js のすぐ後 -->
 <script src="js/player.js"></script>
 <script src="js/media.js"></script>
@@ -1398,6 +1512,7 @@
 <script src="js/fx-presets.js"></script>
 <script src="js/fx-dock.js"></script>
 <script src="js/tv-dock.js"></script>
+<script src="js/tv-rich.js"></script>
 <!-- 🖥 動画の全画面表示（TVドックの⛶とメディアプレーヤーの「全画面で表示」で使います） -->
 <script src="js/video-max.js"></script>
 <script src="js/fx.js"></script>
@@ -1411,6 +1526,7 @@
 <script src="js/lib-skins.js"></script>
 <script src="js/addons.js"></script>
 <script src="js/main.js"></script>
+<script src="js/pad.js"></script>
 <script src="js/speed.js"></script>
 <script src="js/vrm.js"></script>
 <script src="js/mmd.js"></script>

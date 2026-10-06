@@ -11,7 +11,15 @@ See the LICENSE file for the full text.
 The following items are NOT granted by the GPL, because they are not ours to grant
 or are not part of the software license.
 
-## 1. The "trk!" name
+## 1. Bundled third-party libraries (`assets/vendor/`)
+
+trk! does not load code from a CDN. three.js, @pixiv/three-vrm, @pixiv/three-vrm-animation and
+@yohawing/three-mmd-loader are copied into `assets/vendor/` as published on npm (MIT License,
+copyright their authors). Their LICENSE files sit next to the code, the exact bytes are recorded
+in `tools/vendor-lock.json`, and `npm run check` verifies them offline. Regenerate with
+`npm run vendor:update`; never edit those files by hand.
+
+## 2. The "trk!" name
 The GPL covers the code, not the name. Forks and derivative works are welcome,
 but please use a different name (e.g. "trk-plus", "my-drum-fork") so players
 are not confused about which version is official.

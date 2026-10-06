@@ -119,7 +119,7 @@ function paint() {
   if (!ctx || !canvas) return;
   const w = canvas.clientWidth || window.innerWidth || 0, h = canvas.clientHeight || window.innerHeight || 0;
   if (!w || !h) return;
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const dpr = typeof TrkLite === "object" ? TrkLite.pixelRatio(2) : Math.min(2, window.devicePixelRatio || 1);   // 🪶 軽量化は描画解像度の上限
   const W = Math.max(2, Math.round(w * dpr)), H = Math.max(2, Math.round(h * dpr));
   if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
   ctx.setTransform(1, 0, 0, 1, 0, 0);

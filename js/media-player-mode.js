@@ -684,8 +684,10 @@ function drawMediaStage() {
 function mediaStageTick() {
   stageRaf = requestAnimationFrame(mediaStageTick);
   if (!mediaOpen || !stageWrap || stageWrap.hidden) return;
+  /* 🪶 軽量化：映像ステージを描く回数を減らす（音・再生位置・操作はそのまま） */
+  if (typeof TrkLite === "object" && !TrkLite.allow("media", performance.now())) return;
   if (!stageCtx) { try { stageCtx = stageCanvas.getContext("2d", { alpha: false }); } catch (_) { return; } }
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const dpr = typeof TrkLite === "object" ? TrkLite.pixelRatio(2) : Math.min(2, window.devicePixelRatio || 1);
   const cw = Math.max(2, Math.round((stageCanvas.clientWidth || 480) * dpr));
   const ch = Math.max(2, Math.round((stageCanvas.clientHeight || 270) * dpr));
   if (stageCanvas.width !== cw || stageCanvas.height !== ch) { stageCanvas.width = cw; stageCanvas.height = ch; }
@@ -921,18 +923,19 @@ function buildMedia() {
   overlay.addEventListener("keyup", e => e.stopPropagation());
   const isTyping = t => t && ["INPUT", "SELECT", "TEXTAREA"].includes(t.tagName);
   addEventListener("keydown", e => {
-    if (mediaExitBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureMediaExitKey(e.code); return; }
-    if (videoBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureVideoKey(e.code); return; }
+    const code = keyCodeOf(e);      // 📺 TVリモコン・メディアキー対応（e.code が空でも e.key を使う）
+    if (mediaExitBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureMediaExitKey(code); return; }
+    if (videoBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureVideoKey(code); return; }
     if (window._trkSynthModeOpen || window._trkStudyRoomOpen) return;
-    const videoKey = (settings.videoKeys || []).indexOf(e.code);
+    const videoKey = (settings.videoKeys || []).indexOf(code);
     if (videoKey >= 0 && (mediaActive() || phase === "title" || phase === "paused")) {
       e.preventDefault(); e.stopImmediatePropagation();
       if (!e.repeat && (!wallActive || videoKey === WALL_KEY_INDEX)) videoAction(videoKey);
       return;
     }
     if (!mediaOpen) return;
-    if (wallActive && e.code === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); deactivateWall(true); return; }
-    if (e.code === settings.mediaExitKey || e.code === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat) requestMediaExit(); return; }
+    if (wallActive && code === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); deactivateWall(true); return; }
+    if (code === settings.mediaExitKey || code === "Escape" || code === "BrowserBack" || code === "GoBack") { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat) requestMediaExit(); return; }
     if (wallActive) { e.preventDefault(); e.stopImmediatePropagation(); return; }
     if (isTyping(e.target)) return;
     if (e.code === "Space") { e.preventDefault(); e.stopImmediatePropagation(); playPause(); }
@@ -943,10 +946,10 @@ function buildMedia() {
   }, true);
   addEventListener("keyup", e => {
     if (mediaExitBinding !== null || videoBinding !== null || window._trkSynthModeOpen || window._trkStudyRoomOpen || !mediaActive()) return;
-    if (settings.mediaLoopTrigger === "hold" && (settings.videoKeys || [])[LOOP_KEY_INDEX] === e.code) {
+    if (settings.mediaLoopTrigger === "hold" && (settings.videoKeys || [])[LOOP_KEY_INDEX] === keyCodeOf(e)) {
       e.preventDefault(); e.stopImmediatePropagation(); releaseHeldLoop();
     }
-    if (settings.mediaWallTrigger === "hold" && (settings.videoKeys || [])[WALL_KEY_INDEX] === e.code && wallKeyDown) {
+    if (settings.mediaWallTrigger === "hold" && (settings.videoKeys || [])[WALL_KEY_INDEX] === keyCodeOf(e) && wallKeyDown) {
       e.preventDefault(); e.stopImmediatePropagation(); deactivateWall(true);
     }
   }, true);

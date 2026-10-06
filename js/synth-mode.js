@@ -795,7 +795,7 @@ addEventListener("DOMContentLoaded", () => {
   function updatePowerHint() { powerHelp(); }
   function fitCanvas() {
     const r = canvas.getBoundingClientRect(); if (!r.width || !r.height) return;
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const dpr = typeof TrkLite === "object" ? TrkLite.pixelRatio(2) : Math.min(2, window.devicePixelRatio || 1);   // 🪶 軽量化は描画解像度の上限
     const w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
     if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
   }
@@ -804,7 +804,7 @@ addEventListener("DOMContentLoaded", () => {
     const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (now - lastDraw >= (reduce ? 100 : 32)) {
       lastDraw = now; fitCanvas();
-      const r = canvas.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+      const r = canvas.getBoundingClientRect(), dpr = typeof TrkLite === "object" ? TrkLite.pixelRatio(2) : Math.min(2, window.devicePixelRatio || 1);   // 🪶 軽量化は描画解像度の上限
       const w = r.width, h = r.height, g = canvas.getContext("2d");
       if (w && h && g) {
         g.setTransform(dpr, 0, 0, dpr, 0, 0);

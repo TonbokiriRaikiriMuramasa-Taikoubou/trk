@@ -75,9 +75,25 @@ function guessLang() {
 /* キー：メイン2つ（左・右）＋サブ2つ。初期設定は A（ドン）／Space（カッ） */
 const KEY_PRESETS = {
   standard:{ label:"keyPresetDefault", keys:["KeyA", "Space"], sub:["", ""] },
-  taiko:   { label:"keyPresetTaiko",   keys:["KeyF", "KeyD"],  sub:["KeyJ", "KeyK"] }
+  taiko:   { label:"keyPresetTaiko",   keys:["KeyF", "KeyD"],  sub:["KeyJ", "KeyK"] },
+  /* 🕹 アーケード筐体・自作コントローラー（1・2ボタン）／📺 TVリモコン（← →） */
+  arcade:  { label:"keyPresetArcade",  keys:["Digit1", "Digit2"], sub:["", ""] },
+  remote:  { label:"keyPresetRemote",  keys:["ArrowLeft", "ArrowRight"], sub:["", ""] }
 };
 const validCode = k => typeof k === "string" && /^[A-Za-z0-9]{1,24}$/.test(k);
+/* 🎮 パッドの割り当て（js/pad.js）：ボタン＝"b0"、軸＝"a0+"（＋方向）／"a0-"（−方向）。
+   スティック・D-pad（軸で届く機種）・アケコンのレバーも、この1つの形で表します。 */
+const validPadBind = b => typeof b === "string" && /^[ba]\d{1,2}[+-]?$/.test(b) && !(b[0] === "b" && /[+-]$/.test(b));
+const padBindOr = (v, d) => (validPadBind(v) ? v : d);
+const PAD_DEFAULTS = { left:"b0", right:"b1", confirm:"b0", back:"b1", pause:"b9" };
+/* TVリモコン・メディアキーは e.code が空で e.key だけ届くことがあります（逆に e.code が名前の機種も）。
+   ノーツや移動キーの割り当ては、この関数の値で判定します。 */
+function keyCodeOf(e) {
+  if (!e) return "";
+  if (e.code) return e.code;
+  const k = e.key || "";
+  return /^[A-Za-z0-9]{1,24}$/.test(k) ? k : "";
+}
 const VIDEO_KEY_DEFAULTS = ["NumpadAdd", "NumpadSubtract", "NumpadMultiply", "NumpadDivide", "Numpad0", "Numpad9", "Numpad8", "Numpad7"];
 const savedVideoKeys = Array.isArray(prefs.videoKeys) && prefs.videoKeys.length === VIDEO_KEY_DEFAULTS.length &&
   prefs.videoKeys.every(validCode) && new Set(prefs.videoKeys).size === VIDEO_KEY_DEFAULTS.length ? prefs.videoKeys.slice()
@@ -128,13 +144,33 @@ const settings = {
   errorMeter: prefs.errorMeter !== false,
   keys: bootKeys,
   subKeys: bootSub,
+  /* 🎮 ゲームパッド・コントローラー（読み込みは js/pad.js） */
+  padEnabled: prefs.padEnabled !== false,
+  padMenuNav: prefs.padMenuNav !== false,
+  padLeft: padBindOr(prefs.padLeft, PAD_DEFAULTS.left),
+  padRight: padBindOr(prefs.padRight, PAD_DEFAULTS.right),
+  padConfirm: padBindOr(prefs.padConfirm, PAD_DEFAULTS.confirm),
+  padBack: padBindOr(prefs.padBack, PAD_DEFAULTS.back),
+  padPause: padBindOr(prefs.padPause, PAD_DEFAULTS.pause),
   seEnabled: !!prefs.seEnabled,
   seVolume: num(prefs.seVolume, 0, 1, .28),
   musicVolume: num(prefs.musicVolume, 0, 1, .7),
   musicVolumeRestore: num(prefs.musicVolumeRestore, .01, 1,
     typeof prefs.musicVolume === "number" && prefs.musicVolume > 0 ? prefs.musicVolume : .7),
   bannerPause: prefs.bannerPause === true,                                   // ⏯ 右上の曲名バナーをタップで一時停止（初期オフ）
-  bannerSongBtns: prefs.bannerSongBtns !== false,                            // ◀▶ バナー左右の曲送りボタン（初期オン）
+  bannerSongBtns: prefs.bannerSongBtns !== false,                            // ◀▶ バナー右端の曲送りボタン（初期オン）
+  bannerRandomBtn: prefs.bannerRandomBtn !== false,                          // 🎲 バナー右端のおまかせボタン（初期オン）
+  bannerRandomTap: prefs.bannerRandomTap === true,                           // 🎲 タップだけで変える（初期オフ＝長押し）
+  /* 🪶 軽量化（スマホ・タブレット・アプリ向け。読み込みは js/lite.js） */
+  liteMode: pick(prefs.liteMode, ["off", "auto", "on"], "auto"),             // 自動＝端末・省データ・電池を見て決める
+  liteFps: pick(prefs.liteFps, ["60", "30", "20"], "30"),                    // 描画のフレームレート上限
+  liteMascot: pick(prefs.liteMascot, ["60", "30", "15", "off"], "30"),       // 🩷 3Dマスコット（MMD／VRM）の描画レート
+  liteScale: pick(prefs.liteScale, ["device", "1.5", "1"], "1.5"),           // 描画解像度（devicePixelRatio）の上限
+  liteSpectrumOff: prefs.liteSpectrumOff !== false,                          // 📊 軽量化モード中はスペクトラムを止める
+  liteFx: prefs.liteFx !== false,                                            // 軽量化モード中はぼかし・すりガラスを減らす
+  liteBlur: prefs.liteBlur !== false,                                        // 軽量化モード中は映像のぼかしを最大2pxに
+  liteSeen: prefs.liteSeen === true,                                         // 📱 スマホ向けの初回案内を出したか
+  liteGameFull: prefs.liteGameFull === true,                                 // 🎯 ゲーム中は描画を軽くしない（ゲーム優先・初期オフ）
   /* 🎹 シンセ演奏モード */
   synthModeDisabled: !!prefs.synthModeDisabled,
   synthModeFastStart: !!prefs.synthModeFastStart,
@@ -161,7 +197,6 @@ const settings = {
   activePack: typeof prefs.activePack === "string" ? prefs.activePack : null,
   previewEnabled: prefs.previewEnabled !== false,
   libSort: pick(prefs.libSort, ["name", "plays", "recent", "best"], "name"),
-  shortMode: pick(prefs.shortMode, ["off", "90", "120", "180"], "off"),      // 🕹️ ショートプレイ（後半だけ遊ぶ・初期オフ）
   shortMode: pick(prefs.shortMode, ["off", "90", "120", "180"], "off"),      // 🕹️ ショートプレイ（後半だけ遊ぶ・初期オフ）
   libTab: typeof prefs.libTab === "string" ? prefs.libTab : "all",            // 📚 選んでいる棚（タブ）のID
   playlists: (Array.isArray(prefs.playlists) ? prefs.playlists : []).filter(p => p && typeof p === "object").slice(0, 24),   // 🎧 ユーザー定義プレイリスト（library.js が読み込み時に検証）
@@ -229,13 +264,61 @@ const gameplayFxPower = () => settings.fxPower * gameplayFxMultiplier();
      ?reset=tv / ?reset=video         → 映像・TVまわりだけデフォルトに戻す
      ?reset=audio / ?reset=sound      → 音量・SEをデフォルトに戻す
      ?reset=notes                     → ノーツ色・形をデフォルトに戻す（確認あり）
-     ?reset=all / ?factory            → 全設定リセット（ノーツも含む）
+     ?reset=amp / ?reset=rack         → 🔥 TRKアンプ（🎚 エフェクターラック）を空に戻す
+     ?reset=all / ?factory            → 全設定リセット（ノーツも含む）。実行前に確認します（&force=1 で確認を飛ばす）
      ?export=notes / ?export=all      → 設定をJSONでダウンロード
    ノーツ設定は細かく詰める人が多いので、tv/audioリセットでは保持される。 */
+/* ♻️ 全設定リセットの確認ダイアログ。
+   ?reset=all はリンクを踏むだけで（ノーツ・音量・映像・キー・プレイリストまで）消えるため、
+   実行前にここで一度止めます。&force=1 を付けたときだけ、そのまま実行します。
+   ダイアログは素のDOMで作るので、ほかの機能が壊れていても出せます（ESC・外側クリック＝やめる）。 */
+function askFactoryReset(onYes, onNo) {
+  const wrap = document.createElement("div");
+  wrap.setAttribute("role", "dialog");
+  wrap.setAttribute("aria-modal", "true");
+  wrap.dataset.trkAsk = "factory";   /* 見つけやすさのために印を付ける（テスト・支援技術） */
+  wrap.style.cssText = "position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px";
+  const card = document.createElement("div");
+  card.style.cssText = "max-width:min(92vw,470px);background:#16181d;color:#f2f3f5;border:2px solid #ff3d7f;border-radius:14px;padding:16px 18px;box-shadow:0 10px 40px rgba(0,0,0,.6);font:15px/1.65 system-ui,sans-serif";
+  const title = document.createElement("b");
+  title.textContent = "♻️ " + tr("factoryAskTitle");
+  title.style.cssText = "font-size:17px";
+  const body = document.createElement("div");
+  body.textContent = tr("factoryAskBody");
+  body.style.cssText = "margin:8px 0 4px;white-space:pre-line";
+  const hint = document.createElement("div");
+  hint.textContent = tr("factoryForceHint");
+  hint.style.cssText = "opacity:.65;font-size:12px;margin-bottom:12px";
+  const rowBox = document.createElement("div");
+  rowBox.style.cssText = "display:flex;gap:10px;flex-wrap:wrap";
+  const yes = document.createElement("button");
+  yes.type = "button"; yes.textContent = tr("factoryAskYes");
+  yes.style.cssText = "flex:1 1 auto;min-height:44px;padding:10px 14px;border-radius:10px;border:0;background:#ff3d7f;color:#fff;font-weight:700;font-size:15px;cursor:pointer";
+  const no = document.createElement("button");
+  no.type = "button"; no.textContent = tr("factoryAskNo");
+  no.style.cssText = "flex:1 1 auto;min-height:44px;padding:10px 14px;border-radius:10px;border:1px solid #555;background:#22252b;color:#f2f3f5;font-size:15px;cursor:pointer";
+  const close = () => { document.removeEventListener("keydown", onKey); wrap.remove(); };
+  const onKey = e => {
+    if (e.key !== "Escape") return;
+    close();
+    if (typeof onNo === "function") onNo();
+  };
+  yes.addEventListener("click", () => { close(); if (typeof onYes === "function") onYes(); });
+  no.addEventListener("click", () => { close(); if (typeof onNo === "function") onNo(); });
+  wrap.addEventListener("click", e => { if (e.target === wrap) { close(); if (typeof onNo === "function") onNo(); } });
+  document.addEventListener("keydown", onKey);
+  rowBox.append(yes, no);
+  card.append(title, body, hint, rowBox);
+  wrap.append(card);
+  (document.body || document.documentElement).append(wrap);
+  try { no.focus(); } catch (_) {}
+}
 function resetVideoPrefs() {
   settings.videoStyle = "color";
   settings.videoZoom = 1; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.castPolicy = "off"; settings.backgroundPolicy = "off"; settings.fxAntenna = false; settings.fxAntennaShape = "rod"; settings.fxAntennaCustomOn = ""; settings.fxAntennaCustomOff = ""; settings.mediaLoopTrigger = "toggle"; settings.mediaWallTrigger = "toggle"; settings.mediaWallStyle = "midnight"; settings.mediaWallClock = true; settings.mediaWallStopsVideo = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true;
   settings.bgDim = 0; settings.bgBlur = 0;
+  /* ✨ TRKエフェクト（リッチ映像。js/tv-rich.js）の記憶も一緒に戻す */
+  settings.tvRichId = "portrait_natural"; settings.tvRichPrev = ""; settings.tvRichCat = "portrait"; settings.tvRichOpen = true;   /* 初期状態に戻す＝欄は開いておく */
   settings.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs); // user bookmarks survive a TV-only reset
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = true;
@@ -252,6 +335,7 @@ function resetVideoPrefs() {
 }
 function resetAudioPrefs() {
   settings.musicVolume = 0.7; settings.musicVolumeRestore = 0.7; settings.seVolume = 0.28; settings.seEnabled = false; settings.bannerPause = false; settings.bannerSongBtns = true;
+  settings.bannerRandomBtn = true; settings.bannerRandomTap = false;
   settings.synthModeDisabled = false; settings.synthModeFastStart = false; settings.synthModeKeyboardLock = true; settings.synthModeWideKeyboard = false;
   // fx-dock / eq-dock の音まわりがあれば一緒に初期化
   if ("gameVolume" in settings) settings.gameVolume = 0.7;
@@ -259,6 +343,12 @@ function resetAudioPrefs() {
   if ("eqLow" in settings) { settings.eqLow = 0; settings.eqMid = 0; settings.eqHigh = 0; }
   if ("compEnabled" in settings) settings.compEnabled = false;
   try { if (typeof window._trkSyncSynthModeSettings === "function") window._trkSyncSynthModeSettings(); } catch (_) {}
+}
+function resetLitePrefs() {
+  /* 🪶 軽量化（js/lite.js）。?reset=lite と trkReset('lite') から呼びます */
+  settings.liteMode = "auto"; settings.liteFps = "30"; settings.liteMascot = "30"; settings.liteScale = "1.5";
+  settings.liteSpectrumOff = true; settings.liteFx = true; settings.liteBlur = true; settings.liteGameFull = false;
+  if (typeof liteSyncUI === "function") { try { liteSyncUI(); } catch (_) {} }
 }
 function resetNotesPrefs() {
   try {
@@ -268,6 +358,27 @@ function resetNotesPrefs() {
     applyNoteVars();
   } catch(_) { settings.notes = sanitizeNotes(null); }
 }
+/* 🔥 TRKアンプ（🎚 エフェクターラック・js/fx.js。左下の独立カテゴリー）のリセット。
+   fx.js は core.js よりあとに読み込まれるので、読み込み時点では settings.fx… がまだ無い。
+   そのため一度きりの合図を残し、fx.js が読み込み時に拾って片づける
+   （"clear"＝段を空にする／"off"＝段はそのまま止める）。すでに読み込まれているときは、その場でも外す。 */
+const AMP_RESET_KEY = "trk_amp_reset_once";
+function markAmpReset(mode) { try { sessionStorage.setItem(AMP_RESET_KEY, mode); } catch (_) {} }
+function takeAmpReset() {
+  try {
+    const m = sessionStorage.getItem(AMP_RESET_KEY);
+    sessionStorage.removeItem(AMP_RESET_KEY);
+    return m === "clear" || m === "off" ? m : "";
+  } catch (_) { return ""; }
+}
+function resetAmpPrefs() {
+  if ("fxRack" in settings) settings.fxRack = [];
+  if ("fxRackOn" in settings) settings.fxRackOn = false;
+  settings.ampOpen = true;   /* 初期状態に戻す＝欄は開いておく（?safe=1 だけは閉じたまま＝下の enterSafeMode） */
+  markAmpReset("clear");
+  try { if (window.TrkFX && typeof TrkFX.rackClear === "function") { TrkFX.rackClear(); TrkFX.rackOn(false); } } catch (_) {}
+}
+
 /* セーフモードに入ったかどうか（?safe=1 / ?factory で入る）。
    アドオン（js/addons.js）など、あとから来る機能は、これを見て「読み込まない」を決めます。
    URLは処理のあと掃除されるので、印を残しておく必要があります。 */
@@ -290,11 +401,26 @@ function enterSafeMode() {
   settings.synthModeWideKeyboard = false;
   settings.libKeepShared = false;        // 📤 セーフモードでは、端末に残した共有の曲も読み戻さない
   settings.fxPower = 0; settings.gameFxMode = "off"; settings.hideGameplayUI = false;
+  /* 🔥 TRKアンプも安全側へ（段は消さず、止めるだけ。fx.js が読み込み時に拾う） */
+  if ("fxRackOn" in settings) settings.fxRackOn = false;
+  markAmpReset("off");
+  settings.tvRichOpen = false;   /* ✨ TRKエフェクトの欄も安全側では閉じておく */
   if (settings.mascot === "mmd") settings.mascot = "skin";     // 🩷 セーフモードでは MMD を使わない
+  if (settings.mascot === "vrm") settings.mascot = "skin";     // 🧍 同じ理由で VRM も使わない（CDNのライブラリを読まない）
   if (typeof view !== "undefined" && view) { try { view.style.filter = "none"; } catch(_) {} }
 }
+function resetKeysPrefs() {
+  /* ⌨ キー割り当て（🎮 パッド含む）。?reset=keys と trkReset('keys') から呼びます */
+  settings.keys = KEY_PRESETS.standard.keys.slice();
+  settings.subKeys = KEY_PRESETS.standard.sub.slice();
+  settings.menuKey = "KeyM"; settings.mediaExitKey = "Escape";
+  settings.padEnabled = true; settings.padMenuNav = true;
+  settings.padLeft = PAD_DEFAULTS.left; settings.padRight = PAD_DEFAULTS.right;
+  settings.padConfirm = PAD_DEFAULTS.confirm; settings.padBack = PAD_DEFAULTS.back; settings.padPause = PAD_DEFAULTS.pause;
+}
 function resetAllPrefs() {
-  resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs();
+  resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs(); resetLitePrefs(); resetKeysPrefs(); resetAmpPrefs();
+  settings.liteSeen = false;   // 🪶 工場出荷状態では、スマホ向けの初回案内もやり直す
   settings.tvParamFavs = []; // a factory reset clears the separately preserved TV bookmarks too
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
@@ -311,6 +437,8 @@ function exportPrefs(kind) {
   if (kind === "notes") out.notes = settings.notes;
   else if (kind === "tv" || kind === "video") {
     out.videoStyle = settings.videoStyle; out.bgDim = settings.bgDim; out.bgBlur = settings.bgBlur;
+    /* ✨ TRKエフェクト（リッチ映像）の記憶も、映像の書き出しに一緒に乗せる */
+    out.tvRichId = settings.tvRichId; out.tvRichPrev = settings.tvRichPrev; out.tvRichCat = settings.tvRichCat; out.tvRichOpen = settings.tvRichOpen;
     out.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs);
     out.tvDockSkin = settings.tvDockSkin; out.tvDockFive = settings.tvDockFive; out.tvOrder = settings.tvOrder;
     out.tvOverlay = settings.tvOverlay; out.previewEnabled = settings.previewEnabled; out.fxPower = settings.fxPower;
@@ -336,6 +464,7 @@ function exportPrefs(kind) {
     const has = k => sp.has(k) || hash.includes(k);
     let didReset = "";
     let doExport = "";
+    let pendingFactory = false;   /* ♻️ 確認待ちの ?reset=all */
     // export は先に判定（リセットと同時も可）
     if (has("export")) doExport = (get("export") || "all").toLowerCase();
     else if (sp.get("export") ) doExport = sp.get("export").toLowerCase();
@@ -347,12 +476,23 @@ function exportPrefs(kind) {
       if (["tv","video","screen"].includes(r)) { resetVideoPrefs(); didReset = "tv"; }
       else if (["audio","sound","volume"].includes(r)) { resetAudioPrefs(); didReset = "audio"; }
       else if (["notes","note"].includes(r)) { resetNotesPrefs(); didReset = "notes"; }
-      else if (["all","factory","full"].includes(r)) { resetAllPrefs(); didReset = "all"; }
+      else if (["lite","light"].includes(r)) { resetLitePrefs(); didReset = "lite"; }
+      else if (["keys","key","pad","controller","input"].includes(r)) { resetKeysPrefs(); didReset = "keys"; }
+      else if (["amp","rack"].includes(r)) { resetAmpPrefs(); didReset = "amp"; }
+      else if (["all","factory","full"].includes(r)) {
+        /* ♻️ いちばん危ないリセット。リンクを踏んだだけで消えないよう、確認を挟む（&force=1 で省略） */
+        if (sp.get("force") === "1") { resetAllPrefs(); didReset = "all"; } else pendingFactory = true;
+      }
     } else if (hash.includes("#reset")) {
       // #reset 単体は tv リセット扱い
       if (hash.includes("audio") || hash.includes("sound")) { resetAudioPrefs(); didReset = "audio"; }
       else if (hash.includes("notes")) { resetNotesPrefs(); didReset = "notes"; }
-      else if (hash.includes("all")) { resetAllPrefs(); didReset = "all"; }
+      else if (hash.includes("lite")) { resetLitePrefs(); didReset = "lite"; }
+      else if (hash.includes("keys") || hash.includes("pad")) { resetKeysPrefs(); didReset = "keys"; }
+      else if (hash.includes("amp") || hash.includes("rack")) { resetAmpPrefs(); didReset = "amp"; }
+      else if (hash.includes("all")) {
+        if (hash.includes("force")) { resetAllPrefs(); didReset = "all"; } else pendingFactory = true;
+      }
       else { resetVideoPrefs(); didReset = "tv"; }
     }
     if (!didReset) {
@@ -365,17 +505,35 @@ function exportPrefs(kind) {
         if (typeof s === "string" && s.length < 50) { settings.tvDockSkin = s; saveUserPrefs(); }
       }
     }
-    if (didReset || doExport) {
-      saveUserPrefs();
+    if (didReset || doExport || pendingFactory) {
+      if (!pendingFactory) saveUserPrefs();   /* 確認待ちの間は、まだ何も保存し直さない */
       // URLを綺麗にする（リセットループ防止）
       try {
         const clean = new URL(location.href);
-        clean.searchParams.delete("reset"); clean.searchParams.delete("safe"); clean.searchParams.delete("safety"); clean.searchParams.delete("factory");
+        clean.searchParams.delete("reset"); clean.searchParams.delete("safe"); clean.searchParams.delete("safety"); clean.searchParams.delete("factory"); clean.searchParams.delete("force");
         // export は残しても良いが、一度だけにするために削除
         if (doExport) clean.searchParams.delete("export");
         if (clean.hash.toLowerCase().includes("reset") || clean.hash.toLowerCase().includes("safe")) clean.hash = "";
         history.replaceState(null, "", clean.toString());
       } catch(_) {}
+      if (pendingFactory) {
+        /* ♻️ 実行するかどうかを聞く。はい＝リセットして再読み込み（全部を確実に適用するため）、
+           いいえ＝何もしない。URLはもう綺麗にしてあるので、聞き直しにはなりません。 */
+        setTimeout(() => {
+          const toast = text => {
+            if (typeof caption !== "undefined") caption = { text, t: performance.now() };
+            const b = document.createElement("div");
+            b.textContent = text;
+            b.style.cssText = "position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:99999;background:#111;color:#fff;border:2px solid #ff3d7f;padding:10px 16px;border-radius:10px;max-width:90vw;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.6)";
+            document.body.appendChild(b);
+            setTimeout(() => b.remove(), 5000);
+          };
+          askFactoryReset(
+            () => { resetAllPrefs(); saveUserPrefs(); toast("♻️ " + tr("factoryAskYes")); setTimeout(() => location.reload(), 400); },
+            () => toast(tr("factoryAskCanceled"))
+          );
+        }, 300);
+      }
       // バナー表示は DOM 構築後に行うため、少し遅延
       setTimeout(() => {
         if (doExport) exportPrefs(doExport);
@@ -385,6 +543,9 @@ function exportPrefs(kind) {
           tv: "📺 映像・TV設定を初期化しました（?reset=tv）",
           audio: "🔊 音量・SE設定を初期化しました（?reset=audio）",
           notes: "🎨 ノーツ設定を初期化しました（?reset=notes）",
+          lite: "🪶 軽量化の設定を初期化しました（?reset=lite）",
+          keys: "🎮 キー割り当て（パッド・リモコン含む）を初期化しました（?reset=keys）",
+          amp: "🔥 TRKアンプ（エフェクターラック）を空に戻しました（?reset=amp）",
           all: "♻️ 全設定を初期化しました（?reset=all）"
         }[didReset] || `リセットしました: ${didReset}`;
         // 既存のcaptionシステムがあれば使う、なければalert風div
@@ -399,7 +560,12 @@ function exportPrefs(kind) {
     // グローバルからも手動で呼べるように公開
     window.trkReset = (k="tv") => {
       k = String(k).toLowerCase();
-      if (k==="safe") enterSafeMode(); else if (["tv","video"].includes(k)) resetVideoPrefs(); else if (["audio","sound"].includes(k)) resetAudioPrefs(); else if (k==="notes") resetNotesPrefs(); else if (["all","factory"].includes(k)) resetAllPrefs(); else resetVideoPrefs();
+      if (["all","factory"].includes(k)) {
+        /* ♻️ コンソールからの trkReset("all") も、消す前に確認する */
+        askFactoryReset(() => { resetAllPrefs(); saveUserPrefs(); location.reload(); }, () => {});
+        return;
+      }
+      if (k==="safe") enterSafeMode(); else if (["tv","video"].includes(k)) resetVideoPrefs(); else if (["audio","sound"].includes(k)) resetAudioPrefs(); else if (k==="notes") resetNotesPrefs(); else if (["lite","light"].includes(k)) resetLitePrefs(); else if (["keys","key","pad","controller","input"].includes(k)) resetKeysPrefs(); else if (["amp","rack"].includes(k)) resetAmpPrefs(); else resetVideoPrefs();
       saveUserPrefs(); location.reload();
     };
     window.trkExport = (k="all") => exportPrefs(String(k).toLowerCase());
@@ -457,6 +623,28 @@ const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls)
 const extOf = p => String(p).split(".").pop().toLowerCase();
 const baseName = n => String(n).replace(/\.[^.]+$/, "");
 const safeName = s => String(s).replace(/[\\/:*?"<>|]+/g, "_").slice(0, 60) || "file";
+/* 外から来た文字列を <a href> にする前の関所（🛡 セキュリティ）。
+   javascript: / data: / vbscript: / blob: などはリンクにしない＝クリックでコードが動く経路を作らない。
+   共有パックの名刺・プレゼントの入手先・イベントの作者リンクなど、他人が作った文字列は必ずここを通す。
+   読めれば用は足りるので、危ない URL は「リンクにせず、ただの文字」として出す（情報は消さない）。 */
+function safeHttpUrl(v) {
+  const s = typeof v === "string" ? v.trim() : "";
+  if (!s || s.length > 300) return "";
+  try {
+    const u = new URL(s, location.href);
+    return u.protocol === "https:" && u.hostname ? u.href : "";
+  } catch (_) { return ""; }
+}
+function safeLink(cls, url, text) {
+  const label = text != null ? String(text) : String(url == null ? "" : url);
+  const href = safeHttpUrl(url);
+  const n = href ? el("a", cls, label) : el("span", cls, label);
+  if (href) { n.href = href; n.target = "_blank"; n.rel = "noopener noreferrer"; }
+  return n;
+}
+/* 設定の読み込みなどで、オブジェクトを丸ごと書き戻すときに踏んではいけないキー
+   （__proto__ を代入すると、そのオブジェクトの継承先ごと入れ替わってしまう） */
+const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
 function fmtTime(s) { s = Math.max(0, Math.floor(s || 0)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; }
 function fmtDate(t) {
   try { return new Date(t).toLocaleString(document.documentElement.lang || undefined, { month:"numeric", day:"numeric", hour:"2-digit", minute:"2-digit" }); }
@@ -468,8 +656,28 @@ function formatKey(code) {
   if (code.startsWith("Digit")) return code.slice(5);
   const map = { ArrowLeft:"←", ArrowRight:"→", ArrowUp:"↑", ArrowDown:"↓", Space:"Space", ShiftLeft:"L-Shift", ShiftRight:"R-Shift",
     ControlLeft:"L-Ctrl", ControlRight:"R-Ctrl", AltLeft:"L-Alt", AltRight:"R-Alt", Semicolon:";", Comma:",", Period:".", Slash:"/",
-    BracketLeft:"[", BracketRight:"]", Quote:"'", Backslash:"\\", Minus:"-", Equal:"=", Backquote:"`", Enter:"Enter", Backspace:"BS" };
+    BracketLeft:"[", BracketRight:"]", Quote:"'", Backslash:"\\", Minus:"-", Equal:"=", Backquote:"`", Enter:"Enter", Backspace:"BS",
+    PageUp:"PgUp", PageDown:"PgDn", Insert:"Ins", Delete:"Del", Tab:"Tab", ContextMenu:"Menu", CapsLock:"Caps",
+    MediaPlayPause:"⏯", MediaPlay:"▶", MediaPause:"⏸", MediaStop:"⏹", MediaTrackNext:"⏭", MediaTrackPrevious:"⏮",
+    VolumeUp:"Vol+", VolumeDown:"Vol−", VolumeMute:"🔇", ChannelUp:"CH+", ChannelDown:"CH−",
+    BrowserBack:"←戻る", GoBack:"←戻る", ColorF0Red:"🔴", ColorF1Green:"🟢", ColorF2Yellow:"🟡", ColorF3Blue:"🔵" };
   return map[code] || code.replace(/^Numpad/, "Num ");
+}
+/* 🎮 パッドの割り当てを表示用に（ボタン0 → 「ボタン0・A／×」） */
+const PAD_BUTTON_NAMES = { 0:"A／×", 1:"B／○", 2:"X／□", 3:"Y／△", 4:"LB／L1", 5:"RB／R1", 6:"LT／L2", 7:"RT／R2",
+  8:"Back／Share", 9:"Start／Options", 10:"L3", 11:"R3", 12:"↑", 13:"↓", 14:"←", 15:"→", 16:"Home／PS" };
+/* 軸の名前は、どの言語でも読める short 表記（L-Stick ← など）にする */
+const PAD_AXIS_NAMES = { 0:["L-Stick ←", "L-Stick →"], 1:["L-Stick ↑", "L-Stick ↓"],
+  2:["LT", "RT"], 3:["R-Stick ←", "R-Stick →"], 4:["R-Stick ↑", "R-Stick ↓"],
+  9:["D-pad ←", "D-pad →"], 10:["D-pad ↑", "D-pad ↓"] };
+function formatPadBind(bind) {
+  if (!validPadBind(bind)) return tr("unset");
+  if (bind[0] === "b") {
+    const n = +bind.slice(1), name = PAD_BUTTON_NAMES[n];
+    return tr("padBtn", { n, name: name ? "・" + name : "" });
+  }
+  const axis = +bind.slice(1, -1), dir = bind.endsWith("+") ? 1 : 0, name = PAD_AXIS_NAMES[axis];
+  return tr("padAxis", { n:axis, dir: name ? name[dir] : (bind.endsWith("+") ? "＋" : "−") });
 }
 /* 押されたキーが左右どちらの枠か（メイン・サブ両方を見る）。なければ -1 */
 function slotOfKey(code) {
@@ -565,7 +773,10 @@ function applyLanguage(code) {
   lang = TEXT[code] ? code : "en"; settings.language = lang; $("language").value = lang;
   document.documentElement.lang = { ja:"ja", en:"en", zh:"zh-CN", ko:"ko" }[lang];
   document.querySelectorAll("[data-i18n]").forEach(n => { n.textContent = tr(n.dataset.i18n); });
+  /* 読み上げ名（aria-label）も同じ辞書から。data-i18n-aria="key" と書く */
+  document.querySelectorAll("[data-i18n-aria]").forEach(n => { n.setAttribute("aria-label", tr(n.dataset.i18nAria)); });
   buildSkinGrid(); updateKeyUI(); updateTouchKeys(); refreshSeedSecrets(); syncPickers(); renderAllStatuses();
+  if (typeof updatePadUI === "function") updatePadUI();   // 🎮 pad.js（読み込み前は何もしない）
   emit("language");
 }
 
@@ -632,8 +843,11 @@ function videoFilter() {
   const base = { color:"none", mono:"grayscale(1) contrast(1.6)", dim:"brightness(.42) saturate(.85)" }[settings.videoStyle] ?? (skin().video || "none");
   const parts = base && base !== "none" ? [base] : [];
   const dim = clampTvDim(settings.bgDim), blur = clampTvBlur(settings.bgBlur);
+  /* 🪶 軽量化モード中は、いちばん重い「ぼかし」を2pxまでに抑える（設定そのものは変えません） */
+  const cap = (typeof window.TrkLite === "object" && window.TrkLite && typeof window.TrkLite.blurCap === "function") ? window.TrkLite.blurCap() : 0;
+  const useBlur = cap ? Math.min(blur, cap) : blur;
   if (dim > 0) parts.push(`brightness(${(1 - dim).toFixed(2)})`);
-  if (blur > 0) parts.push(`blur(${blur}px)`);
+  if (useBlur > 0) parts.push(`blur(${useBlur}px)`);
   return parts.join(" ") || "none";
 }
 function applyNoteVars() {
@@ -818,7 +1032,8 @@ function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
         }
         // 全体的にマージ（知らないキーは無視せず一応入れるが、型チェックは緩め）
         for (const k of Object.keys(data)) {
-          if (k in settings && !applied.includes(k) && k !== "notes") {
+          if (UNSAFE_KEYS.has(k) || k === "notes" || applied.includes(k)) continue;   /* 🛡 __proto__ / constructor / prototype は入れない */
+          if (Object.prototype.hasOwnProperty.call(settings, k)) {
             try { settings[k] = data[k]; applied.push(k); } catch(_){}
           }
         }

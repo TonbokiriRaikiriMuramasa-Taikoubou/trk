@@ -501,9 +501,10 @@ function renderFavPanel() {
 
   /* 種類（映像フィルター／エフェクト／曲） */
   const row = fEl("div", "inline tight");
-  row.append(fEl("span", "", ftr("favKind")));
+  const kindLab = fEl("span", "", ftr("favKind")); kindLab.id = "favKindSelLabel";
+  row.append(kindLab);
   const sel = document.createElement("select");
-  sel.id = "favKindSel";
+  sel.id = "favKindSel"; sel.setAttribute("aria-labelledby", "favKindSelLabel");
   sel.className = "favKindSel";
   for (const k of KINDS) { const o = document.createElement("option"); o.value = k; o.textContent = kindLabel(k); sel.append(o); }
   sel.value = kind;

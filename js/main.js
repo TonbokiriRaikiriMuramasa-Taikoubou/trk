@@ -197,10 +197,11 @@ function nudgeLatency(d) {
 /* ---------- キーボード ---------- */
 addEventListener("keydown", e => {
   if (window._trkSynthModeOpen || window._trkMediaPlayerOpen || window._trkStudyRoomOpen) return;
-  if (menuBinding !== null) { e.preventDefault(); captureMenuKey(e.code); return; }
-  if (bindingSlot !== null) { e.preventDefault(); captureKey(e.code); return; }
+  const code = keyCodeOf(e);        // 📺 TVリモコン・メディアキーは e.code が空で e.key だけ届く
+  if (menuBinding !== null) { e.preventDefault(); captureMenuKey(code); return; }
+  if (bindingSlot !== null) { e.preventDefault(); captureKey(code); return; }
   if (phase === "playing") {
-    const slot = slotOfKey(e.code);
+    const slot = slotOfKey(code);
     if (slot >= 0) { e.preventDefault(); if (!e.repeat) handleInput(slotLane(slot), e.timeStamp); return; }
   }
   if (phase !== "title") {
@@ -211,11 +212,12 @@ addEventListener("keydown", e => {
   const typing = t && (t.tagName === "TEXTAREA" || t.tagName === "SELECT" ||
     (t.tagName === "INPUT" && !["range", "checkbox", "file", "button", "color"].includes(t.type)));
   if (typing) return;
-  if (e.code === settings.menuKey) { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat) requestMenuReturn(); return; }
-  if (e.code === "KeyP" || e.code === "Escape") {
+  if (code === settings.menuKey) { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat) requestMenuReturn(); return; }
+  /* 📺 リモコンの「戻る」は機種によって Escape／BrowserBack／GoBack で届く（Backspace は入力欄のため除外） */
+  if (code === "KeyP" || code === "Escape" || code === "BrowserBack" || code === "GoBack") {
     if (phase === "playing") { e.preventDefault(); pauseGame(); }
     else if (phase === "paused") { e.preventDefault(); resumeGame(); }
-    else if (phase === "title" && screen === "settings" && e.code === "Escape") { e.preventDefault(); closeSettings(); }
+    else if (phase === "title" && screen === "settings" && code === "Escape") { e.preventDefault(); closeSettings(); }
     return;
   }
   if (e.code === "KeyF" && !e.repeat && !e.ctrlKey && !e.metaKey && slotOfKey("KeyF") < 0 && fullscreenSupported) toggleFullscreen();
@@ -247,6 +249,8 @@ addEventListener("pointerdown", poke);
 /* ---------- 選曲画面 ---------- */
 $("language").addEventListener("change", () => { applyLanguage($("language").value); saveUserPrefs(); });
 $("mediaFile").addEventListener("change", e => { const fs = Array.from(e.target.files || []); e.target.value = ""; addSongFiles(fs); });
+/* 🎬 動画を読み込む：映像つきかどうかを確かめてから記録し、そのまま全画面で流す（library.js） */
+$("videoFile").addEventListener("change", e => { const fs = Array.from(e.target.files || []); e.target.value = ""; addVideoFiles(fs); });
 $("openSettingsBtn").addEventListener("click", openSettings);
 $("closeSettingsBtn").addEventListener("click", closeSettings);
 

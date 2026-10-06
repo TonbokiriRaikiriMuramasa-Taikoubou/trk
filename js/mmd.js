@@ -1275,7 +1275,7 @@ function frameCamera() {
 function applyRect() {
   if (!renderer || !camera) return;
   const R = mmdRect(), sc = Math.min(innerWidth / 1920, innerHeight / 1080);
-  const pr = Math.min(2, Math.max(0.5, (devicePixelRatio || 1) * sc));
+  const pr = Math.min(typeof TrkLite === "object" ? TrkLite.pixelRatio(2) : 2, Math.max(0.5, (devicePixelRatio || 1) * sc));   // 🪶 軽量化は描画解像度の上限
   const key = `${R.x},${R.y},${R.w},${R.h},${pr.toFixed(2)}`;
   if (key === curKey) return;
   curKey = key;
@@ -1439,12 +1439,15 @@ function animate(now) {
     autoBpmUsed = songBpm();
     enqueue(() => applyMotion("auto", { silent:true, fromRestore:true }));
   }
-  playing = !!model && phase !== "title" && activeMascot() === "mmd";
+  /* 🪶 軽量化：3Dマスコットの描画レートを下げる／「描画しない」ときは何も描かない */
+  const mascotOff = typeof TrkLite === "object" && TrkLite.noMascot("mmd");
+  playing = !!model && phase !== "title" && activeMascot() === "mmd" && !mascotOff;
   canvas.hidden = !playing;
   const panel = $("mmdPanel");
-  const previewOn = !!model && phase === "title" && screen === "settings" && !!panel && panel.open && !!prev;
-  const quickOn = !!model && phase === "title" && screen === "select" && settings.mmdQuickUI !== false && activeMascot() === "mmd" && !!quickPreview && !safeNow();
+  const previewOn = !!model && !mascotOff && phase === "title" && screen === "settings" && !!panel && panel.open && !!prev;
+  const quickOn = !!model && !mascotOff && phase === "title" && screen === "select" && settings.mmdQuickUI !== false && activeMascot() === "mmd" && !!quickPreview && !safeNow();
   if (!playing && !previewOn && !quickOn) { lastT = now; return; }
+  if (typeof TrkLite === "object" && !TrkLite.mascotAllow("mmd", now)) return;
   const dt = Math.min(0.1, Math.max(0.001, (now - lastT) / 1000)); lastT = now;
   try {
     applyRect(); applyModelTransform();

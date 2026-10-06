@@ -115,9 +115,9 @@ const allSongs = () => {
   }
   return [...out, ...packSongs, ...addonSongs];
 };
-function addedItem(file) {
+function addedItem(file, video) {
   const base = baseName(file.name);
-  return { key:`${file.size}|${base}`, source:"file", file, title:base, base, size:file.size };
+  return { key:`${file.size}|${base}`, source:"file", file, title:base, base, size:file.size, video:!!video };
 }
 function packItem(s) {
   const ext = extOf(s.audio), file = new File([s.audioBlob], `${safeName(s.title)}.${ext}`, { type:s.audioBlob.type || "" });
@@ -499,10 +499,32 @@ function libTabMatch(it, id) {
 const PL_COLORS = { none:"", aqua:"#0e6e6e", green:"#1d6b3c", amber:"#8a5a12", red:"#8a2b35",
   purple:"#5b2d8e", blue:"#1f4f8f", pink:"#8e2d64", gray:"#4a4f5a" };
 const SONG_META_KEY = "shadow_taiko_songmeta_v1";
-let SONG_META = {};
-try { SONG_META = JSON.parse(localStorage.getItem(SONG_META_KEY)) || {}; } catch (_) { SONG_META = {}; }
-if (!SONG_META || typeof SONG_META !== "object" || Array.isArray(SONG_META)) SONG_META = {};
-function songMetaSave() { try { localStorage.setItem(SONG_META_KEY, JSON.stringify(SONG_META)); } catch (_) {} }
+const SONG_META_MAX = 3000;   /* 🛡 曲プロフィールの上限（共有プレイリストの取り込みで増えても、ここで頭打ち） */
+function songMetaClean(raw) {   /* 1件ぶんの検証：文字列だけ・長さ上限・入手先は https のみ */
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const out = {};
+  for (const [k, n] of [["title", 120], ["artist", 100], ["album", 100], ["composer", 100]]) {
+    if (typeof raw[k] === "string" && raw[k].trim()) out[k] = raw[k].trim().slice(0, n);
+  }
+  const url = typeof raw.srcUrl === "string" ? raw.srcUrl.trim() : "";
+  if (url && /^https:\/\/\S+$/i.test(url)) out.srcUrl = url.slice(0, 300);   /* javascript: などは捨てる */
+  return Object.keys(out).length ? out : null;
+}
+function songMetaCleanAll(obj) {
+  const out = {};
+  if (!obj || typeof obj !== "object" || Array.isArray(obj)) return out;
+  for (const k of Object.keys(obj).slice(0, SONG_META_MAX)) {
+    if (typeof k !== "string" || k.length > 128) continue;
+    const m = songMetaClean(obj[k]);
+    if (m) out[k] = m;
+  }
+  return out;
+}
+let SONG_META = songMetaCleanAll((() => { try { return JSON.parse(localStorage.getItem(SONG_META_KEY)) || {}; } catch (_) { return {}; } })());
+function songMetaSave() {
+  if (Object.keys(SONG_META).length > SONG_META_MAX) SONG_META = songMetaCleanAll(SONG_META);
+  try { localStorage.setItem(SONG_META_KEY, JSON.stringify(SONG_META)); } catch (_) {}
+}
 function metaOf(key) { const m = SONG_META[key]; return (m && typeof m === "object") ? m : null; }
 
 /* 保存されていたプレイリスト1つの検証（読み込み時に全部に通す） */
@@ -1179,6 +1201,10 @@ function plMatchByTitle(s, all) {
   return fallback;
 }
 function plOpenLink(url) {   /* https限定＋開く前に確認（osu!の「入手先を明示」流・trk!は内容を保証しない） */
+  /* 🛡 呼び出し側でも https を確かめているが、開く瞬間にもう一度通す。
+     古い保存データ・手で書き換えた localStorage・将来の呼び出しが javascript: を渡しても開かない。 */
+  url = safeHttpUrl(url);
+  if (!url) return;
   const d = plDialog(tr("plLinkOpen"));
   d.card.append(el("div", "plHint", url), el("div", "plHint", tr("plLinkWarn")));
   const open = el("button", "plBtn", tr("plLinkOpen")); open.type = "button";
@@ -1266,6 +1292,9 @@ function renderLibTabs(tabs) {
   if (!box) return active;
   box.textContent = "";
   box.hidden = false;   /* 🎧 「＋」（新規プレイリスト）があるので、タブが1つでも帯は出す */
+  /* role=tablist は「タブだけ」を子に持たせ、＋ボタンはその外に置く（入れ子の規則を守る）。
+     見た目は display:contents なので、これまでと同じ並び・同じスキンのまま */
+  const tabList = el("div", "libTabsList"); tabList.setAttribute("role", "tablist"); tabList.setAttribute("aria-label", tr("libTitle"));
   for (const t of tabs) {
     const b = el("button", "libTab" + (t.id === active ? " on" : "")); b.type = "button";
     b.dataset.tab = t.id;
@@ -1305,10 +1334,11 @@ function renderLibTabs(tabs) {
         if (key) { const n = t.pl.songs.length; plAddSong(t.pl, key); if (t.pl.songs.length !== n) renderLib(); }
       });
     }
-    box.append(b);
+    tabList.append(b);
   }
+  box.append(tabList);
   const plus = el("button", "libTab plPlus", "＋"); plus.type = "button";
-  plus.title = tr("plNewTab"); plus.setAttribute("aria-label", tr("plNewTab")); plus.setAttribute("role", "presentation");
+  plus.title = tr("plNewTab"); plus.setAttribute("aria-label", tr("plNewTab"));
   plus.addEventListener("click", () => { if (!plSuppressClick()) plCreate(); });
   box.append(plus);
   return active;
@@ -1383,7 +1413,7 @@ function renderLib() {
     const b = el("button", `libRow src-${it.source}` + (cur ? " cur" : "")); b.type = "button"; b.style.flex = "1"; b.style.minWidth = "0";
     const left = el("span", "libLeft"), meta = el("span", "libMeta");
     const m = metaOf(it.key) || {};   /* 🎶 曲プロフィール（長押しで編集） */
-    left.append(el("span", "libName", (m.title || it.title) + (info && info.title ? " " + info.title : "")),   // 例：曲名 🥁🐔🚚⚔🎪🚛
+    left.append(el("span", "libName", (it.video ? "🎬 " : "") + (m.title || it.title) + (info && info.title ? " " + info.title : "")),   // 例：🎬 動画 / 曲名 🥁🐔🚚⚔🎪🚛
                 el("span", "libSub", [m.artist || it.artist, m.album, srcLabel(it)].filter(Boolean).join(" · ")));
     if (it.charts) meta.append(el("i", "libTag", "📄"));
     if (it.shared) { const st = el("i", "libTag", "📤"); st.title = tr("libKeepShared"); meta.append(st); }   /* 💾 端末に残した共有の曲 */
@@ -1606,27 +1636,110 @@ bannerVolBtn.addEventListener("click", e => {
   bannerVolPanel.hidden = !bannerVolPanel.hidden; bannerVolSync();
 });
 bannerVolSlider.addEventListener("input", () => setBannerMusicVolume(bannerVolSlider.value));
-/* ◀▶ バナーの左右中央で曲送り（TVドックの◀▶と同じ仕組み。いま開いているタブの中を送る） */
-const bannerPrevBtn = el("button", "bannerSongBtn", "◀"); bannerPrevBtn.type = "button"; bannerPrevBtn.style.left = "10px";
-const bannerNextBtn = el("button", "bannerSongBtn", "▶"); bannerNextBtn.type = "button"; bannerNextBtn.style.right = "10px";
-$("songBanner").append(bannerPrevBtn, bannerNextBtn);
+/* ◀🎲▶ バナーの右端にまとめて曲送り（TVドックの◀▶と同じ仕組み。いま開いているタブの中を送る）
+   ・左端に置くと曲名の頭に重なるので、曲の操作は右端の [◀][🎲][▶] に集める
+   ・🎲 は誤操作を防ぐため、既定では長押し（650ms）で変える。設定でタップだけにも、🎲 自体を隠すこともできる */
+const bannerSongBar = el("div", "bannerSongBar");
+const bannerPrevBtn = el("button", "bannerSongBtn", "◀"); bannerPrevBtn.type = "button";
+const bannerRandomBtn = el("button", "bannerSongBtn bannerRandomBtn", "🎲"); bannerRandomBtn.type = "button";
+const bannerNextBtn = el("button", "bannerSongBtn", "▶"); bannerNextBtn.type = "button";
+bannerSongBar.append(bannerPrevBtn, bannerRandomBtn, bannerNextBtn);
+$("songBanner").append(bannerSongBar);
+
+/* 🎲 おまかせの候補：いまの一覧 ＋ 📌ピンの曲（ほかのタブにいても、必ず候補に入る） */
+function randomSongPool() {
+  const pool = libView.slice();
+  const F = window.TrkFavs;
+  if (F) {
+    for (const key of F.state("song").pins) {
+      if (F.groupOf("song", key) === "former") continue;
+      const it = allSongs().find(x => x.key === key);
+      if (it && !pool.includes(it)) pool.push(it);
+    }
+  }
+  return pool;
+}
+function randomSongPick() {
+  const pool = randomSongPool();
+  return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
+}
+const bannerRandomTapMode = () => settings.bannerRandomTap === true;   /* タップだけで変える（初期オフ＝長押し） */
+
 function bannerSongBtnsSync() {
   const on = settings.bannerSongBtns !== false && allSongs().length > 0 && phase === "title";
+  const rand = on && settings.bannerRandomBtn !== false;
+  bannerSongBar.hidden = !on;
   bannerPrevBtn.hidden = bannerNextBtn.hidden = !on;
+  bannerRandomBtn.hidden = !rand;
+  $("songBanner").classList.toggle("hasSongBtns", on);   /* 曲名の右側を空けて、右端のボタンと重ならないようにする */
   const t1 = tr("tvPrevSong"), t2 = tr("tvNextSong");
   for (const [b, t] of [[bannerPrevBtn, t1], [bannerNextBtn, t2]]) { b.title = t; b.setAttribute("aria-label", t); }
+  const tip = tr(bannerRandomTapMode() ? "bannerRandomTapTip" : "bannerRandomHoldTip");
+  if (bannerRandomBtn.title !== tip) { bannerRandomBtn.title = tip; bannerRandomBtn.setAttribute("aria-label", tip); }
 }
 async function bannerSongStep(dir) {
   if (phase !== "title") return;
   const it = dir < 0 ? prevSong() : nextSong();
   if (it) await selectSong(it);
 }
+async function bannerSongRandom() {
+  if (phase !== "title") return;
+  const it = randomSongPick();
+  if (it) await selectSong(it);
+}
 bannerPrevBtn.addEventListener("click", () => bannerSongStep(-1));
 bannerNextBtn.addEventListener("click", () => bannerSongStep(1));
+/* 🎲：既定は長押しでおまかせ。タップだけで変える設定とキーボード操作（click の detail が 0）は、その場で変える */
+let bannerRandTimer = 0, bannerRandLongPressed = false, bannerRandPointer = null, bannerRandDownX = 0, bannerRandDownY = 0;
+function bannerRandCancelPress() {
+  if (bannerRandTimer) clearTimeout(bannerRandTimer);
+  bannerRandTimer = 0; bannerRandPointer = null;
+}
+bannerRandomBtn.addEventListener("pointerdown", e => {
+  if (e.pointerType === "mouse" && e.button !== 0) return;
+  bannerRandCancelPress(); bannerRandLongPressed = false;
+  if (bannerRandomTapMode()) return;   /* タップだけで変える設定：クリックに任せる */
+  bannerRandPointer = e.pointerId; bannerRandDownX = e.clientX; bannerRandDownY = e.clientY;
+  try { bannerRandomBtn.setPointerCapture(e.pointerId); } catch (_) {}
+  bannerRandTimer = setTimeout(() => {
+    bannerRandTimer = 0; bannerRandLongPressed = true;
+    bannerSongRandom();
+  }, 650);
+});
+bannerRandomBtn.addEventListener("pointermove", e => {
+  if (bannerRandPointer !== e.pointerId) return;
+  if (Math.hypot(e.clientX - bannerRandDownX, e.clientY - bannerRandDownY) > 12) bannerRandCancelPress();
+});
+bannerRandomBtn.addEventListener("pointerup", e => { if (bannerRandPointer === e.pointerId) bannerRandCancelPress(); });
+bannerRandomBtn.addEventListener("pointercancel", e => { if (bannerRandPointer === e.pointerId) bannerRandCancelPress(); });
+bannerRandomBtn.addEventListener("contextmenu", e => e.preventDefault());
+bannerRandomBtn.addEventListener("click", e => {
+  if (bannerRandLongPressed) {
+    bannerRandLongPressed = false;
+    e.preventDefault(); e.stopImmediatePropagation();
+    return;
+  }
+  if (e.detail === 0 || bannerRandomTapMode()) { bannerSongRandom(); return; }
+  plToast(tr("bannerRandomHold"));   /* 誤操作防止：短押しでは変えず、押し方だけ案内する */
+});
+function bannerRandomSyncPrefs() {
+  const show = settings.bannerRandomBtn !== false;
+  $("bannerRandomBtn").checked = show;
+  $("bannerRandomTap").checked = settings.bannerRandomTap === true;
+  $("bannerRandomTap").disabled = !show;   /* 🎲 を隠しているときは、押し方の設定は関係ない */
+}
 $("bannerSongBtns").addEventListener("change", e => {
   settings.bannerSongBtns = e.target.checked; saveUserPrefs(); bannerSongBtnsSync();
 });
+$("bannerRandomBtn").addEventListener("change", e => {
+  settings.bannerRandomBtn = e.target.checked; saveUserPrefs(); bannerRandomSyncPrefs(); bannerSongBtnsSync();
+});
+$("bannerRandomTap").addEventListener("change", e => {
+  settings.bannerRandomTap = e.target.checked; saveUserPrefs(); bannerSongBtnsSync();
+});
 $("bannerSongBtns").checked = settings.bannerSongBtns !== false;
+bannerRandomSyncPrefs();
+on("settings", bannerRandomSyncPrefs);   /* 音リセットなどで設定が変わっても、開いたときに合わせる */
 bannerSongBtnsSync();   /* 初回の表示あわせ（renderBanner が先に走っていた場合の保険） */
 
 
@@ -1728,6 +1841,75 @@ async function addSongFiles(list) {
   renderLib();
   if (first) selectSong(first);
 }
+/* ---------- 🎬 動画ファイルとして読み込む ----------
+   ふつうの「＋ 曲ファイルを追加」は音も映像も同じ道を通るため、大きな動画だと
+   ・音声解析でファイルを丸ごとメモリに載せる（2GBなどは失敗・待たされる）
+   ・映像が間に合わず、音楽ファイルのように見えてしまう
+   ことがあります。こちらは「映像つき」として読み込みます：
+   ① <video> で最初のフレームまで待ち、videoWidth > 0 を確かめる（＝動画だと正確に分かる。ここが時間のかかる所）
+   ② 確かめられたものだけ 🎬 として記録する（大きいファイルの音声解析は media.js 側で省略）
+   ③ 読み込み後、そのまま全画面ビューア（🖥）で流す
+   ※ 端末が映像を解釈できない形式なら「音として読み込みました」と出します（無理に動かさない）。 */
+const VIDEO_EXT = ["mp4", "m4v", "mov", "webm", "mkv", "avi", "ogv", "3gp"];
+const VIDEO_PROBE_MS = 15000;   /* 最初のフレームを待つ上限 */
+function probeVideoFile(file) {
+  return new Promise(resolve => {
+    const el = document.createElement("video");
+    let url = "", done = false, timer = 0;
+    el.preload = "auto"; el.muted = true; el.setAttribute("playsinline", "");
+    const finish = ok => {
+      if (done) return; done = true;
+      clearTimeout(timer);
+      try { el.removeAttribute("src"); el.load(); } catch (_) {}
+      if (url) URL.revokeObjectURL(url);
+      resolve(!!ok);
+    };
+    const check = () => { if (el.videoWidth > 0 && el.videoHeight > 0) finish(true); };
+    const looksLikeAudio = !VIDEO_EXT.includes(extOf(file.name)) && !/^video\//i.test(file.type || "");
+    const meta = () => {   /* 映像が無いと分かる形（音声ファイル）なら、待たずに終える */
+      check();
+      if (!done && looksLikeAudio && el.videoWidth === 0 && el.readyState >= 1) finish(false);
+    };
+    el.addEventListener("loadedmetadata", meta);
+    el.addEventListener("loadeddata", check);
+    el.addEventListener("canplay", check);
+    el.addEventListener("playing", () => { try { el.pause(); } catch (_) {} check(); });
+    el.addEventListener("error", () => finish(false));
+    timer = setTimeout(() => finish(el.videoWidth > 0), VIDEO_PROBE_MS);
+    try { url = URL.createObjectURL(file); el.src = url; el.load(); } catch (_) { finish(false); }
+  });
+}
+async function addVideoFiles(list) {
+  const files = Array.from(list || []).filter(f => f && (VIDEO_EXT.includes(extOf(f.name)) || /^video\//i.test(f.type || "") || MEDIA_EXT.includes(extOf(f.name))));
+  if (!files.length) return;
+  let first = null;
+  setStatus("libStatus", "libVideoProbe");
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i], isVideo = await probeVideoFile(f);
+    if (files.length > 1) setStatus("libStatus", "libVideoProbeN", { i:i + 1, n:files.length, name:f.name });
+    const it = addedItem(f, isVideo), at = addedSongs.findIndex(x => x.key === it.key);
+    if (at >= 0) addedSongs.splice(at, 1);
+    addedSongs.unshift(it); first = first || it;
+    songDB.put(it.key, { key:it.key, file:f, name:f.name, addedAt:Date.now(), video:isVideo }).catch(() => {});
+    setStatus("libStatus", isVideo ? "libVideoYes" : "libVideoNo", { name:f.name });
+  }
+  while (addedSongs.length > ADDED_MAX) { const x = addedSongs.pop(); songDB.del(x.key).catch(() => {}); }
+  renderLib();
+  if (!first) return;
+  selectSong(first);
+  if (!first.video) return;
+  /* 映像の準備ができたら、そのまま全画面ビューアを開く（見たかった映画をすぐ見られるように） */
+  let waited = 0;
+  const openWhenReady = () => {
+    if (!window.TrkVideoMax || typeof window.TrkVideoMax.open !== "function") return;
+    if (typeof videoReady !== "undefined" && (videoReady || waited >= 8000)) {
+      try { if (window.TrkVideoMax.open()) setStatus("libStatus", "libVideoWatch"); } catch (_) {}
+      return;
+    }
+    waited += 300; setTimeout(openWhenReady, 300);
+  };
+  setTimeout(openWhenReady, 300);
+}
 function removeAdded(it) {
   addedSongs = addedSongs.filter(x => x.key !== it.key);
   songDB.del(it.key).catch(() => {});
@@ -1821,7 +2003,12 @@ async function shareMusicFolder() {
 }
 /* 🚫 共有をやめる：覚えた許可と、端末に残した曲をぜんぶ消します */
 async function stopSharing() {
+  /* 🛡 覚えてあるフォルダの鍵（📤 共有の "share" と 📁 開くの "dir"）を、両方とも IndexedDB から消す。
+     ページ内で動くコード（アドオン等）が、許可の生きているうちに再利用できないようにするため。
+     ⚠ handle.remove() は呼ばない：あれは「本物のファイル／フォルダを消す」API。
+       権限の取り消しはブラウザの設定（サイトデータ）側で行うもので、こちらからは触らない。 */
   try { await libKV.del("share"); } catch (_) {}
+  try { await libKV.del("dir"); } catch (_) {}
   shareRemembered = false;
   await clearSharedSongs();
   if (libShared) {
@@ -1943,17 +2130,10 @@ let libSearchTimer = 0;
 $("libSearch").addEventListener("input", () => { clearTimeout(libSearchTimer); libSearchTimer = setTimeout(renderLib, 150); });
 $("libSort").addEventListener("change", e => { settings.libSort = e.target.value; saveUserPrefs(); renderLib(); });
 $("libRandomBtn").addEventListener("click", () => {
-  /* 🎲 おまかせ：いまの一覧 ＋ 📌ピンの曲（ほかのタブにいても、必ず候補に入る） */
-  const pool = libView.slice();
-  const F = window.TrkFavs;
-  if (F) {
-    for (const key of F.state("song").pins) {
-      if (F.groupOf("song", key) === "former") continue;
-      const it = allSongs().find(x => x.key === key);
-      if (it && !pool.includes(it)) pool.push(it);
-    }
-  }
-  if (pool.length) selectSong(pool[Math.floor(Math.random() * pool.length)]);
+  /* 🎲 おまかせ：いまの一覧 ＋ 📌ピンの曲（ほかのタブにいても、必ず候補に入る）
+     ＝ 曲名バナーの🎲（長押し／タップ）と同じ抽選を使う */
+  const it = randomSongPick();
+  if (it) selectSong(it);
 });
 
 on("records", renderLib);
@@ -1966,19 +2146,22 @@ on("studyCoverChanged", key => {
     if (currentSong === song) return setBackground(blob || song.bgBlob || null);
   }).catch(() => {});
 });
-on("language", () => { $("libSearch").placeholder = tr("libSearch"); showReconnect(); syncShareUI(); renderLib(); renderBanner(); });
+on("language", () => { $("libSearch").placeholder = tr("libSearch"); showReconnect(); syncShareUI(); renderLib(); renderBanner(); syncVideoButton(); });
+/* 🎬 「動画を読み込む」の説明（通常より時間がかかります）をボタンに付ける */
+function syncVideoButton() { const label = $("libVideoLabel"); if (label) label.title = tr("libAddVideoHint"); }
 
 /* ---------- 起動時（main.js から呼びます） ---------- */
 async function initLibrary() {
   $("libSort").value = settings.libSort;
   $("previewEnabled").checked = settings.previewEnabled;
   $("libSearch").placeholder = tr("libSearch");
+  syncVideoButton();
   renderBanner(); renderSeedTools();
   try {
     const recs = await songDB.all();
     addedSongs = recs.filter(r => r && r.file)
       .sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0))
-      .map(r => addedItem(r.file instanceof File ? r.file : new File([r.file], r.name || "song")));
+      .map(r => addedItem(r.file instanceof File ? r.file : new File([r.file], r.name || "song"), r.video));
   } catch (_) {}
   await refreshPackSongs();
   if (canPickDir) {

@@ -81,16 +81,62 @@ window.TrkStudyUtils = (() => {
     return String(input || "").replace(/\r\n?/g, "\n").replace(/\f/g, "\n\n");
   }
 
+  /* 🛡 青空文庫ルビの切り分け。
+     ここは「後戻りしない1回の前向き走査（線形）」で書いてあります。
+     以前は正規表現（/｜([^《\n]+)《…/u）でしたが、細工した本文で後戻りが爆発し、
+     タブが固まることが実測で分かったためです（例：漢字だけが延々と続く本文、閉じない《 が大量にある本文）。
+     位置（次の改行・次の《・次の》と、その《に対する》）は前から後ろへ一度だけ探すので、合計は本文の長さに比例します。
+     ルビとして扱う条件は以前と同じ：
+       ・｜親文字《ルビ》 … 明示のルビ（親文字・ルビとも1文字以上・改行をまたがない）
+       ・親文字《ルビ》   … 漢字（+ 々〆ヵヶ）の並びの直後の《》だけをルビとみなす
+       ・閉じない《、空のルビ、改行をまたぐルビは、ルビにせずそのまま文字として残す */
+  const KANJI_LIKE = /[\u3400-\u9fff々〆ヵヶ]/;
   function aozoraSegments(input) {
     const source = normalizeText(input).replace(/［＃改ページ］/g, "\n\n");
-    const out = [], rubyPattern = /｜([^《\n]+)《([^》\n]+)》|([\u3400-\u9fff々〆ヵヶ]+)《([^》\n]+)》/gu;
-    let cursor = 0, match;
-    while ((match = rubyPattern.exec(source))) {
-      if (match.index > cursor) out.push({ text:source.slice(cursor, match.index) });
-      out.push({ ruby:match[1] || match[3], reading:match[2] || match[4] });
-      cursor = rubyPattern.lastIndex;
+    const out = [];
+    const len = source.length;
+    let cursor = 0, i = 0, runStart = -1;
+    let nl = source.indexOf("\n"), open = source.indexOf("《"), close = source.indexOf("》");
+    let openPos = -1, closeForOpen = -1;
+    const advance = () => {   /* それぞれの位置は前にしか進まない（合計 O(n)） */
+      if (nl >= 0 && nl < i) nl = source.indexOf("\n", i);
+      if (open >= 0 && open < i) open = source.indexOf("《", i);
+      if (close >= 0 && close < i) close = source.indexOf("》", i);
+    };
+    const sameLine = p => p >= 0 && (nl < 0 || p < nl);
+    /* 《 ごとに、そのあとの最初の 》 を一度だけ探して覚える（同じ《を何度も調べ直さない） */
+    const closeAfter = at => {
+      if (at !== openPos) { openPos = at; closeForOpen = source.indexOf("》", at + 1); }
+      return closeForOpen;
+    };
+    while (i < len) {
+      advance();
+      const c = source[i];
+      if (c === "\n") { runStart = -1; i++; continue; }
+      if (c === "｜") {
+        const at = open;   /* 同じ行で、いちばん近い《 */
+        if (sameLine(at) && at > i + 1) {
+          const end = closeAfter(at);
+          if (sameLine(end) && end > at + 1) {
+            if (i > cursor) out.push({ text:source.slice(cursor, i) });
+            out.push({ ruby:source.slice(i + 1, at), reading:source.slice(at + 1, end) });
+            cursor = i = end + 1; runStart = -1; continue;
+          }
+        }
+        runStart = -1; i++; continue;
+      }
+      if (c === "《" && runStart >= 0) {
+        const end = closeAfter(i);
+        if (sameLine(end) && end > i + 1) {
+          if (runStart > cursor) out.push({ text:source.slice(cursor, runStart) });
+          out.push({ ruby:source.slice(runStart, i), reading:source.slice(i + 1, end) });
+          cursor = i = end + 1; runStart = -1; continue;
+        }
+      }
+      runStart = KANJI_LIKE.test(c) ? (runStart < 0 ? i : runStart) : -1;
+      i++;
     }
-    if (cursor < source.length) out.push({ text:source.slice(cursor) });
+    if (cursor < len) out.push({ text:source.slice(cursor) });
     return out;
   }
 

@@ -235,6 +235,71 @@ if (!exists("js/fx-worklet.js") ||
   ok("pro-audio effects (gate / denoise / dynamic EQ) and rack are wired");
 }
 
+// 🔥 TRK amp: the independent category right below "🎛 More (EQ / skin / menu)"
+// at the bottom-left of the song column, driving the layered effect rack
+// through the small rack API that fx.js exposes (the DSP itself is untouched).
+{
+  const fx = read("js/fx.js");
+  const dock = read("js/fx-dock.js");
+  const core = read("js/core.js");
+  const css = read("css/style.css");
+  const ampKeys = ["ampTitle", "ampHint", "ampUse", "ampStateOn", "ampStateOff", "ampEmpty", "ampStacksLabel",
+    "ampStackTrk", "ampStackWarm", "ampStackRadio", "ampStackClean", "ampStackSet", "ampOnMsg", "ampOffMsg",
+    "ampCleared", "ampFull", "ampStageAdd", "ampClear", "ampMore", "ampAdjustHint"];
+  const apiOk = ['rack:() => ({ on:!!settings.fxRackOn, list:settings.fxRack.map(copy) })', "rackTypes:() => RACK_META.map",
+    "rackOn:v =>", "rackSet:list =>", "rackAdd:type =>", "rackClear:() =>", 'emit("fxRack")'].every(t => fx.includes(t)) &&
+    fx.includes("function cleanFx") && fx.includes("RACK_MAX = 8") &&
+    /* 検証の定数（R / BIQUAD …）は、settings.fxRack を cleanFx で読む行より前に無いと
+       保存済みの段がある人の読み込みで落ちる（参照エラー）ので、順番も見張る */
+    fx.indexOf("const R = (v, lo, hi, d)") >= 0 &&
+    fx.indexOf("const R = (v, lo, hi, d)") < fx.indexOf("settings.fxRack = (Array.isArray(prefs.fxRack)");
+  const resetOk = ["function resetAmpPrefs()", 'markAmpReset("clear")', 'markAmpReset("off")',
+    "function takeAmpReset()", '["amp","rack"].includes(r)'].every(t => core.includes(t)) &&
+    fx.includes("takeAmpReset()") && fx.includes("if (ampReset === \"clear\") settings.fxRack = []");
+  const uiOk = dock.includes('amp.id = "ampPanel"') && dock.includes("const AMP_STACKS") &&
+    ["trk", "warm", "radio", "clean"].every(id => dock.includes(id + ":")) && dock.includes("data-ampstack") &&
+    dock.includes('dock.append(dev, favChips, overLabel, overflow, body);') && dock.includes("const placeAmp = () =>") &&
+    dock.includes('on("fxRack", renderAmp)') && dock.includes("const AMP_MAX = 8") &&
+    dock.includes('settings.ampOpen = typeof prefs.ampOpen === "boolean" ? prefs.ampOpen : true') &&
+    core.includes("settings.ampOpen = true;") && core.includes("settings.tvRichOpen = false;") &&
+    fx.includes("settings.ampOpen = ampReset === \"clear\";") && dock.includes('data-i18n="sfxRackTitle"') &&
+    ["TrkFX.rackSet(", "TrkFX.rackOn(true)", "TrkFX.rackAdd(", "TrkFX.rackClear()"].every(t => dock.includes(t)) &&
+    css.includes("#ampPanel .ampStage") && css.includes("#ampPanel .ampStages");
+  const langOk = ampKeys.every(k => (dock.match(new RegExp("\\b" + k + ":", "g")) || []).length === 4);
+  if (!apiOk) fail("TRK amp rack API (fx.js) is missing: rack / rackTypes / rackOn / rackSet / rackAdd / rackClear (or the validators moved below the saved-rack load)");
+  else if (!resetOk) fail("TRK amp reset plumbing (?reset=amp / ?reset=all / ?safe=1) is missing");
+  else if (!uiOk) fail("TRK amp category (bottom-left, below 🎛 More) is not wired to the rack");
+  else if (!langOk) fail("TRK amp strings are missing from one of the four languages");
+  else ok("TRK amp: independent bottom-left category (below 🎛 More), open on arrival, with 4 stacks, stage chips and rack API in 4 languages");
+}
+
+// ✨ TRK effects: the independent bottom-left category right below 🔥 TRK amp,
+// surfacing the "rich" video grades (portrait / anime / texture / studio) that
+// tv-presets.js added. It only drives settings.videoStyle through TrkTV, so the
+// TV's own video-filter list and this panel can never drift apart.
+{
+  const rich = read("js/tv-rich.js");
+  const html = read("index.html");
+  const css = read("css/style.css");
+  const core = read("js/core.js");
+  const keys = ["richTitle", "richHint", "richUse", "richOn", "richOff", "richSafe", "richPrevLabel",
+    "richNextLabel", "richRandom", "richReset", "richRandomed", "richRestored", "richMore", "richNote", "richNoPreset"];
+  const apiOk = rich.includes('panel.id = "richPanel"') && rich.includes('el("details", "panel dockRich")') &&
+    rich.includes('const RICH_CATS = ["portrait", "anime", "texture", "quality"]') &&
+    rich.includes("window.TrkTV") && rich.includes("TrkTV.list()") && rich.includes("TrkTV.select(") &&
+    rich.includes("TrkTV.current()") && rich.includes('on("tvChange"') && rich.includes("const placeRich = () =>") &&
+    rich.includes("settings.tvRichId") && rich.includes("settings.tvRichPrev") && rich.includes('typeof settings[key] === "string"') &&
+    rich.includes("prefs.tvRichOpen !== false") && core.includes("settings.tvRichOpen = true;");
+  const wireOk = html.includes('<script src="js/tv-rich.js"></script>') && css.includes("#richPanel .richChips") &&
+    css.includes("#richPanel .richCats") && core.includes('settings.tvRichId = "portrait_natural"') &&
+    core.includes("out.tvRichId = settings.tvRichId");
+  const langOk = keys.every(k => (rich.match(new RegExp("\\b" + k + ":", "g")) || []).length === 4);
+  if (!apiOk) fail("TRK effects (rich video) panel is not wired to the video filter (TrkTV / videoStyle)");
+  else if (!wireOk) fail("TRK effects (rich video) is missing the script tag, styles, or the video reset/export keys");
+  else if (!langOk) fail("TRK effects (rich video) strings are missing from one of the four languages");
+  else ok("TRK effects: rich video grades as an independent bottom-left category (below 🔥 TRK amp), open on arrival, in 4 languages");
+}
+
 // 🛒 Official-source catalog: no-audio curated playlists with wishlist matching.
 if (!exists("js/catalog.js") ||
     !read("js/catalog.js").includes("TRK_CATALOG") ||
@@ -276,6 +341,38 @@ if (!read("js/library.js").includes("plAuthorMenu") ||
   } else {
     ok("song-banner tap-pause, short-tap slider, and four-language long-press mute/restore are wired");
   }
+}
+
+// ◀🎲▶ Song banner: the song controls ([◀][🎲][▶]) sit together at the right edge
+// so the left ◀ no longer covers the song title. 🎲 is long-press by default
+// (mis-tap safety) with an on/off switch and a tap-only option for people who
+// like random, and a short tap only shows a hint.
+{
+  const library = read("js/library.js");
+  const html = read("index.html");
+  const css = read("css/style.css");
+  const core = read("js/core.js");
+  const i18n = read("js/i18n.js");
+  const layoutOk = library.includes('const bannerSongBar = el("div", "bannerSongBar")') &&
+    library.includes("bannerSongBar.append(bannerPrevBtn, bannerRandomBtn, bannerNextBtn)") &&
+    !library.includes("bannerPrevBtn.style.left") &&
+    css.includes(".bannerSongBar{position:absolute;top:50%;right:10px") &&
+    css.includes(".banner.hasSongBtns .bannerText{padding-right:") &&
+    library.includes('classList.toggle("hasSongBtns", on)');
+  const randomOk = library.includes("function randomSongPick()") &&
+    library.includes("function bannerSongRandom()") && library.includes("bannerRandomTapMode") &&
+    library.includes("bannerRandLongPressed") && library.includes("}, 650);") &&
+    library.includes('plToast(tr("bannerRandomHold"))') &&
+    core.includes("bannerRandomBtn: prefs.bannerRandomBtn !== false") &&
+    core.includes("bannerRandomTap: prefs.bannerRandomTap === true") &&
+    core.includes("settings.bannerRandomBtn = true; settings.bannerRandomTap = false;");
+  const uiOk = html.includes('id="bannerRandomBtn"') && html.includes('id="bannerRandomTap"') &&
+    ["bannerRandomBtn", "bannerRandomTap", "bannerRandomHoldTip", "bannerRandomTapTip", "bannerRandomHold"]
+      .every(key => (i18n.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4);
+  if (!layoutOk) fail("banner song controls should sit together at the right edge so they do not cover the song title");
+  else if (!randomOk) fail("banner random button (default long press / tap-only option / on-off) is incomplete");
+  else if (!uiOk) fail("banner random button UI (checkboxes + four-language strings) is incomplete");
+  else ok("banner ◀🎲▶ controls sit at the right edge; 🎲 is long-press by default with on/off and tap-only options");
 }
 
 // 🩷 MMD: defaults, grouped 60-motion chooser, facial morphs and original procedural VMD.
@@ -505,6 +602,107 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else if (!uiOk) fail("frame interpolation must be wired into the media player above the A-B loop box");
   else if (!langOk) fail("frame interpolation strings are missing from one of the four languages");
   else ok("frame interpolation is opt-in, WebGL2-only, offline, above the A-B loop box, in four languages");
+}
+
+// 🪶 Lite mode for phones / tablets / apps (js/lite.js): the settings panel in
+// the bottom-right of ⚙ settings, the auto probe, and the draw-only gates. The
+// important contract is that judging and the clock stay OUTSIDE the gate.
+{
+  const lite = read("js/lite.js");
+  const html = read("index.html");
+  const core = read("js/core.js");
+  const css = read("css/style.css");
+  const i18n = read("js/i18n.js");
+  const render = read("js/render.js");
+  const spectrum = read("js/spectrum.js");
+  const mmd = read("js/mmd.js");
+  const vrm = read("js/vrm.js");
+  const media = read("js/media-player-mode.js");
+  const tv = read("js/tv-dock.js");
+  const ids = ["litePanel", "liteMode", "liteFps", "liteMascot", "liteScale", "liteSpecOff", "liteFx", "liteBlur", "liteState", "liteDevice", "liteRecheckBtn", "litePreset", "liteGameFull"];
+  const settingsKeys = ["liteMode", "liteFps", "liteMascot", "liteScale", "liteSpectrumOff", "liteFx", "liteBlur", "liteGameFull"];
+  const wiringOk = ["window.TrkLite = Object.freeze({", "function liteActive()", "function liteProbe()", "liteBatteryProbe",
+    "navigator.connection", "deviceMemory", "liteGate(", "function litePixelRatio(", "liteBlurCap", "liteSpecBlocked",
+    "liteMascotAllow", "classList.toggle(\"trkLite\"", "classList.toggle(\"trkLiteFx\"", "classList.toggle(\"trkNoMascot\""]
+    .every(token => lite.includes(token));
+  /* 🎯 プリセット（ゲーム優先＝ノーツ・反応はそのまま、他だけ軽くする） */
+  const presetOk = lite.includes("const LITE_PRESETS = [") && ["balanced", "game", "max", "off"].every(id => lite.includes(`id:"${id}"`)) &&
+    lite.includes("function litePresetId()") && lite.includes("function liteApplyPreset(id)") && lite.includes("allowGame: liteAllowGame") &&
+    lite.includes("function liteAllowGame(now)") && lite.includes("settings.liteGameFull === true") &&
+    html.includes('<option value="game" data-i18n="litePresetGame">') && html.includes('id="liteGameFull"') &&
+    core.includes("liteGameFull: prefs.liteGameFull === true");
+  const uiOk = ids.every(id => html.includes(`id="${id}"`) && (id === "litePanel" || lite.includes(`"${id}"`))) &&
+    html.includes('<script src="js/lite.js"></script>') &&
+    html.indexOf('<script src="js/lite.js"></script>') > html.indexOf('<script src="js/core.js"></script>') &&
+    settingsKeys.every(key => core.includes(`lite${key.slice(4)}: `) || core.includes(`${key}: `)) &&
+    core.includes("function resetLitePrefs()") && core.includes('["lite","light"].includes(r)') &&
+    core.includes('["lite","light"].includes(k)') && core.includes("resetLitePrefs();") &&
+    core.includes("TrkLite.blurCap") && tv.includes("TrkLite.blurCap") &&
+    css.includes("body.trkLiteFx") && css.includes("body.trkNoMascot #mmdCanvas") && css.includes("#litePanel.liteOn");
+  /* 判定・時計（tickClock／sweepMisses）は 🪶 ゲートより前にあること */
+  const gateAt = render.indexOf("TrkLite.allowGame(");
+  const gateOk = gateAt > 0 && gateAt > render.indexOf("tickClock();") && gateAt > render.indexOf("sweepMisses(now)") &&
+    gateAt > render.indexOf("truckJudge(now)") &&
+    spectrum.includes('TrkLite.allow("spec"') && spectrum.includes("const specLive = () => settings.specOn && !isSafe() && !liteOff();") &&
+    mmd.includes('TrkLite.mascotAllow("mmd"') && mmd.includes('TrkLite.noMascot("mmd")') &&
+    vrm.includes('TrkLite.mascotAllow("vrm"') && vrm.includes('TrkLite.noMascot("vrm")') &&
+    media.includes('TrkLite.allow("media"') && tv.includes('TrkLite.allow("tv"') && tv.includes('TrkLite.allow("tvCheck"') &&
+    read("js/video-max.js").includes("TrkLite.pixelRatio(2)") && read("js/synth-mode.js").includes("TrkLite.pixelRatio(2)");
+  const langKeys = ["secLite", "liteHint", "liteNote", "liteMode", "liteModeAuto", "liteModeOn", "liteModeOff", "liteFps",
+    "liteFps60", "liteFps30", "liteFps20", "liteMascot", "liteMascot60", "liteMascot30", "liteMascot15", "liteMascotOff",
+    "liteMascotOffNote", "liteScale", "liteScaleDevice", "liteScale15", "liteScale10", "liteSpecOff", "liteFx", "liteBlur",
+    "liteStateOn", "liteStateOff", "liteDevice", "liteCores", "liteMem", "liteApp", "liteBrowser", "liteBattery",
+    "liteWhyManual", "liteWhyOff", "liteWhySaveData", "liteWhyBattery", "liteWhyMotion", "liteWhyLow", "liteWhyAutoOff",
+    "liteWhyDesktop", "liteRecheck", "liteNowOn", "liteNowOff", "liteFpsSet", "liteMascotSet", "liteToast", "specLiteOff",
+    "litePreset", "litePresetBalanced", "litePresetGame", "litePresetMax", "litePresetOff", "litePresetCustom", "litePresetSet",
+    "liteGameFull", "liteGameFullNote", "liteGameFullOn", "liteGameFullOff"];
+  const langOk = langKeys.every(key => (i18n.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4);
+  if (!wiringOk) fail("lite mode module (js/lite.js) is missing its probe / gates / body classes");
+  else if (!uiOk) fail("lite-mode settings panel, script order, defaults or reset path is incomplete");
+  else if (!presetOk) fail("lite-mode presets (balanced / game-first / maximum saving / off) are incomplete");
+  else if (!gateOk) fail("lite-mode draw gates are missing (or the game clock/judging slipped behind the gate)");
+  else if (!langOk) fail("lite-mode strings are missing from one of the four languages");
+  else ok("lite mode (phones/apps): auto probe, presets incl. game-first, draw-only gates in 4 languages");
+}
+
+// 🎮 Gamepads, controllers and TV remotes (js/pad.js): the ⚙ → ⌨ Controls
+// sub-panel, button/axis bindings, menu focus and the keyboard-side extras
+// (media keys / remote "back" keys) that make a remote usable.
+{
+  const pad = read("js/pad.js");
+  const html = read("index.html");
+  const core = read("js/core.js");
+  const main = read("js/main.js");
+  const media = read("js/media-player-mode.js");
+  const i18n = read("js/i18n.js");
+  const actions = ["left", "right", "confirm", "back", "pause"];
+  const wiringOk = ["window.TrkPad = Object.freeze({", "function updatePadUI()", "getGamepads", "function padRawEdges(",
+    "function padAssign(", "function padMoveFocus(", "function padActivate()", "function padTap(", "function padPressed(",
+    "requestAnimationFrame(padTick)", "window._trkStudyRoomOpen", "catchState", "stageInput", "handleInput("]
+    .every(token => pad.includes(token)) &&
+    ["function keyCodeOf(e)", "const validPadBind =", "const PAD_DEFAULTS =", "function formatPadBind(",
+     "function resetKeysPrefs()", "if (typeof updatePadUI === \"function\") updatePadUI();"]
+    .every(token => core.includes(token));
+  const uiOk = ["padPanel", "padEnabled", "padMenuNav", "padStatus", "padPresets"].every(id => html.includes(`id="${id}"`)) &&
+    actions.every(a => html.includes(`data-padbind="${a}"`) && html.includes(`data-padvalue="${a}"`)) &&
+    ["ab", "dpad", "stick"].every(p => html.includes(`data-padpreset="${p}"`)) &&
+    ["standard", "taiko", "arcade", "remote"].every(p => html.includes(`data-keypreset="${p}"`)) &&
+    html.includes('<script src="js/pad.js"></script>') &&
+    html.indexOf('<script src="js/pad.js"></script>') > html.indexOf('<script src="js/main.js"></script>') &&
+    core.includes("padEnabled: prefs.padEnabled !== false") && core.includes('arcade:  { label:"keyPresetArcade"') &&
+    core.includes('remote:  { label:"keyPresetRemote"') && core.includes("resetKeysPrefs();") &&
+    core.includes('["keys","key","pad","controller","input"].includes(r)') && core.includes('["keys","key","pad","controller","input"].includes(k)') &&
+    main.includes("const code = keyCodeOf(e);") && main.includes("captureKey(code)") && main.includes("captureMenuKey(code)") &&
+    main.includes('code === "BrowserBack"') && media.includes("captureMediaExitKey(code)") && media.includes("keyCodeOf(e)");
+  const langKeys = ["keyPresetArcade", "keyPresetRemote", "padPanelTitle", "padHint", "padEnable", "padEnableOn", "padEnableOff",
+    "padMenuNav", "padMenuNavHint", "padMenuNavOn", "padMenuNavOff", "padPresetAB", "padPresetDpad", "padPresetStick", "padPresetSet",
+    "padActLeft", "padActRight", "padActConfirm", "padActBack", "padActPause", "padConnected", "padNone", "padCapture",
+    "padBindSet", "padConnectedToast", "padGoneToast", "padRemoteHint", "padBtn", "padAxis"];
+  const langOk = langKeys.every(key => (i18n.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4);
+  if (!wiringOk) fail("gamepad module (js/pad.js) is missing its probe, bindings or play/menu helpers");
+  else if (!uiOk) fail("gamepad / TV-remote settings panel, presets, script order or reset path is incomplete");
+  else if (!langOk) fail("gamepad / TV-remote strings are missing from one of the four languages");
+  else ok("gamepads and TV remotes: button+axis key config, menu focus, media keys, four languages");
 }
 
 // A cache name is deliberately checked for existence, not for a guessed

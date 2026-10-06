@@ -58,7 +58,7 @@ Object.assign(TEXT.ja, {
   sfxConfirmDelete:"このマイプリセットを消しますか？", sfxQuick:"🎛 エフェクト", sfxOff:"オフ",
   sfxRackTitle:"🎚 エフェクターラック（段で重ねる）", sfxRackOn:"ラックを使う（プリセットのあとに重なります）",
   sfxRackHint:"ポータブルアンプを多段に積むように、エフェクターを段にして重ねられます（最大8段）。プリセットと「かんたんEQ」の間に入ります。書き出し・マイプリセット保存にも段ごと入ります。",
-  sfxRackAdd:"＋ 段を追加", sfxRackSave:"💾 今の音をマイプリセットに保存", sfxRackFull:"ラックは8段までです。",
+  sfxRackAdd:"＋ 段を追加", sfxRackPick:"追加するエフェクト", sfxRackSave:"💾 今の音をマイプリセットに保存", sfxRackFull:"ラックは8段までです。",
   sfxRackEmpty:"まだ段がありません。下の＋で追加できます。", sfxRackPresetName:"マイラック{n}",
   sfxRackUp:"ひとつ上へ", sfxRackDown:"ひとつ下へ", sfxRackRemove:"この段を外す",
   sfxTypeGate:"🚪 ノイズゲート", sfxTypeDenoise:"🧹 ノイズ消し", sfxTypeDynEQ:"🎚 ダイナミックEQ", sfxTypeExciter:"✨ エキサイター",
@@ -100,7 +100,7 @@ Object.assign(TEXT.en, {
   sfxConfirmDelete:"Delete this preset?", sfxQuick:"🎛 Sound", sfxOff:"Off",
   sfxRackTitle:"🎚 Effect rack (stack your own)", sfxRackOn:"Use rack (stacks after the preset)",
   sfxRackHint:"Like stacking portable amps, chain effects as stages (up to 8). They sit between the preset and the Quick EQ, and are included in exports and saved presets.",
-  sfxRackAdd:"＋ Add stage", sfxRackSave:"💾 Save current sound as my preset", sfxRackFull:"The rack holds up to 8 stages.",
+  sfxRackAdd:"＋ Add stage", sfxRackPick:"Effect to add", sfxRackSave:"💾 Save current sound as my preset", sfxRackFull:"The rack holds up to 8 stages.",
   sfxRackEmpty:"No stages yet — add one below.", sfxRackPresetName:"My rack {n}",
   sfxRackUp:"Move up", sfxRackDown:"Move down", sfxRackRemove:"Remove this stage",
   sfxTypeGate:"🚪 Noise gate", sfxTypeDenoise:"🧹 Noise reduction", sfxTypeDynEQ:"🎚 Dynamic EQ", sfxTypeExciter:"✨ Exciter",
@@ -142,7 +142,7 @@ Object.assign(TEXT.zh, {
   sfxConfirmDelete:"要删除此预设吗？", sfxQuick:"🎛 音效", sfxOff:"关闭",
   sfxRackTitle:"🎚 效果器机架（分段叠加）", sfxRackOn:"使用机架（叠加在预设之后）",
   sfxRackHint:"像多段便携功放一样，把效果器当作一段段叠起来（最多8段）。位于预设和简易均衡器之间，导出与保存预设时也会一并记录。",
-  sfxRackAdd:"＋ 添加一段", sfxRackSave:"💾 把当前声音保存为我的预设", sfxRackFull:"机架最多8段。",
+  sfxRackAdd:"＋ 添加一段", sfxRackPick:"要添加的效果", sfxRackSave:"💾 把当前声音保存为我的预设", sfxRackFull:"机架最多8段。",
   sfxRackEmpty:"还没有段。在下面添加。", sfxRackPresetName:"我的机架{n}",
   sfxRackUp:"上移", sfxRackDown:"下移", sfxRackRemove:"移除这段",
   sfxTypeGate:"🚪 噪声门", sfxTypeDenoise:"🧹 降噪", sfxTypeDynEQ:"🎚 动态EQ", sfxTypeExciter:"✨ 激励器",
@@ -184,7 +184,7 @@ Object.assign(TEXT.ko, {
   sfxConfirmDelete:"이 프리셋을 삭제할까요?", sfxQuick:"🎛 사운드", sfxOff:"끄기",
   sfxRackTitle:"🎚 이펙터 랙 (단으로 쌓기)", sfxRackOn:"랙 사용 (프리셋 뒤에 겹쳐짐)",
   sfxRackHint:"휴대용 앰프를 여러 단 쌓듯이, 이펙터를 단으로 쌓을 수 있어요 (최대 8단). 프리셋과 간단 EQ 사이에 들어가고, 내보내기・프리셋 저장에도 포함돼요.",
-  sfxRackAdd:"＋ 단 추가", sfxRackSave:"💾 지금 소리를 내 프리셋으로 저장", sfxRackFull:"랙은 최대 8단이에요.",
+  sfxRackAdd:"＋ 단 추가", sfxRackPick:"추가할 효과", sfxRackSave:"💾 지금 소리를 내 프리셋으로 저장", sfxRackFull:"랙은 최대 8단이에요.",
   sfxRackEmpty:"아직 단이 없어요. 아래에서 추가하세요.", sfxRackPresetName:"내 랙 {n}",
   sfxRackUp:"위로", sfxRackDown:"아래로", sfxRackRemove:"이 단 빼기",
   sfxTypeGate:"🚪 노이즈 게이트", sfxTypeDenoise:"🧹 노이즈 제거", sfxTypeDynEQ:"🎚 다이내믹 EQ", sfxTypeExciter:"✨ 엑사이터",
@@ -203,6 +203,14 @@ const FX_STORE = "trk_fx_presets_v1", FX_MAX = 30, TEMP_ID = "__chart", RECENT_M
 const GAME_DEF = { miss:true, combo:true, pinch:false, blast:true, pan:false };
 const EQ_BANDS = [["lowshelf", 60, "60Hz"], ["peaking", 250, "250Hz"], ["peaking", 1000, "1kHz"], ["peaking", 4000, "4kHz"], ["highshelf", 12000, "12kHz"]];
 const idList = (v, max) => Array.isArray(v) ? [...new Set(v.filter(x => typeof x === "string" && /^[a-z0-9_]{1,40}$/.test(x)))].slice(0, max) : [];
+/* 🎚 ラック（settings.fxRack）はこの下ですぐ cleanFx で検証するので、
+   検証で使う定数・短縮形は先に用意しておく（あとに置くと読み込み時に参照エラーになる）。 */
+const R = (v, lo, hi, d) => num(Number(v), lo, hi, d);
+const str = (v, n) => typeof v === "string" ? v.trim().slice(0, n) : "";
+const HTTPS = /^https:\/\/[^\s"'<>]+$/;
+const BIQUAD = ["lowshelf", "highshelf", "peaking", "lowpass", "highpass", "bandpass", "notch"];
+const SWEEP_F = ["lowpass", "highpass", "bandpass"];
+const NOISES = ["pink", "vinyl", "tape", "rain", "wind", "fire", "crowd"];
 settings.fxOn = !!prefs.fxOn;
 settings.fxPreset = typeof prefs.fxPreset === "string" ? prefs.fxPreset.slice(0, 40) : "flat";
 if (settings.fxPreset === TEMP_ID) settings.fxPreset = "flat";   // 一時プリセットは保存しないので、起動時はフラットに戻す
@@ -217,16 +225,22 @@ settings.fxFav = idList(prefs.fxFav, FAV_MAX);
 settings.fxRecent = idList(prefs.fxRecent, RECENT_MAX);
 settings.fxRackOn = !!prefs.fxRackOn;
 settings.fxRack = (Array.isArray(prefs.fxRack) ? prefs.fxRack : []).map(cleanFx).filter(Boolean).slice(0, RACK_MAX);   /* 🎚 段の並び */
+/* 🔥 TRKアンプ：core.js のリセット／セーフモード（core.js は先に読み込まれる）を受け取る。
+   "clear"＝空にする（?reset=amp・?reset=all）／"off"＝段は残して止める（?safe=1） */
+{
+  const ampReset = typeof takeAmpReset === "function" ? takeAmpReset() : "";
+  if (ampReset) {
+    if (ampReset === "clear") settings.fxRack = [];
+    settings.fxRackOn = false;
+    settings.ampOpen = ampReset === "clear";   /* リセットは初期状態（開く）へ。セーフモードは閉じたまま */
+    try { saveUserPrefs(); } catch (_) {}
+  }
+}
 settings.fxGame = {};
 for (const k of Object.keys(GAME_DEF)) settings.fxGame[k] = prefs.fxGame && typeof prefs.fxGame[k] === "boolean" ? prefs.fxGame[k] : GAME_DEF[k];
 
-/* ============ ③ エフェクトの検証（決められた種類と範囲だけ） ============ */
-const R = (v, lo, hi, d) => num(Number(v), lo, hi, d);
-const str = (v, n) => typeof v === "string" ? v.trim().slice(0, n) : "";
-const HTTPS = /^https:\/\/[^\s"'<>]+$/;
-const BIQUAD = ["lowshelf", "highshelf", "peaking", "lowpass", "highpass", "bandpass", "notch"];
-const SWEEP_F = ["lowpass", "highpass", "bandpass"];
-const NOISES = ["pink", "vinyl", "tape", "rain", "wind", "fire", "crowd"];
+/* ============ ③ エフェクトの検証（決められた種類と範囲だけ）
+   R / str / BIQUAD / SWEEP_F / NOISES は ② の先頭に置いてある（settings.fxRack の検証で先に要るため） ============ */
 function cleanFx(f) {
   if (!f || typeof f !== "object") return null;
   switch (f.type) {
@@ -772,6 +786,7 @@ function refresh() {
   if (!settings.fxOn) bypass = false;
   if (G.src) { rebuild(); applyOut(); }
   saveUserPrefs(); syncUI();
+  emit("fxRack");            /* 🔥 TRKアンプ（js/fx-dock.js）の段表示を同期 */
 }
 function setOn(v) { settings.fxOn = !!v; refresh(); }
 function pushRecent(id) {
@@ -906,9 +921,15 @@ function check(label, onChange) {
   inp.addEventListener("change", () => onChange(inp.checked));
   return { lab, inp };
 }
+let fxRangeSeq = 0;
 function range(labelNode, min, max, step, onInput) {
   const row = el("div", "inline"), inp = document.createElement("input"), val = el("span", "mono");
   inp.type = "range"; inp.min = min; inp.max = max; inp.step = step;
+  /* 読み上げ名：隣に出している見出しをそのまま名前にする（見た目は変えずに、名前だけ結びつける） */
+  if (labelNode && labelNode.nodeType === 1) {
+    if (!labelNode.id) labelNode.id = "fxRangeLab" + (++fxRangeSeq);
+    inp.setAttribute("aria-labelledby", labelNode.id);
+  }
   inp.addEventListener("input", () => onInput(Number(inp.value)));
   row.append(labelNode, inp, val);
   return { row, inp, val };
@@ -934,6 +955,7 @@ add(tx("h3", "sfxRackTitle"));
 const rackCk = check("sfxRackOn", v => { settings.fxRackOn = v; if (v && !settings.fxOn) setOn(true); else refresh(); });
 const rackBox = el("div", "fxRack");
 const rackSel = document.createElement("select"); rackSel.className = "fxQuickSelect";
+rackSel.setAttribute("aria-label", tr("sfxRackPick"));   // 読み上げ名（隣の「＋ 段を追加」ボタンと対）
 const rackAdd = tx("button", "sfxRackAdd"); rackAdd.type = "button"; rackAdd.style.cssText = "padding:8px 12px;font-size:14px";
 rackAdd.addEventListener("click", () => {
   if (settings.fxRack.length >= RACK_MAX) { setStatus("sfxStatus", "sfxRackFull"); return; }
@@ -957,7 +979,7 @@ const rackFmt = (v, unit) => unit === "Hz" ? (v >= 1000 ? (v / 1000).toFixed(1) 
 function renderRack() {
   rackBox.textContent = "";
   rackSel.textContent = "";
-  for (const m of RACK_META) rackSel.append(new Option(m.icon + " " + tr(m.key), m.type));
+  for (const m of RACK_META) rackSel.append(new Option(tr(m.key), m.type));   /* 名前（sfxType…）に絵文字が入っているので二重にしない */
   learnBtn.hidden = learnStat.hidden = !settings.fxRack.some(f => f.type === "denoise");
   if (!learnBtn.hidden) learnStat.textContent = G.denoiseLearned ? tr("sfxLearned") : tr("sfxDenoiseHint");
   if (G.wk === false && settings.fxRack.some(f => f.type === "gate" || f.type === "denoise" || f.type === "dynEQ"))
@@ -1040,7 +1062,7 @@ delBtn.addEventListener("click", () => {
 acts.append(expBtn, impLab, delBtn);
 const editor = el("details", "subPanel"), area = document.createElement("textarea"), apply = tx("button", "sfxApply");
 editor.append(tx("summary", "sfxEditor"), area, apply);
-area.spellcheck = false; area.className = "fxEditor";
+area.spellcheck = false; area.className = "fxEditor"; area.setAttribute("aria-label", tr("sfxEditor"));
 apply.type = "button"; apply.style.marginTop = "8px";
 editor.addEventListener("toggle", () => { if (editor.open) area.value = JSON.stringify(exportForFile(), null, 2); });
 apply.addEventListener("click", () => {
@@ -1119,7 +1141,7 @@ function renderDesc(p) {
   const d = presetDesc(p);
   desc.append(pText(p.label) + (d ? " — " + d : ""));
   if (p.url) {
-    const a = el("a", "", p.url); a.href = p.url; a.target = "_blank"; a.rel = "noopener noreferrer";
+    const a = safeLink("", p.url);   /* 🛡 https 以外はリンクにしない（共有プリセット対策） */
     a.style.cssText = "margin-left:8px;color:var(--ui-accent);word-break:break-all";
     desc.append(a);
   }
@@ -1160,7 +1182,14 @@ on("language", syncUI);
    TrkFX.delayMs()     → 今の自動補正（ms）
    TrkFX.tap(fftSize)  → エフェクト後の音を見る AnalyserNode（使えなければ null）。使い終わったら disconnect()
    TrkFX.tapElement(el)   → アドオンなど、ほかの <audio>/<video> を同じエフェクターに通す（MediaElementSource。同じ要素は一度だけ）
-   TrkFX.untapElement(el) → その通り道を外す（true / false） */
+   TrkFX.untapElement(el) → その通り道を外す（true / false）
+   🎚 ラック（🔥 TRKアンプ／js/fx-dock.js から段を積む。DSP とつまみは今までどおり）
+   TrkFX.rack()        → { on, list:[…段…] }（コピー。書き換えても本体は変わらない）
+   TrkFX.rackTypes()   → [{ type, icon, name }]（積める段の種類）
+   TrkFX.rackOn(v)     → ラックのオン／オフ（オンにするときはエフェクトも入れる）
+   TrkFX.rackSet(list) → 段を丸ごと入れ替える（cleanFx で検証・最大 RACK_MAX 段）
+   TrkFX.rackAdd(type) → 段を1つ足す（いっぱいなら -1）
+   TrkFX.rackClear()   → 段を全部外す */
 window.TrkFX = Object.freeze({
   version:3,
   list:() => CATS.flatMap(c => presetsOf(c).map(p => ({ id:p.id, cat:p.cat, name:presetName(p) }))),
@@ -1173,6 +1202,18 @@ window.TrkFX = Object.freeze({
   off:() => setOn(false),
   clean:json => copy(cleanPreset(json)),
   delayMs:() => fxDelayMs(),
+  rack:() => ({ on:!!settings.fxRackOn, list:settings.fxRack.map(copy) }),
+  rackTypes:() => RACK_META.map(m => ({ type:m.type, icon:m.icon, name:tr(m.key) })),
+  rackOn:v => { settings.fxRackOn = !!v; if (settings.fxRackOn && !settings.fxOn) setOn(true); else refresh(); return settings.fxRackOn; },
+  rackSet:list => {
+    settings.fxRack = (Array.isArray(list) ? list : []).map(cleanFx).filter(Boolean).slice(0, RACK_MAX);
+    refresh(); return settings.fxRack.length;
+  },
+  rackAdd:type => {
+    const d = FX_DEFAULTS[type]; if (!d || settings.fxRack.length >= RACK_MAX) return -1;
+    settings.fxRack.push(cleanFx({ ...d })); refresh(); return settings.fxRack.length;
+  },
+  rackClear:() => { settings.fxRack = []; refresh(); return 0; },
   tap,
   tapElement,
   untapElement

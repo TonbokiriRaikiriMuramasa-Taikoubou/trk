@@ -144,11 +144,32 @@ async function readZip(blob) {
   }
   return files;
 }
-async function inflateEntry(e) {
-  if (e.method === 0) return new Blob([e.data]);
+async function inflateEntry(e, limit = 0, label = "") {
+  if (e.method === 0) {
+    if (limit > 0 && e.data.byteLength > limit) throw new PackError("packFileTooBig", { f:label });
+    return new Blob([e.data]);
+  }
   if (e.method !== 8) throw new PackError("packBadZip");
   if (typeof DecompressionStream === "undefined") throw new PackError("packUnsupported");
-  return new Response(new Blob([e.data]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).blob();
+  const stream = new Blob([e.data]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+  if (!(limit > 0)) return new Response(stream).blob();
+  /* 🛡 圧縮爆弾よけ：ZIPの「展開後の大きさ（usize）」は作り手が自由に書けるので信用しない。
+     展開しながら数えて、上限を超えた時点でその場で止める（展開しきってから測ると、測る前にメモリを食われる）。 */
+  const reader = stream.getReader(), chunks = [];
+  let size = 0;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > limit) throw new PackError("packFileTooBig", { f:label });
+      chunks.push(value);
+    }
+  } catch (err) {
+    try { await reader.cancel(); } catch (_) {}
+    throw err;
+  }
+  return new Blob(chunks);
 }
 const CRC_TABLE = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
 function crc32(u8) { let c = 0xffffffff; for (let i = 0; i < u8.length; i++) c = CRC_TABLE[(c ^ u8[i]) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; }
@@ -310,7 +331,7 @@ async function installPackFile(file) {
     if (!mf) throw new PackError("packNoManifest");
     const root = mf.slice(0, mf.length - "pack.json".length);
     let raw = null;
-    try { raw = JSON.parse(await (await inflateEntry(entries[mf])).text()); } catch (e) { if (e instanceof PackError) throw e; }
+    try { raw = JSON.parse(await (await inflateEntry(entries[mf], PACK_MB, mf)).text()); } catch (e) { if (e instanceof PackError) throw e; }
     const man = sanitizeManifest(raw);
     if (!man) throw new PackError("packBadManifest");
     const files = {}; let total = 0;
@@ -319,7 +340,7 @@ async function installPackFile(file) {
       const ent = entries[root + path], lim = PACK_LIMIT[kind] * PACK_MB;
       if (!ent) throw new PackError("packMissingFile", { f:path });
       if (ent.usize > lim) throw new PackError("packFileTooBig", { f:path });
-      const blob = await inflateEntry(ent);
+      const blob = await inflateEntry(ent, lim, path);   /* 🛡 展開中に上限で止める */
       if (blob.size > lim) throw new PackError("packFileTooBig", { f:path });
       total += blob.size; if (total > PACK_MAX) throw new PackError("packTooBig");
       files[path] = new Blob([blob], { type:MIME[extOf(path)] || "" });
@@ -625,7 +646,7 @@ function appendPackCreditCard(parent, card, packName = "") {
   const rights = creditCardText(card.rights); if (rights) body.append(el("p", "packCreditRights", "⚖ " + rights));
   if (card.license) body.append(el("p", "packCreditLicense", "▣ " + card.license));
   if (card.handle) body.append(el("p", "packCreditHandle", (card.handle.startsWith("@") ? card.handle : "@" + card.handle)));
-  if (card.url) { const a = el("a", "packCreditUrl", card.url); a.href = card.url; a.target = "_blank"; a.rel = "noopener noreferrer"; body.append(a); }
+  if (card.url) body.append(safeLink("packCreditUrl", card.url));   /* 🛡 https 以外はリンクにしない */
   body.append(el("p", "packCreditDisclaimer", tr("packCreditDisclaimer")));
   const contributors = card.contributors || [];
   if (contributors.length) {
@@ -639,7 +660,7 @@ function appendPackCreditCard(parent, card, packName = "") {
       const personRights = creditCardText(person.rights); if (personRights) item.append(el("div", "packContributorRights", "⚖ " + personRights));
       if (person.license) item.append(el("div", "packContributorLicense", "▣ " + person.license));
       if (person.handle) item.append(el("div", "packContributorHandle", person.handle.startsWith("@") ? person.handle : "@" + person.handle));
-      if (person.url) { const a = el("a", "packContributorUrl", person.url); a.href = person.url; a.target = "_blank"; a.rel = "noopener noreferrer"; item.append(a); }
+      if (person.url) item.append(safeLink("packContributorUrl", person.url));   /* 🛡 https 以外はリンクにしない */
       list.append(item);
     }
     body.append(list);
@@ -673,7 +694,7 @@ async function renderPackList() {
     if (m.license || m.url) {
       const d = el("details"); d.append(el("summary", "", tr("packLicenseLabel")));
       if (m.license) d.append(el("div", "", m.license));
-      if (m.url) { const a = el("a", "", m.url); a.href = m.url; a.target = "_blank"; a.rel = "noopener noreferrer"; d.append(a); }
+      if (m.url) d.append(safeLink("", m.url));   /* 🛡 https 以外はリンクにしない */
       card.append(d);
     }
     const acts = el("div", "miniActions");

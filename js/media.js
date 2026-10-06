@@ -27,6 +27,10 @@ async function setBackground(blob) {
   return im;
 }
 
+/* 🎬 これより大きいファイルは音声解析（file.arrayBuffer で丸ごとメモリに載せる）をしません。
+   解析が無くても譜面はBPMから作れます（analysis を使う所は全部 if (analysis) で守ってあります）。 */
+const ANALYZE_MAX = 96 * 1024 * 1024;
+
 /* ---------- 曲の読み込み ----------
    opts.title   : 表示名
    opts.onReady : 解析後・譜面生成前に呼ばれる。true を返すと自動生成を省略（曲パックの譜面など） */
@@ -51,10 +55,12 @@ async function loadMedia(file, opts = {}) {
   if (!ok || !isFinite(video.duration) || video.duration <= 0) { setStatus("loadStatus", "loadError"); updateChartButtons(); return false; }
   videoReady = true; fingerprint = `${file.size}:${Math.round(video.duration * 10)}`;
   setStatus("loadStatus", "analyzing"); updateChartButtons();
-  await new Promise(r => setTimeout(r, 30));
-  try { analysis = await analyzeAudio(file); } catch (_) { analysis = null; }
+  await new Promise(r => { setTimeout(r, 30); });
+  const tooBig = (Number(file.size) || 0) > ANALYZE_MAX;
+  if (tooBig) analysis = null;
+  else { try { analysis = await analyzeAudio(file); } catch (_) { analysis = null; } }
   if (token !== loadToken) return false;
-  setStatus("loadStatus", analysis ? "loaded" : "decodeFallback");
+  setStatus("loadStatus", tooBig ? "analysisSkipped" : analysis ? "loaded" : "decodeFallback");
   let supplied = false;
   if (opts.onReady) { try { supplied = !!(await opts.onReady()); } catch (e) { console.error(e); } }
   if (token !== loadToken) return false;

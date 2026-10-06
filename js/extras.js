@@ -172,6 +172,7 @@ window.drawExtrasOverlay = drawGhost;
   const rows = [["bgDim", "bgDim", 0, .9, .05, v => Math.round(v * 100) + "%"], ["bgBlur", "bgBlur", 0, 12, 1, v => v + "px"]].map(([key, label, min, max, step, fmt]) => {
     const row = el("div", "inline"), lab = el("span"), inp = document.createElement("input"), val = el("span", "mono");
     lab.dataset.i18n = label; inp.type = "range"; inp.min = min; inp.max = max; inp.step = step;
+    lab.id = "videoStyleLab-" + key; inp.setAttribute("aria-labelledby", lab.id);
     const sync = () => { inp.value = settings[key]; val.textContent = fmt(settings[key]); };
     inp.addEventListener("input", () => { settings[key] = Number(inp.value); saveUserPrefs(); sync(); view.style.filter = videoFilter(); });
     sync(); row.append(lab, inp, val);

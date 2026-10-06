@@ -6,13 +6,17 @@
   "description": "trk! web assets and Capacitor Android wrapper",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "check": "node tools/check-repo.mjs && node tools/check-mmd-motion-data.mjs && node tools/check-study-room.mjs",
+    "check": "node tools/check-repo.mjs && node tools/check-security.mjs && node tools/check-a11y.mjs && node tools/check-vendor.mjs && node tools/check-mmd-motion-data.mjs && node tools/check-study-room.mjs",
     "prepare:mobile": "node tools/prepare-mobile-web.mjs",
     "cap:add:android": "npm run prepare:mobile && cap add android",
     "cap:sync": "npm run prepare:mobile && cap sync",
     "cap:open:android": "cap open android",
     "cap:run:android": "cap run android",
-    "cap:build:android": "npm run cap:sync && cap build android"
+    "cap:build:android": "npm run cap:sync && cap build android",
+    "check:a11y": "node tools/check-a11y.mjs",
+    "check:vendor": "node tools/check-vendor.mjs",
+    "check:vendor:npm": "node tools/check-vendor.mjs --source=npm",
+    "vendor:update": "node tools/vendor-cdn.mjs --source=npm"
   },
   "dependencies": {
     "@capacitor/android": "8.5.2",

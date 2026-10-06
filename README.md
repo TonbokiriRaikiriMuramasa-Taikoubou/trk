@@ -104,7 +104,8 @@ python -m http.server 8000
 | **HIDDEN／SUDDEN** | ノーツが途中で消える／途中から現れる |
 | 🎲 **RANDOM／ANTI-ROLL**（STAGE） | レーンの並びを入れ替える／同じレーンの連打を避けて1ノーツずつ入れ替える。Seedで決まるので記録の対象です |
 | **ミラー**（STAGE） | 左右反転 |
-| **キー設定** | メイン・サブキー、プリセット（A／Space、osu!taiko風 F・J／D・K）、左右反転（左利き用） |
+| **キー設定** | メイン・サブキー、プリセット（A／Space、osu!taiko風 F・J／D・K、🕹 アーケード1・2、📺 リモコン ←→）、左右反転（左利き用） |
+| **🎮 パッド・リモコン** | ゲームパッド／音ゲーム用コントローラーの**ボタンやスティックを直接割り当て**られます（左ノーツ・右ノーツ・決定・戻る・一時停止）。メニューもD-pad／スティックで移動でき、TVリモコン（キーボードとして届く機種）はキー設定のまま使えます |
 | **動画操作** | 動画の拡大・縮小（0.5〜3x）、逆再生、A-B区間ループ、メディアプレーヤーの再生速度・一時停止をキーアサインできます。区間ループはトグル／長押し中だけを選べます |
 | **ナビゲーション** | メニューへ戻るキー、プレーヤー終了キー、各操作の確認表示、説明文の表示／非表示を設定できます |
 | **追加演出** | 「全部見せる／控えめ／追加演出オフ」。画面の光・揺れ・ヒット演出だけを抑え、音声エフェクターは別に設定できます |
@@ -160,7 +161,7 @@ AUTO中か、「シークバーを表示（練習用）」をオンにしてい�
 - **スキン**：シャドウ・デイライト・ネオン・サクラ・ターミナル・クラリティ（色覚配慮）・ミク系（PCL二次創作）・グラデーション系など**31種**（うち1種は🧭チュートリアルのスタンプ5つで解禁されるごほうびスキン🎓）。設定画面の **🖼 スキンの棚** では、定番／ミク／ダーク／ライト／グラデ／遊び心のチップで絞り込めます。色を選んで**自作スキン**も作れます（背景は2色＋上下左右のグラデ対応、JSONで共有可）。
 - **レイアウト**：横スクロール／縦・左／縦・中央／解説動画風
 - **ノーツ**：色と形（丸・ひし形・四角）を、スキンとは別に決められます。
-- **背景映像**：カラー・モノクロ・暗め・非表示に加えて、**暗さ**と**ぼかし**をスライダーで調整できます。選曲画面の📺TVドックから、**映像フィルター65種**（レトロ・シネマ・不思議・自然に加え、人物／肌色・アニメ／セル・質感・スタジオ／画質）と**TVスキン30種**（ブラウン管・ウッド・アーケード・水槽・プロジェクターなど）を切り替えられます。人物向けも画面全体にかかる色調整で、肌だけを検出・補正する機能ではありません。映像が変になったら `?safe=1` で安全な状態に戻せます。
+- **背景映像**：カラー・モノクロ・暗め・非表示に加えて、**暗さ**と**ぼかし**をスライダーで調整できます。選曲画面の📺TVドックから、**映像フィルター65種**（レトロ・シネマ・不思議・自然に加え、人物／肌色・アニメ／セル・質感・スタジオ／画質）と**TVスキン30種**（ブラウン管・ウッド・アーケード・水槽・プロジェクターなど）を切り替えられます。人物向けも画面全体にかかる色調整で、肌だけを検出・補正する機能ではありません。映像が変になったら `?safe=1` で安全な状態に戻せます。選曲画面の**左下には独立カテゴリー「✨ TRKエフェクトを使う」**があり、このうち人物／アニメ／質感／スタジオのリッチな20種をその場で試せます（設定を開かなくてもOK。下でくわしく説明します）。
 - **明るさ・ぼかしの安心操作**：🎛🎲ボタンはタップでランダム調整、**長押しで両方を0へ**戻します（説明：「(長押しでデフォルトに戻します。)」）。各スライダーも長押しでその値だけ0へ。ボタンでの個別リセットもあり、現在の明るさ＋ぼかしの組み合わせは**最大8組お気に入り保存**して、ワンタップで呼び戻せます。これは動画フィルターやTV本体の見た目をリセットしません。
 - **カスタムTV**：設定画面の🎨から、色6つ・形（ボタン数／列／角の丸み／画面のふち）・飾り28種・質感（光る／ガラスの反射／走査線）を選んで、自分のテレビを作れます。保存するとTVドックのスキン一覧に出て、`trk-tvskin`（JSON）で共有できます（最大30個）。
 - **📡 アンテナのキャラ肌**：バックグラウンド再生アンテナの見た目を、4形状に加えて**ドットキャラ10体**（🚚トラック・🤖ロボット・🐱ネコ・🫧スライム・👻オバケ＋東方Projectの⛩霊夢・🧹魔理沙・❄チルノ・🦇フランドール・🗡妖夢。**ON＝起きる・歩く／OFF＝倒れる・眠る** の2フレームアニメ）や**自分のイラスト2枚**（ON用・OFF用。端末内だけに保存）に変えられます。右上のコンパクトアンテナでも同じキャラが出ます。東方Projectのキャラは二次創作ドット絵（公式素材は不使用）。
@@ -182,8 +183,22 @@ AUTO中か、「シークバーを表示（練習用）」をオンにしてい�
 - **🛒 公式プレイリストカタログ**：📚すべて長押し →「🛒公式カタログ」で、**音源を一切同梱しない**キュレーションプレイリスト（🎒ブルーアーカイブ／🩺アークナイツ／⚔️LoL Sessions: Vi／🎯VALORANT／⭐東方Project／⚡NoCopyrightSounds／🎼Kevin MacLeod／❄原神／🍊100% Orange Juice／🌟学園アイドルマスター）を取り込めます。中身は「欲しい曲リスト」で、未入手の曲は**薄く表示**（曲名をタップすると公式の入手先リンク。アークナイツは曲ごとにMonster-Sirenのページへ🔗）。**入手した音源をMusicフォルダに入れるだけで、同じ曲名の曲が自動でプレイリストに加わります**（🧊フリーズ中は自動追加しません）。取り込むと「ソーシャルゲーム → アークナイツ」のような**カテゴリ→シリーズのフォルダ**も自動で作り、タブ長押しの設定に入手先ガイドが出ます。楽曲・シリーズの権利は各権利者にあります（trk!は非公認・リンク先の内容は保証しません）。カタログ本体は `js/catalog.js` の `TRK_CATALOG` で、MODでシリーズを追加できます。
 - **👥 投稿者ツール（共有プレイリストをたくさん受け取る人向け・初期オフ）**：共有プレイリストには**投稿者名**を添えられます（設定で名前を決めるだけ。相手側のビューアに 👤 として表示）。📚すべて長押しの設定で「👥 投稿者ツール」をONにすると、**投稿者名で検索**・**🚫ブロック**（その人のプレイリストをタブ・フォルダから隠す）・**⭐お気に入り投稿者だけ表示**が使えるようになります。スパム的な大量投稿をさばくための道具で、使わない人は基本のUIに出てきません（投稿者名はファイルに書かれた値をそのまま表示するもので、なりすましは防げません）。
 - **🕹️ ショートプレイ（長い曲の後半だけ）**：上級者向け設定の「🕹️ ショートプレイ」で**後半90秒／120秒／180秒**を選べます。楽曲の終わりからさかのぼって開始し、**終盤に長い無音がある曲は自動で検知して、音が実際に止まった位置で終了**します（8秒くらい余白のある曲も大丈夫）。クリア判定・グレード・FC/APは通常どおり出ますが、記録は**フルプレイと完全に分けて保存**（フルのベストや視聴証明を汚しません）。称号まわりはモードを問わず一律 **🕹️** で統一。AUTOは従来どおりフル再生です。
-- **⏯🔊 曲名バナーが反応する**：右上の曲名バナーの**右下に音量ボタン 🔊**があります（設定の「曲音量」と同じもの）。**短押しでスライダー表示、長押しでミュート、もう一度長押しで直前の音量に復元**します。さらに設定の「**右上の曲名をタップで一時停止／再生**」（**デフォルトはオフ**）をONにすると、バナーをタップするだけで**プレイ中は一時停止／再開、選曲中はプレビューの再生／停止**ができます（バナーの中のボタンや🎚エフェクト欄の操作は今までどおり）。
+- **⏯🔊 曲名バナーが反応する**：右上の曲名バナーの**右下に音量ボタン 🔊**があります（設定の「曲音量」と同じもの）。**短押しでスライダー表示、長押しでミュート、もう一度長押しで直前の音量に復元**します。さらに設定の「**右上の曲名をタップで一時停止／再生**」（**デフォルトはオフ**）をONにすると、バナーをタップするだけで**プレイ中は一時停止／再開、選曲中はプレビューの再生／停止**ができます（バナーの中のボタンや🎚エフェクト欄の操作は今までどおり）。バナーの**右端には [◀][🎲][▶]** が並びます（曲名と重ならないように右側へまとめました）。**◀▶**は前後の曲へ移動（いま開いているタブの中・端は先頭／末尾へ回り込み）。**🎲 は既定では長押し（650ms）でおまかせ**なので、選曲中にうっかり押しても曲は変わりません（短押しすると「長押しでおまかせ」とだけ案内します）。**タップだけで変えたい人**は設定の「🎲 おまかせをタップだけで変える」をONに、**🎲 が不要な人**は「🎲 曲名バナーの右端におまかせボタンを出す」をOFFにできます（🎲 の候補には 📌ピンの曲も必ず入ります）。
+- **🎮 コントローラー・パッド・TVリモコンで遊ぶ**：設定 ⚙ の「⌨ 操作」の中に「**🎮 コントローラー・パッド・リモコン**」があります。USB／Bluetoothのゲームパッドや音ゲーム用コントローラーの**ボタン・D-pad・スティック（軸）を、左ノーツ／右ノーツ／決定／戻る／一時停止へ直接割り当て**られます（「変更」→押したいボタン。「A・B（Xbox／PS）」「D-pad ← →」「左スティック ← →」のプリセットもあり、同じボタンを「左ノーツ」と「決定」で兼用できます＝プレイ中はノーツ、メニューでは決定）。**メニューもパッドで選べます**（D-pad／左スティック＝移動、押しっぱなしで連続移動、決定＝押す、戻る＝ESCと同じ）。📺 **TVリモコン**は、ふつうキーボードとして届くので、すぐ上のキー設定でノーツを ← → にする（プリセット「📺 リモコン」）だけで遊べます。メディアキー（⏯⏭⏮）や Back も割り当てでき、🕹 **アーケード筐体・自作コントローラー**（1・2ボタンで届く機種）にはプリセット「🕹 アーケード（1・2）」が使えます。`?reset=keys` でキー割り当て（パッド含む）だけ戻せます。
+- **🪶 軽量化（スマホ向け）**：設定 ⚙ の右下の「🪶 軽量化」に、フレームレートの上限・3Dマスコット（MMD／VRM）の描画レート・描画解像度・スペクトラムやぼかしの節約をまとめました。**自動**なら端末（モバイル・コア数・メモリ・省データ・電池・「動きを減らす」設定）を見て、必要そうなときだけ働きます。くわしくは [📱 スマホで遊ぶ](#-スマホで遊ぶ) へ。
 - **🩷 MMDマスコット（持ち込み式）**：Lat式ミクやタワシ式CHAN×CO系ミクなど、**お手持ちのMMDモデル**を動かせます。テクスチャごとフォルダを選ぶだけ。**内蔵モーション65種はすべて trk! のコードから実行時にVMD生成**し、日常／ダンス／ミク曲テンポのオリジナル／ミク定番ネタ／表情・演技／🎤 歌・口パクの6グループに整理しました。Lat式ミクの実在する表情モーフ名を使った笑顔・ウィンク・照れ・怒り・困り顔・口パクなども含み、同名モーフのあるモデルでだけ表情が動きます（口パクは母音のループで音声同期ではありません）。曲名・「〜風」はテンポや雰囲気の参考で、既存の振付を再現するものではありません。新規設定／Lat式プリセットの初期モーションは「🎤 あいうお口パク（音声同期なし）」で、歌ものは🎤グループにもう6種あります。既存の保存済み選択は尊重し、自分の `.vmd` も読み込めます。**第三者のモデルやVMDは、再配布条件を確認できない限り同梱しません**。例外として、再配布条件と原文ReadMeを同梱できるLat式モデルを `assets/mmd/lat-miku/` に収録しています。大きさ・向き・画面下のクレジットを設定でき、チェックを入れると次に開いたときも復元します。`?safe=1` のときは読み込みません。**うまく動かないときは、同じパネルの「🔎 動作チェック」**を押すと、WebGL・CDN（three／three-mmd-loader）・モデル・モーションの状態が1か所に出ます。「📋 結果をコピー」でそのまま貼ってもらえれば、原因を切り分けられます。
+
+#### ✨ TRKエフェクトを使う（左下の独立カテゴリー）
+
+選曲画面の左下、**「🔥 TRKアンプを使う」のすぐ下**に **✨ TRKエフェクトを使う** があります。映像フィルターの中でも**リッチな「盛る」ジャンル**（きれいに見せる色づくり）だけを集めた入り口です。**中身は📺TVドックの映像フィルターと同じ**なので、どちらで選んでも同じ値が付きます（二重がけにはなりません）。
+
+- **人物・肌色／アニメ・セル／質感／スタジオ・高画質** の4タブ、各5種＝**20種**。例：自然な肌・やわらか肌・血色・マット肌・証明写真／クリアセル・セル塗り・パステル・夜アニメ・印刷（ハーフトーン）／粒子・紙・網点・ソフトグロー・ベルベット／バランス・クリーン・ハイライト・開放感・シネマ。
+- **欄は最初から開いています**（🔥 TRKアンプとおそろい。閉じると次からは閉じたまま、リセットで開へ戻ります）。
+- **TRKエフェクトを使う**（スイッチ）＝いま選んでいるリッチな色をかけます。**切ると直前の色に戻ります**（↩ でも戻せます）。
+- **◀ ▶ 🎲** で前後・おまかせ（🎲 はこの20種の中だけを回します）。
+- **🎛 映像フィルターをくわしく**＝設定の映像フィルターへ。定番45種・⭐お気に入り・🕘最近使ったものは**これまでどおりTVドック側**にあります。
+- リセットは `?reset=tv`（この記憶も消えて、欄は初期の開に戻ります）／`?reset=all`。**`?safe=1` ではスイッチごと無効**になり、記憶は残ります。設定の書き出し（JSON）にも入ります。
+- ⚠ 画面全体にかかる色調整で、**顔や肌の検出・輪郭の抽出・描き足し・解像度の向上はしません**（白飛びの救済もできません）。「きれいに見せる」ための色づくりです。
 
 ---
 
@@ -192,6 +207,18 @@ AUTO中か、「シークバーを表示（練習用）」をオンにしてい�
 trk! は、音楽プレイヤーとしても楽しめます。設定画面の「🎛 サウンドエフェクト」か、選曲画面のメニューで切り替えます。記録には影響しません。
 
 その下の **🎚 エフェクターラック** では、ポータブルアンプを多段に積むように、エフェクターを**段にして重ねられます**（最大8段。プリセットの後に効いて、マイプリセット保存・書き出しにも入ります）。並べられるのは **🚪ノイズゲート**（しきい値を下回ると閉じる）／**🧹ノイズ消し**（再生中の静かな部分で「🔇 いまの音をノイズとして覚える」を押すと、そのスペクトルを2秒間学習して消します。Audacity・ReaFir・Bertom Denoiser Classic の概念を自前実装）／**🎚 ダイナミックEQ**（その帯域が大きい時だけ減らす。TDR Nova・Ozone 流）／**✨エキサイター**（高域に倍音を足す）／**🧲コンプレッサー**／**📢音量**。ノイズ消しは音が約20ms遅れて聞こえるぶん、ノーツのタイミング自動補正が引き受けてくれます。
+
+#### 🔥 TRKアンプを使う（左下の独立カテゴリー）
+
+選曲画面の左下、**「🎛 くわしく（EQ・スキン・メニュー）」のすぐ下**に **🔥 TRKアンプを使う** があります。これは、上の **🎚 エフェクターラック**（段で重ねる仕組み）を、**わざわざ設定を開かなくてもその場で使える**ようにした入り口です（中身は同じラック。設定の「🎚 エフェクターラック」とその場で同期します）。
+
+- **欄は最初から開いています**（「なんだこれ！」と気づいてもらうため）。いちど自分で閉じれば、次からは閉じたまま（リセットで初期の開へ戻ります）。
+- **TRKアンプを使う**（スイッチ）＝ラックをオンにします。段が空のときは、**🚪ノイズゲート → ✨エキサイター → 🧲コンプレッサー → 📢音量** の標準の4段を組んでから始めます。
+- **ワンタップで段を組む**：**🔥 TRKアンプ（標準）／🍯 あたたか／📻 ラジカセ／🧹 クリーン** の4つ。押すとその構成で組み直し、すぐ鳴ります。
+- **段はチップで並びます**：`🚪 ノイズゲート` のように名前が出て、**↑ ↓** で並べ替え、**✕** で1段だけ外せます。**＋ 段を追加** で好きな段を足せます（最大8段）。
+- **🎛 段をくわしく調整**：つまみ（しきい値・周波数・レシオなど）は**設定の「🎚 エフェクターラック」**で詰めます。ここは「組む・並べる・止める」のための入り口です。
+- **切っても段は残ります**（オフ＝素の音。消したいときだけ ✕ 全部外す）。
+- リセットは **`?reset=amp`**（段を空に）／**`?reset=all`**（工場出荷。段も空に）／**`?safe=1`**（段は残して、アンプだけ止めて安全側に）。書き出し（設定のJSON・マイプリセット）には段もそのまま入ります。
 
 | 分類 | 数 | 例 |
 |---|---|---|
@@ -266,7 +293,7 @@ trk! は、音楽プレイヤーとしても楽しめます。設定画面の「
 
 - いらない人は、**設定 →「📊 スペクトラム」のいちばん上の「🚫 スペクトラムを使用しない」**にチェックするだけで、まとめてオフにできます（バナー・くわしい欄・TVの重ね・音の通り道まで全部。チェックを外せばそのまま戻ります）。
 - 置き場所は3つ：**📊 曲名バナー（右上の曲名のところ）**／**🎛 ラックの「⚙ 詳しい設定」の中**／**設定画面の「📊 スペクトラム」**。
-  - 曲名バナーは**スキン**になっていて、**左上の「＋」**を押すと大きく開きます（開くとその場で「⇄ 次の見え方」と色の丸ボタンが出ます）。もう一度押すと元に戻ります。**「＋」の長押し**で、設定画面の📊スペクトラム欄へジャンプします。バナーの左右端には**◀▶曲送りボタン**（いまのタブの中を送る・設定でオフにできます）もあります。
+  - 曲名バナーは**スキン**になっていて、**左上の「＋」**を押すと大きく開きます（開くとその場で「⇄ 次の見え方」と色の丸ボタンが出ます）。もう一度押すと元に戻ります。**「＋」の長押し**で、設定画面の📊スペクトラム欄へジャンプします。バナーの**右端には [◀][🎲][▶]**（曲送りと🎲おまかせ。いまのタブの中を送る・設定で🎲だけ／ボタン全体をオフにできます）もあります。
   - 「ピークを出す」「📺 TVに重ねる」などは**設定（オプション）側**にまとめてあります。
 - **📺 TVの画面にも重ねられます**（初期はオフ）。映像の上に重なるので、選曲中ずっと眺めていられます。ゲーム中は出ません。
 - ⚠ 表示すると、音は**エフェクターと同じ通り道（Web Audio）**を通ります。エフェクトを一度も使っていないときも、オンにすると通り道が作られます（**判定の記録には影響しません**）。`?safe=1` では出ません。
@@ -334,6 +361,17 @@ osu! のスキンのように、いろいろなものを1つのファイル（`.
 
 タッチ操作にも対応しています（MANUAL・TRUCK・ORBITは左右ボタン、STAGEはレーンをタップ、CATCHは画面をなぞる）。
 
+### 🎮 パッド・コントローラー・TVリモコン
+
+設定 ⚙ →「⌨ 操作」→「**🎮 コントローラー・パッド・リモコン**」で、パッドの**ボタンや軸（スティック）をそのまま割り当て**られます。
+
+- **接続**：USB／Bluetoothでつないでから**パッドのボタンを1回押す**とブラウザが認識します（認識すると設定に名前が出ます）。
+- **割り当て**：「変更」→押したいボタンか、動かしたいスティック。「左ノーツ」「右ノーツ」「決定」「戻る」「一時停止／再開」の5つ。**同じボタンの兼用**もできます（プレイ中はノーツ、メニューでは決定）。スティックは「L-Stick ←」のように表示されます。
+- **メニュー操作**：D-pad／左スティック＝移動（押しっぱなしで連続）、決定＝いま選んでいるボタンを押す、戻る＝ESCと同じ（プレイ中は一時停止）。設定でオフにもできます。
+- **TVリモコン**：多くのリモコンはキーボード（← → ↑ ↓・Enter・Back・⏯⏭⏮）として届きます。ノーツを ← → にすれば（プリセット「📺 リモコン」）リモコンだけで遊べます。**戻る**は機種によって Escape／BrowserBack／GoBack で届いても同じように働きます。
+- **アケコン・自作コントローラー**：1・2ボタンで届く機種にはプリセット「🕹 アーケード（1・2）」、レバーが軸で届く機種には「左スティック ← →」が便利です。
+- ノーツの判定はこれまでどおり**音声の時計**なので、パッドでもタイミングはズレません。`?reset=keys` でキー割り当てとパッドの割り当てだけを初期値に戻せます。
+
 ---
 
 ## 📱 スマホで遊ぶ
@@ -342,6 +380,13 @@ osu! のスキンのように、いろいろなものを1つのファイル（`.
 - スマホでは「**📤 ミュージックフォルダを共有**」を試してください。フォルダを選べる端末（Android の Chrome など）なら、ミュージックフォルダの中身を一気に取り込めます。フォルダを選べない端末では、曲を1つずつ追加してください。
 - フォルダの許可を**覚えておく**のは、パソコンの Chrome／Edge だけです。スマホでも設定の「**💾 共有した曲を端末に残す**」をオンにすると、保存された曲（最大150曲・300MB）は許可なしで遊べます。
 - APK版はまだ配布していません。PWAの静的Web資産をCapacitorでAndroidアプリへ同期する準備を追加しました。初回セットアップと制限は [docs/android.md](docs/android.md) をご覧ください。
+- **🪶 軽量化（設定の右下）**：スマホ・タブレット・アプリ（PWA／APK）向けに、描画を軽くする設定をまとめました。まず**プリセット**から選べます。
+  **🪶 バランス（おすすめ）**／**🎯 ゲーム優先（ノーツ・反応はそのまま）**／**🔋 最大節約（いちばん軽い）**／**✨ 軽量化しない**／**🧩 カスタム**（下の項目で調整した状態）。
+  **🎯 ゲーム優先**は、**プレイ中の描画（ノーツ・背景・エフェクト）には上限をかけず**、メニュー・スペクトラム・3Dマスコット・描画解像度だけを軽くします（判定と反応はどのプリセットでも変わりません＝音声の時計で判定しているため）。
+  こまかくは、設定 ⚙ → 右下の「**🪶 軽量化（スマホ向け）**」で、
+  **軽量化モード**（自動／つねにオン／オフ）、**フレームレートの上限**（60／30／20fps）、**3Dマスコット（MMD／VRM）の描画レート**（60／30／15fps／描画しない）、**描画解像度**（端末のまま／1.5倍まで／1.0倍）、**スペクトラムをオフ**・**ぼかし・すりガラスを減らす**・**映像のぼかしを最大2pxに抑える**を選べます。
+  「**自動**」は、モバイル判定・CPUのコア数・メモリ・**省データ設定**・**電池残量（20%以下で充電していないとき）**・OSの「動きを減らす」設定を見て、必要そうなときだけ働きます（判定は端末の中だけで、送信はしません）。いまの状態とこの端末の情報は設定欄に表示され、「🔄 端末を判定しなおす」でやり直せます。
+  **ゲームの判定と時計は音声の時計（`gameTime`）を使うので、フレームレートを下げても判定はズレません**（間引くのは描画だけ。無音検知・カウントダウン・入力は今までどおり毎フレーム動きます。とくに「🎯 ゲーム優先」ならノーツの描画も上限なしのまま遊べます）。スマホらしい端末では、まだ軽量化モードを使っていないときに**1回だけ**案内が出ます。`?reset=lite` で軽量化の設定だけ戻せます。
 - プライバシー方針は [privacy.html](privacy.html) です。trk! はアカウント・広告・行動分析を使わず、曲や設定を基本的に端末内で扱います。
 - コード・ミク・同梱モデル・第三者ライブラリのクレジットは [credits.html](credits.html) の「権利とクレジット図鑑」にまとめています。正式な注意書きは [NOTICE.md](NOTICE.md) です。
 
@@ -358,14 +403,29 @@ osu! のスキンのように、いろいろなものを1つのファイル（`.
 | 💾 共有した曲を端末に残す | 設定でオンにしたときだけ（IndexedDB `shadow_taiko_shared`。最大150曲・300MB。`?safe=1` では読み戻しません） |
 | パックの読み込み | `DecompressionStream` に対応したブラウザ |
 | 公認パックの確認 | HTTPS か localhost（指紋の計算に必要です） |
-| VRM | WebGL。初回だけ three.js／three-vrm をCDNから読み込みます |
-| MMD | WebGL。初回だけ three.js／three-mmd-loader をCDNから読み込みます |
+| VRM | WebGL。three.js／three-vrm は同梱（`assets/vendor/`）。VRMを使い始めたときだけ読み込みます |
+| MMD | WebGL。three.js／three-mmd-loader は同梱（`assets/vendor/`）。MMDを使い始めたときだけ読み込みます |
 | ⭐ お気に入り | 端末の中だけ（localStorage）。フォルダ分けも同じ |
 | 📚 書斎 | 端末の中だけ（IndexedDB `trk_study_room_v1` の books／pages／covers／settings）。アルバム最大3000枚・600MB／文章1ファイル12MB／本棚500冊。栞・メモのコピー・ジャケット・表示設定も同じ場所。`?safe=1` では開きません |
 
 **保存について：** 設定・記録・パック・追加した曲・マイプリセットは、**このブラウザの中だけ**に保存されます（localStorage・IndexedDB）。ブラウザのデータを消すと消えるので、記録はときどきバックアップしてください。
 
 ---
+
+## 🛡 セキュリティ
+
+trk! はサーバーを持たず、曲も書斎の本も端末の外へ出ません。そのかわり、**他人が作ったファイル（パック・譜面・スキン・エフェクト・プレイリスト）を読み込む**ところと、**🧩 アドオン**、**同梱した第三者ライブラリ（`assets/vendor/`）**が攻撃面になります。2026-10-06 に一度しっかり洗い出して、共有ファイルの URL を `https` 以外リンクにしない関所、設定読み込みのプロトタイプ汚染よけ、`.stpack` の圧縮爆弾よけを入れて、`npm run check` に静的な見張り番（`tools/check-security.mjs`）を追加しました。
+
+- 見つけたもの・仕様として残したもの・これからの推奨は **[docs/SECURITY.md](docs/SECURITY.md)** にまとめてあります（直した穴も消さずに残しています）。
+- **共有プレイリスト（他人から受け取るファイル）で起きること**：楽曲ファイルも譜面も**コードも含みません**。相手にできるのは「曲名を偽る」「文章を表示する」「https のリンクを踏ませる（開く前に必ず確認）」までで、**あなたのファイルを読んだり、コードを動かしたりはできません**。曲名偽装（なりすまし）に注意して、取り込む曲は自分で選んでください。
+- 🎬 **動画は「🎬 動画を読み込む」から**：映像の最初のフレームまで確かめて「映像つき」と分かったものだけ 🎬 として記録し（曲リストにも 🎬 が付きます）、読み込んだあとはそのまま全画面ビューアで流せます。**大きなファイル（96MB超）は音声解析を省く**ので、2GBの映画でもメモリを圧迫しません（譜面はBPMグリッドから作られます）。
+- ♿ **読みやすさ（アクセシビリティ）・堅牢性の素振り記録**：html-validate（HTMLの文法）・axe-core（起動後の画面の読み上げ）・ESLint（書き間違い）・css-tree（CSSの文法）を一度かけた記録が `docs/QUALITY-CHECKS.md` にあります。見つけた読み上げ名の不足23か所・タブの入れ子・見出しの押し方などを直し、**毎回の `npm run check` には依存パッケージ不要の見張り番**（`tools/check-a11y.mjs`：idの重複・入力欄の読み上げ名・`alt`・role の消し方・タブの入れ子）が入っています。
+- 🧾 **標準の脆弱性リストとの突き合わせ**：OWASP Top 10 Client-Side Security Risks と CWE Top 25（2025）に1項目ずつ当てはめた一覧が `docs/SECURITY-CHECKLIST.md` にあります（✅確認済み／🟡仕様／🔶未実施の推奨／➖対象外）。
+- 🛡 **VRM／MMD のライブラリは同梱になりました（CDNをやめました）**：three.js・three-vrm・three-mmd-loader を `assets/vendor/` に置き、import map も相対パスに。**外部オリジンはゼロ**で、中身は `tools/vendor-lock.json`（98ファイル・3.60MB・SHA-384）に固定し、**`npm run check` が毎回オフラインで検証**します（`npm run check:vendor:npm` で npm のタール玉とも突き合わせ）。起動時には読まず、VRM／MMD を使い始めたときだけ読みます（`?safe=1` では読みません）。
+- 📚 **書斎の本文は、いつでも「文字」として表示されます**：`.txt` はもちろん、`.html`／`.js`／`.md`／`.csv`／`.json` も**ソースのまま**見えます（HTML として解釈したり、マークダウンを装飾したりはしません）。だから、中身が HTML や JavaScript のファイルをうっかり本として入れても、**コードは動きません**。画像として取り込めるのは `jpg／png／webp／gif／avif／bmp` だけで、SVG は対象外です。
+- 守っていることの例：共有リンクは https 限定＋開く前に確認（**取り込むとき**と**開くとき**の両方で検証）／譜面とパックの形式・容量・パスを検証／カスタムスキンは色の許しリストのみ／`eval` を使わない・`innerHTML` は結果画面の `esc()` 済み1か所だけ／ファイル選択は読み取り専用／アドオンは安全モードで読み込まない。
+- 🧩 **アドオンは「入れた人の責任」**です。ページの中でフル権限で動くプログラムなので、**信頼できるものだけ**入れてください（共有ファイルから勝手に入ることはありません）。
+- 悪用できる詳細を含む報告は、GitHub の Security Advisories（非公開）からお願いします。
 
 ## 💬 感想・要望・不具合の報告
 
@@ -428,7 +488,7 @@ trk/
 │  ├─ truck.js  modes.js  stage.js  stagefx.js  catch.js   … 各モード・体力・称号・演出
 │  ├─ extras.js                  … オフセット測定・ゴーストなど
 │  ├─ tv-presets.js  tv-dock.js  … 映像フィルター・TVドック・カスタムTVスキン
-│  ├─ fx-presets.js  fx.js       … サウンドエフェクト
+│  ├─ fx-presets.js  fx.js  fx-dock.js   … サウンドエフェクトと、左下の 🔥 TRKアンプ
 │  ├─ library.js                 … 選曲画面・AUTO・ラジオ・曲のタブ（棚）
 │  ├─ lib-skins.js               … 棚スキン16種（曲タブの見た目・🎨ボタン）
 │  ├─ verified.js                … 公認パック
@@ -492,7 +552,7 @@ trk! は、たくさんの音楽ゲームから着想をもらっています。
 | 「trk!」の名前 | ライセンスの対象外です。派生版は、別の名前で公開してください |
 | 初音ミクのマスコット（`js/characters/miku.js`） | ピアプロ・キャラクター・ライセンス（PCL）に基づく二次創作です。**GPLの対象外**で、非営利・無償の範囲でのみ使えます |
 | アンテナの東方キャラ肌5体（`js/fx-dock.js` の `ANT_CHARS`：霊夢・魔理沙・チルノ・フランドール・妖夢） | 東方Project（© 上海アリス幻樂団）を題材にした二次創作ドット絵です。**GPLの対象外**。[公式ガイドライン](https://touhou-project.news/guideline/)に従い無料で提供しています（公式のゲーム素材は不使用） |
-| three.js ／ three-vrm ／ three-vrm-animation ／ three-mmd-loader | MIT License（VRM・MMDの使用時にCDNから読み込み） |
+| three.js ／ three-vrm ／ three-vrm-animation ／ three-mmd-loader | MIT License（`assets/vendor/` に同梱・v3.5.5等） |
 | Capacitor Core ／ Android | MIT License（任意のAndroidラッパーを生成したときだけ使用） |
 | Capacitor CLI ／ TypeScript | MIT ／ Apache-2.0（APK生成用の開発ツール。アプリ実行時には含めない） |
 | 利用者が読み込む曲・VRM・MMDモデル・.vmd・パック | それぞれの作者のものです |
@@ -529,7 +589,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 - 🎪 **STAGE** — 4/5/6-lane vertical play with stairs, trills and wide notes (inspired by World Dai Star: Yume no Stellarium)
 - 🚛 **CATCH** — catch falling parcels with your truck; grab nitro cans 🚀 for **Blast mode**
 
-**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), a song-banner volume button (tap for the slider, hold to mute/restore), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, antenna character skins (ten original dot characters that wake up and walk when ON and fall asleep when OFF, plus your own two ON/OFF images stored on your device only; Reimu, Marisa, Cirno, Flandre and Youmu are original Touhou Project fan art drawn for trk!, following the official fan-work guidelines), VRM 1.0 mascots, MMD mascots (65 original procedural choices grouped by daily movement, dance, Miku references, expressions, and singing/lip-sync; Lat morph tracks; the A-I-U-O mouth cycle with no audio sync is the default for new installs and the bundled Lat preset; saved choices are kept, bring your own model with an on-device self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), 📤 **share your music folder** (one permission pulls the whole folder in at once, with an optional on-device copy of up to 150 songs / 300 MB), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, visual effect-chain editor, automatic latency compensation and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 16 built-in sounds (including electric guitar, electronic sax, and layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, a default option to lock mapped keys to the piano while synth mode is open, an optional wider on-screen keyboard for larger displays, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
+**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), a song-banner volume button (tap for the slider, hold to mute/restore), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, antenna character skins (ten original dot characters that wake up and walk when ON and fall asleep when OFF, plus your own two ON/OFF images stored on your device only; Reimu, Marisa, Cirno, Flandre and Youmu are original Touhou Project fan art drawn for trk!, following the official fan-work guidelines), VRM 1.0 mascots, MMD mascots (65 original procedural choices grouped by daily movement, dance, Miku references, expressions, and singing/lip-sync; Lat morph tracks; the A-I-U-O mouth cycle with no audio sync is the default for new installs and the bundled Lat preset; saved choices are kept, bring your own model with an on-device self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), 📤 **share your music folder** (one permission pulls the whole folder in at once, with an optional on-device copy of up to 150 songs / 300 MB), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, a visual effect-chain editor, a bottom-left 🔥 **TRK amp** panel that builds/reorders/switches the layered effect rack in one tap — `?reset=amp` — automatic latency compensation and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 16 built-in sounds (including electric guitar, electronic sax, and layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, a default option to lock mapped keys to the piano while synth mode is open, an optional wider on-screen keyboard for larger displays, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
 
 **Study Room:** long-press the song-list title (or focus it and press Enter/Space) to open a local-only reader. Image folders become albums (single/spread/vertical, an American-style flip, reversed image order, zoom from 0.5× to 4× by buttons, Ctrl+wheel or pinch; up to 3,000 images / 600 MB per album), text files open as books with UTF-8 / UTF-16 / Shift_JIS detection and Aozora-style ruby (up to 12 MB each) with five reading skins, text size / line-height / margin tuning and in-book search. The shelf sorts (updated / added / title / type / size), searches titles, paths and excerpts, shows a bookmark list and a storage footer, and reports import progress with a cancel button. A TV pane (position, six looks, three sizes, aspect ratio, optional song title) shows the playing video or the song's jacket — assigned by a 680 ms long-press, and always handed back when the room closes or a song finishes. Everything stays in this browser (IndexedDB `trk_study_room_v1`); nothing is uploaded, and `?safe=1` keeps it closed.
 

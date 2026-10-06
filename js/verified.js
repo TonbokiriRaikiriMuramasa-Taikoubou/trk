@@ -169,10 +169,7 @@ function creatorRow(id) {
   row.append(el("b", "", c.name));
   if (c.roles.length) row.append(el("span", "hint", " " + c.roles.map(r => tr(ROLE_KEY[r])).join("・")));
   const href = c.x ? "https://x.com/" + c.x : c.url;
-  if (href) {
-    const a = el("a", "", c.x ? "@" + c.x : c.url); a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer";
-    row.append(" ", a);
-  }
+  if (href && (c.x || safeHttpUrl(c.url))) row.append(" ", safeLink("", href, c.x ? "@" + c.x : c.url));   /* 🛡 念のため通す */
   return row;
 }
 

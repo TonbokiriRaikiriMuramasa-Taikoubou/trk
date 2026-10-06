@@ -212,6 +212,7 @@ showJudge = function (kind, delta, star) {
   size.addEventListener("click", applyJudgeStyle);
   const row = el("div", "inline"), lab = el("span", "", tr("judgePos")), inp = document.createElement("input"), val = el("span", "mono");
   lab.dataset.i18n = "judgePos"; inp.type = "range"; inp.min = "-300"; inp.max = "300"; inp.step = "10";
+  lab.id = "judgePosLab"; inp.setAttribute("aria-labelledby", lab.id);
   const sync = () => { inp.value = settings.judgePos; val.textContent = (settings.judgePos > 0 ? "+" : "") + settings.judgePos + "px"; };
   inp.addEventListener("input", () => { settings.judgePos = Number(inp.value); saveUserPrefs(); sync(); applyJudgeStyle(); });
   sync(); row.append(lab, inp, val);

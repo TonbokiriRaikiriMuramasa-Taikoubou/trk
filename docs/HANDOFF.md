@@ -46,14 +46,15 @@
   - **監査範囲の限界**：F-29〜F-30では難易度／判定／ライフ／スキンとSpectrum／MMD／FXの設定ID経路を個別に確認・修正し回帰検査へ追加した。2026-10-07 の外部検収で 🪶 `js/lite.js`（M-02）と ✨ `js/tv-rich.js`（M-03）も**全行確認して「問題なし」**となり、加えて `LITE_ENUM_VALUES`／`richIdOk`／`videoIdOk` で予防的に閉じた（記録は `docs/SECURITY.md` の「問題なし」テーブル）。それでも設定値が関係する全辞書参照を網羅監査したわけではない。**未確認で残るのは layout、short mode など**で、問題があると断定せず今後の再点検項目とする。
   - **指摘の読み分け**：`?tv`／`?skin` の「任意CSS注入」は誤検知（CSS文字列はURLから入らず、実際のリスクは未検証IDの保存・表示）。URL経由の保存動作は維持しつつ未許可IDは無視する。既存 `TrkAddons.install(text,name)` のraw-code APIと、同意記録のない旧アドオンの警告付き互換実行も維持。アドオン同意指紋はlocalStorage内の変更検知であって署名・隔離ではない。
   - **外部セキュリティ再点検**：レビュー指摘は必ず実コードで再現性・到達経路・必要なユーザー操作を確認してから判断し、未確認項目を修正済みと扱わない。公開GitHub PagesのURL自体は秘密ではないため、悪用詳細は公開Issueに書かず非公開Security Advisoryへ。制限版を試す必要がある場合は認証付きの別ステージングを使い、本番のURL隠しで代用しない。
-  - **最新検査（2026-10-06）**：`node tools/check-security.mjs` 55項目PASS、`npm run check` 全体PASS、`git diff --check` PASS。a11yの見出し順序WARN 1件は既知。実ブラウザ／タッチ端末の手動確認は別途必要。
+  - **最新検査（2026-10-07）**：`node tools/check-security.mjs` 55項目PASS、`npm run check` 全体PASS、`git diff --check` PASS。a11yの見出し順序WARN 1件は既知。パック容量の v2 化（`size` index と移行）を含む。**実ブラウザ／タッチ端末の手動確認は別途必要**（下の「未確認の実機項目」の先頭を参照）。
   - **検査は「効いているか」まで確認する（2026-10-07）**：新しく足した検査は、**わざと修正を元に戻して FAIL すること**を `/tmp` のコピーで確認してから採用する。**PASS だけ見ると「通っているふり」の検査が紛れ込む。** 実際に1回やらかした：
     - ❌ **「通っているふり」の実例**：`tv-rich.js` の検証を確かめる検査で、vm 上から `richIdOk()`／`videoIdOk()` を**直接呼んで**合否を見ていた。その結果 `pickRich("tvRichId", richIdOk, …)` の**配線を外しても**（緩い `idOk` に戻しても）検査は通り続けた。→ **直した**：実際に保存値を注入して `settings.tvRichId` / `settings.tvRichPrev` の**結果**を見る形に変更（＋配線の文字列チェック）。
     - ✅ このとき効いた逆テスト（いずれも FAIL を確認）：①`THEME_KEYS` を `{}` に戻す ②`packRecordBytes` を旧実装に戻す ③報告処理を消す ④spectrum に7個目の null-prototype 辞書を足す ⑤i18n を3言語しか足さない ⑥`LITE_ENUM_VALUES` を外す ⑦tv-rich の検証を緩い `idOk` に戻す ⑧`tvRichPrev` を `richIdOk`（誤った許可リスト）で検証する ⑨検証関数を残したまま配線だけ外す ⑩hash の値まで小文字化する ⑪`?factory` を全リセット扱いに戻す ⑫Import 報告の重複よけを外す ⑬`size` index を使わない v1 に戻す ⑭v1→v2 の移行（`size` の書き戻し）を消す ⑮件数が食い違っても数え直さない（過小計上へ戻す）⑯`onblocked` を外す ⑰`sizeOf` を渡さない ⑱`packDbBlocked` を1言語だけにする。
     - ⚠ **vm で検証するときの落とし穴**：トップレベルの `const`／`let` は**グローバルオブジェクトに載らない**（`ctx.TRK_TV_PRESETS` は `undefined` になる）。別スクリプトからは字句スコープで見えるので、`window.TrkTV = { list: () => TRK_TV_PRESETS.map(…) }` のように**vm の内側でスタブを組む**こと。外側から渡すと `TypeError` が try/catch に飲まれて「一覧が読めない＝fail-open」になり、**検査が無条件で通ってしまう**。
+    - 🧪 **IndexedDB を実走させるハーネス（2026-10-07・リポジトリ外で実施）**：パック容量の v2 化は「本当に Blob を復元していないか」「移行が効いているか」を確かめる必要があるため、**最小限のフェイク IndexedDB** を書いて `idbStore()` をそのまま動かした（`vm` で `js/core.js` の `const IDB_VERSION` から `idbStore` までを切り出し、`indexedDB` をスタブとして渡す）。落とし穴は2つ：①`idbStore()` は**遅延オープン**なので、メソッドを1つ呼ぶまで `open()`（＝移行）が走らない ②フェイク側は**未処理リクエストが 0 になるまでトランザクションを完了させない**（早く `oncomplete` を呼ぶと `putIf` が常に false になり「保存されない」と誤判定する）。`getAll` を呼んだかどうかを `log` に記録して「Blob を復元していない」ことを直接確かめた。
     - ✅ **検査のほうが本体の穴を見つけた実例（2026-10-07）**：`size` index の検査を書くとき「数値でないキーは過小計上になる」と気づいて `null`（＝全件数え直し）を期待したところ、実装は `keys.length !== count` しか見ておらず **`Number.isFinite(k) ? k : 0` で 0 に落として通していた**。つまり `size:"900"` のような壊れたレコードがあると合計が過小になり、上限を素通しする。→ **実装側を直した**（数値でない／負のキーは `null` を返す）。検査を先に厳しく書くと、実装の穴が見つかる。
   - **♿ 読みやすさ**：外部ツール（html-validate・axe-core・ESLint・css-tree・Manifest）を一度かけた記録が `docs/QUALITY-CHECKS.md`（**再点検で axe violation 0**）。見つけた実害（読み上げ名の不足23か所＋つまみ60か所・`role="tablist"` に「＋」が混ざっていた・見出しに `role="button"`・重複キー29件）はすべて修正済み。**残したものと理由も同文書**（見出しの飛び h1→h3 は WARN だけ、色のコントラストは実機で、動画の字幕は該当なし など）。
-- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-sec31`。公開ファイルを変更したら必ず更新する。
+- `sw.js` の現在のキャッシュ名は `trk-v2026.10.6-sec32`。公開ファイルを変更したら必ず更新する。
 - このcheckoutで `npm run check` はコード・データの自動検査を行うが、MMDの実描画・タッチ操作・音声の実機確認は別途必要。
 - **Issue #21〜#25 の再調査・残件（2026-10-06）**：
   - **#21**：不正な `specStyle`／`specTheme` を設定Import時点で拒否し、Spectrum辞書もnull-prototype化済み。GitHub本文の再現手順どおりの実ブラウザ確認はまだなので、画面・コンソール確認を残す。
@@ -207,6 +208,7 @@ JSDOM の実挙動ハーネス（**コミットしていない・消えたら作
 
 ### 未確認の実機項目
 
+- 💾 **パック容量 v2 の移行（次回の最優先・2026-10-07 追加）**：既に `.stpack` を入れてあるブラウザで更新すると `shadow_taiko_packs` が **v1→v2** へ上がり、`size` を持たない古いレコードへ合計が書き戻される。確認手順：(1) 更新前にパック一覧と使用量を控える (2) 更新して再読み込み (3) DevTools → Application → IndexedDB → `shadow_taiko_packs` で **version が 2**／`packs` に **`size` index** がある／古いレコードにも `size` が入っている (4) 新しいパックを1つ入れて、容量まわりの案内が正しいか。⚠ **他のタブで trk! を開いたまま保存**すると `packDbBlocked`（4言語）で止まるので、その文言も確認する。**合計が 0 になる／移行が走らない場合は最優先で報告**（過小計上は1 GiB上限の素通しになる）。
 - Lat式ミクの表示・表情モーフ・65種の動き、特に左右の腕／顔／裾の見え方。同梱ライブラリ（`assets/vendor/`）の読み込みを含むため実ブラウザで確認する。
 - 🚶歩行／🏃走行の「その場足踏み」：足が上がって（歩き0.7／走り1.1ユニット）、ひざが前へ出て、腕が前後に振れているか。**🎤6種**：口の動きが見えるか、手が口や体に被らないか、マイク持ち（`songMic`）がそれらしく見えるか。
 - 曲名バナー音量ボタンの短押し・650ms長押し、ドラッグ時の誤発火防止、タッチ端末でのミュート／復元。
@@ -243,6 +245,8 @@ JSDOM の実挙動ハーネス（**コミットしていない・消えたら作
   - **PR #16／#17（書斎・MMD）**：`arena/872022dd-trk` で開発し `main` へマージ。PR #17 は本棚の並べ替え・検索、栞一覧、本文検索、拡大／見開き、文字組み、TVペインの見た目、取り込みの進捗・中止・入れ子設定、❓キーの説明、孤立ページの掃除（詳細は §2）に加えて、**MMDモーションの改修**＝🎤 歌・口パクの6種と第6グループ、既定を `faceSing` へ、🚶／🏃の前後振りと足ＩＫの足踏み、エアギターの一旦削除（詳細は §6）を追加。
   - **PR #18（`arena/ba7b73c1-trk`・2026-10-06・16コミット）**：7つのまとまった仕事が入った。順に、①🎛 曲名バナーの曲操作を右端の `[◀][🎲][▶]` に集約（🎲は既定で長押し・設定で🎲オフ／タップだけ）／②🪶 軽量化（設定の右下・自動判定・プリセット4種＝**🎯 ゲーム優先はノーツと反応を下げない**・フレームレート上限・マスコット描画レート・描画解像度・スペクトラム／ぼかしの節約）／③🎮 キーコンフィング（ゲームパッド・音ゲーム用コントローラー・TVリモコン。ボタン／軸の直接割り当て・メニュー移動・プリセット `arcade`／`remote`）／④🔥 TRKアンプ と ⑤✨ TRKエフェクト を左下の独立カテゴリーに（どちらも**初期は開**・触って閉じた人の `false` は尊重）／⑥🛡 **セキュリティ点検（5回）**＝共有ファイル、書斎（ルビの ReDoS を線形走査に修正）、CDN（→ 自前ホスティング）、セーフモード（SWキャッシュの穴を修正）、🎬 大きい動画の扱い（`ANALYZE_MAX` と最初のフレーム判定）。記録は `docs/SECURITY.md`（F-1〜F-21）と `docs/SECURITY-CHECKLIST.md`／⑦🌐 **CDN をやめて `assets/vendor/` に同梱**（98ファイル・3.60MB・SHA-384 ロック・`npm run vendor:update`）＋🔐 **守りの追加**（`?reset=all` の確認・アドオンの同意記録）＋♿ **堅牢性／読みやすさの点検**（`tools/check-a11y.mjs`・`docs/QUALITY-CHECKS.md`）。**詳細は §2 の「点検・守りの現在地」と各節、利用者向けは `README.md`。**
   - **PR #19（2026-10-06・squash merge）**：セキュリティ追補 F-22〜F-29 と回帰検査・関連文書の更新。詳細と互換性の注意は §2 および `docs/SECURITY.md`。
+  - **PR #26（2026-10-06・squash merge）**：セキュリティ追補 F-30〜F-32＝設定Importの enum 許可リスト、reset の `force=1` 完全一致、`.stpack` の累積1 GiB上限・quota 事前確認・容量と put の一体化。詳細は §2 と `docs/SECURITY.md`。
+  - **PR #27（2026-10-07・`arena/cfdfdfd5-trk`）**：**外部検収（PR #26 への指摘）を受けた仕上げと大型修正**。①緊急設定Importが弾いたキーを**理由つき**で報告（4言語・重複なし・表示は先頭12件）②回帰検査を **55項目**へ（spectrum の ID 辞書6個すべて／lite-mode 4キー／tv-rich の実在ID／`?factory` の文書ドリフト）③**パック容量の集計を `size` index 化（DB v2）**＝Blob を復元せず合計を出し、移行と件数食い違いで過小計上を防ぐ。⚠ 版数を上げたので**他タブがあると `onblocked` で止まる**（`packDbBlocked` を4言語で案内）。詳細は §2、`docs/SECURITY.md`、このPRの本文。
 - 以前の統合元ブランチ：`arena/01a109eb-trk`（Part 1–17・コミット35+・`main` へマージ済み）、`arena/01a10c69-trk`（PR #14）。
 - 公開URL：<https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/>
 
@@ -263,6 +267,8 @@ JSDOM の実挙動ハーネス（**コミットしていない・消えたら作
 - **♿ 読みやすさの残り**（`docs/QUALITY-CHECKS.md` §3 に理由つき）：左の列の見出しを `h3` → `h2` に上げる（スキンの見た目の確認が要る）、`<main>` ランドマーク、実ブラウザでの**色のコントラスト**確認、`aria-label` の英語（`Zoom`／`Seek` など）の日本語化。**JS が作るボタンの `type="button"`**（97か所。いま `<form>` が無いので実害ゼロだが、フォームを足すときは要対応）。
 - **CSP は「基本は入れない」方針**（ユーザー判断・2026-10-06）。入れるのは**安定版としてリリースするときだけ**で、そのときは inline の import map の外部化＋ハッシュ＋`media-src blob:` を実機テスト付きで（`docs/SECURITY.md` §6-1）。アドオンの間接 `eval` は `script-src 'self'` で止まり、`'unsafe-eval'` はXSS防御を弱めるため、アドオンをどう扱うか先に決める。第三者オリジンがゼロになったので設定自体は簡単になっている。
 - **配布物まわり**：GitHub Actions の SHA 固定、`mobile-web/` から開発用文書（`docs/HANDOFF.md` など）を除外、配信側のヘッダ（`frame-ancestors` など）。
+- **Issue #21〜#25 のラベル付けと #24 本文の修正（2026-10-07 時点で未実施・権限待ち）**：この環境の GitHub トークンは `issues=read` しかなく、**ラベル付与・コメント・Issue本文の修正がすべて 403**（`Resource not accessible by integration`）になる（読み取りは 200、PR本文の更新は 200、GraphQL の `viewerPermission` は `ADMIN` なので**アカウント権限ではなくトークンの中身**の問題。Arena の GitHub 接続を切り直すか、fine-grained PAT の Issues: Read and write を有効にする）。付けるラベルの案：`#21`＝`security, severity:low, needs-verification`／`#22`＝`security, severity:medium, needs-verification`／`#23`＝`security, severity:low, needs-verification`／`#24`＝`security, severity:low, needs-verification`／`#25`＝`security, severity:info, needs-verification`。⚠ **#24 の本文にはドメインの途中に空白が混ざったURL**（`https://tonbokiriraik imuramasa-taikoubou.github.io/trk/#reset=all&force=0`）があるので、`force=1` の完全一致を PR #26 で直した旨と合わせて本文を直す。
+- **IndexedDB の実走ハーネスをリポジトリへ（2026-10-07 追加）**：パック容量 v2 で書いたフェイク IndexedDB のハーネス（§2「検査は効いているか」に落とし穴つきで記録）は `tools/check-idb.mjs` として取り込む価値がある。`npm run check` に足すなら**依存パッケージ不要**のまま（`node:vm` だけで動く）。移行・過剰/過小計上・`onblocked` は壊れやすいので、見張り番にしておくと安心。
 
 ---
 

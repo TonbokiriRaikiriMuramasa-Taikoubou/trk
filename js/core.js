@@ -768,14 +768,43 @@ function downloadBlob(blob, name) {
 }
 function downloadJSON(obj, name) { downloadBlob(new Blob([JSON.stringify(obj, null, 2)], { type:"application/json" }), name); }
 
-/* ブラウザ内保存（IndexedDB）。データベース名はこれまでと同じものを使います */
-function idbStore(dbName, store = "kv") {
+/* ブラウザ内保存（IndexedDB）。データベース名はこれまでと同じものを使います。
+   opts（省略可）：
+     sizeKey … レコードのサイズを入れているキー名。これを渡すと**そのキーに index を張り**、
+               合計を「index のキー（数値）だけ」で数えられるようになる（レコード本体＝Blob を復元しない）。
+     sizeOf  … sizeKey が無い古いレコードからサイズを計算する関数（index への移行と、数え直しの両方で使う）。 */
+const IDB_VERSION = 2;   /* v2＝サイズ index。v1→v2 の移行で size を持たない古いレコードへ書き戻す */
+function idbStore(dbName, store = "kv", opts = null) {
+  const opt = opts || {};
+  const sizeKey = opt.sizeKey || "";
+  const sizeOf = typeof opt.sizeOf === "function" ? opt.sizeOf
+    : (rec => (rec && Number.isFinite(rec[sizeKey]) ? rec[sizeKey] : 0));
   let p = null;
   const open = () => p || (p = new Promise((res, rej) => {
-    const r = indexedDB.open(dbName, 1);
-    r.onupgradeneeded = () => { if (!r.result.objectStoreNames.contains(store)) r.result.createObjectStore(store); };
+    const r = indexedDB.open(dbName, IDB_VERSION);
+    r.onupgradeneeded = () => {
+      const db = r.result;
+      if (!db.objectStoreNames.contains(store)) db.createObjectStore(store);
+      const os = r.transaction.objectStore(store);
+      if (!sizeKey || os.indexNames.contains(sizeKey)) return;
+      os.createIndex(sizeKey, sizeKey);
+      /* ⚠ 移行を省くと「size を持たないレコード」が index に載らず、**合計が過小**になって
+         上限を素通しする（＝危険な方向）。なので v1→v2 の一度きりで size を書き戻す。 */
+      const cur = os.openCursor();
+      cur.onsuccess = () => {
+        const c = cur.result; if (!c) return;
+        const rec = c.value;
+        if (rec && typeof rec === "object" && !Array.isArray(rec) && !Number.isFinite(rec[sizeKey])) {
+          try { c.update(Object.assign({}, rec, { [sizeKey]: sizeOf(rec) })); } catch (_) {}
+        }
+        c.continue();
+      };
+    };
     r.onsuccess = () => res(r.result);
     r.onerror = () => { p = null; rej(r.error); };
+    /* ⚠ バージョンを上げたので、古いタブが v1 を掴んでいるとブロックされる。
+       onblocked を貼らないと onsuccess も onerror も来ず、**保存が永遠に固まる**。 */
+    r.onblocked = () => { p = null; rej(new Error("idb-blocked")); };
   }));
   const run = async (mode, fn) => {
     const db = await open();
@@ -785,19 +814,67 @@ function idbStore(dbName, store = "kv") {
       tx.onerror = tx.onabort = () => rej(tx.error);
     });
   };
+  /* 合計を index のキー（数値）だけで組み立てる。レコード本体（Blob）を復元しない。
+     ⚠ **件数と食い違ったら null を返す**。それは「size を持たないレコードがある」ということで、
+        合計が過小＝上限を素通しする危険な向きなので、呼び出し側で全件を数え直させる。 */
+  const statsFromKeys = (keys, count, prev) => {
+    if (!Array.isArray(keys) || !Number.isFinite(count) || keys.length !== count) return null;
+    let stored = 0;
+    for (const k of keys) {
+      /* 数値でないキー＝壊れた size（文字列など）を持ち込まれた状態。0 として足すと**過小**になるので、
+         ここも null を返して全件を数え直させる（安全側＝数え直しに倒す）。 */
+      if (!Number.isFinite(k) || k < 0) return null;
+      stored += k;
+    }
+    return { stored, replacing: prev == null ? 0 : sizeOf(prev), count, fast: true };
+  };
+  /* 全レコードを読む、遅いが確実な経路（index が使えない／件数が食い違ったとき） */
+  const statsFromAll = (os, replacingId, cb) => {
+    const req = os.getAll();
+    req.onsuccess = () => {
+      const list = req.result || [];
+      cb({
+        stored: list.reduce((a, r) => a + sizeOf(r), 0),
+        replacing: list.reduce((a, r) => a + (r && replacingId != null && r.id === replacingId ? sizeOf(r) : 0), 0),
+        count: list.length, fast: false
+      });
+    };
+  };
+  /* stats を取る共通部分。replacingId を渡すと「置き換えられる分」も一緒に返す。 */
+  const readStats = (os, replacingId, cb) => {
+    const idx = sizeKey && os.indexNames.contains(sizeKey) ? os.index(sizeKey) : null;
+    if (!idx) { statsFromAll(os, replacingId, cb); return; }
+    let keys = null, count = null, prev = replacingId == null ? null : undefined, out = null;
+    const maybe = () => {
+      if (out || keys === null || count === null || prev === undefined) return;
+      out = statsFromKeys(keys, count, prev);
+      if (out) cb(out); else statsFromAll(os, replacingId, s => { out = s; cb(s); });
+    };
+    idx.getAllKeys().onsuccess = e => { keys = e.target.result || []; maybe(); };
+    os.count().onsuccess = e => { count = e.target.result || 0; maybe(); };
+    if (replacingId == null) prev = null;
+    else os.get(replacingId).onsuccess = e => { prev = e.target.result == null ? null : e.target.result; maybe(); };
+  };
   return {
     get: k => run("readonly", s => s.get(k)),
     put: (k, v) => run("readwrite", s => s.put(v, k)),
+    /* 合計だけを知りたいとき（Blob を復元しない。件数が食い違えば自動で全件を数え直す） */
+    usage: () => open().then(db => new Promise((res, rej) => {
+      const tx = db.transaction(store, "readonly"), os = tx.objectStore(store);
+      readStats(os, null, res);
+      tx.onerror = tx.onabort = () => rej(tx.error || new Error("IndexedDB usage read failed"));
+    })),
+    /* 上限の判定と put を**同じ readwrite トランザクション内**で一体化する（複数タブ間の競合を防ぐ）。
+       predicate には全レコードではなく**集計値** { stored, replacing, count, fast } を渡す。 */
     putIf: (k, v, predicate) => open().then(db => new Promise((res, rej) => {
-      const tx = db.transaction(store, "readwrite"), objectStore = tx.objectStore(store);
+      const tx = db.transaction(store, "readwrite"), os = tx.objectStore(store);
       let permitted = false, checkError = null;
-      const req = objectStore.getAll();
-      req.onsuccess = () => {
+      readStats(os, v && v.id, stats => {
         try {
-          permitted = predicate(req.result) === true;
-          if (permitted) objectStore.put(v, k);
+          permitted = predicate(stats) === true;
+          if (permitted) os.put(v, k);
         } catch (e) { checkError = e; tx.abort(); }
-      };
+      });
       tx.oncomplete = () => res(permitted);
       tx.onerror = tx.onabort = () => rej(checkError || tx.error || new Error("IndexedDB transaction aborted"));
     })),

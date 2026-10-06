@@ -322,7 +322,9 @@ function manifestPaths(m) {
 const hasLook = m => !!(m.skin || m.notes || m.sounds || m.fx || m.mascot);
 
 /* ============ パックの保存・追加・適用 ============ */
-const packDB = idbStore("shadow_taiko_packs", "packs");
+/* ⚠ sizeKey/sizeOf を渡すと、合計を「index のキー（数値）だけ」で数えられる（Blob を復元しない）。
+   sizeOf は「size を持たない古いレコード」の移行と、件数が食い違ったときの数え直しに使う。 */
+const packDB = idbStore("shadow_taiko_packs", "packs", { sizeKey:"size", sizeOf:packRecordBytes });
 const packRuntime = { id:null, captions:null, noteImages:[null, null], urls:[], skinId:null, hadSounds:false };
 const noteImage = lane => { const im = packRuntime.noteImages[lane]; return im && im.complete && im.naturalWidth ? im : null; };
 function packRecordBytes(record) {
@@ -336,27 +338,26 @@ function packRecordBytes(record) {
     return sum + (file && Number.isFinite(file.size) && file.size > 0 ? file.size : 0);
   }, 0);
 }
-function projectedPackStoreSize(records, id, incoming) {
-  let stored = 0, replacing = 0;
-  for (const record of records || []) {
-    const size = packRecordBytes(record);
-    stored += size;
-    if (record && record.id === id) replacing += size;
-  }
-  return { stored, replacing, projected:stored - replacing + incoming };
-}
+/* 集計値（{ stored, replacing }）から、保存後の見込み合計を出す。
+   同じ名前・作者のパックを更新するときは、置き換える前の分を差し引く。 */
+function packProjected(stats, incoming) { return stats.stored - stats.replacing + incoming; }
+/* 容量チェック。合計は index のキーだけで数えるので、レコード本体（Blob）を復元しない。
+   ⚠ 「size を持たないレコードがある」ときは idbStore 側が自動で全件を数え直す（過小計上＝上限の素通しを防ぐ）。 */
 async function checkPackStorageCapacity(id, incoming) {
-  let records;
-  try { records = await packDB.all(); }
+  let stats, prev;
+  try { stats = await packDB.usage(); }
   catch (_) { throw new PackError("packStorageCheckFailed"); }
-  const sizes = projectedPackStoreSize(records, id, incoming);
-  if (sizes.projected > PACK_STORE_MAX) throw new PackError("packStoreLimit", { max:PACK_STORE_MAX / PACK_MB });
+  try { prev = await packDB.get(id); } catch (_) { prev = null; }   /* 置き換えられる分（1件だけ読む） */
+  const replacing = prev ? packRecordBytes(prev) : 0;
+  if (packProjected({ stored:stats.stored, replacing }, incoming) > PACK_STORE_MAX) {
+    throw new PackError("packStoreLimit", { max:PACK_STORE_MAX / PACK_MB });
+  }
   try {
     const storage = typeof navigator !== "undefined" && navigator.storage;
     if (storage && typeof storage.estimate === "function") {
       const estimate = await storage.estimate();
       if (Number.isFinite(estimate.quota) && Number.isFinite(estimate.usage)) {
-        const available = Math.max(0, estimate.quota - estimate.usage) + sizes.replacing;
+        const available = Math.max(0, estimate.quota - estimate.usage) + replacing;
         if (incoming > available) throw new PackError("packStorageQuota");
       }
     }
@@ -395,7 +396,9 @@ async function installPackFileSerial(file) {
     const id = "p" + hashString(`${man.name}|${man.author}`).toString(36);
     await checkPackStorageCapacity(id, total);
     const record = { id, manifest:man, files, size:total, installedAt:Date.now() };
-    const stored = await packDB.putIf(id, record, records => projectedPackStoreSize(records, id, total).projected <= PACK_STORE_MAX);
+    /* 最終的な上限判定と保存を**同じ readwrite トランザクション**で行う（複数タブ間の競合を防ぐ）。
+       ここでも合計は index のキーだけで数えるので、Blob を復元せずロック時間も短い。 */
+    const stored = await packDB.putIf(id, record, stats => packProjected(stats, total) <= PACK_STORE_MAX);
     if (!stored) throw new PackError("packStoreLimit", { max:PACK_STORE_MAX / PACK_MB });
     setStatus("packStatus", "packInstalled", { name:man.name });
     await renderPackList();
@@ -404,7 +407,10 @@ async function installPackFileSerial(file) {
   } catch (e) {
     console.error(e);
     const quotaError = e && (e.name === "QuotaExceededError" || e.code === 22 || e.code === 1014);
-    setStatus("packStatus", e instanceof PackError ? e.key : quotaError ? "packStorageQuota" : "packBadZip", e && e.vars);
+    /* バージョン変更が他のタブにブロックされた（onblocked）。放置すると固まるので案内を出す */
+    const blockedError = !!e && (e.message === "idb-blocked" || e.name === "BlockedError");
+    setStatus("packStatus", e instanceof PackError ? e.key
+      : blockedError ? "packDbBlocked" : quotaError ? "packStorageQuota" : "packBadZip", e && e.vars);
     return null;
   }
 }

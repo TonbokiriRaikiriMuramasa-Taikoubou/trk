@@ -236,6 +236,7 @@ const occurrences = (text, re) => [...text.matchAll(re)];
 /* ---------- 5. ZIP の展開上限（圧縮爆弾よけ） ---------- */
 {
   const custom = js["js/custom.js"];
+  const core = js["js/core.js"];
   const capped = custom.includes("async function inflateEntry(e, limit = 0, label = \"\")") &&
     custom.includes("const reader = stream.getReader(), chunks = []") &&
     custom.includes("if (size > limit) throw new PackError(\"packFileTooBig\"") &&
@@ -247,26 +248,57 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   const budgetSource = recordStart >= 0 && recordEnd >= 0 ? custom.slice(recordStart, recordEnd) : "";
   let budgetBehavior = false;
   try {
-    const projectedSize = vm.runInNewContext(`(()=>{${budgetSource}; return projectedPackStoreSize;})()`);
-    const sizes = projectedSize([
-      { id:"replace", files:{ audio:{ size:120 }, chart:{ size:30 } } },
-      { id:"keep", files:{ audio:{ size:70 } } }
-    ], "replace", 50);
-    /* 新しいレコードは size を優先し、古い/壊れたレコードだけ files を数え直す */
-    const mixed = projectedSize([
-      { id:"newer", size:200, files:{ audio:{ size:10 } } },
-      { id:"legacy", files:{ audio:{ size:40 } } },
-      { id:"broken", size:Number.NaN, files:{ audio:{ size:5 } } }
-    ], "newer", 0);
-    budgetBehavior = sizes.stored === 220 && sizes.replacing === 150 && sizes.projected === 120 &&
-      projectedSize([], "new", 10).projected === 10 &&
-      mixed.stored === 245 && mixed.replacing === 200 && mixed.projected === 45;
+    const budget = vm.runInNewContext(`(()=>{${budgetSource}; return { bytes:packRecordBytes, projected:packProjected };})()`);
+    /* レコード1件ぶん：新しいものは size を優先、古い/壊れたものだけ files を数え直す */
+    budgetBehavior = budget.bytes({ id:"newer", size:200, files:{ a:{ size:10 } } }) === 200 &&
+      budget.bytes({ id:"legacy", files:{ a:{ size:40 } } }) === 40 &&
+      budget.bytes({ id:"broken", size:Number.NaN, files:{ a:{ size:5 } } }) === 5 &&
+      budget.bytes(null) === 0 &&
+      /* 保存後の見込み＝合計 − 置き換える分 ＋ 今回の分 */
+      budget.projected({ stored:220, replacing:150 }, 50) === 120 &&
+      budget.projected({ stored:0, replacing:0 }, 10) === 10 &&
+      budget.projected({ stored:100, replacing:100 }, 500) === 500;
   } catch (_) {}
   const storeCap = custom.includes("PACK_STORE_MAX = 1024 * PACK_MB") &&
     custom.includes("await checkPackStorageCapacity(id, total)") && custom.includes("storage.estimate()") &&
     custom.includes("packDB.putIf(id, record") && js["js/core.js"].includes("putIf: (k, v, predicate)") &&
     custom.includes("let packInstallQueue = Promise.resolve()") && budgetBehavior;
   rule(storeCap, "pack imports serialize and enforce a net 1 GiB installed-pack budget plus browser quota preflight");
+
+  /* F-32 の大型修正：合計を「size index のキーだけ」で数える（レコード本体＝Blob を復元しない）。
+     ⚠ size を持たないレコードは index に載らず**合計が過小**になる＝上限を素通しする危険な向き。
+        だから ①v1→v2 の移行で size を書き戻し ②件数と食い違ったら全件を数え直す、の二段構え。 */
+  const idbIndexed = core.includes("const IDB_VERSION = 2") &&
+    core.includes("os.createIndex(sizeKey, sizeKey)") &&
+    core.includes("readStats(os, null, res)") &&
+    core.includes("readStats(os, v && v.id, stats =>") &&
+    custom.includes('idbStore("shadow_taiko_packs", "packs", { sizeKey:"size", sizeOf:packRecordBytes })');
+  rule(idbIndexed, "pack totals come from a size index (no blob deserialization) instead of reading every record");
+
+  const idbMigration = /os\.openCursor\(\)[\s\S]{0,500}?c\.update\(Object\.assign\(\{\}, rec, \{ \[sizeKey\]: sizeOf\(rec\) \}\)\)/.test(core);
+  rule(idbMigration, "the v1→v2 migration backfills size on legacy records (otherwise the index under-counts)");
+
+  /* 件数の食い違い＝「index に載らないレコードがある」→ null を返して全件を数え直させる */
+  let statsGuard = false;
+  try {
+    const m = /const statsFromKeys =[\s\S]*?\n  \};/.exec(core);
+    const f = vm.runInNewContext(`(()=>{${m[0]}; return statsFromKeys;})()`,
+      { sizeOf: r => (r && Number.isFinite(r.size) ? r.size : 0) });
+    const full = f([100, 250, 70], 3, null);
+    const mismatch = f([100], 2, null);                 /* ← index に載らないレコードがある状態 */
+    const withPrev = f([100, 50], 2, { size:50 });
+    statsGuard = !!full && full.stored === 420 && full.replacing === 0 && full.fast === true &&
+      mismatch === null &&                              /* null＝「測れない」ので全件読みへ落ちる */
+      !!withPrev && withPrev.stored === 150 && withPrev.replacing === 50 && withPrev.count === 2 &&
+      f(["x", 3], 2, null) === null;                    /* 数値でないキーも過小計上につながるので弾く */
+  } catch (_) {}
+  rule(statsGuard, "a size-index/count mismatch forces a full recount instead of under-counting the pack budget");
+
+  /* バージョンを上げたので、古いタブが掴んでいるとブロックされる。onblocked が無いと永遠に固まる。 */
+  const idbBlocked = core.includes('r.onblocked = () => { p = null; rej(new Error("idb-blocked")); };') &&
+    custom.includes('blockedError ? "packDbBlocked"') &&
+    read("js/i18n.js").split("packDbBlocked:").length - 1 === 4;
+  rule(idbBlocked, "a blocked IndexedDB version upgrade rejects instead of hanging, and says so in four languages");
 
   const storageErrors = custom.includes('e.name === "QuotaExceededError"') &&
     custom.includes('"packStorageQuota"') && custom.includes('"packStorageCheckFailed"') &&

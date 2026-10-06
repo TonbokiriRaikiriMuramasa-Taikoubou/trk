@@ -72,7 +72,7 @@ trk! は **サーバーを持たない** ブラウザ音ゲーです。アカウ
 | F-31 | 低 | `#reset=all` の破壊的操作は `hash.includes("force")` で確認を省略しており、`#reset=all&force=0` でも設定を消せた（query側は `force=1` を確認） | **修正**（hashを `URLSearchParams` として解析し、query/hashとも `force` の値が厳密に `1` の場合だけ確認を省略。`force=0`／`forcely=1` の回帰検査を追加） |
 | F-32 | 低 | `.stpack` には単体500 MiB上限があるが、複数導入時の合計上限・ブラウザIndexedDB quota不足の案内がなかった | **修正**（保存済みパックの展開後合計を1 GiBで制限し、同一IDの置換分を差し引いて判定。`navigator.storage.estimate()` を事前確認し、quota／確認失敗を4言語で案内。タブ内importを直列化し、IndexedDBのreadwrite transaction内でも容量確認とputを一体化して複数タブ間の競合を防ぐ。**合計の算出は `size` index のキーだけで行い、レコード本体（Blob）を復元しない**＝`packs` ストアを v2 へ上げて移行時に古いレコードの `size` を書き戻す。index に載らない／数値でない `size` を見つけたら全件を数え直すので、**過小計上で上限を素通ししない**） |
 | F-4 | 中 | アドオンはページ内のフル権限を持ち、設定・保存領域・DOM・通信に触れられる（データを外へ送ることも技術的には可能） | **フル権限は仕様として維持**（sandboxではないため信頼できるコードだけ導入。新規導入の事前同意と起動時指紋検査はF-21/F-22で追加したが、同意記録は署名・権限境界ではない。§5参照） |
-| F-5 | 中 | three.js 系を jsDelivr から読む（バージョン固定は有り）。**import map は SRI が使えない**ため、CDN 側が汚染されると trk! のページで任意コードが動く | **修正（自前ホスティング）**：`assets/vendor/` に同梱し、import map を相対パスにしました（§8）。第三者オリジンはゼロ、中身は `tools/vendor-lock.json`（SHA-384・98ファイル・3.60MB）で固定し、`npm run check` の中で毎回オフライン検証します |
+| F-5 | 中 | three.js 系を jsDelivr から読む（バージョン固定は有り）。**import map は SRI が使えない**ため、CDN 側が汚染されると trk! のページで任意コードが動く | **修正（自前ホスティング）**：`assets/vendor/` に同梱し、import map を相対パスにしました（§8）。第三者オリジンはゼロ、中身は `tools/vendor-lock.json`（SHA-384・100ファイル・4.98MB）で固定し、`npm run check` の中で毎回オフライン検証します |
 | F-6 | 低 | `?reset=all` / `#reset=all` は**確認なし**で設定（プレイリスト・TVお気に入り含む）を初期化。リンクを踏むだけで消せる | **F-20 に統合・修正済み**（公開Issueとしての重複記録。現在は確認ダイアログあり） |
 | F-7 | 低 | GitHub Pages では `frame-ancestors` / `X-Frame-Options` を付けられず、**どこかのページに iframe で埋め込める**（クリックジャッキング）。ただしフォルダ共有は `window.self === window.top` で iframe 内では無効、削除系は `confirm` 有り | 文書化（§6） |
 | F-8 | 低 | `?tv=` `?skin=` はリンクだけで見た目を書き換え、**保存までする**。以前は任意の短い文字列を設定値に保存していた（「任意CSSを注入できる」という指摘は誤検知。描画時にはプリセット辞書で照合され、実際の問題は不正値の保存と意図しない表示） | **修正**（`?tv` は映像プリセットIDの許可リスト、`?skin` は読み込み済みTVスキンIDの許可リストで照合。設定Importも同じ制限。未知IDは無視し、`__proto__` 等がスキン表の継承プロパティを拾わないよう own-property で検索。URL経由での保存仕様は維持） |
@@ -96,7 +96,7 @@ trk! は **サーバーを持たない** ブラウザ音ゲーです。アカウ
 | 📚 書斎の**パス・トラバーサル**（`../` で端末のファイルを読む／書く） | `relativePath` → `stableId` → IndexedDB の流れを追い、書斎が**ファイルシステムや URL に path を渡す箇所が無い**ことを確認（唯一の `img.src` は許可リスト画像のブロブ URL）。`../../../../etc/passwd.txt` を実際に取り込み | **問題なし**。path は「本の見出し・検索対象」と IndexedDB のキー（ハッシュID）にしか使われない。書き込みはメモの書き出しだけで、ファイル名からは `\ / : * ? " < > \|` を除去。実測で外部への読み書きも発生しない |
 | 書斎の**ファイル偽装**（`.txt` の中身が HTML/JS で、HTML として描画される） | 本文の描画経路を追い、`.html` / `.js` / `.md` / `.csv` / `.json` を実際に取り込んで開いた | **問題なし**。本文は `createTextNode` / `textContent` だけで組み立てられ、**マークダウンのレンダラも HTML 解釈も存在しない**（ソースがそのまま文字として見える）。`<script>`・`onerror`・`javascript:` リンクは実行も生成もされない |
 | 書斎の本文に**スクリプトが混ざる**（青空文庫ルビ経由） | ルビ解析の出力を全部 DOM へ通す箇所を確認 | **問題なし**。`{ruby, reading, text}` はすべてテキストノード（`<rt>` も `textContent`）。HTML として解釈される経路は無い |
-| **第三者ライブラリの供給網**（three.js / three-vrm / three-mmd-loader） | import map・`import()` の呼び出し箇所・Service Worker のキャッシュ条件を確認し、**モジュールグラフ全体の SHA-384 を記録**して検証する道具を作った（`npm run check:vendor`＝オフライン、`npm run check:vendor:npm`＝npm と突き合わせ） | **修正（自前ホスティング）**：`assets/vendor/` に同梱（98ファイル・3.60MB）し、**import map から第三者オリジンが消えました**。**起動時には読みません**（VRM／MMD を使い始めたときだけ動的 import。`?safe=1` では VRM・MMD とも `skin` に戻すので読みません）。中身の固定はロック＋毎回の検査（`npm run check` の一部・ネットワーク不要）。版の更新は `npm run vendor:update` の1コマンドで、差分がPRに残ります |
+| **第三者ライブラリの供給網**（three.js / three-vrm / three-mmd-loader） | import map・`import()` の呼び出し箇所・Service Worker のキャッシュ条件を確認し、**モジュールグラフ全体の SHA-384 を記録**して検証する道具を作った（`npm run check:vendor`＝オフライン、`npm run check:vendor:npm`＝npm と突き合わせ） | **修正（自前ホスティング）**：`assets/vendor/` に同梱（100ファイル・4.98MB）し、**import map から第三者オリジンが消えました**。**起動時には読みません**（VRM／MMD を使い始めたときだけ動的 import。`?safe=1` では VRM・MMD とも `skin` に戻すので読みません）。中身の固定はロック＋毎回の検査（`npm run check` の一部・ネットワーク不要）。版の更新は `npm run vendor:update` の1コマンドで、差分がPRに残ります |
 | 書斎の**画像**が HTML／SVG だった場合 | 許可リストと描画先を確認 | **問題なし**。許可リストは `jpg/jpeg/png/webp/gif/avif/bmp` のみ（**SVG は除外**、check-study-room が見張り）、描画は `<img src=blob:>` だけ（`<iframe>`／`<object>` は不使用） |
 
 ### 逆に、すでに固かったところ（回帰させない）
@@ -139,7 +139,7 @@ trk! は **サーバーを持たない** ブラウザ音ゲーです。アカウ
 
 ### 済んだもの（記録）
 
-- **three.js 系の自前ホスティング**：2026-10-06 完了（§8）。**98ファイル・3.60MB**（three-mmd-loader＋アセット 2.42MB、three.js 本体 0.60MB＋GLTFLoader 0.11MB、three-vrm 一式 0.50MB、各LICENSE）。版を上げるときは `npm run vendor:update` → 差分を確認 → `npm run check`。
+- **three.js 系の自前ホスティング**：2026-10-06 完了（§8）。**100ファイル・4.98MB**（three-mmd-loader＋アセット 2.42MB、three.js 一式 2.06MB〔`three.core.js` 1.40MB・`BufferGeometryUtils.js` 35KBを追加〕、three-vrm 一式 0.50MB、各LICENSE）。版を上げるときは `npm run vendor:update` → 差分を確認 → `npm run check`。
 - **`?reset=all` の確認ダイアログ**：2026-10-06 完了（F-20）。
 - **アドオン**：2026-10-06 追加・強化（F-21〜F-23・F-26）：同意前実行の禁止、SHA-256指紋（Web Crypto対応時）、起動時の不一致停止、コード512KiB／入力ファイル4MiB上限、壊れたJSONのfail-closed化。旧FNV記録・同意記録なしの旧アドオンは互換性のため残す（権限境界ではない）。
 - **単体譜面JSON**：2026-10-06 強化（F-24）：2MiB上限と数値型検証。
@@ -159,7 +159,7 @@ trk! は **サーバーを持たない** ブラウザ音ゲーです。アカウ
 
 ## 8. 同梱した第三者コードを確かめる（`assets/vendor` と `tools/vendor-lock.json`）
 
-three.js／three-vrm／three-mmd-loader は **`assets/vendor/<package>@<version>/…` に同梱**してあります（98ファイル・3.60MB）。入口の `import()` から `import` の連鎖を辿り、WASM やテクスチャのような**実行時アセット**（`new URL("…", import.meta.url)`）まで含めたコピーです。
+three.js／three-vrm／three-mmd-loader は **`assets/vendor/<package>@<version>/…` に同梱**してあります（100ファイル・4.98MB）。入口の `import()` から `import` の連鎖を辿り、WASM やテクスチャのような**実行時アセット**（`new URL("…", import.meta.url)`／`new URL('…', import.meta.url)`）まで含めたコピーです。
 
 ```
 node tools/check-vendor.mjs               # オフライン検証：記録とのハッシュ一致・相対importの解決・import mapの被覆
@@ -169,6 +169,8 @@ npm run vendor:update                     # 版を上げるとき：取得し直
 ```
 
 オフライン検証は **`npm run check` の中に入っています**（ネットワーク不要）。`--source=npm` は npm に届く環境で来歴を確認するためのものです。同梱ファイルは**手で編集しない**でください（編集した瞬間に検査が落ちます）。
+
+**2026-10-06 の再点検**：取り込み道具と検査がどちらもダブルクォートの import だけを拾っていたため、three.js の `./three.core.js` と GLTFLoader の `../utils/BufferGeometryUtils.js`（シングルクォート）が本番配布物から欠け、旧検査も8項目PASSのまま見逃していました。両方の引用形式を後方参照で抽出し、`new URL(..., import.meta.url)` は import map を使わずファイル相対アセットとして検査します。逆テストで対象ファイルと lock 記録を外すと、旧検査はPASS、新検査は missing edge でFAILすることを確認しました。`npm run vendor:update` はローカル import map の正規化とローカルパスの二重変換も修正し、再実行可能にしています。
 
 ## 9. この文書の更新ルール
 

@@ -786,6 +786,33 @@ window.TrkEnsureTrkPlaylist = ensureTrkPlaylist;
 window.TrkTrkPlaylistId = TRK_PLAYLIST_ID;
 window.TrkEnsureTrkClassicPlaylist = ensureTrkClassicPlaylist;
 window.TrkClassicId = TRK_CLASSIC_ID;
+function trkOrderedPlaylists(list) {
+  if (settings.trkSortABC) return list.slice().sort((a,b) => a.name.localeCompare(b.name, 'ja'));
+  const order = settings.playlistOrder || [];
+  if (!order.length) return list.slice().sort((a,b) => (a.createdAt||0)-(b.createdAt||0));
+  const idx = new Map(order.map((id,i)=>[id,i]));
+  return list.slice().sort((a,b) => {
+    const ai = idx.has(a.id) ? idx.get(a.id) : 1e9;
+    const bi = idx.has(b.id) ? idx.get(b.id) : 1e9;
+    if (ai !== bi) return ai - bi;
+    return (a.createdAt||0)-(b.createdAt||0);
+  });
+}
+function trkMovePlaylist(id, dir) {
+  let order = (settings.playlistOrder||[]).slice();
+  const ids = trkOrderedPlaylists(settings.playlists.filter(p=> p.folder===TRK_FOLDER_ID || p.folder==="trk-classic" || p.folder==="trk-ba" || p.folder==="trk-touhou" || p.folder==="trk-arknights" || p.folder==="trk-gakumas" || settings.plFolders.some(f=> f.id===p.folder && f.parent===TRK_FOLDER_ID) )).map(p=>p.id);
+  // ensure order contains all ids
+  for (const pid of ids) if (!order.includes(pid)) order.push(pid);
+  const i = order.indexOf(id);
+  if (i < 0) return;
+  const j = i + dir;
+  if (j < 0 || j >= order.length) return;
+  [order[i], order[j]] = [order[j], order[i]];
+  settings.playlistOrder = order.slice(0,200);
+  saveUserPrefs();
+  renderLib();
+  try { if (typeof renderTrkSettings === "function") renderTrkSettings(); } catch(_){}
+}
 window.ensureTrkDistributionPlaylists = ensureTrkDistributionPlaylists;
 
 function trkWishesForSeries(seriesId) {
@@ -1009,6 +1036,29 @@ function plFolderMenu(f) {
   del.addEventListener("click", () => plFolderDelete(f, d.close));
   d.card.append(plRow(tr("plName"), name), plRow(tr("plIcon"), icon), plRow(tr("plColor"), color),
     plRow(tr("plFolderOf"), parent), save, del);
+  // 🐔 trk folder special: show inner playlists (Game Vol.1, Classic Vol.1, BlueArchive etc.) for quick open
+  if (f.id === TRK_FOLDER_ID || f.id === "trk-classic" || f.id === "trk-ba" || f.id === "trk-touhou" || f.id === "trk-arknights" || f.id === "trk-gakumas") {
+    const innerIds = f.id === TRK_FOLDER_ID ? [TRK_FOLDER_ID, "trk-classic", "trk-ba", "trk-touhou", "trk-arknights", "trk-gakumas"] : [f.id];
+    const allInner = settings.playlists.filter(p => innerIds.includes(p.folder) || (f.id===TRK_FOLDER_ID && settings.plFolders.some(ff=> innerIds.includes(ff.id) && ff.id===p.folder)) );
+    if (allInner.length) {
+      d.card.append(el("div", "plSep"));
+      d.card.append(el("b", "plCardTitle", tr("plFolderContents") || "中のプレイリスト"));
+      const ordered = trkOrderedPlaylists(allInner);
+      for (const p of ordered) {
+        const row = el("div"); row.style.cssText = "display:flex;gap:8px;align-items:center;margin:4px 0;flex-wrap:wrap";
+        const open = el("button", "plBtn", (p.icon||"🎧")+" "+p.name+" ("+plCount(p, new Set((window.__libAll||[]).map(x=>x.key)))+")"); open.type="button";
+        open.addEventListener("click", () => { d.close(); settings.libTab="pl:"+p.id; renderLib(); });
+        const up = el("button", "plBtn small", "↑"); up.type="button"; up.title="上へ";
+        const down = el("button", "plBtn small", "↓"); down.type="button"; down.title="下へ";
+        if (settings.trkSortABC) { up.disabled=true; down.disabled=true; up.style.opacity=".45"; down.style.opacity=".45"; }
+        up.addEventListener("click", () => trkMovePlaylist(p.id, -1));
+        down.addEventListener("click", () => trkMovePlaylist(p.id, 1));
+        row.append(open, up, down);
+        d.card.append(row);
+      }
+      if (settings.trkSortABC) d.card.append(el("div", "plHint", "🔤 ABC順がオンのため、手動並べ替えは無効です。設定でオフにしてください。"));
+    }
+  }
   name.focus(); name.select();
 }
 
@@ -2333,6 +2383,40 @@ function syncTrkUI() {
     else if (tc) stC.textContent = tr("trkClassicTitle") + " \u00B7 " + tr("plSongsNow", { n: (tc.songs.length + (tc.wish ? tc.wish.length : 0)) });
     else stC.textContent = tr("trkClassicHint");
   }
+  const chkAbc = $("trkSortAbcChk");
+  if (chkAbc) chkAbc.checked = !!settings.trkSortABC;
+  try { renderTrkSettings(); } catch(_){}
+}
+function renderTrkSettings() {
+  const box = $("trkOrderList");
+  if (!box) return;
+  box.replaceChildren();
+  const innerIds = [TRK_FOLDER_ID, "trk-classic", "trk-ba", "trk-touhou", "trk-arknights", "trk-gakumas"];
+  const list = settings.playlists.filter(p => innerIds.includes(p.folder) || settings.plFolders.some(f=> f.parent===TRK_FOLDER_ID && f.id===p.folder && innerIds.includes(f.id)) || innerIds.includes(p.folder));
+  // also include playlists whose folder is a direct trk subfolder
+  const trkList = settings.playlists.filter(p => {
+    if (p.id===TRK_PLAYLIST_ID || p.id===TRK_CLASSIC_ID) return true;
+    if (innerIds.includes(p.folder)) return true;
+    const f = settings.plFolders.find(x=> x.id===p.folder);
+    return f && f.parent===TRK_FOLDER_ID;
+  });
+  if (!trkList.length) { box.append(el("div","hint","（まだプレイリストがありません。チュートリアルを完了すると自動作成されます）")); return; }
+  const ordered = trkOrderedPlaylists(trkList);
+  for (let i=0;i<ordered.length;i++) {
+    const p = ordered[i];
+    const row = el("div"); row.style.cssText="display:flex;gap:8px;align-items:center;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;padding:6px 8px";
+    const name = el("span","", (p.icon||"🎧")+" "+p.name); name.style.cssText="flex:1;min-width:120px";
+    const open = el("button","plBtn small","開く"); open.type="button";
+    open.addEventListener("click", ()=>{ settings.libTab="pl:"+p.id; saveUserPrefs(); renderLib(); });
+    const up = el("button","plBtn small","↑"); up.type="button"; up.title="上へ";
+    const down = el("button","plBtn small","↓"); down.type="button"; down.title="下へ";
+    if (settings.trkSortABC) { up.disabled=true; down.disabled=true; up.style.opacity=".45"; down.style.opacity=".45"; }
+    up.addEventListener("click", ()=> trkMovePlaylist(p.id, -1));
+    down.addEventListener("click", ()=> trkMovePlaylist(p.id, 1));
+    row.append(name, open, up, down);
+    box.append(row);
+  }
+  if (settings.trkSortABC) box.append(el("div","hint","🔤 ABC順がオンのため、手動の ↑↓ は無効です。"));
 }
 
 
@@ -2347,6 +2431,11 @@ if (trkChk) trkChk.addEventListener("change", function(){
   if (settings.trkPlaylist) try { ensureTrkPlaylist({ toast: false }); } catch(_){}
   syncTrkUI(); renderLib();
   setStatus("trkStatus", settings.trkPlaylist ? "trkShow" : "trkHide");
+});
+const trkAbcChk = $("trkSortAbcChk");
+if (trkAbcChk) trkAbcChk.addEventListener("change", function(){
+  settings.trkSortABC = !!trkAbcChk.checked; saveUserPrefs();
+  syncTrkUI(); renderLib();
 });
 const trkOpenBtn = $("trkOpenBtn");
 if (trkOpenBtn) trkOpenBtn.addEventListener("click", function(){

@@ -758,6 +758,7 @@ requestAnimationFrame(frame);
 
 /* ブラウザは、ユーザーの操作のあとでないと音を出せないので、最初の操作で準備する */
 function wakeAudio() {
+  if (window._trkStudyRoomOpen) return;   // 書斎の閲覧中は音の準備をしない（読書を邪魔しない）
   if (settings.fxOn) ensureGraph();
   if (G.ac && G.ac.state === "suspended") G.ac.resume();
 }

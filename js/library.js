@@ -1642,7 +1642,10 @@ async function selectSong(it) {
     if (it.file) { /* file を持っていれば、ふつうの曲と同じ道（loadMedia）を通る */ }
     else { emit("addonSelect", it); renderSeedTools(); return; }
   }
-  await setBackground(it.bgBlob || null);
+  let studySongArt = null;
+  try { if (window.TrkStudyRoom && typeof window.TrkStudyRoom.getSongCoverBlob === "function") studySongArt = await window.TrkStudyRoom.getSongCoverBlob(it.key); } catch (_) {}
+  if (currentSong !== it) return;
+  await setBackground(studySongArt || it.bgBlob || null);
   if (currentSong !== it) return;
   previewPending = true;
   const ok = await loadMedia(it.file, { title:it.title, onReady:() => restoreSongState(it) });
@@ -1955,6 +1958,14 @@ $("libRandomBtn").addEventListener("click", () => {
 
 on("records", renderLib);
 on("chart", updateSpBuilder);
+// 書斎で曲のジャケットを割り当て直したら、いま流している曲だけ即座に背景へ反映する。
+on("studyCoverChanged", key => {
+  const song = currentSong;
+  if (!song || key !== song.key || !window.TrkStudyRoom || typeof window.TrkStudyRoom.getSongCoverBlob !== "function") return;
+  window.TrkStudyRoom.getSongCoverBlob(key).then(blob => {
+    if (currentSong === song) return setBackground(blob || song.bgBlob || null);
+  }).catch(() => {});
+});
 on("language", () => { $("libSearch").placeholder = tr("libSearch"); showReconnect(); syncShareUI(); renderLib(); renderBanner(); });
 
 /* ---------- 起動時（main.js から呼びます） ---------- */

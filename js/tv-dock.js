@@ -1043,9 +1043,11 @@ addEventListener("DOMContentLoaded", () => {
   const screen = el("div", "tvScreen");
   const screenGlare = el("i", "tvGlare");
   const speaker = el("div", "tvSpeaker");
+  /* 🎨 書斎で割り当てたローカルジャケット（音声だけの曲でもTVを寂しくしない） */
+  const coverImg = document.createElement("img"); coverImg.className = "tvCover"; coverImg.alt = ""; coverImg.hidden = true;
   /* 🆕 選曲中は、この画面に流れているmp4を映す（paintVideoFrame が描く） */
   const liveCanvas = document.createElement("canvas"); liveCanvas.className = "tvLive";
-  screen.append(liveCanvas, screenGlare, el("i", "tvScanlines"));   // 走査線はカスタムTVスキン用（[data-scan="1"] のときだけ出る）
+  screen.append(coverImg, liveCanvas, screenGlare, el("i", "tvScanlines"));   // 走査線はカスタムTVスキン用（[data-scan="1"] のときだけ出る）
   screenWrap.append(screen, speaker);
   const deco = el("div", "tvDeco");
   const slots = el("div", "tvSlots");
@@ -1630,6 +1632,8 @@ addEventListener("DOMContentLoaded", () => {
     const liveOn = settings.tvMenuPreview !== false && !isOff && videoReady && !video.paused &&
       phase === "title" && screenName() === "select";
     screen.dataset.live = liveOn ? "1" : "0";
+    liveCanvas.style.opacity = liveOn ? "" : "0";
+    coverImg.hidden = isOff || liveOn || !coverImg.hasAttribute("src");
     if (liveOn) startLive(); else stopLive();
     powLed.classList.toggle("on", !isOff);
     /* 🖥 全画面表示のときに点灯（スキンの点灯アイコンの見た目はそのまま） */
@@ -1745,6 +1749,29 @@ addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // 書斎から曲へ割り当てたローカル画像を、曲情報TVにも反映する。
+  let coverObjectUrl = "", coverRequest = 0;
+  function clearDockCover() {
+    if (coverObjectUrl) { URL.revokeObjectURL(coverObjectUrl); coverObjectUrl = ""; }
+    coverImg.removeAttribute("src"); coverImg.hidden = true;
+  }
+  async function refreshDockCover(songKey) {
+    const token = ++coverRequest, key = songKey || currentSong && currentSong.key;
+    if (!key) { clearDockCover(); render(); return; }
+    let blob = null;
+    try {
+      if (window.TrkStudyRoom && typeof window.TrkStudyRoom.getSongCoverBlob === "function") blob = await window.TrkStudyRoom.getSongCoverBlob(key);
+    } catch (_) {}
+    if (token !== coverRequest || !currentSong || currentSong.key !== key) return;
+    if (!blob) blob = currentSong.bgBlob || null;
+    if (coverObjectUrl) { URL.revokeObjectURL(coverObjectUrl); coverObjectUrl = ""; }
+    try {
+      if (blob && typeof URL.createObjectURL === "function") { coverObjectUrl = URL.createObjectURL(blob); coverImg.src = coverObjectUrl; }
+      else coverImg.removeAttribute("src");
+    } catch (_) { coverImg.removeAttribute("src"); }
+    render();
+  }
+
   let queued = false;
   const update = () => { if (queued) return; queued=true; requestAnimationFrame(()=>{ queued=false; render(); }); };
   const mo = new MutationObserver(update);
@@ -1754,8 +1781,12 @@ addEventListener("DOMContentLoaded", () => {
   on("tvChange", () => { update(); applyOrder(); menuVideoTick(); previewTick(); });
   on("phase", update);
   on("screen", update);
+  on("mediaReady", update);
+  on("songSelected", song => refreshDockCover(song && song.key));
+  on("studyCoverChanged", key => { if (!key || currentSong && key === currentSong.key) refreshDockCover(key || currentSong && currentSong.key); });
 
   render(true);
+  refreshDockCover(currentSong && currentSong.key);
   applyOrder();
   // fxDock が後から作られる場合も並び替え
   setTimeout(applyOrder, 500);

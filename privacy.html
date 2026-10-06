@@ -20,7 +20,7 @@
     <p class="eyebrow">PRIVACY</p>
     <h1>プライバシーについて</h1>
     <p class="lead">trk! は、手持ちの曲で遊ぶための、サーバーを持たないブラウザ音ゲーです。現在のWeb版とPWA版では、アカウント登録・広告・行動分析を使いません。</p>
-    <p class="updated">最終更新：2026年10月5日</p>
+    <p class="updated">最終更新：2026年10月6日</p>
 
     <nav class="toc" aria-label="このページの項目">
       <a href="#collect">収集する情報</a>
@@ -50,9 +50,11 @@
         <li>音量、言語、スキン、キー割り当て、シンセの設定</li>
         <li>スコア、記録、お気に入り、カスタムスキン、エフェクト設定</li>
         <li>ユーザーが明示的に「端末に残す」を選んだ共有曲のファイルとメタデータ</li>
+        <li>📚 書斎へ取り込んだ画像・テキストのコピー、栞と栞一覧、書き出し前のメモ、曲へ割り当てたジャケット、書斎の表示設定（並べ替え・文字組み・TVの見た目など。IndexedDB <code>trk_study_room_v1</code>）</li>
         <li>PWAをオフラインで起動するためのアプリファイルのキャッシュ</li>
       </ul>
       <p>曲の端末保存は初期状態ではオフです。保存した曲や設定は、ゲーム内の削除操作、設定のリセット、ブラウザのサイトデータ削除で消せます。ブラウザの保存容量やOSの判断により、保存が拒否・削除されることがあります。</p>
+      <p>書斎へ取り込んだ本も端末内だけに保存され、外部へ送信・アップロードしません。本棚の「この本を削除」またはブラウザのサイトデータ削除で消せます。元のファイルは変更しません。栞・メモのコピー・ジャケットの割り当て・表示設定も同じ場所に保存され、同じ操作で消せます。</p>
     </section>
 
     <section id="permissions">
@@ -101,7 +103,7 @@
     <p>trk! is a local-first browser rhythm game. The current web and PWA versions do not require an account and do not use advertising, analytics, or telemetry. User-selected songs, charts, settings, scores, favorites, and optional saved music stay in the browser or app storage and are not uploaded by trk!.</p>
     <p>The app may request file or folder access when you choose music. VRM/MMD features may load three.js-related libraries from jsDelivr. GitHub Pages, GitHub Issues, X, jsDelivr, and other external services have their own policies when you visit them.</p>
     <p>The APK build is not distributed yet. This repository contains a Capacitor preparation path for packaging the same web assets; any future native media permissions will be documented here before release.</p>
-    <p>See the Japanese sections above for the full current policy. Last updated: October 5, 2026.</p>
+    <p>See the Japanese sections above for the full current policy. Last updated: October 6, 2026.</p>
   </article>
 </main>
 

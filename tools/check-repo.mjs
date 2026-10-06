@@ -285,32 +285,34 @@ if (!read("js/library.js").includes("plAuthorMenu") ||
   const preset = JSON.parse(read("assets/mmd/lat-miku/preset.json"));
   const labelKeys = [
     "mmdMotionWalk", "mmdMotionRun", "mmdMotionSit", "mmdMotionDance", "mmdMotionLegacy",
-    "mmdGroupDaily", "mmdGroupDance", "mmdGroupSongs", "mmdGroupMiku", "mmdGroupFaces",
+    "mmdGroupDaily", "mmdGroupDance", "mmdGroupSongs", "mmdGroupMiku", "mmdGroupFaces", "mmdGroupVoice",
     "mmdMotionFaceSmile", "mmdMotionFaceWink", "mmdMotionFaceShy", "mmdMotionFaceAngry", "mmdMotionFaceConfused",
     "mmdMotionFaceSurprise", "mmdMotionFaceSleepy", "mmdMotionFacePout", "mmdMotionFaceLaugh", "mmdMotionFaceSing",
     "mmdMotionPrincess", "mmdMotionLeekShake", "mmdMotionPopipo", "mmdMotionTriple", "mmdMotionNyan", "mmdMotionSalute",
     "mmdMotionDoubleHeart", "mmdMotionPoint", "mmdMotionEncore", "mmdMotionDramatic", "mmdMotionVictory", "mmdMotionPenlight",
     "mmdMotionChibi", "mmdMotionSpin", "mmdMotionGroove", "mmdMotionStepTouch", "mmdMotionShoulderPop", "mmdMotionArmWave",
-    "mmdMotionCrossStep", "mmdMotionSoftBow", "mmdMotionMarionette"
+    "mmdMotionCrossStep", "mmdMotionSoftBow", "mmdMotionMarionette",
+    "mmdMotionSongMic", "mmdMotionSongLong", "mmdMotionSongUp", "mmdMotionSongHum", "mmdMotionSongWhisper", "mmdMotionSongCall"
   ];
   const labelsOk = labelKeys.every(key => (mmd.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4);
-  const defaultOk = preset.motion === "dreamy128" && preset.bpm === 128 &&
-    core.includes('prefs.mmdMotionKind : "dreamy128"') && core.includes('settings.mmdMotionKind = "dreamy128"');
+  const defaultOk = preset.motion === "faceSing" && preset.bpm === 0 &&
+    core.includes('prefs.mmdMotionKind : "faceSing"') && core.includes('settings.mmdMotionKind = "faceSing"');
   const chooserOk = mmd.includes('const MOTION_GROUPS = [') && mmd.includes('const MOTION_MENU_IDS = MOTION_GROUPS.flatMap(group => group.ids)') &&
     mmd.includes("const MOTION_MENU_SET = new Set(MOTION_MENU_IDS)") && mmd.includes('visibleMotions: () => MOTION_MENU_IDS.slice()') &&
     mmd.includes('motionGroups: () => MOTION_GROUPS.map') && mmd.includes("for (const group of MOTION_GROUPS)") &&
     mmd.includes("if (BUILTIN[keep] && !MOTION_MENU_SET.has(keep))");
-  const motionOk = ["walk112", "run152", "sit10", "dance128", "dreamy128", "airgtr128", "melt170", "wedh174", "faceSmile", "faceSing", "mikuPrincess152", "mikuLeek120"]
+  const motionOk = ["walk112", "run152", "sit10", "dance128", "dreamy128", "melt170", "wedh174", "faceSmile", "faceSing", "songMic", "songCall", "mikuPrincess152", "mikuLeek120"]
     .every(id => mmd.includes(`${id}: {`) || mmd.includes(`${id}: makeGesture(`));
   const morphOk = mmd.includes("const FACE_MORPHS = [") && mmd.includes("dv.setUint32(at, morphCount, true)") &&
     mmd.includes('buildVmd(frames, "trk-builtin-" + id, morphFrames)');
-  const docsOk = read("README.md").includes("内蔵モーション60種") &&
-    read("docs/HANDOFF.md").includes("60種をすべて選択可能") &&
+  const docsOk = read("README.md").includes("内蔵モーション65種") &&
+    read("docs/HANDOFF.md").includes("65種をすべて選択可能") &&
+    read("docs/HANDOFF.md").includes("🎤 歌・口パクの6グループ") &&
     read("NOTICE.md").includes("third-party VMD or choreography file is bundled");
   if (!labelsOk || !defaultOk || !chooserOk || !motionOk || !morphOk || !docsOk) {
-    fail("MMD defaults, grouped 60-motion chooser, facial morph tracks, original VMD definitions, or rights note is missing");
+    fail("MMD defaults, grouped 65-motion chooser, facial morph tracks, original VMD definitions, or rights note is missing");
   } else {
-    ok("MMD 60-motion chooser, Lat morph tracks, four-language labels and dreamy128 default are wired");
+    ok("MMD 65-motion chooser, Lat morph tracks, four-language labels and faceSing default are wired");
   }
 }
 

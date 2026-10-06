@@ -22,7 +22,7 @@
     "toon_kami.bmp"
   ],
   "credit": "Lat式ミク / Lat様",
-  "motion": "dreamy128",
-  "bpm": 128,
+  "motion": "faceSing",
+  "bpm": 0,
   "readme": "ReadMe.txt"
 }

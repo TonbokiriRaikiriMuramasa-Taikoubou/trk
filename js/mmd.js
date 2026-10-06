@@ -44,7 +44,7 @@ Object.assign(TEXT.ja, {
   mmdMotionSit:"🪑 おすわり（座ってひと息・BPM非依存）", mmdMotionDance:"💃128 ポップダンス（オリジナル・16拍）", mmdMotionLegacy:"旧設定",
   mmdMotionStep:"内蔵① ステップ（120BPM）", mmdMotionSwing:"内蔵② ゆらゆら（100BPM）", mmdMotionTurn:"内蔵③ ターン（120BPM）",
   mmdMotionJump:"内蔵④ ジャンプ（130BPM・はで）", mmdMotionIdol:"内蔵⑤ アイドル（128BPM）",
-  mmdMotionAirgtr:"🎸128 エアギター（シューゲイザーむけ）", mmdMotionDreamy:"🎸128 しっとり（When You Sleepむけ）",
+  mmdMotionDreamy:"🎸128 しっとり（When You Sleepむけ）",
   mmdMotionKneel:"🎸128 かたひざ（しずかに眺める）",
   mmdMotionIevan:"🎵120 ネギスピン（Ievan Polkkaむけ）", mmdMotionKyukura:"🎵165 くらくら（きゅうくらりんむけ）",
   mmdMotionRabbit:"🎵173 うさみみ（ラビットホールむけ・5拍子スキップ）", mmdMotionMesmer:"🎵185 すましシャッフル（メズマライザーむけ）",
@@ -54,11 +54,14 @@ Object.assign(TEXT.ja, {
   mmdMotionUmg:"🎵170 つたえる（アンノウン・マザーグースむけ）", mmdMotionWedh:"🎵174 ダンスホール（ワールズエンドむけ）",
   mmdMotionRolling:"🎵194 ぐるぐる（ローリンガールむけ）", mmdMotionUraomote:"🎵196 うらおもて（裏表ラバーズむけ）",
   mmdMotionVanish:"🎵240 こうそく（消失むけ）",
-  mmdGroupDaily:"👀 日常・ひとやすみ", mmdGroupDance:"💃 ダンス・ステージ", mmdGroupSongs:"🎵 ミク曲テンポのオリジナル", mmdGroupMiku:"🌟 ミク定番ネタ・ポーズ", mmdGroupFaces:"🎭 表情・しぐさ",
+  mmdGroupDaily:"👀 日常・ひとやすみ", mmdGroupDance:"💃 ダンス・ステージ", mmdGroupSongs:"🎵 ミク曲テンポのオリジナル", mmdGroupMiku:"🌟 ミク定番ネタ・ポーズ", mmdGroupFaces:"🎭 表情・しぐさ", mmdGroupVoice:"🎤 歌・口パク",
   mmdMotionFaceSmile:"😊 にっこり＆小さな手ふり（表情）", mmdMotionFaceWink:"😉 ウィンク＆決めポーズ", mmdMotionFaceShy:"🫣 てれおじぎ", mmdMotionFaceAngry:"😤 ぷんぷんポーズ", mmdMotionFaceConfused:"💭 こまり首かしげ", mmdMotionFaceSurprise:"😲 びっくりポーズ", mmdMotionFaceSleepy:"😴 ねむねむゆらゆら", mmdMotionFacePout:"😗 ぷくっと口をとがらせる", mmdMotionFaceLaugh:"😆 くすくす笑い", mmdMotionFaceSing:"🎤 あいうお口パク（音声同期なし）",
+  mmdMotionSongMic:"🎤 マイク風に歌う（胸の前で・BPM非依存）", mmdMotionSongLong:"🎤 しっとり長めに歌う（ゆったり）",
+  mmdMotionSongUp:"🎤 ノリノリで歌う（速い口パク・左右に揺れ）", mmdMotionSongHum:"🎤 鼻歌（口は小さく・首でリズム）",
+  mmdMotionSongWhisper:"🎤 ひそひそ歌（前のめりで小声）", mmdMotionSongCall:"🎤 サビで腕を広げて歌い上げる",
   mmdMotionPrincess:"🎵152 👑 お姫さまポーズ（ワールドイズマイン風）", mmdMotionLeekShake:"🎵120 🧅 ネギふり手ぶり（小物なし）", mmdMotionPopipo:"🎵150 🥬 野菜バウンス（ぽっぴっぽー風）", mmdMotionTriple:"🎵140 😜 おちゃめな交互ポーズ（トリプルバカ風）", mmdMotionNyan:"🎵160 🐾 ねこ手ステップ（衣装・耳なし）", mmdMotionSalute:"🎵128 🫡 ミクサルート", mmdMotionDoubleHeart:"🎵128 🫶 両手ハート風ポーズ", mmdMotionPoint:"🎵160 👉 左右交互の指さし風", mmdMotionEncore:"🎵128 👏 アンコールのお手ふり", mmdMotionDramatic:"🎵170 🎭 胸から届けるバラード風", mmdMotionVictory:"🎵128 ✌️ ピース＆勝利ポーズ", mmdMotionPenlight:"🎵145 ✨ ペンライト風の腕ふり（小物なし）", mmdMotionChibi:"🎵128 🍬 ミニバウンス（ちいさく跳ねる）", mmdMotionSpin:"🎵128 🌀 くるりターン（半回転風）",
   mmdMotionGroove:"🕺 ゆるいグルーヴ（112）", mmdMotionStepTouch:"👟 ステップタッチ（128）", mmdMotionShoulderPop:"🎵 肩でポップ（128）", mmdMotionArmWave:"🌊 なめらかアームウェーブ（120）", mmdMotionCrossStep:"👣 クロスステップ（128）", mmdMotionSoftBow:"🙇 おじぎして、もどる（BPM非依存）", mmdMotionMarionette:"🧵 マリオネット風アーム（120）",
-  mmdBuiltinNote:"内蔵モーション60種は trk! のコードからVMDを実行時生成します（第三者VMDや振付ファイルは同梱しません）。表情はLat式ミクPMDで確認したモーフ名を使うため、同名モーフがあるモデルだけ反映されます。🎵や「〜風」はテンポ・雰囲気の着想を示すだけで、原曲の振付再現ではありません。🎤口パクは母音ループで、音声とは同期しません。基準BPMが0のとき、内蔵モーションは曲に自動シンクします。",
+  mmdBuiltinNote:"内蔵モーション65種は trk! のコードからVMDを実行時生成します（第三者VMDや振付ファイルは同梱しません）。表情はLat式ミクPMDで確認したモーフ名を使うため、同名モーフがあるモデルだけ反映されます。🎵や「〜風」はテンポ・雰囲気の着想を示すだけで、原曲の振付再現ではありません。🎤口パクは母音ループで、音声とは同期しません。基準BPMが0のとき、内蔵モーションは曲に自動シンクします。",
   mmdBpm:"モーションの基準BPM（0＝内蔵は自動シンク・持ち込みVMDは固定）",
   mmdLoading:"モデルを読み込んでいます…", mmdLoadingPct:"モデルを読み込んでいます… {n}%",
   mmdLoaded:"モデル「{name}」を読み込みました。", mmdRestored:"前回のモデルを戻しました。",
@@ -98,7 +101,7 @@ Object.assign(TEXT.en, {
   mmdMotionSit:"🪑 Sit and rest (no BPM)", mmdMotionDance:"💃128 Pop dance (original · 16 beats)", mmdMotionLegacy:"saved motion",
   mmdMotionStep:"Built-in 1: Step (120 BPM)", mmdMotionSwing:"Built-in 2: Sway (100 BPM)", mmdMotionTurn:"Built-in 3: Turn (120 BPM)",
   mmdMotionJump:"Built-in 4: Jump (130 BPM, flashy)", mmdMotionIdol:"Built-in 5: Idol pump (128 BPM)",
-  mmdMotionAirgtr:"🎸128 Air guitar (shoegaze)", mmdMotionDreamy:"🎸128 Dreamy drift (for When You Sleep)",
+  mmdMotionDreamy:"🎸128 Dreamy drift (for When You Sleep)",
   mmdMotionKneel:"🎸128 One-knee gaze (quiet)",
   mmdMotionIevan:"🎵120 Leek spin (for Ievan Polkka)", mmdMotionKyukura:"🎵165 Dizzy puppet (for Kyu-kurarin)",
   mmdMotionRabbit:"🎵173 Bunny-ear hop (for Rabbit Hole, 5-beat skip)", mmdMotionMesmer:"🎵185 Cartoon shuffle (for Mesmerizer)",
@@ -108,11 +111,14 @@ Object.assign(TEXT.en, {
   mmdMotionUmg:"🎵170 Reaching out (for Unknown Mother Goose)", mmdMotionWedh:"🎵174 Dancehall (for World's End Dancehall)",
   mmdMotionRolling:"🎵194 Rolling (for Rolling Girl)", mmdMotionUraomote:"🎵196 Flip-flop (for Ura-Omote Lovers)",
   mmdMotionVanish:"🎵240 Hyper rush (for The Disappearance)",
-  mmdGroupDaily:"👀 Daily & idle", mmdGroupDance:"💃 Dance & stage", mmdGroupSongs:"🎵 Original dances at Miku-song tempos", mmdGroupMiku:"🌟 Miku-inspired gestures", mmdGroupFaces:"🎭 Expressions & acting",
+  mmdGroupDaily:"👀 Daily & idle", mmdGroupDance:"💃 Dance & stage", mmdGroupSongs:"🎵 Original dances at Miku-song tempos", mmdGroupMiku:"🌟 Miku-inspired gestures", mmdGroupFaces:"🎭 Expressions & acting", mmdGroupVoice:"🎤 Singing & lip-sync",
   mmdMotionFaceSmile:"😊 Smile and small wave", mmdMotionFaceWink:"😉 Wink and pose", mmdMotionFaceShy:"🫣 Shy bow", mmdMotionFaceAngry:"😤 Grumpy pose", mmdMotionFaceConfused:"💭 Confused head tilt", mmdMotionFaceSurprise:"😲 Surprised pose", mmdMotionFaceSleepy:"😴 Sleepy sway", mmdMotionFacePout:"😗 Pout", mmdMotionFaceLaugh:"😆 Laughing bounce", mmdMotionFaceSing:"🎤 A-I-U-O mouth cycle (not audio-synced)",
+  mmdMotionSongMic:"🎤 Sing into an invisible mic (at chest, no BPM)", mmdMotionSongLong:"🎤 Soft, long ballad line (slow mouth)",
+  mmdMotionSongUp:"🎤 Upbeat sing-along (fast mouth, side sway)", mmdMotionSongHum:"🎤 Humming (small mouth, head groove)",
+  mmdMotionSongWhisper:"🎤 Whisper-sing (leaning in, tiny mouth)", mmdMotionSongCall:"🎤 Chorus spread-arms belt-out",
   mmdMotionPrincess:"🎵152 👑 Princess pose (World is Mine-inspired)", mmdMotionLeekShake:"🎵120 🧅 Leek-wave gesture (no prop)", mmdMotionPopipo:"🎵150 🥬 Veggie bounce (PoPiPo-inspired)", mmdMotionTriple:"🎵140 😜 Playful alternating pose (Triple Baka-inspired)", mmdMotionNyan:"🎵160 🐾 Cat-paw steps (no costume or ears)", mmdMotionSalute:"🎵128 🫡 Miku salute", mmdMotionDoubleHeart:"🎵128 🫶 Double-heart pose", mmdMotionPoint:"🎵160 👉 Alternating point-out gesture", mmdMotionEncore:"🎵128 👏 Encore wave", mmdMotionDramatic:"🎵170 🎭 Dramatic ballad reach", mmdMotionVictory:"🎵128 ✌️ Victory pose", mmdMotionPenlight:"🎵145 ✨ Penlight-style arm wave (no prop)", mmdMotionChibi:"🎵128 🍬 Tiny bouncy steps", mmdMotionSpin:"🎵128 🌀 Gentle turn-in-place",
   mmdMotionGroove:"🕺 Easy groove (112 BPM)", mmdMotionStepTouch:"👟 Step-touch (128 BPM)", mmdMotionShoulderPop:"🎵 Shoulder pop (128 BPM)", mmdMotionArmWave:"🌊 Smooth arm wave (120 BPM)", mmdMotionCrossStep:"👣 Cross-step (128 BPM)", mmdMotionSoftBow:"🙇 Soft bow and return (no BPM)", mmdMotionMarionette:"🧵 Marionette-style arms (120 BPM)",
-  mmdBuiltinNote:"All 60 built-in motions are generated at runtime from trk!'s original code; no third-party VMD or choreography files are bundled. Facial tracks target morph names verified in the Lat-style PMD and only work on models with matching morphs. Song names and “-inspired” labels are tempo or mood references, not recreated official choreography. The A-I-U-O mouth loop is not audio-synced. At base BPM 0, built-ins follow the song BPM.",
+  mmdBuiltinNote:"All 65 built-in motions are generated at runtime from trk!'s original code; no third-party VMD or choreography files are bundled. Facial tracks target morph names verified in the Lat-style PMD and only work on models with matching morphs. Song names and “-inspired” labels are tempo or mood references, not recreated official choreography. The A-I-U-O mouth loop is not audio-synced. At base BPM 0, built-ins follow the song BPM.",
   mmdBpm:"Motion base BPM (0 = built-ins auto-sync; your own VMD stays fixed)",
   mmdLoading:"Loading the model…", mmdLoadingPct:"Loading the model… {n}%",
   mmdLoaded:"Loaded the model “{name}”.", mmdRestored:"Restored your previous model.",
@@ -152,7 +158,7 @@ Object.assign(TEXT.zh, {
   mmdMotionSit:"🪑 坐下休息再起身（与BPM无关）", mmdMotionDance:"💃128 流行舞（原创・16拍）", mmdMotionLegacy:"旧设置",
   mmdMotionStep:"内置① 踏步（120BPM）", mmdMotionSwing:"内置② 摇摆（100BPM）", mmdMotionTurn:"内置③ 转身（120BPM）",
   mmdMotionJump:"内置④ 跳跃（130BPM・华丽）", mmdMotionIdol:"内置⑤ 偶像应援（128BPM）",
-  mmdMotionAirgtr:"🎸128 空气吉他（Shoegaze风）", mmdMotionDreamy:"🎸128 沉静漂浮（When You Sleep风）",
+  mmdMotionDreamy:"🎸128 沉静漂浮（When You Sleep风）",
   mmdMotionKneel:"🎸128 单膝远眺（安静）",
   mmdMotionIevan:"🎵120 甩葱旋转（Ievan Polkka风）", mmdMotionKyukura:"🎵165 晕乎乎（Kyu-kurarin风）",
   mmdMotionRabbit:"🎵173 兔耳蹦跳（Rabbit Hole风・5拍子）", mmdMotionMesmer:"🎵185 卡通摇摆（Mesmerizer风）",
@@ -162,11 +168,14 @@ Object.assign(TEXT.zh, {
   mmdMotionUmg:"🎵170 倾诉（Unknown Mother Goose风）", mmdMotionWedh:"🎵174 舞厅（World's End Dancehall风）",
   mmdMotionRolling:"🎵194 转圈（Rolling Girl风）", mmdMotionUraomote:"🎵196 里表翻转（里表Lovers风）",
   mmdMotionVanish:"🎵240 高速（消失风）",
-  mmdGroupDaily:"👀 日常与休息", mmdGroupDance:"💃 舞蹈与舞台", mmdGroupSongs:"🎵 初音歌曲节奏的原创动作", mmdGroupMiku:"🌟 初音风格手势与姿势", mmdGroupFaces:"🎭 表情与演技",
+  mmdGroupDaily:"👀 日常与休息", mmdGroupDance:"💃 舞蹈与舞台", mmdGroupSongs:"🎵 初音歌曲节奏的原创动作", mmdGroupMiku:"🌟 初音风格手势与姿势", mmdGroupFaces:"🎭 表情与演技", mmdGroupVoice:"🎤 唱歌与口型",
   mmdMotionFaceSmile:"😊 微笑挥手", mmdMotionFaceWink:"😉 眨眼定格", mmdMotionFaceShy:"🫣 害羞鞠躬", mmdMotionFaceAngry:"😤 生气姿势", mmdMotionFaceConfused:"💭 困惑歪头", mmdMotionFaceSurprise:"😲 惊讶姿势", mmdMotionFaceSleepy:"😴 困倦摇摆", mmdMotionFacePout:"😗 嘟嘴", mmdMotionFaceLaugh:"😆 开心笑跳", mmdMotionFaceSing:"🎤 あ・い・う・お口型循环（不同步音频）",
+  mmdMotionSongMic:"🎤 像拿麦克风一样唱（胸前·不随BPM）", mmdMotionSongLong:"🎤 温柔长音演唱（慢速）",
+  mmdMotionSongUp:"🎤 欢快跟唱（快速口型·左右摇摆）", mmdMotionSongHum:"🎤 哼歌（小口型·晃头打拍）",
+  mmdMotionSongWhisper:"🎤 悄悄唱（前倾小声）", mmdMotionSongCall:"🎤 副歌张开手臂唱出来",
   mmdMotionPrincess:"🎵152 👑 公主姿势（World is Mine风格）", mmdMotionLeekShake:"🎵120 🧅 挥葱手势（无道具）", mmdMotionPopipo:"🎵150 🥬 蔬菜弹跳（PoPiPo风格）", mmdMotionTriple:"🎵140 😜 俏皮交替姿势（Triple Baka风格）", mmdMotionNyan:"🎵160 🐾 猫爪步（无服饰或猫耳）", mmdMotionSalute:"🎵128 🫡 初音敬礼", mmdMotionDoubleHeart:"🎵128 🫶 双手爱心姿势", mmdMotionPoint:"🎵160 👉 左右交替指向", mmdMotionEncore:"🎵128 👏 返场挥手", mmdMotionDramatic:"🎵170 🎭 抒情戏剧伸手", mmdMotionVictory:"🎵128 ✌️ 胜利姿势", mmdMotionPenlight:"🎵145 ✨ 应援灯式手臂摇摆（无道具）", mmdMotionChibi:"🎵128 🍬 轻快小跳", mmdMotionSpin:"🎵128 🌀 原地轻转",
   mmdMotionGroove:"🕺 轻松律动（112 BPM）", mmdMotionStepTouch:"👟 左右点步（128 BPM）", mmdMotionShoulderPop:"🎵 肩部律动（128 BPM）", mmdMotionArmWave:"🌊 流畅手臂波浪（120 BPM）", mmdMotionCrossStep:"👣 交叉步（128 BPM）", mmdMotionSoftBow:"🙇 轻轻鞠躬再起身（无 BPM）", mmdMotionMarionette:"🧵 木偶风手臂（120 BPM）",
-  mmdBuiltinNote:"60种内置动作由 trk! 代码在运行时生成，不附带第三方VMD或编舞文件。表情轨道使用已在Lat式PMD中确认的变形名称，仅在模型含有同名变形时生效。歌曲名与“风格”只表示节奏或气氛参考，并非复刻原曲编舞。🎤口型是あ・い・う・お循环，不与音频同步。基准BPM为0时，内置动作跟随歌曲BPM。",
+  mmdBuiltinNote:"65种内置动作由 trk! 代码在运行时生成，不附带第三方VMD或编舞文件。表情轨道使用已在Lat式PMD中确认的变形名称，仅在模型含有同名变形时生效。歌曲名与“风格”只表示节奏或气氛参考，并非复刻原曲编舞。🎤口型是あ・い・う・お循环，不与音频同步。基准BPM为0时，内置动作跟随歌曲BPM。",
   mmdBpm:"动作基准BPM（0＝内置自动同步・自带VMD保持固定）",
   mmdLoading:"正在读取模型…", mmdLoadingPct:"正在读取模型… {n}%",
   mmdLoaded:"已读取模型「{name}」。", mmdRestored:"已恢复上次的模型。",
@@ -206,7 +215,7 @@ Object.assign(TEXT.ko, {
   mmdMotionSit:"🪑 앉아 쉬었다 일어나기 (BPM 무관)", mmdMotionDance:"💃128 팝 댄스 (자작・16박)", mmdMotionLegacy:"이전 설정",
   mmdMotionStep:"내장① 스텝 (120BPM)", mmdMotionSwing:"내장② 흔들흔들 (100BPM)", mmdMotionTurn:"내장③ 턴 (120BPM)",
   mmdMotionJump:"내장④ 점프 (130BPM・화려)", mmdMotionIdol:"내장⑤ 아이돌 (128BPM)",
-  mmdMotionAirgtr:"🎸128 에어기타 (슈게이저풍)", mmdMotionDreamy:"🎸128 차분히 (When You Sleep풍)",
+  mmdMotionDreamy:"🎸128 차분히 (When You Sleep풍)",
   mmdMotionKneel:"🎸128 한쪽 무릎 (조용히 바라보기)",
   mmdMotionIevan:"🎵120 파 돌리기 (Ievan Polkka풍)", mmdMotionKyukura:"🎵165 어질어질 (큐쿠라린풍)",
   mmdMotionRabbit:"🎵173 토끼귀 폴짝 (Rabbit Hole풍・5박자)", mmdMotionMesmer:"🎵185 카툰 셔플 (메즈머라이저풍)",
@@ -216,11 +225,14 @@ Object.assign(TEXT.ko, {
   mmdMotionUmg:"🎵170 전하기 (Unknown Mother Goose풍)", mmdMotionWedh:"🎵174 댄스홀 (World's End Dancehall풍)",
   mmdMotionRolling:"🎵194 빙글빙글 (Rolling Girl풍)", mmdMotionUraomote:"🎵196 안팎 뒤집기 (우라오모테 Lovers풍)",
   mmdMotionVanish:"🎵240 고속 (소실풍)",
-  mmdGroupDaily:"👀 일상·휴식", mmdGroupDance:"💃 댄스·무대", mmdGroupSongs:"🎵 미쿠 곡 템포의 오리지널", mmdGroupMiku:"🌟 미쿠풍 제스처·포즈", mmdGroupFaces:"🎭 표정·연기",
+  mmdGroupDaily:"👀 일상·휴식", mmdGroupDance:"💃 댄스·무대", mmdGroupSongs:"🎵 미쿠 곡 템포의 오리지널", mmdGroupMiku:"🌟 미쿠풍 제스처·포즈", mmdGroupFaces:"🎭 표정·연기", mmdGroupVoice:"🎤 노래·입모양",
   mmdMotionFaceSmile:"😊 미소와 가벼운 손 흔들기", mmdMotionFaceWink:"😉 윙크 포즈", mmdMotionFaceShy:"🫣 수줍은 인사", mmdMotionFaceAngry:"😤 토라진 포즈", mmdMotionFaceConfused:"💭 갸우뚱", mmdMotionFaceSurprise:"😲 깜짝 포즈", mmdMotionFaceSleepy:"😴 졸린 흔들림", mmdMotionFacePout:"😗 삐죽 입", mmdMotionFaceLaugh:"😆 웃음 바운스", mmdMotionFaceSing:"🎤 아·이·우·오 입 모양 (음성 동기화 아님)",
+  mmdMotionSongMic:"🎤 마이크처럼 노래 (가슴 앞·BPM 무관)", mmdMotionSongLong:"🎤 부드럽게 길게 노래 (느리게)",
+  mmdMotionSongUp:"🎤 신나게 따라 부르기 (빠른 입모양·좌우 흔들)", mmdMotionSongHum:"🎤 콧노래 (작은 입모양·고개 리듬)",
+  mmdMotionSongWhisper:"🎤 속삭임 노래 (앞으로 기울여)", mmdMotionSongCall:"🎤 후렴에서 팔 펼치고 부르기",
   mmdMotionPrincess:"🎵152 👑 공주 포즈 (World is Mine풍)", mmdMotionLeekShake:"🎵120 🧅 파 흔들기 제스처 (소품 없음)", mmdMotionPopipo:"🎵150 🥬 채소 바운스 (PoPiPo풍)", mmdMotionTriple:"🎵140 😜 장난스러운 교대 포즈 (Triple Baka풍)", mmdMotionNyan:"🎵160 🐾 고양이 손 스텝 (의상·귀 없음)", mmdMotionSalute:"🎵128 🫡 미쿠 경례", mmdMotionDoubleHeart:"🎵128 🫶 양손 하트 포즈", mmdMotionPoint:"🎵160 👉 좌우 번갈아 가리키기", mmdMotionEncore:"🎵128 👏 앙코르 손 흔들기", mmdMotionDramatic:"🎵170 🎭 발라드풍 드라마틱 리치", mmdMotionVictory:"🎵128 ✌️ 승리 포즈", mmdMotionPenlight:"🎵145 ✨ 펜라이트풍 팔 흔들기 (소품 없음)", mmdMotionChibi:"🎵128 🍬 작고 경쾌한 바운스", mmdMotionSpin:"🎵128 🌀 제자리에서 부드럽게 회전",
   mmdMotionGroove:"🕺 느긋한 그루브 (112 BPM)", mmdMotionStepTouch:"👟 스텝 터치 (128 BPM)", mmdMotionShoulderPop:"🎵 어깨 팝 (128 BPM)", mmdMotionArmWave:"🌊 부드러운 암 웨이브 (120 BPM)", mmdMotionCrossStep:"👣 크로스 스텝 (128 BPM)", mmdMotionSoftBow:"🙇 가볍게 인사하고 돌아오기 (BPM 무관)", mmdMotionMarionette:"🧵 마리오네트풍 팔 동작 (120 BPM)",
-  mmdBuiltinNote:"내장 모션 60종은 trk!의 오리지널 코드로 실행 시 VMD를 생성하며, 제3자 VMD나 안무 파일은 포함하지 않습니다. 표정 트랙은 Lat식 PMD에서 확인한 모프 이름을 사용하므로 같은 이름의 모프가 있는 모델에서만 적용됩니다. 곡명과 ‘풍’ 표기는 템포·분위기 참고일 뿐 원곡 안무 재현이 아닙니다. 🎤 입 모양은 아·이·우·오 반복으로 실제 음성과 동기화되지 않습니다. 기준 BPM이 0이면 내장 모션이 곡 BPM을 따릅니다.",
+  mmdBuiltinNote:"내장 모션 65종은 trk!의 오리지널 코드로 실행 시 VMD를 생성하며, 제3자 VMD나 안무 파일은 포함하지 않습니다. 표정 트랙은 Lat식 PMD에서 확인한 모프 이름을 사용하므로 같은 이름의 모프가 있는 모델에서만 적용됩니다. 곡명과 ‘풍’ 표기는 템포·분위기 참고일 뿐 원곡 안무 재현이 아닙니다. 🎤 입 모양은 아·이·우·오 반복으로 실제 음성과 동기화되지 않습니다. 기준 BPM이 0이면 내장 모션이 곡 BPM을 따릅니다.",
   mmdBpm:"모션 기준 BPM (0＝내장은 자동 동기화・직접 가져온 VMD는 고정)",
   mmdLoading:"모델을 불러오는 중…", mmdLoadingPct:"모델을 불러오는 중… {n}%",
   mmdLoaded:"모델 '{name}'을(를) 불러왔습니다.", mmdRestored:"지난번 모델을 되돌렸습니다.",
@@ -261,7 +273,8 @@ const SJIS = {
   "こ":[0x82,0xb1], "や":[0x82,0xe2], "ワ":[0x83,0x8f], "ω":[0x83,0xd6], "あ":[0x82,0xa0], "う":[0x82,0xa4],
   "お":[0x82,0xa8], "照":[0x8f,0xc6], "れ":[0x82,0xea], "青":[0x90,0xc2], "筋":[0x8b,0xd8], "眼":[0x8a,0xe1],
   "鏡":[0x8b,0xbe], "瞳":[0x93,0xb5], "小":[0x8f,0xac], "ご":[0x82,0xb2], "み":[0x82,0xdd], "は":[0x82,0xcd],
-  "ぅ":[0x82,0xa3], "ま":[0x82,0xdc], "ば":[0x82,0xce], "た":[0x82,0xbd], "き":[0x82,0xab]
+  "ぅ":[0x82,0xa3], "ま":[0x82,0xdc], "ば":[0x82,0xce], "た":[0x82,0xbd], "き":[0x82,0xab],
+  "Ｉ":[0x82,0x68], "Ｋ":[0x82,0x6a]   // 足ＩＫ（つま先／足のIKターゲット）を動かすため
 };
 function sjisFix(str, len) {
   const out = new Uint8Array(len);
@@ -334,7 +347,11 @@ const FACE_POSES = {
   surprise:{"あ":0.6,"ワ":0.5,"上":0.2,"瞳小":0.16},
   sleepy:{"じと目":0.62,"下":0.24,"ぽけー":0.28},
   pout:{"ω":0.7,"ぽけー":0.18}, laugh:{"笑い":0.84,"にっこり":0.66},
-  serious:{"真面目":0.52}, sparkle:{"ｼｬｷｰﾝ":0.72,"にっこり":0.24}
+  serious:{"真面目":0.52}, sparkle:{"ｼｬｷｰﾝ":0.72,"にっこり":0.24},
+  /* 🎤 歌もののベース表情（この上に母音の重みを足す） */
+  singUp:{"にっこり":0.34,"上":0.12}, singSoft:{"なごみ":0.38,"にっこり":0.16},
+  hum:{"なごみ":0.42,"にっこり":0.28}, whisper:{"照れ":0.26,"下":0.16,"なごみ":0.2},
+  call:{"にっこり":0.36,"上":0.18}
 };
 const wrap01 = n => ((n % 1) + 1) % 1;
 function facePulse(phase, center, width) {
@@ -348,12 +365,26 @@ function faceMorphs(kind, t, seconds) {
     ? Math.max(facePulse(q, 0.31, 0.024), facePulse(q, 0.76, 0.024))
     : facePulse(q, 0.69, 0.024);
   if (kind === "wink") out["ウィンク"] = Math.max(facePulse(q, 0.28, 0.09), facePulse(q, 0.77, 0.09));
-  if (kind === "sing") {
-    const vowels = ["あ", "い", "う", "お"], phase = q * vowels.length;
-    const current = Math.floor(phase) % vowels.length, next = (current + 1) % vowels.length;
+  /* 🎤 口パク：母音モーフを順にクロスフェード（Lat式に「え」が無いので あ・い・う・お と ワ を使う） */
+  const vowelTrack = (list, speed, weight) => {
+    const phase = q * list.length * speed;
+    const current = Math.floor(phase) % list.length, next = (current + 1) % list.length;
     const fade = 0.5 - 0.5 * Math.cos(Math.PI * (phase % 1));
-    out[vowels[current]] = 0.9 * (1 - fade);
-    out[vowels[next]] = 0.9 * fade;
+    out[list[current]] = weight * (1 - fade);
+    out[list[next]] = weight * fade;
+  };
+  if (kind === "sing") vowelTrack(["あ", "い", "う", "お"], 1, 0.9);
+  else if (kind === "singUp") vowelTrack(["あ", "い", "う", "お"], 2, 0.92);      // 🎤 速めの4母音（ノリノリ）
+  else if (kind === "singSoft") vowelTrack(["あ", "お"], 1, 0.86);                 // 🎤 ゆったり2母音（しっとり）
+  else if (kind === "call") vowelTrack(["あ", "ワ"], 1, 0.88);                     // 🎤 大きく開く2母音（サビ）
+  else if (kind === "hum") {                                                     // 🎤 鼻歌（口はほぼ閉じたまま）
+    const beat = 0.5 + 0.5 * Math.sin(2 * Math.PI * q * 4);
+    out["ω"] = 0.5 + 0.14 * beat;
+    out["あ"] = 0.1 + 0.12 * beat;
+  } else if (kind === "whisper") {                                                 // 🎤 ひそひそ（小さい い・う）
+    const beat = 0.5 + 0.5 * Math.sin(2 * Math.PI * q * 8);
+    out["い"] = 0.3 * beat;
+    out["う"] = 0.26 * (1 - beat);
   }
   return out;
 }
@@ -511,6 +542,50 @@ function gesturePose(style, t, bpm, beats, seconds, phase = 0) {
     case "actPout": return { ...base, "センター":center([0, -0.035, 0], [0, 0, 2 * sway]), "上半身":poseBone([0, -5, 0]), "頭":poseBone([0, 0, -5 * sway]), ...arms([2, 0, -58], [-2, 0, 58], [0, -44, 0], [0, 44, 0]) };
     case "actLaugh": return { ...base, "センター":center([0, 0.05 * hop - 0.04, 0], [0, 0, 2 * sway]), "上半身":poseBone([-4 * hop, 4 * sway, 0]), ...arms([12 * hop, 0, -38], [4, 6, 48], [0, -58, 0], [0, 46, 0]) };
     case "actSing": return { ...base, "センター":center([0.035 * sway, -0.035, 0], [0, -5 * sway, 2 * sway]), ...arms([0, 0, -48], [-8, 10, 46], [0, -34, 0], [0, 52, 0]) };
+    /* 🎤 歌もの。肘は「前に折る」向き（左＝+Y／右＝-Y）で、手が体の前へ来るようにする */
+    case "actSongMic": return {                                // 右手＝マイクを胸の前に持って歌う（小物なし）
+      ...base, "センター":center([0.03 * sway, -0.035 + 0.022 * hop, 0], [0, 3 * sway, 2 * sway]),
+      "上半身":poseBone([2, 3 * sway, 1 * sway]), "首":poseBone([-3, -2 * sway, -2 * sway]),
+      "頭":poseBone([2 + 2 * hop, 0, -4 * sway]),
+      ...arms([6, 4, -46], [30, -6, 30], [0, 22, 0], [0, -120, 0], [-6, 10])
+    };
+    case "actSongSoft": return {                               // 両手を胸の前にそっと構えて、しっとり歌う
+      ...base, "センター":center([0.035 * sway, -0.04, 0], [0, 2 * sway, 2.5 * sway]),
+      "上半身":poseBone([3, 3 * sway, 2 * sway]), "首":poseBone([-2, -3 * sway, -3 * sway]),
+      "頭":poseBone([3, 0, -6 * sway]),
+      ...arms([14, 2, -34 + 4 * sway], [16, -2, 36 - 4 * sway], [0, 74 + 6 * sway, 0], [0, -70 - 6 * sway, 0], [-8, 8])
+    };
+    case "actSongUp": return {                                 // 弾みながら、左右交互に手を上げて歌う
+      ...base, "センター":center([0.06 * alt, -0.05 + 0.05 * hop, 0], [0, 4 * alt, 3 * alt]),
+      "上半身":poseBone([3 - 3 * hop, 5 * alt, 3 * alt]), "首":poseBone([-3, -4 * alt, -2 * alt]),
+      "頭":poseBone([5 * hop, 0, -4 * alt]),
+      ...arms([-14 - 8 * alt, 10 * alt, -26 + 32 * L], [14 - 8 * alt, -10 * alt, 26 - 32 * R],
+             [0, 34 + 26 * L, 0], [0, -34 - 26 * R, 0], [-10 * L, 10 * R]),
+      ...feet(-8 * alt, 8 * alt, 5 * hop)
+    };
+    case "actSongHum": return {                                // 鼻歌：力まずゆらゆら、首でリズムを取る
+      ...base, "センター":center([0.05 * alt, -0.03 + 0.02 * hop, 0], [0, 2 * alt, 3 * sway]),
+      "上半身":poseBone([1, 3 * alt, 2 * sway]), "首":poseBone([-4 - 3 * alt, -3 * sway, -2 * sway]),
+      "頭":poseBone([5 + 4 * alt, 0, -4 * sway]),
+      ...arms([8 * alt, 4, -42 + 4 * fast], [-8 * alt, -4, 42 - 4 * fast],
+             [0, 30 + 6 * alt, 0], [0, -30 + 6 * alt, 0], [-5, 5]),
+      ...feet(-3 * alt, 3 * alt, 2 * hop)
+    };
+    case "actSongWhisper": return {                            // ひそひそ：前のめりで小さく歌う
+      ...base, "センター":center([0.02 * sway, -0.05, 0], [3, -3, 1.5 * sway]),
+      "上半身":poseBone([6, -2 + 2 * sway, 1]), "首":poseBone([-5, 3 * sway, -2]),
+      "頭":poseBone([-2, 2 * sway, -4 * sway]),
+      ...arms([10, 8, -34 + 5 * sway], [26, -8, 34 - 5 * sway], [0, 92 + 7 * sway, 0], [0, -104 - 7 * sway, 0], [4, 6]),
+      ...feet(3, -3, 1)
+    };
+    case "actSongCall": return {                               // サビ：片手を大きく広げて歌い上げる
+      ...base, "センター":center([0.05 * sway, -0.02 + 0.05 * hop, 0], [0, -4, 2 * sway]),
+      "上半身":poseBone([-4 * hop, 6 * sway, 2 * sway]), "首":poseBone([-6 - 3 * hop, -4 * sway, 0]),
+      "頭":poseBone([-7 - 4 * hop, 0, -3 * sway]),
+      /* 左＝大きく外へ上げる（+Z＝体側から上へ）／右＝体の横で手を胸に添える */
+      ...arms([10 + 6 * L, 0, 26 + 20 * L], [4, -6, 34 + 14 * R], [14, 10, 0], [18, -40, 0], [-12 * L, 10 * R]),
+      ...feet(-3 * alt, 3 * alt, 3 * hop)
+    };
     default: return base;
   }
 }
@@ -590,36 +665,52 @@ const BUILTIN = {
       "右ひじ":{ rot:[0, 30 + 25 * pump, 0] }
     };
   } },
-  /* ---- 🚶 その場の歩行／🏃走行（左右交互・移動せず足踏み。脚と裾の振れは控えめ） ---- */
+  /* ---- 🚶 その場の歩行／🏃走行（左右交互・移動せず足踏み）
+     腕は脚と逆相（左足が後ろ＝左腕は前）。前後は「腕のX」、ひねりは「腕のY」、下ろし具合は「腕のZ」で作る。
+     歩行の目安（歩行分析の一般値）：肩の前後 ±20〜25°／肘は常時20°以上曲げ、前へ振るとき最大45°前後 ---- */
   walk112: { label:"mmdMotionWalk", bpm:112, auto:false, seconds:8 * 60 / 112, pose:t => {
-    const beat = t * 112 / 60, stride = Math.sin(Math.PI * beat);
-    const liftL = Math.max(0, stride), liftR = Math.max(0, -stride);
+    const beat = t * 112 / 60, stride = Math.sin(Math.PI * beat), bounce = Math.abs(Math.cos(Math.PI * beat));
+    /* 足踏みの位相：脚を振り出している（浮いている）間だけ 1。足ＩＫを動かして、その場で足を上げる */
+    const liftL = Math.max(0, -Math.cos(Math.PI * beat)), liftR = Math.max(0, Math.cos(Math.PI * beat));
+    const swing = 34 * stride, elbowL = 22 + 20 * liftL, elbowR = 22 + 20 * liftR;
     return {
-      "センター": { pos:[0.045 * stride, -0.06 + 0.018 * (liftL + liftR), 0], rot:[0, 1.5 * stride, 1.2 * stride] },
-      "上半身": { rot:[1, 1.5 * stride, 1.5 * stride] },
-      "首":    { rot:[-1.5 * (liftL + liftR), -2 * stride, 0] },
-      "左足":  { rot:[-18 * stride, 0, 0] }, "右足":  { rot:[18 * stride, 0, 0] },
-      "左ひざ":{ rot:[20 * liftL, 0, 0] }, "右ひざ":{ rot:[20 * liftR, 0, 0] },
-      "左足首":{ rot:[-4 * liftL, 0, 0] }, "右足首":{ rot:[-4 * liftR, 0, 0] },
-      "左腕":  { rot:[-7 * stride, 0, -52] }, "右腕":  { rot:[7 * stride, 0, 52] },
-      "左ひじ":{ rot:[0, -22 - 6 * stride, 0] }, "右ひじ":{ rot:[0, 22 - 6 * stride, 0] },
+      "センター": { pos:[0.04 * stride, -0.06 + 0.02 * (liftL + liftR), 0], rot:[0.5, -2.4 * stride, 1.2 * stride] },
+      "上半身": { rot:[1, 3.4 * stride, 1.4 * stride] },
+      "首":    { rot:[-1.5 * (liftL + liftR), -0.6 * stride, 0] },
+      "頭":    { rot:[1.5 * bounce, 0, -1.2 * stride] },
+      "左足":  { rot:[-19 * stride, 0, 0] }, "右足":  { rot:[19 * stride, 0, 0] },
+      "左ひざ":{ rot:[26 * liftL, 0, 0] }, "右ひざ":{ rot:[26 * liftR, 0, 0] },
+      "左足首":{ rot:[-7 * liftL, 0, 0] }, "右足首":{ rot:[-7 * liftR, 0, 0] },
+      /* 足ＩＫ＝足のIKターゲット。Y＝持ち上げ、Z（-で手前）＝ひざを前へ */
+      "左足ＩＫ":{ rot:[0, 0, 0], pos:[0, 0.7 * liftL, -0.5 * liftL] },
+      "右足ＩＫ":{ rot:[0, 0, 0], pos:[0, 0.7 * liftR, -0.5 * liftR] },
+      "左腕":  { rot:[swing, 0, -50 + 4 * liftR] }, "右腕":  { rot:[-swing, 0, 50 - 4 * liftL] },
+      "左ひじ":{ rot:[elbowL, 0, 0] }, "右ひじ":{ rot:[elbowR, 0, 0] },
+      "左手首":{ rot:[0, 0, -6] }, "右手首":{ rot:[0, 0, 6] },
       "左ｽｶｰﾄ前":{ rot:[-2 * liftL, 0, -2 * stride] }, "右ｽｶｰﾄ前":{ rot:[-2 * liftR, 0, 2 * stride] },
       "左ｽｶｰﾄ後":{ rot:[2 * liftL, 0, -stride] }, "右ｽｶｰﾄ後":{ rot:[2 * liftR, 0, stride] }
     };
   } },
   run152: { label:"mmdMotionRun", bpm:152, auto:false, seconds:8 * 60 / 152, pose:t => {
     const beat = t * 152 / 60, stride = Math.sin(Math.PI * beat);
-    const liftL = Math.max(0, stride), liftR = Math.max(0, -stride);
-    const bounce = Math.max(0, Math.sin(Math.PI * beat));
+    const liftL = Math.max(0, -Math.cos(Math.PI * beat)), liftR = Math.max(0, Math.cos(Math.PI * beat));
+    const bounce = Math.max(0, Math.sin(Math.PI * beat)), land = Math.abs(Math.cos(Math.PI * beat));
+    const swing = 54 * stride, elbowL = 64 + 16 * liftL, elbowR = 64 + 16 * liftR;
     return {
-      "センター": { pos:[0.055 * stride, -0.13 + 0.16 * bounce, 0], rot:[0, 2 * stride, 1.8 * stride] },
-      "上半身": { rot:[3 - 2 * bounce, 2 * stride, 2 * stride] },
-      "首":    { rot:[-3 * bounce, -3 * stride, 0] },
-      "左足":  { rot:[-28 * stride, 0, 0] }, "右足":  { rot:[28 * stride, 0, 0] },
-      "左ひざ":{ rot:[38 * liftL, 0, 0] }, "右ひざ":{ rot:[38 * liftR, 0, 0] },
-      "左足首":{ rot:[-7 * liftL, 0, 0] }, "右足首":{ rot:[-7 * liftR, 0, 0] },
-      "左腕":  { rot:[-15 * stride, 0, -58] }, "右腕":  { rot:[15 * stride, 0, 58] },
-      "左ひじ":{ rot:[0, -42 - 9 * stride, 0] }, "右ひじ":{ rot:[0, 42 - 9 * stride, 0] },
+      "センター": { pos:[0.05 * stride, -0.11 + 0.16 * bounce - 0.02 * land, 0], rot:[4, -3 * stride, 2 * stride] },
+      "上半身": { rot:[4 - 2 * bounce, 4 * stride, 2 * stride] },
+      "首":    { rot:[-3 * bounce, -2 * stride, 0] },
+      "頭":    { rot:[3 * bounce, 0, -1.5 * stride] },
+      "左足":  { rot:[-30 * stride, 0, 0] }, "右足":  { rot:[30 * stride, 0, 0] },
+      "左ひざ":{ rot:[42 * liftL, 0, 0] }, "右ひざ":{ rot:[42 * liftR, 0, 0] },
+      "左足首":{ rot:[-10 * liftL, 0, 0] }, "右足首":{ rot:[-10 * liftR, 0, 0] },
+      /* 足ＩＫ＝足のIKターゲット。走りなので、歩きより大きく上げて前へ */
+      "左足ＩＫ":{ rot:[0, 0, 0], pos:[0, 1.1 * liftL, -0.7 * liftL] },
+      "右足ＩＫ":{ rot:[0, 0, 0], pos:[0, 1.1 * liftR, -0.7 * liftR] },
+      "左腕":  { rot:[6 + swing, 0, -50 + 5 * liftR] }, "右腕":  { rot:[6 - swing, 0, 50 - 5 * liftL] },
+      /* ひじは「前へ折る」＝rot[0]（前後）。rot[1] は手を体の前へ寄せる向き（左右で逆符号） */
+      "左ひじ":{ rot:[elbowL, 10, 0] }, "右ひじ":{ rot:[elbowR, -10, 0] },
+      "左手首":{ rot:[0, 0, -8] }, "右手首":{ rot:[0, 0, 8] },
       "左ｽｶｰﾄ前":{ rot:[-4 * liftL, 0, -3 * stride] }, "右ｽｶｰﾄ前":{ rot:[-4 * liftR, 0, 3 * stride] },
       "左ｽｶｰﾄ後":{ rot:[3 * liftL, 0, -1.5 * stride] }, "右ｽｶｰﾄ後":{ rot:[3 * liftR, 0, 1.5 * stride] }
     };
@@ -712,26 +803,9 @@ const BUILTIN = {
       "左ひじ":{ rot:[0, -52, 0] }, "右ひじ":{ rot:[0, 52, 0] }
     };
   } },
-  /* ---- 🎸 シューゲイザー3部作（128BPM：Sometimes / When You Sleep あたりむけ） ---- */
-  airgtr128: { label:"mmdMotionAirgtr", bpm:128, seconds:16 * 60 / 128, pose:t => { // エアギター（16拍・腕＋肘＋手首でストラミング）
-    const b = t * 128 / 60, down = Math.sin(2 * Math.PI * b), strum = Math.sin(4 * Math.PI * b);
-    const chord = Math.sin(Math.PI * b / 2), sway = Math.sin(Math.PI * b / 4), bounce = Math.abs(Math.sin(Math.PI * b));
-    return {
-      "センター": { pos:[0.045 * sway, -0.10 - 0.035 * bounce, 0], rot:[0, -12 + 5 * sway, 0] },
-      "上半身": { rot:[12, 5 * sway, 2 * sway] },
-      "上半身2":{ rot:[6, 0, 0] },
-      "首":    { rot:[14, -4 * sway, 2 * sway] },
-      "頭":    { rot:[18 + 2 * down, 0, 4 * sway] },               // 弦を見ながら小さくうなずく
-      "左腕":  { rot:[22, 18 + 3 * chord, -38] },                 // ネックを支え、コードを押さえる
-      "左ひじ":{ rot:[0, -76 + 9 * chord, 0] },
-      "左手首":{ rot:[0, 0, -10 + 11 * chord] },
-      "右腕":  { rot:[20 + 18 * strum, -5 + 5 * down, 50 + 10 * strum] }, // 肩から小さく振る
-      "右ひじ":{ rot:[0, 48 + 34 * strum, 0] },
-      "右手首":{ rot:[0, 0, 24 * strum] },                         // 手首を返して上下にかき鳴らす
-      "左ひざ":{ rot:[5 * bounce, 0, 0] }, "右ひざ":{ rot:[5 * bounce, 0, 0] },
-      "左ｽｶｰﾄ前":{ rot:[-1.5 * bounce, 0, -sway] }, "右ｽｶｰﾄ前":{ rot:[-1.5 * bounce, 0, sway] }
-    };
-  } },
+  /* ---- 🎸 128BPM しっとり（Sometimes / When You Sleep あたりむけ）
+     2026-10 に一度エアギター（旧 airgtr128）を外しました：腕・肘が弦の位置に乗らず破綻しやすかったためです。
+     復活させたいときは git の履歴（147720e 時点）から pose を戻してください。 ---- */
   dreamy128: { label:"mmdMotionDreamy", bpm:128, seconds:7.5, pose:t => { // しっとり（16拍・ゆったりただよう）
     const b = t * 128 / 60, w = Math.PI * b / 8, s = Math.sin(w), drift = Math.sin(Math.PI * b / 4);
     return {
@@ -978,6 +1052,14 @@ const BUILTIN = {
   faceLaugh: makeGesture("mmdMotionFaceLaugh", 0, 8, "actLaugh", "laugh", { fixed:true }),
   faceSing: makeGesture("mmdMotionFaceSing", 0, 8, "actSing", "sing", { fixed:true }),
 
+  // 🎤 歌・口パク（すべてBPM非依存の6秒ループ。音声とは同期しません。肘は前に折る向き＝左+Y／右-Y）
+  songMic: makeGesture("mmdMotionSongMic", 0, 8, "actSongMic", "sing", { fixed:true }),
+  songLong: makeGesture("mmdMotionSongLong", 0, 8, "actSongSoft", "singSoft", { fixed:true }),
+  songUp: makeGesture("mmdMotionSongUp", 0, 8, "actSongUp", "singUp", { fixed:true }),
+  songHum: makeGesture("mmdMotionSongHum", 0, 8, "actSongHum", "hum", { fixed:true }),
+  songWhisper: makeGesture("mmdMotionSongWhisper", 0, 8, "actSongWhisper", "whisper", { fixed:true }),
+  songCall: makeGesture("mmdMotionSongCall", 0, 8, "actSongCall", "call", { fixed:true }),
+
   // ミクらしい記号的な手ぶり・ポーズ。既存曲の振付データや小物は含めない
   mikuPrincess152: makeGesture("mmdMotionPrincess", 152, 8, "princess", "proud", { auto:true }),
   mikuLeek120: makeGesture("mmdMotionLeekShake", 120, 8, "leek", "joy", { auto:true }),
@@ -1006,7 +1088,7 @@ const BUILTIN = {
 const EXISTING_EXPRESSIONS = {
   step:"smile", swing:"calm", turn:"proud", jump:"joy", idol:"joy",
   walk112:"soft", run152:"joy", sit10:"calm", dance128:"joy", dreamy128:"soft",
-  airgtr128:"serious", kneel128:"calm", ievan120:"joy", watch:"calm", stroll:"soft",
+  kneel128:"calm", ievan120:"joy", watch:"calm", stroll:"soft",
   dune135:"serious", green145:"joy", tyw150:"smile", senbon154:"serious", mikumiku160:"proud",
   kyukura165:"confused", melt170:"love", umg170:"soft", rabbit173:"wink", wedh174:"joy",
   mesmer185:"surprise", rolling194:"confused", uraomote196:"grin", vanish240:"serious"
@@ -1041,7 +1123,7 @@ const MOTION_GROUPS = [
     "watch", "stroll", "walk112", "run152", "sit10", "dreamy128", "kneel128", "softBow", "swing", "groove112"
   ] },
   { label:"mmdGroupDance", ids:[
-    "step", "turn", "jump", "idol", "dance128", "airgtr128", "stepTouch128", "shoulderPop128", "armWave120", "crossStep128", "marionette120"
+    "step", "turn", "jump", "idol", "dance128", "stepTouch128", "shoulderPop128", "armWave120", "crossStep128", "marionette120"
   ] },
   { label:"mmdGroupSongs", ids:[
     "ievan120", "kyukura165", "dune135", "green145", "tyw150", "senbon154", "mikumiku160", "melt170", "umg170", "rabbit173", "wedh174", "mesmer185", "rolling194", "uraomote196", "vanish240"
@@ -1051,7 +1133,10 @@ const MOTION_GROUPS = [
     "mikuPoint160", "mikuEncore128", "mikuDramatic170", "mikuVictory128", "mikuPenlight145", "mikuChibi128", "mikuSpin128"
   ] },
   { label:"mmdGroupFaces", ids:[
-    "faceSmile", "faceWink", "faceShy", "faceAngry", "faceConfused", "faceSurprise", "faceSleepy", "facePout", "faceLaugh", "faceSing"
+    "faceSmile", "faceWink", "faceShy", "faceAngry", "faceConfused", "faceSurprise", "faceSleepy", "facePout", "faceLaugh"
+  ] },
+  { label:"mmdGroupVoice", ids:[
+    "faceSing", "songMic", "songLong", "songUp", "songHum", "songWhisper", "songCall"
   ] }
 ];
 const MOTION_MENU_IDS = MOTION_GROUPS.flatMap(group => group.ids);
@@ -1063,7 +1148,7 @@ const MOTION_MENU_SET = new Set(MOTION_MENU_IDS);
    （例：Lat式ミク＝「版権元ガイドラインの範囲内であれば改変・流用を含む利用・再配布等オールOK」）
    preset.json の形：
      { "label":"Lat式ミク", "files":["LatMiku.pmd","tex/body.bmp", …],
-       "credit":"Lat式ミク / Lat様", "motion":"dreamy128", "bpm":128, "readme":"readme_lat.txt" }
+       "credit":"Lat式ミク / Lat様", "motion":"faceSing", "bpm":0, "readme":"readme_lat.txt" }
    ・files は dir からの相対パス。テクスチャも全部列挙する（GitHub Pages は大文字小文字を区別）
    ・readme は規約の原文ファイル（必ず同じフォルダに置く） */
 const PRESET_BASE = "assets/mmd/", PRESET_DIRS = ["lat-miku"];
@@ -1128,7 +1213,7 @@ let renderer = null, scene = null, camera = null, pivot = null;
 let L = null, injected = null;                     // L = { THREE, ThreeMmdLoader, createMmdFileIndex }
 let model = null, modelFiles = [], modelName = "", modelKey = "";
 const initialMotionKind = settings.mmdMotionKind === "auto" || settings.mmdMotionKind === "none" || BUILTIN[settings.mmdMotionKind]
-  ? settings.mmdMotionKind : "dreamy128";
+  ? settings.mmdMotionKind : "faceSing";
 let anim = null, motionKind = initialMotionKind, motionName = "", motionDur = 0;
 let frameInfo = null, fitScale = 1, lastT = 0, curKey = "", playing = false, clock = 0;
 
@@ -1331,7 +1416,7 @@ function motionRate() {
 let autoId = "watch", autoBpmUsed = -1;
 function pickAuto(bpm) {
   if (!bpm) return "watch";
-  let best = MOTION_MENU_IDS.find(id => BUILTIN[id].bpm && !BUILTIN[id].fixed && BUILTIN[id].auto !== false) || "dreamy128", d = Infinity;
+  let best = MOTION_MENU_IDS.find(id => BUILTIN[id].bpm && !BUILTIN[id].fixed && BUILTIN[id].auto !== false) || "faceSing", d = Infinity;
   for (const id of MOTION_MENU_IDS) {
     const m = BUILTIN[id];
     if (!m.bpm || m.fixed || m.auto === false) continue;

@@ -340,14 +340,14 @@ function drawCatchField(now) {
 /* ============ 入力（キーを押している間だけ動く／画面をなぞると追いかける） ============ */
 let catchBinding = null, catchPointer = false;
 addEventListener("keydown", e => {
-  if (window._trkSynthModeOpen || window._trkMediaPlayerOpen) return;
+  if (window._trkSynthModeOpen || window._trkMediaPlayerOpen || window._trkStudyRoomOpen) return;
   if (catchBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureCatchKey(e.code); return; }
   if (phase !== "playing" || !isCatch() || bindingSlot !== null || settings.autoPlay) return;
   const d = catchKeyDir(e.code); if (!d) return;
   e.preventDefault(); e.stopImmediatePropagation();
   catchState.held[d > 0 ? 1 : 0] = true;
 }, true);
-addEventListener("keyup", e => { const d = catchKeyDir(e.code); if (d) catchState.held[d > 0 ? 1 : 0] = false; });
+addEventListener("keyup", e => { if (window._trkStudyRoomOpen) return; const d = catchKeyDir(e.code); if (d) catchState.held[d > 0 ? 1 : 0] = false; });
 addEventListener("blur", () => { catchState.held = [false, false]; });
 function catchTargetFrom(e) {
   const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W;

@@ -27,8 +27,8 @@ const data = context.__mmdCheck;
 const fail = message => { throw new Error(message); };
 const decoder = new TextDecoder("shift_jis");
 const ids = Object.keys(data.BUILTIN);
-const expectedMotionCount = 60;
-const required = ["walk112", "run152", "sit10", "dance128", "dreamy128", "airgtr128", "melt170", "wedh174", "faceSmile", "faceWink", "faceSing", "mikuPrincess152", "mikuLeek120", "mikuPopipo150", "mikuNyan160"];
+const expectedMotionCount = 65;
+const required = ["walk112", "run152", "sit10", "dance128", "dreamy128", "melt170", "wedh174", "faceSmile", "faceWink", "faceSing", "songMic", "songLong", "songUp", "songHum", "songWhisper", "songCall", "mikuPrincess152", "mikuLeek120", "mikuPopipo150", "mikuNyan160"];
 const retained = ["step", "swing", "turn", "jump", "idol", "stroll", "dune135", "kyukura165", "tyw150", "rolling194", "vanish240"];
 
 if (ids.length !== expectedMotionCount) fail(`Expected ${expectedMotionCount} built-in motions, found ${ids.length}`);
@@ -173,24 +173,56 @@ if (skirtFront.some((n, i) => n !== expectedFront[i]) || skirtBack.some((n, i) =
   fail("Lat-style skirt bone names do not encode as CP932");
 }
 
+/* 🚶 歩行／🏃 走行：腕の前後振りが脚と逆相で出ているか、肘を前に折っているか、足ＩＫで足を持ち上げているか。
+   2026-10 の「腕が横にしか動かない」の再発防止（前後は rot[0]、足はＩＫの position.y、肘は左＝+Y／右＝-Y） */
+for (const { id, arm, lift, elbowAxis, elbowMin, elbowMirrored } of [
+  { id: "walk112", arm: 25, lift: 0.5, elbowAxis: 0, elbowMin: 20, elbowMirrored: false },
+  { id: "run152", arm: 40, lift: 0.8, elbowAxis: 0, elbowMin: 45, elbowMirrored: false }
+]) {
+  const motion = data.BUILTIN[id];
+  if (!motion) fail(`Swing check needs the ${id} motion`);
+  const samples = 24, armShots = [], armLegShots = [];
+  let armMin = Infinity, armMax = -Infinity, diffMin = Infinity, diffMax = -Infinity, elbowMax = 0, liftL = 0, liftR = 0, bothUp = 0;
+  for (let i = 0; i < samples; i++) {
+    const pose = motion.pose(motion.seconds * i / samples);
+    const left = pose["左腕"], right = pose["右腕"], leg = pose["左足"], elbowL = pose["左ひじ"], elbowR = pose["右ひじ"],
+          ikL = pose["左足ＩＫ"], ikR = pose["右足ＩＫ"];
+    if (!left || !right || !leg || !elbowL || !elbowR || !ikL || !ikR) fail(`${id}: the swing check needs 腕・ひじ・足・足ＩＫ in every frame`);
+    const l = left.rot[0], r = right.rot[0];
+    armMin = Math.min(armMin, l); armMax = Math.max(armMax, l);
+    diffMin = Math.min(diffMin, l - r); diffMax = Math.max(diffMax, l - r);
+    armShots.push(l); armLegShots.push(l * leg.rot[0]);
+    elbowMax = Math.max(elbowMax, elbowL.rot[elbowAxis], elbowMirrored ? -elbowR.rot[elbowAxis] : elbowR.rot[elbowAxis]);
+    liftL = Math.max(liftL, ikL.pos[1]); liftR = Math.max(liftR, ikR.pos[1]);
+    if (ikL.pos[1] > lift * 0.3 && ikR.pos[1] > lift * 0.3) bothUp++;
+  }
+  if (armMax - armMin < arm * 2) fail(`${id}: the arms must swing fore/aft by ±${arm}° (found ${((armMax - armMin) / 2).toFixed(1)}°)`);
+  if (diffMax - diffMin < arm * 2) fail(`${id}: the two arms must swing in opposite directions (found ${((diffMax - diffMin) / 2).toFixed(1)}°)`);
+  if (armLegShots.some(v => v > 0.5)) fail(`${id}: the arm must swing opposite to the leg on the same side`);
+  if (elbowMax < elbowMin) fail(`${id}: the elbow must fold forward by at least ${elbowMin}° (found ${elbowMax.toFixed(1)}°)`);
+  if (liftL < lift || liftR < lift) fail(`${id}: each foot must lift by at least ${lift} (found ${liftL.toFixed(2)} / ${liftR.toFixed(2)})`);
+  if (bothUp > 1) fail(`${id}: the feet must lift alternately, not together`);
+}
+
 const translatedKeys = [
   "mmdMotionWalk", "mmdMotionRun", "mmdMotionSit", "mmdMotionDance", "mmdMotionLegacy",
-  "mmdGroupDaily", "mmdGroupDance", "mmdGroupSongs", "mmdGroupMiku", "mmdGroupFaces",
+  "mmdGroupDaily", "mmdGroupDance", "mmdGroupSongs", "mmdGroupMiku", "mmdGroupFaces", "mmdGroupVoice",
   "mmdMotionFaceSmile", "mmdMotionFaceWink", "mmdMotionFaceShy", "mmdMotionFaceAngry", "mmdMotionFaceConfused",
   "mmdMotionFaceSurprise", "mmdMotionFaceSleepy", "mmdMotionFacePout", "mmdMotionFaceLaugh", "mmdMotionFaceSing",
   "mmdMotionPrincess", "mmdMotionLeekShake", "mmdMotionPopipo", "mmdMotionTriple", "mmdMotionNyan", "mmdMotionSalute",
   "mmdMotionDoubleHeart", "mmdMotionPoint", "mmdMotionEncore", "mmdMotionDramatic", "mmdMotionVictory", "mmdMotionPenlight",
   "mmdMotionChibi", "mmdMotionSpin", "mmdMotionGroove", "mmdMotionStepTouch", "mmdMotionShoulderPop", "mmdMotionArmWave",
-  "mmdMotionCrossStep", "mmdMotionSoftBow", "mmdMotionMarionette"
+  "mmdMotionCrossStep", "mmdMotionSoftBow", "mmdMotionMarionette",
+  "mmdMotionSongMic", "mmdMotionSongLong", "mmdMotionSongUp", "mmdMotionSongHum", "mmdMotionSongWhisper", "mmdMotionSongCall"
 ];
 for (const key of translatedKeys) {
   const count = (source.match(new RegExp(`\\b${key}:`, "g")) || []).length;
   if (count !== 4) fail(`${key} must have four translations (found ${count})`);
 }
 const core = fs.readFileSync(path.join(root, "js/core.js"), "utf8");
-if (preset.motion !== "dreamy128" || preset.bpm !== 128) fail("Bundled Lat-style Miku preset must start with dreamy128 at 128 BPM");
-if (!core.includes('prefs.mmdMotionKind : "dreamy128"') || !core.includes('settings.mmdMotionKind = "dreamy128"')) {
-  fail("Missing-preference and reset defaults must use dreamy128");
+if (preset.motion !== "faceSing" || preset.bpm !== 0) fail("Bundled Lat-style Miku preset must start with the BPM-free faceSing mouth loop");
+if (!core.includes('prefs.mmdMotionKind : "faceSing"') || !core.includes('settings.mmdMotionKind = "faceSing"')) {
+  fail("Missing-preference and reset defaults must use faceSing");
 }
 if (!source.includes('settings.mmdMotionKind === "none"') || !source.includes("visibleMotions: () => MOTION_MENU_IDS.slice()")) {
   fail("Saved no-motion choice or chooser API is not preserved/exposed");
@@ -204,4 +236,4 @@ if (!source.includes("for (const group of MOTION_GROUPS)") || !source.includes("
   fail("Grouped select/quick motion lists are not wired");
 }
 
-console.log(`MMD motion smoke check passed · ${ids.length} built-ins/choices · ${data.FACE_MORPHS.length} Lat morph tracks · VMD/CP932/poses valid`);
+console.log(`MMD motion smoke check passed · ${ids.length} built-ins/choices · ${data.FACE_MORPHS.length} Lat morph tracks · VMD/CP932/poses + walk/run swing valid`);

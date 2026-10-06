@@ -59,8 +59,9 @@ textures and `.vmd` motions: by default **trk! does not bundle, host or upload t
 You pick a model or a folder from your own device in the settings panel, and the
 MMD terms of that model's author apply (most MMD models forbid redistribution,
 use outside MMD/MMM, and commercial use).
-The 60 built-in motion choices (daily actions, dances, Miku-inspired gestures,
-and expression acting) are **original code-generated routines**. `js/mmd.js`
+The 65 built-in motion choices (daily actions, dances, Miku-inspired gestures,
+expression acting and singing/lip-sync routines) are **original code-generated
+routines**. `js/mmd.js`
 creates their `.vmd` bytes at runtime from pose and facial-weight formulas; no
 third-party VMD or choreography file is bundled. The facial tracks refer to
 existing morph names in the redistributable Lat-style PMD; they do not include
@@ -71,6 +72,11 @@ original song choreography is reproduced. A motion being free to download or
 available on a hosting page is not, by itself, permission to redistribute its
 VMD; no third-party VMD is added unless the redistribution terms for the actual
 file are clear.
+The 📚 Study Room (書斎) reads the image folders and text files **you** choose and
+keeps its own copies inside this browser only (IndexedDB `trk_study_room_v1`);
+nothing is uploaded or shared, the original files are never modified, and the
+rights in imported books and images stay with their authors. The reader, its
+text decoding and its display styles are original trk! code under the GPL.
 
 ### 3a. Bundled MMD models (`assets/mmd/`)
 A model may be bundled under `assets/mmd/` ONLY when its own readme explicitly

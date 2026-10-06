@@ -196,7 +196,7 @@ function nudgeLatency(d) {
 
 /* ---------- キーボード ---------- */
 addEventListener("keydown", e => {
-  if (window._trkSynthModeOpen || window._trkMediaPlayerOpen) return;
+  if (window._trkSynthModeOpen || window._trkMediaPlayerOpen || window._trkStudyRoomOpen) return;
   if (menuBinding !== null) { e.preventDefault(); captureMenuKey(e.code); return; }
   if (bindingSlot !== null) { e.preventDefault(); captureKey(e.code); return; }
   if (phase === "playing") {
@@ -220,7 +220,7 @@ addEventListener("keydown", e => {
   }
   if (e.code === "KeyF" && !e.repeat && !e.ctrlKey && !e.metaKey && slotOfKey("KeyF") < 0 && fullscreenSupported) toggleFullscreen();
 });
-addEventListener("keyup", e => { if (window._trkSynthModeOpen || window._trkMediaPlayerOpen) return; if (e.code === "Backquote") cancelRetryHold(); });
+addEventListener("keyup", e => { if (window._trkSynthModeOpen || window._trkMediaPlayerOpen || window._trkStudyRoomOpen) return; if (e.code === "Backquote") cancelRetryHold(); });
 addEventListener("blur", cancelRetryHold);
 
 /* ---------- タッチ操作（MANUAL・TRUCK・ORBITの左右ボタン） ---------- */

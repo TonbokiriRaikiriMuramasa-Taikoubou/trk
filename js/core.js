@@ -1095,7 +1095,9 @@ function updateChartButtons() {
 }
 function chartSummary() {
   if (!chart.length) return "";
-  return `${tr(chartMode === "generated" ? "chartGenerated" : "chartImported")} · ${tr(chartDiff)} · ${chart.length} ${tr("notes")} · ${tr("level")}${currentLevel} ${tr("estimate")}`;
+  /* 自動生成 / trk!手づくり（同梱デモ） / 読み込んだ譜面 */
+  const label = chartMode === "generated" ? "chartGenerated" : chartMode === "custom" ? "chartCustom" : "chartImported";
+  return `${tr(label)} · ${tr(chartDiff)} · ${chart.length} ${tr("notes")} · ${tr("level")}${currentLevel} ${tr("estimate")}`;
 }
 
 /* ---------- フェーズと画面 ---------- */

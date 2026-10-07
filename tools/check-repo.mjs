@@ -562,6 +562,62 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else ok("First Spark: optional 30-second demo folder is lazy-loaded and can be removed without affecting the media player");
 }
 
+// 🎼 First Spark handmade demo charts: easy / normal / hard ship as authored JSON, master stays generated.
+{
+  const library = read("js/library.js"), core = read("js/core.js"), i18n = read("js/i18n.js");
+  const demoDir = path.join(root, "assets/optional-demo-audio");
+  const bundled = fs.existsSync(demoDir);   // a lightweight build deletes the whole folder
+  const demoReadme = fs.existsSync(path.join(demoDir, "README.md")) ? read("assets/optional-demo-audio/README.md").replace(/\r/g, "") : "";
+  const wired =
+    library.includes('const FIRST_SPARK_CHART_DIR = "./assets/optional-demo-audio/";') &&
+    library.includes('const FIRST_SPARK_CHART_DIFFS = ["easy", "normal", "hard"];') &&
+    library.includes("async function firstSparkChartData(diff)") &&
+    library.includes('if (response.status === 404) { firstSparkChartCache.set(diff, null); return null; }') &&
+    library.includes('applyChartData(data, "custom", "importStatus", false)') &&
+    library.includes('s.source === "builtin" && s.key === FIRST_SPARK_KEY && firstSparkChartMap[d]') &&
+    library.includes("manifest.charts === false") &&
+    core.includes('chartMode === "custom" ? "chartCustom"') &&
+    (!bundled || demoReadme.includes("first-spark-tutorial.easy.json")) &&
+    ["chartCustom", "builtinChartLoaded"].every(k => i18n.split(`${k}:`).length - 1 === 4);
+  if (!wired) fail("First Spark demo charts: lazy fetch, 404 fallback to the generated chart, custom chart mode, folder README or four-language labels are missing");
+  else ok("First Spark demo charts are lazy-loaded per difficulty and fall back to the generated chart when absent");
+
+  if (bundled) {
+    try {
+      const mod = await import("./make-first-spark-charts.mjs");
+      const { buildCharts, CHART_DIFFS: diffs, chartFileName, BPM: bpm, BARS: bars } = mod;
+      const authored = buildCharts();
+      const step = 60000 / bpm / 4, songMs = bars * 4 * 60000 / bpm;
+      const counts = {};
+      let bad = 0;
+      for (const diff of diffs) {
+        const file = path.join(demoDir, chartFileName(diff));
+        let stored = null;
+        try { stored = JSON.parse(fs.readFileSync(file, "utf8")); } catch { bad++; fail(`First Spark chart ${chartFileName(diff)} is missing or not valid JSON`); continue; }
+        const notes = Array.isArray(stored.notes) ? stored.notes : [];
+        counts[diff] = notes.length;
+        const onGrid = notes.every(([t, lane]) => Number.isInteger(t) && t >= 0 && lane >= 0 && lane <= 1 &&
+          Math.abs(t - Math.round(t / step) * step) <= 1 && t < songMs);
+        const firstHalf = notes.filter(([t]) => t < songMs / 2).length;
+        const lanes = new Set(notes.map(n => n[1]));
+        if (stored.format !== "shadow-taiko-chart" || stored.difficulty !== diff || stored.bpm !== bpm || Number(stored.offset) !== 0) { bad++; fail(`First Spark chart ${chartFileName(diff)} has the wrong format/bpm/offset fields`); }
+        else if (JSON.stringify(stored) !== JSON.stringify(authored[diff])) { bad++; fail(`First Spark chart ${chartFileName(diff)} drifted from tools/make-first-spark-charts.mjs`); }
+        else if (!notes.length || !onGrid) { bad++; fail(`First Spark chart ${chartFileName(diff)} has notes off the ${bpm} BPM grid or outside the song`); }
+        else if (firstHalf < notes.length * 0.3) { bad++; fail(`First Spark chart ${chartFileName(diff)} packs most notes into the second half (${firstHalf}/${notes.length} before the middle)`); }
+        else if (lanes.size < 2 || notes[notes.length - 1][1] !== 0) { bad++; fail(`First Spark chart ${chartFileName(diff)} needs both don and ka, ending on don`); }
+        else if (fs.statSync(file).size > 64 * 1024) { bad++; fail(`First Spark chart ${chartFileName(diff)} is bigger than 64 KiB`); }
+      }
+      if (!bad && !(counts.easy < counts.normal && counts.normal < counts.hard)) fail(`First Spark charts should rise in notes: easy ${counts.easy} < normal ${counts.normal} < hard ${counts.hard}`);
+      else if (!bad) ok(`First Spark handmade charts match the generator (easy ${counts.easy} / normal ${counts.normal} / hard ${counts.hard} notes on the 128 BPM grid)`);
+      for (const extra of ["master", "rush"]) {
+        if (fs.existsSync(path.join(demoDir, `first-spark-tutorial.${extra}.json`))) fail(`First Spark bundled a ${extra} chart - ${extra} must stay generated from the seed`);
+      }
+    } catch (error) {
+      fail(`First Spark chart check could not run: ${error.message}`);
+    }
+  }
+}
+
 // 📊 Spectrum expansion (30 styles / 16 themes) + banner song buttons.
 {
   const spec = read("js/spectrum.js");

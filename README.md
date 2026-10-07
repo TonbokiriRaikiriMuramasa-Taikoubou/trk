@@ -48,13 +48,13 @@ trk!（トラック）は、ブラウザだけで動く**非営利のリズム�
 3. 曲を選ぶと、プレビューが流れます。
 4. プレイ方法と難易度を選んで、**▶ PLAY**！
 
-画面上部の **🧭 まずは3分チュートリアル** を開くと、スキン・サウンドエフェクト・TRUCK／CATCHの遊び方を5つの短い手順で確認できます。デモ音源フォルダーを含む配布版では、**🎵 30秒デモを選ぶ**から `assets/optional-demo-audio/` のオリジナル曲「FIRST SPARK」を選んでPLAYでき、手持ちの曲がなくても最初のプレイを試せます。手順を実際に試すたびに**スタンプ**が押されていき、Seed欄へ `trk!` と入力した**瞬間**にチュートリアル完了で案内が消えます（不要な人は**スキップ**できます。設定の「見た目」から**もう一度**表示もできます）。5つのスタンプを集めると、ごほうびスキン **🎓グラデュエーション** が解禁されます。Seed欄への特定の入力にも、こっそり反応します🥚
+画面上部の **🧭 まずは3分チュートリアル** を開くと、スキン・サウンドエフェクト・TRUCK／CATCHの遊び方を5つの短い手順で確認できます。デモ音源フォルダーを含む配布版では、**🎵 30秒デモを選ぶ**から `assets/optional-demo-audio/` のオリジナル曲「FIRST SPARK」を選んでPLAYでき、手持ちの曲がなくても最初のプレイを試せます。デモ曲には **trk! 手づくりの譜面**（初級・中級・上級）がいっしょに入っているので、選んだ瞬間から拍にぴったり合った譜面で遊べます（達人・RUSHはSeedからの自動生成）。手順を実際に試すたびに**スタンプ**が押されていき、Seed欄へ `trk!` と入力した**瞬間**にチュートリアル完了で案内が消えます（不要な人は**スキップ**できます。設定の「見た目」から**もう一度**表示もできます）。5つのスタンプを集めると、ごほうびスキン **🎓グラデュエーション** が解禁されます。Seed欄への特定の入力にも、こっそり反応します🥚
 
 ### ゲームをせず、メディアプレーヤーとして使う
 
 チュートリアルが不要なら、案内内の **スキップ** を押せます。ゲームを始めずに使う場合は、TVドックの **⏻ 電源を長押し**してメディアプレーヤーへ切り替え、手持ちの曲を読み込んでください。
 
-同梱デモが不要な軽量ビルドを作る場合は、**`assets/optional-demo-audio/` フォルダー全体を削除**してください（MP3は約704 KiB）。`manifest.json` が無くなると、デモ曲とチュートリアルのデモボタンは自動で非表示になります。メディアプレーヤーや自分の曲の再生には影響しません。すでにブラウザーへ音源が保存されている場合は、容量を完全に空けるためにサイトデータ／Service Worker のキャッシュも消してください。
+同梱デモが不要な軽量ビルドを作る場合は、**`assets/optional-demo-audio/` フォルダー全体を削除**してください（MP3は約704 KiB＋手づくり譜面3ファイルで約4 KiB）。`manifest.json` が無くなると、デモ曲とチュートリアルのデモボタンは自動で非表示になります。音源だけ残して譜面を消す（`manifest.json` の `"charts": false`、またはJSONファイルだけを削除）と、デモ曲は全難易度で自動生成になります。メディアプレーヤーや自分の曲の再生には影響しません。すでにブラウザーへ音源が保存されている場合は、容量を完全に空けるためにサイトデータ／Service Worker のキャッシュも消してください。
 
 メディアプレーヤーでは、再生キュー、曲送り、リピート、シャッフル、再生速度、前回位置の復元、スリープタイマー、Media Sessionに対応しています。逆再生（対応環境では音声も反転）とA-B区間ループも使えます。**Loop Lab**では、現在位置から5／10／20秒の区間ループ、ランダムな短区間、曲ごとのA-Bプリセット保存・呼び出し・個別削除・全消去ができます。プリセットは曲識別子とA/B秒数だけを端末内に保存し、音源の切り取り・変換・書き出し・アップロードは行いません。動画を一時的に壁紙／スクリーンセーバーで隠すこともでき、時計表示、動画を止める／続ける、トグル／長押し、端末から選んだ画像（セッション中のみ）に対応します。キャストアンテナとバックグラウンド再生アンテナは個別に設定できます。バックグラウンド再生のアンテナはドックの上だけでなく、**右上（言語選択の左）にコンパクトに置く**こともできます（ドックのアンテナを隠しても、バックグラウンド再生は使えます）。キャストは初期オフで、対応ブラウザだけがキャストアンテナから選択画面を開きます（キャストを隠しても、再生用のアンテナは消えません）。アンテナの見た目は、伸縮ロッド／円形ループ／パラボラ／サイバービームの4形状に加えて、**ドットキャラ10体**（🚚トラック・🤖ロボット・🐱ネコ・🫧スライム・👻オバケ、そして東方Projectから⛩霊夢・🧹魔理沙・❄チルノ・🦇フランドール・🗡妖夢）を選べます。キャラは **ONで起きて歩き、OFFで倒れて眠ります**。どれもtrk!の描きおろしで、東方Projectのキャラは二次創作ドット絵です（公式ガイドラインに従い、無料のブラウザゲームとして提供。公式の素材ではありません）。**自分のイラスト2枚**（ON用・OFF用）を選ぶこともでき、画像は端末内にだけ保存されます（設定の初期化で消えます）。
 
@@ -84,6 +84,7 @@ python -m http.server 8000
 
 - 譜面は、BPM・譜面ずらし・**Seed**から自動で作られます。Seedを変えると譜面も変わります。
 - 難易度：初級・中級・上級（隠し難易度もあります）。
+- 🎵 同梱デモ「FIRST SPARK」の**初級・中級・上級だけ手づくり譜面**です（128 BPMの4つ打ちを採譜した27／54／111ノーツ。`tools/make-first-spark-charts.mjs` で再生成でき、`⇧ 譜面を読み込む`／`↺ 自動生成に戻す` は他の曲と同じく使えます）。
 - どのモードでも同じ譜面を使い、記録はモードごとに別々に残ります。
 
 ---
@@ -481,7 +482,7 @@ trk/
 ├─ package.json  capacitor.config.ts
 ├─ css/style.css  css/study-room.css  … 書斎の見た目（本棚・リーダー・TV）
 ├─ icons/                        … アプリのアイコン
-├─ assets/optional-demo-audio/   … 任意の First Spark デモ音源（軽量版ではフォルダーごと削除可）
+├─ assets/optional-demo-audio/   … 任意の First Spark デモ音源＋手づくり譜面3種（軽量版ではフォルダーごと削除可）
 ├─ js/
 │  ├─ i18n.js  i18n-options.js   … 4言語の文章
 │  ├─ data.js                    … スキン・レイアウト・難易度・マスコット登録
@@ -520,7 +521,7 @@ trk/
 ## 💐 着想元とリスペクト
 
 trk! は、たくさんの音楽ゲームから着想をもらっています。どの作品とも関係のない、**非公式のファンメイド**です。
-各ゲームの譜面・画像・音声・名前は使っていません。内蔵の譜面はすべて自動生成です。
+各ゲームの譜面・画像・音声・名前は使っていません。内蔵の譜面は自動生成が基本で、唯一の例外がデモ曲「FIRST SPARK」に同梱した手づくり譜面（初級・中級・上級）です。こちらも自作の小節構成表から作っており、他の作品の譜面データは使っていません（`tools/make-first-spark-charts.mjs`）。
 
 | trk! の機能 | 着想元 |
 |---|---|
@@ -564,6 +565,7 @@ trk! は、たくさんの音楽ゲームから着想をもらっています。
 | Capacitor CLI ／ TypeScript | MIT ／ Apache-2.0（APK生成用の開発ツール。アプリ実行時には含めない） |
 | 利用者が読み込む曲・VRM・MMDモデル・.vmd・パック | それぞれの作者のものです |
 | 公認パックの曲・譜面・作者のことば | 作者さんのものです。GPLの対象外で、trk! で遊ぶための公開です |
+| デモ曲「FIRST SPARK」の音源と手づくり譜面（`assets/optional-demo-audio/`） | trk! 自作のオリジナル（第三者の録音・サンプル・既存譜面データは不使用）。音源の取り扱いのみ [NOTICE.md](NOTICE.md) に注記あり |
 
 ### 初音ミクについて
 この作品はピアプロ・キャラクター・ライセンスに基づいてクリプトン・フューチャー・メディア株式会社のキャラクター「初音ミク」を描いたものです。
@@ -593,7 +595,7 @@ Load your own music or video and trk! **auto-generates a chart** for it. Nothing
 
 Press **Skip** in the quick guide if you do not need the tutorial. To listen without starting a game, long-press the TV dock's **⏻ power** button and load your own music.
 
-The optional FIRST SPARK demo lives in `assets/optional-demo-audio/` (about 704 KiB; the MP3 is fetched only when selected). For a lighter build, delete the **entire folder**; without its `manifest.json`, the demo entry and button stay hidden. This does not affect the media player or your own songs. If the audio was already cached, clear the site's data/service-worker cache to reclaim that stored copy.
+The optional FIRST SPARK demo lives in `assets/optional-demo-audio/` (about 704 KiB; the MP3 is fetched only when selected). It ships **handmade Easy / Normal / Hard charts** (27 / 54 / 111 notes on the song's 128 BPM four-on-the-floor grid) as plain `shadow-taiko-chart` JSON, fetched only when that difficulty is used; MASTER and RUSH stay generated from the seed. For a lighter build, delete the **entire folder**; without its `manifest.json`, the demo entry and button stay hidden. Set `"charts": false` (or remove only the chart JSON files) to keep the audio with generated charts. This does not affect the media player or your own songs. If the audio was already cached, clear the site's data/service-worker cache to reclaim that stored copy.
 
 **Five play styles**
 - 🥁 **MANUAL** — two-button Don/Ka drumming

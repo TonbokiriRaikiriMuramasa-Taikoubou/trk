@@ -118,7 +118,8 @@ const LITE_ENUM_VALUES = {
   liteMode: ["off", "auto", "on"],
   liteFps: ["60", "30", "20"],
   liteMascot: ["60", "30", "15", "off"],
-  liteScale: ["device", "1.5", "1"]
+  liteScale: ["device", "1.5", "1"],
+  liteLibRows: ["device", "150", "60"]      // 🪶 曲リストが初回に描く行数
 };
 /* 🐔 trk's playlist のタブ表示名（3種類）。名前が長いのを嫌う人向けに短くできる。
    "icon" は文字を出さない（🐔 のアイコンだけ）。名前と色は固定なので、ここで選べるのは表示名だけ。 */
@@ -189,6 +190,10 @@ const settings = {
   liteSpectrumOff: prefs.liteSpectrumOff !== false,                          // 📊 軽量化モード中はスペクトラムを止める
   liteFx: prefs.liteFx !== false,                                            // 軽量化モード中はぼかし・すりガラスを減らす
   liteBlur: prefs.liteBlur !== false,                                        // 軽量化モード中は映像のぼかしを最大2pxに
+  liteDecor: prefs.liteDecor !== false,                                      // 軽量化モード中は動き続ける装飾（📡ドックのキャラ等）を間引く
+  liteLibRows: pick(prefs.liteLibRows, LITE_ENUM_VALUES.liteLibRows, "device"),  // 🪶 曲リストの初回表示行数（device＝制限なし）
+  liteNoAnalyze: prefs.liteNoAnalyze === true,                               // 軽量化モード中は曲の音声解析をしない（譜面はBPM中心）
+  liteMascotNoLoad: prefs.liteMascotNoLoad === true,                         // 軽量化モード中は3Dマスコットを自動で読み込まない
   liteSeen: prefs.liteSeen === true,                                         // 📱 スマホ向けの初回案内を出したか
   liteGameFull: prefs.liteGameFull === true,                                 // 🎯 ゲーム中は描画を軽くしない（ゲーム優先・初期オフ）
   /* 🎹 シンセ演奏モード */
@@ -375,6 +380,7 @@ function resetLitePrefs() {
   /* 🪶 軽量化（js/lite.js）。?reset=lite と trkReset('lite') から呼びます */
   settings.liteMode = "auto"; settings.liteFps = "30"; settings.liteMascot = "30"; settings.liteScale = "1.5";
   settings.liteSpectrumOff = true; settings.liteFx = true; settings.liteBlur = true; settings.liteGameFull = false;
+  settings.liteDecor = true; settings.liteLibRows = "device"; settings.liteNoAnalyze = false; settings.liteMascotNoLoad = false;
   if (typeof liteSyncUI === "function") { try { liteSyncUI(); } catch (_) {} }
 }
 function resetNotesPrefs() {
@@ -1125,7 +1131,7 @@ function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
       🪶 軽量化のように core.js で決め打ちできるものは LITE_ENUM_VALUES へ、
       🐔 タブ表示名のように UI 側の定数と対になるものは TRK_ENUM_VALUES へ寄せる（読み込み順に左右されない）。 */
 const SETTING_ENUM_KEYS = ["specStyle", "specTheme", "mmdMotionKind", "fxPreset",
-  "liteMode", "liteFps", "liteMascot", "liteScale", "trkTabName"];
+  "liteMode", "liteFps", "liteMascot", "liteScale", "liteLibRows", "trkTabName"];
 /* Importで弾いた理由（対応が変わるので、表示では区別して出す） */
 const SKIP_WHY = { enum:"prefSkipWhyId", type:"prefSkipWhyType", unknown:"prefSkipWhyUnknown", failed:"prefSkipWhyType" };
 function validImportedSettingEnum(key, value) {

@@ -2,12 +2,21 @@
 /* ============ 🪶 軽量化（スマホ・タブレット・アプリ「PWA／APK」向け） ============
    ・設定（⚙）の右下「🪶 軽量化（スマホ向け）」の欄から操作します。保存先はいつもの
      `shadow_taiko_preferences_v2`（settings.liteMode／liteFps／liteMascot／liteScale／
-     liteSpectrumOff／liteFx／liteBlur／liteSeen）。localStorage のキーは増やしません。
+     liteSpectrumOff／liteFx／liteBlur／liteDecor／liteLibRows／liteNoAnalyze／
+     liteMascotNoLoad／liteSeen）。localStorage のキーは増やしません。
    ・liteMode="auto" のときは、端末（モバイル判定・コア数・メモリ・省データ設定・電池・
      動きを減らす設定）を見て、必要そうなときだけ働きます。
    ・軽くする方法は「rAFは今までどおり回したまま、描く回数・描く大きさを減らす」だけです。
      ゲームの判定と時計（tickClock／gameTime＝音声の時計）は毎フレーム動くので、
      フレームレートを下げても判定はずれません。
+   ・軽くする対象（2026-10 の棚卸し）
+     ①描画回数：ゲーム・メニュー・📊スペクトラム・🩷3Dマスコット・📡ドックの装飾・🎬映像
+     ②描画サイズ：devicePixelRatioの上限（liteScale）
+     ③CSS：すりガラス・ぼかし（liteFx／liteBlur）、動き続ける装飾アニメ（liteDecor）
+     ④読む量：曲リストの行数（liteLibRows）、曲の音声解析（liteNoAnalyze）、
+       3Dマスコットのモデルとthree.js（liteMascotNoLoad）
+     ※①②は「描かない」だけで判定・時計に影響なし。③は見た目だけ。
+       ④は起動の待ち時間・メモリを減らす（譜面はBPMグリッド中心になり、3Dマスコットは選んだときに読みます）
    ・?safe=1 では何も変えません（セーフモードは元から映像を止めています）。        */
 "use strict";
 
@@ -84,7 +93,7 @@ const liteMascotFpsValue = () => ({ "60":60, "30":30, "15":15 }[settings.liteMas
 const liteScaleValue = () => (settings.liteScale === "1" ? 1 : settings.liteScale === "1.5" ? 1.5 : 0);
 function liteGate(key, fps, now) {
   if (fps >= 60) return true;                        // 60fps上限＝実質いままでどおり
-  const t = typeof now === "number" ? now : performance.now();
+  const t = typeof now === "number" && now > 0 ? now : performance.now();   // 0・NaN・呼び忘れでも止まらない
   const iv = 1000 / fps, prev = liteGates[key] || 0;
   if (t - prev < iv - 1.5) return false;             // 60Hzの画面でも目標のfpsに届くように少しだけ緩める
   liteGates[key] = t;
@@ -103,6 +112,23 @@ const liteNoMascot = id => liteActive() && settings.liteMascot === "off" && (id 
 function liteMascotAllow(id, now) { return !liteNoMascot(id) && (!liteActive() || liteGate("mascot:" + id, liteMascotFpsValue(), now)); }
 /* 📊 軽量化モード中はスペクトラム（アナライザー）を止める */
 const liteSpecBlocked = () => liteActive() && settings.liteSpectrumOff !== false;
+/* 📡 軽量化モード中は「動き続ける装飾」を間引く（ドックのアンテナのキャラ・スキャンライン等）。
+   見た目の問題であって判定・操作には影響ないので、📊スペクトラムや🎬映像と同じ liteFps の上限で間引きます */
+const liteDecorBlocked = () => liteActive() && settings.liteDecor !== false;
+const liteDecorAllow = now => !liteDecorBlocked() || liteGate("decor", liteFpsValue(), now);
+/* 📜 曲リスト：初回に描く行数の上限（長い棚の読み込み・スクロールを軽くする） */
+const liteLibRowsValue = () => (settings.liteLibRows === "60" ? 60 : settings.liteLibRows === "150" ? 150 : 0);
+function liteLibRows(max) {
+  const all = Number(max) || 0, cap = liteActive() ? liteLibRowsValue() : 0;
+  return cap && all > cap ? cap : all;
+}
+/* 🧠 曲を選ぶときの音声解析（音量・立ち上がりの走査）を省略する。
+   長い曲ほど効きます（解析はファイル全体をデコードするので時間とメモリが大きい）。
+   譜面はBPMグリッド中心の自動生成になります（既存の自作譜面・自定义譜面はそのまま） */
+const liteNoAnalyze = () => liteActive() && settings.liteNoAnalyze === true;
+/* 🩷 3Dマスコット（MMD／VRM）を起動時に自動で読み込まない（three.jsごと読みません）。
+   マスコットに選んだとき・設定欄を開いたとき・ファイルを選ぶときに読むので、失われません */
+const liteMascotNoLoad = () => liteActive() && settings.liteMascotNoLoad === true;
 /* 🎬 軽量化モード中は映像のぼかしを最大2pxに（スマホのGPUでいちばん重いところ） */
 const liteBlurCap = () => (liteActive() && settings.liteBlur !== false ? 2 : 0);
 /* 🖼 描画解像度：端末のdevicePixelRatioに、軽量化モードの上限をかける */
@@ -116,16 +142,25 @@ function litePixelRatio(max) {
    ・「カスタム」はここでは何も変えません（下の項目で調整した状態）              */
 const LITE_PRESET_KEYS = { balanced:"litePresetBalanced", game:"litePresetGame", max:"litePresetMax", off:"litePresetOff", custom:"litePresetCustom" };
 const LITE_PRESETS = [
-  /* 🪶 バランス：どこもほどほどに軽くする（初期値と同じ） */
-  { id:"balanced", values:{ liteFps:"30", liteMascot:"30", liteScale:"1.5", liteSpectrumOff:true, liteFx:true, liteBlur:true, liteGameFull:false } },
+  /* 🪶 バランス：どこもほどほどに軽くする（初期値と同じ）。読む量（解析・リスト・3D）は変えません */
+  { id:"balanced", values:{ liteFps:"30", liteMascot:"30", liteScale:"1.5", liteSpectrumOff:true, liteFx:true, liteBlur:true, liteGameFull:false,
+    liteDecor:true, liteLibRows:"150", liteNoAnalyze:false, liteMascotNoLoad:false } },
   /* 🎯 ゲーム優先：ノーツ・映像はそのまま。メニュー・スペクトラム・マスコット・解像度だけ軽くする */
-  { id:"game", values:{ liteFps:"30", liteMascot:"15", liteScale:"1.5", liteSpectrumOff:true, liteFx:true, liteBlur:true, liteGameFull:true } },
-  /* 🔋 最大節約：いちばん軽い（ゲーム中も20fps・マスコットなし・解像度1.0倍） */
-  { id:"max", values:{ liteFps:"20", liteMascot:"off", liteScale:"1", liteSpectrumOff:true, liteFx:true, liteBlur:true, liteGameFull:false } },
+  { id:"game", values:{ liteFps:"30", liteMascot:"15", liteScale:"1.5", liteSpectrumOff:true, liteFx:true, liteBlur:true, liteGameFull:true,
+    liteDecor:true, liteLibRows:"150", liteNoAnalyze:false, liteMascotNoLoad:false } },
+  /* 🔋 最大節約：いちばん軽い（ゲーム中も20fps・マスコットなし・解像度1.0倍・読む量も削る） */
+  { id:"max", values:{ liteFps:"20", liteMascot:"off", liteScale:"1", liteSpectrumOff:true, liteFx:true, liteBlur:true, liteGameFull:false,
+    liteDecor:true, liteLibRows:"60", liteNoAnalyze:true, liteMascotNoLoad:true } },
   /* ✨ 軽量化しない：見た目はそのまま（軽量化モードをオフにする） */
-  { id:"off", mode:"off", values:{ liteFps:"60", liteMascot:"60", liteScale:"device", liteSpectrumOff:false, liteFx:false, liteBlur:false, liteGameFull:false } }
+  { id:"off", mode:"off", values:{ liteFps:"60", liteMascot:"60", liteScale:"device", liteSpectrumOff:false, liteFx:false, liteBlur:false, liteGameFull:false,
+    liteDecor:false, liteLibRows:"device", liteNoAnalyze:false, liteMascotNoLoad:false } }
 ];
-const liteValueOf = key => (key === "liteSpectrumOff" || key === "liteFx" || key === "liteBlur") ? settings[key] !== false : settings[key];
+/* 既定オンの項目（liteSpectrumOff／liteFx／liteBlur／liteDecor）は「明示的にoffと言わない限りON」。
+   ここを settings[key] !== false の形に揃えないと、 Object.prototype などの継承キーが truthy に通る
+   M-02 の落とし穴が戻る（undefined !== false → true で「既定オン」を化かせる）ので、キー名で判定します */
+const LITE_DEFAULT_ON = ["liteSpectrumOff", "liteFx", "liteBlur", "liteDecor"];
+const liteValueOf = key => !Object.prototype.hasOwnProperty.call(settings, key) ? undefined
+  : LITE_DEFAULT_ON.indexOf(key) >= 0 ? settings[key] !== false : settings[key];
 function litePresetId() {
   for (const preset of LITE_PRESETS) {
     if (preset.mode === "off" ? liteModeValue() !== "off" : liteModeValue() === "off") continue;
@@ -139,6 +174,9 @@ function liteApplyPreset(id) {
   if (!preset) { liteSyncUI(); return; }        // カスタム：下の項目で調整するので何も変えない
   for (const [key, value] of Object.entries(preset.values)) settings[key] = value;
   if (preset.mode) settings.liteMode = preset.mode;
+  /* ✨「軽量化しない」の状態で軽いプリセットを選ぶと、modeが off のままなので何も軽く見えない。
+     プリセットを選んだ以上は効かせる、がいちばん紛れないので、そのときだけ auto ではなく on に戻します */
+  else if (liteModeValue() === "off") settings.liteMode = "on";
   saveUserPrefs(); liteSyncUI();
   liteSay(tr("litePresetSet", { name:litePresetName(id) }));
 }
@@ -149,6 +187,7 @@ function liteApply() {
   if (!body) return;
   body.classList.toggle("trkLite", on);
   body.classList.toggle("trkLiteFx", on && settings.liteFx !== false);
+  body.classList.toggle("trkLiteStill", liteDecorBlocked());
   body.classList.toggle("trkNoMascot", on && settings.liteMascot === "off");
 }
 function liteDeviceParts() {
@@ -180,6 +219,10 @@ function liteSyncUI() {
   chk("liteSpecOff", settings.liteSpectrumOff !== false);
   chk("liteFx", settings.liteFx !== false);
   chk("liteBlur", settings.liteBlur !== false);
+  chk("liteDecor", settings.liteDecor !== false);
+  chk("liteNoAnalyze", settings.liteNoAnalyze === true);
+  chk("liteMascotNoLoad", settings.liteMascotNoLoad === true);
+  sel("liteLibRows", settings.liteLibRows === "60" ? "60" : settings.liteLibRows === "150" ? "150" : "device");
   chk("liteGameFull", settings.liteGameFull === true);
   const panel = $("litePanel");
   if (panel) panel.classList.toggle("liteOn", on);
@@ -218,9 +261,25 @@ function liteInit() {
     settings.liteScale = ["device", "1.5", "1"].includes(e.target.value) ? e.target.value : "1.5";
     saveUserPrefs(); liteSyncUI();
   });
-  for (const [id, key] of [["liteSpecOff", "liteSpectrumOff"], ["liteFx", "liteFx"], ["liteBlur", "liteBlur"]]) {
+  for (const [id, key] of [["liteSpecOff", "liteSpectrumOff"], ["liteFx", "liteFx"], ["liteBlur", "liteBlur"], ["liteDecor", "liteDecor"]]) {
     $(id).addEventListener("change", e => { settings[key] = e.target.checked; saveUserPrefs(); liteSyncUI(); });
   }
+  /* 📜 曲リストの初回表示行数 */
+  $("liteLibRows").addEventListener("change", e => {
+    settings.liteLibRows = ["device", "150", "60"].includes(e.target.value) ? e.target.value : "device";
+    saveUserPrefs(); liteSyncUI();
+    liteSay(tr("liteLibRowsSet", { n:settings.liteLibRows === "device" ? tr("liteLibRowsDeviceShort") : settings.liteLibRows }));
+  });
+  /* 🧠 曲の音声解析 */
+  $("liteNoAnalyze").addEventListener("change", e => {
+    settings.liteNoAnalyze = e.target.checked; saveUserPrefs(); liteSyncUI();
+    liteSay(tr(settings.liteNoAnalyze ? "liteAnalyzeOffNow" : "liteAnalyzeOnNow"));
+  });
+  /* 🩷 3Dマスコットの自動読み込み（オフにすれば、その場で読みに行きます） */
+  $("liteMascotNoLoad").addEventListener("change", e => {
+    settings.liteMascotNoLoad = e.target.checked; saveUserPrefs(); liteSyncUI();
+    liteSay(tr(settings.liteMascotNoLoad ? "liteMascotSkipOn" : "liteMascotSkipOff"));
+  });
   $("liteRecheckBtn").addEventListener("click", () => {
     liteProbe(); liteBatteryProbe(); liteSyncUI();
     liteSay(tr(liteActive() ? "liteNowOn" : "liteNowOff"));
@@ -248,6 +307,8 @@ window.TrkLite = Object.freeze({
   active: liteActive, reasons: liteReasons, allow: liteAllow, allowGame: liteAllowGame, mascotAllow: liteMascotAllow,
   preset: litePresetId, presetName: litePresetName, applyPreset: liteApplyPreset,
   noMascot: liteNoMascot, specBlocked: liteSpecBlocked, blurCap: liteBlurCap, pixelRatio: litePixelRatio,
+  decorBlocked: liteDecorBlocked, decorAllow: liteDecorAllow, libRows: liteLibRows,
+  noAnalyze: liteNoAnalyze, mascotNoLoad: liteMascotNoLoad,
   fps: liteFpsValue, mascotFps: liteMascotFpsValue, scale: liteScaleValue,
   info: () => ({ ...liteInfo }), probe: liteProbe, sync: liteSyncUI
 });

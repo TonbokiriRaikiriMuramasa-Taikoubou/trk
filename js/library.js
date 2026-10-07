@@ -1970,7 +1970,10 @@ function renderLib() {
   if (!rows.length) {
     box.append(el("div", "libEmpty", tr(scope.length ? "libNoMatch" : (tabId.startsWith("pl:") ? "plTabHint" : tabId.startsWith("fld:") ? "fldTabHint" : "libTabEmpty")))); return;
   }
-  for (const row of rows.slice(0, LIB_SHOW)) {
+  /* 🪶 軽量化：初回に描く行数をへらす（行にはボタン・長押し・ドラッグの監視がたくさん付くので、
+     長い棚ではここが端末いちばんの待ち時間になります）。棚自体とランダム選曲は全曲のままです */
+  const libShow = (typeof TrkLite === "object" && typeof TrkLite.libRows === "function") ? TrkLite.libRows(LIB_SHOW) : LIB_SHOW;
+  for (const row of rows.slice(0, libShow)) {
     if (!row.it) { box.append(plWishRow(row.w)); continue; }   /* 🛒 まだ持っていない曲（灰色）＝タップで入手先 */
     const { it, info } = row;
     const wrap = el("div"); wrap.style.cssText = "display:flex;gap:6px;align-items:stretch";
@@ -2019,7 +2022,7 @@ function renderLib() {
     }
     box.append(wrap);
   }
-  if (rows.length > LIB_SHOW) box.append(el("div", "hint", tr("libMore", { n:rows.length - LIB_SHOW })));
+  if (rows.length > libShow) box.append(el("div", "hint", tr("libMore", { n:rows.length - libShow })));
 }
 
 /* ---------- 選曲画面の曲名の欄 ---------- */

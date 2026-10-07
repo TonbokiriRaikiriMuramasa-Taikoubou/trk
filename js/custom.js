@@ -34,6 +34,9 @@ $("notePresets").addEventListener("click", e => {
 const PCL_URL = "https://piapro.jp/license/pcl/summary";
 function updateMascotUI() {
   $("mascotSelect").value = settings.mascot;
+  /* 🩷 マスコットが変わった合図。js/mmd.js・js/vrm.js は、🪶 軽量化で起動時に読み込まなかった
+     3Dモデルをここで読みに行きます（モデルが既にあるときは中身を見てすぐ止まるので無駄打ちしません） */
+  try { emit("mascot"); } catch (_) {}
   const on = isPclMascot(activeMascot());
   document.querySelectorAll(".pclCredit").forEach(n => {
     n.hidden = !on; n.textContent = "";

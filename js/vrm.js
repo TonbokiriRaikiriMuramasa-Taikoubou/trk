@@ -363,9 +363,19 @@ dispatchEvent(new Event("stvrm-ready"));
 
 /* ---------- 起動時：パックの復元を待ってから、自分のモデルを戻す ---------- */
 syncAgree(); syncControls();
+/* 🪶 軽量化で「起動時に自動で読み込まない」がオンのあいだは、自分のモデルをここでは読みません。
+   VRMをマスコットに選んだ／この欄を開いた／軽量化が外れた、のどれかで読みに行きます（enqueueは1列なので多重に読みません） */
+function restoreWhenAllowed() {
+  if (vrm && motionAnim) return;   // モデルもモーションも既にある（＝読むものがない）
+  if (typeof TrkLite === "object" && TrkLite.mascotNoLoad && TrkLite.mascotNoLoad()) return;
+  enqueue(async () => { if (!packOwned) await restorePersonal(); });
+}
 (async () => {
   try { await packsReady; } catch (_) {}
-  enqueue(async () => { if (!packOwned) await restorePersonal(); });
+  restoreWhenAllowed();
 })();
+on("lite", () => restoreWhenAllowed());
+on("mascot", () => { if (activeMascot() === "vrm") restoreWhenAllowed(); });
+if ($("vrmPanel")) $("vrmPanel").addEventListener("toggle", () => { if ($("vrmPanel").open) restoreWhenAllowed(); });
 })();
 /* ✅ vrm.js 完了 —— 統合版の全ファイルがそろいました 🎉 */

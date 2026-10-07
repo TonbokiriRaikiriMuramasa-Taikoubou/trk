@@ -294,9 +294,15 @@ details.panel[open]>summary{margin-bottom:14px}
 /* ===== 🪶 軽量化（スマホ・タブレット・アプリ向け。js/lite.js が body に付けます） =====
    ・body.trkLite       … 軽量化モードが動いている（設定画面の目印・マスコットの描画レートなど）
    ・body.trkLiteFx     … ぼかし・すりガラス（backdrop-filter）を使わない＝スマホのGPUで重いところ
-   ・body.trkNoMascot   … 3Dマスコットを描かないとき（MMD／VRMのキャンバスを隠す）            */
+   ・body.trkNoMascot   … 3Dマスコットを描かないとき（MMD／VRMのキャンバスを隠す）
+   ・body.trkLiteStill  … 動き続ける装飾を止める（ドック・TV・角のマスコットの常時アニメ）  */
 body.trkLiteFx *,body.trkLiteFx *::before,body.trkLiteFx *::after{
   backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+/* ⏳ 軽量化：ここで止まるのは「ずっと繰り返しているだけ」の装飾です（判定・操作・曲の再生には無関係）。
+   プレイ中の演出（判定文字・花吹雪など）は canvas 側なので、ここでは消しません */
+body.trkLiteStill #fxDock *,body.trkLiteStill #fxDock *::before,body.trkLiteStill #fxDock *::after,
+body.trkLiteStill #tvDock *,body.trkLiteStill #tvDock *::before,body.trkLiteStill #tvDock *::after,
+body.trkLiteStill .cornerAnt *{animation:none!important}
 body.trkNoMascot #mmdCanvas,body.trkNoMascot #mmdPreview,body.trkNoMascot #mmdQuickPreview,
 body.trkNoMascot #vrmCanvas,body.trkNoMascot #vrmPreview{display:none!important}
 #litePanel.liteOn>summary::after{content:"🪶 ON";margin-left:8px;font-size:12px;font-weight:800;color:var(--ui-accent)}

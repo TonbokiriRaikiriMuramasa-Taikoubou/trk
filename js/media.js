@@ -57,10 +57,14 @@ async function loadMedia(file, opts = {}) {
   setStatus("loadStatus", "analyzing"); updateChartButtons();
   await new Promise(r => { setTimeout(r, 30); });
   const tooBig = (Number(file.size) || 0) > ANALYZE_MAX;
-  if (tooBig) analysis = null;
+  /* 🪶 軽量化：解析をしない設定では、ファイル全体をデコードして走り直すところごと飛ばします
+     （長い曲ほど効きます。譜面はBPMグリッド中心の自動生成になり、自作・取り込み譜面はそのまま） */
+  const liteSkip = !tooBig && typeof TrkLite === "object" && typeof TrkLite.noAnalyze === "function" && TrkLite.noAnalyze();
+  const skipAnalyze = tooBig || liteSkip;
+  if (skipAnalyze) analysis = null;
   else { try { analysis = await analyzeAudio(file); } catch (_) { analysis = null; } }
   if (token !== loadToken) return false;
-  setStatus("loadStatus", tooBig ? "analysisSkipped" : analysis ? "loaded" : "decodeFallback");
+  setStatus("loadStatus", tooBig ? "analysisSkipped" : liteSkip ? "analysisSkippedLite" : analysis ? "loaded" : "decodeFallback");
   let supplied = false;
   if (opts.onReady) { try { supplied = !!(await opts.onReady()); } catch (e) { console.error(e); } }
   if (token !== loadToken) return false;

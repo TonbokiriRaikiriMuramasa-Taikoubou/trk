@@ -1801,23 +1801,35 @@ addEventListener("DOMContentLoaded", () => {
 
   on("language", () => { syncUI(); renderPresetRow(); renderQuick(); });
 
-  /* 前回のモデルを戻す（覚える設定のときだけ・セーフモードでは何もしない） */
+  /* 前回のモデルを戻す（覚える設定のときだけ・セーフモードでは何もしない）。
+     🪶 軽量化で「起動時に自動で読み込まない」がオンのあいだは、ここでは読みません。
+     そのかわり、下の3つのどれかで読みに行きます＝①MMDをマスコットに選んだ ②この欄を開いた
+     ③端末の判定し直しなどで軽量化が外れた。ファイルで直接選んだ読み込みはいつもどおりです */
+  function restoreRemembered() {
+    if (model || !settings.mmdRemember || safeNow()) return;
+    if (typeof TrkLite === "object" && TrkLite.mascotNoLoad && TrkLite.mascotNoLoad()) return;
+    enqueue(async () => {
+      if (model) return;
+      try {
+        const rec = await mmdDB.get("model");
+        if (rec && rec.files && rec.files.length) {
+          settings.mmdAgreed = true; syncUI();
+          const keep = settings.mmdMotionKind;                           // 記憶したモーション（none/auto/内蔵）
+          if (keep && (keep === "auto" || BUILTIN[keep])) motionKind = keep;
+          await doLoadModel(rec.files, { restored:true, select:false, save:false });
+          const m = await mmdDB.get("motion");
+          if (m && m.file) await doLoadMotion(m.file, { restored:true });
+        }
+      } catch (_) {}
+    });
+  }
   syncUI();
   if (safeNow()) { status("mmdSafe"); return; }
   enqueue(findPresets);                              // 💠 同梱モデルがあればボタンを出す（無ければ何もしない）
-  if (settings.mmdRemember) enqueue(async () => {
-    try {
-      const rec = await mmdDB.get("model");
-      if (rec && rec.files && rec.files.length) {
-        settings.mmdAgreed = true; syncUI();
-        const keep = settings.mmdMotionKind;                           // 記憶したモーション（none/auto/内蔵）
-        if (keep && (keep === "auto" || BUILTIN[keep])) motionKind = keep;
-        await doLoadModel(rec.files, { restored:true, select:false, save:false });
-        const m = await mmdDB.get("motion");
-        if (m && m.file) await doLoadMotion(m.file, { restored:true });
-      }
-    } catch (_) {}
-  });
+  restoreRemembered();
+  on("lite", () => restoreRemembered());            // 🪶 軽量化の設定を変えたら、その場で読み直す
+  on("mascot", () => { if (activeMascot() === "mmd") restoreRemembered(); });
+  $("mmdPanel").addEventListener("toggle", () => { if ($("mmdPanel").open) restoreRemembered(); });
 });
 
 function loadMotionKind(kind) {

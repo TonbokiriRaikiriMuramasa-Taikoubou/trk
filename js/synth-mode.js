@@ -801,7 +801,8 @@ addEventListener("DOMContentLoaded", () => {
   }
   function drawScope(now) {
     if (overlay.hidden) return;
-    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) ||
+      (typeof TrkLite === "object" && TrkLite.decorBlocked && TrkLite.decorBlocked());   // 🪶 軽量化も「動きを減らす」と同じ扱い
     if (now - lastDraw >= (reduce ? 100 : 32)) {
       lastDraw = now; fitCanvas();
       const r = canvas.getBoundingClientRect(), dpr = typeof TrkLite === "object" ? TrkLite.pixelRatio(2) : Math.min(2, window.devicePixelRatio || 1);   // 🪶 軽量化は描画解像度の上限

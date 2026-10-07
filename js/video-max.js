@@ -122,6 +122,9 @@ function paint() {
   const dpr = typeof TrkLite === "object" ? TrkLite.pixelRatio(2) : Math.min(2, window.devicePixelRatio || 1);   // 🪶 軽量化は描画解像度の上限
   const W = Math.max(2, Math.round(w * dpr)), H = Math.max(2, Math.round(h * dpr));
   if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
+  /* 🪶 軽量化：全屏の canvas 書き出しは負荷が大きいので、メニューと同じ上限で間引く
+     （描かないフレームは前の絵が残るだけ＝コマ落ちに見える。曲の再生・操作はそのまま） */
+  if (typeof TrkLite === "object" && !TrkLite.allow("max", performance.now())) return;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, W, H);

@@ -98,9 +98,35 @@ const FIRST_SPARK_KEY = "builtin:first-spark-tutorial-v1";
 const FIRST_SPARK_MAX_BYTES = 2 * 1024 * 1024;
 const FIRST_SPARK_MANIFEST = "./assets/optional-demo-audio/manifest.json";
 const FIRST_SPARK_ASSET = "./assets/optional-demo-audio/first-spark-tutorial.mp3";
+/* 🎼 手づくりのデモ譜面（初級・中級・上級）。同じフォルダーに入る任意の同梱物で、
+   ファイルが無ければ自動生成に戻ります。達人・RUSH は置いていないので今までどおりSeedから作ります。
+   名前はここで決め打ち（manifest 経由でパスを変えない）＋ shadow-taiko-chart の項目検証を通します。 */
+const FIRST_SPARK_CHART_DIR = "./assets/optional-demo-audio/";
+const FIRST_SPARK_CHART_DIFFS = ["easy", "normal", "hard"];
+const firstSparkChartFile = diff => `first-spark-tutorial.${diff}.json`;
 let builtInSongs = [];
 let firstSparkFilePromise = null;
+let firstSparkChartMap = {};      /* 難易度 → URL（manifest.charts === false のときは空） */
+let firstSparkChartCache = new Map();   /* 難易度 → 読んだ譜面データ（null = このビルドに無い） */
 let songSelectToken = 0;
+/* 譜面を1回だけ読みに行って覚える。404は「同梱していない」、その他の失敗は次回もう一度試す */
+async function firstSparkChartData(diff) {
+  const url = firstSparkChartMap[diff];
+  if (!url) return null;
+  if (firstSparkChartCache.has(diff)) return firstSparkChartCache.get(diff);
+  try {
+    const response = await fetch(url, { credentials:"same-origin" });
+    if (response.status === 404) { firstSparkChartCache.set(diff, null); return null; }
+    if (!response.ok) return null;
+    const declared = Number(response.headers.get("Content-Length") || 0);
+    if (declared > CHART_FILE_MAX) return null;
+    const text = await response.text();
+    if (!text.length || text.length > CHART_FILE_MAX) return null;
+    const data = JSON.parse(text);
+    firstSparkChartCache.set(diff, data);
+    return data;
+  } catch (_) { return null; }   /* 通信・JSONの失敗は自動生成で遊ぶ（デモを止めない） */
+}
 async function initOptionalTutorialDemo() {
   const button = $("guideDemoBtn");
   if (button) button.hidden = true;
@@ -109,9 +135,13 @@ async function initOptionalTutorialDemo() {
     if (!response.ok) return;
     const manifest = await response.json();
     if (!manifest || manifest.version !== 1 || manifest.enabled !== true || manifest.file !== "first-spark-tutorial.mp3") return;
+    /* manifest.charts === false なら音源だけ同梱した構成（譜面は自動生成） */
+    firstSparkChartMap = manifest.charts === false ? {} :
+      Object.fromEntries(FIRST_SPARK_CHART_DIFFS.map(d => [d, FIRST_SPARK_CHART_DIR + firstSparkChartFile(d)]));
     builtInSongs = [{
       key:FIRST_SPARK_KEY, source:"builtin", file:null, fileName:"FIRST_SPARK_Tutorial_30s.mp3",
-      title:"FIRST SPARK — Tutorial", base:"FIRST SPARK — Tutorial", artist:"trk!", size:0, bpm:128, offset:0
+      title:"FIRST SPARK — Tutorial", base:"FIRST SPARK — Tutorial", artist:"trk!", size:0, bpm:128, offset:0,
+      charter:Object.keys(firstSparkChartMap).length ? "trk!" : "", builtinDemo:true
     }];
     if (button) button.hidden = false;
     renderLib();
@@ -1940,7 +1970,10 @@ function renderLib() {
   if (!rows.length) {
     box.append(el("div", "libEmpty", tr(scope.length ? "libNoMatch" : (tabId.startsWith("pl:") ? "plTabHint" : tabId.startsWith("fld:") ? "fldTabHint" : "libTabEmpty")))); return;
   }
-  for (const row of rows.slice(0, LIB_SHOW)) {
+  /* 🪶 軽量化：初回に描く行数をへらす（行にはボタン・長押し・ドラッグの監視がたくさん付くので、
+     長い棚ではここが端末いちばんの待ち時間になります）。棚自体とランダム選曲は全曲のままです */
+  const libShow = (typeof TrkLite === "object" && typeof TrkLite.libRows === "function") ? TrkLite.libRows(LIB_SHOW) : LIB_SHOW;
+  for (const row of rows.slice(0, libShow)) {
     if (!row.it) { box.append(plWishRow(row.w)); continue; }   /* 🛒 まだ持っていない曲（灰色）＝タップで入手先 */
     const { it, info } = row;
     const wrap = el("div"); wrap.style.cssText = "display:flex;gap:6px;align-items:stretch";
@@ -1953,6 +1986,7 @@ function renderLib() {
     if (it.charts) meta.append(el("i", "libTag", "📄"));
     if (it.shared) { const st = el("i", "libTag", "📤"); st.title = tr("libKeepShared"); meta.append(st); }   /* 💾 端末に残した共有の曲 */
     if (it.chartBlobs && Object.keys(it.chartBlobs).length) meta.append(el("i", "libTag", "📦"));
+    if (it.builtinDemo && Object.keys(firstSparkChartMap).length) meta.append(el("i", "libTag", "🎼"));   /* 🎼 trk!手づくりのデモ譜面がいっしょに入っている印 */
     if (info && info.plays) meta.append(el("i", "libTag", tr("libPlays", { n:info.plays })));
     if (info && info.best) meta.append(el("i", "libTag", info.best.toLocaleString()));
     b.append(left, meta);
@@ -1988,7 +2022,7 @@ function renderLib() {
     }
     box.append(wrap);
   }
-  if (rows.length > LIB_SHOW) box.append(el("div", "hint", tr("libMore", { n:rows.length - LIB_SHOW })));
+  if (rows.length > libShow) box.append(el("div", "hint", tr("libMore", { n:rows.length - libShow })));
 }
 
 /* ---------- 選曲画面の曲名の欄 ---------- */
@@ -2361,6 +2395,13 @@ async function restoreSongState(it) {
 async function trySongChart() {
   const s = currentSong, d = settings.difficulty;
   if (!s || !videoReady) return false;
+  /* 🎼 trk!同梱のデモ譜面（初級・中級・上級）。無い難易度＝達人・RUSHは自動生成へ戻る */
+  if (s.source === "builtin" && s.key === FIRST_SPARK_KEY && firstSparkChartMap[d]) {
+    let data = null;
+    try { data = await firstSparkChartData(d); } catch (_) {}
+    if (data && applyChartData(data, "custom", "importStatus", false)) { setStatus("importStatus", "builtinChartLoaded", { d:tr(d) }); return true; }
+    return false;
+  }
   if (s.chartBlobs && s.chartBlobs[d]) {
     let data = null; try { data = JSON.parse(await s.chartBlobs[d].text()); } catch (_) {}
     if (data && applyChartData(data, "pack", "importStatus", false)) { setStatus("importStatus", "packChartLoaded", { d:tr(d) }); return true; }

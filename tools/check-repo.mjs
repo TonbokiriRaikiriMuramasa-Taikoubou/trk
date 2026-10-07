@@ -389,7 +389,7 @@ if (!exists("js/fx-worklet.js") ||
     /* 🐔 タブを OFF にしたらタブは消える。ただし 🎻 classic が生きていれば、そのタブだけは出す（行き止まりにしない） */
     library.includes("if (trkFolder && settings.trkPlaylist !== false)") &&
     core.includes('trkTabName: ["full", "short", "icon"]') && core.includes('trkTabName: pick(prefs.trkTabName') &&
-    core.includes('settings.trkTabName = "full"') && core.includes('"liteMode", "liteFps", "liteMascot", "liteScale", "trkTabName"');
+    core.includes('settings.trkTabName = "full"') && core.includes('"liteMode", "liteFps", "liteMascot", "liteScale", "liteLibRows", "trkTabName"');
   /* 長押し＝階層。プロフィール編集（plMenu／plFolderMenu）へは行かせない */
   const pressOk = library.includes("if (t.trk) plTrkMenu(); else if (t.pl) plMenu(t.pl); else if (t.fld) plFolderMenu(t.fld); else plGlobalMenu();") &&
     library.includes("if (f && f.id === TRK_FOLDER_ID) { plTrkMenu(); return; }") && library.includes("function plTrkMenu(");
@@ -560,6 +560,62 @@ if (!read("js/main.js").includes("guideEggKind") ||
     keys.every(k => i18n.split(`${k}:`).length - 1 === 4);
   if (!wired) fail("the optional First Spark demo folder, lazy-load/hide path, tutorial controls, rights note, or four-language labels are missing");
   else ok("First Spark: optional 30-second demo folder is lazy-loaded and can be removed without affecting the media player");
+}
+
+// 🎼 First Spark handmade demo charts: easy / normal / hard ship as authored JSON, master stays generated.
+{
+  const library = read("js/library.js"), core = read("js/core.js"), i18n = read("js/i18n.js");
+  const demoDir = path.join(root, "assets/optional-demo-audio");
+  const bundled = fs.existsSync(demoDir);   // a lightweight build deletes the whole folder
+  const demoReadme = fs.existsSync(path.join(demoDir, "README.md")) ? read("assets/optional-demo-audio/README.md").replace(/\r/g, "") : "";
+  const wired =
+    library.includes('const FIRST_SPARK_CHART_DIR = "./assets/optional-demo-audio/";') &&
+    library.includes('const FIRST_SPARK_CHART_DIFFS = ["easy", "normal", "hard"];') &&
+    library.includes("async function firstSparkChartData(diff)") &&
+    library.includes('if (response.status === 404) { firstSparkChartCache.set(diff, null); return null; }') &&
+    library.includes('applyChartData(data, "custom", "importStatus", false)') &&
+    library.includes('s.source === "builtin" && s.key === FIRST_SPARK_KEY && firstSparkChartMap[d]') &&
+    library.includes("manifest.charts === false") &&
+    core.includes('chartMode === "custom" ? "chartCustom"') &&
+    (!bundled || demoReadme.includes("first-spark-tutorial.easy.json")) &&
+    ["chartCustom", "builtinChartLoaded"].every(k => i18n.split(`${k}:`).length - 1 === 4);
+  if (!wired) fail("First Spark demo charts: lazy fetch, 404 fallback to the generated chart, custom chart mode, folder README or four-language labels are missing");
+  else ok("First Spark demo charts are lazy-loaded per difficulty and fall back to the generated chart when absent");
+
+  if (bundled) {
+    try {
+      const mod = await import("./make-first-spark-charts.mjs");
+      const { buildCharts, CHART_DIFFS: diffs, chartFileName, BPM: bpm, BARS: bars } = mod;
+      const authored = buildCharts();
+      const step = 60000 / bpm / 4, songMs = bars * 4 * 60000 / bpm;
+      const counts = {};
+      let bad = 0;
+      for (const diff of diffs) {
+        const file = path.join(demoDir, chartFileName(diff));
+        let stored = null;
+        try { stored = JSON.parse(fs.readFileSync(file, "utf8")); } catch { bad++; fail(`First Spark chart ${chartFileName(diff)} is missing or not valid JSON`); continue; }
+        const notes = Array.isArray(stored.notes) ? stored.notes : [];
+        counts[diff] = notes.length;
+        const onGrid = notes.every(([t, lane]) => Number.isInteger(t) && t >= 0 && lane >= 0 && lane <= 1 &&
+          Math.abs(t - Math.round(t / step) * step) <= 1 && t < songMs);
+        const firstHalf = notes.filter(([t]) => t < songMs / 2).length;
+        const lanes = new Set(notes.map(n => n[1]));
+        if (stored.format !== "shadow-taiko-chart" || stored.difficulty !== diff || stored.bpm !== bpm || Number(stored.offset) !== 0) { bad++; fail(`First Spark chart ${chartFileName(diff)} has the wrong format/bpm/offset fields`); }
+        else if (JSON.stringify(stored) !== JSON.stringify(authored[diff])) { bad++; fail(`First Spark chart ${chartFileName(diff)} drifted from tools/make-first-spark-charts.mjs`); }
+        else if (!notes.length || !onGrid) { bad++; fail(`First Spark chart ${chartFileName(diff)} has notes off the ${bpm} BPM grid or outside the song`); }
+        else if (firstHalf < notes.length * 0.3) { bad++; fail(`First Spark chart ${chartFileName(diff)} packs most notes into the second half (${firstHalf}/${notes.length} before the middle)`); }
+        else if (lanes.size < 2 || notes[notes.length - 1][1] !== 0) { bad++; fail(`First Spark chart ${chartFileName(diff)} needs both don and ka, ending on don`); }
+        else if (fs.statSync(file).size > 64 * 1024) { bad++; fail(`First Spark chart ${chartFileName(diff)} is bigger than 64 KiB`); }
+      }
+      if (!bad && !(counts.easy < counts.normal && counts.normal < counts.hard)) fail(`First Spark charts should rise in notes: easy ${counts.easy} < normal ${counts.normal} < hard ${counts.hard}`);
+      else if (!bad) ok(`First Spark handmade charts match the generator (easy ${counts.easy} / normal ${counts.normal} / hard ${counts.hard} notes on the 128 BPM grid)`);
+      for (const extra of ["master", "rush"]) {
+        if (fs.existsSync(path.join(demoDir, `first-spark-tutorial.${extra}.json`))) fail(`First Spark bundled a ${extra} chart - ${extra} must stay generated from the seed`);
+      }
+    } catch (error) {
+      fail(`First Spark chart check could not run: ${error.message}`);
+    }
+  }
 }
 
 // 📊 Spectrum expansion (30 styles / 16 themes) + banner song buttons.
@@ -746,11 +802,18 @@ if (!read("js/main.js").includes("guideEggKind") ||
   const vrm = read("js/vrm.js");
   const media = read("js/media-player-mode.js");
   const tv = read("js/tv-dock.js");
-  const ids = ["litePanel", "liteMode", "liteFps", "liteMascot", "liteScale", "liteSpecOff", "liteFx", "liteBlur", "liteState", "liteDevice", "liteRecheckBtn", "litePreset", "liteGameFull"];
-  const settingsKeys = ["liteMode", "liteFps", "liteMascot", "liteScale", "liteSpectrumOff", "liteFx", "liteBlur", "liteGameFull"];
+  const songMedia = read("js/media.js"), fxDock = read("js/fx-dock.js"), library = read("js/library.js");
+  const ids = ["litePanel", "liteMode", "liteFps", "liteMascot", "liteScale", "liteSpecOff", "liteFx", "liteBlur", "liteState", "liteDevice", "liteRecheckBtn", "litePreset", "liteGameFull",
+    "liteDecor", "liteLibRows", "liteNoAnalyze", "liteMascotNoLoad"];
+  const settingsKeys = ["liteMode", "liteFps", "liteMascot", "liteScale", "liteSpectrumOff", "liteFx", "liteBlur", "liteGameFull",
+    "liteDecor", "liteLibRows", "liteNoAnalyze", "liteMascotNoLoad"];
   const wiringOk = ["window.TrkLite = Object.freeze({", "function liteActive()", "function liteProbe()", "liteBatteryProbe",
     "navigator.connection", "deviceMemory", "liteGate(", "function litePixelRatio(", "liteBlurCap", "liteSpecBlocked",
-    "liteMascotAllow", "classList.toggle(\"trkLite\"", "classList.toggle(\"trkLiteFx\"", "classList.toggle(\"trkNoMascot\""]
+    "liteMascotAllow", "classList.toggle(\"trkLite\"", "classList.toggle(\"trkLiteFx\"", "classList.toggle(\"trkLiteStill\"", "classList.toggle(\"trkNoMascot\"",
+    /* ④「読む量をへらす」枠（曲リスト・音声解析・3Dマスコットのモデル）。既定値をプリセットに全部並べ、
+       liteValueOf は既定オンのキー名で判定する（settings[key] !== false を素の値に混ぜると Object.prototype が通る） */
+    "liteDecorBlocked", "liteDecorAllow", "liteLibRowsValue", "function liteLibRows(max)", "liteNoAnalyze", "liteMascotNoLoad",
+    "LITE_DEFAULT_ON", 'liteLibRows:"150"', 'liteNoAnalyze:true', 'liteMascotNoLoad:true']
     .every(token => lite.includes(token));
   /* 🎯 プリセット（ゲーム優先＝ノーツ・反応はそのまま、他だけ軽くする） */
   const presetOk = lite.includes("const LITE_PRESETS = [") && ["balanced", "game", "max", "off"].every(id => lite.includes(`id:"${id}"`)) &&
@@ -774,8 +837,16 @@ if (!read("js/main.js").includes("guideEggKind") ||
     mmd.includes('TrkLite.mascotAllow("mmd"') && mmd.includes('TrkLite.noMascot("mmd")') &&
     vrm.includes('TrkLite.mascotAllow("vrm"') && vrm.includes('TrkLite.noMascot("vrm")') &&
     media.includes('TrkLite.allow("media"') && tv.includes('TrkLite.allow("tv"') && tv.includes('TrkLite.allow("tvCheck"') &&
-    read("js/video-max.js").includes("TrkLite.pixelRatio(2)") && read("js/synth-mode.js").includes("TrkLite.pixelRatio(2)");
+    read("js/video-max.js").includes("TrkLite.pixelRatio(2)") && read("js/video-max.js").includes('TrkLite.allow("max"') &&
+    read("js/synth-mode.js").includes("TrkLite.pixelRatio(2)") && read("js/synth-mode.js").includes("TrkLite.decorBlocked") &&
+    /* 📡 選曲中も動き続けていたドックの装飾、📜 曲リストの行数、🧠 曲の解析、🩷 3Dモデルの自動読み込み */
+    fxDock.includes("TrkLite.decorAllow(") && library.includes("TrkLite.libRows(LIB_SHOW)") &&
+    songMedia.includes("TrkLite.noAnalyze()") && songMedia.includes("analysisSkippedLite") &&
+    mmd.includes("TrkLite.mascotNoLoad") && mmd.includes('on("mascot"') && mmd.includes('$("mmdPanel").addEventListener("toggle"') &&
+    vrm.includes("TrkLite.mascotNoLoad") && vrm.includes('on("mascot"') && read("js/custom.js").includes('emit("mascot")');
   const langKeys = ["secLite", "liteHint", "liteNote", "liteMode", "liteModeAuto", "liteModeOn", "liteModeOff", "liteFps",
+    "liteDecor", "liteLibRows", "liteLibRowsDevice", "liteLibRows150", "liteLibRows60", "liteLibRowsDeviceShort", "liteLibRowsSet",
+    "liteNoAnalyze", "liteMascotNoLoad", "liteLeanNote", "liteAnalyzeOffNow", "liteAnalyzeOnNow", "liteMascotSkipOn", "liteMascotSkipOff",
     "liteFps60", "liteFps30", "liteFps20", "liteMascot", "liteMascot60", "liteMascot30", "liteMascot15", "liteMascotOff",
     "liteMascotOffNote", "liteScale", "liteScaleDevice", "liteScale15", "liteScale10", "liteSpecOff", "liteFx", "liteBlur",
     "liteStateOn", "liteStateOff", "liteDevice", "liteCores", "liteMem", "liteApp", "liteBrowser", "liteBattery",
@@ -789,7 +860,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else if (!presetOk) fail("lite-mode presets (balanced / game-first / maximum saving / off) are incomplete");
   else if (!gateOk) fail("lite-mode draw gates are missing (or the game clock/judging slipped behind the gate)");
   else if (!langOk) fail("lite-mode strings are missing from one of the four languages");
-  else ok("lite mode (phones/apps): auto probe, presets incl. game-first, draw-only gates in 4 languages");
+  else ok("lite mode (phones/apps): auto probe, presets incl. game-first, draw/size/loading gates in 4 languages");
 }
 
 // 🎮 Gamepads, controllers and TV remotes (js/pad.js): the ⚙ → ⌨ Controls

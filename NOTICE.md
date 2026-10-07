@@ -86,9 +86,11 @@ nothing is uploaded or shared, the original files are never modified, and the
 rights in imported books and images stay with their authors. The reader, its
 text decoding and its display styles are original trk! code under the GPL.
 
-### Optional original tutorial audio (`assets/optional-demo-audio/`)
+### Optional original tutorial audio and demo charts (`assets/optional-demo-audio/`)
 
 `assets/optional-demo-audio/first-spark-tutorial.mp3` is an optional 30-second instrumental edit of **FIRST SPARK**, created for the trk! tutorial. The whole folder may be omitted from a lightweight build; its manifest controls whether the demo is shown. It is rendered from original procedural synthesis; no third-party recording, sample pack, loop, or quoted melody is bundled. This note records the asset's provenance and intended in-app demo use; the application's GPL notice should not be read as a blanket license for extracting this audio into unrelated works.
+
+`first-spark-tutorial.easy.json` / `.normal.json` / `.hard.json` are original chart data written for the same tutorial, not transcriptions of any commercial chart. Notes are placed on the track's own 128 BPM / 4/4 grid (kick on every beat, brighter synth on the off-beats, a break in bars 9-10, one accent in the last bar) from a documented pattern table in `tools/make-first-spark-charts.mjs`. They use the public `shadow-taiko-chart` format, so they can be inspected, exported and re-imported like any other chart. MASTER and RUSH deliberately ship no chart and stay generated from the Seed.
 
 ### 3a. Bundled MMD models (`assets/mmd/`)
 A model may be bundled under `assets/mmd/` ONLY when its own readme explicitly

@@ -792,6 +792,9 @@ addEventListener("DOMContentLoaded", () => {
   function antCharTick(ts) {
     requestAnimationFrame(antCharTick);
     if (!isCharShape(settings.fxAntennaShape) || document.hidden) return;
+    /* 🪶 軽量化：装飾を間引く設定では、このキャラの描き直しだけフレームレートを落とす
+       （ドックは選曲中にも常時動いていたので、スマホではここで発熱が残っていた） */
+    if (typeof TrkLite === "object" && typeof TrkLite.decorAllow === "function" && !TrkLite.decorAllow(performance.now())) return;
     if (charWhere.dock && dockCharCv.isConnected) drawAntChar(dockCharCv, settings.fxAntenna, ts || 0);
     if (charWhere.corner && cornerCharCv.isConnected) drawAntChar(cornerCharCv, settings.fxAntenna, ts || 0);
   }

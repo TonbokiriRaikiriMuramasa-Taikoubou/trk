@@ -154,6 +154,10 @@ const occurrences = (text, re) => [...text.matchAll(re)];
       !validate("liteMascot", "constructor") && !validate("liteMascot", "toString") &&
       validate("liteScale", "device") && validate("liteScale", "1.5") &&
       !validate("liteScale", "constructor") && !validate("liteScale", "9") &&
+      /* 🪶 曲リストの行数も同じ関門を通す（"0" や "9999" で画面を空にされないように） */
+      validate("liteLibRows", "device") && validate("liteLibRows", "150") && validate("liteLibRows", "60") &&
+      !validate("liteLibRows", "constructor") && !validate("liteLibRows", "__proto__") &&
+      !validate("liteLibRows", "0") && !validate("liteLibRows", "9999") &&
       validate("liteMode", "auto") && !validate("liteMode", "constructor") &&
       /* 🐔 trk's playlist のタブ表示名：3種類だけを通す。"" や継承キーで「アイコンだけ」に化けないよう弾く */
       validate("trkTabName", "full") && validate("trkTabName", "short") && validate("trkTabName", "icon") &&

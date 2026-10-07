@@ -179,6 +179,16 @@ on("settings", () => guideStamp("safe", "guideStampSafe"));
   });
 }
 /* スキップ（もう知っている人へ）ともう一度（⚙設定の見た目から） */
+$("guideDemoBtn").addEventListener("click", async () => {
+  const button = $("guideDemoBtn");
+  button.disabled = true;
+  guideNote("guideDemoLoading");
+  try {
+    const ready = window.TrkSelectTutorialSong && await window.TrkSelectTutorialSong();
+    guideNote(ready ? "guideDemoReady" : "guideDemoUnavailable");
+  } catch (_) { guideNote("guideDemoUnavailable"); }
+  finally { button.disabled = false; }
+});
 $("guideSkip").addEventListener("click", () => { settings.tutorialDone = true; saveUserPrefs(); syncTutorialUI(); maybeAddTrkPlaylist(); });
 $("tutorialReplayBtn").addEventListener("click", () => {
   settings.tutorialDone = false; saveUserPrefs(); syncTutorialUI();

@@ -86,6 +86,10 @@ nothing is uploaded or shared, the original files are never modified, and the
 rights in imported books and images stay with their authors. The reader, its
 text decoding and its display styles are original trk! code under the GPL.
 
+### Optional original tutorial audio (`assets/optional-demo-audio/`)
+
+`assets/optional-demo-audio/first-spark-tutorial.mp3` is an optional 30-second instrumental edit of **FIRST SPARK**, created for the trk! tutorial. The whole folder may be omitted from a lightweight build; its manifest controls whether the demo is shown. It is rendered from original procedural synthesis; no third-party recording, sample pack, loop, or quoted melody is bundled. This note records the asset's provenance and intended in-app demo use; the application's GPL notice should not be read as a blanket license for extracting this audio into unrelated works.
+
 ### 3a. Bundled MMD models (`assets/mmd/`)
 A model may be bundled under `assets/mmd/` ONLY when its own readme explicitly
 allows redistribution. Example — Lat-style Miku's readme states that, within the

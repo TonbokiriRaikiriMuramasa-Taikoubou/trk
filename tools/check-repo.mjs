@@ -533,6 +533,35 @@ if (!read("js/main.js").includes("guideEggKind") ||
   ok("tutorial easter eggs (skip / cheat / god mode) are wired");
 }
 
+// 🎓 Optional First Spark tutorial audio: lazy-loaded from same origin, removable as one folder.
+{
+  const html = read("index.html"), library = read("js/library.js"), main = read("js/main.js");
+  const i18n = read("js/i18n.js"), notice = read("NOTICE.md"), ignore = read(".gitignore"), readme = read("README.md");
+  const demoDir = path.join(root, "assets/optional-demo-audio");
+  const audio = path.join(demoDir, "first-spark-tutorial.mp3"), manifestFile = path.join(demoDir, "manifest.json");
+  let optionalFolderOk = !fs.existsSync(demoDir);
+  if (fs.existsSync(demoDir)) {
+    try {
+      const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
+      const size = fs.statSync(audio).size;
+      optionalFolderOk = fs.existsSync(path.join(demoDir, "README.md")) && size > 0 && size <= 2 * 1024 * 1024 &&
+        manifest.version === 1 && manifest.enabled === true && manifest.file === "first-spark-tutorial.mp3";
+    } catch { optionalFolderOk = false; }
+  }
+  const keys = ["guideDemoBtn", "guideDemoLoading", "guideDemoReady", "guideDemoUnavailable", "demoSongUnavailable"];
+  const wired = optionalFolderOk && html.includes('id="guideDemoBtn"') && html.includes('id="guideDemoBtn" class="guideDemoBtn" type="button" data-i18n="guideDemoBtn" hidden') &&
+    main.includes("TrkSelectTutorialSong") && library.includes('source:"builtin"') &&
+    library.includes('const FIRST_SPARK_MANIFEST = "./assets/optional-demo-audio/manifest.json";') &&
+    library.includes('const FIRST_SPARK_ASSET = "./assets/optional-demo-audio/first-spark-tutorial.mp3";') &&
+    library.includes("void initOptionalTutorialDemo()") && library.includes('id === "builtin"') &&
+    notice.includes("assets/optional-demo-audio/first-spark-tutorial.mp3") &&
+    ignore.includes("!assets/optional-demo-audio/first-spark-tutorial.mp3") &&
+    readme.includes("フォルダー全体を削除") && readme.includes("Press **Skip**") &&
+    keys.every(k => i18n.split(`${k}:`).length - 1 === 4);
+  if (!wired) fail("the optional First Spark demo folder, lazy-load/hide path, tutorial controls, rights note, or four-language labels are missing");
+  else ok("First Spark: optional 30-second demo folder is lazy-loaded and can be removed without affecting the media player");
+}
+
 // 📊 Spectrum expansion (30 styles / 16 themes) + banner song buttons.
 {
   const spec = read("js/spectrum.js");

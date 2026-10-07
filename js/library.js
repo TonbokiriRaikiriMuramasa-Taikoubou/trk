@@ -93,6 +93,30 @@ on("language", renderSeedTools);
 
 /* ---------- 曲リストの中身 ---------- */
 let folderSongs = [], addedSongs = [], packSongs = [], libHandle = null, libView = [];
+/* 🎓 任意同梱デモ。小さな manifest で存在確認し、MP3は選択時だけ同一オリジンから読みます。 */
+const FIRST_SPARK_KEY = "builtin:first-spark-tutorial-v1";
+const FIRST_SPARK_MAX_BYTES = 2 * 1024 * 1024;
+const FIRST_SPARK_MANIFEST = "./assets/optional-demo-audio/manifest.json";
+const FIRST_SPARK_ASSET = "./assets/optional-demo-audio/first-spark-tutorial.mp3";
+let builtInSongs = [];
+let firstSparkFilePromise = null;
+let songSelectToken = 0;
+async function initOptionalTutorialDemo() {
+  const button = $("guideDemoBtn");
+  if (button) button.hidden = true;
+  try {
+    const response = await fetch(FIRST_SPARK_MANIFEST, { credentials:"same-origin" });
+    if (!response.ok) return;
+    const manifest = await response.json();
+    if (!manifest || manifest.version !== 1 || manifest.enabled !== true || manifest.file !== "first-spark-tutorial.mp3") return;
+    builtInSongs = [{
+      key:FIRST_SPARK_KEY, source:"builtin", file:null, fileName:"FIRST_SPARK_Tutorial_30s.mp3",
+      title:"FIRST SPARK — Tutorial", base:"FIRST SPARK — Tutorial", artist:"trk!", size:0, bpm:128, offset:0
+    }];
+    if (button) button.hidden = false;
+    renderLib();
+  } catch (_) { /* no manifest = intentional lightweight build or an offline optional asset */ }
+}
 /* 📤 ミュージックフォルダを共有（許可は1回。中身のリストをぜんぶ取り込む）まわりの状態 */
 let sharedSongs = [];        /* 💾 端末に残してある共有の曲（リロード後も残る） */
 let libShared = false;       /* いまの libHandle が「📤 共有」でもらったものか（📁 開く と区別するため） */
@@ -110,7 +134,7 @@ function setAddonSongs(list) {
    （共有を端末に残すと、同じ曲がフォルダ側と端末側の両方に居るため） */
 const allSongs = () => {
   const out = [], seen = new Set();
-  for (const it of [...folderSongs, ...sharedSongs, ...addedSongs]) {
+  for (const it of [...builtInSongs, ...folderSongs, ...sharedSongs, ...addedSongs]) {
     if (!it || seen.has(it.key)) continue;
     seen.add(it.key); out.push(it);
   }
@@ -129,6 +153,7 @@ function packItem(s) {
 function srcLabel(s) {
   if (s.source === "pack") return `${tr("srcPack")} · ${s.packName || ""}`;
   if (s.source === "file") return tr("srcFile");
+  if (s.source === "builtin") return tr("srcBuiltin");
   return s.dir || tr("srcFolder");
 }
 /* 記録の要約（称号は modes.js の titleString で計算） */
@@ -151,19 +176,23 @@ function songInfo(it, idx) {
    ・選んだタブは settings.libTab に残る。消えたタブは「すべて」を表示（設定は残すので、
      パックを入れ直すと、またそのタブが選ばれた状態に戻る） */
 Object.assign(TEXT.ja, {
-  libTabAll:"すべて", libTabFiles:"追加した曲", libTabVerified:"公認", libTabPackNone:"曲パック", libTabFolderTop:"フォルダ（直下）", libTabAddon:"アドオン",
+  libTabAll:"すべて", libTabFiles:"追加した曲", libTabVerified:"公認", libTabPackNone:"曲パック", libTabFolderTop:"フォルダ（直下）", libTabAddon:"アドオン", libTabDemo:"デモ曲",
+  srcBuiltin:"trk! 同梱デモ",
   libTabGo:"この棚に {n}曲", libTabEmpty:"このタブには曲がありません。ほかのタブを見てみてください。"
 });
 Object.assign(TEXT.en, {
-  libTabAll:"All", libTabFiles:"Added", libTabVerified:"Verified", libTabPackNone:"Song pack", libTabFolderTop:"Folder (top level)", libTabAddon:"Add-on",
+  libTabAll:"All", libTabFiles:"Added", libTabVerified:"Verified", libTabPackNone:"Song pack", libTabFolderTop:"Folder (top level)", libTabAddon:"Add-on", libTabDemo:"Demo track",
+  srcBuiltin:"Bundled trk! demo",
   libTabGo:"{n} songs in this shelf", libTabEmpty:"No songs in this tab. Try another tab."
 });
 Object.assign(TEXT.zh, {
-  libTabAll:"全部", libTabFiles:"已添加", libTabVerified:"认证", libTabPackNone:"歌曲包", libTabFolderTop:"文件夹（顶层）", libTabAddon:"插件",
+  libTabAll:"全部", libTabFiles:"已添加", libTabVerified:"认证", libTabPackNone:"歌曲包", libTabFolderTop:"文件夹（顶层）", libTabAddon:"插件", libTabDemo:"演示曲",
+  srcBuiltin:"trk! 内置演示曲",
   libTabGo:"这个架子有 {n} 首", libTabEmpty:"此标签内没有歌曲。请看看其他标签。"
 });
 Object.assign(TEXT.ko, {
-  libTabAll:"전체", libTabFiles:"추가한 곡", libTabVerified:"공인", libTabPackNone:"곡 팩", libTabFolderTop:"폴더 (최상위)", libTabAddon:"애드온",
+  libTabAll:"전체", libTabFiles:"추가한 곡", libTabVerified:"공인", libTabPackNone:"곡 팩", libTabFolderTop:"폴더 (최상위)", libTabAddon:"애드온", libTabDemo:"데모 곡",
+  srcBuiltin:"trk! 내장 데모",
   libTabGo:"이 선반에 {n}곡", libTabEmpty:"이 탭에는 곡이 없습니다. 다른 탭을 봐 주세요."
 });
 Object.assign(TEXT.ja, {
@@ -523,6 +552,7 @@ const libPackKey = it => it.packId || it.packName || "";
 function libTabIdOf(it) {
   if (it.source === "pack") return "pack:" + libPackKey(it);
   if (it.source === "file") return "file";
+  if (it.source === "builtin") return "builtin";
   const seg = libFolderSeg(it);
   return seg ? "folder:" + seg : "folder";
 }
@@ -535,7 +565,7 @@ function libFavKeys(all) {
   for (const it of all) if (F.inGroup("song", g, it.key)) n++;
   return { n, group:g };
 }
-/* タブの一覧（順番：すべて → ⭐お気に入り → パック → フォルダー → 追加した曲 → 公認） */
+/* タブの一覧（順番：すべて → ⭐お気に入り → プレイリスト → パック／アドオン／フォルダー → デモ曲 → 追加した曲 → 公認） */
 function libTabsOf(all) {
   const tabs = [{ id:"all", icon:"📚", label:tr("libTabAll"), n:all.length }];
   const favN = libFavKeys(all).n;
@@ -549,9 +579,10 @@ function libTabsOf(all) {
     if (cp && cp.folder && plVisible(cp) && !tabs.some(t => t.id === settings.libTab)) tabs.push({ id:"pl:" + cp.id, icon: plIcon(cp), label: cp.name, n: plCount(cp, plKeys), pl: cp, nested: true });
   }
   const packs = new Map(), folders = new Map(), addons = new Map();
-  let nFiles = 0;
+  let nFiles = 0, nBuiltins = 0;
   for (const it of all) {
-    if (it.source === "pack") {
+    if (it.source === "builtin") nBuiltins++;
+    else if (it.source === "pack") {
       const key = libPackKey(it), t = packs.get(key) || { id:"pack:" + key, icon:"📦", label:it.packName || tr("libTabPackNone"), n:0 };
       t.n++; packs.set(key, t);
     } else if (it.source === "addon") {
@@ -566,6 +597,7 @@ function libTabsOf(all) {
   for (const t of packs.values()) tabs.push(t);
   for (const t of addons.values()) tabs.push(t);          // 🧩 アドオンが足した曲
   for (const t of folders.values()) tabs.push(t);
+  if (nBuiltins) tabs.push({ id:"builtin", icon:"🎓", label:tr("libTabDemo"), n:nBuiltins });
   if (nFiles) tabs.push({ id:"file", icon:"📄", label:tr("libTabFiles"), n:nFiles });
   const nv = all.filter(it => it.source === "pack" && libIsVerified(it)).length;
   if (nv) tabs.push({ id:"verified", icon:"✔", label:tr("libTabVerified"), n:nv });
@@ -597,6 +629,7 @@ function libTabMatch(it, id) {
   if (id.startsWith("pl:")) { const p = plById(id.slice(3)); return !!p && p.songs.includes(it.key); }
   if (id.startsWith("fld:")) return plFolderUnionKeys(id.slice(4)).has(it.key);   /* 📁 フォルダ＝中のプレイリストの曲ぜんぶ */
   if (id === "file") return it.source === "file";
+  if (id === "builtin") return it.source === "builtin";
   if (id === "verified") return it.source === "pack" && libIsVerified(it);
   if (id.startsWith("pack:")) return it.source === "pack" && "pack:" + libPackKey(it) === id;
   if (id.startsWith("addon:")) return it.source === "addon" && "addon:" + (it.addonId || "") === id;
@@ -2245,8 +2278,46 @@ bannerSongBtnsSync();   /* 初回の表示あわせ（renderBanner が先に走�
 
 
 /* ---------- 曲を選ぶ ---------- */
+async function materializeBuiltinSong(it) {
+  if (it.source !== "builtin" || it.key !== FIRST_SPARK_KEY) return it;
+  if (it.file) return it;
+  if (!firstSparkFilePromise) {
+    firstSparkFilePromise = (async () => {
+      const response = await fetch(FIRST_SPARK_ASSET, { credentials:"same-origin" });
+      if (!response.ok) { const error = new Error("tutorial-audio-unavailable"); error.code = response.status === 404 ? "not-found" : "http-error"; throw error; }
+      const declared = Number(response.headers.get("Content-Length") || 0);
+      if (declared > FIRST_SPARK_MAX_BYTES) throw new Error("tutorial-audio-too-large");
+      const blob = await response.blob();
+      if (!blob.size || blob.size > FIRST_SPARK_MAX_BYTES) throw new Error("tutorial-audio-size-invalid");
+      const file = new File([blob], it.fileName, { type:"audio/mpeg" });
+      const ready = { ...it, file, size:file.size };
+      const idx = builtInSongs.findIndex(song => song.key === FIRST_SPARK_KEY);
+      if (idx >= 0) builtInSongs[idx] = ready;
+      renderLib();
+      return ready;
+    })().catch(error => { firstSparkFilePromise = null; throw error; });
+  }
+  return firstSparkFilePromise;
+}
 async function selectSong(it) {
   if (phase !== "title" || !it) return;
+  const selection = ++songSelectToken;
+  if (it.source === "builtin" && !it.file) {
+    try { it = await materializeBuiltinSong(it); }
+    catch (error) {
+      if (selection === songSelectToken) {
+        console.error("tutorial audio load failed", error);
+        if (error && error.code === "not-found") {
+          builtInSongs = builtInSongs.filter(song => song.key !== FIRST_SPARK_KEY);
+          const button = $("guideDemoBtn"); if (button) button.hidden = true;
+          renderLib();
+        }
+        setStatus("loadStatus", "demoSongUnavailable");
+      }
+      return;
+    }
+    if (phase !== "title" || selection !== songSelectToken) return;
+  }
   if (currentSong && currentSong.key === it.key) { if (videoReady) startPreview(); return; }
   currentSong = it;
   stopPreview(); renderLib(); renderBanner(); updateSpBuilder();
@@ -2266,6 +2337,13 @@ async function selectSong(it) {
   if (!ok || currentSong !== it) return;
   renderLib(); renderBanner(); updateSpBuilder(); renderSeedTools();
 }
+window.TrkSelectTutorialSong = async function() {
+  const demo = builtInSongs.find(song => song.key === FIRST_SPARK_KEY);
+  if (!demo || phase !== "title") return false;
+  settings.libTab = "builtin"; saveUserPrefs(); renderLib();
+  await selectSong(demo);
+  return !!(videoReady && currentSong && currentSong.key === FIRST_SPARK_KEY);
+};
 /* 解析後・譜面を作る前に呼ばれる。true を返すと自動生成を省略 */
 async function restoreSongState(it) {
   if (currentSong !== it) return false;
@@ -2791,5 +2869,6 @@ async function initLibrary() {
   }
   syncTrkUI();
   renderLib();
+  void initOptionalTutorialDemo();
 }
 /* ✅ library.js 完了 */

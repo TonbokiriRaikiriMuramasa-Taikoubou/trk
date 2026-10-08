@@ -3,7 +3,7 @@
 /* ============ trk! 統合版：データ（スキン・レイアウト・難易度・マスコット登録） ============
    内蔵スキンを増やすときは SKINS に1項目足すだけで、設定画面の一覧に出ます。
      ui     : メニュー画面の色（CSS変数）。--ui-bg は linear-gradient(…) も可（グラデーション）
-     cat    : （任意）スキンの棚での絞り込み用タグ（basic / miku / dark / light / grad / fun / access の配列）
+     cat    : （任意）スキンの棚での絞り込み用タグ（basic / miku / dark / light / grad / fun / access / life の配列）
      game   : プレイ画面の色
      shapes : [ドン, カッ] の「おすすめ」ノーツ形状（circle / diamond / square）
      video  : 背景映像に掛けるCSSフィルター
@@ -418,6 +418,44 @@ const SKINS = {
     game:{don:"#8f3500",ka:"#56b4e9",stage:"#f4f4ef",lane:"rgba(0,0,0,.05)",track:"rgba(0,0,0,.35)",ink:"#1a1a1a",
       inkShadow:"rgba(255,255,255,.8)",noteBorder:"#1a1a1a",panel:"rgba(255,255,255,.95)",perfect:"#8f3500",good:"#0072b2",miss:"#6b6b6b",glow:false},
     shapes:["circle","diamond"], video:"grayscale(.5) brightness(1.1) contrast(1.05)"
+  },
+
+  /* ===== 生活（life）：日常の場面をテーマにする（すべて自作の配色。素材・画像は使わない） ===== */
+  "rainWindow": {
+    cat:["life"],
+    label:{ja:"雨の窓",en:"Rainy window",zh:"雨窗",ko:"빗속 창가"},
+    desc:{ja:"窓ガラスを流れる雨、夜の灯りがにじむ",en:"Rain on the glass, night lights blurred",zh:"玻璃窗上流淌的雨，夜灯朦胧",ko:"유리창을 타고 흐르는 빗물, 번지는 밤의 불빛"},
+    ui:{"--ui-bg":"#111a22","--ui-panel":"rgba(20,30,40,.96)","--ui-soft":"rgba(255,255,255,.05)","--ui-text":"#e8eef4",
+      "--ui-muted":"#9fb0c0","--ui-border":"rgba(255,255,255,.18)","--ui-button":"#1a2834","--ui-button-hover":"#24364a",
+      "--ui-field":"#0e1720","--ui-accent":"#6fb7d6","--ui-on-accent":"#06131a","--ui-gold":"#e8d28a",
+      "--ui-shadow":"0 24px 80px rgba(0,0,0,.5)","--ui-glow":"rgba(111,183,214,.16)"},
+    game:{don:"#f2a36b",ka:"#6fb7d6",stage:"#0e1820",lane:"rgba(0,0,0,.35)",track:"rgba(255,255,255,.18)",ink:"#e8eef4",
+      inkShadow:"rgba(0,0,0,.7)",noteBorder:"rgba(255,255,255,.7)",panel:"rgba(14,24,32,.94)",perfect:"#f2d27a",good:"#e8eef4",miss:"#7d8c99",glow:false},
+    shapes:["circle","circle"], video:"grayscale(.4) brightness(.7) contrast(1.1)"
+  },
+  "nightBath": {
+    cat:["life"],
+    label:{ja:"夜の銭湯",en:"Night bathhouse",zh:"夜间澡堂",ko:"밤의 목욕탕"},
+    desc:{ja:"タイルの壁と、ぬくもりのある電球色",en:"Tiled walls and warm bulb light",zh:"瓷砖墙与温暖的灯光",ko:"타일 벽과 따뜻한 전구 빛"},
+    ui:{"--ui-bg":"#0d2a2e","--ui-panel":"rgba(12,40,44,.96)","--ui-soft":"rgba(255,255,255,.05)","--ui-text":"#eef7f4",
+      "--ui-muted":"#a8cfc8","--ui-border":"rgba(255,255,255,.2)","--ui-button":"#15393e","--ui-button-hover":"#1d4b52",
+      "--ui-field":"#0a2024","--ui-accent":"#f0b35a","--ui-on-accent":"#2a1800","--ui-gold":"#ffd98a",
+      "--ui-shadow":"0 24px 80px rgba(0,0,0,.5)","--ui-glow":"rgba(240,179,90,.16)"},
+    game:{don:"#f0b35a",ka:"#7fd3c4",stage:"#0b2428",lane:"rgba(0,0,0,.25)",track:"rgba(255,255,255,.2)",ink:"#eef7f4",
+      inkShadow:"rgba(0,0,0,.7)",noteBorder:"rgba(255,255,255,.6)",panel:"rgba(10,36,40,.94)",perfect:"#ffd98a",good:"#eef7f4",miss:"#88a9a4",glow:true},
+    shapes:["circle","circle"], video:"sepia(.3) saturate(1.2) brightness(.7)"
+  },
+  "shojiLight": {
+    cat:["life"],
+    label:{ja:"障子の光",en:"Shoji light",zh:"障子之光",ko:"쇼지의 빛"},
+    desc:{ja:"和紙越しのやわらかい光と、木の桟",en:"Soft light through washi paper and wooden lattice",zh:"透过和纸的柔光与木格栅",ko:"와시 종이를 통한 부드러운 빛과 나무 격자"},
+    ui:{"--ui-bg":"#efe9dc","--ui-panel":"#fbf8f1","--ui-soft":"rgba(60,45,30,.05)","--ui-text":"#2b2620",
+      "--ui-muted":"#6b6257","--ui-border":"rgba(60,45,30,.25)","--ui-button":"#e6dfd0","--ui-button-hover":"#d9d0bd",
+      "--ui-field":"#fffdf8","--ui-accent":"#b5533c","--ui-on-accent":"#fff8f0","--ui-gold":"#a67c2e",
+      "--ui-shadow":"0 12px 36px rgba(60,45,30,.12)","--ui-glow":"rgba(181,83,60,.14)"},
+    game:{don:"#b5533c",ka:"#5f7f8f",stage:"#f4eee0",lane:"rgba(60,45,30,.06)",track:"rgba(60,45,30,.3)",ink:"#2b2620",
+      inkShadow:"rgba(255,255,255,.7)",noteBorder:"rgba(43,38,32,.6)",panel:"rgba(251,248,241,.95)",perfect:"#b5533c",good:"#2b2620",miss:"#8a8075",glow:false},
+    shapes:["circle","circle"], video:"sepia(.2) brightness(1.1) contrast(.95)"
   }
 };
 

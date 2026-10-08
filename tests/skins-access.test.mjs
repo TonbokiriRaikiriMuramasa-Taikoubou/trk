@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-/* 見やすさのスキン（cat: access）の配色を node --test で検査する。
+/* 見やすさのスキン（cat: access）と生活のスキン（cat: life）の配色を node --test で検査する。
+ *   見やすさ：文字のコントラスト、形と輝度による区別（色覚配慮）。生活：文字のコントラストだけ。
  *
  *   node --test tests/        または   npm test
  *
@@ -18,6 +19,7 @@ vm.runInContext(fs.readFileSync(path.join(ROOT, "js/data.js"), "utf8"), sb, { fi
 const SKINS = sb.window.SKINS;
 
 const ACCESS = Object.keys(SKINS).filter(id => Array.isArray(SKINS[id].cat) && SKINS[id].cat.includes("access"));
+const LIFE = Object.keys(SKINS).filter(id => Array.isArray(SKINS[id].cat) && SKINS[id].cat.includes("life"));
 
 /* WCAG 2.x の相対輝度（#rrggbb） */
 function lum(hex) {
@@ -37,8 +39,12 @@ describe("見やすさのスキン（access）", () => {
     assert.deepEqual(ACCESS.sort(), ["cbDark", "cbLight", "hc"]);
   });
 
+  test("生活のテーマ3種が登録され、カテゴリ life に入る", () => {
+    assert.deepEqual(LIFE.sort(), ["nightBath", "rainWindow", "shojiLight"]);
+  });
+
   test("本文の文字は背景に対して 4.5:1 以上（WCAG 本文の基準）", () => {
-    for (const id of ACCESS) {
+    for (const id of [...ACCESS, ...LIFE]) {
       const { ui, game } = SKINS[id];
       assert.ok(ratio(ui["--ui-text"], ui["--ui-bg"]) >= 4.5, `${id}: 本文 ${ratio(ui["--ui-text"], ui["--ui-bg"]).toFixed(2)}`);
       assert.ok(ratio(ui["--ui-muted"], ui["--ui-bg"]) >= 4.5, `${id}: 補足 ${ratio(ui["--ui-muted"], ui["--ui-bg"]).toFixed(2)}`);
@@ -54,14 +60,14 @@ describe("見やすさのスキン（access）", () => {
   });
 
   test("ノーツの「ドン」と「カッ」は、形を変えて区別する（色だけに頼らない）", () => {
-    for (const id of ACCESS) {
+    for (const id of ACCESS) {   // 形の区別は色覚配慮の要件（生活系は対象外）
       const { shapes } = SKINS[id];
       assert.notEqual(shapes[0], shapes[1], `${id}: 形が同じ`);
     }
   });
 
   test("ノーツの2色は、輝度にも差がある（白黒で見ても区別できる）", () => {
-    for (const id of ACCESS) {
+    for (const id of ACCESS) {   // 輝度の差も色覚配慮の要件（生活系は対象外）
       const { don, ka } = SKINS[id].game;
       assert.ok(Math.abs(lum(don) - lum(ka)) >= 0.1 || ratio(don, ka) >= 2, `${id}: ${don} と ${ka} の差が小さい`);
     }

@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：入力・イベント・初期化 ============
    サブキー・クイックリトライ（` 長押し）・オフセット調整（- / =）・プレイオプション・起動処理
@@ -538,3 +539,12 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
     .catch(() => { /* オフライン用のキャッシュが無くても、ゲームはそのまま遊べます */ });
 }
 /* ✅ main.js 完了 */
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.RESERVED = RESERVED;
+Object.defineProperty(window, "idleTimer", { configurable:true, get:() => idleTimer, set:v => { idleTimer = v; } });
+window.packsReady = packsReady;
+window.poke = poke;
+window.showFxPower = showFxPower;
+window.syncOptionsUI = syncOptionsUI;
+})();

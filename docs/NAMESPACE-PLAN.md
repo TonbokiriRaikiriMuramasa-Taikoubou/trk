@@ -83,6 +83,7 @@ node tools/smoke-browser.mjs --compare
 | 1 | `js/study-room.js` を即時関数で包む（公開は `window.TrkStudyRoom` のまま） | 927 | 316 | スモーク OK。window から消えた `study*` 関数は他から使われていないもの（報告のみ） |
 | 2 | `js/tv-rich.js`（公開 0）・`js/pad.js`（公開 2：`padBack`・`updatePadUI`）を包む。pad の 2 件は末尾で `window.padBack = padBack;` のように据え置く | 881 | 314（うち 2 件は window 経由に移った） | スモーク OK。`check-security.mjs` の M-03 検査は、包みの先頭を外して同じ関数を動かすように直した（検査の中身は同じ） |
 | 3 | `js/lite.js`（公開 4：`liteLibRows`・`liteNoAnalyze`・`liteMascotNoLoad`・`liteSyncUI` を据え置き）を包む | 839 | 310 | スモーク OK。`check-lite.mjs` は、包みを外して評価するように直した（120 件すべて通過） |
+| 4 | `js/main.js`（公開 6：`RESERVED`・`packsReady`・`poke`・`showFxPower`・`syncOptionsUI` は据え置き、`idleTimer` は `let` のため getter/setter で window に出す） を包む | 798 | 304 | スモーク OK（報告：window 増 6 件・減 214 件。減は他から参照されていない関数。未解決の名前 0）。`let` の公開は据え置きの値ではなく get/set にする |
 
 ## 4. 止める条件
 

@@ -1,11 +1,11 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 44,
+  "windowProps": 49,
   "duplicates": 0,
-  "declarations": 839,
-  "private": 529,
-  "public": 310
+  "declarations": 798,
+  "private": 494,
+  "public": 304
  },
  "files": [
   {
@@ -535,16 +535,9 @@
   },
   {
    "file": "js/main.js",
-   "decls": 41,
-   "private": 35,
-   "public": [
-    "RESERVED",
-    "idleTimer",
-    "packsReady",
-    "poke",
-    "showFxPower",
-    "syncOptionsUI"
-   ]
+   "decls": 0,
+   "private": 0,
+   "public": []
   },
   {
    "file": "js/pad.js",
@@ -608,6 +601,13 @@
   }
  ],
  "windowCoupling": [
+  {
+   "name": "RESERVED",
+   "writers": [
+    "js/main.js"
+   ],
+   "readers": []
+  },
   {
    "name": "ShadowTaikoVRM",
    "writers": [
@@ -988,9 +988,37 @@
    "readers": []
   },
   {
+   "name": "packsReady",
+   "writers": [
+    "js/main.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "padBack",
    "writers": [
     "js/pad.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "poke",
+   "writers": [
+    "js/main.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "showFxPower",
+   "writers": [
+    "js/main.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "syncOptionsUI",
+   "writers": [
+    "js/main.js"
    ],
    "readers": []
   },

@@ -41,6 +41,7 @@ const TEXT = {
     /* 📤 ミュージックフォルダを共有（許可は1回だけ。フォルダの中身のリストをぜんぶ取り込みます） */
     libShare:"📤 ミュージックフォルダを共有", secShare:"📤 ミュージックフォルダの共有",
     libShareHint:"端末（PC・スマホ）に1回だけ許可すると、ミュージックフォルダの中身を一気にリストへ取り込みます。お目当て以外の曲や動画までとびこんでくるので、思いがけない1曲に出会えることもあります。曲は端末の外へ送りません（このブラウザの中だけで使います）。",
+    libOpenShareHint: "📁 開く：フォルダを選んで、その中の曲を入れます（共有としては覚えません）。📤 共有：許可すると共有として覚え、曲に📤の印が付き、「共有をやめる」でまとめて外せます。",
     libShareScanning:"📤 共有を読み込み中… {n}曲",
     libShareFound:"📤 「{dir}」を共有しました：{n}曲（対象外のファイル {skip}件はとばしました）",
     libShareResume:"🔗 「{name}」の共有をつづける",
@@ -340,6 +341,7 @@ const TEXT = {
     /* 📤 Share your music folder (one permission, the whole list comes in at once) */
     libShare:"📤 Share music folder", secShare:"📤 Music folder sharing",
     libShareHint:"Grant permission once on your device (PC or phone) and trk! pulls the whole music folder into the song list at once. Tracks and videos you were not looking for come along too, which is half the fun. Your files never leave the device — everything stays inside this browser.",
+    libOpenShareHint: "📁 Open: pick a folder and add the songs in it (it is not kept as shared). 📤 Share: once allowed, the folder is kept as shared; its songs get a 📤 mark, and “Stop sharing” removes them all at once.",
     libShareScanning:"📤 Reading the shared folder… {n} songs",
     libShareFound:"📤 Shared “{dir}”: {n} songs ({skip} unsupported files skipped)",
     libShareResume:"🔗 Keep sharing “{name}”",
@@ -630,6 +632,7 @@ const TEXT = {
     /* 📤 共享音乐文件夹（只需许可一次，整个列表一起导入） */
     libShare:"📤 共享音乐文件夹", secShare:"📤 音乐文件夹共享",
     libShareHint:"在设备（电脑・手机）上许可一次，trk! 就会把整个音乐文件夹一次性导入歌曲列表。没打算找的歌曲和视频也会一起进来，也许会遇到意外的惊喜。文件不会离开设备（只在这个浏览器里使用）。",
+    libOpenShareHint: "📁 打开：选择文件夹，把其中的曲目加入（不作为共享记住）。📤 共享：允许一次后，以“共享”记住该文件夹；曲目带有📤标记，“停止共享”可一次全部移除。",
     libShareScanning:"📤 正在读取共享… {n}首",
     libShareFound:"📤 已共享「{dir}」：{n}首（跳过{skip}个不支持的文件）",
     libShareResume:"🔗 继续共享「{name}」",
@@ -919,6 +922,7 @@ const TEXT = {
     /* 📤 음악 폴더 공유 (허락은 한 번, 폴더 안의 목록을 통째로 불러옵니다) */
     libShare:"📤 음악 폴더 공유", secShare:"📤 음악 폴더 공유 설정",
     libShareHint:"기기(PC・스마트폰)에 한 번만 허락하면 음악 폴더의 내용을 한꺼번에 곡 목록으로 불러옵니다. 찾던 곡이 아닌 노래나 영상도 같이 들어와서, 뜻밖의 한 곡을 만나는 재미도 있습니다. 곡은 기기 밖으로 나가지 않습니다(이 브라우저 안에서만 사용).",
+    libOpenShareHint: "📁 열기: 폴더를 골라 그 안의 곡을 넣습니다(공유로 기억하지 않음). 📤 공유: 한 번 허락하면 '공유'로 기억하고, 곡에 📤 표시가 붙으며, '공유 중지'로 한꺼번에 뺄 수 있습니다.",
     libShareScanning:"📤 공유를 읽는 중… {n}곡",
     libShareFound:"📤 '{dir}'을(를) 공유했습니다: {n}곡 (대상이 아닌 파일 {skip}개는 건너뜀)",
     libShareResume:"🔗 '{name}' 공유 이어가기",

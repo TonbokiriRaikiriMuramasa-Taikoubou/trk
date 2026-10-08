@@ -496,10 +496,12 @@ const occurrences = (text, re) => [...text.matchAll(re)];
       parseHashParams("#RESET=ALL").get("reset") === "ALL" &&
       parseHashParams("#skin=MySkin").get("skin") === "MySkin";
   } catch (_) {}
+  /* #24：force は文字列の包含（hash.includes("force")）ではなく、パラメータの完全一致（=== "1"）で判定する。
+     包含で判定すると force=0 や forcely=1 でも通ってしまう。変数名や引用符が変わっても禁止する。 */
   const factoryGuard = core.includes("function askFactoryReset(") && core.includes("let pendingFactory = false") &&
     core.includes('if (sp.get("force") === "1")') && core.includes('if (hashParams.get("force") === "1")') &&
     core.includes("const hashParams = parseHashParams(location.hash)") && core.includes("const get = k => sp.get(k)") &&
-    core.includes("hashParams.has(\"reset\")") && !core.includes('hash.includes("force")') && hashForceExact && core.includes("if (!pendingFactory) saveUserPrefs()") &&
+    core.includes("hashParams.has(\"reset\")") && !/includes\(\s*["'`]force["'`]/.test(core) && hashForceExact && core.includes("if (!pendingFactory) saveUserPrefs()") &&
     core.includes('askFactoryReset(') && !/else if \(\["all","factory","full"\]\.includes\(r\)\) \{ resetAllPrefs\(\)/.test(core);
   rule(factoryGuard, "query/hash factory reset asks for confirmation unless the exact force=1 parameter is present");
 

@@ -883,13 +883,19 @@ function idbStore(dbName, store = "kv", opts = null) {
   const readStats = (os, replacingId, cb) => {
     const idx = sizeKey && os.indexNames.contains(sizeKey) ? os.index(sizeKey) : null;
     if (!idx) { statsFromAll(os, replacingId, cb); return; }
-    let keys = null, count = null, prev = replacingId == null ? null : undefined, out = null;
+    /* index の「キー」（＝各レコードの size）を1件ずつ読む。IDBIndex.getAllKeys() は**主キー**を返すので使わない。
+       主キーを size と取り違えると合計が出たらめになり、文字列の主キー（パックは "p…"）では高速経路が毎回外れて
+       Blob を含む全件を読んでいた。openKeyCursor の cursor.key が索引の値。 */
+    let keys = [], keysDone = false, count = null, prev = replacingId == null ? null : undefined, out = null;
     const maybe = () => {
-      if (out || keys === null || count === null || prev === undefined) return;
+      if (out || !keysDone || count === null || prev === undefined) return;
       out = statsFromKeys(keys, count, prev);
       if (out) cb(out); else statsFromAll(os, replacingId, s => { out = s; cb(s); });
     };
-    idx.getAllKeys().onsuccess = e => { keys = e.target.result || []; maybe(); };
+    idx.openKeyCursor().onsuccess = e => {
+      const c = e.target.result;
+      if (c) { keys.push(c.key); c.continue(); } else { keysDone = true; maybe(); }
+    };
     os.count().onsuccess = e => { count = e.target.result || 0; maybe(); };
     if (replacingId == null) prev = null;
     else os.get(replacingId).onsuccess = e => { prev = e.target.result == null ? null : e.target.result; maybe(); };

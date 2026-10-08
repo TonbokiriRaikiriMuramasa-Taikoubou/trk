@@ -84,7 +84,7 @@ npm run check
 git diff --check
 ```
 
-`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安はSecurity 55 checks、a11y 7 checks、vendor 8 checks、軽量化120 assertions。a11yでは既知の見出し順 `h1→h3` 1件だけWARNを許容し、未知の警告や同じ警告の増加はFAILする。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
+`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安はSecurity 55 checks、a11y 7 checks、vendor 8 checks、軽量化120 assertions。a11yでは既知の見出し順 `h1→h3` 1件だけWARNを許容し、未知の警告や同じ警告の増加はFAILする。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
 
 `check-repo.mjs` はJavaScript構文・ローカル参照・ID・設定文言に加え、Arknights公式リンク、Blue Archive 225曲、LoL Sessions 108曲／Phase 1の58件、Gakumas 50件・別名、公式リンクと権利注記、既存プレイリストの所有曲・カスタムフィールド保持を検査する。チェックは意図的な逆テストでもFAILすることを確認してから追加する。外部ツールの起動後DOM検査は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照し、リポジトリ外で行う。
 
@@ -126,7 +126,7 @@ git diff --check
 
 - **音楽カタログ**：LoLの未調査範囲（旧ログインテーマ・残りChampion Themes・Skin／イベント曲・ゲームOSTなど）を公式ソースと利用条件から段階調査。Blue Archiveについても権利者のガイドラインを軸に公式配信・購入先を案内し、購入だけで二次利用が許可されるという前提は置かない。
 - **譜面生成**：静かなイントロから始まり後半ほど音量が大きい曲では、旧方式の自動譜面が後半へ偏る（冒頭に0ノーツ・20秒から開始の実測あり）。新方式（`chartGen` "2"）で改善し、**2026-10-08に既定を新方式へ切り替えた**（旧方式は `"1"` で選べる）。実機での手触りは§7で確認する。上級以上は元の密度が高く、盛り上がりの区間は候補の100%で頭打ちになる（仕様上、候補にない位置へは置かない）。レビューの対応状況は `docs/REVIEW-2026-10-08.md`。
-- **IndexedDB回帰検査**：パック容量v2の移行・`size` index・複数タブ `onblocked` をNodeだけで実走する依存なしハーネス（候補 `tools/check-idb.mjs`）は未実装。現状は静的検査と§7の実機確認でカバーする。
+- **IndexedDB回帰検査（済・2026-10-08）**：`tests/idb.test.mjs`（13件）が、パック容量v2の移行・`size` index（主キーを size と取り違えない）・`putIf` の上限・`onblocked`・`onversionchange`、および解析キャッシュ（往復・壊れた記録・30件の上限・セーフモード・2回目は解析しない）を、`js/core.js` の `idbStore` と `js/media.js` の該当区間を vm で読んで検査する。実ブラウザの代わりに `tests/helpers/fake-idb.mjs`（in-memory の shim）を使うので、本物の挙動との差は shim の冒頭に書いてある。実 Chromium での確認は別途（`IDBIndex.getAllKeys` は主キーを返し、`openKeyCursor` の `key` が索引の値）。
 - **軽量化の追加候補**：起動時のサンプル映像 preload と、rAF外のA-B／逆再生setIntervalは未調整。初速・ループ精度とのトレードオフがあるため、実機検証なしに変更しない。
 - **実ブラウザ検収**：§7の端末確認が未完了。静的テストを根拠に実機検収済みとしない。
 - **支援案（構想のみ）**：機能の有料解放・月額支援はしない。GitHub Sponsors等の候補、匿名性・本人向け支援記録、使途説明は未決定。権利条件が確認できるまで寄付リンク／募集表示を追加しない。Ko-fiへの誘導はしない。

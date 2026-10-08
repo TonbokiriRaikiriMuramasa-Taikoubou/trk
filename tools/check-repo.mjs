@@ -31,6 +31,12 @@ function ok(message) {
 function read(rel) {
   return fs.readFileSync(path.join(root, rel), "utf8");
 }
+
+/* 曲名の照合（js/title-match.js の純関数）＋ plWishMatch（library.js）。
+   check-repo の文字列検査と、vm での入出力検査が同じ定義を見るための共通の断片。 */
+const titleMatchSrc = read("js/title-match.js");
+const plWishMatchSlice = (read("js/library.js").match(/function plWishMatch[\s\S]*?(?=\nfunction plSyncWishes)/) || [""])[0];
+const matchLogicSrc = titleMatchSrc + "\n" + plWishMatchSlice;
 function exists(rel) {
   return fs.existsSync(path.join(root, rel));
 }
@@ -466,9 +472,9 @@ if (!exists("js/fx-worklet.js") ||
     catalog.includes('PL("ak-solongadele", "アークナイツ — So Long, Adele"') &&
     soLongRefreshBlock.includes('if (JSON.stringify(existing.wish) !== JSON.stringify(wishes)) { existing.wish = wishes; changed = true; }');
   /* 📡 「集める棚」：未入手の曲を開いた瞬間から灰色で並べ、入手したら黒くなる */
-  const collectionOk = library.includes("function plTitleKeys(") &&
+  const collectionOk = titleMatchSrc.includes("function plTitleKeys(") &&
     /function plWishMatch\(w, byTitle\) \{\s*for \(const k of plWishTitleKeys\(w\)\)/.test(library) &&
-    library.includes("function plSongMatchKeys(title, matchHint)") &&
+    titleMatchSrc.includes("function plSongMatchKeys(title, matchHint)") &&
     library.includes("for (const k of plSongMatchKeys(m.title || it.title, m.matchHint)) byTitleAdd(k, it);") &&
     library.includes("function plCollectionEntries(") && library.includes("function plWishFolderIds(") &&
     library.includes("const entries = plCollectionEntries(tabId, byTitle);") &&
@@ -487,7 +493,7 @@ if (!exists("js/fx-worklet.js") ||
     .every(k => library.split(k + ':\"').length - 1 === 4);
   let matchHintBehaviorOk = false;
   try {
-    const logic = library.match(/const plNormTitle =[\s\S]*?(?=\nfunction plSyncWishes)/);
+    const logic = plWishMatchSlice ? [matchLogicSrc] : null;
     if (logic) {
       const ctx = { metaOf: () => null };
       vm.runInNewContext(`${logic[0]}\nglobalThis.__plSongMatchKeys = plSongMatchKeys; globalThis.__plWishMatch = plWishMatch;`, ctx);
@@ -522,7 +528,7 @@ if (!exists("js/fx-worklet.js") ||
   const fileExtensionOk = !/\.pgg\b/i.test(library + read("README.md") + read("docs/HANDOFF.md")) &&
     /BELIEVE\.ogg/i.test(read("README.md") + read("docs/HANDOFF.md"));
   const profileMatchOk = fileExtensionOk && library.includes('["matchHint", 80]') &&
-    library.includes('function plWishTitleKeys(wish)') &&
+    titleMatchSrc.includes('function plWishTitleKeys(wish)') &&
     library.includes('matchMemo.placeholder = tr("plMatchMemoPh")') &&
     library.includes('f.matchHint = matchMemo') &&
     library.includes('m.matchHint ? `${tr("plMatchMemo")}: ${m.matchHint}` : ""') &&
@@ -612,7 +618,7 @@ if (!exists("js/fx-worklet.js") ||
     const wishHelperEnd = library.indexOf("\nfunction trkWishesFromCatalog", wishHelperStart);
     const sanitizeStart = library.indexOf("function plSanitize(raw) {");
     const sanitizeEnd = library.indexOf("\nconst TRK_PLAYLIST_ID", sanitizeStart);
-    const matchLogic = library.match(/const plNormTitle =[\s\S]*?(?=\nfunction plSyncWishes)/);
+    const matchLogic = plWishMatchSlice ? [matchLogicSrc] : null;
     if (gakumasDataOk && wishHelperStart >= 0 && wishHelperEnd > wishHelperStart &&
         sanitizeStart >= 0 && sanitizeEnd > sanitizeStart && matchLogic) {
       const aliasContext = vm.createContext({ PL_COLORS:{}, metaOf:() => null });

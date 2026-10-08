@@ -406,9 +406,10 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   rule(swSafe, "the service worker never serves cached copies to a ?safe=1 client (no cache poisoning bypass)");
 
   const media = js["js/media.js"], library = js["js/library.js"];
-  rule(media.includes("const ANALYZE_MAX = 96 * 1024 * 1024") && media.includes('tooBig ? "analysisSkipped"') &&
+  rule(media.includes("const ANALYZE_MAX = 96 * 1024 * 1024") && media.includes("const ANALYZE_MAX_SEC = 20 * 60") &&
+    media.includes("video.duration > ANALYZE_MAX_SEC") && media.includes('tooLong ? "analysisSkippedLong"') && media.includes('tooBig ? "analysisSkipped"') &&
     !/file\.arrayBuffer\(\)[^\n]*\n[^\n]*ANALYZE/ .test(media),
-    "huge media is never read into memory: audio analysis is skipped above ANALYZE_MAX (a 2GB file used to be loaded whole)");
+    "huge media is never read into memory: audio analysis is skipped above ANALYZE_MAX (96MB file) or ANALYZE_MAX_SEC (20 min, decoded PCM size)");
   const chartCap = media.includes("const CHART_FILE_MAX = 2 * 1024 * 1024") &&
     media.includes("file.size > CHART_FILE_MAX") && media.indexOf("file.size > CHART_FILE_MAX") < media.indexOf("file.text()") &&
     media.includes("!Number.isFinite(file.size)") && media.includes('typeof time === "number"') && media.includes('typeof lane === "number"') &&

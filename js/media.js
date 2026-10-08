@@ -30,6 +30,11 @@ async function setBackground(blob) {
 /* 🎬 これより大きいファイルは音声解析（file.arrayBuffer で丸ごとメモリに載せる）をしません。
    解析が無くても譜面はBPMから作れます（analysis を使う所は全部 if (analysis) で守ってあります）。 */
 const ANALYZE_MAX = 96 * 1024 * 1024;
+/* 🎬 ファイルサイズ（圧縮後）だけでは判断できない：デコード後のPCMは長さに比例して膨らむ
+   （48kHz・ステレオ・float32 で 1分 ≒ 23MB、20分 ≒ 460MB）。長さでも区切る。
+   decodeAudioData は元のサンプリングレートのまま返すので、OfflineAudioContext で
+   ダウンサンプルしても瞬間の最大メモリは減らない（デコード自体で同じ量を使う）。 */
+const ANALYZE_MAX_SEC = 20 * 60;
 
 /* ---------- 曲の読み込み ----------
    opts.title   : 表示名
@@ -57,14 +62,15 @@ async function loadMedia(file, opts = {}) {
   setStatus("loadStatus", "analyzing"); updateChartButtons();
   await new Promise(r => { setTimeout(r, 30); });
   const tooBig = (Number(file.size) || 0) > ANALYZE_MAX;
+  const tooLong = video.duration > ANALYZE_MAX_SEC;
   /* 🪶 軽量化：解析をしない設定では、ファイル全体をデコードして走り直すところごと飛ばします
      （長い曲ほど効きます。譜面はBPMグリッド中心の自動生成になり、自作・取り込み譜面はそのまま） */
-  const liteSkip = !tooBig && typeof TrkLite === "object" && typeof TrkLite.noAnalyze === "function" && TrkLite.noAnalyze();
-  const skipAnalyze = tooBig || liteSkip;
+  const liteSkip = !tooBig && !tooLong && typeof TrkLite === "object" && typeof TrkLite.noAnalyze === "function" && TrkLite.noAnalyze();
+  const skipAnalyze = tooBig || tooLong || liteSkip;
   if (skipAnalyze) analysis = null;
   else { try { analysis = await analyzeAudio(file); } catch (_) { analysis = null; } }
   if (token !== loadToken) return false;
-  setStatus("loadStatus", tooBig ? "analysisSkipped" : liteSkip ? "analysisSkippedLite" : analysis ? "loaded" : "decodeFallback");
+  setStatus("loadStatus", tooBig ? "analysisSkipped" : tooLong ? "analysisSkippedLong" : liteSkip ? "analysisSkippedLite" : analysis ? "loaded" : "decodeFallback");
   let supplied = false;
   if (opts.onReady) { try { supplied = !!(await opts.onReady()); } catch (e) { console.error(e); } }
   if (token !== loadToken) return false;

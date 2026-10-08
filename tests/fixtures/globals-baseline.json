@@ -1,0 +1,992 @@
+{
+ "totals": {
+  "scripts": 45,
+  "windowProps": 38,
+  "duplicates": 0,
+  "declarations": 1169,
+  "private": 853,
+  "public": 316
+ },
+ "files": [
+  {
+   "file": "index.html(inline)",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/i18n.js",
+   "decls": 3,
+   "private": 0,
+   "public": [
+    "TEXT",
+    "lang",
+    "tr"
+   ]
+  },
+  {
+   "file": "js/i18n-options.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/data.js",
+   "decls": 33,
+   "private": 4,
+   "public": [
+    "DIFFS",
+    "DIFF_IDS",
+    "EGG_KEYS",
+    "EGG_WORDS",
+    "FONT_DEFAULT",
+    "H",
+    "HEX",
+    "LAYOUTS",
+    "MASCOT_CAPTIONS",
+    "MASCOT_DEFS",
+    "MASCOT_FAMILY",
+    "MASCOT_IDS",
+    "MASCOT_POS",
+    "NOTE_PRESETS",
+    "NOTE_SHAPES",
+    "SKINS",
+    "TAU",
+    "VRM_RECT",
+    "W",
+    "buildCustomSkin",
+    "has",
+    "hexToRgba",
+    "luminance",
+    "mixHex",
+    "parseGrad",
+    "registerMascot",
+    "sanitizeNotes",
+    "sanitizeSkinDef",
+    "toHex"
+   ]
+  },
+  {
+   "file": "js/characters/miku.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/tv-presets.js",
+   "decls": 1,
+   "private": 0,
+   "public": [
+    "TRK_TV_PRESETS"
+   ]
+  },
+  {
+   "file": "js/core.js",
+   "decls": 160,
+   "private": 44,
+   "public": [
+    "$",
+    "BEST_KEY",
+    "CAPTION_MS",
+    "CUSTOM_SKIN_MAX",
+    "KEY_PRESETS",
+    "PAD_DEFAULTS",
+    "SKIN_FORMAT",
+    "TRK_ENUM_VALUES",
+    "TV_PARAM_FAV_MAX",
+    "VIDEO_KEY_DEFAULTS",
+    "activeMascot",
+    "activeMods",
+    "analysis",
+    "applyLanguage",
+    "applyNoteVars",
+    "applySkin",
+    "avatarHit",
+    "baseName",
+    "bgImage",
+    "bindingSlot",
+    "buildSkinGrid",
+    "buildSkinNow",
+    "caption",
+    "chart",
+    "chartDiff",
+    "chartMeta",
+    "chartMode",
+    "chartSummary",
+    "clampTvBlur",
+    "clampTvDim",
+    "cleanTvParamFavorites",
+    "clock",
+    "closeSettings",
+    "ctx",
+    "currentLevel",
+    "currentSong",
+    "customSkinDefs",
+    "downloadBlob",
+    "downloadJSON",
+    "effects",
+    "el",
+    "emit",
+    "errors",
+    "esc",
+    "extOf",
+    "fingerprint",
+    "fmtDate",
+    "fmtTime",
+    "fontFamily",
+    "formatKey",
+    "formatPadBind",
+    "fx",
+    "gameplayFxMultiplier",
+    "gameplayFxPower",
+    "hashString",
+    "idbStore",
+    "isPclMascot",
+    "keyCodeOf",
+    "keysLabel",
+    "laneCol",
+    "laneColor",
+    "laneName",
+    "lastMissT",
+    "levelOverride",
+    "loadToken",
+    "mediaName",
+    "mediaURL",
+    "modsUnranked",
+    "mulberry32",
+    "nextIdx",
+    "noteShape",
+    "num",
+    "on",
+    "openSettings",
+    "phase",
+    "pick",
+    "practice",
+    "prefs",
+    "pressFlash",
+    "pressH",
+    "refreshSeedSecrets",
+    "rememberMusicVolume",
+    "renderAllStatuses",
+    "renderStatus",
+    "safeHttpUrl",
+    "safeLink",
+    "safeModeOn",
+    "safeName",
+    "saveCustomSkins",
+    "saveUserPrefs",
+    "savedSkinAtBoot",
+    "screen",
+    "seekDragging",
+    "setPhase",
+    "setStatus",
+    "settings",
+    "showScreen",
+    "skin",
+    "slotLane",
+    "slotOfKey",
+    "stage",
+    "stats",
+    "syncPickers",
+    "takeAmpReset",
+    "travelMs",
+    "updateChartButtons",
+    "updateKeyUI",
+    "updateTouchKeys",
+    "validCode",
+    "validPadBind",
+    "vctx",
+    "video",
+    "videoFilter",
+    "videoReady",
+    "view",
+    "windows"
+   ]
+  },
+  {
+   "file": "js/lite.js",
+   "decls": 42,
+   "private": 38,
+   "public": [
+    "liteLibRows",
+    "liteMascotNoLoad",
+    "liteNoAnalyze",
+    "liteSyncUI"
+   ]
+  },
+  {
+   "file": "js/player.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/chart-gen.js",
+   "decls": 18,
+   "private": 16,
+   "public": [
+    "buildChartNotes",
+    "cgEstimateLevel"
+   ]
+  },
+  {
+   "file": "js/media.js",
+   "decls": 25,
+   "private": 7,
+   "public": [
+    "CHART_FILE_MAX",
+    "applyChartData",
+    "audioCtx",
+    "buildChart",
+    "chartToData",
+    "decodeAudio",
+    "estimateLevel",
+    "exportChart",
+    "generateNotes",
+    "getAC",
+    "importChartFile",
+    "loadMedia",
+    "loadSE",
+    "playSE",
+    "rmsAt",
+    "seBuffers",
+    "seFiles",
+    "setBackground"
+   ]
+  },
+  {
+   "file": "js/game.js",
+   "decls": 62,
+   "private": 35,
+   "public": [
+    "PLAY_KEYS",
+    "autoPlay",
+    "chartKeyOf",
+    "currentAcc",
+    "currentScore",
+    "endGame",
+    "gameTime",
+    "goAt",
+    "handleInput",
+    "judgeNote",
+    "leadIn",
+    "pauseGame",
+    "pausedInLeadIn",
+    "rateKey",
+    "records",
+    "renderRecords",
+    "resumeGame",
+    "runShort",
+    "runUnranked",
+    "saveRecords",
+    "seekTo",
+    "showJudge",
+    "songRec",
+    "startGame",
+    "sweepMisses",
+    "tickClock",
+    "toTitle"
+   ]
+  },
+  {
+   "file": "js/render.js",
+   "decls": 39,
+   "private": 27,
+   "public": [
+    "beatPulse",
+    "drawVideo",
+    "hitPos",
+    "layout",
+    "loop",
+    "noteAlpha",
+    "ownField",
+    "retryHoldAt",
+    "rr",
+    "showToast",
+    "toast",
+    "vrmState"
+   ]
+  },
+  {
+   "file": "js/custom.js",
+   "decls": 65,
+   "private": 54,
+   "public": [
+    "getPackSongs",
+    "initPacks",
+    "installPackFile",
+    "noteImage",
+    "packDB",
+    "packRuntime",
+    "renderPackList",
+    "sanitizeSong",
+    "skinShelf",
+    "syncNoteUI",
+    "updateMascotUI"
+   ]
+  },
+  {
+   "file": "js/truck.js",
+   "decls": 24,
+   "private": 9,
+   "public": [
+    "drawLaneTint",
+    "drawTruck",
+    "isTruck",
+    "lanePivot",
+    "laneTilt",
+    "reduceMotion",
+    "resetTruck",
+    "steerTruck",
+    "syncTruckKeyUI",
+    "truckBinding",
+    "truckJudge",
+    "truckKeysLabel",
+    "truckPosKeys",
+    "truckRowY",
+    "truckState"
+   ]
+  },
+  {
+   "file": "js/modes.js",
+   "decls": 57,
+   "private": 38,
+   "public": [
+    "ORBIT_CX",
+    "ORBIT_CY",
+    "ORBIT_IGNORE",
+    "drawLives",
+    "drawOrbitField",
+    "failSound",
+    "hintEl",
+    "isOrbit",
+    "lifeAfterJudge",
+    "lifeState",
+    "makeCheck",
+    "makeColorRow",
+    "makeSeg",
+    "orbit",
+    "orbitHitPos",
+    "resetLives",
+    "resetOrbit",
+    "starPath",
+    "titleString"
+   ]
+  },
+  {
+   "file": "js/stage.js",
+   "decls": 24,
+   "private": 13,
+   "public": [
+    "STAGE",
+    "drawStageField",
+    "ensureStageMap",
+    "isStage",
+    "resetStage",
+    "stageBinding",
+    "stageHitPos",
+    "stageInput",
+    "stageKeys",
+    "stageMap",
+    "stagePress"
+   ]
+  },
+  {
+   "file": "js/stagefx.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/catch.js",
+   "decls": 30,
+   "private": 21,
+   "public": [
+    "CATCH",
+    "catchAllKeys",
+    "catchHitPos",
+    "catchJudge",
+    "catchState",
+    "drawCatchField",
+    "isBlast",
+    "isCatch",
+    "resetCatch"
+   ]
+  },
+  {
+   "file": "js/extras.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/fx-presets.js",
+   "decls": 1,
+   "private": 0,
+   "public": [
+    "TRK_FX_PRESETS"
+   ]
+  },
+  {
+   "file": "js/fx-dock.js",
+   "decls": 1,
+   "private": 1,
+   "public": []
+  },
+  {
+   "file": "js/tv-dock.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/tv-rich.js",
+   "decls": 10,
+   "private": 10,
+   "public": []
+  },
+  {
+   "file": "js/video-max.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/fx.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/fx-synth.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/favs.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/catalog.js",
+   "decls": 1,
+   "private": 0,
+   "public": [
+    "TRK_CATALOG"
+   ]
+  },
+  {
+   "file": "js/title-match.js",
+   "decls": 4,
+   "private": 0,
+   "public": [
+    "plNormTitle",
+    "plSongMatchKeys",
+    "plTitleKeys",
+    "plWishTitleKeys"
+   ]
+  },
+  {
+   "file": "js/library.js",
+   "decls": 250,
+   "private": 225,
+   "public": [
+    "LIB_SHOW",
+    "addSongFiles",
+    "addVideoFiles",
+    "addonSongs",
+    "allSongs",
+    "bannerRandomBtn",
+    "bannerVolTip",
+    "ensureTrkDistributionPlaylists",
+    "initLibrary",
+    "libView",
+    "nextSong",
+    "onLongPress",
+    "plToast",
+    "prevSong",
+    "previewStartFor",
+    "refreshPackSongs",
+    "renderBanner",
+    "renderLib",
+    "saveSongPrefs",
+    "selectSong",
+    "setAddonSongs",
+    "songInfo",
+    "srcLabel",
+    "startPreview",
+    "trySongChart"
+   ]
+  },
+  {
+   "file": "js/verified.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/lib-skins.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/addons.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/main.js",
+   "decls": 41,
+   "private": 35,
+   "public": [
+    "RESERVED",
+    "idleTimer",
+    "packsReady",
+    "poke",
+    "showFxPower",
+    "syncOptionsUI"
+   ]
+  },
+  {
+   "file": "js/pad.js",
+   "decls": 36,
+   "private": 34,
+   "public": [
+    "padBack",
+    "updatePadUI"
+   ]
+  },
+  {
+   "file": "js/speed.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/vrm.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/mmd.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/spectrum.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/synth-mode.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/frame-interp.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/media-player-mode.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/study-room-utils.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/study-room.js",
+   "decls": 242,
+   "private": 242,
+   "public": []
+  }
+ ],
+ "windowCoupling": [
+  {
+   "name": "ShadowTaikoVRM",
+   "writers": [
+    "js/vrm.js"
+   ],
+   "readers": [
+    "js/custom.js"
+   ]
+  },
+  {
+   "name": "TrkAddons",
+   "writers": [
+    "js/addons.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "TrkClassicId",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": [
+    "js/main.js"
+   ]
+  },
+  {
+   "name": "TrkEnsureTrkClassicPlaylist",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": [
+    "js/main.js"
+   ]
+  },
+  {
+   "name": "TrkEnsureTrkPlaylist",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": [
+    "js/main.js"
+   ]
+  },
+  {
+   "name": "TrkFX",
+   "writers": [
+    "js/fx.js"
+   ],
+   "readers": [
+    "js/core.js",
+    "js/game.js",
+    "js/fx-dock.js",
+    "js/fx-synth.js",
+    "js/favs.js",
+    "js/addons.js",
+    "js/spectrum.js",
+    "js/synth-mode.js"
+   ]
+  },
+  {
+   "name": "TrkFavs",
+   "writers": [
+    "js/favs.js"
+   ],
+   "readers": [
+    "js/fx-dock.js",
+    "js/tv-dock.js",
+    "js/library.js"
+   ]
+  },
+  {
+   "name": "TrkFrameInterp",
+   "writers": [
+    "js/frame-interp.js"
+   ],
+   "readers": [
+    "js/video-max.js",
+    "js/media-player-mode.js"
+   ]
+  },
+  {
+   "name": "TrkLibSkins",
+   "writers": [
+    "js/lib-skins.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "TrkLite",
+   "writers": [
+    "js/lite.js"
+   ],
+   "readers": [
+    "js/core.js"
+   ]
+  },
+  {
+   "name": "TrkMMD",
+   "writers": [
+    "js/mmd.js"
+   ],
+   "readers": [
+    "js/core.js",
+    "js/render.js"
+   ]
+  },
+  {
+   "name": "TrkMediaPlayer",
+   "writers": [
+    "js/media-player-mode.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "TrkPad",
+   "writers": [
+    "js/pad.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "TrkSafeMode",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": [
+    "js/lite.js",
+    "js/tv-rich.js",
+    "js/video-max.js",
+    "js/library.js",
+    "js/addons.js",
+    "js/mmd.js",
+    "js/spectrum.js",
+    "js/synth-mode.js",
+    "js/media-player-mode.js",
+    "js/study-room.js"
+   ]
+  },
+  {
+   "name": "TrkSelectTutorialSong",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": [
+    "js/main.js"
+   ]
+  },
+  {
+   "name": "TrkSpec",
+   "writers": [
+    "js/spectrum.js"
+   ],
+   "readers": [
+    "js/core.js"
+   ]
+  },
+  {
+   "name": "TrkStudyRoom",
+   "writers": [
+    "js/study-room.js"
+   ],
+   "readers": [
+    "js/tv-dock.js",
+    "js/library.js"
+   ]
+  },
+  {
+   "name": "TrkStudyUtils",
+   "writers": [
+    "js/study-room-utils.js"
+   ],
+   "readers": [
+    "js/study-room.js"
+   ]
+  },
+  {
+   "name": "TrkTV",
+   "writers": [
+    "js/tv-dock.js"
+   ],
+   "readers": [
+    "js/core.js",
+    "js/tv-rich.js",
+    "js/favs.js"
+   ]
+  },
+  {
+   "name": "TrkTrkPlaylistId",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": [
+    "js/main.js"
+   ]
+  },
+  {
+   "name": "TrkVerified",
+   "writers": [
+    "js/verified.js"
+   ],
+   "readers": [
+    "js/library.js"
+   ]
+  },
+  {
+   "name": "TrkVideoMax",
+   "writers": [
+    "js/video-max.js"
+   ],
+   "readers": [
+    "js/tv-dock.js",
+    "js/library.js",
+    "js/media-player-mode.js"
+   ]
+  },
+  {
+   "name": "__trkPendingTvDockSkin",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": [
+    "js/tv-dock.js"
+   ]
+  },
+  {
+   "name": "_escHold",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "_trkCloseSynth",
+   "writers": [
+    "js/synth-mode.js"
+   ],
+   "readers": [
+    "js/media-player-mode.js"
+   ]
+  },
+  {
+   "name": "_trkMediaPlayerMode",
+   "writers": [
+    "js/media-player-mode.js"
+   ],
+   "readers": [
+    "js/library.js"
+   ]
+  },
+  {
+   "name": "_trkMediaPlayerOpen",
+   "writers": [
+    "js/media-player-mode.js"
+   ],
+   "readers": [
+    "js/player.js",
+    "js/truck.js",
+    "js/modes.js",
+    "js/stage.js",
+    "js/catch.js",
+    "js/extras.js",
+    "js/main.js",
+    "js/pad.js",
+    "js/speed.js"
+   ]
+  },
+  {
+   "name": "_trkStudyRoomOpen",
+   "writers": [
+    "js/study-room.js"
+   ],
+   "readers": [
+    "js/player.js",
+    "js/truck.js",
+    "js/modes.js",
+    "js/stage.js",
+    "js/catch.js",
+    "js/extras.js",
+    "js/video-max.js",
+    "js/fx.js",
+    "js/main.js",
+    "js/pad.js",
+    "js/speed.js",
+    "js/synth-mode.js",
+    "js/media-player-mode.js"
+   ]
+  },
+  {
+   "name": "_trkSyncSynthModeSettings",
+   "writers": [
+    "js/synth-mode.js"
+   ],
+   "readers": [
+    "js/core.js"
+   ]
+  },
+  {
+   "name": "_trkSynthModeOpen",
+   "writers": [
+    "js/synth-mode.js"
+   ],
+   "readers": [
+    "js/player.js",
+    "js/truck.js",
+    "js/modes.js",
+    "js/stage.js",
+    "js/catch.js",
+    "js/extras.js",
+    "js/main.js",
+    "js/pad.js",
+    "js/speed.js",
+    "js/media-player-mode.js"
+   ]
+  },
+  {
+   "name": "drawExtrasOverlay",
+   "writers": [
+    "js/extras.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "drawFxOverlay",
+   "writers": [
+    "js/stagefx.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "drawStageBackdrop",
+   "writers": [
+    "js/stagefx.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "drawVideo",
+   "writers": [
+    "js/tv-dock.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "ensureTrkDistributionPlaylists",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": [
+    "js/main.js"
+   ]
+  },
+  {
+   "name": "trkExport",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "trkReset",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "videoFilter",
+   "writers": [
+    "js/tv-dock.js"
+   ],
+   "readers": []
+  }
+ ]
+}

@@ -443,7 +443,7 @@ function recordPlay(r) {
   const mode = settings.playMode, auto = !!settings.autoPlay;
   const unranked = runUnranked() || !!r.failed;
   const ck = chartKeyOf(), rk = rateKey();
-  const c = s.charts[ck] || (s.charts[ck] = { diff:chartDiff, level:currentLevel, ...newSlot() });
+  const c = s.charts[ck] || (s.charts[ck] = { diff:chartDiff, level:currentLevel, ...(chartMode === "generated" ? { gen:String(settings.chartGen) } : {}), ...newSlot() });
   c.diff = chartDiff; c.level = currentLevel;
   const base = MODE_PLAYS[mode] ? (c[mode] ||= newSlot()) : c;
   let slot = rk && settings.rate > 1 ? ((base.rates ||= {})[rk] ||= newSlot()) : base;
@@ -509,7 +509,7 @@ function renderRecords() {
     const row = el("tr", key === ck ? "cur" : ""), badge = c.ap ? " ⭐" : c.fc ? " FC" : "";
     const bestMods = c.best && Array.isArray(c.best.mods) && c.best.mods.length ? ` [${c.best.mods.join(" ")}]` : "";
     row.append(
-      el("td", "", `${tr(c.diff)} Lv.${c.level}${badge}`),
+      el("td", "", `${tr(c.diff)} Lv.${c.level}${badge}${c.gen === "1" ? " · " + tr("recOldGen") : ""}`),
       el("td", "", c.best ? Number(c.best.score).toLocaleString() + bestMods : "—"),
       el("td", "", c.best ? Number(c.best.acc).toFixed(2) + "%" : "—"),
       el("td", "", String(c.bestPerfect || 0)),

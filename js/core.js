@@ -125,7 +125,7 @@ const LITE_ENUM_VALUES = {
    "icon" は文字を出さない（🐔 のアイコンだけ）。名前と色は固定なので、ここで選べるのは表示名だけ。 */
 const TRK_ENUM_VALUES = {
   trkTabName: ["full", "short", "icon"],
-  chartGen: ["1", "2"]          // 🎼 自動譜面の作り方（1＝旧方式・既定、2＝新方式。js/chart-gen.js）
+  chartGen: ["1", "2"]          // 🎼 自動譜面の作り方（1＝旧方式、2＝新方式・既定。js/chart-gen.js）
 };
 
 const settings = {
@@ -149,7 +149,7 @@ const settings = {
   autoPlay: prefs.autoPlay === true || prefs.playMode === "auto",
   difficulty: pick(prefs.difficulty, DIFF_IDS, "normal"),
   showMasterDiff: !!prefs.showMasterDiff,
-  chartGen: pick(prefs.chartGen, ["1", "2"], "1"),                        // 🎼 自動譜面の作り方（既定は旧方式＝記録の譜面と一致）
+  chartGen: pick(prefs.chartGen, ["1", "2"], "2"),                        // 🎼 自動譜面の作り方（既定は新方式。旧方式「1」へ戻せば、旧譜面の記録もそのまま開ける）
   seed: typeof prefs.seed === "string" ? prefs.seed.slice(0, 32) : "834271",   // 曲ごとの設定がない曲の初期値
   bpm: num(prefs.bpm, 60, 300, 138),
   offset: num(prefs.offset, -5000, 5000, 0),
@@ -459,7 +459,7 @@ function resetAllPrefs() {
   settings.tvParamFavs = []; // a factory reset clears the separately preserved TV bookmarks too
   settings.trkPlaylist = true; // 🐔 trk's playlistも初期状態に戻す（再表示）
   settings.trkClassic = true;  // 🎻 trk classic も初期状態に戻す
-  settings.trkSortABC = false; settings.playlistOrder = []; settings.trkTabName = "full"; settings.chartGen = "1";
+  settings.trkSortABC = false; settings.playlistOrder = []; settings.trkTabName = "full"; settings.chartGen = "2";
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
   settings.catchNitroBonus = true; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();

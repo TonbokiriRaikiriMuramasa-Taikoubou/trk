@@ -262,14 +262,16 @@ for (const lang of ["en", "zh", "ko"]) {
   assert.deepEqual(extra, [], `${lang} has no Study string missing from Japanese`);
 }
 
-/* 24種類の文字スキン（既存5種を含む）と4分類 */
+/* 30種類の文字スキン（既存24種＋trk86の6種）と4分類 */
 const themeDeclaration = reader.match(/const STUDY_THEMES = \[([\s\S]*?)\];/);
 assert.ok(themeDeclaration, "the supported Study theme IDs are declared");
 const studyThemes = [...themeDeclaration[1].matchAll(/"([a-z]+)"/g)].map(match => match[1]);
-assert.equal(studyThemes.length, 24, "Study keeps exactly 24 text themes");
-assert.equal(new Set(studyThemes).size, 24, "Study theme IDs are unique");
+assert.equal(studyThemes.length, 30, "Study keeps exactly 30 text themes");
+assert.equal(new Set(studyThemes).size, 30, "Study theme IDs are unique");
 const expectedThemes = ["plain", "paper", "warm", "lined", "genko", "sepia", "dark", "midnight", "terminal", "graphite", "blueprint", "contrast",
   "prompt", "neural", "latent", "matrix", "synth", "neon", "aurora", "sunset", "ocean", "mint", "dream", "prism"];
+expectedThemes.splice(6, 0, "sticky", "letter", "diary", "haiku", "newspaper");
+expectedThemes.push("staff");
 assert.deepEqual(studyThemes, expectedThemes, "the stable theme IDs and category order stay intentional");
 assert.ok(reader.includes('if (node.tagName === "OPTGROUP") node.label = translated;'), "language changes update optgroup labels without replacing their options");
 for (const key of ["studyThemeGroupWriter", "studyThemeGroupCode", "studyThemeGroupAi", "studyThemeGroupFree"])
@@ -286,7 +288,7 @@ const themeGroups = [...themeSelectMarkup.matchAll(/<optgroup\b[^>]*data-i18n="(
 assert.equal(themeGroups.length, 4, "text themes have four localized optgroups");
 assert.deepEqual(themeGroups.map(group => group[1]), ["studyThemeGroupWriter", "studyThemeGroupCode", "studyThemeGroupAi", "studyThemeGroupFree"]);
 const groupedThemes = themeGroups.map(group => [...group[2].matchAll(/<option\b[^>]*value="([^"]+)"/g)].map(match => match[1]));
-assert.deepEqual(groupedThemes.map(group => group.length), [6, 6, 5, 7], "writer/code/AI/freeform groups have the planned counts");
+assert.deepEqual(groupedThemes.map(group => group.length), [11, 6, 5, 8], "writer/code/AI/freeform groups have the planned counts");
 assert.deepEqual(groupedThemes.flat(), studyThemes, "HTML options match the supported theme list and order");
 assert.ok(section.includes('id="studyRoom"') && section.includes('id="studyBookmarkPanel"') && section.includes('id="studyImportWrap"'));
 assert.ok(section.includes('id="studyShelfSort"') && section.includes('id="studyFindRow"') && section.includes('id="studyHelp"') && section.includes('id="studyZoomIn"'));
@@ -370,4 +372,4 @@ for (const file of ["player.js", "main.js", "media-player-mode.js", "catch.js", 
   assert.ok(!/_trk(MediaPlayer|SynthMode)Open/.test(core), "core.js has no old media／synth flag left");
 }
 
-console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 24 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring`);
+console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring`);

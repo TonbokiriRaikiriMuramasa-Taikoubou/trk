@@ -22,7 +22,7 @@ Object.assign(TEXT.ja, {
   studyModeSingle:"一枚ずつ（中央）", studyModeSpread:"見開き（右が1ページ目）", studyModeVertical:"縦読み漫画",
   studyAmerican:"🇺🇸 アメリカン（左右・順序反転）", studyThemeLabel:"文字のスキン",
   studyThemePlain:"普通のテキスト", studyThemeDark:"ダークモード", studyThemeNeon:"ネオン",
-  studyThemeLined:"ルーズリーフ", studyThemeGenko:"作文用紙（縦書き・右から）",
+  studyThemeLined:"ルーズリーフ", studyThemeGenko:"作文用紙（縦書き・右から）", studyThemeSticky:"付箋（黄色い紙）", studyThemeLetter:"便箋", studyThemeDiary:"日記帳", studyThemeHaiku:"俳句の短冊", studyThemeNewspaper:"新聞の紙面（段の罫線）", studyThemeStaff:"楽譜の余白（五線）",
   studyThemeGroupWriter:"✍ 文筆・読書", studyThemeGroupCode:"⌨ コーディング",
   studyThemeGroupAi:"◈ AI・プロンプト風（見た目のみ）", studyThemeGroupFree:"✦ 自由な発想",
   studyThemePaper:"和紙", studyThemeWarm:"クリーム", studyThemeSepia:"古書",
@@ -138,7 +138,7 @@ Object.assign(TEXT.en, {
   studyModeSingle:"Single page (centered)", studyModeSpread:"Two-page spread (page 1 on right)", studyModeVertical:"Vertical comic",
   studyAmerican:"🇺🇸 American mode (reverse sides and order)", studyThemeLabel:"Text skin",
   studyThemePlain:"Plain text", studyThemeDark:"Dark mode", studyThemeNeon:"Neon", studyThemeLined:"Loose-leaf paper",
-  studyThemeGenko:"Manuscript paper (vertical, right to left)",
+  studyThemeGenko:"Manuscript paper (vertical, right to left)", studyThemeSticky:"Sticky note", studyThemeLetter:"Letter paper", studyThemeDiary:"Diary", studyThemeHaiku:"Haiku strip (tanzaku)", studyThemeNewspaper:"Newspaper (column rules)", studyThemeStaff:"Sheet music margin (staff)",
   studyThemeGroupWriter:"✍ Writing & reading", studyThemeGroupCode:"⌨ Coding",
   studyThemeGroupAi:"◈ AI / prompt aesthetics (visual only)", studyThemeGroupFree:"✦ Freeform",
   studyThemePaper:"Washi paper", studyThemeWarm:"Warm cream", studyThemeSepia:"Antique book",
@@ -250,7 +250,7 @@ Object.assign(TEXT.zh, {
   studyBack:"← 书架", studyFullscreen:"⛶ 图片全屏", studyModeLabel:"图片排列方式", studyModeSingle:"单页（居中）",
   studyModeSpread:"双页（第一页在右）", studyModeVertical:"纵向漫画", studyAmerican:"🇺🇸 美式模式（左右与顺序反转）",
   studyThemeLabel:"文字主题", studyThemePlain:"普通文本", studyThemeDark:"深色模式", studyThemeNeon:"霓虹",
-  studyThemeLined:"活页纸", studyThemeGenko:"作文纸（竖排，从右向左）",
+  studyThemeLined:"活页纸", studyThemeGenko:"作文纸（竖排，从右向左）", studyThemeSticky:"便利贴", studyThemeLetter:"信纸", studyThemeDiary:"日记本", studyThemeHaiku:"俳句短笺", studyThemeNewspaper:"报纸版面（分栏线）", studyThemeStaff:"乐谱空白（五线）",
   studyThemeGroupWriter:"✍ 写作与阅读", studyThemeGroupCode:"⌨ 编程",
   studyThemeGroupAi:"◈ AI／提示词风格（仅外观）", studyThemeGroupFree:"✦ 自由创作",
   studyThemePaper:"和纸", studyThemeWarm:"暖奶油纸", studyThemeSepia:"古籍", studyThemeMidnight:"午夜",
@@ -353,7 +353,7 @@ Object.assign(TEXT.ko, {
   studyBack:"← 책장", studyFullscreen:"⛶ 이미지 전체 화면", studyModeLabel:"이미지 배열", studyModeSingle:"한 페이지 (중앙)",
   studyModeSpread:"두 페이지 (첫 페이지 오른쪽)", studyModeVertical:"세로형 만화", studyAmerican:"🇺🇸 미국식 (좌우와 순서 반전)",
   studyThemeLabel:"텍스트 스킨", studyThemePlain:"일반 텍스트", studyThemeDark:"다크 모드", studyThemeNeon:"네온",
-  studyThemeLined:"루즈리프", studyThemeGenko:"원고지 (세로쓰기·오른쪽부터)",
+  studyThemeLined:"루즈리프", studyThemeGenko:"원고지 (세로쓰기·오른쪽부터)", studyThemeSticky:"포스트잇", studyThemeLetter:"편지지", studyThemeDiary:"일기장", studyThemeHaiku:"하이쿠 단자쿠", studyThemeNewspaper:"신문 지면 (단 구분선)", studyThemeStaff:"악보 여백 (오선)",
   studyThemeGroupWriter:"✍ 글쓰기와 독서", studyThemeGroupCode:"⌨ 코딩",
   studyThemeGroupAi:"◈ AI·프롬프트 분위기 (외관만)", studyThemeGroupFree:"✦ 자유로운 발상",
   studyThemePaper:"화지", studyThemeWarm:"웜 크림", studyThemeSepia:"앤티크 북", studyThemeMidnight:"미드나이트",
@@ -468,10 +468,10 @@ const STUDY_TV_WIDTH = { small:"min(100%,560px)", medium:"100%", large:"100%" };
 const STUDY_TV_RATIO = { "16:9":"16 / 9", "4:3":"4 / 3", "21:9":"21 / 9" };
 const STUDY_IMAGE_MODES = ["single", "spread", "vertical"];
 const STUDY_THEMES = [
-  "plain", "paper", "warm", "lined", "genko", "sepia",
+  "plain", "paper", "warm", "lined", "genko", "sepia", "sticky", "letter", "diary", "haiku", "newspaper",
   "dark", "midnight", "terminal", "graphite", "blueprint", "contrast",
   "prompt", "neural", "latent", "matrix", "synth",
-  "neon", "aurora", "sunset", "ocean", "mint", "dream", "prism"
+  "neon", "aurora", "sunset", "ocean", "mint", "dream", "prism", "staff"
 ];
 const STUDY_SORTS = ["updated", "added", "title", "type", "size"];
 const STUDY_FOLDER_MAX = 200;

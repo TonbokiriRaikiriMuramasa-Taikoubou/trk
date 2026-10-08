@@ -1,11 +1,11 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 132,
+  "windowProps": 141,
   "duplicates": 0,
-  "declarations": 325,
-  "private": 115,
-  "public": 210
+  "declarations": 295,
+  "private": 94,
+  "public": 201
  },
  "files": [
   {
@@ -321,19 +321,9 @@
   },
   {
    "file": "js/catch.js",
-   "decls": 30,
-   "private": 21,
-   "public": [
-    "CATCH",
-    "catchAllKeys",
-    "catchHitPos",
-    "catchJudge",
-    "catchState",
-    "drawCatchField",
-    "isBlast",
-    "isCatch",
-    "resetCatch"
-   ]
+   "decls": 0,
+   "private": 0,
+   "public": []
   },
   {
    "file": "js/extras.js",
@@ -502,6 +492,13 @@
   }
  ],
  "windowCoupling": [
+  {
+   "name": "CATCH",
+   "writers": [
+    "js/catch.js"
+   ],
+   "readers": []
+  },
   {
    "name": "LIB_SHOW",
    "writers": [
@@ -908,6 +905,34 @@
    "readers": []
   },
   {
+   "name": "catchAllKeys",
+   "writers": [
+    "js/catch.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "catchHitPos",
+   "writers": [
+    "js/catch.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "catchJudge",
+   "writers": [
+    "js/catch.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "catchState",
+   "writers": [
+    "js/catch.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "chartKeyOf",
    "writers": [
     "js/game.js"
@@ -925,6 +950,13 @@
    "name": "currentScore",
    "writers": [
     "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "drawCatchField",
+   "writers": [
+    "js/catch.js"
    ],
    "readers": []
   },
@@ -1047,6 +1079,20 @@
    "name": "installPackFile",
    "writers": [
     "js/custom.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "isBlast",
+   "writers": [
+    "js/catch.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "isCatch",
+   "writers": [
+    "js/catch.js"
    ],
    "readers": []
   },
@@ -1292,6 +1338,13 @@
    "name": "renderRecords",
    "writers": [
     "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "resetCatch",
+   "writers": [
+    "js/catch.js"
    ],
    "readers": []
   },

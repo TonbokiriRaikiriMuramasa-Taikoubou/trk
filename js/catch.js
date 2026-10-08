@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ==========================================================================
    trk! catch.js — 🚛 CATCH（荷物を受け止めるトラック）＋ 🚀 ぶっ飛ばしモード
@@ -412,3 +413,15 @@ function captureCatchKey(code) {
   setStatus("catchBindStatus", "catchAssigned"); syncCatchKeyUI();
 }
 /* ✅ catch.js 完了 */
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.CATCH = CATCH;
+window.catchAllKeys = catchAllKeys;
+window.catchHitPos = catchHitPos;
+window.catchJudge = catchJudge;
+window.catchState = catchState;
+window.drawCatchField = drawCatchField;
+window.isBlast = isBlast;
+window.isCatch = isCatch;
+window.resetCatch = resetCatch;
+})();

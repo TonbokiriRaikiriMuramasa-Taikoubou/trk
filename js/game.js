@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：ゲーム進行・判定・時計・プレイ記録 ============
    対応：カウントダウン・MOD・MANUAL／TRUCK／ORBIT／STAGE／CATCH・AUTO（全モードと組み合わせ）
@@ -570,3 +571,33 @@ $("recResetBtn").addEventListener("click", () => {
   setStatus("recStatus", "recCleared");
 });
 /* ✅ game.js 完了 */
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.PLAY_KEYS = PLAY_KEYS;
+window.autoPlay = autoPlay;
+window.chartKeyOf = chartKeyOf;
+window.currentAcc = currentAcc;
+window.currentScore = currentScore;
+window.endGame = endGame;
+window.gameTime = gameTime;
+Object.defineProperty(window, "goAt", { configurable:true, get:() => goAt, set:v => { goAt = v; } });
+window.handleInput = handleInput;
+window.judgeNote = judgeNote;
+Object.defineProperty(window, "leadIn", { configurable:true, get:() => leadIn, set:v => { leadIn = v; } });
+window.pauseGame = pauseGame;
+Object.defineProperty(window, "pausedInLeadIn", { configurable:true, get:() => pausedInLeadIn, set:v => { pausedInLeadIn = v; } });
+window.rateKey = rateKey;
+Object.defineProperty(window, "records", { configurable:true, get:() => records, set:v => { records = v; } });
+window.renderRecords = renderRecords;
+window.resumeGame = resumeGame;
+Object.defineProperty(window, "runShort", { configurable:true, get:() => runShort, set:v => { runShort = v; } });
+window.runUnranked = runUnranked;
+window.saveRecords = saveRecords;
+window.seekTo = seekTo;
+window.showJudge = showJudge;
+window.songRec = songRec;
+window.startGame = startGame;
+window.sweepMisses = sweepMisses;
+window.tickClock = tickClock;
+window.toTitle = toTitle;
+})();

@@ -1,11 +1,11 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 101,
+  "windowProps": 123,
   "duplicates": 0,
-  "declarations": 426,
-  "private": 177,
-  "public": 249
+  "declarations": 364,
+  "private": 142,
+  "public": 222
  },
  "files": [
   {
@@ -251,37 +251,9 @@
   },
   {
    "file": "js/game.js",
-   "decls": 62,
-   "private": 35,
-   "public": [
-    "PLAY_KEYS",
-    "autoPlay",
-    "chartKeyOf",
-    "currentAcc",
-    "currentScore",
-    "endGame",
-    "gameTime",
-    "goAt",
-    "handleInput",
-    "judgeNote",
-    "leadIn",
-    "pauseGame",
-    "pausedInLeadIn",
-    "rateKey",
-    "records",
-    "renderRecords",
-    "resumeGame",
-    "runShort",
-    "runUnranked",
-    "saveRecords",
-    "seekTo",
-    "showJudge",
-    "songRec",
-    "startGame",
-    "sweepMisses",
-    "tickClock",
-    "toTitle"
-   ]
+   "decls": 0,
+   "private": 0,
+   "public": []
   },
   {
    "file": "js/render.js",
@@ -568,6 +540,13 @@
    "name": "ORBIT_IGNORE",
    "writers": [
     "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "PLAY_KEYS",
+   "writers": [
+    "js/game.js"
    ],
    "readers": []
   },
@@ -914,6 +893,13 @@
    "readers": []
   },
   {
+   "name": "autoPlay",
+   "writers": [
+    "js/game.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "bannerRandomBtn",
    "writers": [
     "js/library.js"
@@ -924,6 +910,27 @@
    "name": "bannerVolTip",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "chartKeyOf",
+   "writers": [
+    "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "currentAcc",
+   "writers": [
+    "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "currentScore",
+   "writers": [
+    "js/game.js"
    ],
    "readers": []
   },
@@ -970,6 +977,13 @@
    "readers": []
   },
   {
+   "name": "endGame",
+   "writers": [
+    "js/game.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "ensureTrkDistributionPlaylists",
    "writers": [
     "js/library.js"
@@ -986,9 +1000,23 @@
    "readers": []
   },
   {
+   "name": "gameTime",
+   "writers": [
+    "js/game.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "getPackSongs",
    "writers": [
     "js/custom.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "handleInput",
+   "writers": [
+    "js/game.js"
    ],
    "readers": []
   },
@@ -1024,6 +1052,13 @@
    "name": "isOrbit",
    "writers": [
     "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "judgeNote",
+   "writers": [
+    "js/game.js"
    ],
    "readers": []
   },
@@ -1154,6 +1189,13 @@
    "readers": []
   },
   {
+   "name": "pauseGame",
+   "writers": [
+    "js/game.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "plToast",
    "writers": [
     "js/library.js"
@@ -1178,6 +1220,13 @@
    "name": "previewStartFor",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "rateKey",
+   "writers": [
+    "js/game.js"
    ],
    "readers": []
   },
@@ -1210,6 +1259,13 @@
    "readers": []
   },
   {
+   "name": "renderRecords",
+   "writers": [
+    "js/game.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "resetLives",
    "writers": [
     "js/modes.js"
@@ -1224,6 +1280,20 @@
    "readers": []
   },
   {
+   "name": "resumeGame",
+   "writers": [
+    "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "runUnranked",
+   "writers": [
+    "js/game.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "sanitizeSong",
    "writers": [
     "js/custom.js"
@@ -1231,9 +1301,23 @@
    "readers": []
   },
   {
+   "name": "saveRecords",
+   "writers": [
+    "js/game.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "saveSongPrefs",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "seekTo",
+   "writers": [
+    "js/game.js"
    ],
    "readers": []
   },
@@ -1259,6 +1343,13 @@
    "readers": []
   },
   {
+   "name": "showJudge",
+   "writers": [
+    "js/game.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "skinShelf",
    "writers": [
     "js/custom.js"
@@ -1269,6 +1360,13 @@
    "name": "songInfo",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "songRec",
+   "writers": [
+    "js/game.js"
    ],
    "readers": []
   },
@@ -1287,9 +1385,23 @@
    "readers": []
   },
   {
+   "name": "startGame",
+   "writers": [
+    "js/game.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "startPreview",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "sweepMisses",
+   "writers": [
+    "js/game.js"
    ],
    "readers": []
   },
@@ -1308,9 +1420,23 @@
    "readers": []
   },
   {
+   "name": "tickClock",
+   "writers": [
+    "js/game.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "titleString",
    "writers": [
     "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "toTitle",
+   "writers": [
+    "js/game.js"
    ],
    "readers": []
   },

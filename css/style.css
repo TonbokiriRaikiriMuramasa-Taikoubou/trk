@@ -1665,3 +1665,6 @@ body.helpTextOff .videoMaxHint{display:none!important}
 .mediaInterpRow input[type=range]{width:100%;accent-color:#75e4ff}
 .mediaInterpStatus{min-height:1em;color:#9fe8ff}
 @media(max-width:680px){.mediaStageCanvas{height:clamp(130px,22vh,220px)}}
+
+/* 👆 長押しの代わりのボタン（設定 showMoreBtns をオフにすると隠れる） */
+body.noMoreBtns .moreBtn { display:none !important; }

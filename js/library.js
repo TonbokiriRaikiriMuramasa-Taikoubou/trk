@@ -234,6 +234,7 @@ Object.assign(TEXT.ja, {
   plSongsNow:"現在 {n} 曲", plSave:"💾 保存", plDelete:"🗑 このプレイリストを削除",
   plDeleted:"🗑 プレイリストを削除しました（曲はライブラリに残ります）", plCreated:"📁 {name} を作成しました",
   plLockedNo:"🔒 ロック中は削除できません（長押しの設定で 🔒 を外してください）",
+  libProfileBtn:"🎶 曲のプロフィール（編集・プレイリストへの追加）",
   plFrozenNo:"🧊 {name} はフリーズ中です（追加できません）",
   plDelOne:"中クリック1回で削除する", plDelThree:"同じタブを3回中クリックして削除する",
   plDelModeHint:"🗑 プレイリストを消しても、曲はライブラリに残ります。スマホでは長押し →「🗑 このプレイリストを削除」からも消せます。",
@@ -253,6 +254,7 @@ Object.assign(TEXT.en, {
   plSongsNow:"{n} songs", plSave:"💾 Save", plDelete:"🗑 Delete this playlist",
   plDeleted:"🗑 Playlist deleted (songs stay in your library)", plCreated:"📁 Created {name}",
   plLockedNo:"🔒 Locked — can't delete (uncheck 🔒 in long-press settings)",
+  libProfileBtn:"🎶 Song profile (edit · add to playlist)",
   plFrozenNo:"🧊 {name} is frozen (can't add songs)",
   plDelOne:"Middle-click once to delete", plDelThree:"Middle-click the same tab 3 times to delete",
   plDelModeHint:"🗑 Deleting a playlist never removes the songs. On touch screens, use long-press → “🗑 Delete this playlist”.",
@@ -272,6 +274,7 @@ Object.assign(TEXT.zh, {
   plSongsNow:"当前 {n} 首", plSave:"💾 保存", plDelete:"🗑 删除此播放列表",
   plDeleted:"🗑 已删除播放列表（歌曲仍保留在库中）", plCreated:"📁 已创建 {name}",
   plLockedNo:"🔒 锁定中无法删除（请在长按设置中取消 🔒）",
+  libProfileBtn:"🎶 歌曲资料（编辑·加入播放列表）",
   plFrozenNo:"🧊 {name} 已冻结（无法添加歌曲）",
   plDelOne:"中键点击1次即删除", plDelThree:"同一标签中键点击3次才删除",
   plDelModeHint:"🗑 删除播放列表不会删除歌曲。触屏设备请长按 →「🗑 删除此播放列表」。",
@@ -291,6 +294,7 @@ Object.assign(TEXT.ko, {
   plSongsNow:"현재 {n}곡", plSave:"💾 저장", plDelete:"🗑 이 재생목록 삭제",
   plDeleted:"🗑 재생목록을 삭제했습니다(곡은 라이브러리에 남습니다)", plCreated:"📁 {name}을(를) 만들었습니다",
   plLockedNo:"🔒 잠금 중에는 삭제할 수 없어요(길게 누른 설정에서 🔒를 해제하세요)",
+  libProfileBtn:"🎶 곡 프로필 (편집·재생목록에 추가)",
   plFrozenNo:"🧊 {name}은(는) 프리즈 중입니다(추가할 수 없어요)",
   plDelOne:"가운데 클릭 1회로 삭제", plDelThree:"같은 탭을 3번 가운데 클릭해 삭제",
   plDelModeHint:"🗑 재생목록을 지워도 곡은 라이브러리에 남습니다. 터치 화면에서는 길게 누르기 → '🗑 이 재생목록 삭제'를 사용하세요.",
@@ -2010,7 +2014,18 @@ function renderLibTabs(tabs) {
 }
 
 /* ---------- 曲リストの表示 ---------- */
+/* 長押しの代わりのボタン（曲の 🎶・テレビくわしいの ▶）を出すか。設定 showMoreBtns（既定は出す） */
+function syncMoreBtns() {
+  const on = window.Trk.core.settings.showMoreBtns !== false;
+  document.body.classList.toggle("noMoreBtns", !on);
+  const c = window.Trk.core.$("showMoreBtns"); if (c) c.checked = on;
+}
+window.Trk.core.$("showMoreBtns").addEventListener("change", e => {
+  window.Trk.core.settings.showMoreBtns = e.target.checked; window.Trk.core.saveUserPrefs(); syncMoreBtns();
+});
+
 function renderLib() {
+  syncMoreBtns();
   const box = window.Trk.core.$("libList"); box.textContent = "";
   const all = allSongs();
   libAllKeys = new Set(all.map(x => x.key));
@@ -2117,6 +2132,11 @@ function renderLib() {
     b.addEventListener("dragend", () => { plDragKey = ""; document.body.classList.remove("plDragging"); });
     onLongPress(b, () => songProfile(it));   /* 🎶 長押しでプロフィール＆プレイリスト */
     wrap.append(b);
+    /* 🎶 長押しの代わり（見えるボタン）。設定「長押しの代わりのボタンを出す」で隠せる（body.noMoreBtns） */
+    const pb = el("button", "libFav moreBtn", "🎶"); pb.type = "button";
+    pb.title = tr("libProfileBtn"); pb.setAttribute("aria-label", tr("libProfileBtn") + " " + (m.title || it.title));
+    pb.addEventListener("click", e => { e.stopPropagation(); songProfile(it); });
+    wrap.append(pb);
     /* ⭐ お気に入り（📌は ⋯ のメニューから） */
     const F = window.TrkFavs;
     if (F) {

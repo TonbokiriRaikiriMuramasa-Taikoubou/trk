@@ -1736,5 +1736,16 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   else ok("README は " + readmeBytes + " bytes（上限 12KB）。docs/guide/ の " + guideFiles.length + " 件は全て目次に載っている");
 }
 
+/* 項目 6（長押しの代わり）：長押しでしか開けない「曲のプロフィール」「メディアプレーヤー」に、見えるボタンと
+   設定（showMoreBtns）が付いていること。ボタンの有無は headless の確認（/tmp の probe）でも見ている。 */
+{
+  const libSrc = read("js/library.js"), tvSrc = read("js/tv-dock.js"), idx = read("index.html");
+  const songBtn = /pb\.addEventListener\("click"[^\n]*songProfile\(it\)/.test(libSrc) && libSrc.includes('"libFav moreBtn"');
+  const tvBtn = /mediaBtn\.addEventListener\("click"[^\n]*window\.openMedia\(\)/.test(tvSrc) && tvSrc.includes('"inline tight moreBtn"');
+  const toggle = idx.includes('id="showMoreBtns"') && libSrc.includes("syncMoreBtns") && /body\.noMoreBtns \.moreBtn/.test(read("css/style.css"));
+  if (!songBtn || !tvBtn || !toggle) fail("長押しの代わりのボタン（曲の🎶・TVの▶）か、設定 showMoreBtns の配線が無い");
+  else ok("長押しの代わりのボタン（曲の🎶・TVの▶）と設定 showMoreBtns が付いている");
+}
+
 console.log(`\nStatic check: ${failures ? "FAILED" : "passed"} · ${failures} failure(s) · ${warnings} warning(s)`);
 if (failures) process.exitCode = 1;

@@ -236,6 +236,7 @@ Object.assign(TEXT.ja, {
   tvFavOverflow:"⭐ ボタンに入りきらないお気に入り（ボタンは {m}個・お気に入りは {n}個）",
   tvNoFav:"お気に入りはまだありません。ボタンを長押しすると、今の映像を登録できます。",
   tvMore:"⚙ 映像の詳しい設定",
+  tvMediaBtn:"▶ メディアプレーヤーを開く（電源の長押しと同じ）",
   tvReset:"↺ テレビ設定をリセット", tvResetDone:"テレビ設定をリセットしました",
   tvPower:"⏻ 電源（映像オン／オフ）",
   tvPowerOn:"📺 テレビON", tvPowerOff:"📺 テレビOFF",
@@ -306,6 +307,7 @@ Object.assign(TEXT.en, {
   tvSongSkip:"♪ Switched to {t}",
   tvNoFav:"No favorites yet. Long-press a button to save the current video filter.",
   tvMore:"⚙ More video settings",
+  tvMediaBtn:"▶ Open Media Player (same as holding power)",
   tvReset:"↺ Reset TV settings", tvResetDone:"TV settings reset",
   tvPower:"⏻ Power (video on/off)",
   tvPowerOn:"📺 TV ON", tvPowerOff:"📺 TV OFF",
@@ -376,6 +378,7 @@ Object.assign(TEXT.zh, {
   tvSongSkip:"♪ 已切到 {t}",
   tvNoFav:"还没有收藏。长按按钮即可登记当前视频滤镜。",
   tvMore:"⚙ 视频详细设置",
+  tvMediaBtn:"▶ 打开媒体播放器（与长按电源相同）",
   tvReset:"↺ 重置电视设置", tvResetDone:"已重置电视设置",
   tvPower:"⏻ 电源（视频开／关）",
   tvPowerOn:"📺 电视开", tvPowerOff:"📺 电视关",
@@ -446,6 +449,7 @@ Object.assign(TEXT.ko, {
   tvSongSkip:"♪ {t}(으)로 바꿨습니다",
   tvNoFav:"아직 즐겨찾기가 없습니다. 버튼을 길게 누르면 현재 영상을 등록할 수 있습니다.",
   tvMore:"⚙ 영상 자세한 설정",
+  tvMediaBtn:"▶ 미디어 플레이어 열기 (전원 길게 누르기와 같음)",
   tvReset:"↺ TV 설정 초기화", tvResetDone:"TV 설정을 초기화했습니다",
   tvPower:"⏻ 전원 (영상 켜기/끄기)",
   tvPowerOn:"📺 TV 켜기", tvPowerOff:"📺 TV 끄기",
@@ -1450,7 +1454,12 @@ addEventListener("DOMContentLoaded", () => {
   window.Trk.core.video.addEventListener("canplay", previewTick);
   showTab("setup");
 
-  body.append(tx("summary","tvMoreTitle"), quickRow, skinRow, dimRow, blurRow, paramHint, paramTools, paramFavWrap, tabsBar, paneSetup, panePreview);
+  /* 長押しの代わり：電源ボタンの長押し（＝メディアプレーヤー）と同じ入口。設定 showMoreBtns で隠せる */
+  const mediaRow = window.Trk.core.el("div", "inline tight moreBtn");
+  const mediaBtn = tx("button", "tvMediaBtn", "tvMediaOpen"); mediaBtn.type = "button";
+  mediaBtn.addEventListener("click", () => { if (typeof window.openMedia === "function") window.openMedia(); });
+  mediaRow.append(mediaBtn);
+  body.append(tx("summary","tvMoreTitle"), quickRow, mediaRow, skinRow, dimRow, blurRow, paramHint, paramTools, paramFavWrap, tabsBar, paneSetup, panePreview);
 
   dock.append(dev, favChips, overLabel, overflow, body);
   col.append(dock);

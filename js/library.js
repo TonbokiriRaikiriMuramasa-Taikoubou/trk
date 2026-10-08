@@ -2660,7 +2660,7 @@ function removeAdded(it) {
 
 /* ---------- 曲パックの曲 ---------- */
 async function refreshPackSongs() {
-  try { packSongs = (await getPackSongs()).map(packItem); } catch (e) { console.error(e); packSongs = []; }
+  try { packSongs = (await window.Trk.custom.getPackSongs()).map(packItem); } catch (e) { console.error(e); packSongs = []; }
   renderLib();
 }
 on("packsChanged", refreshPackSongs);

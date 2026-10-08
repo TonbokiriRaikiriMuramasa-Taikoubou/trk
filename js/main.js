@@ -518,7 +518,7 @@ if (!fullscreenSupported) { $("fullBtn").hidden = true; $("fullBtnTitle").hidden
 applySkin(settings.skin, false);
 applyLanguage(settings.language);
 syncTutorialUI();
-syncNoteUI(); showFxPower(); updateMascotUI(); syncOptionsUI();
+window.Trk.custom.syncNoteUI(); showFxPower(); window.Trk.custom.updateMascotUI(); syncOptionsUI();
 setStatus("seStatus", settings.seEnabled ? "seOn" : "seDefault");
 setStatus("songPrefsStatus", "songPrefsHint");
 setPhase("title");
@@ -529,7 +529,7 @@ saveUserPrefs();
 requestAnimationFrame(loop);
 
 /* パックを戻してから曲リストを作る（vrm.js も packsReady を待ちます） */
-const packsReady = initPacks().catch(e => console.error(e));
+const packsReady = window.Trk.custom.initPacks().catch(e => console.error(e));
 packsReady.then(() => initLibrary()).catch(e => console.error(e));
 
 /* PWA：オフラインでも開けるようにする（HTTPS か localhost のときだけ）。

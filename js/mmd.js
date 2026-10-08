@@ -1200,7 +1200,7 @@ async function doLoadPreset(p) {
     if (typeof p.man.bpm === "number") settings.mmdMotionBpm = Math.max(0, Math.min(300, p.man.bpm));
     settings.mascot = "mmd";
     settings.mmdQuickUI = true;
-    saveUserPrefs(); syncUI(); renderQuick(); updateMascotUI();
+    saveUserPrefs(); syncUI(); renderQuick(); window.Trk.custom.updateMascotUI();
   } catch (e) {
     console.error(e);
     status(e && e.key ? e.key : "mmdLoadError");
@@ -1523,8 +1523,8 @@ function buildQuickPanel() {
 }
 function quickTap(mode) {
   quickPickOpen = (mode === "pick");
-  if (mode === "off") { settings.mascot = "none"; saveUserPrefs(); updateMascotUI(); syncUI(); renderQuick(); return; }
-  if (settings.mascot !== "mmd" && model) { settings.mascot = "mmd"; saveUserPrefs(); updateMascotUI(); syncUI(); }
+  if (mode === "off") { settings.mascot = "none"; saveUserPrefs(); window.Trk.custom.updateMascotUI(); syncUI(); renderQuick(); return; }
+  if (settings.mascot !== "mmd" && model) { settings.mascot = "mmd"; saveUserPrefs(); window.Trk.custom.updateMascotUI(); syncUI(); }
   if (mode === "watch") {                           // 👀 ひとやすみ
     loadMotionKind("watch");
   } else if (mode === "auto") loadMotionKind("auto");
@@ -1672,7 +1672,7 @@ function setAgreeUI() {
     const lab = inp && inp.closest("label"); if (lab) lab.classList.toggle("disabled", !on);
   }
 }
-function selectMmdMascot() { settings.mascot = "mmd"; saveUserPrefs(); updateMascotUI(); status("mmdSelected"); }
+function selectMmdMascot() { settings.mascot = "mmd"; saveUserPrefs(); window.Trk.custom.updateMascotUI(); status("mmdSelected"); }
 function renderMotionList() {
   const sel = $("mmdMotionSelect");
   if (!sel) return;
@@ -1780,12 +1780,12 @@ addEventListener("DOMContentLoaded", () => {
       }
       if (model) {
         settings.mascot = "mmd";
-        updateMascotUI();
+        window.Trk.custom.updateMascotUI();
       }
     } else {
       if (settings.mascot === "mmd") {
         settings.mascot = "none";
-        updateMascotUI();
+        window.Trk.custom.updateMascotUI();
       }
     }
     saveUserPrefs();

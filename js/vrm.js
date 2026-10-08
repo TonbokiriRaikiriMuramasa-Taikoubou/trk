@@ -19,7 +19,7 @@ const status = (k, v) => setStatus("vrmStatus", k, v);
 const vrmRect = () => VRM_RECT[settings.layout] || VRM_RECT.classic;
 const isTalking = () => !!caption && performance.now() - caption.t < CAPTION_MS;
 const setLoaded = (onFlag, credit) => { vrmState.loaded = onFlag; vrmState.credit = credit || ""; };
-function selectVrmMascot() { settings.mascot = "vrm"; saveUserPrefs(); updateMascotUI(); }
+function selectVrmMascot() { settings.mascot = "vrm"; saveUserPrefs(); window.Trk.custom.updateMascotUI(); }
 
 /* ---------- ライブラリは必要になったときだけ読み込む ---------- */
 let libsP = null, animP = null, L = null, A = null;

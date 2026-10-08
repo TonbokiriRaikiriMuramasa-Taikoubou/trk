@@ -170,7 +170,7 @@ if (typeof prefs !== "undefined") {
   if (typeof settings !== "undefined" && !keepSafe) {
     window.Trk.core.settings.tvDockSkin = pick(window.Trk.core.prefs.tvDockSkin, Object.keys(TV_DOCK_SKINS), "cinema");
     window.Trk.core.settings.tvDockFive = !!window.Trk.core.prefs.tvDockFive;
-    window.Trk.core.settings.tvDockOpen = window.Trk.core.prefs.tvDockOpen === true;
+    window.Trk.core.settings.tvDockOpen = window.Trk.core.prefs.tvDockOpen !== false;   /* 既定は開いた状態 */
     window.Trk.core.settings.tvFav = idList(window.Trk.core.prefs.tvFav, TV_FAV_MAX);   // TV_FAV_MAX=0＝上限なし
     window.Trk.core.settings.tvParamFavs = window.Trk.core.cleanTvParamFavorites(window.Trk.core.prefs.tvParamFavs);
     window.Trk.core.settings.tvRecent = idList(window.Trk.core.prefs.tvRecent, TV_RECENT_MAX);
@@ -226,6 +226,8 @@ const tvSlotCols = () => window.Trk.core.settings.tvDockFive ? 5 : tvSkinDef().c
 Object.assign(TEXT.ja, {
   tvTitle:"📺 テレビ（映像出力）",
   tvMoreTitle:"📺 くわしく（設定と映像の確認）",
+  tvFiveLabel:"🔢 5枠化",
+  tvDockGroup:"📺 TVドック", tvDockGroupTitle:"📺 TVドック", tvWall:"🧱 壁掛け", tvWallHint:"テレビを壁に掛けた形にします（壁掛けのスキン）。", tvReorder:"↕ 並び替え", tvReorderHint:"テレビとラックの上下を入れ替えます。", tvFiveHint:"選べるボタンを5つにします（どのスキンでも）。",
   tvNoFavShort:"⭐ お気に入りがありません",
   tvSongPlay:"▶◀ 演奏中も ◀▶ で曲を変える",
   tvSongPlayHint:"初期オフ。オンのときは、演奏中に ◀▶ を押すと、いまのプレイをやめてその曲に移ります（記録は残りません）。",
@@ -297,6 +299,8 @@ Object.assign(TEXT.ja, {
 Object.assign(TEXT.en, {
   tvTitle:"📺 TV (video output)",
   tvMoreTitle:"📺 More (setup & video check)",
+  tvFiveLabel:"🔢 5 slots",
+  tvDockGroup:"📺 TV dock", tvDockGroupTitle:"📺 TV dock", tvWall:"🧱 Wall mount", tvWallHint:"Mounts the TV on the wall (the wall skin).", tvReorder:"↕ Swap order", tvReorderHint:"Swaps the TV and the rack (top and bottom).", tvFiveHint:"Shows 5 buttons on every skin.",
   tvFavLabel:"⭐ Favorites that don't fit on the buttons",
   tvFavLabelN:"⭐ {n} favorites (this TV has {m} buttons — all of them fit)",
   tvFavOverflow:"⭐ Favorites that don't fit on the buttons (buttons: {m}, favorites: {n})",
@@ -368,6 +372,8 @@ Object.assign(TEXT.en, {
 Object.assign(TEXT.zh, {
   tvTitle:"📺 电视（视频输出）",
   tvMoreTitle:"📺 详细（设置与画面确认）",
+  tvFiveLabel:"🔢 5个按钮",
+  tvDockGroup:"📺 电视底座", tvDockGroupTitle:"📺 电视底座", tvWall:"🧱 壁挂", tvWallHint:"把电视挂在墙上（壁挂皮肤）。", tvReorder:"↕ 调换顺序", tvReorderHint:"调换电视与机架的上下位置。", tvFiveHint:"所有皮肤都显示5个按钮。",
   tvFavLabel:"⭐ 按钮放不下的收藏",
   tvFavLabelN:"⭐ 收藏 {n}个（这台电视有 {m} 个按钮，全部放得下）",
   tvFavOverflow:"⭐ 按钮放不下的收藏（按钮 {m}个、收藏 {n}个）",
@@ -439,6 +445,8 @@ Object.assign(TEXT.zh, {
 Object.assign(TEXT.ko, {
   tvTitle:"📺 TV (영상 출력)",
   tvMoreTitle:"📺 자세히 (설정과 영상 확인)",
+  tvFiveLabel:"🔢 5칸",
+  tvDockGroup:"📺 TV 도크", tvDockGroupTitle:"📺 TV 도크", tvWall:"🧱 벽걸이", tvWallHint:"TV를 벽에 건 모양으로 합니다(벽걸이 스킨).", tvReorder:"↕ 순서 바꾸기", tvReorderHint:"TV와 랙의 위아래를 바꿉니다.", tvFiveHint:"모든 스킨에서 버튼을 5개로 합니다.",
   tvFavLabel:"⭐ 버튼에 다 들어가지 않는 즐겨찾기",
   tvFavLabelN:"⭐ 즐겨찾기 {n}개 (이 TV 버튼은 {m}개 · 전부 들어갑니다)",
   tvFavOverflow:"⭐ 버튼에 다 안 들어가는 즐겨찾기 (버튼 {m}개 · 즐겨찾기 {n}개)",
@@ -1197,7 +1205,7 @@ addEventListener("DOMContentLoaded", () => {
 
   const skinRow = window.Trk.core.el("label","field"), skinSel = document.createElement("select");
   skinRow.append(tx("span","tvSkinLabel"), skinSel);
-  skinSel.addEventListener("change", () => { window.Trk.core.settings.tvDockSkin = skinSel.value; window.Trk.core.saveUserPrefs(); render(true); });
+  skinSel.addEventListener("change", () => { window.Trk.core.settings.tvDockSkin = skinSel.value; window.Trk.core.saveUserPrefs(); applyOrder(); render(true); });
 
   // 🎨 カスタムTVスキンのエディタを開く（キーは tvmOpen。tvMakerOpen だと生キーが出てしまう）。開発者表示（devView）の中
   const makerBtn = tx("button","tvmOpen","fxMini slim devOnly"); makerBtn.type = "button";
@@ -1209,19 +1217,32 @@ addEventListener("DOMContentLoaded", () => {
     setTimeout(() => mk.scrollIntoView({behavior:"smooth", block:"center"}), 50);
   });
 
-  const five = (() => {
-    const lab = window.Trk.core.el("label","check"), inp = document.createElement("input");
-    inp.type = "checkbox"; lab.append(inp, tx("span","tvFive"));
-    inp.addEventListener("change", () => { window.Trk.core.settings.tvDockFive = inp.checked; window.Trk.core.saveUserPrefs(); render(); });
-    return { lab, inp };
-  })();
-
-  const orderRow = window.Trk.core.el("label","field"), orderSel = document.createElement("select");
-  orderRow.append(tx("span","tvOrderLabel"), orderSel);
-  const opt1 = document.createElement("option"); opt1.value = "tv-first"; opt1.textContent = tr("tvOrderTvFirst");
-  const opt2 = document.createElement("option"); opt2.value = "fx-first"; opt2.textContent = tr("tvOrderFxFirst");
-  orderSel.append(opt1, opt2);
-  orderSel.addEventListener("change", () => { window.Trk.core.settings.tvOrder = orderSel.value; window.Trk.core.saveUserPrefs(); applyOrder(); render(); });
+  /* 📺 TVドックの設定（3つのチェック。説明は短く）。既定はすべて OFF：映画館・テレビが上・5枠なし。
+     壁掛けは「スキンが壁掛けテレビ」と同じ。外すと映画館に戻す。 */
+  const dockCheck = (key, hintKey, onChange) => {
+    const wrap = window.Trk.core.el("div", "tvDockItem");
+    const lab = window.Trk.core.el("label", "check"), inp = document.createElement("input");
+    inp.type = "checkbox"; lab.append(inp, tx("span", key));
+    inp.addEventListener("change", () => onChange(inp.checked));
+    wrap.append(lab, tx("div", hintKey, "hint"));
+    return { wrap, inp };
+  };
+  const wallCheck = dockCheck("tvWall", "tvWallHint", checked => {
+    const st = window.Trk.core.settings;
+    st.tvDockSkin = checked ? "wall" : (st.tvDockSkin === "wall" ? "cinema" : st.tvDockSkin);
+    window.Trk.core.saveUserPrefs(); applyOrder(); render(true);
+  });
+  const reorderCheck = dockCheck("tvReorder", "tvReorderHint", checked => {
+    window.Trk.core.settings.tvOrder = checked ? "fx-first" : "tv-first";
+    window.Trk.core.saveUserPrefs(); applyOrder(); render();
+  });
+  const fiveCheck = dockCheck("tvFiveLabel", "tvFiveHint", checked => {
+    window.Trk.core.settings.tvDockFive = checked; window.Trk.core.saveUserPrefs(); render();
+  });
+  const dockGroupTitle = tx("div", "tvDockGroup", "tvDockGroupTitle"); dockGroupTitle.id = "tvDockGroupTitle";
+  const dockGroup = window.Trk.core.el("div", "tvDockGroup");
+  dockGroup.setAttribute("role", "group"); dockGroup.setAttribute("aria-labelledby", "tvDockGroupTitle");
+  dockGroup.append(dockGroupTitle, wallCheck.wrap, reorderCheck.wrap, fiveCheck.wrap);
 
   const overlayCheck = (() => {
     const lab = window.Trk.core.el("label","check"), inp = document.createElement("input");
@@ -1306,8 +1327,8 @@ addEventListener("DOMContentLoaded", () => {
      （以前は text 扱いで "[object HTMLButtonElement]" になり、4つのボタンが消えていた） */
   const paneSetupActions = window.Trk.core.el("div", "miniActions");
   paneSetupActions.append(makerBtn, shareBtn, moreBtn, resetBtn);
-  paneSetup.append(tx("div","tvOverlayHint","hint"), overlayCheck.lab, five.lab, orderRow,
-    tx("div","tvOrderHint","hint"), songPlayCheck.lab, tx("div","tvSongPlayHint","hint"),
+  paneSetup.append(tx("div","tvOverlayHint","hint"), overlayCheck.lab, dockGroup,
+    songPlayCheck.lab, tx("div","tvSongPlayHint","hint"),
     paneSetupActions);
 
   const pvWrap = window.Trk.core.el("div", "tvpWrap");
@@ -1774,8 +1795,9 @@ addEventListener("DOMContentLoaded", () => {
       const o = document.createElement("option"); o.value = id; o.textContent = `${d.label[lang]||d.label.en}（${d.n}）`; skinSel.append(o);
     }
     skinSel.value = window.Trk.core.settings.tvDockSkin;
-    five.inp.checked = window.Trk.core.settings.tvDockFive;
-    orderSel.value = window.Trk.core.settings.tvOrder;
+    fiveCheck.inp.checked = window.Trk.core.settings.tvDockFive;
+    reorderCheck.inp.checked = window.Trk.core.settings.tvOrder === "fx-first";
+    wallCheck.inp.checked = window.Trk.core.settings.tvDockSkin === "wall";
     overlayCheck.inp.checked = window.Trk.core.settings.tvOverlay;
     songPlayCheck.inp.checked = !!window.Trk.core.settings.tvSongWhilePlaying;
     menuPrevCheck.inp.checked = window.Trk.core.settings.tvMenuPreview !== false;

@@ -1697,5 +1697,25 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   else ok("window.screen is left to the browser (the app state is window.Trk.core.screen only)");
 }
 
+/* アドオンの api（js/addons.js の makeApi）の鍵は、docs/ADDONS.md に `api.<鍵>` として載っていること。
+   載っていない鍵は、使ってよい窓口として約束していないので、増やすときは文書も増やす。 */
+{
+  const addonsSrc = fs.readFileSync(path.join(root, "js/addons.js"), "utf8");
+  const block = (addonsSrc.match(/function makeApi\(id\) \{[\s\S]*?\n\}\n/) || [""])[0];
+  /* 鍵は字下げ4の行にある（同じ行に , で続くものも含む）。メソッド形式（addStyle(css)）も含む */
+  const keys = [];
+  for (const line of block.split("\n")) {
+    if (!/^\s{4}\S/.test(line)) continue;
+    const m1 = line.match(/^\s{4}([A-Za-z_$][\w$]*)\s*\(/); if (m1) keys.push(m1[1]);
+    const m2 = line.match(/^\s{4}([A-Za-z_$][\w$]*),\s*$/); if (m2) keys.push(m2[1]);   /* 省略記法（id,） */
+    for (const m of line.matchAll(/(?:^\s{4}|,\s+)([A-Za-z_$][\w$]*)\s*:/g)) keys.push(m[1]);
+  }
+  const docs = fs.readFileSync(path.join(root, "docs/ADDONS.md"), "utf8");
+  const missing = [...new Set(keys)].filter(k => !new RegExp("api\\." + k.replace("$", "\\$") + "(?![\\w$])").test(docs));
+  if (!block || keys.length < 10) fail("js/addons.js: makeApi の鍵を読めませんでした（" + keys.length + "件）");
+  else if (missing.length) fail("docs/ADDONS.md に載っていない api の鍵: " + missing.join(", "));
+  else ok("アドオンの api の鍵（" + keys.length + "件）は docs/ADDONS.md に全て載っている");
+}
+
 console.log(`\nStatic check: ${failures ? "FAILED" : "passed"} · ${failures} failure(s) · ${warnings} warning(s)`);
 if (failures) process.exitCode = 1;

@@ -29,6 +29,28 @@ trk! 本体には入れられない機能を、あとから足せるしくみで
 
 ---
 
+## 0. 使ってよい窓口と、使ってはいけない内部
+
+アドオンが**安定して頼ってよい**のは、次の3つだけです（`apiVersion` 1）。
+
+| 窓口 | 中身 | 変わるとき |
+|---|---|---|
+| `api`（`setup(api)` の引数） | §3〜§5 | 変えるときは `apiVersion` を上げ、旧い版も一定期間は動かします |
+| `TrkAddons`（コンソール・設定画面） | §8 | 同上 |
+| `TrkFX`（エフェクター） | `api.fx` を経由するのが基本。直接使うなら `TrkFX.tapElement(el)` と `TrkFX.untapElement(el)` | `js/fx.js` は凍結されていて、この2つは変わりにくい |
+
+次は**内部**です。予告なく変わることがあるので、アドオンは頼らないでください。
+
+- `window.Trk.<領域>.*`（例：`window.Trk.core.el`、`window.Trk.library.*`）。本体の内部の整理先です。
+- 旧来の大域名（`window.renderLib` など）。今は互換のために残していますが、将来取り除くことがあります。
+- 即時関数の中の名前（ファイルの中だけで使う関数や変数）。
+- 本体の内部イベント。`api.on` で拾えるものでも、§3「イベント」の表に無いものは保証の対象外です（`beforeLoad`・`beforePlay`・`chart`・`options`・`phase`・`records`・`screen`・`settings`・`studyCoverChanged` など）。
+- `window.screen` は、ブラウザ標準のものです。本体は上書きしません（以前は一部の版で隠していました）。
+
+> 作者向けの近道：`api` と `TrkAddons` だけで書けない機能が必要になったら、本体の内部に頼る前に、Issue で「どの窓口がほしいか」を書いてください。
+
+---
+
 ## 1. 入れ方
 
 | 方法 | やり方 |
@@ -109,6 +131,7 @@ TrkAddons.register({
 | `api.fx.available()` | エフェクター（`TrkFX`）が使えるか |
 | `api.fx.tapElement(el)` | 自分の `<audio>` / `<video>` を、本体のエフェクターに通す |
 | `api.log(...)` | コンソールに出す（`[addon:id]` が付きます） |
+| `api.id` / `api.apiVersion` | 自分の `id`、いま使っている API の版（いまは 1） |
 
 ### 置き場所（slot）
 
@@ -126,7 +149,9 @@ TrkAddons.register({
 | 名前 | いつ |
 |---|---|
 | `language` | 言語が変わった |
-| `tvChange` / `tvSkin`（tv-dock.js 由来） | テレビの設定が変わった |
+| `tvChange`（tv-dock.js 由来） | テレビの機種を変えた（機種の id が渡ります） |
+| `skin` | 画面のスキンが変わった |
+
 | `packsChanged` | 曲パックが増減した |
 | `songSelected` | 曲が選ばれた（`data` は曲の情報） |
 | `addonSelect` | **アドオンの曲**が選ばれた（自前のプレイヤーで鳴らす合図） |
@@ -200,9 +225,11 @@ TrkAddons.apiVersion            // 1
 TrkAddons.list()                // 入っているアドオン（consent: { state:"ok"|"stale"|"none", at, sha } つき）
 TrkAddons.active()              // いま動いている id
 TrkAddons.install(text, name)   // 文字列から入れる（テスト用・同意ダイアログが出ます＝同意するまで実行しません）
+TrkAddons.register({...})      // 定義を登録する（§2 の書き方。ふつうは直接使わず、入れ方から読まれます）
 TrkAddons.setEnabled(id, false) // オン/オフ
 TrkAddons.remove(id)            // 外す
 TrkAddons.slots()               // 使える置き場所
 TrkAddons.songs(id)             // そのアドオンが足した曲
 TrkAddons.panel()               // 設定画面のアドオン欄を開く
+TrkAddons.docs                  // このファイルの場所（"docs/ADDONS.md"）
 ```

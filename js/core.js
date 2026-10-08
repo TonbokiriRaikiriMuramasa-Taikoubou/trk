@@ -1330,7 +1330,7 @@ function validImportedSettingEnum(key, value) {
 })();
 /* ✅ core.js 完了 */
 
-/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+/* window.Trk.core が本体の正規の置き場所。旧window名は、凍結中の js/fx.js が読む5件だけを残す（docs/ADDONS.md §0）。 */
 window.$ = $;
 window.BEST_KEY = BEST_KEY;
 window.CAPTION_MS = CAPTION_MS;
@@ -1342,43 +1342,26 @@ window.TRK_ENUM_VALUES = TRK_ENUM_VALUES;
 window.TV_PARAM_FAV_MAX = TV_PARAM_FAV_MAX;
 window.VIDEO_KEY_DEFAULTS = VIDEO_KEY_DEFAULTS;
 window.activeMascot = activeMascot;
-/* 後から読み込まれるファイルがこの名前を差し替える（window.activeMods の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
-Object.defineProperty(window, "activeMods", { configurable:true, get:() => activeMods, set:v => { activeMods = v; } });
-Object.defineProperty(window, "analysis", { configurable:true, get:() => analysis, set:v => { analysis = v; } });
 window.applyLanguage = applyLanguage;
 window.applyNoteVars = applyNoteVars;
-/* 後から読み込まれるファイルがこの名前を差し替える（window.applySkin の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
-Object.defineProperty(window, "applySkin", { configurable:true, get:() => applySkin, set:v => { applySkin = v; } });
-Object.defineProperty(window, "avatarHit", { configurable:true, get:() => avatarHit, set:v => { avatarHit = v; } });
 window.baseName = baseName;
-Object.defineProperty(window, "bgImage", { configurable:true, get:() => bgImage, set:v => { bgImage = v; } });
-Object.defineProperty(window, "bindingSlot", { configurable:true, get:() => bindingSlot, set:v => { bindingSlot = v; } });
 window.buildSkinGrid = buildSkinGrid;
 window.buildSkinNow = buildSkinNow;
-Object.defineProperty(window, "caption", { configurable:true, get:() => caption, set:v => { caption = v; } });
-Object.defineProperty(window, "chart", { configurable:true, get:() => chart, set:v => { chart = v; } });
-Object.defineProperty(window, "chartDiff", { configurable:true, get:() => chartDiff, set:v => { chartDiff = v; } });
+/* fx.js は凍結扱いのため、同ファイルが読む5名のwindow別名は移行まで残す。 */
 Object.defineProperty(window, "chartMeta", { configurable:true, get:() => chartMeta, set:v => { chartMeta = v; } });
-Object.defineProperty(window, "chartMode", { configurable:true, get:() => chartMode, set:v => { chartMode = v; } });
 window.chartSummary = chartSummary;
 window.clampTvBlur = clampTvBlur;
 window.clampTvDim = clampTvDim;
 window.cleanTvParamFavorites = cleanTvParamFavorites;
-Object.defineProperty(window, "clock", { configurable:true, get:() => clock, set:v => { clock = v; } });
 window.closeSettings = closeSettings;
 window.ctx = ctx;
-Object.defineProperty(window, "currentLevel", { configurable:true, get:() => currentLevel, set:v => { currentLevel = v; } });
-Object.defineProperty(window, "currentSong", { configurable:true, get:() => currentSong, set:v => { currentSong = v; } });
 window.customSkinDefs = customSkinDefs;
 window.downloadBlob = downloadBlob;
 window.downloadJSON = downloadJSON;
-Object.defineProperty(window, "effects", { configurable:true, get:() => effects, set:v => { effects = v; } });
 window.el = el;
 window.emit = emit;
-Object.defineProperty(window, "errors", { configurable:true, get:() => errors, set:v => { errors = v; } });
 window.esc = esc;
 window.extOf = extOf;
-Object.defineProperty(window, "fingerprint", { configurable:true, get:() => fingerprint, set:v => { fingerprint = v; } });
 window.fmtDate = fmtDate;
 window.fmtTime = fmtTime;
 window.fontFamily = fontFamily;
@@ -1395,37 +1378,26 @@ window.keysLabel = keysLabel;
 window.laneCol = laneCol;
 window.laneColor = laneColor;
 window.laneName = laneName;
-Object.defineProperty(window, "lastMissT", { configurable:true, get:() => lastMissT, set:v => { lastMissT = v; } });
-Object.defineProperty(window, "levelOverride", { configurable:true, get:() => levelOverride, set:v => { levelOverride = v; } });
-Object.defineProperty(window, "loadToken", { configurable:true, get:() => loadToken, set:v => { loadToken = v; } });
-Object.defineProperty(window, "mediaName", { configurable:true, get:() => mediaName, set:v => { mediaName = v; } });
-Object.defineProperty(window, "mediaURL", { configurable:true, get:() => mediaURL, set:v => { mediaURL = v; } });
 window.modsUnranked = modsUnranked;
 window.mulberry32 = mulberry32;
-Object.defineProperty(window, "nextIdx", { configurable:true, get:() => nextIdx, set:v => { nextIdx = v; } });
 window.noteShape = noteShape;
 window.num = num;
 window.on = on;
 window.openSettings = openSettings;
 Object.defineProperty(window, "phase", { configurable:true, get:() => phase, set:v => { phase = v; } });
 window.pick = pick;
-Object.defineProperty(window, "practice", { configurable:true, get:() => practice, set:v => { practice = v; } });
 Object.defineProperty(window, "prefs", { configurable:true, get:() => prefs, set:v => { prefs = v; } });
-Object.defineProperty(window, "pressFlash", { configurable:true, get:() => pressFlash, set:v => { pressFlash = v; } });
-Object.defineProperty(window, "pressH", { configurable:true, get:() => pressH, set:v => { pressH = v; } });
 window.refreshSeedSecrets = refreshSeedSecrets;
 window.rememberMusicVolume = rememberMusicVolume;
 window.renderAllStatuses = renderAllStatuses;
 window.renderStatus = renderStatus;
 window.safeHttpUrl = safeHttpUrl;
 window.safeLink = safeLink;
-Object.defineProperty(window, "safeModeOn", { configurable:true, get:() => safeModeOn, set:v => { safeModeOn = v; } });
 window.safeName = safeName;
 window.saveCustomSkins = saveCustomSkins;
 window.saveUserPrefs = saveUserPrefs;
 window.savedSkinAtBoot = savedSkinAtBoot;
 /* screen は window.screen（ブラウザ標準）と同名のため、窓へは出さない（利用者の決定）。読むのは window.Trk.core.screen */
-Object.defineProperty(window, "seekDragging", { configurable:true, get:() => seekDragging, set:v => { seekDragging = v; } });
 window.setPhase = setPhase;
 window.setStatus = setStatus;
 window.settings = settings;
@@ -1445,16 +1417,16 @@ window.validCode = validCode;
 window.validPadBind = validPadBind;
 window.vctx = vctx;
 window.video = video;
-/* 後から読み込まれるファイルがこの名前を差し替える（window.videoFilter の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
-Object.defineProperty(window, "videoFilter", { configurable:true, get:() => videoFilter, set:v => { videoFilter = v; } });
 Object.defineProperty(window, "videoReady", { configurable:true, get:() => videoReady, set:v => { videoReady = v; } });
 window.view = view;
 window.windows = windows;
-/* 領域（window.Trk.core）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
+/* 領域（window.Trk.core）：コア状態の正規の場所。window直下の旧互換名は frozen js/fx.js が読む5件だけ。 */
 window.Trk = window.Trk || {};
 window.Trk.core = Object.assign(window.Trk.core || {}, { $, BEST_KEY, CAPTION_MS, CUSTOM_SKIN_MAX, KEY_PRESETS, PAD_DEFAULTS, SKIN_FORMAT, TRK_ENUM_VALUES, TV_PARAM_FAV_MAX, VIDEO_KEY_DEFAULTS, activeMascot, applyLanguage, applyNoteVars, baseName, buildSkinGrid, buildSkinNow, chartSummary, clampTvBlur, clampTvDim, cleanTvParamFavorites, closeSettings, ctx, customSkinDefs, downloadBlob, downloadJSON, el, emit, esc, extOf, fmtDate, fmtTime, fontFamily, formatKey, formatPadBind, fx, gameplayFxMultiplier, gameplayFxPower, hashString, idbStore, isPclMascot, keyCodeOf, keysLabel, laneCol, laneColor, laneName, modsUnranked, mulberry32, noteShape, num, on, openSettings, pick, refreshSeedSecrets, rememberMusicVolume, renderAllStatuses, renderStatus, safeHttpUrl, safeLink, safeName, saveCustomSkins, saveUserPrefs, savedSkinAtBoot, setPhase, setStatus, settings, showScreen, skin, slotLane, slotOfKey, stage, syncPickers, takeAmpReset, travelMs, updateChartButtons, updateKeyUI, updateTouchKeys, validCode, validPadBind, vctx, video, view, windows });
+/* catch.js／stage.js はこの正規アクセサを差し替える（旧window.activeMods別名はtrk90で廃止）。 */
 Object.defineProperty(window.Trk.core, "activeMods", { configurable:true, get:() => activeMods, set:v => { activeMods = v; } });
 Object.defineProperty(window.Trk.core, "analysis", { configurable:true, get:() => analysis, set:v => { analysis = v; } });
+/* stage.js は正規アクセサを差し替える（旧window.applySkin別名はtrk90で廃止）。 */
 Object.defineProperty(window.Trk.core, "applySkin", { configurable:true, get:() => applySkin, set:v => { applySkin = v; } });
 Object.defineProperty(window.Trk.core, "avatarHit", { configurable:true, get:() => avatarHit, set:v => { avatarHit = v; } });
 Object.defineProperty(window.Trk.core, "bgImage", { configurable:true, get:() => bgImage, set:v => { bgImage = v; } });

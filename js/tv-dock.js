@@ -168,15 +168,15 @@ function applyTvSkinVars(node, id) {
   if (node.classList.contains("tvCustom")) clearTvVars(node);
 }
 
-if (typeof prefs !== "undefined") {
+if (core.prefs && typeof core.prefs === "object") {
   if (!core.prefs.tvFavSeeded) {
     const cur = Array.isArray(core.prefs.tvFav) ? core.prefs.tvFav : [];
     core.prefs.tvFav = [...DEFAULT_TV_FAV, ...cur.filter(id => !DEFAULT_TV_FAV.includes(id))];
   }
   // 既存の保存値を settings に反映（core.js の settings は既に存在）
   // 🛟 ただし ?safe=1（セーフモード）のときは読み戻さない。core.js が入れた「TVは映画館・映像OFF」を守る
-  const keepSafe = (typeof safeModeOn !== "undefined") && core.safeModeOn;
-  if (typeof settings !== "undefined" && !keepSafe) {
+  const keepSafe = core.safeModeOn === true;
+  if (!keepSafe) {
     core.settings.tvDockSkin = pick(core.prefs.tvDockSkin, Object.keys(TV_DOCK_SKINS), "cinema");
     core.settings.tvDockFive = !!core.prefs.tvDockFive;
     core.settings.tvDockOpen = core.prefs.tvDockOpen !== false;   /* 既定は開いた状態 */
@@ -199,7 +199,7 @@ if (typeof prefs !== "undefined") {
 }
 
 // settings がまだ無い場合の保険
-if (typeof settings !== "undefined") {
+if (core.settings) {
   core.settings.tvDockSkin = hasTvSkin(core.settings.tvDockSkin) ? core.settings.tvDockSkin : "cinema";
   core.settings.tvDockFive = !!core.settings.tvDockFive;
   core.settings.tvDockOpen = !!core.settings.tvDockOpen;
@@ -222,7 +222,7 @@ try {
   requestedTvSkin = window.__trkPendingTvDockSkin || "";
   delete window.__trkPendingTvDockSkin;
 } catch (_) {}
-if (typeof settings !== "undefined" && !(typeof safeModeOn !== "undefined" && core.safeModeOn) && hasTvSkin(requestedTvSkin)) {
+if (core.settings && !core.safeModeOn && hasTvSkin(requestedTvSkin)) {
   core.settings.tvDockSkin = requestedTvSkin;
   core.saveUserPrefs();
 }
@@ -567,7 +567,7 @@ function tvMatches(p, q) {
 
 /* ============ videoFilter を包む（既存の背景の暗さ・ぼかしも含める） ============ */
 let baseVideoFilter = null;
-if (typeof videoFilter === "function") baseVideoFilter = core.videoFilter;
+if (typeof core.videoFilter === "function") baseVideoFilter = core.videoFilter;
 
 function currentTvPreset() {
   return tvPresetById(core.settings.videoStyle) || null;
@@ -605,12 +605,8 @@ function newVideoFilter() {
   return parts.join(" ") || "none";
 }
 
-// 上書き
-if (typeof window !== "undefined") {
-  window.videoFilter = newVideoFilter;
-  // core.js の videoFilter 参照も上書き（同じスコープなら）
-  try { core.videoFilter = newVideoFilter; } catch (_) {}
-}
+// 正規の core accessor を差し替える（旧window.videoFilter別名はtrk90で廃止）。
+core.videoFilter = newVideoFilter;
 
 /* ============ drawVideo を包んでオーバーレイを描く ============ */
 // Textures are drawn locally with Canvas; no image assets, LUTs or vendor presets are loaded.
@@ -863,7 +859,7 @@ function wrappedDrawVideo() {
   if (base.off) return;
 
   // 映像が無いときは砂嵐を出す（プレイ中以外）
-  if (typeof videoReady !== "undefined" && !core.videoReady) {
+  if (!core.videoReady) {
     const t = performance.now();
     // 背景が何も描かれていない場合のみ砂嵐（bgImageも無い）
     if (!core.bgImage || !core.bgImage.naturalWidth) {

@@ -104,9 +104,8 @@ describe("新方式（chartGen 2）", () => {
   });
 
   test("音量の差が大きい曲では、静かな区間の方が密度が低い（係数と絶対音量ゲートの両方が効く）", () => {
-    // 係数だけなら 小さい区間÷大きい区間 ≒ 0.7 ÷ 1.3 ≒ 0.54 になる。絶対音量ゲート（静かな区間は候補の25%）が
-    // その上に効くので、実測は約 0.22〜0.24（初級・中級）。方向（0.7 以下）と、下がりすぎない下限（0.15）を見る。
-    // 上級以上は元の密度が高く、盛り上がりの区間が候補の100%で頭打ちになるので、ここでは初級・中級だけで判定する。
+    // 係数だけなら 小さい区間÷大きい区間 ≒ 0.7 ÷ 1.3 ≒ 0.54 になる。絶対音量ゲートは上級の25%を基準に、
+    // 難易度の density に比例して上限を調整する。初級・中級でも静かな側が十分低く、かつゼロにはならないことを見る。
     for (const diff of ["easy", "normal"]) {
       const notes = generate("contrast", { diff, chartGen: "2" });
       const ratio = perSec(notes, 0, 16) / perSec(notes, 96, 120);
@@ -114,13 +113,22 @@ describe("新方式（chartGen 2）", () => {
     }
   });
 
-  test("絶対音量ゲート：静かな長い区間（contrast の 0〜90秒）は、上級・名人でも密度の上限を超えない", () => {
-    // 局所正規化だけだと、音量の小さい区間もその区間では普通の音量として扱われ、ほぼ満密度になっていた（修正前は 3.9 nps・Lv 10）。
-    // 絶対音量ゲート（CG_QUIET_REL・CG_QUIET_CAP）で候補数を 25% に絞る。修正後は約 2.5 nps。
-    for (const diff of ["hard", "master"]) {
+  test("静かな長い曲では、難易度のdensityに応じて静かな区間の上限も増える", () => {
+    // 以前は上級・達人とも静かな区間が候補の25%、盛り上がりが候補の100%で頭打ちになり、459ノーツで一致した。
+    // contrast は上の難易度にも候補の余地が残るため、ノーツ数が厳密に増えることを検査する。
+    assert.equal(DIFFS.hard.density, 0.60, "chart-gen の静かな上限の基準は DIFFS.hard.density と揃える");
+    const counts = DIFF_IDS.map(diff => generate("contrast", { diff, chartGen: "2" }).length);
+    for (let i = 1; i < counts.length; i++) {
+      assert.ok(counts[i] > counts[i - 1], `${DIFF_IDS[i - 1]}=${counts[i - 1]} !< ${DIFF_IDS[i]}=${counts[i]}`);
+    }
+  });
+
+  test("絶対音量ゲート：静かな長い区間（contrast の 0〜90秒）も、上級・達人で満密度にはならない", () => {
+    // 上級（25%）は約2.5 nps、達人（約34%）は約3.1 nps。どちらも旧来の満密度（約7.9 nps）より低い。
+    for (const [diff, maxNps] of [["hard", 3.0], ["master", 3.5]]) {
       const notes = generate("contrast", { diff, chartGen: "2" });
       const quiet = perSec(notes, 0, 90);
-      assert.ok(quiet <= 3.0, `${diff}: 静かな区間 ${quiet.toFixed(2)} nps`);
+      assert.ok(quiet <= maxNps, `${diff}: 静かな区間 ${quiet.toFixed(2)} nps > ${maxNps}`);
       assert.ok(quiet > 0, `${diff}: 静かな区間にも全く置かないのは行き過ぎ`);
     }
   });

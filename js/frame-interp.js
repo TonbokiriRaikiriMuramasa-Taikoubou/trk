@@ -659,7 +659,7 @@ let rvfcOn = false;
 function tick() {
   raf = 0;
   if (mode() === "off" || surfaces.size === 0) { stopLoop(); return; }
-  const ready = !!(typeof videoReady !== "undefined" && core.videoReady) && !!videoEl.src && !!(videoEl.videoWidth);
+  const ready = !!core.videoReady && !!videoEl.src && !!(videoEl.videoWidth);
   if (!ready) { raf = requestAnimationFrame(tick); return; }
   if (!ensureSizes()) { raf = requestAnimationFrame(tick); return; }
   if (!videoEl.paused && newFrameArrived()) {
@@ -718,7 +718,7 @@ function drawTo(ctx, w, h) {
   if (mode() === "off" || !ok2) return false;
   if (!w || !h || !W || !H) return false;
   if (!havePair) return false;
-  if (typeof videoReady !== "undefined" && !core.videoReady) return false;
+  if (!core.videoReady) return false;
   const now = performance.now();
   let t = (now - pairAt) / Math.max(8, pairInterval);
   t = Math.min(1, Math.max(0, t));

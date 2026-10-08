@@ -1628,7 +1628,7 @@ try {
 }
 
 /* 差し替えの回帰（名前空間 B の欠陥の再発防止）：後から読み込まれるファイルが代入で上書きする関数は、
-   窓の名前をアクセサ（get/set）で持つ。値のコピーだと、ファイル内部の呼び出しに差し替えが届かない。 */
+   正規の公開先（window.Trk.core等）をアクセサ（get/set）で持つ。値のコピーだと内部呼び出しへ届かない。 */
 const PATCHED_FUNCTIONS = {
   "js/core.js": ["activeMods", "applySkin", "videoFilter"],
   "js/custom.js": ["installPackFile", "sanitizeSong", "getPackSongs", "renderPackList"],
@@ -1639,12 +1639,13 @@ const PATCHED_FUNCTIONS = {
 };
 for (const [rel, name] of Object.entries(PATCHED_FUNCTIONS).flatMap(([r, ns]) => ns.map(n => [r, n]))) {
   const owner = exists(rel) ? read(rel) : "";
-  const accessor = new RegExp(`Object\\.defineProperty\\(window, "${name}", \\{[^}]*get:\\(\\) => ${name}, set:v => \\{ ${name} = v; \\} \\}\\)`);
+  const accessorTarget = rel === "js/core.js" ? "window\\.Trk\\.core" : "window";
+  const accessor = new RegExp(`Object\\.defineProperty\\(${accessorTarget}, "${name}", \\{[^}]*get:\\(\\) => ${name}, set:v => \\{ ${name} = v; \\} \\}\\)`);
   const patchedElsewhere = walk(path.join(root, "js")).filter(f => f.endsWith(".js") && path.relative(root, f) !== rel)
     .some(f => new RegExp(`^\\s*(?:window\\.(?:Trk\\.[\\w]+\\.)?)?${name} = (?:async )?(?:function|\\(|[A-Za-z_$][\\w$]* =>|[A-Za-z_$][\\w$]*;)`, "m").test(read(path.relative(root, f))));
   if (!patchedElsewhere) fail(`${name}: no later file overrides it (remove it from PATCHED_FUNCTIONS if this is intended)`);
-  else if (!accessor.test(owner)) fail(`${name} is overridden by a later file but ${rel} does not expose it as a window accessor`);
-  else ok(`${name} override reaches internal calls (window accessor in ${rel})`);
+  else if (!accessor.test(owner)) fail(`${name} is overridden by a later file but ${rel} does not expose it as a ${rel === "js/core.js" ? "Trk.core" : "window"} accessor`);
+  else ok(`${name} override reaches internal calls (${rel === "js/core.js" ? "Trk.core" : "window"} accessor in ${rel})`);
 }
 
 /* 名前空間 D：領域の公開名は window.Trk.<領域> にも載る（旧名 window.X は別名として残す）。
@@ -1728,22 +1729,34 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   else ok("アドオンの api の鍵（" + keys.length + "件）は docs/ADDONS.md に全て載っている");
 }
 
-/* 廃止予定の互換名：js/core.js が window 直下に出す互換名（defineProperty(window, "名前")）と、
-   docs/ADDONS.md の「廃止予定の互換名」の一覧が一致すること。対象外（_trkStudyRoomOpen＝fx.js が読む）は除く。
-   増やした・減らした一方だけを変えると落ちる。 */
+/* 互換名の段階的廃止：現存する window 別名・今回外した名前・Trk.core の正規 accessor を照合。
+   fx.js が凍結中の5名を読むため、その5名だけは移行後まで保留する。 */
 {
   const coreSrc = fs.readFileSync(path.join(root, "js/core.js"), "utf8");
+  const fxSrc = fs.readFileSync(path.join(root, "js/fx.js"), "utf8");
   const exempt = new Set(["_trkStudyRoomOpen"]);
   const actual = [...coreSrc.matchAll(/defineProperty\(window, "([A-Za-z_$][\w$]*)"/g)].map(m => m[1]).filter(n => !exempt.has(n));
   const docs = fs.readFileSync(path.join(root, "docs/ADDONS.md"), "utf8");
-  const sec = (docs.match(/### 廃止予定の互換名[\s\S]*?(?=\n## |\n### )/) || [""])[0];
-  const target = (sec.match(/^- 対象：(.*)$/m) || [, ""])[1];   /* 一覧は「- 対象：」の行にだけ書く */
-  const listed = [...target.matchAll(/`([A-Za-z_$][\w$]*)`/g)].map(m => m[1]).filter(n => !exempt.has(n));
-  const onlyCode = actual.filter(n => !listed.includes(n));
-  const onlyDocs = [...new Set(listed)].filter(n => !actual.includes(n));
-  if (!sec) fail("docs/ADDONS.md に「廃止予定の互換名」の節がありません");
-  else if (onlyCode.length || onlyDocs.length) fail("廃止予定の互換名が一致しません（core.js にだけ: " + onlyCode.join(", ") + " ／ 文書にだけ: " + onlyDocs.join(", ") + "）");
-  else ok("廃止予定の互換名（" + actual.length + "件）は core.js と docs/ADDONS.md で一致");
+  const sec = (docs.match(/### 互換名の廃止状況[\s\S]*?(?=\n## |\n### )/) || [""])[0];
+  const removedLine = (sec.match(/^- \*\*trk90で廃止（28件）：\*\*(.*)$/m) || [, ""])[1];
+  const retainedLine = (sec.match(/^- \*\*現存（5件）：\*\*(.*)$/m) || [, ""])[1];
+  const removed = [...removedLine.matchAll(/`([A-Za-z_$][\w$]*)`/g)].map(m => m[1]);
+  const retained = [...retainedLine.matchAll(/`([A-Za-z_$][\w$]*)`/g)].map(m => m[1]);
+  const former = `activeMods analysis applySkin avatarHit bgImage bindingSlot caption chart chartDiff chartMeta chartMode clock currentLevel currentSong effects errors fingerprint lastMissT levelOverride loadToken mediaName mediaURL nextIdx phase practice prefs pressFlash pressH safeModeOn seekDragging stats videoFilter videoReady`.split(" ");
+  const coreMembers = new Set([...coreSrc.matchAll(/defineProperty\(window\.Trk\.core, "([A-Za-z_$][\w$]*)"/g)].map(m => m[1]));
+  const currentSorted = [...new Set(actual)].sort();
+  const retainedSorted = [...new Set(retained)].sort();
+  const formerSorted = [...former].sort();
+  const accountedSorted = [...new Set([...removed, ...retained])].sort();
+  const expectedRetained = ["chartMeta", "phase", "prefs", "stats", "videoReady"];
+  const missingCore = former.filter(n => !coreMembers.has(n));
+  const missingFrozenConsumer = expectedRetained.filter(n => !new RegExp(`(?<![\\w$.])${n}(?![\\w$])`).test(fxSrc));
+  if (!sec) fail("docs/ADDONS.md に「互換名の廃止状況」の節がありません");
+  else if (JSON.stringify(currentSorted) !== JSON.stringify(retainedSorted)) fail("現存する core.js のwindow別名と docs/ADDONS.md の現存一覧が不一致");
+  else if (JSON.stringify(accountedSorted) !== JSON.stringify(formerSorted) || removed.length !== 28 || retained.length !== 5) fail("trk90廃止分と保留分が、従来の33互換名を重複なく網羅していません");
+  else if (missingCore.length) fail("廃止済み／保留の名前が window.Trk.core にありません: " + missingCore.join(", "));
+  else if (JSON.stringify(retainedSorted) !== JSON.stringify([...expectedRetained].sort()) || missingFrozenConsumer.length) fail("保留する5名は frozen js/fx.js の実際の読者と一致しません");
+  else ok("互換名: 28件を廃止、frozen js/fx.js の5件を保留（Trk.core は全33件を維持）");
 }
 
 /* 項目 5（README の分割）：README は概要に絞る（上限 12KB）。docs/guide/ の全ファイルは目次（index.md）に載せる。 */

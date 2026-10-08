@@ -47,14 +47,13 @@ trk! 本体には入れられない機能を、あとから足せるしくみで
 - 本体の内部イベント。`api.on` で拾えるものでも、§3「イベント」の表に無いものは保証の対象外です（`beforeLoad`・`beforePlay`・`chart`・`options`・`phase`・`records`・`screen`・`settings`・`studyCoverChanged` など）。
 - `window.screen` は、ブラウザ標準のものです。本体は上書きしません（以前は一部の版で隠していました）。
 
-### 廃止予定の互換名（window 直下の 33 件）
+### 互換名の廃止状況（window 直下）
 
-`js/core.js` は、旧来の大域名（`window.activeMods`・`window.chart` など）を `window.Trk.core.*` への別名として残しています。これらは**廃止予定**です。
+`window.Trk.core.*` がコア状態の正規名ですが、これは本体内部の整理先で、安定したアドオン API ではありません。旧来の 33 個の `window` 直下の別名は、公開版を2回重ねて削除する予定（trk76 で予告、trk78 以降）でしたが、trk89 時点で期限を過ぎていました。consumer を調べ、trk90 で安全に外せる 28 件を削除しました。アドオンは削除済みの名前を使わず、§3〜§5 の `api` を使ってください。必要な公開機能がなければ Issue で相談してください。
 
-- **予告：trk76（2026-10-08）から。** この版以降、アドオンはこれらの名前に頼らないでください。`window.Trk.core.<名前>` か、§3〜§5 の `api` を使います。
-- **削除：trk76 から数えて公開版をさらに2回重ねたあと**（trk78 以降の版。利用者の決定 2026-10-08）に取り除きます。削除する版の `sw.js` のキャッシュ名と、本書の「最近の変更」に明記します。
-- 対象：`activeMods` `analysis` `applySkin` `avatarHit` `bgImage` `bindingSlot` `caption` `chart` `chartDiff` `chartMeta` `chartMode` `clock` `currentLevel` `currentSong` `effects` `errors` `fingerprint` `lastMissT` `levelOverride` `loadToken` `mediaName` `mediaURL` `nextIdx` `phase` `practice` `prefs` `pressFlash` `pressH` `safeModeOn` `seekDragging` `stats` `videoFilter` `videoReady`（33件）。
-- **対象外（当面残す）**：`_trkStudyRoomOpen`（読み取り専用）。`js/fx.js` は凍結されていて書き換えないため、fx.js がこの名前を読まなくなるまで残します。
+- **trk90で廃止（28件）：** `activeMods` `analysis` `applySkin` `avatarHit` `bgImage` `bindingSlot` `caption` `chart` `chartDiff` `chartMode` `clock` `currentLevel` `currentSong` `effects` `errors` `fingerprint` `lastMissT` `levelOverride` `loadToken` `mediaName` `mediaURL` `nextIdx` `practice` `pressFlash` `pressH` `safeModeOn` `seekDragging` `videoFilter`
+- **現存（5件）：** `chartMeta` `phase` `prefs` `stats` `videoReady`。これらは frozen `js/fx.js` が裸のグローバルとして読むため、fx.js を移行するまで保留します。削除時期は fx.js の移行リリースに合わせます（現時点で別の固定リリースは決めません）。
+- **対象外（当面残す）：** `_trkStudyRoomOpen`（読み取り専用）。`js/fx.js` が読む既存の互換フラグで、33件の一覧には含めません。
 
 > 作者向けの近道：`api` と `TrkAddons` だけで書けない機能が必要になったら、本体の内部に頼る前に、Issue で「どの窓口がほしいか」を書いてください。
 

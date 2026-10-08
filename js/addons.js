@@ -221,7 +221,7 @@ const safeNow = () => {
     return sp.has("safe") || sp.get("safe") === "1" || (u.hash || "").toLowerCase().includes("safe") || sp.has("factory");
   } catch (_) { return false; }
 };
-const appPhase = () => (typeof phase === "string" ? core.phase : "");
+const appPhase = () => (typeof core.phase === "string" ? core.phase : "");
 
 /* ============ 置き場所（アドオンがUIを足せる場所） ============ */
 function mountSlots() {

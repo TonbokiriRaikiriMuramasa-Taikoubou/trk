@@ -1405,7 +1405,7 @@ const loadMotionFile = (file, opts) => enqueue(() => doLoadMotion(file, opts));
 /* モーションの速さ：曲のBPM ÷ モーションの基準BPM。
    基準BPM（mmdBpm）が 0 のときは、内蔵モーションは自分の bpm で曲に自動シンク（持ち込みVMDは固定のまま）。
    👀 fixed:true のモーションと、🎲おまかせで選ばれた fixed は、いつも等速 */
-const songBpm = () => (typeof chartMeta !== "undefined" && core.chartMeta && core.chartMeta.bpm) || 0;
+const songBpm = () => (core.chartMeta && core.chartMeta.bpm) || 0;
 function motionRate() {
   const cur = BUILTIN[motionKind === "auto" ? autoId : motionKind];
   if (cur && cur.fixed) return 1;
@@ -1442,11 +1442,11 @@ function animate(now) {
   }
   /* 🪶 軽量化：3Dマスコットの描画レートを下げる／「描画しない」ときは何も描かない */
   const mascotOff = typeof TrkLite === "object" && TrkLite.noMascot("mmd");
-  playing = !!model && phase !== "title" && core.activeMascot() === "mmd" && !mascotOff;
+  playing = !!model && core.phase !== "title" && core.activeMascot() === "mmd" && !mascotOff;
   canvas.hidden = !playing;
   const panel = core.$("mmdPanel");
-  const previewOn = !!model && !mascotOff && phase === "title" && core.screen === "settings" && !!panel && panel.open && !!prev;
-  const quickOn = !!model && !mascotOff && phase === "title" && core.screen === "select" && core.settings.mmdQuickUI !== false && core.activeMascot() === "mmd" && !!quickPreview && !safeNow();
+  const previewOn = !!model && !mascotOff && core.phase === "title" && core.screen === "settings" && !!panel && panel.open && !!prev;
+  const quickOn = !!model && !mascotOff && core.phase === "title" && core.screen === "select" && core.settings.mmdQuickUI !== false && core.activeMascot() === "mmd" && !!quickPreview && !safeNow();
   if (!playing && !previewOn && !quickOn) { lastT = now; return; }
   if (typeof TrkLite === "object" && !TrkLite.mascotAllow("mmd", now)) return;
   const dt = Math.min(0.1, Math.max(0.001, (now - lastT) / 1000)); lastT = now;

@@ -221,9 +221,9 @@ const THEME_SWATCH = Object.assign(Object.create(null), {
   volcano:"linear-gradient(90deg,#ff3d00,#ff9100)", marine:"linear-gradient(90deg,#0ea5e9,#065f7a)",
   gameboy:"linear-gradient(90deg,#9bbc0f,#0f380f)", synth:"linear-gradient(90deg,#ff2d95,#7c3aed,#ff9e00)"
 });
-const specSafe = (typeof safeModeOn !== "undefined") && core.safeModeOn;
+const specSafe = core.safeModeOn === true;
 /* 🛟 セーフモードのときは、保存値を読み戻さない（core.js が入れた「表示しない」を守る） */
-if (typeof prefs !== "undefined" && !specSafe) {
+if (core.prefs && !specSafe) {
   core.settings.specOn    = core.prefs.specOn !== false;                                  // 表示する（初期オン）
   /* v1 の頃の初期値（bars）がそのまま残っているときだけ、新しい初期値（ring）へ一度だけ移す。
      （v2 以降は specSkin が保存に入るので、自分で選んだ bars はそのまま残ります） */
@@ -312,7 +312,7 @@ function rms01(a) {
   return Math.min(1, Math.sqrt(s / Math.max(1, c)) * 2.4);
 }
 function bpmNow() {
-  const b = (typeof chartMeta !== "undefined" && core.chartMeta && core.chartMeta.bpm) ? core.chartMeta.bpm : 0;
+  const b = core.chartMeta && core.chartMeta.bpm ? core.chartMeta.bpm : 0;
   return b > 0 ? Math.round(b) : 0;
 }
 /* 帯ごとの履歴（リングバッファ）。st[key + "I"] が「次に書く場所」＝いちばん古い場所 */
@@ -1158,7 +1158,7 @@ function reducedMotion() {
   try { return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); } catch (_) { return false; }
 }
 
-const isSafe = () => (typeof safeModeOn !== "undefined" && core.safeModeOn) || (typeof window.TrkSafeMode === "function" && window.TrkSafeMode());
+const isSafe = () => core.safeModeOn === true || (typeof window.TrkSafeMode === "function" && window.TrkSafeMode());
 /* 🪶 軽量化モード中は、音を見るアナライザーも描画も止める（設定の liteSpectrumOff で戻せます） */
 const liteOff = () => typeof TrkLite === "object" && TrkLite.specBlocked();
 const specLive = () => core.settings.specOn && !isSafe() && !liteOff();

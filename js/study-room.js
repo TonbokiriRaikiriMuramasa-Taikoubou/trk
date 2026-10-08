@@ -1905,7 +1905,7 @@ async function studyRefreshTV() {
   if (!studyRoomOpen || !studyCurrentBook || !studyPrefs.tvEnabled || studyPrefs.tvPosition === "off") return;
   const song = core.currentSong;
   core.$("studyTvLabel").textContent = song ? (song.title || song.key) : "";
-  const hasVideo = !!(typeof videoReady !== "undefined" && core.videoReady && core.video.videoWidth > 0 && core.video.videoHeight > 0 && core.settings.videoStyle !== "off");
+  const hasVideo = !!(core.videoReady && core.video.videoWidth > 0 && core.video.videoHeight > 0 && core.settings.videoStyle !== "off");
   if (hasVideo) { studySetTVVisible(true, false); return; }
   let blob = null;
   if (song && window.TrkStudyRoom) blob = await studyGetSongCoverBlob(song.key);

@@ -3,8 +3,8 @@
   "scripts": 45,
   "windowProps": 211,
   "duplicates": 0,
-  "declarations": 189,
-  "private": 61,
+  "declarations": 188,
+  "private": 60,
   "public": 128
  },
  "files": [
@@ -264,8 +264,8 @@
   },
   {
    "file": "js/fx-dock.js",
-   "decls": 1,
-   "private": 1,
+   "decls": 0,
+   "private": 0,
    "public": []
   },
   {

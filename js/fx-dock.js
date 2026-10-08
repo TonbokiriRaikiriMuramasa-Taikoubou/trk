@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ==========================================================================
    trk! fx-dock.js — 🎛 さわれるエフェクト本体（メイン画面の曲リストの下）
@@ -982,3 +983,4 @@ addEventListener("DOMContentLoaded", () => {
 });
 })();
 /* ✅ fx-dock.js 完了 */
+})();

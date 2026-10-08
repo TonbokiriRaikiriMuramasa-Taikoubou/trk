@@ -119,6 +119,16 @@ node tools/smoke-browser.mjs --compare
 - 検査：`tools/check-repo.mjs` の `PATCHED_FUNCTIONS`（14 件）に「窓のアクセサ」の検査を追加。アクセサを値のコピーへ戻すと失敗することを確認（逆テスト）。
 - D 段階の規則：差し替えられる名前（`名前 = …`・`window.名前 = …`・`名前++`・for-in/of の左辺で、宣言していないファイルから触られるもの）は、Trk と窓の両方をアクセサにする。凍結の `js/fx.js` は書き換えず、窓のアクセサで届く。
 
+### D の進捗（領域ごと。利用者の承認：「Dを領域ごとですね〜」）
+
+各段階：`node --check`・`npm run check`・`npm test`・スモーク `--compare`・`git diff --check`・`sw.js` を上げる・`tools/check-repo.mjs` の登録検査（`TRK_REGISTRARS`）。書き換えは AST（acorn）で判定し、凍結（`js/fx.js`・`js/fx-presets.js`）は書き換えない。
+
+| 領域 | 登録元 | 登録（window.Trk.領域） | 書き換え（件数） | sw.js | 結果 |
+|---|---|---|---|---|---|
+| chart | `js/chart-gen.js` | `buildChartNotes`・`cgEstimateLevel`・`cgAllocate`（値のコピー） | 2（`js/media.js`） | trk57 | 登録検査は、登録の無い HEAD で失敗（確認）→ 適用後に通る。1 名だけ抜いた逆テストで失敗（確認）。スモーク OK（未解決 0・譜面 10 件一致） |
+
+残りの領域（pad・lite・main・custom・library・media・data・play・modes・core）は未着手。HANDOFF §7 の実機確認は別途。
+
 ## 4. 止める条件
 
 - スモーク `--compare` が NG で、原因が説明できない。

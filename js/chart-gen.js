@@ -369,4 +369,7 @@ function cgEstimateLevel(notes) {
 window.buildChartNotes = buildChartNotes;
 window.cgEstimateLevel = cgEstimateLevel;
 window.cgAllocate = cgAllocate;
+/* 領域（window.Trk.chart）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
+window.Trk = window.Trk || {};
+window.Trk.chart = Object.assign(window.Trk.chart || {}, { buildChartNotes, cgEstimateLevel, cgAllocate });
 })();

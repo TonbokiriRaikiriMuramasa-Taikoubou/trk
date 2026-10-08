@@ -118,14 +118,14 @@ const CHART_FILE_MAX = 2 * 1024 * 1024;   // docs/pack-format.md の譜面JSON�
 /* 譜面の難易度表示。本体の式は js/chart-gen.js（cgEstimateLevel）。ここでは levelOverride（譜面パックの指定）だけを見る */
 function estimateLevel(notes) {
   if (levelOverride) return levelOverride;
-  return cgEstimateLevel(notes);
+  return window.Trk.chart.cgEstimateLevel(notes);
 }
 /* ゲームの状態を変えずに譜面だけを作る（曲パックの書き出しでも使う）。
    作り方は chartGen（設定 settings.chartGen／既定 "1" = 旧方式）。中身は js/chart-gen.js の純関数。 */
 function generateNotes(diff, bpm, offset, seed, chartGen = settings.chartGen) {
   if (!videoReady || !(bpm >= 60 && bpm <= 300) || !DIFF_IDS.includes(diff)) return [];
   const rand = mulberry32(hashString(`${String(seed).trim()}|${diff}|${bpm}|${offset}`));
-  return buildChartNotes({ analysis, durationMs: video.duration * 1000, diff, spec: DIFFS[diff], bpm, offset, rand, chartGen });
+  return window.Trk.chart.buildChartNotes({ analysis, durationMs: video.duration * 1000, diff, spec: DIFFS[diff], bpm, offset, rand, chartGen });
 }
 function buildChart() {
   if (!videoReady) return;

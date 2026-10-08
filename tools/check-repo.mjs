@@ -1633,5 +1633,25 @@ for (const [rel, name] of Object.entries(PATCHED_FUNCTIONS).flatMap(([r, ns]) =>
   else ok(`${name} override reaches internal calls (window accessor in ${rel})`);
 }
 
+/* 名前空間 D：領域の公開名は window.Trk.<領域> にも載る（旧名 window.X は別名として残す）。
+   登録元の包みの末尾に、窓へ出している名前（window.X = X・defineProperty(window, …)）がすべて
+   window.Trk.<領域> の登録に入っていることを確かめる。登録が無い・抜けると失敗する。 */
+const TRK_REGISTRARS = {
+  "js/chart-gen.js": "chart",
+};
+const TRK_NOT_REGISTERED = { "js/core.js": ["_trkStudyRoomOpen"] }; // 互換の読み取り専用アクセサ（宣言ではない）
+for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
+  const src = exists(rel) ? read(rel) : "";
+  const exported = [
+    ...[...src.matchAll(/^window\.([A-Za-z_$][\w$]*) = \1;/gm)].map(m => m[1]),
+    ...[...src.matchAll(/^Object\.defineProperty\(window, "([^"]+)"/gm)].map(m => m[1]),
+  ].filter(n => !(TRK_NOT_REGISTERED[rel] || []).includes(n));
+  const tail = src.slice(src.indexOf(`window.Trk.${area} = `));
+  const missing = exported.filter(n => !new RegExp(`[{,]\\s*${n.replace(/\$/g, "\\$")}\\s*[,}]|window\\.Trk\\.${area}, "${n.replace(/\$/g, "\\$")}"`).test(tail));
+  if (src.indexOf(`window.Trk.${area} = `) < 0) fail(`${rel}: window.Trk.${area} is not registered`);
+  else if (missing.length) fail(`${rel}: not registered under window.Trk.${area}: ${missing.join(", ")}`);
+  else ok(`${rel} registers ${exported.length} public name(s) under window.Trk.${area}`);
+}
+
 console.log(`\nStatic check: ${failures ? "FAILED" : "passed"} · ${failures} failure(s) · ${warnings} warning(s)`);
 if (failures) process.exitCode = 1;

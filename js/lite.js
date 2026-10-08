@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ 🪶 軽量化（スマホ・タブレット・アプリ「PWA／APK」向け） ============
    ・設定（⚙）の右下「🪶 軽量化（スマホ向け）」の欄から操作します。保存先はいつもの
@@ -312,3 +313,10 @@ window.TrkLite = Object.freeze({
   fps: liteFpsValue, mascotFps: liteMascotFpsValue, scale: liteScaleValue,
   info: () => ({ ...liteInfo }), probe: liteProbe, sync: liteSyncUI
 });
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.liteLibRows = liteLibRows;
+window.liteNoAnalyze = liteNoAnalyze;
+window.liteMascotNoLoad = liteMascotNoLoad;
+window.liteSyncUI = liteSyncUI;
+})();

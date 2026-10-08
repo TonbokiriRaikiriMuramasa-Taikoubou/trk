@@ -54,7 +54,7 @@ node tools/smoke-browser.mjs --compare
 | 段階 | 内容 | 公開名 | 状態 |
 |---|---|---|---|
 | A 準備 | 棚卸し・スモーク基準・字句処理の検査・計画 | 変えない | 完了 |
-| B 非公開を包む | 他から使われない名前だけを即時関数で包む。公開名は大域のまま | 変えない | 着手 |
+| B 非公開を包む | 他から使われない名前だけを即時関数で包む。公開名は大域のまま（据え置きは `window.NAME = NAME`） | 変えない | 進行中（3 ファイル完了） |
 | C 旗を集約 | `window._trk*Open` などを `window.Trk` 配下の一つの関数・状態へ | 読み手を書き換える | 未着手 |
 | D 公開名を移す | 公開名を `window.Trk.<領域>` へ移し、呼び出し側を書き換える（領域ごと） | 段階的 | 未着手 |
 | E 文書化 | `docs/ADDONS.md` に、アドオンが使ってよい公開 API を明記 | — | 未着手 |
@@ -82,6 +82,7 @@ node tools/smoke-browser.mjs --compare
 | 0 | （準備の時点） | 1169 | 316 | 基準 `40122ea` |
 | 1 | `js/study-room.js` を即時関数で包む（公開は `window.TrkStudyRoom` のまま） | 927 | 316 | スモーク OK。window から消えた `study*` 関数は他から使われていないもの（報告のみ） |
 | 2 | `js/tv-rich.js`（公開 0）・`js/pad.js`（公開 2：`padBack`・`updatePadUI`）を包む。pad の 2 件は末尾で `window.padBack = padBack;` のように据え置く | 881 | 314（うち 2 件は window 経由に移った） | スモーク OK。`check-security.mjs` の M-03 検査は、包みの先頭を外して同じ関数を動かすように直した（検査の中身は同じ） |
+| 3 | `js/lite.js`（公開 4：`liteLibRows`・`liteNoAnalyze`・`liteMascotNoLoad`・`liteSyncUI` を据え置き）を包む | 839 | 310 | スモーク OK。`check-lite.mjs` は、包みを外して評価するように直した（120 件すべて通過） |
 
 ## 4. 止める条件
 

@@ -51,7 +51,9 @@ function emit(){}
 function plToast(t){ toasts.push(t); }
 `;
 /* liteInit() は設定画面の DOM を配線する関数なので、評価だけさせて呼ばない（IDの網羅は下の静的検査で見張る） */
-let body = liteSource.replace(/\nliteInit\(\);\n/, "\n/* liteInit() is wired against the real DOM; skipped here */\n");
+/* 即時関数で包まれていても、中の名前を同じ方法で取り出す（包みの先頭と末尾だけを外す） */
+let body = liteSource.replace(/^\(\(\) => \{\n/, "").replace(/\}\)\(\);\s*$/, "");
+body = body.replace(/\nliteInit\(\);\n/, "\n/* liteInit() is wired against the real DOM; skipped here */\n");
 assert.notEqual(body, liteSource, "js/lite.js still calls liteInit() at the end");
 body = "var __exports = null;\n" + body + `
 ;__exports = { liteActive, liteAllow, liteAllowGame, liteMascotAllow, liteNoMascot, liteSpecBlocked, liteBlurCap,

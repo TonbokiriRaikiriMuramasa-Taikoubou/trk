@@ -1,11 +1,11 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 40,
+  "windowProps": 44,
   "duplicates": 0,
-  "declarations": 881,
-  "private": 567,
-  "public": 314
+  "declarations": 839,
+  "private": 529,
+  "public": 310
  },
  "files": [
   {
@@ -205,14 +205,9 @@
   },
   {
    "file": "js/lite.js",
-   "decls": 42,
-   "private": 38,
-   "public": [
-    "liteLibRows",
-    "liteMascotNoLoad",
-    "liteNoAnalyze",
-    "liteSyncUI"
-   ]
+   "decls": 0,
+   "private": 0,
+   "public": []
   },
   {
    "file": "js/player.js",
@@ -963,6 +958,34 @@
    "readers": [
     "js/main.js"
    ]
+  },
+  {
+   "name": "liteLibRows",
+   "writers": [
+    "js/lite.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "liteMascotNoLoad",
+   "writers": [
+    "js/lite.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "liteNoAnalyze",
+   "writers": [
+    "js/lite.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "liteSyncUI",
+   "writers": [
+    "js/lite.js"
+   ],
+   "readers": []
   },
   {
    "name": "padBack",

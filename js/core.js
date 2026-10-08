@@ -124,7 +124,8 @@ const LITE_ENUM_VALUES = {
 /* 🐔 trk's playlist のタブ表示名（3種類）。名前が長いのを嫌う人向けに短くできる。
    "icon" は文字を出さない（🐔 のアイコンだけ）。名前と色は固定なので、ここで選べるのは表示名だけ。 */
 const TRK_ENUM_VALUES = {
-  trkTabName: ["full", "short", "icon"]
+  trkTabName: ["full", "short", "icon"],
+  chartGen: ["1", "2"]          // 🎼 自動譜面の作り方（1＝旧方式・既定、2＝新方式。js/chart-gen.js）
 };
 
 const settings = {
@@ -148,6 +149,7 @@ const settings = {
   autoPlay: prefs.autoPlay === true || prefs.playMode === "auto",
   difficulty: pick(prefs.difficulty, DIFF_IDS, "normal"),
   showMasterDiff: !!prefs.showMasterDiff,
+  chartGen: pick(prefs.chartGen, ["1", "2"], "1"),                        // 🎼 自動譜面の作り方（既定は旧方式＝記録の譜面と一致）
   seed: typeof prefs.seed === "string" ? prefs.seed.slice(0, 32) : "834271",   // 曲ごとの設定がない曲の初期値
   bpm: num(prefs.bpm, 60, 300, 138),
   offset: num(prefs.offset, -5000, 5000, 0),
@@ -457,7 +459,7 @@ function resetAllPrefs() {
   settings.tvParamFavs = []; // a factory reset clears the separately preserved TV bookmarks too
   settings.trkPlaylist = true; // 🐔 trk's playlistも初期状態に戻す（再表示）
   settings.trkClassic = true;  // 🎻 trk classic も初期状態に戻す
-  settings.trkSortABC = false; settings.playlistOrder = []; settings.trkTabName = "full";
+  settings.trkSortABC = false; settings.playlistOrder = []; settings.trkTabName = "full"; settings.chartGen = "1";
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
   settings.catchNitroBonus = true; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();
@@ -1131,7 +1133,7 @@ function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
       🪶 軽量化のように core.js で決め打ちできるものは LITE_ENUM_VALUES へ、
       🐔 タブ表示名のように UI 側の定数と対になるものは TRK_ENUM_VALUES へ寄せる（読み込み順に左右されない）。 */
 const SETTING_ENUM_KEYS = ["specStyle", "specTheme", "mmdMotionKind", "fxPreset",
-  "liteMode", "liteFps", "liteMascot", "liteScale", "liteLibRows", "trkTabName"];
+  "liteMode", "liteFps", "liteMascot", "liteScale", "liteLibRows", "trkTabName", "chartGen"];
 /* Importで弾いた理由（対応が変わるので、表示では区別して出す） */
 const SKIP_WHY = { enum:"prefSkipWhyId", type:"prefSkipWhyType", unknown:"prefSkipWhyUnknown", failed:"prefSkipWhyType" };
 function validImportedSettingEnum(key, value) {

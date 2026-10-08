@@ -105,200 +105,20 @@ async function analyzeAudio(file) {
   return { rms, onset, ratio, frames, frameMs, maxRms: maxRms || 1, scale: scale || 1 };
 }
 const frameAt = t => Math.round(t / analysis.frameMs);
-function onsetAt(t) {
-  const f = frameAt(t); let m = 0;
-  for (let i = Math.max(0, f - 3); i <= Math.min(analysis.frames - 1, f + 3); i++) if (analysis.onset[i] > m) m = analysis.onset[i];
-  return m;
-}
 function rmsAt(t) { return analysis.rms[Math.min(analysis.frames - 1, Math.max(0, frameAt(t)))]; }
-function ratioAt(t) {
-  const f = frameAt(t); let s = 0, c = 0;
-  for (let i = Math.max(0, f); i <= Math.min(analysis.frames - 1, f + 4); i++) { s += analysis.ratio[i]; c++; }
-  return c ? s / c : 0;
-}
-
 /* ---------- 譜面 ---------- */
 const CHART_FILE_MAX = 2 * 1024 * 1024;   // docs/pack-format.md の譜面JSON上限に合わせる
+/* 譜面の難易度表示。本体の式は js/chart-gen.js（cgEstimateLevel）。ここでは levelOverride（譜面パックの指定）だけを見る */
 function estimateLevel(notes) {
   if (levelOverride) return levelOverride;
-  if (!notes || !notes.length) return 1;
-  const span = Math.max(10, (notes[notes.length - 1].time - notes[0].time) / 1000);
-  const nps = notes.length / span;
-
-  let peak = 0, j = 0;
-  for (let i = 0; i < notes.length; i++) {
-    while (notes[i].time - notes[j].time > 2500) j++;
-    peak = Math.max(peak, (i - j + 1) / 2.5);
-  }
-
-  let fastCount = 0, trillCount = 0, ultraFast = 0;
-  for (let i = 1; i < notes.length; i++) {
-    const gap = notes[i].time - notes[i - 1].time;
-    if (gap <= 220) {
-      fastCount++;
-      if (gap <= 100) ultraFast++;
-      if (notes[i].lane !== notes[i - 1].lane && i >= 2 && notes[i - 1].lane !== notes[i - 2].lane && notes[i - 1].time - notes[i - 2].time <= 220) {
-        trillCount++;
-      }
-    }
-  }
-
-  const fastRatio = fastCount / (notes.length - 1 || 1);
-  const trillRatio = trillCount / (notes.length - 1 || 1);
-  const ultraRatio = ultraFast / (notes.length - 1 || 1);
-
-  // 音ゲー標準の Lv. 1 〜 20 スケール（初級 1〜3 / 中級 4〜6 / 上級 7〜11 / 達人 12〜15 / RUSH 16〜20）
-  const base = nps * 0.88 + peak * 0.38 + 0.5;
-  const tech = fastRatio * 1.8 + trillRatio * 1.5 + ultraRatio * 2.2;
-
-  return Math.max(1, Math.min(20, Math.round(base + tech)));
+  return cgEstimateLevel(notes);
 }
-/* ゲームの状態を変えずに譜面だけを作る（曲パックの書き出しでも使う） */
-function generateNotes(diff, bpm, offset, seed) {
+/* ゲームの状態を変えずに譜面だけを作る（曲パックの書き出しでも使う）。
+   作り方は chartGen（設定 settings.chartGen／既定 "1" = 旧方式）。中身は js/chart-gen.js の純関数。 */
+function generateNotes(diff, bpm, offset, seed, chartGen = settings.chartGen) {
   if (!videoReady || !(bpm >= 60 && bpm <= 300) || !DIFF_IDS.includes(diff)) return [];
-  const d = DIFFS[diff], durMs = video.duration * 1000;
   const rand = mulberry32(hashString(`${String(seed).trim()}|${diff}|${bpm}|${offset}`));
-  const step = 60000 / bpm / d.div;
-  let startMs = 600, endMs = durMs - 400;
-  if (analysis) {
-    const thr = analysis.maxRms * .06; let f0 = 0, f1 = analysis.frames - 1;
-    while (f0 < f1 && analysis.rms[f0] < thr) f0++;
-    while (f1 > f0 && analysis.rms[f1] < thr) f1--;
-    startMs = Math.max(300, f0 * analysis.frameMs - 30); endMs = Math.min(endMs, f1 * analysis.frameMs + 30);
-  }
-  const cands = [];
-  for (let k = Math.ceil((startMs - offset) / step); ; k++) {
-    const t = offset + k * step; if (t > endMs) break; if (t < startMs) continue;
-    const sub = ((k % d.div) + d.div) % d.div, beatIdx = Math.floor(k / d.div);
-    const onBeat = sub === 0, onBar = onBeat && ((beatIdx % 4) + 4) % 4 === 0;
-    let s, loud = 0.5;
-    if (analysis) {
-      loud = rmsAt(t) / (analysis.maxRms || 1);
-      if (loud < .05) continue;
-      s = Math.min(1.6, onsetAt(t) / (analysis.scale || 1)) + loud * .35;
-    } else s = rand() * .6;
-    s *= onBar ? 1.6 : onBeat ? 1.3 : (sub % 2 === 0 ? 1.1 : 0.95);
-    s += rand() * .1;
-    cands.push({ t, s, onBar, onBeat, sub, k, loud });
-  }
-
-  let sel;
-  if (diff === "easy" || diff === "normal") {
-    const count = Math.round(cands.length * d.density);
-    sel = cands.slice().sort((a, b) => b.s - a.s).slice(0, count).sort((a, b) => a.t - b.t);
-  } else {
-    // 上級・達人・RUSH：音楽的フレーズ構造（8分音符骨格＋16分連打・トリル）
-    const targetCount = d.target ? Math.min(cands.length, d.target) : Math.round(cands.length * d.density);
-    const chosen = new Set();
-    for (const c of cands) {
-      if ((c.onBeat || c.sub % 2 === 0) && (c.loud > 0.22 || c.s > 0.75)) {
-        chosen.add(c);
-      }
-    }
-    for (let i = 0; i < cands.length; i++) {
-      const c = cands[i];
-      const loudThreshold = (diff === "master" || diff === "rush") ? 0.30 : 0.50;
-      if (c.loud > loudThreshold && c.s > 0.8) {
-        const isDense = (diff === "master" || diff === "rush");
-        const burstLen = isDense ? (rand() < 0.45 ? 7 : (rand() < 0.5 ? 5 : 3)) : (rand() < 0.35 ? 5 : 3);
-        for (let b = 0; b < burstLen && i + b < cands.length; b++) {
-          chosen.add(cands[i + b]);
-        }
-      }
-    }
-    let list = Array.from(chosen);
-    if (list.length < targetCount) {
-      const remaining = cands.filter(c => !chosen.has(c)).sort((a, b) => b.s - a.s);
-      list = list.concat(remaining.slice(0, targetCount - list.length));
-    } else if (list.length > targetCount && diff !== "rush") {
-      list.sort((a, b) => b.s - a.s);
-      list = list.slice(0, targetCount);
-    }
-    sel = list.sort((a, b) => a.t - b.t);
-  }
-
-  // 専門的な音ゲー配置（トリル・連打・複合ストリーム）
-  const PAT_3 = [
-    [0, 0, 1], // ドドカ
-    [1, 1, 0], // カカド
-    [0, 1, 0], // ドカド
-    [1, 0, 1], // カドカ
-    [0, 1, 1], // ドカカ
-    [1, 0, 0], // カドド
-    [0, 0, 0]  // ドドド
-  ];
-  const PAT_5 = [
-    [0, 0, 1, 1, 0], // ドドカカド
-    [1, 1, 0, 0, 1], // カカドドカ
-    [0, 1, 0, 1, 0], // 5連トリル
-    [0, 1, 1, 0, 1], // ドカカドカ
-    [0, 0, 1, 0, 0]  // ドドカドド
-  ];
-
-  let med = 0, ratios = null;
-  if (analysis && sel.length) {
-    ratios = sel.map(c => ratioAt(c.t));
-    const sr = ratios.slice().sort((a, b) => a - b);
-    med = sr[Math.floor(sr.length / 2)] || 0;
-  }
-
-  const L = sel.length;
-  const result = new Array(L);
-  let idx = 0;
-  const fastThresh = (60000 / bpm / d.div) * 1.35;
-
-  while (idx < L) {
-    let runEnd = idx;
-    while (runEnd + 1 < L && sel[runEnd + 1].t - sel[runEnd].t <= fastThresh) {
-      runEnd++;
-    }
-    const runLen = runEnd - idx + 1;
-
-    if (runLen >= 3 && (diff === "hard" || diff === "master" || diff === "rush")) {
-      const isTrill = (diff === "master" || diff === "rush") ? (rand() < 0.52) : (rand() < 0.38);
-      if (isTrill || runLen >= 6) {
-        let startColor = sel[idx].onBar ? 0 : (rand() < 0.6 ? 0 : 1);
-        for (let k = 0; k < runLen; k++) {
-          result[idx + k] = { time: Math.round(sel[idx + k].t), lane: (startColor + k) % 2 };
-        }
-      } else if (runLen === 3) {
-        const pat = PAT_3[Math.floor(rand() * PAT_3.length)];
-        for (let k = 0; k < 3; k++) {
-          result[idx + k] = { time: Math.round(sel[idx + k].t), lane: pat[k] };
-        }
-      } else if (runLen === 4) {
-        const r4 = rand();
-        const pat4 = r4 < 0.45 ? [0, 1, 0, 1] : (r4 < 0.75 ? [0, 0, 1, 1] : [0, 1, 1, 0]);
-        for (let k = 0; k < 4; k++) {
-          result[idx + k] = { time: Math.round(sel[idx + k].t), lane: pat4[k] };
-        }
-      } else if (runLen === 5) {
-        const pat = PAT_5[Math.floor(rand() * PAT_5.length)];
-        for (let k = 0; k < 5; k++) {
-          result[idx + k] = { time: Math.round(sel[idx + k].t), lane: pat[k] };
-        }
-      } else {
-        const chunk = rand() < 0.5 ? 1 : 2;
-        for (let k = 0; k < runLen; k++) {
-          result[idx + k] = { time: Math.round(sel[idx + k].t), lane: Math.floor(k / chunk) % 2 };
-        }
-      }
-      idx = runEnd + 1;
-    } else {
-      let lane;
-      if (sel[idx].onBar && rand() < 0.85) lane = 0;
-      else if (analysis && ratios) {
-        lane = ratios[idx] > med ? 1 : 0;
-        if (rand() < 0.10) lane = 1 - lane;
-      } else {
-        lane = rand() < 0.35 ? 1 : 0;
-      }
-      result[idx] = { time: Math.round(sel[idx].t), lane };
-      idx++;
-    }
-  }
-
-  return result;
+  return buildChartNotes({ analysis, durationMs: video.duration * 1000, diff, spec: DIFFS[diff], bpm, offset, rand, chartGen });
 }
 function buildChart() {
   if (!videoReady) return;

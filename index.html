@@ -205,6 +205,13 @@
                 <span data-i18n="seed">Seed</span>
                 <input id="seed" type="text" maxlength="32" autocomplete="off">
               </label>
+              <label class="field">
+                <span data-i18n="chartGen">自動譜面の作り方</span>
+                <select id="chartGen">
+                  <option value="1" data-i18n="chartGen1">旧方式（今までどおり）</option>
+                  <option value="2" data-i18n="chartGen2">新方式（区間ごとに配分）</option>
+                </select>
+              </label>
             </div>
             <div id="songPrefsStatus" class="hint"></div>
             <!-- library.js がここに「🎲 シードを引く」と最近のシードを追加します -->
@@ -1642,6 +1649,7 @@
 <script src="js/lite.js"></script>
 <!-- player.js：AUTO・練習中の再生操作。各モードより先にキーを受け取るため、core.js のすぐ後 -->
 <script src="js/player.js"></script>
+<script src="js/chart-gen.js"></script>
 <script src="js/media.js"></script>
 <script src="js/game.js"></script>
 <script src="js/render.js"></script>

@@ -289,6 +289,10 @@ $("bpm").addEventListener("change", () => {
   if (v >= 60 && v <= 300) { if (!saveSongPrefs()) { settings.bpm = v; saveUserPrefs(); } }
   if (videoReady && chartMode === "generated") buildChart();
 });
+$("chartGen").addEventListener("change", () => {
+  settings.chartGen = $("chartGen").value === "2" ? "2" : "1"; saveUserPrefs();   // 譜面の作り方は全曲共通の設定
+  if (videoReady && chartMode === "generated") buildChart();
+});
 $("offset").addEventListener("change", () => {
   const v = Number($("offset").value);
   if (isFinite(v)) { if (!saveSongPrefs()) { settings.offset = Math.max(-5000, Math.min(5000, v)); saveUserPrefs(); } }
@@ -489,6 +493,7 @@ addEventListener("drop", async e => {
 $("bpm").value = settings.bpm;
 $("offset").value = settings.offset;
 $("seed").value = settings.seed;
+$("chartGen").value = settings.chartGen;
 $("hideGameplayUI").checked = settings.hideGameplayUI;
 $("errorMeter").checked = settings.errorMeter;
 $("playerMode").checked = settings.playerMode;

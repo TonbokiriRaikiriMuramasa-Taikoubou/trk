@@ -44,7 +44,7 @@
 - **📺 TVドックの設定（`js/tv-dock.js`）**：くわしいの中の「📺 TVドック」グループ。チェックは3つ：🧱 壁掛け（スキン `wall` と同じ。外すと映画館に戻る）、↕ 並び替え（テレビとラックの上下）、🔢 5枠化（`tvDockFive`）。既定はすべて OFF（映画館・テレビが上・5枠なし）。くわしいは既定で開いた状態（保存済みの開閉は変えない）。テレビ本体とラックの表示は変えていない。
 - **Loop Lab の映像書き出し（`js/media-player-mode.js` の `exportLoopClip`）**：開発者表示の中だけ。記録した区間の行の 🎬 を押すと、映像と音を区間の長さのぶん録画して保存する（WebM。対応していれば MP4）。設定は持たない。書き出し後は再生位置・再生／停止・速度・ループを元に戻す。曲を切り替えたら途中で止め、保存しない。音声だけの曲は書き出さない。
 - **「📁 開く」と「📤 共有」**（`js/library.js`）：📁 開く は曲を入れるだけで、共有としては覚えない。📤 共有 は共有として覚え、📤 の印が付き、「共有をやめる」でまとめて外せ、「端末に残す」の対象になる。ボタンの下の説明行は `libOpenShareHint`（4言語）。
-- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.8-trk77`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
+- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.8-trk78`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
 
 ## 3. 権利・データ・セキュリティの不変条件
 
@@ -92,7 +92,7 @@ npm run check
 git diff --check
 ```
 
-`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-08）は Security 55 checks、a11y 8 checks、vendor 8 checks、軽量化 121 assertions、`npm test` 61件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
+`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-08）は Security 55 checks、a11y 8 checks、vendor 8 checks、軽量化 121 assertions、`npm test` 67件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
 
 `check-repo.mjs` はJavaScript構文・ローカル参照・ID・設定文言に加え、Arknights公式リンク、Blue Archive 225曲、LoL Sessions 108曲／Phase 1の58件、Gakumas 50件・別名、公式リンクと権利注記、既存プレイリストの所有曲・カスタムフィールド保持を検査する。チェックは意図的な逆テストでもFAILすることを確認してから追加する。外部ツールの起動後DOM検査は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照し、リポジトリ外で行う。
 
@@ -161,6 +161,7 @@ git diff --check
 
 ## 11. 最近の変更
 
+- **2026-10-08 — 見やすさのスキン（trk78）：** ゲーム画面スキンに 3 種を追加（`js/data.js`、カテゴリ `access`・表示名「見やすさ」を4言語で追加）。ハイコントラスト（黒地・黄とシアン）、色覚にやさしい暗め／明るめ（Okabe & Ito の青と朱色の組み。明るめは輝度の差を広げた）。ノーツは丸と菱形で形も変え、色だけに頼らない。総数 31 → 34（`check-repo` の期待値を更新）。`tests/skins-access.test.mjs`（6件）が WCAG のコントラスト（本文 4.5:1、ハイコントラストは 7:1）、ノーツの形の違い、輝度の差、4言語の表示名を検査。テストの検査で、明るめの2色が白黒で区別しにくいと分かり、配色を直した。**未確認**：実ブラウザでの見た目（この環境に Chromium がない）、韓国語・中国語の文言の母語話者による確認。
 - **2026-10-08 — 名前空間：IIFE 冒頭の別名（レビュー4・trk77）：** 各 IIFE の先頭に `const core = window.Trk.core;` を置き、本文の `window.Trk.core.X` を `core.X` にした（32 ファイル、約 6,000 箇所。`core.js`・凍結の `fx.js`／`fx-presets.js` は対象外）。別名は同じオブジェクトを指すので、getter／setter の挙動は変わらない。読み込み順は `core.js` が先（別名を作るのは IIFE 実行時で、`core.js` より前に読まれるファイルは使わない）。構文・AST で置換したので、コメント・文字列には触れていない。**静的検査は別名を元の綴りへ戻して照合する**（`tools/lib/js-source.mjs` の `restoreCoreAlias`。check-repo／check-security／check-a11y／check-lite／check-study-room／check-mmd／globals-audit が使う）。戻した結果は変換前の HEAD と 32 件すべてビット一致（`/tmp` の往復検査）。棚卸しの数（1188／182／316、重複 0）は変わらない。**未確認**：実ブラウザでの起動（この環境に Chromium がない。`tools/smoke-browser.mjs` で別途確認）。
 - **2026-10-08 — 再レビュー（b7d88ad→6150725）の対応（trk75・trk76）：** ① 解析キャッシュを LRU 化（読み出しで `savedAt` を更新。テスト2件追加）。② `media.js` のコメント2件を修正（既定は `"2"`、decodeAudioData は再サンプル後の長さは減るがピークは減らない）。③ 静かな長い区間（レビュー1）：絶対音量ゲート（区間の平均音量が曲の最大の6%未満なら候補数の25%まで）を `chart-gen.js` に追加。合成曲 contrast の上級の静かな区間は 3.9→2.5 nps（Lv 10→9）。導入部（introChorus の 0〜30秒）・flat・silentLead は変わらない。**副作用**：contrast の上級・名人の総数が 562→459、768→459 に減る（盛り上がり側が候補の上限 7.9 nps に張り付くため）。テスト3件追加・1件の判定を変更（静かな区間の方が低いことを方向と下限で判定）。④ 互換名の廃止予定（レビュー4）：`docs/ADDONS.md` に 33 件を予告（trk76 から。trk76 から公開版を2回重ねた版で削除）。`tools/check-repo.mjs` が core.js の互換名と一覧の一致を検査。`const core` の別名導入は後回し（§9）。
 - **2026-10-08 — 今回の作業のまとめ（マージ前）：** ① IndexedDB：容量計算の索引の取り違えを修正（`5c93ef5`、`tests/idb.test.mjs` 13件）。② 解析結果のキャッシュを確定（`0761f72`、ヘッドレスで2回目のデコード0回・譜面一致・セーフモードは書かない）。③ 項目6：「📁 開く／📤 共有」の説明行（`15ea669`）。④ Loop Lab：区間の 🎬 で映像を書き出し（`e8fae4d`、開発者表示の中だけ）。⑤ 📺 TVドックの設定：壁掛け・並び替え・5枠化の3チェック、既定はくわしいが開いた状態、3つとも OFF（`04fb26e`）。⑥ Issue：#21・#22・#24・#25 を修正済みとして閉じ、#23 は安定版の追跡項目として閉じた。

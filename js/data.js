@@ -3,7 +3,7 @@
 /* ============ trk! 統合版：データ（スキン・レイアウト・難易度・マスコット登録） ============
    内蔵スキンを増やすときは SKINS に1項目足すだけで、設定画面の一覧に出ます。
      ui     : メニュー画面の色（CSS変数）。--ui-bg は linear-gradient(…) も可（グラデーション）
-     cat    : （任意）スキンの棚での絞り込み用タグ（basic / miku / dark / light / grad / fun の配列）
+     cat    : （任意）スキンの棚での絞り込み用タグ（basic / miku / dark / light / grad / fun / access の配列）
      game   : プレイ画面の色
      shapes : [ドン, カッ] の「おすすめ」ノーツ形状（circle / diamond / square）
      video  : 背景映像に掛けるCSSフィルター
@@ -376,6 +376,48 @@ const SKINS = {
     game:{don:"#ffd166",ka:"#6fa8ff",stage:"linear-gradient(180deg,#0a0e28 0%,#241b52 55%,#b8892a 100%)",lane:"rgba(8,6,24,.62)",track:"rgba(255,209,102,.32)",ink:"#fdf6e3",
       inkShadow:"rgba(0,0,0,.85)",noteBorder:"#ffffff",panel:"rgba(15,12,36,.95)",perfect:"#ffe9a8",good:"#fdf6e3",miss:"#8d84a8",glow:true},
     shapes:["circle","circle"], video:"grayscale(1) contrast(1.5) sepia(1) hue-rotate(18deg) saturate(1.4) brightness(.55)"
+  },
+
+  /* ===== 見やすさ（access）：色覚配慮と高コントラスト =====
+     色覚配慮の配色は Okabe & Ito（2008）の基本の8色の値を使う（色の組み合わせの提案で、値は公開の指定）。
+     赤と緑の区別に頼らず、青とだいだい（朱色）の組みにする。さらに、ノーツの形（丸と菱形）でも区別する。
+     明るい背景では、朱色を濃い茶色寄りにし、青は明るい水色にして、輝度でも差をつける（白黒でも区別できるように）。
+     コントラストは WCAG の基準（本文 4.5:1 以上）を tests/skins-access.test.mjs で検査する。 */
+  "hc": {
+    cat:["access"],
+    label:{ja:"ハイコントラスト",en:"High contrast",zh:"高对比度",ko:"고대비"},
+    desc:{ja:"白と黒の強い対比。数字と判定を最優先",en:"Strong black-and-white contrast; numbers and judgments first",zh:"黑白强对比，优先显示数字与判定",ko:"흑백 강한 대비, 숫자와 판정 우선"},
+    ui:{"--ui-bg":"#000000","--ui-panel":"rgba(0,0,0,.98)","--ui-soft":"rgba(255,255,255,.10)","--ui-text":"#ffffff",
+      "--ui-muted":"#e6e6e6","--ui-border":"#ffffff","--ui-button":"#111111","--ui-button-hover":"#262626",
+      "--ui-field":"#000000","--ui-accent":"#ffff00","--ui-on-accent":"#000000","--ui-gold":"#ffff00",
+      "--ui-shadow":"0 0 0 2px #ffffff","--ui-glow":"rgba(255,255,0,.25)"},
+    game:{don:"#ffff00",ka:"#00e5ff",stage:"#000000",lane:"rgba(255,255,255,.12)",track:"#ffffff",ink:"#ffffff",
+      inkShadow:"#000000",noteBorder:"#ffffff",panel:"rgba(0,0,0,.98)",perfect:"#ffff00",good:"#ffffff",miss:"#bfbfbf",glow:false},
+    shapes:["circle","diamond"], video:"grayscale(1) brightness(.6) contrast(1.4)"
+  },
+  "cbDark": {
+    cat:["access"],
+    label:{ja:"色覚にやさしい（暗め）",en:"Colorblind-friendly (dark)",zh:"色觉友好（深色）",ko:"색각 친화（어두움）"},
+    desc:{ja:"青とだいだい色。ノーツの形も変えて区別",en:"Blue and vermilion, with different note shapes",zh:"蓝色与朱红色，并用不同形状区分",ko:"파랑과 주황. 노트 모양도 달리해 구분"},
+    ui:{"--ui-bg":"#0b0f17","--ui-panel":"rgba(16,22,34,.97)","--ui-soft":"rgba(255,255,255,.06)","--ui-text":"#f0f4f8",
+      "--ui-muted":"#b8c2d0","--ui-border":"rgba(255,255,255,.28)","--ui-button":"#1b2536","--ui-button-hover":"#26334a",
+      "--ui-field":"#0e1420","--ui-accent":"#56b4e9","--ui-on-accent":"#001018","--ui-gold":"#f0e442",
+      "--ui-shadow":"0 24px 80px rgba(0,0,0,.55)","--ui-glow":"rgba(86,180,233,.18)"},
+    game:{don:"#d55e00",ka:"#56b4e9",stage:"#0b0f17",lane:"rgba(255,255,255,.06)",track:"rgba(255,255,255,.35)",ink:"#f0f4f8",
+      inkShadow:"rgba(0,0,0,.8)",noteBorder:"#ffffff",panel:"rgba(16,22,34,.94)",perfect:"#f0e442",good:"#ffffff",miss:"#9aa6b8",glow:false},
+    shapes:["circle","diamond"], video:"grayscale(.6) contrast(1.2) brightness(.8)"
+  },
+  "cbLight": {
+    cat:["access"],
+    label:{ja:"色覚にやさしい（明るめ）",en:"Colorblind-friendly (light)",zh:"色觉友好（浅色）",ko:"색각 친화（밝음）"},
+    desc:{ja:"明るい背景で、青とだいだい色を使う",en:"Light background using blue and vermilion",zh:"浅色背景，使用蓝与朱红色",ko:"밝은 배경에 파랑과 주황 사용"},
+    ui:{"--ui-bg":"#f7f7f4","--ui-panel":"#ffffff","--ui-soft":"rgba(0,0,0,.04)","--ui-text":"#1a1a1a",
+      "--ui-muted":"#4a4a4a","--ui-border":"rgba(0,0,0,.30)","--ui-button":"#e9e9e4","--ui-button-hover":"#dcdcd4",
+      "--ui-field":"#ffffff","--ui-accent":"#0072b2","--ui-on-accent":"#ffffff","--ui-gold":"#b07000",
+      "--ui-shadow":"0 12px 40px rgba(0,0,0,.12)","--ui-glow":"rgba(0,114,178,.15)"},
+    game:{don:"#8f3500",ka:"#56b4e9",stage:"#f4f4ef",lane:"rgba(0,0,0,.05)",track:"rgba(0,0,0,.35)",ink:"#1a1a1a",
+      inkShadow:"rgba(255,255,255,.8)",noteBorder:"#1a1a1a",panel:"rgba(255,255,255,.95)",perfect:"#8f3500",good:"#0072b2",miss:"#6b6b6b",glow:false},
+    shapes:["circle","diamond"], video:"grayscale(.5) brightness(1.1) contrast(1.05)"
   }
 };
 

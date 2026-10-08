@@ -130,7 +130,7 @@ const TEXT = {
     feedbackLabel:"感想・要望・不具合はこちらへ",
 
     /* 見た目 */
-    secDisplay:"🎨 見た目", skin:"スキン", skinShelf:"🖼 スキンの棚", catAll:"すべて", catBasic:"定番", catMiku:"ミク", catDark:"ダーク", catLight:"ライト", catGrad:"グラデ", catFun:"遊び心", catCustom:"マイスキン", gameLayout:"ゲームレイアウト",
+    secDisplay:"🎨 見た目", skin:"スキン", skinShelf:"🖼 スキンの棚", catAll:"すべて", catBasic:"定番", catMiku:"ミク", catDark:"ダーク", catLight:"ライト", catGrad:"グラデ", catFun:"遊び心", catAccess:"見やすさ", catCustom:"マイスキン", gameLayout:"ゲームレイアウト",
     secModes:"🚚🪐🎪 各モードの専用設定（TRUCK・ORBIT・STAGE）",
     modeKeysTitle:"🚚🎪🚛 各モードの操作キー（TRUCK・STAGE・CATCH・速度）",
     layoutClassic:"横スクロール", layoutVertical:"縦・左レーン", layoutCenter:"縦・中央レーン", layoutCommentary:"解説動画風",
@@ -429,7 +429,7 @@ const TEXT = {
     controlsHint:"MANUAL: hit with your keys · TRUCK: ↑↓ / ←→ change lanes · ORBIT: any key (one button) · STAGE: lane keys or tap · CATCH: ←→ to catch parcels · P/ESC: pause",
     feedbackLabel:"Feedback, requests and bug reports:",
 
-    secDisplay:"🎨 Appearance", skin:"Skin", skinShelf:"🖼 Skin shelf", catAll:"All", catBasic:"Classics", catMiku:"Miku", catDark:"Dark", catLight:"Light", catGrad:"Gradients", catFun:"Playful", catCustom:"My skins", gameLayout:"Playfield layout",
+    secDisplay:"🎨 Appearance", skin:"Skin", skinShelf:"🖼 Skin shelf", catAll:"All", catBasic:"Classics", catMiku:"Miku", catDark:"Dark", catLight:"Light", catGrad:"Gradients", catFun:"Playful", catAccess:"Accessibility", catCustom:"My skins", gameLayout:"Playfield layout",
     secModes:"🚚🪐🎪 Mode settings (TRUCK / ORBIT / STAGE)",
     modeKeysTitle:"🚚🎪🚛 Mode keys (TRUCK / STAGE / CATCH / Speed)",
     layoutClassic:"Horizontal", layoutVertical:"Vertical · left", layoutCenter:"Vertical · center", layoutCommentary:"Commentary",
@@ -720,7 +720,7 @@ const TEXT = {
     controlsHint:"MANUAL：用设定的按键敲击 · TRUCK：↑↓／←→切换车道 · ORBIT：任意键（单键） · STAGE：轨道按键或点击 · CATCH：←→接住包裹 · P/ESC：暂停",
     feedbackLabel:"感想、建议与问题反馈：",
 
-    secDisplay:"🎨 外观", skin:"皮肤", skinShelf:"🖼 皮肤架", catAll:"全部", catBasic:"经典", catMiku:"初音", catDark:"深色", catLight:"浅色", catGrad:"渐变", catFun:"趣味", catCustom:"我的皮肤", gameLayout:"游戏布局",
+    secDisplay:"🎨 外观", skin:"皮肤", skinShelf:"🖼 皮肤架", catAll:"全部", catBasic:"经典", catMiku:"初音", catDark:"深色", catLight:"浅色", catGrad:"渐变", catFun:"趣味", catAccess:"易读性", catCustom:"我的皮肤", gameLayout:"游戏布局",
     secModes:"🚚🪐🎪 各模式专用设置（TRUCK・ORBIT・STAGE）",
     modeKeysTitle:"🚚🎪🚛 各模式按键（TRUCK・STAGE・CATCH・速度）",
     layoutClassic:"横向", layoutVertical:"纵向·左侧", layoutCenter:"纵向·居中", layoutCommentary:"解说视频风",
@@ -1010,7 +1010,7 @@ const TEXT = {
     controlsHint:"MANUAL: 설정한 키로 두드리기 · TRUCK: ↑↓／←→로 레인 이동 · ORBIT: 아무 키 (원버튼) · STAGE: 레인 키 또는 탭 · CATCH: ←→로 짐 받기 · P/ESC: 일시정지",
     feedbackLabel:"감상・요청・버그 제보는 이쪽으로",
 
-    secDisplay:"🎨 외관", skin:"스킨", skinShelf:"🖼 스킨 선반", catAll:"전체", catBasic:"기본", catMiku:"미쿠", catDark:"다크", catLight:"라이트", catGrad:"그라데이션", catFun:"장난기", catCustom:"내 스킨", gameLayout:"게임 레이아웃",
+    secDisplay:"🎨 외관", skin:"스킨", skinShelf:"🖼 스킨 선반", catAll:"전체", catBasic:"기본", catMiku:"미쿠", catDark:"다크", catLight:"라이트", catGrad:"그라데이션", catFun:"장난기", catAccess:"접근성", catCustom:"내 스킨", gameLayout:"게임 레이아웃",
     secModes:"🚚🪐🎪 각 모드 전용 설정 (TRUCK・ORBIT・STAGE)",
     modeKeysTitle:"🚚🎪🚛 각 모드 조작 키 (TRUCK・STAGE・CATCH・속도)",
     layoutClassic:"가로", layoutVertical:"세로 · 왼쪽", layoutCenter:"세로 · 중앙", layoutCommentary:"해설 영상풍",

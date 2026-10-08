@@ -111,11 +111,13 @@ node tools/smoke-browser.mjs --compare
 
 ### 回帰修正（B の欠陥・D の前に）
 
-- 症状：`js/verified.js` が `renderLib`・`installPackFile` を、`js/fx.js`（凍結）が `chartToData` を、`js/stagefx.js` が `showJudge` を、`js/stage.js`・`js/catch.js` が `activeMods` を上書きしている。B 段階で包んだあと、窓の値のコピーになり、ファイル内部の呼び出し（例：`library.js` の `renderLib()` 十数箇所）が差し替えを見なくなった。
+- 症状：後から読み込まれるファイルが、関数を代入で差し替えていた（`window.X = …` を含む）。B 段階で包んだあと、窓の値のコピーになり、ファイル内部の呼び出し（例：`library.js` の `renderLib()` 十数箇所）が差し替えを見なくなった。
+- 対象（14 件・旧版と差し替えの元）：`activeMods`（stage.js・catch.js）、`applySkin`（main.js）、`videoFilter`（tv-dock.js）、`installPackFile`・`sanitizeSong`・`getPackSongs`・`renderPackList`（verified.js）、`showJudge`（stagefx.js）、`gameTime`（fx.js）、`renderLib`・`renderBanner`（verified.js）、`chartToData`・`applyChartData`（fx.js）、`drawVideo`（tv-dock.js）。
+
 - 確認：ヘッドレス Chromium で、`window.renderLib` を見張り関数に差し替えてから一覧の並べ替え（`libSort` の change）を発火させる。旧版 `ca84a19` は 1 回、B 段階の HEAD は 0 回（回帰）。修正後は 1 回（一致）。
-- 修正：上の 5 件を `Object.defineProperty(window, "名前", { get, set })` に変えた（`js/core.js`・`js/custom.js`・`js/game.js`・`js/library.js`・`js/media.js`）。`npm run check`・`npm test`（44/44）・スモーク `--compare`（未解決 0・譜面 10 件一致・クリックエラー 1 は基準と同じ）・`git diff --check` OK。
-- 検査：`tools/check-repo.mjs` に「差し替えられる関数の窓のアクセサ」の検査を追加。アクセサを値のコピーへ戻すと失敗することを確認（逆テスト）。
-- 残り：`window.X` の差し替えを D の段階で一括に扱うとき、同じ規則を使う（差し替えられる名前は、呼び出し側を書き換えず、アクセサで登録する）。
+- 修正（`trk55` で 5 件、`trk56` で残り 9 件）：窓の値のコピー（`window.X = X;`）を `Object.defineProperty(window, "名前", { get, set })` に変えた。対象ファイル：`js/core.js`・`js/custom.js`・`js/game.js`・`js/library.js`・`js/media.js`・`js/render.js`。`window.drawVideo`・`window.videoFilter` の差し替えを内部の呼び出しに届かせる。ヘッドレスで `renderLib` の内部呼び出しが旧版と一致（1 回）、書斎・シンスの開閉（`overlay-probe`）も OK。`npm run check`・`npm test`（44/44）・スモーク `--compare`（未解決 0・譜面 10 件一致・クリックエラー 1 は基準と同じ）・`git diff --check` OK。
+- 検査：`tools/check-repo.mjs` の `PATCHED_FUNCTIONS`（14 件）に「窓のアクセサ」の検査を追加。アクセサを値のコピーへ戻すと失敗することを確認（逆テスト）。
+- D 段階の規則：差し替えられる名前（`名前 = …`・`window.名前 = …`・`名前++`・for-in/of の左辺で、宣言していないファイルから触られるもの）は、Trk と窓の両方をアクセサにする。凍結の `js/fx.js` は書き換えず、窓のアクセサで届く。
 
 ## 4. 止める条件
 

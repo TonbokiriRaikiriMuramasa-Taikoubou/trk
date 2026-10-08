@@ -488,7 +488,8 @@ function loop() {
 
 /* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
 window.beatPulse = beatPulse;
-window.drawVideo = drawVideo;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.drawVideo の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "drawVideo", { configurable:true, get:() => drawVideo, set:v => { drawVideo = v; } });
 window.hitPos = hitPos;
 window.layout = layout;
 window.loop = loop;

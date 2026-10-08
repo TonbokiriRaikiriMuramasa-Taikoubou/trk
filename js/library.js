@@ -3055,7 +3055,8 @@ window.plToast = plToast;
 window.prevSong = prevSong;
 window.previewStartFor = previewStartFor;
 window.refreshPackSongs = refreshPackSongs;
-window.renderBanner = renderBanner;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.renderBanner の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "renderBanner", { configurable:true, get:() => renderBanner, set:v => { renderBanner = v; } });
 /* 後から読み込まれるファイルがこの名前を差し替える（window.renderLib の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
 Object.defineProperty(window, "renderLib", { configurable:true, get:() => renderLib, set:v => { renderLib = v; } });
 window.saveSongPrefs = saveSongPrefs;

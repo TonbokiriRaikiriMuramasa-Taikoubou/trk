@@ -250,7 +250,8 @@ async function loadSE(file, lane) {
 
 /* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
 window.CHART_FILE_MAX = CHART_FILE_MAX;
-window.applyChartData = applyChartData;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.applyChartData の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "applyChartData", { configurable:true, get:() => applyChartData, set:v => { applyChartData = v; } });
 Object.defineProperty(window, "audioCtx", { configurable:true, get:() => audioCtx, set:v => { audioCtx = v; } });
 window.buildChart = buildChart;
 /* 後から読み込まれるファイルがこの名前を差し替える（window.chartToData の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */

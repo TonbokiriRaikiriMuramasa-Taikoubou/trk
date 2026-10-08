@@ -579,7 +579,8 @@ window.chartKeyOf = chartKeyOf;
 window.currentAcc = currentAcc;
 window.currentScore = currentScore;
 window.endGame = endGame;
-window.gameTime = gameTime;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.gameTime の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "gameTime", { configurable:true, get:() => gameTime, set:v => { gameTime = v; } });
 Object.defineProperty(window, "goAt", { configurable:true, get:() => goAt, set:v => { goAt = v; } });
 window.handleInput = handleInput;
 window.judgeNote = judgeNote;

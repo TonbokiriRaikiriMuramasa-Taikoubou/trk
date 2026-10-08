@@ -801,15 +801,18 @@ addEventListener("drop", e => {      // .stpack / .zip は他の処理より先�
 /* ✅ custom.js 完了 */
 
 /* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
-window.getPackSongs = getPackSongs;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.getPackSongs の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "getPackSongs", { configurable:true, get:() => getPackSongs, set:v => { getPackSongs = v; } });
 window.initPacks = initPacks;
 /* 後から読み込まれるファイルがこの名前を差し替える（window.installPackFile の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
 Object.defineProperty(window, "installPackFile", { configurable:true, get:() => installPackFile, set:v => { installPackFile = v; } });
 window.noteImage = noteImage;
 window.packDB = packDB;
 window.packRuntime = packRuntime;
-window.renderPackList = renderPackList;
-window.sanitizeSong = sanitizeSong;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.renderPackList の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "renderPackList", { configurable:true, get:() => renderPackList, set:v => { renderPackList = v; } });
+/* 後から読み込まれるファイルがこの名前を差し替える（window.sanitizeSong の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "sanitizeSong", { configurable:true, get:() => sanitizeSong, set:v => { sanitizeSong = v; } });
 window.skinShelf = skinShelf;
 window.syncNoteUI = syncNoteUI;
 window.updateMascotUI = updateMascotUI;

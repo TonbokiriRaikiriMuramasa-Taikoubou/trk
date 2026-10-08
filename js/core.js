@@ -1338,7 +1338,8 @@ Object.defineProperty(window, "activeMods", { configurable:true, get:() => activ
 Object.defineProperty(window, "analysis", { configurable:true, get:() => analysis, set:v => { analysis = v; } });
 window.applyLanguage = applyLanguage;
 window.applyNoteVars = applyNoteVars;
-window.applySkin = applySkin;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.applySkin の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "applySkin", { configurable:true, get:() => applySkin, set:v => { applySkin = v; } });
 Object.defineProperty(window, "avatarHit", { configurable:true, get:() => avatarHit, set:v => { avatarHit = v; } });
 window.baseName = baseName;
 Object.defineProperty(window, "bgImage", { configurable:true, get:() => bgImage, set:v => { bgImage = v; } });
@@ -1435,7 +1436,8 @@ window.validCode = validCode;
 window.validPadBind = validPadBind;
 window.vctx = vctx;
 window.video = video;
-window.videoFilter = videoFilter;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.videoFilter の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "videoFilter", { configurable:true, get:() => videoFilter, set:v => { videoFilter = v; } });
 Object.defineProperty(window, "videoReady", { configurable:true, get:() => videoReady, set:v => { videoReady = v; } });
 window.view = view;
 window.windows = windows;

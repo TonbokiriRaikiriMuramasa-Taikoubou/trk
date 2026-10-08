@@ -1025,6 +1025,35 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
 #tvDock[data-skin="gameboy"] .gbDpad{width:24px;height:24px;background:radial-gradient(circle,#222,#000);clip-path:polygon(35% 0,65% 0,65% 35%,100% 35%,100% 65%,65% 65%,65% 100%,35% 100%,35% 65%,0 65%,0 35%,35% 35%);border-radius:2px}
 #tvDock[data-skin="gameboy"] .gbBtnA{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,#a00,#600);border:1px solid #000}
 #tvDock[data-skin="gameboy"] .gbBtnB{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,#a00,#600);border:1px solid #000}
+
+/* ②TVドックの追加（train・porthole・lantern）。飾りは <i> の組み合わせだけで作る */
+#tvDock[data-skin="train"] .tvDev{background:linear-gradient(#e9ecef,#bfc6d1);border:3px solid #34435e;border-radius:8px;box-shadow:0 4px 0 #34435e}
+#tvDock[data-skin="train"] .tvScreenWrap{border:4px solid #1d2a40;border-radius:4px;background:#0c1322}
+#tvDock[data-skin="train"] .tvScreen{background:#0c1322;color:#ffcc33;font-family:monospace}
+#tvDock[data-skin="train"] .trainRail{position:absolute;left:0;right:0;top:0;height:14px;background:repeating-linear-gradient(90deg,#34435e 0 14px,#1d2a40 14px 16px)}
+#tvDock[data-skin="train"] .trainLed{position:absolute;left:6px;bottom:6px;width:10px;height:10px;border-radius:50%;background:#ffcc33;box-shadow:0 0 6px #ffcc33;animation:trainBlink 1.6s infinite steps(2)}
+#tvDock[data-skin="train"] .trainDoor{position:absolute;top:16px;bottom:16px;width:12%;background:linear-gradient(90deg,#9aa4b4,#dfe4ec);opacity:.5}
+#tvDock[data-skin="train"] .trainDoor.left{left:0}
+#tvDock[data-skin="train"] .trainDoor.right{right:0}
+@keyframes trainBlink{50%{opacity:.2}}
+#tvDock[data-skin="porthole"] .tvDev{background:radial-gradient(circle at 30% 25%,#ffffff,#d8dde2);border:3px solid #b08d57;border-radius:50%;aspect-ratio:1;box-shadow:inset 0 0 0 6px #d8dde2,inset 0 0 0 8px #8a6c42}
+#tvDock[data-skin="porthole"] .tvScreenWrap{border:6px solid #b08d57;border-radius:50%;aspect-ratio:1;background:#0b3d5c;box-shadow:inset 0 0 24px rgba(0,0,0,.5)}
+#tvDock[data-skin="porthole"] .tvScreen{border-radius:50%;background:radial-gradient(circle,#2f8fbf,#0b3d5c 75%);color:#fff}
+#tvDock[data-skin="porthole"] .portRivet{position:absolute;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle,#e7c48a,#8a6c42);z-index:2}
+#tvDock[data-skin="porthole"] .portRivet.r1{top:6%;left:50%;margin-left:-4px}
+#tvDock[data-skin="porthole"] .portRivet.r2{bottom:6%;left:50%;margin-left:-4px}
+#tvDock[data-skin="porthole"] .portRivet.r3{left:6%;top:50%;margin-top:-4px}
+#tvDock[data-skin="porthole"] .portRivet.r4{right:6%;top:50%;margin-top:-4px}
+#tvDock[data-skin="porthole"] .portWave{position:absolute;left:-10%;right:-10%;bottom:0;height:30%;border-radius:50% 50% 0 0;background:rgba(255,255,255,.18);animation:portRoll 4s infinite ease-in-out}
+@keyframes portRoll{50%{transform:translateX(6%)}}
+#tvDock[data-skin="lantern"] .tvDev{background:radial-gradient(ellipse at center,#e8603c,#b8361c 70%);border:3px solid #3a2418;border-radius:44% 44% 40% 40%/30% 30% 40% 40%;box-shadow:inset 0 0 26px rgba(255,210,120,.45)}
+#tvDock[data-skin="lantern"] .tvScreenWrap{border:5px solid #3a2418;border-radius:40%;background:repeating-linear-gradient(90deg,transparent 0 16px,rgba(58,36,24,.5) 16px 18px),#f7d9a0}
+#tvDock[data-skin="lantern"] .tvScreen{background:#f7d9a0;color:#3a1a0a}
+#tvDock[data-skin="lantern"] .lanCord{position:absolute;left:50%;top:0;width:2px;height:8px;margin-left:-1px;background:#3a2418}
+#tvDock[data-skin="lantern"] .lanCap{position:absolute;left:30%;right:30%;height:6px;background:#3a2418;border-radius:3px}
+#tvDock[data-skin="lantern"] .lanCap.top{top:8px}
+#tvDock[data-skin="lantern"] .lanCap.bottom{bottom:0}
+#tvDock[data-skin="lantern"] .lanTassel{position:absolute;left:50%;bottom:-10px;width:6px;height:10px;margin-left:-3px;background:#ffd27a;border-radius:0 0 3px 3px}
 #tvDock[data-skin="gameboy"] .gbSpeaker{width:28px;height:10px;background:repeating-linear-gradient(90deg,#444 0 1px,#aaa 1px 3px);border-radius:2px;transform:rotate(-20deg)}
 
 #tvDock[data-skin="jumbotron"] .tvDev{background:linear-gradient(#222,#000);border:4px solid #444;color:#fff;border-radius:6px;box-shadow:0 0 0 8px #111, 0 12px 30px rgba(0,0,0,.8)}

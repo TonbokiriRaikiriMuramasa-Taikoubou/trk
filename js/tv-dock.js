@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ==========================================================================
    trk! tv-dock.js — 📺 映像出力のTV風ドック（メイン画面の曲リストの下）
-   ・本体のスキン30種（ボタン数がそれぞれ違う）、電源・一時停止・お気に入り登録
+   ・TVドックのスキン33種（ボタン数がそれぞれ違う）、電源・一時停止・お気に入り登録
    ・映像フィルター65種類（tv-presets.js）をまとめて触れる
    ・🆕 カスタムTVスキン：設定画面の #tvMaker で色・形・飾りを決めて作れる（trk-tvskin / trk_tv_skins_v1）
    ・🆕 ◀ ▶ の物理ボタン：前の曲・次の曲へ（選曲リストをチャンネル送りのように）
@@ -48,7 +48,11 @@ const TV_DOCK_SKINS = {
   window:    { n:5, cols:5, deco:"window",  label:L4("🪟 窓ガラスTV", "🪟 Window TV", "🪟 窗户电视", "🪟 창문 TV") },
   microwave: { n:4, cols:2, deco:"microwave",label:L4("🍳 電子レンジテレビ", "🍳 Microwave TV", "🍳 微波炉电视", "🍳 전자레인지 TV") },
   videowall: { n:8, cols:4, deco:"videowall",label:L4("🧱 ビデオウォール", "🧱 Video wall", "🧱 电视墙", "🧱 비디오월") },
-  hologram:  { n:6, cols:3, deco:"hologram",label:L4("🔮 ホログラム", "🔮 Hologram", "🔮 全息投影", "🔮 홀로그램") }
+  hologram:  { n:6, cols:3, deco:"hologram",label:L4("🔮 ホログラム", "🔮 Hologram", "🔮 全息投影", "🔮 홀로그램") },
+  /* ②TVドックの追加（SKIN-PLAN §3-2）：一般的な意匠だけで作る。特定の鉄道会社・船舶・製品の見た目は使わない */
+  train:     { n:4, cols:2, deco:"train",   label:L4("🚃 車内モニター", "🚃 Train monitor", "🚃 车厢显示屏", "🚃 열차 내 모니터") },
+  porthole:  { n:4, cols:4, deco:"porthole",label:L4("🚢 船の丸窓", "🚢 Ship porthole", "🚢 船舷圆窗", "🚢 선박 둥근 창") },
+  lantern:   { n:5, cols:5, deco:"lantern", label:L4("🏮 提灯", "🏮 Lantern", "🏮 灯笼", "🏮 제등") }
 };
 const hasTvSkin = id => Object.prototype.hasOwnProperty.call(TV_DOCK_SKINS, id);
 const TV_FAV_MAX = 0, TV_RECENT_MAX = 5, TV_TEMP_ID = "__tv_temp", TV_LONG_MS = 600;   /* 0＝上限なし（⭐は js/favs.js がフォルダ分けする） */
@@ -68,7 +72,7 @@ const TV_VAR_KEYS = ["--tv-body", "--tv-body2", "--tv-bezel", "--tv-screen", "--
 /* 飾り（物理デコ）に使える名前。ラベルは、それを使っている内蔵TVスキンから借りる */
 const TV_DECO_KEYS = ["home", "tube", "wood", "antenna", "paper", "dials", "wall", "holo", "screen", "phone", "arcade",
   "laptop", "cinema", "car", "airplane", "vr", "aquarium", "scope", "cctv", "gameboy", "jumbotron", "frame",
-  "transparent", "toy", "cardboard", "window", "microwave", "videowall"];
+  "transparent", "toy", "cardboard", "window", "microwave", "videowall", "train", "porthole", "lantern"];
 const tvDecoLabel = k => {
   const hit = Object.values(TV_DOCK_SKINS).find(d => !d.custom && d.deco === k);
   return hit ? (hit.label[lang] || hit.label.en) : k;
@@ -1666,6 +1670,12 @@ addEventListener("DOMContentLoaded", () => {
       deco.append(core.el("i","mwTimer"), core.el("i","mwDoor"), core.el("i","mwPlate"));
     } else if (d === "videowall") {
       deco.append(core.el("i","vwBezH"), core.el("i","vwBezV"), core.el("i","vwSeam"));
+    } else if (d === "train") {
+      deco.append(core.el("i","trainRail"), core.el("i","trainLed"), core.el("i","trainDoor left"), core.el("i","trainDoor right"));
+    } else if (d === "porthole") {
+      deco.append(core.el("i","portRivet r1"), core.el("i","portRivet r2"), core.el("i","portRivet r3"), core.el("i","portRivet r4"), core.el("i","portWave"));
+    } else if (d === "lantern") {
+      deco.append(core.el("i","lanCord"), core.el("i","lanCap top"), core.el("i","lanCap bottom"), core.el("i","lanTassel"));
     }
   }
 

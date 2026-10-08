@@ -1,11 +1,11 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 123,
+  "windowProps": 132,
   "duplicates": 0,
-  "declarations": 364,
-  "private": 142,
-  "public": 222
+  "declarations": 325,
+  "private": 115,
+  "public": 210
  },
  "files": [
   {
@@ -257,22 +257,9 @@
   },
   {
    "file": "js/render.js",
-   "decls": 39,
-   "private": 27,
-   "public": [
-    "beatPulse",
-    "drawVideo",
-    "hitPos",
-    "layout",
-    "loop",
-    "noteAlpha",
-    "ownField",
-    "retryHoldAt",
-    "rr",
-    "showToast",
-    "toast",
-    "vrmState"
-   ]
+   "decls": 0,
+   "private": 0,
+   "public": []
   },
   {
    "file": "js/custom.js",
@@ -914,6 +901,13 @@
    "readers": []
   },
   {
+   "name": "beatPulse",
+   "writers": [
+    "js/render.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "chartKeyOf",
    "writers": [
     "js/game.js"
@@ -972,6 +966,7 @@
   {
    "name": "drawVideo",
    "writers": [
+    "js/render.js",
     "js/tv-dock.js"
    ],
    "readers": []
@@ -1028,6 +1023,13 @@
    "readers": []
   },
   {
+   "name": "hitPos",
+   "writers": [
+    "js/render.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "initLibrary",
    "writers": [
     "js/library.js"
@@ -1059,6 +1061,13 @@
    "name": "judgeNote",
    "writers": [
     "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "layout",
+   "writers": [
+    "js/render.js"
    ],
    "readers": []
   },
@@ -1105,6 +1114,13 @@
    "readers": []
   },
   {
+   "name": "loop",
+   "writers": [
+    "js/render.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "makeCheck",
    "writers": [
     "js/modes.js"
@@ -1133,6 +1149,13 @@
    "readers": []
   },
   {
+   "name": "noteAlpha",
+   "writers": [
+    "js/render.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "noteImage",
    "writers": [
     "js/custom.js"
@@ -1157,6 +1180,13 @@
    "name": "orbitHitPos",
    "writers": [
     "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "ownField",
+   "writers": [
+    "js/render.js"
    ],
    "readers": []
   },
@@ -1287,6 +1317,13 @@
    "readers": []
   },
   {
+   "name": "rr",
+   "writers": [
+    "js/render.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "runUnranked",
    "writers": [
     "js/game.js"
@@ -1346,6 +1383,13 @@
    "name": "showJudge",
    "writers": [
     "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "showToast",
+   "writers": [
+    "js/render.js"
    ],
    "readers": []
   },
@@ -1479,6 +1523,13 @@
    "name": "videoFilter",
    "writers": [
     "js/tv-dock.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "vrmState",
+   "writers": [
+    "js/render.js"
    ],
    "readers": []
   }

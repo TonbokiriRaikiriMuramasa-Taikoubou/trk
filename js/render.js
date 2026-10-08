@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：描画・マスコット ============
    対応：MANUAL／TRUCK／ORBIT／STAGE／CATCH・体力・揺れ・キャラ登録・カウントダウン・HIDDEN/SUDDEN
@@ -484,3 +485,18 @@ function loop() {
   drawVideo(); drawGame(now); updateProgress();
 }
 /* ✅ render.js 完了 */
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.beatPulse = beatPulse;
+window.drawVideo = drawVideo;
+window.hitPos = hitPos;
+window.layout = layout;
+window.loop = loop;
+window.noteAlpha = noteAlpha;
+window.ownField = ownField;
+Object.defineProperty(window, "retryHoldAt", { configurable:true, get:() => retryHoldAt, set:v => { retryHoldAt = v; } });
+window.rr = rr;
+window.showToast = showToast;
+Object.defineProperty(window, "toast", { configurable:true, get:() => toast, set:v => { toast = v; } });
+window.vrmState = vrmState;
+})();

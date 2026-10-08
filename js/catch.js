@@ -63,7 +63,7 @@ const catchAllKeys = () => [...settings.catchKeys, ...CATCH_ALT];   // player.js
 
 /* ============ 🚀 常時ぶっ飛ばしのSeed ============ */
 const NITRO_SEEDS = ["nitro", "buttobi", "ぶっとばし"];
-for (const s of NITRO_SEEDS) EGG_KEYS[s] = "eggNitro";
+for (const s of NITRO_SEEDS) window.Trk.data.EGG_KEYS[s] = "eggNitro";
 const alwaysBlast = () => NITRO_SEEDS.includes(($("seed").value || "").trim().toLowerCase());
 /* MODS に ∞BLAST を表示 */
 (() => {
@@ -132,7 +132,7 @@ function triggerBlast(now, it) {
   catchState.blastUntil = start + len;
   catchState.blastLen = catchState.blastUntil - now;
   stats.blasts = (stats.blasts || 0) + 1;
-  effects.push({ x:catchX(it.x), y:CATCH.lineY - 20, c:"#ffb000", t:performance.now(), kind:"perfect", seed:Math.random() * TAU });
+  effects.push({ x:catchX(it.x), y:CATCH.lineY - 20, c:"#ffb000", t:performance.now(), kind:"perfect", seed:Math.random() * window.Trk.data.TAU });
   showToast(tr("blastToast")); blastSound();
 }
 
@@ -205,14 +205,14 @@ function drawNitro(x, y, p) {
   const pulse = .5 + .5 * Math.sin(p / 120);
   const gr = ctx.createRadialGradient(x, y, 0, x, y, 52);
   gr.addColorStop(0, `rgba(255,176,0,${.5 + .3 * pulse})`); gr.addColorStop(1, "rgba(255,176,0,0)");
-  ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, 52, 0, TAU); ctx.fill();
-  ctx.font = `44px ${FONT_DEFAULT}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, 52, 0, window.Trk.data.TAU); ctx.fill();
+  ctx.font = `44px ${window.Trk.data.FONT_DEFAULT}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
   ctx.fillText("🚀", x, y + 2);
 }
 function drawCatchTruck(x, y, p, blast, now) {
   const hitK = Math.max(0, 1 - (p - Math.max(avatarHit[0], avatarHit[1])) / 200);
   ctx.save(); ctx.translate(x, y - hitK * 6);
-  ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.beginPath(); ctx.ellipse(0, 76, 112, 14, 0, 0, TAU); ctx.fill();
+  ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.beginPath(); ctx.ellipse(0, 76, 112, 14, 0, 0, window.Trk.data.TAU); ctx.fill();
   if ((stats.combo >= 50 && gameplayFxPower() > 0) || blast) {       // マフラーの炎（ぶっ飛ばし中は大きく）
     for (const s of [-1, 1]) {
       const f = (blast ? 46 : 14) + Math.random() * (blast ? 34 : 12);
@@ -234,7 +234,7 @@ function drawCatchTruck(x, y, p, blast, now) {
   ctx.fillStyle = "#1b1b22"; ctx.font = `900 14px ${fontFamily()}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("trk!", 0, 37);
   if (hitK > 0) {
     ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = hitK * .6;
-    ctx.fillStyle = toHex(skin().ui["--ui-accent"]); rr(-92, -46, 184, 20, 10); ctx.fill();
+    ctx.fillStyle = window.Trk.data.toHex(skin().ui["--ui-accent"]); rr(-92, -46, 184, 20, 10); ctx.fill();
     ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
   }
   if (blast && !alwaysBlast()) {                                     // 残り時間のゲージ
@@ -246,23 +246,23 @@ function drawCatchTruck(x, y, p, blast, now) {
 }
 function drawCatchField(now) {
   updateCatch(now);
-  const g = skin().game, travel = travelMs(), p = performance.now(), accent = toHex(skin().ui["--ui-accent"]);
+  const g = skin().game, travel = travelMs(), p = performance.now(), accent = window.Trk.data.toHex(skin().ui["--ui-accent"]);
   const Lx = CATCH.left, Wd = CATCH.width, top = CATCH.topY, ly = CATCH.lineY;
   const still = reduceMotion.matches, blast = isBlast(now), blastVisual = blast && gameplayFxMultiplier() > 0, hue = (p / 6) % 360;
   ctx.save();
 
   /* 道路（白線はコンボとぶっ飛ばしで速く流れる） */
-  ctx.fillStyle = g.lane; rr(Lx - 40, top - 30, Wd + 80, H - top + 60, 28); ctx.fill();
-  const edge = blastVisual ? `hsla(${hue},90%,60%,.85)` : hexToRgba(accent, .35);
-  ctx.fillStyle = edge; ctx.fillRect(Lx - 40, top - 30, blastVisual ? 14 : 8, H); ctx.fillRect(Lx + Wd + (blastVisual ? 26 : 32), top - 30, blastVisual ? 14 : 8, H);
+  ctx.fillStyle = g.lane; rr(Lx - 40, top - 30, Wd + 80, window.Trk.data.H - top + 60, 28); ctx.fill();
+  const edge = blastVisual ? `hsla(${hue},90%,60%,.85)` : window.Trk.data.hexToRgba(accent, .35);
+  ctx.fillStyle = edge; ctx.fillRect(Lx - 40, top - 30, blastVisual ? 14 : 8, window.Trk.data.H); ctx.fillRect(Lx + Wd + (blastVisual ? 26 : 32), top - 30, blastVisual ? 14 : 8, window.Trk.data.H);
   const boost = Math.min(1, stats.combo / 100), speed = .45 + .35 * boost + (blastVisual ? 1.2 : 0);
   const off = still ? 0 : ((now * speed) % 120 + 120) % 120;
   ctx.fillStyle = g.track;
-  for (const fx of [.25, .5, .75]) for (let y = top - 120 + off; y < H; y += 120) ctx.fillRect(Lx + fx * Wd - 4, y, 8, 60);
+  for (const fx of [.25, .5, .75]) for (let y = top - 120 + off; y < window.Trk.data.H; y += 120) ctx.fillRect(Lx + fx * Wd - 4, y, 8, 60);
   if ((boost >= .5 || blastVisual) && !still) {                            // スピード線
     ctx.globalAlpha = blastVisual ? .55 : .25 * boost;
     for (let i = 0; i < (blastVisual ? 22 : 10); i++) {
-      const sx = (i * 211) % W, sy = (p * (blastVisual ? 2.2 : .9) + i * 137) % H;
+      const sx = (i * 211) % window.Trk.data.W, sy = (p * (blastVisual ? 2.2 : .9) + i * 137) % window.Trk.data.H;
       ctx.fillStyle = blastVisual ? `hsl(${(hue + i * 30) % 360},90%,70%)` : "#fff";
       if (sx < Lx - 40 || sx > Lx + Wd + 40) ctx.fillRect(sx, sy, 3, blastVisual ? 160 : 90);
     }
@@ -318,7 +318,7 @@ function drawCatchField(now) {
   }
   if (!settings.hideGameplayUI && !settings.autoPlay) {
     ctx.font = `800 20px ${fontFamily()}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = g.ink;
-    ctx.fillText(`◀ ${formatKey(settings.catchKeys[0])} / A      D / ${formatKey(settings.catchKeys[1])} ▶`, 960, H - 30);
+    ctx.fillText(`◀ ${formatKey(settings.catchKeys[0])} / A      D / ${formatKey(settings.catchKeys[1])} ▶`, 960, window.Trk.data.H - 30);
   }
   ctx.restore();
 }
@@ -351,7 +351,7 @@ addEventListener("keydown", e => {
 addEventListener("keyup", e => { if (window.Trk.overlay.is("study")) return; const d = catchKeyDir(e.code); if (d) catchState.held[d > 0 ? 1 : 0] = false; });
 addEventListener("blur", () => { catchState.held = [false, false]; });
 function catchTargetFrom(e) {
-  const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W;
+  const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * window.Trk.data.W;
   catchState.target = Math.max(0, Math.min(1, (x - CATCH.left) / CATCH.width));
 }
 stage.addEventListener("pointerdown", e => {

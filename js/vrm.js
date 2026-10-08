@@ -16,7 +16,7 @@ const asFile = (rec, fb) => rec.file instanceof File ? rec.file : new File([rec.
 
 /* ---------- ゲーム本体の状態を読むための小さな関数 ---------- */
 const status = (k, v) => setStatus("vrmStatus", k, v);
-const vrmRect = () => VRM_RECT[settings.layout] || VRM_RECT.classic;
+const vrmRect = () => window.Trk.data.VRM_RECT[settings.layout] || window.Trk.data.VRM_RECT.classic;
 const isTalking = () => !!caption && performance.now() - caption.t < CAPTION_MS;
 const setLoaded = (onFlag, credit) => { vrmState.loaded = onFlag; vrmState.credit = credit || ""; };
 function selectVrmMascot() { settings.mascot = "vrm"; saveUserPrefs(); window.Trk.custom.updateMascotUI(); }

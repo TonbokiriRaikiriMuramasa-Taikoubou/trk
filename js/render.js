@@ -7,7 +7,7 @@
    初音ミクの絵は js/characters/miku.js にあり、このファイルには含まれていません。 */
 "use strict";
 
-const layout = () => LAYOUTS[settings.layout] || LAYOUTS.classic;
+const layout = () => window.Trk.data.LAYOUTS[settings.layout] || window.Trk.data.LAYOUTS.classic;
 const vrmState = { loaded:false, credit:"" };      // vrm.js から更新されます
 let toast = null;                                  // 画面上部の短い通知
 let retryHoldAt = 0;                               // ` 長押し中の開始時刻（main.js が設定）
@@ -29,7 +29,7 @@ function shapePath(x, y, r, shape) {
   if (shape === "diamond") {
     const s = r * 1.18; ctx.beginPath(); ctx.moveTo(x, y - s); ctx.lineTo(x + s, y); ctx.lineTo(x, y + s); ctx.lineTo(x - s, y); ctx.closePath();
   } else if (shape === "square") { const s = r * .92; rr(x - s, y - s, s * 2, s * 2, r * .22); }
-  else { ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); }
+  else { ctx.beginPath(); ctx.arc(x, y, r, 0, window.Trk.data.TAU); }
 }
 function drawLabel(text, x, y, size, color = "#fff") {
   ctx.font = `900 ${size}px ${fontFamily()}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.lineJoin = "round";
@@ -64,9 +64,9 @@ function noteAlpha(u) {
 
 /* ---------- 背景（映像。音声だけの曲は曲パックの背景画像。暗さ・ぼかしは core.js の videoFilter） ---------- */
 function drawVideo() {
-  vctx.clearRect(0, 0, W, H);
+  vctx.clearRect(0, 0, window.Trk.data.W, window.Trk.data.H);
   if (!videoReady || settings.videoStyle === "off") return;
-  const a = ownField() ? { x:0, y:0, w:W, h:H } : layout().video;
+  const a = ownField() ? { x:0, y:0, w:window.Trk.data.W, h:window.Trk.data.H } : layout().video;
   const zoom = Math.max(.5, Math.min(3, Number(settings.videoZoom) || 1));
   if (video.videoWidth && video.readyState >= 2) {
     const s = Math.min(a.w / video.videoWidth, a.h / video.videoHeight) * zoom;
@@ -82,7 +82,7 @@ function drawVideo() {
     vctx.restore();
   }
 }
-function drawScanlines() { ctx.fillStyle = "rgba(0,0,0,.22)"; for (let y = 0; y < H; y += 4) ctx.fillRect(0, y, W, 2); }
+function drawScanlines() { ctx.fillStyle = "rgba(0,0,0,.22)"; for (let y = 0; y < window.Trk.data.H; y += 4) ctx.fillRect(0, y, window.Trk.data.W, 2); }
 
 /* ---------- レーン（MANUAL・TRUCK） ---------- */
 function drawHorizontalField(L, now) {
@@ -93,7 +93,7 @@ function drawHorizontalField(L, now) {
       const ry = truckRowY(L, lane);
       ctx.fillStyle = g.track; rr(L.hitX, ry - 4, L.endX - L.hitX, 8, 4); ctx.fill();
       ctx.globalAlpha = .8; ctx.strokeStyle = laneColor(lane); ctx.lineWidth = 4;
-      ctx.beginPath(); ctx.arc(L.hitX, ry, 34 + pulse * 3, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1;
+      ctx.beginPath(); ctx.arc(L.hitX, ry, 34 + pulse * 3, 0, window.Trk.data.TAU); ctx.stroke(); ctx.globalAlpha = 1;
     }
     return;
   }
@@ -101,11 +101,11 @@ function drawHorizontalField(L, now) {
   const age = p - pressH.t;
   if (age < 120) {
     ctx.globalAlpha = Math.min(1, .5 * gameplayFxPower()) * (1 - age / 120); ctx.fillStyle = laneColor(pressH.lane);
-    ctx.beginPath(); ctx.arc(L.hitX, y, 64, 0, TAU); ctx.fill(); ctx.globalAlpha = 1;
+    ctx.beginPath(); ctx.arc(L.hitX, y, 64, 0, window.Trk.data.TAU); ctx.fill(); ctx.globalAlpha = 1;
   }
   ctx.strokeStyle = g.ink;
-  ctx.globalAlpha = .9; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(L.hitX, y, 46 + pulse * 5, 0, TAU); ctx.stroke();
-  ctx.globalAlpha = .35; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(L.hitX, y, 62, 0, TAU); ctx.stroke();
+  ctx.globalAlpha = .9; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(L.hitX, y, 46 + pulse * 5, 0, window.Trk.data.TAU); ctx.stroke();
+  ctx.globalAlpha = .35; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(L.hitX, y, 62, 0, window.Trk.data.TAU); ctx.stroke();
   ctx.globalAlpha = 1;
 }
 function drawVerticalField(L, now) {
@@ -118,7 +118,7 @@ function drawVerticalField(L, now) {
     const age = p - pressFlash[col];
     if (age < 160) {
       const gr = ctx.createLinearGradient(0, L.hitY, 0, L.hitY - 460);
-      gr.addColorStop(0, hexToRgba(c, Math.min(.95, .6 * gameplayFxPower()) * (1 - age / 160))); gr.addColorStop(1, hexToRgba(c, 0));
+      gr.addColorStop(0, window.Trk.data.hexToRgba(c, Math.min(.95, .6 * gameplayFxPower()) * (1 - age / 160))); gr.addColorStop(1, window.Trk.data.hexToRgba(c, 0));
       ctx.fillStyle = gr; ctx.fillRect(x - lw / 2, L.hitY - 460, lw, 460);
     }
   }
@@ -183,21 +183,21 @@ function drawKeyHintsH(L) {
 /* ---------- 解説動画風パネル ---------- */
 function drawCommentaryPanel() {
   const g = skin().game, p = performance.now(), font = fontFamily();
-  ctx.fillStyle = g.panel; ctx.fillRect(0, 740, W, 340);
-  ctx.fillStyle = laneColor(0); ctx.fillRect(0, 740, W / 2, 4); ctx.fillStyle = laneColor(1); ctx.fillRect(W / 2, 740, W / 2, 4);
+  ctx.fillStyle = g.panel; ctx.fillRect(0, 740, window.Trk.data.W, 340);
+  ctx.fillStyle = laneColor(0); ctx.fillRect(0, 740, window.Trk.data.W / 2, 4); ctx.fillStyle = laneColor(1); ctx.fillRect(window.Trk.data.W / 2, 740, window.Trk.data.W / 2, 4);
   const capOn = caption && p - caption.t < CAPTION_MS;
   for (let i = 0; i < 2; i++) {
     const cx = i ? 292 : 112, c = laneColor(i);
     const cy = 880 - Math.max(0, 1 - (p - avatarHit[i]) / 200) * 10;
-    ctx.fillStyle = c; ctx.beginPath(); ctx.arc(cx, cy, 58, 0, TAU); ctx.fill();
+    ctx.fillStyle = c; ctx.beginPath(); ctx.arc(cx, cy, 58, 0, window.Trk.data.TAU); ctx.fill();
     ctx.lineWidth = 4; ctx.strokeStyle = g.noteBorder; ctx.stroke();
     for (const dx of [-20, 20]) {
-      ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.ellipse(cx + dx, cy - 10, 11, 14, 0, 0, TAU); ctx.fill();
-      ctx.fillStyle = "#1b1b22"; ctx.beginPath(); ctx.arc(cx + dx + (i ? -3 : 3), cy - 8, 6, 0, TAU); ctx.fill();
+      ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.ellipse(cx + dx, cy - 10, 11, 14, 0, 0, window.Trk.data.TAU); ctx.fill();
+      ctx.fillStyle = "#1b1b22"; ctx.beginPath(); ctx.arc(cx + dx + (i ? -3 : 3), cy - 8, 6, 0, window.Trk.data.TAU); ctx.fill();
     }
     ctx.fillStyle = "#1b1b22"; ctx.strokeStyle = "#1b1b22"; ctx.lineWidth = 4;
     if (capOn && caption.speaker === i) {
-      ctx.beginPath(); ctx.ellipse(cx, cy + 24, 12, 4 + Math.abs(Math.sin(p / 70)) * 9, 0, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(cx, cy + 24, 12, 4 + Math.abs(Math.sin(p / 70)) * 9, 0, 0, window.Trk.data.TAU); ctx.fill();
     } else { ctx.beginPath(); ctx.arc(cx, cy + 16, 12, .15 * Math.PI, .85 * Math.PI); ctx.stroke(); }
     const name = tr(i ? "speakerB" : "speakerA");
     ctx.font = `800 20px ${font}`; const tw = Math.max(100, ctx.measureText(name).width + 32);
@@ -228,25 +228,25 @@ function drawEffects() {
     ctx.globalCompositeOperation = "lighter";
     const rad = (60 + a * 50) * (0.8 + 0.4 * k);
     const gr = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, rad);
-    gr.addColorStop(0, hexToRgba(e.c, Math.min(1, .55 * k) * fade));
-    gr.addColorStop(.45, hexToRgba(e.c, Math.min(1, .25 * k) * fade));
-    gr.addColorStop(1, hexToRgba(e.c, 0));
-    ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(e.x, e.y, rad, 0, TAU); ctx.fill();
+    gr.addColorStop(0, window.Trk.data.hexToRgba(e.c, Math.min(1, .55 * k) * fade));
+    gr.addColorStop(.45, window.Trk.data.hexToRgba(e.c, Math.min(1, .25 * k) * fade));
+    gr.addColorStop(1, window.Trk.data.hexToRgba(e.c, 0));
+    ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(e.x, e.y, rad, 0, window.Trk.data.TAU); ctx.fill();
     if (e.kind === "perfect" && a < .35) {
       ctx.fillStyle = `rgba(255,255,255,${Math.min(.9, .45 * k) * (1 - a / .35)})`;
-      ctx.beginPath(); ctx.arc(e.x, e.y, 30 + a * 40, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.arc(e.x, e.y, 30 + a * 40, 0, window.Trk.data.TAU); ctx.fill();
     }
     ctx.globalCompositeOperation = "source-over";
     ctx.globalAlpha = Math.min(1, fade * (0.55 + 0.45 * Math.min(k, 1.5)));
     ctx.strokeStyle = e.c; ctx.lineWidth = (8 * fade + 2) * (0.7 + 0.3 * k);
     ctx.shadowColor = e.c; ctx.shadowBlur = 12 * k;
-    ctx.beginPath(); ctx.arc(e.x, e.y, 44 + a * 70 * (0.8 + 0.2 * k), 0, TAU); ctx.stroke();
+    ctx.beginPath(); ctx.arc(e.x, e.y, 44 + a * 70 * (0.8 + 0.2 * k), 0, window.Trk.data.TAU); ctx.stroke();
     ctx.shadowBlur = 0;
     if (e.kind === "perfect") {
       const count = Math.round(8 + 4 * k), size = 4 + 2 * Math.min(k, 2);
       ctx.fillStyle = g.perfect;
       for (let i = 0; i < count; i++) {
-        const ang = i / count * TAU + e.seed, r = 60 + a * 90 * (0.8 + 0.2 * k);
+        const ang = i / count * window.Trk.data.TAU + e.seed, r = 60 + a * 90 * (0.8 + 0.2 * k);
         ctx.fillRect(e.x + Math.cos(ang) * r - size / 2, e.y + Math.sin(ang) * r - size / 2, size, size);
       }
     }
@@ -342,10 +342,10 @@ function drawBuddy(x, y, st) {
     for (const s of [-1, 1]) { rr(x + s * 22 - 5, y - 10 - eh / 2, 10, eh, 3); ctx.fill(); }
   }
   ctx.globalAlpha = .35; ctx.fillStyle = "#ff3b6b";
-  for (const s of [-1, 1]) { ctx.beginPath(); ctx.ellipse(x + s * 38, y + 10, 10, 6, 0, 0, TAU); ctx.fill(); }
+  for (const s of [-1, 1]) { ctx.beginPath(); ctx.ellipse(x + s * 38, y + 10, 10, 6, 0, 0, window.Trk.data.TAU); ctx.fill(); }
   ctx.globalAlpha = 1;
   ctx.fillStyle = "#2a1408"; ctx.strokeStyle = "#2a1408"; ctx.lineWidth = 4;
-  if (st.talking) { ctx.beginPath(); ctx.ellipse(x, y + 20, 9, 3 + Math.abs(Math.sin(p / 70)) * 8, 0, 0, TAU); ctx.fill(); }
+  if (st.talking) { ctx.beginPath(); ctx.ellipse(x, y + 20, 9, 3 + Math.abs(Math.sin(p / 70)) * 8, 0, 0, window.Trk.data.TAU); ctx.fill(); }
   else if (st.sad) { ctx.beginPath(); ctx.arc(x, y + 30, 10, 1.15 * Math.PI, 1.85 * Math.PI); ctx.stroke(); }
   else { ctx.beginPath(); ctx.arc(x, y + 12, st.happy ? 14 : 10, .15 * Math.PI, .85 * Math.PI); ctx.stroke(); }
 }
@@ -372,14 +372,14 @@ function drawCornerCredit(text) {
   const g = skin().game;
   ctx.globalAlpha = .75; ctx.font = `600 15px ${fontFamily()}`;
   ctx.textAlign = "right"; ctx.textBaseline = "alphabetic"; ctx.fillStyle = g.ink;
-  ctx.fillText(text, W - 20, H - 16, 700);
+  ctx.fillText(text, window.Trk.data.W - 20, window.Trk.data.H - 16, 700);
   ctx.globalAlpha = 1;
 }
 
 /* ---------- マスコット全体 ---------- */
 function drawVrmOverlay() {
   if (!vrmState.loaded) return;
-  const R = VRM_RECT[settings.layout] || VRM_RECT.classic, talking = !!caption && performance.now() - caption.t < CAPTION_MS;
+  const R = window.Trk.data.VRM_RECT[settings.layout] || window.Trk.data.VRM_RECT.classic, talking = !!caption && performance.now() - caption.t < CAPTION_MS;
   ctx.save();
   if (talking && settings.layout !== "commentary") drawBubble(R.x + 40, R.y + 50, 640, skin().ui["--ui-accent"], true);
   if (vrmState.credit) drawCornerCredit(vrmState.credit);
@@ -389,7 +389,7 @@ function drawVrmOverlay() {
 function drawMmdOverlay() {
   const info = window.TrkMMD && window.TrkMMD.model && window.TrkMMD.model();
   if (!info) return;
-  const R = VRM_RECT[settings.layout] || VRM_RECT.classic, talking = !!caption && performance.now() - caption.t < CAPTION_MS;
+  const R = window.Trk.data.VRM_RECT[settings.layout] || window.Trk.data.VRM_RECT.classic, talking = !!caption && performance.now() - caption.t < CAPTION_MS;
   ctx.save();
   if (talking && settings.layout !== "commentary") drawBubble(R.x + 40, R.y + 50, 640, skin().ui["--ui-accent"], true);
   const credit = String(settings.mmdCredit || "").trim();
@@ -400,14 +400,14 @@ function drawMascot() {
   const m = activeMascot(); if (!m) return;
   if (m === "vrm") { drawVrmOverlay(); return; }
   if (m === "mmd") { drawMmdOverlay(); return; }
-  const def = m === "buddy" ? BUDDY_DEF : MASCOT_DEFS[m];
+  const def = m === "buddy" ? BUDDY_DEF : window.Trk.data.MASCOT_DEFS[m];
   if (!def) return;
-  const P = MASCOT_POS[settings.layout] || MASCOT_POS.classic, p = performance.now();
+  const P = window.Trk.data.MASCOT_POS[settings.layout] || window.Trk.data.MASCOT_POS.classic, p = performance.now();
   const hitAge = p - Math.max(avatarHit[0], avatarHit[1]);
   const st = { p, sad: p - lastMissT < 700, happy: hitAge < 300, talking: !!caption && p - caption.t < CAPTION_MS };
   const x = P.x, y = P.y - Math.max(0, 1 - hitAge / 180) * 14 + Math.sin(p / 420) * 4;
   ctx.save();
-  ctx.fillStyle = "rgba(0,0,0,.3)"; ctx.beginPath(); ctx.ellipse(P.x, P.y + (def.shadowY || 74), 48, 10, 0, 0, TAU); ctx.fill();
+  ctx.fillStyle = "rgba(0,0,0,.3)"; ctx.beginPath(); ctx.ellipse(P.x, P.y + (def.shadowY || 74), 48, 10, 0, 0, window.Trk.data.TAU); ctx.fill();
   ctx.save();
   try { def.draw(x, y, st); } catch (e) { console.error(e); }
   ctx.restore();
@@ -428,7 +428,7 @@ function tiltPivot(L) {
 }
 function drawGame(now) {
   const L = layout(), g = skin().game, mode = settings.playMode;
-  ctx.clearRect(0, 0, W, H);
+  ctx.clearRect(0, 0, window.Trk.data.W, window.Trk.data.H);
   if (g.scanlines) drawScanlines();
   if (L.commentary && !ownField()) drawCommentaryPanel();
   if (mode === "stage" && typeof drawStageBackdrop === "function") drawStageBackdrop(now);

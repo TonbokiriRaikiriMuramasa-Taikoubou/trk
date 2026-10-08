@@ -249,7 +249,7 @@ Object.assign(TEXT.ko, {
 
 /* ============ 小さな道具 ============ */
 const status = (k, v) => setStatus("mmdStatus", k, v);
-const mmdRect = () => VRM_RECT[settings.layout] || VRM_RECT.classic;
+const mmdRect = () => window.Trk.data.VRM_RECT[settings.layout] || window.Trk.data.VRM_RECT.classic;
 const safeNow = () => { try { return typeof window.TrkSafeMode === "function" && window.TrkSafeMode(); } catch (_) { return false; } };
 const isMmdFile = n => /\.(pmx|pmd)$/i.test(String(n || ""));
 const isVmdFile = n => /\.vmd$/i.test(String(n || ""));

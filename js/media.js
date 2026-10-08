@@ -123,9 +123,9 @@ function estimateLevel(notes) {
 /* ゲームの状態を変えずに譜面だけを作る（曲パックの書き出しでも使う）。
    作り方は chartGen（設定 settings.chartGen／既定 "1" = 旧方式）。中身は js/chart-gen.js の純関数。 */
 function generateNotes(diff, bpm, offset, seed, chartGen = settings.chartGen) {
-  if (!videoReady || !(bpm >= 60 && bpm <= 300) || !DIFF_IDS.includes(diff)) return [];
+  if (!videoReady || !(bpm >= 60 && bpm <= 300) || !window.Trk.data.DIFF_IDS.includes(diff)) return [];
   const rand = mulberry32(hashString(`${String(seed).trim()}|${diff}|${bpm}|${offset}`));
-  return window.Trk.chart.buildChartNotes({ analysis, durationMs: video.duration * 1000, diff, spec: DIFFS[diff], bpm, offset, rand, chartGen });
+  return window.Trk.chart.buildChartNotes({ analysis, durationMs: video.duration * 1000, diff, spec: window.Trk.data.DIFFS[diff], bpm, offset, rand, chartGen });
 }
 function buildChart() {
   if (!videoReady) return;
@@ -188,7 +188,7 @@ function applyChartData(data, mode = "imported", sid = "importStatus", checkFing
   if (v.key) { setStatus(sid, v.key); return false; }
   chart = v.notes.map(n => ({ time:Math.round(n.time), lane:n.lane, judged:false, result:null }));
   chartMode = mode;
-  chartDiff = DIFF_IDS.includes(data.difficulty) ? data.difficulty : settings.difficulty;
+  chartDiff = window.Trk.data.DIFF_IDS.includes(data.difficulty) ? data.difficulty : settings.difficulty;
   chartMeta = {
     bpm:typeof data.bpm === "number" && Number.isFinite(data.bpm) ? data.bpm : 0,
     offset:typeof data.offset === "number" && Number.isFinite(data.offset) ? data.offset : 0

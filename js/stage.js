@@ -243,7 +243,7 @@ function stageQuad(x0t, x1t, x0b, x1b, yb) {
 function drawStageField(now) {
   ensureStageMap();
   const g = skin().game, N = stageN(), p = performance.now(), travel = travelMs();
-  const accent = toHex(skin().ui["--ui-accent"]), pulse = beatPulse(now);
+  const accent = window.Trk.data.toHex(skin().ui["--ui-accent"]), pulse = beatPulse(now);
   const topW = stageWidthAt(0), botW = stageWidthAt(1), yb = STAGE.hitY + 60;
   const tl = STAGE.cx - topW / 2, bl = STAGE.cx - botW / 2;
   ctx.save();
@@ -258,7 +258,7 @@ function drawStageField(now) {
       const age = p - stagePress[l]; if (age > 180) continue;
       const a = Math.min(.9, .5 * gameplayFxPower()) * (1 - age / 180);
       const gr = ctx.createLinearGradient(0, STAGE.hitY, 0, STAGE.topY);
-      gr.addColorStop(0, hexToRgba(accent, a)); gr.addColorStop(1, hexToRgba(accent, 0));
+      gr.addColorStop(0, window.Trk.data.hexToRgba(accent, a)); gr.addColorStop(1, window.Trk.data.hexToRgba(accent, 0));
       stageQuad(tl + l * topW / N, tl + (l + 1) * topW / N, bl + l * botW / N, bl + (l + 1) * botW / N, STAGE.hitY);
       ctx.fillStyle = gr; ctx.fill();
     }
@@ -272,7 +272,7 @@ function drawStageField(now) {
     ctx.beginPath(); ctx.moveTo(tl + l * topW / N, STAGE.topY); ctx.lineTo(bl + l * botW / N, yb);
     if (hype && !edge) {
       ctx.shadowColor = accent; ctx.shadowBlur = 14 * gameplayFxPower();
-      ctx.strokeStyle = hexToRgba(accent, .55 + .35 * pulse); ctx.lineWidth = 3;
+      ctx.strokeStyle = window.Trk.data.hexToRgba(accent, .55 + .35 * pulse); ctx.lineWidth = 3;
     } else { ctx.strokeStyle = g.track; ctx.lineWidth = 2; ctx.globalAlpha = edge ? .9 : .45; }
     ctx.stroke(); ctx.shadowBlur = 0; ctx.globalAlpha = 1;
   }
@@ -339,7 +339,7 @@ stage.addEventListener("pointerdown", e => {
   if (phase !== "playing" || !isStage() || settings.autoPlay) return;
   if (e.target.closest("#controls, #seekBar")) return;
   e.preventDefault(); e.stopPropagation();
-  const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W;
+  const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * window.Trk.data.W;
   const bw = stageBottomW(), N = stageN(), l = Math.floor((x - (STAGE.cx - bw / 2)) / (bw / N));
   if (l >= -1 && l <= N) stageInput(Math.max(0, Math.min(N - 1, l)), e.timeStamp);
 }, true);

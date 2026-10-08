@@ -132,8 +132,9 @@ node tools/smoke-browser.mjs --compare
 | custom | `js/custom.js` | `initPacks`・`noteImage`・`packDB`・`packRuntime`・`skinShelf`・`syncNoteUI`・`updateMascotUI`（値のコピー）、`installPackFile`・`sanitizeSong`・`getPackSongs`・`renderPackList`（アクセサ。verified.js が差し替える） | 21（追補で代入の左辺 4 件を加えた） | trk61・trk62（追補） | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。差し替えの 4 名は窓と Trk の両方をアクセサ。追補：代入の左辺（`verified.js` の `installPackFile = …` など）が書き換えられていなかったのを直した（acorn-walk は左辺を `VariablePattern` として走査する）。スモーク OK |
 | library | `js/library.js` | 公開名のうち値のコピー、`addonSongs`・`libView`・`renderLib`・`renderBanner`（アクセサ。verified.js などが差し替える）。title-match.js の 4 関数も登録 | 31 | trk63 | 登録検査（title-match.js の関数も対象に広げた。失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
 | media | `js/media.js` | `CHART_FILE_MAX`・`buildChart`・`decodeAudio`・`estimateLevel`・`exportChart`・`generateNotes`・`getAC`・`importChartFile`・`loadMedia`・`loadSE`・`playSE`・`rmsAt`・`seBuffers`・`seFiles`・`setBackground`（値のコピー）、`applyChartData`・`chartToData`・`audioCtx`（アクセサ。fx.js が凍結のまま差し替える） | 62 | trk64 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。js/fx.js は未変更（凍結）。スモーク OK |
+| data | `js/data.js` | 29 名（`DIFFS`・`DIFF_IDS`・`SKINS`・`NOTE_PRESETS`・`buildCustomSkin`・`hexToRgba` など。すべて値のコピー） | 219 | trk65 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。検査の文字列照合（check-repo の SKINS 数・check-security の形の検査）は window.Trk.<領域>. を除いた本文で見るように直した（見る条件は変えていない）。スモーク OK |
 
-残りの領域（lite・main・custom・library・data・play・modes・core）は未着手。HANDOFF §7 の実機確認は別途。
+残りの領域（lite・main・custom・library・media・play・modes・core）は未着手。HANDOFF §7 の実機確認は別途。
 
 ## 4. 止める条件
 

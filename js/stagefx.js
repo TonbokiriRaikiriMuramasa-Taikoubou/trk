@@ -57,7 +57,7 @@ Object.assign(TEXT.ko, {
 });
 
 /* ============ 設定 ============ */
-const hexOk = v => typeof v === "string" && HEX.test(v) ? v.toLowerCase() : "";
+const hexOk = v => typeof v === "string" && window.Trk.data.HEX.test(v) ? v.toLowerCase() : "";
 settings.stageFx = pick(prefs.stageFx, ["off", "soft", "std", "rich"], "std");
 settings.stageLight = pick(prefs.stageLight, ["skin", "rainbow", "custom"], "skin");
 settings.stageLightColor = hexOk(prefs.stageLightColor);
@@ -71,7 +71,7 @@ const still = () => reduceMotion.matches;
 function lightColor(i, t) {
   if (settings.stageLight === "rainbow") return `hsl(${Math.round((t / 25 + i * 72) % 360)},90%,65%)`;
   if (settings.stageLight === "custom") return settings.stageLightColor || "#ffd166";
-  return toHex(i % 2 ? skin().game.perfect : skin().ui["--ui-accent"]);
+  return window.Trk.data.toHex(i % 2 ? skin().game.perfect : skin().ui["--ui-accent"]);
 }
 
 /* ============ STAGEの舞台演出（render.js がレーンの下に描きます） ============ */
@@ -98,7 +98,7 @@ function drawStageBackdrop(now) {
     const fl = ctx.createRadialGradient(0, 0, 0, 0, 0, 170);
     fl.addColorStop(0, c); fl.addColorStop(1, "rgba(0,0,0,0)");
     ctx.globalAlpha = Math.min(.6, .22 * k); ctx.fillStyle = fl;
-    ctx.beginPath(); ctx.arc(0, 0, 170, 0, TAU); ctx.fill(); ctx.restore();
+    ctx.beginPath(); ctx.arc(0, 0, 170, 0, window.Trk.data.TAU); ctx.fill(); ctx.restore();
   }
 
   /* レーンの下の床の反射 */
@@ -106,17 +106,17 @@ function drawStageBackdrop(now) {
   const rf = ctx.createRadialGradient(0, 0, 0, 0, 0, 640);
   rf.addColorStop(0, lightColor(0, t)); rf.addColorStop(1, "rgba(0,0,0,0)");
   ctx.globalAlpha = Math.min(.5, .2 * k * (.85 + .3 * pulse)); ctx.fillStyle = rf;
-  ctx.beginPath(); ctx.arc(0, 0, 640, 0, TAU); ctx.fill(); ctx.restore();
+  ctx.beginPath(); ctx.arc(0, 0, 640, 0, window.Trk.data.TAU); ctx.fill(); ctx.restore();
 
   /* 舞い上がる光 */
   const count = { soft:12, std:24, rich:44 }[settings.stageFx] || 0;
   for (let i = 0; i < count; i++) {
     const sp = .04 * (1 + (i % 4) * .35);
-    const x = (i * 397.3) % W + (still() ? 0 : Math.sin(t / 900 + i) * 20);
+    const x = (i * 397.3) % window.Trk.data.W + (still() ? 0 : Math.sin(t / 900 + i) * 20);
     const y = 1100 - ((t * sp + i * 173) % 1200);
     ctx.globalAlpha = Math.min(.8, .45 * k) * (1 - Math.abs(y - 540) / 700);
     ctx.fillStyle = lightColor(i, t);
-    ctx.beginPath(); ctx.arc(x, y, 1.5 + (i % 3), 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, 1.5 + (i % 3), 0, window.Trk.data.TAU); ctx.fill();
   }
   ctx.restore();
 }
@@ -126,7 +126,7 @@ function drawApFc() {
   if (!settings.apfcShow || phase !== "playing" || settings.autoPlay) return;
   if (stats.perfect + stats.good === 0 || stats.miss > 0 || stats.crash > 0) return;
   const ap = stats.good === 0, txt = ap ? "AP" : "FC";
-  const c = toHex(ap ? skin().game.perfect : skin().ui["--ui-accent"]);
+  const c = window.Trk.data.toHex(ap ? skin().game.perfect : skin().ui["--ui-accent"]);
   const x0 = settings.layout === "vertical" && !ownField() ? 760 : 70, y = 190;
   ctx.save();
   ctx.font = `900 18px ${fontFamily()}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
@@ -138,7 +138,7 @@ function drawApFc() {
 
 /* ============ カーテンコール（Seedのイースターエッグ） ============ */
 const CURTAIN_SEEDS = ["20230726", "20260929", "curtaincall"];
-for (const s of CURTAIN_SEEDS) EGG_KEYS[s] = "eggCurtain";
+for (const s of CURTAIN_SEEDS) window.Trk.data.EGG_KEYS[s] = "eggCurtain";
 const isCurtain = () => CURTAIN_SEEDS.includes(($("seed").value || "").trim().toLowerCase());
 let curtainAt = -1e9, endAt = -1e9;
 on("beforePlay", () => { curtainAt = performance.now(); });
@@ -153,18 +153,18 @@ function drawCurtain() {
   const ease = 1 - Math.pow(1 - open, 3), w = 960 * (1 - ease) + 80;
   ctx.save();
   for (const side of [-1, 1]) {           // 左右の幕（ひだ付き）
-    const x0 = side < 0 ? 0 : W - w;
-    ctx.fillStyle = "#8e1028"; ctx.fillRect(x0, 0, w, H);
+    const x0 = side < 0 ? 0 : window.Trk.data.W - w;
+    ctx.fillStyle = "#8e1028"; ctx.fillRect(x0, 0, w, window.Trk.data.H);
     for (let x = 0; x < w; x += 46) {
       const gr = ctx.createLinearGradient(x0 + x, 0, x0 + x + 46, 0);
       gr.addColorStop(0, "rgba(0,0,0,.35)"); gr.addColorStop(.5, "rgba(255,255,255,.08)"); gr.addColorStop(1, "rgba(0,0,0,.35)");
-      ctx.fillStyle = gr; ctx.fillRect(x0 + x, 0, 46, H);
+      ctx.fillStyle = gr; ctx.fillRect(x0 + x, 0, 46, window.Trk.data.H);
     }
   }
-  ctx.fillStyle = "#5c0a1c"; ctx.fillRect(0, 0, W, 64);    // 緞帳の上部
+  ctx.fillStyle = "#5c0a1c"; ctx.fillRect(0, 0, window.Trk.data.W, 64);    // 緞帳の上部
   ctx.fillStyle = "#8e1028";
-  for (let x = 0; x < W; x += 120) { ctx.beginPath(); ctx.arc(x + 60, 64, 60, 0, Math.PI); ctx.fill(); }
-  ctx.fillStyle = "#e0b04a"; ctx.fillRect(0, 62, W, 4);
+  for (let x = 0; x < window.Trk.data.W; x += 120) { ctx.beginPath(); ctx.arc(x + 60, 64, 60, 0, Math.PI); ctx.fill(); }
+  ctx.fillStyle = "#e0b04a"; ctx.fillRect(0, 62, window.Trk.data.W, 4);
   ctx.restore();
 }
 function drawConfetti() {
@@ -172,7 +172,7 @@ function drawConfetti() {
   const age = performance.now() - endAt; if (age < 0 || age > 6000) return;
   ctx.save();
   for (let i = 0; i < 60; i++) {
-    const x = (i * 331) % W + Math.sin(age / 500 + i) * 30;
+    const x = (i * 331) % window.Trk.data.W + Math.sin(age / 500 + i) * 30;
     const y = ((age * .25 * (1 + (i % 3) * .3) + i * 53) % 1200) - 100;
     ctx.globalAlpha = Math.min(1, (6000 - age) / 1500);
     starPath(x, y, 6 + (i % 4) * 2); ctx.fillStyle = i % 3 ? "#ffd166" : lightColor(i, age); ctx.fill();

@@ -14,7 +14,7 @@ function syncNoteUI() {
   }
 }
 function setNotes(list, persist = true) {
-  settings.notes = sanitizeNotes(list);
+  settings.notes = window.Trk.data.sanitizeNotes(list);
   syncNoteUI(); applyNoteVars(); updateTouchKeys();
   if (persist) saveUserPrefs();
 }
@@ -26,9 +26,9 @@ $("notePresets").addEventListener("click", e => {
   const b = e.target.closest("button[data-preset]"); if (!b) return;
   if (b.dataset.preset === "skin") {
     const s = skin();
-    setNotes([{ color:toHex(s.game.don, NOTE_PRESETS.classic[0].color), shape:s.shapes[0] },
-              { color:toHex(s.game.ka, NOTE_PRESETS.classic[1].color), shape:s.shapes[1] }]);
-  } else setNotes(NOTE_PRESETS[b.dataset.preset]);
+    setNotes([{ color:window.Trk.data.toHex(s.game.don, window.Trk.data.NOTE_PRESETS.classic[0].color), shape:s.shapes[0] },
+              { color:window.Trk.data.toHex(s.game.ka, window.Trk.data.NOTE_PRESETS.classic[1].color), shape:s.shapes[1] }]);
+  } else setNotes(window.Trk.data.NOTE_PRESETS[b.dataset.preset]);
 });
 
 /* ============ マスコット設定・PCLクレジット ============ */
@@ -57,14 +57,14 @@ const MAKER_COLORS = ["bg", "bg2", "panel", "text", "accent", "gold"];
 const CUSTOM_SKIN_FILE_MAX = 256 * 1024;
 function defFromSkin(id) {
   if (Object.prototype.hasOwnProperty.call(customSkinDefs, id)) return JSON.parse(JSON.stringify(customSkinDefs[id]));
-  const s = has(SKINS, id) ? SKINS[id] : SKINS.shadow, u = s.ui;
+  const s = window.Trk.data.has(window.Trk.data.SKINS, id) ? window.Trk.data.SKINS[id] : window.Trk.data.SKINS.shadow, u = s.ui;
   const font = !s.font ? "default" : /mono|consolas/i.test(s.font) ? "mono" : /serif/i.test(s.font) && !/sans/i.test(s.font) ? "serif" : "rounded";
-  const g = parseGrad(u["--ui-bg"]);   // グラデーションのスキンをリミックスしたら、2色と向きをそのまま持ってくる
+  const g = window.Trk.data.parseGrad(u["--ui-bg"]);   // グラデーションのスキンをリミックスしたら、2色と向きをそのまま持ってくる
   return {
     name:`${s.label[lang] || s.label.en} ${tr("remix")}`.slice(0, 24),
-    colors:{ bg:g ? g.from : toHex(u["--ui-bg"]), bg2:g ? g.to : "", panel:toHex(u["--ui-panel"]), text:toHex(u["--ui-text"]), accent:toHex(u["--ui-accent"]), gold:toHex(u["--ui-gold"]) },
+    colors:{ bg:g ? g.from : window.Trk.data.toHex(u["--ui-bg"]), bg2:g ? g.to : "", panel:window.Trk.data.toHex(u["--ui-panel"]), text:window.Trk.data.toHex(u["--ui-text"]), accent:window.Trk.data.toHex(u["--ui-accent"]), gold:window.Trk.data.toHex(u["--ui-gold"]) },
     glow:!!s.game.glow, scanlines:!!s.game.scanlines, gradDir:g ? g.dir : "none", font, video:"mono",
-    mascot:MASCOT_IDS.includes(s.mascot) ? s.mascot : "none"
+    mascot:window.Trk.data.MASCOT_IDS.includes(s.mascot) ? s.mascot : "none"
   };
 }
 function fillSkinMaker(id) {
@@ -78,11 +78,11 @@ function fillSkinMaker(id) {
 function readSkinMaker() {
   const colors = {};
   for (const k of MAKER_COLORS) colors[k] = $("makerColor_" + k).value;
-  return sanitizeSkinDef({ name:$("makerName").value, colors, glow:$("makerGlow").checked, scanlines:$("makerScan").checked, gradDir:$("makerGradDir").value,
+  return window.Trk.data.sanitizeSkinDef({ name:$("makerName").value, colors, glow:$("makerGlow").checked, scanlines:$("makerScan").checked, gradDir:$("makerGradDir").value,
     font:$("makerFont").value, video:$("makerVideo").value, mascot:$("makerMascot").value });
 }
 function storeCustomSkin(id, def) {
-  customSkinDefs[id] = def; SKINS[id] = buildCustomSkin(def);
+  customSkinDefs[id] = def; window.Trk.data.SKINS[id] = window.Trk.data.buildCustomSkin(def);
   saveCustomSkins(); buildSkinGrid(); applySkin(id);
 }
 const newSkinId = () => "custom_" + Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36);
@@ -114,7 +114,7 @@ $("makerImportFile").addEventListener("change", async e => {
     setStatus("makerStatus", "skinBad"); return;
   }
   let raw = null; try { raw = JSON.parse(await f.text()); } catch (_) {}
-  const def = raw && (!raw.format || raw.format === SKIN_FORMAT) ? sanitizeSkinDef(raw) : null;
+  const def = raw && (!raw.format || raw.format === SKIN_FORMAT) ? window.Trk.data.sanitizeSkinDef(raw) : null;
   if (!def) { setStatus("makerStatus", "skinBad"); return; }
   if (Object.keys(customSkinDefs).length >= CUSTOM_SKIN_MAX) { setStatus("makerStatus", "skinLimit"); return; }
   storeCustomSkin(newSkinId(), def); fillSkinMaker(settings.skin); setStatus("makerStatus", "skinImported");
@@ -123,7 +123,7 @@ $("makerDeleteBtn").addEventListener("click", () => {
   const id = settings.skin;
   if (!Object.prototype.hasOwnProperty.call(customSkinDefs, id)) { setStatus("makerStatus", "builtinLocked"); return; }
   if (!confirm(tr("confirmDelete"))) return;
-  delete customSkinDefs[id]; delete SKINS[id]; saveCustomSkins();
+  delete customSkinDefs[id]; delete window.Trk.data.SKINS[id]; saveCustomSkins();
   buildSkinGrid(); applySkin("shadow"); fillSkinMaker("shadow"); setStatus("makerStatus", "skinDeleted");
 });
 
@@ -232,7 +232,7 @@ function sanitizeSong(r, i) {
   if (typeof r.offset === "number" && isFinite(r.offset)) s.offset = Math.max(-5000, Math.min(5000, r.offset));
   if (typeof r.previewStart === "number" && isFinite(r.previewStart) && r.previewStart >= 0) s.previewStart = Math.min(36000, r.previewStart);
   if (r.charts && typeof r.charts === "object") {
-    const c = {}; for (const d of DIFF_IDS) { const p = safePath(r.charts[d], ["json"]); if (p) c[d] = p; }
+    const c = {}; for (const d of window.Trk.data.DIFF_IDS) { const p = safePath(r.charts[d], ["json"]); if (p) c[d] = p; }
     if (Object.keys(c).length) s.charts = c;
   }
   return s;
@@ -270,14 +270,14 @@ function sanitizeManifest(raw) {
   const m = { format:PACK_FORMAT, version:1, name, author:pstr(raw.author, 40), description:pstr(raw.description, 200),
               license:pstr(raw.license, 400), url:/^https:\/\/[^\s"'<>]+$/.test(url) ? url : "" };
   const creditCard = sanitizeCreditCard(raw.creditCard); if (creditCard) m.creditCard = creditCard;
-  if (raw.skin && typeof raw.skin === "object") { const d = sanitizeSkinDef({ ...raw.skin, name }); if (d) m.skin = d; }
+  if (raw.skin && typeof raw.skin === "object") { const d = window.Trk.data.sanitizeSkinDef({ ...raw.skin, name }); if (d) m.skin = d; }
   if (raw.notes && typeof raw.notes === "object") {
     const notes = {};
     for (const k of ["don", "ka"]) {
       const n = raw.notes[k]; if (!n || typeof n !== "object") continue;
       const o = {};
-      if (typeof n.color === "string" && HEX.test(n.color)) o.color = n.color.toLowerCase();
-      if (NOTE_SHAPES.includes(n.shape)) o.shape = n.shape;
+      if (typeof n.color === "string" && window.Trk.data.HEX.test(n.color)) o.color = n.color.toLowerCase();
+      if (window.Trk.data.NOTE_SHAPES.includes(n.shape)) o.shape = n.shape;
       const img = safePath(n.image, IMG_EXT); if (img) o.image = img;
       if (Object.keys(o).length) notes[k] = o;
     }
@@ -438,10 +438,10 @@ async function activatePack(id, { restore = false, skipConfirm = false } = {}) {
   packRuntime.id = id;
   packRuntime.captions = (m.mascot && m.mascot.captions) || null;
   if (m.skin) {
-    const sid = "pack_" + id, s = buildCustomSkin({ ...m.skin, mascot:m.mascot && m.mascot.vrm ? "vrm" : m.skin.mascot });
+    const sid = "pack_" + id, s = window.Trk.data.buildCustomSkin({ ...m.skin, mascot:m.mascot && m.mascot.vrm ? "vrm" : m.skin.mascot });
     s.custom = false; s.pack = true;
     s.label = { en:m.name }; s.desc = { ja:"📦 パック", en:"📦 Pack", zh:"📦 资源包", ko:"📦 팩" };
-    SKINS[sid] = s; packRuntime.skinId = sid; buildSkinGrid();
+    window.Trk.data.SKINS[sid] = s; packRuntime.skinId = sid; buildSkinGrid();
     if (!restore || savedSkinAtBoot === sid) applySkin(sid);
   }
   if (m.notes) {
@@ -475,7 +475,7 @@ async function activatePack(id, { restore = false, skipConfirm = false } = {}) {
 function deactivatePack(persist = true) {
   if (packRuntime.id) {
     if (packRuntime.skinId) {
-      const sid = packRuntime.skinId; delete SKINS[sid];
+      const sid = packRuntime.skinId; delete window.Trk.data.SKINS[sid];
       if (settings.skin === sid) applySkin("shadow", false);
       buildSkinGrid();
     }

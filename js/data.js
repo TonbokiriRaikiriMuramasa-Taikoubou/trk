@@ -556,4 +556,7 @@ window.registerMascot = registerMascot;
 window.sanitizeNotes = sanitizeNotes;
 window.sanitizeSkinDef = sanitizeSkinDef;
 window.toHex = toHex;
+/* 領域（window.Trk.data）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
+window.Trk = window.Trk || {};
+window.Trk.data = Object.assign(window.Trk.data || {}, { DIFFS, DIFF_IDS, EGG_KEYS, EGG_WORDS, FONT_DEFAULT, H, HEX, LAYOUTS, MASCOT_CAPTIONS, MASCOT_DEFS, MASCOT_FAMILY, MASCOT_IDS, MASCOT_POS, NOTE_PRESETS, NOTE_SHAPES, SKINS, TAU, VRM_RECT, W, buildCustomSkin, has, hexToRgba, luminance, mixHex, parseGrad, registerMascot, sanitizeNotes, sanitizeSkinDef, toHex });
 })();

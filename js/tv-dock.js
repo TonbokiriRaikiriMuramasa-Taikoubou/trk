@@ -94,7 +94,7 @@ function sanitizeTvDef(raw) {
   const colors = {};
   for (const k of TV_COLOR_KEYS) {
     const v = c[k];
-    if (typeof v !== "string" || !HEX.test(v.trim())) return null;
+    if (typeof v !== "string" || !window.Trk.data.HEX.test(v.trim())) return null;
     colors[k] = v.trim().toLowerCase();
   }
   const s = (raw.shape && typeof raw.shape === "object") ? raw.shape : raw;
@@ -130,18 +130,18 @@ const newTvSkinId = () => "custom_tv_" + Date.now().toString(36) + Math.floor(Ma
 
 /* 色と形を CSS 変数にして流し込む（#tvDock とエディタのプレビューの両方で使う） */
 function paintTvVars(node, def) {
-  const c = def.colors, s = def.shape, dark = luminance(c.body) < .35;
+  const c = def.colors, s = def.shape, dark = window.Trk.data.luminance(c.body) < .35;
   node.style.setProperty("--tv-body", c.body);
-  node.style.setProperty("--tv-body2", mixHex(c.body, dark ? "#000000" : "#ffffff", dark ? .45 : .18));
+  node.style.setProperty("--tv-body2", window.Trk.data.mixHex(c.body, dark ? "#000000" : "#ffffff", dark ? .45 : .18));
   node.style.setProperty("--tv-bezel", c.bezel);
   node.style.setProperty("--tv-screen", c.screen);
   node.style.setProperty("--tv-button", c.button);
   node.style.setProperty("--tv-accent", c.accent);
   node.style.setProperty("--tv-text", c.text);
-  node.style.setProperty("--tv-on-accent", luminance(c.accent) > .45 ? "#111111" : "#ffffff");
+  node.style.setProperty("--tv-on-accent", window.Trk.data.luminance(c.accent) > .45 ? "#111111" : "#ffffff");
   node.style.setProperty("--tv-radius", s.radius + "px");
   node.style.setProperty("--tv-bezelw", s.bezel + "px");
-  node.style.setProperty("--tv-lcd-bg", mixHex(c.screen, "#000000", .45));
+  node.style.setProperty("--tv-lcd-bg", window.Trk.data.mixHex(c.screen, "#000000", .45));
   node.style.setProperty("--tv-lcd-text", c.accent);
   node.dataset.glare = s.glare ? "1" : "0";
   node.dataset.scan = s.scan ? "1" : "0";
@@ -1387,7 +1387,7 @@ addEventListener("DOMContentLoaded", () => {
     ctx.globalAlpha = 1;
     ctx.fillStyle = "#000"; ctx.fillRect(0, 0, 1920, 1080);
     ctx.fillStyle = "rgba(255,255,255,.82)";
-    ctx.font = `600 56px ${FONT_DEFAULT}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.font = `600 56px ${window.Trk.data.FONT_DEFAULT}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
     ctx.fillText(text, 960, 540);
   }
   function pvFrame() {

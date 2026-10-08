@@ -72,7 +72,7 @@ Object.assign(TEXT.ko, {
 });
 
 /* ============ 設定 ============ */
-const hexOrEmpty = v => typeof v === "string" && HEX.test(v) ? v.toLowerCase() : "";
+const hexOrEmpty = v => typeof v === "string" && window.Trk.data.HEX.test(v) ? v.toLowerCase() : "";
 settings.lifeNumber = !!prefs.lifeNumber;
 settings.lifeSkin = pick(prefs.lifeSkin, ["heart", "bar", "segments", "battery", "shield", "mode", "custom"], "heart");
 settings.lifeEmoji = typeof prefs.lifeEmoji === "string" && prefs.lifeEmoji.trim() ? Array.from(prefs.lifeEmoji).slice(0, 4).join("") : "💠";
@@ -86,8 +86,8 @@ settings.orbitMoonShape = pick(prefs.orbitMoonShape, ["orb", "star", "comet"], "
 settings.orbitMoonColor = hexOrEmpty(prefs.orbitMoonColor);
 
 const isOrbit = () => settings.playMode === "orbit";
-const orbitCoreColor = () => settings.orbitCoreColor || toHex(skin().ui["--ui-accent"]);
-const orbitMoonColor = () => settings.orbitMoonColor || toHex(skin().game.perfect);
+const orbitCoreColor = () => settings.orbitCoreColor || window.Trk.data.toHex(skin().ui["--ui-accent"]);
+const orbitMoonColor = () => settings.orbitMoonColor || window.Trk.data.toHex(skin().game.perfect);
 
 /* ============ 設定画面の部品（ほかのファイルからも使います） ============ */
 function makeSeg(id, key, items) {
@@ -279,7 +279,7 @@ function drawLives() {   // render.js から呼ばれます
   if (!lifeState.max || phase === "title") return;
   const p = performance.now(), x0 = settings.layout === "vertical" && !ownField() ? 760 : 70, y = 152;
   const ratio = Math.max(0, Math.min(1, lifeState.hp / lifeState.max));
-  const color = ratio <= .3 ? "#ffb000" : toHex(skin().ui["--ui-accent"]);
+  const color = ratio <= .3 ? "#ffb000" : window.Trk.data.toHex(skin().ui["--ui-accent"]);
   const shake = Math.max(0, 1 - (p - lifeState.lostAt) / 400) * Math.sin(p / 25) * 5;
   const healing = p - lifeState.healAt < 600;
   ctx.save(); ctx.textBaseline = "middle";
@@ -295,7 +295,7 @@ function drawLives() {   // render.js から呼ばれます
     ctx.restore(); return;
   }
   const icon = lifeIcon(), bx = icon ? x0 + 46 : x0 + 12, bw = 200, bh = 12;
-  if (icon) { ctx.font = `22px ${FONT_DEFAULT}`; ctx.textAlign = "left"; ctx.fillStyle = "#fff"; ctx.fillText(icon, x0 + 12 + shake, y + 1); }
+  if (icon) { ctx.font = `22px ${window.Trk.data.FONT_DEFAULT}`; ctx.textAlign = "left"; ctx.fillStyle = "#fff"; ctx.fillText(icon, x0 + 12 + shake, y + 1); }
   if (healing) { ctx.shadowColor = color; ctx.shadowBlur = 12; }
   drawLifeBar(bx, y - bh / 2, bw, bh, ratio, color);
   ctx.shadowBlur = 0;
@@ -419,12 +419,12 @@ on("records", renderTitles);
     makeSeg("orbitCorePicker", "orbitCore", [["planet", "orbitCorePlanet"], ["ring", "orbitCoreRing"], ["square", "orbitCoreSquare"],
       ["diamond", "orbitCoreDiamond"], ["target", "orbitCoreTarget"], ["bracket", "orbitCoreBracket"]]),
     hintEl("orbitCoreHint"),
-    makeColorRow("orbitCoreColor", "orbitCoreColor", () => toHex(skin().ui["--ui-accent"])),
+    makeColorRow("orbitCoreColor", "orbitCoreColor", () => window.Trk.data.toHex(skin().ui["--ui-accent"])),
     hintEl("orbitMoonLabel"),
     makeSeg("orbitMoonPicker", "orbitMoon", [["song", "orbitMoonSong"], ["beat", "orbitMoonBeat"], ["off", "orbitMoonOff"]]),
     hintEl("orbitMoonShapeLabel"),
     makeSeg("orbitMoonShapePicker", "orbitMoonShape", [["orb", "orbitMoonOrb"], ["star", "orbitMoonStar"], ["comet", "orbitMoonComet"]]),
-    makeColorRow("orbitMoonColor", "orbitMoonColor", () => toHex(skin().game.perfect)),
+    makeColorRow("orbitMoonColor", "orbitMoonColor", () => window.Trk.data.toHex(skin().game.perfect)),
     makeCheck("swayOrbit", "swayOrbit", "swayOrbit"),
     hintEl("orbitViewHint")
   );
@@ -497,9 +497,9 @@ function orbitHitPos() { return { x:orbit.ax, y:orbit.ay }; }   // game.js か�
 /* ============ 🪐 ORBIT：描画 ============ */
 function drawOrb(x, y, c, r) {
   const gr = ctx.createRadialGradient(x, y, 0, x, y, r * 2.2);
-  gr.addColorStop(0, hexToRgba(toHex(c), .55)); gr.addColorStop(1, hexToRgba(toHex(c), 0));
-  ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, r * 2.2, 0, TAU); ctx.fill();
-  ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
+  gr.addColorStop(0, window.Trk.data.hexToRgba(window.Trk.data.toHex(c), .55)); gr.addColorStop(1, window.Trk.data.hexToRgba(window.Trk.data.toHex(c), 0));
+  ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, r * 2.2, 0, window.Trk.data.TAU); ctx.fill();
+  ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y, r, 0, window.Trk.data.TAU); ctx.fill();
   ctx.lineWidth = 3; ctx.strokeStyle = "#fff"; ctx.stroke();
 }
 function starPath(x, y, r) {   // stagefx.js（紙吹雪）も使います
@@ -527,8 +527,8 @@ function drawOrbitNote(n, isNext, c, g) {
     const w = windows(), vpm = orbitPath.vpm, hw = 20;
     const lp = Math.max(6, w.perfect * vpm), lg = Math.max(lp + 4, w.good * vpm);
     rr(-lg, -hw - 4, lg * 2, hw * 2 + 8, 10);
-    ctx.fillStyle = hexToRgba(toHex(c), .16); ctx.fill();
-    ctx.lineWidth = 2; ctx.strokeStyle = hexToRgba(toHex(c), .55); ctx.stroke();
+    ctx.fillStyle = window.Trk.data.hexToRgba(window.Trk.data.toHex(c), .16); ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = window.Trk.data.hexToRgba(window.Trk.data.toHex(c), .55); ctx.stroke();
     if (isNext) { ctx.shadowColor = c; ctx.shadowBlur = 22; }
     rr(-lp, -hw, lp * 2, hw * 2, Math.min(9, lp)); ctx.fillStyle = c; ctx.fill(); ctx.shadowBlur = 0;
     ctx.lineWidth = isNext ? 4 : 3; ctx.strokeStyle = g.noteBorder; ctx.stroke();
@@ -545,16 +545,16 @@ function drawOrbitCore(ax, ay, now, g) {
   const c = orbitCoreColor(), type = settings.orbitCore, pulse = beatPulse(now);
   const age = performance.now() - pressH.t, flash = age < 120 ? Math.min(1, .5 * gameplayFxPower()) * (1 - age / 120) : 0;
   if (type === "planet") {
-    if (flash) { ctx.globalAlpha = flash; ctx.fillStyle = c; ctx.beginPath(); ctx.arc(ax, ay, 44, 0, TAU); ctx.fill(); ctx.globalAlpha = 1; }
+    if (flash) { ctx.globalAlpha = flash; ctx.fillStyle = c; ctx.beginPath(); ctx.arc(ax, ay, 44, 0, window.Trk.data.TAU); ctx.fill(); ctx.globalAlpha = 1; }
     ctx.globalAlpha = .9; ctx.lineWidth = 5; ctx.strokeStyle = g.ink;
-    ctx.beginPath(); ctx.arc(ax, ay, 36 + pulse * 5, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1;
+    ctx.beginPath(); ctx.arc(ax, ay, 36 + pulse * 5, 0, window.Trk.data.TAU); ctx.stroke(); ctx.globalAlpha = 1;
     drawOrb(ax, ay, c, 16);
     return;
   }
   const s = 31 + pulse * 3, round = type === "ring" || type === "target";
   ctx.save(); ctx.translate(ax, ay);
   if (!round) ctx.rotate(orbitDir(now) + (type === "diamond" ? Math.PI / 4 : 0));
-  const shape = () => { if (round) { ctx.beginPath(); ctx.arc(0, 0, s, 0, TAU); } else rr(-s, -s, s * 2, s * 2, 8); };
+  const shape = () => { if (round) { ctx.beginPath(); ctx.arc(0, 0, s, 0, window.Trk.data.TAU); } else rr(-s, -s, s * 2, s * 2, 8); };
   if (flash) { shape(); ctx.globalAlpha = flash; ctx.fillStyle = c; ctx.fill(); ctx.globalAlpha = 1; }
   ctx.lineJoin = "round"; ctx.lineCap = "round";
   if (type === "bracket") {
@@ -567,7 +567,7 @@ function drawOrbitCore(ax, ay, now, g) {
   ctx.lineWidth = 5; ctx.strokeStyle = c; ctx.stroke();
   if (type === "target") {
     ctx.globalAlpha = .85; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(0, 0, s * .45, 0, TAU); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 0, s * .45, 0, window.Trk.data.TAU); ctx.stroke();
     ctx.beginPath();
     for (let i = 0; i < 4; i++) {
       const a = i * Math.PI / 2;
@@ -583,14 +583,14 @@ function drawOrbitMoon(ax, ay, now) {
   let ang;
   if (mode === "song") {
     const dur = (video.duration || 0) * 1000, k = dur ? Math.max(0, Math.min(1, now / dur)) : 0;
-    ang = -Math.PI / 2 + k * TAU;
+    ang = -Math.PI / 2 + k * window.Trk.data.TAU;
     ctx.save(); ctx.lineCap = "round"; ctx.strokeStyle = c;
-    ctx.globalAlpha = .18; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(ax, ay, R, 0, TAU); ctx.stroke();
+    ctx.globalAlpha = .18; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(ax, ay, R, 0, window.Trk.data.TAU); ctx.stroke();
     if (k > 0) { ctx.globalAlpha = .65; ctx.beginPath(); ctx.arc(ax, ay, R, -Math.PI / 2, ang); ctx.stroke(); }
     ctx.restore();
   } else {
     const beat = 60000 / (chartMeta.bpm || 120);
-    ang = (now - (chartMeta.offset || 0)) / beat * TAU - Math.PI / 2;
+    ang = (now - (chartMeta.offset || 0)) / beat * window.Trk.data.TAU - Math.PI / 2;
   }
   const x = ax + Math.cos(ang) * R, y = ay + Math.sin(ang) * R;
   ctx.save();
@@ -599,7 +599,7 @@ function drawOrbitMoon(ax, ay, now) {
     for (let i = 6; i >= 1; i--) {
       const a = ang - i * step;
       ctx.globalAlpha = .45 * (1 - i / 7); ctx.fillStyle = c;
-      ctx.beginPath(); ctx.arc(ax + Math.cos(a) * R, ay + Math.sin(a) * R, 8 - i, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.arc(ax + Math.cos(a) * R, ay + Math.sin(a) * R, 8 - i, 0, window.Trk.data.TAU); ctx.fill();
     }
     ctx.globalAlpha = 1; drawOrb(x, y, c, 8);
   } else if (settings.orbitMoonShape === "star") {
@@ -611,7 +611,7 @@ function drawOrbitMoon(ax, ay, now) {
 }
 function drawOrbitField(now) {   // render.js から呼ばれます
   ensureOrbit(); updateOrbitCam(now);
-  const g = skin().game, travel = travelMs(), tEnd = now + travel * 1.1, accent = toHex(skin().ui["--ui-accent"]);
+  const g = skin().game, travel = travelMs(), tEnd = now + travel * 1.1, accent = window.Trk.data.toHex(skin().ui["--ui-accent"]);
   ctx.save(); ctx.lineCap = "round"; ctx.lineJoin = "round";
   strokeOrbitRange(now - 700, now, 46, g.lane, .45);
   strokeOrbitRange(now, tEnd, 46, g.lane, 1);
@@ -641,8 +641,8 @@ function drawOrbitField(now) {   // render.js から呼ばれます
   drawOrbitMoon(ax, ay, now);
   if (nextIdx === 0 && !settings.hideGameplayUI && !settings.autoPlay) {
     ctx.font = `800 26px ${fontFamily()}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.lineWidth = 6; ctx.strokeStyle = "rgba(0,0,0,.6)"; ctx.strokeText(tr("orbitAnyKey"), ax, H - 150);
-    ctx.fillStyle = "#fff"; ctx.fillText(tr("orbitAnyKey"), ax, H - 150);
+    ctx.lineWidth = 6; ctx.strokeStyle = "rgba(0,0,0,.6)"; ctx.strokeText(tr("orbitAnyKey"), ax, window.Trk.data.H - 150);
+    ctx.fillStyle = "#fff"; ctx.fillText(tr("orbitAnyKey"), ax, window.Trk.data.H - 150);
   }
   ctx.restore();
 }

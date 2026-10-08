@@ -265,7 +265,7 @@ function ensureAnalyser() {
 }
 
 /* ============ 小さな道具（色・履歴・数字） ============ */
-const FONT = (size, weight) => `${weight ? weight + " " : ""}${Math.max(8, Math.round(size))}px ${FONT_DEFAULT}`;
+const FONT = (size, weight) => `${weight ? weight + " " : ""}${Math.max(8, Math.round(size))}px ${window.Trk.data.FONT_DEFAULT}`;
 const MONO = size => `${Math.max(8, Math.round(size))}px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace`;
 
 function themeColor(theme, i, n, v) {

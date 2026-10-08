@@ -230,7 +230,7 @@ on("language", syncTruckKeyUI);
 /* ---------- レーンの色付け（スキンのアクセント色） ---------- */
 function drawLaneTint(L) {
   const a = settings.laneTint; if (a <= 0) return;
-  ctx.fillStyle = hexToRgba(toHex(skin().ui["--ui-accent"]), a);
+  ctx.fillStyle = window.Trk.data.hexToRgba(window.Trk.data.toHex(skin().ui["--ui-accent"]), a);
   if (L.vertical) {
     const x0 = L.centers[0] - L.laneW / 2, x1 = L.centers[1] + L.laneW / 2;
     ctx.fillRect(x0, L.topY, x1 - x0, L.hitY - L.topY);
@@ -290,7 +290,7 @@ function drawTruck(L, now) {
     ctx.restore();
   }
   ctx.lineJoin = "round";
-  ctx.fillStyle = "rgba(0,0,0,.28)"; ctx.beginPath(); ctx.ellipse(-35, 36, 70, 8, 0, 0, TAU); ctx.fill();   // 影
+  ctx.fillStyle = "rgba(0,0,0,.28)"; ctx.beginPath(); ctx.ellipse(-35, 36, 70, 8, 0, 0, window.Trk.data.TAU); ctx.fill();   // 影
   rr(-100, -30, 82, 52, 7); ctx.fillStyle = "#f4f4f8"; ctx.fill();                                          // 荷台
   ctx.lineWidth = 3; ctx.strokeStyle = ink; ctx.stroke();
   ctx.fillStyle = cab; ctx.fillRect(-100, 4, 82, 7);
@@ -298,17 +298,17 @@ function drawTruck(L, now) {
   ctx.fillText("trk!", -59, -12);
   rr(-16, -18, 44, 40, 9); ctx.fillStyle = cab; ctx.fill(); ctx.stroke();                                  // 運転席（今のレーンの色）
   rr(6, -12, 17, 14, 4); ctx.fillStyle = "#cfeaff"; ctx.fill();
-  ctx.fillStyle = "#ffe27a"; ctx.beginPath(); ctx.arc(27, 12, 4 + hitK * 2, 0, TAU); ctx.fill();            // ヘッドライト
+  ctx.fillStyle = "#ffe27a"; ctx.beginPath(); ctx.arc(27, 12, 4 + hitK * 2, 0, window.Trk.data.TAU); ctx.fill();            // ヘッドライト
   if (hitK > 0 && gameplayFxPower() > 0) {
     ctx.globalCompositeOperation = "lighter";
     const gr = ctx.createRadialGradient(30, 12, 0, 30, 12, 44);
     gr.addColorStop(0, `rgba(255,226,122,${Math.min(.8, .4 * gameplayFxPower()) * hitK})`); gr.addColorStop(1, "rgba(255,226,122,0)");
-    ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(30, 12, 44, 0, TAU); ctx.fill();
+    ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(30, 12, 44, 0, window.Trk.data.TAU); ctx.fill();
     ctx.globalCompositeOperation = "source-over";
   }
-  const spin = (p / 60) % TAU;                                                                              // タイヤ
+  const spin = (p / 60) % window.Trk.data.TAU;                                                                              // タイヤ
   for (const wx of [-78, -40, 12]) {
-    ctx.fillStyle = ink; ctx.beginPath(); ctx.arc(wx, 24, 11, 0, TAU); ctx.fill();
+    ctx.fillStyle = ink; ctx.beginPath(); ctx.arc(wx, 24, 11, 0, window.Trk.data.TAU); ctx.fill();
     ctx.strokeStyle = "#9aa0aa"; ctx.lineWidth = 2; ctx.beginPath();
     ctx.moveTo(wx + Math.cos(spin) * 7, 24 + Math.sin(spin) * 7); ctx.lineTo(wx - Math.cos(spin) * 7, 24 - Math.sin(spin) * 7); ctx.stroke();
   }

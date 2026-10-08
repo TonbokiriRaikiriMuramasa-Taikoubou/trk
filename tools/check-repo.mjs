@@ -208,7 +208,7 @@ if (skinsStart < 0 || skinsEnd < 0) {
   fail("SKINS block could not be read in js/data.js");
 } else {
   const presetCount = (dataJs.slice(skinsStart, skinsEnd).match(/label:\{ja:/g) || []).length;
-  const mikuCount = (read("js/characters/miku.js").match(/^ {2}SKINS\.[A-Za-z0-9]+ = \{/gm) || []).length;
+  const mikuCount = (read("js/characters/miku.js").match(/^ {2}(?:window\.Trk\.data\.)?SKINS\.[A-Za-z0-9]+ = \{/gm) || []).length;
   if (presetCount + mikuCount !== 31) fail(`expected 31 overall skins, found ${presetCount + mikuCount}`);
   else ok("overall skin count is 31");
   /* 🎓 ごほうびスキン（グラデュエーション）は、スタンプ5つで解禁まで鍵がかかっていること */
@@ -1644,6 +1644,7 @@ const TRK_REGISTRARS = {
   "js/custom.js": "custom",
   "js/library.js": "library",
   "js/media.js": "media",
+  "js/data.js": "data",
 };
 const TRK_NOT_REGISTERED = { "js/core.js": ["_trkStudyRoomOpen"] }; // 互換の読み取り専用アクセサ（宣言ではない）
 const TRK_EXTRAS = { "js/library.js": ["js/title-match.js"] }; // 登録元が別ファイルの関数も領域へ出す（plTitleKeys など）

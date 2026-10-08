@@ -17,7 +17,7 @@ const view = $("view"), vctx = view.getContext("2d");
 const fx = $("fx"), ctx = fx.getContext("2d");
 
 function fitStage() {
-  const s = Math.min(innerWidth / W, innerHeight / H);
+  const s = Math.min(innerWidth / window.Trk.data.W, innerHeight / window.Trk.data.H);
   stage.style.transform = `translate(-50%,-50%) scale(${s})`;
 }
 addEventListener("resize", fitStage);
@@ -53,8 +53,8 @@ function saveCustomSkins() { try { localStorage.setItem(CUSTOM_SKINS_KEY, JSON.s
   try { raw = JSON.parse(localStorage.getItem(CUSTOM_SKINS_KEY)) || {}; } catch (_) {}
   for (const [id, d] of Object.entries(raw)) {
     if (!/^custom_[a-z0-9]+$/.test(id)) continue;
-    const def = sanitizeSkinDef(d);
-    if (def) { customSkinDefs[id] = def; SKINS[id] = buildCustomSkin(def); }
+    const def = window.Trk.data.sanitizeSkinDef(d);
+    if (def) { customSkinDefs[id] = def; window.Trk.data.SKINS[id] = window.Trk.data.buildCustomSkin(def); }
   }
 })();
 
@@ -145,10 +145,10 @@ const TRK_ENUM_VALUES = {
 
 const settings = {
   language: pick(prefs.language, ["ja", "en", "zh", "ko"], guessLang()),
-  skin: has(SKINS, prefs.skin) ? prefs.skin : (prefs.skin === "dark" ? "shadow" : prefs.skin === "light" ? "daylight" : "shadow"),
+  skin: has(window.Trk.data.SKINS, prefs.skin) ? prefs.skin : (prefs.skin === "dark" ? "shadow" : prefs.skin === "light" ? "daylight" : "shadow"),
   skinShelfOpen: prefs.skinShelfOpen !== false,      // 🖼 スキンの棚の開閉（30種＋カスタムでも設定画面が膨らまないように）
   skinShelfCat: pick(prefs.skinShelfCat, ["all","basic","miku","dark","light","grad","fun","custom"], "all"),
-  layout: pick(prefs.layout ?? prefs.gameplayLayout, Object.keys(LAYOUTS), "classic"),
+  layout: pick(prefs.layout ?? prefs.gameplayLayout, Object.keys(window.Trk.data.LAYOUTS), "classic"),
   videoStyle: pick(prefs.videoStyle, VIDEO_STYLE_IDS, "skin"),
   videoZoom: num(prefs.videoZoom, .5, 3, 1),
   videoKeys: savedVideoKeys,
@@ -162,7 +162,7 @@ const settings = {
   /* プレイ方法：以前の「AUTO」モードは「MANUAL＋AUTOオン」に引き継ぐ */
   playMode: pick(prefs.playMode, PLAY_MODES, "manual"),
   autoPlay: prefs.autoPlay === true || prefs.playMode === "auto",
-  difficulty: pick(prefs.difficulty, DIFF_IDS, "normal"),
+  difficulty: pick(prefs.difficulty, window.Trk.data.DIFF_IDS, "normal"),
   showMasterDiff: !!prefs.showMasterDiff,
   chartGen: pick(prefs.chartGen, ["1", "2"], "2"),                        // 🎼 自動譜面の作り方（既定は新方式。旧方式「1」へ戻せば、旧譜面の記録もそのまま開ける）
   seed: typeof prefs.seed === "string" ? prefs.seed.slice(0, 32) : "834271",   // 曲ごとの設定がない曲の初期値
@@ -218,8 +218,8 @@ const settings = {
   synthModeFastStart: !!prefs.synthModeFastStart,
   synthModeKeyboardLock: prefs.synthModeKeyboardLock !== false,
   synthModeWideKeyboard: !!prefs.synthModeWideKeyboard,
-  notes: sanitizeNotes(prefs.notes ?? (prefs.skin === "clarity" ? NOTE_PRESETS.clarity : null)),
-  mascot: pick(prefs.mascot, ["skin", "none", ...MASCOT_IDS], "skin"),
+  notes: window.Trk.data.sanitizeNotes(prefs.notes ?? (prefs.skin === "clarity" ? window.Trk.data.NOTE_PRESETS.clarity : null)),
+  mascot: pick(prefs.mascot, ["skin", "none", ...window.Trk.data.MASCOT_IDS], "skin"),
   fxPower: num(prefs.fxPower, 0, 3, 1.5),
   gameFxMode: pick(prefs.gameFxMode, ["full", "soft", "off"], "full"),
   vrmFrame: pick(prefs.vrmFrame, ["full", "upper", "face"], "full"),
@@ -402,11 +402,11 @@ function resetLitePrefs() {
 }
 function resetNotesPrefs() {
   try {
-    const def = (typeof NOTE_PRESETS !== "undefined" && NOTE_PRESETS.standard) ? NOTE_PRESETS.standard : null;
+    const def = (typeof NOTE_PRESETS !== "undefined" && window.Trk.data.NOTE_PRESETS.standard) ? window.Trk.data.NOTE_PRESETS.standard : null;
     if (def) settings.notes = JSON.parse(JSON.stringify(def));
-    else settings.notes = sanitizeNotes(null);
+    else settings.notes = window.Trk.data.sanitizeNotes(null);
     applyNoteVars();
-  } catch(_) { settings.notes = sanitizeNotes(null); }
+  } catch(_) { settings.notes = window.Trk.data.sanitizeNotes(null); }
 }
 /* 🔥 TRKアンプ（🎚 エフェクターラック・js/fx.js。左下の独立カテゴリー）のリセット。
    fx.js は core.js よりあとに読み込まれるので、読み込み時点では settings.fx… がまだ無い。
@@ -642,13 +642,13 @@ function parseHashParams(hash) {
 })();
 
 
-const skin = () => has(SKINS, settings.skin) ? SKINS[settings.skin] : SKINS.shadow;
-const fontFamily = () => skin().font || FONT_DEFAULT;
+const skin = () => has(window.Trk.data.SKINS, settings.skin) ? window.Trk.data.SKINS[settings.skin] : window.Trk.data.SKINS.shadow;
+const fontFamily = () => skin().font || window.Trk.data.FONT_DEFAULT;
 function activeMascot() {
   const m = settings.mascot === "skin" ? skin().mascot : settings.mascot;
-  return MASCOT_IDS.includes(m) ? m : null;
+  return window.Trk.data.MASCOT_IDS.includes(m) ? m : null;
 }
-const isPclMascot = m => !!m && MASCOT_FAMILY[m] === "miku";
+const isPclMascot = m => !!m && window.Trk.data.MASCOT_FAMILY[m] === "miku";
 
 /* ---------- 状態 ---------- */
 let phase = "title";            // title / playing / paused / ended
@@ -765,7 +765,7 @@ const travelMs = () => 1700 / settings.scroll;
 /* 判定幅（難易度 × 判定の厳しさ） */
 const JUDGE_SCALE = { lenient:1.3, standard:1, strict:.75 };
 const windows = () => {
-  const d = DIFF_IDS.includes(chartDiff) ? DIFFS[chartDiff] : DIFFS.normal;
+  const d = window.Trk.data.DIFF_IDS.includes(chartDiff) ? window.Trk.data.DIFFS[chartDiff] : window.Trk.data.DIFFS.normal;
   const k = Object.prototype.hasOwnProperty.call(JUDGE_SCALE, settings.judge) ? JUDGE_SCALE[settings.judge] : 1;
   return { perfect:d.perfect * k, good:d.good * k };
 };
@@ -963,7 +963,7 @@ function buildSkinGrid() {
   const grid = $("skinGrid"); if (!grid) return;
   grid.textContent = "";
   /* 棚のチップ（そのカテゴリーに属するスキンがないときはチップ自体を出さない） */
-  const cats = new Set(); for (const s of Object.values(SKINS)) skinCatList(s).forEach(c => cats.add(c));
+  const cats = new Set(); for (const s of Object.values(window.Trk.data.SKINS)) skinCatList(s).forEach(c => cats.add(c));
   const cat = settings.skinShelfCat !== "all" && cats.has(settings.skinShelfCat) ? settings.skinShelfCat : "all";
   const chips = $("skinChips");
   if (chips) {
@@ -976,8 +976,8 @@ function buildSkinGrid() {
       chips.append(c);
     }
   }
-  const count = $("skinShelfCount"); if (count) count.textContent = `（${Object.keys(SKINS).length}）`;
-  for (const [id, s] of Object.entries(SKINS)) {
+  const count = $("skinShelfCount"); if (count) count.textContent = `（${Object.keys(window.Trk.data.SKINS).length}）`;
+  for (const [id, s] of Object.entries(window.Trk.data.SKINS)) {
     if (cat !== "all" && !skinCatList(s).includes(cat)) continue;
     if (s.locked && !settings.skinGradUnlocked) {   /* ❓ ごほうびスキン（スタンプ5つで解禁）は、正体不明カードで出す */
       const q = el("button", "skinCard locked"); q.type = "button"; q.disabled = true; q.title = tr("skinLockedHint");
@@ -1018,12 +1018,12 @@ function applyNoteVars() {
   root.setProperty("--don", settings.notes[0].color); root.setProperty("--ka", settings.notes[1].color);
 }
 function applySkin(id, persist = true) {
-  if (has(SKINS, id) && SKINS[id].locked && !settings.skinGradUnlocked) id = "shadow";   /* 🔒 ごほうびスキンは、スタンプ5つで解禁されるまで当てられない */
-  settings.skin = has(SKINS, id) ? id : "shadow";
+  if (has(window.Trk.data.SKINS, id) && window.Trk.data.SKINS[id].locked && !settings.skinGradUnlocked) id = "shadow";   /* 🔒 ごほうびスキンは、スタンプ5つで解禁されるまで当てられない */
+  settings.skin = has(window.Trk.data.SKINS, id) ? id : "shadow";
   const s = skin(), root = document.documentElement.style;
   for (const [k, v] of Object.entries(s.ui)) root.setProperty(k, v);
   root.setProperty("--stage-bg", s.game.stage); root.setProperty("--hud-text", s.game.ink);
-  root.setProperty("--hud-shadow", s.game.inkShadow); root.setProperty("--font", s.font || FONT_DEFAULT);
+  root.setProperty("--hud-shadow", s.game.inkShadow); root.setProperty("--font", s.font || window.Trk.data.FONT_DEFAULT);
   root.setProperty("--j-perfect", s.game.perfect); root.setProperty("--j-good", s.game.good); root.setProperty("--j-miss", s.game.miss);
   applyNoteVars();
   document.documentElement.dataset.skin = settings.skin;
@@ -1071,10 +1071,10 @@ on("options", updateTouchKeys);
 /* 隠しSeedの効果を調べる（完全一致：EGG_KEYS／言葉を含む：EGG_WORDS） */
 function seedEggs(raw) {
   const s = String(raw || "").trim(), low = s.toLowerCase();
-  const r = { master:false, rush:false, level:null, key:EGG_KEYS[low] || EGG_KEYS[s] || null, vars:null };
+  const r = { master:false, rush:false, level:null, key:window.Trk.data.EGG_KEYS[low] || window.Trk.data.EGG_KEYS[s] || null, vars:null };
   if (low === "765" || low === "143") r.master = true;
   if (low === "2000" || low === "143") r.rush = true;
-  for (const rule of EGG_WORDS) {
+  for (const rule of window.Trk.data.EGG_WORDS) {
     const w = rule.words.find(x => low.includes(x)); if (!w) continue;
     if (rule.master) r.master = true;
     if (rule.rush) r.rush = true;
@@ -1213,7 +1213,7 @@ function validImportedSettingEnum(key, value) {
         if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("設定JSONはオブジェクト形式にしてください");
         let applied = [], rejected = [];
         const hasImported = key => Object.prototype.hasOwnProperty.call(data, key);
-        if (hasImported("notes")) { settings.notes = sanitizeNotes(data.notes); applied.push("notes"); }
+        if (hasImported("notes")) { settings.notes = window.Trk.data.sanitizeNotes(data.notes); applied.push("notes"); }
         const importedVideoStyle = hasImported("videoStyle") ? pick(data.videoStyle, VIDEO_STYLE_IDS, "") : "";
         if (importedVideoStyle) { settings.videoStyle = importedVideoStyle; applied.push("videoStyle"); }
         if (hasImported("bgDim") && typeof data.bgDim === "number") { settings.bgDim = clampTvDim(data.bgDim); applied.push("bgDim"); }

@@ -249,9 +249,9 @@ function endGame(failed = false) {
 
 /* ---------- セリフ ---------- */
 function setCaption(key, vars, speaker) {
-  const m = activeMascot(), fam = m ? MASCOT_FAMILY[m] : null;
+  const m = activeMascot(), fam = m ? window.Trk.data.MASCOT_FAMILY[m] : null;
   const pc = (typeof packRuntime !== "undefined" && packRuntime.captions) || null;
-  const own = (pc && pc[key]) || (fam && MASCOT_CAPTIONS[fam] && MASCOT_CAPTIONS[fam][key]) || (skin().captions && skin().captions[key]);
+  const own = (pc && pc[key]) || (fam && window.Trk.data.MASCOT_CAPTIONS[fam] && window.Trk.data.MASCOT_CAPTIONS[fam][key]) || (skin().captions && skin().captions[key]);
   let text = own ? (own[lang] || own.en || Object.values(own)[0]) : tr(key);
   if (vars) for (const [k, v] of Object.entries(vars)) text = text.split(`{${k}}`).join(String(v));
   caption = { text, speaker, t:performance.now() };
@@ -301,7 +301,7 @@ function judgeNote(n, kind, delta) {
       }
     }
     const hp = judgeHitPos(n);
-    effects.push({ x:hp.x, y:hp.y, c:laneColor(n.lane), t:performance.now(), kind, seed:Math.random() * TAU });
+    effects.push({ x:hp.x, y:hp.y, c:laneColor(n.lane), t:performance.now(), kind, seed:Math.random() * window.Trk.data.TAU });
     avatarHit[n.lane] = performance.now();
     if (stats.combo % 50 === 0) setCaption("capCombo", { n:stats.combo }, 1);
     if (delta != null && !settings.autoPlay) { stats.errN++; stats.errSum += delta; stats.errSq += delta * delta; }   // 平均とばらつき
@@ -505,7 +505,7 @@ function renderRecords() {
   const ck = chart.length ? chartKeyOf() : "", tbl = el("table", "recTable"), head = el("tr");
   [tr("recDiff"), tr("recBest"), tr("recAcc"), tr("recBestP"), tr("recCount"), ...SLOT_COLS.map(([, , k]) => tr(k))].forEach(h => head.append(el("th", "", h)));
   tbl.append(head);
-  const charts = Object.entries(s.charts || {}).sort(([, a], [, b]) => DIFF_IDS.indexOf(a.diff) - DIFF_IDS.indexOf(b.diff));
+  const charts = Object.entries(s.charts || {}).sort(([, a], [, b]) => window.Trk.data.DIFF_IDS.indexOf(a.diff) - window.Trk.data.DIFF_IDS.indexOf(b.diff));
   charts.forEach(([key, c]) => {
     const row = el("tr", key === ck ? "cur" : ""), badge = c.ap ? " ⭐" : c.fc ? " FC" : "";
     const bestMods = c.best && Array.isArray(c.best.mods) && c.best.mods.length ? ` [${c.best.mods.join(" ")}]` : "";

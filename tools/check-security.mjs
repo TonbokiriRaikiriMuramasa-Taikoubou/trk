@@ -406,7 +406,10 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     sw.indexOf("safeClients.add") < sw.indexOf("caches.match");
   rule(swSafe, "the service worker never serves cached copies to a ?safe=1 client (no cache poisoning bypass)");
 
-  const media = js["js/media.js"], library = js["js/library.js"];
+  /* 名前空間 D：領域の公開名（window.Trk.<領域>.）を取り除いた本文で、コードの形（検証の有無）を見る。
+     見る内容は変えない。移動した名前（DIFF_IDS・SKINS など）も同じ条件で照合する */
+  const jsNs = Object.fromEntries(Object.entries(js).map(([k, v]) => [k, v.replace(/window\.Trk\.\w+\./g, "")]));
+  const media = jsNs["js/media.js"], library = jsNs["js/library.js"];
   rule(media.includes("const ANALYZE_MAX = 96 * 1024 * 1024") && media.includes("const ANALYZE_MAX_SEC = 20 * 60") &&
     media.includes("video.duration > ANALYZE_MAX_SEC") && media.includes('tooLong ? "analysisSkippedLong"') && media.includes('tooBig ? "analysisSkipped"') &&
     !/file\.arrayBuffer\(\)[^\n]*\n[^\n]*ANALYZE/ .test(media),
@@ -418,22 +421,22 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     media.includes('has("bpm")') && media.includes('has("offset")') && media.includes("!Number.isFinite(data.offset)");
   rule(chartCap, "standalone chart JSON is size-capped and note values must be numeric JSON values");
 
-  const core = js["js/core.js"], tv = js["js/tv-dock.js"];
+  const core = jsNs["js/core.js"], tv = jsNs["js/tv-dock.js"];
   const safeUrlSettings = core.includes("VIDEO_STYLE_IDS.includes(f)") && core.includes("pick(data.videoStyle, VIDEO_STYLE_IDS, \"\")") &&
     core.includes("window.TrkTV.skins().some") && core.includes('window.__trkPendingTvDockSkin = s') &&
     tv.includes("hasTvSkin(requestedTvSkin)") && tv.includes("Object.prototype.hasOwnProperty.call(TV_DOCK_SKINS, id)") &&
     core.includes("Object.prototype.hasOwnProperty.call(baseMap, settings.videoStyle)");
   rule(safeUrlSettings, "URL/import video and TV skin values are allowlisted before persistence or map lookup");
-  const skinMapSafe = js["js/data.js"].includes("const has = (o, k) => !!o && Object.prototype.hasOwnProperty.call(o, k)") &&
+  const skinMapSafe = jsNs["js/data.js"].includes("const has = (o, k) => !!o && Object.prototype.hasOwnProperty.call(o, k)") &&
     core.includes("has(SKINS, prefs.skin)") && core.includes("has(SKINS, settings.skin)") && core.includes("has(SKINS, id)") &&
-    js["js/custom.js"].includes("has(SKINS, id) ? SKINS[id] : SKINS.shadow") &&
-    js["js/lib-skins.js"].includes("Object.prototype.hasOwnProperty.call(LIB_SKINS, id)") &&
-    js["js/fx-dock.js"].includes("Object.prototype.hasOwnProperty.call(DOCK_SKINS, settings.fxDockSkin)");
+    jsNs["js/custom.js"].includes("has(SKINS, id) ? SKINS[id] : SKINS.shadow") &&
+    jsNs["js/lib-skins.js"].includes("Object.prototype.hasOwnProperty.call(LIB_SKINS, id)") &&
+    jsNs["js/fx-dock.js"].includes("Object.prototype.hasOwnProperty.call(DOCK_SKINS, settings.fxDockSkin)");
   rule(skinMapSafe, "built-in/custom skin selection rejects inherited object properties such as __proto__");
-  const customSkin = js["js/custom.js"], skinFilesSafe = customSkin.includes("CUSTOM_SKIN_FILE_MAX = 256 * 1024") &&
+  const customSkin = jsNs["js/custom.js"], skinFilesSafe = customSkin.includes("CUSTOM_SKIN_FILE_MAX = 256 * 1024") &&
     customSkin.includes("f.size > CUSTOM_SKIN_FILE_MAX") && customSkin.indexOf("f.size > CUSTOM_SKIN_FILE_MAX") < customSkin.indexOf("await f.text()") &&
     customSkin.includes("Object.prototype.hasOwnProperty.call(customSkinDefs, settings.skin)") &&
-    js["js/data.js"].includes("glow: raw.glow === true, scanlines: raw.scanlines === true") &&
+    jsNs["js/data.js"].includes("glow: raw.glow === true, scanlines: raw.scanlines === true") &&
     tv.includes("TV_SKIN_FILE_MAX = 256 * 1024") && tv.includes("f.size > TV_SKIN_FILE_MAX") &&
     tv.indexOf("f.size > TV_SKIN_FILE_MAX") < tv.indexOf("await f.text()") && tv.includes('typeof v === "number" && Number.isFinite(v)') &&
     tv.includes("tvMakerPreset = id => Object.prototype.hasOwnProperty.call(TV_MAKER_PRESETS, id)");
@@ -446,10 +449,10 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   const enumMapSafe = media.includes("!DIFF_IDS.includes(diff)") && core.includes("DIFF_IDS.includes(chartDiff)") &&
     core.includes("Object.prototype.hasOwnProperty.call(JUDGE_SCALE, settings.judge)") &&
     core.includes("Object.prototype.hasOwnProperty.call(LIVES_TAG, settings.lives)") &&
-    js["js/modes.js"].includes("Object.prototype.hasOwnProperty.call(LIFE_TAGS, settings.lives)");
+    jsNs["js/modes.js"].includes("Object.prototype.hasOwnProperty.call(LIFE_TAGS, settings.lives)");
   rule(enumMapSafe, "settings-imported difficulty, judge and life IDs cannot select inherited dictionary properties");
 
-  const addons = js["js/addons.js"];
+  const addons = jsNs["js/addons.js"];
   const installAt = addons.indexOf("function installWithConsent(");
   const consentAt = addons.indexOf("askConsent(shown,", installAt);
   const installTextAt = addons.indexOf("function installText(", installAt);

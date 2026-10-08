@@ -240,6 +240,8 @@ details.panel[open]>summary{margin-bottom:14px}
 .songCol,.detailCol{display:flex;flex-direction:column;gap:14px;min-width:0}
 .libHead{display:flex;justify-content:space-between;align-items:baseline}
 .libHead h3{margin:0}
+/* 曲リストの見出しは h2（見出し順を h1→h2 にするため）。見た目は従来の h3（.panel h3 ほか）と同じにする */
+.libHead > h2.libTitle{margin:0;font-size:14px;font-weight:700;letter-spacing:.16em;color:var(--ui-muted)}
 .libTools{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:10px}
 .libTools input,.libTools select{padding:9px 12px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border);font-size:16px}
 .libTools button{padding:8px 14px;font-size:16px}

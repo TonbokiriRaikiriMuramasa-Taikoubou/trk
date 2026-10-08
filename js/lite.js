@@ -18,7 +18,8 @@
        3Dマスコットのモデルとthree.js（liteMascotNoLoad）
      ※①②は「描かない」だけで判定・時計に影響なし。③は見た目だけ。
        ④は起動の待ち時間・メモリを減らす（譜面はBPMグリッド中心になり、3Dマスコットは選んだときに読みます）
-   ・?safe=1 では何も変えません（セーフモードは元から映像を止めています）。        */
+   ・?safe=1 でも軽量化の判定と働き方は変えません（セーフモードは元から映像を止めています）。
+     変えるのは初回の「軽量化しますか」案内を出さないことだけです。                  */
 "use strict";
 
 /* ---------- 端末の判定（判定は読み取りだけ。送信はしません） ---------- */
@@ -175,9 +176,9 @@ function liteApplyPreset(id) {
   if (!preset) { liteSyncUI(); return; }        // カスタム：下の項目で調整するので何も変えない
   for (const [key, value] of Object.entries(preset.values)) window.Trk.core.settings[key] = value;
   if (preset.mode) window.Trk.core.settings.liteMode = preset.mode;
-  /* ✨「軽量化しない」の状態で軽いプリセットを選ぶと、modeが off のままなので何も軽く見えない。
-     プリセットを選んだ以上は効かせる、がいちばん紛れないので、そのときだけ auto ではなく on に戻します */
-  else if (liteModeValue() === "off") window.Trk.core.settings.liteMode = "on";
+  /* ✨ 軽いプリセットを選んだのに、mode が auto（＝デスクトップなどでは働かない）や off のままだと何も軽く見えない。
+     プリセットを選んだ以上は効かせる、がいちばん紛れないので、mode を on にします（自動判定には戻しません） */
+  else if (liteModeValue() !== "on") window.Trk.core.settings.liteMode = "on";
   window.Trk.core.saveUserPrefs(); liteSyncUI();
   liteSay(tr("litePresetSet", { name:litePresetName(id) }));
 }

@@ -8,6 +8,7 @@ trk! はまずWeb版・PWA版を正本にし、その同じ静的Web資産をCap
 - Web版の `index.html`、`css/`、`js/`、`assets/`、アイコン、`manifest.webmanifest`、`sw.js` をそのまま使います。
 - `tools/prepare-mobile-web.mjs` が `mobile-web/`（Git管理外）へアプリ用の静的ファイルをコピーします。
 - `capacitor.config.ts` は `mobile-web/` を `webDir` に指定します。Android側からWebサーバーへ接続する構成ではありません。
+- `package.json` の devDependency `typescript` は、この `capacitor.config.ts` を Capacitor CLI が読むために必要です（入っていないと `cap` は「TypeScript が見つからない」で止まります。2026-10-08 に `npx cap config` で確認）。TypeScript 7 はコンパイラ API を外しているため、CLI は Node 22.6 以降の型除去機能で読みます。`typescript` は削除しないでください。
 - `privacy.html`、`credits.html`、`NOTICE.md`、`docs/` も同じアプリ資産に含め、権利とプライバシーをアプリ内から確認できるようにします。
 - いまのAPK準備だけでは、Android WebViewでFile System Access APIがデスクトップChromeと同じように使えるとは限りません。音楽ライブラリへのネイティブアクセスは、別途CapacitorプラグインまたはAndroidブリッジを設計します。
 - アプリ版で追加のネイティブ権限を導入する前に、`privacy.html`、ストア説明、アプリ内の案内を更新します。

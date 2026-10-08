@@ -137,6 +137,11 @@ eq([S.liteMode, L.liteActive()], ["off", false], "✨ no lite mode switches the 
 eq([S.liteDecor, S.liteLibRows, S.liteNoAnalyze, S.liteMascotNoLoad], [false, "device", false, false], "✨ no lite mode resets the new keys too");
 L.liteApplyPreset("max");
 eq([S.liteMode, L.liteActive()], ["on", true], "picking a lite preset while off re-enables lite mode");
+/* 自動（auto）のまま、PC などで軽いプリセットを選んだら、mode を on にして効かせる（以前は auto のまま何も変わらなかった） */
+S.liteMode = "auto";
+L.liteApplyPreset("balanced");
+eq(S.liteMode, "on", "picking a preset while auto switches to on (it must take effect)");
+L.liteApplyPreset("max");   // 後の検査は最大節約の状態を前提にしている
 
 /* ---------- 5) body クラス（CSS 側の間引き） ---------- */
 const cls = ctx.document.body.classList.set;

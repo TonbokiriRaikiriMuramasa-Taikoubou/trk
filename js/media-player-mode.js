@@ -24,6 +24,7 @@ Object.assign(TEXT.ja, {
   mediaKeyboard:"Space：再生／一時停止　←→：10秒　N：次の曲　P：前の曲　Esc：閉じる　逆再生・区間ループ・壁紙は設定で割り当て",
   mediaVideoKeysTitle:"🎬 動画プレーヤーのキー", mediaWallKey:"壁紙／スクリーンセーバー", mediaReverse:"逆再生", mediaReverseStart:"逆再生を開始", mediaForward:"順再生に戻す", mediaReverseLoading:"逆再生を準備中…", mediaReverseUnavailable:"この曲の逆再生用音声を準備できませんでした。映像のみで試します。", mediaReverseDone:"曲の先頭まで逆再生しました。",
   mediaLoop:"区間ループ", mediaLoopSetA:"A点を設定", mediaLoopSetB:"B点を設定", mediaLoopClear:"解除", mediaLoopMode:"区間ループの操作", mediaLoopToggle:"トグル", mediaLoopHold:"長押し中だけ", mediaLoopHint:"A点・B点を設定すると、範囲をくり返します。割り当てキーはA点 → B点／開始 → 解除を順に操作できます。", mediaLoopNone:"区間ループ：なし", mediaLoopOnlyA:"A点 {a} — B点を設定してください", mediaLoopRange:"{a} – {b} をくり返し中", mediaLoopNeedRange:"先にA点とB点を設定してください。", mediaLoopLabTitle:"🎛 ループ・ラボ", mediaLoopQuickHint:"5秒・10秒・20秒の区間をすぐ作れます。保存した区間は曲ごとに端末内へ記録します。", mediaLoopQuick5:"5秒", mediaLoopQuick10:"10秒", mediaLoopQuick20:"20秒", mediaLoopRandom:"🎲 ランダム区間", mediaLoopSave:"この区間を保存", mediaLoopPresets:"保存した区間", mediaLoopNoPresets:"保存した区間はまだありません。", mediaLoopDelete:"この区間を削除", mediaLoopClearPresets:"保存を消去", mediaLoopSaved:"区間を保存しました",
+  mediaClipExport:"🎬 映像で書き出す", mediaClipBusy:"🎬 書き出し中…（区間の長さのぶん待ちます）", mediaClipDone:"🎬 書き出しました", mediaClipFailed:"書き出せませんでした", mediaClipNoVideo:"映像のない曲は書き出せません（音声だけの曲）", mediaClipUnsupported:"このブラウザでは映像の書き出しに対応していません", mediaClipNeedMedia:"先に曲を読み込んでください",
   mediaWall:"壁紙／スクリーンセーバー", mediaWallShow:"壁紙を表示", mediaWallHide:"壁紙を閉じる", mediaWallHint:"人目を避けたいときに動画を壁紙で隠します。ESCまたは同じキーで戻れます。", mediaWallStyle:"壁紙", mediaWallMidnight:"ミッドナイト", mediaWallAurora:"オーロラ", mediaWallPaper:"紙", mediaWallCustom:"アップロード画像", mediaWallUpload:"画像を選ぶ", mediaWallUploadHint:"画像はこのセッションの端末内だけで使います。外部へ送信しません。", mediaWallResetImage:"アップロード画像を外す", mediaWallNoImage:"画像を選ぶとここに表示します。", mediaWallClock:"時計を表示", mediaWallPlayback:"壁紙中の動画", mediaWallStopVideo:"動画を止める", mediaWallContinueVideo:"動画を続ける", mediaWallTrigger:"壁紙キーの操作", mediaWallToggle:"トグル", mediaWallHold:"長押し中だけ",
   mediaVideoMax:"全画面で表示", mediaVideoMaxClose:"全画面を閉じる",
   mediaVideoZoomIn:"動画を拡大", mediaVideoZoomOut:"動画を縮小", mediaVideoFaster:"再生速度を上げる", mediaVideoSlower:"再生速度を下げる", mediaVideoPause:"再生／一時停止",
@@ -49,6 +50,7 @@ Object.assign(TEXT.en, {
   mediaKeyboard:"Space: play/pause   ←→: 10 seconds   N: next   P: previous   Esc: close   Assign reverse / A-B loop / wallpaper in Settings",
   mediaVideoKeysTitle:"🎬 Video player keys", mediaWallKey:"Wallpaper / screen saver", mediaReverse:"Reverse", mediaReverseStart:"Start reverse", mediaForward:"Return to forward", mediaReverseLoading:"Preparing reverse playback…", mediaReverseUnavailable:"Could not prepare reverse audio for this track. Trying video frames only.", mediaReverseDone:"Reverse playback reached the beginning.",
   mediaLoop:"A-B loop", mediaLoopSetA:"Set A", mediaLoopSetB:"Set B", mediaLoopClear:"Clear", mediaLoopMode:"A-B loop control", mediaLoopToggle:"Toggle", mediaLoopHold:"While held", mediaLoopHint:"Set A and B to repeat a range. The assigned key cycles A → B / start → clear.", mediaLoopNone:"A-B loop: off", mediaLoopOnlyA:"A at {a} — set B", mediaLoopRange:"Repeating {a} – {b}", mediaLoopNeedRange:"Set both A and B first.", mediaLoopLabTitle:"🎛 Loop lab", mediaLoopQuickHint:"Make a 5, 10, or 20 second loop instantly. Saved ranges stay on this device per song.", mediaLoopQuick5:"5 sec", mediaLoopQuick10:"10 sec", mediaLoopQuick20:"20 sec", mediaLoopRandom:"🎲 Random range", mediaLoopSave:"Save this range", mediaLoopPresets:"Saved ranges", mediaLoopNoPresets:"No saved ranges yet.", mediaLoopDelete:"Delete this range", mediaLoopClearPresets:"Clear saved", mediaLoopSaved:"Range saved",
+  mediaClipExport:"🎬 Export as video", mediaClipBusy:"🎬 Exporting… (takes as long as the section)", mediaClipDone:"🎬 Exported", mediaClipFailed:"Could not export", mediaClipNoVideo:"Audio-only songs can't be exported as video", mediaClipUnsupported:"This browser can't export video", mediaClipNeedMedia:"Load a song first",
   mediaWall:"Wallpaper / screen saver", mediaWallShow:"Show wallpaper", mediaWallHide:"Close wallpaper", mediaWallHint:"Hide the video behind a wallpaper when you need privacy. Press ESC or the same key to return.", mediaWallStyle:"Wallpaper", mediaWallMidnight:"Midnight", mediaWallAurora:"Aurora", mediaWallPaper:"Paper", mediaWallCustom:"Uploaded image", mediaWallUpload:"Choose image", mediaWallUploadHint:"The image stays on this device for this session and is never uploaded.", mediaWallResetImage:"Remove uploaded image", mediaWallNoImage:"Choose an image to show it here.", mediaWallClock:"Show clock", mediaWallPlayback:"Video while wallpaper is shown", mediaWallStopVideo:"Stop video", mediaWallContinueVideo:"Keep video playing", mediaWallTrigger:"Wallpaper key behavior", mediaWallToggle:"Toggle", mediaWallHold:"While held",
   mediaVideoMax:"Full screen", mediaVideoMaxClose:"Close full screen",
   mediaVideoZoomIn:"Zoom in", mediaVideoZoomOut:"Zoom out", mediaVideoFaster:"Speed up", mediaVideoSlower:"Slow down", mediaVideoPause:"Play / pause",
@@ -72,6 +74,7 @@ Object.assign(TEXT.zh, {
   mediaKeyboard:"空格：播放／暂停　←→：10秒　N：下一首　P：上一首　Esc：关闭　倒放／区间循环／壁纸可在设置中分配",
   mediaVideoKeysTitle:"🎬 视频播放器按键", mediaWallKey:"壁纸／屏幕保护", mediaReverse:"倒放", mediaReverseStart:"开始倒放", mediaForward:"恢复正放", mediaReverseLoading:"正在准备倒放…", mediaReverseUnavailable:"无法准备这首歌的倒放音频，将尝试仅倒放画面。", mediaReverseDone:"倒放已到达开头。",
   mediaLoop:"区间循环", mediaLoopSetA:"设为A点", mediaLoopSetB:"设为B点", mediaLoopClear:"解除", mediaLoopMode:"区间循环操作", mediaLoopToggle:"切换", mediaLoopHold:"按住时循环", mediaLoopHint:"设置A点和B点后重复区间。分配的按键会依次执行A点 → B点／开始 → 解除。", mediaLoopNone:"区间循环：关闭", mediaLoopOnlyA:"A点 {a} — 请设置B点", mediaLoopRange:"重复 {a} – {b}", mediaLoopNeedRange:"请先设置A点和B点。", mediaLoopLabTitle:"🎛 循环实验室", mediaLoopQuickHint:"可立即创建5秒、10秒或20秒区间。保存的区间会按歌曲保存在设备中。", mediaLoopQuick5:"5秒", mediaLoopQuick10:"10秒", mediaLoopQuick20:"20秒", mediaLoopRandom:"🎲 随机区间", mediaLoopSave:"保存此区间", mediaLoopPresets:"已保存区间", mediaLoopNoPresets:"还没有保存的区间。", mediaLoopDelete:"删除此区间", mediaLoopClearPresets:"清除保存", mediaLoopSaved:"区间已保存",
+  mediaClipExport:"🎬 导出为视频", mediaClipBusy:"🎬 导出中…（需要等待区间的时长）", mediaClipDone:"🎬 已导出", mediaClipFailed:"无法导出", mediaClipNoVideo:"纯音频曲目无法导出为视频", mediaClipUnsupported:"此浏览器不支持导出视频", mediaClipNeedMedia:"请先载入曲目",
   mediaWall:"壁纸／屏幕保护", mediaWallShow:"显示壁纸", mediaWallHide:"关闭壁纸", mediaWallHint:"需要隐私时，用壁纸遮住视频。按ESC或同一个按键返回。", mediaWallStyle:"壁纸", mediaWallMidnight:"午夜", mediaWallAurora:"极光", mediaWallPaper:"纸张", mediaWallCustom:"上传的图片", mediaWallUpload:"选择图片", mediaWallUploadHint:"图片仅在本次会话中保留在设备上，不会上传到外部。", mediaWallResetImage:"移除上传图片", mediaWallNoImage:"选择图片后会显示在这里。", mediaWallClock:"显示时钟", mediaWallPlayback:"显示壁纸时的视频", mediaWallStopVideo:"停止视频", mediaWallContinueVideo:"继续播放视频", mediaWallTrigger:"壁纸按键操作", mediaWallToggle:"切换", mediaWallHold:"按住时显示",
   mediaVideoMax:"全屏显示", mediaVideoMaxClose:"关闭全屏",
   mediaVideoZoomIn:"放大视频", mediaVideoZoomOut:"缩小视频", mediaVideoFaster:"提高速度", mediaVideoSlower:"降低速度", mediaVideoPause:"播放／暂停",
@@ -95,6 +98,7 @@ Object.assign(TEXT.ko, {
   mediaKeyboard:"Space: 재생／일시정지   ←→: 10초   N: 다음   P: 이전   Esc: 닫기   역재생／구간 반복／배경은 설정에서 지정",
   mediaVideoKeysTitle:"🎬 동영상 플레이어 키", mediaWallKey:"배경／스크린세이버", mediaReverse:"역재생", mediaReverseStart:"역재생 시작", mediaForward:"정재생으로", mediaReverseLoading:"역재생 준비 중…", mediaReverseUnavailable:"이 곡의 역재생 오디오를 준비하지 못했습니다. 영상 프레임만 시도합니다.", mediaReverseDone:"역재생이 처음에 도달했습니다.",
   mediaLoop:"구간 반복", mediaLoopSetA:"A점 설정", mediaLoopSetB:"B점 설정", mediaLoopClear:"해제", mediaLoopMode:"구간 반복 조작", mediaLoopToggle:"토글", mediaLoopHold:"누르는 동안", mediaLoopHint:"A점과 B점을 설정하면 구간을 반복합니다. 지정한 키는 A점 → B점／시작 → 해제를 차례로 실행합니다.", mediaLoopNone:"구간 반복: 없음", mediaLoopOnlyA:"A점 {a} — B점을 정해 주세요", mediaLoopRange:"{a} – {b} 반복 중", mediaLoopNeedRange:"먼저 A점과 B점을 설정하세요.", mediaLoopLabTitle:"🎛 반복 실험실", mediaLoopQuickHint:"5초・10초・20초 구간을 바로 만들 수 있습니다. 저장한 구간은 곡별로 이 기기에 기록됩니다.", mediaLoopQuick5:"5초", mediaLoopQuick10:"10초", mediaLoopQuick20:"20초", mediaLoopRandom:"🎲 랜덤 구간", mediaLoopSave:"이 구간 저장", mediaLoopPresets:"저장한 구간", mediaLoopNoPresets:"저장한 구간이 없습니다.", mediaLoopDelete:"이 구간 삭제", mediaLoopClearPresets:"저장 지우기", mediaLoopSaved:"구간을 저장했습니다",
+  mediaClipExport:"🎬 영상으로 내보내기", mediaClipBusy:"🎬 내보내는 중…（구간 길이만큼 걸려요）", mediaClipDone:"🎬 내보냈습니다", mediaClipFailed:"내보내지 못했습니다", mediaClipNoVideo:"영상이 없는 곡은 영상으로 내보낼 수 없습니다", mediaClipUnsupported:"이 브라우저는 영상 내보내기를 지원하지 않습니다", mediaClipNeedMedia:"먼저 곡을 불러오세요",
   mediaWall:"배경／스크린세이버", mediaWallShow:"배경 표시", mediaWallHide:"배경 닫기", mediaWallHint:"사생활이 필요할 때 배경으로 영상을 가립니다. ESC 또는 같은 키로 돌아갑니다.", mediaWallStyle:"배경", mediaWallMidnight:"미드나이트", mediaWallAurora:"오로라", mediaWallPaper:"종이", mediaWallCustom:"업로드한 이미지", mediaWallUpload:"이미지 선택", mediaWallUploadHint:"이미지는 이번 세션 동안 이 기기에만 보관되며 외부로 업로드되지 않습니다.", mediaWallResetImage:"업로드한 이미지 제거", mediaWallNoImage:"이미지를 선택하면 여기에 표시됩니다.", mediaWallClock:"시계 표시", mediaWallPlayback:"배경 표시 중 동영상", mediaWallStopVideo:"동영상 멈추기", mediaWallContinueVideo:"동영상 계속 재생", mediaWallTrigger:"배경 키 동작", mediaWallToggle:"토글", mediaWallHold:"누르는 동안 표시",
   mediaVideoMax:"전체 화면으로 보기", mediaVideoMaxClose:"전체 화면 닫기",
   mediaVideoZoomIn:"동영상 확대", mediaVideoZoomOut:"동영상 축소", mediaVideoFaster:"재생 속도 높이기", mediaVideoSlower:"재생 속도 낮추기", mediaVideoPause:"재생／일시정지",
@@ -203,6 +207,86 @@ function syncLoopPresetSelection() {
     button.classList.toggle("selected", selected); button.setAttribute("aria-pressed", String(selected));
   });
 }
+/* 🎬 記録した区間を映像で書き出す。設定は持たない（区間の行の 🎬 を押すだけ）。
+   動画要素の映像と音をそのまま録るので、区間の長さのぶん待つ。終わったら再生位置・再生/停止・速度・ループを元に戻す。 */
+let clipBusy = false, clipAbort = null;
+function clipMimeType() {
+  const can = m => typeof MediaRecorder.isTypeSupported === "function" && MediaRecorder.isTypeSupported(m);
+  return ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm", "video/mp4"].find(can) || "";
+}
+function clipFileName(a, b, ext) {
+  const base = String(window.Trk.core.mediaName || "clip").replace(/\.[^.]+$/, "").replace(/[\\/:*?"<>|\x00-\x1f]/g, "_").slice(0, 80) || "clip";
+  return `${base}_${a.toFixed(1)}-${b.toFixed(1)}s.${ext}`;
+}
+function exportLoopClip(a, b) {
+  const say = key => { if (typeof showToast === "function") window.Trk.play.showToast(tr(key)); };
+  if (clipBusy) { say("mediaClipBusy"); return; }
+  const v = window.Trk.core.video;
+  if (!window.Trk.core.videoReady || !v) { say("mediaClipNeedMedia"); return; }
+  if (!(v.videoWidth > 0)) { say("mediaClipNoVideo"); return; }
+  if (typeof MediaRecorder === "undefined" || typeof v.captureStream !== "function") { say("mediaClipUnsupported"); return; }
+  let stream;
+  try { stream = v.captureStream(); } catch (_) { say("mediaClipUnsupported"); return; }
+  const mime = clipMimeType();
+  let rec;
+  try { rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined); }
+  catch (_) { stream.getTracks().forEach(t => t.stop()); say("mediaClipUnsupported"); return; }
+
+  const resume = { paused: v.paused, time: v.currentTime, rate: v.playbackRate, loop: loopActive };
+  const chunks = [];
+  let timer = 0, aborted = false, restored = false;
+  const restore = (seek) => {
+    if (restored) return; restored = true;
+    clipBusy = false; clipAbort = null; loopActive = resume.loop;
+    try { v.playbackRate = resume.rate || 1; } catch (_) {}
+    if (seek && Number.isFinite(resume.time)) { try { v.currentTime = resume.time; } catch (_) {} }
+    if (!resume.paused && !aborted) v.play().catch(() => {});
+    renderLoopUI();
+  };
+  const finish = (abort = false) => {
+    if (abort) aborted = true;
+    clearInterval(timer);
+    try { v.pause(); } catch (_) {}
+    if (rec.state === "inactive") restore(!aborted);
+    else { try { rec.stop(); } catch (_) { restore(!aborted); } }
+  };
+  rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+  rec.onstop = () => {
+    clearInterval(timer);
+    stream.getTracks().forEach(t => t.stop());
+    if (!aborted) {
+      const type = rec.mimeType || mime || "video/webm";
+      const blob = new Blob(chunks, { type });
+      if (blob.size > 0) { downloadBlob(blob, clipFileName(a, b, type.includes("mp4") ? "mp4" : "webm")); say("mediaClipDone"); }
+      else say("mediaClipFailed");
+    }
+    restore(!aborted);
+  };
+  rec.onerror = () => { say("mediaClipFailed"); finish(true); };
+
+  clipBusy = true; clipAbort = () => finish(true);
+  loopActive = false;
+  if (reverseActive || reverseLoading) stopReverse(false, true);
+  try { v.playbackRate = 1; } catch (_) {}
+  renderLoopUI();
+  say("mediaClipBusy");
+  const start = () => {
+    if (aborted || !clipBusy) return;
+    try { rec.start(1000); } catch (_) { finish(true); return; }
+    const t0 = performance.now(), limit = (b - a) * 1000 + 5000;
+    v.play().catch(() => finish(true));
+    timer = setInterval(() => {
+      if (v.currentTime >= b - 0.03 || v.ended || performance.now() - t0 > limit) finish(false);
+      else if (v.paused && performance.now() - t0 > 800) finish(false);
+    }, 30);
+  };
+  if (Math.abs(v.currentTime - a) < 0.05) start();
+  else {
+    const onSeeked = () => { v.removeEventListener("seeked", onSeeked); start(); };
+    v.addEventListener("seeked", onSeeked);
+    try { v.currentTime = a; } catch (_) { v.removeEventListener("seeked", onSeeked); finish(true); }
+  }
+}
 function renderLoopPresets() {
   if (!loopPresetListNode) return;
   const key = mediaLoopStoreKey(), list = storedMediaLoops(), sig = list.map(x => `${x.a}:${x.b}`).join("|");
@@ -218,7 +302,10 @@ function renderLoopPresets() {
     const b = window.Trk.core.el("button", "mediaLoopPreset", `${mpFmt(x.a)} – ${mpFmt(x.b)}`); b.type = "button"; b.title = tr("mediaLoopRange", { a:mpFmt(x.a), b:mpFmt(x.b) });
     b.addEventListener("click", () => setMediaLoopRange(x.a, x.b, true));
     const del = window.Trk.core.el("button", "mediaLoopPresetDelete", "×"); del.type = "button"; del.title = tr("mediaLoopDelete"); del.setAttribute("aria-label", tr("mediaLoopDelete")); del.addEventListener("click", () => deleteMediaLoopPreset(i));
-    row.append(b, del); loopPresetListNode.append(row);
+    const clip = window.Trk.core.el("button", "mediaLoopPresetClip", "🎬"); clip.type = "button";
+    clip.title = tr("mediaClipExport"); clip.setAttribute("aria-label", tr("mediaClipExport"));
+    clip.addEventListener("click", () => exportLoopClip(x.a, x.b));
+    row.append(b, clip, del); loopPresetListNode.append(row);
   });
   if (loopSaveNode) loopSaveNode.disabled = !loopHasRange();
   if (loopClearPresetsNode) loopClearPresetsNode.disabled = !list.length;
@@ -962,7 +1049,7 @@ function buildMedia() {
     if (type === "timeupdate" && Date.now() - lastPositionSave > 2000) { lastPositionSave = Date.now(); saveMediaPosition(); }
     if (type === "ended") endedMedia(); else renderMedia();
   });
-  window.Trk.core.on("beforeLoad", () => { stopReverse(false, true); clearMediaLoop(true); reverseBuffer = null; reverseBufferKey = ""; });
+  window.Trk.core.on("beforeLoad", () => { if (clipAbort) clipAbort(); stopReverse(false, true); clearMediaLoop(true); reverseBuffer = null; reverseBufferKey = ""; });
   window.Trk.core.on("songSelected", renderMedia); window.Trk.core.on("mediaReady", () => { if (mediaOpen) renderMedia(); updateMediaSession(); });
   window.Trk.core.on("records", renderQueue); window.Trk.core.on("packsChanged", renderQueue); window.Trk.core.on("language", () => {
     if (stageNote) { stageNote.textContent = tr("mediaStageNoVideo"); stageNote.dataset.i18n = "mediaStageNoVideo"; }

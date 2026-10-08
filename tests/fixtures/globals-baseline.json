@@ -1,11 +1,11 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 141,
+  "windowProps": 151,
   "duplicates": 0,
-  "declarations": 295,
-  "private": 94,
-  "public": 201
+  "declarations": 271,
+  "private": 81,
+  "public": 190
  },
  "files": [
   {
@@ -297,21 +297,9 @@
   },
   {
    "file": "js/stage.js",
-   "decls": 24,
-   "private": 13,
-   "public": [
-    "STAGE",
-    "drawStageField",
-    "ensureStageMap",
-    "isStage",
-    "resetStage",
-    "stageBinding",
-    "stageHitPos",
-    "stageInput",
-    "stageKeys",
-    "stageMap",
-    "stagePress"
-   ]
+   "decls": 0,
+   "private": 0,
+   "public": []
   },
   {
    "file": "js/stagefx.js",
@@ -538,6 +526,13 @@
    "name": "RESERVED",
    "writers": [
     "js/main.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "STAGE",
+   "writers": [
+    "js/stage.js"
    ],
    "readers": []
   },
@@ -996,6 +991,13 @@
    "readers": []
   },
   {
+   "name": "drawStageField",
+   "writers": [
+    "js/stage.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "drawVideo",
    "writers": [
     "js/render.js",
@@ -1007,6 +1009,13 @@
    "name": "endGame",
    "writers": [
     "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "ensureStageMap",
+   "writers": [
+    "js/stage.js"
    ],
    "readers": []
   },
@@ -1100,6 +1109,13 @@
    "name": "isOrbit",
    "writers": [
     "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "isStage",
+   "writers": [
+    "js/stage.js"
    ],
    "readers": []
   },
@@ -1363,6 +1379,13 @@
    "readers": []
   },
   {
+   "name": "resetStage",
+   "writers": [
+    "js/stage.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "resumeGame",
    "writers": [
     "js/game.js"
@@ -1471,6 +1494,41 @@
    "name": "srcLabel",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "stageHitPos",
+   "writers": [
+    "js/stage.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "stageInput",
+   "writers": [
+    "js/stage.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "stageKeys",
+   "writers": [
+    "js/stage.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "stageMap",
+   "writers": [
+    "js/stage.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "stagePress",
+   "writers": [
+    "js/stage.js"
    ],
    "readers": []
   },

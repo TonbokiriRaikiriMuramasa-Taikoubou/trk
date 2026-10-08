@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ==========================================================================
    trk! stage.js — 🎪 STAGE（縦レーン・4／5／6レーン）
@@ -425,3 +426,17 @@ function captureStageKey(code) {
   setStatus("stageBindStatus", "stageAssigned"); syncStageKeyUI();
 }
 /* ✅ stage.js 完了 */
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.STAGE = STAGE;
+window.drawStageField = drawStageField;
+window.ensureStageMap = ensureStageMap;
+window.isStage = isStage;
+window.resetStage = resetStage;
+Object.defineProperty(window, "stageBinding", { configurable:true, get:() => stageBinding, set:v => { stageBinding = v; } });
+window.stageHitPos = stageHitPos;
+window.stageInput = stageInput;
+window.stageKeys = stageKeys;
+window.stageMap = stageMap;
+window.stagePress = stagePress;
+})();

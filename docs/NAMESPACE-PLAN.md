@@ -90,6 +90,7 @@ node tools/smoke-browser.mjs --compare
 | 8 | `js/game.js` を即時関数で包む（公開27名のうち let は get/set、それ以外は据え置き） | 364 | 222 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
 | 9 | `js/render.js` を即時関数で包む（公開12名：let は get/set、それ以外は据え置き） | 325 | 210 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
 | 10 | `js/catch.js` を即時関数で包む（公開8名は据え置き） | 295 | 201 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
+| 11 | `js/stage.js` を即時関数で包む（公開11名：let の stageBinding は get/set、それ以外は据え置き） | 271 | 190 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
 
 ## 4. 止める条件
 

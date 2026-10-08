@@ -3,7 +3,7 @@
    trk! lib-skins.js — 📚 曲リストの「棚」スキン（曲タブの見た目）
    ・タブの中身（どの曲がどのタブか）は library.js が作ります。
      ここは #libPanel[data-lib-skin="…"] を付け替えて、見た目を変えるだけ。
-   ・21種類：player / note / sticker / card / cassette / blackboard / retro / clearfile
+   ・24種類：player / note / sticker / card / cassette / blackboard / retro / clearfile
               ＋ 🎰 juke（ジュークボックス）／📻 guide（ラジオ番組表）／🚉 board（電光掲示板）
               ＋ 💿 vinyl（レコード棚）／📼 vhs（レンタルビデオ）／🎤 karaoke（カラオケ目次）／🗂️ archive（図書館の書架）／🍱 menu（お品書き）
    ・曲リストの見出しの 🎨 ボタンで、その場で切り替え（settings.libSkinQuick で隠せます）
@@ -49,8 +49,8 @@ Object.assign(TEXT.ko, {
   libSkinApplied:"선반 스킨: {name}"
 });
 
-/* ============ スキン21種 ============ */
-const LIB_SKIN_ORDER = ["player", "note", "sticker", "card", "cassette", "blackboard", "retro", "clearfile", "juke", "guide", "board", "vinyl", "vhs", "karaoke", "archive", "menu", "toolbox", "herbarium", "kusuri", "geta", "dagashi"];
+/* ============ スキン24種 ============ */
+const LIB_SKIN_ORDER = ["player", "note", "sticker", "card", "cassette", "blackboard", "retro", "clearfile", "juke", "guide", "board", "vinyl", "vhs", "karaoke", "archive", "menu", "toolbox", "herbarium", "kusuri", "geta", "dagashi", "message", "postal", "score"];
 const LIB_SKINS = {
   player:     { icon:"🎛", label:L4("タブプレーヤー", "Tab player", "标签播放器", "탭 플레이어") },
   note:       { icon:"📝", label:L4("ノート", "Notebook", "笔记本", "노트") },
@@ -75,7 +75,11 @@ const LIB_SKINS = {
   herbarium:  { icon:"🌿", label:L4("植物標本箱", "Herbarium", "植物标本箱", "식물 표본함") },
   kusuri:     { icon:"💊", label:L4("薬箪笥", "Medicine chest", "药柜", "약장") },
   geta:       { icon:"🏨", label:L4("旅館の下駄箱", "Ryokan shoe lockers", "旅馆鞋柜", "여관 신발장") },
-  dagashi:    { icon:"🍬", label:L4("駄菓子屋の棚", "Candy shop shelf", "零食店货架", "주전부리 가게 선반") }
+  dagashi:    { icon:"🍬", label:L4("駄菓子屋の棚", "Candy shop shelf", "零食店货架", "주전부리 가게 선반") },
+  /* 棚スキン（追加：駅の伝言板・郵便の仕分け棚・楽譜棚）。CSS だけで作る */
+  message:    { icon:"📌", label:L4("駅の伝言板", "Station message board", "车站留言板", "역 메시지 게시판") },
+  postal:     { icon:"📮", label:L4("郵便の仕分け棚", "Postal sorting shelf", "邮件分拣架", "우편 분류함") },
+  score:      { icon:"🎼", label:L4("楽譜棚", "Sheet music shelf", "乐谱架", "악보 선반") }
 };
 const hasLibSkin = id => Object.prototype.hasOwnProperty.call(LIB_SKINS, id);
 const skinDef = id => hasLibSkin(id) ? LIB_SKINS[id] : LIB_SKINS.player;
@@ -110,7 +114,7 @@ function openBar(on) {
   bar.hidden = !want;
   if (b) b.setAttribute("aria-expanded", String(want));
 }
-/* 表示の並び：かんたん＝棚スキンの上位6つ（おすすめ）を先頭に、残りは従来の順。全部＝LIB_SKIN_ORDER そのまま。ランダムは並びに関係なく同じ21から選ぶ */
+/* 表示の並び：かんたん＝棚スキンの上位6つ（おすすめ）を先頭に、残りは従来の順。全部＝LIB_SKIN_ORDER そのまま。ランダムは並びに関係なく同じ24から選ぶ */
 const LIB_SKIN_SIMPLE_TOP = ["player", "cassette", "vinyl", "note", "karaoke", "retro"];
 function libSkinOrder() {
   if (core.settings.displayMode === "full") return LIB_SKIN_ORDER;

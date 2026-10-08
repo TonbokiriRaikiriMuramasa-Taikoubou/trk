@@ -189,7 +189,7 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   rule(importFeedback, "the emergency settings import reports every key it refused, with a reason, in all four languages");
 
   /* ✨ M-03（tv-rich.js）：tvRichId／tvRichPrev を実在IDで検証する。
-     ⚠ 二つは行き先が違う（tvRichId＝リッチ20種／tvRichPrev＝元の映像フィルター全65種）。
+     ⚠ 二つは行き先が違う（tvRichId＝リッチ20種／tvRichPrev＝元の映像フィルター全70種）。
        同じ許可リストにすると保存済みの「戻る先」が毎回リセットされるので、別々に検証する。 */
   /* ⚠ 関数を直接呼ぶだけでは「配線が外れていても通る」。実際に保存値を入れて settings の結果を見る。 */
   const richSrc = js["js/tv-rich.js"];

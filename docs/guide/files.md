@@ -26,7 +26,7 @@ trk/
 │  ├─ tv-presets.js  tv-dock.js  … 映像フィルター・TVドック・カスタムTVスキン
 │  ├─ fx-presets.js  fx.js  fx-dock.js   … サウンドエフェクトと、左下の 🔥 TRKアンプ
 │  ├─ library.js                 … 選曲画面・AUTO・ラジオ・曲のタブ（棚）
-│  ├─ lib-skins.js               … 棚スキン21種（曲タブの見た目・🎨ボタン）
+│  ├─ lib-skins.js               … 棚スキン24種（曲タブの見た目・🎨ボタン）
 │  ├─ verified.js                … 公認パック
 │  ├─ addons.js  addons/         … アドオン（あとから機能を足すしくみ・見本）
 │  ├─ main.js  speed.js          … 入力・起動・速度

@@ -81,7 +81,7 @@ const idOk = v => typeof v === "string" && /^[a-z0-9_]{1,40}$/.test(v);
    将来ここに辞書参照を足した瞬間の種を残さないよう、実在IDでも検証する。
    ⚠ 二つのキーは**行き先が違う**ので同じ許可リストにしてはいけない：
      ・tvRichId   ＝選べるリッチプリセット（portrait/anime/texture/quality の20種）
-     ・tvRichPrev ＝リッチではない元の映像フィルター（skin／vivid／off など**全65種**）
+     ・tvRichPrev ＝リッチではない元の映像フィルター（skin／vivid／off など**全70種**）
      tvRichPrev をリッチ20種で検証すると、保存済みの「戻る先」が毎回リセットされる。
    一覧が読めないときは従来どおり書式だけ（保存値を勝手に捨てない＝fail-open）。 */
 const richIds = () => {

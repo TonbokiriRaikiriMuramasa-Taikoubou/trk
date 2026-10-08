@@ -118,7 +118,7 @@ else ok(`index.html static IDs are unique (${indexIds.length} checked)`);
   const uniqueIds = new Set(ids).size === ids.length;
   const langsOk = ["tvCatPortrait", "tvCatAnime", "tvCatTexture", "tvCatQuality", "tvParamRandHint", "tvParamHint"]
     .every(key => (tv.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4);
-  const presetsOk = ids.length === 65 && uniqueIds && Object.values(catCounts).every(n => n === 5);
+  const presetsOk = ids.length === 70 && uniqueIds && Object.values(catCounts).every(n => n === 5);
   const resetOk = tv.includes('bindLongPressReset(rPar, () => applyParamValues(0, 0, "tvParamDefaultDone"))') &&
     tv.includes('bindLongPressReset(dimInp, () => applyParamValues(0, settings.bgBlur, "tvDimResetDone")') &&
     tv.includes('bindLongPressReset(blurInp, () => applyParamValues(settings.bgDim, 0, "tvBlurResetDone")') &&
@@ -134,12 +134,12 @@ else ok(`index.html static IDs are unique (${indexIds.length} checked)`);
     tv.includes("CanvasRenderingContext2D.filter is unavailable") && tv.includes("ctx.canvas.style.filter = filter") &&
     notice.includes("No third-party LUTs") && notice.includes("do not detect faces") && notice.includes("do not increase");
   const favoriteStyleOk = style.includes(".tvParamFavList") && style.includes(".tvParamTools");
-  if (!presetsOk) fail(`TV preset catalog should contain 65 unique filters, five in each new category (found ${ids.length}; ${JSON.stringify(catCounts)})`);
+  if (!presetsOk) fail(`TV preset catalog should contain 70 unique filters, five in each new category (found ${ids.length}; ${JSON.stringify(catCounts)})`);
   else if (!langsOk) fail("TV portrait/anime/texture/quality groups or parameter reset help are missing from one of the four languages");
   else if (!resetOk) fail("TV random button and brightness/blur sliders need their long-press reset paths and explicit reset control");
   else if (!favoritesOk) fail("brightness/blur favorites must be bounded, validated, persisted and safe-mode aware");
   else if (!overlaysOk || !canvasOriginalOk || !favoriteStyleOk) fail("original Canvas TV overlays, documented rights/scope, CSS-filter fallback, or parameter-favorite styling are missing");
-  else ok("TV catalog (65 presets), localized picture categories, long-press resets, and bounded brightness/blur favorites are wired");
+  else ok("TV catalog (70 presets), localized picture categories, long-press resets, and bounded brightness/blur favorites are wired");
 }
 
 const privacy = read("privacy.html").replace(/<!--[\s\S]*?-->/g, "");
@@ -207,8 +207,8 @@ if (!orderMatch) {
   fail("LIB_SKIN_ORDER could not be read");
 } else {
   const ids = [...orderMatch[1].matchAll(/["']([^"']+)["']/g)].map(m => m[1]);
-  if (ids.length !== 21) fail(`expected 21 shelf skins, found ${ids.length}`);
-  else ok("shelf skin count is 21");
+  if (ids.length !== 24) fail(`expected 24 shelf skins, found ${ids.length}`);
+  else ok("shelf skin count is 24");
 }
 if (/棚スキン11種|・11種類/.test(read("css/style.css") + skins)) {
   fail("stale shelf skin count (11) remains in source comments");

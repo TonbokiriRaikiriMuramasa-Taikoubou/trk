@@ -1,12 +1,12 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 284,
+  "windowProps": 283,
   "duplicates": 0,
-  "declarations": 1175,
-  "private": 994,
-  "public": 181,
-  "globalNames": 316
+  "declarations": 1189,
+  "private": 1009,
+  "public": 180,
+  "globalNames": 288
  },
  "files": [
   {
@@ -60,7 +60,7 @@
   {
    "file": "js/core.js",
    "decls": 162,
-   "private": 118,
+   "private": 120,
    "public": [
     "$",
     "TRK_ENUM_VALUES",
@@ -91,7 +91,6 @@
     "practice",
     "prefs",
     "safeLink",
-    "safeModeOn",
     "safeName",
     "saveUserPrefs",
     "screen",
@@ -103,7 +102,6 @@
     "takeAmpReset",
     "vctx",
     "video",
-    "videoFilter",
     "videoReady",
     "view"
    ]
@@ -127,14 +125,14 @@
   },
   {
    "file": "js/chart-gen.js",
-   "decls": 18,
-   "private": 18,
+   "decls": 21,
+   "private": 21,
    "public": []
   },
   {
    "file": "js/media.js",
-   "decls": 25,
-   "private": 19,
+   "decls": 36,
+   "private": 30,
    "public": [
     "applyChartData",
     "audioCtx",
@@ -181,11 +179,12 @@
   {
    "file": "js/render.js",
    "decls": 39,
-   "private": 33,
+   "private": 32,
    "public": [
     "drawVideo",
     "hitPos",
     "layout",
+    "loop",
     "rr",
     "showToast",
     "toast"
@@ -898,6 +897,7 @@
    ],
    "readers": [
     "js/lite.js",
+    "js/media.js",
     "js/tv-rich.js",
     "js/video-max.js",
     "js/library.js",
@@ -2547,13 +2547,6 @@
    "name": "video",
    "writers": [
     "js/core.js"
-   ],
-   "readers": []
-  },
-  {
-   "name": "videoFilter",
-   "writers": [
-    "js/tv-dock.js"
    ],
    "readers": []
   },

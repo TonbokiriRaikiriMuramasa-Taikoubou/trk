@@ -483,28 +483,13 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     addons.includes("codeShaLegacy(entry.code)");
   rule(strongFingerprint, "new add-on consent fingerprints use SHA-256 where Web Crypto is available (legacy hashes remain compatible)");
 
-  const hashParserStart = core.indexOf("function parseHashParams(");
-  const hashParserEnd = core.indexOf("\n}", hashParserStart);
-  const hashParserSource = hashParserStart >= 0 && hashParserEnd >= 0 ? core.slice(hashParserStart, hashParserEnd + 2) : "";
-  let hashForceExact = false;
-  try {
-    const parseHashParams = vm.runInNewContext(`(${hashParserSource})`, { URLSearchParams });
-    hashForceExact = parseHashParams("#reset=all&force=1").get("force") === "1" &&
-      parseHashParams("#reset=all&force=0").get("force") !== "1" &&
-      parseHashParams("#reset=all&forcely=1").get("force") !== "1" &&
-      parseHashParams("#RESET=ALL&FORCE=1").get("force") === "1" &&
-      /* 小文字にするのは**キーだけ**。値まで小文字にすると将来ケースを区別する値が静かに壊れる */
-      parseHashParams("#RESET=ALL").get("reset") === "ALL" &&
-      parseHashParams("#skin=MySkin").get("skin") === "MySkin";
-  } catch (_) {}
-  /* #24：force は文字列の包含（hash.includes("force")）ではなく、パラメータの完全一致（=== "1"）で判定する。
-     包含で判定すると force=0 や forcely=1 でも通ってしまう。変数名や引用符が変わっても禁止する。 */
-  const factoryGuard = core.includes("function askFactoryReset(") && core.includes("let pendingFactory = false") &&
-    core.includes('if (sp.get("force") === "1")') && core.includes('if (hashParams.get("force") === "1")') &&
-    core.includes("const hashParams = parseHashParams(location.hash)") && core.includes("const get = k => sp.get(k)") &&
-    core.includes("hashParams.has(\"reset\")") && !/includes\(\s*["'`]force["'`]/.test(core) && hashForceExact && core.includes("if (!pendingFactory) saveUserPrefs()") &&
-    core.includes('askFactoryReset(') && !/else if \(\["all","factory","full"\]\.includes\(r\)\) \{ resetAllPrefs\(\)/.test(core);
-  rule(factoryGuard, "query/hash factory reset asks for confirmation unless the exact force=1 parameter is present");
+  /* Behaviour lives in node:test, which runs with npm test and npm run check. Keep the reset behavior test independent of
+     restoreCoreAlias/string-spelling guards so harmless refactors do not erase coverage of the destructive path. */
+  const safetyTests = fs.existsSync(path.join(root, "tests/core-safety.test.mjs"))
+    ? fs.readFileSync(path.join(root, "tests/core-safety.test.mjs"), "utf8") : "";
+  const factoryBehaviorCovered = safetyTests.includes("factory reset waits for explicit confirmation") &&
+    safetyTests.includes("?factory enters safe mode") && safetyTests.includes("safe mode disables risky output");
+  rule(factoryBehaviorCovered, "query/hash factory-reset and safe-mode behavior is covered by node:test");
 
   /* ?factory 単体は**セーフモード**（壊す動作にしない）。js/addons.js の safeNow() と同じ解釈。 */
   const factorySafe = core.includes('if (has("safe") || has("safety") || sp.has("factory"))') &&

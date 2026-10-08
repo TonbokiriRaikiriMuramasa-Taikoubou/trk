@@ -167,7 +167,7 @@ function tidy(kind, st) {
   return st;
 }
 function boot(kind) {
-  const p = (typeof prefs !== "undefined" && core.prefs && core.prefs.favs && typeof core.prefs.favs === "object") ? core.prefs.favs[kind] : null;
+  const p = (core.prefs && core.prefs.favs && typeof core.prefs.favs === "object") ? core.prefs.favs[kind] : null;
   const src = (p && typeof p === "object") ? p : {};
   return tidy(kind, {
     main: [], sub: list0(src.sub, kind), frozen: list0(src.frozen, kind), former: list0(src.former, kind),
@@ -184,7 +184,7 @@ const mainKey = kind => kind === "tv" ? "tvFav" : kind === "fx" ? "fxFav" : "son
    保存されている生の値を優先して読みます（fx.js の40個の上限で切られたぶんを戻すため）。 */
 function bootMain(kind) {
   const k = mainKey(kind);
-  const raw = (typeof prefs !== "undefined" && core.prefs && Array.isArray(core.prefs[k])) ? core.prefs[k] : core.settings[k];
+  const raw = (core.prefs && Array.isArray(core.prefs[k])) ? core.prefs[k] : core.settings[k];
   return list0(raw, kind);
 }
 /* ほかのファイルが settings.tvFav などを「別の配列に差し替えた」ときは、そちらに乗り換える */
@@ -602,7 +602,7 @@ function fxToggleFav() {
   try {
     if (typeof settings === "undefined") return;
     /* 読み込み時に fx.js が40個で切ったぶんを、保存されている値から戻す */
-    if (typeof prefs !== "undefined" && core.prefs && Array.isArray(core.prefs.fxFav)) {
+    if (core.prefs && Array.isArray(core.prefs.fxFav)) {
       const full = list0(core.prefs.fxFav, "fx");
       if (full.length > (Array.isArray(core.settings.fxFav) ? core.settings.fxFav.length : 0)) { core.settings.fxFav = full; S.fx = null; }
     }

@@ -785,7 +785,7 @@ addEventListener("DOMContentLoaded", () => {
     return s || tr("instTrackNone");
   }
   function updateTrackControls() {
-    const loaded = typeof videoReady !== "undefined" && core.videoReady;
+    const loaded = core.videoReady;
     songPlay.textContent = tr(core.video.paused ? "instTrackPlay" : "instTrackPause");
     songMute.textContent = tr(core.video.muted ? "instTrackUnmute" : "instTrackMute");
     songName.textContent = trackTitle();
@@ -905,7 +905,7 @@ addEventListener("DOMContentLoaded", () => {
     e.preventDefault(); sampleInput.click();
   });
   songPlay.addEventListener("click", async () => {
-    if (!(typeof videoReady !== "undefined" && core.videoReady)) return;
+    if (!core.videoReady) return;
     if (!core.video.paused) { core.video.pause(); return; }
     try {
       if (core.video.muted) core.video.muted = false;

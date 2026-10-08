@@ -2697,7 +2697,7 @@ async function addVideoFiles(list) {
   let waited = 0;
   const openWhenReady = () => {
     if (!window.TrkVideoMax || typeof window.TrkVideoMax.open !== "function") return;
-    if (typeof videoReady !== "undefined" && (core.videoReady || waited >= 8000)) {
+    if (core.videoReady || waited >= 8000) {
       try { if (window.TrkVideoMax.open()) core.setStatus("libStatus", "libVideoWatch"); } catch (_) {}
       return;
     }

@@ -1,18 +1,21 @@
 # 名前空間の整理（レビュー項目4）— 計画と安全網
 
 > 対象：レビュー `docs/REVIEW-2026-10-08.md` の項目 4「グローバル名前空間が限界に近い」。
-> 目的：**動きを変えずに**、大域に置かれている名前を減らし、外へ出すものを `window.Trk.*` に集める。新機能は入れない。
+> 目的：名前空間整理自体は**動きを変えずに**大域の名前を減らし、外へ出すものを `window.Trk.*` に集める。新機能は入れない。trk90 には別途、再レビューで合意した自動譜面の静かな区間 cap 修正も含む（詳細は `docs/HANDOFF.md` §2.3）。
 
 ## 1. 現状（`node tools/globals-audit.mjs` の結果）
 
 | 項目 | 数 |
 |---|---|
 | classic script（index.html の読み込み順） | 45 |
-| トップレベル宣言（function／const／let／var／class） | 1169 |
-| うち、他のファイルから使われない（private） | 853 |
-| うち、他のファイルから使われる（public） | 316 |
+| トップレベル宣言（function／const／let／var／class） | 1189 |
+| うち、他のファイルから使われない（private） | 1009 |
+| うち、他のファイルから使われる（public） | 180 |
 | 同名の別ファイル宣言（衝突） | 0 |
-| window のプロパティを介した連携（書いて別ファイルが読む） | 26 |
+| window のプロパティを介した連携（書いて別ファイルが読む） | 25 |
+| 大域に残る名前（公開版の実行環境） | 288 |
+
+**trk90 状態：** 旧core window alias 33件のうち28件を削除、凍結 `js/fx.js` の読み手5件（`chartMeta`・`phase`・`prefs`・`stats`・`videoReady`）を保留。`window.Trk.core` の正規アクセサは33件すべて維持。
 
 - インラインのイベント属性（`onclick="…"`）は `index.html` に**無い**。イベントは JS から配線している。
 - `window._trk*Open` の旗（書斎・シンス・メディアプレーヤーを開いているか）は、13 以上のファイルが読んでいる。これは裸の名前ではなく window の性質なので、棚卸しで別に数える。
@@ -25,7 +28,7 @@
 | `npm run check`・`npm test` | 静的な約束（文字列の検査・セキュリティ・4言語・a11y・node:test） | 常時 |
 | `tools/globals-audit.mjs` | 宣言の数・使われ方・衝突・window 連携の変化 | `node tools/globals-audit.mjs`（基準は `tests/fixtures/globals-baseline.json`） |
 | `tests/globals-audit.test.mjs` | 棚卸しの字句処理（コメント・文字列・テンプレート・正規表現・即時関数） | `npm test` に含む |
-| `tools/smoke-browser.mjs` | 実ブラウザで、起動エラー・実行時に解決できない名前・譜面（生成方式×難易度）のハッシュ・全ボタンのクリック時のエラー | 下記（環境変数が必要） |
+| `tools/smoke-browser.mjs` | 実ブラウザで、起動エラー・未解決名・注入合成analysisの譜面ハッシュ／キー集合・実WAVのデコード／解析エラー・キー集合と件数±5%・全ボタンのエラー | 下記（環境変数が必要） |
 
 ### スモーク検査の実行
 
@@ -34,13 +37,13 @@
 ```sh
 SMOKE_CHROME=/path/to/chromium \
 SMOKE_CHROME_ARGS='["--no-sandbox"]' \
-SMOKE_PUPPETEER=/path/to/puppeteer-core/lib/esm/puppeteer/puppeteer-core.js \
+SMOKE_PUPPETEER=/path/to/puppeteer-core/lib/puppeteer/puppeteer-core.js \
 node tools/smoke-browser.mjs --compare
 ```
 
-- `--write` で基準（`tests/fixtures/smoke-baseline.json`）を作る。**名前空間の変更の前に一度だけ**作り、以後は `--compare` で比べる。
-- 基準に入っている既知のエラー：ヘッドレス環境で `trk-dynEQ` の AudioWorklet が登録されない（`ampStackRadio` を押したとき）。実機では出ない想定で、基準として許容する。
-- 譜面が変わったら NG。意図した変更なら、理由を書いて基準を作り直す。
+- `--write` で基準（`tests/fixtures/smoke-baseline.json`）を作るのは、譜面／名前空間などを意図して変え、その理由を記録した場合だけ。通常は `--compare` を使う。
+- 合成譜面のハッシュ（notes・levelを含む）は、`tests/helpers/synth.mjs` と同じanalysisを直接注入して比較し、譜面キー集合も完全一致させる。実WAVは音声デコード・解析がエラーなく完了し、難易度のキー集合が一致したうえで件数が基準の±5%に収まることを別に見る（AudioContextのサンプルレート差を譜面ハッシュ比較に混ぜない）。
+- 現行基準：boot／未解決名／browser decode／ページ／クリックのエラーはすべて0。合成譜面10件が完全一致、実WAVの譜面10件は±5%で比較。
 - window の名前の増減は**報告のみ**（移行で意図して変わるため）。
 
 ### 検査が失敗することの確認（変異テスト）
@@ -56,8 +59,8 @@ node tools/smoke-browser.mjs --compare
 | A 準備 | 棚卸し・スモーク基準・字句処理の検査・計画 | 変えない | 完了 |
 | B 非公開を包む | 他から使われない名前だけを即時関数で包む。公開名は大域のまま（据え置きは `window.NAME = NAME`） | 変えない | 完了（私有の名前は全て包んだ。包んでいないファイルは公開名だけ：`i18n.js`・`tv-presets.js`・`catalog.js`・`title-match.js`、凍結の `fx-presets.js` は触らない） |
 | C 旗を集約 | `window._trk*Open` などを `window.Trk` 配下の一つの関数・状態へ | 読み手を書き換える | 完了（書斎・メディアプレーヤー・シンスの 3 旗を `window.Trk.overlay` に集約。下の「C の進捗」） |
-| D 公開名を移す | 公開名を `window.Trk.<領域>` へ移し、呼び出し側を書き換える（領域ごと） | 段階的 | 未着手。**方針（利用者の決定）：旧名は別名として残す**。ただし別名だけでは大域の名前数（317）は減らない。減らすには呼び出し側を `window.Trk.*` に書き換えてから別名を外す（後の段階） |
-| E 文書化 | `docs/ADDONS.md` に、アドオンが使ってよい公開 API を明記 | — | 完了（trk70 のまま。文書と検査のみ）：§0 に安定した窓口と内部を分けて記載。`api` の鍵を `check-repo` で文書と照合（逆テストで失敗を確認）。文書の誤り `tvSkin`→`skin` を修正 |
+| D 公開名を移す | 公開名を `window.Trk.<領域>` へ移し、呼び出し側を書き換える（領域ごと） | 段階的 | 領域登録は完了（trk57〜70）。互換名の第一者consumerを調べ、trk90で28件削除、凍結 `js/fx.js` の5件だけ保留。履歴・追加の段階削除は `docs/ADDONS.md` §0。 |
+| E 文書化 | `docs/ADDONS.md` に、アドオンが使ってよい公開 API を明記 | — | 完了：§0で安定した窓口と内部を分け、API keyを `check-repo` で照合。trk90に旧core aliasの削除済み28件・fx.js移行待ち5件と期限超過を追記し、実コード／文書／frozen consumerの整合も検査 |
 
 ### B の進め方（規則）
 
@@ -138,12 +141,11 @@ node tools/smoke-browser.mjs --compare
 | play | `js/render.js` | game.js・render.js の公開名（`PLAY_KEYS`・`startGame`・`judgeNote` など、値のコピー）。アクセサは `gameTime`・`showJudge`・`drawVideo`・`retryHoldAt`・`toast`・`goAt`・`leadIn` など | 147 | trk66 | 登録は領域で最後に読み込まれる render.js の末尾（game.js の末尾に置いたら、render.js の名前を読む時点で ReferenceError になり、起動が止まった：その試行は捨てて HEAD に戻した）。書き換え 147。登録検査（render.js・TRK_EXTRAS で game.js の窓の名前も対象）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
 | modes | `js/catch.js` | modes.js・truck.js・stage.js・catch.js の公開名 54（値のコピー。`truckBinding`・`stageBinding` は let のためアクセサ） | 27 | trk67 | 登録は領域で最後に読み込まれる catch.js の末尾。登録より前に読み込まれる stagefx.js などの裸の参照は書き換えない（起動時の順序を変えないため。窓の別名で従来どおり動く＝残り）。登録検査（catch.js・TRK_EXTRAS で modes/truck/stage の窓の名前も対象）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
 | core | `js/core.js` | 116 名（`let` 約 40 名はアクセサ、差し替えられる `activeMods`・`applySkin`・`videoFilter` などはアクセサ、残りは値のコピー）。`_trkStudyRoomOpen`（互換の読み取り専用）は登録しない | 6013 | trk68 | 登録は core.js の末尾（読み込み順で領域の最初。core 以外の領域の名前は、この後の登録で出る）。書き換え 6013（代入の左辺を含む。core.js より後に読み込まれるファイルだけ）。検査：check-repo・check-security・check-lite・check-study-room の文字列照合は window.Trk.<領域>. を除いた本文で見る（overlay は除かない）。check-lite の仮想環境に window.Trk.core を用意。1 名抜いた逆テストで失敗（確認）。スモーク OK。ヘッドレス（差し替え・書斎/シンス）OK |
-| screen（窓の別名を削除） | `js/core.js` | `Object.defineProperty(window, "screen", …)` を削除（ブラウザ標準の `window.screen` を隠さない）。`window.Trk.core.screen` は残す。例外は本件だけ（他の旧名は別名として残す方針どおり） | 0 | trk70 | 検査（`check-repo.mjs`）：定義を戻すと失敗（確認）。コードに裸の `screen` 参照が無いことを確認（`study-room.js` の `const screen` は局所）。`js/fx.js` に `screen` 参照なし。スモーク OK |
+| screen（窓の別名を削除） | `js/core.js` | `Object.defineProperty(window, "screen", …)` を削除（ブラウザ標準の `window.screen` を隠さない）。`window.Trk.core.screen` は残す。trk70時点は単独の例外。その後、trk90で他の旧core aliasもconsumer確認のうえ28件削除 | 0 | trk70 | 検査（`check-repo.mjs`）：定義を戻すと失敗（確認）。コードに裸の `screen` 参照が無いことを確認（`study-room.js` の `const screen` は局所）。`js/fx.js` に `screen` 参照なし。スモーク OK |
 | study（別名） | `js/study-room.js` | `window.Trk.study = window.TrkStudyRoom;`（凍結のオブジェクトの同じ参照。登録ではなく別名） | 0 | trk69 | 検査（`check-repo.mjs` の別名検査）：無い状態で失敗→追加後に通る。行を消す逆テストで失敗（確認）。スモーク OK |
 
 
-大域の名前（監査）は 317 → **316**（trk70 で `screen` の窓の別名を外した）。`public` は 316 → **181**：D の書き換えで、他ファイルから裸で使われていた名前が `window.Trk.<領域>.X` の参照に移ったため（監査の定義どおりの見え方の変化。宣言数 1171 は不変。`windowProps` 296→284）。以前は「317 のまま」と書いていた。旧名（window.X）は別名として残す方針（利用者の決定）のため、減るのは別名を外したときだけ。Trk 側の正規の場所は `window.Trk.<領域>`（監査の window 経由の連携に `window.Trk` が 12 ファイルから書かれる）。
-残りの領域は無し（11 領域の登録・書き換えは完了）。`screen`（window.screen と衝突）は利用者の選択（c）で決定し、trk70 で窓の別名のみ削除。HANDOFF §7 の実機確認は別途。HANDOFF §7 の実機確認は別途。
+**現在の結果（trk90）：** 棚卸しは宣言 1189・private 1009・public 180・衝突0・大域に残る名前288・window経由連携25。領域登録（chart・pad・lite・main・custom・library・media・data・play・modes・core）とstudy別名は完了。`window.screen` はtrk70でブラウザ標準を優先して削除済み。互換名の期限超過後、33件の旧core window aliasから28件を外し、凍結 `js/fx.js` が読む5件だけ保留した。`window.Trk.core` の33 accessorは維持する。残るaliasの期限とconsumerは `docs/ADDONS.md` §0、実機確認は HANDOFF §7。
 
 ## 4. 止める条件
 

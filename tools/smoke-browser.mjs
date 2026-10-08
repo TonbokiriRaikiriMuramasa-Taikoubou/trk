@@ -4,15 +4,16 @@
  *
  *   SMOKE_CHROME=/path/to/chromium [SMOKE_CHROME_ARGS='["--no-sandbox", …]'] \
  *   SMOKE_PUPPETEER=puppeteer-core \
- *   node tools/smoke-browser.mjs --write      … 基準を tests/fixtures/smoke-baseline.json に書く（変更の前に一度）
- *   node tools/smoke-browser.mjs --compare    … 基準と比べる（譜面の一致・未解決の名前・新しいエラーがあれば終了コード1）
+ *   node tools/smoke-browser.mjs --write      … 意図した変更と理由を記録した後で基準を tests/fixtures/smoke-baseline.json に書く
+ *   node tools/smoke-browser.mjs --compare    … 基準と比べる（譜面・キー集合の差、未解決名、新しいエラーで終了コード1）
  *
  * 見ること：
  *   1. 起動直後のエラー（pageerror／console.error）
  *   2. 監査（tools/globals-audit.mjs）が大域に残ると判定した名前（包みの外の宣言・window に出す名前）が、実行時に本当に解決できるか
- *   3. 合成曲の譜面（生成方式 1／2 × 難易度すべて）の一致（ノーツ列のハッシュ）
- *   4. 画面の見えているボタンを順に押したときの新しいエラー
+ *   3. 合成analysis注入の譜面（生成方式 1／2 × 難易度すべて）のハッシュとキー集合の完全一致
+ *   4. 実 WAV のデコード・音声解析にエラーがなく、キー集合一致・件数±5%以内か
  *   5. 公開 API を通す場面（書斎の開閉・一覧・統計・掃除）の結果と、その間のエラー
+ *   6. 画面の見えているボタンを順に押したときの新しいエラー
  * window に増減した名前は、名前空間の移行で意図して変わるので「報告のみ」。 */
 import http from "node:http";
 import fs from "node:fs";
@@ -20,6 +21,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { audit } from "./globals-audit.mjs";
+import { SYNTH_SONGS, synthAnalysis } from "../tests/helpers/synth.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MODE = process.argv.includes("--write") ? "write" : process.argv.includes("--compare") ? "compare" : null;
@@ -48,6 +50,30 @@ function makeWav() {
   hdr.write("data", 36); hdr.writeUInt32LE(pcm.length * 2, 40);
   return Buffer.concat([hdr, Buffer.from(pcm.buffer)]);
 }
+
+/* chart-gen の比較には tests と同じ合成 analysis を渡す。
+   decodeAudioData の環境差は、この決定的な譜面比較には混ぜない。 */
+const CHART_SMOKE_SONG_ID = "contrast";
+const CHART_SMOKE_SEED = "834271";
+const CHART_SMOKE_OFFSET = 0;
+const chartSmokeSong = SYNTH_SONGS[CHART_SMOKE_SONG_ID];
+const chartSmokeAnalysis = synthAnalysis(chartSmokeSong, 7);
+const CHART_SMOKE_INPUT = {
+  song: CHART_SMOKE_SONG_ID,
+  seed: CHART_SMOKE_SEED,
+  offset: CHART_SMOKE_OFFSET,
+  bpm: chartSmokeSong.bpm,
+  durationMs: chartSmokeSong.durSec * 1000,
+  analysis: {
+    frames: chartSmokeAnalysis.frames,
+    frameMs: chartSmokeAnalysis.frameMs,
+    maxRms: chartSmokeAnalysis.maxRms,
+    scale: chartSmokeAnalysis.scale,
+    rms: Array.from(chartSmokeAnalysis.rms),
+    onset: Array.from(chartSmokeAnalysis.onset),
+    ratio: Array.from(chartSmokeAnalysis.ratio),
+  },
+};
 
 const MIME = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json", ".png": "image/png", ".svg": "image/svg+xml", ".webmanifest": "application/manifest+json", ".mjs": "text/javascript", ".wasm": "application/wasm" };
 function serve() {
@@ -120,28 +146,55 @@ async function main() {
     const appNames = await page.evaluate(() => Object.getOwnPropertyNames(window));
     report.globals.added = uniq(appNames.filter(n => !baseNames.includes(n)));
 
-    /* 3. 譜面：生成方式 × 難易度ごとにノーツ列のハッシュ */
-    const diffIds = await page.evaluate(() => (typeof DIFF_IDS !== "undefined" ? DIFF_IDS : []));
-    await page.evaluate(async () => {
-      const buf = await (await fetch("/__smoke.wav")).arrayBuffer();
-      await loadMedia(new File([buf], "smoke.wav", { type: "audio/wav" }), {});
-    });
-    for (const gen of ["1", "2"]) {
-      for (const d of diffIds) {
-        const row = await page.evaluate((g, diff) => {
-          settings.chartGen = g; settings.difficulty = diff; buildChart();
-          const body = JSON.stringify(chart.map(n => [n.time, n.lane ?? n.col ?? n.l ?? null, n.type ?? n.kind ?? null]));
-          return { notes: chart.length, level: currentLevel, body };
-        }, gen, d);
-        report.charts[`gen${gen}/${d}`] = {
-          notes: row.notes, level: row.level,
-          hash: crypto.createHash("sha256").update(row.body).digest("hex").slice(0, 16),
-        };
+    /* 3. 譜面の比較は合成 analysis を直接注入し、node:test と同じ入力・Seedに固定する。
+       これにより AudioContext のサンプルレートやデコード実装差で基準が揺れない。 */
+    const diffIds = await page.evaluate(() => window.Trk.data.DIFF_IDS);
+    const injectedCharts = await page.evaluate((fixture, diffs) => {
+      const analysis = {
+        frames:fixture.analysis.frames, frameMs:fixture.analysis.frameMs,
+        maxRms:fixture.analysis.maxRms, scale:fixture.analysis.scale,
+        rms:Float32Array.from(fixture.analysis.rms),
+        onset:Float32Array.from(fixture.analysis.onset),
+        ratio:Float32Array.from(fixture.analysis.ratio),
+      };
+      const out = {};
+      for (const gen of ["1", "2"]) for (const diff of diffs) {
+        const rand = window.Trk.core.mulberry32(window.Trk.core.hashString(`${String(fixture.seed).trim()}|${diff}|${fixture.bpm}|${fixture.offset}`));
+        const notes = window.Trk.chart.buildChartNotes({
+          analysis, durationMs:fixture.durationMs, diff, spec:window.Trk.data.DIFFS[diff],
+          bpm:fixture.bpm, offset:fixture.offset, rand, chartGen:gen,
+        });
+        out[`gen${gen}/${diff}`] = { notes:notes.length, level:window.Trk.chart.cgEstimateLevel(notes), body:JSON.stringify(notes) };
       }
+      return out;
+    }, CHART_SMOKE_INPUT, diffIds);
+    for (const [key, row] of Object.entries(injectedCharts)) {
+      report.charts[key] = {
+        notes:row.notes, level:row.level,
+        hash:crypto.createHash("sha256").update(row.body).digest("hex").slice(0, 16),
+      };
     }
+
+    /* 4. 実 WAV はデコード／解析の経路だけを検査する。
+       サンプル値は環境依存なので、譜面のハッシュではなくエラーと件数±5%だけを見る。 */
+    const decodeStart = errors.length;
+    const decoded = await page.evaluate(async diffs => {
+      const buf = await (await fetch("/__smoke.wav")).arrayBuffer();
+      const loaded = await window.Trk.media.loadMedia(new File([buf], "smoke.wav", { type:"audio/wav" }), {});
+      const core = window.Trk.core;
+      const result = { loaded:!!loaded, analyzed:!!core.analysis, duration:core.video.duration, charts:{} };
+      if (loaded) for (const gen of ["1", "2"]) for (const diff of diffs) {
+        const notes = window.Trk.media.generateNotes(diff, 120, 0, "834271", gen);
+        result.charts[`gen${gen}/${diff}`] = { notes:notes.length };
+      }
+      return result;
+    }, diffIds);
+    await new Promise(r => setTimeout(r, 100));
+    await flush();
+    report.decoded = { ...decoded, errors:uniq(errors.slice(decodeStart)) };
     errors.length = 0;
 
-    /* 3b. 公開 API を通す場面（書斎：開閉・一覧・統計・掃除）。値は基準と一致すること */
+    /* 5. 公開 API を通す場面（書斎：開閉・一覧・統計・掃除）。値は基準と一致すること */
     const scenarios = [
       ["study:open", "() => { TrkStudyRoom.open(); return TrkStudyRoom.isOpen(); }"],
       ["study:stats", "() => JSON.stringify(TrkStudyRoom.stats())"],
@@ -164,7 +217,7 @@ async function main() {
     }
     errors.length = 0;
 
-    /* 4. 見えているボタンを順に押す。押すたびに新しいエラーが出ないかを見る */
+    /* 6. 見えているボタンを順に押す。押すたびに新しいエラーが出ないかを見る */
     const clickLabels = await page.evaluate(() => {
       const out = [];
       document.querySelectorAll("button, [role=button]").forEach((b, i) => {
@@ -221,7 +274,8 @@ try {
 const summary = {
   boot: report.boot.errors.length, unresolved: report.unresolved.length,
   decls: report.declCount, globals: report.globalCount, added: report.globals.added.length,
-  charts: Object.keys(report.charts).length, scenarios: Object.keys(report.scenarios).length, clicks: report.clicks.clicked,
+  charts: Object.keys(report.charts).length, decodedCharts: Object.keys(report.decoded.charts).length,
+  decodeErrors: report.decoded.errors.length, scenarios: Object.keys(report.scenarios).length, clicks: report.clicks.clicked,
   clickErrors: report.clicks.errors.length,
 };
 console.log(JSON.stringify(summary));
@@ -232,9 +286,26 @@ if (MODE === "write") {
 } else {
   const base = JSON.parse(fs.readFileSync(BASELINE, "utf8"));
   const problems = [];
-  for (const [k, v] of Object.entries(base.charts)) {
+  const baseChartKeys = Object.keys(base.charts || {}).sort();
+  const nowChartKeys = Object.keys(report.charts).sort();
+  if (JSON.stringify(baseChartKeys) !== JSON.stringify(nowChartKeys)) problems.push(`合成analysisの譜面キーが違う: ${baseChartKeys.join(", ")} → ${nowChartKeys.join(", ")}`);
+  for (const [k, v] of Object.entries(base.charts || {})) {
     const now = report.charts[k];
-    if (!now || now.hash !== v.hash || now.notes !== v.notes || now.level !== v.level) problems.push(`譜面が変わった: ${k}（${v.notes} → ${now ? now.notes : "なし"}）`);
+    if (!now || now.hash !== v.hash || now.notes !== v.notes || now.level !== v.level) problems.push(`合成analysis注入の譜面が変わった: ${k}（${v.notes} → ${now ? now.notes : "なし"}）`);
+  }
+  if (!report.decoded.loaded || !report.decoded.analyzed) problems.push(`実WAVのデコード／解析に失敗: loaded=${report.decoded.loaded}, analyzed=${report.decoded.analyzed}`);
+  for (const e of report.decoded.errors) problems.push(`実WAVのデコード経路でエラー: ${e}`);
+  const decodedBase = base.decoded && base.decoded.charts;
+  if (!decodedBase || !Object.keys(decodedBase).length) problems.push("基準に decoded.charts がありません（--write で更新してください）");
+  const decodedBaseKeys = Object.keys(decodedBase || {}).sort();
+  const decodedNowKeys = Object.keys(report.decoded.charts).sort();
+  if (JSON.stringify(decodedBaseKeys) !== JSON.stringify(decodedNowKeys)) problems.push(`実WAV譜面のキーが違う: ${decodedBaseKeys.join(", ")} → ${decodedNowKeys.join(", ")}`);
+  for (const [k, v] of Object.entries(decodedBase || {})) {
+    const now = report.decoded.charts[k];
+    const tolerance = Math.max(1, Math.floor(Number(v.notes) * 0.05));
+    if (!now || Math.abs(now.notes - Number(v.notes)) > tolerance) {
+      problems.push(`実WAVのノーツ件数が±5%を超えた: ${k}（${v.notes} → ${now ? now.notes : "なし"}、許容±${tolerance}）`);
+    }
   }
   for (const [k, v] of Object.entries(base.scenarios || {})) {
     const now = report.scenarios[k];

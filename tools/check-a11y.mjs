@@ -12,7 +12,7 @@
  *   3. 画像に alt があるか
  *   4. 押せるものに role="presentation" / "none" を付けていないか（読み上げから消える）
  *   5. role="tablist" の中身がタブだけか（＋ボタンなどを混ぜない）
- *   6. 見出し(h1〜h6)の順番が飛んでいないか（飛んでいたら警告だけ。今の構成は既知のため）
+ *   6. 見出し(h1〜h6)の順番が飛んでいないか（既知の h1→h3 だけWARNを許可し、未知・増加分はFAIL）
  *
  * 実行: node tools/check-a11y.mjs
  * 外部ツールでの点検のしかたは docs/QUALITY-CHECKS.md を参照。
@@ -132,13 +132,21 @@ for (const f of htmlFiles) {
 }
 rule(tabProblems.length === 0, "role=tablist holds tabs only (the ＋ button stays outside)", tabProblems.join(" / ") || "js/library.js の libTabsList");
 
-/* ---------- 6. 見出しの順番（警告だけ） ---------- */
+/* ---------- 6. 見出し順: 許容済みWARN以外はFAIL ---------- */
 {
   const src = read("index.html");
   const levels = [...src.matchAll(/<h([1-6])\b[^>]*>/g)].map(m => Number(m[1]));
   let prev = 0; const jumps = [];
   for (const l of levels) { if (prev && l > prev + 1) jumps.push(`h${prev}→h${l}`); prev = l; }
-  if (jumps.length) warn("見出しの順番が飛んでいます（今の画面構成では既知。下の docs/QUALITY-CHECKS.md を参照）", `${jumps.join(", ")}（左の列の見出しが h3 のため。h2 へ変えると見た目が変わるので保留中）`);
+  const allowed = new Map([["h1→h3", 1]]); // docs/QUALITY-CHECKS.md に理由と修正条件を記録
+  const observed = new Map();
+  for (const jump of jumps) observed.set(jump, (observed.get(jump) || 0) + 1);
+  const unreviewed = [...observed].filter(([jump, count]) => count > (allowed.get(jump) || 0))
+    .map(([jump, count]) => `${jump}×${count}（許容 ${allowed.get(jump) || 0}）`);
+  rule(unreviewed.length === 0, "heading-order warnings match the reviewed allowlist",
+    unreviewed.length ? `unreviewed: ${unreviewed.join(", ")}` : jumps.length ? "known h1→h3 warning only" : "no heading-order warnings");
+  if (jumps.length) warn("見出しの順番が飛んでいます（許容済みの既知WARN。docs/QUALITY-CHECKS.md を参照）",
+    `${jumps.join(", ")}（左の列の見出しが h3 のため。h2 へ変えると見た目が変わるので保留中）`);
   else rule(true, "heading levels never skip a level in index.html");
 }
 

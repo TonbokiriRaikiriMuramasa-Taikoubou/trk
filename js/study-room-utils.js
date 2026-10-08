@@ -186,6 +186,32 @@ window.TrkStudyUtils = (() => {
       default: return rows.sort(byUpdated);
     }
   }
+  function sortShelfItems(items, options) {
+    const rows = Array.from(items || []), config = options && typeof options === "object" ? options : {};
+    const mode = ["updated", "added", "title", "type", "size"].includes(config.mode) ? config.mode : "updated";
+    const orderKeys = Array.isArray(config.orderKeys) ? config.orderKeys : [];
+    if (config.manual === true) {
+      const order = new Map(orderKeys.map((key, index) => [String(key), index]));
+      rows.sort((a, b) => (order.get(String(a && a.key)) ?? Number.MAX_SAFE_INTEGER) -
+        (order.get(String(b && b.key)) ?? Number.MAX_SAFE_INTEGER) || comparePath(a && a.title, b && b.title));
+    } else {
+      const typeRank = item => item && item.itemType === "folder" ? 2 : item && item.kind === "image" ? 0 : 1;
+      rows.sort((a, b) => {
+        let result = 0;
+        if (mode === "title") result = comparePath(a && a.title, b && b.title);
+        else if (mode === "added") result = (Number(a && a.createdAt) || 0) - (Number(b && b.createdAt) || 0);
+        else if (mode === "type") result = typeRank(a) - typeRank(b);
+        else if (mode === "size") result = (Number(b && b.size) || 0) - (Number(a && a.size) || 0);
+        else result = (Number(b && b.updatedAt) || 0) - (Number(a && a.updatedAt) || 0);
+        return result || comparePath(a && a.title, b && b.title);
+      });
+    }
+    if (config.foldersFirst === true) {
+      return rows.filter(item => item && item.itemType === "folder").concat(rows.filter(item => !item || item.itemType !== "folder"));
+    }
+    return rows;
+  }
+
   function formatBytes(bytes) {
     const value = Math.max(0, Number(bytes) || 0);
     if (value < 1024) return `${Math.round(value)} B`;
@@ -222,5 +248,5 @@ window.TrkStudyUtils = (() => {
 
   return Object.freeze({ IMAGE_EXTS, TEXT_EXTS, ROOT_ALBUM, MAX_MATCHES, extension, baseName, relativePath, isImageFile, isTextFile,
     comparePath, groupImageFiles, listTextFiles, decodeTextBuffer, normalizeText, aozoraSegments, findMatches, snippetAt, textStats,
-    bookSize, sortBooks, formatBytes, bookmarkedBooks, orderPages, stableId });
+    bookSize, sortBooks, sortShelfItems, formatBytes, bookmarkedBooks, orderPages, stableId });
 })();

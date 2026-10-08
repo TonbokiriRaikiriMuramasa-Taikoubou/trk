@@ -13,7 +13,7 @@
  *   5. ZIP（.stpack）の展開が、宣言サイズを信用せず上限で止まるか
  *   6. アドオンが安全モードで止まり、遠隔のコードを取りに行かないか
  *   7. ページから出ていく通信が、許した相手だけか（同一オリジン / jsDelivr の import map のみ）
- *   8. ファイル選択が読み取り専用か（createWritable など書き込みAPIを使っていないか）
+ *   8. 入力ファイルは読み取り専用で、明示的なStudy書き出しだけが選択先に新規コピーを作るか（既存ファイルを上書きしないか）
  *
  * 実行: node tools/check-security.mjs
  */
@@ -516,20 +516,37 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     "the 🎬 video import waits for a real first frame before marking an item as video, then opens the viewer");
 }
 
-/* ---------- 8. ファイルは読み取りだけ ---------- */
+/* ---------- 8. ローカル入力は読み取り専用、書き出しは明示的な新規コピーだけ ---------- */
 {
-  const writes = [];
+  const writes = [], study = js["js/study-room.js"];
+  const exportWriter = study.match(/async function studyWriteExportCopy\(directory, blob, title, extension\) \{[\s\S]*?^\}/m);
+  const exportText = study.match(/async function studyExportText\(\) \{[\s\S]*?^\}/m);
+  const exportPicker = study.match(/async function studyChooseExportDirectory\(\) \{[\s\S]*?^\}/m);
+  const inBlock = (match, index) => !!match && index >= match.index && index < match.index + match[0].length;
   for (const [file, text] of allJs) {
     for (const re of [/createWritable\s*\(/g, /\.write\s*\(\s*[a-zA-Z]/g, /removeEntry\s*\(/g, /getFileHandle\s*\(/g]) {
       for (const m of occurrences(text, re)) {
-        if (file === "js/study-room.js" && /\.write\(/.test(m[0])) continue;   /* IndexedDB への書き込み */
+        if (file === "js/study-room.js" && inBlock(exportWriter, m.index) && !/removeEntry/.test(m[0])) continue;
         writes.push(file + ": " + m[0].trim());
       }
     }
   }
-  const pickers = allJs.filter(([, text]) => text.includes("showDirectoryPicker"))
-    .every(([, text]) => !/mode\s*:\s*"readwrite"/.test(text) && /mode\s*:\s*"read"/.test(text));
-  rule(writes.length === 0 && pickers, "folder/file access is read-only (mode:\"read\", no createWritable)",
+  let pickers = true;
+  for (const [file, text] of allJs) {
+    for (const m of occurrences(text, /(?:window\.)?showDirectoryPicker\s*\(\s*\{[^}]*\}\s*\)/g)) {
+      const explicitExport = file === "js/study-room.js" && inBlock(exportPicker, m.index) && /mode\s*:\s*"readwrite"/.test(m[0]);
+      const readOnly = /mode\s*:\s*"read"/.test(m[0]);
+      if (!explicitExport && !readOnly) pickers = false;
+    }
+  }
+  const exportCalls = occurrences(study, /studyWriteExportCopy\s*\(/g);
+  const exportCalledOnlyByButton = !!exportWriter && !!exportText && exportCalls.length === 2 &&
+    inBlock(exportWriter, exportCalls[0].index) && inBlock(exportText, exportCalls[1].index);
+  const exportCollisionGuard = exportCalledOnlyByButton && exportWriter[0].includes("directory.getFileHandle(candidate)") &&
+    exportWriter[0].includes('error.name !== "NotFoundError"') &&
+    exportWriter[0].includes('directory.getFileHandle(filename, { create:true })') && exportWriter[0].includes("writable.write(blob)");
+  rule(writes.length === 0 && pickers && exportCollisionGuard,
+    "local inputs remain read-only; explicit Study export alone writes a collision-checked new copy to a user-selected folder",
     writes.slice(0, 3).join(" · "));
 }
 

@@ -14,7 +14,7 @@
 | JavaScript の書き間違い | `eslint` 10.12（possible-problems 系ルールのみ。整形の好みは見ない） | **31件**（重複キー29・不可視空白1・Promise の戻り値1） |
 | CSS の文法 | `css-tree` 3.x | **0件**（`css/style.css` 1652行・`study-room.css` 300行・`privacy.css` 69行、インライン `<style>` も無し） |
 | Web App Manifest | 手元の検査（必須項目・アイコンの実在とサイズ） | **0件**（`display:fullscreen` / 192px・512px あり） |
-| 毎回の見張り番 | **`node tools/check-a11y.mjs`**（依存パッケージ不要・`npm run check` に含まれる） | 5項目（下記 §4） |
+| 毎回の見張り番 | **`node tools/check-a11y.mjs`**（依存パッケージ不要・`npm run check` に含まれる） | 7 checks。既知の `h1→h3` 1件だけWARNを許容し、新規・増加した警告はFAIL |
 
 > ⚠ この環境からは **validator.w3.org / jigsaw.w3.org / pagespeed.web.dev に到達できません**（ネットワーク遮断）。
 > そのため W3C のオンライン診断と同じ規則を実装したオフライン版で代用しています。**手元のブラウザでは**
@@ -41,7 +41,7 @@
 
 | こと | 理由 |
 |---|---|
-| **見出しの順番が h1→h3**（`heading-order` moderate） | 左の列（曲リスト・マスター・スペクトラム…）の見出しが `h3`。`h2` に上げるのが本筋だが、**スキンごとの見た目（サイズ・余白）が変わる**ため、いまは**警告として出すだけ**（`tools/check-a11y.mjs` の WARN）。 |
+| **見出しの順番が h1→h3**（`heading-order` moderate） | 左の列（曲リスト・マスター・スペクトラム…）の見出しが `h3`。`h2` に上げるのが本筋だが、**スキンごとの見た目（サイズ・余白）が変わる**ため、既知の `h1→h3` 1件だけは `tools/check-a11y.mjs` でWARNを許容する。想定外の見出し飛び、または同じ警告の増加はチェックをFAILにする。 |
 | **`<main>` ランドマークが無い**（`landmark-one-main`） | 画面全体が `.screen` の入れ替え（選曲・設定・書斎…）で、`<main>` を1つに決めると**全画面の入れ替え構造そのもの**を触ることになる。単独画面のゲームでは実害が小さい。 |
 | **動画に字幕が無い**（`video-caption` critical） | 読み込むのは**利用者自身の動画**で、字幕トラックは端末内に存在しない。アプリ側で字幕を作ることはできない（該当なし扱い）。 |
 | **色のコントラスト**（`color-contrast`） | jsdom では**色を計算できない**ので未検証。ここは**実ブラウザの axe DevTools / Lighthouse**で見てください。 |
@@ -60,7 +60,7 @@
 3. **`<img>` に `alt` がある**
 4. **押せるものの role を消していない**（`role="presentation"` / `"none"`）
 5. **`role="tablist"` の中身がタブだけ**（＋ボタンを混ぜない。`js/library.js` の `libTabsList` を見る）
-6. おまけで**見出しの飛び**を WARN（失敗にはしない）
+6. **見出し順の警告を許可リスト照合** — `h1→h3` 1件だけWARNを許容し、新しい種類・追加発生はFAIL（解消された場合はWARNなしでPASS）
 
 ## 5. もう一度やりたいとき（手順）
 
@@ -84,4 +84,4 @@ node -e 'import("html-validate").then(async ({HtmlValidate})=>{const r=await new
 
 ---
 
-最終更新: 2026-10-06（`tools/check-a11y.mjs` 追加・`docs/HANDOFF.md` から参照）
+最終更新: 2026-10-08（見出し順WARNを許可リスト照合に変更し、未レビューの警告増加はFAILにする）

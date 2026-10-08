@@ -102,7 +102,7 @@ function setRate(r) {
   if (!isFinite(r)) return;
   settings.rate = r; saveUserPrefs();
   if (phase === "title" && !video.paused) video.playbackRate = r;   // プレビューにもすぐ反映
-  syncOptionsUI(); emit("options");
+  window.Trk.main.syncOptionsUI(); emit("options");
 }
 function stepRate(dir) {
   if (settings.speedPanel === "hidden") return;
@@ -174,7 +174,7 @@ function usedKeys() {
 function captureSpeedKey(code) {
   const slot = speedBinding;
   if (code === "Escape") { speedBinding = null; setStatus("speedBindStatus", "cancelBind"); syncSpeedKeyUI(); return; }
-  if (RESERVED.has(code)) { setStatus("speedBindStatus", "reservedKey"); return; }
+  if (window.Trk.main.RESERVED.has(code)) { setStatus("speedBindStatus", "reservedKey"); return; }
   if (usedKeys().includes(code) || settings.speedKeys[1 - slot] === code) { setStatus("speedBindStatus", "duplicateKey"); return; }
   const old = settings.speedKeys.slice();
   settings.speedKeys[slot] = code; speedBinding = null; saveUserPrefs();
@@ -242,6 +242,6 @@ if (truckHint) {
 }
 
 i18nNow(panel);
-syncOptionsUI(); emit("options");
+window.Trk.main.syncOptionsUI(); emit("options");
 })();
 /* ✅ speed.js 完了 */

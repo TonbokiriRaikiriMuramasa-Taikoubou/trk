@@ -1640,6 +1640,7 @@ const TRK_REGISTRARS = {
   "js/chart-gen.js": "chart",
   "js/pad.js": "pad",
   "js/lite.js": "lite",
+  "js/main.js": "main",
 };
 const TRK_NOT_REGISTERED = { "js/core.js": ["_trkStudyRoomOpen"] }; // 互換の読み取り専用アクセサ（宣言ではない）
 for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {

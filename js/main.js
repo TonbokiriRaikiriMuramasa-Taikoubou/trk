@@ -547,4 +547,8 @@ window.packsReady = packsReady;
 window.poke = poke;
 window.showFxPower = showFxPower;
 window.syncOptionsUI = syncOptionsUI;
+/* 領域（window.Trk.main）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
+window.Trk = window.Trk || {};
+window.Trk.main = Object.assign(window.Trk.main || {}, { RESERVED, packsReady, poke, showFxPower, syncOptionsUI });
+Object.defineProperty(window.Trk.main, "idleTimer", { configurable:true, get:() => idleTimer, set:v => { idleTimer = v; } });
 })();

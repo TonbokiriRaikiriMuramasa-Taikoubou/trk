@@ -371,7 +371,7 @@ function restoreWhenAllowed() {
   enqueue(async () => { if (!packOwned) await restorePersonal(); });
 }
 (async () => {
-  try { await packsReady; } catch (_) {}
+  try { await window.Trk.main.packsReady; } catch (_) {}
   restoreWhenAllowed();
 })();
 on("lite", () => restoreWhenAllowed());

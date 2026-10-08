@@ -128,8 +128,9 @@ node tools/smoke-browser.mjs --compare
 | chart | `js/chart-gen.js` | `buildChartNotes`・`cgEstimateLevel`・`cgAllocate`（値のコピー） | 2（`js/media.js`） | trk57 | 登録検査は、登録の無い HEAD で失敗（確認）→ 適用後に通る。1 名だけ抜いた逆テストで失敗（確認）。スモーク OK（未解決 0・譜面 10 件一致） |
 | pad | `js/pad.js` | `padBack`・`updatePadUI`（値のコピー） | 0 | trk58 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
 | lite | `js/lite.js` | `liteLibRows`・`liteNoAnalyze`・`liteMascotNoLoad`・`liteSyncUI`（値のコピー） | 0 | trk59 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
+| main | `js/main.js` | `RESERVED`・`packsReady`・`poke`・`showFxPower`・`syncOptionsUI`（値のコピー）・`idleTimer`（アクセサ） | 4 | trk60 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。書き換えは speed.js 3・vrm.js 1。スモーク OK |
 
-残りの領域（main・custom・library・media・data・play・modes・core）は未着手。HANDOFF §7 の実機確認は別途。
+残りの領域（lite・custom・library・media・data・play・modes・core）は未着手。HANDOFF §7 の実機確認は別途。
 
 ## 4. 止める条件
 

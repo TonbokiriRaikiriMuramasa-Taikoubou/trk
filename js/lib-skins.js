@@ -43,7 +43,7 @@ Object.assign(TEXT.zh, {
 Object.assign(TEXT.ko, {
   libSkinHead:"📚 곡 목록 선반(탭) 스킨",
   libSkinQuick:"곡 목록에 🎨 버튼 표시 (그 자리에서 스킨 전환)",
-  libSkinHint:"곡 탭의 모양을 노트・스티커 앨범・주크박스・전광판 등에서 고를 수 있습니다. 탭 자체는 곡의 입구(팩・폴더・추가한 곡)마다 자동으로 생깁니다.",
+  libSkinHint:"곡 탭의 모양을 노트·스티커 앨범·주크박스·전광판 등에서 고를 수 있습니다. 탭 자체는 곡의 입구(팩·폴더·추가한 곡)마다 자동으로 생깁니다.",
   libSkinBtnTitle:"🎨 선반 스킨 (곡 탭 모양)",
   libSkinRand:"🎲 랜덤",
   libSkinApplied:"선반 스킨: {name}"

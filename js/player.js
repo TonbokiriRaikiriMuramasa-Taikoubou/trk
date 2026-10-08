@@ -34,8 +34,8 @@ Object.assign(TEXT.en, {
   abToastA:"🔁 A {t}", abToastB:"🔁 Repeating {a} – {b}", abToastClear:"🔁 A-B repeat cleared"
 });
 Object.assign(TEXT.zh, {
-  skipTitle:"⏯ 播放操作（AUTO・练习中）", skipBack:"倒退", skipFwd:"快进", skipKeyReset:"↺ 恢复为 ← ／ →",
-  skipHint:"AUTO中（或显示练习进度条时），可以拖动下方进度条跳到任意位置，也可以用按键每次倒退・快进10秒。按 R 键进行区间重复（A点 → B点 → 解除）。暂停中也能使用。",
+  skipTitle:"⏯ 播放操作（AUTO·练习中）", skipBack:"倒退", skipFwd:"快进", skipKeyReset:"↺ 恢复为 ← ／ →",
+  skipHint:"AUTO中（或显示练习进度条时），可以拖动下方进度条跳到任意位置，也可以用按键每次倒退·快进10秒。按 R 键进行区间重复（A点 → B点 → 解除）。暂停中也能使用。",
   skipCapture0:"请按下“倒退”的按键。ESC取消。",
   skipCapture1:"请按下“快进”的按键。ESC取消。",
   skipAssigned:"已设置播放操作按键。",
@@ -44,8 +44,8 @@ Object.assign(TEXT.zh, {
   abToastA:"🔁 A点 {t}", abToastB:"🔁 重复 {a} – {b}", abToastClear:"🔁 已解除区间重复"
 });
 Object.assign(TEXT.ko, {
-  skipTitle:"⏯ 재생 조작 (AUTO・연습 중)", skipBack:"되감기", skipFwd:"빨리 감기", skipKeyReset:"↺ ← ／ → 로 되돌리기",
-  skipHint:"AUTO 중(또는 연습용 시크바 표시 중)에는 아래 재생 바로 원하는 위치로 이동하고, 키로 10초씩 되감기・빨리 감기할 수 있습니다. R 키로 구간 반복 (A점 → B점 → 해제). 일시정지 중에도 쓸 수 있습니다.",
+  skipTitle:"⏯ 재생 조작 (AUTO·연습 중)", skipBack:"되감기", skipFwd:"빨리 감기", skipKeyReset:"↺ ← ／ → 로 되돌리기",
+  skipHint:"AUTO 중(또는 연습용 시크바 표시 중)에는 아래 재생 바로 원하는 위치로 이동하고, 키로 10초씩 되감기·빨리 감기할 수 있습니다. R 키로 구간 반복 (A점 → B점 → 해제). 일시정지 중에도 쓸 수 있습니다.",
   skipCapture0:"'되감기'로 지정할 키를 누르세요. ESC로 취소.",
   skipCapture1:"'빨리 감기'로 지정할 키를 누르세요. ESC로 취소.",
   skipAssigned:"재생 조작 키를 설정했습니다.",

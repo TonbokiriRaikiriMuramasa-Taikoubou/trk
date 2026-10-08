@@ -41,7 +41,7 @@ Object.assign(TEXT.zh, {
   stageFxHint:"用聚光灯、地面反光和上升的光点装点STAGE，高潮段落会更亮。系统开启“减弱动态效果”时停止动态。",
   judgeSizeLabel:"判定文字大小", sizeS:"小", sizeM:"中", sizeL:"大", judgePos:"判定文字位置",
   fastSlowLabel:"FAST/SLOW 显示", fsGood:"仅GOOD", fsAll:"PERFECT✦以外全部", fsOff:"不显示",
-  apfcLabel:"保持AP・FC期间显示",
+  apfcLabel:"保持AP·FC期间显示",
   eggCurtain:"✦ CURTAIN CALL：特别的幕布升起。感谢所有的舞台。",
   curtainCall:"CURTAIN CALL", curtainThanks:"感谢大家的掌声。"
 });
@@ -49,10 +49,10 @@ Object.assign(TEXT.ko, {
   fxTitle:"🎭 무대 연출과 판정 표시",
   stageFxLabel:"STAGE 연출", stageFxOff:"끄기", stageFxSoft:"은은하게", stageFxStd:"표준", stageFxRich:"화려하게",
   stageLightLabel:"스포트라이트 색", lightSkin:"스킨 색", lightRainbow:"무지개", lightCustom:"사용자 지정", lightColor:"조명 색",
-  stageFxHint:"스포트라이트・바닥 반사・떠오르는 빛으로 STAGE를 꾸밉니다. 신나는 구간에서는 더 밝아집니다. 시스템의 '동작 줄이기'가 켜져 있으면 움직임을 멈춥니다.",
+  stageFxHint:"스포트라이트·바닥 반사·떠오르는 빛으로 STAGE를 꾸밉니다. 신나는 구간에서는 더 밝아집니다. 시스템의 '동작 줄이기'가 켜져 있으면 움직임을 멈춥니다.",
   judgeSizeLabel:"판정 문자 크기", sizeS:"작게", sizeM:"보통", sizeL:"크게", judgePos:"판정 문자 위치",
   fastSlowLabel:"FAST/SLOW 표시", fsGood:"GOOD만", fsAll:"PERFECT✦ 외 전부", fsOff:"표시 안 함",
-  apfcLabel:"AP・FC가 이어지는 동안 표시",
+  apfcLabel:"AP·FC가 이어지는 동안 표시",
   eggCurtain:"✦ CURTAIN CALL: 특별한 막이 오릅니다. 모든 무대에 감사합니다.",
   curtainCall:"CURTAIN CALL", curtainThanks:"많은 박수, 감사합니다."
 });

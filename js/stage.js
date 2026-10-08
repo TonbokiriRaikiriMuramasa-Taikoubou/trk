@@ -53,7 +53,7 @@ Object.assign(TEXT.zh, {
   stageAdjacent:"按相邻轨道也算判定（宽松）", stageMirror:"镜像（左右翻转）",
   stageLaneColor:"用咚／咔的颜色显示音符（关闭＝皮肤单色）",
   stageBeam:"按键光束（点亮按下的轨道）", stageGuides:"轨道辅助线", stageHype:"高潮段落点亮轨道",
-  perfectStar:"显示 PERFECT✦（所有模式・不影响分数）",
+  perfectStar:"显示 PERFECT✦（所有模式·不影响分数）",
   stageViewHint:"快速连打会变成阶梯或交互，小节开头会变成两轨宽的宽音符。难度越高，配置越分散。",
   stageKeysTitle:"🎪 STAGE 按键", stageKeyReset:"↺ 恢复默认按键", stageLaneN:"轨道{n}",
   stageCapture:"请按下轨道{n}的按键。ESC取消。", stageAssigned:"已设置STAGE按键。"
@@ -68,7 +68,7 @@ Object.assign(TEXT.ko, {
   stageAdjacent:"옆 레인을 눌러도 판정 (느슨하게)", stageMirror:"미러 (좌우 반전)",
   stageLaneColor:"노트를 쿵／딱 색으로 표시 (끄면 스킨 색 한 가지)",
   stageBeam:"키 빔 (누른 레인 빛내기)", stageGuides:"레인 보조선", stageHype:"신나는 구간에서 레인 빛내기",
-  perfectStar:"PERFECT✦ 표시 (모든 모드・점수 변화 없음)",
+  perfectStar:"PERFECT✦ 표시 (모든 모드·점수 변화 없음)",
   stageViewHint:"빠른 연타는 계단이나 트릴로, 마디 첫 박은 2레인 폭의 와이드 노트가 됩니다. 난이도가 높을수록 배치가 넓어집니다.",
   stageKeysTitle:"🎪 STAGE 키", stageKeyReset:"↺ 기본 키로", stageLaneN:"레인 {n}",
   stageCapture:"레인 {n}에 지정할 키를 누르세요. ESC로 취소.", stageAssigned:"STAGE 키를 설정했습니다."

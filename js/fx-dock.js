@@ -217,9 +217,9 @@ Object.assign(TEXT.en, {
   ampAdjustHint:"Stage knobs (thresholds, frequencies…) live in Settings → 🎚 Effect rack (stack your own). Turning the amp off keeps your preset sound."
 });
 Object.assign(TEXT.zh, {
-  dockTitle:"🎛 详细（均衡器・皮肤・菜单）", dockFavLabel:"⭐ 按钮放不下的收藏",
+  dockTitle:"🎛 详细（均衡器·皮肤·菜单）", dockFavLabel:"⭐ 按钮放不下的收藏",
   dockNoFavShort:"⭐ 还没有收藏",
-  dockNoFav:"还没有收藏。长按按钮即可登记当前音效。", dockMore:"⚙ 详细设置（游戏联动・我的预设等）",
+  dockNoFav:"还没有收藏。长按按钮即可登记当前音效。", dockMore:"⚙ 详细设置（游戏联动·我的预设等）",
   dockPower:"⏻ 电源（静音）", dockAntenna:"📡 天线（后台播放）", dockCastButton:"投放",
   dockAntOn:"📡 后台播放开启：切到后台也继续播放", dockAntOff:"📡 后台播放关闭", dockMute:"🔇 MUTE", dockFxOff:"FX OFF", dockCastOn:"📡 已打开投放选择", dockCastOffDone:"📡 已断开投放", dockCastFailed:"无法开始外部输出。", dockCastUnsupported:"此浏览器不支持外部输出选择。",
   dockBackgroundPolicy:"后台播放天线", dockBackgroundOff:"不显示（无后台播放）", dockBackgroundAntenna:"在机台上显示天线", dockBackgroundCorner:"放到右上角（语言左侧·紧凑）", dockBackgroundHint:"可以与投放分开，只允许后台播放。选择「在机台上显示」或「放到右上角」并开启后，切到后台也会继续播放。",
@@ -237,7 +237,7 @@ Object.assign(TEXT.zh, {
   dockAntCustomOn:"ON的图片", dockAntCustomOff:"OFF的图片", dockAntCustomClear:"删除图片", dockAntCustomNg:"无法读取该图片", dockAntCustomCleared:"已删除ON／OFF图片",
   dockAntCustomHint:"两张图片只保存在设备内（初始化设置后会消失）。ON图＝天线立起时，OFF图＝睡着时。过大的图片会自动缩小。",
   dockLockChain:"🔒 参数随机时不改变预设本身（只改均衡器）", dockLockHint:"标记 🔒 的均衡器在随机时不会变化",
-  dockAntHint:"竖起天线后，切到后台或关闭屏幕也会继续播放（选曲试听・电台等待・AUTO中）。自己游玩时为了保护记录，仍会照常暂停。后台期间，随节拍变化的音效和画面动画会停止，倒计时会省略。可以在锁屏或通知中播放・暂停・切到下一首。部分设备的省电设置仍可能停止播放。",
+  dockAntHint:"竖起天线后，切到后台或关闭屏幕也会继续播放（选曲试听·电台等待·AUTO中）。自己游玩时为了保护记录，仍会照常暂停。后台期间，随节拍变化的音效和画面动画会停止，倒计时会省略。可以在锁屏或通知中播放·暂停·切到下一首。部分设备的省电设置仍可能停止播放。",
   /* 🔥 TRK 功放（在左下角直接操作效果机架） */
   ampTitle:"🔥 使用 TRK 功放",
   ampHint:"在这里直接操作“像多段便携功放一样叠段”的效果机架（最多8段）。段会叠加在预设之后。",
@@ -253,9 +253,9 @@ Object.assign(TEXT.zh, {
   ampAdjustHint:"段的旋钮（阈值、频率等）在设置的“🎚 效果器机架（分段叠加）”里调整。关闭功放不会改变预设的音色。"
 });
 Object.assign(TEXT.ko, {
-  dockTitle:"🎛 자세히 (EQ・스킨・메뉴)", dockFavLabel:"⭐ 버튼에 다 들어가지 않는 즐겨찾기",
+  dockTitle:"🎛 자세히 (EQ·스킨·메뉴)", dockFavLabel:"⭐ 버튼에 다 들어가지 않는 즐겨찾기",
   dockNoFavShort:"⭐ 즐겨찾기가 없습니다",
-  dockNoFav:"아직 즐겨찾기가 없습니다. 버튼을 길게 누르면 지금 이펙트를 등록할 수 있습니다.", dockMore:"⚙ 자세한 설정 (게임 연동・내 프리셋 등)",
+  dockNoFav:"아직 즐겨찾기가 없습니다. 버튼을 길게 누르면 지금 이펙트를 등록할 수 있습니다.", dockMore:"⚙ 자세한 설정 (게임 연동·내 프리셋 등)",
   dockPower:"⏻ 전원 (음소거)", dockAntenna:"📡 안테나 (백그라운드 재생)", dockCastButton:"캐스트",
   dockAntOn:"📡 백그라운드 재생 ON: 백그라운드에서도 계속 재생", dockAntOff:"📡 백그라운드 재생 OFF", dockMute:"🔇 MUTE", dockFxOff:"FX OFF", dockCastOn:"📡 캐스트 선택을 열었습니다", dockCastOffDone:"📡 캐스트 연결을 끊었습니다", dockCastFailed:"외부 출력을 시작하지 못했습니다.", dockCastUnsupported:"이 브라우저는 외부 출력 선택을 지원하지 않습니다.",
   dockBackgroundPolicy:"백그라운드 재생 안테나", dockBackgroundOff:"표시하지 않기 (백그라운드 재생 없음)", dockBackgroundAntenna:"독에 안테나 표시", dockBackgroundCorner:"오른쪽 상단에 두기 (언어 왼쪽·컴팩트)", dockBackgroundHint:"캐스트와 별도로 백그라운드 재생만 허용할 수 있습니다. 독에 안테나 표시 또는 오른쪽 상단에 두기를 켜면 백그라운드에서도 계속 재생합니다.",
@@ -273,7 +273,7 @@ Object.assign(TEXT.ko, {
   dockAntCustomOn:"ON 이미지", dockAntCustomOff:"OFF 이미지", dockAntCustomClear:"이미지 삭제", dockAntCustomNg:"이미지를 읽지 못했습니다", dockAntCustomCleared:"ON/OFF 이미지를 삭제했습니다",
   dockAntCustomHint:"두 장의 이미지는 기기에만 저장됩니다(설정 초기화로 사라집니다). ON 이미지 = 안테나가 서 있을 때, OFF 이미지 = 잠들어 있을 때. 큰 이미지는 자동으로 줄입니다.",
   dockLockChain:"🔒 파라미터 랜덤에서 프리셋 자체는 바꾸지 않기 (EQ만)", dockLockHint:"🔒 표시한 EQ는 랜덤에서도 움직이지 않습니다",
-  dockAntHint:"안테나를 세우면 앱을 백그라운드로 보내거나 화면을 꺼도 계속 재생합니다 (곡 선택 미리듣기・라디오 대기・AUTO 중). 직접 플레이하는 중에는 기록을 지키기 위해 지금처럼 일시정지합니다. 백그라운드에서는 비트에 맞춰 움직이는 이펙트와 화면 애니메이션이 멈추고, 카운트다운은 생략합니다. 잠금 화면이나 알림에서 재생・일시정지・다음 곡을 조작할 수 있습니다. 기기의 절전 설정에 따라 멈출 수도 있습니다.",
+  dockAntHint:"안테나를 세우면 앱을 백그라운드로 보내거나 화면을 꺼도 계속 재생합니다 (곡 선택 미리듣기·라디오 대기·AUTO 중). 직접 플레이하는 중에는 기록을 지키기 위해 지금처럼 일시정지합니다. 백그라운드에서는 비트에 맞춰 움직이는 이펙트와 화면 애니메이션이 멈추고, 카운트다운은 생략합니다. 잠금 화면이나 알림에서 재생·일시정지·다음 곡을 조작할 수 있습니다. 기기의 절전 설정에 따라 멈출 수도 있습니다.",
   /* 🔥 TRK 앰프 (왼쪽 아래에서 이펙터 랙을 바로 만지기) */
   ampTitle:"🔥 TRK 앰프 사용",
   ampHint:"휴대용 앰프처럼 단을 쌓는 ‘이펙터 랙’을 여기서 바로 만질 수 있어요 (최대 8단). 단은 프리셋 뒤에 겹쳐져요.",
@@ -286,7 +286,7 @@ Object.assign(TEXT.ko, {
   ampCleared:"모든 단을 뺐어요", ampFull:"랙은 최대 8단이에요.",
   ampStageAdd:"＋ 단 추가", ampStagePick:"추가할 단", ampClear:"✕ 전부 빼기",
   ampMore:"🎛 단을 자세히 조정 (설정 열기)",
-  ampAdjustHint:"단의 노브(임계값・주파수 등)는 설정의 ‘🎚 이펙터 랙 (단으로 쌓기)’에서 조정해요. 앰프를 꺼도 프리셋 소리는 그대로예요."
+  ampAdjustHint:"단의 노브(임계값·주파수 등)는 설정의 ‘🎚 이펙터 랙 (단으로 쌓기)’에서 조정해요. 앰프를 꺼도 프리셋 소리는 그대로예요."
 });
 
 /* ============ 📡 アンテナ：バックグラウンド再生 ============

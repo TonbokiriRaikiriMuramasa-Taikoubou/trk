@@ -44,7 +44,7 @@
 - **📺 TVドックの設定（`js/tv-dock.js`）**：くわしいの中の「📺 TVドック」グループ。チェックは3つ：🧱 壁掛け（スキン `wall` と同じ。外すと映画館に戻る）、↕ 並び替え（テレビとラックの上下）、🔢 5枠化（`tvDockFive`）。既定はすべて OFF（映画館・テレビが上・5枠なし）。くわしいは既定で開いた状態（保存済みの開閉は変えない）。テレビ本体とラックの表示は変えていない。
 - **Loop Lab の映像書き出し（`js/media-player-mode.js` の `exportLoopClip`）**：開発者表示の中だけ。記録した区間の行の 🎬 を押すと、映像と音を区間の長さのぶん録画して保存する（WebM。対応していれば MP4）。設定は持たない。書き出し後は再生位置・再生／停止・速度・ループを元に戻す。曲を切り替えたら途中で止め、保存しない。音声だけの曲は書き出さない。
 - **「📁 開く」と「📤 共有」**（`js/library.js`）：📁 開く は曲を入れるだけで、共有としては覚えない。📤 共有 は共有として覚え、📤 の印が付き、「共有をやめる」でまとめて外せ、「端末に残す」の対象になる。ボタンの下の説明行は `libOpenShareHint`（4言語）。
-- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.8-trk80`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
+- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.8-trk81`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
 
 ## 3. 権利・データ・セキュリティの不変条件
 
@@ -92,7 +92,7 @@ npm run check
 git diff --check
 ```
 
-`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-08）は Security 55 checks、a11y 8 checks、vendor 8 checks、軽量化 121 assertions、`npm test` 68件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
+`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-08）は Security 55 checks、a11y 8 checks、vendor 8 checks、軽量化 121 assertions、`npm test` 69件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
 
 `check-repo.mjs` はJavaScript構文・ローカル参照・ID・設定文言に加え、Arknights公式リンク、Blue Archive 225曲、LoL Sessions 108曲／Phase 1の58件、Gakumas 50件・別名、公式リンクと権利注記、既存プレイリストの所有曲・カスタムフィールド保持を検査する。チェックは意図的な逆テストでもFAILすることを確認してから追加する。外部ツールの起動後DOM検査は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照し、リポジトリ外で行う。
 
@@ -161,6 +161,8 @@ git diff --check
 
 ## 11. 最近の変更
 
+- **2026-10-08 — ゲーム画面スキンの残り＋ UX の 4 か国語確認（trk81）：** 水墨・楽譜・ドット絵の夜・霧の森を追加（総数 40 → 44）。`tests/skins-access.test.mjs` に追加分のコントラスト検査（テスト 69 件）。
+  4 か国語の確認（機械的な検査、約 1,617 キー × 4 言語）：キー数は全言語で揃った。英語の欠落 6 件（音色プリセット名）を追加。中国語・韓国語の文中の「・」（日本語の中点）を「·」に置換（111 箇所）。中国語の仮名の残り（「Lat式ミク」「あいうえお」）を訂正。差し込み記号（{n} など）は全言語で一致。抜き取り約 90 件を読んだ範囲では概ね自然。韓国語の引用符の一部が直線の ' のまま（未修正）。**母語話者による全件の確認は未実施**。
 - **2026-10-08 — 生活のスキン 2回目（trk80）：** 駅のホーム（夕暮れ）・台所の朝・商店街の夕暮れを追加（生活系は計6種、総数 37 → 40）。`tests/skins-access.test.mjs` の生活系の期待一覧を更新（新規の検査は追加なし。npm test は 68 件のまま）。
 - **2026-10-08 — 生活のスキン（trk79）：** 生活場面のテーマを 3 種追加（カテゴリ `life`・表示名「生活」を4言語で追加）：雨の窓・夜の銭湯・障子の光。すべて自作の配色（素材・画像なし）。総数 34 → 37（`check-repo` の期待値を更新）。`tests/skins-access.test.mjs` が生活系の文字のコントラストを同じ基準で検査（形と輝度の検査は色覚配慮の要件なので生活系は対象外）。**未確認**：実ブラウザでの見た目、韓国語・中国語の文言の母語話者による確認。
 - **2026-10-08 — 見やすさのスキン（trk78）：** ゲーム画面スキンに 3 種を追加（`js/data.js`、カテゴリ `access`・表示名「見やすさ」を4言語で追加）。ハイコントラスト（黒地・黄とシアン）、色覚にやさしい暗め／明るめ（Okabe & Ito の青と朱色の組み。明るめは輝度の差を広げた）。ノーツは丸と菱形で形も変え、色だけに頼らない。総数 31 → 34（`check-repo` の期待値を更新）。`tests/skins-access.test.mjs`（6件）が WCAG のコントラスト（本文 4.5:1、ハイコントラストは 7:1）、ノーツの形の違い、輝度の差、4言語の表示名を検査。テストの検査で、明るめの2色が白黒で区別しにくいと分かり、配色を直した。**未確認**：実ブラウザでの見た目（この環境に Chromium がない）、韓国語・中国語の文言の母語話者による確認。

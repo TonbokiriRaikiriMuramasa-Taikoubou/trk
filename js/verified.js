@@ -34,7 +34,7 @@ Object.assign(TEXT.en, {
   vfNoHash:"No fingerprint: reinstall this pack to check whether it's verified."
 });
 Object.assign(TEXT.zh, {
-  vfBadge:"✔ 认证", vfBadgeTitle:"已确认作曲者・谱面作者本人身份及权利的资源包",
+  vfBadge:"✔ 认证", vfBadgeTitle:"已确认作曲者·谱面作者本人身份及权利的资源包",
   vfComment:"💬 作者的话", vfCharter:"谱面：{name}", vfBpm:"BPM {n}",
   vfRoleComposer:"作曲", vfRoleArranger:"编曲", vfRoleLyricist:"作词", vfRoleVocalist:"演唱", vfRoleCharter:"谱面", vfRoleIllustrator:"插画",
   vfCommentField:"💬 作者的话（可选）",
@@ -44,11 +44,11 @@ Object.assign(TEXT.zh, {
   vfNoHash:"没有指纹：重新安装此资源包即可确认是否认证。"
 });
 Object.assign(TEXT.ko, {
-  vfBadge:"✔ 공인", vfBadgeTitle:"작곡가・채보 제작자 본인 확인과 권리 확인을 마친 팩입니다",
+  vfBadge:"✔ 공인", vfBadgeTitle:"작곡가·채보 제작자 본인 확인과 권리 확인을 마친 팩입니다",
   vfComment:"💬 제작자의 한마디", vfCharter:"채보: {name}", vfBpm:"BPM {n}",
   vfRoleComposer:"작곡", vfRoleArranger:"편곡", vfRoleLyricist:"작사", vfRoleVocalist:"보컬", vfRoleCharter:"채보", vfRoleIllustrator:"일러스트",
   vfCommentField:"💬 제작자의 한마디 (선택)",
-  vfCommentHint:"공인된 제작자의 팩에서만 표시됩니다. 길이는 X 무료 계정과 같은 280까지입니다 (전각 문자・이모지는 2로 셉니다).",
+  vfCommentHint:"공인된 제작자의 팩에서만 표시됩니다. 길이는 X 무료 계정과 같은 280까지입니다 (전각 문자·이모지는 2로 셉니다).",
   vfCount:"{n} / 280", vfTooLong:"한마디가 너무 깁니다 (최대 280).", vfNeedCharter:"곡 팩에는 채보 제작자 이름을 넣어 주세요.",
   vfHash:"지문 (SHA-256)", vfCopySnippet:"📋 공인 목록용으로 복사", vfCopied:"verified.json용 항목을 복사했습니다.",
   vfNoHash:"지문 없음: 이 팩을 다시 넣으면 공인 여부를 확인할 수 있습니다."

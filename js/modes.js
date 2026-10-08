@@ -64,7 +64,7 @@ Object.assign(TEXT.ko, {
   orbitSizeHint:"'판정 범위로 표시': 타일 길이＝PERFECT 범위, 바깥쪽 옅은 테두리＝GOOD 범위. 타일이 판정점에 닿아 있는 동안 누르면 PERFECT입니다.",
   orbitCoreLabel:"판정점 (ORBIT 본체) 모양", orbitCorePlanet:"● 행성", orbitCoreRing:"◯ 링 테두리", orbitCoreSquare:"□ 사각 테두리",
   orbitCoreDiamond:"◇ 마름모 테두리", orbitCoreTarget:"◎ 조준점", orbitCoreBracket:"⌜⌟ 브래킷",
-  orbitCoreHint:"테두리형은 가운데가 비어 있어, 노트가 빈 곳에 들어맞을 때 누릅니다. 사각・마름모・브래킷은 길의 방향에 맞춰 회전합니다.",
+  orbitCoreHint:"테두리형은 가운데가 비어 있어, 노트가 빈 곳에 들어맞을 때 누릅니다. 사각·마름모·브래킷은 길의 방향에 맞춰 회전합니다.",
   orbitCoreColor:"판정점 색", orbitMoonColor:"항성 색", colorReset:"↺ 스킨 색",
   orbitMoonLabel:"항성 (주위를 도는 별)", orbitMoonSong:"곡 끝에서 한 바퀴 (진행도)", orbitMoonBeat:"1박에 한 바퀴", orbitMoonOff:"표시 안 함",
   orbitMoonShapeLabel:"항성 모양", orbitMoonOrb:"● 구슬", orbitMoonStar:"★ 별", orbitMoonComet:"☄ 혜성",

@@ -40,7 +40,7 @@ Object.assign(TEXT.en, {
 });
 Object.assign(TEXT.zh, {
   richTitle:"✨ 使用 TRK 影像特效",
-  richHint:"把人像／肤色・动画／赛璐珞・质感・影棚／画质这20种“进阶”影像调色放在这里直接使用。它与电视的“影像滤镜”是同一个设置（不会影响成绩）。",
+  richHint:"把人像／肤色·动画／赛璐珞·质感·影棚／画质这20种“进阶”影像调色放在这里直接使用。它与电视的“影像滤镜”是同一个设置（不会影响成绩）。",
   richUse:"使用 TRK 影像特效（叠加到影像）",
   richOn:"✨ 使用中：{name}", richOff:"未使用（{name}）",
   richSafe:"🛟 安全模式下不显示影像（去掉 ?safe 即可恢复）",
@@ -52,14 +52,14 @@ Object.assign(TEXT.zh, {
 });
 Object.assign(TEXT.ko, {
   richTitle:"✨ TRK 영상 이펙트 사용",
-  richHint:"인물/피부톤・애니/셀・질감・스튜디오/화질의 ‘리치’ 영상 그레이드 20종을 여기서 바로. TV의 ‘영상 필터’와 같은 설정을 움직입니다 (기록에는 영향 없음).",
+  richHint:"인물/피부톤·애니/셀·질감·스튜디오/화질의 ‘리치’ 영상 그레이드 20종을 여기서 바로. TV의 ‘영상 필터’와 같은 설정을 움직입니다 (기록에는 영향 없음).",
   richUse:"TRK 영상 이펙트 사용 (영상 위에 겹치기)",
   richOn:"✨ 사용 중: {name}", richOff:"사용 안 함 ({name})",
   richSafe:"🛟 세이프 모드에서는 영상을 표시하지 않아요 (?safe를 빼면 돌아옵니다)",
   richPrevLabel:"◀ 이전", richNextLabel:"다음 ▶", richRandom:"🎲 랜덤", richReset:"↩ 원래 색으로",
   richRandomed:"✨ {name} (으)로 바꿨어요", richRestored:"↩ 영상 필터를 되돌렸어요",
   richMore:"🎛 영상 필터를 자세히 조정 (설정 열기)",
-  richNote:"🎞 그 외 프리셋(모노·레트로 등)・⭐즐겨찾기・🕘최근 사용은 지금처럼 TV의 ‘영상 필터’에서 고를 수 있어요.",
+  richNote:"🎞 그 외 프리셋(모노·레트로 등)·⭐즐겨찾기·🕘최근 사용은 지금처럼 TV의 ‘영상 필터’에서 고를 수 있어요.",
   richNoPreset:"(영상 프리셋을 찾지 못했습니다)"
 });
 

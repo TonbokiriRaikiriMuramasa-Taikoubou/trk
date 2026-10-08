@@ -33,21 +33,21 @@ Object.assign(TEXT.en, {
   catchNitroBonus:"🚀 Score x1.1 during Nitro", catchNitroBonusHint:"When on, notes caught during Nitro give a small score bonus.",
 });
 Object.assign(TEXT.zh, {
-  catchHint:"用货斗接住落下的包裹。用 ← →（或 A・D）左右移动，也可以在画面上拖动。拿到路上的氮气罐🚀，会进入一段时间的“狂飙模式”（接取范围2倍・移动更快）。",
+  catchHint:"用货斗接住落下的包裹。用 ← →（或 A·D）左右移动，也可以在画面上拖动。拿到路上的氮气罐🚀，会进入一段时间的“狂飙模式”（接取范围2倍·移动更快）。",
   catchKeysTitle:"🚛 CATCH 按键", catchLeft:"向左", catchRight:"向右", catchKeyReset:"↺ 恢复为 ← ／ →",
   catchCapture0:"请按下“向左”的按键。ESC取消。", catchCapture1:"请按下“向右”的按键。ESC取消。",
   catchAssigned:"已设置CATCH按键。",
   blastToast:"🚀 狂飙！", blastLabel:"🚀 BLAST", blastCount:"🚀 狂飙：{n}次",
-  eggNitro:"✦ NITRO：CATCH整首歌都是狂飙模式（练习・不计最高分）",
+  eggNitro:"✦ NITRO：CATCH整首歌都是狂飙模式（练习·不计最高分）",
   catchNitroBonus:"🚀 氮气中得分×1.1", catchNitroBonusHint:"开启后，在氮气期间接住音符会获得少量分数加成。",
 });
 Object.assign(TEXT.ko, {
-  catchHint:"떨어지는 짐을 짐칸으로 받습니다. ← →(A・D도 가능)로 좌우로 움직이고, 화면을 드래그해도 됩니다. 길 위의 니트로 캔🚀을 먹으면 잠시 '폭주 모드'(받는 폭 2배・이동이 빨라짐)가 됩니다.",
+  catchHint:"떨어지는 짐을 짐칸으로 받습니다. ← →(A·D도 가능)로 좌우로 움직이고, 화면을 드래그해도 됩니다. 길 위의 니트로 캔🚀을 먹으면 잠시 '폭주 모드'(받는 폭 2배·이동이 빨라짐)가 됩니다.",
   catchKeysTitle:"🚛 CATCH 키", catchLeft:"왼쪽", catchRight:"오른쪽", catchKeyReset:"↺ ← ／ → 로 되돌리기",
   catchCapture0:"'왼쪽'으로 지정할 키를 누르세요. ESC로 취소.", catchCapture1:"'오른쪽'으로 지정할 키를 누르세요. ESC로 취소.",
   catchAssigned:"CATCH 키를 설정했습니다.",
   blastToast:"🚀 폭주!", blastLabel:"🚀 BLAST", blastCount:"🚀 폭주: {n}회",
-  eggNitro:"✦ NITRO: CATCH가 곡 내내 폭주 모드가 됩니다 (연습 취급・최고 점수 제외)",
+  eggNitro:"✦ NITRO: CATCH가 곡 내내 폭주 모드가 됩니다 (연습 취급·최고 점수 제외)",
   catchNitroBonus:"🚀 니트로 중 점수×1.1", catchNitroBonusHint:"켜면 니트로 중 받은 노트에 작은 점수 보너스가 붙습니다.",
 });
 

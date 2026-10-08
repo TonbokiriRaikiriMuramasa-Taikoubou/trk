@@ -36,7 +36,7 @@ Object.assign(TEXT.zh, {
   owHint:"请跟着“咔哒”声点击约16次。用耳朵对拍，而不是看画面。更换耳机后请重新测量。",
   owRunning:"测量中… {n}次", owResult:"平均偏差 {m}ms（离散 {s}ms）→ 建议补偿值 {v}ms",
   owApply:"✓ 使用此值", owApplied:"已将延迟补偿设为 {v}ms。", owFail:"测量失败，请重试。",
-  autoAdj:"每次游玩后自动微调延迟补偿（MANUAL・ORBIT・STAGE）",
+  autoAdj:"每次游玩后自动微调延迟补偿（MANUAL·ORBIT·STAGE）",
   autoAdjDone:"已调整延迟补偿 {d}ms（当前 {v}ms）",
   ghostLabel:"👻 游玩中显示与个人最佳的差距（幽灵）",
   judgeStats:"📊 判定 平均 {m}ms · 离散 {s}ms", bgDim:"背景暗度", bgBlur:"背景模糊"
@@ -46,7 +46,7 @@ Object.assign(TEXT.ko, {
   owHint:"딸깍 소리에 맞춰 16번 정도 탭하세요. 화면이 아니라 귀로 맞추는 것이 요령입니다. 이어폰을 바꾸면 다시 측정하세요.",
   owRunning:"측정 중… {n}회", owResult:"평균 어긋남 {m}ms (흩어짐 {s}ms) → 추천 보정값 {v}ms",
   owApply:"✓ 이 값으로", owApplied:"지연 보정을 {v}ms로 설정했습니다.", owFail:"측정하지 못했습니다. 다시 시도해 주세요.",
-  autoAdj:"플레이 후 지연 보정을 자동으로 미세 조정 (MANUAL・ORBIT・STAGE)",
+  autoAdj:"플레이 후 지연 보정을 자동으로 미세 조정 (MANUAL·ORBIT·STAGE)",
   autoAdjDone:"지연 보정을 {d}ms 조정했습니다 (현재 {v}ms)",
   ghostLabel:"👻 플레이 중 개인 최고 기록과의 차이 표시 (고스트)",
   judgeStats:"📊 판정 평균 {m}ms · 흩어짐 {s}ms", bgDim:"배경 어둡기", bgBlur:"배경 흐림"

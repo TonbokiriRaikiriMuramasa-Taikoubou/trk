@@ -20,6 +20,8 @@ const SKINS = sb.window.SKINS;
 
 const ACCESS = Object.keys(SKINS).filter(id => Array.isArray(SKINS[id].cat) && SKINS[id].cat.includes("access"));
 const LIFE = Object.keys(SKINS).filter(id => Array.isArray(SKINS[id].cat) && SKINS[id].cat.includes("life"));
+/* ①ゲーム画面の追加分（水墨・楽譜・ドット絵の夜・霧の森）。文字のコントラストだけ検査する */
+const ART = ["sumi", "score", "dotNight", "mistForest"];
 
 /* WCAG 2.x の相対輝度（#rrggbb） */
 function lum(hex) {
@@ -44,13 +46,17 @@ describe("見やすさのスキン（access）", () => {
   });
 
   test("本文の文字は背景に対して 4.5:1 以上（WCAG 本文の基準）", () => {
-    for (const id of [...ACCESS, ...LIFE]) {
+    for (const id of [...ACCESS, ...LIFE, ...ART]) {
       const { ui, game } = SKINS[id];
       assert.ok(ratio(ui["--ui-text"], ui["--ui-bg"]) >= 4.5, `${id}: 本文 ${ratio(ui["--ui-text"], ui["--ui-bg"]).toFixed(2)}`);
       assert.ok(ratio(ui["--ui-muted"], ui["--ui-bg"]) >= 4.5, `${id}: 補足 ${ratio(ui["--ui-muted"], ui["--ui-bg"]).toFixed(2)}`);
       assert.ok(ratio(ui["--ui-on-accent"], ui["--ui-accent"]) >= 4.5, `${id}: ボタンの文字 ${ratio(ui["--ui-on-accent"], ui["--ui-accent"]).toFixed(2)}`);
       assert.ok(ratio(game.ink, game.stage) >= 4.5, `${id}: 譜面の文字 ${ratio(game.ink, game.stage).toFixed(2)}`);
     }
+  });
+
+  test("①の追加分4種が登録されている", () => {
+    for (const id of ART) assert.ok(SKINS[id], id);
   });
 
   test("高コントラストは、本文が 7:1 以上（WCAG の強化の基準）", () => {

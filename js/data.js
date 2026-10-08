@@ -494,6 +494,56 @@ const SKINS = {
     game:{don:"#ffd166",ka:"#8ec5e8",stage:"#24181f",lane:"rgba(0,0,0,.3)",track:"rgba(255,255,255,.2)",ink:"#f7eef0",
       inkShadow:"rgba(0,0,0,.7)",noteBorder:"rgba(255,255,255,.6)",panel:"rgba(36,24,31,.94)",perfect:"#ffd166",good:"#f7eef0",miss:"#9c8790",glow:true},
     shapes:["circle","circle"], video:"sepia(.25) saturate(1.2) brightness(.75)"
+  },
+
+  /* ①ゲーム画面の残り（水墨・楽譜・ドット絵の夜・霧の森）。すべて自作の配色。素材・画像・フォントは使わない */
+  "sumi": {
+    cat:["light"],
+    label:{ja:"水墨（墨と朱の判子）",en:"Sumi ink (ink and red seal)",zh:"水墨（墨与朱印）",ko:"수묵(먹과 주인)"},
+    desc:{ja:"和紙に墨の濃淡、朱の判子だけの差し色",en:"Ink wash on washi paper, with only a red seal as accent",zh:"宣纸上的墨色浓淡，仅以朱印点缀",ko:"한지 위의 먹 농담, 주인 한 점만 더한 색"},
+    ui:{"--ui-bg":"#f3efe6","--ui-panel":"#fbf8f1","--ui-soft":"rgba(27,27,27,.05)","--ui-text":"#1b1b1b",
+      "--ui-muted":"#56534c","--ui-border":"rgba(27,27,27,.25)","--ui-button":"#e7e1d3","--ui-button-hover":"#dad2bf",
+      "--ui-field":"#ffffff","--ui-accent":"#b3261e","--ui-on-accent":"#ffffff","--ui-gold":"#8f3500",
+      "--ui-shadow":"0 12px 36px rgba(27,27,27,.12)","--ui-glow":"rgba(179,38,30,.12)"},
+    game:{don:"#1d1d1d",ka:"#7d7a72",stage:"#f3efe6",lane:"rgba(27,27,27,.05)",track:"rgba(27,27,27,.3)",ink:"#1b1b1b",
+      inkShadow:"rgba(255,255,255,.7)",noteBorder:"rgba(27,27,27,.7)",panel:"rgba(251,248,241,.95)",perfect:"#b3261e",good:"#1b1b1b",miss:"#8b877c",glow:false},
+    shapes:["circle","circle"], video:"grayscale(.6) contrast(1.05)"
+  },
+  "score": {
+    cat:["light"],
+    label:{ja:"楽譜（五線と音符）",en:"Sheet music (staves and notes)",zh:"乐谱（五线与音符）",ko:"악보(오선과 음표)"},
+    desc:{ja:"淡い紙の上に五線、ブラウンの音符",en:"Staff lines and brown notes on pale paper",zh:"淡色纸上的五线与棕色音符",ko:"연한 종이 위의 오선과 갈색 음표"},
+    ui:{"--ui-bg":"#faf7ef","--ui-panel":"#fffdf7","--ui-soft":"rgba(60,40,20,.05)","--ui-text":"#2a2118",
+      "--ui-muted":"#6b5a48","--ui-border":"rgba(60,40,20,.22)","--ui-button":"#eee6d4","--ui-button-hover":"#e2d6bb",
+      "--ui-field":"#ffffff","--ui-accent":"#7a4a1e","--ui-on-accent":"#ffffff","--ui-gold":"#8f5e10",
+      "--ui-shadow":"0 12px 36px rgba(60,40,20,.12)","--ui-glow":"rgba(122,74,30,.12)"},
+    game:{don:"#2a2118",ka:"#4f7a96",stage:"#fbf9f2",lane:"rgba(60,40,20,.04)",track:"rgba(60,40,20,.35)",ink:"#2a2118",
+      inkShadow:"rgba(255,255,255,.7)",noteBorder:"rgba(42,33,24,.6)",panel:"rgba(255,253,247,.95)",perfect:"#7a4a1e",good:"#2a2118",miss:"#8b7e6e",glow:false},
+    shapes:["circle","circle"], video:"sepia(.2) brightness(1.04)"
+  },
+  "dotNight": {
+    cat:["dark","fun"],
+    label:{ja:"ドット絵の夜",en:"Pixel night",zh:"像素夜空",ko:"도트 밤하늘"},
+    desc:{ja:"8ビット風の星空と、自作のドット",en:"An 8-bit starry sky with original pixel art",zh:"8位风格的星空与自制像素画",ko:"8비트풍 별밤과 직접 만든 도트"},
+    ui:{"--ui-bg":"#0b0f2a","--ui-panel":"rgba(14,20,50,.96)","--ui-soft":"rgba(255,255,255,.05)","--ui-text":"#e8ecff",
+      "--ui-muted":"#a9b3e0","--ui-border":"rgba(232,236,255,.22)","--ui-button":"#18214a","--ui-button-hover":"#24306a",
+      "--ui-field":"#070a1e","--ui-accent":"#ffd23f","--ui-on-accent":"#1a1400","--ui-gold":"#ffd23f",
+      "--ui-shadow":"0 0 0 2px #000,0 16px 0 #000","--ui-glow":"rgba(255,210,63,.16)"},
+    game:{don:"#ffd23f",ka:"#5ee0ff",stage:"#0b0f2a",lane:"rgba(255,255,255,.04)",track:"rgba(232,236,255,.25)",ink:"#e8ecff",
+      inkShadow:"rgba(0,0,0,.8)",noteBorder:"#000000",panel:"rgba(11,15,42,.94)",perfect:"#ffd23f",good:"#e8ecff",miss:"#7f8bbd",glow:true},
+    shapes:["square","square"], video:"contrast(1.1) saturate(1.2)"
+  },
+  "mistForest": {
+    cat:["dark"],
+    label:{ja:"霧の森",en:"Misty forest",zh:"雾林",ko:"안개 숲"},
+    desc:{ja:"薄い霧が流れる、緑の階調",en:"Drifting thin mist over layers of green",zh:"薄雾流动的绿色层次",ko:"얇은 안개가 흐르는 초록의 농담"},
+    ui:{"--ui-bg":"#1d3a33","--ui-panel":"rgba(24,50,43,.96)","--ui-soft":"rgba(255,255,255,.05)","--ui-text":"#e9f3ee",
+      "--ui-muted":"#a9c7bb","--ui-border":"rgba(233,243,238,.2)","--ui-button":"#264a41","--ui-button-hover":"#2f5a4f",
+      "--ui-field":"#162e28","--ui-accent":"#8fd3b0","--ui-on-accent":"#0c231b","--ui-gold":"#d8e8a0",
+      "--ui-shadow":"0 24px 80px rgba(0,0,0,.45)","--ui-glow":"rgba(143,211,176,.16)"},
+    game:{don:"#8fd3b0",ka:"#d7ecd9",stage:"#1d3a33",lane:"rgba(255,255,255,.05)",track:"rgba(233,243,238,.22)",ink:"#e9f3ee",
+      inkShadow:"rgba(0,0,0,.6)",noteBorder:"rgba(233,243,238,.5)",panel:"rgba(29,58,51,.94)",perfect:"#d8e8a0",good:"#e9f3ee",miss:"#8fa89e",glow:false},
+    shapes:["circle","circle"], video:"saturate(.85) brightness(.9)"
   }
 };
 

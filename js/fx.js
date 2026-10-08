@@ -114,12 +114,12 @@ Object.assign(TEXT.en, {
   sfxWorkletWait:"⏳ Preparing the high-precision engine — try again in a moment.", sfxWorkletNo:"⚠ 🚪🧹🎚 aren't available in this browser (✨🧲📢 stages still work)."
 });
 Object.assign(TEXT.zh, {
-  sfxTitle:"🎛 音效（均衡器・效果器）", sfxOn:"使用音效",
+  sfxTitle:"🎛 音效（均衡器·效果器）", sfxOn:"使用音效",
   sfxHint:"改变歌曲的听感。混响等只是叠加在原声上。不影响记录。",
   sfxPresetLabel:"预设", sfxCatBasic:"基本", sfxCatGenre:"曲风", sfxCatScene:"场景", sfxCatSpace:"空间",
   sfxCatGame:"游戏", sfxCatFun:"趣味", sfxCatWeird:"奇怪", sfxCatCustom:"我的预设",
   sfxCatFav:"★ 收藏", sfxCatRecent:"🕘 最近使用",
-  sfxSearch:"🔍 搜索预设（名称・说明・作者）", sfxNoMatch:"没有结果。", sfxHits:"找到{n}个",
+  sfxSearch:"🔍 搜索预设（名称·说明·作者）", sfxNoMatch:"没有结果。", sfxHits:"找到{n}个",
   sfxFavAdd:"☆ 加入收藏", sfxFavRemove:"★ 取消收藏",
   sfxPrev:"上一个预设", sfxNext:"下一个预设", sfxRandom:"随机",
   sfxCompare:"👂 按住听原声", sfxCompareHint:"按住期间播放没有音效的原声",
@@ -129,7 +129,7 @@ Object.assign(TEXT.zh, {
   sfxGamePan:"声音随卡车位置左右移动（CATCH）",
   sfxSyncTitle:"⏱ 时机与记录", sfxComp:"自动补偿音效造成的声音延迟（调整音符时机）",
   sfxCompExtra:"微调", sfxCompNow:"当前自动补偿：约 {n}ms",
-  sfxCompHint:"补偿经过Web Audio的延迟，以及每个压缩器・限幅器约6ms・降噪约20ms的延迟。这是估计值，感觉有偏差时请微调。会在“⌨ 操作”的延迟补偿之外另行叠加。",
+  sfxCompHint:"补偿经过Web Audio的延迟，以及每个压缩器·限幅器约6ms·降噪约20ms的延迟。这是估计值，感觉有偏差时请微调。会在“⌨ 操作”的延迟补偿之外另行叠加。",
   sfxRecord:"导出谱面时一并记录当前音效", sfxChartLoad:"读取并使用谱面中记录的音效",
   sfxChartApplied:"📄 正在使用谱面记录的音效“{name}”", sfxResult:"🎛 音效：{name}",
   sfxRecent:"🎛 本曲最近使用的音效：{name}", sfxUseThis:"使用此音效", sfxApplied:"已切换为音效“{name}”。",
@@ -156,12 +156,12 @@ Object.assign(TEXT.zh, {
   sfxWorkletWait:"⏳ 正在准备高精度模式，稍后再试。", sfxWorkletNo:"⚠ 此浏览器不支持🚪🧹🎚（✨🧲📢的段仍可用）。"
 });
 Object.assign(TEXT.ko, {
-  sfxTitle:"🎛 사운드 이펙트 (EQ・이펙터)", sfxOn:"이펙트 사용",
+  sfxTitle:"🎛 사운드 이펙트 (EQ·이펙터)", sfxOn:"이펙트 사용",
   sfxHint:"곡이 들리는 방식을 바꿉니다. 리버브 등은 원음에 겹칠 뿐입니다. 기록에는 영향이 없습니다.",
   sfxPresetLabel:"프리셋", sfxCatBasic:"기본", sfxCatGenre:"장르", sfxCatScene:"상황", sfxCatSpace:"공간",
   sfxCatGame:"게임", sfxCatFun:"재미", sfxCatWeird:"조금 이상한", sfxCatCustom:"내 프리셋",
   sfxCatFav:"★ 즐겨찾기", sfxCatRecent:"🕘 최근 사용",
-  sfxSearch:"🔍 프리셋 검색 (이름・설명・제작자)", sfxNoMatch:"결과가 없습니다.", sfxHits:"{n}개 찾음",
+  sfxSearch:"🔍 프리셋 검색 (이름·설명·제작자)", sfxNoMatch:"결과가 없습니다.", sfxHits:"{n}개 찾음",
   sfxFavAdd:"☆ 즐겨찾기에 추가", sfxFavRemove:"★ 즐겨찾기에서 빼기",
   sfxPrev:"이전 프리셋", sfxNext:"다음 프리셋", sfxRandom:"랜덤",
   sfxCompare:"👂 누르는 동안 원음", sfxCompareHint:"누르고 있는 동안 이펙트 없는 소리가 납니다",
@@ -171,7 +171,7 @@ Object.assign(TEXT.ko, {
   sfxGamePan:"트럭 위치에 맞춰 좌우로 이동 (CATCH)",
   sfxSyncTitle:"⏱ 타이밍과 기록", sfxComp:"이펙트로 인한 소리 지연을 노트 타이밍에서 자동 보정",
   sfxCompExtra:"미세 조정", sfxCompNow:"현재 자동 보정: 약 {n}ms",
-  sfxCompHint:"Web Audio를 거치는 지연과, 컴프레서・리미터 하나당 약 6ms・노이즈 제거 하나당 약 20ms의 지연을 더해 보정합니다. 추정값이므로 어긋남이 느껴지면 미세 조정하세요. '⌨ 조작'의 지연 보정과는 별도로 더해집니다.",
+  sfxCompHint:"Web Audio를 거치는 지연과, 컴프레서·리미터 하나당 약 6ms·노이즈 제거 하나당 약 20ms의 지연을 더해 보정합니다. 추정값이므로 어긋남이 느껴지면 미세 조정하세요. '⌨ 조작'의 지연 보정과는 별도로 더해집니다.",
   sfxRecord:"채보를 내보낼 때 사용 중인 이펙트도 기록", sfxChartLoad:"채보에 기록된 이펙트를 불러와 사용",
   sfxChartApplied:"📄 채보에 기록된 이펙트 '{name}' 사용 중", sfxResult:"🎛 이펙트: {name}",
   sfxRecent:"🎛 이 곡에서 최근 사용한 이펙트: {name}", sfxUseThis:"이 이펙트 사용", sfxApplied:"이펙트를 '{name}'(으)로 바꿨습니다.",
@@ -183,7 +183,7 @@ Object.assign(TEXT.ko, {
   sfxLimit:"내 프리셋은 최대 30개입니다.", sfxExported:"이펙트 JSON을 내보냈습니다.", sfxUnsupported:"이 브라우저에서는 이펙트를 사용할 수 없습니다.",
   sfxConfirmDelete:"이 프리셋을 삭제할까요?", sfxQuick:"🎛 사운드", sfxOff:"끄기",
   sfxRackTitle:"🎚 이펙터 랙 (단으로 쌓기)", sfxRackOn:"랙 사용 (프리셋 뒤에 겹쳐짐)",
-  sfxRackHint:"휴대용 앰프를 여러 단 쌓듯이, 이펙터를 단으로 쌓을 수 있어요 (최대 8단). 프리셋과 간단 EQ 사이에 들어가고, 내보내기・프리셋 저장에도 포함돼요.",
+  sfxRackHint:"휴대용 앰프를 여러 단 쌓듯이, 이펙터를 단으로 쌓을 수 있어요 (최대 8단). 프리셋과 간단 EQ 사이에 들어가고, 내보내기·프리셋 저장에도 포함돼요.",
   sfxRackAdd:"＋ 단 추가", sfxRackPick:"추가할 효과", sfxRackSave:"💾 지금 소리를 내 프리셋으로 저장", sfxRackFull:"랙은 최대 8단이에요.",
   sfxRackEmpty:"아직 단이 없어요. 아래에서 추가하세요.", sfxRackPresetName:"내 랙 {n}",
   sfxRackUp:"위로", sfxRackDown:"아래로", sfxRackRemove:"이 단 빼기",

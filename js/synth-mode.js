@@ -83,7 +83,8 @@ Object.assign(TEXT.en, {
   instPatchDeleted:"Deleted the custom sound.", instDeleteConfirm:"Delete this custom sound?",
   instSavedSourcesOnly:"Sample files are not included in presets. Only oscillator settings were saved.",
   instStop:"■ Stop notes", instPresetSine:"Sine Keys", instPresetSquare:"Square Lead", instPresetSaw:"Saw Lead",
-  instPresetPad:"Warm Pad", instPresetPluck:"Pluck", instPresetBass:"Sub Bass", instPresetOrgan:"Organ", instPresetBell:"Bell", instPresetSuper:"Super Saw", instPresetZunpet:"ZUNPET-style Brass"
+  instPresetPad:"Warm Pad", instPresetPluck:"Pluck", instPresetBass:"Sub Bass", instPresetOrgan:"Organ", instPresetBell:"Bell", instPresetSuper:"Super Saw", instPresetZunpet:"ZUNPET-style Brass",
+  instPresetGuitar:"Electric Guitar", instPresetESax:"Electric Sax", instPresetEPiano:"FM E-Piano", instPresetStrings:"Synth Strings", instPresetChip:"8-bit Chip", instPresetVocal:"Vocoder Voice"
 });
 Object.assign(TEXT.zh, {
   instHoldHint:"长按打开合成器", instFastHoldHint:"长按0.2秒打开合成器", instHoldDisabledHint:"合成器模式已在设置中禁用",

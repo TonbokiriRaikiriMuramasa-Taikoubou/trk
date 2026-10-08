@@ -1,11 +1,11 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 49,
+  "windowProps": 71,
   "duplicates": 0,
-  "declarations": 798,
-  "private": 494,
-  "public": 304
+  "declarations": 548,
+  "private": 269,
+  "public": 279
  },
  "files": [
   {
@@ -485,35 +485,9 @@
   },
   {
    "file": "js/library.js",
-   "decls": 250,
-   "private": 225,
-   "public": [
-    "LIB_SHOW",
-    "addSongFiles",
-    "addVideoFiles",
-    "addonSongs",
-    "allSongs",
-    "bannerRandomBtn",
-    "bannerVolTip",
-    "ensureTrkDistributionPlaylists",
-    "initLibrary",
-    "libView",
-    "nextSong",
-    "onLongPress",
-    "plToast",
-    "prevSong",
-    "previewStartFor",
-    "refreshPackSongs",
-    "renderBanner",
-    "renderLib",
-    "saveSongPrefs",
-    "selectSong",
-    "setAddonSongs",
-    "songInfo",
-    "srcLabel",
-    "startPreview",
-    "trySongChart"
-   ]
+   "decls": 0,
+   "private": 0,
+   "public": []
   },
   {
    "file": "js/verified.js",
@@ -601,6 +575,13 @@
   }
  ],
  "windowCoupling": [
+  {
+   "name": "LIB_SHOW",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
   {
    "name": "RESERVED",
    "writers": [
@@ -923,6 +904,41 @@
    ]
   },
   {
+   "name": "addSongFiles",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "addVideoFiles",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "allSongs",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "bannerRandomBtn",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "bannerVolTip",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "drawExtrasOverlay",
    "writers": [
     "js/extras.js"
@@ -960,6 +976,13 @@
    ]
   },
   {
+   "name": "initLibrary",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "liteLibRows",
    "writers": [
     "js/lite.js"
@@ -988,6 +1011,20 @@
    "readers": []
   },
   {
+   "name": "nextSong",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "onLongPress",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "packsReady",
    "writers": [
     "js/main.js"
@@ -1002,6 +1039,13 @@
    "readers": []
   },
   {
+   "name": "plToast",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "poke",
    "writers": [
     "js/main.js"
@@ -1009,9 +1053,86 @@
    "readers": []
   },
   {
+   "name": "prevSong",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "previewStartFor",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "refreshPackSongs",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "renderBanner",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "renderLib",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "saveSongPrefs",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "selectSong",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "setAddonSongs",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "showFxPower",
    "writers": [
     "js/main.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "songInfo",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "srcLabel",
+   "writers": [
+    "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "startPreview",
+   "writers": [
+    "js/library.js"
    ],
    "readers": []
   },
@@ -1033,6 +1154,13 @@
    "name": "trkReset",
    "writers": [
     "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "trySongChart",
+   "writers": [
+    "js/library.js"
    ],
    "readers": []
   },

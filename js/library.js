@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：選曲画面 ============
    曲リスト・フォルダ・プレビュー・曲ごとの設定・称号表示
@@ -3036,3 +3037,31 @@ async function initLibrary() {
   void initOptionalTutorialDemo();
 }
 /* ✅ library.js 完了 */
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.LIB_SHOW = LIB_SHOW;
+window.addSongFiles = addSongFiles;
+window.addVideoFiles = addVideoFiles;
+Object.defineProperty(window, "addonSongs", { configurable:true, get:() => addonSongs, set:v => { addonSongs = v; } });
+window.allSongs = allSongs;
+window.bannerRandomBtn = bannerRandomBtn;
+window.bannerVolTip = bannerVolTip;
+window.ensureTrkDistributionPlaylists = ensureTrkDistributionPlaylists;
+window.initLibrary = initLibrary;
+Object.defineProperty(window, "libView", { configurable:true, get:() => libView, set:v => { libView = v; } });
+window.nextSong = nextSong;
+window.onLongPress = onLongPress;
+window.plToast = plToast;
+window.prevSong = prevSong;
+window.previewStartFor = previewStartFor;
+window.refreshPackSongs = refreshPackSongs;
+window.renderBanner = renderBanner;
+window.renderLib = renderLib;
+window.saveSongPrefs = saveSongPrefs;
+window.selectSong = selectSong;
+window.setAddonSongs = setAddonSongs;
+window.songInfo = songInfo;
+window.srcLabel = srcLabel;
+window.startPreview = startPreview;
+window.trySongChart = trySongChart;
+})();

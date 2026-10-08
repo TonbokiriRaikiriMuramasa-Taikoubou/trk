@@ -92,7 +92,7 @@ const padClearMsg = () => { if (!padMsg) return; padMsg = ""; updatePadUI(); };
 /* ---------- メニューの移動（D-pad／スティック）・決定・戻る ---------- */
 /* 🎮 を使ってよい場面か（プレイ中と、書斎・プレーヤー・シンセが開いている間はメニュー操作をしない） */
 const padMenuOk = () => settings.padMenuNav && phase !== "playing" &&
-  !window._trkStudyRoomOpen && !window._trkMediaPlayerOpen && !window._trkSynthModeOpen;
+  !window.Trk.overlay.any();
 
 function padFocusables() {
   const all = [...document.querySelectorAll(PAD_FOCUS_SEL)].filter(n => !n.closest("[hidden]") && n.getAttribute("aria-hidden") !== "true");

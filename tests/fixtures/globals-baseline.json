@@ -1,10 +1,10 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 298,
+  "windowProps": 296,
   "duplicates": 0,
-  "declarations": 1169,
-  "private": 853,
+  "declarations": 1171,
+  "private": 855,
   "public": 316,
   "globalNames": 317
  },
@@ -83,8 +83,8 @@
   },
   {
    "file": "js/core.js",
-   "decls": 160,
-   "private": 44,
+   "decls": 162,
+   "private": 46,
    "public": [
     "$",
     "BEST_KEY",
@@ -872,6 +872,27 @@
    "readers": []
   },
   {
+   "name": "Trk",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": [
+    "js/player.js",
+    "js/truck.js",
+    "js/modes.js",
+    "js/stage.js",
+    "js/catch.js",
+    "js/extras.js",
+    "js/video-max.js",
+    "js/main.js",
+    "js/pad.js",
+    "js/speed.js",
+    "js/synth-mode.js",
+    "js/media-player-mode.js",
+    "js/study-room.js"
+   ]
+  },
+  {
    "name": "TrkAddons",
    "writers": [
     "js/addons.js"
@@ -1133,68 +1154,12 @@
    ]
   },
   {
-   "name": "_trkMediaPlayerOpen",
-   "writers": [
-    "js/media-player-mode.js"
-   ],
-   "readers": [
-    "js/player.js",
-    "js/truck.js",
-    "js/modes.js",
-    "js/stage.js",
-    "js/catch.js",
-    "js/extras.js",
-    "js/main.js",
-    "js/pad.js",
-    "js/speed.js"
-   ]
-  },
-  {
-   "name": "_trkStudyRoomOpen",
-   "writers": [
-    "js/study-room.js"
-   ],
-   "readers": [
-    "js/player.js",
-    "js/truck.js",
-    "js/modes.js",
-    "js/stage.js",
-    "js/catch.js",
-    "js/extras.js",
-    "js/video-max.js",
-    "js/fx.js",
-    "js/main.js",
-    "js/pad.js",
-    "js/speed.js",
-    "js/synth-mode.js",
-    "js/media-player-mode.js"
-   ]
-  },
-  {
    "name": "_trkSyncSynthModeSettings",
    "writers": [
     "js/synth-mode.js"
    ],
    "readers": [
     "js/core.js"
-   ]
-  },
-  {
-   "name": "_trkSynthModeOpen",
-   "writers": [
-    "js/synth-mode.js"
-   ],
-   "readers": [
-    "js/player.js",
-    "js/truck.js",
-    "js/modes.js",
-    "js/stage.js",
-    "js/catch.js",
-    "js/extras.js",
-    "js/main.js",
-    "js/pad.js",
-    "js/speed.js",
-    "js/media-player-mode.js"
    ]
   },
   {

@@ -30,6 +30,20 @@ function emit(name, ...args) {
   for (const fn of HOOKS[name] || []) { try { fn(...args); } catch (e) { console.error(e); } }
 }
 
+/* ---------- 全画面の重ね表示が開いているか（名前空間の移行で、旧 window の旗 3 つ＝書斎・メディアプレーヤー・シンス を置き換え） ----------
+   書く側：window.Trk.overlay.set("study", true)   読む側：window.Trk.overlay.is("study")
+   どれか一つでも開いているか：window.Trk.overlay.any()   名前は "study"（書斎）・"media"（メディアプレーヤー）・"synth"（シンス） */
+const TRK_OVERLAY_OPEN = { study:false, media:false, synth:false };
+const trkOverlayHas = name => Object.prototype.hasOwnProperty.call(TRK_OVERLAY_OPEN, name);
+window.Trk = window.Trk || {};
+window.Trk.overlay = {
+  set(name, open) { if (trkOverlayHas(name)) TRK_OVERLAY_OPEN[name] = !!open; },
+  is(name) { return trkOverlayHas(name) && TRK_OVERLAY_OPEN[name] === true; },
+  any() { return Object.keys(TRK_OVERLAY_OPEN).some(k => TRK_OVERLAY_OPEN[k] === true); },
+};
+/* 互換：js/fx.js（凍結のため書き換えない）はまだ window._trkStudyRoomOpen を読む。読み取り専用で、書斎の開閉を映す */
+Object.defineProperty(window, "_trkStudyRoomOpen", { configurable: true, get: () => TRK_OVERLAY_OPEN.study === true });
+
 /* ---------- カスタムスキン（設定より先に読み込む） ---------- */
 const CUSTOM_SKINS_KEY = "shadow_taiko_custom_skins_v1", CUSTOM_SKIN_MAX = 20, SKIN_FORMAT = "skin.shadow-taiko";
 const customSkinDefs = {};

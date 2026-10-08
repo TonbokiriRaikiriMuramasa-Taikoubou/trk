@@ -853,7 +853,7 @@ addEventListener("DOMContentLoaded", () => {
   }
   function openSynth() {
     if (settings.synthModeDisabled || (window.TrkSafeMode && window.TrkSafeMode())) return;
-    window._trkSynthModeOpen = true;
+    window.Trk.overlay.set("synth", true);
     overlay.hidden = false; document.body.classList.add("instOpen");
     refreshText(); updateTrackControls(); startScope(); closeBtn.focus();
     ensureAudio();
@@ -862,7 +862,7 @@ addEventListener("DOMContentLoaded", () => {
     if (overlay.hidden) return;
     stopAllNotes();
     if (assignMode) setAssign(false); else pendingMidi = null;
-    window._trkSynthModeOpen = false;
+    window.Trk.overlay.set("synth", false);
     overlay.hidden = true; document.body.classList.remove("instOpen");
     cancelAnimationFrame(visualRaf); visualRaf = 0;
     if (restoreFocus) power.focus();
@@ -961,7 +961,7 @@ addEventListener("DOMContentLoaded", () => {
     setStatus(previous >= 0 && previous !== midi - FIRST_MIDI ? "instKeyMoved" : "instAssigned", { note:noteName(midi), key:keyCodeLabel(code) });
   }
   window.addEventListener("keydown", e => {
-    if (overlay.hidden || window._trkStudyRoomOpen) return;
+    if (overlay.hidden || window.Trk.overlay.is("study")) return;
     if (e.code === "Tab") return; // keep the modal keyboard-navigable
     if (e.ctrlKey || e.metaKey || e.altKey) return; // retain browser/system shortcuts
     if (e.code === "Escape") {
@@ -995,7 +995,7 @@ addEventListener("DOMContentLoaded", () => {
     e.preventDefault(); e.stopImmediatePropagation(); // keep game hotkeys from leaking through the open instrument
   }, true);
   window.addEventListener("keyup", e => {
-    if (overlay.hidden || window._trkStudyRoomOpen) return;
+    if (overlay.hidden || window.Trk.overlay.is("study")) return;
     const token = `key-${e.code}`;
     /* keydownと同じ優先順位でkeyupも止める。これでフォーカス中のrange/selectへ
        リリース時のキーイベントが流れず、押鍵の開始と終了が必ず対になる。 */

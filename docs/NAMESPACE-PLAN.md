@@ -55,7 +55,7 @@ node tools/smoke-browser.mjs --compare
 |---|---|---|---|
 | A 準備 | 棚卸し・スモーク基準・字句処理の検査・計画 | 変えない | 完了 |
 | B 非公開を包む | 他から使われない名前だけを即時関数で包む。公開名は大域のまま（据え置きは `window.NAME = NAME`） | 変えない | 完了（私有の名前は全て包んだ。包んでいないファイルは公開名だけ：`i18n.js`・`tv-presets.js`・`catalog.js`・`title-match.js`、凍結の `fx-presets.js` は触らない） |
-| C 旗を集約 | `window._trk*Open` などを `window.Trk` 配下の一つの関数・状態へ | 読み手を書き換える | 未着手 |
+| C 旗を集約 | `window._trk*Open` などを `window.Trk` 配下の一つの関数・状態へ | 読み手を書き換える | 完了（書斎・メディアプレーヤー・シンスの 3 旗を `window.Trk.overlay` に集約。下の「C の進捗」） |
 | D 公開名を移す | 公開名を `window.Trk.<領域>` へ移し、呼び出し側を書き換える（領域ごと） | 段階的 | 未着手 |
 | E 文書化 | `docs/ADDONS.md` に、アドオンが使ってよい公開 API を明記 | — | 未着手 |
 
@@ -97,6 +97,15 @@ node tools/smoke-browser.mjs --compare
 | 15 | `js/fx-dock.js` を即時関数で包む（公開0） | 376 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
 | 16 | `js/chart-gen.js` を即時関数で包む（公開2名（buildChartNotes・cgEstimateLevel）と、テスト用の cgAllocate を据え置き。テストは ctx.window から読む） | 361 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
 | 17 | `js/core.js`（ハブ。公開 116 名は据え置き。`let` は get/set、`const`・`function` は据え置き。私有 44 名は包みの中に残す） | 317 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`window.screen` と衝突する名前が 1 つある（`screen`、ゲームの画面状態）。段階 D で改名する対象。監査の数え方を直した後（`1122f98`）に包んだ |
+
+### C の進捗
+
+- 旗 3 つ（`window._trkStudyRoomOpen`・`window._trkMediaPlayerOpen`・`window._trkSynthModeOpen`）を `window.Trk.overlay` に置き換えた。API は `set(name, bool)`・`is(name)`・`any()`（名前は `"study"`・`"media"`・`"synth"`）。定義は `js/core.js`。
+- 読み手 21 箇所（`is`・`any`）と書き手 7 箇所（`set`）を書き換えた。旗の値は真偽値のみで、`=== true` で読むので、旧い `undefined`（未設定）の扱いも同じ。
+- **例外：`js/fx.js` は凍結（HANDOFF の制約）なので書き換えず、読み手 1 箇所（`window._trkStudyRoomOpen`）を残した。** `core.js` に読み取り専用の互換アクセサ（`Object.defineProperty(window, "_trkStudyRoomOpen", { get })`）を置き、書斎の開閉を映す。fx.js を書き換えた後に、この互換を外す（段階 D の後で判断）。
+- `tools/check-study-room.mjs` に「旧い旗が残っていないこと」（fx.js と core.js の互換だけ例外）の検査を追加。旧コードと変異（旗を一つ戻す）の両方で落ちることを確認。
+- 検査：`check-repo.mjs`（pad の文字列）・`check-study-room.mjs`（書斎の鍵止め）を新しい書き方に直した。ヘッドレス Chromium で、書斎とシンスの開閉が `overlay` に反映されること、互換アクセサの値が書斎の開閉に合うことを確認（未知の名前・`toString` は false、ページエラーなし）。
+- 残した連携（旗ではない）：`window._trkMediaPlayerMode`・`window._trkCloseSynth`・`window._trkSyncSynthModeSettings`・`window.__trkPendingTvDockSkin`。次の段階で扱う。
 
 ## 4. 止める条件
 

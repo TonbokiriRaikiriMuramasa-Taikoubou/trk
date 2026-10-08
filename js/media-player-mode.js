@@ -455,7 +455,7 @@ const mpFmt = sec => {
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 };
 const mpSongs = () => typeof allSongs === "function" ? allSongs().filter(Boolean) : [];
-const mediaActive = () => !!window._trkMediaPlayerOpen;
+const mediaActive = () => !!window.Trk.overlay.is("media");
 function currentList() {
   const q = queueFilter.trim().toLowerCase();
   return mpSongs().filter(it => !q || `${it.title || ""} ${it.artist || ""} ${it.packName || ""} ${it.dir || ""}`.toLowerCase().includes(q));
@@ -754,7 +754,7 @@ function closeMedia(restore = true) {
   if (!mediaOpen) return;
   if (window.TrkVideoMax && window.TrkVideoMax.isOpen()) window.TrkVideoMax.close();   /* 🖥 全画面表示も一緒に閉じる */
   deactivateWall(false);
-  mediaOpen = false; window._trkMediaPlayerOpen = false; window._trkMediaPlayerMode = false;
+  mediaOpen = false; window.Trk.overlay.set("media", false); window._trkMediaPlayerMode = false;
   clearInterval(tickTimer); tickTimer = 0; stopSleepTimer(true); seeking = false;
   clearInterval(loopTimer); loopTimer = 0; stopReverse(false, true); clearMediaLoop(true);
   saveMediaPosition(); video.pause(); video.playbackRate = 1;
@@ -767,8 +767,8 @@ function closeMedia(restore = true) {
 }
 function openMedia() {
   if (!overlay || (window.TrkSafeMode && TrkSafeMode())) return;
-  if (window._trkSynthModeOpen && typeof window._trkCloseSynth === "function") window._trkCloseSynth();
-  mediaOpen = true; window._trkMediaPlayerOpen = true; window._trkMediaPlayerMode = true;
+  if (window.Trk.overlay.is("synth") && typeof window._trkCloseSynth === "function") window._trkCloseSynth();
+  mediaOpen = true; window.Trk.overlay.set("media", true); window._trkMediaPlayerMode = true;
   overlay.hidden = false; document.body.classList.add("mediaOpen");
   if (videoReady) { video.muted = false; video.volume = settings.musicVolume; setRate(mediaRate); }
   if (currentSong && videoReady) { try { video.currentTime = savedMediaPosition(); } catch (_) {} }
@@ -926,7 +926,7 @@ function buildMedia() {
     const code = keyCodeOf(e);      // 📺 TVリモコン・メディアキー対応（e.code が空でも e.key を使う）
     if (mediaExitBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureMediaExitKey(code); return; }
     if (videoBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureVideoKey(code); return; }
-    if (window._trkSynthModeOpen || window._trkStudyRoomOpen) return;
+    if (window.Trk.overlay.is("synth") || window.Trk.overlay.is("study")) return;
     const videoKey = (settings.videoKeys || []).indexOf(code);
     if (videoKey >= 0 && (mediaActive() || phase === "title" || phase === "paused")) {
       e.preventDefault(); e.stopImmediatePropagation();
@@ -945,7 +945,7 @@ function buildMedia() {
     else if (e.code === "KeyP") { e.preventDefault(); e.stopImmediatePropagation(); stepMedia(-1); }
   }, true);
   addEventListener("keyup", e => {
-    if (mediaExitBinding !== null || videoBinding !== null || window._trkSynthModeOpen || window._trkStudyRoomOpen || !mediaActive()) return;
+    if (mediaExitBinding !== null || videoBinding !== null || window.Trk.overlay.is("synth") || window.Trk.overlay.is("study") || !mediaActive()) return;
     if (settings.mediaLoopTrigger === "hold" && (settings.videoKeys || [])[LOOP_KEY_INDEX] === keyCodeOf(e)) {
       e.preventDefault(); e.stopImmediatePropagation(); releaseHeldLoop();
     }
@@ -1051,7 +1051,7 @@ addEventListener("DOMContentLoaded", () => {
   applyLanguage(settings.language);
 });
 window.TrkMediaPlayer = { open:openMedia, close:closeMedia, isOpen:mediaActive };
-window._trkMediaPlayerOpen = false;
+window.Trk.overlay.set("media", false);
 window._trkMediaPlayerMode = false;
 })();
 /* ✅ media-player-mode.js 完了 */

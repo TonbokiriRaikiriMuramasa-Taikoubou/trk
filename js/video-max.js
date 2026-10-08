@@ -244,7 +244,7 @@ function build() {
 
 /* ---- キー（開いている間だけ、先に受け取る） ---- */
 addEventListener("keydown", e => {
-  if (!isOn || window._trkStudyRoomOpen) return;
+  if (!isOn || window.Trk.overlay.is("study")) return;
   if (e.code === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); closeMax(); return; }
   if (e.code === "Space") { e.preventDefault(); e.stopImmediatePropagation(); togglePlay(); return; }
   if (e.code === "ArrowLeft" || e.code === "ArrowRight") {

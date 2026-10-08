@@ -227,7 +227,7 @@ function nudgeLatency(d) {
 
 /* ---------- キーボード ---------- */
 addEventListener("keydown", e => {
-  if (window._trkSynthModeOpen || window._trkMediaPlayerOpen || window._trkStudyRoomOpen) return;
+  if (window.Trk.overlay.any()) return;
   const code = keyCodeOf(e);        // 📺 TVリモコン・メディアキーは e.code が空で e.key だけ届く
   if (menuBinding !== null) { e.preventDefault(); captureMenuKey(code); return; }
   if (bindingSlot !== null) { e.preventDefault(); captureKey(code); return; }
@@ -253,7 +253,7 @@ addEventListener("keydown", e => {
   }
   if (e.code === "KeyF" && !e.repeat && !e.ctrlKey && !e.metaKey && slotOfKey("KeyF") < 0 && fullscreenSupported) toggleFullscreen();
 });
-addEventListener("keyup", e => { if (window._trkSynthModeOpen || window._trkMediaPlayerOpen || window._trkStudyRoomOpen) return; if (e.code === "Backquote") cancelRetryHold(); });
+addEventListener("keyup", e => { if (window.Trk.overlay.any()) return; if (e.code === "Backquote") cancelRetryHold(); });
 addEventListener("blur", cancelRetryHold);
 
 /* ---------- タッチ操作（MANUAL・TRUCK・ORBITの左右ボタン） ---------- */

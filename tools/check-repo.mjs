@@ -1542,7 +1542,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
   const actions = ["left", "right", "confirm", "back", "pause"];
   const wiringOk = ["window.TrkPad = Object.freeze({", "function updatePadUI()", "getGamepads", "function padRawEdges(",
     "function padAssign(", "function padMoveFocus(", "function padActivate()", "function padTap(", "function padPressed(",
-    "requestAnimationFrame(padTick)", "window._trkStudyRoomOpen", "catchState", "stageInput", "handleInput("]
+    "requestAnimationFrame(padTick)", "window.Trk.overlay.any()", "catchState", "stageInput", "handleInput("]
     .every(token => pad.includes(token)) &&
     ["function keyCodeOf(e)", "const validPadBind =", "const PAD_DEFAULTS =", "function formatPadBind(",
      "function resetKeysPrefs()", "if (typeof updatePadUI === \"function\") updatePadUI();"]

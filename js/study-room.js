@@ -2449,7 +2449,7 @@ function studyVerticalScroll() {
 function studyOpenRoom() {
   if (studySafeMode()) { studyNotify("studySafeMode"); return; }
   if (studyRoomOpen) return;
-  studyRoomOpen = true; window._trkStudyRoomOpen = true;
+  studyRoomOpen = true; window.Trk.overlay.set("study", true);
   $("studyRoom").hidden = false; document.body.classList.add("study-room-open");
   studyRefreshPrefsUI();
   studyReadyPromise.then(() => {
@@ -2475,7 +2475,7 @@ async function studyCloseRoom() {
   studyPointers.clear(); studyPinchStart = 0;
   if (!$("studyHelp").hidden) $("studyHelp").hidden = true;
   studyEndSearch();
-  studyRoomOpen = false; window._trkStudyRoomOpen = false;
+  studyRoomOpen = false; window.Trk.overlay.set("study", false);
   $("studyProgressWrap").hidden = true; $("studyRoom").classList.remove("study-progress-visible");
   if (document.fullscreenElement === $("studyRoom") && document.exitFullscreen) document.exitFullscreen().catch(() => {});
   studyFullscreenFallback = false; $("studyRoom").classList.remove("study-fullimage");

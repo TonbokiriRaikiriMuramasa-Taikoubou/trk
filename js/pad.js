@@ -42,7 +42,7 @@ const padAxisVal = (pad, i) => { const v = (pad.axes || [])[i]; return Number.is
 const padBtnOn = b => !!b && (b.pressed === true || (Number.isFinite(b.value) && b.value > .5));
 /* 割り当て（"b0"／"a0+"）はいま押されているか */
 function padBindOn(pad, bind) {
-  if (!validPadBind(bind)) return false;
+  if (!window.Trk.core.validPadBind(bind)) return false;
   if (bind[0] === "b") return padBtnOn((pad.buttons || [])[+bind.slice(1)]);
   const v = padAxisVal(pad, +bind.slice(1, -1));
   return bind.endsWith("+") ? v > PAD_AXIS_ON : v < -PAD_AXIS_ON;
@@ -76,10 +76,10 @@ function padStateOf(pad) {
 
 /* ---------- 割り当て ---------- */
 function padAssign(id, bind) {
-  if (!validPadBind(bind)) return false;
-  settings[padSettingOf(id)] = bind;
-  padBinding = null; saveUserPrefs(); updatePadUI();
-  padNote("padBindSet", { name:tr(padActKey(id)), v:formatPadBind(bind) });
+  if (!window.Trk.core.validPadBind(bind)) return false;
+  window.Trk.core.settings[padSettingOf(id)] = bind;
+  padBinding = null; window.Trk.core.saveUserPrefs(); updatePadUI();
+  padNote("padBindSet", { name:tr(padActKey(id)), v:window.Trk.core.formatPadBind(bind) });
   return true;
 }
 function padNote(id, vars) {
@@ -91,7 +91,7 @@ const padClearMsg = () => { if (!padMsg) return; padMsg = ""; updatePadUI(); };
 
 /* ---------- メニューの移動（D-pad／スティック）・決定・戻る ---------- */
 /* 🎮 を使ってよい場面か（プレイ中と、書斎・プレーヤー・シンセが開いている間はメニュー操作をしない） */
-const padMenuOk = () => settings.padMenuNav && phase !== "playing" &&
+const padMenuOk = () => window.Trk.core.settings.padMenuNav && window.Trk.core.phase !== "playing" &&
   !window.Trk.overlay.any();
 
 function padFocusables() {
@@ -144,10 +144,10 @@ const padBack = () => padDispatchKey("Escape");       // 戻る＝ESC と同じ�
 
 /* ---------- 叩く ---------- */
 function padTap(slot) {
-  const lane = slotLane(slot), p = performance.now();
+  const lane = window.Trk.core.slotLane(slot), p = performance.now();
   try {
-    if (settings.playMode === "stage" && typeof stageInput === "function") { window.Trk.modes.stageInput(lane, p); return; }
-    if (settings.playMode === "catch" && typeof catchState !== "undefined" && window.Trk.modes.catchState.held) {
+    if (window.Trk.core.settings.playMode === "stage" && typeof stageInput === "function") { window.Trk.modes.stageInput(lane, p); return; }
+    if (window.Trk.core.settings.playMode === "catch" && typeof catchState !== "undefined" && window.Trk.modes.catchState.held) {
       window.Trk.modes.catchState.held[lane] = true; setTimeout(() => { window.Trk.modes.catchState.held[lane] = false; }, 140); return;   // 🚛 は一瞬だけ倒す
     }
   } catch (_) {}
@@ -155,8 +155,8 @@ function padTap(slot) {
 }
 /* 押した瞬間の1回だけ（プレイ中＝ノーツ・一時停止／それ以外＝メニュー） */
 function padPressed(id) {
-  if (phase === "playing") {
-    if (settings.autoPlay) { if (id === "pause") window.Trk.play.pauseGame(); return; }
+  if (window.Trk.core.phase === "playing") {
+    if (window.Trk.core.settings.autoPlay) { if (id === "pause") window.Trk.play.pauseGame(); return; }
     if (id === "left") padTap(0);
     else if (id === "right") padTap(1);
     else if (id === "pause") window.Trk.play.pauseGame();
@@ -182,7 +182,7 @@ function padTick(now) {
   requestAnimationFrame(padTick);
   const pads = padList();
   if (pads.length !== padCount) { padCount = pads.length; updatePadUI(); }
-  if (!settings.padEnabled || !pads.length) return;
+  if (!window.Trk.core.settings.padEnabled || !pads.length) return;
   for (const pad of pads) {
     const s = padStateOf(pad), edges = padRawEdges(pad, s);
     if (padBinding !== null) {                          // 🎮 割り当て待ち：生のボタン／軸をそのまま拾う
@@ -190,7 +190,7 @@ function padTick(now) {
       continue;
     }
     for (const id of PAD_ACTIONS) {
-      const bind = settings[padSettingOf(id)];
+      const bind = window.Trk.core.settings[padSettingOf(id)];
       if (bind && edges.includes(bind)) padPressed(id);
     }
     padHandleDirs(pad, s, now);
@@ -199,16 +199,16 @@ function padTick(now) {
 
 /* ---------- 表示（設定 ⚙ の ⌨ 操作 → 🎮 パッド） ---------- */
 function updatePadUI() {
-  const en = $("padEnabled"), nav = $("padMenuNav");
-  if (en) en.checked = settings.padEnabled;
-  if (nav) nav.checked = settings.padMenuNav;
-  document.querySelectorAll("[data-padvalue]").forEach(n => { n.textContent = formatPadBind(settings[padSettingOf(n.dataset.padvalue)]); });
+  const en = window.Trk.core.$("padEnabled"), nav = window.Trk.core.$("padMenuNav");
+  if (en) en.checked = window.Trk.core.settings.padEnabled;
+  if (nav) nav.checked = window.Trk.core.settings.padMenuNav;
+  document.querySelectorAll("[data-padvalue]").forEach(n => { n.textContent = window.Trk.core.formatPadBind(window.Trk.core.settings[padSettingOf(n.dataset.padvalue)]); });
   document.querySelectorAll("[data-padbind]").forEach(b => b.classList.toggle("listening", padBinding === b.dataset.padbind));
   document.querySelectorAll("#padPresets button").forEach(b => {
     const P = PAD_PRESETS[b.dataset.padpreset];
-    b.classList.toggle("selected", !!P && P.left === settings.padLeft && P.right === settings.padRight);
+    b.classList.toggle("selected", !!P && P.left === window.Trk.core.settings.padLeft && P.right === window.Trk.core.settings.padRight);
   });
-  const st = $("padStatus");
+  const st = window.Trk.core.$("padStatus");
   if (!st) return;
   const pads = padList();
   if (padMsg) st.textContent = padMsg;                                              // 直近の案内を優先
@@ -228,18 +228,18 @@ document.querySelectorAll("[data-padbind]").forEach(b => b.addEventListener("cli
 }));
 document.querySelectorAll("#padPresets button").forEach(b => b.addEventListener("click", () => {
   const P = PAD_PRESETS[b.dataset.padpreset]; if (!P) return;
-  settings.padLeft = P.left; settings.padRight = P.right; settings.padEnabled = true;
-  padBinding = null; saveUserPrefs(); updatePadUI();
+  window.Trk.core.settings.padLeft = P.left; window.Trk.core.settings.padRight = P.right; window.Trk.core.settings.padEnabled = true;
+  padBinding = null; window.Trk.core.saveUserPrefs(); updatePadUI();
   padNote("padPresetSet", { name:tr(PAD_PRESET_KEYS[b.dataset.padpreset] || "padPanelTitle") });
 }));
 (() => {
-  const en = $("padEnabled"); if (en) en.addEventListener("change", () => {
-    settings.padEnabled = en.checked; saveUserPrefs(); updatePadUI();
-    padNote(settings.padEnabled ? "padEnableOn" : "padEnableOff");
+  const en = window.Trk.core.$("padEnabled"); if (en) en.addEventListener("change", () => {
+    window.Trk.core.settings.padEnabled = en.checked; window.Trk.core.saveUserPrefs(); updatePadUI();
+    padNote(window.Trk.core.settings.padEnabled ? "padEnableOn" : "padEnableOff");
   });
-  const nav = $("padMenuNav"); if (nav) nav.addEventListener("change", () => {
-    settings.padMenuNav = nav.checked; saveUserPrefs(); updatePadUI();
-    padNote(settings.padMenuNav ? "padMenuNavOn" : "padMenuNavOff");
+  const nav = window.Trk.core.$("padMenuNav"); if (nav) nav.addEventListener("change", () => {
+    window.Trk.core.settings.padMenuNav = nav.checked; window.Trk.core.saveUserPrefs(); updatePadUI();
+    padNote(window.Trk.core.settings.padMenuNav ? "padMenuNavOn" : "padMenuNavOff");
   });
 })();
 addEventListener("gamepadconnected", e => {
@@ -256,7 +256,7 @@ updatePadUI();
 requestAnimationFrame(padTick);
 /* ✅ pad.js 完了：公開は window.TrkPad（検査・将来の拡張用） */
 window.TrkPad = Object.freeze({
-  list: padList, format: formatPadBind, defaults: PAD_DEFAULTS, presets: PAD_PRESETS,
+  list: padList, format: window.Trk.core.formatPadBind, defaults: window.Trk.core.PAD_DEFAULTS, presets: PAD_PRESETS,
   binding: () => padBinding, tick: padTick, moveFocus: padMoveFocus, activate: padActivate, back: padBack, menuOk: padMenuOk
 });
 

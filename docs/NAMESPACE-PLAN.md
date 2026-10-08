@@ -137,8 +137,9 @@ node tools/smoke-browser.mjs --compare
 | data | `js/data.js` | 29 名（`DIFFS`・`DIFF_IDS`・`SKINS`・`NOTE_PRESETS`・`buildCustomSkin`・`hexToRgba` など。すべて値のコピー） | 219 | trk65 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。検査の文字列照合（check-repo の SKINS 数・check-security の形の検査）は window.Trk.<領域>. を除いた本文で見るように直した（見る条件は変えていない）。スモーク OK |
 | play | `js/render.js` | game.js・render.js の公開名（`PLAY_KEYS`・`startGame`・`judgeNote` など、値のコピー）。アクセサは `gameTime`・`showJudge`・`drawVideo`・`retryHoldAt`・`toast`・`goAt`・`leadIn` など | 147 | trk66 | 登録は領域で最後に読み込まれる render.js の末尾（game.js の末尾に置いたら、render.js の名前を読む時点で ReferenceError になり、起動が止まった：その試行は捨てて HEAD に戻した）。書き換え 147。登録検査（render.js・TRK_EXTRAS で game.js の窓の名前も対象）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
 | modes | `js/catch.js` | modes.js・truck.js・stage.js・catch.js の公開名 54（値のコピー。`truckBinding`・`stageBinding` は let のためアクセサ） | 27 | trk67 | 登録は領域で最後に読み込まれる catch.js の末尾。登録より前に読み込まれる stagefx.js などの裸の参照は書き換えない（起動時の順序を変えないため。窓の別名で従来どおり動く＝残り）。登録検査（catch.js・TRK_EXTRAS で modes/truck/stage の窓の名前も対象）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
+| core | `js/core.js` | 116 名（`let` 約 40 名はアクセサ、差し替えられる `activeMods`・`applySkin`・`videoFilter` などはアクセサ、残りは値のコピー）。`_trkStudyRoomOpen`（互換の読み取り専用）は登録しない | 6013 | trk68 | 登録は core.js の末尾（読み込み順で領域の最初。core 以外の領域の名前は、この後の登録で出る）。書き換え 6013（代入の左辺を含む。core.js より後に読み込まれるファイルだけ）。検査：check-repo・check-security・check-lite・check-study-room の文字列照合は window.Trk.<領域>. を除いた本文で見る（overlay は除かない）。check-lite の仮想環境に window.Trk.core を用意。1 名抜いた逆テストで失敗（確認）。スモーク OK。ヘッドレス（差し替え・書斎/シンス）OK |
 
-残りの領域（lite・main・custom・library・media・data・play・core）は未着手。HANDOFF §7 の実機確認は別途。
+残りの領域（lite・main・custom・library・media・data・play・modes）は未着手。HANDOFF §7 の実機確認は別途。
 
 ## 4. 止める条件
 

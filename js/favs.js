@@ -166,7 +166,7 @@ function tidy(kind, st) {
   return st;
 }
 function boot(kind) {
-  const p = (typeof prefs !== "undefined" && prefs && prefs.favs && typeof prefs.favs === "object") ? prefs.favs[kind] : null;
+  const p = (typeof prefs !== "undefined" && window.Trk.core.prefs && window.Trk.core.prefs.favs && typeof window.Trk.core.prefs.favs === "object") ? window.Trk.core.prefs.favs[kind] : null;
   const src = (p && typeof p === "object") ? p : {};
   return tidy(kind, {
     main: [], sub: list0(src.sub, kind), frozen: list0(src.frozen, kind), former: list0(src.former, kind),
@@ -183,26 +183,26 @@ const mainKey = kind => kind === "tv" ? "tvFav" : kind === "fx" ? "fxFav" : "son
    保存されている生の値を優先して読みます（fx.js の40個の上限で切られたぶんを戻すため）。 */
 function bootMain(kind) {
   const k = mainKey(kind);
-  const raw = (typeof prefs !== "undefined" && prefs && Array.isArray(prefs[k])) ? prefs[k] : settings[k];
+  const raw = (typeof prefs !== "undefined" && window.Trk.core.prefs && Array.isArray(window.Trk.core.prefs[k])) ? window.Trk.core.prefs[k] : window.Trk.core.settings[k];
   return list0(raw, kind);
 }
 /* ほかのファイルが settings.tvFav などを「別の配列に差し替えた」ときは、そちらに乗り換える */
 function syncMain(kind) {
   const st = S[kind]; if (!st) return;
   const k = mainKey(kind);
-  if (Array.isArray(settings[k]) && settings[k] !== st.main) st.main = settings[k] = list0(settings[k], kind);
+  if (Array.isArray(window.Trk.core.settings[k]) && window.Trk.core.settings[k] !== st.main) st.main = window.Trk.core.settings[k] = list0(window.Trk.core.settings[k], kind);
 }
 function state(kind) {
   if (!KINDS.includes(kind)) kind = "tv";
   if (!S[kind]) {
     const st = boot(kind);
-    st.main = settings[mainKey(kind)] = bootMain(kind);
+    st.main = window.Trk.core.settings[mainKey(kind)] = bootMain(kind);
     S[kind] = st;
   }
   syncMain(kind);
   return S[kind];
 }
-const save = () => { try { if (typeof saveUserPrefs === "function") saveUserPrefs(); } catch (_) {} };
+const save = () => { try { if (typeof saveUserPrefs === "function") window.Trk.core.saveUserPrefs(); } catch (_) {} };
 
 /* ---------- 読み出し ---------- */
 const label = g => ftr(LABEL_KEY[g] || "favGroupMain");
@@ -341,7 +341,7 @@ function exportJSON(kind) {
   const o = exportObj(kind);
   try {
     const name = `trk-favs-${kind}-` + new Date().toISOString().slice(0, 10) + ".json";
-    if (typeof downloadJSON === "function") downloadJSON(o, name);
+    if (typeof downloadJSON === "function") window.Trk.core.downloadJSON(o, name);
     else {
       const blob = new Blob([JSON.stringify(o, null, 2)], { type:"application/json" });
       const a = document.createElement("a");
@@ -360,7 +360,7 @@ async function importFile(kind, file) {
     const r = importObj(kind, data);
     if (!r.ok) { toast(ftr("favImportBad")); return r; }
     toast(ftr("favImported", { n:r.n }));
-    if (typeof emit === "function") emit("language");            // 各画面を作り直す
+    if (typeof emit === "function") window.Trk.core.emit("language");            // 各画面を作り直す
     return r;
   } catch (e) { console.error(e); toast(ftr("favImportBad")); return { ok:false, why:"bad" }; }
 }
@@ -431,7 +431,7 @@ function msg(why, g) {
 function rmsg(r) { const t = msg(r.why, r.g); if (t) toast(t); }
 /* どこかの画面を作り直す（お気に入りを触ったあと） */
 function refresh() {
-  try { if (typeof emit === "function") emit("language"); } catch (_) {}
+  try { if (typeof emit === "function") window.Trk.core.emit("language"); } catch (_) {}
   try { if (typeof renderLib === "function") renderLib(); } catch (_) {}
   try { if (typeof renderFavPanel === "function") renderFavPanel(); } catch (_) {}
 }
@@ -585,8 +585,8 @@ if (typeof document !== "undefined") {
 function fxToggleFav() {
   try {
     const TEMP = (typeof TEMP_ID !== "undefined" && TEMP_ID) || "__chart";
-    const id = settings.fxPreset;
-    if (!settings.fxOn || id === TEMP) return;
+    const id = window.Trk.core.settings.fxPreset;
+    if (!window.Trk.core.settings.fxOn || id === TEMP) return;
     if (has("fx", id)) {
       const r = remove("fx", id);
       if (!r.ok) rmsg(r);
@@ -601,9 +601,9 @@ function fxToggleFav() {
   try {
     if (typeof settings === "undefined") return;
     /* 読み込み時に fx.js が40個で切ったぶんを、保存されている値から戻す */
-    if (typeof prefs !== "undefined" && prefs && Array.isArray(prefs.fxFav)) {
-      const full = list0(prefs.fxFav, "fx");
-      if (full.length > (Array.isArray(settings.fxFav) ? settings.fxFav.length : 0)) { settings.fxFav = full; S.fx = null; }
+    if (typeof prefs !== "undefined" && window.Trk.core.prefs && Array.isArray(window.Trk.core.prefs.fxFav)) {
+      const full = list0(window.Trk.core.prefs.fxFav, "fx");
+      if (full.length > (Array.isArray(window.Trk.core.settings.fxFav) ? window.Trk.core.settings.fxFav.length : 0)) { window.Trk.core.settings.fxFav = full; S.fx = null; }
     }
     if (typeof favBtn === "undefined" || typeof toggleFav !== "function") return;
     favBtn.removeEventListener("click", toggleFav);

@@ -73,61 +73,61 @@ Object.assign(TEXT.ko, {
 
 /* ============ 設定 ============ */
 const hexOrEmpty = v => typeof v === "string" && window.Trk.data.HEX.test(v) ? v.toLowerCase() : "";
-settings.lifeNumber = !!prefs.lifeNumber;
-settings.lifeSkin = pick(prefs.lifeSkin, ["heart", "bar", "segments", "battery", "shield", "mode", "custom"], "heart");
-settings.lifeEmoji = typeof prefs.lifeEmoji === "string" && prefs.lifeEmoji.trim() ? Array.from(prefs.lifeEmoji).slice(0, 4).join("") : "💠";
-settings.orbitLaneColor = !!prefs.orbitLaneColor;
-settings.orbitStyle = pick(prefs.orbitStyle, ["free", "calm"], "free");
-settings.orbitNoteSize = pick(prefs.orbitNoteSize, ["grow", "fixed", "judge"], "grow");
-settings.orbitCore = pick(prefs.orbitCore, ["planet", "ring", "square", "diamond", "target", "bracket"], "planet");
-settings.orbitCoreColor = hexOrEmpty(prefs.orbitCoreColor);
-settings.orbitMoon = pick(prefs.orbitMoon, ["song", "beat", "off"], "song");
-settings.orbitMoonShape = pick(prefs.orbitMoonShape, ["orb", "star", "comet"], "orb");
-settings.orbitMoonColor = hexOrEmpty(prefs.orbitMoonColor);
+window.Trk.core.settings.lifeNumber = !!window.Trk.core.prefs.lifeNumber;
+window.Trk.core.settings.lifeSkin = window.Trk.core.pick(window.Trk.core.prefs.lifeSkin, ["heart", "bar", "segments", "battery", "shield", "mode", "custom"], "heart");
+window.Trk.core.settings.lifeEmoji = typeof window.Trk.core.prefs.lifeEmoji === "string" && window.Trk.core.prefs.lifeEmoji.trim() ? Array.from(window.Trk.core.prefs.lifeEmoji).slice(0, 4).join("") : "💠";
+window.Trk.core.settings.orbitLaneColor = !!window.Trk.core.prefs.orbitLaneColor;
+window.Trk.core.settings.orbitStyle = window.Trk.core.pick(window.Trk.core.prefs.orbitStyle, ["free", "calm"], "free");
+window.Trk.core.settings.orbitNoteSize = window.Trk.core.pick(window.Trk.core.prefs.orbitNoteSize, ["grow", "fixed", "judge"], "grow");
+window.Trk.core.settings.orbitCore = window.Trk.core.pick(window.Trk.core.prefs.orbitCore, ["planet", "ring", "square", "diamond", "target", "bracket"], "planet");
+window.Trk.core.settings.orbitCoreColor = hexOrEmpty(window.Trk.core.prefs.orbitCoreColor);
+window.Trk.core.settings.orbitMoon = window.Trk.core.pick(window.Trk.core.prefs.orbitMoon, ["song", "beat", "off"], "song");
+window.Trk.core.settings.orbitMoonShape = window.Trk.core.pick(window.Trk.core.prefs.orbitMoonShape, ["orb", "star", "comet"], "orb");
+window.Trk.core.settings.orbitMoonColor = hexOrEmpty(window.Trk.core.prefs.orbitMoonColor);
 
-const isOrbit = () => settings.playMode === "orbit";
-const orbitCoreColor = () => settings.orbitCoreColor || window.Trk.data.toHex(skin().ui["--ui-accent"]);
-const orbitMoonColor = () => settings.orbitMoonColor || window.Trk.data.toHex(skin().game.perfect);
+const isOrbit = () => window.Trk.core.settings.playMode === "orbit";
+const orbitCoreColor = () => window.Trk.core.settings.orbitCoreColor || window.Trk.data.toHex(window.Trk.core.skin().ui["--ui-accent"]);
+const orbitMoonColor = () => window.Trk.core.settings.orbitMoonColor || window.Trk.data.toHex(window.Trk.core.skin().game.perfect);
 
 /* ============ 設定画面の部品（ほかのファイルからも使います） ============ */
 function makeSeg(id, key, items) {
-  const seg = el("div", "seg"); seg.id = id;
+  const seg = window.Trk.core.el("div", "seg"); seg.id = id;
   for (const [value, label] of items) {
-    const b = el("button"); b.type = "button"; b.dataset.v = value; b.dataset.i18n = label; b.textContent = tr(label); seg.append(b);
+    const b = window.Trk.core.el("button"); b.type = "button"; b.dataset.v = value; b.dataset.i18n = label; b.textContent = tr(label); seg.append(b);
   }
   const sync = () => seg.querySelectorAll("button").forEach(b => {
-    const on = b.dataset.v === String(settings[key]);
+    const on = b.dataset.v === String(window.Trk.core.settings[key]);
     b.classList.toggle("selected", on); b.setAttribute("aria-pressed", String(on));
   });
   seg.addEventListener("click", e => {
     const b = e.target.closest("button[data-v]"); if (!b) return;
-    settings[key] = b.dataset.v; saveUserPrefs(); sync();
+    window.Trk.core.settings[key] = b.dataset.v; window.Trk.core.saveUserPrefs(); sync();
     if (key === "orbitStyle") orbitPath.src = null;
   });
   sync();
   return seg;
 }
 function makeCheck(id, key, label) {
-  const lab = el("label", "check"), inp = document.createElement("input"), sp = el("span", "", tr(label));
-  inp.type = "checkbox"; inp.id = id; inp.checked = !!settings[key];
+  const lab = window.Trk.core.el("label", "check"), inp = document.createElement("input"), sp = window.Trk.core.el("span", "", tr(label));
+  inp.type = "checkbox"; inp.id = id; inp.checked = !!window.Trk.core.settings[key];
   sp.dataset.i18n = label; lab.append(inp, sp);
-  inp.addEventListener("change", () => { settings[key] = inp.checked; saveUserPrefs(); });
+  inp.addEventListener("change", () => { window.Trk.core.settings[key] = inp.checked; window.Trk.core.saveUserPrefs(); });
   return lab;
 }
 let colorRowSeq = 0;
 function makeColorRow(key, label, fallback) {
-  const row = el("div", "inline"), lab = el("span", "", tr(label)), inp = document.createElement("input"), reset = el("button", "", tr("colorReset"));
+  const row = window.Trk.core.el("div", "inline"), lab = window.Trk.core.el("span", "", tr(label)), inp = document.createElement("input"), reset = window.Trk.core.el("button", "", tr("colorReset"));
   lab.dataset.i18n = label; inp.type = "color";
   lab.id = "colorRowLab" + (++colorRowSeq); inp.setAttribute("aria-labelledby", lab.id);
   reset.type = "button"; reset.dataset.i18n = "colorReset"; reset.style.cssText = "padding:6px 12px;font-size:14px";
-  const sync = () => { inp.value = settings[key] || fallback(); reset.disabled = !settings[key]; };
-  inp.addEventListener("input", () => { settings[key] = inp.value.toLowerCase(); saveUserPrefs(); sync(); });
-  reset.addEventListener("click", () => { settings[key] = ""; saveUserPrefs(); sync(); });
+  const sync = () => { inp.value = window.Trk.core.settings[key] || fallback(); reset.disabled = !window.Trk.core.settings[key]; };
+  inp.addEventListener("input", () => { window.Trk.core.settings[key] = inp.value.toLowerCase(); window.Trk.core.saveUserPrefs(); sync(); });
+  reset.addEventListener("click", () => { window.Trk.core.settings[key] = ""; window.Trk.core.saveUserPrefs(); sync(); });
   on("skin", sync); sync();
   row.append(lab, inp, reset);
   return row;
 }
-function hintEl(key) { const h = el("div", "hint", tr(key)); h.dataset.i18n = key; return h; }
+function hintEl(key) { const h = window.Trk.core.el("div", "hint", tr(key)); h.dataset.i18n = key; return h; }
 
 /* ============ ❤ 体力ルール（ノーツ数に応じた動的スケーリング） ============
    音ゲー（IIDX・SDVX・太鼓・osu!・チュウニズム等）のライフ／ゲージ設計を研究し、
@@ -148,15 +148,15 @@ const ORBIT_LIFE_RULES = {    // ORBIT（基準値）
 };
 
 function lifeRule(totalNotes) {
-  const opt = settings.lives || "standard";
+  const opt = window.Trk.core.settings.lives || "standard";
   if (opt === "none") return { start:0, max:0, heal:0 };
   if (opt === "chicken") return { start:1, max:1, heal:0 }; // trk! 1-life sudden death (調整なし)
 
   const n = (typeof totalNotes === "number" && totalNotes > 0)
     ? totalNotes
-    : ((Array.isArray(chart) && chart.length > 0) ? chart.length : 350);
+    : ((Array.isArray(window.Trk.core.chart) && window.Trk.core.chart.length > 0) ? window.Trk.core.chart.length : 350);
   const factor = Math.max(0, Math.min(1, (n - 50) / 1150));
-  const m = settings.playMode;
+  const m = window.Trk.core.settings.playMode;
 
   if (m === "truck") {
     if (opt === "knight") {
@@ -200,11 +200,11 @@ function lifeRule(totalNotes) {
 
 const LIFE_TAGS = { knight:"KNIGHT", chicken:"TRK!", none:"INF" };
 const lifeState = { hp:0, max:0, heal:0, lostAt:-1e9, healAt:-1e9 };
-const lifeTags = () => Object.prototype.hasOwnProperty.call(LIFE_TAGS, settings.lives) ? [LIFE_TAGS[settings.lives]] : [];
+const lifeTags = () => Object.prototype.hasOwnProperty.call(LIFE_TAGS, window.Trk.core.settings.lives) ? [LIFE_TAGS[window.Trk.core.settings.lives]] : [];
 
 function resetLives() {
   const r = lifeRule();
-  lifeState.max = settings.autoPlay ? 0 : r.max;
+  lifeState.max = window.Trk.core.settings.autoPlay ? 0 : r.max;
   lifeState.hp = lifeState.max ? Math.min(lifeState.max, r.start ?? r.max) : 0;
   lifeState.heal = r.heal || 0;
   lifeState.lostAt = lifeState.healAt = -1e9;
@@ -218,7 +218,7 @@ function lifeAfterJudge(kind) {
     lifeState.hp = Math.max(0, lifeState.hp - 1); lifeState.lostAt = p;
     return lifeState.hp <= 0;
   }
-  if (healInterval > 0 && stats.combo > 0 && stats.combo % healInterval === 0 && lifeState.hp < lifeState.max) {
+  if (healInterval > 0 && window.Trk.core.stats.combo > 0 && window.Trk.core.stats.combo % healInterval === 0 && lifeState.hp < lifeState.max) {
     lifeState.hp++; lifeState.healAt = p;
     window.Trk.play.showToast(tr("lifeHeal"));
   }
@@ -229,118 +229,118 @@ function failSound() {
   if (ac.state === "suspended") ac.resume();
   const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
   o.type = "sawtooth"; o.frequency.setValueAtTime(440, t); o.frequency.exponentialRampToValueAtTime(70, t + .7);
-  g.gain.setValueAtTime(Math.max(.002, settings.seVolume * .6), t); g.gain.exponentialRampToValueAtTime(.0001, t + .8);
+  g.gain.setValueAtTime(Math.max(.002, window.Trk.core.settings.seVolume * .6), t); g.gain.exponentialRampToValueAtTime(.0001, t + .8);
   o.connect(g).connect(ac.destination); o.start(t); o.stop(t + .85);
 }
 
 /* ============ ❤ 体力の表示（コンパクト。5以下のハートは並べ、多いときはゲージ） ============ */
 const MODE_EMOJI = { manual:"🥁", truck:"🚚", orbit:"🪐", stage:"🎪", catch:"🚛" };
 function heartPath(x, y, s) {
-  ctx.beginPath(); ctx.moveTo(x, y + s * .9);
-  ctx.bezierCurveTo(x - s * 1.4, y - s * .2, x - s * .7, y - s * 1.2, x, y - s * .45);
-  ctx.bezierCurveTo(x + s * .7, y - s * 1.2, x + s * 1.4, y - s * .2, x, y + s * .9);
-  ctx.closePath();
+  window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.moveTo(x, y + s * .9);
+  window.Trk.core.ctx.bezierCurveTo(x - s * 1.4, y - s * .2, x - s * .7, y - s * 1.2, x, y - s * .45);
+  window.Trk.core.ctx.bezierCurveTo(x + s * .7, y - s * 1.2, x + s * 1.4, y - s * .2, x, y + s * .9);
+  window.Trk.core.ctx.closePath();
 }
 function lifeIcon() {
-  switch (settings.lifeSkin) {
+  switch (window.Trk.core.settings.lifeSkin) {
     case "heart": return "❤";
     case "shield": return "🛡";
-    case "mode": return MODE_EMOJI[settings.playMode] || "❤";
-    case "custom": return settings.lifeEmoji || "💠";
+    case "mode": return MODE_EMOJI[window.Trk.core.settings.playMode] || "❤";
+    case "custom": return window.Trk.core.settings.lifeEmoji || "💠";
     default: return "";
   }
 }
 function lifeText(x, y, size) {
   const t = `${lifeState.hp}/${lifeState.max}`;
-  ctx.font = `800 ${size}px ${fontFamily()}`; ctx.textAlign = "left";
-  ctx.lineWidth = 4; ctx.strokeStyle = "rgba(0,0,0,.7)"; ctx.strokeText(t, x, y);
-  ctx.fillStyle = "#fff"; ctx.fillText(t, x, y);
+  window.Trk.core.ctx.font = `800 ${size}px ${window.Trk.core.fontFamily()}`; window.Trk.core.ctx.textAlign = "left";
+  window.Trk.core.ctx.lineWidth = 4; window.Trk.core.ctx.strokeStyle = "rgba(0,0,0,.7)"; window.Trk.core.ctx.strokeText(t, x, y);
+  window.Trk.core.ctx.fillStyle = "#fff"; window.Trk.core.ctx.fillText(t, x, y);
 }
 function drawLifeBar(x, y, w, h, ratio, color) {
-  const battery = settings.lifeSkin === "battery", seg = settings.lifeSkin === "segments";
-  window.Trk.play.rr(x, y, w, h, battery ? 4 : h / 2); ctx.fillStyle = "rgba(0,0,0,.4)"; ctx.fill();
+  const battery = window.Trk.core.settings.lifeSkin === "battery", seg = window.Trk.core.settings.lifeSkin === "segments";
+  window.Trk.play.rr(x, y, w, h, battery ? 4 : h / 2); window.Trk.core.ctx.fillStyle = "rgba(0,0,0,.4)"; window.Trk.core.ctx.fill();
   if (battery) {
-    ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.stroke();
-    ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.fillRect(x + w + 2, y + h * .28, 5, h * .44);
+    window.Trk.core.ctx.lineWidth = 2; window.Trk.core.ctx.strokeStyle = "rgba(255,255,255,.85)"; window.Trk.core.ctx.stroke();
+    window.Trk.core.ctx.fillStyle = "rgba(255,255,255,.85)"; window.Trk.core.ctx.fillRect(x + w + 2, y + h * .28, 5, h * .44);
   }
   if (seg) {
     const n = 10, gap = 3, cw = (w - gap * (n - 1)) / n, act = Math.ceil(ratio * n);
     for (let i = 0; i < n; i++) {
       window.Trk.play.rr(x + i * (cw + gap), y, cw, h, 3);
-      ctx.fillStyle = i < act ? color : "rgba(255,255,255,.12)"; ctx.fill();
+      window.Trk.core.ctx.fillStyle = i < act ? color : "rgba(255,255,255,.12)"; window.Trk.core.ctx.fill();
     }
   } else if (ratio > 0) {
     const pad = battery ? 3 : 0, fw = (w - pad * 2) * ratio;
     window.Trk.play.rr(x + pad, y + pad, Math.max(h - pad * 2, fw), h - pad * 2, Math.min(6, h / 2));
-    ctx.fillStyle = color; ctx.fill();
+    window.Trk.core.ctx.fillStyle = color; window.Trk.core.ctx.fill();
   }
 }
 function drawLives() {   // render.js から呼ばれます
-  if (!lifeState.max || phase === "title") return;
-  const p = performance.now(), x0 = settings.layout === "vertical" && !window.Trk.play.ownField() ? 760 : 70, y = 152;
+  if (!lifeState.max || window.Trk.core.phase === "title") return;
+  const p = performance.now(), x0 = window.Trk.core.settings.layout === "vertical" && !window.Trk.play.ownField() ? 760 : 70, y = 152;
   const ratio = Math.max(0, Math.min(1, lifeState.hp / lifeState.max));
-  const color = ratio <= .3 ? "#ffb000" : window.Trk.data.toHex(skin().ui["--ui-accent"]);
+  const color = ratio <= .3 ? "#ffb000" : window.Trk.data.toHex(window.Trk.core.skin().ui["--ui-accent"]);
   const shake = Math.max(0, 1 - (p - lifeState.lostAt) / 400) * Math.sin(p / 25) * 5;
   const healing = p - lifeState.healAt < 600;
-  ctx.save(); ctx.textBaseline = "middle";
-  if (settings.lifeSkin === "heart" && lifeState.max <= 5) {
+  window.Trk.core.ctx.save(); window.Trk.core.ctx.textBaseline = "middle";
+  if (window.Trk.core.settings.lifeSkin === "heart" && lifeState.max <= 5) {
     for (let i = 0; i < lifeState.max; i++) {
       const x = x0 + 16 + i * 32 + (i === lifeState.hp ? shake : 0);
       heartPath(x, y, 12);
-      if (i < lifeState.hp && healing && i === lifeState.hp - 1) { ctx.shadowColor = color; ctx.shadowBlur = 14; }
-      ctx.fillStyle = i < lifeState.hp ? color : "rgba(0,0,0,.35)"; ctx.fill(); ctx.shadowBlur = 0;
-      ctx.lineWidth = 2; ctx.strokeStyle = "#fff"; ctx.stroke();
+      if (i < lifeState.hp && healing && i === lifeState.hp - 1) { window.Trk.core.ctx.shadowColor = color; window.Trk.core.ctx.shadowBlur = 14; }
+      window.Trk.core.ctx.fillStyle = i < lifeState.hp ? color : "rgba(0,0,0,.35)"; window.Trk.core.ctx.fill(); window.Trk.core.ctx.shadowBlur = 0;
+      window.Trk.core.ctx.lineWidth = 2; window.Trk.core.ctx.strokeStyle = "#fff"; window.Trk.core.ctx.stroke();
     }
-    if (settings.lifeNumber) lifeText(x0 + 8 + lifeState.max * 32, y, 17);
-    ctx.restore(); return;
+    if (window.Trk.core.settings.lifeNumber) lifeText(x0 + 8 + lifeState.max * 32, y, 17);
+    window.Trk.core.ctx.restore(); return;
   }
   const icon = lifeIcon(), bx = icon ? x0 + 46 : x0 + 12, bw = 200, bh = 12;
-  if (icon) { ctx.font = `22px ${window.Trk.data.FONT_DEFAULT}`; ctx.textAlign = "left"; ctx.fillStyle = "#fff"; ctx.fillText(icon, x0 + 12 + shake, y + 1); }
-  if (healing) { ctx.shadowColor = color; ctx.shadowBlur = 12; }
+  if (icon) { window.Trk.core.ctx.font = `22px ${window.Trk.data.FONT_DEFAULT}`; window.Trk.core.ctx.textAlign = "left"; window.Trk.core.ctx.fillStyle = "#fff"; window.Trk.core.ctx.fillText(icon, x0 + 12 + shake, y + 1); }
+  if (healing) { window.Trk.core.ctx.shadowColor = color; window.Trk.core.ctx.shadowBlur = 12; }
   drawLifeBar(bx, y - bh / 2, bw, bh, ratio, color);
-  ctx.shadowBlur = 0;
-  if (settings.lifeNumber) lifeText(bx + bw + 14, y, 15);
-  ctx.restore();
+  window.Trk.core.ctx.shadowBlur = 0;
+  if (window.Trk.core.settings.lifeNumber) lifeText(bx + bw + 14, y, 15);
+  window.Trk.core.ctx.restore();
 }
 
 /* ============ ❤ 体力の設定画面 ============ */
 function syncLivesUI() {
   document.querySelectorAll("#livesPicker button").forEach(b => {
-    const on = b.dataset.lives === settings.lives;
+    const on = b.dataset.lives === window.Trk.core.settings.lives;
     b.classList.toggle("selected", on); b.setAttribute("aria-pressed", String(on));
   });
-  const num = $("lifeNumber"), sel = $("lifeSkinSelect"), emo = $("lifeEmojiInput");
-  if (num) num.checked = settings.lifeNumber;
-  if (sel) sel.value = settings.lifeSkin;
-  if (emo) { emo.value = settings.lifeEmoji; emo.closest(".field").hidden = settings.lifeSkin !== "custom"; }
+  const num = window.Trk.core.$("lifeNumber"), sel = window.Trk.core.$("lifeSkinSelect"), emo = window.Trk.core.$("lifeEmojiInput");
+  if (num) num.checked = window.Trk.core.settings.lifeNumber;
+  if (sel) sel.value = window.Trk.core.settings.lifeSkin;
+  if (emo) { emo.value = window.Trk.core.settings.lifeEmoji; emo.closest(".field").hidden = window.Trk.core.settings.lifeSkin !== "custom"; }
 }
-$("livesPicker").addEventListener("click", e => {
+window.Trk.core.$("livesPicker").addEventListener("click", e => {
   const b = e.target.closest("button[data-lives]"); if (!b) return;
-  settings.lives = b.dataset.lives; saveUserPrefs(); syncLivesUI(); emit("options");
+  window.Trk.core.settings.lives = b.dataset.lives; window.Trk.core.saveUserPrefs(); syncLivesUI(); window.Trk.core.emit("options");
 });
 (() => {
   /* 「体力の数字も表示する」：index.html にあればそれを使い、なければ作る */
-  let num = $("lifeNumber");
-  if (num) num.addEventListener("change", () => { settings.lifeNumber = num.checked; saveUserPrefs(); });
+  let num = window.Trk.core.$("lifeNumber");
+  if (num) num.addEventListener("change", () => { window.Trk.core.settings.lifeNumber = num.checked; window.Trk.core.saveUserPrefs(); });
   else {
-    const picker = $("livesPicker"); if (!picker) return;
+    const picker = window.Trk.core.$("livesPicker"); if (!picker) return;
     (picker.nextElementSibling || picker).after(makeCheck("lifeNumber", "lifeNumber", "lifeNumber"));
-    num = $("lifeNumber");
+    num = window.Trk.core.$("lifeNumber");
   }
   /* 表示スタイルと絵文字 */
-  const skinField = el("label", "field"), skinLab = el("span", "", tr("lifeSkinLabel")), sel = document.createElement("select");
+  const skinField = window.Trk.core.el("label", "field"), skinLab = window.Trk.core.el("span", "", tr("lifeSkinLabel")), sel = document.createElement("select");
   skinLab.dataset.i18n = "lifeSkinLabel"; sel.id = "lifeSkinSelect";
   for (const [v, k] of [["heart", "lifeSkinHeart"], ["bar", "lifeSkinBar"], ["segments", "lifeSkinSegments"],
     ["battery", "lifeSkinBattery"], ["shield", "lifeSkinShield"], ["mode", "lifeSkinMode"], ["custom", "lifeSkinCustom"]]) {
     const o = document.createElement("option"); o.value = v; o.dataset.i18n = k; o.textContent = tr(k); sel.append(o);
   }
   skinField.append(skinLab, sel);
-  const emoField = el("label", "field"), emoLab = el("span", "", tr("lifeEmojiLabel")), emo = document.createElement("input");
+  const emoField = window.Trk.core.el("label", "field"), emoLab = window.Trk.core.el("span", "", tr("lifeEmojiLabel")), emo = document.createElement("input");
   emoLab.dataset.i18n = "lifeEmojiLabel"; emo.id = "lifeEmojiInput"; emo.type = "text"; emo.maxLength = 8; emo.autocomplete = "off";
   emoField.append(emoLab, emo);
   num.closest("label").after(skinField, emoField);
-  sel.addEventListener("change", () => { settings.lifeSkin = sel.value; saveUserPrefs(); syncLivesUI(); });
-  emo.addEventListener("input", () => { settings.lifeEmoji = Array.from(emo.value).slice(0, 4).join("") || "💠"; saveUserPrefs(); });
+  sel.addEventListener("change", () => { window.Trk.core.settings.lifeSkin = sel.value; window.Trk.core.saveUserPrefs(); syncLivesUI(); });
+  emo.addEventListener("input", () => { window.Trk.core.settings.lifeEmoji = Array.from(emo.value).slice(0, 4).join("") || "💠"; window.Trk.core.saveUserPrefs(); });
   syncLivesUI();
 })();
 
@@ -374,30 +374,30 @@ let titleSnap = null;
 on("beforePlay", () => { titleSnap = songTitles(window.Trk.play.songRec(false)); });
 on("screen", id => {
   if (id !== "endScreen") return;
-  const pair = TITLE_MODES.find(([m]) => m === settings.playMode); if (!pair) return;
+  const pair = TITLE_MODES.find(([m]) => m === window.Trk.core.settings.playMode); if (!pair) return;
   const [mode, icon] = pair;
   if ((lifeState.max > 0 && lifeState.hp <= 0) || window.Trk.play.runUnranked()) return;   // FAILED・AUTO・練習扱いは対象外
-  const noMiss = stats.miss === 0 && !(stats.crash > 0) && stats.perfect + stats.good > 0;
+  const noMiss = window.Trk.core.stats.miss === 0 && !(window.Trk.core.stats.crash > 0) && window.Trk.core.stats.perfect + window.Trk.core.stats.good > 0;
   const tier = noMiss ? 3 : window.Trk.play.currentAcc() >= 95 ? 2 : 1;
   const s = window.Trk.play.songRec(false);
   const now = songTitles(s)[mode], prev = titleSnap ? titleSnap[mode] : 0;
-  const b = $("result").querySelector(".badges");
+  const b = window.Trk.core.$("result").querySelector(".badges");
   if (b) {
-    b.append(el("span", "badge", `${icon}${TIER_MARK[tier]} ${tr(TIER_TEXT[tier])}`));
-    if (now > prev) b.append(el("span", "badge", tr("newTitle")));
+    b.append(window.Trk.core.el("span", "badge", `${icon}${TIER_MARK[tier]} ${tr(TIER_TEXT[tier])}`));
+    if (now > prev) b.append(window.Trk.core.el("span", "badge", tr("newTitle")));
   }
   const h = s && s.history && s.history[0];
   if (h && h.mode === mode) {
     h.title = icon + TIER_MARK[tier];
     h.mods = [...(Array.isArray(h.mods) ? h.mods : []), h.title];
-    window.Trk.play.saveRecords(); window.Trk.play.renderRecords(); emit("records");
+    window.Trk.play.saveRecords(); window.Trk.play.renderRecords(); window.Trk.core.emit("records");
   }
 });
 function renderTitles() {
-  if (!videoReady) return;
+  if (!window.Trk.core.videoReady) return;
   const s = window.Trk.play.songRec(false); if (!s || !s.history || !s.history.length) return;
   const t = titleString(s);
-  if (t) $("recSummary").append(el("div", "hint status", `${tr("titlesLabel")}: ${t}`));
+  if (t) window.Trk.core.$("recSummary").append(window.Trk.core.el("div", "hint status", `${tr("titlesLabel")}: ${t}`));
 }
 on("chart", renderTitles);
 on("language", renderTitles);
@@ -405,8 +405,8 @@ on("records", renderTitles);
 
 /* ============ 🪐 ORBIT：見た目の設定（「見た目」の欄に追加） ============ */
 (() => {
-  const anchor = $("orbitSettingsAnchor") || $("swayReducedNote"); if (!anchor) return;
-  const h3 = el("h3", "", tr("orbitViewTitle")); h3.dataset.i18n = "orbitViewTitle";
+  const anchor = window.Trk.core.$("orbitSettingsAnchor") || window.Trk.core.$("swayReducedNote"); if (!anchor) return;
+  const h3 = window.Trk.core.el("h3", "", tr("orbitViewTitle")); h3.dataset.i18n = "orbitViewTitle";
   anchor.after(
     h3,
     hintEl("orbitStyleLabel"),
@@ -419,12 +419,12 @@ on("records", renderTitles);
     makeSeg("orbitCorePicker", "orbitCore", [["planet", "orbitCorePlanet"], ["ring", "orbitCoreRing"], ["square", "orbitCoreSquare"],
       ["diamond", "orbitCoreDiamond"], ["target", "orbitCoreTarget"], ["bracket", "orbitCoreBracket"]]),
     hintEl("orbitCoreHint"),
-    makeColorRow("orbitCoreColor", "orbitCoreColor", () => window.Trk.data.toHex(skin().ui["--ui-accent"])),
+    makeColorRow("orbitCoreColor", "orbitCoreColor", () => window.Trk.data.toHex(window.Trk.core.skin().ui["--ui-accent"])),
     hintEl("orbitMoonLabel"),
     makeSeg("orbitMoonPicker", "orbitMoon", [["song", "orbitMoonSong"], ["beat", "orbitMoonBeat"], ["off", "orbitMoonOff"]]),
     hintEl("orbitMoonShapeLabel"),
     makeSeg("orbitMoonShapePicker", "orbitMoonShape", [["orb", "orbitMoonOrb"], ["star", "orbitMoonStar"], ["comet", "orbitMoonComet"]]),
-    makeColorRow("orbitMoonColor", "orbitMoonColor", () => window.Trk.data.toHex(skin().game.perfect)),
+    makeColorRow("orbitMoonColor", "orbitMoonColor", () => window.Trk.data.toHex(window.Trk.core.skin().game.perfect)),
     makeCheck("swayOrbit", "swayOrbit", "swayOrbit"),
     hintEl("orbitViewHint")
   );
@@ -440,18 +440,18 @@ const angDiff = (a, b) => Math.atan2(Math.sin(a - b), Math.cos(a - b));
 /* 時間 t の位置＝道を一定の速さで進んだ場所。小節ごとに「まっすぐ／カーブ／方向転換／ジグザグ」。
    見えている範囲の曲がりの合計を180°未満に抑えるので、見えている道は交差しません。 */
 function buildOrbitPath() {
-  const beat = 60000 / (chartMeta.bpm || 120), bar = beat * 4;
-  const last = chart.length ? chart[chart.length - 1].time : 0;
-  const t0 = -6000, t1 = Math.max(last, (video.duration || 0) * 1000) + 4000;
+  const beat = 60000 / (window.Trk.core.chartMeta.bpm || 120), bar = beat * 4;
+  const last = window.Trk.core.chart.length ? window.Trk.core.chart[window.Trk.core.chart.length - 1].time : 0;
+  const t0 = -6000, t1 = Math.max(last, (window.Trk.core.video.duration || 0) * 1000) + 4000;
   const n = Math.max(2, Math.ceil((t1 - t0) / ORBIT_STEP) + 1);
   const xs = new Float32Array(n), ys = new Float32Array(n);
-  const calm = settings.orbitStyle === "calm";
+  const calm = window.Trk.core.settings.orbitStyle === "calm";
   const S = calm ? { kMax:.0011, budget:.55 * Math.PI, speed:.75 } : { kMax:.0032, budget:.92 * Math.PI, speed:.6 };
   const AIMS = calm ? [0, -.35, .35, -.7, .7, 0]
     : [-Math.PI / 2, Math.PI / 2, 0, Math.PI, -Math.PI / 4, Math.PI / 4, -3 * Math.PI / 4, 3 * Math.PI / 4];
-  const rand = mulberry32(hashString(`orbit|${settings.orbitStyle}|${chart.length}|${chart.length ? chart[0].time : 0}|${last}|${$("seed").value}`));
-  const vpm = S.speed * settings.scroll, v = vpm * ORBIT_STEP;
-  const win = Math.max(8, Math.ceil((travelMs() * 1.15 + 800) / ORBIT_STEP));
+  const rand = window.Trk.core.mulberry32(window.Trk.core.hashString(`orbit|${window.Trk.core.settings.orbitStyle}|${window.Trk.core.chart.length}|${window.Trk.core.chart.length ? window.Trk.core.chart[0].time : 0}|${last}|${window.Trk.core.$("seed").value}`));
+  const vpm = S.speed * window.Trk.core.settings.scroll, v = vpm * ORBIT_STEP;
+  const win = Math.max(8, Math.ceil((window.Trk.core.travelMs() * 1.15 + 800) / ORBIT_STEP));
   const ring = new Float32Array(win); let ri = 0, used = 0;
   let x = 0, y = 0, h = 0, k = 0, kt = 0, mode = "straight", aim = 0, zig = 1, nextZig = 0, nextTurn = t0 + bar * 2;
   for (let i = 0; i < n; i++) {
@@ -476,11 +476,11 @@ function buildOrbitPath() {
     h += d; xs[i] = x; ys[i] = y;
     x += v * Math.cos(h); y += v * Math.sin(h);
   }
-  Object.assign(orbitPath, { src:chart, len:chart.length, bpm:chartMeta.bpm, scroll:settings.scroll, style:settings.orbitStyle, t0, n, xs, ys, vpm });
+  Object.assign(orbitPath, { src:window.Trk.core.chart, len:window.Trk.core.chart.length, bpm:window.Trk.core.chartMeta.bpm, scroll:window.Trk.core.settings.scroll, style:window.Trk.core.settings.orbitStyle, t0, n, xs, ys, vpm });
 }
 function ensureOrbit() {
   const P = orbitPath;
-  if (P.src !== chart || P.len !== chart.length || P.bpm !== chartMeta.bpm || P.scroll !== settings.scroll || P.style !== settings.orbitStyle) buildOrbitPath();
+  if (P.src !== window.Trk.core.chart || P.len !== window.Trk.core.chart.length || P.bpm !== window.Trk.core.chartMeta.bpm || P.scroll !== window.Trk.core.settings.scroll || P.style !== window.Trk.core.settings.orbitStyle) buildOrbitPath();
 }
 function orbitPos(t) {
   const P = orbitPath;
@@ -496,155 +496,155 @@ function orbitHitPos() { return { x:orbit.ax, y:orbit.ay }; }   // game.js か�
 
 /* ============ 🪐 ORBIT：描画 ============ */
 function drawOrb(x, y, c, r) {
-  const gr = ctx.createRadialGradient(x, y, 0, x, y, r * 2.2);
+  const gr = window.Trk.core.ctx.createRadialGradient(x, y, 0, x, y, r * 2.2);
   gr.addColorStop(0, window.Trk.data.hexToRgba(window.Trk.data.toHex(c), .55)); gr.addColorStop(1, window.Trk.data.hexToRgba(window.Trk.data.toHex(c), 0));
-  ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, r * 2.2, 0, window.Trk.data.TAU); ctx.fill();
-  ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y, r, 0, window.Trk.data.TAU); ctx.fill();
-  ctx.lineWidth = 3; ctx.strokeStyle = "#fff"; ctx.stroke();
+  window.Trk.core.ctx.fillStyle = gr; window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(x, y, r * 2.2, 0, window.Trk.data.TAU); window.Trk.core.ctx.fill();
+  window.Trk.core.ctx.fillStyle = c; window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(x, y, r, 0, window.Trk.data.TAU); window.Trk.core.ctx.fill();
+  window.Trk.core.ctx.lineWidth = 3; window.Trk.core.ctx.strokeStyle = "#fff"; window.Trk.core.ctx.stroke();
 }
 function starPath(x, y, r) {   // stagefx.js（紙吹雪）も使います
-  ctx.beginPath();
+  window.Trk.core.ctx.beginPath();
   for (let i = 0; i < 10; i++) {
     const a = -Math.PI / 2 + i * Math.PI / 5, rad = i % 2 ? r * .45 : r;
-    i ? ctx.lineTo(x + Math.cos(a) * rad, y + Math.sin(a) * rad) : ctx.moveTo(x + Math.cos(a) * rad, y + Math.sin(a) * rad);
+    i ? window.Trk.core.ctx.lineTo(x + Math.cos(a) * rad, y + Math.sin(a) * rad) : window.Trk.core.ctx.moveTo(x + Math.cos(a) * rad, y + Math.sin(a) * rad);
   }
-  ctx.closePath();
+  window.Trk.core.ctx.closePath();
 }
 function strokeOrbitRange(ta, tb, width, color, alpha) {
   if (tb <= ta) return;
-  ctx.globalAlpha = alpha; ctx.lineWidth = width; ctx.strokeStyle = color; ctx.beginPath();
+  window.Trk.core.ctx.globalAlpha = alpha; window.Trk.core.ctx.lineWidth = width; window.Trk.core.ctx.strokeStyle = color; window.Trk.core.ctx.beginPath();
   for (let t = ta, first = true; ; t += ORBIT_STEP * 2) {
     const tt = Math.min(t, tb), [sx, sy] = orbitToScreen(...orbitPos(tt));
-    if (first) { ctx.moveTo(sx, sy); first = false; } else ctx.lineTo(sx, sy);
+    if (first) { window.Trk.core.ctx.moveTo(sx, sy); first = false; } else window.Trk.core.ctx.lineTo(sx, sy);
     if (tt >= tb) break;
   }
-  ctx.stroke(); ctx.globalAlpha = 1;
+  window.Trk.core.ctx.stroke(); window.Trk.core.ctx.globalAlpha = 1;
 }
 function drawOrbitNote(n, isNext, c, g) {
-  const [sx, sy] = orbitToScreen(...orbitPos(n.time)), mode = settings.orbitNoteSize;
-  ctx.save(); ctx.translate(sx, sy); ctx.rotate(orbitDir(n.time));
+  const [sx, sy] = orbitToScreen(...orbitPos(n.time)), mode = window.Trk.core.settings.orbitNoteSize;
+  window.Trk.core.ctx.save(); window.Trk.core.ctx.translate(sx, sy); window.Trk.core.ctx.rotate(orbitDir(n.time));
   if (mode === "judge") {
-    const w = windows(), vpm = orbitPath.vpm, hw = 20;
+    const w = window.Trk.core.windows(), vpm = orbitPath.vpm, hw = 20;
     const lp = Math.max(6, w.perfect * vpm), lg = Math.max(lp + 4, w.good * vpm);
     window.Trk.play.rr(-lg, -hw - 4, lg * 2, hw * 2 + 8, 10);
-    ctx.fillStyle = window.Trk.data.hexToRgba(window.Trk.data.toHex(c), .16); ctx.fill();
-    ctx.lineWidth = 2; ctx.strokeStyle = window.Trk.data.hexToRgba(window.Trk.data.toHex(c), .55); ctx.stroke();
-    if (isNext) { ctx.shadowColor = c; ctx.shadowBlur = 22; }
-    window.Trk.play.rr(-lp, -hw, lp * 2, hw * 2, Math.min(9, lp)); ctx.fillStyle = c; ctx.fill(); ctx.shadowBlur = 0;
-    ctx.lineWidth = isNext ? 4 : 3; ctx.strokeStyle = g.noteBorder; ctx.stroke();
-    ctx.fillStyle = g.noteBorder; ctx.fillRect(-1.5, -hw, 3, hw * 2);
+    window.Trk.core.ctx.fillStyle = window.Trk.data.hexToRgba(window.Trk.data.toHex(c), .16); window.Trk.core.ctx.fill();
+    window.Trk.core.ctx.lineWidth = 2; window.Trk.core.ctx.strokeStyle = window.Trk.data.hexToRgba(window.Trk.data.toHex(c), .55); window.Trk.core.ctx.stroke();
+    if (isNext) { window.Trk.core.ctx.shadowColor = c; window.Trk.core.ctx.shadowBlur = 22; }
+    window.Trk.play.rr(-lp, -hw, lp * 2, hw * 2, Math.min(9, lp)); window.Trk.core.ctx.fillStyle = c; window.Trk.core.ctx.fill(); window.Trk.core.ctx.shadowBlur = 0;
+    window.Trk.core.ctx.lineWidth = isNext ? 4 : 3; window.Trk.core.ctx.strokeStyle = g.noteBorder; window.Trk.core.ctx.stroke();
+    window.Trk.core.ctx.fillStyle = g.noteBorder; window.Trk.core.ctx.fillRect(-1.5, -hw, 3, hw * 2);
   } else {
     const s = mode === "grow" && isNext ? 27 : 21;
-    if (isNext) { ctx.shadowColor = c; ctx.shadowBlur = 26; }
-    window.Trk.play.rr(-s, -s, s * 2, s * 2, 9); ctx.fillStyle = c; ctx.fill(); ctx.shadowBlur = 0;
-    ctx.lineWidth = isNext ? 5 : 3; ctx.strokeStyle = g.noteBorder; ctx.stroke();
+    if (isNext) { window.Trk.core.ctx.shadowColor = c; window.Trk.core.ctx.shadowBlur = 26; }
+    window.Trk.play.rr(-s, -s, s * 2, s * 2, 9); window.Trk.core.ctx.fillStyle = c; window.Trk.core.ctx.fill(); window.Trk.core.ctx.shadowBlur = 0;
+    window.Trk.core.ctx.lineWidth = isNext ? 5 : 3; window.Trk.core.ctx.strokeStyle = g.noteBorder; window.Trk.core.ctx.stroke();
   }
-  ctx.restore();
+  window.Trk.core.ctx.restore();
 }
 function drawOrbitCore(ax, ay, now, g) {
-  const c = orbitCoreColor(), type = settings.orbitCore, pulse = window.Trk.play.beatPulse(now);
-  const age = performance.now() - pressH.t, flash = age < 120 ? Math.min(1, .5 * gameplayFxPower()) * (1 - age / 120) : 0;
+  const c = orbitCoreColor(), type = window.Trk.core.settings.orbitCore, pulse = window.Trk.play.beatPulse(now);
+  const age = performance.now() - window.Trk.core.pressH.t, flash = age < 120 ? Math.min(1, .5 * window.Trk.core.gameplayFxPower()) * (1 - age / 120) : 0;
   if (type === "planet") {
-    if (flash) { ctx.globalAlpha = flash; ctx.fillStyle = c; ctx.beginPath(); ctx.arc(ax, ay, 44, 0, window.Trk.data.TAU); ctx.fill(); ctx.globalAlpha = 1; }
-    ctx.globalAlpha = .9; ctx.lineWidth = 5; ctx.strokeStyle = g.ink;
-    ctx.beginPath(); ctx.arc(ax, ay, 36 + pulse * 5, 0, window.Trk.data.TAU); ctx.stroke(); ctx.globalAlpha = 1;
+    if (flash) { window.Trk.core.ctx.globalAlpha = flash; window.Trk.core.ctx.fillStyle = c; window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(ax, ay, 44, 0, window.Trk.data.TAU); window.Trk.core.ctx.fill(); window.Trk.core.ctx.globalAlpha = 1; }
+    window.Trk.core.ctx.globalAlpha = .9; window.Trk.core.ctx.lineWidth = 5; window.Trk.core.ctx.strokeStyle = g.ink;
+    window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(ax, ay, 36 + pulse * 5, 0, window.Trk.data.TAU); window.Trk.core.ctx.stroke(); window.Trk.core.ctx.globalAlpha = 1;
     drawOrb(ax, ay, c, 16);
     return;
   }
   const s = 31 + pulse * 3, round = type === "ring" || type === "target";
-  ctx.save(); ctx.translate(ax, ay);
-  if (!round) ctx.rotate(orbitDir(now) + (type === "diamond" ? Math.PI / 4 : 0));
-  const shape = () => { if (round) { ctx.beginPath(); ctx.arc(0, 0, s, 0, window.Trk.data.TAU); } else window.Trk.play.rr(-s, -s, s * 2, s * 2, 8); };
-  if (flash) { shape(); ctx.globalAlpha = flash; ctx.fillStyle = c; ctx.fill(); ctx.globalAlpha = 1; }
-  ctx.lineJoin = "round"; ctx.lineCap = "round";
+  window.Trk.core.ctx.save(); window.Trk.core.ctx.translate(ax, ay);
+  if (!round) window.Trk.core.ctx.rotate(orbitDir(now) + (type === "diamond" ? Math.PI / 4 : 0));
+  const shape = () => { if (round) { window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(0, 0, s, 0, window.Trk.data.TAU); } else window.Trk.play.rr(-s, -s, s * 2, s * 2, 8); };
+  if (flash) { shape(); window.Trk.core.ctx.globalAlpha = flash; window.Trk.core.ctx.fillStyle = c; window.Trk.core.ctx.fill(); window.Trk.core.ctx.globalAlpha = 1; }
+  window.Trk.core.ctx.lineJoin = "round"; window.Trk.core.ctx.lineCap = "round";
   if (type === "bracket") {
-    const L = s * .55; ctx.beginPath();
+    const L = s * .55; window.Trk.core.ctx.beginPath();
     for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
-      ctx.moveTo(sx * s, sy * (s - L)); ctx.lineTo(sx * s, sy * s); ctx.lineTo(sx * (s - L), sy * s);
+      window.Trk.core.ctx.moveTo(sx * s, sy * (s - L)); window.Trk.core.ctx.lineTo(sx * s, sy * s); window.Trk.core.ctx.lineTo(sx * (s - L), sy * s);
     }
   } else shape();
-  ctx.lineWidth = 10; ctx.strokeStyle = "rgba(0,0,0,.45)"; ctx.stroke();
-  ctx.lineWidth = 5; ctx.strokeStyle = c; ctx.stroke();
+  window.Trk.core.ctx.lineWidth = 10; window.Trk.core.ctx.strokeStyle = "rgba(0,0,0,.45)"; window.Trk.core.ctx.stroke();
+  window.Trk.core.ctx.lineWidth = 5; window.Trk.core.ctx.strokeStyle = c; window.Trk.core.ctx.stroke();
   if (type === "target") {
-    ctx.globalAlpha = .85; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(0, 0, s * .45, 0, window.Trk.data.TAU); ctx.stroke();
-    ctx.beginPath();
+    window.Trk.core.ctx.globalAlpha = .85; window.Trk.core.ctx.lineWidth = 2;
+    window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(0, 0, s * .45, 0, window.Trk.data.TAU); window.Trk.core.ctx.stroke();
+    window.Trk.core.ctx.beginPath();
     for (let i = 0; i < 4; i++) {
       const a = i * Math.PI / 2;
-      ctx.moveTo(Math.cos(a) * (s + 4), Math.sin(a) * (s + 4)); ctx.lineTo(Math.cos(a) * (s + 15), Math.sin(a) * (s + 15));
+      window.Trk.core.ctx.moveTo(Math.cos(a) * (s + 4), Math.sin(a) * (s + 4)); window.Trk.core.ctx.lineTo(Math.cos(a) * (s + 15), Math.sin(a) * (s + 15));
     }
-    ctx.lineWidth = 3; ctx.stroke(); ctx.globalAlpha = 1;
+    window.Trk.core.ctx.lineWidth = 3; window.Trk.core.ctx.stroke(); window.Trk.core.ctx.globalAlpha = 1;
   }
-  ctx.restore();
+  window.Trk.core.ctx.restore();
 }
 function drawOrbitMoon(ax, ay, now) {
-  const mode = settings.orbitMoon; if (mode === "off") return;
+  const mode = window.Trk.core.settings.orbitMoon; if (mode === "off") return;
   const c = orbitMoonColor(), R = 64;
   let ang;
   if (mode === "song") {
-    const dur = (video.duration || 0) * 1000, k = dur ? Math.max(0, Math.min(1, now / dur)) : 0;
+    const dur = (window.Trk.core.video.duration || 0) * 1000, k = dur ? Math.max(0, Math.min(1, now / dur)) : 0;
     ang = -Math.PI / 2 + k * window.Trk.data.TAU;
-    ctx.save(); ctx.lineCap = "round"; ctx.strokeStyle = c;
-    ctx.globalAlpha = .18; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(ax, ay, R, 0, window.Trk.data.TAU); ctx.stroke();
-    if (k > 0) { ctx.globalAlpha = .65; ctx.beginPath(); ctx.arc(ax, ay, R, -Math.PI / 2, ang); ctx.stroke(); }
-    ctx.restore();
+    window.Trk.core.ctx.save(); window.Trk.core.ctx.lineCap = "round"; window.Trk.core.ctx.strokeStyle = c;
+    window.Trk.core.ctx.globalAlpha = .18; window.Trk.core.ctx.lineWidth = 4; window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(ax, ay, R, 0, window.Trk.data.TAU); window.Trk.core.ctx.stroke();
+    if (k > 0) { window.Trk.core.ctx.globalAlpha = .65; window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(ax, ay, R, -Math.PI / 2, ang); window.Trk.core.ctx.stroke(); }
+    window.Trk.core.ctx.restore();
   } else {
-    const beat = 60000 / (chartMeta.bpm || 120);
-    ang = (now - (chartMeta.offset || 0)) / beat * window.Trk.data.TAU - Math.PI / 2;
+    const beat = 60000 / (window.Trk.core.chartMeta.bpm || 120);
+    ang = (now - (window.Trk.core.chartMeta.offset || 0)) / beat * window.Trk.data.TAU - Math.PI / 2;
   }
   const x = ax + Math.cos(ang) * R, y = ay + Math.sin(ang) * R;
-  ctx.save();
-  if (settings.orbitMoonShape === "comet") {
+  window.Trk.core.ctx.save();
+  if (window.Trk.core.settings.orbitMoonShape === "comet") {
     const step = mode === "song" ? .05 : .12;
     for (let i = 6; i >= 1; i--) {
       const a = ang - i * step;
-      ctx.globalAlpha = .45 * (1 - i / 7); ctx.fillStyle = c;
-      ctx.beginPath(); ctx.arc(ax + Math.cos(a) * R, ay + Math.sin(a) * R, 8 - i, 0, window.Trk.data.TAU); ctx.fill();
+      window.Trk.core.ctx.globalAlpha = .45 * (1 - i / 7); window.Trk.core.ctx.fillStyle = c;
+      window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(ax + Math.cos(a) * R, ay + Math.sin(a) * R, 8 - i, 0, window.Trk.data.TAU); window.Trk.core.ctx.fill();
     }
-    ctx.globalAlpha = 1; drawOrb(x, y, c, 8);
-  } else if (settings.orbitMoonShape === "star") {
-    ctx.shadowColor = c; ctx.shadowBlur = 16;
-    starPath(x, y, 13); ctx.fillStyle = c; ctx.fill(); ctx.shadowBlur = 0;
-    ctx.lineWidth = 2; ctx.strokeStyle = "#fff"; ctx.stroke();
+    window.Trk.core.ctx.globalAlpha = 1; drawOrb(x, y, c, 8);
+  } else if (window.Trk.core.settings.orbitMoonShape === "star") {
+    window.Trk.core.ctx.shadowColor = c; window.Trk.core.ctx.shadowBlur = 16;
+    starPath(x, y, 13); window.Trk.core.ctx.fillStyle = c; window.Trk.core.ctx.fill(); window.Trk.core.ctx.shadowBlur = 0;
+    window.Trk.core.ctx.lineWidth = 2; window.Trk.core.ctx.strokeStyle = "#fff"; window.Trk.core.ctx.stroke();
   } else drawOrb(x, y, c, 8);
-  ctx.restore();
+  window.Trk.core.ctx.restore();
 }
 function drawOrbitField(now) {   // render.js から呼ばれます
   ensureOrbit(); updateOrbitCam(now);
-  const g = skin().game, travel = travelMs(), tEnd = now + travel * 1.1, accent = window.Trk.data.toHex(skin().ui["--ui-accent"]);
-  ctx.save(); ctx.lineCap = "round"; ctx.lineJoin = "round";
+  const g = window.Trk.core.skin().game, travel = window.Trk.core.travelMs(), tEnd = now + travel * 1.1, accent = window.Trk.data.toHex(window.Trk.core.skin().ui["--ui-accent"]);
+  window.Trk.core.ctx.save(); window.Trk.core.ctx.lineCap = "round"; window.Trk.core.ctx.lineJoin = "round";
   strokeOrbitRange(now - 700, now, 46, g.lane, .45);
   strokeOrbitRange(now, tEnd, 46, g.lane, 1);
   strokeOrbitRange(now - 700, now, 4, g.track, .4);
   strokeOrbitRange(now, tEnd, 4, g.track, 1);
-  const beat = 60000 / (chartMeta.bpm || 120), off = chartMeta.offset || 0;
-  ctx.strokeStyle = g.track;
+  const beat = 60000 / (window.Trk.core.chartMeta.bpm || 120), off = window.Trk.core.chartMeta.offset || 0;
+  window.Trk.core.ctx.strokeStyle = g.track;
   for (let k = Math.ceil((now - off) / beat); ; k++) {
     const t = off + k * beat; if (t > tEnd) break;
     const barLine = ((k % 4) + 4) % 4 === 0, [sx, sy] = orbitToScreen(...orbitPos(t)), d = orbitDir(t) + Math.PI / 2, L = barLine ? 28 : 15;
-    ctx.globalAlpha = window.Trk.play.noteAlpha(Math.max(0, t - now)) * (barLine ? .9 : .55); ctx.lineWidth = barLine ? 3 : 2;
-    ctx.beginPath(); ctx.moveTo(sx - Math.cos(d) * L, sy - Math.sin(d) * L); ctx.lineTo(sx + Math.cos(d) * L, sy + Math.sin(d) * L); ctx.stroke();
+    window.Trk.core.ctx.globalAlpha = window.Trk.play.noteAlpha(Math.max(0, t - now)) * (barLine ? .9 : .55); window.Trk.core.ctx.lineWidth = barLine ? 3 : 2;
+    window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.moveTo(sx - Math.cos(d) * L, sy - Math.sin(d) * L); window.Trk.core.ctx.lineTo(sx + Math.cos(d) * L, sy + Math.sin(d) * L); window.Trk.core.ctx.stroke();
   }
-  ctx.globalAlpha = 1;
-  const ax = orbit.ax, ay = orbit.ay, frame = settings.orbitCore !== "planet";
+  window.Trk.core.ctx.globalAlpha = 1;
+  const ax = orbit.ax, ay = orbit.ay, frame = window.Trk.core.settings.orbitCore !== "planet";
   if (frame) drawOrbitCore(ax, ay, now, g);
-  let end = nextIdx;
-  while (end < chart.length && chart[end].time - now <= travel * 1.05) end++;
-  for (let i = end - 1; i >= nextIdx; i--) {
-    const n = chart[i]; if (n.judged) continue;
+  let end = window.Trk.core.nextIdx;
+  while (end < window.Trk.core.chart.length && window.Trk.core.chart[end].time - now <= travel * 1.05) end++;
+  for (let i = end - 1; i >= window.Trk.core.nextIdx; i--) {
+    const n = window.Trk.core.chart[i]; if (n.judged) continue;
     const a = window.Trk.play.noteAlpha(n.time - now); if (a <= 0) continue;
-    ctx.globalAlpha = a;
-    drawOrbitNote(n, i === nextIdx, settings.orbitLaneColor ? laneColor(n.lane) : accent, g);
+    window.Trk.core.ctx.globalAlpha = a;
+    drawOrbitNote(n, i === window.Trk.core.nextIdx, window.Trk.core.settings.orbitLaneColor ? window.Trk.core.laneColor(n.lane) : accent, g);
   }
-  ctx.globalAlpha = 1;
+  window.Trk.core.ctx.globalAlpha = 1;
   if (!frame) drawOrbitCore(ax, ay, now, g);
   drawOrbitMoon(ax, ay, now);
-  if (nextIdx === 0 && !settings.hideGameplayUI && !settings.autoPlay) {
-    ctx.font = `800 26px ${fontFamily()}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.lineWidth = 6; ctx.strokeStyle = "rgba(0,0,0,.6)"; ctx.strokeText(tr("orbitAnyKey"), ax, window.Trk.data.H - 150);
-    ctx.fillStyle = "#fff"; ctx.fillText(tr("orbitAnyKey"), ax, window.Trk.data.H - 150);
+  if (window.Trk.core.nextIdx === 0 && !window.Trk.core.settings.hideGameplayUI && !window.Trk.core.settings.autoPlay) {
+    window.Trk.core.ctx.font = `800 26px ${window.Trk.core.fontFamily()}`; window.Trk.core.ctx.textAlign = "center"; window.Trk.core.ctx.textBaseline = "middle";
+    window.Trk.core.ctx.lineWidth = 6; window.Trk.core.ctx.strokeStyle = "rgba(0,0,0,.6)"; window.Trk.core.ctx.strokeText(tr("orbitAnyKey"), ax, window.Trk.data.H - 150);
+    window.Trk.core.ctx.fillStyle = "#fff"; window.Trk.core.ctx.fillText(tr("orbitAnyKey"), ax, window.Trk.data.H - 150);
   }
-  ctx.restore();
+  window.Trk.core.ctx.restore();
 }
 
 /* ============ 🪐 ORBIT：入力（どのキーでも1ボタン。main.js より先に受け取る） ============
@@ -653,13 +653,13 @@ const ORBIT_IGNORE = new Set(["KeyP", "Escape", "Backquote", "Minus", "Equal", "
   "AltLeft", "AltRight", "ControlLeft", "ControlRight", "ContextMenu", "PrintScreen"]);
 addEventListener("keydown", e => {
   if (window.Trk.overlay.any()) return;
-  if (phase !== "playing" || !isOrbit() || bindingSlot !== null || settings.autoPlay) return;
+  if (window.Trk.core.phase !== "playing" || !isOrbit() || window.Trk.core.bindingSlot !== null || window.Trk.core.settings.autoPlay) return;
   if (ORBIT_IGNORE.has(e.code) || /^F\d{1,2}$/.test(e.code) || e.ctrlKey || e.metaKey) return;
   e.preventDefault(); e.stopImmediatePropagation();
   if (!e.repeat) window.Trk.play.handleInput(0, e.timeStamp);
 }, true);
-stage.addEventListener("pointerdown", e => {
-  if (phase !== "playing" || !isOrbit() || settings.autoPlay) return;
+window.Trk.core.stage.addEventListener("pointerdown", e => {
+  if (window.Trk.core.phase !== "playing" || !isOrbit() || window.Trk.core.settings.autoPlay) return;
   if (e.target.closest("#controls, #seekBar, #touchKeys")) return;
   e.preventDefault(); window.Trk.play.handleInput(0, e.timeStamp);
 });

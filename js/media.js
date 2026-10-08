@@ -18,13 +18,13 @@ function decodeAudio(buf) {
 
 /* ---------- 背景画像（曲パック用。音声だけの曲で表示） ---------- */
 async function setBackground(blob) {
-  if (bgImage && bgImage._url) URL.revokeObjectURL(bgImage._url);
-  bgImage = null;
+  if (window.Trk.core.bgImage && window.Trk.core.bgImage._url) URL.revokeObjectURL(window.Trk.core.bgImage._url);
+  window.Trk.core.bgImage = null;
   if (!blob) return null;
   const url = URL.createObjectURL(blob), im = new Image();
   const ok = await new Promise(res => { im.onload = () => res(true); im.onerror = () => res(false); im.src = url; });
   if (!ok) { URL.revokeObjectURL(url); return null; }
-  im._url = url; bgImage = im;
+  im._url = url; window.Trk.core.bgImage = im;
   return im;
 }
 
@@ -41,42 +41,42 @@ const ANALYZE_MAX_SEC = 20 * 60;
    opts.title   : 表示名
    opts.onReady : 解析後・譜面生成前に呼ばれる。true を返すと自動生成を省略（曲パックの譜面など） */
 async function loadMedia(file, opts = {}) {
-  if (!file || phase !== "title") return false;
-  const token = ++loadToken;
-  emit("beforeLoad");
-  video.pause();
-  videoReady = false; analysis = null; chart = []; chartMode = "generated"; fingerprint = "";
-  setStatus("chartStatus", null); setStatus("importStatus", null); updateChartButtons();
-  if (mediaURL) URL.revokeObjectURL(mediaURL);
-  mediaURL = URL.createObjectURL(file); mediaName = file.name || "song";
-  $("songTitle").textContent = opts.title || baseName(mediaName);
-  setStatus("loadStatus", "loading");
+  if (!file || window.Trk.core.phase !== "title") return false;
+  const token = ++window.Trk.core.loadToken;
+  window.Trk.core.emit("beforeLoad");
+  window.Trk.core.video.pause();
+  window.Trk.core.videoReady = false; window.Trk.core.analysis = null; window.Trk.core.chart = []; window.Trk.core.chartMode = "generated"; window.Trk.core.fingerprint = "";
+  window.Trk.core.setStatus("chartStatus", null); window.Trk.core.setStatus("importStatus", null); window.Trk.core.updateChartButtons();
+  if (window.Trk.core.mediaURL) URL.revokeObjectURL(window.Trk.core.mediaURL);
+  window.Trk.core.mediaURL = URL.createObjectURL(file); window.Trk.core.mediaName = file.name || "song";
+  window.Trk.core.$("songTitle").textContent = opts.title || window.Trk.core.baseName(window.Trk.core.mediaName);
+  window.Trk.core.setStatus("loadStatus", "loading");
   const ok = await new Promise(res => {
-    const done = v => { video.removeEventListener("loadedmetadata", onOk); video.removeEventListener("error", onErr); res(v); };
+    const done = v => { window.Trk.core.video.removeEventListener("loadedmetadata", onOk); window.Trk.core.video.removeEventListener("error", onErr); res(v); };
     const onOk = () => done(true), onErr = () => done(false);
-    video.addEventListener("loadedmetadata", onOk); video.addEventListener("error", onErr);
-    video.src = mediaURL; video.load();
+    window.Trk.core.video.addEventListener("loadedmetadata", onOk); window.Trk.core.video.addEventListener("error", onErr);
+    window.Trk.core.video.src = window.Trk.core.mediaURL; window.Trk.core.video.load();
   });
-  if (token !== loadToken) return false;
-  if (!ok || !isFinite(video.duration) || video.duration <= 0) { setStatus("loadStatus", "loadError"); updateChartButtons(); return false; }
-  videoReady = true; fingerprint = `${file.size}:${Math.round(video.duration * 10)}`;
-  setStatus("loadStatus", "analyzing"); updateChartButtons();
+  if (token !== window.Trk.core.loadToken) return false;
+  if (!ok || !isFinite(window.Trk.core.video.duration) || window.Trk.core.video.duration <= 0) { window.Trk.core.setStatus("loadStatus", "loadError"); window.Trk.core.updateChartButtons(); return false; }
+  window.Trk.core.videoReady = true; window.Trk.core.fingerprint = `${file.size}:${Math.round(window.Trk.core.video.duration * 10)}`;
+  window.Trk.core.setStatus("loadStatus", "analyzing"); window.Trk.core.updateChartButtons();
   await new Promise(r => { setTimeout(r, 30); });
   const tooBig = (Number(file.size) || 0) > ANALYZE_MAX;
-  const tooLong = video.duration > ANALYZE_MAX_SEC;
+  const tooLong = window.Trk.core.video.duration > ANALYZE_MAX_SEC;
   /* 🪶 軽量化：解析をしない設定では、ファイル全体をデコードして走り直すところごと飛ばします
      （長い曲ほど効きます。譜面はBPMグリッド中心の自動生成になり、自作・取り込み譜面はそのまま） */
   const liteSkip = !tooBig && !tooLong && typeof TrkLite === "object" && typeof TrkLite.noAnalyze === "function" && TrkLite.noAnalyze();
   const skipAnalyze = tooBig || tooLong || liteSkip;
-  if (skipAnalyze) analysis = null;
-  else { try { analysis = await analyzeAudio(file); } catch (_) { analysis = null; } }
-  if (token !== loadToken) return false;
-  setStatus("loadStatus", tooBig ? "analysisSkipped" : tooLong ? "analysisSkippedLong" : liteSkip ? "analysisSkippedLite" : analysis ? "loaded" : "decodeFallback");
+  if (skipAnalyze) window.Trk.core.analysis = null;
+  else { try { window.Trk.core.analysis = await analyzeAudio(file); } catch (_) { window.Trk.core.analysis = null; } }
+  if (token !== window.Trk.core.loadToken) return false;
+  window.Trk.core.setStatus("loadStatus", tooBig ? "analysisSkipped" : tooLong ? "analysisSkippedLong" : liteSkip ? "analysisSkippedLite" : window.Trk.core.analysis ? "loaded" : "decodeFallback");
   let supplied = false;
   if (opts.onReady) { try { supplied = !!(await opts.onReady()); } catch (e) { console.error(e); } }
-  if (token !== loadToken) return false;
+  if (token !== window.Trk.core.loadToken) return false;
   if (!supplied) buildChart();
-  emit("mediaReady");
+  window.Trk.core.emit("mediaReady");
   return true;
 }
 
@@ -111,46 +111,46 @@ async function analyzeAudio(file) {
   const scale = nz.length ? nz[Math.floor(nz.length * .95)] || nz[nz.length - 1] : 1;
   return { rms, onset, ratio, frames, frameMs, maxRms: maxRms || 1, scale: scale || 1 };
 }
-const frameAt = t => Math.round(t / analysis.frameMs);
-function rmsAt(t) { return analysis.rms[Math.min(analysis.frames - 1, Math.max(0, frameAt(t)))]; }
+const frameAt = t => Math.round(t / window.Trk.core.analysis.frameMs);
+function rmsAt(t) { return window.Trk.core.analysis.rms[Math.min(window.Trk.core.analysis.frames - 1, Math.max(0, frameAt(t)))]; }
 /* ---------- 譜面 ---------- */
 const CHART_FILE_MAX = 2 * 1024 * 1024;   // docs/pack-format.md の譜面JSON上限に合わせる
 /* 譜面の難易度表示。本体の式は js/chart-gen.js（cgEstimateLevel）。ここでは levelOverride（譜面パックの指定）だけを見る */
 function estimateLevel(notes) {
-  if (levelOverride) return levelOverride;
+  if (window.Trk.core.levelOverride) return window.Trk.core.levelOverride;
   return window.Trk.chart.cgEstimateLevel(notes);
 }
 /* ゲームの状態を変えずに譜面だけを作る（曲パックの書き出しでも使う）。
    作り方は chartGen（設定 settings.chartGen／既定 "1" = 旧方式）。中身は js/chart-gen.js の純関数。 */
-function generateNotes(diff, bpm, offset, seed, chartGen = settings.chartGen) {
-  if (!videoReady || !(bpm >= 60 && bpm <= 300) || !window.Trk.data.DIFF_IDS.includes(diff)) return [];
-  const rand = mulberry32(hashString(`${String(seed).trim()}|${diff}|${bpm}|${offset}`));
-  return window.Trk.chart.buildChartNotes({ analysis, durationMs: video.duration * 1000, diff, spec: window.Trk.data.DIFFS[diff], bpm, offset, rand, chartGen });
+function generateNotes(diff, bpm, offset, seed, chartGen = window.Trk.core.settings.chartGen) {
+  if (!window.Trk.core.videoReady || !(bpm >= 60 && bpm <= 300) || !window.Trk.data.DIFF_IDS.includes(diff)) return [];
+  const rand = window.Trk.core.mulberry32(window.Trk.core.hashString(`${String(seed).trim()}|${diff}|${bpm}|${offset}`));
+  return window.Trk.chart.buildChartNotes({ analysis: window.Trk.core.analysis, durationMs: window.Trk.core.video.duration * 1000, diff, spec: window.Trk.data.DIFFS[diff], bpm, offset, rand, chartGen });
 }
 function buildChart() {
-  if (!videoReady) return;
-  chartMode = "generated"; chartDiff = settings.difficulty;
-  const bpm = Number($("bpm").value), offset = Number($("offset").value) || 0;
-  if (!(bpm >= 60 && bpm <= 300)) { chart = []; setStatus("chartStatus", "noChart"); updateChartButtons(); return; }
-  chart = generateNotes(chartDiff, bpm, offset, $("seed").value).map(n => ({ ...n, judged:false, result:null }));
-  chartMeta = { bpm, offset };
-  currentLevel = estimateLevel(chart);
-  setStatus("chartStatus", chart.length ? () => chartSummary() : "noChart");
-  updateChartButtons();
+  if (!window.Trk.core.videoReady) return;
+  window.Trk.core.chartMode = "generated"; window.Trk.core.chartDiff = window.Trk.core.settings.difficulty;
+  const bpm = Number(window.Trk.core.$("bpm").value), offset = Number(window.Trk.core.$("offset").value) || 0;
+  if (!(bpm >= 60 && bpm <= 300)) { window.Trk.core.chart = []; window.Trk.core.setStatus("chartStatus", "noChart"); window.Trk.core.updateChartButtons(); return; }
+  window.Trk.core.chart = generateNotes(window.Trk.core.chartDiff, bpm, offset, window.Trk.core.$("seed").value).map(n => ({ ...n, judged:false, result:null }));
+  window.Trk.core.chartMeta = { bpm, offset };
+  window.Trk.core.currentLevel = estimateLevel(window.Trk.core.chart);
+  window.Trk.core.setStatus("chartStatus", window.Trk.core.chart.length ? () => window.Trk.core.chartSummary() : "noChart");
+  window.Trk.core.updateChartButtons();
 }
-function chartToData(notes, diff, meta = chartMeta) {
+function chartToData(notes, diff, meta = window.Trk.core.chartMeta) {
   return {
     format:"shadow-taiko-chart", version:2, app:"trk!",
-    media:{ name:mediaName, fingerprint, duration:+(video.duration || 0).toFixed(3) },
-    bpm:meta.bpm, offset:meta.offset, seed:$("seed").value.trim(), difficulty:diff, level:estimateLevel(notes),
+    media:{ name:window.Trk.core.mediaName, fingerprint: window.Trk.core.fingerprint, duration:+(window.Trk.core.video.duration || 0).toFixed(3) },
+    bpm:meta.bpm, offset:meta.offset, seed:window.Trk.core.$("seed").value.trim(), difficulty:diff, level:estimateLevel(notes),
     notes:notes.map(n => [n.time, n.lane])
   };
 }
 function exportChart(statusId) {
-  if (!chart.length) { setStatus(statusId, "exportNone"); return; }
-  const base = safeName(baseName(mediaName) || "chart");
-  downloadBlob(new Blob([JSON.stringify(chartToData(chart, chartDiff))], { type:"application/json" }), `${base}-${chartDiff}.shadow-taiko.json`);
-  setStatus(statusId, "exportDone");
+  if (!window.Trk.core.chart.length) { window.Trk.core.setStatus(statusId, "exportNone"); return; }
+  const base = window.Trk.core.safeName(window.Trk.core.baseName(window.Trk.core.mediaName) || "chart");
+  window.Trk.core.downloadBlob(new Blob([JSON.stringify(chartToData(window.Trk.core.chart, window.Trk.core.chartDiff))], { type:"application/json" }), `${base}-${window.Trk.core.chartDiff}.shadow-taiko.json`);
+  window.Trk.core.setStatus(statusId, "exportDone");
 }
 function parseNote(n) {
   let time, lane;
@@ -176,47 +176,47 @@ function validateChartData(data, checkFingerprint = true) {
   const notes = data.notes.map(parseNote);
   if (notes.some(n => !isFinite(n.time) || n.time < 0 || (n.lane !== 0 && n.lane !== 1))) return { key:"importInvalid" };
   if (!notes.length) return { key:"importEmpty" };
-  if (checkFingerprint && data.media && data.media.fingerprint && data.media.fingerprint !== fingerprint) return { key:"importMismatch" };
+  if (checkFingerprint && data.media && data.media.fingerprint && data.media.fingerprint !== window.Trk.core.fingerprint) return { key:"importMismatch" };
   notes.sort((a, b) => a.time - b.time);
-  if (notes[notes.length - 1].time > video.duration * 1000 + 1000) return { key:"importTooLong" };
+  if (notes[notes.length - 1].time > window.Trk.core.video.duration * 1000 + 1000) return { key:"importTooLong" };
   return { notes };
 }
 /* 確認した譜面を今の譜面にする（mode: "imported" / "pack"） */
 function applyChartData(data, mode = "imported", sid = "importStatus", checkFingerprint = true) {
-  if (!videoReady) { setStatus(sid, "loadError"); return false; }
+  if (!window.Trk.core.videoReady) { window.Trk.core.setStatus(sid, "loadError"); return false; }
   const v = validateChartData(data, checkFingerprint);
-  if (v.key) { setStatus(sid, v.key); return false; }
-  chart = v.notes.map(n => ({ time:Math.round(n.time), lane:n.lane, judged:false, result:null }));
-  chartMode = mode;
-  chartDiff = window.Trk.data.DIFF_IDS.includes(data.difficulty) ? data.difficulty : settings.difficulty;
-  chartMeta = {
+  if (v.key) { window.Trk.core.setStatus(sid, v.key); return false; }
+  window.Trk.core.chart = v.notes.map(n => ({ time:Math.round(n.time), lane:n.lane, judged:false, result:null }));
+  window.Trk.core.chartMode = mode;
+  window.Trk.core.chartDiff = window.Trk.data.DIFF_IDS.includes(data.difficulty) ? data.difficulty : window.Trk.core.settings.difficulty;
+  window.Trk.core.chartMeta = {
     bpm:typeof data.bpm === "number" && Number.isFinite(data.bpm) ? data.bpm : 0,
     offset:typeof data.offset === "number" && Number.isFinite(data.offset) ? data.offset : 0
   };
-  currentLevel = estimateLevel(chart);
-  setStatus("chartStatus", () => chartSummary());
-  if (mode === "imported") setStatus(sid, "importSuccess");
-  updateChartButtons();
+  window.Trk.core.currentLevel = estimateLevel(window.Trk.core.chart);
+  window.Trk.core.setStatus("chartStatus", () => window.Trk.core.chartSummary());
+  if (mode === "imported") window.Trk.core.setStatus(sid, "importSuccess");
+  window.Trk.core.updateChartButtons();
   return true;
 }
 async function importChartFile(file, sid = "importStatus") {
   if (!file || typeof file.size !== "number" || !Number.isFinite(file.size) || file.size < 0 ||
       file.size > CHART_FILE_MAX || typeof file.text !== "function") {
-    setStatus(sid, "importInvalid"); return false;
+    window.Trk.core.setStatus(sid, "importInvalid"); return false;
   }
   let data = null;
-  try { data = JSON.parse(await file.text()); } catch (_) { setStatus(sid, "importBad"); return false; }
+  try { data = JSON.parse(await file.text()); } catch (_) { window.Trk.core.setStatus(sid, "importBad"); return false; }
   return applyChartData(data, "imported", sid, true);
 }
 
 /* ---------- ヒットSE ---------- */
 const seBuffers = [null, null], seFiles = [null, null]; let noiseBuf = null;
 function playSE(lane, force = false) {
-  if (!settings.seEnabled && !force) return;
+  if (!window.Trk.core.settings.seEnabled && !force) return;
   const ac = getAC(); if (!ac) return;
   if (ac.state === "suspended") ac.resume();
   const t = ac.currentTime, out = ac.createGain();
-  out.gain.value = settings.seVolume; out.connect(ac.destination);
+  out.gain.value = window.Trk.core.settings.seVolume; out.connect(ac.destination);
   if (seBuffers[lane]) { const s = ac.createBufferSource(); s.buffer = seBuffers[lane]; s.connect(out); s.start(t); return; }
   const o = ac.createOscillator(), e = ac.createGain();
   if (lane === 0) {
@@ -239,12 +239,12 @@ function playSE(lane, force = false) {
 }
 async function loadSE(file, lane) {
   if (!file) return;
-  if (!getAC()) { setStatus("seStatus", "seUnavailable"); return; }
+  if (!getAC()) { window.Trk.core.setStatus("seStatus", "seUnavailable"); return; }
   try {
     seBuffers[lane] = await decodeAudio(await file.arrayBuffer());
     seFiles[lane] = file;
-    setStatus("seStatus", lane ? "seLoadedKa" : "seLoadedDon");
-  } catch (_) { setStatus("seStatus", "seLoadError"); }
+    window.Trk.core.setStatus("seStatus", lane ? "seLoadedKa" : "seLoadedDon");
+  } catch (_) { window.Trk.core.setStatus("seStatus", "seLoadError"); }
 }
 /* ✅ media.js 完了 */
 

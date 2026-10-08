@@ -19,11 +19,11 @@ let eqDockLabelSeq = 0;
 
 /* ============ 最初のお気に入り（fx.js より先に prefs へ入れる。1回だけ） ============ */
 const DEFAULT_FAV = ["vshape", "warp", "itodenwa", "spacesuit", "study"];
-if (!prefs.fxFavSeeded) {
-  const cur = Array.isArray(prefs.fxFav) ? prefs.fxFav : [];
-  prefs.fxFav = [...DEFAULT_FAV, ...cur.filter(id => !DEFAULT_FAV.includes(id))];
+if (!window.Trk.core.prefs.fxFavSeeded) {
+  const cur = Array.isArray(window.Trk.core.prefs.fxFav) ? window.Trk.core.prefs.fxFav : [];
+  window.Trk.core.prefs.fxFav = [...DEFAULT_FAV, ...cur.filter(id => !DEFAULT_FAV.includes(id))];
 }
-settings.fxFavSeeded = true;
+window.Trk.core.settings.fxFavSeeded = true;
 
 /* ============ 本体のスキン ============ */
 const L4 = (ja, en, zh, ko) => ({ ja, en, zh, ko });
@@ -37,19 +37,19 @@ const DOCK_SKINS = {
   aero:    { n:5,  cols:5, deco:"bubbles", label:L4("🫧 Frutiger Aero", "🫧 Frutiger Aero", "🫧 Frutiger Aero", "🫧 Frutiger Aero") }
 };
 const FAV_MAX = 0, TEMP_ID = "__chart", LONG_MS = 600;   /* 0＝上限なし（⭐は js/favs.js がフォルダ分けする） */
-settings.fxDockSkin = pick(prefs.fxDockSkin, Object.keys(DOCK_SKINS), "standard");
-settings.fxDockFive = !!prefs.fxDockFive;
-settings.fxDockOpen = prefs.fxDockOpen === true;      // くわしい欄は最初は閉じる
-settings.ampOpen = typeof prefs.ampOpen === "boolean" ? prefs.ampOpen : true;   // 🔥 TRKアンプの欄は最初から開いておく（「なんだこれ！」と気づいてもらう。触って閉じた人の記憶は残す）
-settings.castPolicy = pick(settings.castPolicy, ["off", "antenna"], "off");
-settings.backgroundPolicy = pick(settings.backgroundPolicy, ["off", "antenna", "corner"], settings.castPolicy === "antenna" ? "antenna" : "off");
-settings.fxAntenna = settings.backgroundPolicy === "off" ? false : !!prefs.fxAntenna;
-const antShapePref = prefs.fxAntennaShape === "miko" ? "reimu" : prefs.fxAntennaShape;   /* 旧保存値の移行 */
-settings.fxAntennaShape = pick(antShapePref, ["rod", "loop", "dish", "beam", "truck", "robot", "cat", "slime", "ghost", "reimu", "marisa", "cirno", "flandre", "youmu", "custom"], "rod");
+window.Trk.core.settings.fxDockSkin = window.Trk.core.pick(window.Trk.core.prefs.fxDockSkin, Object.keys(DOCK_SKINS), "standard");
+window.Trk.core.settings.fxDockFive = !!window.Trk.core.prefs.fxDockFive;
+window.Trk.core.settings.fxDockOpen = window.Trk.core.prefs.fxDockOpen === true;      // くわしい欄は最初は閉じる
+window.Trk.core.settings.ampOpen = typeof window.Trk.core.prefs.ampOpen === "boolean" ? window.Trk.core.prefs.ampOpen : true;   // 🔥 TRKアンプの欄は最初から開いておく（「なんだこれ！」と気づいてもらう。触って閉じた人の記憶は残す）
+window.Trk.core.settings.castPolicy = window.Trk.core.pick(window.Trk.core.settings.castPolicy, ["off", "antenna"], "off");
+window.Trk.core.settings.backgroundPolicy = window.Trk.core.pick(window.Trk.core.settings.backgroundPolicy, ["off", "antenna", "corner"], window.Trk.core.settings.castPolicy === "antenna" ? "antenna" : "off");
+window.Trk.core.settings.fxAntenna = window.Trk.core.settings.backgroundPolicy === "off" ? false : !!window.Trk.core.prefs.fxAntenna;
+const antShapePref = window.Trk.core.prefs.fxAntennaShape === "miko" ? "reimu" : window.Trk.core.prefs.fxAntennaShape;   /* 旧保存値の移行 */
+window.Trk.core.settings.fxAntennaShape = window.Trk.core.pick(antShapePref, ["rod", "loop", "dish", "beam", "truck", "robot", "cat", "slime", "ghost", "reimu", "marisa", "cirno", "flandre", "youmu", "custom"], "rod");
 /* 🖼 自分のイラスト2枚（ON／OFF）の検証（純粋関数・テスト対象） */
 function antCustomOk(u) { return typeof u === "string" && u.startsWith("data:image/") && u.length <= 400000; }
-settings.fxAntennaCustomOn = antCustomOk(prefs.fxAntennaCustomOn) ? prefs.fxAntennaCustomOn : "";
-settings.fxAntennaCustomOff = antCustomOk(prefs.fxAntennaCustomOff) ? prefs.fxAntennaCustomOff : "";
+window.Trk.core.settings.fxAntennaCustomOn = antCustomOk(window.Trk.core.prefs.fxAntennaCustomOn) ? window.Trk.core.prefs.fxAntennaCustomOn : "";
+window.Trk.core.settings.fxAntennaCustomOff = antCustomOk(window.Trk.core.prefs.fxAntennaCustomOff) ? window.Trk.core.prefs.fxAntennaCustomOff : "";
 /* ---- 📡 アンテナのドットキャラ（16×16・全部trk!の描きおろし。東方キャラ5体の権利メモは NOTICE.md 2b節） ---- */
 const ANT_CHARS = {
   truck: {
@@ -134,11 +134,11 @@ function bgAntennaView(policy) {
   const p = policy === "antenna" || policy === "corner" ? policy : "off";
   return { allowed: p !== "off", dock: p === "antenna", corner: p === "corner" };
 }
-settings.fxEqLock = Array.isArray(prefs.fxEqLock) && prefs.fxEqLock.length === 5 ? prefs.fxEqLock.map(Boolean) : [false, false, false, false, false];
-settings.fxLockChain = !!prefs.fxLockChain;
-const skinDef = () => Object.prototype.hasOwnProperty.call(DOCK_SKINS, settings.fxDockSkin) ? DOCK_SKINS[settings.fxDockSkin] : DOCK_SKINS.standard;
-const slotCount = () => settings.fxDockFive ? 5 : skinDef().n;
-const slotCols = () => settings.fxDockFive ? 5 : skinDef().cols;
+window.Trk.core.settings.fxEqLock = Array.isArray(window.Trk.core.prefs.fxEqLock) && window.Trk.core.prefs.fxEqLock.length === 5 ? window.Trk.core.prefs.fxEqLock.map(Boolean) : [false, false, false, false, false];
+window.Trk.core.settings.fxLockChain = !!window.Trk.core.prefs.fxLockChain;
+const skinDef = () => Object.prototype.hasOwnProperty.call(DOCK_SKINS, window.Trk.core.settings.fxDockSkin) ? DOCK_SKINS[window.Trk.core.settings.fxDockSkin] : DOCK_SKINS.standard;
+const slotCount = () => window.Trk.core.settings.fxDockFive ? 5 : skinDef().n;
+const slotCols = () => window.Trk.core.settings.fxDockFive ? 5 : skinDef().cols;
 
 /* ============ 文章（接頭辞 dock…） ============ */
 Object.assign(TEXT.ja, {
@@ -291,8 +291,8 @@ Object.assign(TEXT.ko, {
 /* ============ 📡 アンテナ：バックグラウンド再生 ============
    library.js（プレビューを止める）・main.js（プレイを一時停止）より先に visibilitychange を受け取り、
    続けてよい場面だけ止める処理を飛ばす。自分で遊んでいる最中は止める（記録のため） */
-const keepAlive = () => settings.fxAntenna &&
-  (phase === "title" || phase === "ended" || (phase === "playing" && settings.autoPlay));
+const keepAlive = () => window.Trk.core.settings.fxAntenna &&
+  (window.Trk.core.phase === "title" || window.Trk.core.phase === "ended" || (window.Trk.core.phase === "playing" && window.Trk.core.settings.autoPlay));
 function wakeAC() { if (typeof audioCtx !== "undefined" && window.Trk.media.audioCtx && window.Trk.media.audioCtx.state === "suspended") window.Trk.media.audioCtx.resume().catch(() => {}); }
 document.addEventListener("visibilitychange", e => {
   if (!document.hidden || !keepAlive()) return;
@@ -302,9 +302,9 @@ document.addEventListener("visibilitychange", e => {
 /* 裏では画面の更新（requestAnimationFrame）が止まり、カウントダウンが進まないので省く */
 function skipCountsIfHidden() {
   if (!document.hidden) return;
-  const a = settings.countdown, b = settings.resumeCountdown;
-  settings.countdown = false; settings.resumeCountdown = false;
-  setTimeout(() => { settings.countdown = a; settings.resumeCountdown = b; }, 0);
+  const a = window.Trk.core.settings.countdown, b = window.Trk.core.settings.resumeCountdown;
+  window.Trk.core.settings.countdown = false; window.Trk.core.settings.resumeCountdown = false;
+  setTimeout(() => { window.Trk.core.settings.countdown = a; window.Trk.core.settings.resumeCountdown = b; }, 0);
 }
 on("beforePlay", skipCountsIfHidden);
 
@@ -314,21 +314,21 @@ const setAct = (a, f) => { try { ms.setActionHandler(a, f); } catch (_) {} };
 async function goNext() {
   if (typeof nextSong !== "function" || typeof selectSong !== "function") return;
   const nx = nextSong(); if (!nx) return;
-  if (phase !== "title") window.Trk.play.toTitle();
+  if (window.Trk.core.phase !== "title") window.Trk.play.toTitle();
   await selectSong(nx);
-  if (settings.autoPlay && phase === "title" && videoReady && chart.length && currentSong === nx) { skipCountsIfHidden(); window.Trk.play.startGame(); }
+  if (window.Trk.core.settings.autoPlay && window.Trk.core.phase === "title" && window.Trk.core.videoReady && window.Trk.core.chart.length && window.Trk.core.currentSong === nx) { skipCountsIfHidden(); window.Trk.play.startGame(); }
 }
 function msMeta() {
   if (!ms || typeof MediaMetadata === "undefined") return;
-  const s = currentSong || {};
+  const s = window.Trk.core.currentSong || {};
   try {
-    ms.metadata = new MediaMetadata({ title:s.title || baseName(mediaName) || "trk!", artist:s.artist || "trk!", album:"trk!",
+    ms.metadata = new MediaMetadata({ title:s.title || window.Trk.core.baseName(window.Trk.core.mediaName) || "trk!", artist:s.artist || "trk!", album:"trk!",
       artwork:[{ src:"icons/icon-512.png", sizes:"512x512", type:"image/png" }, { src:"icons/icon-192.png", sizes:"192x192", type:"image/png" }] });
   } catch (_) {}
 }
 if (ms) {
-  setAct("play", () => { skipCountsIfHidden(); if (phase === "paused") window.Trk.play.resumeGame(); else video.play().catch(() => {}); });
-  setAct("pause", () => { if (phase === "playing") window.Trk.play.pauseGame(); else video.pause(); });
+  setAct("play", () => { skipCountsIfHidden(); if (window.Trk.core.phase === "paused") window.Trk.play.resumeGame(); else window.Trk.core.video.play().catch(() => {}); });
+  setAct("pause", () => { if (window.Trk.core.phase === "playing") window.Trk.play.pauseGame(); else window.Trk.core.video.pause(); });
   setAct("nexttrack", () => { goNext(); });
 }
 
@@ -352,61 +352,61 @@ function jitter(o) {
 
 /* ============ 画面の組み立て（全部のファイルを読み終えてから） ============ */
 addEventListener("DOMContentLoaded", () => {
-  const col = document.querySelector(".songCol"), quick = $("fxQuickPanel"), full = $("fxPanel");
+  const col = document.querySelector(".songCol"), quick = window.Trk.core.$("fxQuickPanel"), full = window.Trk.core.$("fxPanel");
   if (!col || !quick || !full || !window.TrkFX) return;
-  saveUserPrefs();
+  window.Trk.core.saveUserPrefs();
 
-  const tx = (tag, key, cls) => { const n = el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; };
-  const btn = (cls, ...kids) => { const b = el("button", cls); b.type = "button"; b.append(...kids); return b; };
+  const tx = (tag, key, cls) => { const n = window.Trk.core.el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; };
+  const btn = (cls, ...kids) => { const b = window.Trk.core.el("button", cls); b.type = "button"; b.append(...kids); return b; };
   const names = () => Object.fromEntries(TrkFX.list().map(p => [p.id, p.name]));
 
   /* ---- 本体 ---- */
-  const dock = el("div"); dock.id = "fxDock";
-  const dev = el("div", "dockDev");
-  const antWrap = el("div", "antWrap");
-  const antBody = el("div", "antBody"), antTip = el("div", "antTip"), antSignal = el("div", "antSignal");
-  const dockCharCv = el("canvas", "antChar"); dockCharCv.width = 48; dockCharCv.height = 48;
+  const dock = window.Trk.core.el("div"); dock.id = "fxDock";
+  const dev = window.Trk.core.el("div", "dockDev");
+  const antWrap = window.Trk.core.el("div", "antWrap");
+  const antBody = window.Trk.core.el("div", "antBody"), antTip = window.Trk.core.el("div", "antTip"), antSignal = window.Trk.core.el("div", "antSignal");
+  const dockCharCv = window.Trk.core.el("canvas", "antChar"); dockCharCv.width = 48; dockCharCv.height = 48;
   antWrap.append(antBody, antTip, antSignal, dockCharCv);
 
-  const powLed = el("i", "led"), antLed = el("i", "led ledAnt");
-  const pow = btn("dockKey dockPow", powLed, el("span", "", "⏻"));
-  const ant = btn("dockKey dockAnt", antLed, el("span", "antIcon", "📡"), el("span", "antTxt", "ANT"));
-  const castTxt = el("span", "castTxt"), castAnt = btn("dockKey dockCast", castTxt);
-  const lcd = el("div", "dockLcd");
-  const top = el("div", "dockTop"); top.append(pow, lcd, ant, castAnt);
-  const deco = el("div", "dockDeco");
-  const slots = el("div", "dockSlots");
+  const powLed = window.Trk.core.el("i", "led"), antLed = window.Trk.core.el("i", "led ledAnt");
+  const pow = btn("dockKey dockPow", powLed, window.Trk.core.el("span", "", "⏻"));
+  const ant = btn("dockKey dockAnt", antLed, window.Trk.core.el("span", "antIcon", "📡"), window.Trk.core.el("span", "antTxt", "ANT"));
+  const castTxt = window.Trk.core.el("span", "castTxt"), castAnt = btn("dockKey dockCast", castTxt);
+  const lcd = window.Trk.core.el("div", "dockLcd");
+  const top = window.Trk.core.el("div", "dockTop"); top.append(pow, lcd, ant, castAnt);
+  const deco = window.Trk.core.el("div", "dockDeco");
+  const slots = window.Trk.core.el("div", "dockSlots");
   const rFx = btn("dockKey"), rFav = btn("dockKey"), rPar = btn("dockKey");
-  const rnd = el("div", "dockRand"); rnd.append(rFx, rFav, rPar);
+  const rnd = window.Trk.core.el("div", "dockRand"); rnd.append(rFx, rFav, rPar);
   const slotHint = tx("div", "dockSlotHint", "hint dockHint");
   dev.append(antWrap, top, deco, slots, rnd, slotHint);
 
   /* 📡 右上（言語選択の左）のコンパクトなアンテナ。backgroundPolicy="corner"のときだけ出る */
-  const cornerAnt = btn("cornerAnt", el("span", "caIcon", "📡"), el("i", "caSignal"));
-  const cornerCharCv = el("canvas", "caCanvas"); cornerCharCv.width = 48; cornerCharCv.height = 48;
+  const cornerAnt = btn("cornerAnt", window.Trk.core.el("span", "caIcon", "📡"), window.Trk.core.el("i", "caSignal"));
+  const cornerCharCv = window.Trk.core.el("canvas", "caCanvas"); cornerCharCv.width = 48; cornerCharCv.height = 48;
   cornerAnt.append(cornerCharCv);
   const headTools = document.querySelector(".headTools");
   if (headTools) headTools.prepend(cornerAnt);   /* 言語選択の左＝headTools の先頭 */
 
   /* ---- ⭐ お気に入り（フォルダのチップと、ボタンに入りきらないぶん） ---- */
   const overLabel = tx("div", "dockFavLabel", "hint");
-  const overflow = el("div", "fxFavRow");
-  const favChips = el("div", "favChipsWrap");
+  const overflow = window.Trk.core.el("div", "fxFavRow");
+  const favChips = window.Trk.core.el("div", "favChipsWrap");
 
   /* ---- くわしい欄（メニュー・EQ・スキン） ---- */
-  const body = el("details", "panel dockMore"); body.open = settings.fxDockOpen;
-  body.addEventListener("toggle", () => { settings.fxDockOpen = body.open; saveUserPrefs(); });
+  const body = window.Trk.core.el("details", "panel dockMore"); body.open = window.Trk.core.settings.fxDockOpen;
+  body.addEventListener("toggle", () => { window.Trk.core.settings.fxDockOpen = body.open; window.Trk.core.saveUserPrefs(); });
   quick.classList.add("inDock");
   const eqRanges = Array.from(full.querySelectorAll('input[type="range"]')).slice(0, 5);   // fx.js のかんたんEQ
-  const eqBox = el("div", "fxDockEq");
+  const eqBox = window.Trk.core.el("div", "fxDockEq");
   eqBox.append(tx("div", "sfxEqLabel", "hint"));
   const mirrors = eqRanges.map((o, i) => {
-    const row = el("div", "inline tight"), m = document.createElement("input"), val = el("span", "mono");
+    const row = window.Trk.core.el("div", "inline tight"), m = document.createElement("input"), val = window.Trk.core.el("span", "mono");
     m.type = "range"; m.min = o.min; m.max = o.max; m.step = o.step;
     m.addEventListener("input", () => { o.value = m.value; o.dispatchEvent(new Event("input", { bubbles:true })); });
     const lock = btn("fxMini dockLock");
-    lock.addEventListener("click", () => { settings.fxEqLock[i] = !settings.fxEqLock[i]; saveUserPrefs(); render(); });
-    const nameSpan = el("span", "", ["60Hz", "250Hz", "1kHz", "4kHz", "12kHz"][i]);
+    lock.addEventListener("click", () => { window.Trk.core.settings.fxEqLock[i] = !window.Trk.core.settings.fxEqLock[i]; window.Trk.core.saveUserPrefs(); render(); });
+    const nameSpan = window.Trk.core.el("span", "", ["60Hz", "250Hz", "1kHz", "4kHz", "12kHz"][i]);
     nameSpan.id = "fxDockEqLab" + (++eqDockLabelSeq); m.setAttribute("aria-labelledby", nameSpan.id);
     row.append(nameSpan, m, val, lock);
     eqBox.append(row);
@@ -415,22 +415,22 @@ addEventListener("DOMContentLoaded", () => {
   const origReset = full.querySelector('[data-i18n="sfxEqReset"]');
   if (origReset) { const r = tx("button", "sfxEqReset", "fxMini"); r.type = "button"; r.addEventListener("click", () => origReset.click()); eqBox.append(r); }
   const mkCheck = (key, label) => {
-    const lab = el("label", "check"), inp = document.createElement("input");
+    const lab = window.Trk.core.el("label", "check"), inp = document.createElement("input");
     inp.type = "checkbox"; lab.append(inp, tx("span", label));
     inp.addEventListener("change", () => {
       if (key === "fxAntenna") { toggleAntenna(inp.checked); return; }
-      settings[key] = inp.checked; saveUserPrefs(); render();
+      window.Trk.core.settings[key] = inp.checked; window.Trk.core.saveUserPrefs(); render();
     });
     return { lab, inp };
   };
   const lockChain = mkCheck("fxLockChain", "dockLockChain");
-  const skinRow = el("label", "field"), skinSel = document.createElement("select");
+  const skinRow = window.Trk.core.el("label", "field"), skinSel = document.createElement("select");
   skinRow.append(tx("span", "dockSkinLabel"), skinSel);
-  skinSel.addEventListener("change", () => { settings.fxDockSkin = skinSel.value; saveUserPrefs(); render(true); });
+  skinSel.addEventListener("change", () => { window.Trk.core.settings.fxDockSkin = skinSel.value; window.Trk.core.saveUserPrefs(); render(true); });
   const five = mkCheck("fxDockFive", "dockFive");
 
   /* 📡 アンテナの形状 & 通常アンテナを使う（バックグラウンド再生モード）チェックボックス */
-  const antShapeRow = el("label", "field antShapeField");
+  const antShapeRow = window.Trk.core.el("label", "field antShapeField");
   const antShapeSel = document.createElement("select");
   const antShapes = [
     ["rod", "dockAntShapeRod"],
@@ -474,18 +474,18 @@ addEventListener("DOMContentLoaded", () => {
       g3.append(o);
     }
     antShapeSel.append(g1, g2, g3);
-    antShapeSel.value = settings.fxAntennaShape || "rod";
+    antShapeSel.value = window.Trk.core.settings.fxAntennaShape || "rod";
   };
   buildAntShapes();
   antShapeSel.addEventListener("change", () => {
-    settings.fxAntennaShape = antShapeSel.value;
-    saveUserPrefs();
+    window.Trk.core.settings.fxAntennaShape = antShapeSel.value;
+    window.Trk.core.saveUserPrefs();
     render();
   });
   antShapeRow.append(tx("span", "dockAntShapeLabel"), antShapeSel);
 
   /* 🖼 自分のイラスト2枚（ON／OFF）— 端末内にだけ保存 */
-  const antCustomRow = el("div", "antCustomRow");
+  const antCustomRow = window.Trk.core.el("div", "antCustomRow");
   function fileToAntImage(file, cb) {
     if (!file || !/^image\//.test(file.type)) { cb(""); return; }
     const r = new FileReader();
@@ -508,14 +508,14 @@ addEventListener("DOMContentLoaded", () => {
     r.readAsDataURL(file);
   }
   const mkAntUpload = (which, labelKey) => {
-    const lab = el("label", "antUploadLab"), inp = document.createElement("input");
+    const lab = window.Trk.core.el("label", "antUploadLab"), inp = document.createElement("input");
     inp.type = "file"; inp.accept = "image/*";
     lab.append(tx("span", labelKey), inp);
     inp.addEventListener("change", () => {
       fileToAntImage(inp.files && inp.files[0], url => {
         if (antCustomOk(url)) {
-          settings["fxAntennaCustom" + (which === "on" ? "On" : "Off")] = url;
-          saveUserPrefs(); render();
+          window.Trk.core.settings["fxAntennaCustom" + (which === "on" ? "On" : "Off")] = url;
+          window.Trk.core.saveUserPrefs(); render();
         } else lcdFlash(tr("dockAntCustomNg"));
         inp.value = "";
       });
@@ -524,41 +524,41 @@ addEventListener("DOMContentLoaded", () => {
   };
   const antCustomClear = tx("button", "dockAntCustomClear", "fxMini"); antCustomClear.type = "button";
   antCustomClear.addEventListener("click", () => {
-    settings.fxAntennaCustomOn = ""; settings.fxAntennaCustomOff = "";
-    saveUserPrefs(); lcdFlash(tr("dockAntCustomCleared")); render();
+    window.Trk.core.settings.fxAntennaCustomOn = ""; window.Trk.core.settings.fxAntennaCustomOff = "";
+    window.Trk.core.saveUserPrefs(); lcdFlash(tr("dockAntCustomCleared")); render();
   });
   antCustomRow.append(mkAntUpload("on", "dockAntCustomOn"), mkAntUpload("off", "dockAntCustomOff"),
     antCustomClear, tx("div", "dockAntCustomHint", "hint"));
 
-  const backgroundRow = el("label", "field"), backgroundSel = document.createElement("select");
+  const backgroundRow = window.Trk.core.el("label", "field"), backgroundSel = document.createElement("select");
   backgroundRow.append(tx("span", "dockBackgroundPolicy"), backgroundSel);
   for (const [value, key] of [["off", "dockBackgroundOff"], ["antenna", "dockBackgroundAntenna"], ["corner", "dockBackgroundCorner"]]) {
     const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); backgroundSel.append(o);
   }
-  backgroundSel.value = settings.backgroundPolicy;
+  backgroundSel.value = window.Trk.core.settings.backgroundPolicy;
   const backgroundHint = tx("div", "dockBackgroundHint", "hint");
   backgroundSel.addEventListener("change", () => {
-    settings.backgroundPolicy = backgroundSel.value === "antenna" || backgroundSel.value === "corner" ? backgroundSel.value : "off";
-    if (settings.backgroundPolicy === "off") settings.fxAntenna = false;
-    saveUserPrefs(); render();
+    window.Trk.core.settings.backgroundPolicy = backgroundSel.value === "antenna" || backgroundSel.value === "corner" ? backgroundSel.value : "off";
+    if (window.Trk.core.settings.backgroundPolicy === "off") window.Trk.core.settings.fxAntenna = false;
+    window.Trk.core.saveUserPrefs(); render();
   });
-  const castRow = el("label", "field"), castSel = document.createElement("select");
+  const castRow = window.Trk.core.el("label", "field"), castSel = document.createElement("select");
   castRow.append(tx("span", "dockCastPolicy"), castSel);
   for (const [value, key] of [["off", "dockCastOff"], ["antenna", "dockCastAntenna"]]) {
     const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); castSel.append(o);
   }
-  castSel.value = settings.castPolicy;
+  castSel.value = window.Trk.core.settings.castPolicy;
   const castHint = tx("div", "dockCastHint", "hint");
   castSel.addEventListener("change", () => {
-    settings.castPolicy = castSel.value === "antenna" ? "antenna" : "off";
-    if (settings.castPolicy === "off") disconnectExternalPlayback();
-    saveUserPrefs(); render();
+    window.Trk.core.settings.castPolicy = castSel.value === "antenna" ? "antenna" : "off";
+    if (window.Trk.core.settings.castPolicy === "off") disconnectExternalPlayback();
+    window.Trk.core.saveUserPrefs(); render();
   });
   const antCheck = mkCheck("fxAntenna", "dockAntCheckLabel");
 
   const more = tx("button", "dockMore", "fxMini"); more.type = "button";
   more.addEventListener("click", () => {
-    openSettings(); full.open = true;
+    window.Trk.core.openSettings(); full.open = true;
     setTimeout(() => full.scrollIntoView({ behavior:"smooth", block:"start" }), 50);
   });
   body.append(tx("summary", "dockTitle"), quick, eqBox, tx("div", "dockLockHint", "hint"), lockChain.lab,
@@ -588,15 +588,15 @@ addEventListener("DOMContentLoaded", () => {
       { type:"denoise", amount:10 },
       { type:"comp", threshold:-20, ratio:3, attack:.01, release:.25, knee:10, makeup:2 }] }
   };
-  const amp = el("details", "panel dockAmp"); amp.id = "ampPanel";
-  amp.open = settings.ampOpen;
-  amp.addEventListener("toggle", () => { settings.ampOpen = amp.open; saveUserPrefs(); if (amp.open) renderAmp(); });
-  const ampUseLab = el("label", "check"), ampUseInp = document.createElement("input");
+  const amp = window.Trk.core.el("details", "panel dockAmp"); amp.id = "ampPanel";
+  amp.open = window.Trk.core.settings.ampOpen;
+  amp.addEventListener("toggle", () => { window.Trk.core.settings.ampOpen = amp.open; window.Trk.core.saveUserPrefs(); if (amp.open) renderAmp(); });
+  const ampUseLab = window.Trk.core.el("label", "check"), ampUseInp = document.createElement("input");
   ampUseInp.type = "checkbox"; ampUseLab.append(ampUseInp, tx("span", "ampUse"));
-  const ampState = el("div", "hint status"); ampState.id = "ampState";
-  const ampStacks = el("div", "seg ampStacks"); ampStacks.id = "ampStacks";
-  const ampStages = el("div", "ampStages");
-  const ampRow = el("div", "miniActions");
+  const ampState = window.Trk.core.el("div", "hint status"); ampState.id = "ampState";
+  const ampStacks = window.Trk.core.el("div", "seg ampStacks"); ampStacks.id = "ampStacks";
+  const ampStages = window.Trk.core.el("div", "ampStages");
+  const ampRow = window.Trk.core.el("div", "miniActions");
   const ampSel = document.createElement("select"); ampSel.className = "fxQuickSelect";
   ampSel.setAttribute("aria-label", tr("ampStagePick"));
   const ampAdd = tx("button", "ampStageAdd", "fxMini"); ampAdd.type = "button";
@@ -609,7 +609,7 @@ addEventListener("DOMContentLoaded", () => {
     const b = tx("button", st.label); b.type = "button"; b.dataset.ampstack = id; ampStacks.append(b);
   }
   const ampMini = (txt, fn) => {
-    const b = el("button", "fxMini"); b.type = "button"; b.textContent = txt;
+    const b = window.Trk.core.el("button", "fxMini"); b.type = "button"; b.textContent = txt;
     b.addEventListener("click", fn); return b;
   };
   const ampTypeList = () => (window.TrkFX && typeof TrkFX.rackTypes === "function" ? TrkFX.rackTypes() : []);
@@ -631,8 +631,8 @@ addEventListener("DOMContentLoaded", () => {
     const types = list.map(f => f.type).join();
     list.forEach((f, i) => {
       const meta = ampMetaOf(f.type);
-      const chip = el("div", "ampStage");
-      chip.append(el("span", "ampName", ampLabel(meta)));
+      const chip = window.Trk.core.el("div", "ampStage");
+      chip.append(window.Trk.core.el("span", "ampName", ampLabel(meta)));
       const up = ampMini("↑", () => ampMove(i, -1));
       const dn = ampMini("↓", () => ampMove(i, 1));
       const rm = ampMini("✕", () => {
@@ -689,7 +689,7 @@ addEventListener("DOMContentLoaded", () => {
   });
   ampClearBtn.addEventListener("click", () => { TrkFX.rackClear(); lcdFlash(tr("ampCleared")); renderAmp(); render(); });
   ampMore.addEventListener("click", () => {
-    openSettings(); full.open = true;
+    window.Trk.core.openSettings(); full.open = true;
     const head = full.querySelector('[data-i18n="sfxRackTitle"]');
     setTimeout(() => { try { (head || full).scrollIntoView({ behavior:"smooth", block:"center" }); } catch (_) {} }, 60);
   });
@@ -723,40 +723,40 @@ addEventListener("DOMContentLoaded", () => {
   /* ---- ボタンの動き ---- */
   function disconnectExternalPlayback() {
     try {
-      if (video.remote && video.remote.state === "connected" && typeof video.remote.disconnect === "function") video.remote.disconnect();
+      if (window.Trk.core.video.remote && window.Trk.core.video.remote.state === "connected" && typeof window.Trk.core.video.remote.disconnect === "function") window.Trk.core.video.remote.disconnect();
     } catch (_) {}
   }
   async function requestExternalPlayback() {
-    if (settings.castPolicy !== "antenna") return;
+    if (window.Trk.core.settings.castPolicy !== "antenna") return;
     try {
-      if (video.remote && typeof video.remote.prompt === "function") {
-        await video.remote.prompt();
+      if (window.Trk.core.video.remote && typeof window.Trk.core.video.remote.prompt === "function") {
+        await window.Trk.core.video.remote.prompt();
         lcdFlash(tr("dockCastOn")); render(); return;
       }
-      if (typeof video.webkitShowPlaybackTargetPicker === "function") {
-        video.webkitShowPlaybackTargetPicker();
+      if (typeof window.Trk.core.video.webkitShowPlaybackTargetPicker === "function") {
+        window.Trk.core.video.webkitShowPlaybackTargetPicker();
         lcdFlash(tr("dockCastOn")); render(); return;
       }
       lcdFlash(tr("dockCastUnsupported"));
     } catch (_) { lcdFlash(tr("dockCastFailed")); }
   }
-  function castConnected() { return !!(video.remote && video.remote.state === "connected"); }
+  function castConnected() { return !!(window.Trk.core.video.remote && window.Trk.core.video.remote.state === "connected"); }
   function openCastPicker() {
-    if (settings.castPolicy !== "antenna") return;
+    if (window.Trk.core.settings.castPolicy !== "antenna") return;
     if (castConnected()) { disconnectExternalPlayback(); lcdFlash(tr("dockCastOffDone")); render(); return; }
     requestExternalPlayback();
   }
   function toggleAntenna(forced) {
-    if (!bgAntennaView(settings.backgroundPolicy).allowed) {
-      settings.fxAntenna = false; saveUserPrefs(); lcdFlash(tr("dockBackgroundOff")); render(); return;
+    if (!bgAntennaView(window.Trk.core.settings.backgroundPolicy).allowed) {
+      window.Trk.core.settings.fxAntenna = false; window.Trk.core.saveUserPrefs(); lcdFlash(tr("dockBackgroundOff")); render(); return;
     }
-    settings.fxAntenna = forced !== undefined ? !!forced : !settings.fxAntenna;
-    saveUserPrefs();
-    lcdFlash(tr(settings.fxAntenna ? "dockAntOn" : "dockAntOff"));
+    window.Trk.core.settings.fxAntenna = forced !== undefined ? !!forced : !window.Trk.core.settings.fxAntenna;
+    window.Trk.core.saveUserPrefs();
+    lcdFlash(tr(window.Trk.core.settings.fxAntenna ? "dockAntOn" : "dockAntOff"));
     render();
   }
-  pow.addEventListener("click", () => { video.muted = !video.muted; render(); });
-  video.addEventListener("volumechange", () => render());
+  pow.addEventListener("click", () => { window.Trk.core.video.muted = !window.Trk.core.video.muted; render(); });
+  window.Trk.core.video.addEventListener("volumechange", () => render());
   ant.addEventListener("click", () => toggleAntenna());
   antWrap.addEventListener("click", () => toggleAntenna());
   cornerAnt.addEventListener("click", () => toggleAntenna());
@@ -765,7 +765,7 @@ addEventListener("DOMContentLoaded", () => {
   const charWhere = { dock: false, corner: false };
   const customImgs = { on: null, onSrc: "", off: null, offSrc: "" };
   function customImgOf(which) {
-    const src = which === "on" ? settings.fxAntennaCustomOn : settings.fxAntennaCustomOff;
+    const src = which === "on" ? window.Trk.core.settings.fxAntennaCustomOn : window.Trk.core.settings.fxAntennaCustomOff;
     if (!src) return null;
     if (customImgs[which + "Src"] !== src) {
       const img = new Image();
@@ -778,7 +778,7 @@ addEventListener("DOMContentLoaded", () => {
   function drawAntChar(cv, on, t) {
     const g = cv.getContext("2d"); if (!g) return;
     g.clearRect(0, 0, cv.width, cv.height);
-    const shape = settings.fxAntennaShape;
+    const shape = window.Trk.core.settings.fxAntennaShape;
     if (shape === "custom") {
       const img = customImgOf(on ? "on" : "off");
       if (!img) { g.font = "18px sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("📡", cv.width / 2, cv.height / 2 + 2); return; }
@@ -792,39 +792,39 @@ addEventListener("DOMContentLoaded", () => {
   }
   function antCharTick(ts) {
     requestAnimationFrame(antCharTick);
-    if (!isCharShape(settings.fxAntennaShape) || document.hidden) return;
+    if (!isCharShape(window.Trk.core.settings.fxAntennaShape) || document.hidden) return;
     /* 🪶 軽量化：装飾を間引く設定では、このキャラの描き直しだけフレームレートを落とす
        （ドックは選曲中にも常時動いていたので、スマホではここで発熱が残っていた） */
     if (typeof TrkLite === "object" && typeof TrkLite.decorAllow === "function" && !TrkLite.decorAllow(performance.now())) return;
-    if (charWhere.dock && dockCharCv.isConnected) drawAntChar(dockCharCv, settings.fxAntenna, ts || 0);
-    if (charWhere.corner && cornerCharCv.isConnected) drawAntChar(cornerCharCv, settings.fxAntenna, ts || 0);
+    if (charWhere.dock && dockCharCv.isConnected) drawAntChar(dockCharCv, window.Trk.core.settings.fxAntenna, ts || 0);
+    if (charWhere.corner && cornerCharCv.isConnected) drawAntChar(cornerCharCv, window.Trk.core.settings.fxAntenna, ts || 0);
   }
   requestAnimationFrame(antCharTick);
   castAnt.addEventListener("click", () => openCastPicker());
   rFx.addEventListener("click", () => TrkFX.random());
   rFav.addEventListener("click", () => {
     const F = window.TrkFavs;
-    const src = F ? F.pool("fx") : (settings.fxFav || []);
-    const list = src.filter(id => id !== settings.fxPreset && names()[id]);
+    const src = F ? F.pool("fx") : (window.Trk.core.settings.fxFav || []);
+    const list = src.filter(id => id !== window.Trk.core.settings.fxPreset && names()[id]);
     if (list.length) TrkFX.select(list[Math.floor(Math.random() * list.length)]);
     else lcdFlash(tr("dockNoFavShort"));
   });
   rPar.addEventListener("click", () => {
-    const eq = settings.fxEq.map((v, i) => settings.fxEqLock[i] ? v : Math.round((Math.random() * 12 - 6) * 2) / 2);
+    const eq = window.Trk.core.settings.fxEq.map((v, i) => window.Trk.core.settings.fxEqLock[i] ? v : Math.round((Math.random() * 12 - 6) * 2) / 2);
     const cur = TrkFX.current();
-    if (!settings.fxLockChain && cur && cur.chain.length) {
+    if (!window.Trk.core.settings.fxLockChain && cur && cur.chain.length) {
       const base = cur.name.replace(/ 🎲$/, "").slice(0, 21);
       TrkFX.apply({ format:"trk-fx", version:1, name:base + " 🎲", chain:jitter(cur.chain), eq, volume:cur.volume });
     } else {
-      eqRanges.forEach((o, i) => { if (settings.fxEqLock[i]) return; o.value = eq[i]; o.dispatchEvent(new Event("input", { bubbles:true })); });
+      eqRanges.forEach((o, i) => { if (window.Trk.core.settings.fxEqLock[i]) return; o.value = eq[i]; o.dispatchEvent(new Event("input", { bubbles:true })); });
     }
     lcdFlash("🎛🎲 " + tr("dockParamDone"));
   });
 
   /* ボタンに今のエフェクトを登録（もとの登録は1つ後ろへずらすので、消えない） */
   function assign(i) {
-    if (!settings.fxOn) { lcdFlash(tr("dockNeedOn")); return; }
-    const id = settings.fxPreset;
+    if (!window.Trk.core.settings.fxOn) { lcdFlash(tr("dockNeedOn")); return; }
+    const id = window.Trk.core.settings.fxPreset;
     if (id === TEMP_ID || !names()[id]) { lcdFlash(tr("dockTempNo")); return; }
     const F = window.TrkFavs;
     if (F) {
@@ -832,19 +832,19 @@ addEventListener("DOMContentLoaded", () => {
       const g = ["main", "sub", "frozen"].includes(F.activeOf("fx")) ? F.activeOf("fx") : "main";
       const r = F.add("fx", id, { group:g, index:i });
       if (!r.ok) { lcdFlash(F.msg(r.why)); return; }
-      emit("language");
+      window.Trk.core.emit("language");
       lcdFlash(tr("dockSaved", { n:i + 1, name:names()[id] }));
       return;
     }
-    const arr = (settings.fxFav || []).filter(x => x !== id);
+    const arr = (window.Trk.core.settings.fxFav || []).filter(x => x !== id);
     arr.splice(Math.min(i, arr.length), 0, id);
-    settings.fxFav = arr; saveUserPrefs();
-    emit("language");
+    window.Trk.core.settings.fxFav = arr; window.Trk.core.saveUserPrefs();
+    window.Trk.core.emit("language");
     lcdFlash(tr("dockSaved", { n:i + 1, name:names()[id] }));
   }
   function slotButton(i, id, nm) {
-    const on = settings.fxOn && settings.fxPreset === id;
-    const b = btn("dockKey slot" + (id ? "" : " empty") + (on ? " selected" : ""), el("span", "num", String(i + 1)), el("span", "nm", nm || "—"));
+    const on = window.Trk.core.settings.fxOn && window.Trk.core.settings.fxPreset === id;
+    const b = btn("dockKey slot" + (id ? "" : " empty") + (on ? " selected" : ""), window.Trk.core.el("span", "num", String(i + 1)), window.Trk.core.el("span", "nm", nm || "—"));
     b.title = id ? nm : tr("dockEmptySlot");
     b.setAttribute("aria-pressed", String(on));
     let timer = 0, long = false;
@@ -863,57 +863,57 @@ addEventListener("DOMContentLoaded", () => {
   function buildDeco() {
     deco.textContent = "";
     const d = skinDef().deco; deco.className = "dockDeco " + d; deco.hidden = !d;
-    if (d === "reels") deco.append(el("i", "reel"), el("i", "reel"));
-    else if (d === "disc") deco.append(el("i", "disc"));
-    else if (d === "scan") deco.append(el("i", "scanbar"));
-    else if (d === "bubbles") for (let k = 0; k < 4; k++) deco.append(el("i", "bubble"));
+    if (d === "reels") deco.append(window.Trk.core.el("i", "reel"), window.Trk.core.el("i", "reel"));
+    else if (d === "disc") deco.append(window.Trk.core.el("i", "disc"));
+    else if (d === "scan") deco.append(window.Trk.core.el("i", "scanbar"));
+    else if (d === "bubbles") for (let k = 0; k < 4; k++) deco.append(window.Trk.core.el("i", "bubble"));
   }
 
   /* ---- 表示 ---- */
   let lastSkin = "";
   function render(skinChanged) {
     const nm = names();
-    dock.dataset.skin = settings.fxDockSkin;
-    dock.dataset.antShape = settings.fxAntennaShape || "rod";
-    antWrap.dataset.shape = settings.fxAntennaShape || "rod";
-    const charShape = isCharShape(settings.fxAntennaShape);
+    dock.dataset.skin = window.Trk.core.settings.fxDockSkin;
+    dock.dataset.antShape = window.Trk.core.settings.fxAntennaShape || "rod";
+    antWrap.dataset.shape = window.Trk.core.settings.fxAntennaShape || "rod";
+    const charShape = isCharShape(window.Trk.core.settings.fxAntennaShape);
     antWrap.classList.toggle("char", charShape);
     cornerAnt.classList.toggle("char", charShape);
-    if (antCustomRow) antCustomRow.hidden = settings.fxAntennaShape !== "custom";
-    dock.classList.toggle("ant", settings.fxAntenna);
-    dock.classList.toggle("playing", !video.paused);
-    if (skinChanged || lastSkin !== settings.fxDockSkin) { buildDeco(); lastSkin = settings.fxDockSkin; }
+    if (antCustomRow) antCustomRow.hidden = window.Trk.core.settings.fxAntennaShape !== "custom";
+    dock.classList.toggle("ant", window.Trk.core.settings.fxAntenna);
+    dock.classList.toggle("playing", !window.Trk.core.video.paused);
+    if (skinChanged || lastSkin !== window.Trk.core.settings.fxDockSkin) { buildDeco(); lastSkin = window.Trk.core.settings.fxDockSkin; }
     /* 電源・アンテナ・液晶 */
-    powLed.classList.toggle("on", !video.muted);
-    antLed.classList.toggle("on", settings.fxAntenna);
-    ant.classList.toggle("on", settings.fxAntenna);
-    const bgView = bgAntennaView(settings.backgroundPolicy);   /* off / antenna（ドック）/ corner（右上） */
-    if (castSel) castSel.value = settings.castPolicy || "off";
-    if (backgroundSel) backgroundSel.value = settings.backgroundPolicy || "off";
+    powLed.classList.toggle("on", !window.Trk.core.video.muted);
+    antLed.classList.toggle("on", window.Trk.core.settings.fxAntenna);
+    ant.classList.toggle("on", window.Trk.core.settings.fxAntenna);
+    const bgView = bgAntennaView(window.Trk.core.settings.backgroundPolicy);   /* off / antenna（ドック）/ corner（右上） */
+    if (castSel) castSel.value = window.Trk.core.settings.castPolicy || "off";
+    if (backgroundSel) backgroundSel.value = window.Trk.core.settings.backgroundPolicy || "off";
     ant.hidden = !bgView.dock; antWrap.hidden = !bgView.dock;
     cornerAnt.hidden = !bgView.corner;                         /* 右上のコンパクト版（言語の左） */
     charWhere.dock = bgView.dock; charWhere.corner = bgView.corner;   /* 📡 ドットキャラを描く場所 */
-    cornerAnt.classList.toggle("on", settings.fxAntenna);
-    cornerAnt.title = tr(settings.fxAntenna ? "dockAntOn" : "dockAntOff");
+    cornerAnt.classList.toggle("on", window.Trk.core.settings.fxAntenna);
+    cornerAnt.title = tr(window.Trk.core.settings.fxAntenna ? "dockAntOn" : "dockAntOff");
     cornerAnt.setAttribute("aria-label", cornerAnt.title);
-    cornerAnt.setAttribute("aria-pressed", String(settings.fxAntenna));
-    if (antCheck) { antCheck.lab.hidden = !bgView.allowed; antCheck.inp.checked = settings.fxAntenna; antCheck.inp.disabled = !bgView.allowed; }
-    if (antShapeSel) antShapeSel.value = settings.fxAntennaShape || "rod";
-    pow.title = tr("dockPower"); pow.setAttribute("aria-label", pow.title); pow.setAttribute("aria-pressed", String(!video.muted));
-    ant.title = tr("dockAntenna"); ant.setAttribute("aria-label", ant.title); ant.setAttribute("aria-pressed", String(settings.fxAntenna));
-    castAnt.hidden = settings.castPolicy !== "antenna";
+    cornerAnt.setAttribute("aria-pressed", String(window.Trk.core.settings.fxAntenna));
+    if (antCheck) { antCheck.lab.hidden = !bgView.allowed; antCheck.inp.checked = window.Trk.core.settings.fxAntenna; antCheck.inp.disabled = !bgView.allowed; }
+    if (antShapeSel) antShapeSel.value = window.Trk.core.settings.fxAntennaShape || "rod";
+    pow.title = tr("dockPower"); pow.setAttribute("aria-label", pow.title); pow.setAttribute("aria-pressed", String(!window.Trk.core.video.muted));
+    ant.title = tr("dockAntenna"); ant.setAttribute("aria-label", ant.title); ant.setAttribute("aria-pressed", String(window.Trk.core.settings.fxAntenna));
+    castAnt.hidden = window.Trk.core.settings.castPolicy !== "antenna";
     castAnt.classList.toggle("selected", castConnected());
     castAnt.title = castConnected() ? tr("dockCastOffDone") : tr("dockCastButton");
     castAnt.setAttribute("aria-label", castAnt.title); castAnt.setAttribute("aria-pressed", String(castConnected()));
     castTxt.textContent = tr("dockCastButton");
     lcd.textContent = flash && Date.now() < flash.until ? flash.text
-      : (video.muted ? tr("dockMute") + " · " : "") + (settings.fxOn ? (nm[settings.fxPreset] || "FX") : tr("dockFxOff")) + (settings.fxAntenna ? " 📡" : "");
+      : (window.Trk.core.video.muted ? tr("dockMute") + " · " : "") + (window.Trk.core.settings.fxOn ? (nm[window.Trk.core.settings.fxPreset] || "FX") : tr("dockFxOff")) + (window.Trk.core.settings.fxAntenna ? " 📡" : "");
     /* ランダム */
     rFx.textContent = tr("dockRandFx"); rFav.textContent = tr("dockRandFav"); rPar.textContent = tr("dockRandParam");
     /* ⭐ ボタン（いまのフォルダの中身。1軍＝これまでの settings.fxFav）と、入りきらないぶん */
     const F = window.TrkFavs;
     const favGroup = F && ["main", "sub", "frozen"].includes(F.activeOf("fx")) ? F.activeOf("fx") : "main";
-    const favAll = F ? F.list("fx", favGroup) : (settings.fxFav || []);
+    const favAll = F ? F.list("fx", favGroup) : (window.Trk.core.settings.fxFav || []);
     const fav = favAll.filter(id => nm[id]), n = slotCount();
     slots.style.setProperty("--cols", slotCols());
     slots.textContent = "";
@@ -934,7 +934,7 @@ addEventListener("DOMContentLoaded", () => {
     }
     if (!fav.length) overflow.append(tx("div", "dockNoFav", "hint"));
     for (const id of rest) {
-      const on = settings.fxOn && settings.fxPreset === id;
+      const on = window.Trk.core.settings.fxOn && window.Trk.core.settings.fxPreset === id;
       const b = btn(on ? "selected" : "", "⭐" + (F && F.pinned("fx", id) ? "📌" : "") + nm[id]);
       b.setAttribute("aria-pressed", String(on));
       b.addEventListener("click", () => { if (on) TrkFX.off(); else TrkFX.select(id); });
@@ -953,12 +953,12 @@ addEventListener("DOMContentLoaded", () => {
     for (const [id, d] of Object.entries(DOCK_SKINS)) {
       const o = document.createElement("option"); o.value = id; o.textContent = `${d.label[lang] || d.label.en}（${d.n}）`; skinSel.append(o);
     }
-    skinSel.value = settings.fxDockSkin;
-    five.inp.checked = settings.fxDockFive; lockChain.inp.checked = settings.fxLockChain;
+    skinSel.value = window.Trk.core.settings.fxDockSkin;
+    five.inp.checked = window.Trk.core.settings.fxDockFive; lockChain.inp.checked = window.Trk.core.settings.fxLockChain;
     for (const [i, r] of mirrors.entries()) {
       r.m.value = r.o.value; if (r.oVal) r.val.textContent = r.oVal.textContent;
-      r.lock.textContent = settings.fxEqLock[i] ? "🔒" : "🔓";
-      r.lock.setAttribute("aria-pressed", String(settings.fxEqLock[i]));
+      r.lock.textContent = window.Trk.core.settings.fxEqLock[i] ? "🔒" : "🔓";
+      r.lock.setAttribute("aria-pressed", String(window.Trk.core.settings.fxEqLock[i]));
     }
   }
 
@@ -975,8 +975,8 @@ addEventListener("DOMContentLoaded", () => {
   const mo = new MutationObserver(update);
   const sel = quick.querySelector("select"); if (sel) mo.observe(sel, { childList:true });
   for (const r of mirrors) if (r.oVal) mo.observe(r.oVal, { childList:true, characterData:true, subtree:true });
-  video.addEventListener("play", () => { if (ms) ms.playbackState = "playing"; msMeta(); wakeAC(); update(); });
-  video.addEventListener("pause", () => { if (ms) ms.playbackState = "paused"; update(); });
+  window.Trk.core.video.addEventListener("play", () => { if (ms) ms.playbackState = "playing"; msMeta(); wakeAC(); update(); });
+  window.Trk.core.video.addEventListener("pause", () => { if (ms) ms.playbackState = "paused"; update(); });
   on("chart", msMeta);
   on("language", update);
   render(true);

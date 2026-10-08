@@ -28,8 +28,11 @@ function warn(message) {
 function ok(message) {
   console.log(`OK    ${message}`);
 }
+/* 名前空間 D：js/ の本文では、領域の接頭辞 window.Trk.<領域>. を取り除いて照合する（同じ束縛の別の書き方）。
+   window.Trk.overlay は取り除かない（書斎・シンスの旗の検査が、その綴りを見る）。 */
 function read(rel) {
-  return fs.readFileSync(path.join(root, rel), "utf8");
+  const text = fs.readFileSync(path.join(root, rel), "utf8");
+  return rel.startsWith("js/") ? text.replace(/window\.Trk\.(?!overlay\b)[A-Za-z]\w*\./g, "") : text;
 }
 
 /* 曲名の照合（js/title-match.js の純関数）＋ plWishMatch（library.js）。
@@ -1647,6 +1650,7 @@ const TRK_REGISTRARS = {
   "js/data.js": "data",
   "js/render.js": "play",
   "js/catch.js": "modes",
+  "js/core.js": "core",
 };
 const TRK_NOT_REGISTERED = { "js/core.js": ["_trkStudyRoomOpen"] }; // 互換の読み取り専用アクセサ（宣言ではない）
 const TRK_EXTRAS = {

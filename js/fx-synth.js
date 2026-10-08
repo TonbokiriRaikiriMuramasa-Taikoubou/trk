@@ -223,11 +223,11 @@ const copy = value => value == null ? value : JSON.parse(JSON.stringify(value));
 addEventListener("DOMContentLoaded", () => {
   /* tv-dock.js moves .dockMore outside #fxDock into .songCol before this runs. */
   const dockMore = document.querySelector(".songCol > details.dockMore") || document.querySelector("#fxDock details.dockMore");
-  const fxPanel = $("fxPanel"), quick = $("fxQuickPanel");
+  const fxPanel = window.Trk.core.$("fxPanel"), quick = window.Trk.core.$("fxQuickPanel");
   if (!dockMore || !fxPanel || !quick || !window.TrkFX) return;
 
   const tx = (tag, key, cls = "") => {
-    const node = el(tag, cls, tr(key));
+    const node = window.Trk.core.el(tag, cls, tr(key));
     node.dataset.i18n = key;
     return node;
   };
@@ -237,24 +237,24 @@ addEventListener("DOMContentLoaded", () => {
     node.dataset.titleKey = key;
     return node;
   };
-  const panel = el("details", "subPanel fxSynth");
+  const panel = window.Trk.core.el("details", "subPanel fxSynth");
   panel.id = "fxSynthPanel";
   const summary = tx("summary", "synthTitle");
   const hint = tx("div", "synthHint", "hint fxSynthHint");
-  const nameLabel = el("label", "field fxSynthName");
+  const nameLabel = window.Trk.core.el("label", "field fxSynthName");
   nameLabel.append(tx("span", "synthName"));
   const nameInput = document.createElement("input");
   nameInput.type = "text"; nameInput.maxLength = 24; nameInput.autocomplete = "off";
   nameLabel.append(nameInput);
-  const master = el("section", "fxSynthMaster");
+  const master = window.Trk.core.el("section", "fxSynthMaster");
   const masterHead = tx("h3", "synthMaster");
   const masterHint = tx("div", "synthMasterHint", "hint fxSynthMasterHint");
-  const masterControls = el("div", "fxSynthParams");
+  const masterControls = window.Trk.core.el("div", "fxSynthParams");
   master.append(masterHead, masterHint, masterControls);
 
-  const topActions = el("div", "miniActions fxSynthActions");
+  const topActions = window.Trk.core.el("div", "miniActions fxSynthActions");
   const loadBtn = tx("button", "synthLoad"); loadBtn.type = "button";
-  const importLabel = el("label", "fileBtn small fxSynthFile");
+  const importLabel = window.Trk.core.el("label", "fileBtn small fxSynthFile");
   const importInput = document.createElement("input");
   importInput.type = "file"; importInput.accept = "application/json,.json"; importInput.hidden = true;
   const importText = tx("span", "synthImport");
@@ -262,19 +262,19 @@ addEventListener("DOMContentLoaded", () => {
   const exportBtn = tx("button", "synthExport"); exportBtn.type = "button";
   topActions.append(loadBtn, importLabel, exportBtn);
 
-  const addRow = el("div", "fxSynthAddRow");
+  const addRow = window.Trk.core.el("div", "fxSynthAddRow");
   const typeSelect = document.createElement("select"); typeSelect.className = "fxSynthTypePicker";
   typeSelect.setAttribute("aria-label", tr("synthEffectType"));
   const addBtn = tx("button", "synthAdd", "fxMini"); addBtn.type = "button";
   addRow.append(typeSelect, addBtn);
   const addHint = tx("div", "synthAddHint", "hint fxSynthAddHint");
-  const chainHost = el("div", "fxSynthChain");
+  const chainHost = window.Trk.core.el("div", "fxSynthChain");
   const footerHint = tx("div", "synthSaveHint", "hint fxSynthSaveHint");
-  const bottomActions = el("div", "miniActions fxSynthActions");
+  const bottomActions = window.Trk.core.el("div", "miniActions fxSynthActions");
   const applyBtn = tx("button", "synthApply", "primary slim"); applyBtn.type = "button";
   const saveBtn = tx("button", "synthSave", "primary slim"); saveBtn.type = "button";
   bottomActions.append(applyBtn, saveBtn);
-  const status = el("div", "hint status fxSynthStatus");
+  const status = window.Trk.core.el("div", "hint status fxSynthStatus");
   panel.append(summary, hint, nameLabel, master, topActions, addRow, addHint, chainHost, footerHint, bottomActions, status);
   const eqAnchor = dockMore.querySelector(".fxDockEq");
   if (eqAnchor) dockMore.insertBefore(panel, eqAnchor);
@@ -282,8 +282,8 @@ addEventListener("DOMContentLoaded", () => {
 
   let synthDraft = {
     name:tr("synthNamePlaceholder"), author:"", url:"", chain:[],
-    eq:Array.isArray(settings.fxEq) ? settings.fxEq.slice() : [0, 0, 0, 0, 0],
-    volume:Number.isFinite(Number(settings.fxVolume)) ? Number(settings.fxVolume) : 0
+    eq:Array.isArray(window.Trk.core.settings.fxEq) ? window.Trk.core.settings.fxEq.slice() : [0, 0, 0, 0, 0],
+    volume:Number.isFinite(Number(window.Trk.core.settings.fxVolume)) ? Number(window.Trk.core.settings.fxVolume) : 0
   };
   let synthDirty = false;
   let currentSignature = "";
@@ -297,9 +297,9 @@ addEventListener("DOMContentLoaded", () => {
   function currentFx() { return TrkFX.current(); }
   function signature() {
     const cur = currentFx();
-    const eq = cur && Array.isArray(cur.eq) ? cur.eq : settings.fxEq;
-    const volume = cur && Number.isFinite(Number(cur.volume)) ? cur.volume : settings.fxVolume;
-    return `${cur ? settings.fxPreset + "|" + cur.name + "|" + JSON.stringify(cur.chain) : "off"}|${JSON.stringify(eq)}|${volume}`;
+    const eq = cur && Array.isArray(cur.eq) ? cur.eq : window.Trk.core.settings.fxEq;
+    const volume = cur && Number.isFinite(Number(cur.volume)) ? cur.volume : window.Trk.core.settings.fxVolume;
+    return `${cur ? window.Trk.core.settings.fxPreset + "|" + cur.name + "|" + JSON.stringify(cur.chain) : "off"}|${JSON.stringify(eq)}|${volume}`;
   }
   function populateCurrent(showMessage) {
     const cur = currentFx();
@@ -307,8 +307,8 @@ addEventListener("DOMContentLoaded", () => {
       name:cur && cur.name ? String(cur.name).slice(0, 24) : tr("synthNamePlaceholder"),
       author:cur && typeof cur.author === "string" ? cur.author : "", url:cur && typeof cur.url === "string" ? cur.url : "",
       chain:cur && Array.isArray(cur.chain) ? copy(cur.chain) : [],
-      eq:cur && Array.isArray(cur.eq) ? cur.eq.slice() : (Array.isArray(settings.fxEq) ? settings.fxEq.slice() : [0, 0, 0, 0, 0]),
-      volume:cur && Number.isFinite(Number(cur.volume)) ? Number(cur.volume) : (Number.isFinite(Number(settings.fxVolume)) ? Number(settings.fxVolume) : 0)
+      eq:cur && Array.isArray(cur.eq) ? cur.eq.slice() : (Array.isArray(window.Trk.core.settings.fxEq) ? window.Trk.core.settings.fxEq.slice() : [0, 0, 0, 0, 0]),
+      volume:cur && Number.isFinite(Number(cur.volume)) ? Number(cur.volume) : (Number.isFinite(Number(window.Trk.core.settings.fxVolume)) ? Number(window.Trk.core.settings.fxVolume) : 0)
     };
     synthDirty = false;
     currentSignature = signature();
@@ -365,10 +365,10 @@ addEventListener("DOMContentLoaded", () => {
     return String(value);
   }
   function makeRangeControl(target, spec, value, idSuffix) {
-    const control = el("div", "fxSynthControl");
+    const control = window.Trk.core.el("div", "fxSynthControl");
     const label = tx("span", spec.label, "fxSynthControlLabel");
-    const dial = el("div", "fxSynthDial");
-    const readout = el("span", "fxSynthDialValue");
+    const dial = window.Trk.core.el("div", "fxSynthDial");
+    const readout = window.Trk.core.el("span", "fxSynthDialValue");
     dial.append(readout);
     const slider = document.createElement("input");
     slider.type = "range"; slider.className = "fxSynthRange";
@@ -395,7 +395,7 @@ addEventListener("DOMContentLoaded", () => {
     return control;
   }
   function makeChoice(target, key, options, current, labelKey, cls = "") {
-    const field = el("label", "field fxSynthChoice " + cls);
+    const field = window.Trk.core.el("label", "field fxSynthChoice " + cls);
     field.append(tx("span", labelKey));
     const select = document.createElement("select");
     fillSelect(select, options, current);
@@ -417,11 +417,11 @@ addEventListener("DOMContentLoaded", () => {
 
   function renderEqEffect(effect, index, host) {
     const bands = Array.isArray(effect.bands) ? effect.bands : (effect.bands = []);
-    const bandHost = el("div", "fxSynthBands");
+    const bandHost = window.Trk.core.el("div", "fxSynthBands");
     bands.forEach((band, bandIndex) => {
-      const bandCard = el("section", "fxSynthBand");
-      const head = el("div", "fxSynthBandHead");
-      const bandTitle = el("strong", "", tr("synthEqBand", { n:bandIndex + 1 }));
+      const bandCard = window.Trk.core.el("section", "fxSynthBand");
+      const head = window.Trk.core.el("div", "fxSynthBandHead");
+      const bandTitle = window.Trk.core.el("strong", "", tr("synthEqBand", { n:bandIndex + 1 }));
       const remove = iconButton("×", "synthRemoveBand", () => {
         if (effect.bands.length <= 1) return;
         effect.bands.splice(bandIndex, 1); markDirty(); renderChain();
@@ -429,7 +429,7 @@ addEventListener("DOMContentLoaded", () => {
       remove.disabled = bands.length <= 1;
       head.append(bandTitle, remove);
       const choice = makeChoice(band, "type", BIQUAD_TYPES, band.type, "synthFilterLabel", "fxSynthBandType");
-      const params = el("div", "fxSynthParams");
+      const params = window.Trk.core.el("div", "fxSynthParams");
       params.append(
         makeRangeControl(band, p("freq", 20, 20000, 1, "freq", true), band.freq, `eq-${index}-${bandIndex}-freq`),
         makeRangeControl(band, p("gain", -24, 24, .5, "db"), band.gain, `eq-${index}-${bandIndex}-gain`),
@@ -450,10 +450,10 @@ addEventListener("DOMContentLoaded", () => {
   }
 
   function renderEffect(effect, index) {
-    const card = el("article", "fxSynthEffect");
+    const card = window.Trk.core.el("article", "fxSynthEffect");
     card.dataset.type = effect.type;
-    const head = el("div", "fxSynthEffectHead");
-    const stepLabel = el("span", "fxSynthStep", tr("synthStep", { n:index + 1 }));
+    const head = window.Trk.core.el("div", "fxSynthEffectHead");
+    const stepLabel = window.Trk.core.el("span", "fxSynthStep", tr("synthStep", { n:index + 1 }));
     const effectSelect = document.createElement("select"); effectSelect.className = "fxSynthEffectType";
     fillSelect(effectSelect, FX_TYPES, effect.type);
     effectSelect.setAttribute("aria-label", tr("synthEffectType"));
@@ -462,7 +462,7 @@ addEventListener("DOMContentLoaded", () => {
       if (!next) return;
       synthDraft.chain[index] = next; markDirty(); renderChain();
     });
-    const tools = el("div", "fxSynthEffectTools");
+    const tools = window.Trk.core.el("div", "fxSynthEffectTools");
     const up = iconButton("↑", "synthMoveUp", () => {
       if (!index) return;
       [synthDraft.chain[index - 1], synthDraft.chain[index]] = [synthDraft.chain[index], synthDraft.chain[index - 1]];
@@ -478,10 +478,10 @@ addEventListener("DOMContentLoaded", () => {
     up.disabled = index === 0; down.disabled = index === synthDraft.chain.length - 1;
     tools.append(up, down, remove);
     head.append(stepLabel, effectSelect, tools);
-    const content = el("div", "fxSynthEffectBody");
+    const content = window.Trk.core.el("div", "fxSynthEffectBody");
     if (effect.type === "eq") renderEqEffect(effect, index, content);
     else {
-      const params = el("div", "fxSynthParams");
+      const params = window.Trk.core.el("div", "fxSynthParams");
       for (const spec of PARAMS[effect.type] || []) {
         if (typeof effect[spec.key] !== "number") continue;
         params.append(makeRangeControl(effect, spec, effect[spec.key], `${index}-${spec.key}`));
@@ -507,7 +507,7 @@ addEventListener("DOMContentLoaded", () => {
   function cleanDraft() {
     const checked = TrkFX.clean({
       format:"trk-fx", version:1, name:synthDraft.name, author:synthDraft.author, url:synthDraft.url, chain:synthDraft.chain,
-      eq:Array.isArray(synthDraft.eq) ? synthDraft.eq : settings.fxEq,
+      eq:Array.isArray(synthDraft.eq) ? synthDraft.eq : window.Trk.core.settings.fxEq,
       volume:synthDraft.volume
     });
     if (!checked) return null;
@@ -525,7 +525,7 @@ addEventListener("DOMContentLoaded", () => {
     const payload = cleanDraft();
     if (!payload) { setStatus("synthApplyFailed"); return false; }
     const result = TrkFX.apply(payload);
-    if (result == null || !settings.fxOn) { setStatus("synthApplyFailed"); return false; }
+    if (result == null || !window.Trk.core.settings.fxOn) { setStatus("synthApplyFailed"); return false; }
     populateCurrent(false);
     setStatus("synthApplied");
     return true;
@@ -540,7 +540,7 @@ addEventListener("DOMContentLoaded", () => {
     jsonEditor.value = JSON.stringify(current, null, 2);
     /* Reuse fx.js's own validator and storePreset path instead of duplicating persistence. */
     saveAction.click();
-    if (typeof settings.fxPreset === "string" && settings.fxPreset.startsWith("my_")) {
+    if (typeof window.Trk.core.settings.fxPreset === "string" && window.Trk.core.settings.fxPreset.startsWith("my_")) {
       populateCurrent(false);
       setStatus("synthSaved");
     } else {
@@ -550,7 +550,7 @@ addEventListener("DOMContentLoaded", () => {
   function exportDraft() {
     const output = currentExport();
     if (!output) { setStatus("synthApplyFailed"); return; }
-    downloadJSON(output, `${safeName(output.name)}.trk-fx.json`);
+    window.Trk.core.downloadJSON(output, `${window.Trk.core.safeName(output.name)}.trk-fx.json`);
     setStatus("synthExported");
   }
   async function importDraft(file) {
@@ -562,8 +562,8 @@ addEventListener("DOMContentLoaded", () => {
     if (!checked) { setStatus("synthBad"); return; }
     synthDraft = {
       name:checked.name || tr("synthNamePlaceholder"), author:checked.author || "", url:checked.url || "", chain:copy(checked.chain || []),
-      eq:Array.isArray(checked.eq) ? checked.eq.slice() : (Array.isArray(settings.fxEq) ? settings.fxEq.slice() : [0, 0, 0, 0, 0]),
-      volume:Number.isFinite(Number(checked.volume)) ? Number(checked.volume) : (Number.isFinite(Number(settings.fxVolume)) ? Number(settings.fxVolume) : 0)
+      eq:Array.isArray(checked.eq) ? checked.eq.slice() : (Array.isArray(window.Trk.core.settings.fxEq) ? window.Trk.core.settings.fxEq.slice() : [0, 0, 0, 0, 0]),
+      volume:Number.isFinite(Number(checked.volume)) ? Number(checked.volume) : (Number.isFinite(Number(window.Trk.core.settings.fxVolume)) ? Number(window.Trk.core.settings.fxVolume) : 0)
     };
     synthDirty = true;
     nameInput.value = synthDraft.name;
@@ -610,7 +610,7 @@ addEventListener("DOMContentLoaded", () => {
     const observer = new MutationObserver(() => syncFromCurrent());
     observer.observe(presetSelect, { childList:true });
   }
-  on("language", () => {
+  window.Trk.core.on("language", () => {
     summary.textContent = tr("synthTitle");
     hint.textContent = tr("synthHint");
     nameLabel.querySelector("[data-i18n='synthName']").textContent = tr("synthName");
@@ -623,7 +623,7 @@ addEventListener("DOMContentLoaded", () => {
     renderMaster(); renderChain();
     if (statusInfo) status.textContent = tr(statusInfo.key, statusInfo.vars);
   });
-  on("chart", syncFromCurrent);
+  window.Trk.core.on("chart", syncFromCurrent);
 });
 })();
 /* ✅ fx-synth.js 完了 */

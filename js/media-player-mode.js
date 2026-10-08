@@ -105,11 +105,11 @@ Object.assign(TEXT.ko, {
 });
 
 const HOLD_MS = 650;
-if (!Array.isArray(settings.videoKeys) || settings.videoKeys.length !== VIDEO_KEY_DEFAULTS.length || settings.videoKeys.some(k => !validCode(k)) || new Set(settings.videoKeys).size !== VIDEO_KEY_DEFAULTS.length) settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();
+if (!Array.isArray(window.Trk.core.settings.videoKeys) || window.Trk.core.settings.videoKeys.length !== window.Trk.core.VIDEO_KEY_DEFAULTS.length || window.Trk.core.settings.videoKeys.some(k => !window.Trk.core.validCode(k)) || new Set(window.Trk.core.settings.videoKeys).size !== window.Trk.core.VIDEO_KEY_DEFAULTS.length) window.Trk.core.settings.videoKeys = window.Trk.core.VIDEO_KEY_DEFAULTS.slice();
 let overlay, dialog, powerButton;
 let mediaOpen = false, holdTimer = 0, longPressed = false;
-let repeatMode = settings.mediaRepeat || "off", shuffle = !!settings.mediaShuffle;
-let mediaRate = Number(settings.mediaRate) || 1, sleepTimer = 0, sleepUntil = 0, tickTimer = 0;
+let repeatMode = window.Trk.core.settings.mediaRepeat || "off", shuffle = !!window.Trk.core.settings.mediaShuffle;
+let mediaRate = Number(window.Trk.core.settings.mediaRate) || 1, sleepTimer = 0, sleepUntil = 0, tickTimer = 0;
 let seeking = false, queueFilter = "", videoBinding = null;
 let reverseActive = false, reverseLoading = false, reverseTimer = 0, reverseSource = null, reverseGain = null;
 let reverseBuffer = null, reverseBufferKey = "", reverseVideoMuted = false, reverseStartAt = 0, reverseClockAt = 0;
@@ -131,18 +131,18 @@ const MEDIA_POS_KEY = "trk_media_positions_v1", MEDIA_LOOP_KEY = "trk_media_loop
 let mediaPositions = {}, mediaLoopPresets = {};
 try { mediaPositions = JSON.parse(localStorage.getItem(MEDIA_POS_KEY)) || {}; } catch (_) { mediaPositions = {}; }
 try { mediaLoopPresets = JSON.parse(localStorage.getItem(MEDIA_LOOP_KEY)) || {}; } catch (_) { mediaLoopPresets = {}; }
-function mediaLoopStoreKey() { return (currentSong && currentSong.key) || fingerprint || ""; }
+function mediaLoopStoreKey() { return (window.Trk.core.currentSong && window.Trk.core.currentSong.key) || window.Trk.core.fingerprint || ""; }
 function storedMediaLoops() { const list = mediaLoopPresets[mediaLoopStoreKey()]; return Array.isArray(list) ? list.filter(x => x && Number.isFinite(x.a) && Number.isFinite(x.b) && x.b > x.a).slice(0, 8) : []; }
 function saveMediaLoopStore() { try { localStorage.setItem(MEDIA_LOOP_KEY, JSON.stringify(mediaLoopPresets)); } catch (_) {} }
-function mediaPositionKey() { return fingerprint || (currentSong && currentSong.key) || ""; }
+function mediaPositionKey() { return window.Trk.core.fingerprint || (window.Trk.core.currentSong && window.Trk.core.currentSong.key) || ""; }
 function savedMediaPosition() {
   const p = Number(mediaPositions[mediaPositionKey()]);
-  return Number.isFinite(p) && p > 5 && video.duration > p + 5 ? p : 0;
+  return Number.isFinite(p) && p > 5 && window.Trk.core.video.duration > p + 5 ? p : 0;
 }
 function saveMediaPosition(clear = false) {
-  const key = mediaPositionKey(); if (!key || !videoReady) return;
-  if (clear || video.ended || !Number.isFinite(video.currentTime) || video.currentTime < 5 || video.currentTime >= (video.duration || Infinity) - 5) delete mediaPositions[key];
-  else mediaPositions[key] = Math.round(video.currentTime * 10) / 10;
+  const key = mediaPositionKey(); if (!key || !window.Trk.core.videoReady) return;
+  if (clear || window.Trk.core.video.ended || !Number.isFinite(window.Trk.core.video.currentTime) || window.Trk.core.video.currentTime < 5 || window.Trk.core.video.currentTime >= (window.Trk.core.video.duration || Infinity) - 5) delete mediaPositions[key];
+  else mediaPositions[key] = Math.round(window.Trk.core.video.currentTime * 10) / 10;
   try { localStorage.setItem(MEDIA_POS_KEY, JSON.stringify(mediaPositions)); } catch (_) {}
 }
 function loopHasRange() { return Number.isFinite(loopA) && Number.isFinite(loopB) && loopB > loopA; }
@@ -152,8 +152,8 @@ function loopStatusText() {
   return loopActive ? tr("mediaLoopRange", { a:mpFmt(loopA), b:mpFmt(loopB) }) : tr("mediaLoop", {});
 }
 function setMediaLoopRange(a, b, active = true) {
-  if (!videoReady || !Number.isFinite(video.duration) || video.duration <= 0) return false;
-  const duration = video.duration;
+  if (!window.Trk.core.videoReady || !Number.isFinite(window.Trk.core.video.duration) || window.Trk.core.video.duration <= 0) return false;
+  const duration = window.Trk.core.video.duration;
   loopA = Math.max(0, Math.min(duration, Number(a) || 0));
   loopB = Math.max(0, Math.min(duration, Number(b) || loopA + .1));
   if (loopB - loopA < .1) {
@@ -161,19 +161,19 @@ function setMediaLoopRange(a, b, active = true) {
     else loopB = Math.min(duration, loopA + .1);
   }
   loopActive = loopB > loopA && active; loopKeyDown = false;
-  try { video.currentTime = loopA; } catch (_) {}
+  try { window.Trk.core.video.currentTime = loopA; } catch (_) {}
   renderLoopUI(); return loopHasRange();
 }
 function setQuickMediaLoop(seconds) {
-  if (!videoReady || !Number.isFinite(video.duration)) return;
-  const len = Math.min(Number(seconds) || 5, video.duration), cur = Math.max(0, video.currentTime || 0);
-  const start = Math.max(0, Math.min(cur, video.duration - len));
+  if (!window.Trk.core.videoReady || !Number.isFinite(window.Trk.core.video.duration)) return;
+  const len = Math.min(Number(seconds) || 5, window.Trk.core.video.duration), cur = Math.max(0, window.Trk.core.video.currentTime || 0);
+  const start = Math.max(0, Math.min(cur, window.Trk.core.video.duration - len));
   setMediaLoopRange(start, start + len, true);
 }
 function setRandomMediaLoop() {
-  if (!videoReady || !Number.isFinite(video.duration)) return;
-  const len = Math.min(video.duration, 4 + Math.floor(Math.random() * 9));
-  const start = Math.random() * Math.max(0, video.duration - len);
+  if (!window.Trk.core.videoReady || !Number.isFinite(window.Trk.core.video.duration)) return;
+  const len = Math.min(window.Trk.core.video.duration, 4 + Math.floor(Math.random() * 9));
+  const start = Math.random() * Math.max(0, window.Trk.core.video.duration - len);
   setMediaLoopRange(start, start + len, true);
 }
 function saveMediaLoopPreset() {
@@ -212,12 +212,12 @@ function renderLoopPresets() {
     syncLoopPresetSelection(); return;
   }
   loopPresetRenderKey = key; loopPresetRenderSig = sig; loopPresetListNode.textContent = "";
-  if (!list.length) loopPresetListNode.append(el("span", "hint", tr("mediaLoopNoPresets")));
+  if (!list.length) loopPresetListNode.append(window.Trk.core.el("span", "hint", tr("mediaLoopNoPresets")));
   else list.forEach((x, i) => {
-    const row = el("div", "mediaLoopPresetRow");
-    const b = el("button", "mediaLoopPreset", `${mpFmt(x.a)} – ${mpFmt(x.b)}`); b.type = "button"; b.title = tr("mediaLoopRange", { a:mpFmt(x.a), b:mpFmt(x.b) });
+    const row = window.Trk.core.el("div", "mediaLoopPresetRow");
+    const b = window.Trk.core.el("button", "mediaLoopPreset", `${mpFmt(x.a)} – ${mpFmt(x.b)}`); b.type = "button"; b.title = tr("mediaLoopRange", { a:mpFmt(x.a), b:mpFmt(x.b) });
     b.addEventListener("click", () => setMediaLoopRange(x.a, x.b, true));
-    const del = el("button", "mediaLoopPresetDelete", "×"); del.type = "button"; del.title = tr("mediaLoopDelete"); del.setAttribute("aria-label", tr("mediaLoopDelete")); del.addEventListener("click", () => deleteMediaLoopPreset(i));
+    const del = window.Trk.core.el("button", "mediaLoopPresetDelete", "×"); del.type = "button"; del.title = tr("mediaLoopDelete"); del.setAttribute("aria-label", tr("mediaLoopDelete")); del.addEventListener("click", () => deleteMediaLoopPreset(i));
     row.append(b, del); loopPresetListNode.append(row);
   });
   if (loopSaveNode) loopSaveNode.disabled = !loopHasRange();
@@ -226,11 +226,11 @@ function renderLoopPresets() {
 }
 function renderLoopUI() {
   if (loopStatusNode) loopStatusNode.textContent = loopStatusText();
-  if (loopSetANode) loopSetANode.disabled = !videoReady;
-  if (loopSetBNode) loopSetBNode.disabled = !videoReady || !Number.isFinite(loopA);
+  if (loopSetANode) loopSetANode.disabled = !window.Trk.core.videoReady;
+  if (loopSetBNode) loopSetBNode.disabled = !window.Trk.core.videoReady || !Number.isFinite(loopA);
   if (loopClearNode) loopClearNode.disabled = !Number.isFinite(loopA);
-  loopQuickNodes.forEach(n => { n.disabled = !videoReady; });
-  if (loopModeNode) loopModeNode.value = settings.mediaLoopTrigger || "toggle";
+  loopQuickNodes.forEach(n => { n.disabled = !window.Trk.core.videoReady; });
+  if (loopModeNode) loopModeNode.value = window.Trk.core.settings.mediaLoopTrigger || "toggle";
   renderLoopPresets();
 }
 function clearMediaLoop(silent = false) {
@@ -239,20 +239,20 @@ function clearMediaLoop(silent = false) {
   renderLoopUI();
 }
 function setMediaLoopPoint(which) {
-  if (!videoReady || !Number.isFinite(video.duration)) return;
-  const t = Math.max(0, Math.min(video.duration, video.currentTime || 0));
+  if (!window.Trk.core.videoReady || !Number.isFinite(window.Trk.core.video.duration)) return;
+  const t = Math.max(0, Math.min(window.Trk.core.video.duration, window.Trk.core.video.currentTime || 0));
   if (which === "a") {
     loopA = t; loopB = null; loopActive = false;
   } else if (Number.isFinite(loopA)) {
     if (Math.abs(t - loopA) < .1) return;
     if (t < loopA) [loopA, loopB] = [t, loopA]; else loopB = t;
     loopActive = true;
-    if (settings.mediaLoopTrigger === "hold") loopActive = false;
+    if (window.Trk.core.settings.mediaLoopTrigger === "hold") loopActive = false;
   }
   renderLoopUI();
 }
 function cycleMediaLoop() {
-  if (!videoReady) return;
+  if (!window.Trk.core.videoReady) return;
   if (!Number.isFinite(loopA)) setMediaLoopPoint("a");
   else if (!Number.isFinite(loopB)) setMediaLoopPoint("b");
   else clearMediaLoop();
@@ -263,7 +263,7 @@ function activateHeldLoop() {
   loopActive = true; loopKeyDown = true; renderLoopUI();
 }
 function releaseHeldLoop() {
-  if (settings.mediaLoopTrigger === "hold" && loopKeyDown) { loopActive = false; loopKeyDown = false; renderLoopUI(); }
+  if (window.Trk.core.settings.mediaLoopTrigger === "hold" && loopKeyDown) { loopActive = false; loopKeyDown = false; renderLoopUI(); }
 }
 function stopReverseAudio() {
   if (reverseSource) { reverseSource.onended = null; try { reverseSource.stop(); } catch (_) {} reverseSource = null; }
@@ -273,16 +273,16 @@ function stopReverse(resume = false, silent = true) {
   if (!reverseActive && !reverseLoading) return;
   reverseActive = false; reverseLoading = false; clearInterval(reverseTimer); reverseTimer = 0;
   stopReverseAudio();
-  video.muted = reverseVideoMuted; video.playbackRate = mediaRate;
-  if (resume && videoReady) video.play().catch(() => {});
+  window.Trk.core.video.muted = reverseVideoMuted; window.Trk.core.video.playbackRate = mediaRate;
+  if (resume && window.Trk.core.videoReady) window.Trk.core.video.play().catch(() => {});
   if (!silent && typeof showToast === "function") window.Trk.play.showToast(tr("mediaForward"));
   renderMedia();
 }
 async function reverseAudioForCurrentSong() {
-  const key = (currentSong && currentSong.key) || mediaPositionKey();
+  const key = (window.Trk.core.currentSong && window.Trk.core.currentSong.key) || mediaPositionKey();
   if (reverseBuffer && reverseBufferKey === key) return reverseBuffer;
-  if (!currentSong || !currentSong.file || typeof decodeAudio !== "function" || typeof getAC !== "function") throw new Error("reverse audio unavailable");
-  const decoded = await window.Trk.media.decodeAudio(await currentSong.file.arrayBuffer());
+  if (!window.Trk.core.currentSong || !window.Trk.core.currentSong.file || typeof decodeAudio !== "function" || typeof getAC !== "function") throw new Error("reverse audio unavailable");
+  const decoded = await window.Trk.media.decodeAudio(await window.Trk.core.currentSong.file.arrayBuffer());
   const ac = window.Trk.media.getAC(); if (!ac) throw new Error("audio context unavailable");
   const reversed = ac.createBuffer(decoded.numberOfChannels, decoded.length, decoded.sampleRate);
   for (let ch = 0; ch < decoded.numberOfChannels; ch++) {
@@ -298,33 +298,33 @@ function reverseClockSeconds() {
 }
 let reverseHasAudio = false, reverseBoundaryBusy = false;
 function reverseTick() {
-  if (!reverseActive || reverseLoading || !videoReady) return;
+  if (!reverseActive || reverseLoading || !window.Trk.core.videoReady) return;
   const elapsed = Math.max(0, reverseClockSeconds() - reverseClockAt) * Math.abs(mediaRate || 1);
   const t = reverseStartAt - elapsed;
   if (loopActive && loopHasRange() && t <= loopA) {
     if (reverseBoundaryBusy) return;
     reverseBoundaryBusy = true;
-    video.currentTime = loopB;
+    window.Trk.core.video.currentTime = loopB;
     startReverseAt(loopB, true).finally(() => { reverseBoundaryBusy = false; });
     return;
   }
   if (t <= .02) {
-    video.currentTime = 0; stopReverse(false, true);
+    window.Trk.core.video.currentTime = 0; stopReverse(false, true);
     if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaReverseDone"));
     return;
   }
-  try { video.currentTime = t; } catch (_) {}
+  try { window.Trk.core.video.currentTime = t; } catch (_) {}
   renderMedia();
 }
 async function startReverseAt(position, restart = false) {
-  if (!videoReady || !Number.isFinite(video.duration) || video.duration <= 0) return;
+  if (!window.Trk.core.videoReady || !Number.isFinite(window.Trk.core.video.duration) || window.Trk.core.video.duration <= 0) return;
   if (reverseLoading && !restart) return;
-  if (!reverseActive) { reverseVideoMuted = !!video.muted; reverseActive = true; }
+  if (!reverseActive) { reverseVideoMuted = !!window.Trk.core.video.muted; reverseActive = true; }
   reverseLoading = true; clearInterval(reverseTimer); reverseTimer = 0; stopReverseAudio();
-  video.pause(); video.muted = true;
-  let start = Math.max(0, Math.min(video.duration, Number(position) || 0));
-  if (!restart && start <= .02) start = video.duration;
-  try { video.currentTime = start; } catch (_) {}
+  window.Trk.core.video.pause(); window.Trk.core.video.muted = true;
+  let start = Math.max(0, Math.min(window.Trk.core.video.duration, Number(position) || 0));
+  if (!restart && start <= .02) start = window.Trk.core.video.duration;
+  try { window.Trk.core.video.currentTime = start; } catch (_) {}
   if (typeof showToast === "function" && !restart) window.Trk.play.showToast(tr("mediaReverseLoading"));
   let buffer = null;
   try { const gestureAC = typeof getAC === "function" ? window.Trk.media.getAC() : null; if (gestureAC && gestureAC.state === "suspended") gestureAC.resume().catch(() => {}); } catch (_) {}
@@ -332,7 +332,7 @@ async function startReverseAt(position, restart = false) {
     reverseBuffer = null; reverseBufferKey = "";
     if (typeof showToast === "function" && !restart) window.Trk.play.showToast(tr("mediaReverseUnavailable"));
   }
-  if (!reverseActive || !videoReady) return;
+  if (!reverseActive || !window.Trk.core.videoReady) return;
   reverseHasAudio = false;
   const ac = buffer && typeof getAC === "function" ? window.Trk.media.getAC() : null;
   if (buffer && ac) {
@@ -340,9 +340,9 @@ async function startReverseAt(position, restart = false) {
       if (ac.state === "suspended") await ac.resume();
       const src = ac.createBufferSource(), gain = ac.createGain();
       src.buffer = buffer; src.playbackRate.value = Math.max(.05, Math.abs(mediaRate || 1));
-      gain.gain.value = reverseVideoMuted ? 0 : Math.max(0, Math.min(1, Number(settings.musicVolume) || 0));
+      gain.gain.value = reverseVideoMuted ? 0 : Math.max(0, Math.min(1, Number(window.Trk.core.settings.musicVolume) || 0));
       src.connect(gain); gain.connect(ac.destination);
-      const offset = Math.max(0, Math.min(buffer.duration - .001, buffer.duration * (1 - start / video.duration)));
+      const offset = Math.max(0, Math.min(buffer.duration - .001, buffer.duration * (1 - start / window.Trk.core.video.duration)));
       reverseSource = src; reverseGain = gain; reverseHasAudio = true;
       src.onended = () => { if (reverseActive && reverseSource === src) reverseTick(); };
       src.start(0, offset);
@@ -353,29 +353,29 @@ async function startReverseAt(position, restart = false) {
   renderMedia();
 }
 function toggleReverse() {
-  if (!mediaActive() || !videoReady) return;
+  if (!mediaActive() || !window.Trk.core.videoReady) return;
   if (reverseActive || reverseLoading) stopReverse(true, false);
-  else startReverseAt(video.currentTime || 0);
+  else startReverseAt(window.Trk.core.video.currentTime || 0);
 }
 function checkMediaLoop() {
-  if (!mediaActive() || !loopActive || !loopHasRange() || !videoReady || reverseActive || video.paused) return;
-  if ((video.currentTime || 0) >= loopB - .02) {
-    try { video.currentTime = loopA; } catch (_) {}
+  if (!mediaActive() || !loopActive || !loopHasRange() || !window.Trk.core.videoReady || reverseActive || window.Trk.core.video.paused) return;
+  if ((window.Trk.core.video.currentTime || 0) >= loopB - .02) {
+    try { window.Trk.core.video.currentTime = loopA; } catch (_) {}
   }
 }
 function renderWall() {
   if (!wallOverlay) return;
-  const configuredStyle = settings.mediaWallStyle || "midnight";
+  const configuredStyle = window.Trk.core.settings.mediaWallStyle || "midnight";
   const style = configuredStyle === "custom" && !wallCustomURL ? "midnight" : configuredStyle;
   wallOverlay.dataset.style = style;
   wallOverlay.style.backgroundImage = configuredStyle === "custom" && wallCustomURL ? `url("${wallCustomURL}")` : "";
-  if (wallClockNode) wallClockNode.hidden = !settings.mediaWallClock;
-  if (wallDateNode) wallDateNode.hidden = !settings.mediaWallClock;
+  if (wallClockNode) wallClockNode.hidden = !window.Trk.core.settings.mediaWallClock;
+  if (wallDateNode) wallDateNode.hidden = !window.Trk.core.settings.mediaWallClock;
   if (wallDateNode) {
     const now = new Date();
     try {
-      wallClockNode.textContent = now.toLocaleTimeString(settings.language || undefined, { hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false });
-      wallDateNode.textContent = now.toLocaleDateString(settings.language || undefined, { weekday:"short", year:"numeric", month:"short", day:"numeric" });
+      wallClockNode.textContent = now.toLocaleTimeString(window.Trk.core.settings.language || undefined, { hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false });
+      wallDateNode.textContent = now.toLocaleDateString(window.Trk.core.settings.language || undefined, { weekday:"short", year:"numeric", month:"short", day:"numeric" });
     } catch (_) { wallClockNode.textContent = now.toLocaleTimeString(); wallDateNode.textContent = now.toLocaleDateString(); }
   }
   if (wallNode) { wallNode.textContent = tr(wallActive ? "mediaWallHide" : "mediaWallShow"); wallNode.dataset.i18n = wallActive ? "mediaWallHide" : "mediaWallShow"; wallNode.setAttribute("aria-pressed", String(wallActive)); }
@@ -384,8 +384,8 @@ function activateWall() {
   if (!mediaActive() || wallActive) return;
   if (window.TrkVideoMax && window.TrkVideoMax.isOpen()) window.TrkVideoMax.close();   /* 🖥 壁紙の上に残さない */
   wallActive = true; wallKeyDown = false;
-  wallWasPlaying = !!(reverseActive || reverseLoading || (videoReady && !video.paused && !video.ended));
-  if (settings.mediaWallStopsVideo) { stopReverse(false, true); video.pause(); }
+  wallWasPlaying = !!(reverseActive || reverseLoading || (window.Trk.core.videoReady && !window.Trk.core.video.paused && !window.Trk.core.video.ended));
+  if (window.Trk.core.settings.mediaWallStopsVideo) { stopReverse(false, true); window.Trk.core.video.pause(); }
   wallOverlay.hidden = false; document.body.classList.add("mediaWallOpen");
   clearInterval(wallTimer); wallTimer = setInterval(renderWall, 1000); renderWall();
 }
@@ -393,9 +393,9 @@ function deactivateWall(resume = true) {
   if (!wallActive) return;
   wallActive = false; wallKeyDown = false; clearInterval(wallTimer); wallTimer = 0;
   wallOverlay.hidden = true; document.body.classList.remove("mediaWallOpen");
-  const shouldResume = resume && settings.mediaWallStopsVideo && wallWasPlaying && videoReady && !document.hidden;
+  const shouldResume = resume && window.Trk.core.settings.mediaWallStopsVideo && wallWasPlaying && window.Trk.core.videoReady && !document.hidden;
   wallWasPlaying = false;
-  if (shouldResume) video.play().catch(() => {});
+  if (shouldResume) window.Trk.core.video.play().catch(() => {});
   renderMedia();
 }
 function toggleWall() {
@@ -404,11 +404,11 @@ function toggleWall() {
 }
 function videoAction(action) {
   if (action === 0 || action === 1) {
-    settings.videoZoom = Math.max(.5, Math.min(3, (Number(settings.videoZoom) || 1) + (action === 0 ? .1 : -.1)));
-    const z = document.getElementById("videoZoom"); if (z) z.value = settings.videoZoom;
-    const zv = document.getElementById("videoZoomVal"); if (zv) zv.textContent = settings.videoZoom.toFixed(1) + "x";
-    saveUserPrefs();
-    if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaVideoToastZoom", { n:settings.videoZoom.toFixed(1) }));
+    window.Trk.core.settings.videoZoom = Math.max(.5, Math.min(3, (Number(window.Trk.core.settings.videoZoom) || 1) + (action === 0 ? .1 : -.1)));
+    const z = document.getElementById("videoZoom"); if (z) z.value = window.Trk.core.settings.videoZoom;
+    const zv = document.getElementById("videoZoomVal"); if (zv) zv.textContent = window.Trk.core.settings.videoZoom.toFixed(1) + "x";
+    window.Trk.core.saveUserPrefs();
+    if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaVideoToastZoom", { n:window.Trk.core.settings.videoZoom.toFixed(1) }));
     return;
   }
   if (!mediaActive()) return;
@@ -418,34 +418,34 @@ function videoAction(action) {
     if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaVideoToastRate", { n:next.toFixed(2) }));
   } else if (action === 4) playPause();
   else if (action === REVERSE_KEY_INDEX) toggleReverse();
-  else if (action === LOOP_KEY_INDEX) settings.mediaLoopTrigger === "hold" ? activateHeldLoop() : cycleMediaLoop();
-  else if (action === WALL_KEY_INDEX) settings.mediaWallTrigger === "hold" ? (activateWall(), wallKeyDown = true) : toggleWall();
+  else if (action === LOOP_KEY_INDEX) window.Trk.core.settings.mediaLoopTrigger === "hold" ? activateHeldLoop() : cycleMediaLoop();
+  else if (action === WALL_KEY_INDEX) window.Trk.core.settings.mediaWallTrigger === "hold" ? (activateWall(), wallKeyDown = true) : toggleWall();
 }
 function syncMediaExitUI() {
   const value = document.getElementById("mediaExitKeyValue"), button = document.getElementById("mediaExitKeyAssign"), check = document.getElementById("mediaExitConfirmCheck");
-  if (value) value.textContent = formatKey(settings.mediaExitKey);
+  if (value) value.textContent = window.Trk.core.formatKey(window.Trk.core.settings.mediaExitKey);
   if (button) button.classList.toggle("listening", mediaExitBinding !== null);
-  if (check) check.checked = settings.mediaExitConfirm !== false;
+  if (check) check.checked = window.Trk.core.settings.mediaExitConfirm !== false;
 }
 function captureMediaExitKey(code) {
   if (mediaExitBinding === null) return;
   if (code === "Escape") { mediaExitBinding = null; syncMediaExitUI(); return; }
-  const used = [...(settings.videoKeys || []), settings.menuKey, settings.mediaExitKey, "Space", "ArrowLeft", "ArrowRight", "KeyN", "KeyP"];
-  if (VIDEO_KEY_BAD.includes(code) || (used.includes(code) && code !== settings.mediaExitKey)) return;
-  settings.mediaExitKey = code; mediaExitBinding = null; saveUserPrefs(); syncMediaExitUI();
+  const used = [...(window.Trk.core.settings.videoKeys || []), window.Trk.core.settings.menuKey, window.Trk.core.settings.mediaExitKey, "Space", "ArrowLeft", "ArrowRight", "KeyN", "KeyP"];
+  if (VIDEO_KEY_BAD.includes(code) || (used.includes(code) && code !== window.Trk.core.settings.mediaExitKey)) return;
+  window.Trk.core.settings.mediaExitKey = code; mediaExitBinding = null; window.Trk.core.saveUserPrefs(); syncMediaExitUI();
 }
 function requestMediaExit() {
   const go = () => closeMedia();
-  if (settings.mediaExitConfirm === false || typeof confirm !== "function" || confirm(tr("mediaExitConfirm"))) go();
+  if (window.Trk.core.settings.mediaExitConfirm === false || typeof confirm !== "function" || confirm(tr("mediaExitConfirm"))) go();
 }
 function captureVideoKey(code) {
   const i = videoBinding;
   if (code === "Escape") { videoBinding = null; syncVideoKeysUI(); return; }
-  if (VIDEO_KEY_BAD.includes(code) || ((settings.videoKeys || []).includes(code) && settings.videoKeys[i] !== code)) {
+  if (VIDEO_KEY_BAD.includes(code) || ((window.Trk.core.settings.videoKeys || []).includes(code) && window.Trk.core.settings.videoKeys[i] !== code)) {
     if (typeof showToast === "function") window.Trk.play.showToast(tr("reservedKey"));
     return;
   }
-  settings.videoKeys[i] = code; videoBinding = null; saveUserPrefs(); syncVideoKeysUI();
+  window.Trk.core.settings.videoKeys[i] = code; videoBinding = null; window.Trk.core.saveUserPrefs(); syncVideoKeysUI();
 }
 let syncVideoKeysUI = () => {};
 
@@ -462,20 +462,20 @@ function currentList() {
 }
 function setRate(value) {
   mediaRate = Number(value) || 1;
-  settings.mediaRate = mediaRate;
-  if (video) video.playbackRate = mediaRate;
-  saveUserPrefs();
-  if (reverseActive && !reverseLoading) startReverseAt(video.currentTime || 0, true);
+  window.Trk.core.settings.mediaRate = mediaRate;
+  if (window.Trk.core.video) window.Trk.core.video.playbackRate = mediaRate;
+  window.Trk.core.saveUserPrefs();
+  if (reverseActive && !reverseLoading) startReverseAt(window.Trk.core.video.currentTime || 0, true);
 }
 function setRepeat(value) {
   repeatMode = ["off", "one", "all"].includes(value) ? value : "off";
-  settings.mediaRepeat = repeatMode;
-  saveUserPrefs(); renderMedia();
+  window.Trk.core.settings.mediaRepeat = repeatMode;
+  window.Trk.core.saveUserPrefs(); renderMedia();
 }
 function setShuffle(value) {
   shuffle = !!value;
-  settings.mediaShuffle = shuffle;
-  saveUserPrefs(); renderMedia();
+  window.Trk.core.settings.mediaShuffle = shuffle;
+  window.Trk.core.saveUserPrefs(); renderMedia();
 }
 function stopSleepTimer(silent = true) {
   clearTimeout(sleepTimer); sleepTimer = 0; sleepUntil = 0;
@@ -488,7 +488,7 @@ function setSleep(minutes) {
     sleepUntil = Date.now() + n * 60000;
     sleepTimer = setTimeout(() => {
       sleepTimer = 0; sleepUntil = 0;
-      video.pause();
+      window.Trk.core.video.pause();
       if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaSleepDone"));
       renderMedia();
     }, n * 60000);
@@ -500,7 +500,7 @@ function mediaCandidates() {
   const list = mpSongs();
   if (!list.length) return [];
   if (shuffle) {
-    const cur = currentSong && currentSong.key;
+    const cur = window.Trk.core.currentSong && window.Trk.core.currentSong.key;
     const other = list.filter(x => x.key !== cur);
     return other.length ? other : list;
   }
@@ -509,37 +509,37 @@ function mediaCandidates() {
 function nextMediaSong(dir = 1) {
   const list = mediaCandidates(); if (!list.length) return null;
   if (shuffle) return list[Math.floor(Math.random() * list.length)];
-  const i = currentSong ? list.findIndex(x => x.key === currentSong.key) : -1;
+  const i = window.Trk.core.currentSong ? list.findIndex(x => x.key === window.Trk.core.currentSong.key) : -1;
   return list[(i + dir + list.length) % list.length];
 }
 async function playSong(it, fromStart = true) {
   if (!it || typeof selectSong !== "function") return;
   if (reverseActive || reverseLoading) stopReverse(false, true);
   clearMediaLoop(true);
-  if (phase !== "title") {
+  if (window.Trk.core.phase !== "title") {
     if (typeof toTitle === "function") window.Trk.play.toTitle();
     else return;
   }
   window._trkMediaPlayerMode = true;
-  if (!currentSong || currentSong.key !== it.key) {
+  if (!window.Trk.core.currentSong || window.Trk.core.currentSong.key !== it.key) {
     saveMediaPosition();
     await window.Trk.library.selectSong(it);
-  } else if (!videoReady) {
+  } else if (!window.Trk.core.videoReady) {
     await window.Trk.library.selectSong(it);
   }
-  if (!mediaActive() || currentSong !== it || !videoReady) { renderMedia(); return; }
-  if (fromStart) { try { video.currentTime = savedMediaPosition(); } catch (_) {} }
-  video.muted = false; video.volume = settings.musicVolume; setRate(mediaRate);
-  try { await video.play(); } catch (_) { showMediaStatus("mediaLoadFailed"); }
+  if (!mediaActive() || window.Trk.core.currentSong !== it || !window.Trk.core.videoReady) { renderMedia(); return; }
+  if (fromStart) { try { window.Trk.core.video.currentTime = savedMediaPosition(); } catch (_) {} }
+  window.Trk.core.video.muted = false; window.Trk.core.video.volume = window.Trk.core.settings.musicVolume; setRate(mediaRate);
+  try { await window.Trk.core.video.play(); } catch (_) { showMediaStatus("mediaLoadFailed"); }
   renderMedia(); updateMediaSession();
 }
 function playPause() {
-  if (!videoReady) return;
+  if (!window.Trk.core.videoReady) return;
   if (reverseActive || reverseLoading) { stopReverse(true, false); renderMedia(); return; }
-  if (video.paused || video.ended) {
-    if (video.ended) { try { video.currentTime = 0; } catch (_) {} }
-    video.muted = false; video.volume = settings.musicVolume; video.play().catch(() => showMediaStatus("mediaLoadFailed"));
-  } else video.pause();
+  if (window.Trk.core.video.paused || window.Trk.core.video.ended) {
+    if (window.Trk.core.video.ended) { try { window.Trk.core.video.currentTime = 0; } catch (_) {} }
+    window.Trk.core.video.muted = false; window.Trk.core.video.volume = window.Trk.core.settings.musicVolume; window.Trk.core.video.play().catch(() => showMediaStatus("mediaLoadFailed"));
+  } else window.Trk.core.video.pause();
   renderMedia();
 }
 async function stepMedia(dir) {
@@ -548,9 +548,9 @@ async function stepMedia(dir) {
   else showMediaStatus("mediaNoSongs");
 }
 function seekBy(delta) {
-  if (!videoReady || !Number.isFinite(video.duration)) return;
+  if (!window.Trk.core.videoReady || !Number.isFinite(window.Trk.core.video.duration)) return;
   if (reverseActive || reverseLoading) stopReverse(false, true);
-  video.currentTime = Math.max(0, Math.min(video.duration, (video.currentTime || 0) + delta));
+  window.Trk.core.video.currentTime = Math.max(0, Math.min(window.Trk.core.video.duration, (window.Trk.core.video.currentTime || 0) + delta));
   renderMedia();
 }
 function showMediaStatus(key, vars) {
@@ -560,7 +560,7 @@ function showMediaStatus(key, vars) {
 }
 function endedMedia() {
   if (!mediaActive()) return;
-  if (repeatMode === "one") { saveMediaPosition(true); try { video.currentTime = 0; } catch (_) {} video.play().catch(() => {}); }
+  if (repeatMode === "one") { saveMediaPosition(true); try { window.Trk.core.video.currentTime = 0; } catch (_) {} window.Trk.core.video.play().catch(() => {}); }
   else if (repeatMode === "all" || shuffle) stepMedia(1);
   else saveMediaPosition(true);
   renderMedia(); updateMediaSession();
@@ -568,13 +568,13 @@ function endedMedia() {
 function updateMediaSession() {
   const ms = navigator.mediaSession;
   if (!ms) return;
-  const s = currentSong || {};
+  const s = window.Trk.core.currentSong || {};
   if (typeof MediaMetadata !== "undefined" && s) {
-    try { ms.metadata = new MediaMetadata({ title:s.title || baseName(mediaName) || "trk!", artist:s.artist || "trk!", album:s.packName || "trk!", artwork:[{ src:"icons/icon-512.png", sizes:"512x512", type:"image/png" }] }); } catch (_) {}
+    try { ms.metadata = new MediaMetadata({ title:s.title || window.Trk.core.baseName(window.Trk.core.mediaName) || "trk!", artist:s.artist || "trk!", album:s.packName || "trk!", artwork:[{ src:"icons/icon-512.png", sizes:"512x512", type:"image/png" }] }); } catch (_) {}
   }
   try {
-    if (videoReady && Number.isFinite(video.duration) && video.duration > 0 && typeof ms.setPositionState === "function") {
-      ms.setPositionState({ duration:video.duration, playbackRate:video.playbackRate || 1, position:Math.max(0, Math.min(video.duration, video.currentTime || 0)) });
+    if (window.Trk.core.videoReady && Number.isFinite(window.Trk.core.video.duration) && window.Trk.core.video.duration > 0 && typeof ms.setPositionState === "function") {
+      ms.setPositionState({ duration:window.Trk.core.video.duration, playbackRate:window.Trk.core.video.playbackRate || 1, position:Math.max(0, Math.min(window.Trk.core.video.duration, window.Trk.core.video.currentTime || 0)) });
     }
   } catch (_) {}
 }
@@ -582,29 +582,29 @@ async function sessionSong(dir) {
   const pick = dir > 0 ? window.Trk.library.nextSong : window.Trk.library.prevSong;
   if (typeof pick !== "function" || typeof selectSong !== "function") return;
   const it = pick(); if (!it) return;
-  if (phase !== "title" && typeof toTitle === "function") window.Trk.play.toTitle();
+  if (window.Trk.core.phase !== "title" && typeof toTitle === "function") window.Trk.play.toTitle();
   await window.Trk.library.selectSong(it);
-  if (settings.autoPlay && phase === "title" && videoReady && chart.length && currentSong === it && typeof startGame === "function") window.Trk.play.startGame();
+  if (window.Trk.core.settings.autoPlay && window.Trk.core.phase === "title" && window.Trk.core.videoReady && window.Trk.core.chart.length && window.Trk.core.currentSong === it && typeof startGame === "function") window.Trk.play.startGame();
 }
 function installMediaSession() {
   const ms = navigator.mediaSession; if (!ms) return;
   const act = (name, fn) => { try { ms.setActionHandler(name, fn); } catch (_) {} };
-  act("play", () => mediaActive() ? playPause() : (phase === "paused" ? window.Trk.play.resumeGame() : video.play().catch(() => {})));
-  act("pause", () => mediaActive() ? playPause() : (phase === "playing" ? window.Trk.play.pauseGame() : video.pause()));
+  act("play", () => mediaActive() ? playPause() : (window.Trk.core.phase === "paused" ? window.Trk.play.resumeGame() : window.Trk.core.video.play().catch(() => {})));
+  act("pause", () => mediaActive() ? playPause() : (window.Trk.core.phase === "playing" ? window.Trk.play.pauseGame() : window.Trk.core.video.pause()));
   act("previoustrack", () => mediaActive() ? stepMedia(-1) : sessionSong(-1));
   act("nexttrack", () => mediaActive() ? stepMedia(1) : sessionSong(1));
   act("seekbackward", d => seekBy(-(d && d.seekOffset || 10)));
   act("seekforward", d => seekBy(d && d.seekOffset || 10));
-  act("seekto", d => { if (Number.isFinite(d && d.seekTime) && videoReady) { if (reverseActive || reverseLoading) stopReverse(false, true); video.currentTime = Math.max(0, Math.min(video.duration || 0, d.seekTime)); } });
+  act("seekto", d => { if (Number.isFinite(d && d.seekTime) && window.Trk.core.videoReady) { if (reverseActive || reverseLoading) stopReverse(false, true); window.Trk.core.video.currentTime = Math.max(0, Math.min(window.Trk.core.video.duration || 0, d.seekTime)); } });
 }
 
 let statusNode, queueNode, progressNode, playNode, timeNode, titleNode, subNode, volumeNode, muteNode, shuffleNode, repeatNode, rateNode, sleepNode, searchNode;
 let reverseNode, loopStatusNode, loopSetANode, loopSetBNode, loopClearNode, loopModeNode, loopPresetListNode, loopSaveNode, loopClearPresetsNode;
 let loopPresetRenderKey = null, loopPresetRenderSig = null, loopQuickNodes = [];
-function tx(tag, key, cls) { const n = el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; }
-function makeButton(key, cls = "mediaSmallBtn") { const b = el("button", cls, tr(key)); b.type = "button"; b.dataset.i18n = key; return b; }
+function tx(tag, key, cls) { const n = window.Trk.core.el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; }
+function makeButton(key, cls = "mediaSmallBtn") { const b = window.Trk.core.el("button", cls, tr(key)); b.type = "button"; b.dataset.i18n = key; return b; }
 function updateTrackText() {
-  const s = currentSong;
+  const s = window.Trk.core.currentSong;
   titleNode.textContent = s ? s.title : tr("mediaNoTrack");
   subNode.textContent = s ? [s.artist, s.packName, srcLabelSafe(s)].filter(Boolean).join(" · ") : tr("mediaModeStatus");
   titleNode.dataset.i18n = s ? "" : "mediaNoTrack";
@@ -617,28 +617,28 @@ function renderQueue() {
   if (!queueNode) return;
   queueNode.textContent = "";
   const all = currentList();
-  if (!all.length) { queueNode.append(el("div", "mediaEmpty", tr(mpSongs().length ? "mediaNoMatch" : "mediaNoSongs"))); return; }
+  if (!all.length) { queueNode.append(window.Trk.core.el("div", "mediaEmpty", tr(mpSongs().length ? "mediaNoMatch" : "mediaNoSongs"))); return; }
   for (const it of all.slice(0, 300)) {
-    const b = el("button", "mediaQueueItem" + (currentSong && currentSong.key === it.key ? " selected" : ""));
+    const b = window.Trk.core.el("button", "mediaQueueItem" + (window.Trk.core.currentSong && window.Trk.core.currentSong.key === it.key ? " selected" : ""));
     b.type = "button"; b.dataset.key = it.key;
-    const name = el("strong", "mediaQueueName", it.title || "song");
-    const meta = el("span", "mediaQueueMeta", [it.artist, srcLabelSafe(it)].filter(Boolean).join(" · "));
+    const name = window.Trk.core.el("strong", "mediaQueueName", it.title || "song");
+    const meta = window.Trk.core.el("span", "mediaQueueMeta", [it.artist, srcLabelSafe(it)].filter(Boolean).join(" · "));
     b.append(name, meta);
     b.addEventListener("click", () => playSong(it, true));
     queueNode.append(b);
   }
-  if (all.length > 300) queueNode.append(el("div", "hint", `+ ${all.length - 300}`));
+  if (all.length > 300) queueNode.append(window.Trk.core.el("div", "hint", `+ ${all.length - 300}`));
 }
 /* ================= ✨ フレーム補完（js/frame-interp.js） =================
    ・設定は区間ループのすぐ上。効果は上の映像エリアで見られます。
    ・重い処理なので、表示しているときだけ取り込みを動かします。 */
-const interpStrengthValue = () => Math.max(0, Math.min(1, Number(settings.frameInterpStrength)));
-function hasVideoFrames() { return !!(videoReady && video && video.videoWidth > 0); }
+const interpStrengthValue = () => Math.max(0, Math.min(1, Number(window.Trk.core.settings.frameInterpStrength)));
+function hasVideoFrames() { return !!(window.Trk.core.videoReady && window.Trk.core.video && window.Trk.core.video.videoWidth > 0); }
 function renderInterp() {
   const FI = window.TrkFrameInterp;
   if (!interpBox) return;
   const supported = !!(FI && FI.supported());
-  const m = settings.frameInterp || "off";
+  const m = window.Trk.core.settings.frameInterp || "off";
   if (interpModeNode) {
     interpModeNode.value = m;
     interpModeNode.disabled = !supported;
@@ -670,14 +670,14 @@ function drawMediaStage() {
   if (!w || !h) return;
   let drew = false;
   const FI = window.TrkFrameInterp;
-  if (FI && settings.frameInterp !== "off") { try { drew = FI.drawTo(stageCtx, w, h); } catch (_) { drew = false; } }
+  if (FI && window.Trk.core.settings.frameInterp !== "off") { try { drew = FI.drawTo(stageCtx, w, h); } catch (_) { drew = false; } }
   if (!drew) {
     stageCtx.fillStyle = "#000";
     stageCtx.fillRect(0, 0, w, h);
     if (hasVideoFrames()) {
-      const s = Math.min(w / video.videoWidth, h / video.videoHeight);
-      const dw = video.videoWidth * s, dh = video.videoHeight * s;
-      stageCtx.drawImage(video, (w - dw) / 2, (h - dh) / 2, dw, dh);
+      const s = Math.min(w / window.Trk.core.video.videoWidth, h / window.Trk.core.video.videoHeight);
+      const dw = window.Trk.core.video.videoWidth * s, dh = window.Trk.core.video.videoHeight * s;
+      stageCtx.drawImage(window.Trk.core.video, (w - dw) / 2, (h - dh) / 2, dw, dh);
     }
   }
 }
@@ -701,7 +701,7 @@ function syncMediaStage() {
   stageWrap.hidden = !show;
   stageCanvas.hidden = !frames;                 // 映像が無い曲では注記だけ出す
   if (show && frames) {
-    if (FI && settings.frameInterp !== "off") FI.attach("media", stageCanvas);
+    if (FI && window.Trk.core.settings.frameInterp !== "off") FI.attach("media", stageCanvas);
     if (!stageRaf) stageRaf = requestAnimationFrame(mediaStageTick);
   } else {
     if (FI) FI.detach("media");
@@ -713,15 +713,15 @@ function syncMediaStage() {
 function renderMedia() {
   if (!mediaOpen || !overlay) return;
   updateTrackText();
-  const ready = !!(videoReady && currentSong);
-  const cur = ready ? (video.currentTime || 0) : 0, dur = ready && Number.isFinite(video.duration) ? video.duration : 0;
+  const ready = !!(window.Trk.core.videoReady && window.Trk.core.currentSong);
+  const cur = ready ? (window.Trk.core.video.currentTime || 0) : 0, dur = ready && Number.isFinite(window.Trk.core.video.duration) ? window.Trk.core.video.duration : 0;
   if (progressNode) {
     progressNode.max = String(dur || 1); progressNode.value = String(Math.min(cur, dur || 0)); progressNode.disabled = !ready;
     progressNode.setAttribute("aria-valuetext", `${mpFmt(cur)} / ${mpFmt(dur)}`);
   }
   if (timeNode) timeNode.textContent = `${mpFmt(cur)} / ${mpFmt(dur)}`;
   if (playNode) {
-    const playKey = reverseActive || reverseLoading ? "mediaForward" : (video.ended ? "mediaRestart" : (video.paused || !ready ? "mediaPlay" : "mediaPause"));
+    const playKey = reverseActive || reverseLoading ? "mediaForward" : (window.Trk.core.video.ended ? "mediaRestart" : (window.Trk.core.video.paused || !ready ? "mediaPlay" : "mediaPause"));
     playNode.textContent = tr(playKey); playNode.dataset.i18n = playKey;
   }
   if (reverseNode) { reverseNode.textContent = tr(reverseActive || reverseLoading ? "mediaForward" : "mediaReverseStart"); reverseNode.dataset.i18n = reverseActive || reverseLoading ? "mediaForward" : "mediaReverseStart"; reverseNode.disabled = !ready; reverseNode.classList.toggle("selected", reverseActive || reverseLoading); reverseNode.setAttribute("aria-pressed", String(reverseActive || reverseLoading)); }
@@ -733,14 +733,14 @@ function renderMedia() {
     maxNode.classList.toggle("selected", maxOn);
     maxNode.setAttribute("aria-pressed", String(maxOn));
   }
-  if (volumeNode) volumeNode.value = String(settings.musicVolume);
-  if (muteNode) { const isMuted = reverseActive || reverseLoading ? reverseVideoMuted : video.muted; muteNode.textContent = isMuted ? tr("mediaUnmute") : tr("mediaMute"); muteNode.dataset.i18n = isMuted ? "mediaUnmute" : "mediaMute"; }
+  if (volumeNode) volumeNode.value = String(window.Trk.core.settings.musicVolume);
+  if (muteNode) { const isMuted = reverseActive || reverseLoading ? reverseVideoMuted : window.Trk.core.video.muted; muteNode.textContent = isMuted ? tr("mediaUnmute") : tr("mediaMute"); muteNode.dataset.i18n = isMuted ? "mediaUnmute" : "mediaMute"; }
   if (shuffleNode) { shuffleNode.classList.toggle("selected", shuffle); shuffleNode.setAttribute("aria-pressed", String(shuffle)); }
   if (repeatNode) { repeatNode.value = repeatMode; }
   if (rateNode) rateNode.value = String(mediaRate);
   if (sleepNode) sleepNode.value = sleepUntil ? String(Math.max(1, Math.round((sleepUntil - Date.now()) / 60000))) : "0";
   if (statusNode) {
-    const statusKey = reverseLoading ? "mediaReverseLoading" : reverseActive ? "mediaReverse" : videoReady && currentSong ? (video.ended ? "mediaEnded" : video.paused ? "mediaPaused" : "mediaNow") : "mediaNoTrack";
+    const statusKey = reverseLoading ? "mediaReverseLoading" : reverseActive ? "mediaReverse" : window.Trk.core.videoReady && window.Trk.core.currentSong ? (window.Trk.core.video.ended ? "mediaEnded" : window.Trk.core.video.paused ? "mediaPaused" : "mediaNow") : "mediaNoTrack";
     statusNode.textContent = tr(statusKey); statusNode.dataset.i18n = "";
   }
   renderLoopUI();
@@ -757,12 +757,12 @@ function closeMedia(restore = true) {
   mediaOpen = false; window.Trk.overlay.set("media", false); window._trkMediaPlayerMode = false;
   clearInterval(tickTimer); tickTimer = 0; stopSleepTimer(true); seeking = false;
   clearInterval(loopTimer); loopTimer = 0; stopReverse(false, true); clearMediaLoop(true);
-  saveMediaPosition(); video.pause(); video.playbackRate = 1;
+  saveMediaPosition(); window.Trk.core.video.pause(); window.Trk.core.video.playbackRate = 1;
   if (stageRaf) { cancelAnimationFrame(stageRaf); stageRaf = 0; }
   if (window.TrkFrameInterp) window.TrkFrameInterp.detach("media");
   if (stageWrap) stageWrap.hidden = true;
   overlay.hidden = true; document.body.classList.remove("mediaOpen");
-  if (restore && phase === "title" && settings.previewEnabled && typeof startPreview === "function") setTimeout(window.Trk.library.startPreview, 50);
+  if (restore && window.Trk.core.phase === "title" && window.Trk.core.settings.previewEnabled && typeof startPreview === "function") setTimeout(window.Trk.library.startPreview, 50);
   if (powerButton) powerButton.focus();
 }
 function openMedia() {
@@ -770,8 +770,8 @@ function openMedia() {
   if (window.Trk.overlay.is("synth") && typeof window._trkCloseSynth === "function") window._trkCloseSynth();
   mediaOpen = true; window.Trk.overlay.set("media", true); window._trkMediaPlayerMode = true;
   overlay.hidden = false; document.body.classList.add("mediaOpen");
-  if (videoReady) { video.muted = false; video.volume = settings.musicVolume; setRate(mediaRate); }
-  if (currentSong && videoReady) { try { video.currentTime = savedMediaPosition(); } catch (_) {} }
+  if (window.Trk.core.videoReady) { window.Trk.core.video.muted = false; window.Trk.core.video.volume = window.Trk.core.settings.musicVolume; setRate(mediaRate); }
+  if (window.Trk.core.currentSong && window.Trk.core.videoReady) { try { window.Trk.core.video.currentTime = savedMediaPosition(); } catch (_) {} }
   tickTimer = setInterval(renderMedia, 250); loopTimer = setInterval(checkMediaLoop, 40);
   renderMedia(); updateMediaSession(); syncMediaStage();
   const focus = playNode || closeNode; if (focus) focus.focus();
@@ -780,28 +780,28 @@ let closeNode;
 function buildMedia() {
   powerButton = document.querySelector("#tvDock .tvPow");
   if (!powerButton) return false;
-  overlay = el("div", "instOverlay mediaOverlay"); overlay.id = "mediaPlayerMode"; overlay.hidden = true;
-  const backdrop = el("div", "instBackdrop");
-  dialog = el("section", "instDialog mediaDialog"); dialog.setAttribute("role", "dialog"); dialog.setAttribute("aria-modal", "true"); dialog.setAttribute("aria-labelledby", "mediaTitle");
-  const header = el("header", "instHeader mediaHeader");
-  const hwrap = el("div"); const h = tx("h2", "mediaTitle"); h.id = "mediaTitle";
+  overlay = window.Trk.core.el("div", "instOverlay mediaOverlay"); overlay.id = "mediaPlayerMode"; overlay.hidden = true;
+  const backdrop = window.Trk.core.el("div", "instBackdrop");
+  dialog = window.Trk.core.el("section", "instDialog mediaDialog"); dialog.setAttribute("role", "dialog"); dialog.setAttribute("aria-modal", "true"); dialog.setAttribute("aria-labelledby", "mediaTitle");
+  const header = window.Trk.core.el("header", "instHeader mediaHeader");
+  const hwrap = window.Trk.core.el("div"); const h = tx("h2", "mediaTitle"); h.id = "mediaTitle";
   hwrap.append(h, tx("p", "mediaSubtitle", "instSubtitle"));
   closeNode = makeButton("mediaClose", "instClose"); closeNode.addEventListener("click", () => closeMedia());
   header.append(hwrap, closeNode);
 
-  const display = el("div", "mediaDisplay");
-  titleNode = el("strong", "mediaDisplayTitle", tr("mediaNoTrack"));
-  subNode = el("span", "mediaDisplaySub", tr("mediaModeStatus"));
-  statusNode = el("span", "mediaStatus", tr("mediaPaused"));
+  const display = window.Trk.core.el("div", "mediaDisplay");
+  titleNode = window.Trk.core.el("strong", "mediaDisplayTitle", tr("mediaNoTrack"));
+  subNode = window.Trk.core.el("span", "mediaDisplaySub", tr("mediaModeStatus"));
+  statusNode = window.Trk.core.el("span", "mediaStatus", tr("mediaPaused"));
   display.append(titleNode, subNode, statusNode);
 
   /* ✨ 映像エリア（フレーム補完の効果をここで見られます） */
-  stageWrap = el("div", "mediaStage"); stageWrap.hidden = true;
+  stageWrap = window.Trk.core.el("div", "mediaStage"); stageWrap.hidden = true;
   stageCanvas = document.createElement("canvas"); stageCanvas.className = "mediaStageCanvas"; stageCanvas.hidden = true;
-  stageNote = el("div", "mediaStageNote hint", tr("mediaStageNoVideo")); stageNote.dataset.i18n = "mediaStageNoVideo";
+  stageNote = window.Trk.core.el("div", "mediaStageNote hint", tr("mediaStageNoVideo")); stageNote.dataset.i18n = "mediaStageNoVideo";
   stageWrap.append(stageCanvas, stageNote);
 
-  const controls = el("div", "mediaControls");
+  const controls = window.Trk.core.el("div", "mediaControls");
   const prev = makeButton("mediaPrev", "mediaControlBtn");
   playNode = makeButton("mediaPlay", "mediaControlBtn mediaPlayBtn");
   const next = makeButton("mediaNext", "mediaControlBtn");
@@ -811,99 +811,99 @@ function buildMedia() {
   wallNode = makeButton("mediaWallShow", "mediaSmallBtn");
   const restart = makeButton("mediaRestart", "mediaSmallBtn");
   prev.addEventListener("click", () => stepMedia(-1)); playNode.addEventListener("click", playPause); next.addEventListener("click", () => stepMedia(1)); reverseNode.addEventListener("click", toggleReverse); wallNode.addEventListener("click", toggleWall);
-  restart.addEventListener("click", () => { if (videoReady) { if (reverseActive || reverseLoading) stopReverse(false, true); saveMediaPosition(true); video.currentTime = 0; video.play().catch(() => {}); } });
+  restart.addEventListener("click", () => { if (window.Trk.core.videoReady) { if (reverseActive || reverseLoading) stopReverse(false, true); saveMediaPosition(true); window.Trk.core.video.currentTime = 0; window.Trk.core.video.play().catch(() => {}); } });
   maxNode.addEventListener("click", () => { if (window.TrkVideoMax) window.TrkVideoMax.toggle(); });
   if (window.TrkVideoMax) window.TrkVideoMax.onChange(() => renderMedia());
   controls.append(prev, playNode, next, reverseNode, maxNode, wallNode, restart);
 
-  const progressRow = el("div", "mediaProgressRow");
+  const progressRow = window.Trk.core.el("div", "mediaProgressRow");
   progressNode = document.createElement("input"); progressNode.type = "range"; progressNode.min = "0"; progressNode.step = "0.1"; progressNode.value = "0"; progressNode.className = "mediaProgress"; progressNode.setAttribute("aria-label", tr("mediaSeek"));
-  timeNode = el("span", "mono mediaTime", "0:00 / 0:00");
+  timeNode = window.Trk.core.el("span", "mono mediaTime", "0:00 / 0:00");
   progressRow.append(progressNode, timeNode);
   progressNode.addEventListener("pointerdown", () => { seeking = true; });
   progressNode.addEventListener("pointerup", () => { seeking = false; });
-  progressNode.addEventListener("input", () => { if (videoReady && video.duration) { if (reverseActive || reverseLoading) stopReverse(false, true); video.currentTime = Number(progressNode.value); timeNode.textContent = `${mpFmt(video.currentTime)} / ${mpFmt(video.duration)}`; } });
+  progressNode.addEventListener("input", () => { if (window.Trk.core.videoReady && window.Trk.core.video.duration) { if (reverseActive || reverseLoading) stopReverse(false, true); window.Trk.core.video.currentTime = Number(progressNode.value); timeNode.textContent = `${mpFmt(window.Trk.core.video.currentTime)} / ${mpFmt(window.Trk.core.video.duration)}`; } });
 
   /* ✨ フレーム補完の設定（区間ループのすぐ上） */
   const FI = window.TrkFrameInterp;
-  interpBox = el("section", "mediaInterpBox");
+  interpBox = window.Trk.core.el("section", "mediaInterpBox");
   const fiHead = tx("h3", "mediaInterpTitle");
-  const fiRow = el("label", "mediaOption mediaInterpRow");
+  const fiRow = window.Trk.core.el("label", "mediaOption mediaInterpRow");
   fiRow.append(tx("span", "mediaInterpMode"));
   interpModeNode = document.createElement("select");
   for (const [value, key] of [["off", "mediaInterpOff"], ["blend", "mediaInterpBlend"], ["flow", "mediaInterpFlow"]]) {
     const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); interpModeNode.append(o);
   }
   fiRow.append(interpModeNode);
-  const fiStrengthRow = el("label", "mediaOption mediaInterpRow");
+  const fiStrengthRow = window.Trk.core.el("label", "mediaOption mediaInterpRow");
   fiStrengthRow.append(tx("span", "mediaInterpStrength"));
   interpStrengthNode = document.createElement("input");
   interpStrengthNode.type = "range"; interpStrengthNode.min = "0"; interpStrengthNode.max = "1"; interpStrengthNode.step = "0.05";
-  interpStrengthVal = el("span", "mono");
+  interpStrengthVal = window.Trk.core.el("span", "mono");
   fiStrengthRow.append(interpStrengthNode, interpStrengthVal);
-  interpStatusNode = el("div", "hint mediaInterpStatus", "");
+  interpStatusNode = window.Trk.core.el("div", "hint mediaInterpStatus", "");
   interpHintNode = tx("p", "mediaInterpHint", "hint");
   interpUnsupported = tx("p", "mediaInterpUnsupported", "hint status");
   interpUnsupported.hidden = true;
   interpBox.append(fiHead, fiRow, fiStrengthRow, interpStatusNode, interpHintNode, interpUnsupported);
   interpModeNode.addEventListener("change", () => { if (FI) FI.setMode(interpModeNode.value); renderInterp(); renderMedia(); });
   interpStrengthNode.addEventListener("input", () => {
-    settings.frameInterpStrength = Number(interpStrengthNode.value);
-    interpStrengthVal.textContent = Math.round(settings.frameInterpStrength * 100) + "%";
-    saveUserPrefs();
+    window.Trk.core.settings.frameInterpStrength = Number(interpStrengthNode.value);
+    interpStrengthVal.textContent = Math.round(window.Trk.core.settings.frameInterpStrength * 100) + "%";
+    window.Trk.core.saveUserPrefs();
   });
   if (FI) FI.onChange(renderInterp);
 
-  const loopBox = el("section", "mediaLoopBox");
+  const loopBox = window.Trk.core.el("section", "mediaLoopBox");
   const loopHeading = tx("h3", "mediaLoop");
-  loopStatusNode = el("div", "hint", tr("mediaLoopNone"));
+  loopStatusNode = window.Trk.core.el("div", "hint", tr("mediaLoopNone"));
   const loopHint = tx("p", "mediaLoopHint", "hint");
-  const loopButtons = el("div", "miniActions");
+  const loopButtons = window.Trk.core.el("div", "miniActions");
   loopSetANode = makeButton("mediaLoopSetA"); loopSetBNode = makeButton("mediaLoopSetB"); loopClearNode = makeButton("mediaLoopClear");
   loopSetANode.addEventListener("click", () => setMediaLoopPoint("a")); loopSetBNode.addEventListener("click", () => setMediaLoopPoint("b")); loopClearNode.addEventListener("click", () => clearMediaLoop());
   loopButtons.append(loopSetANode, loopSetBNode, loopClearNode);
-  const loopModeLabel = el("label", "mediaOption"); loopModeLabel.append(tx("span", "mediaLoopMode"));
+  const loopModeLabel = window.Trk.core.el("label", "mediaOption"); loopModeLabel.append(tx("span", "mediaLoopMode"));
   loopModeNode = document.createElement("select");
   for (const [value, key] of [["toggle", "mediaLoopToggle"], ["hold", "mediaLoopHold"]]) { const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); loopModeNode.append(o); }
-  loopModeLabel.append(loopModeNode); loopModeNode.addEventListener("change", () => { settings.mediaLoopTrigger = loopModeNode.value; saveUserPrefs(); if (settings.mediaLoopTrigger !== "hold") loopActive = loopHasRange(); renderLoopUI(); });
+  loopModeLabel.append(loopModeNode); loopModeNode.addEventListener("change", () => { window.Trk.core.settings.mediaLoopTrigger = loopModeNode.value; window.Trk.core.saveUserPrefs(); if (window.Trk.core.settings.mediaLoopTrigger !== "hold") loopActive = loopHasRange(); renderLoopUI(); });
   const loopLabHeading = tx("h4", "mediaLoopLabTitle");
   const loopQuickHint = tx("p", "mediaLoopQuickHint", "hint");
-  const loopQuickButtons = el("div", "miniActions"); loopQuickNodes = [];
+  const loopQuickButtons = window.Trk.core.el("div", "miniActions"); loopQuickNodes = [];
   for (const [seconds, key] of [[5, "mediaLoopQuick5"], [10, "mediaLoopQuick10"], [20, "mediaLoopQuick20"]]) { const b = makeButton(key, "mediaSmallBtn"); b.addEventListener("click", () => setQuickMediaLoop(seconds)); loopQuickButtons.append(b); loopQuickNodes.push(b); }
   const randomLoop = makeButton("mediaLoopRandom", "mediaSmallBtn"); randomLoop.addEventListener("click", setRandomMediaLoop); loopQuickButtons.append(randomLoop); loopQuickNodes.push(randomLoop);
-  const loopSaveRow = el("div", "miniActions"); loopSaveNode = makeButton("mediaLoopSave", "mediaSmallBtn"); loopSaveNode.addEventListener("click", saveMediaLoopPreset); loopClearPresetsNode = makeButton("mediaLoopClearPresets", "mediaSmallBtn"); loopClearPresetsNode.addEventListener("click", clearMediaLoopPresets); loopSaveRow.append(loopSaveNode, loopClearPresetsNode);
-  const loopPresetHeading = tx("div", "mediaLoopPresets", "mediaLoopPresetHeading"); loopPresetListNode = el("div", "mediaLoopPresetList");
+  const loopSaveRow = window.Trk.core.el("div", "miniActions"); loopSaveNode = makeButton("mediaLoopSave", "mediaSmallBtn"); loopSaveNode.addEventListener("click", saveMediaLoopPreset); loopClearPresetsNode = makeButton("mediaLoopClearPresets", "mediaSmallBtn"); loopClearPresetsNode.addEventListener("click", clearMediaLoopPresets); loopSaveRow.append(loopSaveNode, loopClearPresetsNode);
+  const loopPresetHeading = tx("div", "mediaLoopPresets", "mediaLoopPresetHeading"); loopPresetListNode = window.Trk.core.el("div", "mediaLoopPresetList");
   loopBox.append(loopHeading, loopStatusNode, loopHint, loopButtons, loopModeLabel, loopLabHeading, loopQuickHint, loopQuickButtons, loopSaveRow, loopPresetHeading, loopPresetListNode);
 
-  const options = el("div", "mediaOptions");
-  const volumeRow = el("label", "mediaOption mediaVolumeRow"); volumeRow.append(tx("span", "mediaVolume"));
+  const options = window.Trk.core.el("div", "mediaOptions");
+  const volumeRow = window.Trk.core.el("label", "mediaOption mediaVolumeRow"); volumeRow.append(tx("span", "mediaVolume"));
   volumeNode = document.createElement("input"); volumeNode.type = "range"; volumeNode.min = "0"; volumeNode.max = "1"; volumeNode.step = "0.01"; volumeRow.append(volumeNode);
-  volumeNode.addEventListener("input", () => { settings.musicVolume = Number(volumeNode.value); if (settings.musicVolume > 0) rememberMusicVolume(settings.musicVolume); video.volume = settings.musicVolume; if (reverseGain) reverseGain.gain.value = settings.musicVolume; saveUserPrefs(); });
-  muteNode = makeButton("mediaMute", "mediaSmallBtn"); muteNode.addEventListener("click", () => { if (reverseActive || reverseLoading) { reverseVideoMuted = !reverseVideoMuted; if (reverseGain) reverseGain.gain.value = reverseVideoMuted ? 0 : settings.musicVolume; } else video.muted = !video.muted; renderMedia(); });
+  volumeNode.addEventListener("input", () => { window.Trk.core.settings.musicVolume = Number(volumeNode.value); if (window.Trk.core.settings.musicVolume > 0) window.Trk.core.rememberMusicVolume(window.Trk.core.settings.musicVolume); window.Trk.core.video.volume = window.Trk.core.settings.musicVolume; if (reverseGain) reverseGain.gain.value = window.Trk.core.settings.musicVolume; window.Trk.core.saveUserPrefs(); });
+  muteNode = makeButton("mediaMute", "mediaSmallBtn"); muteNode.addEventListener("click", () => { if (reverseActive || reverseLoading) { reverseVideoMuted = !reverseVideoMuted; if (reverseGain) reverseGain.gain.value = reverseVideoMuted ? 0 : window.Trk.core.settings.musicVolume; } else window.Trk.core.video.muted = !window.Trk.core.video.muted; renderMedia(); });
   shuffleNode = makeButton("mediaShuffle", "mediaSmallBtn"); shuffleNode.addEventListener("click", () => setShuffle(!shuffle));
-  const repeatLabel = el("label", "mediaOption"); repeatLabel.append(tx("span", "mediaRepeat"));
+  const repeatLabel = window.Trk.core.el("label", "mediaOption"); repeatLabel.append(tx("span", "mediaRepeat"));
   repeatNode = document.createElement("select");
   for (const [value, key] of [["off", "mediaRepeatOff"], ["one", "mediaRepeatOne"], ["all", "mediaRepeatAll"]]) { const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); repeatNode.append(o); }
   repeatLabel.append(repeatNode); repeatNode.addEventListener("change", () => setRepeat(repeatNode.value));
-  const rateLabel = el("label", "mediaOption"); rateLabel.append(tx("span", "mediaRate"));
+  const rateLabel = window.Trk.core.el("label", "mediaOption"); rateLabel.append(tx("span", "mediaRate"));
   rateNode = document.createElement("select"); for (const v of [.5, .75, 1, 1.25, 1.5, 2]) { const o = document.createElement("option"); o.value = v; o.textContent = `${v.toFixed(2)}x`; rateNode.append(o); }
   rateLabel.append(rateNode); rateNode.addEventListener("change", () => { setRate(rateNode.value); });
-  const sleepLabel = el("label", "mediaOption"); sleepLabel.append(tx("span", "mediaSleep"));
+  const sleepLabel = window.Trk.core.el("label", "mediaOption"); sleepLabel.append(tx("span", "mediaSleep"));
   sleepNode = document.createElement("select"); for (const [v, key] of [[0, "mediaSleepOff"], [15, "mediaSleep15"], [30, "mediaSleep30"], [60, "mediaSleep60"]]) { const o = document.createElement("option"); o.value = v; o.dataset.i18n = key; o.textContent = tr(key); sleepNode.append(o); }
   sleepLabel.append(sleepNode); sleepNode.addEventListener("change", () => setSleep(sleepNode.value));
   options.append(volumeRow, muteNode, shuffleNode, repeatLabel, rateLabel, sleepLabel);
 
-  const queuePanel = el("section", "mediaQueuePanel");
-  const qhead = el("div", "mediaQueueHead"); qhead.append(tx("h3", "mediaQueue"), tx("p", "mediaQueueHint", "hint"));
+  const queuePanel = window.Trk.core.el("section", "mediaQueuePanel");
+  const qhead = window.Trk.core.el("div", "mediaQueueHead"); qhead.append(tx("h3", "mediaQueue"), tx("p", "mediaQueueHint", "hint"));
   searchNode = document.createElement("input"); searchNode.type = "search"; searchNode.placeholder = tr("mediaSearch"); searchNode.dataset.i18nPlaceholder = "mediaSearch"; searchNode.className = "mediaSearch"; searchNode.addEventListener("input", () => { queueFilter = searchNode.value; renderQueue(); });
-  queueNode = el("div", "mediaQueueList"); queuePanel.append(qhead, searchNode, queueNode);
+  queueNode = window.Trk.core.el("div", "mediaQueueList"); queuePanel.append(qhead, searchNode, queueNode);
 
-  const footer = el("footer", "instFooter mediaFooter"); footer.append(tx("span", "mediaModeStatus"), tx("span", "mediaKeyboard", "instKeyHint"));
+  const footer = window.Trk.core.el("footer", "instFooter mediaFooter"); footer.append(tx("span", "mediaModeStatus"), tx("span", "mediaKeyboard", "instKeyHint"));
   dialog.append(header, display, stageWrap, controls, progressRow, interpBox, loopBox, options, queuePanel, footer);
-  wallOverlay = el("section", "mediaWall"); wallOverlay.hidden = true; wallOverlay.setAttribute("role", "dialog"); wallOverlay.setAttribute("aria-modal", "true"); wallOverlay.setAttribute("aria-label", tr("mediaWall"));
-  const wallTop = el("div", "mediaWallTop"); wallTop.append(tx("strong", "mediaWall"));
+  wallOverlay = window.Trk.core.el("section", "mediaWall"); wallOverlay.hidden = true; wallOverlay.setAttribute("role", "dialog"); wallOverlay.setAttribute("aria-modal", "true"); wallOverlay.setAttribute("aria-label", tr("mediaWall"));
+  const wallTop = window.Trk.core.el("div", "mediaWallTop"); wallTop.append(tx("strong", "mediaWall"));
   const wallClose = makeButton("mediaWallHide", "mediaWallClose"); wallClose.addEventListener("click", () => deactivateWall(true)); wallTop.append(wallClose);
-  const wallCenter = el("div", "mediaWallCenter"); wallClockNode = el("div", "mediaWallClock", "00:00:00"); wallDateNode = el("div", "mediaWallDate", ""); wallCenter.append(wallClockNode, wallDateNode);
+  const wallCenter = window.Trk.core.el("div", "mediaWallCenter"); wallClockNode = window.Trk.core.el("div", "mediaWallClock", "00:00:00"); wallDateNode = window.Trk.core.el("div", "mediaWallDate", ""); wallCenter.append(wallClockNode, wallDateNode);
   const wallHint = tx("div", "mediaWallHint", "mediaWallHintText");
   wallOverlay.append(wallTop, wallCenter, wallHint);
   overlay.append(backdrop, dialog, wallOverlay); document.body.append(overlay);
@@ -923,19 +923,19 @@ function buildMedia() {
   overlay.addEventListener("keyup", e => e.stopPropagation());
   const isTyping = t => t && ["INPUT", "SELECT", "TEXTAREA"].includes(t.tagName);
   addEventListener("keydown", e => {
-    const code = keyCodeOf(e);      // 📺 TVリモコン・メディアキー対応（e.code が空でも e.key を使う）
+    const code = window.Trk.core.keyCodeOf(e);      // 📺 TVリモコン・メディアキー対応（e.code が空でも e.key を使う）
     if (mediaExitBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureMediaExitKey(code); return; }
     if (videoBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureVideoKey(code); return; }
     if (window.Trk.overlay.is("synth") || window.Trk.overlay.is("study")) return;
-    const videoKey = (settings.videoKeys || []).indexOf(code);
-    if (videoKey >= 0 && (mediaActive() || phase === "title" || phase === "paused")) {
+    const videoKey = (window.Trk.core.settings.videoKeys || []).indexOf(code);
+    if (videoKey >= 0 && (mediaActive() || window.Trk.core.phase === "title" || window.Trk.core.phase === "paused")) {
       e.preventDefault(); e.stopImmediatePropagation();
       if (!e.repeat && (!wallActive || videoKey === WALL_KEY_INDEX)) videoAction(videoKey);
       return;
     }
     if (!mediaOpen) return;
     if (wallActive && code === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); deactivateWall(true); return; }
-    if (code === settings.mediaExitKey || code === "Escape" || code === "BrowserBack" || code === "GoBack") { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat) requestMediaExit(); return; }
+    if (code === window.Trk.core.settings.mediaExitKey || code === "Escape" || code === "BrowserBack" || code === "GoBack") { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat) requestMediaExit(); return; }
     if (wallActive) { e.preventDefault(); e.stopImmediatePropagation(); return; }
     if (isTyping(e.target)) return;
     if (e.code === "Space") { e.preventDefault(); e.stopImmediatePropagation(); playPause(); }
@@ -946,22 +946,22 @@ function buildMedia() {
   }, true);
   addEventListener("keyup", e => {
     if (mediaExitBinding !== null || videoBinding !== null || window.Trk.overlay.is("synth") || window.Trk.overlay.is("study") || !mediaActive()) return;
-    if (settings.mediaLoopTrigger === "hold" && (settings.videoKeys || [])[LOOP_KEY_INDEX] === keyCodeOf(e)) {
+    if (window.Trk.core.settings.mediaLoopTrigger === "hold" && (window.Trk.core.settings.videoKeys || [])[LOOP_KEY_INDEX] === window.Trk.core.keyCodeOf(e)) {
       e.preventDefault(); e.stopImmediatePropagation(); releaseHeldLoop();
     }
-    if (settings.mediaWallTrigger === "hold" && (settings.videoKeys || [])[WALL_KEY_INDEX] === keyCodeOf(e) && wallKeyDown) {
+    if (window.Trk.core.settings.mediaWallTrigger === "hold" && (window.Trk.core.settings.videoKeys || [])[WALL_KEY_INDEX] === window.Trk.core.keyCodeOf(e) && wallKeyDown) {
       e.preventDefault(); e.stopImmediatePropagation(); deactivateWall(true);
     }
   }, true);
 
   let lastPositionSave = 0;
-  for (const type of ["play", "pause", "timeupdate", "loadedmetadata", "durationchange", "volumechange", "ratechange", "ended", "loadeddata"]) video.addEventListener(type, () => {
+  for (const type of ["play", "pause", "timeupdate", "loadedmetadata", "durationchange", "volumechange", "ratechange", "ended", "loadeddata"]) window.Trk.core.video.addEventListener(type, () => {
     if (type === "timeupdate" && Date.now() - lastPositionSave > 2000) { lastPositionSave = Date.now(); saveMediaPosition(); }
     if (type === "ended") endedMedia(); else renderMedia();
   });
-  on("beforeLoad", () => { stopReverse(false, true); clearMediaLoop(true); reverseBuffer = null; reverseBufferKey = ""; });
-  on("songSelected", renderMedia); on("mediaReady", () => { if (mediaOpen) renderMedia(); updateMediaSession(); });
-  on("records", renderQueue); on("packsChanged", renderQueue); on("language", () => {
+  window.Trk.core.on("beforeLoad", () => { stopReverse(false, true); clearMediaLoop(true); reverseBuffer = null; reverseBufferKey = ""; });
+  window.Trk.core.on("songSelected", renderMedia); window.Trk.core.on("mediaReady", () => { if (mediaOpen) renderMedia(); updateMediaSession(); });
+  window.Trk.core.on("records", renderQueue); window.Trk.core.on("packsChanged", renderQueue); window.Trk.core.on("language", () => {
     if (stageNote) { stageNote.textContent = tr("mediaStageNoVideo"); stageNote.dataset.i18n = "mediaStageNoVideo"; }
     renderInterp();
     loopPresetRenderKey = loopPresetRenderSig = null;
@@ -970,8 +970,8 @@ function buildMedia() {
     if (wallOverlay) wallOverlay.setAttribute("aria-label", tr("mediaWall"));
     if (mediaOpen) renderMedia();
   });
-  on("phase", p => { if (p !== "title" && mediaOpen) closeMedia(false); });
-  document.addEventListener("visibilitychange", () => { if (document.hidden && mediaOpen) { releaseHeldLoop(); stopReverse(false, true); video.pause(); } });
+  window.Trk.core.on("phase", p => { if (p !== "title" && mediaOpen) closeMedia(false); });
+  document.addEventListener("visibilitychange", () => { if (document.hidden && mediaOpen) { releaseHeldLoop(); stopReverse(false, true); window.Trk.core.video.pause(); } });
 
   let pointerTimer = 0;
   powerButton.addEventListener("pointerdown", e => {
@@ -989,54 +989,54 @@ function buildMedia() {
   function buildVideoKeysUI() {
     const anchor = document.querySelector('#settingsScreen [data-i18n="playerMode"]')?.closest("label");
     if (!anchor || document.getElementById("mediaVideoKeysPanel")) return;
-    const panel = el("details", "subPanel"); panel.id = "mediaVideoKeysPanel";
+    const panel = window.Trk.core.el("details", "subPanel"); panel.id = "mediaVideoKeysPanel";
     const heading = tx("summary", "mediaVideoKeysTitle");
     const hint = tx("div", "mediaVideoKeysHint", "hint");
-    const rows = el("div", "keyRows"); rows.style.marginTop = "10px";
+    const rows = window.Trk.core.el("div", "keyRows"); rows.style.marginTop = "10px";
     const reset = tx("button", "mediaVideoKeysReset"); reset.type = "button"; reset.style.marginTop = "8px";
     syncVideoKeysUI = () => {
       rows.textContent = "";
       VIDEO_KEY_LABELS.forEach((key, i) => {
-        const row = el("div", "keyRow"), b = el("button", "", tr("assign"));
+        const row = window.Trk.core.el("div", "keyRow"), b = window.Trk.core.el("button", "", tr("assign"));
         b.type = "button"; b.classList.toggle("listening", videoBinding === i);
-        b.addEventListener("click", () => { bindingSlot = null; updateKeyUI(); videoBinding = i; syncVideoKeysUI(); });
-        row.append(el("strong", "", tr(key)), el("span", "keyValue", formatKey(settings.videoKeys[i])), b);
+        b.addEventListener("click", () => { window.Trk.core.bindingSlot = null; window.Trk.core.updateKeyUI(); videoBinding = i; syncVideoKeysUI(); });
+        row.append(window.Trk.core.el("strong", "", tr(key)), window.Trk.core.el("span", "keyValue", window.Trk.core.formatKey(window.Trk.core.settings.videoKeys[i])), b);
         rows.append(row);
       });
     };
-    reset.addEventListener("click", () => { settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); videoBinding = null; saveUserPrefs(); syncVideoKeysUI(); });
+    reset.addEventListener("click", () => { window.Trk.core.settings.videoKeys = window.Trk.core.VIDEO_KEY_DEFAULTS.slice(); videoBinding = null; window.Trk.core.saveUserPrefs(); syncVideoKeysUI(); });
     panel.append(heading, hint, rows, reset);
-    const wallPanel = el("details", "subPanel mediaWallSettingsPanel"); wallPanel.id = "mediaWallSettingsPanel";
+    const wallPanel = window.Trk.core.el("details", "subPanel mediaWallSettingsPanel"); wallPanel.id = "mediaWallSettingsPanel";
     const wallHeading = tx("summary", "mediaWall");
     const wallHint = tx("div", "mediaWallHint", "hint");
-    const wallStyleLabel = el("label", "mediaOption"); wallStyleLabel.append(tx("span", "mediaWallStyle"));
+    const wallStyleLabel = window.Trk.core.el("label", "mediaOption"); wallStyleLabel.append(tx("span", "mediaWallStyle"));
     wallStyleNode = document.createElement("select");
     for (const [value, key] of [["midnight", "mediaWallMidnight"], ["aurora", "mediaWallAurora"], ["paper", "mediaWallPaper"], ["custom", "mediaWallCustom"]]) { const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); wallStyleNode.append(o); }
     wallStyleLabel.append(wallStyleNode);
-    const wallClockLabel = el("label", "checkLine"); wallClockCheck = document.createElement("input"); wallClockCheck.type = "checkbox"; wallClockLabel.append(wallClockCheck, tx("span", "mediaWallClock"));
-    const wallPlaybackLabel = el("label", "mediaOption"); wallPlaybackLabel.append(tx("span", "mediaWallPlayback"));
+    const wallClockLabel = window.Trk.core.el("label", "checkLine"); wallClockCheck = document.createElement("input"); wallClockCheck.type = "checkbox"; wallClockLabel.append(wallClockCheck, tx("span", "mediaWallClock"));
+    const wallPlaybackLabel = window.Trk.core.el("label", "mediaOption"); wallPlaybackLabel.append(tx("span", "mediaWallPlayback"));
     wallPlaybackNode = document.createElement("select"); for (const [value, key] of [["stop", "mediaWallStopVideo"], ["continue", "mediaWallContinueVideo"]]) { const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); wallPlaybackNode.append(o); } wallPlaybackLabel.append(wallPlaybackNode);
-    const wallTriggerLabel = el("label", "mediaOption"); wallTriggerLabel.append(tx("span", "mediaWallTrigger"));
+    const wallTriggerLabel = window.Trk.core.el("label", "mediaOption"); wallTriggerLabel.append(tx("span", "mediaWallTrigger"));
     wallTriggerNode = document.createElement("select"); for (const [value, key] of [["toggle", "mediaWallToggle"], ["hold", "mediaWallHold"]]) { const o = document.createElement("option"); o.value = value; o.dataset.i18n = key; o.textContent = tr(key); wallTriggerNode.append(o); } wallTriggerLabel.append(wallTriggerNode);
-    const wallUploadRow = el("label", "mediaWallUploadRow"); wallUploadRow.append(tx("span", "mediaWallUpload")); wallFileNode = document.createElement("input"); wallFileNode.type = "file"; wallFileNode.accept = "image/*"; wallUploadRow.append(wallFileNode);
+    const wallUploadRow = window.Trk.core.el("label", "mediaWallUploadRow"); wallUploadRow.append(tx("span", "mediaWallUpload")); wallFileNode = document.createElement("input"); wallFileNode.type = "file"; wallFileNode.accept = "image/*"; wallUploadRow.append(wallFileNode);
     wallResetNode = tx("button", "mediaWallResetImage", "mediaSmallBtn"); wallResetNode.type = "button";
     const wallUploadHint = tx("div", "mediaWallUploadHint", "hint");
-    const syncWallSettingsUI = () => { wallStyleNode.value = settings.mediaWallStyle || "midnight"; wallClockCheck.checked = settings.mediaWallClock !== false; wallPlaybackNode.value = settings.mediaWallStopsVideo === false ? "continue" : "stop"; wallTriggerNode.value = settings.mediaWallTrigger || "toggle"; renderWall(); };
-    wallStyleNode.addEventListener("change", () => { settings.mediaWallStyle = wallStyleNode.value; saveUserPrefs(); renderWall(); });
-    wallClockCheck.addEventListener("change", () => { settings.mediaWallClock = wallClockCheck.checked; saveUserPrefs(); renderWall(); });
-    wallPlaybackNode.addEventListener("change", () => { settings.mediaWallStopsVideo = wallPlaybackNode.value !== "continue"; saveUserPrefs(); });
-    wallTriggerNode.addEventListener("change", () => { settings.mediaWallTrigger = wallTriggerNode.value; saveUserPrefs(); });
-    wallFileNode.addEventListener("change", () => { const f = wallFileNode.files && wallFileNode.files[0]; if (!f || !f.type.startsWith("image/")) return; if (wallCustomURL) URL.revokeObjectURL(wallCustomURL); wallCustomURL = URL.createObjectURL(f); settings.mediaWallStyle = "custom"; saveUserPrefs(); syncWallSettingsUI(); });
-    wallResetNode.addEventListener("click", () => { if (wallCustomURL) URL.revokeObjectURL(wallCustomURL); wallCustomURL = ""; settings.mediaWallStyle = "midnight"; wallFileNode.value = ""; saveUserPrefs(); syncWallSettingsUI(); });
+    const syncWallSettingsUI = () => { wallStyleNode.value = window.Trk.core.settings.mediaWallStyle || "midnight"; wallClockCheck.checked = window.Trk.core.settings.mediaWallClock !== false; wallPlaybackNode.value = window.Trk.core.settings.mediaWallStopsVideo === false ? "continue" : "stop"; wallTriggerNode.value = window.Trk.core.settings.mediaWallTrigger || "toggle"; renderWall(); };
+    wallStyleNode.addEventListener("change", () => { window.Trk.core.settings.mediaWallStyle = wallStyleNode.value; window.Trk.core.saveUserPrefs(); renderWall(); });
+    wallClockCheck.addEventListener("change", () => { window.Trk.core.settings.mediaWallClock = wallClockCheck.checked; window.Trk.core.saveUserPrefs(); renderWall(); });
+    wallPlaybackNode.addEventListener("change", () => { window.Trk.core.settings.mediaWallStopsVideo = wallPlaybackNode.value !== "continue"; window.Trk.core.saveUserPrefs(); });
+    wallTriggerNode.addEventListener("change", () => { window.Trk.core.settings.mediaWallTrigger = wallTriggerNode.value; window.Trk.core.saveUserPrefs(); });
+    wallFileNode.addEventListener("change", () => { const f = wallFileNode.files && wallFileNode.files[0]; if (!f || !f.type.startsWith("image/")) return; if (wallCustomURL) URL.revokeObjectURL(wallCustomURL); wallCustomURL = URL.createObjectURL(f); window.Trk.core.settings.mediaWallStyle = "custom"; window.Trk.core.saveUserPrefs(); syncWallSettingsUI(); });
+    wallResetNode.addEventListener("click", () => { if (wallCustomURL) URL.revokeObjectURL(wallCustomURL); wallCustomURL = ""; window.Trk.core.settings.mediaWallStyle = "midnight"; wallFileNode.value = ""; window.Trk.core.saveUserPrefs(); syncWallSettingsUI(); });
     wallPanel.append(wallHeading, wallHint, wallStyleLabel, wallClockLabel, wallPlaybackLabel, wallTriggerLabel, wallUploadRow, wallUploadHint, wallResetNode);
     anchor.after(panel, wallPanel);
-    on("language", () => { syncVideoKeysUI(); syncWallSettingsUI(); });
+    window.Trk.core.on("language", () => { syncVideoKeysUI(); syncWallSettingsUI(); });
     syncVideoKeysUI(); syncWallSettingsUI();
   }
   const mediaExitAssign = document.getElementById("mediaExitKeyAssign"), mediaExitConfirmCheck = document.getElementById("mediaExitConfirmCheck");
   if (mediaExitAssign) mediaExitAssign.addEventListener("click", () => { mediaExitBinding = 0; syncMediaExitUI(); });
-  if (mediaExitConfirmCheck) mediaExitConfirmCheck.addEventListener("change", e => { settings.mediaExitConfirm = e.target.checked; saveUserPrefs(); });
-  on("language", syncMediaExitUI);
+  if (mediaExitConfirmCheck) mediaExitConfirmCheck.addEventListener("change", e => { window.Trk.core.settings.mediaExitConfirm = e.target.checked; window.Trk.core.saveUserPrefs(); });
+  window.Trk.core.on("language", syncMediaExitUI);
   syncMediaExitUI();
   buildVideoKeysUI();
   installMediaSession();
@@ -1048,7 +1048,7 @@ function buildMedia() {
 /* The TV dock is built by its own DOMContentLoaded callback first. */
 addEventListener("DOMContentLoaded", () => {
   if (!buildMedia()) return;
-  applyLanguage(settings.language);
+  window.Trk.core.applyLanguage(window.Trk.core.settings.language);
 });
 window.TrkMediaPlayer = { open:openMedia, close:closeMedia, isOpen:mediaActive };
 window.Trk.overlay.set("media", false);

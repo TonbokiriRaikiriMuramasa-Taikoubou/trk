@@ -49,6 +49,8 @@ function tr(k, vars){ return k + (vars ? " " + JSON.stringify(vars) : ""); }
 function on(){}
 function emit(){}
 function plToast(t){ toasts.push(t); }
+/* 名前空間 D：lite.js は window.Trk.core.* を読む（同じ束縛へ向ける） */
+var window = { Trk: { core: { $: id => null, emit, phase: "title", saveUserPrefs, get settings(){ return settings; } } } };
 `;
 /* liteInit() は設定画面の DOM を配線する関数なので、評価だけさせて呼ばない（IDの網羅は下の静的検査で見張る） */
 /* 即時関数で包まれていても、中の名前を同じ方法で取り出す（包みの先頭と末尾だけを外す） */

@@ -57,7 +57,7 @@ const VF_URL = "verified.json", VF_MAX = 280, HEX64 = /^[0-9a-f]{64}$/;
 const ROLE_KEY = { composer:"vfRoleComposer", arranger:"vfRoleArranger", lyricist:"vfRoleLyricist",
   vocalist:"vfRoleVocalist", charter:"vfRoleCharter", illustrator:"vfRoleIllustrator" };
 const str = (v, n) => typeof v === "string" ? v.trim().slice(0, n) : "";
-const tx = (tag, key, cls) => { const n = el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; };
+const tx = (tag, key, cls) => { const n = window.Trk.core.el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; };
 
 /* ============ Xと同じ数え方（半角1・全角2・絵文字2、上限280） ============ */
 const LIGHT = [[0x0000, 0x10FF], [0x2000, 0x200D], [0x2010, 0x201F], [0x2032, 0x2037]];
@@ -160,16 +160,16 @@ function verifyOf(item) {
   return v ? { ...v, inf } : null;
 }
 function badge(big) {
-  const b = el("span", "vfBadge" + (big ? " big" : ""), big ? tr("vfBadge") : "✔");
+  const b = window.Trk.core.el("span", "vfBadge" + (big ? " big" : ""), big ? tr("vfBadge") : "✔");
   b.title = tr("vfBadgeTitle");
   return b;
 }
 function creatorRow(id) {
-  const c = VF.creators[id], row = el("div", "vfCreator");
-  row.append(el("b", "", c.name));
-  if (c.roles.length) row.append(el("span", "hint", " " + c.roles.map(r => tr(ROLE_KEY[r])).join("・")));
+  const c = VF.creators[id], row = window.Trk.core.el("div", "vfCreator");
+  row.append(window.Trk.core.el("b", "", c.name));
+  if (c.roles.length) row.append(window.Trk.core.el("span", "hint", " " + c.roles.map(r => tr(ROLE_KEY[r])).join("・")));
   const href = c.x ? "https://x.com/" + c.x : c.url;
-  if (href && (c.x || safeHttpUrl(c.url))) row.append(" ", safeLink("", href, c.x ? "@" + c.x : c.url));   /* 🛡 念のため通す */
+  if (href && (c.x || window.Trk.core.safeHttpUrl(c.url))) row.append(" ", window.Trk.core.safeLink("", href, c.x ? "@" + c.x : c.url));   /* 🛡 念のため通す */
   return row;
 }
 
@@ -177,7 +177,7 @@ function creatorRow(id) {
 const baseLib = window.Trk.library.renderLib;
 window.Trk.library.renderLib = function () {
   baseLib();
-  const rows = Array.from($("libList").children).filter(n => n.querySelector && n.querySelector(".libRow"));
+  const rows = Array.from(window.Trk.core.$("libList").children).filter(n => n.querySelector && n.querySelector(".libRow"));
   window.Trk.library.libView.slice(0, window.Trk.library.LIB_SHOW).forEach((it, i) => {
     if (!rows[i] || !verifyOf(it)) return;
     rows[i].querySelector(".libName").prepend(badge(false), " ");
@@ -185,40 +185,40 @@ window.Trk.library.renderLib = function () {
 };
 
 /* ============ 選曲画面：作者・BPM・公認・作者のことば ============ */
-const vfBox = el("section", "panel vfBox"); vfBox.hidden = true;
-$("songBanner").after(vfBox);
+const vfBox = window.Trk.core.el("section", "panel vfBox"); vfBox.hidden = true;
+window.Trk.core.$("songBanner").after(vfBox);
 function renderVfBox() {
   vfBox.textContent = "";
-  const s = currentSong, inf = s && songInfo[s.key];
+  const s = window.Trk.core.currentSong, inf = s && songInfo[s.key];
   if (!inf) { vfBox.hidden = true; return; }
-  const v = verifyOf(s), head = el("div", "vfHead");
+  const v = verifyOf(s), head = window.Trk.core.el("div", "vfHead");
   if (v) head.append(badge(true));
   const meta = [inf.charter ? tr("vfCharter", { name:inf.charter }) : "", inf.bpm ? tr("vfBpm", { n:inf.bpm }) : ""].filter(Boolean).join(" · ");
-  if (meta) head.append(el("span", "hint", meta));
+  if (meta) head.append(window.Trk.core.el("span", "hint", meta));
   vfBox.append(head);
   if (v) {
     for (const id of v.creators) vfBox.append(creatorRow(id));
     const comment = v.comment || inf.comment;
-    if (comment) vfBox.append(el("div", "vfLabel", tr("vfComment")), el("div", "vfComment", comment));
-    if (v.notice) vfBox.append(el("div", "hint vfNotice", v.notice));
+    if (comment) vfBox.append(window.Trk.core.el("div", "vfLabel", tr("vfComment")), window.Trk.core.el("div", "vfComment", comment));
+    if (v.notice) vfBox.append(window.Trk.core.el("div", "hint vfNotice", v.notice));
   }
   vfBox.hidden = !(v || meta);
 }
 const baseBanner = window.Trk.library.renderBanner;
 window.Trk.library.renderBanner = function () { baseBanner(); renderVfBox(); };
-on("language", renderVfBox);
+window.Trk.core.on("language", renderVfBox);
 
 /* ============ リザルト：公認と作者のことば ============ */
-on("screen", id => {
+window.Trk.core.on("screen", id => {
   if (id !== "endScreen") return;
-  const v = verifyOf(currentSong); if (!v) return;
-  const box = el("div", "vfBox vfResult");
-  const head = el("div", "vfHead"); head.append(badge(true)); box.append(head);
+  const v = verifyOf(window.Trk.core.currentSong); if (!v) return;
+  const box = window.Trk.core.el("div", "vfBox vfResult");
+  const head = window.Trk.core.el("div", "vfHead"); head.append(badge(true)); box.append(head);
   for (const cid of v.creators) box.append(creatorRow(cid));
   const comment = v.comment || v.inf.comment;
-  if (comment) box.append(el("div", "vfComment", comment));
-  if (v.notice) box.append(el("div", "hint vfNotice", v.notice));
-  $("credits").prepend(box);
+  if (comment) box.append(window.Trk.core.el("div", "vfComment", comment));
+  if (v.notice) box.append(window.Trk.core.el("div", "hint vfNotice", v.notice));
+  window.Trk.core.$("credits").prepend(box);
 });
 
 /* ============ パック一覧：指紋・✔・公認リスト用のコピー ============ */
@@ -227,21 +227,21 @@ window.Trk.custom.renderPackList = async function () {
   await basePL();
   let recs = []; try { recs = await window.Trk.custom.packDB.all(); } catch (_) {}
   recs.sort((a, b) => (b.installedAt || 0) - (a.installedAt || 0));   // custom.js と同じ並び
-  const cards = $("packList").querySelectorAll(".packCard");
+  const cards = window.Trk.core.$("packList").querySelectorAll(".packCard");
   recs.forEach((r, i) => {
     const card = cards[i]; if (!card) return;
-    const line = el("div", "hint vfHash");
+    const line = window.Trk.core.el("div", "hint vfHash");
     if (r.sha256) {
       if (VF.packs[r.sha256]) card.querySelector(".packHead").prepend(badge(true));
       line.append(`${tr("vfHash")}: ${r.sha256.slice(0, 16)}… `);
-      const b = el("button", "", tr("vfCopySnippet")); b.type = "button";
+      const b = window.Trk.core.el("button", "", tr("vfCopySnippet")); b.type = "button";
       b.style.cssText = "padding:4px 10px;font-size:12px";
       b.addEventListener("click", () => {
         const songs = (r.manifest && r.manifest.songs) || [];
         const snippet = JSON.stringify({ sha256:r.sha256, creators:[], title:(songs[0] && songs[0].title) || r.manifest.name,
           comment:(songs[0] && songs[0].comment) || "", notice:"", addedAt:new Date().toISOString().slice(0, 10) }, null, 2);
         (navigator.clipboard ? navigator.clipboard.writeText(snippet) : Promise.reject())
-          .then(() => setStatus("packStatus", "vfCopied")).catch(() => prompt("verified.json", snippet));
+          .then(() => window.Trk.core.setStatus("packStatus", "vfCopied")).catch(() => prompt("verified.json", snippet));
       });
       line.append(b);
     } else line.textContent = tr("vfNoHash");
@@ -251,19 +251,19 @@ window.Trk.custom.renderPackList = async function () {
 
 /* ============ 曲パックを作る画面：作者のことば・作者名の確認 ============ */
 (() => {
-  const anchor = $("spLicense") && $("spLicense").closest("label"); if (!anchor) return;
-  const lab = el("label", "field"), area = document.createElement("textarea");
+  const anchor = window.Trk.core.$("spLicense") && window.Trk.core.$("spLicense").closest("label"); if (!anchor) return;
+  const lab = window.Trk.core.el("label", "field"), area = document.createElement("textarea");
   area.id = "spComment"; area.rows = 3; area.maxLength = 600;
   lab.append(tx("span", "vfCommentField"), area);
-  const cnt = el("div", "hint vfCount");
+  const cnt = window.Trk.core.el("div", "hint vfCount");
   anchor.after(lab, cnt, tx("div", "vfCommentHint", "hint"));
   const upd = () => { const n = postLength(area.value); cnt.textContent = tr("vfCount", { n }); cnt.classList.toggle("over", n > VF_MAX); };
-  area.addEventListener("input", upd); on("language", upd); upd();
+  area.addEventListener("input", upd); window.Trk.core.on("language", upd); upd();
   /* 書き出しボタンより先に（キャプチャ段階で）確認する */
-  $("songPackBuilder").addEventListener("click", e => {
+  window.Trk.core.$("songPackBuilder").addEventListener("click", e => {
     if (!e.target.closest("#spBuildBtn")) return;
-    if (!$("spCharter").value.trim()) { e.stopPropagation(); setStatus("spStatus", "vfNeedCharter"); return; }
-    if (postLength(area.value) > VF_MAX) { e.stopPropagation(); setStatus("spStatus", "vfTooLong"); return; }
+    if (!window.Trk.core.$("spCharter").value.trim()) { e.stopPropagation(); window.Trk.core.setStatus("spStatus", "vfNeedCharter"); return; }
+    if (postLength(area.value) > VF_MAX) { e.stopPropagation(); window.Trk.core.setStatus("spStatus", "vfTooLong"); return; }
     pendingComment = area.value;
     setTimeout(() => { pendingComment = null; }, 0);   // buildSongPack は最初の await までに pack.json を作る
   }, true);

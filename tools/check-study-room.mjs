@@ -11,7 +11,11 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
 
-const read = rel => fs.readFileSync(new URL(`../${rel}`, import.meta.url), "utf8");
+// 名前空間 D：js/ の本文では領域の接頭辞 window.Trk.<領域>. を取り除いて照合する（window.Trk.overlay は残す）
+const read = rel => {
+  const text = fs.readFileSync(new URL(`../${rel}`, import.meta.url), "utf8");
+  return rel.startsWith("js/") ? text.replace(/window\.Trk\.(?!overlay\b)[A-Za-z]\w*\./g, "") : text;
+};
 const utilitySource = read("js/study-room-utils.js");
 const windowStub = {};
 vm.runInNewContext(utilitySource, { window:windowStub, TextDecoder, Uint8Array, Intl, Math, Set, Map, String, Number, Object, Array, RegExp });

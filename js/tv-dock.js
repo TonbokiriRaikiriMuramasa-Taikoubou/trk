@@ -1199,8 +1199,8 @@ addEventListener("DOMContentLoaded", () => {
   skinRow.append(tx("span","tvSkinLabel"), skinSel);
   skinSel.addEventListener("change", () => { window.Trk.core.settings.tvDockSkin = skinSel.value; window.Trk.core.saveUserPrefs(); render(true); });
 
-  // 🎨 カスタムTVスキンのエディタを開く（キーは tvmOpen。tvMakerOpen だと生キーが出てしまう）
-  const makerBtn = tx("button","tvmOpen","fxMini slim"); makerBtn.type = "button";
+  // 🎨 カスタムTVスキンのエディタを開く（キーは tvmOpen。tvMakerOpen だと生キーが出てしまう）。開発者表示（devView）の中
+  const makerBtn = tx("button","tvmOpen","fxMini slim devOnly"); makerBtn.type = "button";
   makerBtn.addEventListener("click", () => {
     window.Trk.core.openSettings();
     const mk = document.getElementById("tvMaker");

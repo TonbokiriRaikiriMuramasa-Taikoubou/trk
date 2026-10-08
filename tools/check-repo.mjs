@@ -1758,7 +1758,7 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   const top = arr(libSkins, "LIB_SKIN_SIMPLE_TOP");
   const wired = idx.includes('id="displayMode"') && idx.includes('id="devView"') && libUi.includes("syncDisplayUi") && /body\.noDev \.devOnly/.test(read("css/style.css"));
   const orders = (libSkins.match(/for \(const id of libSkinOrder\(\)\)/g) || []).length === 2 && (tvSrc.match(/for \(const cat of tvGroups\(\)\)/g) || []).length === 2 && tvSrc.includes("TV_RECOMMENDED");
-  const hides = mediaSrc.includes('"mediaLoopLab devOnly"') && libUi.includes('el("div", "devOnly")');
+  const hides = mediaSrc.includes('"mediaLoopLab devOnly"') && libUi.includes('el("div", "devOnly")') && idx.includes('id="skinMaker" class="subPanel devOnly"') && tvSrc.includes('"fxMini slim devOnly"');
   const keys = ["displayModeLabel:", "displaySimple:", "displayFull:", "displayModeHint:", "devViewLabel:"].every(k => (i18n.match(new RegExp(k, "g")) || []).length === 4);
   if (!sameGroups || !top || top.length !== 6 || !wired || !orders || !hides || !keys) fail("表示の並び（かんたん／全部）か開発者表示（devView）の配線が欠けている");
   else ok("表示の並び（かんたん／全部）と開発者表示（ループ・ラボ、投稿者ツールを隠す）が配線されている");

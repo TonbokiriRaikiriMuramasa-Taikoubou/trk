@@ -8,7 +8,7 @@
 
 /* 文言はこの機能内で4言語そろえる（tools/check-study-room.mjs が4言語の抜けを検査します）。 */
 Object.assign(TEXT.ja, {
-  studyTitle:"📚 書斎", studyLaunchHint:"♫を長押しして書斎を開く（キーボードではEnter）",
+  studyTitle:"📚 書斎", studyOpenBtn:"📚 書斎を開く", studyLaunchHint:"♫を長押しして書斎を開く（キーボードではEnter）",
   studyClose:"✕ 書斎を閉じる", studyImportImages:"🖼 画像フォルダを取り込む",
   studyImportTextFiles:"＋ テキストを追加", studyImportTextFolder:"📄 テキストフォルダを取り込む",
   studyShelf:"本棚", studySearch:"タイトル・フォルダを検索…", studyShelfEmpty:"本棚は空です。画像フォルダか TXT / MD / JSON を取り込んでください。",
@@ -124,7 +124,7 @@ Object.assign(TEXT.ja, {
   studyImageOrderReverse:"逆順（右綴じ向け）", studyOrphanSweep:"未使用の画像データを整理しました（{n}件）。"
 });
 Object.assign(TEXT.en, {
-  studyTitle:"📚 Study", studyLaunchHint:"Hold ♫ Songs to open Study (press Enter when focused)",
+  studyTitle:"📚 Study", studyOpenBtn:"📚 Open Study", studyLaunchHint:"Hold ♫ Songs to open Study (press Enter when focused)",
   studyClose:"✕ Close Study", studyImportImages:"🖼 Import image folder", studyImportTextFiles:"＋ Add text files",
   studyImportTextFolder:"📄 Import text folder", studyShelf:"Bookshelf", studySearch:"Search titles and folders…",
   studyShelfEmpty:"Your shelf is empty. Import an image folder or TXT / MD / JSON files.",
@@ -237,7 +237,7 @@ Object.assign(TEXT.en, {
   studyImageOrderReverse:"Reversed (right-binding)", studyOrphanSweep:"Cleaned up {n} unused image(s)."
 });
 Object.assign(TEXT.zh, {
-  studyTitle:"📚 书斋", studyLaunchHint:"长按♫歌曲列表打开书斋（键盘聚焦后按 Enter）",
+  studyTitle:"📚 书斋", studyOpenBtn:"📚 打开书斋", studyLaunchHint:"长按♫歌曲列表打开书斋（键盘聚焦后按 Enter）",
   studyClose:"✕ 关闭书斋", studyImportImages:"🖼 导入图片文件夹", studyImportTextFiles:"＋ 添加文本文件",
   studyImportTextFolder:"📄 导入文本文件夹", studyShelf:"书架", studySearch:"搜索标题或文件夹…",
   studyShelfEmpty:"书架为空。请导入图片文件夹或 TXT / MD / JSON。",
@@ -340,7 +340,7 @@ Object.assign(TEXT.zh, {
   studyImageOrderReverse:"倒序（右开本）", studyOrphanSweep:"已整理 {n} 个未使用的图片数据。"
 });
 Object.assign(TEXT.ko, {
-  studyTitle:"📚 서재", studyLaunchHint:"♫ 곡 목록을 길게 눌러 서재 열기 (키보드에서는 Enter)",
+  studyTitle:"📚 서재", studyOpenBtn:"📚 서재 열기", studyLaunchHint:"♫ 곡 목록을 길게 눌러 서재 열기 (키보드에서는 Enter)",
   studyClose:"✕ 서재 닫기", studyImportImages:"🖼 이미지 폴더 가져오기", studyImportTextFiles:"＋ 텍스트 파일 추가",
   studyImportTextFolder:"📄 텍스트 폴더 가져오기", studyShelf:"책장", studySearch:"제목·폴더 검색…",
   studyShelfEmpty:"책장이 비어 있습니다. 이미지 폴더 또는 TXT / MD / JSON을 가져오세요.",
@@ -2706,7 +2706,11 @@ if (studyLaunchTitle) {
     }
   });
 }
+/* 📚 書斎を開くボタン（見出しの長押しの代わり。タップで開く。設定 showMoreBtns で隠せる） */
+const studyOpenBtn = document.getElementById("studyOpenBtn");
+if (studyOpenBtn) { studyOpenBtn.textContent = tr("studyOpenBtn"); studyOpenBtn.addEventListener("click", () => studyOpenRoom()); }
 window.Trk.core.on("language", () => {
+  if (studyOpenBtn) studyOpenBtn.textContent = tr("studyOpenBtn");
   if (!studyLaunchTitle) return;
   studyLaunchTitle.title = tr("studyLaunchHint");
   studyLaunchTitle.setAttribute("aria-label", `${tr("libTitle")}. ${tr("studyLaunchHint")}`);

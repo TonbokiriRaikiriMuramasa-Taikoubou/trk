@@ -3,8 +3,8 @@
   "scripts": 45,
   "windowProps": 284,
   "duplicates": 0,
-  "declarations": 1173,
-  "private": 992,
+  "declarations": 1175,
+  "private": 994,
   "public": 181,
   "globalNames": 316
  },
@@ -366,8 +366,8 @@
   },
   {
    "file": "js/library.js",
-   "decls": 252,
-   "private": 236,
+   "decls": 253,
+   "private": 237,
    "public": [
     "addonSongs",
     "allSongs",
@@ -475,8 +475,8 @@
   },
   {
    "file": "js/study-room.js",
-   "decls": 242,
-   "private": 242,
+   "decls": 243,
+   "private": 243,
    "public": []
   }
  ],

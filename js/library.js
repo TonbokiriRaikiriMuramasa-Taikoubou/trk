@@ -411,6 +411,7 @@ Object.assign(TEXT.ja, {
   plWishHint:"🛒 {have}/{total} 曲を入手済み。灰色はまだ持っていない曲です（タップで公式の入手先）。Music フォルダに入れると黒くなります。",
   plWishOpen:"公式の入手先を開く", plWishNoLink:"この曲の入手先リンクはありません。公式ストアなどで入手して Music フォルダに入れてください。",
   plAuthorTools:"👥 投稿者ツール（共有プレイリストをたくさん受け取る人向け）",
+  tabSettingsBtn:"⚙ このタブの設定",
   plAuthorNamePh:"例：たぬき（共有ファイルに添わる名前）",
   plAuthorBtn:"👥 投稿者（検索・ブロック・お気に入り）", plAuthorTitle:"👥 投稿者",
   plAuthorSearchPh:"🔍 投稿者名でしぼりこむ", plAuthorOnly:"⭐を付けた投稿者だけ表示する",
@@ -460,6 +461,7 @@ Object.assign(TEXT.en, {
   plWishHint:"🛒 {have}/{total} collected. Grey rows are the ones you do not have yet — tap one for its official source. Add the audio to your Music folder and it turns black.",
   plWishOpen:"Open the official source", plWishNoLink:"No source link for this track yet. Get it from an official store and put it in your Music folder.",
   plAuthorTools:"👥 Author tools (for people who receive lots of shared playlists)",
+  tabSettingsBtn:"⚙ Tab settings",
   plAuthorNamePh:"e.g. tanuki (name attached to your shared files)",
   plAuthorBtn:"👥 Authors (search / block / favorites)", plAuthorTitle:"👥 Authors",
   plAuthorSearchPh:"🔍 Filter by author name", plAuthorOnly:"Show only favorite authors",
@@ -509,6 +511,7 @@ Object.assign(TEXT.zh, {
   plWishHint:"🛒 已入手 {have}/{total} 首。灰色表示尚未拥有（点击可打开官方获取页面）。放入 Music 文件夹后即会变黑。",
   plWishOpen:"打开官方获取页面", plWishNoLink:"此曲暂无获取链接。请从官方商店获取后放入 Music 文件夹。",
   plAuthorTools:"👥 投稿者工具（适合接收大量共享播放列表的人）",
+  tabSettingsBtn:"⚙ 此标签的设置",
   plAuthorNamePh:"例如：狸猫（会附在你共享的文件上）",
   plAuthorBtn:"👥 投稿者（搜索／屏蔽／收藏）", plAuthorTitle:"👥 投稿者",
   plAuthorSearchPh:"🔍 按投稿者名筛选", plAuthorOnly:"只显示收藏的投稿者",
@@ -558,6 +561,7 @@ Object.assign(TEXT.ko, {
   plWishHint:"🛒 {have}/{total}곡 보유 중. 회색은 아직 없는 곡이에요(탭하면 공식 입수처가 열려요). Music 폴더에 넣으면 검게 변해요.",
   plWishOpen:"공식 입수처 열기", plWishNoLink:"이 곡의 입수처 링크가 아직 없어요. 공식 스토어에서 구해 Music 폴더에 넣어 주세요.",
   plAuthorTools:"👥 올린이 도구(공유 플레이리스트를 많이 받는 사람용)",
+  tabSettingsBtn:"⚙ 이 탭 설정",
   plAuthorNamePh:"예: 너구리(공유 파일에 붙는 이름)",
   plAuthorBtn:"👥 올린이(검색・차단・즐겨찾기)", plAuthorTitle:"👥 올린이",
   plAuthorSearchPh:"🔍 올린이 이름으로 찾기", plAuthorOnly:"⭐ 즐겨찾기 올린이만 보기",
@@ -1952,6 +1956,10 @@ function plImportPick() {
   inp.click();
 }
 
+/* タブの設定メニュー（長押しと、タブ帯の ⚙ ボタンで同じものを開く）。🐔 は名前を変えられないので階層だけ */
+function tabSettingsMenu(t) {
+  if (t.trk) plTrkMenu(); else if (t.pl) plMenu(t.pl); else if (t.fld) plFolderMenu(t.fld); else plGlobalMenu();
+}
 /* タブ帯を描いて、いま選ばれているタブのIDを返す */
 function renderLibTabs(tabs) {
   const box = window.Trk.core.$("libTabs");
@@ -1995,7 +2003,7 @@ function renderLibTabs(tabs) {
     });
     /* 長押し＝設定（スマホ・PC共通）。⚠ 🐔 trk's playlist だけは名前と色を変えられないので、
        プロフィール編集（plMenu／plFolderMenu）へは行かせず、階層（Vol 一覧）を開く動作に固定する */
-    onLongPress(b, () => { if (t.trk) plTrkMenu(); else if (t.pl) plMenu(t.pl); else if (t.fld) plFolderMenu(t.fld); else plGlobalMenu(); });
+    onLongPress(b, () => tabSettingsMenu(t));
     if (t.pl) {   /* 曲をドラッグして乗せると追加 */
       b.addEventListener("dragover", e => { e.preventDefault(); b.classList.add("dragOver"); });
       b.addEventListener("dragleave", () => b.classList.remove("dragOver"));
@@ -2012,6 +2020,14 @@ function renderLibTabs(tabs) {
   plus.title = tr("plNewTab"); plus.setAttribute("aria-label", tr("plNewTab"));
   plus.addEventListener("click", () => { if (!plSuppressClick()) plCreate(); });
   box.append(plus);
+  /* ⚙ いま選んでいるタブの設定（長押しの代わり。設定 showMoreBtns で隠せる） */
+  const activeTab = tabs.find(t => t.id === active);
+  if (activeTab) {
+    const gear = el("button", "libTab plPlus moreBtn", "⚙"); gear.type = "button";
+    gear.title = tr("tabSettingsBtn"); gear.setAttribute("aria-label", tr("tabSettingsBtn"));
+    gear.addEventListener("click", () => { if (!plSuppressClick()) tabSettingsMenu(activeTab); });
+    box.append(gear);
+  }
   return active;
 }
 

@@ -56,6 +56,7 @@ Object.assign(TEXT.ja, {
   specSkinHint:"曲名バナーの左上の「＋」を押すと、大きく開きます（ここでも切り替えられます）。",
   specSkinOpenTip:"📊 スペクトラムを大きく開く", specSkinCloseTip:"📊 スペクトラムを小さく閉じる",
   specNextStyle:"次の見え方",
+  specOpenSettings:"⚙ くわしい設定",
   specGain:"感度",
   specPeaks:"ピーク（残像のライン）を出す",
   specTv:"📺 TVの画面にも重ねる",
@@ -95,6 +96,7 @@ Object.assign(TEXT.en, {
   specSkinHint:"Press “＋” at the top-left of the song banner to open it wider (you can also switch it here).",
   specSkinOpenTip:"📊 Open the spectrum wider", specSkinCloseTip:"📊 Close the spectrum",
   specNextStyle:"Next style",
+  specOpenSettings:"⚙ More settings",
   specGain:"Sensitivity",
   specPeaks:"Show peaks (falling lines)",
   specTv:"📺 Overlay it on the TV too",
@@ -133,6 +135,7 @@ Object.assign(TEXT.zh, {
   specSkinHint:"按曲名横幅左上角的「＋」可以放大（在这里也能切换）。",
   specSkinOpenTip:"📊 放大频谱", specSkinCloseTip:"📊 收小频谱",
   specNextStyle:"下一个样式",
+  specOpenSettings:"⚙ 详细设置",
   specGain:"灵敏度",
   specPeaks:"显示峰值（余晖线）",
   specTv:"📺 也叠加到电视画面上",
@@ -171,6 +174,7 @@ Object.assign(TEXT.ko, {
   specSkinHint:"곡명 배너 왼쪽 위의 「＋」를 누르면 크게 열립니다 (여기서도 전환할 수 있습니다).",
   specSkinOpenTip:"📊 스펙트럼 크게 열기", specSkinCloseTip:"📊 스펙트럼 작게 닫기",
   specNextStyle:"다음 모양",
+  specOpenSettings:"⚙ 자세한 설정",
   specGain:"감도",
   specPeaks:"피크(잔상 라인) 표시",
   specTv:"📺 TV 화면에도 겹치기",
@@ -1321,16 +1325,17 @@ function buildBannerSkin() {
     if (window.Trk.core.settings.specSkinOpen) window.Trk.core.settings.specSkin = true;    // 開くときはスキンも入れる
     window.Trk.core.saveUserPrefs(); syncAll();
   });
-  /* ⚙ 長押しで、設定画面のスペクトラム欄を開いてスクロール */
-  window.Trk.library.onLongPress(zipBtn, () => {
-    if (typeof openSettings === "function") window.Trk.core.openSettings();
+  /* ⚙ 長押し、または スキンツールの「⚙ くわしい設定」（見える代わり）で、設定画面のスペクトラム欄を開いてスクロール */
+  const openSpecSettings = () => {
+    window.Trk.core.openSettings();
     setTimeout(() => {
       const p = document.getElementById("specPanel");
       if (!p) return;
       p.open = true;
       if (typeof p.scrollIntoView === "function") { try { p.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (_) {} }
     }, 160);
-  });
+  };
+  window.Trk.library.onLongPress(zipBtn, openSpecSettings);
   banner.append(zipBtn);
 
   skinTools = window.Trk.core.el("div", "specSkinTools");      // 開いたときだけ出る（幅を取らない小さな操作）
@@ -1343,6 +1348,9 @@ function buildBannerSkin() {
     window.Trk.core.saveUserPrefs(); syncAll();
   });
   skinTools.append(styleCycleBtn);
+  const specMore = window.Trk.core.el("button", "specNext moreBtn"); specMore.type = "button";
+  specMore.dataset.i18n = "specOpenSettings"; specMore.addEventListener("click", openSpecSettings);
+  skinTools.append(specMore);
   const dotRow = window.Trk.core.el("div", "specDots");
   for (const v of SPEC_THEMES) {
     const b = window.Trk.core.el("button", "specDot");

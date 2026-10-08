@@ -1764,5 +1764,20 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   else ok("表示の並び（かんたん／全部）と開発者表示（ループ・ラボ、投稿者ツールを隠す）が配線されている");
 }
 
+/* 項目 6（一部／要確認の4件）：長押しの見える代わり。タブ設定（⚙）、スペクトラム（⚙ くわしい設定）、書斎（📚 書斎を開く）、
+   緊急復旧（既存の 🛟 セーフモード）。それぞれ呼び出し先が同じ関数であること、設定 showMoreBtns で隠せることを見る。 */
+{
+  const libSrc = read("js/library.js"), specSrc = read("js/spectrum.js"), studySrc = read("js/study-room.js");
+  const idx = read("index.html"), coreSrc = read("js/core.js");
+  const tabGear = libSrc.includes('"libTab plPlus moreBtn"') && libSrc.includes("onLongPress(b, () => tabSettingsMenu(t))") && libSrc.includes("tabSettingsMenu(activeTab)");
+  const specBtn = specSrc.includes('"specNext moreBtn"') && specSrc.includes("onLongPress(zipBtn, openSpecSettings)") && specSrc.includes("specMore.addEventListener(\"click\", openSpecSettings)");
+  const studyBtn = idx.includes('id="studyOpenBtn"') && studySrc.includes('getElementById("studyOpenBtn")') && idx.includes('id="studyOpenBtn" class="libSkinBtn moreBtn"');
+  const emergency = idx.includes('id="emergencySafeBtn"') && coreSrc.includes('bind("emergencySafeBtn"');
+  const keys = (src, k) => (src.match(new RegExp("\\b" + k + ":", "g")) || []).length === 4;
+  const i18nOk = keys(libSrc, "tabSettingsBtn") && keys(specSrc, "specOpenSettings") && keys(studySrc, "studyOpenBtn");
+  if (!tabGear || !specBtn || !studyBtn || !emergency || !i18nOk) fail("一部／要確認の4件の見える代わり（タブの⚙・スペクトラムのくわしい設定・書斎ボタン・緊急復旧）の配線が欠けている");
+  else ok("一部／要確認の4件に見える代わりがある（タブの⚙・くわしい設定・📚書斎・🛟緊急復旧）");
+}
+
 console.log(`\nStatic check: ${failures ? "FAILED" : "passed"} · ${failures} failure(s) · ${warnings} warning(s)`);
 if (failures) process.exitCode = 1;

@@ -44,7 +44,7 @@
 - **📺 TVドックの設定（`js/tv-dock.js`）**：くわしいの中の「📺 TVドック」グループ。チェックは3つ：🧱 壁掛け（スキン `wall` と同じ。外すと映画館に戻る）、↕ 並び替え（テレビとラックの上下）、🔢 5枠化（`tvDockFive`）。既定はすべて OFF（映画館・テレビが上・5枠なし）。くわしいは既定で開いた状態（保存済みの開閉は変えない）。テレビ本体とラックの表示は変えていない。
 - **Loop Lab の映像書き出し（`js/media-player-mode.js` の `exportLoopClip`）**：開発者表示の中だけ。記録した区間の行の 🎬 を押すと、映像と音を区間の長さのぶん録画して保存する（WebM。対応していれば MP4）。設定は持たない。書き出し後は再生位置・再生／停止・速度・ループを元に戻す。曲を切り替えたら途中で止め、保存しない。音声だけの曲は書き出さない。
 - **「📁 開く」と「📤 共有」**（`js/library.js`）：📁 開く は曲を入れるだけで、共有としては覚えない。📤 共有 は共有として覚え、📤 の印が付き、「共有をやめる」でまとめて外せ、「端末に残す」の対象になる。ボタンの下の説明行は `libOpenShareHint`（4言語）。
-- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.8-trk86`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
+- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.8-trk87`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
 
 ## 3. 権利・データ・セキュリティの不変条件
 
@@ -92,7 +92,7 @@ npm run check
 git diff --check
 ```
 
-`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-08）は Security 55 checks、a11y 8 checks、vendor 8 checks、軽量化 121 assertions、`npm test` 69件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
+`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-08）は Security 55 checks、a11y 8 checks、vendor 8 checks、軽量化 121 assertions、`npm test` 82件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
 
 `check-repo.mjs` はJavaScript構文・ローカル参照・ID・設定文言に加え、Arknights公式リンク、Blue Archive 225曲、LoL Sessions 108曲／Phase 1の58件、Gakumas 50件・別名、公式リンクと権利注記、既存プレイリストの所有曲・カスタムフィールド保持を検査する。チェックは意図的な逆テストでもFAILすることを確認してから追加する。外部ツールの起動後DOM検査は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照し、リポジトリ外で行う。
 
@@ -143,7 +143,7 @@ git diff --check
 - **安定版の後の検討（利用者の決定・2026-10-08）**：
   - **オンライン連携（チャットbot等）**：当面は行わない。やるなら「サーバーなし」の方針を変える別の判断になる（`docs/SECURITY.md`・`privacy.html` と整合させる）。
   - **軽量版（凍結）**：動画再生プレイヤー・音楽再生プレイヤー・書斎に特化し、ゲーム部分・MMD・VRM・譜面機能を外せる版。安定版の確立後に検討する。曲の背景を知る体験には価値がある、という評価。
-  - **スキン**（棚卸しと計画は `docs/SKIN-PLAN.md`。数は ①ゲーム画面40・②TVドック36・③棚24・④映像フィルター70・⑤書斎30・④映像フィルター65・⑤書斎24）：他と比べて数が少ないもの・足りていない方向を引き上げる。テーマ単位で少数ずつ足し、整えながら進める。一般には思いつきにくいジャンルのテーマは、むしろ積極的に増やす。
+  - **スキン**（棚卸しと計画は `docs/SKIN-PLAN.md`。数は ①ゲーム画面40・②TVドック36・③棚30・④映像フィルター70・⑤書斎30・④映像フィルター65・⑤書斎24）：他と比べて数が少ないもの・足りていない方向を引き上げる。テーマ単位で少数ずつ足し、整えながら進める。一般には思いつきにくいジャンルのテーマは、むしろ積極的に増やす。
 - **支援案（構想のみ）**：機能の有料解放・月額支援はしない。GitHub Sponsors等の候補、匿名性・本人向け支援記録、使途説明は未決定。権利条件が確認できるまで寄付リンク／募集表示を追加しない。Ko-fiへの誘導はしない。
 - **権利・公開先**：PCL・東方Project等の条件、AI生成物を受け入れる公開先、5曲の配布条件は未確認のものが残る。別途制作した5曲はボーカルなしの手続き生成で、第三者録音・サンプル・ループ・引用メロディを使わず、アプリ／Gitには未同梱。許諾済みと見なさず、`NOTICE.md` の音源記載を他作品への包括許諾にしない。
 - **開発アイデア**：称号、10秒以内の`trk!`入力に反応するスピードチャレンジ、TV／fxドックの連想ゲーム系スキン。実装決定ではない。
@@ -161,6 +161,7 @@ git diff --check
 
 ## 11. 最近の変更
 
+- **2026-10-08 — 棚スキン 6 種（trk87）：** 色覚配慮の 3 種（青×橙＝Okabe-Ito の基本色、模様で見分ける＝縞・点・格子・破線、黄×黒の案内サイン）とビビットの 3 種（ポップアート、虹色ネオン、トロピカル）を追加。棚は 24 → 30 種。色だけに頼らない（模様・枠の太さ・外枠で区別）。`tests/shelf-skins.test.mjs`（新規 7 件）で、6 種の単色の文字と背景を 4.5:1 以上で検査。模様の指定は目視で確認が必要。`tools/check-repo.mjs` の期待値を 30 に更新。**未確認**：実ブラウザでの見た目、かんたん表示の並び。
 - **2026-10-08 — 書斎の文字スキン 6 種（trk86）：** 付箋・便箋・日記帳・俳句の短冊・新聞の紙面（文筆・読書に追加）、楽譜の余白（自由な発想に追加）。書斎は 24 → 30 種。定義（`STUDY_THEMES`）、画面の選択肢（`index.html`）、4 言語の名前、CSS（`.study-text-stage[data-theme]`）を揃えた。`tools/check-study-room.mjs` の期待値を 30 に更新し、`tests/study-themes.test.mjs`（新規 6 件）で 6 種の本文と編集欄の対比を 4.5:1 以上で検査（テスト 75 件）。**未確認**：実ブラウザでの見た目（特に新聞の段の罫線と、楽譜の五線の間隔が文字の行と合うか）。
 - **2026-10-08 — 棚スキン 3 種・映像フィルター 5 種（trk85）：** 棚に駅の伝言板（message）・郵便の仕分け棚（postal）・楽譜棚（score）を追加（棚 21 → 24）。映像フィルターに水彩のにじみ・墨の滲み・雨の窓ガラス・銭湯の湯気・障子越しの光を追加（70 種、分類は effect）。\n  **計画からの変更：** 計画書の映像案のうち「褪せたフィルム」「サーマル風」「夜間の撮影」は、既存の faded・thermal・night／nightvision と役割が重なるため見送り、代わりに生活の場面の 5 種を選んだ。`tools/check-repo.mjs` の期待値を 70／24 に更新。文字と背景の対比は 4.5:1 以上。**未確認**：実ブラウザでの見た目（特に映像フィルターの見た目と、伝言板の回転したタブ）。
 - **2026-10-08 — 棚スキン 5 種（trk84）：** 工具箱・植物標本箱・薬箪笥・旅館の下駄箱・駄菓子屋の棚を追加（棚 16 → 21）。見た目は CSS の `#libPanel[data-lib-skin]` だけで作り、定義（`LIB_SKINS`）と並び順（`LIB_SKIN_ORDER`）に入れた。文字と背景の対比は 4.5:1 以上（最も低い薬箪笥のタブで 4.83）。`tools/check-repo.mjs` の期待値を 21 に更新。**未確認**：実ブラウザでの見た目、かんたん表示での並び。

@@ -207,8 +207,8 @@ if (!orderMatch) {
   fail("LIB_SKIN_ORDER could not be read");
 } else {
   const ids = [...orderMatch[1].matchAll(/["']([^"']+)["']/g)].map(m => m[1]);
-  if (ids.length !== 24) fail(`expected 24 shelf skins, found ${ids.length}`);
-  else ok("shelf skin count is 24");
+  if (ids.length !== 30) fail(`expected 30 shelf skins, found ${ids.length}`);
+  else ok("shelf skin count is 30");
 }
 if (/棚スキン11種|・11種類/.test(read("css/style.css") + skins)) {
   fail("stale shelf skin count (11) remains in source comments");

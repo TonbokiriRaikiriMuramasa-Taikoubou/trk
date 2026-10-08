@@ -1415,7 +1415,7 @@ window.safeName = safeName;
 window.saveCustomSkins = saveCustomSkins;
 window.saveUserPrefs = saveUserPrefs;
 window.savedSkinAtBoot = savedSkinAtBoot;
-Object.defineProperty(window, "screen", { configurable:true, get:() => screen, set:v => { screen = v; } });
+/* screen は window.screen（ブラウザ標準）と同名のため、窓へは出さない（利用者の決定）。読むのは window.Trk.core.screen */
 Object.defineProperty(window, "seekDragging", { configurable:true, get:() => seekDragging, set:v => { seekDragging = v; } });
 window.setPhase = setPhase;
 window.setStatus = setStatus;

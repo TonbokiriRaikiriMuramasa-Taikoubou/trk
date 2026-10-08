@@ -1689,5 +1689,13 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   else ok("window.Trk.study is the same frozen object as window.TrkStudyRoom");
 }
 
+/* 利用者の決定（2026-10-08）：ブラウザ標準の window.screen を上書きしない。
+   内部の画面状態は window.Trk.core.screen だけで読む（窓の別名は作らない）。 */
+{
+  const coreSrc = read("js/core.js");
+  if (/defineProperty\(window, "screen"|window\.screen = /.test(coreSrc)) fail("js/core.js sets window.screen (the browser's own screen object must not be replaced)");
+  else ok("window.screen is left to the browser (the app state is window.Trk.core.screen only)");
+}
+
 console.log(`\nStatic check: ${failures ? "FAILED" : "passed"} · ${failures} failure(s) · ${warnings} warning(s)`);
 if (failures) process.exitCode = 1;

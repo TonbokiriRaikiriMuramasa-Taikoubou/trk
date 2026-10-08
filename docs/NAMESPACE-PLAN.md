@@ -138,11 +138,12 @@ node tools/smoke-browser.mjs --compare
 | play | `js/render.js` | game.js・render.js の公開名（`PLAY_KEYS`・`startGame`・`judgeNote` など、値のコピー）。アクセサは `gameTime`・`showJudge`・`drawVideo`・`retryHoldAt`・`toast`・`goAt`・`leadIn` など | 147 | trk66 | 登録は領域で最後に読み込まれる render.js の末尾（game.js の末尾に置いたら、render.js の名前を読む時点で ReferenceError になり、起動が止まった：その試行は捨てて HEAD に戻した）。書き換え 147。登録検査（render.js・TRK_EXTRAS で game.js の窓の名前も対象）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
 | modes | `js/catch.js` | modes.js・truck.js・stage.js・catch.js の公開名 54（値のコピー。`truckBinding`・`stageBinding` は let のためアクセサ） | 27 | trk67 | 登録は領域で最後に読み込まれる catch.js の末尾。登録より前に読み込まれる stagefx.js などの裸の参照は書き換えない（起動時の順序を変えないため。窓の別名で従来どおり動く＝残り）。登録検査（catch.js・TRK_EXTRAS で modes/truck/stage の窓の名前も対象）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
 | core | `js/core.js` | 116 名（`let` 約 40 名はアクセサ、差し替えられる `activeMods`・`applySkin`・`videoFilter` などはアクセサ、残りは値のコピー）。`_trkStudyRoomOpen`（互換の読み取り専用）は登録しない | 6013 | trk68 | 登録は core.js の末尾（読み込み順で領域の最初。core 以外の領域の名前は、この後の登録で出る）。書き換え 6013（代入の左辺を含む。core.js より後に読み込まれるファイルだけ）。検査：check-repo・check-security・check-lite・check-study-room の文字列照合は window.Trk.<領域>. を除いた本文で見る（overlay は除かない）。check-lite の仮想環境に window.Trk.core を用意。1 名抜いた逆テストで失敗（確認）。スモーク OK。ヘッドレス（差し替え・書斎/シンス）OK |
+| screen（窓の別名を削除） | `js/core.js` | `Object.defineProperty(window, "screen", …)` を削除（ブラウザ標準の `window.screen` を隠さない）。`window.Trk.core.screen` は残す。例外は本件だけ（他の旧名は別名として残す方針どおり） | 0 | trk70 | 検査（`check-repo.mjs`）：定義を戻すと失敗（確認）。コードに裸の `screen` 参照が無いことを確認（`study-room.js` の `const screen` は局所）。`js/fx.js` に `screen` 参照なし。スモーク OK |
 | study（別名） | `js/study-room.js` | `window.Trk.study = window.TrkStudyRoom;`（凍結のオブジェクトの同じ参照。登録ではなく別名） | 0 | trk69 | 検査（`check-repo.mjs` の別名検査）：無い状態で失敗→追加後に通る。行を消す逆テストで失敗（確認）。スモーク OK |
 
 
-大域の名前（監査）は 317 のまま。旧名（window.X）は別名として残す方針（利用者の決定）のため、減るのは別名を外したときだけ。Trk 側の正規の場所は `window.Trk.<領域>`（監査の window 経由の連携に `window.Trk` が 12 ファイルから書かれる）。
-残りの領域は無し（11 領域の登録・書き換えは完了）。未決：`screen`（window.screen と衝突）の扱い。HANDOFF §7 の実機確認は別途。HANDOFF §7 の実機確認は別途。
+大域の名前（監査）は 317 → **316**（trk70 で `screen` の窓の別名を外した）。`public` は 316 → **181**：D の書き換えで、他ファイルから裸で使われていた名前が `window.Trk.<領域>.X` の参照に移ったため（監査の定義どおりの見え方の変化。宣言数 1171 は不変。`windowProps` 296→284）。以前は「317 のまま」と書いていた。旧名（window.X）は別名として残す方針（利用者の決定）のため、減るのは別名を外したときだけ。Trk 側の正規の場所は `window.Trk.<領域>`（監査の window 経由の連携に `window.Trk` が 12 ファイルから書かれる）。
+残りの領域は無し（11 領域の登録・書き換えは完了）。`screen`（window.screen と衝突）は利用者の選択（c）で決定し、trk70 で窓の別名のみ削除。HANDOFF §7 の実機確認は別途。HANDOFF §7 の実機確認は別途。
 
 ## 4. 止める条件
 
@@ -157,5 +158,5 @@ node tools/smoke-browser.mjs --compare
 - 字句処理は簡易版。正規表現リテラルや特殊な構文で誤判定の可能性がある（誤判定は「公開」側へ倒れるので、包んで壊す方向の誤りは検査で止まる）。
 - 実機（Android Chrome・タッチ・IndexedDB・実曲の音）の確認は、この作業の対象外で、従来どおり HANDOFF §7 に残す。
 - 監査は `tests/`・`tools/` の参照を数えない。テストが vm の文脈から裸の名前を読むと、包んだ瞬間に壊れる（`data.js`・`chart-gen.js` で実際に起きた。どちらも `window` 経由に直した）。包むときは `npm test` を必ず見る。
-- `screen`（core.js）は、ブラウザ標準の `window.screen` と同じ名前。`window.screen` を読むコードは本リポジトリに無いが、大域に出すと標準の値を隠す。段階 D で改名する。
+- `screen`（core.js）は、ブラウザ標準の `window.screen` と同じ名前。`window.screen` を読むコードは本リポジトリに無いが、大域に出すと標準の値を隠す。→ trk70 で窓の別名を外した（利用者の選択 c）。
 - 監査の「大域に残る名前」は、包みの中で `window.X =` または `defineProperty(window, "X", …)` と書いた名前だけを数える。包みの外の宣言は全部数える。

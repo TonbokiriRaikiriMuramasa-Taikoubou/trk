@@ -1,12 +1,12 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 296,
+  "windowProps": 284,
   "duplicates": 0,
   "declarations": 1171,
-  "private": 855,
-  "public": 316,
-  "globalNames": 317
+  "private": 990,
+  "public": 181,
+  "globalNames": 316
  },
  "files": [
   {
@@ -34,37 +34,13 @@
   {
    "file": "js/data.js",
    "decls": 33,
-   "private": 4,
+   "private": 28,
    "public": [
-    "DIFFS",
-    "DIFF_IDS",
-    "EGG_KEYS",
-    "EGG_WORDS",
-    "FONT_DEFAULT",
     "H",
-    "HEX",
-    "LAYOUTS",
-    "MASCOT_CAPTIONS",
-    "MASCOT_DEFS",
-    "MASCOT_FAMILY",
-    "MASCOT_IDS",
-    "MASCOT_POS",
     "NOTE_PRESETS",
-    "NOTE_SHAPES",
-    "SKINS",
     "TAU",
-    "VRM_RECT",
     "W",
-    "buildCustomSkin",
-    "has",
-    "hexToRgba",
-    "luminance",
-    "mixHex",
-    "parseGrad",
-    "registerMascot",
-    "sanitizeNotes",
-    "sanitizeSkinDef",
-    "toHex"
+    "has"
    ]
   },
   {
@@ -84,79 +60,29 @@
   {
    "file": "js/core.js",
    "decls": 162,
-   "private": 46,
+   "private": 118,
    "public": [
     "$",
-    "BEST_KEY",
-    "CAPTION_MS",
-    "CUSTOM_SKIN_MAX",
-    "KEY_PRESETS",
-    "PAD_DEFAULTS",
-    "SKIN_FORMAT",
     "TRK_ENUM_VALUES",
-    "TV_PARAM_FAV_MAX",
-    "VIDEO_KEY_DEFAULTS",
-    "activeMascot",
-    "activeMods",
     "analysis",
-    "applyLanguage",
-    "applyNoteVars",
-    "applySkin",
-    "avatarHit",
     "baseName",
-    "bgImage",
-    "bindingSlot",
     "buildSkinGrid",
     "buildSkinNow",
-    "caption",
     "chart",
-    "chartDiff",
     "chartMeta",
-    "chartMode",
-    "chartSummary",
-    "clampTvBlur",
-    "clampTvDim",
-    "cleanTvParamFavorites",
     "clock",
     "closeSettings",
     "ctx",
-    "currentLevel",
-    "currentSong",
-    "customSkinDefs",
     "downloadBlob",
     "downloadJSON",
-    "effects",
     "el",
     "emit",
-    "errors",
     "esc",
-    "extOf",
     "fingerprint",
-    "fmtDate",
     "fmtTime",
     "fontFamily",
-    "formatKey",
-    "formatPadBind",
     "fx",
-    "gameplayFxMultiplier",
-    "gameplayFxPower",
-    "hashString",
-    "idbStore",
-    "isPclMascot",
-    "keyCodeOf",
-    "keysLabel",
-    "laneCol",
-    "laneColor",
-    "laneName",
-    "lastMissT",
-    "levelOverride",
     "loadToken",
-    "mediaName",
-    "mediaURL",
-    "modsUnranked",
-    "mulberry32",
-    "nextIdx",
-    "noteShape",
     "num",
     "on",
     "openSettings",
@@ -164,44 +90,22 @@
     "pick",
     "practice",
     "prefs",
-    "pressFlash",
-    "pressH",
-    "refreshSeedSecrets",
-    "rememberMusicVolume",
-    "renderAllStatuses",
-    "renderStatus",
-    "safeHttpUrl",
     "safeLink",
     "safeModeOn",
     "safeName",
-    "saveCustomSkins",
     "saveUserPrefs",
-    "savedSkinAtBoot",
     "screen",
-    "seekDragging",
-    "setPhase",
     "setStatus",
     "settings",
-    "showScreen",
     "skin",
-    "slotLane",
-    "slotOfKey",
     "stage",
     "stats",
-    "syncPickers",
     "takeAmpReset",
-    "travelMs",
-    "updateChartButtons",
-    "updateKeyUI",
-    "updateTouchKeys",
-    "validCode",
-    "validPadBind",
     "vctx",
     "video",
     "videoFilter",
     "videoReady",
-    "view",
-    "windows"
+    "view"
    ]
   },
   {
@@ -224,34 +128,19 @@
   {
    "file": "js/chart-gen.js",
    "decls": 18,
-   "private": 16,
-   "public": [
-    "buildChartNotes",
-    "cgEstimateLevel"
-   ]
+   "private": 18,
+   "public": []
   },
   {
    "file": "js/media.js",
    "decls": 25,
-   "private": 7,
+   "private": 19,
    "public": [
-    "CHART_FILE_MAX",
     "applyChartData",
     "audioCtx",
-    "buildChart",
     "chartToData",
     "decodeAudio",
-    "estimateLevel",
-    "exportChart",
-    "generateNotes",
     "getAC",
-    "importChartFile",
-    "loadMedia",
-    "loadSE",
-    "playSE",
-    "rmsAt",
-    "seBuffers",
-    "seFiles",
     "setBackground"
    ]
   },
@@ -292,38 +181,24 @@
   {
    "file": "js/render.js",
    "decls": 39,
-   "private": 27,
+   "private": 33,
    "public": [
-    "beatPulse",
     "drawVideo",
     "hitPos",
     "layout",
-    "loop",
-    "noteAlpha",
-    "ownField",
-    "retryHoldAt",
     "rr",
     "showToast",
-    "toast",
-    "vrmState"
+    "toast"
    ]
   },
   {
    "file": "js/custom.js",
    "decls": 65,
-   "private": 54,
+   "private": 62,
    "public": [
-    "getPackSongs",
-    "initPacks",
-    "installPackFile",
     "noteImage",
-    "packDB",
     "packRuntime",
-    "renderPackList",
-    "sanitizeSong",
-    "skinShelf",
-    "syncNoteUI",
-    "updateMascotUI"
+    "skinShelf"
    ]
   },
   {
@@ -492,33 +367,24 @@
   {
    "file": "js/library.js",
    "decls": 250,
-   "private": 225,
+   "private": 234,
    "public": [
-    "LIB_SHOW",
-    "addSongFiles",
-    "addVideoFiles",
     "addonSongs",
     "allSongs",
     "bannerRandomBtn",
     "bannerVolTip",
     "ensureTrkDistributionPlaylists",
-    "initLibrary",
-    "libView",
     "nextSong",
-    "onLongPress",
     "plToast",
     "prevSong",
     "previewStartFor",
     "refreshPackSongs",
-    "renderBanner",
     "renderLib",
-    "saveSongPrefs",
     "selectSong",
     "setAddonSongs",
     "songInfo",
     "srcLabel",
-    "startPreview",
-    "trySongChart"
+    "startPreview"
    ]
   },
   {
@@ -542,14 +408,12 @@
   {
    "file": "js/main.js",
    "decls": 41,
-   "private": 35,
+   "private": 37,
    "public": [
     "RESERVED",
     "idleTimer",
-    "packsReady",
     "poke",
-    "showFxPower",
-    "syncOptionsUI"
+    "showFxPower"
    ]
   },
   {
@@ -874,22 +738,44 @@
   {
    "name": "Trk",
    "writers": [
-    "js/core.js"
+    "js/data.js",
+    "js/core.js",
+    "js/lite.js",
+    "js/chart-gen.js",
+    "js/media.js",
+    "js/render.js",
+    "js/custom.js",
+    "js/catch.js",
+    "js/library.js",
+    "js/main.js",
+    "js/pad.js",
+    "js/study-room.js"
    ],
    "readers": [
+    "js/characters/miku.js",
     "js/player.js",
+    "js/game.js",
     "js/truck.js",
     "js/modes.js",
     "js/stage.js",
-    "js/catch.js",
+    "js/stagefx.js",
     "js/extras.js",
+    "js/fx-dock.js",
+    "js/tv-dock.js",
+    "js/tv-rich.js",
     "js/video-max.js",
-    "js/main.js",
-    "js/pad.js",
+    "js/fx-synth.js",
+    "js/favs.js",
+    "js/verified.js",
+    "js/lib-skins.js",
+    "js/addons.js",
     "js/speed.js",
+    "js/vrm.js",
+    "js/mmd.js",
+    "js/spectrum.js",
     "js/synth-mode.js",
-    "js/media-player-mode.js",
-    "js/study-room.js"
+    "js/frame-interp.js",
+    "js/media-player-mode.js"
    ]
   },
   {
@@ -1170,13 +1056,6 @@
    "readers": []
   },
   {
-   "name": "activeMods",
-   "writers": [
-    "js/core.js"
-   ],
-   "readers": []
-  },
-  {
    "name": "addSongFiles",
    "writers": [
     "js/library.js"
@@ -1198,13 +1077,6 @@
    "readers": []
   },
   {
-   "name": "applyChartData",
-   "writers": [
-    "js/media.js"
-   ],
-   "readers": []
-  },
-  {
    "name": "applyLanguage",
    "writers": [
     "js/core.js"
@@ -1213,13 +1085,6 @@
   },
   {
    "name": "applyNoteVars",
-   "writers": [
-    "js/core.js"
-   ],
-   "readers": []
-  },
-  {
-   "name": "applySkin",
    "writers": [
     "js/core.js"
    ],
@@ -1348,13 +1213,6 @@
    "name": "chartSummary",
    "writers": [
     "js/core.js"
-   ],
-   "readers": []
-  },
-  {
-   "name": "chartToData",
-   "writers": [
-    "js/media.js"
    ],
    "readers": []
   },
@@ -1501,7 +1359,6 @@
   {
    "name": "drawVideo",
    "writers": [
-    "js/render.js",
     "js/tv-dock.js"
    ],
    "readers": []
@@ -1621,13 +1478,6 @@
    "readers": []
   },
   {
-   "name": "gameTime",
-   "writers": [
-    "js/game.js"
-   ],
-   "readers": []
-  },
-  {
    "name": "gameplayFxMultiplier",
    "writers": [
     "js/core.js"
@@ -1652,13 +1502,6 @@
    "name": "getAC",
    "writers": [
     "js/media.js"
-   ],
-   "readers": []
-  },
-  {
-   "name": "getPackSongs",
-   "writers": [
-    "js/custom.js"
    ],
    "readers": []
   },
@@ -1727,13 +1570,6 @@
   },
   {
    "name": "initPacks",
-   "writers": [
-    "js/custom.js"
-   ],
-   "readers": []
-  },
-  {
-   "name": "installPackFile",
    "writers": [
     "js/custom.js"
    ],
@@ -2167,27 +2003,6 @@
    "readers": []
   },
   {
-   "name": "renderBanner",
-   "writers": [
-    "js/library.js"
-   ],
-   "readers": []
-  },
-  {
-   "name": "renderLib",
-   "writers": [
-    "js/library.js"
-   ],
-   "readers": []
-  },
-  {
-   "name": "renderPackList",
-   "writers": [
-    "js/custom.js"
-   ],
-   "readers": []
-  },
-  {
    "name": "renderRecords",
    "writers": [
     "js/game.js"
@@ -2300,13 +2115,6 @@
    "readers": []
   },
   {
-   "name": "sanitizeSong",
-   "writers": [
-    "js/custom.js"
-   ],
-   "readers": []
-  },
-  {
    "name": "saveCustomSkins",
    "writers": [
     "js/core.js"
@@ -2408,13 +2216,6 @@
    "name": "showFxPower",
    "writers": [
     "js/main.js"
-   ],
-   "readers": []
-  },
-  {
-   "name": "showJudge",
-   "writers": [
-    "js/game.js"
    ],
    "readers": []
   },
@@ -2750,7 +2551,6 @@
   {
    "name": "videoFilter",
    "writers": [
-    "js/core.js",
     "js/tv-dock.js"
    ],
    "readers": []

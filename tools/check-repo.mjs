@@ -1729,34 +1729,36 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   else ok("アドオンの api の鍵（" + keys.length + "件）は docs/ADDONS.md に全て載っている");
 }
 
-/* 互換名の段階的廃止：現存する window 別名・今回外した名前・Trk.core の正規 accessor を照合。
+/* 互換名の段階的廃止：tools/compat-names.json を正とし、現存する window 別名・Trk.core の正規 accessor・
+   frozen js/fx.js の実際の読者を照合する。一覧は文書の文言からは読まず JSON から読む
+   （レビュー4回目の指摘：ADDONS.md の見出しを正規表現で拾っていたため、文を直すだけで検査が落ちた）。
    fx.js が凍結中の5名を読むため、その5名だけは移行後まで保留する。 */
 {
   const coreSrc = fs.readFileSync(path.join(root, "js/core.js"), "utf8");
   const fxSrc = fs.readFileSync(path.join(root, "js/fx.js"), "utf8");
-  const exempt = new Set(["_trkStudyRoomOpen"]);
-  const actual = [...coreSrc.matchAll(/defineProperty\(window, "([A-Za-z_$][\w$]*)"/g)].map(m => m[1]).filter(n => !exempt.has(n));
-  const docs = fs.readFileSync(path.join(root, "docs/ADDONS.md"), "utf8");
-  const sec = (docs.match(/### 互換名の廃止状況[\s\S]*?(?=\n## |\n### )/) || [""])[0];
-  const removedLine = (sec.match(/^- \*\*trk90で廃止（28件）：\*\*(.*)$/m) || [, ""])[1];
-  const retainedLine = (sec.match(/^- \*\*現存（5件）：\*\*(.*)$/m) || [, ""])[1];
-  const removed = [...removedLine.matchAll(/`([A-Za-z_$][\w$]*)`/g)].map(m => m[1]);
-  const retained = [...retainedLine.matchAll(/`([A-Za-z_$][\w$]*)`/g)].map(m => m[1]);
-  const former = `activeMods analysis applySkin avatarHit bgImage bindingSlot caption chart chartDiff chartMeta chartMode clock currentLevel currentSong effects errors fingerprint lastMissT levelOverride loadToken mediaName mediaURL nextIdx phase practice prefs pressFlash pressH safeModeOn seekDragging stats videoFilter videoReady`.split(" ");
-  const coreMembers = new Set([...coreSrc.matchAll(/defineProperty\(window\.Trk\.core, "([A-Za-z_$][\w$]*)"/g)].map(m => m[1]));
-  const currentSorted = [...new Set(actual)].sort();
-  const retainedSorted = [...new Set(retained)].sort();
-  const formerSorted = [...former].sort();
-  const accountedSorted = [...new Set([...removed, ...retained])].sort();
-  const expectedRetained = ["chartMeta", "phase", "prefs", "stats", "videoReady"];
-  const missingCore = former.filter(n => !coreMembers.has(n));
-  const missingFrozenConsumer = expectedRetained.filter(n => !new RegExp(`(?<![\\w$.])${n}(?![\\w$])`).test(fxSrc));
-  if (!sec) fail("docs/ADDONS.md に「互換名の廃止状況」の節がありません");
-  else if (JSON.stringify(currentSorted) !== JSON.stringify(retainedSorted)) fail("現存する core.js のwindow別名と docs/ADDONS.md の現存一覧が不一致");
-  else if (JSON.stringify(accountedSorted) !== JSON.stringify(formerSorted) || removed.length !== 28 || retained.length !== 5) fail("trk90廃止分と保留分が、従来の33互換名を重複なく網羅していません");
-  else if (missingCore.length) fail("廃止済み／保留の名前が window.Trk.core にありません: " + missingCore.join(", "));
-  else if (JSON.stringify(retainedSorted) !== JSON.stringify([...expectedRetained].sort()) || missingFrozenConsumer.length) fail("保留する5名は frozen js/fx.js の実際の読者と一致しません");
-  else ok("互換名: 28件を廃止、frozen js/fx.js の5件を保留（Trk.core は全33件を維持）");
+  let compat = null;
+  try { compat = JSON.parse(fs.readFileSync(path.join(root, "tools/compat-names.json"), "utf8")); }
+  catch (e) { fail("tools/compat-names.json を読めません: " + e.message); }
+  if (compat) {
+    const exempt = new Set((compat.exempt || []).map(r => r.name));
+    const actual = [...coreSrc.matchAll(/defineProperty\(window, "([A-Za-z_$][\w$]*)"/g)].map(m => m[1]).filter(n => !exempt.has(n));
+    const docs = fs.readFileSync(path.join(root, "docs/ADDONS.md"), "utf8");
+    const removed = Array.isArray(compat.removed) ? compat.removed : [];
+    const retained = Array.isArray(compat.retained) ? compat.retained.map(r => r && r.name) : [];
+    const former = [...removed, ...retained];
+    const coreMembers = new Set([...coreSrc.matchAll(/defineProperty\(window\.Trk\.core, "([A-Za-z_$][\w$]*)"/g)].map(m => m[1]));
+    const currentSorted = [...new Set(actual)].sort();
+    const retainedSorted = [...new Set(retained)].sort();
+    const missingCore = former.filter(n => !n || !coreMembers.has(n));
+    const missingFrozenConsumer = retained.filter(n => !n || !new RegExp(`(?<![\\w$.])${n}(?![\\w$])`).test(fxSrc));
+    const docsRefOk = /### 互換名の廃止状況/.test(docs) && /tools\/compat-names\.json/.test(docs);
+    if (!docsRefOk) fail("docs/ADDONS.md の「互換名の廃止状況」節が tools/compat-names.json を参照していません");
+    else if (JSON.stringify(currentSorted) !== JSON.stringify(retainedSorted)) fail("現存する core.js のwindow別名と tools/compat-names.json の保留一覧が不一致");
+    else if (new Set(former).size !== 33 || removed.length !== 28 || retained.length !== 5) fail("trk90廃止分と保留分が、従来の33互換名を重複なく網羅していません（廃止" + removed.length + "件・保留" + retained.length + "件）");
+    else if (missingCore.length) fail("廃止済み／保留の名前が window.Trk.core にありません: " + missingCore.join(", "));
+    else if (missingFrozenConsumer.length) fail("保留する名前が frozen js/fx.js に実際にはありません: " + missingFrozenConsumer.join(", "));
+    else ok("互換名: tools/compat-names.json を正に、28件を廃止・5件を保留（Trk.core は全33件を維持）");
+  }
 }
 
 /* 項目 5（README の分割）：README は概要に絞る（上限 12KB）。docs/guide/ の全ファイルは目次（index.md）に載せる。 */

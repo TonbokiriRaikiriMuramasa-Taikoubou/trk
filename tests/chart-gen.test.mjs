@@ -104,27 +104,36 @@ describe("新方式（chartGen 2）", () => {
   });
 
   test("音量の差が大きい曲では、静かな区間の方が密度が低い（係数と絶対音量ゲートの両方が効く）", () => {
-    // 係数だけなら 小さい区間÷大きい区間 ≒ 0.7 ÷ 1.3 ≒ 0.54 になる。絶対音量ゲートは上級の25%を基準に、
-    // 難易度の density に比例して上限を調整する。初級・中級でも静かな側が十分低く、かつゼロにはならないことを見る。
+    // 係数だけなら 小さい区間÷大きい区間 ≒ 0.7 ÷ 1.3 ≒ 0.54 になる。絶対音量ゲートは難易度順の上限表
+    // （初級15%・中級20%）で静かな区間を絞る。初級は上限15%の表で約0.13（0.44 nps）。
+    // 下限 0.10 は「静かな区間がゼロにはならない」ことの確認で、仕様の数値ではない。
     for (const diff of ["easy", "normal"]) {
       const notes = generate("contrast", { diff, chartGen: "2" });
       const ratio = perSec(notes, 0, 16) / perSec(notes, 96, 120);
-      assert.ok(ratio >= 0.15 && ratio <= 0.7, `contrast ${diff}: 比 ${ratio.toFixed(2)}`);
+      assert.ok(ratio >= 0.10 && ratio <= 0.7, `contrast ${diff}: 比 ${ratio.toFixed(2)}`);
     }
   });
 
-  test("静かな長い曲では、難易度のdensityに応じて静かな区間の上限も増える", () => {
+  test("静かな長い曲では、難易度が上がるとノーツ総数が厳密に増える", () => {
     // 以前は上級・達人とも静かな区間が候補の25%、盛り上がりが候補の100%で頭打ちになり、459ノーツで一致した。
-    // contrast は上の難易度にも候補の余地が残るため、ノーツ数が厳密に増えることを検査する。
-    assert.equal(DIFFS.hard.density, 0.60, "chart-gen の静かな上限の基準は DIFFS.hard.density と揃える");
+    // 静かな区間の上限は難易度順の表（CG_QUIET_CAPS）で単調に増えるため、総数も厳密に増えることを検査する。
     const counts = DIFF_IDS.map(diff => generate("contrast", { diff, chartGen: "2" }).length);
     for (let i = 1; i < counts.length; i++) {
       assert.ok(counts[i] > counts[i - 1], `${DIFF_IDS[i - 1]}=${counts[i - 1]} !< ${DIFF_IDS[i]}=${counts[i]}`);
     }
   });
 
+  test("静かな区間の密度は難易度が上がるほど厳密に増える（上限表が難易度順に単調なことの実効）", () => {
+    // contrast の 0〜90 秒は静かな区間。候補数に対する上限は 初級15% < 中級20% < 上級25% < 達人34% < RUSH40%。
+    // グリッド密度（div）の違いで秒あたりの候補数は難易度ごとに異なるが、実密度も単調に増えることを見る。
+    const nps = DIFF_IDS.map(diff => perSec(generate("contrast", { diff, chartGen: "2" }), 0, 90));
+    for (let i = 1; i < nps.length; i++) {
+      assert.ok(nps[i] > nps[i - 1], `${DIFF_IDS[i - 1]}=${nps[i - 1].toFixed(2)} !< ${DIFF_IDS[i]}=${nps[i].toFixed(2)}`);
+    }
+  });
+
   test("絶対音量ゲート：静かな長い区間（contrast の 0〜90秒）も、上級・達人で満密度にはならない", () => {
-    // 上級（25%）は約2.5 nps、達人（約34%）は約3.1 nps。どちらも旧来の満密度（約7.9 nps）より低い。
+    // 上級（25%）は約2.5 nps、達人（34%）は約3.1 nps。どちらも旧来の満密度（約7.9 nps）より低い。
     for (const [diff, maxNps] of [["hard", 3.0], ["master", 3.5]]) {
       const notes = generate("contrast", { diff, chartGen: "2" });
       const quiet = perSec(notes, 0, 90);

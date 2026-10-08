@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-09**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
+> **最終更新：2026-10-09（trk91）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
 
 ## 1. 作業を再開するとき
 
@@ -38,13 +38,13 @@
 - 軽量化の判定・描画ゲートは `js/lite.js`。ゲーム判定と音声時計は描画間引きの前に処理する。設定の保存形式は既存の `shadow_taiko_preferences_v2` を維持する。
 - 書斎は端末内のIndexedDB `trk_study_room_v1` に保存。書斎の本文は文字として描画し、`.txt`／`.md`／`.js`等の編集は`textarea`からローカルコピーだけを書き換える。HTML／JavaScript／Markdownを実行・HTML解釈・プレビューする経路を追加しない。上級者設定で編集後の本棚フォルダを選べるが、本文の保存先は引き続きIndexedDB。本棚の元ファイルは読み取り専用。明示的な書き出しだけは、ユーザーが別途選んだフォルダへ衝突しない新規名のテキストコピーを作り、既存ファイルを上書きしない（選択ハンドルは起動中のメモリだけに保持。非対応ブラウザは通常ダウンロード）。画像のObject URLは不要時に破棄。本棚フォルダ・本の移動・手動順序は `settings` store の `shelf` レコード、表示状態・Studyナビゲーションキー等は `ui` レコードに保存する。既存DBバージョンを変えずに正規化し、フォルダ削除では本を削除せず本棚へ戻す。
 - 書斎の文字スキンは30種（文筆・読書11／コーディング6／AI・プロンプト風5／自由な発想8）。4分類の`optgroup`と30個のテーマ名は4言語で管理し、読書ページと編集用`textarea`の両方にテーマ色・書体・背景を適用する。AI・プロンプト風は装飾のみで、AI処理・ネットワークアクセスを追加しない。
-- **自動譜面（`js/chart-gen.js`）**：設定 `chartGen`（Seed欄の下の「自動譜面の作り方」）。既定は **`"2"`＝新方式**（2026-10-08、利用者の決定：冒頭の小さな音を拾うこと・総数の増加を受け入れ）。`"1"`＝旧方式は選択で戻せ、旧方式で作った記録は記録表で「旧方式」の印が付く（記録作成時に `gen` を保存）。`"2"`＝新方式は、前後4秒の90パーセンタイルで音量を局所正規化し、8小節ごとに「長さ×密度」でノーツ数を先に配って、盛り上がりは 0.7〜1.3 倍で残す。平均音量が曲の最大の6%未満の静かな区間は、上級（`DIFFS.hard.density = 0.60`）の候補25%を基準に `floor(候補数 × 0.25 × 難易度density / 0.60)` までに絞る（trk90、絶対音量ゲート。削った分は他の区間へ回る）。そのため上限は初級22.9%・中級20%・上級25%・達人34.2%・RUSH39.6%。合成曲 `contrast` の総数は初級〜RUSHで **115／212／459／514／894**、隣接難易度で厳密に増える（候補位置が足りる場合）。同曲の静かな区間（0〜90秒）は上級2.47 nps・達人3.08 nps。達人Lvは10で、Lv12〜15帯を回復したことまでは示さない。冒頭の判定は最大音量の1%未満のみ無音扱い（旧方式は6%）なので、冒頭の小さな音も入りやすい。`chartGen` の純関数としての未指定は旧方式のまま（ゴールデンを保つため）。旧方式の出力は `tests/fixtures/chart-legacy-golden.json`（ca84a19の`generateNotes`から取得）と全件一致が必須。ゴールデンは旧方式を変えたときに**作り直さない**（`node tests/capture-legacy-golden.mjs`は一度きりの道具）。
+- **自動譜面（`js/chart-gen.js`）**：設定 `chartGen`（Seed欄の下の「自動譜面の作り方」）。既定は **`"2"`＝新方式**（2026-10-08、利用者の決定：冒頭の小さな音を拾うこと・総数の増加を受け入れ）。`"1"`＝旧方式は選択で戻せ、旧方式で作った記録は記録表で「旧方式」の印が付く（記録作成時に `gen` を保存）。`"2"`＝新方式は、前後4秒の90パーセンタイルで音量を局所正規化し、8小節ごとに「長さ×密度」でノーツ数を先に配って、盛り上がりは 0.7〜1.3 倍で残す。平均音量が曲の最大の6%未満の静かな区間（絶対音量ゲート）は、候補数の上限を難易度順の表 `CG_QUIET_CAPS` で絞る。上限は初級15%・中級20%・上級25%・達人34%・RUSH40%。削った分は他の区間へ回る。表は `DIFFS` の density とは独立している（trk90 までの density 比例式は、初級22.9%が中級20%を上回る逆転を起こしたため、trk91 で廃止）。合成曲 `contrast` の総数は初級〜RUSHで **100／212／459／514／894**（trk91 で初級は 115→100）、隣接難易度で厳密に増える（候補位置が足りる場合）。同曲の静かな区間（0〜90秒）は上級2.47 nps・達人3.08 nps。達人Lvは10で、Lv12〜15帯を回復したことまでは示さない。冒頭の判定は最大音量の1%未満のみ無音扱い（旧方式は6%）なので、冒頭の小さな音も入りやすい。`chartGen` の純関数としての未指定は旧方式のまま（ゴールデンを保つため）。旧方式の出力は `tests/fixtures/chart-legacy-golden.json`（ca84a19の`generateNotes`から取得）と全件一致が必須。ゴールデンは旧方式を変えたときに**作り直さない**（`node tests/capture-legacy-golden.mjs`は一度きりの道具）。
 - ライフ（体力）の規則は `js/modes.js` の `lifeRule(totalNotes)`（TRUCK の標準・最大・回復の帯）にある。ノーツ数で段階的に決まり、本書には数値を書かない。ノーツ数が増えると回復量が少し増える（帯が変わるのは250／650を越えるときだけ）。自動譜面の総数が増えたことは利用者が受け入れ済み。
 - **解析結果のキャッシュ（`js/media.js` の `analyzeAudioCached`）**：IndexedDB `trk_analysis_cache_v1`（packs DB とは別）。鍵は fingerprint＋先頭・末尾 64KB の SHA-256＋版数 `ANALYSIS_CACHE_VERSION`。保存するのは rms・onset・ratio の配列と数値だけ（PCM は保存しない）。ratio は既定の譜面作り方（chartGen 2）が使うので必ず入れる。読むときは形を確かめ、合わなければ解析し直す。30件まで（最後に読んだ時刻が古い順に消す。読み出しで `savedAt` を更新する LRU）。解析の式を変えたら版数を上げる。
 - **📺 TVドックの設定（`js/tv-dock.js`）**：くわしいの中の「📺 TVドック」グループ。チェックは3つ：🧱 壁掛け（スキン `wall` と同じ。外すと映画館に戻る）、↕ 並び替え（テレビとラックの上下）、🔢 5枠化（`tvDockFive`）。既定はすべて OFF（映画館・テレビが上・5枠なし）。くわしいは既定で開いた状態（保存済みの開閉は変えない）。テレビ本体とラックの表示は変えていない。
 - **Loop Lab の映像書き出し（`js/media-player-mode.js` の `exportLoopClip`）**：開発者表示の中だけ。記録した区間の行の 🎬 を押すと、映像と音を区間の長さのぶん録画して保存する（WebM。対応していれば MP4）。設定は持たない。書き出し後は再生位置・再生／停止・速度・ループを元に戻す。曲を切り替えたら途中で止め、保存しない。音声だけの曲は書き出さない。
 - **「📁 開く」と「📤 共有」**（`js/library.js`）：📁 開く は曲を入れるだけで、共有としては覚えない。📤 共有 は共有として覚え、📤 の印が付き、「共有をやめる」でまとめて外せ、「端末に残す」の対象になる。ボタンの下の説明行は `libOpenShareHint`（4言語）。
-- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.8-trk90`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
+- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.8-trk91`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
 
 ## 3. 権利・データ・セキュリティの不変条件
 
@@ -92,7 +92,7 @@ npm run check
 git diff --check
 ```
 
-`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。譜面ハッシュは注入した合成analysisから生成し、実WAVのデコード経路は別にエラー0・ノーツ件数±5%を確認。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-08／trk90）は Security 55 checks、a11y 8 checks、vendor 8 checks、軽量化 121 assertions、`npm test` 93件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
+`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。譜面ハッシュは注入した合成analysisから生成し、実WAVのデコード経路は別にエラー0・ノーツ件数±5%を確認。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-09／trk91）は Security 55 checks、a11y 8 checks、vendor 8 checks、軽量化 121 assertions、`npm test` 94件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
 
 `check-repo.mjs` はJavaScript構文・ローカル参照・ID・設定文言に加え、Arknights公式リンク、Blue Archive 225曲、LoL Sessions 108曲／Phase 1の58件、Gakumas 50件・別名、公式リンクと権利注記、既存プレイリストの所有曲・カスタムフィールド保持を検査する。チェックは意図的な逆テストでもFAILすることを確認してから追加する。外部ツールの起動後DOM検査は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照し、リポジトリ外で行う。
 
@@ -100,7 +100,7 @@ git diff --check
 
 静的検査だけでは以下を保証できない。対応端末で確認したらこの節を更新する。
 
-- **ブラウザースモーク（trk90）** — `tools/smoke-browser.mjs` の譜面比較は合成analysisを直接注入し、AudioContextの差に依存しないSHA-256基準を使う。実WAVのデコード／解析は別にエラー0・各難易度のノーツ数±5%を確認する。この作業では `@sparticuz/chromium` と `puppeteer-core` を一時領域（リポジトリ外）で使って実行し、`--write`／`--compare` とも成功（boot 0・未解決 0・合成譜面10件のhash／キー集合が完全一致・実WAV10件のキー集合一致と件数±5%・デコードエラー0・click error 0）。依存は `package.json` に追加していない。
+- **ブラウザースモーク（trk90 で実行、trk91 で譜面の基準を一部更新）** — `tools/smoke-browser.mjs` の譜面比較は、合成 analysis を直接注入して SHA-256 で比べるため、AudioContext の差に左右されない。実 WAV のデコード・解析は別経路として、エラー 0・各難易度のノーツ数 ±5% だけを見る。trk90 では `@sparticuz/chromium` と `puppeteer-core` を一時領域（リポジトリ外）で使い、`--write`／`--compare` がともに成功した（boot 0・未解決 0・合成譜面 10 件のハッシュ・キー集合が一致・実 WAV 10 件のキー集合一致と件数 ±5%・デコードエラー 0・click error 0）。trk91 では Chromium のない環境のため再実行していない。合成譜面のうち `gen2/easy` だけが 115→100 に変わったので、基準は node で同じ手順により再計算して更新した（他 9 件は一致）。依存は `package.json` に追加していない。
 - **記録の残し方** — 下の項目を実機で確認したら、Issue「📱 実機確認の記録」（`.github/ISSUE_TEMPLATE/device_check.yml`）で端末・日付・確認した項目を残す。
 - **Service Worker の cache-first（trk74）** — ハッシュ固定の vendor が、オンラインでキャッシュから返ること（通信が出ない）。キャッシュの中身を書き換えたとき（開発者ツールで）、次の読み込みで取り直されること。オフラインでも、MMD／VRM が動くこと（Android Chrome／PC）。`?safe=1` で開いたページは、オフラインで vendor を取れないこと（503 の文）。
 - **長押しの見える代わり（trk73）** — タブ帯の ⚙ が、いま選んでいるタブ（プレイリスト・フォルダ・📚すべて・🐔）の設定を開くこと。スキンを開いたときの「⚙ くわしい設定」が、設定のスペクトラム欄を開いてスクロールすること。曲リストの見出しの右の「📚 書斎を開く」で書斎が開くこと。設定「長押しの代わりのボタンを出す」をオフにすると、3つとも消えること。
@@ -137,7 +137,7 @@ git diff --check
 ## 9. 継続検討・未決事項
 
 - **音楽カタログ**：LoLの未調査範囲（旧ログインテーマ・残りChampion Themes・Skin／イベント曲・ゲームOSTなど）を公式ソースと利用条件から段階調査。Blue Archiveについても権利者のガイドラインを軸に公式配信・購入先を案内し、購入だけで二次利用が許可されるという前提は置かない。
-- **譜面生成**：静かなイントロから始まり後半ほど音量が大きい曲では、旧方式の自動譜面が後半へ偏る（冒頭に0ノーツ・20秒から開始の実測あり）。新方式（`chartGen` "2"）で改善し、**2026-10-08に既定を新方式へ切り替えた**（旧方式は `"1"` で選べる）。静かな長い区間は、絶対音量ゲート（trk76）を難易度のdensityに比例させる（trk90）。合成曲 `contrast` では全難易度の総数が厳密に増えることを検査する一方、達人Lv12〜15帯に届くかは別の受入条件としていない（実測Lv10）。盛り上がり区間は候補の100%で頭打ちになる場合がある（仕様上、候補にない位置へは置かない）。実曲での自然さ・Lv表示・実機の手触りは§7で確認する。レビューの対応状況は `docs/REVIEW-2026-10-08.md`。
+- **譜面生成**：静かなイントロから始まり後半ほど音量が大きい曲では、旧方式の自動譜面が後半へ偏る（冒頭に0ノーツ・20秒から開始の実測あり）。新方式（`chartGen` "2"）で改善し、**2026-10-08に既定を新方式へ切り替えた**（旧方式は `"1"` で選べる）。静かな長い区間は、絶対音量ゲート（trk76）の上限を難易度順の表で絞る（trk91。trk90 の density 比例式から変更）。合成曲 `contrast` では全難易度の総数・静かな区間の密度が厳密に増えることを検査する一方、達人Lv12〜15帯に届くかは別の受入条件としていない（実測Lv10）。Lv は曲の峰で決まるため、同じ曲の上級と達人の Lv が並ぶことは仕様どおり（利用者向けには `docs/guide/play.md` §「難易度名と Lv」に説明）。盛り上がり区間は候補の100%で頭打ちになる場合がある（仕様上、候補にない位置へは置かない）。実曲での自然さ・Lv表示・実機の手触りは§7で確認する。レビューの対応状況は `docs/REVIEW-2026-10-08.md`。
 - **IndexedDB回帰検査（済・2026-10-08）**：`tests/idb.test.mjs`（13件）が、パック容量v2の移行・`size` index（主キーを size と取り違えない）・`putIf` の上限・`onblocked`・`onversionchange`、および解析キャッシュ（往復・壊れた記録・30件の上限・セーフモード・2回目は解析しない）を、`js/core.js` の `idbStore` と `js/media.js` の該当区間を vm で読んで検査する。実ブラウザの代わりに `tests/helpers/fake-idb.mjs`（in-memory の shim）を使うので、本物の挙動との差は shim の冒頭に書いてある。実 Chromium での確認は別途（`IDBIndex.getAllKeys` は主キーを返し、`openKeyCursor` の `key` が索引の値）。
 - **軽量化の追加候補**：起動時のサンプル映像 preload と、rAF外のA-B／逆再生setIntervalは未調整。初速・ループ精度とのトレードオフがあるため、実機検証なしに変更しない。
 - **実ブラウザ検収**：§7の端末確認が未完了。静的テストを根拠に実機検収済みとしない。
@@ -162,14 +162,24 @@ git diff --check
 
 ## 11. 最近の変更
 
-### 作業要約（2026-10-09時点・trk75〜90）
+### 作業要約（2026-10-09時点・trk75〜91）
 
 - **再レビュー対応（trk75〜77、trk90）**：IndexedDB・解析キャッシュ・名前空間・譜面生成・実行動作テスト。詳細は下の項目。
 - **スキンの増量（trk78〜89）**：ゲーム画面 27 → 40、TVドック 30 → 36、棚 16 → 30、書斎 24 → 30、映像フィルター 65 → 70。見やすさ・生活・色覚配慮・ビビットの系統を追加。**✨ TRKエフェクト**（映像フィルターの 20 種）は固定（`tests/trk-effects-fixed.test.mjs`）。映像フィルターの分類「エフェクト」は「ムード・場面」に改名。**スキン数は減らしていない。**
-- **最終検査（2026-10-09）**：`npm run check` 成功（Static 0 failure／0 warning、Security 55、a11y 8、vendor 8、MMD・Study・lite checks passed）、`npm test` 93/93、`node tools/globals-audit.mjs --compare` 成功（classic scripts 45・宣言 1189・private 1009・public 180・衝突 0・global names 288・window経由の連携 25）、`node tools/check-repo.mjs`・`git diff --check` 成功。ブラウザースモーク `--write`／`--compare` とも成功。`--compare` は合成譜面10件のhash／キー集合が完全一致、実WAV譜面10件のキー集合一致・件数±5%、boot／未解決名／decode／page／click errors 0（84 clicks・6 scenarios）。
+- **最終検査（trk91・2026-10-09）**：`npm run check` 成功（Static 0 failure／0 warning、Security 55、a11y 8、vendor 8、node:test 94/94）、`node tools/globals-audit.mjs --compare` 成功、`git diff --check` 成功。ブラウザースモークは trk91 では未実行（§7）。
+- **最終検査（trk90・2026-10-09）**：`npm run check` 成功（Static 0 failure／0 warning、Security 55、a11y 8、vendor 8、MMD・Study・lite checks passed）、`npm test` 93/93、`node tools/globals-audit.mjs --compare` 成功（classic scripts 45・宣言 1189・private 1009・public 180・衝突 0・global names 288・window経由の連携 25）、`node tools/check-repo.mjs`・`git diff --check` 成功。ブラウザースモーク `--write`／`--compare` とも成功。`--compare` は合成譜面10件のhash／キー集合が完全一致、実WAV譜面10件のキー集合一致・件数±5%、boot／未解決名／decode／page／click errors 0（84 clicks・6 scenarios）。
 - **未確認**：実ブラウザでの見た目（§7 に記録）。中国語・韓国語の訳は、母語話者の確認をしていない。自然さに問題があれば issue で指摘してもらう方針。
 - **次の候補**（§9）：棚・TVドックの自由な発想の案、実機での確認。
 
+- **2026-10-09 — 4回目レビュー（48f4550・trk90）の残り3件への対応（trk91）：**
+  - ① 静かな区間の上限を、density 比例式から難易度順の表へ変更（`CG_QUIET_CAPS`：初級15%・中級20%・上級25%・達人34%・RUSH40%）。初級が中級を上回る逆転が解消し、`DIFFS` の density と揃える必要もなくなった。
+    - 実測：contrast の総数は 115→100（初級のみ）／212／459／514／894。静かな区間（0〜90秒）は 0.44／1.03／2.47／3.08／7.30 nps で、難易度順に厳密増加。
+    - 旧方式、introChorus・flat の初級・中級、longRamp の±10% は変わらない。
+    - テスト：density 一致の assert を外し、静かな区間の密度の単調増加を追加（`npm test` 94件）。初級の静かな区間の比の下限は 0.15→0.10（上限15%の表で約0.13。0 にならないことの確認で、仕様の数値ではない）。
+  - ② 互換名の一覧を `tools/compat-names.json` へ移し、`check-repo` は文書の見出し・文言を読まないようにした。JSON を壊すと FAIL、文書の文言だけを変えても通ることを確認。`docs/ADDONS.md` は一覧を JSON 参照に変更。
+  - ③ 静かな曲で上級と達人の Lv が並ぶ件は仕様どおりとし、`docs/guide/play.md` に「難易度名と Lv」の節を追加（Lv は峰の難しさ）。
+  - ブラウザースモーク：合成譜面10件は node で同じ手順により再計算し、変わった `gen2/easy`（115→100、hash `18df8242…`）の1件だけを基準に反映した。他の9件は一致。Chromium がないため、`smoke-browser.mjs --compare` と実 WAV のデコード経路（gen2/easy の件数 ±5%）は未実行。
+  - `sw.js` のキャッシュ名は trk91。
 - **2026-10-08〜09 — 再レビュー（6150725→95c8afb）への対応（trk90）：** ① 静かな区間の候補上限を Hard density 基準の25%から難易度比例へ変更（formula は§2.3）。合成曲 `contrast` は Easy〜RUSHで115／212／459／514／894ノーツ、すべて隣接難易度で増加する回帰テストを追加。Master はLv10のままで、Lv12〜15の回復は別途未対応と明記。② ブラウザスモークの譜面比較を `synthAnalysis` 注入に分離し、実WAVのデコード／解析はエラーなし・件数±5%だけを検査。`--write`／`--compare` はともに成功（boot 0・未解決 0・合成譜面10件のhash／キー集合が完全一致・実WAV10件のキー集合一致と件数±5%・デコードエラー0・click error 0）。③ 古いwindow別名の全consumerを調べ、28件を削除、5件（`chartMeta`・`phase`・`prefs`・`stats`・`videoReady`）は凍結 `js/fx.js` の読者として保留。`docs/ADDONS.md` に期限超過（trk89）と段階削除（trk90）を記録し、`check-repo` が削除・保留・core正規名を照合。`docs/NAMESPACE-PLAN.md` はD/Eの現状・最新audit数・smokeの比較方式を更新。`spectrum.js`／`tv-dock.js` 等も正規の `core.*` accessor へ移行。④ `tests/core-safety.test.mjs` で実際のcore.jsから抽出したURLコマンド／safe-modeをVM実行し、`force=1`、確認・取消、`?factory`、設定とFXラック保存を検査。`check-security` の該当する綴り依存チェックをbehaviorテスト存在確認へ置換。`restoreCoreAlias` を使う他の静的検査は段階移行として残る。
 
 - **2026-10-08 — 映像フィルターの分類名を変更（trk89）：** 「エフェクト」→「ムード・場面」（英：Mood & scenes／中：氛围·场景／韓：분위기·장면）。TRKエフェクトと紛らわしいため。分類の中身（ナイト・監視カメラ・ドリーム・フェード・ポスター・ソフト＋生活の 5 種）と内部 ID（`effect`）は変えない。TRKエフェクトの 20 種は変更なし。

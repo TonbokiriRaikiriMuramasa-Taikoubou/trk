@@ -803,7 +803,8 @@ addEventListener("drop", e => {      // .stpack / .zip は他の処理より先�
 /* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
 window.getPackSongs = getPackSongs;
 window.initPacks = initPacks;
-window.installPackFile = installPackFile;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.installPackFile の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "installPackFile", { configurable:true, get:() => installPackFile, set:v => { installPackFile = v; } });
 window.noteImage = noteImage;
 window.packDB = packDB;
 window.packRuntime = packRuntime;

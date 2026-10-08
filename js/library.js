@@ -3056,7 +3056,8 @@ window.prevSong = prevSong;
 window.previewStartFor = previewStartFor;
 window.refreshPackSongs = refreshPackSongs;
 window.renderBanner = renderBanner;
-window.renderLib = renderLib;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.renderLib の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "renderLib", { configurable:true, get:() => renderLib, set:v => { renderLib = v; } });
 window.saveSongPrefs = saveSongPrefs;
 window.selectSong = selectSong;
 window.setAddonSongs = setAddonSongs;

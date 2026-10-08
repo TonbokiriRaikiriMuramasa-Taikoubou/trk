@@ -253,7 +253,8 @@ window.CHART_FILE_MAX = CHART_FILE_MAX;
 window.applyChartData = applyChartData;
 Object.defineProperty(window, "audioCtx", { configurable:true, get:() => audioCtx, set:v => { audioCtx = v; } });
 window.buildChart = buildChart;
-window.chartToData = chartToData;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.chartToData の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "chartToData", { configurable:true, get:() => chartToData, set:v => { chartToData = v; } });
 window.decodeAudio = decodeAudio;
 window.estimateLevel = estimateLevel;
 window.exportChart = exportChart;

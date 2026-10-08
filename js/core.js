@@ -1333,7 +1333,8 @@ window.TRK_ENUM_VALUES = TRK_ENUM_VALUES;
 window.TV_PARAM_FAV_MAX = TV_PARAM_FAV_MAX;
 window.VIDEO_KEY_DEFAULTS = VIDEO_KEY_DEFAULTS;
 window.activeMascot = activeMascot;
-window.activeMods = activeMods;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.activeMods の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "activeMods", { configurable:true, get:() => activeMods, set:v => { activeMods = v; } });
 Object.defineProperty(window, "analysis", { configurable:true, get:() => analysis, set:v => { analysis = v; } });
 window.applyLanguage = applyLanguage;
 window.applyNoteVars = applyNoteVars;

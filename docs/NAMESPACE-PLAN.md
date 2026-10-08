@@ -70,6 +70,8 @@ node tools/smoke-browser.mjs --compare
 - **触らない**：`js/fx.js`・`js/fx-presets.js`（凍結）。
 - 各コミットの後：`npm run check`・`npm test`・スモーク `--compare`・監査の数の変化を記録。`sw.js` のキャッシュ名は、公開コードを変えたコミットごとに上げる。
 
+- **差し替えられる関数**（後から別のファイルが `名前 = function …` で上書きする）は、窓の名前を get/set のアクセサにする（`Object.defineProperty(window, "名前", { get, set })`）。値のコピー（`window.X = X;`）だと、ファイル内部の呼び出しに差し替えが届かない（B 段階の欠陥。下の「回帰修正」を参照）。`tools/check-repo.mjs` の `PATCHED_FUNCTIONS` が見張る。
+
 ### C 以降の注意
 
 - `window._trk*Open` の旗は、読み手が 13 以上ある。一つの関数（例：`Trk.isModalOpen()`）に置き換えるとき、既存の文字列検査（`tools/check-study-room.mjs`・`tools/check-repo.mjs` の `"window._trkStudyRoomOpen"`）を同時に直す。
@@ -106,6 +108,14 @@ node tools/smoke-browser.mjs --compare
 - `tools/check-study-room.mjs` に「旧い旗が残っていないこと」（fx.js と core.js の互換だけ例外）の検査を追加。旧コードと変異（旗を一つ戻す）の両方で落ちることを確認。
 - 検査：`check-repo.mjs`（pad の文字列）・`check-study-room.mjs`（書斎の鍵止め）を新しい書き方に直した。ヘッドレス Chromium で、書斎とシンスの開閉が `overlay` に反映されること、互換アクセサの値が書斎の開閉に合うことを確認（未知の名前・`toString` は false、ページエラーなし）。
 - 残した連携（旗ではない）：`window._trkMediaPlayerMode`・`window._trkCloseSynth`・`window._trkSyncSynthModeSettings`・`window.__trkPendingTvDockSkin`。次の段階で扱う。
+
+### 回帰修正（B の欠陥・D の前に）
+
+- 症状：`js/verified.js` が `renderLib`・`installPackFile` を、`js/fx.js`（凍結）が `chartToData` を、`js/stagefx.js` が `showJudge` を、`js/stage.js`・`js/catch.js` が `activeMods` を上書きしている。B 段階で包んだあと、窓の値のコピーになり、ファイル内部の呼び出し（例：`library.js` の `renderLib()` 十数箇所）が差し替えを見なくなった。
+- 確認：ヘッドレス Chromium で、`window.renderLib` を見張り関数に差し替えてから一覧の並べ替え（`libSort` の change）を発火させる。旧版 `ca84a19` は 1 回、B 段階の HEAD は 0 回（回帰）。修正後は 1 回（一致）。
+- 修正：上の 5 件を `Object.defineProperty(window, "名前", { get, set })` に変えた（`js/core.js`・`js/custom.js`・`js/game.js`・`js/library.js`・`js/media.js`）。`npm run check`・`npm test`（44/44）・スモーク `--compare`（未解決 0・譜面 10 件一致・クリックエラー 1 は基準と同じ）・`git diff --check` OK。
+- 検査：`tools/check-repo.mjs` に「差し替えられる関数の窓のアクセサ」の検査を追加。アクセサを値のコピーへ戻すと失敗することを確認（逆テスト）。
+- 残り：`window.X` の差し替えを D の段階で一括に扱うとき、同じ規則を使う（差し替えられる名前は、呼び出し側を書き換えず、アクセサで登録する）。
 
 ## 4. 止める条件
 

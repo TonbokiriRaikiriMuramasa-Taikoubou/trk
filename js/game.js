@@ -594,7 +594,8 @@ Object.defineProperty(window, "runShort", { configurable:true, get:() => runShor
 window.runUnranked = runUnranked;
 window.saveRecords = saveRecords;
 window.seekTo = seekTo;
-window.showJudge = showJudge;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.showJudge の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "showJudge", { configurable:true, get:() => showJudge, set:v => { showJudge = v; } });
 window.songRec = songRec;
 window.startGame = startGame;
 window.sweepMisses = sweepMisses;

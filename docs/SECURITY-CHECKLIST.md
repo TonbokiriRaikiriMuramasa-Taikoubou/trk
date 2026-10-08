@@ -23,7 +23,7 @@
 | 6 | **JavaScript Drift**（読み込むコードが知らぬ間に変わる） | ✅ | 第三者コードは**リポジトリに入っている**ので、変われば git の差分として必ず見えます。加えて `check-vendor` がハッシュ・相対importの解決・import map の被覆を毎回検査（来歴の確認は `check:vendor:npm`） |
 | 7 | **Sensitive Data Stored Client-Side** | ✅ | 保存するのは設定・スコア・プレイリスト・パック・書斎の本・VRM/MMDモデル・フォルダのハンドル。**パスワード・トークン・APIキー・個人情報は保存しません**（そもそも持ちません）。端末を触れる人はブラウザのストレージから読める、が正直なところで `privacy.html` に明記 |
 | 8 | **Client-side Security Logging and Monitoring Failures** | 🟡 | 送信型のログ・監視は**ありません**（オフラインで完結するゲームなので、送る先が無い＝プライバシー優先）。異常は画面の表示とコンソールで確認。監視が要るなら有料の外部サービスが必要になるため、意図的に持たない選択 |
-| 9 | **Not Using Standard Browser Security Controls** | 🟡 | 使っている：同一オリジン限定のService Worker（ネットワーク優先）・読み取り専用のファイル選択・`noopener noreferrer`・`safeHttpUrl`・`?safe=1`。**CSP は入れない方針**（§C-1：ビルド無しのHTML/JS・inline import map・blobメディアのため、開発と実機検証が壊れやすい。加えて `'unsafe-eval'` はアドオン機能を保つ場合に必要だがXSS防御を弱める。**安定版リリース時のみ**実機テスト付きで検討）。Referrer-Policyも現行ブラウザ既定を前提に緊急対応とはせず、安定版時にCapacitor／WebViewを含む実配信経路で再評価。第三者オリジンがゼロになったことで、CSP を入れる場合の設定もずっと簡単になりました |
+| 9 | **Not Using Standard Browser Security Controls** | 🟡 | 使っている：同一オリジン限定のService Worker（ネットワーク優先。ハッシュ固定の vendor だけ、SHA-384 の照合が合うキャッシュを先に使う）・読み取り専用のファイル選択・`noopener noreferrer`・`safeHttpUrl`・`?safe=1`。**CSP は入れない方針**（§C-1：ビルド無しのHTML/JS・inline import map・blobメディアのため、開発と実機検証が壊れやすい。加えて `'unsafe-eval'` はアドオン機能を保つ場合に必要だがXSS防御を弱める。**安定版リリース時のみ**実機テスト付きで検討）。Referrer-Policyも現行ブラウザ既定を前提に緊急対応とはせず、安定版時にCapacitor／WebViewを含む実配信経路で再評価。第三者オリジンがゼロになったことで、CSP を入れる場合の設定もずっと簡単になりました |
 | 10 | **Including Proprietary Information on the Client-Side** | ✅ | trk! は GPL-3.0-or-later のオープンソースで、クライアントに秘密は置いていません（APIキー・認証情報・内部エンドポイントなし）。隠し要素は「遊び」であって機密ではありません |
 
 ## B. CWE Top 25（2025）から、ブラウザアプリに関係するもの

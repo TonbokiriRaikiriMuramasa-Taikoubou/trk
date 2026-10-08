@@ -1779,5 +1779,19 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   else ok("一部／要確認の4件に見える代わりがある（タブの⚙・くわしい設定・📚書斎・🛟緊急復旧）");
 }
 
+/* 項目 7（Service Worker）：ハッシュ固定の vendor は cache-first。キャッシュの中身は SHA-384 の照合が通ったものだけ使う。
+   VENDOR_PINS は tools/vendor-lock.json から生成（ずれたら失敗）。セーフモードはキャッシュを読まない（F-19）。 */
+{
+  const swSrc = read("sw.js");
+  const pins = spawnSync(process.execPath, [path.join(root, "tools", "sw-vendor-pins.mjs")], { encoding: "utf8" });
+  const pinsFresh = pins.status === 0;
+  const cacheFirst = /const pinned = pinnedPath\(url\);/.test(swSrc) && /if \(pinned && !safeClient\)/.test(swSrc) && /if \(hit && await pinnedMatches\(hit, pinned\)\) return hit;/.test(swSrc);
+  const offlineVerified = /if \(cached && \(!pinned \|\| await pinnedMatches\(cached, pinned\)\)\) return cached;/.test(swSrc);
+  const digestUsed = /crypto\.subtle\.digest\("SHA-384"/.test(swSrc);
+  const safeIdFromNavigation = swSrc.includes("safeClients.add(event.resultingClientId)") && !swSrc.includes("safeClients.add(event.clientId)");
+  if (!pinsFresh || !cacheFirst || !offlineVerified || !digestUsed || !safeIdFromNavigation) fail("sw.js の vendor の cache-first（SHA-384 照合・セーフモードはキャッシュを読まない）が欠けている、または VENDOR_PINS が lock とずれている");
+  else ok("sw.js: ハッシュ固定の vendor は cache-first で、SHA-384 が合うものだけ使う（VENDOR_PINS は vendor-lock.json と一致）");
+}
+
 console.log(`\nStatic check: ${failures ? "FAILED" : "passed"} · ${failures} failure(s) · ${warnings} warning(s)`);
 if (failures) process.exitCode = 1;

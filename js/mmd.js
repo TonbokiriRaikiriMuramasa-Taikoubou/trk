@@ -32,8 +32,8 @@ Object.assign(TEXT.ja, {
   mmdModelHead:"モデル", mmdMotionHead:"モーション", mmdFitHead:"大きさ・向き",
   mmdSize:"大きさ", mmdTurn:"向き（左右）", mmdCreditLabel:"クレジット表示（作者名など）", mmdCreditPlaceholder:"例：Lat式初音 / Lat",
   mmdCheck:"🔎 動作チェック（実機で）", mmdCopy:"📋 結果をコピー", mmdCopied:"📋 コピーしました", mmdCopyNg:"📋 コピーできませんでした（下の行を選んでコピーしてください）",
-  mmdCheckHint:"うまく動かないときは、これを押すと WebGL・CDN（three／three-mmd-loader）・モデル・モーションの状態を調べて1か所に出します。うまくいかない場合は、この結果を貼ってもらえれば原因を切り分けられます。",
-  mmdCheckRunning:"チェック中…（初回はCDNから読み込むので、少し待ちます）", mmdCheckOk:"✅ チェックOK（WebGL・CDN・ライブラリ）", mmdCheckNg:"❌ チェックで問題が見つかりました（下の結果を見てください）",
+  mmdCheckHint:"うまく動かないときは、これを押すと WebGL・3Dの部品（three／three-mmd-loader、同梱）・モデル・モーションの状態を調べて1か所に出します。うまくいかない場合は、この結果を貼ってもらえれば原因を切り分けられます。",
+  mmdCheckRunning:"チェック中…（初回は3Dの部品を読み込むので、少し待ちます）", mmdCheckOk:"✅ チェックOK（WebGL・3Dの部品・ライブラリ）", mmdCheckNg:"❌ チェックで問題が見つかりました（下の結果を見てください）",
   mmdQuickTitle:"🩷 マスコットのうごき", mmdQuickWatch:"👀 ひとやすみ", mmdQuickAuto:"🎲 おまかせ",
   mmdQuickPick:"🎯 えらぶ", mmdQuickOff:"💤 お留守番",
   mmdQuickUILabel:"🩷 ミクモードをONにする（MMDデスクトップマスコット機能）",
@@ -67,7 +67,7 @@ Object.assign(TEXT.ja, {
   mmdLoading:"モデルを読み込んでいます…", mmdLoadingPct:"モデルを読み込んでいます… {n}%",
   mmdLoaded:"モデル「{name}」を読み込みました。", mmdRestored:"前回のモデルを戻しました。",
   mmdNotMmd:"MMDのモデル（.pmx/.pmd）ではありません。", mmdTooBig:"大きすぎます（モデルは{n}MB、モーションは{m}MBまで）。",
-  mmdNoModel:"先にモデルを読み込んでください。", mmdNetError:"3Dの部品（CDN）を読み込めませんでした。オンラインで開いて、もう一度試してください。",
+  mmdNoModel:"先にモデルを読み込んでください。", mmdNetError:"3Dの部品を読み込めませんでした。ページを再読み込みして、もう一度試してください。",
   mmdNoWebGL:"WebGLを使えない環境です。", mmdLoadError:"モデルを読み込めませんでした。",
   mmdNoAgree:"先に、うえの「規約を確認しました」にチェックを入れてください。",
   mmdFilesEmpty:"モデルのファイルが入っていません。", mmdTooManyFiles:"ファイルが多すぎます（{n}個まで）。",
@@ -89,8 +89,8 @@ Object.assign(TEXT.en, {
   mmdModelHead:"Model", mmdMotionHead:"Motion", mmdFitHead:"Size and angle",
   mmdSize:"Size", mmdTurn:"Facing", mmdCreditLabel:"Credit line (author etc.)", mmdCreditPlaceholder:"e.g. Lat-style Miku / Lat",
   mmdCheck:"🔎 Check (on your device)", mmdCopy:"📋 Copy the result", mmdCopied:"📋 Copied", mmdCopyNg:"📋 Could not copy (select the lines below)",
-  mmdCheckHint:"If something does not work, press this: it checks WebGL, the CDN (three / three-mmd-loader), your model and your motion, and prints one block. Paste that block and we can find the cause.",
-  mmdCheckRunning:"Checking… (the first run loads from the CDN, so give it a moment)", mmdCheckOk:"✅ Check OK (WebGL, CDN, libraries)", mmdCheckNg:"❌ Something is wrong (see the lines below)",
+  mmdCheckHint:"If something does not work, press this: it checks WebGL, the bundled 3D parts (three / three-mmd-loader), your model and your motion, and prints one block. Paste that block and we can find the cause.",
+  mmdCheckRunning:"Checking… (the first run loads the 3D parts, so give it a moment)", mmdCheckOk:"✅ Check OK (WebGL, 3D parts, libraries)", mmdCheckNg:"❌ Something is wrong (see the lines below)",
   mmdQuickTitle:"🩷 Mascot moves", mmdQuickWatch:"👀 Chill", mmdQuickAuto:"🎲 Auto",
   mmdQuickPick:"🎯 Pick", mmdQuickOff:"💤 Away",
   mmdQuickUILabel:"🩷 Enable Miku mode (MMD desktop mascot feature)",
@@ -124,7 +124,7 @@ Object.assign(TEXT.en, {
   mmdLoading:"Loading the model…", mmdLoadingPct:"Loading the model… {n}%",
   mmdLoaded:"Loaded the model “{name}”.", mmdRestored:"Restored your previous model.",
   mmdNotMmd:"That is not an MMD model (.pmx/.pmd).", mmdTooBig:"Too big (models up to {n}MB, motions up to {m}MB).",
-  mmdNoModel:"Load a model first.", mmdNetError:"Could not load the 3D parts (CDN). Open it online and try again.",
+  mmdNoModel:"Load a model first.", mmdNetError:"Could not load the 3D parts. Reload the page and try again.",
   mmdNoWebGL:"WebGL is not available here.", mmdLoadError:"Could not load the model.",
   mmdNoAgree:"Tick “I'll use a model I obtained myself” above first.",
   mmdFilesEmpty:"No files in that folder.", mmdTooManyFiles:"Too many files (up to {n}).",
@@ -146,8 +146,8 @@ Object.assign(TEXT.zh, {
   mmdModelHead:"模型", mmdMotionHead:"动作", mmdFitHead:"大小与朝向",
   mmdSize:"大小", mmdTurn:"朝向", mmdCreditLabel:"署名显示（作者等）", mmdCreditPlaceholder:"例：Lat式初音 / Lat",
   mmdCheck:"🔎 运行检查（在实机上）", mmdCopy:"📋 复制结果", mmdCopied:"📋 已复制", mmdCopyNg:"📋 无法复制（请选中下面的行）",
-  mmdCheckHint:"如果无法运行，按这里会检查 WebGL、CDN（three／three-mmd-loader）、模型和动作，并把结果汇总成一段。把这结果贴出来就能定位原因。",
-  mmdCheckRunning:"检查中…（初次会从 CDN 读取，请稍等）", mmdCheckOk:"✅ 检查通过（WebGL·CDN·库）", mmdCheckNg:"❌ 检查发现问题（请看下面的结果）",
+  mmdCheckHint:"如果无法运行，按这里会检查 WebGL、3D部件（three／three-mmd-loader，已内置）、模型和动作，并把结果汇总成一段。把这结果贴出来就能定位原因。",
+  mmdCheckRunning:"检查中…（初次会读取3D部件，请稍等）", mmdCheckOk:"✅ 检查通过（WebGL·3D部件·库）", mmdCheckNg:"❌ 检查发现问题（请看下面的结果）",
   mmdQuickTitle:"🩷 吉祥物动作", mmdQuickWatch:"👀 休息", mmdQuickAuto:"🎲 自动",
   mmdQuickPick:"🎯 挑选", mmdQuickOff:"💤 不在家",
   mmdQuickUILabel:"🩷 开启初音模式（MMD桌面吉祥物功能）",
@@ -181,7 +181,7 @@ Object.assign(TEXT.zh, {
   mmdLoading:"正在读取模型…", mmdLoadingPct:"正在读取模型… {n}%",
   mmdLoaded:"已读取模型「{name}」。", mmdRestored:"已恢复上次的模型。",
   mmdNotMmd:"这不是MMD模型（.pmx/.pmd）。", mmdTooBig:"太大（模型上限 {n}MB，动作上限 {m}MB）。",
-  mmdNoModel:"请先读取模型。", mmdNetError:"无法读取3D部件（CDN）。请联网后重试。",
+  mmdNoModel:"请先读取模型。", mmdNetError:"无法读取3D部件。请重新加载页面后重试。",
   mmdNoWebGL:"此环境无法使用 WebGL。", mmdLoadError:"无法读取模型。",
   mmdNoAgree:"请先勾选上面的「已确认规约」。",
   mmdFilesEmpty:"文件夹里没有文件。", mmdTooManyFiles:"文件太多（最多 {n} 个）。",
@@ -203,8 +203,8 @@ Object.assign(TEXT.ko, {
   mmdModelHead:"모델", mmdMotionHead:"모션", mmdFitHead:"크기·방향",
   mmdSize:"크기", mmdTurn:"방향", mmdCreditLabel:"크레딧 표시 (제작자 등)", mmdCreditPlaceholder:"예: Lat 모델 미쿠 / Lat",
   mmdCheck:"🔎 동작 확인 (실기에서)", mmdCopy:"📋 결과 복사", mmdCopied:"📋 복사했습니다", mmdCopyNg:"📋 복사할 수 없습니다(아래 줄을 선택해 주세요)",
-  mmdCheckHint:"잘 안 될 때 이걸 누르면 WebGL·CDN(three／three-mmd-loader)·모델·모션 상태를 한곳에 모아 보여 줍니다. 안 되는 경우 이 결과를 붙여 주시면 원인을 좁힐 수 있습니다.",
-  mmdCheckRunning:"확인 중… (처음에는 CDN에서 읽어 오므로 조금 기다려 주세요)", mmdCheckOk:"✅ 확인 OK (WebGL·CDN·라이브러리)", mmdCheckNg:"❌ 확인에서 문제를 찾았습니다(아래 결과를 봐 주세요)",
+  mmdCheckHint:"잘 안 될 때 이걸 누르면 WebGL·3D 부품(three／three-mmd-loader, 내장)·모델·모션 상태를 한곳에 모아 보여 줍니다. 안 되는 경우 이 결과를 붙여 주시면 원인을 좁힐 수 있습니다.",
+  mmdCheckRunning:"확인 중… (처음에는 3D 부품을 읽어 오므로 조금 기다려 주세요)", mmdCheckOk:"✅ 확인 OK (WebGL·3D 부품·라이브러리)", mmdCheckNg:"❌ 확인에서 문제를 찾았습니다(아래 결과를 봐 주세요)",
   mmdQuickTitle:"🩷 마스코트 움직임", mmdQuickWatch:"👀 휴식", mmdQuickAuto:"🎲 자동",
   mmdQuickPick:"🎯 고르기", mmdQuickOff:"💤 자리비움",
   mmdQuickUILabel:"🩷 미쿠 모드 켜기 (MMD 데스크톱 마스코트 기능)",
@@ -238,7 +238,7 @@ Object.assign(TEXT.ko, {
   mmdLoading:"모델을 불러오는 중…", mmdLoadingPct:"모델을 불러오는 중… {n}%",
   mmdLoaded:"모델 '{name}'을(를) 불러왔습니다.", mmdRestored:"지난번 모델을 되돌렸습니다.",
   mmdNotMmd:"MMD 모델(.pmx/.pmd)이 아닙니다.", mmdTooBig:"너무 큽니다 (모델 {n}MB, 모션 {m}MB까지).",
-  mmdNoModel:"먼저 모델을 불러와 주세요.", mmdNetError:"3D 부품(CDN)을 불러오지 못했습니다. 온라인에서 다시 시도해 주세요.",
+  mmdNoModel:"먼저 모델을 불러와 주세요.", mmdNetError:"3D 부품을 불러오지 못했습니다. 페이지를 새로 고침한 뒤 다시 시도해 주세요.",
   mmdNoWebGL:"WebGL을 쓸 수 없는 환경입니다.", mmdLoadError:"모델을 불러오지 못했습니다.",
   mmdNoAgree:"위의 '규약을 확인했습니다'를 먼저 체크해 주세요.",
   mmdFilesEmpty:"폴더에 파일이 없습니다.", mmdTooManyFiles:"파일이 너무 많습니다 ({n}개까지).",
@@ -1615,7 +1615,7 @@ async function diagnose() {
       r.gpu = String(d ? gl.getParameter(d.UNMASKED_RENDERER_WEBGL) : "(hidden)").slice(0, 72);
     }
   } catch (e) { r.webgl = false; r.libError = String((e && e.message) || e).slice(0, 120); }
-  /* ② CDN から three と three-mmd-loader を読めるか */
+  /* ② 同梱の three と three-mmd-loader を読めるか（assets/vendor） */
   try {
     const lib = await libs();
     r.three = (lib && lib.THREE && lib.THREE.REVISION) ? String(lib.THREE.REVISION) : "?";

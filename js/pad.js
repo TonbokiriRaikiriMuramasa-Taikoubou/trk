@@ -263,4 +263,7 @@ window.TrkPad = Object.freeze({
 /* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
 window.padBack = padBack;
 window.updatePadUI = updatePadUI;
+/* 領域（window.Trk.pad）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
+window.Trk = window.Trk || {};
+window.Trk.pad = Object.assign(window.Trk.pad || {}, { padBack, updatePadUI });
 })();

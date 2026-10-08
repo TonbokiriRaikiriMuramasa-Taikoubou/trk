@@ -1638,6 +1638,7 @@ for (const [rel, name] of Object.entries(PATCHED_FUNCTIONS).flatMap(([r, ns]) =>
    window.Trk.<領域> の登録に入っていることを確かめる。登録が無い・抜けると失敗する。 */
 const TRK_REGISTRARS = {
   "js/chart-gen.js": "chart",
+  "js/pad.js": "pad",
 };
 const TRK_NOT_REGISTERED = { "js/core.js": ["_trkStudyRoomOpen"] }; // 互換の読み取り専用アクセサ（宣言ではない）
 for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {

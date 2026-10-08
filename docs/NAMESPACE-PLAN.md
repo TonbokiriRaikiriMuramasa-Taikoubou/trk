@@ -126,8 +126,9 @@ node tools/smoke-browser.mjs --compare
 | 領域 | 登録元 | 登録（window.Trk.領域） | 書き換え（件数） | sw.js | 結果 |
 |---|---|---|---|---|---|
 | chart | `js/chart-gen.js` | `buildChartNotes`・`cgEstimateLevel`・`cgAllocate`（値のコピー） | 2（`js/media.js`） | trk57 | 登録検査は、登録の無い HEAD で失敗（確認）→ 適用後に通る。1 名だけ抜いた逆テストで失敗（確認）。スモーク OK（未解決 0・譜面 10 件一致） |
+| pad | `js/pad.js` | `padBack`・`updatePadUI`（値のコピー） | 0 | trk58 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
 
-残りの領域（pad・lite・main・custom・library・media・data・play・modes・core）は未着手。HANDOFF §7 の実機確認は別途。
+残りの領域（lite・main・custom・library・media・data・play・modes・core）は未着手。HANDOFF §7 の実機確認は別途。
 
 ## 4. 止める条件
 

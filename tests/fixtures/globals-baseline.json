@@ -1,11 +1,11 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 38,
+  "windowProps": 40,
   "duplicates": 0,
-  "declarations": 927,
-  "private": 611,
-  "public": 316
+  "declarations": 881,
+  "private": 567,
+  "public": 314
  },
  "files": [
   {
@@ -441,8 +441,8 @@
   },
   {
    "file": "js/tv-rich.js",
-   "decls": 10,
-   "private": 10,
+   "decls": 0,
+   "private": 0,
    "public": []
   },
   {
@@ -553,12 +553,9 @@
   },
   {
    "file": "js/pad.js",
-   "decls": 36,
-   "private": 34,
-   "public": [
-    "padBack",
-    "updatePadUI"
-   ]
+   "decls": 0,
+   "private": 0,
+   "public": []
   },
   {
    "file": "js/speed.js",
@@ -968,6 +965,13 @@
    ]
   },
   {
+   "name": "padBack",
+   "writers": [
+    "js/pad.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "trkExport",
    "writers": [
     "js/core.js"
@@ -978,6 +982,13 @@
    "name": "trkReset",
    "writers": [
     "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "updatePadUI",
+   "writers": [
+    "js/pad.js"
    ],
    "readers": []
   },

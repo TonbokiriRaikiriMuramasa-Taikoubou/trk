@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：🎮 ゲームパッド・コントローラー・TVリモコン（入力デバイス） ============
    ・Gamepad API を rAF で見張り、割り当て（settings.padLeft など）に「パッドのボタン／軸」を
@@ -258,3 +259,8 @@ window.TrkPad = Object.freeze({
   list: padList, format: formatPadBind, defaults: PAD_DEFAULTS, presets: PAD_PRESETS,
   binding: () => padBinding, tick: padTick, moveFocus: padMoveFocus, activate: padActivate, back: padBack, menuOk: padMenuOk
 });
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.padBack = padBack;
+window.updatePadUI = updatePadUI;
+})();

@@ -64,6 +64,8 @@ node tools/smoke-browser.mjs --compare
 - **1 ファイル 1 コミット**。そのファイルの宣言が private だけ（または公開名を据え置く）ことを監査で確かめてから包む。
 - 包み方：ファイルの先頭に `(() => {`、末尾に `})();` を足す。**中身は字下げし直さない**（文字列検査の一致を保つため）。`"use strict"` は本体の先頭に残す。
 - 包んだあとに `window.X = …` と書かれている名前は、そのまま window に載る（変わらない）。
+- 公開名（他のファイルが裸の名前で読む）を包むときは、末尾で `window.NAME = NAME;` と据え置く。対象は `function`・`const`（再代入されないもの）だけ。`let`・`var` で再代入される名前は、値が古くなるので据え置かない（そのファイルは後の段階へ回す）。
+- 包んだ直後は、そのファイルの中身を文字列で読んでいる検査（`tools/check-*.mjs`）が「包みの先頭」で壊れないかを必ず確かめる。
 - 順番：`study-room.js`（公開は `window.TrkStudyRoom` だけ）→ `tv-rich.js` → `pad.js` → `main.js` → `library.js` の順に小さいものから。
 - **触らない**：`js/fx.js`・`js/fx-presets.js`（凍結）。
 - 各コミットの後：`npm run check`・`npm test`・スモーク `--compare`・監査の数の変化を記録。`sw.js` のキャッシュ名は、公開コードを変えたコミットごとに上げる。
@@ -79,6 +81,7 @@ node tools/smoke-browser.mjs --compare
 |---|---|---|---|---|
 | 0 | （準備の時点） | 1169 | 316 | 基準 `40122ea` |
 | 1 | `js/study-room.js` を即時関数で包む（公開は `window.TrkStudyRoom` のまま） | 927 | 316 | スモーク OK。window から消えた `study*` 関数は他から使われていないもの（報告のみ） |
+| 2 | `js/tv-rich.js`（公開 0）・`js/pad.js`（公開 2：`padBack`・`updatePadUI`）を包む。pad の 2 件は末尾で `window.padBack = padBack;` のように据え置く | 881 | 314（うち 2 件は window 経由に移った） | スモーク OK。`check-security.mjs` の M-03 検査は、包みの先頭を外して同じ関数を動かすように直した（検査の中身は同じ） |
 
 ## 4. 止める条件
 

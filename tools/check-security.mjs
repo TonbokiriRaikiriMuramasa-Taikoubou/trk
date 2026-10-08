@@ -195,7 +195,8 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   try {
     const i18nScript = new vm.Script(read("js/i18n.js"));
     const presetScript = new vm.Script(read("js/tv-presets.js"));
-    const headSrc = richSrc.slice(0, richSrc.indexOf('addEventListener("DOMContentLoaded"'));
+    /* 即時関数で包まれていても、その中の関数を同じ方法で動かす（包みの先頭だけを外す） */
+    const headSrc = richSrc.slice(0, richSrc.indexOf('addEventListener("DOMContentLoaded"')).replace(/^\(\(\) => \{\n/, "");
     /* 保存済みの値 v を入れたとき、settings に何が残るか */
     const probe = v => {
       const ctx = { console, document:{ addEventListener(){} }, addEventListener(){} };

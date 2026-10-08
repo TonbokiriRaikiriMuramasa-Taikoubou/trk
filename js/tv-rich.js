@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ==========================================================================
    trk! tv-rich.js — ✨ TRKエフェクトを使う（リッチ映像の独立カテゴリー）
@@ -262,3 +263,4 @@ addEventListener("DOMContentLoaded", () => {
   render();
 });
 /* ✅ tv-rich.js 完了 */
+})();

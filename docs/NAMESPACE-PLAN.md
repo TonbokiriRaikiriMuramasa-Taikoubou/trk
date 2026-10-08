@@ -123,7 +123,7 @@ node tools/smoke-browser.mjs --compare
 
 各段階：`node --check`・`npm run check`・`npm test`・スモーク `--compare`・`git diff --check`・`sw.js` を上げる・`tools/check-repo.mjs` の登録検査（`TRK_REGISTRARS`）。書き換えは AST（acorn）で判定し、凍結（`js/fx.js`・`js/fx-presets.js`）は書き換えない。
 
-- **登録の置き場所は、領域で読み込み順に最後のファイルの末尾**（play は `render.js`、modes は `catch.js`）。先頭のファイルに置くと、後から読み込まれるファイルの名前を値として読む時点で ReferenceError になり、包みの末尾まで届かない（play で一度起きた。スモークの起動エラーで見つかり、試行は捨てて HEAD に戻した）。
+- **登録の置き場所は、領域で読み込み順に最後のファイルの末尾**（play は `render.js`、modes は `catch.js`）。書き換えは、その置き場所より後に読み込まれるファイルだけ（起動時の順序を変えないため）。前のファイルの裸の参照は、窓の別名で動く（D の残り：将来、遅延する関数の中だけでも書き換えられる）。先頭のファイルに置くと、後から読み込まれるファイルの名前を値として読む時点で ReferenceError になり、包みの末尾まで届かない（play で一度起きた。スモークの起動エラーで見つかり、試行は捨てて HEAD に戻した）。
 
 | 領域 | 登録元 | 登録（window.Trk.領域） | 書き換え（件数） | sw.js | 結果 |
 |---|---|---|---|---|---|
@@ -136,8 +136,9 @@ node tools/smoke-browser.mjs --compare
 | media | `js/media.js` | `CHART_FILE_MAX`・`buildChart`・`decodeAudio`・`estimateLevel`・`exportChart`・`generateNotes`・`getAC`・`importChartFile`・`loadMedia`・`loadSE`・`playSE`・`rmsAt`・`seBuffers`・`seFiles`・`setBackground`（値のコピー）、`applyChartData`・`chartToData`・`audioCtx`（アクセサ。fx.js が凍結のまま差し替える） | 62 | trk64 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。js/fx.js は未変更（凍結）。スモーク OK |
 | data | `js/data.js` | 29 名（`DIFFS`・`DIFF_IDS`・`SKINS`・`NOTE_PRESETS`・`buildCustomSkin`・`hexToRgba` など。すべて値のコピー） | 219 | trk65 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。検査の文字列照合（check-repo の SKINS 数・check-security の形の検査）は window.Trk.<領域>. を除いた本文で見るように直した（見る条件は変えていない）。スモーク OK |
 | play | `js/render.js` | game.js・render.js の公開名（`PLAY_KEYS`・`startGame`・`judgeNote` など、値のコピー）。アクセサは `gameTime`・`showJudge`・`drawVideo`・`retryHoldAt`・`toast`・`goAt`・`leadIn` など | 147 | trk66 | 登録は領域で最後に読み込まれる render.js の末尾（game.js の末尾に置いたら、render.js の名前を読む時点で ReferenceError になり、起動が止まった：その試行は捨てて HEAD に戻した）。書き換え 147。登録検査（render.js・TRK_EXTRAS で game.js の窓の名前も対象）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
+| modes | `js/catch.js` | modes.js・truck.js・stage.js・catch.js の公開名 54（値のコピー。`truckBinding`・`stageBinding` は let のためアクセサ） | 27 | trk67 | 登録は領域で最後に読み込まれる catch.js の末尾。登録より前に読み込まれる stagefx.js などの裸の参照は書き換えない（起動時の順序を変えないため。窓の別名で従来どおり動く＝残り）。登録検査（catch.js・TRK_EXTRAS で modes/truck/stage の窓の名前も対象）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
 
-残りの領域（lite・main・custom・library・media・data・modes・core）は未着手。HANDOFF §7 の実機確認は別途。
+残りの領域（lite・main・custom・library・media・data・play・core）は未着手。HANDOFF §7 の実機確認は別途。
 
 ## 4. 止める条件
 

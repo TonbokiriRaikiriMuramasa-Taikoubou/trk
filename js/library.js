@@ -197,7 +197,7 @@ function songInfo(it, idx) {
     for (const slot of [c, c.truck, c.orbit, c.stage, c.catch]) if (slot && slot.best) best = Math.max(best, Number(slot.best.score) || 0);
   }
   const plays = window.Trk.play.PLAY_KEYS.reduce((a, k) => a + (r[k] || 0), 0);
-  return { plays, best, title:titleString(r), last:r.lastPlayed || 0 };
+  return { plays, best, title:window.Trk.modes.titleString(r), last:r.lastPlayed || 0 };
 }
 
 /* ============ 📚 曲のタブ（曲の入り口ごとに自動でできる棚） ============

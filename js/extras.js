@@ -119,7 +119,7 @@ addEventListener("keydown", e => {                   // 測定中は、どのキ
     owStatus.textContent = tr("owApplied", { v:signed(ow.value) }); owApply.hidden = true;
   });
   box.append(hint, start, owTapBtn, owStatus, owApply);
-  anchor.after(box, makeCheck("autoAdjust", "autoAdjust", "autoAdj"));
+  anchor.after(box, window.Trk.modes.makeCheck("autoAdjust", "autoAdjust", "autoAdj"));
 })();
 
 /* ============ 📊 判定の平均とばらつき／🎯 自動微調整（リザルト） ============ */
@@ -163,7 +163,7 @@ function drawGhost() {
 window.drawExtrasOverlay = drawGhost;
 (() => {
   const anchor = $("errorMeter") && $("errorMeter").closest("label"); if (!anchor) return;
-  anchor.after(makeCheck("ghost", "ghost", "ghostLabel"));
+  anchor.after(window.Trk.modes.makeCheck("ghost", "ghost", "ghostLabel"));
 })();
 
 /* ============ 🌗 背景の暗さ・ぼかし（設定欄） ============ */

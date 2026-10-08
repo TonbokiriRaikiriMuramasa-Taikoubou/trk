@@ -1646,11 +1646,13 @@ const TRK_REGISTRARS = {
   "js/media.js": "media",
   "js/data.js": "data",
   "js/render.js": "play",
+  "js/catch.js": "modes",
 };
 const TRK_NOT_REGISTERED = { "js/core.js": ["_trkStudyRoomOpen"] }; // 互換の読み取り専用アクセサ（宣言ではない）
 const TRK_EXTRAS = {
   "js/library.js": { files: ["js/title-match.js"], functions: true },  // 関数は領域へ出す（plTitleKeys など。窓へは出していない）
   "js/render.js": { files: ["js/game.js"], functions: false },        // 同じ領域の別ファイル：窓へ出している名前だけ
+  "js/catch.js": { files: ["js/modes.js", "js/truck.js", "js/stage.js"], functions: false },
 };
 for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   const src = exists(rel) ? read(rel) : "";

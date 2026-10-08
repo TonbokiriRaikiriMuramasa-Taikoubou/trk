@@ -146,9 +146,9 @@ const padBack = () => padDispatchKey("Escape");       // 戻る＝ESC と同じ�
 function padTap(slot) {
   const lane = slotLane(slot), p = performance.now();
   try {
-    if (settings.playMode === "stage" && typeof stageInput === "function") { stageInput(lane, p); return; }
-    if (settings.playMode === "catch" && typeof catchState !== "undefined" && catchState.held) {
-      catchState.held[lane] = true; setTimeout(() => { catchState.held[lane] = false; }, 140); return;   // 🚛 は一瞬だけ倒す
+    if (settings.playMode === "stage" && typeof stageInput === "function") { window.Trk.modes.stageInput(lane, p); return; }
+    if (settings.playMode === "catch" && typeof catchState !== "undefined" && window.Trk.modes.catchState.held) {
+      window.Trk.modes.catchState.held[lane] = true; setTimeout(() => { window.Trk.modes.catchState.held[lane] = false; }, 140); return;   // 🚛 は一瞬だけ倒す
     }
   } catch (_) {}
   if (typeof handleInput === "function") window.Trk.play.handleInput(lane, p);

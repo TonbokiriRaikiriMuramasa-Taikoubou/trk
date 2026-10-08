@@ -352,11 +352,11 @@ addEventListener("DOMContentLoaded", () => {
   /* Settings: keep the launch controls beside the other audio / spectrum options. */
   const synthSettingsPanel = node("details", "panel"); synthSettingsPanel.id = "synthModeSettings";
   const synthSettingsHint = tx("div", "instSettingsHint", "hint");
-  const synthDisableRow = makeCheck("synthModeDisabled", "synthModeDisabled", "instDisableOption");
-  const synthFastRow = makeCheck("synthModeFastStart", "synthModeFastStart", "instFastOption");
-  const synthKeyboardLockRow = makeCheck("synthModeKeyboardLock", "synthModeKeyboardLock", "instKeyboardLockOption");
+  const synthDisableRow = window.Trk.modes.makeCheck("synthModeDisabled", "synthModeDisabled", "instDisableOption");
+  const synthFastRow = window.Trk.modes.makeCheck("synthModeFastStart", "synthModeFastStart", "instFastOption");
+  const synthKeyboardLockRow = window.Trk.modes.makeCheck("synthModeKeyboardLock", "synthModeKeyboardLock", "instKeyboardLockOption");
   const synthKeyboardLockHint = tx("div", "instKeyboardLockHint", "hint");
-  const synthWideKeyboardRow = makeCheck("synthModeWideKeyboard", "synthModeWideKeyboard", "instWideKeyboardOption");
+  const synthWideKeyboardRow = window.Trk.modes.makeCheck("synthModeWideKeyboard", "synthModeWideKeyboard", "instWideKeyboardOption");
   const synthWideKeyboardHint = tx("div", "instWideKeyboardHint", "hint");
   synthSettingsPanel.append(tx("summary", "instSettingsTitle"), synthSettingsHint, synthDisableRow, synthFastRow, synthKeyboardLockRow, synthKeyboardLockHint, synthWideKeyboardRow, synthWideKeyboardHint);
   const synthSettingsAnchor = document.getElementById("specPanel") || document.getElementById("fxPanel") ||

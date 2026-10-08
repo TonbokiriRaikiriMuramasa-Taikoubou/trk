@@ -161,13 +161,13 @@ video.addEventListener("play", () => { if (phase === "title") video.playbackRate
 /* ---------- 速度変更キー ---------- */
 let speedBinding = null;   // 0＝遅くする、1＝速くする
 function syncOrbitIgnore(oldKeys) {   // ORBIT の「どのキーでもOK」から、速度キーを外す
-  (oldKeys || []).forEach(k => { if (!["Backquote", "Minus", "Equal", "KeyP", "Escape", "Tab"].includes(k)) ORBIT_IGNORE.delete(k); });
-  settings.speedKeys.forEach(k => ORBIT_IGNORE.add(k));
+  (oldKeys || []).forEach(k => { if (!["Backquote", "Minus", "Equal", "KeyP", "Escape", "Tab"].includes(k)) window.Trk.modes.ORBIT_IGNORE.delete(k); });
+  settings.speedKeys.forEach(k => window.Trk.modes.ORBIT_IGNORE.add(k));
 }
 syncOrbitIgnore();
 function usedKeys() {
-  const list = [...settings.keys, ...settings.subKeys, ...truckPosKeys(), ...TRUCK_PRESETS.ud, ...TRUCK_PRESETS.lr,
-    ...stageKeys(), ...catchAllKeys(), ...(settings.skipKeys || []), "KeyR"];
+  const list = [...settings.keys, ...settings.subKeys, ...window.Trk.modes.truckPosKeys(), ...TRUCK_PRESETS.ud, ...TRUCK_PRESETS.lr,
+    ...window.Trk.modes.stageKeys(), ...window.Trk.modes.catchAllKeys(), ...(settings.skipKeys || []), "KeyR"];
   if (settings.truckToggleKey) list.push(settings.truckToggleKey);
   return list.filter(Boolean);
 }
@@ -184,7 +184,7 @@ function captureSpeedKey(code) {
 addEventListener("keydown", e => {
   if (window.Trk.overlay.any()) return;
   if (speedBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureSpeedKey(e.code); return; }
-  if (bindingSlot !== null || truckBinding !== null || stageBinding !== null) return;
+  if (bindingSlot !== null || window.Trk.modes.truckBinding !== null || window.Trk.modes.stageBinding !== null) return;
   const i = settings.speedKeys.indexOf(e.code); if (i < 0) return;
   if (phase === "playing" && slotOfKey(e.code) >= 0) return;      // 叩くキーと同じなら、叩くほうを優先
   const t = e.target;
@@ -198,10 +198,10 @@ addEventListener("keydown", e => {
 /* 🎯 プレイオプション：速度パネルの表示 */
 const rateHint = document.querySelector('#settingsScreen [data-i18n="rateHint"]');
 if (rateHint) {
-  const label = hintEl("speedPanelLabel");
-  const pSeg = makeSeg("speedPanelPicker", "speedPanel",
+  const label = window.Trk.modes.hintEl("speedPanelLabel");
+  const pSeg = window.Trk.modes.makeSeg("speedPanelPicker", "speedPanel",
     [["buttons", "speedPanelButtons"], ["bar", "speedPanelBar"], ["both", "speedPanelBoth"], ["hidden", "speedPanelHidden"]]);
-  const extra = makeCheck("speedExtra", "speedExtra", "speedExtra");
+  const extra = window.Trk.modes.makeCheck("speedExtra", "speedExtra", "speedExtra");
   pSeg.addEventListener("click", () => { if (settings.speedPanel === "hidden") setRate(1); else renderSpeed(); });
   extra.querySelector("input").addEventListener("change", () => { if (settings.rate > maxRate()) setRate(maxRate()); else renderSpeed(); });
   rateHint.after(label, pSeg, extra);
@@ -218,19 +218,19 @@ if (truckHint) {
     name.dataset.i18n = key; b.type = "button"; b.dataset.i18n = "assign"; b.dataset.speedbind = i;
     b.addEventListener("click", () => {
       bindingSlot = null; updateKeyUI();
-      if (truckBinding !== null) { truckBinding = null; syncTruckKeyUI(); }
+      if (window.Trk.modes.truckBinding !== null) { window.Trk.modes.truckBinding = null; window.Trk.modes.syncTruckKeyUI(); }
       speedBinding = i; b.blur();
       setStatus("speedBindStatus", "speedCapture" + i); syncSpeedKeyUI();
     });
     row.append(name, v, b); rows.append(row); values.push(v);
   });
-  const stepSeg = makeSeg("speedStepPicker", "speedStep", [["0.01", "stepFine"], ["0.1", "stepNormal"], ["0.25", "stepBig"]]);
+  const stepSeg = window.Trk.modes.makeSeg("speedStepPicker", "speedStep", [["0.01", "stepFine"], ["0.1", "stepNormal"], ["0.25", "stepBig"]]);
   stepSeg.addEventListener("click", renderSpeed);
   const status = el("div", "hint status"); status.id = "speedBindStatus";
   /* STAGE・CATCHのキー設定（stage.js・catch.js が truckCtlHint の直後に入れたもの）の後ろに並べる */
   let anchor = truckHint;
   for (const id of ["stageBindStatus", "catchBindStatus"]) { const n = $(id); if (n) anchor = n.nextElementSibling && n.nextElementSibling.dataset.i18n === "catchHint" ? n.nextElementSibling : n; }
-  anchor.after(h3, rows, hintEl("speedStepLabel"), stepSeg, status, hintEl("speedKeysHint"));
+  anchor.after(h3, rows, window.Trk.modes.hintEl("speedStepLabel"), stepSeg, status, window.Trk.modes.hintEl("speedKeysHint"));
   syncSpeedKeyUI = () => {
     values.forEach((v, i) => { v.textContent = formatKey(settings.speedKeys[i]); });
     rows.querySelectorAll("[data-speedbind]").forEach(b => b.classList.toggle("listening", speedBinding === +b.dataset.speedbind));

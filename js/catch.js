@@ -424,4 +424,9 @@ window.drawCatchField = drawCatchField;
 window.isBlast = isBlast;
 window.isCatch = isCatch;
 window.resetCatch = resetCatch;
+/* 領域（window.Trk.modes）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
+window.Trk = window.Trk || {};
+window.Trk.modes = Object.assign(window.Trk.modes || {}, { ORBIT_CX, ORBIT_CY, ORBIT_IGNORE, drawLives, drawOrbitField, failSound, hintEl, isOrbit, lifeAfterJudge, lifeState, makeCheck, makeColorRow, makeSeg, orbit, orbitHitPos, resetLives, resetOrbit, starPath, titleString, drawLaneTint, drawTruck, isTruck, lanePivot, laneTilt, reduceMotion, resetTruck, steerTruck, syncTruckKeyUI, truckJudge, truckKeysLabel, truckPosKeys, truckRowY, truckState, STAGE, drawStageField, ensureStageMap, isStage, resetStage, stageHitPos, stageInput, stageKeys, stageMap, stagePress, CATCH, catchAllKeys, catchHitPos, catchJudge, catchState, drawCatchField, isBlast, isCatch, resetCatch });
+Object.defineProperty(window.Trk.modes, "truckBinding", { configurable:true, get:() => truckBinding, set:v => { truckBinding = v; } });
+Object.defineProperty(window.Trk.modes, "stageBinding", { configurable:true, get:() => stageBinding, set:v => { stageBinding = v; } });
 })();

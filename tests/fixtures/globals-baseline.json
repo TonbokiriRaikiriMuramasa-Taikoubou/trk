@@ -1,11 +1,11 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 71,
+  "windowProps": 82,
   "duplicates": 0,
-  "declarations": 548,
-  "private": 269,
-  "public": 279
+  "declarations": 483,
+  "private": 215,
+  "public": 268
  },
  "files": [
   {
@@ -304,21 +304,9 @@
   },
   {
    "file": "js/custom.js",
-   "decls": 65,
-   "private": 54,
-   "public": [
-    "getPackSongs",
-    "initPacks",
-    "installPackFile",
-    "noteImage",
-    "packDB",
-    "packRuntime",
-    "renderPackList",
-    "sanitizeSong",
-    "skinShelf",
-    "syncNoteUI",
-    "updateMascotUI"
-   ]
+   "decls": 0,
+   "private": 0,
+   "public": []
   },
   {
    "file": "js/truck.js",
@@ -976,9 +964,30 @@
    ]
   },
   {
+   "name": "getPackSongs",
+   "writers": [
+    "js/custom.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "initLibrary",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "initPacks",
+   "writers": [
+    "js/custom.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "installPackFile",
+   "writers": [
+    "js/custom.js"
    ],
    "readers": []
   },
@@ -1018,9 +1027,30 @@
    "readers": []
   },
   {
+   "name": "noteImage",
+   "writers": [
+    "js/custom.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "onLongPress",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "packDB",
+   "writers": [
+    "js/custom.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "packRuntime",
+   "writers": [
+    "js/custom.js"
    ],
    "readers": []
   },
@@ -1088,6 +1118,20 @@
    "readers": []
   },
   {
+   "name": "renderPackList",
+   "writers": [
+    "js/custom.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "sanitizeSong",
+   "writers": [
+    "js/custom.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "saveSongPrefs",
    "writers": [
     "js/library.js"
@@ -1116,6 +1160,13 @@
    "readers": []
   },
   {
+   "name": "skinShelf",
+   "writers": [
+    "js/custom.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "songInfo",
    "writers": [
     "js/library.js"
@@ -1133,6 +1184,13 @@
    "name": "startPreview",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "syncNoteUI",
+   "writers": [
+    "js/custom.js"
    ],
    "readers": []
   },
@@ -1161,6 +1219,13 @@
    "name": "trySongChart",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "updateMascotUI",
+   "writers": [
+    "js/custom.js"
    ],
    "readers": []
   },

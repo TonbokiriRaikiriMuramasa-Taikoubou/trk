@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：ノーツ設定・マスコット表示・スキン作成・パック・曲パック ============
    ※ パックの形式名 "shadow-taiko-pack" は、これまでに作られたパックとの互換のため変更していません。 */
@@ -798,3 +799,17 @@ addEventListener("drop", e => {      // .stpack / .zip は他の処理より先�
   installAndUse(f);
 }, true);
 /* ✅ custom.js 完了 */
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.getPackSongs = getPackSongs;
+window.initPacks = initPacks;
+window.installPackFile = installPackFile;
+window.noteImage = noteImage;
+window.packDB = packDB;
+window.packRuntime = packRuntime;
+window.renderPackList = renderPackList;
+window.sanitizeSong = sanitizeSong;
+window.skinShelf = skinShelf;
+window.syncNoteUI = syncNoteUI;
+window.updateMascotUI = updateMascotUI;
+})();

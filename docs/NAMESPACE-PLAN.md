@@ -85,6 +85,7 @@ node tools/smoke-browser.mjs --compare
 | 3 | `js/lite.js`（公開 4：`liteLibRows`・`liteNoAnalyze`・`liteMascotNoLoad`・`liteSyncUI` を据え置き）を包む | 839 | 310 | スモーク OK。`check-lite.mjs` は、包みを外して評価するように直した（120 件すべて通過） |
 | 4 | `js/main.js`（公開 6：`RESERVED`・`packsReady`・`poke`・`showFxPower`・`syncOptionsUI` は据え置き、`idleTimer` は `let` のため getter/setter で window に出す） を包む | 798 | 304 | スモーク OK（報告：window 増 6 件・減 214 件。減は他から参照されていない関数。未解決の名前 0）。`let` の公開は据え置きの値ではなく get/set にする |
 | 5 | `js/library.js`（公開 25：`let` の `addonSongs`・`libView` は get/set、それ以外は据え置き）を包む | 548 | 279 | スモーク OK（未解決の名前 0・譜面 10 件一致）。公開名の数は 304 → 279 で、library.js の公開 25 件と一致。`plWishMatch` は `metaOf` を使うため library.js に残す（言語版の照合は `title-match.js` 側） |
+| 6 | `js/custom.js`（公開 11 を据え置き。`let` は無し）を包む。`"use strict"` は包みの先頭文のまま | 483 | 268 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
 
 ## 4. 止める条件
 

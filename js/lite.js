@@ -319,4 +319,7 @@ window.liteLibRows = liteLibRows;
 window.liteNoAnalyze = liteNoAnalyze;
 window.liteMascotNoLoad = liteMascotNoLoad;
 window.liteSyncUI = liteSyncUI;
+/* 領域（window.Trk.lite）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
+window.Trk = window.Trk || {};
+window.Trk.lite = Object.assign(window.Trk.lite || {}, { liteLibRows, liteNoAnalyze, liteMascotNoLoad, liteSyncUI });
 })();

@@ -17,7 +17,8 @@ export function loadBrowserData() {
   vm.createContext(sb);
   vm.runInContext(dataSrc, sb, { filename: "js/data.js" });
   vm.runInContext(helpers, sb, { filename: "js/core.js#helpers" });
-  const DIFFS = vm.runInContext("DIFFS", sb);
-  const DIFF_IDS = vm.runInContext("DIFF_IDS", sb);
+  /* js/data.js は即時関数で包まれ、公開名は window に出る（名前空間の移行。sb.window で受け取る） */
+  const DIFFS = sb.window.DIFFS;
+  const DIFF_IDS = sb.window.DIFF_IDS;
   return { DIFFS, DIFF_IDS, hashString: sb.hashString, mulberry32: sb.mulberry32 };
 }

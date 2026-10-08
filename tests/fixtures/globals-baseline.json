@@ -1,11 +1,11 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 182,
+  "windowProps": 211,
   "duplicates": 0,
-  "declarations": 222,
-  "private": 65,
-  "public": 157
+  "declarations": 189,
+  "private": 61,
+  "public": 128
  },
  "files": [
   {
@@ -32,39 +32,9 @@
   },
   {
    "file": "js/data.js",
-   "decls": 33,
-   "private": 4,
-   "public": [
-    "DIFFS",
-    "DIFF_IDS",
-    "EGG_KEYS",
-    "EGG_WORDS",
-    "FONT_DEFAULT",
-    "H",
-    "HEX",
-    "LAYOUTS",
-    "MASCOT_CAPTIONS",
-    "MASCOT_DEFS",
-    "MASCOT_FAMILY",
-    "MASCOT_IDS",
-    "MASCOT_POS",
-    "NOTE_PRESETS",
-    "NOTE_SHAPES",
-    "SKINS",
-    "TAU",
-    "VRM_RECT",
-    "W",
-    "buildCustomSkin",
-    "has",
-    "hexToRgba",
-    "luminance",
-    "mixHex",
-    "parseGrad",
-    "registerMascot",
-    "sanitizeNotes",
-    "sanitizeSkinDef",
-    "toHex"
-   ]
+   "decls": 0,
+   "private": 0,
+   "public": []
   },
   {
    "file": "js/characters/miku.js",
@@ -460,9 +430,114 @@
    "readers": []
   },
   {
+   "name": "DIFFS",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "DIFF_IDS",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "EGG_KEYS",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "EGG_WORDS",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "FONT_DEFAULT",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "H",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "HEX",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "LAYOUTS",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "LIB_SHOW",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "MASCOT_CAPTIONS",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "MASCOT_DEFS",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "MASCOT_FAMILY",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "MASCOT_IDS",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "MASCOT_POS",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "NOTE_PRESETS",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "NOTE_SHAPES",
+   "writers": [
+    "js/data.js"
    ],
    "readers": []
   },
@@ -502,6 +577,13 @@
    "readers": []
   },
   {
+   "name": "SKINS",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "STAGE",
    "writers": [
     "js/stage.js"
@@ -516,6 +598,13 @@
    "readers": [
     "js/custom.js"
    ]
+  },
+  {
+   "name": "TAU",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
   },
   {
    "name": "TrkAddons",
@@ -724,6 +813,20 @@
    ]
   },
   {
+   "name": "VRM_RECT",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "W",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "__trkPendingTvDockSkin",
    "writers": [
     "js/core.js"
@@ -882,6 +985,13 @@
    "name": "buildChart",
    "writers": [
     "js/media.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "buildCustomSkin",
+   "writers": [
+    "js/data.js"
    ],
    "readers": []
   },
@@ -1099,6 +1209,20 @@
    "readers": []
   },
   {
+   "name": "has",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "hexToRgba",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "hintEl",
    "writers": [
     "js/modes.js"
@@ -1267,6 +1391,13 @@
    "readers": []
   },
   {
+   "name": "luminance",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "makeCheck",
    "writers": [
     "js/modes.js"
@@ -1284,6 +1415,13 @@
    "name": "makeSeg",
    "writers": [
     "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "mixHex",
+   "writers": [
+    "js/data.js"
    ],
    "readers": []
   },
@@ -1365,6 +1503,13 @@
    "readers": []
   },
   {
+   "name": "parseGrad",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "pauseGame",
    "writers": [
     "js/game.js"
@@ -1424,6 +1569,13 @@
    "name": "refreshPackSongs",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "registerMascot",
+   "writers": [
+    "js/data.js"
    ],
    "readers": []
   },
@@ -1515,6 +1667,20 @@
    "name": "runUnranked",
    "writers": [
     "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "sanitizeNotes",
+   "writers": [
+    "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "sanitizeSkinDef",
+   "writers": [
+    "js/data.js"
    ],
    "readers": []
   },
@@ -1732,6 +1898,13 @@
    "name": "titleString",
    "writers": [
     "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "toHex",
+   "writers": [
+    "js/data.js"
    ],
    "readers": []
   },

@@ -117,7 +117,7 @@ async function sha256Hex(blob) {
   return Array.from(new Uint8Array(buf), x => x.toString(16).padStart(2, "0")).join("");
 }
 const baseInstall = window.Trk.custom.installPackFile;
-installPackFile = async function (file) {
+window.Trk.custom.installPackFile = async function (file) {
   const r = await baseInstall(file);
   if (r) {
     try {
@@ -133,7 +133,7 @@ installPackFile = async function (file) {
 /* ============ 曲パックに「作者のことば」を入れる ============ */
 let pendingComment = null;   // 曲パックを書き出す瞬間だけ、入力欄のことばを入れる
 const baseSong = window.Trk.custom.sanitizeSong;
-sanitizeSong = function (r, i) {
+window.Trk.custom.sanitizeSong = function (r, i) {
   const s = baseSong(r, i); if (!s) return s;
   const raw = r && r.comment != null ? r.comment : (pendingComment != null && i === 0 ? pendingComment : null);
   const c = cleanComment(raw); if (c) s.comment = c;
@@ -143,7 +143,7 @@ sanitizeSong = function (r, i) {
 /* ============ 曲リストの曲に、指紋と作者の情報を結びつける ============ */
 const songInfo = {};   // 曲リストのキー（"pack:…"）→ { sha256, charter, bpm, comment }
 const baseGet = window.Trk.custom.getPackSongs;
-getPackSongs = async function () {
+window.Trk.custom.getPackSongs = async function () {
   const list = await baseGet();
   let recs = []; try { recs = await window.Trk.custom.packDB.all(); } catch (_) {}
   const hashOf = {}; for (const r of recs) hashOf[r.id] = r.sha256 || null;
@@ -223,7 +223,7 @@ on("screen", id => {
 
 /* ============ パック一覧：指紋・✔・公認リスト用のコピー ============ */
 const basePL = window.Trk.custom.renderPackList;
-renderPackList = async function () {
+window.Trk.custom.renderPackList = async function () {
   await basePL();
   let recs = []; try { recs = await window.Trk.custom.packDB.all(); } catch (_) {}
   recs.sort((a, b) => (b.installedAt || 0) - (a.installedAt || 0));   // custom.js と同じ並び

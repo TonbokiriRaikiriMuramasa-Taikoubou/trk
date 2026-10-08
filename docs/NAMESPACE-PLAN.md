@@ -129,7 +129,7 @@ node tools/smoke-browser.mjs --compare
 | pad | `js/pad.js` | `padBack`・`updatePadUI`（値のコピー） | 0 | trk58 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
 | lite | `js/lite.js` | `liteLibRows`・`liteNoAnalyze`・`liteMascotNoLoad`・`liteSyncUI`（値のコピー） | 0 | trk59 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
 | main | `js/main.js` | `RESERVED`・`packsReady`・`poke`・`showFxPower`・`syncOptionsUI`（値のコピー）・`idleTimer`（アクセサ） | 4 | trk60 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。書き換えは speed.js 3・vrm.js 1。スモーク OK |
-| custom | `js/custom.js` | `initPacks`・`noteImage`・`packDB`・`packRuntime`・`skinShelf`・`syncNoteUI`・`updateMascotUI`（値のコピー）、`installPackFile`・`sanitizeSong`・`getPackSongs`・`renderPackList`（アクセサ。verified.js が差し替える） | 21 | trk61 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。差し替えの 4 名は窓と Trk の両方をアクセサに（回帰修正の続き）。スモーク OK |
+| custom | `js/custom.js` | `initPacks`・`noteImage`・`packDB`・`packRuntime`・`skinShelf`・`syncNoteUI`・`updateMascotUI`（値のコピー）、`installPackFile`・`sanitizeSong`・`getPackSongs`・`renderPackList`（アクセサ。verified.js が差し替える） | 21（追補で代入の左辺 4 件を加えた） | trk61・trk62（追補） | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。差し替えの 4 名は窓と Trk の両方をアクセサ。追補：代入の左辺（`verified.js` の `installPackFile = …` など）が書き換えられていなかったのを直した（acorn-walk は左辺を `VariablePattern` として走査する）。スモーク OK |
 
 残りの領域（lite・main・library・media・data・play・modes・core）は未着手。HANDOFF §7 の実機確認は別途。
 

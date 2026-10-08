@@ -1627,7 +1627,7 @@ for (const [rel, name] of Object.entries(PATCHED_FUNCTIONS).flatMap(([r, ns]) =>
   const owner = exists(rel) ? read(rel) : "";
   const accessor = new RegExp(`Object\\.defineProperty\\(window, "${name}", \\{[^}]*get:\\(\\) => ${name}, set:v => \\{ ${name} = v; \\} \\}\\)`);
   const patchedElsewhere = walk(path.join(root, "js")).filter(f => f.endsWith(".js") && path.relative(root, f) !== rel)
-    .some(f => new RegExp(`^\\s*(?:window\\.)?${name} = (?:async )?(?:function|\\(|[A-Za-z_$][\\w$]* =>|[A-Za-z_$][\\w$]*;)`, "m").test(fs.readFileSync(f, "utf8")));
+    .some(f => new RegExp(`^\\s*(?:window\\.(?:Trk\\.[\\w]+\\.)?)?${name} = (?:async )?(?:function|\\(|[A-Za-z_$][\\w$]* =>|[A-Za-z_$][\\w$]*;)`, "m").test(fs.readFileSync(f, "utf8")));
   if (!patchedElsewhere) fail(`${name}: no later file overrides it (remove it from PATCHED_FUNCTIONS if this is intended)`);
   else if (!accessor.test(owner)) fail(`${name} is overridden by a later file but ${rel} does not expose it as a window accessor`);
   else ok(`${name} override reaches internal calls (window accessor in ${rel})`);

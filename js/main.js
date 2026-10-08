@@ -65,13 +65,13 @@ function maybeAddTrkPlaylist() {
     if (window.TrkEnsureTrkPlaylist && settings.tutorialDone) {
       const created = window.TrkEnsureTrkPlaylist({ toast: true, go: false });
       if (created) {
-        setTimeout(function(){ try { if (window.TrkTrkPlaylistId && typeof renderLib === "function") { settings.libTab = "pl:" + window.TrkTrkPlaylistId; saveUserPrefs(); renderLib(); } } catch(_){} }, 900);
+        setTimeout(function(){ try { if (window.TrkTrkPlaylistId && typeof renderLib === "function") { settings.libTab = "pl:" + window.TrkTrkPlaylistId; saveUserPrefs(); window.Trk.library.renderLib(); } } catch(_){} }, 900);
       }
     }
     if (window.TrkEnsureTrkClassicPlaylist && settings.tutorialDone) {
       const createdC = window.TrkEnsureTrkClassicPlaylist({ toast: true, go: false });
       if (createdC) {
-        setTimeout(function(){ try { if (window.TrkClassicId && typeof renderLib === "function") { settings.libTab = "pl:" + window.TrkClassicId; saveUserPrefs(); renderLib(); } } catch(_){} }, 1300);
+        setTimeout(function(){ try { if (window.TrkClassicId && typeof renderLib === "function") { settings.libTab = "pl:" + window.TrkClassicId; saveUserPrefs(); window.Trk.library.renderLib(); } } catch(_){} }, 1300);
       }
     }
     if (window.ensureTrkDistributionPlaylists && settings.tutorialDone) {
@@ -121,7 +121,7 @@ function guideEggPlay(kind) {   /* チュートリアルバーを跳ね飛ばす
   const finish = () => {
     if (g) g.classList.remove("eggSkip", "eggCheat", "eggGod");
     syncTutorialUI();
-    plToast(tr({ eggSkip:"guideEggSkip", eggCheat:"guideEggCheat", eggGod:"guideEggGod" }[kind]));
+    window.Trk.library.plToast(tr({ eggSkip:"guideEggSkip", eggCheat:"guideEggCheat", eggGod:"guideEggGod" }[kind]));
   };
   if (!g) { syncTutorialUI(); return; }
   g.classList.add(kind);
@@ -279,15 +279,15 @@ addEventListener("pointerdown", poke);
 
 /* ---------- 選曲画面 ---------- */
 $("language").addEventListener("change", () => { applyLanguage($("language").value); saveUserPrefs(); });
-$("mediaFile").addEventListener("change", e => { const fs = Array.from(e.target.files || []); e.target.value = ""; addSongFiles(fs); });
+$("mediaFile").addEventListener("change", e => { const fs = Array.from(e.target.files || []); e.target.value = ""; window.Trk.library.addSongFiles(fs); });
 /* 🎬 動画を読み込む：映像つきかどうかを確かめてから記録し、そのまま全画面で流す（library.js） */
-$("videoFile").addEventListener("change", e => { const fs = Array.from(e.target.files || []); e.target.value = ""; addVideoFiles(fs); });
+$("videoFile").addEventListener("change", e => { const fs = Array.from(e.target.files || []); e.target.value = ""; window.Trk.library.addVideoFiles(fs); });
 $("openSettingsBtn").addEventListener("click", openSettings);
 $("closeSettingsBtn").addEventListener("click", closeSettings);
 
 $("bpm").addEventListener("change", () => {
   const v = Number($("bpm").value);
-  if (v >= 60 && v <= 300) { if (!saveSongPrefs()) { settings.bpm = v; saveUserPrefs(); } }
+  if (v >= 60 && v <= 300) { if (!window.Trk.library.saveSongPrefs()) { settings.bpm = v; saveUserPrefs(); } }
   if (videoReady && chartMode === "generated") buildChart();
 });
 $("chartGen").addEventListener("change", () => {
@@ -296,12 +296,12 @@ $("chartGen").addEventListener("change", () => {
 });
 $("offset").addEventListener("change", () => {
   const v = Number($("offset").value);
-  if (isFinite(v)) { if (!saveSongPrefs()) { settings.offset = Math.max(-5000, Math.min(5000, v)); saveUserPrefs(); } }
+  if (isFinite(v)) { if (!window.Trk.library.saveSongPrefs()) { settings.offset = Math.max(-5000, Math.min(5000, v)); saveUserPrefs(); } }
   if (videoReady && chartMode === "generated") buildChart();
 });
 let seedTimer = 0;
 $("seed").addEventListener("input", () => {
-  if (!saveSongPrefs()) { settings.seed = $("seed").value.slice(0, 32); saveUserPrefs(); }
+  if (!window.Trk.library.saveSongPrefs()) { settings.seed = $("seed").value.slice(0, 32); saveUserPrefs(); }
   completeTutorialFromSeed();
   refreshSeedSecrets(); syncPickers();
   clearTimeout(seedTimer);
@@ -319,7 +319,7 @@ $("difficultyPicker").addEventListener("click", e => {
   const b = e.target.closest("button[data-mode]"); if (!b || b.hidden) return;
   settings.difficulty = b.dataset.mode; syncPickers(); saveUserPrefs();
   setStatus("importStatus", null);
-  if (videoReady) trySongChart().then(ok => { if (!ok) buildChart(); });   // パック・フォルダの譜面を優先
+  if (videoReady) window.Trk.library.trySongChart().then(ok => { if (!ok) buildChart(); });   // パック・フォルダの譜面を優先
 });
 
 $("playBtn").addEventListener("click", startGame);
@@ -487,7 +487,7 @@ addEventListener("drop", async e => {
   if (!files.length || phase !== "title") return;
   const json = files.find(f => /\.json$/i.test(f.name) || f.type === "application/json");
   if (json) { await importChartFile(json); return; }
-  addSongFiles(files);
+  window.Trk.library.addSongFiles(files);
 });
 
 /* ============ 起動 ============ */
@@ -530,7 +530,7 @@ requestAnimationFrame(loop);
 
 /* パックを戻してから曲リストを作る（vrm.js も packsReady を待ちます） */
 const packsReady = window.Trk.custom.initPacks().catch(e => console.error(e));
-packsReady.then(() => initLibrary()).catch(e => console.error(e));
+packsReady.then(() => window.Trk.library.initLibrary()).catch(e => console.error(e));
 
 /* PWA：オフラインでも開けるようにする（HTTPS か localhost のときだけ）。
    キャッシュの整理は sw.js が trk- で始まる名前だけを消すので、ほかのサイトに影響しません。 */

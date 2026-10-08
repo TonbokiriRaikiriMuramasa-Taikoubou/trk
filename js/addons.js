@@ -342,7 +342,7 @@ function setSongs(id, list) {
 function syncSongs() {
   const all = [];
   for (const list of songsByAddon.values()) all.push(...list);
-  if (typeof setAddonSongs === "function") setAddonSongs(all);
+  if (typeof setAddonSongs === "function") window.Trk.library.setAddonSongs(all);
 }
 
 /* ============ 入れる／外す ============ */

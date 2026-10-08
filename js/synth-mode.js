@@ -907,7 +907,7 @@ addEventListener("DOMContentLoaded", () => {
     if (!video.paused) { video.pause(); return; }
     try {
       if (video.muted) video.muted = false;
-      if (video.ended) { try { video.currentTime = typeof previewStartFor === "function" ? previewStartFor() : 0; } catch (_) {} }
+      if (video.ended) { try { video.currentTime = typeof previewStartFor === "function" ? window.Trk.library.previewStartFor() : 0; } catch (_) {} }
       await video.play();
     } catch (_) { setStatus("instTrackBlocked"); }
     updateTrackControls();

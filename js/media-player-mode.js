@@ -454,7 +454,7 @@ const mpFmt = sec => {
   const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 };
-const mpSongs = () => typeof allSongs === "function" ? allSongs().filter(Boolean) : [];
+const mpSongs = () => typeof allSongs === "function" ? window.Trk.library.allSongs().filter(Boolean) : [];
 const mediaActive = () => !!window.Trk.overlay.is("media");
 function currentList() {
   const q = queueFilter.trim().toLowerCase();
@@ -523,9 +523,9 @@ async function playSong(it, fromStart = true) {
   window._trkMediaPlayerMode = true;
   if (!currentSong || currentSong.key !== it.key) {
     saveMediaPosition();
-    await selectSong(it);
+    await window.Trk.library.selectSong(it);
   } else if (!videoReady) {
-    await selectSong(it);
+    await window.Trk.library.selectSong(it);
   }
   if (!mediaActive() || currentSong !== it || !videoReady) { renderMedia(); return; }
   if (fromStart) { try { video.currentTime = savedMediaPosition(); } catch (_) {} }
@@ -579,11 +579,11 @@ function updateMediaSession() {
   } catch (_) {}
 }
 async function sessionSong(dir) {
-  const pick = dir > 0 ? nextSong : prevSong;
+  const pick = dir > 0 ? window.Trk.library.nextSong : window.Trk.library.prevSong;
   if (typeof pick !== "function" || typeof selectSong !== "function") return;
   const it = pick(); if (!it) return;
   if (phase !== "title" && typeof toTitle === "function") toTitle();
-  await selectSong(it);
+  await window.Trk.library.selectSong(it);
   if (settings.autoPlay && phase === "title" && videoReady && chart.length && currentSong === it && typeof startGame === "function") startGame();
 }
 function installMediaSession() {
@@ -611,7 +611,7 @@ function updateTrackText() {
   if (!s) delete titleNode.dataset.i18n;
 }
 function srcLabelSafe(s) {
-  try { return typeof srcLabel === "function" ? srcLabel(s) : s.source || ""; } catch (_) { return s.source || ""; }
+  try { return typeof srcLabel === "function" ? window.Trk.library.srcLabel(s) : s.source || ""; } catch (_) { return s.source || ""; }
 }
 function renderQueue() {
   if (!queueNode) return;
@@ -762,7 +762,7 @@ function closeMedia(restore = true) {
   if (window.TrkFrameInterp) window.TrkFrameInterp.detach("media");
   if (stageWrap) stageWrap.hidden = true;
   overlay.hidden = true; document.body.classList.remove("mediaOpen");
-  if (restore && phase === "title" && settings.previewEnabled && typeof startPreview === "function") setTimeout(startPreview, 50);
+  if (restore && phase === "title" && settings.previewEnabled && typeof startPreview === "function") setTimeout(window.Trk.library.startPreview, 50);
   if (powerButton) powerButton.focus();
 }
 function openMedia() {

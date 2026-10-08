@@ -3066,4 +3066,11 @@ window.songInfo = songInfo;
 window.srcLabel = srcLabel;
 window.startPreview = startPreview;
 window.trySongChart = trySongChart;
+/* 領域（window.Trk.library）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
+window.Trk = window.Trk || {};
+window.Trk.library = Object.assign(window.Trk.library || {}, { LIB_SHOW, addSongFiles, addVideoFiles, allSongs, bannerRandomBtn, bannerVolTip, ensureTrkDistributionPlaylists, initLibrary, nextSong, onLongPress, plToast, prevSong, previewStartFor, refreshPackSongs, saveSongPrefs, selectSong, setAddonSongs, songInfo, srcLabel, startPreview, trySongChart, plTitleKeys, plSongMatchKeys, plWishTitleKeys });
+Object.defineProperty(window.Trk.library, "addonSongs", { configurable:true, get:() => addonSongs, set:v => { addonSongs = v; } });
+Object.defineProperty(window.Trk.library, "libView", { configurable:true, get:() => libView, set:v => { libView = v; } });
+Object.defineProperty(window.Trk.library, "renderBanner", { configurable:true, get:() => renderBanner, set:v => { renderBanner = v; } });
+Object.defineProperty(window.Trk.library, "renderLib", { configurable:true, get:() => renderLib, set:v => { renderLib = v; } });
 })();

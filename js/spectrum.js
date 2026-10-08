@@ -1322,7 +1322,7 @@ function buildBannerSkin() {
     saveUserPrefs(); syncAll();
   });
   /* ⚙ 長押しで、設定画面のスペクトラム欄を開いてスクロール */
-  onLongPress(zipBtn, () => {
+  window.Trk.library.onLongPress(zipBtn, () => {
     if (typeof openSettings === "function") openSettings();
     setTimeout(() => {
       const p = document.getElementById("specPanel");

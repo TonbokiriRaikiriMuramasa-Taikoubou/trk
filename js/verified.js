@@ -125,7 +125,7 @@ window.Trk.custom.installPackFile = async function (file) {
       if (rec && h) { rec.sha256 = h; await window.Trk.custom.packDB.put(r.id, rec); }
     } catch (e) { console.error(e); }
     await window.Trk.custom.renderPackList();
-    if (r.man.songs && typeof refreshPackSongs === "function") await refreshPackSongs();
+    if (r.man.songs && typeof refreshPackSongs === "function") await window.Trk.library.refreshPackSongs();
   }
   return r;
 };
@@ -174,11 +174,11 @@ function creatorRow(id) {
 }
 
 /* ============ 曲リスト：曲名の前に ✔ ============ */
-const baseLib = renderLib;
-renderLib = function () {
+const baseLib = window.Trk.library.renderLib;
+window.Trk.library.renderLib = function () {
   baseLib();
   const rows = Array.from($("libList").children).filter(n => n.querySelector && n.querySelector(".libRow"));
-  libView.slice(0, LIB_SHOW).forEach((it, i) => {
+  window.Trk.library.libView.slice(0, window.Trk.library.LIB_SHOW).forEach((it, i) => {
     if (!rows[i] || !verifyOf(it)) return;
     rows[i].querySelector(".libName").prepend(badge(false), " ");
   });
@@ -204,8 +204,8 @@ function renderVfBox() {
   }
   vfBox.hidden = !(v || meta);
 }
-const baseBanner = renderBanner;
-renderBanner = function () { baseBanner(); renderVfBox(); };
+const baseBanner = window.Trk.library.renderBanner;
+window.Trk.library.renderBanner = function () { baseBanner(); renderVfBox(); };
 on("language", renderVfBox);
 
 /* ============ リザルト：公認と作者のことば ============ */
@@ -271,7 +271,7 @@ window.Trk.custom.renderPackList = async function () {
 
 /* ============ 起動 ============ */
 function refreshAll() {
-  renderLib(); renderBanner();
+  window.Trk.library.renderLib(); window.Trk.library.renderBanner();
   window.Trk.custom.renderPackList().catch(() => {});
 }
 /* ============ 窓口（曲タブの「✔公認」など、他のファイルから公認を調べる用） ============ */

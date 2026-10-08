@@ -1642,14 +1642,18 @@ const TRK_REGISTRARS = {
   "js/lite.js": "lite",
   "js/main.js": "main",
   "js/custom.js": "custom",
+  "js/library.js": "library",
 };
 const TRK_NOT_REGISTERED = { "js/core.js": ["_trkStudyRoomOpen"] }; // 互換の読み取り専用アクセサ（宣言ではない）
+const TRK_EXTRAS = { "js/library.js": ["js/title-match.js"] }; // 登録元が別ファイルの関数も領域へ出す（plTitleKeys など）
 for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   const src = exists(rel) ? read(rel) : "";
+  const extraNames = (TRK_EXTRAS[rel] || []).flatMap(f => [...read(f).matchAll(/^function ([A-Za-z_$][\w$]*)\(/gm)].map(m => m[1]));
   const exported = [
     ...[...src.matchAll(/^window\.([A-Za-z_$][\w$]*) = \1;/gm)].map(m => m[1]),
     ...[...src.matchAll(/^Object\.defineProperty\(window, "([^"]+)"/gm)].map(m => m[1]),
-  ].filter(n => !(TRK_NOT_REGISTERED[rel] || []).includes(n));
+    ...extraNames,
+  ].filter((n, i, all) => all.indexOf(n) === i && !(TRK_NOT_REGISTERED[rel] || []).includes(n));
   const tail = src.slice(src.indexOf(`window.Trk.${area} = `));
   const missing = exported.filter(n => !new RegExp(`[{,]\\s*${n.replace(/\$/g, "\\$")}\\s*[,}]|window\\.Trk\\.${area}, "${n.replace(/\$/g, "\\$")}"`).test(tail));
   if (src.indexOf(`window.Trk.${area} = `) < 0) fail(`${rel}: window.Trk.${area} is not registered`);

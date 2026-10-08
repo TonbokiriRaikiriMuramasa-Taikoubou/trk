@@ -44,3 +44,23 @@ describe("棚スキン（trk87の6種）のタブの文字", () => {
     });
   }
 });
+
+/* 棚の整合性：定義（LIB_SKINS）・並び順（LIB_SKIN_ORDER）・見た目（CSS）が、同じ30種で揃っている */
+describe("棚スキンの整合性", () => {
+  const lib = fs.readFileSync(path.join(ROOT, "js/lib-skins.js"), "utf8");
+  const keys = [...lib.matchAll(/^  ([a-z]+):\s*\{ icon/gm)].map(m => m[1]);
+  const order = JSON.parse("[" + lib.match(/const LIB_SKIN_ORDER = \[([^\]]+)\]/)[1] + "]");
+  test("定義と並び順が同じ集合で、重複がない", () => {
+    assert.equal(new Set(keys).size, keys.length);
+    assert.deepEqual([...order].sort(), [...keys].sort());
+    assert.equal(order.length, 30);
+  });
+  test("すべての棚に、見た目の CSS がある", () => {
+    for (const id of order) assert.ok(css.includes(`data-lib-skin="${id}"`), `${id} に CSS がない`);
+  });
+  test("かんたん表示の上位6種は、すべて並び順の中にある", () => {
+    const top = JSON.parse("[" + lib.match(/const LIB_SKIN_SIMPLE_TOP = \[([^\]]+)\]/)[1] + "]");
+    for (const id of top) assert.ok(order.includes(id), id);
+    assert.equal(top.length, 6);
+  });
+});

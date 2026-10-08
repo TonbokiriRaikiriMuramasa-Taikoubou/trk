@@ -44,7 +44,7 @@
 - **📺 TVドックの設定（`js/tv-dock.js`）**：くわしいの中の「📺 TVドック」グループ。チェックは3つ：🧱 壁掛け（スキン `wall` と同じ。外すと映画館に戻る）、↕ 並び替え（テレビとラックの上下）、🔢 5枠化（`tvDockFive`）。既定はすべて OFF（映画館・テレビが上・5枠なし）。くわしいは既定で開いた状態（保存済みの開閉は変えない）。テレビ本体とラックの表示は変えていない。
 - **Loop Lab の映像書き出し（`js/media-player-mode.js` の `exportLoopClip`）**：開発者表示の中だけ。記録した区間の行の 🎬 を押すと、映像と音を区間の長さのぶん録画して保存する（WebM。対応していれば MP4）。設定は持たない。書き出し後は再生位置・再生／停止・速度・ループを元に戻す。曲を切り替えたら途中で止め、保存しない。音声だけの曲は書き出さない。
 - **「📁 開く」と「📤 共有」**（`js/library.js`）：📁 開く は曲を入れるだけで、共有としては覚えない。📤 共有 は共有として覚え、📤 の印が付き、「共有をやめる」でまとめて外せ、「端末に残す」の対象になる。ボタンの下の説明行は `libOpenShareHint`（4言語）。
-- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.8-trk87`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
+- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.8-trk88`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
 
 ## 3. 権利・データ・セキュリティの不変条件
 
@@ -92,7 +92,7 @@ npm run check
 git diff --check
 ```
 
-`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-08）は Security 55 checks、a11y 8 checks、vendor 8 checks、軽量化 121 assertions、`npm test` 82件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
+`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-08）は Security 55 checks、a11y 8 checks、vendor 8 checks、軽量化 121 assertions、`npm test` 88件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
 
 `check-repo.mjs` はJavaScript構文・ローカル参照・ID・設定文言に加え、Arknights公式リンク、Blue Archive 225曲、LoL Sessions 108曲／Phase 1の58件、Gakumas 50件・別名、公式リンクと権利注記、既存プレイリストの所有曲・カスタムフィールド保持を検査する。チェックは意図的な逆テストでもFAILすることを確認してから追加する。外部ツールの起動後DOM検査は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照し、リポジトリ外で行う。
 
@@ -161,6 +161,7 @@ git diff --check
 
 ## 11. 最近の変更
 
+- **2026-10-08 — ④映像フィルターの見直しと TRKエフェクトの固定（trk88）：** 計画書の④を見直し（水彩・墨は実装、既存と重なる 3 案は見送り、規則を追加）。**✨ TRKエフェクト**（`tv-rich.js` の 20 種、人物・アニメ・質感・スタジオ）は固定と決定。`tests/trk-effects-fixed.test.mjs`（新規 3 件）で ID・並び順・分類の人数を守る。棚の整合性（定義・並び順・CSS が同じ 30 種、かんたん表示の上位 6 種が並びに含まれる）を `tests/shelf-skins.test.mjs` に追加（テスト 88 件）。映像フィルターの分類名「エフェクト」の変更は未決定（利用者の判断待ち）。
 - **2026-10-08 — 棚スキン 6 種（trk87）：** 色覚配慮の 3 種（青×橙＝Okabe-Ito の基本色、模様で見分ける＝縞・点・格子・破線、黄×黒の案内サイン）とビビットの 3 種（ポップアート、虹色ネオン、トロピカル）を追加。棚は 24 → 30 種。色だけに頼らない（模様・枠の太さ・外枠で区別）。`tests/shelf-skins.test.mjs`（新規 7 件）で、6 種の単色の文字と背景を 4.5:1 以上で検査。模様の指定は目視で確認が必要。`tools/check-repo.mjs` の期待値を 30 に更新。**未確認**：実ブラウザでの見た目、かんたん表示の並び。
 - **2026-10-08 — 書斎の文字スキン 6 種（trk86）：** 付箋・便箋・日記帳・俳句の短冊・新聞の紙面（文筆・読書に追加）、楽譜の余白（自由な発想に追加）。書斎は 24 → 30 種。定義（`STUDY_THEMES`）、画面の選択肢（`index.html`）、4 言語の名前、CSS（`.study-text-stage[data-theme]`）を揃えた。`tools/check-study-room.mjs` の期待値を 30 に更新し、`tests/study-themes.test.mjs`（新規 6 件）で 6 種の本文と編集欄の対比を 4.5:1 以上で検査（テスト 75 件）。**未確認**：実ブラウザでの見た目（特に新聞の段の罫線と、楽譜の五線の間隔が文字の行と合うか）。
 - **2026-10-08 — 棚スキン 3 種・映像フィルター 5 種（trk85）：** 棚に駅の伝言板（message）・郵便の仕分け棚（postal）・楽譜棚（score）を追加（棚 21 → 24）。映像フィルターに水彩のにじみ・墨の滲み・雨の窓ガラス・銭湯の湯気・障子越しの光を追加（70 種、分類は effect）。\n  **計画からの変更：** 計画書の映像案のうち「褪せたフィルム」「サーマル風」「夜間の撮影」は、既存の faded・thermal・night／nightvision と役割が重なるため見送り、代わりに生活の場面の 5 種を選んだ。`tools/check-repo.mjs` の期待値を 70／24 に更新。文字と背景の対比は 4.5:1 以上。**未確認**：実ブラウザでの見た目（特に映像フィルターの見た目と、伝言板の回転したタブ）。

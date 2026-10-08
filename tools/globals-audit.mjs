@@ -129,6 +129,14 @@ export function topLevelNames(stripped) {
     if (c === "{" || c === "(" || c === "[") d++;
     else if (c === "}" || c === ")" || c === "]") d--;
   }
+  // 即時関数で包んだファイル（先頭が `(() => {`）は、包みの本体を「トップレベル」として数える。
+  // 本体の深さは 2 なので、本体の中だけ 2 を引いて 0 に読み替える（本体の閉じ括弧は深さ 2 で閉じる）。
+  if (/^\s*\(\s*\(\s*\)\s*=>\s*\{/.test(stripped)) {
+    const open = stripped.indexOf("{");
+    let close = n;
+    for (let i = open + 1; i < n; i++) if (stripped[i] === "}" && depth[i] === 2) { close = i; break; }
+    for (let i = open + 1; i < close; i++) depth[i] -= 2;
+  }
   const KW = /(?<![\w$.])(const|let|var|class|function\*?|async\s+function\*?)(?![\w$])/g;
   let m;
   while ((m = KW.exec(stripped))) {

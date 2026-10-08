@@ -3,9 +3,9 @@
   "scripts": 45,
   "windowProps": 214,
   "duplicates": 0,
-  "declarations": 170,
-  "private": 44,
-  "public": 126
+  "declarations": 1169,
+  "private": 853,
+  "public": 316
  },
  "files": [
   {
@@ -32,9 +32,39 @@
   },
   {
    "file": "js/data.js",
-   "decls": 0,
-   "private": 0,
-   "public": []
+   "decls": 33,
+   "private": 4,
+   "public": [
+    "DIFFS",
+    "DIFF_IDS",
+    "EGG_KEYS",
+    "EGG_WORDS",
+    "FONT_DEFAULT",
+    "H",
+    "HEX",
+    "LAYOUTS",
+    "MASCOT_CAPTIONS",
+    "MASCOT_DEFS",
+    "MASCOT_FAMILY",
+    "MASCOT_IDS",
+    "MASCOT_POS",
+    "NOTE_PRESETS",
+    "NOTE_SHAPES",
+    "SKINS",
+    "TAU",
+    "VRM_RECT",
+    "W",
+    "buildCustomSkin",
+    "has",
+    "hexToRgba",
+    "luminance",
+    "mixHex",
+    "parseGrad",
+    "registerMascot",
+    "sanitizeNotes",
+    "sanitizeSkinDef",
+    "toHex"
+   ]
   },
   {
    "file": "js/characters/miku.js",
@@ -175,9 +205,14 @@
   },
   {
    "file": "js/lite.js",
-   "decls": 0,
-   "private": 0,
-   "public": []
+   "decls": 42,
+   "private": 38,
+   "public": [
+    "liteLibRows",
+    "liteMascotNoLoad",
+    "liteNoAnalyze",
+    "liteSyncUI"
+   ]
   },
   {
    "file": "js/player.js",
@@ -187,51 +222,174 @@
   },
   {
    "file": "js/chart-gen.js",
-   "decls": 0,
-   "private": 0,
-   "public": []
+   "decls": 18,
+   "private": 16,
+   "public": [
+    "buildChartNotes",
+    "cgEstimateLevel"
+   ]
   },
   {
    "file": "js/media.js",
-   "decls": 0,
-   "private": 0,
-   "public": []
+   "decls": 25,
+   "private": 7,
+   "public": [
+    "CHART_FILE_MAX",
+    "applyChartData",
+    "audioCtx",
+    "buildChart",
+    "chartToData",
+    "decodeAudio",
+    "estimateLevel",
+    "exportChart",
+    "generateNotes",
+    "getAC",
+    "importChartFile",
+    "loadMedia",
+    "loadSE",
+    "playSE",
+    "rmsAt",
+    "seBuffers",
+    "seFiles",
+    "setBackground"
+   ]
   },
   {
    "file": "js/game.js",
-   "decls": 0,
-   "private": 0,
-   "public": []
+   "decls": 62,
+   "private": 35,
+   "public": [
+    "PLAY_KEYS",
+    "autoPlay",
+    "chartKeyOf",
+    "currentAcc",
+    "currentScore",
+    "endGame",
+    "gameTime",
+    "goAt",
+    "handleInput",
+    "judgeNote",
+    "leadIn",
+    "pauseGame",
+    "pausedInLeadIn",
+    "rateKey",
+    "records",
+    "renderRecords",
+    "resumeGame",
+    "runShort",
+    "runUnranked",
+    "saveRecords",
+    "seekTo",
+    "showJudge",
+    "songRec",
+    "startGame",
+    "sweepMisses",
+    "tickClock",
+    "toTitle"
+   ]
   },
   {
    "file": "js/render.js",
-   "decls": 0,
-   "private": 0,
-   "public": []
+   "decls": 39,
+   "private": 27,
+   "public": [
+    "beatPulse",
+    "drawVideo",
+    "hitPos",
+    "layout",
+    "loop",
+    "noteAlpha",
+    "ownField",
+    "retryHoldAt",
+    "rr",
+    "showToast",
+    "toast",
+    "vrmState"
+   ]
   },
   {
    "file": "js/custom.js",
-   "decls": 0,
-   "private": 0,
-   "public": []
+   "decls": 65,
+   "private": 54,
+   "public": [
+    "getPackSongs",
+    "initPacks",
+    "installPackFile",
+    "noteImage",
+    "packDB",
+    "packRuntime",
+    "renderPackList",
+    "sanitizeSong",
+    "skinShelf",
+    "syncNoteUI",
+    "updateMascotUI"
+   ]
   },
   {
    "file": "js/truck.js",
-   "decls": 0,
-   "private": 0,
-   "public": []
+   "decls": 24,
+   "private": 9,
+   "public": [
+    "drawLaneTint",
+    "drawTruck",
+    "isTruck",
+    "lanePivot",
+    "laneTilt",
+    "reduceMotion",
+    "resetTruck",
+    "steerTruck",
+    "syncTruckKeyUI",
+    "truckBinding",
+    "truckJudge",
+    "truckKeysLabel",
+    "truckPosKeys",
+    "truckRowY",
+    "truckState"
+   ]
   },
   {
    "file": "js/modes.js",
-   "decls": 0,
-   "private": 0,
-   "public": []
+   "decls": 57,
+   "private": 38,
+   "public": [
+    "ORBIT_CX",
+    "ORBIT_CY",
+    "ORBIT_IGNORE",
+    "drawLives",
+    "drawOrbitField",
+    "failSound",
+    "hintEl",
+    "isOrbit",
+    "lifeAfterJudge",
+    "lifeState",
+    "makeCheck",
+    "makeColorRow",
+    "makeSeg",
+    "orbit",
+    "orbitHitPos",
+    "resetLives",
+    "resetOrbit",
+    "starPath",
+    "titleString"
+   ]
   },
   {
    "file": "js/stage.js",
-   "decls": 0,
-   "private": 0,
-   "public": []
+   "decls": 24,
+   "private": 13,
+   "public": [
+    "STAGE",
+    "drawStageField",
+    "ensureStageMap",
+    "isStage",
+    "resetStage",
+    "stageBinding",
+    "stageHitPos",
+    "stageInput",
+    "stageKeys",
+    "stageMap",
+    "stagePress"
+   ]
   },
   {
    "file": "js/stagefx.js",
@@ -241,9 +399,19 @@
   },
   {
    "file": "js/catch.js",
-   "decls": 0,
-   "private": 0,
-   "public": []
+   "decls": 30,
+   "private": 21,
+   "public": [
+    "CATCH",
+    "catchAllKeys",
+    "catchHitPos",
+    "catchJudge",
+    "catchState",
+    "drawCatchField",
+    "isBlast",
+    "isCatch",
+    "resetCatch"
+   ]
   },
   {
    "file": "js/extras.js",
@@ -261,8 +429,8 @@
   },
   {
    "file": "js/fx-dock.js",
-   "decls": 0,
-   "private": 0,
+   "decls": 1,
+   "private": 1,
    "public": []
   },
   {
@@ -273,8 +441,8 @@
   },
   {
    "file": "js/tv-rich.js",
-   "decls": 0,
-   "private": 0,
+   "decls": 10,
+   "private": 10,
    "public": []
   },
   {
@@ -322,9 +490,35 @@
   },
   {
    "file": "js/library.js",
-   "decls": 0,
-   "private": 0,
-   "public": []
+   "decls": 250,
+   "private": 225,
+   "public": [
+    "LIB_SHOW",
+    "addSongFiles",
+    "addVideoFiles",
+    "addonSongs",
+    "allSongs",
+    "bannerRandomBtn",
+    "bannerVolTip",
+    "ensureTrkDistributionPlaylists",
+    "initLibrary",
+    "libView",
+    "nextSong",
+    "onLongPress",
+    "plToast",
+    "prevSong",
+    "previewStartFor",
+    "refreshPackSongs",
+    "renderBanner",
+    "renderLib",
+    "saveSongPrefs",
+    "selectSong",
+    "setAddonSongs",
+    "songInfo",
+    "srcLabel",
+    "startPreview",
+    "trySongChart"
+   ]
   },
   {
    "file": "js/verified.js",
@@ -346,15 +540,25 @@
   },
   {
    "file": "js/main.js",
-   "decls": 0,
-   "private": 0,
-   "public": []
+   "decls": 41,
+   "private": 35,
+   "public": [
+    "RESERVED",
+    "idleTimer",
+    "packsReady",
+    "poke",
+    "showFxPower",
+    "syncOptionsUI"
+   ]
   },
   {
    "file": "js/pad.js",
-   "decls": 0,
-   "private": 0,
-   "public": []
+   "decls": 36,
+   "private": 34,
+   "public": [
+    "padBack",
+    "updatePadUI"
+   ]
   },
   {
    "file": "js/speed.js",
@@ -406,8 +610,8 @@
   },
   {
    "file": "js/study-room.js",
-   "decls": 0,
-   "private": 0,
+   "decls": 242,
+   "private": 242,
    "public": []
   }
  ],

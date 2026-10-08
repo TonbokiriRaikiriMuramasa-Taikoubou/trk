@@ -40,14 +40,14 @@ class Delta {}
 `));
     assert.deepEqual(names, ["Delta", "alpha", "beta", "gamma"]);
   });
-  test("インデントの無い即時関数の中の宣言は、トップレベルに数えない", () => {
+  test("即時関数で包んだファイルは、包みの中身も包みの外も、トップレベルとして数える", () => {
     const names = topLevelNames(stripCode(`(() => {
 const hiddenInIife = 1;
 function alsoHidden() {}
 })();
 const visible = 2;
 `));
-    assert.deepEqual(names, ["visible"]);
+    assert.deepEqual(names, ["alsoHidden", "hiddenInIife", "visible"]);
   });
   test("カンマで続く宣言（const a = 1, b = 2;）の2つ目も拾う", () => {
     const names = topLevelNames(stripCode("const first = 1, second = [3, 4], third = { k: 5 };"));

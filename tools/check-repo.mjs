@@ -1725,6 +1725,24 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   else ok("アドオンの api の鍵（" + keys.length + "件）は docs/ADDONS.md に全て載っている");
 }
 
+/* 廃止予定の互換名：js/core.js が window 直下に出す互換名（defineProperty(window, "名前")）と、
+   docs/ADDONS.md の「廃止予定の互換名」の一覧が一致すること。対象外（_trkStudyRoomOpen＝fx.js が読む）は除く。
+   増やした・減らした一方だけを変えると落ちる。 */
+{
+  const coreSrc = fs.readFileSync(path.join(root, "js/core.js"), "utf8");
+  const exempt = new Set(["_trkStudyRoomOpen"]);
+  const actual = [...coreSrc.matchAll(/defineProperty\(window, "([A-Za-z_$][\w$]*)"/g)].map(m => m[1]).filter(n => !exempt.has(n));
+  const docs = fs.readFileSync(path.join(root, "docs/ADDONS.md"), "utf8");
+  const sec = (docs.match(/### 廃止予定の互換名[\s\S]*?(?=\n## |\n### )/) || [""])[0];
+  const target = (sec.match(/^- 対象：(.*)$/m) || [, ""])[1];   /* 一覧は「- 対象：」の行にだけ書く */
+  const listed = [...target.matchAll(/`([A-Za-z_$][\w$]*)`/g)].map(m => m[1]).filter(n => !exempt.has(n));
+  const onlyCode = actual.filter(n => !listed.includes(n));
+  const onlyDocs = [...new Set(listed)].filter(n => !actual.includes(n));
+  if (!sec) fail("docs/ADDONS.md に「廃止予定の互換名」の節がありません");
+  else if (onlyCode.length || onlyDocs.length) fail("廃止予定の互換名が一致しません（core.js にだけ: " + onlyCode.join(", ") + " ／ 文書にだけ: " + onlyDocs.join(", ") + "）");
+  else ok("廃止予定の互換名（" + actual.length + "件）は core.js と docs/ADDONS.md で一致");
+}
+
 /* 項目 5（README の分割）：README は概要に絞る（上限 12KB）。docs/guide/ の全ファイルは目次（index.md）に載せる。 */
 {
   const readmeBytes = fs.statSync(path.join(root, "README.md")).size;

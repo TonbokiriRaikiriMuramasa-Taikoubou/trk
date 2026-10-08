@@ -47,6 +47,15 @@ trk! 本体には入れられない機能を、あとから足せるしくみで
 - 本体の内部イベント。`api.on` で拾えるものでも、§3「イベント」の表に無いものは保証の対象外です（`beforeLoad`・`beforePlay`・`chart`・`options`・`phase`・`records`・`screen`・`settings`・`studyCoverChanged` など）。
 - `window.screen` は、ブラウザ標準のものです。本体は上書きしません（以前は一部の版で隠していました）。
 
+### 廃止予定の互換名（window 直下の 33 件）
+
+`js/core.js` は、旧来の大域名（`window.activeMods`・`window.chart` など）を `window.Trk.core.*` への別名として残しています。これらは**廃止予定**です。
+
+- **予告：trk76（2026-10-08）から。** この版以降、アドオンはこれらの名前に頼らないでください。`window.Trk.core.<名前>` か、§3〜§5 の `api` を使います。
+- **削除：trk76 から数えて公開版をさらに2回重ねたあと**（目安は trk78 以降の版）に取り除きます。削除する版の `sw.js` のキャッシュ名と、本書の「最近の変更」に明記します。
+- 対象：`activeMods` `analysis` `applySkin` `avatarHit` `bgImage` `bindingSlot` `caption` `chart` `chartDiff` `chartMeta` `chartMode` `clock` `currentLevel` `currentSong` `effects` `errors` `fingerprint` `lastMissT` `levelOverride` `loadToken` `mediaName` `mediaURL` `nextIdx` `phase` `practice` `prefs` `pressFlash` `pressH` `safeModeOn` `seekDragging` `stats` `videoFilter` `videoReady`（33件）。
+- **対象外（当面残す）**：`_trkStudyRoomOpen`（読み取り専用）。`js/fx.js` は凍結されていて書き換えないため、fx.js がこの名前を読まなくなるまで残します。
+
 > 作者向けの近道：`api` と `TrkAddons` だけで書けない機能が必要になったら、本体の内部に頼る前に、Issue で「どの窓口がほしいか」を書いてください。
 
 ---

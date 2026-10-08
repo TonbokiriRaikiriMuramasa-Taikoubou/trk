@@ -39,8 +39,8 @@ describe("見やすさのスキン（access）", () => {
     assert.deepEqual(ACCESS.sort(), ["cbDark", "cbLight", "hc"]);
   });
 
-  test("生活のテーマ3種が登録され、カテゴリ life に入る", () => {
-    assert.deepEqual(LIFE.sort(), ["nightBath", "rainWindow", "shojiLight"]);
+  test("生活のテーマ6種が登録され、カテゴリ life に入る", () => {
+    assert.deepEqual(LIFE.sort(), ["morningKitchen", "nightBath", "rainWindow", "shojiLight", "shoutengai", "stationDusk"]);
   });
 
   test("本文の文字は背景に対して 4.5:1 以上（WCAG 本文の基準）", () => {

@@ -456,6 +456,44 @@ const SKINS = {
     game:{don:"#b5533c",ka:"#5f7f8f",stage:"#f4eee0",lane:"rgba(60,45,30,.06)",track:"rgba(60,45,30,.3)",ink:"#2b2620",
       inkShadow:"rgba(255,255,255,.7)",noteBorder:"rgba(43,38,32,.6)",panel:"rgba(251,248,241,.95)",perfect:"#b5533c",good:"#2b2620",miss:"#8a8075",glow:false},
     shapes:["circle","circle"], video:"sepia(.2) brightness(1.1) contrast(.95)"
+  },
+
+  /* 生活（life）2回目：駅・台所・商店街（すべて自作の配色。素材・画像は使わない） */
+  "stationDusk": {
+    cat:["life"],
+    label:{ja:"駅のホーム（夕暮れ）",en:"Station platform at dusk",zh:"黄昏的站台",ko:"해질녘 역 승강장"},
+    desc:{ja:"電車を待つ、オレンジの灯りと群青の空",en:"Waiting for the train under amber lamps and a deep blue sky",zh:"在橙色灯光与深蓝天空下等车",ko:"주황빛 조명과 남색 하늘 아래 전철을 기다리며"},
+    ui:{"--ui-bg":"#15203a","--ui-panel":"rgba(22,32,58,.96)","--ui-soft":"rgba(255,255,255,.05)","--ui-text":"#f2f4fa",
+      "--ui-muted":"#aeb8d4","--ui-border":"rgba(255,255,255,.18)","--ui-button":"#1d2a4a","--ui-button-hover":"#27396a",
+      "--ui-field":"#0f1930","--ui-accent":"#ffb454","--ui-on-accent":"#2a1600","--ui-gold":"#ffd98a",
+      "--ui-shadow":"0 24px 80px rgba(0,0,0,.5)","--ui-glow":"rgba(255,180,84,.16)"},
+    game:{don:"#ffb454",ka:"#7aa6c2",stage:"#101a31",lane:"rgba(0,0,0,.3)",track:"rgba(255,255,255,.2)",ink:"#f2f4fa",
+      inkShadow:"rgba(0,0,0,.7)",noteBorder:"rgba(255,255,255,.6)",panel:"rgba(16,26,50,.94)",perfect:"#ffd98a",good:"#f2f4fa",miss:"#8b96b5",glow:false},
+    shapes:["circle","circle"], video:"saturate(1.1) brightness(.75) contrast(1.05)"
+  },
+  "morningKitchen": {
+    cat:["life"],
+    label:{ja:"台所の朝",en:"Kitchen morning",zh:"厨房的清晨",ko:"아침 부엌"},
+    desc:{ja:"白いタイルと、窓から入る朝の光",en:"White tiles and morning light from the window",zh:"白色瓷砖与窗边的晨光",ko:"하얀 타일과 창으로 드는 아침 햇살"},
+    ui:{"--ui-bg":"#f5efe6","--ui-panel":"#fffaf2","--ui-soft":"rgba(60,50,40,.05)","--ui-text":"#2e2a24",
+      "--ui-muted":"#67604f","--ui-border":"rgba(60,50,40,.22)","--ui-button":"#ebe3d4","--ui-button-hover":"#ddd3bf",
+      "--ui-field":"#ffffff","--ui-accent":"#3f7d5f","--ui-on-accent":"#ffffff","--ui-gold":"#9a6b1f",
+      "--ui-shadow":"0 12px 36px rgba(60,50,40,.12)","--ui-glow":"rgba(63,125,95,.14)"},
+    game:{don:"#e0894d",ka:"#4f7fb0",stage:"#f7f1e7",lane:"rgba(60,50,40,.05)",track:"rgba(60,50,40,.28)",ink:"#2e2a24",
+      inkShadow:"rgba(255,255,255,.7)",noteBorder:"rgba(46,42,36,.6)",panel:"rgba(255,250,242,.95)",perfect:"#b35f1f",good:"#2e2a24",miss:"#8a8374",glow:false},
+    shapes:["circle","circle"], video:"brightness(1.08) saturate(.95)"
+  },
+  "shoutengai": {
+    cat:["life"],
+    label:{ja:"商店街の夕暮れ",en:"Shopping street at dusk",zh:"傍晚的商店街",ko:"저녁 상점가"},
+    desc:{ja:"赤い提灯と、店先の明かりが並ぶ通り",en:"A street lined with red lanterns and shop lights",zh:"红灯笼与店铺灯火排列的街道",ko:"빨간 등불과 가게 불빛이 늘어선 거리"},
+    ui:{"--ui-bg":"#2a1d24","--ui-panel":"rgba(42,29,36,.96)","--ui-soft":"rgba(255,255,255,.05)","--ui-text":"#f7eef0",
+      "--ui-muted":"#c9b3bb","--ui-border":"rgba(255,255,255,.2)","--ui-button":"#36262e","--ui-button-hover":"#44303a",
+      "--ui-field":"#22161c","--ui-accent":"#ff7a59","--ui-on-accent":"#1d0d08","--ui-gold":"#ffd166",
+      "--ui-shadow":"0 24px 80px rgba(0,0,0,.5)","--ui-glow":"rgba(255,122,89,.16)"},
+    game:{don:"#ffd166",ka:"#8ec5e8",stage:"#24181f",lane:"rgba(0,0,0,.3)",track:"rgba(255,255,255,.2)",ink:"#f7eef0",
+      inkShadow:"rgba(0,0,0,.7)",noteBorder:"rgba(255,255,255,.6)",panel:"rgba(36,24,31,.94)",perfect:"#ffd166",good:"#f7eef0",miss:"#9c8790",glow:true},
+    shapes:["circle","circle"], video:"sepia(.25) saturate(1.2) brightness(.75)"
   }
 };
 

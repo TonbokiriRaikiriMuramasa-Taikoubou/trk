@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 自動譜面の生成（純関数）============
    js/media.js の generateNotes から「音声解析の値とSeedの乱数を受け取って譜面を作る」部分だけを切り出した。
@@ -363,3 +364,9 @@ function cgEstimateLevel(notes) {
 
   return Math.max(1, Math.min(20, Math.round(base + tech)));
 }
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.buildChartNotes = buildChartNotes;
+window.cgEstimateLevel = cgEstimateLevel;
+window.cgAllocate = cgAllocate;
+})();

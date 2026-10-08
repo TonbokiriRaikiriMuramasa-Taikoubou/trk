@@ -95,6 +95,7 @@ node tools/smoke-browser.mjs --compare
 | 13 | `js/media.js` を即時関数で包む（公開18名：let の audioCtx は get/set、それ以外は据え置き。譜面生成の関数も据え置き） | 222 | 157 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
 | 14 | `js/data.js` を即時関数で包む（公開28名は据え置き。テスト補助 tests/helpers/browser-data.mjs は sb.window から DIFFS を取るように直した） | 189 | 128 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
 | 15 | `js/fx-dock.js` を即時関数で包む（公開0） | 188 | 128 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
+| 16 | `js/chart-gen.js` を即時関数で包む（公開2名（buildChartNotes・cgEstimateLevel）と、テスト用の cgAllocate を据え置き。テストは ctx.window から読む） | 170 | 126 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
 
 ## 4. 止める条件
 

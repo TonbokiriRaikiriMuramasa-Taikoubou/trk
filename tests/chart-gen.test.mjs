@@ -15,10 +15,11 @@ import { ROOT, loadBrowserData } from "./helpers/browser-data.mjs";
 import { SYNTH_SONGS, synthAnalysis } from "./helpers/synth.mjs";
 
 const { DIFFS, DIFF_IDS, hashString, mulberry32 } = loadBrowserData();
-const ctx = {};
+/* js/chart-gen.js は即時関数で包まれ、公開名は window に出る（名前空間の移行。ctx.window で受け取る） */
+const ctx = { window: {} };
 vm.createContext(ctx);
 vm.runInContext(fs.readFileSync(path.join(ROOT, "js/chart-gen.js"), "utf8"), ctx, { filename: "js/chart-gen.js" });
-const { buildChartNotes, cgAllocate, cgEstimateLevel } = ctx;
+const { buildChartNotes, cgAllocate, cgEstimateLevel } = ctx.window;
 
 const golden = JSON.parse(fs.readFileSync(path.join(ROOT, "tests/fixtures/chart-legacy-golden.json"), "utf8"));
 const SONGS = { ...SYNTH_SONGS, noAnalysis: { durSec: 90, bpm: 128, ampAt: () => 0.2, none: true } };

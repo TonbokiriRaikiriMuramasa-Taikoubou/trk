@@ -1,11 +1,11 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 211,
+  "windowProps": 214,
   "duplicates": 0,
-  "declarations": 188,
-  "private": 60,
-  "public": 128
+  "declarations": 170,
+  "private": 44,
+  "public": 126
  },
  "files": [
   {
@@ -187,12 +187,9 @@
   },
   {
    "file": "js/chart-gen.js",
-   "decls": 18,
-   "private": 16,
-   "public": [
-    "buildChartNotes",
-    "cgEstimateLevel"
-   ]
+   "decls": 0,
+   "private": 0,
+   "public": []
   },
   {
    "file": "js/media.js",
@@ -989,6 +986,13 @@
    "readers": []
   },
   {
+   "name": "buildChartNotes",
+   "writers": [
+    "js/chart-gen.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "buildCustomSkin",
    "writers": [
     "js/data.js"
@@ -1020,6 +1024,20 @@
    "name": "catchState",
    "writers": [
     "js/catch.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "cgAllocate",
+   "writers": [
+    "js/chart-gen.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "cgEstimateLevel",
+   "writers": [
+    "js/chart-gen.js"
    ],
    "readers": []
   },

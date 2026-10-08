@@ -172,7 +172,7 @@ function openMax() {
   startLoop(); pokeChrome(); syncFsLabel();
   if (closeNode) closeNode.focus();
   notify();
-  if (typeof showToast === "function") showToast(tr("videoMaxToast"));
+  if (typeof showToast === "function") window.Trk.play.showToast(tr("videoMaxToast"));
   return true;
 }
 function closeMax() {

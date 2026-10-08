@@ -596,7 +596,7 @@ function studyFail(error, fallbackKey) {
 
 /* ============ 状態表示・設定 ============ */
 function studySetStatus(key, vars) { if (typeof setStatus === "function") setStatus("studyStatus", key, vars); }
-function studyNotify(key, vars) { studySetStatus(key, vars); if (typeof showToast === "function") showToast(tr(key, vars)); }
+function studyNotify(key, vars) { studySetStatus(key, vars); if (typeof showToast === "function") window.Trk.play.showToast(tr(key, vars)); }
 function studyApplyShelfVisibility() {
   const visible = studyPrefs.shelfVisible !== false;
   $("studyShelf").hidden = !visible;
@@ -1279,7 +1279,7 @@ async function studyImportSummary() {
   if (!added && !kept && !failed) return;
   if (!kept && !failed) { studyNotify("studyImportDone", { n:added }); return; }
   /* 1冊も入らなかったときは「大きすぎる」などの具体的な理由を消さないようにします。 */
-  if (!added && !kept) { if (typeof showToast === "function") showToast(tr("studyImportSummary", { added, kept, failed })); return; }
+  if (!added && !kept) { if (typeof showToast === "function") window.Trk.play.showToast(tr("studyImportSummary", { added, kept, failed })); return; }
   studyNotify("studyImportSummary", { added, kept, failed });
 }
 async function studyImportImageGroup(group, id, position, total) {

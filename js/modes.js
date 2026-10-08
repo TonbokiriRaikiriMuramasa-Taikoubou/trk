@@ -220,7 +220,7 @@ function lifeAfterJudge(kind) {
   }
   if (healInterval > 0 && stats.combo > 0 && stats.combo % healInterval === 0 && lifeState.hp < lifeState.max) {
     lifeState.hp++; lifeState.healAt = p;
-    showToast(tr("lifeHeal"));
+    window.Trk.play.showToast(tr("lifeHeal"));
   }
   return false;
 }
@@ -258,7 +258,7 @@ function lifeText(x, y, size) {
 }
 function drawLifeBar(x, y, w, h, ratio, color) {
   const battery = settings.lifeSkin === "battery", seg = settings.lifeSkin === "segments";
-  rr(x, y, w, h, battery ? 4 : h / 2); ctx.fillStyle = "rgba(0,0,0,.4)"; ctx.fill();
+  window.Trk.play.rr(x, y, w, h, battery ? 4 : h / 2); ctx.fillStyle = "rgba(0,0,0,.4)"; ctx.fill();
   if (battery) {
     ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.stroke();
     ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.fillRect(x + w + 2, y + h * .28, 5, h * .44);
@@ -266,18 +266,18 @@ function drawLifeBar(x, y, w, h, ratio, color) {
   if (seg) {
     const n = 10, gap = 3, cw = (w - gap * (n - 1)) / n, act = Math.ceil(ratio * n);
     for (let i = 0; i < n; i++) {
-      rr(x + i * (cw + gap), y, cw, h, 3);
+      window.Trk.play.rr(x + i * (cw + gap), y, cw, h, 3);
       ctx.fillStyle = i < act ? color : "rgba(255,255,255,.12)"; ctx.fill();
     }
   } else if (ratio > 0) {
     const pad = battery ? 3 : 0, fw = (w - pad * 2) * ratio;
-    rr(x + pad, y + pad, Math.max(h - pad * 2, fw), h - pad * 2, Math.min(6, h / 2));
+    window.Trk.play.rr(x + pad, y + pad, Math.max(h - pad * 2, fw), h - pad * 2, Math.min(6, h / 2));
     ctx.fillStyle = color; ctx.fill();
   }
 }
 function drawLives() {   // render.js から呼ばれます
   if (!lifeState.max || phase === "title") return;
-  const p = performance.now(), x0 = settings.layout === "vertical" && !ownField() ? 760 : 70, y = 152;
+  const p = performance.now(), x0 = settings.layout === "vertical" && !window.Trk.play.ownField() ? 760 : 70, y = 152;
   const ratio = Math.max(0, Math.min(1, lifeState.hp / lifeState.max));
   const color = ratio <= .3 ? "#ffb000" : window.Trk.data.toHex(skin().ui["--ui-accent"]);
   const shake = Math.max(0, 1 - (p - lifeState.lostAt) / 400) * Math.sin(p / 25) * 5;
@@ -371,15 +371,15 @@ function titleString(r) {   // 例：🥁🐔🚚⚔🪐🎪🐔🚛（library.j
   return TITLE_MODES.map(([m, icon]) => t[m] ? icon + TIER_MARK[t[m]] : "").join("");
 }
 let titleSnap = null;
-on("beforePlay", () => { titleSnap = songTitles(songRec(false)); });
+on("beforePlay", () => { titleSnap = songTitles(window.Trk.play.songRec(false)); });
 on("screen", id => {
   if (id !== "endScreen") return;
   const pair = TITLE_MODES.find(([m]) => m === settings.playMode); if (!pair) return;
   const [mode, icon] = pair;
-  if ((lifeState.max > 0 && lifeState.hp <= 0) || runUnranked()) return;   // FAILED・AUTO・練習扱いは対象外
+  if ((lifeState.max > 0 && lifeState.hp <= 0) || window.Trk.play.runUnranked()) return;   // FAILED・AUTO・練習扱いは対象外
   const noMiss = stats.miss === 0 && !(stats.crash > 0) && stats.perfect + stats.good > 0;
-  const tier = noMiss ? 3 : currentAcc() >= 95 ? 2 : 1;
-  const s = songRec(false);
+  const tier = noMiss ? 3 : window.Trk.play.currentAcc() >= 95 ? 2 : 1;
+  const s = window.Trk.play.songRec(false);
   const now = songTitles(s)[mode], prev = titleSnap ? titleSnap[mode] : 0;
   const b = $("result").querySelector(".badges");
   if (b) {
@@ -390,12 +390,12 @@ on("screen", id => {
   if (h && h.mode === mode) {
     h.title = icon + TIER_MARK[tier];
     h.mods = [...(Array.isArray(h.mods) ? h.mods : []), h.title];
-    saveRecords(); renderRecords(); emit("records");
+    window.Trk.play.saveRecords(); window.Trk.play.renderRecords(); emit("records");
   }
 });
 function renderTitles() {
   if (!videoReady) return;
-  const s = songRec(false); if (!s || !s.history || !s.history.length) return;
+  const s = window.Trk.play.songRec(false); if (!s || !s.history || !s.history.length) return;
   const t = titleString(s);
   if (t) $("recSummary").append(el("div", "hint status", `${tr("titlesLabel")}: ${t}`));
 }
@@ -526,23 +526,23 @@ function drawOrbitNote(n, isNext, c, g) {
   if (mode === "judge") {
     const w = windows(), vpm = orbitPath.vpm, hw = 20;
     const lp = Math.max(6, w.perfect * vpm), lg = Math.max(lp + 4, w.good * vpm);
-    rr(-lg, -hw - 4, lg * 2, hw * 2 + 8, 10);
+    window.Trk.play.rr(-lg, -hw - 4, lg * 2, hw * 2 + 8, 10);
     ctx.fillStyle = window.Trk.data.hexToRgba(window.Trk.data.toHex(c), .16); ctx.fill();
     ctx.lineWidth = 2; ctx.strokeStyle = window.Trk.data.hexToRgba(window.Trk.data.toHex(c), .55); ctx.stroke();
     if (isNext) { ctx.shadowColor = c; ctx.shadowBlur = 22; }
-    rr(-lp, -hw, lp * 2, hw * 2, Math.min(9, lp)); ctx.fillStyle = c; ctx.fill(); ctx.shadowBlur = 0;
+    window.Trk.play.rr(-lp, -hw, lp * 2, hw * 2, Math.min(9, lp)); ctx.fillStyle = c; ctx.fill(); ctx.shadowBlur = 0;
     ctx.lineWidth = isNext ? 4 : 3; ctx.strokeStyle = g.noteBorder; ctx.stroke();
     ctx.fillStyle = g.noteBorder; ctx.fillRect(-1.5, -hw, 3, hw * 2);
   } else {
     const s = mode === "grow" && isNext ? 27 : 21;
     if (isNext) { ctx.shadowColor = c; ctx.shadowBlur = 26; }
-    rr(-s, -s, s * 2, s * 2, 9); ctx.fillStyle = c; ctx.fill(); ctx.shadowBlur = 0;
+    window.Trk.play.rr(-s, -s, s * 2, s * 2, 9); ctx.fillStyle = c; ctx.fill(); ctx.shadowBlur = 0;
     ctx.lineWidth = isNext ? 5 : 3; ctx.strokeStyle = g.noteBorder; ctx.stroke();
   }
   ctx.restore();
 }
 function drawOrbitCore(ax, ay, now, g) {
-  const c = orbitCoreColor(), type = settings.orbitCore, pulse = beatPulse(now);
+  const c = orbitCoreColor(), type = settings.orbitCore, pulse = window.Trk.play.beatPulse(now);
   const age = performance.now() - pressH.t, flash = age < 120 ? Math.min(1, .5 * gameplayFxPower()) * (1 - age / 120) : 0;
   if (type === "planet") {
     if (flash) { ctx.globalAlpha = flash; ctx.fillStyle = c; ctx.beginPath(); ctx.arc(ax, ay, 44, 0, window.Trk.data.TAU); ctx.fill(); ctx.globalAlpha = 1; }
@@ -554,7 +554,7 @@ function drawOrbitCore(ax, ay, now, g) {
   const s = 31 + pulse * 3, round = type === "ring" || type === "target";
   ctx.save(); ctx.translate(ax, ay);
   if (!round) ctx.rotate(orbitDir(now) + (type === "diamond" ? Math.PI / 4 : 0));
-  const shape = () => { if (round) { ctx.beginPath(); ctx.arc(0, 0, s, 0, window.Trk.data.TAU); } else rr(-s, -s, s * 2, s * 2, 8); };
+  const shape = () => { if (round) { ctx.beginPath(); ctx.arc(0, 0, s, 0, window.Trk.data.TAU); } else window.Trk.play.rr(-s, -s, s * 2, s * 2, 8); };
   if (flash) { shape(); ctx.globalAlpha = flash; ctx.fillStyle = c; ctx.fill(); ctx.globalAlpha = 1; }
   ctx.lineJoin = "round"; ctx.lineCap = "round";
   if (type === "bracket") {
@@ -622,7 +622,7 @@ function drawOrbitField(now) {   // render.js から呼ばれます
   for (let k = Math.ceil((now - off) / beat); ; k++) {
     const t = off + k * beat; if (t > tEnd) break;
     const barLine = ((k % 4) + 4) % 4 === 0, [sx, sy] = orbitToScreen(...orbitPos(t)), d = orbitDir(t) + Math.PI / 2, L = barLine ? 28 : 15;
-    ctx.globalAlpha = noteAlpha(Math.max(0, t - now)) * (barLine ? .9 : .55); ctx.lineWidth = barLine ? 3 : 2;
+    ctx.globalAlpha = window.Trk.play.noteAlpha(Math.max(0, t - now)) * (barLine ? .9 : .55); ctx.lineWidth = barLine ? 3 : 2;
     ctx.beginPath(); ctx.moveTo(sx - Math.cos(d) * L, sy - Math.sin(d) * L); ctx.lineTo(sx + Math.cos(d) * L, sy + Math.sin(d) * L); ctx.stroke();
   }
   ctx.globalAlpha = 1;
@@ -632,7 +632,7 @@ function drawOrbitField(now) {   // render.js から呼ばれます
   while (end < chart.length && chart[end].time - now <= travel * 1.05) end++;
   for (let i = end - 1; i >= nextIdx; i--) {
     const n = chart[i]; if (n.judged) continue;
-    const a = noteAlpha(n.time - now); if (a <= 0) continue;
+    const a = window.Trk.play.noteAlpha(n.time - now); if (a <= 0) continue;
     ctx.globalAlpha = a;
     drawOrbitNote(n, i === nextIdx, settings.orbitLaneColor ? laneColor(n.lane) : accent, g);
   }
@@ -656,12 +656,12 @@ addEventListener("keydown", e => {
   if (phase !== "playing" || !isOrbit() || bindingSlot !== null || settings.autoPlay) return;
   if (ORBIT_IGNORE.has(e.code) || /^F\d{1,2}$/.test(e.code) || e.ctrlKey || e.metaKey) return;
   e.preventDefault(); e.stopImmediatePropagation();
-  if (!e.repeat) handleInput(0, e.timeStamp);
+  if (!e.repeat) window.Trk.play.handleInput(0, e.timeStamp);
 }, true);
 stage.addEventListener("pointerdown", e => {
   if (phase !== "playing" || !isOrbit() || settings.autoPlay) return;
   if (e.target.closest("#controls, #seekBar, #touchKeys")) return;
-  e.preventDefault(); handleInput(0, e.timeStamp);
+  e.preventDefault(); window.Trk.play.handleInput(0, e.timeStamp);
 });
 on("chart", () => { orbitPath.src = null; });
 /* ✅ modes.js 完了 */

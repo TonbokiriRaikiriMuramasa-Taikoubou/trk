@@ -314,9 +314,9 @@ const setAct = (a, f) => { try { ms.setActionHandler(a, f); } catch (_) {} };
 async function goNext() {
   if (typeof nextSong !== "function" || typeof selectSong !== "function") return;
   const nx = nextSong(); if (!nx) return;
-  if (phase !== "title") toTitle();
+  if (phase !== "title") window.Trk.play.toTitle();
   await selectSong(nx);
-  if (settings.autoPlay && phase === "title" && videoReady && chart.length && currentSong === nx) { skipCountsIfHidden(); startGame(); }
+  if (settings.autoPlay && phase === "title" && videoReady && chart.length && currentSong === nx) { skipCountsIfHidden(); window.Trk.play.startGame(); }
 }
 function msMeta() {
   if (!ms || typeof MediaMetadata === "undefined") return;
@@ -327,8 +327,8 @@ function msMeta() {
   } catch (_) {}
 }
 if (ms) {
-  setAct("play", () => { skipCountsIfHidden(); if (phase === "paused") resumeGame(); else video.play().catch(() => {}); });
-  setAct("pause", () => { if (phase === "playing") pauseGame(); else video.pause(); });
+  setAct("play", () => { skipCountsIfHidden(); if (phase === "paused") window.Trk.play.resumeGame(); else video.play().catch(() => {}); });
+  setAct("pause", () => { if (phase === "playing") window.Trk.play.pauseGame(); else video.pause(); });
   setAct("nexttrack", () => { goNext(); });
 }
 

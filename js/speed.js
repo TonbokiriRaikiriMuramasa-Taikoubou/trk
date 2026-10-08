@@ -112,18 +112,18 @@ function stepRate(dir) {
   if (Math.abs(nr - r) < .001) return;
   setRate(nr);
   if (phase === "playing") {
-    if (leadIn && !leadIn.resume) runRate = nr;                 // 曲が始まる前のカウント中は、記録に影響しない
+    if (window.Trk.play.leadIn && !window.Trk.play.leadIn.resume) runRate = nr;                 // 曲が始まる前のカウント中は、記録に影響しない
     else {
-      if (!leadIn && !video.paused) video.playbackRate = nr;
+      if (!window.Trk.play.leadIn && !video.paused) video.playbackRate = nr;
       if (Math.abs(nr - runRate) > .001) practice = true;       // 途中で速度を変えた → 練習扱い
     }
-    showToast(tr("speedToast", { r:nr.toFixed(2) + "x" }) + (practice && !settings.autoPlay ? " · " + tr("practice") : ""));
+    window.Trk.play.showToast(tr("speedToast", { r:nr.toFixed(2) + "x" }) + (practice && !settings.autoPlay ? " · " + tr("practice") : ""));
   }
 }
 on("beforePlay", () => { runRate = settings.rate; });
 on("phase", p => {   // 一時停止から違う速度で戻ったら練習扱い（開始前のカウント中に止めていた場合は除く）
   if (p !== "playing" || runRate == null || Math.abs(settings.rate - runRate) < .001) return;
-  if (pausedInLeadIn) runRate = settings.rate; else practice = true;
+  if (window.Trk.play.pausedInLeadIn) runRate = settings.rate; else practice = true;
 });
 
 function renderSpeed() {

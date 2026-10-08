@@ -190,13 +190,13 @@ function srcLabel(s) {
 /* 記録の要約（称号は modes.js の titleString で計算） */
 function songInfo(it, idx) {
   const fp = songPrefs.keyFp[it.key];
-  const r = (fp && records[fp]) || idx[`${it.size}|${it.base}`];
+  const r = (fp && window.Trk.play.records[fp]) || idx[`${it.size}|${it.base}`];
   if (!r) return null;
   let best = 0;
   for (const c of Object.values(r.charts || {})) {
     for (const slot of [c, c.truck, c.orbit, c.stage, c.catch]) if (slot && slot.best) best = Math.max(best, Number(slot.best.score) || 0);
   }
-  const plays = PLAY_KEYS.reduce((a, k) => a + (r[k] || 0), 0);
+  const plays = window.Trk.play.PLAY_KEYS.reduce((a, k) => a + (r[k] || 0), 0);
   return { plays, best, title:titleString(r), last:r.lastPlayed || 0 };
 }
 
@@ -1712,13 +1712,13 @@ function notePlayed(key, auto) {   /* リザルトまで行った曲＝クリア
 }
 on("screen", id => {
   if (id !== "endScreen") return;
-  if (currentSong && currentSong.key && !runShort) notePlayed(currentSong.key, !!settings.autoPlay);   /* 🕹️ ショートプレイは視聴証明にしない */
+  if (currentSong && currentSong.key && !window.Trk.play.runShort) notePlayed(currentSong.key, !!settings.autoPlay);   /* 🕹️ ショートプレイは視聴証明にしない */
 });
 
 /* 証明：ランク対象のプレイ記録（クリア）か、視聴記録（AUTO・ラジオ・倍速でもOK） */
 function plRecordsIdx() {
   const idx = {};
-  for (const r of Object.values(records)) if (r && r.title != null) idx[`${r.size}|${r.title}`] = r;
+  for (const r of Object.values(window.Trk.play.records)) if (r && r.title != null) idx[`${r.size}|${r.title}`] = r;
   return idx;
 }
 function plProof(it, idx) {
@@ -2032,7 +2032,7 @@ function renderLib() {
   if (!all.length && !entries.length) { libView = []; box.append(el("div", "libEmpty", tr("libEmptyList"))); return; }
   const scope = all.filter(it => libTabMatch(it, tabId));
   const q = $("libSearch").value.trim().toLowerCase(), idx = {};
-  for (const r of Object.values(records)) if (r && r.title != null) idx[`${r.size}|${r.title}`] = r;
+  for (const r of Object.values(window.Trk.play.records)) if (r && r.title != null) idx[`${r.size}|${r.title}`] = r;
   const items = scope
     .filter(it => { if (!q) return true; const m = metaOf(it.key) || {};   /* 🎶 プロフィール情報も検索対象 */
       return `${m.title || it.title} ${it.dir || ""} ${m.artist || it.artist || ""} ${m.album || ""} ${m.matchHint || ""} ${it.packName || ""}`.toLowerCase().includes(q); })
@@ -2246,8 +2246,8 @@ bannerPauseSync();
 $("songBanner").addEventListener("click", e => {
   const act = bannerPauseAction({ enabled: settings.bannerPause, mediaMode: window._trkMediaPlayerMode,
     target: !!e.target.closest("button, input, a, label"), phase, hasSong: !!(currentSong && video.src) });
-  if (act === "pause") pauseGame();
-  else if (act === "resume") resumeGame();
+  if (act === "pause") window.Trk.play.pauseGame();
+  else if (act === "resume") window.Trk.play.resumeGame();
   else if (act === "preview") { if (video.paused) video.play().catch(() => {}); else video.pause(); }   /* 選曲中のプレビュー */
 });
 /* 🔊 音量（設定の musicVolume と同じもの。バナーの右下の小さなつまみ） */
@@ -2553,9 +2553,9 @@ function prevSong() {
 async function radioGo(next) {
   cancelRadio();
   if (phase !== "ended" || !settings.radio) return;
-  toTitle();
+  window.Trk.play.toTitle();
   await selectSong(next);
-  if (phase === "title" && videoReady && chart.length && currentSong === next) startGame();
+  if (phase === "title" && videoReady && chart.length && currentSong === next) window.Trk.play.startGame();
 }
 on("screen", id => {
   if (id !== "endScreen" || !settings.radio) return;

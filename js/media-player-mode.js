@@ -177,12 +177,12 @@ function setRandomMediaLoop() {
   setMediaLoopRange(start, start + len, true);
 }
 function saveMediaLoopPreset() {
-  if (!loopHasRange()) { if (typeof showToast === "function") showToast(tr("mediaLoopNeedRange")); return; }
+  if (!loopHasRange()) { if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaLoopNeedRange")); return; }
   const key = mediaLoopStoreKey(); if (!key) return;
   const list = storedMediaLoops().filter(x => Math.abs(x.a - loopA) > .1 || Math.abs(x.b - loopB) > .1);
   list.unshift({ a:Math.round(loopA * 10) / 10, b:Math.round(loopB * 10) / 10 });
   mediaLoopPresets[key] = list.slice(0, 8); saveMediaLoopStore();
-  if (typeof showToast === "function") showToast(tr("mediaLoopSaved"));
+  if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaLoopSaved"));
   renderLoopUI();
 }
 function clearMediaLoopPresets() {
@@ -235,7 +235,7 @@ function renderLoopUI() {
 }
 function clearMediaLoop(silent = false) {
   loopA = loopB = null; loopActive = false; loopKeyDown = false;
-  if (!silent && typeof showToast === "function") showToast(tr("mediaLoopClear"));
+  if (!silent && typeof showToast === "function") window.Trk.play.showToast(tr("mediaLoopClear"));
   renderLoopUI();
 }
 function setMediaLoopPoint(which) {
@@ -275,7 +275,7 @@ function stopReverse(resume = false, silent = true) {
   stopReverseAudio();
   video.muted = reverseVideoMuted; video.playbackRate = mediaRate;
   if (resume && videoReady) video.play().catch(() => {});
-  if (!silent && typeof showToast === "function") showToast(tr("mediaForward"));
+  if (!silent && typeof showToast === "function") window.Trk.play.showToast(tr("mediaForward"));
   renderMedia();
 }
 async function reverseAudioForCurrentSong() {
@@ -310,7 +310,7 @@ function reverseTick() {
   }
   if (t <= .02) {
     video.currentTime = 0; stopReverse(false, true);
-    if (typeof showToast === "function") showToast(tr("mediaReverseDone"));
+    if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaReverseDone"));
     return;
   }
   try { video.currentTime = t; } catch (_) {}
@@ -325,12 +325,12 @@ async function startReverseAt(position, restart = false) {
   let start = Math.max(0, Math.min(video.duration, Number(position) || 0));
   if (!restart && start <= .02) start = video.duration;
   try { video.currentTime = start; } catch (_) {}
-  if (typeof showToast === "function" && !restart) showToast(tr("mediaReverseLoading"));
+  if (typeof showToast === "function" && !restart) window.Trk.play.showToast(tr("mediaReverseLoading"));
   let buffer = null;
   try { const gestureAC = typeof getAC === "function" ? window.Trk.media.getAC() : null; if (gestureAC && gestureAC.state === "suspended") gestureAC.resume().catch(() => {}); } catch (_) {}
   try { buffer = await reverseAudioForCurrentSong(); } catch (_) {
     reverseBuffer = null; reverseBufferKey = "";
-    if (typeof showToast === "function" && !restart) showToast(tr("mediaReverseUnavailable"));
+    if (typeof showToast === "function" && !restart) window.Trk.play.showToast(tr("mediaReverseUnavailable"));
   }
   if (!reverseActive || !videoReady) return;
   reverseHasAudio = false;
@@ -408,14 +408,14 @@ function videoAction(action) {
     const z = document.getElementById("videoZoom"); if (z) z.value = settings.videoZoom;
     const zv = document.getElementById("videoZoomVal"); if (zv) zv.textContent = settings.videoZoom.toFixed(1) + "x";
     saveUserPrefs();
-    if (typeof showToast === "function") showToast(tr("mediaVideoToastZoom", { n:settings.videoZoom.toFixed(1) }));
+    if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaVideoToastZoom", { n:settings.videoZoom.toFixed(1) }));
     return;
   }
   if (!mediaActive()) return;
   if (action === 2 || action === 3) {
     const next = Math.max(.5, Math.min(2, (Number(mediaRate) || 1) + (action === 2 ? .25 : -.25)));
     setRate(next); renderMedia();
-    if (typeof showToast === "function") showToast(tr("mediaVideoToastRate", { n:next.toFixed(2) }));
+    if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaVideoToastRate", { n:next.toFixed(2) }));
   } else if (action === 4) playPause();
   else if (action === REVERSE_KEY_INDEX) toggleReverse();
   else if (action === LOOP_KEY_INDEX) settings.mediaLoopTrigger === "hold" ? activateHeldLoop() : cycleMediaLoop();
@@ -442,7 +442,7 @@ function captureVideoKey(code) {
   const i = videoBinding;
   if (code === "Escape") { videoBinding = null; syncVideoKeysUI(); return; }
   if (VIDEO_KEY_BAD.includes(code) || ((settings.videoKeys || []).includes(code) && settings.videoKeys[i] !== code)) {
-    if (typeof showToast === "function") showToast(tr("reservedKey"));
+    if (typeof showToast === "function") window.Trk.play.showToast(tr("reservedKey"));
     return;
   }
   settings.videoKeys[i] = code; videoBinding = null; saveUserPrefs(); syncVideoKeysUI();
@@ -489,10 +489,10 @@ function setSleep(minutes) {
     sleepTimer = setTimeout(() => {
       sleepTimer = 0; sleepUntil = 0;
       video.pause();
-      if (typeof showToast === "function") showToast(tr("mediaSleepDone"));
+      if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaSleepDone"));
       renderMedia();
     }, n * 60000);
-    if (typeof showToast === "function") showToast(tr("mediaSleepSet", { n }));
+    if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaSleepSet", { n }));
   }
   renderMedia();
 }
@@ -517,7 +517,7 @@ async function playSong(it, fromStart = true) {
   if (reverseActive || reverseLoading) stopReverse(false, true);
   clearMediaLoop(true);
   if (phase !== "title") {
-    if (typeof toTitle === "function") toTitle();
+    if (typeof toTitle === "function") window.Trk.play.toTitle();
     else return;
   }
   window._trkMediaPlayerMode = true;
@@ -582,15 +582,15 @@ async function sessionSong(dir) {
   const pick = dir > 0 ? window.Trk.library.nextSong : window.Trk.library.prevSong;
   if (typeof pick !== "function" || typeof selectSong !== "function") return;
   const it = pick(); if (!it) return;
-  if (phase !== "title" && typeof toTitle === "function") toTitle();
+  if (phase !== "title" && typeof toTitle === "function") window.Trk.play.toTitle();
   await window.Trk.library.selectSong(it);
-  if (settings.autoPlay && phase === "title" && videoReady && chart.length && currentSong === it && typeof startGame === "function") startGame();
+  if (settings.autoPlay && phase === "title" && videoReady && chart.length && currentSong === it && typeof startGame === "function") window.Trk.play.startGame();
 }
 function installMediaSession() {
   const ms = navigator.mediaSession; if (!ms) return;
   const act = (name, fn) => { try { ms.setActionHandler(name, fn); } catch (_) {} };
-  act("play", () => mediaActive() ? playPause() : (phase === "paused" ? resumeGame() : video.play().catch(() => {})));
-  act("pause", () => mediaActive() ? playPause() : (phase === "playing" ? pauseGame() : video.pause()));
+  act("play", () => mediaActive() ? playPause() : (phase === "paused" ? window.Trk.play.resumeGame() : video.play().catch(() => {})));
+  act("pause", () => mediaActive() ? playPause() : (phase === "playing" ? window.Trk.play.pauseGame() : video.pause()));
   act("previoustrack", () => mediaActive() ? stepMedia(-1) : sessionSong(-1));
   act("nexttrack", () => mediaActive() ? stepMedia(1) : sessionSong(1));
   act("seekbackward", d => seekBy(-(d && d.seekOffset || 10)));

@@ -77,7 +77,7 @@ function lightColor(i, t) {
 /* ============ STAGEの舞台演出（render.js がレーンの下に描きます） ============ */
 function drawStageBackdrop(now) {
   const k0 = FX_LEVEL[settings.stageFx] || 0; if (!k0) return;
-  const p = performance.now(), t = still() ? 0 : p, pulse = beatPulse(now);
+  const p = performance.now(), t = still() ? 0 : p, pulse = window.Trk.play.beatPulse(now);
   const hype = settings.stageHype && stageMap.len && stageMap.hype[Math.min(nextIdx, stageMap.len - 1)];
   const k = k0 * (hype ? 1.35 : 1);
   const n = settings.stageFx === "rich" ? 5 : settings.stageFx === "std" ? 3 : 2;
@@ -127,10 +127,10 @@ function drawApFc() {
   if (stats.perfect + stats.good === 0 || stats.miss > 0 || stats.crash > 0) return;
   const ap = stats.good === 0, txt = ap ? "AP" : "FC";
   const c = window.Trk.data.toHex(ap ? skin().game.perfect : skin().ui["--ui-accent"]);
-  const x0 = settings.layout === "vertical" && !ownField() ? 760 : 70, y = 190;
+  const x0 = settings.layout === "vertical" && !window.Trk.play.ownField() ? 760 : 70, y = 190;
   ctx.save();
   ctx.font = `900 18px ${fontFamily()}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  rr(x0, y - 13, 48, 26, 13); ctx.fillStyle = "rgba(0,0,0,.5)"; ctx.fill();
+  window.Trk.play.rr(x0, y - 13, 48, 26, 13); ctx.fillStyle = "rgba(0,0,0,.5)"; ctx.fill();
   ctx.lineWidth = 2; ctx.strokeStyle = c; ctx.stroke();
   ctx.fillStyle = c; ctx.fillText(txt, x0 + 24, y + 1);
   ctx.restore();
@@ -185,13 +185,13 @@ function drawFxOverlay() { drawApFc(); drawCurtain(); drawConfetti(); }
 function applyJudgeStyle() {
   const j = $("judge"); if (!j) return;
   j.style.fontSize = { s:"44px", m:"64px", l:"86px" }[settings.judgeSize];
-  j.style.top = ownField() && phase !== "title" ? (isOrbit() ? "260px" : "560px") : "";
+  j.style.top = window.Trk.play.ownField() && phase !== "title" ? (isOrbit() ? "260px" : "560px") : "";
   j.style.marginTop = settings.judgePos + "px";
 }
 on("phase", applyJudgeStyle);
 /* FAST/SLOW の表示範囲（game.js の showJudge のあとに上書き） */
-const baseShowJudge = showJudge;
-showJudge = function (kind, delta, star) {
+const baseShowJudge = window.Trk.play.showJudge;
+window.Trk.play.showJudge = function (kind, delta, star) {
   baseShowJudge(kind, delta, star);
   const sub = $("judgeSub");
   if (settings.fastSlow === "off") {

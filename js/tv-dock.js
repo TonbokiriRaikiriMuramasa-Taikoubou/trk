@@ -623,7 +623,7 @@ function tvTextureRandom(seed) {
   return () => { state = (Math.imul(state, 1664525) + 1013904223) >>> 0; return state / 4294967296; };
 }
 let baseDrawVideo = null;
-if (typeof drawVideo === "function") baseDrawVideo = drawVideo;
+if (typeof drawVideo === "function") baseDrawVideo = window.Trk.play.drawVideo;
 
 function drawTvOverlay(vctx, W, H, overlay) {
   if (!overlay || !settings.tvOverlay) return;
@@ -851,7 +851,7 @@ function wrappedDrawVideo() {
 
 if (typeof window !== "undefined") {
   window.drawVideo = wrappedDrawVideo;
-  try { drawVideo = wrappedDrawVideo; } catch (_) {}
+  try { window.Trk.play.drawVideo = wrappedDrawVideo; } catch (_) {}
 }
 
 /* ============ 操作 ============ */
@@ -1282,7 +1282,7 @@ addEventListener("DOMContentLoaded", () => {
       const text = u.toString();
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(() => {
-          if (typeof showToast === "function") showToast(tr("tvShareCopied"));
+          if (typeof showToast === "function") window.Trk.play.showToast(tr("tvShareCopied"));
           else alert(tr("tvShareCopied"));
         }).catch(() => prompt(tr("tvSharePrompt"), text));
       } else {
@@ -1318,7 +1318,7 @@ addEventListener("DOMContentLoaded", () => {
   pvPlayBtn.dataset.i18n = "tvpPlayGame";
   pvPlayBtn.style.marginTop = "4px";
   pvPlayBtn.addEventListener("click", () => {
-    if (videoReady && chart.length && typeof startGame === "function") startGame();
+    if (videoReady && chart.length && typeof startGame === "function") window.Trk.play.startGame();
   });
 
   const fmtTime = sec => {
@@ -1485,7 +1485,7 @@ addEventListener("DOMContentLoaded", () => {
     if (playing) {
       /* 演奏中に切り替える設定のとき：いまのプレイを閉じて、選曲画面でその曲を選び直す */
       lcdFlash(tr("tvSongSkip", { t:String(it.title || "").slice(0, 24) }));
-      try { if (typeof toTitle === "function") toTitle(); } catch (_) {}
+      try { if (typeof toTitle === "function") window.Trk.play.toTitle(); } catch (_) {}
     } else {
       lcdFlash("♪ " + String(it.title || "").slice(0, 36));
     }

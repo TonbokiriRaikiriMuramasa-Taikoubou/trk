@@ -41,12 +41,12 @@ function captureMenuKey(code) {
 }
 function requestMenuReturn() {
   if (phase === "title" && screen === "select") return;
-  const go = () => { if (typeof toTitle === "function") toTitle(); else if (typeof closeSettings === "function") closeSettings(); };
+  const go = () => { if (typeof toTitle === "function") window.Trk.play.toTitle(); else if (typeof closeSettings === "function") closeSettings(); };
   if (settings.menuConfirm === false || typeof confirm !== "function") { go(); return; }
   const wasPlaying = phase === "playing";
-  if (wasPlaying) pauseGame();
+  if (wasPlaying) window.Trk.play.pauseGame();
   if (confirm(tr("menuReturnConfirm"))) go();
-  else if (wasPlaying) resumeGame();
+  else if (wasPlaying) window.Trk.play.resumeGame();
 }
 
 /* ---------- 🧭 チュートリアル（trk!で完了 ＋ スタンプラリー） ----------
@@ -214,15 +214,15 @@ function toggleFullscreen() {
 const RETRY_HOLD_MS = 350;
 let retryTimer = 0;
 function beginRetryHold() {
-  if (retryHoldAt || !videoReady || !chart.length) return;
-  retryHoldAt = performance.now();
-  retryTimer = setTimeout(() => { retryHoldAt = 0; startGame(); }, RETRY_HOLD_MS);
+  if (window.Trk.play.retryHoldAt || !videoReady || !chart.length) return;
+  window.Trk.play.retryHoldAt = performance.now();
+  retryTimer = setTimeout(() => { window.Trk.play.retryHoldAt = 0; window.Trk.play.startGame(); }, RETRY_HOLD_MS);
 }
-function cancelRetryHold() { clearTimeout(retryTimer); retryHoldAt = 0; }
+function cancelRetryHold() { clearTimeout(retryTimer); window.Trk.play.retryHoldAt = 0; }
 function nudgeLatency(d) {
   settings.latency = Math.max(-300, Math.min(500, settings.latency + d));
   $("latency").value = settings.latency; saveUserPrefs();
-  showToast(tr("offsetToast", { n:(settings.latency > 0 ? "+" : "") + settings.latency }));
+  window.Trk.play.showToast(tr("offsetToast", { n:(settings.latency > 0 ? "+" : "") + settings.latency }));
 }
 
 /* ---------- キーボード ---------- */
@@ -233,7 +233,7 @@ addEventListener("keydown", e => {
   if (bindingSlot !== null) { e.preventDefault(); captureKey(code); return; }
   if (phase === "playing") {
     const slot = slotOfKey(code);
-    if (slot >= 0) { e.preventDefault(); if (!e.repeat) handleInput(slotLane(slot), e.timeStamp); return; }
+    if (slot >= 0) { e.preventDefault(); if (!e.repeat) window.Trk.play.handleInput(slotLane(slot), e.timeStamp); return; }
   }
   if (phase !== "title") {
     if (e.code === "Backquote") { e.preventDefault(); if (!e.repeat) beginRetryHold(); return; }
@@ -246,8 +246,8 @@ addEventListener("keydown", e => {
   if (code === settings.menuKey) { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat) requestMenuReturn(); return; }
   /* 📺 リモコンの「戻る」は機種によって Escape／BrowserBack／GoBack で届く（Backspace は入力欄のため除外） */
   if (code === "KeyP" || code === "Escape" || code === "BrowserBack" || code === "GoBack") {
-    if (phase === "playing") { e.preventDefault(); pauseGame(); }
-    else if (phase === "paused") { e.preventDefault(); resumeGame(); }
+    if (phase === "playing") { e.preventDefault(); window.Trk.play.pauseGame(); }
+    else if (phase === "paused") { e.preventDefault(); window.Trk.play.resumeGame(); }
     else if (phase === "title" && screen === "settings" && code === "Escape") { e.preventDefault(); closeSettings(); }
     return;
   }
@@ -261,7 +261,7 @@ document.querySelectorAll("#touchKeys button").forEach(b => {
   const up = () => b.classList.remove("down");
   b.addEventListener("pointerdown", e => {
     e.preventDefault(); b.classList.add("down"); poke();
-    handleInput(slotLane(+b.dataset.slot), e.timeStamp);
+    window.Trk.play.handleInput(slotLane(+b.dataset.slot), e.timeStamp);
   });
   ["pointerup", "pointercancel", "pointerleave"].forEach(type => b.addEventListener(type, up));
 });
@@ -322,7 +322,7 @@ $("difficultyPicker").addEventListener("click", e => {
   if (videoReady) window.Trk.library.trySongChart().then(ok => { if (!ok) window.Trk.media.buildChart(); });   // パック・フォルダの譜面を優先
 });
 
-$("playBtn").addEventListener("click", startGame);
+$("playBtn").addEventListener("click", window.Trk.play.startGame);
 $("importChartBtn").addEventListener("click", () => $("chartImportFile").click());
 $("regenerateChartBtn").addEventListener("click", () => { setStatus("importStatus", null); window.Trk.media.buildChart(); });
 $("exportSelectBtn").addEventListener("click", () => window.Trk.media.exportChart("importStatus"));
@@ -387,7 +387,7 @@ if (expCheck) {
     settings.showMasterDiff = e.target.checked;
     refreshSeedSecrets();
     optionsChanged();
-    if (settings.showMasterDiff && typeof showToast === "function") showToast(tr("expertUnlocked"));
+    if (settings.showMasterDiff && typeof showToast === "function") window.Trk.play.showToast(tr("expertUnlocked"));
   });
 }
 const expToggle = $("expertDiffToggle");
@@ -396,7 +396,7 @@ if (expToggle) {
     settings.showMasterDiff = !settings.showMasterDiff;
     refreshSeedSecrets();
     optionsChanged();
-    if (settings.showMasterDiff && typeof showToast === "function") showToast(tr("expertUnlocked"));
+    if (settings.showMasterDiff && typeof showToast === "function") window.Trk.play.showToast(tr("expertUnlocked"));
   });
 }
 $("judgePicker").addEventListener("click", e => {
@@ -449,16 +449,16 @@ $("previewKaBtn").addEventListener("click", () => window.Trk.media.playSE(1, tru
 $("volume").addEventListener("input", e => { settings.musicVolume = Number(e.target.value); if (settings.musicVolume > 0) rememberMusicVolume(settings.musicVolume); video.volume = settings.musicVolume; saveUserPrefs(); });
 
 /* ---------- プレイ中・一時停止・リザルト ---------- */
-$("pauseBtn").addEventListener("click", pauseGame);
+$("pauseBtn").addEventListener("click", window.Trk.play.pauseGame);
 $("fullBtn").addEventListener("click", toggleFullscreen);
 $("fullBtnTitle").addEventListener("click", toggleFullscreen);
-$("resumeBtn").addEventListener("click", resumeGame);
-$("retryBtn").addEventListener("click", startGame);
+$("resumeBtn").addEventListener("click", window.Trk.play.resumeGame);
+$("retryBtn").addEventListener("click", window.Trk.play.startGame);
 $("exportPauseBtn").addEventListener("click", () => window.Trk.media.exportChart("pauseStatus"));
-$("returnTitleBtn").addEventListener("click", toTitle);
-$("replayBtn").addEventListener("click", startGame);
+$("returnTitleBtn").addEventListener("click", window.Trk.play.toTitle);
+$("replayBtn").addEventListener("click", window.Trk.play.startGame);
 $("exportEndBtn").addEventListener("click", () => window.Trk.media.exportChart("endStatus"));
-$("endTitleBtn").addEventListener("click", toTitle);
+$("endTitleBtn").addEventListener("click", window.Trk.play.toTitle);
 
 /* ---------- 再生バー（AUTO中・練習中） ---------- */
 const seekBar = $("seekBar");
@@ -466,18 +466,18 @@ seekBar.addEventListener("pointerdown", () => { seekDragging = true; });
 addEventListener("pointerup", () => { seekDragging = false; });
 seekBar.addEventListener("change", () => { seekDragging = false; });
 seekBar.addEventListener("input", () => {
-  if (videoReady && (phase === "playing" || phase === "paused")) seekTo(seekBar.value / 1000 * video.duration);
+  if (videoReady && (phase === "playing" || phase === "paused")) window.Trk.play.seekTo(seekBar.value / 1000 * video.duration);
 });
 
 /* ---------- 動画の合図（イヤホンの再生／停止ボタンにも対応） ----------
    ・カウントダウン中（leadIn）は動画を止めているので、一時停止の合図は無視します
    ・video.paused も確認：プレビューを止めた合図が、ゲーム開始後に遅れて届くことがあるため */
-video.addEventListener("ended", () => { if (phase === "playing") endGame(); });
+video.addEventListener("ended", () => { if (phase === "playing") window.Trk.play.endGame(); });
 video.addEventListener("pause", () => {
-  if (phase === "playing" && !leadIn && video.paused && !video.ended && !video.seeking) pauseGame();
+  if (phase === "playing" && !window.Trk.play.leadIn && video.paused && !video.ended && !video.seeking) window.Trk.play.pauseGame();
 });
 video.addEventListener("play", () => { if (phase === "paused") { showScreen(null); setPhase("playing"); poke(); } });
-document.addEventListener("visibilitychange", () => { if (document.hidden && phase === "playing") pauseGame(); });
+document.addEventListener("visibilitychange", () => { if (document.hidden && phase === "playing") window.Trk.play.pauseGame(); });
 
 /* ---------- ドラッグ＆ドロップ（.stpack は custom.js、.vrm/.vrma は vrm.js が先に受け取ります） ---------- */
 addEventListener("dragover", e => e.preventDefault());
@@ -526,7 +526,7 @@ showScreen("selectScreen");
 updateChartButtons();
 emit("options");
 saveUserPrefs();
-requestAnimationFrame(loop);
+requestAnimationFrame(window.Trk.play.loop);
 
 /* パックを戻してから曲リストを作る（vrm.js も packsReady を待ちます） */
 const packsReady = window.Trk.custom.initPacks().catch(e => console.error(e));

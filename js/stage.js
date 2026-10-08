@@ -215,7 +215,7 @@ function resetStage() { stagePress.fill(-1e9); stageMap.src = null; }
 function stageInput(lane, ts) {
   if (phase !== "playing" || !isStage() || settings.autoPlay) return;
   ensureStageMap();
-  const p = performance.now(), at = (ts > 0 && ts <= p) ? ts : p, now = gameTime(at), w = windows();
+  const p = performance.now(), at = (ts > 0 && ts <= p) ? ts : p, now = window.Trk.play.gameTime(at), w = windows();
   stagePress[lane] = p; pressH = { lane:lane < stageN() / 2 ? 0 : 1, t:p };
   const reach = settings.stageAdjacent ? 1 : 0;
   let best = -1, bestScore = 1e9;
@@ -232,7 +232,7 @@ function stageInput(lane, ts) {
   if (best < 0) { window.Trk.media.playSE(lane < stageN() / 2 ? 0 : 1); return; }   // 空打ちはミスにしない
   const n = chart[best], d = now - n.time;
   window.Trk.media.playSE(n.lane);
-  judgeNote(n, Math.abs(d) <= w.perfect ? "perfect" : "good", d);
+  window.Trk.play.judgeNote(n, Math.abs(d) <= w.perfect ? "perfect" : "good", d);
 }
 
 /* ============ 描画（render.js から呼ばれます） ============ */
@@ -243,7 +243,7 @@ function stageQuad(x0t, x1t, x0b, x1b, yb) {
 function drawStageField(now) {
   ensureStageMap();
   const g = skin().game, N = stageN(), p = performance.now(), travel = travelMs();
-  const accent = window.Trk.data.toHex(skin().ui["--ui-accent"]), pulse = beatPulse(now);
+  const accent = window.Trk.data.toHex(skin().ui["--ui-accent"]), pulse = window.Trk.play.beatPulse(now);
   const topW = stageWidthAt(0), botW = stageWidthAt(1), yb = STAGE.hitY + 60;
   const tl = STAGE.cx - topW / 2, bl = STAGE.cx - botW / 2;
   ctx.save();
@@ -292,7 +292,7 @@ function drawStageField(now) {
   /* 判定ライン */
   ctx.shadowColor = accent; ctx.shadowBlur = 18 * gameplayFxPower();
   ctx.fillStyle = g.ink; ctx.globalAlpha = .75 + .25 * pulse;
-  rr(bl - 8, STAGE.hitY - 5, botW + 16, 10, 5); ctx.fill();
+  window.Trk.play.rr(bl - 8, STAGE.hitY - 5, botW + 16, 10, 5); ctx.fill();
   ctx.shadowBlur = 0; ctx.globalAlpha = 1;
 
   /* ノーツ（奥のものから） */
@@ -300,17 +300,17 @@ function drawStageField(now) {
   while (end < chart.length && chart[end].time - now <= travel) end++;
   for (let i = end - 1; i >= nextIdx; i--) {
     const n = chart[i]; if (n.judged) continue;
-    const u = n.time - now, a = noteAlpha(u); if (a <= 0) continue;
+    const u = n.time - now, a = window.Trk.play.noteAlpha(u); if (a <= 0) continue;
     const q = 1 - u / travel, w = stageWidthAt(q), lw = w / N, span = 1 + stageMap.wide[i];
     const x = stageLaneX(stageMap.lanes[i] + (span - 1) / 2, q), y = stageY(q);
     const sc = w / botW, nw = lw * span * .9 - lw * .04, nh = Math.max(4, 26 * settings.stageThick * sc);
     const c = settings.stageLaneColor ? laneColor(n.lane) : accent;
     ctx.globalAlpha = a;
     if (g.glow || span > 1) { ctx.shadowColor = c; ctx.shadowBlur = (span > 1 ? 22 : 18) * sc; }
-    rr(x - nw / 2, y - nh / 2, nw, nh, nh / 2); ctx.fillStyle = c; ctx.fill(); ctx.shadowBlur = 0;
+    window.Trk.play.rr(x - nw / 2, y - nh / 2, nw, nh, nh / 2); ctx.fillStyle = c; ctx.fill(); ctx.shadowBlur = 0;
     ctx.lineWidth = Math.max(1.5, (span > 1 ? 4 : 3) * sc); ctx.strokeStyle = g.noteBorder; ctx.stroke();
     ctx.globalAlpha = a * .55; ctx.fillStyle = "#fff";
-    rr(x - nw * .32, y - nh * .22, nw * .64, Math.max(1.5, nh * .18), nh * .1); ctx.fill();
+    window.Trk.play.rr(x - nw * .32, y - nh * .22, nw * .64, Math.max(1.5, nh * .18), nh * .1); ctx.fill();
     ctx.globalAlpha = 1;
   }
 

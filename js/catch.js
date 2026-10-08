@@ -133,7 +133,7 @@ function triggerBlast(now, it) {
   catchState.blastLen = catchState.blastUntil - now;
   stats.blasts = (stats.blasts || 0) + 1;
   effects.push({ x:catchX(it.x), y:CATCH.lineY - 20, c:"#ffb000", t:performance.now(), kind:"perfect", seed:Math.random() * window.Trk.data.TAU });
-  showToast(tr("blastToast")); blastSound();
+  window.Trk.play.showToast(tr("blastToast")); blastSound();
 }
 
 /* ============ 動き ============ */
@@ -160,7 +160,7 @@ function updateCatch(now) {
     if (it.done && it.time > now + 50) it.done = false;            // 巻き戻したときは元に戻す
     if (it.done || it.time > now) continue;
     it.done = true;                                                 // 取っても取り逃しても、通り過ぎたら消える
-    if (now - it.time > 150 || leadIn) continue;
+    if (now - it.time > 150 || window.Trk.play.leadIn) continue;
     if (Math.abs(it.x - catchState.x) < CATCH.item) triggerBlast(now, it);
   }
   if (blast) {                                                      // 残像（虹の軌跡）
@@ -181,9 +181,9 @@ function catchJudge(now) {
       const kind = dx <= CATCH.perfect * k ? "perfect" : "good";
       if (bonus) stats.blastBonus = (stats.blastBonus || 0) + (kind === "perfect" ? 1 : .5);
       window.Trk.media.playSE(n.lane);
-      judgeNote(n, kind, dx <= CATCH.perfect * k * .5 ? 0 : null);
+      window.Trk.play.judgeNote(n, kind, dx <= CATCH.perfect * k * .5 ? 0 : null);
       if (k > 1) launchParcel(catchMap.xs[i], n.lane);
-    } else judgeNote(n, "miss", null);
+    } else window.Trk.play.judgeNote(n, "miss", null);
     if (phase !== "playing") return;
   }
 }
@@ -196,7 +196,7 @@ function launchParcel(x, lane) {
 
 /* ============ 描画（render.js から呼ばれます） ============ */
 function drawParcel(x, y, c, s, g) {
-  rr(x - s, y - s, s * 2, s * 2, 8); ctx.fillStyle = c; ctx.fill();
+  window.Trk.play.rr(x - s, y - s, s * 2, s * 2, 8); ctx.fillStyle = c; ctx.fill();
   ctx.lineWidth = 3; ctx.strokeStyle = g.noteBorder; ctx.stroke();
   ctx.fillStyle = "rgba(255,255,255,.85)";
   ctx.fillRect(x - 3, y - s, 6, s * 2); ctx.fillRect(x - s, y - 3, s * 2, 6);
@@ -221,26 +221,26 @@ function drawCatchTruck(x, y, p, blast, now) {
       if (blast) { ctx.fillStyle = "#ffe27a"; ctx.beginPath(); ctx.moveTo(s * 44 - 5, 78); ctx.lineTo(s * 44 + 5, 78); ctx.lineTo(s * 44, 78 + f * .55); ctx.closePath(); ctx.fill(); }
     }
   }
-  ctx.fillStyle = "#1b1b22"; rr(-102, 40, 34, 40, 8); ctx.fill(); rr(68, 40, 34, 40, 8); ctx.fill();
-  rr(-92, -40, 184, 96, 12); ctx.fillStyle = "#f4f4f8"; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = "#1b1b22"; ctx.stroke();
-  rr(-78, -30, 156, 46, 8); ctx.fillStyle = "#2b2f36"; ctx.fill();
+  ctx.fillStyle = "#1b1b22"; window.Trk.play.rr(-102, 40, 34, 40, 8); ctx.fill(); window.Trk.play.rr(68, 40, 34, 40, 8); ctx.fill();
+  window.Trk.play.rr(-92, -40, 184, 96, 12); ctx.fillStyle = "#f4f4f8"; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = "#1b1b22"; ctx.stroke();
+  window.Trk.play.rr(-78, -30, 156, 46, 8); ctx.fillStyle = "#2b2f36"; ctx.fill();
   const pile = Math.min(8, Math.floor(stats.combo / 8));             // 荷台に積み上がる荷物
   for (let i = 0; i < pile; i++) {
     const bx = -57 + (i % 4) * 38, by = -6 - Math.floor(i / 4) * 16;
-    rr(bx - 15, by - 11, 30, 22, 4); ctx.fillStyle = laneColor(i % 2); ctx.fill();
+    window.Trk.play.rr(bx - 15, by - 11, 30, 22, 4); ctx.fillStyle = laneColor(i % 2); ctx.fill();
   }
-  ctx.fillStyle = hitK > 0 ? "#ffe27a" : "#ff3b30"; rr(-88, 24, 20, 12, 4); ctx.fill(); rr(68, 24, 20, 12, 4); ctx.fill();
-  rr(-30, 26, 60, 20, 4); ctx.fillStyle = "#ffd166"; ctx.fill();
+  ctx.fillStyle = hitK > 0 ? "#ffe27a" : "#ff3b30"; window.Trk.play.rr(-88, 24, 20, 12, 4); ctx.fill(); window.Trk.play.rr(68, 24, 20, 12, 4); ctx.fill();
+  window.Trk.play.rr(-30, 26, 60, 20, 4); ctx.fillStyle = "#ffd166"; ctx.fill();
   ctx.fillStyle = "#1b1b22"; ctx.font = `900 14px ${fontFamily()}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("trk!", 0, 37);
   if (hitK > 0) {
     ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = hitK * .6;
-    ctx.fillStyle = window.Trk.data.toHex(skin().ui["--ui-accent"]); rr(-92, -46, 184, 20, 10); ctx.fill();
+    ctx.fillStyle = window.Trk.data.toHex(skin().ui["--ui-accent"]); window.Trk.play.rr(-92, -46, 184, 20, 10); ctx.fill();
     ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
   }
   if (blast && !alwaysBlast()) {                                     // 残り時間のゲージ
     const k = Math.max(0, Math.min(1, (catchState.blastUntil - now) / catchState.blastLen));
-    rr(-60, -66, 120, 8, 4); ctx.fillStyle = "rgba(0,0,0,.5)"; ctx.fill();
-    rr(-60, -66, 120 * k, 8, 4); ctx.fillStyle = "#ffb000"; ctx.fill();
+    window.Trk.play.rr(-60, -66, 120, 8, 4); ctx.fillStyle = "rgba(0,0,0,.5)"; ctx.fill();
+    window.Trk.play.rr(-60, -66, 120 * k, 8, 4); ctx.fillStyle = "#ffb000"; ctx.fill();
   }
   ctx.restore();
 }
@@ -252,7 +252,7 @@ function drawCatchField(now) {
   ctx.save();
 
   /* 道路（白線はコンボとぶっ飛ばしで速く流れる） */
-  ctx.fillStyle = g.lane; rr(Lx - 40, top - 30, Wd + 80, window.Trk.data.H - top + 60, 28); ctx.fill();
+  ctx.fillStyle = g.lane; window.Trk.play.rr(Lx - 40, top - 30, Wd + 80, window.Trk.data.H - top + 60, 28); ctx.fill();
   const edge = blastVisual ? `hsla(${hue},90%,60%,.85)` : window.Trk.data.hexToRgba(accent, .35);
   ctx.fillStyle = edge; ctx.fillRect(Lx - 40, top - 30, blastVisual ? 14 : 8, window.Trk.data.H); ctx.fillRect(Lx + Wd + (blastVisual ? 26 : 32), top - 30, blastVisual ? 14 : 8, window.Trk.data.H);
   const boost = Math.min(1, stats.combo / 100), speed = .45 + .35 * boost + (blastVisual ? 1.2 : 0);
@@ -280,7 +280,7 @@ function drawCatchField(now) {
   while (end < chart.length && chart[end].time - now <= travel) end++;
   for (let i = end - 1; i >= nextIdx; i--) {
     const n = chart[i]; if (n.judged) continue;
-    const u = n.time - now, a = noteAlpha(u); if (a <= 0) continue;
+    const u = n.time - now, a = window.Trk.play.noteAlpha(u); if (a <= 0) continue;
     ctx.globalAlpha = a;
     drawParcel(catchX(catchMap.xs[i]), ly - u / travel * (ly - top), settings.stageLaneColor === false ? accent : laneColor(n.lane), 26, g);
     ctx.globalAlpha = 1;
@@ -292,12 +292,12 @@ function drawCatchField(now) {
     for (const tr0 of catchState.trail) {
       const a = 1 - (p - tr0.t) / 260;
       ctx.globalAlpha = .35 * a; ctx.fillStyle = `hsl(${(hue + (p - tr0.t)) % 360},90%,60%)`;
-      rr(catchX(tr0.x) - 92, ly + 10, 184, 96, 12); ctx.fill();
+      window.Trk.play.rr(catchX(tr0.x) - 92, ly + 10, 184, 96, 12); ctx.fill();
     }
     ctx.globalAlpha = 1;
     const hw = CATCH.half * 2 * Wd, gr = ctx.createLinearGradient(tx - hw, 0, tx + hw, 0);
     for (let i = 0; i <= 6; i++) gr.addColorStop(i / 6, `hsla(${(hue + i * 60) % 360},90%,60%,.75)`);
-    rr(tx - hw, ly - 14, hw * 2, 12, 6); ctx.fillStyle = gr; ctx.fill();
+    window.Trk.play.rr(tx - hw, ly - 14, hw * 2, 12, 6); ctx.fillStyle = gr; ctx.fill();
   }
   drawCatchTruck(tx, ly + 50, p, blastVisual, now);
 
@@ -329,7 +329,7 @@ function drawCatchField(now) {
   const watch = () => {
     requestAnimationFrame(watch);
     if (!isCatch() || !settings.autoPlay || phase !== "playing") { lastPerfect = stats.perfect; return; }
-    if (stats.perfect > lastPerfect && isBlast(gameTime())) {
+    if (stats.perfect > lastPerfect && isBlast(window.Trk.play.gameTime())) {
       const i = Math.max(0, nextIdx - 1);
       if (chart[i]) launchParcel(catchMap.xs[i] ?? .5, chart[i].lane);
     }

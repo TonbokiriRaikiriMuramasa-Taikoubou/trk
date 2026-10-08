@@ -108,7 +108,7 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
    キーは「画面上の位置」に対応します（0＝上か左、1＝下か右）。
    位置→レーンは slotLane() で変換するので、左右反転をオンにしても ↑ は上のレーンのままです。 */
 const truckPosKeys = () => settings.truckKeyMode === "layout"
-  ? (layout().vertical ? TRUCK_PRESETS.lr : TRUCK_PRESETS.ud)
+  ? (window.Trk.play.layout().vertical ? TRUCK_PRESETS.lr : TRUCK_PRESETS.ud)
   : settings.truckKeys;
 const truckPosOfKey = code => truckPosKeys().indexOf(code);
 function truckKeysLabel(pos) {   // プレイ中のキー案内（render.js から使います）
@@ -139,7 +139,7 @@ function truckJudge(now) {
     if (n.judged || n.lane !== truckState.lane) continue;
     const d = now - n.time;
     if (d > w.good) continue;                       // 間に合わなければ sweepMisses がMISSにします
-    judgeNote(n, d <= w.perfect ? "perfect" : "good", d);
+    window.Trk.play.judgeNote(n, d <= w.perfect ? "perfect" : "good", d);
     window.Trk.media.playSE(n.lane);
     const p = performance.now(); pressFlash[laneCol(n.lane)] = p; pressH = { lane:n.lane, t:p };
   }
@@ -234,7 +234,7 @@ function drawLaneTint(L) {
   if (L.vertical) {
     const x0 = L.centers[0] - L.laneW / 2, x1 = L.centers[1] + L.laneW / 2;
     ctx.fillRect(x0, L.topY, x1 - x0, L.hitY - L.topY);
-  } else { rr(L.hitX - 110, L.laneY - 84, L.endX - L.hitX + 170, 168, 42); ctx.fill(); }
+  } else { window.Trk.play.rr(L.hitX - 110, L.laneY - 84, L.endX - L.hitX + 170, 168, 42); ctx.fill(); }
 }
 
 /* ---------- 揺れ（判定位置を軸に傾けるので、叩く場所はほとんど動きません） ---------- */
@@ -271,7 +271,7 @@ function drawTruck(L, now) {
   truckState.vis += (col - truckState.vis) * Math.min(1, dt * 16);
   const v = truckState.vis, lean = (col - v) * .35;
   const hitK = Math.max(0, 1 - (p - Math.max(avatarHit[0], avatarHit[1])) / 180);
-  const bounce = settings.truckBounce && !reduceMotion.matches ? (hitK * 9 + beatPulse(now) * 3) * gameplayFxMultiplier() : 0;
+  const bounce = settings.truckBounce && !reduceMotion.matches ? (hitK * 9 + window.Trk.play.beatPulse(now) * 3) * gameplayFxMultiplier() : 0;
   ctx.save();
   if (L.vertical) {
     ctx.translate(L.centers[0] + (L.centers[1] - L.centers[0]) * v, L.hitY);
@@ -291,13 +291,13 @@ function drawTruck(L, now) {
   }
   ctx.lineJoin = "round";
   ctx.fillStyle = "rgba(0,0,0,.28)"; ctx.beginPath(); ctx.ellipse(-35, 36, 70, 8, 0, 0, window.Trk.data.TAU); ctx.fill();   // 影
-  rr(-100, -30, 82, 52, 7); ctx.fillStyle = "#f4f4f8"; ctx.fill();                                          // 荷台
+  window.Trk.play.rr(-100, -30, 82, 52, 7); ctx.fillStyle = "#f4f4f8"; ctx.fill();                                          // 荷台
   ctx.lineWidth = 3; ctx.strokeStyle = ink; ctx.stroke();
   ctx.fillStyle = cab; ctx.fillRect(-100, 4, 82, 7);
   ctx.fillStyle = ink; ctx.font = `900 18px ${fontFamily()}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
   ctx.fillText("trk!", -59, -12);
-  rr(-16, -18, 44, 40, 9); ctx.fillStyle = cab; ctx.fill(); ctx.stroke();                                  // 運転席（今のレーンの色）
-  rr(6, -12, 17, 14, 4); ctx.fillStyle = "#cfeaff"; ctx.fill();
+  window.Trk.play.rr(-16, -18, 44, 40, 9); ctx.fillStyle = cab; ctx.fill(); ctx.stroke();                                  // 運転席（今のレーンの色）
+  window.Trk.play.rr(6, -12, 17, 14, 4); ctx.fillStyle = "#cfeaff"; ctx.fill();
   ctx.fillStyle = "#ffe27a"; ctx.beginPath(); ctx.arc(27, 12, 4 + hitK * 2, 0, window.Trk.data.TAU); ctx.fill();            // ヘッドライト
   if (hitK > 0 && gameplayFxPower() > 0) {
     ctx.globalCompositeOperation = "lighter";

@@ -1645,12 +1645,25 @@ const TRK_REGISTRARS = {
   "js/library.js": "library",
   "js/media.js": "media",
   "js/data.js": "data",
+  "js/render.js": "play",
 };
 const TRK_NOT_REGISTERED = { "js/core.js": ["_trkStudyRoomOpen"] }; // 互換の読み取り専用アクセサ（宣言ではない）
-const TRK_EXTRAS = { "js/library.js": ["js/title-match.js"] }; // 登録元が別ファイルの関数も領域へ出す（plTitleKeys など）
+const TRK_EXTRAS = {
+  "js/library.js": { files: ["js/title-match.js"], functions: true },  // 関数は領域へ出す（plTitleKeys など。窓へは出していない）
+  "js/render.js": { files: ["js/game.js"], functions: false },        // 同じ領域の別ファイル：窓へ出している名前だけ
+};
 for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   const src = exists(rel) ? read(rel) : "";
-  const extraNames = (TRK_EXTRAS[rel] || []).flatMap(f => [...read(f).matchAll(/^function ([A-Za-z_$][\w$]*)\(/gm)].map(m => m[1]));
+  // 同じ領域の別ファイル（TRK_EXTRAS）：その関数と、窓へ出している名前も登録の対象
+  const extra = TRK_EXTRAS[rel] || { files: [], functions: false };
+  const extraNames = extra.files.flatMap(f => {
+    const t = read(f);
+    return [
+      ...(extra.functions ? [...t.matchAll(/^function ([A-Za-z_$][\w$]*)\(/gm)].map(m => m[1]) : []),
+      ...[...t.matchAll(/^window\.([A-Za-z_$][\w$]*) = \1;/gm)].map(m => m[1]),
+      ...[...t.matchAll(/^Object\.defineProperty\(window, "([^"]+)"/gm)].map(m => m[1]),
+    ];
+  });
   const exported = [
     ...[...src.matchAll(/^window\.([A-Za-z_$][\w$]*) = \1;/gm)].map(m => m[1]),
     ...[...src.matchAll(/^Object\.defineProperty\(window, "([^"]+)"/gm)].map(m => m[1]),

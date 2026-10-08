@@ -141,16 +141,16 @@ let ghostBest = 0;
 on("beforePlay", () => {
   ghostBest = 0;
   if (!settings.ghost || settings.autoPlay) return;
-  const s = songRec(false); if (!s) return;
-  const c = s.charts[chartKeyOf()]; if (!c) return;
+  const s = window.Trk.play.songRec(false); if (!s) return;
+  const c = s.charts[window.Trk.play.chartKeyOf()]; if (!c) return;
   const base = settings.playMode === "manual" ? c : c[settings.playMode];
-  const rk = rateKey(), slot = rk && settings.rate > 1 ? base && base.rates && base.rates[rk] : base;
+  const rk = window.Trk.play.rateKey(), slot = rk && settings.rate > 1 ? base && base.rates && base.rates[rk] : base;
   ghostBest = slot && slot.best ? Number(slot.best.score) || 0 : 0;
 });
 function drawGhost() {
   if (!settings.ghost || !ghostBest || !(phase === "playing" || phase === "paused") || !chart.length) return;
   const judged = stats.perfect + stats.good + stats.miss;
-  const diff = Math.round(currentScore() - ghostBest * judged / chart.length);
+  const diff = Math.round(window.Trk.play.currentScore() - ghostBest * judged / chart.length);
   const vertical = settings.layout === "vertical" && !["stage", "catch"].includes(settings.playMode);
   const g = skin().game, x = vertical ? 760 : 70, y = 226;
   ctx.save();

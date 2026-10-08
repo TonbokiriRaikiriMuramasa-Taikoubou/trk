@@ -18,7 +18,7 @@ const asFile = (rec, fb) => rec.file instanceof File ? rec.file : new File([rec.
 const status = (k, v) => setStatus("vrmStatus", k, v);
 const vrmRect = () => window.Trk.data.VRM_RECT[settings.layout] || window.Trk.data.VRM_RECT.classic;
 const isTalking = () => !!caption && performance.now() - caption.t < CAPTION_MS;
-const setLoaded = (onFlag, credit) => { vrmState.loaded = onFlag; vrmState.credit = credit || ""; };
+const setLoaded = (onFlag, credit) => { window.Trk.play.vrmState.loaded = onFlag; window.Trk.play.vrmState.credit = credit || ""; };
 function selectVrmMascot() { settings.mascot = "vrm"; saveUserPrefs(); window.Trk.custom.updateMascotUI(); }
 
 /* ---------- ライブラリは必要になったときだけ読み込む ---------- */
@@ -219,7 +219,7 @@ function pose(now, dt) {
   const t = now / 1000, Hm = vrm.humanoid, bone = n => Hm && Hm.getNormalizedBoneNode(n);
   const k0 = decay(avatarHit[0], 200, now), k1 = decay(avatarHit[1], 200, now);
   const sad = decay(lastMissT, 800, now);
-  const beat = phase === "playing" ? beatPulse(gameTime()) : 0;
+  const beat = phase === "playing" ? window.Trk.play.beatPulse(window.Trk.play.gameTime()) : 0;
   const talking = isTalking(), cel = talking && caption.speaker === 1 ? 1 : 0;
   if (mixer) {
     // モーション再生中：曲のBPMに合わせて速度を変え、叩き・うなずき・ミスの動きを上乗せ

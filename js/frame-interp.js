@@ -686,11 +686,11 @@ function tune() {
   lastTune = now;
   if (outFps > 0 && outFps < 45 && quality > 0) {
     quality--; degraded = true; havePair = false; W = H = 0; ensureSizes();
-    if (typeof showToast === "function") showToast(tr("mediaInterpDegraded"));
+    if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaInterpDegraded"));
     notify();
   } else if (outFps > 0 && outFps < 45 && quality === 0 && mode() === "flow") {
     settings.frameInterp = "blend"; saveUserPrefs(); degraded = true; notify();
-    if (typeof showToast === "function") showToast(tr("mediaInterpDegraded"));
+    if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaInterpDegraded"));
   } else if (outFps >= 57 && quality < 2 && !degraded) {
     quality++; W = H = 0; ensureSizes(); notify();
   }

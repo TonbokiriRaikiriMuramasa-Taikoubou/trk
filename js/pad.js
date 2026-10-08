@@ -85,7 +85,7 @@ function padAssign(id, bind) {
 function padNote(id, vars) {
   padMsg = tr(id, vars); padMsgAt = performance.now();
   updatePadUI();
-  try { showToast(padMsg); } catch (_) {}
+  try { window.Trk.play.showToast(padMsg); } catch (_) {}
 }
 const padClearMsg = () => { if (!padMsg) return; padMsg = ""; updatePadUI(); };
 
@@ -151,15 +151,15 @@ function padTap(slot) {
       catchState.held[lane] = true; setTimeout(() => { catchState.held[lane] = false; }, 140); return;   // 🚛 は一瞬だけ倒す
     }
   } catch (_) {}
-  if (typeof handleInput === "function") handleInput(lane, p);
+  if (typeof handleInput === "function") window.Trk.play.handleInput(lane, p);
 }
 /* 押した瞬間の1回だけ（プレイ中＝ノーツ・一時停止／それ以外＝メニュー） */
 function padPressed(id) {
   if (phase === "playing") {
-    if (settings.autoPlay) { if (id === "pause") pauseGame(); return; }
+    if (settings.autoPlay) { if (id === "pause") window.Trk.play.pauseGame(); return; }
     if (id === "left") padTap(0);
     else if (id === "right") padTap(1);
-    else if (id === "pause") pauseGame();
+    else if (id === "pause") window.Trk.play.pauseGame();
     return;                                             // プレイ中は決定・戻るをノーツと取り合わない
   }
   if (id === "confirm" || id === "pause") padActivate();

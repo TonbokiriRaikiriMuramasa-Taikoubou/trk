@@ -8,14 +8,15 @@
      "1" … 旧方式。ca84a19 までと同じ出力を保つ（曲全体の最大音量で正規化し、曲全体で上位を選ぶ）。
            譜面の指紋（chartKeyOf＝ノーツ列のハッシュ）で記録が結び付く。旧方式で作った記録を開くときに使う。
            tests/fixtures/chart-legacy-golden.json で「旧譜面の再現」を検査する。
-     "2" … 新方式（既定）。前後4秒の局所正規化、8小節ごとの区間配分（長さ×密度を先に決め、盛り上がりは 0.7〜1.3 倍で残す。平均音量が曲の最大の6%未満の静かな区間は、上級の25%を基準に難易度のdensityに比例した候補数へ絞る）。
+     "2" … 新方式（既定）。前後4秒の局所正規化、8小節ごとの区間配分（長さ×密度を先に決め、盛り上がりは 0.7〜1.3 倍で残す。平均音量が曲の最大の6%未満の静かな区間は、難易度順の上限表（初級15%・中級20%・上級25%・達人34%・RUSH40%）まで候補数を絞る）。
    ⚠ 旧方式の処理は変えない。直すときは "2" 側（cgBuildSectioned）だけを触る。
    ⚠ 関数名・定数名は classic script の共有スコープに載るので、他ファイルと重ならないよう cg 接頭辞を付ける。 */
 
 const CG_SECTION_BARS = 8;          // 区間の長さ（小節）
 const CG_QUIET_REL = 0.06;          // 区間の平均音量÷曲の最大音量。これ未満を「静かな区間」とみなす（絶対音量ゲート）
-const CG_QUIET_CAP_HARD = 0.25;     // 上級（DIFFS.hard）の基準上限。難易度の density に比例させる
-const CG_QUIET_BASE_DENSITY = 0.60; // DIFFS.hard.density。変更時は基準上限との比も合わせて見直す
+/* 静かな区間の候補上限。難易度順に単調な表にした（trk91。それまでは上級25%を基準に density に比例させ、
+   初級22.9% > 中級20% と逆転していた）。DIFFS の density とは切り離したので、両者を揃える必要はない */
+const CG_QUIET_CAPS = { easy: .15, normal: .20, hard: .25, master: .34, rush: .40 };
 const CG_SILENCE_REL = 0.01;        // 曲の最大音量に対してこれ未満は「無音」（新方式の開始・終了の判定）
 const CG_LOCAL_HALF_S = 4;          // 局所正規化の窓（前後の秒数）
 
@@ -237,14 +238,14 @@ function cgBuildSectioned(p) {
   const total = d.target ? Math.min(cands.length, d.target) : Math.round(cands.length * d.density);
   const lists = secKeys.map(k => bySec.get(k));
   /* 絶対音量ゲート：区間の平均音量が曲の最大音量の CG_QUIET_REL 未満なら「静かな区間」。
-     局所正規化では静かな区間もその区間の普通の音量になるため、候補数の上限を難易度の密度に比例させる。
-     上級（hard）の25%を基準に、達人（master）は約34%など。削った分は他の区間へ回る
+     局所正規化では静かな区間もその区間の普通の音量になるため、候補数の上限を難易度順の表
+     （CG_QUIET_CAPS。初級15%・中級20%・上級25%・達人34%・RUSH40%）まで絞る。削った分は他の区間へ回る
      （合計は変えない。全区間の上限に届けば合計は減る）。 */
   const quietCap = list => {
     if (!analysis || !(analysis.maxRms > 0)) return list.length;
     let m = 0; for (const c of list) m += c.rmsAbs; m /= list.length;
     if (m / analysis.maxRms >= CG_QUIET_REL) return list.length;
-    const capRate = CG_QUIET_CAP_HARD * d.density / CG_QUIET_BASE_DENSITY;
+    const capRate = CG_QUIET_CAPS[diff] != null ? CG_QUIET_CAPS[diff] : CG_QUIET_CAPS.hard;
     return Math.min(list.length, Math.floor(list.length * capRate));
   };
   const quotas = cgAllocate(total, lists.map(l => l.length * energyFactor(l)), lists.map(quietCap));

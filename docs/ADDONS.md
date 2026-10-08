@@ -51,9 +51,11 @@ trk! 本体には入れられない機能を、あとから足せるしくみで
 
 `window.Trk.core.*` がコア状態の正規名ですが、これは本体内部の整理先で、安定したアドオン API ではありません。旧来の 33 個の `window` 直下の別名は、公開版を2回重ねて削除する予定（trk76 で予告、trk78 以降）でしたが、trk89 時点で期限を過ぎていました。consumer を調べ、trk90 で安全に外せる 28 件を削除しました。アドオンは削除済みの名前を使わず、§3〜§5 の `api` を使ってください。必要な公開機能がなければ Issue で相談してください。
 
-- **trk90で廃止（28件）：** `activeMods` `analysis` `applySkin` `avatarHit` `bgImage` `bindingSlot` `caption` `chart` `chartDiff` `chartMode` `clock` `currentLevel` `currentSong` `effects` `errors` `fingerprint` `lastMissT` `levelOverride` `loadToken` `mediaName` `mediaURL` `nextIdx` `practice` `pressFlash` `pressH` `safeModeOn` `seekDragging` `videoFilter`
-- **現存（5件）：** `chartMeta` `phase` `prefs` `stats` `videoReady`。これらは frozen `js/fx.js` が裸のグローバルとして読むため、fx.js を移行するまで保留します。削除時期は fx.js の移行リリースに合わせます（現時点で別の固定リリースは決めません）。
-- **対象外（当面残す）：** `_trkStudyRoomOpen`（読み取り専用）。`js/fx.js` が読む既存の互換フラグで、33件の一覧には含めません。
+**一覧の正は [`tools/compat-names.json`](../tools/compat-names.json) です。** この節の文言を変えても機械検査（`tools/check-repo.mjs`）は落ちません。一覧を変えるときはあちらの JSON を直してください。
+
+- **trk90で廃止（28件）** と **現存（5件）** の内訳は、同ファイルの `removed`／`retained` を参照してください。
+- 現存の5件（`chartMeta` `phase` `prefs` `stats` `videoReady`）は frozen `js/fx.js` が裸のグローバルとして読むため、fx.js を移行するまで保留します。削除時期は fx.js の移行リリースに合わせます（現時点で別の固定リリースは決めません）。
+- **対象外（当面残す）：** `_trkStudyRoomOpen`（読み取り専用）。`js/fx.js` が読む既存の互換フラグで、33件の一覧には含めません（同ファイルの `exempt`）。
 
 > 作者向けの近道：`api` と `TrkAddons` だけで書けない機能が必要になったら、本体の内部に頼る前に、Issue で「どの窓口がほしいか」を書いてください。
 

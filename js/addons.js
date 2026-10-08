@@ -50,6 +50,7 @@
    ========================================================================== */
 "use strict";
 (() => {
+  const core = window.Trk.core;
 
 const ADDONS_KEY = "trk_addons_v1";       // 新しい保存キー（既存のキーは触りません）
 const ADDON_FORMAT = "trk-addon";         // 配布ファイルの形式名
@@ -199,7 +200,7 @@ let bootPromise = Promise.resolve();
 
 /* ============ 画面まわり ============ */
 function say(text, isError) {
-  const box = window.Trk.core.$("addonStatus");
+  const box = core.$("addonStatus");
   if (box) { box.textContent = String(text || ""); box.classList.toggle("ng", !!isError); }
 }
 function downloadText(text, filename) {
@@ -220,18 +221,18 @@ const safeNow = () => {
     return sp.has("safe") || sp.get("safe") === "1" || (u.hash || "").toLowerCase().includes("safe") || sp.has("factory");
   } catch (_) { return false; }
 };
-const appPhase = () => (typeof phase === "string" ? window.Trk.core.phase : "");
+const appPhase = () => (typeof phase === "string" ? core.phase : "");
 
 /* ============ 置き場所（アドオンがUIを足せる場所） ============ */
 function mountSlots() {
   const mk = (name, host, put) => {
     if (!host) return;
-    const box = window.Trk.core.el("div", "addonSlot"); box.dataset.addonSlot = name;
+    const box = core.el("div", "addonSlot"); box.dataset.addonSlot = name;
     put(host, box);
     slots.set(name, box);
   };
-  mk("settings", window.Trk.core.$("addonSlots"), (h, d) => h.append(d));
-  mk("libPanel", window.Trk.core.$("libPanel"), (h, d) => { const st = window.Trk.core.$("libStatus"); if (st) st.before(d); else h.append(d); });
+  mk("settings", core.$("addonSlots"), (h, d) => h.append(d));
+  mk("libPanel", core.$("libPanel"), (h, d) => { const st = core.$("libStatus"); if (st) st.before(d); else h.append(d); });
   /* 📺🎛 の「くわしい」は、並べ替えで列の下のほうへ移ることがある（Task E）。どちらでも見つける */
   mk("tvMore", document.querySelector("#tvDock .tvMore") || document.querySelector(".songCol > details.tvMore"), (h, d) => h.append(d));
   mk("rackMore", document.querySelector("#fxDock .dockMore") || document.querySelector(".songCol > details.dockMore"), (h, d) => h.append(d));
@@ -280,17 +281,17 @@ function makeApi(id) {
     id,
     tr: (key, vars) => tr(key, vars),
     log: (...a) => console.log("[addon:" + id + "]", ...a),
-    el: window.Trk.core.el, $: elemId => document.getElementById(elemId),
+    el: core.el, $: elemId => document.getElementById(elemId),
     addStyle(css) {
       const s = document.createElement("style");
       s.dataset.addon = id; s.textContent = String(css || "");
       document.head.append(s); return s;
     },
     on: (ev, fn) => on(ev, fn),
-    emit: (ev, data) => window.Trk.core.emit(ev, data),
+    emit: (ev, data) => core.emit(ev, data),
     slot: name => slots.get(name) || null,
     say: text => say("🧩 " + id + "：" + text),
-    settings: window.Trk.core.settings, savePrefs: () => window.Trk.core.saveUserPrefs(),
+    settings: core.settings, savePrefs: () => core.saveUserPrefs(),
     video: () => document.getElementById("video"),
     phase: appPhase,
     addSongs: list => setSongs(id, list),
@@ -549,33 +550,33 @@ function removeAddon(id) {
 
 /* ============ パネルの絵 ============ */
 function row(entry) {
-  const box = window.Trk.core.el("div", "addonRow" + (entry.enabled ? "" : " off"));
-  const head = window.Trk.core.el("div", "addonHead");
+  const box = core.el("div", "addonRow" + (entry.enabled ? "" : " off"));
+  const head = core.el("div", "addonHead");
   const on = entry.enabled !== false;
   const bits = [
-    window.Trk.core.el("span", "addonDot" + (on ? " on" : "") + (entry.error ? " ng" : "")),
-    window.Trk.core.el("b", "addonName", entry.name || entry.id),
-    window.Trk.core.el("span", "addonVer", "v" + (entry.version || "0"))
+    core.el("span", "addonDot" + (on ? " on" : "") + (entry.error ? " ng" : "")),
+    core.el("b", "addonName", entry.name || entry.id),
+    core.el("span", "addonVer", "v" + (entry.version || "0"))
   ];
-  if (entry.author) bits.push(window.Trk.core.el("span", "addonAuthor", "by " + entry.author));
-  if (entry.source === "file") bits.push(window.Trk.core.el("span", "addonBadge", tr("addonFromFile")));
+  if (entry.author) bits.push(core.el("span", "addonAuthor", "by " + entry.author));
+  if (entry.source === "file") bits.push(core.el("span", "addonBadge", tr("addonFromFile")));
   head.append(...bits);
   box.append(head);
-  if (entry.description) box.append(window.Trk.core.el("div", "hint", entry.description));
+  if (entry.description) box.append(core.el("div", "hint", entry.description));
   if (entry.id && songsByAddon.has(entry.id) && songsByAddon.get(entry.id).length) {
-    box.append(window.Trk.core.el("div", "hint", tr("addonSongs", { n:songsByAddon.get(entry.id).length })));
+    box.append(core.el("div", "hint", tr("addonSongs", { n:songsByAddon.get(entry.id).length })));
   }
-  if (entry.error) box.append(window.Trk.core.el("div", "hint addonErr", tr("addonBroken", { why:entry.error })));
+  if (entry.error) box.append(core.el("div", "hint addonErr", tr("addonBroken", { why:entry.error })));
   /* ✅ 同意の記録（この記録を始める前に導入したアドオンは「記録なし」、中身が変わっていれば「⚠」） */
   if (entry.source !== "file" && entry.id) {
     const state = consentState(entry);
-    const line = window.Trk.core.el("div", "hint" + (state === "ok" ? " addonConsentOk" : " addonConsentWarn"));
+    const line = core.el("div", "hint" + (state === "ok" ? " addonConsentOk" : " addonConsentWarn"));
     line.textContent = state === "ok" ? tr("addonConsentBadge", { date:stamp(entry.consentAt) })
       : state === "stale" ? tr("addonConsentStale") : tr("addonConsentNone");
     box.append(line);
     if (state === "none" && typeof entry.code === "string" && !exceedsUtf8Limit(entry.code, MAX_CODE)) {
-      const acts0 = window.Trk.core.el("div", "miniActions");
-      const agree = window.Trk.core.el("button", "", tr("addonConsentBtn")); agree.type = "button";
+      const acts0 = core.el("div", "miniActions");
+      const agree = core.el("button", "", tr("addonConsentBtn")); agree.type = "button";
       agree.addEventListener("click", async () => {
         const e2 = store[entry.id];
         if (!e2 || typeof e2.code !== "string" || exceedsUtf8Limit(e2.code, MAX_CODE)) return;
@@ -592,10 +593,10 @@ function row(entry) {
     }
   }
   if (entry.source !== "file") {
-    const acts = window.Trk.core.el("div", "miniActions");
-    const tg = window.Trk.core.el("button", "", tr(on ? "addonOff" : "addonOn")); tg.type = "button";
+    const acts = core.el("div", "miniActions");
+    const tg = core.el("button", "", tr(on ? "addonOff" : "addonOn")); tg.type = "button";
     tg.addEventListener("click", () => setEnabled(entry.id, !on));
-    const del = window.Trk.core.el("button", "", tr("addonDelete")); del.type = "button";
+    const del = core.el("button", "", tr("addonDelete")); del.type = "button";
     del.addEventListener("click", () => { if (confirm("🧩 " + entry.name + " / " + tr("addonDelete") + "?")) removeAddon(entry.id); });
     acts.append(tg, del);
     box.append(acts);
@@ -603,15 +604,15 @@ function row(entry) {
   return box;
 }
 function renderList() {
-  const box = window.Trk.core.$("addonList"); if (!box) return;
+  const box = core.$("addonList"); if (!box) return;
   box.textContent = "";
   const entries = Object.values(store).sort((a, b) => (a.addedAt || 0) - (b.addedAt || 0));
-  if (!entries.length && !fileAddons.length) { box.append(window.Trk.core.el("div", "hint", tr("addonNone"))); return; }
+  if (!entries.length && !fileAddons.length) { box.append(core.el("div", "hint", tr("addonNone"))); return; }
   for (const e of entries) box.append(row(e));
   for (const d of fileAddons) box.append(row({ ...d, source:"file", enabled:true }));
 }
 function updateReload() {
-  const b = window.Trk.core.$("addonReloadBtn");
+  const b = core.$("addonReloadBtn");
   if (b) b.hidden = !pendingReload;
 }
 
@@ -651,7 +652,7 @@ async function boot() {
 }
 addEventListener("DOMContentLoaded", () => {
   mountSlots();
-  const fileInput = window.Trk.core.$("addonInstallFile");
+  const fileInput = core.$("addonInstallFile");
   if (fileInput) fileInput.addEventListener("change", async e => {
     const f = e.target.files && e.target.files[0];
     e.target.value = "";
@@ -666,7 +667,7 @@ addEventListener("DOMContentLoaded", () => {
     const res = installWithConsent(text, f.name);
     if (!res.ok) say(tr("addonBadFile", { why:res.why }), true);
   });
-  const sample = window.Trk.core.$("addonSampleBtn");
+  const sample = core.$("addonSampleBtn");
   if (sample) sample.addEventListener("click", async () => {
     let code = "";
     try { const r = await fetch(SAMPLE_URL, { cache:"no-store" }); if (r.ok) code = await r.text(); } catch (_) {}
@@ -674,7 +675,7 @@ addEventListener("DOMContentLoaded", () => {
     downloadText(code, "trk-addon-example.js");
     say(tr("addonSampleSaved"));
   });
-  const reload = window.Trk.core.$("addonReloadBtn");
+  const reload = core.$("addonReloadBtn");
   if (reload) reload.addEventListener("click", () => location.reload());
   on("language", () => { renderList(); updateReload(); });
   bootPromise = boot()
@@ -700,7 +701,7 @@ window.TrkAddons = Object.freeze({
   setEnabled, remove: removeAddon,
   slots: () => [...slots.keys()],
   songs: id => (songsByAddon.get(id) || []).slice(),
-  panel() { const p = window.Trk.core.$("addonPanel"); if (p) { p.open = true; try { p.scrollIntoView({ behavior:"smooth", block:"start" }); } catch (_) {} } },
+  panel() { const p = core.$("addonPanel"); if (p) { p.open = true; try { p.scrollIntoView({ behavior:"smooth", block:"start" }); } catch (_) {} } },
   docs: "docs/ADDONS.md"
 });
 })();

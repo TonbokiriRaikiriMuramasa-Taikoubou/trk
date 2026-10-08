@@ -6,6 +6,7 @@
    ========================================================================== */
 "use strict";
 (() => {
+  const core = window.Trk.core;
 
 /* ============ 文章 ============ */
 Object.assign(TEXT.ja, {
@@ -82,7 +83,8 @@ Object.assign(TEXT.en, {
   instPatchDeleted:"Deleted the custom sound.", instDeleteConfirm:"Delete this custom sound?",
   instSavedSourcesOnly:"Sample files are not included in presets. Only oscillator settings were saved.",
   instStop:"■ Stop notes", instPresetSine:"Sine Keys", instPresetSquare:"Square Lead", instPresetSaw:"Saw Lead",
-  instPresetPad:"Warm Pad", instPresetPluck:"Pluck", instPresetBass:"Sub Bass", instPresetOrgan:"Organ", instPresetBell:"Bell", instPresetSuper:"Super Saw", instPresetZunpet:"ZUNPET-style Brass"
+  instPresetPad:"Warm Pad", instPresetPluck:"Pluck", instPresetBass:"Sub Bass", instPresetOrgan:"Organ", instPresetBell:"Bell", instPresetSuper:"Super Saw", instPresetZunpet:"ZUNPET-style Brass",
+  instPresetGuitar:"Electric Guitar", instPresetESax:"Electric Sax", instPresetEPiano:"FM E-Piano", instPresetStrings:"Synth Strings", instPresetChip:"8-bit Chip", instPresetVocal:"Vocoder Voice"
 });
 Object.assign(TEXT.zh, {
   instHoldHint:"长按打开合成器", instFastHoldHint:"长按0.2秒打开合成器", instHoldDisabledHint:"合成器模式已在设置中禁用",
@@ -256,11 +258,11 @@ addEventListener("DOMContentLoaded", () => {
   powerBadge.setAttribute("aria-hidden", "true");
   power.append(powerBadge);
   const powerHelp = () => {
-    const hintKey = window.Trk.core.settings.synthModeDisabled ? "instHoldDisabledHint" : window.Trk.core.settings.synthModeFastStart ? "instFastHoldHint" : "instHoldHint";
+    const hintKey = core.settings.synthModeDisabled ? "instHoldDisabledHint" : core.settings.synthModeFastStart ? "instFastHoldHint" : "instHoldHint";
     const value = `${tr("dockPower")} · ${tr(hintKey)}`;
     if (power.title !== value) power.title = value;
     if (power.getAttribute("aria-label") !== value) power.setAttribute("aria-label", value);
-    powerBadge.hidden = !!window.Trk.core.settings.synthModeDisabled;
+    powerBadge.hidden = !!core.settings.synthModeDisabled;
   };
   const helpObserver = new MutationObserver(powerHelp);
   helpObserver.observe(power, { attributes:true, attributeFilter:["title", "aria-label"] });
@@ -367,10 +369,10 @@ addEventListener("DOMContentLoaded", () => {
   const synthKeyboardLockInput = synthKeyboardLockRow.querySelector("input");
   const synthWideKeyboardInput = synthWideKeyboardRow.querySelector("input");
   window._trkSyncSynthModeSettings = () => {
-    synthDisableInput.checked = !!window.Trk.core.settings.synthModeDisabled;
-    synthFastInput.checked = !!window.Trk.core.settings.synthModeFastStart;
-    synthKeyboardLockInput.checked = window.Trk.core.settings.synthModeKeyboardLock !== false;
-    synthWideKeyboardInput.checked = !!window.Trk.core.settings.synthModeWideKeyboard;
+    synthDisableInput.checked = !!core.settings.synthModeDisabled;
+    synthFastInput.checked = !!core.settings.synthModeFastStart;
+    synthKeyboardLockInput.checked = core.settings.synthModeKeyboardLock !== false;
+    synthWideKeyboardInput.checked = !!core.settings.synthModeWideKeyboard;
     renderPiano();
     updatePowerHint();
   };
@@ -456,7 +458,7 @@ addEventListener("DOMContentLoaded", () => {
 
   /* ============ 鍵盤（QWERTYのZ列＋Q列。黒鍵を数字・中段キーに対応） ============ */
   function pianoScale() {
-    if (!window.Trk.core.settings.synthModeWideKeyboard) return 1;
+    if (!core.settings.synthModeWideKeyboard) return 1;
     const viewport = Number(window.innerWidth) || Number(document.documentElement && document.documentElement.clientWidth) || 0;
     const available = pianoScroll.clientWidth || Math.max(0, viewport - 40);
     /* 小画面では従来の630pxを守り、余裕のある画面だけ最大806pxまで広げる。 */
@@ -783,14 +785,14 @@ addEventListener("DOMContentLoaded", () => {
     return s || tr("instTrackNone");
   }
   function updateTrackControls() {
-    const loaded = typeof videoReady !== "undefined" && window.Trk.core.videoReady;
-    songPlay.textContent = tr(window.Trk.core.video.paused ? "instTrackPlay" : "instTrackPause");
-    songMute.textContent = tr(window.Trk.core.video.muted ? "instTrackUnmute" : "instTrackMute");
+    const loaded = typeof videoReady !== "undefined" && core.videoReady;
+    songPlay.textContent = tr(core.video.paused ? "instTrackPlay" : "instTrackPause");
+    songMute.textContent = tr(core.video.muted ? "instTrackUnmute" : "instTrackMute");
     songName.textContent = trackTitle();
     songPlay.disabled = !loaded;
     displayTrack.textContent = (loaded && trackTitle() !== tr("instTrackNone")) ? trackTitle() : "trk! synthesizer";
-    songVolume.value = String(window.Trk.core.settings.musicVolume);
-    songMute.setAttribute("aria-pressed", String(window.Trk.core.video.muted));
+    songVolume.value = String(core.settings.musicVolume);
+    songMute.setAttribute("aria-pressed", String(core.video.muted));
   }
   function updatePowerHint() { powerHelp(); }
   function fitCanvas() {
@@ -811,10 +813,10 @@ addEventListener("DOMContentLoaded", () => {
         g.setTransform(dpr, 0, 0, dpr, 0, 0);
         g.fillStyle = "#071018"; g.fillRect(0, 0, w, h);
         try {
-          if (window.Trk.core.video.videoWidth > 0 && !window.Trk.core.video.paused) {
-            const scale = Math.max(w / window.Trk.core.video.videoWidth, h / window.Trk.core.video.videoHeight);
-            const dw = window.Trk.core.video.videoWidth * scale, dh = window.Trk.core.video.videoHeight * scale;
-            g.globalAlpha = .26; g.drawImage(window.Trk.core.video, (w - dw) / 2, (h - dh) / 2, dw, dh); g.globalAlpha = 1;
+          if (core.video.videoWidth > 0 && !core.video.paused) {
+            const scale = Math.max(w / core.video.videoWidth, h / core.video.videoHeight);
+            const dw = core.video.videoWidth * scale, dh = core.video.videoHeight * scale;
+            g.globalAlpha = .26; g.drawImage(core.video, (w - dw) / 2, (h - dh) / 2, dw, dh); g.globalAlpha = 1;
           }
         } catch (_) { g.globalAlpha = 1; }
         g.fillStyle = "rgba(2,8,14,.48)"; g.fillRect(0, 0, w, h);
@@ -852,7 +854,7 @@ addEventListener("DOMContentLoaded", () => {
     if (assignMode) setStatus("instMapOn"); else setStatus("instMapOff");
   }
   function openSynth() {
-    if (window.Trk.core.settings.synthModeDisabled || (window.TrkSafeMode && window.TrkSafeMode())) return;
+    if (core.settings.synthModeDisabled || (window.TrkSafeMode && window.TrkSafeMode())) return;
     window.Trk.overlay.set("synth", true);
     overlay.hidden = false; document.body.classList.add("instOpen");
     refreshText(); updateTrackControls(); startScope(); closeBtn.focus();
@@ -903,21 +905,21 @@ addEventListener("DOMContentLoaded", () => {
     e.preventDefault(); sampleInput.click();
   });
   songPlay.addEventListener("click", async () => {
-    if (!(typeof videoReady !== "undefined" && window.Trk.core.videoReady)) return;
-    if (!window.Trk.core.video.paused) { window.Trk.core.video.pause(); return; }
+    if (!(typeof videoReady !== "undefined" && core.videoReady)) return;
+    if (!core.video.paused) { core.video.pause(); return; }
     try {
-      if (window.Trk.core.video.muted) window.Trk.core.video.muted = false;
-      if (window.Trk.core.video.ended) { try { window.Trk.core.video.currentTime = typeof previewStartFor === "function" ? window.Trk.library.previewStartFor() : 0; } catch (_) {} }
-      await window.Trk.core.video.play();
+      if (core.video.muted) core.video.muted = false;
+      if (core.video.ended) { try { core.video.currentTime = typeof previewStartFor === "function" ? window.Trk.library.previewStartFor() : 0; } catch (_) {} }
+      await core.video.play();
     } catch (_) { setStatus("instTrackBlocked"); }
     updateTrackControls();
   });
-  songMute.addEventListener("click", () => { window.Trk.core.video.muted = !window.Trk.core.video.muted; updateTrackControls(); });
+  songMute.addEventListener("click", () => { core.video.muted = !core.video.muted; updateTrackControls(); });
   songVolume.addEventListener("input", () => {
-    const v = Number(songVolume.value); window.Trk.core.settings.musicVolume = v;
+    const v = Number(songVolume.value); core.settings.musicVolume = v;
     const mainVolume = document.getElementById("volume");
     if (mainVolume) { mainVolume.value = String(v); mainVolume.dispatchEvent(new Event("input", { bubbles:true })); }
-    else { if (v > 0) window.Trk.core.rememberMusicVolume(v); window.Trk.core.video.volume = v; window.Trk.core.saveUserPrefs(); }
+    else { if (v > 0) core.rememberMusicVolume(v); core.video.volume = v; core.saveUserPrefs(); }
   });
   let lastPianoPointer = 0;
   piano.addEventListener("pointerdown", e => {
@@ -970,7 +972,7 @@ addEventListener("DOMContentLoaded", () => {
       return;
     }
     const mappedIndex = keyMap.indexOf(e.code);
-    if (assignMode && isTyping(e.target) && !window.Trk.core.settings.synthModeKeyboardLock) return; // OFFなら文字入力を優先
+    if (assignMode && isTyping(e.target) && !core.settings.synthModeKeyboardLock) return; // OFFなら文字入力を優先
     if (assignMode) {
       const activeAction = e.target && e.target.closest && e.target.closest("button,[role='button']");
       if (pendingMidi == null && activeAction && ["Enter", "Space"].includes(e.code)) return; // keep focused controls operable
@@ -981,7 +983,7 @@ addEventListener("DOMContentLoaded", () => {
     /* ON（初期値）では、フォーカスがスライダーやステータス欄にあっても
        割り当て済みのキーを先に奪い、鍵盤へ固定する。repeatも毎回止めるので
        range inputがキーリピートで動くこともない。 */
-    if (window.Trk.core.settings.synthModeKeyboardLock && mappedIndex >= 0) {
+    if (core.settings.synthModeKeyboardLock && mappedIndex >= 0) {
       e.preventDefault(); e.stopImmediatePropagation();
       if (!e.repeat) noteOn(`key-${e.code}`, FIRST_MIDI + mappedIndex);
       return;
@@ -999,7 +1001,7 @@ addEventListener("DOMContentLoaded", () => {
     const token = `key-${e.code}`;
     /* keydownと同じ優先順位でkeyupも止める。これでフォーカス中のrange/selectへ
        リリース時のキーイベントが流れず、押鍵の開始と終了が必ず対になる。 */
-    if (window.Trk.core.settings.synthModeKeyboardLock && keyMap.indexOf(e.code) >= 0) {
+    if (core.settings.synthModeKeyboardLock && keyMap.indexOf(e.code) >= 0) {
       e.preventDefault(); e.stopImmediatePropagation();
       if (voices.has(token)) noteOff(token);
       return;
@@ -1014,10 +1016,10 @@ addEventListener("DOMContentLoaded", () => {
   power.addEventListener("pointerdown", e => {
     if (e.button !== undefined && e.button !== 0) return;
     clearTimeout(pressTimer); longPressed = false;
-    if (window.Trk.core.settings.synthModeDisabled) return;
-    const holdMs = window.Trk.core.settings.synthModeFastStart ? 200 : 650;
+    if (core.settings.synthModeDisabled) return;
+    const holdMs = core.settings.synthModeFastStart ? 200 : 650;
     pressTimer = setTimeout(() => {
-      if (window.Trk.core.settings.synthModeDisabled || (window.TrkSafeMode && window.TrkSafeMode())) return;
+      if (core.settings.synthModeDisabled || (window.TrkSafeMode && window.TrkSafeMode())) return;
       longPressed = true; openSynth();
     }, holdMs);
   }, true);
@@ -1031,7 +1033,7 @@ addEventListener("DOMContentLoaded", () => {
   power.addEventListener("contextmenu", e => e.preventDefault());
 
   /* Keep track state and labels current while the modal is open. */
-  for (const type of ["play", "pause", "volumechange", "loadedmetadata", "loadeddata", "canplay", "ended"]) window.Trk.core.video.addEventListener(type, updateTrackControls);
+  for (const type of ["play", "pause", "volumechange", "loadedmetadata", "loadeddata", "canplay", "ended"]) core.video.addEventListener(type, updateTrackControls);
   on("chart", updateTrackControls);
   on("language", refreshText);
   on("phase", p => { if (p !== "title") closeSynth(false); });

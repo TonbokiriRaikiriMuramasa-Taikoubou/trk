@@ -10,6 +10,7 @@
    ========================================================================== */
 "use strict";
 (() => {
+  const core = window.Trk.core;
 
 /* ============ 文章 ============ */
 Object.assign(TEXT.ja, {
@@ -33,7 +34,7 @@ Object.assign(TEXT.en, {
   vfNoHash:"No fingerprint: reinstall this pack to check whether it's verified."
 });
 Object.assign(TEXT.zh, {
-  vfBadge:"✔ 认证", vfBadgeTitle:"已确认作曲者・谱面作者本人身份及权利的资源包",
+  vfBadge:"✔ 认证", vfBadgeTitle:"已确认作曲者·谱面作者本人身份及权利的资源包",
   vfComment:"💬 作者的话", vfCharter:"谱面：{name}", vfBpm:"BPM {n}",
   vfRoleComposer:"作曲", vfRoleArranger:"编曲", vfRoleLyricist:"作词", vfRoleVocalist:"演唱", vfRoleCharter:"谱面", vfRoleIllustrator:"插画",
   vfCommentField:"💬 作者的话（可选）",
@@ -43,11 +44,11 @@ Object.assign(TEXT.zh, {
   vfNoHash:"没有指纹：重新安装此资源包即可确认是否认证。"
 });
 Object.assign(TEXT.ko, {
-  vfBadge:"✔ 공인", vfBadgeTitle:"작곡가・채보 제작자 본인 확인과 권리 확인을 마친 팩입니다",
+  vfBadge:"✔ 공인", vfBadgeTitle:"작곡가·채보 제작자 본인 확인과 권리 확인을 마친 팩입니다",
   vfComment:"💬 제작자의 한마디", vfCharter:"채보: {name}", vfBpm:"BPM {n}",
   vfRoleComposer:"작곡", vfRoleArranger:"편곡", vfRoleLyricist:"작사", vfRoleVocalist:"보컬", vfRoleCharter:"채보", vfRoleIllustrator:"일러스트",
   vfCommentField:"💬 제작자의 한마디 (선택)",
-  vfCommentHint:"공인된 제작자의 팩에서만 표시됩니다. 길이는 X 무료 계정과 같은 280까지입니다 (전각 문자・이모지는 2로 셉니다).",
+  vfCommentHint:"공인된 제작자의 팩에서만 표시됩니다. 길이는 X 무료 계정과 같은 280까지입니다 (전각 문자·이모지는 2로 셉니다).",
   vfCount:"{n} / 280", vfTooLong:"한마디가 너무 깁니다 (최대 280).", vfNeedCharter:"곡 팩에는 채보 제작자 이름을 넣어 주세요.",
   vfHash:"지문 (SHA-256)", vfCopySnippet:"📋 공인 목록용으로 복사", vfCopied:"verified.json용 항목을 복사했습니다.",
   vfNoHash:"지문 없음: 이 팩을 다시 넣으면 공인 여부를 확인할 수 있습니다."
@@ -57,7 +58,7 @@ const VF_URL = "verified.json", VF_MAX = 280, HEX64 = /^[0-9a-f]{64}$/;
 const ROLE_KEY = { composer:"vfRoleComposer", arranger:"vfRoleArranger", lyricist:"vfRoleLyricist",
   vocalist:"vfRoleVocalist", charter:"vfRoleCharter", illustrator:"vfRoleIllustrator" };
 const str = (v, n) => typeof v === "string" ? v.trim().slice(0, n) : "";
-const tx = (tag, key, cls) => { const n = window.Trk.core.el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; };
+const tx = (tag, key, cls) => { const n = core.el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; };
 
 /* ============ Xと同じ数え方（半角1・全角2・絵文字2、上限280） ============ */
 const LIGHT = [[0x0000, 0x10FF], [0x2000, 0x200D], [0x2010, 0x201F], [0x2032, 0x2037]];
@@ -160,16 +161,16 @@ function verifyOf(item) {
   return v ? { ...v, inf } : null;
 }
 function badge(big) {
-  const b = window.Trk.core.el("span", "vfBadge" + (big ? " big" : ""), big ? tr("vfBadge") : "✔");
+  const b = core.el("span", "vfBadge" + (big ? " big" : ""), big ? tr("vfBadge") : "✔");
   b.title = tr("vfBadgeTitle");
   return b;
 }
 function creatorRow(id) {
-  const c = VF.creators[id], row = window.Trk.core.el("div", "vfCreator");
-  row.append(window.Trk.core.el("b", "", c.name));
-  if (c.roles.length) row.append(window.Trk.core.el("span", "hint", " " + c.roles.map(r => tr(ROLE_KEY[r])).join("・")));
+  const c = VF.creators[id], row = core.el("div", "vfCreator");
+  row.append(core.el("b", "", c.name));
+  if (c.roles.length) row.append(core.el("span", "hint", " " + c.roles.map(r => tr(ROLE_KEY[r])).join("・")));
   const href = c.x ? "https://x.com/" + c.x : c.url;
-  if (href && (c.x || window.Trk.core.safeHttpUrl(c.url))) row.append(" ", window.Trk.core.safeLink("", href, c.x ? "@" + c.x : c.url));   /* 🛡 念のため通す */
+  if (href && (c.x || core.safeHttpUrl(c.url))) row.append(" ", core.safeLink("", href, c.x ? "@" + c.x : c.url));   /* 🛡 念のため通す */
   return row;
 }
 
@@ -177,7 +178,7 @@ function creatorRow(id) {
 const baseLib = window.Trk.library.renderLib;
 window.Trk.library.renderLib = function () {
   baseLib();
-  const rows = Array.from(window.Trk.core.$("libList").children).filter(n => n.querySelector && n.querySelector(".libRow"));
+  const rows = Array.from(core.$("libList").children).filter(n => n.querySelector && n.querySelector(".libRow"));
   window.Trk.library.libView.slice(0, window.Trk.library.LIB_SHOW).forEach((it, i) => {
     if (!rows[i] || !verifyOf(it)) return;
     rows[i].querySelector(".libName").prepend(badge(false), " ");
@@ -185,40 +186,40 @@ window.Trk.library.renderLib = function () {
 };
 
 /* ============ 選曲画面：作者・BPM・公認・作者のことば ============ */
-const vfBox = window.Trk.core.el("section", "panel vfBox"); vfBox.hidden = true;
-window.Trk.core.$("songBanner").after(vfBox);
+const vfBox = core.el("section", "panel vfBox"); vfBox.hidden = true;
+core.$("songBanner").after(vfBox);
 function renderVfBox() {
   vfBox.textContent = "";
-  const s = window.Trk.core.currentSong, inf = s && songInfo[s.key];
+  const s = core.currentSong, inf = s && songInfo[s.key];
   if (!inf) { vfBox.hidden = true; return; }
-  const v = verifyOf(s), head = window.Trk.core.el("div", "vfHead");
+  const v = verifyOf(s), head = core.el("div", "vfHead");
   if (v) head.append(badge(true));
   const meta = [inf.charter ? tr("vfCharter", { name:inf.charter }) : "", inf.bpm ? tr("vfBpm", { n:inf.bpm }) : ""].filter(Boolean).join(" · ");
-  if (meta) head.append(window.Trk.core.el("span", "hint", meta));
+  if (meta) head.append(core.el("span", "hint", meta));
   vfBox.append(head);
   if (v) {
     for (const id of v.creators) vfBox.append(creatorRow(id));
     const comment = v.comment || inf.comment;
-    if (comment) vfBox.append(window.Trk.core.el("div", "vfLabel", tr("vfComment")), window.Trk.core.el("div", "vfComment", comment));
-    if (v.notice) vfBox.append(window.Trk.core.el("div", "hint vfNotice", v.notice));
+    if (comment) vfBox.append(core.el("div", "vfLabel", tr("vfComment")), core.el("div", "vfComment", comment));
+    if (v.notice) vfBox.append(core.el("div", "hint vfNotice", v.notice));
   }
   vfBox.hidden = !(v || meta);
 }
 const baseBanner = window.Trk.library.renderBanner;
 window.Trk.library.renderBanner = function () { baseBanner(); renderVfBox(); };
-window.Trk.core.on("language", renderVfBox);
+core.on("language", renderVfBox);
 
 /* ============ リザルト：公認と作者のことば ============ */
-window.Trk.core.on("screen", id => {
+core.on("screen", id => {
   if (id !== "endScreen") return;
-  const v = verifyOf(window.Trk.core.currentSong); if (!v) return;
-  const box = window.Trk.core.el("div", "vfBox vfResult");
-  const head = window.Trk.core.el("div", "vfHead"); head.append(badge(true)); box.append(head);
+  const v = verifyOf(core.currentSong); if (!v) return;
+  const box = core.el("div", "vfBox vfResult");
+  const head = core.el("div", "vfHead"); head.append(badge(true)); box.append(head);
   for (const cid of v.creators) box.append(creatorRow(cid));
   const comment = v.comment || v.inf.comment;
-  if (comment) box.append(window.Trk.core.el("div", "vfComment", comment));
-  if (v.notice) box.append(window.Trk.core.el("div", "hint vfNotice", v.notice));
-  window.Trk.core.$("credits").prepend(box);
+  if (comment) box.append(core.el("div", "vfComment", comment));
+  if (v.notice) box.append(core.el("div", "hint vfNotice", v.notice));
+  core.$("credits").prepend(box);
 });
 
 /* ============ パック一覧：指紋・✔・公認リスト用のコピー ============ */
@@ -227,21 +228,21 @@ window.Trk.custom.renderPackList = async function () {
   await basePL();
   let recs = []; try { recs = await window.Trk.custom.packDB.all(); } catch (_) {}
   recs.sort((a, b) => (b.installedAt || 0) - (a.installedAt || 0));   // custom.js と同じ並び
-  const cards = window.Trk.core.$("packList").querySelectorAll(".packCard");
+  const cards = core.$("packList").querySelectorAll(".packCard");
   recs.forEach((r, i) => {
     const card = cards[i]; if (!card) return;
-    const line = window.Trk.core.el("div", "hint vfHash");
+    const line = core.el("div", "hint vfHash");
     if (r.sha256) {
       if (VF.packs[r.sha256]) card.querySelector(".packHead").prepend(badge(true));
       line.append(`${tr("vfHash")}: ${r.sha256.slice(0, 16)}… `);
-      const b = window.Trk.core.el("button", "", tr("vfCopySnippet")); b.type = "button";
+      const b = core.el("button", "", tr("vfCopySnippet")); b.type = "button";
       b.style.cssText = "padding:4px 10px;font-size:12px";
       b.addEventListener("click", () => {
         const songs = (r.manifest && r.manifest.songs) || [];
         const snippet = JSON.stringify({ sha256:r.sha256, creators:[], title:(songs[0] && songs[0].title) || r.manifest.name,
           comment:(songs[0] && songs[0].comment) || "", notice:"", addedAt:new Date().toISOString().slice(0, 10) }, null, 2);
         (navigator.clipboard ? navigator.clipboard.writeText(snippet) : Promise.reject())
-          .then(() => window.Trk.core.setStatus("packStatus", "vfCopied")).catch(() => prompt("verified.json", snippet));
+          .then(() => core.setStatus("packStatus", "vfCopied")).catch(() => prompt("verified.json", snippet));
       });
       line.append(b);
     } else line.textContent = tr("vfNoHash");
@@ -251,19 +252,19 @@ window.Trk.custom.renderPackList = async function () {
 
 /* ============ 曲パックを作る画面：作者のことば・作者名の確認 ============ */
 (() => {
-  const anchor = window.Trk.core.$("spLicense") && window.Trk.core.$("spLicense").closest("label"); if (!anchor) return;
-  const lab = window.Trk.core.el("label", "field"), area = document.createElement("textarea");
+  const anchor = core.$("spLicense") && core.$("spLicense").closest("label"); if (!anchor) return;
+  const lab = core.el("label", "field"), area = document.createElement("textarea");
   area.id = "spComment"; area.rows = 3; area.maxLength = 600;
   lab.append(tx("span", "vfCommentField"), area);
-  const cnt = window.Trk.core.el("div", "hint vfCount");
+  const cnt = core.el("div", "hint vfCount");
   anchor.after(lab, cnt, tx("div", "vfCommentHint", "hint"));
   const upd = () => { const n = postLength(area.value); cnt.textContent = tr("vfCount", { n }); cnt.classList.toggle("over", n > VF_MAX); };
-  area.addEventListener("input", upd); window.Trk.core.on("language", upd); upd();
+  area.addEventListener("input", upd); core.on("language", upd); upd();
   /* 書き出しボタンより先に（キャプチャ段階で）確認する */
-  window.Trk.core.$("songPackBuilder").addEventListener("click", e => {
+  core.$("songPackBuilder").addEventListener("click", e => {
     if (!e.target.closest("#spBuildBtn")) return;
-    if (!window.Trk.core.$("spCharter").value.trim()) { e.stopPropagation(); window.Trk.core.setStatus("spStatus", "vfNeedCharter"); return; }
-    if (postLength(area.value) > VF_MAX) { e.stopPropagation(); window.Trk.core.setStatus("spStatus", "vfTooLong"); return; }
+    if (!core.$("spCharter").value.trim()) { e.stopPropagation(); core.setStatus("spStatus", "vfNeedCharter"); return; }
+    if (postLength(area.value) > VF_MAX) { e.stopPropagation(); core.setStatus("spStatus", "vfTooLong"); return; }
     pendingComment = area.value;
     setTimeout(() => { pendingComment = null; }, 0);   // buildSongPack は最初の await までに pack.json を作る
   }, true);

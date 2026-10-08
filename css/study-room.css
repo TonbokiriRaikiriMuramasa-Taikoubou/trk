@@ -289,6 +289,24 @@ mark.study-search-hit[data-current="1"]{background:#ff9d2e;color:#1a1200;box-sha
   --study-theme-page-image:linear-gradient(90deg,rgba(119,76,35,.035),transparent 13%,transparent 87%,rgba(119,76,35,.035));--study-theme-editor-image:linear-gradient(90deg,rgba(119,76,35,.035),transparent 13%,transparent 87%,rgba(119,76,35,.035))}
 
 /* コーディング向け */
+/* 書斎の文字スキンの追加（sticky・letter・diary・haiku・newspaper・staff）。色と罫線だけで作る */
+.study-text-stage[data-theme="sticky"]{--study-theme-stage:#d9d3c4;--study-theme-page:#fff27a;--study-theme-ink:#3a3412;--study-theme-editor:#fff27a;--study-theme-editor-ink:#3a3412;
+  --study-theme-font:ui-sans-serif,"Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;--study-theme-editor-font:var(--study-theme-font);--study-theme-border:rgba(120,100,0,.35);--study-theme-caret:#7a5b00}
+.study-text-stage[data-theme="letter"]{--study-theme-stage:#dfe6ea;--study-theme-page:#fdfdf8;--study-theme-ink:#26303a;--study-theme-editor:#fdfdf8;--study-theme-editor-ink:#26303a;
+  --study-theme-font:ui-serif,Georgia,"Noto Serif JP","Yu Mincho",serif;--study-theme-editor-font:var(--study-theme-font);--study-theme-border:rgba(70,100,130,.35);--study-theme-caret:#3b6f9a;
+  --study-theme-editor-image:repeating-linear-gradient(180deg,transparent 0 29px,rgba(110,150,190,.35) 29px 30px)}
+.study-text-stage[data-theme="diary"]{--study-theme-stage:#e9dfd0;--study-theme-page:#fffaf0;--study-theme-ink:#3d2f2a;--study-theme-editor:#fffaf0;--study-theme-editor-ink:#3d2f2a;
+  --study-theme-font:ui-rounded,"Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;--study-theme-editor-font:var(--study-theme-font);--study-theme-border:rgba(150,110,90,.35);--study-theme-caret:#b5523b;
+  --study-theme-editor-image:repeating-linear-gradient(180deg,transparent 0 31px,rgba(181,82,59,.2) 31px 32px)}
+.study-text-stage[data-theme="haiku"]{--study-theme-stage:#2f3b33;--study-theme-page:#f7f1e3;--study-theme-ink:#1f2a22;--study-theme-editor:#f7f1e3;--study-theme-editor-ink:#1f2a22;
+  --study-theme-font:ui-serif,Georgia,"Noto Serif JP","Yu Mincho",serif;--study-theme-editor-font:var(--study-theme-font);--study-theme-border:rgba(60,70,50,.4);--study-theme-caret:#3f6b3a;
+  --study-theme-editor-image:repeating-linear-gradient(180deg,transparent 0 33px,rgba(60,70,50,.22) 33px 34px)}
+.study-text-stage[data-theme="newspaper"]{--study-theme-stage:#bdbdb8;--study-theme-page:#f4f2ea;--study-theme-ink:#111111;--study-theme-editor:#f4f2ea;--study-theme-editor-ink:#111111;
+  --study-theme-font:ui-serif,Georgia,"Noto Serif JP","Yu Mincho",serif;--study-theme-editor-font:var(--study-theme-font);--study-theme-border:rgba(0,0,0,.55);--study-theme-caret:#000;
+  --study-theme-editor-image:linear-gradient(90deg,transparent 0 50%,rgba(0,0,0,.14) 50% calc(50% + 1px),transparent calc(50% + 1px))}
+.study-text-stage[data-theme="staff"]{--study-theme-stage:#efe9dc;--study-theme-page:#fbf8f0;--study-theme-ink:#2a2a2a;--study-theme-editor:#fbf8f0;--study-theme-editor-ink:#2a2a2a;
+  --study-theme-font:ui-serif,Georgia,"Noto Serif JP","Yu Mincho",serif;--study-theme-editor-font:var(--study-theme-font);--study-theme-border:rgba(40,40,40,.28);--study-theme-caret:#8a1f1f;
+  --study-theme-editor-image:repeating-linear-gradient(180deg,transparent 0 24px,rgba(40,40,40,.35) 24px 25px,transparent 25px 30px,rgba(40,40,40,.35) 30px 31px,transparent 31px 36px,rgba(40,40,40,.35) 36px 37px,transparent 37px 42px,rgba(40,40,40,.35) 42px 43px,transparent 43px 48px,rgba(40,40,40,.35) 48px 49px,transparent 49px 60px)}
 .study-text-stage[data-theme="midnight"]{--study-theme-stage:#080e1c;--study-theme-page:#121c30;--study-theme-ink:#dce6ff;--study-theme-editor:#121c30;--study-theme-editor-ink:#dce6ff;
   --study-theme-font:ui-monospace,SFMono-Regular,Consolas,monospace;--study-theme-editor-font:var(--study-theme-font);--study-theme-border:rgba(112,151,220,.38);--study-theme-caret:#8ab4ff;--study-theme-selection:rgba(83,129,215,.42)}
 .study-text-stage[data-theme="terminal"]{--study-theme-stage:#020905;--study-theme-page:#030d08;--study-theme-ink:#8df5ad;--study-theme-editor:#030d08;--study-theme-editor-ink:#8df5ad;

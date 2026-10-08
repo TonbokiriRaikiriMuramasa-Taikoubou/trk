@@ -6,13 +6,14 @@
  * the bundled Lat-style PMD's bone/morph names. This is not device rendering.
  */
 import fs from "node:fs";
+import { restoreCoreAlias, sourceOf } from "./lib/js-source.mjs";
 import path from "node:path";
 import vm from "node:vm";
 import { TextDecoder } from "node:util";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const source = fs.readFileSync(path.join(root, "js/mmd.js"), "utf8");
+const source = restoreCoreAlias(fs.readFileSync(path.join(root, "js/mmd.js"), "utf8"));
 const start = source.indexOf("const SJIS = {");
 const end = source.indexOf("\n/* ============ 💠 同梱プリセットモデル", start);
 if (start < 0 || end < 0) throw new Error("Could not locate the pure VMD/motion definitions in js/mmd.js");
@@ -222,7 +223,7 @@ for (const key of translatedKeys) {
   const count = (source.match(new RegExp(`\\b${key}:`, "g")) || []).length;
   if (count !== 4) fail(`${key} must have four translations (found ${count})`);
 }
-const core = fs.readFileSync(path.join(root, "js/core.js"), "utf8");
+const core = restoreCoreAlias(fs.readFileSync(path.join(root, "js/core.js"), "utf8"));
 if (preset.motion !== "faceSing" || preset.bpm !== 0) fail("Bundled Lat-style Miku preset must start with the BPM-free faceSing mouth loop");
 if (!core.includes('prefs.mmdMotionKind : "faceSing"') || !core.includes('settings.mmdMotionKind = "faceSing"')) {
   fail("Missing-preference and reset defaults must use faceSing");

@@ -12,10 +12,11 @@
  * これは実ブラウザ・実機の代わりではありません（発熱・電池・30fpsのプレイ感は実機で確認してください）。
  */
 import assert from "node:assert/strict";
+import { restoreCoreAlias, sourceOf } from "./lib/js-source.mjs";
 import fs from "node:fs";
 import vm from "node:vm";
 
-const read = rel => fs.readFileSync(new URL(`../${rel}`, import.meta.url), "utf8");
+const read = rel => sourceOf(rel, fs.readFileSync(new URL(`../${rel}`, import.meta.url), "utf8"));
 const liteSource = read("js/lite.js");
 const html = read("index.html");
 const core = read("js/core.js");

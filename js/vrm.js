@@ -5,21 +5,22 @@
    ※ 利用者が読み込むVRMモデルの権利は、それぞれの作者にあります（GPLの対象外）。 */
 "use strict";
 (() => {
+  const core = window.Trk.core;
 const MB = 1048576, MAX_VRM = 200 * MB, MAX_VRMA = 30 * MB;
 
 /* ---------- 自分のモデル・モーションをブラウザ内に保存 ---------- */
-const vrmDB = window.Trk.core.idbStore("shadow_taiko_vrm", "files");
+const vrmDB = core.idbStore("shadow_taiko_vrm", "files");
 const saveStored = (key, file) => vrmDB.put(key, { file, name:file.name, savedAt:Date.now() });
 const loadStored = key => vrmDB.get(key);
 const clearStored = key => vrmDB.del(key);
 const asFile = (rec, fb) => rec.file instanceof File ? rec.file : new File([rec.file], rec.name || fb);
 
 /* ---------- ゲーム本体の状態を読むための小さな関数 ---------- */
-const status = (k, v) => window.Trk.core.setStatus("vrmStatus", k, v);
-const vrmRect = () => window.Trk.data.VRM_RECT[window.Trk.core.settings.layout] || window.Trk.data.VRM_RECT.classic;
-const isTalking = () => !!window.Trk.core.caption && performance.now() - window.Trk.core.caption.t < window.Trk.core.CAPTION_MS;
+const status = (k, v) => core.setStatus("vrmStatus", k, v);
+const vrmRect = () => window.Trk.data.VRM_RECT[core.settings.layout] || window.Trk.data.VRM_RECT.classic;
+const isTalking = () => !!core.caption && performance.now() - core.caption.t < core.CAPTION_MS;
 const setLoaded = (onFlag, credit) => { window.Trk.play.vrmState.loaded = onFlag; window.Trk.play.vrmState.credit = credit || ""; };
-function selectVrmMascot() { window.Trk.core.settings.mascot = "vrm"; window.Trk.core.saveUserPrefs(); window.Trk.custom.updateMascotUI(); }
+function selectVrmMascot() { core.settings.mascot = "vrm"; core.saveUserPrefs(); window.Trk.custom.updateMascotUI(); }
 
 /* ---------- ライブラリは必要になったときだけ読み込む ---------- */
 let libsP = null, animP = null, L = null, A = null;
@@ -35,7 +36,7 @@ function animLibs() {
 }
 
 /* ---------- 状態 ---------- */
-const canvas = window.Trk.core.$("vrmCanvas"), prev = window.Trk.core.$("vrmPreview"), pctx = prev.getContext("2d");
+const canvas = core.$("vrmCanvas"), prev = core.$("vrmPreview"), pctx = prev.getContext("2d");
 let renderer = null, scene, camera, pivot, vrm = null, frameInfo = null, mixer = null, motionAnim = null;
 let currentFile = null, motionFile = null, lastInfo = null, lastT = 0, curKey = "", packOwned = false, packMotion = false;
 let chain = Promise.resolve();
@@ -65,7 +66,7 @@ function measure() {
 }
 function frameCamera() {
   if (!frameInfo || !camera) return;
-  const h = Math.max(0.3, frameInfo.maxY - frameInfo.minY), mode = window.Trk.core.settings.vrmFrame;
+  const h = Math.max(0.3, frameInfo.maxY - frameInfo.minY), mode = core.settings.vrmFrame;
   let cy, fh;
   if (mode === "face") { fh = h * 0.24; cy = frameInfo.headY + h * 0.01; }
   else if (mode === "upper") { fh = h * 0.58; cy = frameInfo.headY - h * 0.18; }
@@ -76,7 +77,7 @@ function frameCamera() {
 function applyRect() {
   const R = vrmRect(), sc = Math.min(innerWidth / 1920, innerHeight / 1080);
   const pr = Math.min(typeof TrkLite === "object" ? TrkLite.pixelRatio(2) : 2, Math.max(0.5, (devicePixelRatio || 1) * sc));   // 🪶 軽量化は描画解像度の上限
-  const key = `${R.x},${R.y},${R.w},${R.h},${pr.toFixed(2)},${window.Trk.core.settings.vrmFrame}`;
+  const key = `${R.x},${R.y},${R.w},${R.h},${pr.toFixed(2)},${core.settings.vrmFrame}`;
   if (key === curKey) return;
   curKey = key;
   Object.assign(canvas.style, { left:R.x + "px", top:R.y + "px", width:R.w + "px", height:R.h + "px" });
@@ -103,9 +104,9 @@ function describe(meta, file) {
   };
 }
 function showInfo(i) {
-  const box = window.Trk.core.$("vrmInfo"); box.textContent = "";
+  const box = core.$("vrmInfo"); box.textContent = "";
   if (!i) return;
-  const add = (txt, cls) => box.append(window.Trk.core.el("div", cls || "", txt));
+  const add = (txt, cls) => box.append(core.el("div", cls || "", txt));
   add(`${tr("metaName")}: ${i.name}`);
   if (i.authors) add(`${tr("metaAuthor")}: ${i.authors}`);
   add(`${tr("metaAvatar")}: ${tr("perm_" + i.perm)}`);
@@ -153,7 +154,7 @@ async function doLoadVrm(file, { fromPack = false, restored = false, select = tr
     bindMotion();
     status(restored ? "vrmRestored" : "vrmLoaded");
     if (select) selectVrmMascot();
-    if (!fromPack && !restored && window.Trk.core.settings.vrmRemember) await saveStored("current", file).catch(() => status("vrmSaveFail"));
+    if (!fromPack && !restored && core.settings.vrmRemember) await saveStored("current", file).catch(() => status("vrmSaveFail"));
   } catch (e) {
     console.error(e);
     status(e && e.key ? e.key : "vrmLoadError");
@@ -186,7 +187,7 @@ async function doLoadMotion(file, { fromPack = false, restored = false } = {}) {
     motionAnim = anim; motionFile = file; packMotion = fromPack;
     bindMotion();
     if (!restored) status("vrmaLoaded");
-    if (!fromPack && !restored && window.Trk.core.settings.vrmRemember) await saveStored("motion", file).catch(() => {});
+    if (!fromPack && !restored && core.settings.vrmRemember) await saveStored("motion", file).catch(() => {});
   } catch (e) {
     console.error(e);
     status(e && e.key ? e.key : "vrmaBad");
@@ -204,7 +205,7 @@ async function restorePersonal() {
   try {
     if (!vrm) {
       const r = await loadStored("current");
-      if (r && r.file) { window.Trk.core.$("vrmAgree").checked = true; syncAgree(); await doLoadVrm(asFile(r, "model.vrm"), { restored:true, select:false }); }
+      if (r && r.file) { core.$("vrmAgree").checked = true; syncAgree(); await doLoadVrm(asFile(r, "model.vrm"), { restored:true, select:false }); }
     }
     if (!motionAnim) {
       const m = await loadStored("motion");
@@ -217,13 +218,13 @@ async function restorePersonal() {
 const decay = (t0, ms, now) => Math.max(0, 1 - (now - t0) / ms);
 function pose(now, dt) {
   const t = now / 1000, Hm = vrm.humanoid, bone = n => Hm && Hm.getNormalizedBoneNode(n);
-  const k0 = decay(window.Trk.core.avatarHit[0], 200, now), k1 = decay(window.Trk.core.avatarHit[1], 200, now);
-  const sad = decay(window.Trk.core.lastMissT, 800, now);
-  const beat = window.Trk.core.phase === "playing" ? window.Trk.play.beatPulse(window.Trk.play.gameTime()) : 0;
-  const talking = isTalking(), cel = talking && window.Trk.core.caption.speaker === 1 ? 1 : 0;
+  const k0 = decay(core.avatarHit[0], 200, now), k1 = decay(core.avatarHit[1], 200, now);
+  const sad = decay(core.lastMissT, 800, now);
+  const beat = core.phase === "playing" ? window.Trk.play.beatPulse(window.Trk.play.gameTime()) : 0;
+  const talking = isTalking(), cel = talking && core.caption.speaker === 1 ? 1 : 0;
   if (mixer) {
     // モーション再生中：曲のBPMに合わせて速度を変え、叩き・うなずき・ミスの動きを上乗せ
-    const mb = window.Trk.core.settings.vrmMotionBpm, sb = window.Trk.core.chartMeta.bpm || 0;
+    const mb = core.settings.vrmMotionBpm, sb = core.chartMeta.bpm || 0;
     mixer.timeScale = mb && sb ? Math.min(3, Math.max(0.25, sb / mb)) : 1;
     mixer.update(dt);
     const add = (n, x, y, z) => { const b = bone(n); if (b) { b.rotation.x += x; b.rotation.y += y; b.rotation.z += z; } };
@@ -242,12 +243,12 @@ function pose(now, dt) {
     set("spine", 0.03 * Math.sin(t * 2.1) + 0.05 * sad, 0, 0.02 * Math.sin(t * 1.3));
     set("neck", 0.06 * beat + 0.3 * sad, 0.06 * Math.sin(t * 0.9), 0.04 * (k1 - k0));
   }
-  pivot.rotation.y = L.THREE.MathUtils.degToRad(window.Trk.core.settings.vrmTurn);
+  pivot.rotation.y = L.THREE.MathUtils.degToRad(core.settings.vrmTurn);
   pivot.position.y = -0.015 * beat - 0.02 * Math.max(k0, k1) + (cel ? Math.abs(Math.sin(t * 8)) * 0.03 : 0);
   const em = vrm.expressionManager;
   if (em) {
     const ex = (n, v) => { if (em.getExpression(n)) em.setValue(n, v); };
-    const happy = Math.max(decay(Math.max(window.Trk.core.avatarHit[0], window.Trk.core.avatarHit[1]), 450, now) * .35, cel);
+    const happy = Math.max(decay(Math.max(core.avatarHit[0], core.avatarHit[1]), 450, now) * .35, cel);
     ex("blink", (now % 3800) < 130 && happy < .3 && sad < .1 ? 1 : 0);
     ex("happy", Math.min(1, happy));
     ex("sad", sad * .8);
@@ -261,9 +262,9 @@ function animate(now) {
   requestAnimationFrame(animate);
   /* 🪶 軽量化：3Dマスコットの描画レートを下げる／「描画しない」ときは何も描かない */
   const mascotOff = typeof TrkLite === "object" && TrkLite.noMascot("vrm");
-  const playing = !!vrm && window.Trk.core.phase !== "title" && window.Trk.core.activeMascot() === "vrm" && !mascotOff;
+  const playing = !!vrm && core.phase !== "title" && core.activeMascot() === "vrm" && !mascotOff;
   canvas.hidden = !playing;
-  const previewOn = !!vrm && !mascotOff && window.Trk.core.phase === "title" && window.Trk.core.screen === "settings" && window.Trk.core.$("vrmPanel").open;
+  const previewOn = !!vrm && !mascotOff && core.phase === "title" && core.screen === "settings" && core.$("vrmPanel").open;
   if (!playing && !previewOn) { lastT = now; return; }
   if (typeof TrkLite === "object" && !TrkLite.mascotAllow("vrm", now)) return;
   const dt = Math.min(0.1, Math.max(0.001, (now - lastT) / 1000)); lastT = now;
@@ -279,30 +280,30 @@ requestAnimationFrame(animate);
 
 /* ---------- 設定欄 ---------- */
 function syncAgree() {
-  const ok = window.Trk.core.$("vrmAgree").checked;
-  window.Trk.core.$("vrmFile").disabled = !ok; window.Trk.core.$("vrmFileLabel").classList.toggle("disabled", !ok);
+  const ok = core.$("vrmAgree").checked;
+  core.$("vrmFile").disabled = !ok; core.$("vrmFileLabel").classList.toggle("disabled", !ok);
 }
-function showTurn() { window.Trk.core.$("vrmTurnVal").textContent = `${window.Trk.core.settings.vrmTurn}°`; }
+function showTurn() { core.$("vrmTurnVal").textContent = `${core.settings.vrmTurn}°`; }
 function syncControls() {
-  window.Trk.core.$("vrmFrame").value = window.Trk.core.settings.vrmFrame;
-  window.Trk.core.$("vrmTurn").value = window.Trk.core.settings.vrmTurn; showTurn();
-  window.Trk.core.$("vrmMotionBpm").value = window.Trk.core.settings.vrmMotionBpm ? window.Trk.core.settings.vrmMotionBpm : "";
-  window.Trk.core.$("vrmRemember").checked = window.Trk.core.settings.vrmRemember;
+  core.$("vrmFrame").value = core.settings.vrmFrame;
+  core.$("vrmTurn").value = core.settings.vrmTurn; showTurn();
+  core.$("vrmMotionBpm").value = core.settings.vrmMotionBpm ? core.settings.vrmMotionBpm : "";
+  core.$("vrmRemember").checked = core.settings.vrmRemember;
   curKey = "";
 }
-window.Trk.core.$("vrmAgree").addEventListener("change", syncAgree);
-window.Trk.core.$("vrmFile").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; if (f) loadVrm(f); });
-window.Trk.core.$("vrmFrame").addEventListener("change", e => { window.Trk.core.settings.vrmFrame = e.target.value; window.Trk.core.saveUserPrefs(); curKey = ""; });
-window.Trk.core.$("vrmTurn").addEventListener("input", e => { window.Trk.core.settings.vrmTurn = Number(e.target.value); window.Trk.core.saveUserPrefs(); showTurn(); });
-window.Trk.core.$("vrmMotionBpm").addEventListener("change", e => {
-  const v = Number(e.target.value); window.Trk.core.settings.vrmMotionBpm = v >= 40 && v <= 300 ? v : 0; window.Trk.core.saveUserPrefs(); syncControls();
+core.$("vrmAgree").addEventListener("change", syncAgree);
+core.$("vrmFile").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; if (f) loadVrm(f); });
+core.$("vrmFrame").addEventListener("change", e => { core.settings.vrmFrame = e.target.value; core.saveUserPrefs(); curKey = ""; });
+core.$("vrmTurn").addEventListener("input", e => { core.settings.vrmTurn = Number(e.target.value); core.saveUserPrefs(); showTurn(); });
+core.$("vrmMotionBpm").addEventListener("change", e => {
+  const v = Number(e.target.value); core.settings.vrmMotionBpm = v >= 40 && v <= 300 ? v : 0; core.saveUserPrefs(); syncControls();
 });
-window.Trk.core.$("vrmaFile").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; if (f) loadMotion(f); });
-window.Trk.core.$("vrmaClearBtn").addEventListener("click", () => enqueue(async () => {
+core.$("vrmaFile").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; if (f) loadMotion(f); });
+core.$("vrmaClearBtn").addEventListener("click", () => enqueue(async () => {
   clearMotion(); try { await clearStored("motion"); } catch (_) {} status("vrmaCleared");
 }));
-window.Trk.core.$("vrmRemember").addEventListener("change", e => {
-  const onFlag = e.target.checked; window.Trk.core.settings.vrmRemember = onFlag; window.Trk.core.saveUserPrefs();
+core.$("vrmRemember").addEventListener("change", e => {
+  const onFlag = e.target.checked; core.settings.vrmRemember = onFlag; core.saveUserPrefs();
   enqueue(async () => {
     try {
       if (!onFlag) { await clearStored("current"); await clearStored("motion"); }
@@ -313,7 +314,7 @@ window.Trk.core.$("vrmRemember").addEventListener("change", e => {
     } catch (_) { status("vrmSaveFail"); }
   });
 });
-window.Trk.core.$("vrmClearBtn").addEventListener("click", () => enqueue(async () => {
+core.$("vrmClearBtn").addEventListener("click", () => enqueue(async () => {
   if (renderer) disposeCurrent();
   currentFile = null; lastInfo = null; packOwned = false; showInfo(null);
   setLoaded(false, ""); canvas.hidden = true;
@@ -321,28 +322,28 @@ window.Trk.core.$("vrmClearBtn").addEventListener("click", () => enqueue(async (
   try { await clearStored("current"); } catch (_) {}
   status("vrmCleared");
 }));
-window.Trk.core.on("language", () => showInfo(lastInfo));
+core.on("language", () => showInfo(lastInfo));
 
 /* .vrm / .vrma のドラッグ＆ドロップ（曲用の処理より先に受け取る） */
 addEventListener("drop", e => {
   const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
   if (!f || !/\.(vrm|vrma)$/i.test(f.name)) return;
   e.preventDefault(); e.stopImmediatePropagation();
-  if (window.Trk.core.phase !== "title") return;
-  window.Trk.core.showScreen("settingsScreen"); window.Trk.core.$("vrmPanel").open = true;
+  if (core.phase !== "title") return;
+  core.showScreen("settingsScreen"); core.$("vrmPanel").open = true;
   if (/\.vrma$/i.test(f.name)) { loadMotion(f); return; }
-  if (!window.Trk.core.$("vrmAgree").checked) { status("vrmNeedAgree"); return; }
+  if (!core.$("vrmAgree").checked) { status("vrmNeedAgree"); return; }
   loadVrm(f);
 }, true);
 
 /* ---------- パック機能（custom.js）から使う窓口 ---------- */
 window.ShadowTaikoVRM = {
   loadFromPack(blob, o = {}) {
-    if (o.frame) window.Trk.core.settings.vrmFrame = o.frame;
-    if (typeof o.turn === "number") window.Trk.core.settings.vrmTurn = o.turn;
-    if (o.motionBpm) window.Trk.core.settings.vrmMotionBpm = o.motionBpm;
-    window.Trk.core.saveUserPrefs(); syncControls();
-    window.Trk.core.$("vrmAgree").checked = true; syncAgree();
+    if (o.frame) core.settings.vrmFrame = o.frame;
+    if (typeof o.turn === "number") core.settings.vrmTurn = o.turn;
+    if (o.motionBpm) core.settings.vrmMotionBpm = o.motionBpm;
+    core.saveUserPrefs(); syncControls();
+    core.$("vrmAgree").checked = true; syncAgree();
     loadVrm(new File([blob], "pack.vrm", { type:"model/gltf-binary" }), { fromPack:true, restored:!o.select, select:!!o.select });
     if (o.motion) loadMotion(new File([o.motion], "pack.vrma", { type:"model/gltf-binary" }), { fromPack:true, restored:true });
   },
@@ -374,8 +375,8 @@ function restoreWhenAllowed() {
   try { await window.Trk.main.packsReady; } catch (_) {}
   restoreWhenAllowed();
 })();
-window.Trk.core.on("lite", () => restoreWhenAllowed());
-window.Trk.core.on("mascot", () => { if (window.Trk.core.activeMascot() === "vrm") restoreWhenAllowed(); });
-if (window.Trk.core.$("vrmPanel")) window.Trk.core.$("vrmPanel").addEventListener("toggle", () => { if (window.Trk.core.$("vrmPanel").open) restoreWhenAllowed(); });
+core.on("lite", () => restoreWhenAllowed());
+core.on("mascot", () => { if (core.activeMascot() === "vrm") restoreWhenAllowed(); });
+if (core.$("vrmPanel")) core.$("vrmPanel").addEventListener("toggle", () => { if (core.$("vrmPanel").open) restoreWhenAllowed(); });
 })();
 /* ✅ vrm.js 完了 —— 統合版の全ファイルがそろいました 🎉 */

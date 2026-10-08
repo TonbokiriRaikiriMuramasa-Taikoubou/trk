@@ -28,6 +28,7 @@
    ========================================================================== */
 "use strict";
 (() => {
+  const core = window.Trk.core;
 
 /* ============ 文章（接頭辞 spec…） ============ */
 Object.assign(TEXT.ja, {
@@ -220,31 +221,31 @@ const THEME_SWATCH = Object.assign(Object.create(null), {
   volcano:"linear-gradient(90deg,#ff3d00,#ff9100)", marine:"linear-gradient(90deg,#0ea5e9,#065f7a)",
   gameboy:"linear-gradient(90deg,#9bbc0f,#0f380f)", synth:"linear-gradient(90deg,#ff2d95,#7c3aed,#ff9e00)"
 });
-const specSafe = (typeof safeModeOn !== "undefined") && window.Trk.core.safeModeOn;
+const specSafe = (typeof safeModeOn !== "undefined") && core.safeModeOn;
 /* 🛟 セーフモードのときは、保存値を読み戻さない（core.js が入れた「表示しない」を守る） */
 if (typeof prefs !== "undefined" && !specSafe) {
-  window.Trk.core.settings.specOn    = window.Trk.core.prefs.specOn !== false;                                  // 表示する（初期オン）
+  core.settings.specOn    = core.prefs.specOn !== false;                                  // 表示する（初期オン）
   /* v1 の頃の初期値（bars）がそのまま残っているときだけ、新しい初期値（ring）へ一度だけ移す。
      （v2 以降は specSkin が保存に入るので、自分で選んだ bars はそのまま残ります） */
-  const oldBars = window.Trk.core.prefs.specStyle === "bars" && !("specSkin" in window.Trk.core.prefs);
-  window.Trk.core.settings.specStyle = window.Trk.core.pick(oldBars ? "ring" : window.Trk.core.prefs.specStyle, SPEC_STYLES, "ring");   // 初期はリング
-  window.Trk.core.settings.specTheme = window.Trk.core.pick(window.Trk.core.prefs.specTheme, SPEC_THEMES, "neon");              // 初期はネオン
-  window.Trk.core.settings.specSkin  = window.Trk.core.prefs.specSkin !== false;                                // 📊 曲名バナーのスキン（初期オン）
-  window.Trk.core.settings.specSkinOpen = window.Trk.core.prefs.specSkinOpen === true;                          // 大きく開いた状態で始めるか（初期は閉じ）
-  window.Trk.core.settings.specGain  = window.Trk.core.num(window.Trk.core.prefs.specGain, .4, 2.5, 1);
-  window.Trk.core.settings.specPeaks = window.Trk.core.prefs.specPeaks !== false;                               // ピーク（初期オン）
-  window.Trk.core.settings.specTv    = window.Trk.core.prefs.specTv === true;                                   // 📺 重ね表示（初期オフ）
+  const oldBars = core.prefs.specStyle === "bars" && !("specSkin" in core.prefs);
+  core.settings.specStyle = core.pick(oldBars ? "ring" : core.prefs.specStyle, SPEC_STYLES, "ring");   // 初期はリング
+  core.settings.specTheme = core.pick(core.prefs.specTheme, SPEC_THEMES, "neon");              // 初期はネオン
+  core.settings.specSkin  = core.prefs.specSkin !== false;                                // 📊 曲名バナーのスキン（初期オン）
+  core.settings.specSkinOpen = core.prefs.specSkinOpen === true;                          // 大きく開いた状態で始めるか（初期は閉じ）
+  core.settings.specGain  = core.num(core.prefs.specGain, .4, 2.5, 1);
+  core.settings.specPeaks = core.prefs.specPeaks !== false;                               // ピーク（初期オン）
+  core.settings.specTv    = core.prefs.specTv === true;                                   // 📺 重ね表示（初期オフ）
 }
 /* core.js より前に読まれたとき・?safe=1 のときの保険（知らない値は既定に戻す） */
 if (typeof settings !== "undefined") {
-  window.Trk.core.settings.specOn    = window.Trk.core.settings.specOn !== false;
-  window.Trk.core.settings.specStyle = window.Trk.core.pick(window.Trk.core.settings.specStyle, SPEC_STYLES, "ring");
-  window.Trk.core.settings.specTheme = window.Trk.core.pick(window.Trk.core.settings.specTheme, SPEC_THEMES, "neon");
-  window.Trk.core.settings.specSkin  = window.Trk.core.settings.specSkin !== false;
-  window.Trk.core.settings.specSkinOpen = window.Trk.core.settings.specSkinOpen === true;
-  window.Trk.core.settings.specGain  = window.Trk.core.num(window.Trk.core.settings.specGain, .4, 2.5, 1);
-  window.Trk.core.settings.specPeaks = window.Trk.core.settings.specPeaks !== false;
-  window.Trk.core.settings.specTv    = window.Trk.core.settings.specTv === true;
+  core.settings.specOn    = core.settings.specOn !== false;
+  core.settings.specStyle = core.pick(core.settings.specStyle, SPEC_STYLES, "ring");
+  core.settings.specTheme = core.pick(core.settings.specTheme, SPEC_THEMES, "neon");
+  core.settings.specSkin  = core.settings.specSkin !== false;
+  core.settings.specSkinOpen = core.settings.specSkinOpen === true;
+  core.settings.specGain  = core.num(core.settings.specGain, .4, 2.5, 1);
+  core.settings.specPeaks = core.settings.specPeaks !== false;
+  core.settings.specTv    = core.settings.specTv === true;
 }
 
 /* ============ 🔊 音を見る（TrkFX.tap を1つだけ使い回す） ============
@@ -255,7 +256,7 @@ if (typeof settings !== "undefined") {
 let an = null, freq = null, wave = null, specNoAudio = false, hadGesture = false;
 function ensureAnalyser() {
   if (an) return an;
-  if (specNoAudio || !window.Trk.core.settings.specOn) return null;
+  if (specNoAudio || !core.settings.specOn) return null;
   const T = window.TrkFX;
   if (!T || typeof T.tap !== "function") { specNoAudio = true; updateStatus(); return null; }
   try { an = T.tap(2048); } catch (_) { an = null; }
@@ -311,7 +312,7 @@ function rms01(a) {
   return Math.min(1, Math.sqrt(s / Math.max(1, c)) * 2.4);
 }
 function bpmNow() {
-  const b = (typeof chartMeta !== "undefined" && window.Trk.core.chartMeta && window.Trk.core.chartMeta.bpm) ? window.Trk.core.chartMeta.bpm : 0;
+  const b = (typeof chartMeta !== "undefined" && core.chartMeta && core.chartMeta.bpm) ? core.chartMeta.bpm : 0;
   return b > 0 ? Math.round(b) : 0;
 }
 /* 帯ごとの履歴（リングバッファ）。st[key + "I"] が「次に書く場所」＝いちばん古い場所 */
@@ -1117,7 +1118,7 @@ function drawOne(cv, kind, t) {
   }
   if (live) {
     const bins = freq.length, nyq = ((an.context && an.context.sampleRate) || 48000) / 2;
-    const gain = window.Trk.core.settings.specGain, LO = 40, HI = 14000;
+    const gain = core.settings.specGain, LO = 40, HI = 14000;
     for (let i = 0; i < n; i++) {
       let a = Math.round(LO * Math.pow(HI / LO, i / n) / nyq * bins);
       let b = Math.round(LO * Math.pow(HI / LO, (i + 1) / n) / nyq * bins);
@@ -1128,10 +1129,10 @@ function drawOne(cv, kind, t) {
       vals[i] = Math.min(1, Math.pow((c ? m / c / 255 : 0) * gain, .85));
     }
   }
-  const style = window.Trk.core.settings.specStyle;
+  const style = core.settings.specStyle;
   const fn = STYLE_DRAW[style] || STYLE_DRAW.bars;
   const S = {
-    vals, wave, live, theme: window.Trk.core.settings.specTheme, peaks: window.Trk.core.settings.specPeaks && !reducedMotion(),
+    vals, wave, live, theme: core.settings.specTheme, peaks: core.settings.specPeaks && !reducedMotion(),
     reduced: reducedMotion(), cv, st: stateOf(cv), kind, n, t: t || 0,
     mirror: style === "mirror"
   };
@@ -1157,28 +1158,28 @@ function reducedMotion() {
   try { return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); } catch (_) { return false; }
 }
 
-const isSafe = () => (typeof safeModeOn !== "undefined" && window.Trk.core.safeModeOn) || (typeof window.TrkSafeMode === "function" && window.TrkSafeMode());
+const isSafe = () => (typeof safeModeOn !== "undefined" && core.safeModeOn) || (typeof window.TrkSafeMode === "function" && window.TrkSafeMode());
 /* 🪶 軽量化モード中は、音を見るアナライザーも描画も止める（設定の liteSpectrumOff で戻せます） */
 const liteOff = () => typeof TrkLite === "object" && TrkLite.specBlocked();
-const specLive = () => window.Trk.core.settings.specOn && !isSafe() && !liteOff();
-function onSelectScreen() { return (typeof screen === "undefined" ? "" : window.Trk.core.screen) === "select"; }
+const specLive = () => core.settings.specOn && !isSafe() && !liteOff();
+function onSelectScreen() { return (typeof screen === "undefined" ? "" : core.screen) === "select"; }
 function seeable(n) { return !!n && n.isConnected && n.clientWidth > 0 && n.clientHeight > 0 && !document.hidden; }
 function drawable(n) { return seeable(n) && (!GATES.has(n) || GATES.get(n)()); }
 function panelOn() { return panelCanvases.some(drawable); }
 function tvOn() {
-  if (!tvCanvas || !window.Trk.core.settings.specTv || window.Trk.core.settings.videoStyle === "off" || !onSelectScreen()) return false;
+  if (!tvCanvas || !core.settings.specTv || core.settings.videoStyle === "off" || !onSelectScreen()) return false;
   const dock = document.getElementById("tvDock");
   if (dock && dock.classList.contains("off")) return false;
   return seeable(tvCanvas);
 }
 /* 表示したい場所があるか（アナライザーを作る判断にも使う） */
-function wantLive() { return specLive() && (panelOn() || (tvCanvas && window.Trk.core.settings.specTv && onSelectScreen())); }
+function wantLive() { return specLive() && (panelOn() || (tvCanvas && core.settings.specTv && onSelectScreen())); }
 function clearOne(cv) { const g = cv.getContext && cv.getContext("2d"); if (g) { try { g.clearRect(0, 0, cv.width, cv.height); } catch (_) {} } }
 
 /* 「曲を再生すると動きます」／「このブラウザでは音を見られません」の1行 */
 const statusNodes = [];
 function updateStatus() {
-  const msg = !window.Trk.core.settings.specOn ? "" : liteOff() ? tr("specLiteOff") : specNoAudio ? tr("specNoAudio") : (an ? "" : tr("specIdle"));
+  const msg = !core.settings.specOn ? "" : liteOff() ? tr("specLiteOff") : specNoAudio ? tr("specNoAudio") : (an ? "" : tr("specIdle"));
   for (const n of statusNodes) if (n.textContent !== msg) n.textContent = msg;
 }
 
@@ -1189,7 +1190,7 @@ function frame(t) {
   const on = specLive();
   /* アナライザーは、ページで一度でも操作されたあと（ブラウザの音の制限）に、
      実際に音が鳴っているときだけ作る */
-  if (on && !an && !specNoAudio && hadGesture && !window.Trk.core.video.paused) ensureAnalyser();
+  if (on && !an && !specNoAudio && hadGesture && !core.video.paused) ensureAnalyser();
   /* 音を見ていないときは、毎フレーム描かずに休む（画面を開いているあいだの負担を減らす） */
   const now = t || performance.now();
   const idle = !an;
@@ -1218,10 +1219,10 @@ function kick() { if (!raf && !document.hidden) raf = requestAnimationFrame(fram
 
 /* ============ 画面を作る ============ */
 const SYNCS = [];                      // 表示を合わせる関数（言語を変えたときにも呼ぶ）
-function tx(tag, key, cls) { const n = window.Trk.core.el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; }
+function tx(tag, key, cls) { const n = core.el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; }
 
 function mkChips(pairs, get, set, cls) {
-  const row = window.Trk.core.el("div", "seg specSeg" + (cls ? " " + cls : ""));
+  const row = core.el("div", "seg specSeg" + (cls ? " " + cls : ""));
   const bs = pairs.map(([v, key]) => {
     const b = tx("button", key);
     b.dataset.specVal = v;
@@ -1234,7 +1235,7 @@ function mkChips(pairs, get, set, cls) {
   return row;
 }
 function mkCheck(key, get, set, cls) {
-  const lab = window.Trk.core.el("label", "check" + (cls ? " " + cls : "")), inp = document.createElement("input");
+  const lab = core.el("label", "check" + (cls ? " " + cls : "")), inp = document.createElement("input");
   inp.type = "checkbox";
   lab.append(inp, tx("span", key));
   inp.addEventListener("change", () => set(inp.checked));
@@ -1244,7 +1245,7 @@ function mkCheck(key, get, set, cls) {
 function buildBox(host, withCanvas) {
   /* いちばん上に「🚫 スペクトラムを使用しない」。硬派な人が1か所で確実に切れるように。
      オフのときは、ほかの設定をうすくして「いま効いていない」ことを見せる（.specBox.specOff） */
-  host.append(mkCheck("specOff", () => !window.Trk.core.settings.specOn, v => { window.Trk.core.settings.specOn = !v; window.Trk.core.saveUserPrefs(); syncAll(); }, "specOffRow"));
+  host.append(mkCheck("specOff", () => !core.settings.specOn, v => { core.settings.specOn = !v; core.saveUserPrefs(); syncAll(); }, "specOffRow"));
   host.append(tx("div", "specOffHint", "hint specOffHint"));
   if (withCanvas) {
     const cv = document.createElement("canvas");
@@ -1256,37 +1257,37 @@ function buildBox(host, withCanvas) {
   host.append(tx("div", "specHint", "hint"));
   host.append(tx("div", "specStyle", "hint specLabel"),
     mkChips(SPEC_STYLES.map(v => [v, STYLE_KEYS[v]]),
-      () => window.Trk.core.settings.specStyle, v => { window.Trk.core.settings.specStyle = v; window.Trk.core.saveUserPrefs(); syncAll(); }));
+      () => core.settings.specStyle, v => { core.settings.specStyle = v; core.saveUserPrefs(); syncAll(); }));
   host.append(tx("div", "specTheme", "hint specLabel"),
     mkChips(SPEC_THEMES.map(v => [v, THEME_KEYS[v]]),
-      () => window.Trk.core.settings.specTheme, v => { window.Trk.core.settings.specTheme = v; window.Trk.core.saveUserPrefs(); syncAll(); }, "specSegColor"));
-  const gain = window.Trk.core.el("label", "field");
-  const gr = document.createElement("input"), gv = window.Trk.core.el("span", "mono");
+      () => core.settings.specTheme, v => { core.settings.specTheme = v; core.saveUserPrefs(); syncAll(); }, "specSegColor"));
+  const gain = core.el("label", "field");
+  const gr = document.createElement("input"), gv = core.el("span", "mono");
   gr.type = "range"; gr.min = ".4"; gr.max = "2.5"; gr.step = ".05";
-  gr.addEventListener("input", () => { window.Trk.core.settings.specGain = window.Trk.core.num(Number(gr.value), .4, 2.5, 1); gv.textContent = window.Trk.core.settings.specGain.toFixed(2) + "×"; window.Trk.core.saveUserPrefs(); });
+  gr.addEventListener("input", () => { core.settings.specGain = core.num(Number(gr.value), .4, 2.5, 1); gv.textContent = core.settings.specGain.toFixed(2) + "×"; core.saveUserPrefs(); });
   gain.append(tx("span", "specGain"), gr, gv);
   host.append(gain);
-  SYNCS.push(() => { gr.value = String(window.Trk.core.settings.specGain); gv.textContent = window.Trk.core.settings.specGain.toFixed(2) + "×"; });
-  host.append(mkCheck("specPeaks", () => window.Trk.core.settings.specPeaks, v => { window.Trk.core.settings.specPeaks = v; window.Trk.core.saveUserPrefs(); syncAll(); }));
-  host.append(mkCheck("specTv", () => window.Trk.core.settings.specTv, v => { window.Trk.core.settings.specTv = v; window.Trk.core.saveUserPrefs(); syncAll(); }));
+  SYNCS.push(() => { gr.value = String(core.settings.specGain); gv.textContent = core.settings.specGain.toFixed(2) + "×"; });
+  host.append(mkCheck("specPeaks", () => core.settings.specPeaks, v => { core.settings.specPeaks = v; core.saveUserPrefs(); syncAll(); }));
+  host.append(mkCheck("specTv", () => core.settings.specTv, v => { core.settings.specTv = v; core.saveUserPrefs(); syncAll(); }));
   host.append(tx("div", "specTvHint", "hint specTvHint"));
-  host.append(mkCheck("specSkin", () => window.Trk.core.settings.specSkin, v => { window.Trk.core.settings.specSkin = v; window.Trk.core.saveUserPrefs(); syncAll(); }));
+  host.append(mkCheck("specSkin", () => core.settings.specSkin, v => { core.settings.specSkin = v; core.saveUserPrefs(); syncAll(); }));
   host.append(tx("div", "specSkinHint", "hint specSkinHint"));
-  SYNCS.push(() => host.classList.toggle("specOff", !window.Trk.core.settings.specOn));
+  SYNCS.push(() => host.classList.toggle("specOff", !core.settings.specOn));
   return host;
 }
 function syncAll() {
   for (const f of SYNCS) { try { f(); } catch (e) { console.error(e); } }
   syncTvCanvas();
   /* 濃さは CSS 変数で渡す（インラインの opacity だと「オフのとき 0」に勝ってしまうため） */
-  if (tvCanvas) tvCanvas.style.setProperty("--specTvAlpha", String(TV_ALPHA[window.Trk.core.settings.specStyle] || .92));
+  if (tvCanvas) tvCanvas.style.setProperty("--specTvAlpha", String(TV_ALPHA[core.settings.specStyle] || .92));
   updateStatus();
   kick();
 }
 /* 📺 TVの画面に重ねるキャンバス（要るときだけ DOM に出す） */
 function syncTvCanvas() {
   const screenEl = document.querySelector("#tvDock .tvScreen");
-  const want = !!screenEl && specLive() && window.Trk.core.settings.specTv;
+  const want = !!screenEl && specLive() && core.settings.specTv;
   if (!want) { if (tvCanvas && tvCanvas.parentElement) tvCanvas.parentElement.removeChild(tvCanvas); return; }
   if (!tvCanvas) {
     tvCanvas = document.createElement("canvas");
@@ -1315,19 +1316,19 @@ function buildBannerSkin() {
   bannerCanvas.setAttribute("aria-hidden", "true");
   banner.insertBefore(bannerCanvas, banner.firstChild);
   panelCanvases.push(bannerCanvas);
-  GATES.set(bannerCanvas, () => window.Trk.core.settings.specSkin);
+  GATES.set(bannerCanvas, () => core.settings.specSkin);
 
-  zipBtn = window.Trk.core.el("button", "specZip");            // スキンの左上の「＋」／「−」
+  zipBtn = core.el("button", "specZip");            // スキンの左上の「＋」／「−」
   zipBtn.type = "button";
   zipBtn.textContent = "+";
   zipBtn.addEventListener("click", () => {
-    window.Trk.core.settings.specSkinOpen = !window.Trk.core.settings.specSkinOpen;
-    if (window.Trk.core.settings.specSkinOpen) window.Trk.core.settings.specSkin = true;    // 開くときはスキンも入れる
-    window.Trk.core.saveUserPrefs(); syncAll();
+    core.settings.specSkinOpen = !core.settings.specSkinOpen;
+    if (core.settings.specSkinOpen) core.settings.specSkin = true;    // 開くときはスキンも入れる
+    core.saveUserPrefs(); syncAll();
   });
   /* ⚙ 長押し、または スキンツールの「⚙ くわしい設定」（見える代わり）で、設定画面のスペクトラム欄を開いてスクロール */
   const openSpecSettings = () => {
-    window.Trk.core.openSettings();
+    core.openSettings();
     setTimeout(() => {
       const p = document.getElementById("specPanel");
       if (!p) return;
@@ -1338,26 +1339,26 @@ function buildBannerSkin() {
   window.Trk.library.onLongPress(zipBtn, openSpecSettings);
   banner.append(zipBtn);
 
-  skinTools = window.Trk.core.el("div", "specSkinTools");      // 開いたときだけ出る（幅を取らない小さな操作）
-  styleCycleBtn = window.Trk.core.el("button", "specNext");
+  skinTools = core.el("div", "specSkinTools");      // 開いたときだけ出る（幅を取らない小さな操作）
+  styleCycleBtn = core.el("button", "specNext");
   styleCycleBtn.type = "button";
   styleCycleBtn.dataset.i18n = "specNextStyle";
   styleCycleBtn.addEventListener("click", () => {
-    const i = Math.max(0, SPEC_STYLES.indexOf(window.Trk.core.settings.specStyle));
-    window.Trk.core.settings.specStyle = SPEC_STYLES[(i + 1) % SPEC_STYLES.length];
-    window.Trk.core.saveUserPrefs(); syncAll();
+    const i = Math.max(0, SPEC_STYLES.indexOf(core.settings.specStyle));
+    core.settings.specStyle = SPEC_STYLES[(i + 1) % SPEC_STYLES.length];
+    core.saveUserPrefs(); syncAll();
   });
   skinTools.append(styleCycleBtn);
-  const specMore = window.Trk.core.el("button", "specNext moreBtn"); specMore.type = "button";
+  const specMore = core.el("button", "specNext moreBtn"); specMore.type = "button";
   specMore.dataset.i18n = "specOpenSettings"; specMore.addEventListener("click", openSpecSettings);
   skinTools.append(specMore);
-  const dotRow = window.Trk.core.el("div", "specDots");
+  const dotRow = core.el("div", "specDots");
   for (const v of SPEC_THEMES) {
-    const b = window.Trk.core.el("button", "specDot");
+    const b = core.el("button", "specDot");
     b.type = "button";
     b.dataset.specVal = v;
     b.style.setProperty("--specSwatch", THEME_SWATCH[v] || "currentColor");
-    b.addEventListener("click", () => { window.Trk.core.settings.specTheme = v; window.Trk.core.saveUserPrefs(); syncAll(); });
+    b.addEventListener("click", () => { core.settings.specTheme = v; core.saveUserPrefs(); syncAll(); });
     dotRow.append(b);
     skinDots.push(b);
   }
@@ -1367,19 +1368,19 @@ function buildBannerSkin() {
   SYNCS.push(() => {
     const live = specLive();
     if (bannerHost) {
-      bannerHost.classList.toggle("specSkin", !!window.Trk.core.settings.specSkin && live);
-      bannerHost.classList.toggle("specOpen", !!window.Trk.core.settings.specSkin && !!window.Trk.core.settings.specSkinOpen && live);
+      bannerHost.classList.toggle("specSkin", !!core.settings.specSkin && live);
+      bannerHost.classList.toggle("specOpen", !!core.settings.specSkin && !!core.settings.specSkinOpen && live);
     }
     if (zipBtn) {
       zipBtn.hidden = !live;
-      zipBtn.textContent = window.Trk.core.settings.specSkinOpen ? "−" : "+";
-      const tip = tr(window.Trk.core.settings.specSkinOpen ? "specSkinCloseTip" : "specSkinOpenTip") + " · " + tr("specSettingsTip");
+      zipBtn.textContent = core.settings.specSkinOpen ? "−" : "+";
+      const tip = tr(core.settings.specSkinOpen ? "specSkinCloseTip" : "specSkinOpenTip") + " · " + tr("specSettingsTip");
       if (zipBtn.title !== tip) { zipBtn.title = tip; zipBtn.setAttribute("aria-label", tip); }
     }
-    if (skinTools) skinTools.hidden = !(window.Trk.core.settings.specSkin && window.Trk.core.settings.specSkinOpen && live);
-    if (styleCycleBtn) styleCycleBtn.textContent = "⇄ " + tr(STYLE_KEYS[window.Trk.core.settings.specStyle] || "specStyleBars");
+    if (skinTools) skinTools.hidden = !(core.settings.specSkin && core.settings.specSkinOpen && live);
+    if (styleCycleBtn) styleCycleBtn.textContent = "⇄ " + tr(STYLE_KEYS[core.settings.specStyle] || "specStyleBars");
     for (const b of skinDots) {
-      const sel = b.dataset.specVal === window.Trk.core.settings.specTheme;
+      const sel = b.dataset.specVal === core.settings.specTheme;
       b.classList.toggle("selected", sel);
       b.setAttribute("aria-pressed", sel ? "true" : "false");
       const tip = tr(THEME_KEYS[b.dataset.specVal] || "specTheme");
@@ -1393,7 +1394,7 @@ addEventListener("DOMContentLoaded", () => {
   const col = document.querySelector(".songCol");
   const fxPanel = document.getElementById("fxPanel");
   const secSound = document.getElementById("seEnabled");
-  window.Trk.core.saveUserPrefs();
+  core.saveUserPrefs();
 
   /* ① 🎛 ラックの「くわしい」の中（ドックの一部なので、ならべ替えの邪魔をしない）
      ⚠ くわしい欄は applyOrder() で #fxDock の外（.songCol の直下）へ動くことがあるので、
@@ -1401,10 +1402,10 @@ addEventListener("DOMContentLoaded", () => {
   const moreBtn = document.querySelector('button[data-i18n="dockMore"]');
   const dockMore = moreBtn ? moreBtn.closest("details") : null;
   if (dockMore) {
-    const box = window.Trk.core.el("div", "specBox");
+    const box = core.el("div", "specBox");
     box.append(tx("h3", "specTitle"));
     buildBox(box, true);
-    const dockStatus = window.Trk.core.el("div", "hint specStatus");
+    const dockStatus = core.el("div", "hint specStatus");
     statusNodes.push(dockStatus);
     box.append(dockStatus);
     if (moreBtn) moreBtn.before(box); else dockMore.append(box);
@@ -1412,11 +1413,11 @@ addEventListener("DOMContentLoaded", () => {
   }
 
   /* ② 設定画面「🔊 サウンド」の下（fx.js の #fxPanel の直後） */
-  const panel = window.Trk.core.el("details", "panel"); panel.id = "specPanel";
+  const panel = core.el("details", "panel"); panel.id = "specPanel";
   panel.append(tx("summary", "specTitle"));
-  const spBox = window.Trk.core.el("div", "specBox");
+  const spBox = core.el("div", "specBox");
   buildBox(spBox, true);      // いちばん上に「🚫 スペクトラムを使用しない」。開いているときだけ描く
-  const spStatus = window.Trk.core.el("div", "hint specStatus");
+  const spStatus = core.el("div", "hint specStatus");
   statusNodes.push(spStatus);
   spBox.append(spStatus);
   spBox.append(tx("div", "specWebAudio", "hint specWebAudio"));
@@ -1435,9 +1436,9 @@ addEventListener("DOMContentLoaded", () => {
   on("chart", () => syncAll());
   addEventListener("resize", kick);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) kick(); });
-  for (const ev of ["play", "pause", "seeked", "loadeddata", "canplay"]) window.Trk.core.video.addEventListener(ev, kick);
+  for (const ev of ["play", "pause", "seeked", "loadeddata", "canplay"]) core.video.addEventListener(ev, kick);
   /* 音を見る準備は、ユーザーの操作の中だけでする（ブラウザの音の制限のため） */
-  const arm = () => { hadGesture = true; if (wantLive() && !window.Trk.core.video.paused) ensureAnalyser(); };
+  const arm = () => { hadGesture = true; if (wantLive() && !core.video.paused) ensureAnalyser(); };
   addEventListener("pointerdown", arm, true);
   addEventListener("keyup", arm, true);
   addEventListener("touchstart", arm, { capture: true, passive: true });
@@ -1453,17 +1454,17 @@ window.TrkSpec = Object.freeze({
   version: 3,
   styles: () => SPEC_STYLES.slice(),
   themes: () => SPEC_THEMES.slice(),
-  style: () => window.Trk.core.settings.specStyle,
-  theme: () => window.Trk.core.settings.specTheme,
-  skin: () => !!window.Trk.core.settings.specSkin,
-  skinOpen: () => !!window.Trk.core.settings.specSkinOpen,
-  setSkin: v => { window.Trk.core.settings.specSkin = !!v; window.Trk.core.saveUserPrefs(); syncAll(); return window.Trk.core.settings.specSkin; },
-  openSkin: v => { window.Trk.core.settings.specSkinOpen = !!v; window.Trk.core.saveUserPrefs(); syncAll(); return window.Trk.core.settings.specSkinOpen; },
-  cycleStyle: () => { const i = Math.max(0, SPEC_STYLES.indexOf(window.Trk.core.settings.specStyle)); window.Trk.core.settings.specStyle = SPEC_STYLES[(i + 1) % SPEC_STYLES.length]; window.Trk.core.saveUserPrefs(); syncAll(); return window.Trk.core.settings.specStyle; },
-  setStyle: id => { if (SPEC_STYLES.includes(id)) { window.Trk.core.settings.specStyle = id; window.Trk.core.saveUserPrefs(); syncAll(); return true; } return false; },
-  setTheme: id => { if (SPEC_THEMES.includes(id)) { window.Trk.core.settings.specTheme = id; window.Trk.core.saveUserPrefs(); syncAll(); return true; } return false; },
-  setOn: v => { window.Trk.core.settings.specOn = !!v; window.Trk.core.saveUserPrefs(); syncAll(); return window.Trk.core.settings.specOn; },
-  showTv: v => { window.Trk.core.settings.specTv = !!v; window.Trk.core.saveUserPrefs(); syncAll(); return window.Trk.core.settings.specTv; },
+  style: () => core.settings.specStyle,
+  theme: () => core.settings.specTheme,
+  skin: () => !!core.settings.specSkin,
+  skinOpen: () => !!core.settings.specSkinOpen,
+  setSkin: v => { core.settings.specSkin = !!v; core.saveUserPrefs(); syncAll(); return core.settings.specSkin; },
+  openSkin: v => { core.settings.specSkinOpen = !!v; core.saveUserPrefs(); syncAll(); return core.settings.specSkinOpen; },
+  cycleStyle: () => { const i = Math.max(0, SPEC_STYLES.indexOf(core.settings.specStyle)); core.settings.specStyle = SPEC_STYLES[(i + 1) % SPEC_STYLES.length]; core.saveUserPrefs(); syncAll(); return core.settings.specStyle; },
+  setStyle: id => { if (SPEC_STYLES.includes(id)) { core.settings.specStyle = id; core.saveUserPrefs(); syncAll(); return true; } return false; },
+  setTheme: id => { if (SPEC_THEMES.includes(id)) { core.settings.specTheme = id; core.saveUserPrefs(); syncAll(); return true; } return false; },
+  setOn: v => { core.settings.specOn = !!v; core.saveUserPrefs(); syncAll(); return core.settings.specOn; },
+  showTv: v => { core.settings.specTv = !!v; core.saveUserPrefs(); syncAll(); return core.settings.specTv; },
   analyser: () => an,
   request: () => ensureAnalyser(),
   active: () => !!(specLive() && (panelOn() || tvOn())),

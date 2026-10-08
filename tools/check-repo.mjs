@@ -8,6 +8,7 @@
  * replace real-browser testing.
  */
 import fs from "node:fs";
+import { restoreCoreAlias, sourceOf } from "./lib/js-source.mjs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import vm from "node:vm";
@@ -30,8 +31,10 @@ function ok(message) {
 }
 /* 名前空間 D：js/ の本文では、領域の接頭辞 window.Trk.<領域>. を取り除いて照合する（同じ束縛の別の書き方）。
    window.Trk.overlay は取り除かない（書斎・シンスの旗の検査が、その綴りを見る）。 */
+/* 別名（const core = window.Trk.core;）を使うファイルは、同じ束縛として元の綴りに戻して照合する。
+   alias の行を消し、その後の core. を取り除く（core.js の文字列は除く）。 */
 function read(rel) {
-  const text = fs.readFileSync(path.join(root, rel), "utf8");
+  const text = sourceOf(rel, fs.readFileSync(path.join(root, rel), "utf8"));
   return rel.startsWith("js/") ? text.replace(/window\.Trk\.(?!overlay\b)[A-Za-z]\w*\./g, "") : text;
 }
 
@@ -115,7 +118,7 @@ else ok(`index.html static IDs are unique (${indexIds.length} checked)`);
   const uniqueIds = new Set(ids).size === ids.length;
   const langsOk = ["tvCatPortrait", "tvCatAnime", "tvCatTexture", "tvCatQuality", "tvParamRandHint", "tvParamHint"]
     .every(key => (tv.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4);
-  const presetsOk = ids.length === 65 && uniqueIds && Object.values(catCounts).every(n => n === 5);
+  const presetsOk = ids.length === 70 && uniqueIds && Object.values(catCounts).every(n => n === 5);
   const resetOk = tv.includes('bindLongPressReset(rPar, () => applyParamValues(0, 0, "tvParamDefaultDone"))') &&
     tv.includes('bindLongPressReset(dimInp, () => applyParamValues(0, settings.bgBlur, "tvDimResetDone")') &&
     tv.includes('bindLongPressReset(blurInp, () => applyParamValues(settings.bgDim, 0, "tvBlurResetDone")') &&
@@ -131,12 +134,12 @@ else ok(`index.html static IDs are unique (${indexIds.length} checked)`);
     tv.includes("CanvasRenderingContext2D.filter is unavailable") && tv.includes("ctx.canvas.style.filter = filter") &&
     notice.includes("No third-party LUTs") && notice.includes("do not detect faces") && notice.includes("do not increase");
   const favoriteStyleOk = style.includes(".tvParamFavList") && style.includes(".tvParamTools");
-  if (!presetsOk) fail(`TV preset catalog should contain 65 unique filters, five in each new category (found ${ids.length}; ${JSON.stringify(catCounts)})`);
+  if (!presetsOk) fail(`TV preset catalog should contain 70 unique filters, five in each new category (found ${ids.length}; ${JSON.stringify(catCounts)})`);
   else if (!langsOk) fail("TV portrait/anime/texture/quality groups or parameter reset help are missing from one of the four languages");
   else if (!resetOk) fail("TV random button and brightness/blur sliders need their long-press reset paths and explicit reset control");
   else if (!favoritesOk) fail("brightness/blur favorites must be bounded, validated, persisted and safe-mode aware");
   else if (!overlaysOk || !canvasOriginalOk || !favoriteStyleOk) fail("original Canvas TV overlays, documented rights/scope, CSS-filter fallback, or parameter-favorite styling are missing");
-  else ok("TV catalog (65 presets), localized picture categories, long-press resets, and bounded brightness/blur favorites are wired");
+  else ok("TV catalog (70 presets), localized picture categories, long-press resets, and bounded brightness/blur favorites are wired");
 }
 
 const privacy = read("privacy.html").replace(/<!--[\s\S]*?-->/g, "");
@@ -204,14 +207,14 @@ if (!orderMatch) {
   fail("LIB_SKIN_ORDER could not be read");
 } else {
   const ids = [...orderMatch[1].matchAll(/["']([^"']+)["']/g)].map(m => m[1]);
-  if (ids.length !== 16) fail(`expected 16 shelf skins, found ${ids.length}`);
-  else ok("shelf skin count is 16");
+  if (ids.length !== 30) fail(`expected 30 shelf skins, found ${ids.length}`);
+  else ok("shelf skin count is 30");
 }
 if (/棚スキン11種|・11種類/.test(read("css/style.css") + skins)) {
   fail("stale shelf skin count (11) remains in source comments");
 }
 
-// Overall look skins: 27 presets in data.js (incl. the locked 🎓 reward skin) + 4 Miku skins = 31.
+// Overall look skins: 33 presets in data.js (incl. the locked 🎓 reward skin, 3 見やすさ skins and 6 生活 skins, 4 ゲーム画面 skins) + 4 Miku skins = 44.
 const dataJs = read("js/data.js");
 const skinsStart = dataJs.indexOf("const SKINS = {");
 const skinsEnd = dataJs.indexOf("\n};", skinsStart);
@@ -220,8 +223,8 @@ if (skinsStart < 0 || skinsEnd < 0) {
 } else {
   const presetCount = (dataJs.slice(skinsStart, skinsEnd).match(/label:\{ja:/g) || []).length;
   const mikuCount = (read("js/characters/miku.js").match(/^ {2}(?:window\.Trk\.data\.)?SKINS\.[A-Za-z0-9]+ = \{/gm) || []).length;
-  if (presetCount + mikuCount !== 31) fail(`expected 31 overall skins, found ${presetCount + mikuCount}`);
-  else ok("overall skin count is 31");
+  if (presetCount + mikuCount !== 44) fail(`expected 44 overall skins, found ${presetCount + mikuCount}`);
+  else ok("overall skin count is 44");
   /* 🎓 ごほうびスキン（グラデュエーション）は、スタンプ5つで解禁まで鍵がかかっていること */
   if (!/graduation:\s*\{[\s\S]*?locked:\s*true/.test(dataJs.slice(skinsStart, skinsEnd)) ||
       !read("js/core.js").includes("SKINS[id].locked && !settings.skinGradUnlocked")) fail("graduation reward-skin lock is missing");
@@ -1638,7 +1641,7 @@ for (const [rel, name] of Object.entries(PATCHED_FUNCTIONS).flatMap(([r, ns]) =>
   const owner = exists(rel) ? read(rel) : "";
   const accessor = new RegExp(`Object\\.defineProperty\\(window, "${name}", \\{[^}]*get:\\(\\) => ${name}, set:v => \\{ ${name} = v; \\} \\}\\)`);
   const patchedElsewhere = walk(path.join(root, "js")).filter(f => f.endsWith(".js") && path.relative(root, f) !== rel)
-    .some(f => new RegExp(`^\\s*(?:window\\.(?:Trk\\.[\\w]+\\.)?)?${name} = (?:async )?(?:function|\\(|[A-Za-z_$][\\w$]* =>|[A-Za-z_$][\\w$]*;)`, "m").test(fs.readFileSync(f, "utf8")));
+    .some(f => new RegExp(`^\\s*(?:window\\.(?:Trk\\.[\\w]+\\.)?)?${name} = (?:async )?(?:function|\\(|[A-Za-z_$][\\w$]* =>|[A-Za-z_$][\\w$]*;)`, "m").test(read(path.relative(root, f))));
   if (!patchedElsewhere) fail(`${name}: no later file overrides it (remove it from PATCHED_FUNCTIONS if this is intended)`);
   else if (!accessor.test(owner)) fail(`${name} is overridden by a later file but ${rel} does not expose it as a window accessor`);
   else ok(`${name} override reaches internal calls (window accessor in ${rel})`);
@@ -1723,6 +1726,24 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   if (!block || keys.length < 10) fail("js/addons.js: makeApi の鍵を読めませんでした（" + keys.length + "件）");
   else if (missing.length) fail("docs/ADDONS.md に載っていない api の鍵: " + missing.join(", "));
   else ok("アドオンの api の鍵（" + keys.length + "件）は docs/ADDONS.md に全て載っている");
+}
+
+/* 廃止予定の互換名：js/core.js が window 直下に出す互換名（defineProperty(window, "名前")）と、
+   docs/ADDONS.md の「廃止予定の互換名」の一覧が一致すること。対象外（_trkStudyRoomOpen＝fx.js が読む）は除く。
+   増やした・減らした一方だけを変えると落ちる。 */
+{
+  const coreSrc = fs.readFileSync(path.join(root, "js/core.js"), "utf8");
+  const exempt = new Set(["_trkStudyRoomOpen"]);
+  const actual = [...coreSrc.matchAll(/defineProperty\(window, "([A-Za-z_$][\w$]*)"/g)].map(m => m[1]).filter(n => !exempt.has(n));
+  const docs = fs.readFileSync(path.join(root, "docs/ADDONS.md"), "utf8");
+  const sec = (docs.match(/### 廃止予定の互換名[\s\S]*?(?=\n## |\n### )/) || [""])[0];
+  const target = (sec.match(/^- 対象：(.*)$/m) || [, ""])[1];   /* 一覧は「- 対象：」の行にだけ書く */
+  const listed = [...target.matchAll(/`([A-Za-z_$][\w$]*)`/g)].map(m => m[1]).filter(n => !exempt.has(n));
+  const onlyCode = actual.filter(n => !listed.includes(n));
+  const onlyDocs = [...new Set(listed)].filter(n => !actual.includes(n));
+  if (!sec) fail("docs/ADDONS.md に「廃止予定の互換名」の節がありません");
+  else if (onlyCode.length || onlyDocs.length) fail("廃止予定の互換名が一致しません（core.js にだけ: " + onlyCode.join(", ") + " ／ 文書にだけ: " + onlyDocs.join(", ") + "）");
+  else ok("廃止予定の互換名（" + actual.length + "件）は core.js と docs/ADDONS.md で一致");
 }
 
 /* 項目 5（README の分割）：README は概要に絞る（上限 12KB）。docs/guide/ の全ファイルは目次（index.md）に載せる。 */

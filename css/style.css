@@ -1025,6 +1025,63 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
 #tvDock[data-skin="gameboy"] .gbDpad{width:24px;height:24px;background:radial-gradient(circle,#222,#000);clip-path:polygon(35% 0,65% 0,65% 35%,100% 35%,100% 65%,65% 65%,65% 100%,35% 100%,35% 65%,0 65%,0 35%,35% 35%);border-radius:2px}
 #tvDock[data-skin="gameboy"] .gbBtnA{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,#a00,#600);border:1px solid #000}
 #tvDock[data-skin="gameboy"] .gbBtnB{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,#a00,#600);border:1px solid #000}
+
+/* ②TVドックの追加（fridge・bowl・washer）と、前の3種の帯への合わせ直し */
+#tvDock[data-skin="train"] .trainDoor{display:none}
+#tvDock[data-skin="lantern"] .lanTassel{bottom:0;height:8px}
+#tvDock[data-skin="fridge"] .tvDev{background:linear-gradient(90deg,#f4f7fa,#dfe5ec 50%,#f4f7fa);border:3px solid #9aa6b2;border-radius:14px;box-shadow:0 4px 0 #7d8894}
+#tvDock[data-skin="fridge"] .tvScreenWrap{border:4px solid #b8c2cc;border-radius:8px;background:#1a2028}
+#tvDock[data-skin="fridge"] .tvScreen{background:#1a2028;color:#e8f2ff}
+#tvDock[data-skin="fridge"] .fridgeSeam{position:absolute;left:0;right:0;top:0;height:2px;background:#9aa6b2}
+#tvDock[data-skin="fridge"] .fridgeHandle{position:absolute;left:25%;right:25%;top:14px;height:6px;border-radius:3px;background:linear-gradient(#e6ebf0,#7d8894)}
+#tvDock[data-skin="fridge"] .fridgeNote{position:absolute;left:8px;top:8px;width:20px;height:14px;background:#fff6a0;transform:rotate(-5deg);box-shadow:0 1px 2px rgba(0,0,0,.3)}
+#tvDock[data-skin="fridge"] .fridgeNote.n2{left:auto;right:16px;top:auto;bottom:6px;width:16px;height:12px;background:#bfe8ff;transform:rotate(4deg)}
+#tvDock[data-skin="bowl"] .tvDev{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.95),rgba(190,225,240,.6) 60%,rgba(120,180,210,.55));border:2px solid rgba(255,255,255,.75);border-radius:50%;aspect-ratio:1;box-shadow:inset 0 -18px 30px rgba(40,120,170,.35)}
+#tvDock[data-skin="bowl"] .tvScreenWrap{border:0;border-radius:50%;aspect-ratio:1;background:#9fd6ec}
+#tvDock[data-skin="bowl"] .tvScreen{border-radius:50%;background:linear-gradient(#bfe8f7,#4aa3c9);color:#063a52}
+#tvDock[data-skin="bowl"] .bowlWater{position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.35),rgba(74,163,201,.35))}
+#tvDock[data-skin="bowl"] .bowlPebbles{position:absolute;left:0;right:0;bottom:0;height:12px;background:radial-gradient(circle at 20% 60%,#d8c3a5 0 4px,transparent 5px),radial-gradient(circle at 55% 40%,#c9b08f 0 5px,transparent 6px),radial-gradient(circle at 85% 70%,#e0cdb0 0 4px,transparent 5px)}
+#tvDock[data-skin="bowl"] .bowlFish{position:absolute;left:10%;top:30%;font-size:16px;animation:bowlSwim 6s infinite ease-in-out}
+#tvDock[data-skin="bowl"] .bowlFish::after{content:"🐟"}
+#tvDock[data-skin="bowl"] .bowlBubble{position:absolute;left:70%;bottom:8px;width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.7);animation:bowlUp 3s infinite linear}
+@keyframes bowlSwim{0%,100%{transform:translateX(0)}50%{transform:translateX(120%)}}
+@keyframes bowlUp{from{transform:translateY(0);opacity:1}to{transform:translateY(-36px);opacity:0}}
+#tvDock[data-skin="washer"] .tvDev{background:linear-gradient(#f7f8fa,#d9dee5);border:3px solid #7d8894;border-radius:14px;box-shadow:0 4px 0 #5f6a76}
+#tvDock[data-skin="washer"] .tvScreenWrap{border:4px solid #3a424d;border-radius:50%;aspect-ratio:1;background:#1c2b3c;box-shadow:inset 0 0 14px rgba(0,0,0,.6)}
+#tvDock[data-skin="washer"] .tvScreen{border-radius:50%;background:radial-gradient(circle,#2f6fa8,#14283c);color:#fff}
+#tvDock[data-skin="washer"] .washPanel{position:absolute;left:8px;top:50%;width:30%;height:8px;margin-top:-4px;border-radius:4px;background:#5f6a76}
+#tvDock[data-skin="washer"] .washDial{position:absolute;right:8px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;background:radial-gradient(circle,#eee,#888);border:2px solid #555}
+#tvDock[data-skin="washer"] .washBubbles{position:absolute;left:36%;right:36%;top:6px;bottom:6px;border-radius:12px;background:radial-gradient(circle,rgba(120,200,255,.8) 0 3px,transparent 4px) 0 0/12px 12px;animation:washSpin 1.6s infinite linear}
+@keyframes washSpin{to{background-position:12px 12px}}
+
+/* ②TVドックの追加（train・porthole・lantern）。飾りは <i> の組み合わせだけで作る */
+#tvDock[data-skin="train"] .tvDev{background:linear-gradient(#e9ecef,#bfc6d1);border:3px solid #34435e;border-radius:8px;box-shadow:0 4px 0 #34435e}
+#tvDock[data-skin="train"] .tvScreenWrap{border:4px solid #1d2a40;border-radius:4px;background:#0c1322}
+#tvDock[data-skin="train"] .tvScreen{background:#0c1322;color:#ffcc33;font-family:monospace}
+#tvDock[data-skin="train"] .trainRail{position:absolute;left:0;right:0;top:0;height:14px;background:repeating-linear-gradient(90deg,#34435e 0 14px,#1d2a40 14px 16px)}
+#tvDock[data-skin="train"] .trainLed{position:absolute;left:6px;bottom:6px;width:10px;height:10px;border-radius:50%;background:#ffcc33;box-shadow:0 0 6px #ffcc33;animation:trainBlink 1.6s infinite steps(2)}
+#tvDock[data-skin="train"] .trainDoor{position:absolute;top:16px;bottom:16px;width:12%;background:linear-gradient(90deg,#9aa4b4,#dfe4ec);opacity:.5}
+#tvDock[data-skin="train"] .trainDoor.left{left:0}
+#tvDock[data-skin="train"] .trainDoor.right{right:0}
+@keyframes trainBlink{50%{opacity:.2}}
+#tvDock[data-skin="porthole"] .tvDev{background:radial-gradient(circle at 30% 25%,#ffffff,#d8dde2);border:3px solid #b08d57;border-radius:50%;aspect-ratio:1;box-shadow:inset 0 0 0 6px #d8dde2,inset 0 0 0 8px #8a6c42}
+#tvDock[data-skin="porthole"] .tvScreenWrap{border:6px solid #b08d57;border-radius:50%;aspect-ratio:1;background:#0b3d5c;box-shadow:inset 0 0 24px rgba(0,0,0,.5)}
+#tvDock[data-skin="porthole"] .tvScreen{border-radius:50%;background:radial-gradient(circle,#2f8fbf,#0b3d5c 75%);color:#fff}
+#tvDock[data-skin="porthole"] .portRivet{position:absolute;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle,#e7c48a,#8a6c42);z-index:2}
+#tvDock[data-skin="porthole"] .portRivet.r1{top:6%;left:50%;margin-left:-4px}
+#tvDock[data-skin="porthole"] .portRivet.r2{bottom:6%;left:50%;margin-left:-4px}
+#tvDock[data-skin="porthole"] .portRivet.r3{left:6%;top:50%;margin-top:-4px}
+#tvDock[data-skin="porthole"] .portRivet.r4{right:6%;top:50%;margin-top:-4px}
+#tvDock[data-skin="porthole"] .portWave{position:absolute;left:-10%;right:-10%;bottom:0;height:30%;border-radius:50% 50% 0 0;background:rgba(255,255,255,.18);animation:portRoll 4s infinite ease-in-out}
+@keyframes portRoll{50%{transform:translateX(6%)}}
+#tvDock[data-skin="lantern"] .tvDev{background:radial-gradient(ellipse at center,#e8603c,#b8361c 70%);border:3px solid #3a2418;border-radius:44% 44% 40% 40%/30% 30% 40% 40%;box-shadow:inset 0 0 26px rgba(255,210,120,.45)}
+#tvDock[data-skin="lantern"] .tvScreenWrap{border:5px solid #3a2418;border-radius:40%;background:repeating-linear-gradient(90deg,transparent 0 16px,rgba(58,36,24,.5) 16px 18px),#f7d9a0}
+#tvDock[data-skin="lantern"] .tvScreen{background:#f7d9a0;color:#3a1a0a}
+#tvDock[data-skin="lantern"] .lanCord{position:absolute;left:50%;top:0;width:2px;height:8px;margin-left:-1px;background:#3a2418}
+#tvDock[data-skin="lantern"] .lanCap{position:absolute;left:30%;right:30%;height:6px;background:#3a2418;border-radius:3px}
+#tvDock[data-skin="lantern"] .lanCap.top{top:8px}
+#tvDock[data-skin="lantern"] .lanCap.bottom{bottom:0}
+#tvDock[data-skin="lantern"] .lanTassel{position:absolute;left:50%;bottom:-10px;width:6px;height:10px;margin-left:-3px;background:#ffd27a;border-radius:0 0 3px 3px}
 #tvDock[data-skin="gameboy"] .gbSpeaker{width:28px;height:10px;background:repeating-linear-gradient(90deg,#444 0 1px,#aaa 1px 3px);border-radius:2px;transform:rotate(-20deg)}
 
 #tvDock[data-skin="jumbotron"] .tvDev{background:linear-gradient(#222,#000);border:4px solid #444;color:#fff;border-radius:6px;box-shadow:0 0 0 8px #111, 0 12px 30px rgba(0,0,0,.8)}
@@ -1428,6 +1485,113 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
   border:2px solid #b22222;box-shadow:0 0 12px rgba(178,34,34,.35)}
 #libPanel[data-lib-skin="menu"] .libTab .libTabN{background:#ded5be;color:#4a3f2c}
 #libPanel[data-lib-skin="menu"] .libTab[aria-selected="true"] .libTabN{background:#b22222;color:#fff}
+
+/* ③棚スキンの追加（toolbox・herbarium・kusuri・geta・dagashi） */
+#libPanel[data-lib-skin="toolbox"] .libTabs{gap:6px;padding:10px 12px 6px;border-radius:6px;background:linear-gradient(#3b4a43,#25302a);border:2px solid #17201b}
+#libPanel[data-lib-skin="toolbox"] .libTab{border-radius:4px;border:2px solid #5b6661;background:linear-gradient(#c9d1cf,#9aa6a2);color:#1d2421;box-shadow:inset 0 -3px 0 #7d8985}
+#libPanel[data-lib-skin="toolbox"] .libTab[aria-selected="true"]{background:linear-gradient(#f6c667,#e8a33d);color:#1d1408;border-color:#8a5a12}
+#libPanel[data-lib-skin="toolbox"] .libTab .libTabN{background:#5b6661;color:#f2f5f4}
+#libPanel[data-lib-skin="toolbox"] .libTab[aria-selected="true"] .libTabN{background:#1d1408;color:#f6c667}
+
+#libPanel[data-lib-skin="herbarium"] .libTabs{gap:8px;padding:10px 12px 6px;border-radius:4px;background:#efe7d2;border:1px solid #b9ab88}
+#libPanel[data-lib-skin="herbarium"] .libTab{border-radius:2px;border:1px dashed #8c7e5e;background:#fffdf6;color:#2b3b2b;font-style:italic;box-shadow:0 1px 0 #b9ab88}
+#libPanel[data-lib-skin="herbarium"] .libTab[aria-selected="true"]{background:#2e5e3a;color:#ffffff;border:1px solid #1d3d25;font-style:normal}
+#libPanel[data-lib-skin="herbarium"] .libTab .libTabN{background:#e4dcc4;color:#2b3b2b}
+#libPanel[data-lib-skin="herbarium"] .libTab[aria-selected="true"] .libTabN{background:#c9e3c2;color:#1d3d25}
+
+#libPanel[data-lib-skin="kusuri"] .libTabs{gap:6px;padding:10px 12px 6px;border-radius:6px;background:#4a2f18;border:2px solid #2a1a0c}
+#libPanel[data-lib-skin="kusuri"] .libTab{border-radius:3px;border:1px solid #3e2410;background:linear-gradient(#8b5a2b,#6b4120);color:#fbe7c6;box-shadow:inset 0 -2px 0 #3e2410,inset 0 1px 0 rgba(255,255,255,.2)}
+#libPanel[data-lib-skin="kusuri"] .libTab[aria-selected="true"]{background:linear-gradient(#e0b16a,#c49a4e);color:#2a1608;border:2px solid #d9a441}
+#libPanel[data-lib-skin="kusuri"] .libTab .libTabN{background:#3e2410;color:#fbe7c6}
+#libPanel[data-lib-skin="kusuri"] .libTab[aria-selected="true"] .libTabN{background:#2a1608;color:#f6d28a}
+
+#libPanel[data-lib-skin="geta"] .libTabs{gap:6px;padding:12px 12px 6px;border-radius:6px;background:#3a2a1c;border:2px solid #22170d}
+#libPanel[data-lib-skin="geta"] .libTab{border-radius:6px 6px 2px 2px;border:2px solid #2a1c10;background:#7a5a3a;color:#fff3dc}
+#libPanel[data-lib-skin="geta"] .libTab[aria-selected="true"]{background:#e4b96b;color:#2a1c10;box-shadow:0 0 12px rgba(228,185,107,.5)}
+#libPanel[data-lib-skin="geta"] .libTab .libTabN{background:#2a1c10;color:#fff3dc}
+#libPanel[data-lib-skin="geta"] .libTab[aria-selected="true"] .libTabN{background:#3a2a1c;color:#e4b96b}
+
+#libPanel[data-lib-skin="dagashi"] .libTabs{gap:6px;padding:10px 12px 6px;border-radius:10px;background:#fff4d6;border:3px solid #e0662b}
+#libPanel[data-lib-skin="dagashi"] .libTab{border-radius:10px;border:2px solid #2a2a2a;color:#1a1a1a;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+#libPanel[data-lib-skin="dagashi"] .libTab:nth-child(5n+1){background:#ffd6e0}
+#libPanel[data-lib-skin="dagashi"] .libTab:nth-child(5n+2){background:#c9f0d8}
+#libPanel[data-lib-skin="dagashi"] .libTab:nth-child(5n+3){background:#cfe6ff}
+#libPanel[data-lib-skin="dagashi"] .libTab:nth-child(5n+4){background:#fff0a8}
+#libPanel[data-lib-skin="dagashi"] .libTab:nth-child(5n+5){background:#e8d4ff}
+#libPanel[data-lib-skin="dagashi"] .libTab[aria-selected="true"]{background:#ffffff;border-width:3px;box-shadow:0 0 0 3px #e0662b}
+#libPanel[data-lib-skin="dagashi"] .libTab .libTabN{background:#2a2a2a;color:#fff}
+
+/* 棚スキンの追加（message・postal・score） */
+#libPanel[data-lib-skin="message"] .libTabs{gap:10px;padding:14px 12px 8px;border-radius:6px;background:#2f4a3a;border:6px solid #8a6a3a;box-shadow:inset 0 0 0 2px #22362b}
+#libPanel[data-lib-skin="message"] .libTab{border-radius:2px;border:0;background:#fff6d8;color:#1d1d1d;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+#libPanel[data-lib-skin="message"] .libTab:nth-child(even){transform:rotate(1.2deg);background:#fdeccc}
+#libPanel[data-lib-skin="message"] .libTab:nth-child(3n){transform:rotate(-1deg);background:#e6f4e0}
+#libPanel[data-lib-skin="message"] .libTab::before{content:"📌";font-size:11px;line-height:1}
+#libPanel[data-lib-skin="message"] .libTab[aria-selected="true"]{background:#fff;color:#a4161a;box-shadow:0 0 0 2px #fff,0 0 12px rgba(255,255,255,.5);transform:none}
+#libPanel[data-lib-skin="message"] .libTab .libTabN{background:#2f4a3a;color:#fff6d8}
+#libPanel[data-lib-skin="message"] .libTab[aria-selected="true"] .libTabN{background:#a4161a;color:#fff}
+
+#libPanel[data-lib-skin="postal"] .libTabs{gap:4px;padding:10px 12px 6px;border-radius:4px;background:#6b5a4a;border:2px solid #4a3d31}
+#libPanel[data-lib-skin="postal"] .libTab{border-radius:2px;border:2px solid #8a7556;background:#e6d6b0;color:#2a2118;font-family:monospace;letter-spacing:.04em}
+#libPanel[data-lib-skin="postal"] .libTab[aria-selected="true"]{background:#fffdf7;color:#b3261e;border-color:#b3261e;box-shadow:inset 0 0 0 1px #b3261e}
+#libPanel[data-lib-skin="postal"] .libTab .libTabN{background:#2a2118;color:#f2e6c8;border-radius:2px}
+#libPanel[data-lib-skin="postal"] .libTab[aria-selected="true"] .libTabN{background:#b3261e;color:#fff}
+
+#libPanel[data-lib-skin="score"] .libTabs{gap:4px;padding:14px 12px 8px;border-radius:4px;background:repeating-linear-gradient(#f7f3e8 0 14px,#3a3228 14px 15px) 0 10px/100% 60px no-repeat,#f7f3e8;border:1px solid #d6cdb8}
+#libPanel[data-lib-skin="score"] .libTab{border-radius:2px;border:1px solid #cfc4a8;border-left:8px solid #7a4a1e;background:#fffdf7;color:#2a2a2a}
+#libPanel[data-lib-skin="score"] .libTab:nth-child(3n+2){border-left-color:#1f3b5c}
+#libPanel[data-lib-skin="score"] .libTab:nth-child(3n){border-left-color:#2f5d3a}
+#libPanel[data-lib-skin="score"] .libTab[aria-selected="true"]{background:#fff;color:#1a1a1a;border:2px solid #1a1a1a;border-left-width:8px;font-weight:700}
+#libPanel[data-lib-skin="score"] .libTab .libTabN{background:#eee6d0;color:#3a3228}
+#libPanel[data-lib-skin="score"] .libTab[aria-selected="true"] .libTabN{background:#1a1a1a;color:#fff}
+
+/* 棚スキンの追加（30種へ）：色覚配慮 okabe・pattern・signage ／ ビビット popart・rainbow・tropical */
+#libPanel[data-lib-skin="okabe"] .libTabs{gap:6px;padding:10px 12px 6px;border-radius:8px;background:#f5f5f5;border:2px solid #222}
+#libPanel[data-lib-skin="okabe"] .libTab{border-radius:6px;border:2px solid #222;background:#0072b2;color:#ffffff}
+#libPanel[data-lib-skin="okabe"] .libTab:nth-child(4n+2){background:#e69f00;color:#111111}
+#libPanel[data-lib-skin="okabe"] .libTab:nth-child(4n+3){background:#56b4e9;color:#111111}
+#libPanel[data-lib-skin="okabe"] .libTab:nth-child(4n){background:#d55e00;color:#111111}
+#libPanel[data-lib-skin="okabe"] .libTab[aria-selected="true"]{box-shadow:0 0 0 3px #f5f5f5,0 0 0 6px #222;border-width:3px}
+#libPanel[data-lib-skin="okabe"] .libTab .libTabN{background:#ffffff;color:#222}
+
+#libPanel[data-lib-skin="pattern"] .libTabs{gap:6px;padding:10px 12px 6px;border-radius:8px;background:#ffffff;border:2px solid #333}
+#libPanel[data-lib-skin="pattern"] .libTab{border-radius:4px;border:2px solid #333;color:#111111;background-color:#ffffff}
+#libPanel[data-lib-skin="pattern"] .libTab:nth-child(4n+1){background-image:repeating-linear-gradient(45deg,#ffffff 0 6px,#d4d4d4 6px 12px)}
+#libPanel[data-lib-skin="pattern"] .libTab:nth-child(4n+2){background-image:radial-gradient(circle,#555 1.6px,transparent 2px);background-size:8px 8px}
+#libPanel[data-lib-skin="pattern"] .libTab:nth-child(4n+3){background-image:repeating-linear-gradient(0deg,#9a9a9a 0 1px,transparent 1px 8px),repeating-linear-gradient(90deg,#9a9a9a 0 1px,transparent 1px 8px)}
+#libPanel[data-lib-skin="pattern"] .libTab:nth-child(4n){background-color:#ececec;border-style:dashed;border-width:3px}
+#libPanel[data-lib-skin="pattern"] .libTab[aria-selected="true"]{border-style:solid;border-width:4px;box-shadow:0 0 0 2px #ffffff;font-weight:700}
+#libPanel[data-lib-skin="pattern"] .libTab .libTabN{background:#111111;color:#ffffff}
+
+#libPanel[data-lib-skin="signage"] .libTabs{gap:8px;padding:12px;border-radius:4px;background:#111111;border:4px solid #111111}
+#libPanel[data-lib-skin="signage"] .libTab{border-radius:2px;border:4px solid #111111;background:#ffd400;color:#111111;font-weight:700;text-transform:uppercase}
+#libPanel[data-lib-skin="signage"] .libTab[aria-selected="true"]{background:#ffffff;color:#111111;outline:4px solid #ffd400;outline-offset:2px}
+#libPanel[data-lib-skin="signage"] .libTab .libTabN{background:#111111;color:#ffd400}
+#libPanel[data-lib-skin="signage"] .libTab[aria-selected="true"] .libTabN{background:#111111;color:#ffffff}
+
+#libPanel[data-lib-skin="popart"] .libTabs{gap:8px;padding:12px;border-radius:6px;background-color:#fff6c8;background-image:radial-gradient(circle,#222 1.2px,transparent 1.8px);background-size:10px 10px;border:3px solid #111111}
+#libPanel[data-lib-skin="popart"] .libTab{border-radius:14px;border:3px solid #111111;background:#ffd60a;color:#111111;box-shadow:4px 4px 0 #111111}
+#libPanel[data-lib-skin="popart"] .libTab:nth-child(3n+2){background:#1e56ff;color:#ffffff}
+#libPanel[data-lib-skin="popart"] .libTab:nth-child(3n){background:#c81d25;color:#ffffff}
+#libPanel[data-lib-skin="popart"] .libTab[aria-selected="true"]{transform:translate(-2px,-2px) rotate(-1deg);box-shadow:7px 7px 0 #111111}
+#libPanel[data-lib-skin="popart"] .libTab .libTabN{background:#111111;color:#ffffff}
+
+#libPanel[data-lib-skin="rainbow"] .libTabs{gap:8px;padding:12px;border-radius:12px;background:#0d0d14;border:3px solid transparent;border-image:linear-gradient(90deg,#ff3ea5,#ff8a00,#ffe600,#2ee59d,#27b6ff,#9b5cff) 1}
+#libPanel[data-lib-skin="rainbow"] .libTab{border-radius:999px;border:2px solid #ff3ea5;background:#111118;color:#ffffff;box-shadow:0 0 8px rgba(255,62,165,.5)}
+#libPanel[data-lib-skin="rainbow"] .libTab:nth-child(6n+2){border-color:#ffe600;box-shadow:0 0 8px rgba(255,230,0,.5)}
+#libPanel[data-lib-skin="rainbow"] .libTab:nth-child(6n+3){border-color:#2ee59d;box-shadow:0 0 8px rgba(46,229,157,.5)}
+#libPanel[data-lib-skin="rainbow"] .libTab:nth-child(6n+4){border-color:#27b6ff;box-shadow:0 0 8px rgba(39,182,255,.5)}
+#libPanel[data-lib-skin="rainbow"] .libTab:nth-child(6n+5){border-color:#9b5cff;box-shadow:0 0 8px rgba(155,92,255,.5)}
+#libPanel[data-lib-skin="rainbow"] .libTab:nth-child(6n){border-color:#ff8a00;box-shadow:0 0 8px rgba(255,138,0,.5)}
+#libPanel[data-lib-skin="rainbow"] .libTab[aria-selected="true"]{background:#2a2a38;color:#ffffff;box-shadow:0 0 16px rgba(255,255,255,.45)}
+#libPanel[data-lib-skin="rainbow"] .libTab .libTabN{background:#2a2a38;color:#ffffff}
+
+#libPanel[data-lib-skin="tropical"] .libTabs{gap:8px;padding:12px;border-radius:18px;background:#0e7c86;border:3px solid #073b4c}
+#libPanel[data-lib-skin="tropical"] .libTab{border-radius:999px;border:0;background:#ff6f61;color:#111111}
+#libPanel[data-lib-skin="tropical"] .libTab:nth-child(3n+2){background:#ffd166;color:#111111}
+#libPanel[data-lib-skin="tropical"] .libTab:nth-child(3n){background:#06d6a0;color:#073b4c}
+#libPanel[data-lib-skin="tropical"] .libTab[aria-selected="true"]{background:#ffffff;color:#073b4c;box-shadow:0 0 0 3px #ffd166}
+#libPanel[data-lib-skin="tropical"] .libTab .libTabN{background:#073b4c;color:#ffffff}
 
 /* 設定画面の「棚スキン」の行（見た目セクション） */
 #libSkinSelect{width:100%;padding:10px 12px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);

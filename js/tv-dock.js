@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ==========================================================================
    trk! tv-dock.js — 📺 映像出力のTV風ドック（メイン画面の曲リストの下）
-   ・本体のスキン30種（ボタン数がそれぞれ違う）、電源・一時停止・お気に入り登録
-   ・映像フィルター65種類（tv-presets.js）をまとめて触れる
+   ・TVドックのスキン33種（ボタン数がそれぞれ違う）、電源・一時停止・お気に入り登録
+   ・映像フィルター70種類（tv-presets.js）をまとめて触れる
    ・🆕 カスタムTVスキン：設定画面の #tvMaker で色・形・飾りを決めて作れる（trk-tvskin / trk_tv_skins_v1）
    ・🆕 ◀ ▶ の物理ボタン：前の曲・次の曲へ（選曲リストをチャンネル送りのように）
    ・🆕 ならべ方：TV →（お気に入り）→ ラック →（お気に入り）→ TVくわしい → ラックくわしい
@@ -12,6 +12,7 @@
    ========================================================================== */
 "use strict";
 (() => {
+  const core = window.Trk.core;
 
 /* ============ 設定の初期化（fx-dock.js と同じく prefs から読む） ============ */
 const L4 = (ja, en, zh, ko) => ({ ja, en, zh, ko });
@@ -47,7 +48,15 @@ const TV_DOCK_SKINS = {
   window:    { n:5, cols:5, deco:"window",  label:L4("🪟 窓ガラスTV", "🪟 Window TV", "🪟 窗户电视", "🪟 창문 TV") },
   microwave: { n:4, cols:2, deco:"microwave",label:L4("🍳 電子レンジテレビ", "🍳 Microwave TV", "🍳 微波炉电视", "🍳 전자레인지 TV") },
   videowall: { n:8, cols:4, deco:"videowall",label:L4("🧱 ビデオウォール", "🧱 Video wall", "🧱 电视墙", "🧱 비디오월") },
-  hologram:  { n:6, cols:3, deco:"hologram",label:L4("🔮 ホログラム", "🔮 Hologram", "🔮 全息投影", "🔮 홀로그램") }
+  hologram:  { n:6, cols:3, deco:"hologram",label:L4("🔮 ホログラム", "🔮 Hologram", "🔮 全息投影", "🔮 홀로그램") },
+  /* ②TVドックの追加（SKIN-PLAN §3-2）：一般的な意匠だけで作る。特定の鉄道会社・船舶・製品の見た目は使わない */
+  train:     { n:4, cols:2, deco:"train",   label:L4("🚃 車内モニター", "🚃 Train monitor", "🚃 车厢显示屏", "🚃 열차 내 모니터") },
+  porthole:  { n:4, cols:4, deco:"porthole",label:L4("🚢 船の丸窓", "🚢 Ship porthole", "🚢 船舷圆窗", "🚢 선박 둥근 창") },
+  lantern:   { n:5, cols:5, deco:"lantern", label:L4("🏮 提灯", "🏮 Lantern", "🏮 灯笼", "🏮 제등") },
+  /* ②TVドックの残り3種（SKIN-PLAN §3-2）。飾りは帯（.tvDeco）の中に収まる形 */
+  fridge:    { n:4, cols:2, deco:"fridge",  label:L4("🧊 冷蔵庫の扉", "🧊 Fridge door", "🧊 冰箱门", "🧊 냉장고 문") },
+  bowl:      { n:4, cols:4, deco:"bowl",    label:L4("🫙 金魚鉢", "🫙 Goldfish bowl", "🫙 金鱼缸", "🫙 금붕어 어항") },
+  washer:    { n:5, cols:5, deco:"washer",  label:L4("🌀 洗濯機の窓", "🌀 Washer window", "🌀 洗衣机窗", "🌀 세탁기 창") }
 };
 const hasTvSkin = id => Object.prototype.hasOwnProperty.call(TV_DOCK_SKINS, id);
 const TV_FAV_MAX = 0, TV_RECENT_MAX = 5, TV_TEMP_ID = "__tv_temp", TV_LONG_MS = 600;   /* 0＝上限なし（⭐は js/favs.js がフォルダ分けする） */
@@ -67,7 +76,7 @@ const TV_VAR_KEYS = ["--tv-body", "--tv-body2", "--tv-bezel", "--tv-screen", "--
 /* 飾り（物理デコ）に使える名前。ラベルは、それを使っている内蔵TVスキンから借りる */
 const TV_DECO_KEYS = ["home", "tube", "wood", "antenna", "paper", "dials", "wall", "holo", "screen", "phone", "arcade",
   "laptop", "cinema", "car", "airplane", "vr", "aquarium", "scope", "cctv", "gameboy", "jumbotron", "frame",
-  "transparent", "toy", "cardboard", "window", "microwave", "videowall"];
+  "transparent", "toy", "cardboard", "window", "microwave", "videowall", "train", "porthole", "lantern", "fridge", "bowl", "washer"];
 const tvDecoLabel = k => {
   const hit = Object.values(TV_DOCK_SKINS).find(d => !d.custom && d.deco === k);
   return hit ? (hit.label[lang] || hit.label.en) : k;
@@ -160,29 +169,29 @@ function applyTvSkinVars(node, id) {
 }
 
 if (typeof prefs !== "undefined") {
-  if (!window.Trk.core.prefs.tvFavSeeded) {
-    const cur = Array.isArray(window.Trk.core.prefs.tvFav) ? window.Trk.core.prefs.tvFav : [];
-    window.Trk.core.prefs.tvFav = [...DEFAULT_TV_FAV, ...cur.filter(id => !DEFAULT_TV_FAV.includes(id))];
+  if (!core.prefs.tvFavSeeded) {
+    const cur = Array.isArray(core.prefs.tvFav) ? core.prefs.tvFav : [];
+    core.prefs.tvFav = [...DEFAULT_TV_FAV, ...cur.filter(id => !DEFAULT_TV_FAV.includes(id))];
   }
   // 既存の保存値を settings に反映（core.js の settings は既に存在）
   // 🛟 ただし ?safe=1（セーフモード）のときは読み戻さない。core.js が入れた「TVは映画館・映像OFF」を守る
-  const keepSafe = (typeof safeModeOn !== "undefined") && window.Trk.core.safeModeOn;
+  const keepSafe = (typeof safeModeOn !== "undefined") && core.safeModeOn;
   if (typeof settings !== "undefined" && !keepSafe) {
-    window.Trk.core.settings.tvDockSkin = pick(window.Trk.core.prefs.tvDockSkin, Object.keys(TV_DOCK_SKINS), "cinema");
-    window.Trk.core.settings.tvDockFive = !!window.Trk.core.prefs.tvDockFive;
-    window.Trk.core.settings.tvDockOpen = window.Trk.core.prefs.tvDockOpen !== false;   /* 既定は開いた状態 */
-    window.Trk.core.settings.tvFav = idList(window.Trk.core.prefs.tvFav, TV_FAV_MAX);   // TV_FAV_MAX=0＝上限なし
-    window.Trk.core.settings.tvParamFavs = window.Trk.core.cleanTvParamFavorites(window.Trk.core.prefs.tvParamFavs);
-    window.Trk.core.settings.tvRecent = idList(window.Trk.core.prefs.tvRecent, TV_RECENT_MAX);
-    window.Trk.core.settings.tvOrder = pick(window.Trk.core.prefs.tvOrder, ["tv-first", "fx-first"], "tv-first");
-    window.Trk.core.settings.tvPowerPrev = typeof window.Trk.core.prefs.tvPowerPrev === "string" ? window.Trk.core.prefs.tvPowerPrev : "color";
-    window.Trk.core.settings.tvOverlay = window.Trk.core.prefs.tvOverlay !== false;
+    core.settings.tvDockSkin = pick(core.prefs.tvDockSkin, Object.keys(TV_DOCK_SKINS), "cinema");
+    core.settings.tvDockFive = !!core.prefs.tvDockFive;
+    core.settings.tvDockOpen = core.prefs.tvDockOpen !== false;   /* 既定は開いた状態 */
+    core.settings.tvFav = idList(core.prefs.tvFav, TV_FAV_MAX);   // TV_FAV_MAX=0＝上限なし
+    core.settings.tvParamFavs = core.cleanTvParamFavorites(core.prefs.tvParamFavs);
+    core.settings.tvRecent = idList(core.prefs.tvRecent, TV_RECENT_MAX);
+    core.settings.tvOrder = pick(core.prefs.tvOrder, ["tv-first", "fx-first"], "tv-first");
+    core.settings.tvPowerPrev = typeof core.prefs.tvPowerPrev === "string" ? core.prefs.tvPowerPrev : "color";
+    core.settings.tvOverlay = core.prefs.tvOverlay !== false;
     /* 🆕 メニューでmp4の映像を流す（選曲中） */
-    window.Trk.core.settings.tvSongWhilePlaying = window.Trk.core.prefs.tvSongWhilePlaying === true;  // ◀▶ を演奏中も効かせる（初期オフ）
-    window.Trk.core.settings.tvMenuPreview = window.Trk.core.prefs.tvMenuPreview !== false;   // 選曲中のTVに映像を映す（初期オン）
-    window.Trk.core.settings.tvMenuVideo = window.Trk.core.prefs.tvMenuVideo === true;        // 音のプレビューがオフでも映像を流す（初期オフ）
-    window.Trk.core.settings.tvDockSkin = hasTvSkin(window.Trk.core.settings.tvDockSkin) ? window.Trk.core.settings.tvDockSkin : "cinema";
-    window.Trk.core.settings.tvFavSeeded = true;
+    core.settings.tvSongWhilePlaying = core.prefs.tvSongWhilePlaying === true;  // ◀▶ を演奏中も効かせる（初期オフ）
+    core.settings.tvMenuPreview = core.prefs.tvMenuPreview !== false;   // 選曲中のTVに映像を映す（初期オン）
+    core.settings.tvMenuVideo = core.prefs.tvMenuVideo === true;        // 音のプレビューがオフでも映像を流す（初期オフ）
+    core.settings.tvDockSkin = hasTvSkin(core.settings.tvDockSkin) ? core.settings.tvDockSkin : "cinema";
+    core.settings.tvFavSeeded = true;
   }
 } else {
   // core.js より前に読まれた場合のフォールバック（通常は起きない）
@@ -191,19 +200,19 @@ if (typeof prefs !== "undefined") {
 
 // settings がまだ無い場合の保険
 if (typeof settings !== "undefined") {
-  window.Trk.core.settings.tvDockSkin = hasTvSkin(window.Trk.core.settings.tvDockSkin) ? window.Trk.core.settings.tvDockSkin : "cinema";
-  window.Trk.core.settings.tvDockFive = !!window.Trk.core.settings.tvDockFive;
-  window.Trk.core.settings.tvDockOpen = !!window.Trk.core.settings.tvDockOpen;
-  window.Trk.core.settings.tvFav = window.Trk.core.settings.tvFav || DEFAULT_TV_FAV.slice();
-  window.Trk.core.settings.tvRecent = window.Trk.core.settings.tvRecent || [];
-  window.Trk.core.settings.tvOrder = window.Trk.core.settings.tvOrder || "tv-first";
-  window.Trk.core.settings.tvPowerPrev = window.Trk.core.settings.tvPowerPrev || "color";
-  window.Trk.core.settings.tvOverlay = window.Trk.core.settings.tvOverlay !== false;
-  window.Trk.core.settings.tvMenuPreview = window.Trk.core.settings.tvMenuPreview !== false;
-  window.Trk.core.settings.tvMenuVideo = window.Trk.core.settings.tvMenuVideo === true;
-  window.Trk.core.settings.bgDim = window.Trk.core.clampTvDim(window.Trk.core.settings.bgDim);
-  window.Trk.core.settings.bgBlur = window.Trk.core.clampTvBlur(window.Trk.core.settings.bgBlur);
-  window.Trk.core.settings.tvParamFavs = window.Trk.core.cleanTvParamFavorites(window.Trk.core.settings.tvParamFavs);
+  core.settings.tvDockSkin = hasTvSkin(core.settings.tvDockSkin) ? core.settings.tvDockSkin : "cinema";
+  core.settings.tvDockFive = !!core.settings.tvDockFive;
+  core.settings.tvDockOpen = !!core.settings.tvDockOpen;
+  core.settings.tvFav = core.settings.tvFav || DEFAULT_TV_FAV.slice();
+  core.settings.tvRecent = core.settings.tvRecent || [];
+  core.settings.tvOrder = core.settings.tvOrder || "tv-first";
+  core.settings.tvPowerPrev = core.settings.tvPowerPrev || "color";
+  core.settings.tvOverlay = core.settings.tvOverlay !== false;
+  core.settings.tvMenuPreview = core.settings.tvMenuPreview !== false;
+  core.settings.tvMenuVideo = core.settings.tvMenuVideo === true;
+  core.settings.bgDim = core.clampTvDim(core.settings.bgDim);
+  core.settings.bgBlur = core.clampTvBlur(core.settings.bgBlur);
+  core.settings.tvParamFavs = core.cleanTvParamFavorites(core.settings.tvParamFavs);
 }
 
 /* core.js sees URL commands before the saved custom TV skins are loaded. Consume its
@@ -213,14 +222,14 @@ try {
   requestedTvSkin = window.__trkPendingTvDockSkin || "";
   delete window.__trkPendingTvDockSkin;
 } catch (_) {}
-if (typeof settings !== "undefined" && !(typeof safeModeOn !== "undefined" && window.Trk.core.safeModeOn) && hasTvSkin(requestedTvSkin)) {
-  window.Trk.core.settings.tvDockSkin = requestedTvSkin;
-  window.Trk.core.saveUserPrefs();
+if (typeof settings !== "undefined" && !(typeof safeModeOn !== "undefined" && core.safeModeOn) && hasTvSkin(requestedTvSkin)) {
+  core.settings.tvDockSkin = requestedTvSkin;
+  core.saveUserPrefs();
 }
 
-const tvSkinDef = () => hasTvSkin(window.Trk.core.settings.tvDockSkin) ? TV_DOCK_SKINS[window.Trk.core.settings.tvDockSkin] : TV_DOCK_SKINS.cinema;
-const tvSlotCount = () => window.Trk.core.settings.tvDockFive ? 5 : tvSkinDef().n;
-const tvSlotCols = () => window.Trk.core.settings.tvDockFive ? 5 : tvSkinDef().cols;
+const tvSkinDef = () => hasTvSkin(core.settings.tvDockSkin) ? TV_DOCK_SKINS[core.settings.tvDockSkin] : TV_DOCK_SKINS.cinema;
+const tvSlotCount = () => core.settings.tvDockFive ? 5 : tvSkinDef().n;
+const tvSlotCols = () => core.settings.tvDockFive ? 5 : tvSkinDef().cols;
 
 /* ============ 文章（接頭辞 tv…） ============ */
 Object.assign(TEXT.ja, {
@@ -271,7 +280,7 @@ Object.assign(TEXT.ja, {
   tvOverlay:"📺 映像オーバーレイ（走査線・レターボックス・ノイズなど）を表示",
   tvOverlayHint:"CRT・VHS・質感系などで、走査線・Canvasで描く粒子や網点・黒帯を重ねます。素材の解像度や細部を増やす機能ではありません。",
   tvQuick:"📺 映像", tvOff:"📺 OFF",
-  tvCatBasic:"基本", tvCatVivid:"ビビッド", tvCatRetro:"レトロ", tvCatCinema:"シネマ", tvCatEffect:"エフェクト", tvCatWeird:"不思議", tvCatNature:"自然",
+  tvCatBasic:"基本", tvCatVivid:"ビビッド", tvCatRetro:"レトロ", tvCatCinema:"シネマ", tvCatEffect:"ムード・場面", tvCatWeird:"不思議", tvCatNature:"自然",
   tvCatPortrait:"人物・肌色", tvCatAnime:"アニメ・セル", tvCatTexture:"質感", tvCatQuality:"スタジオ・高画質",
   tvCatFav:"★ お気に入り", tvCatRecent:"🕘 最近使った",
   tvSearch:"🔍 映像フィルターを探す", tvNoMatch:"見つかりません。", tvHits:"{n}個見つかりました",
@@ -344,7 +353,7 @@ Object.assign(TEXT.en, {
   tvOverlay:"📺 Show video overlays (scanlines, letterbox, noise…)",
   tvOverlayHint:"CRT, VHS and texture looks can add scanlines, Canvas-drawn grain or dots, and letterbox bars. These do not add source resolution or recover detail.",
   tvQuick:"📺 Video", tvOff:"📺 OFF",
-  tvCatBasic:"Basic", tvCatVivid:"Vivid", tvCatRetro:"Retro", tvCatCinema:"Cinema", tvCatEffect:"Effect", tvCatWeird:"Weird", tvCatNature:"Nature",
+  tvCatBasic:"Basic", tvCatVivid:"Vivid", tvCatRetro:"Retro", tvCatCinema:"Cinema", tvCatEffect:"Mood & scenes", tvCatWeird:"Weird", tvCatNature:"Nature",
   tvCatPortrait:"Portrait / skin tones", tvCatAnime:"Anime / cel", tvCatTexture:"Texture", tvCatQuality:"Studio / quality",
   tvCatFav:"★ Favorites", tvCatRecent:"🕘 Recent",
   tvSearch:"🔍 Search video filters", tvNoMatch:"No matches.", tvHits:"{n} found",
@@ -394,16 +403,16 @@ Object.assign(TEXT.zh, {
   tvVideoMax:"⛶ 全屏显示视频（再按一次关闭）",
   tvVideoMaxOn:"🖥 已全屏显示", tvVideoMaxOff:"🖥 已关闭全屏",
   tvVideoMaxNeed:"还没有视频，请先选择歌曲",
-  tvRand:"🎲 视频", tvRandFav:"⭐🎲 从收藏", tvRandParam:"🎛🎲 亮度・模糊",
-  tvParamDone:"已随机调整亮度・模糊",
+  tvRand:"🎲 视频", tvRandFav:"⭐🎲 从收藏", tvRandParam:"🎛🎲 亮度·模糊",
+  tvParamDone:"已随机调整亮度·模糊",
   tvParamRandHint:"(长按可恢复默认值。)",
   tvParamHint:"长按亮度或模糊滑块，可只将该项恢复为0。也可将亮度与模糊的组合保存到下方收藏，方便再次使用。",
-  tvParamReset:"↺ 将亮度・模糊重置为0", tvParamSave:"☆ 收藏当前数值",
-  tvParamFavTitle:"⭐ 亮度・模糊收藏（最多8组）",
+  tvParamReset:"↺ 将亮度·模糊重置为0", tvParamSave:"☆ 收藏当前数值",
+  tvParamFavTitle:"⭐ 亮度·模糊收藏（最多8组）",
   tvParamFavEmpty:"还没有收藏。点击☆即可保存当前组合。",
   tvParamFull:"最多保存8组。点击×删除一组后即可继续添加。",
-  tvParamSaved:"已收藏亮度・模糊组合", tvParamExists:"该组合已经收藏",
-  tvParamApplied:"已应用收藏的亮度・模糊", tvParamRemoved:"已删除亮度・模糊收藏",
+  tvParamSaved:"已收藏亮度·模糊组合", tvParamExists:"该组合已经收藏",
+  tvParamApplied:"已应用收藏的亮度·模糊", tvParamRemoved:"已删除亮度·模糊收藏",
   tvParamDefaultDone:"亮度与模糊已恢复为0",
   tvDimResetDone:"背景暗度已恢复为0", tvBlurResetDone:"背景模糊已恢复为0",
   tvParamPair:"暗度 {dim}% / 模糊 {blur}px", tvParamRemove:"删除“{name}”",
@@ -414,11 +423,11 @@ Object.assign(TEXT.zh, {
   tvSkinLabel:"电视机身皮肤", tvFive:"所有皮肤都用5个按钮",
   tvOrderLabel:"Dock 顺序", tvOrderTvFirst:"📺 电视在上、🎛 机架在下（自然）", tvOrderFxFirst:"🎛 机架在上、📺 电视在下",
   tvOrderHint:"默认顺序：电视 →（收藏）→ 机架 →（收藏）→ 电视详细 → 机架详细。电视与机架可以互换（详细选项始终在下方）。",
-  tvOverlay:"📺 显示视频叠加（扫描线・黑边・噪点等）",
+  tvOverlay:"📺 显示视频叠加（扫描线·黑边·噪点等）",
   tvOverlayHint:"CRT、VHS与质感滤镜会叠加扫描线、Canvas绘制的颗粒或网点、黑边；不会提升原片分辨率或恢复细节。",
   tvQuick:"📺 视频", tvOff:"📺 关闭",
-  tvCatBasic:"基本", tvCatVivid:"鲜艳", tvCatRetro:"复古", tvCatCinema:"影院", tvCatEffect:"特效", tvCatWeird:"奇异", tvCatNature:"自然",
-  tvCatPortrait:"人像・肤色", tvCatAnime:"动画・赛璐珞", tvCatTexture:"质感", tvCatQuality:"影棚・画质",
+  tvCatBasic:"基本", tvCatVivid:"鲜艳", tvCatRetro:"复古", tvCatCinema:"影院", tvCatEffect:"氛围·场景", tvCatWeird:"奇异", tvCatNature:"自然",
+  tvCatPortrait:"人像·肤色", tvCatAnime:"动画·赛璐珞", tvCatTexture:"质感", tvCatQuality:"影棚·画质",
   tvCatFav:"★ 收藏", tvCatRecent:"🕘 最近使用",
   tvSearch:"🔍 搜索视频滤镜", tvNoMatch:"没有结果。", tvHits:"找到{n}个",
   tvDim:"背景暗度", tvBlur:"背景模糊",
@@ -467,16 +476,16 @@ Object.assign(TEXT.ko, {
   tvVideoMax:"⛶ 영상을 전체 화면으로 보기 (다시 누르면 닫힘)",
   tvVideoMaxOn:"🖥 전체 화면으로 표시", tvVideoMaxOff:"🖥 전체 화면을 닫음",
   tvVideoMaxNeed:"아직 영상이 없습니다. 곡을 먼저 고르세요",
-  tvRand:"🎲 영상", tvRandFav:"⭐🎲 즐겨찾기에서", tvRandParam:"🎛🎲 밝기・흐림",
-  tvParamDone:"밝기・흐림을 랜덤으로 바꿨습니다",
+  tvRand:"🎲 영상", tvRandFav:"⭐🎲 즐겨찾기에서", tvRandParam:"🎛🎲 밝기·흐림",
+  tvParamDone:"밝기·흐림을 랜덤으로 바꿨습니다",
   tvParamRandHint:"(길게 누르면 기본값으로 돌아갑니다.)",
-  tvParamHint:"밝기 또는 흐림 슬라이더를 길게 누르면 해당 값만 0으로 돌아갑니다. 밝기・흐림 조합을 아래 즐겨찾기에 저장해 빠르게 다시 적용할 수 있습니다.",
-  tvParamReset:"↺ 밝기・흐림을 0으로 초기화", tvParamSave:"☆ 현재 값을 즐겨찾기에 저장",
-  tvParamFavTitle:"⭐ 밝기・흐림 즐겨찾기 (최대 8개)",
+  tvParamHint:"밝기 또는 흐림 슬라이더를 길게 누르면 해당 값만 0으로 돌아갑니다. 밝기·흐림 조합을 아래 즐겨찾기에 저장해 빠르게 다시 적용할 수 있습니다.",
+  tvParamReset:"↺ 밝기·흐림을 0으로 초기화", tvParamSave:"☆ 현재 값을 즐겨찾기에 저장",
+  tvParamFavTitle:"⭐ 밝기·흐림 즐겨찾기 (최대 8개)",
   tvParamFavEmpty:"저장된 조합이 없습니다. ☆를 눌러 현재 조합을 저장하세요.",
   tvParamFull:"즐겨찾기는 최대 8개까지 저장할 수 있습니다. ×로 하나를 삭제한 뒤 추가하세요.",
-  tvParamSaved:"밝기・흐림 조합을 저장했습니다", tvParamExists:"이미 저장된 조합입니다",
-  tvParamApplied:"즐겨찾기 밝기・흐림을 적용했습니다", tvParamRemoved:"밝기・흐림 즐겨찾기를 삭제했습니다",
+  tvParamSaved:"밝기·흐림 조합을 저장했습니다", tvParamExists:"이미 저장된 조합입니다",
+  tvParamApplied:"즐겨찾기 밝기·흐림을 적용했습니다", tvParamRemoved:"밝기·흐림 즐겨찾기를 삭제했습니다",
   tvParamDefaultDone:"밝기와 흐림을 0으로 되돌렸습니다",
   tvDimResetDone:"배경 어둡기를 0으로 되돌렸습니다", tvBlurResetDone:"배경 흐림을 0으로 되돌렸습니다",
   tvParamPair:"어둡기 {dim}% / 흐림 {blur}px", tvParamRemove:"‘{name}’ 삭제",
@@ -487,11 +496,11 @@ Object.assign(TEXT.ko, {
   tvSkinLabel:"TV 본체 스킨", tvFive:"모든 스킨을 5버튼으로",
   tvOrderLabel:"Dock 순서", tvOrderTvFirst:"📺 TV가 위, 🎛 랙이 아래 (자연스러움)", tvOrderFxFirst:"🎛 랙이 위, 📺 TV가 아래",
   tvOrderHint:"기본 순서: TV →(즐겨찾기)→ 랙 →(즐겨찾기)→ TV 자세히 → 랙 자세히. TV와 랙만 서로 바꿀 수 있습니다(자세히는 항상 아래).",
-  tvOverlay:"📺 영상 오버레이 표시 (주사선・레터박스・노이즈 등)",
-  tvOverlayHint:"CRT・VHS・질감 필터는 주사선, Canvas로 그린 입자나 도트, 레터박스를 더합니다. 원본 해상도를 높이거나 세부 묘사를 복구하지 않습니다.",
+  tvOverlay:"📺 영상 오버레이 표시 (주사선·레터박스·노이즈 등)",
+  tvOverlayHint:"CRT·VHS·질감 필터는 주사선, Canvas로 그린 입자나 도트, 레터박스를 더합니다. 원본 해상도를 높이거나 세부 묘사를 복구하지 않습니다.",
   tvQuick:"📺 영상", tvOff:"📺 OFF",
-  tvCatBasic:"기본", tvCatVivid:"비비드", tvCatRetro:"레트로", tvCatCinema:"시네마", tvCatEffect:"이펙트", tvCatWeird:"기묘", tvCatNature:"자연",
-  tvCatPortrait:"인물・피부 톤", tvCatAnime:"애니・셀", tvCatTexture:"질감", tvCatQuality:"스튜디오・화질",
+  tvCatBasic:"기본", tvCatVivid:"비비드", tvCatRetro:"레트로", tvCatCinema:"시네마", tvCatEffect:"분위기·장면", tvCatWeird:"기묘", tvCatNature:"자연",
+  tvCatPortrait:"인물·피부 톤", tvCatAnime:"애니·셀", tvCatTexture:"질감", tvCatQuality:"스튜디오·화질",
   tvCatFav:"★ 즐겨찾기", tvCatRecent:"🕘 최근 사용",
   tvSearch:"🔍 영상 필터 검색", tvNoMatch:"결과가 없습니다.", tvHits:"{n}개 찾음",
   tvDim:"배경 어둡기", tvBlur:"배경 흐림",
@@ -535,12 +544,12 @@ const TV_GROUPS = ["fav", "recent", "basic", "vivid", "retro", "cinema", "portra
 /* 表示の並び：かんたん＝おすすめ順（既定）、全部＝TV_GROUPS の従来の順。映像フィルターの並びは起動時に組み立てる（DOMContentLoaded）ので次の読み込みで反映 */
 const TV_GROUPS_SIMPLE = ["fav", "recent", "basic", "vivid", "cinema", "retro", "anime", "quality", "effect", "texture", "portrait", "nature", "weird"];
 const TV_RECOMMENDED = ["color", "vivid", "pop", "warm", "cinema", "crt", "dream", "anime_clear", "quality_balanced"];
-const tvSimpleOrder = () => window.Trk.core.settings.displayMode !== "full";
+const tvSimpleOrder = () => core.settings.displayMode !== "full";
 const tvGroups = () => (tvSimpleOrder() ? TV_GROUPS_SIMPLE : TV_GROUPS);
 
 function tvPresetsOf(cat) {
-  if (cat === "fav") return (window.Trk.core.settings.tvFav || []).map(tvPresetById).filter(Boolean);
-  if (cat === "recent") return (window.Trk.core.settings.tvRecent || []).map(tvPresetById).filter(Boolean);
+  if (cat === "fav") return (core.settings.tvFav || []).map(tvPresetById).filter(Boolean);
+  if (cat === "recent") return (core.settings.tvRecent || []).map(tvPresetById).filter(Boolean);
   if (typeof TRK_TV_PRESETS === "undefined") return [];
   const items = TRK_TV_PRESETS.filter(p => p.cat === cat);
   if (!tvSimpleOrder()) return items;
@@ -558,36 +567,36 @@ function tvMatches(p, q) {
 
 /* ============ videoFilter を包む（既存の背景の暗さ・ぼかしも含める） ============ */
 let baseVideoFilter = null;
-if (typeof videoFilter === "function") baseVideoFilter = window.Trk.core.videoFilter;
+if (typeof videoFilter === "function") baseVideoFilter = core.videoFilter;
 
 function currentTvPreset() {
-  return tvPresetById(window.Trk.core.settings.videoStyle) || null;
+  return tvPresetById(core.settings.videoStyle) || null;
 }
 function tvFilterBase() {
-  const id = window.Trk.core.settings.videoStyle;
+  const id = core.settings.videoStyle;
   if (id === "off") return { filter:"none", off:true };
   const preset = tvPresetById(id);
   if (preset) {
     if (preset.filter === null) {
       // skin 標準
-      return { filter: (typeof skin === "function" ? (window.Trk.core.skin().video || "none") : "none"), overlay: preset.overlay || null, off: !!preset.off };
+      return { filter: (typeof skin === "function" ? (core.skin().video || "none") : "none"), overlay: preset.overlay || null, off: !!preset.off };
     }
     return { filter: preset.filter || "none", overlay: preset.overlay || null, off: !!preset.off };
   }
   // フォールバック：旧来の videoStyle 値
   const map = { color:"none", mono:"grayscale(1) contrast(1.6)", dim:"brightness(.42) saturate(.85)" };
   const f = Object.prototype.hasOwnProperty.call(map, id)
-    ? map[id] : (typeof skin === "function" ? (window.Trk.core.skin().video || "none") : "none");
+    ? map[id] : (typeof skin === "function" ? (core.skin().video || "none") : "none");
   return { filter: f, overlay: null, off: false };
 }
 
 function newVideoFilter() {
-  if (window.Trk.core.settings.videoStyle === "off") return "none";
+  if (core.settings.videoStyle === "off") return "none";
   const base = tvFilterBase();
   if (base.off) return "none";
   const parts = [];
   if (base.filter && base.filter !== "none") parts.push(base.filter);
-  const dim = window.Trk.core.clampTvDim(window.Trk.core.settings.bgDim), blur = window.Trk.core.clampTvBlur(window.Trk.core.settings.bgBlur);
+  const dim = core.clampTvDim(core.settings.bgDim), blur = core.clampTvBlur(core.settings.bgBlur);
   /* 🪶 軽量化モード中は、いちばん重い「ぼかし」を2pxまでに抑える（設定そのものは変えません） */
   const cap = (typeof TrkLite === "object" && typeof TrkLite.blurCap === "function") ? TrkLite.blurCap() : 0;
   const useBlur = cap ? Math.min(blur, cap) : blur;
@@ -600,7 +609,7 @@ function newVideoFilter() {
 if (typeof window !== "undefined") {
   window.videoFilter = newVideoFilter;
   // core.js の videoFilter 参照も上書き（同じスコープなら）
-  try { window.Trk.core.videoFilter = newVideoFilter; } catch (_) {}
+  try { core.videoFilter = newVideoFilter; } catch (_) {}
 }
 
 /* ============ drawVideo を包んでオーバーレイを描く ============ */
@@ -646,7 +655,7 @@ let baseDrawVideo = null;
 if (typeof drawVideo === "function") baseDrawVideo = window.Trk.play.drawVideo;
 
 function drawTvOverlay(vctx, W, H, overlay) {
-  if (!overlay || !window.Trk.core.settings.tvOverlay) return;
+  if (!overlay || !core.settings.tvOverlay) return;
   const t = performance.now();
   vctx.save();
   switch (overlay) {
@@ -831,11 +840,11 @@ function drawStaticNoise(vctx, W, H, t) {
   }
   // 中央に NO SIGNAL
   vctx.fillStyle = "rgba(255,255,255,0.55)";
-  vctx.font = `900 ${Math.round(H*0.08)}px ${typeof fontFamily==="function"?window.Trk.core.fontFamily():"monospace"}`;
+  vctx.font = `900 ${Math.round(H*0.08)}px ${typeof fontFamily==="function"?core.fontFamily():"monospace"}`;
   vctx.textAlign = "center"; vctx.textBaseline = "middle";
   vctx.fillText("NO SIGNAL", W/2, H/2);
   vctx.fillStyle = "rgba(255,255,255,0.35)";
-  vctx.font = `700 ${Math.round(H*0.03)}px ${typeof fontFamily==="function"?window.Trk.core.fontFamily():"monospace"}`;
+  vctx.font = `700 ${Math.round(H*0.03)}px ${typeof fontFamily==="function"?core.fontFamily():"monospace"}`;
   vctx.fillText("Drop audio / video file to play", W/2, H/2 + H*0.08);
   vctx.restore();
 }
@@ -849,15 +858,15 @@ function wrappedDrawVideo() {
     }
   }
   if (typeof vctx === "undefined" || typeof W === "undefined" || typeof H === "undefined") return;
-  if (window.Trk.core.settings.videoStyle === "off") return;
+  if (core.settings.videoStyle === "off") return;
   const base = tvFilterBase();
   if (base.off) return;
 
   // 映像が無いときは砂嵐を出す（プレイ中以外）
-  if (typeof videoReady !== "undefined" && !window.Trk.core.videoReady) {
+  if (typeof videoReady !== "undefined" && !core.videoReady) {
     const t = performance.now();
     // 背景が何も描かれていない場合のみ砂嵐（bgImageも無い）
-    if (!window.Trk.core.bgImage || !window.Trk.core.bgImage.naturalWidth) {
+    if (!core.bgImage || !core.bgImage.naturalWidth) {
       drawStaticNoise(vctx, W, H, t);
     }
   }
@@ -877,57 +886,57 @@ if (typeof window !== "undefined") {
 /* ============ 操作 ============ */
 function pushRecent(id) {
   if (id === "off" || id === TV_TEMP_ID) return;
-  window.Trk.core.settings.tvRecent = [id, ...window.Trk.core.settings.tvRecent.filter(x => x !== id)].slice(0, TV_RECENT_MAX);
-  window.Trk.core.saveUserPrefs();
+  core.settings.tvRecent = [id, ...core.settings.tvRecent.filter(x => x !== id)].slice(0, TV_RECENT_MAX);
+  core.saveUserPrefs();
 }
 function selectTv(id) {
   const p = tvPresetById(id);
   if (!p) return false;
   if (p.off) {
     // off のときは前のスタイルを記憶
-    if (window.Trk.core.settings.videoStyle !== "off") window.Trk.core.settings.tvPowerPrev = window.Trk.core.settings.videoStyle;
-    window.Trk.core.settings.videoStyle = "off";
+    if (core.settings.videoStyle !== "off") core.settings.tvPowerPrev = core.settings.videoStyle;
+    core.settings.videoStyle = "off";
   } else {
-    if (window.Trk.core.settings.videoStyle === "off") {
+    if (core.settings.videoStyle === "off") {
       // 復帰時はそのまま選択
     }
-    window.Trk.core.settings.videoStyle = id;
+    core.settings.videoStyle = id;
     pushRecent(id);
   }
   // view のフィルターを更新
-  if (typeof view !== "undefined") window.Trk.core.view.style.filter = newVideoFilter();
-  window.Trk.core.saveUserPrefs();
+  if (typeof view !== "undefined") core.view.style.filter = newVideoFilter();
+  core.saveUserPrefs();
   // 設定画面のセレクトも同期
   const vs = document.getElementById("videoStyle");
-  if (vs) vs.value = window.Trk.core.settings.videoStyle;
+  if (vs) vs.value = core.settings.videoStyle;
   // 同期イベント
-  if (typeof emit === "function") window.Trk.core.emit("tvChange", id);
+  if (typeof emit === "function") core.emit("tvChange", id);
   return true;
 }
 function stepTv(dir) {
   const list = tvAllPresets();
   if (!list.length) return;
-  const cur = list.findIndex(p => p.id === window.Trk.core.settings.videoStyle);
+  const cur = list.findIndex(p => p.id === core.settings.videoStyle);
   const nxt = cur < 0 ? (dir > 0 ? 0 : list.length - 1) : (cur + dir + list.length) % list.length;
   selectTv(list[nxt].id);
 }
 function randomTv() {
-  const list = tvAllPresets().filter(p => !p.off && p.id !== window.Trk.core.settings.videoStyle);
+  const list = tvAllPresets().filter(p => !p.off && p.id !== core.settings.videoStyle);
   if (list.length) selectTv(list[Math.floor(Math.random()*list.length)].id);
 }
 function togglePower() {
-  if (window.Trk.core.settings.videoStyle === "off") {
-    const prev = window.Trk.core.settings.tvPowerPrev && tvPresetById(window.Trk.core.settings.tvPowerPrev) ? window.Trk.core.settings.tvPowerPrev : "color";
+  if (core.settings.videoStyle === "off") {
+    const prev = core.settings.tvPowerPrev && tvPresetById(core.settings.tvPowerPrev) ? core.settings.tvPowerPrev : "color";
     selectTv(prev);
   } else {
-    window.Trk.core.settings.tvPowerPrev = window.Trk.core.settings.videoStyle;
+    core.settings.tvPowerPrev = core.settings.videoStyle;
     selectTv("off");
   }
 }
 function togglePause() {
-  if (!window.Trk.core.video) return;
-  if (window.Trk.core.video.paused) window.Trk.core.video.play().catch(()=>{});
-  else window.Trk.core.video.pause();
+  if (!core.video) return;
+  if (core.video.paused) core.video.play().catch(()=>{});
+  else core.video.pause();
 }
 
 /* ============ 並び順の制御 ============ */
@@ -953,7 +962,7 @@ function applyOrder() {
   const { tvDock, fxDock, tvMore, fxMore } = dockParts();
   if (!col || tvDock !== document.getElementById("tvDock")) return;   // ドックが無い（または別物）ときは何もしない
 
-  if (window.Trk.core.settings.tvDockSkin === "wall") {
+  if (core.settings.tvDockSkin === "wall") {
     if (head && tvDock.parentElement !== head) head.appendChild(tvDock);
     tvDock.classList.add("wall-mounted");
   } else {
@@ -961,9 +970,9 @@ function applyOrder() {
     if (tvDock.parentElement !== col) col.appendChild(tvDock);   // ヘッダーから列へ戻す
   }
 
-  const tvFirst = window.Trk.core.settings.tvOrder !== "fx-first";
+  const tvFirst = core.settings.tvOrder !== "fx-first";
   const list = [];
-  if (window.Trk.core.settings.tvDockSkin !== "wall") list.push(tvFirst ? tvDock : fxDock, tvFirst ? fxDock : tvDock);
+  if (core.settings.tvDockSkin !== "wall") list.push(tvFirst ? tvDock : fxDock, tvFirst ? fxDock : tvDock);
   else list.push(fxDock);
   list.push(tvFirst ? tvMore : fxMore, tvFirst ? fxMore : tvMore);
 
@@ -988,14 +997,14 @@ function paintVideoFrame(ctx, W, H, fit) {
   ctx.globalAlpha = 1;
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, W, H);
-  if (!window.Trk.core.videoReady || !window.Trk.core.video.videoWidth || window.Trk.core.settings.videoStyle === "off") return false;
-  const vw = window.Trk.core.video.videoWidth, vh = window.Trk.core.video.videoHeight;
+  if (!core.videoReady || !core.video.videoWidth || core.settings.videoStyle === "off") return false;
+  const vw = core.video.videoWidth, vh = core.video.videoHeight;
   const s = (fit === "cover" ? Math.max : Math.min)(W / vw, H / vh);
   const dw = vw * s, dh = vh * s;
   const filter = newVideoFilter();
   if (canvasFilter) { try { ctx.filter = filter; } catch (_) {} }
   else if (ctx.canvas && ctx.canvas.style) ctx.canvas.style.filter = filter; // CSS-filter fallback where CanvasRenderingContext2D.filter is unavailable
-  try { ctx.drawImage(window.Trk.core.video, (W - dw) / 2, (H - dh) / 2, dw, dh); } catch (_) { return false; }
+  try { ctx.drawImage(core.video, (W - dw) / 2, (H - dh) / 2, dw, dh); } catch (_) { return false; }
   if (canvasFilter) { try { ctx.filter = "none"; } catch (_) {} }
   const preset = currentTvPreset();
   drawTvOverlay(ctx, W, H, (preset && preset.overlay) || tvFilterBase().overlay || null);
@@ -1005,43 +1014,43 @@ function paintVideoFrame(ctx, W, H, fit) {
 /* 「🎬 音のプレビューがオフでも、メニューで映像を再生する」の中身 */
 let menuMutedByUs = false, menuPlayingByUs = false;
 function menuVideoWanted() {
-  return window.Trk.core.settings.tvMenuVideo === true && window.Trk.core.settings.previewEnabled !== true &&
-    window.Trk.core.phase === "title" && screen === "select" && !document.hidden && window.Trk.core.videoReady && !!window.Trk.core.video.src;
+  return core.settings.tvMenuVideo === true && core.settings.previewEnabled !== true &&
+    core.phase === "title" && screen === "select" && !document.hidden && core.videoReady && !!core.video.src;
 }
 function menuVideoTick() {
   if (!menuVideoWanted()) {
-    if (menuPlayingByUs) { try { window.Trk.core.video.pause(); } catch (_) {} menuPlayingByUs = false; }
-    if (menuMutedByUs) { window.Trk.core.video.muted = false; menuMutedByUs = false; }
+    if (menuPlayingByUs) { try { core.video.pause(); } catch (_) {} menuPlayingByUs = false; }
+    if (menuMutedByUs) { core.video.muted = false; menuMutedByUs = false; }
     return;
   }
-  if (window.Trk.core.video.paused) {
-    if (!window.Trk.core.video.muted) { window.Trk.core.video.muted = true; menuMutedByUs = true; }
-    window.Trk.core.video.play().then(() => { menuPlayingByUs = true; }).catch(() => {});
+  if (core.video.paused) {
+    if (!core.video.muted) { core.video.muted = true; menuMutedByUs = true; }
+    core.video.play().then(() => { menuPlayingByUs = true; }).catch(() => {});
   } else {
     menuPlayingByUs = false;   // 誰かが再生している場合は、止めるときも触らない
   }
 }
-window.Trk.core.video.addEventListener("ended", () => {
+core.video.addEventListener("ended", () => {
   if (!menuVideoWanted()) return;
-  try { window.Trk.core.video.currentTime = (typeof previewStartFor === "function") ? previewStartFor() : 0; } catch (_) {}
-  window.Trk.core.video.play().catch(() => {});
+  try { core.video.currentTime = (typeof previewStartFor === "function") ? previewStartFor() : 0; } catch (_) {}
+  core.video.play().catch(() => {});
 });
 document.addEventListener("visibilitychange", menuVideoTick);
 on("screen", menuVideoTick);
 on("phase", menuVideoTick);
-window.Trk.core.video.addEventListener("canplay", menuVideoTick);
-window.Trk.core.video.addEventListener("loadeddata", menuVideoTick);
-window.Trk.core.video.addEventListener("play", menuVideoTick);   // 「pause」は見ない（⏯で止めたものを勝手に戻さないため）
+core.video.addEventListener("canplay", menuVideoTick);
+core.video.addEventListener("loadeddata", menuVideoTick);
+core.video.addEventListener("play", menuVideoTick);   // 「pause」は見ない（⏯で止めたものを勝手に戻さないため）
 
 /* ============ 画面の組み立て ============ */
 addEventListener("DOMContentLoaded", () => {
   const col = document.querySelector(".songCol");
   const vsSel = document.getElementById("videoStyle");
   if (!col) return;
-  window.Trk.core.saveUserPrefs();
+  core.saveUserPrefs();
 
-  const tx = (tag, key, cls) => { const n = window.Trk.core.el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; };
-  const btn = (cls, ...kids) => { const b = window.Trk.core.el("button", cls); b.type = "button"; b.append(...kids); return b; };
+  const tx = (tag, key, cls) => { const n = core.el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; };
+  const btn = (cls, ...kids) => { const b = core.el("button", cls); b.type = "button"; b.append(...kids); return b; };
   const names = () => Object.fromEntries(tvAllPresets().map(p => [p.id, tvPresetName(p)]));
 
   // 設定画面の videoStyle セレクトを全プリセットで埋める
@@ -1061,57 +1070,57 @@ addEventListener("DOMContentLoaded", () => {
       }
       vsSel.append(og);
     }
-    vsSel.value = window.Trk.core.settings.videoStyle;
+    vsSel.value = core.settings.videoStyle;
   }
 
   /* ---- TV 本体 ---- */
-  const dock = window.Trk.core.el("div"); dock.id = "tvDock";
-  const dev = window.Trk.core.el("div", "tvDev");
-  const powLed = window.Trk.core.el("i", "led tvLed");
-  const pauseLed = window.Trk.core.el("i", "led tvPauseLed");
-  const pow = btn("tvKey tvPow", powLed, window.Trk.core.el("span", "", "⏻"));
+  const dock = core.el("div"); dock.id = "tvDock";
+  const dev = core.el("div", "tvDev");
+  const powLed = core.el("i", "led tvLed");
+  const pauseLed = core.el("i", "led tvPauseLed");
+  const pow = btn("tvKey tvPow", powLed, core.el("span", "", "⏻"));
   /* 🖥 「次の曲 ▶」の右のボタン：動画の全画面表示（js/video-max.js）。
      見た目はこれまでの一時停止ボタンと同じ（点灯するLEDアイコンのまま） */
-  const pauseBtn = btn("tvKey tvPause tvMax", pauseLed, window.Trk.core.el("span", "", "⛶"));
-  const lcd = window.Trk.core.el("div", "tvLcd");
+  const pauseBtn = btn("tvKey tvPause tvMax", pauseLed, core.el("span", "", "⛶"));
+  const lcd = core.el("div", "tvLcd");
   /* 🆕 ◀ ▶ の物理ボタン：選曲リストの前の曲・次の曲へ（テレビのチャンネル送りみたいに） */
-  const prevSongBtn = btn("tvKey tvSong", window.Trk.core.el("span", "", "◀"));
-  const nextSongBtn = btn("tvKey tvSong", window.Trk.core.el("span", "", "▶"));
-  const top = window.Trk.core.el("div", "tvTop"); top.append(pow, prevSongBtn, lcd, nextSongBtn, pauseBtn);
-  const screenWrap = window.Trk.core.el("div", "tvScreenWrap");
-  const screen = window.Trk.core.el("div", "tvScreen");
-  const screenGlare = window.Trk.core.el("i", "tvGlare");
-  const speaker = window.Trk.core.el("div", "tvSpeaker");
+  const prevSongBtn = btn("tvKey tvSong", core.el("span", "", "◀"));
+  const nextSongBtn = btn("tvKey tvSong", core.el("span", "", "▶"));
+  const top = core.el("div", "tvTop"); top.append(pow, prevSongBtn, lcd, nextSongBtn, pauseBtn);
+  const screenWrap = core.el("div", "tvScreenWrap");
+  const screen = core.el("div", "tvScreen");
+  const screenGlare = core.el("i", "tvGlare");
+  const speaker = core.el("div", "tvSpeaker");
   /* 🎨 書斎で割り当てたローカルジャケット（音声だけの曲でもTVを寂しくしない） */
   const coverImg = document.createElement("img"); coverImg.className = "tvCover"; coverImg.alt = ""; coverImg.hidden = true;
   /* 🆕 選曲中は、この画面に流れているmp4を映す（paintVideoFrame が描く） */
   const liveCanvas = document.createElement("canvas"); liveCanvas.className = "tvLive";
-  screen.append(coverImg, liveCanvas, screenGlare, window.Trk.core.el("i", "tvScanlines"));   // 走査線はカスタムTVスキン用（[data-scan="1"] のときだけ出る）
+  screen.append(coverImg, liveCanvas, screenGlare, core.el("i", "tvScanlines"));   // 走査線はカスタムTVスキン用（[data-scan="1"] のときだけ出る）
   screenWrap.append(screen, speaker);
-  const deco = window.Trk.core.el("div", "tvDeco");
-  const slots = window.Trk.core.el("div", "tvSlots");
+  const deco = core.el("div", "tvDeco");
+  const slots = core.el("div", "tvSlots");
   const rTv = btn("tvKey"), rFav = btn("tvKey"), rPar = btn("tvKey");
-  const rnd = window.Trk.core.el("div", "tvRand"); rnd.append(rTv, rFav, rPar);
+  const rnd = core.el("div", "tvRand"); rnd.append(rTv, rFav, rPar);
   const paramRandHint = tx("div", "tvParamRandHint", "hint tvParamRandHint");
   const slotHint = tx("div", "tvSlotHint", "hint tvHint");
   dev.append(top, screenWrap, deco, slots, rnd, paramRandHint, slotHint);
 
   const overLabel = tx("div", "tvFavLabel", "hint");
-  const overflow = window.Trk.core.el("div", "tvFavRow");
+  const overflow = core.el("div", "tvFavRow");
   /* ⭐ フォルダのチップ（1軍／2軍／🧊フリーズ／📤元お気に入り。中身は js/favs.js が作る） */
-  const favChips = window.Trk.core.el("div", "favChipsWrap");
+  const favChips = core.el("div", "favChipsWrap");
 
-  const body = window.Trk.core.el("details", "panel tvMore"); body.open = window.Trk.core.settings.tvDockOpen;
-  body.addEventListener("toggle", () => { window.Trk.core.settings.tvDockOpen = body.open; window.Trk.core.saveUserPrefs(); });
+  const body = core.el("details", "panel tvMore"); body.open = core.settings.tvDockOpen;
+  body.addEventListener("toggle", () => { core.settings.tvDockOpen = body.open; core.saveUserPrefs(); });
 
   // くわしい欄の中身
   const quickSel = document.createElement("select"); quickSel.className = "tvQuickSelect";
   quickSel.addEventListener("change", () => { if (quickSel.value) selectTv(quickSel.value); });
-  const quickRow = window.Trk.core.el("div", "inline tight"); quickRow.append(tx("span","tvQuick"), quickSel);
-  const dimRow = window.Trk.core.el("div", "inline tvParamRow"), blurRow = window.Trk.core.el("div", "inline tvParamRow");
+  const quickRow = core.el("div", "inline tight"); quickRow.append(tx("span","tvQuick"), quickSel);
+  const dimRow = core.el("div", "inline tvParamRow"), blurRow = core.el("div", "inline tvParamRow");
   const dimLab = tx("span","tvDim"), blurLab = tx("span","tvBlur");
   const dimInp = document.createElement("input"), blurInp = document.createElement("input");
-  const dimVal = window.Trk.core.el("span","mono"), blurVal = window.Trk.core.el("span","mono");
+  const dimVal = core.el("span","mono"), blurVal = core.el("span","mono");
   dimInp.type = "range"; dimInp.min = 0; dimInp.max = 0.9; dimInp.step = 0.05;
   blurInp.type = "range"; blurInp.min = 0; blurInp.max = 12; blurInp.step = 1;
   dimInp.setAttribute("aria-label", tr("tvDim")); blurInp.setAttribute("aria-label", tr("tvBlur"));
@@ -1120,21 +1129,21 @@ addEventListener("DOMContentLoaded", () => {
   blurRow.append(blurLab, blurInp, blurVal);
 
   const paramHint = tx("div", "tvParamHint", "hint tvParamHint");
-  const paramTools = window.Trk.core.el("div", "tvParamTools");
+  const paramTools = core.el("div", "tvParamTools");
   const paramResetBtn = tx("button", "tvParamReset", "fxMini"); paramResetBtn.type = "button";
   const paramSaveBtn = tx("button", "tvParamSave", "fxMini"); paramSaveBtn.type = "button";
   paramTools.append(paramResetBtn, paramSaveBtn);
-  const paramFavWrap = window.Trk.core.el("div", "tvParamFavs");
+  const paramFavWrap = core.el("div", "tvParamFavs");
   const paramFavTitle = tx("div", "tvParamFavTitle", "tvParamFavTitle");
-  const paramFavList = window.Trk.core.el("div", "tvParamFavList");
+  const paramFavList = core.el("div", "tvParamFavList");
   paramFavWrap.append(paramFavTitle, paramFavList);
 
   function applyParamValues(dim, blur, messageKey) {
-    window.Trk.core.settings.bgDim = window.Trk.core.clampTvDim(Number(dim));
-    window.Trk.core.settings.bgBlur = window.Trk.core.clampTvBlur(Number(blur));
-    dimInp.value = String(window.Trk.core.settings.bgDim); blurInp.value = String(window.Trk.core.settings.bgBlur);
-    if (typeof view !== "undefined" && window.Trk.core.view) window.Trk.core.view.style.filter = newVideoFilter();
-    window.Trk.core.saveUserPrefs();
+    core.settings.bgDim = core.clampTvDim(Number(dim));
+    core.settings.bgBlur = core.clampTvBlur(Number(blur));
+    dimInp.value = String(core.settings.bgDim); blurInp.value = String(core.settings.bgBlur);
+    if (typeof view !== "undefined" && core.view) core.view.style.filter = newVideoFilter();
+    core.saveUserPrefs();
     render();
     if (messageKey) lcdFlash(tr(messageKey));
   }
@@ -1164,53 +1173,53 @@ addEventListener("DOMContentLoaded", () => {
     node.addEventListener("contextmenu", e => e.preventDefault());
   }
   bindLongPressReset(rPar, () => applyParamValues(0, 0, "tvParamDefaultDone"));
-  bindLongPressReset(dimInp, () => applyParamValues(0, window.Trk.core.settings.bgBlur, "tvDimResetDone"), 9);
-  bindLongPressReset(blurInp, () => applyParamValues(window.Trk.core.settings.bgDim, 0, "tvBlurResetDone"), 9);
-  dimInp.addEventListener("input", () => applyParamValues(dimInp.value, window.Trk.core.settings.bgBlur));
-  blurInp.addEventListener("input", () => applyParamValues(window.Trk.core.settings.bgDim, blurInp.value));
+  bindLongPressReset(dimInp, () => applyParamValues(0, core.settings.bgBlur, "tvDimResetDone"), 9);
+  bindLongPressReset(blurInp, () => applyParamValues(core.settings.bgDim, 0, "tvBlurResetDone"), 9);
+  dimInp.addEventListener("input", () => applyParamValues(dimInp.value, core.settings.bgBlur));
+  blurInp.addEventListener("input", () => applyParamValues(core.settings.bgDim, blurInp.value));
 
   function paramPairName(pair) {
     return tr("tvParamPair", { dim: Math.round(pair.dim * 100), blur: pair.blur });
   }
   function renderParamFavorites() {
-    window.Trk.core.settings.tvParamFavs = window.Trk.core.cleanTvParamFavorites(window.Trk.core.settings.tvParamFavs);
+    core.settings.tvParamFavs = core.cleanTvParamFavorites(core.settings.tvParamFavs);
     paramFavList.textContent = "";
-    if (!window.Trk.core.settings.tvParamFavs.length) {
+    if (!core.settings.tvParamFavs.length) {
       paramFavList.append(tx("div", "tvParamFavEmpty", "hint"));
       return;
     }
-    for (const pair of window.Trk.core.settings.tvParamFavs) {
-      const name = paramPairName(pair), row = window.Trk.core.el("div", "tvParamFavItem");
+    for (const pair of core.settings.tvParamFavs) {
+      const name = paramPairName(pair), row = core.el("div", "tvParamFavItem");
       const applyBtn = btn("fxMini tvParamFavApply", "⭐ " + name);
       applyBtn.title = tr("tvParamApplied"); applyBtn.setAttribute("aria-label", name);
       applyBtn.addEventListener("click", () => applyParamValues(pair.dim, pair.blur, "tvParamApplied"));
       const removeBtn = btn("fxMini tvParamFavRemove", "×");
       removeBtn.title = tr("tvParamRemove", { name }); removeBtn.setAttribute("aria-label", removeBtn.title);
       removeBtn.addEventListener("click", () => {
-        window.Trk.core.settings.tvParamFavs = window.Trk.core.cleanTvParamFavorites(window.Trk.core.settings.tvParamFavs.filter(p => p.dim !== pair.dim || p.blur !== pair.blur));
-        window.Trk.core.saveUserPrefs(); renderParamFavorites(); lcdFlash(tr("tvParamRemoved"));
+        core.settings.tvParamFavs = core.cleanTvParamFavorites(core.settings.tvParamFavs.filter(p => p.dim !== pair.dim || p.blur !== pair.blur));
+        core.saveUserPrefs(); renderParamFavorites(); lcdFlash(tr("tvParamRemoved"));
       });
       row.append(applyBtn, removeBtn); paramFavList.append(row);
     }
   }
   paramResetBtn.addEventListener("click", () => applyParamValues(0, 0, "tvParamDefaultDone"));
   paramSaveBtn.addEventListener("click", () => {
-    const pair = { dim: window.Trk.core.clampTvDim(window.Trk.core.settings.bgDim), blur: window.Trk.core.clampTvBlur(window.Trk.core.settings.bgBlur) };
-    const exists = window.Trk.core.settings.tvParamFavs.some(p => p.dim === pair.dim && p.blur === pair.blur);
+    const pair = { dim: core.clampTvDim(core.settings.bgDim), blur: core.clampTvBlur(core.settings.bgBlur) };
+    const exists = core.settings.tvParamFavs.some(p => p.dim === pair.dim && p.blur === pair.blur);
     if (exists) { lcdFlash(tr("tvParamExists")); return; }
-    if (window.Trk.core.settings.tvParamFavs.length >= window.Trk.core.TV_PARAM_FAV_MAX) { lcdFlash(tr("tvParamFull")); return; }
-    window.Trk.core.settings.tvParamFavs = window.Trk.core.cleanTvParamFavorites([pair, ...window.Trk.core.settings.tvParamFavs]);
-    window.Trk.core.saveUserPrefs(); renderParamFavorites(); lcdFlash(tr("tvParamSaved"));
+    if (core.settings.tvParamFavs.length >= core.TV_PARAM_FAV_MAX) { lcdFlash(tr("tvParamFull")); return; }
+    core.settings.tvParamFavs = core.cleanTvParamFavorites([pair, ...core.settings.tvParamFavs]);
+    core.saveUserPrefs(); renderParamFavorites(); lcdFlash(tr("tvParamSaved"));
   });
 
-  const skinRow = window.Trk.core.el("label","field"), skinSel = document.createElement("select");
+  const skinRow = core.el("label","field"), skinSel = document.createElement("select");
   skinRow.append(tx("span","tvSkinLabel"), skinSel);
-  skinSel.addEventListener("change", () => { window.Trk.core.settings.tvDockSkin = skinSel.value; window.Trk.core.saveUserPrefs(); applyOrder(); render(true); });
+  skinSel.addEventListener("change", () => { core.settings.tvDockSkin = skinSel.value; core.saveUserPrefs(); applyOrder(); render(true); });
 
   // 🎨 カスタムTVスキンのエディタを開く（キーは tvmOpen。tvMakerOpen だと生キーが出てしまう）。開発者表示（devView）の中
   const makerBtn = tx("button","tvmOpen","fxMini slim devOnly"); makerBtn.type = "button";
   makerBtn.addEventListener("click", () => {
-    window.Trk.core.openSettings();
+    core.openSettings();
     const mk = document.getElementById("tvMaker");
     if (!mk) return;
     mk.open = true;
@@ -1220,45 +1229,45 @@ addEventListener("DOMContentLoaded", () => {
   /* 📺 TVドックの設定（3つのチェック。説明は短く）。既定はすべて OFF：映画館・テレビが上・5枠なし。
      壁掛けは「スキンが壁掛けテレビ」と同じ。外すと映画館に戻す。 */
   const dockCheck = (key, hintKey, onChange) => {
-    const wrap = window.Trk.core.el("div", "tvDockItem");
-    const lab = window.Trk.core.el("label", "check"), inp = document.createElement("input");
+    const wrap = core.el("div", "tvDockItem");
+    const lab = core.el("label", "check"), inp = document.createElement("input");
     inp.type = "checkbox"; lab.append(inp, tx("span", key));
     inp.addEventListener("change", () => onChange(inp.checked));
     wrap.append(lab, tx("div", hintKey, "hint"));
     return { wrap, inp };
   };
   const wallCheck = dockCheck("tvWall", "tvWallHint", checked => {
-    const st = window.Trk.core.settings;
+    const st = core.settings;
     st.tvDockSkin = checked ? "wall" : (st.tvDockSkin === "wall" ? "cinema" : st.tvDockSkin);
-    window.Trk.core.saveUserPrefs(); applyOrder(); render(true);
+    core.saveUserPrefs(); applyOrder(); render(true);
   });
   const reorderCheck = dockCheck("tvReorder", "tvReorderHint", checked => {
-    window.Trk.core.settings.tvOrder = checked ? "fx-first" : "tv-first";
-    window.Trk.core.saveUserPrefs(); applyOrder(); render();
+    core.settings.tvOrder = checked ? "fx-first" : "tv-first";
+    core.saveUserPrefs(); applyOrder(); render();
   });
   const fiveCheck = dockCheck("tvFiveLabel", "tvFiveHint", checked => {
-    window.Trk.core.settings.tvDockFive = checked; window.Trk.core.saveUserPrefs(); render();
+    core.settings.tvDockFive = checked; core.saveUserPrefs(); render();
   });
   const dockGroupTitle = tx("div", "tvDockGroup", "tvDockGroupTitle"); dockGroupTitle.id = "tvDockGroupTitle";
-  const dockGroup = window.Trk.core.el("div", "tvDockGroup");
+  const dockGroup = core.el("div", "tvDockGroup");
   dockGroup.setAttribute("role", "group"); dockGroup.setAttribute("aria-labelledby", "tvDockGroupTitle");
   dockGroup.append(dockGroupTitle, wallCheck.wrap, reorderCheck.wrap, fiveCheck.wrap);
 
   const overlayCheck = (() => {
-    const lab = window.Trk.core.el("label","check"), inp = document.createElement("input");
+    const lab = core.el("label","check"), inp = document.createElement("input");
     inp.type = "checkbox"; lab.append(inp, tx("span","tvOverlay"));
-    inp.addEventListener("change", () => { window.Trk.core.settings.tvOverlay = inp.checked; window.Trk.core.saveUserPrefs(); render(); });
+    inp.addEventListener("change", () => { core.settings.tvOverlay = inp.checked; core.saveUserPrefs(); render(); });
     return { lab, inp };
   })();
 
   /* 🆕 演奏中も ◀▶ で曲を変える（初期オフ。使いたい人だけオンにする） */
   const songPlayCheck = (() => {
-    const lab = window.Trk.core.el("label","check"), inp = document.createElement("input");
+    const lab = core.el("label","check"), inp = document.createElement("input");
     inp.type = "checkbox"; inp.id = "tvSongWhilePlaying";
     lab.append(inp, tx("span","tvSongPlay"));
     inp.addEventListener("change", () => {
-      window.Trk.core.settings.tvSongWhilePlaying = inp.checked;
-      window.Trk.core.saveUserPrefs();
+      core.settings.tvSongWhilePlaying = inp.checked;
+      core.saveUserPrefs();
       lcdFlash(tr(inp.checked ? "tvSongPlayOn" : "tvSongPlayOff"));
       render();
     });
@@ -1267,7 +1276,7 @@ addEventListener("DOMContentLoaded", () => {
 
   const moreBtn = tx("button","tvMore","fxMini"); moreBtn.type = "button";
   moreBtn.addEventListener("click", () => {
-    window.Trk.core.openSettings();
+    core.openSettings();
     const vs = document.getElementById("videoStyle");
     if (vs) {
       vs.closest("details.panel").open = true;
@@ -1276,19 +1285,19 @@ addEventListener("DOMContentLoaded", () => {
   });
   const resetBtn = tx("button","tvReset","fxMini"); resetBtn.type = "button";
   resetBtn.addEventListener("click", () => {
-    window.Trk.core.settings.videoStyle = "color";
-    window.Trk.core.settings.bgDim = 0; window.Trk.core.settings.bgBlur = 0;
-    window.Trk.core.settings.tvDockSkin = "cinema";
-    window.Trk.core.settings.tvDockFive = false;
-    window.Trk.core.settings.tvOrder = "tv-first";
-    window.Trk.core.settings.tvOverlay = true;
-    window.Trk.core.settings.tvPowerPrev = "color";
-    window.Trk.core.settings.tvMenuPreview = true; window.Trk.core.settings.tvMenuVideo = false;
-    if (typeof view !== "undefined") window.Trk.core.view.style.filter = newVideoFilter();
-    window.Trk.core.saveUserPrefs();
+    core.settings.videoStyle = "color";
+    core.settings.bgDim = 0; core.settings.bgBlur = 0;
+    core.settings.tvDockSkin = "cinema";
+    core.settings.tvDockFive = false;
+    core.settings.tvOrder = "tv-first";
+    core.settings.tvOverlay = true;
+    core.settings.tvPowerPrev = "color";
+    core.settings.tvMenuPreview = true; core.settings.tvMenuVideo = false;
+    if (typeof view !== "undefined") core.view.style.filter = newVideoFilter();
+    core.saveUserPrefs();
     menuVideoTick();
     const vs = document.getElementById("videoStyle");
-    if (vs) vs.value = window.Trk.core.settings.videoStyle;
+    if (vs) vs.value = core.settings.videoStyle;
     if (typeof dimInp !== "undefined") { dimInp.value = 0; blurInp.value = 0; }
     lcdFlash(tr("tvResetDone"));
     render(true);
@@ -1296,22 +1305,22 @@ addEventListener("DOMContentLoaded", () => {
   });
 
   /* ---- 🎛 設定 / 🖼 確認 のタブと中身 ---- */
-  const tabsBar = window.Trk.core.el("div", "seg tvTabs");
+  const tabsBar = core.el("div", "seg tvTabs");
   const tabSetup = btn("");
   const tabPrev = btn("");
   const setLabel = (node, key) => { node.textContent = tr(key); node.dataset.i18n = key; };
   setLabel(tabSetup, "tvpTabSetup"); setLabel(tabPrev, "tvpTabPreview");
   tabsBar.append(tabSetup, tabPrev);
 
-  const paneSetup = window.Trk.core.el("div", "tvPane");
+  const paneSetup = core.el("div", "tvPane");
   const shareBtn = btn("fxMini", "🔗 " + tr("tvShareBtn"));
   shareBtn.dataset.i18n = "tvShareBtn";
   shareBtn.title = tr("tvShareHint");
   shareBtn.addEventListener("click", () => {
     try {
       const u = new URL(location.href);
-      u.searchParams.set("tv", window.Trk.core.settings.videoStyle);
-      u.searchParams.set("skin", window.Trk.core.settings.tvDockSkin);
+      u.searchParams.set("tv", core.settings.videoStyle);
+      u.searchParams.set("skin", core.settings.tvDockSkin);
       const text = u.toString();
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(() => {
@@ -1325,25 +1334,25 @@ addEventListener("DOMContentLoaded", () => {
   });
   /* ⚠ el(tag, cls, text) は文字を1つしか入れられない。ボタンを並べるなら append で足す
      （以前は text 扱いで "[object HTMLButtonElement]" になり、4つのボタンが消えていた） */
-  const paneSetupActions = window.Trk.core.el("div", "miniActions");
+  const paneSetupActions = core.el("div", "miniActions");
   paneSetupActions.append(makerBtn, shareBtn, moreBtn, resetBtn);
   paneSetup.append(tx("div","tvOverlayHint","hint"), overlayCheck.lab, dockGroup,
     songPlayCheck.lab, tx("div","tvSongPlayHint","hint"),
     paneSetupActions);
 
-  const pvWrap = window.Trk.core.el("div", "tvpWrap");
+  const pvWrap = core.el("div", "tvpWrap");
   const pvCanvas = document.createElement("canvas"); pvCanvas.className = "tvpCanvas";
   pvCanvas.width = 1920; pvCanvas.height = 1080;
-  const pvChip = window.Trk.core.el("div", "tvpChip");
+  const pvChip = core.el("div", "tvpChip");
   pvWrap.append(pvCanvas, pvChip);
 
-  const pvControls = window.Trk.core.el("div", "inline");   /* ⚠ ここも文字のつもりで object を渡していたので style が効いていなかった */
+  const pvControls = core.el("div", "inline");   /* ⚠ ここも文字のつもりで object を渡していたので style が効いていなかった */
   pvControls.style.cssText = "gap:8px;margin:8px 0 10px;width:100%";
   const pvPlayPause = btn("fxMini", "▶");
   const pvSeek = document.createElement("input");
   pvSeek.type = "range"; pvSeek.min = "0"; pvSeek.max = "100"; pvSeek.step = "0.1"; pvSeek.value = "0";
   pvSeek.style.flex = "1";
-  const pvTime = window.Trk.core.el("span", "mono", "0:00 / 0:00");
+  const pvTime = core.el("span", "mono", "0:00 / 0:00");
   pvTime.style.fontSize = "12px";
   pvControls.append(pvPlayPause, pvSeek, pvTime);
 
@@ -1351,7 +1360,7 @@ addEventListener("DOMContentLoaded", () => {
   pvPlayBtn.dataset.i18n = "tvpPlayGame";
   pvPlayBtn.style.marginTop = "4px";
   pvPlayBtn.addEventListener("click", () => {
-    if (window.Trk.core.videoReady && window.Trk.core.chart.length && typeof startGame === "function") window.Trk.play.startGame();
+    if (core.videoReady && core.chart.length && typeof startGame === "function") window.Trk.play.startGame();
   });
 
   const fmtTime = sec => {
@@ -1361,11 +1370,11 @@ addEventListener("DOMContentLoaded", () => {
   };
 
   pvPlayPause.addEventListener("click", () => {
-    if (!window.Trk.core.videoReady) return;
-    if (window.Trk.core.video.paused) {
-      window.Trk.core.video.play().then(() => { pvPlayPause.textContent = "⏸"; }).catch(() => {});
+    if (!core.videoReady) return;
+    if (core.video.paused) {
+      core.video.play().then(() => { pvPlayPause.textContent = "⏸"; }).catch(() => {});
     } else {
-      window.Trk.core.video.pause();
+      core.video.pause();
       pvPlayPause.textContent = "▶";
     }
   });
@@ -1373,45 +1382,45 @@ addEventListener("DOMContentLoaded", () => {
   let pvSeeking = false;
   pvSeek.addEventListener("input", () => {
     pvSeeking = true;
-    if (window.Trk.core.video.duration) {
-      const t = (Number(pvSeek.value) / 100) * window.Trk.core.video.duration;
-      pvTime.textContent = `${fmtTime(t)} / ${fmtTime(window.Trk.core.video.duration)}`;
+    if (core.video.duration) {
+      const t = (Number(pvSeek.value) / 100) * core.video.duration;
+      pvTime.textContent = `${fmtTime(t)} / ${fmtTime(core.video.duration)}`;
     }
   });
   pvSeek.addEventListener("change", () => {
-    if (window.Trk.core.video.duration) {
-      window.Trk.core.video.currentTime = (Number(pvSeek.value) / 100) * window.Trk.core.video.duration;
+    if (core.video.duration) {
+      core.video.currentTime = (Number(pvSeek.value) / 100) * core.video.duration;
     }
     pvSeeking = false;
   });
 
   const menuPrevCheck = (() => {
-    const lab = window.Trk.core.el("label","check"), inp = document.createElement("input");
+    const lab = core.el("label","check"), inp = document.createElement("input");
     inp.type = "checkbox"; lab.append(inp, tx("span","tvpMenuPreview"));
-    inp.addEventListener("change", () => { window.Trk.core.settings.tvMenuPreview = inp.checked; window.Trk.core.saveUserPrefs(); render(); });
+    inp.addEventListener("change", () => { core.settings.tvMenuPreview = inp.checked; core.saveUserPrefs(); render(); });
     return { lab, inp };
   })();
   const menuVidCheck = (() => {
-    const lab = window.Trk.core.el("label","check"), inp = document.createElement("input");
+    const lab = core.el("label","check"), inp = document.createElement("input");
     inp.type = "checkbox"; lab.append(inp, tx("span","tvpMenuVideo"));
-    inp.addEventListener("change", () => { window.Trk.core.settings.tvMenuVideo = inp.checked; window.Trk.core.saveUserPrefs(); menuVideoTick(); render(); });
+    inp.addEventListener("change", () => { core.settings.tvMenuVideo = inp.checked; core.saveUserPrefs(); menuVideoTick(); render(); });
     return { lab, inp };
   })();
   const pvPower = btn("fxMini", tr("tvpPower")); pvPower.dataset.i18n = "tvpPower";
   pvPower.addEventListener("click", () => { togglePower(); render(); });
 
-  const panePreview = window.Trk.core.el("div", "tvPane");
-  const panePreviewActions = window.Trk.core.el("div", "miniActions");   /* ⚠ 同じ理由（el の第3引数は文字だけ）で、ここもボタンが消えていた */
+  const panePreview = core.el("div", "tvPane");
+  const panePreviewActions = core.el("div", "miniActions");   /* ⚠ 同じ理由（el の第3引数は文字だけ）で、ここもボタンが消えていた */
   panePreviewActions.append(pvPlayBtn, pvPower, moreBtn);
   panePreview.append(pvWrap, pvControls, tx("div","tvpPreviewHint","hint"), menuPrevCheck.lab, tx("div","tvpMenuPreviewHint","hint"),
     menuVidCheck.lab, tx("div","tvpMenuVideoHint","hint"), panePreviewActions);
 
   let tab = "setup", pvRaf = 0, pvMutedByUs = false, pvPlayedByUs = false;
   const previewOn = () => tab === "preview" && !panePreview.hidden && body.open && !document.hidden &&
-    window.Trk.core.phase === "title" && screenName() === "select";
+    core.phase === "title" && screenName() === "select";
   function pvChipText() {
-    if (window.Trk.core.settings.videoStyle === "off") { pvChip.textContent = tr("tvOff"); return; }
-    pvChip.textContent = tr("tvpNow", { name: names()[window.Trk.core.settings.videoStyle] || window.Trk.core.settings.videoStyle });
+    if (core.settings.videoStyle === "off") { pvChip.textContent = tr("tvOff"); return; }
+    pvChip.textContent = tr("tvpNow", { name: names()[core.settings.videoStyle] || core.settings.videoStyle });
   }
   function pvPlaceholder(ctx, text) {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -1428,26 +1437,26 @@ addEventListener("DOMContentLoaded", () => {
     /* 🪶 軽量化：確認タブ（1920×1080の確認画面）も描く回数を減らす */
     if (typeof TrkLite === "object" && !TrkLite.allow("tvCheck", performance.now())) return;
     const ctx = pvCanvas.getContext("2d"); if (!ctx) return;
-    if (window.Trk.core.settings.videoStyle === "off") { pvPlaceholder(ctx, tr("tvpOff")); return; }
+    if (core.settings.videoStyle === "off") { pvPlaceholder(ctx, tr("tvpOff")); return; }
     if (!paintVideoFrame(ctx, 1920, 1080, "contain")) pvPlaceholder(ctx, tr("tvpNoVideo"));
-    if (!pvSeeking && window.Trk.core.video.duration) {
-      pvSeek.value = ((window.Trk.core.video.currentTime / window.Trk.core.video.duration) * 100).toFixed(1);
-      pvTime.textContent = `${fmtTime(window.Trk.core.video.currentTime)} / ${fmtTime(window.Trk.core.video.duration)}`;
-      pvPlayPause.textContent = window.Trk.core.video.paused ? "▶" : "⏸";
+    if (!pvSeeking && core.video.duration) {
+      pvSeek.value = ((core.video.currentTime / core.video.duration) * 100).toFixed(1);
+      pvTime.textContent = `${fmtTime(core.video.currentTime)} / ${fmtTime(core.video.duration)}`;
+      pvPlayPause.textContent = core.video.paused ? "▶" : "⏸";
     }
   }
   /* 「確認」タブを開いている間は、止まっていたら（音なしで）動かす */
   function pvKeepPlaying() {
-    if (!previewOn() || window.Trk.core.settings.previewEnabled) return;
-    if (window.Trk.core.video.paused && window.Trk.core.videoReady) {
-      if (!window.Trk.core.video.muted) { window.Trk.core.video.muted = true; pvMutedByUs = true; }
-      window.Trk.core.video.play().then(() => { pvPlayedByUs = true; }).catch(() => {});
+    if (!previewOn() || core.settings.previewEnabled) return;
+    if (core.video.paused && core.videoReady) {
+      if (!core.video.muted) { core.video.muted = true; pvMutedByUs = true; }
+      core.video.play().then(() => { pvPlayedByUs = true; }).catch(() => {});
     }
   }
   function pvRelease() {
-    if (window.Trk.core.settings.tvMenuVideo === true) return;   // メニュー再生が続くので触らない
-    if (pvPlayedByUs) { try { window.Trk.core.video.pause(); } catch (_) {} pvPlayedByUs = false; }
-    if (pvMutedByUs) { window.Trk.core.video.muted = false; pvMutedByUs = false; }
+    if (core.settings.tvMenuVideo === true) return;   // メニュー再生が続くので触らない
+    if (pvPlayedByUs) { try { core.video.pause(); } catch (_) {} pvPlayedByUs = false; }
+    if (pvMutedByUs) { core.video.muted = false; pvMutedByUs = false; }
   }
   function previewTick() {
     pvChipText();
@@ -1472,19 +1481,19 @@ addEventListener("DOMContentLoaded", () => {
   tabSetup.addEventListener("click", () => showTab("setup"));
   tabPrev.addEventListener("click", () => showTab("preview"));
   body.addEventListener("toggle", previewTick);
-  window.Trk.core.video.addEventListener("ended", () => {
+  core.video.addEventListener("ended", () => {
     if (!previewOn() || !pvPlayedByUs) return;   // 音ありプレビューが動かしている場合は library.js に任せる
-    try { window.Trk.core.video.currentTime = (typeof previewStartFor === "function") ? previewStartFor() : 0; } catch (_) {}
-    window.Trk.core.video.play().catch(() => {});
+    try { core.video.currentTime = (typeof previewStartFor === "function") ? previewStartFor() : 0; } catch (_) {}
+    core.video.play().catch(() => {});
   });
   document.addEventListener("visibilitychange", previewTick);
-  window.Trk.core.video.addEventListener("play", previewTick);
-  window.Trk.core.video.addEventListener("pause", previewTick);
-  window.Trk.core.video.addEventListener("canplay", previewTick);
+  core.video.addEventListener("play", previewTick);
+  core.video.addEventListener("pause", previewTick);
+  core.video.addEventListener("canplay", previewTick);
   showTab("setup");
 
   /* 長押しの代わり：電源ボタンの長押し（＝メディアプレーヤー）と同じ入口。設定 showMoreBtns で隠せる */
-  const mediaRow = window.Trk.core.el("div", "inline tight moreBtn");
+  const mediaRow = core.el("div", "inline tight moreBtn");
   const mediaBtn = tx("button", "tvMediaBtn", "tvMediaOpen"); mediaBtn.type = "button";
   /* 公開の入口（media-player-mode.js の window.TrkMediaPlayer.open）を呼ぶ。trk71 では存在しない window.openMedia を呼んでいて無反応だった */
   mediaBtn.addEventListener("click", () => { if (window.TrkMediaPlayer) window.TrkMediaPlayer.open(); });
@@ -1500,13 +1509,13 @@ addEventListener("DOMContentLoaded", () => {
 
   pow.addEventListener("click", () => {
     togglePower();
-    lcdFlash(tr(window.Trk.core.settings.videoStyle === "off" ? "tvPowerOff" : "tvPowerOn"));
+    lcdFlash(tr(core.settings.videoStyle === "off" ? "tvPowerOff" : "tvPowerOn"));
   });
   /* 🖥 動画を全画面で表示（もう一度押すと閉じる）。一時停止は全画面の中の ▶ ボタンでできます */
   pauseBtn.addEventListener("click", () => {
     if (!window.TrkVideoMax) { togglePause(); lcdFlash(tr("tvPause")); return; }
     const opening = !window.TrkVideoMax.isOpen();
-    if (opening && !window.Trk.core.videoReady) { lcdFlash(tr("tvVideoMaxNeed")); return; }
+    if (opening && !core.videoReady) { lcdFlash(tr("tvVideoMaxNeed")); return; }
     window.TrkVideoMax.toggle();
     lcdFlash(tr(opening ? "tvVideoMaxOn" : "tvVideoMaxOff"));
   });
@@ -1514,8 +1523,8 @@ addEventListener("DOMContentLoaded", () => {
   /* ◀ ▶：選曲リストを前へ・次へ（ラジオのチャンネル送りみたいに）
      曲の選び方は library.js の nextSong() / prevSong() に任せる（ラジオと同じ並び） */
   const songStep = async dir => {
-    const playing = window.Trk.core.phase !== "title";
-    if (playing && !window.Trk.core.settings.tvSongWhilePlaying) return;        // 初期オフ（ゲーム中は曲が飛ばない）
+    const playing = core.phase !== "title";
+    if (playing && !core.settings.tvSongWhilePlaying) return;        // 初期オフ（ゲーム中は曲が飛ばない）
     const pickSong = dir > 0 ? (typeof nextSong === "function" ? nextSong : null)
                              : (typeof prevSong === "function" ? prevSong : null);
     const it = pickSong ? pickSong() : null;
@@ -1533,13 +1542,13 @@ addEventListener("DOMContentLoaded", () => {
   };
   prevSongBtn.addEventListener("click", () => songStep(-1));
   nextSongBtn.addEventListener("click", () => songStep(1));
-  window.Trk.core.video.addEventListener("play", () => render());
-  window.Trk.core.video.addEventListener("pause", () => render());
+  core.video.addEventListener("play", () => render());
+  core.video.addEventListener("pause", () => render());
   rTv.addEventListener("click", () => randomTv());
   rFav.addEventListener("click", () => {
     const F = window.TrkFavs;
-    const src = F ? F.pool("tv") : (window.Trk.core.settings.tvFav || []);
-    const list = src.filter(id => id !== window.Trk.core.settings.videoStyle && tvPresetById(id) && !tvPresetById(id).off);
+    const src = F ? F.pool("tv") : (core.settings.tvFav || []);
+    const list = src.filter(id => id !== core.settings.videoStyle && tvPresetById(id) && !tvPresetById(id).off);
     if (list.length) selectTv(list[Math.floor(Math.random()*list.length)]);
     else lcdFlash(tr("tvNoFavShort"));
   });
@@ -1551,8 +1560,8 @@ addEventListener("DOMContentLoaded", () => {
   });
 
   function assign(i) {
-    if (window.Trk.core.settings.videoStyle === "off") { lcdFlash(tr("tvNeedOn")); return; }
-    const id = window.Trk.core.settings.videoStyle;
+    if (core.settings.videoStyle === "off") { lcdFlash(tr("tvNeedOn")); return; }
+    const id = core.settings.videoStyle;
     if (!tvPresetById(id) || tvPresetById(id).off) { lcdFlash(tr("tvNeedOn")); return; }
     const F = window.TrkFavs;
     if (F) {
@@ -1560,24 +1569,24 @@ addEventListener("DOMContentLoaded", () => {
       const g = ["main", "sub", "frozen"].includes(F.activeOf("tv")) ? F.activeOf("tv") : "main";
       const r = F.add("tv", id, { group:g, index:i });
       if (!r.ok) { lcdFlash(F.msg(r.why)); return; }
-      window.Trk.core.emit("language");
+      core.emit("language");
       lcdFlash(tr("tvSaved", { n:i+1, name: tvPresetName(tvPresetById(id)) }));
       render();
       return;
     }
-    const arr = (window.Trk.core.settings.tvFav || []).filter(x => x !== id);
+    const arr = (core.settings.tvFav || []).filter(x => x !== id);
     arr.splice(Math.min(i, arr.length), 0, id);
-    window.Trk.core.settings.tvFav = arr;
-    window.Trk.core.saveUserPrefs();
-    if (typeof emit === "function") window.Trk.core.emit("language");
+    core.settings.tvFav = arr;
+    core.saveUserPrefs();
+    if (typeof emit === "function") core.emit("language");
     lcdFlash(tr("tvSaved", { n:i+1, name: tvPresetName(tvPresetById(id)) }));
     render();
   }
   function slotButton(i, id, nm) {
     const preset = tvPresetById(id);
     const isOff = preset && preset.off;
-    const on = !isOff && window.Trk.core.settings.videoStyle === id;
-    const b = btn("tvKey tvSlot" + (id ? "" : " empty") + (on ? " selected" : ""), window.Trk.core.el("span","num", String(i+1)), window.Trk.core.el("span","nm", nm || "—"));
+    const on = !isOff && core.settings.videoStyle === id;
+    const b = btn("tvKey tvSlot" + (id ? "" : " empty") + (on ? " selected" : ""), core.el("span","num", String(i+1)), core.el("span","nm", nm || "—"));
     b.title = id ? nm : tr("tvEmptySlot");
     b.setAttribute("aria-pressed", String(on));
     let timer=0, long=false;
@@ -1600,71 +1609,83 @@ addEventListener("DOMContentLoaded", () => {
     deco.className = "tvDeco " + d;
     deco.hidden = !d;
     if (d === "tube") {
-      deco.append(window.Trk.core.el("i","tubeGlow"), window.Trk.core.el("i","tubeKnob"), window.Trk.core.el("i","tubeKnob"));
+      deco.append(core.el("i","tubeGlow"), core.el("i","tubeKnob"), core.el("i","tubeKnob"));
     } else if (d === "wood") {
-      deco.append(window.Trk.core.el("i","woodGrain"), window.Trk.core.el("i","woodSpeaker"));
+      deco.append(core.el("i","woodGrain"), core.el("i","woodSpeaker"));
     } else if (d === "antenna") {
-      const ant = window.Trk.core.el("i","tvAnt"); deco.append(ant);
-      if (window.Trk.core.settings.videoStyle !== "off" && !window.Trk.core.video.paused) ant.classList.add("on");
+      const ant = core.el("i","tvAnt"); deco.append(ant);
+      if (core.settings.videoStyle !== "off" && !core.video.paused) ant.classList.add("on");
     } else if (d === "paper") {
-      deco.append(window.Trk.core.el("i","paperFrame"), window.Trk.core.el("i","paperSlide"));
+      deco.append(core.el("i","paperFrame"), core.el("i","paperSlide"));
     } else if (d === "dials") {
-      for (let k=0;k<3;k++) deco.append(window.Trk.core.el("i","dial"));
+      for (let k=0;k<3;k++) deco.append(core.el("i","dial"));
     } else if (d === "home") {
-      const chDisp = window.Trk.core.el("i","homeChDisp"); chDisp.textContent = window.Trk.core.settings.videoStyle === "off" ? "--" : window.Trk.core.settings.videoStyle.toUpperCase().slice(0,4);
-      const chUp = window.Trk.core.el("button","homeBtn"); chUp.type="button"; chUp.textContent="▲"; chUp.title=tr("tvNext");
-      const chDown = window.Trk.core.el("button","homeBtn"); chDown.type="button"; chDown.textContent="▼"; chDown.title=tr("tvPrev");
+      const chDisp = core.el("i","homeChDisp"); chDisp.textContent = core.settings.videoStyle === "off" ? "--" : core.settings.videoStyle.toUpperCase().slice(0,4);
+      const chUp = core.el("button","homeBtn"); chUp.type="button"; chUp.textContent="▲"; chUp.title=tr("tvNext");
+      const chDown = core.el("button","homeBtn"); chDown.type="button"; chDown.textContent="▼"; chDown.title=tr("tvPrev");
       chUp.addEventListener("click", ()=>{ stepTv(1); });
       chDown.addEventListener("click", ()=>{ stepTv(-1); });
-      const volUp = window.Trk.core.el("button","homeBtn"); volUp.type="button"; volUp.textContent="＋"; volUp.title="Volume";
-      const volDown = window.Trk.core.el("button","homeBtn"); volDown.type="button"; volDown.textContent="－";
-      volUp.addEventListener("click", ()=>{ window.Trk.core.settings.musicVolume = Math.min(1, window.Trk.core.settings.musicVolume+0.05); if (window.Trk.core.settings.musicVolume > 0) window.Trk.core.rememberMusicVolume(window.Trk.core.settings.musicVolume); if (typeof video!=="undefined") window.Trk.core.video.volume = window.Trk.core.settings.musicVolume; const v=document.getElementById("volume"); if(v) v.value=window.Trk.core.settings.musicVolume; window.Trk.core.saveUserPrefs(); });
-      volDown.addEventListener("click", ()=>{ window.Trk.core.settings.musicVolume = Math.max(0, window.Trk.core.settings.musicVolume-0.05); if (window.Trk.core.settings.musicVolume > 0) window.Trk.core.rememberMusicVolume(window.Trk.core.settings.musicVolume); if (typeof video!=="undefined") window.Trk.core.video.volume = window.Trk.core.settings.musicVolume; const v=document.getElementById("volume"); if(v) v.value=window.Trk.core.settings.musicVolume; window.Trk.core.saveUserPrefs(); });
-      deco.append(chDisp, chUp, chDown, volUp, volDown, window.Trk.core.el("i","homeSpeaker"));
+      const volUp = core.el("button","homeBtn"); volUp.type="button"; volUp.textContent="＋"; volUp.title="Volume";
+      const volDown = core.el("button","homeBtn"); volDown.type="button"; volDown.textContent="－";
+      volUp.addEventListener("click", ()=>{ core.settings.musicVolume = Math.min(1, core.settings.musicVolume+0.05); if (core.settings.musicVolume > 0) core.rememberMusicVolume(core.settings.musicVolume); if (typeof video!=="undefined") core.video.volume = core.settings.musicVolume; const v=document.getElementById("volume"); if(v) v.value=core.settings.musicVolume; core.saveUserPrefs(); });
+      volDown.addEventListener("click", ()=>{ core.settings.musicVolume = Math.max(0, core.settings.musicVolume-0.05); if (core.settings.musicVolume > 0) core.rememberMusicVolume(core.settings.musicVolume); if (typeof video!=="undefined") core.video.volume = core.settings.musicVolume; const v=document.getElementById("volume"); if(v) v.value=core.settings.musicVolume; core.saveUserPrefs(); });
+      deco.append(chDisp, chUp, chDown, volUp, volDown, core.el("i","homeSpeaker"));
     } else if (d === "wall") {
-      deco.append(window.Trk.core.el("i","wallMount"), window.Trk.core.el("i","wallShadow"));
+      deco.append(core.el("i","wallMount"), core.el("i","wallShadow"));
     } else if (d === "holo" || d === "hologram") {
-      deco.append(window.Trk.core.el("i","holoRing"), window.Trk.core.el("i","holoRing"), window.Trk.core.el("i","holoScan"), window.Trk.core.el("i","holoFloat"));
+      deco.append(core.el("i","holoRing"), core.el("i","holoRing"), core.el("i","holoScan"), core.el("i","holoFloat"));
     } else if (d === "screen") {
-      deco.append(window.Trk.core.el("i","projBeam"), window.Trk.core.el("i","projCurtain"), window.Trk.core.el("i","projCurtain right"), window.Trk.core.el("i","projLens"));
+      deco.append(core.el("i","projBeam"), core.el("i","projCurtain"), core.el("i","projCurtain right"), core.el("i","projLens"));
     } else if (d === "phone") {
-      deco.append(window.Trk.core.el("i","phoneNotch"), window.Trk.core.el("i","phoneSpeaker"), window.Trk.core.el("i","phoneHome"));
+      deco.append(core.el("i","phoneNotch"), core.el("i","phoneSpeaker"), core.el("i","phoneHome"));
     } else if (d === "arcade") {
-      deco.append(window.Trk.core.el("i","arcadeMarquee"), window.Trk.core.el("i","arcadeStick"), window.Trk.core.el("i","arcadeBtn"), window.Trk.core.el("i","arcadeBtn"), window.Trk.core.el("i","arcadeCoin"));
+      deco.append(core.el("i","arcadeMarquee"), core.el("i","arcadeStick"), core.el("i","arcadeBtn"), core.el("i","arcadeBtn"), core.el("i","arcadeCoin"));
     } else if (d === "laptop") {
-      deco.append(window.Trk.core.el("i","laptopHinge"), window.Trk.core.el("i","laptopKeys"), window.Trk.core.el("i","laptopTrack"));
+      deco.append(core.el("i","laptopHinge"), core.el("i","laptopKeys"), core.el("i","laptopTrack"));
     } else if (d === "cinema") {
-      deco.append(window.Trk.core.el("i","cinemaCurtain left"), window.Trk.core.el("i","cinemaCurtain right"), window.Trk.core.el("i","cinemaSeats"));
+      deco.append(core.el("i","cinemaCurtain left"), core.el("i","cinemaCurtain right"), core.el("i","cinemaSeats"));
     } else if (d === "car") {
-      deco.append(window.Trk.core.el("i","carDash"), window.Trk.core.el("i","carVent"), window.Trk.core.el("i","carWheel"));
+      deco.append(core.el("i","carDash"), core.el("i","carVent"), core.el("i","carWheel"));
     } else if (d === "airplane") {
-      deco.append(window.Trk.core.el("i","planeTray"), window.Trk.core.el("i","planeBelt"), window.Trk.core.el("i","planeWindow"));
+      deco.append(core.el("i","planeTray"), core.el("i","planeBelt"), core.el("i","planeWindow"));
     } else if (d === "vr") {
-      deco.append(window.Trk.core.el("i","vrStrap"), window.Trk.core.el("i","vrLens"), window.Trk.core.el("i","vrLens right"), window.Trk.core.el("i","vrSensor"));
+      deco.append(core.el("i","vrStrap"), core.el("i","vrLens"), core.el("i","vrLens right"), core.el("i","vrSensor"));
     } else if (d === "aquarium") {
-      deco.append(window.Trk.core.el("i","aquaBubble"), window.Trk.core.el("i","aquaBubble b2"), window.Trk.core.el("i","aquaBubble b3"), window.Trk.core.el("i","aquaFish"), window.Trk.core.el("i","aquaSand"));
+      deco.append(core.el("i","aquaBubble"), core.el("i","aquaBubble b2"), core.el("i","aquaBubble b3"), core.el("i","aquaFish"), core.el("i","aquaSand"));
     } else if (d === "scope") {
-      deco.append(window.Trk.core.el("i","scopeGrid"), window.Trk.core.el("i","scopeKnob"), window.Trk.core.el("i","scopeGlow"));
+      deco.append(core.el("i","scopeGrid"), core.el("i","scopeKnob"), core.el("i","scopeGlow"));
     } else if (d === "cctv") {
-      deco.append(window.Trk.core.el("i","cctvRec"), window.Trk.core.el("i","cctvTime"), window.Trk.core.el("i","cctvScan"));
+      deco.append(core.el("i","cctvRec"), core.el("i","cctvTime"), core.el("i","cctvScan"));
     } else if (d === "gameboy") {
-      deco.append(window.Trk.core.el("i","gbDpad"), window.Trk.core.el("i","gbBtnA"), window.Trk.core.el("i","gbBtnB"), window.Trk.core.el("i","gbSpeaker"));
+      deco.append(core.el("i","gbDpad"), core.el("i","gbBtnA"), core.el("i","gbBtnB"), core.el("i","gbSpeaker"));
     } else if (d === "jumbotron") {
-      deco.append(window.Trk.core.el("i","jumboBolt"), window.Trk.core.el("i","jumboBolt"), window.Trk.core.el("i","jumboBolt"), window.Trk.core.el("i","jumboGlare"));
+      deco.append(core.el("i","jumboBolt"), core.el("i","jumboBolt"), core.el("i","jumboBolt"), core.el("i","jumboGlare"));
     } else if (d === "frame") {
-      deco.append(window.Trk.core.el("i","frameMount"), window.Trk.core.el("i","frameShadow"));
+      deco.append(core.el("i","frameMount"), core.el("i","frameShadow"));
     } else if (d === "transparent") {
-      deco.append(window.Trk.core.el("i","transEdge"), window.Trk.core.el("i","transShine"));
+      deco.append(core.el("i","transEdge"), core.el("i","transShine"));
     } else if (d === "toy") {
-      deco.append(window.Trk.core.el("i","toyBow"), window.Trk.core.el("i","toyHeart"), window.Trk.core.el("i","toyStar"));
+      deco.append(core.el("i","toyBow"), core.el("i","toyHeart"), core.el("i","toyStar"));
     } else if (d === "cardboard") {
-      deco.append(window.Trk.core.el("i","cardTape"), window.Trk.core.el("i","cardScribble"));
+      deco.append(core.el("i","cardTape"), core.el("i","cardScribble"));
     } else if (d === "window") {
-      deco.append(window.Trk.core.el("i","winHandle"), window.Trk.core.el("i","winRain"), window.Trk.core.el("i","winBlind"));
+      deco.append(core.el("i","winHandle"), core.el("i","winRain"), core.el("i","winBlind"));
     } else if (d === "microwave") {
-      deco.append(window.Trk.core.el("i","mwTimer"), window.Trk.core.el("i","mwDoor"), window.Trk.core.el("i","mwPlate"));
+      deco.append(core.el("i","mwTimer"), core.el("i","mwDoor"), core.el("i","mwPlate"));
     } else if (d === "videowall") {
-      deco.append(window.Trk.core.el("i","vwBezH"), window.Trk.core.el("i","vwBezV"), window.Trk.core.el("i","vwSeam"));
+      deco.append(core.el("i","vwBezH"), core.el("i","vwBezV"), core.el("i","vwSeam"));
+    } else if (d === "train") {
+      deco.append(core.el("i","trainRail"), core.el("i","trainLed"));
+    } else if (d === "porthole") {
+      deco.append(core.el("i","portRivet r1"), core.el("i","portRivet r2"), core.el("i","portRivet r3"), core.el("i","portRivet r4"), core.el("i","portWave"));
+    } else if (d === "lantern") {
+      deco.append(core.el("i","lanCord"), core.el("i","lanCap top"), core.el("i","lanCap bottom"), core.el("i","lanTassel"));
+    } else if (d === "fridge") {
+      deco.append(core.el("i","fridgeSeam"), core.el("i","fridgeHandle"), core.el("i","fridgeNote"), core.el("i","fridgeNote n2"));
+    } else if (d === "bowl") {
+      deco.append(core.el("i","bowlWater"), core.el("i","bowlPebbles"), core.el("i","bowlFish"), core.el("i","bowlBubble"));
+    } else if (d === "washer") {
+      deco.append(core.el("i","washPanel"), core.el("i","washDial"), core.el("i","washBubbles"));
     }
   }
 
@@ -1689,17 +1710,17 @@ addEventListener("DOMContentLoaded", () => {
   function render(skinChanged) {
     const nm = names();
     // 知らないスキン名（古い設定・壊れた設定ファイル）は映画館スクリーンとして描く
-    const skinId = hasTvSkin(window.Trk.core.settings.tvDockSkin) ? window.Trk.core.settings.tvDockSkin : "cinema";
+    const skinId = hasTvSkin(core.settings.tvDockSkin) ? core.settings.tvDockSkin : "cinema";
     dock.dataset.skin = skinId;
     applyTvSkinVars(dock, skinId);
-    dock.classList.toggle("off", window.Trk.core.settings.videoStyle === "off");
-    dock.classList.toggle("playing", !window.Trk.core.video.paused && window.Trk.core.settings.videoStyle !== "off");
-    if (skinChanged || lastSkin !== window.Trk.core.settings.tvDockSkin) { buildDeco(); lastSkin = window.Trk.core.settings.tvDockSkin; }
+    dock.classList.toggle("off", core.settings.videoStyle === "off");
+    dock.classList.toggle("playing", !core.video.paused && core.settings.videoStyle !== "off");
+    if (skinChanged || lastSkin !== core.settings.tvDockSkin) { buildDeco(); lastSkin = core.settings.tvDockSkin; }
 
-    const isOff = window.Trk.core.settings.videoStyle === "off";
+    const isOff = core.settings.videoStyle === "off";
     /* 🖼 選曲中のTVに映像を映す（動いているときだけ） */
-    const liveOn = window.Trk.core.settings.tvMenuPreview !== false && !isOff && window.Trk.core.videoReady && !window.Trk.core.video.paused &&
-      window.Trk.core.phase === "title" && screenName() === "select";
+    const liveOn = core.settings.tvMenuPreview !== false && !isOff && core.videoReady && !core.video.paused &&
+      core.phase === "title" && screenName() === "select";
     screen.dataset.live = liveOn ? "1" : "0";
     liveCanvas.style.opacity = liveOn ? "" : "0";
     coverImg.hidden = isOff || liveOn || !coverImg.hasAttribute("src");
@@ -1714,12 +1735,12 @@ addEventListener("DOMContentLoaded", () => {
     prevSongBtn.title = tr("tvPrevSong"); prevSongBtn.setAttribute("aria-label", prevSongBtn.title);
     nextSongBtn.title = tr("tvNextSong"); nextSongBtn.setAttribute("aria-label", nextSongBtn.title);
 
-    const curName = isOff ? tr("tvOff") : (nm[window.Trk.core.settings.videoStyle] || window.Trk.core.settings.videoStyle);
-    lcd.textContent = flash && Date.now() < flash.until ? flash.text : curName + (isOff ? "" : (window.Trk.core.video.paused ? " ⏸" : " ▶"));
+    const curName = isOff ? tr("tvOff") : (nm[core.settings.videoStyle] || core.settings.videoStyle);
+    lcd.textContent = flash && Date.now() < flash.until ? flash.text : curName + (isOff ? "" : (core.video.paused ? " ⏸" : " ▶"));
     // 家庭用TVのCH表示をリアルタイム更新
     try {
       const chDisp = deco.querySelector(".homeChDisp");
-      if (chDisp) chDisp.textContent = isOff ? "--" : (window.Trk.core.settings.videoStyle || "").toUpperCase().slice(0,4);
+      if (chDisp) chDisp.textContent = isOff ? "--" : (core.settings.videoStyle || "").toUpperCase().slice(0,4);
     } catch(_) {}
 
     rTv.textContent = tr("tvRand"); rFav.textContent = tr("tvRandFav"); rPar.textContent = tr("tvRandParam");
@@ -1729,7 +1750,7 @@ addEventListener("DOMContentLoaded", () => {
     // スロット（⭐いまのフォルダの中身。1軍＝これまでの settings.tvFav）
     const F = window.TrkFavs;
     const favGroup = F && ["main", "sub", "frozen"].includes(F.activeOf("tv")) ? F.activeOf("tv") : "main";
-    const favAll = F ? F.list("tv", favGroup) : (window.Trk.core.settings.tvFav || []);
+    const favAll = F ? F.list("tv", favGroup) : (core.settings.tvFav || []);
     const fav = favAll.filter(id => { const p = tvPresetById(id); return p && !p.off; });
     const n = tvSlotCount();
     slots.style.setProperty("--cols", tvSlotCols());
@@ -1754,7 +1775,7 @@ addEventListener("DOMContentLoaded", () => {
     overLabel.hidden = !favAll.length;
     if (!favAll.length) overflow.append(tx("div","tvNoFav","hint"));
     for (const id of rest) {
-      const on = window.Trk.core.settings.videoStyle === id;
+      const on = core.settings.videoStyle === id;
       const b = btn(on ? "selected" : "", "⭐" + (F && F.pinned("tv", id) ? "📌" : "") + (nm[id]||id));
       b.setAttribute("aria-pressed", String(on));
       b.addEventListener("click", () => { if (on) selectTv("off"); else selectTv(id); });
@@ -1780,12 +1801,12 @@ addEventListener("DOMContentLoaded", () => {
       for (const p of items) { if (p.off) continue; const o = document.createElement("option"); o.value = p.id; o.textContent = tvPresetName(p); og.append(o); }
       quickSel.append(og);
     }
-    quickSel.value = isOff ? "off" : window.Trk.core.settings.videoStyle;
+    quickSel.value = isOff ? "off" : core.settings.videoStyle;
 
-    window.Trk.core.settings.bgDim = window.Trk.core.clampTvDim(window.Trk.core.settings.bgDim); window.Trk.core.settings.bgBlur = window.Trk.core.clampTvBlur(window.Trk.core.settings.bgBlur);
-    window.Trk.core.settings.tvParamFavs = window.Trk.core.cleanTvParamFavorites(window.Trk.core.settings.tvParamFavs);
-    dimInp.value = window.Trk.core.settings.bgDim; dimVal.textContent = Math.round(window.Trk.core.settings.bgDim*100)+"%";
-    blurInp.value = window.Trk.core.settings.bgBlur; blurVal.textContent = window.Trk.core.settings.bgBlur+"px";
+    core.settings.bgDim = core.clampTvDim(core.settings.bgDim); core.settings.bgBlur = core.clampTvBlur(core.settings.bgBlur);
+    core.settings.tvParamFavs = core.cleanTvParamFavorites(core.settings.tvParamFavs);
+    dimInp.value = core.settings.bgDim; dimVal.textContent = Math.round(core.settings.bgDim*100)+"%";
+    blurInp.value = core.settings.bgBlur; blurVal.textContent = core.settings.bgBlur+"px";
     dimInp.setAttribute("aria-label", tr("tvDim")); blurInp.setAttribute("aria-label", tr("tvBlur"));
     dimInp.title = tr("tvParamHint"); blurInp.title = tr("tvParamHint");
     renderParamFavorites();
@@ -1794,21 +1815,21 @@ addEventListener("DOMContentLoaded", () => {
     for (const [id, d] of Object.entries(TV_DOCK_SKINS)) {
       const o = document.createElement("option"); o.value = id; o.textContent = `${d.label[lang]||d.label.en}（${d.n}）`; skinSel.append(o);
     }
-    skinSel.value = window.Trk.core.settings.tvDockSkin;
-    fiveCheck.inp.checked = window.Trk.core.settings.tvDockFive;
-    reorderCheck.inp.checked = window.Trk.core.settings.tvOrder === "fx-first";
-    wallCheck.inp.checked = window.Trk.core.settings.tvDockSkin === "wall";
-    overlayCheck.inp.checked = window.Trk.core.settings.tvOverlay;
-    songPlayCheck.inp.checked = !!window.Trk.core.settings.tvSongWhilePlaying;
-    menuPrevCheck.inp.checked = window.Trk.core.settings.tvMenuPreview !== false;
-    menuVidCheck.inp.checked = window.Trk.core.settings.tvMenuVideo === true;
+    skinSel.value = core.settings.tvDockSkin;
+    fiveCheck.inp.checked = core.settings.tvDockFive;
+    reorderCheck.inp.checked = core.settings.tvOrder === "fx-first";
+    wallCheck.inp.checked = core.settings.tvDockSkin === "wall";
+    overlayCheck.inp.checked = core.settings.tvOverlay;
+    songPlayCheck.inp.checked = !!core.settings.tvSongWhilePlaying;
+    menuPrevCheck.inp.checked = core.settings.tvMenuPreview !== false;
+    menuVidCheck.inp.checked = core.settings.tvMenuVideo === true;
 
     // スクリーンの見た目
-    const curPreset = tvPresetById(window.Trk.core.settings.videoStyle);
+    const curPreset = tvPresetById(core.settings.videoStyle);
     screen.dataset.filter = curPreset ? curPreset.id : "";
     screen.dataset.off = isOff ? "1" : "0";
     // スピーカーの光
-    speaker.classList.toggle("on", !isOff && !window.Trk.core.video.paused);
+    speaker.classList.toggle("on", !isOff && !core.video.paused);
   }
 
   // 設定画面の videoStyle 同期
@@ -1826,14 +1847,14 @@ addEventListener("DOMContentLoaded", () => {
     coverImg.removeAttribute("src"); coverImg.hidden = true;
   }
   async function refreshDockCover(songKey) {
-    const token = ++coverRequest, key = songKey || window.Trk.core.currentSong && window.Trk.core.currentSong.key;
+    const token = ++coverRequest, key = songKey || core.currentSong && core.currentSong.key;
     if (!key) { clearDockCover(); render(); return; }
     let blob = null;
     try {
       if (window.TrkStudyRoom && typeof window.TrkStudyRoom.getSongCoverBlob === "function") blob = await window.TrkStudyRoom.getSongCoverBlob(key);
     } catch (_) {}
-    if (token !== coverRequest || !window.Trk.core.currentSong || window.Trk.core.currentSong.key !== key) return;
-    if (!blob) blob = window.Trk.core.currentSong.bgBlob || null;
+    if (token !== coverRequest || !core.currentSong || core.currentSong.key !== key) return;
+    if (!blob) blob = core.currentSong.bgBlob || null;
     if (coverObjectUrl) { URL.revokeObjectURL(coverObjectUrl); coverObjectUrl = ""; }
     try {
       if (blob && typeof URL.createObjectURL === "function") { coverObjectUrl = URL.createObjectURL(blob); coverImg.src = coverObjectUrl; }
@@ -1853,17 +1874,17 @@ addEventListener("DOMContentLoaded", () => {
   on("screen", update);
   on("mediaReady", update);
   on("songSelected", song => refreshDockCover(song && song.key));
-  on("studyCoverChanged", key => { if (!key || window.Trk.core.currentSong && key === window.Trk.core.currentSong.key) refreshDockCover(key || window.Trk.core.currentSong && window.Trk.core.currentSong.key); });
+  on("studyCoverChanged", key => { if (!key || core.currentSong && key === core.currentSong.key) refreshDockCover(key || core.currentSong && core.currentSong.key); });
 
   render(true);
-  refreshDockCover(window.Trk.core.currentSong && window.Trk.core.currentSong.key);
+  refreshDockCover(core.currentSong && core.currentSong.key);
   applyOrder();
   // fxDock が後から作られる場合も並び替え
   setTimeout(applyOrder, 500);
   setTimeout(applyOrder, 1500);
 
   // 初回フィルター適用
-  if (typeof view !== "undefined") window.Trk.core.view.style.filter = newVideoFilter();
+  if (typeof view !== "undefined") core.view.style.filter = newVideoFilter();
 });
 
 /* ============ 🎨 カスタムTVスキンのエディタ（設定画面の #tvMaker） ============
@@ -1931,11 +1952,11 @@ Object.assign(TEXT.ko, {
     if (!nm || !decoSel || !presetSel || Object.values(cols).some(n => !n)) return;
 
     /* ---- プレビュー（TVドックと同じクラス名で小さく作る） ---- */
-    const pvDev = window.Trk.core.el("div","tvDev"), pvTop = window.Trk.core.el("div","tvTop"), pvWrap = window.Trk.core.el("div","tvScreenWrap");
-    const pvScreen = window.Trk.core.el("div","tvScreen"), pvDeco = window.Trk.core.el("div","tvDeco"), pvSlots = window.Trk.core.el("div","tvSlots");
-    pvTop.append(window.Trk.core.el("i","led tvLed on"), window.Trk.core.el("div","tvLcd","COLOR ▶"));
-    pvScreen.append(window.Trk.core.el("i","tvGlare"), window.Trk.core.el("i","tvScanlines"));
-    pvWrap.append(pvScreen, window.Trk.core.el("div","tvSpeaker on"));
+    const pvDev = core.el("div","tvDev"), pvTop = core.el("div","tvTop"), pvWrap = core.el("div","tvScreenWrap");
+    const pvScreen = core.el("div","tvScreen"), pvDeco = core.el("div","tvDeco"), pvSlots = core.el("div","tvSlots");
+    pvTop.append(core.el("i","led tvLed on"), core.el("div","tvLcd","COLOR ▶"));
+    pvScreen.append(core.el("i","tvGlare"), core.el("i","tvScanlines"));
+    pvWrap.append(pvScreen, core.el("div","tvSpeaker on"));
     pvDev.append(pvTop, pvWrap, pvDeco, pvSlots);
     preview.append(pvDev);
 
@@ -1946,8 +1967,8 @@ Object.assign(TEXT.ko, {
       pvSlots.textContent = "";
       const samples = tvAllPresets().filter(p => !p.off).slice(0, s.n);
       for (let i = 0; i < s.n; i++) {
-        const b = window.Trk.core.el("button", "tvKey" + (i === 0 ? " selected" : "")); b.type = "button";
-        b.append(window.Trk.core.el("span", "num", String(i + 1)), window.Trk.core.el("span", "nm", samples[i] ? tvPresetName(samples[i]) : "…"));
+        const b = core.el("button", "tvKey" + (i === 0 ? " selected" : "")); b.type = "button";
+        b.append(core.el("span", "num", String(i + 1)), core.el("span", "nm", samples[i] ? tvPresetName(samples[i]) : "…"));
         pvSlots.append(b);
       }
       pvDeco.className = "tvDeco";
@@ -1991,33 +2012,33 @@ Object.assign(TEXT.ko, {
       }
       presetSel.value = curPreset;
     }
-    const isCustomCurrent = () => Object.prototype.hasOwnProperty.call(customTvDefs, window.Trk.core.settings.tvDockSkin);
-    const toast = (key) => { if (!maker.open) maker.open = true; window.Trk.core.setStatus("tvmStatus", key); };
+    const isCustomCurrent = () => Object.prototype.hasOwnProperty.call(customTvDefs, core.settings.tvDockSkin);
+    const toast = (key) => { if (!maker.open) maker.open = true; core.setStatus("tvmStatus", key); };
 
     /* ---- 操作 ---- */
     const inputs = [nm, ...Object.values(cols), ...Object.values(rng), ...Object.values(tex), decoSel];
-    for (const n of inputs) { n.addEventListener("input", () => { window.Trk.core.setStatus("tvmStatus", null); paint(); }); n.addEventListener("change", paint); }
-    presetSel.addEventListener("change", () => { fillDef(tvMakerPreset(presetSel.value)); window.Trk.core.setStatus("tvmStatus", "tvmPresetLoaded"); });
+    for (const n of inputs) { n.addEventListener("input", () => { core.setStatus("tvmStatus", null); paint(); }); n.addEventListener("change", paint); }
+    presetSel.addEventListener("change", () => { fillDef(tvMakerPreset(presetSel.value)); core.setStatus("tvmStatus", "tvmPresetLoaded"); });
 
     if (btnLoad) btnLoad.addEventListener("click", () => {
-      if (isCustomCurrent()) { fillDef(customTvDefs[window.Trk.core.settings.tvDockSkin]); window.Trk.core.setStatus("tvmStatus", "tvmLoaded"); }
-      else { fillDef(tvMakerPreset(presetSel.value)); window.Trk.core.setStatus("tvmStatus", "tvmPresetLoaded"); }
+      if (isCustomCurrent()) { fillDef(customTvDefs[core.settings.tvDockSkin]); core.setStatus("tvmStatus", "tvmLoaded"); }
+      else { fillDef(tvMakerPreset(presetSel.value)); core.setStatus("tvmStatus", "tvmPresetLoaded"); }
     });
     if (btnNew) btnNew.addEventListener("click", () => {
       if (Object.keys(customTvDefs).length >= TV_SKIN_MAX) { toast("tvmLimit"); return; }
       const def = readDef(); if (!def) { toast("tvmBad"); return; }
       const id = newTvSkinId(); registerTvSkin(id, def);
-      window.Trk.core.settings.tvDockSkin = id; window.Trk.core.saveUserPrefs(); window.Trk.core.emit("tvChange"); toast("tvmSaved");
+      core.settings.tvDockSkin = id; core.saveUserPrefs(); core.emit("tvChange"); toast("tvmSaved");
     });
     if (btnOver) btnOver.addEventListener("click", () => {
       if (!isCustomCurrent()) { toast("tvmLocked"); return; }
       const def = readDef(); if (!def) { toast("tvmBad"); return; }
-      registerTvSkin(window.Trk.core.settings.tvDockSkin, def);
-      window.Trk.core.saveUserPrefs(); window.Trk.core.emit("tvChange"); toast("tvmSaved");
+      registerTvSkin(core.settings.tvDockSkin, def);
+      core.saveUserPrefs(); core.emit("tvChange"); toast("tvmSaved");
     });
     if (btnExp) btnExp.addEventListener("click", () => {
       const def = readDef(); if (!def) { toast("tvmBad"); return; }
-      window.Trk.core.downloadJSON({ format:TV_SKIN_FORMAT, version:1, ...def }, `${window.Trk.core.safeName(def.name)}.tvskin.json`);
+      core.downloadJSON({ format:TV_SKIN_FORMAT, version:1, ...def }, `${core.safeName(def.name)}.tvskin.json`);
       toast("tvmExported");
     });
     if (fileInput) fileInput.addEventListener("change", async e => {
@@ -2028,21 +2049,21 @@ Object.assign(TEXT.ko, {
       if (!def) { toast("tvmBad"); return; }
       if (Object.keys(customTvDefs).length >= TV_SKIN_MAX) { toast("tvmLimit"); return; }
       const id = newTvSkinId(); registerTvSkin(id, def);
-      window.Trk.core.settings.tvDockSkin = id; window.Trk.core.saveUserPrefs(); window.Trk.core.emit("tvChange");
+      core.settings.tvDockSkin = id; core.saveUserPrefs(); core.emit("tvChange");
       fillDef(def); toast("tvmImported");
     });
     if (btnDel) btnDel.addEventListener("click", () => {
       if (!isCustomCurrent()) { toast("tvmLocked"); return; }
       if (!confirm(tr("tvmConfirmDelete"))) return;
-      unregisterTvSkin(window.Trk.core.settings.tvDockSkin);
-      window.Trk.core.settings.tvDockSkin = "cinema"; window.Trk.core.saveUserPrefs(); window.Trk.core.emit("tvChange"); toast("tvmDeleted");
+      unregisterTvSkin(core.settings.tvDockSkin);
+      core.settings.tvDockSkin = "cinema"; core.saveUserPrefs(); core.emit("tvChange"); toast("tvmDeleted");
     });
 
     maker.addEventListener("toggle", () => { if (maker.open) { fillSelects(); paint(); } });
     on("language", () => { fillSelects(); paint(); });
 
     fillSelects();
-    fillDef((Object.prototype.hasOwnProperty.call(customTvDefs, window.Trk.core.settings.tvDockSkin) ? customTvDefs[window.Trk.core.settings.tvDockSkin] : null) ||
+    fillDef((Object.prototype.hasOwnProperty.call(customTvDefs, core.settings.tvDockSkin) ? customTvDefs[core.settings.tvDockSkin] : null) ||
       tvMakerPreset(presetSel.value));
   });
 })();
@@ -2052,15 +2073,15 @@ window.TrkTV = Object.freeze({
   version:2,
   list:() => tvAllPresets().map(p => ({ id:p.id, cat:p.cat, name: tvPresetName(p), overlay: p.overlay||null, off: !!p.off })),
   skins:() => Object.entries(TV_DOCK_SKINS).map(([id, d]) => ({ id, name: d.label[lang] || d.label.en, custom: !!d.custom, n:d.n, cols:d.cols, deco:d.deco||"" })),
-  skin:() => window.Trk.core.settings.tvDockSkin,
-  selectSkin: id => { if (!hasTvSkin(id)) return false; window.Trk.core.settings.tvDockSkin = id; window.Trk.core.saveUserPrefs(); window.Trk.core.emit("tvChange"); return true; },
-  current:() => window.Trk.core.settings.videoStyle,
+  skin:() => core.settings.tvDockSkin,
+  selectSkin: id => { if (!hasTvSkin(id)) return false; core.settings.tvDockSkin = id; core.saveUserPrefs(); core.emit("tvChange"); return true; },
+  current:() => core.settings.videoStyle,
   select:id => selectTv(String(id)),
   next:() => stepTv(1),
   prev:() => stepTv(-1),
   random:() => randomTv(),
   off:() => selectTv("off"),
-  on:() => { if (window.Trk.core.settings.videoStyle==="off") selectTv(window.Trk.core.settings.tvPowerPrev||"color"); },
+  on:() => { if (core.settings.videoStyle==="off") selectTv(core.settings.tvPowerPrev||"color"); },
   toggle:() => togglePower(),
   filter:() => newVideoFilter(),
   overlay:() => { const p = currentTvPreset(); return p ? p.overlay||null : null; }

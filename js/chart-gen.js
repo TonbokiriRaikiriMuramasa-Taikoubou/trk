@@ -8,11 +8,13 @@
      "1" … 旧方式。ca84a19 までと同じ出力を保つ（曲全体の最大音量で正規化し、曲全体で上位を選ぶ）。
            譜面の指紋（chartKeyOf＝ノーツ列のハッシュ）で記録が結び付く。旧方式で作った記録を開くときに使う。
            tests/fixtures/chart-legacy-golden.json で「旧譜面の再現」を検査する。
-     "2" … 新方式（既定）。前後4秒の局所正規化、8小節ごとの区間配分（長さ×密度を先に決め、盛り上がりは 0.7〜1.3 倍で残す）。
+     "2" … 新方式（既定）。前後4秒の局所正規化、8小節ごとの区間配分（長さ×密度を先に決め、盛り上がりは 0.7〜1.3 倍で残す。平均音量が曲の最大の6%未満の静かな区間は、候補の25%までに絞る（絶対音量ゲート））。
    ⚠ 旧方式の処理は変えない。直すときは "2" 側（cgBuildSectioned）だけを触る。
    ⚠ 関数名・定数名は classic script の共有スコープに載るので、他ファイルと重ならないよう cg 接頭辞を付ける。 */
 
 const CG_SECTION_BARS = 8;          // 区間の長さ（小節）
+const CG_QUIET_REL = 0.06;          // 区間の平均音量÷曲の最大音量。これ未満を「静かな区間」とみなす（絶対音量ゲート）
+const CG_QUIET_CAP = 0.25;          // 静かな区間が使える候補数の割合（残りは他の区間へ回す）
 const CG_SILENCE_REL = 0.01;        // 曲の最大音量に対してこれ未満は「無音」（新方式の開始・終了の判定）
 const CG_LOCAL_HALF_S = 4;          // 局所正規化の窓（前後の秒数）
 
@@ -233,7 +235,15 @@ function cgBuildSectioned(p) {
   };
   const total = d.target ? Math.min(cands.length, d.target) : Math.round(cands.length * d.density);
   const lists = secKeys.map(k => bySec.get(k));
-  const quotas = cgAllocate(total, lists.map(l => l.length * energyFactor(l)), lists.map(l => l.length));
+  /* 絶対音量ゲート：区間の平均音量が曲の最大音量の CG_QUIET_REL 未満なら「静かな区間」。
+     局所正規化では静かな区間もその区間の普通の音量になるため、候補数の上限を CG_QUIET_CAP で絞る。
+     削った分は他の区間へ回る（合計は変えない。上限に届けば合計は減る） */
+  const quietCap = list => {
+    if (!analysis || !(analysis.maxRms > 0)) return list.length;
+    let m = 0; for (const c of list) m += c.rmsAbs; m /= list.length;
+    return m / analysis.maxRms < CG_QUIET_REL ? Math.floor(list.length * CG_QUIET_CAP) : list.length;
+  };
+  const quotas = cgAllocate(total, lists.map(l => l.length * energyFactor(l)), lists.map(quietCap));
 
   const sel = [];
   lists.forEach((list, i) => {

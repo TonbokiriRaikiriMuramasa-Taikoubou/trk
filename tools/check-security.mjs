@@ -18,12 +18,13 @@
  * 実行: node tools/check-security.mjs
  */
 import fs from "node:fs";
+import { restoreCoreAlias, sourceOf } from "./lib/js-source.mjs";
 import path from "node:path";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const read = rel => fs.readFileSync(path.join(root, rel), "utf8");
+const read = rel => sourceOf(rel, fs.readFileSync(path.join(root, rel), "utf8"));
 const exists = rel => fs.existsSync(path.join(root, rel));
 const jsFiles = fs.readdirSync(path.join(root, "js")).filter(f => f.endsWith(".js"));
 /* 名前空間 D：js/ の本文では領域の接頭辞 window.Trk.<領域>. を取り除いて照合する（window.Trk.overlay は残す） */
@@ -188,7 +189,7 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   rule(importFeedback, "the emergency settings import reports every key it refused, with a reason, in all four languages");
 
   /* ✨ M-03（tv-rich.js）：tvRichId／tvRichPrev を実在IDで検証する。
-     ⚠ 二つは行き先が違う（tvRichId＝リッチ20種／tvRichPrev＝元の映像フィルター全65種）。
+     ⚠ 二つは行き先が違う（tvRichId＝リッチ20種／tvRichPrev＝元の映像フィルター全70種）。
        同じ許可リストにすると保存済みの「戻る先」が毎回リセットされるので、別々に検証する。 */
   /* ⚠ 関数を直接呼ぶだけでは「配線が外れていても通る」。実際に保存値を入れて settings の結果を見る。 */
   const richSrc = js["js/tv-rich.js"];

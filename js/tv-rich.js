@@ -1,4 +1,5 @@
 (() => {
+  const core = window.Trk.core;
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ==========================================================================
    trk! tv-rich.js — ✨ TRKエフェクトを使う（リッチ映像の独立カテゴリー）
@@ -39,7 +40,7 @@ Object.assign(TEXT.en, {
 });
 Object.assign(TEXT.zh, {
   richTitle:"✨ 使用 TRK 影像特效",
-  richHint:"把人像／肤色・动画／赛璐珞・质感・影棚／画质这20种“进阶”影像调色放在这里直接使用。它与电视的“影像滤镜”是同一个设置（不会影响成绩）。",
+  richHint:"把人像／肤色·动画／赛璐珞·质感·影棚／画质这20种“进阶”影像调色放在这里直接使用。它与电视的“影像滤镜”是同一个设置（不会影响成绩）。",
   richUse:"使用 TRK 影像特效（叠加到影像）",
   richOn:"✨ 使用中：{name}", richOff:"未使用（{name}）",
   richSafe:"🛟 安全模式下不显示影像（去掉 ?safe 即可恢复）",
@@ -51,14 +52,14 @@ Object.assign(TEXT.zh, {
 });
 Object.assign(TEXT.ko, {
   richTitle:"✨ TRK 영상 이펙트 사용",
-  richHint:"인물/피부톤・애니/셀・질감・스튜디오/화질의 ‘리치’ 영상 그레이드 20종을 여기서 바로. TV의 ‘영상 필터’와 같은 설정을 움직입니다 (기록에는 영향 없음).",
+  richHint:"인물/피부톤·애니/셀·질감·스튜디오/화질의 ‘리치’ 영상 그레이드 20종을 여기서 바로. TV의 ‘영상 필터’와 같은 설정을 움직입니다 (기록에는 영향 없음).",
   richUse:"TRK 영상 이펙트 사용 (영상 위에 겹치기)",
   richOn:"✨ 사용 중: {name}", richOff:"사용 안 함 ({name})",
   richSafe:"🛟 세이프 모드에서는 영상을 표시하지 않아요 (?safe를 빼면 돌아옵니다)",
   richPrevLabel:"◀ 이전", richNextLabel:"다음 ▶", richRandom:"🎲 랜덤", richReset:"↩ 원래 색으로",
   richRandomed:"✨ {name} (으)로 바꿨어요", richRestored:"↩ 영상 필터를 되돌렸어요",
   richMore:"🎛 영상 필터를 자세히 조정 (설정 열기)",
-  richNote:"🎞 그 외 프리셋(모노·레트로 등)・⭐즐겨찾기・🕘최근 사용은 지금처럼 TV의 ‘영상 필터’에서 고를 수 있어요.",
+  richNote:"🎞 그 외 프리셋(모노·레트로 등)·⭐즐겨찾기·🕘최근 사용은 지금처럼 TV의 ‘영상 필터’에서 고를 수 있어요.",
   richNoPreset:"(영상 프리셋을 찾지 못했습니다)"
 });
 
@@ -80,7 +81,7 @@ const idOk = v => typeof v === "string" && /^[a-z0-9_]{1,40}$/.test(v);
    将来ここに辞書参照を足した瞬間の種を残さないよう、実在IDでも検証する。
    ⚠ 二つのキーは**行き先が違う**ので同じ許可リストにしてはいけない：
      ・tvRichId   ＝選べるリッチプリセット（portrait/anime/texture/quality の20種）
-     ・tvRichPrev ＝リッチではない元の映像フィルター（skin／vivid／off など**全65種**）
+     ・tvRichPrev ＝リッチではない元の映像フィルター（skin／vivid／off など**全70種**）
      tvRichPrev をリッチ20種で検証すると、保存済みの「戻る先」が毎回リセットされる。
    一覧が読めないときは従来どおり書式だけ（保存値を勝手に捨てない＝fail-open）。 */
 const richIds = () => {
@@ -102,22 +103,22 @@ const videoIds = () => {
 const richIdOk = v => { if (!idOk(v)) return false; const ids = richIds(); return !ids || ids.includes(v); };
 const videoIdOk = v => { if (!idOk(v)) return false; const ids = videoIds(); return !ids || ids.includes(v); };
 const pickRich = (key, ok, def) => {
-  const v = typeof window.Trk.core.settings[key] === "string" ? window.Trk.core.settings[key] : window.Trk.core.prefs[key];
+  const v = typeof core.settings[key] === "string" ? core.settings[key] : core.prefs[key];
   return ok(v) ? v : def;
 };
-window.Trk.core.settings.tvRichId = pickRich("tvRichId", richIdOk, RICH_DEFAULT_ID);
-window.Trk.core.settings.tvRichPrev = pickRich("tvRichPrev", videoIdOk, "");
-window.Trk.core.settings.tvRichCat = pickRich("tvRichCat", v => RICH_CATS.includes(v), RICH_CATS[0]);
-window.Trk.core.settings.tvRichOpen = typeof window.Trk.core.settings.tvRichOpen === "boolean" ? window.Trk.core.settings.tvRichOpen : window.Trk.core.prefs.tvRichOpen !== false;   /* 欄は最初から開いておく（🔥 TRKアンプとおそろい。触って閉じた人の記憶は残す） */
+core.settings.tvRichId = pickRich("tvRichId", richIdOk, RICH_DEFAULT_ID);
+core.settings.tvRichPrev = pickRich("tvRichPrev", videoIdOk, "");
+core.settings.tvRichCat = pickRich("tvRichCat", v => RICH_CATS.includes(v), RICH_CATS[0]);
+core.settings.tvRichOpen = typeof core.settings.tvRichOpen === "boolean" ? core.settings.tvRichOpen : core.prefs.tvRichOpen !== false;   /* 欄は最初から開いておく（🔥 TRKアンプとおそろい。触って閉じた人の記憶は残す） */
 
 /* ============ 画面の組み立て（ほかのファイルを読み終えてから） ============ */
 addEventListener("DOMContentLoaded", () => {
   const col = document.querySelector(".songCol");
   if (!col || !window.TrkTV) return;
-  window.Trk.core.saveUserPrefs();                               /* 追加した設定を一度書いておく */
+  core.saveUserPrefs();                               /* 追加した設定を一度書いておく */
 
-  const tx = (tag, key, cls) => { const n = window.Trk.core.el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; };
-  const btn = (cls, text) => { const b = window.Trk.core.el("button", cls, text); b.type = "button"; return b; };
+  const tx = (tag, key, cls) => { const n = core.el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; };
+  const btn = (cls, text) => { const b = core.el("button", cls, text); b.type = "button"; return b; };
   const safeOn = () => typeof window.TrkSafeMode === "function" && window.TrkSafeMode();
   const richList = () => TrkTV.list().filter(p => RICH_CATS.includes(p.cat) && !p.off);
   /* 説明文は TrkTV.list() に無いので、プリセット表（tv-presets.js）から今の言語で読む */
@@ -133,17 +134,17 @@ addEventListener("DOMContentLoaded", () => {
   const say = msg => { try { if (typeof plToast === "function") plToast(msg); } catch (_) {} };
 
   /* ---- 🔥 TRKアンプの下（無ければ「くわし」の下）に置く独立カテゴリー ---- */
-  const panel = window.Trk.core.el("details", "panel dockRich"); panel.id = "richPanel";
-  panel.open = window.Trk.core.settings.tvRichOpen === true;
-  panel.addEventListener("toggle", () => { window.Trk.core.settings.tvRichOpen = panel.open; window.Trk.core.saveUserPrefs(); if (panel.open) render(); });
+  const panel = core.el("details", "panel dockRich"); panel.id = "richPanel";
+  panel.open = core.settings.tvRichOpen === true;
+  panel.addEventListener("toggle", () => { core.settings.tvRichOpen = panel.open; core.saveUserPrefs(); if (panel.open) render(); });
 
-  const useLab = window.Trk.core.el("label", "check"), useInp = document.createElement("input");
+  const useLab = core.el("label", "check"), useInp = document.createElement("input");
   useInp.type = "checkbox"; useLab.append(useInp, tx("span", "richUse"));
-  const state = window.Trk.core.el("div", "hint status"); state.id = "richState";
-  const cats = window.Trk.core.el("div", "seg richCats"); cats.id = "richCats";
-  const chips = window.Trk.core.el("div", "richChips"); chips.id = "richChips";
-  const desc = window.Trk.core.el("div", "hint"); desc.id = "richDesc";
-  const row = window.Trk.core.el("div", "miniActions");
+  const state = core.el("div", "hint status"); state.id = "richState";
+  const cats = core.el("div", "seg richCats"); cats.id = "richCats";
+  const chips = core.el("div", "richChips"); chips.id = "richChips";
+  const desc = core.el("div", "hint"); desc.id = "richDesc";
+  const row = core.el("div", "miniActions");
   const prevBtn = tx("button", "richPrevLabel", "fxMini"), nextBtn = tx("button", "richNextLabel", "fxMini");
   const randBtn = tx("button", "richRandom", "fxMini"), resetBtn = tx("button", "richReset", "fxMini");
   const moreBtn = tx("button", "richMore", "fxMini");
@@ -155,8 +156,8 @@ addEventListener("DOMContentLoaded", () => {
     const b = btn("richCat", "");
     b.dataset.richcat = cat;
     const catKey = { portrait:"tvCatPortrait", anime:"tvCatAnime", texture:"tvCatTexture", quality:"tvCatQuality" }[cat];
-    b.append(window.Trk.core.el("span", "richCatIcon", RICH_CAT_ICON[cat] + " "), tx("span", catKey));
-    b.addEventListener("click", () => { window.Trk.core.settings.tvRichCat = cat; window.Trk.core.saveUserPrefs(); render(); });
+    b.append(core.el("span", "richCatIcon", RICH_CAT_ICON[cat] + " "), tx("span", catKey));
+    b.addEventListener("click", () => { core.settings.tvRichCat = cat; core.saveUserPrefs(); render(); });
     catBtns[cat] = b; cats.append(b);
   }
 
@@ -164,24 +165,24 @@ addEventListener("DOMContentLoaded", () => {
   function rememberPrev() {
     const cur = TrkTV.current();
     if (!cur || isRich(cur)) return;
-    window.Trk.core.settings.tvRichPrev = cur === "off" ? (window.Trk.core.settings.tvPowerPrev && !isRich(window.Trk.core.settings.tvPowerPrev) ? window.Trk.core.settings.tvPowerPrev : RICH_FALLBACK_ID) : cur;
+    core.settings.tvRichPrev = cur === "off" ? (core.settings.tvPowerPrev && !isRich(core.settings.tvPowerPrev) ? core.settings.tvPowerPrev : RICH_FALLBACK_ID) : cur;
   }
   function applyRich(id, quiet) {
     const p = richById(id);
     if (!p) return false;
     if (safeOn()) { say(tr("richSafe")); return false; }
     rememberPrev();
-    window.Trk.core.settings.tvRichId = id;
+    core.settings.tvRichId = id;
     if (!TrkTV.select(id)) return false;
-    window.Trk.core.saveUserPrefs(); render();
+    core.saveUserPrefs(); render();
     if (!quiet) say(tr("richRandomed", { name: p.name }));
     return true;
   }
   function restoreRich(quiet) {
     if (safeOn()) { say(tr("richSafe")); return; }
-    const prev = window.Trk.core.settings.tvRichPrev;
+    const prev = core.settings.tvRichPrev;
     if (!(prev && !isRich(prev) && TrkTV.select(prev))) TrkTV.select(RICH_FALLBACK_ID);
-    window.Trk.core.saveUserPrefs(); render();
+    core.saveUserPrefs(); render();
     if (!quiet) say(tr("richRestored"));
   }
   const richStep = dir => {
@@ -193,7 +194,7 @@ addEventListener("DOMContentLoaded", () => {
 
   useInp.addEventListener("change", () => {
     if (safeOn()) { useInp.checked = false; say(tr("richSafe")); return; }
-    if (useInp.checked) { if (!applyRich(window.Trk.core.settings.tvRichId || RICH_DEFAULT_ID)) useInp.checked = false; }
+    if (useInp.checked) { if (!applyRich(core.settings.tvRichId || RICH_DEFAULT_ID)) useInp.checked = false; }
     else restoreRich();
   });
   prevBtn.addEventListener("click", () => richStep(-1));
@@ -205,16 +206,16 @@ addEventListener("DOMContentLoaded", () => {
   });
   resetBtn.addEventListener("click", () => restoreRich(true));
   moreBtn.addEventListener("click", () => {
-    window.Trk.core.openSettings(); // 設定画面へ（選曲画面にいるときだけ）
+    core.openSettings(); // 設定画面へ（選曲画面にいるときだけ）
     const vs = document.getElementById("videoStyle");
-    if (vs) { const lab = vs.closest("label") || vs; if (vs.options && vs.value !== window.Trk.core.settings.videoStyle) { try { vs.value = window.Trk.core.settings.videoStyle; } catch (_) {} } setTimeout(() => { try { lab.scrollIntoView({ behavior:"smooth", block:"center" }); } catch (_) {} }, 60); }
+    if (vs) { const lab = vs.closest("label") || vs; if (vs.options && vs.value !== core.settings.videoStyle) { try { vs.value = core.settings.videoStyle; } catch (_) {} } setTimeout(() => { try { lab.scrollIntoView({ behavior:"smooth", block:"center" }); } catch (_) {} }, 60); }
   });
 
   function render() {
     const list = richList();
     const cur = currentRich();
     const safe = safeOn();
-    const cat = RICH_CATS.includes(window.Trk.core.settings.tvRichCat) ? window.Trk.core.settings.tvRichCat : RICH_CATS[0];
+    const cat = RICH_CATS.includes(core.settings.tvRichCat) ? core.settings.tvRichCat : RICH_CATS[0];
     useInp.checked = !!cur;
     useInp.disabled = safe;
     const other = anyPreset(TrkTV.current());
@@ -223,7 +224,7 @@ addEventListener("DOMContentLoaded", () => {
     for (const [c, b] of Object.entries(catBtns)) b.classList.toggle("selected", c === cat);
     chips.textContent = "";
     const items = list.filter(p => p.cat === cat);
-    if (!items.length) chips.append(window.Trk.core.el("div", "hint", tr("richNoPreset")));
+    if (!items.length) chips.append(core.el("div", "hint", tr("richNoPreset")));
     for (const p of items) {
       const chip = btn("richChip" + (cur && cur.id === p.id ? " selected" : ""), p.name);
       chip.dataset.richid = p.id; chip.title = presetDesc(p.id) || p.name; chip.disabled = safe;
@@ -247,18 +248,18 @@ addEventListener("DOMContentLoaded", () => {
   /* ---- 外からの変更（テレビの映像フィルター・🎲・言語）に追従 ----
      テレビ側の 🎲 などでリッチに変わったときも、戻り先（直前に見ていた色）を覚えておく */
   let lastStyle = TrkTV.current();
-  if (isRich(lastStyle)) window.Trk.core.settings.tvRichId = lastStyle;   /* 起動時からリッチなら、スイッチの行き先もそれに合わせる */
+  if (isRich(lastStyle)) core.settings.tvRichId = lastStyle;   /* 起動時からリッチなら、スイッチの行き先もそれに合わせる */
   if (typeof on === "function") {
-    window.Trk.core.on("tvChange", id => {
+    core.on("tvChange", id => {
       if (isRich(id)) {
-        window.Trk.core.settings.tvRichId = id;
-        if (lastStyle && !isRich(lastStyle)) window.Trk.core.settings.tvRichPrev = lastStyle === "off" ? RICH_FALLBACK_ID : lastStyle;
-        window.Trk.core.saveUserPrefs();
+        core.settings.tvRichId = id;
+        if (lastStyle && !isRich(lastStyle)) core.settings.tvRichPrev = lastStyle === "off" ? RICH_FALLBACK_ID : lastStyle;
+        core.saveUserPrefs();
       }
       lastStyle = id;
       render();
     });
-    window.Trk.core.on("language", render);
+    core.on("language", render);
   }
   render();
 });

@@ -214,6 +214,33 @@ describe("解析結果のキャッシュ（js/media.js）", () => {
     assert.equal(recs.has("newest"), true);
   });
 
+  test("LRU：読み出したものは savedAt が今に更新され、次の上限超過で先に消えない", async () => {
+    const { C, fake } = loadCache();
+    const db = await rawOpen(fake, ANALYSIS_DB, 1, d => d.createObjectStore("analysis", { keyPath: "key" }).createIndex("savedAt", "savedAt"));
+    const old = makeAnalysis(4);
+    await rawWrite(db, "analysis", os => {
+      for (let s = 1; s <= 30; s++) os.put({ key: `k${s}`, version: 1, savedAt: s, frames: 4, frameMs: 10, maxRms: 1, scale: 1, rms: old.rms, onset: old.onset, ratio: old.ratio }, undefined);
+    });
+    db.close();
+    const hit = await C.analysisCacheGet("k1");          // 最も古いものを読む（FIFO なら次に消える）
+    assert.equal(hit.frames, 4, "読み出し自体は従来どおり");
+    const recs = fake.dbs.get(ANALYSIS_DB).stores.get("analysis").records;
+    assert.ok(recs.get("k1").savedAt > 30, "読んだ記録の savedAt は今の時刻に更新される");
+    await C.analysisCachePut("newest", makeAnalysis(4));
+    assert.equal(recs.size, 30);
+    assert.equal(recs.has("k1"), true, "読まれた曲は残る（LRU）");
+    assert.equal(recs.has("k2"), false, "読まれなかった最古の曲が消える");
+  });
+
+  test("LRU：不正な記録は読んでも savedAt を書き換えない（解析し直して置き換える）", async () => {
+    const { C, fake } = loadCache();
+    const db = await rawOpen(fake, ANALYSIS_DB, 1, d => d.createObjectStore("analysis", { keyPath: "key" }).createIndex("savedAt", "savedAt"));
+    await rawWrite(db, "analysis", os => os.put({ key: "bad", version: 1, savedAt: 5, frames: 3, frameMs: 10, maxRms: 1, scale: 1, rms: [1, 2, 3], onset: [0, 0, 0], ratio: [0, 0, 0] }));
+    assert.equal(await C.analysisCacheGet("bad"), null);
+    const recs = fake.dbs.get(ANALYSIS_DB).stores.get("analysis").records;
+    assert.equal(recs.get("bad").savedAt, 5);
+  });
+
   test("セーフモードでは読まず・書かず、解析は普通に行う", async () => {
     const { C, fake, ctx } = loadCache({ safe: true });
     let n = 0;

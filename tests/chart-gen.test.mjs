@@ -103,15 +103,32 @@ describe("新方式（chartGen 2）", () => {
     }
   });
 
-  test("音量の差が大きい曲でも、係数は 0.7〜1.3 に収まる（静かな区間は0.7、大きな区間は1.3）", () => {
-    // 小さい区間÷大きい区間 ≒ 0.7 ÷ 1.3 ≒ 0.54。係数の上限を1.6などに広げると 0.44 となり、下限 0.45 を割る。
-    // 上級以上は元の密度が高く（0.82〜0.95）、盛り上がりの区間が候補の100%で頭打ちになるので、ここでは初級・中級だけで判定する
-    // （頭打ちは配分の仕様：候補にない位置へはノーツを置かない）。
+  test("音量の差が大きい曲では、静かな区間の方が密度が低い（係数と絶対音量ゲートの両方が効く）", () => {
+    // 係数だけなら 小さい区間÷大きい区間 ≒ 0.7 ÷ 1.3 ≒ 0.54 になる。絶対音量ゲート（静かな区間は候補の25%）が
+    // その上に効くので、実測は約 0.22〜0.24（初級・中級）。方向（0.7 以下）と、下がりすぎない下限（0.15）を見る。
+    // 上級以上は元の密度が高く、盛り上がりの区間が候補の100%で頭打ちになるので、ここでは初級・中級だけで判定する。
     for (const diff of ["easy", "normal"]) {
       const notes = generate("contrast", { diff, chartGen: "2" });
       const ratio = perSec(notes, 0, 16) / perSec(notes, 96, 120);
-      assert.ok(ratio >= 0.45 && ratio <= 0.7, `contrast ${diff}: 比 ${ratio.toFixed(2)}`);
+      assert.ok(ratio >= 0.15 && ratio <= 0.7, `contrast ${diff}: 比 ${ratio.toFixed(2)}`);
     }
+  });
+
+  test("絶対音量ゲート：静かな長い区間（contrast の 0〜90秒）は、上級・名人でも密度の上限を超えない", () => {
+    // 局所正規化だけだと、音量の小さい区間もその区間では普通の音量として扱われ、ほぼ満密度になっていた（修正前は 3.9 nps・Lv 10）。
+    // 絶対音量ゲート（CG_QUIET_REL・CG_QUIET_CAP）で候補数を 25% に絞る。修正後は約 2.5 nps。
+    for (const diff of ["hard", "master"]) {
+      const notes = generate("contrast", { diff, chartGen: "2" });
+      const quiet = perSec(notes, 0, 90);
+      assert.ok(quiet <= 3.0, `${diff}: 静かな区間 ${quiet.toFixed(2)} nps`);
+      assert.ok(quiet > 0, `${diff}: 静かな区間にも全く置かないのは行き過ぎ`);
+    }
+  });
+
+  test("絶対音量ゲート：通常の導入部（introChorus の 0〜30秒）は絞られない", () => {
+    // 導入部は曲の最大音量の約 10〜12%。静かな区間の判定（6%）より大きいので、密度は変わらない
+    const notes = generate("introChorus", { diff: "hard", chartGen: "2" });
+    assert.ok(perSec(notes, 0, 30) >= 3.0, `hard の導入部 ${perSec(notes, 0, 30).toFixed(2)} nps`);
   });
 
   test("音量がほぼ一定の曲では、前半と後半の密度がそろう", () => {

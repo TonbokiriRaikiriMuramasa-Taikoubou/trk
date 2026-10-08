@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ==========================================================================
-   trk! tv-presets.js — 📺 映像フィルターのプリセット（65種類）
-   ・定番45種＋人物／アニメ・セル／質感／スタジオ・品質の新作20種
+   trk! tv-presets.js — 📺 映像フィルターのプリセット（70種類）
+   ・定番45種＋人物／アニメ・セル／質感／スタジオ・品質の新作20種＋効果の新作5種（70種）
    ・各プリセットは CSS filter 文字列と、任意の overlay タイプを持つ
    ・overlay は tv-dock.js が render で描画する（scanlines, letterbox, vhs など）
    ・形式は fx-presets と似せるが、独立（映像は記録に影響しない）
@@ -154,6 +154,42 @@ const TRK_TV_PRESETS = [
     label:{ja:"CM", en:"Commercial", zh:"广告", ko:"CF"},
     desc:{ja:"CMのような高彩度・明るめ", en:"Bright commercial", zh:"广告般明亮高饱和", ko:"광고처럼 밝고 선명하게"},
     filter:"saturate(1.65) contrast(1.08) brightness(1.12) hue-rotate(2deg)"
+  },
+  // effect（追加：生活の場面。CSS filter だけで作る）
+  {
+    id:"watercolor_bleed",
+    cat:"effect",
+    label:{ja:"💧 水彩のにじみ", en:"💧 Watercolor bleed", zh:"💧 水彩晕染", ko:"💧 수채 번짐"},
+    desc:{ja:"水彩紙に広がるような、やわらかいにじみ", en:"Soft bleeding edges, like paint spreading on wet paper", zh:"像颜料在湿纸上晕开的柔和边缘", ko:"젖은 종이에 번지는 듯한 부드러운 번짐"},
+    filter:"contrast(.9) saturate(1.2) brightness(1.06) blur(.7px)"
+  },
+  {
+    id:"sumi_ink",
+    cat:"effect",
+    label:{ja:"🖌 墨の滲み", en:"🖌 Sumi ink wash", zh:"🖌 墨色晕染", ko:"🖌 먹 번짐"},
+    desc:{ja:"墨の濃淡と、紙にしみる柔らかい輪郭", en:"Ink tones and soft edges that sink into paper", zh:"墨色浓淡与渗入纸面的柔和轮廓", ko:"먹의 농담과 종이에 스미는 부드러운 윤곽"},
+    filter:"grayscale(1) contrast(1.7) brightness(1.02) blur(.5px) sepia(.08)"
+  },
+  {
+    id:"rain_glass",
+    cat:"effect",
+    label:{ja:"🌧 雨の窓ガラス", en:"🌧 Rainy window", zh:"🌧 雨窗玻璃", ko:"🌧 빗물 창문"},
+    desc:{ja:"雨粒の向こうに見える、少しぼやけた青み", en:"A slightly blurred, bluish view through rain-streaked glass", zh:"透过雨水的玻璃所见，略微模糊的蓝调", ko:"빗물 너머로 보이는 살짝 흐릿한 푸른 기운"},
+    filter:"blur(.8px) saturate(.8) brightness(.96) contrast(1.05) hue-rotate(-8deg)"
+  },
+  {
+    id:"steam_bath",
+    cat:"effect",
+    label:{ja:"♨ 銭湯の湯気", en:"♨ Bathhouse steam", zh:"♨ 澡堂蒸汽", ko:"♨ 목욕탕 김"},
+    desc:{ja:"湯気で少し白くかすむ、やわらかい明るさ", en:"Soft light with a faint haze, as if in warm steam", zh:"被蒸汽轻轻染白的柔和亮度", ko:"김으로 살짝 뿌옇게 번진 부드러운 밝기"},
+    filter:"blur(1.2px) brightness(1.1) contrast(.88) saturate(.85)"
+  },
+  {
+    id:"shoji_glow",
+    cat:"effect",
+    label:{ja:"🪟 障子越しの光", en:"🪟 Light through shoji", zh:"🪟 透过障子的光", ko:"🪟 장지문 너머 빛"},
+    desc:{ja:"和紙を通した、温かく拡散する光", en:"Warm, diffused light filtered through washi paper", zh:"透过和纸扩散的温暖光线", ko:"한지를 통과해 따뜻하게 퍼지는 빛"},
+    filter:"brightness(1.1) contrast(.9) sepia(.14) saturate(.92)"
   },
   // effect
   {

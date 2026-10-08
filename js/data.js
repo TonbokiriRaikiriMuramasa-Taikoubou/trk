@@ -3,7 +3,7 @@
 /* ============ trk! 統合版：データ（スキン・レイアウト・難易度・マスコット登録） ============
    内蔵スキンを増やすときは SKINS に1項目足すだけで、設定画面の一覧に出ます。
      ui     : メニュー画面の色（CSS変数）。--ui-bg は linear-gradient(…) も可（グラデーション）
-     cat    : （任意）スキンの棚での絞り込み用タグ（basic / miku / dark / light / grad / fun の配列）
+     cat    : （任意）スキンの棚での絞り込み用タグ（basic / miku / dark / light / grad / fun / access / life の配列）
      game   : プレイ画面の色
      shapes : [ドン, カッ] の「おすすめ」ノーツ形状（circle / diamond / square）
      video  : 背景映像に掛けるCSSフィルター
@@ -376,6 +376,174 @@ const SKINS = {
     game:{don:"#ffd166",ka:"#6fa8ff",stage:"linear-gradient(180deg,#0a0e28 0%,#241b52 55%,#b8892a 100%)",lane:"rgba(8,6,24,.62)",track:"rgba(255,209,102,.32)",ink:"#fdf6e3",
       inkShadow:"rgba(0,0,0,.85)",noteBorder:"#ffffff",panel:"rgba(15,12,36,.95)",perfect:"#ffe9a8",good:"#fdf6e3",miss:"#8d84a8",glow:true},
     shapes:["circle","circle"], video:"grayscale(1) contrast(1.5) sepia(1) hue-rotate(18deg) saturate(1.4) brightness(.55)"
+  },
+
+  /* ===== 見やすさ（access）：色覚配慮と高コントラスト =====
+     色覚配慮の配色は Okabe & Ito（2008）の基本の8色の値を使う（色の組み合わせの提案で、値は公開の指定）。
+     赤と緑の区別に頼らず、青とだいだい（朱色）の組みにする。さらに、ノーツの形（丸と菱形）でも区別する。
+     明るい背景では、朱色を濃い茶色寄りにし、青は明るい水色にして、輝度でも差をつける（白黒でも区別できるように）。
+     コントラストは WCAG の基準（本文 4.5:1 以上）を tests/skins-access.test.mjs で検査する。 */
+  "hc": {
+    cat:["access"],
+    label:{ja:"ハイコントラスト",en:"High contrast",zh:"高对比度",ko:"고대비"},
+    desc:{ja:"白と黒の強い対比。数字と判定を最優先",en:"Strong black-and-white contrast; numbers and judgments first",zh:"黑白强对比，优先显示数字与判定",ko:"흑백 강한 대비, 숫자와 판정 우선"},
+    ui:{"--ui-bg":"#000000","--ui-panel":"rgba(0,0,0,.98)","--ui-soft":"rgba(255,255,255,.10)","--ui-text":"#ffffff",
+      "--ui-muted":"#e6e6e6","--ui-border":"#ffffff","--ui-button":"#111111","--ui-button-hover":"#262626",
+      "--ui-field":"#000000","--ui-accent":"#ffff00","--ui-on-accent":"#000000","--ui-gold":"#ffff00",
+      "--ui-shadow":"0 0 0 2px #ffffff","--ui-glow":"rgba(255,255,0,.25)"},
+    game:{don:"#ffff00",ka:"#00e5ff",stage:"#000000",lane:"rgba(255,255,255,.12)",track:"#ffffff",ink:"#ffffff",
+      inkShadow:"#000000",noteBorder:"#ffffff",panel:"rgba(0,0,0,.98)",perfect:"#ffff00",good:"#ffffff",miss:"#bfbfbf",glow:false},
+    shapes:["circle","diamond"], video:"grayscale(1) brightness(.6) contrast(1.4)"
+  },
+  "cbDark": {
+    cat:["access"],
+    label:{ja:"色覚にやさしい（暗め）",en:"Colorblind-friendly (dark)",zh:"色觉友好（深色）",ko:"색각 친화（어두움）"},
+    desc:{ja:"青とだいだい色。ノーツの形も変えて区別",en:"Blue and vermilion, with different note shapes",zh:"蓝色与朱红色，并用不同形状区分",ko:"파랑과 주황. 노트 모양도 달리해 구분"},
+    ui:{"--ui-bg":"#0b0f17","--ui-panel":"rgba(16,22,34,.97)","--ui-soft":"rgba(255,255,255,.06)","--ui-text":"#f0f4f8",
+      "--ui-muted":"#b8c2d0","--ui-border":"rgba(255,255,255,.28)","--ui-button":"#1b2536","--ui-button-hover":"#26334a",
+      "--ui-field":"#0e1420","--ui-accent":"#56b4e9","--ui-on-accent":"#001018","--ui-gold":"#f0e442",
+      "--ui-shadow":"0 24px 80px rgba(0,0,0,.55)","--ui-glow":"rgba(86,180,233,.18)"},
+    game:{don:"#d55e00",ka:"#56b4e9",stage:"#0b0f17",lane:"rgba(255,255,255,.06)",track:"rgba(255,255,255,.35)",ink:"#f0f4f8",
+      inkShadow:"rgba(0,0,0,.8)",noteBorder:"#ffffff",panel:"rgba(16,22,34,.94)",perfect:"#f0e442",good:"#ffffff",miss:"#9aa6b8",glow:false},
+    shapes:["circle","diamond"], video:"grayscale(.6) contrast(1.2) brightness(.8)"
+  },
+  "cbLight": {
+    cat:["access"],
+    label:{ja:"色覚にやさしい（明るめ）",en:"Colorblind-friendly (light)",zh:"色觉友好（浅色）",ko:"색각 친화（밝음）"},
+    desc:{ja:"明るい背景で、青とだいだい色を使う",en:"Light background using blue and vermilion",zh:"浅色背景，使用蓝与朱红色",ko:"밝은 배경에 파랑과 주황 사용"},
+    ui:{"--ui-bg":"#f7f7f4","--ui-panel":"#ffffff","--ui-soft":"rgba(0,0,0,.04)","--ui-text":"#1a1a1a",
+      "--ui-muted":"#4a4a4a","--ui-border":"rgba(0,0,0,.30)","--ui-button":"#e9e9e4","--ui-button-hover":"#dcdcd4",
+      "--ui-field":"#ffffff","--ui-accent":"#0072b2","--ui-on-accent":"#ffffff","--ui-gold":"#b07000",
+      "--ui-shadow":"0 12px 40px rgba(0,0,0,.12)","--ui-glow":"rgba(0,114,178,.15)"},
+    game:{don:"#8f3500",ka:"#56b4e9",stage:"#f4f4ef",lane:"rgba(0,0,0,.05)",track:"rgba(0,0,0,.35)",ink:"#1a1a1a",
+      inkShadow:"rgba(255,255,255,.8)",noteBorder:"#1a1a1a",panel:"rgba(255,255,255,.95)",perfect:"#8f3500",good:"#0072b2",miss:"#6b6b6b",glow:false},
+    shapes:["circle","diamond"], video:"grayscale(.5) brightness(1.1) contrast(1.05)"
+  },
+
+  /* ===== 生活（life）：日常の場面をテーマにする（すべて自作の配色。素材・画像は使わない） ===== */
+  "rainWindow": {
+    cat:["life"],
+    label:{ja:"雨の窓",en:"Rainy window",zh:"雨窗",ko:"빗속 창가"},
+    desc:{ja:"窓ガラスを流れる雨、夜の灯りがにじむ",en:"Rain on the glass, night lights blurred",zh:"玻璃窗上流淌的雨，夜灯朦胧",ko:"유리창을 타고 흐르는 빗물, 번지는 밤의 불빛"},
+    ui:{"--ui-bg":"#111a22","--ui-panel":"rgba(20,30,40,.96)","--ui-soft":"rgba(255,255,255,.05)","--ui-text":"#e8eef4",
+      "--ui-muted":"#9fb0c0","--ui-border":"rgba(255,255,255,.18)","--ui-button":"#1a2834","--ui-button-hover":"#24364a",
+      "--ui-field":"#0e1720","--ui-accent":"#6fb7d6","--ui-on-accent":"#06131a","--ui-gold":"#e8d28a",
+      "--ui-shadow":"0 24px 80px rgba(0,0,0,.5)","--ui-glow":"rgba(111,183,214,.16)"},
+    game:{don:"#f2a36b",ka:"#6fb7d6",stage:"#0e1820",lane:"rgba(0,0,0,.35)",track:"rgba(255,255,255,.18)",ink:"#e8eef4",
+      inkShadow:"rgba(0,0,0,.7)",noteBorder:"rgba(255,255,255,.7)",panel:"rgba(14,24,32,.94)",perfect:"#f2d27a",good:"#e8eef4",miss:"#7d8c99",glow:false},
+    shapes:["circle","circle"], video:"grayscale(.4) brightness(.7) contrast(1.1)"
+  },
+  "nightBath": {
+    cat:["life"],
+    label:{ja:"夜の銭湯",en:"Night bathhouse",zh:"夜间澡堂",ko:"밤의 목욕탕"},
+    desc:{ja:"タイルの壁と、ぬくもりのある電球色",en:"Tiled walls and warm bulb light",zh:"瓷砖墙与温暖的灯光",ko:"타일 벽과 따뜻한 전구 빛"},
+    ui:{"--ui-bg":"#0d2a2e","--ui-panel":"rgba(12,40,44,.96)","--ui-soft":"rgba(255,255,255,.05)","--ui-text":"#eef7f4",
+      "--ui-muted":"#a8cfc8","--ui-border":"rgba(255,255,255,.2)","--ui-button":"#15393e","--ui-button-hover":"#1d4b52",
+      "--ui-field":"#0a2024","--ui-accent":"#f0b35a","--ui-on-accent":"#2a1800","--ui-gold":"#ffd98a",
+      "--ui-shadow":"0 24px 80px rgba(0,0,0,.5)","--ui-glow":"rgba(240,179,90,.16)"},
+    game:{don:"#f0b35a",ka:"#7fd3c4",stage:"#0b2428",lane:"rgba(0,0,0,.25)",track:"rgba(255,255,255,.2)",ink:"#eef7f4",
+      inkShadow:"rgba(0,0,0,.7)",noteBorder:"rgba(255,255,255,.6)",panel:"rgba(10,36,40,.94)",perfect:"#ffd98a",good:"#eef7f4",miss:"#88a9a4",glow:true},
+    shapes:["circle","circle"], video:"sepia(.3) saturate(1.2) brightness(.7)"
+  },
+  "shojiLight": {
+    cat:["life"],
+    label:{ja:"障子の光",en:"Shoji light",zh:"障子之光",ko:"쇼지의 빛"},
+    desc:{ja:"和紙越しのやわらかい光と、木の桟",en:"Soft light through washi paper and wooden lattice",zh:"透过和纸的柔光与木格栅",ko:"와시 종이를 통한 부드러운 빛과 나무 격자"},
+    ui:{"--ui-bg":"#efe9dc","--ui-panel":"#fbf8f1","--ui-soft":"rgba(60,45,30,.05)","--ui-text":"#2b2620",
+      "--ui-muted":"#6b6257","--ui-border":"rgba(60,45,30,.25)","--ui-button":"#e6dfd0","--ui-button-hover":"#d9d0bd",
+      "--ui-field":"#fffdf8","--ui-accent":"#b5533c","--ui-on-accent":"#fff8f0","--ui-gold":"#a67c2e",
+      "--ui-shadow":"0 12px 36px rgba(60,45,30,.12)","--ui-glow":"rgba(181,83,60,.14)"},
+    game:{don:"#b5533c",ka:"#5f7f8f",stage:"#f4eee0",lane:"rgba(60,45,30,.06)",track:"rgba(60,45,30,.3)",ink:"#2b2620",
+      inkShadow:"rgba(255,255,255,.7)",noteBorder:"rgba(43,38,32,.6)",panel:"rgba(251,248,241,.95)",perfect:"#b5533c",good:"#2b2620",miss:"#8a8075",glow:false},
+    shapes:["circle","circle"], video:"sepia(.2) brightness(1.1) contrast(.95)"
+  },
+
+  /* 生活（life）2回目：駅・台所・商店街（すべて自作の配色。素材・画像は使わない） */
+  "stationDusk": {
+    cat:["life"],
+    label:{ja:"駅のホーム（夕暮れ）",en:"Station platform at dusk",zh:"黄昏的站台",ko:"해질녘 역 승강장"},
+    desc:{ja:"電車を待つ、オレンジの灯りと群青の空",en:"Waiting for the train under amber lamps and a deep blue sky",zh:"在橙色灯光与深蓝天空下等车",ko:"주황빛 조명과 남색 하늘 아래 전철을 기다리며"},
+    ui:{"--ui-bg":"#15203a","--ui-panel":"rgba(22,32,58,.96)","--ui-soft":"rgba(255,255,255,.05)","--ui-text":"#f2f4fa",
+      "--ui-muted":"#aeb8d4","--ui-border":"rgba(255,255,255,.18)","--ui-button":"#1d2a4a","--ui-button-hover":"#27396a",
+      "--ui-field":"#0f1930","--ui-accent":"#ffb454","--ui-on-accent":"#2a1600","--ui-gold":"#ffd98a",
+      "--ui-shadow":"0 24px 80px rgba(0,0,0,.5)","--ui-glow":"rgba(255,180,84,.16)"},
+    game:{don:"#ffb454",ka:"#7aa6c2",stage:"#101a31",lane:"rgba(0,0,0,.3)",track:"rgba(255,255,255,.2)",ink:"#f2f4fa",
+      inkShadow:"rgba(0,0,0,.7)",noteBorder:"rgba(255,255,255,.6)",panel:"rgba(16,26,50,.94)",perfect:"#ffd98a",good:"#f2f4fa",miss:"#8b96b5",glow:false},
+    shapes:["circle","circle"], video:"saturate(1.1) brightness(.75) contrast(1.05)"
+  },
+  "morningKitchen": {
+    cat:["life"],
+    label:{ja:"台所の朝",en:"Kitchen morning",zh:"厨房的清晨",ko:"아침 부엌"},
+    desc:{ja:"白いタイルと、窓から入る朝の光",en:"White tiles and morning light from the window",zh:"白色瓷砖与窗边的晨光",ko:"하얀 타일과 창으로 드는 아침 햇살"},
+    ui:{"--ui-bg":"#f5efe6","--ui-panel":"#fffaf2","--ui-soft":"rgba(60,50,40,.05)","--ui-text":"#2e2a24",
+      "--ui-muted":"#67604f","--ui-border":"rgba(60,50,40,.22)","--ui-button":"#ebe3d4","--ui-button-hover":"#ddd3bf",
+      "--ui-field":"#ffffff","--ui-accent":"#3f7d5f","--ui-on-accent":"#ffffff","--ui-gold":"#9a6b1f",
+      "--ui-shadow":"0 12px 36px rgba(60,50,40,.12)","--ui-glow":"rgba(63,125,95,.14)"},
+    game:{don:"#e0894d",ka:"#4f7fb0",stage:"#f7f1e7",lane:"rgba(60,50,40,.05)",track:"rgba(60,50,40,.28)",ink:"#2e2a24",
+      inkShadow:"rgba(255,255,255,.7)",noteBorder:"rgba(46,42,36,.6)",panel:"rgba(255,250,242,.95)",perfect:"#b35f1f",good:"#2e2a24",miss:"#8a8374",glow:false},
+    shapes:["circle","circle"], video:"brightness(1.08) saturate(.95)"
+  },
+  "shoutengai": {
+    cat:["life"],
+    label:{ja:"商店街の夕暮れ",en:"Shopping street at dusk",zh:"傍晚的商店街",ko:"저녁 상점가"},
+    desc:{ja:"赤い提灯と、店先の明かりが並ぶ通り",en:"A street lined with red lanterns and shop lights",zh:"红灯笼与店铺灯火排列的街道",ko:"빨간 등불과 가게 불빛이 늘어선 거리"},
+    ui:{"--ui-bg":"#2a1d24","--ui-panel":"rgba(42,29,36,.96)","--ui-soft":"rgba(255,255,255,.05)","--ui-text":"#f7eef0",
+      "--ui-muted":"#c9b3bb","--ui-border":"rgba(255,255,255,.2)","--ui-button":"#36262e","--ui-button-hover":"#44303a",
+      "--ui-field":"#22161c","--ui-accent":"#ff7a59","--ui-on-accent":"#1d0d08","--ui-gold":"#ffd166",
+      "--ui-shadow":"0 24px 80px rgba(0,0,0,.5)","--ui-glow":"rgba(255,122,89,.16)"},
+    game:{don:"#ffd166",ka:"#8ec5e8",stage:"#24181f",lane:"rgba(0,0,0,.3)",track:"rgba(255,255,255,.2)",ink:"#f7eef0",
+      inkShadow:"rgba(0,0,0,.7)",noteBorder:"rgba(255,255,255,.6)",panel:"rgba(36,24,31,.94)",perfect:"#ffd166",good:"#f7eef0",miss:"#9c8790",glow:true},
+    shapes:["circle","circle"], video:"sepia(.25) saturate(1.2) brightness(.75)"
+  },
+
+  /* ①ゲーム画面の残り（水墨・楽譜・ドット絵の夜・霧の森）。すべて自作の配色。素材・画像・フォントは使わない */
+  "sumi": {
+    cat:["light"],
+    label:{ja:"水墨（墨と朱の判子）",en:"Sumi ink (ink and red seal)",zh:"水墨（墨与朱印）",ko:"수묵(먹과 주인)"},
+    desc:{ja:"和紙に墨の濃淡、朱の判子だけの差し色",en:"Ink wash on washi paper, with only a red seal as accent",zh:"宣纸上的墨色浓淡，仅以朱印点缀",ko:"한지 위의 먹 농담, 주인 한 점만 더한 색"},
+    ui:{"--ui-bg":"#f3efe6","--ui-panel":"#fbf8f1","--ui-soft":"rgba(27,27,27,.05)","--ui-text":"#1b1b1b",
+      "--ui-muted":"#56534c","--ui-border":"rgba(27,27,27,.25)","--ui-button":"#e7e1d3","--ui-button-hover":"#dad2bf",
+      "--ui-field":"#ffffff","--ui-accent":"#b3261e","--ui-on-accent":"#ffffff","--ui-gold":"#8f3500",
+      "--ui-shadow":"0 12px 36px rgba(27,27,27,.12)","--ui-glow":"rgba(179,38,30,.12)"},
+    game:{don:"#1d1d1d",ka:"#7d7a72",stage:"#f3efe6",lane:"rgba(27,27,27,.05)",track:"rgba(27,27,27,.3)",ink:"#1b1b1b",
+      inkShadow:"rgba(255,255,255,.7)",noteBorder:"rgba(27,27,27,.7)",panel:"rgba(251,248,241,.95)",perfect:"#b3261e",good:"#1b1b1b",miss:"#8b877c",glow:false},
+    shapes:["circle","circle"], video:"grayscale(.6) contrast(1.05)"
+  },
+  "score": {
+    cat:["light"],
+    label:{ja:"楽譜（五線と音符）",en:"Sheet music (staves and notes)",zh:"乐谱（五线与音符）",ko:"악보(오선과 음표)"},
+    desc:{ja:"淡い紙の上に五線、ブラウンの音符",en:"Staff lines and brown notes on pale paper",zh:"淡色纸上的五线与棕色音符",ko:"연한 종이 위의 오선과 갈색 음표"},
+    ui:{"--ui-bg":"#faf7ef","--ui-panel":"#fffdf7","--ui-soft":"rgba(60,40,20,.05)","--ui-text":"#2a2118",
+      "--ui-muted":"#6b5a48","--ui-border":"rgba(60,40,20,.22)","--ui-button":"#eee6d4","--ui-button-hover":"#e2d6bb",
+      "--ui-field":"#ffffff","--ui-accent":"#7a4a1e","--ui-on-accent":"#ffffff","--ui-gold":"#8f5e10",
+      "--ui-shadow":"0 12px 36px rgba(60,40,20,.12)","--ui-glow":"rgba(122,74,30,.12)"},
+    game:{don:"#2a2118",ka:"#4f7a96",stage:"#fbf9f2",lane:"rgba(60,40,20,.04)",track:"rgba(60,40,20,.35)",ink:"#2a2118",
+      inkShadow:"rgba(255,255,255,.7)",noteBorder:"rgba(42,33,24,.6)",panel:"rgba(255,253,247,.95)",perfect:"#7a4a1e",good:"#2a2118",miss:"#8b7e6e",glow:false},
+    shapes:["circle","circle"], video:"sepia(.2) brightness(1.04)"
+  },
+  "dotNight": {
+    cat:["dark","fun"],
+    label:{ja:"ドット絵の夜",en:"Pixel night",zh:"像素夜空",ko:"도트 밤하늘"},
+    desc:{ja:"8ビット風の星空と、自作のドット",en:"An 8-bit starry sky with original pixel art",zh:"8位风格的星空与自制像素画",ko:"8비트풍 별밤과 직접 만든 도트"},
+    ui:{"--ui-bg":"#0b0f2a","--ui-panel":"rgba(14,20,50,.96)","--ui-soft":"rgba(255,255,255,.05)","--ui-text":"#e8ecff",
+      "--ui-muted":"#a9b3e0","--ui-border":"rgba(232,236,255,.22)","--ui-button":"#18214a","--ui-button-hover":"#24306a",
+      "--ui-field":"#070a1e","--ui-accent":"#ffd23f","--ui-on-accent":"#1a1400","--ui-gold":"#ffd23f",
+      "--ui-shadow":"0 0 0 2px #000,0 16px 0 #000","--ui-glow":"rgba(255,210,63,.16)"},
+    game:{don:"#ffd23f",ka:"#5ee0ff",stage:"#0b0f2a",lane:"rgba(255,255,255,.04)",track:"rgba(232,236,255,.25)",ink:"#e8ecff",
+      inkShadow:"rgba(0,0,0,.8)",noteBorder:"#000000",panel:"rgba(11,15,42,.94)",perfect:"#ffd23f",good:"#e8ecff",miss:"#7f8bbd",glow:true},
+    shapes:["square","square"], video:"contrast(1.1) saturate(1.2)"
+  },
+  "mistForest": {
+    cat:["dark"],
+    label:{ja:"霧の森",en:"Misty forest",zh:"雾林",ko:"안개 숲"},
+    desc:{ja:"薄い霧が流れる、緑の階調",en:"Drifting thin mist over layers of green",zh:"薄雾流动的绿色层次",ko:"얇은 안개가 흐르는 초록의 농담"},
+    ui:{"--ui-bg":"#1d3a33","--ui-panel":"rgba(24,50,43,.96)","--ui-soft":"rgba(255,255,255,.05)","--ui-text":"#e9f3ee",
+      "--ui-muted":"#a9c7bb","--ui-border":"rgba(233,243,238,.2)","--ui-button":"#264a41","--ui-button-hover":"#2f5a4f",
+      "--ui-field":"#162e28","--ui-accent":"#8fd3b0","--ui-on-accent":"#0c231b","--ui-gold":"#d8e8a0",
+      "--ui-shadow":"0 24px 80px rgba(0,0,0,.45)","--ui-glow":"rgba(143,211,176,.16)"},
+    game:{don:"#8fd3b0",ka:"#d7ecd9",stage:"#1d3a33",lane:"rgba(255,255,255,.05)",track:"rgba(233,243,238,.22)",ink:"#e9f3ee",
+      inkShadow:"rgba(0,0,0,.6)",noteBorder:"rgba(233,243,238,.5)",panel:"rgba(29,58,51,.94)",perfect:"#d8e8a0",good:"#e9f3ee",miss:"#8fa89e",glow:false},
+    shapes:["circle","circle"], video:"saturate(.85) brightness(.9)"
   }
 };
 

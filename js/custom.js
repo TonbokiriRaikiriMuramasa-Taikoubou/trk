@@ -1,4 +1,5 @@
 (() => {
+  const core = window.Trk.core;
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：ノーツ設定・マスコット表示・スキン作成・パック・曲パック ============
    ※ パックの形式名 "shadow-taiko-pack" は、これまでに作られたパックとの互換のため変更していません。 */
@@ -7,25 +8,25 @@
 /* ============ ノーツの見た目 ============ */
 function syncNoteUI() {
   for (const i of [0, 1]) {
-    window.Trk.core.$("noteColor" + i).value = window.Trk.core.settings.notes[i].color;
-    window.Trk.core.$("noteShape" + i).value = window.Trk.core.settings.notes[i].shape;
-    const d = window.Trk.core.$("notePrev" + i);
-    d.className = `dot big ${window.Trk.core.settings.notes[i].shape}`; d.style.background = window.Trk.core.settings.notes[i].color;
+    core.$("noteColor" + i).value = core.settings.notes[i].color;
+    core.$("noteShape" + i).value = core.settings.notes[i].shape;
+    const d = core.$("notePrev" + i);
+    d.className = `dot big ${core.settings.notes[i].shape}`; d.style.background = core.settings.notes[i].color;
   }
 }
 function setNotes(list, persist = true) {
-  window.Trk.core.settings.notes = window.Trk.data.sanitizeNotes(list);
-  syncNoteUI(); window.Trk.core.applyNoteVars(); window.Trk.core.updateTouchKeys();
-  if (persist) window.Trk.core.saveUserPrefs();
+  core.settings.notes = window.Trk.data.sanitizeNotes(list);
+  syncNoteUI(); core.applyNoteVars(); core.updateTouchKeys();
+  if (persist) core.saveUserPrefs();
 }
 [0, 1].forEach(i => {
-  window.Trk.core.$("noteColor" + i).addEventListener("input", e => { const n = window.Trk.core.settings.notes.map(x => ({ ...x })); n[i].color = e.target.value; setNotes(n); });
-  window.Trk.core.$("noteShape" + i).addEventListener("change", e => { const n = window.Trk.core.settings.notes.map(x => ({ ...x })); n[i].shape = e.target.value; setNotes(n); });
+  core.$("noteColor" + i).addEventListener("input", e => { const n = core.settings.notes.map(x => ({ ...x })); n[i].color = e.target.value; setNotes(n); });
+  core.$("noteShape" + i).addEventListener("change", e => { const n = core.settings.notes.map(x => ({ ...x })); n[i].shape = e.target.value; setNotes(n); });
 });
-window.Trk.core.$("notePresets").addEventListener("click", e => {
+core.$("notePresets").addEventListener("click", e => {
   const b = e.target.closest("button[data-preset]"); if (!b) return;
   if (b.dataset.preset === "skin") {
-    const s = window.Trk.core.skin();
+    const s = core.skin();
     setNotes([{ color:window.Trk.data.toHex(s.game.don, window.Trk.data.NOTE_PRESETS.classic[0].color), shape:s.shapes[0] },
               { color:window.Trk.data.toHex(s.game.ka, window.Trk.data.NOTE_PRESETS.classic[1].color), shape:s.shapes[1] }]);
   } else setNotes(window.Trk.data.NOTE_PRESETS[b.dataset.preset]);
@@ -34,21 +35,21 @@ window.Trk.core.$("notePresets").addEventListener("click", e => {
 /* ============ マスコット設定・PCLクレジット ============ */
 const PCL_URL = "https://piapro.jp/license/pcl/summary";
 function updateMascotUI() {
-  window.Trk.core.$("mascotSelect").value = window.Trk.core.settings.mascot;
+  core.$("mascotSelect").value = core.settings.mascot;
   /* 🩷 マスコットが変わった合図。js/mmd.js・js/vrm.js は、🪶 軽量化で起動時に読み込まなかった
      3Dモデルをここで読みに行きます（モデルが既にあるときは中身を見てすぐ止まるので無駄打ちしません） */
-  try { window.Trk.core.emit("mascot"); } catch (_) {}
-  const on = window.Trk.core.isPclMascot(window.Trk.core.activeMascot());
+  try { core.emit("mascot"); } catch (_) {}
+  const on = core.isPclMascot(core.activeMascot());
   document.querySelectorAll(".pclCredit").forEach(n => {
     n.hidden = !on; n.textContent = "";
     if (!on) return;
-    n.append(window.Trk.core.el("span", "", tr("pclCredit") + " "));
-    if (lang !== "ja" && TEXT.ja.pclCredit) n.append(window.Trk.core.el("span", "", `（${TEXT.ja.pclCredit}）`), " ");   // 正文は日本語版
-    const a = window.Trk.core.el("a", "", PCL_URL); a.href = PCL_URL; a.target = "_blank"; a.rel = "noopener noreferrer";
+    n.append(core.el("span", "", tr("pclCredit") + " "));
+    if (lang !== "ja" && TEXT.ja.pclCredit) n.append(core.el("span", "", `（${TEXT.ja.pclCredit}）`), " ");   // 正文は日本語版
+    const a = core.el("a", "", PCL_URL); a.href = PCL_URL; a.target = "_blank"; a.rel = "noopener noreferrer";
     n.append(a);
   });
 }
-window.Trk.core.$("mascotSelect").addEventListener("change", e => { window.Trk.core.settings.mascot = e.target.value; window.Trk.core.saveUserPrefs(); updateMascotUI(); });
+core.$("mascotSelect").addEventListener("change", e => { core.settings.mascot = e.target.value; core.saveUserPrefs(); updateMascotUI(); });
 on("skin", updateMascotUI);
 on("language", updateMascotUI);
 
@@ -56,7 +57,7 @@ on("language", updateMascotUI);
 const MAKER_COLORS = ["bg", "bg2", "panel", "text", "accent", "gold"];
 const CUSTOM_SKIN_FILE_MAX = 256 * 1024;
 function defFromSkin(id) {
-  if (Object.prototype.hasOwnProperty.call(window.Trk.core.customSkinDefs, id)) return JSON.parse(JSON.stringify(window.Trk.core.customSkinDefs[id]));
+  if (Object.prototype.hasOwnProperty.call(core.customSkinDefs, id)) return JSON.parse(JSON.stringify(core.customSkinDefs[id]));
   const s = window.Trk.data.has(window.Trk.data.SKINS, id) ? window.Trk.data.SKINS[id] : window.Trk.data.SKINS.shadow, u = s.ui;
   const font = !s.font ? "default" : /mono|consolas/i.test(s.font) ? "mono" : /serif/i.test(s.font) && !/sans/i.test(s.font) ? "serif" : "rounded";
   const g = window.Trk.data.parseGrad(u["--ui-bg"]);   // グラデーションのスキンをリミックスしたら、2色と向きをそのまま持ってくる
@@ -69,62 +70,62 @@ function defFromSkin(id) {
 }
 function fillSkinMaker(id) {
   const d = defFromSkin(id);
-  window.Trk.core.$("makerName").value = d.name;
-  for (const k of MAKER_COLORS) window.Trk.core.$("makerColor_" + k).value = d.colors[k] || d.colors.bg;   // bg2 が空のときは bg と同色で立たせておく
-  window.Trk.core.$("makerGradDir").value = d.gradDir || "none";
-  window.Trk.core.$("makerGlow").checked = d.glow; window.Trk.core.$("makerScan").checked = d.scanlines;
-  window.Trk.core.$("makerFont").value = d.font; window.Trk.core.$("makerVideo").value = d.video; window.Trk.core.$("makerMascot").value = d.mascot;
+  core.$("makerName").value = d.name;
+  for (const k of MAKER_COLORS) core.$("makerColor_" + k).value = d.colors[k] || d.colors.bg;   // bg2 が空のときは bg と同色で立たせておく
+  core.$("makerGradDir").value = d.gradDir || "none";
+  core.$("makerGlow").checked = d.glow; core.$("makerScan").checked = d.scanlines;
+  core.$("makerFont").value = d.font; core.$("makerVideo").value = d.video; core.$("makerMascot").value = d.mascot;
 }
 function readSkinMaker() {
   const colors = {};
-  for (const k of MAKER_COLORS) colors[k] = window.Trk.core.$("makerColor_" + k).value;
-  return window.Trk.data.sanitizeSkinDef({ name:window.Trk.core.$("makerName").value, colors, glow:window.Trk.core.$("makerGlow").checked, scanlines:window.Trk.core.$("makerScan").checked, gradDir:window.Trk.core.$("makerGradDir").value,
-    font:window.Trk.core.$("makerFont").value, video:window.Trk.core.$("makerVideo").value, mascot:window.Trk.core.$("makerMascot").value });
+  for (const k of MAKER_COLORS) colors[k] = core.$("makerColor_" + k).value;
+  return window.Trk.data.sanitizeSkinDef({ name:core.$("makerName").value, colors, glow:core.$("makerGlow").checked, scanlines:core.$("makerScan").checked, gradDir:core.$("makerGradDir").value,
+    font:core.$("makerFont").value, video:core.$("makerVideo").value, mascot:core.$("makerMascot").value });
 }
 function storeCustomSkin(id, def) {
-  window.Trk.core.customSkinDefs[id] = def; window.Trk.data.SKINS[id] = window.Trk.data.buildCustomSkin(def);
-  window.Trk.core.saveCustomSkins(); window.Trk.core.buildSkinGrid(); window.Trk.core.applySkin(id);
+  core.customSkinDefs[id] = def; window.Trk.data.SKINS[id] = window.Trk.data.buildCustomSkin(def);
+  core.saveCustomSkins(); core.buildSkinGrid(); core.applySkin(id);
 }
 const newSkinId = () => "custom_" + Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36);
-const skinShelf = window.Trk.core.$("skinShelf");
+const skinShelf = core.$("skinShelf");
 if (skinShelf) {
-  skinShelf.open = window.Trk.core.settings.skinShelfOpen !== false;      // 前回の開閉を復元
-  skinShelf.addEventListener("toggle", () => { window.Trk.core.settings.skinShelfOpen = skinShelf.open; window.Trk.core.saveUserPrefs(); });
+  skinShelf.open = core.settings.skinShelfOpen !== false;      // 前回の開閉を復元
+  skinShelf.addEventListener("toggle", () => { core.settings.skinShelfOpen = skinShelf.open; core.saveUserPrefs(); });
 }
-window.Trk.core.$("skinMaker").addEventListener("toggle", () => { if (window.Trk.core.$("skinMaker").open) fillSkinMaker(window.Trk.core.settings.skin); });
-window.Trk.core.$("makerLoadBtn").addEventListener("click", () => { fillSkinMaker(window.Trk.core.settings.skin); window.Trk.core.setStatus("makerStatus", null); });
-window.Trk.core.$("makerSaveNewBtn").addEventListener("click", () => {
-  if (Object.keys(window.Trk.core.customSkinDefs).length >= window.Trk.core.CUSTOM_SKIN_MAX) { window.Trk.core.setStatus("makerStatus", "skinLimit"); return; }
-  const def = readSkinMaker(); if (!def) { window.Trk.core.setStatus("makerStatus", "skinBad"); return; }
-  storeCustomSkin(newSkinId(), def); window.Trk.core.setStatus("makerStatus", "skinSaved");
+core.$("skinMaker").addEventListener("toggle", () => { if (core.$("skinMaker").open) fillSkinMaker(core.settings.skin); });
+core.$("makerLoadBtn").addEventListener("click", () => { fillSkinMaker(core.settings.skin); core.setStatus("makerStatus", null); });
+core.$("makerSaveNewBtn").addEventListener("click", () => {
+  if (Object.keys(core.customSkinDefs).length >= core.CUSTOM_SKIN_MAX) { core.setStatus("makerStatus", "skinLimit"); return; }
+  const def = readSkinMaker(); if (!def) { core.setStatus("makerStatus", "skinBad"); return; }
+  storeCustomSkin(newSkinId(), def); core.setStatus("makerStatus", "skinSaved");
 });
-window.Trk.core.$("makerOverwriteBtn").addEventListener("click", () => {
-  if (!Object.prototype.hasOwnProperty.call(window.Trk.core.customSkinDefs, window.Trk.core.settings.skin)) { window.Trk.core.setStatus("makerStatus", "builtinLocked"); return; }
-  const def = readSkinMaker(); if (!def) { window.Trk.core.setStatus("makerStatus", "skinBad"); return; }
-  storeCustomSkin(window.Trk.core.settings.skin, def); window.Trk.core.setStatus("makerStatus", "skinSaved");
+core.$("makerOverwriteBtn").addEventListener("click", () => {
+  if (!Object.prototype.hasOwnProperty.call(core.customSkinDefs, core.settings.skin)) { core.setStatus("makerStatus", "builtinLocked"); return; }
+  const def = readSkinMaker(); if (!def) { core.setStatus("makerStatus", "skinBad"); return; }
+  storeCustomSkin(core.settings.skin, def); core.setStatus("makerStatus", "skinSaved");
 });
-window.Trk.core.$("makerExportBtn").addEventListener("click", () => {
-  const def = readSkinMaker(); if (!def) { window.Trk.core.setStatus("makerStatus", "skinBad"); return; }
-  window.Trk.core.downloadJSON({ format:window.Trk.core.SKIN_FORMAT, version:1, ...def }, `${window.Trk.core.safeName(def.name)}.skin.json`);
-  window.Trk.core.setStatus("makerStatus", "skinExported");
+core.$("makerExportBtn").addEventListener("click", () => {
+  const def = readSkinMaker(); if (!def) { core.setStatus("makerStatus", "skinBad"); return; }
+  core.downloadJSON({ format:core.SKIN_FORMAT, version:1, ...def }, `${core.safeName(def.name)}.skin.json`);
+  core.setStatus("makerStatus", "skinExported");
 });
-window.Trk.core.$("makerImportFile").addEventListener("change", async e => {
+core.$("makerImportFile").addEventListener("change", async e => {
   const f = e.target.files[0]; e.target.value = ""; if (!f) return;
   if (typeof f.size !== "number" || !Number.isFinite(f.size) || f.size < 0 || f.size > CUSTOM_SKIN_FILE_MAX) {
-    window.Trk.core.setStatus("makerStatus", "skinBad"); return;
+    core.setStatus("makerStatus", "skinBad"); return;
   }
   let raw = null; try { raw = JSON.parse(await f.text()); } catch (_) {}
-  const def = raw && (!raw.format || raw.format === window.Trk.core.SKIN_FORMAT) ? window.Trk.data.sanitizeSkinDef(raw) : null;
-  if (!def) { window.Trk.core.setStatus("makerStatus", "skinBad"); return; }
-  if (Object.keys(window.Trk.core.customSkinDefs).length >= window.Trk.core.CUSTOM_SKIN_MAX) { window.Trk.core.setStatus("makerStatus", "skinLimit"); return; }
-  storeCustomSkin(newSkinId(), def); fillSkinMaker(window.Trk.core.settings.skin); window.Trk.core.setStatus("makerStatus", "skinImported");
+  const def = raw && (!raw.format || raw.format === core.SKIN_FORMAT) ? window.Trk.data.sanitizeSkinDef(raw) : null;
+  if (!def) { core.setStatus("makerStatus", "skinBad"); return; }
+  if (Object.keys(core.customSkinDefs).length >= core.CUSTOM_SKIN_MAX) { core.setStatus("makerStatus", "skinLimit"); return; }
+  storeCustomSkin(newSkinId(), def); fillSkinMaker(core.settings.skin); core.setStatus("makerStatus", "skinImported");
 });
-window.Trk.core.$("makerDeleteBtn").addEventListener("click", () => {
-  const id = window.Trk.core.settings.skin;
-  if (!Object.prototype.hasOwnProperty.call(window.Trk.core.customSkinDefs, id)) { window.Trk.core.setStatus("makerStatus", "builtinLocked"); return; }
+core.$("makerDeleteBtn").addEventListener("click", () => {
+  const id = core.settings.skin;
+  if (!Object.prototype.hasOwnProperty.call(core.customSkinDefs, id)) { core.setStatus("makerStatus", "builtinLocked"); return; }
   if (!confirm(tr("confirmDelete"))) return;
-  delete window.Trk.core.customSkinDefs[id]; delete window.Trk.data.SKINS[id]; window.Trk.core.saveCustomSkins();
-  window.Trk.core.buildSkinGrid(); window.Trk.core.applySkin("shadow"); fillSkinMaker("shadow"); window.Trk.core.setStatus("makerStatus", "skinDeleted");
+  delete core.customSkinDefs[id]; delete window.Trk.data.SKINS[id]; core.saveCustomSkins();
+  core.buildSkinGrid(); core.applySkin("shadow"); fillSkinMaker("shadow"); core.setStatus("makerStatus", "skinDeleted");
 });
 
 /* ============ ZIP（.stpack の中身） ============ */
@@ -211,7 +212,7 @@ const MIME = { png:"image/png", webp:"image/webp", jpg:"image/jpeg", jpeg:"image
   ogg:"audio/ogg", oga:"audio/ogg", opus:"audio/ogg", m4a:"audio/mp4", aac:"audio/aac", flac:"audio/flac", mp4:"video/mp4",
   webm:"video/webm", vrm:"model/gltf-binary", vrma:"model/gltf-binary", json:"application/json" };
 const PATH_RE = /^[A-Za-z0-9_\-./]{1,120}$/;
-const safePath = (p, exts) => typeof p === "string" && PATH_RE.test(p) && !p.includes("..") && !p.startsWith("/") && exts.includes(window.Trk.core.extOf(p)) ? p : null;
+const safePath = (p, exts) => typeof p === "string" && PATH_RE.test(p) && !p.includes("..") && !p.startsWith("/") && exts.includes(core.extOf(p)) ? p : null;
 const pstr = (v, n) => typeof v === "string" ? v.trim().slice(0, n) : "";
 function langText(o, n) {
   if (typeof o === "string") return o.trim() ? { en:pstr(o, n) } : null;
@@ -224,11 +225,11 @@ function sanitizeSong(r, i) {
   const audio = safePath(r.audio, SONG_EXT); if (!audio) return null;
   const s = {
     id: typeof r.id === "string" && /^[A-Za-z0-9_-]{1,32}$/.test(r.id) ? r.id : `s${i + 1}`,
-    title: pstr(r.title, 80) || window.Trk.core.baseName(audio.split("/").pop()),
+    title: pstr(r.title, 80) || core.baseName(audio.split("/").pop()),
     artist: pstr(r.artist, 60), charter: pstr(r.charter, 40), license: pstr(r.license, 400), audio
   };
   const bg = safePath(r.background, IMG_EXT); if (bg) s.background = bg;
-  const bpm = window.Trk.core.num(r.bpm, 60, 300, 0); if (bpm) s.bpm = bpm;
+  const bpm = core.num(r.bpm, 60, 300, 0); if (bpm) s.bpm = bpm;
   if (typeof r.offset === "number" && isFinite(r.offset)) s.offset = Math.max(-5000, Math.min(5000, r.offset));
   if (typeof r.previewStart === "number" && isFinite(r.previewStart) && r.previewStart >= 0) s.previewStart = Math.min(36000, r.previewStart);
   if (r.charts && typeof r.charts === "object") {
@@ -293,7 +294,7 @@ function sanitizeManifest(raw) {
     const vrmPath = safePath(r.vrm, ["vrm"]), motion = safePath(r.motion, ["vrma"]);
     if (vrmPath) o.vrm = vrmPath;
     if (motion) o.motion = motion;
-    const bpm = window.Trk.core.num(r.motionBpm, 40, 300, 0); if (bpm) o.motionBpm = bpm;
+    const bpm = core.num(r.motionBpm, 40, 300, 0); if (bpm) o.motionBpm = bpm;
     if (["full", "upper", "face"].includes(r.frame)) o.frame = r.frame;
     if (typeof r.turn === "number" && isFinite(r.turn)) o.turn = Math.max(-60, Math.min(60, r.turn));
     for (const k of ["capStart", "capCombo", "capBreak"]) { const t = langText(r.captions && r.captions[k], 60); if (t) caps[k] = t; }
@@ -328,7 +329,7 @@ const hasLook = m => !!(m.skin || m.notes || m.sounds || m.fx || m.mascot);
 /* ============ パックの保存・追加・適用 ============ */
 /* ⚠ sizeKey/sizeOf を渡すと、合計を「index のキー（数値）だけ」で数えられる（Blob を復元しない）。
    sizeOf は「size を持たない古いレコード」の移行と、件数が食い違ったときの数え直しに使う。 */
-const packDB = window.Trk.core.idbStore("shadow_taiko_packs", "packs", { sizeKey:"size", sizeOf:packRecordBytes });
+const packDB = core.idbStore("shadow_taiko_packs", "packs", { sizeKey:"size", sizeOf:packRecordBytes });
 const packRuntime = { id:null, captions:null, noteImages:[null, null], urls:[], skinId:null, hadSounds:false };
 const noteImage = lane => { const im = packRuntime.noteImages[lane]; return im && im.complete && im.naturalWidth ? im : null; };
 function packRecordBytes(record) {
@@ -375,7 +376,7 @@ function installPackFile(file) {
   return task;
 }
 async function installPackFileSerial(file) {
-  window.Trk.core.setStatus("packStatus", "packReading");
+  core.setStatus("packStatus", "packReading");
   try {
     if (file.size > PACK_MAX) throw new PackError("packTooBig");
     const entries = await readZip(file);
@@ -395,25 +396,25 @@ async function installPackFileSerial(file) {
       const blob = await inflateEntry(ent, lim, path);   /* 🛡 展開中に上限で止める */
       if (blob.size > lim) throw new PackError("packFileTooBig", { f:path });
       total += blob.size; if (total > PACK_MAX) throw new PackError("packTooBig");
-      files[path] = new Blob([blob], { type:MIME[window.Trk.core.extOf(path)] || "" });
+      files[path] = new Blob([blob], { type:MIME[core.extOf(path)] || "" });
     }
-    const id = "p" + window.Trk.core.hashString(`${man.name}|${man.author}`).toString(36);
+    const id = "p" + core.hashString(`${man.name}|${man.author}`).toString(36);
     await checkPackStorageCapacity(id, total);
     const record = { id, manifest:man, files, size:total, installedAt:Date.now() };
     /* 最終的な上限判定と保存を**同じ readwrite トランザクション**で行う（複数タブ間の競合を防ぐ）。
        ここでも合計は index のキーだけで数えるので、Blob を復元せずロック時間も短い。 */
     const stored = await packDB.putIf(id, record, stats => packProjected(stats, total) <= PACK_STORE_MAX);
     if (!stored) throw new PackError("packStoreLimit", { max:PACK_STORE_MAX / PACK_MB });
-    window.Trk.core.setStatus("packStatus", "packInstalled", { name:man.name });
+    core.setStatus("packStatus", "packInstalled", { name:man.name });
     await renderPackList();
-    if (man.songs) window.Trk.core.emit("packsChanged");
+    if (man.songs) core.emit("packsChanged");
     return { id, man };
   } catch (e) {
     console.error(e);
     const quotaError = e && (e.name === "QuotaExceededError" || e.code === 22 || e.code === 1014);
     /* バージョン変更が他のタブにブロックされた（onblocked）。放置すると固まるので案内を出す */
     const blockedError = !!e && (e.message === "idb-blocked" || e.name === "BlockedError");
-    window.Trk.core.setStatus("packStatus", e instanceof PackError ? e.key
+    core.setStatus("packStatus", e instanceof PackError ? e.key
       : blockedError ? "packDbBlocked" : quotaError ? "packStorageQuota" : "packBadZip", e && e.vars);
     return null;
   }
@@ -431,7 +432,7 @@ function whenVrmReady(fn) {
 }
 async function activatePack(id, { restore = false, skipConfirm = false } = {}) {
   let rec = null; try { rec = await packDB.get(id); } catch (_) {}
-  if (!rec || !hasLook(rec.manifest)) { if (restore) { window.Trk.core.settings.activePack = null; window.Trk.core.saveUserPrefs(); } return false; }
+  if (!rec || !hasLook(rec.manifest)) { if (restore) { core.settings.activePack = null; core.saveUserPrefs(); } return false; }
   const m = rec.manifest, f = rec.files || {};
   if (!restore && !skipConfirm && m.mascot && m.mascot.vrm && !confirm(tr("packConfirm") + (m.license || "—"))) return false;
   deactivatePack(false);
@@ -441,12 +442,12 @@ async function activatePack(id, { restore = false, skipConfirm = false } = {}) {
     const sid = "pack_" + id, s = window.Trk.data.buildCustomSkin({ ...m.skin, mascot:m.mascot && m.mascot.vrm ? "vrm" : m.skin.mascot });
     s.custom = false; s.pack = true;
     s.label = { en:m.name }; s.desc = { ja:"📦 パック", en:"📦 Pack", zh:"📦 资源包", ko:"📦 팩" };
-    window.Trk.data.SKINS[sid] = s; packRuntime.skinId = sid; window.Trk.core.buildSkinGrid();
-    if (!restore || window.Trk.core.savedSkinAtBoot === sid) window.Trk.core.applySkin(sid);
+    window.Trk.data.SKINS[sid] = s; packRuntime.skinId = sid; core.buildSkinGrid();
+    if (!restore || core.savedSkinAtBoot === sid) core.applySkin(sid);
   }
   if (m.notes) {
     if (!restore) {
-      const cur = window.Trk.core.settings.notes;
+      const cur = core.settings.notes;
       setNotes([0, 1].map(i => { const n = m.notes[i ? "ka" : "don"] || {}; return { color:n.color || cur[i].color, shape:n.shape || cur[i].shape }; }));
     }
     for (const i of [0, 1]) {
@@ -459,16 +460,16 @@ async function activatePack(id, { restore = false, skipConfirm = false } = {}) {
       const p = m.sounds[i ? "ka" : "don"];
       if (p && f[p]) { try { window.Trk.media.seBuffers[i] = await window.Trk.media.decodeAudio(await f[p].arrayBuffer()); packRuntime.hadSounds = true; } catch (_) {} }
     }
-    if (packRuntime.hadSounds && !restore) { window.Trk.core.settings.seEnabled = true; window.Trk.core.$("seEnabled").checked = true; window.Trk.core.setStatus("seStatus", "seOn"); }
+    if (packRuntime.hadSounds && !restore) { core.settings.seEnabled = true; core.$("seEnabled").checked = true; core.setStatus("seStatus", "seOn"); }
   }
-  if (m.fx && !restore) { window.Trk.core.settings.fxPower = m.fx.power; window.Trk.core.$("fxPower").value = m.fx.power; if (typeof showFxPower === "function") showFxPower(); }
+  if (m.fx && !restore) { core.settings.fxPower = m.fx.power; core.$("fxPower").value = m.fx.power; if (typeof showFxPower === "function") showFxPower(); }
   if (m.mascot && m.mascot.vrm && f[m.mascot.vrm]) {
     const mm = m.mascot;
     whenVrmReady(api => api.loadFromPack(f[mm.vrm], { name:m.name, motion:mm.motion ? f[mm.motion] : null,
       motionBpm:mm.motionBpm, frame:mm.frame, turn:mm.turn, select:!restore }));
   }
-  window.Trk.core.settings.activePack = id; window.Trk.core.saveUserPrefs(); updateMascotUI();
-  if (!restore) window.Trk.core.setStatus("packStatus", "packActivated", { name:m.name });
+  core.settings.activePack = id; core.saveUserPrefs(); updateMascotUI();
+  if (!restore) core.setStatus("packStatus", "packActivated", { name:m.name });
   await renderPackList();
   return true;
 }
@@ -476,8 +477,8 @@ function deactivatePack(persist = true) {
   if (packRuntime.id) {
     if (packRuntime.skinId) {
       const sid = packRuntime.skinId; delete window.Trk.data.SKINS[sid];
-      if (window.Trk.core.settings.skin === sid) window.Trk.core.applySkin("shadow", false);
-      window.Trk.core.buildSkinGrid();
+      if (core.settings.skin === sid) core.applySkin("shadow", false);
+      core.buildSkinGrid();
     }
     packRuntime.urls.forEach(u => URL.revokeObjectURL(u));
     if (packRuntime.hadSounds) {   // 自分で読み込んだSEがあればそれに戻す
@@ -486,12 +487,12 @@ function deactivatePack(persist = true) {
     Object.assign(packRuntime, { id:null, captions:null, noteImages:[null, null], urls:[], skinId:null, hadSounds:false });
     if (window.ShadowTaikoVRM) window.ShadowTaikoVRM.unloadPack();
   }
-  if (persist) { window.Trk.core.settings.activePack = null; window.Trk.core.saveUserPrefs(); updateMascotUI(); window.Trk.core.setStatus("packStatus", "packDeactivated"); renderPackList(); }
+  if (persist) { core.settings.activePack = null; core.saveUserPrefs(); updateMascotUI(); core.setStatus("packStatus", "packDeactivated"); renderPackList(); }
 }
 async function installAndUse(file, skipConfirm = false) {
   const r = await installPackFile(file);
   if (!r) return;
-  if (r.man.songs) window.Trk.core.setStatus("libStatus", "packSongsAdded", { n:r.man.songs.length });
+  if (r.man.songs) core.setStatus("libStatus", "packSongsAdded", { n:r.man.songs.length });
   if (hasLook(r.man)) await activatePack(r.id, { skipConfirm });
 }
 /* 曲リスト（library.js）に渡す、全パックの曲一覧 */
@@ -551,112 +552,112 @@ function packToZip(man, files) {
   return writeZip(entries);
 }
 async function buildPack() {
-  const name = window.Trk.core.$("packName").value.trim().slice(0, 40);
-  if (!name) { window.Trk.core.setStatus("packStatus", "packNeedName"); return; }
-  const man = { format:PACK_FORMAT, version:1, name, author:window.Trk.core.$("packAuthor").value, description:window.Trk.core.$("packDesc").value,
-                license:window.Trk.core.$("packLicense").value, url:window.Trk.core.$("packUrl").value.trim() };
-  if (window.Trk.core.$("packCreditCard").checked) {
-    man.creditCard = { name:window.Trk.core.$("packAuthor").value.trim() || name, role:window.Trk.core.$("packRole").value, tagline:window.Trk.core.$("packDesc").value,
-                       license:window.Trk.core.$("packLicense").value, rights:window.Trk.core.$("packRights").value, url:window.Trk.core.$("packUrl").value.trim() };
+  const name = core.$("packName").value.trim().slice(0, 40);
+  if (!name) { core.setStatus("packStatus", "packNeedName"); return; }
+  const man = { format:PACK_FORMAT, version:1, name, author:core.$("packAuthor").value, description:core.$("packDesc").value,
+                license:core.$("packLicense").value, url:core.$("packUrl").value.trim() };
+  if (core.$("packCreditCard").checked) {
+    man.creditCard = { name:core.$("packAuthor").value.trim() || name, role:core.$("packRole").value, tagline:core.$("packDesc").value,
+                       license:core.$("packLicense").value, rights:core.$("packRights").value, url:core.$("packUrl").value.trim() };
   }
   const files = {}, vf = window.ShadowTaikoVRM ? window.ShadowTaikoVRM.getFiles() : {};
-  if (window.Trk.core.$("incSkin").checked) { man.skin = defFromSkin(window.Trk.core.settings.skin); man.fx = { power:window.Trk.core.settings.fxPower }; }
-  if (window.Trk.core.$("incNotes").checked) {
+  if (core.$("incSkin").checked) { man.skin = defFromSkin(core.settings.skin); man.fx = { power:core.settings.fxPower }; }
+  if (core.$("incNotes").checked) {
     man.notes = {};
     for (const i of [0, 1]) {
-      const key = i ? "ka" : "don", n = { color:window.Trk.core.settings.notes[i].color, shape:window.Trk.core.settings.notes[i].shape };
-      const img = window.Trk.core.$(i ? "packKaImg" : "packDonImg").files[0];
+      const key = i ? "ka" : "don", n = { color:core.settings.notes[i].color, shape:core.settings.notes[i].shape };
+      const img = core.$(i ? "packKaImg" : "packDonImg").files[0];
       if (img) {
-        const ext = window.Trk.core.extOf(img.name);
-        if (!IMG_EXT.includes(ext) || img.size > PACK_LIMIT.image * PACK_MB) { window.Trk.core.setStatus("packStatus", "packImgBad"); return; }
+        const ext = core.extOf(img.name);
+        if (!IMG_EXT.includes(ext) || img.size > PACK_LIMIT.image * PACK_MB) { core.setStatus("packStatus", "packImgBad"); return; }
         n.image = `notes/${key}.${ext}`; files[n.image] = img;
       }
       man.notes[key] = n;
     }
   }
-  if (window.Trk.core.$("incSounds").checked) {
+  if (core.$("incSounds").checked) {
     man.sounds = {};
     for (const i of [0, 1]) {
       const sf = window.Trk.media.seFiles[i];
-      if (sf && SND_EXT.includes(window.Trk.core.extOf(sf.name)) && sf.size <= PACK_LIMIT.sound * PACK_MB) {
-        const p = `sounds/${i ? "ka" : "don"}.${window.Trk.core.extOf(sf.name)}`; man.sounds[i ? "ka" : "don"] = p; files[p] = sf;
+      if (sf && SND_EXT.includes(core.extOf(sf.name)) && sf.size <= PACK_LIMIT.sound * PACK_MB) {
+        const p = `sounds/${i ? "ka" : "don"}.${core.extOf(sf.name)}`; man.sounds[i ? "ka" : "don"] = p; files[p] = sf;
       }
     }
   }
   const mascot = {};
-  if (window.Trk.core.$("incVrm").checked && vf.vrm) {
-    if (!vf.allowRedistribution && !window.Trk.core.$("packVrmOk").checked) { window.Trk.core.setStatus("packStatus", "packVrmNoRedist"); return; }
+  if (core.$("incVrm").checked && vf.vrm) {
+    if (!vf.allowRedistribution && !core.$("packVrmOk").checked) { core.setStatus("packStatus", "packVrmNoRedist"); return; }
     mascot.vrm = "mascot/model.vrm"; files[mascot.vrm] = vf.vrm;
-    mascot.frame = window.Trk.core.settings.vrmFrame; mascot.turn = window.Trk.core.settings.vrmTurn;
+    mascot.frame = core.settings.vrmFrame; mascot.turn = core.settings.vrmTurn;
   }
-  if (window.Trk.core.$("incMotion").checked && vf.motion) {
+  if (core.$("incMotion").checked && vf.motion) {
     mascot.motion = "mascot/motion.vrma"; files[mascot.motion] = vf.motion;
-    if (window.Trk.core.settings.vrmMotionBpm) mascot.motionBpm = window.Trk.core.settings.vrmMotionBpm;
+    if (core.settings.vrmMotionBpm) mascot.motionBpm = core.settings.vrmMotionBpm;
   }
-  if (window.Trk.core.$("incCaptions").checked) {
+  if (core.$("incCaptions").checked) {
     const caps = {};
     for (const [k, id] of [["capStart", "capStartTxt"], ["capCombo", "capComboTxt"], ["capBreak", "capBreakTxt"]]) {
-      const t = window.Trk.core.$(id).value.trim(); if (t) caps[k] = { [lang]:t };
+      const t = core.$(id).value.trim(); if (t) caps[k] = { [lang]:t };
     }
     if (Object.keys(caps).length) mascot.captions = caps;
   }
   if (Object.keys(mascot).length) man.mascot = mascot;
   const clean = sanitizeManifest(man);
-  if (!clean) { window.Trk.core.setStatus("packStatus", "packBadManifest"); return; }
+  if (!clean) { core.setStatus("packStatus", "packBadManifest"); return; }
   const out = {};
   for (const { path } of manifestPaths(clean)) if (files[path]) out[path] = files[path];
-  const blob = await packToZip(clean, out), fname = `${window.Trk.core.safeName(name)}.stpack`;
-  window.Trk.core.downloadBlob(blob, fname);
-  window.Trk.core.setStatus("packStatus", "packBuilt");
-  if (window.Trk.core.$("packInstallToo").checked) await installAndUse(new File([blob], fname), true);
+  const blob = await packToZip(clean, out), fname = `${core.safeName(name)}.stpack`;
+  core.downloadBlob(blob, fname);
+  core.setStatus("packStatus", "packBuilt");
+  if (core.$("packInstallToo").checked) await installAndUse(new File([blob], fname), true);
 }
 
 /* ============ 書き出し：曲パック（選曲画面から） ============ */
 async function buildSongPack() {
-  const song = window.Trk.core.currentSong;
-  if (!song || !window.Trk.core.videoReady || !song.file) { window.Trk.core.setStatus("spStatus", "spNoSong"); return; }
-  if (!window.Trk.core.$("spRightsOk").checked) { window.Trk.core.setStatus("spStatus", "spNeedRights"); return; }
-  const audioExt = SONG_EXT.includes(window.Trk.core.extOf(song.file.name || "")) ? window.Trk.core.extOf(song.file.name) : "mp3";
-  if (song.file.size > PACK_LIMIT.audio * PACK_MB) { window.Trk.core.setStatus("spStatus", "spSongTooBig"); return; }
+  const song = core.currentSong;
+  if (!song || !core.videoReady || !song.file) { core.setStatus("spStatus", "spNoSong"); return; }
+  if (!core.$("spRightsOk").checked) { core.setStatus("spStatus", "spNeedRights"); return; }
+  const audioExt = SONG_EXT.includes(core.extOf(song.file.name || "")) ? core.extOf(song.file.name) : "mp3";
+  if (song.file.size > PACK_LIMIT.audio * PACK_MB) { core.setStatus("spStatus", "spSongTooBig"); return; }
   const dir = "songs/s1", files = {}, charts = {};
-  const bpm = Number(window.Trk.core.$("bpm").value), offset = Number(window.Trk.core.$("offset").value) || 0, seed = window.Trk.core.$("seed").value;
+  const bpm = Number(core.$("bpm").value), offset = Number(core.$("offset").value) || 0, seed = core.$("seed").value;
   const meta = { bpm, offset };
-  if (window.Trk.core.$("spIncGenerated").checked && bpm >= 60 && bpm <= 300) {
+  if (core.$("spIncGenerated").checked && bpm >= 60 && bpm <= 300) {
     for (const d of ["easy", "normal", "hard"]) {
       const notes = window.Trk.media.generateNotes(d, bpm, offset, seed);
       if (notes.length) { charts[d] = `${dir}/${d}.json`; files[charts[d]] = new Blob([JSON.stringify(window.Trk.media.chartToData(notes, d, meta))], { type:"application/json" }); }
     }
   }
-  if (window.Trk.core.$("spIncCurrent").checked && window.Trk.core.chart.length) {
-    charts[window.Trk.core.chartDiff] = `${dir}/${window.Trk.core.chartDiff}.json`;
-    files[charts[window.Trk.core.chartDiff]] = new Blob([JSON.stringify(window.Trk.media.chartToData(window.Trk.core.chart, window.Trk.core.chartDiff))], { type:"application/json" });
+  if (core.$("spIncCurrent").checked && core.chart.length) {
+    charts[core.chartDiff] = `${dir}/${core.chartDiff}.json`;
+    files[charts[core.chartDiff]] = new Blob([JSON.stringify(window.Trk.media.chartToData(core.chart, core.chartDiff))], { type:"application/json" });
   }
-  if (!Object.keys(charts).length) { window.Trk.core.setStatus("spStatus", "spNoCharts"); return; }
+  if (!Object.keys(charts).length) { core.setStatus("spStatus", "spNoCharts"); return; }
   let bgPath = null;
-  const bgFile = window.Trk.core.$("spBg").files[0] || song.bgBlob || null;
+  const bgFile = core.$("spBg").files[0] || song.bgBlob || null;
   if (bgFile) {
-    const ext = bgFile.name ? window.Trk.core.extOf(bgFile.name) : ({ "image/png":"png", "image/webp":"webp", "image/jpeg":"jpg" }[bgFile.type] || "");
-    if (!IMG_EXT.includes(ext) || bgFile.size > PACK_LIMIT.bg * PACK_MB) { window.Trk.core.setStatus("spStatus", "spBgBad"); return; }
+    const ext = bgFile.name ? core.extOf(bgFile.name) : ({ "image/png":"png", "image/webp":"webp", "image/jpeg":"jpg" }[bgFile.type] || "");
+    if (!IMG_EXT.includes(ext) || bgFile.size > PACK_LIMIT.bg * PACK_MB) { core.setStatus("spStatus", "spBgBad"); return; }
     bgPath = `${dir}/bg.${ext}`; files[bgPath] = bgFile;
   }
   files[`${dir}/audio.${audioExt}`] = song.file;
-  const title = (song.title || window.Trk.core.baseName(window.Trk.core.mediaName)).slice(0, 80);
-  const s = { id:"s1", title, artist:window.Trk.core.$("spArtist").value, charter:window.Trk.core.$("spCharter").value, license:window.Trk.core.$("spLicense").value,
+  const title = (song.title || core.baseName(core.mediaName)).slice(0, 80);
+  const s = { id:"s1", title, artist:core.$("spArtist").value, charter:core.$("spCharter").value, license:core.$("spLicense").value,
     audio:`${dir}/audio.${audioExt}`, bpm, offset, charts };
   if (bgPath) s.background = bgPath;
   if (song.previewStart != null) s.previewStart = song.previewStart;
-  const rawMan = { format:PACK_FORMAT, version:1, name:title.slice(0, 40), author:window.Trk.core.$("spCharter").value,
-    description:window.Trk.core.$("spArtist").value, license:window.Trk.core.$("spLicense").value, songs:[s] };
-  if (window.Trk.core.$("spCreditCard").checked) {
-    const artist = window.Trk.core.$("spArtist").value.trim(), charter = window.Trk.core.$("spCharter").value.trim(), terms = window.Trk.core.$("spLicense").value.trim();
+  const rawMan = { format:PACK_FORMAT, version:1, name:title.slice(0, 40), author:core.$("spCharter").value,
+    description:core.$("spArtist").value, license:core.$("spLicense").value, songs:[s] };
+  if (core.$("spCreditCard").checked) {
+    const artist = core.$("spArtist").value.trim(), charter = core.$("spCharter").value.trim(), terms = core.$("spLicense").value.trim();
     rawMan.creditCard = { name:artist || title, role:charter ? `Charter: ${charter}` : "Song creator", tagline:title,
                           rights:terms, license:terms };
   }
   const man = sanitizeManifest(rawMan);
-  if (!man) { window.Trk.core.setStatus("spStatus", "packBadManifest"); return; }
+  if (!man) { core.setStatus("spStatus", "packBadManifest"); return; }
   const out = {}; for (const { path } of manifestPaths(man)) if (files[path]) out[path] = files[path];
-  window.Trk.core.downloadBlob(await packToZip(man, out), `${window.Trk.core.safeName(title)}.stpack`);
-  window.Trk.core.setStatus("spStatus", "spBuilt");
+  core.downloadBlob(await packToZip(man, out), `${core.safeName(title)}.stpack`);
+  core.setStatus("spStatus", "spBuilt");
 }
 
 /* ============ パック一覧（中身はすべて textContent で表示） ============ */
@@ -698,81 +699,81 @@ function creditCardMarkdown(man) {
 }
 function appendPackCreditCard(parent, card, packName = "") {
   if (!card || !card.name) return;
-  const d = window.Trk.core.el("details", "packCreditCardBox");
-  d.append(window.Trk.core.el("summary", "", tr("packCreditTitle")));
-  const body = window.Trk.core.el("div", "packCreditCardInner");
-  body.append(window.Trk.core.el("strong", "packCreditName", card.name));
-  const role = creditCardText(card.role); if (role) body.append(window.Trk.core.el("div", "packCreditRole", role));
-  const tagline = creditCardText(card.tagline); if (tagline) body.append(window.Trk.core.el("p", "packCreditTagline", tagline));
-  const rights = creditCardText(card.rights); if (rights) body.append(window.Trk.core.el("p", "packCreditRights", "⚖ " + rights));
-  if (card.license) body.append(window.Trk.core.el("p", "packCreditLicense", "▣ " + card.license));
-  if (card.handle) body.append(window.Trk.core.el("p", "packCreditHandle", (card.handle.startsWith("@") ? card.handle : "@" + card.handle)));
-  if (card.url) body.append(window.Trk.core.safeLink("packCreditUrl", card.url));   /* 🛡 https 以外はリンクにしない */
-  body.append(window.Trk.core.el("p", "packCreditDisclaimer", tr("packCreditDisclaimer")));
+  const d = core.el("details", "packCreditCardBox");
+  d.append(core.el("summary", "", tr("packCreditTitle")));
+  const body = core.el("div", "packCreditCardInner");
+  body.append(core.el("strong", "packCreditName", card.name));
+  const role = creditCardText(card.role); if (role) body.append(core.el("div", "packCreditRole", role));
+  const tagline = creditCardText(card.tagline); if (tagline) body.append(core.el("p", "packCreditTagline", tagline));
+  const rights = creditCardText(card.rights); if (rights) body.append(core.el("p", "packCreditRights", "⚖ " + rights));
+  if (card.license) body.append(core.el("p", "packCreditLicense", "▣ " + card.license));
+  if (card.handle) body.append(core.el("p", "packCreditHandle", (card.handle.startsWith("@") ? card.handle : "@" + card.handle)));
+  if (card.url) body.append(core.safeLink("packCreditUrl", card.url));   /* 🛡 https 以外はリンクにしない */
+  body.append(core.el("p", "packCreditDisclaimer", tr("packCreditDisclaimer")));
   const contributors = card.contributors || [];
   if (contributors.length) {
-    body.append(window.Trk.core.el("h4", "packContributorsTitle", tr("packContributors", { n:contributors.length })));
-    const list = window.Trk.core.el("ul", "packContributors");
+    body.append(core.el("h4", "packContributorsTitle", tr("packContributors", { n:contributors.length })));
+    const list = core.el("ul", "packContributors");
     for (const person of contributors) {
-      const item = window.Trk.core.el("li", "packContributor");
-      const head = window.Trk.core.el("div", "packContributorHead"); head.append(window.Trk.core.el("strong", "packContributorName", person.name));
-      const personRole = creditCardText(person.role); if (personRole) head.append(window.Trk.core.el("span", "packContributorRole", personRole));
+      const item = core.el("li", "packContributor");
+      const head = core.el("div", "packContributorHead"); head.append(core.el("strong", "packContributorName", person.name));
+      const personRole = creditCardText(person.role); if (personRole) head.append(core.el("span", "packContributorRole", personRole));
       item.append(head);
-      const personRights = creditCardText(person.rights); if (personRights) item.append(window.Trk.core.el("div", "packContributorRights", "⚖ " + personRights));
-      if (person.license) item.append(window.Trk.core.el("div", "packContributorLicense", "▣ " + person.license));
-      if (person.handle) item.append(window.Trk.core.el("div", "packContributorHandle", person.handle.startsWith("@") ? person.handle : "@" + person.handle));
-      if (person.url) item.append(window.Trk.core.safeLink("packContributorUrl", person.url));   /* 🛡 https 以外はリンクにしない */
+      const personRights = creditCardText(person.rights); if (personRights) item.append(core.el("div", "packContributorRights", "⚖ " + personRights));
+      if (person.license) item.append(core.el("div", "packContributorLicense", "▣ " + person.license));
+      if (person.handle) item.append(core.el("div", "packContributorHandle", person.handle.startsWith("@") ? person.handle : "@" + person.handle));
+      if (person.url) item.append(core.safeLink("packContributorUrl", person.url));   /* 🛡 https 以外はリンクにしない */
       list.append(item);
     }
     body.append(list);
   }
-  const download = window.Trk.core.el("button", "packCreditDownload", tr("packCreditDownload")); download.type = "button";
-  download.addEventListener("click", () => window.Trk.core.downloadBlob(new Blob([creditCardSvg(card, packName)], { type:"image/svg+xml;charset=utf-8" }), `${window.Trk.core.safeName(packName || card.name)}-rights-card.svg`));
+  const download = core.el("button", "packCreditDownload", tr("packCreditDownload")); download.type = "button";
+  download.addEventListener("click", () => core.downloadBlob(new Blob([creditCardSvg(card, packName)], { type:"image/svg+xml;charset=utf-8" }), `${core.safeName(packName || card.name)}-rights-card.svg`));
   body.append(download);
   d.append(body); parent.append(d);
 }
 async function renderPackList() {
-  const box = window.Trk.core.$("packList"); let recs = [];
+  const box = core.$("packList"); let recs = [];
   try { recs = await packDB.all(); } catch (_) {}
   box.textContent = "";
-  if (!recs.length) { box.append(window.Trk.core.el("div", "hint", tr("packEmpty"))); return; }
+  if (!recs.length) { box.append(core.el("div", "hint", tr("packEmpty"))); return; }
   recs.sort((a, b) => (b.installedAt || 0) - (a.installedAt || 0));
   for (const r of recs) {
-    const m = r.manifest, on = packRuntime.id === r.id, card = window.Trk.core.el("div", "packCard" + (on ? " active" : ""));
-    const head = window.Trk.core.el("div", "packHead"); head.append(window.Trk.core.el("b", "", m.name));
-    if (m.author) head.append(window.Trk.core.el("span", "packBy", "by " + m.author));
-    head.append(window.Trk.core.el("span", "packBy", `${((r.size || 0) / PACK_MB).toFixed(1)} MB`));
+    const m = r.manifest, on = packRuntime.id === r.id, card = core.el("div", "packCard" + (on ? " active" : ""));
+    const head = core.el("div", "packHead"); head.append(core.el("b", "", m.name));
+    if (m.author) head.append(core.el("span", "packBy", "by " + m.author));
+    head.append(core.el("span", "packBy", `${((r.size || 0) / PACK_MB).toFixed(1)} MB`));
     card.append(head);
-    if (m.description) card.append(window.Trk.core.el("div", "hint", m.description));
-    const badges = window.Trk.core.el("div", "packBadges");
+    if (m.description) card.append(core.el("div", "hint", m.description));
+    const badges = core.el("div", "packBadges");
     [[m.skin, "badgeSkin"], [m.notes, "badgeNotes"], [m.sounds, "badgeSounds"], [m.mascot && m.mascot.vrm, "badgeVrm"],
      [m.mascot && m.mascot.motion, "badgeMotion"], [m.mascot && m.mascot.captions, "badgeCaptions"]]
-      .forEach(([v, k]) => { if (v) badges.append(window.Trk.core.el("span", "packBadge", tr(k))); });
-    if (m.songs) badges.append(window.Trk.core.el("span", "packBadge", tr("badgeSongs", { n:m.songs.length })));
-    if (m.creditCard) badges.append(window.Trk.core.el("span", "packBadge", tr("badgeCreditCard")));
+      .forEach(([v, k]) => { if (v) badges.append(core.el("span", "packBadge", tr(k))); });
+    if (m.songs) badges.append(core.el("span", "packBadge", tr("badgeSongs", { n:m.songs.length })));
+    if (m.creditCard) badges.append(core.el("span", "packBadge", tr("badgeCreditCard")));
     card.append(badges);
     appendPackCreditCard(card, m.creditCard, m.name);
     if (m.license || m.url) {
-      const d = window.Trk.core.el("details"); d.append(window.Trk.core.el("summary", "", tr("packLicenseLabel")));
-      if (m.license) d.append(window.Trk.core.el("div", "", m.license));
-      if (m.url) d.append(window.Trk.core.safeLink("", m.url));   /* 🛡 https 以外はリンクにしない */
+      const d = core.el("details"); d.append(core.el("summary", "", tr("packLicenseLabel")));
+      if (m.license) d.append(core.el("div", "", m.license));
+      if (m.url) d.append(core.safeLink("", m.url));   /* 🛡 https 以外はリンクにしない */
       card.append(d);
     }
-    const acts = window.Trk.core.el("div", "miniActions");
+    const acts = core.el("div", "miniActions");
     if (hasLook(m)) {
-      const use = window.Trk.core.el("button", "", tr(on ? "packActive" : "packUse")); use.type = "button"; use.disabled = on;
+      const use = core.el("button", "", tr(on ? "packActive" : "packUse")); use.type = "button"; use.disabled = on;
       use.addEventListener("click", () => activatePack(r.id));
       acts.append(use);
     }
-    const ex = window.Trk.core.el("button", "", tr("packExport")); ex.type = "button";
-    ex.addEventListener("click", async () => window.Trk.core.downloadBlob(await packToZip(m, r.files || {}), `${window.Trk.core.safeName(m.name)}.stpack`));
-    const del = window.Trk.core.el("button", "", tr("packDelete")); del.type = "button";
+    const ex = core.el("button", "", tr("packExport")); ex.type = "button";
+    ex.addEventListener("click", async () => core.downloadBlob(await packToZip(m, r.files || {}), `${core.safeName(m.name)}.stpack`));
+    const del = core.el("button", "", tr("packDelete")); del.type = "button";
     del.addEventListener("click", async () => {
       if (!confirm(tr("confirmDeletePack"))) return;
       if (packRuntime.id === r.id) deactivatePack();
       try { await packDB.del(r.id); } catch (_) {}
-      window.Trk.core.setStatus("packStatus", "packDeleted"); await renderPackList();
-      if (m.songs) window.Trk.core.emit("packsChanged");
+      core.setStatus("packStatus", "packDeleted"); await renderPackList();
+      if (m.songs) core.emit("packsChanged");
     });
     acts.append(ex, del); card.append(acts); box.append(card);
   }
@@ -781,21 +782,21 @@ async function renderPackList() {
 /* 起動時：一覧を出して、使っていたパックを戻す（main.js から呼びます） */
 async function initPacks() {
   await renderPackList();
-  if (window.Trk.core.settings.activePack) await activatePack(window.Trk.core.settings.activePack, { restore:true });
+  if (core.settings.activePack) await activatePack(core.settings.activePack, { restore:true });
 }
 
 /* ============ イベント ============ */
-window.Trk.core.$("packFile").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; if (f) installAndUse(f); });
-window.Trk.core.$("songPackFile").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; if (f) installAndUse(f); });
-window.Trk.core.$("packOffBtn").addEventListener("click", () => deactivatePack());
-window.Trk.core.$("packBuildBtn").addEventListener("click", () => { buildPack().catch(e => { console.error(e); window.Trk.core.setStatus("packStatus", "packBadZip"); }); });
-window.Trk.core.$("spBuildBtn").addEventListener("click", () => { buildSongPack().catch(e => { console.error(e); window.Trk.core.setStatus("spStatus", "packBadZip"); }); });
+core.$("packFile").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; if (f) installAndUse(f); });
+core.$("songPackFile").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; if (f) installAndUse(f); });
+core.$("packOffBtn").addEventListener("click", () => deactivatePack());
+core.$("packBuildBtn").addEventListener("click", () => { buildPack().catch(e => { console.error(e); core.setStatus("packStatus", "packBadZip"); }); });
+core.$("spBuildBtn").addEventListener("click", () => { buildSongPack().catch(e => { console.error(e); core.setStatus("spStatus", "packBadZip"); }); });
 on("language", renderPackList);
 addEventListener("drop", e => {      // .stpack / .zip は他の処理より先に受け取る
   const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
   if (!f || !/\.(stpack|zip)$/i.test(f.name)) return;
   e.preventDefault(); e.stopImmediatePropagation();
-  if (window.Trk.core.phase !== "title") return;
+  if (core.phase !== "title") return;
   installAndUse(f);
 }, true);
 /* ✅ custom.js 完了 */

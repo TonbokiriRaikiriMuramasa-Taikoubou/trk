@@ -52,7 +52,11 @@ const TV_DOCK_SKINS = {
   /* ②TVドックの追加（SKIN-PLAN §3-2）：一般的な意匠だけで作る。特定の鉄道会社・船舶・製品の見た目は使わない */
   train:     { n:4, cols:2, deco:"train",   label:L4("🚃 車内モニター", "🚃 Train monitor", "🚃 车厢显示屏", "🚃 열차 내 모니터") },
   porthole:  { n:4, cols:4, deco:"porthole",label:L4("🚢 船の丸窓", "🚢 Ship porthole", "🚢 船舷圆窗", "🚢 선박 둥근 창") },
-  lantern:   { n:5, cols:5, deco:"lantern", label:L4("🏮 提灯", "🏮 Lantern", "🏮 灯笼", "🏮 제등") }
+  lantern:   { n:5, cols:5, deco:"lantern", label:L4("🏮 提灯", "🏮 Lantern", "🏮 灯笼", "🏮 제등") },
+  /* ②TVドックの残り3種（SKIN-PLAN §3-2）。飾りは帯（.tvDeco）の中に収まる形 */
+  fridge:    { n:4, cols:2, deco:"fridge",  label:L4("🧊 冷蔵庫の扉", "🧊 Fridge door", "🧊 冰箱门", "🧊 냉장고 문") },
+  bowl:      { n:4, cols:4, deco:"bowl",    label:L4("🫙 金魚鉢", "🫙 Goldfish bowl", "🫙 金鱼缸", "🫙 금붕어 어항") },
+  washer:    { n:5, cols:5, deco:"washer",  label:L4("🌀 洗濯機の窓", "🌀 Washer window", "🌀 洗衣机窗", "🌀 세탁기 창") }
 };
 const hasTvSkin = id => Object.prototype.hasOwnProperty.call(TV_DOCK_SKINS, id);
 const TV_FAV_MAX = 0, TV_RECENT_MAX = 5, TV_TEMP_ID = "__tv_temp", TV_LONG_MS = 600;   /* 0＝上限なし（⭐は js/favs.js がフォルダ分けする） */
@@ -72,7 +76,7 @@ const TV_VAR_KEYS = ["--tv-body", "--tv-body2", "--tv-bezel", "--tv-screen", "--
 /* 飾り（物理デコ）に使える名前。ラベルは、それを使っている内蔵TVスキンから借りる */
 const TV_DECO_KEYS = ["home", "tube", "wood", "antenna", "paper", "dials", "wall", "holo", "screen", "phone", "arcade",
   "laptop", "cinema", "car", "airplane", "vr", "aquarium", "scope", "cctv", "gameboy", "jumbotron", "frame",
-  "transparent", "toy", "cardboard", "window", "microwave", "videowall", "train", "porthole", "lantern"];
+  "transparent", "toy", "cardboard", "window", "microwave", "videowall", "train", "porthole", "lantern", "fridge", "bowl", "washer"];
 const tvDecoLabel = k => {
   const hit = Object.values(TV_DOCK_SKINS).find(d => !d.custom && d.deco === k);
   return hit ? (hit.label[lang] || hit.label.en) : k;
@@ -1671,11 +1675,17 @@ addEventListener("DOMContentLoaded", () => {
     } else if (d === "videowall") {
       deco.append(core.el("i","vwBezH"), core.el("i","vwBezV"), core.el("i","vwSeam"));
     } else if (d === "train") {
-      deco.append(core.el("i","trainRail"), core.el("i","trainLed"), core.el("i","trainDoor left"), core.el("i","trainDoor right"));
+      deco.append(core.el("i","trainRail"), core.el("i","trainLed"));
     } else if (d === "porthole") {
       deco.append(core.el("i","portRivet r1"), core.el("i","portRivet r2"), core.el("i","portRivet r3"), core.el("i","portRivet r4"), core.el("i","portWave"));
     } else if (d === "lantern") {
       deco.append(core.el("i","lanCord"), core.el("i","lanCap top"), core.el("i","lanCap bottom"), core.el("i","lanTassel"));
+    } else if (d === "fridge") {
+      deco.append(core.el("i","fridgeSeam"), core.el("i","fridgeHandle"), core.el("i","fridgeNote"), core.el("i","fridgeNote n2"));
+    } else if (d === "bowl") {
+      deco.append(core.el("i","bowlWater"), core.el("i","bowlPebbles"), core.el("i","bowlFish"), core.el("i","bowlBubble"));
+    } else if (d === "washer") {
+      deco.append(core.el("i","washPanel"), core.el("i","washDial"), core.el("i","washBubbles"));
     }
   }
 

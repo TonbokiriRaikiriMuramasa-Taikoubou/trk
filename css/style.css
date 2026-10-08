@@ -1026,6 +1026,34 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
 #tvDock[data-skin="gameboy"] .gbBtnA{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,#a00,#600);border:1px solid #000}
 #tvDock[data-skin="gameboy"] .gbBtnB{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle,#a00,#600);border:1px solid #000}
 
+/* ②TVドックの追加（fridge・bowl・washer）と、前の3種の帯への合わせ直し */
+#tvDock[data-skin="train"] .trainDoor{display:none}
+#tvDock[data-skin="lantern"] .lanTassel{bottom:0;height:8px}
+#tvDock[data-skin="fridge"] .tvDev{background:linear-gradient(90deg,#f4f7fa,#dfe5ec 50%,#f4f7fa);border:3px solid #9aa6b2;border-radius:14px;box-shadow:0 4px 0 #7d8894}
+#tvDock[data-skin="fridge"] .tvScreenWrap{border:4px solid #b8c2cc;border-radius:8px;background:#1a2028}
+#tvDock[data-skin="fridge"] .tvScreen{background:#1a2028;color:#e8f2ff}
+#tvDock[data-skin="fridge"] .fridgeSeam{position:absolute;left:0;right:0;top:0;height:2px;background:#9aa6b2}
+#tvDock[data-skin="fridge"] .fridgeHandle{position:absolute;left:25%;right:25%;top:14px;height:6px;border-radius:3px;background:linear-gradient(#e6ebf0,#7d8894)}
+#tvDock[data-skin="fridge"] .fridgeNote{position:absolute;left:8px;top:8px;width:20px;height:14px;background:#fff6a0;transform:rotate(-5deg);box-shadow:0 1px 2px rgba(0,0,0,.3)}
+#tvDock[data-skin="fridge"] .fridgeNote.n2{left:auto;right:16px;top:auto;bottom:6px;width:16px;height:12px;background:#bfe8ff;transform:rotate(4deg)}
+#tvDock[data-skin="bowl"] .tvDev{background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.95),rgba(190,225,240,.6) 60%,rgba(120,180,210,.55));border:2px solid rgba(255,255,255,.75);border-radius:50%;aspect-ratio:1;box-shadow:inset 0 -18px 30px rgba(40,120,170,.35)}
+#tvDock[data-skin="bowl"] .tvScreenWrap{border:0;border-radius:50%;aspect-ratio:1;background:#9fd6ec}
+#tvDock[data-skin="bowl"] .tvScreen{border-radius:50%;background:linear-gradient(#bfe8f7,#4aa3c9);color:#063a52}
+#tvDock[data-skin="bowl"] .bowlWater{position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.35),rgba(74,163,201,.35))}
+#tvDock[data-skin="bowl"] .bowlPebbles{position:absolute;left:0;right:0;bottom:0;height:12px;background:radial-gradient(circle at 20% 60%,#d8c3a5 0 4px,transparent 5px),radial-gradient(circle at 55% 40%,#c9b08f 0 5px,transparent 6px),radial-gradient(circle at 85% 70%,#e0cdb0 0 4px,transparent 5px)}
+#tvDock[data-skin="bowl"] .bowlFish{position:absolute;left:10%;top:30%;font-size:16px;animation:bowlSwim 6s infinite ease-in-out}
+#tvDock[data-skin="bowl"] .bowlFish::after{content:"🐟"}
+#tvDock[data-skin="bowl"] .bowlBubble{position:absolute;left:70%;bottom:8px;width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.7);animation:bowlUp 3s infinite linear}
+@keyframes bowlSwim{0%,100%{transform:translateX(0)}50%{transform:translateX(120%)}}
+@keyframes bowlUp{from{transform:translateY(0);opacity:1}to{transform:translateY(-36px);opacity:0}}
+#tvDock[data-skin="washer"] .tvDev{background:linear-gradient(#f7f8fa,#d9dee5);border:3px solid #7d8894;border-radius:14px;box-shadow:0 4px 0 #5f6a76}
+#tvDock[data-skin="washer"] .tvScreenWrap{border:4px solid #3a424d;border-radius:50%;aspect-ratio:1;background:#1c2b3c;box-shadow:inset 0 0 14px rgba(0,0,0,.6)}
+#tvDock[data-skin="washer"] .tvScreen{border-radius:50%;background:radial-gradient(circle,#2f6fa8,#14283c);color:#fff}
+#tvDock[data-skin="washer"] .washPanel{position:absolute;left:8px;top:50%;width:30%;height:8px;margin-top:-4px;border-radius:4px;background:#5f6a76}
+#tvDock[data-skin="washer"] .washDial{position:absolute;right:8px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;background:radial-gradient(circle,#eee,#888);border:2px solid #555}
+#tvDock[data-skin="washer"] .washBubbles{position:absolute;left:36%;right:36%;top:6px;bottom:6px;border-radius:12px;background:radial-gradient(circle,rgba(120,200,255,.8) 0 3px,transparent 4px) 0 0/12px 12px;animation:washSpin 1.6s infinite linear}
+@keyframes washSpin{to{background-position:12px 12px}}
+
 /* ②TVドックの追加（train・porthole・lantern）。飾りは <i> の組み合わせだけで作る */
 #tvDock[data-skin="train"] .tvDev{background:linear-gradient(#e9ecef,#bfc6d1);border:3px solid #34435e;border-radius:8px;box-shadow:0 4px 0 #34435e}
 #tvDock[data-skin="train"] .tvScreenWrap{border:4px solid #1d2a40;border-radius:4px;background:#0c1322}

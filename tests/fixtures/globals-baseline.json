@@ -3,8 +3,8 @@
   "scripts": 45,
   "windowProps": 284,
   "duplicates": 0,
-  "declarations": 1172,
-  "private": 991,
+  "declarations": 1173,
+  "private": 992,
   "public": 181,
   "globalNames": 316
  },
@@ -366,8 +366,8 @@
   },
   {
    "file": "js/library.js",
-   "decls": 251,
-   "private": 235,
+   "decls": 252,
+   "private": 236,
    "public": [
     "addonSongs",
     "allSongs",
@@ -880,7 +880,9 @@
    "writers": [
     "js/media-player-mode.js"
    ],
-   "readers": []
+   "readers": [
+    "js/tv-dock.js"
+   ]
   },
   {
    "name": "TrkPad",

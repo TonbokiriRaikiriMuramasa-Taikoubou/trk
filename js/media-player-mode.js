@@ -873,7 +873,10 @@ function buildMedia() {
   const randomLoop = makeButton("mediaLoopRandom", "mediaSmallBtn"); randomLoop.addEventListener("click", setRandomMediaLoop); loopQuickButtons.append(randomLoop); loopQuickNodes.push(randomLoop);
   const loopSaveRow = window.Trk.core.el("div", "miniActions"); loopSaveNode = makeButton("mediaLoopSave", "mediaSmallBtn"); loopSaveNode.addEventListener("click", saveMediaLoopPreset); loopClearPresetsNode = makeButton("mediaLoopClearPresets", "mediaSmallBtn"); loopClearPresetsNode.addEventListener("click", clearMediaLoopPresets); loopSaveRow.append(loopSaveNode, loopClearPresetsNode);
   const loopPresetHeading = tx("div", "mediaLoopPresets", "mediaLoopPresetHeading"); loopPresetListNode = window.Trk.core.el("div", "mediaLoopPresetList");
-  loopBox.append(loopHeading, loopStatusNode, loopHint, loopButtons, loopModeLabel, loopLabHeading, loopQuickHint, loopQuickButtons, loopSaveRow, loopPresetHeading, loopPresetListNode);
+  /* 🎛 ループ・ラボ（クイック・保存・プリセット）は開発者表示（設定 devView）の中。A-B の基本操作は常に出す */
+  const loopLabBox = window.Trk.core.el("div", "mediaLoopLab devOnly");
+  loopLabBox.append(loopLabHeading, loopQuickHint, loopQuickButtons, loopSaveRow, loopPresetHeading, loopPresetListNode);
+  loopBox.append(loopHeading, loopStatusNode, loopHint, loopButtons, loopModeLabel, loopLabBox);
 
   const options = window.Trk.core.el("div", "mediaOptions");
   const volumeRow = window.Trk.core.el("label", "mediaOption mediaVolumeRow"); volumeRow.append(tx("span", "mediaVolume"));

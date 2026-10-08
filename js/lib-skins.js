@@ -103,10 +103,16 @@ function openBar(on) {
   bar.hidden = !want;
   if (b) b.setAttribute("aria-expanded", String(want));
 }
+/* 表示の並び：かんたん＝棚スキンの上位6つ（おすすめ）を先頭に、残りは従来の順。全部＝LIB_SKIN_ORDER そのまま。ランダムは並びに関係なく同じ16から選ぶ */
+const LIB_SKIN_SIMPLE_TOP = ["player", "cassette", "vinyl", "note", "karaoke", "retro"];
+function libSkinOrder() {
+  if (window.Trk.core.settings.displayMode === "full") return LIB_SKIN_ORDER;
+  return [...LIB_SKIN_SIMPLE_TOP, ...LIB_SKIN_ORDER.filter(id => !LIB_SKIN_SIMPLE_TOP.includes(id))];
+}
 function buildBar() {
   const bar = window.Trk.core.$("libSkinBar"); if (!bar) return;
   bar.textContent = "";
-  for (const id of LIB_SKIN_ORDER) {
+  for (const id of libSkinOrder()) {
     const b = window.Trk.core.el("button", "libSkinChip"); b.type = "button"; b.dataset.skin = id;
     b.textContent = skinText(id);
     b.classList.toggle("on", id === window.Trk.core.settings.libSkin);
@@ -121,7 +127,7 @@ function buildBar() {
 function buildSelect() {
   const sel = window.Trk.core.$("libSkinSelect"); if (!sel) return;
   sel.textContent = "";
-  for (const id of LIB_SKIN_ORDER) {
+  for (const id of libSkinOrder()) {
     const o = document.createElement("option"); o.value = id; o.textContent = skinText(id);
     sel.append(o);
   }
@@ -189,5 +195,6 @@ window.TrkLibSkins = {
   open: openBar,
   barOpen
 };
+window.Trk.core.on("displayMode", () => { buildBar(); buildSelect(); });
 })();
 /* ✅ lib-skins.js 完了 */

@@ -1624,10 +1624,12 @@ function plGlobalMenu() {
   const abtn = el("button", "plBtn", tr("plAuthorBtn")); abtn.type = "button"; abtn.hidden = !window.Trk.core.settings.plAuthorTools;
   abtn.addEventListener("click", () => { d.close(); plAuthorMenu(); });
   at.addEventListener("change", () => { window.Trk.core.settings.plAuthorTools = at.checked; window.Trk.core.saveUserPrefs(); nameRow.hidden = !at.checked; abtn.hidden = !at.checked; renderLib(); });
+  /* 👥 投稿者ツールの行は開発者表示（devView）の中 */
+  const authorBox = el("div", "devOnly"); authorBox.append(el("div", "plSep"), plRow(tr("plAuthorTools"), at), nameRow, abtn);
   d.card.append(make, imp, mkfld, trkb, catb, el("div", "plSep"),
     plRow(tr("plDelOne"), one), plRow(tr("plDelThree"), three),
     el("div", "plHint", tr("plDelModeHint")),
-    el("div", "plSep"), plRow(tr("plAuthorTools"), at), nameRow, abtn);
+    authorBox);
 }
 
 /* 曲の追加・取り外し（🧊フリーズ中は断る） */
@@ -2023,9 +2025,23 @@ function syncMoreBtns() {
 window.Trk.core.$("showMoreBtns").addEventListener("change", e => {
   window.Trk.core.settings.showMoreBtns = e.target.checked; window.Trk.core.saveUserPrefs(); syncMoreBtns();
 });
+/* 表示の並び（かんたん／全部）と開発者表示（devView）。どちらも即時に反映（TV の映像フィルターの並びは次の読み込みで） */
+function syncDisplayUi() {
+  const s = window.Trk.core.settings;
+  const sel = window.Trk.core.$("displayMode"); if (sel) sel.value = s.displayMode === "full" ? "full" : "simple";
+  const dv = window.Trk.core.$("devView"); if (dv) dv.checked = s.devView === true;
+  document.body.classList.toggle("noDev", s.devView !== true);
+}
+window.Trk.core.$("displayMode").addEventListener("change", e => {
+  window.Trk.core.settings.displayMode = e.target.value === "full" ? "full" : "simple"; window.Trk.core.saveUserPrefs(); syncDisplayUi(); window.Trk.core.emit("displayMode");
+});
+window.Trk.core.$("devView").addEventListener("change", e => {
+  window.Trk.core.settings.devView = e.target.checked; window.Trk.core.saveUserPrefs(); syncDisplayUi();
+});
 
 function renderLib() {
   syncMoreBtns();
+  syncDisplayUi();
   const box = window.Trk.core.$("libList"); box.textContent = "";
   const all = allSongs();
   libAllKeys = new Set(all.map(x => x.key));

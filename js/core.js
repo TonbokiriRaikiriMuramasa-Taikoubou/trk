@@ -200,6 +200,8 @@ const settings = {
   bannerRandomBtn: prefs.bannerRandomBtn !== false,                          // 🎲 バナー右端のおまかせボタン（初期オン）
   bannerRandomTap: prefs.bannerRandomTap === true,                           // 🎲 タップだけで変える（初期オフ＝長押し）
   showMoreBtns: prefs.showMoreBtns !== false,                                // 👆 長押しの代わりのボタン（🎶・▶）を出す（初期オン）
+  displayMode: prefs.displayMode === "full" ? "full" : "simple",            // 表示の並び：simple＝かんたん（おすすめ順・初期）／full＝全部（従来の順）
+  devView: prefs.devView === true,                                           // 🔧 開発者表示（ループ・ラボ、投稿者ツールを出す。初期オフ）
   /* 🪶 軽量化（スマホ・タブレット・アプリ向け。読み込みは js/lite.js） */
   liteMode: pick(prefs.liteMode, LITE_ENUM_VALUES.liteMode, "auto"),         // 自動＝端末・省データ・電池を見て決める
   liteFps: pick(prefs.liteFps, LITE_ENUM_VALUES.liteFps, "30"),              // 描画のフレームレート上限

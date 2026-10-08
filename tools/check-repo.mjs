@@ -1741,10 +1741,27 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
 {
   const libSrc = read("js/library.js"), tvSrc = read("js/tv-dock.js"), idx = read("index.html");
   const songBtn = /pb\.addEventListener\("click"[^\n]*songProfile\(it\)/.test(libSrc) && libSrc.includes('"libFav moreBtn"');
-  const tvBtn = /mediaBtn\.addEventListener\("click"[^\n]*window\.openMedia\(\)/.test(tvSrc) && tvSrc.includes('"inline tight moreBtn"');
+  const tvBtn = /mediaBtn\.addEventListener\("click"[^\n]*TrkMediaPlayer\.open\(\)/.test(tvSrc) && /window\.TrkMediaPlayer = \{ open:openMedia/.test(read("js/media-player-mode.js")) && tvSrc.includes('"inline tight moreBtn"');
   const toggle = idx.includes('id="showMoreBtns"') && libSrc.includes("syncMoreBtns") && /body\.noMoreBtns \.moreBtn/.test(read("css/style.css"));
   if (!songBtn || !tvBtn || !toggle) fail("長押しの代わりのボタン（曲の🎶・TVの▶）か、設定 showMoreBtns の配線が無い");
   else ok("長押しの代わりのボタン（曲の🎶・TVの▶）と設定 showMoreBtns が付いている");
+}
+
+/* 項目 6（表示の並び・開発者表示）：かんたん／全部の並び替えと、開発者表示（devView）で隠すものの配線。
+   TV の並びは起動時に組み立てるので、切り替えは次の読み込みで反映（index の説明文に書いてある）。 */
+{
+  const idx = read("index.html"), libUi = read("js/library.js"), libSkins = read("js/lib-skins.js");
+  const tvSrc = read("js/tv-dock.js"), mediaSrc = read("js/media-player-mode.js"), i18n = read("js/i18n.js");
+  const arr = (src, name) => { const m = src.match(new RegExp("const " + name + " = \\[([^\\]]*)\\]")); return m ? [...m[1].matchAll(/"([^"]+)"/g)].map(x => x[1]) : null; };
+  const groups = arr(tvSrc, "TV_GROUPS"), simpleGroups = arr(tvSrc, "TV_GROUPS_SIMPLE");
+  const sameGroups = groups && simpleGroups && groups.length === simpleGroups.length && groups.every(g => simpleGroups.includes(g));
+  const top = arr(libSkins, "LIB_SKIN_SIMPLE_TOP");
+  const wired = idx.includes('id="displayMode"') && idx.includes('id="devView"') && libUi.includes("syncDisplayUi") && /body\.noDev \.devOnly/.test(read("css/style.css"));
+  const orders = (libSkins.match(/for \(const id of libSkinOrder\(\)\)/g) || []).length === 2 && (tvSrc.match(/for \(const cat of tvGroups\(\)\)/g) || []).length === 2 && tvSrc.includes("TV_RECOMMENDED");
+  const hides = mediaSrc.includes('"mediaLoopLab devOnly"') && libUi.includes('el("div", "devOnly")');
+  const keys = ["displayModeLabel:", "displaySimple:", "displayFull:", "displayModeHint:", "devViewLabel:"].every(k => (i18n.match(new RegExp(k, "g")) || []).length === 4);
+  if (!sameGroups || !top || top.length !== 6 || !wired || !orders || !hides || !keys) fail("表示の並び（かんたん／全部）か開発者表示（devView）の配線が欠けている");
+  else ok("表示の並び（かんたん／全部）と開発者表示（ループ・ラボ、投稿者ツールを隠す）が配線されている");
 }
 
 console.log(`\nStatic check: ${failures ? "FAILED" : "passed"} · ${failures} failure(s) · ${warnings} warning(s)`);

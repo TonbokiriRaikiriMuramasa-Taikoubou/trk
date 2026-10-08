@@ -1668,3 +1668,6 @@ body.helpTextOff .videoMaxHint{display:none!important}
 
 /* 👆 長押しの代わりのボタン（設定 showMoreBtns をオフにすると隠れる） */
 body.noMoreBtns .moreBtn { display:none !important; }
+
+/* 🔧 開発者表示（設定 devView がオフのとき隠す） */
+body.noDev .devOnly { display: none !important; }

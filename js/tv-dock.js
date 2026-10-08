@@ -524,12 +524,20 @@ function tvPresetDesc(p) {
 }
 const TV_CAT_KEY = { basic:"tvCatBasic", vivid:"tvCatVivid", retro:"tvCatRetro", cinema:"tvCatCinema", effect:"tvCatEffect", weird:"tvCatWeird", nature:"tvCatNature", portrait:"tvCatPortrait", anime:"tvCatAnime", texture:"tvCatTexture", quality:"tvCatQuality", fav:"tvCatFav", recent:"tvCatRecent" };
 const TV_GROUPS = ["fav", "recent", "basic", "vivid", "retro", "cinema", "portrait", "anime", "texture", "quality", "effect", "weird", "nature"];
+/* 表示の並び：かんたん＝おすすめ順（既定）、全部＝TV_GROUPS の従来の順。映像フィルターの並びは起動時に組み立てる（DOMContentLoaded）ので次の読み込みで反映 */
+const TV_GROUPS_SIMPLE = ["fav", "recent", "basic", "vivid", "cinema", "retro", "anime", "quality", "effect", "texture", "portrait", "nature", "weird"];
+const TV_RECOMMENDED = ["color", "vivid", "pop", "warm", "cinema", "crt", "dream", "anime_clear", "quality_balanced"];
+const tvSimpleOrder = () => window.Trk.core.settings.displayMode !== "full";
+const tvGroups = () => (tvSimpleOrder() ? TV_GROUPS_SIMPLE : TV_GROUPS);
 
 function tvPresetsOf(cat) {
   if (cat === "fav") return (window.Trk.core.settings.tvFav || []).map(tvPresetById).filter(Boolean);
   if (cat === "recent") return (window.Trk.core.settings.tvRecent || []).map(tvPresetById).filter(Boolean);
   if (typeof TRK_TV_PRESETS === "undefined") return [];
-  return TRK_TV_PRESETS.filter(p => p.cat === cat);
+  const items = TRK_TV_PRESETS.filter(p => p.cat === cat);
+  if (!tvSimpleOrder()) return items;
+  const rank = p => { const i = TV_RECOMMENDED.indexOf(p.id); return i < 0 ? 999 : i; };
+  return items.map((p, i) => [p, i]).sort((a, b) => (rank(a[0]) - rank(b[0])) || (a[1] - b[1])).map(x => x[0]);
 }
 function tvAllPresets() {
   if (typeof TRK_TV_PRESETS === "undefined") return [];
@@ -1031,7 +1039,7 @@ addEventListener("DOMContentLoaded", () => {
   // 設定画面の videoStyle セレクトを全プリセットで埋める
   if (vsSel) {
     vsSel.textContent = "";
-    for (const cat of TV_GROUPS) {
+    for (const cat of tvGroups()) {
       if (cat === "fav" || cat === "recent") continue;
       const items = tvPresetsOf(cat);
       if (!items.length) continue;
@@ -1457,7 +1465,8 @@ addEventListener("DOMContentLoaded", () => {
   /* 長押しの代わり：電源ボタンの長押し（＝メディアプレーヤー）と同じ入口。設定 showMoreBtns で隠せる */
   const mediaRow = window.Trk.core.el("div", "inline tight moreBtn");
   const mediaBtn = tx("button", "tvMediaBtn", "tvMediaOpen"); mediaBtn.type = "button";
-  mediaBtn.addEventListener("click", () => { if (typeof window.openMedia === "function") window.openMedia(); });
+  /* 公開の入口（media-player-mode.js の window.TrkMediaPlayer.open）を呼ぶ。trk71 では存在しない window.openMedia を呼んでいて無反応だった */
+  mediaBtn.addEventListener("click", () => { if (window.TrkMediaPlayer) window.TrkMediaPlayer.open(); });
   mediaRow.append(mediaBtn);
   body.append(tx("summary","tvMoreTitle"), quickRow, mediaRow, skinRow, dimRow, blurRow, paramHint, paramTools, paramFavWrap, tabsBar, paneSetup, panePreview);
 
@@ -1742,7 +1751,7 @@ addEventListener("DOMContentLoaded", () => {
     // くわしい欄
     quickSel.textContent = "";
     const offOpt = document.createElement("option"); offOpt.value = "off"; offOpt.textContent = tr("tvOff"); quickSel.append(offOpt);
-    for (const cat of TV_GROUPS) {
+    for (const cat of tvGroups()) {
       if (cat === "fav" || cat === "recent") continue;
       const items = tvPresetsOf(cat);
       if (!items.length) continue;

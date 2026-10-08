@@ -52,7 +52,7 @@ trk! 本体には入れられない機能を、あとから足せるしくみで
 `js/core.js` は、旧来の大域名（`window.activeMods`・`window.chart` など）を `window.Trk.core.*` への別名として残しています。これらは**廃止予定**です。
 
 - **予告：trk76（2026-10-08）から。** この版以降、アドオンはこれらの名前に頼らないでください。`window.Trk.core.<名前>` か、§3〜§5 の `api` を使います。
-- **削除：trk76 から数えて公開版をさらに2回重ねたあと**（目安は trk78 以降の版）に取り除きます。削除する版の `sw.js` のキャッシュ名と、本書の「最近の変更」に明記します。
+- **削除：trk76 から数えて公開版をさらに2回重ねたあと**（trk78 以降の版。利用者の決定 2026-10-08）に取り除きます。削除する版の `sw.js` のキャッシュ名と、本書の「最近の変更」に明記します。
 - 対象：`activeMods` `analysis` `applySkin` `avatarHit` `bgImage` `bindingSlot` `caption` `chart` `chartDiff` `chartMeta` `chartMode` `clock` `currentLevel` `currentSong` `effects` `errors` `fingerprint` `lastMissT` `levelOverride` `loadToken` `mediaName` `mediaURL` `nextIdx` `phase` `practice` `prefs` `pressFlash` `pressH` `safeModeOn` `seekDragging` `stats` `videoFilter` `videoReady`（33件）。
 - **対象外（当面残す）**：`_trkStudyRoomOpen`（読み取り専用）。`js/fx.js` は凍結されていて書き換えないため、fx.js がこの名前を読まなくなるまで残します。
 

@@ -1,4 +1,5 @@
 (() => {
+  const core = window.Trk.core;
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：🚚 トラックモード（操作設定つき）・レーンの色付け・揺れ ============
    ・共通の文章（紹介文・操作の案内・記録・称号）は i18n.js にあります。
@@ -84,64 +85,64 @@ Object.assign(TEXT.ko, {
 });
 
 /* ---------- 設定（初期値：色付けはほんのり、揺れと跳ねはオフ、操作はレイアウトに合わせる） ---------- */
-window.Trk.core.settings.laneTint = window.Trk.core.num(window.Trk.core.prefs.laneTint, 0, .5, .12);
-window.Trk.core.settings.truckBounce = window.Trk.core.prefs.truckBounce !== false;
-window.Trk.core.settings.swayBeat = window.Trk.core.prefs.swayBeat !== false;
-window.Trk.core.settings.swayHit = window.Trk.core.prefs.swayHit !== false;
-window.Trk.core.settings.swayPower = window.Trk.core.num(window.Trk.core.prefs.swayPower, .2, 2, 1.1);
+core.settings.laneTint = core.num(core.prefs.laneTint, 0, .5, .12);
+core.settings.truckBounce = core.prefs.truckBounce !== false;
+core.settings.swayBeat = core.prefs.swayBeat !== false;
+core.settings.swayHit = core.prefs.swayHit !== false;
+core.settings.swayPower = core.num(core.prefs.swayPower, .2, 2, 1.1);
 /* 🌀 揺れるモード：既定は 🚚TRUCK と 🪐ORBIT だけ。それぞれのモードで止められます。
    （🪐ORBIT のチェックボックスは modes.js が作ります）
    ❓謎設定の swayAllModes は「揺らさない」設定より優先して、全モードで揺らします。 */
-window.Trk.core.settings.swayTruck = window.Trk.core.prefs.swayTruck !== false;
-window.Trk.core.settings.swayOrbit = window.Trk.core.prefs.swayOrbit !== false;
-window.Trk.core.settings.swayAllModes = window.Trk.core.prefs.swayAllModes === true;
+core.settings.swayTruck = core.prefs.swayTruck !== false;
+core.settings.swayOrbit = core.prefs.swayOrbit !== false;
+core.settings.swayAllModes = core.prefs.swayAllModes === true;
 const TRUCK_PRESETS = { ud:["ArrowUp", "ArrowDown"], lr:["ArrowLeft", "ArrowRight"] };
-window.Trk.core.settings.truckKeyMode = window.Trk.core.pick(window.Trk.core.prefs.truckKeyMode, ["layout", "custom"], "layout");
-window.Trk.core.settings.truckKeys = (Array.isArray(window.Trk.core.prefs.truckKeys) && window.Trk.core.prefs.truckKeys.length === 2 && window.Trk.core.prefs.truckKeys.every(window.Trk.core.validCode) && window.Trk.core.prefs.truckKeys[0] !== window.Trk.core.prefs.truckKeys[1])
-  ? window.Trk.core.prefs.truckKeys.slice() : TRUCK_PRESETS.ud.slice();
-window.Trk.core.settings.truckToggleKey = window.Trk.core.validCode(window.Trk.core.prefs.truckToggleKey) && !window.Trk.core.settings.truckKeys.includes(window.Trk.core.prefs.truckToggleKey) ? window.Trk.core.prefs.truckToggleKey : "";
-window.Trk.core.settings.truckHitKeys = window.Trk.core.prefs.truckHitKeys !== false;
-const isTruck = () => window.Trk.core.settings.playMode === "truck";
+core.settings.truckKeyMode = core.pick(core.prefs.truckKeyMode, ["layout", "custom"], "layout");
+core.settings.truckKeys = (Array.isArray(core.prefs.truckKeys) && core.prefs.truckKeys.length === 2 && core.prefs.truckKeys.every(core.validCode) && core.prefs.truckKeys[0] !== core.prefs.truckKeys[1])
+  ? core.prefs.truckKeys.slice() : TRUCK_PRESETS.ud.slice();
+core.settings.truckToggleKey = core.validCode(core.prefs.truckToggleKey) && !core.settings.truckKeys.includes(core.prefs.truckToggleKey) ? core.prefs.truckToggleKey : "";
+core.settings.truckHitKeys = core.prefs.truckHitKeys !== false;
+const isTruck = () => core.settings.playMode === "truck";
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
 /* ---------- トラックの操作キー ----------
    キーは「画面上の位置」に対応します（0＝上か左、1＝下か右）。
    位置→レーンは slotLane() で変換するので、左右反転をオンにしても ↑ は上のレーンのままです。 */
-const truckPosKeys = () => window.Trk.core.settings.truckKeyMode === "layout"
+const truckPosKeys = () => core.settings.truckKeyMode === "layout"
   ? (window.Trk.play.layout().vertical ? TRUCK_PRESETS.lr : TRUCK_PRESETS.ud)
-  : window.Trk.core.settings.truckKeys;
+  : core.settings.truckKeys;
 const truckPosOfKey = code => truckPosKeys().indexOf(code);
 function truckKeysLabel(pos) {   // プレイ中のキー案内（render.js から使います）
   const list = [truckPosKeys()[pos]];
-  if (window.Trk.core.settings.truckHitKeys) list.push(window.Trk.core.settings.keys[pos], window.Trk.core.settings.subKeys[pos]);
-  return list.filter(Boolean).map(window.Trk.core.formatKey).join("/");
+  if (core.settings.truckHitKeys) list.push(core.settings.keys[pos], core.settings.subKeys[pos]);
+  return list.filter(Boolean).map(core.formatKey).join("/");
 }
 
 /* ---------- トラックの状態 ---------- */
 const TRUCK_ROW = 42;   // 横スクロールで、ドン／カッの段を上下にずらす量
 const truckState = { lane:0, vis:0, last:0, dash:-1e9 };
-function resetTruck() { truckState.lane = 0; truckState.vis = window.Trk.core.laneCol(0); truckState.last = performance.now(); truckState.dash = -1e9; }
+function resetTruck() { truckState.lane = 0; truckState.vis = core.laneCol(0); truckState.last = performance.now(); truckState.dash = -1e9; }
 function steerTruck(lane) {
   const changed = lane !== truckState.lane;
   truckState.lane = lane;
   const p = performance.now();
   if (changed) truckState.dash = p;
-  window.Trk.core.pressFlash[window.Trk.core.laneCol(lane)] = p;
+  core.pressFlash[core.laneCol(lane)] = p;
 }
-const truckRowY = (L, lane) => L.laneY + (window.Trk.core.laneCol(lane) ? 1 : -1) * TRUCK_ROW;
+const truckRowY = (L, lane) => L.laneY + (core.laneCol(lane) ? 1 : -1) * TRUCK_ROW;
 
 /* ---------- 判定：トラックと同じレーンのノーツを自動で踏む（AUTOでないとき。render.js から） ---------- */
 function truckJudge(now) {
-  const w = window.Trk.core.windows();
-  for (let i = window.Trk.core.nextIdx; i < window.Trk.core.chart.length; i++) {
-    if (window.Trk.core.phase !== "playing") return;
-    const n = window.Trk.core.chart[i]; if (n.time > now) break;
+  const w = core.windows();
+  for (let i = core.nextIdx; i < core.chart.length; i++) {
+    if (core.phase !== "playing") return;
+    const n = core.chart[i]; if (n.time > now) break;
     if (n.judged || n.lane !== truckState.lane) continue;
     const d = now - n.time;
     if (d > w.good) continue;                       // 間に合わなければ sweepMisses がMISSにします
     window.Trk.play.judgeNote(n, d <= w.perfect ? "perfect" : "good", d);
     window.Trk.media.playSE(n.lane);
-    const p = performance.now(); window.Trk.core.pressFlash[window.Trk.core.laneCol(n.lane)] = p; window.Trk.core.pressH = { lane:n.lane, t:p };
+    const p = performance.now(); core.pressFlash[core.laneCol(n.lane)] = p; core.pressH = { lane:n.lane, t:p };
   }
 }
 
@@ -151,8 +152,8 @@ const TRUCK_RESERVED = new Set(["KeyP", "Tab", "F5", "F11", "F12", "MetaLeft", "
 addEventListener("keydown", e => {
   if (window.Trk.overlay.any()) return;
   if (truckBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureTruckKey(e.code); return; }
-  if (window.Trk.core.phase !== "playing" || !isTruck() || window.Trk.core.bindingSlot !== null || window.Trk.core.settings.autoPlay) return;   // AUTO中は自動で動く
-  if (window.Trk.core.settings.truckToggleKey && e.code === window.Trk.core.settings.truckToggleKey) {
+  if (core.phase !== "playing" || !isTruck() || core.bindingSlot !== null || core.settings.autoPlay) return;   // AUTO中は自動で動く
+  if (core.settings.truckToggleKey && e.code === core.settings.truckToggleKey) {
     e.preventDefault(); e.stopImmediatePropagation();
     if (!e.repeat) steerTruck(1 - truckState.lane);
     return;
@@ -160,81 +161,81 @@ addEventListener("keydown", e => {
   const pos = truckPosOfKey(e.code);
   if (pos >= 0) {
     e.preventDefault(); e.stopImmediatePropagation();
-    if (!e.repeat) steerTruck(window.Trk.core.slotLane(pos));
+    if (!e.repeat) steerTruck(core.slotLane(pos));
     return;
   }
-  if (!window.Trk.core.settings.truckHitKeys && window.Trk.core.slotOfKey(e.code) >= 0) { e.preventDefault(); e.stopImmediatePropagation(); }   // 叩くキーでは動かさない
+  if (!core.settings.truckHitKeys && core.slotOfKey(e.code) >= 0) { e.preventDefault(); e.stopImmediatePropagation(); }   // 叩くキーでは動かさない
 }, true);
 
 function captureTruckKey(code) {
   const slot = truckBinding;
   if (!code || slot === null) return;
-  if (code === "Escape") { truckBinding = null; window.Trk.core.setStatus("truckBindStatus", "cancelBind"); syncTruckKeyUI(); return; }
+  if (code === "Escape") { truckBinding = null; core.setStatus("truckBindStatus", "cancelBind"); syncTruckKeyUI(); return; }
   if (slot === 2 && code === "Backspace") {
-    window.Trk.core.settings.truckToggleKey = ""; truckBinding = null; window.Trk.core.saveUserPrefs();
-    window.Trk.core.setStatus("truckBindStatus", "truckToggleCleared"); syncTruckKeyUI(); return;
+    core.settings.truckToggleKey = ""; truckBinding = null; core.saveUserPrefs();
+    core.setStatus("truckBindStatus", "truckToggleCleared"); syncTruckKeyUI(); return;
   }
-  if (TRUCK_RESERVED.has(code) || (window.Trk.core.settings.speedKeys || []).includes(code)) { window.Trk.core.setStatus("truckBindStatus", "reservedKey"); return; }
-  const others = slot === 2 ? truckPosKeys() : [window.Trk.core.settings.truckKeys[1 - slot], window.Trk.core.settings.truckToggleKey];
-  if (others.includes(code)) { window.Trk.core.setStatus("truckBindStatus", "duplicateKey"); return; }
-  if (slot === 2) window.Trk.core.settings.truckToggleKey = code; else window.Trk.core.settings.truckKeys[slot] = code;
-  truckBinding = null; window.Trk.core.saveUserPrefs();
-  window.Trk.core.setStatus("truckBindStatus", "truckAssigned"); syncTruckKeyUI();
+  if (TRUCK_RESERVED.has(code) || (core.settings.speedKeys || []).includes(code)) { core.setStatus("truckBindStatus", "reservedKey"); return; }
+  const others = slot === 2 ? truckPosKeys() : [core.settings.truckKeys[1 - slot], core.settings.truckToggleKey];
+  if (others.includes(code)) { core.setStatus("truckBindStatus", "duplicateKey"); return; }
+  if (slot === 2) core.settings.truckToggleKey = code; else core.settings.truckKeys[slot] = code;
+  truckBinding = null; core.saveUserPrefs();
+  core.setStatus("truckBindStatus", "truckAssigned"); syncTruckKeyUI();
 }
 
 /* ---------- 操作設定の表示 ---------- */
 function syncTruckKeyUI() {
-  const keys = truckPosKeys(), auto = window.Trk.core.settings.truckKeyMode === "layout";
-  for (const i of [0, 1]) window.Trk.core.$("truckKeyValue" + i).textContent = window.Trk.core.formatKey(keys[i]) + (auto ? ` (${tr("truckAutoTag")})` : "");
-  window.Trk.core.$("truckKeyValue2").textContent = window.Trk.core.settings.truckToggleKey ? window.Trk.core.formatKey(window.Trk.core.settings.truckToggleKey) : tr("unset");
-  window.Trk.core.$("truckHitKeys").checked = window.Trk.core.settings.truckHitKeys;
+  const keys = truckPosKeys(), auto = core.settings.truckKeyMode === "layout";
+  for (const i of [0, 1]) core.$("truckKeyValue" + i).textContent = core.formatKey(keys[i]) + (auto ? ` (${tr("truckAutoTag")})` : "");
+  core.$("truckKeyValue2").textContent = core.settings.truckToggleKey ? core.formatKey(core.settings.truckToggleKey) : tr("unset");
+  core.$("truckHitKeys").checked = core.settings.truckHitKeys;
   const sel = auto ? "layout"
-    : window.Trk.core.settings.truckKeys.join() === TRUCK_PRESETS.ud.join() ? "ud"
-    : window.Trk.core.settings.truckKeys.join() === TRUCK_PRESETS.lr.join() ? "lr" : "";
+    : core.settings.truckKeys.join() === TRUCK_PRESETS.ud.join() ? "ud"
+    : core.settings.truckKeys.join() === TRUCK_PRESETS.lr.join() ? "lr" : "";
   document.querySelectorAll("#truckKeyPresets button").forEach(b => {
     b.classList.toggle("selected", b.dataset.truckpreset === sel); b.setAttribute("aria-pressed", b.dataset.truckpreset === sel);
   });
   document.querySelectorAll("[data-truckbind]").forEach(b => b.classList.toggle("listening", truckBinding === +b.dataset.truckbind));
-  const parts = [0, 1].map(p => `${window.Trk.core.laneName(window.Trk.core.slotLane(p))}: [${truckKeysLabel(p)}]`);
-  if (window.Trk.core.settings.truckToggleKey) parts.push(`${tr("truckPreviewToggle")}: [${window.Trk.core.formatKey(window.Trk.core.settings.truckToggleKey)}]`);
-  window.Trk.core.$("truckKeyPreview").textContent = parts.join("   ·   ");
+  const parts = [0, 1].map(p => `${core.laneName(core.slotLane(p))}: [${truckKeysLabel(p)}]`);
+  if (core.settings.truckToggleKey) parts.push(`${tr("truckPreviewToggle")}: [${core.formatKey(core.settings.truckToggleKey)}]`);
+  core.$("truckKeyPreview").textContent = parts.join("   ·   ");
 }
-window.Trk.core.$("truckKeyPresets").addEventListener("click", e => {
+core.$("truckKeyPresets").addEventListener("click", e => {
   const b = e.target.closest("button[data-truckpreset]"); if (!b) return;
   const id = b.dataset.truckpreset;
-  if (id === "layout") window.Trk.core.settings.truckKeyMode = "layout";
-  else { window.Trk.core.settings.truckKeyMode = "custom"; window.Trk.core.settings.truckKeys = TRUCK_PRESETS[id].slice(); }
-  if (truckPosKeys().includes(window.Trk.core.settings.truckToggleKey)) window.Trk.core.settings.truckToggleKey = "";
-  truckBinding = null; window.Trk.core.saveUserPrefs(); syncTruckKeyUI();
-  window.Trk.core.setStatus("truckBindStatus", "truckKeysDone", { name:b.textContent });
+  if (id === "layout") core.settings.truckKeyMode = "layout";
+  else { core.settings.truckKeyMode = "custom"; core.settings.truckKeys = TRUCK_PRESETS[id].slice(); }
+  if (truckPosKeys().includes(core.settings.truckToggleKey)) core.settings.truckToggleKey = "";
+  truckBinding = null; core.saveUserPrefs(); syncTruckKeyUI();
+  core.setStatus("truckBindStatus", "truckKeysDone", { name:b.textContent });
 });
 document.querySelectorAll("[data-truckbind]").forEach(b => b.addEventListener("click", () => {
   const slot = +b.dataset.truckbind;
-  if (slot < 2 && window.Trk.core.settings.truckKeyMode === "layout") {   // 自動から自分で設定に切り替え（今のキーを元にする）
-    window.Trk.core.settings.truckKeys = truckPosKeys().slice(); window.Trk.core.settings.truckKeyMode = "custom"; window.Trk.core.saveUserPrefs();
+  if (slot < 2 && core.settings.truckKeyMode === "layout") {   // 自動から自分で設定に切り替え（今のキーを元にする）
+    core.settings.truckKeys = truckPosKeys().slice(); core.settings.truckKeyMode = "custom"; core.saveUserPrefs();
   }
-  window.Trk.core.bindingSlot = null; window.Trk.core.updateKeyUI();                        // 通常のキー設定と同時に待たない
+  core.bindingSlot = null; core.updateKeyUI();                        // 通常のキー設定と同時に待たない
   truckBinding = slot; b.blur();
-  window.Trk.core.setStatus("truckBindStatus", "truckCapture" + slot); syncTruckKeyUI();
+  core.setStatus("truckBindStatus", "truckCapture" + slot); syncTruckKeyUI();
 }));
 document.querySelectorAll("[data-bind]").forEach(b => b.addEventListener("click", () => {
   if (truckBinding !== null) { truckBinding = null; syncTruckKeyUI(); }
 }));
-window.Trk.core.$("truckHitKeys").addEventListener("change", e => { window.Trk.core.settings.truckHitKeys = e.target.checked; window.Trk.core.saveUserPrefs(); syncTruckKeyUI(); });
-window.Trk.core.$("layoutPicker").addEventListener("click", () => setTimeout(syncTruckKeyUI, 0));   // レイアウトで自動のキーが変わる
-window.Trk.core.$("reverseHands").addEventListener("change", () => setTimeout(syncTruckKeyUI, 0));
+core.$("truckHitKeys").addEventListener("change", e => { core.settings.truckHitKeys = e.target.checked; core.saveUserPrefs(); syncTruckKeyUI(); });
+core.$("layoutPicker").addEventListener("click", () => setTimeout(syncTruckKeyUI, 0));   // レイアウトで自動のキーが変わる
+core.$("reverseHands").addEventListener("change", () => setTimeout(syncTruckKeyUI, 0));
 document.querySelectorAll("#keyPresets, [data-bind]").forEach(n => n.addEventListener("click", () => setTimeout(syncTruckKeyUI, 0)));
-addEventListener("keyup", () => { if (window.Trk.overlay.is("study")) return; if (window.Trk.core.bindingSlot === null) syncTruckKeyUI(); });   // 通常キーの変更をプレビューに反映
-window.Trk.core.on("language", syncTruckKeyUI);
+addEventListener("keyup", () => { if (window.Trk.overlay.is("study")) return; if (core.bindingSlot === null) syncTruckKeyUI(); });   // 通常キーの変更をプレビューに反映
+core.on("language", syncTruckKeyUI);
 
 /* ---------- レーンの色付け（スキンのアクセント色） ---------- */
 function drawLaneTint(L) {
-  const a = window.Trk.core.settings.laneTint; if (a <= 0) return;
-  window.Trk.core.ctx.fillStyle = window.Trk.data.hexToRgba(window.Trk.data.toHex(window.Trk.core.skin().ui["--ui-accent"]), a);
+  const a = core.settings.laneTint; if (a <= 0) return;
+  core.ctx.fillStyle = window.Trk.data.hexToRgba(window.Trk.data.toHex(core.skin().ui["--ui-accent"]), a);
   if (L.vertical) {
     const x0 = L.centers[0] - L.laneW / 2, x1 = L.centers[1] + L.laneW / 2;
-    window.Trk.core.ctx.fillRect(x0, L.topY, x1 - x0, L.hitY - L.topY);
-  } else { window.Trk.play.rr(L.hitX - 110, L.laneY - 84, L.endX - L.hitX + 170, 168, 42); window.Trk.core.ctx.fill(); }
+    core.ctx.fillRect(x0, L.topY, x1 - x0, L.hitY - L.topY);
+  } else { window.Trk.play.rr(L.hitX - 110, L.laneY - 84, L.endX - L.hitX + 170, 168, 42); core.ctx.fill(); }
 }
 
 /* ---------- 揺れ（判定位置を軸に傾けるので、叩く場所はほとんど動きません） ---------- */
@@ -245,20 +246,20 @@ function lanePivot(L) {
 /* 既定で揺れるモード（🚚トラック／🪐ORBIT） */
 const SWAY_DEFAULT_MODES = ["truck", "orbit"];
 function swayModeOn(mode) {
-  if (window.Trk.core.settings.swayAllModes) return true;                 // ❓謎設定が最優先
-  const m = mode || window.Trk.core.settings.playMode;
-  if (m === "truck") return window.Trk.core.settings.swayTruck !== false;
-  if (m === "orbit") return window.Trk.core.settings.swayOrbit !== false;
+  if (core.settings.swayAllModes) return true;                 // ❓謎設定が最優先
+  const m = mode || core.settings.playMode;
+  if (m === "truck") return core.settings.swayTruck !== false;
+  if (m === "orbit") return core.settings.swayOrbit !== false;
   return false;                                          // ほかのモード（MANUAL・STAGE・CATCH）は既定で揺れない
 }
 function laneTilt(now) {
   if (reduceMotion.matches || !swayModeOn()) return 0;
-  const D = Math.PI / 180, k = window.Trk.core.settings.swayPower * window.Trk.core.gameplayFxMultiplier(), p = performance.now();
+  const D = Math.PI / 180, k = core.settings.swayPower * core.gameplayFxMultiplier(), p = performance.now();
   let a = 0;
-  if (window.Trk.core.settings.swayBeat && window.Trk.core.chartMeta.bpm) a += Math.sin(Math.PI * (now - window.Trk.core.chartMeta.offset) / (60000 / window.Trk.core.chartMeta.bpm)) * 1.4 * D * k;
-  if (window.Trk.core.settings.swayHit) {
+  if (core.settings.swayBeat && core.chartMeta.bpm) a += Math.sin(Math.PI * (now - core.chartMeta.offset) / (60000 / core.chartMeta.bpm)) * 1.4 * D * k;
+  if (core.settings.swayHit) {
     const dk = t => Math.max(0, 1 - (p - t) / 260);
-    a += (dk(window.Trk.core.avatarHit[1]) - dk(window.Trk.core.avatarHit[0])) * 2.2 * D * k;   // ドン＝左（反時計回り）、カッ＝右
+    a += (dk(core.avatarHit[1]) - dk(core.avatarHit[0])) * 2.2 * D * k;   // ドン＝左（反時計回り）、カッ＝右
   }
   return a;
 }
@@ -267,72 +268,72 @@ function laneTilt(now) {
 function drawTruck(L, now) {
   const p = performance.now(), dt = Math.min(.05, Math.max(0, (p - truckState.last) / 1000));
   truckState.last = p;
-  const col = window.Trk.core.laneCol(truckState.lane);
+  const col = core.laneCol(truckState.lane);
   truckState.vis += (col - truckState.vis) * Math.min(1, dt * 16);
   const v = truckState.vis, lean = (col - v) * .35;
-  const hitK = Math.max(0, 1 - (p - Math.max(window.Trk.core.avatarHit[0], window.Trk.core.avatarHit[1])) / 180);
-  const bounce = window.Trk.core.settings.truckBounce && !reduceMotion.matches ? (hitK * 9 + window.Trk.play.beatPulse(now) * 3) * window.Trk.core.gameplayFxMultiplier() : 0;
-  window.Trk.core.ctx.save();
+  const hitK = Math.max(0, 1 - (p - Math.max(core.avatarHit[0], core.avatarHit[1])) / 180);
+  const bounce = core.settings.truckBounce && !reduceMotion.matches ? (hitK * 9 + window.Trk.play.beatPulse(now) * 3) * core.gameplayFxMultiplier() : 0;
+  core.ctx.save();
   if (L.vertical) {
-    window.Trk.core.ctx.translate(L.centers[0] + (L.centers[1] - L.centers[0]) * v, L.hitY);
-    window.Trk.core.ctx.rotate(-Math.PI / 2); window.Trk.core.ctx.scale(.8 + bounce * .006, .8 + bounce * .006);
+    core.ctx.translate(L.centers[0] + (L.centers[1] - L.centers[0]) * v, L.hitY);
+    core.ctx.rotate(-Math.PI / 2); core.ctx.scale(.8 + bounce * .006, .8 + bounce * .006);
   } else {
-    window.Trk.core.ctx.translate(L.hitX, L.laneY - TRUCK_ROW + 2 * TRUCK_ROW * v - bounce);
-    window.Trk.core.ctx.scale(.78, .78);
+    core.ctx.translate(L.hitX, L.laneY - TRUCK_ROW + 2 * TRUCK_ROW * v - bounce);
+    core.ctx.scale(.78, .78);
   }
-  window.Trk.core.ctx.rotate(lean);
-  const cab = window.Trk.core.laneColor(truckState.lane), ink = "#1b1b22";
+  core.ctx.rotate(lean);
+  const cab = core.laneColor(truckState.lane), ink = "#1b1b22";
   const dashAge = p - truckState.dash;
-  if (dashAge >= 0 && dashAge < 260 && window.Trk.core.gameplayFxPower() > 0) {
-    window.Trk.core.ctx.save(); window.Trk.core.ctx.globalAlpha = (1 - dashAge / 260) * Math.min(1, window.Trk.core.gameplayFxPower());
-    window.Trk.core.ctx.strokeStyle = cab; window.Trk.core.ctx.lineWidth = 5; window.Trk.core.ctx.lineCap = "round";
-    for (const y of [-18, 0, 18]) { window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.moveTo(-142, y); window.Trk.core.ctx.lineTo(-94, y + lean * 18); window.Trk.core.ctx.stroke(); }
-    window.Trk.core.ctx.restore();
+  if (dashAge >= 0 && dashAge < 260 && core.gameplayFxPower() > 0) {
+    core.ctx.save(); core.ctx.globalAlpha = (1 - dashAge / 260) * Math.min(1, core.gameplayFxPower());
+    core.ctx.strokeStyle = cab; core.ctx.lineWidth = 5; core.ctx.lineCap = "round";
+    for (const y of [-18, 0, 18]) { core.ctx.beginPath(); core.ctx.moveTo(-142, y); core.ctx.lineTo(-94, y + lean * 18); core.ctx.stroke(); }
+    core.ctx.restore();
   }
-  window.Trk.core.ctx.lineJoin = "round";
-  window.Trk.core.ctx.fillStyle = "rgba(0,0,0,.28)"; window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.ellipse(-35, 36, 70, 8, 0, 0, window.Trk.data.TAU); window.Trk.core.ctx.fill();   // 影
-  window.Trk.play.rr(-100, -30, 82, 52, 7); window.Trk.core.ctx.fillStyle = "#f4f4f8"; window.Trk.core.ctx.fill();                                          // 荷台
-  window.Trk.core.ctx.lineWidth = 3; window.Trk.core.ctx.strokeStyle = ink; window.Trk.core.ctx.stroke();
-  window.Trk.core.ctx.fillStyle = cab; window.Trk.core.ctx.fillRect(-100, 4, 82, 7);
-  window.Trk.core.ctx.fillStyle = ink; window.Trk.core.ctx.font = `900 18px ${window.Trk.core.fontFamily()}`; window.Trk.core.ctx.textAlign = "center"; window.Trk.core.ctx.textBaseline = "middle";
-  window.Trk.core.ctx.fillText("trk!", -59, -12);
-  window.Trk.play.rr(-16, -18, 44, 40, 9); window.Trk.core.ctx.fillStyle = cab; window.Trk.core.ctx.fill(); window.Trk.core.ctx.stroke();                                  // 運転席（今のレーンの色）
-  window.Trk.play.rr(6, -12, 17, 14, 4); window.Trk.core.ctx.fillStyle = "#cfeaff"; window.Trk.core.ctx.fill();
-  window.Trk.core.ctx.fillStyle = "#ffe27a"; window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(27, 12, 4 + hitK * 2, 0, window.Trk.data.TAU); window.Trk.core.ctx.fill();            // ヘッドライト
-  if (hitK > 0 && window.Trk.core.gameplayFxPower() > 0) {
-    window.Trk.core.ctx.globalCompositeOperation = "lighter";
-    const gr = window.Trk.core.ctx.createRadialGradient(30, 12, 0, 30, 12, 44);
-    gr.addColorStop(0, `rgba(255,226,122,${Math.min(.8, .4 * window.Trk.core.gameplayFxPower()) * hitK})`); gr.addColorStop(1, "rgba(255,226,122,0)");
-    window.Trk.core.ctx.fillStyle = gr; window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(30, 12, 44, 0, window.Trk.data.TAU); window.Trk.core.ctx.fill();
-    window.Trk.core.ctx.globalCompositeOperation = "source-over";
+  core.ctx.lineJoin = "round";
+  core.ctx.fillStyle = "rgba(0,0,0,.28)"; core.ctx.beginPath(); core.ctx.ellipse(-35, 36, 70, 8, 0, 0, window.Trk.data.TAU); core.ctx.fill();   // 影
+  window.Trk.play.rr(-100, -30, 82, 52, 7); core.ctx.fillStyle = "#f4f4f8"; core.ctx.fill();                                          // 荷台
+  core.ctx.lineWidth = 3; core.ctx.strokeStyle = ink; core.ctx.stroke();
+  core.ctx.fillStyle = cab; core.ctx.fillRect(-100, 4, 82, 7);
+  core.ctx.fillStyle = ink; core.ctx.font = `900 18px ${core.fontFamily()}`; core.ctx.textAlign = "center"; core.ctx.textBaseline = "middle";
+  core.ctx.fillText("trk!", -59, -12);
+  window.Trk.play.rr(-16, -18, 44, 40, 9); core.ctx.fillStyle = cab; core.ctx.fill(); core.ctx.stroke();                                  // 運転席（今のレーンの色）
+  window.Trk.play.rr(6, -12, 17, 14, 4); core.ctx.fillStyle = "#cfeaff"; core.ctx.fill();
+  core.ctx.fillStyle = "#ffe27a"; core.ctx.beginPath(); core.ctx.arc(27, 12, 4 + hitK * 2, 0, window.Trk.data.TAU); core.ctx.fill();            // ヘッドライト
+  if (hitK > 0 && core.gameplayFxPower() > 0) {
+    core.ctx.globalCompositeOperation = "lighter";
+    const gr = core.ctx.createRadialGradient(30, 12, 0, 30, 12, 44);
+    gr.addColorStop(0, `rgba(255,226,122,${Math.min(.8, .4 * core.gameplayFxPower()) * hitK})`); gr.addColorStop(1, "rgba(255,226,122,0)");
+    core.ctx.fillStyle = gr; core.ctx.beginPath(); core.ctx.arc(30, 12, 44, 0, window.Trk.data.TAU); core.ctx.fill();
+    core.ctx.globalCompositeOperation = "source-over";
   }
   const spin = (p / 60) % window.Trk.data.TAU;                                                                              // タイヤ
   for (const wx of [-78, -40, 12]) {
-    window.Trk.core.ctx.fillStyle = ink; window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(wx, 24, 11, 0, window.Trk.data.TAU); window.Trk.core.ctx.fill();
-    window.Trk.core.ctx.strokeStyle = "#9aa0aa"; window.Trk.core.ctx.lineWidth = 2; window.Trk.core.ctx.beginPath();
-    window.Trk.core.ctx.moveTo(wx + Math.cos(spin) * 7, 24 + Math.sin(spin) * 7); window.Trk.core.ctx.lineTo(wx - Math.cos(spin) * 7, 24 - Math.sin(spin) * 7); window.Trk.core.ctx.stroke();
+    core.ctx.fillStyle = ink; core.ctx.beginPath(); core.ctx.arc(wx, 24, 11, 0, window.Trk.data.TAU); core.ctx.fill();
+    core.ctx.strokeStyle = "#9aa0aa"; core.ctx.lineWidth = 2; core.ctx.beginPath();
+    core.ctx.moveTo(wx + Math.cos(spin) * 7, 24 + Math.sin(spin) * 7); core.ctx.lineTo(wx - Math.cos(spin) * 7, 24 - Math.sin(spin) * 7); core.ctx.stroke();
   }
-  window.Trk.core.ctx.restore();
+  core.ctx.restore();
 }
 
 /* ---------- 設定画面（見た目の欄） ---------- */
 function showTruckVals() {
-  window.Trk.core.$("laneTintVal").textContent = Math.round(window.Trk.core.settings.laneTint * 100) + "%";
-  window.Trk.core.$("swayPowerVal").textContent = Math.round(window.Trk.core.settings.swayPower * 100) + "%";
+  core.$("laneTintVal").textContent = Math.round(core.settings.laneTint * 100) + "%";
+  core.$("swayPowerVal").textContent = Math.round(core.settings.swayPower * 100) + "%";
 }
-window.Trk.core.$("laneTint").value = window.Trk.core.settings.laneTint;
-window.Trk.core.$("swayPower").value = window.Trk.core.settings.swayPower;
-window.Trk.core.$("truckBounce").checked = window.Trk.core.settings.truckBounce;
-window.Trk.core.$("swayBeat").checked = window.Trk.core.settings.swayBeat;
-window.Trk.core.$("swayHit").checked = window.Trk.core.settings.swayHit;
-window.Trk.core.$("swayTruck").checked = window.Trk.core.settings.swayTruck;
+core.$("laneTint").value = core.settings.laneTint;
+core.$("swayPower").value = core.settings.swayPower;
+core.$("truckBounce").checked = core.settings.truckBounce;
+core.$("swayBeat").checked = core.settings.swayBeat;
+core.$("swayHit").checked = core.settings.swayHit;
+core.$("swayTruck").checked = core.settings.swayTruck;
 showTruckVals();
-window.Trk.core.$("laneTint").addEventListener("input", e => { window.Trk.core.settings.laneTint = Number(e.target.value); showTruckVals(); window.Trk.core.saveUserPrefs(); });
-window.Trk.core.$("swayPower").addEventListener("input", e => { window.Trk.core.settings.swayPower = Number(e.target.value); showTruckVals(); window.Trk.core.saveUserPrefs(); });
+core.$("laneTint").addEventListener("input", e => { core.settings.laneTint = Number(e.target.value); showTruckVals(); core.saveUserPrefs(); });
+core.$("swayPower").addEventListener("input", e => { core.settings.swayPower = Number(e.target.value); showTruckVals(); core.saveUserPrefs(); });
 for (const id of ["truckBounce", "swayTruck", "swayBeat", "swayHit"]) {
-  window.Trk.core.$(id).addEventListener("change", e => { window.Trk.core.settings[id] = e.target.checked; window.Trk.core.saveUserPrefs(); });
+  core.$(id).addEventListener("change", e => { core.settings[id] = e.target.checked; core.saveUserPrefs(); });
 }
-const syncReducedNote = () => { window.Trk.core.$("swayReducedNote").hidden = !reduceMotion.matches; };
+const syncReducedNote = () => { core.$("swayReducedNote").hidden = !reduceMotion.matches; };
 if (reduceMotion.addEventListener) reduceMotion.addEventListener("change", syncReducedNote);
 syncReducedNote();
 setTimeout(syncTruckKeyUI, 0);   // 言語の反映が終わってから表示

@@ -16,6 +16,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { restoreCoreAlias } from "./lib/js-source.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const args = new Set(process.argv.slice(2));
@@ -216,7 +217,8 @@ export function audit(root = ROOT) {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const order = classicScriptOrder(html);
   const units = order.map(s => {
-    const text = s.kind === "file" ? fs.readFileSync(path.join(root, s.name), "utf8") : s.body;
+    /* 別名（const core = window.Trk.core;）は IIFE の中の局所。棚卸しは元の綴りで見る（tools/lib/js-source.mjs） */
+    const text = s.kind === "file" ? restoreCoreAlias(fs.readFileSync(path.join(root, s.name), "utf8")) : s.body;
     const stripped = stripCode(text);
     // 包んだファイル（先頭が「(() => {」）：中身のうち window に出す名前だけが大域に残る
     const wrapped = /^\s*\(\s*\(\s*\)\s*=>\s*\{/.test(stripped);

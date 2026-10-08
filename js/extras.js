@@ -10,6 +10,7 @@
    ========================================================================== */
 "use strict";
 (() => {
+  const core = window.Trk.core;
 Object.assign(TEXT.ja, {
   owTitle:"🎯 オフセットを測る", owStart:"▶ 測定をはじめる", owTap:"🥁 音に合わせてタップ（どのキーでもOK）",
   owHint:"カチッという音に合わせて16回ほどタップしてください。画面ではなく、耳で合わせるのがコツです。イヤホンを変えたら測り直しましょう。",
@@ -51,10 +52,10 @@ Object.assign(TEXT.ko, {
   judgeStats:"📊 판정 평균 {m}ms · 흩어짐 {s}ms", bgDim:"배경 어둡기", bgBlur:"배경 흐림"
 });
 
-window.Trk.core.settings.autoAdjust ??= !!window.Trk.core.prefs.autoAdjust;
-window.Trk.core.settings.ghost ??= window.Trk.core.prefs.ghost !== false;
-window.Trk.core.settings.bgDim ??= window.Trk.core.num(window.Trk.core.prefs.bgDim, 0, .9, 0);
-window.Trk.core.settings.bgBlur ??= window.Trk.core.num(window.Trk.core.prefs.bgBlur, 0, 12, 0);
+core.settings.autoAdjust ??= !!core.prefs.autoAdjust;
+core.settings.ghost ??= core.prefs.ghost !== false;
+core.settings.bgDim ??= core.num(core.prefs.bgDim, 0, .9, 0);
+core.settings.bgBlur ??= core.num(core.prefs.bgBlur, 0, 12, 0);
 const signed = v => (v > 0 ? "+" : "") + v;
 
 /* ============ 🎯 オフセット測定 ============ */
@@ -64,7 +65,7 @@ let owStatus, owApply, owTapBtn;
 function owClick(ac, t) {
   const o = ac.createOscillator(), g = ac.createGain();
   o.type = "square"; o.frequency.value = 1500;
-  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(.05, window.Trk.core.settings.seVolume), t + .002);
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(.05, core.settings.seVolume), t + .002);
   g.gain.exponentialRampToValueAtTime(.0001, t + .05);
   o.connect(g).connect(ac.destination); o.start(t); o.stop(t + .06);
 }
@@ -105,17 +106,17 @@ addEventListener("keydown", e => {                   // 測定中は、どのキ
 }, true);
 (() => {
   const anchor = document.querySelector('#settingsScreen [data-i18n="latencyHint"]'); if (!anchor) return;
-  const box = window.Trk.core.el("details", "subPanel"), sum = window.Trk.core.el("summary"); sum.dataset.i18n = "owTitle"; box.append(sum);
-  const hint = window.Trk.core.el("div", "hint"); hint.dataset.i18n = "owHint";
-  const start = window.Trk.core.el("button"); start.type = "button"; start.dataset.i18n = "owStart";
-  owTapBtn = window.Trk.core.el("button", "primary"); owTapBtn.type = "button"; owTapBtn.dataset.i18n = "owTap"; owTapBtn.style.marginTop = "8px";
-  owStatus = window.Trk.core.el("div", "hint status");
-  owApply = window.Trk.core.el("button"); owApply.type = "button"; owApply.dataset.i18n = "owApply"; owApply.hidden = true;
+  const box = core.el("details", "subPanel"), sum = core.el("summary"); sum.dataset.i18n = "owTitle"; box.append(sum);
+  const hint = core.el("div", "hint"); hint.dataset.i18n = "owHint";
+  const start = core.el("button"); start.type = "button"; start.dataset.i18n = "owStart";
+  owTapBtn = core.el("button", "primary"); owTapBtn.type = "button"; owTapBtn.dataset.i18n = "owTap"; owTapBtn.style.marginTop = "8px";
+  owStatus = core.el("div", "hint status");
+  owApply = core.el("button"); owApply.type = "button"; owApply.dataset.i18n = "owApply"; owApply.hidden = true;
   start.addEventListener("click", owStart);
   owTapBtn.addEventListener("pointerdown", e => { e.preventDefault(); owTap(e.timeStamp); });
   owApply.addEventListener("click", () => {
     if (ow.value == null) return;
-    window.Trk.core.settings.latency = ow.value; window.Trk.core.$("latency").value = ow.value; window.Trk.core.saveUserPrefs();
+    core.settings.latency = ow.value; core.$("latency").value = ow.value; core.saveUserPrefs();
     owStatus.textContent = tr("owApplied", { v:signed(ow.value) }); owApply.hidden = true;
   });
   box.append(hint, start, owTapBtn, owStatus, owApply);
@@ -123,58 +124,58 @@ addEventListener("keydown", e => {                   // 測定中は、どのキ
 })();
 
 /* ============ 📊 判定の平均とばらつき／🎯 自動微調整（リザルト） ============ */
-window.Trk.core.on("screen", id => {
+core.on("screen", id => {
   if (id !== "endScreen") return;
-  const n = window.Trk.core.stats.errN || 0; if (n < 5) return;
-  const m = window.Trk.core.stats.errSum / n, sd = Math.sqrt(Math.max(0, window.Trk.core.stats.errSq / n - m * m));
-  window.Trk.core.$("result").append(window.Trk.core.el("div", "best", tr("judgeStats", { m:signed(+m.toFixed(1)), s:sd.toFixed(1) })));
-  if (!window.Trk.core.settings.autoAdjust || window.Trk.core.settings.autoPlay || n < 20 || !["manual", "orbit", "stage"].includes(window.Trk.core.settings.playMode)) return;
+  const n = core.stats.errN || 0; if (n < 5) return;
+  const m = core.stats.errSum / n, sd = Math.sqrt(Math.max(0, core.stats.errSq / n - m * m));
+  core.$("result").append(core.el("div", "best", tr("judgeStats", { m:signed(+m.toFixed(1)), s:sd.toFixed(1) })));
+  if (!core.settings.autoAdjust || core.settings.autoPlay || n < 20 || !["manual", "orbit", "stage"].includes(core.settings.playMode)) return;
   const d = Math.max(-15, Math.min(15, Math.round(m * .5)));
   if (Math.abs(d) < 2) return;
-  window.Trk.core.settings.latency = Math.max(-300, Math.min(500, window.Trk.core.settings.latency + d));
-  window.Trk.core.$("latency").value = window.Trk.core.settings.latency; window.Trk.core.saveUserPrefs();
-  window.Trk.core.setStatus("endStatus", "autoAdjDone", { d:signed(d), v:signed(window.Trk.core.settings.latency) });
+  core.settings.latency = Math.max(-300, Math.min(500, core.settings.latency + d));
+  core.$("latency").value = core.settings.latency; core.saveUserPrefs();
+  core.setStatus("endStatus", "autoAdjDone", { d:signed(d), v:signed(core.settings.latency) });
 });
 
 /* ============ 👻 ゴースト ============ */
 let ghostBest = 0;
-window.Trk.core.on("beforePlay", () => {
+core.on("beforePlay", () => {
   ghostBest = 0;
-  if (!window.Trk.core.settings.ghost || window.Trk.core.settings.autoPlay) return;
+  if (!core.settings.ghost || core.settings.autoPlay) return;
   const s = window.Trk.play.songRec(false); if (!s) return;
   const c = s.charts[window.Trk.play.chartKeyOf()]; if (!c) return;
-  const base = window.Trk.core.settings.playMode === "manual" ? c : c[window.Trk.core.settings.playMode];
-  const rk = window.Trk.play.rateKey(), slot = rk && window.Trk.core.settings.rate > 1 ? base && base.rates && base.rates[rk] : base;
+  const base = core.settings.playMode === "manual" ? c : c[core.settings.playMode];
+  const rk = window.Trk.play.rateKey(), slot = rk && core.settings.rate > 1 ? base && base.rates && base.rates[rk] : base;
   ghostBest = slot && slot.best ? Number(slot.best.score) || 0 : 0;
 });
 function drawGhost() {
-  if (!window.Trk.core.settings.ghost || !ghostBest || !(window.Trk.core.phase === "playing" || window.Trk.core.phase === "paused") || !window.Trk.core.chart.length) return;
-  const judged = window.Trk.core.stats.perfect + window.Trk.core.stats.good + window.Trk.core.stats.miss;
-  const diff = Math.round(window.Trk.play.currentScore() - ghostBest * judged / window.Trk.core.chart.length);
-  const vertical = window.Trk.core.settings.layout === "vertical" && !["stage", "catch"].includes(window.Trk.core.settings.playMode);
-  const g = window.Trk.core.skin().game, x = vertical ? 760 : 70, y = 226;
-  window.Trk.core.ctx.save();
-  window.Trk.core.ctx.font = `800 18px ${window.Trk.core.fontFamily()}`; window.Trk.core.ctx.textAlign = "left"; window.Trk.core.ctx.textBaseline = "middle";
+  if (!core.settings.ghost || !ghostBest || !(core.phase === "playing" || core.phase === "paused") || !core.chart.length) return;
+  const judged = core.stats.perfect + core.stats.good + core.stats.miss;
+  const diff = Math.round(window.Trk.play.currentScore() - ghostBest * judged / core.chart.length);
+  const vertical = core.settings.layout === "vertical" && !["stage", "catch"].includes(core.settings.playMode);
+  const g = core.skin().game, x = vertical ? 760 : 70, y = 226;
+  core.ctx.save();
+  core.ctx.font = `800 18px ${core.fontFamily()}`; core.ctx.textAlign = "left"; core.ctx.textBaseline = "middle";
   const t = `👻 ${diff >= 0 ? "+" : "−"}${Math.abs(diff).toLocaleString()}`;
-  window.Trk.core.ctx.lineWidth = 4; window.Trk.core.ctx.strokeStyle = "rgba(0,0,0,.6)"; window.Trk.core.ctx.strokeText(t, x, y);
-  window.Trk.core.ctx.fillStyle = diff >= 0 ? g.perfect : g.miss; window.Trk.core.ctx.fillText(t, x, y);
-  window.Trk.core.ctx.restore();
+  core.ctx.lineWidth = 4; core.ctx.strokeStyle = "rgba(0,0,0,.6)"; core.ctx.strokeText(t, x, y);
+  core.ctx.fillStyle = diff >= 0 ? g.perfect : g.miss; core.ctx.fillText(t, x, y);
+  core.ctx.restore();
 }
 window.drawExtrasOverlay = drawGhost;
 (() => {
-  const anchor = window.Trk.core.$("errorMeter") && window.Trk.core.$("errorMeter").closest("label"); if (!anchor) return;
+  const anchor = core.$("errorMeter") && core.$("errorMeter").closest("label"); if (!anchor) return;
   anchor.after(window.Trk.modes.makeCheck("ghost", "ghost", "ghostLabel"));
 })();
 
 /* ============ 🌗 背景の暗さ・ぼかし（設定欄） ============ */
 (() => {
-  const field = window.Trk.core.$("videoStyle") && window.Trk.core.$("videoStyle").closest(".fields2"); if (!field) return;
+  const field = core.$("videoStyle") && core.$("videoStyle").closest(".fields2"); if (!field) return;
   const rows = [["bgDim", "bgDim", 0, .9, .05, v => Math.round(v * 100) + "%"], ["bgBlur", "bgBlur", 0, 12, 1, v => v + "px"]].map(([key, label, min, max, step, fmt]) => {
-    const row = window.Trk.core.el("div", "inline"), lab = window.Trk.core.el("span"), inp = document.createElement("input"), val = window.Trk.core.el("span", "mono");
+    const row = core.el("div", "inline"), lab = core.el("span"), inp = document.createElement("input"), val = core.el("span", "mono");
     lab.dataset.i18n = label; inp.type = "range"; inp.min = min; inp.max = max; inp.step = step;
     lab.id = "videoStyleLab-" + key; inp.setAttribute("aria-labelledby", lab.id);
-    const sync = () => { inp.value = window.Trk.core.settings[key]; val.textContent = fmt(window.Trk.core.settings[key]); };
-    inp.addEventListener("input", () => { window.Trk.core.settings[key] = Number(inp.value); window.Trk.core.saveUserPrefs(); sync(); window.Trk.core.view.style.filter = window.Trk.core.videoFilter(); });
+    const sync = () => { inp.value = core.settings[key]; val.textContent = fmt(core.settings[key]); };
+    inp.addEventListener("input", () => { core.settings[key] = Number(inp.value); core.saveUserPrefs(); sync(); core.view.style.filter = core.videoFilter(); });
     sync(); row.append(lab, inp, val);
     return row;
   });

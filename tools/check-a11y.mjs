@@ -18,11 +18,12 @@
  * 外部ツールでの点検のしかたは docs/QUALITY-CHECKS.md を参照。
  */
 import fs from "node:fs";
+import { restoreCoreAlias, sourceOf } from "./lib/js-source.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const read = rel => fs.readFileSync(path.join(root, rel), "utf8");
+const read = rel => sourceOf(rel, fs.readFileSync(path.join(root, rel), "utf8"));
 const htmlFiles = ["index.html", "credits.html", "privacy.html"].filter(f => fs.existsSync(path.join(root, f)));
 
 const jsFiles = [];

@@ -8,6 +8,7 @@
  * replace real-browser testing.
  */
 import fs from "node:fs";
+import { restoreCoreAlias, sourceOf } from "./lib/js-source.mjs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import vm from "node:vm";
@@ -30,8 +31,10 @@ function ok(message) {
 }
 /* 名前空間 D：js/ の本文では、領域の接頭辞 window.Trk.<領域>. を取り除いて照合する（同じ束縛の別の書き方）。
    window.Trk.overlay は取り除かない（書斎・シンスの旗の検査が、その綴りを見る）。 */
+/* 別名（const core = window.Trk.core;）を使うファイルは、同じ束縛として元の綴りに戻して照合する。
+   alias の行を消し、その後の core. を取り除く（core.js の文字列は除く）。 */
 function read(rel) {
-  const text = fs.readFileSync(path.join(root, rel), "utf8");
+  const text = sourceOf(rel, fs.readFileSync(path.join(root, rel), "utf8"));
   return rel.startsWith("js/") ? text.replace(/window\.Trk\.(?!overlay\b)[A-Za-z]\w*\./g, "") : text;
 }
 
@@ -1638,7 +1641,7 @@ for (const [rel, name] of Object.entries(PATCHED_FUNCTIONS).flatMap(([r, ns]) =>
   const owner = exists(rel) ? read(rel) : "";
   const accessor = new RegExp(`Object\\.defineProperty\\(window, "${name}", \\{[^}]*get:\\(\\) => ${name}, set:v => \\{ ${name} = v; \\} \\}\\)`);
   const patchedElsewhere = walk(path.join(root, "js")).filter(f => f.endsWith(".js") && path.relative(root, f) !== rel)
-    .some(f => new RegExp(`^\\s*(?:window\\.(?:Trk\\.[\\w]+\\.)?)?${name} = (?:async )?(?:function|\\(|[A-Za-z_$][\\w$]* =>|[A-Za-z_$][\\w$]*;)`, "m").test(fs.readFileSync(f, "utf8")));
+    .some(f => new RegExp(`^\\s*(?:window\\.(?:Trk\\.[\\w]+\\.)?)?${name} = (?:async )?(?:function|\\(|[A-Za-z_$][\\w$]* =>|[A-Za-z_$][\\w$]*;)`, "m").test(read(path.relative(root, f))));
   if (!patchedElsewhere) fail(`${name}: no later file overrides it (remove it from PATCHED_FUNCTIONS if this is intended)`);
   else if (!accessor.test(owner)) fail(`${name} is overridden by a later file but ${rel} does not expose it as a window accessor`);
   else ok(`${name} override reaches internal calls (window accessor in ${rel})`);

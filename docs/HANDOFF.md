@@ -44,7 +44,7 @@
 - **📺 TVドックの設定（`js/tv-dock.js`）**：くわしいの中の「📺 TVドック」グループ。チェックは3つ：🧱 壁掛け（スキン `wall` と同じ。外すと映画館に戻る）、↕ 並び替え（テレビとラックの上下）、🔢 5枠化（`tvDockFive`）。既定はすべて OFF（映画館・テレビが上・5枠なし）。くわしいは既定で開いた状態（保存済みの開閉は変えない）。テレビ本体とラックの表示は変えていない。
 - **Loop Lab の映像書き出し（`js/media-player-mode.js` の `exportLoopClip`）**：開発者表示の中だけ。記録した区間の行の 🎬 を押すと、映像と音を区間の長さのぶん録画して保存する（WebM。対応していれば MP4）。設定は持たない。書き出し後は再生位置・再生／停止・速度・ループを元に戻す。曲を切り替えたら途中で止め、保存しない。音声だけの曲は書き出さない。
 - **「📁 開く」と「📤 共有」**（`js/library.js`）：📁 開く は曲を入れるだけで、共有としては覚えない。📤 共有 は共有として覚え、📤 の印が付き、「共有をやめる」でまとめて外せ、「端末に残す」の対象になる。ボタンの下の説明行は `libOpenShareHint`（4言語）。
-- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.8-trk76`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
+- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.8-trk77`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
 
 ## 3. 権利・データ・セキュリティの不変条件
 
@@ -157,6 +157,7 @@ git diff --check
 
 ## 11. 最近の変更
 
+- **2026-10-08 — 名前空間：IIFE 冒頭の別名（レビュー4・trk77）：** 各 IIFE の先頭に `const core = window.Trk.core;` を置き、本文の `window.Trk.core.X` を `core.X` にした（32 ファイル、約 6,000 箇所。`core.js`・凍結の `fx.js`／`fx-presets.js` は対象外）。別名は同じオブジェクトを指すので、getter／setter の挙動は変わらない。読み込み順は `core.js` が先（別名を作るのは IIFE 実行時で、`core.js` より前に読まれるファイルは使わない）。構文・AST で置換したので、コメント・文字列には触れていない。**静的検査は別名を元の綴りへ戻して照合する**（`tools/lib/js-source.mjs` の `restoreCoreAlias`。check-repo／check-security／check-a11y／check-lite／check-study-room／check-mmd／globals-audit が使う）。戻した結果は変換前の HEAD と 32 件すべてビット一致（`/tmp` の往復検査）。棚卸しの数（1188／182／316、重複 0）は変わらない。**未確認**：実ブラウザでの起動（この環境に Chromium がない。`tools/smoke-browser.mjs` で別途確認）。
 - **2026-10-08 — 再レビュー（b7d88ad→6150725）の対応（trk75・trk76）：** ① 解析キャッシュを LRU 化（読み出しで `savedAt` を更新。テスト2件追加）。② `media.js` のコメント2件を修正（既定は `"2"`、decodeAudioData は再サンプル後の長さは減るがピークは減らない）。③ 静かな長い区間（レビュー1）：絶対音量ゲート（区間の平均音量が曲の最大の6%未満なら候補数の25%まで）を `chart-gen.js` に追加。合成曲 contrast の上級の静かな区間は 3.9→2.5 nps（Lv 10→9）。導入部（introChorus の 0〜30秒）・flat・silentLead は変わらない。**副作用**：contrast の上級・名人の総数が 562→459、768→459 に減る（盛り上がり側が候補の上限 7.9 nps に張り付くため）。テスト3件追加・1件の判定を変更（静かな区間の方が低いことを方向と下限で判定）。④ 互換名の廃止予定（レビュー4）：`docs/ADDONS.md` に 33 件を予告（trk76 から。trk76 から公開版を2回重ねた版で削除）。`tools/check-repo.mjs` が core.js の互換名と一覧の一致を検査。`const core` の別名導入は後回し（§9）。
 - **2026-10-08 — 今回の作業のまとめ（マージ前）：** ① IndexedDB：容量計算の索引の取り違えを修正（`5c93ef5`、`tests/idb.test.mjs` 13件）。② 解析結果のキャッシュを確定（`0761f72`、ヘッドレスで2回目のデコード0回・譜面一致・セーフモードは書かない）。③ 項目6：「📁 開く／📤 共有」の説明行（`15ea669`）。④ Loop Lab：区間の 🎬 で映像を書き出し（`e8fae4d`、開発者表示の中だけ）。⑤ 📺 TVドックの設定：壁掛け・並び替え・5枠化の3チェック、既定はくわしいが開いた状態、3つとも OFF（`04fb26e`）。⑥ Issue：#21・#22・#24・#25 を修正済みとして閉じ、#23 は安定版の追跡項目として閉じた。
 - **2026-10-08 — 残りの低優先（レビュー低）と軽量化の確認：** ① 見出しの飛び h1→h3 を解消（曲リストの見出しを h2、見た目は同じ）。② devDependency の typescript は削除せず注記（Capacitor CLI が `capacitor.config.ts` を読むのに必要。`docs/android.md`）。③ 実機確認の Issue フォーム（`device_check.yml`）。④ 軽量化の一通りの確認で、PC の自動モードでプリセットを選んでも働かなかった不具合を直した（プリセットを選んだら「オン」）。⑤ 解析キャッシュ（IndexedDB `trk_analysis_cache_v1`）を追加：保存は rms・onset・ratio の配列と数値だけ（PCM なし）。ratio を入れたのは、既定の譜面作り方が ratio を使い、外すと譜面が変わるため（利用者が選んだ）。

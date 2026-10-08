@@ -8,12 +8,13 @@
  * これは実ブラウザ・実機の代わりではありません（フォルダ取り込み・IndexedDB・タッチ操作は実機で確認してください）。
  */
 import assert from "node:assert/strict";
+import { restoreCoreAlias, sourceOf } from "./lib/js-source.mjs";
 import fs from "node:fs";
 import vm from "node:vm";
 
 // 名前空間 D：js/ の本文では領域の接頭辞 window.Trk.<領域>. を取り除いて照合する（window.Trk.overlay は残す）
 const read = rel => {
-  const text = fs.readFileSync(new URL(`../${rel}`, import.meta.url), "utf8");
+  const text = sourceOf(rel, fs.readFileSync(new URL(`../${rel}`, import.meta.url), "utf8"));
   return rel.startsWith("js/") ? text.replace(/window\.Trk\.(?!overlay\b)[A-Za-z]\w*\./g, "") : text;
 };
 const utilitySource = read("js/study-room-utils.js");

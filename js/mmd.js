@@ -13,9 +13,10 @@
    ========================================================================== */
 "use strict";
 (() => {
+  const core = window.Trk.core;
 const MB = 1048576, MAX_PMX = 120 * MB, MAX_VMD = 40 * MB, MAX_FILES = 400;
 const MMD_LIB = "@yohawing/three-mmd-loader";
-const mmdDB = window.Trk.core.idbStore("shadow_taiko_mmd", "files");     // 🆕 新しい保存先（既存のキーは変えません）
+const mmdDB = core.idbStore("shadow_taiko_mmd", "files");     // 🆕 新しい保存先（既存のキーは変えません）
 
 /* ============ 文章（接頭辞 mmd…） ============ */
 Object.assign(TEXT.ja, {
@@ -248,8 +249,8 @@ Object.assign(TEXT.ko, {
 });
 
 /* ============ 小さな道具 ============ */
-const status = (k, v) => window.Trk.core.setStatus("mmdStatus", k, v);
-const mmdRect = () => window.Trk.data.VRM_RECT[window.Trk.core.settings.layout] || window.Trk.data.VRM_RECT.classic;
+const status = (k, v) => core.setStatus("mmdStatus", k, v);
+const mmdRect = () => window.Trk.data.VRM_RECT[core.settings.layout] || window.Trk.data.VRM_RECT.classic;
 const safeNow = () => { try { return typeof window.TrkSafeMode === "function" && window.TrkSafeMode(); } catch (_) { return false; } };
 const isMmdFile = n => /\.(pmx|pmd)$/i.test(String(n || ""));
 const isVmdFile = n => /\.vmd$/i.test(String(n || ""));
@@ -1166,7 +1167,7 @@ async function findPresets() {
   renderPresetRow();
 }
 function renderPresetRow() {
-  const row = window.Trk.core.$("mmdPresetRow"), hint = window.Trk.core.$("mmdPresetHint");
+  const row = core.$("mmdPresetRow"), hint = core.$("mmdPresetHint");
   if (!row) return;
   row.textContent = "";
   for (const p of presets) {
@@ -1193,14 +1194,14 @@ async function doLoadPreset(p) {
       const blob = await res.blob();
       files.push(new File([blob], String(name).split("/").pop()));
     }
-    if (p.man.credit) window.Trk.core.settings.mmdCredit = String(p.man.credit).slice(0, 120);
+    if (p.man.credit) core.settings.mmdCredit = String(p.man.credit).slice(0, 120);
     await doLoadModel(files, { save:true, select:true });
     if (!model) return;                              // 失敗なら doLoadModel が理由を出している
     if (p.man.motion && BUILTIN[p.man.motion]) await applyMotion(p.man.motion, { silent:true });
-    if (typeof p.man.bpm === "number") window.Trk.core.settings.mmdMotionBpm = Math.max(0, Math.min(300, p.man.bpm));
-    window.Trk.core.settings.mascot = "mmd";
-    window.Trk.core.settings.mmdQuickUI = true;
-    window.Trk.core.saveUserPrefs(); syncUI(); renderQuick(); window.Trk.custom.updateMascotUI();
+    if (typeof p.man.bpm === "number") core.settings.mmdMotionBpm = Math.max(0, Math.min(300, p.man.bpm));
+    core.settings.mascot = "mmd";
+    core.settings.mmdQuickUI = true;
+    core.saveUserPrefs(); syncUI(); renderQuick(); window.Trk.custom.updateMascotUI();
   } catch (e) {
     console.error(e);
     status(e && e.key ? e.key : "mmdLoadError");
@@ -1208,12 +1209,12 @@ async function doLoadPreset(p) {
 }
 
 /* ============ 状態 ============ */
-const canvas = window.Trk.core.$("mmdCanvas"), prev = window.Trk.core.$("mmdPreview"), pctx = prev && prev.getContext("2d");
+const canvas = core.$("mmdCanvas"), prev = core.$("mmdPreview"), pctx = prev && prev.getContext("2d");
 let renderer = null, scene = null, camera = null, pivot = null;
 let L = null, injected = null;                     // L = { THREE, ThreeMmdLoader, createMmdFileIndex }
 let model = null, modelFiles = [], modelName = "", modelKey = "";
-const initialMotionKind = window.Trk.core.settings.mmdMotionKind === "auto" || window.Trk.core.settings.mmdMotionKind === "none" || BUILTIN[window.Trk.core.settings.mmdMotionKind]
-  ? window.Trk.core.settings.mmdMotionKind : "faceSing";
+const initialMotionKind = core.settings.mmdMotionKind === "auto" || core.settings.mmdMotionKind === "none" || BUILTIN[core.settings.mmdMotionKind]
+  ? core.settings.mmdMotionKind : "faceSing";
 let anim = null, motionKind = initialMotionKind, motionName = "", motionDur = 0;
 let frameInfo = null, fitScale = 1, lastT = 0, curKey = "", playing = false, clock = 0;
 
@@ -1259,16 +1260,16 @@ function measure() {
 }
 function applyModelTransform() {
   if (!model || !frameInfo) return;
-  const sc = fitScale * (window.Trk.core.settings.mmdScale || 1);
+  const sc = fitScale * (core.settings.mmdScale || 1);
   model.root.scale.setScalar(sc);
   model.root.position.y = -frameInfo.minY * sc;
-  pivot.rotation.y = (window.Trk.core.settings.mmdTurn || 0) * DEG;
+  pivot.rotation.y = (core.settings.mmdTurn || 0) * DEG;
   frameCamera();
 }
 function frameCamera() {
   if (!frameInfo || !camera || !L) return;
-  const h = Math.max(0.3, frameInfo.maxY - frameInfo.minY) * (window.Trk.core.settings.mmdScale || 1);
-  const fh = 1.6 * (window.Trk.core.settings.mmdScale || 1) * 1.15, cy = fh * 0.52;
+  const h = Math.max(0.3, frameInfo.maxY - frameInfo.minY) * (core.settings.mmdScale || 1);
+  const fh = 1.6 * (core.settings.mmdScale || 1) * 1.15, cy = fh * 0.52;
   const d = (fh / 2) / Math.tan(L.THREE.MathUtils.degToRad(camera.fov) / 2);
   camera.position.set(0, cy, d); camera.lookAt(0, cy, 0);
 }
@@ -1337,7 +1338,7 @@ async function doLoadModel(files, { restored = false, select = true, save = true
     await applyMotion(motionKind, { silent:true, fromRestore:true });
     status(restored ? "mmdRestored" : "mmdLoaded", { name:modelName });
     if (select) selectMmdMascot();
-    if (save && !restored && window.Trk.core.settings.mmdRemember) {
+    if (save && !restored && core.settings.mmdRemember) {
       const keep = files.filter(f => f.size < 60 * MB).slice(0, MAX_FILES);
       await mmdDB.put("model", { files:keep, main:main.name, name:modelName, savedAt:Date.now() })
         .catch(() => status("mmdSaveFail"));
@@ -1376,7 +1377,7 @@ async function applyMotion(kind, { silent = false, fromRestore = false } = {}) {
       motionDur = Math.max(0.5, frames / FPS); motionName = String(file.name).replace(/\.vmd$/i, "").slice(0, 60);
     }
     if (anim && model.setAnimation) model.setAnimation(anim);
-    if (!fromRestore && motionKind !== "file") { window.Trk.core.settings.mmdMotionKind = motionKind; window.Trk.core.saveUserPrefs(); }  // 選択を記憶（次回も同じモーション）
+    if (!fromRestore && motionKind !== "file") { core.settings.mmdMotionKind = motionKind; core.saveUserPrefs(); }  // 選択を記憶（次回も同じモーション）
     if (!fromRestore && !silent && motionKind === "file") status("mmdVmdLoaded", { name:motionName });
   } catch (e) {
     console.error(e);
@@ -1395,7 +1396,7 @@ async function doLoadMotion(file, { restored = false } = {}) {
   try { L = await libs(); } catch (_) { status("mmdNetError"); return; }
   motionFiles = [file];
   await applyMotion("file", { fromRestore:restored });
-  if (!restored && window.Trk.core.settings.mmdRemember) await mmdDB.put("motion", { file, name:file.name, savedAt:Date.now() }).catch(() => {});
+  if (!restored && core.settings.mmdRemember) await mmdDB.put("motion", { file, name:file.name, savedAt:Date.now() }).catch(() => {});
   renderMotionList();
 }
 const loadMotionFile = (file, opts) => enqueue(() => doLoadMotion(file, opts));
@@ -1404,12 +1405,12 @@ const loadMotionFile = (file, opts) => enqueue(() => doLoadMotion(file, opts));
 /* モーションの速さ：曲のBPM ÷ モーションの基準BPM。
    基準BPM（mmdBpm）が 0 のときは、内蔵モーションは自分の bpm で曲に自動シンク（持ち込みVMDは固定のまま）。
    👀 fixed:true のモーションと、🎲おまかせで選ばれた fixed は、いつも等速 */
-const songBpm = () => (typeof chartMeta !== "undefined" && window.Trk.core.chartMeta && window.Trk.core.chartMeta.bpm) || 0;
+const songBpm = () => (typeof chartMeta !== "undefined" && core.chartMeta && core.chartMeta.bpm) || 0;
 function motionRate() {
   const cur = BUILTIN[motionKind === "auto" ? autoId : motionKind];
   if (cur && cur.fixed) return 1;
   const own = (cur && cur.bpm) || 0;
-  const mb = window.Trk.core.settings.mmdMotionBpm || own, sb = songBpm();
+  const mb = core.settings.mmdMotionBpm || own, sb = songBpm();
   return (mb && sb) ? Math.min(3, Math.max(0.25, sb / mb)) : 1;
 }
 /* 🎲 おまかせ：曲のBPMにいちばん近い🎵（bpm持ちの内蔵）を選ぶ。曲のBPMが不明なら 👀みてる */
@@ -1441,11 +1442,11 @@ function animate(now) {
   }
   /* 🪶 軽量化：3Dマスコットの描画レートを下げる／「描画しない」ときは何も描かない */
   const mascotOff = typeof TrkLite === "object" && TrkLite.noMascot("mmd");
-  playing = !!model && phase !== "title" && window.Trk.core.activeMascot() === "mmd" && !mascotOff;
+  playing = !!model && phase !== "title" && core.activeMascot() === "mmd" && !mascotOff;
   canvas.hidden = !playing;
-  const panel = window.Trk.core.$("mmdPanel");
-  const previewOn = !!model && !mascotOff && phase === "title" && window.Trk.core.screen === "settings" && !!panel && panel.open && !!prev;
-  const quickOn = !!model && !mascotOff && phase === "title" && window.Trk.core.screen === "select" && window.Trk.core.settings.mmdQuickUI !== false && window.Trk.core.activeMascot() === "mmd" && !!quickPreview && !safeNow();
+  const panel = core.$("mmdPanel");
+  const previewOn = !!model && !mascotOff && phase === "title" && core.screen === "settings" && !!panel && panel.open && !!prev;
+  const quickOn = !!model && !mascotOff && phase === "title" && core.screen === "select" && core.settings.mmdQuickUI !== false && core.activeMascot() === "mmd" && !!quickPreview && !safeNow();
   if (!playing && !previewOn && !quickOn) { lastT = now; return; }
   if (typeof TrkLite === "object" && !TrkLite.mascotAllow("mmd", now)) return;
   const dt = Math.min(0.1, Math.max(0.001, (now - lastT) / 1000)); lastT = now;
@@ -1475,18 +1476,18 @@ let quickPanel = null, quickSeg = null, quickPickRow = null, quickSelect = null,
 let quickPreview = null, qpctx = null;
 let quickPickOpen = false;                           // 🎯タップでセレクトを開いたままにする
 const quickMode = () =>
-  window.Trk.core.settings.mascot === "none" ? "off" :
+  core.settings.mascot === "none" ? "off" :
   motionKind === "auto" ? "auto" :
   motionKind === "watch" ? "watch" : "pick";
 function buildQuickPanel() {
-  if (quickPanel || !window.Trk.core.$("playBtn")) return;
-  quickPanel = window.Trk.core.el("section", "panel"); quickPanel.id = "mmdQuickPanel"; quickPanel.hidden = true;
-  const head = window.Trk.core.el("div", "libHead"), title = window.Trk.core.el("h3");
+  if (quickPanel || !core.$("playBtn")) return;
+  quickPanel = core.el("section", "panel"); quickPanel.id = "mmdQuickPanel"; quickPanel.hidden = true;
+  const head = core.el("div", "libHead"), title = core.el("h3");
   title.id = "mmdQuickTitle"; title.style.margin = "0";
-  quickName = window.Trk.core.el("b", "mono"); head.append(title, quickName);
+  quickName = core.el("b", "mono"); head.append(title, quickName);
 
-  const body = window.Trk.core.el("div", "mmdQuickBody");
-  const cWrap = window.Trk.core.el("div", "mmdQuickCanvasWrap");
+  const body = core.el("div", "mmdQuickBody");
+  const cWrap = core.el("div", "mmdQuickCanvasWrap");
   quickPreview = document.createElement("canvas");
   quickPreview.id = "mmdQuickPreview";
   quickPreview.width = 240; quickPreview.height = 240;
@@ -1497,34 +1498,34 @@ function buildQuickPanel() {
   qpctx = quickPreview.getContext("2d");
   cWrap.append(quickPreview);
 
-  const ctrl = window.Trk.core.el("div", "mmdQuickControls");
-  quickSeg = window.Trk.core.el("div", "seg"); quickSeg.id = "mmdQuickSeg";
+  const ctrl = core.el("div", "mmdQuickControls");
+  quickSeg = core.el("div", "seg"); quickSeg.id = "mmdQuickSeg";
   for (const [mode, key] of [["watch", "mmdQuickWatch"], ["auto", "mmdQuickAuto"], ["pick", "mmdQuickPick"], ["off", "mmdQuickOff"]]) {
-    const b = window.Trk.core.el("button"); b.type = "button"; b.dataset.quick = mode; b.dataset.i18n = key;
+    const b = core.el("button"); b.type = "button"; b.dataset.quick = mode; b.dataset.i18n = key;
     b.addEventListener("click", () => quickTap(mode));
     quickSeg.append(b);
   }
-  quickPickRow = window.Trk.core.el("div", "inline tight"); quickPickRow.style.marginTop = "8px";
+  quickPickRow = core.el("div", "inline tight"); quickPickRow.style.marginTop = "8px";
   quickSelect = document.createElement("select"); quickSelect.id = "mmdQuickSelect"; quickSelect.style.flex = "1";
   quickSelect.addEventListener("change", () => { loadMotionKind(quickSelect.value); });
-  quickFavBtn = window.Trk.core.el("button"); quickFavBtn.type = "button"; quickFavBtn.id = "mmdQuickFav";
+  quickFavBtn = core.el("button"); quickFavBtn.type = "button"; quickFavBtn.id = "mmdQuickFav";
   quickFavBtn.addEventListener("click", () => {
     const id = (motionKind === "auto" ? "" : motionKind);
     if (!id || !BUILTIN[id]) return;
-    const favs = window.Trk.core.settings.mmdMotionFavs || [];
-    window.Trk.core.settings.mmdMotionFavs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id].slice(0, 50);
-    window.Trk.core.saveUserPrefs(); renderQuick();
+    const favs = core.settings.mmdMotionFavs || [];
+    core.settings.mmdMotionFavs = favs.includes(id) ? favs.filter(x => x !== id) : [...favs, id].slice(0, 50);
+    core.saveUserPrefs(); renderQuick();
   });
   quickPickRow.append(quickSelect, quickFavBtn);
   ctrl.append(quickSeg, quickPickRow);
   body.append(cWrap, ctrl);
   quickPanel.append(head, body);
-  (window.Trk.core.$("speedPanel") || window.Trk.core.$("playBtn")).after(quickPanel);
+  (core.$("speedPanel") || core.$("playBtn")).after(quickPanel);
 }
 function quickTap(mode) {
   quickPickOpen = (mode === "pick");
-  if (mode === "off") { window.Trk.core.settings.mascot = "none"; window.Trk.core.saveUserPrefs(); window.Trk.custom.updateMascotUI(); syncUI(); renderQuick(); return; }
-  if (window.Trk.core.settings.mascot !== "mmd" && model) { window.Trk.core.settings.mascot = "mmd"; window.Trk.core.saveUserPrefs(); window.Trk.custom.updateMascotUI(); syncUI(); }
+  if (mode === "off") { core.settings.mascot = "none"; core.saveUserPrefs(); window.Trk.custom.updateMascotUI(); syncUI(); renderQuick(); return; }
+  if (core.settings.mascot !== "mmd" && model) { core.settings.mascot = "mmd"; core.saveUserPrefs(); window.Trk.custom.updateMascotUI(); syncUI(); }
   if (mode === "watch") {                           // 👀 ひとやすみ
     loadMotionKind("watch");
   } else if (mode === "auto") loadMotionKind("auto");
@@ -1533,7 +1534,7 @@ function quickTap(mode) {
 }
 function renderQuick() {
   if (!quickPanel) return;
-  const show = !!model && window.Trk.core.settings.mmdQuickUI !== false && !safeNow();
+  const show = !!model && core.settings.mmdQuickUI !== false && !safeNow();
   quickPanel.hidden = !show;
   if (!show) return;
   const t = quickPanel.querySelector("#mmdQuickTitle"); if (t) t.textContent = tr("mmdQuickTitle");
@@ -1559,7 +1560,7 @@ function renderQuick() {
   }
   quickPickRow.hidden = mode !== "pick";
   if (mode === "pick") {
-    const favs = (window.Trk.core.settings.mmdMotionFavs || []).filter(id => MOTION_MENU_SET.has(id) || !!BUILTIN[id]);
+    const favs = (core.settings.mmdMotionFavs || []).filter(id => MOTION_MENU_SET.has(id) || !!BUILTIN[id]);
     quickSelect.textContent = "";
     const add = (val, text, group) => { const o = document.createElement("option"); o.value = val; o.textContent = text; (group || quickSelect).append(o); };
     if (favs.length) {
@@ -1581,10 +1582,10 @@ function renderQuick() {
     }
     if (motionKind === "file" || (anim && motionKind === "file")) add("file", "🎬 " + (motionName || "VMD"));
     quickSelect.value = (motionKind === "auto" || motionKind === "file") ? (quickSelect.querySelector(`option[value="${motionKind}"]`) ? motionKind : "none") : motionKind;
-    const fav = (window.Trk.core.settings.mmdMotionFavs || []).includes(motionKind);
+    const fav = (core.settings.mmdMotionFavs || []).includes(motionKind);
     quickFavBtn.textContent = fav ? "⭐" : "☆";
     quickFavBtn.title = tr("mmdQuickFavTip");
-    quickFavBtn.disabled = !MOTION_MENU_SET.has(motionKind) && !(window.Trk.core.settings.mmdMotionFavs || []).includes(motionKind);
+    quickFavBtn.disabled = !MOTION_MENU_SET.has(motionKind) && !(core.settings.mmdMotionFavs || []).includes(motionKind);
   }
 }
 
@@ -1651,7 +1652,7 @@ function copyText(t) {
   return false;
 }
 async function runCheck() {
-  const out = window.Trk.core.$("mmdCheckOut");
+  const out = core.$("mmdCheckOut");
   status("mmdCheckRunning");
   if (out) { out.hidden = false; out.textContent = tr("mmdCheckRunning"); }
   let r;
@@ -1666,15 +1667,15 @@ async function runCheck() {
 }
 
 function setAgreeUI() {
-  const on = !!window.Trk.core.settings.mmdAgreed;
+  const on = !!core.settings.mmdAgreed;
   for (const id of ["mmdModelFile", "mmdFolderFile", "mmdMotionFile"]) {
-    const inp = window.Trk.core.$(id); if (inp) inp.disabled = !on;
+    const inp = core.$(id); if (inp) inp.disabled = !on;
     const lab = inp && inp.closest("label"); if (lab) lab.classList.toggle("disabled", !on);
   }
 }
-function selectMmdMascot() { window.Trk.core.settings.mascot = "mmd"; window.Trk.core.saveUserPrefs(); window.Trk.custom.updateMascotUI(); status("mmdSelected"); }
+function selectMmdMascot() { core.settings.mascot = "mmd"; core.saveUserPrefs(); window.Trk.custom.updateMascotUI(); status("mmdSelected"); }
 function renderMotionList() {
-  const sel = window.Trk.core.$("mmdMotionSelect");
+  const sel = core.$("mmdMotionSelect");
   if (!sel) return;
   const keep = motionKind;
   sel.textContent = "";
@@ -1696,105 +1697,105 @@ function renderMotionList() {
   renderQuick();                                     // 🩷 選曲画面のミニ操作も同じタイミングで更新
 }
 function syncUI() {
-  const box = window.Trk.core.$("mmdInfo");
+  const box = core.$("mmdInfo");
   if (box) {
     box.textContent = "";
-    const add = (k, v) => { const d = window.Trk.core.el("div", "", `${tr(k)}: ${v}`); box.append(d); };
+    const add = (k, v) => { const d = core.el("div", "", `${tr(k)}: ${v}`); box.append(d); };
     if (modelName) add("mmdModelHead", modelName);
     if (motionName) add("mmdMotionHead", motionName);
-    if (!modelName && !motionName) box.append(window.Trk.core.el("div", "hint", tr("mmdHint")));
+    if (!modelName && !motionName) box.append(core.el("div", "hint", tr("mmdHint")));
   }
-  const size = window.Trk.core.$("mmdSize"), sizeVal = window.Trk.core.$("mmdSizeVal");
-  if (size) { size.value = window.Trk.core.settings.mmdScale; if (sizeVal) sizeVal.textContent = Math.round(window.Trk.core.settings.mmdScale * 100) + "%"; }
-  const turn = window.Trk.core.$("mmdTurn"), turnVal = window.Trk.core.$("mmdTurnVal");
-  if (turn) { turn.value = window.Trk.core.settings.mmdTurn; if (turnVal) turnVal.textContent = window.Trk.core.settings.mmdTurn + "°"; }
-  const mb = window.Trk.core.$("mmdBpm"); if (mb) mb.value = window.Trk.core.settings.mmdMotionBpm;
-  const cr = window.Trk.core.$("mmdCredit"); if (cr && document.activeElement !== cr) cr.value = window.Trk.core.settings.mmdCredit || "";
-  const rem = window.Trk.core.$("mmdRemember"); if (rem) rem.checked = window.Trk.core.settings.mmdRemember !== false;
-  const qui = window.Trk.core.$("mmdQuickUI"); if (qui) qui.checked = window.Trk.core.settings.mmdQuickUI !== false && window.Trk.core.settings.mascot === "mmd";
-  const ag = window.Trk.core.$("mmdAgree"); if (ag) ag.checked = !!window.Trk.core.settings.mmdAgreed;
+  const size = core.$("mmdSize"), sizeVal = core.$("mmdSizeVal");
+  if (size) { size.value = core.settings.mmdScale; if (sizeVal) sizeVal.textContent = Math.round(core.settings.mmdScale * 100) + "%"; }
+  const turn = core.$("mmdTurn"), turnVal = core.$("mmdTurnVal");
+  if (turn) { turn.value = core.settings.mmdTurn; if (turnVal) turnVal.textContent = core.settings.mmdTurn + "°"; }
+  const mb = core.$("mmdBpm"); if (mb) mb.value = core.settings.mmdMotionBpm;
+  const cr = core.$("mmdCredit"); if (cr && document.activeElement !== cr) cr.value = core.settings.mmdCredit || "";
+  const rem = core.$("mmdRemember"); if (rem) rem.checked = core.settings.mmdRemember !== false;
+  const qui = core.$("mmdQuickUI"); if (qui) qui.checked = core.settings.mmdQuickUI !== false && core.settings.mascot === "mmd";
+  const ag = core.$("mmdAgree"); if (ag) ag.checked = !!core.settings.mmdAgreed;
   setAgreeUI(); renderMotionList();
 }
 
 addEventListener("DOMContentLoaded", () => {
-  if (!canvas || !window.Trk.core.$("mmdPanel")) return;
+  if (!canvas || !core.$("mmdPanel")) return;
   buildQuickPanel();                                 // 🩷 選曲画面のミニ操作（モデルが来るまで hidden）
 
-  window.Trk.core.$("mmdAgree").addEventListener("change", e => {
-    window.Trk.core.settings.mmdAgreed = !!e.target.checked; window.Trk.core.saveUserPrefs(); setAgreeUI();
-    if (window.Trk.core.settings.mmdAgreed) status("mmdHint"); else status("mmdNoAgree");
+  core.$("mmdAgree").addEventListener("change", e => {
+    core.settings.mmdAgreed = !!e.target.checked; core.saveUserPrefs(); setAgreeUI();
+    if (core.settings.mmdAgreed) status("mmdHint"); else status("mmdNoAgree");
   });
-  window.Trk.core.$("mmdModelFile").addEventListener("change", e => {
+  core.$("mmdModelFile").addEventListener("change", e => {
     const f = e.target.files && e.target.files[0]; e.target.value = "";
     if (!f) return;
-    if (!window.Trk.core.settings.mmdAgreed) { status("mmdNoAgree"); return; }
+    if (!core.settings.mmdAgreed) { status("mmdNoAgree"); return; }
     if (!isMmdFile(f.name)) { status("mmdNotMmd"); return; }
     motionFiles = null;
     loadModelFiles([f]);
   });
-  window.Trk.core.$("mmdFolderFile").addEventListener("change", e => {
+  core.$("mmdFolderFile").addEventListener("change", e => {
     const files = [...(e.target.files || [])]; e.target.value = "";
-    if (!window.Trk.core.settings.mmdAgreed) { status("mmdNoAgree"); return; }
+    if (!core.settings.mmdAgreed) { status("mmdNoAgree"); return; }
     if (!files.length) { status("mmdFilesEmpty"); return; }
     motionFiles = null;
     loadModelFiles(files);
   });
-  window.Trk.core.$("mmdMotionFile").addEventListener("change", e => {
+  core.$("mmdMotionFile").addEventListener("change", e => {
     const f = e.target.files && e.target.files[0]; e.target.value = "";
     if (!f) return;
-    if (!window.Trk.core.settings.mmdAgreed) { status("mmdNoAgree"); return; }
+    if (!core.settings.mmdAgreed) { status("mmdNoAgree"); return; }
     loadMotionFile(f);
   });
-  window.Trk.core.$("mmdMotionSelect").addEventListener("change", e => loadMotionKind(e.target.value));
-  window.Trk.core.$("mmdClearModel").addEventListener("click", () => {
+  core.$("mmdMotionSelect").addEventListener("change", e => loadMotionKind(e.target.value));
+  core.$("mmdClearModel").addEventListener("click", () => {
     disposeModel(); motionKind = "none"; anim = null; motionDur = 0; motionName = "";
     canvas.hidden = true; motionFiles = null;
     mmdDB.del("model").catch(() => {}); mmdDB.del("motion").catch(() => {});
     syncUI(); status("mmdClearModel");
   });
-  window.Trk.core.$("mmdClearMotion").addEventListener("click", () => {
+  core.$("mmdClearMotion").addEventListener("click", () => {
     motionFiles = null; motionKind = "none"; anim = null; motionDur = 0; motionName = "";
     mmdDB.del("motion").catch(() => {});
     syncUI(); status("mmdClearMotion");
   });
-  window.Trk.core.$("mmdSize").addEventListener("input", e => { window.Trk.core.settings.mmdScale = Number(e.target.value) || 1; window.Trk.core.$("mmdSizeVal").textContent = Math.round(window.Trk.core.settings.mmdScale * 100) + "%"; });
-  window.Trk.core.$("mmdSize").addEventListener("change", () => window.Trk.core.saveUserPrefs());
-  window.Trk.core.$("mmdTurn").addEventListener("input", e => { window.Trk.core.settings.mmdTurn = Number(e.target.value) || 0; window.Trk.core.$("mmdTurnVal").textContent = window.Trk.core.settings.mmdTurn + "°"; });
-  window.Trk.core.$("mmdTurn").addEventListener("change", () => window.Trk.core.saveUserPrefs());
-  window.Trk.core.$("mmdBpm").addEventListener("change", e => { window.Trk.core.settings.mmdMotionBpm = Math.max(0, Math.min(300, Number(e.target.value) || 0)); window.Trk.core.saveUserPrefs(); });
-  window.Trk.core.$("mmdCredit").addEventListener("input", e => { window.Trk.core.settings.mmdCredit = String(e.target.value).slice(0, 120); });
-  window.Trk.core.$("mmdCredit").addEventListener("change", () => window.Trk.core.saveUserPrefs());
-  window.Trk.core.$("mmdRemember").addEventListener("change", e => {
-    window.Trk.core.settings.mmdRemember = !!e.target.checked; window.Trk.core.saveUserPrefs();
-    if (!window.Trk.core.settings.mmdRemember) { mmdDB.del("model").catch(() => {}); mmdDB.del("motion").catch(() => {}); }
+  core.$("mmdSize").addEventListener("input", e => { core.settings.mmdScale = Number(e.target.value) || 1; core.$("mmdSizeVal").textContent = Math.round(core.settings.mmdScale * 100) + "%"; });
+  core.$("mmdSize").addEventListener("change", () => core.saveUserPrefs());
+  core.$("mmdTurn").addEventListener("input", e => { core.settings.mmdTurn = Number(e.target.value) || 0; core.$("mmdTurnVal").textContent = core.settings.mmdTurn + "°"; });
+  core.$("mmdTurn").addEventListener("change", () => core.saveUserPrefs());
+  core.$("mmdBpm").addEventListener("change", e => { core.settings.mmdMotionBpm = Math.max(0, Math.min(300, Number(e.target.value) || 0)); core.saveUserPrefs(); });
+  core.$("mmdCredit").addEventListener("input", e => { core.settings.mmdCredit = String(e.target.value).slice(0, 120); });
+  core.$("mmdCredit").addEventListener("change", () => core.saveUserPrefs());
+  core.$("mmdRemember").addEventListener("change", e => {
+    core.settings.mmdRemember = !!e.target.checked; core.saveUserPrefs();
+    if (!core.settings.mmdRemember) { mmdDB.del("model").catch(() => {}); mmdDB.del("motion").catch(() => {}); }
   });
 
-  const qui = window.Trk.core.$("mmdQuickUI");
+  const qui = core.$("mmdQuickUI");
   if (qui) qui.addEventListener("change", async e => {
     const on = !!e.target.checked;
-    window.Trk.core.settings.mmdQuickUI = on;
+    core.settings.mmdQuickUI = on;
     if (on) {
       if (!model && presets.length) {
         await doLoadPreset(presets[0]);
         return;
       }
       if (model) {
-        window.Trk.core.settings.mascot = "mmd";
+        core.settings.mascot = "mmd";
         window.Trk.custom.updateMascotUI();
       }
     } else {
-      if (window.Trk.core.settings.mascot === "mmd") {
-        window.Trk.core.settings.mascot = "none";
+      if (core.settings.mascot === "mmd") {
+        core.settings.mascot = "none";
         window.Trk.custom.updateMascotUI();
       }
     }
-    window.Trk.core.saveUserPrefs();
+    core.saveUserPrefs();
     syncUI();
     renderQuick();
   });
 
-  window.Trk.core.$("mmdCheckBtn").addEventListener("click", () => { enqueue(runCheck); });
-  window.Trk.core.$("mmdCopyBtn").addEventListener("click", () => {
+  core.$("mmdCheckBtn").addEventListener("click", () => { enqueue(runCheck); });
+  core.$("mmdCopyBtn").addEventListener("click", () => {
     if (!lastCheck) { enqueue(async () => { await runCheck(); copyText(lastCheck); }); return; }
     copyText(lastCheck);
   });
@@ -1806,15 +1807,15 @@ addEventListener("DOMContentLoaded", () => {
      そのかわり、下の3つのどれかで読みに行きます＝①MMDをマスコットに選んだ ②この欄を開いた
      ③端末の判定し直しなどで軽量化が外れた。ファイルで直接選んだ読み込みはいつもどおりです */
   function restoreRemembered() {
-    if (model || !window.Trk.core.settings.mmdRemember || safeNow()) return;
+    if (model || !core.settings.mmdRemember || safeNow()) return;
     if (typeof TrkLite === "object" && TrkLite.mascotNoLoad && TrkLite.mascotNoLoad()) return;
     enqueue(async () => {
       if (model) return;
       try {
         const rec = await mmdDB.get("model");
         if (rec && rec.files && rec.files.length) {
-          window.Trk.core.settings.mmdAgreed = true; syncUI();
-          const keep = window.Trk.core.settings.mmdMotionKind;                           // 記憶したモーション（none/auto/内蔵）
+          core.settings.mmdAgreed = true; syncUI();
+          const keep = core.settings.mmdMotionKind;                           // 記憶したモーション（none/auto/内蔵）
           if (keep && (keep === "auto" || BUILTIN[keep])) motionKind = keep;
           await doLoadModel(rec.files, { restored:true, select:false, save:false });
           const m = await mmdDB.get("motion");
@@ -1828,8 +1829,8 @@ addEventListener("DOMContentLoaded", () => {
   enqueue(findPresets);                              // 💠 同梱モデルがあればボタンを出す（無ければ何もしない）
   restoreRemembered();
   on("lite", () => restoreRemembered());            // 🪶 軽量化の設定を変えたら、その場で読み直す
-  on("mascot", () => { if (window.Trk.core.activeMascot() === "mmd") restoreRemembered(); });
-  window.Trk.core.$("mmdPanel").addEventListener("toggle", () => { if (window.Trk.core.$("mmdPanel").open) restoreRemembered(); });
+  on("mascot", () => { if (core.activeMascot() === "mmd") restoreRemembered(); });
+  core.$("mmdPanel").addEventListener("toggle", () => { if (core.$("mmdPanel").open) restoreRemembered(); });
 });
 
 function loadMotionKind(kind) {
@@ -1872,7 +1873,7 @@ window.TrkMMD = {
   isPlaying: () => playing,
   clock: () => clock,
   rate: motionRate,
-  info: () => ({ model:modelName, motion:motionName, kind:motionKind, dur:motionDur, scale:window.Trk.core.settings.mmdScale, turn:window.Trk.core.settings.mmdTurn, agreed:!!window.Trk.core.settings.mmdAgreed })
+  info: () => ({ model:modelName, motion:motionName, kind:motionKind, dur:motionDur, scale:core.settings.mmdScale, turn:core.settings.mmdTurn, agreed:!!core.settings.mmdAgreed })
 };
 })();
 /* ✅ mmd.js 完了 */

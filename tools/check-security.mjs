@@ -18,12 +18,13 @@
  * 実行: node tools/check-security.mjs
  */
 import fs from "node:fs";
+import { restoreCoreAlias, sourceOf } from "./lib/js-source.mjs";
 import path from "node:path";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const read = rel => fs.readFileSync(path.join(root, rel), "utf8");
+const read = rel => sourceOf(rel, fs.readFileSync(path.join(root, rel), "utf8"));
 const exists = rel => fs.existsSync(path.join(root, rel));
 const jsFiles = fs.readdirSync(path.join(root, "js")).filter(f => f.endsWith(".js"));
 /* 名前空間 D：js/ の本文では領域の接頭辞 window.Trk.<領域>. を取り除いて照合する（window.Trk.overlay は残す） */

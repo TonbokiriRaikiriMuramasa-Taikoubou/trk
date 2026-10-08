@@ -1,4 +1,5 @@
 (() => {
+  const core = window.Trk.core;
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ 📚 書斎：端末内の画像・文章リーダー ============
    ・取り込んだ本・栞・ジャケットは、この端末の中（IndexedDB trk_study_room_v1）だけに置きます。
@@ -595,14 +596,14 @@ function studyFail(error, fallbackKey) {
 }
 
 /* ============ 状態表示・設定 ============ */
-function studySetStatus(key, vars) { if (typeof setStatus === "function") window.Trk.core.setStatus("studyStatus", key, vars); }
+function studySetStatus(key, vars) { if (typeof setStatus === "function") core.setStatus("studyStatus", key, vars); }
 function studyNotify(key, vars) { studySetStatus(key, vars); if (typeof showToast === "function") window.Trk.play.showToast(tr(key, vars)); }
 function studyApplyShelfVisibility() {
   const visible = studyPrefs.shelfVisible !== false;
-  window.Trk.core.$("studyShelf").hidden = !visible;
-  window.Trk.core.$("studyRoom").classList.toggle("study-shelf-hidden", !visible);
-  window.Trk.core.$("studyShelfVisible").checked = visible;
-  const button = window.Trk.core.$("studyShowShelfBtn");
+  core.$("studyShelf").hidden = !visible;
+  core.$("studyRoom").classList.toggle("study-shelf-hidden", !visible);
+  core.$("studyShelfVisible").checked = visible;
+  const button = core.$("studyShowShelfBtn");
   button.hidden = visible;
   button.setAttribute("aria-expanded", String(visible));
 }
@@ -618,9 +619,9 @@ function studySetKeyCapture(action) {
 }
 function studyRefreshKeyAssignments() {
   for (const action of ["next", "previous"]) {
-    const isNext = action === "next", button = window.Trk.core.$(isNext ? "studyNextKeyBtn" : "studyPreviousKeyBtn");
-    const value = window.Trk.core.$(isNext ? "studyNextKeyValue" : "studyPreviousKeyValue");
-    const actionNode = window.Trk.core.$(isNext ? "studyNextKeyAction" : "studyPreviousKeyAction");
+    const isNext = action === "next", button = core.$(isNext ? "studyNextKeyBtn" : "studyPreviousKeyBtn");
+    const value = core.$(isNext ? "studyNextKeyValue" : "studyPreviousKeyValue");
+    const actionNode = core.$(isNext ? "studyNextKeyAction" : "studyPreviousKeyAction");
     const code = studyPrefs[isNext ? "studyNextKey" : "studyPreviousKey"];
     const label = tr(isNext ? "studyNextKeyLabel" : "studyPreviousKeyLabel"), capturing = studyKeyCaptureAction === action;
     value.textContent = capturing ? "…" : studyKeyCodeLabel(code);
@@ -686,7 +687,7 @@ function studySavePrefs() {
     .catch(error => { studyFail(error); });
 }
 function studyRefreshEditedTextFolderSelect() {
-  const select = window.Trk.core.$("studyEditedTextFolder"), previous = studyPrefs.editedTextFolderId;
+  const select = core.$("studyEditedTextFolder"), previous = studyPrefs.editedTextFolderId;
   select.textContent = "";
   const keep = document.createElement("option"); keep.value = ""; keep.textContent = tr("studyEditedTextFolderKeep"); select.append(keep);
   const folders = [...studyShelfFolders].sort((a, b) => STUDY_UTIL.comparePath(a.name, b.name));
@@ -702,9 +703,9 @@ function studyCanChooseExportFolder() {
   return !!(window.isSecureContext && window.self === window.top && typeof window.showDirectoryPicker === "function");
 }
 function studyRefreshExportFolderUI() {
-  window.Trk.core.$("studyChooseExportFolderBtn").hidden = !studyCanChooseExportFolder();
-  window.Trk.core.$("studyClearExportFolderBtn").hidden = !studyExportDirectory;
-  window.Trk.core.$("studyExportFolderName").textContent = studyExportDirectory
+  core.$("studyChooseExportFolderBtn").hidden = !studyCanChooseExportFolder();
+  core.$("studyClearExportFolderBtn").hidden = !studyExportDirectory;
+  core.$("studyExportFolderName").textContent = studyExportDirectory
     ? tr("studyExportFolderSelected", { name:studyExportDirectory.name }) : tr("studyExportFolderNone");
 }
 function studyReadShelfMeta(raw) {
@@ -823,7 +824,7 @@ function studyShelfFolderSizes() {
 }
 /* 見た目の設定（TVの枠・文字サイズ・拡大率）をDOMへ反映する。 */
 function studySyncLook() {
-  const screen = window.Trk.core.$("studyTvScreen");
+  const screen = core.$("studyTvScreen");
   if (screen) {
     screen.dataset.look = studyPrefs.tvLook;
     screen.dataset.size = studyPrefs.tvSize;
@@ -832,35 +833,35 @@ function studySyncLook() {
     screen.style.setProperty("--study-tv-width", STUDY_TV_WIDTH[studyPrefs.tvSize] || "100%");
     screen.style.setProperty("--study-tv-ratio", STUDY_TV_RATIO[studyPrefs.tvRatio] || STUDY_TV_RATIO["16:9"]);
   }
-  const label = window.Trk.core.$("studyTvLabel");
+  const label = core.$("studyTvLabel");
   if (label) label.hidden = !studyPrefs.tvLabelOn;
-  const stage = window.Trk.core.$("studyTextStage");
+  const stage = core.$("studyTextStage");
   stage.style.setProperty("--study-text-size", String(STUDY_TEXT_SIZE[studyPrefs.textSize] || 1));
   stage.style.setProperty("--study-text-leading", String(STUDY_TEXT_LEADING[studyPrefs.textSpacing] || 1.9));
   stage.style.setProperty("--study-text-pad", String(STUDY_TEXT_PAD[studyPrefs.textWidth] || 1));
   studyApplyZoom(false);
 }
 function studyRefreshPrefsUI() {
-  window.Trk.core.$("studyImageMode").value = studyPrefs.imageMode;
-  window.Trk.core.$("studyImageOrder").value = studyPrefs.imageOrder;
-  window.Trk.core.$("studyAmerican").checked = studyPrefs.american;
-  window.Trk.core.$("studyTheme").value = studyPrefs.theme;
-  window.Trk.core.$("studyTextSize").value = studyPrefs.textSize;
-  window.Trk.core.$("studyTextSpacing").value = studyPrefs.textSpacing;
-  window.Trk.core.$("studyTextWidth").value = studyPrefs.textWidth;
-  window.Trk.core.$("studyTvCheck").checked = studyPrefs.tvEnabled;
-  window.Trk.core.$("studyTvPosition").value = studyPrefs.tvPosition;
-  window.Trk.core.$("studyTvLook").value = studyPrefs.tvLook;
-  window.Trk.core.$("studyTvSize").value = studyPrefs.tvSize;
-  window.Trk.core.$("studyTvRatio").value = studyPrefs.tvRatio;
-  window.Trk.core.$("studyTvLabelOn").checked = studyPrefs.tvLabelOn;
-  window.Trk.core.$("studyShelfSort").value = studyPrefs.shelfSort;
-  window.Trk.core.$("studyAlbumNesting").value = studyPrefs.albumNesting;
-  window.Trk.core.$("studyManualShelfOrder").checked = studyPrefs.manualShelfOrder;
-  window.Trk.core.$("studyFoldersFirst").checked = studyPrefs.foldersFirst;
-  window.Trk.core.$("studySkipDeleteConfirm").checked = studyPrefs.skipDeleteConfirm;
-  window.Trk.core.$("studyVerticalImageKeys").checked = studyPrefs.verticalImageKeys;
-  window.Trk.core.$("studyShelfSort").disabled = studyPrefs.manualShelfOrder;
+  core.$("studyImageMode").value = studyPrefs.imageMode;
+  core.$("studyImageOrder").value = studyPrefs.imageOrder;
+  core.$("studyAmerican").checked = studyPrefs.american;
+  core.$("studyTheme").value = studyPrefs.theme;
+  core.$("studyTextSize").value = studyPrefs.textSize;
+  core.$("studyTextSpacing").value = studyPrefs.textSpacing;
+  core.$("studyTextWidth").value = studyPrefs.textWidth;
+  core.$("studyTvCheck").checked = studyPrefs.tvEnabled;
+  core.$("studyTvPosition").value = studyPrefs.tvPosition;
+  core.$("studyTvLook").value = studyPrefs.tvLook;
+  core.$("studyTvSize").value = studyPrefs.tvSize;
+  core.$("studyTvRatio").value = studyPrefs.tvRatio;
+  core.$("studyTvLabelOn").checked = studyPrefs.tvLabelOn;
+  core.$("studyShelfSort").value = studyPrefs.shelfSort;
+  core.$("studyAlbumNesting").value = studyPrefs.albumNesting;
+  core.$("studyManualShelfOrder").checked = studyPrefs.manualShelfOrder;
+  core.$("studyFoldersFirst").checked = studyPrefs.foldersFirst;
+  core.$("studySkipDeleteConfirm").checked = studyPrefs.skipDeleteConfirm;
+  core.$("studyVerticalImageKeys").checked = studyPrefs.verticalImageKeys;
+  core.$("studyShelfSort").disabled = studyPrefs.manualShelfOrder;
   studyRefreshEditedTextFolderSelect(); studyRefreshExportFolderUI();
   studyApplyShelfVisibility();
   studyRefreshKeyAssignments();
@@ -973,8 +974,8 @@ function studyShelfMoveItem(drag, destination, reference, after) {
     if (targetIndex >= 0) index = targetIndex + (after ? 1 : 0);
   }
   to.splice(index, 0, key);
-  const scrollTop = window.Trk.core.$("studyShelfList").scrollTop;
-  studySaveShelfMeta(); studyRenderShelf(); window.Trk.core.$("studyShelfList").scrollTop = scrollTop; studySetStatus("studyShelfMoved");
+  const scrollTop = core.$("studyShelfList").scrollTop;
+  studySaveShelfMeta(); studyRenderShelf(); core.$("studyShelfList").scrollTop = scrollTop; studySetStatus("studyShelfMoved");
 }
 function studyShelfDrop(event, target) {
   const drag = studyShelfDragged;
@@ -991,7 +992,7 @@ function studyShelfDrop(event, target) {
   } else if (target.type === "container" && target.folderId) destination = target.folderId;
   studyShelfMoveItem(drag, destination, reference, after);
   studyShelfDragged = null;
-  window.Trk.core.$("studyShelfList").classList.remove("study-drop-target");
+  core.$("studyShelfList").classList.remove("study-drop-target");
 }
 function studyBindShelfDropTarget(node, target) {
   target.node = node;
@@ -1012,7 +1013,7 @@ function studyShelfTargetAt(x, y) {
   return list ? { type:"container", folderId:studyShelfViewFolder, node:list } : null;
 }
 function studyHighlightShelfTarget(x, y) {
-  const list = window.Trk.core.$("studyShelfList");
+  const list = core.$("studyShelfList");
   for (const node of list.querySelectorAll(".study-drop-target")) node.classList.remove("study-drop-target");
   list.classList.remove("study-drop-target");
   const target = studyShelfTargetAt(x, y);
@@ -1020,7 +1021,7 @@ function studyHighlightShelfTarget(x, y) {
   return target;
 }
 function studyShelfDragHandle(type, id, sourceFolder, card) {
-  const handle = window.Trk.core.el("button", "study-tool-btn study-drag-handle", "⋮⋮");
+  const handle = core.el("button", "study-tool-btn study-drag-handle", "⋮⋮");
   handle.type = "button";
   handle.draggable = type === "folder" ? studyPrefs.manualShelfOrder : studyPrefs.manualShelfOrder || studyShelfFolders.length > 0;
   handle.hidden = !handle.draggable;
@@ -1055,8 +1056,8 @@ function studyShelfDragHandle(type, id, sourceFolder, card) {
       }
       studyShelfDragged = null; handle.draggable = originalDraggable;
       card.classList.remove("study-dragging");
-      for (const node of window.Trk.core.$("studyShelfList").querySelectorAll(".study-drop-target")) node.classList.remove("study-drop-target");
-      window.Trk.core.$("studyShelfList").classList.remove("study-drop-target");
+      for (const node of core.$("studyShelfList").querySelectorAll(".study-drop-target")) node.classList.remove("study-drop-target");
+      core.$("studyShelfList").classList.remove("study-drop-target");
     };
     const cancel = cancelEvent => finish(cancelEvent);
     document.addEventListener("pointermove", move, { passive:false });
@@ -1075,87 +1076,87 @@ function studyShelfDragHandle(type, id, sourceFolder, card) {
   });
   handle.addEventListener("dragend", () => {
     studyShelfDragged = null;
-    for (const node of window.Trk.core.$("studyShelfList").querySelectorAll(".study-dragging,.study-drop-target")) node.classList.remove("study-dragging", "study-drop-target");
-    window.Trk.core.$("studyShelfList").classList.remove("study-drop-target");
+    for (const node of core.$("studyShelfList").querySelectorAll(".study-dragging,.study-drop-target")) node.classList.remove("study-dragging", "study-drop-target");
+    core.$("studyShelfList").classList.remove("study-drop-target");
   });
   return handle;
 }
 function studyRenderFolderCard(folder) {
-  const card = window.Trk.core.el("article", "study-folder-card");
+  const card = core.el("article", "study-folder-card");
   card.dataset.studyItemType = "folder"; card.dataset.studyItemId = folder.id;
-  const open = window.Trk.core.el("button", "study-folder-open"); open.type = "button";
-  const copy = window.Trk.core.el("span", "study-book-copy");
-  copy.append(window.Trk.core.el("strong", "study-book-title", folder.name), window.Trk.core.el("span", "study-book-sub", tr("studyFolderCount", { n:studyBooks.filter(book => studyBookFolderId(book.id) === folder.id).length })));
-  open.append(window.Trk.core.el("span", "study-folder-icon", "📁"), copy); open.title = tr("studyFolderOpen");
+  const open = core.el("button", "study-folder-open"); open.type = "button";
+  const copy = core.el("span", "study-book-copy");
+  copy.append(core.el("strong", "study-book-title", folder.name), core.el("span", "study-book-sub", tr("studyFolderCount", { n:studyBooks.filter(book => studyBookFolderId(book.id) === folder.id).length })));
+  open.append(core.el("span", "study-folder-icon", "📁"), copy); open.title = tr("studyFolderOpen");
   open.setAttribute("aria-label", `${tr("studyFolderOpen")}: ${folder.name}`);
   open.addEventListener("click", () => {
-    studyShelfViewFolder = folder.id; studyShelfShown = STUDY_SHELF_PAGE; window.Trk.core.$("studySearch").value = ""; studyRenderShelf();
-    const back = window.Trk.core.$("studyShelfList").querySelector(".study-shelf-back"); if (back) back.focus({ preventScroll:true });
+    studyShelfViewFolder = folder.id; studyShelfShown = STUDY_SHELF_PAGE; core.$("studySearch").value = ""; studyRenderShelf();
+    const back = core.$("studyShelfList").querySelector(".study-shelf-back"); if (back) back.focus({ preventScroll:true });
   });
-  const tools = window.Trk.core.el("span", "study-book-tools");
+  const tools = core.el("span", "study-book-tools");
   tools.append(studyShelfDragHandle("folder", folder.id, "", card));
-  const rename = window.Trk.core.el("button", "study-tool-btn", "✎"); rename.type = "button"; rename.title = tr("studyFolderRename");
+  const rename = core.el("button", "study-tool-btn", "✎"); rename.type = "button"; rename.title = tr("studyFolderRename");
   rename.setAttribute("aria-label", `${tr("studyFolderRename")}: ${folder.name}`); rename.addEventListener("click", () => studyRenameFolder(folder));
-  const remove = window.Trk.core.el("button", "study-tool-btn study-delete-btn", "×"); remove.type = "button"; remove.title = tr("studyFolderDelete");
+  const remove = core.el("button", "study-tool-btn study-delete-btn", "×"); remove.type = "button"; remove.title = tr("studyFolderDelete");
   remove.setAttribute("aria-label", `${tr("studyFolderDelete")}: ${folder.name}`); remove.addEventListener("click", () => studyDeleteFolder(folder));
   tools.append(rename, remove); card.append(open, tools);
   studyBindShelfDropTarget(card, { type:"folder", id:folder.id });
   return card;
 }
 function studyRenderBookCard(book) {
-  const card = window.Trk.core.el("article", "study-book-card"), folderId = studyBookFolderId(book.id), folder = studyFolderById(folderId);
+  const card = core.el("article", "study-book-card"), folderId = studyBookFolderId(book.id), folder = studyFolderById(folderId);
   card.dataset.studyItemType = "book"; card.dataset.studyItemId = book.id; card.dataset.studyFolderId = folderId;
-  const open = window.Trk.core.el("button", "study-book-open"); open.type = "button";
-  const icon = window.Trk.core.el("span", "study-book-icon", book.kind === "image" ? "🖼" : "📄");
-  const text = window.Trk.core.el("span", "study-book-copy");
-  const title = window.Trk.core.el("strong", "study-book-title", book.title);
+  const open = core.el("button", "study-book-open"); open.type = "button";
+  const icon = core.el("span", "study-book-icon", book.kind === "image" ? "🖼" : "📄");
+  const text = core.el("span", "study-book-copy");
+  const title = core.el("strong", "study-book-title", book.title);
   const detail = book.kind === "image" ? `${tr("studyBookImages")} · ${tr("studyPageCount", { n:book.pages.length })}`
     : `${tr("studyBookText")} · ${String(book.extension || "TXT").toUpperCase()} · ${tr("studyTextStats", STUDY_UTIL.textStats(book.content))}`;
-  const sub = window.Trk.core.el("span", "study-book-sub", detail + (folder ? ` · 📁 ${folder.name}` : "") + (book.bookmark ? " · 🔖" : ""));
+  const sub = core.el("span", "study-book-sub", detail + (folder ? ` · 📁 ${folder.name}` : "") + (book.bookmark ? " · 🔖" : ""));
   text.append(title, sub);
   if (book.kind === "text" && book.content) {
     const ratio = book.bookmark && book.bookmark.ratio ? book.bookmark.ratio : 0;
-    text.append(window.Trk.core.el("span", "study-book-snippet", STUDY_UTIL.snippetAt(book.content, ratio, 64)));
+    text.append(core.el("span", "study-book-snippet", STUDY_UTIL.snippetAt(book.content, ratio, 64)));
   }
   open.append(icon, text); open.title = tr("studyOpen"); open.addEventListener("click", () => studyOpenBook(book));
-  const tools = window.Trk.core.el("span", "study-book-tools");
+  const tools = core.el("span", "study-book-tools");
   tools.append(studyShelfDragHandle("book", book.id, folderId, card));
-  const rename = window.Trk.core.el("button", "study-tool-btn", "✎"); rename.type = "button"; rename.title = tr("studyRename"); rename.setAttribute("aria-label", `${tr("studyRename")}: ${book.title}`);
+  const rename = core.el("button", "study-tool-btn", "✎"); rename.type = "button"; rename.title = tr("studyRename"); rename.setAttribute("aria-label", `${tr("studyRename")}: ${book.title}`);
   rename.addEventListener("click", () => studyRenameBook(book));
-  const remove = window.Trk.core.el("button", "study-tool-btn study-delete-btn", "×"); remove.type = "button"; remove.title = tr("studyDelete"); remove.setAttribute("aria-label", `${tr("studyDelete")}: ${book.title}`);
+  const remove = core.el("button", "study-tool-btn study-delete-btn", "×"); remove.type = "button"; remove.title = tr("studyDelete"); remove.setAttribute("aria-label", `${tr("studyDelete")}: ${book.title}`);
   remove.addEventListener("click", () => studyDeleteBook(book));
   tools.append(rename, remove); card.append(open, tools);
   studyBindShelfDropTarget(card, { type:"book", id:book.id, folderId });
   return card;
 }
 function studyRenderShelf() {
-  const list = window.Trk.core.$("studyShelfList"), query = window.Trk.core.$("studySearch").value.trim();
+  const list = core.$("studyShelfList"), query = core.$("studySearch").value.trim();
   list.textContent = "";
   const entries = studyShelfEntries(studyShelfViewFolder, query);
   const bookCount = entries.filter(entry => entry.itemType === "book").length;
   const scopeCount = studyShelfViewFolder ? studyBooks.filter(book => studyBookFolderId(book.id) === studyShelfViewFolder).length : studyBooks.length;
-  window.Trk.core.$("studyBookCount").textContent = query || studyShelfViewFolder ? `${bookCount} / ${scopeCount}` : String(studyBooks.length);
-  window.Trk.core.$("studyShelfDragHelp").hidden = !(studyPrefs.manualShelfOrder || studyShelfFolders.length);
+  core.$("studyBookCount").textContent = query || studyShelfViewFolder ? `${bookCount} / ${scopeCount}` : String(studyBooks.length);
+  core.$("studyShelfDragHelp").hidden = !(studyPrefs.manualShelfOrder || studyShelfFolders.length);
   studySyncWelcome();
   if (studyShelfViewFolder) {
     const folder = studyFolderById(studyShelfViewFolder);
-    const back = window.Trk.core.el("button", "study-shelf-back", `${tr("studyFolderBack")} · ${folder ? folder.name : ""}`); back.type = "button";
+    const back = core.el("button", "study-shelf-back", `${tr("studyFolderBack")} · ${folder ? folder.name : ""}`); back.type = "button";
     back.setAttribute("aria-label", `${tr("studyFolderBack")}: ${folder ? folder.name : ""}`);
     back.addEventListener("click", () => {
-      studyShelfViewFolder = ""; studyShelfShown = STUDY_SHELF_PAGE; window.Trk.core.$("studySearch").value = ""; studyRenderShelf();
+      studyShelfViewFolder = ""; studyShelfShown = STUDY_SHELF_PAGE; core.$("studySearch").value = ""; studyRenderShelf();
       studyShelfTitle.focus({ preventScroll:true });
     });
     studyBindShelfDropTarget(back, { type:"back", folderId:studyShelfViewFolder }); list.append(back);
   }
   if (!entries.length) {
     const key = query ? "studyNoSearchResults" : studyShelfViewFolder ? "studyFolderEmpty" : "studyShelfEmpty";
-    list.append(window.Trk.core.el("div", "study-shelf-empty", tr(key)));
+    list.append(core.el("div", "study-shelf-empty", tr(key)));
     return;
   }
   const visible = entries.slice(0, Math.max(STUDY_SHELF_PAGE, studyShelfShown));
   for (const entry of visible) list.append(entry.itemType === "folder" ? studyRenderFolderCard(entry.folder) : studyRenderBookCard(entry.book));
   if (entries.length > visible.length) {
-    const more = window.Trk.core.el("button", "study-more-btn", tr("studyMore", { n:Math.min(STUDY_SHELF_PAGE, entries.length - visible.length) }));
+    const more = core.el("button", "study-more-btn", tr("studyMore", { n:Math.min(STUDY_SHELF_PAGE, entries.length - visible.length) }));
     more.type = "button";
     more.addEventListener("click", () => { studyShelfShown = visible.length + STUDY_SHELF_PAGE; studyRenderShelf(); });
     list.append(more);
@@ -1164,8 +1165,8 @@ function studyRenderShelf() {
 /* ============ 🔖 栞一覧 ============ */
 /* 説明パネルは「本がなくて、読んでもいない」ときだけ出します（本棚に本があるときは邪魔なので隠す）。 */
 function studySyncWelcome() {
-  const reading = !!studyCurrentBook && !window.Trk.core.$("studyBookView").hidden;
-  window.Trk.core.$("studyWelcome").hidden = studyBooks.length > 0 || reading;
+  const reading = !!studyCurrentBook && !core.$("studyBookView").hidden;
+  core.$("studyWelcome").hidden = studyBooks.length > 0 || reading;
 }
 function studyBookmarkDetail(book) {
   const mark = book.bookmark;
@@ -1174,23 +1175,23 @@ function studyBookmarkDetail(book) {
   return tr("studyBookmarkOpenText", { n:Math.round((mark.ratio || 0) * 100) });
 }
 function studyRenderBookmarks() {
-  const panel = window.Trk.core.$("studyBookmarkPanel"), rows = STUDY_UTIL.bookmarkedBooks(studyBooks);
-  const badge = window.Trk.core.$("studyBookmarkCount");
+  const panel = core.$("studyBookmarkPanel"), rows = STUDY_UTIL.bookmarkedBooks(studyBooks);
+  const badge = core.$("studyBookmarkCount");
   badge.hidden = !rows.length; badge.textContent = tr("studyBookmarkCount", { n:rows.length });
-  window.Trk.core.$("studyBookmarksBtn").setAttribute("aria-pressed", String(studyBookmarkMode));
+  core.$("studyBookmarksBtn").setAttribute("aria-pressed", String(studyBookmarkMode));
   if (!studyBookmarkMode) return;
   panel.textContent = "";
-  if (!rows.length) { panel.append(window.Trk.core.el("div", "study-shelf-empty", tr("studyBookmarksEmpty"))); return; }
-  panel.append(window.Trk.core.el("div", "study-shelf-more", tr("studyBookmarksHint")));
+  if (!rows.length) { panel.append(core.el("div", "study-shelf-empty", tr("studyBookmarksEmpty"))); return; }
+  panel.append(core.el("div", "study-shelf-more", tr("studyBookmarksHint")));
   for (const book of rows) {
-    const card = window.Trk.core.el("article", "study-bookmark-card");
-    const open = window.Trk.core.el("button", "study-bookmark-open"); open.type = "button"; open.title = tr("studyOpen");
-    const copy = window.Trk.core.el("span", "study-bookmark-copy");
-    copy.append(window.Trk.core.el("strong", "", book.title), window.Trk.core.el("span", "", studyBookmarkDetail(book)));
-    open.append(window.Trk.core.el("span", "study-bookmark-icon", "🔖"), copy);
-    if (book.kind === "text" && book.content) copy.append(window.Trk.core.el("span", "", STUDY_UTIL.snippetAt(book.content, (book.bookmark && book.bookmark.ratio) || 0, 56)));
+    const card = core.el("article", "study-bookmark-card");
+    const open = core.el("button", "study-bookmark-open"); open.type = "button"; open.title = tr("studyOpen");
+    const copy = core.el("span", "study-bookmark-copy");
+    copy.append(core.el("strong", "", book.title), core.el("span", "", studyBookmarkDetail(book)));
+    open.append(core.el("span", "study-bookmark-icon", "🔖"), copy);
+    if (book.kind === "text" && book.content) copy.append(core.el("span", "", STUDY_UTIL.snippetAt(book.content, (book.bookmark && book.bookmark.ratio) || 0, 56)));
     open.addEventListener("click", () => studyOpenBookmarkEntry(book));
-    const unset = window.Trk.core.el("button", "study-bookmark-unset", "🗑"); unset.type = "button"; unset.title = tr("studyBookmarkRemove");
+    const unset = core.el("button", "study-bookmark-unset", "🗑"); unset.type = "button"; unset.title = tr("studyBookmarkRemove");
     unset.setAttribute("aria-label", `${tr("studyBookmarkRemove")}: ${book.title}`);
     unset.addEventListener("click", () => studyClearBookmark(book));
     card.append(open, unset); panel.append(card);
@@ -1198,9 +1199,9 @@ function studyRenderBookmarks() {
 }
 function studyToggleBookmarkPanel(force) {
   studyBookmarkMode = typeof force === "boolean" ? force : !studyBookmarkMode;
-  window.Trk.core.$("studyBookmarkPanel").hidden = !studyBookmarkMode;
-  window.Trk.core.$("studyShelfList").hidden = studyBookmarkMode;
-  window.Trk.core.$("studyBookmarksBtn").setAttribute("aria-pressed", String(studyBookmarkMode));
+  core.$("studyBookmarkPanel").hidden = !studyBookmarkMode;
+  core.$("studyShelfList").hidden = studyBookmarkMode;
+  core.$("studyBookmarksBtn").setAttribute("aria-pressed", String(studyBookmarkMode));
   studyRenderBookmarks();
 }
 async function studyOpenBookmarkEntry(book) {
@@ -1221,7 +1222,7 @@ function studyToggleBookmark() {
 }
 /* ============ 使用量の表示 ============ */
 async function studyRefreshShelfFoot() {
-  const foot = window.Trk.core.$("studyShelfFoot");
+  const foot = core.$("studyShelfFoot");
   const books = studyBooks.length, images = studyBooks.reduce((sum, book) => sum + book.pages.length, 0);
   const size = STUDY_UTIL.formatBytes(studyBooks.reduce((sum, book) => sum + STUDY_UTIL.bookSize(book), 0));
   let free = "";
@@ -1252,26 +1253,26 @@ async function studySweepOrphans() {
 /* ============ 取り込み ============ */
 function studyImportStart(total) {
   studyImportState = { active:true, cancelled:false, total, added:0, kept:0, failed:0 };
-  window.Trk.core.$("studyImportWrap").hidden = false; window.Trk.core.$("studyImportFill").style.width = "0%";
-  window.Trk.core.$("studyImportCancelBtn").disabled = false;
-  window.Trk.core.$("studyImportLabel").textContent = tr("studyImportProgress", { n:0, total });
+  core.$("studyImportWrap").hidden = false; core.$("studyImportFill").style.width = "0%";
+  core.$("studyImportCancelBtn").disabled = false;
+  core.$("studyImportLabel").textContent = tr("studyImportProgress", { n:0, total });
   studySetStatus(null);
 }
 function studyImportTick(done, total) {
   const percent = total ? Math.max(0, Math.min(100, Math.round(done / total * 100))) : 0;
-  window.Trk.core.$("studyImportFill").style.width = `${percent}%`;
-  window.Trk.core.$("studyImportLabel").textContent = tr("studyImportProgress", { n:Math.min(done, total), total });
+  core.$("studyImportFill").style.width = `${percent}%`;
+  core.$("studyImportLabel").textContent = tr("studyImportProgress", { n:Math.min(done, total), total });
 }
 function studyImportEnd(key, vars) {
   studyImportState.active = false;
-  window.Trk.core.$("studyImportWrap").hidden = true;
+  core.$("studyImportWrap").hidden = true;
   if (key) studyNotify(key, vars);
 }
 function studyCancelImport() {
   if (!studyImportState.active) return;
   studyImportState.cancelled = true;
-  window.Trk.core.$("studyImportCancelBtn").disabled = true;
-  window.Trk.core.$("studyImportLabel").textContent = tr("studyImportCancel");
+  core.$("studyImportCancelBtn").disabled = true;
+  core.$("studyImportLabel").textContent = tr("studyImportCancel");
 }
 async function studyImportSummary() {
   const state = studyImportState, added = state.added, kept = state.kept, failed = state.failed;
@@ -1310,7 +1311,7 @@ async function studyImportImageGroup(group, id, position, total) {
           else await studyDBRun("covers", "readwrite", store => store.delete(songKey));
           changed.push(songKey);
         }
-        for (const songKey of changed) window.Trk.core.emit("studyCoverChanged", songKey);
+        for (const songKey of changed) core.emit("studyCoverChanged", songKey);
       } catch (error) { console.warn("Study covers could not be rebound after replacing an album", error); }
       if (old.pages.length) studyDBDeleteMany("pages", old.pages.map(page => page.key)).catch(() => {});
     }
@@ -1356,11 +1357,11 @@ async function studyImportImages(files) {
 async function studyImportTextEntry(entry, id, position, total) {
   const file = entry.file, size = Number(file.size) || 0;
   if (size > STUDY_TEXT_FILE_MAX) { studySetStatus("studyTextTooBig", { name:file.name, mb:Math.round(STUDY_TEXT_FILE_MAX / 1048576) }); return "error"; }
-  if (studyCurrentBook && studyCurrentBook.id === id && !window.Trk.core.$("studyMemoEditor").hidden) {
+  if (studyCurrentBook && studyCurrentBook.id === id && !core.$("studyMemoEditor").hidden) {
     if (!await studyFlushMemo(true)) return "error";
-    window.Trk.core.$("studyMemoEditor").readOnly = false; window.Trk.core.$("studyMemoEditor").hidden = true;
-    window.Trk.core.$("studyEditorNotice").hidden = true; window.Trk.core.$("studyTextPage").hidden = false;
-    window.Trk.core.$("studyMemoBtn").textContent = tr("studyMemoEdit"); window.Trk.core.$("studyMemoExportBtn").hidden = false;
+    core.$("studyMemoEditor").readOnly = false; core.$("studyMemoEditor").hidden = true;
+    core.$("studyEditorNotice").hidden = true; core.$("studyTextPage").hidden = false;
+    core.$("studyMemoBtn").textContent = tr("studyMemoEdit"); core.$("studyMemoExportBtn").hidden = false;
     studyRenderTextContent(studyCurrentBook); studySyncTextProgress();
   }
   let old = null;
@@ -1435,13 +1436,13 @@ function studySetImage(img, blob, alt) {
 }
 function studyClearVerticalPages() {
   if (studyVerticalObserver) { studyVerticalObserver.disconnect(); studyVerticalObserver = null; }
-  const box = window.Trk.core.$("studyVerticalPages");
+  const box = core.$("studyVerticalPages");
   for (const img of box.querySelectorAll("img")) studyClearImage(img);
   box.textContent = ""; studyVerticalBookId = "";
 }
 function studyClearPageImages() {
   studyRenderToken++;
-  for (const id of ["studyPageSingle", "studyPageLeft", "studyPageRight"]) studyClearImage(window.Trk.core.$(id));
+  for (const id of ["studyPageSingle", "studyPageLeft", "studyPageRight"]) studyClearImage(core.$(id));
   studyClearVerticalPages();
 }
 async function studyLoadPageImage(img, index, book = studyCurrentBook) {
@@ -1462,20 +1463,20 @@ function studySyncPageCount() {
   const book = studyCurrentBook;
   if (!book || book.kind !== "image") return;
   const total = book.pages.length;
-  const progress = window.Trk.core.$("studyProgress"), mode = studyPrefs.imageMode;
+  const progress = core.$("studyProgress"), mode = studyPrefs.imageMode;
   progress.max = String(Math.max(0, total - 1)); progress.step = mode === "spread" ? "2" : "1";
   progress.value = String(Math.max(0, Math.min(total - 1, studyCurrentPage)));
   let label = tr("studyPagesStatus", { current:Math.min(total, studyCurrentPage + 1), total });
   if (mode === "spread" && total) label = tr("studyPageRange", { first:studyCurrentPage + 1, last:Math.min(total, studyCurrentPage + 2), total });
-  window.Trk.core.$("studyPageCount").textContent = label;
-  window.Trk.core.$("studyImageHint").textContent = tr(mode === "vertical" ? "studyVerticalHint" : "studyTapHint");
+  core.$("studyPageCount").textContent = label;
+  core.$("studyImageHint").textContent = tr(mode === "vertical" ? "studyVerticalHint" : "studyTapHint");
   const canPrev = studyCurrentPage > 0;
   const canNext = mode === "vertical" ? true : studyCurrentPage < total - 1;
-  window.Trk.core.$("studyPrevBtn").disabled = !canPrev;
-  window.Trk.core.$("studyNextBtn").disabled = !canNext;
+  core.$("studyPrevBtn").disabled = !canPrev;
+  core.$("studyNextBtn").disabled = !canNext;
   const american = studyPrefs.american;
-  window.Trk.core.$("studyNextBtn").textContent = tr(american ? "studyNextRightOnly" : "studyNext");
-  window.Trk.core.$("studyPrevBtn").textContent = tr(american ? "studyPreviousLeftOnly" : "studyPrevious");
+  core.$("studyNextBtn").textContent = tr(american ? "studyNextRightOnly" : "studyNext");
+  core.$("studyPrevBtn").textContent = tr(american ? "studyPreviousLeftOnly" : "studyPrevious");
   studyRefreshCoverButtons();
 }
 function studyNormalizePage(page) {
@@ -1490,9 +1491,9 @@ function studyJumpToPage(page, restoreVertical = false) {
   studyCurrentPage = studyNormalizePage(page);
   studySyncPageCount();
   if (studyPrefs.imageMode === "vertical") {
-    const target = window.Trk.core.$("studyVerticalPages").querySelector(`[data-page-index="${studyCurrentPage}"]`);
+    const target = core.$("studyVerticalPages").querySelector(`[data-page-index="${studyCurrentPage}"]`);
     if (target && typeof target.scrollIntoView === "function") target.scrollIntoView({ block:restoreVertical ? "start" : "center", behavior:restoreVertical ? "auto" : "smooth" });
-    else if (!target) window.Trk.core.$("studyImageStage").scrollTop = 0;
+    else if (!target) core.$("studyImageStage").scrollTop = 0;
     return;
   }
   studyRenderImagePage();
@@ -1500,42 +1501,42 @@ function studyJumpToPage(page, restoreVertical = false) {
 async function studyRenderImagePage() {
   const book = studyCurrentBook;
   if (!book || book.kind !== "image") return;
-  window.Trk.core.$("studyImageStage").dataset.mode = studyPrefs.imageMode;
+  core.$("studyImageStage").dataset.mode = studyPrefs.imageMode;
   if (studyPrefs.imageMode === "vertical") {
-    for (const id of ["studyPageSingle", "studyPageLeft", "studyPageRight"]) studyClearImage(window.Trk.core.$(id));
-    window.Trk.core.$("studySingleWrap").hidden = true; window.Trk.core.$("studySpreadWrap").hidden = true; window.Trk.core.$("studyVerticalPages").hidden = false;
+    for (const id of ["studyPageSingle", "studyPageLeft", "studyPageRight"]) studyClearImage(core.$(id));
+    core.$("studySingleWrap").hidden = true; core.$("studySpreadWrap").hidden = true; core.$("studyVerticalPages").hidden = false;
     studyBuildVerticalPages();
-    const target = window.Trk.core.$("studyVerticalPages").children[studyCurrentPage];
+    const target = core.$("studyVerticalPages").children[studyCurrentPage];
     if (target && typeof target.scrollIntoView === "function") requestAnimationFrame(() => { target.scrollIntoView({ block:"start", behavior:"auto" }); studyVerticalScroll(); });
     else studyVerticalScroll();
     studySyncPageCount(); studyApplyZoom(false); return;
   }
   studyClearVerticalPages();
-  window.Trk.core.$("studyVerticalPages").hidden = true;
+  core.$("studyVerticalPages").hidden = true;
   const token = ++studyRenderToken;
   if (studyPrefs.imageMode === "spread") {
-    studyClearImage(window.Trk.core.$("studyPageLeft")); studyClearImage(window.Trk.core.$("studyPageRight"));
-    window.Trk.core.$("studySingleWrap").hidden = true; window.Trk.core.$("studySpreadWrap").hidden = false;
+    studyClearImage(core.$("studyPageLeft")); studyClearImage(core.$("studyPageRight"));
+    core.$("studySingleWrap").hidden = true; core.$("studySpreadWrap").hidden = false;
     const leftIndex = studyPrefs.american ? studyCurrentPage : studyCurrentPage + 1;
     const rightIndex = studyPrefs.american ? studyCurrentPage + 1 : studyCurrentPage;
-    await Promise.all([studyLoadPageImage(window.Trk.core.$("studyPageLeft"), leftIndex, book), studyLoadPageImage(window.Trk.core.$("studyPageRight"), rightIndex, book)]);
+    await Promise.all([studyLoadPageImage(core.$("studyPageLeft"), leftIndex, book), studyLoadPageImage(core.$("studyPageRight"), rightIndex, book)]);
   } else {
-    studyClearImage(window.Trk.core.$("studyPageSingle"));
-    window.Trk.core.$("studySingleWrap").hidden = false; window.Trk.core.$("studySpreadWrap").hidden = true;
-    await studyLoadPageImage(window.Trk.core.$("studyPageSingle"), studyCurrentPage, book);
+    studyClearImage(core.$("studyPageSingle"));
+    core.$("studySingleWrap").hidden = false; core.$("studySpreadWrap").hidden = true;
+    await studyLoadPageImage(core.$("studyPageSingle"), studyCurrentPage, book);
   }
   if (token === studyRenderToken) { studySyncPageCount(); studyApplyZoom(false); }
 }
 function studyBuildVerticalPages() {
-  const book = studyCurrentBook, box = window.Trk.core.$("studyVerticalPages");
+  const book = studyCurrentBook, box = core.$("studyVerticalPages");
   const cacheKey = book ? `${book.id}:${book.generation}:${studyPrefs.imageOrder}` : "";
   if (!book || studyVerticalBookId === cacheKey) return;
   studyClearVerticalPages();
   studyVerticalBookId = cacheKey;
   for (let index = 0; index < book.pages.length; index++) {
     const page = studyPageAt(book, index);
-    const item = window.Trk.core.el("div", "study-vertical-item"); item.dataset.pageIndex = String(index);
-    const img = window.Trk.core.el("img", "study-page-image study-vertical-image"); img.alt = `${book.title} — ${page ? page.name : index + 1} (${index + 1})`;
+    const item = core.el("div", "study-vertical-item"); item.dataset.pageIndex = String(index);
+    const img = core.el("img", "study-page-image study-vertical-image"); img.alt = `${book.title} — ${page ? page.name : index + 1} (${index + 1})`;
     img.loading = "lazy"; img.draggable = false; item.append(img); box.append(item);
   }
   if ("IntersectionObserver" in window) {
@@ -1544,13 +1545,13 @@ function studyBuildVerticalPages() {
         const img = entry.target.querySelector("img"), index = Number(entry.target.dataset.pageIndex);
         if (entry.isIntersecting) {
           if (!img.dataset.studyObjectUrl) studyLoadPageImage(img, index, book);
-          const r = entry.target.getBoundingClientRect(), stageRect = window.Trk.core.$("studyImageStage").getBoundingClientRect();
+          const r = entry.target.getBoundingClientRect(), stageRect = core.$("studyImageStage").getBoundingClientRect();
           if (r.top <= stageRect.top + stageRect.height * .55 && r.bottom >= stageRect.top + stageRect.height * .18) {
             studyCurrentPage = index; studySyncPageCount();
           }
         } else studyClearImage(img);
       }
-    }, { root:window.Trk.core.$("studyImageStage"), rootMargin:"120% 0px" });
+    }, { root:core.$("studyImageStage"), rootMargin:"120% 0px" });
     for (const item of box.children) studyVerticalObserver.observe(item);
   } else studyVerticalScroll();
 }
@@ -1565,14 +1566,14 @@ function studySnapZoom(value) {
 function studyApplyZoomValue(value) {
   const zoom = Math.max(STUDY_ZOOM_STEPS[0], Math.min(STUDY_ZOOM_STEPS[STUDY_ZOOM_STEPS.length - 1], Number(value) || 1));
   studyPrefs.zoom = Math.round(zoom * 100) / 100;
-  const stage = window.Trk.core.$("studyImageStage");
+  const stage = core.$("studyImageStage");
   stage.style.setProperty("--study-zoom", String(studyPrefs.zoom));
   stage.dataset.zoomed = studyPrefs.zoom > 1 ? "1" : "0";
   stage.dataset.zoomActive = Math.abs(studyPrefs.zoom - 1) > .001 ? "1" : "0";
   const label = tr("studyZoomValue", { n:Math.round(studyPrefs.zoom * 100) });
-  window.Trk.core.$("studyZoomLabel").textContent = label; window.Trk.core.$("studyZoomChip").textContent = label;
-  window.Trk.core.$("studyZoomOut").disabled = studyPrefs.zoom <= STUDY_ZOOM_STEPS[0] + .001;
-  window.Trk.core.$("studyZoomIn").disabled = studyPrefs.zoom >= STUDY_ZOOM_STEPS[STUDY_ZOOM_STEPS.length - 1] - .001;
+  core.$("studyZoomLabel").textContent = label; core.$("studyZoomChip").textContent = label;
+  core.$("studyZoomOut").disabled = studyPrefs.zoom <= STUDY_ZOOM_STEPS[0] + .001;
+  core.$("studyZoomIn").disabled = studyPrefs.zoom >= STUDY_ZOOM_STEPS[STUDY_ZOOM_STEPS.length - 1] - .001;
 }
 function studyApplyZoom(notify) {
   studyApplyZoomValue(studyPrefs.zoom);
@@ -1591,7 +1592,7 @@ function studySetZoom(value, save = true) {
 function studyZoomReset() { studySetZoom(1, true); studySetStatus("studyZoomHint"); }
 function studySyncZoomRow() {
   const visible = !!studyCurrentBook && studyCurrentBook.kind === "image" && studyPrefs.imageMode !== "vertical";
-  window.Trk.core.$("studyZoomGroup").hidden = !visible;
+  core.$("studyZoomGroup").hidden = !visible;
   if (visible) studyApplyZoomValue(studyPrefs.zoom);
 }
 
@@ -1600,7 +1601,7 @@ function studySegments(book) { return STUDY_UTIL.aozoraSegments(book && book.con
 /* 表示に使う文字列（ルビの読みは含めない）。検索位置はこの文字列を基準に数える。 */
 function studySearchText(book) { return studySegments(book).map(part => part.ruby || part.text).join(""); }
 function studyRenderTextContent(book) {
-  const target = window.Trk.core.$("studyTextPage");
+  const target = core.$("studyTextPage");
   target.textContent = "";
   const frag = document.createDocumentFragment();
   for (const part of studySegments(book)) {
@@ -1612,18 +1613,18 @@ function studyRenderTextContent(book) {
   target.append(frag);
 }
 function studySyncTextProgress() {
-  if (!studyCurrentBook || studyCurrentBook.kind !== "text" || window.Trk.core.$("studyMemoEditor").hidden === false) return;
-  const node = window.Trk.core.$("studyTextPage"), genko = studyPrefs.theme === "genko";
+  if (!studyCurrentBook || studyCurrentBook.kind !== "text" || core.$("studyMemoEditor").hidden === false) return;
+  const node = core.$("studyTextPage"), genko = studyPrefs.theme === "genko";
   const extent = genko ? node.scrollWidth - node.clientWidth : node.scrollHeight - node.clientHeight;
   const offset = genko ? Math.abs(node.scrollLeft) : node.scrollTop;
   const percent = extent > 0 ? Math.max(0, Math.min(100, Math.round(offset / extent * 100))) : 0;
   const stats = STUDY_UTIL.textStats(studyCurrentBook.content);
-  window.Trk.core.$("studyTextProgress").hidden = false; window.Trk.core.$("studyTextProgress").textContent = tr("studyTextProgress", { n:percent });
-  window.Trk.core.$("studyTextStats").hidden = false; window.Trk.core.$("studyTextStats").textContent = tr("studyTextStats", stats);
+  core.$("studyTextProgress").hidden = false; core.$("studyTextProgress").textContent = tr("studyTextProgress", { n:percent });
+  core.$("studyTextStats").hidden = false; core.$("studyTextStats").textContent = tr("studyTextStats", stats);
 }
 function studyScrollText(direction) {
-  if (!studyCurrentBook || studyCurrentBook.kind !== "text" || !window.Trk.core.$("studyMemoEditor").hidden) return;
-  const node = window.Trk.core.$("studyTextPage"), genko = studyPrefs.theme === "genko", step = direction * Math.max(160, (genko ? node.clientWidth : node.clientHeight) * .82);
+  if (!studyCurrentBook || studyCurrentBook.kind !== "text" || !core.$("studyMemoEditor").hidden) return;
+  const node = core.$("studyTextPage"), genko = studyPrefs.theme === "genko", step = direction * Math.max(160, (genko ? node.clientWidth : node.clientHeight) * .82);
   /* 古い WebView には scrollBy/scrollTo が無いことがあるので、その場合は直接動かします。 */
   if (typeof node.scrollBy === "function") {
     if (genko) node.scrollBy({ left:-step, behavior:"smooth" });
@@ -1633,8 +1634,8 @@ function studyScrollText(direction) {
   setTimeout(studySyncTextProgress, 250);
 }
 function studyTextEdges(edge) {
-  if (!studyCurrentBook || studyCurrentBook.kind !== "text" || !window.Trk.core.$("studyMemoEditor").hidden) return;
-  const node = window.Trk.core.$("studyTextPage"), genko = studyPrefs.theme === "genko";
+  if (!studyCurrentBook || studyCurrentBook.kind !== "text" || !core.$("studyMemoEditor").hidden) return;
+  const node = core.$("studyTextPage"), genko = studyPrefs.theme === "genko";
   const target = edge === "start" ? 0 : (genko ? node.scrollWidth : node.scrollHeight);
   if (typeof node.scrollTo === "function") node.scrollTo(genko ? { left:target, behavior:"smooth" } : { top:target, behavior:"smooth" });
   else if (genko) node.scrollLeft = target;
@@ -1645,11 +1646,11 @@ function studyTextEdges(edge) {
 /* ============ 本文の検索 ============ */
 function studySyncFindRow() {
   const book = studyCurrentBook;
-  const visible = !!book && book.kind === "text" && window.Trk.core.$("studyMemoEditor").hidden;
-  window.Trk.core.$("studyFindRow").hidden = !visible || window.Trk.core.$("studyRoom").classList.contains("study-fullimage");
+  const visible = !!book && book.kind === "text" && core.$("studyMemoEditor").hidden;
+  core.$("studyFindRow").hidden = !visible || core.$("studyRoom").classList.contains("study-fullimage");
 }
 function studyUpdateSearchCount() {
-  const node = window.Trk.core.$("studyFindCount"), state = studySearchState;
+  const node = core.$("studyFindCount"), state = studySearchState;
   if (!state.query) { node.textContent = ""; node.dataset.state = ""; return; }
   if (!state.marks.length) { node.textContent = tr("studyBookSearchNone"); node.dataset.state = "none"; return; }
   node.dataset.state = "";
@@ -1671,7 +1672,7 @@ function studyHighlightMatchesInNode(node, query, budget) {
   return count;
 }
 function studyClearSearchMarks() {
-  const page = window.Trk.core.$("studyTextPage");
+  const page = core.$("studyTextPage");
   for (const mark of [...page.querySelectorAll("mark.study-search-hit")]) {
     const parent = mark.parentNode;
     if (!parent) continue;
@@ -1681,7 +1682,7 @@ function studyClearSearchMarks() {
   }
 }
 function studyRunSearch(query) {
-  const page = window.Trk.core.$("studyTextPage"), text = String(query || "");
+  const page = core.$("studyTextPage"), text = String(query || "");
   studyClearSearchMarks();
   studySearchState = { query:text, marks:[], index:-1, capped:false };
   if (text) {
@@ -1721,14 +1722,14 @@ function studySearchGo(index, quiet) {
 function studyEndSearch() {
   studyClearSearchMarks();
   studySearchState = { query:"", marks:[], index:-1, capped:false };
-  window.Trk.core.$("studyFindInput").value = ""; studyUpdateSearchCount();
-  if (studyCurrentBook && studyCurrentBook.kind === "text" && window.Trk.core.$("studyMemoEditor").hidden) window.Trk.core.$("studyTextPage").focus({ preventScroll:true });
+  core.$("studyFindInput").value = ""; studyUpdateSearchCount();
+  if (studyCurrentBook && studyCurrentBook.kind === "text" && core.$("studyMemoEditor").hidden) core.$("studyTextPage").focus({ preventScroll:true });
 }
 function studyFocusSearch() {
   const book = studyCurrentBook;
-  if (!book || book.kind !== "text" || !window.Trk.core.$("studyMemoEditor").hidden) { studyNotify("studyMemoNeedText"); return; }
-  window.Trk.core.$("studyFindRow").hidden = false;
-  window.Trk.core.$("studyFindInput").focus({ preventScroll:true }); window.Trk.core.$("studyFindInput").select();
+  if (!book || book.kind !== "text" || !core.$("studyMemoEditor").hidden) { studyNotify("studyMemoNeedText"); return; }
+  core.$("studyFindRow").hidden = false;
+  core.$("studyFindInput").focus({ preventScroll:true }); core.$("studyFindInput").select();
   studySetStatus("studyBookSearchHint");
 }
 
@@ -1738,21 +1739,21 @@ function studyRenderCurrentBook() {
   if (!book) return;
   studyClearPageImages(); studyEndSearch();
   const isImage = book.kind === "image";
-  window.Trk.core.$("studyImageStage").hidden = !isImage; window.Trk.core.$("studyTextStage").hidden = isImage;
-  window.Trk.core.$("studyImageModeRow").hidden = !isImage; window.Trk.core.$("studyImageOrderRow").hidden = !isImage;
-  window.Trk.core.$("studyAmericanRow").hidden = !isImage; window.Trk.core.$("studyThemeRow").hidden = isImage;
-  window.Trk.core.$("studyTextTuneRow").hidden = isImage; window.Trk.core.$("studyProgressWrap").hidden = !isImage;
-  window.Trk.core.$("studyTextProgress").hidden = isImage; window.Trk.core.$("studyTextStats").hidden = isImage;
-  window.Trk.core.$("studyAssignCoverBtn").hidden = !isImage; window.Trk.core.$("studyFullscreenBtn").hidden = !isImage;
-  window.Trk.core.$("studyCurrentTitle").textContent = book.title;
-  window.Trk.core.$("studyCurrentMeta").textContent = isImage ? `${tr("studyBookImages")} · ${tr("studyPageCount", { n:book.pages.length })}`
+  core.$("studyImageStage").hidden = !isImage; core.$("studyTextStage").hidden = isImage;
+  core.$("studyImageModeRow").hidden = !isImage; core.$("studyImageOrderRow").hidden = !isImage;
+  core.$("studyAmericanRow").hidden = !isImage; core.$("studyThemeRow").hidden = isImage;
+  core.$("studyTextTuneRow").hidden = isImage; core.$("studyProgressWrap").hidden = !isImage;
+  core.$("studyTextProgress").hidden = isImage; core.$("studyTextStats").hidden = isImage;
+  core.$("studyAssignCoverBtn").hidden = !isImage; core.$("studyFullscreenBtn").hidden = !isImage;
+  core.$("studyCurrentTitle").textContent = book.title;
+  core.$("studyCurrentMeta").textContent = isImage ? `${tr("studyBookImages")} · ${tr("studyPageCount", { n:book.pages.length })}`
     : `${tr("studyBookText")} · ${String(book.extension || "TXT").toUpperCase()}`;
-  window.Trk.core.$("studyMemoBtn").hidden = isImage;
-  window.Trk.core.$("studyMemoExportBtn").hidden = isImage;
-  window.Trk.core.$("studyTextStage").dataset.theme = studyPrefs.theme;
-  window.Trk.core.$("studyMemoEditor").hidden = true; window.Trk.core.$("studyMemoEditor").readOnly = false;
-  window.Trk.core.$("studyTextPage").hidden = false; window.Trk.core.$("studyEditorNotice").hidden = true;
-  window.Trk.core.$("studyMemoBtn").textContent = tr("studyMemoEdit");
+  core.$("studyMemoBtn").hidden = isImage;
+  core.$("studyMemoExportBtn").hidden = isImage;
+  core.$("studyTextStage").dataset.theme = studyPrefs.theme;
+  core.$("studyMemoEditor").hidden = true; core.$("studyMemoEditor").readOnly = false;
+  core.$("studyTextPage").hidden = false; core.$("studyEditorNotice").hidden = true;
+  core.$("studyMemoBtn").textContent = tr("studyMemoEdit");
   if (isImage) {
     studyCurrentPage = studyNormalizePage(book.bookmark ? book.bookmark.index : 0);
     studyRenderImagePage();
@@ -1760,7 +1761,7 @@ function studyRenderCurrentBook() {
     studyRenderTextContent(book);
     const bookmark = book.bookmark;
     requestAnimationFrame(() => {
-      const node = window.Trk.core.$("studyTextPage");
+      const node = core.$("studyTextPage");
       if (bookmark) { node.scrollTop = bookmark.top || 0; node.scrollLeft = bookmark.left || 0; }
       studySyncTextProgress();
     });
@@ -1769,40 +1770,40 @@ function studyRenderCurrentBook() {
 }
 function studySyncCurrentBookControls() {
   const book = studyCurrentBook;
-  window.Trk.core.$("studyImageMode").value = studyPrefs.imageMode;
-  window.Trk.core.$("studyImageOrder").value = studyPrefs.imageOrder;
-  window.Trk.core.$("studyAmerican").checked = studyPrefs.american;
-  window.Trk.core.$("studyTheme").value = studyPrefs.theme;
-  window.Trk.core.$("studyTvCheck").checked = studyPrefs.tvEnabled;
-  window.Trk.core.$("studyTvPosition").value = studyPrefs.tvPosition;
-  window.Trk.core.$("studyMemoBtn").hidden = !book || book.kind !== "text";
-  window.Trk.core.$("studyFullscreenBtn").textContent = tr(window.Trk.core.$("studyRoom").classList.contains("study-fullimage") ? "studyFullscreenExit" : "studyFullscreen");
-  window.Trk.core.$("studyFullscreenBtn").hidden = !book || book.kind !== "image";
+  core.$("studyImageMode").value = studyPrefs.imageMode;
+  core.$("studyImageOrder").value = studyPrefs.imageOrder;
+  core.$("studyAmerican").checked = studyPrefs.american;
+  core.$("studyTheme").value = studyPrefs.theme;
+  core.$("studyTvCheck").checked = studyPrefs.tvEnabled;
+  core.$("studyTvPosition").value = studyPrefs.tvPosition;
+  core.$("studyMemoBtn").hidden = !book || book.kind !== "text";
+  core.$("studyFullscreenBtn").textContent = tr(core.$("studyRoom").classList.contains("study-fullimage") ? "studyFullscreenExit" : "studyFullscreen");
+  core.$("studyFullscreenBtn").hidden = !book || book.kind !== "image";
   studySyncZoomRow();
   if (book && book.kind === "image") studySyncPageCount();
 }
 async function studyOpenBook(book) {
   if (!book || studyClosePending) return;
-  if (studyCurrentBook && !window.Trk.core.$("studyMemoEditor").hidden) {
+  if (studyCurrentBook && !core.$("studyMemoEditor").hidden) {
     if (studyCurrentBook.id === book.id) return;
-    if (!await studyFlushMemo(true)) { window.Trk.core.$("studyMemoEditor").focus({ preventScroll:true }); return; }
+    if (!await studyFlushMemo(true)) { core.$("studyMemoEditor").focus({ preventScroll:true }); return; }
   }
   studyCurrentBook = book;
-  window.Trk.core.$("studyBookView").hidden = false; studySyncWelcome();
+  core.$("studyBookView").hidden = false; studySyncWelcome();
   studyRenderCurrentBook();
-  (book.kind === "image" ? window.Trk.core.$("studyImageStage") : window.Trk.core.$("studyTextPage")).focus({ preventScroll:true });
+  (book.kind === "image" ? core.$("studyImageStage") : core.$("studyTextPage")).focus({ preventScroll:true });
   studySetStatus(null);
 }
 async function studyBackToShelf() {
   if (studyClosePending) return false;
-  if (!window.Trk.core.$("studyMemoEditor").hidden) {
-    if (!await studyFlushMemo(true)) { window.Trk.core.$("studyMemoEditor").focus({ preventScroll:true }); return false; }
-    window.Trk.core.$("studyMemoEditor").readOnly = false; window.Trk.core.$("studyMemoEditor").hidden = true;
-    window.Trk.core.$("studyEditorNotice").hidden = true; window.Trk.core.$("studyTextPage").hidden = false; window.Trk.core.$("studyMemoExportBtn").hidden = true;
-    window.Trk.core.$("studyMemoBtn").textContent = tr("studyMemoEdit");
+  if (!core.$("studyMemoEditor").hidden) {
+    if (!await studyFlushMemo(true)) { core.$("studyMemoEditor").focus({ preventScroll:true }); return false; }
+    core.$("studyMemoEditor").readOnly = false; core.$("studyMemoEditor").hidden = true;
+    core.$("studyEditorNotice").hidden = true; core.$("studyTextPage").hidden = false; core.$("studyMemoExportBtn").hidden = true;
+    core.$("studyMemoBtn").textContent = tr("studyMemoEdit");
   }
   studyEndSearch(); studyCurrentBook = null; studyClearPageImages();
-  window.Trk.core.$("studyBookView").hidden = true;
+  core.$("studyBookView").hidden = true;
   studySyncWelcome();
   studyApplyTVLayout();
   return true;
@@ -1816,8 +1817,8 @@ function studyBookmarkData() {
   const book = studyCurrentBook;
   if (!book) return null;
   if (book.kind === "image") return { index:studyCurrentPage, top:0, left:0, ratio:0, savedAt:Date.now() };
-  if (!window.Trk.core.$("studyMemoEditor").hidden) return { index:0, top:0, left:0, ratio:0, savedAt:Date.now() };
-  const node = window.Trk.core.$("studyTextPage"), genko = studyPrefs.theme === "genko";
+  if (!core.$("studyMemoEditor").hidden) return { index:0, top:0, left:0, ratio:0, savedAt:Date.now() };
+  const node = core.$("studyTextPage"), genko = studyPrefs.theme === "genko";
   const extent = genko ? node.scrollWidth - node.clientWidth : node.scrollHeight - node.clientHeight;
   const offset = genko ? Math.abs(node.scrollLeft) : node.scrollTop;
   return { index:0, top:Math.max(0, node.scrollTop), left:node.scrollLeft, ratio:extent > 0 ? Math.max(0, Math.min(1, offset / extent)) : 0, savedAt:Date.now() };
@@ -1832,7 +1833,7 @@ function studyStep(direction) {
   if (!studyCurrentBook) return;
   if (studyCurrentBook.kind === "text") { studyScrollText(direction); return; }
   if (studyPrefs.imageMode === "vertical") {
-    const stage = window.Trk.core.$("studyImageStage"), amount = direction * Math.max(240, stage.clientHeight * .84);
+    const stage = core.$("studyImageStage"), amount = direction * Math.max(240, stage.clientHeight * .84);
     if (typeof stage.scrollBy === "function") stage.scrollBy({ top:amount, behavior:"smooth" });
     else stage.scrollTop += amount;
     return;
@@ -1847,47 +1848,47 @@ function studyStepPhysical(side) {
 }
 function studyJumpFromSlider() {
   if (!studyCurrentBook || studyCurrentBook.kind !== "image") return;
-  studyJumpToPage(Number(window.Trk.core.$("studyProgress").value), true);
+  studyJumpToPage(Number(core.$("studyProgress").value), true);
 }
 function studyShowProgress() {
   if (!studyCurrentBook || studyCurrentBook.kind !== "image") return;
-  window.Trk.core.$("studyProgressWrap").hidden = false; window.Trk.core.$("studyRoom").classList.add("study-progress-visible");
-  window.Trk.core.$("studyProgress").focus({ preventScroll:true }); studySetStatus("studyProgressHint");
+  core.$("studyProgressWrap").hidden = false; core.$("studyRoom").classList.add("study-progress-visible");
+  core.$("studyProgress").focus({ preventScroll:true }); studySetStatus("studyProgressHint");
 }
 function studyHideProgress() {
-  window.Trk.core.$("studyProgressWrap").hidden = true; window.Trk.core.$("studyRoom").classList.remove("study-progress-visible");
-  if (studyRoomOpen && studyCurrentBook && studyCurrentBook.kind === "image") window.Trk.core.$("studyImageStage").focus({ preventScroll:true });
+  core.$("studyProgressWrap").hidden = true; core.$("studyRoom").classList.remove("study-progress-visible");
+  if (studyRoomOpen && studyCurrentBook && studyCurrentBook.kind === "image") core.$("studyImageStage").focus({ preventScroll:true });
   studySetStatus(null);
 }
 
 /* ============ TVペイン（今の曲を流し見する） ============ */
 function studySaveVideoHome() {
-  if (studyVideoHomeParent && studyVideoHomeParent.isConnected && !window.Trk.core.$("studyTvScreen").contains(window.Trk.core.video)) return;
-  studyVideoHomeParent = window.Trk.core.video.parentNode && window.Trk.core.video.parentNode.nodeType === 1 ? window.Trk.core.video.parentNode : document.body;
-  studyVideoHomeNext = window.Trk.core.video.nextSibling; studyVideoHomeStyle = window.Trk.core.video.getAttribute("style");
+  if (studyVideoHomeParent && studyVideoHomeParent.isConnected && !core.$("studyTvScreen").contains(core.video)) return;
+  studyVideoHomeParent = core.video.parentNode && core.video.parentNode.nodeType === 1 ? core.video.parentNode : document.body;
+  studyVideoHomeNext = core.video.nextSibling; studyVideoHomeStyle = core.video.getAttribute("style");
 }
 function studyMoveVideoToTV() {
-  if (!window.Trk.core.video || !window.Trk.core.$("studyTvScreen")) return;
+  if (!core.video || !core.$("studyTvScreen")) return;
   studySaveVideoHome();
-  if (window.Trk.core.video.parentNode !== window.Trk.core.$("studyTvScreen")) window.Trk.core.$("studyTvScreen").insertBefore(window.Trk.core.video, window.Trk.core.$("studyTvArt"));
-  window.Trk.core.video.classList.add("study-tv-video-visible");
-  try { if (typeof newVideoFilter === "function") window.Trk.core.video.style.filter = newVideoFilter(); } catch (_) {}
+  if (core.video.parentNode !== core.$("studyTvScreen")) core.$("studyTvScreen").insertBefore(core.video, core.$("studyTvArt"));
+  core.video.classList.add("study-tv-video-visible");
+  try { if (typeof newVideoFilter === "function") core.video.style.filter = newVideoFilter(); } catch (_) {}
 }
 function studyRestoreVideoHome() {
-  if (!window.Trk.core.video) return;
+  if (!core.video) return;
   const home = studyVideoHomeParent && studyVideoHomeParent.isConnected ? studyVideoHomeParent : document.body;
-  if (window.Trk.core.video.parentNode !== home) {
+  if (core.video.parentNode !== home) {
     const before = studyVideoHomeNext && studyVideoHomeNext.parentNode === home ? studyVideoHomeNext : null;
-    home.insertBefore(window.Trk.core.video, before);
+    home.insertBefore(core.video, before);
   }
-  window.Trk.core.video.classList.remove("study-tv-video-visible", "study-tv-video-hidden");
-  if (studyVideoHomeStyle == null) window.Trk.core.video.removeAttribute("style"); else window.Trk.core.video.setAttribute("style", studyVideoHomeStyle);
+  core.video.classList.remove("study-tv-video-visible", "study-tv-video-hidden");
+  if (studyVideoHomeStyle == null) core.video.removeAttribute("style"); else core.video.setAttribute("style", studyVideoHomeStyle);
   /* 次に開くときは、そのときの置き場所をもう一度調べ直す（TVドックが作り直されていても迷子にならない）。 */
   studyVideoHomeParent = null; studyVideoHomeNext = null; studyVideoHomeStyle = null;
 }
 function studyApplyTVLayout() {
-  const active = studyRoomOpen && !!studyCurrentBook && !window.Trk.core.$("studyBookView").hidden && studyPrefs.tvEnabled && studyPrefs.tvPosition !== "off";
-  const pane = window.Trk.core.$("studyTvPane"), panels = window.Trk.core.$("studyPanels"), content = window.Trk.core.$("studyContentPane");
+  const active = studyRoomOpen && !!studyCurrentBook && !core.$("studyBookView").hidden && studyPrefs.tvEnabled && studyPrefs.tvPosition !== "off";
+  const pane = core.$("studyTvPane"), panels = core.$("studyPanels"), content = core.$("studyContentPane");
   pane.hidden = !active;
   if (!active) { studyRestoreVideoHome(); return; }
   if (studyPrefs.tvPosition === "top") panels.insertBefore(pane, content);
@@ -1895,16 +1896,16 @@ function studyApplyTVLayout() {
   studyMoveVideoToTV(); studyRefreshTV();
 }
 function studySetTVVisible(hasVideo, hasImage) {
-  window.Trk.core.video.classList.toggle("study-tv-video-hidden", !hasVideo);
-  window.Trk.core.$("studyTvArt").hidden = !hasImage;
-  window.Trk.core.$("studyTvEmpty").hidden = hasVideo || hasImage;
+  core.video.classList.toggle("study-tv-video-hidden", !hasVideo);
+  core.$("studyTvArt").hidden = !hasImage;
+  core.$("studyTvEmpty").hidden = hasVideo || hasImage;
 }
 async function studyRefreshTV() {
   const token = ++studyTVToken;
   if (!studyRoomOpen || !studyCurrentBook || !studyPrefs.tvEnabled || studyPrefs.tvPosition === "off") return;
-  const song = window.Trk.core.currentSong;
-  window.Trk.core.$("studyTvLabel").textContent = song ? (song.title || song.key) : "";
-  const hasVideo = !!(typeof videoReady !== "undefined" && window.Trk.core.videoReady && window.Trk.core.video.videoWidth > 0 && window.Trk.core.video.videoHeight > 0 && window.Trk.core.settings.videoStyle !== "off");
+  const song = core.currentSong;
+  core.$("studyTvLabel").textContent = song ? (song.title || song.key) : "";
+  const hasVideo = !!(typeof videoReady !== "undefined" && core.videoReady && core.video.videoWidth > 0 && core.video.videoHeight > 0 && core.settings.videoStyle !== "off");
   if (hasVideo) { studySetTVVisible(true, false); return; }
   let blob = null;
   if (song && window.TrkStudyRoom) blob = await studyGetSongCoverBlob(song.key);
@@ -1914,28 +1915,28 @@ async function studyRefreshTV() {
   const artKey = song && song.key || "";
   if (blob) {
     if (studyTVArtSong !== artKey || !studyTVArtUrl) {
-      studyClearImage(window.Trk.core.$("studyTvArt"));
-      studyTVArtUrl = studySetImage(window.Trk.core.$("studyTvArt"), blob, song ? (song.title || song.key) : "") ? (window.Trk.core.$("studyTvArt").dataset.studyObjectUrl || "") : "";
+      studyClearImage(core.$("studyTvArt"));
+      studyTVArtUrl = studySetImage(core.$("studyTvArt"), blob, song ? (song.title || song.key) : "") ? (core.$("studyTvArt").dataset.studyObjectUrl || "") : "";
     }
     studyTVArtSong = artKey; studySetTVVisible(false, true);
   } else {
-    studyClearImage(window.Trk.core.$("studyTvArt")); studyTVArtUrl = "";
+    studyClearImage(core.$("studyTvArt")); studyTVArtUrl = "";
     studyTVArtSong = artKey; studySetTVVisible(false, false);
   }
 }
 function studySyncTVDirection() {
-  let position = window.Trk.core.$("studyTvPosition").value, enabled = window.Trk.core.$("studyTvCheck").checked;
-  if (enabled && position === "off") { position = "top"; window.Trk.core.$("studyTvPosition").value = position; }
+  let position = core.$("studyTvPosition").value, enabled = core.$("studyTvCheck").checked;
+  if (enabled && position === "off") { position = "top"; core.$("studyTvPosition").value = position; }
   if (position === "off") enabled = false;
   studyPrefs.tvEnabled = enabled; studyPrefs.tvPosition = position;
-  window.Trk.core.$("studyTvCheck").checked = enabled; studySavePrefs(); studyApplyTVLayout();
+  core.$("studyTvCheck").checked = enabled; studySavePrefs(); studyApplyTVLayout();
 }
 function studyCycleTV() {
   const enabled = studyPrefs.tvEnabled, position = studyPrefs.tvPosition;
   if (!enabled || position === "off") { studyPrefs.tvEnabled = true; studyPrefs.tvPosition = "top"; }
   else if (position === "top") studyPrefs.tvPosition = "bottom";
   else { studyPrefs.tvEnabled = false; studyPrefs.tvPosition = "off"; }
-  window.Trk.core.$("studyTvCheck").checked = studyPrefs.tvEnabled; window.Trk.core.$("studyTvPosition").value = studyPrefs.tvPosition;
+  core.$("studyTvCheck").checked = studyPrefs.tvEnabled; core.$("studyTvPosition").value = studyPrefs.tvPosition;
   studySavePrefs(); studyApplyTVLayout();
 }
 
@@ -1943,16 +1944,16 @@ function studyCycleTV() {
 async function studyAssignCurrentCover() {
   const book = studyCurrentBook;
   if (!book || book.kind !== "image" || !book.pages.length) { studyNotify("studyCoverNeedImage"); return; }
-  if (!window.Trk.core.currentSong) { studyNotify("studyCoverNeedSong"); return; }
-  const songKey = window.Trk.core.currentSong.key, songTitle = window.Trk.core.currentSong.title || window.Trk.core.currentSong.key;
+  if (!core.currentSong) { studyNotify("studyCoverNeedSong"); return; }
+  const songKey = core.currentSong.key, songTitle = core.currentSong.title || core.currentSong.key;
   const index = Math.max(0, Math.min(book.pages.length - 1, studyCurrentPage)), page = studyPageAt(book, index);
   if (!page) { studyNotify("studyCoverNeedImage"); return; }
   try {
     const blob = await studyDBRun("pages", "readonly", store => store.get(page.key));
     if (!blob) throw new Error("Missing Study image");
     await studyDBRun("covers", "readwrite", store => store.put({ bookId:book.id, pageKey:page.key, pageIndex:index, title:book.title, updatedAt:Date.now() }, songKey));
-    window.Trk.core.emit("studyCoverChanged", songKey);
-    if (typeof setBackground === "function" && window.Trk.core.currentSong && window.Trk.core.currentSong.key === songKey) await window.Trk.media.setBackground(blob);
+    core.emit("studyCoverChanged", songKey);
+    if (typeof setBackground === "function" && core.currentSong && core.currentSong.key === songKey) await window.Trk.media.setBackground(blob);
     studyNotify("studyCoverAssigned", { title:songTitle });
     studyRefreshTV(); studyRefreshCoverButtons();
   } catch (error) { studyFail(error, "studyCoverError"); }
@@ -1976,15 +1977,15 @@ async function studyGetSongCoverBlob(songKey) {
   } catch (_) { return null; }
 }
 async function studyClearSongCover(songKey) {
-  const key = typeof songKey === "string" && songKey ? songKey : window.Trk.core.currentSong && window.Trk.core.currentSong.key;
+  const key = typeof songKey === "string" && songKey ? songKey : core.currentSong && core.currentSong.key;
   if (!key) { studyNotify("studyCoverNeedSong"); return false; }
   try {
     const info = await studyGetSongCoverInfo(key);
     if (!info) { studyNotify("studyCoverNeedCover"); return false; }
     await studyDBRun("covers", "readwrite", store => store.delete(key));
-    window.Trk.core.emit("studyCoverChanged", key);
-    if (typeof setBackground === "function" && window.Trk.core.currentSong && window.Trk.core.currentSong.key === key) {
-      const song = window.Trk.core.currentSong;
+    core.emit("studyCoverChanged", key);
+    if (typeof setBackground === "function" && core.currentSong && core.currentSong.key === key) {
+      const song = core.currentSong;
       if (song.bgBlob) await window.Trk.media.setBackground(song.bgBlob); else await window.Trk.media.setBackground(null);
     }
     studyNotify("studyCoverCleared");
@@ -1993,13 +1994,13 @@ async function studyClearSongCover(songKey) {
   } catch (error) { studyFail(error, "studyCoverError"); return false; }
 }
 async function studyRefreshCoverButtons() {
-  const song = window.Trk.core.currentSong, assign = window.Trk.core.$("studyAssignCoverBtn"), clear = window.Trk.core.$("studyClearCoverBtn");
+  const song = core.currentSong, assign = core.$("studyAssignCoverBtn"), clear = core.$("studyClearCoverBtn");
   assign.disabled = !song;
   assign.title = song ? tr("studyAssignCover") : tr("studyCoverNeedSong");
   clear.hidden = true;
   if (!song || !studyRoomOpen) return;
   const info = await studyGetSongCoverInfo(song.key);
-  if (!window.Trk.core.currentSong || window.Trk.core.currentSong.key !== song.key) return;
+  if (!core.currentSong || core.currentSong.key !== song.key) return;
   if (info) {
     clear.hidden = false;
     clear.title = tr("studyCoverSource", { title:info.title || "?", n:info.pageIndex + 1 });
@@ -2018,7 +2019,7 @@ function studyCreateFolder() {
   const now = Date.now();
   const folder = { id, name, createdAt:now, updatedAt:now };
   studyShelfFolders.push(folder); studyShelfContainer("").push(studyShelfItemKey("folder", id));
-  studyShelfViewFolder = ""; studyShelfShown = STUDY_SHELF_PAGE; window.Trk.core.$("studySearch").value = "";
+  studyShelfViewFolder = ""; studyShelfShown = STUDY_SHELF_PAGE; core.$("studySearch").value = "";
   studyRefreshEditedTextFolderSelect(); studySaveShelfMeta(); studyRenderShelf(); studyNotify("studyFolderCreated");
 }
 function studyRenameFolder(folder) {
@@ -2056,7 +2057,7 @@ async function studyRenameBook(book) {
   const title = String(next).trim().slice(0, 160);
   if (!title) return;
   book.title = title;
-  if (studyCurrentBook && studyCurrentBook.id === book.id) window.Trk.core.$("studyCurrentTitle").textContent = title;
+  if (studyCurrentBook && studyCurrentBook.id === book.id) core.$("studyCurrentTitle").textContent = title;
   try { await studySaveBook(book); studyNotify("studyRenamed"); }
   catch (error) { studyFail(error); }
 }
@@ -2072,26 +2073,26 @@ async function studyDeleteBook(book) {
       removedSongs.push(songKey); await studyDBRun("covers", "readwrite", store => store.delete(songKey));
     }
     await studyRefreshBooks();
-    for (const songKey of removedSongs) window.Trk.core.emit("studyCoverChanged", songKey);
+    for (const songKey of removedSongs) core.emit("studyCoverChanged", songKey);
     studyNotify("studyDeleted");
   } catch (error) { studyFail(error); }
 }
 
 /* ============ テキスト編集と書き出し ============ */
 function studySetEditorStatus(key, force = false) {
-  const status = window.Trk.core.$("studyEditorSaveStatus");
+  const status = core.$("studyEditorSaveStatus");
   if (!force && status.dataset.state === key) return;
   status.dataset.state = key; status.textContent = tr(key);
 }
 function studyUpdateEditorStats() {
   if (!studyCurrentBook || studyCurrentBook.kind !== "text") return;
-  const text = window.Trk.core.$("studyMemoEditor").hidden ? studyCurrentBook.content : window.Trk.core.$("studyMemoEditor").value;
-  window.Trk.core.$("studyEditorStats").textContent = tr("studyTextStats", STUDY_UTIL.textStats(text));
+  const text = core.$("studyMemoEditor").hidden ? studyCurrentBook.content : core.$("studyMemoEditor").value;
+  core.$("studyEditorStats").textContent = tr("studyTextStats", STUDY_UTIL.textStats(text));
 }
 async function studyFlushMemo(seal = false) {
   clearTimeout(studyMemoSaveTimer); studyMemoSaveTimer = 0;
-  if (!studyCurrentBook || studyCurrentBook.kind !== "text" || window.Trk.core.$("studyMemoEditor").hidden) return true;
-  const editor = window.Trk.core.$("studyMemoEditor"), book = studyCurrentBook;
+  if (!studyCurrentBook || studyCurrentBook.kind !== "text" || core.$("studyMemoEditor").hidden) return true;
+  const editor = core.$("studyMemoEditor"), book = studyCurrentBook;
   if (seal) editor.readOnly = true;
   const content = editor.value;
   book.content = content;
@@ -2114,7 +2115,7 @@ async function studyFlushMemo(seal = false) {
 }
 function studyMemoInput() {
   if (!studyCurrentBook || studyCurrentBook.kind !== "text") return;
-  studyCurrentBook.content = window.Trk.core.$("studyMemoEditor").value;
+  studyCurrentBook.content = core.$("studyMemoEditor").value;
   studySetEditorStatus("studyEditorUnsaved");
   clearTimeout(studyMemoSaveTimer); studyMemoSaveTimer = setTimeout(studyFlushMemo, 800);
 }
@@ -2122,14 +2123,14 @@ function studyToggleMemo() {
   if (studyClosePending) return;
   const book = studyCurrentBook;
   if (!book || book.kind !== "text") { studyNotify("studyMemoNeedText"); return; }
-  const editor = window.Trk.core.$("studyMemoEditor"), editing = editor.hidden, button = window.Trk.core.$("studyMemoBtn");
+  const editor = core.$("studyMemoEditor"), editing = editor.hidden, button = core.$("studyMemoBtn");
   if (editing) {
     studyEndSearch();
     editor.value = book.content || "";
     editor.spellcheck = ["txt", "md", "markdown"].includes(String(book.extension || "").toLowerCase());
     editor.readOnly = false; editor.hidden = false;
-    window.Trk.core.$("studyEditorNotice").hidden = false; window.Trk.core.$("studyTextPage").hidden = true;
-    button.textContent = tr("studyMemoDone"); window.Trk.core.$("studyMemoExportBtn").hidden = false;
+    core.$("studyEditorNotice").hidden = false; core.$("studyTextPage").hidden = true;
+    button.textContent = tr("studyMemoDone"); core.$("studyMemoExportBtn").hidden = false;
     studySetEditorStatus("studyEditorSaved", true); studyUpdateEditorStats(); studySyncFindRow();
     editor.focus({ preventScroll:true });
   } else {
@@ -2137,8 +2138,8 @@ function studyToggleMemo() {
     studyFlushMemo(true).then(saved => {
       button.disabled = false;
       if (!saved) { editor.focus({ preventScroll:true }); return; }
-      editor.readOnly = false; editor.hidden = true; window.Trk.core.$("studyEditorNotice").hidden = true; window.Trk.core.$("studyTextPage").hidden = false;
-      button.textContent = tr("studyMemoEdit"); window.Trk.core.$("studyMemoExportBtn").hidden = false;
+      editor.readOnly = false; editor.hidden = true; core.$("studyEditorNotice").hidden = true; core.$("studyTextPage").hidden = false;
+      button.textContent = tr("studyMemoEdit"); core.$("studyMemoExportBtn").hidden = false;
       studyRenderTextContent(book); studySyncTextProgress(); studySyncFindRow();
     });
   }
@@ -2179,7 +2180,7 @@ async function studyChooseExportDirectory() {
 async function studyExportText() {
   if (!studyCurrentBook || studyCurrentBook.kind !== "text") return;
   const book = studyCurrentBook;
-  const text = window.Trk.core.$("studyMemoEditor").hidden ? book.content : window.Trk.core.$("studyMemoEditor").value;
+  const text = core.$("studyMemoEditor").hidden ? book.content : core.$("studyMemoEditor").value;
   const title = String(book.title || "notes").replace(/[\\/:*?"<>|\u0000-\u001f]/g, "_").trim().slice(0, 80) || "notes";
   const rawExtension = String(book.extension || "txt").toLowerCase();
   const ext = /^[a-z0-9]{1,16}$/.test(rawExtension) ? rawExtension : "txt";
@@ -2192,28 +2193,28 @@ async function studyExportText() {
     } catch (error) { console.warn(error); fallback = true; }
   }
   if (typeof downloadBlob === "function") {
-    window.Trk.core.downloadBlob(blob, `${title} - edited.${ext}`);
+    core.downloadBlob(blob, `${title} - edited.${ext}`);
     if (fallback) studyNotify("studyExportFolderFallback");
   } else if (fallback) studyNotify("studyExportFolderFallback");
 }
 
 /* ============ ❓ キーの説明 ============ */
 function studyHelpOpen() {
-  if (!studyRoomOpen || !window.Trk.core.$("studyHelp").hidden) return;
+  if (!studyRoomOpen || !core.$("studyHelp").hidden) return;
   if (studyKeyCaptureAction) { studyKeyCaptureAction = ""; studyRefreshKeyAssignments(); }
-  window.Trk.core.$("studyHelp").hidden = false;
-  window.Trk.core.$("studyHelpCloseBtn").focus({ preventScroll:true });
+  core.$("studyHelp").hidden = false;
+  core.$("studyHelpCloseBtn").focus({ preventScroll:true });
 }
 function studyCloseHelp() {
-  if (window.Trk.core.$("studyHelp").hidden) return false;
-  window.Trk.core.$("studyHelp").hidden = true;
+  if (core.$("studyHelp").hidden) return false;
+  core.$("studyHelp").hidden = true;
   studyPrefs.helpSeen = true; studySavePrefs();
-  const target = studyCurrentBook && studyCurrentBook.kind === "image" ? window.Trk.core.$("studyImageStage")
-    : studyCurrentBook ? window.Trk.core.$("studyTextPage") : window.Trk.core.$("studyCloseBtn");
+  const target = studyCurrentBook && studyCurrentBook.kind === "image" ? core.$("studyImageStage")
+    : studyCurrentBook ? core.$("studyTextPage") : core.$("studyCloseBtn");
   if (target) target.focus({ preventScroll:true });
   return true;
 }
-function studyToggleHelp() { if (window.Trk.core.$("studyHelp").hidden) studyHelpOpen(); else studyCloseHelp(); }
+function studyToggleHelp() { if (core.$("studyHelp").hidden) studyHelpOpen(); else studyCloseHelp(); }
 
 /* ============ キー操作 ============ */
 /* 文字を打つ場所では、書斎のキー操作を止めます（入力の邪魔をしない）。 */
@@ -2267,21 +2268,21 @@ function studyKeyDown(event) {
   if (studyHandleKeyCapture(event)) return;
   if (event.code === "Escape" && event.target && event.target.id === "studyMemoEditor") {
     event.preventDefault(); event.stopImmediatePropagation();
-    window.Trk.core.$("studyMemoEditor").blur(); studyToggleMemo(); return;
+    core.$("studyMemoEditor").blur(); studyToggleMemo(); return;
   }
   if (event.target && event.target.id === "studyMemoEditor" && !event.shiftKey && (event.ctrlKey || event.metaKey) && event.code === "KeyS") {
     event.preventDefault(); event.stopImmediatePropagation(); studyFlushMemo(); return;
   }
   if (studyEditorHandleTab(event)) return;
-  const helpOpen = !window.Trk.core.$("studyHelp").hidden;
+  const helpOpen = !core.$("studyHelp").hidden;
   if (helpOpen) {
     if (event.code === "Escape") { event.preventDefault(); event.stopImmediatePropagation(); studyCloseHelp(); return; }
     if (event.code === "Tab") {
-      const card = window.Trk.core.$("studyHelp").querySelector(".study-help-card");
+      const card = core.$("studyHelp").querySelector(".study-help-card");
       const focusable = [...card.querySelectorAll("button:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex='-1'])")]
         .filter(node => !node.hidden && node.getClientRects().length);
       const index = focusable.indexOf(document.activeElement);
-      if (!focusable.length) { event.preventDefault(); window.Trk.core.$("studyHelpCloseBtn").focus(); event.stopImmediatePropagation(); return; }
+      if (!focusable.length) { event.preventDefault(); core.$("studyHelpCloseBtn").focus(); event.stopImmediatePropagation(); return; }
       if (event.shiftKey && index <= 0) { event.preventDefault(); focusable[focusable.length - 1].focus(); }
       else if (!event.shiftKey && (index < 0 || index === focusable.length - 1)) { event.preventDefault(); focusable[0].focus(); }
       event.stopImmediatePropagation(); return;
@@ -2294,7 +2295,7 @@ function studyKeyDown(event) {
   if (event.code === "Tab") {
     const focusable = [...studyRoom.querySelectorAll("button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),summary,[tabindex]:not([tabindex='-1'])")]
       .filter(node => !node.hidden && node.getClientRects().length);
-    if (!focusable.length) { event.preventDefault(); window.Trk.core.$("studyCloseBtn").focus(); event.stopImmediatePropagation(); return; }
+    if (!focusable.length) { event.preventDefault(); core.$("studyCloseBtn").focus(); event.stopImmediatePropagation(); return; }
     const index = focusable.indexOf(document.activeElement);
     if (event.shiftKey && index <= 0) { event.preventDefault(); focusable[focusable.length - 1].focus(); }
     else if (!event.shiftKey && (index < 0 || index === focusable.length - 1)) { event.preventDefault(); focusable[0].focus(); }
@@ -2391,10 +2392,10 @@ function studyImagePointerMove(event) {
     if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
       clearTimeout(studyHoldTimer); studyHoldTimer = 0;
       studyPointerStart.panning = true;
-      const nodes = studyPrefs.imageMode === "spread" ? [...window.Trk.core.$("studySpreadWrap").querySelectorAll(".study-spread-page")] : [window.Trk.core.$("studySingleWrap")];
+      const nodes = studyPrefs.imageMode === "spread" ? [...core.$("studySpreadWrap").querySelectorAll(".study-spread-page")] : [core.$("studySingleWrap")];
       for (const node of nodes) { if (!node) continue; node.scrollLeft -= dx; node.scrollTop -= dy; }
       studyPointerStart.x = event.clientX; studyPointerStart.y = event.clientY;
-      window.Trk.core.$("studyImageStage").dataset.panning = "1";
+      core.$("studyImageStage").dataset.panning = "1";
       return;
     }
   }
@@ -2406,7 +2407,7 @@ function studyImagePointerEnd(event) {
     studyPinchStart = 0; studySetZoom(studySnapZoom(studyPrefs.zoom), true);
     if (Math.abs(studyPrefs.zoom - 1) > .001) studySetStatus("studyZoomHint");
   }
-  delete window.Trk.core.$("studyImageStage").dataset.panning;
+  delete core.$("studyImageStage").dataset.panning;
   if (!studyPointerStart || studyPointerStart.id !== event.pointerId) return;
   clearTimeout(studyHoldTimer); studyHoldTimer = 0;
   const start = studyPointerStart; studyPointerStart = null;
@@ -2422,13 +2423,13 @@ function studyImagePointerEnd(event) {
 function studyImageTap(event) {
   if (Date.now() < studySuppressTapUntil || (event.target && typeof event.target.closest === "function" && event.target.closest("button"))) return;
   if (!studyCurrentBook || studyCurrentBook.kind !== "image" || studyPrefs.imageMode === "vertical") return;
-  const rect = window.Trk.core.$("studyImageStage").getBoundingClientRect();
+  const rect = core.$("studyImageStage").getBoundingClientRect();
   studyStepPhysical(event.clientX < rect.left + rect.width / 2 ? "left" : "right");
 }
 function studyVerticalScroll() {
   clearTimeout(studyVerticalScrollTimer);
   studyVerticalScrollTimer = setTimeout(() => {
-    const box = window.Trk.core.$("studyVerticalPages"), rect = window.Trk.core.$("studyImageStage").getBoundingClientRect(), targetY = rect.top + rect.height * .35;
+    const box = core.$("studyVerticalPages"), rect = core.$("studyImageStage").getBoundingClientRect(), targetY = rect.top + rect.height * .35;
     const items = [...box.children]; let best = null, bestDist = Infinity;
     for (const item of items) {
       const r = item.getBoundingClientRect(), img = item.querySelector("img"), index = Number(item.dataset.pageIndex);
@@ -2450,22 +2451,22 @@ function studyOpenRoom() {
   if (studySafeMode()) { studyNotify("studySafeMode"); return; }
   if (studyRoomOpen) return;
   studyRoomOpen = true; window.Trk.overlay.set("study", true);
-  window.Trk.core.$("studyRoom").hidden = false; document.body.classList.add("study-room-open");
+  core.$("studyRoom").hidden = false; document.body.classList.add("study-room-open");
   studyRefreshPrefsUI();
   studyReadyPromise.then(() => {
     studyRenderShelf(); studyRenderBookmarks(); studyRefreshShelfFoot();
-    if (studyCurrentBook) { window.Trk.core.$("studyBookView").hidden = false; studySyncWelcome(); studyApplyTVLayout(); }
+    if (studyCurrentBook) { core.$("studyBookView").hidden = false; studySyncWelcome(); studyApplyTVLayout(); }
     studySweepOrphans().then(cleaned => { if (cleaned) studySetStatus("studyOrphanSweep", { n:cleaned }); });
   }).catch(studyFail);
-  if (!studyCurrentBook) { window.Trk.core.$("studyBookView").hidden = true; studySyncWelcome(); studyApplyTVLayout(); }
-  window.Trk.core.$("studyCloseBtn").focus({ preventScroll:true });
+  if (!studyCurrentBook) { core.$("studyBookView").hidden = true; studySyncWelcome(); studyApplyTVLayout(); }
+  core.$("studyCloseBtn").focus({ preventScroll:true });
   if (!studyPrefs.helpSeen) { studyPrefs.helpSeen = true; studySavePrefs(); studyHelpOpen(); }
 }
 async function studyCloseRoom() {
   if (!studyRoomOpen || studyClosePending) return;
   studyClosePending = true;
   studyKeyCaptureAction = ""; studyRefreshKeyAssignments();
-  const editor = window.Trk.core.$("studyMemoEditor");
+  const editor = core.$("studyMemoEditor");
   if (!editor.hidden && !await studyFlushMemo(true)) {
     studyClosePending = false; editor.focus({ preventScroll:true }); return;
   }
@@ -2473,21 +2474,21 @@ async function studyCloseRoom() {
   clearTimeout(studyHoldTimer); studyHoldTimer = 0; studyHeldCode = ""; studyPointerStart = null;
   clearTimeout(studyShelfHoldTimer); studyShelfHoldTimer = 0; studyShelfHoldFired = false;
   studyPointers.clear(); studyPinchStart = 0;
-  if (!window.Trk.core.$("studyHelp").hidden) window.Trk.core.$("studyHelp").hidden = true;
+  if (!core.$("studyHelp").hidden) core.$("studyHelp").hidden = true;
   studyEndSearch();
   studyRoomOpen = false; window.Trk.overlay.set("study", false);
-  window.Trk.core.$("studyProgressWrap").hidden = true; window.Trk.core.$("studyRoom").classList.remove("study-progress-visible");
-  if (document.fullscreenElement === window.Trk.core.$("studyRoom") && document.exitFullscreen) document.exitFullscreen().catch(() => {});
-  studyFullscreenFallback = false; window.Trk.core.$("studyRoom").classList.remove("study-fullimage");
+  core.$("studyProgressWrap").hidden = true; core.$("studyRoom").classList.remove("study-progress-visible");
+  if (document.fullscreenElement === core.$("studyRoom") && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+  studyFullscreenFallback = false; core.$("studyRoom").classList.remove("study-fullimage");
   studyRoom.hidden = true; document.body.classList.remove("study-room-open");
   studyTVToken++; studyRestoreVideoHome();
-  studyClearImage(window.Trk.core.$("studyTvArt")); studyTVArtUrl = ""; studyTVArtSong = "";
+  studyClearImage(core.$("studyTvArt")); studyTVArtUrl = ""; studyTVArtSong = "";
   const title = document.querySelector("#libPanel .libHead .study-launch-title"); if (title) title.focus({ preventScroll:true });
   studyClosePending = false;
 }
 async function studyToggleFullscreen() {
   if (!studyCurrentBook || studyCurrentBook.kind !== "image") return;
-  const room = window.Trk.core.$("studyRoom");
+  const room = core.$("studyRoom");
   if (room.classList.contains("study-fullimage")) {
     if (document.fullscreenElement === room && document.exitFullscreen) { try { await document.exitFullscreen(); } catch (_) {} }
     room.classList.remove("study-fullimage"); studyFullscreenFallback = false; studySyncCurrentBookControls(); studySyncFindRow(); return;
@@ -2501,7 +2502,7 @@ async function studyToggleFullscreen() {
 }
 
 /* ============ 配線 ============ */
-const studyRoom = window.Trk.core.$("studyRoom");
+const studyRoom = core.$("studyRoom");
 function studyTranslateNodes() {
   for (const node of studyRoom.querySelectorAll("[data-i18n]")) {
     const translated = tr(node.dataset.i18n);
@@ -2510,9 +2511,9 @@ function studyTranslateNodes() {
   }
 }
 studyTranslateNodes();
-window.Trk.core.$("studySearch").placeholder = tr("studySearch");
-window.Trk.core.$("studyFindInput").placeholder = tr("studyBookSearchPlaceholder");
-const studyShelfTitle = window.Trk.core.$("studyShelfCreateFolder");
+core.$("studySearch").placeholder = tr("studySearch");
+core.$("studyFindInput").placeholder = tr("studyBookSearchPlaceholder");
+const studyShelfTitle = core.$("studyShelfCreateFolder");
 function studySyncShelfTitleHint() {
   studyShelfTitle.title = tr("studyFolderCreateHint");
   studyShelfTitle.setAttribute("aria-label", `${tr("studyShelf")}. ${tr("studyFolderCreateHint")}`);
@@ -2533,48 +2534,48 @@ studyShelfTitle.addEventListener("click", event => {
   if (studyShelfHoldFired) { studyShelfHoldFired = false; event.preventDefault(); event.stopPropagation(); return; }
   studyCreateFolder();
 });
-window.Trk.core.$("studyShowShelfBtn").addEventListener("click", () => {
-  studySetShelfVisible(true); window.Trk.core.$("studyShelfCreateFolder").focus({ preventScroll:true });
+core.$("studyShowShelfBtn").addEventListener("click", () => {
+  studySetShelfVisible(true); core.$("studyShelfCreateFolder").focus({ preventScroll:true });
 });
-window.Trk.core.$("studyNextKeyBtn").addEventListener("click", () => studySetKeyCapture("next"));
-window.Trk.core.$("studyPreviousKeyBtn").addEventListener("click", () => studySetKeyCapture("previous"));
-window.Trk.core.$("studyCloseBtn").addEventListener("click", studyCloseRoom);
-window.Trk.core.$("studyBackBtn").addEventListener("click", studyBackToShelf);
-window.Trk.core.$("studyFullscreenBtn").addEventListener("click", studyToggleFullscreen);
-window.Trk.core.$("studyImportCancelBtn").addEventListener("click", studyCancelImport);
-window.Trk.core.$("studyBookmarksBtn").addEventListener("click", () => studyToggleBookmarkPanel());
-window.Trk.core.$("studyHelpBtn").addEventListener("click", studyToggleHelp);
-window.Trk.core.$("studyHelpCloseBtn").addEventListener("click", studyCloseHelp);
-window.Trk.core.$("studyHelp").addEventListener("click", event => { if (event.target === window.Trk.core.$("studyHelp")) studyCloseHelp(); });
-window.Trk.core.$("studyZoomIn").addEventListener("click", () => studyStepZoom(1));
-window.Trk.core.$("studyZoomOut").addEventListener("click", () => studyStepZoom(-1));
-window.Trk.core.$("studyZoomFit").addEventListener("click", studyZoomReset);
-window.Trk.core.$("studyNextBtn").addEventListener("click", () => studyStep(1));
-window.Trk.core.$("studyPrevBtn").addEventListener("click", () => studyStep(-1));
-window.Trk.core.$("studyBookmarkBtn").addEventListener("click", studyToggleBookmark);
-window.Trk.core.$("studyAssignCoverBtn").addEventListener("click", studyAssignCurrentCover);
-window.Trk.core.$("studyClearCoverBtn").addEventListener("click", () => studyClearSongCover());
-window.Trk.core.$("studyMemoBtn").addEventListener("click", studyToggleMemo);
-window.Trk.core.$("studyMemoExportBtn").addEventListener("click", studyExportText);
-window.Trk.core.$("studyChooseExportFolderBtn").addEventListener("click", studyChooseExportDirectory);
-window.Trk.core.$("studyClearExportFolderBtn").addEventListener("click", () => { studyExportDirectory = null; studyRefreshExportFolderUI(); });
-window.Trk.core.$("studyMemoEditor").addEventListener("input", studyMemoInput);
-window.Trk.core.$("studyProgress").addEventListener("change", studyJumpFromSlider);
-window.Trk.core.$("studyProgressDoneBtn").addEventListener("click", studyHideProgress);
-window.Trk.core.$("studySearch").addEventListener("input", () => { studyShelfShown = STUDY_SHELF_PAGE; studyRenderShelf(); });
-const studyShelfList = window.Trk.core.$("studyShelfList");
+core.$("studyNextKeyBtn").addEventListener("click", () => studySetKeyCapture("next"));
+core.$("studyPreviousKeyBtn").addEventListener("click", () => studySetKeyCapture("previous"));
+core.$("studyCloseBtn").addEventListener("click", studyCloseRoom);
+core.$("studyBackBtn").addEventListener("click", studyBackToShelf);
+core.$("studyFullscreenBtn").addEventListener("click", studyToggleFullscreen);
+core.$("studyImportCancelBtn").addEventListener("click", studyCancelImport);
+core.$("studyBookmarksBtn").addEventListener("click", () => studyToggleBookmarkPanel());
+core.$("studyHelpBtn").addEventListener("click", studyToggleHelp);
+core.$("studyHelpCloseBtn").addEventListener("click", studyCloseHelp);
+core.$("studyHelp").addEventListener("click", event => { if (event.target === core.$("studyHelp")) studyCloseHelp(); });
+core.$("studyZoomIn").addEventListener("click", () => studyStepZoom(1));
+core.$("studyZoomOut").addEventListener("click", () => studyStepZoom(-1));
+core.$("studyZoomFit").addEventListener("click", studyZoomReset);
+core.$("studyNextBtn").addEventListener("click", () => studyStep(1));
+core.$("studyPrevBtn").addEventListener("click", () => studyStep(-1));
+core.$("studyBookmarkBtn").addEventListener("click", studyToggleBookmark);
+core.$("studyAssignCoverBtn").addEventListener("click", studyAssignCurrentCover);
+core.$("studyClearCoverBtn").addEventListener("click", () => studyClearSongCover());
+core.$("studyMemoBtn").addEventListener("click", studyToggleMemo);
+core.$("studyMemoExportBtn").addEventListener("click", studyExportText);
+core.$("studyChooseExportFolderBtn").addEventListener("click", studyChooseExportDirectory);
+core.$("studyClearExportFolderBtn").addEventListener("click", () => { studyExportDirectory = null; studyRefreshExportFolderUI(); });
+core.$("studyMemoEditor").addEventListener("input", studyMemoInput);
+core.$("studyProgress").addEventListener("change", studyJumpFromSlider);
+core.$("studyProgressDoneBtn").addEventListener("click", studyHideProgress);
+core.$("studySearch").addEventListener("input", () => { studyShelfShown = STUDY_SHELF_PAGE; studyRenderShelf(); });
+const studyShelfList = core.$("studyShelfList");
 studyShelfList.addEventListener("dragover", event => studyShelfDragOver(event, { type:"container", folderId:studyShelfViewFolder }, studyShelfList));
 studyShelfList.addEventListener("dragleave", event => { if (!studyShelfList.contains(event.relatedTarget)) studyShelfList.classList.remove("study-drop-target"); });
 studyShelfList.addEventListener("drop", event => studyShelfDrop(event, { type:"container", folderId:studyShelfViewFolder }));
-window.Trk.core.$("studyImageFolderInput").addEventListener("change", event => {
+core.$("studyImageFolderInput").addEventListener("change", event => {
   const files = Array.from(event.target.files || []); event.target.value = ""; if (files.length) studyImportImages(files);
 });
-for (const id of ["studyTextFilesInput", "studyTextFolderInput"]) window.Trk.core.$(id).addEventListener("change", event => {
+for (const id of ["studyTextFilesInput", "studyTextFolderInput"]) core.$(id).addEventListener("change", event => {
   const files = Array.from(event.target.files || []); event.target.value = ""; if (files.length) studyImportTexts(files);
 });
 /* 設定の選択（文字列・チェックボックス）をまとめて結びつける。 */
 function studyBindPref(id, key, onChange) {
-  const node = window.Trk.core.$(id);
+  const node = core.$(id);
   node.addEventListener("change", () => {
     studyPrefs[key] = node.type === "checkbox" ? node.checked : node.value;
     studySavePrefs();
@@ -2591,7 +2592,7 @@ function studySyncBookOrder() {
 studyBindPref("studyImageMode", "imageMode", studySyncBookOrder);
 studyBindPref("studyImageOrder", "imageOrder", studySyncBookOrder);
 studyBindPref("studyAmerican", "american", () => { if (studyCurrentBook && studyCurrentBook.kind === "image" && studyPrefs.imageMode !== "vertical") studyRenderImagePage(); studySyncCurrentBookControls(); });
-studyBindPref("studyTheme", "theme", () => { window.Trk.core.$("studyTextStage").dataset.theme = studyPrefs.theme; studySyncTextProgress(); });
+studyBindPref("studyTheme", "theme", () => { core.$("studyTextStage").dataset.theme = studyPrefs.theme; studySyncTextProgress(); });
 studyBindPref("studyTextSize", "textSize", studySyncLook);
 studyBindPref("studyTextSpacing", "textSpacing", studySyncLook);
 studyBindPref("studyTextWidth", "textWidth", studySyncLook);
@@ -2603,42 +2604,42 @@ studyBindPref("studyTvRatio", "tvRatio", studySyncLook);
 studyBindPref("studyTvLabelOn", "tvLabelOn", studySyncLook);
 studyBindPref("studyShelfSort", "shelfSort", () => studyRefreshBooks());
 studyBindPref("studyManualShelfOrder", "manualShelfOrder", () => {
-  window.Trk.core.$("studyShelfSort").disabled = studyPrefs.manualShelfOrder; studyShelfShown = STUDY_SHELF_PAGE; studyRenderShelf();
+  core.$("studyShelfSort").disabled = studyPrefs.manualShelfOrder; studyShelfShown = STUDY_SHELF_PAGE; studyRenderShelf();
 });
 studyBindPref("studyFoldersFirst", "foldersFirst", () => { studyShelfShown = STUDY_SHELF_PAGE; studyRenderShelf(); });
 studyBindPref("studySkipDeleteConfirm", "skipDeleteConfirm");
 studyBindPref("studyShelfVisible", "shelfVisible", () => {
   studyApplyShelfVisibility();
-  if (!studyPrefs.shelfVisible) window.Trk.core.$("studyShowShelfBtn").focus({ preventScroll:true });
+  if (!studyPrefs.shelfVisible) core.$("studyShowShelfBtn").focus({ preventScroll:true });
 });
 studyBindPref("studyVerticalImageKeys", "verticalImageKeys");
 studyBindPref("studyAlbumNesting", "albumNesting", () => studySetStatus("studyAlbumNestingHint"));
 studyBindPref("studyEditedTextFolder", "editedTextFolderId", () => {
-  if (studyCurrentBook && studyCurrentBook.kind === "text" && !window.Trk.core.$("studyMemoEditor").hidden) studyFlushMemo();
+  if (studyCurrentBook && studyCurrentBook.kind === "text" && !core.$("studyMemoEditor").hidden) studyFlushMemo();
 });
-window.Trk.core.$("studyFindInput").addEventListener("input", () => studyRunSearch(window.Trk.core.$("studyFindInput").value));
-window.Trk.core.$("studyFindInput").addEventListener("keydown", event => {
+core.$("studyFindInput").addEventListener("input", () => studyRunSearch(core.$("studyFindInput").value));
+core.$("studyFindInput").addEventListener("keydown", event => {
   if (event.code === "Enter") { event.preventDefault(); studySearchGo(studySearchState.index + (event.shiftKey ? -1 : 1)); }
   else if (event.code === "Escape") { event.preventDefault(); studyEndSearch(); }
   else if (event.code === "ArrowUp" || event.code === "ArrowDown") event.stopPropagation();
 });
-window.Trk.core.$("studyFindNext").addEventListener("click", () => studySearchGo(studySearchState.index + 1));
-window.Trk.core.$("studyFindPrev").addEventListener("click", () => studySearchGo(studySearchState.index - 1));
-window.Trk.core.$("studyFindClear").addEventListener("click", studyEndSearch);
-window.Trk.core.$("studyImageStage").addEventListener("click", studyImageTap);
-window.Trk.core.$("studyImageStage").addEventListener("pointerdown", studyImagePointerDown);
-window.Trk.core.$("studyImageStage").addEventListener("pointermove", studyImagePointerMove);
-window.Trk.core.$("studyImageStage").addEventListener("pointerup", studyImagePointerEnd);
-window.Trk.core.$("studyImageStage").addEventListener("pointercancel", studyImagePointerEnd);
-window.Trk.core.$("studyImageStage").addEventListener("contextmenu", event => event.preventDefault());
-window.Trk.core.$("studyImageStage").addEventListener("scroll", studyVerticalScroll, { passive:true });
-window.Trk.core.$("studyImageStage").addEventListener("wheel", event => {
+core.$("studyFindNext").addEventListener("click", () => studySearchGo(studySearchState.index + 1));
+core.$("studyFindPrev").addEventListener("click", () => studySearchGo(studySearchState.index - 1));
+core.$("studyFindClear").addEventListener("click", studyEndSearch);
+core.$("studyImageStage").addEventListener("click", studyImageTap);
+core.$("studyImageStage").addEventListener("pointerdown", studyImagePointerDown);
+core.$("studyImageStage").addEventListener("pointermove", studyImagePointerMove);
+core.$("studyImageStage").addEventListener("pointerup", studyImagePointerEnd);
+core.$("studyImageStage").addEventListener("pointercancel", studyImagePointerEnd);
+core.$("studyImageStage").addEventListener("contextmenu", event => event.preventDefault());
+core.$("studyImageStage").addEventListener("scroll", studyVerticalScroll, { passive:true });
+core.$("studyImageStage").addEventListener("wheel", event => {
   if (!event.ctrlKey && !event.metaKey) return;
   event.preventDefault();
   studyStepZoom(event.deltaY > 0 ? -1 : 1);
 }, { passive:false });
-window.Trk.core.$("studyTextPage").addEventListener("scroll", () => { clearTimeout(studyProgressTimer); studyProgressTimer = setTimeout(studySyncTextProgress, 80); }, { passive:true });
-window.Trk.core.$("studyTextStage").addEventListener("scroll", studySyncTextProgress, { passive:true });
+core.$("studyTextPage").addEventListener("scroll", () => { clearTimeout(studyProgressTimer); studyProgressTimer = setTimeout(studySyncTextProgress, 80); }, { passive:true });
+core.$("studyTextStage").addEventListener("scroll", studySyncTextProgress, { passive:true });
 document.addEventListener("keydown", studyKeyDown, true);
 document.addEventListener("keyup", studyKeyUp, true);
 addEventListener("blur", () => {
@@ -2646,33 +2647,33 @@ addEventListener("blur", () => {
   studyPointers.clear(); studyPinchStart = 0;
 });
 document.addEventListener("fullscreenchange", () => {
-  if (!document.fullscreenElement && !studyFullscreenFallback) window.Trk.core.$("studyRoom").classList.remove("study-fullimage");
+  if (!document.fullscreenElement && !studyFullscreenFallback) core.$("studyRoom").classList.remove("study-fullimage");
   studySyncCurrentBookControls(); studySyncFindRow();
 });
-window.Trk.core.video.addEventListener("loadedmetadata", studyRefreshTV); window.Trk.core.video.addEventListener("loadeddata", studyRefreshTV);
-window.Trk.core.video.addEventListener("resize", studyRefreshTV);
-window.Trk.core.on("songSelected", () => { studyRefreshTV(); studyRefreshCoverButtons(); });
-window.Trk.core.on("mediaReady", () => { studyRefreshTV(); studyRefreshCoverButtons(); });
-window.Trk.core.on("studyCoverChanged", key => {
-  if (!key || window.Trk.core.currentSong && key === window.Trk.core.currentSong.key) { studyTVArtSong = ""; studyRefreshTV(); studyRefreshCoverButtons(); }
+core.video.addEventListener("loadedmetadata", studyRefreshTV); core.video.addEventListener("loadeddata", studyRefreshTV);
+core.video.addEventListener("resize", studyRefreshTV);
+core.on("songSelected", () => { studyRefreshTV(); studyRefreshCoverButtons(); });
+core.on("mediaReady", () => { studyRefreshTV(); studyRefreshCoverButtons(); });
+core.on("studyCoverChanged", key => {
+  if (!key || core.currentSong && key === core.currentSong.key) { studyTVArtSong = ""; studyRefreshTV(); studyRefreshCoverButtons(); }
 });
-window.Trk.core.on("phase", p => { if (p !== "title") studyCloseRoom(); else { studyRefreshTV(); studyRefreshCoverButtons(); } });
-window.Trk.core.on("language", () => {
+core.on("phase", p => { if (p !== "title") studyCloseRoom(); else { studyRefreshTV(); studyRefreshCoverButtons(); } });
+core.on("language", () => {
   studyTranslateNodes();
-  window.Trk.core.$("studySearch").placeholder = tr("studySearch");
-  window.Trk.core.$("studyFindInput").placeholder = tr("studyBookSearchPlaceholder");
+  core.$("studySearch").placeholder = tr("studySearch");
+  core.$("studyFindInput").placeholder = tr("studyBookSearchPlaceholder");
   studySyncShelfTitleHint(); studyApplyShelfVisibility(); studyRefreshKeyAssignments();
   studyRefreshEditedTextFolderSelect(); studyRefreshExportFolderUI();
-  window.Trk.core.$("studyMemoBtn").textContent = tr(window.Trk.core.$("studyMemoEditor").hidden ? "studyMemoEdit" : "studyMemoDone");
-  studySetEditorStatus(window.Trk.core.$("studyEditorSaveStatus").dataset.state || "studyEditorSaved", true); studyUpdateEditorStats();
+  core.$("studyMemoBtn").textContent = tr(core.$("studyMemoEditor").hidden ? "studyMemoEdit" : "studyMemoDone");
+  studySetEditorStatus(core.$("studyEditorSaveStatus").dataset.state || "studyEditorSaved", true); studyUpdateEditorStats();
   studyRenderShelf(); studyRenderBookmarks();
   studySyncZoomRow(); studySyncLook();
   if (studyCurrentBook) {
-    window.Trk.core.$("studyCurrentTitle").textContent = studyCurrentBook.title;
-    window.Trk.core.$("studyCurrentMeta").textContent = studyCurrentBook.kind === "image" ? `${tr("studyBookImages")} · ${tr("studyPageCount", { n:studyCurrentBook.pages.length })}`
+    core.$("studyCurrentTitle").textContent = studyCurrentBook.title;
+    core.$("studyCurrentMeta").textContent = studyCurrentBook.kind === "image" ? `${tr("studyBookImages")} · ${tr("studyPageCount", { n:studyCurrentBook.pages.length })}`
       : `${tr("studyBookText")} · ${String(studyCurrentBook.extension || "TXT").toUpperCase()}`;
-    window.Trk.core.$("studyMemoBtn").textContent = window.Trk.core.$("studyMemoEditor").hidden ? tr("studyMemoEdit") : tr("studyMemoDone");
-    window.Trk.core.$("studyMemoExportBtn").hidden = studyCurrentBook.kind !== "text";
+    core.$("studyMemoBtn").textContent = core.$("studyMemoEditor").hidden ? tr("studyMemoEdit") : tr("studyMemoDone");
+    core.$("studyMemoExportBtn").hidden = studyCurrentBook.kind !== "text";
     studySyncPageCount(); studySyncCurrentBookControls(); studySyncTextProgress(); studyUpdateSearchCount();
   }
 });
@@ -2709,7 +2710,7 @@ if (studyLaunchTitle) {
 /* 📚 書斎を開くボタン（見出しの長押しの代わり。タップで開く。設定 showMoreBtns で隠せる） */
 const studyOpenBtn = document.getElementById("studyOpenBtn");
 if (studyOpenBtn) { studyOpenBtn.textContent = tr("studyOpenBtn"); studyOpenBtn.addEventListener("click", () => studyOpenRoom()); }
-window.Trk.core.on("language", () => {
+core.on("language", () => {
   if (studyOpenBtn) studyOpenBtn.textContent = tr("studyOpenBtn");
   if (!studyLaunchTitle) return;
   studyLaunchTitle.title = tr("studyLaunchHint");

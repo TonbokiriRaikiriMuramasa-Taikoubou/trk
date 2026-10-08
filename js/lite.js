@@ -1,4 +1,5 @@
 (() => {
+  const core = window.Trk.core;
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ 🪶 軽量化（スマホ・タブレット・アプリ「PWA／APK」向け） ============
    ・設定（⚙）の右下「🪶 軽量化（スマホ向け）」の欄から操作します。保存先はいつもの
@@ -62,7 +63,7 @@ function liteBatteryProbe() {
 const liteLowEnd = () => (liteInfo.cores > 0 && liteInfo.cores <= 4) || (liteInfo.mem > 0 && liteInfo.mem <= 2);
 /* セーフモード（?safe=1）では、初回の案内は出さない（軽量化そのものは働きます） */
 const liteSafe = () => { try { return typeof window.TrkSafeMode === "function" && window.TrkSafeMode(); } catch (_) { return false; } };
-const liteModeValue = () => (window.Trk.core.settings.liteMode === "on" ? "on" : window.Trk.core.settings.liteMode === "off" ? "off" : "auto");
+const liteModeValue = () => (core.settings.liteMode === "on" ? "on" : core.settings.liteMode === "off" ? "off" : "auto");
 /* 自動でオンにする理由（1つでもあれば働く。どの理由も端末の外へは出しません） */
 function liteAutoReasons() {
   const out = [];
@@ -90,9 +91,9 @@ function liteReasons() {
 
 /* ---------- ゲート（描く回数・描く大きさ） ---------- */
 const liteGates = Object.create(null);
-const liteFpsValue = () => ({ "60":60, "30":30, "20":20 }[window.Trk.core.settings.liteFps] || 30);
-const liteMascotFpsValue = () => ({ "60":60, "30":30, "15":15 }[window.Trk.core.settings.liteMascot] || 30);
-const liteScaleValue = () => (window.Trk.core.settings.liteScale === "1" ? 1 : window.Trk.core.settings.liteScale === "1.5" ? 1.5 : 0);
+const liteFpsValue = () => ({ "60":60, "30":30, "20":20 }[core.settings.liteFps] || 30);
+const liteMascotFpsValue = () => ({ "60":60, "30":30, "15":15 }[core.settings.liteMascot] || 30);
+const liteScaleValue = () => (core.settings.liteScale === "1" ? 1 : core.settings.liteScale === "1.5" ? 1.5 : 0);
 function liteGate(key, fps, now) {
   if (fps >= 60) return true;                        // 60fps上限＝実質いままでどおり
   const t = typeof now === "number" && now > 0 ? now : performance.now();   // 0・NaN・呼び忘れでも止まらない
@@ -106,20 +107,20 @@ function liteAllow(key, now) { return !liteActive() || liteGate(key, liteFpsValu
 /* 🎯 ゲーム中（ノーツ・映像・エフェクト）の描画：ゲーム優先のときは上限をかけない。
    判定と反応はもともと軽量化の影響を受けません（音声の時計で判定するため） */
 function liteAllowGame(now) {
-  if (!liteActive() || window.Trk.core.settings.liteGameFull === true) return true;
+  if (!liteActive() || core.settings.liteGameFull === true) return true;
   return liteGate("game", liteFpsValue(), now);
 }
 /* 🩷 3Dマスコット（MMD／VRM）：描画レートを下げる／「描画しない」 */
-const liteNoMascot = id => liteActive() && window.Trk.core.settings.liteMascot === "off" && (id === "mmd" || id === "vrm");
+const liteNoMascot = id => liteActive() && core.settings.liteMascot === "off" && (id === "mmd" || id === "vrm");
 function liteMascotAllow(id, now) { return !liteNoMascot(id) && (!liteActive() || liteGate("mascot:" + id, liteMascotFpsValue(), now)); }
 /* 📊 軽量化モード中はスペクトラム（アナライザー）を止める */
-const liteSpecBlocked = () => liteActive() && window.Trk.core.settings.liteSpectrumOff !== false;
+const liteSpecBlocked = () => liteActive() && core.settings.liteSpectrumOff !== false;
 /* 📡 軽量化モード中は「動き続ける装飾」を間引く（ドックのアンテナのキャラ・スキャンライン等）。
    見た目の問題であって判定・操作には影響ないので、📊スペクトラムや🎬映像と同じ liteFps の上限で間引きます */
-const liteDecorBlocked = () => liteActive() && window.Trk.core.settings.liteDecor !== false;
+const liteDecorBlocked = () => liteActive() && core.settings.liteDecor !== false;
 const liteDecorAllow = now => !liteDecorBlocked() || liteGate("decor", liteFpsValue(), now);
 /* 📜 曲リスト：初回に描く行数の上限（長い棚の読み込み・スクロールを軽くする） */
-const liteLibRowsValue = () => (window.Trk.core.settings.liteLibRows === "60" ? 60 : window.Trk.core.settings.liteLibRows === "150" ? 150 : 0);
+const liteLibRowsValue = () => (core.settings.liteLibRows === "60" ? 60 : core.settings.liteLibRows === "150" ? 150 : 0);
 function liteLibRows(max) {
   const all = Number(max) || 0, cap = liteActive() ? liteLibRowsValue() : 0;
   return cap && all > cap ? cap : all;
@@ -127,12 +128,12 @@ function liteLibRows(max) {
 /* 🧠 曲を選ぶときの音声解析（音量・立ち上がりの走査）を省略する。
    長い曲ほど効きます（解析はファイル全体をデコードするので時間とメモリが大きい）。
    譜面はBPMグリッド中心の自動生成になります（既存の自作譜面・自定义譜面はそのまま） */
-const liteNoAnalyze = () => liteActive() && window.Trk.core.settings.liteNoAnalyze === true;
+const liteNoAnalyze = () => liteActive() && core.settings.liteNoAnalyze === true;
 /* 🩷 3Dマスコット（MMD／VRM）を起動時に自動で読み込まない（three.jsごと読みません）。
    マスコットに選んだとき・設定欄を開いたとき・ファイルを選ぶときに読むので、失われません */
-const liteMascotNoLoad = () => liteActive() && window.Trk.core.settings.liteMascotNoLoad === true;
+const liteMascotNoLoad = () => liteActive() && core.settings.liteMascotNoLoad === true;
 /* 🎬 軽量化モード中は映像のぼかしを最大2pxに（スマホのGPUでいちばん重いところ） */
-const liteBlurCap = () => (liteActive() && window.Trk.core.settings.liteBlur !== false ? 2 : 0);
+const liteBlurCap = () => (liteActive() && core.settings.liteBlur !== false ? 2 : 0);
 /* 🖼 描画解像度：端末のdevicePixelRatioに、軽量化モードの上限をかける */
 function litePixelRatio(max) {
   const raw = Math.min(Number(max) || 2, typeof devicePixelRatio === "number" && devicePixelRatio > 0 ? devicePixelRatio : 1);
@@ -161,8 +162,8 @@ const LITE_PRESETS = [
    ここを settings[key] !== false の形に揃えないと、 Object.prototype などの継承キーが truthy に通る
    M-02 の落とし穴が戻る（undefined !== false → true で「既定オン」を化かせる）ので、キー名で判定します */
 const LITE_DEFAULT_ON = ["liteSpectrumOff", "liteFx", "liteBlur", "liteDecor"];
-const liteValueOf = key => !Object.prototype.hasOwnProperty.call(window.Trk.core.settings, key) ? undefined
-  : LITE_DEFAULT_ON.indexOf(key) >= 0 ? window.Trk.core.settings[key] !== false : window.Trk.core.settings[key];
+const liteValueOf = key => !Object.prototype.hasOwnProperty.call(core.settings, key) ? undefined
+  : LITE_DEFAULT_ON.indexOf(key) >= 0 ? core.settings[key] !== false : core.settings[key];
 function litePresetId() {
   for (const preset of LITE_PRESETS) {
     if (preset.mode === "off" ? liteModeValue() !== "off" : liteModeValue() === "off") continue;
@@ -174,12 +175,12 @@ const litePresetName = id => tr(LITE_PRESET_KEYS[id] || LITE_PRESET_KEYS.custom)
 function liteApplyPreset(id) {
   const preset = LITE_PRESETS.find(p => p.id === id);
   if (!preset) { liteSyncUI(); return; }        // カスタム：下の項目で調整するので何も変えない
-  for (const [key, value] of Object.entries(preset.values)) window.Trk.core.settings[key] = value;
-  if (preset.mode) window.Trk.core.settings.liteMode = preset.mode;
+  for (const [key, value] of Object.entries(preset.values)) core.settings[key] = value;
+  if (preset.mode) core.settings.liteMode = preset.mode;
   /* ✨ 軽いプリセットを選んだのに、mode が auto（＝デスクトップなどでは働かない）や off のままだと何も軽く見えない。
      プリセットを選んだ以上は効かせる、がいちばん紛れないので、mode を on にします（自動判定には戻しません） */
-  else if (liteModeValue() !== "on") window.Trk.core.settings.liteMode = "on";
-  window.Trk.core.saveUserPrefs(); liteSyncUI();
+  else if (liteModeValue() !== "on") core.settings.liteMode = "on";
+  core.saveUserPrefs(); liteSyncUI();
   liteSay(tr("litePresetSet", { name:litePresetName(id) }));
 }
 
@@ -188,9 +189,9 @@ function liteApply() {
   const on = liteActive(), body = document.body;
   if (!body) return;
   body.classList.toggle("trkLite", on);
-  body.classList.toggle("trkLiteFx", on && window.Trk.core.settings.liteFx !== false);
+  body.classList.toggle("trkLiteFx", on && core.settings.liteFx !== false);
   body.classList.toggle("trkLiteStill", liteDecorBlocked());
-  body.classList.toggle("trkNoMascot", on && window.Trk.core.settings.liteMascot === "off");
+  body.classList.toggle("trkNoMascot", on && core.settings.liteMascot === "off");
 }
 function liteDeviceParts() {
   const p = [];
@@ -204,33 +205,33 @@ function liteDeviceParts() {
 }
 function liteStatus() {
   const on = liteActive();
-  const state = window.Trk.core.$("liteState");
+  const state = core.$("liteState");
   if (state) state.textContent = tr(on ? "liteStateOn" : "liteStateOff", { why:liteReasons().join(" ・ ") });
-  const device = window.Trk.core.$("liteDevice");
+  const device = core.$("liteDevice");
   if (device) device.textContent = tr("liteDevice", { parts:liteDeviceParts().join(" ・ ") });
 }
 function liteSyncUI() {
   const on = liteActive();
-  const sel = (id, v) => { const n = window.Trk.core.$(id); if (n && n.value !== v) n.value = v; };
-  const chk = (id, v) => { const n = window.Trk.core.$(id); if (n) n.checked = !!v; };
+  const sel = (id, v) => { const n = core.$(id); if (n && n.value !== v) n.value = v; };
+  const chk = (id, v) => { const n = core.$(id); if (n) n.checked = !!v; };
   sel("litePreset", litePresetId());
   sel("liteMode", liteModeValue());
   sel("liteFps", String(liteFpsValue()));
-  sel("liteMascot", String(window.Trk.core.settings.liteMascot === "off" ? "off" : liteMascotFpsValue()));
-  sel("liteScale", window.Trk.core.settings.liteScale === "1" ? "1" : window.Trk.core.settings.liteScale === "1.5" ? "1.5" : "device");
-  chk("liteSpecOff", window.Trk.core.settings.liteSpectrumOff !== false);
-  chk("liteFx", window.Trk.core.settings.liteFx !== false);
-  chk("liteBlur", window.Trk.core.settings.liteBlur !== false);
-  chk("liteDecor", window.Trk.core.settings.liteDecor !== false);
-  chk("liteNoAnalyze", window.Trk.core.settings.liteNoAnalyze === true);
-  chk("liteMascotNoLoad", window.Trk.core.settings.liteMascotNoLoad === true);
-  sel("liteLibRows", window.Trk.core.settings.liteLibRows === "60" ? "60" : window.Trk.core.settings.liteLibRows === "150" ? "150" : "device");
-  chk("liteGameFull", window.Trk.core.settings.liteGameFull === true);
-  const panel = window.Trk.core.$("litePanel");
+  sel("liteMascot", String(core.settings.liteMascot === "off" ? "off" : liteMascotFpsValue()));
+  sel("liteScale", core.settings.liteScale === "1" ? "1" : core.settings.liteScale === "1.5" ? "1.5" : "device");
+  chk("liteSpecOff", core.settings.liteSpectrumOff !== false);
+  chk("liteFx", core.settings.liteFx !== false);
+  chk("liteBlur", core.settings.liteBlur !== false);
+  chk("liteDecor", core.settings.liteDecor !== false);
+  chk("liteNoAnalyze", core.settings.liteNoAnalyze === true);
+  chk("liteMascotNoLoad", core.settings.liteMascotNoLoad === true);
+  sel("liteLibRows", core.settings.liteLibRows === "60" ? "60" : core.settings.liteLibRows === "150" ? "150" : "device");
+  chk("liteGameFull", core.settings.liteGameFull === true);
+  const panel = core.$("litePanel");
   if (panel) panel.classList.toggle("liteOn", on);
   liteApply();
   liteStatus();
-  try { if (typeof emit === "function") window.Trk.core.emit("lite"); } catch (_) {}
+  try { if (typeof emit === "function") core.emit("lite"); } catch (_) {}
 }
 function liteSay(text) {
   if (typeof plToast !== "function" || !text) return;
@@ -240,65 +241,65 @@ function liteSay(text) {
 /* ---------- 起動時（設定画面の配線・初回の案内） ---------- */
 function liteInit() {
   liteProbe();
-  window.Trk.core.$("litePreset").addEventListener("change", e => liteApplyPreset(e.target.value));
-  window.Trk.core.$("liteGameFull").addEventListener("change", e => {
-    window.Trk.core.settings.liteGameFull = e.target.checked; window.Trk.core.saveUserPrefs(); liteSyncUI();
-    liteSay(tr(window.Trk.core.settings.liteGameFull ? "liteGameFullOn" : "liteGameFullOff"));
+  core.$("litePreset").addEventListener("change", e => liteApplyPreset(e.target.value));
+  core.$("liteGameFull").addEventListener("change", e => {
+    core.settings.liteGameFull = e.target.checked; core.saveUserPrefs(); liteSyncUI();
+    liteSay(tr(core.settings.liteGameFull ? "liteGameFullOn" : "liteGameFullOff"));
   });
-  window.Trk.core.$("liteMode").addEventListener("change", e => {
-    window.Trk.core.settings.liteMode = ["on", "off"].includes(e.target.value) ? e.target.value : "auto";
-    window.Trk.core.saveUserPrefs(); liteSyncUI();
+  core.$("liteMode").addEventListener("change", e => {
+    core.settings.liteMode = ["on", "off"].includes(e.target.value) ? e.target.value : "auto";
+    core.saveUserPrefs(); liteSyncUI();
     liteSay(tr(liteActive() ? "liteNowOn" : "liteNowOff"));
   });
-  window.Trk.core.$("liteFps").addEventListener("change", e => {
-    window.Trk.core.settings.liteFps = ["60", "30", "20"].includes(e.target.value) ? e.target.value : "30";
-    window.Trk.core.saveUserPrefs(); liteSyncUI(); liteSay(tr("liteFpsSet", { n:liteFpsValue() }));
+  core.$("liteFps").addEventListener("change", e => {
+    core.settings.liteFps = ["60", "30", "20"].includes(e.target.value) ? e.target.value : "30";
+    core.saveUserPrefs(); liteSyncUI(); liteSay(tr("liteFpsSet", { n:liteFpsValue() }));
   });
-  window.Trk.core.$("liteMascot").addEventListener("change", e => {
+  core.$("liteMascot").addEventListener("change", e => {
     const v = e.target.value;
-    window.Trk.core.settings.liteMascot = ["60", "30", "15", "off"].includes(v) ? v : "30";
-    window.Trk.core.saveUserPrefs(); liteSyncUI(); liteSay(tr("liteMascotSet", { n:v === "off" ? tr("liteMascotOff") : liteMascotFpsValue() + "fps" }));
+    core.settings.liteMascot = ["60", "30", "15", "off"].includes(v) ? v : "30";
+    core.saveUserPrefs(); liteSyncUI(); liteSay(tr("liteMascotSet", { n:v === "off" ? tr("liteMascotOff") : liteMascotFpsValue() + "fps" }));
   });
-  window.Trk.core.$("liteScale").addEventListener("change", e => {
-    window.Trk.core.settings.liteScale = ["device", "1.5", "1"].includes(e.target.value) ? e.target.value : "1.5";
-    window.Trk.core.saveUserPrefs(); liteSyncUI();
+  core.$("liteScale").addEventListener("change", e => {
+    core.settings.liteScale = ["device", "1.5", "1"].includes(e.target.value) ? e.target.value : "1.5";
+    core.saveUserPrefs(); liteSyncUI();
   });
   for (const [id, key] of [["liteSpecOff", "liteSpectrumOff"], ["liteFx", "liteFx"], ["liteBlur", "liteBlur"], ["liteDecor", "liteDecor"]]) {
-    window.Trk.core.$(id).addEventListener("change", e => { window.Trk.core.settings[key] = e.target.checked; window.Trk.core.saveUserPrefs(); liteSyncUI(); });
+    core.$(id).addEventListener("change", e => { core.settings[key] = e.target.checked; core.saveUserPrefs(); liteSyncUI(); });
   }
   /* 📜 曲リストの初回表示行数 */
-  window.Trk.core.$("liteLibRows").addEventListener("change", e => {
-    window.Trk.core.settings.liteLibRows = ["device", "150", "60"].includes(e.target.value) ? e.target.value : "device";
-    window.Trk.core.saveUserPrefs(); liteSyncUI();
-    liteSay(tr("liteLibRowsSet", { n:window.Trk.core.settings.liteLibRows === "device" ? tr("liteLibRowsDeviceShort") : window.Trk.core.settings.liteLibRows }));
+  core.$("liteLibRows").addEventListener("change", e => {
+    core.settings.liteLibRows = ["device", "150", "60"].includes(e.target.value) ? e.target.value : "device";
+    core.saveUserPrefs(); liteSyncUI();
+    liteSay(tr("liteLibRowsSet", { n:core.settings.liteLibRows === "device" ? tr("liteLibRowsDeviceShort") : core.settings.liteLibRows }));
   });
   /* 🧠 曲の音声解析 */
-  window.Trk.core.$("liteNoAnalyze").addEventListener("change", e => {
-    window.Trk.core.settings.liteNoAnalyze = e.target.checked; window.Trk.core.saveUserPrefs(); liteSyncUI();
-    liteSay(tr(window.Trk.core.settings.liteNoAnalyze ? "liteAnalyzeOffNow" : "liteAnalyzeOnNow"));
+  core.$("liteNoAnalyze").addEventListener("change", e => {
+    core.settings.liteNoAnalyze = e.target.checked; core.saveUserPrefs(); liteSyncUI();
+    liteSay(tr(core.settings.liteNoAnalyze ? "liteAnalyzeOffNow" : "liteAnalyzeOnNow"));
   });
   /* 🩷 3Dマスコットの自動読み込み（オフにすれば、その場で読みに行きます） */
-  window.Trk.core.$("liteMascotNoLoad").addEventListener("change", e => {
-    window.Trk.core.settings.liteMascotNoLoad = e.target.checked; window.Trk.core.saveUserPrefs(); liteSyncUI();
-    liteSay(tr(window.Trk.core.settings.liteMascotNoLoad ? "liteMascotSkipOn" : "liteMascotSkipOff"));
+  core.$("liteMascotNoLoad").addEventListener("change", e => {
+    core.settings.liteMascotNoLoad = e.target.checked; core.saveUserPrefs(); liteSyncUI();
+    liteSay(tr(core.settings.liteMascotNoLoad ? "liteMascotSkipOn" : "liteMascotSkipOff"));
   });
-  window.Trk.core.$("liteRecheckBtn").addEventListener("click", () => {
+  core.$("liteRecheckBtn").addEventListener("click", () => {
     liteProbe(); liteBatteryProbe(); liteSyncUI();
     liteSay(tr(liteActive() ? "liteNowOn" : "liteNowOff"));
   });
   /* 設定欄を開いたら、初回の案内はもう出さない */
-  window.Trk.core.$("litePanel").addEventListener("toggle", () => {
-    if (window.Trk.core.settings.liteSeen === true) return;
-    window.Trk.core.settings.liteSeen = true; window.Trk.core.saveUserPrefs();
+  core.$("litePanel").addEventListener("toggle", () => {
+    if (core.settings.liteSeen === true) return;
+    core.settings.liteSeen = true; core.saveUserPrefs();
   });
   on("language", liteSyncUI);
   liteSyncUI();
   liteBatteryProbe();
   /* 初回だけ：スマホらしい端末で、まだ軽量化モードを使っていない人に、そっと1回だけ案内する */
-  if (liteInfo.mobile && !liteActive() && window.Trk.core.settings.liteSeen !== true && !liteSafe()) {
+  if (liteInfo.mobile && !liteActive() && core.settings.liteSeen !== true && !liteSafe()) {
     setTimeout(() => {
-      if (window.Trk.core.phase !== "title" || liteActive() || window.Trk.core.settings.liteSeen === true) return;
-      window.Trk.core.settings.liteSeen = true; window.Trk.core.saveUserPrefs();
+      if (core.phase !== "title" || liteActive() || core.settings.liteSeen === true) return;
+      core.settings.liteSeen = true; core.saveUserPrefs();
       liteSay("📱 " + tr("liteToast"));
     }, 2600);
   }

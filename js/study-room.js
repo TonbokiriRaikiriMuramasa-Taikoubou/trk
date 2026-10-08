@@ -2744,4 +2744,7 @@ window.TrkStudyRoom = Object.freeze({
   stats:() => ({ books:studyBooks.length, images:studyBooks.reduce((n, book) => n + book.pages.length, 0),
     bytes:studyBooks.reduce((n, book) => n + STUDY_UTIL.bookSize(book), 0), bookmarks:STUDY_UTIL.bookmarkedBooks(studyBooks).length })
 });
+/* 領域（window.Trk.study）：書斎の公開面は凍結の window.TrkStudyRoom。同じ参照を領域の名前でも出す（旧名は残す） */
+window.Trk = window.Trk || {};
+window.Trk.study = window.TrkStudyRoom;
 })();

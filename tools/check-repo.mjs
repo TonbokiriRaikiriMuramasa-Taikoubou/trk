@@ -1682,5 +1682,12 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   else ok(`${rel} registers ${exported.length} public name(s) under window.Trk.${area}`);
 }
 
+/* 名前空間 D：書斎の公開面（凍結の window.TrkStudyRoom）と同じ参照を、領域の名前 window.Trk.study でも出す */
+{
+  const studySrc = exists("js/study-room.js") ? read("js/study-room.js") : "";
+  if (!/^window\.Trk\.study = window\.TrkStudyRoom;$/m.test(studySrc)) fail("js/study-room.js does not alias window.Trk.study to window.TrkStudyRoom");
+  else ok("window.Trk.study is the same frozen object as window.TrkStudyRoom");
+}
+
 console.log(`\nStatic check: ${failures ? "FAILED" : "passed"} · ${failures} failure(s) · ${warnings} warning(s)`);
 if (failures) process.exitCode = 1;

@@ -77,7 +77,7 @@
         ctx.globalAlpha = .85;
         if (v.extra === "snow") {
           ctx.fillStyle = "#ffffff"; ctx.strokeStyle = "rgba(80,130,180,.5)"; ctx.lineWidth = 1;
-          ctx.beginPath(); ctx.arc(px, py, 2 + (i % 3), 0, TAU); ctx.fill(); ctx.stroke();
+          ctx.beginPath(); ctx.arc(px, py, 2 + (i % 3), 0, window.Trk.data.TAU); ctx.fill(); ctx.stroke();
         } else if (v.extra === "star") {
           ctx.save(); ctx.translate(px, py); ctx.rotate(p / 700 + i);
           ctx.globalAlpha = .55 + .4 * Math.sin(p / 260 + i * 1.7);      // きらきら
@@ -91,7 +91,7 @@
           ctx.closePath(); ctx.fill(); ctx.restore();
         } else {
           ctx.save(); ctx.translate(px, py); ctx.rotate(p / 500 + i);
-          ctx.fillStyle = "#f7a8c4"; ctx.beginPath(); ctx.ellipse(0, 0, 5, 3, 0, 0, TAU); ctx.fill(); ctx.restore();
+          ctx.fillStyle = "#f7a8c4"; ctx.beginPath(); ctx.ellipse(0, 0, 5, 3, 0, 0, window.Trk.data.TAU); ctx.fill(); ctx.restore();
         }
       }
       ctx.globalAlpha = 1;
@@ -112,7 +112,7 @@
       ctx.save(); ctx.translate(s * 19, -2);
       ctx.rotate(-s * (st.happy ? 2.4 : st.sad ? 0.1 : 0.3));
       rr(-5, 0, 10, 30, 5); ctx.fillStyle = v.sleeves; ctx.fill();
-      ctx.fillStyle = v.skin; ctx.beginPath(); ctx.arc(0, 32, 5, 0, TAU); ctx.fill();
+      ctx.fillStyle = v.skin; ctx.beginPath(); ctx.arc(0, 32, 5, 0, window.Trk.data.TAU); ctx.fill();
       ctx.restore();
     }
     rr(-20, -8, 40, 36, 10); ctx.fillStyle = v.shirt; ctx.fill();
@@ -121,7 +121,7 @@
     if (v.scarf) { ctx.fillStyle = v.scarf; rr(-24, -12, 48, 11, 5); ctx.fill(); rr(8, -6, 10, 22, 4); ctx.fill(); }
     ctx.save(); ctx.translate(0, -44); ctx.scale(hs, hs);
     ctx.fillStyle = v.hair; ctx.beginPath(); ctx.arc(0, -2, 44, Math.PI * .85, Math.PI * 2.15); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = v.skin; ctx.beginPath(); ctx.ellipse(0, 6, 35, 32, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = v.skin; ctx.beginPath(); ctx.ellipse(0, 6, 35, 32, 0, 0, window.Trk.data.TAU); ctx.fill();
     ctx.fillStyle = v.hair; ctx.beginPath();
     ctx.moveTo(-44, 0); ctx.arc(0, -2, 44, Math.PI, Math.PI * 2);
     ctx.lineTo(40, -2); ctx.lineTo(30, -12); ctx.lineTo(20, 2); ctx.lineTo(8, -14); ctx.lineTo(-4, 0);
@@ -130,13 +130,13 @@
     ctx.fillStyle = v.headset; rr(-49, -2, 10, 20, 4); ctx.fill(); rr(39, -2, 10, 20, 4); ctx.fill();
     ctx.strokeStyle = v.headset; ctx.lineWidth = 2.5;
     ctx.beginPath(); ctx.moveTo(44, 16); ctx.quadraticCurveTo(40, 30, 24, 30); ctx.stroke();
-    ctx.beginPath(); ctx.arc(22, 30, 3, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(22, 30, 3, 0, window.Trk.data.TAU); ctx.fill();
     if (v.extra === "sakura") {
       for (let k = 0; k < 5; k++) {
-        const a = k / 5 * TAU + p / 2000;
-        ctx.fillStyle = "#f7a8c4"; ctx.beginPath(); ctx.ellipse(26 + Math.cos(a) * 6, -26 + Math.sin(a) * 6, 5, 3.5, a, 0, TAU); ctx.fill();
+        const a = k / 5 * window.Trk.data.TAU + p / 2000;
+        ctx.fillStyle = "#f7a8c4"; ctx.beginPath(); ctx.ellipse(26 + Math.cos(a) * 6, -26 + Math.sin(a) * 6, 5, 3.5, a, 0, window.Trk.data.TAU); ctx.fill();
       }
-      ctx.fillStyle = "#fff2a8"; ctx.beginPath(); ctx.arc(26, -26, 2.5, 0, TAU); ctx.fill();
+      ctx.fillStyle = "#fff2a8"; ctx.beginPath(); ctx.arc(26, -26, 2.5, 0, window.Trk.data.TAU); ctx.fill();
     }
     ctx.lineWidth = 3.5; ctx.strokeStyle = "#2a2a35";
     if (st.sad) {
@@ -147,15 +147,15 @@
     } else {
       const eh = (p % 3600) < 120 ? 1.5 : st.happy ? 5 : 9;
       for (const s of [-1, 1]) {
-        ctx.fillStyle = v.eye; ctx.beginPath(); ctx.ellipse(s * 14, 8, 6.5, eh, 0, 0, TAU); ctx.fill();
-        if (eh > 4) { ctx.fillStyle = "#ffffff"; ctx.beginPath(); ctx.arc(s * 14 - 2, 5, 2.2, 0, TAU); ctx.fill(); }
+        ctx.fillStyle = v.eye; ctx.beginPath(); ctx.ellipse(s * 14, 8, 6.5, eh, 0, 0, window.Trk.data.TAU); ctx.fill();
+        if (eh > 4) { ctx.fillStyle = "#ffffff"; ctx.beginPath(); ctx.arc(s * 14 - 2, 5, 2.2, 0, window.Trk.data.TAU); ctx.fill(); }
       }
     }
     ctx.globalAlpha = .35; ctx.fillStyle = "#ff7a9a";
-    for (const s of [-1, 1]) { ctx.beginPath(); ctx.ellipse(s * 22, 18, 6, 3.5, 0, 0, TAU); ctx.fill(); }
+    for (const s of [-1, 1]) { ctx.beginPath(); ctx.ellipse(s * 22, 18, 6, 3.5, 0, 0, window.Trk.data.TAU); ctx.fill(); }
     ctx.globalAlpha = 1;
     ctx.fillStyle = "#c0395a"; ctx.strokeStyle = "#a83250"; ctx.lineWidth = 2.5;
-    if (st.talking) { ctx.beginPath(); ctx.ellipse(0, 24, 5, 2 + Math.abs(Math.sin(p / 70)) * 5, 0, 0, TAU); ctx.fill(); }
+    if (st.talking) { ctx.beginPath(); ctx.ellipse(0, 24, 5, 2 + Math.abs(Math.sin(p / 70)) * 5, 0, 0, window.Trk.data.TAU); ctx.fill(); }
     else if (st.sad) { ctx.beginPath(); ctx.arc(0, 30, 6, 1.15 * Math.PI, 1.85 * Math.PI); ctx.stroke(); }
     else { ctx.beginPath(); ctx.arc(0, 20, st.happy ? 7 : 5, .15 * Math.PI, .85 * Math.PI); ctx.stroke(); }
     ctx.restore();
@@ -166,7 +166,7 @@
 
   /* ---------- マスコットとして登録 ---------- */
   for (const [id, v] of Object.entries(VARIANTS)) {
-    registerMascot(id, {
+    window.Trk.data.registerMascot(id, {
       family:"miku",
       draw:(x, y, st) => drawMiku(x, y, v, st),
       top:-44 - 46 * (v.headScale || 1) - 6,   // 吹き出しを出す高さ
@@ -175,14 +175,14 @@
       credit:() => tr("pclShort")              // プレイ中、右下にPCLクレジットを表示
     });
   }
-  MASCOT_CAPTIONS.miku = {
+  window.Trk.data.MASCOT_CAPTIONS.miku = {
     capStart:{ja:"いっくよー！一緒に叩こう♪",en:"Here we go! Let's drum together♪",zh:"要开始啦！一起敲吧♪",ko:"간다~! 같이 두드리자♪"},
     capCombo:{ja:"{n}コンボ！すごいすごい！",en:"{n} combo! Amazing!",zh:"{n}连击！好厉害！",ko:"{n} 콤보! 굉장해!"},
     capBreak:{ja:"どんまい！次いこっ！",en:"Don't worry! On to the next one!",zh:"没关系！继续加油！",ko:"괜찮아! 다음 가자!"}
   };
 
   /* ---------- スキン：ミク・ティール／ノワール／クラシック／アイドル（＋スノーフィールドの標準マスコット） ---------- */
-  SKINS.miku39 = {
+  window.Trk.data.SKINS.miku39 = {
     cat:["basic","miku"],
     label:{ja:"ミク・ティール",en:"Miku Teal",zh:"初音青",ko:"미쿠 틸"},
     desc:{ja:"初音ミク二次創作（PCL・非公式）",en:"Hatsune Miku fan art (PCL, unofficial)",zh:"初音未来二次创作（PCL・非官方）",ko:"하츠네 미쿠 2차 창작 (PCL・비공식)"},
@@ -195,9 +195,9 @@
     shapes:["circle","circle"], video:"grayscale(1) contrast(1.4) sepia(1) hue-rotate(130deg) saturate(1.6) brightness(.7)",
     font:'"Trebuchet MS","Avenir Next",system-ui,sans-serif', mascot:"miku"
   };
-  if (SKINS.snowfield) SKINS.snowfield.mascot = "mikuWinter";
+  if (window.Trk.data.SKINS.snowfield) window.Trk.data.SKINS.snowfield.mascot = "mikuWinter";
 
-  SKINS.mikuNoir = {
+  window.Trk.data.SKINS.mikuNoir = {
     cat:["miku","dark"],
     label:{ja:"ミク・ノワール",en:"Miku Noir",zh:"初音・黑",ko:"미쿠 누아르"},
     desc:{ja:"黒い衣装のミク（二次創作・PCL・非公式）",en:"Miku in black (fan art, PCL, unofficial)",zh:"黑衣初音（二次创作・PCL・非官方）",ko:"검은 옷 미쿠 (2차 창작・PCL・비공식)"},
@@ -210,7 +210,7 @@
     shapes:["circle","circle"], video:"grayscale(1) contrast(1.5) brightness(.65)",
     font:'"Trebuchet MS","Avenir Next",system-ui,sans-serif', mascot:"mikuNoir"
   };
-  SKINS.mikuClassic = {
+  window.Trk.data.SKINS.mikuClassic = {
     cat:["miku","light"],
     label:{ja:"ミク・クラシック",en:"Miku Classic",zh:"初音・经典",ko:"미쿠 클래식"},
     desc:{ja:"初期配色を思わせるミク（二次創作・PCL・非公式）",en:"Early-coloring Miku (fan art, PCL, unofficial)",zh:"令人想起初期配色的初音（二次创作・PCL・非官方）",ko:"초기 배색을 떠올리게 하는 미쿠 (2차 창작・PCL・비공식)"},
@@ -223,7 +223,7 @@
     shapes:["circle","circle"], video:"grayscale(.25) brightness(1.08) contrast(1.05)",
     font:'"Trebuchet MS","Avenir Next",system-ui,sans-serif', mascot:"miku"
   };
-  SKINS.mikuIdol = {
+  window.Trk.data.SKINS.mikuIdol = {
     cat:["miku","dark","grad"],
     label:{ja:"ミク・アイドル",en:"Miku Idol",zh:"初音・偶像",ko:"미쿠 아이돌"},
     desc:{ja:"星降る夜のアイドル服ミク（二次創作・PCL・非公式）",en:"Idol-outfit Miku under falling stars (fan art, PCL, unofficial)",zh:"星夜偶像服初音（二次创作・PCL・非官方）",ko:"별이 쏟아지는 밤의 아이돌 옷 미쿠 (2차 창작・PCL・비공식)"},

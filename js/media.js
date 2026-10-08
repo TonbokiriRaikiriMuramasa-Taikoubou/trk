@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：読み込み・音声解析・譜面・ヒットSE ============ */
 "use strict";
@@ -17,60 +18,146 @@ function decodeAudio(buf) {
 
 /* ---------- 背景画像（曲パック用。音声だけの曲で表示） ---------- */
 async function setBackground(blob) {
-  if (bgImage && bgImage._url) URL.revokeObjectURL(bgImage._url);
-  bgImage = null;
+  if (window.Trk.core.bgImage && window.Trk.core.bgImage._url) URL.revokeObjectURL(window.Trk.core.bgImage._url);
+  window.Trk.core.bgImage = null;
   if (!blob) return null;
   const url = URL.createObjectURL(blob), im = new Image();
   const ok = await new Promise(res => { im.onload = () => res(true); im.onerror = () => res(false); im.src = url; });
   if (!ok) { URL.revokeObjectURL(url); return null; }
-  im._url = url; bgImage = im;
+  im._url = url; window.Trk.core.bgImage = im;
   return im;
 }
 
 /* 🎬 これより大きいファイルは音声解析（file.arrayBuffer で丸ごとメモリに載せる）をしません。
    解析が無くても譜面はBPMから作れます（analysis を使う所は全部 if (analysis) で守ってあります）。 */
 const ANALYZE_MAX = 96 * 1024 * 1024;
+/* 🎬 ファイルサイズ（圧縮後）だけでは判断できない：デコード後のPCMは長さに比例して膨らむ
+   （48kHz・ステレオ・float32 で 1分 ≒ 23MB、20分 ≒ 460MB）。長さでも区切る。
+   decodeAudioData は元のサンプリングレートのまま返すので、OfflineAudioContext で
+   ダウンサンプルしても瞬間の最大メモリは減らない（デコード自体で同じ量を使う）。 */
+const ANALYZE_MAX_SEC = 20 * 60;
 
 /* ---------- 曲の読み込み ----------
    opts.title   : 表示名
    opts.onReady : 解析後・譜面生成前に呼ばれる。true を返すと自動生成を省略（曲パックの譜面など） */
 async function loadMedia(file, opts = {}) {
-  if (!file || phase !== "title") return false;
-  const token = ++loadToken;
-  emit("beforeLoad");
-  video.pause();
-  videoReady = false; analysis = null; chart = []; chartMode = "generated"; fingerprint = "";
-  setStatus("chartStatus", null); setStatus("importStatus", null); updateChartButtons();
-  if (mediaURL) URL.revokeObjectURL(mediaURL);
-  mediaURL = URL.createObjectURL(file); mediaName = file.name || "song";
-  $("songTitle").textContent = opts.title || baseName(mediaName);
-  setStatus("loadStatus", "loading");
+  if (!file || window.Trk.core.phase !== "title") return false;
+  const token = ++window.Trk.core.loadToken;
+  window.Trk.core.emit("beforeLoad");
+  window.Trk.core.video.pause();
+  window.Trk.core.videoReady = false; window.Trk.core.analysis = null; window.Trk.core.chart = []; window.Trk.core.chartMode = "generated"; window.Trk.core.fingerprint = "";
+  window.Trk.core.setStatus("chartStatus", null); window.Trk.core.setStatus("importStatus", null); window.Trk.core.updateChartButtons();
+  if (window.Trk.core.mediaURL) URL.revokeObjectURL(window.Trk.core.mediaURL);
+  window.Trk.core.mediaURL = URL.createObjectURL(file); window.Trk.core.mediaName = file.name || "song";
+  window.Trk.core.$("songTitle").textContent = opts.title || window.Trk.core.baseName(window.Trk.core.mediaName);
+  window.Trk.core.setStatus("loadStatus", "loading");
   const ok = await new Promise(res => {
-    const done = v => { video.removeEventListener("loadedmetadata", onOk); video.removeEventListener("error", onErr); res(v); };
+    const done = v => { window.Trk.core.video.removeEventListener("loadedmetadata", onOk); window.Trk.core.video.removeEventListener("error", onErr); res(v); };
     const onOk = () => done(true), onErr = () => done(false);
-    video.addEventListener("loadedmetadata", onOk); video.addEventListener("error", onErr);
-    video.src = mediaURL; video.load();
+    window.Trk.core.video.addEventListener("loadedmetadata", onOk); window.Trk.core.video.addEventListener("error", onErr);
+    window.Trk.core.video.src = window.Trk.core.mediaURL; window.Trk.core.video.load();
   });
-  if (token !== loadToken) return false;
-  if (!ok || !isFinite(video.duration) || video.duration <= 0) { setStatus("loadStatus", "loadError"); updateChartButtons(); return false; }
-  videoReady = true; fingerprint = `${file.size}:${Math.round(video.duration * 10)}`;
-  setStatus("loadStatus", "analyzing"); updateChartButtons();
+  if (token !== window.Trk.core.loadToken) return false;
+  if (!ok || !isFinite(window.Trk.core.video.duration) || window.Trk.core.video.duration <= 0) { window.Trk.core.setStatus("loadStatus", "loadError"); window.Trk.core.updateChartButtons(); return false; }
+  window.Trk.core.videoReady = true; window.Trk.core.fingerprint = `${file.size}:${Math.round(window.Trk.core.video.duration * 10)}`;
+  window.Trk.core.setStatus("loadStatus", "analyzing"); window.Trk.core.updateChartButtons();
   await new Promise(r => { setTimeout(r, 30); });
   const tooBig = (Number(file.size) || 0) > ANALYZE_MAX;
+  const tooLong = window.Trk.core.video.duration > ANALYZE_MAX_SEC;
   /* 🪶 軽量化：解析をしない設定では、ファイル全体をデコードして走り直すところごと飛ばします
      （長い曲ほど効きます。譜面はBPMグリッド中心の自動生成になり、自作・取り込み譜面はそのまま） */
-  const liteSkip = !tooBig && typeof TrkLite === "object" && typeof TrkLite.noAnalyze === "function" && TrkLite.noAnalyze();
-  const skipAnalyze = tooBig || liteSkip;
-  if (skipAnalyze) analysis = null;
-  else { try { analysis = await analyzeAudio(file); } catch (_) { analysis = null; } }
-  if (token !== loadToken) return false;
-  setStatus("loadStatus", tooBig ? "analysisSkipped" : liteSkip ? "analysisSkippedLite" : analysis ? "loaded" : "decodeFallback");
+  const liteSkip = !tooBig && !tooLong && typeof TrkLite === "object" && typeof TrkLite.noAnalyze === "function" && TrkLite.noAnalyze();
+  const skipAnalyze = tooBig || tooLong || liteSkip;
+  if (skipAnalyze) window.Trk.core.analysis = null;
+  else { try { window.Trk.core.analysis = await analyzeAudioCached(file, window.Trk.core.fingerprint); } catch (_) { window.Trk.core.analysis = null; } }
+  if (token !== window.Trk.core.loadToken) return false;
+  window.Trk.core.setStatus("loadStatus", tooBig ? "analysisSkipped" : tooLong ? "analysisSkippedLong" : liteSkip ? "analysisSkippedLite" : window.Trk.core.analysis ? "loaded" : "decodeFallback");
   let supplied = false;
   if (opts.onReady) { try { supplied = !!(await opts.onReady()); } catch (e) { console.error(e); } }
-  if (token !== loadToken) return false;
+  if (token !== window.Trk.core.loadToken) return false;
   if (!supplied) buildChart();
-  emit("mediaReady");
+  window.Trk.core.emit("mediaReady");
   return true;
+}
+
+/* ---------- 解析結果のキャッシュ（IndexedDB・この端末の中だけ） ----------
+   同じ曲をもう一度読み込んだとき、デコードと解析を飛ばすためのもの。
+   保存するのは解析の配列（rms・onset・ratio）と数値だけ。PCM（音声の波形）は保存しない。
+   鍵は fingerprint（サイズ・長さ）＋先頭と末尾 64KB の SHA-256 ＋ 解析のバージョン。
+   解析の式を変えたら ANALYSIS_CACHE_VERSION を上げる（古い結果は読まれなくなる）。
+   セーフモードでは読まない・書かない。失敗しても普通に解析する（キャッシュは速さのためだけ）。 */
+const ANALYSIS_CACHE_DB = "trk_analysis_cache_v1";
+const ANALYSIS_CACHE_VERSION = 1;
+const ANALYSIS_CACHE_MAX = 30;            // 件数の上限。超えたら古いものから消す
+const ANALYSIS_CACHE_EDGE = 64 * 1024;    // 鍵に使う先頭・末尾のバイト数
+let analysisCacheDb = null;
+function analysisCacheOpen() {
+  if (analysisCacheDb) return analysisCacheDb;
+  analysisCacheDb = new Promise((res, rej) => {
+    const r = indexedDB.open(ANALYSIS_CACHE_DB, 1);
+    r.onupgradeneeded = () => {
+      const os = r.result.createObjectStore("analysis", { keyPath: "key" });
+      os.createIndex("savedAt", "savedAt");
+    };
+    r.onsuccess = () => { r.result.onversionchange = () => { r.result.close(); analysisCacheDb = null; }; res(r.result); };
+    r.onerror = () => { analysisCacheDb = null; rej(r.error); };
+    r.onblocked = () => { analysisCacheDb = null; rej(new Error("analysis-cache-blocked")); };
+  });
+  return analysisCacheDb;
+}
+async function analysisCacheKey(file, fingerprint) {
+  const head = await file.slice(0, ANALYSIS_CACHE_EDGE).arrayBuffer();
+  const tail = await file.slice(Math.max(0, file.size - ANALYSIS_CACHE_EDGE)).arrayBuffer();
+  const both = new Uint8Array(head.byteLength + tail.byteLength);
+  both.set(new Uint8Array(head), 0); both.set(new Uint8Array(tail), head.byteLength);
+  const hex = [...new Uint8Array(await crypto.subtle.digest("SHA-256", both)).slice(0, 16)].map(b => b.toString(16).padStart(2, "0")).join("");
+  return `v${ANALYSIS_CACHE_VERSION}|${fingerprint}|${hex}`;
+}
+/* 読んだ記録のかたちを確かめる（端末の中の値は改ざんされうる。合わなければ無いものとして解析し直す） */
+function analysisCacheValid(r) {
+  return !!r && r.version === ANALYSIS_CACHE_VERSION && Number.isInteger(r.frames) && r.frames > 0 &&
+    Number.isFinite(r.frameMs) && r.frameMs > 0 && Number.isFinite(r.maxRms) && Number.isFinite(r.scale) &&
+    [r.rms, r.onset, r.ratio].every(a => a instanceof Float32Array && a.length === r.frames);
+}
+async function analysisCacheGet(key) {
+  const db = await analysisCacheOpen();
+  const rec = await new Promise((res, rej) => {
+    const q = db.transaction("analysis").objectStore("analysis").get(key);
+    q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error);
+  });
+  if (!analysisCacheValid(rec)) return null;
+  return { rms: rec.rms, onset: rec.onset, ratio: rec.ratio, frames: rec.frames, frameMs: rec.frameMs, maxRms: rec.maxRms, scale: rec.scale };
+}
+async function analysisCachePut(key, a) {
+  const db = await analysisCacheOpen();
+  const rec = { key, version: ANALYSIS_CACHE_VERSION, savedAt: Date.now(), frames: a.frames, frameMs: a.frameMs,
+    maxRms: a.maxRms, scale: a.scale, rms: a.rms, onset: a.onset, ratio: a.ratio };
+  await new Promise((res, rej) => {
+    const tx = db.transaction("analysis", "readwrite");
+    tx.objectStore("analysis").put(rec);
+    tx.oncomplete = () => res(); tx.onerror = tx.onabort = () => rej(tx.error);
+  });
+  /* 件数の上限：savedAt の index は古い順に並ぶので、先頭（古い）から消す */
+  const tx2 = db.transaction("analysis", "readwrite");
+  const keys = await new Promise((res, rej) => {
+    const q = tx2.objectStore("analysis").index("savedAt").getAllKeys();
+    q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error);
+  });
+  for (let i = 0; i < keys.length - ANALYSIS_CACHE_MAX; i++) tx2.objectStore("analysis").delete(keys[i]);
+  await new Promise((res, rej) => { tx2.oncomplete = () => res(); tx2.onerror = tx2.onabort = () => rej(tx2.error); });
+}
+/* 解析の入口。キャッシュがあればデコードせずに返す。無ければ解析して、あとで保存する（待たない） */
+async function analyzeAudioCached(file, fingerprint) {
+  const cacheOn = !(typeof window.TrkSafeMode === "function" && window.TrkSafeMode()) &&
+    !!window.indexedDB && !!(window.crypto && window.crypto.subtle) && !!fingerprint;
+  let key = null;
+  if (cacheOn) {
+    try { key = await analysisCacheKey(file, fingerprint); const hit = await analysisCacheGet(key); if (hit) return hit; }
+    catch (_) { key = null; }
+  }
+  const a = await analyzeAudio(file);
+  if (key) analysisCachePut(key, a).catch(() => {});
+  return a;
 }
 
 /* ---------- 音声解析（音量・立ち上がり・高音の割合） ---------- */
@@ -104,226 +191,46 @@ async function analyzeAudio(file) {
   const scale = nz.length ? nz[Math.floor(nz.length * .95)] || nz[nz.length - 1] : 1;
   return { rms, onset, ratio, frames, frameMs, maxRms: maxRms || 1, scale: scale || 1 };
 }
-const frameAt = t => Math.round(t / analysis.frameMs);
-function onsetAt(t) {
-  const f = frameAt(t); let m = 0;
-  for (let i = Math.max(0, f - 3); i <= Math.min(analysis.frames - 1, f + 3); i++) if (analysis.onset[i] > m) m = analysis.onset[i];
-  return m;
-}
-function rmsAt(t) { return analysis.rms[Math.min(analysis.frames - 1, Math.max(0, frameAt(t)))]; }
-function ratioAt(t) {
-  const f = frameAt(t); let s = 0, c = 0;
-  for (let i = Math.max(0, f); i <= Math.min(analysis.frames - 1, f + 4); i++) { s += analysis.ratio[i]; c++; }
-  return c ? s / c : 0;
-}
-
+const frameAt = t => Math.round(t / window.Trk.core.analysis.frameMs);
+function rmsAt(t) { return window.Trk.core.analysis.rms[Math.min(window.Trk.core.analysis.frames - 1, Math.max(0, frameAt(t)))]; }
 /* ---------- 譜面 ---------- */
 const CHART_FILE_MAX = 2 * 1024 * 1024;   // docs/pack-format.md の譜面JSON上限に合わせる
+/* 譜面の難易度表示。本体の式は js/chart-gen.js（cgEstimateLevel）。ここでは levelOverride（譜面パックの指定）だけを見る */
 function estimateLevel(notes) {
-  if (levelOverride) return levelOverride;
-  if (!notes || !notes.length) return 1;
-  const span = Math.max(10, (notes[notes.length - 1].time - notes[0].time) / 1000);
-  const nps = notes.length / span;
-
-  let peak = 0, j = 0;
-  for (let i = 0; i < notes.length; i++) {
-    while (notes[i].time - notes[j].time > 2500) j++;
-    peak = Math.max(peak, (i - j + 1) / 2.5);
-  }
-
-  let fastCount = 0, trillCount = 0, ultraFast = 0;
-  for (let i = 1; i < notes.length; i++) {
-    const gap = notes[i].time - notes[i - 1].time;
-    if (gap <= 220) {
-      fastCount++;
-      if (gap <= 100) ultraFast++;
-      if (notes[i].lane !== notes[i - 1].lane && i >= 2 && notes[i - 1].lane !== notes[i - 2].lane && notes[i - 1].time - notes[i - 2].time <= 220) {
-        trillCount++;
-      }
-    }
-  }
-
-  const fastRatio = fastCount / (notes.length - 1 || 1);
-  const trillRatio = trillCount / (notes.length - 1 || 1);
-  const ultraRatio = ultraFast / (notes.length - 1 || 1);
-
-  // 音ゲー標準の Lv. 1 〜 20 スケール（初級 1〜3 / 中級 4〜6 / 上級 7〜11 / 達人 12〜15 / RUSH 16〜20）
-  const base = nps * 0.88 + peak * 0.38 + 0.5;
-  const tech = fastRatio * 1.8 + trillRatio * 1.5 + ultraRatio * 2.2;
-
-  return Math.max(1, Math.min(20, Math.round(base + tech)));
+  if (window.Trk.core.levelOverride) return window.Trk.core.levelOverride;
+  return window.Trk.chart.cgEstimateLevel(notes);
 }
-/* ゲームの状態を変えずに譜面だけを作る（曲パックの書き出しでも使う） */
-function generateNotes(diff, bpm, offset, seed) {
-  if (!videoReady || !(bpm >= 60 && bpm <= 300) || !DIFF_IDS.includes(diff)) return [];
-  const d = DIFFS[diff], durMs = video.duration * 1000;
-  const rand = mulberry32(hashString(`${String(seed).trim()}|${diff}|${bpm}|${offset}`));
-  const step = 60000 / bpm / d.div;
-  let startMs = 600, endMs = durMs - 400;
-  if (analysis) {
-    const thr = analysis.maxRms * .06; let f0 = 0, f1 = analysis.frames - 1;
-    while (f0 < f1 && analysis.rms[f0] < thr) f0++;
-    while (f1 > f0 && analysis.rms[f1] < thr) f1--;
-    startMs = Math.max(300, f0 * analysis.frameMs - 30); endMs = Math.min(endMs, f1 * analysis.frameMs + 30);
-  }
-  const cands = [];
-  for (let k = Math.ceil((startMs - offset) / step); ; k++) {
-    const t = offset + k * step; if (t > endMs) break; if (t < startMs) continue;
-    const sub = ((k % d.div) + d.div) % d.div, beatIdx = Math.floor(k / d.div);
-    const onBeat = sub === 0, onBar = onBeat && ((beatIdx % 4) + 4) % 4 === 0;
-    let s, loud = 0.5;
-    if (analysis) {
-      loud = rmsAt(t) / (analysis.maxRms || 1);
-      if (loud < .05) continue;
-      s = Math.min(1.6, onsetAt(t) / (analysis.scale || 1)) + loud * .35;
-    } else s = rand() * .6;
-    s *= onBar ? 1.6 : onBeat ? 1.3 : (sub % 2 === 0 ? 1.1 : 0.95);
-    s += rand() * .1;
-    cands.push({ t, s, onBar, onBeat, sub, k, loud });
-  }
-
-  let sel;
-  if (diff === "easy" || diff === "normal") {
-    const count = Math.round(cands.length * d.density);
-    sel = cands.slice().sort((a, b) => b.s - a.s).slice(0, count).sort((a, b) => a.t - b.t);
-  } else {
-    // 上級・達人・RUSH：音楽的フレーズ構造（8分音符骨格＋16分連打・トリル）
-    const targetCount = d.target ? Math.min(cands.length, d.target) : Math.round(cands.length * d.density);
-    const chosen = new Set();
-    for (const c of cands) {
-      if ((c.onBeat || c.sub % 2 === 0) && (c.loud > 0.22 || c.s > 0.75)) {
-        chosen.add(c);
-      }
-    }
-    for (let i = 0; i < cands.length; i++) {
-      const c = cands[i];
-      const loudThreshold = (diff === "master" || diff === "rush") ? 0.30 : 0.50;
-      if (c.loud > loudThreshold && c.s > 0.8) {
-        const isDense = (diff === "master" || diff === "rush");
-        const burstLen = isDense ? (rand() < 0.45 ? 7 : (rand() < 0.5 ? 5 : 3)) : (rand() < 0.35 ? 5 : 3);
-        for (let b = 0; b < burstLen && i + b < cands.length; b++) {
-          chosen.add(cands[i + b]);
-        }
-      }
-    }
-    let list = Array.from(chosen);
-    if (list.length < targetCount) {
-      const remaining = cands.filter(c => !chosen.has(c)).sort((a, b) => b.s - a.s);
-      list = list.concat(remaining.slice(0, targetCount - list.length));
-    } else if (list.length > targetCount && diff !== "rush") {
-      list.sort((a, b) => b.s - a.s);
-      list = list.slice(0, targetCount);
-    }
-    sel = list.sort((a, b) => a.t - b.t);
-  }
-
-  // 専門的な音ゲー配置（トリル・連打・複合ストリーム）
-  const PAT_3 = [
-    [0, 0, 1], // ドドカ
-    [1, 1, 0], // カカド
-    [0, 1, 0], // ドカド
-    [1, 0, 1], // カドカ
-    [0, 1, 1], // ドカカ
-    [1, 0, 0], // カドド
-    [0, 0, 0]  // ドドド
-  ];
-  const PAT_5 = [
-    [0, 0, 1, 1, 0], // ドドカカド
-    [1, 1, 0, 0, 1], // カカドドカ
-    [0, 1, 0, 1, 0], // 5連トリル
-    [0, 1, 1, 0, 1], // ドカカドカ
-    [0, 0, 1, 0, 0]  // ドドカドド
-  ];
-
-  let med = 0, ratios = null;
-  if (analysis && sel.length) {
-    ratios = sel.map(c => ratioAt(c.t));
-    const sr = ratios.slice().sort((a, b) => a - b);
-    med = sr[Math.floor(sr.length / 2)] || 0;
-  }
-
-  const L = sel.length;
-  const result = new Array(L);
-  let idx = 0;
-  const fastThresh = (60000 / bpm / d.div) * 1.35;
-
-  while (idx < L) {
-    let runEnd = idx;
-    while (runEnd + 1 < L && sel[runEnd + 1].t - sel[runEnd].t <= fastThresh) {
-      runEnd++;
-    }
-    const runLen = runEnd - idx + 1;
-
-    if (runLen >= 3 && (diff === "hard" || diff === "master" || diff === "rush")) {
-      const isTrill = (diff === "master" || diff === "rush") ? (rand() < 0.52) : (rand() < 0.38);
-      if (isTrill || runLen >= 6) {
-        let startColor = sel[idx].onBar ? 0 : (rand() < 0.6 ? 0 : 1);
-        for (let k = 0; k < runLen; k++) {
-          result[idx + k] = { time: Math.round(sel[idx + k].t), lane: (startColor + k) % 2 };
-        }
-      } else if (runLen === 3) {
-        const pat = PAT_3[Math.floor(rand() * PAT_3.length)];
-        for (let k = 0; k < 3; k++) {
-          result[idx + k] = { time: Math.round(sel[idx + k].t), lane: pat[k] };
-        }
-      } else if (runLen === 4) {
-        const r4 = rand();
-        const pat4 = r4 < 0.45 ? [0, 1, 0, 1] : (r4 < 0.75 ? [0, 0, 1, 1] : [0, 1, 1, 0]);
-        for (let k = 0; k < 4; k++) {
-          result[idx + k] = { time: Math.round(sel[idx + k].t), lane: pat4[k] };
-        }
-      } else if (runLen === 5) {
-        const pat = PAT_5[Math.floor(rand() * PAT_5.length)];
-        for (let k = 0; k < 5; k++) {
-          result[idx + k] = { time: Math.round(sel[idx + k].t), lane: pat[k] };
-        }
-      } else {
-        const chunk = rand() < 0.5 ? 1 : 2;
-        for (let k = 0; k < runLen; k++) {
-          result[idx + k] = { time: Math.round(sel[idx + k].t), lane: Math.floor(k / chunk) % 2 };
-        }
-      }
-      idx = runEnd + 1;
-    } else {
-      let lane;
-      if (sel[idx].onBar && rand() < 0.85) lane = 0;
-      else if (analysis && ratios) {
-        lane = ratios[idx] > med ? 1 : 0;
-        if (rand() < 0.10) lane = 1 - lane;
-      } else {
-        lane = rand() < 0.35 ? 1 : 0;
-      }
-      result[idx] = { time: Math.round(sel[idx].t), lane };
-      idx++;
-    }
-  }
-
-  return result;
+/* ゲームの状態を変えずに譜面だけを作る（曲パックの書き出しでも使う）。
+   作り方は chartGen（設定 settings.chartGen／既定 "1" = 旧方式）。中身は js/chart-gen.js の純関数。 */
+function generateNotes(diff, bpm, offset, seed, chartGen = window.Trk.core.settings.chartGen) {
+  if (!window.Trk.core.videoReady || !(bpm >= 60 && bpm <= 300) || !window.Trk.data.DIFF_IDS.includes(diff)) return [];
+  const rand = window.Trk.core.mulberry32(window.Trk.core.hashString(`${String(seed).trim()}|${diff}|${bpm}|${offset}`));
+  return window.Trk.chart.buildChartNotes({ analysis: window.Trk.core.analysis, durationMs: window.Trk.core.video.duration * 1000, diff, spec: window.Trk.data.DIFFS[diff], bpm, offset, rand, chartGen });
 }
 function buildChart() {
-  if (!videoReady) return;
-  chartMode = "generated"; chartDiff = settings.difficulty;
-  const bpm = Number($("bpm").value), offset = Number($("offset").value) || 0;
-  if (!(bpm >= 60 && bpm <= 300)) { chart = []; setStatus("chartStatus", "noChart"); updateChartButtons(); return; }
-  chart = generateNotes(chartDiff, bpm, offset, $("seed").value).map(n => ({ ...n, judged:false, result:null }));
-  chartMeta = { bpm, offset };
-  currentLevel = estimateLevel(chart);
-  setStatus("chartStatus", chart.length ? () => chartSummary() : "noChart");
-  updateChartButtons();
+  if (!window.Trk.core.videoReady) return;
+  window.Trk.core.chartMode = "generated"; window.Trk.core.chartDiff = window.Trk.core.settings.difficulty;
+  const bpm = Number(window.Trk.core.$("bpm").value), offset = Number(window.Trk.core.$("offset").value) || 0;
+  if (!(bpm >= 60 && bpm <= 300)) { window.Trk.core.chart = []; window.Trk.core.setStatus("chartStatus", "noChart"); window.Trk.core.updateChartButtons(); return; }
+  window.Trk.core.chart = generateNotes(window.Trk.core.chartDiff, bpm, offset, window.Trk.core.$("seed").value).map(n => ({ ...n, judged:false, result:null }));
+  window.Trk.core.chartMeta = { bpm, offset };
+  window.Trk.core.currentLevel = estimateLevel(window.Trk.core.chart);
+  window.Trk.core.setStatus("chartStatus", window.Trk.core.chart.length ? () => window.Trk.core.chartSummary() : "noChart");
+  window.Trk.core.updateChartButtons();
 }
-function chartToData(notes, diff, meta = chartMeta) {
+function chartToData(notes, diff, meta = window.Trk.core.chartMeta) {
   return {
     format:"shadow-taiko-chart", version:2, app:"trk!",
-    media:{ name:mediaName, fingerprint, duration:+(video.duration || 0).toFixed(3) },
-    bpm:meta.bpm, offset:meta.offset, seed:$("seed").value.trim(), difficulty:diff, level:estimateLevel(notes),
+    media:{ name:window.Trk.core.mediaName, fingerprint: window.Trk.core.fingerprint, duration:+(window.Trk.core.video.duration || 0).toFixed(3) },
+    bpm:meta.bpm, offset:meta.offset, seed:window.Trk.core.$("seed").value.trim(), difficulty:diff, level:estimateLevel(notes),
     notes:notes.map(n => [n.time, n.lane])
   };
 }
 function exportChart(statusId) {
-  if (!chart.length) { setStatus(statusId, "exportNone"); return; }
-  const base = safeName(baseName(mediaName) || "chart");
-  downloadBlob(new Blob([JSON.stringify(chartToData(chart, chartDiff))], { type:"application/json" }), `${base}-${chartDiff}.shadow-taiko.json`);
-  setStatus(statusId, "exportDone");
+  if (!window.Trk.core.chart.length) { window.Trk.core.setStatus(statusId, "exportNone"); return; }
+  const base = window.Trk.core.safeName(window.Trk.core.baseName(window.Trk.core.mediaName) || "chart");
+  window.Trk.core.downloadBlob(new Blob([JSON.stringify(chartToData(window.Trk.core.chart, window.Trk.core.chartDiff))], { type:"application/json" }), `${base}-${window.Trk.core.chartDiff}.shadow-taiko.json`);
+  window.Trk.core.setStatus(statusId, "exportDone");
 }
 function parseNote(n) {
   let time, lane;
@@ -349,47 +256,47 @@ function validateChartData(data, checkFingerprint = true) {
   const notes = data.notes.map(parseNote);
   if (notes.some(n => !isFinite(n.time) || n.time < 0 || (n.lane !== 0 && n.lane !== 1))) return { key:"importInvalid" };
   if (!notes.length) return { key:"importEmpty" };
-  if (checkFingerprint && data.media && data.media.fingerprint && data.media.fingerprint !== fingerprint) return { key:"importMismatch" };
+  if (checkFingerprint && data.media && data.media.fingerprint && data.media.fingerprint !== window.Trk.core.fingerprint) return { key:"importMismatch" };
   notes.sort((a, b) => a.time - b.time);
-  if (notes[notes.length - 1].time > video.duration * 1000 + 1000) return { key:"importTooLong" };
+  if (notes[notes.length - 1].time > window.Trk.core.video.duration * 1000 + 1000) return { key:"importTooLong" };
   return { notes };
 }
 /* 確認した譜面を今の譜面にする（mode: "imported" / "pack"） */
 function applyChartData(data, mode = "imported", sid = "importStatus", checkFingerprint = true) {
-  if (!videoReady) { setStatus(sid, "loadError"); return false; }
+  if (!window.Trk.core.videoReady) { window.Trk.core.setStatus(sid, "loadError"); return false; }
   const v = validateChartData(data, checkFingerprint);
-  if (v.key) { setStatus(sid, v.key); return false; }
-  chart = v.notes.map(n => ({ time:Math.round(n.time), lane:n.lane, judged:false, result:null }));
-  chartMode = mode;
-  chartDiff = DIFF_IDS.includes(data.difficulty) ? data.difficulty : settings.difficulty;
-  chartMeta = {
+  if (v.key) { window.Trk.core.setStatus(sid, v.key); return false; }
+  window.Trk.core.chart = v.notes.map(n => ({ time:Math.round(n.time), lane:n.lane, judged:false, result:null }));
+  window.Trk.core.chartMode = mode;
+  window.Trk.core.chartDiff = window.Trk.data.DIFF_IDS.includes(data.difficulty) ? data.difficulty : window.Trk.core.settings.difficulty;
+  window.Trk.core.chartMeta = {
     bpm:typeof data.bpm === "number" && Number.isFinite(data.bpm) ? data.bpm : 0,
     offset:typeof data.offset === "number" && Number.isFinite(data.offset) ? data.offset : 0
   };
-  currentLevel = estimateLevel(chart);
-  setStatus("chartStatus", () => chartSummary());
-  if (mode === "imported") setStatus(sid, "importSuccess");
-  updateChartButtons();
+  window.Trk.core.currentLevel = estimateLevel(window.Trk.core.chart);
+  window.Trk.core.setStatus("chartStatus", () => window.Trk.core.chartSummary());
+  if (mode === "imported") window.Trk.core.setStatus(sid, "importSuccess");
+  window.Trk.core.updateChartButtons();
   return true;
 }
 async function importChartFile(file, sid = "importStatus") {
   if (!file || typeof file.size !== "number" || !Number.isFinite(file.size) || file.size < 0 ||
       file.size > CHART_FILE_MAX || typeof file.text !== "function") {
-    setStatus(sid, "importInvalid"); return false;
+    window.Trk.core.setStatus(sid, "importInvalid"); return false;
   }
   let data = null;
-  try { data = JSON.parse(await file.text()); } catch (_) { setStatus(sid, "importBad"); return false; }
+  try { data = JSON.parse(await file.text()); } catch (_) { window.Trk.core.setStatus(sid, "importBad"); return false; }
   return applyChartData(data, "imported", sid, true);
 }
 
 /* ---------- ヒットSE ---------- */
 const seBuffers = [null, null], seFiles = [null, null]; let noiseBuf = null;
 function playSE(lane, force = false) {
-  if (!settings.seEnabled && !force) return;
+  if (!window.Trk.core.settings.seEnabled && !force) return;
   const ac = getAC(); if (!ac) return;
   if (ac.state === "suspended") ac.resume();
   const t = ac.currentTime, out = ac.createGain();
-  out.gain.value = settings.seVolume; out.connect(ac.destination);
+  out.gain.value = window.Trk.core.settings.seVolume; out.connect(ac.destination);
   if (seBuffers[lane]) { const s = ac.createBufferSource(); s.buffer = seBuffers[lane]; s.connect(out); s.start(t); return; }
   const o = ac.createOscillator(), e = ac.createGain();
   if (lane === 0) {
@@ -412,11 +319,40 @@ function playSE(lane, force = false) {
 }
 async function loadSE(file, lane) {
   if (!file) return;
-  if (!getAC()) { setStatus("seStatus", "seUnavailable"); return; }
+  if (!getAC()) { window.Trk.core.setStatus("seStatus", "seUnavailable"); return; }
   try {
     seBuffers[lane] = await decodeAudio(await file.arrayBuffer());
     seFiles[lane] = file;
-    setStatus("seStatus", lane ? "seLoadedKa" : "seLoadedDon");
-  } catch (_) { setStatus("seStatus", "seLoadError"); }
+    window.Trk.core.setStatus("seStatus", lane ? "seLoadedKa" : "seLoadedDon");
+  } catch (_) { window.Trk.core.setStatus("seStatus", "seLoadError"); }
 }
 /* ✅ media.js 完了 */
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.CHART_FILE_MAX = CHART_FILE_MAX;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.applyChartData の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "applyChartData", { configurable:true, get:() => applyChartData, set:v => { applyChartData = v; } });
+Object.defineProperty(window, "audioCtx", { configurable:true, get:() => audioCtx, set:v => { audioCtx = v; } });
+window.buildChart = buildChart;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.chartToData の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "chartToData", { configurable:true, get:() => chartToData, set:v => { chartToData = v; } });
+window.decodeAudio = decodeAudio;
+window.estimateLevel = estimateLevel;
+window.exportChart = exportChart;
+window.generateNotes = generateNotes;
+window.getAC = getAC;
+window.importChartFile = importChartFile;
+window.loadMedia = loadMedia;
+window.loadSE = loadSE;
+window.playSE = playSE;
+window.rmsAt = rmsAt;
+window.seBuffers = seBuffers;
+window.seFiles = seFiles;
+window.setBackground = setBackground;
+/* 領域（window.Trk.media）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
+window.Trk = window.Trk || {};
+window.Trk.media = Object.assign(window.Trk.media || {}, { CHART_FILE_MAX, buildChart, decodeAudio, estimateLevel, exportChart, generateNotes, getAC, importChartFile, loadMedia, loadSE, playSE, rmsAt, seBuffers, seFiles, setBackground });
+Object.defineProperty(window.Trk.media, "applyChartData", { configurable:true, get:() => applyChartData, set:v => { applyChartData = v; } });
+Object.defineProperty(window.Trk.media, "audioCtx", { configurable:true, get:() => audioCtx, set:v => { audioCtx = v; } });
+Object.defineProperty(window.Trk.media, "chartToData", { configurable:true, get:() => chartToData, set:v => { chartToData = v; } });
+})();

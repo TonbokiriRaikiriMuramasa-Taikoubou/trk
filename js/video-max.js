@@ -59,9 +59,9 @@ let raf = 0, isOn = false, playedByUs = false, idleTimer = 0;
 const watchers = new Set();
 
 /* core.js のグローバル（let 宣言）は、読み込み前・初期化前だと参照できないので必ず守る */
-const songTitle = () => { try { return (currentSong && (currentSong.title || currentSong.name)) || ""; } catch (_) { return ""; } };
+const songTitle = () => { try { return (window.Trk.core.currentSong && (window.Trk.core.currentSong.title || window.Trk.core.currentSong.name)) || ""; } catch (_) { return ""; } };
 const hasFrames = () => { try { return !!videoEl.videoWidth && videoEl.readyState >= 2 && !!videoEl.src; } catch (_) { return false; } };
-const packImage = () => { try { return (bgImage && bgImage.naturalWidth) ? bgImage : null; } catch (_) { return null; } };
+const packImage = () => { try { return (window.Trk.core.bgImage && window.Trk.core.bgImage.naturalWidth) ? window.Trk.core.bgImage : null; } catch (_) { return null; } };
 
 function notify() { for (const fn of [...watchers]) { try { fn(isOn); } catch (_) {} } }
 function setI18n(node, key) { if (!node) return; node.textContent = tr(key); node.dataset.i18n = key; }
@@ -130,7 +130,7 @@ function paint() {
   ctx.fillRect(0, 0, W, H);
   let drew = false;
   /* ✨ フレーム補完（js/frame-interp.js）：設定がオンのときは、作った中間フレームを映す */
-  const fi = (typeof settings !== "undefined" && settings.frameInterp !== "off" && window.TrkFrameInterp) ? window.TrkFrameInterp : null;
+  const fi = (typeof settings !== "undefined" && window.Trk.core.settings.frameInterp !== "off" && window.TrkFrameInterp) ? window.TrkFrameInterp : null;
   if (fi) { try { drew = fi.drawTo(ctx, W, H); } catch (_) { drew = false; } }
   if (!drew && hasFrames()) {
     const s = Math.min(W / videoEl.videoWidth, H / videoEl.videoHeight);   /* 全体を映す（切らない） */
@@ -172,7 +172,7 @@ function openMax() {
   startLoop(); pokeChrome(); syncFsLabel();
   if (closeNode) closeNode.focus();
   notify();
-  if (typeof showToast === "function") showToast(tr("videoMaxToast"));
+  if (typeof showToast === "function") window.Trk.play.showToast(tr("videoMaxToast"));
   return true;
 }
 function closeMax() {
@@ -202,24 +202,24 @@ function applyTexts() {
   syncFsLabel();
 }
 function build() {
-  root = el("div", "videoMaxView"); root.id = "videoMaxView"; root.hidden = true;
+  root = window.Trk.core.el("div", "videoMaxView"); root.id = "videoMaxView"; root.hidden = true;
   root.setAttribute("role", "dialog"); root.setAttribute("aria-modal", "true");
 
-  topBar = el("div", "videoMaxTop");
-  titleNode = el("strong", "videoMaxTitle", tr("videoMaxTitle")); titleNode.dataset.i18n = "videoMaxTitle";
-  playNode = el("button", "videoMaxBtn", tr("videoMaxPlay")); playNode.type = "button"; playNode.dataset.i18n = "videoMaxPlay";
-  fsNode = el("button", "videoMaxBtn videoMaxFs", "⛶"); fsNode.type = "button";
+  topBar = window.Trk.core.el("div", "videoMaxTop");
+  titleNode = window.Trk.core.el("strong", "videoMaxTitle", tr("videoMaxTitle")); titleNode.dataset.i18n = "videoMaxTitle";
+  playNode = window.Trk.core.el("button", "videoMaxBtn", tr("videoMaxPlay")); playNode.type = "button"; playNode.dataset.i18n = "videoMaxPlay";
+  fsNode = window.Trk.core.el("button", "videoMaxBtn videoMaxFs", "⛶"); fsNode.type = "button";
   fsNode.hidden = !fsSupported();
-  closeNode = el("button", "videoMaxBtn videoMaxClose", "✕"); closeNode.type = "button";
-  const tools = el("div", "videoMaxTools"); tools.append(playNode, fsNode, closeNode);
+  closeNode = window.Trk.core.el("button", "videoMaxBtn videoMaxClose", "✕"); closeNode.type = "button";
+  const tools = window.Trk.core.el("div", "videoMaxTools"); tools.append(playNode, fsNode, closeNode);
   topBar.append(titleNode, tools);
 
-  stage = el("div", "videoMaxStage");
+  stage = window.Trk.core.el("div", "videoMaxStage");
   canvas = document.createElement("canvas"); canvas.className = "videoMaxCanvas";
-  noteNode = el("p", "videoMaxNote hint", tr("videoMaxNoVideo")); noteNode.dataset.i18n = "videoMaxNoVideo";
+  noteNode = window.Trk.core.el("p", "videoMaxNote hint", tr("videoMaxNoVideo")); noteNode.dataset.i18n = "videoMaxNoVideo";
   stage.append(canvas, noteNode);
 
-  hintNode = el("p", "videoMaxHint hint", tr("videoMaxHint")); hintNode.dataset.i18n = "videoMaxHint";
+  hintNode = window.Trk.core.el("p", "videoMaxHint hint", tr("videoMaxHint")); hintNode.dataset.i18n = "videoMaxHint";
 
   root.append(topBar, stage, hintNode);
   document.body.append(root);
@@ -244,7 +244,7 @@ function build() {
 
 /* ---- キー（開いている間だけ、先に受け取る） ---- */
 addEventListener("keydown", e => {
-  if (!isOn || window._trkStudyRoomOpen) return;
+  if (!isOn || window.Trk.overlay.is("study")) return;
   if (e.code === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); closeMax(); return; }
   if (e.code === "Space") { e.preventDefault(); e.stopImmediatePropagation(); togglePlay(); return; }
   if (e.code === "ArrowLeft" || e.code === "ArrowRight") {

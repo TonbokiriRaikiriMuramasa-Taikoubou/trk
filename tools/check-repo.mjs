@@ -28,9 +28,26 @@ function warn(message) {
 function ok(message) {
   console.log(`OK    ${message}`);
 }
+/* 名前空間 D：js/ の本文では、領域の接頭辞 window.Trk.<領域>. を取り除いて照合する（同じ束縛の別の書き方）。
+   window.Trk.overlay は取り除かない（書斎・シンスの旗の検査が、その綴りを見る）。 */
 function read(rel) {
-  return fs.readFileSync(path.join(root, rel), "utf8");
+  const text = fs.readFileSync(path.join(root, rel), "utf8");
+  return rel.startsWith("js/") ? text.replace(/window\.Trk\.(?!overlay\b)[A-Za-z]\w*\./g, "") : text;
 }
+
+/* 利用者向けの説明文：README（概要）と docs/guide/*.md（くわしい説明）を合わせて読む。
+   内容の有無を見る検査はこちらを使う。リンク先の存在は README 本体で見る。 */
+function readReadme() {
+  const guideDir = path.join(root, "docs/guide");
+  const guide = fs.existsSync(guideDir) ? fs.readdirSync(guideDir).filter(f => f.endsWith(".md")).sort().map(f => fs.readFileSync(path.join(guideDir, f), "utf8")) : [];
+  return [fs.readFileSync(path.join(root, "README.md"), "utf8"), ...guide].join("\n");
+}
+
+/* 曲名の照合（js/title-match.js の純関数）＋ plWishMatch（library.js）。
+   check-repo の文字列検査と、vm での入出力検査が同じ定義を見るための共通の断片。 */
+const titleMatchSrc = read("js/title-match.js");
+const plWishMatchSlice = (read("js/library.js").match(/function plWishMatch[\s\S]*?(?=\nfunction plSyncWishes)/) || [""])[0];
+const matchLogicSrc = titleMatchSrc + "\n" + plWishMatchSlice;
 function exists(rel) {
   return fs.existsSync(path.join(root, rel));
 }
@@ -202,7 +219,7 @@ if (skinsStart < 0 || skinsEnd < 0) {
   fail("SKINS block could not be read in js/data.js");
 } else {
   const presetCount = (dataJs.slice(skinsStart, skinsEnd).match(/label:\{ja:/g) || []).length;
-  const mikuCount = (read("js/characters/miku.js").match(/^ {2}SKINS\.[A-Za-z0-9]+ = \{/gm) || []).length;
+  const mikuCount = (read("js/characters/miku.js").match(/^ {2}(?:window\.Trk\.data\.)?SKINS\.[A-Za-z0-9]+ = \{/gm) || []).length;
   if (presetCount + mikuCount !== 31) fail(`expected 31 overall skins, found ${presetCount + mikuCount}`);
   else ok("overall skin count is 31");
   /* 🎓 ごほうびスキン（グラデュエーション）は、スタンプ5つで解禁まで鍵がかかっていること */
@@ -466,9 +483,9 @@ if (!exists("js/fx-worklet.js") ||
     catalog.includes('PL("ak-solongadele", "アークナイツ — So Long, Adele"') &&
     soLongRefreshBlock.includes('if (JSON.stringify(existing.wish) !== JSON.stringify(wishes)) { existing.wish = wishes; changed = true; }');
   /* 📡 「集める棚」：未入手の曲を開いた瞬間から灰色で並べ、入手したら黒くなる */
-  const collectionOk = library.includes("function plTitleKeys(") &&
+  const collectionOk = titleMatchSrc.includes("function plTitleKeys(") &&
     /function plWishMatch\(w, byTitle\) \{\s*for \(const k of plWishTitleKeys\(w\)\)/.test(library) &&
-    library.includes("function plSongMatchKeys(title, matchHint)") &&
+    titleMatchSrc.includes("function plSongMatchKeys(title, matchHint)") &&
     library.includes("for (const k of plSongMatchKeys(m.title || it.title, m.matchHint)) byTitleAdd(k, it);") &&
     library.includes("function plCollectionEntries(") && library.includes("function plWishFolderIds(") &&
     library.includes("const entries = plCollectionEntries(tabId, byTitle);") &&
@@ -487,7 +504,7 @@ if (!exists("js/fx-worklet.js") ||
     .every(k => library.split(k + ':\"').length - 1 === 4);
   let matchHintBehaviorOk = false;
   try {
-    const logic = library.match(/const plNormTitle =[\s\S]*?(?=\nfunction plSyncWishes)/);
+    const logic = plWishMatchSlice ? [matchLogicSrc] : null;
     if (logic) {
       const ctx = { metaOf: () => null };
       vm.runInNewContext(`${logic[0]}\nglobalThis.__plSongMatchKeys = plSongMatchKeys; globalThis.__plWishMatch = plWishMatch;`, ctx);
@@ -519,10 +536,10 @@ if (!exists("js/fx-worklet.js") ||
         ctx.__plWishMatch({ t:"Suguri - BELIEVE", al:"", ar:"" }, noMatch.byTitle) === null;
     }
   } catch (_) { matchHintBehaviorOk = false; }
-  const fileExtensionOk = !/\.pgg\b/i.test(library + read("README.md") + read("docs/HANDOFF.md")) &&
-    /BELIEVE\.ogg/i.test(read("README.md") + read("docs/HANDOFF.md"));
+  const fileExtensionOk = !/\.pgg\b/i.test(library + readReadme() + read("docs/HANDOFF.md")) &&
+    /BELIEVE\.ogg/i.test(readReadme() + read("docs/HANDOFF.md"));
   const profileMatchOk = fileExtensionOk && library.includes('["matchHint", 80]') &&
-    library.includes('function plWishTitleKeys(wish)') &&
+    titleMatchSrc.includes('function plWishTitleKeys(wish)') &&
     library.includes('matchMemo.placeholder = tr("plMatchMemoPh")') &&
     library.includes('f.matchHint = matchMemo') &&
     library.includes('m.matchHint ? `${tr("plMatchMemo")}: ${m.matchHint}` : ""') &&
@@ -612,7 +629,7 @@ if (!exists("js/fx-worklet.js") ||
     const wishHelperEnd = library.indexOf("\nfunction trkWishesFromCatalog", wishHelperStart);
     const sanitizeStart = library.indexOf("function plSanitize(raw) {");
     const sanitizeEnd = library.indexOf("\nconst TRK_PLAYLIST_ID", sanitizeStart);
-    const matchLogic = library.match(/const plNormTitle =[\s\S]*?(?=\nfunction plSyncWishes)/);
+    const matchLogic = plWishMatchSlice ? [matchLogicSrc] : null;
     if (gakumasDataOk && wishHelperStart >= 0 && wishHelperEnd > wishHelperStart &&
         sanitizeStart >= 0 && sanitizeEnd > sanitizeStart && matchLogic) {
       const aliasContext = vm.createContext({ PL_COLORS:{}, metaOf:() => null });
@@ -1160,7 +1177,7 @@ if (!read("js/library.js").includes("plAuthorMenu") ||
     .every(id => mmd.includes(`${id}: {`) || mmd.includes(`${id}: makeGesture(`));
   const morphOk = mmd.includes("const FACE_MORPHS = [") && mmd.includes("dv.setUint32(at, morphCount, true)") &&
     mmd.includes('buildVmd(frames, "trk-builtin-" + id, morphFrames)');
-  const docsOk = read("README.md").includes("内蔵モーション65種") &&
+  const docsOk = readReadme().includes("内蔵モーション65種") &&
     read("docs/HANDOFF.md").includes("65種をすべて選択可能") &&
     read("docs/HANDOFF.md").includes("🎤 歌・口パクの6グループ") &&
     read("NOTICE.md").includes("third-party VMD or choreography file is bundled");
@@ -1196,7 +1213,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
 // 🎓 Optional First Spark tutorial audio: lazy-loaded from same origin, removable as one folder.
 {
   const html = read("index.html"), library = read("js/library.js"), main = read("js/main.js");
-  const i18n = read("js/i18n.js"), notice = read("NOTICE.md"), ignore = read(".gitignore"), readme = read("README.md");
+  const i18n = read("js/i18n.js"), notice = read("NOTICE.md"), ignore = read(".gitignore"), readme = readReadme();
   const demoDir = path.join(root, "assets/optional-demo-audio");
   const audio = path.join(demoDir, "first-spark-tutorial.mp3"), manifestFile = path.join(demoDir, "manifest.json");
   let optionalFolderOk = !fs.existsSync(demoDir);
@@ -1536,7 +1553,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
   const actions = ["left", "right", "confirm", "back", "pause"];
   const wiringOk = ["window.TrkPad = Object.freeze({", "function updatePadUI()", "getGamepads", "function padRawEdges(",
     "function padAssign(", "function padMoveFocus(", "function padActivate()", "function padTap(", "function padPressed(",
-    "requestAnimationFrame(padTick)", "window._trkStudyRoomOpen", "catchState", "stageInput", "handleInput("]
+    "requestAnimationFrame(padTick)", "window.Trk.overlay.any()", "catchState", "stageInput", "handleInput("]
     .every(token => pad.includes(token)) &&
     ["function keyCodeOf(e)", "const validPadBind =", "const PAD_DEFAULTS =", "function formatPadBind(",
      "function resetKeysPrefs()", "if (typeof updatePadUI === \"function\") updatePadUI();"]
@@ -1605,6 +1622,175 @@ try {
   if (pkg.scripts && pkg.scripts["prepare:mobile"] && exists("tools/prepare-mobile-web.mjs")) ok("Capacitor preparation scripts are present");
 } catch (error) {
   fail(`package.json is not valid JSON: ${error.message}`);
+}
+
+/* 差し替えの回帰（名前空間 B の欠陥の再発防止）：後から読み込まれるファイルが代入で上書きする関数は、
+   窓の名前をアクセサ（get/set）で持つ。値のコピーだと、ファイル内部の呼び出しに差し替えが届かない。 */
+const PATCHED_FUNCTIONS = {
+  "js/core.js": ["activeMods", "applySkin", "videoFilter"],
+  "js/custom.js": ["installPackFile", "sanitizeSong", "getPackSongs", "renderPackList"],
+  "js/game.js": ["showJudge", "gameTime"],
+  "js/library.js": ["renderLib", "renderBanner"],
+  "js/media.js": ["chartToData", "applyChartData"],
+  "js/render.js": ["drawVideo"],
+};
+for (const [rel, name] of Object.entries(PATCHED_FUNCTIONS).flatMap(([r, ns]) => ns.map(n => [r, n]))) {
+  const owner = exists(rel) ? read(rel) : "";
+  const accessor = new RegExp(`Object\\.defineProperty\\(window, "${name}", \\{[^}]*get:\\(\\) => ${name}, set:v => \\{ ${name} = v; \\} \\}\\)`);
+  const patchedElsewhere = walk(path.join(root, "js")).filter(f => f.endsWith(".js") && path.relative(root, f) !== rel)
+    .some(f => new RegExp(`^\\s*(?:window\\.(?:Trk\\.[\\w]+\\.)?)?${name} = (?:async )?(?:function|\\(|[A-Za-z_$][\\w$]* =>|[A-Za-z_$][\\w$]*;)`, "m").test(fs.readFileSync(f, "utf8")));
+  if (!patchedElsewhere) fail(`${name}: no later file overrides it (remove it from PATCHED_FUNCTIONS if this is intended)`);
+  else if (!accessor.test(owner)) fail(`${name} is overridden by a later file but ${rel} does not expose it as a window accessor`);
+  else ok(`${name} override reaches internal calls (window accessor in ${rel})`);
+}
+
+/* 名前空間 D：領域の公開名は window.Trk.<領域> にも載る（旧名 window.X は別名として残す）。
+   登録元の包みの末尾に、窓へ出している名前（window.X = X・defineProperty(window, …)）がすべて
+   window.Trk.<領域> の登録に入っていることを確かめる。登録が無い・抜けると失敗する。 */
+const TRK_REGISTRARS = {
+  "js/chart-gen.js": "chart",
+  "js/pad.js": "pad",
+  "js/lite.js": "lite",
+  "js/main.js": "main",
+  "js/custom.js": "custom",
+  "js/library.js": "library",
+  "js/media.js": "media",
+  "js/data.js": "data",
+  "js/render.js": "play",
+  "js/catch.js": "modes",
+  "js/core.js": "core",
+};
+const TRK_NOT_REGISTERED = { "js/core.js": ["_trkStudyRoomOpen"] }; // 互換の読み取り専用アクセサ（宣言ではない）
+const TRK_EXTRAS = {
+  "js/library.js": { files: ["js/title-match.js"], functions: true },  // 関数は領域へ出す（plTitleKeys など。窓へは出していない）
+  "js/render.js": { files: ["js/game.js"], functions: false },        // 同じ領域の別ファイル：窓へ出している名前だけ
+  "js/catch.js": { files: ["js/modes.js", "js/truck.js", "js/stage.js"], functions: false },
+};
+for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
+  const src = exists(rel) ? read(rel) : "";
+  // 同じ領域の別ファイル（TRK_EXTRAS）：その関数と、窓へ出している名前も登録の対象
+  const extra = TRK_EXTRAS[rel] || { files: [], functions: false };
+  const extraNames = extra.files.flatMap(f => {
+    const t = read(f);
+    return [
+      ...(extra.functions ? [...t.matchAll(/^function ([A-Za-z_$][\w$]*)\(/gm)].map(m => m[1]) : []),
+      ...[...t.matchAll(/^window\.([A-Za-z_$][\w$]*) = \1;/gm)].map(m => m[1]),
+      ...[...t.matchAll(/^Object\.defineProperty\(window, "([^"]+)"/gm)].map(m => m[1]),
+    ];
+  });
+  const exported = [
+    ...[...src.matchAll(/^window\.([A-Za-z_$][\w$]*) = \1;/gm)].map(m => m[1]),
+    ...[...src.matchAll(/^Object\.defineProperty\(window, "([^"]+)"/gm)].map(m => m[1]),
+    ...extraNames,
+  ].filter((n, i, all) => all.indexOf(n) === i && !(TRK_NOT_REGISTERED[rel] || []).includes(n));
+  const tail = src.slice(src.indexOf(`window.Trk.${area} = `));
+  const missing = exported.filter(n => !new RegExp(`[{,]\\s*${n.replace(/\$/g, "\\$")}\\s*[,}]|window\\.Trk\\.${area}, "${n.replace(/\$/g, "\\$")}"`).test(tail));
+  if (src.indexOf(`window.Trk.${area} = `) < 0) fail(`${rel}: window.Trk.${area} is not registered`);
+  else if (missing.length) fail(`${rel}: not registered under window.Trk.${area}: ${missing.join(", ")}`);
+  else ok(`${rel} registers ${exported.length} public name(s) under window.Trk.${area}`);
+}
+
+/* 名前空間 D：書斎の公開面（凍結の window.TrkStudyRoom）と同じ参照を、領域の名前 window.Trk.study でも出す */
+{
+  const studySrc = exists("js/study-room.js") ? read("js/study-room.js") : "";
+  if (!/^window\.Trk\.study = window\.TrkStudyRoom;$/m.test(studySrc)) fail("js/study-room.js does not alias window.Trk.study to window.TrkStudyRoom");
+  else ok("window.Trk.study is the same frozen object as window.TrkStudyRoom");
+}
+
+/* 利用者の決定（2026-10-08）：ブラウザ標準の window.screen を上書きしない。
+   内部の画面状態は window.Trk.core.screen だけで読む（窓の別名は作らない）。 */
+{
+  const coreSrc = read("js/core.js");
+  if (/defineProperty\(window, "screen"|window\.screen = /.test(coreSrc)) fail("js/core.js sets window.screen (the browser's own screen object must not be replaced)");
+  else ok("window.screen is left to the browser (the app state is window.Trk.core.screen only)");
+}
+
+/* アドオンの api（js/addons.js の makeApi）の鍵は、docs/ADDONS.md に `api.<鍵>` として載っていること。
+   載っていない鍵は、使ってよい窓口として約束していないので、増やすときは文書も増やす。 */
+{
+  const addonsSrc = fs.readFileSync(path.join(root, "js/addons.js"), "utf8");
+  const block = (addonsSrc.match(/function makeApi\(id\) \{[\s\S]*?\n\}\n/) || [""])[0];
+  /* 鍵は字下げ4の行にある（同じ行に , で続くものも含む）。メソッド形式（addStyle(css)）も含む */
+  const keys = [];
+  for (const line of block.split("\n")) {
+    if (!/^\s{4}\S/.test(line)) continue;
+    const m1 = line.match(/^\s{4}([A-Za-z_$][\w$]*)\s*\(/); if (m1) keys.push(m1[1]);
+    const m2 = line.match(/^\s{4}([A-Za-z_$][\w$]*),\s*$/); if (m2) keys.push(m2[1]);   /* 省略記法（id,） */
+    for (const m of line.matchAll(/(?:^\s{4}|,\s+)([A-Za-z_$][\w$]*)\s*:/g)) keys.push(m[1]);
+  }
+  const docs = fs.readFileSync(path.join(root, "docs/ADDONS.md"), "utf8");
+  const missing = [...new Set(keys)].filter(k => !new RegExp("api\\." + k.replace("$", "\\$") + "(?![\\w$])").test(docs));
+  if (!block || keys.length < 10) fail("js/addons.js: makeApi の鍵を読めませんでした（" + keys.length + "件）");
+  else if (missing.length) fail("docs/ADDONS.md に載っていない api の鍵: " + missing.join(", "));
+  else ok("アドオンの api の鍵（" + keys.length + "件）は docs/ADDONS.md に全て載っている");
+}
+
+/* 項目 5（README の分割）：README は概要に絞る（上限 12KB）。docs/guide/ の全ファイルは目次（index.md）に載せる。 */
+{
+  const readmeBytes = fs.statSync(path.join(root, "README.md")).size;
+  const guideFiles = fs.readdirSync(path.join(root, "docs/guide")).filter(f => f.endsWith(".md") && f !== "index.md");
+  const guideIndex = read("docs/guide/index.md");
+  const notListed = guideFiles.filter(f => !guideIndex.includes("(" + f + ")"));
+  if (readmeBytes > 12 * 1024) fail("README.md が 12KB を超えています（" + readmeBytes + " bytes）。くわしい説明は docs/guide/ へ");
+  else if (notListed.length) fail("docs/guide/index.md に載っていないガイド: " + notListed.join(", "));
+  else ok("README は " + readmeBytes + " bytes（上限 12KB）。docs/guide/ の " + guideFiles.length + " 件は全て目次に載っている");
+}
+
+/* 項目 6（長押しの代わり）：長押しでしか開けない「曲のプロフィール」「メディアプレーヤー」に、見えるボタンと
+   設定（showMoreBtns）が付いていること。ボタンの有無は headless の確認（/tmp の probe）でも見ている。 */
+{
+  const libSrc = read("js/library.js"), tvSrc = read("js/tv-dock.js"), idx = read("index.html");
+  const songBtn = /pb\.addEventListener\("click"[^\n]*songProfile\(it\)/.test(libSrc) && libSrc.includes('"libFav moreBtn"');
+  const tvBtn = /mediaBtn\.addEventListener\("click"[^\n]*TrkMediaPlayer\.open\(\)/.test(tvSrc) && /window\.TrkMediaPlayer = \{ open:openMedia/.test(read("js/media-player-mode.js")) && tvSrc.includes('"inline tight moreBtn"');
+  const toggle = idx.includes('id="showMoreBtns"') && libSrc.includes("syncMoreBtns") && /body\.noMoreBtns \.moreBtn/.test(read("css/style.css"));
+  if (!songBtn || !tvBtn || !toggle) fail("長押しの代わりのボタン（曲の🎶・TVの▶）か、設定 showMoreBtns の配線が無い");
+  else ok("長押しの代わりのボタン（曲の🎶・TVの▶）と設定 showMoreBtns が付いている");
+}
+
+/* 項目 6（表示の並び・開発者表示）：かんたん／全部の並び替えと、開発者表示（devView）で隠すものの配線。
+   TV の並びは起動時に組み立てるので、切り替えは次の読み込みで反映（index の説明文に書いてある）。 */
+{
+  const idx = read("index.html"), libUi = read("js/library.js"), libSkins = read("js/lib-skins.js");
+  const tvSrc = read("js/tv-dock.js"), mediaSrc = read("js/media-player-mode.js"), i18n = read("js/i18n.js");
+  const arr = (src, name) => { const m = src.match(new RegExp("const " + name + " = \\[([^\\]]*)\\]")); return m ? [...m[1].matchAll(/"([^"]+)"/g)].map(x => x[1]) : null; };
+  const groups = arr(tvSrc, "TV_GROUPS"), simpleGroups = arr(tvSrc, "TV_GROUPS_SIMPLE");
+  const sameGroups = groups && simpleGroups && groups.length === simpleGroups.length && groups.every(g => simpleGroups.includes(g));
+  const top = arr(libSkins, "LIB_SKIN_SIMPLE_TOP");
+  const wired = idx.includes('id="displayMode"') && idx.includes('id="devView"') && libUi.includes("syncDisplayUi") && /body\.noDev \.devOnly/.test(read("css/style.css"));
+  const orders = (libSkins.match(/for \(const id of libSkinOrder\(\)\)/g) || []).length === 2 && (tvSrc.match(/for \(const cat of tvGroups\(\)\)/g) || []).length === 2 && tvSrc.includes("TV_RECOMMENDED");
+  const hides = mediaSrc.includes('"mediaLoopLab devOnly"') && libUi.includes('el("div", "devOnly")') && idx.includes('id="skinMaker" class="subPanel devOnly"') && tvSrc.includes('"fxMini slim devOnly"');
+  const keys = ["displayModeLabel:", "displaySimple:", "displayFull:", "displayModeHint:", "devViewLabel:"].every(k => (i18n.match(new RegExp(k, "g")) || []).length === 4);
+  if (!sameGroups || !top || top.length !== 6 || !wired || !orders || !hides || !keys) fail("表示の並び（かんたん／全部）か開発者表示（devView）の配線が欠けている");
+  else ok("表示の並び（かんたん／全部）と開発者表示（ループ・ラボ、投稿者ツールを隠す）が配線されている");
+}
+
+/* 項目 6（一部／要確認の4件）：長押しの見える代わり。タブ設定（⚙）、スペクトラム（⚙ くわしい設定）、書斎（📚 書斎を開く）、
+   緊急復旧（既存の 🛟 セーフモード）。それぞれ呼び出し先が同じ関数であること、設定 showMoreBtns で隠せることを見る。 */
+{
+  const libSrc = read("js/library.js"), specSrc = read("js/spectrum.js"), studySrc = read("js/study-room.js");
+  const idx = read("index.html"), coreSrc = read("js/core.js");
+  const tabGear = libSrc.includes('"libTab plPlus moreBtn"') && libSrc.includes("onLongPress(b, () => tabSettingsMenu(t))") && libSrc.includes("tabSettingsMenu(activeTab)");
+  const specBtn = specSrc.includes('"specNext moreBtn"') && specSrc.includes("onLongPress(zipBtn, openSpecSettings)") && specSrc.includes("specMore.addEventListener(\"click\", openSpecSettings)");
+  const studyBtn = idx.includes('id="studyOpenBtn"') && studySrc.includes('getElementById("studyOpenBtn")') && idx.includes('id="studyOpenBtn" class="libSkinBtn moreBtn"');
+  const emergency = idx.includes('id="emergencySafeBtn"') && coreSrc.includes('bind("emergencySafeBtn"');
+  const keys = (src, k) => (src.match(new RegExp("\\b" + k + ":", "g")) || []).length === 4;
+  const i18nOk = keys(libSrc, "tabSettingsBtn") && keys(specSrc, "specOpenSettings") && keys(studySrc, "studyOpenBtn");
+  if (!tabGear || !specBtn || !studyBtn || !emergency || !i18nOk) fail("一部／要確認の4件の見える代わり（タブの⚙・スペクトラムのくわしい設定・書斎ボタン・緊急復旧）の配線が欠けている");
+  else ok("一部／要確認の4件に見える代わりがある（タブの⚙・くわしい設定・📚書斎・🛟緊急復旧）");
+}
+
+/* 項目 7（Service Worker）：ハッシュ固定の vendor は cache-first。キャッシュの中身は SHA-384 の照合が通ったものだけ使う。
+   VENDOR_PINS は tools/vendor-lock.json から生成（ずれたら失敗）。セーフモードはキャッシュを読まない（F-19）。 */
+{
+  const swSrc = read("sw.js");
+  const pins = spawnSync(process.execPath, [path.join(root, "tools", "sw-vendor-pins.mjs")], { encoding: "utf8" });
+  const pinsFresh = pins.status === 0;
+  const cacheFirst = /const pinned = pinnedPath\(url\);/.test(swSrc) && /if \(pinned && !safeClient\)/.test(swSrc) && /if \(hit && await pinnedMatches\(hit, pinned\)\) return hit;/.test(swSrc);
+  const offlineVerified = /if \(cached && \(!pinned \|\| await pinnedMatches\(cached, pinned\)\)\) return cached;/.test(swSrc);
+  const digestUsed = /crypto\.subtle\.digest\("SHA-384"/.test(swSrc);
+  const safeIdFromNavigation = swSrc.includes("safeClients.add(event.resultingClientId)") && !swSrc.includes("safeClients.add(event.clientId)");
+  if (!pinsFresh || !cacheFirst || !offlineVerified || !digestUsed || !safeIdFromNavigation) fail("sw.js の vendor の cache-first（SHA-384 照合・セーフモードはキャッシュを読まない）が欠けている、または VENDOR_PINS が lock とずれている");
+  else ok("sw.js: ハッシュ固定の vendor は cache-first で、SHA-384 が合うものだけ使う（VENDOR_PINS は vendor-lock.json と一致）");
 }
 
 console.log(`\nStatic check: ${failures ? "FAILED" : "passed"} · ${failures} failure(s) · ${warnings} warning(s)`);

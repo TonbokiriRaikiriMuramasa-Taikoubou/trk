@@ -55,14 +55,14 @@ Object.assign(TEXT.ko, {
 
 /* ---------- 設定 ---------- */
 const SKIP_DEFAULT = ["ArrowLeft", "ArrowRight"];
-settings.skipKeys = (Array.isArray(prefs.skipKeys) && prefs.skipKeys.length === 2 && prefs.skipKeys.every(validCode) && prefs.skipKeys[0] !== prefs.skipKeys[1])
-  ? prefs.skipKeys.slice() : SKIP_DEFAULT.slice();
+window.Trk.core.settings.skipKeys = (Array.isArray(window.Trk.core.prefs.skipKeys) && window.Trk.core.prefs.skipKeys.length === 2 && window.Trk.core.prefs.skipKeys.every(window.Trk.core.validCode) && window.Trk.core.prefs.skipKeys[0] !== window.Trk.core.prefs.skipKeys[1])
+  ? window.Trk.core.prefs.skipKeys.slice() : SKIP_DEFAULT.slice();
 
-const inPlay = () => phase === "playing" || phase === "paused";
-const canSkip = () => inPlay() && videoReady && (settings.autoPlay || settings.playerMode);
+const inPlay = () => window.Trk.core.phase === "playing" || window.Trk.core.phase === "paused";
+const canSkip = () => inPlay() && window.Trk.core.videoReady && (window.Trk.core.settings.autoPlay || window.Trk.core.settings.playerMode);
 /* 練習中（AUTOでないとき）は、遊ぶためのキーを優先する */
 function usedByMode(code) {
-  if (slotOfKey(code) >= 0) return true;
+  if (window.Trk.core.slotOfKey(code) >= 0) return true;
   if (typeof isTruck === "function" && isTruck() && typeof truckPosKeys === "function" && truckPosKeys().includes(code)) return true;
   if (typeof isStage === "function" && isStage() && typeof stageKeys === "function" && stageKeys().includes(code)) return true;
   if (typeof isCatch === "function" && isCatch() && typeof catchAllKeys === "function" && catchAllKeys().includes(code)) return true;
@@ -71,37 +71,37 @@ function usedByMode(code) {
 
 /* ---------- 再生バー：AUTO中も表示 ---------- */
 function syncSeekBar() {
-  $("seekBar").classList.toggle("on", (settings.playerMode || !!settings.autoPlay) && inPlay());
+  window.Trk.core.$("seekBar").classList.toggle("on", (window.Trk.core.settings.playerMode || !!window.Trk.core.settings.autoPlay) && inPlay());
 }
 on("phase", syncSeekBar);
 on("options", syncSeekBar);
 
 /* ---------- 10秒スキップ ---------- */
 function skip(dir) {
-  const d = video.duration || 0; if (!d) return;
-  const t = Math.max(0, Math.min(d - .5, (video.currentTime || 0) + dir * SKIP_SEC));
+  const d = window.Trk.core.video.duration || 0; if (!d) return;
+  const t = Math.max(0, Math.min(d - .5, (window.Trk.core.video.currentTime || 0) + dir * SKIP_SEC));
   seekTo(t);
   if (typeof poke === "function") poke();
-  showToast(`${dir < 0 ? "⏪ -" : "⏩ +"}${SKIP_SEC}s · ${fmtTime(t)}`);
+  showToast(`${dir < 0 ? "⏪ -" : "⏩ +"}${SKIP_SEC}s · ${window.Trk.core.fmtTime(t)}`);
 }
 
 /* ---------- 🔁 区間リピート ---------- */
 const ab = { a:null, b:null };
 function abSet(which) {
   if (!canSkip()) return;
-  const t = video.currentTime || 0;
-  if (which === "a") { ab.a = t; ab.b = null; showToast(tr("abToastA", { t:fmtTime(t) })); }
+  const t = window.Trk.core.video.currentTime || 0;
+  if (which === "a") { ab.a = t; ab.b = null; showToast(tr("abToastA", { t:window.Trk.core.fmtTime(t) })); }
   else if (ab.a != null) {
     if (t <= ab.a + .5) { ab.b = ab.a; ab.a = Math.max(0, t); } else ab.b = t;   // 逆向きに置いたら入れ替える
     if (ab.b - ab.a < .5) ab.b = ab.a + .5;
-    showToast(tr("abToastB", { a:fmtTime(ab.a), b:fmtTime(ab.b) }));
+    showToast(tr("abToastB", { a:window.Trk.core.fmtTime(ab.a), b:window.Trk.core.fmtTime(ab.b) }));
   }
   renderAb();
 }
 function abClear(silent) { ab.a = ab.b = null; if (!silent) showToast(tr("abToastClear")); renderAb(); }
 function abCycle() { if (ab.a == null) abSet("a"); else if (ab.b == null) abSet("b"); else abClear(); }
 function renderAb() {
-  const bar = $("seekBar"), d = video.duration || 0;
+  const bar = window.Trk.core.$("seekBar"), d = window.Trk.core.video.duration || 0;
   const on = ab.a != null && d > 0;
   bar.classList.toggle("ab", on);
   if (on) {
@@ -109,37 +109,37 @@ function renderAb() {
     bar.style.setProperty("--ab-b", ((ab.b ?? ab.a) / d * 100).toFixed(2) + "%");
   }
   abLine.textContent = ab.a == null ? tr("abNone")
-    : ab.b == null ? tr("abOnlyA", { a:fmtTime(ab.a) })
-    : tr("abRange", { a:fmtTime(ab.a), b:fmtTime(ab.b) });
+    : ab.b == null ? tr("abOnlyA", { a:window.Trk.core.fmtTime(ab.a) })
+    : tr("abRange", { a:window.Trk.core.fmtTime(ab.a), b:window.Trk.core.fmtTime(ab.b) });
 }
 /* B点を過ぎたらA点へ戻る（練習扱いは seekTo が付けます） */
 setInterval(() => {
-  if (ab.a == null || ab.b == null || phase !== "playing" || !videoReady) return;
-  if ((video.currentTime || 0) >= ab.b) seekTo(ab.a);
+  if (ab.a == null || ab.b == null || window.Trk.core.phase !== "playing" || !window.Trk.core.videoReady) return;
+  if ((window.Trk.core.video.currentTime || 0) >= ab.b) seekTo(ab.a);
 }, 40);
 on("beforeLoad", () => abClear(true));
 
 /* 一時停止画面の表示とボタン */
-const abBox = el("div"), abLine = el("div", "hint status"), abBtns = el("div", "miniActions");
+const abBox = window.Trk.core.el("div"), abLine = window.Trk.core.el("div", "hint status"), abBtns = window.Trk.core.el("div", "miniActions");
 abBtns.style.justifyContent = "center";
 for (const [key, fn] of [["abSetA", () => abSet("a")], ["abSetB", () => abSet("b")], ["abClear", () => abClear()]]) {
-  const b = el("button"); b.type = "button"; b.dataset.i18n = key; b.textContent = tr(key);
+  const b = window.Trk.core.el("button"); b.type = "button"; b.dataset.i18n = key; b.textContent = tr(key);
   b.addEventListener("click", fn); abBtns.append(b);
 }
 abBox.append(abLine, abBtns);
-$("pauseScreen").querySelector("p").after(abBox);
+window.Trk.core.$("pauseScreen").querySelector("p").after(abBox);
 on("phase", () => { abBox.hidden = !canSkip(); renderAb(); });
 on("language", renderAb);
 
 /* ---------- キー（ほかのモードより先に受け取る） ---------- */
 let skipBinding = null;
 addEventListener("keydown", e => {
-  if (window._trkSynthModeOpen || window._trkMediaPlayerOpen || window._trkStudyRoomOpen) return;
+  if (window.Trk.overlay.any()) return;
   if (skipBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureSkip(e.code); return; }
   if (!canSkip()) return;
-  if (!settings.autoPlay && usedByMode(e.code)) return;
+  if (!window.Trk.core.settings.autoPlay && usedByMode(e.code)) return;
   if (e.code === AB_KEY) { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat) abCycle(); return; }
-  const i = settings.skipKeys.indexOf(e.code); if (i < 0) return;
+  const i = window.Trk.core.settings.skipKeys.indexOf(e.code); if (i < 0) return;
   e.preventDefault(); e.stopImmediatePropagation();
   skip(i ? 1 : -1);                           // 長押しすると続けてスキップ
 }, true);
@@ -147,41 +147,41 @@ addEventListener("keydown", e => {
 const SKIP_BAD = ["KeyP", "Escape", "Tab", "Backquote", "Minus", "Equal", "Backspace", "F5", "F11", "F12", "MetaLeft", "MetaRight", AB_KEY];
 function captureSkip(code) {
   const i = skipBinding;
-  if (code === "Escape") { skipBinding = null; setStatus("skipBindStatus", "cancelBind"); syncSkipUI(); return; }
-  if (SKIP_BAD.includes(code) || (settings.speedKeys || []).includes(code)) { setStatus("skipBindStatus", "reservedKey"); return; }
-  if (settings.skipKeys[1 - i] === code) { setStatus("skipBindStatus", "duplicateKey"); return; }
-  settings.skipKeys[i] = code; skipBinding = null; saveUserPrefs();
-  setStatus("skipBindStatus", "skipAssigned"); syncSkipUI();
+  if (code === "Escape") { skipBinding = null; window.Trk.core.setStatus("skipBindStatus", "cancelBind"); syncSkipUI(); return; }
+  if (SKIP_BAD.includes(code) || (window.Trk.core.settings.speedKeys || []).includes(code)) { window.Trk.core.setStatus("skipBindStatus", "reservedKey"); return; }
+  if (window.Trk.core.settings.skipKeys[1 - i] === code) { window.Trk.core.setStatus("skipBindStatus", "duplicateKey"); return; }
+  window.Trk.core.settings.skipKeys[i] = code; skipBinding = null; window.Trk.core.saveUserPrefs();
+  window.Trk.core.setStatus("skipBindStatus", "skipAssigned"); syncSkipUI();
 }
 
 /* ---------- 設定画面（⌨ 操作 の中） ---------- */
 let syncSkipUI = () => {};
 (() => {
   const anchor = document.querySelector('#settingsScreen [data-i18n="quickRetryHint"]'); if (!anchor) return;
-  const h3 = el("h3"); h3.dataset.i18n = "skipTitle";
-  const rows = el("div", "keyRows"); rows.style.marginTop = "10px";
-  const reset = el("button"); reset.type = "button"; reset.dataset.i18n = "skipKeyReset";
+  const h3 = window.Trk.core.el("h3"); h3.dataset.i18n = "skipTitle";
+  const rows = window.Trk.core.el("div", "keyRows"); rows.style.marginTop = "10px";
+  const reset = window.Trk.core.el("button"); reset.type = "button"; reset.dataset.i18n = "skipKeyReset";
   reset.style.cssText = "margin-top:8px;padding:7px 12px;font-size:14px";
-  const status = el("div", "hint status"); status.id = "skipBindStatus";
-  const hint = el("div", "hint"); hint.dataset.i18n = "skipHint";
+  const status = window.Trk.core.el("div", "hint status"); status.id = "skipBindStatus";
+  const hint = window.Trk.core.el("div", "hint"); hint.dataset.i18n = "skipHint";
   anchor.after(h3, rows, reset, status, hint);
   syncSkipUI = () => {
     rows.textContent = "";
     ["skipBack", "skipFwd"].forEach((key, i) => {
-      const row = el("div", "keyRow"), b = el("button", "", tr("assign"));
+      const row = window.Trk.core.el("div", "keyRow"), b = window.Trk.core.el("button", "", tr("assign"));
       b.type = "button"; b.classList.toggle("listening", skipBinding === i);
       b.addEventListener("click", () => {
-        bindingSlot = null; updateKeyUI();
+        window.Trk.core.bindingSlot = null; window.Trk.core.updateKeyUI();
         skipBinding = i; b.blur();
-        setStatus("skipBindStatus", "skipCapture" + i); syncSkipUI();
+        window.Trk.core.setStatus("skipBindStatus", "skipCapture" + i); syncSkipUI();
       });
-      row.append(el("strong", "", tr(key)), el("span", "keyValue", formatKey(settings.skipKeys[i])), b);
+      row.append(window.Trk.core.el("strong", "", tr(key)), window.Trk.core.el("span", "keyValue", window.Trk.core.formatKey(window.Trk.core.settings.skipKeys[i])), b);
       rows.append(row);
     });
   };
   reset.addEventListener("click", () => {
-    settings.skipKeys = SKIP_DEFAULT.slice(); skipBinding = null; saveUserPrefs();
-    syncSkipUI(); setStatus("skipBindStatus", "skipAssigned");
+    window.Trk.core.settings.skipKeys = SKIP_DEFAULT.slice(); skipBinding = null; window.Trk.core.saveUserPrefs();
+    syncSkipUI(); window.Trk.core.setStatus("skipBindStatus", "skipAssigned");
   });
   document.querySelectorAll("[data-bind], [data-truckbind]").forEach(b => b.addEventListener("click", () => {
     if (skipBinding !== null) { skipBinding = null; syncSkipUI(); }

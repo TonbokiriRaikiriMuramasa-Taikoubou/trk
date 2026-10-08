@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：土台（設定・状態・共通処理・画面切り替え） ============
    ほかのファイルとは「合図」でつながります。
@@ -16,7 +17,7 @@ const view = $("view"), vctx = view.getContext("2d");
 const fx = $("fx"), ctx = fx.getContext("2d");
 
 function fitStage() {
-  const s = Math.min(innerWidth / W, innerHeight / H);
+  const s = Math.min(innerWidth / window.Trk.data.W, innerHeight / window.Trk.data.H);
   stage.style.transform = `translate(-50%,-50%) scale(${s})`;
 }
 addEventListener("resize", fitStage);
@@ -29,6 +30,20 @@ function emit(name, ...args) {
   for (const fn of HOOKS[name] || []) { try { fn(...args); } catch (e) { console.error(e); } }
 }
 
+/* ---------- 全画面の重ね表示が開いているか（名前空間の移行で、旧 window の旗 3 つ＝書斎・メディアプレーヤー・シンス を置き換え） ----------
+   書く側：window.Trk.overlay.set("study", true)   読む側：window.Trk.overlay.is("study")
+   どれか一つでも開いているか：window.Trk.overlay.any()   名前は "study"（書斎）・"media"（メディアプレーヤー）・"synth"（シンス） */
+const TRK_OVERLAY_OPEN = { study:false, media:false, synth:false };
+const trkOverlayHas = name => Object.prototype.hasOwnProperty.call(TRK_OVERLAY_OPEN, name);
+window.Trk = window.Trk || {};
+window.Trk.overlay = {
+  set(name, open) { if (trkOverlayHas(name)) TRK_OVERLAY_OPEN[name] = !!open; },
+  is(name) { return trkOverlayHas(name) && TRK_OVERLAY_OPEN[name] === true; },
+  any() { return Object.keys(TRK_OVERLAY_OPEN).some(k => TRK_OVERLAY_OPEN[k] === true); },
+};
+/* 互換：js/fx.js（凍結のため書き換えない）はまだ window._trkStudyRoomOpen を読む。読み取り専用で、書斎の開閉を映す */
+Object.defineProperty(window, "_trkStudyRoomOpen", { configurable: true, get: () => TRK_OVERLAY_OPEN.study === true });
+
 /* ---------- カスタムスキン（設定より先に読み込む） ---------- */
 const CUSTOM_SKINS_KEY = "shadow_taiko_custom_skins_v1", CUSTOM_SKIN_MAX = 20, SKIN_FORMAT = "skin.shadow-taiko";
 const customSkinDefs = {};
@@ -38,8 +53,8 @@ function saveCustomSkins() { try { localStorage.setItem(CUSTOM_SKINS_KEY, JSON.s
   try { raw = JSON.parse(localStorage.getItem(CUSTOM_SKINS_KEY)) || {}; } catch (_) {}
   for (const [id, d] of Object.entries(raw)) {
     if (!/^custom_[a-z0-9]+$/.test(id)) continue;
-    const def = sanitizeSkinDef(d);
-    if (def) { customSkinDefs[id] = def; SKINS[id] = buildCustomSkin(def); }
+    const def = window.Trk.data.sanitizeSkinDef(d);
+    if (def) { customSkinDefs[id] = def; window.Trk.data.SKINS[id] = window.Trk.data.buildCustomSkin(def); }
   }
 })();
 
@@ -124,15 +139,16 @@ const LITE_ENUM_VALUES = {
 /* 🐔 trk's playlist のタブ表示名（3種類）。名前が長いのを嫌う人向けに短くできる。
    "icon" は文字を出さない（🐔 のアイコンだけ）。名前と色は固定なので、ここで選べるのは表示名だけ。 */
 const TRK_ENUM_VALUES = {
-  trkTabName: ["full", "short", "icon"]
+  trkTabName: ["full", "short", "icon"],
+  chartGen: ["1", "2"]          // 🎼 自動譜面の作り方（1＝旧方式、2＝新方式・既定。js/chart-gen.js）
 };
 
 const settings = {
   language: pick(prefs.language, ["ja", "en", "zh", "ko"], guessLang()),
-  skin: has(SKINS, prefs.skin) ? prefs.skin : (prefs.skin === "dark" ? "shadow" : prefs.skin === "light" ? "daylight" : "shadow"),
+  skin: has(window.Trk.data.SKINS, prefs.skin) ? prefs.skin : (prefs.skin === "dark" ? "shadow" : prefs.skin === "light" ? "daylight" : "shadow"),
   skinShelfOpen: prefs.skinShelfOpen !== false,      // 🖼 スキンの棚の開閉（30種＋カスタムでも設定画面が膨らまないように）
   skinShelfCat: pick(prefs.skinShelfCat, ["all","basic","miku","dark","light","grad","fun","custom"], "all"),
-  layout: pick(prefs.layout ?? prefs.gameplayLayout, Object.keys(LAYOUTS), "classic"),
+  layout: pick(prefs.layout ?? prefs.gameplayLayout, Object.keys(window.Trk.data.LAYOUTS), "classic"),
   videoStyle: pick(prefs.videoStyle, VIDEO_STYLE_IDS, "skin"),
   videoZoom: num(prefs.videoZoom, .5, 3, 1),
   videoKeys: savedVideoKeys,
@@ -146,8 +162,9 @@ const settings = {
   /* プレイ方法：以前の「AUTO」モードは「MANUAL＋AUTOオン」に引き継ぐ */
   playMode: pick(prefs.playMode, PLAY_MODES, "manual"),
   autoPlay: prefs.autoPlay === true || prefs.playMode === "auto",
-  difficulty: pick(prefs.difficulty, DIFF_IDS, "normal"),
+  difficulty: pick(prefs.difficulty, window.Trk.data.DIFF_IDS, "normal"),
   showMasterDiff: !!prefs.showMasterDiff,
+  chartGen: pick(prefs.chartGen, ["1", "2"], "2"),                        // 🎼 自動譜面の作り方（既定は新方式。旧方式「1」へ戻せば、旧譜面の記録もそのまま開ける）
   seed: typeof prefs.seed === "string" ? prefs.seed.slice(0, 32) : "834271",   // 曲ごとの設定がない曲の初期値
   bpm: num(prefs.bpm, 60, 300, 138),
   offset: num(prefs.offset, -5000, 5000, 0),
@@ -182,6 +199,9 @@ const settings = {
   bannerSongBtns: prefs.bannerSongBtns !== false,                            // ◀▶ バナー右端の曲送りボタン（初期オン）
   bannerRandomBtn: prefs.bannerRandomBtn !== false,                          // 🎲 バナー右端のおまかせボタン（初期オン）
   bannerRandomTap: prefs.bannerRandomTap === true,                           // 🎲 タップだけで変える（初期オフ＝長押し）
+  showMoreBtns: prefs.showMoreBtns !== false,                                // 👆 長押しの代わりのボタン（🎶・▶）を出す（初期オン）
+  displayMode: prefs.displayMode === "full" ? "full" : "simple",            // 表示の並び：simple＝かんたん（おすすめ順・初期）／full＝全部（従来の順）
+  devView: prefs.devView === true,                                           // 🔧 開発者表示（ループ・ラボ、投稿者ツールを出す。初期オフ）
   /* 🪶 軽量化（スマホ・タブレット・アプリ向け。読み込みは js/lite.js） */
   liteMode: pick(prefs.liteMode, LITE_ENUM_VALUES.liteMode, "auto"),         // 自動＝端末・省データ・電池を見て決める
   liteFps: pick(prefs.liteFps, LITE_ENUM_VALUES.liteFps, "30"),              // 描画のフレームレート上限
@@ -201,8 +221,8 @@ const settings = {
   synthModeFastStart: !!prefs.synthModeFastStart,
   synthModeKeyboardLock: prefs.synthModeKeyboardLock !== false,
   synthModeWideKeyboard: !!prefs.synthModeWideKeyboard,
-  notes: sanitizeNotes(prefs.notes ?? (prefs.skin === "clarity" ? NOTE_PRESETS.clarity : null)),
-  mascot: pick(prefs.mascot, ["skin", "none", ...MASCOT_IDS], "skin"),
+  notes: window.Trk.data.sanitizeNotes(prefs.notes ?? (prefs.skin === "clarity" ? window.Trk.data.NOTE_PRESETS.clarity : null)),
+  mascot: pick(prefs.mascot, ["skin", "none", ...window.Trk.data.MASCOT_IDS], "skin"),
   fxPower: num(prefs.fxPower, 0, 3, 1.5),
   gameFxMode: pick(prefs.gameFxMode, ["full", "soft", "off"], "full"),
   vrmFrame: pick(prefs.vrmFrame, ["full", "upper", "face"], "full"),
@@ -385,11 +405,11 @@ function resetLitePrefs() {
 }
 function resetNotesPrefs() {
   try {
-    const def = (typeof NOTE_PRESETS !== "undefined" && NOTE_PRESETS.standard) ? NOTE_PRESETS.standard : null;
+    const def = (typeof NOTE_PRESETS !== "undefined" && window.Trk.data.NOTE_PRESETS.standard) ? window.Trk.data.NOTE_PRESETS.standard : null;
     if (def) settings.notes = JSON.parse(JSON.stringify(def));
-    else settings.notes = sanitizeNotes(null);
+    else settings.notes = window.Trk.data.sanitizeNotes(null);
     applyNoteVars();
-  } catch(_) { settings.notes = sanitizeNotes(null); }
+  } catch(_) { settings.notes = window.Trk.data.sanitizeNotes(null); }
 }
 /* 🔥 TRKアンプ（🎚 エフェクターラック・js/fx.js。左下の独立カテゴリー）のリセット。
    fx.js は core.js よりあとに読み込まれるので、読み込み時点では settings.fx… がまだ無い。
@@ -457,7 +477,7 @@ function resetAllPrefs() {
   settings.tvParamFavs = []; // a factory reset clears the separately preserved TV bookmarks too
   settings.trkPlaylist = true; // 🐔 trk's playlistも初期状態に戻す（再表示）
   settings.trkClassic = true;  // 🎻 trk classic も初期状態に戻す
-  settings.trkSortABC = false; settings.playlistOrder = []; settings.trkTabName = "full";
+  settings.trkSortABC = false; settings.playlistOrder = []; settings.trkTabName = "full"; settings.chartGen = "2";
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
   settings.catchNitroBonus = true; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();
@@ -625,13 +645,13 @@ function parseHashParams(hash) {
 })();
 
 
-const skin = () => has(SKINS, settings.skin) ? SKINS[settings.skin] : SKINS.shadow;
-const fontFamily = () => skin().font || FONT_DEFAULT;
+const skin = () => has(window.Trk.data.SKINS, settings.skin) ? window.Trk.data.SKINS[settings.skin] : window.Trk.data.SKINS.shadow;
+const fontFamily = () => skin().font || window.Trk.data.FONT_DEFAULT;
 function activeMascot() {
   const m = settings.mascot === "skin" ? skin().mascot : settings.mascot;
-  return MASCOT_IDS.includes(m) ? m : null;
+  return window.Trk.data.MASCOT_IDS.includes(m) ? m : null;
 }
-const isPclMascot = m => !!m && MASCOT_FAMILY[m] === "miku";
+const isPclMascot = m => !!m && window.Trk.data.MASCOT_FAMILY[m] === "miku";
 
 /* ---------- 状態 ---------- */
 let phase = "title";            // title / playing / paused / ended
@@ -748,7 +768,7 @@ const travelMs = () => 1700 / settings.scroll;
 /* 判定幅（難易度 × 判定の厳しさ） */
 const JUDGE_SCALE = { lenient:1.3, standard:1, strict:.75 };
 const windows = () => {
-  const d = DIFF_IDS.includes(chartDiff) ? DIFFS[chartDiff] : DIFFS.normal;
+  const d = window.Trk.data.DIFF_IDS.includes(chartDiff) ? window.Trk.data.DIFFS[chartDiff] : window.Trk.data.DIFFS.normal;
   const k = Object.prototype.hasOwnProperty.call(JUDGE_SCALE, settings.judge) ? JUDGE_SCALE[settings.judge] : 1;
   return { perfect:d.perfect * k, good:d.good * k };
 };
@@ -863,13 +883,19 @@ function idbStore(dbName, store = "kv", opts = null) {
   const readStats = (os, replacingId, cb) => {
     const idx = sizeKey && os.indexNames.contains(sizeKey) ? os.index(sizeKey) : null;
     if (!idx) { statsFromAll(os, replacingId, cb); return; }
-    let keys = null, count = null, prev = replacingId == null ? null : undefined, out = null;
+    /* index の「キー」（＝各レコードの size）を1件ずつ読む。IDBIndex.getAllKeys() は**主キー**を返すので使わない。
+       主キーを size と取り違えると合計が出たらめになり、文字列の主キー（パックは "p…"）では高速経路が毎回外れて
+       Blob を含む全件を読んでいた。openKeyCursor の cursor.key が索引の値。 */
+    let keys = [], keysDone = false, count = null, prev = replacingId == null ? null : undefined, out = null;
     const maybe = () => {
-      if (out || keys === null || count === null || prev === undefined) return;
+      if (out || !keysDone || count === null || prev === undefined) return;
       out = statsFromKeys(keys, count, prev);
       if (out) cb(out); else statsFromAll(os, replacingId, s => { out = s; cb(s); });
     };
-    idx.getAllKeys().onsuccess = e => { keys = e.target.result || []; maybe(); };
+    idx.openKeyCursor().onsuccess = e => {
+      const c = e.target.result;
+      if (c) { keys.push(c.key); c.continue(); } else { keysDone = true; maybe(); }
+    };
     os.count().onsuccess = e => { count = e.target.result || 0; maybe(); };
     if (replacingId == null) prev = null;
     else os.get(replacingId).onsuccess = e => { prev = e.target.result == null ? null : e.target.result; maybe(); };
@@ -946,7 +972,7 @@ function buildSkinGrid() {
   const grid = $("skinGrid"); if (!grid) return;
   grid.textContent = "";
   /* 棚のチップ（そのカテゴリーに属するスキンがないときはチップ自体を出さない） */
-  const cats = new Set(); for (const s of Object.values(SKINS)) skinCatList(s).forEach(c => cats.add(c));
+  const cats = new Set(); for (const s of Object.values(window.Trk.data.SKINS)) skinCatList(s).forEach(c => cats.add(c));
   const cat = settings.skinShelfCat !== "all" && cats.has(settings.skinShelfCat) ? settings.skinShelfCat : "all";
   const chips = $("skinChips");
   if (chips) {
@@ -959,8 +985,8 @@ function buildSkinGrid() {
       chips.append(c);
     }
   }
-  const count = $("skinShelfCount"); if (count) count.textContent = `（${Object.keys(SKINS).length}）`;
-  for (const [id, s] of Object.entries(SKINS)) {
+  const count = $("skinShelfCount"); if (count) count.textContent = `（${Object.keys(window.Trk.data.SKINS).length}）`;
+  for (const [id, s] of Object.entries(window.Trk.data.SKINS)) {
     if (cat !== "all" && !skinCatList(s).includes(cat)) continue;
     if (s.locked && !settings.skinGradUnlocked) {   /* ❓ ごほうびスキン（スタンプ5つで解禁）は、正体不明カードで出す */
       const q = el("button", "skinCard locked"); q.type = "button"; q.disabled = true; q.title = tr("skinLockedHint");
@@ -1001,12 +1027,12 @@ function applyNoteVars() {
   root.setProperty("--don", settings.notes[0].color); root.setProperty("--ka", settings.notes[1].color);
 }
 function applySkin(id, persist = true) {
-  if (has(SKINS, id) && SKINS[id].locked && !settings.skinGradUnlocked) id = "shadow";   /* 🔒 ごほうびスキンは、スタンプ5つで解禁されるまで当てられない */
-  settings.skin = has(SKINS, id) ? id : "shadow";
+  if (has(window.Trk.data.SKINS, id) && window.Trk.data.SKINS[id].locked && !settings.skinGradUnlocked) id = "shadow";   /* 🔒 ごほうびスキンは、スタンプ5つで解禁されるまで当てられない */
+  settings.skin = has(window.Trk.data.SKINS, id) ? id : "shadow";
   const s = skin(), root = document.documentElement.style;
   for (const [k, v] of Object.entries(s.ui)) root.setProperty(k, v);
   root.setProperty("--stage-bg", s.game.stage); root.setProperty("--hud-text", s.game.ink);
-  root.setProperty("--hud-shadow", s.game.inkShadow); root.setProperty("--font", s.font || FONT_DEFAULT);
+  root.setProperty("--hud-shadow", s.game.inkShadow); root.setProperty("--font", s.font || window.Trk.data.FONT_DEFAULT);
   root.setProperty("--j-perfect", s.game.perfect); root.setProperty("--j-good", s.game.good); root.setProperty("--j-miss", s.game.miss);
   applyNoteVars();
   document.documentElement.dataset.skin = settings.skin;
@@ -1054,10 +1080,10 @@ on("options", updateTouchKeys);
 /* 隠しSeedの効果を調べる（完全一致：EGG_KEYS／言葉を含む：EGG_WORDS） */
 function seedEggs(raw) {
   const s = String(raw || "").trim(), low = s.toLowerCase();
-  const r = { master:false, rush:false, level:null, key:EGG_KEYS[low] || EGG_KEYS[s] || null, vars:null };
+  const r = { master:false, rush:false, level:null, key:window.Trk.data.EGG_KEYS[low] || window.Trk.data.EGG_KEYS[s] || null, vars:null };
   if (low === "765" || low === "143") r.master = true;
   if (low === "2000" || low === "143") r.rush = true;
-  for (const rule of EGG_WORDS) {
+  for (const rule of window.Trk.data.EGG_WORDS) {
     const w = rule.words.find(x => low.includes(x)); if (!w) continue;
     if (rule.master) r.master = true;
     if (rule.rush) r.rush = true;
@@ -1131,7 +1157,7 @@ function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
       🪶 軽量化のように core.js で決め打ちできるものは LITE_ENUM_VALUES へ、
       🐔 タブ表示名のように UI 側の定数と対になるものは TRK_ENUM_VALUES へ寄せる（読み込み順に左右されない）。 */
 const SETTING_ENUM_KEYS = ["specStyle", "specTheme", "mmdMotionKind", "fxPreset",
-  "liteMode", "liteFps", "liteMascot", "liteScale", "liteLibRows", "trkTabName"];
+  "liteMode", "liteFps", "liteMascot", "liteScale", "liteLibRows", "trkTabName", "chartGen"];
 /* Importで弾いた理由（対応が変わるので、表示では区別して出す） */
 const SKIP_WHY = { enum:"prefSkipWhyId", type:"prefSkipWhyType", unknown:"prefSkipWhyUnknown", failed:"prefSkipWhyType" };
 function validImportedSettingEnum(key, value) {
@@ -1196,7 +1222,7 @@ function validImportedSettingEnum(key, value) {
         if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("設定JSONはオブジェクト形式にしてください");
         let applied = [], rejected = [];
         const hasImported = key => Object.prototype.hasOwnProperty.call(data, key);
-        if (hasImported("notes")) { settings.notes = sanitizeNotes(data.notes); applied.push("notes"); }
+        if (hasImported("notes")) { settings.notes = window.Trk.data.sanitizeNotes(data.notes); applied.push("notes"); }
         const importedVideoStyle = hasImported("videoStyle") ? pick(data.videoStyle, VIDEO_STYLE_IDS, "") : "";
         if (importedVideoStyle) { settings.videoStyle = importedVideoStyle; applied.push("videoStyle"); }
         if (hasImported("bgDim") && typeof data.bgDim === "number") { settings.bgDim = clampTvDim(data.bgDim); applied.push("bgDim"); }
@@ -1304,3 +1330,161 @@ function validImportedSettingEnum(key, value) {
 })();
 /* ✅ core.js 完了 */
 
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.$ = $;
+window.BEST_KEY = BEST_KEY;
+window.CAPTION_MS = CAPTION_MS;
+window.CUSTOM_SKIN_MAX = CUSTOM_SKIN_MAX;
+window.KEY_PRESETS = KEY_PRESETS;
+window.PAD_DEFAULTS = PAD_DEFAULTS;
+window.SKIN_FORMAT = SKIN_FORMAT;
+window.TRK_ENUM_VALUES = TRK_ENUM_VALUES;
+window.TV_PARAM_FAV_MAX = TV_PARAM_FAV_MAX;
+window.VIDEO_KEY_DEFAULTS = VIDEO_KEY_DEFAULTS;
+window.activeMascot = activeMascot;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.activeMods の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "activeMods", { configurable:true, get:() => activeMods, set:v => { activeMods = v; } });
+Object.defineProperty(window, "analysis", { configurable:true, get:() => analysis, set:v => { analysis = v; } });
+window.applyLanguage = applyLanguage;
+window.applyNoteVars = applyNoteVars;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.applySkin の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "applySkin", { configurable:true, get:() => applySkin, set:v => { applySkin = v; } });
+Object.defineProperty(window, "avatarHit", { configurable:true, get:() => avatarHit, set:v => { avatarHit = v; } });
+window.baseName = baseName;
+Object.defineProperty(window, "bgImage", { configurable:true, get:() => bgImage, set:v => { bgImage = v; } });
+Object.defineProperty(window, "bindingSlot", { configurable:true, get:() => bindingSlot, set:v => { bindingSlot = v; } });
+window.buildSkinGrid = buildSkinGrid;
+window.buildSkinNow = buildSkinNow;
+Object.defineProperty(window, "caption", { configurable:true, get:() => caption, set:v => { caption = v; } });
+Object.defineProperty(window, "chart", { configurable:true, get:() => chart, set:v => { chart = v; } });
+Object.defineProperty(window, "chartDiff", { configurable:true, get:() => chartDiff, set:v => { chartDiff = v; } });
+Object.defineProperty(window, "chartMeta", { configurable:true, get:() => chartMeta, set:v => { chartMeta = v; } });
+Object.defineProperty(window, "chartMode", { configurable:true, get:() => chartMode, set:v => { chartMode = v; } });
+window.chartSummary = chartSummary;
+window.clampTvBlur = clampTvBlur;
+window.clampTvDim = clampTvDim;
+window.cleanTvParamFavorites = cleanTvParamFavorites;
+Object.defineProperty(window, "clock", { configurable:true, get:() => clock, set:v => { clock = v; } });
+window.closeSettings = closeSettings;
+window.ctx = ctx;
+Object.defineProperty(window, "currentLevel", { configurable:true, get:() => currentLevel, set:v => { currentLevel = v; } });
+Object.defineProperty(window, "currentSong", { configurable:true, get:() => currentSong, set:v => { currentSong = v; } });
+window.customSkinDefs = customSkinDefs;
+window.downloadBlob = downloadBlob;
+window.downloadJSON = downloadJSON;
+Object.defineProperty(window, "effects", { configurable:true, get:() => effects, set:v => { effects = v; } });
+window.el = el;
+window.emit = emit;
+Object.defineProperty(window, "errors", { configurable:true, get:() => errors, set:v => { errors = v; } });
+window.esc = esc;
+window.extOf = extOf;
+Object.defineProperty(window, "fingerprint", { configurable:true, get:() => fingerprint, set:v => { fingerprint = v; } });
+window.fmtDate = fmtDate;
+window.fmtTime = fmtTime;
+window.fontFamily = fontFamily;
+window.formatKey = formatKey;
+window.formatPadBind = formatPadBind;
+window.fx = fx;
+window.gameplayFxMultiplier = gameplayFxMultiplier;
+window.gameplayFxPower = gameplayFxPower;
+window.hashString = hashString;
+window.idbStore = idbStore;
+window.isPclMascot = isPclMascot;
+window.keyCodeOf = keyCodeOf;
+window.keysLabel = keysLabel;
+window.laneCol = laneCol;
+window.laneColor = laneColor;
+window.laneName = laneName;
+Object.defineProperty(window, "lastMissT", { configurable:true, get:() => lastMissT, set:v => { lastMissT = v; } });
+Object.defineProperty(window, "levelOverride", { configurable:true, get:() => levelOverride, set:v => { levelOverride = v; } });
+Object.defineProperty(window, "loadToken", { configurable:true, get:() => loadToken, set:v => { loadToken = v; } });
+Object.defineProperty(window, "mediaName", { configurable:true, get:() => mediaName, set:v => { mediaName = v; } });
+Object.defineProperty(window, "mediaURL", { configurable:true, get:() => mediaURL, set:v => { mediaURL = v; } });
+window.modsUnranked = modsUnranked;
+window.mulberry32 = mulberry32;
+Object.defineProperty(window, "nextIdx", { configurable:true, get:() => nextIdx, set:v => { nextIdx = v; } });
+window.noteShape = noteShape;
+window.num = num;
+window.on = on;
+window.openSettings = openSettings;
+Object.defineProperty(window, "phase", { configurable:true, get:() => phase, set:v => { phase = v; } });
+window.pick = pick;
+Object.defineProperty(window, "practice", { configurable:true, get:() => practice, set:v => { practice = v; } });
+Object.defineProperty(window, "prefs", { configurable:true, get:() => prefs, set:v => { prefs = v; } });
+Object.defineProperty(window, "pressFlash", { configurable:true, get:() => pressFlash, set:v => { pressFlash = v; } });
+Object.defineProperty(window, "pressH", { configurable:true, get:() => pressH, set:v => { pressH = v; } });
+window.refreshSeedSecrets = refreshSeedSecrets;
+window.rememberMusicVolume = rememberMusicVolume;
+window.renderAllStatuses = renderAllStatuses;
+window.renderStatus = renderStatus;
+window.safeHttpUrl = safeHttpUrl;
+window.safeLink = safeLink;
+Object.defineProperty(window, "safeModeOn", { configurable:true, get:() => safeModeOn, set:v => { safeModeOn = v; } });
+window.safeName = safeName;
+window.saveCustomSkins = saveCustomSkins;
+window.saveUserPrefs = saveUserPrefs;
+window.savedSkinAtBoot = savedSkinAtBoot;
+/* screen は window.screen（ブラウザ標準）と同名のため、窓へは出さない（利用者の決定）。読むのは window.Trk.core.screen */
+Object.defineProperty(window, "seekDragging", { configurable:true, get:() => seekDragging, set:v => { seekDragging = v; } });
+window.setPhase = setPhase;
+window.setStatus = setStatus;
+window.settings = settings;
+window.showScreen = showScreen;
+window.skin = skin;
+window.slotLane = slotLane;
+window.slotOfKey = slotOfKey;
+window.stage = stage;
+Object.defineProperty(window, "stats", { configurable:true, get:() => stats, set:v => { stats = v; } });
+window.syncPickers = syncPickers;
+window.takeAmpReset = takeAmpReset;
+window.travelMs = travelMs;
+window.updateChartButtons = updateChartButtons;
+window.updateKeyUI = updateKeyUI;
+window.updateTouchKeys = updateTouchKeys;
+window.validCode = validCode;
+window.validPadBind = validPadBind;
+window.vctx = vctx;
+window.video = video;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.videoFilter の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "videoFilter", { configurable:true, get:() => videoFilter, set:v => { videoFilter = v; } });
+Object.defineProperty(window, "videoReady", { configurable:true, get:() => videoReady, set:v => { videoReady = v; } });
+window.view = view;
+window.windows = windows;
+/* 領域（window.Trk.core）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
+window.Trk = window.Trk || {};
+window.Trk.core = Object.assign(window.Trk.core || {}, { $, BEST_KEY, CAPTION_MS, CUSTOM_SKIN_MAX, KEY_PRESETS, PAD_DEFAULTS, SKIN_FORMAT, TRK_ENUM_VALUES, TV_PARAM_FAV_MAX, VIDEO_KEY_DEFAULTS, activeMascot, applyLanguage, applyNoteVars, baseName, buildSkinGrid, buildSkinNow, chartSummary, clampTvBlur, clampTvDim, cleanTvParamFavorites, closeSettings, ctx, customSkinDefs, downloadBlob, downloadJSON, el, emit, esc, extOf, fmtDate, fmtTime, fontFamily, formatKey, formatPadBind, fx, gameplayFxMultiplier, gameplayFxPower, hashString, idbStore, isPclMascot, keyCodeOf, keysLabel, laneCol, laneColor, laneName, modsUnranked, mulberry32, noteShape, num, on, openSettings, pick, refreshSeedSecrets, rememberMusicVolume, renderAllStatuses, renderStatus, safeHttpUrl, safeLink, safeName, saveCustomSkins, saveUserPrefs, savedSkinAtBoot, setPhase, setStatus, settings, showScreen, skin, slotLane, slotOfKey, stage, syncPickers, takeAmpReset, travelMs, updateChartButtons, updateKeyUI, updateTouchKeys, validCode, validPadBind, vctx, video, view, windows });
+Object.defineProperty(window.Trk.core, "activeMods", { configurable:true, get:() => activeMods, set:v => { activeMods = v; } });
+Object.defineProperty(window.Trk.core, "analysis", { configurable:true, get:() => analysis, set:v => { analysis = v; } });
+Object.defineProperty(window.Trk.core, "applySkin", { configurable:true, get:() => applySkin, set:v => { applySkin = v; } });
+Object.defineProperty(window.Trk.core, "avatarHit", { configurable:true, get:() => avatarHit, set:v => { avatarHit = v; } });
+Object.defineProperty(window.Trk.core, "bgImage", { configurable:true, get:() => bgImage, set:v => { bgImage = v; } });
+Object.defineProperty(window.Trk.core, "bindingSlot", { configurable:true, get:() => bindingSlot, set:v => { bindingSlot = v; } });
+Object.defineProperty(window.Trk.core, "caption", { configurable:true, get:() => caption, set:v => { caption = v; } });
+Object.defineProperty(window.Trk.core, "chart", { configurable:true, get:() => chart, set:v => { chart = v; } });
+Object.defineProperty(window.Trk.core, "chartDiff", { configurable:true, get:() => chartDiff, set:v => { chartDiff = v; } });
+Object.defineProperty(window.Trk.core, "chartMeta", { configurable:true, get:() => chartMeta, set:v => { chartMeta = v; } });
+Object.defineProperty(window.Trk.core, "chartMode", { configurable:true, get:() => chartMode, set:v => { chartMode = v; } });
+Object.defineProperty(window.Trk.core, "clock", { configurable:true, get:() => clock, set:v => { clock = v; } });
+Object.defineProperty(window.Trk.core, "currentLevel", { configurable:true, get:() => currentLevel, set:v => { currentLevel = v; } });
+Object.defineProperty(window.Trk.core, "currentSong", { configurable:true, get:() => currentSong, set:v => { currentSong = v; } });
+Object.defineProperty(window.Trk.core, "effects", { configurable:true, get:() => effects, set:v => { effects = v; } });
+Object.defineProperty(window.Trk.core, "errors", { configurable:true, get:() => errors, set:v => { errors = v; } });
+Object.defineProperty(window.Trk.core, "fingerprint", { configurable:true, get:() => fingerprint, set:v => { fingerprint = v; } });
+Object.defineProperty(window.Trk.core, "lastMissT", { configurable:true, get:() => lastMissT, set:v => { lastMissT = v; } });
+Object.defineProperty(window.Trk.core, "levelOverride", { configurable:true, get:() => levelOverride, set:v => { levelOverride = v; } });
+Object.defineProperty(window.Trk.core, "loadToken", { configurable:true, get:() => loadToken, set:v => { loadToken = v; } });
+Object.defineProperty(window.Trk.core, "mediaName", { configurable:true, get:() => mediaName, set:v => { mediaName = v; } });
+Object.defineProperty(window.Trk.core, "mediaURL", { configurable:true, get:() => mediaURL, set:v => { mediaURL = v; } });
+Object.defineProperty(window.Trk.core, "nextIdx", { configurable:true, get:() => nextIdx, set:v => { nextIdx = v; } });
+Object.defineProperty(window.Trk.core, "phase", { configurable:true, get:() => phase, set:v => { phase = v; } });
+Object.defineProperty(window.Trk.core, "practice", { configurable:true, get:() => practice, set:v => { practice = v; } });
+Object.defineProperty(window.Trk.core, "prefs", { configurable:true, get:() => prefs, set:v => { prefs = v; } });
+Object.defineProperty(window.Trk.core, "pressFlash", { configurable:true, get:() => pressFlash, set:v => { pressFlash = v; } });
+Object.defineProperty(window.Trk.core, "pressH", { configurable:true, get:() => pressH, set:v => { pressH = v; } });
+Object.defineProperty(window.Trk.core, "safeModeOn", { configurable:true, get:() => safeModeOn, set:v => { safeModeOn = v; } });
+Object.defineProperty(window.Trk.core, "screen", { configurable:true, get:() => screen, set:v => { screen = v; } });
+Object.defineProperty(window.Trk.core, "seekDragging", { configurable:true, get:() => seekDragging, set:v => { seekDragging = v; } });
+Object.defineProperty(window.Trk.core, "stats", { configurable:true, get:() => stats, set:v => { stats = v; } });
+Object.defineProperty(window.Trk.core, "videoFilter", { configurable:true, get:() => videoFilter, set:v => { videoFilter = v; } });
+Object.defineProperty(window.Trk.core, "videoReady", { configurable:true, get:() => videoReady, set:v => { videoReady = v; } });
+})();

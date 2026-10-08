@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：選曲画面 ============
    曲リスト・フォルダ・プレビュー・曲ごとの設定・称号表示
@@ -11,32 +12,32 @@ const LIB_DEPTH = 8;                        /* 📤 共有は「一気に全部�
 const SHARED_MAX = 150;                     /* 💾 端末に残す共有の曲の上限（空き容量を守るため） */
 const SHARED_BYTES = 300 * 1024 * 1024, SHARED_MB = Math.round(SHARED_BYTES / 1048576);
 const canPickDir = "showDirectoryPicker" in window && window.isSecureContext && window.self === window.top;
-const libKV = idbStore("shadow_taiko_library", "kv");
-const songDB = idbStore("shadow_taiko_songs", "files");
+const libKV = window.Trk.core.idbStore("shadow_taiko_library", "kv");
+const songDB = window.Trk.core.idbStore("shadow_taiko_songs", "files");
 /* 💾 共有した曲を端末に残すときの保存先（新しいキー。既存の保存キーは変えていません） */
-const sharedDB = idbStore("shadow_taiko_shared", "files");
+const sharedDB = window.Trk.core.idbStore("shadow_taiko_shared", "files");
 
 /* ---------- ▶ AUTO・📻 ラジオの切り替え ---------- */
-settings.radio = !!prefs.radio;
+window.Trk.core.settings.radio = !!window.Trk.core.prefs.radio;
 const RADIO_WAIT = 5;   // 次の曲までの秒数
 const autoBtn = el("button"); autoBtn.type = "button"; autoBtn.id = "autoToggle";
 const radioBtn = el("button"); radioBtn.type = "button"; radioBtn.id = "radioToggle";
 const toggleHint = el("div", "hint");
 (() => {
-  const picker = $("modePicker");
+  const picker = window.Trk.core.$("modePicker");
   const old = picker.querySelector('[data-playmode="auto"]'); if (old) old.remove();   // 古い index.html 用
   picker.after(autoBtn, radioBtn, toggleHint);
 })();
 function syncToggles() {
-  autoBtn.textContent = tr(settings.autoPlay ? "autoOn" : "autoOff");
-  radioBtn.textContent = tr(settings.radio ? "radioOn" : "radioOff");
-  for (const [b, onFlag] of [[autoBtn, settings.autoPlay], [radioBtn, settings.radio]]) {
+  autoBtn.textContent = tr(window.Trk.core.settings.autoPlay ? "autoOn" : "autoOff");
+  radioBtn.textContent = tr(window.Trk.core.settings.radio ? "radioOn" : "radioOff");
+  for (const [b, onFlag] of [[autoBtn, window.Trk.core.settings.autoPlay], [radioBtn, window.Trk.core.settings.radio]]) {
     b.classList.toggle("selected", onFlag); b.setAttribute("aria-pressed", String(onFlag));
   }
   toggleHint.textContent = `${tr("autoHint")} ${tr("radioHint")}`;
 }
-autoBtn.addEventListener("click", () => { settings.autoPlay = !settings.autoPlay; saveUserPrefs(); syncToggles(); emit("options"); });
-radioBtn.addEventListener("click", () => { settings.radio = !settings.radio; saveUserPrefs(); syncToggles(); if (!settings.radio) cancelRadio(); });
+autoBtn.addEventListener("click", () => { window.Trk.core.settings.autoPlay = !window.Trk.core.settings.autoPlay; window.Trk.core.saveUserPrefs(); syncToggles(); window.Trk.core.emit("options"); });
+radioBtn.addEventListener("click", () => { window.Trk.core.settings.radio = !window.Trk.core.settings.radio; window.Trk.core.saveUserPrefs(); syncToggles(); if (!window.Trk.core.settings.radio) cancelRadio(); });
 on("language", syncToggles);
 syncToggles();
 
@@ -51,40 +52,40 @@ function saveSongPrefsStore() { try { localStorage.setItem(SONG_PREFS_KEY, JSON.
 
 /* main.js（BPM・オフセット・Seedの入力）から呼ばれる */
 function saveSongPrefs() {
-  if (!fingerprint) return false;
-  const bpm = Number($("bpm").value), offset = Number($("offset").value) || 0, prev = songPrefs.byFp[fingerprint] || {};
-  songPrefs.byFp[fingerprint] = { ...prev, bpm:bpm >= 60 && bpm <= 300 ? bpm : prev.bpm,
-    offset:Math.max(-5000, Math.min(5000, offset)), seed:$("seed").value.slice(0, 32), t:Date.now() };
+  if (!window.Trk.core.fingerprint) return false;
+  const bpm = Number(window.Trk.core.$("bpm").value), offset = Number(window.Trk.core.$("offset").value) || 0, prev = songPrefs.byFp[window.Trk.core.fingerprint] || {};
+  songPrefs.byFp[window.Trk.core.fingerprint] = { ...prev, bpm:bpm >= 60 && bpm <= 300 ? bpm : prev.bpm,
+    offset:Math.max(-5000, Math.min(5000, offset)), seed:window.Trk.core.$("seed").value.slice(0, 32), t:Date.now() };
   saveSongPrefsStore();
-  setStatus("songPrefsStatus", "songPrefsSaved");
+  window.Trk.core.setStatus("songPrefsStatus", "songPrefsSaved");
   return true;
 }
 
 /* ---------- 🎲 シードを探す道具 ---------- */
 const seedTools = el("div", "miniActions"); seedTools.style.alignItems = "center";
-$("songPrefsStatus").after(seedTools);
+window.Trk.core.$("songPrefsStatus").after(seedTools);
 function setSeed(s) {
-  if (phase !== "title") return;
-  $("seed").value = s;
-  $("seed").dispatchEvent(new Event("input"));    // main.js が保存と譜面の作り直しをします
+  if (window.Trk.core.phase !== "title") return;
+  window.Trk.core.$("seed").value = s;
+  window.Trk.core.$("seed").dispatchEvent(new Event("input"));    // main.js が保存と譜面の作り直しをします
 }
 function renderSeedTools() {
   seedTools.textContent = "";
   const roll = el("button", "", tr("seedRoll")); roll.type = "button";
   roll.addEventListener("click", () => setSeed(String(100000 + Math.floor(Math.random() * 900000))));
   seedTools.append(roll);
-  const seeds = (fingerprint && songPrefs.byFp[fingerprint] && songPrefs.byFp[fingerprint].seeds) || [];
+  const seeds = (window.Trk.core.fingerprint && songPrefs.byFp[window.Trk.core.fingerprint] && songPrefs.byFp[window.Trk.core.fingerprint].seeds) || [];
   if (!seeds.length) return;
   seedTools.append(el("span", "hint", tr("seedRecent")));
   for (const s of seeds) {
-    const b = el("button", s === $("seed").value.trim() ? "selected" : "", s); b.type = "button";
+    const b = el("button", s === window.Trk.core.$("seed").value.trim() ? "selected" : "", s); b.type = "button";
     b.addEventListener("click", () => setSeed(s));
     seedTools.append(b);
   }
 }
 on("beforePlay", () => {
-  const s = $("seed").value.trim(); if (!fingerprint || !s) return;
-  const sp = songPrefs.byFp[fingerprint] ||= {};
+  const s = window.Trk.core.$("seed").value.trim(); if (!window.Trk.core.fingerprint || !s) return;
+  const sp = songPrefs.byFp[window.Trk.core.fingerprint] ||= {};
   sp.seeds = [s, ...(sp.seeds || []).filter(x => x !== s)].slice(0, 8);
   saveSongPrefsStore(); renderSeedTools();
 });
@@ -119,16 +120,16 @@ async function firstSparkChartData(diff) {
     if (response.status === 404) { firstSparkChartCache.set(diff, null); return null; }
     if (!response.ok) return null;
     const declared = Number(response.headers.get("Content-Length") || 0);
-    if (declared > CHART_FILE_MAX) return null;
+    if (declared > window.Trk.media.CHART_FILE_MAX) return null;
     const text = await response.text();
-    if (!text.length || text.length > CHART_FILE_MAX) return null;
+    if (!text.length || text.length > window.Trk.media.CHART_FILE_MAX) return null;
     const data = JSON.parse(text);
     firstSparkChartCache.set(diff, data);
     return data;
   } catch (_) { return null; }   /* 通信・JSONの失敗は自動生成で遊ぶ（デモを止めない） */
 }
 async function initOptionalTutorialDemo() {
-  const button = $("guideDemoBtn");
+  const button = window.Trk.core.$("guideDemoBtn");
   if (button) button.hidden = true;
   try {
     const response = await fetch(FIRST_SPARK_MANIFEST, { credentials:"same-origin" });
@@ -171,12 +172,12 @@ const allSongs = () => {
   return [...out, ...packSongs, ...addonSongs];
 };
 function addedItem(file, video) {
-  const base = baseName(file.name);
+  const base = window.Trk.core.baseName(file.name);
   return { key:`${file.size}|${base}`, source:"file", file, title:base, base, size:file.size, video:!!video };
 }
 function packItem(s) {
-  const ext = extOf(s.audio), file = new File([s.audioBlob], `${safeName(s.title)}.${ext}`, { type:s.audioBlob.type || "" });
-  return { key:`pack:${s.key}`, source:"pack", file, title:s.title, base:baseName(file.name), size:file.size,
+  const ext = window.Trk.core.extOf(s.audio), file = new File([s.audioBlob], `${window.Trk.core.safeName(s.title)}.${ext}`, { type:s.audioBlob.type || "" });
+  return { key:`pack:${s.key}`, source:"pack", file, title:s.title, base:window.Trk.core.baseName(file.name), size:file.size,
     artist:s.artist, charter:s.charter, license:s.license, bpm:s.bpm, offset:s.offset, previewStart:s.previewStart,
     bgBlob:s.bgBlob, chartBlobs:s.chartBlobs, packName:s.packName };
 }
@@ -189,14 +190,14 @@ function srcLabel(s) {
 /* 記録の要約（称号は modes.js の titleString で計算） */
 function songInfo(it, idx) {
   const fp = songPrefs.keyFp[it.key];
-  const r = (fp && records[fp]) || idx[`${it.size}|${it.base}`];
+  const r = (fp && window.Trk.play.records[fp]) || idx[`${it.size}|${it.base}`];
   if (!r) return null;
   let best = 0;
   for (const c of Object.values(r.charts || {})) {
     for (const slot of [c, c.truck, c.orbit, c.stage, c.catch]) if (slot && slot.best) best = Math.max(best, Number(slot.best.score) || 0);
   }
-  const plays = PLAY_KEYS.reduce((a, k) => a + (r[k] || 0), 0);
-  return { plays, best, title:titleString(r), last:r.lastPlayed || 0 };
+  const plays = window.Trk.play.PLAY_KEYS.reduce((a, k) => a + (r[k] || 0), 0);
+  return { plays, best, title:window.Trk.modes.titleString(r), last:r.lastPlayed || 0 };
 }
 
 /* ============ 📚 曲のタブ（曲の入り口ごとに自動でできる棚） ============
@@ -233,6 +234,7 @@ Object.assign(TEXT.ja, {
   plSongsNow:"現在 {n} 曲", plSave:"💾 保存", plDelete:"🗑 このプレイリストを削除",
   plDeleted:"🗑 プレイリストを削除しました（曲はライブラリに残ります）", plCreated:"📁 {name} を作成しました",
   plLockedNo:"🔒 ロック中は削除できません（長押しの設定で 🔒 を外してください）",
+  libProfileBtn:"🎶 曲のプロフィール（編集・プレイリストへの追加）",
   plFrozenNo:"🧊 {name} はフリーズ中です（追加できません）",
   plDelOne:"中クリック1回で削除する", plDelThree:"同じタブを3回中クリックして削除する",
   plDelModeHint:"🗑 プレイリストを消しても、曲はライブラリに残ります。スマホでは長押し →「🗑 このプレイリストを削除」からも消せます。",
@@ -252,6 +254,7 @@ Object.assign(TEXT.en, {
   plSongsNow:"{n} songs", plSave:"💾 Save", plDelete:"🗑 Delete this playlist",
   plDeleted:"🗑 Playlist deleted (songs stay in your library)", plCreated:"📁 Created {name}",
   plLockedNo:"🔒 Locked — can't delete (uncheck 🔒 in long-press settings)",
+  libProfileBtn:"🎶 Song profile (edit · add to playlist)",
   plFrozenNo:"🧊 {name} is frozen (can't add songs)",
   plDelOne:"Middle-click once to delete", plDelThree:"Middle-click the same tab 3 times to delete",
   plDelModeHint:"🗑 Deleting a playlist never removes the songs. On touch screens, use long-press → “🗑 Delete this playlist”.",
@@ -271,6 +274,7 @@ Object.assign(TEXT.zh, {
   plSongsNow:"当前 {n} 首", plSave:"💾 保存", plDelete:"🗑 删除此播放列表",
   plDeleted:"🗑 已删除播放列表（歌曲仍保留在库中）", plCreated:"📁 已创建 {name}",
   plLockedNo:"🔒 锁定中无法删除（请在长按设置中取消 🔒）",
+  libProfileBtn:"🎶 歌曲资料（编辑·加入播放列表）",
   plFrozenNo:"🧊 {name} 已冻结（无法添加歌曲）",
   plDelOne:"中键点击1次即删除", plDelThree:"同一标签中键点击3次才删除",
   plDelModeHint:"🗑 删除播放列表不会删除歌曲。触屏设备请长按 →「🗑 删除此播放列表」。",
@@ -290,6 +294,7 @@ Object.assign(TEXT.ko, {
   plSongsNow:"현재 {n}곡", plSave:"💾 저장", plDelete:"🗑 이 재생목록 삭제",
   plDeleted:"🗑 재생목록을 삭제했습니다(곡은 라이브러리에 남습니다)", plCreated:"📁 {name}을(를) 만들었습니다",
   plLockedNo:"🔒 잠금 중에는 삭제할 수 없어요(길게 누른 설정에서 🔒를 해제하세요)",
+  libProfileBtn:"🎶 곡 프로필 (편집·재생목록에 추가)",
   plFrozenNo:"🧊 {name}은(는) 프리즈 중입니다(추가할 수 없어요)",
   plDelOne:"가운데 클릭 1회로 삭제", plDelThree:"같은 탭을 3번 가운데 클릭해 삭제",
   plDelModeHint:"🗑 재생목록을 지워도 곡은 라이브러리에 남습니다. 터치 화면에서는 길게 누르기 → '🗑 이 재생목록 삭제'를 사용하세요.",
@@ -406,6 +411,7 @@ Object.assign(TEXT.ja, {
   plWishHint:"🛒 {have}/{total} 曲を入手済み。灰色はまだ持っていない曲です（タップで公式の入手先）。Music フォルダに入れると黒くなります。",
   plWishOpen:"公式の入手先を開く", plWishNoLink:"この曲の入手先リンクはありません。公式ストアなどで入手して Music フォルダに入れてください。",
   plAuthorTools:"👥 投稿者ツール（共有プレイリストをたくさん受け取る人向け）",
+  tabSettingsBtn:"⚙ このタブの設定",
   plAuthorNamePh:"例：たぬき（共有ファイルに添わる名前）",
   plAuthorBtn:"👥 投稿者（検索・ブロック・お気に入り）", plAuthorTitle:"👥 投稿者",
   plAuthorSearchPh:"🔍 投稿者名でしぼりこむ", plAuthorOnly:"⭐を付けた投稿者だけ表示する",
@@ -455,6 +461,7 @@ Object.assign(TEXT.en, {
   plWishHint:"🛒 {have}/{total} collected. Grey rows are the ones you do not have yet — tap one for its official source. Add the audio to your Music folder and it turns black.",
   plWishOpen:"Open the official source", plWishNoLink:"No source link for this track yet. Get it from an official store and put it in your Music folder.",
   plAuthorTools:"👥 Author tools (for people who receive lots of shared playlists)",
+  tabSettingsBtn:"⚙ Tab settings",
   plAuthorNamePh:"e.g. tanuki (name attached to your shared files)",
   plAuthorBtn:"👥 Authors (search / block / favorites)", plAuthorTitle:"👥 Authors",
   plAuthorSearchPh:"🔍 Filter by author name", plAuthorOnly:"Show only favorite authors",
@@ -504,6 +511,7 @@ Object.assign(TEXT.zh, {
   plWishHint:"🛒 已入手 {have}/{total} 首。灰色表示尚未拥有（点击可打开官方获取页面）。放入 Music 文件夹后即会变黑。",
   plWishOpen:"打开官方获取页面", plWishNoLink:"此曲暂无获取链接。请从官方商店获取后放入 Music 文件夹。",
   plAuthorTools:"👥 投稿者工具（适合接收大量共享播放列表的人）",
+  tabSettingsBtn:"⚙ 此标签的设置",
   plAuthorNamePh:"例如：狸猫（会附在你共享的文件上）",
   plAuthorBtn:"👥 投稿者（搜索／屏蔽／收藏）", plAuthorTitle:"👥 投稿者",
   plAuthorSearchPh:"🔍 按投稿者名筛选", plAuthorOnly:"只显示收藏的投稿者",
@@ -553,6 +561,7 @@ Object.assign(TEXT.ko, {
   plWishHint:"🛒 {have}/{total}곡 보유 중. 회색은 아직 없는 곡이에요(탭하면 공식 입수처가 열려요). Music 폴더에 넣으면 검게 변해요.",
   plWishOpen:"공식 입수처 열기", plWishNoLink:"이 곡의 입수처 링크가 아직 없어요. 공식 스토어에서 구해 Music 폴더에 넣어 주세요.",
   plAuthorTools:"👥 올린이 도구(공유 플레이리스트를 많이 받는 사람용)",
+  tabSettingsBtn:"⚙ 이 탭 설정",
   plAuthorNamePh:"예: 너구리(공유 파일에 붙는 이름)",
   plAuthorBtn:"👥 올린이(검색・차단・즐겨찾기)", plAuthorTitle:"👥 올린이",
   plAuthorSearchPh:"🔍 올린이 이름으로 찾기", plAuthorOnly:"⭐ 즐겨찾기 올린이만 보기",
@@ -618,11 +627,11 @@ function libTabsOf(all) {
   if (favN) tabs.push({ id:"fav", icon:"⭐", label:tr("favTab"), n:favN });
   const plKeys = new Set(all.map(x => x.key));
   /* 📁 フォルダ（中のプレイリストの曲をぜんぶ）。🐔 trk's playlist は右端に表示名つきで出すので、ここでは出さない */
-  for (const f of settings.plFolders) if (!f.parent && f.id !== TRK_FOLDER_ID) tabs.push({ id:"fld:" + f.id, icon: f.icon || "📁", label: f.name, n: [...plFolderUnionKeys(f.id)].filter(k => plKeys.has(k)).length, fld: f });
-  for (const p of settings.playlists) if (!p.folder && plVisible(p) && p.id !== "trk-playlist" && p.id !== "trk-classic") tabs.push({ id:"pl:" + p.id, icon: plIcon(p), label: p.name, n: plCount(p, plKeys), pl: p });   /* 🎧 フォルダに入っていないプレイリスト（👥投稿者で絞る。🐔🎻は右端に出すため除外） */
-  if (settings.libTab.startsWith("pl:")) {   /* フォルダの中のプレイリストを見ているときは、そのタブも出す（戻れるように） */
-    const cp = plById(settings.libTab.slice(3));
-    if (cp && cp.folder && plVisible(cp) && !tabs.some(t => t.id === settings.libTab)) tabs.push({ id:"pl:" + cp.id, icon: plIcon(cp), label: cp.name, n: plCount(cp, plKeys), pl: cp, nested: true });
+  for (const f of window.Trk.core.settings.plFolders) if (!f.parent && f.id !== TRK_FOLDER_ID) tabs.push({ id:"fld:" + f.id, icon: f.icon || "📁", label: f.name, n: [...plFolderUnionKeys(f.id)].filter(k => plKeys.has(k)).length, fld: f });
+  for (const p of window.Trk.core.settings.playlists) if (!p.folder && plVisible(p) && p.id !== "trk-playlist" && p.id !== "trk-classic") tabs.push({ id:"pl:" + p.id, icon: plIcon(p), label: p.name, n: plCount(p, plKeys), pl: p });   /* 🎧 フォルダに入っていないプレイリスト（👥投稿者で絞る。🐔🎻は右端に出すため除外） */
+  if (window.Trk.core.settings.libTab.startsWith("pl:")) {   /* フォルダの中のプレイリストを見ているときは、そのタブも出す（戻れるように） */
+    const cp = plById(window.Trk.core.settings.libTab.slice(3));
+    if (cp && cp.folder && plVisible(cp) && !tabs.some(t => t.id === window.Trk.core.settings.libTab)) tabs.push({ id:"pl:" + cp.id, icon: plIcon(cp), label: cp.name, n: plCount(cp, plKeys), pl: cp, nested: true });
   }
   const packs = new Map(), folders = new Map(), addons = new Map();
   let nFiles = 0, nBuiltins = 0;
@@ -648,22 +657,22 @@ function libTabsOf(all) {
   const nv = all.filter(it => it.source === "pack" && libIsVerified(it)).length;
   if (nv) tabs.push({ id:"verified", icon:"✔", label:tr("libTabVerified"), n:nv });
   // 🐔 trk's playlist — フォルダを右端に1つ。長押しで中の Vol（階層）が開く。場所を取らずに沢山収容
-  const trkFolder = settings.plFolders.find(f => f.id === TRK_FOLDER_ID);
-  if (trkFolder && settings.trkPlaylist !== false) {
+  const trkFolder = window.Trk.core.settings.plFolders.find(f => f.id === TRK_FOLDER_ID);
+  if (trkFolder && window.Trk.core.settings.trkPlaylist !== false) {
     const keys = plFolderUnionKeys(TRK_FOLDER_ID);
     const n = [...keys].filter(k => plKeys.has(k)).length;
     /* 表示名は設定の3種類（full=trk's playlist／short=trk's／icon=文字なし）。アイコンは 🐔 固定 */
     if (!tabs.some(x => x.id === "fld:" + TRK_FOLDER_ID)) tabs.push({ id:"fld:" + TRK_FOLDER_ID, icon: TRK_TAB_ICON, label: trkTabLabel(), n, fld: trkFolder, trk: true });
-  } else if (settings.trkPlaylist !== false || settings.trkClassic !== false) {
+  } else if (window.Trk.core.settings.trkPlaylist !== false || window.Trk.core.settings.trkClassic !== false) {
     /* フォルダがまだ無いとき、または 🐔 タブを隠しているときのフォールバック（旧来の2タブ）。
        ⚠ 🎻 trk classic だけを表示しているときも、ここで1つタブを出す＝クラシックが行き止まりにならない */
 
-    if (settings.trkPlaylist !== false) {
-      const tp = settings.playlists.find(p => p.id === "trk-playlist");
+    if (window.Trk.core.settings.trkPlaylist !== false) {
+      const tp = window.Trk.core.settings.playlists.find(p => p.id === "trk-playlist");
       if (tp && plVisible(tp) && !tabs.some(x => x.id === "pl:trk-playlist")) tabs.push({ id:"pl:trk-playlist", icon: TRK_TAB_ICON, label: trkTabLabel(), n: plCount(tp, plKeys), pl: tp, trk: true });
     }
-    if (settings.trkClassic !== false) {
-      const tc = settings.playlists.find(p => p.id === "trk-classic");
+    if (window.Trk.core.settings.trkClassic !== false) {
+      const tc = window.Trk.core.settings.playlists.find(p => p.id === "trk-classic");
       if (tc && plVisible(tc) && !tabs.some(x => x.id === "pl:trk-classic")) tabs.push({ id:"pl:trk-classic", icon: plIcon(tc), label: tc.name, n: plCount(tc, plKeys), pl: tc });
     }
   }
@@ -734,7 +743,7 @@ function plFolderSanitize(raw) {
     parent: typeof raw.parent === "string" ? raw.parent.slice(0, 24) : "",
     createdAt: (typeof raw.createdAt === "number" && raw.createdAt > 0 && raw.createdAt < 9e15) ? raw.createdAt : 0 };
 }
-function plFolderById(id) { return settings.plFolders.find(f => f.id === id) || null; }
+function plFolderById(id) { return window.Trk.core.settings.plFolders.find(f => f.id === id) || null; }
 function plDepthOfFolder(id) {   /* 深さ（トップ=0）。循環データでも止まる */
   let d = 0, cur = plFolderById(id); const seen = new Set();
   while (cur && cur.parent && !seen.has(cur.id)) { seen.add(cur.id); d++; cur = plFolderById(cur.parent); }
@@ -747,57 +756,16 @@ function plIsDescendantFolder(id, ancestorId) {   /* id が ancestorId の中（
 }
 function plFolderUnionKeys(fldId, out = new Set(), seen = new Set()) {   /* フォルダの中の曲（子フォルダも再帰） */
   if (seen.has(fldId)) return out; seen.add(fldId);
-  for (const p of settings.playlists) if (p.folder === fldId && plVisible(p)) for (const k of p.songs) out.add(k);   /* 👥 ブロック中の投稿者は数えない */
-  for (const f of settings.plFolders) if (f.parent === fldId) plFolderUnionKeys(f.id, out, seen);
+  for (const p of window.Trk.core.settings.playlists) if (p.folder === fldId && plVisible(p)) for (const k of p.songs) out.add(k);   /* 👥 ブロック中の投稿者は数えない */
+  for (const f of window.Trk.core.settings.plFolders) if (f.parent === fldId) plFolderUnionKeys(f.id, out, seen);
   return out;
 }
 function plFolderContext() {   /* いま見ている場所のフォルダ（新規作成の初期値） */
-  if (settings.libTab.startsWith("fld:")) { const f = plFolderById(settings.libTab.slice(4)); return f ? f.id : ""; }
-  if (settings.libTab.startsWith("pl:")) { const p = plById(settings.libTab.slice(3)); return (p && p.folder) || ""; }
+  if (window.Trk.core.settings.libTab.startsWith("fld:")) { const f = plFolderById(window.Trk.core.settings.libTab.slice(4)); return f ? f.id : ""; }
+  if (window.Trk.core.settings.libTab.startsWith("pl:")) { const p = plById(window.Trk.core.settings.libTab.slice(3)); return (p && p.folder) || ""; }
   return "";
 }
-/* 🛒 カタログの「欲しい曲」（wish）を曲名で探す。見つかればプレイリストに自動追加 */
-const plNormTitle = t => String(t || "").trim().toLowerCase().replace(/\s+/g, " ");
-/* 曲名の照合キー。ファイル名は「08_sometimes.fla」、カタログは「08 sometimes」のように
-   区切りが違うことが多いので、厳しい順に候補を作って照合する（先頭＝そのまま）。 */
-function plTitleKeys(t) {
-  const out = [];
-  const base = plNormTitle(t);
-  if (!base) return out;
-  out.push(base);
-  const sep = base.replace(/\.[a-z0-9]{1,5}$/, "").replace(/[._\-\u30FB\uFF65\uFF0F\/]+/g, " ").replace(/\s+/g, " ").trim();
-  if (sep && !out.includes(sep)) out.push(sep);
-  const noNum = sep.replace(/^(?:vol\.?\s*)?\d{1,3}\s+/, "");   /* 「08 sometimes」→「sometimes」 */
-  if (noNum && !out.includes(noNum)) out.push(noNum);
-  return out;
-}
-/* 曲プロフィールの照合メモは表示タイトルに混ぜず、メモ単独と「メモ - 曲名」の候補を足す。
-   例：タイトル BELIEVE ＋ メモ Suguri → カタログの Suguri - BELIEVE に一致 */
-function plSongMatchKeys(title, matchHint) {
-  const out = plTitleKeys(title);
-  const hint = String(matchHint || "").trim().slice(0, 80);
-  if (!hint) return out;
-  /* メモ単独／「メモ - 曲名」の両方を候補にする。カタログ照合は片方だけでも拾える。 */
-  for (const key of plTitleKeys(hint)) if (!out.includes(key)) out.push(key);
-  for (const key of plTitleKeys(`${hint} - ${title}`)) if (!out.includes(key)) out.push(key);
-  return out;
-}
-function plWishTitleKeys(wish) {
-  const title = typeof wish === "string" ? wish : (wish && wish.t) || "";
-  const out = plTitleKeys(title);
-  /* 「キャラ名 - 曲名」のカタログ見出しは、左右どちらかだけの一致も許す。 */
-  const parts = String(title || "").split(/\s+[-–—]\s+/).filter(Boolean);
-  if (parts.length > 1) for (const part of parts) {
-    for (const key of plTitleKeys(part)) if (!out.includes(key)) out.push(key);
-  }
-  /* 公式名と配布ファイル名が異なる場合だけ、データ側の別表記も照合候補に加える。 */
-  if (wish && typeof wish === "object" && Array.isArray(wish.matchAliases)) {
-    for (const alias of wish.matchAliases.slice(0, 8)) {
-      for (const key of plTitleKeys(alias)) if (!out.includes(key)) out.push(key);
-    }
-  }
-  return out;
-}
+/* 曲名の照合キー（plNormTitle／plTitleKeys／plSongMatchKeys／plWishTitleKeys）は js/title-match.js にある */
 function plWishMatch(w, byTitle) {
   for (const k of plWishTitleKeys(w)) {
     const cands = byTitle.get(k);
@@ -823,7 +791,7 @@ function plSyncWishes(p, byTitle) {
    Music フォルダに入れると plSyncWishes が照合して songs に入り、次に開いたとき黒くなる。 */
 function plWishFolderIds(fid) {
   const ids = new Set([fid]);
-  for (const f of settings.plFolders) if (f.id !== fid && plIsDescendantFolder(f.id, fid)) ids.add(f.id);
+  for (const f of window.Trk.core.settings.plFolders) if (f.id !== fid && plIsDescendantFolder(f.id, fid)) ids.add(f.id);
   return ids;
 }
 function plCollectionEntries(tabId, byTitle) {
@@ -842,7 +810,7 @@ function plCollectionEntries(tabId, byTitle) {
   if (tabId.startsWith("pl:")) { const p = plById(tabId.slice(3)); if (p) take([p]); }
   else if (tabId.startsWith("fld:")) {
     const ids = plWishFolderIds(tabId.slice(4));
-    take(trkOrderedPlaylists(settings.playlists.filter(p => ids.has(p.folder) && plVisible(p))));
+    take(trkOrderedPlaylists(window.Trk.core.settings.playlists.filter(p => ids.has(p.folder) && plVisible(p))));
   }
   return out;
 }
@@ -901,10 +869,10 @@ const TRK_CLASSIC_ID = "trk-classic";
 const TRK_TAB_ICON = "🐔";
 const TRK_FOLDER_NAME = "trk's playlist";
 /* 許可リストは core.js の TRK_ENUM_VALUES.trkTabName（設定Importでも同じものを使う） */
-const TRK_TAB_NAME_MODES = (typeof TRK_ENUM_VALUES === "object" && TRK_ENUM_VALUES && Array.isArray(TRK_ENUM_VALUES.trkTabName))
-  ? TRK_ENUM_VALUES.trkTabName : ["full", "short", "icon"];
+const TRK_TAB_NAME_MODES = (typeof TRK_ENUM_VALUES === "object" && window.Trk.core.TRK_ENUM_VALUES && Array.isArray(window.Trk.core.TRK_ENUM_VALUES.trkTabName))
+  ? window.Trk.core.TRK_ENUM_VALUES.trkTabName : ["full", "short", "icon"];
 function trkNameMode() {
-  const v = settings.trkTabName;
+  const v = window.Trk.core.settings.trkTabName;
   return (v === "short" || v === "icon") ? v : "full";
 }
 function trkTabLabel() {   /* タブに出す文字（"icon" のときは空＝アイコンだけ） */
@@ -916,30 +884,30 @@ function trkCatalog() {   /* 🛒 カタログ本体（catalog.js の const。�
   try { return (typeof TRK_CATALOG !== "undefined" && Array.isArray(TRK_CATALOG)) ? TRK_CATALOG : []; } catch (_) { return []; }
 }
 function trkFolderNormalize() {   /* 保存データ側も固定名・固定アイコン・色なしにそろえる（旧名の 🐔 二重表示も直る） */
-  const f = settings.plFolders.find(x => x.id === TRK_FOLDER_ID);
+  const f = window.Trk.core.settings.plFolders.find(x => x.id === TRK_FOLDER_ID);
   if (!f) return null;
   let ch = false;
   if (f.name !== TRK_FOLDER_NAME) { f.name = TRK_FOLDER_NAME; ch = true; }
   if (f.icon !== TRK_TAB_ICON) { f.icon = TRK_TAB_ICON; ch = true; }
   if (f.color !== "none") { f.color = "none"; ch = true; }
   if (f.parent) { f.parent = ""; ch = true; }
-  if (ch) saveUserPrefs();
+  if (ch) window.Trk.core.saveUserPrefs();
   return f;
 }
 function ensureTrkSubfolder(id, name, icon) {
-  let f = settings.plFolders.find(x => x.id === id);
+  let f = window.Trk.core.settings.plFolders.find(x => x.id === id);
   if (f) return f;
   f = plFolderSanitize({ id, name, icon, color: "none", parent: TRK_FOLDER_ID });
   if (!f) return null;
-  settings.plFolders.push(f);
-  saveUserPrefs();
+  window.Trk.core.settings.plFolders.push(f);
+  window.Trk.core.saveUserPrefs();
   return f;
 }
 function ensureTrkFolder() {
-  let f = settings.plFolders.find(x => x.id === TRK_FOLDER_ID);
+  let f = window.Trk.core.settings.plFolders.find(x => x.id === TRK_FOLDER_ID);
   if (!f) {
     f = plFolderSanitize({ id: TRK_FOLDER_ID, name: TRK_FOLDER_NAME, icon: TRK_TAB_ICON, color: "none", parent: "" });
-    if (f) { settings.plFolders.push(f); saveUserPrefs(); }
+    if (f) { window.Trk.core.settings.plFolders.push(f); window.Trk.core.saveUserPrefs(); }
   }
   ensureTrkSubfolder("trk-classic", "Classic", "🎻");
   ensureTrkSubfolder("trk-ba", "Blue Archive", "🎮");
@@ -949,7 +917,7 @@ function ensureTrkFolder() {
   ensureTrkSubfolder("trk-gakumas", "Gakum@s", "🎤");
   ensureTrkSubfolder("trk-endfield", "Endfield", "🛰️");
   trkFolderNormalize();   /* 旧データの「🐔 trk's playlist」もここで固定名に直す */
-  return settings.plFolders.find(x => x.id === TRK_FOLDER_ID) || f || null;
+  return window.Trk.core.settings.plFolders.find(x => x.id === TRK_FOLDER_ID) || f || null;
 }
 function trkWishFromTrack(tt) {
   const cleanText = (value, limit) => typeof value === "string" ? value.trim().slice(0, limit) : "";
@@ -999,34 +967,34 @@ function ensureTrkPlaylist(opts) {
   const o = opts || {};
   const doToast = o.toast !== false;
   const go = !!o.go;
-  if (settings.trkPlaylist === false) return false;
-  if (settings.playlists.some(function(p){ return p.id === TRK_PLAYLIST_ID; })) return false;
+  if (window.Trk.core.settings.trkPlaylist === false) return false;
+  if (window.Trk.core.settings.playlists.some(function(p){ return p.id === TRK_PLAYLIST_ID; })) return false;
   ensureTrkFolder();
   const wishes = trkWishesFromCatalog();
   if (!wishes.length) return false;
   const p = plSanitize({ id: TRK_PLAYLIST_ID, name: "Game Vol.1", icon: "\uD83D\uDC14", color: "none", folder: TRK_FOLDER_ID, tags: ["Game","Vol.1"], wish: wishes, songs: [], guide: { note: "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8\u3002\u97F3\u6E90\u306F\u540C\u68B1\u3057\u307E\u305B\u3093\u3002\u516C\u5F0F\u306E\u5165\u624B\u5148\u304B\u3089\u3069\u3046\u305E\u3002", url: "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" }, cat: "trk:all", createdAt: Date.now() });
   if (!p) return false;
-  settings.playlists.push(p);
-  saveUserPrefs();
+  window.Trk.core.settings.playlists.push(p);
+  window.Trk.core.saveUserPrefs();
   if (doToast) try { plToast(tr("trkAdded", { n: wishes.length })); } catch(_){}
-  if (go) { settings.libTab = "pl:" + TRK_PLAYLIST_ID; saveUserPrefs(); try { renderLib(); } catch(_){} }
+  if (go) { window.Trk.core.settings.libTab = "pl:" + TRK_PLAYLIST_ID; window.Trk.core.saveUserPrefs(); try { renderLib(); } catch(_){} }
   return true;
 }
 function ensureTrkClassicPlaylist(opts) {
   const o = opts || {};
   const doToast = o.toast !== false;
   const go = !!o.go;
-  if (settings.trkClassic === false) return false;
-  if (settings.playlists.some(function(p){ return p.id === TRK_CLASSIC_ID; })) return false;
+  if (window.Trk.core.settings.trkClassic === false) return false;
+  if (window.Trk.core.settings.playlists.some(function(p){ return p.id === TRK_CLASSIC_ID; })) return false;
   ensureTrkFolder();
   const wishes = trkClassicWishesFromCatalog();
   if (!wishes.length) return false;
   const p = plSanitize({ id: TRK_CLASSIC_ID, name: "Classic Vol.1", icon: "\uD83C\uDFBB", color: "none", folder: "trk-classic", tags: ["Classic","Vol.1"], wish: wishes, songs: [], guide: { note: "\u7248\u6A29\u5207\u308C\u306E\u540D\u6F14\u3092Musopen\u306E\u516C\u958B\u9332\u97F3\u3067\u7D39\u4ECB\u3002\u97F3\u6E90\u306F\u540C\u68B1\u3057\u307E\u305B\u3093\u3002", url: "https://musopen.org/" }, cat: "trk:classic", createdAt: Date.now() });
   if (!p) return false;
-  settings.playlists.push(p);
-  saveUserPrefs();
+  window.Trk.core.settings.playlists.push(p);
+  window.Trk.core.saveUserPrefs();
   if (doToast) try { plToast(tr("trkClassicAdded", { n: wishes.length })); } catch(_){}
-  if (go) { settings.libTab = "pl:" + TRK_CLASSIC_ID; saveUserPrefs(); try { renderLib(); } catch(_){} }
+  if (go) { window.Trk.core.settings.libTab = "pl:" + TRK_CLASSIC_ID; window.Trk.core.saveUserPrefs(); try { renderLib(); } catch(_){} }
   return true;
 }
 window.TrkEnsureTrkPlaylist = ensureTrkPlaylist;
@@ -1034,8 +1002,8 @@ window.TrkTrkPlaylistId = TRK_PLAYLIST_ID;
 window.TrkEnsureTrkClassicPlaylist = ensureTrkClassicPlaylist;
 window.TrkClassicId = TRK_CLASSIC_ID;
 function trkOrderedPlaylists(list) {
-  if (settings.trkSortABC) return list.slice().sort((a,b) => a.name.localeCompare(b.name, 'ja'));
-  const order = settings.playlistOrder || [];
+  if (window.Trk.core.settings.trkSortABC) return list.slice().sort((a,b) => a.name.localeCompare(b.name, 'ja'));
+  const order = window.Trk.core.settings.playlistOrder || [];
   if (!order.length) return list.slice().sort((a,b) => (a.createdAt||0)-(b.createdAt||0));
   const idx = new Map(order.map((id,i)=>[id,i]));
   return list.slice().sort((a,b) => {
@@ -1046,9 +1014,9 @@ function trkOrderedPlaylists(list) {
   });
 }
 function trkMovePlaylist(id, dir) {
-  let order = (settings.playlistOrder||[]).slice();
+  let order = (window.Trk.core.settings.playlistOrder||[]).slice();
   const inTrk = trkFolderIdSet();
-  const ids = trkOrderedPlaylists(settings.playlists.filter(p => inTrk.has(p.folder))).map(p=>p.id);
+  const ids = trkOrderedPlaylists(window.Trk.core.settings.playlists.filter(p => inTrk.has(p.folder))).map(p=>p.id);
   // ensure order contains all ids
   for (const pid of ids) if (!order.includes(pid)) order.push(pid);
   const i = order.indexOf(id);
@@ -1056,8 +1024,8 @@ function trkMovePlaylist(id, dir) {
   const j = i + dir;
   if (j < 0 || j >= order.length) return;
   [order[i], order[j]] = [order[j], order[i]];
-  settings.playlistOrder = order.slice(0,200);
-  saveUserPrefs();
+  window.Trk.core.settings.playlistOrder = order.slice(0,200);
+  window.Trk.core.saveUserPrefs();
   renderLib();
   try { if (typeof renderTrkSettings === "function") renderTrkSettings(); } catch(_){}
 }
@@ -1126,7 +1094,7 @@ function ensureTrkDistributionPlaylists() {
       const guide = trkCatalogGuide(s, pl);
       /* Refresh catalog-owned wish/guide fields only. Never replace owned songs or
          user-edited name, icon, or tags. */
-      for (const imported of settings.playlists) {
+      for (const imported of window.Trk.core.settings.playlists) {
         if (!sourceCats.has(imported.cat)) continue;
         if (JSON.stringify(imported.wish) !== JSON.stringify(wishes)) { imported.wish = wishes; changed = true; }
         if (JSON.stringify(imported.guide || null) !== JSON.stringify(guide)) { imported.guide = guide; changed = true; }
@@ -1135,7 +1103,7 @@ function ensureTrkDistributionPlaylists() {
         if (s.id === "gakumas" && pl.id === "gm-inst" && imported.name === "学マス インスト厳選 — キャラ別 Vol.1") { imported.name = pl.name; changed = true; }
         if (s.id === "gakumas" && pl.id === "gm-inst2" && imported.name === "学マス インスト厳選 — キャラ別 Vol.2") { imported.name = pl.name; changed = true; }
       }
-      const existing = settings.playlists.find(p => p.id === baseId);
+      const existing = window.Trk.core.settings.playlists.find(p => p.id === baseId);
       if (existing) {
         /* 🛤️ Lone Trail の旧3曲版を、同じ公式カタログ項目の10曲版へ更新する。
            cat が一致する公式項目だけ更新し、所持曲・名前・アイコン・タグのユーザー変更は守る。 */
@@ -1168,19 +1136,19 @@ function ensureTrkDistributionPlaylists() {
       const vols = Math.ceil(total / 100) || 1;
       for (let v = 0; v < vols; v++) {
         const vid = vols === 1 ? baseId : baseId + "-v" + (v+1);
-        if (settings.playlists.some(p => p.id === vid)) continue;
+        if (window.Trk.core.settings.playlists.some(p => p.id === vid)) continue;
         const slice = wishes.slice(v*100, (v+1)*100);
         const vTag = vols === 1 ? [] : ["Vol."+(v+1)];
         const vName = vols === 1 ? pl.name : pl.name + " Vol." + (v+1);
         const p = plSanitize({ id: vid, name: vName, icon: pl.icon || s.icon, color: pl.color || s.color, folder, tags: (pl.tags || []).concat(vTag).slice(0,5), wish: slice, songs: [], guide: trkCatalogGuide(s, pl, true), cat: "trk:" + s.id + ":" + pl.id, createdAt: Date.now() + v });
-        if (p) { settings.playlists.push(p); changed = true; }
+        if (p) { window.Trk.core.settings.playlists.push(p); changed = true; }
       }
     }
   }
   /* Migrate the previous one-list Gakumas import to the current catalog without replacing
      its owned songs, custom name/icon/tags or playlist identity. */
   const gakumas = cat.find(s => s.id === "gakumas");
-  const legacyGakumas = settings.playlists.find(p => p.id === "trk-gakumas-v1" && p.cat === "trk:gakumas");
+  const legacyGakumas = window.Trk.core.settings.playlists.find(p => p.id === "trk-gakumas-v1" && p.cat === "trk:gakumas");
   if (gakumas && legacyGakumas) {
     const wishes = trkWishesForSeries("gakumas").slice(0, 100);
     const guide = { note: "DOWNLOAD規約はファン動画向け限定。全用途の許諾ではありません。Drive未掲載は配布不可の証明ではありません。", url: gakumas.url };
@@ -1195,30 +1163,30 @@ function ensureTrkDistributionPlaylists() {
     { id: "trk-gakumas-v1", folder: "trk-gakumas", series: "gakumas" },
   ];
   for (const d of legacy) {
-    if (settings.playlists.some(p => p.id === d.id)) continue;
+    if (window.Trk.core.settings.playlists.some(p => p.id === d.id)) continue;
     const s = cat.find(x=> x.id===d.series);
     if (!s) continue;
     // if new per-PL already cover, skip legacy creation
-    if (s.playlists && s.playlists.some(pl=> settings.playlists.some(p=> p.id==="trk-"+pl.id))) continue;
+    if (s.playlists && s.playlists.some(pl=> window.Trk.core.settings.playlists.some(p=> p.id==="trk-"+pl.id))) continue;
     const wishesAll = trkWishesForSeries(d.series);
     if (!wishesAll.length) continue;
     const slice = wishesAll.slice(0,100);
     const p = plSanitize({ id: d.id, name: s.name + " Vol.1", icon: s.icon, color: s.color, folder: d.folder, tags: ["Game", s.name, "Vol.1"], wish: slice, songs: [], guide: { note: "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8。", url: s.url || "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" }, cat: "trk:" + d.series, createdAt: Date.now() });
-    if (p) { settings.playlists.push(p); changed = true; }
+    if (p) { window.Trk.core.settings.playlists.push(p); changed = true; }
   }
-  if (changed) saveUserPrefs();
+  if (changed) window.Trk.core.saveUserPrefs();
 }
 (function plTighten() {
-  settings.playlists = (settings.playlists || []).map(plSanitize).filter(Boolean).slice(0, 100);
-  settings.plFolders = (settings.plFolders || []).map(plFolderSanitize).filter(Boolean).slice(0, 12);
-  const fids = new Set(settings.plFolders.map(f => f.id));
-  for (const p of settings.playlists) if (p.folder && !fids.has(p.folder)) p.folder = "";
-  for (const f of settings.plFolders) if (f.parent && (!fids.has(f.parent) || f.parent === f.id)) f.parent = "";
-  for (const f of settings.plFolders) if (plIsDescendantFolder(f.id, f.id)) f.parent = "";   /* 循環を断つ */
+  window.Trk.core.settings.playlists = (window.Trk.core.settings.playlists || []).map(plSanitize).filter(Boolean).slice(0, 100);
+  window.Trk.core.settings.plFolders = (window.Trk.core.settings.plFolders || []).map(plFolderSanitize).filter(Boolean).slice(0, 12);
+  const fids = new Set(window.Trk.core.settings.plFolders.map(f => f.id));
+  for (const p of window.Trk.core.settings.playlists) if (p.folder && !fids.has(p.folder)) p.folder = "";
+  for (const f of window.Trk.core.settings.plFolders) if (f.parent && (!fids.has(f.parent) || f.parent === f.id)) f.parent = "";
+  for (const f of window.Trk.core.settings.plFolders) if (plIsDescendantFolder(f.id, f.id)) f.parent = "";   /* 循環を断つ */
   try { trkFolderNormalize(); } catch (_) {}   /* 🐔 名前・アイコン・色は固定（旧データもここでそろう） */
 })();
 
-function plById(id) { return settings.playlists.find(p => p.id === id) || null; }
+function plById(id) { return window.Trk.core.settings.playlists.find(p => p.id === id) || null; }
 function plIcon(p) { if (p.icon) return p.icon; if (p.frozen && p.locked) return "🧩"; if (p.frozen) return "🧊"; if (p.locked) return "🔒"; return "🎧"; }
 function plCount(p, keySet) { let n = 0; for (const k of p.songs) if (keySet.has(k)) n++; return n; }
 
@@ -1285,15 +1253,15 @@ function plColorSwatches(initial) {
 /* 📁 新規プレイリスト */
 function plCreate() {
   const d = plDialog(tr("plNewTab"));
-  const name = el("input", "plInput"); name.type = "text"; name.maxLength = 24; name.value = tr("plDefaultName", { n: settings.playlists.length + 1 });
+  const name = el("input", "plInput"); name.type = "text"; name.maxLength = 24; name.value = tr("plDefaultName", { n: window.Trk.core.settings.playlists.length + 1 });
   const icon = el("input", "plInput"); icon.type = "text"; icon.maxLength = 4; icon.placeholder = tr("plIconPh");
   const color = plColorSwatches("none");
   const save = el("button", "plBtn", tr("plSave")); save.type = "button";
   save.addEventListener("click", () => {
     const p = plSanitize({ id: "pl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      name: name.value || tr("plDefaultName", { n: settings.playlists.length + 1 }), icon: icon.value, color: color.value, frozen: false, locked: false, folder: plFolderContext(), createdAt: Date.now(), songs: [] });
-    settings.playlists.push(p); saveUserPrefs();
-    settings.libTab = "pl:" + p.id;
+      name: name.value || tr("plDefaultName", { n: window.Trk.core.settings.playlists.length + 1 }), icon: icon.value, color: color.value, frozen: false, locked: false, folder: plFolderContext(), createdAt: Date.now(), songs: [] });
+    window.Trk.core.settings.playlists.push(p); window.Trk.core.saveUserPrefs();
+    window.Trk.core.settings.libTab = "pl:" + p.id;
     d.close(); renderLib();
     plToast(tr("plCreated", { name: p.name }));
   });
@@ -1309,8 +1277,8 @@ function plMenu(p) {
   const color = plColorSwatches(p.color);
   const fldSel = el("select", "plInput");
   fldSel.append(new Option(tr("plFolderRoot"), ""));
-  for (const f of settings.plFolders) fldSel.append(new Option("　".repeat(plDepthOfFolder(f.id)) + (f.icon || "📁") + " " + f.name, f.id));
-  fldSel.value = p.folder && settings.plFolders.some(f => f.id === p.folder) ? p.folder : "";
+  for (const f of window.Trk.core.settings.plFolders) fldSel.append(new Option("　".repeat(plDepthOfFolder(f.id)) + (f.icon || "📁") + " " + f.name, f.id));
+  fldSel.value = p.folder && window.Trk.core.settings.plFolders.some(f => f.id === p.folder) ? p.folder : "";
   const tags = el("input", "plInput"); tags.type = "text"; tags.maxLength = 80; tags.value = (p.tags || []).join(" "); tags.placeholder = tr("plTagsPh");
   const fz = el("input"); fz.type = "checkbox"; fz.checked = !!p.frozen;
   const lk = el("input"); lk.type = "checkbox"; lk.checked = !!p.locked;
@@ -1320,7 +1288,7 @@ function plMenu(p) {
       songs: p.songs, wish: p.wish, guide: p.guide, cat: p.cat, by: p.by, createdAt: p.createdAt,
       folder: fldSel.value, tags: tags.value.split(/[\s、，,]+/).map(x => x.trim().slice(0, 16)).filter(Boolean).slice(0, 5) });
     if (t) Object.assign(p, t);   /* 同じオブジェクトを直す（タブのIDは不変） */
-    saveUserPrefs(); d.close(); renderLib();
+    window.Trk.core.saveUserPrefs(); d.close(); renderLib();
   });
   const share = el("button", "plBtn", tr("plShare")); share.type = "button";
   share.addEventListener("click", () => { d.close(); plShare(p); });
@@ -1356,7 +1324,7 @@ function plFolderCreate(defaultParent = "") {
     const f = plFolderSanitize({ id: "fl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       name: name.value || tr("plDefaultFolderName"), icon: icon.value, color: color.value,
       parent: plFolderById(defaultParent) ? defaultParent : "", createdAt: Date.now() });
-    settings.plFolders.push(f); saveUserPrefs();
+    window.Trk.core.settings.plFolders.push(f); window.Trk.core.saveUserPrefs();
     d.close(); renderLib();
     plToast(tr("plFolderCreated", { name: f.name }));
   });
@@ -1374,16 +1342,16 @@ function plFolderMenu(f) {
   const color = plColorSwatches(f.color);
   const parent = el("select", "plInput");
   parent.append(new Option(tr("plFolderRoot"), ""));
-  for (const x of settings.plFolders) {
+  for (const x of window.Trk.core.settings.plFolders) {
     if (x.id === f.id || plIsDescendantFolder(x.id, f.id) || plDepthOfFolder(x.id) >= 3) continue;   /* 自分と子孫・深すぎは選べない */
     parent.append(new Option("　".repeat(plDepthOfFolder(x.id)) + (x.icon || "📁") + " " + x.name, x.id));
   }
-  parent.value = f.parent && settings.plFolders.some(x => x.id === f.parent) ? f.parent : "";
+  parent.value = f.parent && window.Trk.core.settings.plFolders.some(x => x.id === f.parent) ? f.parent : "";
   const save = el("button", "plBtn", tr("plSave")); save.type = "button";
   save.addEventListener("click", () => {
     const t = plFolderSanitize({ id: f.id, name: name.value || f.name, icon: icon.value, color: color.value, parent: parent.value, createdAt: f.createdAt });
     if (t) Object.assign(f, t);
-    saveUserPrefs(); d.close(); renderLib();
+    window.Trk.core.saveUserPrefs(); d.close(); renderLib();
   });
   const del = el("button", "plBtnDanger", tr("plFolderDel")); del.type = "button";
   del.addEventListener("click", () => plFolderDelete(f, d.close));
@@ -1392,7 +1360,7 @@ function plFolderMenu(f) {
   // 🐔 trk folder special: show inner playlists (Game Vol.1, Classic Vol.1, BlueArchive etc.) for quick open
   if (f.id === TRK_FOLDER_ID || f.id === "trk-classic" || f.id === "trk-ba" || f.id === "trk-touhou" || f.id === "trk-arknights" || f.id === "trk-gakumas" || f.id === "trk-endfield") {
     const innerIds = f.id === TRK_FOLDER_ID ? [TRK_FOLDER_ID, "trk-classic", "trk-ba", "trk-touhou", "trk-arknights", "trk-gakumas", "trk-endfield"] : [f.id];
-    const allInner = settings.playlists.filter(p => innerIds.includes(p.folder) || (f.id===TRK_FOLDER_ID && settings.plFolders.some(ff=> innerIds.includes(ff.id) && ff.id===p.folder)) );
+    const allInner = window.Trk.core.settings.playlists.filter(p => innerIds.includes(p.folder) || (f.id===TRK_FOLDER_ID && window.Trk.core.settings.plFolders.some(ff=> innerIds.includes(ff.id) && ff.id===p.folder)) );
     if (allInner.length) {
       d.card.append(el("div", "plSep"));
       d.card.append(el("b", "plCardTitle", tr("plFolderContents") || "中のプレイリスト"));
@@ -1400,16 +1368,16 @@ function plFolderMenu(f) {
       for (const p of ordered) {
         const row = el("div"); row.style.cssText = "display:flex;gap:8px;align-items:center;margin:4px 0;flex-wrap:wrap";
         const open = el("button", "plBtn", (p.icon||"🎧")+" "+p.name+" ("+plCount(p, new Set((window.__libAll||[]).map(x=>x.key)))+")"); open.type="button";
-        open.addEventListener("click", () => { d.close(); settings.libTab="pl:"+p.id; renderLib(); });
+        open.addEventListener("click", () => { d.close(); window.Trk.core.settings.libTab="pl:"+p.id; renderLib(); });
         const up = el("button", "plBtn small", "↑"); up.type="button"; up.title="上へ";
         const down = el("button", "plBtn small", "↓"); down.type="button"; down.title="下へ";
-        if (settings.trkSortABC) { up.disabled=true; down.disabled=true; up.style.opacity=".45"; down.style.opacity=".45"; }
+        if (window.Trk.core.settings.trkSortABC) { up.disabled=true; down.disabled=true; up.style.opacity=".45"; down.style.opacity=".45"; }
         up.addEventListener("click", () => trkMovePlaylist(p.id, -1));
         down.addEventListener("click", () => trkMovePlaylist(p.id, 1));
         row.append(open, up, down);
         d.card.append(row);
       }
-      if (settings.trkSortABC) d.card.append(el("div", "plHint", "🔤 ABC順がオンのため、手動並べ替えは無効です。設定でオフにしてください。"));
+      if (window.Trk.core.settings.trkSortABC) d.card.append(el("div", "plHint", "🔤 ABC順がオンのため、手動並べ替えは無効です。設定でオフにしてください。"));
     }
   }
   name.focus(); name.select();
@@ -1428,10 +1396,10 @@ function plTrkMenu() {
   const rowOf = p => {
     const row = el("div", "plTrkRow");
     const open = el("button", "plBtn", (p.icon || "🎧") + " " + p.name + "（" + plCount(p, keys) + "）"); open.type = "button";
-    open.addEventListener("click", () => { d.close(); settings.libTab = "pl:" + p.id; saveUserPrefs(); renderLib(); });
+    open.addEventListener("click", () => { d.close(); window.Trk.core.settings.libTab = "pl:" + p.id; window.Trk.core.saveUserPrefs(); renderLib(); });
     const up = el("button", "plBtn small", "↑"); up.type = "button"; up.title = tr("trkMoveUp"); up.setAttribute("aria-label", tr("trkMoveUp") + " " + p.name);
     const down = el("button", "plBtn small", "↓"); down.type = "button"; down.title = tr("trkMoveDown"); down.setAttribute("aria-label", tr("trkMoveDown") + " " + p.name);
-    if (settings.trkSortABC) { up.disabled = true; down.disabled = true; up.style.opacity = ".45"; down.style.opacity = ".45"; }
+    if (window.Trk.core.settings.trkSortABC) { up.disabled = true; down.disabled = true; up.style.opacity = ".45"; down.style.opacity = ".45"; }
     up.addEventListener("click", () => { trkMovePlaylist(p.id, -1); paint(); });
     down.addEventListener("click", () => { trkMovePlaylist(p.id, 1); paint(); });
     const gear = el("button", "plBtn small", "⚙"); gear.type = "button"; gear.title = tr("plSettings"); gear.setAttribute("aria-label", tr("plSettings") + " " + p.name);
@@ -1444,15 +1412,15 @@ function plTrkMenu() {
     head.append(el("b", "plCardTitle", (f.icon || "📁") + " " + f.name));
     if (f.id !== TRK_FOLDER_ID) {   /* サブフォルダ（Classic／Blue Archive など）は、その棚を開ける */
       const fo = el("button", "plBtn small", tr("trkMenuOpenFolder")); fo.type = "button";
-      fo.addEventListener("click", () => { d.close(); settings.libTab = "fld:" + f.id; saveUserPrefs(); renderLib(); });
+      fo.addEventListener("click", () => { d.close(); window.Trk.core.settings.libTab = "fld:" + f.id; window.Trk.core.saveUserPrefs(); renderLib(); });
       head.append(fo);
     }
     return head;
   };
   const paint = () => {
     listBox.replaceChildren();
-    const direct = settings.playlists.filter(p => plVisible(p) && p.folder === TRK_FOLDER_ID);
-    const subs = settings.plFolders.filter(f => f.parent === TRK_FOLDER_ID);
+    const direct = window.Trk.core.settings.playlists.filter(p => plVisible(p) && p.folder === TRK_FOLDER_ID);
+    const subs = window.Trk.core.settings.plFolders.filter(f => f.parent === TRK_FOLDER_ID);
     if (!direct.length && !subs.length) { listBox.append(el("div", "plHint", tr("trkOrderEmpty"))); return; }
     if (direct.length) {
       listBox.append(groupHead({ id: TRK_FOLDER_ID, icon: TRK_TAB_ICON, name: trkTabLabel() || tr("trkTabNameFull") }));
@@ -1460,9 +1428,9 @@ function plTrkMenu() {
     }
     for (const f of subs) {   /* 🎻 Classic など。中の Vol を並べる */
       listBox.append(el("div", "plSep"), groupHead(f));
-      for (const p of trkOrderedPlaylists(settings.playlists.filter(p => plVisible(p) && p.folder === f.id))) listBox.append(rowOf(p));
+      for (const p of trkOrderedPlaylists(window.Trk.core.settings.playlists.filter(p => plVisible(p) && p.folder === f.id))) listBox.append(rowOf(p));
     }
-    if (settings.trkSortABC) listBox.append(el("div", "plHint", tr("trkOrderAbcOff")));
+    if (window.Trk.core.settings.trkSortABC) listBox.append(el("div", "plHint", tr("trkOrderAbcOff")));
   };
   d.card.append(listBox);
   paint();
@@ -1470,11 +1438,11 @@ function plTrkMenu() {
 
 /* 🗑 フォルダの削除（中身は消さない。子は上の階層へ） */
 function plFolderDelete(f, onClose) {
-  settings.plFolders = settings.plFolders.filter(x => x !== f);
-  for (const p of settings.playlists) if (p.folder === f.id) p.folder = f.parent;
-  for (const x of settings.plFolders) if (x.parent === f.id) x.parent = f.parent;
-  if (settings.libTab === "fld:" + f.id) settings.libTab = f.parent ? "fld:" + f.parent : "all";
-  saveUserPrefs();
+  window.Trk.core.settings.plFolders = window.Trk.core.settings.plFolders.filter(x => x !== f);
+  for (const p of window.Trk.core.settings.playlists) if (p.folder === f.id) p.folder = f.parent;
+  for (const x of window.Trk.core.settings.plFolders) if (x.parent === f.id) x.parent = f.parent;
+  if (window.Trk.core.settings.libTab === "fld:" + f.id) window.Trk.core.settings.libTab = f.parent ? "fld:" + f.parent : "all";
+  window.Trk.core.saveUserPrefs();
   if (onClose) onClose();
   renderLib();
   plToast(tr("plFolderDeleted"));
@@ -1483,9 +1451,9 @@ function plFolderDelete(f, onClose) {
 /* 🗑 削除（曲はライブラリに残る。🔒中は断る） */
 function plDelete(p, onClose) {
   if (p.locked) { plToast(tr("plLockedNo")); return; }
-  settings.playlists = settings.playlists.filter(x => x !== p);
-  if (settings.libTab === "pl:" + p.id) settings.libTab = "all";
-  saveUserPrefs();
+  window.Trk.core.settings.playlists = window.Trk.core.settings.playlists.filter(x => x !== p);
+  if (window.Trk.core.settings.libTab === "pl:" + p.id) window.Trk.core.settings.libTab = "all";
+  window.Trk.core.saveUserPrefs();
   if (onClose) onClose();
   renderLib();
   plToast(tr("plDeleted"));
@@ -1495,7 +1463,7 @@ function plDelete(p, onClose) {
 let plDelArm = { id: "", n: 0, t: 0 };
 function plDeleteGesture(p, btn) {
   if (p.locked) { plToast(tr("plLockedNo")); return; }
-  if (settings.playlistDelMode === "three") {
+  if (window.Trk.core.settings.playlistDelMode === "three") {
     const now = Date.now();
     if (plDelArm.id !== p.id || now - plDelArm.t > 1600) plDelArm = { id: p.id, n: 0, t: now };
     plDelArm.n++; plDelArm.t = now;
@@ -1512,12 +1480,12 @@ function plDeleteGesture(p, btn) {
 /* 📚すべて／自動タブの長押し＝プレイリスト全体の設定 */
 /* ---------- 🛒 公式カタログ（音源は同梱しない。公式の入手先を案内するだけ） ---------- */
 function plCatalogFolder(s) {   /* シリーズのフォルダ（親カテゴリ → シリーズ。無ければ作る） */
-  let parent = settings.plFolders.find(f => !f.parent && f.name === s.catName);
+  let parent = window.Trk.core.settings.plFolders.find(f => !f.parent && f.name === s.catName);
   if (!parent) { parent = plFolderSanitize({ id: "fl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    name: s.catName, icon: s.catIcon || "🎮", color: "none", parent: "", createdAt: Date.now() }); settings.plFolders.push(parent); }
-  let fld = settings.plFolders.find(f => f.parent === parent.id && f.name === s.name);
+    name: s.catName, icon: s.catIcon || "🎮", color: "none", parent: "", createdAt: Date.now() }); window.Trk.core.settings.plFolders.push(parent); }
+  let fld = window.Trk.core.settings.plFolders.find(f => f.parent === parent.id && f.name === s.name);
   if (!fld) { fld = plFolderSanitize({ id: "fl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    name: s.name, icon: s.icon, color: s.color, parent: parent.id, createdAt: Date.now() }); settings.plFolders.push(fld); }
+    name: s.name, icon: s.icon, color: s.color, parent: parent.id, createdAt: Date.now() }); window.Trk.core.settings.plFolders.push(fld); }
   return fld.id;
 }
 function plCatalogMenu() {
@@ -1550,55 +1518,55 @@ function plCatalogMenu() {
 }
 function plCatalogTake(s, pl) {
   const cat = s.id + ":" + pl.id;
-  if (settings.playlists.some(p => p.cat === cat)) { plToast(tr("plCatalogDup", { name: pl.name })); return; }
+  if (window.Trk.core.settings.playlists.some(p => p.cat === cat)) { plToast(tr("plCatalogDup", { name: pl.name })); return; }
   const fldId = plCatalogFolder(s);
   const p = plSanitize({ id: "pl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
     name: pl.name, icon: pl.icon, color: pl.color, frozen: false, locked: false, folder: fldId, tags: pl.tags,
     cat, wish: pl.songs, guide: trkCatalogGuide(s, pl), songs: [] });
   p.createdAt = Date.now();
-  settings.playlists.push(p); saveUserPrefs();
-  settings.libTab = "pl:" + p.id;
+  window.Trk.core.settings.playlists.push(p); window.Trk.core.saveUserPrefs();
+  window.Trk.core.settings.libTab = "pl:" + p.id;
   renderLib();
   plToast(tr("plCatalogTaken", { name: p.name }));
 }
 
 /* ---------- 👥 投稿者ツール（初期オフ。共有プレイリストをたくさん受け取る人向け） ---------- */
 function plVisible(p) {   /* 🚫ブロック中／⭐絞り込み中の投稿者のプレイリストは隠す（自分のには投稿者がない＝隠れない） */
-  if (!settings.plAuthorTools || !p || !p.by) return true;
-  if (settings.plAuthorBlock.includes(p.by)) return false;
-  if (settings.plAuthorOnly && !settings.plAuthorFav.includes(p.by)) return false;
+  if (!window.Trk.core.settings.plAuthorTools || !p || !p.by) return true;
+  if (window.Trk.core.settings.plAuthorBlock.includes(p.by)) return false;
+  if (window.Trk.core.settings.plAuthorOnly && !window.Trk.core.settings.plAuthorFav.includes(p.by)) return false;
   return true;
 }
 function plAuthorMenu() {
   const d = plDialog(tr("plAuthorTitle"));
   const search = el("input", "plInput"); search.type = "text"; search.maxLength = 24; search.placeholder = tr("plAuthorSearchPh");
-  const only = el("input"); only.type = "checkbox"; only.checked = settings.plAuthorOnly === true;
-  only.addEventListener("change", () => { settings.plAuthorOnly = only.checked; saveUserPrefs(); render(); renderLib(); });
+  const only = el("input"); only.type = "checkbox"; only.checked = window.Trk.core.settings.plAuthorOnly === true;
+  only.addEventListener("change", () => { window.Trk.core.settings.plAuthorOnly = only.checked; window.Trk.core.saveUserPrefs(); render(); renderLib(); });
   const list = el("div", "plShareList");
   const hint = el("div", "plHint", "");
   const render = () => {
     list.textContent = "";
     const q = search.value.trim().toLowerCase();
     const authors = new Map();
-    for (const p of settings.playlists) if (p.by) { if (!authors.has(p.by)) authors.set(p.by, []); authors.get(p.by).push(p); }
-    for (const n of settings.plAuthorBlock) if (!authors.has(n)) authors.set(n, []);   /* プレイリストが無くなってもブロック解除できるように */
+    for (const p of window.Trk.core.settings.playlists) if (p.by) { if (!authors.has(p.by)) authors.set(p.by, []); authors.get(p.by).push(p); }
+    for (const n of window.Trk.core.settings.plAuthorBlock) if (!authors.has(n)) authors.set(n, []);   /* プレイリストが無くなってもブロック解除できるように */
     const names = [...authors.keys()].filter(n => !q || n.toLowerCase().includes(q)).sort((a, b) => a.localeCompare(b));
     if (!names.length) { list.append(el("div", "libEmpty", tr("plAuthorNone"))); hint.textContent = ""; return; }
     let hidden = 0;
     for (const name of names) {
       const pls = authors.get(name);
-      const blocked = settings.plAuthorBlock.includes(name), fav = settings.plAuthorFav.includes(name);
+      const blocked = window.Trk.core.settings.plAuthorBlock.includes(name), fav = window.Trk.core.settings.plAuthorFav.includes(name);
       const row = el("div", "plShareRow" + (blocked ? " miss" : ""));
       row.append(el("b", "", "👤 " + name));
       const fb = el("button", "plLinkMini" + (fav ? " on" : "")); fb.type = "button"; fb.title = tr(fav ? "plAuthorFavDel" : "plAuthorFavAdd"); fb.textContent = fav ? "⭐" : "☆";
       fb.addEventListener("click", () => {
-        settings.plAuthorFav = fav ? settings.plAuthorFav.filter(x => x !== name) : [...settings.plAuthorFav, name].slice(0, 100);
-        saveUserPrefs(); render(); renderLib();
+        window.Trk.core.settings.plAuthorFav = fav ? window.Trk.core.settings.plAuthorFav.filter(x => x !== name) : [...window.Trk.core.settings.plAuthorFav, name].slice(0, 100);
+        window.Trk.core.saveUserPrefs(); render(); renderLib();
       });
       const bb = el("button", "plLinkMini" + (blocked ? " on" : "")); bb.type = "button"; bb.title = tr(blocked ? "plAuthorUnblock" : "plAuthorBlock"); bb.textContent = "🚫";
       bb.addEventListener("click", () => {
-        settings.plAuthorBlock = blocked ? settings.plAuthorBlock.filter(x => x !== name) : [...settings.plAuthorBlock, name].slice(0, 100);
-        saveUserPrefs(); render(); renderLib();
+        window.Trk.core.settings.plAuthorBlock = blocked ? window.Trk.core.settings.plAuthorBlock.filter(x => x !== name) : [...window.Trk.core.settings.plAuthorBlock, name].slice(0, 100);
+        window.Trk.core.saveUserPrefs(); render(); renderLib();
       });
       row.append(fb, bb);
       list.append(row);
@@ -1608,7 +1576,7 @@ function plAuthorMenu() {
         const chips = el("div", "plAuthorChips");
         for (const p of vis) {
           const c = el("button", "skinChip", `${plIcon(p)} ${p.name}（${p.songs.length}）`); c.type = "button";
-          c.addEventListener("click", () => { settings.libTab = "pl:" + p.id; saveUserPrefs(); d.close(); renderLib(); });
+          c.addEventListener("click", () => { window.Trk.core.settings.libTab = "pl:" + p.id; window.Trk.core.saveUserPrefs(); d.close(); renderLib(); });
           chips.append(c);
         }
         list.append(chips);
@@ -1634,49 +1602,51 @@ function plGlobalMenu() {
   trkb.addEventListener("click", () => {
     d.close();
     const created = ensureTrkPlaylist({ toast: true });
-    if (!created && settings.playlists.some(function(p){ return p.id === TRK_PLAYLIST_ID; })) {
+    if (!created && window.Trk.core.settings.playlists.some(function(p){ return p.id === TRK_PLAYLIST_ID; })) {
       // 既にあるならそのタブへ
-      settings.libTab = "pl:" + TRK_PLAYLIST_ID; saveUserPrefs(); renderLib();
+      window.Trk.core.settings.libTab = "pl:" + TRK_PLAYLIST_ID; window.Trk.core.saveUserPrefs(); renderLib();
       plToast(tr("trkDup"));
     } else if (!created) {
       // まだ無くて作れなかった（カタログが無い等）は従来のカタログを表示
       plCatalogMenu();
       return;
     } else {
-      settings.libTab = "pl:" + TRK_PLAYLIST_ID; saveUserPrefs(); renderLib();
+      window.Trk.core.settings.libTab = "pl:" + TRK_PLAYLIST_ID; window.Trk.core.saveUserPrefs(); renderLib();
     }
   });
   const catb = el("button", "plBtn", tr("plCatalogBtn")); catb.type = "button";
   catb.addEventListener("click", () => { d.close(); plCatalogMenu(); });
-  const one = el("input"); one.type = "radio"; one.name = "plDelMode"; one.checked = settings.playlistDelMode !== "three";
-  const three = el("input"); three.type = "radio"; three.name = "plDelMode"; three.checked = settings.playlistDelMode === "three";
-  const saveMode = () => { settings.playlistDelMode = three.checked ? "three" : "one"; saveUserPrefs(); };
+  const one = el("input"); one.type = "radio"; one.name = "plDelMode"; one.checked = window.Trk.core.settings.playlistDelMode !== "three";
+  const three = el("input"); three.type = "radio"; three.name = "plDelMode"; three.checked = window.Trk.core.settings.playlistDelMode === "three";
+  const saveMode = () => { window.Trk.core.settings.playlistDelMode = three.checked ? "three" : "one"; window.Trk.core.saveUserPrefs(); };
   one.addEventListener("change", saveMode); three.addEventListener("change", saveMode);
   /* 👥 投稿者ツール（初期オフ。共有プレイリストをたくさん受け取る人向け。基本のUIに出さない） */
-  const at = el("input"); at.type = "checkbox"; at.checked = settings.plAuthorTools === true;
-  const an = el("input", "plInput"); an.type = "text"; an.maxLength = 24; an.placeholder = tr("plAuthorNamePh"); an.value = settings.plAuthorName || "";
-  an.addEventListener("change", () => { settings.plAuthorName = an.value.trim().slice(0, 24); saveUserPrefs(); });
-  const nameRow = plRow(tr("plAuthorBy"), an); nameRow.hidden = !settings.plAuthorTools;
-  const abtn = el("button", "plBtn", tr("plAuthorBtn")); abtn.type = "button"; abtn.hidden = !settings.plAuthorTools;
+  const at = el("input"); at.type = "checkbox"; at.checked = window.Trk.core.settings.plAuthorTools === true;
+  const an = el("input", "plInput"); an.type = "text"; an.maxLength = 24; an.placeholder = tr("plAuthorNamePh"); an.value = window.Trk.core.settings.plAuthorName || "";
+  an.addEventListener("change", () => { window.Trk.core.settings.plAuthorName = an.value.trim().slice(0, 24); window.Trk.core.saveUserPrefs(); });
+  const nameRow = plRow(tr("plAuthorBy"), an); nameRow.hidden = !window.Trk.core.settings.plAuthorTools;
+  const abtn = el("button", "plBtn", tr("plAuthorBtn")); abtn.type = "button"; abtn.hidden = !window.Trk.core.settings.plAuthorTools;
   abtn.addEventListener("click", () => { d.close(); plAuthorMenu(); });
-  at.addEventListener("change", () => { settings.plAuthorTools = at.checked; saveUserPrefs(); nameRow.hidden = !at.checked; abtn.hidden = !at.checked; renderLib(); });
+  at.addEventListener("change", () => { window.Trk.core.settings.plAuthorTools = at.checked; window.Trk.core.saveUserPrefs(); nameRow.hidden = !at.checked; abtn.hidden = !at.checked; renderLib(); });
+  /* 👥 投稿者ツールの行は開発者表示（devView）の中 */
+  const authorBox = el("div", "devOnly"); authorBox.append(el("div", "plSep"), plRow(tr("plAuthorTools"), at), nameRow, abtn);
   d.card.append(make, imp, mkfld, trkb, catb, el("div", "plSep"),
     plRow(tr("plDelOne"), one), plRow(tr("plDelThree"), three),
     el("div", "plHint", tr("plDelModeHint")),
-    el("div", "plSep"), plRow(tr("plAuthorTools"), at), nameRow, abtn);
+    authorBox);
 }
 
 /* 曲の追加・取り外し（🧊フリーズ中は断る） */
 function plAddSong(p, key) {
   if (p.frozen) { plToast(tr("plFrozenNo", { name: p.name })); return false; }
   if (p.songs.includes(key)) return true;
-  p.songs.push(key); saveUserPrefs();
+  p.songs.push(key); window.Trk.core.saveUserPrefs();
   plToast(tr("plAdded", { name: p.name }));
   return true;
 }
 function plRemoveSong(p, key) {
   if (p.frozen) { plToast(tr("plFrozenNo", { name: p.name })); return false; }
-  p.songs = p.songs.filter(k => k !== key); saveUserPrefs();
+  p.songs = p.songs.filter(k => k !== key); window.Trk.core.saveUserPrefs();
   plToast(tr("plRemovedFrom", { name: p.name }));
   return true;
 }
@@ -1700,9 +1670,9 @@ function songProfile(it) {
   const matchMemoRow = plRow(tr("plMatchMemo"), matchMemo);
   const matchMemoHelp = el("div", "plHint", tr("plMatchMemoNote")); matchMemoHelp.id = "plMatchMemoHelp";
   d.card.append(matchMemoRow, matchMemoHelp);
-  if (settings.playlists.length) {
+  if (window.Trk.core.settings.playlists.length) {
     d.card.append(el("div", "plSep"), el("b", "plCardTitle", tr("plInLists")));
-    for (const p of settings.playlists) {
+    for (const p of window.Trk.core.settings.playlists) {
       const c = el("input"); c.type = "checkbox"; c.checked = p.songs.includes(it.key); c.disabled = !!p.frozen;
       c.addEventListener("change", () => {
         const n = p.songs.length;
@@ -1752,13 +1722,13 @@ function notePlayed(key, auto) {   /* リザルトまで行った曲＝クリア
 }
 on("screen", id => {
   if (id !== "endScreen") return;
-  if (currentSong && currentSong.key && !runShort) notePlayed(currentSong.key, !!settings.autoPlay);   /* 🕹️ ショートプレイは視聴証明にしない */
+  if (window.Trk.core.currentSong && window.Trk.core.currentSong.key && !window.Trk.play.runShort) notePlayed(window.Trk.core.currentSong.key, !!window.Trk.core.settings.autoPlay);   /* 🕹️ ショートプレイは視聴証明にしない */
 });
 
 /* 証明：ランク対象のプレイ記録（クリア）か、視聴記録（AUTO・ラジオ・倍速でもOK） */
 function plRecordsIdx() {
   const idx = {};
-  for (const r of Object.values(records)) if (r && r.title != null) idx[`${r.size}|${r.title}`] = r;
+  for (const r of Object.values(window.Trk.play.records)) if (r && r.title != null) idx[`${r.size}|${r.title}`] = r;
   return idx;
 }
 function plProof(it, idx) {
@@ -1788,7 +1758,7 @@ function plShareData(p, opts) {
   if (opts.note) src.note = String(opts.note).slice(0, 60);
   if (opts.url && /^https:\/\/\S+$/i.test(opts.url)) src.url = String(opts.url).slice(0, 300);   /* 書き出しの境界でも https を確認 */
   return { format: "trk-playlist", version: 1, name: p.name, icon: plIcon(p), color: p.color,
-    author: String(settings.plAuthorName || "").trim().slice(0, 24) || undefined,   /* 👤 投稿者名（受取側の👥投稿者ツールで検索・ブロックできる） */
+    author: String(window.Trk.core.settings.plAuthorName || "").trim().slice(0, 24) || undefined,   /* 👤 投稿者名（受取側の👥投稿者ツールで検索・ブロックできる） */
     count: songs.length, createdAt: new Date(p.createdAt || Date.now()).toISOString(),
     comment: opts.comment || "", tags: opts.tags || [], source: (src.note || src.url) ? src : undefined, songs };
 }
@@ -1851,8 +1821,8 @@ function plShare(p) {
   exportBtn.addEventListener("click", () => {
     if (!check()) return;
     const o = opts();
-    downloadJSON(plShareData(p, o), `trk-playlist-${safeName(p.name)}.json`);
-    p.createdAt = p.createdAt || Date.now(); p.tags = o.tags; saveUserPrefs();
+    window.Trk.core.downloadJSON(plShareData(p, o), `trk-playlist-${window.Trk.core.safeName(p.name)}.json`);
+    p.createdAt = p.createdAt || Date.now(); p.tags = o.tags; window.Trk.core.saveUserPrefs();
     plToast(tr("plShareExported"));
   });
   const copyBtn = el("button", "plBtn", tr("plShareCopy")); copyBtn.type = "button";
@@ -1904,7 +1874,7 @@ function plMatchByTitle(s, all) {
 function plOpenLink(url) {   /* https限定＋開く前に確認（osu!の「入手先を明示」流・trk!は内容を保証しない） */
   /* 🛡 呼び出し側でも https を確かめているが、開く瞬間にもう一度通す。
      古い保存データ・手で書き換えた localStorage・将来の呼び出しが javascript: を渡しても開かない。 */
-  url = safeHttpUrl(url);
+  url = window.Trk.core.safeHttpUrl(url);
   if (!url) return;
   const d = plDialog(tr("plLinkOpen"));
   d.card.append(el("div", "plHint", url), el("div", "plHint", tr("plLinkWarn")));
@@ -1921,7 +1891,7 @@ function plViewer(v) {
   d.card.append(el("b", "plCardTitle", `${v.icon} ${v.name}`));
   d.card.append(el("div", "plHint", [v.createdAt ? v.createdAt.slice(0, 10) : "", tr("plSongsNow", { n: v.songs.length })].filter(Boolean).join(" · ")));
   if (v.author) {   /* 👤 投稿者（ブロック中なら 🚫 を出す。取り込むかどうかは自分で決められる） */
-    const abad = settings.plAuthorTools && settings.plAuthorBlock.includes(v.author);
+    const abad = window.Trk.core.settings.plAuthorTools && window.Trk.core.settings.plAuthorBlock.includes(v.author);
     d.card.append(el("div", "plHint", (abad ? "🚫 " : "👤 ") + tr("plAuthorBy") + "：" + v.author + (abad ? " ・ " + tr("plAuthorBlockedView") : "")));
   }
   if (v.comment) d.card.append(el("div", "plShareComment", "📝 " + v.comment));
@@ -1965,8 +1935,8 @@ function plViewer(v) {
     const p = plSanitize({ id: "pl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       name: v.name, icon: "📥", color: v.color, frozen: false, locked: false, songs: matched.map(x => x.key), tags: v.tags, by: v.author || "" });
     p.createdAt = Date.now();
-    settings.playlists.push(p); saveUserPrefs();
-    settings.libTab = "pl:" + p.id;
+    window.Trk.core.settings.playlists.push(p); window.Trk.core.saveUserPrefs();
+    window.Trk.core.settings.libTab = "pl:" + p.id;
     d.close(); renderLib();
     plToast(tr("plImportTaken", { name: p.name }));
   });
@@ -1986,10 +1956,14 @@ function plImportPick() {
   inp.click();
 }
 
+/* タブの設定メニュー（長押しと、タブ帯の ⚙ ボタンで同じものを開く）。🐔 は名前を変えられないので階層だけ */
+function tabSettingsMenu(t) {
+  if (t.trk) plTrkMenu(); else if (t.pl) plMenu(t.pl); else if (t.fld) plFolderMenu(t.fld); else plGlobalMenu();
+}
 /* タブ帯を描いて、いま選ばれているタブのIDを返す */
 function renderLibTabs(tabs) {
-  const box = $("libTabs");
-  const active = tabs.some(t => t.id === settings.libTab) ? settings.libTab : "all";
+  const box = window.Trk.core.$("libTabs");
+  const active = tabs.some(t => t.id === window.Trk.core.settings.libTab) ? window.Trk.core.settings.libTab : "all";
   if (!box) return active;
   box.textContent = "";
   box.hidden = false;   /* 🎧 「＋」（新規プレイリスト）があるので、タブが1つでも帯は出す */
@@ -2018,8 +1992,8 @@ function renderLibTabs(tabs) {
     b.append(el("span", "libTabIcon", t.icon), el("span", "libTabName", t.label), el("i", "libTabN", String(t.n)));
     b.addEventListener("click", () => {
       if (plSuppressClick()) return;
-      if (settings.libTab === t.id) return;
-      settings.libTab = t.id; saveUserPrefs(); renderLib();
+      if (window.Trk.core.settings.libTab === t.id) return;
+      window.Trk.core.settings.libTab = t.id; window.Trk.core.saveUserPrefs(); renderLib();
     });
     b.addEventListener("mousedown", e => { if (e.button === 1) e.preventDefault(); });   /* 中クリックのオートスクロールを止める */
     b.addEventListener("auxclick", e => {
@@ -2029,7 +2003,7 @@ function renderLibTabs(tabs) {
     });
     /* 長押し＝設定（スマホ・PC共通）。⚠ 🐔 trk's playlist だけは名前と色を変えられないので、
        プロフィール編集（plMenu／plFolderMenu）へは行かせず、階層（Vol 一覧）を開く動作に固定する */
-    onLongPress(b, () => { if (t.trk) plTrkMenu(); else if (t.pl) plMenu(t.pl); else if (t.fld) plFolderMenu(t.fld); else plGlobalMenu(); });
+    onLongPress(b, () => tabSettingsMenu(t));
     if (t.pl) {   /* 曲をドラッグして乗せると追加 */
       b.addEventListener("dragover", e => { e.preventDefault(); b.classList.add("dragOver"); });
       b.addEventListener("dragleave", () => b.classList.remove("dragOver"));
@@ -2046,15 +2020,48 @@ function renderLibTabs(tabs) {
   plus.title = tr("plNewTab"); plus.setAttribute("aria-label", tr("plNewTab"));
   plus.addEventListener("click", () => { if (!plSuppressClick()) plCreate(); });
   box.append(plus);
+  /* ⚙ いま選んでいるタブの設定（長押しの代わり。設定 showMoreBtns で隠せる） */
+  const activeTab = tabs.find(t => t.id === active);
+  if (activeTab) {
+    const gear = el("button", "libTab plPlus moreBtn", "⚙"); gear.type = "button";
+    gear.title = tr("tabSettingsBtn"); gear.setAttribute("aria-label", tr("tabSettingsBtn"));
+    gear.addEventListener("click", () => { if (!plSuppressClick()) tabSettingsMenu(activeTab); });
+    box.append(gear);
+  }
   return active;
 }
 
 /* ---------- 曲リストの表示 ---------- */
+/* 長押しの代わりのボタン（曲の 🎶・テレビくわしいの ▶）を出すか。設定 showMoreBtns（既定は出す） */
+function syncMoreBtns() {
+  const on = window.Trk.core.settings.showMoreBtns !== false;
+  document.body.classList.toggle("noMoreBtns", !on);
+  const c = window.Trk.core.$("showMoreBtns"); if (c) c.checked = on;
+}
+window.Trk.core.$("showMoreBtns").addEventListener("change", e => {
+  window.Trk.core.settings.showMoreBtns = e.target.checked; window.Trk.core.saveUserPrefs(); syncMoreBtns();
+});
+/* 表示の並び（かんたん／全部）と開発者表示（devView）。どちらも即時に反映（TV の映像フィルターの並びは次の読み込みで） */
+function syncDisplayUi() {
+  const s = window.Trk.core.settings;
+  const sel = window.Trk.core.$("displayMode"); if (sel) sel.value = s.displayMode === "full" ? "full" : "simple";
+  const dv = window.Trk.core.$("devView"); if (dv) dv.checked = s.devView === true;
+  document.body.classList.toggle("noDev", s.devView !== true);
+}
+window.Trk.core.$("displayMode").addEventListener("change", e => {
+  window.Trk.core.settings.displayMode = e.target.value === "full" ? "full" : "simple"; window.Trk.core.saveUserPrefs(); syncDisplayUi(); window.Trk.core.emit("displayMode");
+});
+window.Trk.core.$("devView").addEventListener("change", e => {
+  window.Trk.core.settings.devView = e.target.checked; window.Trk.core.saveUserPrefs(); syncDisplayUi();
+});
+
 function renderLib() {
-  const box = $("libList"); box.textContent = "";
+  syncMoreBtns();
+  syncDisplayUi();
+  const box = window.Trk.core.$("libList"); box.textContent = "";
   const all = allSongs();
   libAllKeys = new Set(all.map(x => x.key));
-  $("libCount").textContent = all.length ? tr("libCount", { n:all.length }) : "";
+  window.Trk.core.$("libCount").textContent = all.length ? tr("libCount", { n:all.length }) : "";
   const byTitle = new Map();   /* 🛒 カタログ照合用（曲名の照合キー → 曲のリスト） */
   const byTitleAdd = (k, it) => { const a = byTitle.get(k); if (a) { if (!a.includes(it)) a.push(it); } else byTitle.set(k, [it]); };
   for (const it of all) {
@@ -2062,8 +2069,8 @@ function renderLib() {
     for (const k of plSongMatchKeys(m.title || it.title, m.matchHint)) byTitleAdd(k, it);
   }
   {   /* Musicフォルダに「欲しい曲」が届いていたら自動でプレイリストへ（🧊フリーズ中は尊重） */
-    const wishers = settings.playlists.filter(p => p.wish && p.wish.length && !p.frozen);
-    if (wishers.length && all.length) { let ch = false; for (const p of wishers) if (plSyncWishes(p, byTitle)) ch = true; if (ch) saveUserPrefs(); }
+    const wishers = window.Trk.core.settings.playlists.filter(p => p.wish && p.wish.length && !p.frozen);
+    if (wishers.length && all.length) { let ch = false; for (const p of wishers) if (plSyncWishes(p, byTitle)) ch = true; if (ch) window.Trk.core.saveUserPrefs(); }
   }
   const tabId = renderLibTabs(libTabsOf(all));          // タブは、曲が1つも無くても片付ける
   /* 🛒 「集める棚」（wish つきプレイリスト／それを含むフォルダ）は、曲が1つも無くても
@@ -2071,8 +2078,8 @@ function renderLib() {
   const entries = plCollectionEntries(tabId, byTitle);
   if (!all.length && !entries.length) { libView = []; box.append(el("div", "libEmpty", tr("libEmptyList"))); return; }
   const scope = all.filter(it => libTabMatch(it, tabId));
-  const q = $("libSearch").value.trim().toLowerCase(), idx = {};
-  for (const r of Object.values(records)) if (r && r.title != null) idx[`${r.size}|${r.title}`] = r;
+  const q = window.Trk.core.$("libSearch").value.trim().toLowerCase(), idx = {};
+  for (const r of Object.values(window.Trk.play.records)) if (r && r.title != null) idx[`${r.size}|${r.title}`] = r;
   const items = scope
     .filter(it => { if (!q) return true; const m = metaOf(it.key) || {};   /* 🎶 プロフィール情報も検索対象 */
       return `${m.title || it.title} ${it.dir || ""} ${m.artist || it.artist || ""} ${m.album || ""} ${m.matchHint || ""} ${it.packName || ""}`.toLowerCase().includes(q); })
@@ -2083,7 +2090,7 @@ function renderLib() {
     plays:(a, b) => v(b, "plays") - v(a, "plays"),
     recent:(a, b) => v(b, "last") - v(a, "last"),
     best:(a, b) => v(b, "best") - v(a, "best")
-  }[settings.libSort] || (() => 0);
+  }[window.Trk.core.settings.libSort] || (() => 0);
   items.sort(cmp);
   if (tabId === "fav") {
     const F = window.TrkFavs;
@@ -2095,14 +2102,14 @@ function renderLib() {
   }
   if (tabId.startsWith("fld:")) {   /* 📁 フォルダの中身（子フォルダとプレイリスト）へのチップ */
     const fid = tabId.slice(4), bar = el("div", "plChipsRow");
-    for (const f of settings.plFolders) if (f.parent === fid) {
+    for (const f of window.Trk.core.settings.plFolders) if (f.parent === fid) {
       const c = el("button", "skinChip"); c.type = "button"; c.textContent = (f.icon || "📁") + " " + f.name;
-      c.addEventListener("click", () => { settings.libTab = "fld:" + f.id; saveUserPrefs(); renderLib(); });
+      c.addEventListener("click", () => { window.Trk.core.settings.libTab = "fld:" + f.id; window.Trk.core.saveUserPrefs(); renderLib(); });
       bar.append(c);
     }
-    for (const p of settings.playlists) if (p.folder === fid && plVisible(p)) {
+    for (const p of window.Trk.core.settings.playlists) if (p.folder === fid && plVisible(p)) {
       const c = el("button", "skinChip"); c.type = "button"; c.textContent = `${plIcon(p)} ${p.name}（${plCount(p, new Set(all.map(x => x.key)))}）`;
-      c.addEventListener("click", () => { settings.libTab = "pl:" + p.id; saveUserPrefs(); renderLib(); });
+      c.addEventListener("click", () => { window.Trk.core.settings.libTab = "pl:" + p.id; window.Trk.core.saveUserPrefs(); renderLib(); });
       bar.append(c);
     }
     if (bar.childElementCount) box.append(bar);
@@ -2138,7 +2145,7 @@ function renderLib() {
     if (!row.it) { box.append(plWishRow(row.w)); continue; }   /* 🛒 まだ持っていない曲（灰色）＝タップで入手先 */
     const { it, info } = row;
     const wrap = el("div"); wrap.style.cssText = "display:flex;gap:6px;align-items:stretch";
-    const cur = currentSong && currentSong.key === it.key;
+    const cur = window.Trk.core.currentSong && window.Trk.core.currentSong.key === it.key;
     const b = el("button", `libRow src-${it.source}` + (cur ? " cur" : "")); b.type = "button"; b.style.flex = "1"; b.style.minWidth = "0";
     const left = el("span", "libLeft"), meta = el("span", "libMeta");
     const m = metaOf(it.key) || {};   /* 🎶 曲プロフィール（長押しで編集） */
@@ -2157,6 +2164,11 @@ function renderLib() {
     b.addEventListener("dragend", () => { plDragKey = ""; document.body.classList.remove("plDragging"); });
     onLongPress(b, () => songProfile(it));   /* 🎶 長押しでプロフィール＆プレイリスト */
     wrap.append(b);
+    /* 🎶 長押しの代わり（見えるボタン）。設定「長押しの代わりのボタンを出す」で隠せる（body.noMoreBtns） */
+    const pb = el("button", "libFav moreBtn", "🎶"); pb.type = "button";
+    pb.title = tr("libProfileBtn"); pb.setAttribute("aria-label", tr("libProfileBtn") + " " + (m.title || it.title));
+    pb.addEventListener("click", e => { e.stopPropagation(); songProfile(it); });
+    wrap.append(pb);
     /* ⭐ お気に入り（📌は ⋯ のメニューから） */
     const F = window.TrkFavs;
     if (F) {
@@ -2191,43 +2203,43 @@ let bannerUrl = null;
 const previewSetBtn = el("button", "", "");
 previewSetBtn.type = "button"; previewSetBtn.hidden = true;
 previewSetBtn.style.cssText = "position:absolute;top:12px;right:12px;padding:6px 12px;font-size:13px;z-index:1";
-$("songBanner").append(previewSetBtn);
+window.Trk.core.$("songBanner").append(previewSetBtn);
 function renderBanner() {
-  const b = $("songBanner"), s = currentSong;
+  const b = window.Trk.core.$("songBanner"), s = window.Trk.core.currentSong;
   if (bannerUrl) { URL.revokeObjectURL(bannerUrl); bannerUrl = null; }
   b.style.backgroundImage = ""; b.classList.remove("hasImg");
   if (!s) {
-    $("songTitleBig").textContent = tr("songNone"); $("songSub").textContent = tr("songNoneSub");
+    window.Trk.core.$("songTitleBig").textContent = tr("songNone"); window.Trk.core.$("songSub").textContent = tr("songNoneSub");
   } else {
     const m = metaOf(s.key) || {};   /* 🎶 曲プロフィール */
-    $("songTitleBig").textContent = m.title || s.title;
-    $("songSub").textContent = [m.artist || s.artist, m.album, m.composer ? `${tr("plComposer")}: ${m.composer}` : "",
+    window.Trk.core.$("songTitleBig").textContent = m.title || s.title;
+    window.Trk.core.$("songSub").textContent = [m.artist || s.artist, m.album, m.composer ? `${tr("plComposer")}: ${m.composer}` : "",
       m.matchHint ? `${tr("plMatchMemo")}: ${m.matchHint}` : "", s.charter ? `${tr("chartBy")}: ${s.charter}` : "", srcLabel(s)].filter(Boolean).join(" · ");
     if (s.bgBlob) { bannerUrl = URL.createObjectURL(s.bgBlob); b.style.backgroundImage = `url("${bannerUrl}")`; b.classList.add("hasImg"); }
   }
   previewSetBtn.textContent = tr("previewSet");
-  previewSetBtn.hidden = !(s && videoReady);
+  previewSetBtn.hidden = !(s && window.Trk.core.videoReady);
   if (typeof bannerSongBtnsSync === "function") bannerSongBtnsSync();
 }
 function updateSpBuilder() {
-  $("songPackBuilder").hidden = !(currentSong && videoReady);
-  previewSetBtn.hidden = !(currentSong && videoReady);
+  window.Trk.core.$("songPackBuilder").hidden = !(window.Trk.core.currentSong && window.Trk.core.videoReady);
+  previewSetBtn.hidden = !(window.Trk.core.currentSong && window.Trk.core.videoReady);
 }
 previewSetBtn.addEventListener("click", () => {
-  if (!fingerprint || !isFinite(video.currentTime)) return;
+  if (!window.Trk.core.fingerprint || !isFinite(video.currentTime)) return;
   const t = Math.round(video.currentTime * 10) / 10;
-  songPrefs.byFp[fingerprint] = { ...(songPrefs.byFp[fingerprint] || {}), previewStart:t };
+  songPrefs.byFp[window.Trk.core.fingerprint] = { ...(songPrefs.byFp[window.Trk.core.fingerprint] || {}), previewStart:t };
   saveSongPrefsStore();
-  setStatus("songPrefsStatus", "previewSetDone", { t:fmtTime(t) });
+  window.Trk.core.setStatus("songPrefsStatus", "previewSetDone", { t:window.Trk.core.fmtTime(t) });
 });
 
 /* ---------- プレビュー再生 ---------- */
 let previewPending = false, fadeRaf = 0;
 function previewStartFor() {
-  const fp = fingerprint || (currentSong && isFinite(video.duration) ? `${currentSong.size}:${Math.round(video.duration * 10)}` : "");
+  const fp = window.Trk.core.fingerprint || (window.Trk.core.currentSong && isFinite(video.duration) ? `${window.Trk.core.currentSong.size}:${Math.round(video.duration * 10)}` : "");
   const sp = songPrefs.byFp[fp];
   let t = sp && typeof sp.previewStart === "number" ? sp.previewStart
-        : currentSong && currentSong.previewStart != null ? currentSong.previewStart
+        : window.Trk.core.currentSong && window.Trk.core.currentSong.previewStart != null ? window.Trk.core.currentSong.previewStart
         : (video.duration || 0) * 0.4;
   return Math.max(0, Math.min(t, (video.duration || 0) - 3));
 }
@@ -2237,36 +2249,36 @@ function fadeTo(target, ms) {
   const step = now => {
     const k = Math.min(1, (now - t0) / ms);
     video.volume = Math.max(0, Math.min(1, from + (target - from) * k));
-    if (k < 1 && phase === "title") fadeRaf = requestAnimationFrame(step);
+    if (k < 1 && window.Trk.core.phase === "title") fadeRaf = requestAnimationFrame(step);
   };
   fadeRaf = requestAnimationFrame(step);
 }
 function startPreview() {
-  if (window._trkMediaPlayerMode || !settings.previewEnabled || phase !== "title" || !currentSong || !video.src || !isFinite(video.duration)) return;
+  if (window._trkMediaPlayerMode || !window.Trk.core.settings.previewEnabled || window.Trk.core.phase !== "title" || !window.Trk.core.currentSong || !video.src || !isFinite(video.duration)) return;
   if (!video.paused) return;
   cancelAnimationFrame(fadeRaf);
   try { video.currentTime = previewStartFor(); } catch (_) {}
   video.volume = 0;
-  video.play().then(() => fadeTo(settings.musicVolume * 0.8, 900)).catch(() => {});
+  video.play().then(() => fadeTo(window.Trk.core.settings.musicVolume * 0.8, 900)).catch(() => {});
 }
 function stopPreview() {
   cancelAnimationFrame(fadeRaf);
-  if (phase === "title" && !video.paused) video.pause();
+  if (window.Trk.core.phase === "title" && !video.paused) video.pause();
 }
 video.addEventListener("canplay", () => { if (previewPending) { previewPending = false; startPreview(); } });
 video.addEventListener("ended", () => {
-  if (window._trkMediaPlayerMode || phase !== "title" || !currentSong || !settings.previewEnabled) return;
+  if (window._trkMediaPlayerMode || window.Trk.core.phase !== "title" || !window.Trk.core.currentSong || !window.Trk.core.settings.previewEnabled) return;
   try { video.currentTime = previewStartFor(); } catch (_) {}
   video.play().catch(() => {});
 });
 on("beforePlay", () => { previewPending = false; stopPreview(); });
 on("beforeLoad", stopPreview);
 on("phase", p => { if (p !== "title") { previewPending = false; cancelAnimationFrame(fadeRaf); } });
-on("screen", id => { if (id === "selectScreen" && phase === "title" && videoReady) setTimeout(startPreview, 50); });
-document.addEventListener("visibilitychange", () => { if (document.hidden && phase === "title") stopPreview(); });
-$("previewEnabled").addEventListener("change", e => {
-  settings.previewEnabled = e.target.checked; saveUserPrefs();
-  if (settings.previewEnabled) startPreview(); else stopPreview();
+on("screen", id => { if (id === "selectScreen" && window.Trk.core.phase === "title" && window.Trk.core.videoReady) setTimeout(startPreview, 50); });
+document.addEventListener("visibilitychange", () => { if (document.hidden && window.Trk.core.phase === "title") stopPreview(); });
+window.Trk.core.$("previewEnabled").addEventListener("change", e => {
+  window.Trk.core.settings.previewEnabled = e.target.checked; window.Trk.core.saveUserPrefs();
+  if (window.Trk.core.settings.previewEnabled) startPreview(); else stopPreview();
 });
 /* ---------- ⏯ 曲名バナーをタップで一時停止（設定でON）＋ 🔊 右下の音量 ---------- */
 function bannerPauseAction(st) {   /* 純粋関数（テストで確認）→ null / "pause" / "resume" / "preview" */
@@ -2277,17 +2289,17 @@ function bannerPauseAction(st) {   /* 純粋関数（テストで確認）→ nu
   return null;
 }
 const bannerVolClamp = v => Math.max(0, Math.min(1, Number(v) || 0));
-function bannerPauseSync() { $("songBanner").classList.toggle("tapPause", !!settings.bannerPause); }
-$("bannerPause").addEventListener("change", e => {
-  settings.bannerPause = e.target.checked; saveUserPrefs(); bannerPauseSync();
+function bannerPauseSync() { window.Trk.core.$("songBanner").classList.toggle("tapPause", !!window.Trk.core.settings.bannerPause); }
+window.Trk.core.$("bannerPause").addEventListener("change", e => {
+  window.Trk.core.settings.bannerPause = e.target.checked; window.Trk.core.saveUserPrefs(); bannerPauseSync();
 });
-$("bannerPause").checked = settings.bannerPause;
+window.Trk.core.$("bannerPause").checked = window.Trk.core.settings.bannerPause;
 bannerPauseSync();
-$("songBanner").addEventListener("click", e => {
-  const act = bannerPauseAction({ enabled: settings.bannerPause, mediaMode: window._trkMediaPlayerMode,
-    target: !!e.target.closest("button, input, a, label"), phase, hasSong: !!(currentSong && video.src) });
-  if (act === "pause") pauseGame();
-  else if (act === "resume") resumeGame();
+window.Trk.core.$("songBanner").addEventListener("click", e => {
+  const act = bannerPauseAction({ enabled: window.Trk.core.settings.bannerPause, mediaMode: window._trkMediaPlayerMode,
+    target: !!e.target.closest("button, input, a, label"), phase: window.Trk.core.phase, hasSong: !!(window.Trk.core.currentSong && video.src) });
+  if (act === "pause") window.Trk.play.pauseGame();
+  else if (act === "resume") window.Trk.play.resumeGame();
   else if (act === "preview") { if (video.paused) video.play().catch(() => {}); else video.pause(); }   /* 選曲中のプレビュー */
 });
 /* 🔊 音量（設定の musicVolume と同じもの。バナーの右下の小さなつまみ） */
@@ -2299,13 +2311,13 @@ const bannerVolSlider = el("input", "bannerVolSlider"); bannerVolSlider.type = "
 bannerVolSlider.min = "0"; bannerVolSlider.max = "1"; bannerVolSlider.step = "0.01";
 const bannerVolPanel = el("div", "bannerVolPanel"); bannerVolPanel.hidden = true;
 bannerVolPanel.append(bannerVolSlider);
-$("songBanner").append(bannerVolPanel, bannerVolBtn);
-let bannerVolRestore = settings.musicVolume > 0 ? bannerVolClamp(settings.musicVolume) : bannerVolClamp(settings.musicVolumeRestore || 0.7);
+window.Trk.core.$("songBanner").append(bannerVolPanel, bannerVolBtn);
+let bannerVolRestore = window.Trk.core.settings.musicVolume > 0 ? bannerVolClamp(window.Trk.core.settings.musicVolume) : bannerVolClamp(window.Trk.core.settings.musicVolumeRestore || 0.7);
 let bannerVolPressTimer = 0, bannerVolLongPressed = false, bannerVolPointer = null;
 let bannerVolDownX = 0, bannerVolDownY = 0;
 function bannerVolSync() {
-  const volume = bannerVolClamp(settings.musicVolume);
-  if (volume > 0) { bannerVolRestore = volume; rememberMusicVolume(volume); }
+  const volume = bannerVolClamp(window.Trk.core.settings.musicVolume);
+  if (volume > 0) { bannerVolRestore = volume; window.Trk.core.rememberMusicVolume(volume); }
   bannerVolSlider.value = String(volume);
   bannerVolBtn.textContent = volume > 0 ? "🔊" : "🔇";
   bannerVolBtn.title = bannerVolTip();
@@ -2313,20 +2325,20 @@ function bannerVolSync() {
 }
 function setBannerMusicVolume(value) {
   const volume = bannerVolClamp(value);
-  if (volume > 0) { bannerVolRestore = volume; rememberMusicVolume(volume); }
-  settings.musicVolume = volume;
+  if (volume > 0) { bannerVolRestore = volume; window.Trk.core.rememberMusicVolume(volume); }
+  window.Trk.core.settings.musicVolume = volume;
   cancelAnimationFrame(fadeRaf);   /* プレビューのフェードインと取り合いにならないように */
   video.volume = volume;
-  const sv = $("volume"); if (sv) sv.value = String(volume);   /* 設定画面のスライダーも合わせる */
-  saveUserPrefs(); bannerVolSync();
+  const sv = window.Trk.core.$("volume"); if (sv) sv.value = String(volume);   /* 設定画面のスライダーも合わせる */
+  window.Trk.core.saveUserPrefs(); bannerVolSync();
 }
 function bannerVolLongPressAction() {
-  if (settings.musicVolume > 0) {
-    bannerVolRestore = bannerVolClamp(settings.musicVolume);
-    rememberMusicVolume(bannerVolRestore);
+  if (window.Trk.core.settings.musicVolume > 0) {
+    bannerVolRestore = bannerVolClamp(window.Trk.core.settings.musicVolume);
+    window.Trk.core.rememberMusicVolume(bannerVolRestore);
     setBannerMusicVolume(0);
   } else {
-    bannerVolRestore = bannerVolClamp(settings.musicVolumeRestore || bannerVolRestore || 0.7);
+    bannerVolRestore = bannerVolClamp(window.Trk.core.settings.musicVolumeRestore || bannerVolRestore || 0.7);
     setBannerMusicVolume(bannerVolRestore);
   }
 }
@@ -2374,7 +2386,7 @@ const bannerPrevBtn = el("button", "bannerSongBtn", "◀"); bannerPrevBtn.type =
 const bannerRandomBtn = el("button", "bannerSongBtn bannerRandomBtn", "🎲"); bannerRandomBtn.type = "button";
 const bannerNextBtn = el("button", "bannerSongBtn", "▶"); bannerNextBtn.type = "button";
 bannerSongBar.append(bannerPrevBtn, bannerRandomBtn, bannerNextBtn);
-$("songBanner").append(bannerSongBar);
+window.Trk.core.$("songBanner").append(bannerSongBar);
 
 /* 🎲 おまかせの候補：いまの一覧 ＋ 📌ピンの曲（ほかのタブにいても、必ず候補に入る） */
 function randomSongPool() {
@@ -2393,27 +2405,27 @@ function randomSongPick() {
   const pool = randomSongPool();
   return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
 }
-const bannerRandomTapMode = () => settings.bannerRandomTap === true;   /* タップだけで変える（初期オフ＝長押し） */
+const bannerRandomTapMode = () => window.Trk.core.settings.bannerRandomTap === true;   /* タップだけで変える（初期オフ＝長押し） */
 
 function bannerSongBtnsSync() {
-  const on = settings.bannerSongBtns !== false && allSongs().length > 0 && phase === "title";
-  const rand = on && settings.bannerRandomBtn !== false;
+  const on = window.Trk.core.settings.bannerSongBtns !== false && allSongs().length > 0 && window.Trk.core.phase === "title";
+  const rand = on && window.Trk.core.settings.bannerRandomBtn !== false;
   bannerSongBar.hidden = !on;
   bannerPrevBtn.hidden = bannerNextBtn.hidden = !on;
   bannerRandomBtn.hidden = !rand;
-  $("songBanner").classList.toggle("hasSongBtns", on);   /* 曲名の右側を空けて、右端のボタンと重ならないようにする */
+  window.Trk.core.$("songBanner").classList.toggle("hasSongBtns", on);   /* 曲名の右側を空けて、右端のボタンと重ならないようにする */
   const t1 = tr("tvPrevSong"), t2 = tr("tvNextSong");
   for (const [b, t] of [[bannerPrevBtn, t1], [bannerNextBtn, t2]]) { b.title = t; b.setAttribute("aria-label", t); }
   const tip = tr(bannerRandomTapMode() ? "bannerRandomTapTip" : "bannerRandomHoldTip");
   if (bannerRandomBtn.title !== tip) { bannerRandomBtn.title = tip; bannerRandomBtn.setAttribute("aria-label", tip); }
 }
 async function bannerSongStep(dir) {
-  if (phase !== "title") return;
+  if (window.Trk.core.phase !== "title") return;
   const it = dir < 0 ? prevSong() : nextSong();
   if (it) await selectSong(it);
 }
 async function bannerSongRandom() {
-  if (phase !== "title") return;
+  if (window.Trk.core.phase !== "title") return;
   const it = randomSongPick();
   if (it) await selectSong(it);
 }
@@ -2453,21 +2465,21 @@ bannerRandomBtn.addEventListener("click", e => {
   plToast(tr("bannerRandomHold"));   /* 誤操作防止：短押しでは変えず、押し方だけ案内する */
 });
 function bannerRandomSyncPrefs() {
-  const show = settings.bannerRandomBtn !== false;
-  $("bannerRandomBtn").checked = show;
-  $("bannerRandomTap").checked = settings.bannerRandomTap === true;
-  $("bannerRandomTap").disabled = !show;   /* 🎲 を隠しているときは、押し方の設定は関係ない */
+  const show = window.Trk.core.settings.bannerRandomBtn !== false;
+  window.Trk.core.$("bannerRandomBtn").checked = show;
+  window.Trk.core.$("bannerRandomTap").checked = window.Trk.core.settings.bannerRandomTap === true;
+  window.Trk.core.$("bannerRandomTap").disabled = !show;   /* 🎲 を隠しているときは、押し方の設定は関係ない */
 }
-$("bannerSongBtns").addEventListener("change", e => {
-  settings.bannerSongBtns = e.target.checked; saveUserPrefs(); bannerSongBtnsSync();
+window.Trk.core.$("bannerSongBtns").addEventListener("change", e => {
+  window.Trk.core.settings.bannerSongBtns = e.target.checked; window.Trk.core.saveUserPrefs(); bannerSongBtnsSync();
 });
-$("bannerRandomBtn").addEventListener("change", e => {
-  settings.bannerRandomBtn = e.target.checked; saveUserPrefs(); bannerRandomSyncPrefs(); bannerSongBtnsSync();
+window.Trk.core.$("bannerRandomBtn").addEventListener("change", e => {
+  window.Trk.core.settings.bannerRandomBtn = e.target.checked; window.Trk.core.saveUserPrefs(); bannerRandomSyncPrefs(); bannerSongBtnsSync();
 });
-$("bannerRandomTap").addEventListener("change", e => {
-  settings.bannerRandomTap = e.target.checked; saveUserPrefs(); bannerSongBtnsSync();
+window.Trk.core.$("bannerRandomTap").addEventListener("change", e => {
+  window.Trk.core.settings.bannerRandomTap = e.target.checked; window.Trk.core.saveUserPrefs(); bannerSongBtnsSync();
 });
-$("bannerSongBtns").checked = settings.bannerSongBtns !== false;
+window.Trk.core.$("bannerSongBtns").checked = window.Trk.core.settings.bannerSongBtns !== false;
 bannerRandomSyncPrefs();
 on("settings", bannerRandomSyncPrefs);   /* 音リセットなどで設定が変わっても、開いたときに合わせる */
 bannerSongBtnsSync();   /* 初回の表示あわせ（renderBanner が先に走っていた場合の保険） */
@@ -2496,7 +2508,7 @@ async function materializeBuiltinSong(it) {
   return firstSparkFilePromise;
 }
 async function selectSong(it) {
-  if (phase !== "title" || !it) return;
+  if (window.Trk.core.phase !== "title" || !it) return;
   const selection = ++songSelectToken;
   if (it.source === "builtin" && !it.file) {
     try { it = await materializeBuiltinSong(it); }
@@ -2505,73 +2517,73 @@ async function selectSong(it) {
         console.error("tutorial audio load failed", error);
         if (error && error.code === "not-found") {
           builtInSongs = builtInSongs.filter(song => song.key !== FIRST_SPARK_KEY);
-          const button = $("guideDemoBtn"); if (button) button.hidden = true;
+          const button = window.Trk.core.$("guideDemoBtn"); if (button) button.hidden = true;
           renderLib();
         }
-        setStatus("loadStatus", "demoSongUnavailable");
+        window.Trk.core.setStatus("loadStatus", "demoSongUnavailable");
       }
       return;
     }
-    if (phase !== "title" || selection !== songSelectToken) return;
+    if (window.Trk.core.phase !== "title" || selection !== songSelectToken) return;
   }
-  if (currentSong && currentSong.key === it.key) { if (videoReady) startPreview(); return; }
-  currentSong = it;
+  if (window.Trk.core.currentSong && window.Trk.core.currentSong.key === it.key) { if (window.Trk.core.videoReady) startPreview(); return; }
+  window.Trk.core.currentSong = it;
   stopPreview(); renderLib(); renderBanner(); updateSpBuilder();
-  emit("songSelected", it);
+  window.Trk.core.emit("songSelected", it);
   /* 🧩 アドオンが連れてきた曲：ファイル読み込みは、アドオンに任せる（自前のプレイヤーで鳴らす） */
   if (it.source === "addon") {
     if (it.file) { /* file を持っていれば、ふつうの曲と同じ道（loadMedia）を通る */ }
-    else { emit("addonSelect", it); renderSeedTools(); return; }
+    else { window.Trk.core.emit("addonSelect", it); renderSeedTools(); return; }
   }
   let studySongArt = null;
   try { if (window.TrkStudyRoom && typeof window.TrkStudyRoom.getSongCoverBlob === "function") studySongArt = await window.TrkStudyRoom.getSongCoverBlob(it.key); } catch (_) {}
-  if (currentSong !== it) return;
-  await setBackground(studySongArt || it.bgBlob || null);
-  if (currentSong !== it) return;
+  if (window.Trk.core.currentSong !== it) return;
+  await window.Trk.media.setBackground(studySongArt || it.bgBlob || null);
+  if (window.Trk.core.currentSong !== it) return;
   previewPending = true;
-  const ok = await loadMedia(it.file, { title:it.title, onReady:() => restoreSongState(it) });
-  if (!ok || currentSong !== it) return;
+  const ok = await window.Trk.media.loadMedia(it.file, { title:it.title, onReady:() => restoreSongState(it) });
+  if (!ok || window.Trk.core.currentSong !== it) return;
   renderLib(); renderBanner(); updateSpBuilder(); renderSeedTools();
 }
 window.TrkSelectTutorialSong = async function() {
   const demo = builtInSongs.find(song => song.key === FIRST_SPARK_KEY);
-  if (!demo || phase !== "title") return false;
-  settings.libTab = "builtin"; saveUserPrefs(); renderLib();
+  if (!demo || window.Trk.core.phase !== "title") return false;
+  window.Trk.core.settings.libTab = "builtin"; window.Trk.core.saveUserPrefs(); renderLib();
   await selectSong(demo);
-  return !!(videoReady && currentSong && currentSong.key === FIRST_SPARK_KEY);
+  return !!(window.Trk.core.videoReady && window.Trk.core.currentSong && window.Trk.core.currentSong.key === FIRST_SPARK_KEY);
 };
 /* 解析後・譜面を作る前に呼ばれる。true を返すと自動生成を省略 */
 async function restoreSongState(it) {
-  if (currentSong !== it) return false;
-  const sp = songPrefs.byFp[fingerprint];
-  let bpm = settings.bpm, offset = settings.offset, seed = settings.seed, key = "songPrefsHint";
+  if (window.Trk.core.currentSong !== it) return false;
+  const sp = songPrefs.byFp[window.Trk.core.fingerprint];
+  let bpm = window.Trk.core.settings.bpm, offset = window.Trk.core.settings.offset, seed = window.Trk.core.settings.seed, key = "songPrefsHint";
   if (sp && sp.bpm) { bpm = sp.bpm; offset = sp.offset ?? 0; seed = sp.seed ?? seed; key = "songPrefsRestored"; }
   else if (it.bpm) { bpm = it.bpm; offset = it.offset ?? 0; key = "songPrefsPack"; }
-  $("bpm").value = bpm; $("offset").value = offset; $("seed").value = seed;
-  setStatus("songPrefsStatus", key);
-  refreshSeedSecrets(); syncPickers();
-  songPrefs.keyFp[it.key] = fingerprint; saveSongPrefsStore();
+  window.Trk.core.$("bpm").value = bpm; window.Trk.core.$("offset").value = offset; window.Trk.core.$("seed").value = seed;
+  window.Trk.core.setStatus("songPrefsStatus", key);
+  window.Trk.core.refreshSeedSecrets(); window.Trk.core.syncPickers();
+  songPrefs.keyFp[it.key] = window.Trk.core.fingerprint; saveSongPrefsStore();
   return trySongChart();
 }
 /* 曲パック・フォルダに、今の難易度の譜面があれば読み込む */
 async function trySongChart() {
-  const s = currentSong, d = settings.difficulty;
-  if (!s || !videoReady) return false;
+  const s = window.Trk.core.currentSong, d = window.Trk.core.settings.difficulty;
+  if (!s || !window.Trk.core.videoReady) return false;
   /* 🎼 trk!同梱のデモ譜面（初級・中級・上級）。無い難易度＝達人・RUSHは自動生成へ戻る */
   if (s.source === "builtin" && s.key === FIRST_SPARK_KEY && firstSparkChartMap[d]) {
     let data = null;
     try { data = await firstSparkChartData(d); } catch (_) {}
-    if (data && applyChartData(data, "custom", "importStatus", false)) { setStatus("importStatus", "builtinChartLoaded", { d:tr(d) }); return true; }
+    if (data && window.Trk.media.applyChartData(data, "custom", "importStatus", false)) { window.Trk.core.setStatus("importStatus", "builtinChartLoaded", { d:tr(d) }); return true; }
     return false;
   }
   if (s.chartBlobs && s.chartBlobs[d]) {
     let data = null; try { data = JSON.parse(await s.chartBlobs[d].text()); } catch (_) {}
-    if (data && applyChartData(data, "pack", "importStatus", false)) { setStatus("importStatus", "packChartLoaded", { d:tr(d) }); return true; }
+    if (data && window.Trk.media.applyChartData(data, "pack", "importStatus", false)) { window.Trk.core.setStatus("importStatus", "packChartLoaded", { d:tr(d) }); return true; }
   }
   if (s.charts && s.charts.length) {
     const lower = f => f.name.toLowerCase();
     const f = s.charts.find(x => lower(x).endsWith(`-${d}${CHART_SUFFIX}`)) || s.charts.find(x => lower(x) === (s.base + CHART_SUFFIX).toLowerCase());
-    if (f && await importChartFile(f)) { setStatus("libStatus", "libChartLoaded", { f:f.name }); return true; }
+    if (f && await window.Trk.media.importChartFile(f)) { window.Trk.core.setStatus("libStatus", "libChartLoaded", { f:f.name }); return true; }
   }
   return false;
 }
@@ -2581,36 +2593,36 @@ let radioTimer = 0, radioTick = 0;
 function cancelRadio() { clearTimeout(radioTimer); clearInterval(radioTick); radioTimer = radioTick = 0; }
 function nextSong() {
   const list = libView.length ? libView : allSongs(); if (!list.length) return null;
-  const i = currentSong ? list.findIndex(x => x.key === currentSong.key) : -1;
+  const i = window.Trk.core.currentSong ? list.findIndex(x => x.key === window.Trk.core.currentSong.key) : -1;
   return list[(i + 1) % list.length];
 }
 /* 📺 TVドックの ◀ から使う（前の曲。端は末尾へ回り込む。曲が無いときは null） */
 function prevSong() {
   const list = libView.length ? libView : allSongs(); if (!list.length) return null;
-  const i = currentSong ? Math.max(0, list.findIndex(x => x.key === currentSong.key)) : 0;
+  const i = window.Trk.core.currentSong ? Math.max(0, list.findIndex(x => x.key === window.Trk.core.currentSong.key)) : 0;
   return list[(i - 1 + list.length) % list.length];
 }
 async function radioGo(next) {
   cancelRadio();
-  if (phase !== "ended" || !settings.radio) return;
-  toTitle();
+  if (window.Trk.core.phase !== "ended" || !window.Trk.core.settings.radio) return;
+  window.Trk.play.toTitle();
   await selectSong(next);
-  if (phase === "title" && videoReady && chart.length && currentSong === next) startGame();
+  if (window.Trk.core.phase === "title" && window.Trk.core.videoReady && window.Trk.core.chart.length && window.Trk.core.currentSong === next) window.Trk.play.startGame();
 }
 on("screen", id => {
-  if (id !== "endScreen" || !settings.radio) return;
+  if (id !== "endScreen" || !window.Trk.core.settings.radio) return;
   const next = nextSong(); if (!next) return;
   cancelRadio();
   let n = RADIO_WAIT;
-  setStatus("endStatus", "radioNext", { t:next.title, n });
-  radioTick = setInterval(() => { n--; if (n > 0) setStatus("endStatus", "radioNext", { t:next.title, n }); }, 1000);
+  window.Trk.core.setStatus("endStatus", "radioNext", { t:next.title, n });
+  radioTick = setInterval(() => { n--; if (n > 0) window.Trk.core.setStatus("endStatus", "radioNext", { t:next.title, n }); }, 1000);
   radioTimer = setTimeout(() => radioGo(next), RADIO_WAIT * 1000);
 });
 on("phase", p => { if (p !== "ended") cancelRadio(); });   // もう一度・選曲へ戻ると止まる
 
 /* ---------- 追加した曲（ブラウザ内に保存） ---------- */
 async function addSongFiles(list) {
-  const files = Array.from(list || []).filter(f => MEDIA_EXT.includes(extOf(f.name)));
+  const files = Array.from(list || []).filter(f => MEDIA_EXT.includes(window.Trk.core.extOf(f.name)));
   if (!files.length) return;
   let first = null;
   for (const f of files) {
@@ -2647,7 +2659,7 @@ function probeVideoFile(file) {
       resolve(!!ok);
     };
     const check = () => { if (el.videoWidth > 0 && el.videoHeight > 0) finish(true); };
-    const looksLikeAudio = !VIDEO_EXT.includes(extOf(file.name)) && !/^video\//i.test(file.type || "");
+    const looksLikeAudio = !VIDEO_EXT.includes(window.Trk.core.extOf(file.name)) && !/^video\//i.test(file.type || "");
     const meta = () => {   /* 映像が無いと分かる形（音声ファイル）なら、待たずに終える */
       check();
       if (!done && looksLikeAudio && el.videoWidth === 0 && el.readyState >= 1) finish(false);
@@ -2662,18 +2674,18 @@ function probeVideoFile(file) {
   });
 }
 async function addVideoFiles(list) {
-  const files = Array.from(list || []).filter(f => f && (VIDEO_EXT.includes(extOf(f.name)) || /^video\//i.test(f.type || "") || MEDIA_EXT.includes(extOf(f.name))));
+  const files = Array.from(list || []).filter(f => f && (VIDEO_EXT.includes(window.Trk.core.extOf(f.name)) || /^video\//i.test(f.type || "") || MEDIA_EXT.includes(window.Trk.core.extOf(f.name))));
   if (!files.length) return;
   let first = null;
-  setStatus("libStatus", "libVideoProbe");
+  window.Trk.core.setStatus("libStatus", "libVideoProbe");
   for (let i = 0; i < files.length; i++) {
     const f = files[i], isVideo = await probeVideoFile(f);
-    if (files.length > 1) setStatus("libStatus", "libVideoProbeN", { i:i + 1, n:files.length, name:f.name });
+    if (files.length > 1) window.Trk.core.setStatus("libStatus", "libVideoProbeN", { i:i + 1, n:files.length, name:f.name });
     const it = addedItem(f, isVideo), at = addedSongs.findIndex(x => x.key === it.key);
     if (at >= 0) addedSongs.splice(at, 1);
     addedSongs.unshift(it); first = first || it;
     songDB.put(it.key, { key:it.key, file:f, name:f.name, addedAt:Date.now(), video:isVideo }).catch(() => {});
-    setStatus("libStatus", isVideo ? "libVideoYes" : "libVideoNo", { name:f.name });
+    window.Trk.core.setStatus("libStatus", isVideo ? "libVideoYes" : "libVideoNo", { name:f.name });
   }
   while (addedSongs.length > ADDED_MAX) { const x = addedSongs.pop(); songDB.del(x.key).catch(() => {}); }
   renderLib();
@@ -2684,8 +2696,8 @@ async function addVideoFiles(list) {
   let waited = 0;
   const openWhenReady = () => {
     if (!window.TrkVideoMax || typeof window.TrkVideoMax.open !== "function") return;
-    if (typeof videoReady !== "undefined" && (videoReady || waited >= 8000)) {
-      try { if (window.TrkVideoMax.open()) setStatus("libStatus", "libVideoWatch"); } catch (_) {}
+    if (typeof videoReady !== "undefined" && (window.Trk.core.videoReady || waited >= 8000)) {
+      try { if (window.TrkVideoMax.open()) window.Trk.core.setStatus("libStatus", "libVideoWatch"); } catch (_) {}
       return;
     }
     waited += 300; setTimeout(openWhenReady, 300);
@@ -2700,7 +2712,7 @@ function removeAdded(it) {
 
 /* ---------- 曲パックの曲 ---------- */
 async function refreshPackSongs() {
-  try { packSongs = (await getPackSongs()).map(packItem); } catch (e) { console.error(e); packSongs = []; }
+  try { packSongs = (await window.Trk.custom.getPackSongs()).map(packItem); } catch (e) { console.error(e); packSongs = []; }
   renderLib();
 }
 on("packsChanged", refreshPackSongs);
@@ -2720,15 +2732,15 @@ function ingestFolder(list, dirName, shared, skipped) {
     if (lower.endsWith(CHART_SUFFIX)) {
       const base = file.name.slice(0, -CHART_SUFFIX.length).replace(/-(easy|normal|hard|master|rush)$/i, "");
       (charts[dir + "/" + base] ||= []).push(file);
-    } else if (MEDIA_EXT.includes(extOf(file.name)) && folderSongs.length < LIB_MAX) {
-      const base = baseName(file.name);
+    } else if (MEDIA_EXT.includes(window.Trk.core.extOf(file.name)) && folderSongs.length < LIB_MAX) {
+      const base = window.Trk.core.baseName(file.name);
       folderSongs.push({ key:`${file.size}|${base}`, source:"folder", file, title:base, base, size:file.size, dir });
     }
   }
   for (const it of folderSongs) it.charts = charts[it.dir + "/" + it.base] || null;
   /* 📤 共有のときは「何曲きたか」と「対象外が何件あったか」を両方出す（変なファイルも見て分かるように） */
-  if (shared) setStatus("libStatus", "libShareFound", { dir:dirName || "", n:folderSongs.length, skip:skipped || 0 });
-  else setStatus("libStatus", folderSongs.length ? "libFound" : "libEmpty", { n:folderSongs.length, dir:dirName || "" });
+  if (shared) window.Trk.core.setStatus("libStatus", "libShareFound", { dir:dirName || "", n:folderSongs.length, skip:skipped || 0 });
+  else window.Trk.core.setStatus("libStatus", folderSongs.length ? "libFound" : "libEmpty", { n:folderSongs.length, dir:dirName || "" });
   renderLib();
 }
 /* フォルダの中を歩く。読み込んだ曲数は onProgress に出す（大きなフォルダでも待てるように） */
@@ -2739,7 +2751,7 @@ async function scanHandle(h, onProgress) {
     for await (const e of dir.values()) {
       if (e.kind === "file") {
         const n = e.name.toLowerCase();
-        if (MEDIA_EXT.includes(extOf(n)) || n.endsWith(CHART_SUFFIX)) {
+        if (MEDIA_EXT.includes(window.Trk.core.extOf(n)) || n.endsWith(CHART_SUFFIX)) {
           files.push({ file:await e.getFile(), rel:`${path}/${e.name}` });
           if (onProgress && !(files.length % 25)) onProgress(files.length);
         } else skipped++;                       /* 曲でも譜面でもないファイル（写真・テキストなど） */
@@ -2751,27 +2763,27 @@ async function scanHandle(h, onProgress) {
 }
 async function useHandle(h, remember, shared) {
   libShared = !!shared;
-  setStatus("libStatus", shared ? "libShareScanning" : "libScanning", { n:0 });
+  window.Trk.core.setStatus("libStatus", shared ? "libShareScanning" : "libScanning", { n:0 });
   try {
-    const r = await scanHandle(h, n => setStatus("libStatus", shared ? "libShareScanning" : "libScanning", { n }));
+    const r = await scanHandle(h, n => window.Trk.core.setStatus("libStatus", shared ? "libShareScanning" : "libScanning", { n }));
     libHandle = h; lastScan = r.files;
     ingestFolder(r.files, h.name, libShared, r.skipped);
     if (remember) { libKV.put(shared ? "share" : "dir", h).catch(() => {}); if (shared) shareRemembered = true; }
-    $("libReconnectBtn").hidden = true; $("libRescanBtn").hidden = false;
-    if (shared && settings.libKeepShared) await keepSharedSongs(r.files);
+    window.Trk.core.$("libReconnectBtn").hidden = true; window.Trk.core.$("libRescanBtn").hidden = false;
+    if (shared && window.Trk.core.settings.libKeepShared) await keepSharedSongs(r.files);
     syncShareUI();
-  } catch (e) { console.error(e); setStatus("libStatus", shared ? "libShareDenied" : "libDenied"); }
+  } catch (e) { console.error(e); window.Trk.core.setStatus("libStatus", shared ? "libShareDenied" : "libDenied"); }
 }
 async function openFolder() {
   dirInputMode = "open";
-  if (!canPickDir) { $("libDirInput").click(); return; }
+  if (!canPickDir) { window.Trk.core.$("libDirInput").click(); return; }
   try { await useHandle(await showDirectoryPicker({ id:"trk-music", mode:"read", startIn:"music" }), true, false); }
-  catch (e) { if (e.name !== "AbortError") { console.error(e); $("libDirInput").click(); } }
+  catch (e) { if (e.name !== "AbortError") { console.error(e); window.Trk.core.$("libDirInput").click(); } }
 }
 /* 📤 ミュージックフォルダを共有：端末に1回許可してもらうと、中身のリストをぜんぶ引き受けます */
 async function shareMusicFolder() {
   dirInputMode = "share";
-  if (!canPickDir) { setStatus("libShareStatus", "libShareUnsupported"); $("libDirInput").click(); return; }
+  if (!canPickDir) { window.Trk.core.setStatus("libShareStatus", "libShareUnsupported"); window.Trk.core.$("libDirInput").click(); return; }
   try {
     /* startIn:"music" で、端末のミュージックフォルダを最初から開きます（スマホは SAF のフォルダ選びになります） */
     const h = await showDirectoryPicker({ id:"trk-music-share", mode:"read", startIn:"music" });
@@ -2779,8 +2791,8 @@ async function shareMusicFolder() {
   } catch (e) {
     if (e.name === "AbortError") { dirInputMode = "open"; return; }   /* キャンセルは何もしない */
     console.error(e);
-    setStatus("libStatus", "libShareDenied"); setStatus("libShareStatus", "libShareUnsupported");
-    $("libDirInput").click();
+    window.Trk.core.setStatus("libStatus", "libShareDenied"); window.Trk.core.setStatus("libShareStatus", "libShareUnsupported");
+    window.Trk.core.$("libDirInput").click();
   }
 }
 /* 🚫 共有をやめる：覚えた許可と、端末に残した曲をぜんぶ消します */
@@ -2795,19 +2807,19 @@ async function stopSharing() {
   await clearSharedSongs();
   if (libShared) {
     folderSongs = []; libHandle = null; libShared = false; lastScan = [];
-    $("libReconnectBtn").hidden = true; $("libRescanBtn").hidden = true;
+    window.Trk.core.$("libReconnectBtn").hidden = true; window.Trk.core.$("libRescanBtn").hidden = true;
   }
   renderLib(); syncShareUI();
-  setStatus("libShareStatus", "libShareStopped");
+  window.Trk.core.setStatus("libShareStatus", "libShareStopped");
 }
 function showReconnect() {
-  const b = $("libReconnectBtn");
+  const b = window.Trk.core.$("libReconnectBtn");
   if (libHandle && b && !b.hidden) b.textContent = tr(libShared ? "libShareResume" : "libReconnect", { name:libHandle.name });
 }
 
 /* ---------- 💾 共有した曲を端末に残す（settings.libKeepShared） ---------- */
 function sharedItem(r) {
-  const f = r.file instanceof File ? r.file : new File([r.file], r.name || "song"), base = baseName(f.name);
+  const f = r.file instanceof File ? r.file : new File([r.file], r.name || "song"), base = window.Trk.core.baseName(f.name);
   return { key:`${f.size}|${base}`, source:"folder", shared:true, file:f, title:base, base, size:f.size, dir:r.dir || "", charts:null };
 }
 async function loadSharedSongs() {
@@ -2838,25 +2850,25 @@ async function keepSharedSongs(list) {
   } catch (_) {}
   let n = have.size;
   for (const { file, rel } of list || []) {
-    if (!MEDIA_EXT.includes(extOf(file.name))) continue;
-    const dir = rel.includes("/") ? rel.slice(0, rel.lastIndexOf("/")) : "", key = `${file.size}|${baseName(file.name)}`;
+    if (!MEDIA_EXT.includes(window.Trk.core.extOf(file.name))) continue;
+    const dir = rel.includes("/") ? rel.slice(0, rel.lastIndexOf("/")) : "", key = `${file.size}|${window.Trk.core.baseName(file.name)}`;
     if (have.has(key)) continue;
     if (n >= SHARED_MAX || bytes + file.size > SHARED_BYTES) { why = "full"; break; }
     try { await sharedDB.put(key, { key, file, name:file.name, dir, addedAt:Date.now() }); }
     catch (e) { console.error(e); why = "failed"; break; }            /* 空き容量が足りない（QuotaExceededError など） */
     have.set(key, file.size); n++; bytes += file.size; saved++;
-    if (!(saved % 10)) setStatus("libShareStatus", "libKeepSharedSaving", { n:saved });
+    if (!(saved % 10)) window.Trk.core.setStatus("libShareStatus", "libKeepSharedSaving", { n:saved });
   }
   await loadSharedSongs();
   renderLib();
-  setStatus("libShareStatus", why === "failed" ? "libKeepSharedFailed" : why === "full" ? "libKeepSharedFull" : "libKeepSharedSaved",
+  window.Trk.core.setStatus("libShareStatus", why === "failed" ? "libKeepSharedFailed" : why === "full" ? "libKeepSharedFull" : "libKeepSharedSaved",
     { n, max:SHARED_MAX, mb:SHARED_MB });
   return n;
 }
 /* 設定パネル「📤 ミュージックフォルダの共有」の中身を、いまの状態に合わせます */
 function syncShareUI() {
-  const chk = $("libKeepSharedChk"), hint = $("libKeepSharedHint"), state = $("libShareState"), stop = $("libShareStopBtn");
-  if (chk) chk.checked = !!settings.libKeepShared;
+  const chk = window.Trk.core.$("libKeepSharedChk"), hint = window.Trk.core.$("libKeepSharedHint"), state = window.Trk.core.$("libShareState"), stop = window.Trk.core.$("libShareStopBtn");
+  if (chk) chk.checked = !!window.Trk.core.settings.libKeepShared;
   if (hint) hint.textContent = tr("libKeepSharedHint", { max:SHARED_MAX, mb:SHARED_MB });
   const sharing = !!libHandle && libShared;
   if (state) state.textContent = sharing ? tr("libShareStateShared", { name:libHandle.name, n:folderSongs.length })
@@ -2865,150 +2877,150 @@ function syncShareUI() {
   showReconnect();
 }
 function syncTrkUI() {
-  const chk = $("trkPlaylistChk");
-  if (chk) chk.checked = settings.trkPlaylist !== false;
-  const st = $("trkStatus");
+  const chk = window.Trk.core.$("trkPlaylistChk");
+  if (chk) chk.checked = window.Trk.core.settings.trkPlaylist !== false;
+  const st = window.Trk.core.$("trkStatus");
   if (st) {
-    const tp = settings.playlists.find(function(p){ return p.id === TRK_PLAYLIST_ID; });
-    if (settings.trkPlaylist === false) st.textContent = tr("trkHide") + " \u2014 " + tr("trkPanelHint");
+    const tp = window.Trk.core.settings.playlists.find(function(p){ return p.id === TRK_PLAYLIST_ID; });
+    if (window.Trk.core.settings.trkPlaylist === false) st.textContent = tr("trkHide") + " \u2014 " + tr("trkPanelHint");
     else if (tp) st.textContent = tr("trkPlaylistTitle") + " \u00B7 " + tr("plSongsNow", { n: (tp.songs.length + (tp.wish ? tp.wish.length : 0)) });
     else st.textContent = tr("trkPlaylistHint");
   }
-  const chkC = $("trkClassicChk");
-  if (chkC) chkC.checked = settings.trkClassic !== false;
-  const stC = $("trkClassicStatus");
+  const chkC = window.Trk.core.$("trkClassicChk");
+  if (chkC) chkC.checked = window.Trk.core.settings.trkClassic !== false;
+  const stC = window.Trk.core.$("trkClassicStatus");
   if (stC) {
-    const tc = settings.playlists.find(function(p){ return p.id === TRK_CLASSIC_ID; });
-    if (settings.trkClassic === false) stC.textContent = tr("trkClassicHide") + " \u2014 " + tr("trkClassicPanelHint");
+    const tc = window.Trk.core.settings.playlists.find(function(p){ return p.id === TRK_CLASSIC_ID; });
+    if (window.Trk.core.settings.trkClassic === false) stC.textContent = tr("trkClassicHide") + " \u2014 " + tr("trkClassicPanelHint");
     else if (tc) stC.textContent = tr("trkClassicTitle") + " \u00B7 " + tr("plSongsNow", { n: (tc.songs.length + (tc.wish ? tc.wish.length : 0)) });
     else stC.textContent = tr("trkClassicHint");
   }
-  const nameSel = $("trkTabNameSel");
+  const nameSel = window.Trk.core.$("trkTabNameSel");
   if (nameSel) nameSel.value = trkNameMode();
-  const chkAbc = $("trkSortAbcChk");
-  if (chkAbc) chkAbc.checked = !!settings.trkSortABC;
+  const chkAbc = window.Trk.core.$("trkSortAbcChk");
+  if (chkAbc) chkAbc.checked = !!window.Trk.core.settings.trkSortABC;
   try { renderTrkSettings(); } catch(_){}
 }
 function trkFolderIdSet() { return plWishFolderIds(TRK_FOLDER_ID); }   /* 🐔 の階層に入るフォルダ（trk 自身と、その子孫） */
 function renderTrkSettings() {
-  const box = $("trkOrderList");
+  const box = window.Trk.core.$("trkOrderList");
   if (!box) return;
   box.replaceChildren();
   const ids = trkFolderIdSet();
-  const trkList = settings.playlists.filter(p => ids.has(p.folder));
+  const trkList = window.Trk.core.settings.playlists.filter(p => ids.has(p.folder));
   if (!trkList.length) { box.append(el("div", "hint", tr("trkOrderEmpty"))); return; }
   for (const p of trkOrderedPlaylists(trkList)) {
     const row = el("div", "plTrkRow"); row.style.cssText = "border:1px solid var(--ui-border);border-radius:10px;padding:6px 8px";
     const name = el("span", "", (p.icon || "\uD83C\uDFA7") + " " + p.name);
     const open = el("button", "plBtn small", tr("trkOpenItem")); open.type = "button";
-    open.addEventListener("click", () => { settings.libTab = "pl:" + p.id; saveUserPrefs(); renderLib(); });
+    open.addEventListener("click", () => { window.Trk.core.settings.libTab = "pl:" + p.id; window.Trk.core.saveUserPrefs(); renderLib(); });
     const up = el("button", "plBtn small", "\u2191"); up.type = "button"; up.title = tr("trkMoveUp"); up.setAttribute("aria-label", tr("trkMoveUp") + " " + p.name);
     const down = el("button", "plBtn small", "\u2193"); down.type = "button"; down.title = tr("trkMoveDown"); down.setAttribute("aria-label", tr("trkMoveDown") + " " + p.name);
-    if (settings.trkSortABC) { up.disabled = true; down.disabled = true; up.style.opacity = ".45"; down.style.opacity = ".45"; }
+    if (window.Trk.core.settings.trkSortABC) { up.disabled = true; down.disabled = true; up.style.opacity = ".45"; down.style.opacity = ".45"; }
     up.addEventListener("click", () => trkMovePlaylist(p.id, -1));
     down.addEventListener("click", () => trkMovePlaylist(p.id, 1));
     row.append(name, open, up, down);
     box.append(row);
   }
-  if (settings.trkSortABC) box.append(el("div", "hint", tr("trkOrderAbcOff")));
+  if (window.Trk.core.settings.trkSortABC) box.append(el("div", "hint", tr("trkOrderAbcOff")));
 }
 
 
 /* ---------- ボタンの配線（📁 開く と 📤 共有 はならべて残します） ---------- */
-const libOpenBtn = $("libOpenBtn"); if (libOpenBtn) libOpenBtn.addEventListener("click", openFolder);
-const libShareBtn = $("libShareBtn"); if (libShareBtn) libShareBtn.addEventListener("click", shareMusicFolder);
-const libShareSettingsBtn = $("libShareSettingsBtn"); if (libShareSettingsBtn) libShareSettingsBtn.addEventListener("click", shareMusicFolder);
-const libShareStopBtn = $("libShareStopBtn"); if (libShareStopBtn) libShareStopBtn.addEventListener("click", stopSharing);
-const trkMusicFolderBtn = $("trkMusicFolderBtn");
+const libOpenBtn = window.Trk.core.$("libOpenBtn"); if (libOpenBtn) libOpenBtn.addEventListener("click", openFolder);
+const libShareBtn = window.Trk.core.$("libShareBtn"); if (libShareBtn) libShareBtn.addEventListener("click", shareMusicFolder);
+const libShareSettingsBtn = window.Trk.core.$("libShareSettingsBtn"); if (libShareSettingsBtn) libShareSettingsBtn.addEventListener("click", shareMusicFolder);
+const libShareStopBtn = window.Trk.core.$("libShareStopBtn"); if (libShareStopBtn) libShareStopBtn.addEventListener("click", stopSharing);
+const trkMusicFolderBtn = window.Trk.core.$("trkMusicFolderBtn");
 if (trkMusicFolderBtn) trkMusicFolderBtn.addEventListener("click", openFolder);   /* 📁 自分で作った Music/trk を読み取り専用で選ぶ */
-const trkChk = $("trkPlaylistChk");
+const trkChk = window.Trk.core.$("trkPlaylistChk");
 if (trkChk) trkChk.addEventListener("change", function(){
-  settings.trkPlaylist = !!trkChk.checked; saveUserPrefs();
-  if (settings.trkPlaylist) try { ensureTrkPlaylist({ toast: false }); } catch(_){}
+  window.Trk.core.settings.trkPlaylist = !!trkChk.checked; window.Trk.core.saveUserPrefs();
+  if (window.Trk.core.settings.trkPlaylist) try { ensureTrkPlaylist({ toast: false }); } catch(_){}
   syncTrkUI(); renderLib();
-  setStatus("trkStatus", settings.trkPlaylist ? "trkShow" : "trkHide");
+  window.Trk.core.setStatus("trkStatus", window.Trk.core.settings.trkPlaylist ? "trkShow" : "trkHide");
 });
-const trkAbcChk = $("trkSortAbcChk");
+const trkAbcChk = window.Trk.core.$("trkSortAbcChk");
 if (trkAbcChk) trkAbcChk.addEventListener("change", function(){
-  settings.trkSortABC = !!trkAbcChk.checked; saveUserPrefs();
+  window.Trk.core.settings.trkSortABC = !!trkAbcChk.checked; window.Trk.core.saveUserPrefs();
   syncTrkUI(); renderLib();
 });
 /* 🐔 タブの表示名（3種類）。名前と色そのものは固定なので、選べるのは表示だけ */
-const trkNameSel = $("trkTabNameSel");
+const trkNameSel = window.Trk.core.$("trkTabNameSel");
 if (trkNameSel) trkNameSel.addEventListener("change", function(){
-  settings.trkTabName = TRK_TAB_NAME_MODES.includes(trkNameSel.value) ? trkNameSel.value : "full";
-  saveUserPrefs(); syncTrkUI(); renderLib();
+  window.Trk.core.settings.trkTabName = TRK_TAB_NAME_MODES.includes(trkNameSel.value) ? trkNameSel.value : "full";
+  window.Trk.core.saveUserPrefs(); syncTrkUI(); renderLib();
 });
-const trkOpenBtn = $("trkOpenBtn");
+const trkOpenBtn = window.Trk.core.$("trkOpenBtn");
 if (trkOpenBtn) trkOpenBtn.addEventListener("click", function(){
   const created = ensureTrkPlaylist({ toast: true });
-  settings.libTab = "pl:" + TRK_PLAYLIST_ID; saveUserPrefs(); renderLib();
+  window.Trk.core.settings.libTab = "pl:" + TRK_PLAYLIST_ID; window.Trk.core.saveUserPrefs(); renderLib();
   if (!created) plToast(tr("trkDup"));
 });
-const trkHideBtn = $("trkHideBtn");
+const trkHideBtn = window.Trk.core.$("trkHideBtn");
 if (trkHideBtn) trkHideBtn.addEventListener("click", function(){
-  settings.trkPlaylist = false; saveUserPrefs(); syncTrkUI(); renderLib(); plToast(tr("trkHide"));
+  window.Trk.core.settings.trkPlaylist = false; window.Trk.core.saveUserPrefs(); syncTrkUI(); renderLib(); plToast(tr("trkHide"));
 });
-const trkClassicChk = $("trkClassicChk");
+const trkClassicChk = window.Trk.core.$("trkClassicChk");
 if (trkClassicChk) trkClassicChk.addEventListener("change", function(){
-  settings.trkClassic = !!trkClassicChk.checked; saveUserPrefs();
-  if (settings.trkClassic) try { ensureTrkClassicPlaylist({ toast: false }); } catch(_){}
+  window.Trk.core.settings.trkClassic = !!trkClassicChk.checked; window.Trk.core.saveUserPrefs();
+  if (window.Trk.core.settings.trkClassic) try { ensureTrkClassicPlaylist({ toast: false }); } catch(_){}
   syncTrkUI(); renderLib();
-  setStatus("trkClassicStatus", settings.trkClassic ? "trkClassicShow" : "trkClassicHide");
+  window.Trk.core.setStatus("trkClassicStatus", window.Trk.core.settings.trkClassic ? "trkClassicShow" : "trkClassicHide");
 });
-const trkClassicOpenBtn = $("trkClassicOpenBtn");
+const trkClassicOpenBtn = window.Trk.core.$("trkClassicOpenBtn");
 if (trkClassicOpenBtn) trkClassicOpenBtn.addEventListener("click", function(){
   const created = ensureTrkClassicPlaylist({ toast: true });
-  settings.libTab = "pl:" + TRK_CLASSIC_ID; saveUserPrefs(); renderLib();
+  window.Trk.core.settings.libTab = "pl:" + TRK_CLASSIC_ID; window.Trk.core.saveUserPrefs(); renderLib();
   if (!created) plToast(tr("trkClassicDup"));
 });
-const trkClassicHideBtn = $("trkClassicHideBtn");
+const trkClassicHideBtn = window.Trk.core.$("trkClassicHideBtn");
 if (trkClassicHideBtn) trkClassicHideBtn.addEventListener("click", function(){
-  settings.trkClassic = false; saveUserPrefs(); syncTrkUI(); renderLib(); plToast(tr("trkClassicHide"));
+  window.Trk.core.settings.trkClassic = false; window.Trk.core.saveUserPrefs(); syncTrkUI(); renderLib(); plToast(tr("trkClassicHide"));
 });
 if (typeof on === "function") on("language", syncTrkUI);
-const libKeepChk = $("libKeepSharedChk");
+const libKeepChk = window.Trk.core.$("libKeepSharedChk");
 if (libKeepChk) libKeepChk.addEventListener("change", async () => {
-  settings.libKeepShared = !!libKeepChk.checked; saveUserPrefs();
-  if (settings.libKeepShared) {
+  window.Trk.core.settings.libKeepShared = !!libKeepChk.checked; window.Trk.core.saveUserPrefs();
+  if (window.Trk.core.settings.libKeepShared) {
     if (lastScan.length) await keepSharedSongs(lastScan);
-    else setStatus("libShareStatus", "libKeepSharedNone");            /* まだ共有していない */
+    else window.Trk.core.setStatus("libShareStatus", "libKeepSharedNone");            /* まだ共有していない */
   } else {
     await clearSharedSongs(); renderLib();
-    setStatus("libShareStatus", "libKeepSharedCleared");
+    window.Trk.core.setStatus("libShareStatus", "libKeepSharedCleared");
   }
   syncShareUI();
 });
-$("libRescanBtn").addEventListener("click", () => {
+window.Trk.core.$("libRescanBtn").addEventListener("click", () => {
   if (libHandle) useHandle(libHandle, false, libShared);
-  else { dirInputMode = libShared ? "share" : "open"; $("libDirInput").click(); }
+  else { dirInputMode = libShared ? "share" : "open"; window.Trk.core.$("libDirInput").click(); }
 });
-$("libDirInput").addEventListener("change", e => {
+window.Trk.core.$("libDirInput").addEventListener("change", e => {
   const list = Array.from(e.target.files || []).map(f => ({ file:f, rel:f.webkitRelativePath || f.name }));
   e.target.value = "";
   if (!list.length) return;
   const shared = dirInputMode === "share"; dirInputMode = "open";
-  const skipped = list.filter(({ file }) => !MEDIA_EXT.includes(extOf(file.name)) && !file.name.toLowerCase().endsWith(CHART_SUFFIX)).length;
-  libShared = shared; libHandle = null; lastScan = list; $("libRescanBtn").hidden = false;
+  const skipped = list.filter(({ file }) => !MEDIA_EXT.includes(window.Trk.core.extOf(file.name)) && !file.name.toLowerCase().endsWith(CHART_SUFFIX)).length;
+  libShared = shared; libHandle = null; lastScan = list; window.Trk.core.$("libRescanBtn").hidden = false;
   ingestFolder(list, list[0].rel.split("/")[0] || "", shared, skipped);
-  if (shared && settings.libKeepShared) keepSharedSongs(list);
+  if (shared && window.Trk.core.settings.libKeepShared) keepSharedSongs(list);
   syncShareUI();
 });
-$("libReconnectBtn").addEventListener("click", async () => {
+window.Trk.core.$("libReconnectBtn").addEventListener("click", async () => {
   if (!libHandle) return;
   try {
     let p = await libHandle.queryPermission({ mode:"read" });
     if (p !== "granted") p = await libHandle.requestPermission({ mode:"read" });
-    if (p !== "granted") { setStatus("libStatus", libShared ? "libShareDenied" : "libDenied"); return; }
+    if (p !== "granted") { window.Trk.core.setStatus("libStatus", libShared ? "libShareDenied" : "libDenied"); return; }
     await useHandle(libHandle, false, libShared);
-  } catch (e) { console.error(e); setStatus("libStatus", libShared ? "libShareDenied" : "libDenied"); }
+  } catch (e) { console.error(e); window.Trk.core.setStatus("libStatus", libShared ? "libShareDenied" : "libDenied"); }
 });
 
 /* ---------- 検索・並べ替え・ランダム ---------- */
 let libSearchTimer = 0;
-$("libSearch").addEventListener("input", () => { clearTimeout(libSearchTimer); libSearchTimer = setTimeout(renderLib, 150); });
-$("libSort").addEventListener("change", e => { settings.libSort = e.target.value; saveUserPrefs(); renderLib(); });
-$("libRandomBtn").addEventListener("click", () => {
+window.Trk.core.$("libSearch").addEventListener("input", () => { clearTimeout(libSearchTimer); libSearchTimer = setTimeout(renderLib, 150); });
+window.Trk.core.$("libSort").addEventListener("change", e => { window.Trk.core.settings.libSort = e.target.value; window.Trk.core.saveUserPrefs(); renderLib(); });
+window.Trk.core.$("libRandomBtn").addEventListener("click", () => {
   /* 🎲 おまかせ：いまの一覧 ＋ 📌ピンの曲（ほかのタブにいても、必ず候補に入る）
      ＝ 曲名バナーの🎲（長押し／タップ）と同じ抽選を使う */
   const it = randomSongPick();
@@ -3019,21 +3031,21 @@ on("records", renderLib);
 on("chart", updateSpBuilder);
 // 書斎で曲のジャケットを割り当て直したら、いま流している曲だけ即座に背景へ反映する。
 on("studyCoverChanged", key => {
-  const song = currentSong;
+  const song = window.Trk.core.currentSong;
   if (!song || key !== song.key || !window.TrkStudyRoom || typeof window.TrkStudyRoom.getSongCoverBlob !== "function") return;
   window.TrkStudyRoom.getSongCoverBlob(key).then(blob => {
-    if (currentSong === song) return setBackground(blob || song.bgBlob || null);
+    if (window.Trk.core.currentSong === song) return window.Trk.media.setBackground(blob || song.bgBlob || null);
   }).catch(() => {});
 });
-on("language", () => { $("libSearch").placeholder = tr("libSearch"); showReconnect(); syncShareUI(); syncTrkUI(); renderLib(); renderBanner(); syncVideoButton(); });
+on("language", () => { window.Trk.core.$("libSearch").placeholder = tr("libSearch"); showReconnect(); syncShareUI(); syncTrkUI(); renderLib(); renderBanner(); syncVideoButton(); });
 /* 🎬 「動画を読み込む」の説明（通常より時間がかかります）をボタンに付ける */
-function syncVideoButton() { const label = $("libVideoLabel"); if (label) label.title = tr("libAddVideoHint"); }
+function syncVideoButton() { const label = window.Trk.core.$("libVideoLabel"); if (label) label.title = tr("libAddVideoHint"); }
 
 /* ---------- 起動時（main.js から呼びます） ---------- */
 async function initLibrary() {
-  $("libSort").value = settings.libSort;
-  $("previewEnabled").checked = settings.previewEnabled;
-  $("libSearch").placeholder = tr("libSearch");
+  window.Trk.core.$("libSort").value = window.Trk.core.settings.libSort;
+  window.Trk.core.$("previewEnabled").checked = window.Trk.core.settings.previewEnabled;
+  window.Trk.core.$("libSearch").placeholder = tr("libSearch");
   syncVideoButton();
   renderBanner(); renderSeedTools();
   try {
@@ -3050,26 +3062,26 @@ async function initLibrary() {
       const h = hs || hd;
       if (h && h.kind === "directory") {
         libHandle = h; libShared = !!hs; shareRemembered = !!hs;
-        $("libReconnectBtn").hidden = false; showReconnect();
+        window.Trk.core.$("libReconnectBtn").hidden = false; showReconnect();
       }
     } catch (_) {}
-  } else setStatus("libStatus", "libFallbackNote");
+  } else window.Trk.core.setStatus("libStatus", "libFallbackNote");
   /* 💾 端末に残した共有の曲（?safe=1 では読み戻しません） */
-  if (settings.libKeepShared && !(window.TrkSafeMode && TrkSafeMode())) {
+  if (window.Trk.core.settings.libKeepShared && !(window.TrkSafeMode && TrkSafeMode())) {
     await loadSharedSongs();
-    if (sharedSongs.length) setStatus("libStatus", "libKeepSharedRestored", { n:sharedSongs.length });
+    if (sharedSongs.length) window.Trk.core.setStatus("libStatus", "libKeepSharedRestored", { n:sharedSongs.length });
   }
   syncShareUI();
   // 🐔 trk's playlist — チュートリアル済みなら初回だけ自動で1タブ追加（設定で非表示なら作らない・トーストなし）
-  if (settings.tutorialDone && settings.trkPlaylist !== false) {
+  if (window.Trk.core.settings.tutorialDone && window.Trk.core.settings.trkPlaylist !== false) {
     try { ensureTrkPlaylist({ toast: false }); } catch(_){}
   }
   // 🎻 trk classic — 同上。ゲームとは別枠で100曲。設定で非表示なら作らない
-  if (settings.tutorialDone && settings.trkClassic !== false) {
+  if (window.Trk.core.settings.tutorialDone && window.Trk.core.settings.trkClassic !== false) {
     try { ensureTrkClassicPlaylist({ toast: false }); } catch(_){}
   }
   // 配布形態で分類: 各タイトル別 Vol を作る（長押しで開くリスト）
-  if (settings.tutorialDone) {
+  if (window.Trk.core.settings.tutorialDone) {
     try { ensureTrkDistributionPlaylists(); } catch(_){}
   }
   syncTrkUI();
@@ -3077,3 +3089,40 @@ async function initLibrary() {
   void initOptionalTutorialDemo();
 }
 /* ✅ library.js 完了 */
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.LIB_SHOW = LIB_SHOW;
+window.addSongFiles = addSongFiles;
+window.addVideoFiles = addVideoFiles;
+Object.defineProperty(window, "addonSongs", { configurable:true, get:() => addonSongs, set:v => { addonSongs = v; } });
+window.allSongs = allSongs;
+window.bannerRandomBtn = bannerRandomBtn;
+window.bannerVolTip = bannerVolTip;
+window.ensureTrkDistributionPlaylists = ensureTrkDistributionPlaylists;
+window.initLibrary = initLibrary;
+Object.defineProperty(window, "libView", { configurable:true, get:() => libView, set:v => { libView = v; } });
+window.nextSong = nextSong;
+window.onLongPress = onLongPress;
+window.plToast = plToast;
+window.prevSong = prevSong;
+window.previewStartFor = previewStartFor;
+window.refreshPackSongs = refreshPackSongs;
+/* 後から読み込まれるファイルがこの名前を差し替える（window.renderBanner の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "renderBanner", { configurable:true, get:() => renderBanner, set:v => { renderBanner = v; } });
+/* 後から読み込まれるファイルがこの名前を差し替える（window.renderLib の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */
+Object.defineProperty(window, "renderLib", { configurable:true, get:() => renderLib, set:v => { renderLib = v; } });
+window.saveSongPrefs = saveSongPrefs;
+window.selectSong = selectSong;
+window.setAddonSongs = setAddonSongs;
+window.songInfo = songInfo;
+window.srcLabel = srcLabel;
+window.startPreview = startPreview;
+window.trySongChart = trySongChart;
+/* 領域（window.Trk.library）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
+window.Trk = window.Trk || {};
+window.Trk.library = Object.assign(window.Trk.library || {}, { LIB_SHOW, addSongFiles, addVideoFiles, allSongs, bannerRandomBtn, bannerVolTip, ensureTrkDistributionPlaylists, initLibrary, nextSong, onLongPress, plToast, prevSong, previewStartFor, refreshPackSongs, saveSongPrefs, selectSong, setAddonSongs, songInfo, srcLabel, startPreview, trySongChart, plTitleKeys, plSongMatchKeys, plWishTitleKeys });
+Object.defineProperty(window.Trk.library, "addonSongs", { configurable:true, get:() => addonSongs, set:v => { addonSongs = v; } });
+Object.defineProperty(window.Trk.library, "libView", { configurable:true, get:() => libView, set:v => { libView = v; } });
+Object.defineProperty(window.Trk.library, "renderBanner", { configurable:true, get:() => renderBanner, set:v => { renderBanner = v; } });
+Object.defineProperty(window.Trk.library, "renderLib", { configurable:true, get:() => renderLib, set:v => { renderLib = v; } });
+})();

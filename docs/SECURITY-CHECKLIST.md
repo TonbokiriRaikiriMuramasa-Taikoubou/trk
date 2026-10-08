@@ -23,7 +23,7 @@
 | 6 | **JavaScript Drift**（読み込むコードが知らぬ間に変わる） | ✅ | 第三者コードは**リポジトリに入っている**ので、変われば git の差分として必ず見えます。加えて `check-vendor` がハッシュ・相対importの解決・import map の被覆を毎回検査（来歴の確認は `check:vendor:npm`） |
 | 7 | **Sensitive Data Stored Client-Side** | ✅ | 保存するのは設定・スコア・プレイリスト・パック・書斎の本・VRM/MMDモデル・フォルダのハンドル。**パスワード・トークン・APIキー・個人情報は保存しません**（そもそも持ちません）。端末を触れる人はブラウザのストレージから読める、が正直なところで `privacy.html` に明記 |
 | 8 | **Client-side Security Logging and Monitoring Failures** | 🟡 | 送信型のログ・監視は**ありません**（オフラインで完結するゲームなので、送る先が無い＝プライバシー優先）。異常は画面の表示とコンソールで確認。監視が要るなら有料の外部サービスが必要になるため、意図的に持たない選択 |
-| 9 | **Not Using Standard Browser Security Controls** | 🟡 | 使っている：同一オリジン限定のService Worker（ネットワーク優先）・読み取り専用のファイル選択・`noopener noreferrer`・`safeHttpUrl`・`?safe=1`。**CSP は入れない方針**（§C-1：ビルド無しのHTML/JS・inline import map・blobメディアのため、開発と実機検証が壊れやすい。加えて `'unsafe-eval'` はアドオン機能を保つ場合に必要だがXSS防御を弱める。**安定版リリース時のみ**実機テスト付きで検討）。Referrer-Policyも現行ブラウザ既定を前提に緊急対応とはせず、安定版時にCapacitor／WebViewを含む実配信経路で再評価。第三者オリジンがゼロになったことで、CSP を入れる場合の設定もずっと簡単になりました |
+| 9 | **Not Using Standard Browser Security Controls** | 🟡 | 使っている：同一オリジン限定のService Worker（ネットワーク優先。ハッシュ固定の vendor だけ、SHA-384 の照合が合うキャッシュを先に使う）・読み取り専用のファイル選択・`noopener noreferrer`・`safeHttpUrl`・`?safe=1`。**CSP は入れない方針**（§C-1：ビルド無しのHTML/JS・inline import map・blobメディアのため、開発と実機検証が壊れやすい。加えて `'unsafe-eval'` はアドオン機能を保つ場合に必要だがXSS防御を弱める。**安定版リリース時のみ**実機テスト付きで検討）。Referrer-Policyも現行ブラウザ既定を前提に緊急対応とはせず、安定版時にCapacitor／WebViewを含む実配信経路で再評価。第三者オリジンがゼロになったことで、CSP を入れる場合の設定もずっと簡単になりました |
 | 10 | **Including Proprietary Information on the Client-Side** | ✅ | trk! は GPL-3.0-or-later のオープンソースで、クライアントに秘密は置いていません（APIキー・認証情報・内部エンドポイントなし）。隠し要素は「遊び」であって機密ではありません |
 
 ## B. CWE Top 25（2025）から、ブラウザアプリに関係するもの
@@ -37,7 +37,7 @@
 | 502 | Deserialization of Untrusted Data | ✅ | 扱うのは JSON と ZIP のみ。形式ごとの検証（`sanitizeManifest`／`plSanitizeShared`／`validateChartData`／`sanitizeTvDef`／`sanitizeSkinDef`／`studyBookClean`）と、設定インポートの**プロトタイプ汚染よけ**（`__proto__` 等をスキップ・自分のキーだけ） |
 | 20 | Improper Input Validation | ✅ | 数値は範囲・件数は上限・URLは https のみ・URL／ImportのTVスタイルとスキンは許可リスト・譜面ノート時刻／レーンはJSON numberのみ・色は `#rrggbb` のみ・ノート色/形は許可リスト。設定Importはトップレベルobject・own key・値の形を確認し、難易度／Spectrum style・theme／MMD motion／FX presetも代入前に実在IDを検証。スキン・MMD・FX・Spectrumの該当辞書はown-property／null-prototype参照。スキンJSONは256KiBで読込前に制限。上限値は `LIB_MAX`／`SHARED_MAX`／`PACK_LIMIT`／`STUDY_*`／プレイリスト24件など |
 | 200 | Exposure of Sensitive Information | ✅ | 外部に送るものは無い（A-3）。`privacy.html` に「送っていません」と明記し、実装の grep と一致することを確認 |
-| 770 | Allocation of Resources Without Limits | ✅ | `.stpack` は**展開しながら数えて上限で中止**（単体500MiB・保存済み合計1GiB・ブラウザquota事前確認と失敗案内）、**96MiB超のメディアは音声解析をしない**（`ANALYZE_MAX`）、単体譜面JSON／緊急設定Importは2MiB、アドオン入力ファイルは4MiB（コード512KiB／件）、カスタムスキンJSONは256KiB、ノート5万件・曲1000件・曲名/タグに長さ上限、書斎も曲数/ファイル上限あり |
+| 770 | Allocation of Resources Without Limits | ✅ | `.stpack` は**展開しながら数えて上限で中止**（単体500MiB・保存済み合計1GiB・ブラウザquota事前確認と失敗案内）、**96MiB超、または20分超のメディアは音声解析をしない**（`ANALYZE_MAX`・`ANALYZE_MAX_SEC`。デコード後のPCMは長さに比例するため長さでも判定）、単体譜面JSON／緊急設定Importは2MiB、アドオン入力ファイルは4MiB（コード512KiB／件）、カスタムスキンJSONは256KiB、ノート5万件・曲1000件・曲名/タグに長さ上限、書斎も曲数/ファイル上限あり |
 | 918 | SSRF | ➖ | サーバがありません（ユーザーが入力したURLをサーバ側で取りに行く処理は無し）。外部URLは `safeLink` ＋確認ダイアログのうえ**開くだけ** |
 | 89 / 352 / 862 / 863 / 284 / 306 / 639 | SQLi・CSRF・認可まわり | ➖ | サーバ・アカウント・セッションが無いため対象外（ローカル完結）。「認可」に相当するのは A-1 のクライアント側アクセス制御 |
 | 787 / 125 / 416 / 120 / 121 / 122 / 476 | メモリ破壊・解放後使用など | ➖ | JSエンジン側の領域（trk! のコードでは扱いません） |

@@ -57,147 +57,147 @@ Object.assign(TEXT.ko, {
 });
 
 /* ============ 設定 ============ */
-const hexOk = v => typeof v === "string" && HEX.test(v) ? v.toLowerCase() : "";
-settings.stageFx = pick(prefs.stageFx, ["off", "soft", "std", "rich"], "std");
-settings.stageLight = pick(prefs.stageLight, ["skin", "rainbow", "custom"], "skin");
-settings.stageLightColor = hexOk(prefs.stageLightColor);
-settings.judgeSize = pick(prefs.judgeSize, ["s", "m", "l"], "m");
-settings.judgePos = num(prefs.judgePos, -300, 300, 0);
-settings.fastSlow = pick(prefs.fastSlow, ["good", "all", "off"], "good");
-settings.apfcShow = prefs.apfcShow !== false;
+const hexOk = v => typeof v === "string" && window.Trk.data.HEX.test(v) ? v.toLowerCase() : "";
+window.Trk.core.settings.stageFx = window.Trk.core.pick(window.Trk.core.prefs.stageFx, ["off", "soft", "std", "rich"], "std");
+window.Trk.core.settings.stageLight = window.Trk.core.pick(window.Trk.core.prefs.stageLight, ["skin", "rainbow", "custom"], "skin");
+window.Trk.core.settings.stageLightColor = hexOk(window.Trk.core.prefs.stageLightColor);
+window.Trk.core.settings.judgeSize = window.Trk.core.pick(window.Trk.core.prefs.judgeSize, ["s", "m", "l"], "m");
+window.Trk.core.settings.judgePos = window.Trk.core.num(window.Trk.core.prefs.judgePos, -300, 300, 0);
+window.Trk.core.settings.fastSlow = window.Trk.core.pick(window.Trk.core.prefs.fastSlow, ["good", "all", "off"], "good");
+window.Trk.core.settings.apfcShow = window.Trk.core.prefs.apfcShow !== false;
 
 const FX_LEVEL = { off:0, soft:.55, std:1, rich:1.6 };
 const still = () => reduceMotion.matches;
 function lightColor(i, t) {
-  if (settings.stageLight === "rainbow") return `hsl(${Math.round((t / 25 + i * 72) % 360)},90%,65%)`;
-  if (settings.stageLight === "custom") return settings.stageLightColor || "#ffd166";
-  return toHex(i % 2 ? skin().game.perfect : skin().ui["--ui-accent"]);
+  if (window.Trk.core.settings.stageLight === "rainbow") return `hsl(${Math.round((t / 25 + i * 72) % 360)},90%,65%)`;
+  if (window.Trk.core.settings.stageLight === "custom") return window.Trk.core.settings.stageLightColor || "#ffd166";
+  return window.Trk.data.toHex(i % 2 ? window.Trk.core.skin().game.perfect : window.Trk.core.skin().ui["--ui-accent"]);
 }
 
 /* ============ STAGEの舞台演出（render.js がレーンの下に描きます） ============ */
 function drawStageBackdrop(now) {
-  const k0 = FX_LEVEL[settings.stageFx] || 0; if (!k0) return;
-  const p = performance.now(), t = still() ? 0 : p, pulse = beatPulse(now);
-  const hype = settings.stageHype && stageMap.len && stageMap.hype[Math.min(nextIdx, stageMap.len - 1)];
+  const k0 = FX_LEVEL[window.Trk.core.settings.stageFx] || 0; if (!k0) return;
+  const p = performance.now(), t = still() ? 0 : p, pulse = window.Trk.play.beatPulse(now);
+  const hype = window.Trk.core.settings.stageHype && stageMap.len && stageMap.hype[Math.min(window.Trk.core.nextIdx, stageMap.len - 1)];
   const k = k0 * (hype ? 1.35 : 1);
-  const n = settings.stageFx === "rich" ? 5 : settings.stageFx === "std" ? 3 : 2;
-  ctx.save();
-  ctx.globalCompositeOperation = "lighter";
+  const n = window.Trk.core.settings.stageFx === "rich" ? 5 : window.Trk.core.settings.stageFx === "std" ? 3 : 2;
+  window.Trk.core.ctx.save();
+  window.Trk.core.ctx.globalCompositeOperation = "lighter";
 
   /* スポットライト（上から床へ、ゆっくり首を振る） */
   for (let i = 0; i < n; i++) {
     const sx = 210 + i * 1500 / (n - 1), c = lightColor(i, t);
     const a = (sx < 900 ? .22 : sx > 1020 ? -.22 : 0) + (still() ? 0 : Math.sin(t / 1700 + i * 1.3) * .28);
     const bx = sx + Math.tan(a) * 1020, by = 1000, bw = 150;
-    const gr = ctx.createLinearGradient(sx, -20, bx, by);
+    const gr = window.Trk.core.ctx.createLinearGradient(sx, -20, bx, by);
     gr.addColorStop(0, c); gr.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.globalAlpha = Math.min(.5, .14 * k * (.8 + .4 * pulse));
-    ctx.fillStyle = gr; ctx.beginPath();
-    ctx.moveTo(sx - 9, -20); ctx.lineTo(sx + 9, -20); ctx.lineTo(bx + bw, by); ctx.lineTo(bx - bw, by); ctx.closePath(); ctx.fill();
-    ctx.save(); ctx.translate(bx, by); ctx.scale(1, .2);                       // 床に落ちた光
-    const fl = ctx.createRadialGradient(0, 0, 0, 0, 0, 170);
+    window.Trk.core.ctx.globalAlpha = Math.min(.5, .14 * k * (.8 + .4 * pulse));
+    window.Trk.core.ctx.fillStyle = gr; window.Trk.core.ctx.beginPath();
+    window.Trk.core.ctx.moveTo(sx - 9, -20); window.Trk.core.ctx.lineTo(sx + 9, -20); window.Trk.core.ctx.lineTo(bx + bw, by); window.Trk.core.ctx.lineTo(bx - bw, by); window.Trk.core.ctx.closePath(); window.Trk.core.ctx.fill();
+    window.Trk.core.ctx.save(); window.Trk.core.ctx.translate(bx, by); window.Trk.core.ctx.scale(1, .2);                       // 床に落ちた光
+    const fl = window.Trk.core.ctx.createRadialGradient(0, 0, 0, 0, 0, 170);
     fl.addColorStop(0, c); fl.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.globalAlpha = Math.min(.6, .22 * k); ctx.fillStyle = fl;
-    ctx.beginPath(); ctx.arc(0, 0, 170, 0, TAU); ctx.fill(); ctx.restore();
+    window.Trk.core.ctx.globalAlpha = Math.min(.6, .22 * k); window.Trk.core.ctx.fillStyle = fl;
+    window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(0, 0, 170, 0, window.Trk.data.TAU); window.Trk.core.ctx.fill(); window.Trk.core.ctx.restore();
   }
 
   /* レーンの下の床の反射 */
-  ctx.save(); ctx.translate(960, STAGE.hitY + 70); ctx.scale(1, .16);
-  const rf = ctx.createRadialGradient(0, 0, 0, 0, 0, 640);
+  window.Trk.core.ctx.save(); window.Trk.core.ctx.translate(960, STAGE.hitY + 70); window.Trk.core.ctx.scale(1, .16);
+  const rf = window.Trk.core.ctx.createRadialGradient(0, 0, 0, 0, 0, 640);
   rf.addColorStop(0, lightColor(0, t)); rf.addColorStop(1, "rgba(0,0,0,0)");
-  ctx.globalAlpha = Math.min(.5, .2 * k * (.85 + .3 * pulse)); ctx.fillStyle = rf;
-  ctx.beginPath(); ctx.arc(0, 0, 640, 0, TAU); ctx.fill(); ctx.restore();
+  window.Trk.core.ctx.globalAlpha = Math.min(.5, .2 * k * (.85 + .3 * pulse)); window.Trk.core.ctx.fillStyle = rf;
+  window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(0, 0, 640, 0, window.Trk.data.TAU); window.Trk.core.ctx.fill(); window.Trk.core.ctx.restore();
 
   /* 舞い上がる光 */
-  const count = { soft:12, std:24, rich:44 }[settings.stageFx] || 0;
+  const count = { soft:12, std:24, rich:44 }[window.Trk.core.settings.stageFx] || 0;
   for (let i = 0; i < count; i++) {
     const sp = .04 * (1 + (i % 4) * .35);
-    const x = (i * 397.3) % W + (still() ? 0 : Math.sin(t / 900 + i) * 20);
+    const x = (i * 397.3) % window.Trk.data.W + (still() ? 0 : Math.sin(t / 900 + i) * 20);
     const y = 1100 - ((t * sp + i * 173) % 1200);
-    ctx.globalAlpha = Math.min(.8, .45 * k) * (1 - Math.abs(y - 540) / 700);
-    ctx.fillStyle = lightColor(i, t);
-    ctx.beginPath(); ctx.arc(x, y, 1.5 + (i % 3), 0, TAU); ctx.fill();
+    window.Trk.core.ctx.globalAlpha = Math.min(.8, .45 * k) * (1 - Math.abs(y - 540) / 700);
+    window.Trk.core.ctx.fillStyle = lightColor(i, t);
+    window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(x, y, 1.5 + (i % 3), 0, window.Trk.data.TAU); window.Trk.core.ctx.fill();
   }
-  ctx.restore();
+  window.Trk.core.ctx.restore();
 }
 
 /* ============ AP・FC継続表示（全モード。AUTOでは出さない） ============ */
 function drawApFc() {
-  if (!settings.apfcShow || phase !== "playing" || settings.autoPlay) return;
-  if (stats.perfect + stats.good === 0 || stats.miss > 0 || stats.crash > 0) return;
-  const ap = stats.good === 0, txt = ap ? "AP" : "FC";
-  const c = toHex(ap ? skin().game.perfect : skin().ui["--ui-accent"]);
-  const x0 = settings.layout === "vertical" && !ownField() ? 760 : 70, y = 190;
-  ctx.save();
-  ctx.font = `900 18px ${fontFamily()}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  rr(x0, y - 13, 48, 26, 13); ctx.fillStyle = "rgba(0,0,0,.5)"; ctx.fill();
-  ctx.lineWidth = 2; ctx.strokeStyle = c; ctx.stroke();
-  ctx.fillStyle = c; ctx.fillText(txt, x0 + 24, y + 1);
-  ctx.restore();
+  if (!window.Trk.core.settings.apfcShow || window.Trk.core.phase !== "playing" || window.Trk.core.settings.autoPlay) return;
+  if (window.Trk.core.stats.perfect + window.Trk.core.stats.good === 0 || window.Trk.core.stats.miss > 0 || window.Trk.core.stats.crash > 0) return;
+  const ap = window.Trk.core.stats.good === 0, txt = ap ? "AP" : "FC";
+  const c = window.Trk.data.toHex(ap ? window.Trk.core.skin().game.perfect : window.Trk.core.skin().ui["--ui-accent"]);
+  const x0 = window.Trk.core.settings.layout === "vertical" && !window.Trk.play.ownField() ? 760 : 70, y = 190;
+  window.Trk.core.ctx.save();
+  window.Trk.core.ctx.font = `900 18px ${window.Trk.core.fontFamily()}`; window.Trk.core.ctx.textAlign = "center"; window.Trk.core.ctx.textBaseline = "middle";
+  window.Trk.play.rr(x0, y - 13, 48, 26, 13); window.Trk.core.ctx.fillStyle = "rgba(0,0,0,.5)"; window.Trk.core.ctx.fill();
+  window.Trk.core.ctx.lineWidth = 2; window.Trk.core.ctx.strokeStyle = c; window.Trk.core.ctx.stroke();
+  window.Trk.core.ctx.fillStyle = c; window.Trk.core.ctx.fillText(txt, x0 + 24, y + 1);
+  window.Trk.core.ctx.restore();
 }
 
 /* ============ カーテンコール（Seedのイースターエッグ） ============ */
 const CURTAIN_SEEDS = ["20230726", "20260929", "curtaincall"];
-for (const s of CURTAIN_SEEDS) EGG_KEYS[s] = "eggCurtain";
-const isCurtain = () => CURTAIN_SEEDS.includes(($("seed").value || "").trim().toLowerCase());
+for (const s of CURTAIN_SEEDS) window.Trk.data.EGG_KEYS[s] = "eggCurtain";
+const isCurtain = () => CURTAIN_SEEDS.includes((window.Trk.core.$("seed").value || "").trim().toLowerCase());
 let curtainAt = -1e9, endAt = -1e9;
-on("beforePlay", () => { curtainAt = performance.now(); });
-on("screen", id => {
+window.Trk.core.on("beforePlay", () => { curtainAt = performance.now(); });
+window.Trk.core.on("screen", id => {
   if (id !== "endScreen" || !isCurtain()) return;
   endAt = performance.now();
-  $("credits").prepend(el("div", "best new", `✦ ${tr("curtainCall")} ✦ ${tr("curtainThanks")}`));
+  window.Trk.core.$("credits").prepend(window.Trk.core.el("div", "best new", `✦ ${tr("curtainCall")} ✦ ${tr("curtainThanks")}`));
 });
 function drawCurtain() {
-  if (!isCurtain() || phase === "title") return;
+  if (!isCurtain() || window.Trk.core.phase === "title") return;
   const p = performance.now(), open = still() ? 1 : Math.min(1, Math.max(0, (p - curtainAt - 300) / 1800));
   const ease = 1 - Math.pow(1 - open, 3), w = 960 * (1 - ease) + 80;
-  ctx.save();
+  window.Trk.core.ctx.save();
   for (const side of [-1, 1]) {           // 左右の幕（ひだ付き）
-    const x0 = side < 0 ? 0 : W - w;
-    ctx.fillStyle = "#8e1028"; ctx.fillRect(x0, 0, w, H);
+    const x0 = side < 0 ? 0 : window.Trk.data.W - w;
+    window.Trk.core.ctx.fillStyle = "#8e1028"; window.Trk.core.ctx.fillRect(x0, 0, w, window.Trk.data.H);
     for (let x = 0; x < w; x += 46) {
-      const gr = ctx.createLinearGradient(x0 + x, 0, x0 + x + 46, 0);
+      const gr = window.Trk.core.ctx.createLinearGradient(x0 + x, 0, x0 + x + 46, 0);
       gr.addColorStop(0, "rgba(0,0,0,.35)"); gr.addColorStop(.5, "rgba(255,255,255,.08)"); gr.addColorStop(1, "rgba(0,0,0,.35)");
-      ctx.fillStyle = gr; ctx.fillRect(x0 + x, 0, 46, H);
+      window.Trk.core.ctx.fillStyle = gr; window.Trk.core.ctx.fillRect(x0 + x, 0, 46, window.Trk.data.H);
     }
   }
-  ctx.fillStyle = "#5c0a1c"; ctx.fillRect(0, 0, W, 64);    // 緞帳の上部
-  ctx.fillStyle = "#8e1028";
-  for (let x = 0; x < W; x += 120) { ctx.beginPath(); ctx.arc(x + 60, 64, 60, 0, Math.PI); ctx.fill(); }
-  ctx.fillStyle = "#e0b04a"; ctx.fillRect(0, 62, W, 4);
-  ctx.restore();
+  window.Trk.core.ctx.fillStyle = "#5c0a1c"; window.Trk.core.ctx.fillRect(0, 0, window.Trk.data.W, 64);    // 緞帳の上部
+  window.Trk.core.ctx.fillStyle = "#8e1028";
+  for (let x = 0; x < window.Trk.data.W; x += 120) { window.Trk.core.ctx.beginPath(); window.Trk.core.ctx.arc(x + 60, 64, 60, 0, Math.PI); window.Trk.core.ctx.fill(); }
+  window.Trk.core.ctx.fillStyle = "#e0b04a"; window.Trk.core.ctx.fillRect(0, 62, window.Trk.data.W, 4);
+  window.Trk.core.ctx.restore();
 }
 function drawConfetti() {
   if (!isCurtain()) return;
   const age = performance.now() - endAt; if (age < 0 || age > 6000) return;
-  ctx.save();
+  window.Trk.core.ctx.save();
   for (let i = 0; i < 60; i++) {
-    const x = (i * 331) % W + Math.sin(age / 500 + i) * 30;
+    const x = (i * 331) % window.Trk.data.W + Math.sin(age / 500 + i) * 30;
     const y = ((age * .25 * (1 + (i % 3) * .3) + i * 53) % 1200) - 100;
-    ctx.globalAlpha = Math.min(1, (6000 - age) / 1500);
-    starPath(x, y, 6 + (i % 4) * 2); ctx.fillStyle = i % 3 ? "#ffd166" : lightColor(i, age); ctx.fill();
+    window.Trk.core.ctx.globalAlpha = Math.min(1, (6000 - age) / 1500);
+    starPath(x, y, 6 + (i % 4) * 2); window.Trk.core.ctx.fillStyle = i % 3 ? "#ffd166" : lightColor(i, age); window.Trk.core.ctx.fill();
   }
-  ctx.restore();
+  window.Trk.core.ctx.restore();
 }
 function drawFxOverlay() { drawApFc(); drawCurtain(); drawConfetti(); }
 
 /* ============ 判定文字の表示 ============ */
 function applyJudgeStyle() {
-  const j = $("judge"); if (!j) return;
-  j.style.fontSize = { s:"44px", m:"64px", l:"86px" }[settings.judgeSize];
-  j.style.top = ownField() && phase !== "title" ? (isOrbit() ? "260px" : "560px") : "";
-  j.style.marginTop = settings.judgePos + "px";
+  const j = window.Trk.core.$("judge"); if (!j) return;
+  j.style.fontSize = { s:"44px", m:"64px", l:"86px" }[window.Trk.core.settings.judgeSize];
+  j.style.top = window.Trk.play.ownField() && window.Trk.core.phase !== "title" ? (isOrbit() ? "260px" : "560px") : "";
+  j.style.marginTop = window.Trk.core.settings.judgePos + "px";
 }
-on("phase", applyJudgeStyle);
+window.Trk.core.on("phase", applyJudgeStyle);
 /* FAST/SLOW の表示範囲（game.js の showJudge のあとに上書き） */
-const baseShowJudge = showJudge;
-showJudge = function (kind, delta, star) {
+const baseShowJudge = window.Trk.play.showJudge;
+window.Trk.play.showJudge = function (kind, delta, star) {
   baseShowJudge(kind, delta, star);
-  const sub = $("judgeSub");
-  if (settings.fastSlow === "off") {
+  const sub = window.Trk.core.$("judgeSub");
+  if (window.Trk.core.settings.fastSlow === "off") {
     sub.textContent = "";
     sub.className = "";
-  } else if (settings.fastSlow === "all" && kind === "perfect" && !star && delta) {
+  } else if (window.Trk.core.settings.fastSlow === "all" && kind === "perfect" && !star && delta) {
     const isEarly = delta < 0;
     sub.textContent = tr(isEarly ? "early" : "late");
     sub.className = isEarly ? "early" : "late";
@@ -206,15 +206,15 @@ showJudge = function (kind, delta, star) {
 
 /* ============ 設定画面（STAGEの設定の下、マスコットの上） ============ */
 (() => {
-  const anchor = $("stageSettingsAnchor") || document.querySelector('#settingsScreen [data-i18n="mascotSel"]'); if (!anchor) return;
-  const h3 = el("h3", "", tr("fxTitle")); h3.dataset.i18n = "fxTitle";
+  const anchor = window.Trk.core.$("stageSettingsAnchor") || document.querySelector('#settingsScreen [data-i18n="mascotSel"]'); if (!anchor) return;
+  const h3 = window.Trk.core.el("h3", "", tr("fxTitle")); h3.dataset.i18n = "fxTitle";
   const size = makeSeg("judgeSizePicker", "judgeSize", [["s", "sizeS"], ["m", "sizeM"], ["l", "sizeL"]]);
   size.addEventListener("click", applyJudgeStyle);
-  const row = el("div", "inline"), lab = el("span", "", tr("judgePos")), inp = document.createElement("input"), val = el("span", "mono");
+  const row = window.Trk.core.el("div", "inline"), lab = window.Trk.core.el("span", "", tr("judgePos")), inp = document.createElement("input"), val = window.Trk.core.el("span", "mono");
   lab.dataset.i18n = "judgePos"; inp.type = "range"; inp.min = "-300"; inp.max = "300"; inp.step = "10";
   lab.id = "judgePosLab"; inp.setAttribute("aria-labelledby", lab.id);
-  const sync = () => { inp.value = settings.judgePos; val.textContent = (settings.judgePos > 0 ? "+" : "") + settings.judgePos + "px"; };
-  inp.addEventListener("input", () => { settings.judgePos = Number(inp.value); saveUserPrefs(); sync(); applyJudgeStyle(); });
+  const sync = () => { inp.value = window.Trk.core.settings.judgePos; val.textContent = (window.Trk.core.settings.judgePos > 0 ? "+" : "") + window.Trk.core.settings.judgePos + "px"; };
+  inp.addEventListener("input", () => { window.Trk.core.settings.judgePos = Number(inp.value); window.Trk.core.saveUserPrefs(); sync(); applyJudgeStyle(); });
   sync(); row.append(lab, inp, val);
   anchor.before(
     h3,

@@ -68,125 +68,125 @@ Object.assign(TEXT.ko, {
 
 /* ---------- 設定 ---------- */
 const SPEED_BASE = [.75, 1, 1.3, 1.5], SPEED_EXTRA = [2, 3];
-settings.speedPanel = pick(prefs.speedPanel, ["buttons", "bar", "both", "hidden"], "buttons");
-settings.speedExtra = !!prefs.speedExtra;
-settings.speedStep = pick(prefs.speedStep, ["0.01", "0.1", "0.25"], "0.1");
-settings.speedKeys = (Array.isArray(prefs.speedKeys) && prefs.speedKeys.length === 2 && prefs.speedKeys.every(validCode) && prefs.speedKeys[0] !== prefs.speedKeys[1])
-  ? prefs.speedKeys.slice() : ["BracketLeft", "BracketRight"];
-const maxRate = () => settings.speedExtra ? 3 : 2;
-settings.rate = Math.min(maxRate(), settings.rate);
-if (settings.speedPanel === "hidden") settings.rate = 1;
+window.Trk.core.settings.speedPanel = window.Trk.core.pick(window.Trk.core.prefs.speedPanel, ["buttons", "bar", "both", "hidden"], "buttons");
+window.Trk.core.settings.speedExtra = !!window.Trk.core.prefs.speedExtra;
+window.Trk.core.settings.speedStep = window.Trk.core.pick(window.Trk.core.prefs.speedStep, ["0.01", "0.1", "0.25"], "0.1");
+window.Trk.core.settings.speedKeys = (Array.isArray(window.Trk.core.prefs.speedKeys) && window.Trk.core.prefs.speedKeys.length === 2 && window.Trk.core.prefs.speedKeys.every(window.Trk.core.validCode) && window.Trk.core.prefs.speedKeys[0] !== window.Trk.core.prefs.speedKeys[1])
+  ? window.Trk.core.prefs.speedKeys.slice() : ["BracketLeft", "BracketRight"];
+const maxRate = () => window.Trk.core.settings.speedExtra ? 3 : 2;
+window.Trk.core.settings.rate = Math.min(maxRate(), window.Trk.core.settings.rate);
+if (window.Trk.core.settings.speedPanel === "hidden") window.Trk.core.settings.rate = 1;
 const i18nNow = root => root.querySelectorAll("[data-i18n]").forEach(n => { n.textContent = tr(n.dataset.i18n); });
 const fmtRate = r => r.toFixed(2).replace(/0$/, "") + "x";       // 0.75x / 1.0x / 1.3x
-const keyHintText = () => tr("speedKeyHint", { down:formatKey(settings.speedKeys[0]), up:formatKey(settings.speedKeys[1]), step:settings.speedStep });
+const keyHintText = () => tr("speedKeyHint", { down:window.Trk.core.formatKey(window.Trk.core.settings.speedKeys[0]), up:window.Trk.core.formatKey(window.Trk.core.settings.speedKeys[1]), step:window.Trk.core.settings.speedStep });
 
 /* ---------- 選曲画面のパネル ---------- */
-const panel = el("section", "panel"); panel.id = "speedPanel";
-const head = el("div", "libHead"), title = el("h3"), val = el("b", "mono");
+const panel = window.Trk.core.el("section", "panel"); panel.id = "speedPanel";
+const head = window.Trk.core.el("div", "libHead"), title = window.Trk.core.el("h3"), val = window.Trk.core.el("b", "mono");
 title.dataset.i18n = "speedTitle"; title.style.margin = "0"; head.append(title, val);
-const seg = el("div", "seg"); seg.id = "speedButtons"; seg.style.marginTop = "8px";
-const barRow = el("div", "inline tight"), bar = document.createElement("input");
+const seg = window.Trk.core.el("div", "seg"); seg.id = "speedButtons"; seg.style.marginTop = "8px";
+const barRow = window.Trk.core.el("div", "inline tight"), bar = document.createElement("input");
 bar.type = "range"; bar.min = "0.5"; bar.step = "0.01"; bar.style.flex = "1"; barRow.append(bar);
-const note = el("div", "hint"), keyNote = el("div", "hint");
+const note = window.Trk.core.el("div", "hint"), keyNote = window.Trk.core.el("div", "hint");
 panel.append(head, seg, barRow, note, keyNote);
-$("playBtn").after(panel);
+window.Trk.core.$("playBtn").after(panel);
 
 /* 一時停止画面に、今の速度とキーを表示 */
-const pauseLine = el("div", "hint status");
-$("pauseScreen").querySelector("p").after(pauseLine);
+const pauseLine = window.Trk.core.el("div", "hint status");
+window.Trk.core.$("pauseScreen").querySelector("p").after(pauseLine);
 
 /* ---------- 速度の変更 ---------- */
 let runRate = null;   // このプレイを始めたときの速度
 function setRate(r) {
   r = Math.min(maxRate(), Math.max(.5, Math.round(Number(r) * 100) / 100));
   if (!isFinite(r)) return;
-  settings.rate = r; saveUserPrefs();
-  if (phase === "title" && !video.paused) video.playbackRate = r;   // プレビューにもすぐ反映
-  syncOptionsUI(); emit("options");
+  window.Trk.core.settings.rate = r; window.Trk.core.saveUserPrefs();
+  if (window.Trk.core.phase === "title" && !window.Trk.core.video.paused) window.Trk.core.video.playbackRate = r;   // プレビューにもすぐ反映
+  window.Trk.main.syncOptionsUI(); window.Trk.core.emit("options");
 }
 function stepRate(dir) {
-  if (settings.speedPanel === "hidden") return;
-  const s = Number(settings.speedStep), r = settings.rate;
+  if (window.Trk.core.settings.speedPanel === "hidden") return;
+  const s = Number(window.Trk.core.settings.speedStep), r = window.Trk.core.settings.rate;
   let nr = dir > 0 ? Math.floor(r / s + 1e-6) * s + s : Math.ceil(r / s - 1e-6) * s - s;   // きりのいい数字にそろえる
   nr = Math.min(maxRate(), Math.max(.5, Math.round(nr * 100) / 100));
   if (Math.abs(nr - r) < .001) return;
   setRate(nr);
-  if (phase === "playing") {
-    if (leadIn && !leadIn.resume) runRate = nr;                 // 曲が始まる前のカウント中は、記録に影響しない
+  if (window.Trk.core.phase === "playing") {
+    if (window.Trk.play.leadIn && !window.Trk.play.leadIn.resume) runRate = nr;                 // 曲が始まる前のカウント中は、記録に影響しない
     else {
-      if (!leadIn && !video.paused) video.playbackRate = nr;
-      if (Math.abs(nr - runRate) > .001) practice = true;       // 途中で速度を変えた → 練習扱い
+      if (!window.Trk.play.leadIn && !window.Trk.core.video.paused) window.Trk.core.video.playbackRate = nr;
+      if (Math.abs(nr - runRate) > .001) window.Trk.core.practice = true;       // 途中で速度を変えた → 練習扱い
     }
-    showToast(tr("speedToast", { r:nr.toFixed(2) + "x" }) + (practice && !settings.autoPlay ? " · " + tr("practice") : ""));
+    window.Trk.play.showToast(tr("speedToast", { r:nr.toFixed(2) + "x" }) + (window.Trk.core.practice && !window.Trk.core.settings.autoPlay ? " · " + tr("practice") : ""));
   }
 }
-on("beforePlay", () => { runRate = settings.rate; });
-on("phase", p => {   // 一時停止から違う速度で戻ったら練習扱い（開始前のカウント中に止めていた場合は除く）
-  if (p !== "playing" || runRate == null || Math.abs(settings.rate - runRate) < .001) return;
-  if (pausedInLeadIn) runRate = settings.rate; else practice = true;
+window.Trk.core.on("beforePlay", () => { runRate = window.Trk.core.settings.rate; });
+window.Trk.core.on("phase", p => {   // 一時停止から違う速度で戻ったら練習扱い（開始前のカウント中に止めていた場合は除く）
+  if (p !== "playing" || runRate == null || Math.abs(window.Trk.core.settings.rate - runRate) < .001) return;
+  if (window.Trk.play.pausedInLeadIn) runRate = window.Trk.core.settings.rate; else window.Trk.core.practice = true;
 });
 
 function renderSpeed() {
-  const mode = settings.speedPanel, list = settings.speedExtra ? [...SPEED_BASE, ...SPEED_EXTRA] : SPEED_BASE;
+  const mode = window.Trk.core.settings.speedPanel, list = window.Trk.core.settings.speedExtra ? [...SPEED_BASE, ...SPEED_EXTRA] : SPEED_BASE;
   panel.hidden = mode === "hidden";
   seg.hidden = mode === "bar"; barRow.hidden = mode === "buttons";
   seg.textContent = "";
   for (const r of list) {
-    const b = el("button", "", fmtRate(r)); b.type = "button";
-    const onFlag = Math.abs(r - settings.rate) < .001;
+    const b = window.Trk.core.el("button", "", fmtRate(r)); b.type = "button";
+    const onFlag = Math.abs(r - window.Trk.core.settings.rate) < .001;
     b.classList.toggle("selected", onFlag); b.setAttribute("aria-pressed", onFlag);
     b.addEventListener("click", () => setRate(r));
     seg.append(b);
   }
-  bar.max = String(maxRate()); bar.value = settings.rate;
-  val.textContent = settings.rate.toFixed(2) + "x";
-  note.textContent = tr(settings.rate < 1 ? "speedNotePractice" : settings.rate > 1 ? "speedNoteRecord" : "speedNoteNormal");
+  bar.max = String(maxRate()); bar.value = window.Trk.core.settings.rate;
+  val.textContent = window.Trk.core.settings.rate.toFixed(2) + "x";
+  note.textContent = tr(window.Trk.core.settings.rate < 1 ? "speedNotePractice" : window.Trk.core.settings.rate > 1 ? "speedNoteRecord" : "speedNoteNormal");
   keyNote.textContent = keyHintText();
-  const rs = $("rate");                                            // 設定画面の速度バー
+  const rs = window.Trk.core.$("rate");                                            // 設定画面の速度バー
   if (rs) { rs.max = String(maxRate()); rs.step = "0.01"; rs.disabled = mode === "hidden"; }
   pauseLine.hidden = mode === "hidden";
-  pauseLine.textContent = `${tr("speedTitle")} ${settings.rate.toFixed(2)}x · ${keyHintText()}`
-    + (phase === "paused" && runRate != null && Math.abs(settings.rate - runRate) > .001 ? ` · ${tr("speedMidNote")}` : "");
+  pauseLine.textContent = `${tr("speedTitle")} ${window.Trk.core.settings.rate.toFixed(2)}x · ${keyHintText()}`
+    + (window.Trk.core.phase === "paused" && runRate != null && Math.abs(window.Trk.core.settings.rate - runRate) > .001 ? ` · ${tr("speedMidNote")}` : "");
 }
 bar.addEventListener("input", e => setRate(e.target.value));
-on("options", renderSpeed);
-on("language", renderSpeed);
-on("phase", renderSpeed);
+window.Trk.core.on("options", renderSpeed);
+window.Trk.core.on("language", renderSpeed);
+window.Trk.core.on("phase", renderSpeed);
 
 /* 設定画面の速度バー：main.js の処理のあとに、上限を2.0x／3.0xに合わせて決め直す */
-$("rate").addEventListener("input", e => setRate(e.target.value));
+window.Trk.core.$("rate").addEventListener("input", e => setRate(e.target.value));
 /* 選曲中のプレビューも、選んだ速度で流す */
-video.addEventListener("play", () => { if (phase === "title") video.playbackRate = settings.rate; });
+window.Trk.core.video.addEventListener("play", () => { if (window.Trk.core.phase === "title") window.Trk.core.video.playbackRate = window.Trk.core.settings.rate; });
 
 /* ---------- 速度変更キー ---------- */
 let speedBinding = null;   // 0＝遅くする、1＝速くする
 function syncOrbitIgnore(oldKeys) {   // ORBIT の「どのキーでもOK」から、速度キーを外す
-  (oldKeys || []).forEach(k => { if (!["Backquote", "Minus", "Equal", "KeyP", "Escape", "Tab"].includes(k)) ORBIT_IGNORE.delete(k); });
-  settings.speedKeys.forEach(k => ORBIT_IGNORE.add(k));
+  (oldKeys || []).forEach(k => { if (!["Backquote", "Minus", "Equal", "KeyP", "Escape", "Tab"].includes(k)) window.Trk.modes.ORBIT_IGNORE.delete(k); });
+  window.Trk.core.settings.speedKeys.forEach(k => window.Trk.modes.ORBIT_IGNORE.add(k));
 }
 syncOrbitIgnore();
 function usedKeys() {
-  const list = [...settings.keys, ...settings.subKeys, ...truckPosKeys(), ...TRUCK_PRESETS.ud, ...TRUCK_PRESETS.lr,
-    ...stageKeys(), ...catchAllKeys(), ...(settings.skipKeys || []), "KeyR"];
-  if (settings.truckToggleKey) list.push(settings.truckToggleKey);
+  const list = [...window.Trk.core.settings.keys, ...window.Trk.core.settings.subKeys, ...window.Trk.modes.truckPosKeys(), ...TRUCK_PRESETS.ud, ...TRUCK_PRESETS.lr,
+    ...window.Trk.modes.stageKeys(), ...window.Trk.modes.catchAllKeys(), ...(window.Trk.core.settings.skipKeys || []), "KeyR"];
+  if (window.Trk.core.settings.truckToggleKey) list.push(window.Trk.core.settings.truckToggleKey);
   return list.filter(Boolean);
 }
 function captureSpeedKey(code) {
   const slot = speedBinding;
-  if (code === "Escape") { speedBinding = null; setStatus("speedBindStatus", "cancelBind"); syncSpeedKeyUI(); return; }
-  if (RESERVED.has(code)) { setStatus("speedBindStatus", "reservedKey"); return; }
-  if (usedKeys().includes(code) || settings.speedKeys[1 - slot] === code) { setStatus("speedBindStatus", "duplicateKey"); return; }
-  const old = settings.speedKeys.slice();
-  settings.speedKeys[slot] = code; speedBinding = null; saveUserPrefs();
+  if (code === "Escape") { speedBinding = null; window.Trk.core.setStatus("speedBindStatus", "cancelBind"); syncSpeedKeyUI(); return; }
+  if (window.Trk.main.RESERVED.has(code)) { window.Trk.core.setStatus("speedBindStatus", "reservedKey"); return; }
+  if (usedKeys().includes(code) || window.Trk.core.settings.speedKeys[1 - slot] === code) { window.Trk.core.setStatus("speedBindStatus", "duplicateKey"); return; }
+  const old = window.Trk.core.settings.speedKeys.slice();
+  window.Trk.core.settings.speedKeys[slot] = code; speedBinding = null; window.Trk.core.saveUserPrefs();
   syncOrbitIgnore(old);
-  setStatus("speedBindStatus", "speedAssigned"); syncSpeedKeyUI(); renderSpeed();
+  window.Trk.core.setStatus("speedBindStatus", "speedAssigned"); syncSpeedKeyUI(); renderSpeed();
 }
 addEventListener("keydown", e => {
-  if (window._trkSynthModeOpen || window._trkMediaPlayerOpen || window._trkStudyRoomOpen) return;
+  if (window.Trk.overlay.any()) return;
   if (speedBinding !== null) { e.preventDefault(); e.stopImmediatePropagation(); captureSpeedKey(e.code); return; }
-  if (bindingSlot !== null || truckBinding !== null || stageBinding !== null) return;
-  const i = settings.speedKeys.indexOf(e.code); if (i < 0) return;
-  if (phase === "playing" && slotOfKey(e.code) >= 0) return;      // 叩くキーと同じなら、叩くほうを優先
+  if (window.Trk.core.bindingSlot !== null || window.Trk.modes.truckBinding !== null || window.Trk.modes.stageBinding !== null) return;
+  const i = window.Trk.core.settings.speedKeys.indexOf(e.code); if (i < 0) return;
+  if (window.Trk.core.phase === "playing" && window.Trk.core.slotOfKey(e.code) >= 0) return;      // 叩くキーと同じなら、叩くほうを優先
   const t = e.target;
   if (t && (t.tagName === "TEXTAREA" || t.tagName === "SELECT" ||
     (t.tagName === "INPUT" && !["range", "checkbox", "button", "color", "file"].includes(t.type)))) return;
@@ -198,41 +198,41 @@ addEventListener("keydown", e => {
 /* 🎯 プレイオプション：速度パネルの表示 */
 const rateHint = document.querySelector('#settingsScreen [data-i18n="rateHint"]');
 if (rateHint) {
-  const label = hintEl("speedPanelLabel");
-  const pSeg = makeSeg("speedPanelPicker", "speedPanel",
+  const label = window.Trk.modes.hintEl("speedPanelLabel");
+  const pSeg = window.Trk.modes.makeSeg("speedPanelPicker", "speedPanel",
     [["buttons", "speedPanelButtons"], ["bar", "speedPanelBar"], ["both", "speedPanelBoth"], ["hidden", "speedPanelHidden"]]);
-  const extra = makeCheck("speedExtra", "speedExtra", "speedExtra");
-  pSeg.addEventListener("click", () => { if (settings.speedPanel === "hidden") setRate(1); else renderSpeed(); });
-  extra.querySelector("input").addEventListener("change", () => { if (settings.rate > maxRate()) setRate(maxRate()); else renderSpeed(); });
+  const extra = window.Trk.modes.makeCheck("speedExtra", "speedExtra", "speedExtra");
+  pSeg.addEventListener("click", () => { if (window.Trk.core.settings.speedPanel === "hidden") setRate(1); else renderSpeed(); });
+  extra.querySelector("input").addEventListener("change", () => { if (window.Trk.core.settings.rate > maxRate()) setRate(maxRate()); else renderSpeed(); });
   rateHint.after(label, pSeg, extra);
 }
 /* ⌨ 操作：速度の変更キー */
 let syncSpeedKeyUI = () => {};
 const truckHint = document.querySelector('#settingsScreen [data-i18n="truckCtlHint"]');
 if (truckHint) {
-  const h3 = el("h3", "", tr("speedKeysTitle")); h3.dataset.i18n = "speedKeysTitle";
-  const rows = el("div", "keyRows"); rows.style.marginTop = "10px";
+  const h3 = window.Trk.core.el("h3", "", tr("speedKeysTitle")); h3.dataset.i18n = "speedKeysTitle";
+  const rows = window.Trk.core.el("div", "keyRows"); rows.style.marginTop = "10px";
   const values = [];
   ["speedDown", "speedUp"].forEach((key, i) => {
-    const row = el("div", "keyRow"), name = el("strong", "", tr(key)), v = el("span", "keyValue"), b = el("button", "", tr("assign"));
+    const row = window.Trk.core.el("div", "keyRow"), name = window.Trk.core.el("strong", "", tr(key)), v = window.Trk.core.el("span", "keyValue"), b = window.Trk.core.el("button", "", tr("assign"));
     name.dataset.i18n = key; b.type = "button"; b.dataset.i18n = "assign"; b.dataset.speedbind = i;
     b.addEventListener("click", () => {
-      bindingSlot = null; updateKeyUI();
-      if (truckBinding !== null) { truckBinding = null; syncTruckKeyUI(); }
+      window.Trk.core.bindingSlot = null; window.Trk.core.updateKeyUI();
+      if (window.Trk.modes.truckBinding !== null) { window.Trk.modes.truckBinding = null; window.Trk.modes.syncTruckKeyUI(); }
       speedBinding = i; b.blur();
-      setStatus("speedBindStatus", "speedCapture" + i); syncSpeedKeyUI();
+      window.Trk.core.setStatus("speedBindStatus", "speedCapture" + i); syncSpeedKeyUI();
     });
     row.append(name, v, b); rows.append(row); values.push(v);
   });
-  const stepSeg = makeSeg("speedStepPicker", "speedStep", [["0.01", "stepFine"], ["0.1", "stepNormal"], ["0.25", "stepBig"]]);
+  const stepSeg = window.Trk.modes.makeSeg("speedStepPicker", "speedStep", [["0.01", "stepFine"], ["0.1", "stepNormal"], ["0.25", "stepBig"]]);
   stepSeg.addEventListener("click", renderSpeed);
-  const status = el("div", "hint status"); status.id = "speedBindStatus";
+  const status = window.Trk.core.el("div", "hint status"); status.id = "speedBindStatus";
   /* STAGE・CATCHのキー設定（stage.js・catch.js が truckCtlHint の直後に入れたもの）の後ろに並べる */
   let anchor = truckHint;
-  for (const id of ["stageBindStatus", "catchBindStatus"]) { const n = $(id); if (n) anchor = n.nextElementSibling && n.nextElementSibling.dataset.i18n === "catchHint" ? n.nextElementSibling : n; }
-  anchor.after(h3, rows, hintEl("speedStepLabel"), stepSeg, status, hintEl("speedKeysHint"));
+  for (const id of ["stageBindStatus", "catchBindStatus"]) { const n = window.Trk.core.$(id); if (n) anchor = n.nextElementSibling && n.nextElementSibling.dataset.i18n === "catchHint" ? n.nextElementSibling : n; }
+  anchor.after(h3, rows, window.Trk.modes.hintEl("speedStepLabel"), stepSeg, status, window.Trk.modes.hintEl("speedKeysHint"));
   syncSpeedKeyUI = () => {
-    values.forEach((v, i) => { v.textContent = formatKey(settings.speedKeys[i]); });
+    values.forEach((v, i) => { v.textContent = window.Trk.core.formatKey(window.Trk.core.settings.speedKeys[i]); });
     rows.querySelectorAll("[data-speedbind]").forEach(b => b.classList.toggle("listening", speedBinding === +b.dataset.speedbind));
   };
   document.querySelectorAll("[data-bind], [data-truckbind]").forEach(b => b.addEventListener("click", () => {
@@ -242,6 +242,6 @@ if (truckHint) {
 }
 
 i18nNow(panel);
-syncOptionsUI(); emit("options");
+window.Trk.main.syncOptionsUI(); window.Trk.core.emit("options");
 })();
 /* ✅ speed.js 完了 */

@@ -240,6 +240,8 @@ details.panel[open]>summary{margin-bottom:14px}
 .songCol,.detailCol{display:flex;flex-direction:column;gap:14px;min-width:0}
 .libHead{display:flex;justify-content:space-between;align-items:baseline}
 .libHead h3{margin:0}
+/* 曲リストの見出しは h2（見出し順を h1→h2 にするため）。見た目は従来の h3（.panel h3 ほか）と同じにする */
+.libHead > h2.libTitle{margin:0;font-size:14px;font-weight:700;letter-spacing:.16em;color:var(--ui-muted)}
 .libTools{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:10px}
 .libTools input,.libTools select{padding:9px 12px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border);font-size:16px}
 .libTools button{padding:8px 14px;font-size:16px}
@@ -1589,6 +1591,10 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
 .mediaTime{min-width:92px;text-align:right;font-size:12px;color:#ffe6a3}
 .mediaLoopBox{margin:0 14px 2px;padding:10px 12px;border:1px solid rgba(255,209,102,.18);border-radius:12px;background:rgba(255,209,102,.045)}
 .mediaLoopBox h3{margin:0 0 5px;font-size:14px;color:#ffe6a3}.mediaLoopBox h4{margin:12px 0 4px;font-size:13px;color:#ffe6a3}.mediaLoopBox>.hint{margin:4px 0;font-size:11px;line-height:1.4}.mediaLoopBox .miniActions{margin:7px 0;justify-content:flex-start}.mediaLoopBox .mediaOption{max-width:260px}.mediaLoopPresetHeading{margin-top:8px;color:var(--ui-muted);font-size:11px;font-weight:800}.mediaLoopPresetList{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}.mediaLoopPresetRow{display:flex;align-items:center;gap:3px}.mediaLoopPreset{padding:5px 8px;border:1px solid rgba(255,209,102,.28);border-radius:7px;background:rgba(255,209,102,.08);color:#ffe6a3;font:700 11px ui-monospace,monospace}.mediaLoopPreset:hover,.mediaLoopPreset.selected{border-color:#ffd166;background:rgba(255,209,102,.2);box-shadow:0 0 0 1px rgba(255,209,102,.18) inset}.mediaLoopPresetDelete{padding:3px 5px!important;min-width:0!important;border-color:rgba(255,110,110,.3)!important;color:#ffaaa0!important}
+.tvDockGroup{margin:8px 0;padding:8px 10px;border:1px solid rgba(255,255,255,.12);border-radius:10px}
+.tvDockGroupTitle{font-weight:800;margin-bottom:4px}
+.tvDockItem{margin:4px 0}
+.mediaLoopPresetClip{padding:3px 5px!important;min-width:0!important;border-color:rgba(255,209,102,.3)!important}
 .mediaOptions{display:grid;grid-template-columns:minmax(160px,1.5fr) repeat(5,minmax(92px,1fr));align-items:end;gap:8px;padding:10px 14px;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.14)}
 .mediaOption{display:flex;flex-direction:column;gap:5px;min-width:0;color:var(--ui-muted);font-size:11px;font-weight:750}
 .mediaOption>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1665,3 +1671,9 @@ body.helpTextOff .videoMaxHint{display:none!important}
 .mediaInterpRow input[type=range]{width:100%;accent-color:#75e4ff}
 .mediaInterpStatus{min-height:1em;color:#9fe8ff}
 @media(max-width:680px){.mediaStageCanvas{height:clamp(130px,22vh,220px)}}
+
+/* 👆 長押しの代わりのボタン（設定 showMoreBtns をオフにすると隠れる） */
+body.noMoreBtns .moreBtn { display:none !important; }
+
+/* 🔧 開発者表示（設定 devView がオフのとき隠す） */
+body.noDev .devOnly { display: none !important; }

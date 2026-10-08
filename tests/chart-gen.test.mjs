@@ -1,0 +1,220 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+/* 自動譜面の生成を node --test で検査する（依存パッケージ不要）。
+ *
+ *   node --test tests/        または   npm test
+ *
+ * 対象は js/chart-gen.js の純関数（buildChartNotes／cgAllocate／cgEstimateLevel）。
+ * 音源は使わず、tests/helpers/synth.mjs の合成曲で検査する。 */
+import { test, describe } from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import vm from "node:vm";
+import crypto from "node:crypto";
+import { ROOT, loadBrowserData } from "./helpers/browser-data.mjs";
+import { SYNTH_SONGS, synthAnalysis } from "./helpers/synth.mjs";
+
+const { DIFFS, DIFF_IDS, hashString, mulberry32 } = loadBrowserData();
+/* js/chart-gen.js は即時関数で包まれ、公開名は window に出る（名前空間の移行。ctx.window で受け取る） */
+const ctx = { window: {} };
+vm.createContext(ctx);
+vm.runInContext(fs.readFileSync(path.join(ROOT, "js/chart-gen.js"), "utf8"), ctx, { filename: "js/chart-gen.js" });
+const { buildChartNotes, cgAllocate, cgEstimateLevel } = ctx.window;
+
+const golden = JSON.parse(fs.readFileSync(path.join(ROOT, "tests/fixtures/chart-legacy-golden.json"), "utf8"));
+const SONGS = { ...SYNTH_SONGS, noAnalysis: { durSec: 90, bpm: 128, ampAt: () => 0.2, none: true } };
+
+/* media.js の generateNotes と同じ手順で乱数を作り、純関数を呼ぶ */
+function generate(songId, { diff, seed = "834271", offset = 0, chartGen }) {
+  const song = SONGS[songId];
+  const analysis = song.none ? null : synthAnalysis(song, 7);
+  const rand = mulberry32(hashString(`${String(seed).trim()}|${diff}|${song.bpm}|${offset}`));
+  return buildChartNotes({ analysis, durationMs: song.durSec * 1000, diff, spec: DIFFS[diff], bpm: song.bpm, offset, rand, chartGen });
+}
+const sha = notes => crypto.createHash("sha256").update(JSON.stringify(notes)).digest("hex");
+/* 区間 [a,b) 秒の1秒あたりのノーツ数 */
+const perSec = (notes, a, b) => notes.filter(n => n.time >= a * 1000 && n.time < b * 1000).length / (b - a);
+
+describe("旧譜面の再現（chartGen 1）", () => {
+  test("旧方式は ca84a19 の generateNotes と全件ビット一致する（ゴールデン 140件）", () => {
+    const bad = [];
+    for (const g of golden.cases) {
+      const notes = generate(g.song, { diff: g.diff, seed: g.seed, offset: g.offset, chartGen: "1" });
+      if (notes.length !== g.count || sha(notes) !== g.sha256) bad.push(`${g.song}/${g.diff}/seed=${g.seed}/offset=${g.offset}`);
+    }
+    assert.deepEqual(bad, [], `旧方式の出力が変わった組み合わせ（旧譜面の記録が結び付かなくなる）`);
+    assert.equal(golden.cases.length, 140);
+  });
+
+  test("旧方式の譜面の Lv（estimateLevel）も ca84a19 と全件一致する", () => {
+    const bad = [];
+    for (const g of golden.cases) {
+      const lv = cgEstimateLevel(generate(g.song, { diff: g.diff, seed: g.seed, offset: g.offset, chartGen: "1" }));
+      if (lv !== g.level) bad.push(`${g.song}/${g.diff}: ${lv} != ${g.level}`);
+    }
+    assert.deepEqual(bad, []);
+  });
+
+  test("chartGen が未指定・\"1\" のときは旧方式を使う", () => {
+    for (const diff of DIFF_IDS) {
+      const a = generate("introChorus", { diff, chartGen: "1" });
+      assert.deepEqual(generate("introChorus", { diff }), a, `${diff}: 未指定`);
+      assert.deepEqual(generate("introChorus", { diff, chartGen: 1 }), a, `${diff}: 数値の1`);
+    }
+  });
+});
+
+describe("新方式（chartGen 2）", () => {
+  test("同じ入力なら同じ譜面になる（決定性）", () => {
+    for (const diff of DIFF_IDS) {
+      const a = generate("longRamp", { diff, chartGen: "2" });
+      assert.deepEqual(generate("longRamp", { diff, chartGen: "2" }), a, diff);
+    }
+  });
+
+  test("Seed を変えると譜面も変わる", () => {
+    for (const diff of ["normal", "master"]) {
+      const a = generate("introChorus", { diff, seed: "834271", chartGen: "2" });
+      const b = generate("introChorus", { diff, seed: "other-seed", chartGen: "2" });
+      assert.notEqual(sha(a), sha(b), diff);
+    }
+  });
+
+  test("静かなイントロにもノーツが置かれる（旧方式では易しい難易度で0件だった）", () => {
+    for (const diff of DIFF_IDS) {
+      const notes = generate("introChorus", { diff, chartGen: "2" });
+      assert.ok(notes.filter(n => n.time < 30000).length > 0, `${diff}: 0〜30秒に1件もない`);
+    }
+  });
+
+  test("静かな区間と盛り上がりの1秒あたり密度比は、区間係数（0.7〜1.3）の範囲に収まる", () => {
+    // 区間（8小節＝introChorus・longRampは120／174 BPM で 16秒強）の境界にそろえて比べる。
+    // 理論上の範囲は 0.7/1.3 〜 1.3/0.7（約0.54〜1.86）。易しい難易度は1区間に十数個しかないため、
+    // 整数の丸めで数％ずれるぶんを見込んで [0.45, 2.2] で判定する。
+    for (const diff of DIFF_IDS) {
+      const notes = generate("introChorus", { diff, chartGen: "2" });
+      const ratio = perSec(notes, 0, 16) / perSec(notes, 96, 176);
+      assert.ok(ratio >= 0.45 && ratio <= 2.2, `introChorus ${diff}: 比 ${ratio.toFixed(2)}`);
+    }
+    for (const diff of DIFF_IDS) {
+      const notes = generate("longRamp", { diff, chartGen: "2" });
+      const ratio = perSec(notes, 0, 16) / perSec(notes, 224, 300);
+      assert.ok(ratio >= 0.45 && ratio <= 2.2, `longRamp ${diff}: 比 ${ratio.toFixed(2)}`);
+    }
+  });
+
+  test("音量の差が大きい曲でも、係数は 0.7〜1.3 に収まる（静かな区間は0.7、大きな区間は1.3）", () => {
+    // 小さい区間÷大きい区間 ≒ 0.7 ÷ 1.3 ≒ 0.54。係数の上限を1.6などに広げると 0.44 となり、下限 0.45 を割る。
+    // 上級以上は元の密度が高く（0.82〜0.95）、盛り上がりの区間が候補の100%で頭打ちになるので、ここでは初級・中級だけで判定する
+    // （頭打ちは配分の仕様：候補にない位置へはノーツを置かない）。
+    for (const diff of ["easy", "normal"]) {
+      const notes = generate("contrast", { diff, chartGen: "2" });
+      const ratio = perSec(notes, 0, 16) / perSec(notes, 96, 120);
+      assert.ok(ratio >= 0.45 && ratio <= 0.7, `contrast ${diff}: 比 ${ratio.toFixed(2)}`);
+    }
+  });
+
+  test("音量がほぼ一定の曲では、前半と後半の密度がそろう", () => {
+    for (const diff of DIFF_IDS) {
+      const notes = generate("flat", { diff, chartGen: "2" });
+      const ratio = perSec(notes, 0, 60) / perSec(notes, 60, 120);
+      assert.ok(ratio >= 0.9 && ratio <= 1.1, `${diff}: 比 ${ratio.toFixed(2)}`);
+    }
+  });
+
+  test("無音の冒頭（0〜6秒）には置かず、音が始まった直後から置く", () => {
+    for (const diff of DIFF_IDS) {
+      const notes = generate("silentLead", { diff, chartGen: "2" });
+      assert.ok(notes.length > 0, diff);
+      assert.ok(notes[0].time >= 5900 && notes[0].time <= 7000, `${diff}: 最初のノーツ ${notes[0].time}ms`);
+    }
+  });
+
+  test("初級・中級のノーツ総数は旧方式と同じ（配り方だけが変わる）", () => {
+    for (const songId of ["introChorus", "flat"]) {
+      for (const diff of ["easy", "normal"]) {
+        const oldN = generate(songId, { diff, chartGen: "1" }).length;
+        const newN = generate(songId, { diff, chartGen: "2" }).length;
+        assert.equal(newN, oldN, `${songId}/${diff}`);
+      }
+    }
+  });
+
+  test("上級以上のノーツ総数は目標の±10%に収まる", () => {
+    for (const diff of ["hard", "master"]) {
+      const oldN = generate("longRamp", { diff, chartGen: "1" }).length;
+      const newN = generate("longRamp", { diff, chartGen: "2" }).length;
+      assert.ok(Math.abs(newN - oldN) <= oldN * 0.1, `${diff}: 旧 ${oldN} / 新 ${newN}`);
+    }
+  });
+
+  test("ノーツは時刻順に並び、同じ時刻の重複がない", () => {
+    for (const id of Object.keys(SONGS)) {
+      for (const diff of DIFF_IDS) {
+        const notes = generate(id, { diff, chartGen: "2" });
+        for (let i = 1; i < notes.length; i++) assert.ok(notes[i].time > notes[i - 1].time, `${id}/${diff}/${i}`);
+        for (const n of notes) assert.ok(n.lane === 0 || n.lane === 1, `${id}/${diff}: lane ${n.lane}`);
+      }
+    }
+  });
+
+  test("baseline：旧方式と新方式の数値を診断に出す（判定はしない）", t => {
+    const rows = [];
+    for (const gen of ["1", "2"]) {
+      const quiet = DIFF_IDS.map(diff => {
+        const notes = generate("introChorus", { diff, chartGen: gen });
+        return `${diff}=${(perSec(notes, 0, 30) / perSec(notes, 90, 180)).toFixed(2)}`;
+      });
+      rows.push(`gen${gen} 前半(0-30s)÷後半(90-180s)の密度比: ${quiet.join("  ")}`);
+    }
+    t.diagnostic(rows.join("\n"));
+  });
+});
+
+describe("区間配分（cgAllocate）", () => {
+  test("合計は min(総数, 上限の和) になり、各区間は上限を超えない", () => {
+    const cases = [
+      [10, [10, 1], [3, 100]],
+      [50, [1, 1, 1, 1], [5, 5, 5, 5]],
+      [7, [0.7, 1.3], [2, 9]],
+      [100, [1, 2, 3], [4, 4, 4]]
+    ];
+    for (const [total, weights, caps] of cases) {
+      const out = Array.from(cgAllocate(total, weights, caps));
+      const sum = out.reduce((x, y) => x + y, 0);
+      assert.equal(sum, Math.min(total, caps.reduce((x, y) => x + y, 0)));
+      out.forEach((v, i) => assert.ok(v >= 0 && v <= caps[i], `caps超過 ${v} > ${caps[i]}`));
+    }
+  });
+
+  test("上限に届かなければ重みの比で割る", () => {
+    assert.deepEqual(Array.from(cgAllocate(8, [1, 1, 2], [100, 100, 100])), [2, 2, 4]);
+  });
+
+  test("上限に届いた区間は固定し、余りを他の区間へ回す", () => {
+    assert.deepEqual(Array.from(cgAllocate(10, [10, 1], [3, 100])), [3, 7]);
+  });
+
+  test("重みが0・上限が0の区間には配らない", () => {
+    assert.deepEqual(Array.from(cgAllocate(4, [0, 1, 1], [5, 0, 5])), [0, 0, 4]);
+  });
+});
+
+describe("譜面の難易度表示（cgEstimateLevel）", () => {
+  test("難易度が上がるほどLvが下がらない（新旧どちらの方式でも、1〜20の範囲）", () => {
+    for (const gen of ["1", "2"]) {
+      for (const id of Object.keys(SONGS)) {
+        const levels = DIFF_IDS.map(diff => cgEstimateLevel(generate(id, { diff, chartGen: gen })));
+        levels.forEach(v => assert.ok(Number.isInteger(v) && v >= 1 && v <= 20, `${id}/gen${gen}: ${v}`));
+        for (let i = 1; i < levels.length; i++) {
+          assert.ok(levels[i] >= levels[i - 1], `${id}/gen${gen}: ${DIFF_IDS[i - 1]}=${levels[i - 1]} > ${DIFF_IDS[i]}=${levels[i]}`);
+        }
+      }
+    }
+  });
+
+  test("空の譜面は Lv.1", () => {
+    assert.equal(cgEstimateLevel([]), 1);
+    assert.equal(cgEstimateLevel(null), 1);
+  });
+});

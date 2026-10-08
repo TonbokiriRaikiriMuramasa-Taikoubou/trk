@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：データ（スキン・レイアウト・難易度・マスコット登録） ============
    内蔵スキンを増やすときは SKINS に1項目足すだけで、設定画面の一覧に出ます。
@@ -524,3 +525,38 @@ const EGG_WORDS = [
   { words:["1919", "go"], key:"eggGo", level:10 }                                       // 推定レベル Lv.10
 ];
 /* ✅ data.js 完了 */
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.DIFFS = DIFFS;
+window.DIFF_IDS = DIFF_IDS;
+window.EGG_KEYS = EGG_KEYS;
+window.EGG_WORDS = EGG_WORDS;
+window.FONT_DEFAULT = FONT_DEFAULT;
+window.H = H;
+window.HEX = HEX;
+window.LAYOUTS = LAYOUTS;
+window.MASCOT_CAPTIONS = MASCOT_CAPTIONS;
+window.MASCOT_DEFS = MASCOT_DEFS;
+window.MASCOT_FAMILY = MASCOT_FAMILY;
+window.MASCOT_IDS = MASCOT_IDS;
+window.MASCOT_POS = MASCOT_POS;
+window.NOTE_PRESETS = NOTE_PRESETS;
+window.NOTE_SHAPES = NOTE_SHAPES;
+window.SKINS = SKINS;
+window.TAU = TAU;
+window.VRM_RECT = VRM_RECT;
+window.W = W;
+window.buildCustomSkin = buildCustomSkin;
+window.has = has;
+window.hexToRgba = hexToRgba;
+window.luminance = luminance;
+window.mixHex = mixHex;
+window.parseGrad = parseGrad;
+window.registerMascot = registerMascot;
+window.sanitizeNotes = sanitizeNotes;
+window.sanitizeSkinDef = sanitizeSkinDef;
+window.toHex = toHex;
+/* 領域（window.Trk.data）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
+window.Trk = window.Trk || {};
+window.Trk.data = Object.assign(window.Trk.data || {}, { DIFFS, DIFF_IDS, EGG_KEYS, EGG_WORDS, FONT_DEFAULT, H, HEX, LAYOUTS, MASCOT_CAPTIONS, MASCOT_DEFS, MASCOT_FAMILY, MASCOT_IDS, MASCOT_POS, NOTE_PRESETS, NOTE_SHAPES, SKINS, TAU, VRM_RECT, W, buildCustomSkin, has, hexToRgba, luminance, mixHex, parseGrad, registerMascot, sanitizeNotes, sanitizeSkinDef, toHex });
+})();

@@ -11,7 +11,11 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
 
-const read = rel => fs.readFileSync(new URL(`../${rel}`, import.meta.url), "utf8");
+// 名前空間 D：js/ の本文では領域の接頭辞 window.Trk.<領域>. を取り除いて照合する（window.Trk.overlay は残す）
+const read = rel => {
+  const text = fs.readFileSync(new URL(`../${rel}`, import.meta.url), "utf8");
+  return rel.startsWith("js/") ? text.replace(/window\.Trk\.(?!overlay\b)[A-Za-z]\w*\./g, "") : text;
+};
 const utilitySource = read("js/study-room-utils.js");
 const windowStub = {};
 vm.runInNewContext(utilitySource, { window:windowStub, TextDecoder, Uint8Array, Intl, Math, Set, Map, String, Number, Object, Array, RegExp });
@@ -348,8 +352,21 @@ assert.ok(tv.includes('className = "tvCover"') && tv.includes('on("studyCoverCha
 assert.ok(library.includes('on("studyCoverChanged"') && library.includes("getSongCoverBlob"));
 assert.ok(library.includes("studySongArt"), "song selection prefers the Study cover");
 
-/* 書斎を開いている間、ゲーム側のキーを止める */
-for (const file of ["player.js", "main.js", "media-player-mode.js", "catch.js", "modes.js", "stage.js", "truck.js", "speed.js", "extras.js", "video-max.js", "synth-mode.js", "fx.js"])
-  assert.ok(read(`js/${file}`).includes("_trkStudyRoomOpen"), `${file} yields global keys to Study`);
+/* 書斎を開いている間、ゲーム側のキーを止める（旗は window.Trk.overlay に集めた。旧 window._trk*Open は残さない） */
+/* js/fx.js は凍結（書き換えない）。その 1 箇所だけは、core.js の読み取り専用の互換アクセサ window._trkStudyRoomOpen を読む */
+for (const file of ["player.js", "main.js", "media-player-mode.js", "catch.js", "modes.js", "stage.js", "truck.js", "speed.js", "extras.js", "video-max.js", "synth-mode.js", "fx.js"]) {
+  const src = read(`js/${file}`);
+  const yields = /Trk\.overlay\.(is\("study"\)|any\(\))/.test(src) || (file === "fx.js" && src.includes("window._trkStudyRoomOpen"));
+  assert.ok(yields, `${file} yields global keys to Study`);
+}
+{
+  const jsFiles = fs.readdirSync(new URL("../js/", import.meta.url)).filter(f => f.endsWith(".js") && f !== "fx.js" && f !== "core.js");
+  const oldFlags = jsFiles.filter(f => /_trk(StudyRoom|MediaPlayer|SynthMode)Open/.test(read(`js/${f}`)));
+  assert.deepEqual(oldFlags, [], "the old window._trk*Open flags are gone (except the frozen fx.js); use window.Trk.overlay");
+  const core = read("js/core.js");
+  assert.ok(core.includes("window.Trk.overlay = {"), "core.js defines window.Trk.overlay");
+  assert.ok(core.includes('Object.defineProperty(window, "_trkStudyRoomOpen"'), "core.js keeps the read-only compatibility getter for the frozen fx.js");
+  assert.ok(!/_trk(MediaPlayer|SynthMode)Open/.test(core), "core.js has no old media／synth flag left");
+}
 
 console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 24 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring`);

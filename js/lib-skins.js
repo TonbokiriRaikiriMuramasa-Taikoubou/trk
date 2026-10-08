@@ -79,64 +79,70 @@ const skinIds = () => LIB_SKIN_ORDER.slice();
 function applyLibSkin(id, opts) {
   const save = !opts || opts.save !== false;
   if (!hasLibSkin(id)) id = "player";
-  settings.libSkin = id;
-  const panel = $("libPanel");
+  window.Trk.core.settings.libSkin = id;
+  const panel = window.Trk.core.$("libPanel");
   if (panel) panel.dataset.libSkin = id;
   document.querySelectorAll("#libSkinBar .libSkinChip").forEach(c => {
     const on = c.dataset.skin === id;
     c.classList.toggle("on", on); c.setAttribute("aria-pressed", String(on));
   });
-  const sel = $("libSkinSelect");
+  const sel = window.Trk.core.$("libSkinSelect");
   if (sel) sel.value = id;
-  if (save) saveUserPrefs();
+  if (save) window.Trk.core.saveUserPrefs();
   return id;
 }
 function randomLibSkin() { return applyLibSkin(LIB_SKIN_ORDER[Math.floor(Math.random() * LIB_SKIN_ORDER.length)]); }
 
 /* ============ 🎨 ボタンと、スキン選びの帯 ============ */
-function barOpen() { const bar = $("libSkinBar"); return !!bar && !bar.hidden; }
+function barOpen() { const bar = window.Trk.core.$("libSkinBar"); return !!bar && !bar.hidden; }
 function openBar(on) {
-  const bar = $("libSkinBar"), b = $("libSkinBtn");
+  const bar = window.Trk.core.$("libSkinBar"), b = window.Trk.core.$("libSkinBtn");
   if (!bar) return;
   const want = (on === undefined) ? bar.hidden : !!on;
-  if (want && settings.libSkinQuick === false) return;     // ボタンを隠す設定のときは開かない
+  if (want && window.Trk.core.settings.libSkinQuick === false) return;     // ボタンを隠す設定のときは開かない
   bar.hidden = !want;
   if (b) b.setAttribute("aria-expanded", String(want));
 }
+/* 表示の並び：かんたん＝棚スキンの上位6つ（おすすめ）を先頭に、残りは従来の順。全部＝LIB_SKIN_ORDER そのまま。ランダムは並びに関係なく同じ16から選ぶ */
+const LIB_SKIN_SIMPLE_TOP = ["player", "cassette", "vinyl", "note", "karaoke", "retro"];
+function libSkinOrder() {
+  if (window.Trk.core.settings.displayMode === "full") return LIB_SKIN_ORDER;
+  return [...LIB_SKIN_SIMPLE_TOP, ...LIB_SKIN_ORDER.filter(id => !LIB_SKIN_SIMPLE_TOP.includes(id))];
+}
 function buildBar() {
-  const bar = $("libSkinBar"); if (!bar) return;
+  const bar = window.Trk.core.$("libSkinBar"); if (!bar) return;
   bar.textContent = "";
-  for (const id of LIB_SKIN_ORDER) {
-    const b = el("button", "libSkinChip"); b.type = "button"; b.dataset.skin = id;
+  for (const id of libSkinOrder()) {
+    const b = window.Trk.core.el("button", "libSkinChip"); b.type = "button"; b.dataset.skin = id;
     b.textContent = skinText(id);
-    b.classList.toggle("on", id === settings.libSkin);
-    b.setAttribute("aria-pressed", String(id === settings.libSkin));
+    b.classList.toggle("on", id === window.Trk.core.settings.libSkin);
+    b.setAttribute("aria-pressed", String(id === window.Trk.core.settings.libSkin));
     b.addEventListener("click", () => { applyLibSkin(id); flashSkin(skinText(id)); });
     bar.append(b);
   }
-  const rnd = el("button", "libSkinChip libSkinRand", tr("libSkinRand")); rnd.type = "button";
-  rnd.addEventListener("click", () => { randomLibSkin(); flashSkin(skinText(settings.libSkin)); });
+  const rnd = window.Trk.core.el("button", "libSkinChip libSkinRand", tr("libSkinRand")); rnd.type = "button";
+  rnd.addEventListener("click", () => { randomLibSkin(); flashSkin(skinText(window.Trk.core.settings.libSkin)); });
   bar.append(rnd);
 }
 function buildSelect() {
-  const sel = $("libSkinSelect"); if (!sel) return;
+  const sel = window.Trk.core.$("libSkinSelect"); if (!sel) return;
   sel.textContent = "";
-  for (const id of LIB_SKIN_ORDER) {
+  for (const id of libSkinOrder()) {
     const o = document.createElement("option"); o.value = id; o.textContent = skinText(id);
     sel.append(o);
   }
-  sel.value = hasLibSkin(settings.libSkin) ? settings.libSkin : "player";
+  sel.value = hasLibSkin(window.Trk.core.settings.libSkin) ? window.Trk.core.settings.libSkin : "player";
 }
 function applyQuick() {
-  const b = $("libSkinBtn");
-  const on = settings.libSkinQuick !== false;
+  const b = window.Trk.core.$("libSkinBtn");
+  const on = window.Trk.core.settings.libSkinQuick !== false;
   if (b) b.hidden = !on;
   if (!on) openBar(false);
-  const chk = $("libSkinQuickChk"); if (chk) chk.checked = on;
+  const chk = window.Trk.core.$("libSkinQuickChk"); if (chk) chk.checked = on;
 }
 let flashTimer = 0;
 function flashSkin(name) {
-  const box = $("libSkinNote");
+  const box = window.Trk.core.$("libSkinNote");
   if (!box) return;
   box.textContent = tr("libSkinApplied", { name });
   box.hidden = false;
@@ -147,21 +153,21 @@ function flashSkin(name) {
 /* ============ 画面の組み立て（全部のファイルを読み終えてから） ============ */
 addEventListener("DOMContentLoaded", () => {
   /* 知らないスキン名（古い設定・壊れた設定ファイル）は player として扱う */
-  applyLibSkin(hasLibSkin(settings.libSkin) ? settings.libSkin : "player", { save:false });
+  applyLibSkin(hasLibSkin(window.Trk.core.settings.libSkin) ? window.Trk.core.settings.libSkin : "player", { save:false });
   buildBar(); buildSelect(); applyQuick();
 
-  const b = $("libSkinBtn");
+  const b = window.Trk.core.$("libSkinBtn");
   if (b) {
     b.textContent = "🎨";
     b.title = tr("libSkinBtnTitle"); b.setAttribute("aria-label", b.title);
     b.setAttribute("aria-haspopup", "true");
     b.addEventListener("click", () => openBar());
   }
-  const sel = $("libSkinSelect");
+  const sel = window.Trk.core.$("libSkinSelect");
   if (sel) sel.addEventListener("change", e => applyLibSkin(e.target.value));
-  const chk = $("libSkinQuickChk");
+  const chk = window.Trk.core.$("libSkinQuickChk");
   if (chk) chk.addEventListener("change", e => {
-    settings.libSkinQuick = !!e.target.checked; saveUserPrefs(); applyQuick();
+    window.Trk.core.settings.libSkinQuick = !!e.target.checked; window.Trk.core.saveUserPrefs(); applyQuick();
     if (e.target.checked) openBar(true);
   });
 
@@ -183,11 +189,12 @@ addEventListener("DOMContentLoaded", () => {
 window.TrkLibSkins = {
   version: 1,
   skins: skinIds,
-  skin: () => settings.libSkin,
+  skin: () => window.Trk.core.settings.libSkin,
   selectSkin: id => applyLibSkin(id),
   random: randomLibSkin,
   open: openBar,
   barOpen
 };
+window.Trk.core.on("displayMode", () => { buildBar(); buildSelect(); });
 })();
 /* ✅ lib-skins.js 完了 */

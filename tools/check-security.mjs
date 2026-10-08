@@ -26,7 +26,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = rel => fs.readFileSync(path.join(root, rel), "utf8");
 const exists = rel => fs.existsSync(path.join(root, rel));
 const jsFiles = fs.readdirSync(path.join(root, "js")).filter(f => f.endsWith(".js"));
-const js = Object.fromEntries(jsFiles.map(f => ["js/" + f, read("js/" + f)]));
+/* 名前空間 D：js/ の本文では領域の接頭辞 window.Trk.<領域>. を取り除いて照合する（window.Trk.overlay は残す） */
+const js = Object.fromEntries(jsFiles.map(f => ["js/" + f, read("js/" + f).replace(/window\.Trk\.(?!overlay\b)[A-Za-z]\w*\./g, "")]));
 const allJs = Object.entries(js);
 const indexHtml = read("index.html");
 const sw = read("sw.js");
@@ -195,7 +196,8 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   try {
     const i18nScript = new vm.Script(read("js/i18n.js"));
     const presetScript = new vm.Script(read("js/tv-presets.js"));
-    const headSrc = richSrc.slice(0, richSrc.indexOf('addEventListener("DOMContentLoaded"'));
+    /* 即時関数で包まれていても、その中の関数を同じ方法で動かす（包みの先頭だけを外す） */
+    const headSrc = richSrc.slice(0, richSrc.indexOf('addEventListener("DOMContentLoaded"')).replace(/^\(\(\) => \{\n/, "");
     /* 保存済みの値 v を入れたとき、settings に何が残るか */
     const probe = v => {
       const ctx = { console, document:{ addEventListener(){} }, addEventListener(){} };
@@ -406,9 +408,10 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   rule(swSafe, "the service worker never serves cached copies to a ?safe=1 client (no cache poisoning bypass)");
 
   const media = js["js/media.js"], library = js["js/library.js"];
-  rule(media.includes("const ANALYZE_MAX = 96 * 1024 * 1024") && media.includes('tooBig ? "analysisSkipped"') &&
+  rule(media.includes("const ANALYZE_MAX = 96 * 1024 * 1024") && media.includes("const ANALYZE_MAX_SEC = 20 * 60") &&
+    media.includes("video.duration > ANALYZE_MAX_SEC") && media.includes('tooLong ? "analysisSkippedLong"') && media.includes('tooBig ? "analysisSkipped"') &&
     !/file\.arrayBuffer\(\)[^\n]*\n[^\n]*ANALYZE/ .test(media),
-    "huge media is never read into memory: audio analysis is skipped above ANALYZE_MAX (a 2GB file used to be loaded whole)");
+    "huge media is never read into memory: audio analysis is skipped above ANALYZE_MAX (96MB file) or ANALYZE_MAX_SEC (20 min, decoded PCM size)");
   const chartCap = media.includes("const CHART_FILE_MAX = 2 * 1024 * 1024") &&
     media.includes("file.size > CHART_FILE_MAX") && media.indexOf("file.size > CHART_FILE_MAX") < media.indexOf("file.text()") &&
     media.includes("!Number.isFinite(file.size)") && media.includes('typeof time === "number"') && media.includes('typeof lane === "number"') &&
@@ -493,10 +496,12 @@ const occurrences = (text, re) => [...text.matchAll(re)];
       parseHashParams("#RESET=ALL").get("reset") === "ALL" &&
       parseHashParams("#skin=MySkin").get("skin") === "MySkin";
   } catch (_) {}
+  /* #24：force は文字列の包含（hash.includes("force")）ではなく、パラメータの完全一致（=== "1"）で判定する。
+     包含で判定すると force=0 や forcely=1 でも通ってしまう。変数名や引用符が変わっても禁止する。 */
   const factoryGuard = core.includes("function askFactoryReset(") && core.includes("let pendingFactory = false") &&
     core.includes('if (sp.get("force") === "1")') && core.includes('if (hashParams.get("force") === "1")') &&
     core.includes("const hashParams = parseHashParams(location.hash)") && core.includes("const get = k => sp.get(k)") &&
-    core.includes("hashParams.has(\"reset\")") && !core.includes('hash.includes("force")') && hashForceExact && core.includes("if (!pendingFactory) saveUserPrefs()") &&
+    core.includes("hashParams.has(\"reset\")") && !/includes\(\s*["'`]force["'`]/.test(core) && hashForceExact && core.includes("if (!pendingFactory) saveUserPrefs()") &&
     core.includes('askFactoryReset(') && !/else if \(\["all","factory","full"\]\.includes\(r\)\) \{ resetAllPrefs\(\)/.test(core);
   rule(factoryGuard, "query/hash factory reset asks for confirmation unless the exact force=1 parameter is present");
 
@@ -506,7 +511,9 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   rule(factorySafe, "?factory alone enters safe mode, matching js/addons.js (never a destructive reset)");
 
   /* 文書ドリスト：実装はセーフモードなのに「?factory で全リセット」と書いてあったら FAIL にする */
-  const factoryDrift = ["docs/HANDOFF.md", "docs/SECURITY.md", "js/core.js", "README.md"]
+  /* README（概要）と docs/guide/*.md（くわしい説明）の両方を見る */
+  const guideDocs = fs.readdirSync(path.join(root, "docs/guide")).filter(f => f.endsWith(".md")).map(f => "docs/guide/" + f);
+  const factoryDrift = ["docs/HANDOFF.md", "docs/SECURITY.md", "js/core.js", "README.md", ...guideDocs]
     .filter(f => { try { return /`\?reset=all`\s*[／/]\s*`\?factory`/.test(read(f)) || /\?factory\s*→\s*全設定リセット/.test(read(f)); } catch (_) { return false; } });
   rule(factoryDrift.length === 0, "no documentation claims ?factory resets every setting (it is a safe-mode alias)",
     factoryDrift.length ? `still claims it: ${factoryDrift.join(", ")}` : "");

@@ -49,9 +49,13 @@ function tr(k, vars){ return k + (vars ? " " + JSON.stringify(vars) : ""); }
 function on(){}
 function emit(){}
 function plToast(t){ toasts.push(t); }
+/* 名前空間 D：lite.js は window.Trk.core.* を読む（同じ束縛へ向ける） */
+var window = { Trk: { core: { $: id => null, emit, phase: "title", saveUserPrefs, get settings(){ return settings; } } } };
 `;
 /* liteInit() は設定画面の DOM を配線する関数なので、評価だけさせて呼ばない（IDの網羅は下の静的検査で見張る） */
-let body = liteSource.replace(/\nliteInit\(\);\n/, "\n/* liteInit() is wired against the real DOM; skipped here */\n");
+/* 即時関数で包まれていても、中の名前を同じ方法で取り出す（包みの先頭と末尾だけを外す） */
+let body = liteSource.replace(/^\(\(\) => \{\n/, "").replace(/\}\)\(\);\s*$/, "");
+body = body.replace(/\nliteInit\(\);\n/, "\n/* liteInit() is wired against the real DOM; skipped here */\n");
 assert.notEqual(body, liteSource, "js/lite.js still calls liteInit() at the end");
 body = "var __exports = null;\n" + body + `
 ;__exports = { liteActive, liteAllow, liteAllowGame, liteMascotAllow, liteNoMascot, liteSpecBlocked, liteBlurCap,
@@ -133,6 +137,11 @@ eq([S.liteMode, L.liteActive()], ["off", false], "✨ no lite mode switches the 
 eq([S.liteDecor, S.liteLibRows, S.liteNoAnalyze, S.liteMascotNoLoad], [false, "device", false, false], "✨ no lite mode resets the new keys too");
 L.liteApplyPreset("max");
 eq([S.liteMode, L.liteActive()], ["on", true], "picking a lite preset while off re-enables lite mode");
+/* 自動（auto）のまま、PC などで軽いプリセットを選んだら、mode を on にして効かせる（以前は auto のまま何も変わらなかった） */
+S.liteMode = "auto";
+L.liteApplyPreset("balanced");
+eq(S.liteMode, "on", "picking a preset while auto switches to on (it must take effect)");
+L.liteApplyPreset("max");   // 後の検査は最大節約の状態を前提にしている
 
 /* ---------- 5) body クラス（CSS 側の間引き） ---------- */
 const cls = ctx.document.body.classList.set;

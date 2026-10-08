@@ -134,9 +134,10 @@
         <div class="songCol">
           <section class="panel" id="libPanel">
             <div class="libHead">
-              <h3><button type="button" class="study-launch-title" data-i18n="libTitle" aria-haspopup="dialog"></button></h3>
+              <h2 class="libTitle"><button type="button" class="study-launch-title" data-i18n="libTitle" aria-haspopup="dialog"></button></h2>
               <span class="libHeadRight">
                 <span id="libCount" class="hint"></span>
+                <button id="studyOpenBtn" class="libSkinBtn moreBtn" type="button" aria-haspopup="dialog"></button>
                 <button id="libSkinBtn" class="libSkinBtn" type="button" hidden></button>
               </span>
             </div>
@@ -160,6 +161,7 @@
                 <span data-i18n="libAddPack"></span>
               </label>
             </div>
+            <div class="hint" data-i18n="libOpenShareHint"></div>
             <input id="libDirInput" type="file" webkitdirectory multiple hidden>
             <div class="libTools">
               <input id="libSearch" type="search" autocomplete="off" data-i18n-aria="libSearch">
@@ -204,6 +206,13 @@
               <label class="field">
                 <span data-i18n="seed">Seed</span>
                 <input id="seed" type="text" maxlength="32" autocomplete="off">
+              </label>
+              <label class="field">
+                <span data-i18n="chartGen">自動譜面の作り方</span>
+                <select id="chartGen">
+                  <option value="2" data-i18n="chartGen2">新方式（おすすめ・既定）</option>
+                  <option value="1" data-i18n="chartGen1">旧方式（今までどおり）</option>
+                </select>
               </label>
             </div>
             <div id="songPrefsStatus" class="hint"></div>
@@ -323,6 +332,9 @@
         <div class="col">
           <details class="panel" open>
             <summary data-i18n="secDisplay"></summary>
+            <div><label><span data-i18n="displayModeLabel"></span> <select id="displayMode"><option value="simple" data-i18n="displaySimple"></option><option value="full" data-i18n="displayFull"></option></select></label></div>
+            <p class="hint" data-i18n="displayModeHint"></p>
+            <label class="check"><input id="devView" type="checkbox"><span data-i18n="devViewLabel"></span></label>
             <h3 data-i18n="skin"></h3>
             <div id="skinNow"></div>
             <details id="skinShelf" class="subPanel" open>
@@ -331,7 +343,7 @@
               <div id="skinGrid"></div>
             </details>
 
-            <details id="skinMaker" class="subPanel">
+            <details id="skinMaker" class="subPanel devOnly">
               <summary data-i18n="addSkin"></summary>
               <div class="hint" data-i18n="makerHint"></div>
               <label class="field">
@@ -1058,6 +1070,7 @@
             <label class="check"><input id="bannerSongBtns" type="checkbox"><span data-i18n="bannerSongBtns"></span></label>
             <label class="check"><input id="bannerRandomBtn" type="checkbox"><span data-i18n="bannerRandomBtn"></span></label>
             <label class="check"><input id="bannerRandomTap" type="checkbox"><span data-i18n="bannerRandomTap"></span></label>
+            <label class="check"><input id="showMoreBtns" type="checkbox"><span data-i18n="showMoreBtns"></span></label>
           </details>
           <!-- fx.js がここに「🎛 サウンドエフェクト」の欄を追加します -->
           <!-- ⭐ お気に入りのフォルダ管理（中身は js/favs.js が作ります） -->
@@ -1642,6 +1655,7 @@
 <script src="js/lite.js"></script>
 <!-- player.js：AUTO・練習中の再生操作。各モードより先にキーを受け取るため、core.js のすぐ後 -->
 <script src="js/player.js"></script>
+<script src="js/chart-gen.js"></script>
 <script src="js/media.js"></script>
 <script src="js/game.js"></script>
 <script src="js/render.js"></script>
@@ -1666,6 +1680,7 @@
 <!-- ===== 選曲・公認・入力・起動 ===== -->
 <!-- ===== 🛒 公式カタログ（音源同梱なし・MODは catalog.js より前に読む） ===== -->
 <script src="js/catalog.js"></script>
+<script src="js/title-match.js"></script>
 <script src="js/library.js"></script>
 <script src="js/verified.js"></script>
 <script src="js/lib-skins.js"></script>

@@ -87,8 +87,8 @@ const CUT_THRESHOLD = 34;                   // シーンチェンジ判定（0-2
 const FLOW_RANGE = 64;                      // 8bitテクスチャ時に保持できる flow の最大値（flow解像度px）
 const FLOW_LAMBDA = 0.010;                  // 平坦部で大きなベクトルを拾わないための変位ペナルティ（full-res px あたり）
 
-const mode = () => (MODES.includes(settings.frameInterp) ? settings.frameInterp : "off");
-const strength = () => Math.max(0, Math.min(1, Number(settings.frameInterpStrength)));
+const mode = () => (MODES.includes(window.Trk.core.settings.frameInterp) ? window.Trk.core.settings.frameInterp : "off");
+const strength = () => Math.max(0, Math.min(1, Number(window.Trk.core.settings.frameInterpStrength)));
 
 let gl = null, glc = null, ok2 = false, initTried = false, blocked = false;
 let prog = {};
@@ -658,7 +658,7 @@ let rvfcOn = false;
 function tick() {
   raf = 0;
   if (mode() === "off" || surfaces.size === 0) { stopLoop(); return; }
-  const ready = !!(typeof videoReady !== "undefined" && videoReady) && !!videoEl.src && !!(videoEl.videoWidth);
+  const ready = !!(typeof videoReady !== "undefined" && window.Trk.core.videoReady) && !!videoEl.src && !!(videoEl.videoWidth);
   if (!ready) { raf = requestAnimationFrame(tick); return; }
   if (!ensureSizes()) { raf = requestAnimationFrame(tick); return; }
   if (!videoEl.paused && newFrameArrived()) {
@@ -686,11 +686,11 @@ function tune() {
   lastTune = now;
   if (outFps > 0 && outFps < 45 && quality > 0) {
     quality--; degraded = true; havePair = false; W = H = 0; ensureSizes();
-    if (typeof showToast === "function") showToast(tr("mediaInterpDegraded"));
+    if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaInterpDegraded"));
     notify();
   } else if (outFps > 0 && outFps < 45 && quality === 0 && mode() === "flow") {
-    settings.frameInterp = "blend"; saveUserPrefs(); degraded = true; notify();
-    if (typeof showToast === "function") showToast(tr("mediaInterpDegraded"));
+    window.Trk.core.settings.frameInterp = "blend"; window.Trk.core.saveUserPrefs(); degraded = true; notify();
+    if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaInterpDegraded"));
   } else if (outFps >= 57 && quality < 2 && !degraded) {
     quality++; W = H = 0; ensureSizes(); notify();
   }
@@ -717,7 +717,7 @@ function drawTo(ctx, w, h) {
   if (mode() === "off" || !ok2) return false;
   if (!w || !h || !W || !H) return false;
   if (!havePair) return false;
-  if (typeof videoReady !== "undefined" && !videoReady) return false;
+  if (typeof videoReady !== "undefined" && !window.Trk.core.videoReady) return false;
   const now = performance.now();
   let t = (now - pairAt) / Math.max(8, pairInterval);
   t = Math.min(1, Math.max(0, t));
@@ -735,9 +735,9 @@ function drawTo(ctx, w, h) {
 }
 function setMode(m) {
   const next = MODES.includes(m) ? m : "off";
-  if (settings.frameInterp === next) return;
-  settings.frameInterp = next;
-  saveUserPrefs();
+  if (window.Trk.core.settings.frameInterp === next) return;
+  window.Trk.core.settings.frameInterp = next;
+  window.Trk.core.saveUserPrefs();
   if (next !== "off" && surfaces.size) {
     if (tryInit()) { W = H = 0; havePair = false; quality = 2; degraded = false; ensureSizes(); startLoop(); }
   }
@@ -766,8 +766,8 @@ window.TrkFrameInterp = Object.freeze({
 });
 
 /* 動画が変わったら作り直す */
-on("beforeLoad", () => { havePair = false; blocked = false; });
-on("mediaReady", () => { havePair = false; blocked = false; if (mode() !== "off" && surfaces.size) { W = H = 0; ensureSizes(); } });
+window.Trk.core.on("beforeLoad", () => { havePair = false; blocked = false; });
+window.Trk.core.on("mediaReady", () => { havePair = false; blocked = false; if (mode() !== "off" && surfaces.size) { W = H = 0; ensureSizes(); } });
 addEventListener("DOMContentLoaded", () => { tryInit(); rvfcOn = useRvfc(); });
 
 })();

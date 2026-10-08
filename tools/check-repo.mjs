@@ -10,6 +10,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -304,11 +305,172 @@ if (!exists("js/fx-worklet.js") ||
 {
   const library = read("js/library.js");
   const css = read("css/style.css");
+  const catalog = read("js/catalog.js");
+  const babelStart = catalog.indexOf('PL("ak-babel"');
+  const babelEnd = catalog.indexOf('PL("ak-hen"', babelStart + 1);
+  const babelBlock = babelStart >= 0 && babelEnd > babelStart ? catalog.slice(babelStart, babelEnd) : "";
+  const expectedBabelRows = [
+    ["Storyteller", "https://monster-siren.hypergryph.com/music/779480"],
+    ["Fire's Embrace", "https://monster-siren.hypergryph.com/music/953979"],
+    ["The Opening", "https://monster-siren.hypergryph.com/music/697614"],
+    ["Founding Stone", "https://monster-siren.hypergryph.com/music/048797"],
+    ["Silent Tales", "https://monster-siren.hypergryph.com/music/461148"]
+  ];
+  const actualBabelRows = [...babelBlock.matchAll(/T\("([^"]+)",[^\n]*?"(https:\/\/monster-siren\.hypergryph\.com\/music\/\d{6})"\)/g)]
+    .map(m => [m[1], m[2]]);
+  const babelLinksOk = actualBabelRows.length === expectedBabelRows.length &&
+    expectedBabelRows.every(([title, url], i) => actualBabelRows[i][0] === title && actualBabelRows[i][1] === url);
+  const loneTrailStart = catalog.indexOf('PL("ak-lonetrail"');
+  const loneTrailEnd = catalog.indexOf('PL("ak-walkindust"', loneTrailStart + 1);
+  const loneTrailBlock = loneTrailStart >= 0 && loneTrailEnd > loneTrailStart ? catalog.slice(loneTrailStart, loneTrailEnd) : "";
+  const expectedLoneTrailRows = [
+    ["Ad astra", "https://monster-siren.hypergryph.com/music/125074"],
+    ["Control's Wishes", "https://monster-siren.hypergryph.com/music/880337"],
+    ["The Coming of the Future", "https://monster-siren.hypergryph.com/music/461158"],
+    ["特里蒙的天空", "https://monster-siren.hypergryph.com/music/232266"],
+    ["群星见我", "https://monster-siren.hypergryph.com/music/125073"],
+    ["A World Above", "https://monster-siren.hypergryph.com/music/232265"],
+    ["Rhine Lab.LLC", "https://monster-siren.hypergryph.com/music/779491"],
+    ["Blues with you", "https://monster-siren.hypergryph.com/music/514542"],
+    ["Bubble", "https://monster-siren.hypergryph.com/music/048700"],
+    ["绿意游曳", "https://monster-siren.hypergryph.com/music/697629"]
+  ];
+  const actualLoneTrailRows = [...loneTrailBlock.matchAll(/T\("([^"]+)",[^\n]*?"(https:\/\/monster-siren\.hypergryph\.com\/music\/\d{6})"\)/g)]
+    .map(m => [m[1], m[2]]);
+  const loneTrailLinksOk = actualLoneTrailRows.length === expectedLoneTrailRows.length &&
+    expectedLoneTrailRows.every(([title, url], i) => actualLoneTrailRows[i][0] === title && actualLoneTrailRows[i][1] === url);
+  const loneTrailCatalogRefreshOk = catalog.includes('PL("ak-lonetrail", "LONETRAIL", "🚀"') &&
+    library.includes('if (pl.id === "ak-lonetrail" && existing.cat === "trk:" + s.id + ":" + pl.id)') &&
+    library.includes('if (JSON.stringify(existing.wish) !== JSON.stringify(wishes)) { existing.wish = wishes; changed = true; }') &&
+    library.includes('if (existing.name === "アークナイツ — Lone Trail") { existing.name = pl.name; changed = true; }') &&
+    library.includes('if (existing.icon === "🛤️") { existing.icon = pl.icon || s.icon; changed = true; }') &&
+    library.includes('if (JSON.stringify(existing.tags) === JSON.stringify(["Game","Arknights","MSR","Lone Trail"]))');
+  const xuStart = catalog.indexOf('PL("ak-hen"');
+  const xuNext = catalog.indexOf('\n   PL(', xuStart + 1);
+  const xuEnd = xuNext >= 0 ? xuNext : catalog.indexOf('])]);', xuStart);
+  const xuBlock = xuStart >= 0 && xuEnd > xuStart ? catalog.slice(xuStart, xuEnd) : "";
+  const expectedXuRows = [
+    ["2:00 PM in Mitsukue", "https://monster-siren.hypergryph.com/music/779461"],
+    ["墟", "https://monster-siren.hypergryph.com/music/232232"],
+    ["夏日潜行", "https://monster-siren.hypergryph.com/music/306880"],
+    ["夜间超速", "https://monster-siren.hypergryph.com/music/048779"],
+    ["刀刃所栖之物", "https://monster-siren.hypergryph.com/music/514514"],
+    ["关掉播放器之前", "https://monster-siren.hypergryph.com/music/697697"],
+    ["与你在黄昏街角相遇", "https://monster-siren.hypergryph.com/music/125048"]
+  ];
+  const actualXuRows = [...xuBlock.matchAll(/T\("([^"]+)",[^\n]*?"(https:\/\/monster-siren\.hypergryph\.com\/music\/\d{6})"\)/g)]
+    .map(m => [m[1], m[2]]);
+  const xuLinksOk = actualXuRows.length === expectedXuRows.length &&
+    expectedXuRows.every(([title, url], i) => actualXuRows[i][0] === title && actualXuRows[i][1] === url);
+  const xuRefreshStart = library.indexOf('if (pl.id === "ak-hen" && existing.cat === "trk:" + s.id + ":" + pl.id)');
+  const xuRefreshEnd = library.indexOf("\n        }\n        continue;", xuRefreshStart);
+  const xuRefreshBlock = xuRefreshStart >= 0 && xuRefreshEnd > xuRefreshStart ? library.slice(xuRefreshStart, xuRefreshEnd) : "";
+  const xuCatalogRefreshOk = catalog.split('PL("ak-hen"').length - 1 === 1 &&
+    catalog.includes('PL("ak-hen", "アークナイツ — 墟", "👹"') &&
+    !xuBlock.includes('T("痕 — Wounds"') &&
+    xuRefreshBlock.includes('if (JSON.stringify(existing.wish) !== JSON.stringify(wishes)) { existing.wish = wishes; changed = true; }') &&
+    library.includes('if (pl.id === "ak-hen" && existing.cat === "trk:" + s.id + ":" + pl.id)') &&
+    library.includes('if (existing.name === "アークナイツ — 痕") { existing.name = pl.name; changed = true; }') &&
+    library.includes('if (existing.icon === "🩹") { existing.icon = pl.icon || s.icon; changed = true; }') &&
+    library.includes('if (JSON.stringify(existing.tags) === JSON.stringify(["Game","Arknights","MSR","痕"]))');
+  const eventPlaylistExpected = {
+    "ak-solongadele": [
+      ["Misty Memory (Day Version)", "https://monster-siren.hypergryph.com/music/048708"],
+      ["Misty Memory (Night Version)", "https://monster-siren.hypergryph.com/music/306816"],
+      ["Misty Memory (Acoustic Version)", "https://monster-siren.hypergryph.com/music/880333"],
+      ["Effervescence", "https://monster-siren.hypergryph.com/music/306815"],
+      ["Counting Sheep", "https://monster-siren.hypergryph.com/music/953981"],
+      ["Sheepnado Decimates Nomadic City", "https://monster-siren.hypergryph.com/music/232262"],
+      ["Adele's Dream", "https://monster-siren.hypergryph.com/music/125070"],
+      ["So Long for Another Summer", "https://monster-siren.hypergryph.com/music/514549"],
+      ["Drifting Blossom", "https://monster-siren.hypergryph.com/music/461154"]
+    ],
+    "ak-nearlight": [
+      ["大骑士领", "https://monster-siren.hypergryph.com/music/125091"],
+      ["骑士之日", "https://monster-siren.hypergryph.com/music/697642"],
+      ["无畏者", "https://monster-siren.hypergryph.com/music/953900"],
+      ["冠军对决", "https://monster-siren.hypergryph.com/music/048729"]
+    ],
+    "ak-silverneherze": [
+      ["Day Train to Lake Silberneherze", "https://monster-siren.hypergryph.com/music/514538"],
+      ["Play with Burdenbeasts", "https://monster-siren.hypergryph.com/music/779486"],
+      ["First Crevasse on the Frozen Lake", "https://monster-siren.hypergryph.com/music/461143"]
+    ],
+    "ak-ilsiracusano": [
+      ["叙拉古人", "https://monster-siren.hypergryph.com/music/048728"],
+      ["文明之名", "https://monster-siren.hypergryph.com/music/880356"],
+      ["狼之主", "https://monster-siren.hypergryph.com/music/514563"],
+      ["我即荒野", "https://monster-siren.hypergryph.com/music/880355"]
+    ],
+    "ak-stultiferanavis": [
+      ["愚人曲", "https://monster-siren.hypergryph.com/music/953915"],
+      ["黄金时代的遗产", "https://monster-siren.hypergryph.com/music/880362"],
+      ["蔓延", "https://monster-siren.hypergryph.com/music/514570"],
+      ["礁石不朽", "https://monster-siren.hypergryph.com/music/306849"],
+      ["深渊梦呓", "https://monster-siren.hypergryph.com/music/697654"],
+      ["Hunter's Song", "https://monster-siren.hypergryph.com/music/125007"]
+    ],
+    "ak-whoreal": [
+      ["今夕何夕", "https://monster-siren.hypergryph.com/music/953903"],
+      ["起墨", "https://monster-siren.hypergryph.com/music/697645"],
+      ["何时卷", "https://monster-siren.hypergryph.com/music/779411"],
+      ["几更笔", "https://monster-siren.hypergryph.com/music/048722"],
+      ["山水烬尽", "https://monster-siren.hypergryph.com/music/880350"]
+    ],
+    "ak-comevultures": [
+      ["巴伦巨舰", "https://monster-siren.hypergryph.com/music/697625"],
+      ["Case Ejection", "https://monster-siren.hypergryph.com/music/232261"],
+      ["The Survivor, The Winner", "https://monster-siren.hypergryph.com/music/880332"]
+    ],
+    "ak-zwillingstuerme": [
+      ["Visage", "https://monster-siren.hypergryph.com/music/514547"],
+      ["Underneath the Spires", "https://monster-siren.hypergryph.com/music/125078"],
+      ["Der Hexenkönig", "https://monster-siren.hypergryph.com/music/779496"],
+      ["Die Sünden des Herkunftshorns", "https://monster-siren.hypergryph.com/music/697623"],
+      ["The Theme (Imperial)", "https://monster-siren.hypergryph.com/music/779495"],
+      ["The Theme (Variant)", "https://monster-siren.hypergryph.com/music/461151"],
+      ["Pavillon, My Last Creation", "https://monster-siren.hypergryph.com/music/306812"],
+      ["Scordatura", "https://monster-siren.hypergryph.com/music/880330"],
+      ["Before the Cessation", "https://monster-siren.hypergryph.com/music/232269"]
+    ]
+  };
+  const eventPlaylistNames = {
+    "ak-solongadele": "アークナイツ — So Long, Adele",
+    "ak-nearlight": "アークナイツ — Near Light",
+    "ak-silverneherze": "アークナイツ — The Rides to Lake Silberneherze",
+    "ak-ilsiracusano": "アークナイツ — Il Siracusano",
+    "ak-stultiferanavis": "アークナイツ — Stultifera Navis",
+    "ak-whoreal": "アークナイツ — Who Is Real",
+    "ak-comevultures": "アークナイツ — Come Catastrophes or Wakes of Vultures",
+    "ak-zwillingstuerme": "アークナイツ — Zwillingstürme im Herbst"
+  };
+  const eventPlaylistLinksOk = Object.entries(eventPlaylistExpected).every(([id, expectedRows]) => {
+    const start = catalog.indexOf(`PL("${id}"`);
+    if (start < 0 || catalog.split(`PL("${id}"`).length - 1 !== 1 ||
+        !catalog.includes(`PL("${id}", "${eventPlaylistNames[id]}"`)) return false;
+    const next = catalog.indexOf("\n   PL(", start + 1);
+    const final = catalog.indexOf("])]);", start);
+    const end = next >= 0 && final >= 0 ? Math.min(next, final) : next >= 0 ? next : final;
+    if (end <= start) return false;
+    const block = catalog.slice(start, end);
+    const actualRows = [...block.matchAll(/T\("([^\"]+)",[^\n]*?"(https:\/\/monster-siren\.hypergryph\.com\/music\/\d{6})"\)/g)]
+      .map(m => [m[1], m[2]]);
+    return actualRows.length === expectedRows.length &&
+      expectedRows.every(([title, url], i) => actualRows[i][0] === title && actualRows[i][1] === url);
+  });
+  const soLongRefreshStart = library.indexOf('if (pl.id === "ak-solongadele" && existing.cat === "trk:" + s.id + ":" + pl.id)');
+  const soLongRefreshEnd = library.indexOf("\n        }", soLongRefreshStart);
+  const soLongRefreshBlock = soLongRefreshStart >= 0 && soLongRefreshEnd > soLongRefreshStart ?
+    library.slice(soLongRefreshStart, soLongRefreshEnd) : "";
+  const soLongCatalogRefreshOk = catalog.split('PL("ak-solongadele"').length - 1 === 1 &&
+    catalog.includes('PL("ak-solongadele", "アークナイツ — So Long, Adele"') &&
+    soLongRefreshBlock.includes('if (JSON.stringify(existing.wish) !== JSON.stringify(wishes)) { existing.wish = wishes; changed = true; }');
   /* 📡 「集める棚」：未入手の曲を開いた瞬間から灰色で並べ、入手したら黒くなる */
   const collectionOk = library.includes("function plTitleKeys(") &&
-    /function plWishMatch\(w, byTitle\) \{\s*for \(const k of plTitleKeys\(w\.t\)\)/.test(library) &&
+    /function plWishMatch\(w, byTitle\) \{\s*for \(const k of plWishTitleKeys\(w\)\)/.test(library) &&
+    library.includes("function plSongMatchKeys(title, matchHint)") &&
+    library.includes("for (const k of plSongMatchKeys(m.title || it.title, m.matchHint)) byTitleAdd(k, it);") &&
     library.includes("function plCollectionEntries(") && library.includes("function plWishFolderIds(") &&
-    library.includes("for (const k of plTitleKeys((metaOf(it.key) || {}).title || it.title)) byTitleAdd(k, it);") &&
     library.includes("const entries = plCollectionEntries(tabId, byTitle);") &&
     library.includes("if (!all.length && !entries.length) {") &&
     library.includes("if (!row.it) { box.append(plWishRow(row.w)); continue; }") &&
@@ -321,6 +483,50 @@ if (!exists("js/fx-worklet.js") ||
   const stringsOk = ["plWishHead", "plWishTag", "plWishHint", "plWishOpen", "plWishNoLink",
     "plCatalogBtn", "plCatalogHint", "plCatalogTake", "plCatalogTaken", "plCatalogDup"]
     .every(k => library.split(k + ':\"').length - 1 === 4);
+  const profileMatchStringsOk = ["plMatchMemo", "plMatchMemoPh", "plMatchMemoNote"]
+    .every(k => library.split(k + ':\"').length - 1 === 4);
+  let matchHintBehaviorOk = false;
+  try {
+    const logic = library.match(/const plNormTitle =[\s\S]*?(?=\nfunction plSyncWishes)/);
+    if (logic) {
+      const ctx = { metaOf: () => null };
+      vm.runInNewContext(`${logic[0]}\nglobalThis.__plSongMatchKeys = plSongMatchKeys; globalThis.__plWishMatch = plWishMatch;`, ctx);
+      const mapSong = (title, hint) => {
+        const it = { key:title, title }, byTitle = new Map();
+        for (const key of ctx.__plSongMatchKeys(title, hint)) {
+          const hits = byTitle.get(key) || [];
+          if (!hits.includes(it)) hits.push(it);
+          byTitle.set(key, hits);
+        }
+        return { it, byTitle };
+      };
+      const examples = [
+        ["BELIEVE.ogg", "Suguri", "Suguri - BELIEVE"],
+        ["Comet.ogg", "Hime", "Hime - Comet"],
+        ["Up_to_you.ogg", "Sora", "Sora - Up to you"]
+      ];
+      matchHintBehaviorOk = examples.every(([title, hint, wishTitle]) => {
+        const { it, byTitle } = mapSong(title, hint);
+        return ctx.__plWishMatch({ t:wishTitle, al:"", ar:"" }, byTitle) === it && it.title === title;
+      });
+      /* 曲名かメモの片方だけでよい。メモなしで BELIEVE.ogg、または別タイトル＋Suguri でも候補に当たる。 */
+      const titleOnly = mapSong("BELIEVE.ogg", "");
+      const hintOnly = mapSong("unrelated.ogg", "Suguri");
+      const noMatch = mapSong("unrelated.ogg", "other hint");
+      matchHintBehaviorOk = matchHintBehaviorOk &&
+        ctx.__plWishMatch({ t:"Suguri - BELIEVE", al:"", ar:"" }, titleOnly.byTitle) === titleOnly.it &&
+        ctx.__plWishMatch({ t:"Suguri - BELIEVE", al:"", ar:"" }, hintOnly.byTitle) === hintOnly.it &&
+        ctx.__plWishMatch({ t:"Suguri - BELIEVE", al:"", ar:"" }, noMatch.byTitle) === null;
+    }
+  } catch (_) { matchHintBehaviorOk = false; }
+  const fileExtensionOk = !/\.pgg\b/i.test(library + read("README.md") + read("docs/HANDOFF.md")) &&
+    /BELIEVE\.ogg/i.test(read("README.md") + read("docs/HANDOFF.md"));
+  const profileMatchOk = fileExtensionOk && library.includes('["matchHint", 80]') &&
+    library.includes('function plWishTitleKeys(wish)') &&
+    library.includes('matchMemo.placeholder = tr("plMatchMemoPh")') &&
+    library.includes('f.matchHint = matchMemo') &&
+    library.includes('m.matchHint ? `${tr("plMatchMemo")}: ${m.matchHint}` : ""') &&
+    profileMatchStringsOk && matchHintBehaviorOk;
   if (!exists("js/catalog.js") ||
       !read("js/catalog.js").includes("TRK_CATALOG") ||
       !library.includes("plCatalogMenu") ||
@@ -328,11 +534,463 @@ if (!exists("js/fx-worklet.js") ||
       !library.includes("function plWishRow(") ||
       !read("index.html").includes('src="js/catalog.js"')) {
     fail("official catalog plumbing is missing");
-  } else if (!collectionOk || !stringsOk) {
-    fail("the collection shelf (grey unowned rows inline, turning black on arrival) is not wired");
+  } else if (!collectionOk || !stringsOk || !profileMatchOk) {
+    fail("the collection shelf, .ogg examples, or one-sided local profile match-hint path is incomplete");
+  } else if (!babelLinksOk) {
+    fail("the five Babel OST tracks do not point to their matching Monster-Siren song pages in order");
+  } else if (!loneTrailLinksOk || !loneTrailCatalogRefreshOk) {
+    fail("the ten LONETRAIL songs, direct links, or safe refresh for existing catalog imports are incomplete");
+  } else if (!xuLinksOk || !xuCatalogRefreshOk) {
+    fail("the seven 墟 songs, direct links, or safe replacement of existing 痕 imports are incomplete");
+  } else if (!eventPlaylistLinksOk || !soLongCatalogRefreshOk) {
+    fail("selected Arknights event OST titles, direct song links, or safe So Long, Adele catalog refresh are incomplete");
   } else {
-    ok("official catalog (wishlist auto-match, no bundled audio) is wired");
+    ok("official catalog (wishlist auto-match, profile match hint, Babel + LONETRAIL + 墟 + selected event OSTs, no bundled audio) is wired");
   }
+}
+
+// 🎯 VALORANT / 🩺 Arknights / ❄ Genshin / 🍊 OJ / 🌟 Gakumas catalog updates:
+// official destinations, separated distribution claims, SEARCH RIGHT/LIGHT alias, safe refresh.
+{
+  const catalogSource = read("js/catalog.js");
+  const library = read("js/library.js");
+  let targetCatalogOk = false;
+  let aliasBehaviorOk = false;
+  let safeRefreshOk = false;
+  try {
+    const fixture = JSON.parse(read("tools/gakumas-download-tracks.json"));
+    const catalogContext = vm.createContext({});
+    new vm.Script(catalogSource + "\nglobalThis.__TRK_CATALOG_FOR_CHECK = TRK_CATALOG;").runInContext(catalogContext);
+    const all = catalogContext.__TRK_CATALOG_FOR_CHECK;
+    const gakumas = all.find(series => series.id === "gakumas");
+    const instrumentLists = gakumas && ["gm-inst", "gm-inst2"].map(id => gakumas.playlists.find(pl => pl.id === id));
+    const discography = gakumas && gakumas.playlists.find(pl => pl.id === "gm-releases");
+    const instrumentSongs = instrumentLists && instrumentLists.flatMap(pl => pl.songs);
+    const searchRight = instrumentSongs && instrumentSongs.find(track => track.t === "SEARCH RIGHT");
+    const officialDiscographyUrl = url => /^https:\/\/gakuen-label\.idolmaster-official\.jp\/discography\/[A-Za-z0-9_-]+$/.test(url || "");
+    const gakumasDataOk = !!gakumas && gakumas.url === fixture.sourcePage &&
+      fixture.sourceUrl === "https://drive.google.com/drive/folders/1iv1Qrca365CpgklE5z-Al40_hNZI11Ly?usp=sharing" &&
+      fixture.files.length === 50 && new Set(fixture.files).size === 50 &&
+      instrumentLists.every((pl, i) => pl && pl.songs.length === 25 &&
+        pl.sourceUrl === fixture.sourceUrl && pl.sourceLabel.includes("公式Google Drive") &&
+        pl.songs.every(track => officialDiscographyUrl(track.u))) &&
+      instrumentSongs.length === 50 && discography && discography.songs.length === 14 &&
+      discography.sourceUrl === "https://gakuen-label.idolmaster-official.jp/discography" &&
+      discography.songs.every(track => officialDiscographyUrl(track.u)) &&
+      fixture.filenameAliases["SEARCH RIGHT"] === "SEARCH LIGHT" &&
+      fixture.files.includes("SEARCH LIGHT") && searchRight &&
+      JSON.stringify(searchRight.matchAliases) === JSON.stringify(["SEARCH LIGHT"]) &&
+      gakumas.note.includes("限定的なファン動画向け") && gakumas.note.includes("購入や所持による利用許諾ではありません") &&
+      gakumas.note.includes("配布不可と断定せず") && gakumas.note.includes("2026-10-14");
+
+    const valorant = all.find(series => series.id === "valorant");
+    const valThemes = valorant && valorant.playlists.find(pl => pl.id === "val-themes");
+    const valAgents = valorant && valorant.playlists.find(pl => pl.id === "val-agent-themes");
+    const genshin = all.find(series => series.id === "genshin");
+    const arknights = all.find(series => series.id === "arknights");
+    const xu = arknights && arknights.playlists.find(pl => pl.id === "ak-hen");
+    const carnevale = arknights && arknights.playlists.find(pl => pl.id === "ak-ilcarnevale");
+    const sam = all.find(series => series.id === "samfree");
+    const oj = all.find(series => series.id === "oj");
+    targetCatalogOk = gakumasDataOk &&
+      !!valorant && valorant.url === "https://www.riotgames.com/en/riot-music-creator-safe-guidelines" &&
+      !!valThemes && valThemes.songs.length === 6 && !!valAgents && valAgents.songs.length === 3 &&
+      valorant.note.includes("二次利用許諾ではありません") && valorant.note.includes("Creator-Safe") &&
+      !!genshin && genshin.playlists.length === 1 && genshin.playlists[0].songs.length === 12 &&
+      genshin.playlists[0].songs.every(track => /^https:\/\/music\.apple\.com\/(?:us|jp)\/song\//.test(track.u)) &&
+      genshin.note.includes("サブスク・購入は二次利用許諾ではありません") &&
+      !!xu && xu.name === "アークナイツ — 墟" && xu.icon === "👹" && xu.songs.length === 7 &&
+      !!carnevale && carnevale.songs.length === 6 &&
+      arknights.playlists.every(pl => pl.songs.every(track => /^https:\/\/monster-siren\.hypergryph\.com\/music\/\d{6}$/.test(track.u))) &&
+      !!sam && sam.playlists[0].songs.length === 10 &&
+      sam.note.includes("個別の公式曲ページ・配布条件・二次利用許諾は未確認") &&
+      !!oj && oj.playlists[0].songs.length === 15 &&
+      oj.note.includes("個別公式曲ページや再利用許諾は未確認") &&
+      [...sam.playlists, ...oj.playlists].every(pl => pl.songs.every(track => track.u === "https://fruitbatfactory.com/100orange/"));
+
+    const wishHelperStart = library.indexOf("function trkWishFromTrack(");
+    const wishHelperEnd = library.indexOf("\nfunction trkWishesFromCatalog", wishHelperStart);
+    const sanitizeStart = library.indexOf("function plSanitize(raw) {");
+    const sanitizeEnd = library.indexOf("\nconst TRK_PLAYLIST_ID", sanitizeStart);
+    const matchLogic = library.match(/const plNormTitle =[\s\S]*?(?=\nfunction plSyncWishes)/);
+    if (gakumasDataOk && wishHelperStart >= 0 && wishHelperEnd > wishHelperStart &&
+        sanitizeStart >= 0 && sanitizeEnd > sanitizeStart && matchLogic) {
+      const aliasContext = vm.createContext({ PL_COLORS:{}, metaOf:() => null });
+      new vm.Script(library.slice(wishHelperStart, wishHelperEnd) + "\n" +
+        library.slice(sanitizeStart, sanitizeEnd) + "\n" + matchLogic[0] +
+        "\nglobalThis.__trkWishFromTrack = trkWishFromTrack; globalThis.__plSanitize = plSanitize;" +
+        " globalThis.__plWishMatch = plWishMatch; globalThis.__plSongMatchKeys = plSongMatchKeys;").runInContext(aliasContext);
+      const projectedWish = aliasContext.__plSanitize({ id:"gakumas-alias-check", wish:[aliasContext.__trkWishFromTrack(searchRight)] }).wish[0];
+      const downloadedFile = { key:"local-search-light", title:"SEARCH LIGHT.ogg", artist:"not 初星学園" };
+      const byTitle = new Map();
+      for (const key of aliasContext.__plSongMatchKeys(downloadedFile.title, "")) byTitle.set(key, [downloadedFile]);
+      const unrelatedFile = { key:"unrelated", title:"unrelated.ogg", artist:"" };
+      const unrelatedMap = new Map([["unrelated.ogg", [unrelatedFile]], ["unrelated", [unrelatedFile]]]);
+      aliasBehaviorOk = projectedWish.t === "SEARCH RIGHT" &&
+        JSON.stringify(projectedWish.matchAliases) === JSON.stringify(["SEARCH LIGHT"]) &&
+        aliasContext.__plWishMatch(projectedWish, byTitle) === downloadedFile &&
+        aliasContext.__plWishMatch(projectedWish, unrelatedMap) === null;
+
+      const toWish = track => {
+        const wish = { t:track.t, al:track.al || "", ar:track.ar || "", u:track.u || "" };
+        if (Array.isArray(track.matchAliases) && track.matchAliases.length) wish.matchAliases = track.matchAliases.slice(0, 8);
+        return wish;
+      };
+      const allGakumasWishes = gakumas.playlists.flatMap(pl => pl.songs.map(toWish));
+      const owned = ["owned-gakumas-song"];
+      const manualOwned = ["manual-gakumas-song"];
+      const autoExisting = { id:"trk-gm-inst", cat:"trk:gakumas:gm-inst", name:"My renamed instruments", icon:"🎧", tags:["my-custom-tag"],
+        wish:[{t:"obsolete", al:"", ar:"", u:""}], songs:owned, guide:{note:"old guide", url:"https://example.com/old"} };
+      const manuallyImported = { id:"manual-gm-inst", cat:"gakumas:gm-inst", name:"My manual list", icon:"🌟", tags:["manual"],
+        wish:[{t:"obsolete", al:"", ar:"", u:""}], songs:manualOwned, guide:{note:"old guide", url:"https://example.com/old"} };
+      const renamedDefault = { id:"previous-gm-inst", cat:"trk:gakumas:gm-inst", name:"学マス インスト厳選 — キャラ別 Vol.1", icon:"🎛", tags:["old-tag"],
+        wish:[{t:"obsolete", al:"", ar:"", u:""}], songs:["owned-default-song"], guide:{note:"old guide", url:"https://example.com/old"} };
+      const legacyOwned = ["legacy-gakumas-song"];
+      const legacy = { id:"trk-gakumas-v1", cat:"trk:gakumas", name:"My legacy Gakumas", icon:"🌸", tags:["legacy-custom"],
+        wish:[{t:"obsolete", al:"", ar:"", u:""}], songs:legacyOwned, guide:{note:"old guide", url:"https://example.com/old"} };
+      const testSettings = { playlists:[autoExisting, manuallyImported, renamedDefault, legacy] };
+      let saveCount = 0;
+      const runContext = vm.createContext({
+        settings:testSettings,
+        ensureTrkFolder:() => {},
+        trkCatalog:() => [gakumas],
+        plSanitize:raw => raw,
+        saveUserPrefs:() => { saveCount++; },
+        trkWishesForSeries:() => allGakumasWishes
+      });
+      new vm.Script(library.slice(wishHelperStart, wishHelperEnd) + "\n" +
+        library.slice(library.indexOf("function trkCatalogGuide("), library.indexOf("\n(function plTighten()")) +
+        "\nensureTrkDistributionPlaylists();").runInContext(runContext);
+      const expectedInstrumentWish = instrumentLists[0].songs.map(toWish);
+      const updatedImported = JSON.stringify(autoExisting.wish) === JSON.stringify(expectedInstrumentWish) &&
+        JSON.stringify(manuallyImported.wish) === JSON.stringify(expectedInstrumentWish) &&
+        autoExisting.guide.url === fixture.sourcePage && manuallyImported.guide.url === fixture.sourcePage &&
+        autoExisting.guide.note.includes("ファン動画向け") && manuallyImported.guide.note.includes("ファン動画向け");
+      const preservedUserData = autoExisting.name === "My renamed instruments" && autoExisting.icon === "🎧" &&
+        JSON.stringify(autoExisting.tags) === JSON.stringify(["my-custom-tag"]) && autoExisting.songs === owned &&
+        manuallyImported.name === "My manual list" && manuallyImported.icon === "🌟" &&
+        JSON.stringify(manuallyImported.tags) === JSON.stringify(["manual"]) && manuallyImported.songs === manualOwned &&
+        renamedDefault.name === instrumentLists[0].name && renamedDefault.icon === "🎛" &&
+        JSON.stringify(renamedDefault.tags) === JSON.stringify(["old-tag"]) &&
+        JSON.stringify(renamedDefault.songs) === JSON.stringify(["owned-default-song"]) &&
+        legacy.name === "My legacy Gakumas" && legacy.icon === "🌸" &&
+        JSON.stringify(legacy.tags) === JSON.stringify(["legacy-custom"]) && legacy.songs === legacyOwned;
+      const legacyRefresh = JSON.stringify(legacy.wish) === JSON.stringify(allGakumasWishes) &&
+        legacy.guide.url === fixture.sourcePage && legacy.guide.note.includes("ファン動画向け限定") &&
+        legacy.guide.note.includes("Drive未掲載は配布不可の証明ではありません");
+      const createsSeparatedLists = ["gm-inst2", "gm-releases"].every(id => {
+        const created = testSettings.playlists.find(pl => pl.id === "trk-" + id);
+        return !!created && created.folder === "trk-gakumas" && created.wish.length ===
+          gakumas.playlists.find(pl => pl.id === id).songs.length && created.guide.url === fixture.sourcePage;
+      });
+      safeRefreshOk = updatedImported && preservedUserData && legacyRefresh && createsSeparatedLists && saveCount > 0;
+    }
+  } catch (error) {
+    console.error(`WARN  targeted catalog test setup failed: ${error.message}`);
+  }
+  if (!targetCatalogOk) fail("VALORANT / Arknights / Genshin / OJ / Gakumas source, count, or rights-scope catalog checks failed");
+  else if (!aliasBehaviorOk) fail("Gakumas SEARCH RIGHT must retain its official title and match the verified SEARCH LIGHT Drive filename after wish sanitization");
+  else if (!safeRefreshOk) fail("Gakumas refresh must carry aliases, preserve owned/custom data, migrate legacy wishes, and keep instrumental/discography lists separate");
+  else ok("VALORANT / Arknights / Genshin / OJ / Gakumas: official links, cautious rights notes, SEARCH RIGHT alias and safe list refresh");
+}
+
+// 🎒 Blue Archive OST Vol.1–8: official order, track-level Apple Music IDs,
+// per-volume NexTone links, and a safe refresh of existing catalog playlists.
+{
+  const catalogSource = read("js/catalog.js");
+  const library = read("js/library.js");
+  const core = read("js/core.js");
+  let catalogDataOk = false;
+  let safeRefreshOk = false;
+  let catalogGuideOk = false;
+  try {
+    const fixture = JSON.parse(read("tools/bluearchive-tracklist.json"));
+    const catalogContext = vm.createContext({});
+    new vm.Script(catalogSource + "\nglobalThis.__TRK_CATALOG_FOR_CHECK = TRK_CATALOG;").runInContext(catalogContext);
+    const series = catalogContext.__TRK_CATALOG_FOR_CHECK.find(item => item.id === "bluearchive");
+    const expectedAlbumIds = fixture.albums.map(album => album.id);
+    const playlistOrderOk = !!series && JSON.stringify(series.playlists.map(pl => pl.id)) === JSON.stringify(expectedAlbumIds);
+    let trackTotal = 0;
+    let tracksMatch = playlistOrderOk;
+    const appleIds = [];
+    if (playlistOrderOk) for (let i = 0; i < fixture.albums.length; i++) {
+      const expected = fixture.albums[i], actual = series.playlists[i];
+      if (actual.sourceUrl !== expected.nexToneUrl || actual.sourceLabel !== "NexTone.Link" ||
+          !/^https:\/\/nex-tone\.link\/A\d+$/.test(actual.sourceUrl || "") ||
+          !/^https:\/\/music\.apple\.com\/jp\/album\/[^/]+\/\d+$/.test(expected.appleAlbumUrl || "")) tracksMatch = false;
+      if (actual.songs.length !== expected.tracks.length) tracksMatch = false;
+      for (let j = 0; j < expected.tracks.length; j++) {
+        const [title, artist, appleId] = expected.tracks[j];
+        const track = actual.songs[j];
+        trackTotal++;
+        appleIds.push(appleId);
+        let validAppleUrl = false;
+        try {
+          const link = new URL(track.u);
+          validAppleUrl = link.protocol === "https:" && link.hostname === "music.apple.com" &&
+            /^\/jp\/song\/[^/]+\/\d+$/.test(link.pathname) && link.pathname.endsWith("/" + appleId);
+        } catch (_) {}
+        if (!track || track.t !== title || track.ar !== artist || track.al !== expected.album || !validAppleUrl) tracksMatch = false;
+      }
+    }
+    catalogDataOk = playlistOrderOk && tracksMatch && trackTotal === 225 &&
+      JSON.stringify(fixture.albums.map(album => album.tracks.length)) === JSON.stringify([39, 21, 26, 28, 27, 28, 28, 28]) &&
+      new Set(appleIds).size === 225;
+
+    const ensureStart = library.indexOf("function trkCatalogGuide(");
+    const ensureEnd = library.indexOf("\n(function plTighten()", ensureStart);
+    if (ensureStart >= 0 && ensureEnd > ensureStart) {
+      const importedOwned = ["owned-bluearchive-track"];
+      const autoOwned = ["custom-owned-track"];
+      const autoExisting = { id:"trk-ba-v1", cat:"trk:bluearchive:ba-v1", name:"My renamed volume", icon:"🎧", tags:["my-custom-tag"],
+        wish:[{t:"obsolete", al:"", ar:"", u:""}], songs:autoOwned, guide:{note:"old guide", url:"https://example.com/old"} };
+      const manuallyImported = { id:"pl-manual-ba-v1", cat:"bluearchive:ba-v1", name:"My other name", icon:"🌸", tags:["personal", "tag"],
+        wish:[{t:"obsolete", al:"", ar:"", u:""}], songs:importedOwned, guide:{note:"old guide", url:"https://example.com/old"} };
+      const testSettings = { playlists:[autoExisting, manuallyImported] };
+      let saveCount = 0;
+      const runContext = vm.createContext({
+        settings:testSettings,
+        ensureTrkFolder:() => {},
+        trkCatalog:() => [series],
+        plSanitize:raw => raw,
+        saveUserPrefs:() => { saveCount++; },
+        trkWishesForSeries:() => []
+      });
+      new vm.Script(library.slice(library.indexOf("function trkWishFromTrack("), library.indexOf("\nfunction trkWishesFromCatalog")) + "\n" + library.slice(ensureStart, ensureEnd) + "\nensureTrkDistributionPlaylists();").runInContext(runContext);
+      const expectedWish = fixture.albums[0].tracks.map(([t, ar, id], i) => {
+        const track = series.playlists[0].songs[i];
+        return { t, al:fixture.albums[0].album, ar, u:track.u };
+      });
+      const preservesCustomData = autoExisting.name === "My renamed volume" && autoExisting.icon === "🎧" &&
+        JSON.stringify(autoExisting.tags) === JSON.stringify(["my-custom-tag"]) && autoExisting.songs === autoOwned &&
+        manuallyImported.name === "My other name" && manuallyImported.icon === "🌸" &&
+        JSON.stringify(manuallyImported.tags) === JSON.stringify(["personal", "tag"]) && manuallyImported.songs === importedOwned;
+      const refreshesBothSources = JSON.stringify(autoExisting.wish) === JSON.stringify(expectedWish) &&
+        JSON.stringify(manuallyImported.wish) === JSON.stringify(expectedWish) &&
+        autoExisting.guide.url === fixture.albums[0].nexToneUrl && manuallyImported.guide.url === fixture.albums[0].nexToneUrl &&
+        autoExisting.guide.note.includes("購入・サブスクは利用許諾ではありません") &&
+        manuallyImported.guide.note.includes("購入・サブスクは利用許諾ではありません");
+      const createsAllOtherVolumes = fixture.albums.slice(1).every(album => {
+        const created = testSettings.playlists.find(p => p.id === "trk-" + album.id);
+        return created && created.wish.length === album.tracks.length && created.guide.url === album.nexToneUrl;
+      });
+      safeRefreshOk = preservesCustomData && refreshesBothSources && createsAllOtherVolumes && saveCount > 0;
+    }
+    catalogGuideOk = /if \(pl\.sourceUrl\) \{[\s\S]*?plOpenLink\(pl\.sourceUrl\)/.test(library) &&
+      library.includes("guide: trkCatalogGuide(s, pl)") && library.includes("guide: trkCatalogGuide(s, pl, true)") &&
+      library.includes("songs: p.songs, wish: p.wish, guide: p.guide, cat: p.cat, by: p.by, createdAt: p.createdAt") &&
+      !/catb\.hidden\s*=\s*true/.test(library) &&
+      core.includes(".slice(0, 100)") && library.includes(".filter(Boolean).slice(0, 100)");
+  } catch (error) {
+    console.error(`WARN  Blue Archive catalog test setup failed: ${error.message}`);
+  }
+  if (!catalogDataOk) fail("Blue Archive OST fixture/catalog mismatch (expected 225 ordered tracks, artist + exact album, unique Apple Music song IDs, and eight NexTone links)");
+  else if (!safeRefreshOk) fail("Blue Archive refresh must update wishes and per-volume guides while preserving owned songs and customized name/icon/tags");
+  else if (!catalogGuideOk) fail("Blue Archive per-volume NexTone links must be reachable before import and from imported playlist guides; wishlist capacity must retain all volumes");
+  else ok("Blue Archive OST Vol.1–8: 225 ordered Apple Music-linked tracks, NexTone per-volume guides, safe existing-playlist refresh");
+}
+
+// ⚔️ LoL Creator-Safe Sessions: complete SoundCloud album order/count and one official song URL per track.
+{
+  const catalogSource = read("js/catalog.js");
+  const library = read("js/library.js");
+  let catalogDataOk = false;
+  let safeRefreshOk = false;
+  try {
+    const fixture = JSON.parse(read("tools/leagueoflegends-sessions-tracklist.json"));
+    const catalogContext = vm.createContext({});
+    new vm.Script(catalogSource + "\nglobalThis.__TRK_CATALOG_FOR_CHECK = TRK_CATALOG;").runInContext(catalogContext);
+    const series = catalogContext.__TRK_CATALOG_FOR_CHECK.find(item => item.id === "lol");
+    const expectedIds = fixture.albums.map(album => album.id);
+    const sessionPlaylists = series ? series.playlists.filter(pl => expectedIds.includes(pl.id)) : [];
+    const playlistOrderOk = !!series && JSON.stringify(sessionPlaylists.map(pl => pl.id)) === JSON.stringify(expectedIds);
+    let trackTotal = 0;
+    let tracksMatch = playlistOrderOk;
+    const spotifyIds = [];
+    if (playlistOrderOk) for (let i = 0; i < fixture.albums.length; i++) {
+      const expected = fixture.albums[i], actual = series.playlists[i];
+      const validSoundCloudAlbum = (actual.sourceUrl || "").startsWith("https://soundcloud.com/leagueoflegends/sets/");
+      const validSpotifyAlbum = /^https:\/\/open\.spotify\.com\/album\/[A-Za-z0-9]{22}$/.test(expected.spotifyAlbumUrl || "");
+      if (actual.name !== expected.name || actual.sourceUrl !== expected.soundcloudUrl || actual.sourceLabel !== "SoundCloud" ||
+          !validSoundCloudAlbum || !validSpotifyAlbum || actual.songs.length !== expected.trackCount ||
+          actual.songs.length !== expected.tracks.length) tracksMatch = false;
+      for (let j = 0; j < expected.tracks.length; j++) {
+        const [title, artist, spotifyId] = expected.tracks[j];
+        const track = actual.songs[j];
+        trackTotal++;
+        spotifyIds.push(spotifyId);
+        let validSpotifyUrl = false;
+        try {
+          const link = new URL(track.u);
+          validSpotifyUrl = link.protocol === "https:" && link.hostname === "open.spotify.com" &&
+            link.pathname === "/track/" + spotifyId && link.search === "";
+        } catch (_) {}
+        if (!/^[A-Za-z0-9]{22}$/.test(spotifyId) || !track || track.t !== title || track.ar !== artist ||
+            track.al !== expected.name || !validSpotifyUrl) tracksMatch = false;
+      }
+    }
+    catalogDataOk = playlistOrderOk && tracksMatch && trackTotal === 108 && new Set(spotifyIds).size === 108 &&
+      JSON.stringify(fixture.albums.map(album => album.trackCount)) === JSON.stringify([36, 43, 29]) &&
+      series.note.includes("これはLoL全楽曲ではなく") &&
+      series.note.includes("二次利用許諾ではありません") &&
+      series.url === "https://www.riotgames.com/en/riot-music-creator-safe-guidelines";
+
+    const ensureStart = library.indexOf("function trkCatalogGuide(");
+    const ensureEnd = library.indexOf("\n(function plTighten()", ensureStart);
+    if (ensureStart >= 0 && ensureEnd > ensureStart) {
+      const autoOwned = ["owned-lol-vi-track"];
+      const manuallyOwned = ["manual-owned-lol-track"];
+      const autoExisting = { id:"trk-lol-svi", cat:"trk:lol:lol-svi", name:"My renamed Vi playlist", icon:"🎧", tags:["my-custom-tag"],
+        wish:[{t:"obsolete", al:"", ar:"", u:""}], songs:autoOwned, guide:{note:"old guide", url:"https://example.com/old"} };
+      const manuallyImported = { id:"pl-manual-lol-svi", cat:"lol:lol-svi", name:"Sessions: Vi 厳選", icon:"🥊", tags:["personal", "tag"],
+        wish:[{t:"obsolete", al:"", ar:"", u:""}], songs:manuallyOwned, guide:{note:"old guide", url:"https://example.com/old"} };
+      const testSettings = { playlists:[autoExisting, manuallyImported] };
+      let saveCount = 0;
+      const runContext = vm.createContext({
+        settings:testSettings,
+        ensureTrkFolder:() => {},
+        trkCatalog:() => [series],
+        plSanitize:raw => raw,
+        saveUserPrefs:() => { saveCount++; },
+        trkWishesForSeries:() => []
+      });
+      new vm.Script(library.slice(library.indexOf("function trkWishFromTrack("), library.indexOf("\nfunction trkWishesFromCatalog")) + "\n" + library.slice(ensureStart, ensureEnd) + "\nensureTrkDistributionPlaylists();").runInContext(runContext);
+      const expectedWish = fixture.albums[0].tracks.map(([t, ar, spotifyId], i) => ({
+        t, al:fixture.albums[0].name, ar, u:series.playlists[0].songs[i].u
+      }));
+      const preservesCustomData = autoExisting.name === "My renamed Vi playlist" && autoExisting.icon === "🎧" &&
+        JSON.stringify(autoExisting.tags) === JSON.stringify(["my-custom-tag"]) && autoExisting.songs === autoOwned &&
+        manuallyImported.name === "Sessions: Vi" && manuallyImported.icon === "🥊" &&
+        JSON.stringify(manuallyImported.tags) === JSON.stringify(["personal", "tag"]) && manuallyImported.songs === manuallyOwned;
+      const refreshesBothSources = JSON.stringify(autoExisting.wish) === JSON.stringify(expectedWish) &&
+        JSON.stringify(manuallyImported.wish) === JSON.stringify(expectedWish) &&
+        autoExisting.guide.url === fixture.albums[0].soundcloudUrl && manuallyImported.guide.url === fixture.albums[0].soundcloudUrl &&
+        autoExisting.guide.note.includes("SoundCloud") && manuallyImported.guide.note.includes("SoundCloud") &&
+        autoExisting.guide.note.includes("二次利用許諾ではありません") && manuallyImported.guide.note.includes("二次利用許諾ではありません");
+      const createsOtherSessionsAlbums = fixture.albums.slice(1).every(album => {
+        const created = testSettings.playlists.find(p => p.id === "trk-" + album.id);
+        return created && created.folder === "trk-lol" && created.wish.length === album.trackCount &&
+          created.guide.url === album.soundcloudUrl && created.guide.note.includes("SoundCloud");
+      });
+      safeRefreshOk = preservesCustomData && refreshesBothSources && createsOtherSessionsAlbums && saveCount > 0 &&
+        library.includes('lol: "trk-lol"') && library.includes('ensureTrkSubfolder("trk-lol", "League of Legends", "⚔️")') &&
+        library.includes('pl.sourceLabel || "公式リンク"');
+    }
+  } catch (error) {
+    console.error(`WARN  League of Legends Sessions test setup failed: ${error.message}`);
+  }
+  if (!catalogDataOk) fail("LoL Sessions fixture/catalog mismatch (expected complete Vi/Diana/Taliyah albums: 36+43+29 tracks, official SoundCloud album links, ordered individual Spotify song links)");
+  else if (!safeRefreshOk) fail("LoL Sessions imports must refresh song wishes/guides safely, preserve owned/custom data, and create all albums in the League of Legends trk folder");
+  else ok("LoL Sessions: three complete official SoundCloud albums (108 ordered Spotify-linked tracks), safe catalog refresh");
+}
+
+// 🎵 LoL phase-one catalogue: verified individual theme / event releases stay split by type,
+// use official destinations, state the intentionally incomplete scope, and never imply reuse rights.
+{
+  const catalogSource = read("js/catalog.js");
+  const library = read("js/library.js");
+  let catalogDataOk = false;
+  let safeRefreshOk = false;
+  try {
+    const fixture = JSON.parse(read("tools/leagueoflegends-music-tracklist.json"));
+    const catalogContext = vm.createContext({});
+    new vm.Script(catalogSource + "\nglobalThis.__TRK_CATALOG_FOR_CHECK = TRK_CATALOG;").runInContext(catalogContext);
+    const series = catalogContext.__TRK_CATALOG_FOR_CHECK.find(item => item.id === "lol");
+    const sessions = JSON.parse(read("tools/leagueoflegends-sessions-tracklist.json"));
+    const sessionIds = sessions.albums.map(album => album.id);
+    const expectedLists = [fixture.championThemes, fixture.worldsAnthems, fixture.msiAnthems];
+    const sessionOrderOk = !!series && JSON.stringify(series.playlists.slice(0, 3).map(pl => pl.id)) === JSON.stringify(sessionIds);
+    const phaseOrderOk = !!series && JSON.stringify(series.playlists.slice(3, 6).map(pl => pl.id)) ===
+      JSON.stringify(expectedLists.map(list => list.id));
+    let trackTotal = 0;
+    let tracksMatch = sessionOrderOk && phaseOrderOk;
+    let announcedOnlyCount = 0;
+    const allUrls = [];
+    for (const expectedList of expectedLists) {
+      const actual = series && series.playlists.find(pl => pl.id === expectedList.id);
+      if (!actual || actual.name !== expectedList.name || actual.songs.length !== expectedList.tracks.length) {
+        tracksMatch = false;
+        continue;
+      }
+      for (let i = 0; i < expectedList.tracks.length; i++) {
+        const expected = expectedList.tracks[i], track = actual.songs[i];
+        trackTotal++;
+        allUrls.push(track.u);
+        let validOfficialUrl = false;
+        try {
+          const url = new URL(track.u);
+          if (url.protocol === "https:" && url.hostname === "open.spotify.com") {
+            validOfficialUrl = url.pathname.startsWith("/track/") && /^[A-Za-z0-9]{22}$/.test(url.pathname.slice(7)) && !url.search;
+          } else if (url.protocol === "https:" && url.hostname === "www.youtube.com") {
+            validOfficialUrl = url.pathname === "/watch" && /^[A-Za-z0-9_-]{11}$/.test(url.searchParams.get("v") || "") &&
+              [...url.searchParams.keys()].length === 1;
+          } else if (url.protocol === "https:" && url.hostname === "soundcloud.com") {
+            validOfficialUrl = url.pathname.startsWith("/leagueoflegends/") && !url.search;
+          } else if (url.protocol === "https:" && url.hostname === "lolesports.com") {
+            validOfficialUrl = track.u === fixture.sources.worlds2026Announcement;
+          }
+        } catch (_) {}
+        if (expected.status === "announced-only") {
+          announcedOnlyCount++;
+          if (!track.al.includes("audio link pending") || track.u !== fixture.sources.worlds2026Announcement) tracksMatch = false;
+        }
+        if (track.t !== expected.title || track.al !== (expected.status === "announced-only"
+            ? "Worlds 2026 Anthem — announced; official audio link pending" : expected.album) ||
+            track.ar !== expected.artist || track.u !== expected.url || !validOfficialUrl) tracksMatch = false;
+      }
+    }
+    const rightsAndScopeOk = !!series && series.url === fixture.sources.creatorSafeGuidelines &&
+      series.note.includes("二次利用許諾ではありません") && series.note.includes("Creator-Safe対象") &&
+      series.note.includes("これはLoL全楽曲ではなく") && series.note.includes("今後の調査対象");
+    catalogDataOk = tracksMatch && trackTotal === 58 && announcedOnlyCount === 1 &&
+      new Set(allUrls).size === allUrls.length && rightsAndScopeOk;
+
+    const ensureStart = library.indexOf("function trkCatalogGuide(");
+    const ensureEnd = library.indexOf("\n(function plTighten()", ensureStart);
+    if (ensureStart >= 0 && ensureEnd > ensureStart) {
+      const autoOwned = ["owned-lol-champion-theme"];
+      const manualOwned = ["owned-lol-worlds-song"];
+      const autoExisting = { id:"trk-lol-champion-themes", cat:"trk:lol:lol-champion-themes", name:"My Champion Themes",
+        icon:"🎧", tags:["custom-theme-tag"], wish:[{t:"old", al:"", ar:"", u:""}], songs:autoOwned,
+        guide:{note:"old guide", url:"https://example.com/old"} };
+      const manualExisting = { id:"trk-lol-worlds-anthems", cat:"lol:lol-worlds-anthems", name:"My Worlds playlist",
+        icon:"🌟", tags:["custom-worlds-tag"], wish:[{t:"old", al:"", ar:"", u:""}], songs:manualOwned,
+        guide:{note:"old guide", url:"https://example.com/old"} };
+      const testSettings = { playlists:[autoExisting, manualExisting] };
+      let saveCount = 0;
+      const runContext = vm.createContext({
+        settings:testSettings,
+        ensureTrkFolder:() => {},
+        trkCatalog:() => [series],
+        plSanitize:raw => raw,
+        saveUserPrefs:() => { saveCount++; },
+        trkWishesForSeries:() => []
+      });
+      new vm.Script(library.slice(library.indexOf("function trkWishFromTrack("), library.indexOf("\nfunction trkWishesFromCatalog")) + "\n" + library.slice(ensureStart, ensureEnd) + "\nensureTrkDistributionPlaylists();").runInContext(runContext);
+      const expectWish = list => list.tracks.map(track => ({ t:track.title, al:track.status === "announced-only"
+        ? "Worlds 2026 Anthem — announced; official audio link pending" : track.album, ar:track.artist, u:track.url }));
+      const preservesCustom = autoExisting.name === "My Champion Themes" && autoExisting.icon === "🎧" &&
+        JSON.stringify(autoExisting.tags) === JSON.stringify(["custom-theme-tag"]) && autoExisting.songs === autoOwned &&
+        manualExisting.name === "My Worlds playlist" && manualExisting.icon === "🌟" &&
+        JSON.stringify(manualExisting.tags) === JSON.stringify(["custom-worlds-tag"]) && manualExisting.songs === manualOwned;
+      const refreshesWishAndGuide = JSON.stringify(autoExisting.wish) === JSON.stringify(expectWish(fixture.championThemes)) &&
+        JSON.stringify(manualExisting.wish) === JSON.stringify(expectWish(fixture.worldsAnthems)) &&
+        autoExisting.guide.url === fixture.sources.creatorSafeGuidelines && manualExisting.guide.url === fixture.sources.creatorSafeGuidelines &&
+        autoExisting.guide.note.includes("二次利用許諾ではありません") && manualExisting.guide.note.includes("二次利用許諾ではありません");
+      const createdMsi = testSettings.playlists.find(p => p.id === "trk-lol-msi-anthems");
+      const createsMissingList = createdMsi && createdMsi.folder === "trk-lol" && createdMsi.wish.length === fixture.msiAnthems.tracks.length &&
+        JSON.stringify(createdMsi.wish) === JSON.stringify(expectWish(fixture.msiAnthems)) &&
+        createdMsi.guide.url === fixture.sources.creatorSafeGuidelines &&
+        createdMsi.guide.note.includes("二次利用許諾ではありません");
+      safeRefreshOk = preservesCustom && refreshesWishAndGuide && createsMissingList && saveCount > 0 &&
+        library.includes('lol: "trk-lol"');
+    }
+  } catch (error) {
+    console.error(`WARN  LoL phase-one catalogue test setup failed: ${error.message}`);
+  }
+  if (!catalogDataOk) fail("LoL phase-one fixture/catalog mismatch (expected 41 modern Champion Themes, 12 released Worlds + one announcement, four MSI anthems, official links and rights/scope notice)");
+  else if (!safeRefreshOk) fail("LoL phase-one playlist refresh must update wishes/guides, preserve user-owned songs/customized fields, and create missing lists in trk-lol");
+  else ok("LoL phase one: 41 modern Champion Themes + Worlds 2014–26 (2026 announcement only) + four MSI anthems; official-link fixture, rights notice, safe refresh");
 }
 
 // ⚠ el(tag, cls, text) は文字を1つしか入れられない（入れ子を渡すと "[object ...]" になる）。
@@ -397,17 +1055,19 @@ if (!exists("js/fx-worklet.js") ||
   const panelOk = html.includes('id="trkTabNameSel"') && html.includes('<option value="short" data-i18n="trkTabNameShort">') &&
     html.includes('<option value="icon" data-i18n="trkTabNameIcon">') &&
     /<details class="panel" id="trkPanel">[\s\S]*<details class="subPanel" id="trkClassicPanel">[\s\S]*?<\/details>\s*<\/details>/.test(html) &&
-    html.includes('id="trkSortAbcChk"') && html.includes('id="trkOrderList"');
+    html.includes('id="trkSortAbcChk"') && html.includes('id="trkOrderList"') &&
+    html.includes('id="trkMusicFolderBtn"') && html.includes('data-i18n="trkMusicFolderHint"') &&
+    library.includes('trkMusicFolderBtn.addEventListener("click", openFolder)');
   const keys = ["trkTabNameLabel", "trkTabNameFull", "trkTabNameShort", "trkTabNameIcon", "trkTabNameNote",
-    "trkMenuTitle", "trkMenuHint", "trkMenuOpenFolder", "trkOpenItem", "trkMoveUp", "trkMoveDown", "trkOrderEmpty", "trkOrderAbcOff"];
+    "trkMusicFolderHint", "trkMusicFolderBtn", "trkMenuTitle", "trkMenuHint", "trkMenuOpenFolder", "trkOpenItem", "trkMoveUp", "trkMoveDown", "trkOrderEmpty", "trkOrderAbcOff"];
   const langOk = keys.every(k => (i18n.match(new RegExp("\\b" + k + ":", "g")) || []).length === 4);
   if (!fixedOk) fail("trk's playlist name/icon/colour are not pinned (a 🐔 name brings back the double 🐔 tab)");
   else if (!catalogOk) fail("trk wish lists read window.TRK_CATALOG, which is always undefined — the Vol tabs are never created");
   else if (!labelOk) fail("the trk tab label (full / short / icon) or its allowlist is not wired");
   else if (!pressOk) fail("long-press on the trk tab must open the hierarchy, not the profile editor");
-  else if (!panelOk) fail("the trk settings panel is missing the label select or the nested trk classic panel");
+  else if (!panelOk) fail("the trk settings panel is missing the label select, read-only Music/trk folder guide, or nested trk classic panel");
   else if (!langOk) fail("trk tab/menu strings are missing from one of the four languages");
-  else ok("🐔 trk's playlist: fixed name/icon, three labels, long-press opens the hierarchy, trk classic nested in settings");
+  else ok("🐔 trk's playlist: fixed name/icon, three labels, read-only Music/trk folder guide, long-press hierarchy, trk classic nested in settings");
 }
 
 // 👥 Author tools for shared playlists (off by default; search/block/favorite).

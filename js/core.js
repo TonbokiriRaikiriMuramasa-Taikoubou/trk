@@ -224,7 +224,7 @@ const settings = {
   libSort: pick(prefs.libSort, ["name", "plays", "recent", "best"], "name"),
   shortMode: pick(prefs.shortMode, ["off", "90", "120", "180"], "off"),      // 🕹️ ショートプレイ（後半だけ遊ぶ・初期オフ）
   libTab: typeof prefs.libTab === "string" ? prefs.libTab : "all",            // 📚 選んでいる棚（タブ）のID
-  playlists: (Array.isArray(prefs.playlists) ? prefs.playlists : []).filter(p => p && typeof p === "object").slice(0, 24),   // 🎧 ユーザー定義プレイリスト（library.js が読み込み時に検証）
+  playlists: (Array.isArray(prefs.playlists) ? prefs.playlists : []).filter(p => p && typeof p === "object").slice(0, 100),  // 🎧 ユーザー定義＋公式カタログ由来プレイリスト（library.js が読み込み時に検証）
   plFolders: (Array.isArray(prefs.plFolders) ? prefs.plFolders : []).filter(f => f && typeof f === "object").slice(0, 12),  // 📁 プレイリストフォルダ（ネスト可。library.js が検証）
   playlistDelMode: prefs.playlistDelMode === "three" ? "three" : "one",       // 🎧 タブの中クリック削除を3回にするモード
   plAuthorTools: prefs.plAuthorTools === true,                                // 👥 投稿者ツール（初期オフ。library.js）

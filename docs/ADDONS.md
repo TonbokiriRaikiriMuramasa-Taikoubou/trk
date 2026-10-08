@@ -13,7 +13,7 @@ trk! 本体には入れられない機能を、あとから足せるしくみで
 | 触れられるもの | 中身 |
 |---|---|
 | `localStorage` | 設定（`shadow_taiko_preferences_v2`）、記録、お気に入り、曲のプロフィール、アドオン一覧 |
-| IndexedDB | パック（`shadow_taiko_packs`）、追加した曲（`shadow_taiko_songs`）、共有した曲（`shadow_taiko_shared`）、VRM／MMD、**📚 書斎の本・画像・栞・メモ**（`trk_study_room_v1`）、**覚えてあるミュージックフォルダのハンドル**（`shadow_taiko_library` の `share` / `dir`） |
+| IndexedDB | 解析結果のキャッシュ（`trk_analysis_cache_v1`。配列と数値だけ・PCMなし・30件まで）、パック（`shadow_taiko_packs`）、追加した曲（`shadow_taiko_songs`）、共有した曲（`shadow_taiko_shared`）、VRM／MMD、**📚 書斎の本・画像・栞・メモ**（`trk_study_room_v1`）、**覚えてあるミュージックフォルダのハンドル**（`shadow_taiko_library` の `share` / `dir`） |
 | 画面 | すべての DOM（書き換え・自動クリック・入力の読み取り） |
 | 音・映像 | Web Audio のグラフ、`<video>`／`<audio>` |
 | 通信 | 任意の URL への `fetch`（**端末内のデータを外へ送ることも技術的には可能**） |

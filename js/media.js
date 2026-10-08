@@ -69,7 +69,7 @@ async function loadMedia(file, opts = {}) {
   const liteSkip = !tooBig && !tooLong && typeof TrkLite === "object" && typeof TrkLite.noAnalyze === "function" && TrkLite.noAnalyze();
   const skipAnalyze = tooBig || tooLong || liteSkip;
   if (skipAnalyze) window.Trk.core.analysis = null;
-  else { try { window.Trk.core.analysis = await analyzeAudio(file); } catch (_) { window.Trk.core.analysis = null; } }
+  else { try { window.Trk.core.analysis = await analyzeAudioCached(file, window.Trk.core.fingerprint); } catch (_) { window.Trk.core.analysis = null; } }
   if (token !== window.Trk.core.loadToken) return false;
   window.Trk.core.setStatus("loadStatus", tooBig ? "analysisSkipped" : tooLong ? "analysisSkippedLong" : liteSkip ? "analysisSkippedLite" : window.Trk.core.analysis ? "loaded" : "decodeFallback");
   let supplied = false;
@@ -78,6 +78,86 @@ async function loadMedia(file, opts = {}) {
   if (!supplied) buildChart();
   window.Trk.core.emit("mediaReady");
   return true;
+}
+
+/* ---------- 解析結果のキャッシュ（IndexedDB・この端末の中だけ） ----------
+   同じ曲をもう一度読み込んだとき、デコードと解析を飛ばすためのもの。
+   保存するのは解析の配列（rms・onset・ratio）と数値だけ。PCM（音声の波形）は保存しない。
+   鍵は fingerprint（サイズ・長さ）＋先頭と末尾 64KB の SHA-256 ＋ 解析のバージョン。
+   解析の式を変えたら ANALYSIS_CACHE_VERSION を上げる（古い結果は読まれなくなる）。
+   セーフモードでは読まない・書かない。失敗しても普通に解析する（キャッシュは速さのためだけ）。 */
+const ANALYSIS_CACHE_DB = "trk_analysis_cache_v1";
+const ANALYSIS_CACHE_VERSION = 1;
+const ANALYSIS_CACHE_MAX = 30;            // 件数の上限。超えたら古いものから消す
+const ANALYSIS_CACHE_EDGE = 64 * 1024;    // 鍵に使う先頭・末尾のバイト数
+let analysisCacheDb = null;
+function analysisCacheOpen() {
+  if (analysisCacheDb) return analysisCacheDb;
+  analysisCacheDb = new Promise((res, rej) => {
+    const r = indexedDB.open(ANALYSIS_CACHE_DB, 1);
+    r.onupgradeneeded = () => {
+      const os = r.result.createObjectStore("analysis", { keyPath: "key" });
+      os.createIndex("savedAt", "savedAt");
+    };
+    r.onsuccess = () => { r.result.onversionchange = () => { r.result.close(); analysisCacheDb = null; }; res(r.result); };
+    r.onerror = () => { analysisCacheDb = null; rej(r.error); };
+    r.onblocked = () => { analysisCacheDb = null; rej(new Error("analysis-cache-blocked")); };
+  });
+  return analysisCacheDb;
+}
+async function analysisCacheKey(file, fingerprint) {
+  const head = await file.slice(0, ANALYSIS_CACHE_EDGE).arrayBuffer();
+  const tail = await file.slice(Math.max(0, file.size - ANALYSIS_CACHE_EDGE)).arrayBuffer();
+  const both = new Uint8Array(head.byteLength + tail.byteLength);
+  both.set(new Uint8Array(head), 0); both.set(new Uint8Array(tail), head.byteLength);
+  const hex = [...new Uint8Array(await crypto.subtle.digest("SHA-256", both)).slice(0, 16)].map(b => b.toString(16).padStart(2, "0")).join("");
+  return `v${ANALYSIS_CACHE_VERSION}|${fingerprint}|${hex}`;
+}
+/* 読んだ記録のかたちを確かめる（端末の中の値は改ざんされうる。合わなければ無いものとして解析し直す） */
+function analysisCacheValid(r) {
+  return !!r && r.version === ANALYSIS_CACHE_VERSION && Number.isInteger(r.frames) && r.frames > 0 &&
+    Number.isFinite(r.frameMs) && r.frameMs > 0 && Number.isFinite(r.maxRms) && Number.isFinite(r.scale) &&
+    [r.rms, r.onset, r.ratio].every(a => a instanceof Float32Array && a.length === r.frames);
+}
+async function analysisCacheGet(key) {
+  const db = await analysisCacheOpen();
+  const rec = await new Promise((res, rej) => {
+    const q = db.transaction("analysis").objectStore("analysis").get(key);
+    q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error);
+  });
+  if (!analysisCacheValid(rec)) return null;
+  return { rms: rec.rms, onset: rec.onset, ratio: rec.ratio, frames: rec.frames, frameMs: rec.frameMs, maxRms: rec.maxRms, scale: rec.scale };
+}
+async function analysisCachePut(key, a) {
+  const db = await analysisCacheOpen();
+  const rec = { key, version: ANALYSIS_CACHE_VERSION, savedAt: Date.now(), frames: a.frames, frameMs: a.frameMs,
+    maxRms: a.maxRms, scale: a.scale, rms: a.rms, onset: a.onset, ratio: a.ratio };
+  await new Promise((res, rej) => {
+    const tx = db.transaction("analysis", "readwrite");
+    tx.objectStore("analysis").put(rec);
+    tx.oncomplete = () => res(); tx.onerror = tx.onabort = () => rej(tx.error);
+  });
+  /* 件数の上限：savedAt の index は古い順に並ぶので、先頭（古い）から消す */
+  const tx2 = db.transaction("analysis", "readwrite");
+  const keys = await new Promise((res, rej) => {
+    const q = tx2.objectStore("analysis").index("savedAt").getAllKeys();
+    q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error);
+  });
+  for (let i = 0; i < keys.length - ANALYSIS_CACHE_MAX; i++) tx2.objectStore("analysis").delete(keys[i]);
+  await new Promise((res, rej) => { tx2.oncomplete = () => res(); tx2.onerror = tx2.onabort = () => rej(tx2.error); });
+}
+/* 解析の入口。キャッシュがあればデコードせずに返す。無ければ解析して、あとで保存する（待たない） */
+async function analyzeAudioCached(file, fingerprint) {
+  const cacheOn = !(typeof window.TrkSafeMode === "function" && window.TrkSafeMode()) &&
+    !!window.indexedDB && !!(window.crypto && window.crypto.subtle) && !!fingerprint;
+  let key = null;
+  if (cacheOn) {
+    try { key = await analysisCacheKey(file, fingerprint); const hit = await analysisCacheGet(key); if (hit) return hit; }
+    catch (_) { key = null; }
+  }
+  const a = await analyzeAudio(file);
+  if (key) analysisCachePut(key, a).catch(() => {});
+  return a;
 }
 
 /* ---------- 音声解析（音量・立ち上がり・高音の割合） ---------- */

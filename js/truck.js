@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：🚚 トラックモード（操作設定つき）・レーンの色付け・揺れ ============
    ・共通の文章（紹介文・操作の案内・記録・称号）は i18n.js にあります。
@@ -336,3 +337,21 @@ if (reduceMotion.addEventListener) reduceMotion.addEventListener("change", syncR
 syncReducedNote();
 setTimeout(syncTruckKeyUI, 0);   // 言語の反映が終わってから表示
 /* ✅ truck.js 完了 */
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.drawLaneTint = drawLaneTint;
+window.drawTruck = drawTruck;
+window.isTruck = isTruck;
+window.lanePivot = lanePivot;
+window.laneTilt = laneTilt;
+window.reduceMotion = reduceMotion;
+window.resetTruck = resetTruck;
+window.steerTruck = steerTruck;
+window.syncTruckKeyUI = syncTruckKeyUI;
+Object.defineProperty(window, "truckBinding", { configurable:true, get:() => truckBinding, set:v => { truckBinding = v; } });
+window.truckJudge = truckJudge;
+window.truckKeysLabel = truckKeysLabel;
+window.truckPosKeys = truckPosKeys;
+window.truckRowY = truckRowY;
+window.truckState = truckState;
+})();

@@ -1,11 +1,11 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 151,
+  "windowProps": 165,
   "duplicates": 0,
-  "declarations": 271,
-  "private": 81,
-  "public": 190
+  "declarations": 247,
+  "private": 72,
+  "public": 175
  },
  "files": [
   {
@@ -269,25 +269,9 @@
   },
   {
    "file": "js/truck.js",
-   "decls": 24,
-   "private": 9,
-   "public": [
-    "drawLaneTint",
-    "drawTruck",
-    "isTruck",
-    "lanePivot",
-    "laneTilt",
-    "reduceMotion",
-    "resetTruck",
-    "steerTruck",
-    "syncTruckKeyUI",
-    "truckBinding",
-    "truckJudge",
-    "truckKeysLabel",
-    "truckPosKeys",
-    "truckRowY",
-    "truckState"
-   ]
+   "decls": 0,
+   "private": 0,
+   "public": []
   },
   {
    "file": "js/modes.js",
@@ -970,6 +954,13 @@
    "readers": []
   },
   {
+   "name": "drawLaneTint",
+   "writers": [
+    "js/truck.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "drawLives",
    "writers": [
     "js/modes.js"
@@ -994,6 +985,13 @@
    "name": "drawStageField",
    "writers": [
     "js/stage.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "drawTruck",
+   "writers": [
+    "js/truck.js"
    ],
    "readers": []
   },
@@ -1120,9 +1118,30 @@
    "readers": []
   },
   {
+   "name": "isTruck",
+   "writers": [
+    "js/truck.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "judgeNote",
    "writers": [
     "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "lanePivot",
+   "writers": [
+    "js/truck.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "laneTilt",
+   "writers": [
+    "js/truck.js"
    ],
    "readers": []
   },
@@ -1323,6 +1342,13 @@
    "readers": []
   },
   {
+   "name": "reduceMotion",
+   "writers": [
+    "js/truck.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "refreshPackSongs",
    "writers": [
     "js/library.js"
@@ -1382,6 +1408,13 @@
    "name": "resetStage",
    "writers": [
     "js/stage.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "resetTruck",
+   "writers": [
+    "js/truck.js"
    ],
    "readers": []
   },
@@ -1554,6 +1587,13 @@
    "readers": []
   },
   {
+   "name": "steerTruck",
+   "writers": [
+    "js/truck.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "sweepMisses",
    "writers": [
     "js/game.js"
@@ -1571,6 +1611,13 @@
    "name": "syncOptionsUI",
    "writers": [
     "js/main.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "syncTruckKeyUI",
+   "writers": [
+    "js/truck.js"
    ],
    "readers": []
   },
@@ -1606,6 +1653,41 @@
    "name": "trkReset",
    "writers": [
     "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "truckJudge",
+   "writers": [
+    "js/truck.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "truckKeysLabel",
+   "writers": [
+    "js/truck.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "truckPosKeys",
+   "writers": [
+    "js/truck.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "truckRowY",
+   "writers": [
+    "js/truck.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "truckState",
+   "writers": [
+    "js/truck.js"
    ],
    "readers": []
   },

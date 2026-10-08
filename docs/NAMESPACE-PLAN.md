@@ -73,6 +73,13 @@ node tools/smoke-browser.mjs --compare
 - `window._trk*Open` の旗は、読み手が 13 以上ある。一つの関数（例：`Trk.isModalOpen()`）に置き換えるとき、既存の文字列検査（`tools/check-study-room.mjs`・`tools/check-repo.mjs` の `"window._trkStudyRoomOpen"`）を同時に直す。
 - 公開名の移動（D）は、裸の識別子を書き換える必要がある。字句処理で範囲を確かめ、書き換えた箇所の数を記録する。書き換え漏れは、監査（「公開なのに裸で参照されている」）とスモークで捕まえる。
 
+### B の進捗
+
+| 回 | 対象 | トップレベル宣言 | 公開名 | 基準・結果 |
+|---|---|---|---|---|
+| 0 | （準備の時点） | 1169 | 316 | 基準 `40122ea` |
+| 1 | `js/study-room.js` を即時関数で包む（公開は `window.TrkStudyRoom` のまま） | 927 | 316 | スモーク OK。window から消えた `study*` 関数は他から使われていないもの（報告のみ） |
+
 ## 4. 止める条件
 
 - スモーク `--compare` が NG で、原因が説明できない。

@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ 📚 書斎：端末内の画像・文章リーダー ============
    ・取り込んだ本・栞・ジャケットは、この端末の中（IndexedDB trk_study_room_v1）だけに置きます。
@@ -2743,3 +2744,4 @@ window.TrkStudyRoom = Object.freeze({
   stats:() => ({ books:studyBooks.length, images:studyBooks.reduce((n, book) => n + book.pages.length, 0),
     bytes:studyBooks.reduce((n, book) => n + STUDY_UTIL.bookSize(book), 0), bookmarks:STUDY_UTIL.bookmarkedBooks(studyBooks).length })
 });
+})();

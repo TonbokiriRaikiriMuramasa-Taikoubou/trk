@@ -725,6 +725,32 @@
    "hash": "68f4da3558d0f09e"
   }
  },
+ "scenarios": {
+  "study:open": {
+   "value": "true",
+   "newErrors": []
+  },
+  "study:stats": {
+   "value": "{\"books\":0,\"images\":0,\"bytes\":0,\"bookmarks\":0}",
+   "newErrors": []
+  },
+  "study:books": {
+   "value": "true",
+   "newErrors": []
+  },
+  "study:close": {
+   "value": "true",
+   "newErrors": []
+  },
+  "study:toggle": {
+   "value": "true",
+   "newErrors": []
+  },
+  "study:sweep": {
+   "value": "true",
+   "newErrors": []
+  }
+ },
  "clicks": {
   "candidates": 161,
   "clicked": 109,

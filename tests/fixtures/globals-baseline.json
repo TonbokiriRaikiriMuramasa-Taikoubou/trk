@@ -3,8 +3,8 @@
   "scripts": 45,
   "windowProps": 38,
   "duplicates": 0,
-  "declarations": 1169,
-  "private": 853,
+  "declarations": 927,
+  "private": 611,
   "public": 316
  },
  "files": [
@@ -610,8 +610,8 @@
   },
   {
    "file": "js/study-room.js",
-   "decls": 242,
-   "private": 242,
+   "decls": 0,
+   "private": 0,
    "public": []
   }
  ],

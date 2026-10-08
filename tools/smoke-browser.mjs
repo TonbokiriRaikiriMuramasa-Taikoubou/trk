@@ -12,6 +12,7 @@
  *   2. 監査（tools/globals-audit.mjs）がトップレベルと判定した名前が、実行時に本当に解決できるか
  *   3. 合成曲の譜面（生成方式 1／2 × 難易度すべて）の一致（ノーツ列のハッシュ）
  *   4. 画面の見えているボタンを順に押したときの新しいエラー
+ *   5. 公開 API を通す場面（書斎の開閉・一覧・統計・掃除）の結果と、その間のエラー
  * window に増減した名前は、名前空間の移行で意図して変わるので「報告のみ」。 */
 import http from "node:http";
 import fs from "node:fs";
@@ -78,7 +79,7 @@ async function main() {
   const launch = { headless: true, args: JSON.parse(process.env.SMOKE_CHROME_ARGS || "[]") };
   if (process.env.SMOKE_CHROME) launch.executablePath = process.env.SMOKE_CHROME;
   const browser = await puppeteer.launch(launch);
-  const report = { boot: {}, globals: {}, unresolved: [], charts: {}, clicks: {}, pageErrors: [] };
+  const report = { boot: {}, globals: {}, unresolved: [], charts: {}, scenarios: {}, clicks: {}, pageErrors: [] };
   try {
     /* 基準：何も読み込んでいない about:blank の window の名前 */
     const blank = await browser.newPage();
@@ -133,6 +134,29 @@ async function main() {
           notes: row.notes, level: row.level,
           hash: crypto.createHash("sha256").update(row.body).digest("hex").slice(0, 16),
         };
+      }
+    }
+    errors.length = 0;
+
+    /* 3b. 公開 API を通す場面（書斎：開閉・一覧・統計・掃除）。値は基準と一致すること */
+    const scenarios = [
+      ["study:open", "() => { TrkStudyRoom.open(); return TrkStudyRoom.isOpen(); }"],
+      ["study:stats", "() => JSON.stringify(TrkStudyRoom.stats())"],
+      ["study:books", "() => Array.isArray(TrkStudyRoom.books())"],
+      ["study:close", "() => { TrkStudyRoom.close(); return !TrkStudyRoom.isOpen(); }"],
+      ["study:toggle", "() => { TrkStudyRoom.toggle(); const o = TrkStudyRoom.isOpen(); TrkStudyRoom.toggle(); return o && !TrkStudyRoom.isOpen(); }"],
+      ["study:sweep", "async () => { await TrkStudyRoom.sweepOrphans(); return true; }"],
+    ];
+    report.scenarios = {};
+    for (const [name, fn] of scenarios) {
+      const before = errors.length;
+      try {
+        const value = await page.evaluate(`(${fn})()`);
+        await new Promise(r => setTimeout(r, 100));
+        await flush();
+        report.scenarios[name] = { value: value === undefined ? "undefined" : String(value), newErrors: errors.slice(before) };
+      } catch (e) {
+        report.scenarios[name] = { value: "throw", newErrors: [String(e && e.message || e).split("\n")[0]] };
       }
     }
     errors.length = 0;
@@ -194,7 +218,7 @@ try {
 const summary = {
   boot: report.boot.errors.length, unresolved: report.unresolved.length,
   decls: report.declCount, added: report.globals.added.length,
-  charts: Object.keys(report.charts).length, clicks: report.clicks.clicked,
+  charts: Object.keys(report.charts).length, scenarios: Object.keys(report.scenarios).length, clicks: report.clicks.clicked,
   clickErrors: report.clicks.errors.length,
 };
 console.log(JSON.stringify(summary));
@@ -209,6 +233,11 @@ if (MODE === "write") {
     const now = report.charts[k];
     if (!now || now.hash !== v.hash || now.notes !== v.notes || now.level !== v.level) problems.push(`譜面が変わった: ${k}（${v.notes} → ${now ? now.notes : "なし"}）`);
   }
+  for (const [k, v] of Object.entries(base.scenarios || {})) {
+    const now = report.scenarios[k];
+    if (!now || now.value !== v.value) problems.push(`場面の結果が変わった: ${k}（${v.value} → ${now ? now.value : "なし"}）`);
+    if (now && now.newErrors.length) problems.push(`場面で新しいエラー: ${k}: ${now.newErrors.join(" / ")}`);
+  }
   if (report.unresolved.length) problems.push(`実行時に解決できない宣言: ${report.unresolved.join(", ")}`);
   const baseErr = new Set([...base.boot.errors, ...base.pageErrors, ...base.clicks.errors.map(e => e.error)]);
   for (const e of [...report.boot.errors, ...report.pageErrors, ...report.clicks.errors.map(x => x.error)]) {
@@ -216,7 +245,8 @@ if (MODE === "write") {
   }
   const addedNow = new Set(report.globals.added), addedBase = new Set(base.globals.added);
   const diff = { gained: [...addedNow].filter(n => !addedBase.has(n)), lost: [...addedBase].filter(n => !addedNow.has(n)) };
-  if (diff.gained.length || diff.lost.length) console.log("window の名前の増減（報告のみ）:", JSON.stringify(diff));
+  const short = a => `${a.length}件 ${a.slice(0, 12).join(", ")}${a.length > 12 ? " …" : ""}`;
+  if (diff.gained.length || diff.lost.length) console.log(`window の名前の増減（報告のみ）: 増 ${short(diff.gained)} ／ 減 ${short(diff.lost)}`);
   if (problems.length) { console.log("NG\n- " + problems.join("\n- ")); process.exit(1); }
   console.log("OK：譜面・未解決の名前・新しいエラーはありません");
 }

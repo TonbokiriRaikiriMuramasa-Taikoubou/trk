@@ -55,7 +55,7 @@ npm run cap:build:android
 1. Android WebView内では、PWAのService Worker、File System Access API、IndexedDB、Web Audio、CDN読込の挙動がブラウザ版と異なる場合があります。
 2. `📤 ミュージックフォルダを共有` は、Android Chromeで動く場合でも、Capacitor WebViewで同じ動作になるとは限りません。
 3. Androidの共有ストレージや音楽ライブラリを読む機能は、まだ実装していません。`READ_MEDIA_AUDIO` を追加する場合は、必要性と対象SDKの要件を再確認し、権限なしでも遊べるフォールバックを残します。
-4. 現在のMMD／VRM機能はCDNへ接続するため、完全オフラインのAPK機能とは扱いません。
+4. 現在のMMD／VRM機能の3D部品（three.js、three-vrm、three-mmd-loader）は `assets/vendor/` に同梱しており、CDNへは接続しません。ただし、利用者が用意するモデル・モーションの読込元は利用者の判断に従うため、完全オフラインのAPK機能としては扱いません。
 5. APKの実機確認は未完了です。起動、横画面、音声、タッチ鍵盤、曲の選択、保存、戻る操作、画面回転、スリープ復帰を確認するまで完了扱いにしません。
 
 ## リリース前チェック

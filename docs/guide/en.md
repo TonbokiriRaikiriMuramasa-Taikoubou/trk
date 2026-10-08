@@ -1,34 +1,489 @@
 # trk! — English guide
 
-> English guide (full). The short English summary is in README.md.
+> English guide (full). The short English summary is in README.md. The Japanese original of each section is in the linked file.
 
-← [📚 ガイド目次](index.md)　／　[README](../../README.md)
+← [📚 Guide index](index.md)　／　[README](../../README.md)
 
-## Media-player-only and lighter builds
+## Contents
+
+- [Media player only, and lighter builds](#media-player-only-and-lighter-builds)
+- [Play: AUTO, radio, options, practice](#play-auto-radio-options-practice)
+- [Difficulty names and Lv (auto charts)](#difficulty-names-and-lv-auto-charts)
+- [Records and titles](#records-and-titles)
+- [Controls](#controls)
+- [Appearance](#appearance)
+- [Sound effects](#sound-effects)
+- [Spectrum](#spectrum)
+- [Study Room](#study-room)
+- [Packs and verified packs](#packs-and-verified-packs)
+- [Playing on a phone](#playing-on-a-phone)
+- [Requirements and saved data](#requirements-and-saved-data)
+- [Making mods](#making-mods)
+- [File layout](#file-layout)
+- [Security](#security)
+- [Inspirations and credits](#inspirations-and-credits)
+
+## Media player only, and lighter builds
 
 Press **Skip** in the quick guide if you do not need the tutorial. To listen without starting a game, long-press the TV dock's **⏻ power** button and load your own music.
 
 The optional FIRST SPARK demo lives in `assets/optional-demo-audio/` (about 704 KiB; the MP3 is fetched only when selected). It ships **handmade Easy / Normal / Hard charts** (27 / 54 / 111 notes on the song's 128 BPM four-on-the-floor grid) as plain `shadow-taiko-chart` JSON, fetched only when that difficulty is used; MASTER and RUSH stay generated from the seed. For a lighter build, delete the **entire folder**; without its `manifest.json`, the demo entry and button stay hidden. Set `"charts": false` (or remove only the chart JSON files) to keep the audio with generated charts. This does not affect the media player or your own songs. If the audio was already cached, clear the site's data/service-worker cache to reclaim that stored copy.
 
-**Five play styles**
-- 🥁 **MANUAL** — two-button Don/Ka drumming
-- 🚚 **TRUCK** — switch lanes and let your truck drive over the notes (easy mode for everyone)
-- 🪐 **ORBIT** — one-button play; a winding path flows into the center target (inspired by Gitaroo Man)
-- 🎪 **STAGE** — 4/5/6-lane vertical play with stairs, trills and wide notes (inspired by World Dai Star: Yume no Stellarium)
-- 🚛 **CATCH** — catch falling parcels with your truck; grab nitro cans 🚀 for **Blast mode**
+The media player supports a play queue, next/previous track, repeat, shuffle, playback speed, resuming from the last position, a sleep timer, and Media Session. Reverse playback (with audio reversed where the browser allows it) and A-B section looping are also available.
 
-**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), a song-banner volume button (tap for the slider, hold to mute/restore), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, antenna character skins (ten original dot characters that wake up and walk when ON and fall asleep when OFF, plus your own two ON/OFF images stored on your device only; Reimu, Marisa, Cirno, Flandre and Youmu are original Touhou Project fan art drawn for trk!, following the official fan-work guidelines), VRM 1.0 mascots, MMD mascots (65 original procedural choices grouped by daily movement, dance, Miku references, expressions, and singing/lip-sync; Lat morph tracks; the A-I-U-O mouth cycle with no audio sync is the default for new installs and the bundled Lat preset; saved choices are kept, bring your own model with an on-device self check), ⭐ favorites folders (1st/2nd/Frozen/Former, no cap, `trk-favs` export), 📤 **share your music folder** (one permission pulls the whole folder in at once, with an optional on-device copy of up to 150 songs / 300 MB), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, a visual effect-chain editor, a bottom-left 🔥 **TRK amp** panel that builds/reorders/switches the layered effect rack in one tap — `?reset=amp` — automatic latency compensation and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 16 built-in sounds (including electric guitar, electronic sax, and layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, a default option to lock mapped keys to the piano while synth mode is open, an optional wider on-screen keyboard for larger displays, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
+**Loop Lab** can loop a 5 / 10 / 20-second section from the current position, or a random short section. You can save, recall, delete one by one, or clear all A-B presets per song. Presets store only a song identifier and the A/B seconds on your device; trk! does not cut, convert, export, or upload audio. The video can also be hidden temporarily behind a wallpaper or screensaver, with a clock, pause/resume of the video, toggle or long-press, and an image chosen from your device (kept for the session only). The cast antenna and the background-playback antenna can be set separately. The background-playback antenna can also sit **compactly at the top right, next to the language selector**, instead of on the dock (background playback still works when the dock antenna is hidden). Casting is off by default; on browsers that support it, the cast antenna opens the device picker (hiding the cast antenna does not remove the playback antenna).
 
-**Study Room:** long-press the song-list title (or focus it and press Enter/Space) to open a local-only reader. Image folders become albums (single/spread/vertical, an American-style flip, reversed image order, zoom from 0.5× to 4× by buttons, Ctrl+wheel or pinch; up to 3,000 images / 600 MB per album), text files open as books with UTF-8 / UTF-16 / Shift_JIS detection and Aozora-style ruby (up to 12 MB each). There are 24 text skins across writing/reading, coding, AI/prompt aesthetics, and freeform looks; each skin applies its palette, font and background to both the reading page and editing textarea. AI-themed skins are visual only—no AI processing or network access. Text size / line-height / margin tuning and in-book search are included. Text books have an always-available edit-copy mode with autosave, Tab indentation and Ctrl/⌘+S; imported originals stay read-only, and JS / HTML / Markdown are never executed or rendered as markup. Export is available from the reading view too. Advanced settings can file edited books into a Study shelf folder and, in supported browsers, select an export folder for the current session; exports to the selected folder create a uniquely named copy without overwriting existing files; unsupported browsers use the regular download flow (duplicate-name handling is browser-controlled). The shelf supports user-created folders (click or hold “Bookshelf”), drag-and-drop to move books into folders, and manual ordering with a drag handle. It stays visible outside full-screen by default, with a header button to restore it if hidden. Advanced checkboxes can disable automatic sorting, pin folders above books, skip delete confirmation, and rebind Study's navigation keys (default `→` next / `←` previous, optionally `↑` / `↓` for image pages). It also searches titles, paths and excerpts, shows a bookmark list and storage footer, and reports import progress with a cancel button. A TV pane (position, six looks, three sizes, aspect ratio, optional song title) shows the playing video or the song's jacket — assigned by a 680 ms long-press, and always handed back when the room closes or a song finishes. Everything stays in this browser (IndexedDB `trk_study_room_v1`); nothing is uploaded, and `?safe=1` keeps it closed.
+Antenna shapes: telescopic rod, circular loop, parabola, or cyber beam, plus **ten dot characters**: 🚚 truck, 🤖 robot, 🐱 cat, 🫧 slime, 👻 ghost, and from Touhou Project: ⛩ Reimu, 🧹 Marisa, ❄ Cirno, 🦇 Flandre, 🗡 Youmu. The characters **wake up and walk when ON, and lie down and sleep when OFF**. All are original drawings by trk!, except the Touhou characters, which are fan-made pixel art (drawn under the official fan-work guidelines, offered as a free browser game; not official assets). You can also choose **two of your own illustrations** (one for ON, one for OFF); they are stored only on your device and removed by resetting settings.
 
-**✔ Verified packs:** song packs whose composer/charter identity and rights have been confirmed get a ✔ badge and a short message from the creator (up to 280, like a free X post). See [docs/verified.md](../verified.md).
+**Supported formats:** MP4, MP3, M4A, OGG, OPUS, WAV, WebM, FLAC, AAC, MOV (anything your browser can play).
+
+## Play: AUTO, radio, options, practice
+
+### ▶ AUTO and radio
+
+Both work with any mode, using the buttons on the song select screen.
+
+| Feature | What it does |
+|---|---|
+| **▶ AUTO** | Autoplay, so you can watch the notes flow. Useful for checking hard parts or looking for a seed you like. No life, records, or titles. |
+| **📻 Radio** | When a song ends, the next song in the list starts after 5 seconds. With **AUTO + Radio + sound effects** it becomes a music player you can leave running. It stops with "play again" or "back to select". |
+
+### 🎯 Play options
+
+| Option | What it does |
+|---|---|
+| ❤ **Life mode** | Standard / Knight / **trk!** (one miss ends the run 🐔) / Infinite. The display can be hearts, a gauge, a battery, emoji, and more (7 styles). |
+| **3・2・1・GO!** | A countdown matched to the song's BPM. It also counts in when you resume from pause. |
+| **Judgement strictness** | Loose (counts as practice) / Standard / Strict. |
+| ⏩ **Playback speed** | 0.5x to 2.0x (up to 3.0x in Settings). The default is a slightly fast **1.2x**. Pitch does not change. From 1.05x up, each speed keeps its own high score and a "🏁 fastest clear" record. |
+| **HIDDEN / SUDDEN** | Notes vanish partway through / appear partway through. |
+| 🎲 **RANDOM / ANTI-ROLL** (STAGE) | Shuffles the lane order / reshuffles so the same lane is not hit twice in a row. Decided by the seed, so they count for records. |
+| **Mirror** (STAGE) | Left-right flip. |
+| **Keys** | Main and sub keys. Presets: A / Space, osu!taiko-style F·J / D·K, 🕹 Arcade 1·2, 📺 Remote ←→. Left-right swap for left-handed play. |
+| **🎮 Pad and remote** | Assign gamepad or rhythm-controller buttons and sticks directly (left note, right note, confirm, back, pause). Menus can be navigated with the D-pad or stick. A TV remote that sends keyboard keys works with the key settings. |
+| **Video controls** | Zoom the video (0.5–3x), reverse, A-B loop, and playback speed / pause in the media player can all be key-assigned. Loop can be set to toggle or hold-only. |
+| **Navigation** | Keys to return to the menu and to close the player, plus options for confirmation prompts and description text. |
+| **Extra effects** | "Show all / Reduced / Extra effects off". This reduces screen flashes, shake, and hit effects only; sound effects are set separately. |
+| 🎯 **Offset measurement** | Tap 16 times to a click sound and it suggests a timing correction. |
+| **Auto fine-tune** | After a play, nudges the correction value based on whether you tended to hit early or late (off by default). |
+| ▶ **Media player** | Starts with a long-press on the TV dock's power button. Play a queue, next/previous, repeat, shuffle, 0.5–2x speed, reverse, A-B loop, wallpaper / screensaver, 15 / 30 / 60-minute sleep timer, and resume from the last position, all without starting a game. **Loop Lab** creates 5 / 10 / 20-second and random sections and saves A-B presets per song on the device. There is no file cutting, conversion, or export. Set A and B points and release them with a toggle or hold of the assigned key. M returns to the menu, and ESC closes the player (the confirmation can be turned off). The cast and background antennas are set separately. |
+
+### 🔁 Practice features
+
+These work during AUTO, or when "show seek bar (practice)" is on. Any play that uses them counts as **practice**, and it is not saved as a high score.
+
+| Feature | How |
+|---|---|
+| Seek bar | Move to any position with the bar at the bottom of the screen. |
+| 10-second skip | ← / → (keys can be changed). |
+| 🔁 Section repeat | **R key**: set A → set B → clear. The pause screen has buttons for this too. |
+| Hold `` ` `` | Restart from the beginning immediately. |
+| - / = | Adjust the timing correction by 5 ms. |
+| [ / ] | Change the playback speed (a play where you change speed counts as practice). |
+
+Also available:
+- 👻 **Ghost**: shows the difference from your personal best during play.
+- 📊 **Judgement average and spread**: shown on the results screen, e.g. "avg +3.2 ms · spread 11.4 ms".
+- **Timing meter**: shows how far off each hit was.
+
+## Difficulty names and Lv (auto charts)
+
+- **Difficulty names (Easy to RUSH) are a guide to note density.** The higher the difficulty, the more notes the same song gets in total.
+- **Lv is decided by the busiest stretch of the song (the peak).** So the same song can show the same Lv for Hard and MASTER. Treat Lv as a number for how hard the peaks feel, not as a replacement for the difficulty name.
+- Each difficulty has a cap on how many notes can be placed in quiet sections. Loud sections gain more notes when there are enough candidate positions.
+- You can choose the auto-chart method (new or legacy) in Settings under "Auto-chart method".
+
+## Records and titles
+
+- Records are kept per song, per chart, per mode, and per speed: high score, accuracy, most PERFECTs, play count, and the last 30 plays.
+- **PERFECT✦**: a PERFECT that landed especially close to the exact timing. It does not change the score.
+- **Titles** appear next to song names in the song list.
+
+| Mark | Meaning |
+|---|---|
+| 🥁 🚚 🪐 🎪 🚛 | Cleared in that mode |
+| ⚔ | S rank (95% accuracy) or better |
+| 🐔 | No miss |
+| ⭐ | ALL PERFECT |
+
+## Five play styles
+
+- 🥁 **MANUAL**: two-button Don/Ka drumming.
+- 🚚 **TRUCK**: switch lanes and let your truck drive over the notes (easy mode for everyone).
+- 🪐 **ORBIT**: one-button play; a winding path flows into the center target (inspired by Gitaroo Man).
+- 🎪 **STAGE**: 4/5/6-lane vertical play with stairs, trills and wide notes (inspired by World Dai Star: Yume no Stellarium).
+- 🚛 **CATCH**: catch falling parcels with your truck; grab nitro cans 🚀 for **Blast mode**.
+
+**Also:** AUTO play for every mode, 📻 Radio (auto-advance to the next song), a song-banner volume button (tap for the slider, hold to mute/restore), life modes, countdown, playback speed with per-speed records, HIDDEN/SUDDEN, RANDOM/ANTI-ROLL, offset wizard, A-B repeat, ghost, timing stats, titles, custom skins, antenna character skins (described above), VRM 1.0 mascots, MMD mascots (65 original procedural motions grouped by daily movement, dance, Miku-tempo, classic poses, expressions, and singing/lip-sync; Lat morph tracks; the A-I-U-O mouth cycle with no audio sync is the default for new installs and the bundled Lat preset; saved choices are kept; bring your own model and check it with the on-device self check), ⭐ favorites folders (1st / 2nd / Frozen / Former, no cap, `trk-favs` export), 📤 **share your music folder** (one permission pulls the whole folder in, with an optional on-device copy of up to 150 songs / 300 MB), shareable `.stpack` packs, 🎛 **sound effects** (115 EQ/FX presets, a visual effect-chain editor, a bottom-left 🔥 **TRK amp** panel, automatic latency compensation, and shareable `trk-fx` JSON), and a 🎹 **play-along synthesizer** with 16 built-in sounds (electric guitar, electronic sax, layered ZUNPET-inspired brass), a saved ±8-semitone pitch control that also retunes held notes, QWERTY-mapped keys, a default option to lock mapped keys to the piano while synth mode is open, an optional wider on-screen keyboard, local sample layers, and Settings controls to disable it or shorten its launch hold to 0.2 seconds.
+
+## Controls
+
+| Key | Action |
+|---|---|
+| A / Space | Don / Ka (MANUAL; changeable) |
+| ↑↓ / ←→ | TRUCK lane change / CATCH movement |
+| D F J K etc. | STAGE lanes |
+| Any key | ORBIT |
+| P / Esc | Pause and resume |
+| `` ` `` (left of 1), hold | Restart from the beginning |
+| - / = | Timing correction ±5 ms |
+| [ / ] | Playback speed |
+| ← / → | 10-second skip (AUTO and practice) |
+| R | Section repeat (AUTO and practice) |
+| F | Fullscreen |
+
+Touch is supported too: MANUAL, TRUCK and ORBIT use left and right buttons, STAGE uses tapping lanes, and CATCH uses swiping.
+
+### 🎮 Pads, controllers, and TV remotes
+
+Open Settings ⚙ → "⌨ Controls" → "**🎮 Controller, pad and remote**". You can **assign any pad button or axis (stick) directly**.
+
+- **Connecting:** plug in over USB or Bluetooth, then **press a button once**; the browser recognizes it and the name appears in Settings.
+- **Assigning:** press "Change", then the button or stick you want. The five actions are "Left note", "Right note", "Confirm", "Back", and "Pause / resume". **One button can serve two actions** (during play it is a note, in menus it confirms). Sticks show as, for example, "L-Stick ←".
+- **Menu navigation:** D-pad or left stick moves (hold to repeat), confirm presses the highlighted button, and back works like ESC (it pauses during play). It can be turned off.
+- **TV remotes:** most remotes arrive as keyboard keys (← → ↑ ↓, Enter, Back, ⏯⏭⏮). Set the notes to ← → (preset "📺 Remote") to play with the remote alone. **Back** works whether the device sends Escape, BrowserBack, or GoBack.
+- **Arcade sticks and homemade controllers:** for devices that send buttons 1 and 2, use the preset "🕹 Arcade (1·2)". For a lever that sends axes, use "Left stick ← →".
+- Note judgement is still based on the **audio clock**, so timing does not drift with a pad.
+- `?reset=keys` resets only the keyboard and pad assignments.
+
+## Appearance
+
+- **Skins:** shadow, daylight, neon, sakura, terminal, clarity (color-vision friendly), Miku-based (PCL fan work), gradient, accessibility (high contrast, and a color-vision-friendly dark and light pair), everyday scenes (rainy window, night bathhouse, shoji light, station platform, morning kitchen, shopping street at dusk), ink wash, score paper, pixel night, misty forest, and more: **44 in all** (one is a reward skin 🎓 unlocked by five tutorial stamps). In **🖼 Skin shelf** in Settings, filter by chip: classic, Miku, dark, light, gradient, playful. You can build a **custom skin** by choosing colors (two-tone background with gradient in any direction; shareable as JSON).
+- **Layout:** horizontal scroll / vertical left / vertical center / commentary-video style.
+- **Display order:** in Settings, "Display order" switches between **Simple** (default; recommended order, the top six shelf skins come first, and video filters start with the classics) and **All** (the original order). The set of items does not change. Shelf skins re-sort immediately; video filter order applies on the next load.
+- **🔧 Developer display (off by default):** shows the Loop Lab in the media player (quick, saved, presets; the basic A-B controls are always visible), the 👥 contributor tool, 🎨 Make a custom TV skin, and "+ Add or edit skins".
+- **Notes:** color and shape (circle, diamond, square), chosen separately from the skin.
+- **Background video:** color, monochrome, dimmed, or hidden, plus sliders for **darkness** and **blur**. From the 📺 TV dock on the song select screen, choose from **65 video filters** (retro, cinema, dreamy, nature, plus portrait/skin tone, anime/cel, texture, and studio/quality) and **30 TV skins** (CRT, wood, arcade, aquarium, projector, and more). Portrait looks are whole-screen color adjustments; they do not detect or correct skin areas. If the video looks wrong, `?safe=1` returns to a safe state. In the **bottom-left of the song select screen** there is a separate **✨ TRK effects** section with 20 richer looks from the portrait, anime, texture, and studio tabs (see below).
+- **Safe brightness and blur:** the 🎛🎲 buttons randomize on tap, and **long-press resets both to 0**. Each slider also resets to 0 on long-press. You can save up to **8 brightness and blur combinations** as favorites and recall them with one tap. This does not reset the video filter or the TV itself.
+- **Custom TV:** from the 🎨 button in Settings, choose six colors, a shape (button count, columns, corner rounding, screen border), 34 decorations, and surface finish (glow, glass reflection, scan lines). Saved TVs appear in the TV dock's skin list and can be shared as `trk-tvskin` (JSON). Up to 30.
+- **📡 Antenna characters:** the background-playback antenna can use one of four shapes, the ten dot characters (including the Touhou ones), or **your own two illustrations** (ON and OFF, stored only on your device). The compact top-right antenna shows the same character. The Touhou characters are fan-made pixel art; no official assets are used.
+- **📺 Channel buttons on the TV:** next to the power and pause buttons are **◀ ▶**, which move to the previous or next song like a TV channel. At the ends of the list they wrap around, and the screen shows `♪ song name`. **During playback, by default the song does not change** (to keep you focused). Tick "change songs with ◀ ▶ during play" to switch immediately (that play is not recorded).
+- **Layout order:** song select shows **📺 TV → (favorites) → 🎛 Rack → (favorites) → 📺 TV details → 🎛 Rack details**. The rack sits right under the TV, like audio gear under a TV. The TV and rack order can be swapped inside "details".
+- **⭐ Favorites in folders:** under the dock are chips for **⭐ 1st team / ⭐ 2nd team / 🧊 Frozen / 📤 Former favorites**, each with a count. Tap one to swap the buttons to that folder. 🔒 freezes it. Items that do not fit appear in the row below. Long-press (or ⋯) to move, pin with 📌, or remove. **No cap.**
+- **🧩 Add-ons:** add features that are not built in. In Settings, "🧩 Add-ons" → "📄 Install an add-on" takes a `.js` or `.trk-addon` (JSON) file and saves it to `trk_addons_v1`. Add-ons can **add songs** (grouped in the 🧩 tab of the song list), **add UI** in places such as Settings, the song list, the TV details, and the rack details, and **route their own audio through the built-in effects** (`api.fx.tapElement`). See [docs/ADDONS.md](../ADDONS.md) and the example [`js/addons/example.js`](../../js/addons/example.js). If an add-on breaks, `?safe=1` keeps it from loading.
+- **📤 Share your music folder:** in the song list, "📤 Share music folder" asks the device for permission **once** and pulls the whole music folder into the list **at once**. It also brings in things you did not look for (including videos), which pairs well with 🎲 Random. The app reports how many songs were added and how many files were skipped. The permission is remembered, so next time one tap on "🔗 Keep sharing" is enough. In Settings, "📤 Music folder sharing" offers **💾 Keep shared songs on the device** (up to 150 songs / 300 MB, so no permission is needed next time) and **🚫 Stop sharing** (removes the remembered permission and the songs on the device). The older "📁 Open music folder" is kept alongside, for folders such as videos. **Songs are never uploaded**; they are only read.
+- **📚 Song tabs (shelves):** above the song list, **a tab for each source** is added automatically: 📚 All, 📦 by pack, 📁 by folder, 📄 added songs, ✔ verified. **Installing a song pack adds a tab for it**, so songs you add later are easy to find. Search and sort work within the tab you are in; TV ◀ ▶ moves through songs **in the open tab**. Each tab shows a count.
+- **📚 Shelf skins (30):** the song tabs can look like 🎛 Tab player, 📝 Notebook, 🌈 Sticker book, 🗄 Card catalog, 📼 Cassette label, 🖍 Blackboard, 🕹 Retro PC, 📁 Clear folder, 🎰 Jukebox, 📻 Radio schedule, 🚉 Departure board, 💿 Record shelf, 📼 Rental video, 🎤 Karaoke index, 🗂 Library shelf, 🍱 Menu board, 🧰 Toolbox, 🌿 Plant specimen case, 💊 Medicine chest, 🏨 Inn shoe rack, 🍬 Candy shop shelf, 📌 Station message board, 📮 Mail sorting rack, 🎼 Score shelf, 🔷 Color-vision friendly (blue × orange), 🧵 Patterns, 🚧 Warning signs (yellow × black), 💥 Pop art, 🦄 Rainbow neon, 🍍 Tropical. Use the **🎨 button** above the song list to switch on the spot (including `🎲 Random`). Hide the 🎨 button in Settings "Appearance" if you do not need it.
+- **Playing an mp4 from song select:** choosing a song shows its video on the TV dock screen (can be turned off). Under "🖼 Check video" in the details, you can check filters, TV skins, darkness and blur **before** playing, with the same view as in-game.
+- **ORBIT:** path motion, note size (can show the judgement width), six hit-point shapes, and a star orbiting around.
+- **STAGE:** lane width and darkness, note thickness, key beams, guide lines, lanes that light up at climaxes, spotlights, and other stage effects.
+- **Judgement text:** size, position, the FAST/SLOW display range, and persistent AP/FC display.
+- **Sway:** tilts the lanes with the beat or with drum hits (off by default; stops if the OS "reduce motion" setting is on).
+- **Mascots:** an orange partner, Hatsune Miku (PCL, unofficial fan work), **your own VRM model** (VRM 1.0), and **your own MMD model** (.pmx / .pmd). Both VRM `.vrma` and MMD `.vmd` motions follow the song's BPM.
+- **⭐ Favorites in folders:** songs, video filters, and effects can be kept in four folders: **⭐ 1st team, ⭐ 2nd team, 🧊 Frozen, 📤 Former favorites**. There is no cap; items that do not fit appear below the buttons. 🧊 freezes (no adding or removing). 📌 means "never removed"; pinned items always appear in 🎲 Random. Items you remove go to 📤 Former favorites and are not drawn by Random. Export and import (`trk-favs`) move them to another device.
+- **🎧 Playlist tabs (your own shelves):** add a playlist with **+** in the tab bar, or middle-click / long-press **📚 All**. Long-press a playlist tab for its name, icon, and color (🧊 Frozen prevents accidental additions; 🔒 Lock prevents accidental deletion; 🧩 marks an add-on). Middle-click deletes (you can change this to "same tab three times" in Settings; on phones, long-press → delete). Playlists only reference songs, so deleting one leaves the songs in the library. Long-press a song to edit its profile (title, artist, album, composer, **source link**, **catalog match note**) and add or remove it from playlists. For example, for `BELIEVE.ogg`, a note of `Suguri` matches "Suguri - BELIEVE" without changing the display name. Either the title or the note alone is enough for a match. On PC you can also drag and drop songs onto playlists. Playlists can be placed in **📁 folders** (long-press 📚 All → "📁 New folder"; up to three levels deep). Deleting a folder moves its contents up a level; no songs are lost. Playlists can have up to five **🏷 tags**, which carry into shared files and clipboard summaries as #hashtags. The **📤 Share** option in the tab long-press menu exports a shared file **without any audio** (condition: **9 or more songs, all cleared or watched**. AUTO, radio, and faster speeds count as watched, but a song watched only in AUTO always gets **▶AUTO**; leaving out scores and mode titles is optional). A comment (up to 140 characters), creation date, **source link** (https only; a confirmation dialog appears before opening), per-song source links (the 🔗 in the profile, for example for YouTube compilations), and **🏷 tags** can be added. The person who receives the file can review it in the viewer and import only the songs they already have.
+- **🛒 Official playlist catalog:** long-press 📚 All (or ⚙ in the tab bar) → "🛒 Official catalog". It offers curated playlists that **never include audio**: 🎒 Blue Archive OST Vol. 1–8 (225 songs in official order, with artist, album, and Apple Music links per song, plus NexTone.Link per volume), 🩺 Arknights, ⚔️ LoL (Creator-Safe Sessions, 3 series / 108 songs; recent Champion Themes, 41 songs; Worlds / WCS anthems 2014–25, and one 2026 announcement song; four MSI anthems with confirmed official sources; not all LoL music), 🎯 VALORANT, ⭐ Touhou Project, ⚡ NoCopyrightSounds, 🎼 Kevin MacLeod, ❄ Genshin Impact, 🍊 100% Orange Juice, and 🌟 Gakuen Idolmaster. Each list is a **"songs I want" list**: all songs appear as soon as you open it. Songs you do not have are shown in **grey**; tapping one opens the official source link. Arknights has "Babel" (5 songs), "🚀LONETRAIL" (10), "👹 Ruins" (7), and eight popular story OSTs (43 songs in all), each linking to Monster-Siren's official per-song page. **Put the audio you own in your Music folder and the grey row turns black and becomes playable.** Songs with the same title are added to the playlist automatically (not while 🧊 Frozen). File names such as `08_sometimes.fla` match the catalog title `08 sometimes`. If a title with a character name does not match, use the "catalog match note" in the song profile (for example `Suguri`). The note stays on the device, and it does not change the displayed title or shared playlists. Importing creates **category → series folders** (for example "Social games → Arknights"), and the tab's long-press menu shows source guides. Blue Archive audio is not included; each song links to its official Apple Music page and each volume to NexTone.Link. Yostar's guidelines prohibit copying audio and music for fan works, and buying or subscribing does not lift that restriction. Check the [Yostar official guidelines](https://bluearchive.jp/fankit/guidelines) before use. Rights in songs and series belong to their owners; trk! is unofficial and does not guarantee the linked content. The catalog itself is `TRK_CATALOG` in `js/catalog.js`; add-ons can add series.
+- **Scope and rights notes for the official catalog (2026-10-08):** VALORANT is split into Champions Anthems (6 songs, 2021–2026) and Agent Themes (3 songs), each linking to its official source and the [Riot Creator-Safe guide](https://www.riotgames.com/en/riot-music-creator-safe-guidelines). Publishing, buying, or subscribing does not by itself grant rights to reuse. Arknights links to Monster-Siren Records' music and OST pages; Genshin links to HOYO-MiX's Apple Music pages (12 songs). Neither is a license. SAM Free Music / 100% Orange Juice keep their 25-song selection, while Fruitbat Factory's **official game page** is used only as work information; per-song sources and permissions are not confirmed. Gakuen Idolmaster lists 50 instrumentals (two lists of 25) confirmed on the official Drive, and 14 songs from the official discography in a separate list. The discography list includes songs not currently found on the Drive, but this does not mean they cannot be distributed. **SEARCH RIGHT** is the official title; the Drive name **SEARCH LIGHT** is also registered for matching. The official Drive download terms are for limited fan videos; they are not a license for all songs or for general use, and owning or buying a song is not a license either. No audio is included in any list.
+- **🐔 trk songs in your Music folder:** Settings → "🐔 trk's playlist" has instructions and a "📂 Load the trk folder in Music" button. Create a `trk` folder inside Music yourself, put songs in it, then select that folder with the button. The library then reads only that folder. To go back to all of Music, choose Music again with the normal folder picker. trk! only reads; it does not create folders or move songs.
+- **👥 Contributor tool (for people who receive many shared playlists; in Developer display, off by default):** a shared playlist can carry a **contributor name** (set your own in Settings; the viewer shows 👤 with it). With Developer display on, turn on "👥 Contributor tool" in the settings of 📚 All. It adds **search by contributor name**, **🚫 Block** (hides that person's playlists from tabs and folders), and **show only starred contributors**. It is for handling large volumes of spammy submissions. Most people never see it. Contributor names are displayed as written in the file, so they cannot prevent impersonation.
+- **🕹️ Short play (the second half of a long song):** in Advanced settings, choose **the last 90 / 120 / 180 seconds**. It starts from the end of the song, and **detects long silences near the end**, ending where the sound actually stops (songs with about 8 seconds of tail are fine). Clear, grade, and FC/AP are shown as usual, but records are **saved separately from full plays** (they do not touch full-play bests or watch proof). Titles use one 🕹️ mark in every mode. AUTO remains a full-length play.
+- **⏯🔊 Title banner controls:** the volume button 🔊 at the bottom right of the title banner (the same as "song volume" in Settings). **A short press opens the slider. A long press mutes, and another long press restores the previous volume.** Settings also have **"Tap the title banner to pause / play"** (**off by default**). When on, tapping the banner pauses or resumes during play, and starts or stops preview while selecting. Buttons inside the banner and in the 🎚 effect area work as before. The right end of the banner holds **[◀][🎲][▶]** (kept to the right so they do not overlap the title). **◀ ▶** move to the previous or next song (within the open tab; the ends wrap). **🎲 is a long press (650 ms) for random by default**, so a stray tap while browsing does not change the song (a short press only shows a hint: "long-press for random"). If you want **tap-only** random, turn on "🎲 Random with a tap only" in Settings. If you do not need 🎲, turn off "🎲 Show the random button on the title banner". Pinned 📌 songs always appear in 🎲 Random's candidates.
+- **🎮 Pads, controllers, and TV remotes:** in Settings ⚙ → "⌨ Controls" → "**🎮 Controller, pad and remote**". USB or Bluetooth gamepads and rhythm controllers can have their **buttons, D-pad, and sticks assigned directly** to left note, right note, confirm, back, and pause ("Change", then press the button). Presets include "A·B (Xbox / PS)", "D-pad ← →", and "Left stick ← →". One button can be both "left note" and "confirm" (during play it is a note, in menus it confirms). **Menus can be navigated with the pad** (D-pad or left stick moves, hold to repeat, confirm presses, back works like ESC). A **📺 TV remote** that sends keyboard keys works by setting the notes to ← → (the "📺 Remote" preset). Media keys (⏯⏭⏮) and Back can be assigned too. For **🕹 arcade cabinets and homemade controllers** (devices that send buttons 1 and 2), use the "🕹 Arcade (1·2)" preset. `?reset=keys` resets only key and pad assignments.
+- **🪶 Lightweight mode (for phones):** in Settings ⚙ bottom right, "🪶 Lightweight" collects the frame-rate cap, 3D mascot draw rate, render resolution, savings for spectrum and blur, thinning of always-moving decorations, the number of rows in the song list, and skipping audio analysis or 3D model loading. **Auto** works only when needed, based on the device (mobile, cores, memory, data saver, battery, and the "reduce motion" setting). See [📱 Playing on a phone](mobile.md#playing-on-a-phone).
+- **🩷 MMD mascots (bring your own):** move your own MMD model, such as Lat-style Miku or Tawashi-style CHAN×CO Miku. Select the texture folder. **All 65 built-in motions are generated by trk! code at run time as VMD**, grouped into six: daily, dance, Miku-tempo originals, classic Miku poses, expressions and acting, and 🎤 singing / lip-sync. They include smiles, winks, blushes, anger, troubled faces, and lip-sync that use real morph names from the Lat-style Miku. Expressions only move on models that have the same morph names. The lip-sync is a vowel loop and is not synced to the audio. Titles and "in the style of" references only suggest tempo and mood; they do not reproduce existing choreography. New installs and the Lat-style preset default to "🎤 A-I-U-O lip-sync (no audio sync)"; six more singing motions are in the 🎤 group. Saved choices are kept, and you can load your own `.vmd`. **Third-party models and VMD files are not bundled unless their redistribution terms can be confirmed.** One exception: a Lat-style model with its original terms and ReadMe is included in `assets/mmd/lat-miku/`. Scale, direction, and bottom-of-screen credit can be set and are restored when you next open the app. `?safe=1` does not load them. If something does not work, press **🔎 Check** on the same panel: it shows WebGL, the bundled 3D parts (three / three-mmd-loader), the model, and the motion in one block. Press "📋 Copy result" and paste it when asking for help.
+
+### ✨ TRK effects (bottom-left, separate section)
+
+On the song select screen, below **🔥 TRK amp**, is **✨ TRK effects**. It gathers only the **richer "beautify" looks** from the video filters (color styling that makes footage look nicer). **The contents are the same as the TV dock's video filters**, so either place stores the same value (no double application).
+
+- Four tabs with five looks each, **20 in all**: portrait / skin tone, anime / cel, texture, and studio / quality. For example: natural skin, soft skin, flush, matte skin, ID photo; clear cel, cel fill, pastel, night anime, print (halftone); grain, paper, halftone dots, soft glow, velvet; balanced, clean, highlight, open, cinema.
+- The section is open the first time (matching TRK amp). Closing it keeps it closed on later visits; reset returns it to open.
+- **Use TRK effects** (switch) applies the current look. **Turning it off returns to the previous look** (↩ also restores it).
+- **◀ ▶ 🎲** move through the looks or pick at random (🎲 only chooses among these 20).
+- **🎛 Video filters in detail** opens the settings video filter list. The 45 classic looks, ⭐ favorites, and 🕘 recently used are still in the TV dock.
+- Reset with `?reset=tv` (this also clears the memory and returns the section to open) or `?reset=all`. **`?safe=1` disables the switch**, but keeps the memory. Settings exports (JSON) include it.
+- ⚠ These are whole-screen color adjustments. They **do not detect or outline faces or skin, paint over areas, enhance resolution, or recover blown highlights**. They are only for making things look nicer.
+
+## Sound effects
+
+trk! also works as a music player. Open "🎛 Sound effects" in Settings or from the song select menu. It does not affect scoring.
+
+Below it is the **🎚 Effect rack**, where you can stack effects **in up to eight stages**, like a portable amp chain. Stages run after the preset and are included in saved presets and exports. Available stages are: **🚪 Noise gate** (closes when the signal falls below a threshold); **🧹 Noise reduction** (during a quiet passage, press "🔇 Learn the current sound as noise"; it learns that spectrum for two seconds and removes it, a self-made version of the approaches in Audacity, ReaFir, and Bertom Denoiser Classic); **🎚 Dynamic EQ** (reduces a band only when that band is loud, after TDR Nova and Ozone); **✨ Exciter** (adds harmonics to the highs); **🧲 Compressor**; and **📢 Volume**. Noise reduction is heard about 20 ms late, which the automatic timing compensation absorbs.
+
+### 🔥 Using TRK amp (own section, bottom-left)
+
+On the song select screen, **directly below "🎛 Details (EQ, skins, menu)"** in the bottom-left is **🔥 Use TRK amp**. It is an entry point to the rack above (the stage-stacking system), so you can use it on the spot without opening Settings. It is the same rack and stays in sync with "🎚 Effect rack" in Settings.
+
+- **The section is open the first time** so you notice it. Close it once and it stays closed next time (reset returns it to open).
+- **Use TRK amp** (switch) turns the rack on. If the rack is empty, it first builds the standard four stages: **🚪 Noise gate → ✨ Exciter → 🧲 Compressor → 📢 Volume**.
+- **Build a chain in one tap:** **🔥 TRK amp (standard), 🍯 Warm, 📻 Boombox, 🧹 Clean**. Each rebuilds the chain and plays immediately.
+- **Stages appear as chips** (for example `🚪 Noise gate`). Reorder with **↑ ↓**, remove one with **✕**, or add with **＋ Add stage** (up to eight).
+- **🎛 Adjust stages in detail:** edit knobs (threshold, frequency, ratio, and so on) in **"🎚 Effect rack" in Settings**. This section is for building, ordering, and switching.
+- **Switching off keeps the stages** (off = plain sound). Use ✕ on everything to remove them.
+- Resets: **`?reset=amp`** (empties the rack), **`?reset=all`** (factory; empties the rack too), **`?safe=1`** (keeps the stages but turns the amp off for safety). Exports (settings JSON and presets) include the stages.
+
+| Category | Count | Examples |
+|---|---|---|
+| Basic | 10 | Scooped sound, night mode, clear, mix check: phone |
+| Genre | 16 | EDM, piano, jazz, orchestra, city pop, vocaloid |
+| Scene | 20 | Goodnight, rainy day, campfire, night highway, snowy night, whisper |
+| Space | 17 | Cathedral, next room, planetarium, inside a closet, station platform |
+| Game | 15 | Boss battle, save point, flashback, ending roll |
+| Fun | 21 | 8D-style, karaoke, record, string telephone, answering machine |
+| Quirky | 16 | Robot, live house behind the wall, deep sea, near a black hole |
+
+- **Simple EQ** (five bands, ±12 dB) applies on top of any preset.
+- EDM pumping, gates, 8D, echo, and similar effects **follow the song's BPM**.
+- 🎮 **Game-linked:** a brief muffle on a miss, brightness on combos, a heartbeat at low life, a bigger sound during 🚀 Blast mode (during play only).
+- ⏱ **Automatic timing compensation:** the delay added by effects is corrected in the judgement (fine-tuning available).
+- 📄 **Saved with the chart:** exported charts include the effects, so others hear the same sound.
+- 🎛 **Effect chain editor:** connect 17 effects visually, reorder them, and adjust EQ and volume. Try them, save as presets, or load and save `trk-fx` JSON.
+- 🎹 **Synth play mode:** long-press the ⏻ speaker on the rack (default 0.65 s; can be turned off or shortened to 0.2 s in Settings). It has 16 built-in tones (electric guitar, electronic sax, ZUNPET-inspired brass, and more), a pitch knob (−8 to +8 semitones, default 0, saved, and applied to held notes), up to six layers (stacked oscillators, or short samples from your device), and a two-octave keyboard with key assignments, so you can play along with the song preview. While the synth is open, mapped keys are locked to the keyboard by default (can be changed). The keyboard can be widened in Settings. The top of the screen shows video and the spectrum.
+
+## 🧩 Personal presets (MOD)
+
+Export the current settings as JSON with "⇩ Export current settings as JSON", edit the file, and import it to make your own preset (format `trk-fx`).
+
+```json
+{ "format":"trk-fx", "version":1, "name":"My city pop",
+  "chain":[ { "type":"eq", "bands":[ { "type":"lowshelf", "freq":90, "gain":3 } ] },
+            { "type":"reverb", "size":1.8, "decay":3, "mix":0.15 } ],
+  "eq":[0,0,0,1,2], "volume":0 }
+```
+
+Available effects: `eq` `comp` `gain` `width` `vocalCut` `delay` `reverb` `drive` `lofi` `pump` `tremolo` `autopan` `sweep` `ringmod` `chorus` `noise` `crossfeed`
+
+Only values of the allowed types and ranges are read, and no program is run, so you can safely try other people's JSON.
+
+> Built-in presets stop at **115**. Make new sounds with personal presets and MODs, and share them with **#trkAGRG**.
+
+## Spectrum
+
+See what is playing on the song select screen. It reads **the sound after the effects**, so you can see how EQ and effects are applied.
+
+- **30 display styles** (table below) and **16 colors** (neon, sunset, monochrome, rainbow, **trk (red × blue)**, sakura, toxic, VHS, gold, ice, forest, candy, lava, ocean, Game Boy-style, synthwave). Default: **⭕ Ring × neon**.
+- **Sensitivity** slider and **peak lines**. Settings are saved in the same place as other settings (`shadow_taiko_preferences_v2`).
+
+| Style | What you see |
+|---|---|
+| 📊 Bars / 🪞 Mirror / 〰 Waveform / ⭕ Ring | The classics: loudness as bars, mirrored bars, a wave, and a circle. |
+| 🎚 DAW waveform | A recording-software timeline with waveform history, playhead, dB scale, and a REC dot. |
+| 🧭 VU meter | Two analog needles (L/R) that bounce. |
+| 🔴 LED ladder | A cassette-deck level meter: green → yellow → red, with "CLIP" when clipping. |
+| 🌈 Spectrogram | Time × frequency heat map, scrolling right to left. |
+| 💓 ECG | The waveform as an ECG trace; the sharpness of onsets shows clearly. BPM is shown too. |
+| 📉 Seismograph | Red needle on drum paper; shows the strength as a seismic intensity. |
+| 📡 Radar | A sweep with blips; each band leaves dots behind. |
+| 🎹 Piano roll | Notes stretch above the keys in response to sound. |
+| 📈 Business chart | Presentation-style bars with a target line and achievement rate. |
+| 💹 Frequency board | Stock-board style, with four rows from bass to treble, values, and ▲▼. |
+| 🤥 Lie detector | Three recording strips: pulse, breathing, and sweat. Loud sounds stamp "LIE". |
+| 🔥 Campfire | The flame grows with loudness and sparks fly. |
+| 🔵 Dot grid | Towers of dots that light up per band, like an LED panel. |
+| 🏙 City lights | A night skyline; windows light up with the sound. |
+| 🫧 Bubbles | Bubbles rise from each band. |
+| 🏔 Mountains | Three ridges for bass, mids, and treble. |
+| 🎸 Strings | Strings for each band vibrate. |
+| 🌸 Flower | Petals open with the sound; a slowly turning flower. |
+| 🌀 Kaleidoscope | An eight-way mirrored kaleidoscope. |
+| ✨ Starfield | Scattered stars that twinkle with the sound's brightness. |
+| 🟢 Matrix | Falling characters at the speed of sound. |
+| 🎆 Fireworks | Fireworks launched by the sound's peaks. |
+| 🌊 Swell | Three layers of rolling waves. |
+| 🐚 Spiral | A spiraling line of light. |
+| 🌬 Windmill | Blade length follows the sound; wind turns the windmill. |
+| ⚡ Lightning | Bright bolts on peaks, with lights on the ground. |
+
+- To turn it off everywhere, check **🚫 Do not use the spectrum** at the top of Settings → "📊 Spectrum". This removes it from the banner, details, TV overlay, and the audio path. Unchecking restores it.
+- Three places: **📊 Title banner (on the song title, top right)**, **🎛 "⚙ Details" inside the rack**, and **"📊 Spectrum" in Settings**.
+  - The title banner is a **skin**. Press **+** at the top left to open it wide (then "⇄ Next style" and color dots appear). Press again to close. **Long-press +** to jump to the spectrum section in Settings. The right end of the banner has **[◀][🎲][▶]** (move through songs, and 🎲 random in the current tab). You can limit 🎲 alone or hide the whole group in Settings.
+  - Options such as "show peaks" and "📺 Overlay on TV" are in the settings.
+- **📺 You can overlay it on the TV screen** (off by default). It sits over the video, so you can watch it throughout song select. It does not appear during play.
+- ⚠ When shown, sound passes through **the same audio path as the effects (Web Audio)**. If you have never used effects, turning this on still creates that path. **Scores are not affected.** It does not appear in `?safe=1`.
+- If the OS "reduce motion" setting is on, the number of bars is reduced and peaks are not drawn.
+
+## Study Room
+
+Study Room is a local image and text viewer. Long-press the title at the top left of the song list (or focus it and press Enter / Space) to open it. Press Esc to close.
+
+Imported images, text, bookmarks, notes, and jacket assignments are saved **only in this browser** in IndexedDB `trk_study_room_v1`. Nothing is uploaded or sent over the network. Original files are not changed. `?safe=1` does not open Study Room and does not touch its storage.
+
+- **🗂 Shelf:** each image folder becomes **one album** (nested folders can be "one album per folder" or "one album total"). Each text file is one book. The shelf holds up to 500 books. Click or long-press the shelf heading to create organizing folders. Drag the **⋮⋮** handle to reorder cards, or drop them on a folder to move them. Search by title, path, or excerpt. Sort by **newest updated / oldest added / name / type / largest**. The shelf normally shows outside full-screen; with "show shelf" in the header you can restore it if hidden in Advanced settings. Advanced settings also include "don't use sorting" (manual layout), "show folders above books", and "don't confirm deletion". Books with a bookmark show 🔖; ✎ renames, × deletes (deleting a folder moves its books back to the shelf). The bottom of the shelf shows book count, image count, and usage (plus free space where the browser reports it).
+- **📥 Import:** shows a progress bar and a **Cancel** button. Books already imported stay after a cancel. When a book has the same name, choose "replace contents" or "keep as a new book". Files that are too large, and similar cases, are skipped with a reason, and a final summary shows added / kept / failed counts.
+- **🖼 Images:** choose a folder and its images are sorted by name (numbers sorted as numbers). Album limits: up to 3,000 images, 600 MB total, and 100 MB per file (`jpg / png / webp / gif / avif / bmp`). Three layouts: **one page / spread (right first) / vertical comic**. **🇺🇸 American** swaps left-right and order. **Reverse page order** reverses the reading direction. **Tap the left side of an image or press →** for next; **the right side or ←** for previous (🇺🇸 reverses the tap positions). Swipe works too. **Zoom** from 0.5x to 4x by buttons, `Ctrl+wheel`, pinch, or `+` / `-` / `0`. When zoomed, drag to pan. In vertical mode only visible pages load, so long books stay light.
+- **📄 Text:** import single files or whole folders (12 MB per file, up to 200 files at a time; TXT, MD, JSON, CSV, logs, and similar). The encoding is detected automatically: **UTF-8 / UTF-16 (with BOM) / Shift_JIS**. Aozora-style ruby (`｜《》`) is rendered. There are **24 text skins** in total (writing and reading 6 / coding 6 / AI and prompt style 5 / free-form 7). The chosen colors, font, and background apply to both the reader and the editing text area. The AI-style skins are visual only; they do no AI processing and no networking. Adjust **text size, line height, and margins** in three steps each (the manuscript-paper style flows sideways). **In-book search** (`Ctrl+F` or 🔍; `Enter` / `Shift+Enter` for next / previous; matches are highlighted).
+- **🔖 Bookmarks and progress:** hold `Enter` to bookmark, `M` for the **bookmark list** (jump to or remove). Hold `Space` for the **page slider** (images); `Home` / `End` jump to the first or last page. Reopening resumes from the page you left.
+- **⌨️ Keys:** by default `→` next and `←` previous. In Advanced settings you can rebind next and previous separately (you can also use `↑` / `↓` for image pages). Left/right taps and swipes follow the binding direction.
+- **❓ Key help:** appears the first time and can be reopened any time from the top-right "❓ Keys" button or `?`.
+- **✎ Text editing and export:** open a `.txt`, `.md`, or `.js` book and press "Edit a copy" to type. Input is saved automatically; `Ctrl` / `⌘+S` saves immediately; `Tab` indents; `Esc` returns to reading. Edits are saved to a copy inside Study Room, and the original file is not changed. **JavaScript, HTML, and Markdown are always treated as plain text**: they are never run, interpreted as HTML, or previewed. The export button works while reading too. Renaming a book in the shelf also changes the exported file name. In Advanced settings you can choose a shelf folder for edited books, and in supported browsers you can choose an export folder on your device. When exporting to a folder you choose, the file is saved under a **new name** and existing files are not overwritten. The folder choice is kept only while the app is open. Browsers without support use a normal download (duplicate names are handled by the browser).
+- **📺 TV and jacket:** Study Room has a TV (**top / bottom / hidden**). It has **six looks** (plain, CRT, wood frame, arcade, projector, aquarium), **three sizes**, **aspect ratios** (16:9, 4:3, 21:9, 1:1), and a title on or off. It shows the video when one is playing, or the jacket for an audio-only song. Assign a jacket by **long-pressing an image (680 ms)** or with "🖼 Use this page as the song's jacket". It is shown as the song-select background and on the TV dock, and is saved per song inside Study Room; the same action removes it. When Study Room closes, a song starts, or the song changes, any video is **always returned to where it was**.
+- While Study Room is open, in-game key actions (mode keys, skip, speed, and so on) are paused. Leftover read-only images from an interrupted import are cleaned up automatically the next time you open it.
+
+## Packs and verified packs
+
+Like osu! skins, you can share many things in one file (`.stpack`). There is no server; share through Discord, cloud storage, or similar.
+
+- **Look packs:** skins, note colors / shapes / images, sound effects, VRM, motions, and mascot lines.
+- **Song packs:** audio, charts, background images, BPM, chart creator names, and a creator's message (up to 50 songs per pack).
+- How to make one: "+ Make a pack from current settings" in Settings, or "📦 Make this song a song pack" on the song select screen.
+- How to install: drop the file onto the screen.
+- An optional `creditCard` in `pack.json` shows the creator name, title, rights notes, and terms like a business card. `contributors` shows up to 12 co-creators, and a `CREDITS.md` is generated inside the pack. A shareable SVG card can be downloaded from the pack list. The format is text-based (no images), so it is easy to handle when shared.
+
+> ⚠ Only include **music and material you have the right to redistribute**.
+> The contents are a ZIP file. The format name `shadow-taiko-pack` is kept for compatibility with older packs. The fields, limits, and a `pack.json` example are in [docs/pack-format.md](../pack-format.md).
+>
+> Static checks of the repository can be run with `node tools/check-repo.mjs`. These are not a substitute for testing in a real browser.
+
+### ✔ Verified packs
+
+A song pack whose creator's identity and rights have been confirmed shows a **✔ Verified** badge, along with a message from the creator (up to 280 characters, like a free X post).
+
+- The SHA-256 fingerprint of the whole pack file is checked against [`verified.json`](../../verified.json) in the repository. If even one byte changes, the ✔ is not shown.
+- Unverified song packs still show the **chart creator and BPM**.
+- To apply for verification, send a DM to X [@ttrk143](https://x.com/ttrk143) or open an Issue. The steps and rights checklist are in [docs/verified.md](../verified.md).
+
+## Playing on a phone
+
+- Open the web play URL from the [README](../../README.md) in a phone browser and choose "**Add to Home Screen**" to play full-screen like an app.
+- On phones, try "**📤 Share music folder**". On devices that can pick folders (such as Android Chrome), it pulls the whole music folder in at once. On devices without folder picking, add songs one at a time.
+- Folder permission is **remembered** only in desktop Chrome / Edge. On phones, you can turn on "**💾 Keep shared songs on the device**" in Settings, and saved songs (up to 150 songs / 300 MB) can be played without permission.
+- An APK is not yet distributed. The static web assets are synced into an Android app with Capacitor, and the setup steps and limits are in [docs/android.md](../android.md).
+- **🪶 Lightweight mode (bottom right of Settings):** settings for drawing lighter on phones, tablets, and apps (PWA / APK). Start with a **preset**:
+  **🪶 Balanced (recommended)** / **🎯 Game priority (notes and response unchanged)** / **🔋 Maximum saving (lightest)** / **✨ No lightweight mode** / **🧩 Custom** (the state after you adjust the items below).
+  Choosing any preset other than "No lightweight mode" turns lightweight mode **on** (it works on PC too). To go back to automatic detection, set "Lightweight mode" below to "Auto".
+  **🎯 Game priority** puts **no cap on in-game drawing** (notes, background, and effects). It only lightens the menus, spectrum, 3D mascots, and render resolution. Judgement and response are the same in every preset, because judgement uses the audio clock.
+  For detail, open Settings ⚙ → "**🪶 Lightweight (for phones)**" at the bottom right:
+  **Lightweight mode** (Auto / always on / off), **frame-rate cap** (60 / 30 / 20 fps), **3D mascot (MMD / VRM) draw rate** (60 / 30 / 15 fps / no drawing), **render resolution** (device / up to 1.5x / 1.0x), **turn off spectrum**, **reduce blur and frosted glass**, **cap video blur at 2 px**, and four options that **reduce what is read**: **📡 Thin out always-moving decoration** (the antenna, characters, and skin lights are redrawn at the frame-rate cap); **songs drawn in the list at first** (all / up to 150 / up to 60); **🧠 Skip song audio analysis** (lighter for long songs and memory; auto charts then follow the BPM grid, and your own and imported charts are kept); **🩷 Do not load 3D mascots at startup** (three.js is not loaded either; it loads when you choose a mascot, open the ⚙ settings panel, or turn lightweight mode off). Models and files are never removed.
+  "**Auto**" looks at mobile status, CPU cores, memory, the data-saver setting, **battery level (below 20% while not charging)**, and the OS "reduce motion" setting, and works only when it seems needed. The check runs on the device and nothing is sent. The current state and device information are shown in Settings; "🔄 Re-check this device" runs it again.
+  **Gameplay judgement and timing use the audio clock (`gameTime`)**, so lowering the frame rate does not shift judgement. Only drawing is thinned. Silence detection, countdown, and input still run every frame. "🎯 Game priority" keeps note drawing uncapped.
+  If you select a light preset while "No lightweight mode" is on, lightweight mode turns back on for that choice. On phone-like devices that have not used lightweight mode yet, a notice appears **once**. `?reset=lite` resets only lightweight settings.
+- Privacy policy: [privacy.html](../../privacy.html). trk! uses no accounts, no ads, and no behavior tracking, and it keeps songs and settings on the device.
+- Credits for code, Miku, bundled models, and third-party libraries are in [credits.html](../../credits.html) (the "rights and credits" gallery). The formal notices are in [NOTICE.md](../../NOTICE.md).
+
+## Requirements and saved data
+
+The latest **Chrome or Edge** is recommended. Firefox and Safari (16.4 and later) also work.
+
+| Feature | Requirement |
+|---|---|
+| 📁 Remember music folder | Desktop Chrome / Edge (HTTPS or localhost). Other browsers ask for the folder each time. |
+| 📤 Remember sharing (🔗 Keep sharing) | Desktop Chrome / Edge (HTTPS or localhost). Other browsers ask for the folder each time. |
+| 🧠 Keep analysis results on the device | Automatic. Replaying a song skips audio analysis. Stored in IndexedDB `trk_analysis_cache_v1`: numbers only (no waveform), up to 30 songs. Not used in `?safe=1`. |
+| 💾 Keep shared songs on the device | Only if turned on in Settings. IndexedDB `shadow_taiko_shared`, up to 150 songs / 300 MB. Not read back in `?safe=1`. |
+| Loading packs | A browser that supports `DecompressionStream`. |
+| Verified-pack checks | HTTPS or localhost (the fingerprint calculation needs it). |
+| VRM | WebGL. three.js and three-vrm are bundled (`assets/vendor/`). Loaded only when you start using VRM. |
+| MMD | WebGL. three.js and three-mmd-loader are bundled (`assets/vendor/`). Loaded only when you start using MMD. |
+| ⭐ Favorites | On this device only (localStorage). Folder organization too. |
+| 📚 Study Room | On this device only (IndexedDB `trk_study_room_v1`: books, pages, covers, settings). Up to 3,000 album images / 600 MB, 12 MB per text file, 500 books on the shelf. Bookmarks, copied notes, jackets, and display settings are stored there too. It does not open in `?safe=1`. |
+
+**About saving:** settings, records, packs, added songs, and personal presets are stored **only in this browser** (localStorage and IndexedDB). Analysis results (numbers such as loudness) are kept in the same places. The ♻️ factory reset does not delete them (only settings return to defaults). Clearing browser data deletes everything, so back up your records from time to time.
+
+## Making mods
+
+trk! is split into files by feature, so it is easy to mod.
+
+- **Your own mascot:** use `js/characters/miku.js` as a model, write a file that calls `registerMascot()`, and add one line in `index.html`.
+- **Built-in skins:** add one entry to `SKINS` in `js/data.js` and it appears in the list. Use the `cat` tag to filter the shelf. `--ui-bg` and `game.stage` accept `linear-gradient(…)`. Setting `locked: true` keeps it locked until the unlock flag `settings.skinGradUnlocked` is set; on the shelf it shows as a "❓ ???" card. Example: the reward skin 🎓 Graduation gradient. Miku skins are registered in `js/characters/miku.js`.
+- **Shelf skins (song tab look):** add one entry to `LIB_SKINS` and `LIB_SKIN_ORDER` in `js/lib-skins.js`, and add the style for `#libPanel[data-lib-skin="ID"] …` in `css/style.css`.
+- **Add-ons:** add features without touching `js/*.js`. Call `TrkAddons.register({...})`, and either install it from Settings or add one line to `index.html`. The API is in [docs/ADDONS.md](../ADDONS.md), and the example is `js/addons/example.js`.
+- **TV skins:** add one entry to `TV_DOCK_SKINS` in `js/tv-dock.js`, add decorations in `buildDeco()`, and add the style in `css/style.css`. To make your own without code, use the 🎨 (`#tvMaker`) in Settings.
+- **Sound effects:** a personal preset (`trk-fx` JSON), or your own file added to `TRK_FX_PRESETS`.
+- **Translations:** `TEXT.ja / en / zh / ko` in `js/i18n.js` and similar files.
+- **Contributing:** [CONTRIBUTING.md](../../CONTRIBUTING.md).
+- **Development handoff:** [docs/HANDOFF.md](../HANDOFF.md) (design thinking, the agreements between files, and the saved-data format).
+
+When you publish a derivative version, please use a different name (see "License and rights" below).
+
+## File layout
+
+```
+trk/
+├─ index.html  privacy.html  credits.html  manifest.webmanifest  sw.js  verified.json
+├─ package.json  capacitor.config.ts
+├─ css/style.css  css/study-room.css  … looks for the shelf, reader, and TV
+├─ icons/                        … app icons
+├─ assets/optional-demo-audio/   … optional First Spark demo audio + three handmade charts (the whole folder can be deleted in lightweight builds)
+├─ js/
+│  ├─ i18n.js  i18n-options.js   … text in four languages
+│  ├─ data.js                    … registration of skins, layouts, difficulties, and mascots
+│  ├─ characters/miku.js         … Hatsune Miku (PCL). The game works without it.
+│  ├─ core.js                    … settings, state, shared processing
+│  ├─ player.js                  … playback controls and section repeat
+│  ├─ media.js                   … loading, audio analysis, chart generation
+│  ├─ game.js                    … progress, judgement, records
+│  ├─ render.js                  … drawing
+│  ├─ custom.js                  … note and skin creation, packs
+│  ├─ truck.js  modes.js  stage.js  stagefx.js  catch.js   … modes, life, titles, effects
+│  ├─ extras.js                  … offset measurement, ghost, and more
+│  ├─ tv-presets.js  tv-dock.js  … video filters, TV dock, custom TV skins
+│  ├─ fx-presets.js  fx.js  fx-dock.js   … sound effects, and the 🔥 TRK amp at bottom left
+│  ├─ library.js                 … song select, AUTO, radio, song tabs (shelves)
+│  ├─ lib-skins.js               … 30 shelf skins (song tab look and the 🎨 button)
+│  ├─ verified.js                … verified packs
+│  ├─ addons.js  addons/         … add-ons (a way to add features later, with an example)
+│  ├─ main.js  speed.js          … input, startup, speed
+│  ├─ vrm.js                     … VRM mascots
+│  ├─ mmd.js                     … MMD mascots (bring your own; a Lat-style model with its terms is included)
+│  ├─ favs.js                    … ⭐ favorite folders (1st / 2nd / Frozen / Former)
+│  ├─ spectrum.js                … 📊 spectrum (shown over the TV screen too)
+│  └─ study-room.js  study-room-utils.js  … 📚 Study Room (local image and text viewer)
+├─ docs/  HANDOFF.md  pack-format.md  android.md  verified.md  og.png
+├─ tools/make-icons.html         … tool to make icons and the OGP image
+├─ tools/check-repo.mjs          … dependency-free static checks
+├─ tools/check-study-room.mjs    … static checks for Study Room loading, encodings, and safety
+├─ tools/prepare-mobile-web.mjs  … sync of web assets for Capacitor
+├─ .github/ISSUE_TEMPLATE/       … forms for bugs and ideas
+├─ README.md  NOTICE.md  CONTRIBUTING.md  LICENSE
+```
+
+## Security
+
+trk! has no server, and neither songs nor Study Room books leave your device. The attack surfaces are **files others make** (packs, charts, skins, effects, playlists), **🧩 add-ons**, and **bundled third-party libraries** (`assets/vendor/`). On 2026-10-06 these were reviewed in depth. Shared-file URLs are limited to `https`, settings loading guards against prototype pollution, and `.stpack` files are checked against zip bombs. A static checker (`tools/check-security.mjs`) runs in `npm run check`.
+
+- Findings, accepted risks, and recommendations are in **[docs/SECURITY.md](../SECURITY.md)**. Fixed issues are kept in the record.
+- **Shared playlists (files received from others):** they contain **no audio and no code**. A sender can only **falsify a song title**, **display text**, or **offer an https link to open** (always confirm before opening). They **cannot read your files or run code**. Be careful of impersonation, and choose the songs you import yourself.
+- 🎬 **Videos are loaded with "🎬 Load a video":** only files whose first frame confirms they have video are recorded as 🎬 (the mark appears in the song list). Once loaded they play in the full-screen viewer. **Large files (over 96 MB) skip audio analysis** so a 2 GB movie does not exhaust memory (charts follow the BPM grid).
+- ♿ **Accessibility and robustness checks:** a one-time run of html-validate (HTML syntax), axe-core (on-screen content after startup), ESLint (typos), and css-tree (CSS syntax) is recorded in `docs/QUALITY-CHECKS.md`. It found and fixed 23 missing accessible names, nested tabs, and heading order. The **dependency-free checker** `tools/check-a11y.mjs` runs on every `npm run check` (duplicate IDs, input labels, `alt`, role misuse, and nested tabs).
+- 🧾 **Cross-check with standard vulnerability lists:** `docs/SECURITY-CHECKLIST.md` maps each item of the OWASP Top 10 Client-Side Security Risks and the CWE Top 25 (2025) (✅ verified / 🟡 by design / 🔶 recommended but not done / ➖ not applicable).
+- 🛡 **VRM and MMD libraries are bundled (no more CDN):** three.js, three-vrm, and three-mmd-loader are in `assets/vendor/`, and the import map uses relative paths. **There are zero external origins.** Contents are pinned in `tools/vendor-lock.json` (100 files, 4.98 MB, SHA-384), and **`npm run check` verifies them offline every time** (`npm run check:vendor:npm` also compares against the npm tarballs). They are not loaded at startup; they load only when you start using VRM or MMD (never in `?safe=1`).
+- 📚 **Study Room text is always displayed as text:** `.txt` as well as `.html`, `.js`, `.md`, `.csv`, and `.json` appear **as source**. They are never interpreted as HTML or formatted as Markdown, so a file that contains HTML or JavaScript **does not run**. Only `jpg / png / webp / gif / avif / bmp` can be imported as images; SVG is excluded.
+- Examples of what is protected: shared links are https-only and confirmed before opening (checked both on import and on open). Chart JSON is limited to 2 MiB and 50,000 notes, with numeric fields validated. Emergency settings import is limited to 2 MiB, and add-on input files to 4 MiB, checked before reading. Pack format, size, and paths are validated. Custom skins use an allowlist of colors only. Dynamic code evaluation happens **only in add-on code the user explicitly agreed to** (this is not a sandbox). `innerHTML` is used in one place, the results screen, after `esc()`. File selection is read-only. Add-ons do not load in safe mode, and if the stored code's fingerprint has changed, startup stops.
+- 🧩 **Add-ons are your own responsibility.** They run with full page permissions, so install **only ones you trust** (nothing installs itself from a shared file).
+- Report vulnerabilities with exploit details privately through GitHub Security Advisories.
+
+## Inspirations and credits
+
+trk! draws on many rhythm games. It is an **unofficial fan project** with no relation to any of them.
+trk! does not use the charts, images, audio, or names of any of those games. Built-in charts are generated automatically, except for the handmade charts (beginner, intermediate, advanced) included with the demo song "FIRST SPARK". Those were written from our own bar-structure table, and they use no chart data from other games (`tools/make-first-spark-charts.mjs`).
+
+| trk! feature | Inspiration |
+|---|---|
+| Packs, skins, MOD culture, offset measurement, background dimming | osu! |
+| 🪐 ORBIT path motion | Gitaroo Man's Trace Line |
+| 🏁 Records per speed | A Dance of Fire and Ice's Speed Trial |
+| 🎪 STAGE, PERFECT✦, curtain call | World Dai Star: Yume no Stellarium |
+| 🚛 CATCH | osu!catch |
+| Section repeat, judgement stats, sway | SOUND VOLTEX |
+| Auto fine-tune, ghost | beatmania IIDX |
+| RANDOM / ANTI-ROLL | EZ2ON |
+| 📻 Radio | DJMAX |
+| 📡 Antenna characters (Reimu, Marisa, Cirno, Flandre, Youmu) | Touhou Project (fan-made pixel art; no official assets used) |
+
+<details>
+<summary>🤫 Hidden seeds (spoilers)</summary>
+
+| Seed | Effect |
+|---|---|
+| `143` | Unlocks all hidden difficulties |
+| `765` / `2000` | MASTER / 2000 RUSH |
+| any seed containing `olivier`, `nightmare`, `lunatic`, or `hentai` | Unlocks MASTER |
+| `20230726` / `20260929` / `curtaincall` | Curtain call (thank you for all the stages) |
+| `nitro` / `buttobi` / `ぶっとばし` | CATCH stays in blast mode from start to finish (counts as practice) |
+
+There may be more…?
+</details>
+
+## License and rights
+
+**License:** code under **GPL-3.0-or-later**. The name "trk!" is not licensed, so please rename forks. The Hatsune Miku mascot (`js/characters/miku.js`) is fan art under the Piapro Character License (non-commercial only) and is **not** covered by the GPL. Delete that file and its `<script>` line for commercial forks. The Touhou Project antenna character skins (Reimu, Marisa, Cirno, Flandre, and Youmu, in `ANT_CHARS` of `js/fx-dock.js`) are original fan works (© Team Shanghai Alice / ZUN) following the official fan-work guidelines. No assets from the official games are used. Remove their entries for a Touhou-free build. MMD models and `.vmd` motions are normally loaded from your device, and their authors' terms apply. The redistributable Lat-style model under `assets/mmd/lat-miku/` includes its original terms and is not covered by the GPL. Songs, charts, and messages in verified packs belong to their creators.
+
+This work depicts the character "Hatsune Miku" of Crypton Future Media, INC. under the Piapro Character License.
+
+trk! is an unofficial fan project and is not affiliated with any of the games listed above.
+
+## Run locally and feedback
 
 **Run locally:** `python -m http.server 8000`, then open `http://localhost:8000`.
 
 **Feedback:** casual thoughts on X [@ttrk143](https://x.com/ttrk143) (hashtag **#trkAGRG**), bugs and ideas on [GitHub Issues](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues).
-
-**License:** code under **GPL-3.0-or-later**. The name “trk!” is not licensed — please rename forks. The Hatsune Miku mascot (`js/characters/miku.js`) is fan art under the Piapro Character License (non-commercial only) and is **not** covered by the GPL; delete that file and its `<script>` line for commercial forks. The Touhou Project antenna character skins (Reimu, Marisa, Cirno, Flandre and Youmu in `ANT_CHARS` of `js/fx-dock.js`) are original fan works (© Team Shanghai Alice / ZUN) following the official fan-work guidelines — no assets from the official games are used; remove their entries for a Touhou-free build. MMD models and `.vmd` motions are normally loaded from your device and their authors' terms apply; the redistributable Lat-style model under `assets/mmd/lat-miku/` includes its original terms and is not covered by the GPL. Songs, charts and messages in verified packs belong to their creators.
-
-This work depicts the character “Hatsune Miku” of Crypton Future Media, INC. under the Piapro Character License.
-
-trk! is an unofficial fan project and is not affiliated with any of the games listed above.

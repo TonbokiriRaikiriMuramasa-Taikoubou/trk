@@ -1,11 +1,11 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 165,
+  "windowProps": 182,
   "duplicates": 0,
-  "declarations": 247,
-  "private": 72,
-  "public": 175
+  "declarations": 222,
+  "private": 65,
+  "public": 157
  },
  "files": [
   {
@@ -226,28 +226,9 @@
   },
   {
    "file": "js/media.js",
-   "decls": 25,
-   "private": 7,
-   "public": [
-    "CHART_FILE_MAX",
-    "applyChartData",
-    "audioCtx",
-    "buildChart",
-    "chartToData",
-    "decodeAudio",
-    "estimateLevel",
-    "exportChart",
-    "generateNotes",
-    "getAC",
-    "importChartFile",
-    "loadMedia",
-    "loadSE",
-    "playSE",
-    "rmsAt",
-    "seBuffers",
-    "seFiles",
-    "setBackground"
-   ]
+   "decls": 0,
+   "private": 0,
+   "public": []
   },
   {
    "file": "js/game.js",
@@ -468,6 +449,13 @@
    "name": "CATCH",
    "writers": [
     "js/catch.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "CHART_FILE_MAX",
+   "writers": [
+    "js/media.js"
    ],
    "readers": []
   },
@@ -856,6 +844,13 @@
    "readers": []
   },
   {
+   "name": "applyChartData",
+   "writers": [
+    "js/media.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "autoPlay",
    "writers": [
     "js/game.js"
@@ -880,6 +875,13 @@
    "name": "beatPulse",
    "writers": [
     "js/render.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "buildChart",
+   "writers": [
+    "js/media.js"
    ],
    "readers": []
   },
@@ -919,6 +921,13 @@
    "readers": []
   },
   {
+   "name": "chartToData",
+   "writers": [
+    "js/media.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "currentAcc",
    "writers": [
     "js/game.js"
@@ -929,6 +938,13 @@
    "name": "currentScore",
    "writers": [
     "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "decodeAudio",
+   "writers": [
+    "js/media.js"
    ],
    "readers": []
   },
@@ -1027,6 +1043,20 @@
    ]
   },
   {
+   "name": "estimateLevel",
+   "writers": [
+    "js/media.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "exportChart",
+   "writers": [
+    "js/media.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "failSound",
    "writers": [
     "js/modes.js"
@@ -1037,6 +1067,20 @@
    "name": "gameTime",
    "writers": [
     "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "generateNotes",
+   "writers": [
+    "js/media.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "getAC",
+   "writers": [
+    "js/media.js"
    ],
    "readers": []
   },
@@ -1065,6 +1109,13 @@
    "name": "hitPos",
    "writers": [
     "js/render.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "importChartFile",
+   "writers": [
+    "js/media.js"
    ],
    "readers": []
   },
@@ -1195,6 +1246,20 @@
    "readers": []
   },
   {
+   "name": "loadMedia",
+   "writers": [
+    "js/media.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "loadSE",
+   "writers": [
+    "js/media.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "loop",
    "writers": [
     "js/render.js"
@@ -1314,6 +1379,13 @@
    "readers": []
   },
   {
+   "name": "playSE",
+   "writers": [
+    "js/media.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "poke",
    "writers": [
     "js/main.js"
@@ -1426,6 +1498,13 @@
    "readers": []
   },
   {
+   "name": "rmsAt",
+   "writers": [
+    "js/media.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "rr",
    "writers": [
     "js/render.js"
@@ -1461,6 +1540,20 @@
    "readers": []
   },
   {
+   "name": "seBuffers",
+   "writers": [
+    "js/media.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "seFiles",
+   "writers": [
+    "js/media.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "seekTo",
    "writers": [
     "js/game.js"
@@ -1478,6 +1571,13 @@
    "name": "setAddonSongs",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "setBackground",
+   "writers": [
+    "js/media.js"
    ],
    "readers": []
   },

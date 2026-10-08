@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ trk! 統合版：読み込み・音声解析・譜面・ヒットSE ============ */
 "use strict";
@@ -246,3 +247,24 @@ async function loadSE(file, lane) {
   } catch (_) { setStatus("seStatus", "seLoadError"); }
 }
 /* ✅ media.js 完了 */
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.CHART_FILE_MAX = CHART_FILE_MAX;
+window.applyChartData = applyChartData;
+Object.defineProperty(window, "audioCtx", { configurable:true, get:() => audioCtx, set:v => { audioCtx = v; } });
+window.buildChart = buildChart;
+window.chartToData = chartToData;
+window.decodeAudio = decodeAudio;
+window.estimateLevel = estimateLevel;
+window.exportChart = exportChart;
+window.generateNotes = generateNotes;
+window.getAC = getAC;
+window.importChartFile = importChartFile;
+window.loadMedia = loadMedia;
+window.loadSE = loadSE;
+window.playSE = playSE;
+window.rmsAt = rmsAt;
+window.seBuffers = seBuffers;
+window.seFiles = seFiles;
+window.setBackground = setBackground;
+})();

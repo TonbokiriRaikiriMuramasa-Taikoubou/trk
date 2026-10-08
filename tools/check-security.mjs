@@ -330,8 +330,8 @@ const occurrences = (text, re) => [...text.matchAll(re)];
 
   const metaGuard = lib.includes("function songMetaClean(raw)") && lib.includes("function songMetaCleanAll(obj)") &&
     lib.includes("let SONG_META = songMetaCleanAll(") && lib.includes("const SONG_META_MAX = 3000") &&
-    lib.includes("/^https:\\/\\/\\S+$/i.test(url)");
-  rule(metaGuard, "per-song profiles (SONG_META) are sanitised on load, https-only, and capped");
+    lib.includes('["matchHint", 80]') && lib.includes("/^https:\\/\\/\\S+$/i.test(url)");
+  rule(metaGuard, "per-song profiles (SONG_META) and the 80-character catalog match hint are sanitised on load, https-only, and capped");
 
   /* コメント（「handle.remove() は呼ばない」という注意書き）を外してから、実行される呼び出しだけを見る */
   const libCode = lib.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");

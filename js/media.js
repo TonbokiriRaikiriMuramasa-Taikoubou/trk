@@ -33,8 +33,9 @@ async function setBackground(blob) {
 const ANALYZE_MAX = 96 * 1024 * 1024;
 /* 🎬 ファイルサイズ（圧縮後）だけでは判断できない：デコード後のPCMは長さに比例して膨らむ
    （48kHz・ステレオ・float32 で 1分 ≒ 23MB、20分 ≒ 460MB）。長さでも区切る。
-   decodeAudioData は元のサンプリングレートのまま返すので、OfflineAudioContext で
-   ダウンサンプルしても瞬間の最大メモリは減らない（デコード自体で同じ量を使う）。 */
+   decodeAudioData が返す量（コンテキストのサンプリングレートへ再サンプルした後の長さ）は減るが、
+   デコード中のピークメモリは実装しだいで減らないことが多い。OfflineAudioContext で
+   ダウンサンプルしても瞬間の最大メモリは減らない見込み（時間上限で切る判断はこのため）。 */
 const ANALYZE_MAX_SEC = 20 * 60;
 
 /* ---------- 曲の読み込み ----------
@@ -119,13 +120,19 @@ function analysisCacheValid(r) {
     Number.isFinite(r.frameMs) && r.frameMs > 0 && Number.isFinite(r.maxRms) && Number.isFinite(r.scale) &&
     [r.rms, r.onset, r.ratio].every(a => a instanceof Float32Array && a.length === r.frames);
 }
+/* 読んだら savedAt を今に更新する（LRU：よく使う曲が件数の上限で先に消えないように）。
+   不正な記録は触らない（解析し直したあと put で置き換わる）。 */
 async function analysisCacheGet(key) {
   const db = await analysisCacheOpen();
+  const tx = db.transaction("analysis", "readwrite");
+  const os = tx.objectStore("analysis");
   const rec = await new Promise((res, rej) => {
-    const q = db.transaction("analysis").objectStore("analysis").get(key);
+    const q = os.get(key);
     q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error);
   });
-  if (!analysisCacheValid(rec)) return null;
+  if (!analysisCacheValid(rec)) { tx.abort(); return null; }
+  os.put({ ...rec, savedAt: Date.now() });
+  await new Promise((res, rej) => { tx.oncomplete = () => res(); tx.onerror = tx.onabort = () => rej(tx.error); });
   return { rms: rec.rms, onset: rec.onset, ratio: rec.ratio, frames: rec.frames, frameMs: rec.frameMs, maxRms: rec.maxRms, scale: rec.scale };
 }
 async function analysisCachePut(key, a) {
@@ -137,7 +144,7 @@ async function analysisCachePut(key, a) {
     tx.objectStore("analysis").put(rec);
     tx.oncomplete = () => res(); tx.onerror = tx.onabort = () => rej(tx.error);
   });
-  /* 件数の上限：savedAt の index は古い順に並ぶので、先頭（古い）から消す */
+  /* 件数の上限：savedAt の index は古い順に並ぶので、先頭（古い）から消す（読み出しで savedAt を更新しているので LRU） */
   const tx2 = db.transaction("analysis", "readwrite");
   const keys = await new Promise((res, rej) => {
     const q = tx2.objectStore("analysis").index("savedAt").getAllKeys();
@@ -201,7 +208,7 @@ function estimateLevel(notes) {
   return window.Trk.chart.cgEstimateLevel(notes);
 }
 /* ゲームの状態を変えずに譜面だけを作る（曲パックの書き出しでも使う）。
-   作り方は chartGen（設定 settings.chartGen／既定 "1" = 旧方式）。中身は js/chart-gen.js の純関数。 */
+   作り方は chartGen（設定 settings.chartGen／既定 "2" = 新方式。"1" = 旧方式）。中身は js/chart-gen.js の純関数。 */
 function generateNotes(diff, bpm, offset, seed, chartGen = window.Trk.core.settings.chartGen) {
   if (!window.Trk.core.videoReady || !(bpm >= 60 && bpm <= 300) || !window.Trk.data.DIFF_IDS.includes(diff)) return [];
   const rand = window.Trk.core.mulberry32(window.Trk.core.hashString(`${String(seed).trim()}|${diff}|${bpm}|${offset}`));

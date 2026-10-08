@@ -1952,7 +1952,7 @@ async function studyAssignCurrentCover() {
     if (!blob) throw new Error("Missing Study image");
     await studyDBRun("covers", "readwrite", store => store.put({ bookId:book.id, pageKey:page.key, pageIndex:index, title:book.title, updatedAt:Date.now() }, songKey));
     emit("studyCoverChanged", songKey);
-    if (typeof setBackground === "function" && currentSong && currentSong.key === songKey) await setBackground(blob);
+    if (typeof setBackground === "function" && currentSong && currentSong.key === songKey) await window.Trk.media.setBackground(blob);
     studyNotify("studyCoverAssigned", { title:songTitle });
     studyRefreshTV(); studyRefreshCoverButtons();
   } catch (error) { studyFail(error, "studyCoverError"); }
@@ -1985,7 +1985,7 @@ async function studyClearSongCover(songKey) {
     emit("studyCoverChanged", key);
     if (typeof setBackground === "function" && currentSong && currentSong.key === key) {
       const song = currentSong;
-      if (song.bgBlob) await setBackground(song.bgBlob); else await setBackground(null);
+      if (song.bgBlob) await window.Trk.media.setBackground(song.bgBlob); else await window.Trk.media.setBackground(null);
     }
     studyNotify("studyCoverCleared");
     studyRefreshTV(); studyRefreshCoverButtons();

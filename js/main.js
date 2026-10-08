@@ -288,16 +288,16 @@ $("closeSettingsBtn").addEventListener("click", closeSettings);
 $("bpm").addEventListener("change", () => {
   const v = Number($("bpm").value);
   if (v >= 60 && v <= 300) { if (!window.Trk.library.saveSongPrefs()) { settings.bpm = v; saveUserPrefs(); } }
-  if (videoReady && chartMode === "generated") buildChart();
+  if (videoReady && chartMode === "generated") window.Trk.media.buildChart();
 });
 $("chartGen").addEventListener("change", () => {
   settings.chartGen = $("chartGen").value === "2" ? "2" : "1"; saveUserPrefs();   // 譜面の作り方は全曲共通の設定
-  if (videoReady && chartMode === "generated") buildChart();
+  if (videoReady && chartMode === "generated") window.Trk.media.buildChart();
 });
 $("offset").addEventListener("change", () => {
   const v = Number($("offset").value);
   if (isFinite(v)) { if (!window.Trk.library.saveSongPrefs()) { settings.offset = Math.max(-5000, Math.min(5000, v)); saveUserPrefs(); } }
-  if (videoReady && chartMode === "generated") buildChart();
+  if (videoReady && chartMode === "generated") window.Trk.media.buildChart();
 });
 let seedTimer = 0;
 $("seed").addEventListener("input", () => {
@@ -306,8 +306,8 @@ $("seed").addEventListener("input", () => {
   refreshSeedSecrets(); syncPickers();
   clearTimeout(seedTimer);
   seedTimer = setTimeout(() => {
-    if (videoReady && chartMode === "generated") buildChart();
-    else if (chart.length) { currentLevel = estimateLevel(chart); renderStatus("chartStatus"); }
+    if (videoReady && chartMode === "generated") window.Trk.media.buildChart();
+    else if (chart.length) { currentLevel = window.Trk.media.estimateLevel(chart); renderStatus("chartStatus"); }
   }, 300);
 });
 
@@ -319,16 +319,16 @@ $("difficultyPicker").addEventListener("click", e => {
   const b = e.target.closest("button[data-mode]"); if (!b || b.hidden) return;
   settings.difficulty = b.dataset.mode; syncPickers(); saveUserPrefs();
   setStatus("importStatus", null);
-  if (videoReady) window.Trk.library.trySongChart().then(ok => { if (!ok) buildChart(); });   // パック・フォルダの譜面を優先
+  if (videoReady) window.Trk.library.trySongChart().then(ok => { if (!ok) window.Trk.media.buildChart(); });   // パック・フォルダの譜面を優先
 });
 
 $("playBtn").addEventListener("click", startGame);
 $("importChartBtn").addEventListener("click", () => $("chartImportFile").click());
-$("regenerateChartBtn").addEventListener("click", () => { setStatus("importStatus", null); buildChart(); });
-$("exportSelectBtn").addEventListener("click", () => exportChart("importStatus"));
+$("regenerateChartBtn").addEventListener("click", () => { setStatus("importStatus", null); window.Trk.media.buildChart(); });
+$("exportSelectBtn").addEventListener("click", () => window.Trk.media.exportChart("importStatus"));
 $("chartImportFile").addEventListener("change", async e => {
   const f = e.target.files[0]; e.target.value = "";
-  if (f && phase === "title") await importChartFile(f);
+  if (f && phase === "title") await window.Trk.media.importChartFile(f);
 });
 
 /* ---------- 設定画面：見た目 ---------- */
@@ -439,13 +439,13 @@ $("keyPresets").addEventListener("click", e => {
 $("seEnabled").addEventListener("change", e => {
   settings.seEnabled = e.target.checked; saveUserPrefs();
   setStatus("seStatus", settings.seEnabled ? "seOn" : "seOff");
-  if (settings.seEnabled) { const ac = getAC(); if (ac && ac.state === "suspended") ac.resume(); }
+  if (settings.seEnabled) { const ac = window.Trk.media.getAC(); if (ac && ac.state === "suspended") ac.resume(); }
 });
 $("seVolume").addEventListener("input", e => { settings.seVolume = Number(e.target.value); saveUserPrefs(); });
-$("donSeFile").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; loadSE(f, 0); });
-$("kaSeFile").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; loadSE(f, 1); });
-$("previewDonBtn").addEventListener("click", () => playSE(0, true));
-$("previewKaBtn").addEventListener("click", () => playSE(1, true));
+$("donSeFile").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; window.Trk.media.loadSE(f, 0); });
+$("kaSeFile").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; window.Trk.media.loadSE(f, 1); });
+$("previewDonBtn").addEventListener("click", () => window.Trk.media.playSE(0, true));
+$("previewKaBtn").addEventListener("click", () => window.Trk.media.playSE(1, true));
 $("volume").addEventListener("input", e => { settings.musicVolume = Number(e.target.value); if (settings.musicVolume > 0) rememberMusicVolume(settings.musicVolume); video.volume = settings.musicVolume; saveUserPrefs(); });
 
 /* ---------- プレイ中・一時停止・リザルト ---------- */
@@ -454,10 +454,10 @@ $("fullBtn").addEventListener("click", toggleFullscreen);
 $("fullBtnTitle").addEventListener("click", toggleFullscreen);
 $("resumeBtn").addEventListener("click", resumeGame);
 $("retryBtn").addEventListener("click", startGame);
-$("exportPauseBtn").addEventListener("click", () => exportChart("pauseStatus"));
+$("exportPauseBtn").addEventListener("click", () => window.Trk.media.exportChart("pauseStatus"));
 $("returnTitleBtn").addEventListener("click", toTitle);
 $("replayBtn").addEventListener("click", startGame);
-$("exportEndBtn").addEventListener("click", () => exportChart("endStatus"));
+$("exportEndBtn").addEventListener("click", () => window.Trk.media.exportChart("endStatus"));
 $("endTitleBtn").addEventListener("click", toTitle);
 
 /* ---------- 再生バー（AUTO中・練習中） ---------- */
@@ -486,7 +486,7 @@ addEventListener("drop", async e => {
   const files = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
   if (!files.length || phase !== "title") return;
   const json = files.find(f => /\.json$/i.test(f.name) || f.type === "application/json");
-  if (json) { await importChartFile(json); return; }
+  if (json) { await window.Trk.media.importChartFile(json); return; }
   window.Trk.library.addSongFiles(files);
 });
 

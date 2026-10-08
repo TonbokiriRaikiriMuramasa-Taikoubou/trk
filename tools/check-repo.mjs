@@ -1643,6 +1643,7 @@ const TRK_REGISTRARS = {
   "js/main.js": "main",
   "js/custom.js": "custom",
   "js/library.js": "library",
+  "js/media.js": "media",
 };
 const TRK_NOT_REGISTERED = { "js/core.js": ["_trkStudyRoomOpen"] }; // 互換の読み取り専用アクセサ（宣言ではない）
 const TRK_EXTRAS = { "js/library.js": ["js/title-match.js"] }; // 登録元が別ファイルの関数も領域へ出す（plTitleKeys など）

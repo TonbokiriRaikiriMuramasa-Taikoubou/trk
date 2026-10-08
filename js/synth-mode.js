@@ -500,7 +500,7 @@ addEventListener("DOMContentLoaded", () => {
       if (window.TrkFX && typeof window.TrkFX.tap === "function") {
         try { analyser = window.TrkFX.tap(2048); if (analyser) { audio = analyser.context; } } catch (_) { analyser = null; }
       }
-      if (!audio && typeof getAC === "function") audio = getAC();
+      if (!audio && typeof getAC === "function") audio = window.Trk.media.getAC();
       if (!audio) {
         const C = window.AudioContext || window.webkitAudioContext;
         if (C) audio = new C();
@@ -746,7 +746,7 @@ addEventListener("DOMContentLoaded", () => {
     if (currentPatch.sources.length >= MAX_SOURCES) { setStatus("instSourceLimit"); return; }
     if (!ensureAudio()) return;
     try {
-      const buffer = typeof decodeAudio === "function" ? await decodeAudio(await file.arrayBuffer()) : await audio.decodeAudioData(await file.arrayBuffer());
+      const buffer = typeof decodeAudio === "function" ? await window.Trk.media.decodeAudio(await file.arrayBuffer()) : await audio.decodeAudioData(await file.arrayBuffer());
       if (buffer.duration > MAX_SAMPLE_SECONDS) { setStatus("instSampleTooLong"); return; }
       const sampleId = `sample-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
       sampleBank.set(sampleId, { buffer, name:file.name });

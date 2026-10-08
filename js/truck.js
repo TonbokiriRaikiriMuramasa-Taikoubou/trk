@@ -140,7 +140,7 @@ function truckJudge(now) {
     const d = now - n.time;
     if (d > w.good) continue;                       // 間に合わなければ sweepMisses がMISSにします
     judgeNote(n, d <= w.perfect ? "perfect" : "good", d);
-    playSE(n.lane);
+    window.Trk.media.playSE(n.lane);
     const p = performance.now(); pressFlash[laneCol(n.lane)] = p; pressH = { lane:n.lane, t:p };
   }
 }

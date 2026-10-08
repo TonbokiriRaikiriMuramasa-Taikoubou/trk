@@ -293,7 +293,7 @@ Object.assign(TEXT.ko, {
    続けてよい場面だけ止める処理を飛ばす。自分で遊んでいる最中は止める（記録のため） */
 const keepAlive = () => settings.fxAntenna &&
   (phase === "title" || phase === "ended" || (phase === "playing" && settings.autoPlay));
-function wakeAC() { if (typeof audioCtx !== "undefined" && audioCtx && audioCtx.state === "suspended") audioCtx.resume().catch(() => {}); }
+function wakeAC() { if (typeof audioCtx !== "undefined" && window.Trk.media.audioCtx && window.Trk.media.audioCtx.state === "suspended") window.Trk.media.audioCtx.resume().catch(() => {}); }
 document.addEventListener("visibilitychange", e => {
   if (!document.hidden || !keepAlive()) return;
   e.stopImmediatePropagation();

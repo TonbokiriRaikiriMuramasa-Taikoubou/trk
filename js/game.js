@@ -19,7 +19,7 @@ function countIv() {
 }
 function countTick(k) {
   if (!settings.countdownSE) return;
-  const ac = getAC(); if (!ac) return;
+  const ac = window.Trk.media.getAC(); if (!ac) return;
   if (ac.state === "suspended") ac.resume();
   const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain(), go = k >= 3;
   o.type = "square"; o.frequency.value = go ? 1320 : 880;
@@ -101,7 +101,7 @@ function resetRun() {
 async function startGame() {
   if (!videoReady || !chart.length) return;
   emit("beforePlay");
-  const ac = getAC(); if (ac && ac.state === "suspended") ac.resume();
+  const ac = window.Trk.media.getAC(); if (ac && ac.state === "suspended") ac.resume();
   if (phase === "playing" || phase === "paused") video.pause();
   resetRun();
   video.playbackRate = settings.rate;
@@ -321,7 +321,7 @@ function orbitInput(ts) {
   if (!n) return;
   const d = now - n.time;
   if (d < -w.good * 2) return;
-  playSE(n.lane);
+  window.Trk.media.playSE(n.lane);
   if (d < -w.good) { judgeNote(n, "miss", d); return; }
   judgeNote(n, Math.abs(d) <= w.perfect ? "perfect" : "good", d);
 }
@@ -333,7 +333,7 @@ function handleInput(lane, ts) {
   if (mode === "truck") { steerTruck(lane); return; }
   const p = performance.now(), at = (ts > 0 && ts <= p) ? ts : p;
   const now = gameTime(at);
-  playSE(lane);
+  window.Trk.media.playSE(lane);
   pressFlash[laneCol(lane)] = p; pressH = { lane, t:p };
   const w = windows();
   for (let i = nextIdx; i < chart.length; i++) {
@@ -360,7 +360,7 @@ function autoPlay(now) {
   for (let i = nextIdx; i < chart.length; i++) {
     if (phase !== "playing") break;
     const n = chart[i]; if (n.time > now) break;
-    if (!n.judged) { judgeNote(n, "perfect", 0); playSE(n.lane); autoVisual(n, i, performance.now()); }
+    if (!n.judged) { judgeNote(n, "perfect", 0); window.Trk.media.playSE(n.lane); autoVisual(n, i, performance.now()); }
   }
   autoJudging = false;
   const nx = chart[nextIdx];                                       // TRUCKは次のノーツのレーンへ先回り

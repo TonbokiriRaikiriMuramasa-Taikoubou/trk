@@ -120,9 +120,9 @@ async function firstSparkChartData(diff) {
     if (response.status === 404) { firstSparkChartCache.set(diff, null); return null; }
     if (!response.ok) return null;
     const declared = Number(response.headers.get("Content-Length") || 0);
-    if (declared > CHART_FILE_MAX) return null;
+    if (declared > window.Trk.media.CHART_FILE_MAX) return null;
     const text = await response.text();
-    if (!text.length || text.length > CHART_FILE_MAX) return null;
+    if (!text.length || text.length > window.Trk.media.CHART_FILE_MAX) return null;
     const data = JSON.parse(text);
     firstSparkChartCache.set(diff, data);
     return data;
@@ -2486,10 +2486,10 @@ async function selectSong(it) {
   let studySongArt = null;
   try { if (window.TrkStudyRoom && typeof window.TrkStudyRoom.getSongCoverBlob === "function") studySongArt = await window.TrkStudyRoom.getSongCoverBlob(it.key); } catch (_) {}
   if (currentSong !== it) return;
-  await setBackground(studySongArt || it.bgBlob || null);
+  await window.Trk.media.setBackground(studySongArt || it.bgBlob || null);
   if (currentSong !== it) return;
   previewPending = true;
-  const ok = await loadMedia(it.file, { title:it.title, onReady:() => restoreSongState(it) });
+  const ok = await window.Trk.media.loadMedia(it.file, { title:it.title, onReady:() => restoreSongState(it) });
   if (!ok || currentSong !== it) return;
   renderLib(); renderBanner(); updateSpBuilder(); renderSeedTools();
 }
@@ -2521,17 +2521,17 @@ async function trySongChart() {
   if (s.source === "builtin" && s.key === FIRST_SPARK_KEY && firstSparkChartMap[d]) {
     let data = null;
     try { data = await firstSparkChartData(d); } catch (_) {}
-    if (data && applyChartData(data, "custom", "importStatus", false)) { setStatus("importStatus", "builtinChartLoaded", { d:tr(d) }); return true; }
+    if (data && window.Trk.media.applyChartData(data, "custom", "importStatus", false)) { setStatus("importStatus", "builtinChartLoaded", { d:tr(d) }); return true; }
     return false;
   }
   if (s.chartBlobs && s.chartBlobs[d]) {
     let data = null; try { data = JSON.parse(await s.chartBlobs[d].text()); } catch (_) {}
-    if (data && applyChartData(data, "pack", "importStatus", false)) { setStatus("importStatus", "packChartLoaded", { d:tr(d) }); return true; }
+    if (data && window.Trk.media.applyChartData(data, "pack", "importStatus", false)) { setStatus("importStatus", "packChartLoaded", { d:tr(d) }); return true; }
   }
   if (s.charts && s.charts.length) {
     const lower = f => f.name.toLowerCase();
     const f = s.charts.find(x => lower(x).endsWith(`-${d}${CHART_SUFFIX}`)) || s.charts.find(x => lower(x) === (s.base + CHART_SUFFIX).toLowerCase());
-    if (f && await importChartFile(f)) { setStatus("libStatus", "libChartLoaded", { f:f.name }); return true; }
+    if (f && await window.Trk.media.importChartFile(f)) { setStatus("libStatus", "libChartLoaded", { f:f.name }); return true; }
   }
   return false;
 }
@@ -2982,7 +2982,7 @@ on("studyCoverChanged", key => {
   const song = currentSong;
   if (!song || key !== song.key || !window.TrkStudyRoom || typeof window.TrkStudyRoom.getSongCoverBlob !== "function") return;
   window.TrkStudyRoom.getSongCoverBlob(key).then(blob => {
-    if (currentSong === song) return setBackground(blob || song.bgBlob || null);
+    if (currentSong === song) return window.Trk.media.setBackground(blob || song.bgBlob || null);
   }).catch(() => {});
 });
 on("language", () => { $("libSearch").placeholder = tr("libSearch"); showReconnect(); syncShareUI(); syncTrkUI(); renderLib(); renderBanner(); syncVideoButton(); });

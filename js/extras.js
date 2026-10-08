@@ -69,7 +69,7 @@ function owClick(ac, t) {
   o.connect(g).connect(ac.destination); o.start(t); o.stop(t + .06);
 }
 function owStart() {
-  const ac = getAC(); if (!ac) { owStatus.textContent = tr("seUnavailable"); return; }
+  const ac = window.Trk.media.getAC(); if (!ac) { owStatus.textContent = tr("seUnavailable"); return; }
   if (ac.state === "suspended") ac.resume();
   const lead = .8, t0 = ac.currentTime + lead, p0 = performance.now() + lead * 1000;
   ow.beats = []; ow.taps = []; ow.value = null; ow.running = true; owApply.hidden = true;

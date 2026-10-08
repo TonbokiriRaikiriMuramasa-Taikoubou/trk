@@ -457,7 +457,7 @@ async function activatePack(id, { restore = false, skipConfirm = false } = {}) {
   if (m.sounds) {
     for (const i of [0, 1]) {
       const p = m.sounds[i ? "ka" : "don"];
-      if (p && f[p]) { try { seBuffers[i] = await decodeAudio(await f[p].arrayBuffer()); packRuntime.hadSounds = true; } catch (_) {} }
+      if (p && f[p]) { try { window.Trk.media.seBuffers[i] = await window.Trk.media.decodeAudio(await f[p].arrayBuffer()); packRuntime.hadSounds = true; } catch (_) {} }
     }
     if (packRuntime.hadSounds && !restore) { settings.seEnabled = true; $("seEnabled").checked = true; setStatus("seStatus", "seOn"); }
   }
@@ -481,7 +481,7 @@ function deactivatePack(persist = true) {
     }
     packRuntime.urls.forEach(u => URL.revokeObjectURL(u));
     if (packRuntime.hadSounds) {   // 自分で読み込んだSEがあればそれに戻す
-      for (const i of [0, 1]) { seBuffers[i] = null; if (seFiles[i]) loadSE(seFiles[i], i); }
+      for (const i of [0, 1]) { window.Trk.media.seBuffers[i] = null; if (window.Trk.media.seFiles[i]) window.Trk.media.loadSE(window.Trk.media.seFiles[i], i); }
     }
     Object.assign(packRuntime, { id:null, captions:null, noteImages:[null, null], urls:[], skinId:null, hadSounds:false });
     if (window.ShadowTaikoVRM) window.ShadowTaikoVRM.unloadPack();
@@ -577,7 +577,7 @@ async function buildPack() {
   if ($("incSounds").checked) {
     man.sounds = {};
     for (const i of [0, 1]) {
-      const sf = seFiles[i];
+      const sf = window.Trk.media.seFiles[i];
       if (sf && SND_EXT.includes(extOf(sf.name)) && sf.size <= PACK_LIMIT.sound * PACK_MB) {
         const p = `sounds/${i ? "ka" : "don"}.${extOf(sf.name)}`; man.sounds[i ? "ka" : "don"] = p; files[p] = sf;
       }
@@ -623,13 +623,13 @@ async function buildSongPack() {
   const meta = { bpm, offset };
   if ($("spIncGenerated").checked && bpm >= 60 && bpm <= 300) {
     for (const d of ["easy", "normal", "hard"]) {
-      const notes = generateNotes(d, bpm, offset, seed);
-      if (notes.length) { charts[d] = `${dir}/${d}.json`; files[charts[d]] = new Blob([JSON.stringify(chartToData(notes, d, meta))], { type:"application/json" }); }
+      const notes = window.Trk.media.generateNotes(d, bpm, offset, seed);
+      if (notes.length) { charts[d] = `${dir}/${d}.json`; files[charts[d]] = new Blob([JSON.stringify(window.Trk.media.chartToData(notes, d, meta))], { type:"application/json" }); }
     }
   }
   if ($("spIncCurrent").checked && chart.length) {
     charts[chartDiff] = `${dir}/${chartDiff}.json`;
-    files[charts[chartDiff]] = new Blob([JSON.stringify(chartToData(chart, chartDiff))], { type:"application/json" });
+    files[charts[chartDiff]] = new Blob([JSON.stringify(window.Trk.media.chartToData(chart, chartDiff))], { type:"application/json" });
   }
   if (!Object.keys(charts).length) { setStatus("spStatus", "spNoCharts"); return; }
   let bgPath = null;

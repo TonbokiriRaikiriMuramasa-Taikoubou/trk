@@ -169,7 +169,7 @@ function ensureStageMap() {
     lanes[i] = l; prev = l; prevT = n.time;
   }
   if (settings.stageHype && analysis && L) {
-    const loud = chart.map(n => rmsAt(n.time)), sorted = loud.slice().sort((a, b) => a - b);
+    const loud = chart.map(n => window.Trk.media.rmsAt(n.time)), sorted = loud.slice().sort((a, b) => a - b);
     const thr = sorted[Math.floor(sorted.length * .75)];
     loud.forEach((v, i) => { hype[i] = v >= thr ? 1 : 0; });
   }
@@ -229,9 +229,9 @@ function stageInput(lane, ts) {
     const score = Math.abs(d) + dist * 40;                        // 同じレーンを優先
     if (score < bestScore) { bestScore = score; best = i; }
   }
-  if (best < 0) { playSE(lane < stageN() / 2 ? 0 : 1); return; }   // 空打ちはミスにしない
+  if (best < 0) { window.Trk.media.playSE(lane < stageN() / 2 ? 0 : 1); return; }   // 空打ちはミスにしない
   const n = chart[best], d = now - n.time;
-  playSE(n.lane);
+  window.Trk.media.playSE(n.lane);
   judgeNote(n, Math.abs(d) <= w.perfect ? "perfect" : "good", d);
 }
 

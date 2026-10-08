@@ -225,7 +225,7 @@ function lifeAfterJudge(kind) {
   return false;
 }
 function failSound() {
-  const ac = getAC(); if (!ac) return;
+  const ac = window.Trk.media.getAC(); if (!ac) return;
   if (ac.state === "suspended") ac.resume();
   const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
   o.type = "sawtooth"; o.frequency.setValueAtTime(440, t); o.frequency.exponentialRampToValueAtTime(70, t + .7);

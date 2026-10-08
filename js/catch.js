@@ -119,7 +119,7 @@ function catchHitPos(n) {      // game.js から使います（ヒットエフ�
 
 /* ============ 🚀 ぶっ飛ばし ============ */
 function blastSound() {
-  const ac = getAC(); if (!ac) return;
+  const ac = window.Trk.media.getAC(); if (!ac) return;
   if (ac.state === "suspended") ac.resume();
   const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
   o.type = "sawtooth"; o.frequency.setValueAtTime(180, t); o.frequency.exponentialRampToValueAtTime(1400, t + .35);
@@ -180,7 +180,7 @@ function catchJudge(now) {
     if (dx <= CATCH.half * k) {
       const kind = dx <= CATCH.perfect * k ? "perfect" : "good";
       if (bonus) stats.blastBonus = (stats.blastBonus || 0) + (kind === "perfect" ? 1 : .5);
-      playSE(n.lane);
+      window.Trk.media.playSE(n.lane);
       judgeNote(n, kind, dx <= CATCH.perfect * k * .5 ? 0 : null);
       if (k > 1) launchParcel(catchMap.xs[i], n.lane);
     } else judgeNote(n, "miss", null);

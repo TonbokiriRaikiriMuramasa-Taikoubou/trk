@@ -269,4 +269,10 @@ window.rmsAt = rmsAt;
 window.seBuffers = seBuffers;
 window.seFiles = seFiles;
 window.setBackground = setBackground;
+/* 領域（window.Trk.media）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
+window.Trk = window.Trk || {};
+window.Trk.media = Object.assign(window.Trk.media || {}, { CHART_FILE_MAX, buildChart, decodeAudio, estimateLevel, exportChart, generateNotes, getAC, importChartFile, loadMedia, loadSE, playSE, rmsAt, seBuffers, seFiles, setBackground });
+Object.defineProperty(window.Trk.media, "applyChartData", { configurable:true, get:() => applyChartData, set:v => { applyChartData = v; } });
+Object.defineProperty(window.Trk.media, "audioCtx", { configurable:true, get:() => audioCtx, set:v => { audioCtx = v; } });
+Object.defineProperty(window.Trk.media, "chartToData", { configurable:true, get:() => chartToData, set:v => { chartToData = v; } });
 })();

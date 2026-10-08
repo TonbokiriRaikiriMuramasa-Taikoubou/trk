@@ -282,8 +282,8 @@ async function reverseAudioForCurrentSong() {
   const key = (currentSong && currentSong.key) || mediaPositionKey();
   if (reverseBuffer && reverseBufferKey === key) return reverseBuffer;
   if (!currentSong || !currentSong.file || typeof decodeAudio !== "function" || typeof getAC !== "function") throw new Error("reverse audio unavailable");
-  const decoded = await decodeAudio(await currentSong.file.arrayBuffer());
-  const ac = getAC(); if (!ac) throw new Error("audio context unavailable");
+  const decoded = await window.Trk.media.decodeAudio(await currentSong.file.arrayBuffer());
+  const ac = window.Trk.media.getAC(); if (!ac) throw new Error("audio context unavailable");
   const reversed = ac.createBuffer(decoded.numberOfChannels, decoded.length, decoded.sampleRate);
   for (let ch = 0; ch < decoded.numberOfChannels; ch++) {
     const from = decoded.getChannelData(ch), to = reversed.getChannelData(ch);
@@ -293,7 +293,7 @@ async function reverseAudioForCurrentSong() {
   return reversed;
 }
 function reverseClockSeconds() {
-  if (reverseHasAudio && typeof audioCtx !== "undefined" && audioCtx) return audioCtx.currentTime;
+  if (reverseHasAudio && typeof audioCtx !== "undefined" && window.Trk.media.audioCtx) return window.Trk.media.audioCtx.currentTime;
   return performance.now() / 1000;
 }
 let reverseHasAudio = false, reverseBoundaryBusy = false;
@@ -327,14 +327,14 @@ async function startReverseAt(position, restart = false) {
   try { video.currentTime = start; } catch (_) {}
   if (typeof showToast === "function" && !restart) showToast(tr("mediaReverseLoading"));
   let buffer = null;
-  try { const gestureAC = typeof getAC === "function" ? getAC() : null; if (gestureAC && gestureAC.state === "suspended") gestureAC.resume().catch(() => {}); } catch (_) {}
+  try { const gestureAC = typeof getAC === "function" ? window.Trk.media.getAC() : null; if (gestureAC && gestureAC.state === "suspended") gestureAC.resume().catch(() => {}); } catch (_) {}
   try { buffer = await reverseAudioForCurrentSong(); } catch (_) {
     reverseBuffer = null; reverseBufferKey = "";
     if (typeof showToast === "function" && !restart) showToast(tr("mediaReverseUnavailable"));
   }
   if (!reverseActive || !videoReady) return;
   reverseHasAudio = false;
-  const ac = buffer && typeof getAC === "function" ? getAC() : null;
+  const ac = buffer && typeof getAC === "function" ? window.Trk.media.getAC() : null;
   if (buffer && ac) {
     try {
       if (ac.state === "suspended") await ac.resume();

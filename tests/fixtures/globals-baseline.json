@@ -1,11 +1,11 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 82,
+  "windowProps": 101,
   "duplicates": 0,
-  "declarations": 483,
-  "private": 215,
-  "public": 268
+  "declarations": 426,
+  "private": 177,
+  "public": 249
  },
  "files": [
   {
@@ -332,29 +332,9 @@
   },
   {
    "file": "js/modes.js",
-   "decls": 57,
-   "private": 38,
-   "public": [
-    "ORBIT_CX",
-    "ORBIT_CY",
-    "ORBIT_IGNORE",
-    "drawLives",
-    "drawOrbitField",
-    "failSound",
-    "hintEl",
-    "isOrbit",
-    "lifeAfterJudge",
-    "lifeState",
-    "makeCheck",
-    "makeColorRow",
-    "makeSeg",
-    "orbit",
-    "orbitHitPos",
-    "resetLives",
-    "resetOrbit",
-    "starPath",
-    "titleString"
-   ]
+   "decls": 0,
+   "private": 0,
+   "public": []
   },
   {
    "file": "js/stage.js",
@@ -567,6 +547,27 @@
    "name": "LIB_SHOW",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "ORBIT_CX",
+   "writers": [
+    "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "ORBIT_CY",
+   "writers": [
+    "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "ORBIT_IGNORE",
+   "writers": [
+    "js/modes.js"
    ],
    "readers": []
   },
@@ -941,6 +942,20 @@
    "readers": []
   },
   {
+   "name": "drawLives",
+   "writers": [
+    "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "drawOrbitField",
+   "writers": [
+    "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "drawStageBackdrop",
    "writers": [
     "js/stagefx.js"
@@ -964,9 +979,23 @@
    ]
   },
   {
+   "name": "failSound",
+   "writers": [
+    "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "getPackSongs",
    "writers": [
     "js/custom.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "hintEl",
+   "writers": [
+    "js/modes.js"
    ],
    "readers": []
   },
@@ -988,6 +1017,27 @@
    "name": "installPackFile",
    "writers": [
     "js/custom.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "isOrbit",
+   "writers": [
+    "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "lifeAfterJudge",
+   "writers": [
+    "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "lifeState",
+   "writers": [
+    "js/modes.js"
    ],
    "readers": []
   },
@@ -1020,6 +1070,27 @@
    "readers": []
   },
   {
+   "name": "makeCheck",
+   "writers": [
+    "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "makeColorRow",
+   "writers": [
+    "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "makeSeg",
+   "writers": [
+    "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "nextSong",
    "writers": [
     "js/library.js"
@@ -1037,6 +1108,20 @@
    "name": "onLongPress",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "orbit",
+   "writers": [
+    "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "orbitHitPos",
+   "writers": [
+    "js/modes.js"
    ],
    "readers": []
   },
@@ -1125,6 +1210,20 @@
    "readers": []
   },
   {
+   "name": "resetLives",
+   "writers": [
+    "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "resetOrbit",
+   "writers": [
+    "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "sanitizeSong",
    "writers": [
     "js/custom.js"
@@ -1181,6 +1280,13 @@
    "readers": []
   },
   {
+   "name": "starPath",
+   "writers": [
+    "js/modes.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "startPreview",
    "writers": [
     "js/library.js"
@@ -1198,6 +1304,13 @@
    "name": "syncOptionsUI",
    "writers": [
     "js/main.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "titleString",
+   "writers": [
+    "js/modes.js"
    ],
    "readers": []
   },

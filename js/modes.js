@@ -1,3 +1,4 @@
+(() => {
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ==========================================================================
    trk! modes.js — 🪐 ORBIT（ワンボタン）／❤ 体力・体力の表示／🏅 称号
@@ -664,3 +665,25 @@ stage.addEventListener("pointerdown", e => {
 });
 on("chart", () => { orbitPath.src = null; });
 /* ✅ modes.js 完了 */
+
+/* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */
+window.ORBIT_CX = ORBIT_CX;
+window.ORBIT_CY = ORBIT_CY;
+window.ORBIT_IGNORE = ORBIT_IGNORE;
+window.drawLives = drawLives;
+window.drawOrbitField = drawOrbitField;
+window.failSound = failSound;
+window.hintEl = hintEl;
+window.isOrbit = isOrbit;
+window.lifeAfterJudge = lifeAfterJudge;
+window.lifeState = lifeState;
+window.makeCheck = makeCheck;
+window.makeColorRow = makeColorRow;
+window.makeSeg = makeSeg;
+window.orbit = orbit;
+window.orbitHitPos = orbitHitPos;
+window.resetLives = resetLives;
+window.resetOrbit = resetOrbit;
+window.starPath = starPath;
+window.titleString = titleString;
+})();

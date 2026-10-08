@@ -140,6 +140,8 @@ node tools/smoke-browser.mjs --compare
 | core | `js/core.js` | 116 名（`let` 約 40 名はアクセサ、差し替えられる `activeMods`・`applySkin`・`videoFilter` などはアクセサ、残りは値のコピー）。`_trkStudyRoomOpen`（互換の読み取り専用）は登録しない | 6013 | trk68 | 登録は core.js の末尾（読み込み順で領域の最初。core 以外の領域の名前は、この後の登録で出る）。書き換え 6013（代入の左辺を含む。core.js より後に読み込まれるファイルだけ）。検査：check-repo・check-security・check-lite・check-study-room の文字列照合は window.Trk.<領域>. を除いた本文で見る（overlay は除かない）。check-lite の仮想環境に window.Trk.core を用意。1 名抜いた逆テストで失敗（確認）。スモーク OK。ヘッドレス（差し替え・書斎/シンス）OK |
 | study（別名） | `js/study-room.js` | `window.Trk.study = window.TrkStudyRoom;`（凍結のオブジェクトの同じ参照。登録ではなく別名） | 0 | trk69 | 検査（`check-repo.mjs` の別名検査）：無い状態で失敗→追加後に通る。行を消す逆テストで失敗（確認）。スモーク OK |
 
+
+大域の名前（監査）は 317 のまま。旧名（window.X）は別名として残す方針（利用者の決定）のため、減るのは別名を外したときだけ。Trk 側の正規の場所は `window.Trk.<領域>`（監査の window 経由の連携に `window.Trk` が 12 ファイルから書かれる）。
 残りの領域は無し（11 領域の登録・書き換えは完了）。未決：`screen`（window.screen と衝突）の扱い。HANDOFF §7 の実機確認は別途。HANDOFF §7 の実機確認は別途。
 
 ## 4. 止める条件

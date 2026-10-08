@@ -24,6 +24,8 @@ assert.equal(U.baseName("folder/Novel.MD"), "Novel");
 assert.equal(U.isImageFile({ name:"page.webp", type:"image/webp" }), true);
 assert.equal(U.isImageFile({ name:"script.svg", type:"image/svg+xml" }), false, "SVG stays outside the image allowlist");
 assert.equal(U.isTextFile({ name:"book.json" }), true);
+assert.equal(U.isTextFile({ name:"notes.md" }), true);
+assert.equal(U.isTextFile({ name:"snippet.js" }), true);
 assert.equal(U.isTextFile({ name:"photo.png" }), false);
 
 const imageFile = (name, rel, size = 10) => {
@@ -100,6 +102,15 @@ assert.deepEqual(Array.from(U.sortBooks(shelf, "added"), b => b.id), ["a", "b"])
 assert.deepEqual(Array.from(U.sortBooks(shelf, "title"), b => b.id), ["b", "a"]);
 assert.deepEqual(Array.from(U.sortBooks(shelf, "type"), b => b.id), ["b", "a"]);
 assert.deepEqual(Array.from(U.sortBooks(shelf, "size"), b => b.id), ["b", "a"]);
+const shelfEntries = [
+  { key:"book:a", itemType:"book", kind:"text", title:"Alpha", updatedAt:30, createdAt:10, size:40 },
+  { key:"folder:x", itemType:"folder", kind:"folder", title:"Zeta", updatedAt:10, createdAt:5, size:0 },
+  { key:"book:b", itemType:"book", kind:"image", title:"Beta", updatedAt:20, createdAt:20, size:200 }
+];
+assert.deepEqual(Array.from(U.sortShelfItems(shelfEntries, { mode:"title" }), item => item.key), ["book:a", "book:b", "folder:x"]);
+assert.deepEqual(Array.from(U.sortShelfItems(shelfEntries, { manual:true, orderKeys:["book:b", "folder:x", "book:a"] }), item => item.key), ["book:b", "folder:x", "book:a"]);
+assert.deepEqual(Array.from(U.sortShelfItems(shelfEntries, { manual:true, foldersFirst:true, orderKeys:["book:b", "folder:x", "book:a"] }), item => item.key), ["folder:x", "book:b", "book:a"]);
+assert.deepEqual(Array.from(U.sortShelfItems(shelfEntries, { mode:"updated", foldersFirst:true }), item => item.key), ["folder:x", "book:a", "book:b"]);
 assert.equal(U.sortBooks(undefined, "updated").length, 0, "an empty shelf stays safe");
 assert.equal(U.bookSize(shelf[1]), 2048);
 assert.equal(U.formatBytes(0), "0 B");
@@ -135,6 +146,97 @@ assert.ok(reader.includes("STUDY_TV_LOOKS") && reader.includes("STUDY_TV_RATIO")
 assert.ok(reader.includes("studyIsBlob(") && reader.includes('typeof URL.createObjectURL !== "function"'), "stored blobs and object URLs are handled defensively");
 assert.ok(reader.includes("studyTypingTarget") && reader.includes("studyActivateTarget"), "typing vs. activation targets are separated");
 assert.ok(reader.includes("studySyncWelcome") && reader.includes("STUDY_SHELF_PAGE = 60"), "the shelf hides the welcome panel when it has books and pages the list");
+assert.ok(reader.includes("studyNormalizeShelfMeta") && reader.includes('store.put(value, "shelf")'), "folder assignments and manual order persist separately without a DB version migration");
+assert.ok(reader.includes("function studyCreateFolder") && reader.includes("studyShelfTitle.addEventListener(\"pointerdown\""), "the bookshelf title supports long-press folder creation");
+assert.ok(reader.includes("studyShelfDragOver") && reader.includes("studyShelfMoveItem") && reader.includes("studyBindShelfDropTarget"), "shelf items can be dragged to folders and manually reordered");
+assert.ok(reader.includes('handle.addEventListener("pointerdown"') && reader.includes("studyHighlightShelfTarget"), "shelf dragging also supports touch and pen pointers");
+assert.ok(reader.includes("studyPrefs.manualShelfOrder") && reader.includes("studyPrefs.foldersFirst") && reader.includes("studyPrefs.skipDeleteConfirm"), "the three advanced shelf checkboxes are wired");
+assert.ok(reader.includes("!studyPrefs.skipDeleteConfirm && !confirm"), "book deletion can skip confirmation only when explicitly enabled");
+assert.ok(reader.includes('STUDY_DEFAULT_NEXT_KEY = "ArrowRight"') && reader.includes('STUDY_DEFAULT_PREVIOUS_KEY = "ArrowLeft"'),
+  "Study's default keyboard navigation advances with right and goes back with left");
+assert.ok(reader.includes("studyHandleKeyCapture") && reader.includes("studyPrefs.studyNextKey") && reader.includes("studyPrefs.studyPreviousKey") &&
+  reader.includes("studyPrefs.verticalImageKeys"), "navigation keys can be assigned, with optional up/down image navigation");
+assert.ok(reader.includes("studyApplyShelfVisibility") && reader.includes("studySetShelfVisible(true)"),
+  "the shelf is visible by default and can be restored from the header after hiding");
+assert.ok(reader.includes("studyEditorHandleTab") && reader.includes('event.code === "KeyS"') &&
+  reader.includes("if (editor.value !== content)") && reader.includes("studyEditorUnsaved"),
+  "the text editor supports indentation, immediate save, and visible auto-save state");
+assert.ok(reader.includes("studyEditorSafety") && reader.includes("studySaveBook(book)") && reader.includes("studyExportText"),
+  "text editing stays in the local Study copy and offers explicit copy export");
+assert.ok(reader.includes("studyApplyEditedTextFolder") && reader.includes("studyPrefs.editedTextFolderId") &&
+  reader.includes("studyTextFiledInFolder"), "edited text can be filed into a chosen bookshelf folder after saving");
+const prefsWriter = reader.match(/function studySavePrefs\(\) \{[\s\S]*?\n\}/);
+assert.ok(prefsWriter && prefsWriter[0].includes('store.put({ ...studyPrefs }, "ui")') && !prefsWriter[0].includes("studyExportDirectory"),
+  "the selected device folder handle is transient and is not stored in Study preferences");
+assert.ok(reader.includes("studyWriteExportCopy") && reader.includes('mode:"readwrite"') &&
+  reader.includes('getFileHandle(filename, { create:true })') && reader.includes('writable.write(blob)') &&
+  reader.includes('$("studyMemoExportBtn").hidden = isImage'),
+  "text export is available while reading and writes a new copy to the user-selected destination");
+assert.ok(reader.includes('$("studyMemoBtn").textContent = tr($("studyMemoEditor").hidden ? "studyMemoEdit" : "studyMemoDone")'),
+  "the edit button keeps its localized label when the app language changes mid-edit");
+assert.ok(!reader.includes("studyPrefs.memoEnabled") && !html.includes('id="studyMemoEnabled"'),
+  "editing text books is immediately available rather than hidden behind an opt-in preference");
+assert.ok(!/\beval\s*\(/.test(reader) && !/\bnew\s+Function\s*\(/.test(reader) && !reader.includes(".innerHTML"),
+  "text and source-code books remain inert; the reader does not execute or parse their contents as markup");
+const editorTabFn = reader.match(/function studyEditorHandleTab\(event\) \{[\s\S]*?\n\}/);
+assert.ok(editorTabFn, "the editor indentation handler is defined");
+const editorTestContext = vm.createContext({ Event: class { constructor(type, options) { this.type = type; Object.assign(this, options); } } });
+vm.runInContext(`${editorTabFn[0]}\nglobalThis.handleTab = studyEditorHandleTab;`, editorTestContext);
+function applyEditorTab(value, start, end, shiftKey = false) {
+  const editor = {
+    id:"studyMemoEditor", value, selectionStart:start, selectionEnd:end,
+    setRangeText(replacement, from, to, mode) {
+      this.value = this.value.slice(0, from) + replacement + this.value.slice(to);
+      if (mode === "end") this.selectionStart = this.selectionEnd = from + replacement.length;
+    },
+    setSelectionRange(from, to) { this.selectionStart = from; this.selectionEnd = to; },
+    dispatchEvent(event) { this.inputEvent = event.type; },
+  };
+  const event = { code:"Tab", target:editor, shiftKey, preventDefault(){ this.prevented = true; }, stopImmediatePropagation(){ this.stopped = true; } };
+  editorTestContext.handleTab(event);
+  return { editor, event };
+}
+let editorTabResult = applyEditorTab("ab", 1, 1);
+assert.equal(editorTabResult.editor.value, "a\tb");
+assert.equal(editorTabResult.editor.selectionStart, 2);
+editorTabResult = applyEditorTab("one\ntwo\nthree", 1, 8);
+assert.equal(editorTabResult.editor.value, "\tone\n\ttwo\nthree");
+assert.deepEqual([editorTabResult.editor.selectionStart, editorTabResult.editor.selectionEnd], [2, 10]);
+editorTabResult = applyEditorTab("\tone\n\ttwo\nthree", 2, 10, true);
+assert.equal(editorTabResult.editor.value, "one\ntwo\nthree");
+assert.deepEqual([editorTabResult.editor.selectionStart, editorTabResult.editor.selectionEnd], [1, 8]);
+assert.ok(editorTabResult.event.prevented && editorTabResult.event.stopped && editorTabResult.editor.inputEvent === "input");
+const exportWriterFn = reader.match(/async function studyWriteExportCopy\(directory, blob, title, extension\) \{[\s\S]*?^\}/m);
+assert.ok(exportWriterFn, "the explicit export writer is defined separately from file import");
+const exportWriterContext = vm.createContext({ crypto:{ randomUUID:() => "test-export-id" }, Date:{ now:() => 123456789 } });
+vm.runInContext(`${exportWriterFn[0]}\nglobalThis.writeExportCopy = studyWriteExportCopy;`, exportWriterContext);
+const existingExports = new Set(); let exportChecks = 0, exportedBlob = null, exportClosed = false;
+const fakeExportDirectory = { getFileHandle:async (name, options) => {
+  if (options && options.create) {
+    assert.ok(!existingExports.has(name), "export never opens an existing file for writing"); existingExports.add(name);
+    return { createWritable:async () => ({ write:async value => { exportedBlob = value; }, close:async () => { exportClosed = true; } }) };
+  }
+  exportChecks++;
+  if (exportChecks <= 2) { existingExports.add(name); return {}; }
+  const missing = new Error("not found"); missing.name = "NotFoundError"; throw missing;
+} };
+const testExportBlob = { text:"edited copy" };
+const testExportName = await exportWriterContext.writeExportCopy(fakeExportDirectory, testExportBlob, "draft", "txt");
+assert.match(testExportName, /draft - edited-.* \(3\)\.txt$/);
+assert.equal(exportedBlob, testExportBlob); assert.equal(exportClosed, true);
+const reservedKeys = reader.match(/const STUDY_RESERVED_KEYS = new Set\([\s\S]*?\);/);
+const keyAllowed = reader.match(/function studyKeyCodeAllowed\(code\) \{[\s\S]*?\n\}/);
+const keyLabel = reader.match(/function studyKeyCodeLabel\(code\) \{[\s\S]*?\n\}/);
+assert.ok(reservedKeys && keyAllowed && keyLabel, "navigation key validation and labels are defined");
+const keyTestContext = vm.createContext({});
+vm.runInContext(`${reservedKeys[0]}\n${keyAllowed[0]}\n${keyLabel[0]}\nglobalThis.allowed = studyKeyCodeAllowed; globalThis.label = studyKeyCodeLabel;`, keyTestContext);
+for (const code of ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "KeyA", "Digit3", "Numpad4", "PageUp", "PageDown", "Home", "End"])
+  assert.equal(keyTestContext.allowed(code), true, `${code} is a supported navigation key`);
+for (const code of ["Escape", "Tab", "Space", "Enter", "KeyB", "KeyM", "KeyT", "KeyF", "Digit0", "Unknown"])
+  assert.equal(keyTestContext.allowed(code), false, `${code} is reserved or unsupported`);
+assert.equal(keyTestContext.label("ArrowRight"), "→");
+assert.equal(keyTestContext.label("KeyA"), "A");
+assert.equal(keyTestContext.label("Numpad4"), "Num 4");
 assert.ok(reader.includes('typeof node.scrollBy === "function"') && reader.includes('typeof node.scrollTo === "function"'), "scrollBy/scrollTo have fallbacks for older webviews");
 assert.ok(reader.includes("sweepOrphans:studySweepOrphans") && reader.includes("toggle:() =>"), "the public API exposes sweepOrphans/toggle for hosts and tests");
 assert.ok(reader.includes("function studyHelpOpen") && reader.includes("studyHelpTitle"), "the shortcut help overlay exists");
@@ -155,13 +257,51 @@ for (const lang of ["en", "zh", "ko"]) {
   assert.deepEqual(extra, [], `${lang} has no Study string missing from Japanese`);
 }
 
+/* 24種類の文字スキン（既存5種を含む）と4分類 */
+const themeDeclaration = reader.match(/const STUDY_THEMES = \[([\s\S]*?)\];/);
+assert.ok(themeDeclaration, "the supported Study theme IDs are declared");
+const studyThemes = [...themeDeclaration[1].matchAll(/"([a-z]+)"/g)].map(match => match[1]);
+assert.equal(studyThemes.length, 24, "Study keeps exactly 24 text themes");
+assert.equal(new Set(studyThemes).size, 24, "Study theme IDs are unique");
+const expectedThemes = ["plain", "paper", "warm", "lined", "genko", "sepia", "dark", "midnight", "terminal", "graphite", "blueprint", "contrast",
+  "prompt", "neural", "latent", "matrix", "synth", "neon", "aurora", "sunset", "ocean", "mint", "dream", "prism"];
+assert.deepEqual(studyThemes, expectedThemes, "the stable theme IDs and category order stay intentional");
+assert.ok(reader.includes('if (node.tagName === "OPTGROUP") node.label = translated;'), "language changes update optgroup labels without replacing their options");
+for (const key of ["studyThemeGroupWriter", "studyThemeGroupCode", "studyThemeGroupAi", "studyThemeGroupFree"])
+  for (const lang of ["ja", "en", "zh", "ko"]) assert.ok(localizedKeys[lang].has(key), `${lang} includes ${key}`);
+
 /* index.html のIDと data-i18n */
 const staticIds = new Set([...html.matchAll(/\bid=["']([^"']+)["']/g)].map(match => match[1]));
 const missingIds = [...reader.matchAll(/\$\(["']([^"']+)["']\)/g)].map(match => match[1]).filter(id => !staticIds.has(id));
 assert.deepEqual([...new Set(missingIds)], [], "Study static element references exist in index.html");
 const section = html.slice(html.indexOf('<section id="studyRoom"'), html.indexOf('<button id="floatingSafeBtn"'));
+const themeSelectMarkup = section.match(/<select id="studyTheme">([\s\S]*?)<\/select>/)?.[1];
+assert.ok(themeSelectMarkup, "the Study text-theme selector exists");
+const themeGroups = [...themeSelectMarkup.matchAll(/<optgroup\b[^>]*data-i18n="([^"]+)"[^>]*>([\s\S]*?)<\/optgroup>/g)];
+assert.equal(themeGroups.length, 4, "text themes have four localized optgroups");
+assert.deepEqual(themeGroups.map(group => group[1]), ["studyThemeGroupWriter", "studyThemeGroupCode", "studyThemeGroupAi", "studyThemeGroupFree"]);
+const groupedThemes = themeGroups.map(group => [...group[2].matchAll(/<option\b[^>]*value="([^"]+)"/g)].map(match => match[1]));
+assert.deepEqual(groupedThemes.map(group => group.length), [6, 6, 5, 7], "writer/code/AI/freeform groups have the planned counts");
+assert.deepEqual(groupedThemes.flat(), studyThemes, "HTML options match the supported theme list and order");
 assert.ok(section.includes('id="studyRoom"') && section.includes('id="studyBookmarkPanel"') && section.includes('id="studyImportWrap"'));
 assert.ok(section.includes('id="studyShelfSort"') && section.includes('id="studyFindRow"') && section.includes('id="studyHelp"') && section.includes('id="studyZoomIn"'));
+assert.ok(section.includes('id="studyShelfCreateFolder"') && section.includes('id="studyManualShelfOrder"') &&
+  section.includes('id="studyFoldersFirst"') && section.includes('id="studySkipDeleteConfirm"') && section.includes('id="studyShelfDragHelp"'),
+  "the bookshelf folder and advanced preference controls exist in the room markup");
+assert.ok(section.includes('id="studyShelfVisible"') && section.includes('id="studyShowShelfBtn"') &&
+  section.includes('id="studyNextKeyBtn"') && section.includes('id="studyPreviousKeyBtn"') && section.includes('id="studyVerticalImageKeys"'),
+  "the shelf visibility and configurable navigation controls exist in the room markup");
+assert.ok(section.includes('id="studyEditorNotice"') && section.includes('id="studyEditorLabel"') &&
+  section.includes('id="studyEditorSafetyText"') && section.includes('id="studyEditorSaveStatus"') &&
+  section.includes('aria-labelledby="studyEditorLabel"') && section.includes('aria-describedby="studyEditorSafetyText"') &&
+  section.includes('maxlength="12582912"'),
+  "the inert local-copy editor includes a safety notice, save state, and accessible label");
+assert.ok(section.includes('id="studyEditedTextFolder"') && section.includes('aria-labelledby="studyEditedTextFolderLabel"') &&
+  section.includes('aria-describedby="studyEditedTextFolderHint"') && section.includes('id="studyEditedTextFolderHint"') &&
+  section.includes('id="studyChooseExportFolderBtn"') && section.includes('aria-describedby="studyExportFolderHint"') &&
+  section.includes('id="studyExportFolderHint"') && section.includes('id="studyClearExportFolderBtn"') &&
+  section.includes('id="studyExportFolderName"'),
+  "advanced options can organize edited books and select a device export folder");
 const htmlKeys = new Set([...section.matchAll(/data-i18n=["']([^"']+)["']/g)].map(match => match[1]));
 const missingHtmlKeys = [...htmlKeys].filter(key => !localizedKeys.ja.has(key));
 assert.deepEqual(missingHtmlKeys, [], "every data-i18n key in the Study markup has a Japanese string");
@@ -176,9 +316,29 @@ assert.ok(!/createMediaElementSource/.test(reader), "Study never re-routes the a
 
 /* 見た目（css） */
 const css = read("css/study-room.css");
+assert.ok(css.includes("background-color:var(--study-theme-page)") && css.includes("color:var(--study-theme-ink)") &&
+  css.includes("font-family:var(--study-theme-font)"), "reader colors, backgrounds, and fonts use the active theme");
+assert.ok(css.includes("background-color:var(--study-theme-editor)") && css.includes("color:var(--study-theme-editor-ink)") &&
+  css.includes("font-family:var(--study-theme-editor-font)") && css.includes("font-size:calc(15px * var(--study-text-size))"),
+  "the editing textarea also uses the active theme palette, font, and text sizing");
+assert.ok(css.includes("--study-theme-editor:#fcfaf4"), "the standard theme also styles the editor like the reading page");
+assert.ok(css.includes(".study-text-stage[data-theme=\"genko\"] .study-memo-editor{writing-mode:vertical-rl;text-orientation:mixed;direction:ltr}"),
+  "manuscript-paper writing remains vertical in the editor");
+for (const theme of studyThemes.filter(id => id !== "plain")) {
+  const themeRules = [...css.matchAll(new RegExp(`\\.study-text-stage\\[data-theme="${theme}"\\]\\s*\\{([^}]*)\\}`, "g"))]
+    .map(match => match[1]).join("\\n");
+  assert.ok(themeRules.includes("--study-theme-stage:") && themeRules.includes("--study-theme-page:") &&
+    themeRules.includes("--study-theme-editor:") && themeRules.includes("--study-theme-ink:") && themeRules.includes("--study-theme-editor-ink:"),
+    `${theme} defines coordinated reader and editor colors/backgrounds`);
+}
+assert.ok(css.includes("AI／プロンプト作業をイメージした装飾テーマ（AI処理・通信機能はありません）"), "AI-themed skins are presentation only");
 for (const selector of ['.study-tv-screen[data-look="crt"]', '.study-tv-screen[data-look="aquarium"]', "mark.study-search-hit",
-  "--study-zoom", "--study-text-size", "--study-tv-ratio", ".study-bookmark-card", ".study-import-track", ".study-help-card"])
+  "--study-zoom", "--study-text-size", "--study-tv-ratio", ".study-bookmark-card", ".study-import-track", ".study-help-card",
+  ".study-folder-card", ".study-drop-target", ".study-shelf-title", ".study-shelf-advanced", ".study-key-capture", ".study-shelf-hidden",
+  ".study-editor-notice", ".study-editor-save-status", ".study-memo-editor", ".study-export-folder-controls", ".study-export-folder-name"])
   assert.ok(css.includes(selector), `css is missing ${selector}`);
+assert.ok(css.includes("grid-template-rows:minmax(220px,44vh)") && css.includes("grid-template-rows:minmax(210px,42vh)"),
+  "the responsive bookshelf reserves more vertical space for the shelf and its item list");
 assert.ok(css.includes("prefers-reduced-motion"), "reduced motion is respected");
 
 /* TVドック／選曲画面との連携（背景・ジャケット） */
@@ -192,4 +352,4 @@ assert.ok(library.includes("studySongArt"), "song selection prefers the Study co
 for (const file of ["player.js", "main.js", "media-player-mode.js", "catch.js", "modes.js", "stage.js", "truck.js", "speed.js", "extras.js", "video-max.js", "synth-mode.js", "fx.js"])
   assert.ok(read(`js/${file}`).includes("_trkStudyRoomOpen"), `${file} yields global keys to Study`);
 
-console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, data safety, zoom/search/bookmarks/TV wiring`);
+console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 24 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring`);

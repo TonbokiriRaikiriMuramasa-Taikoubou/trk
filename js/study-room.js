@@ -14,21 +14,39 @@ Object.assign(TEXT.ja, {
   studyWelcomeTitle:"読みたいものを選ぶ", studyWelcomeHint:"画像はフォルダ単位、テキストはファイルごとにこの端末内へ保存します。外へアップロードしません。",
   studyWelcomeHelp:"操作が分からなくなったら、右上の「❓ キーの説明」を開いてください。",
   studySupported:"画像: JPG / PNG / WebP / GIF / AVIF / BMP · 文章: TXT / MD / JSON / CSV / HTML / XML など",
-  studyTapHint:"左側／←で次へ · 右側／→で前へ · Space / Enterで次へ · Enter長押しで栞 · Space長押しでページ移動 · Escで終了",
+  studyTapHint:"画像の左側タップ／→で次へ · 右側タップ／←で前へ（🇺🇸ではタップ位置を反転） · Space / Enterで次へ · Enter長押しで栞 · Space長押しでページ移動 · Escで終了",
   studyVerticalHint:"縦にスクロール／フリックして読み進める · Space / Enterで次へ · Enter長押しで栞 · Escで終了",
   studyBack:"← 本棚", studyFullscreen:"⛶ 画像を全画面化", studyModeLabel:"画像の並べ方",
   studyModeSingle:"一枚ずつ（中央）", studyModeSpread:"見開き（右が1ページ目）", studyModeVertical:"縦読み漫画",
   studyAmerican:"🇺🇸 アメリカン（左右・順序反転）", studyThemeLabel:"文字のスキン",
   studyThemePlain:"普通のテキスト", studyThemeDark:"ダークモード", studyThemeNeon:"ネオン",
   studyThemeLined:"ルーズリーフ", studyThemeGenko:"作文用紙（縦書き・右から）",
+  studyThemeGroupWriter:"✍ 文筆・読書", studyThemeGroupCode:"⌨ コーディング",
+  studyThemeGroupAi:"◈ AI・プロンプト風（見た目のみ）", studyThemeGroupFree:"✦ 自由な発想",
+  studyThemePaper:"和紙", studyThemeWarm:"クリーム", studyThemeSepia:"古書",
+  studyThemeMidnight:"ミッドナイト", studyThemeTerminal:"ターミナル", studyThemeGraphite:"グラファイト",
+  studyThemeBlueprint:"設計図", studyThemeContrast:"高コントラスト",
+  studyThemePrompt:"プロンプト・ラボ", studyThemeNeural:"ニューラル", studyThemeLatent:"潜在空間",
+  studyThemeMatrix:"トークン・マトリクス", studyThemeSynth:"シンセシス",
+  studyThemeAurora:"オーロラ", studyThemeSunset:"サンセット", studyThemeOcean:"深海",
+  studyThemeMint:"ミント", studyThemeDream:"ドリーム", studyThemePrism:"プリズム",
   studyTvToggle:"TVを流し見する", studyTvPosLabel:"TVの位置", studyTvTop:"上", studyTvBottom:"下", studyTvHidden:"表示しない",
   studyTvEmpty:"動画または曲のジャケットがここに表示されます。", studyTvCaption:"今の曲・動画を表示します。別の音声を重ねて再生しません。",
   studyTvHint:"（画像を長押しすると、この曲のジャケットにできます）",
   studyBookmark:"🔖 栞を挟む", studyBookmarkSaved:"🔖 栞を更新しました。", studyBookmarkError:"栞を保存できませんでした。",
-  studyAdvanced:"⚙ 上級者向け", studyMemoToggle:"テキストをメモ帳として編集可能にする",
-  studyMemoHint:"編集は書斎内のコピーに保存し、元ファイルは書き換えません。",
-  studyMemoEdit:"✎ メモ帳で編集", studyMemoDone:"閲覧に戻る", studyExportText:"⇩ テキストを書き出す",
-  studyMemoSaved:"メモのコピーを保存しました。", studyMemoSaveError:"メモを保存できませんでした。",
+  studyAdvanced:"⚙ 上級者向け", studyMemoEdit:"✎ コピーを編集", studyMemoDone:"閲覧に戻る", studyExportText:"⇩ テキストコピーを書き出す",
+  studyMemoSaved:"書斎内のコピーを保存しました。", studyMemoSaveError:"書斎内コピーを保存できませんでした。",
+  studyEditorLabel:"テキスト編集", studyEditorSafety:"書斎内のコピーを編集します。元ファイルは変更せず、JS / HTMLは実行せず、Markdownも装飾表示しません。Tabで字下げ、Ctrl / ⌘+Sで保存、Escで閲覧に戻ります。",
+  studyEditorUnsaved:"未保存の変更（自動保存します）", studyEditorSaving:"保存中…", studyEditorSaved:"書斎に保存済み",
+  studyEditorSaveFailed:"保存に失敗しました。編集画面を閉じる前に、テキストコピーを書き出してください。",
+  studyEditedTextFolderLabel:"編集した文章の本棚フォルダ", studyEditedTextFolderKeep:"自動で移動しない（今の場所）",
+  studyEditedTextFolderHint:"選ぶと、編集内容を保存した本をこのフォルダへ整理します。本文は端末内の書斎に保存し、元ファイルは変更しません。",
+  studyTextFiledInFolder:"編集した本を「{folder}」に整理しました。", studyEditedTextFolderSaveFailed:"本文は保存しましたが、本棚のフォルダを更新できませんでした。",
+  studyExportFolderLabel:"書き出し先（端末）", studyChooseExportFolder:"書き出しフォルダを選ぶ", studyClearExportFolder:"解除",
+  studyExportFolderNone:"未選択（ブラウザの通常ダウンロード先）", studyExportFolderSelected:"選択中：{name}（この起動中のみ）",
+  studyExportFolderHint:"選んだフォルダに新しいファイルを作成します。同名があれば別名にし、既存ファイルは上書きしません。未対応ブラウザでは通常のダウンロードを使います。",
+  studyExportSavedToFolder:"「{folder}」へ「{name}」を書き出しました。", studyExportFolderSelectError:"書き出しフォルダを選べませんでした。",
+  studyExportFolderFallback:"選んだフォルダへ保存できなかったため、通常のダウンロードを開始しました。",
   studyNext:"◀ 次へ", studyNextRight:"次へ ▶", studyPrevious:"前へ ▶", studyPreviousLeft:"◀ 前へ",
   studyNextRightOnly:"次へ ▶", studyPreviousLeftOnly:"◀ 前へ", studyProgressDone:"完了",
   studyAssignCover:"🖼 このページを曲のジャケットに", studyCoverAssigned:"「{title}」のジャケットに設定しました。",
@@ -49,7 +67,7 @@ Object.assign(TEXT.ja, {
   studyProgressHint:"長押し中に開いたバーを動かすと、ページを移動できます。", studyBookmarked:"栞から再開しました。",
   studyMemoNeedText:"テキスト本でのみメモ帳を使えます。", studyFullscreenExit:"全画面を閉じる",
   studyHelp:"❓ キーの説明", studyHelpTitle:"書斎のキー操作", studyHelpClose:"閉じる",
-  studyHelpNav:"← → か、画像の左右タップでページ送り（🇺🇸では左右が入れ替わります）。テキストはスクロールします。",
+  studyHelpNav:"→で次へ・←で前へ（上級者向け設定で変更可）。画像の左右タップは綴じ方向に従います。テキストはスクロールします。",
   studyHelpSpace:"次のページへ。長押しすると、画像=ページ移動バー、テキスト=栞を挟みます。",
   studyHelpPg:"前のページ／次のページ（Home / End で最初／最後へ）。",
   studyHelpZoom:"画像の拡大・縮小・フィット（縦読みでは使いません）。Ctrl+ホイールやピンチでも変えられます。",
@@ -59,6 +77,22 @@ Object.assign(TEXT.ja, {
   studyHelpEsc:"?=この説明、Esc=説明を閉じる／書斎を閉じる。",
   studySortLabel:"並べ替え", studySortUpdated:"更新が新しい順", studySortAdded:"追加が古い順", studySortTitle:"名前順",
   studySortType:"種類別（画像→テキスト）", studySortSize:"大きい順", studyMore:"さらに{n}冊表示",
+  studyFolderCreateHint:"クリックまたは長押しで新しいフォルダを作成", studyCreateFolderPrompt:"新しいフォルダ名を入力してください。",
+  studyRenameFolderPrompt:"フォルダの新しい名前", studyFolderCreated:"フォルダを作成しました。", studyFolderDuplicate:"同じ名前のフォルダがあります。",
+  studyFolderLimit:"フォルダは最大200個です。", studyFolderNameRequired:"フォルダ名を入力してください。", studyFolderCount:"{n}冊",
+  studyFolderBack:"← 本棚へ戻る", studyFolderEmpty:"このフォルダは空です。本をここへドラッグできます。", studyFolderOpen:"フォルダを開く",
+  studyFolderRename:"フォルダ名を変更", studyFolderDelete:"フォルダを削除（本は本棚に残す）",
+  studyFolderDeleted:"フォルダを削除し、本を本棚へ戻しました。",
+  studyShelfDragHint:"⋮⋮をドラッグして移動。自動並び替えを使わない設定で順番も変更できます。フォルダへドロップすると移動します。",
+  studyKeepShelfVisible:"全画面表示でないときは本棚を表示する。", studyShelfVisibilityHint:"チェックを外すと本棚を隠します。右上の「本棚を表示」からいつでも戻せます。",
+  studyShowShelf:"📚 本棚を表示", studyNextKeyLabel:"次へ", studyPreviousKeyLabel:"前へ", studyKeyChange:"変更", studyKeyPressKey:"キーを押す · Escでキャンセル",
+  studyVerticalImageKeys:"画像ページを↑ / ↓で移動する", studyKeyAssignmentHint:"ボタンを押してから使いたいキーを押します。方向キー・英字・数字・PageUp / PageDown・Home / Endを設定でき、既存ショートカットは選べません。",
+  studyKeyCaptureHint:"{action}に割り当てるキーを押してください。Escでキャンセル。", studyKeyAssigned:"{action}を「{key}」に設定しました。",
+  studyKeyInvalid:"このキーは割り当てできません。別のキーを押してください。", studyKeyConflict:"次へと前へには別々のキーを割り当ててください。",
+  studyKeyButtonLabel:"{action}のキーは{key}です。押して変更します。", studyKeyButtonCaptureLabel:"{action}キーを設定中です。キーを押してください。Escでキャンセルします。",
+  studyDragHandle:"ドラッグして移動または並べ替え", studyShelfMoved:"本棚の配置を更新しました。",
+  studyNoSort:"並び替えを使わない。", studyFoldersFirst:"フォルダを上に表示する。",
+  studyNoDeleteConfirm:"削除の時、確認をしない。", studyManualOrderHint:"自動並び替えを止め、ドラッグでフォルダや本を自由に配置します。",
   studyStorageInfo:"{books}冊 · 画像{images}枚 · 書斎 {size}", studyStorageFree:"{books}冊 · 画像{images}枚 · 書斎 {size}（端末の空き 約{free}）",
   studyBookmarks:"🔖 栞一覧", studyBookmarkCount:"栞 {n}件",
   studyBookmarksEmpty:"栞を挟んだ本はありません。読みながら Enter 長押し（または🔖ボタン）で挟めます。",
@@ -96,20 +130,40 @@ Object.assign(TEXT.en, {
   studyWelcomeTitle:"Choose something to read", studyWelcomeHint:"Images are saved by folder and text files individually on this device. Nothing is uploaded.",
   studyWelcomeHelp:"If you get lost, open “❓ Shortcuts” at the top right.",
   studySupported:"Images: JPG / PNG / WebP / GIF / AVIF / BMP · Text: TXT / MD / JSON / CSV / HTML / XML, and more",
-  studyTapHint:"Tap left / ← for next · tap right / → for previous · Space / Enter for next · hold Enter for a bookmark · hold Space for page seek · Esc to exit",
+  studyTapHint:"Tap left / → for next · tap right / ← for previous (🇺🇸 reverses tap sides) · Space / Enter for next · hold Enter for a bookmark · hold Space for page seek · Esc to exit",
   studyVerticalHint:"Scroll or swipe vertically to read · Space / Enter for next · hold Enter for a bookmark · Esc to exit",
   studyBack:"← Bookshelf", studyFullscreen:"⛶ Full-screen image", studyModeLabel:"Image layout",
   studyModeSingle:"Single page (centered)", studyModeSpread:"Two-page spread (page 1 on right)", studyModeVertical:"Vertical comic",
   studyAmerican:"🇺🇸 American mode (reverse sides and order)", studyThemeLabel:"Text skin",
   studyThemePlain:"Plain text", studyThemeDark:"Dark mode", studyThemeNeon:"Neon", studyThemeLined:"Loose-leaf paper",
-  studyThemeGenko:"Manuscript paper (vertical, right to left)", studyTvToggle:"Watch TV while reading", studyTvPosLabel:"TV position",
+  studyThemeGenko:"Manuscript paper (vertical, right to left)",
+  studyThemeGroupWriter:"✍ Writing & reading", studyThemeGroupCode:"⌨ Coding",
+  studyThemeGroupAi:"◈ AI / prompt aesthetics (visual only)", studyThemeGroupFree:"✦ Freeform",
+  studyThemePaper:"Washi paper", studyThemeWarm:"Warm cream", studyThemeSepia:"Antique book",
+  studyThemeMidnight:"Midnight", studyThemeTerminal:"Terminal green", studyThemeGraphite:"Graphite",
+  studyThemeBlueprint:"Blueprint", studyThemeContrast:"High contrast", studyThemePrompt:"Prompt lab",
+  studyThemeNeural:"Neural grid", studyThemeLatent:"Latent space", studyThemeMatrix:"Token matrix",
+  studyThemeSynth:"Synthesis", studyThemeAurora:"Aurora", studyThemeSunset:"Sunset",
+  studyThemeOcean:"Deep ocean", studyThemeMint:"Mint", studyThemeDream:"Dream", studyThemePrism:"Prism",
+  studyTvToggle:"Watch TV while reading", studyTvPosLabel:"TV position",
   studyTvTop:"Top", studyTvBottom:"Bottom", studyTvHidden:"Hide TV", studyTvEmpty:"The current video or song cover appears here.",
   studyTvCaption:"Shows the current song or video without starting a second audio stream.",
   studyTvHint:"(hold an image to make it this song's cover)",
   studyBookmark:"🔖 Save bookmark", studyBookmarkSaved:"🔖 Bookmark saved.", studyBookmarkError:"Could not save the bookmark.",
-  studyAdvanced:"⚙ Advanced", studyMemoToggle:"Allow text books to open as a notepad", studyMemoHint:"Edits are saved as a copy in Study; the original file is never changed.",
-  studyMemoEdit:"✎ Edit as notepad", studyMemoDone:"Back to reading", studyExportText:"⇩ Export text copy", studyMemoSaved:"Local text copy saved.",
-  studyMemoSaveError:"Could not save the text copy.", studyNext:"◀ Next", studyNextRight:"Next ▶", studyPrevious:"Previous ▶", studyPreviousLeft:"◀ Previous",
+  studyAdvanced:"⚙ Advanced", studyMemoEdit:"✎ Edit copy", studyMemoDone:"Finish editing", studyExportText:"⇩ Export text copy",
+  studyMemoSaved:"Saved the Study copy.", studyMemoSaveError:"Could not save the Study copy.",
+  studyEditorLabel:"Text editor", studyEditorSafety:"You are editing a local Study copy. The original is untouched; JS / HTML are never run and Markdown is not rendered. Tab indents · Ctrl / ⌘+S saves · Esc returns to reading.",
+  studyEditorUnsaved:"Unsaved changes · auto-save pending", studyEditorSaving:"Saving…", studyEditorSaved:"Saved in Study",
+  studyEditorSaveFailed:"Save failed. Export a text copy before leaving the editor.",
+  studyEditedTextFolderLabel:"Bookshelf folder for edited text", studyEditedTextFolderKeep:"Keep the current location",
+  studyEditedTextFolderHint:"When selected, successfully saved text books are organized in this bookshelf folder. Text stays in Study's local browser storage; the original file is unchanged.",
+  studyTextFiledInFolder:"Filed the edited book in “{folder}”.", studyEditedTextFolderSaveFailed:"The text was saved, but its bookshelf folder could not be updated.",
+  studyExportFolderLabel:"Export location on this device", studyChooseExportFolder:"Choose export folder", studyClearExportFolder:"Clear",
+  studyExportFolderNone:"Not selected (browser downloads)", studyExportFolderSelected:"Selected: {name} (this session only)",
+  studyExportFolderHint:"A new file is created in the chosen folder. If its name already exists, a different name is used; existing files are never overwritten. Unsupported browsers use a normal download instead.",
+  studyExportSavedToFolder:"Exported “{name}” to “{folder}”.", studyExportFolderSelectError:"Could not select an export folder.",
+  studyExportFolderFallback:"Could not save in the selected folder, so a normal download was started instead.",
+  studyNext:"◀ Next", studyNextRight:"Next ▶", studyPrevious:"Previous ▶", studyPreviousLeft:"◀ Previous",
   studyNextRightOnly:"Next ▶", studyPreviousLeftOnly:"◀ Previous", studyProgressDone:"Done",
   studyAssignCover:"🖼 Set this page as song cover", studyCoverAssigned:"Set as the cover for “{title}”.",
   studyCoverNeedSong:"Select a song first.", studyCoverNeedImage:"Open an image page first.", studyCoverError:"Could not save the cover.",
@@ -126,7 +180,7 @@ Object.assign(TEXT.en, {
   studySafeMode:"Study data is not loaded in safe mode. Open the app normally to use Study.", studyProgressHint:"Move the seek bar to jump to a page.",
   studyBookmarked:"Resumed from bookmark.", studyMemoNeedText:"Notepad editing is available for text books only.", studyFullscreenExit:"Close full screen",
   studyHelp:"❓ Shortcuts", studyHelpTitle:"Study shortcuts", studyHelpClose:"Close",
-  studyHelpNav:"← → or tapping the left/right of an image turns pages (🇺🇸 swaps the sides). Text scrolls instead.",
+  studyHelpNav:"→ goes forward and ← goes back (reassignable in Advanced settings). Tapping an image's left/right side follows the binding direction. Text scrolls instead.",
   studyHelpSpace:"Next page. Hold for the page seek bar (images) or to save a bookmark (text).",
   studyHelpPg:"Previous / next page (Home / End jump to the first / last page).",
   studyHelpZoom:"Zoom in, out, and fit for images (not used in vertical comic mode). Ctrl+wheel and pinch work too.",
@@ -136,6 +190,22 @@ Object.assign(TEXT.en, {
   studyHelpEsc:"? = this help, Esc = close the help / close Study.",
   studySortLabel:"Sort", studySortUpdated:"Recently updated", studySortAdded:"Oldest added first", studySortTitle:"Title",
   studySortType:"Type (images first)", studySortSize:"Largest first", studyMore:"Show {n} more",
+  studyFolderCreateHint:"Click or hold to create a new folder", studyCreateFolderPrompt:"Enter a name for the new folder.",
+  studyRenameFolderPrompt:"New folder name", studyFolderCreated:"Folder created.", studyFolderDuplicate:"A folder with that name already exists.",
+  studyFolderLimit:"You can create up to 200 folders.", studyFolderNameRequired:"Enter a folder name.", studyFolderCount:"{n} books",
+  studyFolderBack:"← Back to bookshelf", studyFolderEmpty:"This folder is empty. Drag books here to move them in.", studyFolderOpen:"Open folder",
+  studyFolderRename:"Rename folder", studyFolderDelete:"Delete folder (keep its books)",
+  studyFolderDeleted:"Folder deleted; its books were moved back to the bookshelf.",
+  studyShelfDragHint:"Drag ⋮⋮ to move items. Turn off automatic sorting to reorder; drop an item on a folder to move it.",
+  studyKeepShelfVisible:"Keep the bookshelf visible outside full screen.", studyShelfVisibilityHint:"Turn this off to hide the shelf. Use “Show bookshelf” in the header to bring it back at any time.",
+  studyShowShelf:"📚 Show bookshelf", studyNextKeyLabel:"Next", studyPreviousKeyLabel:"Previous", studyKeyChange:"Change", studyKeyPressKey:"Press a key · Esc to cancel",
+  studyVerticalImageKeys:"Use ↑ / ↓ to navigate image pages", studyKeyAssignmentHint:"Select a button, then press the key to use. Arrows, letters, digits, Page Up / Down, Home and End are supported; built-in shortcut keys cannot be assigned.",
+  studyKeyCaptureHint:"Press the key to assign to {action}. Esc cancels.", studyKeyAssigned:"{action} key set to “{key}”.",
+  studyKeyInvalid:"That key cannot be assigned. Press a different key.", studyKeyConflict:"Choose different keys for Next and Previous.",
+  studyKeyButtonLabel:"The {action} key is {key}. Activate to change it.", studyKeyButtonCaptureLabel:"Assigning the {action} key. Press a key; Esc cancels.",
+  studyDragHandle:"Drag to move or reorder", studyShelfMoved:"Bookshelf arrangement updated.",
+  studyNoSort:"Disable automatic sorting (arrange manually).", studyFoldersFirst:"Show folders at the top.",
+  studyNoDeleteConfirm:"Skip confirmation when deleting.", studyManualOrderHint:"Turn off automatic sorting, then drag folders and books into any order.",
   studyStorageInfo:"{books} books · {images} images · Study {size}", studyStorageFree:"{books} books · {images} images · Study {size} (about {free} free)",
   studyBookmarks:"🔖 Bookmarks", studyBookmarkCount:"{n} bookmarks",
   studyBookmarksEmpty:"No bookmarks yet. While reading, hold Enter (or press the 🔖 button) to add one.",
@@ -173,18 +243,37 @@ Object.assign(TEXT.zh, {
   studyWelcomeTitle:"选择要阅读的内容", studyWelcomeHint:"图片按文件夹、文本按文件分别保存在本设备中，不会上传。",
   studyWelcomeHelp:"如果忘记操作，请打开右上角的「❓ 按键说明」。",
   studySupported:"图片: JPG / PNG / WebP / GIF / AVIF / BMP · 文本: TXT / MD / JSON / CSV / HTML / XML 等",
-  studyTapHint:"点左侧／← 下一页 · 点右侧／→ 上一页 · Space / Enter 下一页 · 长按 Enter 书签 · 长按 Space 跳页 · Esc 退出",
+  studyTapHint:"点击图片左侧／→ 下一页 · 点击右侧／← 上一页（🇺🇸模式会反转点击位置） · Space / Enter 下一页 · 长按 Enter 添加书签 · 长按 Space 跳页 · Esc 退出",
   studyVerticalHint:"上下滚动或滑动阅读 · Space / Enter 下一页 · 长按 Enter 书签 · Esc 退出",
   studyBack:"← 书架", studyFullscreen:"⛶ 图片全屏", studyModeLabel:"图片排列方式", studyModeSingle:"单页（居中）",
   studyModeSpread:"双页（第一页在右）", studyModeVertical:"纵向漫画", studyAmerican:"🇺🇸 美式模式（左右与顺序反转）",
   studyThemeLabel:"文字主题", studyThemePlain:"普通文本", studyThemeDark:"深色模式", studyThemeNeon:"霓虹",
-  studyThemeLined:"活页纸", studyThemeGenko:"作文纸（竖排，从右向左）", studyTvToggle:"边阅读边看电视", studyTvPosLabel:"电视位置",
+  studyThemeLined:"活页纸", studyThemeGenko:"作文纸（竖排，从右向左）",
+  studyThemeGroupWriter:"✍ 写作与阅读", studyThemeGroupCode:"⌨ 编程",
+  studyThemeGroupAi:"◈ AI／提示词风格（仅外观）", studyThemeGroupFree:"✦ 自由创作",
+  studyThemePaper:"和纸", studyThemeWarm:"暖奶油纸", studyThemeSepia:"古籍", studyThemeMidnight:"午夜",
+  studyThemeTerminal:"终端绿", studyThemeGraphite:"石墨灰", studyThemeBlueprint:"蓝图", studyThemeContrast:"高对比",
+  studyThemePrompt:"提示词实验室", studyThemeNeural:"神经网络网格", studyThemeLatent:"潜空间",
+  studyThemeMatrix:"Token矩阵", studyThemeSynth:"合成", studyThemeAurora:"极光", studyThemeSunset:"日落",
+  studyThemeOcean:"深海", studyThemeMint:"薄荷", studyThemeDream:"梦境", studyThemePrism:"棱镜",
+  studyTvToggle:"边阅读边看电视", studyTvPosLabel:"电视位置",
   studyTvTop:"上方", studyTvBottom:"下方", studyTvHidden:"不显示", studyTvEmpty:"此处显示当前视频或歌曲封面。",
   studyTvCaption:"显示当前歌曲或视频，不会另外启动一条音频流。", studyTvHint:"（长按图片可设为这首歌的封面）",
   studyBookmark:"🔖 添加书签", studyBookmarkSaved:"🔖 已保存书签。", studyBookmarkError:"无法保存书签。",
-  studyAdvanced:"⚙ 高级选项", studyMemoToggle:"允许将文本书作为记事本编辑", studyMemoHint:"编辑内容保存在书斋副本中，不会修改原文件。",
-  studyMemoEdit:"✎ 记事本编辑", studyMemoDone:"返回阅读", studyExportText:"⇩ 导出文本副本", studyMemoSaved:"已保存本地文本副本。",
-  studyMemoSaveError:"无法保存文本副本。", studyNext:"◀ 下一页", studyNextRight:"下一页 ▶", studyPrevious:"上一页 ▶", studyPreviousLeft:"◀ 上一页",
+  studyAdvanced:"⚙ 高级选项", studyMemoEdit:"✎ 编辑副本", studyMemoDone:"结束编辑", studyExportText:"⇩ 导出文本副本",
+  studyMemoSaved:"已保存书斋副本。", studyMemoSaveError:"无法保存书斋副本。",
+  studyEditorLabel:"文本编辑器", studyEditorSafety:"正在编辑书斋中的本地副本。原文件不会更改；JS / HTML绝不执行，Markdown也不会渲染成格式化内容。Tab缩进 · Ctrl / ⌘+S保存 · Esc返回阅读。",
+  studyEditorUnsaved:"有未保存的更改 · 即将自动保存", studyEditorSaving:"正在保存…", studyEditorSaved:"已保存到书斋",
+  studyEditorSaveFailed:"保存失败。离开编辑器前，请先导出文本副本。",
+  studyEditedTextFolderLabel:"已编辑文本的书架文件夹", studyEditedTextFolderKeep:"不自动移动（保留当前位置）",
+  studyEditedTextFolderHint:"选择后，成功保存的文本书籍会整理到此书架文件夹。正文保存在书斋的本地浏览器存储中，原文件不会更改。",
+  studyTextFiledInFolder:"已将编辑的书籍整理到“{folder}”。", studyEditedTextFolderSaveFailed:"正文已保存，但无法更新书架文件夹。",
+  studyExportFolderLabel:"导出位置（此设备）", studyChooseExportFolder:"选择导出文件夹", studyClearExportFolder:"清除",
+  studyExportFolderNone:"未选择（使用浏览器下载）", studyExportFolderSelected:"已选择：{name}（仅本次运行有效）",
+  studyExportFolderHint:"将在所选文件夹中新建文件。若文件名已存在，会使用其他名称；绝不覆盖现有文件。不支持此功能的浏览器会改用普通下载。",
+  studyExportSavedToFolder:"已将“{name}”导出到“{folder}”。", studyExportFolderSelectError:"无法选择导出文件夹。",
+  studyExportFolderFallback:"无法保存到所选文件夹，已改为启动普通下载。",
+  studyNext:"◀ 下一页", studyNextRight:"下一页 ▶", studyPrevious:"上一页 ▶", studyPreviousLeft:"◀ 上一页",
   studyNextRightOnly:"下一页 ▶", studyPreviousLeftOnly:"◀ 上一页", studyProgressDone:"完成",
   studyAssignCover:"🖼 将此页设为歌曲封面", studyCoverAssigned:"已设为“{title}”的封面。", studyCoverNeedSong:"请先选择一首歌曲。",
   studyCoverNeedImage:"请先打开图片页面。", studyCoverError:"无法保存封面。", studyDelete:"删除", studyRename:"重命名", studyOpen:"打开",
@@ -199,7 +288,7 @@ Object.assign(TEXT.zh, {
   studyImageLoadError:"无法加载此图片，请重新导入。", studySafeMode:"安全模式下不会读取书斋数据。请正常打开应用。",
   studyProgressHint:"拖动进度条可跳转页面。", studyBookmarked:"已从书签继续阅读。", studyMemoNeedText:"只有文本书籍可以用记事本编辑。",
   studyFullscreenExit:"退出全屏", studyHelp:"❓ 按键说明", studyHelpTitle:"书斋的按键操作", studyHelpClose:"关闭",
-  studyHelpNav:"← → 或点击图片左右翻页（🇺🇸 模式下左右互换）。文本会滚动。",
+  studyHelpNav:"→ 前进，← 后退（可在高级设置中重新指定）。点击图片左右侧仍按装订方向翻页。文本会滚动。",
   studyHelpSpace:"下一页。长按：图片=页码跳转条，文本=添加书签。",
   studyHelpPg:"上一页／下一页（Home / End 跳到最前／最后）。",
   studyHelpZoom:"图片的放大、缩小、适应（纵向漫画不使用）。也支持 Ctrl+滚轮和双指缩放。",
@@ -208,7 +297,24 @@ Object.assign(TEXT.zh, {
   studyHelpTv:"T=切换电视显示（上→下→隐藏），F=图片全屏。",
   studyHelpEsc:"?=此说明，Esc=关闭说明／关闭书斋。",
   studySortLabel:"排序", studySortUpdated:"最近更新", studySortAdded:"最早添加", studySortTitle:"名称", studySortType:"按类型（图片优先）",
-  studySortSize:"从大到小", studyMore:"再显示 {n} 本", studyStorageInfo:"{books} 本 · 图片 {images} 张 · 书斋 {size}",
+  studySortSize:"从大到小", studyMore:"再显示 {n} 本",
+  studyFolderCreateHint:"点击或长按以创建新文件夹", studyCreateFolderPrompt:"请输入新文件夹名称。",
+  studyRenameFolderPrompt:"新文件夹名称", studyFolderCreated:"文件夹已创建。", studyFolderDuplicate:"已存在同名文件夹。",
+  studyFolderLimit:"最多可创建 200 个文件夹。", studyFolderNameRequired:"请输入文件夹名称。", studyFolderCount:"{n} 本",
+  studyFolderBack:"← 返回书架", studyFolderEmpty:"此文件夹为空。将书籍拖到这里即可移入。", studyFolderOpen:"打开文件夹",
+  studyFolderRename:"重命名文件夹", studyFolderDelete:"删除文件夹（保留其中的书籍）",
+  studyFolderDeleted:"文件夹已删除，其中的书籍已移回书架。",
+  studyShelfDragHint:"拖动 ⋮⋮ 可移动项目。关闭自动排序后可手动排序；拖放到文件夹即可移入。",
+  studyKeepShelfVisible:"非全屏时显示书架。", studyShelfVisibilityHint:"取消勾选即可隐藏书架。随时可点击标题栏中的“显示书架”将其恢复。",
+  studyShowShelf:"📚 显示书架", studyNextKeyLabel:"下一页", studyPreviousKeyLabel:"上一页", studyKeyChange:"更改", studyKeyPressKey:"请按一个按键 · Esc 取消",
+  studyVerticalImageKeys:"使用 ↑ / ↓ 浏览图片页面", studyKeyAssignmentHint:"点击按钮后按下要使用的按键。支持方向键、字母、数字、Page Up / Down、Home 和 End；不能使用内置快捷键。",
+  studyKeyCaptureHint:"请按下要分配给“{action}”的按键。Esc 取消。", studyKeyAssigned:"已将“{action}”设为“{key}”。",
+  studyKeyInvalid:"无法分配此按键，请按其他按键。", studyKeyConflict:"“下一页”和“上一页”必须使用不同的按键。",
+  studyKeyButtonLabel:"“{action}”按键为 {key}。点击可更改。", studyKeyButtonCaptureLabel:"正在设置“{action}”按键。请按键；Esc 取消。",
+  studyDragHandle:"拖动以移动或排序", studyShelfMoved:"书架排列已更新。",
+  studyNoSort:"不使用自动排序（手动排列）。", studyFoldersFirst:"将文件夹显示在顶部。",
+  studyNoDeleteConfirm:"删除时不再确认。", studyManualOrderHint:"关闭自动排序后，可拖动文件夹和书籍自由排列。",
+  studyStorageInfo:"{books} 本 · 图片 {images} 张 · 书斋 {size}",
   studyStorageFree:"{books} 本 · 图片 {images} 张 · 书斋 {size}（可用约 {free}）", studyBookmarks:"🔖 书签列表", studyBookmarkCount:"书签 {n} 个",
   studyBookmarksEmpty:"还没有书签。阅读时长按 Enter（或按 🔖 按钮）即可添加。", studyBookmarksHint:"每本书一个书签，点击即从该位置继续阅读。",
   studyBookmarkOpenAt:"从第 {n} 页打开", studyBookmarkOpenText:"从约 {n}% 的位置打开", studyBookmarkRemove:"移除书签", studyBookmarkRemoved:"已移除书签。",
@@ -240,19 +346,36 @@ Object.assign(TEXT.ko, {
   studyWelcomeTitle:"읽을 항목을 선택하세요", studyWelcomeHint:"이미지는 폴더별로, 텍스트는 파일별로 이 기기에 저장합니다. 업로드하지 않습니다.",
   studyWelcomeHelp:"조작이 헷갈리면 오른쪽 위의 「❓ 키 설명」을 열어 보세요.",
   studySupported:"이미지: JPG / PNG / WebP / GIF / AVIF / BMP · 텍스트: TXT / MD / JSON / CSV / HTML / XML 등",
-  studyTapHint:"왼쪽／← 다음 · 오른쪽／→ 이전 · Space / Enter 다음 · Enter 길게 눌러 책갈피 · Space 길게 눌러 이동 · Esc 종료",
+  studyTapHint:"이미지 왼쪽 누르기／→ 다음 · 오른쪽 누르기／← 이전 (🇺🇸에서는 누르는 위치 반전) · Space / Enter 다음 · Enter 길게 눌러 책갈피 · Space 길게 눌러 이동 · Esc 종료",
   studyVerticalHint:"위아래로 스크롤하거나 밀어서 읽기 · Space / Enter 다음 · Enter 길게 눌러 책갈피 · Esc 종료",
   studyBack:"← 책장", studyFullscreen:"⛶ 이미지 전체 화면", studyModeLabel:"이미지 배열", studyModeSingle:"한 페이지 (중앙)",
   studyModeSpread:"두 페이지 (첫 페이지 오른쪽)", studyModeVertical:"세로형 만화", studyAmerican:"🇺🇸 미국식 (좌우와 순서 반전)",
   studyThemeLabel:"텍스트 스킨", studyThemePlain:"일반 텍스트", studyThemeDark:"다크 모드", studyThemeNeon:"네온",
-  studyThemeLined:"루즈리프", studyThemeGenko:"원고지 (세로쓰기·오른쪽부터)", studyTvToggle:"읽으면서 TV 보기", studyTvPosLabel:"TV 위치",
+  studyThemeLined:"루즈리프", studyThemeGenko:"원고지 (세로쓰기·오른쪽부터)",
+  studyThemeGroupWriter:"✍ 글쓰기와 독서", studyThemeGroupCode:"⌨ 코딩",
+  studyThemeGroupAi:"◈ AI·프롬프트 분위기 (외관만)", studyThemeGroupFree:"✦ 자유로운 발상",
+  studyThemePaper:"화지", studyThemeWarm:"웜 크림", studyThemeSepia:"앤티크 북", studyThemeMidnight:"미드나이트",
+  studyThemeTerminal:"터미널 그린", studyThemeGraphite:"그라파이트", studyThemeBlueprint:"블루프린트", studyThemeContrast:"고대비",
+  studyThemePrompt:"프롬프트 랩", studyThemeNeural:"뉴럴 그리드", studyThemeLatent:"잠재 공간",
+  studyThemeMatrix:"토큰 매트릭스", studyThemeSynth:"신시시스", studyThemeAurora:"오로라", studyThemeSunset:"선셋",
+  studyThemeOcean:"딥 오션", studyThemeMint:"민트", studyThemeDream:"드림", studyThemePrism:"프리즘",
+  studyTvToggle:"읽으면서 TV 보기", studyTvPosLabel:"TV 위치",
   studyTvTop:"위", studyTvBottom:"아래", studyTvHidden:"표시 안 함", studyTvEmpty:"현재 영상 또는 곡 커버가 여기에 표시됩니다.",
   studyTvCaption:"현재 곡이나 영상을 표시합니다. 별도의 오디오 스트림을 재생하지 않습니다.", studyTvHint:"(이미지를 길게 누르면 이 곡의 커버로 지정됩니다)",
   studyBookmark:"🔖 책갈피 저장", studyBookmarkSaved:"🔖 책갈피를 저장했습니다.", studyBookmarkError:"책갈피를 저장하지 못했습니다.",
-  studyAdvanced:"⚙ 고급 설정", studyMemoToggle:"텍스트 책을 메모장으로 편집 허용",
-  studyMemoHint:"편집 내용은 서재의 사본에 저장하며 원본 파일은 변경하지 않습니다.",
-  studyMemoEdit:"✎ 메모장으로 편집", studyMemoDone:"읽기로 돌아가기", studyExportText:"⇩ 텍스트 사본 내보내기",
-  studyMemoSaved:"로컬 텍스트 사본을 저장했습니다.", studyMemoSaveError:"텍스트 사본을 저장하지 못했습니다.",
+  studyAdvanced:"⚙ 고급 설정", studyMemoEdit:"✎ 사본 편집", studyMemoDone:"편집 마치기", studyExportText:"⇩ 텍스트 사본 내보내기",
+  studyMemoSaved:"서재 사본을 저장했습니다.", studyMemoSaveError:"서재 사본을 저장하지 못했습니다.",
+  studyEditorLabel:"텍스트 편집기", studyEditorSafety:"서재의 로컬 사본을 편집합니다. 원본 파일은 바뀌지 않습니다. JS / HTML은 실행하지 않고 Markdown도 서식으로 렌더링하지 않습니다. Tab 들여쓰기 · Ctrl / ⌘+S 저장 · Esc 읽기로 돌아가기.",
+  studyEditorUnsaved:"저장되지 않은 변경 사항 · 자동 저장 대기 중", studyEditorSaving:"저장 중…", studyEditorSaved:"서재에 저장됨",
+  studyEditorSaveFailed:"저장하지 못했습니다. 편집기를 나가기 전에 텍스트 사본을 내보내세요.",
+  studyEditedTextFolderLabel:"편집한 텍스트를 넣을 책장 폴더", studyEditedTextFolderKeep:"자동 이동 안 함 (현재 위치 유지)",
+  studyEditedTextFolderHint:"선택하면 저장된 텍스트 책을 이 책장 폴더로 정리합니다. 내용은 서재의 로컬 브라우저 저장소에 보관하며 원본 파일은 바꾸지 않습니다.",
+  studyTextFiledInFolder:"편집한 책을 “{folder}” 폴더에 정리했습니다.", studyEditedTextFolderSaveFailed:"본문은 저장했지만 책장 폴더를 업데이트하지 못했습니다.",
+  studyExportFolderLabel:"기기의 내보내기 위치", studyChooseExportFolder:"내보내기 폴더 선택", studyClearExportFolder:"해제",
+  studyExportFolderNone:"선택 안 함 (브라우저 다운로드 사용)", studyExportFolderSelected:"선택됨: {name} (이번 실행 중에만)",
+  studyExportFolderHint:"선택한 폴더에 새 파일을 만듭니다. 같은 이름이 있으면 다른 이름을 사용하며 기존 파일은 덮어쓰지 않습니다. 미지원 브라우저에서는 일반 다운로드를 사용합니다.",
+  studyExportSavedToFolder:"“{name}”을(를) “{folder}”에 내보냈습니다.", studyExportFolderSelectError:"내보내기 폴더를 선택하지 못했습니다.",
+  studyExportFolderFallback:"선택한 폴더에 저장하지 못해 일반 다운로드를 시작했습니다.",
   studyNext:"◀ 다음", studyNextRight:"다음 ▶", studyPrevious:"이전 ▶", studyPreviousLeft:"◀ 이전",
   studyNextRightOnly:"다음 ▶", studyPreviousLeftOnly:"◀ 이전", studyProgressDone:"완료",
   studyAssignCover:"🖼 이 페이지를 곡 커버로 지정", studyCoverAssigned:"“{title}”의 커버로 지정했습니다.",
@@ -271,7 +394,7 @@ Object.assign(TEXT.ko, {
   studyProgressHint:"탐색 막대를 움직여 페이지를 이동할 수 있습니다.", studyBookmarked:"책갈피 위치에서 다시 시작했습니다.",
   studyMemoNeedText:"텍스트 책에서만 메모장 편집을 사용할 수 있습니다.", studyFullscreenExit:"전체 화면 닫기",
   studyHelp:"❓ 키 설명", studyHelpTitle:"서재 키 조작", studyHelpClose:"닫기",
-  studyHelpNav:"← → 또는 이미지 좌우를 눌러 페이지 이동 (🇺🇸에서는 좌우가 바뀝니다). 텍스트는 스크롤합니다.",
+  studyHelpNav:"→ 다음, ← 이전 (고급 설정에서 다시 지정할 수 있습니다). 이미지의 좌우를 누르면 제본 방향에 따라 넘깁니다. 텍스트는 스크롤합니다.",
   studyHelpSpace:"다음 페이지. 길게 누르면 이미지=페이지 이동 막대, 텍스트=책갈피 저장입니다.",
   studyHelpPg:"이전/다음 페이지 (Home / End 로 처음/마지막).",
   studyHelpZoom:"이미지 확대·축소·맞춤 (세로형 만화에서는 사용하지 않습니다). Ctrl+휠과 핀치도 가능합니다.",
@@ -281,6 +404,22 @@ Object.assign(TEXT.ko, {
   studyHelpEsc:"?=이 설명, Esc=설명 닫기/서재 닫기.",
   studySortLabel:"정렬", studySortUpdated:"최근 업데이트순", studySortAdded:"오래된 추가순", studySortTitle:"이름순",
   studySortType:"종류별 (이미지 먼저)", studySortSize:"큰 순", studyMore:"{n}권 더 보기",
+  studyFolderCreateHint:"클릭하거나 길게 눌러 새 폴더 만들기", studyCreateFolderPrompt:"새 폴더 이름을 입력하세요.",
+  studyRenameFolderPrompt:"새 폴더 이름", studyFolderCreated:"폴더를 만들었습니다.", studyFolderDuplicate:"같은 이름의 폴더가 이미 있습니다.",
+  studyFolderLimit:"폴더는 최대 200개까지 만들 수 있습니다.", studyFolderNameRequired:"폴더 이름을 입력하세요.", studyFolderCount:"{n}권",
+  studyFolderBack:"← 책장으로 돌아가기", studyFolderEmpty:"폴더가 비어 있습니다. 책을 여기로 끌어 놓아 이동할 수 있습니다.", studyFolderOpen:"폴더 열기",
+  studyFolderRename:"폴더 이름 변경", studyFolderDelete:"폴더 삭제 (책은 보관)",
+  studyFolderDeleted:"폴더를 삭제하고 책을 책장으로 옮겼습니다.",
+  studyShelfDragHint:"⋮⋮를 끌어 항목을 이동하세요. 자동 정렬을 끄면 순서를 바꿀 수 있고, 폴더에 놓으면 폴더로 이동합니다.",
+  studyKeepShelfVisible:"전체 화면이 아닐 때 책장 표시", studyShelfVisibilityHint:"선택을 해제하면 책장을 숨깁니다. 제목 표시줄의 ‘책장 표시’를 눌러 언제든 다시 열 수 있습니다.",
+  studyShowShelf:"📚 책장 표시", studyNextKeyLabel:"다음", studyPreviousKeyLabel:"이전", studyKeyChange:"변경", studyKeyPressKey:"키를 누르세요 · Esc 취소",
+  studyVerticalImageKeys:"이미지 페이지를 ↑ / ↓로 이동", studyKeyAssignmentHint:"버튼을 누른 뒤 사용할 키를 누르세요. 방향키, 영문자, 숫자, Page Up / Down, Home, End를 사용할 수 있으며 기본 단축키는 지정할 수 없습니다.",
+  studyKeyCaptureHint:"‘{action}’에 지정할 키를 누르세요. Esc를 누르면 취소됩니다.", studyKeyAssigned:"‘{action}’ 키를 ‘{key}’로 지정했습니다.",
+  studyKeyInvalid:"지정할 수 없는 키입니다. 다른 키를 누르세요.", studyKeyConflict:"다음과 이전에는 서로 다른 키를 지정하세요.",
+  studyKeyButtonLabel:"{action} 키는 {key}입니다. 눌러서 변경하세요.", studyKeyButtonCaptureLabel:"{action} 키 지정 중입니다. 키를 누르세요. Esc로 취소합니다.",
+  studyDragHandle:"끌어서 이동 또는 정렬", studyShelfMoved:"책장 배치를 업데이트했습니다.",
+  studyNoSort:"자동 정렬 사용 안 함 (직접 배치).", studyFoldersFirst:"폴더를 위에 표시합니다.",
+  studyNoDeleteConfirm:"삭제할 때 확인하지 않습니다.", studyManualOrderHint:"자동 정렬을 끄면 폴더와 책을 끌어서 자유롭게 배치할 수 있습니다.",
   studyStorageInfo:"{books}권 · 이미지 {images}장 · 서재 {size}", studyStorageFree:"{books}권 · 이미지 {images}장 · 서재 {size} (여유 약 {free})",
   studyBookmarks:"🔖 책갈피 목록", studyBookmarkCount:"책갈피 {n}개",
   studyBookmarksEmpty:"책갈피를 저장한 책이 없습니다. 읽으면서 Enter를 길게 누르면(또는 🔖 버튼) 저장됩니다.",
@@ -326,25 +465,48 @@ const STUDY_TV_MAX = { small:"18vh", medium:"26vh", large:"36vh" };
 const STUDY_TV_WIDTH = { small:"min(100%,560px)", medium:"100%", large:"100%" };
 const STUDY_TV_RATIO = { "16:9":"16 / 9", "4:3":"4 / 3", "21:9":"21 / 9" };
 const STUDY_IMAGE_MODES = ["single", "spread", "vertical"];
-const STUDY_THEMES = ["plain", "dark", "neon", "lined", "genko"];
+const STUDY_THEMES = [
+  "plain", "paper", "warm", "lined", "genko", "sepia",
+  "dark", "midnight", "terminal", "graphite", "blueprint", "contrast",
+  "prompt", "neural", "latent", "matrix", "synth",
+  "neon", "aurora", "sunset", "ocean", "mint", "dream", "prism"
+];
 const STUDY_SORTS = ["updated", "added", "title", "type", "size"];
+const STUDY_FOLDER_MAX = 200;
+const STUDY_DEFAULT_NEXT_KEY = "ArrowRight", STUDY_DEFAULT_PREVIOUS_KEY = "ArrowLeft";
+const STUDY_RESERVED_KEYS = new Set(["Escape", "Tab", "Space", "Enter", "NumpadEnter", "KeyB", "KeyM", "KeyT", "KeyF",
+  "Equal", "NumpadAdd", "Minus", "NumpadSubtract", "Digit0", "Numpad0", "Slash"]);
+function studyKeyCodeAllowed(code) {
+  return typeof code === "string" && !STUDY_RESERVED_KEYS.has(code) &&
+    (/^Arrow(?:Left|Right|Up|Down)$/.test(code) || /^Key[A-Z]$/.test(code) || /^Digit[1-9]$/.test(code) ||
+      /^Numpad[1-9]$/.test(code) || ["PageUp", "PageDown", "Home", "End"].includes(code));
+}
+function studyKeyCodeLabel(code) {
+  return ({ ArrowLeft:"←", ArrowRight:"→", ArrowUp:"↑", ArrowDown:"↓" })[code] ||
+    (/^Key[A-Z]$/.test(code) ? code.slice(3) : /^Digit[1-9]$/.test(code) ? code.slice(5) : /^Numpad[1-9]$/.test(code) ? `Num ${code.slice(6)}` : code);
+}
 
 let studyDbPromise = null;
 let studyBooks = [], studyCurrentBook = null, studyCurrentPage = 0;
 let studyVerticalBookId = "", studyVerticalObserver = null, studyVerticalScrollTimer = 0;
 let studyMemoSaveTimer = 0, studyProgressTimer = 0, studyRenderToken = 0, studyImageLoadSeq = 0;
-let studyRoomOpen = false, studyTVToken = 0, studyTVArtUrl = "", studyTVArtSong = "";
+let studyRoomOpen = false, studyClosePending = false, studyTVToken = 0, studyTVArtUrl = "", studyTVArtSong = "";
 let studyHoldTimer = 0, studyHeldCode = "", studyHoldAction = "", studySuppressTapUntil = 0;
 let studyPointerStart = null, studyLaunchTimer = 0, studyLaunchFired = false, studyLaunchPointerAt = 0;
 let studyVideoHomeParent = null, studyVideoHomeNext = null, studyVideoHomeStyle = null, studyFullscreenFallback = false;
 let studyShelfShown = STUDY_SHELF_PAGE, studyBookmarkMode = false, studySweepBusy = false, studySweepAt = 0;
+let studyShelfFolders = [], studyBookFolder = Object.create(null), studyShelfOrder = Object.create(null), studyShelfViewFolder = "";
+let studyShelfDragged = null, studyShelfHoldTimer = 0, studyShelfHoldFired = false, studyDataReady = false;
+let studyKeyCaptureAction = "", studyExportDirectory = null;
 let studyPointers = new Map(), studyPinchStart = 0, studyPinchZoom = 1;
 let studySearchState = { query:"", marks:[], index:-1, capped:false };
 let studyImportState = { active:false, cancelled:false, total:0, added:0, kept:0, failed:0 };
 const studyObjectUrls = new Set();
 let studyPrefs = { imageMode:"single", imageOrder:"natural", american:false, zoom:1, theme:"plain",
   textSize:"normal", textSpacing:"normal", textWidth:"normal", tvEnabled:false, tvPosition:"top", tvLook:"plain",
-  tvSize:"medium", tvRatio:"16:9", tvLabelOn:true, memoEnabled:false, shelfSort:"updated", albumNesting:"split", helpSeen:false };
+  tvSize:"medium", tvRatio:"16:9", tvLabelOn:true, shelfSort:"updated", albumNesting:"split",
+  manualShelfOrder:false, foldersFirst:false, skipDeleteConfirm:false, shelfVisible:true, verticalImageKeys:false, editedTextFolderId:"",
+  studyNextKey:STUDY_DEFAULT_NEXT_KEY, studyPreviousKey:STUDY_DEFAULT_PREVIOUS_KEY, helpSeen:false };
 
 /* ============ 保存（IndexedDB） ============ */
 function studySafeMode() { return typeof window.TrkSafeMode === "function" && window.TrkSafeMode(); }
@@ -434,6 +596,59 @@ function studyFail(error, fallbackKey) {
 /* ============ 状態表示・設定 ============ */
 function studySetStatus(key, vars) { if (typeof setStatus === "function") setStatus("studyStatus", key, vars); }
 function studyNotify(key, vars) { studySetStatus(key, vars); if (typeof showToast === "function") showToast(tr(key, vars)); }
+function studyApplyShelfVisibility() {
+  const visible = studyPrefs.shelfVisible !== false;
+  $("studyShelf").hidden = !visible;
+  $("studyRoom").classList.toggle("study-shelf-hidden", !visible);
+  $("studyShelfVisible").checked = visible;
+  const button = $("studyShowShelfBtn");
+  button.hidden = visible;
+  button.setAttribute("aria-expanded", String(visible));
+}
+function studySetShelfVisible(visible) {
+  studyPrefs.shelfVisible = !!visible;
+  studyApplyShelfVisibility(); studySavePrefs();
+}
+function studySetKeyCapture(action) {
+  studyKeyCaptureAction = studyKeyCaptureAction === action ? "" : action;
+  studyRefreshKeyAssignments();
+  if (studyKeyCaptureAction) studySetStatus("studyKeyCaptureHint", { action:tr(action === "next" ? "studyNextKeyLabel" : "studyPreviousKeyLabel") });
+  else studySetStatus(null);
+}
+function studyRefreshKeyAssignments() {
+  for (const action of ["next", "previous"]) {
+    const isNext = action === "next", button = $(isNext ? "studyNextKeyBtn" : "studyPreviousKeyBtn");
+    const value = $(isNext ? "studyNextKeyValue" : "studyPreviousKeyValue");
+    const actionNode = $(isNext ? "studyNextKeyAction" : "studyPreviousKeyAction");
+    const code = studyPrefs[isNext ? "studyNextKey" : "studyPreviousKey"];
+    const label = tr(isNext ? "studyNextKeyLabel" : "studyPreviousKeyLabel"), capturing = studyKeyCaptureAction === action;
+    value.textContent = capturing ? "…" : studyKeyCodeLabel(code);
+    actionNode.textContent = tr(capturing ? "studyKeyPressKey" : "studyKeyChange");
+    button.setAttribute("aria-pressed", String(capturing));
+    button.setAttribute("aria-label", tr(capturing ? "studyKeyButtonCaptureLabel" : "studyKeyButtonLabel",
+      capturing ? { action:label } : { action:label, key:studyKeyCodeLabel(code) }));
+    button.classList.toggle("study-capture-active", capturing);
+  }
+}
+function studyHandleKeyCapture(event) {
+  if (!studyKeyCaptureAction) return false;
+  event.preventDefault(); event.stopImmediatePropagation();
+  if (event.code === "Escape") {
+    studyKeyCaptureAction = ""; studyRefreshKeyAssignments(); studySetStatus(null); return true;
+  }
+  if (event.repeat || /^(?:Shift|Control|Alt|Meta)/.test(event.code || "")) return true;
+  if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey || !studyKeyCodeAllowed(event.code)) {
+    studyNotify("studyKeyInvalid"); return true;
+  }
+  const isNext = studyKeyCaptureAction === "next";
+  const property = isNext ? "studyNextKey" : "studyPreviousKey";
+  const other = studyPrefs[isNext ? "studyPreviousKey" : "studyNextKey"];
+  if (event.code === other) { studyNotify("studyKeyConflict"); return true; }
+  studyPrefs[property] = event.code;
+  studyKeyCaptureAction = ""; studySavePrefs(); studyRefreshKeyAssignments();
+  studyNotify("studyKeyAssigned", { action:tr(isNext ? "studyNextKeyLabel" : "studyPreviousKeyLabel"), key:studyKeyCodeLabel(event.code) });
+  return true;
+}
 function studyReadPrefs(raw) {
   if (!raw || typeof raw !== "object") return;
   studyPrefs.imageMode = STUDY_IMAGE_MODES.includes(raw.imageMode) ? raw.imageMode : "single";
@@ -451,14 +666,159 @@ function studyReadPrefs(raw) {
   studyPrefs.tvSize = ["small", "medium", "large"].includes(raw.tvSize) ? raw.tvSize : "medium";
   studyPrefs.tvRatio = Object.keys(STUDY_TV_RATIO).includes(raw.tvRatio) ? raw.tvRatio : "16:9";
   studyPrefs.tvLabelOn = raw.tvLabelOn !== false;
-  studyPrefs.memoEnabled = raw.memoEnabled === true;
   studyPrefs.shelfSort = STUDY_SORTS.includes(raw.shelfSort) ? raw.shelfSort : "updated";
   studyPrefs.albumNesting = raw.albumNesting === "flat" ? "flat" : "split";
+  studyPrefs.manualShelfOrder = raw.manualShelfOrder === true;
+  studyPrefs.foldersFirst = raw.foldersFirst === true;
+  studyPrefs.skipDeleteConfirm = raw.skipDeleteConfirm === true;
+  studyPrefs.shelfVisible = raw.shelfVisible !== false;
+  studyPrefs.verticalImageKeys = raw.verticalImageKeys === true;
+  studyPrefs.editedTextFolderId = typeof raw.editedTextFolderId === "string" && raw.editedTextFolderId.length <= 128 ? raw.editedTextFolderId : "";
+  studyPrefs.studyNextKey = studyKeyCodeAllowed(raw.studyNextKey) ? raw.studyNextKey : STUDY_DEFAULT_NEXT_KEY;
+  const previousKey = studyKeyCodeAllowed(raw.studyPreviousKey) ? raw.studyPreviousKey : STUDY_DEFAULT_PREVIOUS_KEY;
+  studyPrefs.studyPreviousKey = previousKey !== studyPrefs.studyNextKey ? previousKey
+    : studyPrefs.studyNextKey !== STUDY_DEFAULT_PREVIOUS_KEY ? STUDY_DEFAULT_PREVIOUS_KEY : STUDY_DEFAULT_NEXT_KEY;
   studyPrefs.helpSeen = raw.helpSeen === true;
 }
 function studySavePrefs() {
   return studyDBRun("settings", "readwrite", store => store.put({ ...studyPrefs }, "ui"))
     .catch(error => { studyFail(error); });
+}
+function studyRefreshEditedTextFolderSelect() {
+  const select = $("studyEditedTextFolder"), previous = studyPrefs.editedTextFolderId;
+  select.textContent = "";
+  const keep = document.createElement("option"); keep.value = ""; keep.textContent = tr("studyEditedTextFolderKeep"); select.append(keep);
+  const folders = [...studyShelfFolders].sort((a, b) => STUDY_UTIL.comparePath(a.name, b.name));
+  for (const folder of folders) {
+    const option = document.createElement("option"); option.value = folder.id; option.textContent = folder.name; select.append(option);
+  }
+  if (previous && !folders.some(folder => folder.id === previous)) {
+    studyPrefs.editedTextFolderId = ""; studySavePrefs();
+  }
+  select.value = studyPrefs.editedTextFolderId;
+}
+function studyCanChooseExportFolder() {
+  return !!(window.isSecureContext && window.self === window.top && typeof window.showDirectoryPicker === "function");
+}
+function studyRefreshExportFolderUI() {
+  $("studyChooseExportFolderBtn").hidden = !studyCanChooseExportFolder();
+  $("studyClearExportFolderBtn").hidden = !studyExportDirectory;
+  $("studyExportFolderName").textContent = studyExportDirectory
+    ? tr("studyExportFolderSelected", { name:studyExportDirectory.name }) : tr("studyExportFolderNone");
+}
+function studyReadShelfMeta(raw) {
+  studyShelfFolders = [];
+  studyBookFolder = Object.create(null);
+  studyShelfOrder = Object.create(null);
+  studyShelfOrder.root = [];
+  if (!raw || typeof raw !== "object") return;
+  const seen = new Set();
+  for (const row of Array.isArray(raw.folders) ? raw.folders.slice(0, STUDY_FOLDER_MAX) : []) {
+    if (!row || typeof row !== "object") continue;
+    const id = String(row.id || "").slice(0, 80), name = String(row.name || "").trim().slice(0, 120);
+    if (!/^[a-z0-9_-]{1,80}$/i.test(id) || id === "root" || !name || seen.has(id)) continue;
+    seen.add(id);
+    studyShelfFolders.push({ id, name, createdAt:Math.max(0, Number(row.createdAt) || Date.now()), updatedAt:Math.max(0, Number(row.updatedAt) || Date.now()) });
+    studyShelfOrder[id] = [];
+  }
+  const folderIds = new Set(studyShelfFolders.map(folder => folder.id));
+  if (raw.bookFolder && typeof raw.bookFolder === "object" && !Array.isArray(raw.bookFolder)) {
+    for (const [bookId, folderId] of Object.entries(raw.bookFolder).slice(0, STUDY_SHELF_MAX)) {
+      if (typeof bookId === "string" && bookId.length <= 100 && folderIds.has(String(folderId))) studyBookFolder[bookId] = String(folderId);
+    }
+  }
+  if (raw.orderByFolder && typeof raw.orderByFolder === "object" && !Array.isArray(raw.orderByFolder)) {
+    for (const [container, values] of Object.entries(raw.orderByFolder).slice(0, STUDY_FOLDER_MAX + 1)) {
+      if (container !== "root" && !folderIds.has(container)) continue;
+      if (!Array.isArray(values)) continue;
+      const keys = [], used = new Set();
+      for (const value of values.slice(0, STUDY_SHELF_MAX + STUDY_FOLDER_MAX)) {
+        const key = String(value || "").slice(0, 240);
+        if (!/^(?:book|folder):/.test(key) || used.has(key)) continue;
+        used.add(key); keys.push(key);
+      }
+      studyShelfOrder[container] = keys;
+    }
+  }
+}
+function studyShelfSnapshot() {
+  return JSON.stringify({ folders:studyShelfFolders, bookFolder:studyBookFolder, orderByFolder:studyShelfOrder });
+}
+function studyNormalizeShelfMeta() {
+  const before = studyShelfSnapshot();
+  const folderIds = new Set(studyShelfFolders.map(folder => folder.id));
+  const bookIds = new Set(studyBooks.map(book => book.id));
+  for (const id of Object.keys(studyBookFolder)) if (!bookIds.has(id)) delete studyBookFolder[id];
+  for (const book of studyBooks) {
+    const folderId = studyBookFolder[book.id];
+    if (!folderIds.has(folderId)) studyBookFolder[book.id] = "";
+  }
+  const expected = Object.create(null);
+  expected.root = studyShelfFolders.map(folder => `folder:${folder.id}`);
+  for (const folder of studyShelfFolders) expected[folder.id] = [];
+  for (const book of studyBooks) {
+    const folderId = studyBookFolder[book.id] || "";
+    expected[folderId || "root"].push(`book:${book.id}`);
+  }
+  let folderSizes = null;
+  const entryForKey = key => {
+    const id = key.slice(key.indexOf(":") + 1);
+    if (key.startsWith("folder:")) {
+      const folder = studyShelfFolders.find(item => item.id === id);
+      return folder && { key, itemType:"folder", kind:"folder", title:folder.name, createdAt:folder.createdAt, updatedAt:folder.updatedAt,
+        size:(folderSizes || (folderSizes = studyShelfFolderSizes())).get(id) || 0 };
+    }
+    const book = studyBooks.find(item => item.id === id);
+    return book && { key, itemType:"book", kind:book.kind, title:book.title, createdAt:book.createdAt, updatedAt:book.updatedAt,
+      size:STUDY_UTIL.bookSize(book) };
+  };
+  const normalized = Object.create(null);
+  for (const [container, keys] of Object.entries(expected)) {
+    const valid = new Set(keys), used = new Set();
+    const current = Array.isArray(studyShelfOrder[container]) ? studyShelfOrder[container] : [];
+    const ordered = current.filter(key => valid.has(key) && !used.has(key) && used.add(key));
+    const missing = STUDY_UTIL.sortShelfItems(keys.filter(key => !used.has(key)).map(entryForKey).filter(Boolean),
+      { mode:studyPrefs.shelfSort, foldersFirst:studyPrefs.foldersFirst }).map(entry => entry.key);
+    normalized[container] = ordered.concat(missing);
+  }
+  studyShelfOrder = normalized;
+  if (studyShelfViewFolder && !folderIds.has(studyShelfViewFolder)) studyShelfViewFolder = "";
+  return before !== studyShelfSnapshot();
+}
+function studySaveShelfMeta() {
+  if (studySafeMode()) return Promise.resolve(true);
+  const value = { folders:studyShelfFolders, bookFolder:studyBookFolder, orderByFolder:studyShelfOrder };
+  return studyDBRun("settings", "readwrite", store => store.put(value, "shelf"))
+    .then(() => true).catch(error => { studyFail(error); return false; });
+}
+function studyShelfContainer(folderId) {
+  const key = folderId || "root";
+  if (!Array.isArray(studyShelfOrder[key])) studyShelfOrder[key] = [];
+  return studyShelfOrder[key];
+}
+function studyShelfItemKey(type, id) { return `${type === "folder" ? "folder" : "book"}:${id}`; }
+function studyFolderById(id) { return studyShelfFolders.find(folder => folder.id === id) || null; }
+function studyBookFolderId(bookId) { return studyBookFolder[bookId] || ""; }
+async function studyApplyEditedTextFolder(book) {
+  const folderId = studyPrefs.editedTextFolderId;
+  const folder = folderId && studyFolderById(folderId);
+  if (!book || book.kind !== "text" || !folder || studyBookFolderId(book.id) === folderId) return null;
+  const previousFolder = studyBookFolderId(book.id);
+  studyBookFolder[book.id] = folderId; studyNormalizeShelfMeta();
+  if (!await studySaveShelfMeta()) {
+    studyBookFolder[book.id] = previousFolder; studyNormalizeShelfMeta(); studyRenderShelf();
+    return false;
+  }
+  studyShelfViewFolder = folderId; studyRenderShelf(); studyNotify("studyTextFiledInFolder", { folder:folder.name });
+  return true;
+}
+function studyShelfFolderSizes() {
+  const sizes = new Map(studyShelfFolders.map(folder => [folder.id, 0]));
+  for (const book of studyBooks) {
+    const folderId = studyBookFolderId(book.id);
+    if (sizes.has(folderId)) sizes.set(folderId, sizes.get(folderId) + STUDY_UTIL.bookSize(book));
+  }
+  return sizes;
 }
 /* 見た目の設定（TVの枠・文字サイズ・拡大率）をDOMへ反映する。 */
 function studySyncLook() {
@@ -493,9 +853,16 @@ function studyRefreshPrefsUI() {
   $("studyTvSize").value = studyPrefs.tvSize;
   $("studyTvRatio").value = studyPrefs.tvRatio;
   $("studyTvLabelOn").checked = studyPrefs.tvLabelOn;
-  $("studyMemoEnabled").checked = studyPrefs.memoEnabled;
   $("studyShelfSort").value = studyPrefs.shelfSort;
   $("studyAlbumNesting").value = studyPrefs.albumNesting;
+  $("studyManualShelfOrder").checked = studyPrefs.manualShelfOrder;
+  $("studyFoldersFirst").checked = studyPrefs.foldersFirst;
+  $("studySkipDeleteConfirm").checked = studyPrefs.skipDeleteConfirm;
+  $("studyVerticalImageKeys").checked = studyPrefs.verticalImageKeys;
+  $("studyShelfSort").disabled = studyPrefs.manualShelfOrder;
+  studyRefreshEditedTextFolderSelect(); studyRefreshExportFolderUI();
+  studyApplyShelfVisibility();
+  studyRefreshKeyAssignments();
   studySyncLook();
   studySyncCurrentBookControls();
 }
@@ -536,42 +903,258 @@ async function studyRefreshBooks() {
     const fresh = studyBooks.find(book => book.id === studyCurrentBook.id);
     if (fresh) studyCurrentBook = fresh; else studyCurrentBook = null;
   }
+  if (studyNormalizeShelfMeta()) studySaveShelfMeta();
   studyRenderShelf(); studyRenderBookmarks(); studyRefreshShelfFoot();
 }
 
 /* ============ 本棚 ============ */
-function studyRenderShelf() {
-  const list = $("studyShelfList"), query = $("studySearch").value.trim().toLocaleLowerCase();
-  list.textContent = "";
-  const shown = studyBooks.filter(book => !query || `${book.title} ${book.sourcePath} ${book.extension}`.toLocaleLowerCase().includes(query));
-  $("studyBookCount").textContent = shown.length === studyBooks.length ? String(studyBooks.length) : `${shown.length} / ${studyBooks.length}`;
-  studySyncWelcome();
-  if (!shown.length) { list.append(el("div", "study-shelf-empty", tr(studyBooks.length ? "studyNoSearchResults" : "studyShelfEmpty"))); return; }
-  const visible = shown.slice(0, Math.max(STUDY_SHELF_PAGE, studyShelfShown));
-  for (const book of visible) {
-    const card = el("article", "study-book-card");
-    const open = el("button", "study-book-open"); open.type = "button";
-    const icon = el("span", "study-book-icon", book.kind === "image" ? "🖼" : "📄");
-    const text = el("span", "study-book-copy");
-    const title = el("strong", "study-book-title", book.title);
-    const detail = book.kind === "image" ? `${tr("studyBookImages")} · ${tr("studyPageCount", { n:book.pages.length })}`
-      : `${tr("studyBookText")} · ${String(book.extension || "TXT").toUpperCase()} · ${tr("studyTextStats", STUDY_UTIL.textStats(book.content))}`;
-    const sub = el("span", "study-book-sub", detail + (book.bookmark ? " · 🔖" : ""));
-    text.append(title, sub);
-    if (book.kind === "text" && book.content) {
-      const ratio = book.bookmark && book.bookmark.ratio ? book.bookmark.ratio : 0;
-      text.append(el("span", "study-book-snippet", STUDY_UTIL.snippetAt(book.content, ratio, 64)));
+function studyShelfEntries(folderId, query) {
+  const search = String(query || "").toLocaleLowerCase(), entries = [];
+  const folderSizes = folderId ? null : studyShelfFolderSizes();
+  if (!folderId) {
+    for (const folder of studyShelfFolders) {
+      if (search && !folder.name.toLocaleLowerCase().includes(search)) continue;
+      entries.push({ key:studyShelfItemKey("folder", folder.id), itemType:"folder", kind:"folder", title:folder.name,
+        createdAt:folder.createdAt, updatedAt:folder.updatedAt, size:folderSizes.get(folder.id) || 0, folder });
     }
-    open.append(icon, text); open.title = tr("studyOpen"); open.addEventListener("click", () => studyOpenBook(book));
-    const tools = el("span", "study-book-tools");
-    const rename = el("button", "study-tool-btn", "✎"); rename.type = "button"; rename.title = tr("studyRename"); rename.setAttribute("aria-label", `${tr("studyRename")}: ${book.title}`);
-    rename.addEventListener("click", () => studyRenameBook(book));
-    const remove = el("button", "study-tool-btn study-delete-btn", "×"); remove.type = "button"; remove.title = tr("studyDelete"); remove.setAttribute("aria-label", `${tr("studyDelete")}: ${book.title}`);
-    remove.addEventListener("click", () => studyDeleteBook(book));
-    tools.append(rename, remove); card.append(open, tools); list.append(card);
   }
-  if (shown.length > visible.length) {
-    const more = el("button", "study-more-btn", tr("studyMore", { n:Math.min(STUDY_SHELF_PAGE, shown.length - visible.length) }));
+  for (const book of studyBooks) {
+    const parent = studyBookFolderId(book.id);
+    if (folderId ? parent !== folderId : !search && parent) continue;
+    const folder = studyFolderById(parent);
+    const searchable = `${book.title} ${book.sourcePath} ${book.extension} ${folder ? folder.name : ""}`.toLocaleLowerCase();
+    if (search && !searchable.includes(search)) continue;
+    entries.push({ key:studyShelfItemKey("book", book.id), itemType:"book", kind:book.kind, title:book.title,
+      createdAt:book.createdAt, updatedAt:book.updatedAt, size:STUDY_UTIL.bookSize(book), book, folderId:parent });
+  }
+  let orderKeys = studyShelfContainer(folderId);
+  if (!folderId && search) orderKeys = ["root", ...studyShelfFolders.map(folder => folder.id)].flatMap(key => studyShelfContainer(key));
+  return STUDY_UTIL.sortShelfItems(entries, { mode:studyPrefs.shelfSort, manual:studyPrefs.manualShelfOrder,
+    foldersFirst:studyPrefs.foldersFirst, orderKeys });
+}
+function studyShelfCanDrop(drag, target) {
+  if (!drag || !target) return false;
+  if (target.type === "back") return drag.type === "book" && !!drag.sourceFolder;
+  if (target.type === "folder") return drag.type === "book" || drag.type === "folder" && studyPrefs.manualShelfOrder;
+  if (target.type === "book") {
+    if (drag.type === "book") return studyPrefs.manualShelfOrder || drag.sourceFolder !== (target.folderId || "");
+    return drag.type === "folder" && studyPrefs.manualShelfOrder && !target.folderId;
+  }
+  if (target.type === "container") {
+    const destination = target.folderId || "";
+    if (drag.type === "book") return studyPrefs.manualShelfOrder || drag.sourceFolder !== destination;
+    return drag.type === "folder" && studyPrefs.manualShelfOrder && !destination;
+  }
+  return false;
+}
+function studyShelfDragOver(event, target, node) {
+  if (!studyShelfCanDrop(studyShelfDragged, target)) return;
+  event.preventDefault(); event.stopPropagation();
+  if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+  node.classList.add("study-drop-target");
+}
+function studyShelfMoveItem(drag, destination, reference, after) {
+  if (!drag) return;
+  const isFolder = drag.type === "folder", key = studyShelfItemKey(drag.type, drag.id);
+  const source = isFolder ? "" : studyBookFolderId(drag.id);
+  const targetFolder = isFolder ? "" : (destination || "");
+  if (isFolder && !studyPrefs.manualShelfOrder || !isFolder && !studyBooks.some(book => book.id === drag.id)) return;
+  if (targetFolder && !studyFolderById(targetFolder)) return;
+  if (!studyPrefs.manualShelfOrder && !isFolder && source === targetFolder) return;
+  if (reference && reference.key === key) return;
+  const from = studyShelfContainer(source), fromIndex = from.indexOf(key);
+  if (fromIndex >= 0) from.splice(fromIndex, 1);
+  if (!isFolder) studyBookFolder[drag.id] = targetFolder;
+  const to = studyShelfContainer(targetFolder);
+  let index = to.length;
+  if (reference && reference.key) {
+    const targetIndex = to.indexOf(reference.key);
+    if (targetIndex >= 0) index = targetIndex + (after ? 1 : 0);
+  }
+  to.splice(index, 0, key);
+  const scrollTop = $("studyShelfList").scrollTop;
+  studySaveShelfMeta(); studyRenderShelf(); $("studyShelfList").scrollTop = scrollTop; studySetStatus("studyShelfMoved");
+}
+function studyShelfDrop(event, target) {
+  const drag = studyShelfDragged;
+  if (!studyShelfCanDrop(drag, target)) return;
+  event.preventDefault(); event.stopPropagation();
+  let destination = "", reference = null, after = false;
+  if (target.type === "folder") {
+    if (drag.type === "book") destination = target.id;
+    else { reference = { key:studyShelfItemKey("folder", target.id) }; after = event.clientY > target.node.getBoundingClientRect().top + target.node.getBoundingClientRect().height / 2; }
+  } else if (target.type === "book") {
+    destination = target.folderId || "";
+    reference = { key:studyShelfItemKey("book", target.id) };
+    const rect = target.node.getBoundingClientRect(); after = event.clientY > rect.top + rect.height / 2;
+  } else if (target.type === "container" && target.folderId) destination = target.folderId;
+  studyShelfMoveItem(drag, destination, reference, after);
+  studyShelfDragged = null;
+  $("studyShelfList").classList.remove("study-drop-target");
+}
+function studyBindShelfDropTarget(node, target) {
+  target.node = node;
+  node.addEventListener("dragover", event => studyShelfDragOver(event, target, node));
+  node.addEventListener("dragleave", event => { if (!node.contains(event.relatedTarget)) node.classList.remove("study-drop-target"); });
+  node.addEventListener("drop", event => studyShelfDrop(event, target));
+}
+function studyShelfTargetAt(x, y) {
+  const hit = document.elementFromPoint(x, y);
+  if (!hit || typeof hit.closest !== "function") return null;
+  const back = hit.closest(".study-shelf-back");
+  if (back) return { type:"back", folderId:"", node:back };
+  const folder = hit.closest(".study-folder-card");
+  if (folder) return { type:"folder", id:folder.dataset.studyItemId, node:folder };
+  const book = hit.closest(".study-book-card");
+  if (book) return { type:"book", id:book.dataset.studyItemId, folderId:book.dataset.studyFolderId || "", node:book };
+  const list = hit.closest("#studyShelfList");
+  return list ? { type:"container", folderId:studyShelfViewFolder, node:list } : null;
+}
+function studyHighlightShelfTarget(x, y) {
+  const list = $("studyShelfList");
+  for (const node of list.querySelectorAll(".study-drop-target")) node.classList.remove("study-drop-target");
+  list.classList.remove("study-drop-target");
+  const target = studyShelfTargetAt(x, y);
+  if (studyShelfCanDrop(studyShelfDragged, target)) (target.node || list).classList.add("study-drop-target");
+  return target;
+}
+function studyShelfDragHandle(type, id, sourceFolder, card) {
+  const handle = el("button", "study-tool-btn study-drag-handle", "⋮⋮");
+  handle.type = "button";
+  handle.draggable = type === "folder" ? studyPrefs.manualShelfOrder : studyPrefs.manualShelfOrder || studyShelfFolders.length > 0;
+  handle.hidden = !handle.draggable;
+  handle.title = tr("studyDragHandle"); handle.setAttribute("aria-label", `${tr("studyDragHandle")}: ${type === "folder" ? (studyFolderById(id) || {}).name || id : (studyBooks.find(book => book.id === id) || {}).title || id}`);
+  handle.addEventListener("pointerdown", event => {
+    if (event.pointerType === "mouse" || !handle.draggable) return;
+    event.preventDefault();
+    const originalDraggable = handle.draggable;
+    handle.draggable = false;
+    const pointer = { id:event.pointerId, x:event.clientX, y:event.clientY, started:false };
+    const startDrag = () => {
+      pointer.started = true; studyShelfDragged = { type, id, sourceFolder:sourceFolder || "" };
+      card.classList.add("study-dragging");
+    };
+    const move = moveEvent => {
+      if (moveEvent.pointerId !== pointer.id) return;
+      if (!pointer.started && Math.hypot(moveEvent.clientX - pointer.x, moveEvent.clientY - pointer.y) < 8) return;
+      moveEvent.preventDefault();
+      if (!pointer.started) startDrag();
+      studyHighlightShelfTarget(moveEvent.clientX, moveEvent.clientY);
+    };
+    const finish = endEvent => {
+      if (endEvent.pointerId !== pointer.id) return;
+      document.removeEventListener("pointermove", move);
+      document.removeEventListener("pointerup", finish);
+      document.removeEventListener("pointercancel", cancel);
+      if (pointer.started && endEvent.type === "pointerup") {
+        const target = studyHighlightShelfTarget(endEvent.clientX, endEvent.clientY);
+        if (studyShelfCanDrop(studyShelfDragged, target)) studyShelfDrop({
+          preventDefault() {}, stopPropagation() {}, clientY:endEvent.clientY
+        }, target);
+      }
+      studyShelfDragged = null; handle.draggable = originalDraggable;
+      card.classList.remove("study-dragging");
+      for (const node of $("studyShelfList").querySelectorAll(".study-drop-target")) node.classList.remove("study-drop-target");
+      $("studyShelfList").classList.remove("study-drop-target");
+    };
+    const cancel = cancelEvent => finish(cancelEvent);
+    document.addEventListener("pointermove", move, { passive:false });
+    document.addEventListener("pointerup", finish);
+    document.addEventListener("pointercancel", cancel);
+    try { handle.setPointerCapture(event.pointerId); } catch (_) {}
+  });
+  handle.addEventListener("dragstart", event => {
+    if (type === "folder" && !studyPrefs.manualShelfOrder) { event.preventDefault(); return; }
+    studyShelfDragged = { type, id, sourceFolder:sourceFolder || "" };
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "move";
+      try { event.dataTransfer.setData("text/plain", studyShelfItemKey(type, id)); } catch (_) {}
+    }
+    card.classList.add("study-dragging");
+  });
+  handle.addEventListener("dragend", () => {
+    studyShelfDragged = null;
+    for (const node of $("studyShelfList").querySelectorAll(".study-dragging,.study-drop-target")) node.classList.remove("study-dragging", "study-drop-target");
+    $("studyShelfList").classList.remove("study-drop-target");
+  });
+  return handle;
+}
+function studyRenderFolderCard(folder) {
+  const card = el("article", "study-folder-card");
+  card.dataset.studyItemType = "folder"; card.dataset.studyItemId = folder.id;
+  const open = el("button", "study-folder-open"); open.type = "button";
+  const copy = el("span", "study-book-copy");
+  copy.append(el("strong", "study-book-title", folder.name), el("span", "study-book-sub", tr("studyFolderCount", { n:studyBooks.filter(book => studyBookFolderId(book.id) === folder.id).length })));
+  open.append(el("span", "study-folder-icon", "📁"), copy); open.title = tr("studyFolderOpen");
+  open.setAttribute("aria-label", `${tr("studyFolderOpen")}: ${folder.name}`);
+  open.addEventListener("click", () => {
+    studyShelfViewFolder = folder.id; studyShelfShown = STUDY_SHELF_PAGE; $("studySearch").value = ""; studyRenderShelf();
+    const back = $("studyShelfList").querySelector(".study-shelf-back"); if (back) back.focus({ preventScroll:true });
+  });
+  const tools = el("span", "study-book-tools");
+  tools.append(studyShelfDragHandle("folder", folder.id, "", card));
+  const rename = el("button", "study-tool-btn", "✎"); rename.type = "button"; rename.title = tr("studyFolderRename");
+  rename.setAttribute("aria-label", `${tr("studyFolderRename")}: ${folder.name}`); rename.addEventListener("click", () => studyRenameFolder(folder));
+  const remove = el("button", "study-tool-btn study-delete-btn", "×"); remove.type = "button"; remove.title = tr("studyFolderDelete");
+  remove.setAttribute("aria-label", `${tr("studyFolderDelete")}: ${folder.name}`); remove.addEventListener("click", () => studyDeleteFolder(folder));
+  tools.append(rename, remove); card.append(open, tools);
+  studyBindShelfDropTarget(card, { type:"folder", id:folder.id });
+  return card;
+}
+function studyRenderBookCard(book) {
+  const card = el("article", "study-book-card"), folderId = studyBookFolderId(book.id), folder = studyFolderById(folderId);
+  card.dataset.studyItemType = "book"; card.dataset.studyItemId = book.id; card.dataset.studyFolderId = folderId;
+  const open = el("button", "study-book-open"); open.type = "button";
+  const icon = el("span", "study-book-icon", book.kind === "image" ? "🖼" : "📄");
+  const text = el("span", "study-book-copy");
+  const title = el("strong", "study-book-title", book.title);
+  const detail = book.kind === "image" ? `${tr("studyBookImages")} · ${tr("studyPageCount", { n:book.pages.length })}`
+    : `${tr("studyBookText")} · ${String(book.extension || "TXT").toUpperCase()} · ${tr("studyTextStats", STUDY_UTIL.textStats(book.content))}`;
+  const sub = el("span", "study-book-sub", detail + (folder ? ` · 📁 ${folder.name}` : "") + (book.bookmark ? " · 🔖" : ""));
+  text.append(title, sub);
+  if (book.kind === "text" && book.content) {
+    const ratio = book.bookmark && book.bookmark.ratio ? book.bookmark.ratio : 0;
+    text.append(el("span", "study-book-snippet", STUDY_UTIL.snippetAt(book.content, ratio, 64)));
+  }
+  open.append(icon, text); open.title = tr("studyOpen"); open.addEventListener("click", () => studyOpenBook(book));
+  const tools = el("span", "study-book-tools");
+  tools.append(studyShelfDragHandle("book", book.id, folderId, card));
+  const rename = el("button", "study-tool-btn", "✎"); rename.type = "button"; rename.title = tr("studyRename"); rename.setAttribute("aria-label", `${tr("studyRename")}: ${book.title}`);
+  rename.addEventListener("click", () => studyRenameBook(book));
+  const remove = el("button", "study-tool-btn study-delete-btn", "×"); remove.type = "button"; remove.title = tr("studyDelete"); remove.setAttribute("aria-label", `${tr("studyDelete")}: ${book.title}`);
+  remove.addEventListener("click", () => studyDeleteBook(book));
+  tools.append(rename, remove); card.append(open, tools);
+  studyBindShelfDropTarget(card, { type:"book", id:book.id, folderId });
+  return card;
+}
+function studyRenderShelf() {
+  const list = $("studyShelfList"), query = $("studySearch").value.trim();
+  list.textContent = "";
+  const entries = studyShelfEntries(studyShelfViewFolder, query);
+  const bookCount = entries.filter(entry => entry.itemType === "book").length;
+  const scopeCount = studyShelfViewFolder ? studyBooks.filter(book => studyBookFolderId(book.id) === studyShelfViewFolder).length : studyBooks.length;
+  $("studyBookCount").textContent = query || studyShelfViewFolder ? `${bookCount} / ${scopeCount}` : String(studyBooks.length);
+  $("studyShelfDragHelp").hidden = !(studyPrefs.manualShelfOrder || studyShelfFolders.length);
+  studySyncWelcome();
+  if (studyShelfViewFolder) {
+    const folder = studyFolderById(studyShelfViewFolder);
+    const back = el("button", "study-shelf-back", `${tr("studyFolderBack")} · ${folder ? folder.name : ""}`); back.type = "button";
+    back.setAttribute("aria-label", `${tr("studyFolderBack")}: ${folder ? folder.name : ""}`);
+    back.addEventListener("click", () => {
+      studyShelfViewFolder = ""; studyShelfShown = STUDY_SHELF_PAGE; $("studySearch").value = ""; studyRenderShelf();
+      studyShelfTitle.focus({ preventScroll:true });
+    });
+    studyBindShelfDropTarget(back, { type:"back", folderId:studyShelfViewFolder }); list.append(back);
+  }
+  if (!entries.length) {
+    const key = query ? "studyNoSearchResults" : studyShelfViewFolder ? "studyFolderEmpty" : "studyShelfEmpty";
+    list.append(el("div", "study-shelf-empty", tr(key)));
+    return;
+  }
+  const visible = entries.slice(0, Math.max(STUDY_SHELF_PAGE, studyShelfShown));
+  for (const entry of visible) list.append(entry.itemType === "folder" ? studyRenderFolderCard(entry.folder) : studyRenderBookCard(entry.book));
+  if (entries.length > visible.length) {
+    const more = el("button", "study-more-btn", tr("studyMore", { n:Math.min(STUDY_SHELF_PAGE, entries.length - visible.length) }));
     more.type = "button";
     more.addEventListener("click", () => { studyShelfShown = visible.length + STUDY_SHELF_PAGE; studyRenderShelf(); });
     list.append(more);
@@ -773,8 +1356,10 @@ async function studyImportTextEntry(entry, id, position, total) {
   const file = entry.file, size = Number(file.size) || 0;
   if (size > STUDY_TEXT_FILE_MAX) { studySetStatus("studyTextTooBig", { name:file.name, mb:Math.round(STUDY_TEXT_FILE_MAX / 1048576) }); return "error"; }
   if (studyCurrentBook && studyCurrentBook.id === id && !$("studyMemoEditor").hidden) {
-    await studyFlushMemo(); $("studyMemoEditor").hidden = true; $("studyTextPage").hidden = false;
-    $("studyMemoBtn").textContent = tr("studyMemoEdit"); $("studyMemoExportBtn").hidden = true;
+    if (!await studyFlushMemo(true)) return "error";
+    $("studyMemoEditor").readOnly = false; $("studyMemoEditor").hidden = true;
+    $("studyEditorNotice").hidden = true; $("studyTextPage").hidden = false;
+    $("studyMemoBtn").textContent = tr("studyMemoEdit"); $("studyMemoExportBtn").hidden = false;
     studyRenderTextContent(studyCurrentBook); studySyncTextProgress();
   }
   let old = null;
@@ -1161,10 +1746,11 @@ function studyRenderCurrentBook() {
   $("studyCurrentTitle").textContent = book.title;
   $("studyCurrentMeta").textContent = isImage ? `${tr("studyBookImages")} · ${tr("studyPageCount", { n:book.pages.length })}`
     : `${tr("studyBookText")} · ${String(book.extension || "TXT").toUpperCase()}`;
-  $("studyMemoBtn").hidden = isImage || !studyPrefs.memoEnabled;
-  $("studyMemoExportBtn").hidden = isImage || $("studyMemoEditor").hidden;
+  $("studyMemoBtn").hidden = isImage;
+  $("studyMemoExportBtn").hidden = isImage;
   $("studyTextStage").dataset.theme = studyPrefs.theme;
-  $("studyMemoEditor").hidden = true; $("studyTextPage").hidden = false;
+  $("studyMemoEditor").hidden = true; $("studyMemoEditor").readOnly = false;
+  $("studyTextPage").hidden = false; $("studyEditorNotice").hidden = true;
   $("studyMemoBtn").textContent = tr("studyMemoEdit");
   if (isImage) {
     studyCurrentPage = studyNormalizePage(book.bookmark ? book.bookmark.index : 0);
@@ -1188,18 +1774,17 @@ function studySyncCurrentBookControls() {
   $("studyTheme").value = studyPrefs.theme;
   $("studyTvCheck").checked = studyPrefs.tvEnabled;
   $("studyTvPosition").value = studyPrefs.tvPosition;
-  $("studyMemoEnabled").checked = studyPrefs.memoEnabled;
-  $("studyMemoBtn").hidden = !book || book.kind !== "text" || !studyPrefs.memoEnabled;
+  $("studyMemoBtn").hidden = !book || book.kind !== "text";
   $("studyFullscreenBtn").textContent = tr($("studyRoom").classList.contains("study-fullimage") ? "studyFullscreenExit" : "studyFullscreen");
   $("studyFullscreenBtn").hidden = !book || book.kind !== "image";
   studySyncZoomRow();
   if (book && book.kind === "image") studySyncPageCount();
 }
 async function studyOpenBook(book) {
-  if (!book) return;
+  if (!book || studyClosePending) return;
   if (studyCurrentBook && !$("studyMemoEditor").hidden) {
     if (studyCurrentBook.id === book.id) return;
-    await studyFlushMemo();
+    if (!await studyFlushMemo(true)) { $("studyMemoEditor").focus({ preventScroll:true }); return; }
   }
   studyCurrentBook = book;
   $("studyBookView").hidden = false; studySyncWelcome();
@@ -1208,11 +1793,18 @@ async function studyOpenBook(book) {
   studySetStatus(null);
 }
 async function studyBackToShelf() {
-  if (!$("studyMemoEditor").hidden) await studyFlushMemo();
+  if (studyClosePending) return false;
+  if (!$("studyMemoEditor").hidden) {
+    if (!await studyFlushMemo(true)) { $("studyMemoEditor").focus({ preventScroll:true }); return false; }
+    $("studyMemoEditor").readOnly = false; $("studyMemoEditor").hidden = true;
+    $("studyEditorNotice").hidden = true; $("studyTextPage").hidden = false; $("studyMemoExportBtn").hidden = true;
+    $("studyMemoBtn").textContent = tr("studyMemoEdit");
+  }
   studyEndSearch(); studyCurrentBook = null; studyClearPageImages();
   $("studyBookView").hidden = true;
   studySyncWelcome();
   studyApplyTVLayout();
+  return true;
 }
 function studySaveBook(book) {
   if (!book) return Promise.resolve();
@@ -1412,6 +2004,51 @@ async function studyRefreshCoverButtons() {
     clear.title = tr("studyCoverSource", { title:info.title || "?", n:info.pageIndex + 1 });
   }
 }
+function studyCreateFolder() {
+  if (!studyDataReady) { studyReadyPromise.then(() => { if (studyDataReady) studyCreateFolder(); }); return; }
+  if (studyShelfFolders.length >= STUDY_FOLDER_MAX) { studyNotify("studyFolderLimit"); return; }
+  const value = prompt(tr("studyCreateFolderPrompt"), "");
+  if (value == null) return;
+  const name = String(value).trim().slice(0, 120);
+  if (!name) { studyNotify("studyFolderNameRequired"); return; }
+  if (studyShelfFolders.some(folder => folder.name.toLocaleLowerCase() === name.toLocaleLowerCase())) { studyNotify("studyFolderDuplicate"); return; }
+  let id = `folder-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  while (studyFolderById(id)) id = `folder-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  const now = Date.now();
+  const folder = { id, name, createdAt:now, updatedAt:now };
+  studyShelfFolders.push(folder); studyShelfContainer("").push(studyShelfItemKey("folder", id));
+  studyShelfViewFolder = ""; studyShelfShown = STUDY_SHELF_PAGE; $("studySearch").value = "";
+  studyRefreshEditedTextFolderSelect(); studySaveShelfMeta(); studyRenderShelf(); studyNotify("studyFolderCreated");
+}
+function studyRenameFolder(folder) {
+  if (!folder) return;
+  const value = prompt(tr("studyRenameFolderPrompt"), folder.name);
+  if (value == null) return;
+  const name = String(value).trim().slice(0, 120);
+  if (!name) { studyNotify("studyFolderNameRequired"); return; }
+  if (studyShelfFolders.some(item => item.id !== folder.id && item.name.toLocaleLowerCase() === name.toLocaleLowerCase())) {
+    studyNotify("studyFolderDuplicate"); return;
+  }
+  folder.name = name; folder.updatedAt = Date.now();
+  studyRefreshEditedTextFolderSelect(); studySaveShelfMeta(); studyRenderShelf(); studyNotify("studyRenamed");
+}
+function studyDeleteFolder(folder) {
+  if (!folder) return;
+  const root = studyShelfContainer(""), inside = studyShelfContainer(folder.id).slice();
+  for (const key of inside) {
+    if (!key.startsWith("book:")) continue;
+    const bookId = key.slice(5);
+    if (!studyBooks.some(book => book.id === bookId)) continue;
+    studyBookFolder[bookId] = "";
+    if (!root.includes(key)) root.push(key);
+  }
+  const folderKey = studyShelfItemKey("folder", folder.id), folderIndex = root.indexOf(folderKey);
+  if (folderIndex >= 0) root.splice(folderIndex, 1);
+  studyShelfFolders = studyShelfFolders.filter(item => item.id !== folder.id);
+  delete studyShelfOrder[folder.id];
+  if (studyShelfViewFolder === folder.id) studyShelfViewFolder = "";
+  studyRefreshEditedTextFolderSelect(); studySaveShelfMeta(); studyRenderShelf(); studyNotify("studyFolderDeleted");
+}
 async function studyRenameBook(book) {
   const next = prompt(tr("studyRenamePrompt"), book.title);
   if (next == null) return;
@@ -1423,9 +2060,9 @@ async function studyRenameBook(book) {
   catch (error) { studyFail(error); }
 }
 async function studyDeleteBook(book) {
-  if (!confirm(tr("studyDeleteConfirm", { title:book.title }))) return;
+  if (!studyPrefs.skipDeleteConfirm && !confirm(tr("studyDeleteConfirm", { title:book.title }))) return;
   try {
-    if (studyCurrentBook && studyCurrentBook.id === book.id) await studyBackToShelf();
+    if (studyCurrentBook && studyCurrentBook.id === book.id && !await studyBackToShelf()) return;
     await studyDBRun("books", "readwrite", store => store.delete(book.id));
     const pageKeys = book.pages.map(page => page.key);
     if (pageKeys.length) await studyDBDeleteMany("pages", pageKeys);
@@ -1439,49 +2076,130 @@ async function studyDeleteBook(book) {
   } catch (error) { studyFail(error); }
 }
 
-/* ============ メモ帳と書き出し ============ */
-async function studyFlushMemo() {
+/* ============ テキスト編集と書き出し ============ */
+function studySetEditorStatus(key, force = false) {
+  const status = $("studyEditorSaveStatus");
+  if (!force && status.dataset.state === key) return;
+  status.dataset.state = key; status.textContent = tr(key);
+}
+function studyUpdateEditorStats() {
+  if (!studyCurrentBook || studyCurrentBook.kind !== "text") return;
+  const text = $("studyMemoEditor").hidden ? studyCurrentBook.content : $("studyMemoEditor").value;
+  $("studyEditorStats").textContent = tr("studyTextStats", STUDY_UTIL.textStats(text));
+}
+async function studyFlushMemo(seal = false) {
   clearTimeout(studyMemoSaveTimer); studyMemoSaveTimer = 0;
-  if (!studyCurrentBook || studyCurrentBook.kind !== "text" || $("studyMemoEditor").hidden) return;
-  studyCurrentBook.content = $("studyMemoEditor").value;
-  try { await studySaveBook(studyCurrentBook); studySetStatus("studyMemoSaved"); }
-  catch (error) { studyFail(error, "studyMemoSaveError"); }
+  if (!studyCurrentBook || studyCurrentBook.kind !== "text" || $("studyMemoEditor").hidden) return true;
+  const editor = $("studyMemoEditor"), book = studyCurrentBook;
+  if (seal) editor.readOnly = true;
+  const content = editor.value;
+  book.content = content;
+  studySetEditorStatus("studyEditorSaving");
+  try {
+    await studySaveBook(book);
+    const filed = await studyApplyEditedTextFolder(book);
+    if (editor.value !== content) {
+      studySetEditorStatus("studyEditorUnsaved"); studyUpdateEditorStats();
+      return true;
+    }
+    studySetEditorStatus("studyEditorSaved"); studyUpdateEditorStats();
+    studySetStatus(filed === false ? "studyEditedTextFolderSaveFailed" : "studyMemoSaved");
+    return true;
+  } catch (error) {
+    if (seal) editor.readOnly = false;
+    studySetEditorStatus("studyEditorSaveFailed"); studyFail(error, "studyMemoSaveError");
+    return false;
+  }
 }
 function studyMemoInput() {
   if (!studyCurrentBook || studyCurrentBook.kind !== "text") return;
   studyCurrentBook.content = $("studyMemoEditor").value;
-  clearTimeout(studyMemoSaveTimer); studyMemoSaveTimer = setTimeout(studyFlushMemo, 600);
+  studySetEditorStatus("studyEditorUnsaved");
+  clearTimeout(studyMemoSaveTimer); studyMemoSaveTimer = setTimeout(studyFlushMemo, 800);
 }
 function studyToggleMemo() {
+  if (studyClosePending) return;
   const book = studyCurrentBook;
   if (!book || book.kind !== "text") { studyNotify("studyMemoNeedText"); return; }
-  const editing = $("studyMemoEditor").hidden;
+  const editor = $("studyMemoEditor"), editing = editor.hidden, button = $("studyMemoBtn");
   if (editing) {
     studyEndSearch();
-    $("studyMemoEditor").value = book.content || "";
-    $("studyMemoEditor").hidden = false; $("studyTextPage").hidden = true;
-    $("studyMemoBtn").textContent = tr("studyMemoDone"); $("studyMemoExportBtn").hidden = false;
-    studySyncFindRow();
-    $("studyMemoEditor").focus({ preventScroll:true });
+    editor.value = book.content || "";
+    editor.spellcheck = ["txt", "md", "markdown"].includes(String(book.extension || "").toLowerCase());
+    editor.readOnly = false; editor.hidden = false;
+    $("studyEditorNotice").hidden = false; $("studyTextPage").hidden = true;
+    button.textContent = tr("studyMemoDone"); $("studyMemoExportBtn").hidden = false;
+    studySetEditorStatus("studyEditorSaved", true); studyUpdateEditorStats(); studySyncFindRow();
+    editor.focus({ preventScroll:true });
   } else {
-    studyFlushMemo().finally(() => {
-      $("studyMemoEditor").hidden = true; $("studyTextPage").hidden = false;
-      $("studyMemoBtn").textContent = tr("studyMemoEdit"); $("studyMemoExportBtn").hidden = true;
+    button.disabled = true;
+    studyFlushMemo(true).then(saved => {
+      button.disabled = false;
+      if (!saved) { editor.focus({ preventScroll:true }); return; }
+      editor.readOnly = false; editor.hidden = true; $("studyEditorNotice").hidden = true; $("studyTextPage").hidden = false;
+      button.textContent = tr("studyMemoEdit"); $("studyMemoExportBtn").hidden = false;
       studyRenderTextContent(book); studySyncTextProgress(); studySyncFindRow();
     });
   }
 }
-function studyExportText() {
+async function studyWriteExportCopy(directory, blob, title, extension) {
+  const safeTitle = String(title || "notes").replace(/[\\/:*?"<>|\u0000-\u001f]/g, "_").trim().slice(0, 80) || "notes";
+  const rawExtension = String(extension || "txt").toLowerCase();
+  const ext = /^[a-z0-9]{1,16}$/.test(rawExtension) ? rawExtension : "txt";
+  const token = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID().slice(0, 8) : Math.random().toString(36).slice(2, 10);
+  const stem = `${safeTitle} - edited-${Date.now().toString(36)}-${token}`;
+  let filename = "", available = false;
+  for (let index = 1; index <= 1000; index++) {
+    const candidate = `${stem}${index === 1 ? "" : ` (${index})`}.${ext}`;
+    try { await directory.getFileHandle(candidate); }
+    catch (error) {
+      if (!error || error.name !== "NotFoundError") throw error;
+      filename = candidate; available = true; break;
+    }
+  }
+  if (!available) throw new Error("Could not find an unused export filename");
+  const fileHandle = await directory.getFileHandle(filename, { create:true });
+  const writable = await fileHandle.createWritable();
+  try { await writable.write(blob); await writable.close(); }
+  catch (error) { if (typeof writable.abort === "function") { try { await writable.abort(); } catch (_) {} } throw error; }
+  return filename;
+}
+async function studyChooseExportDirectory() {
+  if (!studyCanChooseExportFolder()) { studyRefreshExportFolderUI(); return; }
+  try {
+    studyExportDirectory = await window.showDirectoryPicker({ id:"trk-study-text-export", mode:"readwrite" });
+    studyRefreshExportFolderUI();
+  } catch (error) {
+    if (error && error.name === "AbortError") return;
+    studyFail(error, "studyExportFolderSelectError");
+  }
+}
+async function studyExportText() {
   if (!studyCurrentBook || studyCurrentBook.kind !== "text") return;
-  const text = $("studyMemoEditor").hidden ? studyCurrentBook.content : $("studyMemoEditor").value;
-  const ext = studyCurrentBook.extension || "txt", blob = new Blob([text], { type:"text/plain;charset=utf-8" });
-  const name = `${(studyCurrentBook.title || "notes").replace(/[\\/:*?"<>|]/g, "_")}.${ext}`;
-  if (typeof downloadBlob === "function") downloadBlob(blob, name);
+  const book = studyCurrentBook;
+  const text = $("studyMemoEditor").hidden ? book.content : $("studyMemoEditor").value;
+  const title = String(book.title || "notes").replace(/[\\/:*?"<>|\u0000-\u001f]/g, "_").trim().slice(0, 80) || "notes";
+  const rawExtension = String(book.extension || "txt").toLowerCase();
+  const ext = /^[a-z0-9]{1,16}$/.test(rawExtension) ? rawExtension : "txt";
+  const blob = new Blob([text], { type:"text/plain;charset=utf-8" });
+  let fallback = false;
+  if (studyExportDirectory) {
+    try {
+      const name = await studyWriteExportCopy(studyExportDirectory, blob, title, ext);
+      studyNotify("studyExportSavedToFolder", { name, folder:studyExportDirectory.name }); return;
+    } catch (error) { console.warn(error); fallback = true; }
+  }
+  if (typeof downloadBlob === "function") {
+    downloadBlob(blob, `${title} - edited.${ext}`);
+    if (fallback) studyNotify("studyExportFolderFallback");
+  } else if (fallback) studyNotify("studyExportFolderFallback");
 }
 
 /* ============ ❓ キーの説明 ============ */
 function studyHelpOpen() {
   if (!studyRoomOpen || !$("studyHelp").hidden) return;
+  if (studyKeyCaptureAction) { studyKeyCaptureAction = ""; studyRefreshKeyAssignments(); }
   $("studyHelp").hidden = false;
   $("studyHelpCloseBtn").focus({ preventScroll:true });
 }
@@ -1505,12 +2223,55 @@ function studyTypingTarget(target) {
 function studyActivateTarget(target) {
   return !!(target && typeof target.closest === "function" && target.closest("button,summary,a[href],[role='button'],[role='link']"));
 }
+function studyEditorHandleTab(event) {
+  const editor = event.target;
+  if (event.code !== "Tab" || !editor || editor.id !== "studyMemoEditor") return false;
+  event.preventDefault(); event.stopImmediatePropagation();
+  const start = editor.selectionStart, end = editor.selectionEnd, text = editor.value;
+  let changed = false;
+  if (!event.shiftKey && start === end) {
+    if (typeof editor.setRangeText === "function") editor.setRangeText("\t", start, end, "end");
+    else { editor.value = `${text.slice(0, start)}\t${text.slice(end)}`; editor.setSelectionRange(start + 1, start + 1); }
+    changed = true;
+  } else {
+    const firstLineStart = text.lastIndexOf("\n", start - 1) + 1;
+    const lastSelectedPosition = Math.max(start, end - 1);
+    const nextLineBreak = text.indexOf("\n", lastSelectedPosition);
+    const blockEnd = nextLineBreak < 0 ? text.length : nextLineBreak;
+    const lines = text.slice(firstLineStart, blockEnd).split("\n");
+    const replaceLines = replacement => {
+      if (typeof editor.setRangeText === "function") editor.setRangeText(replacement, firstLineStart, blockEnd, "preserve");
+      else editor.value = `${text.slice(0, firstLineStart)}${replacement}${text.slice(blockEnd)}`;
+    };
+    if (!event.shiftKey) {
+      replaceLines(lines.map(line => `\t${line}`).join("\n"));
+      editor.setSelectionRange(start + 1, end + lines.length); changed = true;
+    } else {
+      const removed = lines.map(line => (line.match(/^(?:\t| {1,4})/) || [""])[0].length);
+      if (removed.some(length => length > 0)) {
+        replaceLines(lines.map((line, index) => line.slice(removed[index])).join("\n"));
+        const lastLineStart = firstLineStart + lines.slice(0, -1).reduce((length, line) => length + line.length + 1, 0);
+        const startRemoved = Math.min(removed[0], start - firstLineStart);
+        const endRemoved = removed.slice(0, -1).reduce((sum, length) => sum + length, 0) +
+          Math.min(removed[removed.length - 1], Math.max(0, end - lastLineStart));
+        editor.setSelectionRange(start - startRemoved, end - endRemoved); changed = true;
+      }
+    }
+  }
+  if (changed) editor.dispatchEvent(new Event("input", { bubbles:true }));
+  return true;
+}
 function studyKeyDown(event) {
   if (!studyRoomOpen) return;
+  if (studyHandleKeyCapture(event)) return;
   if (event.code === "Escape" && event.target && event.target.id === "studyMemoEditor") {
     event.preventDefault(); event.stopImmediatePropagation();
     $("studyMemoEditor").blur(); studyToggleMemo(); return;
   }
+  if (event.target && event.target.id === "studyMemoEditor" && !event.shiftKey && (event.ctrlKey || event.metaKey) && event.code === "KeyS") {
+    event.preventDefault(); event.stopImmediatePropagation(); studyFlushMemo(); return;
+  }
+  if (studyEditorHandleTab(event)) return;
   const helpOpen = !$("studyHelp").hidden;
   if (helpOpen) {
     if (event.code === "Escape") { event.preventDefault(); event.stopImmediatePropagation(); studyCloseHelp(); return; }
@@ -1542,8 +2303,12 @@ function studyKeyDown(event) {
   const key = event.key || "";
   if ((event.ctrlKey || event.metaKey) && event.code === "KeyF") { event.preventDefault(); event.stopImmediatePropagation(); studyFocusSearch(); return; }
   if (key === "?" || (event.code === "Slash" && event.shiftKey)) { event.preventDefault(); event.stopImmediatePropagation(); studyToggleHelp(); return; }
-  if (event.code === "ArrowLeft" || event.code === "ArrowRight") {
-    event.preventDefault(); event.stopImmediatePropagation(); studyStepPhysical(event.code === "ArrowLeft" ? "left" : "right"); return;
+  if (event.code === studyPrefs.studyNextKey || event.code === studyPrefs.studyPreviousKey) {
+    event.preventDefault(); event.stopImmediatePropagation(); studyStep(event.code === studyPrefs.studyNextKey ? 1 : -1); return;
+  }
+  if (studyPrefs.verticalImageKeys && studyCurrentBook && studyCurrentBook.kind === "image" &&
+      (event.code === "ArrowUp" || event.code === "ArrowDown")) {
+    event.preventDefault(); event.stopImmediatePropagation(); studyStep(event.code === "ArrowDown" ? 1 : -1); return;
   }
   if (event.code === "PageDown") { event.preventDefault(); event.stopImmediatePropagation(); studyStep(1); return; }
   if (event.code === "PageUp") { event.preventDefault(); event.stopImmediatePropagation(); studyStep(-1); return; }
@@ -1695,9 +2460,17 @@ function studyOpenRoom() {
   $("studyCloseBtn").focus({ preventScroll:true });
   if (!studyPrefs.helpSeen) { studyPrefs.helpSeen = true; studySavePrefs(); studyHelpOpen(); }
 }
-function studyCloseRoom() {
-  if (!studyRoomOpen) return;
-  studyFlushMemo(); clearTimeout(studyHoldTimer); studyHoldTimer = 0; studyHeldCode = ""; studyPointerStart = null;
+async function studyCloseRoom() {
+  if (!studyRoomOpen || studyClosePending) return;
+  studyClosePending = true;
+  studyKeyCaptureAction = ""; studyRefreshKeyAssignments();
+  const editor = $("studyMemoEditor");
+  if (!editor.hidden && !await studyFlushMemo(true)) {
+    studyClosePending = false; editor.focus({ preventScroll:true }); return;
+  }
+  editor.readOnly = false;
+  clearTimeout(studyHoldTimer); studyHoldTimer = 0; studyHeldCode = ""; studyPointerStart = null;
+  clearTimeout(studyShelfHoldTimer); studyShelfHoldTimer = 0; studyShelfHoldFired = false;
   studyPointers.clear(); studyPinchStart = 0;
   if (!$("studyHelp").hidden) $("studyHelp").hidden = true;
   studyEndSearch();
@@ -1709,6 +2482,7 @@ function studyCloseRoom() {
   studyTVToken++; studyRestoreVideoHome();
   studyClearImage($("studyTvArt")); studyTVArtUrl = ""; studyTVArtSong = "";
   const title = document.querySelector("#libPanel .libHead .study-launch-title"); if (title) title.focus({ preventScroll:true });
+  studyClosePending = false;
 }
 async function studyToggleFullscreen() {
   if (!studyCurrentBook || studyCurrentBook.kind !== "image") return;
@@ -1727,9 +2501,42 @@ async function studyToggleFullscreen() {
 
 /* ============ 配線 ============ */
 const studyRoom = $("studyRoom");
-for (const node of studyRoom.querySelectorAll("[data-i18n]")) node.textContent = tr(node.dataset.i18n);
+function studyTranslateNodes() {
+  for (const node of studyRoom.querySelectorAll("[data-i18n]")) {
+    const translated = tr(node.dataset.i18n);
+    if (node.tagName === "OPTGROUP") node.label = translated;
+    else node.textContent = translated;
+  }
+}
+studyTranslateNodes();
 $("studySearch").placeholder = tr("studySearch");
 $("studyFindInput").placeholder = tr("studyBookSearchPlaceholder");
+const studyShelfTitle = $("studyShelfCreateFolder");
+function studySyncShelfTitleHint() {
+  studyShelfTitle.title = tr("studyFolderCreateHint");
+  studyShelfTitle.setAttribute("aria-label", `${tr("studyShelf")}. ${tr("studyFolderCreateHint")}`);
+}
+studySyncShelfTitleHint();
+studyShelfTitle.addEventListener("pointerdown", event => {
+  if (event.button != null && event.button !== 0) return;
+  clearTimeout(studyShelfHoldTimer); studyShelfHoldFired = false;
+  studyShelfHoldTimer = setTimeout(() => {
+    studyShelfHoldTimer = 0; studyShelfHoldFired = true; studyCreateFolder();
+    setTimeout(() => { studyShelfHoldFired = false; }, 1200);
+  }, 650);
+});
+const releaseShelfTitle = () => { clearTimeout(studyShelfHoldTimer); studyShelfHoldTimer = 0; };
+for (const type of ["pointerup", "pointercancel", "pointerleave"]) studyShelfTitle.addEventListener(type, releaseShelfTitle);
+studyShelfTitle.addEventListener("contextmenu", event => event.preventDefault());
+studyShelfTitle.addEventListener("click", event => {
+  if (studyShelfHoldFired) { studyShelfHoldFired = false; event.preventDefault(); event.stopPropagation(); return; }
+  studyCreateFolder();
+});
+$("studyShowShelfBtn").addEventListener("click", () => {
+  studySetShelfVisible(true); $("studyShelfCreateFolder").focus({ preventScroll:true });
+});
+$("studyNextKeyBtn").addEventListener("click", () => studySetKeyCapture("next"));
+$("studyPreviousKeyBtn").addEventListener("click", () => studySetKeyCapture("previous"));
 $("studyCloseBtn").addEventListener("click", studyCloseRoom);
 $("studyBackBtn").addEventListener("click", studyBackToShelf);
 $("studyFullscreenBtn").addEventListener("click", studyToggleFullscreen);
@@ -1748,10 +2555,16 @@ $("studyAssignCoverBtn").addEventListener("click", studyAssignCurrentCover);
 $("studyClearCoverBtn").addEventListener("click", () => studyClearSongCover());
 $("studyMemoBtn").addEventListener("click", studyToggleMemo);
 $("studyMemoExportBtn").addEventListener("click", studyExportText);
+$("studyChooseExportFolderBtn").addEventListener("click", studyChooseExportDirectory);
+$("studyClearExportFolderBtn").addEventListener("click", () => { studyExportDirectory = null; studyRefreshExportFolderUI(); });
 $("studyMemoEditor").addEventListener("input", studyMemoInput);
 $("studyProgress").addEventListener("change", studyJumpFromSlider);
 $("studyProgressDoneBtn").addEventListener("click", studyHideProgress);
 $("studySearch").addEventListener("input", () => { studyShelfShown = STUDY_SHELF_PAGE; studyRenderShelf(); });
+const studyShelfList = $("studyShelfList");
+studyShelfList.addEventListener("dragover", event => studyShelfDragOver(event, { type:"container", folderId:studyShelfViewFolder }, studyShelfList));
+studyShelfList.addEventListener("dragleave", event => { if (!studyShelfList.contains(event.relatedTarget)) studyShelfList.classList.remove("study-drop-target"); });
+studyShelfList.addEventListener("drop", event => studyShelfDrop(event, { type:"container", folderId:studyShelfViewFolder }));
 $("studyImageFolderInput").addEventListener("change", event => {
   const files = Array.from(event.target.files || []); event.target.value = ""; if (files.length) studyImportImages(files);
 });
@@ -1787,12 +2600,21 @@ studyBindPref("studyTvLook", "tvLook", studySyncLook);
 studyBindPref("studyTvSize", "tvSize", studySyncLook);
 studyBindPref("studyTvRatio", "tvRatio", studySyncLook);
 studyBindPref("studyTvLabelOn", "tvLabelOn", studySyncLook);
-studyBindPref("studyMemoEnabled", "memoEnabled", () => {
-  if (studyCurrentBook) studySyncCurrentBookControls();
-  if (!studyPrefs.memoEnabled && !$("studyMemoEditor").hidden) studyToggleMemo();
-});
 studyBindPref("studyShelfSort", "shelfSort", () => studyRefreshBooks());
+studyBindPref("studyManualShelfOrder", "manualShelfOrder", () => {
+  $("studyShelfSort").disabled = studyPrefs.manualShelfOrder; studyShelfShown = STUDY_SHELF_PAGE; studyRenderShelf();
+});
+studyBindPref("studyFoldersFirst", "foldersFirst", () => { studyShelfShown = STUDY_SHELF_PAGE; studyRenderShelf(); });
+studyBindPref("studySkipDeleteConfirm", "skipDeleteConfirm");
+studyBindPref("studyShelfVisible", "shelfVisible", () => {
+  studyApplyShelfVisibility();
+  if (!studyPrefs.shelfVisible) $("studyShowShelfBtn").focus({ preventScroll:true });
+});
+studyBindPref("studyVerticalImageKeys", "verticalImageKeys");
 studyBindPref("studyAlbumNesting", "albumNesting", () => studySetStatus("studyAlbumNestingHint"));
+studyBindPref("studyEditedTextFolder", "editedTextFolderId", () => {
+  if (studyCurrentBook && studyCurrentBook.kind === "text" && !$("studyMemoEditor").hidden) studyFlushMemo();
+});
 $("studyFindInput").addEventListener("input", () => studyRunSearch($("studyFindInput").value));
 $("studyFindInput").addEventListener("keydown", event => {
   if (event.code === "Enter") { event.preventDefault(); studySearchGo(studySearchState.index + (event.shiftKey ? -1 : 1)); }
@@ -1835,9 +2657,13 @@ on("studyCoverChanged", key => {
 });
 on("phase", p => { if (p !== "title") studyCloseRoom(); else { studyRefreshTV(); studyRefreshCoverButtons(); } });
 on("language", () => {
-  for (const node of studyRoom.querySelectorAll("[data-i18n]")) node.textContent = tr(node.dataset.i18n);
+  studyTranslateNodes();
   $("studySearch").placeholder = tr("studySearch");
   $("studyFindInput").placeholder = tr("studyBookSearchPlaceholder");
+  studySyncShelfTitleHint(); studyApplyShelfVisibility(); studyRefreshKeyAssignments();
+  studyRefreshEditedTextFolderSelect(); studyRefreshExportFolderUI();
+  $("studyMemoBtn").textContent = tr($("studyMemoEditor").hidden ? "studyMemoEdit" : "studyMemoDone");
+  studySetEditorStatus($("studyEditorSaveStatus").dataset.state || "studyEditorSaved", true); studyUpdateEditorStats();
   studyRenderShelf(); studyRenderBookmarks();
   studySyncZoomRow(); studySyncLook();
   if (studyCurrentBook) {
@@ -1845,7 +2671,7 @@ on("language", () => {
     $("studyCurrentMeta").textContent = studyCurrentBook.kind === "image" ? `${tr("studyBookImages")} · ${tr("studyPageCount", { n:studyCurrentBook.pages.length })}`
       : `${tr("studyBookText")} · ${String(studyCurrentBook.extension || "TXT").toUpperCase()}`;
     $("studyMemoBtn").textContent = $("studyMemoEditor").hidden ? tr("studyMemoEdit") : tr("studyMemoDone");
-    $("studyMemoExportBtn").hidden = studyCurrentBook.kind !== "text" || $("studyMemoEditor").hidden;
+    $("studyMemoExportBtn").hidden = studyCurrentBook.kind !== "text";
     studySyncPageCount(); studySyncCurrentBookControls(); studySyncTextProgress(); studyUpdateSearchCount();
   }
 });
@@ -1890,8 +2716,12 @@ let studyReadyPromise = Promise.resolve();
 async function studyInit() {
   if (studySafeMode()) return;
   try {
-    const saved = await studyDBRun("settings", "readonly", store => store.get("ui"));
-    studyReadPrefs(saved); studyRefreshPrefsUI(); await studyRefreshBooks();
+    const [saved, shelf] = await Promise.all([
+      studyDBRun("settings", "readonly", store => store.get("ui")),
+      studyDBRun("settings", "readonly", store => store.get("shelf"))
+    ]);
+    studyReadPrefs(saved); studyReadShelfMeta(shelf); studyRefreshPrefsUI(); await studyRefreshBooks();
+    studyDataReady = true;
     const cleaned = await studySweepOrphans();
     if (cleaned) studySetStatus("studyOrphanSweep", { n:cleaned });
   } catch (error) { studyFail(error); }

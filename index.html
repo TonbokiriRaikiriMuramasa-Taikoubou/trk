@@ -1250,6 +1250,7 @@
         <div id="studyStatus" class="study-status" aria-live="polite"></div>
       </div>
       <div class="study-import-actions">
+        <button id="studyShowShelfBtn" type="button" class="study-file-btn study-show-shelf" aria-controls="studyShelf" hidden data-i18n="studyShowShelf">📚 本棚を表示</button>
         <label class="study-file-btn">
           <input id="studyImageFolderInput" type="file" webkitdirectory multiple accept="image/*" hidden>
           <span data-i18n="studyImportImages">🖼 画像フォルダを取り込む</span>
@@ -1268,9 +1269,9 @@
     </header>
 
     <div class="study-workspace">
-      <aside class="study-shelf" aria-label="Study shelf">
+      <aside id="studyShelf" class="study-shelf" aria-label="Study shelf">
         <div class="study-shelf-heading">
-          <strong data-i18n="studyShelf">本棚</strong>
+          <button id="studyShelfCreateFolder" type="button" class="study-shelf-title" data-i18n="studyShelf">本棚</button>
           <div class="study-shelf-btns">
             <button id="studyBookmarksBtn" type="button" class="study-icon-btn" aria-pressed="false" data-i18n="studyBookmarks">🔖 栞一覧</button>
             <span id="studyBookmarkCount" class="study-badge" hidden>0</span>
@@ -1288,6 +1289,69 @@
             <option value="size" data-i18n="studySortSize">大きい順</option>
           </select>
         </div>
+        <details class="study-advanced study-shelf-advanced">
+          <summary data-i18n="studyAdvanced">⚙ 上級者向け</summary>
+          <label class="study-check-option">
+            <input id="studyShelfVisible" type="checkbox" checked>
+            <span data-i18n="studyKeepShelfVisible">全画面以外では本棚を表示する</span>
+          </label>
+          <p class="study-advanced-hint" data-i18n="studyShelfVisibilityHint">チェックを外しても、上の「本棚を表示」からいつでも戻せます。</p>
+          <label class="study-check-option">
+            <input id="studyManualShelfOrder" type="checkbox">
+            <span data-i18n="studyNoSort">並び替えを使わない。</span>
+          </label>
+          <p class="study-advanced-hint" data-i18n="studyManualOrderHint">自動並び替えを止め、ドラッグでフォルダや本を自由に配置します。</p>
+          <label class="study-check-option">
+            <input id="studyFoldersFirst" type="checkbox">
+            <span data-i18n="studyFoldersFirst">フォルダを上に表示する。</span>
+          </label>
+          <label class="study-check-option">
+            <input id="studySkipDeleteConfirm" type="checkbox">
+            <span data-i18n="studyNoDeleteConfirm">削除の時、確認をしない。</span>
+          </label>
+          <div class="study-advanced-row study-key-row">
+            <span id="studyNextKeyLabel" data-i18n="studyNextKeyLabel">次へ</span>
+            <button id="studyNextKeyBtn" type="button" class="study-key-capture" aria-pressed="false">
+              <kbd id="studyNextKeyValue">→</kbd><span id="studyNextKeyAction" data-i18n="studyKeyChange">変更</span>
+            </button>
+          </div>
+          <div class="study-advanced-row study-key-row">
+            <span id="studyPreviousKeyLabel" data-i18n="studyPreviousKeyLabel">前へ</span>
+            <button id="studyPreviousKeyBtn" type="button" class="study-key-capture" aria-pressed="false">
+              <kbd id="studyPreviousKeyValue">←</kbd><span id="studyPreviousKeyAction" data-i18n="studyKeyChange">変更</span>
+            </button>
+          </div>
+          <label class="study-check-option">
+            <input id="studyVerticalImageKeys" type="checkbox">
+            <span data-i18n="studyVerticalImageKeys">画像ページを↑ / ↓で移動する</span>
+          </label>
+          <p class="study-advanced-hint" data-i18n="studyKeyAssignmentHint">ボタンを押してから使いたいキーを押します。設定済みのショートカットは選べません。</p>
+          <div class="study-advanced-row">
+            <span data-i18n="studyAlbumNestingLabel" id="studyAlbumNestingLabel">アルバムの分け方</span>
+            <select id="studyAlbumNesting" aria-labelledby="studyAlbumNestingLabel">
+              <option value="split" data-i18n="studyAlbumNestingSplit">サブフォルダごとに1冊</option>
+              <option value="flat" data-i18n="studyAlbumNestingFlat">フォルダ全体で1冊</option>
+            </select>
+          </div>
+          <p class="study-advanced-hint" data-i18n="studyAlbumNestingHint">次の取り込みから反映します。</p>
+          <div class="study-advanced-row study-edited-text-folder-row">
+            <span id="studyEditedTextFolderLabel" data-i18n="studyEditedTextFolderLabel">編集した文章の本棚フォルダ</span>
+            <select id="studyEditedTextFolder" aria-labelledby="studyEditedTextFolderLabel" aria-describedby="studyEditedTextFolderHint">
+              <option value="" data-i18n="studyEditedTextFolderKeep">自動で移動しない（今の場所）</option>
+            </select>
+          </div>
+          <p id="studyEditedTextFolderHint" class="study-advanced-hint" data-i18n="studyEditedTextFolderHint">選ぶと、編集内容を保存した本をこのフォルダへ整理します。本文は端末内の書斎に保存し、元ファイルは変更しません。</p>
+          <div class="study-advanced-row study-export-folder-row">
+            <span id="studyExportFolderLabel" data-i18n="studyExportFolderLabel">書き出し先（端末）</span>
+            <div class="study-export-folder-controls">
+              <button id="studyChooseExportFolderBtn" type="button" class="study-small-btn" aria-describedby="studyExportFolderHint" data-i18n="studyChooseExportFolder">書き出しフォルダを選ぶ</button>
+              <button id="studyClearExportFolderBtn" type="button" class="study-small-btn" data-i18n="studyClearExportFolder" hidden>解除</button>
+            </div>
+          </div>
+          <p id="studyExportFolderName" class="study-export-folder-name" role="status" aria-live="polite">未選択（ブラウザの通常ダウンロード先）</p>
+          <p id="studyExportFolderHint" class="study-advanced-hint" data-i18n="studyExportFolderHint">選んだフォルダに新しいファイルを作成します。同名があれば別名にし、既存ファイルは上書きしません。未対応ブラウザでは通常のダウンロードを使います。</p>
+        </details>
+        <p id="studyShelfDragHelp" class="study-shelf-draghint" data-i18n="studyShelfDragHint" hidden></p>
         <div id="studyShelfList" class="study-shelf-list"></div>
         <div id="studyBookmarkPanel" class="study-bookmark-list" hidden></div>
         <div id="studyImportWrap" class="study-import-wrap" hidden>
@@ -1349,11 +1413,38 @@
             <label id="studyThemeRow" class="study-option">
               <span data-i18n="studyThemeLabel">文字のスキン</span>
               <select id="studyTheme">
-                <option value="plain" data-i18n="studyThemePlain">普通のテキスト</option>
-                <option value="dark" data-i18n="studyThemeDark">ダークモード</option>
-                <option value="neon" data-i18n="studyThemeNeon">ネオン</option>
-                <option value="lined" data-i18n="studyThemeLined">ルーズリーフ</option>
-                <option value="genko" data-i18n="studyThemeGenko">作文用紙（縦書き・右から）</option>
+                <optgroup data-i18n="studyThemeGroupWriter" label="✍ 文筆・読書">
+                  <option value="plain" data-i18n="studyThemePlain">普通のテキスト</option>
+                  <option value="paper" data-i18n="studyThemePaper">和紙</option>
+                  <option value="warm" data-i18n="studyThemeWarm">クリーム</option>
+                  <option value="lined" data-i18n="studyThemeLined">ルーズリーフ</option>
+                  <option value="genko" data-i18n="studyThemeGenko">作文用紙（縦書き・右から）</option>
+                  <option value="sepia" data-i18n="studyThemeSepia">古書</option>
+                </optgroup>
+                <optgroup data-i18n="studyThemeGroupCode" label="⌨ コーディング">
+                  <option value="dark" data-i18n="studyThemeDark">ダークモード</option>
+                  <option value="midnight" data-i18n="studyThemeMidnight">ミッドナイト</option>
+                  <option value="terminal" data-i18n="studyThemeTerminal">ターミナル</option>
+                  <option value="graphite" data-i18n="studyThemeGraphite">グラファイト</option>
+                  <option value="blueprint" data-i18n="studyThemeBlueprint">設計図</option>
+                  <option value="contrast" data-i18n="studyThemeContrast">高コントラスト</option>
+                </optgroup>
+                <optgroup data-i18n="studyThemeGroupAi" label="◈ AI・プロンプト風（見た目のみ）">
+                  <option value="prompt" data-i18n="studyThemePrompt">プロンプト・ラボ</option>
+                  <option value="neural" data-i18n="studyThemeNeural">ニューラル</option>
+                  <option value="latent" data-i18n="studyThemeLatent">潜在空間</option>
+                  <option value="matrix" data-i18n="studyThemeMatrix">トークン・マトリクス</option>
+                  <option value="synth" data-i18n="studyThemeSynth">シンセシス</option>
+                </optgroup>
+                <optgroup data-i18n="studyThemeGroupFree" label="✦ 自由な発想">
+                  <option value="neon" data-i18n="studyThemeNeon">ネオン</option>
+                  <option value="aurora" data-i18n="studyThemeAurora">オーロラ</option>
+                  <option value="sunset" data-i18n="studyThemeSunset">サンセット</option>
+                  <option value="ocean" data-i18n="studyThemeOcean">深海</option>
+                  <option value="mint" data-i18n="studyThemeMint">ミント</option>
+                  <option value="dream" data-i18n="studyThemeDream">ドリーム</option>
+                  <option value="prism" data-i18n="studyThemePrism">プリズム</option>
+                </optgroup>
               </select>
             </label>
             <span id="studyTextTuneRow" class="study-option">
@@ -1419,22 +1510,6 @@
               <span data-i18n="studyTvNameToggle">曲名を表示</span>
             </label>
             <button id="studyBookmarkBtn" type="button" class="study-small-btn" data-i18n="studyBookmark">🔖 栞を挟む</button>
-            <details class="study-advanced">
-              <summary data-i18n="studyAdvanced">⚙ 上級者向け</summary>
-              <label class="study-check-option">
-                <input id="studyMemoEnabled" type="checkbox">
-                <span data-i18n="studyMemoToggle">テキストをメモ帳として編集可能にする</span>
-              </label>
-              <p class="study-advanced-hint" data-i18n="studyMemoHint">編集は書斎内のコピーに保存し、元ファイルは変更しません。</p>
-              <div class="study-advanced-row">
-                <span data-i18n="studyAlbumNestingLabel" id="studyAlbumNestingLabel">アルバムの分け方</span>
-                <select id="studyAlbumNesting" aria-labelledby="studyAlbumNestingLabel">
-                  <option value="split" data-i18n="studyAlbumNestingSplit">サブフォルダごとに1冊</option>
-                  <option value="flat" data-i18n="studyAlbumNestingFlat">フォルダ全体で1冊</option>
-                </select>
-              </div>
-              <p class="study-advanced-hint" data-i18n="studyAlbumNestingHint">次の取り込みから反映します。</p>
-            </details>
           </div>
 
           <div id="studyFindRow" class="study-find-row" hidden>
@@ -1473,8 +1548,18 @@
                 <div id="studyImageHint" class="study-image-hint" data-i18n="studyTapHint">左側／←で次へ · 右側／→で前へ · Space / Enterで次へ</div>
               </div>
               <div id="studyTextStage" class="study-text-stage" hidden>
+                <div id="studyEditorNotice" class="study-editor-notice" hidden>
+                  <div class="study-editor-notice-copy">
+                    <label id="studyEditorLabel" for="studyMemoEditor" data-i18n="studyEditorLabel">テキスト編集</label>
+                    <p id="studyEditorSafetyText" data-i18n="studyEditorSafety">書斎内のコピーを編集します。元ファイルは変更せず、JS / HTMLも文字として扱い実行しません。</p>
+                  </div>
+                  <div class="study-editor-meta">
+                    <span id="studyEditorStats" class="study-editor-stats"></span>
+                    <span id="studyEditorSaveStatus" class="study-editor-save-status" data-state="studyEditorSaved" role="status" aria-live="polite">書斎に保存済み</span>
+                  </div>
+                </div>
                 <article id="studyTextPage" class="study-text-page" tabindex="0" data-search=""></article>
-                <textarea id="studyMemoEditor" class="study-memo-editor" spellcheck="false" hidden></textarea>
+                <textarea id="studyMemoEditor" class="study-memo-editor" aria-labelledby="studyEditorLabel" aria-describedby="studyEditorSafetyText" maxlength="12582912" spellcheck="false" hidden></textarea>
               </div>
             </section>
           </div>

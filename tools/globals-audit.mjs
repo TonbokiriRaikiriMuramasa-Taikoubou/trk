@@ -218,7 +218,11 @@ export function audit(root = ROOT) {
   const units = order.map(s => {
     const text = s.kind === "file" ? fs.readFileSync(path.join(root, s.name), "utf8") : s.body;
     const stripped = stripCode(text);
-    return { name: s.name, decls: topLevelNames(stripped), ids: identifiers(stripped), ...windowProps(stripped) };
+    // 包んだファイル（先頭が「(() => {」）：中身のうち window に出す名前だけが大域に残る
+    const wrapped = /^\s*\(\s*\(\s*\)\s*=>\s*\{/.test(stripped);
+    // Object.defineProperty(window, "NAME", …) も window に出す（文字列は stripCode で消えるので元の本文から読む）
+    const defined = new Set([...text.matchAll(/defineProperty\(\s*(?:window|globalThis|self)\s*,\s*"([A-Za-z_$][\w$]*)"/g)].map(m => m[1]));
+    return { name: s.name, wrapped, defined, decls: topLevelNames(stripped), ids: identifiers(stripped), ...windowProps(stripped) };
   });
   const result = units.map(u => {
     const publicNames = [];
@@ -227,9 +231,11 @@ export function audit(root = ROOT) {
       const usedBy = units.filter(o => o !== u && (o.ids.has(name) || o.winReads.has(name))).map(o => o.name);
       if (usedBy.length) publicNames.push({ name, usedBy });
     }
+    // 大域に残る名前：包みの外の宣言、または包みの中で window に出す名前
+    const globalNames = u.wrapped ? u.decls.filter(n => u.winWrites.has(n) || u.defined.has(n)) : u.decls;
     return {
       file: u.name, decls: u.decls.length, private: u.decls.length - publicNames.length,
-      public: publicNames, names: u.decls,
+      public: publicNames, names: u.decls, wrapped: u.wrapped, globalNames,
     };
   });
   /* 同じ名前を2つのファイルが宣言していると、後から読んだ方が前を上書きする（大域の衝突） */
@@ -254,6 +260,7 @@ export function audit(root = ROOT) {
     declarations: result.reduce((a, r) => a + r.decls, 0),
     private: result.reduce((a, r) => a + r.private, 0),
     public: result.reduce((a, r) => a + r.public.length, 0),
+    globalNames: result.reduce((a, r) => a + r.globalNames.length, 0),
   };
   return { totals, files: result, duplicates, windowCoupling };
 }
@@ -263,6 +270,7 @@ function printReport(res) {
   console.log(`  private（他から使われない・包んでも安全な候補）: ${res.totals.private}`);
   console.log(`  public （他のファイルから使われる）            : ${res.totals.public}`);
   console.log(`  同名の重複宣言（別ファイル）                   : ${res.totals.duplicates}`);
+  console.log(`  大域に残る名前（包みの外の宣言＋包みの中で window に出す名前）: ${res.totals.globalNames}`);
   for (const d of res.duplicates) console.log(`    ! ${d.name}  ← ${d.files.join(", ")}`);
   console.log(`  window 経由の連携（window.X を書いて別ファイルが読む）: ${res.windowCoupling.filter(w => w.readers.length).length} 件`);
   for (const w of res.windowCoupling.filter(x => x.readers.length)) console.log(`    · window.${w.name}  書く:${w.writers.join(",")}  読む:${w.readers.join(",")}`);

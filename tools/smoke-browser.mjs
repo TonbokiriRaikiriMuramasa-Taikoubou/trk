@@ -9,7 +9,7 @@
  *
  * 見ること：
  *   1. 起動直後のエラー（pageerror／console.error）
- *   2. 監査（tools/globals-audit.mjs）がトップレベルと判定した名前が、実行時に本当に解決できるか
+ *   2. 監査（tools/globals-audit.mjs）が大域に残ると判定した名前（包みの外の宣言・window に出す名前）が、実行時に本当に解決できるか
  *   3. 合成曲の譜面（生成方式 1／2 × 難易度すべて）の一致（ノーツ列のハッシュ）
  *   4. 画面の見えているボタンを順に押したときの新しいエラー
  *   5. 公開 API を通す場面（書斎の開閉・一覧・統計・掃除）の結果と、その間のエラー
@@ -107,11 +107,14 @@ async function main() {
     errors.length = 0;
 
     /* 2. 名前の解決：監査が宣言とみなした名前（トップレベル）は、実行時に参照できるはず */
-    const auditAll = uniq(audit().files.flatMap(f => f.names));
+    /* 包んだ中の私有の名前は大域に無いのが正しいので、確かめるのは大域に残る名前だけ */
+    const audited = audit().files;
+    const globalAll = uniq(audited.flatMap(f => f.globalNames));
     report.unresolved = await page.evaluate(names => names.filter(n => {
       try { (0, eval)(n); return false; } catch (_) { return true; }
-    }), auditAll);
-    report.declCount = auditAll.length;
+    }), globalAll);
+    report.declCount = uniq(audited.flatMap(f => f.names)).length;
+    report.globalCount = globalAll.length;
 
     /* 1・3. window に増えた名前（報告のみ） */
     const appNames = await page.evaluate(() => Object.getOwnPropertyNames(window));
@@ -217,7 +220,7 @@ try {
 }
 const summary = {
   boot: report.boot.errors.length, unresolved: report.unresolved.length,
-  decls: report.declCount, added: report.globals.added.length,
+  decls: report.declCount, globals: report.globalCount, added: report.globals.added.length,
   charts: Object.keys(report.charts).length, scenarios: Object.keys(report.scenarios).length, clicks: report.clicks.clicked,
   clickErrors: report.clicks.errors.length,
 };

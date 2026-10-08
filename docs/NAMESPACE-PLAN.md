@@ -54,7 +54,7 @@ node tools/smoke-browser.mjs --compare
 | 段階 | 内容 | 公開名 | 状態 |
 |---|---|---|---|
 | A 準備 | 棚卸し・スモーク基準・字句処理の検査・計画 | 変えない | 完了 |
-| B 非公開を包む | 他から使われない名前だけを即時関数で包む。公開名は大域のまま（据え置きは `window.NAME = NAME`） | 変えない | 進行中（3 ファイル完了） |
+| B 非公開を包む | 他から使われない名前だけを即時関数で包む。公開名は大域のまま（据え置きは `window.NAME = NAME`） | 変えない | 完了（私有の名前は全て包んだ。包んでいないファイルは公開名だけ：`i18n.js`・`tv-presets.js`・`catalog.js`・`title-match.js`、凍結の `fx-presets.js` は触らない） |
 | C 旗を集約 | `window._trk*Open` などを `window.Trk` 配下の一つの関数・状態へ | 読み手を書き換える | 未着手 |
 | D 公開名を移す | 公開名を `window.Trk.<領域>` へ移し、呼び出し側を書き換える（領域ごと） | 段階的 | 未着手 |
 | E 文書化 | `docs/ADDONS.md` に、アドオンが使ってよい公開 API を明記 | — | 未着手 |
@@ -64,7 +64,7 @@ node tools/smoke-browser.mjs --compare
 - **1 ファイル 1 コミット**。そのファイルの宣言が private だけ（または公開名を据え置く）ことを監査で確かめてから包む。
 - 包み方：ファイルの先頭に `(() => {`、末尾に `})();` を足す。**中身は字下げし直さない**（文字列検査の一致を保つため）。`"use strict"` は本体の先頭に残す。
 - 包んだあとに `window.X = …` と書かれている名前は、そのまま window に載る（変わらない）。
-- 公開名（他のファイルが裸の名前で読む）を包むときは、末尾で `window.NAME = NAME;` と据え置く。対象は `function`・`const`（再代入されないもの）だけ。`let`・`var` で再代入される名前は、値が古くなるので据え置かない（そのファイルは後の段階へ回す）。
+- 公開名（他のファイルが裸の名前で読む）を包むときは、末尾で `window.NAME = NAME;` と据え置く。対象は `function`・`const`（再代入されないもの）だけ。`let`・`var` で再代入される名前は、値が古くなるので「据え置き」の代入では出さない。**実施：`Object.defineProperty(window, …)` の get/set で、元の変数を読み書きする形にした**（値は常に一致する）。当初の「後の段階へ回す」からの変更（理由：`core.js` など再代入の多いファイルで、後回しにすると B が終わらないため）。
 - 包んだ直後は、そのファイルの中身を文字列で読んでいる検査（`tools/check-*.mjs`）が「包みの先頭」で壊れないかを必ず確かめる。
 - 順番：`study-room.js`（公開は `window.TrkStudyRoom` だけ）→ `tv-rich.js` → `pad.js` → `main.js` → `library.js` の順に小さいものから。
 - **触らない**：`js/fx.js`・`js/fx-presets.js`（凍結）。
@@ -77,25 +77,26 @@ node tools/smoke-browser.mjs --compare
 
 ### B の進捗
 
-| 回 | 対象 | トップレベル宣言 | 公開名 | 基準・結果 |
+| 回 | 対象 | 大域に残る名前（監査） | 全宣言（不変） | 基準・結果 |
 |---|---|---|---|---|
-| 0 | （準備の時点） | 1169 | 316 | 基準 `40122ea` |
-| 1 | `js/study-room.js` を即時関数で包む（公開は `window.TrkStudyRoom` のまま） | 927 | 316 | スモーク OK。window から消えた `study*` 関数は他から使われていないもの（報告のみ） |
-| 2 | `js/tv-rich.js`（公開 0）・`js/pad.js`（公開 2：`padBack`・`updatePadUI`）を包む。pad の 2 件は末尾で `window.padBack = padBack;` のように据え置く | 881 | 314（うち 2 件は window 経由に移った） | スモーク OK。`check-security.mjs` の M-03 検査は、包みの先頭を外して同じ関数を動かすように直した（検査の中身は同じ） |
-| 3 | `js/lite.js`（公開 4：`liteLibRows`・`liteNoAnalyze`・`liteMascotNoLoad`・`liteSyncUI` を据え置き）を包む | 839 | 310 | スモーク OK。`check-lite.mjs` は、包みを外して評価するように直した（120 件すべて通過） |
-| 4 | `js/main.js`（公開 6：`RESERVED`・`packsReady`・`poke`・`showFxPower`・`syncOptionsUI` は据え置き、`idleTimer` は `let` のため getter/setter で window に出す） を包む | 798 | 304 | スモーク OK（報告：window 増 6 件・減 214 件。減は他から参照されていない関数。未解決の名前 0）。`let` の公開は据え置きの値ではなく get/set にする |
-| 5 | `js/library.js`（公開 25：`let` の `addonSongs`・`libView` は get/set、それ以外は据え置き）を包む | 548 | 279 | スモーク OK（未解決の名前 0・譜面 10 件一致）。公開名の数は 304 → 279 で、library.js の公開 25 件と一致。`plWishMatch` は `metaOf` を使うため library.js に残す（言語版の照合は `title-match.js` 側） |
-| 6 | `js/custom.js`（公開 11 を据え置き。`let` は無し）を包む。`"use strict"` は包みの先頭文のまま | 483 | 268 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
-| 7 | `js/modes.js` を即時関数で包む（公開19名は据え置き） | 426 | 249 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
-| 8 | `js/game.js` を即時関数で包む（公開27名のうち let は get/set、それ以外は据え置き） | 364 | 222 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
-| 9 | `js/render.js` を即時関数で包む（公開12名：let は get/set、それ以外は据え置き） | 325 | 210 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
-| 10 | `js/catch.js` を即時関数で包む（公開8名は据え置き） | 295 | 201 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
-| 11 | `js/stage.js` を即時関数で包む（公開11名：let の stageBinding は get/set、それ以外は据え置き） | 271 | 190 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
-| 12 | `js/truck.js` を即時関数で包む（公開15名：let の truckBinding は get/set、それ以外は据え置き） | 247 | 175 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
-| 13 | `js/media.js` を即時関数で包む（公開18名：let の audioCtx は get/set、それ以外は据え置き。譜面生成の関数も据え置き） | 222 | 157 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
-| 14 | `js/data.js` を即時関数で包む（公開28名は据え置き。テスト補助 tests/helpers/browser-data.mjs は sb.window から DIFFS を取るように直した） | 189 | 128 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
-| 15 | `js/fx-dock.js` を即時関数で包む（公開0） | 188 | 128 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
-| 16 | `js/chart-gen.js` を即時関数で包む（公開2名（buildChartNotes・cgEstimateLevel）と、テスト用の cgAllocate を据え置き。テストは ctx.window から読む） | 170 | 126 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
+| 0 | （準備の時点） | 1169 | 1169 | 基準 `40122ea` |
+| 1 | `js/study-room.js` を即時関数で包む（公開は `window.TrkStudyRoom` のまま） | 927 | 1169 | スモーク OK。window から消えた `study*` 関数は他から使われていないもの（報告のみ） |
+| 2 | `js/tv-rich.js`（公開 0）・`js/pad.js`（公開 2：`padBack`・`updatePadUI`）を包む。pad の 2 件は末尾で `window.padBack = padBack;` のように据え置く | 883 | 1169 | スモーク OK。`check-security.mjs` の M-03 検査は、包みの先頭を外して同じ関数を動かすように直した（検査の中身は同じ） |
+| 3 | `js/lite.js`（公開 4：`liteLibRows`・`liteNoAnalyze`・`liteMascotNoLoad`・`liteSyncUI` を据え置き）を包む | 845 | 1169 | スモーク OK。`check-lite.mjs` は、包みを外して評価するように直した（120 件すべて通過） |
+| 4 | `js/main.js`（公開 6：`RESERVED`・`packsReady`・`poke`・`showFxPower`・`syncOptionsUI` は据え置き、`idleTimer` は `let` のため getter/setter で window に出す） を包む | 810 | 1169 | スモーク OK（報告：window 増 6 件・減 214 件。減は他から参照されていない関数。未解決の名前 0）。`let` の公開は据え置きの値ではなく get/set にする |
+| 5 | `js/library.js`（公開 25：`let` の `addonSongs`・`libView` は get/set、それ以外は据え置き）を包む | 585 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。公開名の数は 304 → 279 で、library.js の公開 25 件と一致。`plWishMatch` は `metaOf` を使うため library.js に残す（言語版の照合は `title-match.js` 側） |
+| 6 | `js/custom.js`（公開 11 を据え置き。`let` は無し）を包む。`"use strict"` は包みの先頭文のまま | 531 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
+| 7 | `js/modes.js` を即時関数で包む（公開19名は据え置き） | 493 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
+| 8 | `js/game.js` を即時関数で包む（公開27名のうち let は get/set、それ以外は据え置き） | 458 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
+| 9 | `js/render.js` を即時関数で包む（公開12名：let は get/set、それ以外は据え置き） | 431 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
+| 10 | `js/catch.js` を即時関数で包む（公開8名は据え置き） | 410 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
+| 11 | `js/stage.js` を即時関数で包む（公開11名：let の stageBinding は get/set、それ以外は据え置き） | 397 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
+| 12 | `js/truck.js` を即時関数で包む（公開15名：let の truckBinding は get/set、それ以外は据え置き） | 388 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
+| 13 | `js/media.js` を即時関数で包む（公開18名：let の audioCtx は get/set、それ以外は据え置き。譜面生成の関数も据え置き） | 381 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
+| 14 | `js/data.js` を即時関数で包む（公開28名は据え置き。テスト補助 tests/helpers/browser-data.mjs は sb.window から DIFFS を取るように直した） | 377 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
+| 15 | `js/fx-dock.js` を即時関数で包む（公開0） | 376 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
+| 16 | `js/chart-gen.js` を即時関数で包む（公開2名（buildChartNotes・cgEstimateLevel）と、テスト用の cgAllocate を据え置き。テストは ctx.window から読む） | 361 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`npm run check`・`npm test`・`git diff --check` OK |
+| 17 | `js/core.js`（ハブ。公開 116 名は据え置き。`let` は get/set、`const`・`function` は据え置き。私有 44 名は包みの中に残す） | 317 | 1169 | スモーク OK（未解決の名前 0・譜面 10 件一致）。`window.screen` と衝突する名前が 1 つある（`screen`、ゲームの画面状態）。段階 D で改名する対象。監査の数え方を直した後（`1122f98`）に包んだ |
 
 ## 4. 止める条件
 
@@ -109,3 +110,6 @@ node tools/smoke-browser.mjs --compare
 - スモークは「押したボタン」しか見ていない。押していない経路の実行時エラーは検出できない。
 - 字句処理は簡易版。正規表現リテラルや特殊な構文で誤判定の可能性がある（誤判定は「公開」側へ倒れるので、包んで壊す方向の誤りは検査で止まる）。
 - 実機（Android Chrome・タッチ・IndexedDB・実曲の音）の確認は、この作業の対象外で、従来どおり HANDOFF §7 に残す。
+- 監査は `tests/`・`tools/` の参照を数えない。テストが vm の文脈から裸の名前を読むと、包んだ瞬間に壊れる（`data.js`・`chart-gen.js` で実際に起きた。どちらも `window` 経由に直した）。包むときは `npm test` を必ず見る。
+- `screen`（core.js）は、ブラウザ標準の `window.screen` と同じ名前。`window.screen` を読むコードは本リポジトリに無いが、大域に出すと標準の値を隠す。段階 D で改名する。
+- 監査の「大域に残る名前」は、包みの中で `window.X =` または `defineProperty(window, "X", …)` と書いた名前だけを数える。包みの外の宣言は全部数える。

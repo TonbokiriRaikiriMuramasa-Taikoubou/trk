@@ -1,11 +1,12 @@
 {
  "totals": {
   "scripts": 45,
-  "windowProps": 214,
+  "windowProps": 298,
   "duplicates": 0,
   "declarations": 1169,
   "private": 853,
-  "public": 316
+  "public": 316,
+  "globalNames": 317
  },
  "files": [
   {
@@ -617,6 +618,27 @@
  ],
  "windowCoupling": [
   {
+   "name": "$",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "BEST_KEY",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "CAPTION_MS",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "CATCH",
    "writers": [
     "js/catch.js"
@@ -627,6 +649,13 @@
    "name": "CHART_FILE_MAX",
    "writers": [
     "js/media.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "CUSTOM_SKIN_MAX",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -676,6 +705,13 @@
    "name": "HEX",
    "writers": [
     "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "KEY_PRESETS",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -764,6 +800,13 @@
    "readers": []
   },
   {
+   "name": "PAD_DEFAULTS",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "PLAY_KEYS",
    "writers": [
     "js/game.js"
@@ -781,6 +824,13 @@
    "name": "SKINS",
    "writers": [
     "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "SKIN_FORMAT",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -804,6 +854,20 @@
    "name": "TAU",
    "writers": [
     "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "TRK_ENUM_VALUES",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "TV_PARAM_FAV_MAX",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -1014,6 +1078,13 @@
    ]
   },
   {
+   "name": "VIDEO_KEY_DEFAULTS",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "VRM_RECT",
    "writers": [
     "js/data.js"
@@ -1127,6 +1198,20 @@
    ]
   },
   {
+   "name": "activeMascot",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "activeMods",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "addSongFiles",
    "writers": [
     "js/library.js"
@@ -1155,6 +1240,27 @@
    "readers": []
   },
   {
+   "name": "applyLanguage",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "applyNoteVars",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "applySkin",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "autoPlay",
    "writers": [
     "js/game.js"
@@ -1172,6 +1278,13 @@
    "name": "bannerVolTip",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "baseName",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -1200,6 +1313,20 @@
    "name": "buildCustomSkin",
    "writers": [
     "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "buildSkinGrid",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "buildSkinNow",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -1253,9 +1380,51 @@
    "readers": []
   },
   {
+   "name": "chartSummary",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "chartToData",
    "writers": [
     "js/media.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "clampTvBlur",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "clampTvDim",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "cleanTvParamFavorites",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "closeSettings",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "ctx",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -1274,9 +1443,30 @@
    "readers": []
   },
   {
+   "name": "customSkinDefs",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "decodeAudio",
    "writers": [
     "js/media.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "downloadBlob",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "downloadJSON",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -1352,6 +1542,20 @@
    "readers": []
   },
   {
+   "name": "el",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "emit",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "endGame",
    "writers": [
     "js/game.js"
@@ -1375,6 +1579,13 @@
    ]
   },
   {
+   "name": "esc",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "estimateLevel",
    "writers": [
     "js/media.js"
@@ -1389,6 +1600,13 @@
    "readers": []
   },
   {
+   "name": "extOf",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "failSound",
    "writers": [
     "js/modes.js"
@@ -1396,9 +1614,65 @@
    "readers": []
   },
   {
+   "name": "fmtDate",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "fmtTime",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "fontFamily",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "formatKey",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "formatPadBind",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "fx",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "gameTime",
    "writers": [
     "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "gameplayFxMultiplier",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "gameplayFxPower",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -1438,6 +1712,13 @@
    "readers": []
   },
   {
+   "name": "hashString",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "hexToRgba",
    "writers": [
     "js/data.js"
@@ -1455,6 +1736,13 @@
    "name": "hitPos",
    "writers": [
     "js/render.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "idbStore",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -1508,6 +1796,13 @@
    "readers": []
   },
   {
+   "name": "isPclMascot",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "isStage",
    "writers": [
     "js/stage.js"
@@ -1525,6 +1820,41 @@
    "name": "judgeNote",
    "writers": [
     "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "keyCodeOf",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "keysLabel",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "laneCol",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "laneColor",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "laneName",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -1648,6 +1978,20 @@
    "readers": []
   },
   {
+   "name": "modsUnranked",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "mulberry32",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "nextSong",
    "writers": [
     "js/library.js"
@@ -1669,9 +2013,37 @@
    "readers": []
   },
   {
+   "name": "noteShape",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "num",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "on",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "onLongPress",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "openSettings",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -1739,6 +2111,13 @@
    "readers": []
   },
   {
+   "name": "pick",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "plToast",
    "writers": [
     "js/library.js"
@@ -1795,9 +2174,30 @@
    "readers": []
   },
   {
+   "name": "refreshSeedSecrets",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "registerMascot",
    "writers": [
     "js/data.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "rememberMusicVolume",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "renderAllStatuses",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -1826,6 +2226,13 @@
    "name": "renderRecords",
    "writers": [
     "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "renderStatus",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -1893,6 +2300,27 @@
    "readers": []
   },
   {
+   "name": "safeHttpUrl",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "safeLink",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "safeName",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "sanitizeNotes",
    "writers": [
     "js/data.js"
@@ -1914,6 +2342,13 @@
    "readers": []
   },
   {
+   "name": "saveCustomSkins",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "saveRecords",
    "writers": [
     "js/game.js"
@@ -1924,6 +2359,20 @@
    "name": "saveSongPrefs",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "saveUserPrefs",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "savedSkinAtBoot",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -1970,6 +2419,27 @@
    "readers": []
   },
   {
+   "name": "setPhase",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "setStatus",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "settings",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "showFxPower",
    "writers": [
     "js/main.js"
@@ -1984,6 +2454,13 @@
    "readers": []
   },
   {
+   "name": "showScreen",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "showToast",
    "writers": [
     "js/render.js"
@@ -1991,9 +2468,30 @@
    "readers": []
   },
   {
+   "name": "skin",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "skinShelf",
    "writers": [
     "js/custom.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "slotLane",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "slotOfKey",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -2015,6 +2513,13 @@
    "name": "srcLabel",
    "writers": [
     "js/library.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "stage",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -2103,9 +2608,23 @@
    "readers": []
   },
   {
+   "name": "syncPickers",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "syncTruckKeyUI",
    "writers": [
     "js/truck.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "takeAmpReset",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -2134,6 +2653,13 @@
    "name": "toTitle",
    "writers": [
     "js/game.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "travelMs",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -2194,6 +2720,20 @@
    "readers": []
   },
   {
+   "name": "updateChartButtons",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "updateKeyUI",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "updateMascotUI",
    "writers": [
     "js/custom.js"
@@ -2208,9 +2748,52 @@
    "readers": []
   },
   {
+   "name": "updateTouchKeys",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "validCode",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "validPadBind",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "vctx",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "video",
+   "writers": [
+    "js/core.js"
+   ],
+   "readers": []
+  },
+  {
    "name": "videoFilter",
    "writers": [
+    "js/core.js",
     "js/tv-dock.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "view",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   },
@@ -2218,6 +2801,13 @@
    "name": "vrmState",
    "writers": [
     "js/render.js"
+   ],
+   "readers": []
+  },
+  {
+   "name": "windows",
+   "writers": [
+    "js/core.js"
    ],
    "readers": []
   }

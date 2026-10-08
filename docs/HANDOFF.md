@@ -138,6 +138,7 @@ git diff --check
 
 ## 11. 最近の変更
 
+- **2026-10-08 — README の分割（レビュー5）：** README を約 98KB から約 6KB に絞った（3ステップ・5つのプレイ方法・関連資料・感想・ライセンスの要点・英語の要約）。くわしい説明は `docs/guide/`（目次 `index.md` ＋ 14 ファイル、英語全文 `en.md`）へ移した。移動の際は、見出しを一段上げ、相対リンクを直し、全リンク（108件）が解決することを確認した。検査：内容を見る検査は README と `docs/guide/` を合わせて読む（`readReadme()`）。リンクの有無を見る検査（privacy・credits・pack-format・SECURITY・QUALITY-CHECKS）は README 本体で見る。新しい検査：README は 12KB 以下、`docs/guide/` の全ファイルは目次に載る（両方とも逆テストで失敗を確認）。GIF は未追加（録画が必要）。公開コードは変えていないため、キャッシュ名は trk70 のまま。
 - **2026-10-08 — 名前空間 段階 E（レビュー4）：** `docs/ADDONS.md` §0 に、使ってよい窓口（`api`・`TrkAddons`・`TrkFX`）と内部（`window.Trk.*`・旧来の大域名・即時関数の中の名前・内部イベント）を分けて明記。`api` の鍵が文書に全て載っているかを `tools/check-repo.mjs` で検査（逆テストで失敗を確認）。文書の誤り（`tvSkin`→`skin`）と不足（`api.id`・`api.apiVersion`・`TrkAddons.register`・`docs`）を修正。公開コードは変えていないため、キャッシュ名は trk70 のまま。
 - **2026-10-08 — 名前空間 `screen` の決定（レビュー4・trk70）：** 利用者の選択（c）により、`window.screen`（ブラウザ標準）の定義を `js/core.js` から外した。`window.Trk.core.screen` は残す（内部の画面状態の読み書き先）。検査 `tools/check-repo.mjs` に「`js/core.js` が `window.screen` を定義しない」を追加（定義を戻す逆テストで失敗を確認）。大域の名前は 317→316。監査の `public` 316→181 は、D の書き換えで裸の参照が `window.Trk.<領域>.X` に移ったための見え方の変化（宣言数は変わらず 1171）。スモーク OK、`npm test` 44/44、overlay・regress のヘッドレス確認 OK。
 - **2026-10-08 — 譜面生成（レビュー1）：** 自動譜面を `js/chart-gen.js` の純関数へ分離。旧方式はca84a19の出力と140件ビット一致（ゴールデン）、新方式（`chartGen` "2"）は局所正規化・8小節区間配分・冒頭無音の判定の改善。`npm test` を追加。既定を新方式へ変更し、旧方式の記録に印を付けた。
@@ -153,4 +154,4 @@ git diff --check
 - **2026-10-07：** PR #31で集める棚・trk階層プレイリストを整備。PR #32でFIRST SPARK手づくり譜面と軽量化拡張を追加。
 - **2026-10-06〜07：** PR #18/#19/#26/#27でvendor同梱、セキュリティ／アクセシビリティ検査、設定・パック容量検証を拡張。
 
-長い旧 `NEXT_SESSION_HANDOFF.md` は本書へ統合済み。過去の細かな実装履歴・PR差分はGit履歴、検収記録は `docs/SECURITY.md`／`docs/QUALITY-CHECKS.md`、利用者向け仕様は `README.md` を参照する。
+長い旧 `NEXT_SESSION_HANDOFF.md` は本書へ統合済み。過去の細かな実装履歴・PR差分はGit履歴、検収記録は `docs/SECURITY.md`／`docs/QUALITY-CHECKS.md`、利用者向け仕様は `README.md`（概要）と `docs/guide/`（くわしい説明）を参照する。

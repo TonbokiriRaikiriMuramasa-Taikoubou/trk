@@ -35,6 +35,14 @@ function read(rel) {
   return rel.startsWith("js/") ? text.replace(/window\.Trk\.(?!overlay\b)[A-Za-z]\w*\./g, "") : text;
 }
 
+/* 利用者向けの説明文：README（概要）と docs/guide/*.md（くわしい説明）を合わせて読む。
+   内容の有無を見る検査はこちらを使う。リンク先の存在は README 本体で見る。 */
+function readReadme() {
+  const guideDir = path.join(root, "docs/guide");
+  const guide = fs.existsSync(guideDir) ? fs.readdirSync(guideDir).filter(f => f.endsWith(".md")).sort().map(f => fs.readFileSync(path.join(guideDir, f), "utf8")) : [];
+  return [fs.readFileSync(path.join(root, "README.md"), "utf8"), ...guide].join("\n");
+}
+
 /* 曲名の照合（js/title-match.js の純関数）＋ plWishMatch（library.js）。
    check-repo の文字列検査と、vm での入出力検査が同じ定義を見るための共通の断片。 */
 const titleMatchSrc = read("js/title-match.js");
@@ -528,8 +536,8 @@ if (!exists("js/fx-worklet.js") ||
         ctx.__plWishMatch({ t:"Suguri - BELIEVE", al:"", ar:"" }, noMatch.byTitle) === null;
     }
   } catch (_) { matchHintBehaviorOk = false; }
-  const fileExtensionOk = !/\.pgg\b/i.test(library + read("README.md") + read("docs/HANDOFF.md")) &&
-    /BELIEVE\.ogg/i.test(read("README.md") + read("docs/HANDOFF.md"));
+  const fileExtensionOk = !/\.pgg\b/i.test(library + readReadme() + read("docs/HANDOFF.md")) &&
+    /BELIEVE\.ogg/i.test(readReadme() + read("docs/HANDOFF.md"));
   const profileMatchOk = fileExtensionOk && library.includes('["matchHint", 80]') &&
     titleMatchSrc.includes('function plWishTitleKeys(wish)') &&
     library.includes('matchMemo.placeholder = tr("plMatchMemoPh")') &&
@@ -1169,7 +1177,7 @@ if (!read("js/library.js").includes("plAuthorMenu") ||
     .every(id => mmd.includes(`${id}: {`) || mmd.includes(`${id}: makeGesture(`));
   const morphOk = mmd.includes("const FACE_MORPHS = [") && mmd.includes("dv.setUint32(at, morphCount, true)") &&
     mmd.includes('buildVmd(frames, "trk-builtin-" + id, morphFrames)');
-  const docsOk = read("README.md").includes("内蔵モーション65種") &&
+  const docsOk = readReadme().includes("内蔵モーション65種") &&
     read("docs/HANDOFF.md").includes("65種をすべて選択可能") &&
     read("docs/HANDOFF.md").includes("🎤 歌・口パクの6グループ") &&
     read("NOTICE.md").includes("third-party VMD or choreography file is bundled");
@@ -1205,7 +1213,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
 // 🎓 Optional First Spark tutorial audio: lazy-loaded from same origin, removable as one folder.
 {
   const html = read("index.html"), library = read("js/library.js"), main = read("js/main.js");
-  const i18n = read("js/i18n.js"), notice = read("NOTICE.md"), ignore = read(".gitignore"), readme = read("README.md");
+  const i18n = read("js/i18n.js"), notice = read("NOTICE.md"), ignore = read(".gitignore"), readme = readReadme();
   const demoDir = path.join(root, "assets/optional-demo-audio");
   const audio = path.join(demoDir, "first-spark-tutorial.mp3"), manifestFile = path.join(demoDir, "manifest.json");
   let optionalFolderOk = !fs.existsSync(demoDir);
@@ -1715,6 +1723,17 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   if (!block || keys.length < 10) fail("js/addons.js: makeApi の鍵を読めませんでした（" + keys.length + "件）");
   else if (missing.length) fail("docs/ADDONS.md に載っていない api の鍵: " + missing.join(", "));
   else ok("アドオンの api の鍵（" + keys.length + "件）は docs/ADDONS.md に全て載っている");
+}
+
+/* 項目 5（README の分割）：README は概要に絞る（上限 12KB）。docs/guide/ の全ファイルは目次（index.md）に載せる。 */
+{
+  const readmeBytes = fs.statSync(path.join(root, "README.md")).size;
+  const guideFiles = fs.readdirSync(path.join(root, "docs/guide")).filter(f => f.endsWith(".md") && f !== "index.md");
+  const guideIndex = read("docs/guide/index.md");
+  const notListed = guideFiles.filter(f => !guideIndex.includes("(" + f + ")"));
+  if (readmeBytes > 12 * 1024) fail("README.md が 12KB を超えています（" + readmeBytes + " bytes）。くわしい説明は docs/guide/ へ");
+  else if (notListed.length) fail("docs/guide/index.md に載っていないガイド: " + notListed.join(", "));
+  else ok("README は " + readmeBytes + " bytes（上限 12KB）。docs/guide/ の " + guideFiles.length + " 件は全て目次に載っている");
 }
 
 console.log(`\nStatic check: ${failures ? "FAILED" : "passed"} · ${failures} failure(s) · ${warnings} warning(s)`);

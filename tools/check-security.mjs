@@ -509,7 +509,9 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   rule(factorySafe, "?factory alone enters safe mode, matching js/addons.js (never a destructive reset)");
 
   /* 文書ドリスト：実装はセーフモードなのに「?factory で全リセット」と書いてあったら FAIL にする */
-  const factoryDrift = ["docs/HANDOFF.md", "docs/SECURITY.md", "js/core.js", "README.md"]
+  /* README（概要）と docs/guide/*.md（くわしい説明）の両方を見る */
+  const guideDocs = fs.readdirSync(path.join(root, "docs/guide")).filter(f => f.endsWith(".md")).map(f => "docs/guide/" + f);
+  const factoryDrift = ["docs/HANDOFF.md", "docs/SECURITY.md", "js/core.js", "README.md", ...guideDocs]
     .filter(f => { try { return /`\?reset=all`\s*[／/]\s*`\?factory`/.test(read(f)) || /\?factory\s*→\s*全設定リセット/.test(read(f)); } catch (_) { return false; } });
   rule(factoryDrift.length === 0, "no documentation claims ?factory resets every setting (it is a safe-mode alias)",
     factoryDrift.length ? `still claims it: ${factoryDrift.join(", ")}` : "");

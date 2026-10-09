@@ -15,6 +15,8 @@ const mainSource = read("js/main.js");
 const optionsSource = read("js/i18n-options.js");
 const spectrumSource = read("js/spectrum.js");
 const renderSource = read("js/render.js");
+const tvDockSource = read("js/tv-dock.js");
+const tvPresetsSource = read("js/tv-presets.js");
 
 function between(source, start, end) {
   const a = source.indexOf(start);
@@ -26,13 +28,14 @@ function between(source, start, end) {
 
 const drawVideoSource = between(renderSource, "function drawVideo() {", "\nfunction drawScanlines()");
 const drawArtworkInsetSource = between(spectrumSource, "function drawArtworkInset(g, W, H, dpr) {", "\n\n/* ============ 描き続けるかどうか ============ */");
+const tvDockRenderSource = between(tvDockSource, "function render(skinChanged) {", "\n    powLed.classList.toggle");
 
-function drawVideo({ wallpaper = false, hideDuringChart = false, phase = "playing", videoWidth = 0, image = { naturalWidth:2, naturalHeight:1 } } = {}) {
+function drawVideo({ wallpaper = false, hideDuringChart = false, phase = "playing", videoWidth = 0, zoom = 1, image = { naturalWidth:2, naturalHeight:1 } } = {}) {
   const calls = { images:[], clips:[] };
   const video = { videoWidth, videoHeight:videoWidth ? 180 : 0, readyState:2 };
   const core = {
     videoReady:true, phase, video,
-    settings:{ videoStyle:"color", videoZoom:1, artWallpaperBg:wallpaper, hideArtworkDuringChart:hideDuringChart },
+    settings:{ videoStyle:"color", videoZoom:zoom, artWallpaperBg:wallpaper, hideArtworkDuringChart:hideDuringChart },
     bgImage:image,
     vctx:{
       clearRect() {}, save() {}, beginPath() {}, clip() {}, restore() {},
@@ -88,6 +91,7 @@ test("譜面オプション3種は既定オフで、謎設定に置き、4言語
   const controls = indexSource.indexOf('id="artWallpaperBg"');
   const end = indexSource.indexOf("</details>", mystery);
   assert.ok(mystery < controls && controls < end, "artwork options stay inside the mystery section");
+  assert.match(optionsSource, /artWallpaperBg:"🖼 ジャケット画像を全画面にする"/);
 });
 
 test("スペクトラムのサムネイル設定は曲名バナー設定の直下で既定オフ", () => {
@@ -106,18 +110,32 @@ test("スペクトラムには設定オンのときだけ、右上に小さな�
   assert.equal(drawSpectrumArtwork({ enabled:true, hideDuringChart:true, phase:"playing" }).calls.images.length, 0);
 });
 
-test("埋め込みジャケットは既定でTV／動画枠に表示し、譜面中も使う", () => {
+test("通常時の埋め込みジャケットは拡大せず、動画枠の中央に表示する", () => {
   const { calls, image } = drawVideo();
   assert.equal(calls.images.length, 1);
   assert.equal(calls.images[0][0], image);
   assert.deepEqual(calls.clips[0], [110, 210, 500, 250], "default remains within the normal video region");
+  assert.deepEqual(Array.from(calls.images[0].slice(1)), [359, 334.5, 2, 1], "small art stays at native size and is centered");
 });
 
-test("壁紙設定オンでは動画の代わりに静止画を全画面背景にする", () => {
+test("通常時は大きなジャケットだけ動画枠内へ縮小し、videoZoomで拡大しない", () => {
+  const { calls } = drawVideo({ image:{ naturalWidth:1000, naturalHeight:500 }, zoom:2 });
+  assert.deepEqual(Array.from(calls.images[0].slice(1)), [110, 210, 500, 250]);
+});
+
+test("全画面設定オンでは動画の代わりに静止画を従来どおり全画面へ広げる", () => {
   const { calls, image } = drawVideo({ wallpaper:true, videoWidth:320 });
   assert.equal(calls.images.length, 1);
   assert.equal(calls.images[0][0], image);
   assert.deepEqual(calls.clips[0], [0, 0, 1920, 1080]);
+  assert.deepEqual(Array.from(calls.images[0].slice(1)), [-120, 0, 2160, 1080], "full-screen mode preserves the old cover/crop fit");
+});
+
+test("TVの選択フィルターはTVドックの静止ジャケットにも反映する", () => {
+  assert.match(tvDockRenderSource, /coverImg\.style\.filter\s*=\s*newVideoFilter\(\)/);
+  assert.match(tvDockSource, /function newVideoFilter\(\)/);
+  const monoPreset = between(tvPresetsSource, 'id:"mono",', "\n  },");
+  assert.match(monoPreset, /filter:"grayscale\(1\) contrast\(1\.6\)"/);
 });
 
 test("譜面時は設定で静止画を隠せるが、元の動画再生は隠さない", () => {

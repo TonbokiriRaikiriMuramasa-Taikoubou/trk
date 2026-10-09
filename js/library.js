@@ -1057,9 +1057,9 @@ function trkCatalogGuide(s, pl, forDistributionPlaylist = false) {
   const note = isBlueArchiveOst
     ? "NexTone.Link／Apple Music公式案内。音源なし。購入・サブスクは利用許諾ではありません。"
     : isSoundCloudPopular
-      ? "公式SoundCloudの人気曲ページ（音源なし）。配信・購入は二次利用許諾ではありません。Creator-Safeの条件を確認。"
+      ? "公式SoundCloudの人気曲ページ（音源なし）。配信・購入は二次利用許諾ではありません。共同制作曲はCreator-Safe対象外。"
       : isSoundCloudAlbum
-      ? "公式SoundCloudアルバム（音源なし）。配信・購入は二次利用許諾ではありません。Creator-Safeの条件を確認。"
+      ? "公式SoundCloudアルバム（音源なし）。Riotが権利を持つ曲でCreator-Safe対象。配信・購入は二次利用許諾ではありません。"
       : isLoLLinkList
         ? loLLinkNote
         : isGakumasInstrument

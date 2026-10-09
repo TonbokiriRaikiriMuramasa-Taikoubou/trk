@@ -590,11 +590,13 @@ S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber
    アルバムのリンクは公式SoundCloud、各曲のリンクは公式Spotify個別曲（Sessionsと同じ方式）。
    SoundCloudのセットページはJavaScriptなしだと先頭15曲しか出ないため、曲順・曲数・曲名は
    公式Spotifyアルバムで確認した（Season 1＝9曲・Season 2＝30曲は公式SoundCloudとも一致）。
+   Season 1〜9のゲームOSTとWarsongsはRiot公式Creator-Safe Playlistの対象曲（Riotが権利を持つ曲）として扱う。
+   人気曲30曲はスナップショットで、Worlds／K/DA等の外部アーティスト共同制作曲はCreator-Safe対象外。
    音源は同梱せず、公式配信へのリンクを二次利用許諾とは扱わない。
    旧ログインテーマ、他の仮想アーティスト、残りChampion Theme、Skin／イベント曲、その他のOSTは未調査。
    Champion Themeは全チャンピオン分が存在するという意味ではなく、確認できた単独テーマのみ。 */
 S("lol", "League of Legends", "⚔️", "aqua", "PCゲーム", "🕹️",
-  "公式リンク集（音源なし）。配信・購入は二次利用許諾ではありません。利用前にCreator-Safe対象か公式ガイドで要確認。Sessions 3作・108曲、近年Champion Theme 41曲、Worlds/WCS 2014–26の公式アンセム13曲、確認できたMSIアンセム4曲、K/DAの公式曲6曲を分類して掲載。Worlds 2026「Know My Name」は公式MVとSpotify個別曲を確認。K/DAもCreator-Safe対象かは未確認です。公式SoundCloudアルバムはSeason 1〜9のゲームOSTをシーズン別の9プレイリスト（計243曲）とWarsongs 11曲に分け、公式SoundCloudの人気曲30曲（2026-10-09時点のスナップショット・一部は地域により再生できません）も別リストにしました。アルバムは公式SoundCloud、各曲は公式Spotify個別曲へリンクします（人気曲は公式SoundCloudの個別曲へ）。これはLoL全楽曲ではなく、旧ログインテーマ、他の仮想アーティスト／Champion Theme、Skin／イベント曲、その他のゲームOSTなどは今後の調査対象です。Sessionsは各巻を公式SoundCloud、個別曲をSpotifyへリンク。Viは現行公式36曲を採用（旧37曲表記の二次資料にある『Take Your Time』は現行SoundCloud／Spotify／Apple Musicの掲載にないため含めません）。",
+  "公式リンク集（音源なし）。配信・購入は二次利用許諾ではありません。利用前にCreator-Safe対象か公式ガイドで要確認。Sessions 3作・108曲、近年Champion Theme 41曲、Worlds/WCS 2014–26の公式アンセム13曲、確認できたMSIアンセム4曲、K/DAの公式曲6曲を分類して掲載。Worlds 2026「Know My Name」は公式MVとSpotify個別曲を確認。K/DAもCreator-Safe対象かは未確認です。Season 1〜9のゲームOST 243曲とWarsongs 11曲はRiot公式Creator-Safe Playlist（Riotが権利を持つ曲の集まり・979曲）の対象として扱います（Season 9の収録は実際に確認しました）。人気曲30曲のうちのWorlds／K/DA等の外部アーティスト共同制作曲はCreator-Safe対象外・要確認です。公式SoundCloudアルバムはSeason 1〜9のゲームOSTをシーズン別の9プレイリスト（計243曲）とWarsongs 11曲に分け、公式SoundCloudの人気曲30曲（2026-10-09時点のスナップショット・一部は地域により再生できません）も別リストにしました。アルバムは公式SoundCloud、各曲は公式Spotify個別曲へリンクします（人気曲は公式SoundCloudの個別曲へ）。これはLoL全楽曲ではなく、旧ログインテーマ、他の仮想アーティスト／Champion Theme、Skin／イベント曲、その他のゲームOSTなどは今後の調査対象です。Sessionsは各巻を公式SoundCloud、個別曲をSpotifyへリンク。Viは現行公式36曲を採用（旧37曲表記の二次資料にある『Take Your Time』は現行SoundCloud／Spotify／Apple Musicの掲載にないため含めません）。",
   "https://www.riotgames.com/en/riot-music-creator-safe-guidelines",
   [
    PL("lol-svi", "Sessions: Vi", "🥊", "aqua", ["Game", "LoL", "Sessions:Vi", "Riot Games"],

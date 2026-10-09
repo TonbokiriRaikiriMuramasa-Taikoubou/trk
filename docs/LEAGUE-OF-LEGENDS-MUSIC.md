@@ -67,6 +67,13 @@ K/DAの全関連コンテンツを網羅したという意味ではなく、Crea
 - **Season 4〜9 と Warsongs のSoundCloudセットページはこの作業では開けていない**（SoundCloudが自動アクセスに対して断続的に「非対応ブラウザ」エラーを返した）。URLは2026-10-09に公式アルバム一覧から取得したもので、曲順・曲数は同名・同アーティスト・同リリース年の公式Spotifyアルバムに依る。実ブラウザでの再確認は下記「次の確認」に残す。
 - Warsongs の11曲は Riot 公式の発表ページ（nexus.leagueoflegends.com）のトラックリストと一致。Spotifyの曲名は「Piercing Light (feat. Mako)」形式、Riot発表は「Piercing Light (Mako Remix)」形式で、**表記が違うだけ**の同一曲。カタログはリンク先のSpotify表記を採用した。
 - SoundCloud側の総再生時間はSpotifyより短い（Season 2 で 40:10 に対し Spotify は 69:42）。曲数・曲名・曲順は一致しているので、SoundCloud掲載音源の長さが違う可能性がある。この差は未確認。
+- Spotifyには**同一アルバムの別版（別のアルバムID）**がある。Season 9 では、アルバムURLに採用した `3cYnSSnBe1akJwxv64PHOg` とは別版（`2mW3TZ7nddsMIAYpw3Rbat`）のトラックIDを曲別リンクに採用した形になっている。曲名・アーティスト・曲順・再生時間は同一で、トラックID側のリンクは実際に開いて確認した（「Arcade 2019: ULTRACOMBO」、2026-10-10）。どちらも正規リンクなので差し替えない。
+
+**Creator-Safe の対象（2026-10-10 確定）**：Season 1〜9のゲームOST 243曲と Warsongs 11曲は、Riot公式の [Creator-Safe Playlist](https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N)（979曲・説明文は「This is a collection of music that is 100% owned by Riot Games. It can be used in streams or content creation as long as it follows the “Legal Jibber Jabber” rules on our website.」）の**対象曲として扱う**。同プレイリストに Season 9 のアルバム（`3cYnSSnBe1akJwxv64PHOg`）の曲が実際に含まれていることを、曲名・曲順・再生時間まで突き合わせて確認した。他のシーズンも同じ「Riotが権利を持つゲーム音楽」の枠だが、979曲との1曲ずつの突合はしていない。
+
+対象であっても条件は残る。Riotの法務表記（Legal Jibber Jabber）に従うことが前提で、**音源の同梱・再配布・販売、企業広告での利用は別条件**。trk! はリンクの索引にとどめる。
+
+一方、人気曲30曲はスナップショットで、Worlds／MSIアンセム・K/DA・True Damage・HEARTSTEEL などの**外部アーティストとの共同制作曲は Creator-Safe 対象外・要確認**のまま（次節と「権利・利用条件」を参照）。
 
 **人気曲30曲（`lol-popular-tracks`）**：公式[Popular tracks](https://soundcloud.com/leagueoflegends/popular-tracks)ページの**2026-10-09時点の表示順そのまま**を、表示タイトル・アーティスト表記・個別曲URLつきで収録した。アルバムではないので `al`（アルバム名）は空。注意点は次のとおり。
 
@@ -98,7 +105,7 @@ K/DAの全関連コンテンツを網羅したという意味ではなく、Crea
 1. **旧Champion Theme／旧ログインテーマ**：2010年代の公開先・地域版・アルバム収録を照合し、個別の曲名と公式配信先が確認できたものから追加。曲が存在しないチャンピオンへテーマを割り当てない。
 2. **その他のチャンピオン関連曲／バーチャルアーティスト**：K/DAは「POP/STARS」と「ALL OUT」収録5曲を別リストに追加済み。その他のK/DA作品、True Damageの他作品（Worlds 2026「Know My Name」はWorlds枠で収録済み）、HEARTSTEEL、PentakillなどはChampion Themeと混ぜず、プロジェクト／イベント別に調査・収録する。
 3. **Skin Theme／イベント曲**：Riot公式Musicタグの「Skin Theme」「Event Theme」や、季節イベント・ゲームモードの公式公開曲を別リストにする。現時点で候補を見つけても、分類・公式個別リンクを確認するまでは未収録。
-4. **ゲームOST／映像OST**：シーズン別OST「The Music of League of Legends: Season 1〜9」と「Warsongs」はアルバム別プレイリストとして収録済み（Phase 3）。残るは公式SoundCloudアルバム一覧に出ている他のOST（例：`Pandemonium`・`For Demacia`・`Summoner's Snowdrift`・`Trials of Twilight`・`Spirit Blossom Beyond`・`Welcome to Noxus` の各2025–2026年作）と Arcane 系の映像OSTで、収録順・重複・ゲーム内曲／映像曲の区別とともにアルバム別に照合する。
+4. **ゲームOST／映像OST**：シーズン別OST「The Music of League of Legends: Season 1〜9」と「Warsongs」はアルバム別プレイリストとして収録済み（Phase 3）。残るは公式SoundCloudアルバム一覧に出ている他のOSTと Arcane 系の映像OSTで、収録順・重複・ゲーム内曲／映像曲の区別とともにアルバム別に照合する。手がかりとして確認済みの公式SpotifyアルバムID：`Pandemonium`（2026）`78RpNOe76RHMhCRZbJS68n`、`For Demacia`（2026）`4UPfbzGfDeKVC8wiMEwrJA`、`Trials of Twilight`（2025）`7mpX4l9M8bFRZOQb73qEbd`、`Spirit Blossom Beyond`（2025）`0mNCXeb7azjErkTqoaR4BA`、`Welcome to Noxus`（2025）`7oCUh77MwNd0x12QjA7F5K`、`Arcane`（2021）`0jV32pIk8l3vTaU3thTaW2`、`Arcane Season 2`（2024）`18r1yGUJUNHXYj1DQU0qIE`。
 5. **競技テーマ／イベント用オーケストラ曲**：Worlds／MSIの歌唱アンセムと分け、年ごとの公式投稿が特定できたものだけ収録。
 6. **MSIの未確定年・その他イベント**：候補曲を調査継続。検索で見つからなかった年を「曲なし」と断定しない。
 
@@ -109,7 +116,8 @@ K/DAの全関連コンテンツを網羅したという意味ではなく、Crea
 - Riotの[Creator-Safeガイドライン](https://www.riotgames.com/en/riot-music-creator-safe-guidelines)は、RiotがCreator-Safeとして指定する**特定のプレイリスト内の曲**と利用条件を基準にしています。Riot自身の説明でも、外部アーティスト／出版社／レーベル等との共同制作曲には複雑な権利関係があり、Creator-Safeプレイリスト外の曲は一般に権利者のライセンスが必要で、配信・動画での利用が安全とは保証されないとされています。
 - Worlds／MSIアンセムは外部アーティストとの共同制作を含むため、公式YouTube／Spotify／SoundCloudで聴けることを**再利用の許可**と見なしません。創作動画・配信等に使う場合は、曲が現在のCreator-Safeリストに含まれるか、必要な権利者の許諾があるかを曲ごとに確認してください。企業広告・販売・音源再配布などは別条件です。
 - 「Know My Name」がRiotのCreator-Safeプレイリストに含まれることはこの調査で確認できていません。よってカタログではCreator-Safeと表示せず、利用条件は未確認として扱います。公式MV／配信先があることだけでは、動画・配信への利用や音源の再配布は許諾されません。
-- Phase 3 のシーズン別OST（243曲）・Warsongs（11曲）・人気曲30曲も、**Creator-Safe対象かどうかは確認できていません**。公式SoundCloud／Spotifyに掲載されていることは、動画・配信での利用や音源の再配布の許諾ではありません。ゲーム内BGM・スキン曲・リミックスは外部アーティストとの共同制作を含むため、利用前に曲ごとにCreator-Safeプレイリストと権利者の条件を確認してください。人気曲ページには「日本では利用できません」と表示される曲もあり、リンク先の再生可否は地域と時期で変わります。
+- **Phase 3 のシーズン別OST（243曲）・Warsongs（11曲）は Creator-Safe 対象**（2026-10-10確定、根拠は上の「Creator-Safe の対象」）。対象でも、Riotの法務表記に従うことが条件で、音源の同梱・再配布・販売や企業広告での利用は別条件です。Creator-Safe は trk! が音源を配布してよい意味にはなりません。
+- 人気曲30曲は**曲ごとに扱いが違います**。ゲーム音楽（チャンピオンテーマ等）は Creator-Safe 対象ですが、Worlds／MSIアンセム・K/DA・True Damage・HEARTSTEEL など外部アーティストとの共同制作曲は対象外・要確認です。人気曲ページには「日本では利用できません」と表示される曲もあり、リンク先の再生可否は地域と時期で変わります。
 - 収録したK/DA 6曲もCreator-Safe対象か・適用条件を確認できていません。Spotify個別曲ページとRiot公式動画を確認したことは、二次利用や音源同梱／再配布の許可を意味しません。
 - SessionsはCreator-Safe Sessionsとして提供された範囲で案内し、Riotの現行ガイドラインとクレジット／利用条件に従う前提です。Creator-Safeであることも、音源そのものの再配布を許す意味ではありません。
 - 本アプリは公式リンクを開くための索引です。音源をダウンロード・同梱・再配布せず、リンク先の内容・地域利用可否・権利状態も保証しません。利用直前に公式ガイドと該当曲の権利情報を確認してください。
@@ -118,7 +126,7 @@ K/DAの全関連コンテンツを網羅したという意味ではなく、Crea
 
 - [Riot Games — 法務表記（日本語）](https://www.riotgames.com/ja/legal)（一般的な法務案内。個別曲の利用条件はCreator-Safeガイド／権利者の条件で別途確認）
 - [Riot Games — Creator-Safe Guidelines](https://www.riotgames.com/en/riot-music-creator-safe-guidelines)
-- [Riot Games — Creator-Safe Playlist（Spotify）](https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N)（曲ごとの対象確認用。Know My Name・K/DAの収録は未確認）
+- [Riot Games — Creator-Safe Playlist（Spotify）](https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N)（979曲・「100% Riot Games が権利を持つ曲」。Season 9 アルバムの収録を2026-10-10に確認。Know My Name・K/DAの収録は未確認）
 - [League of Legends — Champion Theme の公式記事一覧](https://www.leagueoflegends.com/en-us/news/tags/champion-theme/)
 - [League of Legends — Music の公式記事一覧](https://www.leagueoflegends.com/en-us/news/tags/music/)
 - [League of Legends — 公式YouTubeチャンネル](https://www.youtube.com/@leagueoflegends)（Champion Theme個別投稿を確認。例：[Locke, the Ashen Exorcist](https://www.youtube.com/watch?v=nakzw9Y_CLI)、2026-06-26公開）

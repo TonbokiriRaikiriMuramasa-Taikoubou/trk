@@ -51,7 +51,7 @@ function makeContext({
 
 function runEndGameWithRecordFailure() {
   const nodes = new Map();
-  const shown = [], statuses = [], errors = [];
+  const shown = [], statuses = [], errors = [], emitted = [];
   const node = id => {
     if (!nodes.has(id)) {
       const value = { id, hidden:false, textContent:"", innerHTML:"", children:[], append(...children) { this.children.push(...children); } };
@@ -68,6 +68,7 @@ function runEndGameWithRecordFailure() {
     $(id) { return node(id); },
     setPhase(phase) { this.phase = phase; },
     showScreen(id) { shown.push(id); },
+    emit(name, ...args) { emitted.push([name, ...args]); },
     setStatus(...args) { statuses.push(args); },
     esc:text => String(text), el(_tag, _className, text) { return { textContent:text }; },
     baseName:name => name,
@@ -86,7 +87,7 @@ function runEndGameWithRecordFailure() {
   const context = vm.createContext(sandbox);
   vm.runInContext(`${endGameLogic}\nglobalThis.runEndGame = endGame;`, context);
   context.runEndGame(false);
-  return { core, nodes, shown, statuses, errors };
+  return { core, nodes, shown, statuses, errors, emitted };
 }
 
 test("tickClock catches a paused terminal video before its paused/seeking early return in every mode", () => {
@@ -155,4 +156,16 @@ test("game.js owns ended/pause handling and keeps the result visible if record s
   assert.ok(showAt >= 0 && recordAt > showAt, "show the result screen before optional record persistence");
   assert.match(endGameLogic, /try\s*\{\s*rec\s*=\s*recordPlay\(/,
     "a record/storage error must not prevent rendering the result");
+});
+
+test("the result DOM is filled before the screen event, so screen listeners (judge stats, title tier) land in it", () => {
+  const resultAt = endGameLogic.indexOf('core.$("result").innerHTML');
+  const showAt = endGameLogic.indexOf('core.showScreen("endScreen")');
+  const recordAt = endGameLogic.indexOf("recordPlay(");
+  assert.ok(resultAt >= 0 && resultAt < showAt, "render the result body before showing the screen");
+  assert.ok(showAt < recordAt, "show before the record is saved (trk95 contract)");
+  assert.match(endGameLogic, /core\.emit\("resultRecorded"/, "title tier is added after the record exists");
+  const modesSource = fs.readFileSync(path.join(root, "js/modes.js"), "utf8");
+  assert.match(modesSource, /on\("resultRecorded",/, "the title tier listener must wait for the saved record");
+  assert.doesNotMatch(modesSource, /on\("screen", id => \{\s*if \(id !== "endScreen"\) return;\s*const pair = TITLE_MODES/);
 });

@@ -470,19 +470,7 @@ seekBar.addEventListener("input", () => {
   if (core.videoReady && (core.phase === "playing" || core.phase === "paused")) window.Trk.play.seekTo(seekBar.value / 1000 * core.video.duration);
 });
 
-/* ---------- 動画の合図（イヤホンの再生／停止ボタンにも対応） ----------
-   ・カウントダウン中（leadIn）は動画を止めているので、一時停止の合図は無視します
-   ・video.paused も確認：プレビューを止めた合図が、ゲーム開始後に遅れて届くことがあるため */
-core.video.addEventListener("ended", () => { if (core.phase === "playing") window.Trk.play.endGame(); });
-core.video.addEventListener("pause", () => {
-  if (core.phase === "playing" && !window.Trk.play.leadIn && core.video.paused && !core.video.seeking) {
-    if (core.video.ended || (isFinite(core.video.duration) && core.video.duration > 0 && core.video.currentTime >= core.video.duration - 0.3)) {
-      window.Trk.play.endGame();
-    } else {
-      window.Trk.play.pauseGame();
-    }
-  }
-});
+/* ---------- 動画の再生合図（終端・pause は game.js が共通処理） ---------- */
 core.video.addEventListener("play", () => { if (core.phase === "paused") { core.showScreen(null); core.setPhase("playing"); poke(); } });
 document.addEventListener("visibilitychange", () => { if (document.hidden && core.phase === "playing") window.Trk.play.pauseGame(); });
 

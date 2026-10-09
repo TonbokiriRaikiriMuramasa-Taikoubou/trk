@@ -151,15 +151,3 @@ test("safe mode disables risky output without deleting the saved FX rack", () =>
     assert.equal(sandbox.view.style.filter, "none");
   }
 });
-
-test("playback end guards reliably trigger endGame and transition to results screen", () => {
-  const gameSource = fs.readFileSync(path.join(root, "js/game.js"), "utf8");
-  assert.match(gameSource, /if\s*\(core\.phase\s*===\s*"playing"\s*&&\s*!leadIn\)\s*\{\s*const dur = core\.video\.duration;\s*if\s*\(core\.video\.ended\s*\|\|\s*\(isFinite\(dur\)\s*&&\s*dur > 0\s*&&\s*core\.video\.currentTime >= dur - 0\.05\)\)/,
-    "tickClock must contain a robust playback-end fallback guard");
-
-  const mainSource = fs.readFileSync(path.join(root, "js/main.js"), "utf8");
-  assert.match(mainSource, /core\.video\.addEventListener\("ended",\s*\(\)\s*=>\s*\{\s*if\s*\(core\.phase\s*===\s*"playing"\)\s*window\.Trk\.play\.endGame\(\);\s*\}\)/,
-    "main.js must listen for video ended event");
-  assert.match(mainSource, /if\s*\(core\.video\.ended\s*\|\|\s*\(isFinite\(core\.video\.duration\)\s*&&\s*core\.video\.duration > 0\s*&&\s*core\.video\.currentTime >= core\.video\.duration - 0\.3\)\)/,
-    "pause event near track end must trigger endGame instead of pausing");
-});

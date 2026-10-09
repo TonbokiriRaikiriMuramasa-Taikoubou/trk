@@ -104,6 +104,21 @@ const duplicateIds = [...idCounts].filter(([, count]) => count > 1).map(([id, co
 if (duplicateIds.length) fail(`index.html contains duplicate IDs: ${duplicateIds.join(", ")}`);
 else ok(`index.html static IDs are unique (${indexIds.length} checked)`);
 
+// The fixed 1920×1080 stage must fit the current layout viewport, including narrow portrait screens.
+{
+  const css = read("css/style.css"), core = read("js/core.js");
+  const fixed = css.includes("#stage{position:fixed;");
+  const fit = core.includes("Math.min(innerWidth / W, innerHeight / H)") &&
+    core.includes("stage.style.transform = `translate(-50%,-50%) scale(${s})`");
+  const smoke = read("tools/smoke-browser.mjs");
+  const viewportSmoke = smoke.includes("width:360, height:800") && smoke.includes("width:800, height:360") &&
+    smoke.includes("getBoundingClientRect()") && smoke.includes("document.documentElement.scrollWidth");
+  if (!fixed || !fit) fail("#stage must stay fixed to the viewport and fitStage() must scale against both viewport dimensions");
+  else ok("#stage stays viewport-fixed and fitStage() scales for portrait and landscape viewports");
+  if (!viewportSmoke) fail("the browser smoke must bound #stage in narrow portrait and short landscape viewports");
+  else ok("browser smoke checks #stage bounds and document overflow at 360×800 and 800×360");
+}
+
 // 📺 TV picture looks and brightness/blur favorites: keep the documented
 // preset count, four localized groups, safe long-press resets and bounded data.
 {
@@ -1825,7 +1840,8 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   const offlineVerified = /if \(cached && \(!pinned \|\| await pinnedMatches\(cached, pinned\)\)\) return cached;/.test(swSrc);
   const digestUsed = /crypto\.subtle\.digest\("SHA-384"/.test(swSrc);
   const safeIdFromNavigation = swSrc.includes("safeClients.add(event.resultingClientId)") && !swSrc.includes("safeClients.add(event.clientId)");
-  if (!pinsFresh || !cacheFirst || !offlineVerified || !digestUsed || !safeIdFromNavigation) fail("sw.js の vendor の cache-first（SHA-384 照合・セーフモードはキャッシュを読まない）が欠けている、または VENDOR_PINS が lock とずれている");
+  const safeInitialNavigation = /const safeClient = safeClients\.has\(event\.clientId\)\s*\|\|\s*\(request\.mode === "navigate" && safeWanted\(url\)\);/.test(swSrc);
+  if (!pinsFresh || !cacheFirst || !offlineVerified || !digestUsed || !safeIdFromNavigation || !safeInitialNavigation) fail("sw.js の vendor の cache-first（SHA-384 照合・初回ナビゲーションを含めセーフモードはキャッシュを読まない）が欠けている、または VENDOR_PINS が lock とずれている");
   else ok("sw.js: ハッシュ固定の vendor は cache-first で、SHA-384 が合うものだけ使う（VENDOR_PINS は vendor-lock.json と一致）");
 }
 

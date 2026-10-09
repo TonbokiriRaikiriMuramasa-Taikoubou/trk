@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-09（trk92）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
+> **最終更新：2026-10-09（trk93）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
 
 ## 1. 作業を再開するとき
 
@@ -41,20 +41,21 @@
 - **自動譜面（`js/chart-gen.js`）**：設定 `chartGen`（Seed欄の下の「自動譜面の作り方」）。既定は **`"2"`＝新方式**（2026-10-08、利用者の決定：冒頭の小さな音を拾うこと・総数の増加を受け入れ）。`"1"`＝旧方式は選択で戻せ、旧方式で作った記録は記録表で「旧方式」の印が付く（記録作成時に `gen` を保存）。`"2"`＝新方式は、前後4秒の90パーセンタイルで音量を局所正規化し、8小節ごとに「長さ×密度」でノーツ数を先に配って、盛り上がりは 0.7〜1.3 倍で残す。平均音量が曲の最大の6%未満の静かな区間（絶対音量ゲート）は、候補数の上限を難易度順の表 `CG_QUIET_CAPS` で絞る。上限は初級15%・中級20%・上級25%・達人34%・RUSH40%。削った分は他の区間へ回る。表は `DIFFS` の density とは独立している（trk90 までの density 比例式は、初級22.9%が中級20%を上回る逆転を起こしたため、trk91 で廃止）。合成曲 `contrast` の総数は初級〜RUSHで **100／212／459／514／894**（trk91 で初級は 115→100）、隣接難易度で厳密に増える（候補位置が足りる場合）。同曲の静かな区間（0〜90秒）は上級2.47 nps・達人3.08 nps。達人Lvは10で、Lv12〜15帯を回復したことまでは示さない。冒頭の判定は最大音量の1%未満のみ無音扱い（旧方式は6%）なので、冒頭の小さな音も入りやすい。`chartGen` の純関数としての未指定は旧方式のまま（ゴールデンを保つため）。旧方式の出力は `tests/fixtures/chart-legacy-golden.json`（ca84a19の`generateNotes`から取得）と全件一致が必須。ゴールデンは旧方式を変えたときに**作り直さない**（`node tests/capture-legacy-golden.mjs`は一度きりの道具）。
 - ライフ（体力）の規則は `js/modes.js` の `lifeRule(totalNotes)`（TRUCK の標準・最大・回復の帯）にある。ノーツ数で段階的に決まり、本書には数値を書かない。ノーツ数が増えると回復量が少し増える（帯が変わるのは250／650を越えるときだけ）。自動譜面の総数が増えたことは利用者が受け入れ済み。
 - **解析結果のキャッシュ（`js/media.js` の `analyzeAudioCached`）**：IndexedDB `trk_analysis_cache_v1`（packs DB とは別）。鍵は fingerprint＋先頭・末尾 64KB の SHA-256＋版数 `ANALYSIS_CACHE_VERSION`。保存するのは rms・onset・ratio の配列と数値だけ（PCM は保存しない）。ratio は既定の譜面作り方（chartGen 2）が使うので必ず入れる。読むときは形を確かめ、合わなければ解析し直す。30件まで（最後に読んだ時刻が古い順に消す。読み出しで `savedAt` を更新する LRU）。解析の式を変えたら版数を上げる。
+- **音声解析の資源上限**：96 MiB の既存ファイル上限を維持。通常モードは20分、`TrkLite.active()` が true のときだけ10分を超えた曲の解析を省略する。`liteNoAnalyze`（利用者が選ぶ解析省略）とは別判定。省略後もBPMグリッドの譜面は作る。`analysisSkipped`／`analysisSkippedLong`／`analysisSkippedLiteLong` は4言語。19分モノラルWAVのピーク664MB等はユーザー提供の仮想検査値で、実機測定ではない。
 - **📺 TVドックの設定（`js/tv-dock.js`）**：くわしいの中の「📺 TVドック」グループ。チェックは3つ：🧱 壁掛け（スキン `wall` と同じ。外すと映画館に戻る）、↕ 並び替え（テレビとラックの上下）、🔢 5枠化（`tvDockFive`）。既定はすべて OFF（映画館・テレビが上・5枠なし）。くわしいは既定で開いた状態（保存済みの開閉は変えない）。テレビ本体とラックの表示は変えていない。
 - **Loop Lab の映像書き出し（`js/media-player-mode.js` の `exportLoopClip`）**：開発者表示の中だけ。記録した区間の行の 🎬 を押すと、映像と音を区間の長さのぶん録画して保存する（WebM。対応していれば MP4）。設定は持たない。書き出し後は再生位置・再生／停止・速度・ループを元に戻す。曲を切り替えたら途中で止め、保存しない。音声だけの曲は書き出さない。
 - **「📁 開く」と「📤 共有」**（`js/library.js`）：📁 開く は曲を入れるだけで、共有としては覚えない。📤 共有 は共有として覚え、📤 の印が付き、「共有をやめる」でまとめて外せ、「端末に残す」の対象になる。ボタンの下の説明行は `libOpenShareHint`（4言語）。
-- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.9-trk92`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
+- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.9-trk93`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
 
 ## 3. 権利・データ・セキュリティの不変条件
 
 - ソースは GPL-3.0-or-later。プロジェクト名・同梱モデル等の個別条件は [`NOTICE.md`](../NOTICE.md) を正とする。MMDモデル・テクスチャ・VMDは、無料公開だけを理由に再配布しない。Lat式ミクは原文ReadMeと再配布条件を維持する。Piapro Character License／東方Projectの説明・クレジットも変更しない。
 - 音楽カタログは紹介用で音源を含めない。公開・販売・ストリーミング・購入・公式ページへのリンクを、一般の二次利用許諾と混同しない。許諾・対象曲・利用条件が未確認なら、未確認と表示する。
-- ユーザーが取り込んだローカル音源・文章・フォルダの元ファイルは読み取り専用。入力用ハンドルで `FileSystemHandle.remove()`／`createWritable()`／移動・作成・削除を行わない。唯一の例外は、利用者が明示的に実行する書斎テキストコピー書き出しで、別に選択したフォルダへ衝突しない新しいコピーだけを作る。既存ファイル・元ファイルは上書きせず、フォルダハンドルを設定へ永続保存しない。メディアを丸ごとメモリへ読まず、音声解析は、ファイルが `ANALYZE_MAX`（96MB・圧縮後）を超えるか、長さが `ANALYZE_MAX_SEC`（20分）を超える場合に省略する（デコード後のPCMは長さに比例するため、サイズだけでは判断しない）。省略時は状態に理由（`analysisSkipped`／`analysisSkippedLong`）を表示する。
+- ユーザーが取り込んだローカル音源・文章・フォルダの元ファイルは読み取り専用。入力用ハンドルで `FileSystemHandle.remove()`／`createWritable()`／移動・作成・削除を行わない。唯一の例外は、利用者が明示的に実行する書斎テキストコピー書き出しで、別に選択したフォルダへ衝突しない新しいコピーだけを作る。既存ファイル・元ファイルは上書きせず、フォルダハンドルを設定へ永続保存しない。メディアを丸ごとメモリへ読まず、音声解析は、ファイルが `ANALYZE_MAX`（96MB・圧縮後）を超える場合、または通常モードで `ANALYZE_MAX_SEC`（20分）、軽量化ONで `ANALYZE_LITE_MAX_SEC`（10分）を超える場合に省略する（デコード後のPCMは長さに比例するため、サイズだけでは判断しない）。長さ上限の軽量化判定は `TrkLite.active()` だけで、`liteNoAnalyze` の設定とは分離。省略時は理由（`analysisSkipped`／`analysisSkippedLong`／`analysisSkippedLiteLong`）を4言語で表示する。
 - 外部由来URLは `safeHttpUrl()`／`safeLink()` を通し、開く直前にも `plOpenLink()` で再検証する。設定・共有データは許可リストとサイズ上限で検証し、未検証JSONをコード実行しない。
 - `.stpack` は展開後合計1GiB上限。IndexedDB v2 の `size` indexで合計し、移行・件数不一致・不正値の過小計上を防ぐ。上限検査とputは同一readwrite transaction内で行う。書斎の容量とは別枠。索引の値は `openKeyCursor()` の `cursor.key` で読む。`IDBIndex.getAllKeys()` は**主キー**を返すので、合計に使ってはいけない（2026-10-08 に取り違えを修正。パックの主キーは `"p…"` の文字列）。
 - 解析結果のキャッシュは PCM を保存せず、`?safe=1` では読まず・書かない。初期化（♻️ ファクトリーリセット）では消えない（設定だけが戻る）。
-- `?safe=1` の判定・Service Workerのセーフクライアント除外を迂回しない。全設定リセットは確認ダイアログを通し、完全一致の `force=1` のみ確認を省く。`?factory` 単体は全消去ではなくセーフモード。新規アドオンは同意後にだけ実行し、起動時に指紋を確認する。
+- `?safe=1`／`#safe` の判定・Service Workerの初回ナビゲーションを含むセーフクライアント除外を迂回しない。全設定リセットは確認ダイアログを通し、完全一致の `force=1` のみ確認を省く。`?factory` 単体は全消去ではなくセーフモード。新規アドオンは同意後にだけ実行し、起動時に指紋を確認する。
 - 第三者ライブラリは `assets/vendor/` に同梱。CDNから実行コードを取得しない。vendorファイルは手で編集せず、`npm run vendor:update` と `npm run check` で更新・検証する。
 - `js/fx.js` と `js/fx-presets.js` は凍結扱い。変更が必要なら `TrkFX` API利用者とfx-dock／fx-synthを一緒に確認する。新規UI文言は日本語・英語・中国語・韓国語を同時に追加する。
 - セキュリティの調査経緯・例外・残件は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md)、読みやすさの点検は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照。
@@ -75,7 +76,7 @@
 | `js/fx.js`／`js/fx-presets.js` | 音響API・プリセット。凍結扱い |
 | `js/vrm.js`／`js/mmd.js` | 3D機能。vendorライブラリは利用時だけ動的import。`?safe=1` では読み込まない |
 | `js/study-room-utils.js`／`js/study-room.js` | 書斎の純データ処理・UI。ルビ解析は線形走査を維持 |
-| `sw.js` | 同一オリジンGET資源のキャッシュ。safeクライアントへキャッシュを返さない |
+| `sw.js` | 同一オリジンGET資源のキャッシュ。safeクライアントと `safeWanted(url)` の初回ナビゲーションへキャッシュを返さない |
 | `tools/check-*.mjs` | 静的回帰検査。失敗時は最初のエラーから直す |
 
 ## 5. MMD実装メモ
@@ -92,7 +93,7 @@ npm run check
 git diff --check
 ```
 
-`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。譜面ハッシュは注入した合成analysisから生成し、実WAVのデコード経路は別にエラー0・ノーツ件数±5%を確認。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-09／trk91）は Security 55 checks、a11y 8 checks、vendor 8 checks、軽量化 121 assertions、`npm test` 94件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
+`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。譜面ハッシュは注入した合成analysisから生成し、実WAVのデコード経路は別にエラー0・ノーツ件数±5%を確認。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-09／trk93）は Security 56 checks、a11y 8 checks、vendor 8 checks、軽量化 123 assertions、`npm test` 101件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
 
 `check-repo.mjs` はJavaScript構文・ローカル参照・ID・設定文言に加え、Arknights公式リンク、Blue Archive 225曲、LoL Sessions 108曲／Phase 1の58件、Gakumas 50件・別名、公式リンクと権利注記、既存プレイリストの所有曲・カスタムフィールド保持を検査する。チェックは意図的な逆テストでもFAILすることを確認してから追加する。外部ツールの起動後DOM検査は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照し、リポジトリ外で行う。
 
@@ -121,7 +122,10 @@ git diff --check
 - **テキスト編集・書き出し** — `.txt`／`.md`／`.js` の入力、Tab字下げ、Ctrl／⌘+S、自動保存と切替時の失敗ガード、本棚フォルダへの振り分けを確認する。通常ダウンロード／対応ブラウザのフォルダ選択、同名ファイルを上書きしないこと、元ファイル非書込み、HTML／JavaScriptを実行しないことも実機で確認。
 - **媒体操作** — ゲームパッド／TVリモコン、バナーの短押し・650ms長押し、映像・音声・メディアプレーヤー・シンセを実ブラウザで確認。
 - **譜面生成（chartGen・既定は新方式）** — 実機で、新方式の譜面が曲ごとに自然か（冒頭の静かな部分・後半の盛り上がり・Easy〜RUSHのLv表示・ノーツ増加の手触り）を確認する。「旧方式」に切り替えて従来の譜面・記録が出ること、旧方式の記録に「旧方式」の印が付くことも確認する。ヘッドレス（Chromium）での読込・切替・再読込の保存は確認済み（実機ではない）。
-- **長い曲の解析省略（20分超）** — 実機（Android Chrome等）で、20分を超える音声・動画を読み込んだとき「20分を超える曲は…省略」の表示と、BPMグリッドの譜面が出ることを確認する。ヘッドレスChromiumでは21分のWAVで省略の表示と譜面生成を確認済み（実機ではない）。96MB超のファイルの省略は未確認。メモリ使用量は端末で未測定。
+- **音声解析の上限（通常20分／軽量化ON10分）** — Android Chrome等の実機で、各上限を超えた音声／動画に正しい理由文が出て、BPMグリッド譜面で遊べることを確認する。`tests/media-analysis-limit.test.mjs` は19分通常モード、10分境界、両上限超、`liteNoAnalyze` との区別、96MiB上限を実際の `loadMedia()` で検査する。trk91ではヘッドレスChromiumで21分WAVの解析省略と譜面生成を確認済み（実機ではない）。ユーザー提供レポートの19分モノラル22kHz WAV・ピーク664MB、ステレオMP3で約2倍という値は本環境で再測定していない。96MiB超の実メディアと実機メモリ使用量は未確認。
+- **モバイルのゲームステージ** — `#stage` は `position:fixed` とし、`fitStage()` がviewportの幅・高さに合わせて縮小する。ブラウザースモークに360×800 portrait／800×360 landscapeの境界・スクロール検査を追加したが、実ブラウザ／実機ではまだ未確認。
+- **選曲画面のコントラスト** — `tests/skin-contrast.test.mjs` は44内蔵スキンの選択ボタン前景・通常／hover文字・曲リスト補助文字の不透明HEX色ペアをWCAG比で静的に検査する。CSS配線の追加テストもある。これはaxeのDOM色合成・opacity・擬似状態検査を再現しない。ユーザー提供の「19/44」報告はこの作業では実DOMで再現していないため、選曲画面でaxeを再実行し、特に手動ボタンのhover・`.libSub`・`#guideProgress` を確認する。
+- **Service Workerのsafeオフライン回帰** — `tools/smoke-browser.mjs` に、汚染した `index.html` を有効キャッシュへ入れ、HTTPサーバーを実際に停止した後で `/index.html?safe=1`・`/?safe=1`・`/#safe` を新しいページから開き、503と汚染スクリプト未実行を確かめる検査を追加した。Puppeteerのoffline modeだけでは代用しない。実ブラウザでの実行は未確認。
 - **3D部品の同梱後の表示（trk92）** — MMD・VRMの3D部品は `assets/vendor/` から読む。実機（Android Chrome・PC）で、初回読込・チェックボタンの表示が「3Dの部品」になっていること、読込に失敗したときのエラー文（`mmdNetError`）が4言語で正しく出ることを確認する。
 - **名前空間 D（window.Trk.*）と差し替えの回帰** — 実機（Android Chrome・PC）で次を確認：①曲リストで ✔（verified）の表示が、並べ替え・タブ切替・取り込み直後の再描画でも出る（`renderLib` 差し替え）、②アドオンの曲パック取り込み（`installPackFile`）と、取り込み後の一覧表示（`renderPackList`・`getPackSongs`）、③FIRST SPARK 以外の譜面で、結果画面・判定表示（`showJudge`）・映像（`drawVideo`）が従来どおり動く、④書斎・メディア・シンスの開閉で、ゲームのキーが止まる（overlay）。静的検査・ヘッドレスでは、差し替えの届き方（`renderLib` のみ）しか見ていない。
 
@@ -164,8 +168,10 @@ git diff --check
 
 ## 11. 最近の変更
 
-### 作業要約（2026-10-09時点・trk75〜91）
+### 作業要約（2026-10-09時点・trk75〜93）
 
+- **追補（trk93）**：SWの初回safeナビゲーション判定を強化し、キャッシュ名を `trk-v2026.10.9-trk93` に更新。汚染 `index.html`＋HTTPサーバー停止を使うオフライン回帰と360×800／800×360のstage幾何検査をブラウザースモークへ追加（実行はブラウザ未搭載のため未確認）。`#stage` をfixedに変更。軽量化中だけ音声解析の上限を10分にし、96MiB／通常20分と `liteNoAnalyze` を分離、スキップ理由を4言語化。44スキンのボタン／曲一覧補助文字とカスタムアクセントを静的WCAG計算で検査するテストを追加。`npm run check` 成功（Static 0 failure、Security 56、a11y 8、vendor 8、lite 123 assertions、node:test 101/101）、`git diff --check` 成功。axeの実DOM再現・実機測定ではない。
+- **英語ガイド・3D部品（trk92）**：英語ガイドの全節を整備し、three.js系の3D部品をローカル同梱へ移行。CDN参照を除き、エラー文言も4言語で更新。英語の母語話者確認と実機での3D表示は未確認（§7）。
 - **再レビュー対応（trk75〜77、trk90）**：IndexedDB・解析キャッシュ・名前空間・譜面生成・実行動作テスト。詳細は下の項目。
 - **スキンの増量（trk78〜89）**：ゲーム画面 27 → 40、TVドック 30 → 36、棚 16 → 30、書斎 24 → 30、映像フィルター 65 → 70。見やすさ・生活・色覚配慮・ビビットの系統を追加。**✨ TRKエフェクト**（映像フィルターの 20 種）は固定（`tests/trk-effects-fixed.test.mjs`）。映像フィルターの分類「エフェクト」は「ムード・場面」に改名。**スキン数は減らしていない。**
 - **最終検査（trk91・2026-10-09）**：`npm run check` 成功（Static 0 failure／0 warning、Security 55、a11y 8、vendor 8、node:test 94/94）、`node tools/globals-audit.mjs --compare` 成功、`git diff --check` 成功。ブラウザースモークは trk91 では未実行（§7）。
@@ -202,7 +208,7 @@ git diff --check
 - **2026-10-08 — 再レビュー（b7d88ad→6150725）の対応（trk75・trk76）：** ① 解析キャッシュを LRU 化（読み出しで `savedAt` を更新。テスト2件追加）。② `media.js` のコメント2件を修正（既定は `"2"`、decodeAudioData は再サンプル後の長さは減るがピークは減らない）。③ 静かな長い区間（レビュー1）：絶対音量ゲート（区間の平均音量が曲の最大の6%未満なら候補数の25%まで）を `chart-gen.js` に追加。合成曲 contrast の上級の静かな区間は 3.9→2.5 nps（Lv 10→9）。導入部（introChorus の 0〜30秒）・flat・silentLead は変わらない。**副作用**：contrast の上級・名人の総数が 562→459、768→459 に減る（盛り上がり側が候補の上限 7.9 nps に張り付くため）。テスト3件追加・1件の判定を変更（静かな区間の方が低いことを方向と下限で判定）。④ 互換名の廃止予定（レビュー4）：`docs/ADDONS.md` に 33 件を予告（trk76 から。trk76 から公開版を2回重ねた版で削除）。`tools/check-repo.mjs` が core.js の互換名と一覧の一致を検査。`const core` の別名導入は後回し（§9）。
 - **2026-10-08 — 今回の作業のまとめ（マージ前）：** ① IndexedDB：容量計算の索引の取り違えを修正（`5c93ef5`、`tests/idb.test.mjs` 13件）。② 解析結果のキャッシュを確定（`0761f72`、ヘッドレスで2回目のデコード0回・譜面一致・セーフモードは書かない）。③ 項目6：「📁 開く／📤 共有」の説明行（`15ea669`）。④ Loop Lab：区間の 🎬 で映像を書き出し（`e8fae4d`、開発者表示の中だけ）。⑤ 📺 TVドックの設定：壁掛け・並び替え・5枠化の3チェック、既定はくわしいが開いた状態、3つとも OFF（`04fb26e`）。⑥ Issue：#21・#22・#24・#25 を修正済みとして閉じ、#23 は安定版の追跡項目として閉じた。
 - **2026-10-08 — 残りの低優先（レビュー低）と軽量化の確認：** ① 見出しの飛び h1→h3 を解消（曲リストの見出しを h2、見た目は同じ）。② devDependency の typescript は削除せず注記（Capacitor CLI が `capacitor.config.ts` を読むのに必要。`docs/android.md`）。③ 実機確認の Issue フォーム（`device_check.yml`）。④ 軽量化の一通りの確認で、PC の自動モードでプリセットを選んでも働かなかった不具合を直した（プリセットを選んだら「オン」）。⑤ 解析キャッシュ（IndexedDB `trk_analysis_cache_v1`）を追加：保存は rms・onset・ratio の配列と数値だけ（PCM なし）。ratio を入れたのは、既定の譜面作り方が ratio を使い、外すと譜面が変わるため（利用者が選んだ）。
-- **2026-10-08 — Service Worker（レビュー7・trk74）：** ハッシュ固定の vendor（`assets/vendor/`、100 ファイル）だけを cache-first にした。キャッシュの中身は、`sw.js` の `VENDOR_PINS`（`tools/vendor-lock.json` の SHA-384、`tools/sw-vendor-pins.mjs` で生成）と合うものだけ使う。合わなければ通信し、オフラインでは 503。セーフモード（`?safe=1`）はキャッシュを読まない（従来どおり）。あわせて、セーフモードの判定が効いていなかった既存の欠陥（F-20）を直した：ナビゲーションの要求の `event.clientId` は空なので、`event.resultingClientId` を使う。確認：check-repo の検査（逆検証 5 件とも失敗）、headless（SW の CDP で通信件数）：2回目の取得は通信 0、偽物は拒否して取り直し、オフラインの偽物は 503、オフラインの正しいキャッシュは 200、セーフモードは通信し、オフラインは 503。修正前の 1 行に戻すと、セーフモードのオフラインが 200 になることも確認。
+- **2026-10-08 — Service Worker（レビュー7・trk74）：** ハッシュ固定の vendor（`assets/vendor/`、100 ファイル）だけを cache-first にした。キャッシュの中身は、`sw.js` の `VENDOR_PINS`（`tools/vendor-lock.json` の SHA-384、`tools/sw-vendor-pins.mjs` で生成）と合うものだけ使う。合わなければ通信し、オフラインでは 503。セーフモード（`?safe=1`）はキャッシュを読まない（従来どおり）。あわせて、セーフモードの判定が効いていなかった既存の欠陥（当時の `SECURITY.md` ではF-20、2026-10-09の現行一覧ではF-19に統合）を直した：ナビゲーションの要求の `event.clientId` は空なので、`event.resultingClientId` を使う。確認：check-repo の検査（逆検証 5 件とも失敗）、headless（SW の CDP で通信件数）：2回目の取得は通信 0、偽物は拒否して取り直し、オフラインの偽物は 503、オフラインの正しいキャッシュは 200、セーフモードは通信し、オフラインは 503。修正前の 1 行に戻すと、セーフモードのオフラインが 200 になることも確認。
 - **2026-10-08 — 入口の整理 その3（レビュー6・trk73）：** 「一部／要確認」の4件を判断した。タブ帯の ⚙（`tabSettingsMenu`、長押しと同じメニュー）、スキンツールの「⚙ くわしい設定」（`openSpecSettings`、長押しの判定 `typeof openSettings` を除去して、長押しでも設定を開くようにした）、曲リストの見出しの「📚 書斎を開く」（`studyOpenBtn`）を付けた。3つとも `moreBtn`（設定 showMoreBtns で隠せる）。Esc は設定の「🛟 緊急復旧」→「セーフモード」が既存なので変えない。check-repo に検査を追加（逆検証 3 件とも失敗を確認）。headless の probe（⚙ でメニュー、書斎ボタンで開く、⚙ くわしい設定で specPanel が開く、設定オフで3つ消える）、ページエラーなし。
 - **2026-10-09 — 英語ガイドの全節（trk92）：** `docs/guide/en.md` に、日本語版の全節（start・play・controls・appearance・sound・spectrum・study-room・packs・mobile・environment・mods・files・security・credits）の英訳を追加した。目次つき。リンクは全件解決を確認。`appearance.md` の MMD 確認の文言（CDN）も同梱の表現に直した。英語版は日本語版の翻訳で、正は日本語版（§10 の項目）。**未確認**：英語の表現の母語話者による確認。
 - **2026-10-09 — 残りの注意点の整理（trk92）：** ① 英語ガイド `docs/guide/en.md` に「Difficulty names and Lv」の節を追加（日本語版 play.md と同内容）。② 3D部品（three.js・three-vrm・three-mmd-loader）は `assets/vendor/` に同梱し、importmap もローカルを指す（CDN へ接続しない）。古い記述を直した：`js/mmd.js` の注釈、`docs/android.md` の制限4、MMD の確認・エラー文言（4言語。「CDN」→「3Dの部品」、オンラインへの案内を削除）。③ `sw.js` のキャッシュ名を `trk-v2026.10.9-trk92` に更新。確認：`npm run check` 全件通過（テスト 94/94）、`git diff --check`。ヘッドレスのブラウザは環境にないため、文言の表示と MMD の読込は実機で未確認（§7）。

@@ -38,6 +38,8 @@ const ANALYZE_MAX = 96 * 1024 * 1024;
    デコード中のピークメモリは実装しだいで減らないことが多い。OfflineAudioContext で
    ダウンサンプルしても瞬間の最大メモリは減らない見込み（時間上限で切る判断はこのため）。 */
 const ANALYZE_MAX_SEC = 20 * 60;
+/* 🪶 軽量化が有効な端末では、PCM のピークを抑えるため解析を10分までにする */
+const ANALYZE_LITE_MAX_SEC = 10 * 60;
 
 /* ---------- 曲の読み込み ----------
    opts.title   : 表示名
@@ -65,7 +67,9 @@ async function loadMedia(file, opts = {}) {
   core.setStatus("loadStatus", "analyzing"); core.updateChartButtons();
   await new Promise(r => { setTimeout(r, 30); });
   const tooBig = (Number(file.size) || 0) > ANALYZE_MAX;
-  const tooLong = core.video.duration > ANALYZE_MAX_SEC;
+  const liteActive = typeof TrkLite === "object" && typeof TrkLite.active === "function" && TrkLite.active();
+  const tooLong = core.video.duration > (liteActive ? ANALYZE_LITE_MAX_SEC : ANALYZE_MAX_SEC);
+  const liteLong = liteActive && tooLong;
   /* 🪶 軽量化：解析をしない設定では、ファイル全体をデコードして走り直すところごと飛ばします
      （長い曲ほど効きます。譜面はBPMグリッド中心の自動生成になり、自作・取り込み譜面はそのまま） */
   const liteSkip = !tooBig && !tooLong && typeof TrkLite === "object" && typeof TrkLite.noAnalyze === "function" && TrkLite.noAnalyze();
@@ -73,7 +77,7 @@ async function loadMedia(file, opts = {}) {
   if (skipAnalyze) core.analysis = null;
   else { try { core.analysis = await analyzeAudioCached(file, core.fingerprint); } catch (_) { core.analysis = null; } }
   if (token !== core.loadToken) return false;
-  core.setStatus("loadStatus", tooBig ? "analysisSkipped" : tooLong ? "analysisSkippedLong" : liteSkip ? "analysisSkippedLite" : core.analysis ? "loaded" : "decodeFallback");
+  core.setStatus("loadStatus", tooBig ? "analysisSkipped" : liteLong ? "analysisSkippedLiteLong" : tooLong ? "analysisSkippedLong" : liteSkip ? "analysisSkippedLite" : core.analysis ? "loaded" : "decodeFallback");
   let supplied = false;
   if (opts.onReady) { try { supplied = !!(await opts.onReady()); } catch (e) { console.error(e); } }
   if (token !== core.loadToken) return false;

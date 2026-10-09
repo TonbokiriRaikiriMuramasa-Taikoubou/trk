@@ -14,6 +14,8 @@
  *   4. 実 WAV のデコード・音声解析にエラーがなく、キー集合一致・件数±5%以内か
  *   5. 公開 API を通す場面（書斎の開閉・一覧・統計・掃除）の結果と、その間のエラー
  *   6. 画面の見えているボタンを順に押したときの新しいエラー
+ *   7. 360×800 portrait／800×360 landscape で #stage が viewport 内に収まるか
+ *   8. 汚染した index.html をSW cacheへ入れ、HTTPサーバーを停止した状態で safe URL が 503 になり、偽スクリプトを実行しないか
  * window に増減した名前は、名前空間の移行で意図して変わるので「報告のみ」。 */
 import http from "node:http";
 import fs from "node:fs";
@@ -28,6 +30,9 @@ const MODE = process.argv.includes("--write") ? "write" : process.argv.includes(
 if (!MODE) { console.error("使い方：--write か --compare を付けてください（先頭のコメント参照）"); process.exit(2); }
 const CLICK_LIMIT = Number(process.env.SMOKE_CLICKS || 400);
 const BASELINE = path.join(ROOT, "tests/fixtures/smoke-baseline.json");
+const SW_SOURCE = fs.readFileSync(path.join(ROOT, "sw.js"), "utf8");
+const CACHE_NAME = SW_SOURCE.match(/CACHE\s*=\s*['"]([^'"]+)['"]/)?.[1];
+if (!CACHE_NAME) throw new Error("sw.js cache name could not be read for the offline safe-mode smoke test");
 
 /* ---- 合成曲（tests/helpers/synth.mjs と同じ考え方：区間ごとに音量を変える） ---- */
 function makeWav() {
@@ -90,6 +95,14 @@ function serve() {
   return new Promise(r => server.listen(0, "127.0.0.1", () => r(server)));
 }
 
+function closeServer(server) {
+  return new Promise((resolve, reject) => {
+    if (!server.listening) return resolve();
+    server.close(err => err ? reject(err) : resolve());
+    server.closeAllConnections?.();
+  });
+}
+
 async function loadPuppeteer() {
   const spec = process.env.SMOKE_PUPPETEER || "puppeteer-core";
   const mod = await import(spec.startsWith("/") ? pathToFileURL(spec).href : spec);
@@ -104,9 +117,10 @@ async function main() {
   const port = server.address().port;
   const launch = { headless: true, args: JSON.parse(process.env.SMOKE_CHROME_ARGS || "[]") };
   if (process.env.SMOKE_CHROME) launch.executablePath = process.env.SMOKE_CHROME;
-  const browser = await puppeteer.launch(launch);
-  const report = { boot: {}, globals: {}, unresolved: [], charts: {}, scenarios: {}, clicks: {}, pageErrors: [] };
+  let browser = null, serverStopped = false;
+  const report = { boot: {}, globals: {}, unresolved: [], charts: {}, scenarios: {}, clicks: {}, mobileStage: null, safeOffline: null, pageErrors: [] };
   try {
+    browser = await puppeteer.launch(launch);
     /* 基準：何も読み込んでいない about:blank の window の名前 */
     const blank = await browser.newPage();
     await blank.goto(`http://127.0.0.1:${port}/__blank.html`, { waitUntil: "load" });
@@ -255,11 +269,102 @@ async function main() {
       await page.keyboard.press("Escape").catch(() => {});
     }
     report.clicks = { candidates: clickLabels.length, clicked, errors: clickErrors };
+
+    /* 7. Narrow portrait and short landscape viewports: #stage must remain inside the layout viewport. */
+    const mobilePage = await browser.newPage();
+    const mobileOrigin = `http://127.0.0.1:${port}`;
+    const mobileSizes = [{ name:"portrait", width:360, height:800 }, { name:"landscape", width:800, height:360 }];
+    const mobileMeasurements = {};
+    for (const size of mobileSizes) {
+      await mobilePage.setViewport({ width:size.width, height:size.height, isMobile:true, deviceScaleFactor:1 });
+      await mobilePage.goto(`${mobileOrigin}/index.html`, { waitUntil:"load", timeout:60000 });
+      await mobilePage.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      mobileMeasurements[size.name] = await mobilePage.evaluate(expected => {
+        const stage = document.getElementById("stage"), r = stage?.getBoundingClientRect();
+        if (!r) return { expected, missingStage:true };
+        const viewport = { width:innerWidth, height:innerHeight };
+        const rect = { left:r.left, top:r.top, right:r.right, bottom:r.bottom, width:r.width, height:r.height };
+        const inBounds = Math.abs(viewport.width - expected.width) <= 1 && Math.abs(viewport.height - expected.height) <= 1 &&
+          rect.left >= -1 && rect.top >= -1 && rect.right <= viewport.width + 1 && rect.bottom <= viewport.height + 1 &&
+          document.documentElement.scrollWidth <= viewport.width + 1 && document.documentElement.scrollHeight <= viewport.height + 1;
+        return { expected, viewport, rect, scroll:{ width:document.documentElement.scrollWidth, height:document.documentElement.scrollHeight }, inBounds };
+      }, { width:size.width, height:size.height });
+    }
+    await mobilePage.close();
+    const mobileOk = mobileSizes.every(size => mobileMeasurements[size.name]?.inBounds === true);
+    report.mobileStage = { ok:mobileOk, viewports:mobileMeasurements };
+    report.scenarios["layout:mobile-stage"] = {
+      value:mobileOk ? "portrait and landscape stage bounds inside viewport" : JSON.stringify(mobileMeasurements),
+      newErrors:mobileOk ? [] : ["#stage is outside the mobile layout viewport or caused document overflow"],
+    };
+
+    /* 8. Seed the active SW cache with a deliberately executable index.html, then stop the HTTP server.
+       Navigation is deliberately from a fresh client, where event.clientId is empty. */
+    const controlled = async () => page.evaluate(async () => {
+      if (!("serviceWorker" in navigator)) return false;
+      try {
+        await navigator.serviceWorker.ready;
+        if (!navigator.serviceWorker.controller) await new Promise(resolve => {
+          const timer = setTimeout(resolve, 5000);
+          navigator.serviceWorker.addEventListener("controllerchange", () => { clearTimeout(timer); resolve(); }, { once:true });
+        });
+        return !!navigator.serviceWorker.controller;
+      } catch (_) { return false; }
+    });
+    let hasController = await controlled();
+    if (!hasController) {
+      await page.reload({ waitUntil:"load", timeout:60000 });
+      hasController = await controlled();
+    }
+    if (!hasController) throw new Error("service worker did not control the app page for the offline safe-mode regression");
+    const poisonSeeded = await page.evaluate(async cacheName => {
+      const cache = await caches.open(cacheName), root = new URL("./", location.href);
+      const poison = '<!doctype html><meta charset="utf-8"><title>POISONED-SHELL</title><script>window.__trkSmokePoisonRan=true;document.title="POISONED-SHELL"</script>';
+      const response = new Response(poison, { status:200, headers:{ "Content-Type":"text/html; charset=utf-8" } });
+      await cache.put(new URL("index.html", root).href, response.clone());
+      await cache.put(root.href, response.clone());
+      return (await cache.match(new URL("index.html", root).href))?.status === 200;
+    }, CACHE_NAME);
+    if (!poisonSeeded) throw new Error("could not seed the active service-worker cache for the safe-mode regression");
+    await closeServer(server);
+    serverStopped = true;
+    const safeTargets = [
+      { name:"index-query", path:"/index.html?safe=1" },
+      { name:"root-query", path:"/?safe=1" },
+      { name:"root-hash", path:"/#safe" },
+    ];
+    const safeResults = [];
+    for (const target of safeTargets) {
+      const offlinePage = await browser.newPage();
+      let response = null, navigationError = "";
+      try { response = await offlinePage.goto(`${mobileOrigin}${target.path}`, { waitUntil:"load", timeout:15000 }); }
+      catch (e) { navigationError = String(e && e.message || e).split("\n")[0]; }
+      const landed = await offlinePage.evaluate(() => ({
+        title:document.title, poisoned:window.__trkSmokePoisonRan === true,
+        body:(document.body?.innerText || "").slice(0, 240), href:location.href,
+      })).catch(() => ({ title:"", poisoned:false, body:"", href:"" }));
+      const status = response?.status() ?? null;
+      const safeMessage = landed.body.includes("Safe mode does not use the cached copy");
+      const passed = status === 503 && safeMessage && !landed.poisoned && landed.title !== "POISONED-SHELL";
+      safeResults.push({ name:target.name, path:target.path, status, navigationError, safeMessage, poisoned:landed.poisoned, passed });
+      await offlinePage.close();
+    }
+    const safeOk = safeResults.length === safeTargets.length && safeResults.every(row => row.passed) && !server.listening;
+    report.safeOffline = {
+      ok:safeOk, cacheSeeded:poisonSeeded, serverStopped:!server.listening,
+      blocked:safeResults.filter(row => row.passed).length, poisonExecutions:safeResults.filter(row => row.poisoned).length,
+      routes:safeResults,
+    };
+    report.scenarios["security:safe-offline-shell"] = {
+      value:`blocked=${report.safeOffline.blocked}/${safeTargets.length}; poisonRuns=${report.safeOffline.poisonExecutions}; serverStopped=${report.safeOffline.serverStopped}`,
+      newErrors:safeOk ? [] : safeResults.filter(row => !row.passed).map(row => `${row.name}: HTTP ${row.status ?? "none"}, poison=${row.poisoned}, safeMessage=${row.safeMessage}${row.navigationError ? `, ${row.navigationError}` : ""}`),
+    };
+
     await flush();
     report.pageErrors = uniq(errors);
   } finally {
-    await browser.close().catch(() => {});
-    server.close();
+    if (browser) await browser.close().catch(() => {});
+    if (!serverStopped) await closeServer(server).catch(() => {});
   }
   return report;
 }
@@ -276,16 +381,22 @@ const summary = {
   decls: report.declCount, globals: report.globalCount, added: report.globals.added.length,
   charts: Object.keys(report.charts).length, decodedCharts: Object.keys(report.decoded.charts).length,
   decodeErrors: report.decoded.errors.length, scenarios: Object.keys(report.scenarios).length, clicks: report.clicks.clicked,
-  clickErrors: report.clicks.errors.length,
+  clickErrors: report.clicks.errors.length, mobileStage: report.mobileStage?.ok === true, safeOffline: report.safeOffline?.ok === true,
 };
 console.log(JSON.stringify(summary));
 if (MODE === "write") {
+  const required = [];
+  if (!report.mobileStage?.ok) required.push("mobile #stage viewport geometry");
+  if (!report.safeOffline?.ok) required.push("offline safe-mode rejection of the poisoned shell");
+  if (required.length) { console.log("NG\n- smoke gate failed: " + required.join(" / ")); process.exit(1); }
   fs.mkdirSync(path.dirname(BASELINE), { recursive: true });
   fs.writeFileSync(BASELINE, JSON.stringify(report, null, 1) + "\n");
   console.log(`wrote ${path.relative(ROOT, BASELINE)}`);
 } else {
   const base = JSON.parse(fs.readFileSync(BASELINE, "utf8"));
   const problems = [];
+  if (!report.mobileStage?.ok) problems.push("モバイル portrait/landscape で #stage が viewport 内に収まらない");
+  if (!report.safeOffline?.ok) problems.push("停止したサーバー上の safe URL が汚染 index.html を拒否できない");
   const baseChartKeys = Object.keys(base.charts || {}).sort();
   const nowChartKeys = Object.keys(report.charts).sort();
   if (JSON.stringify(baseChartKeys) !== JSON.stringify(nowChartKeys)) problems.push(`合成analysisの譜面キーが違う: ${baseChartKeys.join(", ")} → ${nowChartKeys.join(", ")}`);

@@ -2,7 +2,7 @@
 /* trk! offline shell: network first, cached same-origin app files as a fallback.
    Exception: the hash-pinned vendor files (assets/vendor, tools/vendor-lock.json) are cache-first,
    but a cached copy is used only when its SHA-384 matches the pin below. */
-const CACHE = "trk-v2026.10.9-trk92";
+const CACHE = "trk-v2026.10.9-trk93";
 const CACHE_PREFIX = "trk-";
 const SCOPE = new URL(self.registration.scope);
 const VENDOR_PREFIX = "assets/vendor/";
@@ -163,7 +163,8 @@ self.addEventListener("fetch", event => {
 
   /* ナビゲーションの要求では event.clientId は空（まだ無いページ）。そのページの id は resultingClientId にある */
   if (request.mode === "navigate" && safeWanted(url) && event.resultingClientId) safeClients.add(event.resultingClientId);
-  const safeClient = safeClients.has(event.clientId);
+  /* 初回ナビゲーションでは clientId が空なので、URL 自体が safe を要求していればキャッシュを使わない */
+  const safeClient = safeClients.has(event.clientId) || (request.mode === "navigate" && safeWanted(url));
   const pinned = pinnedPath(url);
 
   event.respondWith((async () => {

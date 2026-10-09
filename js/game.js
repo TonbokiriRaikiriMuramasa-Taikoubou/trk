@@ -172,7 +172,7 @@ const MODE_LABEL = { truck:"truckPlay", orbit:"orbitPlay", stage:"stagePlay", ca
 const MODE_ICON = { truck:"🚚", orbit:"🪐", stage:"🎪", catch:"🚛" };
 const modeLabel = () => tr(MODE_LABEL[core.settings.playMode] || "manualPlay") + (core.settings.autoPlay ? " · " + tr("autoPlay") : "");
 const modeIcon = m => MODE_ICON[m] || "";
-const runMods = () => [...core.activeMods(), ...lifeTags(),
+const runMods = () => [...core.activeMods(), ...window.Trk.modes.lifeTags(),
   ...(core.settings.playMode === "catch" && core.settings.catchNitroBonus && core.stats.blastBonus > 0 ? ["NITRO×1.1"] : []),
   ...(core.settings.playMode === "stage" && core.settings.stageMirror && !core.settings.modMirror ? ["MIRROR"] : []),
   ...(core.settings.playMode === "stage" && core.settings.stageRandom === "random" && !core.settings.modRandom ? ["RANDOM"] : []),

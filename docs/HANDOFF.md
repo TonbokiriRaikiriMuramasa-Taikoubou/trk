@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-09（trk97）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
+> **最終更新：2026-10-09（trk98）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
 
 ## 1. 作業を再開するとき
 
@@ -48,7 +48,7 @@
 - **📺 TVドックの設定（`js/tv-dock.js`）**：くわしいの中の「📺 TVドック」グループ。チェックは3つ：🧱 壁掛け（スキン `wall` と同じ。外すと映画館に戻る）、↕ 並び替え（テレビとラックの上下）、🔢 5枠化（`tvDockFive`）。既定はすべて OFF（映画館・テレビが上・5枠なし）。くわしいは既定で開いた状態（保存済みの開閉は変えない）。テレビ本体とラックの表示は変えていない。
 - **Loop Lab の映像書き出し（`js/media-player-mode.js` の `exportLoopClip`）**：開発者表示の中だけ。記録した区間の行の 🎬 を押すと、映像と音を区間の長さのぶん録画して保存する（WebM。対応していれば MP4）。設定は持たない。書き出し後は再生位置・再生／停止・速度・ループを元に戻す。曲を切り替えたら途中で止め、保存しない。音声だけの曲は書き出さない。
 - **「📁 開く」と「📤 共有」**（`js/library.js`）：📁 開く は曲を入れるだけで、共有としては覚えない。📤 共有 は共有として覚え、📤 の印が付き、「共有をやめる」でまとめて外せ、「端末に残す」の対象になる。ボタンの下の説明行は `libOpenShareHint`（4言語）。
-- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.9-trk97`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
+- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.9-trk98`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
 
 ## 3. 権利・データ・セキュリティの不変条件
 
@@ -98,7 +98,9 @@ git diff --check
 
 リザルト・Esc・ランク判定の検査：`tests/game-end.test.mjs`（終端・記録失敗・表示順序）、`tests/esc-hold.test.mjs`（Esc長押し）、`tests/ranked-option.test.mjs`（ランク判定の記録）。いずれも VM で実ソースを動かす静的寄りの検査で、実ブラウザでの表示は §7 に残す。
 
-`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。譜面ハッシュは注入した合成analysisから生成し、実WAVのデコード経路は別にエラー0・ノーツ件数±5%を確認。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-09／trk95）は Security 56 checks、a11y 8 checks、vendor 8 checks、軽量化 123 assertions、`npm test` 109件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
+実ブラウザでの終端検査は `tools/smoke-game-end.mjs`（trk98。`SMOKE_CHROME`・`SMOKE_PUPPETEER` を指定して手動で実行。`npm run check` には入れない）。20秒の合成音声を MANUAL と AUTO で最後まで流し、結果画面が出て pageerror が 0 件であることを確かめる。
+
+`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。譜面ハッシュは注入した合成analysisから生成し、実WAVのデコード経路は別にエラー0・ノーツ件数±5%を確認。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-09／trk98）は、Security 56 checks・a11y 8 checks・vendor 8 checks・軽量化 123 assertions は trk95 時点の値、`npm test` は **124件**（trk98で `game-end` の配線検査を追加）。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
 
 `check-repo.mjs` はJavaScript構文・ローカル参照・ID・設定文言に加え、Arknights公式リンク、Blue Archive 225曲、LoL Sessions 108曲／Phase 1の58件、Gakumas 50件・別名、公式リンクと権利注記、既存プレイリストの所有曲・カスタムフィールド保持を検査する。チェックは意図的な逆テストでもFAILすることを確認してから追加する。外部ツールの起動後DOM検査は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照し、リポジトリ外で行う。
 
@@ -121,7 +123,7 @@ git diff --check
 - **Music／プレイリスト** — タッチ端末で🐔の長押し階層・表示名・並べ替えを確認。Music内で利用者が作った`trk`フォルダを選んで中だけが読み込まれ、再スキャン可能であり、ファイルの新規作成・移動がないこと。公式wishで灰色→所持後に黒い行となり遊べること、`.ogg`と照合メモ／SEARCH LIGHT別名を実ファイルで確認。
 - **カタログ曲リンク** — wish行から公式の個別ページ／作品ページが開くこと。楽曲別ページがない案内先は作品ページとして表示され、利用許諾と誤解されないこと。アークナイツ「墟」👹、Babel 5曲、LONETRAIL 10曲、イベントOST8作品も確認。
 - **FIRST SPARK** — 30秒デモの初級・中級・上級を実際に遊び、27／54／111ノーツが音に合うか、`chartCustom`表示・難易度切替・達人/RUSHの自動生成・404時のフォールバックを確認。
-- **リザルト画面（trk95・trk96で表示順序を修正）** — Android Chrome・PCで MANUAL操作とAUTO設定の両方により、MANUAL／TRUCK／ORBIT／STAGE／CATCH 全モードを完走し、リザルトが1回だけ表示されることを確認する。中断・再開で誤って終了しないこと、音源終端で ended 通知が欠ける端末でも結果へ進むことも確認（静的・VMテストのみ実施、実機未確認）。
+- **リザルト画面（trk95・trk96で表示順序を修正、trk98で `lifeTags` の公開漏れを修正）** — trk98 では実ブラウザ（ヘッドレスChromium）で、MANUAL・AUTO のクリアと体力切れ（FAILED）の結果画面が出ることを確認済み。実機では未確認。Android Chrome・PCで MANUAL操作とAUTO設定の両方により、MANUAL／TRUCK／ORBIT／STAGE／CATCH 全モードを完走し、リザルトが1回だけ表示されることを確認する。中断・再開で誤って終了しないこと、音源終端で ended 通知が欠ける端末でも結果へ進むことも確認（静的・VMテストのみ実施、実機未確認）。
 - **軽量化** — Android Chrome／PWAで自動判定、20／30fpsの操作感・発熱・電池、装飾間引き、曲リスト60行、音声解析省略、MMD／VRM遅延読込を確認。
 - **解析キャッシュ（trk_analysis_cache_v1）** — 同じ曲の2回目の読み込みで解析を省くこと、件数の上限（30）と容量の見え方を実機で確認する（ヘッドレスでは、2回目のデコードが0回・譜面が一致・壊れた記録は無視して作り直す・件数の上限を確認済み）。
 - **IndexedDB** — 既存pack入りのブラウザでv1→v2移行・`size` index・旧レコードのsize・新規保存・複数タブ時の `packDbBlocked` を確認。容量が0になる／過小計上する場合は最優先で調査。2026-10-08 に、索引の取り違えで高速経路が一度も使われていなかった不具合を直した（ヘッドレスで確認済み）。実機で容量の表示が前と同じかを確かめる。
@@ -176,10 +178,10 @@ git diff --check
 
 ## 11. 最近の変更
 
-直近の作業だけを残す。trk70〜trk95 の詳しい記録は [`docs/HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) にある。
+直近の作業だけを残す。trk70〜trk96 の詳しい記録は [`docs/HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) にある。
 
 - **trk97 — Esc長押しで選曲へ戻る**：プレイ中・一時停止中・リザルトで Esc を約1秒押すと、確認なしで選曲画面へ戻る（`js/main.js` の `escHoldStart`）。短押しは従来どおり。❓謎設定の「Esc長押しで曲選択画面に戻らない」（`escNoReturn`、既定オフ＝戻る）で止められる。合成キー（パッドの戻る）と、書斎などの開いている間は対象外。検査は `tests/esc-hold.test.mjs`。
 - **trk97 — ランク判定の検査**：ゆるめ判定・1.00x未満は練習扱い（プレイ回数は増えるがハイスコアは更新しない）、きびしめ・1.05x以上は記録対象、AUTO は記録しない、を実ソースの `recordPlay` で確かめる（`tests/ranked-option.test.mjs`）。ヘッドレスのブラウザは環境になく、画面上での確認は §7 に残す。
-- **trk96 — リザルトのランク・称号が消える問題**：画面を出す前に結果を描いていなかったため、聞き手の出力（判定の平均・称号など）が消えていた。順序を「結果を描く → 画面を出す → 記録 → 記録に依る行を埋める → `resultRecorded`」に直した（`js/game.js`・`js/modes.js`）。検査は `tests/game-end.test.mjs`。
-- **trk95 — 終端・リザルト遷移**：終端判定を `game.js` に一元化（§2.3）。
-- 公開コードを変えたので `sw.js` のキャッシュ名は **`trk-v2026.10.9-trk97`**。
+- **trk98 — 曲の終わりで結果画面が出ない不具合（回帰）を修正**：`game.js` の `runMods` が、IIFE の中にある `lifeTags` を裸の名前で呼んでいたため ReferenceError になり、`phase` だけ `ended` になって結果画面が空のままだった（trk95・96 の修正は正しく、その後の名前の整理で `lifeTags` が公開されなくなった）。`js/modes.js` で `window.Trk.modes.lifeTags` として公開し、`game.js` はそれを呼ぶ。既存の検査はスタブで `runMods` を置き換えていたため見逃していた。検査：`tests/game-end.test.mjs` に配線の検査を追加。実ブラウザの検査として `tools/smoke-game-end.mjs`（下記）を追加。
+- **trk98 — 実ブラウザの終端検査**：`SMOKE_CHROME=… SMOKE_PUPPETEER=… node tools/smoke-game-end.mjs` で、20秒の合成音声を MANUAL と AUTO の両方で最後まで流し、結果画面の表示と pageerror 0 を確かめる。`npm run check` には入れない。
+- 公開コードを変えたので `sw.js` のキャッシュ名は **`trk-v2026.10.9-trk98`**。

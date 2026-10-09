@@ -686,4 +686,8 @@ window.resetLives = resetLives;
 window.resetOrbit = resetOrbit;
 window.starPath = starPath;
 window.titleString = titleString;
+/* game.js の runMods（リザルトの「MODS:」行）が使う。IIFE の中の const なので、公開しないと届かない。
+   これが無いと endGame が ReferenceError で止まり、phase だけ ended になって結果画面が出ない（trk97 の回帰） */
+window.Trk = window.Trk || {};
+window.Trk.modes = Object.assign(window.Trk.modes || {}, { lifeTags });
 })();

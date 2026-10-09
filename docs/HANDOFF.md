@@ -1,195 +1,94 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-09（trk100）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
+> **最終更新：2026-10-09（trk104）**。この文書は現在の設計・利用者指定・未完了事項だけをまとめる。詳細な履歴は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、セキュリティは [`SECURITY.md`](SECURITY.md)／[`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照する。
 
-## 1. 作業を再開するとき
+## 1. 再開・変更の基本
 
-1. `git status --short` と差分を読み、未コミットの変更を勝手に破棄しない。
-2. Arenaが指定したブランチを使い、別ブランチへ切り替えない。`main` への反映はPR経由。
-3. 最低限 `npm run check` と `git diff --check` を実行する。
-4. 静的検査の成功を実ブラウザ・タッチ端末・WebGL確認済みと扱わない。未確認事項は §7 に残す。
+- 最初に `git status --short` と差分を確認する。既存の変更を確認せずに破棄・上書きしない。
+- Arena指定の作業ブランチを維持し、`main` へ直接 push しない。反映はPR経由。
+- 変更後は最低限 `npm run check` と `git diff --check`。静的・VMテストの成功を、未実施の実ブラウザ／実機確認済みとは扱わない。
+- バンドラーはない。`index.html` のscript読込順が実行順。公開コード変更時は関連テスト・文書・`sw.js` のキャッシュ名を確認する。
 
-バンドラーはない。`index.html` をHTTPサーバーまたはGitHub Pagesから開く。scriptの読込順は `index.html` が正で、変更時はテスト・関連文書・`sw.js` のキャッシュ名も確認する。
+## 2. 現在の優先事項
 
-## 2. 現在の実装・カタログ
+- **音楽カタログと権利確認を優先し、TV機能の追加作業は保留。LoLを先に調査する。**
+- LoLは段階収録。現状はCreator-Safe Sessions 3作／108曲、近年のChampion Themes 41曲、Worlds/WCS公式アンセム13曲、確認済みMSIアンセム4曲、K/DA 6曲。K/DAは「POP/STARS」＋「ALL OUT」EP収録5曲を独立リストに収録済み。全楽曲の網羅を主張しない。
+- 次のLoL調査候補は、旧ログインテーマ／旧Champion Themes、他の仮想アーティスト作品、Skin・イベント曲、ゲームOST等。Champion Theme・大会アンセム・仮想アーティストを混ぜず、公式の個別曲名・リンク・分類が確認できた範囲だけ追加する。見つからなかったことを「存在しない」と扱わない。
+- 調査台帳：[`LEAGUE-OF-LEGENDS-MUSIC.md`](LEAGUE-OF-LEGENDS-MUSIC.md)。曲別の出典・fixture：`tools/leagueoflegends-music-tracklist.json` と `tools/leagueoflegends-sessions-tracklist.json`。
 
-### 2.1 公式音楽カタログ
+## 3. 権利・配布の扱い
 
-実装本体は `js/catalog.js` の `TRK_CATALOG`（`S`＝シリーズ、`PL`＝リスト、`T`＝曲）。音源ファイルは同梱せず、カタログ行から公式の作品・配信先へ案内する。**公式リンクは視聴・購入先の案内であり、二次利用許諾ではない。** 個別曲ページが確認できれば優先し、なければ公式カタログ／作品ページを案内する。ファンWikiや第三者投稿を公式配信先として扱わない。
+- 音楽カタログは曲名・クレジット・公式配信／公開先を案内する**リンク索引**で、音源を同梱・再配布しない。公式リンク、視聴、購入、サブスクリプションだけで二次利用・再配布の許諾があるとは扱わない。
+- Riotの[日本語法務ページ](https://www.riotgames.com/ja/legal)を一般的な参照先として記録する。個別曲の使用では、[Riot Creator-Safeガイドライン](https://www.riotgames.com/en/riot-music-creator-safe-guidelines)と該当曲の条件を照合する。一般の法務案内や「誰でも使える」ライセンスの存在だけから、K/DA等の個別曲へ包括許諾を推定しない。ライセンスを根拠にする場合は、対象曲・利用範囲・条件を確認できる一次資料を残す。
+- K/DA 6曲とWorlds 2026「Know My Name」のCreator-Safe対象・利用条件は**未確認**。公式Spotify／YouTubeページの確認は二次利用許諾の確認ではない。各曲のリンクと未確認事項はLoL調査台帳に記録する。
+- PCL／東方Project等の条件、公開先の受け入れ条件、別途制作した5曲の配布条件は未確認事項として扱う。別途制作曲は第三者録音・サンプル・引用メロディを用いていないが、配布許諾済みとは見なさない。`NOTICE.md` の説明を他作品へ広げない。
+- ゲーム内素材・モデル等は [`NOTICE.md`](../NOTICE.md) の個別条件を守る。無料公開・公認・出典表記だけを再配布許可の根拠にしない。
 
-- **League of Legends**：Creator-Safe Sessions 3作／108曲（Vi 36・Diana 43・Star Guardian Taliyah 29）、近年のChampion Themes 41曲、Worlds/WCSアンセム2014–2025の12曲＋2026年の告知曲、確認できたMSIアンセム4曲。Phase 1であり全楽曲ではない。旧ログインテーマ・他のChampion Theme・Skin／イベント曲・ゲームOSTは調査対象として残る。個別の利用条件は[Riot Creator-Safeガイド](https://www.riotgames.com/en/riot-music-creator-safe-guidelines)で確認する。調査台帳とfixtureは `docs/LEAGUE-OF-LEGENDS-MUSIC.md`、`tools/leagueoflegends-music-tracklist.json`、`tools/leagueoflegends-sessions-tracklist.json`。
-- **VALORANT**：Champions Anthems（2021–2026）6曲とAgent関連3曲を別リストに分類。曲別の公式公開先とCreator-Safeガイドを案内する。公開・購入・サブスクを二次利用許諾の根拠にしない。
-- **アークナイツ**：Monster-Siren Recordsの曲／OSTページへ案内。誤記だった「痕」は表示せず、永続ID `ak-hen` のまま **「墟」／👹** に置換。`ak-msr` は4曲、`ak-ilcarnevale` はOST曲目ページ6曲。既存リストの更新では所持曲・カスタム情報を維持する。
-- **原神**：HOYO-MiX公式Apple Musicの個別曲ページ12件。
-- **100% Orange Juice／SAM Free Music**：選曲15曲／10曲を維持。Fruitbat Factory公式のゲーム案内は作品ページであり、個別曲の公式配信先・利用許諾の確認済みとは表現しない。
-- **学園アイドルマスター**：確認日2026-10-08の公式Drive掲載インスト50件を `gm-inst`／`gm-inst2` に25曲ずつ、公式ディスコグラフィの14曲を `gm-releases` に分離。公式曲名は **SEARCH RIGHT**、Drive掲載名 **SEARCH LIGHT** は照合用別名。`SUGAR FLAVOR` はDrive掲載を確認したが、公式ページ記載の配信日は2026-10-14。Drive未掲載は配布不可の証明ではない。fixture `tools/gakumas-download-tracks.json`。
-- **ブルーアーカイブ**：公式OST Vol.1–8、合計225曲。公式収録順・曲ごとのApple Music URL・巻別NexTone.Linkを案内。Yostar公式ガイドラインは音声・楽曲素材のコピー等を制限している。購入・サブスクリプションと二次利用許諾は別。利用前に[公式ガイドライン](https://bluearchive.jp/fankit/guidelines)を確認する。fixture `tools/bluearchive-tracklist.json`。
+## 4. 維持する利用者指定・受入条件
 
-### 2.2 Wishlist照合・既存リストの更新
+### TV・音源ジャケット
 
-- 音声ファイルの例は `.ogg`。区切りや拡張子違いは `plTitleKeys()` で正規化し、カタログ見出しの左右どちらかだけ一致する場合も候補として扱う。プロフィールの「カタログ照合メモ」`SONG_META.matchHint` は80文字まで・端末内保存・共有データには出さない。例：`BELIEVE.ogg` に `Suguri` とメモすると `Suguri - BELIEVE` に一致する。**曲名またはメモの片方だけの一致で十分**。
-- 曲プロフィールで照合しにくい公式名／ファイル名の差にはカタログの `matchAliases` を使う。`plSanitize()`、カタログwish生成、照合、既存wish更新まで保持し、SEARCH RIGHT ↔ SEARCH LIGHT を回帰検査する。
-- `ensureTrkDistributionPlaylists()` は `cat` が公式項目と一致する既存リストのwish／guideを更新する。所持曲と利用者編集の名前・アイコン・タグは維持し、既知の旧既定名だけ旧値一致時に変更する。旧 `trk-gakumas-v1` はwishを現行64曲へ更新するが、ユーザーの所持曲・表示設定は保持する。
-- 設定の「🐔 trk's playlist」からMusic内の `trk` フォルダを選べる。フォルダは**利用者が自分で作成**し、アプリは読み取り専用で選択・走査する。アプリはフォルダ作成、曲の移動、書込み、削除をしない。Music全体へ戻す場合は通常のフォルダ選択でMusicを選び直す。
+- **trk100の基本確認は済み**（利用者の実ブラウザ確認、2026-10-09）。音のプレビューOFF＋該当設定ONでもMUTEで無音。TVオフで映像を消せる。設定画面・演奏中・映像フィルター「非表示」の条件でもTV映像が出ない。これらを未確認扱いに戻さない。
+- スペクトラム右上のサムネイル `specArtwork` は**既定オフ**。ゲーム中TV側のMP3サムネイル表示は**既定オン**。謎設定の3チェック（壁紙を背景にする／書斎のサムネイルを使う／譜面時にサムネイルを隠す）は**すべて既定オフ**。
+- 書斎カバーを手動で設定・解除した場合も、関連設定と画像の優先順位に沿って背景を更新する。動画・静止画の優先関係を崩さない。
+- TV／ジャケット機能は現状の挙動を維持し、追加作業は後回し。実ブラウザで未確認の境界条件は §7 に残す。
 
-### 2.3 その他の実装上の要点
+### その他の仕様・安全条件
 
-- MMD内蔵モーションは **65種をすべて選択可能**。日常・休憩／ダンス・ステージ／ミク曲テンポ／ミク定番ポーズ／表情・演技／🎤 歌・口パクの6グループ。VMDは `js/mmd.js` のコードから使用時に生成し、第三者のVMD・振付データは同梱しない。
-- 軽量化の判定・描画ゲートは `js/lite.js`。ゲーム判定と音声時計は描画間引きの前に処理する。設定の保存形式は既存の `shadow_taiko_preferences_v2` を維持する。
-- **ゲーム終端・リザルト遷移（`js/game.js`）**：`ended`／`pause` 合図と、`tickClock()` 冒頭の終端時刻fallbackを共通化する。fallbackは `paused`／`seeking` の早期 return より前に実行し、通知欠落時もMANUAL／AUTO・全モードで結果へ進む。実際の `video.ended` 前の手動pauseは結果扱いしない。結果の本体を描き、画面を出してから記録を保存する（記録エラーでは表示を止めない）。記録に依る行（自己ベスト・称号）は記録の後で埋める。回帰検査は `tests/game-end.test.mjs`（§6・§7）。
-- 書斎は端末内のIndexedDB `trk_study_room_v1` に保存。書斎の本文は文字として描画し、`.txt`／`.md`／`.js`等の編集は`textarea`からローカルコピーだけを書き換える。HTML／JavaScript／Markdownを実行・HTML解釈・プレビューする経路を追加しない。上級者設定で編集後の本棚フォルダを選べるが、本文の保存先は引き続きIndexedDB。本棚の元ファイルは読み取り専用。明示的な書き出しだけは、ユーザーが別途選んだフォルダへ衝突しない新規名のテキストコピーを作り、既存ファイルを上書きしない（選択ハンドルは起動中のメモリだけに保持。非対応ブラウザは通常ダウンロード）。画像のObject URLは不要時に破棄。本棚フォルダ・本の移動・手動順序は `settings` store の `shelf` レコード、表示状態・Studyナビゲーションキー等は `ui` レコードに保存する。既存DBバージョンを変えずに正規化し、フォルダ削除では本を削除せず本棚へ戻す。
-- 書斎の文字スキンは30種（文筆・読書11／コーディング6／AI・プロンプト風5／自由な発想8）。4分類の`optgroup`と30個のテーマ名は4言語で管理し、読書ページと編集用`textarea`の両方にテーマ色・書体・背景を適用する。AI・プロンプト風は装飾のみで、AI処理・ネットワークアクセスを追加しない。
-- **自動譜面（`js/chart-gen.js`）**：設定 `chartGen`（Seed欄の下の「自動譜面の作り方」）。既定は **`"2"`＝新方式**（2026-10-08、利用者の決定：冒頭の小さな音を拾うこと・総数の増加を受け入れ）。`"1"`＝旧方式は選択で戻せ、旧方式で作った記録は記録表で「旧方式」の印が付く（記録作成時に `gen` を保存）。`"2"`＝新方式は、前後4秒の90パーセンタイルで音量を局所正規化し、8小節ごとに「長さ×密度」でノーツ数を先に配って、盛り上がりは 0.7〜1.3 倍で残す。平均音量が曲の最大の6%未満の静かな区間（絶対音量ゲート）は、候補数の上限を難易度順の表 `CG_QUIET_CAPS` で絞る。上限は初級15%・中級20%・上級25%・達人34%・RUSH40%。削った分は他の区間へ回る。表は `DIFFS` の density とは独立している（trk90 までの density 比例式は、初級22.9%が中級20%を上回る逆転を起こしたため、trk91 で廃止）。合成曲 `contrast` の総数は初級〜RUSHで **100／212／459／514／894**（trk91 で初級は 115→100）、隣接難易度で厳密に増える（候補位置が足りる場合）。同曲の静かな区間（0〜90秒）は上級2.47 nps・達人3.08 nps。達人Lvは10で、Lv12〜15帯を回復したことまでは示さない。冒頭の判定は最大音量の1%未満のみ無音扱い（旧方式は6%）なので、冒頭の小さな音も入りやすい。`chartGen` の純関数としての未指定は旧方式のまま（ゴールデンを保つため）。旧方式の出力は `tests/fixtures/chart-legacy-golden.json`（ca84a19の`generateNotes`から取得）と全件一致が必須。ゴールデンは旧方式を変えたときに**作り直さない**（`node tests/capture-legacy-golden.mjs`は一度きりの道具）。
-- ライフ（体力）の規則は `js/modes.js` の `lifeRule(totalNotes)`（TRUCK の標準・最大・回復の帯）にある。ノーツ数で段階的に決まり、本書には数値を書かない。ノーツ数が増えると回復量が少し増える（帯が変わるのは250／650を越えるときだけ）。自動譜面の総数が増えたことは利用者が受け入れ済み。
-- **解析結果のキャッシュ（`js/media.js` の `analyzeAudioCached`）**：IndexedDB `trk_analysis_cache_v1`（packs DB とは別）。鍵は fingerprint＋先頭・末尾 64KB の SHA-256＋版数 `ANALYSIS_CACHE_VERSION`。保存するのは rms・onset・ratio の配列と数値だけ（PCM は保存しない）。ratio は既定の譜面作り方（chartGen 2）が使うので必ず入れる。読むときは形を確かめ、合わなければ解析し直す。30件まで（最後に読んだ時刻が古い順に消す。読み出しで `savedAt` を更新する LRU）。解析の式を変えたら版数を上げる。
-- **音声解析の資源上限**：96 MiB の既存ファイル上限を維持。通常モードは20分、`TrkLite.active()` が true のときだけ10分を超えた曲の解析を省略する。`liteNoAnalyze`（利用者が選ぶ解析省略）とは別判定。省略後もBPMグリッドの譜面は作る。`analysisSkipped`／`analysisSkippedLong`／`analysisSkippedLiteLong` は4言語。19分モノラルWAVのピーク664MB等はユーザー提供の仮想検査値で、実機測定ではない。
-- **Esc長押しで選曲へ戻る（trk97、`js/main.js`）**：Esc を約1秒押すと選曲へ戻る（プレイ中・一時停止中・リザルト）。❓謎設定の `escNoReturn` で止められる（既定はオフ＝戻る）。
-- **MANUAL の打鍵とノーツの対応づけ（trk99、`js/judge-match.js`）**：`handleInput` は純関数 `window.Trk.judge.matchManualInput(chart, nextIdx, lane, now, windows, policy)` に「どのノーツをどう判定するか」を任せ、戻り値で `judgeNote` を1回呼ぶだけ。判定幅・`sweepMisses`・PERFECT✦・他モード（ORBIT／STAGE／TRUCK／CATCH）は変えていない。既定 `"smart"`：同じ色を時刻順（早い順）に探し、前の色違いノーツはその**時刻を過ぎていれば**飛ばして叩ける（osu!lazer の境界。飛ばした分は幅を出たら `sweepMisses` が MISS）。色違いは太鼓と同じく MISS だが、**PERFECT 幅より早い色違いは空振り**（相手を巻き込まない）。旧方式 `"ordered"`（幅内でいちばん早いノーツ、色違いは常に MISS＝trk98 までと同じ結果）は ❓謎設定 `judgeOrdered`（既定オフ）で選べる。両方式とも記録の扱いは同じ（mod ではない）。原因・他ゲームの調べ・採らなかった案・シミュレーションは [`JUDGE-MATCH.md`](JUDGE-MATCH.md)。
-- **ランク判定**：ゆるめ判定と1.00x未満は練習扱い（ハイスコア対象外）、きびしめと1.05x以上は記録（速度別）。AUTO は記録しない（`core.js` の `modsUnranked`、`game.js` の `runUnranked`・`recordPlay`）。
-- **📺 TVドックの設定（`js/tv-dock.js`）**：くわしいの中の「📺 TVドック」グループ。チェックは3つ：🧱 壁掛け（スキン `wall` と同じ。外すと映画館に戻る）、↕ 並び替え（テレビとラックの上下）、🔢 5枠化（`tvDockFive`）。既定はすべて OFF（映画館・テレビが上・5枠なし）。くわしいは既定で開いた状態（保存済みの開閉は変えない）。テレビ本体とラックの表示は変えていない。
-- **Loop Lab の映像書き出し（`js/media-player-mode.js` の `exportLoopClip`）**：開発者表示の中だけ。記録した区間の行の 🎬 を押すと、映像と音を区間の長さのぶん録画して保存する（WebM。対応していれば MP4）。設定は持たない。書き出し後は再生位置・再生／停止・速度・ループを元に戻す。曲を切り替えたら途中で止め、保存しない。音声だけの曲は書き出さない。
-- **「📁 開く」と「📤 共有」**（`js/library.js`）：📁 開く は曲を入れるだけで、共有としては覚えない。📤 共有 は共有として覚え、📤 の印が付き、「共有をやめる」でまとめて外せ、「端末に残す」の対象になる。ボタンの下の説明行は `libOpenShareHint`（4言語）。
-- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.9-trk100`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
+- `js/library.js` の公式wish更新は、所持曲と利用者が変更した名前・アイコン・タグを保持する。`matchAliases` は曲名照合用で、根拠のない別名を作らない。プロフィール照合メモは端末内だけ・80文字まで。
+- ユーザーのローカル音源・文章・元ファイルは読み取り専用。入力フォルダから作成・移動・削除・上書きしない。書斎のテキスト書き出しだけは、利用者が別に選択した保存先に衝突しない新規コピーを作る。
+- 新規UI文言は日本語・英語・中国語・韓国語を同時に追加する。`js/fx.js`／`js/fx-presets.js` は凍結扱い。
+- 譜面生成 `chartGen=2` が既定、`1` は旧方式への選択肢。MANUAL判定は `smart` が既定で、❓謎設定 `judgeOrdered` から旧方式へ戻せる。詳細は [`JUDGE-MATCH.md`](JUDGE-MATCH.md) と `docs/guide/play.md`。
+- MMD内蔵モーションは **65種をすべて選択可能**。日常・休憩／ダンス・ステージ／ミク曲テンポ／ミク定番ポーズ／表情・演技／🎤 歌・口パクの6グループ。新規・リセット時の表情既定は `faceSing`。VMDはコードから生成し、第三者のVMD・振付データは同梱しない。
 
-## 3. 権利・データ・セキュリティの不変条件
+## 5. 主な実装・検査ファイル
 
-- ソースは GPL-3.0-or-later。プロジェクト名・同梱モデル等の個別条件は [`NOTICE.md`](../NOTICE.md) を正とする。MMDモデル・テクスチャ・VMDは、無料公開だけを理由に再配布しない。Lat式ミクは原文ReadMeと再配布条件を維持する。Piapro Character License／東方Projectの説明・クレジットも変更しない。
-- 音楽カタログは紹介用で音源を含めない。公開・販売・ストリーミング・購入・公式ページへのリンクを、一般の二次利用許諾と混同しない。許諾・対象曲・利用条件が未確認なら、未確認と表示する。
-- ユーザーが取り込んだローカル音源・文章・フォルダの元ファイルは読み取り専用。入力用ハンドルで `FileSystemHandle.remove()`／`createWritable()`／移動・作成・削除を行わない。唯一の例外は、利用者が明示的に実行する書斎テキストコピー書き出しで、別に選択したフォルダへ衝突しない新しいコピーだけを作る。既存ファイル・元ファイルは上書きせず、フォルダハンドルを設定へ永続保存しない。メディアを丸ごとメモリへ読まず、音声解析は、ファイルが `ANALYZE_MAX`（96MB・圧縮後）を超える場合、または通常モードで `ANALYZE_MAX_SEC`（20分）、軽量化ONで `ANALYZE_LITE_MAX_SEC`（10分）を超える場合に省略する（デコード後のPCMは長さに比例するため、サイズだけでは判断しない）。長さ上限の軽量化判定は `TrkLite.active()` だけで、`liteNoAnalyze` の設定とは分離。省略時は理由（`analysisSkipped`／`analysisSkippedLong`／`analysisSkippedLiteLong`）を4言語で表示する。
-- 外部由来URLは `safeHttpUrl()`／`safeLink()` を通し、開く直前にも `plOpenLink()` で再検証する。設定・共有データは許可リストとサイズ上限で検証し、未検証JSONをコード実行しない。
-- `.stpack` は展開後合計1GiB上限。IndexedDB v2 の `size` indexで合計し、移行・件数不一致・不正値の過小計上を防ぐ。上限検査とputは同一readwrite transaction内で行う。書斎の容量とは別枠。索引の値は `openKeyCursor()` の `cursor.key` で読む。`IDBIndex.getAllKeys()` は**主キー**を返すので、合計に使ってはいけない（2026-10-08 に取り違えを修正。パックの主キーは `"p…"` の文字列）。
-- 解析結果のキャッシュは PCM を保存せず、`?safe=1` では読まず・書かない。初期化（♻️ ファクトリーリセット）では消えない（設定だけが戻る）。
-- `?safe=1`／`#safe` の判定・Service Workerの初回ナビゲーションを含むセーフクライアント除外を迂回しない。全設定リセットは確認ダイアログを通し、完全一致の `force=1` のみ確認を省く。`?factory` 単体は全消去ではなくセーフモード。新規アドオンは同意後にだけ実行し、起動時に指紋を確認する。
-- 第三者ライブラリは `assets/vendor/` に同梱。CDNから実行コードを取得しない。vendorファイルは手で編集せず、`npm run vendor:update` と `npm run check` で更新・検証する。
-- `js/fx.js` と `js/fx-presets.js` は凍結扱い。変更が必要なら `TrkFX` API利用者とfx-dock／fx-synthを一緒に確認する。新規UI文言は日本語・英語・中国語・韓国語を同時に追加する。
-- セキュリティの調査経緯・例外・残件は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md)、読みやすさの点検は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照。
-
-## 4. 主要ファイル・依存関係
-
-`index.html` のscript順が実行順。依存を追加・移動する場合はHTMLと `tools/check-repo.mjs` の両方を更新する。
-
-| ファイル | 責務・注意 |
+| 対象 | ファイル・参照先 |
 |---|---|
-| `js/core.js` | 設定・保存・セーフモード・リセット・共通検証 |
-| `js/lite.js` | 軽量化。設定読込後、描画側より前にロード |
-| `js/chart-gen.js` | 自動譜面の純関数。`chartGen` 1＝旧方式（ca84a19の出力を保つ）、2＝新方式・既定（局所正規化＋8小節ごとの区間配分）。`media.js` の `generateNotes` は薄いラッパー。`tests/` が検査 |
-| `js/catalog.js` → `js/title-match.js` → `js/library.js` | 公式カタログ定義、プレイリスト・照合・Music読込。曲名の照合キー（`plTitleKeys`・`plSongMatchKeys`・`plWishTitleKeys`）は純関数として `title-match.js` にあり、`tests/title-match.test.mjs` が入出力を検査する（`plWishMatch` は `metaOf` を使うため `library.js` に残す）。`catalog.js` のトップレベル `const TRK_CATALOG` は `window` に載らないため、`trkCatalog()` 経由で読む |
-| `js/media.js` | 音声の解析・解析結果のキャッシュ（`analyzeAudioCached`）・譜面生成の薄いラッパー |
-| `js/judge-match.js` → `js/game.js` | MANUAL の打鍵とノーツの対応づけ（純関数 `matchManualInput`・`window.Trk.judge`。`game.js` より前に読む）。`game.js` は進行・判定幅・`judgeNote`・`sweepMisses`・記録 |
-| `js/media-player-mode.js` | メディアプレーヤー・A-B ループ・Loop Lab（区間の記録と 🎬 の映像書き出し、開発者表示の中） |
-| `js/tv-dock.js` | テレビ本体・「くわしい」・📺TVドックの設定（壁掛け・並び替え・5枠化） |
-| `js/fx.js`／`js/fx-presets.js` | 音響API・プリセット。凍結扱い |
-| `js/vrm.js`／`js/mmd.js` | 3D機能。vendorライブラリは利用時だけ動的import。`?safe=1` では読み込まない |
-| `js/study-room-utils.js`／`js/study-room.js` | 書斎の純データ処理・UI。ルビ解析は線形走査を維持 |
-| `sw.js` | 同一オリジンGET資源のキャッシュ。safeクライアントと `safeWanted(url)` の初回ナビゲーションへキャッシュを返さない |
-| `tools/check-*.mjs` | 静的回帰検査。失敗時は最初のエラーから直す |
+| 公式曲カタログ／LoL調査 | `js/catalog.js`、`docs/LEAGUE-OF-LEGENDS-MUSIC.md`、`tools/leagueoflegends-music-tracklist.json` |
+| 既存wishの安全な更新・曲名照合 | `js/library.js`、`js/title-match.js`、`tests/title-match.test.mjs` |
+| 埋め込みジャケット | `js/audio-art.js`、`js/render.js`、`js/spectrum.js`、`js/tv-dock.js`、`js/study-room.js`。画像の読取・縮小は端末内。テストは `tests/audio-art.test.mjs`、`tests/song-art-display.test.mjs` |
+| MANUAL判定／譜面生成 | `js/judge-match.js`、`js/chart-gen.js`、`tests/judge-match.test.mjs`、`JUDGE-MATCH.md` |
+| 書斎のデータ安全・表示 | `js/study-room-utils.js`、`js/study-room.js`、`tools/check-study-room.mjs` |
+| 静的・権利・表示回帰 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs`、`tests/` |
+| Service Worker | `sw.js`。現在のcache名：`trk-v2026.10.9-trk104`。vendorのpinは `tools/vendor-lock.json` が正 |
+| 詳細な検査条件 | [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md)、[`SECURITY.md`](SECURITY.md)、[`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) |
 
-## 5. MMD実装メモ
+## 6. 最終検査の記録
 
-- `BUILTIN` は65種。生成は `buildVmd()`／`builtinBytes()`。Lat式PMDで確認した26種類の既存表情モーフを使う。新規・未設定・リセット時の既定は `faceSing`（簡易口パク、音声とは同期しない）。保存済みの有効選択（`none` 含む）は上書きしない。
-- `pose.rot` の軸：X＝前後の傾き、Y＝上下軸まわりの水平回転、Z＝前後軸まわりの傾き。`pos[1]` は上、`pos[2]` の負値は手前。腕の前後振りは `rot[0]`。
-- 歩行112／走行152は `左足ＩＫ`／`右足ＩＫ` の位置キーで足を交互に上げる（歩き0.7／走り1.1）。CP932表の `Ｉ`／`Ｋ` を削らない。モーションの値・左右・VMD構造は `tools/check-mmd-motion-data.mjs` が検査する。
-- テストは実際のモデル表示、VMDローダー、髪・衣装・スカートの貫通を保証しない。Latモデル・VRMの実描画は実ブラウザで別途確認する。
+2026-10-09／trk104時点で `git diff --check` と `npm run check` が成功。Static 0 failure／0 warning、`npm test` 172/172。LoL checkerはSessions 108、Champion Themes 41、Worlds 13、MSI 4、K/DA 6の順序・曲データ・公式リンク・権利注記・既存wishを保つ更新を検査する。以後コードを変えた場合は再実行する。
 
-## 6. 自動検査
+`npm run check` は `check-repo`、security、a11y、vendor、MMD motion、Study Room、lite-modeの検査と `tests/` を実行する。ブラウザースモークは含まない。譜面／IndexedDB／描画の詳細なテスト範囲と既知の制約は `QUALITY-CHECKS.md` を正とする。
 
-```sh
-npm run check
-git diff --check
-```
+## 7. 未完了の実機確認
 
-リザルト・Esc・ランク判定の検査：`tests/game-end.test.mjs`（終端・記録失敗・表示順序）、`tests/esc-hold.test.mjs`（Esc長押し）、`tests/ranked-option.test.mjs`（ランク判定の記録）。いずれも VM で実ソースを動かす静的寄りの検査で、実ブラウザでの表示は §7 に残す。
+- **ジャケット表示（trk101／102）**：Node検査は合成データ。MP3等の実音源で曲行・選択中バナー・TV・書斎の表示、画像なし時の表示、スペクトラム設定の初期オフ／オン、謎設定3種の初期オフと優先順、譜面中の静止画非表示（元動画は継続）、手動での書斎カバー設定・解除後の背景更新を実端末で確認する。曲一覧へのサムネイル表示は利用者確認済み（2026-10-09）。
+- **ゲーム／入力**：Android ChromeとPCでMANUALの連打・判定、Esc長押し、ランク表示、chartGen新旧方式、軽量化を確認する。VM/Nodeで確認済みの条件は [`JUDGE-MATCH.md`](JUDGE-MATCH.md) と `QUALITY-CHECKS.md` に記録。
+- **3D／オフライン／端末差**：Android ChromeとPCでMMD・VRMの描画、Service Workerのcache-first／safeオフライン、IndexedDBの実ブラウザ挙動を確認する。静的・shimテストは実ブラウザの代わりにならない。
+- 実施したら端末・日付・シナリオを [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) または「📱 実機確認の記録」Issueへ残す。**trk100で確認済みの項目は未完了一覧へ戻さない。**
 
-MANUAL の判定の対応づけ：`tests/judge-match.test.mjs`（trk99・26件）。①純関数 `matchManualInput` の場面別（境界、色違い＝MISS、落とし・早すぎる空振り・両手打ちが連鎖しないこと、旧方式では連鎖すること）、②`game.js` の `handleInput` を実ソースから切り出して VM で動かす配線、③実ソースの自動譜面（`longRamp` 上級）にプレイヤーモデルを当てて「±PERFECT で正しく押したのに MISS」が smart で起きないこと、④設定 `judgeOrdered` の配線（初期値・リセット・`index.html`・`main.js`・4言語）。設計と数値は `JUDGE-MATCH.md`。
+## 8. 次の作業
 
-選曲画面のTVと画面状態：`tests/tv-screen-state.test.mjs`（trk100・8件）。`js/tv-dock.js` の実ソース断片（`screenName`・`menuVideoWanted`／`menuVideoTick`・`liveOn`・`previewOn`）を vm で実行し、ブラウザ標準の `window.screen`（オブジェクト）が在る中でも画面状態を `core.screen` から読むことを検査する。あわせて `check-repo.mjs` が js/core.js 以外の classic script の裸の `screen` 識別子を禁止する（逆テスト確認済み）。
+1. LoLの未調査音楽範囲を公式ソースから継続調査。K/DA 6曲は収録済み。新規項目は曲別公式リンク・分類・クレジットを確認してから追加する。
+2. Creator-Safe対象・権利条件を曲ごとに確認し、一般的な法務ページ・公式公開先・購入／サブスクリプションを包括許諾と解釈しない。
+3. TV機能の追加作業は保留。関連の実機確認は上記受入条件を変えず、利用者の指示があったときに再開する。
+4. PCL／東方Project、公開先の受け入れ条件、別途制作曲5曲の配布条件は引き続き未確認として扱う。
 
-実ブラウザでの終端検査は `tools/smoke-game-end.mjs`（trk98。`SMOKE_CHROME`・`SMOKE_PUPPETEER` を指定して手動で実行。`npm run check` には入れない）。20秒の合成音声を MANUAL と AUTO で最後まで流し、結果画面が出て pageerror が 0 件であることを確かめる。
+## 9. 最近の変更
 
-`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。譜面ハッシュは注入した合成analysisから生成し、実WAVのデコード経路は別にエラー0・ノーツ件数±5%を確認。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-09／trk100）は、Security 56 checks・a11y 8 checks・vendor 8 checks・軽量化 123 assertions は trk95 時点の値、`npm test` は **158件**（trk98で `game-end` の配線検査、trk99で `judge-match` 26件、trk100で `tv-screen-state` 8件を追加）。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
+作業履歴は要点のみ。trk99以前は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、個別の詳細は上記トピック文書とGit履歴を参照する。
 
-`check-repo.mjs` はJavaScript構文・ローカル参照・ID・設定文言に加え、Arknights公式リンク、Blue Archive 225曲、LoL Sessions 108曲／Phase 1の58件、Gakumas 50件・別名、公式リンクと権利注記、既存プレイリストの所有曲・カスタムフィールド保持を検査する。チェックは意図的な逆テストでもFAILすることを確認してから追加する。外部ツールの起動後DOM検査は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照し、リポジトリ外で行う。
+- **trk100 — 選曲画面TVの状態修正**：`core.screen` 経由に統一し、利用者が確認したTV条件は §4 に記録。
+- **trk101／102 — 音源ジャケット**：端末内抽出・縮小・表示先／設定を追加。画像・処理量を制限し、通信・永続画像保存はしない。設定既定値と実機未確認項目は §4／§7。
+- **trk103 — Worlds 2026「Know My Name」**：公式MVとSpotify個別曲ページを照合して収録。Creator-Safe対象は未確認。
+- **trk104 — K/DA 6曲**：公式Spotify個別曲・表示クレジットとLeague of Legends公式YouTube動画を確認し、独立リストへ収録。Creator-Safe・二次利用条件は未確認。
+- `sw.js` cache名は `trk-v2026.10.9-trk104`。
 
-## 7. 実機確認の未完了項目
+## 10. 変更時チェックリスト
 
-静的検査だけでは以下を保証できない。対応端末で確認したらこの節を更新する。
-
-- **MANUAL の判定の対応づけ（trk99）** — 上級以降の16分（ドカド・トリル・3連）を PC キーボードと Android のタッチで遊び、①1個落としたあと次の正しい打鍵が MISS の連鎖にならない、②色違いは従来どおり MISS（両ボタン連打で得をしない）、③同色の連打で遅れ気味でも判定が1個ずつ進む、④❓謎設定「判定を昔のやり方にする」で trk98 までの手触りに戻り、再読み込み後も保持され、リセットで戻る、⑤リザルトの判定統計が不自然でない、を確認する。調整点は `JUDGE-MATCH.md` §7。
-- **Esc長押しで選曲へ戻る（trk97）** — PC（キーボード）で、プレイ中・一時停止中・リザルトから約1秒の長押しで選曲へ戻ること。短押しは一時停止・再開のまま。設定「Esc長押しで曲選択画面に戻らない」をオンにすると戻らないこと。TVリモコンの「戻る」の挙動も確認。
-- **ランク判定の表示（trk97）** — ゆるめ判定・1.00x未満で遊んだ後、リザルトに「練習扱い」の表示が出て、ハイスコアが更新されないこと。きびしめ・1.05x以上では記録されること（記録の値は VM 検査済み、画面の表示は未確認）。
-- **ブラウザースモーク（trk90 で実行、trk91 で譜面の基準を一部更新）** — `tools/smoke-browser.mjs` の譜面比較は、合成 analysis を直接注入して SHA-256 で比べるため、AudioContext の差に左右されない。実 WAV のデコード・解析は別経路として、エラー 0・各難易度のノーツ数 ±5% だけを見る。trk90 では `@sparticuz/chromium` と `puppeteer-core` を一時領域（リポジトリ外）で使い、`--write`／`--compare` がともに成功した（boot 0・未解決 0・合成譜面 10 件のハッシュ・キー集合が一致・実 WAV 10 件のキー集合一致と件数 ±5%・デコードエラー 0・click error 0）。trk91 では Chromium のない環境のため再実行していない。合成譜面のうち `gen2/easy` だけが 115→100 に変わったので、基準は node で同じ手順により再計算して更新した（他 9 件は一致）。依存は `package.json` に追加していない。
-- **記録の残し方** — 下の項目を実機で確認したら、Issue「📱 実機確認の記録」（`.github/ISSUE_TEMPLATE/device_check.yml`）で端末・日付・確認した項目を残す。
-- **Service Worker の cache-first（trk74）** — ハッシュ固定の vendor が、オンラインでキャッシュから返ること（通信が出ない）。キャッシュの中身を書き換えたとき（開発者ツールで）、次の読み込みで取り直されること。オフラインでも、MMD／VRM が動くこと（Android Chrome／PC）。`?safe=1` で開いたページは、オフラインで vendor を取れないこと（503 の文）。
-- **長押しの見える代わり（trk73）** — タブ帯の ⚙ が、いま選んでいるタブ（プレイリスト・フォルダ・📚すべて・🐔）の設定を開くこと。スキンを開いたときの「⚙ くわしい設定」が、設定のスペクトラム欄を開いてスクロールすること。曲リストの見出しの右の「📚 書斎を開く」で書斎が開くこと。設定「長押しの代わりのボタンを出す」をオフにすると、3つとも消えること。
-- **表示の並び・開発者表示（trk72）** — 設定「表示の並び」を切り替えると、棚スキンの並びがすぐ変わり、映像フィルターの並びは次の読み込みで変わること。かんたん（初期）と全部で、一覧の数が同じこと。設定「🔧 開発者表示」をオンにすると、メディアプレーヤーの 🎛 ループ・ラボ（クイック・保存・プリセット）と 👥 投稿者ツールが出て、オフで隠れること。テレビくわしいの ▶ で、メディアプレーヤーが実際に開くこと（trk71 の不具合の修正）。開発者表示オンで「＋ スキンを追加・編集」と「🎨 カスタムTVスキンを作る」が出ること。スマホで並びが見やすいか。
-- **入口の整理（trk71）** — 曲の行の 🎶 が、タッチ（スマホ）と PC で押しやすいか、行の幅を押し出さないか。テレビの「くわしく」を開いた中の ▶ メディアプレーヤーが押せるか。設定「長押しの代わりのボタンを出す」をオフにして、両方が消えるか。
-- **映像の書き出し（Loop Lab・2026-10-08）** — 開発者表示をオンにして区間を記録し、🎬 を押す。Android Chrome と PC で、保存されたファイルが再生でき、音が入っていること。区間の長さのぶん待つ感じ（数分の区間の待ち時間）。終わったあと再生位置が戻ること。対応していない端末では理由が出ること。
-- **📺 TVドックの設定（2026-10-08）** — 既定（くわしいが開いている、3つ OFF、映画館）。壁掛けにするとテレビが壁掛けの見た目になり、外すと映画館に戻ること。並び替えと5枠化の見た目がスマホ幅で崩れないこと。
-- **選曲画面のTVの映像（trk100）** — 何も設定していない状態で、映像つきの曲を選ぶと選曲画面のTV（標準の画面）に映像が動くこと。くわしい →「🖼 確認」タブで映像が動くこと。音のプレビューをOFFにして「🎬 音のプレビューがオフでも、メニューで映像を再生する」をONにすると、TVで映像だけが無音で再生されること。⛶ 最大化とメディアプレーヤーは従来どおり表示されること。設定画面・演奏中・映像フィルター「非表示」ではTVに映像が出ないこと。実ブラウザでは未確認（vm検査と静的ガードのみ）。
-- **「📁 開く／📤 共有」の説明行（項目6）** — スマホ幅で折り返して読めること。
-- **最優先：MMD／VRM** — 実ブラウザでLat式PMDとVRMを読み込み、Consoleにmodule resolution errorがなく、vendorの `three.core.js`／`BufferGeometryUtils.js` が404にならず、モデルが表示されること。
-- **Music／プレイリスト** — タッチ端末で🐔の長押し階層・表示名・並べ替えを確認。Music内で利用者が作った`trk`フォルダを選んで中だけが読み込まれ、再スキャン可能であり、ファイルの新規作成・移動がないこと。公式wishで灰色→所持後に黒い行となり遊べること、`.ogg`と照合メモ／SEARCH LIGHT別名を実ファイルで確認。
-- **カタログ曲リンク** — wish行から公式の個別ページ／作品ページが開くこと。楽曲別ページがない案内先は作品ページとして表示され、利用許諾と誤解されないこと。アークナイツ「墟」👹、Babel 5曲、LONETRAIL 10曲、イベントOST8作品も確認。
-- **FIRST SPARK** — 30秒デモの初級・中級・上級を実際に遊び、27／54／111ノーツが音に合うか、`chartCustom`表示・難易度切替・達人/RUSHの自動生成・404時のフォールバックを確認。
-- **リザルト画面（trk95・trk96で表示順序を修正、trk98で `lifeTags` の公開漏れを修正）** — trk98 では実ブラウザ（ヘッドレスChromium）で、MANUAL・AUTO のクリアと体力切れ（FAILED）の結果画面が出ることを確認済み。実機では未確認。Android Chrome・PCで MANUAL操作とAUTO設定の両方により、MANUAL／TRUCK／ORBIT／STAGE／CATCH 全モードを完走し、リザルトが1回だけ表示されることを確認する。中断・再開で誤って終了しないこと、音源終端で ended 通知が欠ける端末でも結果へ進むことも確認（静的・VMテストのみ実施、実機未確認）。
-- **軽量化** — Android Chrome／PWAで自動判定、20／30fpsの操作感・発熱・電池、装飾間引き、曲リスト60行、音声解析省略、MMD／VRM遅延読込を確認。
-- **解析キャッシュ（trk_analysis_cache_v1）** — 同じ曲の2回目の読み込みで解析を省くこと、件数の上限（30）と容量の見え方を実機で確認する（ヘッドレスでは、2回目のデコードが0回・譜面が一致・壊れた記録は無視して作り直す・件数の上限を確認済み）。
-- **IndexedDB** — 既存pack入りのブラウザでv1→v2移行・`size` index・旧レコードのsize・新規保存・複数タブ時の `packDbBlocked` を確認。容量が0になる／過小計上する場合は最優先で調査。2026-10-08 に、索引の取り違えで高速経路が一度も使われていなかった不具合を直した（ヘッドレスで確認済み）。実機で容量の表示が前と同じかを確かめる。
-- **書斎表示・テーマ** — 30スキンすべてで閲覧ページ・編集欄の色／書体／背景が反映されること、作文用紙の縦書き、4言語切替後も4つの`optgroup`内に選択肢が残ることを確認。AI風スキンが見た目だけで通信しないことも確認する。大量画像・Shift_JIS・quota超過・TVペインからのvideo復帰、色コントラスト、読み上げ（NVDA／TalkBack／VoiceOver）、モバイル幅も実機で確認。
-- **本棚操作** — タイトルのクリック／長押しでフォルダ作成、PCのドラッグ＆ドロップとタッチでのフォルダ移動、手動順序・フォルダ先頭・削除確認スキップの保存／再起動後の復元、既定表示／非表示からの再表示、`→`／`←`割当・画像用`↑`／`↓`を確認する。狭い縦画面でも項目リストの高さを確保する。
-- **テキスト編集・書き出し** — `.txt`／`.md`／`.js` の入力、Tab字下げ、Ctrl／⌘+S、自動保存と切替時の失敗ガード、本棚フォルダへの振り分けを確認する。通常ダウンロード／対応ブラウザのフォルダ選択、同名ファイルを上書きしないこと、元ファイル非書込み、HTML／JavaScriptを実行しないことも実機で確認。
-- **媒体操作** — ゲームパッド／TVリモコン、バナーの短押し・650ms長押し、映像・音声・メディアプレーヤー・シンセを実ブラウザで確認。
-- **譜面生成（chartGen・既定は新方式）** — 実機で、新方式の譜面が曲ごとに自然か（冒頭の静かな部分・後半の盛り上がり・Easy〜RUSHのLv表示・ノーツ増加の手触り）を確認する。「旧方式」に切り替えて従来の譜面・記録が出ること、旧方式の記録に「旧方式」の印が付くことも確認する。ヘッドレス（Chromium）での読込・切替・再読込の保存は確認済み（実機ではない）。
-- **音声解析の上限（通常20分／軽量化ON10分）** — Android Chrome等の実機で、各上限を超えた音声／動画に正しい理由文が出て、BPMグリッド譜面で遊べることを確認する（「軽量化ONの端末で10分を超える曲を入れると省略表示（🪶 Lite mode skips…）が出る」）。`tests/media-analysis-limit.test.mjs` は19分通常モード、10分境界、両上限超、`liteNoAnalyze` との区別、96MiB上限を実際の `loadMedia()` で検査する。trk91ではヘッドレスChromiumで21分WAVの解析省略と譜面生成を確認済み（実機ではない）。ユーザー提供レポートの19分モノラル22kHz WAV・ピーク664MB、ステレオMP3で約2倍という値は本環境で再測定していない。96MiB超の実メディアと実機メモリ使用量は未確認。
-- **モバイルのゲームステージ** — `#stage` は `position:fixed` とし、`fitStage()` がviewportの幅・高さに合わせて縮小する。仮想環境（縦360px、横780×360、320×568）ではぴったり収まることを確認済み。実機では端末を縦横に回しても端が切れないことを確認する。
-- **選曲画面・設定画面のコントラスト** — `tests/skin-contrast.test.mjs` は44内蔵スキンの選択ボタン前景・通常／hover文字・曲リスト補助文字・全プルダウン（`select`）・棚件数（`#skinShelfCount`）の不透明HEX色ペアをWCAG比で静的に検査する。設定画面の `.field` 外 select（`#displayMode`, `#shortMode`）にもスキンの field 背景・text 文字色が当たり、暗いスキンでの白地に白文字問題を解消。`#skinShelfCount` の `opacity:.6` を廃止し `color:var(--ui-muted)` へ変更。実機で選択中の行やボタンの見やすさ、アクセント色ボタンの見え方を確認する。
-- **Service Workerのsafeオフライン回帰** — `tools/smoke-browser.mjs` に、汚染した `index.html` を有効キャッシュへ入れ、HTTPサーバーを実際に停止した後で `/index.html?safe=1`・`/?safe=1`・`/#safe` を新しいページから開き、503と汚染スクリプト未実行を確かめる検査を追加した。仮想環境では改ざんした殻でも3つとも503になることを確認済み。実ブラウザ・実機での実行は未確認。
-- **3D部品の同梱後の表示（trk92）** — MMD・VRMの3D部品は `assets/vendor/` から読む。実機（Android Chrome・PC）で、初回読込・チェックボタンの表示が「3Dの部品」になっていること、読込に失敗したときのエラー文（`mmdNetError`）が4言語で正しく出ることを確認する。
-- **名前空間 D（window.Trk.*）と差し替えの回帰** — 実機（Android Chrome・PC）で次を確認：①曲リストで ✔（verified）の表示が、並べ替え・タブ切替・取り込み直後の再描画でも出る（`renderLib` 差し替え）、②アドオンの曲パック取り込み（`installPackFile`）と、取り込み後の一覧表示（`renderPackList`・`getPackSongs`）、③FIRST SPARK 以外の譜面で、結果画面・判定表示（`showJudge`）・映像（`drawVideo`）が従来どおり動く、④書斎・メディア・シンスの開閉で、ゲームのキーが止まる（overlay）。静的検査・ヘッドレスでは、差し替えの届き方（`renderLib` のみ）しか見ていない。
-
-## 8. ユーザーが指定した維持条件
-
-- アークナイツの「痕」は覚え違い。表示から消し、「墟」へ置換し、アイコンは👹。既存ID `ak-hen` は移行のため維持。
-- 音声例は `.ogg`。Wish照合は両方一致を要求せず、曲名・キャラクター名／照合メモ・登録別名の**片方だけの一致でも候補にする**。
-- Music内の`trk`フォルダを案内し、設定に選択導線を置く。既存フォルダ／ファイルは読み取り専用で、アプリはフォルダ作成や曲移動をしない。
-- Blue Archiveは公式配布・配信と公式収録順を基準にし、購入・所持と二次利用の許諾を混同しない。Yostar公式ガイドラインを確認し、全楽曲・全用途に許諾があると断定しない。
-- LoLは全楽曲カタログの調査を続け、特に約180体規模のChampion Themeは分割実装可。Worlds/WCS・MSIアンセムは公式リンクの存在だけで利用許諾とせず、権利・対象・条件を確認する。
-- VALORANT・Arknights・Genshin・学マス・OJ/SAMも、公式リンクは利用許諾ではない。非公式Wiki・第三者アップロードを公式配信先と表記しない。学マスDOWNLOAD規約の限定的なファン動画条件を一般利用へ広げず、Drive未掲載は配布不可の証明としない。
-- 他ゲーム（『太鼓の仙人12』等）の話題は設計思想の参考に限る。既存作品の楽曲・素材・表現を取り込まず、権利を守り独自の設計・コンテンツで進める。
-
-## 9. 継続検討・未決事項
-
-- **音楽カタログ**：LoLの未調査範囲（旧ログインテーマ・残りChampion Themes・Skin／イベント曲・ゲームOSTなど）を公式ソースと利用条件から段階調査。Blue Archiveについても権利者のガイドラインを軸に公式配信・購入先を案内し、購入だけで二次利用が許可されるという前提は置かない。
-- **譜面生成**：静かなイントロから始まり後半ほど音量が大きい曲では、旧方式の自動譜面が後半へ偏る（冒頭に0ノーツ・20秒から開始の実測あり）。新方式（`chartGen` "2"）で改善し、**2026-10-08に既定を新方式へ切り替えた**（旧方式は `"1"` で選べる）。静かな長い区間は、絶対音量ゲート（trk76）の上限を難易度順の表で絞る（trk91。trk90 の density 比例式から変更）。合成曲 `contrast` では全難易度の総数・静かな区間の密度が厳密に増えることを検査する一方、達人Lv12〜15帯に届くかは別の受入条件としていない（実測Lv10）。Lv は曲の峰で決まるため、同じ曲の上級と達人の Lv が並ぶことは仕様どおり（利用者向けには `docs/guide/play.md` §「難易度名と Lv」に説明）。盛り上がり区間は候補の100%で頭打ちになる場合がある（仕様上、候補にない位置へは置かない）。実曲での自然さ・Lv表示・実機の手触りは§7で確認する。レビューの対応状況は `docs/REVIEW-2026-10-08.md`。
-- **IndexedDB回帰検査（済・2026-10-08）**：`tests/idb.test.mjs`（13件）が、パック容量v2の移行・`size` index（主キーを size と取り違えない）・`putIf` の上限・`onblocked`・`onversionchange`、および解析キャッシュ（往復・壊れた記録・30件の上限・セーフモード・2回目は解析しない）を、`js/core.js` の `idbStore` と `js/media.js` の該当区間を vm で読んで検査する。実ブラウザの代わりに `tests/helpers/fake-idb.mjs`（in-memory の shim）を使うので、本物の挙動との差は shim の冒頭に書いてある。実 Chromium での確認は別途（`IDBIndex.getAllKeys` は主キーを返し、`openKeyCursor` の `key` が索引の値）。
-- **MANUAL の判定の対応づけ（trk99）**：巻き込みの原因は判定幅ではなく打鍵の割り当て（旧方式は幅内でいちばん早いノーツを取り、色違いを MISS にするため、1回のミスで以降が連鎖）。採用は osu!lazer 式の到達規則＋太鼓式の色違い MISS＋IIDX 式の空振り。幅の厳格化・精密モード・同色の「いちばん近い」・デバウンスは採らなかった。シミュレーション（上級 2083 ノーツ・σ25ms）で MISS 19.0 → 0.7、最大コンボ 672 → 1884、正確な手は両方式とも 0 MISS。根拠・出典・数値・調整点は [`JUDGE-MATCH.md`](JUDGE-MATCH.md)。実機の手触りは §7。
-- **軽量化の追加候補**：起動時のサンプル映像 preload と、rAF外のA-B／逆再生setIntervalは未調整。初速・ループ精度とのトレードオフがあるため、実機検証なしに変更しない。
-- **実ブラウザ検収**：§7の端末確認が未完了。静的テストを根拠に実機検収済みとしない。
-- **安定版の後の検討（利用者の決定・2026-10-08）**：
-  - **オンライン連携（チャットbot等）**：当面は行わない。やるなら「サーバーなし」の方針を変える別の判断になる（`docs/SECURITY.md`・`privacy.html` と整合させる）。
-  - **軽量版（凍結）**：動画再生プレイヤー・音楽再生プレイヤー・書斎に特化し、ゲーム部分・MMD・VRM・譜面機能を外せる版。安定版の確立後に検討する。曲の背景を知る体験には価値がある、という評価。
-  - **スキン**（棚卸しと計画は `docs/SKIN-PLAN.md`。数は ①ゲーム画面40・②TVドック36・③棚30・④映像フィルター70・⑤書斎30）：他と比べて数が少ないもの・足りていない方向を引き上げる。テーマ単位で少数ずつ足し、整えながら進める。一般には思いつきにくいジャンルのテーマは、むしろ積極的に増やす。
-- **支援案（構想のみ）**：機能の有料解放・月額支援はしない。GitHub Sponsors等の候補、匿名性・本人向け支援記録、使途説明は未決定。権利条件が確認できるまで寄付リンク／募集表示を追加しない。Ko-fiへの誘導はしない。
-- **権利・公開先**：PCL・東方Project等の条件、AI生成物を受け入れる公開先、5曲の配布条件は未確認のものが残る。別途制作した5曲はボーカルなしの手続き生成で、第三者録音・サンプル・ループ・引用メロディを使わず、アプリ／Gitには未同梱。許諾済みと見なさず、`NOTICE.md` の音源記載を他作品への包括許諾にしない。
-- **開発アイデア**：称号、10秒以内の`trk!`入力に反応するスピードチャレンジ、TV／fxドックの連想ゲーム系スキン。実装決定ではない。
-- **GitHub の Issue（2026-10-08 時点）**：#21・#22・#24・#25 は修正済みとして閉じた（#21・#22 は F-30 の許可リストと null プロトタイプの辞書、#24 は完全一致の判定と静的ガード、#25 は累積上限と容量超過の案内）。#23（CSP・配信ヘッダー）は、安定版の準備で再オープンする追跡項目として閉じた。現在の状態は GitHub で確認する。#24 本文の再現URLは誤記（`imuramasa`）。正しいのは `https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/#reset=all&force=0`。CSP の判断は `SECURITY.md` §6 が正で、通常開発では CSP を追加しない。
-- **映像の書き出しの待ち時間（未決）**：現在は区間の長さだけ実時間で録画する。長い区間は待ち時間が長い。速くする方式（別の書き出し方式）は設計してから決める。
-- **表示の並び（trk72）**：（a）カスタムラボの項目をまとめる画面（カスタムTVスキン・ノーツ／スキン作成などを1つの開発者用の入口に）の案。UX を見てから実装する。（b）譜面制作モードの新機能案：楽曲を流しながらキー入力で譜面を作り、完成後に再走して自分でクリアしないと完成にならない、マリオメーカー型。既存の入口ではなく、設計は未定。（c）映像フィルターのおすすめ順は採用済み（案のまま）。
-
-## 10. 変更時のチェックリスト
-
-- [ ] `git status`・差分を読み、既存のデータ／所持曲／ユーザーカスタムを保持した。
-- [ ] 新規UIは4言語対応。設定は初期値・リセット・Import/Export・`?safe=1` を確認した。
-- [ ] 外部URL・ファイル・第三者素材の出所と利用条件を検証し、利用許諾を誤認させない。
+- [ ] 作業開始時にstatus/diffを確認し、既存の変更と利用者指定を保持した。
+- [ ] UI・設定は4言語、初期値、リセット、Import/Export、`?safe=1` の挙動を確認した。
+- [ ] 外部URL・素材の出所と利用条件を確認し、未確認を許諾済みと表現していない。
 - [ ] 関連テスト、`npm run check`、`git diff --check` を通した。
-- [ ] `README.md`・`NOTICE.md`・本書・`sw.js`の更新要否を確認し、未確認の実機作業を明記した。
-- [ ] `docs/guide/` の日本語版を変えたら、`docs/guide/en.md` の対応する節も同じ内容に合わせた（en.md は日本語版の翻訳で、全節を含む）。
-
-## 11. 最近の変更
-
-直近の作業だけを残す。trk70〜trk99 の詳しい記録は [`docs/HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) にある。
-
-- **trk98 — 曲の終わりで結果画面が出ない回帰を修正**：`game.js` の `runMods` が IIFE 内の `lifeTags` を裸の名前で呼んで ReferenceError になっていた。`window.Trk.modes.lifeTags` として公開し、`tests/game-end.test.mjs` に配線の検査、実ブラウザの終端検査 `tools/smoke-game-end.mjs` を追加。詳細はアーカイブ。
-- **trk99 — 密な連打で横のノーツを巻き込む問題（MANUAL）**：打鍵とノーツの対応づけを純関数 `js/judge-match.js`（`window.Trk.judge`）に切り出し、既定を新方式 `"smart"` に。❓謎設定 `judgeOrdered`（既定オフ）で旧方式へ戻せる。検査は `tests/judge-match.test.mjs`（26件）。詳細はアーカイブ。
-- **trk100 — 選曲画面のTV（標準画面）に映像が出ない回帰を修正**：`js/tv-dock.js` がアプリの画面状態を裸の名前 `screen` で読んでいた。core.js が `screen` を大域へ出さなくなって（trk70・ブラウザ標準 `window.screen` 優先の利用者決定）から、裸の参照は静かに `window.screen`（オブジェクト）に当たり、`screenName()` が常に `""` を返して、選曲中のTV映像（`liveOn`）・「🖼 確認」タブ（`previewOn`）・メニュー再生（`menuVideoWanted`）がすべて止まっていた。エラーが出ないためスモークの未解決名検査でも検出できず、⛶ 最大化（`video-max.js`）とメディアプレーヤーは別の経路なので表示され続けた（利用者の報告で発覚）。読みを正規アクセサ `core.screen` へ修正し、局所変数も改名した（`tv-dock.js` のTV画面div `screen`→`screenDiv`、`study-room.js` の `screen`→`tvScreen`、`spectrum.js` の `typeof screen` ガード→`core.screen`）。ガード：`check-repo.mjs` に「js/core.js 以外に裸の `screen` 識別子を置かない」検査（逆テスト確認済み）、`tests/tv-screen-state.test.mjs`（8件）。文書：`NAMESPACE-PLAN.md` の screen 行と §5。実機確認は §7。
-- 公開コードを変えたので `sw.js` のキャッシュ名は **`trk-v2026.10.9-trk100`**。
+- [ ] README／NOTICE／handoff、`sw.js` cache名、実機確認の記録の更新要否を確認した。
+- [ ] `docs/guide/` の日本語を変えたときは `docs/guide/en.md` に対応する節を反映した。

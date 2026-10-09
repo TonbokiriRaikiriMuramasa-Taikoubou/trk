@@ -1912,6 +1912,7 @@ async function studyRefreshTV() {
   let blob = null;
   if (song && window.TrkStudyRoom) blob = await studyGetSongCoverBlob(song.key);
   if (!studyIsBlob(blob) && song && song.bgBlob) blob = song.bgBlob;
+  if (!studyIsBlob(blob) && song && song.artBlob) blob = song.artBlob;
   if (!studyIsBlob(blob)) blob = null;
   if (token !== studyTVToken || !studyRoomOpen) return;
   const artKey = song && song.key || "";
@@ -1955,7 +1956,6 @@ async function studyAssignCurrentCover() {
     if (!blob) throw new Error("Missing Study image");
     await studyDBRun("covers", "readwrite", store => store.put({ bookId:book.id, pageKey:page.key, pageIndex:index, title:book.title, updatedAt:Date.now() }, songKey));
     core.emit("studyCoverChanged", songKey);
-    if (typeof setBackground === "function" && core.currentSong && core.currentSong.key === songKey) await window.Trk.media.setBackground(blob);
     studyNotify("studyCoverAssigned", { title:songTitle });
     studyRefreshTV(); studyRefreshCoverButtons();
   } catch (error) { studyFail(error, "studyCoverError"); }
@@ -1986,10 +1986,6 @@ async function studyClearSongCover(songKey) {
     if (!info) { studyNotify("studyCoverNeedCover"); return false; }
     await studyDBRun("covers", "readwrite", store => store.delete(key));
     core.emit("studyCoverChanged", key);
-    if (typeof setBackground === "function" && core.currentSong && core.currentSong.key === key) {
-      const song = core.currentSong;
-      if (song.bgBlob) await window.Trk.media.setBackground(song.bgBlob); else await window.Trk.media.setBackground(null);
-    }
     studyNotify("studyCoverCleared");
     studyRefreshTV(); studyRefreshCoverButtons();
     return true;
@@ -2655,6 +2651,7 @@ document.addEventListener("fullscreenchange", () => {
 core.video.addEventListener("loadedmetadata", studyRefreshTV); core.video.addEventListener("loadeddata", studyRefreshTV);
 core.video.addEventListener("resize", studyRefreshTV);
 core.on("songSelected", () => { studyRefreshTV(); studyRefreshCoverButtons(); });
+core.on("songArtwork", () => studyRefreshTV());
 core.on("mediaReady", () => { studyRefreshTV(); studyRefreshCoverButtons(); });
 core.on("studyCoverChanged", key => {
   if (!key || core.currentSong && key === core.currentSong.key) { studyTVArtSong = ""; studyRefreshTV(); studyRefreshCoverButtons(); }

@@ -37,7 +37,7 @@ const liveOnSrc = between(tvSource, "const liveOn =", "screenDiv.dataset.live");
 const previewOnSrc = between(tvSource, "const previewOn =", "function pvChipText");
 
 function makeContext({
-  screen = "select", phase = "title", videoReady = true, paused = false, hasSrc = true,
+  screen = "select", phase = "title", videoReady = true, paused = false, hasSrc = true, videoWidth = 320, videoHeight = 180,
   tvMenuPreview = true, tvMenuVideo = false, previewEnabled = true, videoStyle = "color",
   tab = "preview", detailsOpen = true, paneHidden = false, docHidden = false,
 } = {}) {
@@ -47,7 +47,7 @@ function makeContext({
     phase, videoReady,
     settings: { tvMenuPreview, tvMenuVideo, previewEnabled, videoStyle },
     video: {
-      src: hasSrc ? "blob:trk-demo" : "", paused, muted: false,
+      src: hasSrc ? "blob:trk-demo" : "", paused, muted: false, videoWidth, videoHeight,
       play() { calls.play++; this.paused = false; return Promise.resolve(); },
       pause() { calls.pause++; this.paused = true; },
     },
@@ -85,6 +85,10 @@ test("screenName() は core.screen を読む（select／settings／非文字列�
 test("TVの標準画面（liveOn）：既定のまま・選曲中・再生中なら映像が出る", () => {
   /* 何も設定していない状態＝ tvMenuPreview 初期オン・videoStyle off 以外・プレビュー再生中 */
   assert.equal(makeContext().out.liveOn, true);
+});
+
+test("音声だけのMP3プレビューではTV動画を重ねず、ジャケット表示の場所を空ける", () => {
+  assert.equal(makeContext({ videoWidth:0, videoHeight:0 }).out.liveOn, false);
 });
 
 test("TVの標準画面（liveOn）：設定画面・再生していない・電源オフ・演奏中・初期オンを切った場合は出ない", () => {

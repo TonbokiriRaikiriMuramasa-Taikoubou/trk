@@ -253,7 +253,11 @@ select{padding:8px 10px;border-radius:10px;background:var(--ui-field);color:var(
 .libRow.cur{border-color:var(--ui-accent);color:var(--ui-text);background:var(--ui-button-hover)}
 .libRow.src-pack{border-left-color:var(--ui-gold)}
 .libRow.src-file{border-left-color:var(--ka)}
-.libLeft{min-width:0;display:flex;flex-direction:column}
+.libLeft{min-width:0;flex:1;display:flex;align-items:center;gap:10px}
+.libText{min-width:0;flex:1;display:flex;flex-direction:column}
+.libThumb{position:relative;display:flex;align-items:center;justify-content:center;flex:0 0 40px;width:40px;height:40px;overflow:hidden;border:1px solid var(--ui-border);border-radius:8px;background:var(--ui-field);color:var(--ui-muted)}
+.libThumb img{display:block;width:100%;height:100%;object-fit:cover}
+.libThumbFallback{font-size:19px;line-height:1}
 .libName{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .libSub{font-size:12px;color:var(--ui-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .libMeta{display:flex;gap:5px;flex:none}

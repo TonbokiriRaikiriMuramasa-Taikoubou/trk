@@ -1,12 +1,18 @@
 {
-  "asOf": "2026-10-08",
-  "scope": "Phase 1: individually released champion themes from the modern champion-theme era and official Worlds/MSI vocal anthems. Not the complete LoL music catalog.",
+  "asOf": "2026-10-09",
+  "scope": "Phase 1: individually released modern Champion Themes and official Worlds/MSI vocal anthems. Phase 2: six K/DA releases (POP/STARS and all five ALL OUT tracks). Not the complete LoL music catalog.",
   "sources": {
     "championThemeTag": "https://www.leagueoflegends.com/en-us/news/tags/champion-theme/",
     "musicTag": "https://www.leagueoflegends.com/en-us/news/tags/music/",
     "creatorSafeGuidelines": "https://www.riotgames.com/en/riot-music-creator-safe-guidelines",
     "worlds2026Announcement": "https://lolesports.com/en-US/news/worlds-anthem-presented-by-true-damage",
-    "leagueOfLegendsYouTube": "https://www.youtube.com/@leagueoflegends"
+    "worlds2026OfficialVideo": "https://www.youtube.com/watch?v=mlFxxNsExJc",
+    "worlds2026SpotifyTrack": "https://open.spotify.com/track/3s2YCL5LHLzXWbw7ezQru3",
+    "worlds2026ListenNow": "https://truedamage.ffm.to/knowmyname",
+    "leagueOfLegendsYouTube": "https://www.youtube.com/@leagueoflegends",
+    "kdaSpotifyArtist": "https://open.spotify.com/artist/4gOc8TsQed9eqnqJct2c5v",
+    "kdaAllOutSpotifyAlbum": "https://open.spotify.com/album/3wX4yrxMuHapSLvadxQkVV",
+    "kdaOfficialYoutubeChannel": "https://www.youtube.com/@leagueoflegends"
   },
   "championThemes": {
     "id": "lol-champion-themes",
@@ -339,9 +345,9 @@
       {
         "title": "Know My Name",
         "album": "Worlds 2026 Anthem",
-        "artist": "True Damage",
-        "url": "https://lolesports.com/en-US/news/worlds-anthem-presented-by-true-damage",
-        "status": "announced-only"
+        "artist": "True Damage, SOYEON of i-dle, Coco Jones, VIC MENSA, Sofía Reyes",
+        "url": "https://open.spotify.com/track/3s2YCL5LHLzXWbw7ezQru3",
+        "status": "released"
       }
     ]
   },
@@ -372,6 +378,54 @@
         "album": "MSI 2023 Anthem",
         "artist": "Che Lingo",
         "url": "https://www.youtube.com/watch?v=kE19Ac234Zo"
+      }
+    ]
+  },
+  "kdaSongs": {
+    "id": "lol-kda-songs",
+    "name": "K/DA — POP/STARS + ALL OUT",
+    "tracks": [
+      {
+        "title": "POP/STARS",
+        "album": "POP/STARS",
+        "artist": "K/DA, Madison Beer, i-dle, Jaira Burns, League of Legends",
+        "url": "https://open.spotify.com/track/3em2uN4cCWHcCXhjMzJ8ps",
+        "officialVideoUrl": "https://www.youtube.com/watch?v=UOxkGD8qRB4"
+      },
+      {
+        "title": "THE BADDEST",
+        "album": "ALL OUT",
+        "artist": "K/DA, i-dle, Wolftyla, Bea Miller, League of Legends",
+        "url": "https://open.spotify.com/track/6y3EPT8iw6HmuMpX05gyvt",
+        "officialVideoUrl": "https://www.youtube.com/watch?v=RkID8_gnTxw"
+      },
+      {
+        "title": "MORE",
+        "album": "ALL OUT",
+        "artist": "K/DA, Madison Beer, i-dle, Lexie Liu, Jaira Burns, Seraphine, League of Legends",
+        "url": "https://open.spotify.com/track/65pHtEdxGt4e3Fv1ncPi6V",
+        "officialVideoUrl": "https://www.youtube.com/watch?v=3VTkBuxU4yk"
+      },
+      {
+        "title": "VILLAIN",
+        "album": "ALL OUT",
+        "artist": "K/DA, Madison Beer, Kim Petras, League of Legends",
+        "url": "https://open.spotify.com/track/33CZravFcGBOwRw5dCOCel",
+        "officialVideoUrl": "https://www.youtube.com/watch?v=xoWxv2yZXLQ"
+      },
+      {
+        "title": "DRUM GO DUM",
+        "album": "ALL OUT",
+        "artist": "K/DA, Wolftyla, Bekuh Boom, Aluna, League of Legends",
+        "url": "https://open.spotify.com/track/3CEW3iffD2QvNZMK20sMqW",
+        "officialVideoUrl": "https://www.youtube.com/watch?v=E_PbH5y70Tc"
+      },
+      {
+        "title": "I'LL SHOW YOU",
+        "album": "ALL OUT",
+        "artist": "K/DA, TWICE, Bekuh Boom, Annika Wells, League of Legends",
+        "url": "https://open.spotify.com/track/497qmwcUsCv5hmMU0K8Hik",
+        "officialVideoUrl": "https://www.youtube.com/watch?v=WW1BpABbzHs"
       }
     ]
   }

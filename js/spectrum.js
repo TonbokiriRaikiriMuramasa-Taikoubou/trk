@@ -55,6 +55,8 @@ Object.assign(TEXT.ja, {
   specSettingsTip:"長押しでスペクトラムの設定を開く",
   specSkin:"📊 曲名バナーをスペクトラムにする",
   specSkinHint:"曲名バナーの左上の「＋」を押すと、大きく開きます（ここでも切り替えられます）。",
+  specArtwork:"🎨 楽曲のサムネイルを表示する",
+  specArtworkHint:"スペクトラムの右上に、現在の曲のジャケットを小さく表示します（初期はオフ）。",
   specSkinOpenTip:"📊 スペクトラムを大きく開く", specSkinCloseTip:"📊 スペクトラムを小さく閉じる",
   specNextStyle:"次の見え方",
   specOpenSettings:"⚙ くわしい設定",
@@ -95,6 +97,8 @@ Object.assign(TEXT.en, {
   specSettingsTip:"Long-press to open spectrum settings",
   specSkin:"📊 Use the spectrum as the song banner",
   specSkinHint:"Press “＋” at the top-left of the song banner to open it wider (you can also switch it here).",
+  specArtwork:"🎨 Show the song thumbnail",
+  specArtworkHint:"Show a small cover for the current song in the top-right corner of the spectrum (off by default).",
   specSkinOpenTip:"📊 Open the spectrum wider", specSkinCloseTip:"📊 Close the spectrum",
   specNextStyle:"Next style",
   specOpenSettings:"⚙ More settings",
@@ -134,6 +138,8 @@ Object.assign(TEXT.zh, {
   specSettingsTip:"长按打开频谱设置",
   specSkin:"📊 把曲名横幅变成频谱",
   specSkinHint:"按曲名横幅左上角的「＋」可以放大（在这里也能切换）。",
+  specArtwork:"🎨 显示歌曲封面缩略图",
+  specArtworkHint:"在频谱右上角显示当前歌曲的小封面（默认关闭）。",
   specSkinOpenTip:"📊 放大频谱", specSkinCloseTip:"📊 收小频谱",
   specNextStyle:"下一个样式",
   specOpenSettings:"⚙ 详细设置",
@@ -173,6 +179,8 @@ Object.assign(TEXT.ko, {
   specSettingsTip:"길게 누르면 스펙트럼 설정 열기",
   specSkin:"📊 곡명 배너를 스펙트럼으로",
   specSkinHint:"곡명 배너 왼쪽 위의 「＋」를 누르면 크게 열립니다 (여기서도 전환할 수 있습니다).",
+  specArtwork:"🎨 곡 썸네일 표시",
+  specArtworkHint:"스펙트럼 오른쪽 위에 현재 곡의 작은 표지를 표시합니다 (기본 꺼짐).",
   specSkinOpenTip:"📊 스펙트럼 크게 열기", specSkinCloseTip:"📊 스펙트럼 작게 닫기",
   specNextStyle:"다음 모양",
   specOpenSettings:"⚙ 자세한 설정",
@@ -232,6 +240,7 @@ if (core.prefs && !specSafe) {
   core.settings.specTheme = core.pick(core.prefs.specTheme, SPEC_THEMES, "neon");              // 初期はネオン
   core.settings.specSkin  = core.prefs.specSkin !== false;                                // 📊 曲名バナーのスキン（初期オン）
   core.settings.specSkinOpen = core.prefs.specSkinOpen === true;                          // 大きく開いた状態で始めるか（初期は閉じ）
+  core.settings.specArtwork = core.prefs.specArtwork === true;                            // 🎨 楽曲サムネイル（初期オフ）
   core.settings.specGain  = core.num(core.prefs.specGain, .4, 2.5, 1);
   core.settings.specPeaks = core.prefs.specPeaks !== false;                               // ピーク（初期オン）
   core.settings.specTv    = core.prefs.specTv === true;                                   // 📺 重ね表示（初期オフ）
@@ -243,6 +252,7 @@ if (typeof settings !== "undefined") {
   core.settings.specTheme = core.pick(core.settings.specTheme, SPEC_THEMES, "neon");
   core.settings.specSkin  = core.settings.specSkin !== false;
   core.settings.specSkinOpen = core.settings.specSkinOpen === true;
+  core.settings.specArtwork = core.settings.specArtwork === true;
   core.settings.specGain  = core.num(core.settings.specGain, .4, 2.5, 1);
   core.settings.specPeaks = core.settings.specPeaks !== false;
   core.settings.specTv    = core.settings.specTv === true;
@@ -1138,7 +1148,31 @@ function drawOne(cv, kind, t) {
   };
   try { fn(S, g, W, H); } catch (e) { console.error(e); }
   if (!live && IDLE_LINE[style]) idleLine(g, W, H);
+  drawArtworkInset(g, W, H, dpr);
   return true;
+}
+function drawArtworkInset(g, W, H, dpr) {
+  const image = core.bgImage;
+  if (!core.settings.specArtwork || !core.currentSong || !image || !image.naturalWidth || !image.naturalHeight) return;
+  if (core.settings.hideArtworkDuringChart && core.phase === "playing") return;
+  const pad = Math.max(4, Math.round(5 * dpr));
+  const size = Math.min(Math.round(H * .62), Math.round(W * .24));
+  if (size < 12 || size + pad * 2 > W || size + pad * 2 > H) return;
+  const x = W - size - pad, y = pad;
+  g.save();
+  g.setTransform(1, 0, 0, 1, 0, 0); g.filter = "none"; g.globalAlpha = .96;
+  g.fillStyle = "rgba(0,0,0,.72)"; g.fillRect(x - 2, y - 2, size + 4, size + 4);
+  g.save();
+  g.beginPath();
+  if (typeof g.roundRect === "function") g.roundRect(x, y, size, size, Math.max(3, 5 * dpr));
+  else g.rect(x, y, size, size);
+  g.clip();
+  const scale = Math.max(size / image.naturalWidth, size / image.naturalHeight);
+  const w = image.naturalWidth * scale, h = image.naturalHeight * scale;
+  g.drawImage(image, x + (size - w) / 2, y + (size - h) / 2, w, h);
+  g.restore();
+  g.strokeStyle = "rgba(255,255,255,.82)"; g.lineWidth = Math.max(1, dpr); g.strokeRect(x, y, size, size);
+  g.restore();
 }
 
 /* ============ 描き続けるかどうか ============ */
@@ -1273,6 +1307,8 @@ function buildBox(host, withCanvas) {
   host.append(tx("div", "specTvHint", "hint specTvHint"));
   host.append(mkCheck("specSkin", () => core.settings.specSkin, v => { core.settings.specSkin = v; core.saveUserPrefs(); syncAll(); }));
   host.append(tx("div", "specSkinHint", "hint specSkinHint"));
+  host.append(mkCheck("specArtwork", () => core.settings.specArtwork, v => { core.settings.specArtwork = v; core.saveUserPrefs(); syncAll(); }));
+  host.append(tx("div", "specArtworkHint", "hint specArtworkHint"));
   SYNCS.push(() => host.classList.toggle("specOff", !core.settings.specOn));
   return host;
 }
@@ -1433,6 +1469,9 @@ addEventListener("DOMContentLoaded", () => {
   on("phase", () => syncAll());
   on("language", () => syncAll());
   on("lite", () => syncAll());   /* 🪶 軽量化モードの切り替えで、バナーのスキンとアナライザーを合わせ直す */
+  on("songSelected", () => kick());
+  on("songArtwork", () => kick());
+  on("studyCoverChanged", () => kick());
   on("chart", () => syncAll());
   addEventListener("resize", kick);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) kick(); });
@@ -1458,6 +1497,8 @@ window.TrkSpec = Object.freeze({
   theme: () => core.settings.specTheme,
   skin: () => !!core.settings.specSkin,
   skinOpen: () => !!core.settings.specSkinOpen,
+  showArtwork: () => !!core.settings.specArtwork,
+  setShowArtwork: v => { core.settings.specArtwork = !!v; core.saveUserPrefs(); syncAll(); return core.settings.specArtwork; },
   setSkin: v => { core.settings.specSkin = !!v; core.saveUserPrefs(); syncAll(); return core.settings.specSkin; },
   openSkin: v => { core.settings.specSkinOpen = !!v; core.saveUserPrefs(); syncAll(); return core.settings.specSkinOpen; },
   cycleStyle: () => { const i = Math.max(0, SPEC_STYLES.indexOf(core.settings.specStyle)); core.settings.specStyle = SPEC_STYLES[(i + 1) % SPEC_STYLES.length]; core.saveUserPrefs(); syncAll(); return core.settings.specStyle; },

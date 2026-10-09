@@ -166,6 +166,9 @@ const settings = {
   showMasterDiff: !!prefs.showMasterDiff,
   escNoReturn: prefs.escNoReturn === true,   /* ❓謎設定：Esc長押しで選曲へ戻らない（既定はオフ＝長押しで戻る） */
   judgeOrdered: prefs.judgeOrdered === true, /* ❓謎設定：MANUALの判定を昔のやり方（時刻順・色違いは常にMISS）にする（既定はオフ＝js/judge-match.js の "smart"） */
+  artWallpaperBg: prefs.artWallpaperBg === true,                     // 🖼 楽曲の静止画を譜面の後ろ全体へ広げる（既定は通常の動画枠内）
+  useStudyArtwork: prefs.useStudyArtwork === true,                   // 📚 書斎で割り当てた画像をTV／ゲーム背景にも使う（既定オフ）
+  hideArtworkDuringChart: prefs.hideArtworkDuringChart === true,     // 🎼 譜面中は静止画を隠す（既定オフ）
   chartGen: pick(prefs.chartGen, ["1", "2"], "2"),                        // 🎼 自動譜面の作り方（既定は新方式。旧方式「1」へ戻せば、旧譜面の記録もそのまま開ける）
   seed: typeof prefs.seed === "string" ? prefs.seed.slice(0, 32) : "834271",   // 曲ごとの設定がない曲の初期値
   bpm: num(prefs.bpm, 60, 300, 138),
@@ -274,6 +277,7 @@ const settings = {
   specTv: prefs.specTv === true,                                              // 📺 TVに重ねる（初期オフ）
   specSkin: prefs.specSkin !== false,                                         // 📊 曲名バナーをスキンにする（初期オン）
   specSkinOpen: prefs.specSkinOpen === true,                                  // 大きく開いた状態（初期は閉じ）
+  specArtwork: prefs.specArtwork === true,                                   // 🎨 曲のサムネイルをスペクトラムに小さく重ねる（初期オフ）
   /* プレイオプション */
   lives: pick(prefs.lives, ["standard", "knight", "chicken", "none"], "standard"),
   countdown: prefs.countdown !== false,
@@ -380,10 +384,11 @@ function resetVideoPrefs() {
   settings.tvSongWhilePlaying = false;   /* ◀▶ を演奏中も効かせる設定も一緒に戻す */
   /* tv-dock.js の「選曲中に映像を流す」も一緒に戻す */
   settings.tvMenuPreview = true; settings.tvMenuVideo = false;
+  settings.artWallpaperBg = false; settings.useStudyArtwork = false; settings.hideArtworkDuringChart = false;
   /* 📊 スペクトラム（js/spectrum.js）も映像まわりとして一緒に戻す */
   settings.specOn = true; settings.specStyle = "ring"; settings.specTheme = "neon";
   settings.specGain = 1; settings.specPeaks = true; settings.specTv = false;
-  settings.specSkin = true; settings.specSkinOpen = false;
+  settings.specSkin = true; settings.specSkinOpen = false; settings.specArtwork = false;
   if (typeof view !== "undefined" && view) { try { view.style.filter = videoFilter(); } catch(_) {} }
   if (typeof menuVideoTick === "function") { try { menuVideoTick(); } catch(_) {} }
 }
@@ -451,7 +456,8 @@ function enterSafeMode() {
   settings.tvMenuPreview = false; settings.tvMenuVideo = false;   // セーフモードは映像を流さない
   settings.tvSongWhilePlaying = false;                            // セーフモードでは演奏中の曲送りもしない
   settings.specOn = false; settings.specTv = false;               // 📊 スペクトラムも出さない（音の通り道を作らない）
-  settings.specSkin = false; settings.specSkinOpen = false;
+  settings.specSkin = false; settings.specSkinOpen = false; settings.specArtwork = false;
+  settings.artWallpaperBg = false; settings.useStudyArtwork = false; settings.hideArtworkDuringChart = false;
   settings.synthModeKeyboardLock = true; // 🎹 セーフモードではシンセを開けないが、既定値は壊さない
   settings.synthModeWideKeyboard = false;
   settings.libKeepShared = false;        // 📤 セーフモードでは、端末に残した共有の曲も読み戻さない
@@ -501,6 +507,8 @@ function exportPrefs(kind) {
     out.tvDockSkin = settings.tvDockSkin; out.tvDockFive = settings.tvDockFive; out.tvOrder = settings.tvOrder;
     out.tvOverlay = settings.tvOverlay; out.previewEnabled = settings.previewEnabled; out.fxPower = settings.fxPower;
     out.tvMenuPreview = settings.tvMenuPreview; out.tvMenuVideo = settings.tvMenuVideo;
+    out.artWallpaperBg = settings.artWallpaperBg; out.useStudyArtwork = settings.useStudyArtwork;
+    out.hideArtworkDuringChart = settings.hideArtworkDuringChart; out.specArtwork = settings.specArtwork;
   } else if (kind === "audio") {
     out.musicVolume = settings.musicVolume; out.musicVolumeRestore = settings.musicVolumeRestore; out.seEnabled = settings.seEnabled; out.seVolume = settings.seVolume;
     out.synthModeDisabled = settings.synthModeDisabled; out.synthModeFastStart = settings.synthModeFastStart;

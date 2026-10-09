@@ -353,7 +353,10 @@ const tv = read("js/tv-dock.js");
 const library = read("js/library.js");
 assert.ok(tv.includes('className = "tvCover"') && tv.includes('on("studyCoverChanged"'));
 assert.ok(library.includes('on("studyCoverChanged"') && library.includes("getSongCoverBlob"));
-assert.ok(library.includes("studySongArt"), "song selection prefers the Study cover");
+assert.ok(library.includes("settings.useStudyArtwork && window.TrkStudyRoom") &&
+  library.includes("studyCover || it.bgBlob || it.artBlob"), "song selection gates the Study cover setting, then prefers pack background over embedded art");
+assert.ok(library.includes("lastUseStudyArtwork") && library.includes('on("options"') && library.includes("applySongBackground(song)"),
+  "changing Study cover preference reapplies the selected song background");
 
 /* 書斎を開いている間、ゲーム側のキーを止める（旗は window.Trk.overlay に集めた。旧 window._trk*Open は残さない） */
 /* js/fx.js は凍結（書き換えない）。その 1 箇所だけは、core.js の読み取り専用の互換アクセサ window._trkStudyRoomOpen を読む */

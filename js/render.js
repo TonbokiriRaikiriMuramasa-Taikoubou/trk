@@ -83,7 +83,11 @@ function drawVideo() {
     core.vctx.drawImage(core.video, a.x + (a.w - w) / 2, a.y + (a.h - h) / 2, w, h);
     core.vctx.restore();
   } else if (showImage) {
-    const s = Math.max(a.w / image.naturalWidth, a.h / image.naturalHeight) * zoom;
+    // Usually preserve the embedded image's pixels: shrink only when needed to fit the video area.
+    // The mystery setting keeps the former full-screen cover/crop behavior for people who prefer it.
+    const s = fullArt
+      ? Math.max(a.w / image.naturalWidth, a.h / image.naturalHeight) * zoom
+      : Math.min(1, a.w / image.naturalWidth, a.h / image.naturalHeight);
     const w = image.naturalWidth * s, h = image.naturalHeight * s;
     core.vctx.save(); core.vctx.beginPath(); core.vctx.rect(a.x, a.y, a.w, a.h); core.vctx.clip();
     core.vctx.drawImage(image, a.x + (a.w - w) / 2, a.y + (a.h - h) / 2, w, h);

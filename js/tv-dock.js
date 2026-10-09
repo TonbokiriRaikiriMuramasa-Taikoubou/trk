@@ -1722,6 +1722,8 @@ addEventListener("DOMContentLoaded", () => {
       core.phase === "title" && screenName() === "select";
     screenDiv.dataset.live = liveOn ? "1" : "0";
     liveCanvas.style.opacity = liveOn ? "" : "0";
+    // Static covers sit outside #view, so give them the same selected TV color/dim/blur filter explicitly.
+    coverImg.style.filter = newVideoFilter();
     coverImg.hidden = isOff || liveOn || !coverImg.hasAttribute("src");
     if (liveOn) startLive(); else stopLive();
     powLed.classList.toggle("on", !isOff);

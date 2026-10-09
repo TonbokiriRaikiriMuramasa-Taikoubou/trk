@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-09（trk93）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
+> **最終更新：2026-10-09（trk94）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
 
 ## 1. 作業を再開するとき
 
@@ -45,7 +45,7 @@
 - **📺 TVドックの設定（`js/tv-dock.js`）**：くわしいの中の「📺 TVドック」グループ。チェックは3つ：🧱 壁掛け（スキン `wall` と同じ。外すと映画館に戻る）、↕ 並び替え（テレビとラックの上下）、🔢 5枠化（`tvDockFive`）。既定はすべて OFF（映画館・テレビが上・5枠なし）。くわしいは既定で開いた状態（保存済みの開閉は変えない）。テレビ本体とラックの表示は変えていない。
 - **Loop Lab の映像書き出し（`js/media-player-mode.js` の `exportLoopClip`）**：開発者表示の中だけ。記録した区間の行の 🎬 を押すと、映像と音を区間の長さのぶん録画して保存する（WebM。対応していれば MP4）。設定は持たない。書き出し後は再生位置・再生／停止・速度・ループを元に戻す。曲を切り替えたら途中で止め、保存しない。音声だけの曲は書き出さない。
 - **「📁 開く」と「📤 共有」**（`js/library.js`）：📁 開く は曲を入れるだけで、共有としては覚えない。📤 共有 は共有として覚え、📤 の印が付き、「共有をやめる」でまとめて外せ、「端末に残す」の対象になる。ボタンの下の説明行は `libOpenShareHint`（4言語）。
-- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.9-trk93`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
+- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.9-trk94`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
 
 ## 3. 権利・データ・セキュリティの不変条件
 
@@ -93,7 +93,7 @@ npm run check
 git diff --check
 ```
 
-`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。譜面ハッシュは注入した合成analysisから生成し、実WAVのデコード経路は別にエラー0・ノーツ件数±5%を確認。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-09／trk93）は Security 56 checks、a11y 8 checks、vendor 8 checks、軽量化 123 assertions、`npm test` 101件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
+`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。譜面ハッシュは注入した合成analysisから生成し、実WAVのデコード経路は別にエラー0・ノーツ件数±5%を確認。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-09／trk94）は Security 56 checks、a11y 8 checks、vendor 8 checks、軽量化 123 assertions、`npm test` 103件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
 
 `check-repo.mjs` はJavaScript構文・ローカル参照・ID・設定文言に加え、Arknights公式リンク、Blue Archive 225曲、LoL Sessions 108曲／Phase 1の58件、Gakumas 50件・別名、公式リンクと権利注記、既存プレイリストの所有曲・カスタムフィールド保持を検査する。チェックは意図的な逆テストでもFAILすることを確認してから追加する。外部ツールの起動後DOM検査は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照し、リポジトリ外で行う。
 
@@ -122,10 +122,10 @@ git diff --check
 - **テキスト編集・書き出し** — `.txt`／`.md`／`.js` の入力、Tab字下げ、Ctrl／⌘+S、自動保存と切替時の失敗ガード、本棚フォルダへの振り分けを確認する。通常ダウンロード／対応ブラウザのフォルダ選択、同名ファイルを上書きしないこと、元ファイル非書込み、HTML／JavaScriptを実行しないことも実機で確認。
 - **媒体操作** — ゲームパッド／TVリモコン、バナーの短押し・650ms長押し、映像・音声・メディアプレーヤー・シンセを実ブラウザで確認。
 - **譜面生成（chartGen・既定は新方式）** — 実機で、新方式の譜面が曲ごとに自然か（冒頭の静かな部分・後半の盛り上がり・Easy〜RUSHのLv表示・ノーツ増加の手触り）を確認する。「旧方式」に切り替えて従来の譜面・記録が出ること、旧方式の記録に「旧方式」の印が付くことも確認する。ヘッドレス（Chromium）での読込・切替・再読込の保存は確認済み（実機ではない）。
-- **音声解析の上限（通常20分／軽量化ON10分）** — Android Chrome等の実機で、各上限を超えた音声／動画に正しい理由文が出て、BPMグリッド譜面で遊べることを確認する。`tests/media-analysis-limit.test.mjs` は19分通常モード、10分境界、両上限超、`liteNoAnalyze` との区別、96MiB上限を実際の `loadMedia()` で検査する。trk91ではヘッドレスChromiumで21分WAVの解析省略と譜面生成を確認済み（実機ではない）。ユーザー提供レポートの19分モノラル22kHz WAV・ピーク664MB、ステレオMP3で約2倍という値は本環境で再測定していない。96MiB超の実メディアと実機メモリ使用量は未確認。
-- **モバイルのゲームステージ** — `#stage` は `position:fixed` とし、`fitStage()` がviewportの幅・高さに合わせて縮小する。ブラウザースモークに360×800 portrait／800×360 landscapeの境界・スクロール検査を追加したが、実ブラウザ／実機ではまだ未確認。
-- **選曲画面のコントラスト** — `tests/skin-contrast.test.mjs` は44内蔵スキンの選択ボタン前景・通常／hover文字・曲リスト補助文字の不透明HEX色ペアをWCAG比で静的に検査する。CSS配線の追加テストもある。これはaxeのDOM色合成・opacity・擬似状態検査を再現しない。ユーザー提供の「19/44」報告はこの作業では実DOMで再現していないため、選曲画面でaxeを再実行し、特に手動ボタンのhover・`.libSub`・`#guideProgress` を確認する。
-- **Service Workerのsafeオフライン回帰** — `tools/smoke-browser.mjs` に、汚染した `index.html` を有効キャッシュへ入れ、HTTPサーバーを実際に停止した後で `/index.html?safe=1`・`/?safe=1`・`/#safe` を新しいページから開き、503と汚染スクリプト未実行を確かめる検査を追加した。Puppeteerのoffline modeだけでは代用しない。実ブラウザでの実行は未確認。
+- **音声解析の上限（通常20分／軽量化ON10分）** — Android Chrome等の実機で、各上限を超えた音声／動画に正しい理由文が出て、BPMグリッド譜面で遊べることを確認する（「軽量化ONの端末で10分を超える曲を入れると省略表示（🪶 Lite mode skips…）が出る」）。`tests/media-analysis-limit.test.mjs` は19分通常モード、10分境界、両上限超、`liteNoAnalyze` との区別、96MiB上限を実際の `loadMedia()` で検査する。trk91ではヘッドレスChromiumで21分WAVの解析省略と譜面生成を確認済み（実機ではない）。ユーザー提供レポートの19分モノラル22kHz WAV・ピーク664MB、ステレオMP3で約2倍という値は本環境で再測定していない。96MiB超の実メディアと実機メモリ使用量は未確認。
+- **モバイルのゲームステージ** — `#stage` は `position:fixed` とし、`fitStage()` がviewportの幅・高さに合わせて縮小する。仮想環境（縦360px、横780×360、320×568）ではぴったり収まることを確認済み。実機では端末を縦横に回しても端が切れないことを確認する。
+- **選曲画面・設定画面のコントラスト** — `tests/skin-contrast.test.mjs` は44内蔵スキンの選択ボタン前景・通常／hover文字・曲リスト補助文字・全プルダウン（`select`）・棚件数（`#skinShelfCount`）の不透明HEX色ペアをWCAG比で静的に検査する。設定画面の `.field` 外 select（`#displayMode`, `#shortMode`）にもスキンの field 背景・text 文字色が当たり、暗いスキンでの白地に白文字問題を解消。`#skinShelfCount` の `opacity:.6` を廃止し `color:var(--ui-muted)` へ変更。実機で選択中の行やボタンの見やすさ、アクセント色ボタンの見え方を確認する。
+- **Service Workerのsafeオフライン回帰** — `tools/smoke-browser.mjs` に、汚染した `index.html` を有効キャッシュへ入れ、HTTPサーバーを実際に停止した後で `/index.html?safe=1`・`/?safe=1`・`/#safe` を新しいページから開き、503と汚染スクリプト未実行を確かめる検査を追加した。仮想環境では改ざんした殻でも3つとも503になることを確認済み。実ブラウザ・実機での実行は未確認。
 - **3D部品の同梱後の表示（trk92）** — MMD・VRMの3D部品は `assets/vendor/` から読む。実機（Android Chrome・PC）で、初回読込・チェックボタンの表示が「3Dの部品」になっていること、読込に失敗したときのエラー文（`mmdNetError`）が4言語で正しく出ることを確認する。
 - **名前空間 D（window.Trk.*）と差し替えの回帰** — 実機（Android Chrome・PC）で次を確認：①曲リストで ✔（verified）の表示が、並べ替え・タブ切替・取り込み直後の再描画でも出る（`renderLib` 差し替え）、②アドオンの曲パック取り込み（`installPackFile`）と、取り込み後の一覧表示（`renderPackList`・`getPackSongs`）、③FIRST SPARK 以外の譜面で、結果画面・判定表示（`showJudge`）・映像（`drawVideo`）が従来どおり動く、④書斎・メディア・シンスの開閉で、ゲームのキーが止まる（overlay）。静的検査・ヘッドレスでは、差し替えの届き方（`renderLib` のみ）しか見ていない。
 
@@ -168,8 +168,17 @@ git diff --check
 
 ## 11. 最近の変更
 
-### 作業要約（2026-10-09時点・trk75〜93）
+### 作業要約（2026-10-09時点・trk75〜94）
 
+- **リザルト画面移行の安全ガードと軽量化設定欄の配置変更（trk94追補）**：
+  - 曲の再生終了時（通常・AUTO問わず）、ブラウザの `ended` イベントの欠落・遅延や末尾 pause に依存せず確実にリザルト画面へ移行するよう `js/game.js` の `tickClock`（`core.video.ended` または `currentTime >= duration - 0.05` で `endGame(false)`）と `js/main.js` の `pause` ハンドラーに曲終端ガードを追加。
+  - 重さを感じた時に気づきやすいよう、設定画面の右下にあった「🪶 軽量化設定（`#litePanel`）」を左列の「🩷 MMDマスコット（`#mmdPanel`）」のすぐ上に移動。
+  - `tests/core-safety.test.mjs` に曲終端ガードの回帰テストを追加（`npm test` 103/103）。
+- **設定画面プルダウンと棚カウンターのコントラスト改善（trk94）**：
+  - `.field` の外にある `#displayMode`（表示モード）と `#shortMode`（短縮）を含む全 `select` 要素に素の `select` スタイル（`padding:8px 10px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border);font-size:16px`）を適用し、暗いスキン28種で白地に白文字になる視認性問題を根本解消。
+  - `#skinShelfCount` の `opacity:.6` を廃止し、`color:var(--ui-muted);font-weight:600` に変更して明るいスキンでのコントラスト低下（2.2〜3.2）を解消。
+  - `tests/skin-contrast.test.mjs` に全 select 要素のスタイル適用および shelf counter のコントラスト回帰テストを追加。
+  - `sw.js` キャッシュ名を `trk-v2026.10.9-trk94` に更新。
 - **追補（trk93）**：SWの初回safeナビゲーション判定を強化し、キャッシュ名を `trk-v2026.10.9-trk93` に更新。汚染 `index.html`＋HTTPサーバー停止を使うオフライン回帰と360×800／800×360のstage幾何検査をブラウザースモークへ追加（実行はブラウザ未搭載のため未確認）。`#stage` をfixedに変更。軽量化中だけ音声解析の上限を10分にし、96MiB／通常20分と `liteNoAnalyze` を分離、スキップ理由を4言語化。44スキンのボタン／曲一覧補助文字とカスタムアクセントを静的WCAG計算で検査するテストを追加。`npm run check` 成功（Static 0 failure、Security 56、a11y 8、vendor 8、lite 123 assertions、node:test 101/101）、`git diff --check` 成功。axeの実DOM再現・実機測定ではない。
 - **英語ガイド・3D部品（trk92）**：英語ガイドの全節を整備し、three.js系の3D部品をローカル同梱へ移行。CDN参照を除き、エラー文言も4言語で更新。英語の母語話者確認と実機での3D表示は未確認（§7）。
 - **再レビュー対応（trk75〜77、trk90）**：IndexedDB・解析キャッシュ・名前空間・譜面生成・実行動作テスト。詳細は下の項目。

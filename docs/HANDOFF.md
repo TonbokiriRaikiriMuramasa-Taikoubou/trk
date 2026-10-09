@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-09（trk94）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
+> **最終更新：2026-10-09（trk95）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
 
 ## 1. 作業を再開するとき
 
@@ -36,6 +36,7 @@
 
 - MMD内蔵モーションは **65種をすべて選択可能**。日常・休憩／ダンス・ステージ／ミク曲テンポ／ミク定番ポーズ／表情・演技／🎤 歌・口パクの6グループ。VMDは `js/mmd.js` のコードから使用時に生成し、第三者のVMD・振付データは同梱しない。
 - 軽量化の判定・描画ゲートは `js/lite.js`。ゲーム判定と音声時計は描画間引きの前に処理する。設定の保存形式は既存の `shadow_taiko_preferences_v2` を維持する。
+- **ゲーム終端・リザルト遷移（`js/game.js`）**：`ended`／`pause` 合図と、`tickClock()` 冒頭の終端時刻fallbackを共通化する。fallbackは `paused`／`seeking` の早期 return より前に実行し、通知欠落時もMANUAL／AUTO・全モードで結果へ進む。実際の `video.ended` 前の手動pauseは結果扱いしない。リザルト画面は記録保存より先に表示し、記録エラーでは表示を止めない。回帰検査は `tests/game-end.test.mjs`（§6・§7）。
 - 書斎は端末内のIndexedDB `trk_study_room_v1` に保存。書斎の本文は文字として描画し、`.txt`／`.md`／`.js`等の編集は`textarea`からローカルコピーだけを書き換える。HTML／JavaScript／Markdownを実行・HTML解釈・プレビューする経路を追加しない。上級者設定で編集後の本棚フォルダを選べるが、本文の保存先は引き続きIndexedDB。本棚の元ファイルは読み取り専用。明示的な書き出しだけは、ユーザーが別途選んだフォルダへ衝突しない新規名のテキストコピーを作り、既存ファイルを上書きしない（選択ハンドルは起動中のメモリだけに保持。非対応ブラウザは通常ダウンロード）。画像のObject URLは不要時に破棄。本棚フォルダ・本の移動・手動順序は `settings` store の `shelf` レコード、表示状態・Studyナビゲーションキー等は `ui` レコードに保存する。既存DBバージョンを変えずに正規化し、フォルダ削除では本を削除せず本棚へ戻す。
 - 書斎の文字スキンは30種（文筆・読書11／コーディング6／AI・プロンプト風5／自由な発想8）。4分類の`optgroup`と30個のテーマ名は4言語で管理し、読書ページと編集用`textarea`の両方にテーマ色・書体・背景を適用する。AI・プロンプト風は装飾のみで、AI処理・ネットワークアクセスを追加しない。
 - **自動譜面（`js/chart-gen.js`）**：設定 `chartGen`（Seed欄の下の「自動譜面の作り方」）。既定は **`"2"`＝新方式**（2026-10-08、利用者の決定：冒頭の小さな音を拾うこと・総数の増加を受け入れ）。`"1"`＝旧方式は選択で戻せ、旧方式で作った記録は記録表で「旧方式」の印が付く（記録作成時に `gen` を保存）。`"2"`＝新方式は、前後4秒の90パーセンタイルで音量を局所正規化し、8小節ごとに「長さ×密度」でノーツ数を先に配って、盛り上がりは 0.7〜1.3 倍で残す。平均音量が曲の最大の6%未満の静かな区間（絶対音量ゲート）は、候補数の上限を難易度順の表 `CG_QUIET_CAPS` で絞る。上限は初級15%・中級20%・上級25%・達人34%・RUSH40%。削った分は他の区間へ回る。表は `DIFFS` の density とは独立している（trk90 までの density 比例式は、初級22.9%が中級20%を上回る逆転を起こしたため、trk91 で廃止）。合成曲 `contrast` の総数は初級〜RUSHで **100／212／459／514／894**（trk91 で初級は 115→100）、隣接難易度で厳密に増える（候補位置が足りる場合）。同曲の静かな区間（0〜90秒）は上級2.47 nps・達人3.08 nps。達人Lvは10で、Lv12〜15帯を回復したことまでは示さない。冒頭の判定は最大音量の1%未満のみ無音扱い（旧方式は6%）なので、冒頭の小さな音も入りやすい。`chartGen` の純関数としての未指定は旧方式のまま（ゴールデンを保つため）。旧方式の出力は `tests/fixtures/chart-legacy-golden.json`（ca84a19の`generateNotes`から取得）と全件一致が必須。ゴールデンは旧方式を変えたときに**作り直さない**（`node tests/capture-legacy-golden.mjs`は一度きりの道具）。
@@ -45,7 +46,7 @@
 - **📺 TVドックの設定（`js/tv-dock.js`）**：くわしいの中の「📺 TVドック」グループ。チェックは3つ：🧱 壁掛け（スキン `wall` と同じ。外すと映画館に戻る）、↕ 並び替え（テレビとラックの上下）、🔢 5枠化（`tvDockFive`）。既定はすべて OFF（映画館・テレビが上・5枠なし）。くわしいは既定で開いた状態（保存済みの開閉は変えない）。テレビ本体とラックの表示は変えていない。
 - **Loop Lab の映像書き出し（`js/media-player-mode.js` の `exportLoopClip`）**：開発者表示の中だけ。記録した区間の行の 🎬 を押すと、映像と音を区間の長さのぶん録画して保存する（WebM。対応していれば MP4）。設定は持たない。書き出し後は再生位置・再生／停止・速度・ループを元に戻す。曲を切り替えたら途中で止め、保存しない。音声だけの曲は書き出さない。
 - **「📁 開く」と「📤 共有」**（`js/library.js`）：📁 開く は曲を入れるだけで、共有としては覚えない。📤 共有 は共有として覚え、📤 の印が付き、「共有をやめる」でまとめて外せ、「端末に残す」の対象になる。ボタンの下の説明行は `libOpenShareHint`（4言語）。
-- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.9-trk94`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
+- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.9-trk95`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
 
 ## 3. 権利・データ・セキュリティの不変条件
 
@@ -93,7 +94,7 @@ npm run check
 git diff --check
 ```
 
-`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。譜面ハッシュは注入した合成analysisから生成し、実WAVのデコード経路は別にエラー0・ノーツ件数±5%を確認。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-09／trk94）は Security 56 checks、a11y 8 checks、vendor 8 checks、軽量化 123 assertions、`npm test` 103件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
+`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。譜面ハッシュは注入した合成analysisから生成し、実WAVのデコード経路は別にエラー0・ノーツ件数±5%を確認。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-09／trk95）は Security 56 checks、a11y 8 checks、vendor 8 checks、軽量化 123 assertions、`npm test` 109件。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
 
 `check-repo.mjs` はJavaScript構文・ローカル参照・ID・設定文言に加え、Arknights公式リンク、Blue Archive 225曲、LoL Sessions 108曲／Phase 1の58件、Gakumas 50件・別名、公式リンクと権利注記、既存プレイリストの所有曲・カスタムフィールド保持を検査する。チェックは意図的な逆テストでもFAILすることを確認してから追加する。外部ツールの起動後DOM検査は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照し、リポジトリ外で行う。
 
@@ -114,6 +115,7 @@ git diff --check
 - **Music／プレイリスト** — タッチ端末で🐔の長押し階層・表示名・並べ替えを確認。Music内で利用者が作った`trk`フォルダを選んで中だけが読み込まれ、再スキャン可能であり、ファイルの新規作成・移動がないこと。公式wishで灰色→所持後に黒い行となり遊べること、`.ogg`と照合メモ／SEARCH LIGHT別名を実ファイルで確認。
 - **カタログ曲リンク** — wish行から公式の個別ページ／作品ページが開くこと。楽曲別ページがない案内先は作品ページとして表示され、利用許諾と誤解されないこと。アークナイツ「墟」👹、Babel 5曲、LONETRAIL 10曲、イベントOST8作品も確認。
 - **FIRST SPARK** — 30秒デモの初級・中級・上級を実際に遊び、27／54／111ノーツが音に合うか、`chartCustom`表示・難易度切替・達人/RUSHの自動生成・404時のフォールバックを確認。
+- **リザルト画面（trk95）** — Android Chrome・PCで MANUAL操作とAUTO設定の両方により、MANUAL／TRUCK／ORBIT／STAGE／CATCH 全モードを完走し、リザルトが1回だけ表示されることを確認する。中断・再開で誤って終了しないこと、音源終端で ended 通知が欠ける端末でも結果へ進むことも確認（静的・VMテストのみ実施、実機未確認）。
 - **軽量化** — Android Chrome／PWAで自動判定、20／30fpsの操作感・発熱・電池、装飾間引き、曲リスト60行、音声解析省略、MMD／VRM遅延読込を確認。
 - **解析キャッシュ（trk_analysis_cache_v1）** — 同じ曲の2回目の読み込みで解析を省くこと、件数の上限（30）と容量の見え方を実機で確認する（ヘッドレスでは、2回目のデコードが0回・譜面が一致・壊れた記録は無視して作り直す・件数の上限を確認済み）。
 - **IndexedDB** — 既存pack入りのブラウザでv1→v2移行・`size` index・旧レコードのsize・新規保存・複数タブ時の `packDbBlocked` を確認。容量が0になる／過小計上する場合は最優先で調査。2026-10-08 に、索引の取り違えで高速経路が一度も使われていなかった不具合を直した（ヘッドレスで確認済み）。実機で容量の表示が前と同じかを確かめる。
@@ -168,12 +170,16 @@ git diff --check
 
 ## 11. 最近の変更
 
-### 作業要約（2026-10-09時点・trk75〜94）
+### 作業要約（2026-10-09時点・trk75〜95）
 
-- **リザルト画面移行の安全ガードと軽量化設定欄の配置変更（trk94追補）**：
-  - 曲の再生終了時（通常・AUTO問わず）、ブラウザの `ended` イベントの欠落・遅延や末尾 pause に依存せず確実にリザルト画面へ移行するよう `js/game.js` の `tickClock`（`core.video.ended` または `currentTime >= duration - 0.05` で `endGame(false)`）と `js/main.js` の `pause` ハンドラーに曲終端ガードを追加。
-  - 重さを感じた時に気づきやすいよう、設定画面の右下にあった「🪶 軽量化設定（`#litePanel`）」を左列の「🩷 MMDマスコット（`#mmdPanel`）」のすぐ上に移動。
-  - `tests/core-safety.test.mjs` に曲終端ガードの回帰テストを追加（`npm test` 103/103）。
+- **リザルト画面が出ない問題の再修正（trk95）**：
+  - 原因：`tickClock()` の終端ガードが、`video.paused`／`seeking` の早期 return より後にあり、終端付近で video が pause 済みだと実行されなかった。`main.js` のイベント側も `phase === "playing"` の場合だけを見ており、終端・pause・時計の判定が分散していた。
+  - 終端・pause の処理を `game.js` に一元化。終端判定を早期 return より前に行い、ブラウザの `ended` 通知が欠落しても終端時刻を検知する。AUTO／MANUAL／TRUCK／ORBIT／STAGE／CATCH 共通。手動一時停止中は、実際に `video.ended` になった場合だけ結果へ進む。極端に短い音源を開始直後に終了扱いしないよう、終端許容幅は曲長に比例させる。
+  - リザルト画面を記録保存より先に表示し、記録・履歴の保存に失敗してもスコア結果を描画する。短い無音区間終了・FAILEDも、phase を終端へ移した後で video を pause し、pause 合図との競合を避ける。
+  - `tests/game-end.test.mjs` を追加し、pause 済みの終端・ended 通知・通常 pause・短い曲・全5モード／AUTO／MANUALを検査。`npm run check` 成功（`npm test` 109/109、Static 0 failure／0 warning）。実ブラウザ／実機の再確認は未実施（§7）。`sw.js` のキャッシュ名を `trk-v2026.10.9-trk95` に更新。
+- **リザルト終端ガードの初回対応／軽量化設定欄の配置変更（trk94、終端処理はtrk95で再修正）**：
+  - `tickClock` と `main.js` に終端ガードを追加したが、`tickClock` 側は `video.paused`／`seeking` の早期 return より後にあり、停止状態では実行されない欠陥が残っていた。trk95で処理を共通化し、動作を伴う回帰テストへ置き換えた。
+  - 設定画面の右下にあった「🪶 軽量化設定（`#litePanel`）」を左列の「🩷 MMDマスコット（`#mmdPanel`）」のすぐ上に移動（この配置変更は維持）。
 - **設定画面プルダウンと棚カウンターのコントラスト改善（trk94）**：
   - `.field` の外にある `#displayMode`（表示モード）と `#shortMode`（短縮）を含む全 `select` 要素に素の `select` スタイル（`padding:8px 10px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border);font-size:16px`）を適用し、暗いスキン28種で白地に白文字になる視認性問題を根本解消。
   - `#skinShelfCount` の `opacity:.6` を廃止し、`color:var(--ui-muted);font-weight:600` に変更して明るいスキンでのコントラスト低下（2.2〜3.2）を解消。

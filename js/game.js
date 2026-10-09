@@ -66,8 +66,8 @@ function shortSilenceWatch() {   /* 終盤の無音を検知したらそこで�
   if (!shortSilenceSince) { shortSilenceSince = now; return; }
   if (now - shortSilenceSince > 2200 && core.video.currentTime > 10) {   /* 2.2秒ずっと無音＝曲の終わり */
     shortSilenceSince = 0;
-    core.video.pause();
     endGame(false);
+    core.video.pause();
   }
 }
 function shortCleanup() { if (shortAn) { try { shortAn.disconnect(); } catch (_) {} shortAn = null; } shortSilenceSince = 0; }
@@ -155,9 +155,9 @@ function toTitle() {
 function failGame() {
   if (core.phase !== "playing") return;
   leadIn = null;
-  core.video.pause();
   failSound();
   endGame(true);
+  core.video.pause();
 }
 
 /* ---------- スコア ---------- */
@@ -181,18 +181,22 @@ const showStar = () => core.settings.perfectStar !== false;
 
 /* ---------- リザルト ---------- */
 function endGame(failed = false) {
-  if (core.phase !== "playing") return;
+  if (!canEndGame(failed)) return;
   for (const n of core.chart) if (!n.judged) { n.judged = true; n.result = "miss"; core.stats.miss++; }
   shortCleanup();
   core.setPhase("ended");
   core.video.playbackRate = 1;
+  core.$("endScreen").querySelector("h2").textContent = tr(failed ? "failed" : "finished");
+  core.showScreen("endScreen");
   const mode = core.settings.playMode, icon = modeIcon(mode);
   const acc = currentAcc(), score = currentScore(), clean = !failed && !(core.stats.crash > 0);   // CATCHでぶつかったらFCなし
   const ap = clean && core.stats.perfect > 0 && core.stats.good === 0 && core.stats.miss === 0;
   const fc = clean && core.stats.miss === 0 && core.stats.perfect + core.stats.good > 0;
   const grade = failed ? "F" : ap ? "SS" : acc >= 95 ? "S" : acc >= 90 ? "A" : acc >= 80 ? "B" : acc >= 70 ? "C" : "D";
 
-  const rec = recordPlay({ score, acc, grade, ap, fc, failed, short: runShort || 0 });
+  let rec = {};
+  try { rec = recordPlay({ score, acc, grade, ap, fc, failed, short: runShort || 0 }) || {}; }
+  catch (e) { console.error("Could not save the play record:", e); }
   const shTag = runShort ? ` 🕹️${runShort}s` : "";
   let bestHtml = "";
   if (rec.chart) {
@@ -219,7 +223,6 @@ function endGame(failed = false) {
                : ap ? `<span class="badge">${core.esc(tr(apKey))}</span>`
                : fc ? `<span class="badge">${core.esc(tr(fcKey))}</span>` : "";
   const starHtml = showStar() ? `<small style="display:block;font-size:14px;opacity:.85">${core.esc(tr("starCount", { n:core.stats.star || 0 }))}</small>` : "";
-  core.$("endScreen").querySelector("h2").textContent = tr(failed ? "failed" : "finished");
   core.$("result").innerHTML = `
     <div class="gradeRow"><div class="grade" aria-label="${core.esc(tr("grade"))}">${grade}</div>
       <div style="text-align:left"><div class="bigScore">${score.toLocaleString()}</div>
@@ -245,7 +248,6 @@ function endGame(failed = false) {
   if (song.source !== "pack") cr.append(core.el("div", "", tr("creditNote")));
 
   core.setStatus("endStatus", null);
-  core.showScreen("endScreen");
 }
 
 /* ---------- セリフ ---------- */
@@ -391,8 +393,37 @@ function seekTo(sec) {
   updateHud();
 }
 
+/* ---------- 曲終端の扱い ---------- */
+function mediaAtEnd() {
+  const duration = core.video.duration, time = core.video.currentTime;
+  if (core.video.ended) return true;
+  if (!Number.isFinite(duration) || duration <= 0 || !Number.isFinite(time)) return false;
+  /* 最後の pause / timeupdate が少し手前で止まる端末向け。短い音源を早く終わらせないよう長さに比例させる */
+  return time >= duration - Math.min(.3, duration * .05);
+}
+function canEndGame(failed = false) {
+  if (core.phase === "playing") return true;
+  /* 手動一時停止中は、実際にメディアが ended になった場合だけ結果へ進める */
+  return !failed && core.phase === "paused" && !leadIn && core.video.ended;
+}
+function finishIfMediaEnded() {
+  if (leadIn || (core.phase !== "playing" && core.phase !== "paused")) return false;
+  if (core.video.seeking && !core.video.ended) return false;
+  if (core.phase === "paused" ? !core.video.ended : !mediaAtEnd()) return false;
+  endGame(false);
+  return core.phase === "ended";
+}
+function handleVideoEnded() { finishIfMediaEnded(); }
+function handleVideoPause() {
+  if (finishIfMediaEnded()) return;
+  if (core.phase === "playing" && !leadIn && core.video.paused && !core.video.seeking) pauseGame();
+}
+
 /* ---------- 時計 ---------- */
 function tickClock() {
+  /* video.paused の早期 return より先に見る。 ended / pause の通知が欠落しても、
+     一時停止状態で終端に達していれば MANUAL・AUTO・各モード共通で結果へ進む */
+  if (finishIfMediaEnded()) return;
   if (runShort && !leadIn) shortSilenceWatch();   /* 🕹️ 終盤の無音検知 */
   const p = performance.now();
   if (leadIn && core.phase === "playing") {
@@ -412,14 +443,6 @@ function tickClock() {
     core.clock.lastCt = ct;
   }
   core.clock.t = t; core.clock.perf = p;
-
-  /* 曲終端のガード：ブラウザのendedイベントが欠落・遅延しても確実にリザルトへ移行 */
-  if (core.phase === "playing" && !leadIn) {
-    const dur = core.video.duration;
-    if (core.video.ended || (isFinite(dur) && dur > 0 && core.video.currentTime >= dur - 0.05)) {
-      endGame(false);
-    }
-  }
 }
 function gameTime(at = performance.now()) {
   let base;
@@ -579,6 +602,10 @@ core.$("recResetBtn").addEventListener("click", () => {
   delete records[core.fingerprint]; saveRecords(); renderRecords(); core.emit("records");
   core.setStatus("recStatus", "recCleared");
 });
+/* メディア終端・外部一時停止は、モード共通のゲーム進行側で一元処理 */
+core.video.addEventListener("ended", handleVideoEnded);
+core.video.addEventListener("pause", handleVideoPause);
+
 /* ✅ game.js 完了 */
 
 /* 公開名は据え置き（名前空間の移行の途中。window.Trk.* への移動は後の段階で行う） */

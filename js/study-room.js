@@ -824,14 +824,16 @@ function studyShelfFolderSizes() {
 }
 /* 見た目の設定（TVの枠・文字サイズ・拡大率）をDOMへ反映する。 */
 function studySyncLook() {
-  const screen = core.$("studyTvScreen");
-  if (screen) {
-    screen.dataset.look = studyPrefs.tvLook;
-    screen.dataset.size = studyPrefs.tvSize;
-    screen.dataset.ratio = studyPrefs.tvRatio;
-    screen.style.setProperty("--study-tv-max", STUDY_TV_MAX[studyPrefs.tvSize] || STUDY_TV_MAX.medium);
-    screen.style.setProperty("--study-tv-width", STUDY_TV_WIDTH[studyPrefs.tvSize] || "100%");
-    screen.style.setProperty("--study-tv-ratio", STUDY_TV_RATIO[studyPrefs.tvRatio] || STUDY_TV_RATIO["16:9"]);
+  /* 局所変数に裸の screen という名前を使わないこと（ブラウザ標準の window.screen と、
+     core.screen＝アプリの画面状態のどちらとも取り違えるため。trk100 のTV映像消失と同型） */
+  const tvScreen = core.$("studyTvScreen");
+  if (tvScreen) {
+    tvScreen.dataset.look = studyPrefs.tvLook;
+    tvScreen.dataset.size = studyPrefs.tvSize;
+    tvScreen.dataset.ratio = studyPrefs.tvRatio;
+    tvScreen.style.setProperty("--study-tv-max", STUDY_TV_MAX[studyPrefs.tvSize] || STUDY_TV_MAX.medium);
+    tvScreen.style.setProperty("--study-tv-width", STUDY_TV_WIDTH[studyPrefs.tvSize] || "100%");
+    tvScreen.style.setProperty("--study-tv-ratio", STUDY_TV_RATIO[studyPrefs.tvRatio] || STUDY_TV_RATIO["16:9"]);
   }
   const label = core.$("studyTvLabel");
   if (label) label.hidden = !studyPrefs.tvLabelOn;

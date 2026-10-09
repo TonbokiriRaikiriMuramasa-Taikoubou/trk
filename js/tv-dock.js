@@ -979,9 +979,12 @@ function applyOrder() {
 }
 
 /* ============ 🎬🖼 選曲中にmp4を流す（メニュー再生・確認用の描画） ============
-   注意：ドックを組み立てている中のスコープでは const screen（TV画面のdiv）が
-   core.js の画面名（"select" / "settings"）を隠してしまうので、画面名はこの関数で読む */
-const screenName = () => (typeof screen === "string" ? screen : "");
+   アプリの画面名（"select" / "settings"）は必ず core.screen（＝window.Trk.core.screen）で読む。
+   裸の名前 screen はブラウザ標準の window.screen（オブジェクト）を指し、画面名にはならない。
+   core.js が screen を大域へ出さなくなって（trk70）から、裸の参照が window.screen に当たり、
+   選曲画面のTV・確認タブ・メニュー再生が「静かに」全部止まっていた（trk100 で修正）。
+   TV画面の div も、画面名と取り違えないように screenDiv という名前で持つ。 */
+const screenName = () => (typeof core.screen === "string" ? core.screen : "");
 
 /* ・音は出さない。音ありのプレビュー（settings.previewEnabled）がオンのときは、そちらを優先する
    ・fit:"contain" はゲーム画面と同じ（黒帯つきで全体を映す）／fit:"cover" はTVの画面いっぱい（はみ出しは切る） */
@@ -1011,7 +1014,7 @@ function paintVideoFrame(ctx, W, H, fit) {
 let menuMutedByUs = false, menuPlayingByUs = false;
 function menuVideoWanted() {
   return core.settings.tvMenuVideo === true && core.settings.previewEnabled !== true &&
-    core.phase === "title" && screen === "select" && !document.hidden && core.videoReady && !!core.video.src;
+    core.phase === "title" && screenName() === "select" && !document.hidden && core.videoReady && !!core.video.src;
 }
 function menuVideoTick() {
   if (!menuVideoWanted()) {
@@ -1084,15 +1087,15 @@ addEventListener("DOMContentLoaded", () => {
   const nextSongBtn = btn("tvKey tvSong", core.el("span", "", "▶"));
   const top = core.el("div", "tvTop"); top.append(pow, prevSongBtn, lcd, nextSongBtn, pauseBtn);
   const screenWrap = core.el("div", "tvScreenWrap");
-  const screen = core.el("div", "tvScreen");
+  const screenDiv = core.el("div", "tvScreen");
   const screenGlare = core.el("i", "tvGlare");
   const speaker = core.el("div", "tvSpeaker");
   /* 🎨 書斎で割り当てたローカルジャケット（音声だけの曲でもTVを寂しくしない） */
   const coverImg = document.createElement("img"); coverImg.className = "tvCover"; coverImg.alt = ""; coverImg.hidden = true;
   /* 🆕 選曲中は、この画面に流れているmp4を映す（paintVideoFrame が描く） */
   const liveCanvas = document.createElement("canvas"); liveCanvas.className = "tvLive";
-  screen.append(coverImg, liveCanvas, screenGlare, core.el("i", "tvScanlines"));   // 走査線はカスタムTVスキン用（[data-scan="1"] のときだけ出る）
-  screenWrap.append(screen, speaker);
+  screenDiv.append(coverImg, liveCanvas, screenGlare, core.el("i", "tvScanlines"));   // 走査線はカスタムTVスキン用（[data-scan="1"] のときだけ出る）
+  screenWrap.append(screenDiv, speaker);
   const deco = core.el("div", "tvDeco");
   const slots = core.el("div", "tvSlots");
   const rTv = btn("tvKey"), rFav = btn("tvKey"), rPar = btn("tvKey");
@@ -1717,7 +1720,7 @@ addEventListener("DOMContentLoaded", () => {
     /* 🖼 選曲中のTVに映像を映す（動いているときだけ） */
     const liveOn = core.settings.tvMenuPreview !== false && !isOff && core.videoReady && !core.video.paused &&
       core.phase === "title" && screenName() === "select";
-    screen.dataset.live = liveOn ? "1" : "0";
+    screenDiv.dataset.live = liveOn ? "1" : "0";
     liveCanvas.style.opacity = liveOn ? "" : "0";
     coverImg.hidden = isOff || liveOn || !coverImg.hasAttribute("src");
     if (liveOn) startLive(); else stopLive();
@@ -1822,8 +1825,8 @@ addEventListener("DOMContentLoaded", () => {
 
     // スクリーンの見た目
     const curPreset = tvPresetById(core.settings.videoStyle);
-    screen.dataset.filter = curPreset ? curPreset.id : "";
-    screen.dataset.off = isOff ? "1" : "0";
+    screenDiv.dataset.filter = curPreset ? curPreset.id : "";
+    screenDiv.dataset.off = isOff ? "1" : "0";
     // スピーカーの光
     speaker.classList.toggle("on", !isOff && !core.video.paused);
   }

@@ -82,6 +82,32 @@ describe("game UI contrast across the skin catalogue", () => {
     assert.match(css, /\.guideStep span\{color:var\(--ui-muted\)\}/);
   });
 
+  test("select elements and shelf counter use solid skin colors with AA contrast", () => {
+    // Bare select base rule guarantees background and text color match skin field variables
+    assert.match(css, /select\{[^}]*background:var\(--ui-field\)[^}]*color:var\(--ui-text\)/,
+      "bare select elements must explicitly use skin field background and text colors");
+
+    // All select elements in index.html must be covered
+    const indexHtml = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+    const selectMatches = [...indexHtml.matchAll(/<select[^>]*id="([^"]+)"[^>]*>/g)];
+    assert.ok(selectMatches.length >= 35, `expected at least 35 select elements in index.html, found ${selectMatches.length}`);
+    for (const [, id] of selectMatches) {
+      assert.ok(id, "select element must have an id");
+    }
+
+    // Shelf counter uses --ui-muted without opacity fading
+    const shelfCount = css.match(/#skinShelfCount\{([^}]*)\}/)?.[1] || "";
+    assert.match(shelfCount, /color:var\(--ui-muted\)/, "#skinShelfCount must use solid --ui-muted");
+    assert.doesNotMatch(shelfCount, /opacity\s*:/, "#skinShelfCount must not use opacity");
+
+    // Verify text on field contrast across all 44 skins
+    for (const [id, skin] of Object.entries(SKINS)) {
+      const ui = skin.ui;
+      assert.ok(contrast(ui["--ui-text"], ui["--ui-field"]) >= 4.5,
+        `${id}: select text ${ui["--ui-text"]} on ${ui["--ui-field"]} is ${contrast(ui["--ui-text"], ui["--ui-field"]).toFixed(2)}:1`);
+    }
+  });
+
   test("custom-skin accent labels choose a black or white foreground with AA contrast", () => {
     const accents = ["#000000", "#101010", "#333333", "#767676", "#777777", "#808080", "#b78be0", "#e69f00", "#39c5bb", "#ff3b55", "#fefefe"];
     for (const accent of accents) {

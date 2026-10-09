@@ -475,7 +475,13 @@ seekBar.addEventListener("input", () => {
    ・video.paused も確認：プレビューを止めた合図が、ゲーム開始後に遅れて届くことがあるため */
 core.video.addEventListener("ended", () => { if (core.phase === "playing") window.Trk.play.endGame(); });
 core.video.addEventListener("pause", () => {
-  if (core.phase === "playing" && !window.Trk.play.leadIn && core.video.paused && !core.video.ended && !core.video.seeking) window.Trk.play.pauseGame();
+  if (core.phase === "playing" && !window.Trk.play.leadIn && core.video.paused && !core.video.seeking) {
+    if (core.video.ended || (isFinite(core.video.duration) && core.video.duration > 0 && core.video.currentTime >= core.video.duration - 0.3)) {
+      window.Trk.play.endGame();
+    } else {
+      window.Trk.play.pauseGame();
+    }
+  }
 });
 core.video.addEventListener("play", () => { if (core.phase === "paused") { core.showScreen(null); core.setPhase("playing"); poke(); } });
 document.addEventListener("visibilitychange", () => { if (document.hidden && core.phase === "playing") window.Trk.play.pauseGame(); });

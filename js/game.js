@@ -412,6 +412,14 @@ function tickClock() {
     core.clock.lastCt = ct;
   }
   core.clock.t = t; core.clock.perf = p;
+
+  /* 曲終端のガード：ブラウザのendedイベントが欠落・遅延しても確実にリザルトへ移行 */
+  if (core.phase === "playing" && !leadIn) {
+    const dur = core.video.duration;
+    if (core.video.ended || (isFinite(dur) && dur > 0 && core.video.currentTime >= dur - 0.05)) {
+      endGame(false);
+    }
+  }
 }
 function gameTime(at = performance.now()) {
   let base;

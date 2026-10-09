@@ -415,6 +415,81 @@
               <div id="makerStatus" class="hint status"></div>
             </details>
 
+            <!-- 🪶 軽量化（スマホ・タブレット・アプリ向け）: 配線は js/lite.js が行います -->
+            <details class="subPanel" id="litePanel">
+              <summary data-i18n="secLite"></summary>
+              <div class="hint" data-i18n="liteHint"></div>
+              <label class="field">
+                <span data-i18n="litePreset"></span>
+                <select id="litePreset">
+                  <option value="balanced" data-i18n="litePresetBalanced"></option>
+                  <option value="game" data-i18n="litePresetGame"></option>
+                  <option value="max" data-i18n="litePresetMax"></option>
+                  <option value="off" data-i18n="litePresetOff"></option>
+                  <option value="custom" data-i18n="litePresetCustom"></option>
+                </select>
+              </label>
+              <label class="check"><input id="liteGameFull" type="checkbox"><span data-i18n="liteGameFull"></span></label>
+              <div class="hint" data-i18n="liteGameFullNote"></div>
+              <label class="field">
+                <span data-i18n="liteMode"></span>
+                <select id="liteMode">
+                  <option value="auto" data-i18n="liteModeAuto"></option>
+                  <option value="on" data-i18n="liteModeOn"></option>
+                  <option value="off" data-i18n="liteModeOff"></option>
+                </select>
+              </label>
+              <div class="fields2">
+                <label class="field">
+                  <span data-i18n="liteFps"></span>
+                  <select id="liteFps">
+                    <option value="60" data-i18n="liteFps60"></option>
+                    <option value="30" data-i18n="liteFps30"></option>
+                    <option value="20" data-i18n="liteFps20"></option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span data-i18n="liteMascot"></span>
+                  <select id="liteMascot">
+                    <option value="60" data-i18n="liteMascot60"></option>
+                    <option value="30" data-i18n="liteMascot30"></option>
+                    <option value="15" data-i18n="liteMascot15"></option>
+                    <option value="off" data-i18n="liteMascotOff"></option>
+                  </select>
+                </label>
+              </div>
+              <label class="field">
+                <span data-i18n="liteScale"></span>
+                <select id="liteScale">
+                  <option value="device" data-i18n="liteScaleDevice"></option>
+                  <option value="1.5" data-i18n="liteScale15"></option>
+                  <option value="1" data-i18n="liteScale10"></option>
+                </select>
+              </label>
+              <label class="check"><input id="liteSpecOff" type="checkbox"><span data-i18n="liteSpecOff"></span></label>
+              <label class="check"><input id="liteFx" type="checkbox"><span data-i18n="liteFx"></span></label>
+              <label class="check"><input id="liteBlur" type="checkbox"><span data-i18n="liteBlur"></span></label>
+              <label class="check"><input id="liteDecor" type="checkbox"><span data-i18n="liteDecor"></span></label>
+              <label class="field">
+                <span data-i18n="liteLibRows"></span>
+                <select id="liteLibRows">
+                  <option value="device" data-i18n="liteLibRowsDevice"></option>
+                  <option value="150" data-i18n="liteLibRows150"></option>
+                  <option value="60" data-i18n="liteLibRows60"></option>
+                </select>
+              </label>
+              <label class="check"><input id="liteNoAnalyze" type="checkbox"><span data-i18n="liteNoAnalyze"></span></label>
+              <label class="check"><input id="liteMascotNoLoad" type="checkbox"><span data-i18n="liteMascotNoLoad"></span></label>
+              <div class="hint" data-i18n="liteLeanNote"></div>
+              <div class="hint" data-i18n="liteMascotOffNote"></div>
+              <div id="liteState" class="hint liteState"></div>
+              <div id="liteDevice" class="hint"></div>
+              <div class="miniActions">
+                <button id="liteRecheckBtn" type="button" data-i18n="liteRecheck"></button>
+              </div>
+              <div class="hint" data-i18n="liteNote"></div>
+            </details>
+
             <!-- 🩷 MMDマスコット（ミクモード・モデル追加） -->
             <details id="mmdPanel" class="subPanel">
               <summary data-i18n="mmdTitle"></summary>
@@ -1077,80 +1152,6 @@
           <details class="panel" id="favPanel">
             <summary id="favPanelSummary">⭐ お気に入り</summary>
             <div id="favPanelBody"></div>
-          </details>
-          <!-- 🪶 軽量化（スマホ・タブレット・アプリ向け）: 配線は js/lite.js が行います -->
-          <details class="panel" id="litePanel">
-            <summary data-i18n="secLite"></summary>
-            <div class="hint" data-i18n="liteHint"></div>
-            <label class="field">
-              <span data-i18n="litePreset"></span>
-              <select id="litePreset">
-                <option value="balanced" data-i18n="litePresetBalanced"></option>
-                <option value="game" data-i18n="litePresetGame"></option>
-                <option value="max" data-i18n="litePresetMax"></option>
-                <option value="off" data-i18n="litePresetOff"></option>
-                <option value="custom" data-i18n="litePresetCustom"></option>
-              </select>
-            </label>
-            <label class="check"><input id="liteGameFull" type="checkbox"><span data-i18n="liteGameFull"></span></label>
-            <div class="hint" data-i18n="liteGameFullNote"></div>
-            <label class="field">
-              <span data-i18n="liteMode"></span>
-              <select id="liteMode">
-                <option value="auto" data-i18n="liteModeAuto"></option>
-                <option value="on" data-i18n="liteModeOn"></option>
-                <option value="off" data-i18n="liteModeOff"></option>
-              </select>
-            </label>
-            <div class="fields2">
-              <label class="field">
-                <span data-i18n="liteFps"></span>
-                <select id="liteFps">
-                  <option value="60" data-i18n="liteFps60"></option>
-                  <option value="30" data-i18n="liteFps30"></option>
-                  <option value="20" data-i18n="liteFps20"></option>
-                </select>
-              </label>
-              <label class="field">
-                <span data-i18n="liteMascot"></span>
-                <select id="liteMascot">
-                  <option value="60" data-i18n="liteMascot60"></option>
-                  <option value="30" data-i18n="liteMascot30"></option>
-                  <option value="15" data-i18n="liteMascot15"></option>
-                  <option value="off" data-i18n="liteMascotOff"></option>
-                </select>
-              </label>
-            </div>
-            <label class="field">
-              <span data-i18n="liteScale"></span>
-              <select id="liteScale">
-                <option value="device" data-i18n="liteScaleDevice"></option>
-                <option value="1.5" data-i18n="liteScale15"></option>
-                <option value="1" data-i18n="liteScale10"></option>
-              </select>
-            </label>
-            <label class="check"><input id="liteSpecOff" type="checkbox"><span data-i18n="liteSpecOff"></span></label>
-            <label class="check"><input id="liteFx" type="checkbox"><span data-i18n="liteFx"></span></label>
-            <label class="check"><input id="liteBlur" type="checkbox"><span data-i18n="liteBlur"></span></label>
-            <label class="check"><input id="liteDecor" type="checkbox"><span data-i18n="liteDecor"></span></label>
-            <label class="field">
-              <span data-i18n="liteLibRows"></span>
-              <select id="liteLibRows">
-                <option value="device" data-i18n="liteLibRowsDevice"></option>
-                <option value="150" data-i18n="liteLibRows150"></option>
-                <option value="60" data-i18n="liteLibRows60"></option>
-              </select>
-            </label>
-            <label class="check"><input id="liteNoAnalyze" type="checkbox"><span data-i18n="liteNoAnalyze"></span></label>
-            <label class="check"><input id="liteMascotNoLoad" type="checkbox"><span data-i18n="liteMascotNoLoad"></span></label>
-            <div class="hint" data-i18n="liteLeanNote"></div>
-            <div class="hint" data-i18n="liteMascotOffNote"></div>
-            <div id="liteState" class="hint liteState"></div>
-            <div id="liteDevice" class="hint"></div>
-            <div class="miniActions">
-              <button id="liteRecheckBtn" type="button" data-i18n="liteRecheck"></button>
-            </div>
-            <div class="hint" data-i18n="liteNote"></div>
           </details>
 
           <details class="panel" id="emergencyPanel">

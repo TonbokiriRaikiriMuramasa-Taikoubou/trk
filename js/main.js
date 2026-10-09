@@ -227,6 +227,23 @@ function nudgeLatency(d) {
 }
 
 /* ---------- キーボード ---------- */
+/* ---------- Esc長押しで選曲画面へ戻る（❓謎設定「Esc長押しで曲選択画面に戻らない」で止められる。既定はオン） ----------
+   短押しは従来どおり（プレイ中は一時停止、設定を閉じる）。押しっぱなしが ESC_HOLD_MS を越えたら、確認なしで選曲へ戻る。
+   ・プレイ中・一時停止中・リザルト画面が対象（選曲・設定・書斎などは対象外）。
+   ・合成キー（パッドの「戻る」）には keyup が来ないので、信頼できるイベント（isTrusted）だけで始める。 */
+const ESC_HOLD_MS = 1000;
+let escHoldTimer = 0;
+function escHoldCancel() { clearTimeout(escHoldTimer); escHoldTimer = 0; }
+function escHoldStart() {
+  escHoldCancel();
+  if (core.settings.escNoReturn) return;
+  escHoldTimer = setTimeout(() => {
+    escHoldTimer = 0;
+    if (!["playing", "paused", "ended"].includes(core.phase) || window.Trk.overlay.any()) return;
+    window.Trk.play.toTitle();
+  }, ESC_HOLD_MS);
+}
+
 addEventListener("keydown", e => {
   if (window.Trk.overlay.any()) return;
   const code = core.keyCodeOf(e);        // 📺 TVリモコン・メディアキーは e.code が空で e.key だけ届く
@@ -247,6 +264,7 @@ addEventListener("keydown", e => {
   if (code === core.settings.menuKey) { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat) requestMenuReturn(); return; }
   /* 📺 リモコンの「戻る」は機種によって Escape／BrowserBack／GoBack で届く（Backspace は入力欄のため除外） */
   if (code === "KeyP" || code === "Escape" || code === "BrowserBack" || code === "GoBack") {
+    if (code === "Escape" && e.isTrusted && !e.repeat) escHoldStart();
     if (core.phase === "playing") { e.preventDefault(); window.Trk.play.pauseGame(); }
     else if (core.phase === "paused") { e.preventDefault(); window.Trk.play.resumeGame(); }
     else if (core.phase === "title" && core.screen === "settings" && code === "Escape") { e.preventDefault(); core.closeSettings(); }
@@ -254,8 +272,8 @@ addEventListener("keydown", e => {
   }
   if (e.code === "KeyF" && !e.repeat && !e.ctrlKey && !e.metaKey && core.slotOfKey("KeyF") < 0 && fullscreenSupported) toggleFullscreen();
 });
-addEventListener("keyup", e => { if (window.Trk.overlay.any()) return; if (e.code === "Backquote") cancelRetryHold(); });
-addEventListener("blur", cancelRetryHold);
+addEventListener("keyup", e => { if (e.code === "Escape") escHoldCancel(); if (window.Trk.overlay.any()) return; if (e.code === "Backquote") cancelRetryHold(); });
+addEventListener("blur", () => { cancelRetryHold(); escHoldCancel(); });
 
 /* ---------- タッチ操作（MANUAL・TRUCK・ORBITの左右ボタン） ---------- */
 document.querySelectorAll("#touchKeys button").forEach(b => {
@@ -368,6 +386,7 @@ function syncOptionsUI() {
   if (core.$("optRandom")) core.$("optRandom").checked = !!core.settings.modRandom;
   if (core.$("showMasterDiff")) core.$("showMasterDiff").checked = !!core.settings.showMasterDiff;
   if (core.$("swayAllModes")) core.$("swayAllModes").checked = !!core.settings.swayAllModes;
+  if (core.$("escNoReturn")) core.$("escNoReturn").checked = !!core.settings.escNoReturn;
   core.$("rate").value = core.settings.rate;
   core.$("rateVal").textContent = core.settings.rate.toFixed(2) + "x";
   core.$("cover").value = core.settings.cover;
@@ -378,7 +397,7 @@ function syncOptionsUI() {
 function optionsChanged() { core.saveUserPrefs(); syncOptionsUI(); core.emit("options"); }
 [["countdown", "countdown"], ["countdownSE", "countdownSE"], ["resumeCountdown", "resumeCountdown"],
  ["optHidden", "hidden"], ["optSudden", "sudden"], ["optMirror", "modMirror"], ["optRandom", "modRandom"],
- ["swayAllModes", "swayAllModes"]].forEach(([id, key]) => {
+ ["swayAllModes", "swayAllModes"], ["escNoReturn", "escNoReturn"]].forEach(([id, key]) => {
   const el = core.$(id);
   if (el) el.addEventListener("change", e => { core.settings[key] = e.target.checked; optionsChanged(); });
 });

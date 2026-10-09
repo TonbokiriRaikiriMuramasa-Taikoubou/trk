@@ -125,6 +125,7 @@ Also available:
 | D F J K etc. | STAGE lanes |
 | Any key | ORBIT |
 | P / Esc | Pause and resume |
+| Hold Esc for about a second | Return to song select (while playing, paused, or on the result screen; can be turned off in ❓ Mystery settings: “Don’t return to song select on a long Esc press”) |
 | `` ` `` (left of 1), hold | Restart from the beginning |
 | - / = | Timing correction ±5 ms |
 | [ / ] | Playback speed |

@@ -373,8 +373,7 @@ function titleString(r) {   // 例：🥁🐔🚚⚔🪐🎪🐔🚛（library.j
 }
 let titleSnap = null;
 on("beforePlay", () => { titleSnap = songTitles(window.Trk.play.songRec(false)); });
-on("screen", id => {
-  if (id !== "endScreen") return;
+on("resultRecorded", () => {   /* 記録を保存した後（履歴の先頭がこの曲）に、リザルトへ称号（ランク）を足す */
   const pair = TITLE_MODES.find(([m]) => m === core.settings.playMode); if (!pair) return;
   const [mode, icon] = pair;
   if ((lifeState.max > 0 && lifeState.hp <= 0) || window.Trk.play.runUnranked()) return;   // FAILED・AUTO・練習扱いは対象外

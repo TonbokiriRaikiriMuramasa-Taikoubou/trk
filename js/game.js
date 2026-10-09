@@ -187,26 +187,29 @@ function endGame(failed = false) {
   core.setPhase("ended");
   core.video.playbackRate = 1;
   core.$("endScreen").querySelector("h2").textContent = tr(failed ? "failed" : "finished");
-  core.showScreen("endScreen");
   const mode = core.settings.playMode, icon = modeIcon(mode);
   const acc = currentAcc(), score = currentScore(), clean = !failed && !(core.stats.crash > 0);   // CATCHでぶつかったらFCなし
   const ap = clean && core.stats.perfect > 0 && core.stats.good === 0 && core.stats.miss === 0;
   const fc = clean && core.stats.miss === 0 && core.stats.perfect + core.stats.good > 0;
   const grade = failed ? "F" : ap ? "SS" : acc >= 95 ? "S" : acc >= 90 ? "A" : acc >= 80 ? "B" : acc >= 70 ? "C" : "D";
 
-  let rec = {};
-  try { rec = recordPlay({ score, acc, grade, ap, fc, failed, short: runShort || 0 }) || {}; }
-  catch (e) { console.error("Could not save the play record:", e); }
+  /* 表示の順序（trk96）：
+     ① 結果の本体を描く　② 画面を出す（screen の聞き手＝判定の平均・公認・ゴースト等は、描かれた結果へ足す）
+     ③ 記録を保存する（失敗しても①②は済んでいる）　④ 記録で決まる行（自己ベスト・クレジットの ⭐）と称号を埋める。
+     ②より前に記録すると、画面の聞き手が直前の曲の履歴を見てしまう。 */
   const shTag = runShort ? ` 🕹️${runShort}s` : "";
-  let bestHtml = "";
-  if (rec.chart) {
-    const star = rec.chart.ap ? ` ${icon}⭐` : "";
-    const rk = rateKey() ? ` (${rateKey()}x)` : "";
-    if (rec.isNew) bestHtml = `<div class="best new">${core.esc(tr("newBest"))}${rk}${star}${shTag}</div>`;
-    else if (rec.prev) bestHtml = `<div class="best">${core.esc(tr("best"))}${rk}${shTag}: ${Number(rec.prev.score).toLocaleString()} · ${Number(rec.prev.acc).toFixed(2)}%${star}</div>`;
-    if (rec.newSpeed) bestHtml += `<div class="best new">${core.esc(tr("newSpeed", { r:core.settings.rate.toFixed(2) + "x" }))}</div>`;
-    bestHtml += `<div class="best">${core.esc(tr("recPlayCount", { n:rec.plays }))}</div>`;
-  }
+  const bestHtmlOf = rec => {
+    let html = "";
+    if (rec.chart) {
+      const star = rec.chart.ap ? ` ${icon}⭐` : "";
+      const rk = rateKey() ? ` (${rateKey()}x)` : "";
+      if (rec.isNew) html = `<div class="best new">${core.esc(tr("newBest"))}${rk}${star}${shTag}</div>`;
+      else if (rec.prev) html = `<div class="best">${core.esc(tr("best"))}${rk}${shTag}: ${Number(rec.prev.score).toLocaleString()} · ${Number(rec.prev.acc).toFixed(2)}%${star}</div>`;
+      if (rec.newSpeed) html += `<div class="best new">${core.esc(tr("newSpeed", { r:core.settings.rate.toFixed(2) + "x" }))}</div>`;
+      html += `<div class="best">${core.esc(tr("recPlayCount", { n:rec.plays }))}</div>`;
+    }
+    return html;
+  };
   const meta = [modeLabel(), tr(core.chartDiff), `${tr("level")}${core.currentLevel} ${tr("estimate")}`];
   if (runShort) meta.push(tr("shortTag", { n: runShort }));   /* 🕹️ 称号はモードを問わずこの絵文字で統一 */
   const mods = runMods();
@@ -237,17 +240,24 @@ function endGame(failed = false) {
     <div class="fastSlowRow">
       <div class="fsBadge fastBadge"><span class="fsLabel">FAST</span><b class="fsVal">${core.stats.fast || 0}</b>${core.stats.goodFast ? `<small class="fsSub">(${core.esc(tr("good"))} ${core.stats.goodFast})</small>` : ""}</div>
       <div class="fsBadge slowBadge"><span class="fsLabel">SLOW</span><b class="fsVal">${core.stats.slow || 0}</b>${core.stats.goodSlow ? `<small class="fsSub">(${core.esc(tr("good"))} ${core.stats.goodSlow})</small>` : ""}</div>
-    </div>${bestHtml}`;
+    </div>`;
+  const bestBox = core.el("div", "resultBest");   /* 記録の後で埋める */
+  core.$("result").append(bestBox);
+  const cr = core.$("credits"); cr.textContent = "";   /* 公認の欄は screen の聞き手が先頭に入れる */
+  core.setStatus("endStatus", null);   /* 自動微調整の文言（screen の聞き手が出す）を消さないよう、画面を出す前に */
+  core.showScreen("endScreen");
 
-  const cr = core.$("credits"); cr.textContent = "";
+  let rec = {};
+  try { rec = recordPlay({ score, acc, grade, ap, fc, failed, short: runShort || 0 }) || {}; }
+  catch (e) { console.error("Could not save the play record:", e); }
+  bestBox.innerHTML = bestHtmlOf(rec);
   const song = core.currentSong || {};
   cr.append(core.el("div", "", `♪ ${song.title || core.baseName(core.mediaName)}${rec.chart && rec.chart.ap ? ` ${icon}⭐` : ""}`));
   if (song.artist) cr.append(core.el("div", "", `${tr("songBy")}: ${song.artist}`));
   if (song.charter) cr.append(core.el("div", "", `${tr("chartBy")}: ${song.charter}`));
   if (song.license) cr.append(core.el("div", "", `${tr("songLicense")}: ${song.license}`));
   if (song.source !== "pack") cr.append(core.el("div", "", tr("creditNote")));
-
-  core.setStatus("endStatus", null);
+  core.emit("resultRecorded", rec);   /* 🏅 称号（記録の後の履歴で決める） */
 }
 
 /* ---------- セリフ ---------- */

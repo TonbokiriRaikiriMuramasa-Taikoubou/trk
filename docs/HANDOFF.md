@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-09（trk106）**。現行の設計、維持条件、未完了事項をまとめる。詳細な履歴は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、セキュリティは [`SECURITY.md`](SECURITY.md)／[`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。
+> **最終更新：2026-10-09（trk107）**。現行の設計、維持条件、未完了事項をまとめる。詳細な履歴は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、セキュリティは [`SECURITY.md`](SECURITY.md)／[`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。
 
 ## 1. 再開・変更の手順
 
@@ -13,9 +13,9 @@
 ## 2. 現在の優先事項
 
 - 音楽カタログと権利確認を優先し、LoLを先に調査する。未依頼のTV機能追加は保留。音源ジャケット表示の実装（trk101〜106）は完了し、残る実機確認は §7 を参照。
-- LoLカタログは段階収録中。現在はCreator-Safe Sessions 3作／108曲、近年のChampion Themes 41曲、Worlds/WCS公式アンセム13曲、確認済みMSIアンセム4曲、K/DA 6曲。K/DAは「POP/STARS」と「ALL OUT」EP収録5曲を独立リストに収録済み。全楽曲の網羅を主張しない。
-- 次のLoL調査候補は、旧ログインテーマ／旧Champion Themes、他の仮想アーティスト作品、Skin・イベント曲、ゲームOST等。分類を混ぜず、公式の個別曲名・リンク・分類を確認できた範囲だけ追加する。見つからなかったことを「存在しない」と扱わない。
-- 調査台帳：[`LEAGUE-OF-LEGENDS-MUSIC.md`](LEAGUE-OF-LEGENDS-MUSIC.md)。曲別出典・fixture：`tools/leagueoflegends-music-tracklist.json`、`tools/leagueoflegends-sessions-tracklist.json`。
+- LoLカタログは段階収録中。現在はCreator-Safe Sessions 3作／108曲、近年のChampion Themes 41曲、Worlds/WCS公式アンセム13曲、確認済みMSIアンセム4曲、K/DA 6曲。K/DAは「POP/STARS」と「ALL OUT」EP収録5曲を独立リストに収録済み。trk107で公式SoundCloudアルバムを**1アルバム＝1プレイリスト**に整理し、Season 1〜9のゲームOST 243曲（9／30／23／22／25／27／48／39／20）・Warsongs 11曲・公式人気曲30曲を追加した（LoLは計18プレイリスト・456曲）。全楽曲の網羅を主張しない。
+- 次のLoL調査候補は、旧ログインテーマ／旧Champion Themes、他の仮想アーティスト作品、Skin・イベント曲、残るゲームOST（`Pandemonium`・`For Demacia` など2025–2026年作）と Arcane 系の映像OST等。分類を混ぜず、公式の個別曲名・リンク・分類を確認できた範囲だけ追加する。見つからなかったことを「存在しない」と扱わない。
+- 調査台帳：[`LEAGUE-OF-LEGENDS-MUSIC.md`](LEAGUE-OF-LEGENDS-MUSIC.md)。曲別出典・fixture：`tools/leagueoflegends-music-tracklist.json`、`tools/leagueoflegends-sessions-tracklist.json`、`tools/leagueoflegends-soundcloud-albums-tracklist.json`（Season 1〜9・Warsongs・人気曲）。
 
 ## 3. TV・音源ジャケットの維持条件
 
@@ -30,6 +30,7 @@
 
 - 音楽カタログは曲名・クレジット・公式配信／公開先を案内するリンク索引。音源を同梱・再配布しない。公式リンク、視聴、購入、サブスクリプションだけで二次利用・再配布の許諾があるとは扱わない。
 - Riotの[日本語法務ページ](https://www.riotgames.com/ja/legal)は一般的な参照先として記録する。個別曲は[Riot Creator-Safeガイドライン](https://www.riotgames.com/en/riot-music-creator-safe-guidelines)と当該曲の条件を照合する。一般の法務案内や「誰でも使える」ライセンスから、K/DA等への包括許諾を推定しない。許諾を根拠にする場合は、対象曲・利用範囲・条件が分かる一次資料を残す。
+- Phase 3（Season 1〜9のOST 243曲・Warsongs 11曲・人気曲30曲）もCreator-Safe対象か未確認。SoundCloudのセットページはJavaScriptなしだと先頭15曲しか出ないため、**アルバムのリンクは公式SoundCloud・曲別のリンクは公式Spotify個別曲**にした（Sessionsと同じ方式）。人気曲だけ公式SoundCloudの個別曲へリンクし、地域制限（「日本では利用できません」）の3件を台帳に記録した。Season 1・2はSoundCloud側と曲数／曲順／曲名を突き合わせ済み、Season 4〜9とWarsongsのSoundCloudセットページは実ブラウザでの再確認が残る。曲名照合の別名は公式タイトルの前方一致の切り詰めだけで、通称・別題は作らない。
 - K/DA 6曲とWorlds 2026「Know My Name」のCreator-Safe対象・利用条件は未確認。公式Spotify／YouTubeページの確認は二次利用許諾の確認ではない。各曲のリンクと未確認事項はLoL調査台帳に記録する。
 - PCL／東方Project等の条件、公開先の受け入れ条件、別途制作した5曲の配布条件は未確認。別途制作曲は第三者録音・サンプル・引用メロディを使っていないが、配布許諾済みとは見なさない。`NOTICE.md` の説明を他作品へ広げない。
 - ゲーム内素材・モデル等は [`NOTICE.md`](../NOTICE.md) の個別条件に従う。無料公開・公認・出典表記だけを再配布許可の根拠にしない。
@@ -46,21 +47,21 @@
 
 | 対象 | ファイル・参照先 |
 |---|---|
-| LoLカタログ／調査 | `js/catalog.js`、`docs/LEAGUE-OF-LEGENDS-MUSIC.md`、`tools/leagueoflegends-music-tracklist.json` |
+| LoLカタログ／調査 | `js/catalog.js`、`docs/LEAGUE-OF-LEGENDS-MUSIC.md`、`tools/leagueoflegends-music-tracklist.json`、`tools/leagueoflegends-sessions-tracklist.json`、`tools/leagueoflegends-soundcloud-albums-tracklist.json` |
 | wish更新／曲名照合 | `js/library.js`、`js/title-match.js`、`tests/title-match.test.mjs` |
 | 音源ジャケット | `js/audio-art.js`、`js/render.js`、`js/spectrum.js`、`js/tv-dock.js`、`js/study-room.js`、`tests/audio-art.test.mjs`、`tests/song-art-display.test.mjs` |
 | MANUAL判定／譜面生成 | `js/judge-match.js`、`js/chart-gen.js`、`tests/judge-match.test.mjs`、`JUDGE-MATCH.md` |
 | 書斎データ安全・表示 | `js/study-room-utils.js`、`js/study-room.js`、`tools/check-study-room.mjs` |
 | 静的・セキュリティ・a11y・軽量化 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs`、`tests/` |
-| Service Worker | `sw.js`。現在のcache名：`trk-v2026.10.9-trk106`。vendor pinの正は `tools/vendor-lock.json` |
+| Service Worker | `sw.js`。現在のcache名：`trk-v2026.10.9-trk107`。vendor pinの正は `tools/vendor-lock.json` |
 | 検査条件 | [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md)、[`SECURITY.md`](SECURITY.md)、[`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) |
 
-### 2026-10-09／trk106の検査結果
+### 2026-10-09／trk107の検査結果
 
 - `npm run check` 成功。Static 0 failure／0 warning。
 - `npm test` 176/176、`git diff --check` 成功。
 - `npm run check` はrepo・security・a11y・vendor・MMD motion・Study Room・lite-mode検査とテストを実行するが、実ブラウザースモークは含まない。
-- LoL checkerはSessions 108、Champion Themes 41、Worlds 13、MSI 4、K/DA 6の曲データ・公式リンク・権利注記・安全なwish更新を検査する。
+- LoL checkerはSessions 108、Champion Themes 41、Worlds 13、MSI 4、K/DA 6に加え、Season 1〜9の243曲・Warsongs 11曲・人気曲30曲の曲順／曲名／アーティスト／アルバム、公式SoundCloudアルバムURLと公式Spotify個別曲URL（人気曲はSoundCloud個別曲）、ID・URLの重複なし、前方一致だけの別名、プレイリスト名24文字・1リスト100曲・自動作成69本（上限100本）の保存上限、権利注記、安全なwish更新を検査する。
 
 ## 7. 未完了の実機確認
 
@@ -81,6 +82,7 @@
 - **trk101／102 — 音源ジャケット**：端末内抽出・縮小・表示先と設定を追加。画像・処理量を制限し、通信・永続画像保存はしない。
 - **trk103／104 — LoLカタログ**：Worlds 2026「Know My Name」とK/DA 6曲を追加。Creator-Safe・二次利用条件は未確認。
 - **trk105 — ジャケット表示調整**：既定を原寸以下の中央表示にし、全画面設定は既存 `artWallpaperBg` を再利用。TVドックの静止カバーにもTVのCSSフィルターを適用。実機確認は §7 に残す。
+- **trk107 — LoLプレイリストの整理（公式SoundCloudアルバム）**：「どの曲が入ってどの曲が入っていないか」が分かるように、公式SoundCloudアルバムを1アルバム＝1プレイリストにした。Season 1〜9のゲームOST 243曲、Warsongs 11曲、公式人気曲30曲（2026-10-09時点のスナップショット）を追加し、LoLは計18プレイリスト・456曲。既存7リストの内容と並び順は変えず、新リストは後ろに追加した。アルバムは公式SoundCloud、各曲は公式Spotify個別曲（人気曲は公式SoundCloud個別曲）へリンクし、音源は同梱しない。OST曲には公式タイトルの前方一致の切り詰めだけを別名として付け、`Jhin, the Virtuoso.mp3` のようなファイル名でも照合できるようにした。`js/library.js` は人気曲リストのガイド文を「アルバム」ではなく「人気曲ページ」と案内する。検査データは `tools/leagueoflegends-soundcloud-albums-tracklist.json`、検査は `tools/check-repo.mjs` の新ブロック。Creator-Safe対象かは未確認で、Season 4〜9／Warsongs のSoundCloudセットページは実ブラウザでの再確認を台帳「次の確認」に残す。`sw.js` のcache名を `trk-v2026.10.9-trk107` に更新。
 - **trk106 — 譜面演奏中のジャケット配置**：中央表示をやめ、右上タイマーの下（160×160px枠）へ移動。右余白とタイマー間隔を固定し、各レイアウトでレーン・ノーツに重ねない。元画像は拡大せず、選曲中は従来どおり動画枠中央、全画面設定オンも従来どおり。謎設定・既定値・保存形式は変更せず、PC／Androidの実機確認は §7 に残す。
 
 ## 9. 変更時チェックリスト

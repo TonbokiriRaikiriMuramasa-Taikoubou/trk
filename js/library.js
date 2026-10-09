@@ -1047,14 +1047,18 @@ function trkWishesForSeries(seriesId) {
 }
 function trkCatalogGuide(s, pl, forDistributionPlaylist = false) {
   const isBlueArchiveOst = s.id === "bluearchive" && pl && pl.sourceUrl;
-  const isSoundCloudAlbum = s.id === "lol" && pl && pl.sourceUrl && pl.sourceLabel === "SoundCloud";
+  /* 📻 LoLの人気曲リストはアルバムではなく公式SoundCloudの人気曲ページなので、案内文を分ける。 */
+  const isSoundCloudPopular = s.id === "lol" && !!pl && pl.id === "lol-popular-tracks";
+  const isSoundCloudAlbum = s.id === "lol" && pl && pl.sourceUrl && pl.sourceLabel === "SoundCloud" && !isSoundCloudPopular;
   const isLoLLinkList = s.id === "lol" && pl && !isSoundCloudAlbum;
   const isGakumasInstrument = s.id === "gakumas" && pl && (pl.id === "gm-inst" || pl.id === "gm-inst2");
   const isGakumasDiscography = s.id === "gakumas" && pl && pl.id === "gm-releases";
   const loLLinkNote = "公式リンク集。配信・購入は二次利用許諾ではありません。Creator-Safeの対象と条件を要確認。";
   const note = isBlueArchiveOst
     ? "NexTone.Link／Apple Music公式案内。音源なし。購入・サブスクは利用許諾ではありません。"
-    : isSoundCloudAlbum
+    : isSoundCloudPopular
+      ? "公式SoundCloudの人気曲ページ（音源なし）。配信・購入は二次利用許諾ではありません。Creator-Safeの条件を確認。"
+      : isSoundCloudAlbum
       ? "公式SoundCloudアルバム（音源なし）。配信・購入は二次利用許諾ではありません。Creator-Safeの条件を確認。"
       : isLoLLinkList
         ? loLLinkNote

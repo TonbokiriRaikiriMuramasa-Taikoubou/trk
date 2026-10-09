@@ -35,7 +35,7 @@ function run({ judge = "standard", rate = 1, autoPlay = false, score = 1000, pre
   const context = vm.createContext({
     core, settings: core.settings,
     localStorage: { getItem: k => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) },
-    console, renderRecords() {}, lifeTags: () => [],
+    console, renderRecords() {}, window: { Trk: { modes: { lifeTags: () => [] } } },
   });
   vm.runInContext(`${modsLine}\ncore.modsUnranked = modsUnranked;`, context);
   vm.runInContext(`${recordBlock}\nglobalThis.recordPlay = recordPlay; globalThis.songRec = songRec; globalThis.runUnranked = runUnranked;`, context);

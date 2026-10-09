@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-09（trk97）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
+> **最終更新：2026-10-09（trk98）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
 
 ## 1. 作業を再開するとき
 
@@ -48,7 +48,7 @@
 - **📺 TVドックの設定（`js/tv-dock.js`）**：くわしいの中の「📺 TVドック」グループ。チェックは3つ：🧱 壁掛け（スキン `wall` と同じ。外すと映画館に戻る）、↕ 並び替え（テレビとラックの上下）、🔢 5枠化（`tvDockFive`）。既定はすべて OFF（映画館・テレビが上・5枠なし）。くわしいは既定で開いた状態（保存済みの開閉は変えない）。テレビ本体とラックの表示は変えていない。
 - **Loop Lab の映像書き出し（`js/media-player-mode.js` の `exportLoopClip`）**：開発者表示の中だけ。記録した区間の行の 🎬 を押すと、映像と音を区間の長さのぶん録画して保存する（WebM。対応していれば MP4）。設定は持たない。書き出し後は再生位置・再生／停止・速度・ループを元に戻す。曲を切り替えたら途中で止め、保存しない。音声だけの曲は書き出さない。
 - **「📁 開く」と「📤 共有」**（`js/library.js`）：📁 開く は曲を入れるだけで、共有としては覚えない。📤 共有 は共有として覚え、📤 の印が付き、「共有をやめる」でまとめて外せ、「端末に残す」の対象になる。ボタンの下の説明行は `libOpenShareHint`（4言語）。
-- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.9-trk97`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
+- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.9-trk98`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
 
 ## 3. 権利・データ・セキュリティの不変条件
 
@@ -182,4 +182,6 @@ git diff --check
 - **trk97 — ランク判定の検査**：ゆるめ判定・1.00x未満は練習扱い（プレイ回数は増えるがハイスコアは更新しない）、きびしめ・1.05x以上は記録対象、AUTO は記録しない、を実ソースの `recordPlay` で確かめる（`tests/ranked-option.test.mjs`）。ヘッドレスのブラウザは環境になく、画面上での確認は §7 に残す。
 - **trk96 — リザルトのランク・称号が消える問題**：画面を出す前に結果を描いていなかったため、聞き手の出力（判定の平均・称号など）が消えていた。順序を「結果を描く → 画面を出す → 記録 → 記録に依る行を埋める → `resultRecorded`」に直した（`js/game.js`・`js/modes.js`）。検査は `tests/game-end.test.mjs`。
 - **trk95 — 終端・リザルト遷移**：終端判定を `game.js` に一元化（§2.3）。
-- 公開コードを変えたので `sw.js` のキャッシュ名は **`trk-v2026.10.9-trk97`**。
+- **trk98 — 曲の終わりで結果画面が出ない不具合（回帰）を修正**：`game.js` の `runMods` が、IIFE の中にある `lifeTags` を裸の名前で呼んでいたため ReferenceError になり、`phase` だけ `ended` になって結果画面が空のままだった（trk95・96 の修正は正しく、その後の名前の整理で `lifeTags` が公開されなくなった）。`js/modes.js` で `window.Trk.modes.lifeTags` として公開し、`game.js` はそれを呼ぶ。既存の検査はスタブで `runMods` を置き換えていたため見逃していた。検査：`tests/game-end.test.mjs` に配線の検査を追加。実ブラウザの検査として `tools/smoke-game-end.mjs`（下記）を追加。
+- **trk98 — 実ブラウザの終端検査**：`SMOKE_CHROME=… SMOKE_PUPPETEER=… node tools/smoke-game-end.mjs` で、20秒の合成音声を MANUAL と AUTO の両方で最後まで流し、結果画面の表示と pageerror 0 を確かめる。`npm run check` には入れない。
+- 公開コードを変えたので `sw.js` のキャッシュ名は **`trk-v2026.10.9-trk98`**。

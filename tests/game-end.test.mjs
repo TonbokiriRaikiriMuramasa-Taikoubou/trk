@@ -169,3 +169,14 @@ test("the result DOM is filled before the screen event, so screen listeners (jud
   assert.match(modesSource, /on\("resultRecorded",/, "the title tier listener must wait for the saved record");
   assert.doesNotMatch(modesSource, /on\("screen", id => \{\s*if \(id !== "endScreen"\) return;\s*const pair = TITLE_MODES/);
 });
+
+test("the MODS line of the result reaches lifeTags across files (trk97 regression: ReferenceError left the result blank)", () => {
+  /* modes.js は IIFE なので、game.js から裸の名前では届かない。公開名（window.Trk.modes）経由で呼ぶこと。
+     以前は裸の lifeTags() を呼んでいたため、endGame が runMods で止まり、結果画面が出なかった。 */
+  const modesSource = fs.readFileSync(path.join(root, "js/modes.js"), "utf8");
+  assert.match(modesSource, /window\.Trk\.modes = Object\.assign\(window\.Trk\.modes \|\| \{\}, \{ lifeTags \}\)/,
+    "modes.js must expose lifeTags on window.Trk.modes");
+  assert.match(gameSource, /const runMods = \(\) => \[\.\.\.core\.activeMods\(\), \.\.\.window\.Trk\.modes\.lifeTags\(\)/,
+    "runMods must call the exposed lifeTags");
+  assert.doesNotMatch(gameSource, /(?<![\w.$])lifeTags\(/, "game.js must not call a bare lifeTags()");
+});

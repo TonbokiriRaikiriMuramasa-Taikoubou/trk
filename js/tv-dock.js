@@ -1718,7 +1718,7 @@ addEventListener("DOMContentLoaded", () => {
 
     const isOff = core.settings.videoStyle === "off";
     /* 🖼 選曲中のTVに映像を映す（動いているときだけ） */
-    const liveOn = core.settings.tvMenuPreview !== false && !isOff && core.videoReady && !core.video.paused &&
+    const liveOn = core.settings.tvMenuPreview !== false && !isOff && core.videoReady && core.video.videoWidth > 0 && core.video.videoHeight > 0 && !core.video.paused &&
       core.phase === "title" && screenName() === "select";
     screenDiv.dataset.live = liveOn ? "1" : "0";
     liveCanvas.style.opacity = liveOn ? "" : "0";
@@ -1850,10 +1850,10 @@ addEventListener("DOMContentLoaded", () => {
     if (!key) { clearDockCover(); render(); return; }
     let blob = null;
     try {
-      if (window.TrkStudyRoom && typeof window.TrkStudyRoom.getSongCoverBlob === "function") blob = await window.TrkStudyRoom.getSongCoverBlob(key);
+      if (core.settings.useStudyArtwork && window.TrkStudyRoom && typeof window.TrkStudyRoom.getSongCoverBlob === "function") blob = await window.TrkStudyRoom.getSongCoverBlob(key);
     } catch (_) {}
     if (token !== coverRequest || !core.currentSong || core.currentSong.key !== key) return;
-    if (!blob) blob = core.currentSong.bgBlob || null;
+    if (!blob) blob = core.currentSong.bgBlob || core.currentSong.artBlob || null;
     if (coverObjectUrl) { URL.revokeObjectURL(coverObjectUrl); coverObjectUrl = ""; }
     try {
       if (blob && typeof URL.createObjectURL === "function") { coverObjectUrl = URL.createObjectURL(blob); coverImg.src = coverObjectUrl; }
@@ -1873,7 +1873,14 @@ addEventListener("DOMContentLoaded", () => {
   on("screen", update);
   on("mediaReady", update);
   on("songSelected", song => refreshDockCover(song && song.key));
+  on("songArtwork", song => refreshDockCover(song && song.key));
   on("studyCoverChanged", key => { if (!key || core.currentSong && key === core.currentSong.key) refreshDockCover(key || core.currentSong && core.currentSong.key); });
+  let lastUseStudyArtwork = core.settings.useStudyArtwork === true;
+  on("options", () => {
+    update();
+    const enabled = core.settings.useStudyArtwork === true;
+    if (enabled !== lastUseStudyArtwork) { lastUseStudyArtwork = enabled; if (core.currentSong) refreshDockCover(core.currentSong.key); }
+  });
 
   render(true);
   refreshDockCover(core.currentSong && core.currentSong.key);

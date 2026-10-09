@@ -67,19 +67,26 @@ function noteAlpha(u) {
 function drawVideo() {
   core.vctx.clearRect(0, 0, window.Trk.data.W, window.Trk.data.H);
   if (!core.videoReady || core.settings.videoStyle === "off") return;
-  const a = ownField() ? { x:0, y:0, w:window.Trk.data.W, h:window.Trk.data.H } : layout().video;
+  const videoOn = !!(core.video.videoWidth && core.video.readyState >= 2);
+  const image = core.bgImage && core.bgImage.naturalWidth ? core.bgImage : null;
+  const hideImage = !!(image && core.settings.hideArtworkDuringChart && core.phase === "playing");
+  const wallpaperImage = !!(image && core.settings.artWallpaperBg && !hideImage);
+  const showVideo = videoOn && !wallpaperImage;
+  const showImage = !!(image && !showVideo && !hideImage);
+  const fullArt = !!(showImage && core.settings.artWallpaperBg);
+  const a = ownField() || fullArt ? { x:0, y:0, w:window.Trk.data.W, h:window.Trk.data.H } : layout().video;
   const zoom = Math.max(.5, Math.min(3, Number(core.settings.videoZoom) || 1));
-  if (core.video.videoWidth && core.video.readyState >= 2) {
+  if (showVideo) {
     const s = Math.min(a.w / core.video.videoWidth, a.h / core.video.videoHeight) * zoom;
     const w = core.video.videoWidth * s, h = core.video.videoHeight * s;
     core.vctx.save(); core.vctx.beginPath(); core.vctx.rect(a.x, a.y, a.w, a.h); core.vctx.clip();
     core.vctx.drawImage(core.video, a.x + (a.w - w) / 2, a.y + (a.h - h) / 2, w, h);
     core.vctx.restore();
-  } else if (core.bgImage && core.bgImage.naturalWidth) {
-    const s = Math.max(a.w / core.bgImage.naturalWidth, a.h / core.bgImage.naturalHeight) * zoom;
-    const w = core.bgImage.naturalWidth * s, h = core.bgImage.naturalHeight * s;
+  } else if (showImage) {
+    const s = Math.max(a.w / image.naturalWidth, a.h / image.naturalHeight) * zoom;
+    const w = image.naturalWidth * s, h = image.naturalHeight * s;
     core.vctx.save(); core.vctx.beginPath(); core.vctx.rect(a.x, a.y, a.w, a.h); core.vctx.clip();
-    core.vctx.drawImage(core.bgImage, a.x + (a.w - w) / 2, a.y + (a.h - h) / 2, w, h);
+    core.vctx.drawImage(image, a.x + (a.w - w) / 2, a.y + (a.h - h) / 2, w, h);
     core.vctx.restore();
   }
 }

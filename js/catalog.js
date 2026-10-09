@@ -580,13 +580,14 @@ S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber
      T("REAPER", "Endfield OST", "Metal Scar Radio", "https://github.com/2t3/endfield-ost-download")])]);
 
 /* ================= ⚔️ League of Legends（Riot Games） =================
-   Phase 1: Creator-Safe Sessions 3作・108曲、近年の公式Champion Theme単曲41曲、
-   Worlds/WCSアンセム（2014–2025の12曲＋2026年の告知曲）、MSIアンセム4曲。
-   Sessions以外は公式配信／公開へのリンク集で、音源を同梱せず、二次利用許諾もしない。
-   公式ログインテーマの全履歴、全スキン／イベント曲、ゲームOSTなど未調査範囲が残る。
+   Phase 1: Creator-Safe Sessions 3作・108曲、近年の公式Champion Theme 41曲、
+   Worlds/WCS公式アンセム13曲、確認済みMSIアンセム4曲。
+   Phase 2: 公式K/DA曲（POP/STARS＋ALL OUT収録曲）6曲を別リストに追加。
+   音源は同梱せず、公式配信へのリンクを二次利用許諾とは扱わない。
+   旧ログインテーマ、他の仮想アーティスト、残りChampion Theme、Skin／イベント曲、ゲームOSTは未調査。
    Champion Themeは全チャンピオン分が存在するという意味ではなく、確認できた単独テーマのみ。 */
 S("lol", "League of Legends", "⚔️", "aqua", "PCゲーム", "🕹️",
-  "公式リンク集（音源なし）。配信・購入は二次利用許諾ではありません。利用前にCreator-Safe対象か公式ガイドで要確認。Sessions 3作・108曲、近年Champion Theme 41曲、Worlds/WCS 2014–26（2026曲は発表のみ）、確認できたMSIアンセム4曲を掲載。これはLoL全楽曲ではなく、旧ログインテーマ、他のChampion Theme、スキン／イベント曲、ゲームOSTなどは今後の調査対象です。Sessionsの各巻は公式SoundCloud、個別曲は公式Spotifyへリンク。Viは現行公式36曲を採用（旧37曲表記の二次資料にある『Take Your Time』は現行SoundCloud／Spotify／Apple Musicの掲載にないため含めません）。",
+  "公式リンク集（音源なし）。配信・購入は二次利用許諾ではありません。利用前にCreator-Safe対象か公式ガイドで要確認。Sessions 3作・108曲、近年Champion Theme 41曲、Worlds/WCS 2014–26の公式アンセム13曲、確認できたMSIアンセム4曲、K/DAの公式曲6曲を分類して掲載。Worlds 2026「Know My Name」は公式MVとSpotify個別曲を確認。K/DAもCreator-Safe対象かは未確認です。これはLoL全楽曲ではなく、旧ログインテーマ、他の仮想アーティスト／Champion Theme、Skin／イベント曲、ゲームOSTなどは今後の調査対象です。Sessionsは各巻を公式SoundCloud、個別曲をSpotifyへリンク。Viは現行公式36曲を採用（旧37曲表記の二次資料にある『Take Your Time』は現行SoundCloud／Spotify／Apple Musicの掲載にないため含めません）。",
   "https://www.riotgames.com/en/riot-music-creator-safe-guidelines",
   [
    PL("lol-svi", "Sessions: Vi", "🥊", "aqua", ["Game", "LoL", "Sessions:Vi", "Riot Games"],
@@ -762,13 +763,21 @@ S("lol", "League of Legends", "⚔️", "aqua", "PCゲーム", "🕹️",
      T("GODS", "Worlds 2023 Anthem", "NewJeans", "https://www.youtube.com/watch?v=C3GouGa0noM"),
      T("Heavy Is the Crown", "Worlds 2024 Anthem", "Linkin Park", "https://www.youtube.com/watch?v=5FrhtahQiRc"),
      T("Sacrifice", "Worlds 2025 Anthem", "G.E.M.", "https://www.youtube.com/watch?v=pzt6SmvGpXk"),
-     T("Know My Name", "Worlds 2026 Anthem — announced; official audio link pending", "True Damage", "https://lolesports.com/en-US/news/worlds-anthem-presented-by-true-damage")
+     T("Know My Name", "Worlds 2026 Anthem", "True Damage, SOYEON of i-dle, Coco Jones, VIC MENSA, Sofía Reyes", "https://open.spotify.com/track/3s2YCL5LHLzXWbw7ezQru3")
     ]),
    PL("lol-msi-anthems", "MSI Anthems", "🏆", "red", ["Game", "LoL", "MSI", "Anthem"], [
      T("Bring Home the Glory", "MSI 2019 Anthem", "Sara Skinner", "https://www.youtube.com/watch?v=TG-RGt7Q1oI"),
      T("Starts Right Here", "MSI 2021 Anthem", "Kenny Mason, Foreign Air", "https://soundcloud.com/leagueoflegends/starts-right-here-feat-kenny-mason-foreign-air"),
      T("Set It Off", "MSI 2022 Anthem", "DPR LIVE, DPR CLINE", "https://www.youtube.com/watch?v=Q2zIiN0LyC4"),
      T("Rules (Are Meant To Break)", "MSI 2023 Anthem", "Che Lingo", "https://www.youtube.com/watch?v=kE19Ac234Zo")
+    ]),
+   PL("lol-kda-songs", "K/DA — POP/STARS + ALL OUT", "🎤", "pink", ["Game", "LoL", "K/DA", "Virtual Artist", "Riot Games"], [
+     T("POP/STARS", "POP/STARS", "K/DA, Madison Beer, i-dle, Jaira Burns, League of Legends", "https://open.spotify.com/track/3em2uN4cCWHcCXhjMzJ8ps"),
+     T("THE BADDEST", "ALL OUT", "K/DA, i-dle, Wolftyla, Bea Miller, League of Legends", "https://open.spotify.com/track/6y3EPT8iw6HmuMpX05gyvt"),
+     T("MORE", "ALL OUT", "K/DA, Madison Beer, i-dle, Lexie Liu, Jaira Burns, Seraphine, League of Legends", "https://open.spotify.com/track/65pHtEdxGt4e3Fv1ncPi6V"),
+     T("VILLAIN", "ALL OUT", "K/DA, Madison Beer, Kim Petras, League of Legends", "https://open.spotify.com/track/33CZravFcGBOwRw5dCOCel"),
+     T("DRUM GO DUM", "ALL OUT", "K/DA, Wolftyla, Bekuh Boom, Aluna, League of Legends", "https://open.spotify.com/track/3CEW3iffD2QvNZMK20sMqW"),
+     T("I'LL SHOW YOU", "ALL OUT", "K/DA, TWICE, Bekuh Boom, Annika Wells, League of Legends", "https://open.spotify.com/track/497qmwcUsCv5hmMU0K8Hik")
     ])
   ]);
 

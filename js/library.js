@@ -2056,7 +2056,127 @@ core.$("devView").addEventListener("change", e => {
   core.settings.devView = e.target.checked; core.saveUserPrefs(); syncDisplayUi();
 });
 
+const SONG_ART_CACHE_BYTES = 12 * 1024 * 1024, SONG_ART_CACHE_ITEMS = 120, SONG_ART_DISPLAY_BYTES = 8 * 1024 * 1024;
+const songArtCache = new Map();            // key -> resized Blob | null (negative entries are bounded too)
+const songArtPending = new Map();
+let songArtCacheBytes = 0, songArtLoadsActive = 0, songArtLoadWaiters = [];
+let libArtworkObserver = null, libArtworkGeneration = 0;
+const libArtworkUrls = new Set();
+function songArtCacheKey(it) {
+  const f = it && it.file;
+  return `${it && it.key || ""}|${it && it.dir || ""}|${f && f.name || ""}|${f && f.size || it && it.size || 0}|${f && f.lastModified || 0}`;
+}
+function rememberSongArt(key, blob) {
+  if (songArtCache.has(key)) { const old = songArtCache.get(key); if (old) songArtCacheBytes -= old.size || 0; songArtCache.delete(key); }
+  if (blob && blob.size > SONG_ART_CACHE_BYTES) return;
+  songArtCache.set(key, blob || null); if (blob) songArtCacheBytes += blob.size || 0;
+  while (songArtCache.size > SONG_ART_CACHE_ITEMS || songArtCacheBytes > SONG_ART_CACHE_BYTES) {
+    const oldest = songArtCache.keys().next().value;
+    if (oldest == null) break;
+    const old = songArtCache.get(oldest); if (old) songArtCacheBytes -= old.size || 0;
+    songArtCache.delete(oldest);
+  }
+}
+function cachedSongArt(key) {
+  if (!songArtCache.has(key)) return undefined;
+  const blob = songArtCache.get(key); songArtCache.delete(key); songArtCache.set(key, blob);
+  return blob;
+}
+async function withSongArtSlot(fn) {
+  if (songArtLoadsActive >= 2) await new Promise(resolve => songArtLoadWaiters.push(resolve));
+  else songArtLoadsActive++;
+  try { return await fn(); }
+  finally {
+    const wake = songArtLoadWaiters.shift();
+    if (wake) wake();                         // hand the occupied slot directly to the next waiter
+    else songArtLoadsActive--;
+  }
+}
+function canExtractSongArt(it) {
+  if (!it || !it.file) return false;
+  const ext = core.extOf(it.file.name);
+  if (it.video && ext !== "mp4") return false;
+  return ["mp3", "m4a", "m4b", "mp4", "aac", "wav", "flac", "ogg", "oga", "opus"].includes(ext);
+}
+async function loadSongArtwork(it) {
+  if (!it) return null;
+  if (it.bgBlob) return it.bgBlob;                // 曲パックに明示された背景を一覧のサムネイルにも使う
+  if (it.artBlob) return it.artBlob;
+  if (!canExtractSongArt(it)) return null;
+  const key = songArtCacheKey(it), cached = cachedSongArt(key);
+  if (cached !== undefined) return cached;
+  if (songArtPending.has(key)) return songArtPending.get(key);
+  const job = withSongArtSlot(async () => {
+    const api = window.Trk.media && window.Trk.media.audioArt;
+    if (!api) return null;
+    const raw = await api.extract(it.file);
+    return raw ? await api.thumbnail(raw) : null;
+  }).then(blob => { rememberSongArt(key, blob); return blob; }).catch(() => { rememberSongArt(key, null); return null; });
+  songArtPending.set(key, job);
+  try { return await job; } finally { if (songArtPending.get(key) === job) songArtPending.delete(key); }
+}
+let songBackgroundRequest = 0;
+async function applySongBackground(it) {
+  const request = ++songBackgroundRequest;
+  if (!it || core.currentSong !== it) return false;
+  let studyCover = null;
+  if (core.settings.useStudyArtwork && window.TrkStudyRoom && typeof window.TrkStudyRoom.getSongCoverBlob === "function") {
+    try { studyCover = await window.TrkStudyRoom.getSongCoverBlob(it.key); } catch (_) {}
+  }
+  if (core.currentSong !== it || request !== songBackgroundRequest) return false;
+  const blob = studyCover || it.bgBlob || it.artBlob || null;
+  try { await window.Trk.media.setBackground(blob); } catch (_) {}
+  if (core.currentSong !== it || request !== songBackgroundRequest) {
+    if (core.currentSong && core.currentSong !== it) void applySongBackground(core.currentSong);
+    return false;
+  }
+  return true;
+}
+function beginLibArtworkRender() {
+  if (libArtworkObserver) { libArtworkObserver.disconnect(); libArtworkObserver = null; }
+  for (const url of libArtworkUrls) { try { URL.revokeObjectURL(url); } catch (_) {} }
+  libArtworkUrls.clear();
+  const generation = ++libArtworkGeneration;
+  if (typeof IntersectionObserver === "function") {
+    const box = core.$("libList");
+    libArtworkObserver = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting && entry.intersectionRatio <= 0) continue;
+        const img = entry.target, job = img.__trkSongArtJob;
+        if (libArtworkObserver) libArtworkObserver.unobserve(img);
+        if (job) loadSongArtwork(job.it).then(blob => showSongArtwork(job, blob)).catch(() => {});
+      }
+    }, { root:box, rootMargin:"140px 0px" });
+  }
+  return generation;
+}
+function showSongArtwork(job, blob) {
+  if (!blob || job.generation !== libArtworkGeneration || job.img.isConnected === false || !job.img.parentNode || blob.size > SONG_ART_DISPLAY_BYTES ||
+      !/^image\/(?:png|jpeg|webp)$/i.test(String(blob.type || ""))) return;
+  let url = "";
+  try { url = URL.createObjectURL(blob); } catch (_) { return; }
+  libArtworkUrls.add(url);
+  const fail = () => {
+    job.img.hidden = true; job.fallback.hidden = false;
+    if (libArtworkUrls.delete(url)) { try { URL.revokeObjectURL(url); } catch (_) {} }
+  };
+  job.img.onload = () => {
+    if (job.generation !== libArtworkGeneration || job.img.isConnected === false || !job.img.parentNode) { fail(); return; }
+    job.img.hidden = false; job.fallback.hidden = true;
+  };
+  job.img.onerror = fail;
+  job.img.src = url;
+}
+function watchSongArtwork(img, fallback, it, generation, eager = false) {
+  const job = { img, fallback, it, generation };
+  img.__trkSongArtJob = job;
+  if (libArtworkObserver) libArtworkObserver.observe(img);
+  else if (eager) loadSongArtwork(it).then(blob => showSongArtwork(job, blob)).catch(() => {});
+}
+
 function renderLib() {
+  const artworkGeneration = beginLibArtworkRender();
+  let eagerArtworkCount = 0;
   syncMoreBtns();
   syncDisplayUi();
   const box = core.$("libList"); box.textContent = "";
@@ -2149,9 +2269,13 @@ function renderLib() {
     const cur = core.currentSong && core.currentSong.key === it.key;
     const b = el("button", `libRow src-${it.source}` + (cur ? " cur" : "")); b.type = "button"; b.style.flex = "1"; b.style.minWidth = "0";
     const left = el("span", "libLeft"), meta = el("span", "libMeta");
-    const m = metaOf(it.key) || {};   /* 🎶 曲プロフィール（長押しで編集） */
-    left.append(el("span", "libName", (it.video ? "🎬 " : "") + (m.title || it.title) + (info && info.title ? " " + info.title : "")),   // 例：🎬 動画 / 曲名 🥁🐔🚚⚔🎪🚛
+    const thumb = el("span", "libThumb"), thumbImg = el("img", ""), thumbFallback = el("span", "libThumbFallback", "♫");
+    thumb.setAttribute("aria-hidden", "true"); thumbImg.alt = ""; thumbImg.decoding = "async"; thumbImg.hidden = true;
+    thumb.append(thumbImg, thumbFallback);
+    const text = el("span", "libText"), m = metaOf(it.key) || {};   /* 🎶 曲プロフィール（長押しで編集） */
+    text.append(el("span", "libName", (it.video ? "🎬 " : "") + (m.title || it.title) + (info && info.title ? " " + info.title : "")),   // 例：🎬 動画 / 曲名 🥁🐔🚚⚔🎪🚛
                 el("span", "libSub", [m.artist || it.artist, m.album, m.matchHint ? `${tr("plMatchMemo")}: ${m.matchHint}` : "", srcLabel(it)].filter(Boolean).join(" · ")));
+    left.append(thumb, text);
     if (it.charts) meta.append(el("i", "libTag", "📄"));
     if (it.shared) { const st = el("i", "libTag", "📤"); st.title = tr("libKeepShared"); meta.append(st); }   /* 💾 端末に残した共有の曲 */
     if (it.chartBlobs && Object.keys(it.chartBlobs).length) meta.append(el("i", "libTag", "📦"));
@@ -2195,6 +2319,7 @@ function renderLib() {
       wrap.append(del);
     }
     box.append(wrap);
+    watchSongArtwork(thumbImg, thumbFallback, it, artworkGeneration, eagerArtworkCount++ < 24);
   }
   if (rows.length > libShow) box.append(el("div", "hint", tr("libMore", { n:rows.length - libShow })));
 }
@@ -2216,7 +2341,8 @@ function renderBanner() {
     core.$("songTitleBig").textContent = m.title || s.title;
     core.$("songSub").textContent = [m.artist || s.artist, m.album, m.composer ? `${tr("plComposer")}: ${m.composer}` : "",
       m.matchHint ? `${tr("plMatchMemo")}: ${m.matchHint}` : "", s.charter ? `${tr("chartBy")}: ${s.charter}` : "", srcLabel(s)].filter(Boolean).join(" · ");
-    if (s.bgBlob) { bannerUrl = URL.createObjectURL(s.bgBlob); b.style.backgroundImage = `url("${bannerUrl}")`; b.classList.add("hasImg"); }
+    const art = s.bgBlob || s.artBlob || null;
+    if (art) { try { bannerUrl = URL.createObjectURL(art); b.style.backgroundImage = `url("${bannerUrl}")`; b.classList.add("hasImg"); } catch (_) {} }
   }
   previewSetBtn.textContent = tr("previewSet");
   previewSetBtn.hidden = !(s && core.videoReady);
@@ -2528,6 +2654,7 @@ async function selectSong(it) {
     if (core.phase !== "title" || selection !== songSelectToken) return;
   }
   if (core.currentSong && core.currentSong.key === it.key) { if (core.videoReady) startPreview(); return; }
+  if (core.currentSong && core.currentSong !== it && core.currentSong.artBlob) delete core.currentSong.artBlob; // 選曲を離れた縮小画像は有界キャッシュだけに残す
   core.currentSong = it;
   stopPreview(); renderLib(); renderBanner(); updateSpBuilder();
   core.emit("songSelected", it);
@@ -2536,10 +2663,17 @@ async function selectSong(it) {
     if (it.file) { /* file を持っていれば、ふつうの曲と同じ道（loadMedia）を通る */ }
     else { core.emit("addonSelect", it); renderSeedTools(); return; }
   }
-  let studySongArt = null;
-  try { if (window.TrkStudyRoom && typeof window.TrkStudyRoom.getSongCoverBlob === "function") studySongArt = await window.TrkStudyRoom.getSongCoverBlob(it.key); } catch (_) {}
-  if (core.currentSong !== it) return;
-  await window.Trk.media.setBackground(studySongArt || it.bgBlob || null);
+  /* 埋め込み画像は再生準備と並行して読む。静止画音源では完了後にゲームの動画枠にも反映する。 */
+  if (!it.bgBlob && !it.artBlob && canExtractSongArt(it)) {
+    loadSongArtwork(it).then(async art => {
+      if (!art || core.currentSong !== it) return;
+      it.artBlob = art;
+      await applySongBackground(it);
+      if (core.currentSong !== it) return;
+      renderLib(); renderBanner(); core.emit("songArtwork", it);
+    }).catch(() => {});
+  }
+  await applySongBackground(it);
   if (core.currentSong !== it) return;
   previewPending = true;
   const ok = await window.Trk.media.loadMedia(it.file, { title:it.title, onReady:() => restoreSongState(it) });
@@ -3030,13 +3164,19 @@ core.$("libRandomBtn").addEventListener("click", () => {
 
 on("records", renderLib);
 on("chart", updateSpBuilder);
-// 書斎で曲のジャケットを割り当て直したら、いま流している曲だけ即座に背景へ反映する。
+let lastUseStudyArtwork = core.settings.useStudyArtwork === true;
+// 書斎カバーの割り当て／使用設定が変わったら、選択中の曲の背景を優先順で読み直す。
 on("studyCoverChanged", key => {
   const song = core.currentSong;
-  if (!song || key !== song.key || !window.TrkStudyRoom || typeof window.TrkStudyRoom.getSongCoverBlob !== "function") return;
-  window.TrkStudyRoom.getSongCoverBlob(key).then(blob => {
-    if (core.currentSong === song) return window.Trk.media.setBackground(blob || song.bgBlob || null);
-  }).catch(() => {});
+  if (!song || key !== song.key) return;
+  applySongBackground(song).then(ok => { if (ok && core.currentSong === song) core.emit("songArtwork", song); }).catch(() => {});
+});
+on("options", () => {
+  const enabled = core.settings.useStudyArtwork === true;
+  if (enabled === lastUseStudyArtwork) return;
+  lastUseStudyArtwork = enabled;
+  const song = core.currentSong;
+  if (song) applySongBackground(song).then(ok => { if (ok && core.currentSong === song) core.emit("songArtwork", song); }).catch(() => {});
 });
 on("language", () => { core.$("libSearch").placeholder = tr("libSearch"); showReconnect(); syncShareUI(); syncTrkUI(); renderLib(); renderBanner(); syncVideoButton(); });
 /* 🎬 「動画を読み込む」の説明（通常より時間がかかります）をボタンに付ける */

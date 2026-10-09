@@ -920,7 +920,7 @@ if (!exists("js/fx-worklet.js") ||
   else ok("LoL Sessions: three complete official SoundCloud albums (108 ordered Spotify-linked tracks), safe catalog refresh");
 }
 
-// 🎵 LoL phase-one catalogue: verified individual theme / event releases stay split by type,
+// 🎵 LoL catalogue (Phase 1 + incremental K/DA): verified releases stay split by type,
 // use official destinations, state the intentionally incomplete scope, and never imply reuse rights.
 {
   const catalogSource = read("js/catalog.js");
@@ -934,13 +934,13 @@ if (!exists("js/fx-worklet.js") ||
     const series = catalogContext.__TRK_CATALOG_FOR_CHECK.find(item => item.id === "lol");
     const sessions = JSON.parse(read("tools/leagueoflegends-sessions-tracklist.json"));
     const sessionIds = sessions.albums.map(album => album.id);
-    const expectedLists = [fixture.championThemes, fixture.worldsAnthems, fixture.msiAnthems];
+    const expectedLists = [fixture.championThemes, fixture.worldsAnthems, fixture.msiAnthems, fixture.kdaSongs];
     const sessionOrderOk = !!series && JSON.stringify(series.playlists.slice(0, 3).map(pl => pl.id)) === JSON.stringify(sessionIds);
-    const phaseOrderOk = !!series && JSON.stringify(series.playlists.slice(3, 6).map(pl => pl.id)) ===
+    const phaseOrderOk = !!series && JSON.stringify(series.playlists.slice(3, 3 + expectedLists.length).map(pl => pl.id)) ===
       JSON.stringify(expectedLists.map(list => list.id));
     let trackTotal = 0;
     let tracksMatch = sessionOrderOk && phaseOrderOk;
-    let announcedOnlyCount = 0;
+    let worlds2026ReleasedCount = 0;
     const allUrls = [];
     for (const expectedList of expectedLists) {
       const actual = series && series.playlists.find(pl => pl.id === expectedList.id);
@@ -966,19 +966,36 @@ if (!exists("js/fx-worklet.js") ||
             validOfficialUrl = track.u === fixture.sources.worlds2026Announcement;
           }
         } catch (_) {}
-        if (expected.status === "announced-only") {
-          announcedOnlyCount++;
-          if (!track.al.includes("audio link pending") || track.u !== fixture.sources.worlds2026Announcement) tracksMatch = false;
+        if (expected.status === "released") {
+          worlds2026ReleasedCount++;
+          if (expectedList.id !== "lol-worlds-anthems" || expected.url !== fixture.sources.worlds2026SpotifyTrack ||
+              expected.url === fixture.sources.worlds2026Announcement || !expected.artist.includes("True Damage") ||
+              fixture.sources.worlds2026OfficialVideo !== "https://www.youtube.com/watch?v=mlFxxNsExJc" ||
+              fixture.sources.worlds2026ListenNow !== "https://truedamage.ffm.to/knowmyname") tracksMatch = false;
         }
-        if (track.t !== expected.title || track.al !== (expected.status === "announced-only"
-            ? "Worlds 2026 Anthem — announced; official audio link pending" : expected.album) ||
-            track.ar !== expected.artist || track.u !== expected.url || !validOfficialUrl) tracksMatch = false;
+        if (track.t !== expected.title || track.al !== expected.album || track.ar !== expected.artist ||
+            track.u !== expected.url || !validOfficialUrl) tracksMatch = false;
       }
     }
+    const kdaTrackIds = ["3em2uN4cCWHcCXhjMzJ8ps", "6y3EPT8iw6HmuMpX05gyvt", "65pHtEdxGt4e3Fv1ncPi6V",
+      "33CZravFcGBOwRw5dCOCel", "3CEW3iffD2QvNZMK20sMqW", "497qmwcUsCv5hmMU0K8Hik"];
+    const kdaVideoIds = ["UOxkGD8qRB4", "RkID8_gnTxw", "3VTkBuxU4yk", "xoWxv2yZXLQ", "E_PbH5y70Tc", "WW1BpABbzHs"];
+    const kdaSourcesOk = fixture.kdaSongs && fixture.kdaSongs.id === "lol-kda-songs" &&
+      fixture.sources.kdaSpotifyArtist === "https://open.spotify.com/artist/4gOc8TsQed9eqnqJct2c5v" &&
+      fixture.sources.kdaAllOutSpotifyAlbum === "https://open.spotify.com/album/3wX4yrxMuHapSLvadxQkVV" &&
+      fixture.sources.kdaOfficialYoutubeChannel === "https://www.youtube.com/@leagueoflegends" &&
+      JSON.stringify(fixture.kdaSongs.tracks.map(track => track.url.split("/").pop())) === JSON.stringify(kdaTrackIds) &&
+      JSON.stringify(fixture.kdaSongs.tracks.map(track => new URL(track.officialVideoUrl).searchParams.get("v"))) === JSON.stringify(kdaVideoIds) &&
+      fixture.kdaSongs.tracks.every(track => {
+        const video = new URL(track.officialVideoUrl);
+        return video.protocol === "https:" && video.hostname === "www.youtube.com" && video.pathname === "/watch" &&
+          [...video.searchParams.keys()].length === 1;
+      });
     const rightsAndScopeOk = !!series && series.url === fixture.sources.creatorSafeGuidelines &&
       series.note.includes("二次利用許諾ではありません") && series.note.includes("Creator-Safe対象") &&
-      series.note.includes("これはLoL全楽曲ではなく") && series.note.includes("今後の調査対象");
-    catalogDataOk = tracksMatch && trackTotal === 58 && announcedOnlyCount === 1 &&
+      series.note.includes("K/DAの公式曲6曲") && series.note.includes("これはLoL全楽曲ではなく") &&
+      series.note.includes("今後の調査対象");
+    catalogDataOk = tracksMatch && kdaSourcesOk && trackTotal === 64 && worlds2026ReleasedCount === 1 &&
       new Set(allUrls).size === allUrls.length && rightsAndScopeOk;
 
     const ensureStart = library.indexOf("function trkCatalogGuide(");
@@ -1014,19 +1031,24 @@ if (!exists("js/fx-worklet.js") ||
         autoExisting.guide.url === fixture.sources.creatorSafeGuidelines && manualExisting.guide.url === fixture.sources.creatorSafeGuidelines &&
         autoExisting.guide.note.includes("二次利用許諾ではありません") && manualExisting.guide.note.includes("二次利用許諾ではありません");
       const createdMsi = testSettings.playlists.find(p => p.id === "trk-lol-msi-anthems");
-      const createsMissingList = createdMsi && createdMsi.folder === "trk-lol" && createdMsi.wish.length === fixture.msiAnthems.tracks.length &&
+      const createsMissingMsi = createdMsi && createdMsi.folder === "trk-lol" && createdMsi.wish.length === fixture.msiAnthems.tracks.length &&
         JSON.stringify(createdMsi.wish) === JSON.stringify(expectWish(fixture.msiAnthems)) &&
         createdMsi.guide.url === fixture.sources.creatorSafeGuidelines &&
         createdMsi.guide.note.includes("二次利用許諾ではありません");
-      safeRefreshOk = preservesCustom && refreshesWishAndGuide && createsMissingList && saveCount > 0 &&
+      const createdKda = testSettings.playlists.find(p => p.id === "trk-lol-kda-songs");
+      const createsKda = createdKda && createdKda.folder === "trk-lol" && createdKda.wish.length === fixture.kdaSongs.tracks.length &&
+        JSON.stringify(createdKda.wish) === JSON.stringify(expectWish(fixture.kdaSongs)) &&
+        createdKda.guide.url === fixture.sources.creatorSafeGuidelines &&
+        createdKda.guide.note.includes("二次利用許諾ではありません");
+      safeRefreshOk = preservesCustom && refreshesWishAndGuide && createsMissingMsi && createsKda && saveCount > 0 &&
         library.includes('lol: "trk-lol"');
     }
   } catch (error) {
-    console.error(`WARN  LoL phase-one catalogue test setup failed: ${error.message}`);
+    console.error(`WARN  LoL catalogue test setup failed: ${error.message}`);
   }
-  if (!catalogDataOk) fail("LoL phase-one fixture/catalog mismatch (expected 41 modern Champion Themes, 12 released Worlds + one announcement, four MSI anthems, official links and rights/scope notice)");
-  else if (!safeRefreshOk) fail("LoL phase-one playlist refresh must update wishes/guides, preserve user-owned songs/customized fields, and create missing lists in trk-lol");
-  else ok("LoL phase one: 41 modern Champion Themes + Worlds 2014–26 (2026 announcement only) + four MSI anthems; official-link fixture, rights notice, safe refresh");
+  if (!catalogDataOk) fail("LoL fixture/catalog mismatch (expected 41 modern Champion Themes, 13 released Worlds anthems, four MSI anthems, six K/DA songs, official track/video sources, and rights/scope notice)");
+  else if (!safeRefreshOk) fail("LoL playlist refresh must update wishes/guides, preserve user-owned songs/customized fields, and create missing MSI/K/DA lists in trk-lol");
+  else ok("LoL catalog: Sessions 108 + Champion Themes 41 + Worlds 13 + MSI 4 + K/DA 6; official links, rights notices, safe refresh");
 }
 
 // ⚠ el(tag, cls, text) は文字を1つしか入れられない（入れ子を渡すと "[object ...]" になる）。

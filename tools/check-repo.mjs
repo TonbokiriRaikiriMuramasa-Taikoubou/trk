@@ -1051,6 +1051,152 @@ if (!exists("js/fx-worklet.js") ||
   else ok("LoL catalog: Sessions 108 + Champion Themes 41 + Worlds 13 + MSI 4 + K/DA 6; official links, rights notices, safe refresh");
 }
 
+// 🎧 LoL Phase 3 (SoundCloud albums): one playlist per official album — Season 1–9 + Warsongs — plus the
+// official popular-tracks snapshot. Album links stay on SoundCloud, per-track links on the official
+// individual pages, wishes keep the prefix-only aliases, and nothing may imply reuse rights.
+{
+  const catalogSource = read("js/catalog.js");
+  const library = read("js/library.js");
+  let catalogDataOk = false;
+  let capacityOk = false;
+  let safeRefreshOk = false;
+  let autoCreated = 0;
+  try {
+    const fixture = JSON.parse(read("tools/leagueoflegends-soundcloud-albums-tracklist.json"));
+    const catalogContext = vm.createContext({});
+    new vm.Script(catalogSource + "\nglobalThis.__TRK_CATALOG_FOR_CHECK = TRK_CATALOG;").runInContext(catalogContext);
+    const series = catalogContext.__TRK_CATALOG_FOR_CHECK.find(item => item.id === "lol");
+    const popular = fixture.popularTracks;
+    const expected = fixture.albums.concat([popular]);
+    const actual = expected.map(list => (series ? series.playlists.find(pl => pl.id === list.id) : null));
+    /* 既存の7リスト（Sessions 3＋Champion Themes／Worlds／MSI／K/DA）の後ろに、Season 1→9・Warsongs・人気曲の順 */
+    const orderOk = !!series && actual.every(Boolean) &&
+      JSON.stringify(series.playlists.slice(7).map(pl => pl.id)) === JSON.stringify(expected.map(list => list.id));
+    const trackUrl = (list, target) => list.id === popular.id
+      ? "https://soundcloud.com/leagueoflegends/" + target
+      : "https://open.spotify.com/track/" + target;
+    const wishOf = list => list.tracks.map(([title, artist, target, alias]) => {
+      const wish = { t: title, al: list.id === popular.id ? "" : list.album, ar: artist, u: trackUrl(list, target) };
+      if (alias) wish.matchAliases = [alias];
+      return wish;
+    });
+    let trackTotal = 0;
+    let listsMatch = orderOk;
+    const spotifyIds = [];
+    const soundcloudUrls = [];
+    for (let i = 0; i < expected.length; i++) {
+      const want = expected[i], got = actual[i];
+      const isPopular = want.id === popular.id;
+      if (!got) { listsMatch = false; continue; }
+      if (got.name !== want.name || got.name.length > 24 || got.sourceUrl !== want.soundcloudUrl ||
+          got.sourceLabel !== "SoundCloud" || got.songs.length !== want.trackCount ||
+          got.songs.length !== want.tracks.length || got.tags.length > 5 || got.tags.some(tag => tag.length > 16)) listsMatch = false;
+      let sourceOk = false;
+      try {
+        const url = new URL(want.soundcloudUrl);
+        sourceOk = url.protocol === "https:" && url.hostname === "soundcloud.com" && !url.search &&
+          (isPopular ? url.pathname === "/leagueoflegends/popular-tracks" : url.pathname.startsWith("/leagueoflegends/sets/"));
+      } catch (_) {}
+      if (!sourceOk || (!isPopular && !/^https:\/\/open\.spotify\.com\/album\/[A-Za-z0-9]{22}$/.test(want.spotifyAlbumUrl || ""))) listsMatch = false;
+      for (let j = 0; j < want.tracks.length; j++) {
+        const [title, artist, target, alias] = want.tracks[j];
+        const track = got.songs[j];
+        trackTotal++;
+        let urlOk = false;
+        try {
+          const url = new URL(track.u);
+          urlOk = url.protocol === "https:" && !url.search && track.u === trackUrl(want, target) &&
+            (isPopular
+              ? url.hostname === "soundcloud.com" && url.pathname === "/leagueoflegends/" + target && /^[a-z0-9-]+$/.test(target)
+              : url.hostname === "open.spotify.com" && url.pathname === "/track/" + target && /^[A-Za-z0-9]{22}$/.test(target));
+        } catch (_) {}
+        if (isPopular) soundcloudUrls.push(track.u); else spotifyIds.push(target);
+        /* 別名は公式タイトルの前方一致（切り詰め）だけ。根拠のない別名を作らない。 */
+        const aliases = Array.isArray(track.matchAliases) ? track.matchAliases : [];
+        const aliasOk = alias
+          ? aliases.length === 1 && aliases[0] === alias && title.startsWith(alias) && alias.length >= 3
+          : aliases.length === 0;
+        if (!track || track.t !== title || track.ar !== artist ||
+            track.al !== (isPopular ? "" : want.album) || !urlOk || !aliasOk) listsMatch = false;
+      }
+    }
+    const rightsOk = !!series && series.url === fixture.sources.creatorSafeGuidelines &&
+      fixture.sources.soundcloudAlbumsPage === "https://soundcloud.com/leagueoflegends/albums" &&
+      fixture.sources.soundcloudPopularTracks === "https://soundcloud.com/leagueoflegends/popular-tracks" &&
+      series.note.includes("Season 1〜9") && series.note.includes("Warsongs 11曲") &&
+      series.note.includes("人気曲30曲") && series.note.includes("二次利用許諾ではありません") &&
+      series.note.includes("これはLoL全楽曲ではなく");
+    catalogDataOk = listsMatch && rightsOk && trackTotal === 284 && spotifyIds.length === 254 &&
+      soundcloudUrls.length === 30 && new Set(spotifyIds).size === 254 && new Set(soundcloudUrls).size === 30 &&
+      JSON.stringify(fixture.albums.map(album => album.trackCount)) === JSON.stringify([9, 30, 23, 22, 25, 27, 48, 39, 20, 11]);
+
+    /* 🐔 保存側の実上限（1プレイリスト100曲・全体100リスト）に収まること。超えると wish や Vol が黙って消える。 */
+    const folderMap = { bluearchive: "trk-ba", lol: "trk-lol", touhou: "trk-touhou", arknights: "trk-arknights", gakumas: "trk-gakumas", endfield: "trk-endfield" };
+    for (const s of catalogContext.__TRK_CATALOG_FOR_CHECK) {
+      const folder = folderMap[s.id] || "";
+      for (const pl of (s.playlists || [])) {
+        const songs = (pl.songs || []).length;
+        if (!folder || !songs) continue;
+        autoCreated += Math.ceil(songs / 100) || 1;
+      }
+    }
+    capacityOk = expected.every(list => list.trackCount <= 100) && autoCreated <= 100;
+
+    const ensureStart = library.indexOf("function trkCatalogGuide(");
+    const ensureEnd = library.indexOf("\n(function plTighten()", ensureStart);
+    if (ensureStart >= 0 && ensureEnd > ensureStart) {
+      const seasonOne = fixture.albums[0];
+      const ownedSongs = ["owned-lol-season-track"];
+      const manualSongs = ["manual-owned-lol-popular-track"];
+      const autoExisting = { id: "trk-lol-season-1", cat: "trk:lol:lol-season-1", name: "My Season 1 list",
+        icon: "🎧", tags: ["my-season-tag"], wish: [{ t: "old", al: "", ar: "", u: "" }], songs: ownedSongs,
+        guide: { note: "old guide", url: "https://example.com/old" } };
+      const manualPopular = { id: "pl-manual-lol-popular", cat: "lol:lol-popular-tracks", name: "LoL 人気曲メモ",
+        icon: "⭐", tags: ["personal", "tag"], wish: [{ t: "old", al: "", ar: "", u: "" }], songs: manualSongs,
+        guide: { note: "old guide", url: "https://example.com/old" } };
+      const testSettings = { playlists: [autoExisting, manualPopular] };
+      let saveCount = 0;
+      const runContext = vm.createContext({
+        settings: testSettings,
+        ensureTrkFolder: () => {},
+        trkCatalog: () => [series],
+        plSanitize: raw => raw,
+        saveUserPrefs: () => { saveCount++; },
+        trkWishesForSeries: () => []
+      });
+      new vm.Script(library.slice(library.indexOf("function trkWishFromTrack("), library.indexOf("\nfunction trkWishesFromCatalog")) + "\n" + library.slice(ensureStart, ensureEnd) + "\nensureTrkDistributionPlaylists();").runInContext(runContext);
+      const preservesCustomData = autoExisting.name === "My Season 1 list" && autoExisting.icon === "🎧" &&
+        JSON.stringify(autoExisting.tags) === JSON.stringify(["my-season-tag"]) && autoExisting.songs === ownedSongs &&
+        manualPopular.name === "LoL 人気曲メモ" && manualPopular.icon === "⭐" &&
+        JSON.stringify(manualPopular.tags) === JSON.stringify(["personal", "tag"]) && manualPopular.songs === manualSongs;
+      const refreshesWishAndGuide = JSON.stringify(autoExisting.wish) === JSON.stringify(wishOf(seasonOne)) &&
+        JSON.stringify(manualPopular.wish) === JSON.stringify(wishOf(popular)) &&
+        autoExisting.guide.url === seasonOne.soundcloudUrl && manualPopular.guide.url === popular.soundcloudUrl &&
+        autoExisting.guide.note.includes("公式SoundCloudアルバム") && manualPopular.guide.note.includes("人気曲ページ") &&
+        autoExisting.guide.note.includes("二次利用許諾ではありません") && manualPopular.guide.note.includes("二次利用許諾ではありません") &&
+        autoExisting.guide.note.length <= 80 && manualPopular.guide.note.length <= 80;
+      const createdAlbums = fixture.albums.slice(1).every(album => {
+        const created = testSettings.playlists.find(p => p.id === "trk-" + album.id);
+        return created && created.folder === "trk-lol" && created.name === album.name &&
+          JSON.stringify(created.wish) === JSON.stringify(wishOf(album)) &&
+          created.guide.url === album.soundcloudUrl && created.guide.note.includes("公式SoundCloudアルバム");
+      });
+      const createdPopular = testSettings.playlists.find(p => p.id === "trk-" + popular.id);
+      safeRefreshOk = preservesCustomData && refreshesWishAndGuide && createdAlbums && saveCount > 0 &&
+        !!createdPopular && createdPopular.folder === "trk-lol" &&
+        JSON.stringify(createdPopular.wish) === JSON.stringify(wishOf(popular)) &&
+        createdPopular.guide.url === popular.soundcloudUrl &&
+        library.includes('pl.id === "lol-popular-tracks"');
+    }
+  } catch (error) {
+    console.error(`WARN  LoL SoundCloud album test setup failed: ${error.message}`);
+  }
+  if (!catalogDataOk) fail("LoL SoundCloud album fixture/catalog mismatch (expected Season 1–9 as nine playlists with 9/30/23/22/25/27/48/39/20 ordered tracks, Warsongs with 11, the 30-track popular-tracks snapshot, official album links, prefix-only aliases, and the rights/scope notice)");
+  else if (!capacityOk) fail(`LoL SoundCloud albums must fit the saved-playlist limits (100 wishes per playlist, ${autoCreated} auto-created trk playlists of 100 allowed)`);
+  else if (!safeRefreshOk) fail("LoL SoundCloud album imports must refresh wishes/guides, keep owned songs and customized name/icon/tags, create every Season/Warsongs/popular list under trk-lol, and describe the popular-tracks page as a page, not an album");
+  else ok(`LoL SoundCloud albums: Season 1–9 (243 tracks) + Warsongs (11) + popular-tracks snapshot (30), official album/track links, ${autoCreated} auto-created trk playlists within the 100 cap, safe refresh`);
+}
+
 // ⚠ el(tag, cls, text) は文字を1つしか入れられない（入れ子を渡すと "[object ...]" になる）。
 // 引数4つ以上／第3引数がオブジェクト literal は取り違えなので、静的に止める。
 {

@@ -64,6 +64,24 @@ function noteAlpha(u) {
 }
 
 /* ---------- 背景（映像。音声だけの曲は曲パックの背景画像。暗さ・ぼかしは core.js の videoFilter） ---------- */
+function drawChartArtwork(image) {
+  // 1920×1080のステージ上で、タイマー直下・右端に160pxのジャケット枠を置く。
+  // 枠の下端は通常レーンの上端より上に収め、どのレイアウトでもノーツに重ねない。
+  const size = 160, frame = 4, right = 70, x = window.Trk.data.W - right - size - frame * 2, y = 76;
+  const ix = x + frame, iy = y + frame;
+  core.vctx.save();
+  core.vctx.fillStyle = "rgba(0,0,0,.78)";
+  core.vctx.fillRect(x, y, size + frame * 2, size + frame * 2);
+  core.vctx.save(); core.vctx.beginPath(); core.vctx.rect(ix, iy, size, size); core.vctx.clip();
+  // 既定表示では元画像を拡大せず、枠に収まるときだけ縮小する。
+  const scale = Math.min(1, size / image.naturalWidth, size / image.naturalHeight);
+  const w = image.naturalWidth * scale, h = image.naturalHeight * scale;
+  core.vctx.drawImage(image, ix + (size - w) / 2, iy + (size - h) / 2, w, h);
+  core.vctx.restore();
+  core.vctx.strokeStyle = "rgba(255,255,255,.82)"; core.vctx.lineWidth = 2;
+  core.vctx.strokeRect(ix, iy, size, size);
+  core.vctx.restore();
+}
 function drawVideo() {
   core.vctx.clearRect(0, 0, window.Trk.data.W, window.Trk.data.H);
   if (!core.videoReady || core.settings.videoStyle === "off") return;
@@ -74,6 +92,7 @@ function drawVideo() {
   const showVideo = videoOn && !wallpaperImage;
   const showImage = !!(image && !showVideo && !hideImage);
   const fullArt = !!(showImage && core.settings.artWallpaperBg);
+  const chartArtwork = !!(showImage && core.phase === "playing" && !fullArt);
   const a = ownField() || fullArt ? { x:0, y:0, w:window.Trk.data.W, h:window.Trk.data.H } : layout().video;
   const zoom = Math.max(.5, Math.min(3, Number(core.settings.videoZoom) || 1));
   if (showVideo) {
@@ -83,15 +102,18 @@ function drawVideo() {
     core.vctx.drawImage(core.video, a.x + (a.w - w) / 2, a.y + (a.h - h) / 2, w, h);
     core.vctx.restore();
   } else if (showImage) {
-    // Usually preserve the embedded image's pixels: shrink only when needed to fit the video area.
-    // The mystery setting keeps the former full-screen cover/crop behavior for people who prefer it.
-    const s = fullArt
-      ? Math.max(a.w / image.naturalWidth, a.h / image.naturalHeight) * zoom
-      : Math.min(1, a.w / image.naturalWidth, a.h / image.naturalHeight);
-    const w = image.naturalWidth * s, h = image.naturalHeight * s;
-    core.vctx.save(); core.vctx.beginPath(); core.vctx.rect(a.x, a.y, a.w, a.h); core.vctx.clip();
-    core.vctx.drawImage(image, a.x + (a.w - w) / 2, a.y + (a.h - h) / 2, w, h);
-    core.vctx.restore();
+    if (chartArtwork) drawChartArtwork(image);
+    else {
+      // Outside gameplay, preserve the source pixels and shrink only when needed to fit the video area.
+      // The mystery setting keeps the former full-screen cover/crop behavior for people who prefer it.
+      const s = fullArt
+        ? Math.max(a.w / image.naturalWidth, a.h / image.naturalHeight) * zoom
+        : Math.min(1, a.w / image.naturalWidth, a.h / image.naturalHeight);
+      const w = image.naturalWidth * s, h = image.naturalHeight * s;
+      core.vctx.save(); core.vctx.beginPath(); core.vctx.rect(a.x, a.y, a.w, a.h); core.vctx.clip();
+      core.vctx.drawImage(image, a.x + (a.w - w) / 2, a.y + (a.h - h) / 2, w, h);
+      core.vctx.restore();
+    }
   }
 }
 function drawScanlines() { core.ctx.fillStyle = "rgba(0,0,0,.22)"; for (let y = 0; y < window.Trk.data.H; y += 4) core.ctx.fillRect(0, y, window.Trk.data.W, 2); }

@@ -26,12 +26,13 @@ function between(source, start, end) {
   return source.slice(a, b);
 }
 
+const drawChartArtworkSource = between(renderSource, "function drawChartArtwork(image) {", "\nfunction drawVideo()");
 const drawVideoSource = between(renderSource, "function drawVideo() {", "\nfunction drawScanlines()");
 const drawArtworkInsetSource = between(spectrumSource, "function drawArtworkInset(g, W, H, dpr) {", "\n\n/* ============ 描き続けるかどうか ============ */");
 const tvDockRenderSource = between(tvDockSource, "function render(skinChanged) {", "\n    powLed.classList.toggle");
 
-function drawVideo({ wallpaper = false, hideDuringChart = false, phase = "playing", videoWidth = 0, zoom = 1, image = { naturalWidth:2, naturalHeight:1 } } = {}) {
-  const calls = { images:[], clips:[] };
+function drawVideo({ wallpaper = false, hideDuringChart = false, phase = "playing", videoWidth = 0, zoom = 1, image = { naturalWidth:2, naturalHeight:1 }, ownField:ownFieldMode = false } = {}) {
+  const calls = { images:[], clips:[], fills:[], strokes:[] };
   const video = { videoWidth, videoHeight:videoWidth ? 180 : 0, readyState:2 };
   const core = {
     videoReady:true, phase, video,
@@ -40,21 +41,22 @@ function drawVideo({ wallpaper = false, hideDuringChart = false, phase = "playin
     vctx:{
       clearRect() {}, save() {}, beginPath() {}, clip() {}, restore() {},
       rect(...args) { calls.clips.push(args); },
+      fillRect(...args) { calls.fills.push(args); },
+      strokeRect(...args) { calls.strokes.push(args); },
       drawImage(...args) { calls.images.push(args); },
     },
   };
   const sandbox = {
     core,
     window:{ Trk:{ data:{ W:1920, H:1080 } } },
-    ownField:() => false,
+    ownField:() => ownFieldMode,
     layout:() => ({ video:{ x:110, y:210, w:500, h:250 } }),
   };
   const context = vm.createContext(sandbox);
-  vm.runInContext(`${drawVideoSource}\nglobalThis.runDrawVideo = drawVideo;`, context, { filename:"js/render.js#drawVideo" });
+  vm.runInContext(`${drawChartArtworkSource}\n${drawVideoSource}\nglobalThis.runDrawVideo = drawVideo;`, context, { filename:"js/render.js#drawVideo" });
   sandbox.runDrawVideo();
   return { calls, image, video };
 }
-
 function drawSpectrumArtwork({ enabled = false, hideDuringChart = false, phase = "title" } = {}) {
   const image = { naturalWidth:400, naturalHeight:300 };
   const calls = { images:[] };
@@ -92,6 +94,9 @@ test("譜面オプション3種は既定オフで、謎設定に置き、4言語
   const end = indexSource.indexOf("</details>", mystery);
   assert.ok(mystery < controls && controls < end, "artwork options stay inside the mystery section");
   assert.match(optionsSource, /artWallpaperBg:"🖼 ジャケット画像を全画面にする"/);
+  for (const phrase of ["タイマーの下", "below the top-right timer", "右上角计时器下方", "오른쪽 위 타이머 아래"]) {
+    assert.ok(optionsSource.includes(phrase), `artwork placement hint is localized: ${phrase}`);
+  }
 });
 
 test("スペクトラムのサムネイル設定は曲名バナー設定の直下で既定オフ", () => {
@@ -110,17 +115,33 @@ test("スペクトラムには設定オンのときだけ、右上に小さな�
   assert.equal(drawSpectrumArtwork({ enabled:true, hideDuringChart:true, phase:"playing" }).calls.images.length, 0);
 });
 
-test("通常時の埋め込みジャケットは拡大せず、動画枠の中央に表示する", () => {
+test("譜面中のジャケットは右上のタイマー直下に置き、原寸を超えて拡大しない", () => {
   const { calls, image } = drawVideo();
   assert.equal(calls.images.length, 1);
   assert.equal(calls.images[0][0], image);
-  assert.deepEqual(calls.clips[0], [110, 210, 500, 250], "default remains within the normal video region");
+  assert.deepEqual(calls.fills, [[1682, 76, 168, 168]], "the framed artwork aligns with the 70px right margin below the timer");
+  assert.deepEqual(calls.clips[0], [1686, 80, 160, 160], "the artwork stays inside its fixed square");
+  assert.deepEqual(Array.from(calls.images[0].slice(1)), [1765, 159.5, 2, 1], "small artwork keeps its native pixels inside the frame");
+  assert.deepEqual(calls.strokes, [[1686, 80, 160, 160]], "the cover gets a subtle frame");
+});
+
+test("譜面中の大きなジャケットは右上の枠へ縮小し、videoZoomの影響を受けない", () => {
+  const { calls } = drawVideo({ image:{ naturalWidth:1000, naturalHeight:500 }, zoom:2 });
+  assert.deepEqual(Array.from(calls.images[0].slice(1)), [1686, 120, 160, 80]);
+});
+
+test("選曲中は従来どおり、ジャケットを拡大せず動画枠の中央に表示する", () => {
+  const { calls, image } = drawVideo({ phase:"title" });
+  assert.equal(calls.images.length, 1);
+  assert.equal(calls.images[0][0], image);
+  assert.deepEqual(calls.clips[0], [110, 210, 500, 250], "title artwork stays in the normal video region");
   assert.deepEqual(Array.from(calls.images[0].slice(1)), [359, 334.5, 2, 1], "small art stays at native size and is centered");
 });
 
-test("通常時は大きなジャケットだけ動画枠内へ縮小し、videoZoomで拡大しない", () => {
-  const { calls } = drawVideo({ image:{ naturalWidth:1000, naturalHeight:500 }, zoom:2 });
-  assert.deepEqual(Array.from(calls.images[0].slice(1)), [110, 210, 500, 250]);
+test("プレイ中は中央フィールドを使うモードでもジャケットの位置を右上に固定する", () => {
+  const { calls } = drawVideo({ ownField:true });
+  assert.deepEqual(calls.clips[0], [1686, 80, 160, 160]);
+  assert.deepEqual(Array.from(calls.images[0].slice(1)), [1765, 159.5, 2, 1]);
 });
 
 test("全画面設定オンでは動画の代わりに静止画を従来どおり全画面へ広げる", () => {

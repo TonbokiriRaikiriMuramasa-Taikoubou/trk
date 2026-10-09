@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-09（trk105）**。現行の設計、維持条件、未完了事項をまとめる。詳細な履歴は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、セキュリティは [`SECURITY.md`](SECURITY.md)／[`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。
+> **最終更新：2026-10-09（trk106）**。現行の設計、維持条件、未完了事項をまとめる。詳細な履歴は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、セキュリティは [`SECURITY.md`](SECURITY.md)／[`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。
 
 ## 1. 再開・変更の手順
 
@@ -12,7 +12,7 @@
 
 ## 2. 現在の優先事項
 
-- 音楽カタログと権利確認を優先し、LoLを先に調査する。未依頼のTV機能追加は保留。trk105で依頼されたジャケット表示変更は実装済みで、残りは §7 の実機確認。
+- 音楽カタログと権利確認を優先し、LoLを先に調査する。未依頼のTV機能追加は保留。音源ジャケット表示の実装（trk101〜106）は完了し、残る実機確認は §7 を参照。
 - LoLカタログは段階収録中。現在はCreator-Safe Sessions 3作／108曲、近年のChampion Themes 41曲、Worlds/WCS公式アンセム13曲、確認済みMSIアンセム4曲、K/DA 6曲。K/DAは「POP/STARS」と「ALL OUT」EP収録5曲を独立リストに収録済み。全楽曲の網羅を主張しない。
 - 次のLoL調査候補は、旧ログインテーマ／旧Champion Themes、他の仮想アーティスト作品、Skin・イベント曲、ゲームOST等。分類を混ぜず、公式の個別曲名・リンク・分類を確認できた範囲だけ追加する。見つからなかったことを「存在しない」と扱わない。
 - 調査台帳：[`LEAGUE-OF-LEGENDS-MUSIC.md`](LEAGUE-OF-LEGENDS-MUSIC.md)。曲別出典・fixture：`tools/leagueoflegends-music-tracklist.json`、`tools/leagueoflegends-sessions-tracklist.json`。
@@ -21,7 +21,7 @@
 
 - **trk100の基本確認は済み**（利用者の実ブラウザ確認、2026-10-09）。音プレビューOFF＋該当設定ONでもMUTEで無音。TVオフで映像を消せる。設定画面・演奏中・映像フィルター「非表示」でもTV映像が出ない。確認済みの条件を未確認に戻さない。
 - `specArtwork`（スペクトラム右上のサムネイル）は既定OFF。ゲーム中TV側のMP3サムネイル表示は既定ON。謎設定の3項目（ジャケット全画面／書斎のサムネイルを使用／譜面時の静止画非表示）はすべて既定OFF。
-- 「ジャケット画像を全画面にする」は、既存の `artWallpaperBg` 設定キーを再利用する。オフでは原寸以下で動画枠の中央に表示し、オンでは従来の全画面カバー表示にする。設定キー、既定値、リセット、Import/Export、`?safe=1` の扱いを変えない。
+- 「ジャケット画像を全画面にする」は、既存の `artWallpaperBg` 設定キーを再利用する。オフでは譜面演奏中に右上タイマーの下へ表示し、選曲中などは原寸以下で動画枠の中央に表示する。オンでは従来どおり全画面カバー表示にする。設定キー、既定値、リセット、Import/Export、`?safe=1` の扱いを変えない。
 - ゲーム背景は `#view` のTVフィルターを受ける。TVドックの別要素として表示する静止カバーにも、CSSによる色調・モノクロ・暗さ・ぼかしを適用する。
 - 書斎カバーを手動で設定・解除した場合も、関連設定と画像の優先順位に沿って背景を更新する。動画・静止画の優先関係を崩さない。
 - ジャケットの抽出・縮小は端末内で行う。元ファイルは読み取り専用で、画像のアップロードや永続画像保存はしない。
@@ -52,14 +52,23 @@
 | MANUAL判定／譜面生成 | `js/judge-match.js`、`js/chart-gen.js`、`tests/judge-match.test.mjs`、`JUDGE-MATCH.md` |
 | 書斎データ安全・表示 | `js/study-room-utils.js`、`js/study-room.js`、`tools/check-study-room.mjs` |
 | 静的・セキュリティ・a11y・軽量化 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs`、`tests/` |
-| Service Worker | `sw.js`。現在のcache名：`trk-v2026.10.9-trk105`。vendor pinの正は `tools/vendor-lock.json` |
+| Service Worker | `sw.js`。現在のcache名：`trk-v2026.10.9-trk106`。vendor pinの正は `tools/vendor-lock.json` |
 | 検査条件 | [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md)、[`SECURITY.md`](SECURITY.md)、[`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) |
 
-2026-10-09／trk105の検査：`npm run check` 成功、Static 0 failure／0 warning、`npm test` 174/174。`git diff --check` 成功。`npm run check` はrepo・security・a11y・vendor・MMD motion・Study Room・lite-mode検査とテストを実行するが、実ブラウザースモークは含まない。LoL checkerはSessions 108、Champion Themes 41、Worlds 13、MSI 4、K/DA 6の曲データ・公式リンク・権利注記・安全なwish更新を検査する。
+### 2026-10-09／trk106の検査結果
+
+- `npm run check` 成功。Static 0 failure／0 warning。
+- `npm test` 176/176、`git diff --check` 成功。
+- `npm run check` はrepo・security・a11y・vendor・MMD motion・Study Room・lite-mode検査とテストを実行するが、実ブラウザースモークは含まない。
+- LoL checkerはSessions 108、Champion Themes 41、Worlds 13、MSI 4、K/DA 6の曲データ・公式リンク・権利注記・安全なwish更新を検査する。
 
 ## 7. 未完了の実機確認
 
-- **ジャケット表示（trk101／102／105）**：Node検査は合成データ。MP3等の実音源で、曲行・選択中バナー・TV・書斎、画像なし時、`specArtwork` 初期OFF／ON、謎設定3種の初期OFFと優先順、譜面中の静止画非表示（元動画は継続）、書斎カバー設定・解除後の背景更新を確認する。trk105の原寸以下・中央表示／全画面切替と、TVフィルター（特にモノクロ）がTVドックのカバーにも適用されることもPC・Androidで確認する。曲一覧のサムネイル表示は利用者確認済み（2026-10-09）。
+- **ジャケット表示（trk101／102／105／106）**：Node検査は合成データのため、実音源・実機確認は未完了。
+  - PC／Androidで、MP3等の実音源を使い、曲行・選択中バナー・TV・書斎、画像なし時、`specArtwork` 初期OFF／ON、謎設定3種の初期OFFと優先順、譜面中に静止画を隠しても元動画は続くこと、書斎カバー設定・解除後の背景更新を確認する。
+  - trk105の原寸以下・中央表示／全画面切替と、trk106の右上タイマー直下への配置が各レイアウト・ゲームモードで干渉しないことを確認する。
+  - TVフィルター（特にモノクロ）がTVドックのカバーにも適用されることを確認する。
+  - 曲一覧のサムネイル表示は利用者確認済み（2026-10-09）。
 - **ゲーム／入力**：Android ChromeとPCでMANUALの連打・判定、Esc長押し、ランク表示、chartGen新旧方式、軽量化を確認する。VM／Nodeで確認済みの条件は [`JUDGE-MATCH.md`](JUDGE-MATCH.md) と `QUALITY-CHECKS.md` に記録する。
 - **3D／オフライン／端末差**：Android ChromeとPCでMMD・VRM描画、Service Workerのcache-first／safeオフライン、IndexedDBの実ブラウザ挙動を確認する。静的・shimテストは実ブラウザの代わりにならない。
 - 実施後は端末・日付・シナリオを [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) または「📱 実機確認の記録」Issueへ残す。**trk100で確認済みの項目は未完了一覧へ戻さない。**
@@ -72,6 +81,7 @@
 - **trk101／102 — 音源ジャケット**：端末内抽出・縮小・表示先と設定を追加。画像・処理量を制限し、通信・永続画像保存はしない。
 - **trk103／104 — LoLカタログ**：Worlds 2026「Know My Name」とK/DA 6曲を追加。Creator-Safe・二次利用条件は未確認。
 - **trk105 — ジャケット表示調整**：既定を原寸以下の中央表示にし、全画面設定は既存 `artWallpaperBg` を再利用。TVドックの静止カバーにもTVのCSSフィルターを適用。実機確認は §7 に残す。
+- **trk106 — 譜面演奏中のジャケット配置**：中央表示をやめ、右上タイマーの下（160×160px枠）へ移動。右余白とタイマー間隔を固定し、各レイアウトでレーン・ノーツに重ねない。元画像は拡大せず、選曲中は従来どおり動画枠中央、全画面設定オンも従来どおり。謎設定・既定値・保存形式は変更せず、PC／Androidの実機確認は §7 に残す。
 
 ## 9. 変更時チェックリスト
 

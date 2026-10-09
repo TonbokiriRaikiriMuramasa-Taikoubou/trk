@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-09（trk98）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
+> **最終更新：2026-10-09（trk99）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
 
 ## 1. 作業を再開するとき
 
@@ -44,11 +44,12 @@
 - **解析結果のキャッシュ（`js/media.js` の `analyzeAudioCached`）**：IndexedDB `trk_analysis_cache_v1`（packs DB とは別）。鍵は fingerprint＋先頭・末尾 64KB の SHA-256＋版数 `ANALYSIS_CACHE_VERSION`。保存するのは rms・onset・ratio の配列と数値だけ（PCM は保存しない）。ratio は既定の譜面作り方（chartGen 2）が使うので必ず入れる。読むときは形を確かめ、合わなければ解析し直す。30件まで（最後に読んだ時刻が古い順に消す。読み出しで `savedAt` を更新する LRU）。解析の式を変えたら版数を上げる。
 - **音声解析の資源上限**：96 MiB の既存ファイル上限を維持。通常モードは20分、`TrkLite.active()` が true のときだけ10分を超えた曲の解析を省略する。`liteNoAnalyze`（利用者が選ぶ解析省略）とは別判定。省略後もBPMグリッドの譜面は作る。`analysisSkipped`／`analysisSkippedLong`／`analysisSkippedLiteLong` は4言語。19分モノラルWAVのピーク664MB等はユーザー提供の仮想検査値で、実機測定ではない。
 - **Esc長押しで選曲へ戻る（trk97、`js/main.js`）**：Esc を約1秒押すと選曲へ戻る（プレイ中・一時停止中・リザルト）。❓謎設定の `escNoReturn` で止められる（既定はオフ＝戻る）。
+- **MANUAL の打鍵とノーツの対応づけ（trk99、`js/judge-match.js`）**：`handleInput` は純関数 `window.Trk.judge.matchManualInput(chart, nextIdx, lane, now, windows, policy)` に「どのノーツをどう判定するか」を任せ、戻り値で `judgeNote` を1回呼ぶだけ。判定幅・`sweepMisses`・PERFECT✦・他モード（ORBIT／STAGE／TRUCK／CATCH）は変えていない。既定 `"smart"`：同じ色を時刻順（早い順）に探し、前の色違いノーツはその**時刻を過ぎていれば**飛ばして叩ける（osu!lazer の境界。飛ばした分は幅を出たら `sweepMisses` が MISS）。色違いは太鼓と同じく MISS だが、**PERFECT 幅より早い色違いは空振り**（相手を巻き込まない）。旧方式 `"ordered"`（幅内でいちばん早いノーツ、色違いは常に MISS＝trk98 までと同じ結果）は ❓謎設定 `judgeOrdered`（既定オフ）で選べる。両方式とも記録の扱いは同じ（mod ではない）。原因・他ゲームの調べ・採らなかった案・シミュレーションは [`JUDGE-MATCH.md`](JUDGE-MATCH.md)。
 - **ランク判定**：ゆるめ判定と1.00x未満は練習扱い（ハイスコア対象外）、きびしめと1.05x以上は記録（速度別）。AUTO は記録しない（`core.js` の `modsUnranked`、`game.js` の `runUnranked`・`recordPlay`）。
 - **📺 TVドックの設定（`js/tv-dock.js`）**：くわしいの中の「📺 TVドック」グループ。チェックは3つ：🧱 壁掛け（スキン `wall` と同じ。外すと映画館に戻る）、↕ 並び替え（テレビとラックの上下）、🔢 5枠化（`tvDockFive`）。既定はすべて OFF（映画館・テレビが上・5枠なし）。くわしいは既定で開いた状態（保存済みの開閉は変えない）。テレビ本体とラックの表示は変えていない。
 - **Loop Lab の映像書き出し（`js/media-player-mode.js` の `exportLoopClip`）**：開発者表示の中だけ。記録した区間の行の 🎬 を押すと、映像と音を区間の長さのぶん録画して保存する（WebM。対応していれば MP4）。設定は持たない。書き出し後は再生位置・再生／停止・速度・ループを元に戻す。曲を切り替えたら途中で止め、保存しない。音声だけの曲は書き出さない。
 - **「📁 開く」と「📤 共有」**（`js/library.js`）：📁 開く は曲を入れるだけで、共有としては覚えない。📤 共有 は共有として覚え、📤 の印が付き、「共有をやめる」でまとめて外せ、「端末に残す」の対象になる。ボタンの下の説明行は `libOpenShareHint`（4言語）。
-- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.9-trk98`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
+- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.9-trk99`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
 
 ## 3. 権利・データ・セキュリティの不変条件
 
@@ -74,6 +75,7 @@
 | `js/chart-gen.js` | 自動譜面の純関数。`chartGen` 1＝旧方式（ca84a19の出力を保つ）、2＝新方式・既定（局所正規化＋8小節ごとの区間配分）。`media.js` の `generateNotes` は薄いラッパー。`tests/` が検査 |
 | `js/catalog.js` → `js/title-match.js` → `js/library.js` | 公式カタログ定義、プレイリスト・照合・Music読込。曲名の照合キー（`plTitleKeys`・`plSongMatchKeys`・`plWishTitleKeys`）は純関数として `title-match.js` にあり、`tests/title-match.test.mjs` が入出力を検査する（`plWishMatch` は `metaOf` を使うため `library.js` に残す）。`catalog.js` のトップレベル `const TRK_CATALOG` は `window` に載らないため、`trkCatalog()` 経由で読む |
 | `js/media.js` | 音声の解析・解析結果のキャッシュ（`analyzeAudioCached`）・譜面生成の薄いラッパー |
+| `js/judge-match.js` → `js/game.js` | MANUAL の打鍵とノーツの対応づけ（純関数 `matchManualInput`・`window.Trk.judge`。`game.js` より前に読む）。`game.js` は進行・判定幅・`judgeNote`・`sweepMisses`・記録 |
 | `js/media-player-mode.js` | メディアプレーヤー・A-B ループ・Loop Lab（区間の記録と 🎬 の映像書き出し、開発者表示の中） |
 | `js/tv-dock.js` | テレビ本体・「くわしい」・📺TVドックの設定（壁掛け・並び替え・5枠化） |
 | `js/fx.js`／`js/fx-presets.js` | 音響API・プリセット。凍結扱い |
@@ -98,9 +100,11 @@ git diff --check
 
 リザルト・Esc・ランク判定の検査：`tests/game-end.test.mjs`（終端・記録失敗・表示順序）、`tests/esc-hold.test.mjs`（Esc長押し）、`tests/ranked-option.test.mjs`（ランク判定の記録）。いずれも VM で実ソースを動かす静的寄りの検査で、実ブラウザでの表示は §7 に残す。
 
+MANUAL の判定の対応づけ：`tests/judge-match.test.mjs`（trk99・26件）。①純関数 `matchManualInput` の場面別（境界、色違い＝MISS、落とし・早すぎる空振り・両手打ちが連鎖しないこと、旧方式では連鎖すること）、②`game.js` の `handleInput` を実ソースから切り出して VM で動かす配線、③実ソースの自動譜面（`longRamp` 上級）にプレイヤーモデルを当てて「±PERFECT で正しく押したのに MISS」が smart で起きないこと、④設定 `judgeOrdered` の配線（初期値・リセット・`index.html`・`main.js`・4言語）。設計と数値は `JUDGE-MATCH.md`。
+
 実ブラウザでの終端検査は `tools/smoke-game-end.mjs`（trk98。`SMOKE_CHROME`・`SMOKE_PUPPETEER` を指定して手動で実行。`npm run check` には入れない）。20秒の合成音声を MANUAL と AUTO で最後まで流し、結果画面が出て pageerror が 0 件であることを確かめる。
 
-`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。譜面ハッシュは注入した合成analysisから生成し、実WAVのデコード経路は別にエラー0・ノーツ件数±5%を確認。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-09／trk98）は、Security 56 checks・a11y 8 checks・vendor 8 checks・軽量化 123 assertions は trk95 時点の値、`npm test` は **124件**（trk98で `game-end` の配線検査を追加）。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
+`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。譜面ハッシュは注入した合成analysisから生成し、実WAVのデコード経路は別にエラー0・ノーツ件数±5%を確認。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-09／trk99）は、Security 56 checks・a11y 8 checks・vendor 8 checks・軽量化 123 assertions は trk95 時点の値、`npm test` は **150件**（trk98で `game-end` の配線検査、trk99で `judge-match` 26件を追加）。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
 
 `check-repo.mjs` はJavaScript構文・ローカル参照・ID・設定文言に加え、Arknights公式リンク、Blue Archive 225曲、LoL Sessions 108曲／Phase 1の58件、Gakumas 50件・別名、公式リンクと権利注記、既存プレイリストの所有曲・カスタムフィールド保持を検査する。チェックは意図的な逆テストでもFAILすることを確認してから追加する。外部ツールの起動後DOM検査は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照し、リポジトリ外で行う。
 
@@ -108,6 +112,7 @@ git diff --check
 
 静的検査だけでは以下を保証できない。対応端末で確認したらこの節を更新する。
 
+- **MANUAL の判定の対応づけ（trk99）** — 上級以降の16分（ドカド・トリル・3連）を PC キーボードと Android のタッチで遊び、①1個落としたあと次の正しい打鍵が MISS の連鎖にならない、②色違いは従来どおり MISS（両ボタン連打で得をしない）、③同色の連打で遅れ気味でも判定が1個ずつ進む、④❓謎設定「判定を昔のやり方にする」で trk98 までの手触りに戻り、再読み込み後も保持され、リセットで戻る、⑤リザルトの判定統計が不自然でない、を確認する。調整点は `JUDGE-MATCH.md` §7。
 - **Esc長押しで選曲へ戻る（trk97）** — PC（キーボード）で、プレイ中・一時停止中・リザルトから約1秒の長押しで選曲へ戻ること。短押しは一時停止・再開のまま。設定「Esc長押しで曲選択画面に戻らない」をオンにすると戻らないこと。TVリモコンの「戻る」の挙動も確認。
 - **ランク判定の表示（trk97）** — ゆるめ判定・1.00x未満で遊んだ後、リザルトに「練習扱い」の表示が出て、ハイスコアが更新されないこと。きびしめ・1.05x以上では記録されること（記録の値は VM 検査済み、画面の表示は未確認）。
 - **ブラウザースモーク（trk90 で実行、trk91 で譜面の基準を一部更新）** — `tools/smoke-browser.mjs` の譜面比較は、合成 analysis を直接注入して SHA-256 で比べるため、AudioContext の差に左右されない。実 WAV のデコード・解析は別経路として、エラー 0・各難易度のノーツ数 ±5% だけを見る。trk90 では `@sparticuz/chromium` と `puppeteer-core` を一時領域（リポジトリ外）で使い、`--write`／`--compare` がともに成功した（boot 0・未解決 0・合成譜面 10 件のハッシュ・キー集合が一致・実 WAV 10 件のキー集合一致と件数 ±5%・デコードエラー 0・click error 0）。trk91 では Chromium のない環境のため再実行していない。合成譜面のうち `gen2/easy` だけが 115→100 に変わったので、基準は node で同じ手順により再計算して更新した（他 9 件は一致）。依存は `package.json` に追加していない。
@@ -154,6 +159,7 @@ git diff --check
 - **音楽カタログ**：LoLの未調査範囲（旧ログインテーマ・残りChampion Themes・Skin／イベント曲・ゲームOSTなど）を公式ソースと利用条件から段階調査。Blue Archiveについても権利者のガイドラインを軸に公式配信・購入先を案内し、購入だけで二次利用が許可されるという前提は置かない。
 - **譜面生成**：静かなイントロから始まり後半ほど音量が大きい曲では、旧方式の自動譜面が後半へ偏る（冒頭に0ノーツ・20秒から開始の実測あり）。新方式（`chartGen` "2"）で改善し、**2026-10-08に既定を新方式へ切り替えた**（旧方式は `"1"` で選べる）。静かな長い区間は、絶対音量ゲート（trk76）の上限を難易度順の表で絞る（trk91。trk90 の density 比例式から変更）。合成曲 `contrast` では全難易度の総数・静かな区間の密度が厳密に増えることを検査する一方、達人Lv12〜15帯に届くかは別の受入条件としていない（実測Lv10）。Lv は曲の峰で決まるため、同じ曲の上級と達人の Lv が並ぶことは仕様どおり（利用者向けには `docs/guide/play.md` §「難易度名と Lv」に説明）。盛り上がり区間は候補の100%で頭打ちになる場合がある（仕様上、候補にない位置へは置かない）。実曲での自然さ・Lv表示・実機の手触りは§7で確認する。レビューの対応状況は `docs/REVIEW-2026-10-08.md`。
 - **IndexedDB回帰検査（済・2026-10-08）**：`tests/idb.test.mjs`（13件）が、パック容量v2の移行・`size` index（主キーを size と取り違えない）・`putIf` の上限・`onblocked`・`onversionchange`、および解析キャッシュ（往復・壊れた記録・30件の上限・セーフモード・2回目は解析しない）を、`js/core.js` の `idbStore` と `js/media.js` の該当区間を vm で読んで検査する。実ブラウザの代わりに `tests/helpers/fake-idb.mjs`（in-memory の shim）を使うので、本物の挙動との差は shim の冒頭に書いてある。実 Chromium での確認は別途（`IDBIndex.getAllKeys` は主キーを返し、`openKeyCursor` の `key` が索引の値）。
+- **MANUAL の判定の対応づけ（trk99）**：巻き込みの原因は判定幅ではなく打鍵の割り当て（旧方式は幅内でいちばん早いノーツを取り、色違いを MISS にするため、1回のミスで以降が連鎖）。採用は osu!lazer 式の到達規則＋太鼓式の色違い MISS＋IIDX 式の空振り。幅の厳格化・精密モード・同色の「いちばん近い」・デバウンスは採らなかった。シミュレーション（上級 2083 ノーツ・σ25ms）で MISS 19.0 → 0.7、最大コンボ 672 → 1884、正確な手は両方式とも 0 MISS。根拠・出典・数値・調整点は [`JUDGE-MATCH.md`](JUDGE-MATCH.md)。実機の手触りは §7。
 - **軽量化の追加候補**：起動時のサンプル映像 preload と、rAF外のA-B／逆再生setIntervalは未調整。初速・ループ精度とのトレードオフがあるため、実機検証なしに変更しない。
 - **実ブラウザ検収**：§7の端末確認が未完了。静的テストを根拠に実機検収済みとしない。
 - **安定版の後の検討（利用者の決定・2026-10-08）**：
@@ -178,10 +184,9 @@ git diff --check
 
 ## 11. 最近の変更
 
-直近の作業だけを残す。trk70〜trk96 の詳しい記録は [`docs/HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) にある。
+直近の作業だけを残す。trk70〜trk98 の詳しい記録は [`docs/HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) にある。
 
-- **trk97 — Esc長押しで選曲へ戻る**：プレイ中・一時停止中・リザルトで Esc を約1秒押すと、確認なしで選曲画面へ戻る（`js/main.js` の `escHoldStart`）。短押しは従来どおり。❓謎設定の「Esc長押しで曲選択画面に戻らない」（`escNoReturn`、既定オフ＝戻る）で止められる。合成キー（パッドの戻る）と、書斎などの開いている間は対象外。検査は `tests/esc-hold.test.mjs`。
-- **trk97 — ランク判定の検査**：ゆるめ判定・1.00x未満は練習扱い（プレイ回数は増えるがハイスコアは更新しない）、きびしめ・1.05x以上は記録対象、AUTO は記録しない、を実ソースの `recordPlay` で確かめる（`tests/ranked-option.test.mjs`）。ヘッドレスのブラウザは環境になく、画面上での確認は §7 に残す。
-- **trk98 — 曲の終わりで結果画面が出ない不具合（回帰）を修正**：`game.js` の `runMods` が、IIFE の中にある `lifeTags` を裸の名前で呼んでいたため ReferenceError になり、`phase` だけ `ended` になって結果画面が空のままだった（trk95・96 の修正は正しく、その後の名前の整理で `lifeTags` が公開されなくなった）。`js/modes.js` で `window.Trk.modes.lifeTags` として公開し、`game.js` はそれを呼ぶ。既存の検査はスタブで `runMods` を置き換えていたため見逃していた。検査：`tests/game-end.test.mjs` に配線の検査を追加。実ブラウザの検査として `tools/smoke-game-end.mjs`（下記）を追加。
-- **trk98 — 実ブラウザの終端検査**：`SMOKE_CHROME=… SMOKE_PUPPETEER=… node tools/smoke-game-end.mjs` で、20秒の合成音声を MANUAL と AUTO の両方で最後まで流し、結果画面の表示と pageerror 0 を確かめる。`npm run check` には入れない。
-- 公開コードを変えたので `sw.js` のキャッシュ名は **`trk-v2026.10.9-trk98`**。
+- **trk97 — Esc長押しで選曲へ戻る**（`js/main.js` の `escHoldStart`、❓謎設定 `escNoReturn` で停止）と、**ランク判定の検査**（`tests/ranked-option.test.mjs`）。詳細はアーカイブ。
+- **trk98 — 曲の終わりで結果画面が出ない回帰を修正**：`game.js` の `runMods` が IIFE 内の `lifeTags` を裸の名前で呼んで ReferenceError になっていた。`window.Trk.modes.lifeTags` として公開し、`tests/game-end.test.mjs` に配線の検査、実ブラウザの終端検査 `tools/smoke-game-end.mjs` を追加。詳細はアーカイブ。
+- **trk99 — 密な連打で横のノーツを巻き込む問題（MANUAL）**：打鍵とノーツの対応づけを `js/judge-match.js`（純関数・`window.Trk.judge`）に切り出し、既定を新方式 `"smart"` にした（§2.3）。❓謎設定「🥁 判定を昔のやり方にする」（`judgeOrdered`、既定オフ、4言語、リセット・Export／Import 対応、`?safe=1` は触らない）で旧方式 `"ordered"` に戻せる。読込順 `js/media.js` → `js/judge-match.js` → `js/game.js`、`tools/check-repo.mjs` の `TRK_REGISTRARS` に `judge`、検査 `tests/judge-match.test.mjs`（26件）、`tests/fixtures/globals-baseline.json` を再生成（trk97〜98 のずれも取り込み）。文書：`JUDGE-MATCH.md`（設計メモ）、`guide/play.md`・`guide/en.md` に「🥁 MANUAL の判定のしくみ」、`guide/credits.md`・`en.md` の着想元に osu!lazer・太鼓・IIDX、`guide/files.md`・`NAMESPACE-PLAN.md` に新ファイル。実機確認は §7。
+- 公開コードを変えたので `sw.js` のキャッシュ名は **`trk-v2026.10.9-trk99`**。

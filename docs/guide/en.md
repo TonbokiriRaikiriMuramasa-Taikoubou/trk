@@ -86,6 +86,16 @@ Also available:
 - 📊 **Judgement average and spread**: shown on the results screen, e.g. "avg +3.2 ms · spread 11.4 ms".
 - **Timing meter**: shows how far off each hit was.
 
+### 🥁 How MANUAL matches presses to notes (dense runs)
+
+Sixteenth notes from Advanced upward (94–75 ms apart at 160–200 BPM) are about as close as, or closer than, the GOOD window (Advanced ±95 ms, Master ±80 ms, RUSH ±75 ms), so the windows of neighbouring notes overlap. MANUAL therefore decides which note a press belongs to like this:
+
+- **It looks for a note of the same colour, in time order.** Among same-colour notes the earliest wins (a slightly late press does not jump to the next note).
+- **An earlier note of the other colour is skipped once its time has passed.** The skipped note becomes a MISS when it leaves the window (while it is still inside the window you can go back and hit it). Dropping one note no longer makes your next correct presses get swallowed by the previous note in a chain of misses.
+- **A wrong colour is a MISS** (as in Taiko; mashing both buttons does not pay). But a wrong-colour press that is earlier than the PERFECT window counts as a **whiff** (nothing happens), so an early press or the second hit of a two-handed press does not consume the next note.
+
+"**Use the old hit matching**" in ❓ Mystery settings restores the old rule (up to trk98): the earliest note inside the window is taken and a wrong colour is always a MISS. It is there for comparison and does not change how records are kept. The window sizes themselves are set by "Judgement strictness".
+
 ## Difficulty names and Lv (auto charts)
 
 - **Difficulty names (Easy to RUSH) are a guide to note density.** The higher the difficulty, the more notes the same song gets in total.
@@ -402,6 +412,7 @@ trk/
 │  ├─ core.js                    … settings, state, shared processing
 │  ├─ player.js                  … playback controls and section repeat
 │  ├─ media.js                   … loading, audio analysis, chart generation
+│  ├─ judge-match.js             … matching MANUAL presses to notes (pure function)
 │  ├─ game.js                    … progress, judgement, records
 │  ├─ render.js                  … drawing
 │  ├─ custom.js                  … note and skin creation, packs
@@ -456,7 +467,9 @@ trk! does not use the charts, images, audio, or names of any of those games. Bui
 | 🎪 STAGE, PERFECT✦, curtain call | World Dai Star: Yume no Stellarium |
 | 🚛 CATCH | osu!catch |
 | Section repeat, judgement stats, sway | SOUND VOLTEX |
-| Auto fine-tune, ghost | beatmania IIDX |
+| Auto fine-tune, ghost; a whiff that does not consume the next note | beatmania IIDX |
+| Dense-run hit matching (a later note becomes hittable once the earlier note's time has passed) | osu!lazer |
+| Wrong colour = MISS | Taiko no Tatsujin |
 | RANDOM / ANTI-ROLL | EZ2ON |
 | 📻 Radio | DJMAX |
 | 📡 Antenna characters (Reimu, Marisa, Cirno, Flandre, Youmu) | Touhou Project (fan-made pixel art; no official assets used) |

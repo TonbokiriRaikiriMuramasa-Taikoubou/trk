@@ -387,6 +387,7 @@ function syncOptionsUI() {
   if (core.$("showMasterDiff")) core.$("showMasterDiff").checked = !!core.settings.showMasterDiff;
   if (core.$("swayAllModes")) core.$("swayAllModes").checked = !!core.settings.swayAllModes;
   if (core.$("escNoReturn")) core.$("escNoReturn").checked = !!core.settings.escNoReturn;
+  if (core.$("judgeOrdered")) core.$("judgeOrdered").checked = !!core.settings.judgeOrdered;
   core.$("rate").value = core.settings.rate;
   core.$("rateVal").textContent = core.settings.rate.toFixed(2) + "x";
   core.$("cover").value = core.settings.cover;
@@ -397,7 +398,7 @@ function syncOptionsUI() {
 function optionsChanged() { core.saveUserPrefs(); syncOptionsUI(); core.emit("options"); }
 [["countdown", "countdown"], ["countdownSE", "countdownSE"], ["resumeCountdown", "resumeCountdown"],
  ["optHidden", "hidden"], ["optSudden", "sudden"], ["optMirror", "modMirror"], ["optRandom", "modRandom"],
- ["swayAllModes", "swayAllModes"], ["escNoReturn", "escNoReturn"]].forEach(([id, key]) => {
+ ["swayAllModes", "swayAllModes"], ["escNoReturn", "escNoReturn"], ["judgeOrdered", "judgeOrdered"]].forEach(([id, key]) => {
   const el = core.$(id);
   if (el) el.addEventListener("change", e => { core.settings[key] = e.target.checked; optionsChanged(); });
 });

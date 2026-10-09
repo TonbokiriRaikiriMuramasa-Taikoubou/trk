@@ -18,6 +18,7 @@ trk/
 │  ├─ core.js                    … 設定・状態・共通処理
 │  ├─ player.js                  … 再生操作・区間リピート
 │  ├─ media.js                   … 読み込み・音声解析・譜面生成
+│  ├─ judge-match.js             … MANUAL の打鍵とノーツの対応づけ（純関数）
 │  ├─ game.js                    … 進行・判定・記録
 │  ├─ render.js                  … 描画
 │  ├─ custom.js                  … ノーツ・スキン作成・パック

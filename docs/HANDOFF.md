@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-09（trk99）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
+> **最終更新：2026-10-09（trk100）**。この文書は、次の作業に必要な現在の設計・権利上の制約・未確認事項をまとめる。利用者向けの説明は [`README.md`](../README.md)、権利・同梱物の詳細は [`NOTICE.md`](../NOTICE.md)、セキュリティの調査記録は [`SECURITY.md`](SECURITY.md) と [`SECURITY-CHECKLIST.md`](SECURITY-CHECKLIST.md) を参照。コードと回帰検査を正とし、古い作業履歴は `git log` で確認する。
 
 ## 1. 作業を再開するとき
 
@@ -49,7 +49,7 @@
 - **📺 TVドックの設定（`js/tv-dock.js`）**：くわしいの中の「📺 TVドック」グループ。チェックは3つ：🧱 壁掛け（スキン `wall` と同じ。外すと映画館に戻る）、↕ 並び替え（テレビとラックの上下）、🔢 5枠化（`tvDockFive`）。既定はすべて OFF（映画館・テレビが上・5枠なし）。くわしいは既定で開いた状態（保存済みの開閉は変えない）。テレビ本体とラックの表示は変えていない。
 - **Loop Lab の映像書き出し（`js/media-player-mode.js` の `exportLoopClip`）**：開発者表示の中だけ。記録した区間の行の 🎬 を押すと、映像と音を区間の長さのぶん録画して保存する（WebM。対応していれば MP4）。設定は持たない。書き出し後は再生位置・再生／停止・速度・ループを元に戻す。曲を切り替えたら途中で止め、保存しない。音声だけの曲は書き出さない。
 - **「📁 開く」と「📤 共有」**（`js/library.js`）：📁 開く は曲を入れるだけで、共有としては覚えない。📤 共有 は共有として覚え、📤 の印が付き、「共有をやめる」でまとめて外せ、「端末に残す」の対象になる。ボタンの下の説明行は `libOpenShareHint`（4言語）。
-- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.9-trk99`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
+- `sw.js` の現在のキャッシュ名は **`trk-v2026.10.9-trk100`**。公開コードを更新するときは変更する。vendor（`assets/vendor/`）を更新したら、`node tools/sw-vendor-pins.mjs --write` で `sw.js` の `VENDOR_PINS` を書き直す（`npm run check` がずれを見つける）。
 
 ## 3. 権利・データ・セキュリティの不変条件
 
@@ -102,9 +102,11 @@ git diff --check
 
 MANUAL の判定の対応づけ：`tests/judge-match.test.mjs`（trk99・26件）。①純関数 `matchManualInput` の場面別（境界、色違い＝MISS、落とし・早すぎる空振り・両手打ちが連鎖しないこと、旧方式では連鎖すること）、②`game.js` の `handleInput` を実ソースから切り出して VM で動かす配線、③実ソースの自動譜面（`longRamp` 上級）にプレイヤーモデルを当てて「±PERFECT で正しく押したのに MISS」が smart で起きないこと、④設定 `judgeOrdered` の配線（初期値・リセット・`index.html`・`main.js`・4言語）。設計と数値は `JUDGE-MATCH.md`。
 
+選曲画面のTVと画面状態：`tests/tv-screen-state.test.mjs`（trk100・8件）。`js/tv-dock.js` の実ソース断片（`screenName`・`menuVideoWanted`／`menuVideoTick`・`liveOn`・`previewOn`）を vm で実行し、ブラウザ標準の `window.screen`（オブジェクト）が在る中でも画面状態を `core.screen` から読むことを検査する。あわせて `check-repo.mjs` が js/core.js 以外の classic script の裸の `screen` 識別子を禁止する（逆テスト確認済み）。
+
 実ブラウザでの終端検査は `tools/smoke-game-end.mjs`（trk98。`SMOKE_CHROME`・`SMOKE_PUPPETEER` を指定して手動で実行。`npm run check` には入れない）。20秒の合成音声を MANUAL と AUTO で最後まで流し、結果画面が出て pageerror が 0 件であることを確かめる。
 
-`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。譜面ハッシュは注入した合成analysisから生成し、実WAVのデコード経路は別にエラー0・ノーツ件数±5%を確認。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-09／trk99）は、Security 56 checks・a11y 8 checks・vendor 8 checks・軽量化 123 assertions は trk95 時点の値、`npm test` は **150件**（trk98で `game-end` の配線検査、trk99で `judge-match` 26件を追加）。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
+`npm run check` は `check-repo`、`check-security.mjs`、`check-a11y.mjs`、`check-vendor.mjs`、`check-mmd-motion-data.mjs`、`check-study-room.mjs`、`check-lite.mjs`、`tests/` の node:test（`idb.test.mjs` を含む）（`npm test`＝`tools/run-tests.mjs`）を実行する。名前空間の棚卸しは `node tools/globals-audit.mjs`（基準 `tests/fixtures/globals-baseline.json`）、実ブラウザのスモークは `tools/smoke-browser.mjs`（Chromium と puppeteer-core を環境変数で指定。`npm run check` には入れない。譜面ハッシュは注入した合成analysisから生成し、実WAVのデコード経路は別にエラー0・ノーツ件数±5%を確認。手順は [`NAMESPACE-PLAN.md`](NAMESPACE-PLAN.md) §2）。依存パッケージは追加不要（Node 22 の `node:test`）。テストは合成曲で譜面生成を検査する（音源は使わない）。現行の目安（2026-10-09／trk100）は、Security 56 checks・a11y 8 checks・vendor 8 checks・軽量化 123 assertions は trk95 時点の値、`npm test` は **158件**（trk98で `game-end` の配線検査、trk99で `judge-match` 26件、trk100で `tv-screen-state` 8件を追加）。a11y の見出し順の許可リストは空（`h1→h3` は 2026-10-08 に解消）。未知の警告は FAIL する。理由・許容条件・外部ツールでの再検査方法は `QUALITY-CHECKS.md` に記録している。
 
 `check-repo.mjs` はJavaScript構文・ローカル参照・ID・設定文言に加え、Arknights公式リンク、Blue Archive 225曲、LoL Sessions 108曲／Phase 1の58件、Gakumas 50件・別名、公式リンクと権利注記、既存プレイリストの所有曲・カスタムフィールド保持を検査する。チェックは意図的な逆テストでもFAILすることを確認してから追加する。外部ツールの起動後DOM検査は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照し、リポジトリ外で行う。
 
@@ -123,6 +125,7 @@ MANUAL の判定の対応づけ：`tests/judge-match.test.mjs`（trk99・26件�
 - **入口の整理（trk71）** — 曲の行の 🎶 が、タッチ（スマホ）と PC で押しやすいか、行の幅を押し出さないか。テレビの「くわしく」を開いた中の ▶ メディアプレーヤーが押せるか。設定「長押しの代わりのボタンを出す」をオフにして、両方が消えるか。
 - **映像の書き出し（Loop Lab・2026-10-08）** — 開発者表示をオンにして区間を記録し、🎬 を押す。Android Chrome と PC で、保存されたファイルが再生でき、音が入っていること。区間の長さのぶん待つ感じ（数分の区間の待ち時間）。終わったあと再生位置が戻ること。対応していない端末では理由が出ること。
 - **📺 TVドックの設定（2026-10-08）** — 既定（くわしいが開いている、3つ OFF、映画館）。壁掛けにするとテレビが壁掛けの見た目になり、外すと映画館に戻ること。並び替えと5枠化の見た目がスマホ幅で崩れないこと。
+- **選曲画面のTVの映像（trk100）** — 何も設定していない状態で、映像つきの曲を選ぶと選曲画面のTV（標準の画面）に映像が動くこと。くわしい →「🖼 確認」タブで映像が動くこと。音のプレビューをOFFにして「🎬 音のプレビューがオフでも、メニューで映像を再生する」をONにすると、TVで映像だけが無音で再生されること。⛶ 最大化とメディアプレーヤーは従来どおり表示されること。設定画面・演奏中・映像フィルター「非表示」ではTVに映像が出ないこと。実ブラウザでは未確認（vm検査と静的ガードのみ）。
 - **「📁 開く／📤 共有」の説明行（項目6）** — スマホ幅で折り返して読めること。
 - **最優先：MMD／VRM** — 実ブラウザでLat式PMDとVRMを読み込み、Consoleにmodule resolution errorがなく、vendorの `three.core.js`／`BufferGeometryUtils.js` が404にならず、モデルが表示されること。
 - **Music／プレイリスト** — タッチ端末で🐔の長押し階層・表示名・並べ替えを確認。Music内で利用者が作った`trk`フォルダを選んで中だけが読み込まれ、再スキャン可能であり、ファイルの新規作成・移動がないこと。公式wishで灰色→所持後に黒い行となり遊べること、`.ogg`と照合メモ／SEARCH LIGHT別名を実ファイルで確認。
@@ -186,7 +189,7 @@ MANUAL の判定の対応づけ：`tests/judge-match.test.mjs`（trk99・26件�
 
 直近の作業だけを残す。trk70〜trk98 の詳しい記録は [`docs/HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) にある。
 
-- **trk97 — Esc長押しで選曲へ戻る**（`js/main.js` の `escHoldStart`、❓謎設定 `escNoReturn` で停止）と、**ランク判定の検査**（`tests/ranked-option.test.mjs`）。詳細はアーカイブ。
 - **trk98 — 曲の終わりで結果画面が出ない回帰を修正**：`game.js` の `runMods` が IIFE 内の `lifeTags` を裸の名前で呼んで ReferenceError になっていた。`window.Trk.modes.lifeTags` として公開し、`tests/game-end.test.mjs` に配線の検査、実ブラウザの終端検査 `tools/smoke-game-end.mjs` を追加。詳細はアーカイブ。
 - **trk99 — 密な連打で横のノーツを巻き込む問題（MANUAL）**：打鍵とノーツの対応づけを `js/judge-match.js`（純関数・`window.Trk.judge`）に切り出し、既定を新方式 `"smart"` にした（§2.3）。❓謎設定「🥁 判定を昔のやり方にする」（`judgeOrdered`、既定オフ、4言語、リセット・Export／Import 対応、`?safe=1` は触らない）で旧方式 `"ordered"` に戻せる。読込順 `js/media.js` → `js/judge-match.js` → `js/game.js`、`tools/check-repo.mjs` の `TRK_REGISTRARS` に `judge`、検査 `tests/judge-match.test.mjs`（26件）、`tests/fixtures/globals-baseline.json` を再生成（trk97〜98 のずれも取り込み）。文書：`JUDGE-MATCH.md`（設計メモ）、`guide/play.md`・`guide/en.md` に「🥁 MANUAL の判定のしくみ」、`guide/credits.md`・`en.md` の着想元に osu!lazer・太鼓・IIDX、`guide/files.md`・`NAMESPACE-PLAN.md` に新ファイル。実機確認は §7。
-- 公開コードを変えたので `sw.js` のキャッシュ名は **`trk-v2026.10.9-trk99`**。
+- **trk100 — 選曲画面のTV（標準画面）に映像が出ない回帰を修正**：`js/tv-dock.js` がアプリの画面状態を裸の名前 `screen` で読んでいた。core.js が `screen` を大域へ出さなくなって（trk70・ブラウザ標準 `window.screen` 優先の利用者決定）から、裸の参照は静かに `window.screen`（オブジェクト）に当たり、`screenName()` が常に `""` を返して、選曲中のTV映像（`liveOn`）・「🖼 確認」タブ（`previewOn`）・メニュー再生（`menuVideoWanted`）がすべて止まっていた。エラーが出ないためスモークの未解決名検査でも検出できず、⛶ 最大化（`video-max.js`）とメディアプレーヤーは別の経路なので表示され続けた（利用者の報告で発覚）。読みを正規アクセサ `core.screen` へ修正し、局所変数も改名した（`tv-dock.js` のTV画面div `screen`→`screenDiv`、`study-room.js` の `screen`→`tvScreen`、`spectrum.js` の `typeof screen` ガード→`core.screen`）。ガード：`check-repo.mjs` に「js/core.js 以外に裸の `screen` 識別子を置かない」検査（逆テスト確認済み）、`tests/tv-screen-state.test.mjs`（8件）。文書：`NAMESPACE-PLAN.md` の screen 行と §5。実機確認は §7。
+- 公開コードを変えたので `sw.js` のキャッシュ名は **`trk-v2026.10.9-trk100`**。

@@ -9,6 +9,7 @@
  */
 import fs from "node:fs";
 import { restoreCoreAlias, sourceOf } from "./lib/js-source.mjs";
+import { classicScriptOrder, stripCode } from "./globals-audit.mjs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import vm from "node:vm";
@@ -1723,6 +1724,33 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   const coreSrc = read("js/core.js");
   if (/defineProperty\(window, "screen"|window\.screen = /.test(coreSrc)) fail("js/core.js sets window.screen (the browser's own screen object must not be replaced)");
   else ok("window.screen is left to the browser (the app state is window.Trk.core.screen only)");
+}
+
+/* trk100 の回帰ガード：画面状態を裸の名前 screen で読まないこと。
+   core.js は screen を大域へ出さないので、他ファイルの裸の screen はブラウザ標準の
+   window.screen（オブジェクト）に静かに当たり、比較が常に false になる（選曲画面のTVの
+   映像・確認タブ・メニュー再生がまとめて止まった trk100 の不具合と同型）。
+   読むときは core.screen（＝window.Trk.core.screen）。局所変数にも screen という名前を
+   使わない（定義元の js/core.js だけが私有の let screen を持てる）。
+   走査は index.html の classic script 順（インライン含む）で、文字列・コメントは除去済み。
+   オブジェクトリテラルの鍵（screen:"#…" など、直後が : のもの）は状態の読み書きではないので許す。 */
+{
+  const offenders = [];
+  /* 生の本文で見る（read() は core.X を元の綴りへ戻すので、core.screen が裸の screen に見えてしまう） */
+  const rawOf = rel => fs.readFileSync(path.join(root, rel), "utf8");
+  for (const unit of classicScriptOrder(rawOf("index.html"))) {
+    if (unit.kind === "file" && unit.name === "js/core.js") continue;   // 定義元（IIFE の私有状態）
+    const stripped = stripCode(unit.kind === "file" ? rawOf(unit.name) : unit.body);
+    const re = /(^|[^.\w$])screen(?![\w$])/g;
+    let m;
+    while ((m = re.exec(stripped))) {
+      if (/^\s*:/.test(stripped.slice(m.index + m[0].length))) continue;   // オブジェクトリテラルの鍵
+      const line = stripped.slice(0, m.index).split("\n").length;
+      offenders.push(`${unit.name}:${line}`);
+    }
+  }
+  if (offenders.length) fail(`bare \`screen\` reads the browser's window.screen, not the app state (use core.screen): ${offenders.join(", ")}`);
+  else ok("no bare `screen` identifier outside js/core.js (the app screen state is read via core.screen only)");
 }
 
 /* アドオンの api（js/addons.js の makeApi）の鍵は、docs/ADDONS.md に `api.<鍵>` として載っていること。

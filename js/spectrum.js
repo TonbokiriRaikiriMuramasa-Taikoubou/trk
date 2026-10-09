@@ -1162,7 +1162,7 @@ const isSafe = () => core.safeModeOn === true || (typeof window.TrkSafeMode === 
 /* 🪶 軽量化モード中は、音を見るアナライザーも描画も止める（設定の liteSpectrumOff で戻せます） */
 const liteOff = () => typeof TrkLite === "object" && TrkLite.specBlocked();
 const specLive = () => core.settings.specOn && !isSafe() && !liteOff();
-function onSelectScreen() { return (typeof screen === "undefined" ? "" : core.screen) === "select"; }
+function onSelectScreen() { return (typeof core.screen === "string" ? core.screen : "") === "select"; }
 function seeable(n) { return !!n && n.isConnected && n.clientWidth > 0 && n.clientHeight > 0 && !document.hidden; }
 function drawable(n) { return seeable(n) && (!GATES.has(n) || GATES.get(n)()); }
 function panelOn() { return panelCanvases.some(drawable); }

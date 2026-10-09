@@ -1,9 +1,15 @@
 # trk! 開発履歴アーカイブ（HANDOFF §11 の旧記録）
 
-> `docs/HANDOFF.md` から移した、trk70〜trk96 までの作業記録の全文です。現在の状態・未確認事項は HANDOFF.md が正です。このアーカイブは履歴として残し、新しい作業は HANDOFF.md の §11 に短く書きます。
+> `docs/HANDOFF.md` から移した、trk70〜trk98 までの作業記録の全文です。現在の状態・未確認事項は HANDOFF.md が正です。このアーカイブは履歴として残し、新しい作業は HANDOFF.md の §11 に短く書きます。
 
 ## 旧 §11 最近の変更
 
+### trk97〜trk98 の記録（2026-10-09。trk99 のときに HANDOFF §11 から移動）
+
+- **trk97 — Esc長押しで選曲へ戻る**：プレイ中・一時停止中・リザルトで Esc を約1秒押すと、確認なしで選曲画面へ戻る（`js/main.js` の `escHoldStart`）。短押しは従来どおり。❓謎設定の「Esc長押しで曲選択画面に戻らない」（`escNoReturn`、既定オフ＝戻る）で止められる。合成キー（パッドの戻る）と、書斎などの開いている間は対象外。検査は `tests/esc-hold.test.mjs`。
+- **trk97 — ランク判定の検査**：ゆるめ判定・1.00x未満は練習扱い（プレイ回数は増えるがハイスコアは更新しない）、きびしめ・1.05x以上は記録対象、AUTO は記録しない、を実ソースの `recordPlay` で確かめる（`tests/ranked-option.test.mjs`）。ヘッドレスのブラウザは環境になく、画面上での確認は §7 に残す。
+- **trk98 — 曲の終わりで結果画面が出ない不具合（回帰）を修正**：`game.js` の `runMods` が、IIFE の中にある `lifeTags` を裸の名前で呼んでいたため ReferenceError になり、`phase` だけ `ended` になって結果画面が空のままだった（trk95・96 の修正は正しく、その後の名前の整理で `lifeTags` が公開されなくなった）。`js/modes.js` で `window.Trk.modes.lifeTags` として公開し、`game.js` はそれを呼ぶ。既存の検査はスタブで `runMods` を置き換えていたため見逃していた。検査：`tests/game-end.test.mjs` に配線の検査を追加。実ブラウザの検査として `tools/smoke-game-end.mjs`（下記）を追加。
+- **trk98 — 実ブラウザの終端検査**：`SMOKE_CHROME=… SMOKE_PUPPETEER=… node tools/smoke-game-end.mjs` で、20秒の合成音声を MANUAL と AUTO の両方で最後まで流し、結果画面の表示と pageerror 0 を確かめる。`npm run check` には入れない。
 
 ### 作業要約（2026-10-09時点・trk75〜97）
 

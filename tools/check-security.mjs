@@ -404,15 +404,27 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   rule(swGuards, "the service worker caches only same-origin, basic, GET responses");
 
   const swSafe = sw.includes("const safeClients") && sw.includes("function safeWanted") &&
-    sw.includes('params.has("safe")') && sw.includes("if (safeClient)") &&
+    sw.includes('params.has("safe")') && sw.includes('String(url.hash || "").toLowerCase().includes("safe")') && sw.includes("if (safeClient)") &&
+    /const safeClient = safeClients\.has\(event\.clientId\) \|\| \(request\.mode === "navigate" && safeWanted\(url\)\);/.test(sw) &&
     sw.indexOf("safeClients.add") < sw.indexOf("caches.match");
   rule(swSafe, "the service worker never serves cached copies to a ?safe=1 client (no cache poisoning bypass)");
+  const safeSmoke = read("tools/smoke-browser.mjs");
+  const offlineSafeRegression = safeSmoke.includes('path:"/index.html?safe=1"') && safeSmoke.includes('path:"/?safe=1"') &&
+    safeSmoke.includes('path:"/#safe"') && safeSmoke.includes('"POISONED-SHELL"') &&
+    safeSmoke.includes("await closeServer(server)") && safeSmoke.includes("status === 503") &&
+    safeSmoke.includes("window.__trkSmokePoisonRan");
+  rule(offlineSafeRegression, "the browser smoke seeds a poisoned app shell, stops HTTP, and checks safe query/hash navigations for a 503");
 
   const media = js["js/media.js"], library = js["js/library.js"];
-  rule(media.includes("const ANALYZE_MAX = 96 * 1024 * 1024") && media.includes("const ANALYZE_MAX_SEC = 20 * 60") &&
-    media.includes("video.duration > ANALYZE_MAX_SEC") && media.includes('tooLong ? "analysisSkippedLong"') && media.includes('tooBig ? "analysisSkipped"') &&
-    !/file\.arrayBuffer\(\)[^\n]*\n[^\n]*ANALYZE/ .test(media),
-    "huge media is never read into memory: audio analysis is skipped above ANALYZE_MAX (96MB file) or ANALYZE_MAX_SEC (20 min, decoded PCM size)");
+  const analysisCaps = media.includes("const ANALYZE_MAX = 96 * 1024 * 1024") &&
+    media.includes("const ANALYZE_MAX_SEC = 20 * 60") && media.includes("const ANALYZE_LITE_MAX_SEC = 10 * 60") &&
+    media.includes("video.duration > (liteActive ? ANALYZE_LITE_MAX_SEC : ANALYZE_MAX_SEC)") &&
+    media.includes('liteLong ? "analysisSkippedLiteLong"') && media.includes('tooLong ? "analysisSkippedLong"') &&
+    media.includes('tooBig ? "analysisSkipped"') &&
+    (read("js/i18n.js").match(/\banalysisSkippedLiteLong:/g) || []).length === 4 &&
+    !/file\.arrayBuffer\(\)[^\n]*\n[^\n]*ANALYZE/ .test(media);
+  rule(analysisCaps,
+    "audio analysis keeps the 96 MiB file cap and 20-minute normal cap, with a distinct 10-minute lite cap and localized skip reason");
   const chartCap = media.includes("const CHART_FILE_MAX = 2 * 1024 * 1024") &&
     media.includes("file.size > CHART_FILE_MAX") && media.indexOf("file.size > CHART_FILE_MAX") < media.indexOf("file.text()") &&
     media.includes("!Number.isFinite(file.size)") && media.includes('typeof time === "number"') && media.includes('typeof lane === "number"') &&

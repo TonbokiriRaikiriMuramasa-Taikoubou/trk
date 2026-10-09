@@ -6,7 +6,7 @@
   - **OWASP Top 10 Client-Side Security Risks**（ブラウザ側コード向け・OWASP プロジェクト）<https://owasp.org/projects/top-10-client-side-security-risks>
   - **CWE Top 25 Most Dangerous Software Weaknesses（2025）**（MITRE）<https://cwe.mitre.org/top25/>
   - 補助：OWASP Top 10（2021）の項目名（該当する物だけ）
-- 確認の方法：`npm run check`（`tools/check-security.mjs` **55項目**＋同梱ライブラリ検証8項目ほか）／`npm run check:vendor:npm`（npm上流との照合）／jsdom の動的テスト（リポジトリ外の検証用ハーネス）／手動の実機確認
+- 確認の方法：`npm run check`（`tools/check-security.mjs` **56項目**＋同梱ライブラリ検証8項目ほか）／`npm run check:vendor:npm`（npm上流との照合）／jsdom の動的テスト（リポジトリ外の検証用ハーネス）／手動の実機確認
 - 凡例：✅ 確認済み・🟡 仕様として残した（理由あり）・🔶 未実施の推奨・➖ このアプリには当てはまらない
 
 ---
@@ -37,7 +37,7 @@
 | 502 | Deserialization of Untrusted Data | ✅ | 扱うのは JSON と ZIP のみ。形式ごとの検証（`sanitizeManifest`／`plSanitizeShared`／`validateChartData`／`sanitizeTvDef`／`sanitizeSkinDef`／`studyBookClean`）と、設定インポートの**プロトタイプ汚染よけ**（`__proto__` 等をスキップ・自分のキーだけ） |
 | 20 | Improper Input Validation | ✅ | 数値は範囲・件数は上限・URLは https のみ・URL／ImportのTVスタイルとスキンは許可リスト・譜面ノート時刻／レーンはJSON numberのみ・色は `#rrggbb` のみ・ノート色/形は許可リスト。設定Importはトップレベルobject・own key・値の形を確認し、難易度／Spectrum style・theme／MMD motion／FX presetも代入前に実在IDを検証。スキン・MMD・FX・Spectrumの該当辞書はown-property／null-prototype参照。スキンJSONは256KiBで読込前に制限。上限値は `LIB_MAX`／`SHARED_MAX`／`PACK_LIMIT`／`STUDY_*`／プレイリスト24件など |
 | 200 | Exposure of Sensitive Information | ✅ | 外部に送るものは無い（A-3）。`privacy.html` に「送っていません」と明記し、実装の grep と一致することを確認 |
-| 770 | Allocation of Resources Without Limits | ✅ | `.stpack` は**展開しながら数えて上限で中止**（単体500MiB・保存済み合計1GiB・ブラウザquota事前確認と失敗案内）、**96MiB超、または20分超のメディアは音声解析をしない**（`ANALYZE_MAX`・`ANALYZE_MAX_SEC`。デコード後のPCMは長さに比例するため長さでも判定）、単体譜面JSON／緊急設定Importは2MiB、アドオン入力ファイルは4MiB（コード512KiB／件）、カスタムスキンJSONは256KiB、ノート5万件・曲1000件・曲名/タグに長さ上限、書斎も曲数/ファイル上限あり |
+| 770 | Allocation of Resources Without Limits | ✅ | `.stpack` は**展開しながら数えて上限で中止**（単体500MiB・保存済み合計1GiB・ブラウザquota事前確認と失敗案内）、音声解析は96MiB超で省略し、長さは通常20分／軽量化ON10分（`ANALYZE_MAX`・`ANALYZE_MAX_SEC`・`ANALYZE_LITE_MAX_SEC`。デコード後のPCMは長さに比例する）。`tests/media-analysis-limit.test.mjs` は `loadMedia()` の境界と軽量化設定の独立を検査。単体譜面JSON／緊急設定Importは2MiB、アドオン入力ファイルは4MiB（コード512KiB／件）、カスタムスキンJSONは256KiB、ノート5万件・曲1000件・曲名/タグに長さ上限、書斎も曲数/ファイル上限あり |
 | 918 | SSRF | ➖ | サーバがありません（ユーザーが入力したURLをサーバ側で取りに行く処理は無し）。外部URLは `safeLink` ＋確認ダイアログのうえ**開くだけ** |
 | 89 / 352 / 862 / 863 / 284 / 306 / 639 | SQLi・CSRF・認可まわり | ➖ | サーバ・アカウント・セッションが無いため対象外（ローカル完結）。「認可」に相当するのは A-1 のクライアント側アクセス制御 |
 | 787 / 125 / 416 / 120 / 121 / 122 / 476 | メモリ破壊・解放後使用など | ➖ | JSエンジン側の領域（trk! のコードでは扱いません） |

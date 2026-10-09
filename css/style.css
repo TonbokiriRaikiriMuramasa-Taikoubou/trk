@@ -30,7 +30,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:
 button,input,select,textarea{font:inherit;color:inherit}
 
 /* ===== 3. ステージ（1920×1080 を画面に合わせて縮小） ===== */
-#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform:translate(-50%,-50%);
+#stage{position:fixed;left:50%;top:50%;width:1920px;height:1080px;transform:translate(-50%,-50%);
   overflow:hidden;background:var(--stage-bg);user-select:none;-webkit-user-select:none}
 #view,#fx{position:absolute;inset:0;width:1920px;height:1080px}
 #fx{z-index:3;pointer-events:none}
@@ -94,7 +94,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* ===== 5. ボタン・入力 ===== */
 button{padding:11px 20px;border-radius:999px;border:1px solid var(--ui-border);background:var(--ui-button);color:var(--ui-text);
   font-size:17px;font-weight:750;cursor:pointer;transition:color .15s,border-color .15s,background .15s,transform .1s}
-button:hover{background:var(--ui-button-hover);border-color:var(--ui-accent);color:var(--ui-accent)}
+button:hover{background:var(--ui-button-hover);border-color:var(--ui-accent);color:var(--ui-text)}
 button:active{transform:scale(.97)}
 button:disabled{opacity:.4;cursor:default;transform:none}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--ui-accent);outline-offset:3px}
@@ -150,7 +150,7 @@ input[type=color]{width:52px;height:34px;padding:2px;border:1px solid var(--ui-b
 .guideStep{display:flex;flex-direction:column;gap:4px;padding:10px;border:1px solid var(--ui-border);border-radius:12px;background:rgba(0,0,0,.12);font-size:13px;line-height:1.45}
 .guideStep b{color:var(--ui-text);font-size:14px}.guideStep span{color:var(--ui-muted)}
 /* 🧭 チュートリアルのスタンプラリー（試した瞬間にスタンプが押される） */
-.guideProgress{font-size:12px;opacity:.75;font-weight:600}
+.guideProgress{font-size:12px;color:var(--ui-muted);font-weight:600}
 .guideStep{position:relative}
 .guideStep .guideStamp{position:absolute;top:9px;right:10px;width:20px;height:20px;border:1.5px solid var(--ui-border);border-radius:50%;pointer-events:none}
 .guideStep.stamped{border-color:var(--ui-gold);background:rgba(255,209,102,.07)}
@@ -209,7 +209,7 @@ details.panel[open]>summary{margin-bottom:14px}
 .fileBtn{display:inline-flex;align-items:center;gap:6px;padding:12px 20px;border-radius:999px;cursor:pointer;font-weight:800;
   background:var(--ui-accent);color:var(--ui-on-accent);white-space:nowrap}
 .fileBtn.small{padding:8px 14px;font-size:15px;background:var(--ui-button);color:var(--ui-text);border:1px solid var(--ui-border)}
-.fileBtn.small:hover{border-color:var(--ui-accent);color:var(--ui-accent)}
+.fileBtn.small:hover{border-color:var(--ui-accent);color:var(--ui-text)}
 .fileBtn.disabled{opacity:.45;cursor:not-allowed}
 .hint{color:var(--ui-muted);font-size:14px;margin:6px 0;line-height:1.5}
 .status{color:var(--ui-gold);font-weight:700}
@@ -248,7 +248,7 @@ details.panel[open]>summary{margin-bottom:14px}
 #libList{display:flex;flex-direction:column;gap:5px;margin-top:10px;height:640px;overflow:auto;padding-right:4px}
 .libRow{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;padding:11px 16px;border-radius:12px;
   text-align:left;font-size:17px;border-left:5px solid transparent}
-.libRow.cur{border-color:var(--ui-accent);color:var(--ui-accent);background:var(--ui-button-hover)}
+.libRow.cur{border-color:var(--ui-accent);color:var(--ui-text);background:var(--ui-button-hover)}
 .libRow.src-pack{border-left-color:var(--ui-gold)}
 .libRow.src-file{border-left-color:var(--ka)}
 .libLeft{min-width:0;display:flex;flex-direction:column}
@@ -447,7 +447,7 @@ body.trkNoMascot #vrmCanvas,body.trkNoMascot #vrmPreview{display:none!important}
 #speedPanel .libHead b{color:var(--ui-gold);font-size:20px}
 /* シードを探す道具・小さいボタンの並び */
 .miniActions .hint{margin:0}
-.miniActions button.selected{border-color:var(--ui-accent);color:var(--ui-accent)}
+.miniActions button.selected{border-color:var(--ui-accent);color:var(--ui-text)}
 /* 🔁 区間リピート：再生バーの上に範囲を表示（player.js が --ab-a / --ab-b を設定） */
 #seekBar.ab{background:linear-gradient(90deg,transparent var(--ab-a),rgba(255,209,102,.35) var(--ab-a),rgba(255,209,102,.35) var(--ab-b),transparent var(--ab-b));border-radius:999px}
 /* 🎯 オフセット測定のタップボタン（extras.js） */

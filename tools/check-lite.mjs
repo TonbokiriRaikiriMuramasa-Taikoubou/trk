@@ -174,6 +174,13 @@ for (const key of ["liteDecor", "liteLibRows", "liteNoAnalyze", "liteMascotNoLoa
   assert.ok(core.includes(`${key}: `), `js/core.js has a default for settings.${key}`);
   assert.equal((i18n.match(new RegExp("\\b" + key + ":", "g")) || []).length, 4, `settings.${key} label exists in four languages`);
 }
+const mediaSource = read("js/media.js");
+truthy(mediaSource.includes("const ANALYZE_LITE_MAX_SEC = 10 * 60") &&
+  mediaSource.includes("liteActive ? ANALYZE_LITE_MAX_SEC : ANALYZE_MAX_SEC") &&
+  mediaSource.includes('liteLong ? "analysisSkippedLiteLong"'), "light mode uses a separate 10-minute analysis cap and status");
+checks++;
+assert.equal((i18n.match(/\banalysisSkippedLiteLong:/g) || []).length, 4,
+  "the light-mode 10-minute skip reason exists in four languages");
 truthy(core.includes('liteLibRows: ["device", "150", "60"]'), "LITE_ENUM_VALUES lists the row choices");
 truthy(core.includes('"liteMode", "liteFps", "liteMascot", "liteScale", "liteLibRows", "trkTabName"'),
   "the emergency settings import validates liteLibRows too");

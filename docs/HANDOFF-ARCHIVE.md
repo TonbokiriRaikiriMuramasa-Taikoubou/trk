@@ -1,6 +1,6 @@
 # trk! 開発履歴アーカイブ（HANDOFF §11 の旧記録）
 
-> `docs/HANDOFF.md` から移した、trk70〜trk98 までの作業記録の全文です。現在の状態・未確認事項は HANDOFF.md が正です。このアーカイブは履歴として残し、新しい作業は HANDOFF.md の §11 に短く書きます。
+> `docs/HANDOFF.md` から移した、trk70〜trk99 までの作業記録の全文です。現在の状態・未確認事項は HANDOFF.md が正です。このアーカイブは履歴として残し、新しい作業は HANDOFF.md の §11 に短く書きます。
 
 ## 旧 §11 最近の変更
 
@@ -10,6 +10,10 @@
 - **trk97 — ランク判定の検査**：ゆるめ判定・1.00x未満は練習扱い（プレイ回数は増えるがハイスコアは更新しない）、きびしめ・1.05x以上は記録対象、AUTO は記録しない、を実ソースの `recordPlay` で確かめる（`tests/ranked-option.test.mjs`）。ヘッドレスのブラウザは環境になく、画面上での確認は §7 に残す。
 - **trk98 — 曲の終わりで結果画面が出ない不具合（回帰）を修正**：`game.js` の `runMods` が、IIFE の中にある `lifeTags` を裸の名前で呼んでいたため ReferenceError になり、`phase` だけ `ended` になって結果画面が空のままだった（trk95・96 の修正は正しく、その後の名前の整理で `lifeTags` が公開されなくなった）。`js/modes.js` で `window.Trk.modes.lifeTags` として公開し、`game.js` はそれを呼ぶ。既存の検査はスタブで `runMods` を置き換えていたため見逃していた。検査：`tests/game-end.test.mjs` に配線の検査を追加。実ブラウザの検査として `tools/smoke-game-end.mjs`（下記）を追加。
 - **trk98 — 実ブラウザの終端検査**：`SMOKE_CHROME=… SMOKE_PUPPETEER=… node tools/smoke-game-end.mjs` で、20秒の合成音声を MANUAL と AUTO の両方で最後まで流し、結果画面の表示と pageerror 0 を確かめる。`npm run check` には入れない。
+
+### trk99 の記録（2026-10-09。trk100 のときに HANDOFF §11 から移動）
+
+- **trk99 — 密な連打で横のノーツを巻き込む問題（MANUAL）**：打鍵とノーツの対応づけを `js/judge-match.js`（純関数・`window.Trk.judge`）に切り出し、既定を新方式 `"smart"` にした（HANDOFF §2.3）。❓謎設定「🥁 判定を昔のやり方にする」（`judgeOrdered`、既定オフ、4言語、リセット・Export／Import 対応、`?safe=1` は触らない）で旧方式 `"ordered"` に戻せる。読込順 `js/media.js` → `js/judge-match.js` → `js/game.js`、`tools/check-repo.mjs` の `TRK_REGISTRARS` に `judge`、検査 `tests/judge-match.test.mjs`（26件）、`tests/fixtures/globals-baseline.json` を再生成（trk97〜98 のずれも取り込み）。文書：`JUDGE-MATCH.md`（設計メモ）、`guide/play.md`・`guide/en.md` に「🥁 MANUAL の判定のしくみ」、`guide/credits.md`・`en.md` の着想元に osu!lazer・太鼓・IIDX、`guide/files.md`・`NAMESPACE-PLAN.md` に新ファイル。実機確認は HANDOFF §7。
 
 ### 作業要約（2026-10-09時点・trk75〜97）
 

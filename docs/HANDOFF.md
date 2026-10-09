@@ -187,9 +187,9 @@ MANUAL の判定の対応づけ：`tests/judge-match.test.mjs`（trk99・26件�
 
 ## 11. 最近の変更
 
-直近の作業だけを残す。trk70〜trk98 の詳しい記録は [`docs/HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) にある。
+直近の作業だけを残す。trk70〜trk99 の詳しい記録は [`docs/HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) にある。
 
 - **trk98 — 曲の終わりで結果画面が出ない回帰を修正**：`game.js` の `runMods` が IIFE 内の `lifeTags` を裸の名前で呼んで ReferenceError になっていた。`window.Trk.modes.lifeTags` として公開し、`tests/game-end.test.mjs` に配線の検査、実ブラウザの終端検査 `tools/smoke-game-end.mjs` を追加。詳細はアーカイブ。
-- **trk99 — 密な連打で横のノーツを巻き込む問題（MANUAL）**：打鍵とノーツの対応づけを `js/judge-match.js`（純関数・`window.Trk.judge`）に切り出し、既定を新方式 `"smart"` にした（§2.3）。❓謎設定「🥁 判定を昔のやり方にする」（`judgeOrdered`、既定オフ、4言語、リセット・Export／Import 対応、`?safe=1` は触らない）で旧方式 `"ordered"` に戻せる。読込順 `js/media.js` → `js/judge-match.js` → `js/game.js`、`tools/check-repo.mjs` の `TRK_REGISTRARS` に `judge`、検査 `tests/judge-match.test.mjs`（26件）、`tests/fixtures/globals-baseline.json` を再生成（trk97〜98 のずれも取り込み）。文書：`JUDGE-MATCH.md`（設計メモ）、`guide/play.md`・`guide/en.md` に「🥁 MANUAL の判定のしくみ」、`guide/credits.md`・`en.md` の着想元に osu!lazer・太鼓・IIDX、`guide/files.md`・`NAMESPACE-PLAN.md` に新ファイル。実機確認は §7。
+- **trk99 — 密な連打で横のノーツを巻き込む問題（MANUAL）**：打鍵とノーツの対応づけを純関数 `js/judge-match.js`（`window.Trk.judge`）に切り出し、既定を新方式 `"smart"` に。❓謎設定 `judgeOrdered`（既定オフ）で旧方式へ戻せる。検査は `tests/judge-match.test.mjs`（26件）。詳細はアーカイブ。
 - **trk100 — 選曲画面のTV（標準画面）に映像が出ない回帰を修正**：`js/tv-dock.js` がアプリの画面状態を裸の名前 `screen` で読んでいた。core.js が `screen` を大域へ出さなくなって（trk70・ブラウザ標準 `window.screen` 優先の利用者決定）から、裸の参照は静かに `window.screen`（オブジェクト）に当たり、`screenName()` が常に `""` を返して、選曲中のTV映像（`liveOn`）・「🖼 確認」タブ（`previewOn`）・メニュー再生（`menuVideoWanted`）がすべて止まっていた。エラーが出ないためスモークの未解決名検査でも検出できず、⛶ 最大化（`video-max.js`）とメディアプレーヤーは別の経路なので表示され続けた（利用者の報告で発覚）。読みを正規アクセサ `core.screen` へ修正し、局所変数も改名した（`tv-dock.js` のTV画面div `screen`→`screenDiv`、`study-room.js` の `screen`→`tvScreen`、`spectrum.js` の `typeof screen` ガード→`core.screen`）。ガード：`check-repo.mjs` に「js/core.js 以外に裸の `screen` 識別子を置かない」検査（逆テスト確認済み）、`tests/tv-screen-state.test.mjs`（8件）。文書：`NAMESPACE-PLAN.md` の screen 行と §5。実機確認は §7。
 - 公開コードを変えたので `sw.js` のキャッシュ名は **`trk-v2026.10.9-trk100`**。

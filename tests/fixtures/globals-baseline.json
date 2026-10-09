@@ -1,11 +1,11 @@
 {
  "totals": {
-  "scripts": 45,
+  "scripts": 46,
   "windowProps": 283,
   "duplicates": 0,
-  "declarations": 1189,
-  "private": 1009,
-  "public": 180,
+  "declarations": 1203,
+  "private": 1021,
+  "public": 182,
   "globalNames": 288
  },
  "files": [
@@ -60,7 +60,7 @@
   {
    "file": "js/core.js",
    "decls": 162,
-   "private": 120,
+   "private": 119,
    "public": [
     "$",
     "TRK_ENUM_VALUES",
@@ -83,6 +83,7 @@
     "fontFamily",
     "fx",
     "loadToken",
+    "nextIdx",
     "num",
     "on",
     "openSettings",
@@ -109,8 +110,9 @@
   {
    "file": "js/lite.js",
    "decls": 42,
-   "private": 38,
+   "private": 37,
    "public": [
+    "liteActive",
     "liteLibRows",
     "liteMascotNoLoad",
     "liteNoAnalyze",
@@ -125,14 +127,14 @@
   },
   {
    "file": "js/chart-gen.js",
-   "decls": 21,
-   "private": 21,
+   "decls": 20,
+   "private": 20,
    "public": []
   },
   {
    "file": "js/media.js",
-   "decls": 36,
-   "private": 30,
+   "decls": 37,
+   "private": 31,
    "public": [
     "applyChartData",
     "audioCtx",
@@ -143,9 +145,15 @@
    ]
   },
   {
+   "file": "js/judge-match.js",
+   "decls": 4,
+   "private": 4,
+   "public": []
+  },
+  {
    "file": "js/game.js",
-   "decls": 62,
-   "private": 35,
+   "decls": 68,
+   "private": 41,
    "public": [
     "PLAY_KEYS",
     "autoPlay",
@@ -406,8 +414,8 @@
   },
   {
    "file": "js/main.js",
-   "decls": 41,
-   "private": 37,
+   "decls": 45,
+   "private": 41,
    "public": [
     "RESERVED",
     "idleTimer",
@@ -742,8 +750,10 @@
     "js/lite.js",
     "js/chart-gen.js",
     "js/media.js",
+    "js/judge-match.js",
     "js/render.js",
     "js/custom.js",
+    "js/modes.js",
     "js/catch.js",
     "js/library.js",
     "js/main.js",
@@ -755,7 +765,6 @@
     "js/player.js",
     "js/game.js",
     "js/truck.js",
-    "js/modes.js",
     "js/stage.js",
     "js/stagefx.js",
     "js/extras.js",

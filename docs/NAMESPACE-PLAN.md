@@ -131,6 +131,7 @@ node tools/smoke-browser.mjs --compare
 | 領域 | 登録元 | 登録（window.Trk.領域） | 書き換え（件数） | sw.js | 結果 |
 |---|---|---|---|---|---|
 | chart | `js/chart-gen.js` | `buildChartNotes`・`cgEstimateLevel`・`cgAllocate`（値のコピー） | 2（`js/media.js`） | trk57 | 登録検査は、登録の無い HEAD で失敗（確認）→ 適用後に通る。1 名だけ抜いた逆テストで失敗（確認）。スモーク OK（未解決 0・譜面 10 件一致） |
+| judge | `js/judge-match.js` | `JUDGE_POLICIES`・`JUDGE_POLICY_DEFAULT`・`matchManualInput`（新規ファイル。旧名 `window.X` は作らない） | 1（`js/game.js`） | trk99 | 登録検査（`TRK_REGISTRARS`）。純関数なので `tests/judge-match.test.mjs` が VM で直接検査 |
 | pad | `js/pad.js` | `padBack`・`updatePadUI`（値のコピー） | 0 | trk58 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
 | lite | `js/lite.js` | `liteLibRows`・`liteNoAnalyze`・`liteMascotNoLoad`・`liteSyncUI`（値のコピー） | 0 | trk59 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。スモーク OK |
 | main | `js/main.js` | `RESERVED`・`packsReady`・`poke`・`showFxPower`・`syncOptionsUI`（値のコピー）・`idleTimer`（アクセサ） | 4 | trk60 | 登録検査（失敗→適用後に通る）。1 名抜いた逆テストで失敗（確認）。書き換えは speed.js 3・vrm.js 1。スモーク OK |

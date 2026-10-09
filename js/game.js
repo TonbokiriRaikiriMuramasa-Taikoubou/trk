@@ -338,6 +338,7 @@ function orbitInput(ts) {
   if (d < -w.good) { judgeNote(n, "miss", d); return; }
   judgeNote(n, Math.abs(d) <= w.perfect ? "perfect" : "good", d);
 }
+const judgePolicy = () => core.settings.judgeOrdered ? "ordered" : window.Trk.judge.JUDGE_POLICY_DEFAULT;   // MANUALの判定の割り当て方
 function handleInput(lane, ts) {
   if (core.phase !== "playing" || core.settings.autoPlay) return;            // AUTO中は見るだけ
   const mode = core.settings.playMode;
@@ -348,17 +349,11 @@ function handleInput(lane, ts) {
   const now = gameTime(at);
   window.Trk.media.playSE(lane);
   core.pressFlash[core.laneCol(lane)] = p; core.pressH = { lane, t:p };
-  const w = core.windows();
-  for (let i = core.nextIdx; i < core.chart.length; i++) {
-    const n = core.chart[i]; if (n.judged) continue;
-    const d = now - n.time;
-    if (d < -w.good) break;
-    if (Math.abs(d) <= w.good) {
-      if (n.lane !== lane) judgeNote(n, "miss", d);
-      else judgeNote(n, Math.abs(d) <= w.perfect ? "perfect" : "good", d);
-      return;
-    }
-  }
+  /* どのノーツに当てるかは js/judge-match.js（純関数）。既定は "smart"（同じ色を時刻順に探し、前の色違いノーツの
+     時刻を過ぎていれば飛ばして叩ける。色違いの打鍵は早すぎなければ太鼓と同じく MISS）。
+     ❓謎設定「判定を昔のやり方にする」（judgeOrdered）で旧方式 "ordered" に戻せる（trk99） */
+  const m = window.Trk.judge.matchManualInput(core.chart, core.nextIdx, lane, now, core.windows(), judgePolicy());
+  if (m) judgeNote(core.chart[m.idx], m.kind, m.delta);
 }
 /* AUTO：どのモードでも、ちょうどのタイミングでPERFECT。モードに合わせて光らせる */
 function autoVisual(n, i, p) {

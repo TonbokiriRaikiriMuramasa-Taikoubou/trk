@@ -826,6 +826,97 @@ if (!exists("js/fx-worklet.js") ||
   else ok("Blue Archive OST Vol.1–8: 225 ordered Apple Music-linked tracks, NexTone per-volume guides, safe existing-playlist refresh");
 }
 
+// 🛰️ Arknights: Endfield — Zeroth Directive OST Vol.1–2: official order, Spotify track links,
+// verified Chinese official titles as match aliases, ffm.to smart-link album sources, cautious rights notes,
+// and a safe refresh of the old four-part 初号指令 playlist import.
+{
+  const catalogSource = read("js/catalog.js");
+  const library = read("js/library.js");
+  let catalogDataOk = false;
+  let safeRefreshOk = false;
+  try {
+    const fixture = JSON.parse(read("tools/endfield-zeroth-directive-tracklist.json"));
+    const catalogContext = vm.createContext({});
+    new vm.Script(catalogSource + "\nglobalThis.__TRK_CATALOG_FOR_CHECK = TRK_CATALOG;").runInContext(catalogContext);
+    const series = catalogContext.__TRK_CATALOG_FOR_CHECK.find(item => item.id === "endfield");
+    let trackTotal = 0;
+    const spotifyIds = [];
+    let albumsMatch = !!series && series.url === fixture.sources.officialSiteJa;
+    for (const expected of fixture.albums) {
+      const actual = series && series.playlists.find(pl => pl.id === expected.id);
+      if (!actual || actual.name !== expected.name || actual.songs.length !== expected.tracks.length ||
+          actual.sourceUrl !== expected.ffmToUrl || actual.sourceLabel !== "公式配信リンク（ffm.to）") { albumsMatch = false; continue; }
+      for (let i = 0; i < expected.tracks.length; i++) {
+        const [title, artist, spotifyId, cnTitle] = expected.tracks[i];
+        const track = actual.songs[i];
+        trackTotal++;
+        spotifyIds.push(spotifyId);
+        if (!track || track.t !== title || track.ar !== artist || track.al !== expected.album ||
+            track.u !== "https://open.spotify.com/track/" + spotifyId ||
+            JSON.stringify(track.matchAliases || []) !== JSON.stringify([cnTitle])) albumsMatch = false;
+      }
+    }
+    const characterOstsKept = !!series && [["ef-blurring", 2], ["ef-ashen", 2], ["ef-floaty", 2], ["ef-makers", 1], ["ef-signal", 5]]
+      .every(([id, count]) => {
+        const pl = series.playlists.find(item => item.id === id);
+        return !!pl && pl.songs.length === count;
+      });
+    const rightsOk = !!series && series.note.includes("音源は同梱せず") &&
+      series.note.includes("二次利用許諾ではありません") &&
+      series.note.includes(fixture.sources.fanContentGuidelinesJa) &&
+      series.note.includes("ffm.to") &&
+      fixture.sources.jpAnnouncement === "https://x.com/AKEndfieldJP/status/2022928866638205084" &&
+      fixture.albums.every(album => album.releaseDate === "2026-02-15" && album.trackCount === album.tracks.length);
+    catalogDataOk = albumsMatch && characterOstsKept && rightsOk && trackTotal === 60 &&
+      new Set(spotifyIds).size === 60 &&
+      JSON.stringify(fixture.albums.map(album => album.tracks.length)) === JSON.stringify([37, 23]);
+
+    const ensureStart = library.indexOf("function trkCatalogGuide(");
+    const ensureEnd = library.indexOf("\n(function plTighten()", ensureStart);
+    if (ensureStart >= 0 && ensureEnd > ensureStart) {
+      const defaultImported = { id:"trk-ef-firstorder", cat:"trk:endfield:ef-firstorder", name:"Endfield — 初号指令 OST", icon:"📜",
+        tags:["Game","Endfield","Metal Scar Radio","First Order"], wish:[{t:"obsolete", al:"", ar:"", u:""}],
+        songs:["owned-endfield-track"], guide:{note:"old guide", url:"https://example.com/old"} };
+      const customImported = { id:"pl-manual-ef", cat:"endfield:ef-firstorder", name:"My Endfield mix", icon:"🌸", tags:["personal"],
+        wish:[{t:"obsolete", al:"", ar:"", u:""}], songs:["manual-owned-track"], guide:{note:"old guide", url:"https://example.com/old"} };
+      const testSettings = { playlists:[defaultImported, customImported] };
+      let saveCount = 0;
+      const runContext = vm.createContext({
+        settings:testSettings,
+        ensureTrkFolder:() => {},
+        trkCatalog:() => [series],
+        plSanitize:raw => raw,
+        saveUserPrefs:() => { saveCount++; },
+        trkWishesForSeries:() => []
+      });
+      new vm.Script(library.slice(library.indexOf("function trkWishFromTrack("), library.indexOf("\nfunction trkWishesFromCatalog")) + "\n" +
+        library.slice(ensureStart, ensureEnd) + "\nensureTrkDistributionPlaylists();").runInContext(runContext);
+      const expectedWish = fixture.albums[0].tracks.map(([t, ar, id, cnTitle]) => ({
+        t, al:fixture.albums[0].album, ar, u:"https://open.spotify.com/track/" + id, matchAliases:[cnTitle]
+      }));
+      const migratesDefault = defaultImported.name === fixture.albums[0].name && defaultImported.icon === "📜" &&
+        JSON.stringify(defaultImported.tags) === JSON.stringify(["Game","Endfield","Zeroth Directive","Metal Scar Radio"]) &&
+        JSON.stringify(defaultImported.songs) === JSON.stringify(["owned-endfield-track"]) &&
+        JSON.stringify(defaultImported.wish) === JSON.stringify(expectedWish) &&
+        defaultImported.guide.url === fixture.albums[0].ffmToUrl &&
+        defaultImported.guide.note.includes("二次利用許諾ではありません");
+      const preservesCustom = customImported.name === "My Endfield mix" && customImported.icon === "🌸" &&
+        JSON.stringify(customImported.tags) === JSON.stringify(["personal"]) &&
+        JSON.stringify(customImported.songs) === JSON.stringify(["manual-owned-track"]) &&
+        JSON.stringify(customImported.wish) === JSON.stringify(expectedWish);
+      const createdVol2 = testSettings.playlists.find(pl => pl.id === "trk-ef-firstorder2");
+      const createsVol2 = !!createdVol2 && createdVol2.folder === "trk-endfield" && createdVol2.wish.length === 23 &&
+        createdVol2.guide.url === fixture.albums[1].ffmToUrl;
+      safeRefreshOk = migratesDefault && preservesCustom && createsVol2 && saveCount > 0;
+    }
+  } catch (error) {
+    console.error(`WARN  Endfield catalog test setup failed: ${error.message}`);
+  }
+  if (!catalogDataOk) fail("Endfield Zeroth Directive fixture/catalog mismatch (expected Vol.1 37 + Vol.2 23 ordered tracks, unique official Spotify track links, Chinese-title match aliases, ffm.to album sources, and rights notes)");
+  else if (!safeRefreshOk) fail("Endfield refresh must migrate the old 初号指令 default name/tags to Vol.1, keep owned songs and custom data, and create the Vol.2 playlist");
+  else ok("Arknights: Endfield Zeroth Directive OST Vol.1–2: 60 ordered Spotify-linked tracks, Chinese-title aliases, ffm.to guides, safe existing-playlist refresh");
+}
+
 // ⚔️ LoL Creator-Safe Sessions: complete SoundCloud album order/count and one official song URL per track.
 {
   const catalogSource = read("js/catalog.js");

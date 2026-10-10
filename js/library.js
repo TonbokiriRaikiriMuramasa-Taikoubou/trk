@@ -1151,7 +1151,9 @@ function trkCatalogGuide(s, pl, forDistributionPlaylist = false) {
                   ? "公式ゲーム案内のみ。個別曲の公式配信先・使用許諾は未確認です。"
                   : s.id === "arknights"
                     ? "Monster-Siren公式の曲／OSTページです。音源は同梱せず、リンクは利用許諾ではありません。"
-                    : forDistributionPlaylist
+                    : s.id === "endfield"
+                      ? "公式Spotify・ffm.to配信一覧への案内（音源なし）。配信・購入は二次利用許諾ではありません。利用前は公式二次創作ガイドラインを確認してください。"
+                      : forDistributionPlaylist
                       ? "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8。" + s.name + " の配布形態別フォルダに収容。"
                       : (s.note || "");
   /* GakumasはDrive置場と規約ページを分離。VALORANTの設定ガイドはCreator-Safeへ直接案内。 */
@@ -1209,6 +1211,14 @@ function ensureTrkDistributionPlaylists() {
           if (existing.name === "アークナイツ — 痕") { existing.name = pl.name; changed = true; }
           if (existing.icon === "🩹") { existing.icon = pl.icon || s.icon; changed = true; }
           if (JSON.stringify(existing.tags) === JSON.stringify(["Game","Arknights","MSR","痕"])) {
+            existing.tags = (pl.tags || []).slice(0,5); changed = true;
+          }
+        }
+        /* 🛰️ 初号指令OSTの旧4パート紹介版を、公式Vol.1全37曲版の既定名・タグへ更新する。
+           wish と guide は上の共通処理で更新済み。所持曲とユーザー変更（名前・アイコン・タグ）は守る。 */
+        if (pl.id === "ef-firstorder" && existing.cat === "trk:" + s.id + ":" + pl.id) {
+          if (existing.name === "Endfield — 初号指令 OST") { existing.name = pl.name; changed = true; }
+          if (JSON.stringify(existing.tags) === JSON.stringify(["Game","Endfield","Metal Scar Radio","First Order"])) {
             existing.tags = (pl.tags || []).slice(0,5); changed = true;
           }
         }

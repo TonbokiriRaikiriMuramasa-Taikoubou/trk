@@ -28,6 +28,7 @@ const T = (t, al, ar, u, matchAliases = []) => {
 const spotifyTrackUrl = id => "https://open.spotify.com/track/" + id;
 const sessionsTracks = (album, rows) => rows.map(([t, ar, id]) => T(t, album, ar, spotifyTrackUrl(id)));
 const lolAlbumTracks = (album, rows) => rows.map(([t, ar, id, alias]) => T(t, album, ar, spotifyTrackUrl(id), alias ? [alias] : []));
+const endfieldOstTracks = (album, rows) => rows.map(([t, ar, id, cnTitle]) => T(t, album, ar, spotifyTrackUrl(id), cnTitle ? [cnTitle] : []));
 const lolSoundCloudTracks = rows => rows.map(([t, ar, slug, alias]) => T(t, "", ar, "https://soundcloud.com/leagueoflegends/" + slug, alias ? [alias] : []));
 
 /* ================= 🍊 SAM Free Music — 100% Orange Juice! で出会える10曲（最初のオススメ） =================
@@ -553,11 +554,15 @@ S("arknights", "アークナイツ", "🩺", "amber", "ソーシャルゲーム"
      T("Before the Cessation", "崔林特尔梅之金OST", "", "https://monster-siren.hypergryph.com/music/232269")])]);
 
 /* ================= 🛰️ アークナイツ：エンドフィールド（Hypergryph / Gryphline） =================
-   音楽レーベル「Metal Scar Radio（鐵痕電台）」は Arknights: Endfield の公式レーベル。
-   Monster Siren Records と同じ Hypergryph による運営で、YouTube 公式アートトラックで試聴・配信中。 */
+   音楽レーベル「Metal Scar Radio（鐵痕電台）」は Arknights: Endfield の公式レーベル（作中世界の放送局という設定で、
+   実運営は Monster Siren Records と同じ Hypergryph）。単独公式サイトはなく、配信は各種サブスクと公式YouTube。
+   初号指令OST（Zeroth Directive、零号委托）上・下は 2026-02-15 から Spotify／YouTube／Amazon Music 等で配信中
+   （中国は网易云音乐など）。公式告知の ffm.to スマートリンクを各巻の案内にし、各曲は公式Spotify個別曲へリンクする。
+   ©/℗ 2026 GRYPHLINE（上海鹰角网络科技有限公司）。音源は同梱せず、配信・購入は二次利用許諾ではない。
+   公式二次創作ガイドラインは「公式素材をそのまま複製・抽出するなど創作性が著しく乏しいもの」を禁止している。 */
 S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber", "ソーシャルゲーム", "🎮",
-  "音楽レーベル「Metal Scar Radio（鐵痕電台）」の公式配信曲。YouTube 公式アートトラックや各種サブスクで試聴できます。ツール https://github.com/2t3/endfield-ost-download はタイトル確認に便利です（本カタログは音源を同梱せず、曲名の事実情報と公式入手先のみ）。",
-  "https://endfield.hypergryph.com/",
+  "音楽レーベル「Metal Scar Radio（鐵痕電台）」の公式配信曲（音源は同梱せず、曲名などの事実情報と公式入手先のみ）。「初号指令OST」Zeroth Directive Vol.1 37曲・Vol.2 23曲は各曲を公式Spotify個別曲ページへ、各巻を公式告知のffm.to配信一覧（Spotify／YouTube／Amazon Music等、中国は网易云音乐）へリンクします。キャラクターOST等はYouTube公式アートトラックや各種サブスクで試聴できます。配信・サブスク・購入は二次利用許諾ではありません。実況・動画投稿の条件と禁止事項（公式素材のそのままの複製・抽出など）は公式二次創作ガイドライン https://endfield.gryphline.com/ja-jp/news/4497 で利用前に確認してください。ツール https://github.com/2t3/endfield-ost-download はタイトル確認に便利です。",
+  "https://endfield.gryphline.com/ja-jp/",
   [PL("ef-blurring", "Endfield — Blurring", "🌫️", "gray", ["Game","Endfield","Metal Scar Radio","MSR Endfield"],
     [T("Blurring", "Blurring", "Metal Scar Radio", "https://www.youtube.com/@ArknightsEndfield"),
      T("Blurring (Instrumental)", "Blurring", "Metal Scar Radio", "https://endfield.hypergryph.com/")]),
@@ -569,11 +574,74 @@ S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber
      T("The Floaty Envelope (Instrumental)", "The Floaty Envelope", "Metal Scar Radio", "https://endfield.hypergryph.com/")]),
    PL("ef-makers", "Endfield — MAKER'S LUV", "💖", "pink", ["Game","Endfield","Metal Scar Radio","Yvonne"],
     [T("MAKER'S LUV", "MAKER'S LUV — Yvonne OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2027624810168390017")]),
-   PL("ef-firstorder", "Endfield — 初号指令 OST", "📜", "amber", ["Game","Endfield","Metal Scar Radio","First Order"],
-    [T("初号指令 OST 上 — Part 1", "初号指令 OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2022928866638205084"),
-     T("初号指令 OST 上 — Part 2", "初号指令 OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2022928866638205084"),
-     T("初号指令 OST 下 — Part 1", "初号指令 OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2022928866638205084"),
-     T("初号指令 OST 下 — Part 2", "初号指令 OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2022928866638205084")]),
+   /* ef-firstorder は永続IDとして維持（旧・上下4パート紹介版 → 公式Vol.1全37曲へ既存取り込みをその場で更新）。
+      曲順・曲名・アーティスト表記は公式Spotifyアルバム、中国語公式曲名は照合別名（网易云音乐／VGMdbで確認）。 */
+   PL("ef-firstorder", "Endfield — Zeroth Directive OST Vol.1（初号指令・上）", "📜", "amber", ["Game","Endfield","Zeroth Directive","Metal Scar Radio"],
+    endfieldOstTracks("Zeroth Directive Original Soundtrack, Vol. 1", [
+      ["Protocol Flow", "Metal Scar Radio, Hybrid", "0NOD8FVBXkLbmrJSYCS3Aq", "协议流"],
+      ["Initial Process", "Metal Scar Radio, Gareth Coker", "57d9mK6RV0bizpXK1Qn8Pr", "最初进程"],
+      ["Shape of the Tower", "Metal Scar Radio, Gareth Coker", "3QAvUY8zexlNtAOls3Cfwk", "塔之形"],
+      ["Protocolized Resonance", "Metal Scar Radio, Gareth Coker", "225SxJEm6YYWkhFbqdKKZ0", "协议化轰鸣"],
+      ["Existence", "Metal Scar Radio, Gareth Coker", "1Sx7W1yEghAW8Oa4Nc2CNT", "本有"],
+      ["Defying Stillness", "Metal Scar Radio, Hybrid", "0tRjyNRuNZBe4vewMfBbMR", "否定沉寂"],
+      ["Cosmic Observer", "Metal Scar Radio, Hybrid", "44IGAtL6UxB13zhby5jzeE", "寰宇观者"],
+      ["Downpour", "Metal Scar Radio, Hybrid", "5HS3n0elShzZKDSC6F8CBq", "降之雨流"],
+      ["Promotion Structure", "Metal Scar Radio, Gareth Coker", "4AjuUlEkp4BYisV9mTo2z3", "进阶构成"],
+      ["Edge/Mechanics", "Metal Scar Radio, Hybrid", "4dNsfN1Hy3GTsGd2RxeQbE", "锋刃/机械"],
+      ["Nexus Event", "Metal Scar Radio, Hybrid", "34yq954sCweaNmXSjugQ8t", "中枢现象"],
+      ["Soils of Life", "Metal Scar Radio, Hybrid", "4j47ihnA2y30qt2Laus5gW", "生之泥壤"],
+      ["Fort in the Acid Fog", "Metal Scar Radio, Hybrid", "4AFefMOgOfQYfX8edlMSPU", "雾蚀要塞"],
+      ["Guns/Steel", "Metal Scar Radio, Hybrid", "2zEEwI0uFuOCofZUTfExyY", "铳/钢铁"],
+      ["Outpost Shaping I", "Metal Scar Radio, Hybrid", "07n4CfyBw4SrNhfFycIiAx", "据点塑成I"],
+      ["Outpost Shaping II", "Metal Scar Radio, Hybrid", "2Eokhj679zoVAqywFykWpq", "据点塑成II"],
+      ["Outpost Shaping III", "Metal Scar Radio, Hybrid", "5AwJQcr0cYLPzo3TKPddQH", "据点塑成III"],
+      ["Outpost Shaping IV", "Metal Scar Radio, Hybrid", "1Xn5iOdiiYIwOuF3PrixJH", "据点塑成IV"],
+      ["Imprisoned Below", "Metal Scar Radio, Hybrid", "2WfrnGt27WNGaOpxyOl7VS", "地牢囚者"],
+      ["Hazefyre", "Metal Scar Radio, Hybrid", "3O0GfLIt03pB8ub8sbqx5R", "雾火"],
+      ["The Bonekrushing Fist", "Metal Scar Radio, Gareth Coker", "0tsG3JQ064n0TLwRNRXRf6", "碾骨之拳"],
+      ["Echoes in Ore", "Metal Scar Radio, Gareth Coker", "7yHbrlVnFiWmdnBbErgNGl", "岩石密语"],
+      ["Evacuation 373", "Metal Scar Radio, Gareth Coker", "5whDfg415m9xBRjhRKqY36", "373号撤离"],
+      ["The Planter's Trace", "Metal Scar Radio, Hybrid", "4WDzT25chfGRaKb5VlKFUS", "种植者留痕"],
+      ["Originium Science Park", "Metal Scar Radio, Hybrid", "1oVsPq1xRPr77WDMdWnGqV", "源石研究园"],
+      ["Journey to the Vein", "Metal Scar Radio, Hybrid", "3VSuE9MC9qyFvbygrtQDUS", "行向矿脉"],
+      ["Surviving Mining", "Metal Scar Radio, Hybrid", "0WKf9g8biP06EHSaSoP9cM", "矿业余生"],
+      ["Arts/Blood", "Metal Scar Radio, Hybrid", "7MCy2nFsCJSaXzgK1mhxgy", "法术/血液"],
+      ["Lodespring Corner", "Metal Scar Radio, Gareth Coker", "2TRQdwBHPAaTnf4zFmXAqZ", "源区一隅"],
+      ["Ankhor! Ankhor! Ankhor!", "Metal Scar Radio, Hybrid", "3ENwa03847OrFuy1gaoPmn", "锚点！锚点！锚点！"],
+      ["Triaggelos: Remaining", "Metal Scar Radio, Gareth Coker", "3PuUBlKn2Z35eVQWDwJ408", "三位一体：亡骸"],
+      ["Triaggelos: Being", "Metal Scar Radio, Gareth Coker", "2At7k5s0O9UJWtFAb3Aw8M", "三位一体：造物"],
+      ["Triaggelos: Obscurity", "Metal Scar Radio, Gareth Coker", "7A3DxC1kgjLzfcaa3l6ANr", "三位一体：晦暗"],
+      ["Sinking Rays", "Metal Scar Radio, Gareth Coker", "27F6i9A5wxNBfiP2FK9ZL5", "光线沉降"],
+      ["Marble Aggelomoirai", "Metal Scar Radio, Gareth Coker", "6a6L23E4lQGFhqmGJn55gY", "白垩界卫"],
+      ["Joyous Now", "Metal Scar Radio, Hybrid", "1nwA4ElX1TOCCli3Hnornh", "庆乐此时"],
+      ["Faith's Imprint", "Metal Scar Radio, Hybrid", "15gTGxr577tNJ2gZZXTfAG", "信念拓印"]
+    ]), "https://ffm.to/ro6qjnl", "公式配信リンク（ffm.to）"),
+   PL("ef-firstorder2", "Endfield — Zeroth Directive OST Vol.2（初号指令・下）", "⛰️", "green", ["Game","Endfield","Zeroth Directive","Metal Scar Radio"],
+    endfieldOstTracks("Zeroth Directive Original Soundtrack, Vol. 2", [
+      ["Wisdom of the Landscape", "Metal Scar Radio, Gareth Coker", "3Rg8XrRfqzePhy3cgoupOu", "知山水"],
+      ["To Walk, To Cross", "Metal Scar Radio, Gareth Coker", "62nDuLgX0MvZVf2Jrz2cuX", "行渡"],
+      ["Misty Grove", "Metal Scar Radio, Hybrid", "0DOftQ7ORTVmYq7TdYQALA", "雾篁"],
+      ["The Settling Gaze", "Metal Scar Radio, Gareth Coker", "0QPrEnH64GC7JcCYF0rmhV", "沉降视线"],
+      ["Marching Onwards", "Metal Scar Radio, Hybrid", "6P14Kt3awMRXeJ8ZpZ3drF", "武装继进"],
+      ["Pools in the Ice Cave", "Metal Scar Radio, Gareth Coker", "7BVpNwdNqdjS3p1RkdUGJg", "寒窟聚水"],
+      ["Jingyu at Daybreak", "Metal Scar Radio, Gareth Coker", "0ooLLIYdk5PokE3NvPfGq0", "景玉朝明"],
+      ["Jingyu at Eventide", "Metal Scar Radio, Gareth Coker", "1LLqtSJcxZo3H4IG7WDODX", "景玉夕时"],
+      ["Blossoms Bring an Old Friend", "Metal Scar Radio, Kirara Magic", "72Mt1lphOXDWakRctULOAW", "春景故人来"],
+      ["The Great Tide", "Metal Scar Radio, VISION SOUND, Salty Salt", "5nYYWzAu9FSRiZfIGAwKmP", "大潮升"],
+      ["Watching the Ling Waters", "Metal Scar Radio, 原田萌喜, Alec Justice, Cody Matthew Johnson, Aurora Sky", "1g3VBk3XzZLny7PXxtHEQY", "观陵水"],
+      ["Fangxing", "Metal Scar Radio, VISION SOUND, Salty Salt", "4oSRLPUPLrHcDooZc2oOdx", "方兴"],
+      ["Strings of Hue", "Metal Scar Radio, VISION SOUND, Salty Salt", "4JlHjfYQ3S5uYFwVwdHtTw", "戏彩绳"],
+      ["A Day for Ourselves", "Metal Scar Radio, MeLo_绿萝组", "6gOwtSP1ul3w7uN84KWksh", "寻暇日"],
+      ["By the Solemn Glow", "Metal Scar Radio, MSR Studio, BLACK 0, Aurora Sky", "6yEVLr9xHTeAk3sxPV6l22", "孤案灯青"],
+      ["Peace Under a Vast Sky", "Metal Scar Radio, MeLo_绿萝组", "68yAQasLeIi4VaWGz0l0oh", "万里升平"],
+      ["Charged by Verdant Tubes", "Metal Scar Radio, Kirara Magic", "0g7dFkfwlkZ1UhzQqzbGeC", "青简注我"],
+      ["Crimson in the Crag", "Metal Scar Radio, MSR Studio", "7IU7nfBAqKDYV2u6ZlHT7E", "山樆轻"],
+      ["When the Spring Rite Arrives", "Metal Scar Radio, VISION SOUND, Salty Salt", "2x8rSsHHA6BLMYLLvNCsCJ", "来时新社"],
+      ["Of Grace and Gentle Might", "Metal Scar Radio, MeLo_绿萝组", "3nT3EmeiixysEpL1Lnn2LK", "穆如清风"],
+      ["The Wind of Rupture", "Metal Scar Radio, VISION SOUND, Salty Salt", "3OZxJyMH1A5HrrpdPTlyph", "不周风"],
+      ["New Foundation", "Metal Scar Radio, Robert Wolf", "54MxCLBrmnKfzS2zYCcNbZ", "新壤"],
+      ["Forge", "Metal Scar Radio, SKa2or", "3TKJkruK3HMHG25SwptRxi", "洪炉"]
+    ]), "https://ffm.to/eq8xpy7", "公式配信リンク（ffm.to）"),
    PL("ef-signal", "Endfield — The Signal Is Still Pulsing", "📡", "green", ["Game","Endfield","Metal Scar Radio","Signal"],
     [T("The Signal Is Still Pulsing", "Metal Scar Radio #01", "Metal Scar Radio", "https://endfield.wiki.gg/wiki/Metal_Scar_Radio"),
      T("The Magic Radio", "Metal Scar Radio #02", "Metal Scar Radio", "https://endfield.wiki.gg/wiki/Metal_Scar_Radio"),

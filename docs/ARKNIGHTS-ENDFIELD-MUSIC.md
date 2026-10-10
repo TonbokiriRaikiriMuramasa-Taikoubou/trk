@@ -120,7 +120,7 @@
 
 ## 未確認・次段階
 
-- 60曲のSpotify個別曲URLは 2026-10-10 時点の公式アルバムページHTMLで確認しましたが、実ブラウザでの一括再確認（地域制限・ログイン要求の有無）は未実施です。
+- 60曲のSpotify個別曲URLは 2026-10-10 時点の公式アルバムページHTMLで確認しましたが、実ブラウザでの一括再確認（地域制限・ログイン要求の有無）は未実施です。抜取確認として同日、Vol.1 #37「Faith's Imprint」と Vol.2 #23「Forge」の個別曲ページを開き、曲名・収録アルバム・アーティスト・長さがカタログと一致することを確認しました。
 - Apple Music でのアルバム掲載は未確認（「配信なし」の断定ではありません）。
 - Metal Scar Radio の他の公式アルバム（Spotifyアーティストページで確認できる Eve of Departure、Homecoming、Dreamscape of Wind and Snow、Contingency Contract: Re-Ignition、At the Wake of Spring、Fragmented Dreams、Thunder's Legacy、Mirairo Rider、Qingbo! Oh My Life、Snapshot、Blurring、Lollipop Neo-nista 等）は**今後の調査対象**です。既存の `ef-blurring` 等は紹介版のままです。
 - 中国語版・英語版の二次創作ガイドラインは未精読。この台帳は日本語版ガイドライン（2026-08-24改訂版）を正とします。

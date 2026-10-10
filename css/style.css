@@ -1218,7 +1218,7 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
 /* テレビのすぐ下にラックが来るように、TVの下の余白は詰める */
 .songCol > #tvDock{margin-bottom:0}
 /* くわしい（details）は、列の下のほうに並ぶ。デバイスと少し離して「設定」に見せる */
-.songCol > details.tvMore,.songCol > details.dockMore,.songCol > details.dockAmp{margin-top:4px}
+.songCol > details.tvMore,.songCol > details.dockMore,.songCol > details.dockAmp,.songCol > details.dockMidiMix{margin-top:4px}
 
 /* 🔥 TRKアンプ（左下・「くわしく」の下の独立カテゴリー。段のチップ） */
 #ampPanel .ampStages{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}

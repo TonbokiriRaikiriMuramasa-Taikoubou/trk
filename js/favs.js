@@ -308,7 +308,7 @@ function nameOf(kind, id) {
       }
       if (typeof presetById === "function" && typeof presetName === "function") { const p = presetById(id); if (p) return presetName(p); }
     } else {
-      if (typeof allSongs === "function") { const it = allSongs().find(x => x.key === id); if (it && it.title) return it.title; }
+      if (typeof allSongs === "function") { const it = allSongs().find(x => x.key === id); if (it && it.title) return typeof songDisplayTitle === "function" ? songDisplayTitle(it) : it.title; }
     }
   } catch (_) {}
   return id;

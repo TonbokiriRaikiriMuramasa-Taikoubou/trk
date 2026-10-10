@@ -60,7 +60,7 @@ let raf = 0, isOn = false, playedByUs = false, idleTimer = 0;
 const watchers = new Set();
 
 /* core.js のグローバル（let 宣言）は、読み込み前・初期化前だと参照できないので必ず守る */
-const songTitle = () => { try { return (core.currentSong && (core.currentSong.title || core.currentSong.name)) || ""; } catch (_) { return ""; } };
+const songTitle = () => { try { const song = core.currentSong; return (song && (typeof songDisplayTitle === "function" ? songDisplayTitle(song) : (song.title || song.name))) || ""; } catch (_) { return ""; } };
 const hasFrames = () => { try { return !!videoEl.videoWidth && videoEl.readyState >= 2 && !!videoEl.src; } catch (_) { return false; } };
 const packImage = () => { try { return (core.bgImage && core.bgImage.naturalWidth) ? core.bgImage : null; } catch (_) { return null; } };
 

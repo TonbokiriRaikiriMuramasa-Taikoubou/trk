@@ -18,6 +18,7 @@ README は概要だけにして、くわしい説明はこのフォルダに分�
 | [mods.md](mods.md) | 🛠 MODを作る（詳しくは [docs/ADDONS.md](../ADDONS.md)） |
 | [files.md](files.md) | 📁 ファイル構成 |
 | [credits.md](credits.md) | 💐 着想元とリスペクト |
+| [touhou-midi.md](touhou-midi.md) | ⭐ 東方カタログ・ローカルMIDI再生・音声抽出の案内とライセンス確認 |
 | [en.md](en.md) | English guide（full） |
 
 関連：[README](../../README.md)・[パック形式](../pack-format.md)・[公認パック](../verified.md)・[品質の確認](../QUALITY-CHECKS.md)・[プライバシー方針](../../privacy.html)・[クレジット](../../credits.html)

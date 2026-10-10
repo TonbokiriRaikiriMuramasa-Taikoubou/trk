@@ -141,13 +141,16 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     const validate = vm.runInNewContext(`(${enumFn})`, { window:{
       TrkSpec:{ styles:() => ["bars"], themes:() => ["neon"] },
       TrkMMD:{ builtins:() => ["faceSing"] },
-      TrkFX:{ list:() => [{ id:"flat" }, { id:"my_test" }] }
+      TrkFX:{ list:() => [{ id:"flat" }, { id:"my_test" }] },
+      Trk:{ midiProfiles:{ list:() => [{ id:"studio_gm" }, { id:"trk_pixel" }] } }
     }, LITE_ENUM_VALUES, TRK_ENUM_VALUES });
     enumBehavior = validate("specStyle", "bars") && !validate("specStyle", "constructor") &&
       validate("specTheme", "neon") && !validate("specTheme", "__proto__") &&
       validate("mmdMotionKind", "faceSing") && validate("mmdMotionKind", "auto") && validate("mmdMotionKind", "none") &&
       !validate("mmdMotionKind", "file") && !validate("mmdMotionKind", "constructor") &&
       validate("fxPreset", "flat") && validate("fxPreset", "my_test") && !validate("fxPreset", "constructor") &&
+      validate("midiSoundProfile", "studio_gm") && validate("midiMixProfile", "trk_pixel") &&
+      !validate("midiSoundProfile", "constructor") && !validate("midiMixProfile", "__proto__") &&
       /* 🪶 M-02：{ "60":60, … }[settings.liteFps] || 30 に継承キーが入ると Object 関数が truthy で返り、
          || 30 の保険が効かずゲート間隔が NaN になる（軽量化が一瞬効かなくなる）。Import時点で弾く。 */
       validate("liteFps", "30") && validate("liteFps", "60") && validate("liteFps", "20") &&
@@ -169,9 +172,9 @@ const occurrences = (text, re) => [...text.matchAll(re)];
       JSON.stringify(TRK_ENUM_VALUES.trkTabName) === JSON.stringify(["full", "short", "icon"]);
   } catch (_) {}
   /* 許可リストに載っていても SETTING_ENUM_KEYS から外れていたら関門を通らない（両方そろって初めて効く） */
-  const enumKeyListed = /const SETTING_ENUM_KEYS = \[[\s\S]*?"trkTabName"[\s\S]*?\]/.test(core);
+  const enumKeyListed = /const SETTING_ENUM_KEYS = \[[\s\S]*?"trkTabName"[\s\S]*?"midiSoundProfile"[\s\S]*?"midiMixProfile"[\s\S]*?\]/.test(core);
   rule(!!enumFn && enumBehavior && enumKeyListed && core.includes('!validImportedSettingEnum(k, incoming)'),
-    "emergency settings import allowlists spectrum, MMD, FX, lite-mode and trk-tab enum IDs before assignment");
+    "emergency settings import allowlists spectrum, MMD, FX, lite-mode, trk-tab and MIDI profile enum IDs before assignment");
 
   /* 緊急Importで弾いたキーは黙って捨てない（「読み込みました」なのに反映されない事故を防ぐ）。
      理由（この端末に無いID／型が違う／この設定に無いキー）でも対応が変わるので、区別して出す。 */

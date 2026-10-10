@@ -1948,7 +1948,7 @@ async function studyAssignCurrentCover() {
   const book = studyCurrentBook;
   if (!book || book.kind !== "image" || !book.pages.length) { studyNotify("studyCoverNeedImage"); return; }
   if (!core.currentSong) { studyNotify("studyCoverNeedSong"); return; }
-  const songKey = core.currentSong.key, songTitle = core.currentSong.title || core.currentSong.key;
+  const songKey = core.currentSong.key, songTitle = typeof songDisplayTitle === "function" ? songDisplayTitle(core.currentSong) : core.currentSong.title || core.currentSong.key;
   const index = Math.max(0, Math.min(book.pages.length - 1, studyCurrentPage)), page = studyPageAt(book, index);
   if (!page) { studyNotify("studyCoverNeedImage"); return; }
   try {

@@ -6,7 +6,7 @@
    ・音源ファイル・譜面は一切ここに入れない。曲名などの「見出し」と公式の入手先だけ
    ・取り込むと「欲しい曲リスト（wish）」付きのプレイリストになる。未入手の曲は
      ライブラリでは薄く表示され、Musicフォルダに同じ曲名のファイルが入ると自動で追加される
-   ・リンク先はすべて公式サイト（https限定）。trk! は内容を保証しない
+   ・出典リンクは原則公式（https限定）。Touhou の関連作品索引などコミュニティ出典は明示し、trk! は内容を保証しない
    ・楽曲名・アルバム名は事実情報（著作権で保護されない）だが、シリーズ名などの
      商標はそれぞれの権利者さんのもの（NOTICE.md 参照。無関係・非公認です）
    ・MOD：自分のファイルで TRK_CATALOG.push({...}) しても追加できる（catalog.js より前に読む）
@@ -1297,68 +1297,174 @@ S("gakumas", "学園アイドルマスター", "🌟", "pink", "ソーシャル�
      T("理論武装して", "", "雨夜 燕", "https://gakuen-label.idolmaster-official.jp/discography/ufncogar2m")],
     "https://gakuen-label.idolmaster-official.jp/discography", "公式ディスコグラフィ")]);
 
-/* ================= ⭐ 東方Project（上海アリス幻樂団） ================= */
-S("touhou", "東方Project", "⭐", "red", "同人ゲーム", "🏮",
-  "ZUNさん（上海アリス幻樂団）の公式サイト。作品と音楽CDの情報はここで。ゲームの体験版もダウンロードできます（体験版にもBGMが入っています）。タイトル別フォルダで収容（100超は Vol.2 自動作成）。",
-  "https://www16.big.or.jp/~zun/",
-  [PL("th-koumakyou", "東方紅魔郷", "🌹", "red", ["Game","Touhou","紅魔郷","ZUN"],
-    [T("U.N.オーエンは彼女なのか?", "東方紅魔郷", "ZUN", "https://www16.big.or.jp/~zun/html/th06.html"),
-     T("亡き王女の為のセプテット", "東方紅魔郷", "ZUN", "https://www16.big.or.jp/~zun/html/th06.html"),
-     T("月まで届け、不死の煙", "東方紅魔郷", "ZUN", "https://www16.big.or.jp/~zun/html/th06.html")]),
-   PL("th-youyoumu", "東方妖々夢", "🌸", "pink", ["Game","Touhou","妖々夢","ZUN"],
-    [T("幽雅に咲かせ、墨染の桜 ～ Border of Life", "東方妖々夢", "ZUN", "https://www16.big.or.jp/~zun/html/th07.html"),
-     T("ネクロファンタジア", "東方妖々夢", "ZUN", "https://www16.big.or.jp/~zun/html/th07.html")]),
-   PL("th-eiyasyou", "東方永夜抄", "🌙", "purple", ["Game","Touhou","永夜抄","ZUN"],
-    [T("千年幻想郷 ～ History of the Moon", "東方永夜抄", "ZUN", "https://www16.big.or.jp/~zun/html/th08.html"),
-     T("竹取飛翔 ～ Lunatic Princess", "東方永夜抄", "ZUN", "https://www16.big.or.jp/~zun/html/th08.html")]),
-   PL("th-fuujinroku", "東方風神録", "⛩️", "green", ["Game","Touhou","風神録","ZUN"],
-    [T("神々が恋した幻想郷", "東方風神録", "ZUN", "https://www16.big.or.jp/~zun/html/th10.html"),
-     T("ネイティブフェイス", "東方風神録", "ZUN", "https://www16.big.or.jp/~zun/html/th10.html")]),
-   PL("th-chireiden", "東方地霊殿", "🔮", "amber", ["Game","Touhou","地霊殿","ZUN"],
-    [T("ハルトマンの妖怪少女", "東方地霊殿", "ZUN", "https://www16.big.or.jp/~zun/html/th11.html"),
-     T("霊知の太陽信仰 ～ Nuclear Fusion", "東方地霊殿", "ZUN", "https://www16.big.or.jp/~zun/html/th11.html"),
-     T("ラストリモート", "東方地霊殿", "ZUN", "https://www16.big.or.jp/~zun/html/th11.html")]),
-   PL("th-seirensen", "東方星蓮船", "🚢", "blue", ["Game","Touhou","星蓮船","ZUN"],
-    [T("春の湊に", "東方星蓮船", "ZUN", "https://www16.big.or.jp/~zun/html/th12.html"),
-     T("虎柄の毘沙門天", "東方星蓮船", "ZUN", "https://www16.big.or.jp/~zun/html/th12.html"),
-     T("感情の摩天楼 ～ Cosmic Mind", "東方星蓮船", "ZUN", "https://www16.big.or.jp/~zun/html/th12.html"),
-     T("夜空のユーフォーロマンス", "東方星蓮船", "ZUN", "https://www16.big.or.jp/~zun/html/th12.html")]),
-   PL("th-shinreibyou", "東方神霊廟", "⛩️", "purple", ["Game","Touhou","神霊廟","ZUN"],
-    [T("欲深き霊魂", "東方神霊廟", "ZUN", "https://www16.big.or.jp/~zun/html/th13.html"),
-     T("リジッドパラダイス", "東方神霊廟", "ZUN", "https://www16.big.or.jp/~zun/html/th13.html"),
-     T("古きユアンシェン", "東方神霊廟", "ZUN", "https://www16.big.or.jp/~zun/html/th13.html"),
-     T("デザイアドライブ", "東方神霊廟", "ZUN", "https://www16.big.or.jp/~zun/html/th13.html")]),
-   PL("th-kishinjou", "東方輝針城", "💎", "green", ["Game","Touhou","輝針城","ZUN"],
-    [T("輝く針の小人族 ～ Little Princess", "東方輝針城", "ZUN", "https://www16.big.or.jp/~zun/html/th14.html"),
-     T("始原のビート ～ Pristine Beat", "東方輝針城", "ZUN", "https://www16.big.or.jp/~zun/html/th14.html"),
-     T("魔力の雷雲", "東方輝針城", "ZUN", "https://www16.big.or.jp/~zun/html/th14.html")]),
-   PL("th-kanjuden", "東方紺珠伝", "🌙", "blue", ["Game","Touhou","紺珠伝","ZUN"],
-    [T("宇宙巫女現る", "東方紺珠伝", "ZUN", "https://www16.big.or.jp/~zun/html/th15.html"),
-     T("ピュアヒューリーズ ～ 心の在処", "東方紺珠伝", "ZUN", "https://www16.big.or.jp/~zun/html/th15.html"),
-     T("凍り付いた永遠の都", "東方紺珠伝", "ZUN", "https://www16.big.or.jp/~zun/html/th15.html"),
-     T("星条旗のピエロ", "東方紺珠伝", "ZUN", "https://www16.big.or.jp/~zun/html/th15.html")]),
-   PL("th-tenkuushou", "東方天空璋", "🌟", "amber", ["Game","Touhou","天空璋","ZUN"],
-    [T("桜舞い散る天空", "東方天空璋", "ZUN", "https://www16.big.or.jp/~zun/html/th16.html"),
-     T("希望の星は青霄に昇る", "東方天空璋", "ZUN", "https://www16.big.or.jp/~zun/html/th16.html"),
-     T("色無き風は妖怪の山に", "東方天空璋", "ZUN", "https://www16.big.or.jp/~zun/html/th16.html")]),
-   PL("th-kikeijuu", "東方鬼形獣", "👹", "red", ["Game","Touhou","鬼形獣","ZUN"],
-    [T("聖徳太子のペガサス ～ Dark Pegasus", "東方鬼形獣", "ZUN", "https://www16.big.or.jp/~zun/html/th17.html"),
-     T("ジェリーストーン", "東方鬼形獣", "ZUN", "https://www16.big.or.jp/~zun/html/th17.html"),
-     T("ビーストメトロポリス", "東方鬼形獣", "ZUN", "https://www16.big.or.jp/~zun/html/th17.html")]),
-   PL("th-kouryudou", "東方虹龍洞", "🌈", "purple", ["Game","Touhou","虹龍洞","ZUN"],
-    [T("虹の架かる幻想郷", "東方虹龍洞", "ZUN", "https://www16.big.or.jp/~zun/html/th18.html"),
-     T("バンデットリィテクノロジー", "東方虹龍洞", "ZUN", "https://www16.big.or.jp/~zun/html/th18.html"),
-     T("龍王殺しのプリンセス", "東方虹龍洞", "ZUN", "https://www16.big.or.jp/~zun/html/th18.html")]),
-   PL("th-juuouen", "東方獣王園", "🦁", "amber", ["Game","Touhou","獣王園","ZUN"],
-    [T("獣王園のテーマ", "東方獣王園", "ZUN", "https://www16.big.or.jp/~zun/html/th19.html"),
-     T("トウホウ・ハードコア", "東方獣王園", "ZUN", "https://www16.big.or.jp/~zun/html/th19.html")]),
-   PL("th-pc98", "東方旧作・PC-98", "💾", "gray", ["Game","Touhou","PC-98","ZUN"],
-    [T("Bad Apple!!", "東方幻想郷 Lotus Land Story", "ZUN", "https://www16.big.or.jp/~zun/html/th04.html"),
-     T("少女綺想曲 ～ Dream Battle", "東方永夜抄", "ZUN", "https://www16.big.or.jp/~zun/html/th08.html"),
-     T("幽霊楽団 ～ Phantom Ensemble", "東方妖々夢", "ZUN", "https://www16.big.or.jp/~zun/html/th07.html")]),
-   PL("th-zun-cds", "ZUN's Music Collection", "💿", "blue", ["Game","Touhou","ZUN","Music Collection"],
-    [T("蓬莱人形 ～ Dolls in Pseudo Paradise", "ZUN's Music Collection", "ZUN", "https://www16.big.or.jp/~zun/"),
-     T("夜が降りてくる ～ Evening Star", "ZUN's Music Collection", "ZUN", "https://www16.big.or.jp/~zun/"),
-     T("芥川龍之介の河童 ～ Candid Friend", "ZUN's Music Collection", "ZUN", "https://www16.big.or.jp/~zun/")])]);
+/* ================= ⭐ Touhou Project — ThemeDB release-ID catalogue =================
+   Japanese titles and release-ID redirects are metadata only, derived from the pinned
+   TouhouThemeDB snapshot (Unlicense; see js/touhou-theme-data.js). The snapshot includes
+   games, print/music-CD bonuses and arrangements. Audio is not bundled or licensed here.
+   Adjacent games outside Touhou Project are listed in a separate series below. */
+const TOUHOU_OFFICIAL_HOME = "https://www16.big.or.jp/~zun/";
+const TOUHOU_THEME_DB_URL = "https://www.thpatch.net/wiki/Touhou_Patch_Center:List_of_music_themes/en";
+const touhouThemeData = typeof window !== "undefined" && window.TrkTouhouThemeData
+  ? window.TrkTouhouThemeData : { titles: {}, redirects: {} };
+const touhouResolveTitle = id => {
+  const seen = new Set();
+  let key = id;
+  while (!touhouThemeData.titles[key] && touhouThemeData.redirects[key] && !seen.has(key)) {
+    seen.add(key);
+    key = touhouThemeData.redirects[key];
+  }
+  return touhouThemeData.titles[key] || "";
+};
+const touhouIdCompare = new Intl.Collator("en", { numeric: true, sensitivity: "base" });
+const touhouThemeIds = [...new Set([
+  ...Object.keys(touhouThemeData.titles || {}),
+  ...Object.keys(touhouThemeData.redirects || {})
+])].filter(id => id !== "none" && id !== "th_main").sort(touhouIdCompare.compare);
+const touhouTrackGroups = new Map();
+for (const id of touhouThemeIds) {
+  const title = touhouResolveTitle(id);
+  const split = id.lastIndexOf("_");
+  if (!title || split < 1) continue;
+  const releaseId = id.slice(0, split);
+  if (!touhouTrackGroups.has(releaseId)) touhouTrackGroups.set(releaseId, []);
+  touhouTrackGroups.get(releaseId).push({ id, title });
+}
+const touhouReleaseMeta = [
+  // PC-98 games
+  ["th01", "東方靈異伝", "💾", "gray", "game"],
+  ["th02", "東方封魔録", "💾", "gray", "game"],
+  ["th03", "東方夢時空", "💾", "gray", "game"],
+  ["th04", "東方幻想郷", "💾", "gray", "game"],
+  ["th05", "東方怪綺談", "💾", "gray", "game"],
+  // Main games and official spin-offs / fighting games
+  ["th06", "東方紅魔郷", "🌹", "red", "game", "th-koumakyou"],
+  ["th07", "東方妖々夢", "🌸", "pink", "game", "th-youyoumu"],
+  ["th075", "東方萃夢想", "🍶", "purple", "game"],
+  ["th08", "東方永夜抄", "🌙", "purple", "game", "th-eiyasyou"],
+  ["th09", "東方花映塚", "🌼", "green", "game"],
+  ["th095", "東方文花帖", "📖", "blue", "game"],
+  ["th10", "東方風神録", "⛩️", "green", "game", "th-fuujinroku"],
+  ["th105", "東方緋想天", "☁️", "blue", "game"],
+  ["th11", "東方地霊殿", "🔮", "amber", "game", "th-chireiden"],
+  ["th12", "東方星蓮船", "🚢", "blue", "game", "th-seirensen"],
+  ["th123", "東方非想天則", "🤖", "red", "game"],
+  ["th125", "ダブルスポイラー", "📷", "blue", "game"],
+  ["th128", "妖精大戦争", "🧚", "green", "game"],
+  ["th13", "東方神霊廟", "⛩️", "purple", "game", "th-shinreibyou"],
+  ["th135", "東方心綺楼", "🎭", "purple", "game"],
+  ["th14", "東方輝針城", "💎", "green", "game", "th-kishinjou"],
+  ["th143", "弾幕アマノジャク", "📜", "amber", "game"],
+  ["th145", "東方深秘録", "👁️", "blue", "game"],
+  ["th145_ps4", "東方深秘録 PS4", "🎮", "blue", "game"],
+  ["th15", "東方紺珠伝", "🌙", "blue", "game", "th-kanjuden"],
+  ["th155", "東方憑依華", "👻", "purple", "game"],
+  ["th16", "東方天空璋", "🌟", "amber", "game", "th-tenkuushou"],
+  ["th165", "秘封ナイトメア", "💤", "purple", "game"],
+  ["th17", "東方鬼形獣", "👹", "red", "game", "th-kikeijuu"],
+  ["th175", "東方剛欲異聞", "🌊", "blue", "game"],
+  ["th18", "東方虹龍洞", "🌈", "purple", "game", "th-kouryudou"],
+  ["th185", "バレットフィリア", "🛍️", "amber", "game"],
+  ["th19", "東方獣王園", "🦁", "amber", "game", "th-juuouen"],
+  ["th20", "東方錦上京", "🏯", "red", "game"],
+  // ZUN music CDs, book/manga bonuses, and magazine CDs
+  ["mcd_01", "蓬莱人形", "💿", "blue", "cd", "th-mcd-01", "ZUN"],
+  ["mcd_02", "蓮台野夜行", "💿", "blue", "cd", "", "ZUN"],
+  ["mcd_03", "夢違科学世紀", "💿", "blue", "cd", "", "ZUN"],
+  ["mcd_04", "卯酉東海道", "💿", "blue", "cd", "", "ZUN"],
+  ["mcd_05", "大空魔術", "💿", "blue", "cd", "", "ZUN"],
+  ["mcd_055", "未知の花 魅知の旅", "💿", "blue", "cd", "", "ZUN"],
+  ["mcd_06", "鳥船遺跡", "💿", "blue", "cd", "", "ZUN"],
+  ["mcd_07", "伊弉諾物質", "💿", "blue", "cd", "", "ZUN"],
+  ["mcd_08", "燕石博物誌", "💿", "blue", "cd", "", "ZUN"],
+  ["mcd_09", "旧約酒場", "💿", "blue", "cd", "", "ZUN"],
+  ["mcd_095", "虹色のセプテントリオン", "💿", "blue", "cd", "", "ZUN"],
+  ["mcd_10", "七夕坂夢幻能", "💿", "blue", "cd", "", "ZUN"],
+  ["mcd_11", "霊長新益京", "💿", "blue", "cd", "", "ZUN"],
+  ["mcd_baijr", "文花帖付属CD", "📖", "amber", "cd"],
+  ["mcd_fairy01", "三月精CD 01", "🧚", "green", "cd"],
+  ["mcd_fairy02", "三月精CD 02", "🧚", "green", "cd"],
+  ["mcd_fairy03", "三月精CD 03", "🧚", "green", "cd"],
+  ["mcd_fairy04", "三月精CD 04", "🧚", "green", "cd"],
+  ["mcd_fairy05", "三月精CD 05", "🧚", "green", "cd"],
+  ["mcd_fairy06", "三月精CD 06", "🧚", "green", "cd"],
+  ["mcd_fairy07", "三月精CD 07", "🧚", "green", "cd"],
+  ["mcd_fs", "鈴奈庵付属CD", "📖", "amber", "cd"],
+  ["mcd_gom", "グリモワール付属CD", "📖", "amber", "cd"],
+  ["mcd_pmiss", "求聞史紀付属CD", "📖", "amber", "cd"],
+  ["mcd_scoow01", "外來韋編CD 01", "📚", "amber", "cd"],
+  ["mcd_scoow02", "外來韋編CD 02", "📚", "amber", "cd"],
+  ["mcd_scoow03", "外來韋編CD 03", "📚", "amber", "cd"],
+  ["mcd_scoow04", "外來韋編CD 04", "📚", "amber", "cd"],
+  ["mcd_scoow05", "外來韋編CD 05", "📚", "amber", "cd"],
+  ["mcd_scoow06", "外來韋編CD 06", "📚", "amber", "cd"],
+  ["mcd_ssib", "儚月抄付属CD", "📖", "amber", "cd"],
+  ["zsw", "ZUNの音楽作品", "🎼", "purple", "cd", "", "ZUN"],
+  // These associated works are explicitly kept outside the Touhou Project series.
+  ["sh01", "秋霜玉（Seihou 1）", "🚀", "blue", "other"],
+  ["sh02", "稀翁玉（Seihou 2）", "🚀", "blue", "other"],
+  ["tmgc", "Torte Le Magic", "🎮", "purple", "other"],
+  ["alcostg", "Uwabami Breakers", "🍶", "amber", "other"],
+  ["touki", "Magus in Mystic Geometries", "🔮", "purple", "other"],
+  ["thmj", "Touhou Unreal Mahjong", "🀄", "green", "other"]
+].map(([id, name, icon, color, kind, playlistId, artist]) => ({
+  id, name, icon, color, kind, artist: artist || (/^th(?:0[1-9]|1\d|20)$/.test(id) ? "ZUN" : ""),
+  playlistId: playlistId || (kind === "other" ? "zun-" + id : "th-" + id)
+}));
+const touhouReleaseById = new Map(touhouReleaseMeta.map(meta => [meta.id, meta]));
+const touhouMainlineSourceUrl = prefix => /^th(?:0[6-9]|1[0-8])$/.test(prefix)
+  ? TOUHOU_OFFICIAL_HOME + "html/" + prefix + ".html" : TOUHOU_OFFICIAL_HOME;
+const touhouSourceForRelease = meta => meta.kind === "other" ? TOUHOU_THEME_DB_URL : touhouMainlineSourceUrl(meta.id);
+const touhouLabelForRelease = meta => meta.kind === "other"
+  ? "Touhou Patch Center（関連作品の索引）" : "上海アリス幻樂団 作品案内";
+const touhouMakeTrack = (row, meta) => T(
+  row.title, meta.name, meta.artist, touhouSourceForRelease(meta), [row.id]
+);
+const touhouPlaylistForRelease = meta => PL(
+  meta.playlistId, meta.name, meta.icon, meta.color,
+  meta.kind === "other" ? ["Other Game", "Not Touhou Project"]
+    : meta.kind === "cd" ? ["Touhou", "Music CD"] : ["Touhou", "Game"],
+  (touhouTrackGroups.get(meta.id) || []).map(row => touhouMakeTrack(row, meta)),
+  touhouSourceForRelease(meta), touhouLabelForRelease(meta)
+);
+const touhouTrackedGroups = touhouReleaseMeta.filter(meta => touhouTrackGroups.has(meta.id));
+const touhouCDTracks = [...touhouTrackGroups.entries()]
+  .filter(([id]) => id.startsWith("mcd_") || id === "zsw")
+  .flatMap(([, rows]) => rows);
+const touhouPc98Tracks = [...touhouTrackGroups.entries()]
+  .filter(([id]) => /^th0[1-5]$/.test(id))
+  .flatMap(([, rows]) => rows);
+const touhouMakeAggregatePlaylists = (id, title, icon, color, tracks, tags) => {
+  const sorted = tracks.slice().sort((a, b) => touhouIdCompare.compare(a.id, b.id));
+  const volumes = Math.ceil(sorted.length / 100) || 1;
+  return Array.from({ length: volumes }, (_, index) => {
+    const number = index + 1;
+    const name = title + " Vol." + number;
+    return PL(index === 0 ? id : id + "-v" + number, name, icon, color, tags,
+      sorted.slice(index * 100, (index + 1) * 100).map(row => {
+        const releaseId = row.id.slice(0, row.id.lastIndexOf("_"));
+        const releaseMeta = touhouReleaseById.get(releaseId);
+        return releaseMeta ? touhouMakeTrack(row, releaseMeta) : null;
+      }).filter(Boolean),
+      TOUHOU_OFFICIAL_HOME, "上海アリス幻樂団 作品案内");
+  });
+};
+const touhouPc98Aggregate = touhouMakeAggregatePlaylists(
+  "th-pc98", "東方PC-98旧作", "💾", "gray", touhouPc98Tracks, ["Touhou", "PC-98", "Legacy"]
+);
+const touhouCdAggregate = touhouMakeAggregatePlaylists(
+  "th-zun-cds", "東方CD・書籍付録", "💿", "blue", touhouCDTracks, ["Touhou", "Music CD", "Book CD"]
+);
+S("touhou", "東方Project 曲名カタログ", "⭐", "red", "同人ゲーム", "🏮",
+  `TouhouThemeDBの日本語タイトルとIDリダイレクトを使った作品別案内。ピン留めしたデータ版は ${touhouThemeIds.length} release ID・${touhouTrackGroups.size} グループ（体験版・重複/編曲IDを含む）。PC-98旧作、Windows作品、公式書籍/CD付録を収録。音源は同梱せず、抽出ツールの案内と手元の音源再生を分けています。ThemeDBの数え方・更新時点は公式の曲数表示と一致しないことがあるため、未収録なしを保証する公式一覧ではありません。東方Project外の関連作品は別シリーズです。`,
+  TOUHOU_OFFICIAL_HOME,
+  [
+    ...touhouTrackedGroups.filter(meta => meta.kind !== "other").map(touhouPlaylistForRelease),
+    ...touhouPc98Aggregate,
+    ...touhouCdAggregate
+  ]);
+S("zun-other", "東方Project外の関連作品", "🪐", "purple", "関連ゲーム", "🎮",
+  "TouhouThemeDBに関連作品として掲載される東方Project外のゲーム音楽。Seihou、Torte Le Magic、Uwabami Breakers、fan games を東方Project本体と混同しないよう別カテゴリに収録しています。曲名データはコミュニティ索引で、権利や音源の再配布許諾を示すものではありません。音源は同梱しません。",
+  TOUHOU_THEME_DB_URL,
+  touhouTrackedGroups.filter(meta => meta.kind === "other").map(touhouPlaylistForRelease));
 })();
-/* ✅ catalog.js 完了（シリーズ5・プレイリスト5。MODで TRK_CATALOG.push して追加できます） */
+/* ✅ catalog.js 完了。MODで TRK_CATALOG.push してシリーズを追加できます。 */

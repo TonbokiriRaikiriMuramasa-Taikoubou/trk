@@ -7,7 +7,7 @@
    文章は i18n.js にあります。 */
 "use strict";
 
-const MEDIA_EXT = ["mp4", "m4a", "mp3", "ogg", "oga", "opus", "wav", "webm", "flac", "aac", "mov"];
+const MEDIA_EXT = ["mp4", "m4a", "mp3", "ogg", "oga", "opus", "wav", "webm", "flac", "aac", "mov", "mid", "midi"];
 const LIB_MAX = 3000, LIB_SHOW = 300, ADDED_MAX = 50, CHART_SUFFIX = ".shadow-taiko.json";
 const LIB_DEPTH = 8;                        /* 📤 共有は「一気に全部」が売りなので、フォルダの深さも広く歩く（旧 6） */
 const SHARED_MAX = 150;                     /* 💾 端末に残す共有の曲の上限（空き容量を守るため） */
@@ -596,6 +596,56 @@ Object.assign(TEXT.ko, {
   trkClassicBtn:"🎻 trk classic", trkClassicTab:"🎻 trk classic"
 });
 
+/* 🎹 Touhou MIDI: only local files are synthesized; no game audio or extractor is bundled. */
+Object.assign(TEXT.ja, {
+  midiRendering:"選択したコード音色プロフィールでMIDIを準備中…", midiLoaded:"選択したコード音色プロフィールでMIDIを再生します（実サンプルなし・元ファイルは変更しません）。",
+  midiTooLarge:"MIDIファイルが大きすぎます（上限8MB）。", midiTooLong:"MIDIが10分を超えるため再生を中止しました。",
+  midiUnsupported:"このMIDIの時間形式（SMPTE）は未対応です。", midiFormatUnsupported:"SMF 0/1以外の形式には対応していません。", midiTooComplex:"イベント数が多すぎるため安全に再生できません。", midiError:"MIDIを読めません。標準MIDIファイル（SMF）か確認してください。",
+  touhouCatalogNote:"TouhouThemeDB（Unlicense）のコミュニティ索引を使用。東方Project本体は{groups}グループ・{tracks} release ID（体験版・重複/編曲IDを含む）。手元の .mid/.midi は再生できますが、全曲にMIDIがあるわけではありません。正規に入手した自分のゲームから抽出し、ゲームデータや抽出物を再配布しないでください。thtk の上流 COPYING は二条件のBSD系文面ですが、Touhou Patch CenterのガイドではBGMアーカイブ抽出に非対応と明記されています。別ツールTouhou Music Room（GPL-3.0-or-later、追加許可あり）はWindows作品の音声を抽出しますが、MIDIは出力しません。ゲーム音源・抽出ツールは同梱しません。",
+  zunOtherCatalogNote:"ここはSeihou、Torte Le Magic、Uwabami Breakers、神魔討綺伝など、TouhouThemeDBに関連作品として載る東方Project外の6作品（{groups}グループ・{tracks} release ID）。正史Touhouとは別枠です。コミュニティ索引は権利許諾を示しません。音源は同梱しません。",
+  touhouPlaylistGuide:"手元のMIDIを再生。ID名（th06_05.mid）はカタログ曲名で表示。Music Roomは音声抽出用（MIDI非対応）。音源なし。",
+  touhouThemeDbSnapshot:"TouhouThemeDB固定データ（Unlicense）",
+  zunOtherPlaylistGuide:"東方Project外の関連作品です。手元のMIDIのみ再生。音源・抽出物の同梱や再配布はしません。",
+  touhouToolkitDocs:"thtkガイド（BGMアーカイブ抽出は非対応）", touhouToolkitLicense:"thtk COPYING（ライセンス条件）",
+  touhouMusicRoom:"Touhou Music Room 外部ツール", touhouMusicRoomLicense:"Touhou Music Room LICENSE（GPL-3.0-or-later・追加許可）"
+});
+Object.assign(TEXT.en, {
+  midiRendering:"Preparing MIDI with the selected code-generated timbre profile…", midiLoaded:"MIDI rendered with the selected procedural timbre (no samples; the original file is unchanged).",
+  midiTooLarge:"MIDI file is too large (8 MB maximum).", midiTooLong:"Playback stopped: this MIDI is longer than 10 minutes.",
+  midiUnsupported:"This MIDI timing mode (SMPTE) is not supported.", midiFormatUnsupported:"Only Standard MIDI File type 0/1 is supported.", midiTooComplex:"This MIDI has too many events to render safely.", midiError:"Could not read this file. Please check that it is a Standard MIDI File (SMF).",
+  touhouCatalogNote:"Community-maintained Japanese title data from TouhouThemeDB (Unlicense): {groups} Touhou Project groups and {tracks} release IDs, including demos and duplicate/arranged entries. Local .mid/.midi files can be played, but not every track has MIDI. Extract only from a game you lawfully obtained; do not redistribute game data or rips. thtk's upstream COPYING has two-condition BSD-style terms, but the Touhou Patch Center guide says it cannot extract BGM archives. Touhou Music Room (GPL-3.0-or-later, additional permission) extracts game audio on Windows, not MIDI. No game audio or extractor is bundled.",
+  zunOtherCatalogNote:"This separate section has {groups} associated games outside Touhou Project ({tracks} release IDs), as listed by TouhouThemeDB. It is not part of the Touhou Project canon. The community index grants no rights. No audio is bundled.",
+  touhouPlaylistGuide:"Local MIDI only; ID filenames show catalogue titles. Music Room exports audio, not MIDI. No audio is bundled.",
+  touhouThemeDbSnapshot:"TouhouThemeDB pinned snapshot (Unlicense)",
+  zunOtherPlaylistGuide:"Not Touhou Project canon. Local MIDI only; no game audio bundled.",
+  touhouToolkitDocs:"thtk guide (BGM archive extraction unsupported)", touhouToolkitLicense:"thtk COPYING (license terms)",
+  touhouMusicRoom:"Touhou Music Room (external tool)", touhouMusicRoomLicense:"Touhou Music Room LICENSE (GPL-3.0-or-later + additional permission)"
+});
+Object.assign(TEXT.zh, {
+  midiRendering:"正在用所选代码音色配置准备MIDI…", midiLoaded:"已用所选代码合成音色渲染MIDI（不含采样，不会修改原文件）。",
+  midiTooLarge:"MIDI文件过大（上限8 MB）。", midiTooLong:"MIDI超过10分钟，已停止播放。",
+  midiUnsupported:"暂不支持此MIDI时间格式（SMPTE）。", midiFormatUnsupported:"仅支持标准MIDI文件类型0/1。", midiTooComplex:"MIDI事件过多，无法安全渲染。", midiError:"无法读取文件，请确认它是标准MIDI文件（SMF）。",
+  touhouCatalogNote:"日文曲名来自TouhouThemeDB（Unlicense，社区维护）：东方Project本体共{groups}组、{tracks}个release ID，含体验版及重复/改编条目。可播放本地.mid/.midi，但并非每首曲目都有MIDI。仅从自己合法取得的游戏中提取；请勿再分发游戏数据或提取物。thtk上游COPYING为BSD双条件风格条款，但Touhou Patch Center指南说明它不能提取BGM档案。Touhou Music Room（GPL-3.0-or-later，含附加许可）可在Windows提取游戏音频，不输出MIDI。不附带游戏音源或提取工具。",
+  zunOtherCatalogNote:"此处单独列出TouhouThemeDB收录的{groups}组、{tracks}个东方式Project外相关游戏。它们不属于东方Project正史；社区索引不授予任何权利。不附带音源。",
+  touhouPlaylistGuide:"仅播放本地MIDI；ID文件名显示曲名。Music Room提取音频，不输出MIDI；无音源。",
+  touhouThemeDbSnapshot:"TouhouThemeDB固定数据（Unlicense）",
+  zunOtherPlaylistGuide:"东方Project外的相关作品。仅播放本地MIDI；不附带或再分发音源/游戏提取物。",
+  touhouToolkitDocs:"thtk指南（不支持提取BGM档案）", touhouToolkitLicense:"thtk COPYING（许可条款）",
+  touhouMusicRoom:"Touhou Music Room外部工具", touhouMusicRoomLicense:"Touhou Music Room LICENSE（GPL-3.0-or-later，附加许可）"
+});
+Object.assign(TEXT.ko, {
+  midiRendering:"선택한 코드 생성 음색 프로필로 MIDI 준비 중…", midiLoaded:"선택한 절차 생성 음색으로 MIDI를 렌더링했습니다 (샘플 없음, 원본 파일은 그대로예요).",
+  midiTooLarge:"MIDI 파일이 너무 큽니다 (최대 8MB).", midiTooLong:"MIDI가 10분을 넘어 재생을 중단했어요.",
+  midiUnsupported:"이 MIDI 시간 형식(SMPTE)은 지원하지 않아요.", midiFormatUnsupported:"표준 MIDI 파일 형식 0/1만 지원해요.", midiTooComplex:"이 MIDI는 이벤트가 너무 많아 안전하게 렌더링할 수 없어요.", midiError:"파일을 읽을 수 없어요. 표준 MIDI 파일(SMF)인지 확인해 주세요.",
+  touhouCatalogNote:"TouhouThemeDB(Unlicense)의 커뮤니티 일본어 곡명 색인: 동방 Project 본편 {groups}개 그룹, {tracks}개 release ID(체험판·중복/편곡 포함). 로컬 .mid/.midi는 재생하지만 모든 곡에 MIDI가 있는 것은 아니에요. 정식 취득한 본인 게임에서 추출하고 게임 데이터/추출물은 재배포하지 마세요. thtk의 upstream COPYING은 BSD 2조건 계열이지만 Touhou Patch Center 안내에 따르면 BGM 아카이브는 추출할 수 없어요. Touhou Music Room(GPL-3.0-or-later, 추가 허가 있음)은 Windows 게임 음원을 추출하지만 MIDI는 출력하지 않아요. 게임 음원/추출 도구는 포함하지 않아요.",
+  zunOtherCatalogNote:"TouhouThemeDB가 관련 작품으로 분류한 동방 Project 외 게임 {groups}개 그룹, {tracks}개 release ID를 별도 표시해요. 동방 Project 정사가 아니며, 커뮤니티 색인은 권리를 허가하지 않아요. 음원은 포함하지 않아요.",
+  touhouPlaylistGuide:"로컬 MIDI만 재생하며 ID 파일명은 곡명으로 표시해요. Music Room은 음원을 추출하지만 MIDI는 출력하지 않아요.",
+  touhouThemeDbSnapshot:"TouhouThemeDB 고정 데이터 (Unlicense)",
+  zunOtherPlaylistGuide:"동방 Project 정사가 아니에요. 로컬 MIDI만 재생; 게임 음원 미포함.",
+  touhouToolkitDocs:"thtk 안내 (BGM 아카이브 추출 미지원)", touhouToolkitLicense:"thtk COPYING (라이선스 조건)",
+  touhouMusicRoom:"Touhou Music Room 외부 도구", touhouMusicRoomLicense:"Touhou Music Room LICENSE (GPL-3.0-or-later, 추가 허가)"
+});
+
 
 const libFolderSeg = it => String(it.dir || "").split("/")[0].trim();
 /* ✔公認の判定は verified.js の窓口から（読み込まれていなければ、公認タブは作りません） */
@@ -733,6 +783,26 @@ function songMetaSave() {
   try { localStorage.setItem(SONG_META_KEY, JSON.stringify(SONG_META)); } catch (_) {}
 }
 function metaOf(key) { const m = SONG_META[key]; return (m && typeof m === "object") ? m : null; }
+/* A local Touhou MIDI file is often named by its stable ThemeDB ID (th06_15.mid).
+   Keep the filename and metadata untouched, but show the community title anywhere the song appears. */
+function touhouCatalogTitle(it) {
+  const data = window.TrkTouhouThemeData;
+  if (!data || !it) return "";
+  const raw = String(it.base || it.title || (it.file && it.file.name) || "").trim();
+  const id = raw.replace(/\.[a-z0-9]{1,5}$/i, "").toLowerCase();
+  if (!/^(?:th\d+[a-z0-9]*|mcd|zsw|sh\d+|tmgc|alcostg|touki|thmj)_[a-z0-9_]+$/i.test(id)) return "";
+  const seen = new Set();
+  let key = id;
+  const hasTitle = value => Object.prototype.hasOwnProperty.call(data.titles || {}, value);
+  while (!hasTitle(key) && data.redirects && data.redirects[key] && !seen.has(key)) {
+    seen.add(key);
+    key = data.redirects[key];
+  }
+  return hasTitle(key) ? data.titles[key] : "";
+}
+function songDisplayTitle(it, meta = metaOf(it && it.key) || {}) {
+  return meta.title || touhouCatalogTitle(it) || (it && it.title) || "";
+}
 
 /* 保存されていたプレイリスト1つの検証（読み込み時に全部に通す） */
 /* 📁 プレイリストフォルダ（ネスト可・深さは3階層まで） */
@@ -914,6 +984,7 @@ function ensureTrkFolder() {
   ensureTrkSubfolder("trk-ba", "Blue Archive", "🎮");
   ensureTrkSubfolder("trk-lol", "League of Legends", "⚔️");
   ensureTrkSubfolder("trk-touhou", "Touhou", "⛩️");
+  ensureTrkSubfolder("trk-touhou-other", "Related games (not Touhou)", "🪐");
   ensureTrkSubfolder("trk-arknights", "Arknights", "🎮");
   ensureTrkSubfolder("trk-gakumas", "Gakum@s", "🎤");
   ensureTrkSubfolder("trk-endfield", "Endfield", "🛰️");
@@ -1053,6 +1124,8 @@ function trkCatalogGuide(s, pl, forDistributionPlaylist = false) {
   const isLoLLinkList = s.id === "lol" && pl && !isSoundCloudAlbum;
   const isGakumasInstrument = s.id === "gakumas" && pl && (pl.id === "gm-inst" || pl.id === "gm-inst2");
   const isGakumasDiscography = s.id === "gakumas" && pl && pl.id === "gm-releases";
+  const isTouhou = s.id === "touhou";
+  const isTouhouOther = s.id === "zun-other";
   const loLLinkNote = "公式リンク集。配信・購入は二次利用許諾ではありません。Creator-Safeの対象と条件を要確認。";
   const note = isBlueArchiveOst
     ? "NexTone.Link／Apple Music公式案内。音源なし。購入・サブスクは利用許諾ではありません。"
@@ -1066,7 +1139,11 @@ function trkCatalogGuide(s, pl, forDistributionPlaylist = false) {
           ? "公式Driveで配布確認済み。DOWNLOAD規約はファン動画向けの限定条件で、全用途の許諾ではありません。"
           : isGakumasDiscography
             ? "公式ディスコグラフィ掲載曲。現行Driveで未確認の曲も含みます（配布不可の断定ではありません）。"
-            : s.id === "valorant"
+            : isTouhou
+              ? tr("touhouPlaylistGuide")
+              : isTouhouOther
+                ? tr("zunOtherPlaylistGuide")
+                : s.id === "valorant"
               ? "公式曲リンク集。配信・購入は二次利用許諾ではありません。Creator-Safeの対象と条件を要確認。"
               : s.id === "genshin"
                 ? "Apple Music公式配信への案内です。サブスク・購入は二次利用許諾ではありません。"
@@ -1078,15 +1155,17 @@ function trkCatalogGuide(s, pl, forDistributionPlaylist = false) {
                       ? "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8。" + s.name + " の配布形態別フォルダに収容。"
                       : (s.note || "");
   /* GakumasはDrive置場と規約ページを分離。VALORANTの設定ガイドはCreator-Safeへ直接案内。 */
-  const guideUrl = (s.id === "gakumas" || s.id === "valorant")
-    ? (s.url || "")
-    : (pl && pl.sourceUrl) || s.url || "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk";
+  const guideUrl = isTouhou
+    ? "https://github.com/DTM9025/musicroom/releases/latest"
+    : (s.id === "gakumas" || s.id === "valorant")
+      ? (s.url || "")
+      : (pl && pl.sourceUrl) || s.url || "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk";
   return { note, url: guideUrl };
 }
 function ensureTrkDistributionPlaylists() {
   ensureTrkFolder();
   const cat = trkCatalog();
-  const folderMap = { bluearchive: "trk-ba", lol: "trk-lol", touhou: "trk-touhou", arknights: "trk-arknights", gakumas: "trk-gakumas", endfield: "trk-endfield" };
+  const folderMap = { bluearchive: "trk-ba", lol: "trk-lol", touhou: "trk-touhou", "zun-other": "trk-touhou-other", arknights: "trk-arknights", gakumas: "trk-gakumas", endfield: "trk-endfield" };
   let changed = false;
   for (const s of cat) {
     /* Only these series are auto-created under trk. Manually imported catalog entries
@@ -1182,7 +1261,7 @@ function ensureTrkDistributionPlaylists() {
   if (changed) core.saveUserPrefs();
 }
 (function plTighten() {
-  core.settings.playlists = (core.settings.playlists || []).map(plSanitize).filter(Boolean).slice(0, 100);
+  core.settings.playlists = (core.settings.playlists || []).map(plSanitize).filter(Boolean).slice(0, 200);
   core.settings.plFolders = (core.settings.plFolders || []).map(plFolderSanitize).filter(Boolean).slice(0, 12);
   const fids = new Set(core.settings.plFolders.map(f => f.id));
   for (const p of core.settings.playlists) if (p.folder && !fids.has(p.folder)) p.folder = "";
@@ -1500,7 +1579,25 @@ function plCatalogMenu() {
   if (!cat.length) d.card.append(el("div", "plSep"), el("div", "plHint", tr("plImportBad")));
   for (const s of cat) {
     d.card.append(el("div", "plSep"), el("b", "plCardTitle", `${s.icon} ${s.name}`));
-    if (s.note) d.card.append(el("div", "plHint", "📄 " + s.note));
+    const aliasIds = new Set((s.playlists || []).flatMap(pl => (pl.songs || []).flatMap(song => song.matchAliases || [])));
+    const releaseGroups = new Set([...aliasIds].map(id => id.slice(0, id.lastIndexOf("_"))).filter(Boolean));
+    const counts = { tracks: aliasIds.size, groups: releaseGroups.size };
+    const note = s.id === "touhou" ? tr("touhouCatalogNote", counts)
+      : s.id === "zun-other" ? tr("zunOtherCatalogNote", counts) : s.note;
+    if (note) d.card.append(el("div", "plHint", "📄 " + note));
+    if (s.id === "touhou") {
+      for (const [label, url] of [
+        [tr("touhouThemeDbSnapshot"), "https://github.com/thpatch/TouhouThemeDB/tree/e70e6451cf2e44d75564c09aa7c5a9cc09982692"],
+        [tr("touhouMusicRoom"), "https://github.com/DTM9025/musicroom/releases/latest"],
+        [tr("touhouMusicRoomLicense"), "https://github.com/DTM9025/musicroom/blob/master/LICENSE.md"],
+        [tr("touhouToolkitDocs"), "https://www.thpatch.net/wiki/Touhou_Patch_Center:THTK"],
+        [tr("touhouToolkitLicense"), "https://github.com/thpatch/thtk/blob/master/COPYING"]
+      ]) {
+        const b = el("button", "plBtn", label); b.type = "button";
+        b.addEventListener("click", () => plOpenLink(url));
+        d.card.append(b);
+      }
+    }
     if (s.url) {
       const b = el("button", "plBtn", tr("plLinkOpen")); b.type = "button";
       b.addEventListener("click", () => plOpenLink(s.url));
@@ -1663,7 +1760,7 @@ function songProfile(it) {
   const f = {};
   for (const [id, key] of [["title", "plTitle"], ["artist", "plArtist"], ["album", "plAlbum"], ["composer", "plComposer"], ["srcUrl", "plProfileUrl"]]) {
     const inp = el("input", "plInput"); inp.type = "text"; inp.maxLength = id === "srcUrl" ? 300 : 100; inp.value = m[id] || "";
-    if (id === "title") inp.placeholder = it.title;
+    if (id === "title") inp.placeholder = songDisplayTitle(it, m);
     f[id] = inp;
     d.card.append(plRow(tr(key), inp));
   }
@@ -1813,7 +1910,7 @@ function plShare(p) {
     const songs = plLocalSongs(p);
     if (songs.length < PL_SHARE_MIN) { status.textContent = tr("plShareNeed9", { n: songs.length }); return false; }
     const idx = plRecordsIdx();
-    const unplayed = songs.filter(it => !plProof(it, idx).ok).map(it => (metaOf(it.key) || {}).title || it.title);
+    const unplayed = songs.filter(it => !plProof(it, idx).ok).map(it => songDisplayTitle(it));
     if (unplayed.length) {
       status.textContent = tr("plShareUnplayed", { list: unplayed.slice(0, 3).join(" / ") + (unplayed.length > 3 ? " …" : "") });
       return false;
@@ -2206,12 +2303,12 @@ function renderLib() {
   const q = core.$("libSearch").value.trim().toLowerCase(), idx = {};
   for (const r of Object.values(window.Trk.play.records)) if (r && r.title != null) idx[`${r.size}|${r.title}`] = r;
   const items = scope
-    .filter(it => { if (!q) return true; const m = metaOf(it.key) || {};   /* 🎶 プロフィール情報も検索対象 */
-      return `${m.title || it.title} ${it.dir || ""} ${m.artist || it.artist || ""} ${m.album || ""} ${m.matchHint || ""} ${it.packName || ""}`.toLowerCase().includes(q); })
+    .filter(it => { if (!q) return true; const m = metaOf(it.key) || {};   /* 🎶 プロフィール情報と曲ID由来のカタログ名も検索対象 */
+      return `${songDisplayTitle(it, m)} ${it.dir || ""} ${m.artist || it.artist || ""} ${m.album || ""} ${m.matchHint || ""} ${it.packName || ""}`.toLowerCase().includes(q); })
     .map(it => ({ it, info:songInfo(it, idx) }));
   const v = (x, k) => (x.info ? x.info[k] : 0);
   const cmp = {
-    name:(a, b) => a.it.title.localeCompare(b.it.title, undefined, { numeric:true }),
+    name:(a, b) => songDisplayTitle(a.it).localeCompare(songDisplayTitle(b.it), undefined, { numeric:true }),
     plays:(a, b) => v(b, "plays") - v(a, "plays"),
     recent:(a, b) => v(b, "last") - v(a, "last"),
     best:(a, b) => v(b, "best") - v(a, "best")
@@ -2277,7 +2374,8 @@ function renderLib() {
     thumb.setAttribute("aria-hidden", "true"); thumbImg.alt = ""; thumbImg.decoding = "async"; thumbImg.hidden = true;
     thumb.append(thumbImg, thumbFallback);
     const text = el("span", "libText"), m = metaOf(it.key) || {};   /* 🎶 曲プロフィール（長押しで編集） */
-    text.append(el("span", "libName", (it.video ? "🎬 " : "") + (m.title || it.title) + (info && info.title ? " " + info.title : "")),   // 例：🎬 動画 / 曲名 🥁🐔🚚⚔🎪🚛
+    const displayTitle = songDisplayTitle(it, m);
+    text.append(el("span", "libName", (it.video ? "🎬 " : "") + displayTitle + (info && info.title ? " " + info.title : "")),   // 例：🎬 動画 / 曲名 🥁🐔🚚⚔🎪🚛
                 el("span", "libSub", [m.artist || it.artist, m.album, m.matchHint ? `${tr("plMatchMemo")}: ${m.matchHint}` : "", srcLabel(it)].filter(Boolean).join(" · ")));
     left.append(thumb, text);
     if (it.charts) meta.append(el("i", "libTag", "📄"));
@@ -2295,7 +2393,7 @@ function renderLib() {
     wrap.append(b);
     /* 🎶 長押しの代わり（見えるボタン）。設定「長押しの代わりのボタンを出す」で隠せる（body.noMoreBtns） */
     const pb = el("button", "libFav moreBtn", "🎶"); pb.type = "button";
-    pb.title = tr("libProfileBtn"); pb.setAttribute("aria-label", tr("libProfileBtn") + " " + (m.title || it.title));
+    pb.title = tr("libProfileBtn"); pb.setAttribute("aria-label", tr("libProfileBtn") + " " + displayTitle);
     pb.addEventListener("click", e => { e.stopPropagation(); songProfile(it); });
     wrap.append(pb);
     /* ⭐ お気に入り（📌は ⋯ のメニューから） */
@@ -2305,7 +2403,7 @@ function renderLib() {
       const sb = el("button", "libFav" + (inFav ? " on" : ""), inFav ? "★" : "☆");
       sb.type = "button";
       sb.title = tr(inFav ? "favDel" : "favAdd");
-      sb.setAttribute("aria-label", tr(inFav ? "favIn" : "favAdd") + " " + it.title);
+      sb.setAttribute("aria-label", tr(inFav ? "favIn" : "favAdd") + " " + displayTitle);
       sb.setAttribute("aria-pressed", String(inFav));
       sb.addEventListener("click", e => {
         e.stopPropagation();
@@ -2342,7 +2440,7 @@ function renderBanner() {
     core.$("songTitleBig").textContent = tr("songNone"); core.$("songSub").textContent = tr("songNoneSub");
   } else {
     const m = metaOf(s.key) || {};   /* 🎶 曲プロフィール */
-    core.$("songTitleBig").textContent = m.title || s.title;
+    core.$("songTitleBig").textContent = songDisplayTitle(s, m);
     core.$("songSub").textContent = [m.artist || s.artist, m.album, m.composer ? `${tr("plComposer")}: ${m.composer}` : "",
       m.matchHint ? `${tr("plMatchMemo")}: ${m.matchHint}` : "", s.charter ? `${tr("chartBy")}: ${s.charter}` : "", srcLabel(s)].filter(Boolean).join(" · ");
     const art = s.bgBlob || s.artBlob || null;
@@ -2680,7 +2778,7 @@ async function selectSong(it) {
   await applySongBackground(it);
   if (core.currentSong !== it) return;
   previewPending = true;
-  const ok = await window.Trk.media.loadMedia(it.file, { title:it.title, onReady:() => restoreSongState(it) });
+  const ok = await window.Trk.media.loadMedia(it.file, { title:songDisplayTitle(it), onReady:() => restoreSongState(it) });
   if (!ok || core.currentSong !== it) return;
   renderLib(); renderBanner(); updateSpBuilder(); renderSeedTools();
 }

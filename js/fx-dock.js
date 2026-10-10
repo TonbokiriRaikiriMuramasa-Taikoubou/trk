@@ -177,7 +177,10 @@ Object.assign(TEXT.ja, {
   ampCleared:"段を全部外しました", ampFull:"ラックは8段までです。",
   ampStageAdd:"＋ 段を追加", ampStagePick:"追加する段", ampClear:"✕ 全部外す",
   ampMore:"🎛 段をくわしく調整（設定を開く）",
-  ampAdjustHint:"段のつまみ（しきい値・周波数など）は、設定の「🎚 エフェクターラック（段で重ねる）」で調整できます。アンプを切っても、プリセットの音はそのまま残ります。"
+  ampAdjustHint:"段のつまみ（しきい値・周波数など）は、設定の「🎚 エフェクターラック（段で重ねる）」で調整できます。アンプを切っても、プリセットの音はそのまま残ります。",
+  midiMixTitle:"🎚 TRK MIDI MIX",
+  midiMixHint:"MP3・WAVなど通常の再生音に音響効果をかけます。SoundFont音源や音声からMIDIへの変換ではありません。MIDI音色プロフィールとは独立し、初期設定はオフです。",
+  midiMixEnable:"通常音声にTRK MIDI MIXを使う（初期オフ）", midiMixProfile:"MIXプロフィール"
 });
 Object.assign(TEXT.en, {
   dockTitle:"🎛 More (EQ, skin, menu)", dockFavLabel:"⭐ Favorites that don't fit on the buttons",
@@ -214,7 +217,10 @@ Object.assign(TEXT.en, {
   ampCleared:"Removed every stage", ampFull:"The rack holds up to 8 stages.",
   ampStageAdd:"＋ Add stage", ampStagePick:"Stage to add", ampClear:"✕ Remove all",
   ampMore:"🎛 Fine-tune the stages (open settings)",
-  ampAdjustHint:"Stage knobs (thresholds, frequencies…) live in Settings → 🎚 Effect rack (stack your own). Turning the amp off keeps your preset sound."
+  ampAdjustHint:"Stage knobs (thresholds, frequencies…) live in Settings → 🎚 Effect rack (stack your own). Turning the amp off keeps your preset sound.",
+  midiMixTitle:"🎚 TRK MIDI MIX",
+  midiMixHint:"Adds audio effects to ordinary playback such as MP3 and WAV. It is not a SoundFont synthesizer or audio-to-MIDI converter. It is independent of the MIDI timbre profiles and starts off.",
+  midiMixEnable:"Use TRK MIDI MIX on regular audio (off by default)", midiMixProfile:"MIX profile"
 });
 Object.assign(TEXT.zh, {
   dockTitle:"🎛 详细（均衡器·皮肤·菜单）", dockFavLabel:"⭐ 按钮放不下的收藏",
@@ -250,7 +256,10 @@ Object.assign(TEXT.zh, {
   ampCleared:"已移除全部段", ampFull:"机架最多8段。",
   ampStageAdd:"＋ 添加一段", ampStagePick:"要添加的段", ampClear:"✕ 全部移除",
   ampMore:"🎛 细致调整段（打开设置）",
-  ampAdjustHint:"段的旋钮（阈值、频率等）在设置的“🎚 效果器机架（分段叠加）”里调整。关闭功放不会改变预设的音色。"
+  ampAdjustHint:"段的旋钮（阈值、频率等）在设置的“🎚 效果器机架（分段叠加）”里调整。关闭功放不会改变预设的音色。",
+  midiMixTitle:"🎚 TRK MIDI MIX",
+  midiMixHint:"为 MP3、WAV 等普通播放音频添加音效。这不是 SoundFont 合成器，也不会将音频转换成 MIDI。它独立于 MIDI 音色配置，默认关闭。",
+  midiMixEnable:"对普通音频使用 TRK MIDI MIX（默认关闭）", midiMixProfile:"MIX 配置"
 });
 Object.assign(TEXT.ko, {
   dockTitle:"🎛 자세히 (EQ·스킨·메뉴)", dockFavLabel:"⭐ 버튼에 다 들어가지 않는 즐겨찾기",
@@ -286,7 +295,10 @@ Object.assign(TEXT.ko, {
   ampCleared:"모든 단을 뺐어요", ampFull:"랙은 최대 8단이에요.",
   ampStageAdd:"＋ 단 추가", ampStagePick:"추가할 단", ampClear:"✕ 전부 빼기",
   ampMore:"🎛 단을 자세히 조정 (설정 열기)",
-  ampAdjustHint:"단의 노브(임계값·주파수 등)는 설정의 ‘🎚 이펙터 랙 (단으로 쌓기)’에서 조정해요. 앰프를 꺼도 프리셋 소리는 그대로예요."
+  ampAdjustHint:"단의 노브(임계값·주파수 등)는 설정의 ‘🎚 이펙터 랙 (단으로 쌓기)’에서 조정해요. 앰프를 꺼도 프리셋 소리는 그대로예요.",
+  midiMixTitle:"🎚 TRK MIDI MIX",
+  midiMixHint:"MP3, WAV 등 일반 재생 오디오에 음향 효과를 적용합니다. SoundFont 신시사이저나 오디오를 MIDI로 변환하는 기능이 아닙니다. MIDI 음색 프로필과 독립적이며 기본값은 꺼짐입니다.",
+  midiMixEnable:"일반 오디오에 TRK MIDI MIX 사용 (기본 꺼짐)", midiMixProfile:"MIX 프로필"
 });
 
 /* ============ 📡 アンテナ：バックグラウンド再生 ============
@@ -694,6 +706,69 @@ addEventListener("DOMContentLoaded", () => {
     const head = full.querySelector('[data-i18n="sfxRackTitle"]');
     setTimeout(() => { try { (head || full).scrollIntoView({ behavior:"smooth", block:"center" }); } catch (_) {} }, 60);
   });
+
+  /* 🎚 通常音声向けの独立MIX（SoundFont合成や音声→MIDI変換ではない。初期オフ） */
+  const midiMix = core.el("details", "panel dockMidiMix"); midiMix.id = "midiMixPanel";
+  midiMix.open = core.settings.midiMixOpen !== false;
+  midiMix.addEventListener("toggle", () => { core.settings.midiMixOpen = midiMix.open; core.saveUserPrefs(); });
+  const midiMixUseLab = core.el("label", "check"), midiMixUseInp = document.createElement("input");
+  midiMixUseInp.type = "checkbox"; midiMixUseLab.append(midiMixUseInp, tx("span", "midiMixEnable"));
+  const midiMixProfileRow = core.el("label", "field"), midiMixProfileSel = document.createElement("select");
+  midiMixProfileRow.append(tx("span", "midiMixProfile"), midiMixProfileSel);
+  function buildMidiMixProfiles() {
+    const api = window.Trk && window.Trk.midiProfiles;
+    if (!api || typeof api.list !== "function") { midiMix.hidden = true; return; }
+    midiMix.hidden = false;
+    const selected = api.normalize(core.settings.midiMixProfile);
+    if (selected !== core.settings.midiMixProfile) {
+      core.settings.midiMixProfile = selected;
+      core.saveUserPrefs();
+    }
+    midiMixProfileSel.textContent = "";
+    for (const [category, labelKey] of [["reference", "midiProfileReference"], ["trk", "midiProfileOriginal"]]) {
+      const group = document.createElement("optgroup"); group.label = tr(labelKey);
+      for (const profile of api.list().filter(p => p.category === category)) {
+        const option = document.createElement("option"); option.value = profile.id;
+        const name = profile.name || {};
+        option.textContent = name[core.settings.language] || name.en || name.ja || profile.id;
+        group.append(option);
+      }
+      if (group.children.length) midiMixProfileSel.append(group);
+    }
+    midiMixProfileSel.value = selected;
+  }
+  function syncMidiMix() {
+    midiMixUseInp.checked = core.settings.midiMixEnabled === true;
+    midiMix.open = core.settings.midiMixOpen !== false;
+    const api = window.Trk && window.Trk.midiProfiles;
+    if (!api || typeof api.normalize !== "function") return;
+    const selected = api.normalize(core.settings.midiMixProfile);
+    if (selected !== core.settings.midiMixProfile) {
+      core.settings.midiMixProfile = selected;
+      core.saveUserPrefs();
+    }
+    midiMixProfileSel.value = selected;
+  }
+  midiMixUseInp.checked = core.settings.midiMixEnabled === true;
+  midiMixUseInp.addEventListener("change", () => {
+    const F = window.TrkFX;
+    core.settings.midiMixEnabled = !!(F && typeof F.midiMixOn === "function" && F.midiMixOn(midiMixUseInp.checked));
+    midiMixUseInp.checked = core.settings.midiMixEnabled;
+  });
+  midiMixProfileSel.addEventListener("change", () => {
+    const F = window.TrkFX;
+    const selected = F && typeof F.midiMixProfile === "function" ? F.midiMixProfile(midiMixProfileSel.value) : "studio_gm";
+    core.settings.midiMixProfile = selected;
+    midiMixProfileSel.value = selected;
+  });
+  midiMix.append(tx("summary", "midiMixTitle"), tx("div", "midiMixHint", "hint"), midiMixUseLab, midiMixProfileRow);
+  buildMidiMixProfiles(); syncMidiMix();
+  if (typeof on === "function") {
+    on("language", () => { buildMidiMixProfiles(); syncMidiMix(); });
+    on("midiMix", syncMidiMix);
+    on("audioPrefsReset", () => { buildMidiMixProfiles(); syncMidiMix(); });
+  }
+
   ampBuildTypes(); renderAmp();
   if (typeof on === "function") { on("fxRack", renderAmp); on("language", () => { ampBuildTypes(); renderAmp(); }); }
 
@@ -715,6 +790,20 @@ addEventListener("DOMContentLoaded", () => {
   setTimeout(placeAmp, 0);
   if (typeof MutationObserver === "function") {
     try { new MutationObserver(placeAmp).observe(col, { childList:true }); } catch (_) {}
+  }
+
+  /* 🎚 MIXは #richPanel の直下を維持する（TVドックの並べ替え・再生成にも追従）。 */
+  const midiMixOwner = () => col.querySelector(":scope > #richPanel");
+  const placeMidiMix = () => {
+    const owner = midiMixOwner();
+    if (owner && owner.nextElementSibling !== midiMix) owner.after(midiMix);
+    else if (!owner && amp.parentElement === col && amp.nextElementSibling !== midiMix) amp.after(midiMix);
+    else if (!owner && amp.parentElement !== col && midiMix.parentElement !== col) col.append(midiMix);
+  };
+  if (!midiMix.parentElement) col.append(midiMix);
+  placeMidiMix(); setTimeout(placeMidiMix, 0);
+  if (typeof MutationObserver === "function") {
+    try { new MutationObserver(placeMidiMix).observe(col, { childList:true }); } catch (_) {}
   }
 
   /* ---- 液晶の一時メッセージ ---- */

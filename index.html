@@ -148,7 +148,7 @@
               <button id="libReconnectBtn" type="button" hidden></button>
               <button id="libRescanBtn" type="button" hidden data-i18n="libRescan"></button>
               <label class="fileBtn small">
-                <input id="mediaFile" type="file" accept="video/*,audio/*" multiple hidden>
+                <input id="mediaFile" type="file" accept="video/*,audio/*,.mid,.midi" multiple hidden>
                 <span data-i18n="libAddFile"></span>
               </label>
               <!-- 🎬 動画を読み込む：最初のフレームまで確かめて「映像つき」として記録し、そのまま全画面で流す -->
@@ -1138,6 +1138,14 @@
 
           <details class="panel">
             <summary data-i18n="secSound"></summary>
+            <details id="midiSoundPanel" class="subPanel">
+              <summary data-i18n="midiSoundTitle"></summary>
+              <label class="field">
+                <span id="midiSoundProfileLabel" data-i18n="midiSoundLabel"></span>
+                <select id="midiSoundProfile" aria-labelledby="midiSoundProfileLabel"></select>
+              </label>
+              <div class="hint" data-i18n="midiSoundHint"></div>
+            </details>
             <label class="check"><input id="seEnabled" type="checkbox"><span data-i18n="enableSE"></span></label>
             <div class="inline">
               <span data-i18n="seVolume" id="seVolumeLabel"></span>
@@ -1673,6 +1681,9 @@
 <!-- player.js：AUTO・練習中の再生操作。各モードより先にキーを受け取るため、core.js のすぐ後 -->
 <script src="js/player.js"></script>
 <script src="js/chart-gen.js"></script>
+<script src="js/midi-profiles.js"></script>
+<script src="js/midi-player.js"></script>
+<script src="js/midi-settings.js"></script>
 <script src="js/media.js"></script>
 <script src="js/audio-art.js"></script>
 <script src="js/judge-match.js"></script>
@@ -1698,6 +1709,7 @@
 <script src="js/favs.js"></script>
 <!-- ===== 選曲・公認・入力・起動 ===== -->
 <!-- ===== 🛒 公式カタログ（音源同梱なし・MODは catalog.js より前に読む） ===== -->
+<script src="js/touhou-theme-data.js"></script>
 <script src="js/catalog.js"></script>
 <script src="js/title-match.js"></script>
 <script src="js/library.js"></script>

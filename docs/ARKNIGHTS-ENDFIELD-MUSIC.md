@@ -24,7 +24,7 @@
 | Vol.2（初号指令OST 下 / 零号委托OST（下））23曲・70:52 | https://ffm.to/eq8xpy7 | [4msN2gQVhoyeSNxH5fp6RW](https://open.spotify.com/album/4msN2gQVhoyeSNxH5fp6RW) | [OLAK5uy_lTVj4U8HrYsSidSEgzrTsC7AHCIoao3mE](https://music.youtube.com/playlist?list=OLAK5uy_lTVj4U8HrYsSidSEgzrTsC7AHCIoao3mE) | [B0GN36HRI9](https://music.amazon.com/albums/B0GN36HRI9) | [361958075](https://music.163.com/#/album?id=361958075) | [Deezer](https://www.deezer.com/album/917391741)・[Qobuz](https://play.qobuz.com/album/okt4htf3bnn16) |
 
 - 資料用ページ（公式ではない）：VGMdb [Vol.1](https://vgmdb.net/album/157312) / [Vol.2](https://vgmdb.net/album/157313)
-- **Apple Music 掲載は 2026-10-10 時点で確認できませんでした**（公式告知の配信サービス名とffm.toの表示範囲にApple Musicがない）。これは「配信されていない」証明ではありません。
+- **Apple Music 掲載**：2026-10-10 時点では確認できませんでしたが、**2026-10-11 にレーベルの Apple Music アーティストページ（[1870752601](https://music.apple.com/us/artist/metal-scar-radio/1870752601)）で Vol.1 の掲載を確認しました**（[Zeroth Directive (Original Soundtrack), Vol. 1 — 1879684533](https://music.apple.com/us/album/zeroth-directive-original-soundtrack-vol-1/1879684533)）。Vol.2 のアルバム別URL・曲別URLの照合は未実施です。
 
 ## 収録したプレイリスト（js/catalog.js・シリーズ `endfield`）
 
@@ -250,13 +250,36 @@
 - trk! は曲名などの事実情報と公式配信先リンクのみを表示し、**音源を同梱・再配布しません**。配信・購入・サブスクリプションは二次利用許諾ではありません。
 - ゲームプレイ動画にゲーム内BGMが含まれる場合の自動コンテンツ識別（クレーム）運用までは個別検証していません。ガイドラインの配信条件を満たす利用と、音源単体の再利用は分けて考えてください。
 
+## 調査中の他の公式リリース（batch 3候補・2026-10-11）
+
+レーベルの Apple Music アーティストページ（[Metal Scar Radio / 1870752601](https://music.apple.com/us/artist/metal-scar-radio/1870752601)）・Amazon Music アーティストページ・Shazam・Spotify の「人気曲」表示から、カタログ未収録の公式リリースを洗い出しました。**まだカタログには入れていません**（Spotify のアルバムID・全曲順・曲別IDがそろったものから追加します）。
+
+| リリース | 種別 | 配信日 | 曲数 | 2026-10-11 時点で確認できたこと | 未取得 |
+|---|---|---|---|---|---|
+| Yi | EP | 2026-04-21（Spotifyページの日付表示。要再確認） | 4 | Spotifyアルバム [`7wYXh2CxBTVo30xgmS3kAw`](https://open.spotify.com/album/7wYXh2CxBTVo30xgmS3kAw) と公式ffm.toスマートリンク https://ffm.to/yi 。4曲（Yi／Yi (Instrumental Version)／The World Is Waking／The World Is Waking (Instrumental Version)）の曲名・アーティスト・曲順をSpotify埋め込みページで確認済み | 個別曲ID |
+| Old Deep Water Dies, by Rising Tide It is Denied（新潮起，故渊离OST） | OST | 2026-03-25 | 14 | Apple Music [1887205933](https://music.apple.com/us/album/old-deep-water-dies-by-rising-tide-it-is-denied-original/1887205933)（14曲・34分・℗ 2026 GRYPHLINE）、VGMdb [158491](https://vgmdb.net/album/158491)、Qobuz掲載。作曲クレジットはVGMdbで確認可 | SpotifyアルバムID・全曲順・曲別ID |
+| Sketches of Lost Heirlooms | OST | 未確認 | 未確認 | Apple Music [6781173816](https://music.apple.com/us/album/sketches-of-lost-heirlooms-original-soundtrack/6781173816)、Amazon Music／Qobuz に「Album・2026」表記 | SpotifyアルバムID・曲数・曲順 |
+| Ode to the Night Stars | EP（Compilation） | 未確認 | 未確認 | Shazam／Apple のアーティストページに「Compilation Album・2026」表記 | すべて |
+| Mirairo Rider | EP | 未確認 | 未確認 | Spotify のレーベル人気曲10位に「Mirairo Rider (Japanese Ver.)」（Metal Scar Radio, 居川純平, 如月結愛, 佐々木李子・3:57） | アルバムID・収録曲 |
+| Fragmented Dreams | Single | 未確認 | 未確認 | Apple Music [6806960879](https://music.apple.com/us/album/fragmented-dreams/6806960879)、Spotify人気曲に「Fragmented Dreams」（Metal Scar Radio, ReStudio, Evan, z1on・4:03） | アルバムID |
+| Under My Breath | Single | 未確認 | 未確認 | Apple Music [6782831565](https://music.apple.com/us/album/under-my-breath/6782831565) | アルバムID・曲情報 |
+| Guided by Echoes | Single | 未確認 | 未確認 | Apple Music [6793472028](https://music.apple.com/us/album/guided-by-echoes/6793472028)（Metal Scar Radio, Runyu Qian, Breakfast@A8RECORDS, Sephid）。既存 `ef-signal` に紹介項目あり | アルバムID |
+| Snapshot | Single | 未確認 | 未確認 | Shazam のアーティストページに記載（Metal Scar Radio, Adam Gubman, Sorah Eun） | アルバムID・曲情報 |
+| My World (Blood Oath) | EP | 未確認 | 未確認 | Apple Music [1890100176](https://music.apple.com/us/album/my-world-blood-oath-tale-version/1890100176)（「Tale Version」を含む） | アルバムID・曲数 |
+| A Promise Makes a Home | Single | 2026-10-07 | 2 | Apple Music [6820048204](https://music.apple.com/us/album/a-promise-makes-a-home-single/6820048204)（2曲・レーベルページの「最新リリース」） | Spotify ID |
+| Ashen Remains | EP | 未確認 | 未確認 | Apple Music [1880258196](https://music.apple.com/us/album/sign-of-the-coming-flame/1880258196)（「Sign of the Coming Flame」を収録）。既存 `ef-ashen` は紹介版のまま | アルバムID・収録曲 |
+| Blurring | Single | 未確認 | 未確認 | Apple Music [1872026534](https://music.apple.com/us/album/blurring/1872026534)。既存 `ef-blurring` は紹介版のまま | アルバムID・収録曲 |
+
+- Apple Music・Amazon Music のアルバムIDは**参考情報**です。カタログのリンクは公式Spotifyに統一する方針なので、追加前にSpotifyのアルバムIDと曲順を確認します。
+- 「未確認」は「存在しない」ではありません。曲数・曲順が公式ページで確認できないリリースはカタログに入れません。
+
 ## 未確認・次段階
 
 - 60曲のSpotify個別曲URLは 2026-10-10 時点の公式アルバムページHTMLで確認しましたが、実ブラウザでの一括再確認（地域制限・ログイン要求の有無）は未実施です。抜取確認として同日、Vol.1 #37「Faith's Imprint」と Vol.2 #23「Forge」の個別曲ページを開き、曲名・収録アルバム・アーティスト・長さがカタログと一致することを確認しました。
 - Apple Music での Zeroth Directive Vol.1–2 のアルバム掲載は未確認（「配信なし」の断定ではありません）。
 - バッチ2（trk111）の6作81曲は、曲順・曲名・アーティストを 2026-10-11 に公式Spotifyのアルバム埋め込みページで6作すべて再確認し、Homecoming の30曲は公式ffm.toスマートリンクでも照合しました。個別曲IDの抜取確認は6曲（PHEONIX ON THE RISE／Drowned in Depth／Rekindled／Keeper of My Heart／Vermilion／HER Calling）で、**残り75曲のIDは個別に開いて確認していません**。実ブラウザでの地域制限・ログイン要求の確認も未実施です。
 - バッチ2の6作について未確認のまま：中国語公式曲名（＝照合別名を未登録）、公式告知のffm.to配信一覧（Homecoming の https://ffm.to/homecoming-original-soundtrack は確認済み。他5作は未確認）、VGMdb照合（Eve of Departure のページ 158984 の存在は確認しましたが内容は未精読）、他ストアのアルバム別・曲別URL（Apple Music／Amazon Music／TIDAL／Qobuz への掲載自体は確認）。
-- Metal Scar Radio の残る公式リリース（Spotify／Apple Music のアーティストページで確認できる Sketches of Lost Heirlooms、Old Deep Water Dies by Rising Tide It is Denied、Yi、Ode to the Night Stars、Fragmented Dreams、Mirairo Rider、Under My Breath、Journey to Brickyland、Qingbo! Oh My Life、Snapshot、Lollipop Neo-nista 等）は**今後の調査対象**です。既存の `ef-blurring` 等は紹介版のままです。
+- Metal Scar Radio の残る公式リリースは**今後の調査対象**です。2026-10-11 に洗い出した候補（Yi、Old Deep Water Dies、Sketches of Lost Heirlooms、Ode to the Night Stars、Mirairo Rider、Fragmented Dreams、Under My Breath、Guided by Echoes、Snapshot、My World (Blood Oath)、A Promise Makes a Home、Ashen Remains、Blurring ほか）と確認状況は上の「調査中の他の公式リリース」の表を参照してください。既存の `ef-blurring`・`ef-ashen` 等は紹介版のままです。
 - 中国語版・英語版の二次創作ガイドラインは未精読。この台帳は日本語版ガイドライン（2026-08-24改訂版）を正とします。
 
 ## 参照先

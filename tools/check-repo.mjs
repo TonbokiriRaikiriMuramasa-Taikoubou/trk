@@ -917,6 +917,88 @@ if (!exists("js/fx-worklet.js") ||
   else ok("Arknights: Endfield Zeroth Directive OST Vol.1–2: 60 ordered Spotify-linked tracks, Chinese-title aliases, ffm.to guides, safe existing-playlist refresh");
 }
 
+// 🛰️ Arknights: Endfield — Metal Scar Radio official albums (batch 2): six albums (Eve of Departure,
+// Thunder's Legacy, At the Wake of Spring, Contingency Contract Re-Ignition, Homecoming, Dreamscape of
+// Wind and Snow) in official Spotify album order with unique per-track Spotify links, official Spotify
+// album-page sources, cautious rights notes, and auto-creation of all six playlists under trk-endfield.
+{
+  const catalogSource = read("js/catalog.js");
+  const library = read("js/library.js");
+  let catalogDataOk = false;
+  let autoCreateOk = false;
+  try {
+    const fixture = JSON.parse(read("tools/endfield-msr-albums-tracklist.json"));
+    const catalogContext = vm.createContext({});
+    new vm.Script(catalogSource + "\nglobalThis.__TRK_CATALOG_FOR_CHECK = TRK_CATALOG;").runInContext(catalogContext);
+    const series = catalogContext.__TRK_CATALOG_FOR_CHECK.find(item => item.id === "endfield");
+    let trackTotal = 0;
+    const spotifyIds = [];
+    let albumsMatch = !!series && series.url === fixture.sources.officialSiteJa;
+    for (const expected of fixture.albums) {
+      const actual = series && series.playlists.find(pl => pl.id === expected.id);
+      if (!actual || actual.name !== expected.name || actual.songs.length !== expected.tracks.length ||
+          actual.sourceUrl !== expected.spotifyAlbumUrl || actual.sourceLabel !== "公式Spotifyアルバム") { albumsMatch = false; continue; }
+      for (let i = 0; i < expected.tracks.length; i++) {
+        const [title, artist, spotifyId] = expected.tracks[i];
+        const track = actual.songs[i];
+        trackTotal++;
+        spotifyIds.push(spotifyId);
+        if (!/^[A-Za-z0-9]{22}$/.test(spotifyId) || !track || track.t !== title || track.ar !== artist ||
+            track.al !== expected.album || track.u !== "https://open.spotify.com/track/" + spotifyId ||
+            track.matchAliases) albumsMatch = false;
+      }
+    }
+    const earlierListsKept = !!series && [["ef-blurring", 2], ["ef-ashen", 2], ["ef-floaty", 2], ["ef-makers", 1],
+      ["ef-firstorder", 37], ["ef-firstorder2", 23], ["ef-signal", 5]]
+      .every(([id, count]) => {
+        const pl = series.playlists.find(item => item.id === id);
+        return !!pl && pl.songs.length === count;
+      });
+    const rightsOk = !!series && series.note.includes("音源は同梱せず") &&
+      series.note.includes("二次利用許諾ではありません") &&
+      series.note.includes(fixture.sources.fanContentGuidelinesJa) &&
+      series.note.includes("Homecoming") && series.note.includes("Dreamscape of Wind and Snow") &&
+      fixture.albums.every(album => album.trackCount === album.tracks.length &&
+        /^2026-\d{2}-\d{2}$/.test(album.releaseDate) &&
+        /^https:\/\/open\.spotify\.com\/album\/[A-Za-z0-9]{22}$/.test(album.spotifyAlbumUrl)) &&
+      fixture.verification.spotCheckedTrackIds.every(([title, id]) =>
+        fixture.albums.some(album => album.tracks.some(track => track[0] === title && track[2] === id)));
+    catalogDataOk = albumsMatch && earlierListsKept && rightsOk && trackTotal === 81 &&
+      new Set(spotifyIds).size === 81 &&
+      JSON.stringify(fixture.albums.map(album => album.tracks.length)) === JSON.stringify([5, 9, 17, 4, 30, 16]);
+
+    const ensureStart = library.indexOf("function trkCatalogGuide(");
+    const ensureEnd = library.indexOf("\n(function plTighten()", ensureStart);
+    if (ensureStart >= 0 && ensureEnd > ensureStart) {
+      const testSettings = { playlists: [] };
+      let saveCount = 0;
+      const runContext = vm.createContext({
+        settings: testSettings,
+        ensureTrkFolder: () => {},
+        trkCatalog: () => [series],
+        plSanitize: raw => raw,
+        saveUserPrefs: () => { saveCount++; },
+        trkWishesForSeries: () => []
+      });
+      new vm.Script(library.slice(library.indexOf("function trkWishFromTrack("), library.indexOf("\nfunction trkWishesFromCatalog")) + "\n" +
+        library.slice(ensureStart, ensureEnd) + "\nensureTrkDistributionPlaylists();").runInContext(runContext);
+      autoCreateOk = saveCount > 0 && fixture.albums.every(expected => {
+        const created = testSettings.playlists.find(pl => pl.id === "trk-" + expected.id);
+        return !!created && created.folder === "trk-endfield" && created.cat === "trk:endfield:" + expected.id &&
+          created.name === expected.name && created.wish.length === expected.tracks.length &&
+          created.wish.every(wish => !wish.matchAliases && /^https:\/\/open\.spotify\.com\/track\//.test(wish.u)) &&
+          created.guide.url === expected.spotifyAlbumUrl &&
+          created.guide.note.includes("二次利用許諾ではありません");
+      });
+    }
+  } catch (error) {
+    console.error(`WARN  Endfield MSR albums test setup failed: ${error.message}`);
+  }
+  if (!catalogDataOk) fail("Endfield MSR albums fixture/catalog mismatch (expected 6 albums with 5+9+17+4+30+16 ordered tracks, unique official Spotify track links, Spotify album-page sources, and rights notes)");
+  else if (!autoCreateOk) fail("Endfield MSR albums must auto-create the six playlists under trk-endfield with full wishes and official Spotify album guides");
+  else ok("Arknights: Endfield Metal Scar Radio albums (batch 2): 81 ordered Spotify-linked tracks across Eve of Departure, Thunder's Legacy, At the Wake of Spring, Re-Ignition, Homecoming, Dreamscape");
+}
+
 // ⚔️ LoL Creator-Safe Sessions: complete SoundCloud album order/count and one official song URL per track.
 {
   const catalogSource = read("js/catalog.js");

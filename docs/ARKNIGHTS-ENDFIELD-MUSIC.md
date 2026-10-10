@@ -1,6 +1,6 @@
 # アークナイツ：エンドフィールド 公式楽曲カタログ — 調査・実装台帳
 
-最終確認：**2026-10-10（UTC）**
+最終確認：**2026-10-11（UTC）**（trk111：Metal Scar Radio公式アルバム6作・81曲を追加）
 
 ## 方針
 
@@ -24,7 +24,7 @@
 | Vol.2（初号指令OST 下 / 零号委托OST（下））23曲・70:52 | https://ffm.to/eq8xpy7 | [4msN2gQVhoyeSNxH5fp6RW](https://open.spotify.com/album/4msN2gQVhoyeSNxH5fp6RW) | [OLAK5uy_lTVj4U8HrYsSidSEgzrTsC7AHCIoao3mE](https://music.youtube.com/playlist?list=OLAK5uy_lTVj4U8HrYsSidSEgzrTsC7AHCIoao3mE) | [B0GN36HRI9](https://music.amazon.com/albums/B0GN36HRI9) | [361958075](https://music.163.com/#/album?id=361958075) | [Deezer](https://www.deezer.com/album/917391741)・[Qobuz](https://play.qobuz.com/album/okt4htf3bnn16) |
 
 - 資料用ページ（公式ではない）：VGMdb [Vol.1](https://vgmdb.net/album/157312) / [Vol.2](https://vgmdb.net/album/157313)
-- **Apple Music 掲載は 2026-10-10 時点で確認できませんでした**（公式告知の配信サービス名とffm.toの表示範囲にApple Musicがない）。これは「配信されていない」証明ではありません。
+- **Apple Music 掲載**：2026-10-10 時点では確認できませんでしたが、**2026-10-11 にレーベルの Apple Music アーティストページ（[1870752601](https://music.apple.com/us/artist/metal-scar-radio/1870752601)）で Vol.1 の掲載を確認しました**（[Zeroth Directive (Original Soundtrack), Vol. 1 — 1879684533](https://music.apple.com/us/album/zeroth-directive-original-soundtrack-vol-1/1879684533)）。Vol.2 のアルバム別URL・曲別URLの照合は未実施です。
 
 ## 収録したプレイリスト（js/catalog.js・シリーズ `endfield`）
 
@@ -32,11 +32,17 @@
 |---|---|---|---|---|
 | `ef-firstorder`「Endfield — Zeroth Directive OST Vol.1（初号指令・上）」 | 初号指令OST（上）＝Zeroth Directive Vol.1 全曲を公式収録順で | 37 | 公式Spotify個別曲 | 公式ffm.to配信一覧 |
 | `ef-firstorder2`「Endfield — Zeroth Directive OST Vol.2（初号指令・下）」 | 初号指令OST（下）＝Zeroth Directive Vol.2 全曲を公式収録順で | 23 | 公式Spotify個別曲 | 公式ffm.to配信一覧 |
+| `ef-eve`「Endfield — Eve of Departure」 | EP全曲を公式収録順で（2026-04-11） | 5 | 公式Spotify個別曲 | 公式Spotifyアルバム |
+| `ef-thunder`「Endfield — Thunder's Legacy」 | アルバム全曲を公式収録順で（2026-04-22） | 9 | 公式Spotify個別曲 | 公式Spotifyアルバム |
+| `ef-wake`「Endfield — At the Wake of Spring OST」 | OST全曲を公式収録順で（2026-04-30） | 17 | 公式Spotify個別曲 | 公式Spotifyアルバム |
+| `ef-ccr`「Endfield — Contingency Contract Re-Ignition OST」 | EP全曲を公式収録順で（2026-06-20） | 4 | 公式Spotify個別曲 | 公式Spotifyアルバム |
+| `ef-homecoming`「Endfield — Homecoming OST」 | OST全曲を公式収録順で（2026-07-31） | 30 | 公式Spotify個別曲 | 公式Spotifyアルバム |
+| `ef-dreamscape`「Endfield — Dreamscape of Wind and Snow OST」 | OST全曲を公式収録順で（2026-09-10） | 16 | 公式Spotify個別曲 | 公式Spotifyアルバム |
 
 - 旧版の「初号指令 OST」プレイリスト（上・下それぞれ Part 1/2 の4項目紹介版）は、**永続ID `ef-firstorder` を保ったまま Vol.1 全37曲版へ更新**します。既存の取り込みは wish・ガイドと旧既定名／タグだけが更新され、所持曲・ユーザーが変えた名前／アイコン／タグはそのままです（`js/library.js` のセーフリフレッシュ、検査は `tools/check-repo.mjs`）。
 - 中国語公式曲名（例：`协议流`＝Protocol Flow）は**照合別名（matchAliases）**として登録。中国語ファイル名の手元音源も曲名照合できます。表示曲名は公式英語名です。
-- キャラクターOST等の既存プレイリスト（`ef-blurring`・`ef-ashen`・`ef-floaty`・`ef-makers`・`ef-signal`）の内容は変更していません。
-- データの正： [`tools/endfield-zeroth-directive-tracklist.json`](../tools/endfield-zeroth-directive-tracklist.json)
+- キャラクターOST等の既存プレイリスト（`ef-blurring`・`ef-ashen`・`ef-floaty`・`ef-makers`・`ef-signal`）の内容は変更していません。紹介版の `ef-signal` には「Rekindled」「REAPER」が含まれており、本バッチの `ef-ccr`・`ef-homecoming` と曲が重複しますが、両方とも残しています（紹介版は変更しない方針）。
+- データの正： [`tools/endfield-zeroth-directive-tracklist.json`](../tools/endfield-zeroth-directive-tracklist.json)（Zeroth Directive Vol.1–2）・[`tools/endfield-msr-albums-tracklist.json`](../tools/endfield-msr-albums-tracklist.json)（本バッチの6作81曲）
 
 ### Tracklist — Vol.1（初号指令OST 上 / 零号委托OST（上））
 
@@ -108,6 +114,132 @@
 | 22 | New Foundation | 新壤 | Metal Scar Radio, Robert Wolf | [track](https://open.spotify.com/track/54MxCLBrmnKfzS2zYCcNbZ) |
 | 23 | Forge | 洪炉 | Metal Scar Radio, SKa2or | [track](https://open.spotify.com/track/3TKJkruK3HMHG25SwptRxi) |
 
+## Metal Scar Radio の他の公式アルバム6作（trk111で追加）
+
+レーベルの公式Spotifyアーティストページ（[Metal Scar Radio](https://open.spotify.com/artist/63CsKCn2OazatczRm1tk9c)）のディスコグラフィから、以下の6作をカタログに追加しました。曲順・曲名・アーティスト表記は **2026-10-11 に公式Spotifyのアルバム埋め込みページ（`open.spotify.com/embed/album/…`）で6作すべてを再確認**し、Homecoming の30曲は公式ffm.toスマートリンク（Data Controller 表示が **Arknights: Endfield**）でも曲順を照合しました（©/℗ 2026 GRYPHLINE）。個別曲IDは6曲（PHEONIX ON THE RISE／Drowned in Depth／Rekindled／Keeper of My Heart／Vermilion／HER Calling）を公式個別曲ページで抜取確認し、残り75曲のIDは同日のアルバムページ取得値のままです。
+
+この6作は Zeroth Directive のような**公式告知のffm.to配信一覧（Homecomingを除く）・VGMdb照合・中国語公式曲名を確認していない**ため、照合別名は未登録で、各アルバムの案内リンクは公式Spotifyアルバムページです。他ストアについては、Apple Music・Amazon Music・TIDAL・Qobuz の Metal Scar Radio アーティスト／アルバムページに本バッチのアルバムの掲載を 2026-10-11 に確認しましたが、**アルバム別・曲別URLの照合は未実施**なので、カタログのリンクはすべて公式Spotifyに統一しています（「他ストアに配信なし」の断定ではありません）。
+
+| アルバム | 配信日 | 曲数 | 公式Spotifyアルバム |
+|---|---|---|---|
+| Eve of Departure（Eve of Departure（EP）） | 2026-04-11 | 5 | [2zRC0GHUly8RwEZWV8Wnpr](https://open.spotify.com/album/2zRC0GHUly8RwEZWV8Wnpr) |
+| Thunder's Legacy（Thunder's Legacy） | 2026-04-22 | 9 | [7oQIngNMaM8CNqfOdV5alW](https://open.spotify.com/album/7oQIngNMaM8CNqfOdV5alW) |
+| At the Wake of Spring OST（At the Wake of Spring Original Soundtrack） | 2026-04-30 | 17 | [3wxeHdhX8CWYyn10gAeFEE](https://open.spotify.com/album/3wxeHdhX8CWYyn10gAeFEE) |
+| Contingency Contract Re-Ignition OST（Contingency Contract Re-Ignition Experimental Operation Original Soundtrack） | 2026-06-20 | 4 | [1qzlMIr2jwYizwY17Bseaa](https://open.spotify.com/album/1qzlMIr2jwYizwY17Bseaa) |
+| Homecoming OST（Homecoming Original Soundtrack） | 2026-07-31 | 30 | [1OUsAGgNlKQWUWQ154UN2v](https://open.spotify.com/album/1OUsAGgNlKQWUWQ154UN2v) |
+| Dreamscape of Wind and Snow OST（Dreamscape of Wind and Snow Original Soundtrack） | 2026-09-10 | 16 | [36qyyiGRMbtktVXGptjZL6](https://open.spotify.com/album/36qyyiGRMbtktVXGptjZL6) |
+
+### Tracklist — Eve of Departure（2026-04-11）
+
+| # | 曲名 | アーティスト | 公式リンク |
+|---|---|---|---|
+| 1 | PHEONIX ON THE RISE | Metal Scar Radio, Hero Baldwin, Alexander Rudd | [track](https://open.spotify.com/track/2LMFipAOoaXiyLG5VI0Mg0) |
+| 2 | New Frontier | Metal Scar Radio, Jonathan Sookdew Sing, Alec Justice, 10/KNIVES, Gold3n Ord3r | [track](https://open.spotify.com/track/1j1ac6RzycakpP4jWsU3or) |
+| 3 | Army of Angels | Metal Scar Radio, Hybrid | [track](https://open.spotify.com/track/7dl9PJdz9QMjZlJUulvaQw) |
+| 4 | Rising Horizon | Metal Scar Radio, Michael McCann | [track](https://open.spotify.com/track/2QMyswj0l2QzTEAEVO0mf9) |
+| 5 | Echo of Vision | Metal Scar Radio, Gareth Coker | [track](https://open.spotify.com/track/2qixuX48eng4w2gLc2qaKx) |
+
+### Tracklist — Thunder's Legacy（2026-04-22）
+
+| # | 曲名 | アーティスト | 公式リンク |
+|---|---|---|---|
+| 1 | Nightmare Without Veil | Metal Scar Radio, VISION SOUND, Salty Salt | [track](https://open.spotify.com/track/2xDxF7U8he0i62u7j2u4Kd) |
+| 2 | Lingering Glow | Metal Scar Radio, Aurora Sky, Lucien X | [track](https://open.spotify.com/track/2sWun7tcDHwmWSChKYrUdv) |
+| 3 | Hour of Blossoms | Metal Scar Radio, BaoUner | [track](https://open.spotify.com/track/15ACa86aWwwLZHjz1jtCXH) |
+| 4 | Where We Walked | Metal Scar Radio, 曾怡HeartStrings | [track](https://open.spotify.com/track/0nNQqZFKQ5gXvWqpfZ1s4F) |
+| 5 | Through Old Dreams | Metal Scar Radio, 封炫宇 | [track](https://open.spotify.com/track/4KvWGTm792bakBkXOyZbSo) |
+| 6 | Just So | Metal Scar Radio, 曾怡HeartStrings, Feryquitous, 王陽 | [track](https://open.spotify.com/track/1yReGHyOSa8LwAFuemxEXF) |
+| 7 | Butterfly in Ashes | Metal Scar Radio, Aurora Sky, Lucien X | [track](https://open.spotify.com/track/4ZqySz7IHJyGcsS3Rtv6TS) |
+| 8 | Where the Light Is Taken | Metal Scar Radio, Hyunmin Cho, 王陽 | [track](https://open.spotify.com/track/3RVCk4oW6FvzLAwGUM7RYq) |
+| 9 | Keeper of My Heart | Metal Scar Radio, MSR Studio | [track](https://open.spotify.com/track/3SBmFiIf302cz9R8jL0qNT) |
+
+### Tracklist — At the Wake of Spring OST（2026-04-30）
+
+| # | 曲名 | アーティスト | 公式リンク |
+|---|---|---|---|
+| 1 | Drowned in Depth | Metal Scar Radio, Bleeding Fingers, Giovanni Rios | [track](https://open.spotify.com/track/7J44kY14TyaFxOLQqKVRpA) |
+| 2 | Evil-Sealing Pool | Metal Scar Radio, BLEEDING FINGERS MUSIC, Martí Noguer | [track](https://open.spotify.com/track/5IbZUeHnQd765HoQtcChCU) |
+| 3 | Illusions, Begone | Metal Scar Radio, N2V, VISION SOUND | [track](https://open.spotify.com/track/6T5ESNUjQDiEKLEPJXw6iI) |
+| 4 | Celestial Axis | Metal Scar Radio, BLEEDING FINGERS MUSIC, Martí Noguer | [track](https://open.spotify.com/track/5sh7aqFWASUn1J0N7CMBXf) |
+| 5 | Beneath the Words | Metal Scar Radio, 動點 | [track](https://open.spotify.com/track/2zxgqmNobCCYqnbkmCgCyG) |
+| 6 | Blaze and Ruin | Metal Scar Radio, KH | [track](https://open.spotify.com/track/6qSHPMR4yI7O59ltrOzsmK) |
+| 7 | Seize the Pass | Metal Scar Radio, Unisonar, Nick Froud | [track](https://open.spotify.com/track/70onCdBvJk7DeVnErRsTi4) |
+| 8 | Blazing Hopes | Metal Scar Radio, Unisonar, Nick Froud | [track](https://open.spotify.com/track/1xunSAkv7lZL4GtrqXfNc9) |
+| 9 | Array of Fates | Metal Scar Radio, Unisonar, Nick Froud | [track](https://open.spotify.com/track/197Chn4ZrhbXdC6SWfoeal) |
+| 10 | Blooming Lanterns | Metal Scar Radio, Unisonar, Nick Froud | [track](https://open.spotify.com/track/4Ya7F9gD9XSs5Ni9xKPAHc) |
+| 11 | Rewrite the Prophecy | Metal Scar Radio, VISION SOUND, Salty Salt, Aurora Sky | [track](https://open.spotify.com/track/56FnXoQ7QWtA0q3DBJsSDX) |
+| 12 | Whispers of Decay | Metal Scar Radio, Cody Matthew Johnson, Alec Justice, Will Chen | [track](https://open.spotify.com/track/3fPtedaOmPMXP21OhH6a6X) |
+| 13 | Shatter the Crown | Metal Scar Radio, Cody Matthew Johnson, Alec Justice, Will Chen | [track](https://open.spotify.com/track/4qfiRQACYtdO6YQEu87d6S) |
+| 14 | Annihilation Response | Metal Scar Radio, Cody Matthew Johnson, Alec Justice, Will Chen | [track](https://open.spotify.com/track/2FSLJPqx0JYnvHRynhFqbb) |
+| 15 | Wake the Sea | Metal Scar Radio, Cody Matthew Johnson, Alec Justice, Will Chen | [track](https://open.spotify.com/track/2y4P0C6oz3xt4Lffx5f0Cn) |
+| 16 | Drawn by Spring | Metal Scar Radio, WS Music, 乃工 Milkman | [track](https://open.spotify.com/track/1BpJUvKBIMKvVBPf6PLKwN) |
+| 17 | Skipping Through Light | Metal Scar Radio, 動點 | [track](https://open.spotify.com/track/3xbdArOQXxOMlZpClXBJ1c) |
+
+### Tracklist — Contingency Contract Re-Ignition OST（2026-06-20）
+
+| # | 曲名 | アーティスト | 公式リンク |
+|---|---|---|---|
+| 1 | Rekindled | Metal Scar Radio, Alec Justice, Keep Close, Chapters | [track](https://open.spotify.com/track/5aWMskK7XVKh0SmKBD7h84) |
+| 2 | Contract of Order | Metal Scar Radio, Alec Justice | [track](https://open.spotify.com/track/4poeDOugwCenAMDD76w5Vt) |
+| 3 | Artificial Ruin | Metal Scar Radio, VISION SOUND, Salty Salt | [track](https://open.spotify.com/track/0xKCSZjYssDeGDXs8ONzHG) |
+| 4 | Rekindled (Instrumental Version) | Metal Scar Radio, Alec Justice, Keep Close, Chapters | [track](https://open.spotify.com/track/1nmZG5ln7TOHwzbrTQKT77) |
+
+### Tracklist — Homecoming OST（2026-07-31）
+
+| # | 曲名 | アーティスト | 公式リンク |
+|---|---|---|---|
+| 1 | Questioning the Veil | Metal Scar Radio, INSPION | [track](https://open.spotify.com/track/45k4MS7tTg8s0Obmzt7ihn) |
+| 2 | Glorious Mountain Pass | Metal Scar Radio, Ceru_ | [track](https://open.spotify.com/track/60oNwqMHyZOJfTy062Zyt9) |
+| 3 | The Day After Tomorrow | Metal Scar Radio, Ceru_ | [track](https://open.spotify.com/track/3WPjEMfpaEo0qiWAazXqnl) |
+| 4 | A Life for a Shadow | Metal Scar Radio, Ceru_ | [track](https://open.spotify.com/track/2ELjsQsirLmkc7MFcK8P4b) |
+| 5 | The Painted World | Metal Scar Radio, Hyunmin Cho | [track](https://open.spotify.com/track/0HsYy9dq4WDdIHfiD5xGMb) |
+| 6 | Inkwash Journey | Metal Scar Radio, Hyunmin Cho | [track](https://open.spotify.com/track/1S6a4fdUYJbZEU5hv56e9Z) |
+| 7 | Blunted by Endless Trials | Metal Scar Radio, 李化禹 | [track](https://open.spotify.com/track/2o9tc7CgklORR7RyaXclL5) |
+| 8 | Parting the Miasma | Metal Scar Radio, David Murillo, Moroi | [track](https://open.spotify.com/track/77iAGTWQ6KkbHexOGdFoT7) |
+| 9 | Guarding the Nexus | Metal Scar Radio, LCwwww, Feryquitous | [track](https://open.spotify.com/track/23plnEDuyTZCdMDB4M3ZtA) |
+| 10 | Void Annihilation | Metal Scar Radio, AION, Hahlweg | [track](https://open.spotify.com/track/4a7buJoufnwjYIhjTaTbA9) |
+| 11 | Exclusion Zone | Metal Scar Radio, Lukas Knoebl | [track](https://open.spotify.com/track/7ITAo94sRZV9ygWhlmqiS0) |
+| 12 | Honed Blade Ascension | Metal Scar Radio, Nick Froud | [track](https://open.spotify.com/track/7uSOYgjCn29hzbquKm1nHm) |
+| 13 | Tales of the Sword | Metal Scar Radio, Nick Froud | [track](https://open.spotify.com/track/4PB31GLS6FIugHjwpLjG7D) |
+| 14 | Matters Before the Hall | Metal Scar Radio, 湯湯 | [track](https://open.spotify.com/track/5F73p8qhJm4pLycLWUFCx8) |
+| 15 | Lost in the Flux | Metal Scar Radio, 明家歆, Jean-Gabriel Raynaud, 原田萌喜 | [track](https://open.spotify.com/track/4SPcnQDo7MBUEJ7HCIk2C2) |
+| 16 | Toward the Dreamscape | Metal Scar Radio, Hyunmin Cho | [track](https://open.spotify.com/track/3gtXhoK86da8pv9XvG8La5) |
+| 17 | The Heart Crumbles | Metal Scar Radio, Ceru_ | [track](https://open.spotify.com/track/25YiDTbYMaFo3UN3C5Liyl) |
+| 18 | My Former Home | Metal Scar Radio, Hyunmin Cho | [track](https://open.spotify.com/track/4B5ktT0DWQ1Ej4WT8CHJPq) |
+| 19 | For your name | Metal Scar Radio, Edine | [track](https://open.spotify.com/track/1I02UcCu4i0eRb5GM7WbLU) |
+| 20 | As Hope Fades | Metal Scar Radio, 明家歆, Ceru_ | [track](https://open.spotify.com/track/1K61OpMiLPjrqZjRNnuQbp) |
+| 21 | Anchor of Solitary Sea | Metal Scar Radio, Runyu Qian, Salty Salt, Sephid | [track](https://open.spotify.com/track/7h0bcXX82WYkrUYwBIycSX) |
+| 22 | Eyes Bright Through the Haze | Metal Scar Radio, N2V | [track](https://open.spotify.com/track/2PF6oTrlTjAZWC4XTHTi4H) |
+| 23 | ADELPHOCLAST | Metal Scar Radio, Crywolf, YMIR, Tal Richards | [track](https://open.spotify.com/track/3H49F5DYiZ3KlslAe191Nf) |
+| 24 | ACHERON | Metal Scar Radio, Crywolf, YMIR | [track](https://open.spotify.com/track/2v1dDhyTRfLEMh9P16KWPx) |
+| 25 | ABYSSUS, ABYSSUM, INVOCAT | Metal Scar Radio, Crywolf, YMIR, Tal Richards | [track](https://open.spotify.com/track/4AMLteLKP1pEYZrKTycCev) |
+| 26 | REAPER | Metal Scar Radio, Crywolf, YMIR | [track](https://open.spotify.com/track/5RbN3YkMdzBaMKyjyOyAwr) |
+| 27 | AMARANTHUS CAUDATUS | Metal Scar Radio, Crywolf, YMIR, Tal Richards | [track](https://open.spotify.com/track/2MiM7YNCCHAPsVJCd0Hdw4) |
+| 28 | Echoes of the Deep | Metal Scar Radio | [track](https://open.spotify.com/track/56IsNJwjZu0wKMJfAUX4b3) |
+| 29 | Reverberance of Forgotten Lands | Metal Scar Radio, Alan@8:48, Breakfast@A8RECORDS | [track](https://open.spotify.com/track/0pgohm8s5PRc2VBHyPOM1S) |
+| 30 | Vermilion | Metal Scar Radio, 明家歆, BLACK 0, Ceru_ | [track](https://open.spotify.com/track/4PAnuVHeI6tUEIsbe1exQe) |
+
+### Tracklist — Dreamscape of Wind and Snow OST（2026-09-10）
+
+| # | 曲名 | アーティスト | 公式リンク |
+|---|---|---|---|
+| 1 | Snowy Forest | Metal Scar Radio, Adam Gubman | [track](https://open.spotify.com/track/5Vs88v4h48Mq8AxpVhMC27) |
+| 2 | Following the Story's Footsteps | Metal Scar Radio, 紅唐 | [track](https://open.spotify.com/track/2gJUHzPc2TyTSko5rHn61a) |
+| 3 | Hear the Singing Bowstring | Metal Scar Radio, 封炫宇, Adam Gubman | [track](https://open.spotify.com/track/72Xu0IGcax8Bbql5LxIr9I) |
+| 4 | Arrows and Snowflakes | Metal Scar Radio, 原田萌喜 | [track](https://open.spotify.com/track/6T4hXrDU7juJbo3vu2uqlK) |
+| 5 | Child of the Snowy Forest | Metal Scar Radio, 原田萌喜 | [track](https://open.spotify.com/track/0Nk3QhIWsZTp22X2CLeqBt) |
+| 6 | Frozen Mist | Metal Scar Radio, Robert Wolf | [track](https://open.spotify.com/track/3gKhHXczEy2SCcnBWXyqvn) |
+| 7 | Arrow Feathers Become Words | Metal Scar Radio, Enzalla | [track](https://open.spotify.com/track/2dXm66A5akSbV3jSJTUG7G) |
+| 8 | The Hunt | Metal Scar Radio, Martí Noguer | [track](https://open.spotify.com/track/1iDVSN9x1CozVHLuWWiJwa) |
+| 9 | Along the Traces of Never-Melting Snow | Metal Scar Radio, 原田萌喜 | [track](https://open.spotify.com/track/7odVcoSSbBhks1JhM8RT2Y) |
+| 10 | When Illusory Light Fades | Metal Scar Radio, 工藤吉三 | [track](https://open.spotify.com/track/4BfQLjhZVxPr9ukIYYrIHn) |
+| 11 | HER Guidance | Metal Scar Radio, Vilma Jää | [track](https://open.spotify.com/track/6NX8KR65bWbiDN3tNs6mzX) |
+| 12 | Rage Ignited from Oblivion | Metal Scar Radio, Elliot Hsu, Enzalla | [track](https://open.spotify.com/track/52toP8thZ3zrPvPzL5ivvg) |
+| 13 | Forward, My Child | Metal Scar Radio, Elliot Hsu | [track](https://open.spotify.com/track/6PgwjrqWsYlgfDjGvHX2KY) |
+| 14 | Amma's Touch | Metal Scar Radio, Elliot Hsu, Enzalla | [track](https://open.spotify.com/track/3K0dFWOR2IxxtihIsTdedR) |
+| 15 | Prophecy and Legend | Metal Scar Radio, 原田萌喜 | [track](https://open.spotify.com/track/39gMhBsuqgO6tUIvVuQXxz) |
+| 16 | HER Calling | Metal Scar Radio, z1on | [track](https://open.spotify.com/track/5KAfy19XUphrZCdSejQt3n) |
+
 ## 権利・利用条件（重要）
 
 - **『アークナイツ：エンドフィールド』二次創作ガイドライン**（GRYPH FRONTIER PTE. LTD.、2026-02-03制定・2026-08-24改訂）： https://endfield.gryphline.com/ja-jp/news/4497
@@ -118,18 +250,44 @@
 - trk! は曲名などの事実情報と公式配信先リンクのみを表示し、**音源を同梱・再配布しません**。配信・購入・サブスクリプションは二次利用許諾ではありません。
 - ゲームプレイ動画にゲーム内BGMが含まれる場合の自動コンテンツ識別（クレーム）運用までは個別検証していません。ガイドラインの配信条件を満たす利用と、音源単体の再利用は分けて考えてください。
 
+## 調査中の他の公式リリース（batch 3候補・2026-10-11）
+
+レーベルの Apple Music アーティストページ（[Metal Scar Radio / 1870752601](https://music.apple.com/us/artist/metal-scar-radio/1870752601)）・Amazon Music アーティストページ・Shazam・Spotify の「人気曲」表示から、カタログ未収録の公式リリースを洗い出しました。**まだカタログには入れていません**（Spotify のアルバムID・全曲順・曲別IDがそろったものから追加します）。
+
+| リリース | 種別 | 配信日 | 曲数 | 2026-10-11 時点で確認できたこと | 未取得 |
+|---|---|---|---|---|---|
+| Yi | EP | 2026-04-21（Spotifyページの日付表示。要再確認） | 4 | Spotifyアルバム [`7wYXh2CxBTVo30xgmS3kAw`](https://open.spotify.com/album/7wYXh2CxBTVo30xgmS3kAw) と公式ffm.toスマートリンク https://ffm.to/yi 。4曲（Yi／Yi (Instrumental Version)／The World Is Waking／The World Is Waking (Instrumental Version)）の曲名・アーティスト・曲順をSpotify埋め込みページで確認済み | 個別曲ID |
+| Old Deep Water Dies, by Rising Tide It is Denied（新潮起，故渊离OST） | OST | 2026-03-25 | 14 | Apple Music [1887205933](https://music.apple.com/us/album/old-deep-water-dies-by-rising-tide-it-is-denied-original/1887205933)（14曲・34分・℗ 2026 GRYPHLINE）、VGMdb [158491](https://vgmdb.net/album/158491)、Qobuz掲載。作曲クレジットはVGMdbで確認可 | SpotifyアルバムID・全曲順・曲別ID |
+| Sketches of Lost Heirlooms | OST | 未確認 | 未確認 | Apple Music [6781173816](https://music.apple.com/us/album/sketches-of-lost-heirlooms-original-soundtrack/6781173816)、Amazon Music／Qobuz に「Album・2026」表記 | SpotifyアルバムID・曲数・曲順 |
+| Ode to the Night Stars | EP（Compilation） | 未確認 | 未確認 | Shazam／Apple のアーティストページに「Compilation Album・2026」表記 | すべて |
+| Mirairo Rider | EP | 未確認 | 未確認 | Spotify のレーベル人気曲10位に「Mirairo Rider (Japanese Ver.)」（Metal Scar Radio, 居川純平, 如月結愛, 佐々木李子・3:57） | アルバムID・収録曲 |
+| Fragmented Dreams | Single | 未確認 | 未確認 | Apple Music [6806960879](https://music.apple.com/us/album/fragmented-dreams/6806960879)、Spotify人気曲に「Fragmented Dreams」（Metal Scar Radio, ReStudio, Evan, z1on・4:03） | アルバムID |
+| Under My Breath | Single | 未確認 | 未確認 | Apple Music [6782831565](https://music.apple.com/us/album/under-my-breath/6782831565) | アルバムID・曲情報 |
+| Guided by Echoes | Single | 未確認 | 未確認 | Apple Music [6793472028](https://music.apple.com/us/album/guided-by-echoes/6793472028)（Metal Scar Radio, Runyu Qian, Breakfast@A8RECORDS, Sephid）。既存 `ef-signal` に紹介項目あり | アルバムID |
+| Snapshot | Single | 未確認 | 未確認 | Shazam のアーティストページに記載（Metal Scar Radio, Adam Gubman, Sorah Eun） | アルバムID・曲情報 |
+| My World (Blood Oath) | EP | 未確認 | 未確認 | Apple Music [1890100176](https://music.apple.com/us/album/my-world-blood-oath-tale-version/1890100176)（「Tale Version」を含む） | アルバムID・曲数 |
+| A Promise Makes a Home | Single | 2026-10-07 | 2 | Apple Music [6820048204](https://music.apple.com/us/album/a-promise-makes-a-home-single/6820048204)（2曲・レーベルページの「最新リリース」） | Spotify ID |
+| Ashen Remains | EP | 未確認 | 未確認 | Apple Music [1880258196](https://music.apple.com/us/album/sign-of-the-coming-flame/1880258196)（「Sign of the Coming Flame」を収録）。既存 `ef-ashen` は紹介版のまま | アルバムID・収録曲 |
+| Blurring | Single | 未確認 | 未確認 | Apple Music [1872026534](https://music.apple.com/us/album/blurring/1872026534)。既存 `ef-blurring` は紹介版のまま | アルバムID・収録曲 |
+
+- Apple Music・Amazon Music のアルバムIDは**参考情報**です。カタログのリンクは公式Spotifyに統一する方針なので、追加前にSpotifyのアルバムIDと曲順を確認します。
+- 「未確認」は「存在しない」ではありません。曲数・曲順が公式ページで確認できないリリースはカタログに入れません。
+
 ## 未確認・次段階
 
 - 60曲のSpotify個別曲URLは 2026-10-10 時点の公式アルバムページHTMLで確認しましたが、実ブラウザでの一括再確認（地域制限・ログイン要求の有無）は未実施です。抜取確認として同日、Vol.1 #37「Faith's Imprint」と Vol.2 #23「Forge」の個別曲ページを開き、曲名・収録アルバム・アーティスト・長さがカタログと一致することを確認しました。
-- Apple Music でのアルバム掲載は未確認（「配信なし」の断定ではありません）。
-- Metal Scar Radio の他の公式アルバム（Spotifyアーティストページで確認できる Eve of Departure、Homecoming、Dreamscape of Wind and Snow、Contingency Contract: Re-Ignition、At the Wake of Spring、Fragmented Dreams、Thunder's Legacy、Mirairo Rider、Qingbo! Oh My Life、Snapshot、Blurring、Lollipop Neo-nista 等）は**今後の調査対象**です。既存の `ef-blurring` 等は紹介版のままです。
+- Apple Music での Zeroth Directive Vol.1–2 のアルバム掲載は未確認（「配信なし」の断定ではありません）。
+- バッチ2（trk111）の6作81曲は、曲順・曲名・アーティストを 2026-10-11 に公式Spotifyのアルバム埋め込みページで6作すべて再確認し、Homecoming の30曲は公式ffm.toスマートリンクでも照合しました。個別曲IDの抜取確認は6曲（PHEONIX ON THE RISE／Drowned in Depth／Rekindled／Keeper of My Heart／Vermilion／HER Calling）で、**残り75曲のIDは個別に開いて確認していません**。実ブラウザでの地域制限・ログイン要求の確認も未実施です。
+- バッチ2の6作について未確認のまま：中国語公式曲名（＝照合別名を未登録）、公式告知のffm.to配信一覧（Homecoming の https://ffm.to/homecoming-original-soundtrack は確認済み。他5作は未確認）、VGMdb照合（Eve of Departure のページ 158984 の存在は確認しましたが内容は未精読）、他ストアのアルバム別・曲別URL（Apple Music／Amazon Music／TIDAL／Qobuz への掲載自体は確認）。
+- Metal Scar Radio の残る公式リリースは**今後の調査対象**です。2026-10-11 に洗い出した候補（Yi、Old Deep Water Dies、Sketches of Lost Heirlooms、Ode to the Night Stars、Mirairo Rider、Fragmented Dreams、Under My Breath、Guided by Echoes、Snapshot、My World (Blood Oath)、A Promise Makes a Home、Ashen Remains、Blurring ほか）と確認状況は上の「調査中の他の公式リリース」の表を参照してください。既存の `ef-blurring`・`ef-ashen` 等は紹介版のままです。
 - 中国語版・英語版の二次創作ガイドラインは未精読。この台帳は日本語版ガイドライン（2026-08-24改訂版）を正とします。
 
 ## 参照先
 
-- データ（正）： [`tools/endfield-zeroth-directive-tracklist.json`](../tools/endfield-zeroth-directive-tracklist.json)
+- データ（正）： [`tools/endfield-zeroth-directive-tracklist.json`](../tools/endfield-zeroth-directive-tracklist.json)（Zeroth Directive Vol.1–2）／ [`tools/endfield-msr-albums-tracklist.json`](../tools/endfield-msr-albums-tracklist.json)（バッチ2の公式アルバム6作）
 - カタログ実装： `js/catalog.js`（シリーズ `endfield`）、取り込み・更新： `js/library.js`
-- 検査： `tools/check-repo.mjs`（🛰️ Endfield Zeroth Directive ブロック）
+- 検査： `tools/check-repo.mjs`（🛰️ Endfield Zeroth Directive ブロック・🛰️ Endfield MSR albums ブロック）
 - 公式告知（日本）： https://x.com/AKEndfieldJP/status/2022928866638205084
-- 公式配信一覧： https://ffm.to/ro6qjnl （Vol.1） / https://ffm.to/eq8xpy7 （Vol.2）
+- 公式配信一覧： https://ffm.to/ro6qjnl （Vol.1） / https://ffm.to/eq8xpy7 （Vol.2） / https://ffm.to/homecoming-original-soundtrack （Homecoming OST）
+- レーベルの公式Spotifyアーティストページ： https://open.spotify.com/artist/63CsKCn2OazatczRm1tk9c
 - 資料： VGMdb https://vgmdb.net/album/157312 / https://vgmdb.net/album/157313

@@ -1,8 +1,13 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移したtrk70〜trk108の履歴です。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
+> `docs/HANDOFF.md` から移したtrk70〜trk110の履歴です。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
 
 ## 旧 HANDOFF §11「最近の変更」
+
+### trk109〜trk110 の記録（2026-10-10。trk113のときに HANDOFF §7 から移動）
+
+- **trk109 — Touhouローカル曲名・MIDI音色・MIX**：TouhouThemeDBのローカル曲名カタログとID形式名の表示、実サンプルを使わない24種のコード生成MIDI音色、通常音声用・初期オフのTRK MIDI MIXを追加。詳細な権利・抽出注意は [`guide/touhou-midi.md`](guide/touhou-midi.md)。
+- **trk110 — Endfield 初号指令OST**：公式カタログに「初号指令OST」Zeroth Directive Vol.1（37曲）・Vol.2（23曲）を公式収録順で追加。各曲は公式Spotify個別曲、各巻は公式ffm.to配信一覧へリンクし、中国語公式曲名を照合別名に登録。旧4パート紹介版プレイリストは永続ID `ef-firstorder` を保ったまま安全更新。権利調査は [`ARKNIGHTS-ENDFIELD-MUSIC.md`](ARKNIGHTS-ENDFIELD-MUSIC.md)、fixtureは `tools/endfield-zeroth-directive-tracklist.json`、検査は `tools/check-repo.mjs` の🛰️ブロックに追加。ガイド（`appearance.md`・`en.md`）とNOTICEを更新し、`sw.js` cache名を `trk-v2026.10.10-trk110` に更新。
 
 ### trk106〜trk108 の記録（2026-10-10。trk109のときに旧HANDOFF §8 から移動）
 

@@ -233,7 +233,7 @@ Object.assign(TEXT.ja, {
   plColor:"色", plColorNone:"標準の色",
   plFrozenCheck:"🧊 フリーズ（曲の追加を防ぐ）", plLockedCheck:"🔒 ロック（削除を防ぐ）",
   plSongsNow:"現在 {n} 曲", plSave:"💾 保存", plDelete:"🗑 このプレイリストを削除",
-  plDeleted:"🗑 プレイリストを削除しました（曲はライブラリに残ります）", plCreated:"📁 {name} を作成しました",
+  plDeleted:"🗑 プレイリストを削除しました（曲はライブラリに残ります）", plTabClosed:"📂 タブを閉じました（プレイリストは残っています）", plCreated:"📁 {name} を作成しました",
   plLockedNo:"🔒 ロック中は削除できません（長押しの設定で 🔒 を外してください）",
   libProfileBtn:"🎶 曲のプロフィール（編集・プレイリストへの追加）",
   plFrozenNo:"🧊 {name} はフリーズ中です（追加できません）",
@@ -253,7 +253,7 @@ Object.assign(TEXT.en, {
   plColor:"Color", plColorNone:"Default color",
   plFrozenCheck:"🧊 Freeze (blocks adding songs)", plLockedCheck:"🔒 Lock (blocks deleting)",
   plSongsNow:"{n} songs", plSave:"💾 Save", plDelete:"🗑 Delete this playlist",
-  plDeleted:"🗑 Playlist deleted (songs stay in your library)", plCreated:"📁 Created {name}",
+  plDeleted:"🗑 Playlist deleted (songs stay in your library)", plTabClosed:"📂 Tab closed (playlist kept)", plCreated:"📁 Created {name}",
   plLockedNo:"🔒 Locked — can't delete (uncheck 🔒 in long-press settings)",
   libProfileBtn:"🎶 Song profile (edit · add to playlist)",
   plFrozenNo:"🧊 {name} is frozen (can't add songs)",
@@ -273,7 +273,7 @@ Object.assign(TEXT.zh, {
   plColor:"颜色", plColorNone:"默认颜色",
   plFrozenCheck:"🧊 冻结（防止添加歌曲）", plLockedCheck:"🔒 锁定（防止删除）",
   plSongsNow:"当前 {n} 首", plSave:"💾 保存", plDelete:"🗑 删除此播放列表",
-  plDeleted:"🗑 已删除播放列表（歌曲仍保留在库中）", plCreated:"📁 已创建 {name}",
+  plDeleted:"🗑 已删除播放列表（歌曲仍保留在库中）", plTabClosed:"📂 已关闭标签（播放列表保留）", plCreated:"📁 已创建 {name}",
   plLockedNo:"🔒 锁定中无法删除（请在长按设置中取消 🔒）",
   libProfileBtn:"🎶 歌曲资料（编辑·加入播放列表）",
   plFrozenNo:"🧊 {name} 已冻结（无法添加歌曲）",
@@ -293,7 +293,7 @@ Object.assign(TEXT.ko, {
   plColor:"색", plColorNone:"기본 색",
   plFrozenCheck:"🧊 프리즈(곡 추가 막기)", plLockedCheck:"🔒 잠금(삭제 막기)",
   plSongsNow:"현재 {n}곡", plSave:"💾 저장", plDelete:"🗑 이 재생목록 삭제",
-  plDeleted:"🗑 재생목록을 삭제했습니다(곡은 라이브러리에 남습니다)", plCreated:"📁 {name}을(를) 만들었습니다",
+  plDeleted:"🗑 재생목록을 삭제했습니다(곡은 라이브러리에 남습니다)", plTabClosed:"📂 탭을 닫았습니다(재생목록은 유지)", plCreated:"📁 {name}을(를) 만들었습니다",
   plLockedNo:"🔒 잠금 중에는 삭제할 수 없어요(길게 누른 설정에서 🔒를 해제하세요)",
   libProfileBtn:"🎶 곡 프로필 (편집·재생목록에 추가)",
   plFrozenNo:"🧊 {name}은(는) 프리즈 중입니다(추가할 수 없어요)",
@@ -679,11 +679,25 @@ function libTabsOf(all) {
   const plKeys = new Set(all.map(x => x.key));
   /* 📁 フォルダ（中のプレイリストの曲をぜんぶ）。🐔 trk's playlist は右端に表示名つきで出すので、ここでは出さない */
   for (const f of core.settings.plFolders) if (!f.parent && f.id !== TRK_FOLDER_ID) tabs.push({ id:"fld:" + f.id, icon: f.icon || "📁", label: f.name, n: [...plFolderUnionKeys(f.id)].filter(k => plKeys.has(k)).length, fld: f });
-  for (const p of core.settings.playlists) if (!p.folder && plVisible(p) && p.id !== "trk-playlist" && p.id !== "trk-classic") tabs.push({ id:"pl:" + p.id, icon: plIcon(p), label: p.name, n: plCount(p, plKeys), pl: p });   /* 🎧 フォルダに入っていないプレイリスト（👥投稿者で絞る。🐔🎻は右端に出すため除外） */
+  for (const p of core.settings.playlists) if (!p.folder && plVisible(p) && p.id !== "trk-playlist" && p.id !== "trk-classic" && p.id !== TRK_OST_ID) tabs.push({ id:"pl:" + p.id, icon: plIcon(p), label: p.name, n: plCount(p, plKeys), pl: p });   /* 🎧 フォルダに入っていないプレイリスト（👥投稿者で絞る。🐔🎻は右端に出すため除外） */
   if (core.settings.libTab.startsWith("pl:")) {   /* フォルダの中のプレイリストを見ているときは、そのタブも出す（戻れるように） */
     const cp = plById(core.settings.libTab.slice(3));
     if (cp && cp.folder && plVisible(cp) && !tabs.some(t => t.id === core.settings.libTab)) tabs.push({ id:"pl:" + cp.id, icon: plIcon(cp), label: cp.name, n: plCount(cp, plKeys), pl: cp, nested: true });
   }
+  /* 📂 開いたフォルダ内プレイリストのタブは残す（settings.libOpenTabs に永続化）。
+     いま見ているフォルダ内プレイリストも記録し、閉じるまではタブ帯に残す＝ブラウザのタブに近い */
+  const openIds = Array.isArray(core.settings.libOpenTabs) ? core.settings.libOpenTabs : [];
+  let openChanged = false;
+  if (core.settings.libTab.startsWith("pl:")) {
+    const ap = plById(core.settings.libTab.slice(3));
+    if (ap && ap.folder && !openIds.includes(ap.id)) { openIds.push(ap.id); openChanged = true; }
+  }
+  for (const oid of openIds) {
+    if (tabs.some(t => t.id === "pl:" + oid)) continue;
+    const op = plById(oid);
+    if (op && op.folder && plVisible(op)) tabs.push({ id:"pl:" + oid, icon: plIcon(op), label: op.name, n: plCount(op, plKeys), pl: op, nested: true });
+  }
+  if (openChanged) { core.settings.libOpenTabs = openIds.slice(); core.saveUserPrefs(); }
   const packs = new Map(), folders = new Map(), addons = new Map();
   let nFiles = 0, nBuiltins = 0;
   for (const it of all) {
@@ -703,7 +717,7 @@ function libTabsOf(all) {
   for (const t of packs.values()) tabs.push(t);
   for (const t of addons.values()) tabs.push(t);          // 🧩 アドオンが足した曲
   for (const t of folders.values()) tabs.push(t);
-  if (nBuiltins) tabs.push({ id:"builtin", icon:"🎓", label:tr("libTabDemo"), n:nBuiltins });
+  /* 🎓 デモ曲は独立タブにせず「trk's OST Vol.1」プレイリストへ（一番下に出す。中クリックで消せる） */
   if (nFiles) tabs.push({ id:"file", icon:"📄", label:tr("libTabFiles"), n:nFiles });
   const nv = all.filter(it => it.source === "pack" && libIsVerified(it)).length;
   if (nv) tabs.push({ id:"verified", icon:"✔", label:tr("libTabVerified"), n:nv });
@@ -727,6 +741,10 @@ function libTabsOf(all) {
       if (tc && plVisible(tc) && !tabs.some(x => x.id === "pl:trk-classic")) tabs.push({ id:"pl:trk-classic", icon: plIcon(tc), label: tc.name, n: plCount(tc, plKeys), pl: tc });
     }
   }
+  /* 🎓 trk's OST Vol.1 — 一番下（右端）に出す。通常のプレイリストなので中クリックで削除できる */
+  const ostPl = core.settings.playlists.find(p => p.id === TRK_OST_ID);
+  if (ostPl && plVisible(ostPl) && !tabs.some(x => x.id === "pl:" + TRK_OST_ID))
+    tabs.push({ id:"pl:" + TRK_OST_ID, icon: plIcon(ostPl), label: ostPl.name, n: plCount(ostPl, plKeys), pl: ostPl, ost: true });
   return tabs;
 }
 function libTabMatch(it, id) {
@@ -933,6 +951,7 @@ function plSanitize(raw) {
 const TRK_PLAYLIST_ID = "trk-playlist";
 const TRK_FOLDER_ID = "trk";
 const TRK_CLASSIC_ID = "trk-classic";
+const TRK_OST_ID = "trk-ost-v1";   /* 🎓 オリジナル曲リスト（チュートリアルのデモ曲もここに入る。タブは一番下） */
 /* 🐔 trk's playlist ＝ 右端のタブ（実体は trk フォルダ）。
    ・名前（タブの文字）は settings.trkTabName の3種類から選ぶ。空文字＝🐔 のアイコンだけ
    ・アイコン（🐔）と色（標準）とフォルダ名は固定＝利用者は変えられない（plFolderMenu も開かせない）
@@ -1069,6 +1088,23 @@ function ensureTrkClassicPlaylist(opts) {
   if (go) { core.settings.libTab = "pl:" + TRK_CLASSIC_ID; core.saveUserPrefs(); try { renderLib(); } catch(_){} }
   return true;
 }
+/* 🎓 trk's OST Vol.1 — オリジナル曲とチュートリアルのデモ曲をまとめるプレイリスト。
+   通常のプレイリストタブとして一番下に出すので、他と同じく中クリックで削除できる
+   （タブを消しても曲自体はライブラリに残る＝参照リストのため）。フォルダには入れない。 */
+function ensureTrkOstPlaylist(opts) {
+  const o = opts || {};
+  const doToast = o.toast !== false;
+  if (core.settings.playlists.some(p => p.id === TRK_OST_ID)) return false;
+  const p = plSanitize({ id: TRK_OST_ID, name: "trk's OST Vol.1", icon: "\uD83C\uDF93", color: "none",
+    folder: "", tags: ["trk", "OST"], wish: [], songs: [FIRST_SPARK_KEY], createdAt: Date.now() });
+  if (!p) return false;
+  core.settings.playlists.push(p);
+  core.saveUserPrefs();
+  if (doToast) try { plToast(tr("trkAdded", { n: p.songs.length })); } catch(_){}
+  return true;
+}
+window.TrkEnsureTrkOstPlaylist = ensureTrkOstPlaylist;
+window.TrkOstPlaylistId = TRK_OST_ID;
 window.TrkEnsureTrkPlaylist = ensureTrkPlaylist;
 window.TrkTrkPlaylistId = TRK_PLAYLIST_ID;
 window.TrkEnsureTrkClassicPlaylist = ensureTrkClassicPlaylist;
@@ -1546,11 +1582,21 @@ function plFolderDelete(f, onClose) {
 function plDelete(p, onClose) {
   if (p.locked) { plToast(tr("plLockedNo")); return; }
   core.settings.playlists = core.settings.playlists.filter(x => x !== p);
+  core.settings.libOpenTabs = (Array.isArray(core.settings.libOpenTabs) ? core.settings.libOpenTabs : []).filter(x => x !== p.id);
   if (core.settings.libTab === "pl:" + p.id) core.settings.libTab = "all";
   core.saveUserPrefs();
   if (onClose) onClose();
   renderLib();
   plToast(tr("plDeleted"));
+}
+/* 📂 フォルダ内プレイリストのタブを閉じる（プレイリスト本体は消さない）。中クリックで使う */
+function plCloseOpenTab(p) {
+  const had = (core.settings.libOpenTabs || []).includes(p.id) || core.settings.libTab === "pl:" + p.id;
+  core.settings.libOpenTabs = (Array.isArray(core.settings.libOpenTabs) ? core.settings.libOpenTabs : []).filter(x => x !== p.id);
+  if (core.settings.libTab === "pl:" + p.id) core.settings.libTab = "all";
+  core.saveUserPrefs();
+  renderLib();
+  if (had) plToast(tr("plTabClosed"));
 }
 
 /* 中クリックでの削除（設定で「同じタブ3回」モードにできる） */
@@ -2111,6 +2157,7 @@ function renderLibTabs(tabs) {
     b.addEventListener("auxclick", e => {
       if (e.button !== 1) return;
       if (t.id === "all") plCreate();            /* 📚すべて の中クリック＝新規プレイリスト */
+      else if (t.pl && t.pl.folder) plCloseOpenTab(t.pl);   /* 📂フォルダ内プレイリストの中クリック＝タブを閉じる（本体は残す） */
       else if (t.pl) plDeleteGesture(t.pl, b);   /* プレイリストタブの中クリック＝削除 */
     });
     /* 長押し＝設定（スマホ・PC共通）。⚠ 🐔 trk's playlist だけは名前と色を変えられないので、
@@ -2795,7 +2842,8 @@ async function selectSong(it) {
 window.TrkSelectTutorialSong = async function() {
   const demo = builtInSongs.find(song => song.key === FIRST_SPARK_KEY);
   if (!demo || core.phase !== "title") return false;
-  core.settings.libTab = "builtin"; core.saveUserPrefs(); renderLib();
+  try { ensureTrkOstPlaylist({ toast: false }); } catch(_){}   /* 🎓 デモ曲の居所（trk's OST Vol.1）を用意 */
+  core.settings.libTab = "pl:" + TRK_OST_ID; core.saveUserPrefs(); renderLib();
   await selectSong(demo);
   return !!(core.videoReady && core.currentSong && core.currentSong.key === FIRST_SPARK_KEY);
 };
@@ -3333,10 +3381,16 @@ async function initLibrary() {
   if (core.settings.tutorialDone && core.settings.trkClassic !== false) {
     try { ensureTrkClassicPlaylist({ toast: false }); } catch(_){}
   }
+  // 🎓 trk's OST Vol.1 — オリジナル曲＋デモ曲のリスト（一番下・中クリックで消せる）
+  if (core.settings.tutorialDone) {
+    try { ensureTrkOstPlaylist({ toast: false }); } catch(_){}
+  }
   // 配布形態で分類: 各タイトル別 Vol を作る（長押しで開くリスト）
   if (core.settings.tutorialDone) {
     try { ensureTrkDistributionPlaylists(); } catch(_){}
   }
+  /* 旧「🎓デモ曲」タブ（builtin）を見ていた設定を、新しいOSTプレイリストへ移行 */
+  if (core.settings.libTab === "builtin") core.settings.libTab = "pl:" + TRK_OST_ID;
   syncTrkUI();
   renderLib();
   void initOptionalTutorialDemo();

@@ -185,8 +185,11 @@ endorsement of trk!.
 Riot Games music is displayed under Riot's fan-content / creator-safe policy
 (keep it free, don't imply official affiliation); see
 https://www.riotgames.com/en/legal — "Courtesy of Riot Games".
-Arknights: Endfield songs (Zeroth Directive OST Vol. 1–2 and character OSTs)
-are listed as factual metadata pointing to their official streaming pages;
+Arknights: Endfield songs (Zeroth Directive OST Vol. 1–2, six further Metal
+Scar Radio albums — Eve of Departure, Thunder's Legacy, At the Wake of Spring,
+Contingency Contract Re-Ignition, Homecoming, Dreamscape of Wind and Snow —
+and character OSTs) are listed as factual metadata pointing to their official
+streaming pages (Spotify song/album pages and the announced ffm.to smart links);
 GRYPHLINE's fan-content guidelines prohibit copying or extracting official
 assets and streaming or buying is not a reuse license — see
 https://endfield.gryphline.com/ja-jp/news/4497 and

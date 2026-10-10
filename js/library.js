@@ -1152,7 +1152,7 @@ function trkCatalogGuide(s, pl, forDistributionPlaylist = false) {
                   : s.id === "arknights"
                     ? "Monster-Siren公式の曲／OSTページです。音源は同梱せず、リンクは利用許諾ではありません。"
                     : s.id === "endfield"
-                      ? "公式Spotify・ffm.to配信一覧への案内（音源なし）。配信・購入は二次利用許諾ではありません。利用前は公式二次創作ガイドラインを確認してください。"
+                      ? "公式Spotify個別曲・アルバムページとffm.to配信一覧への案内（音源なし）。配信・購入は二次利用許諾ではありません。利用前は公式二次創作ガイドラインを確認してください。"
                       : forDistributionPlaylist
                       ? "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8。" + s.name + " の配布形態別フォルダに収容。"
                       : (s.note || "");

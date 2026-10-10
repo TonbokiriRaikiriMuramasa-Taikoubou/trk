@@ -558,10 +558,13 @@ S("arknights", "アークナイツ", "🩺", "amber", "ソーシャルゲーム"
    実運営は Monster Siren Records と同じ Hypergryph）。単独公式サイトはなく、配信は各種サブスクと公式YouTube。
    初号指令OST（Zeroth Directive、零号委托）上・下は 2026-02-15 から Spotify／YouTube／Amazon Music 等で配信中
    （中国は网易云音乐など）。公式告知の ffm.to スマートリンクを各巻の案内にし、各曲は公式Spotify個別曲へリンクする。
+   他の公式アルバム6作（Eve of Departure・Thunder's Legacy・At the Wake of Spring OST・Contingency Contract Re-Ignition OST・
+   Homecoming OST・Dreamscape of Wind and Snow OST、計81曲）も各曲を公式Spotify個別曲、各アルバムを公式Spotifyアルバムページへリンクする
+   （6作のffm.to告知リンク・中国語公式曲名は未確認＝次段階。tools/endfield-msr-albums-tracklist.json がデータの正）。
    ©/℗ 2026 GRYPHLINE（上海鹰角网络科技有限公司）。音源は同梱せず、配信・購入は二次利用許諾ではない。
    公式二次創作ガイドラインは「公式素材をそのまま複製・抽出するなど創作性が著しく乏しいもの」を禁止している。 */
 S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber", "ソーシャルゲーム", "🎮",
-  "音楽レーベル「Metal Scar Radio（鐵痕電台）」の公式配信曲（音源は同梱せず、曲名などの事実情報と公式入手先のみ）。「初号指令OST」Zeroth Directive Vol.1 37曲・Vol.2 23曲は各曲を公式Spotify個別曲ページへ、各巻を公式告知のffm.to配信一覧（Spotify／YouTube／Amazon Music等、中国は网易云音乐）へリンクします。キャラクターOST等はYouTube公式アートトラックや各種サブスクで試聴できます。配信・サブスク・購入は二次利用許諾ではありません。実況・動画投稿の条件と禁止事項（公式素材のそのままの複製・抽出など）は公式二次創作ガイドライン https://endfield.gryphline.com/ja-jp/news/4497 で利用前に確認してください。ツール https://github.com/2t3/endfield-ost-download はタイトル確認に便利です。",
+  "音楽レーベル「Metal Scar Radio（鐵痕電台）」の公式配信曲（音源は同梱せず、曲名などの事実情報と公式入手先のみ）。「初号指令OST」Zeroth Directive Vol.1 37曲・Vol.2 23曲は各曲を公式Spotify個別曲ページへ、各巻を公式告知のffm.to配信一覧（Spotify／YouTube／Amazon Music等、中国は网易云音乐）へリンクします。他の公式アルバム6作（Eve of Departure 5曲・Thunder's Legacy 9曲・At the Wake of Spring OST 17曲・Contingency Contract Re-Ignition OST 4曲・Homecoming OST 30曲・Dreamscape of Wind and Snow OST 16曲、計81曲）も各曲を公式Spotify個別曲ページへ、各アルバムを公式Spotifyアルバムページへリンクします（この6作の中国語公式曲名・公式告知のffm.to配信一覧は未確認＝照合別名なし）。キャラクターOST等はYouTube公式アートトラックや各種サブスクで試聴できます。配信・サブスク・購入は二次利用許諾ではありません。実況・動画投稿の条件と禁止事項（公式素材のそのままの複製・抽出など）は公式二次創作ガイドライン https://endfield.gryphline.com/ja-jp/news/4497 で利用前に確認してください。ツール https://github.com/2t3/endfield-ost-download はタイトル確認に便利です。",
   "https://endfield.gryphline.com/ja-jp/",
   [PL("ef-blurring", "Endfield — Blurring", "🌫️", "gray", ["Game","Endfield","Metal Scar Radio","MSR Endfield"],
     [T("Blurring", "Blurring", "Metal Scar Radio", "https://www.youtube.com/@ArknightsEndfield"),
@@ -642,6 +645,110 @@ S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber
       ["New Foundation", "Metal Scar Radio, Robert Wolf", "54MxCLBrmnKfzS2zYCcNbZ", "新壤"],
       ["Forge", "Metal Scar Radio, SKa2or", "3TKJkruK3HMHG25SwptRxi", "洪炉"]
     ]), "https://ffm.to/eq8xpy7", "公式配信リンク（ffm.to）"),
+   /* 🛰️ Metal Scar Radio の他の公式アルバム6作（trk111で追加）：曲順・曲名・アーティスト表記は公式Spotifyアルバムページで確認（©/℗ 2026 GRYPHLINE）。
+      各曲は公式Spotify個別曲、各アルバムは公式Spotifyアルバムページへリンクする。この6作は公式告知のffm.to配信一覧・中国語公式曲名・
+      VGMdb照合が未確認（次段階の調査対象）なので、照合別名は登録していない。データの正は tools/endfield-msr-albums-tracklist.json。
+      Eve of Departure（2026-04-11・EP5曲）／Thunder’s Legacy（2026-04-22・9曲）／At the Wake of Spring OST（2026-04-30・17曲）／
+      Contingency Contract Re-Ignition OST（2026-06-20・EP4曲）／Homecoming OST（2026-07-31・30曲）／Dreamscape of Wind and Snow OST（2026-09-10・16曲）。 */
+   PL("ef-eve", "Endfield — Eve of Departure", "🌅", "amber", ["Game","Endfield","Metal Scar Radio","Eve of Departure"],
+    endfieldOstTracks("Eve of Departure", [
+      ["PHEONIX ON THE RISE", "Metal Scar Radio, Hero Baldwin, Alexander Rudd", "2LMFipAOoaXiyLG5VI0Mg0"],
+      ["New Frontier", "Metal Scar Radio, Jonathan Sookdew Sing, Alec Justice, 10/KNIVES, Gold3n Ord3r", "1j1ac6RzycakpP4jWsU3or"],
+      ["Army of Angels", "Metal Scar Radio, Hybrid", "7dl9PJdz9QMjZlJUulvaQw"],
+      ["Rising Horizon", "Metal Scar Radio, Michael McCann", "2QMyswj0l2QzTEAEVO0mf9"],
+      ["Echo of Vision", "Metal Scar Radio, Gareth Coker", "2qixuX48eng4w2gLc2qaKx"]
+    ]), "https://open.spotify.com/album/2zRC0GHUly8RwEZWV8Wnpr", "公式Spotifyアルバム"),
+   PL("ef-thunder", "Endfield — Thunder's Legacy", "⚡", "purple", ["Game","Endfield","Metal Scar Radio","Thunder's Legacy"],
+    endfieldOstTracks("Thunder's Legacy", [
+      ["Nightmare Without Veil", "Metal Scar Radio, VISION SOUND, Salty Salt", "2xDxF7U8he0i62u7j2u4Kd"],
+      ["Lingering Glow", "Metal Scar Radio, Aurora Sky, Lucien X", "2sWun7tcDHwmWSChKYrUdv"],
+      ["Hour of Blossoms", "Metal Scar Radio, BaoUner", "15ACa86aWwwLZHjz1jtCXH"],
+      ["Where We Walked", "Metal Scar Radio, 曾怡HeartStrings", "0nNQqZFKQ5gXvWqpfZ1s4F"],
+      ["Through Old Dreams", "Metal Scar Radio, 封炫宇", "4KvWGTm792bakBkXOyZbSo"],
+      ["Just So", "Metal Scar Radio, 曾怡HeartStrings, Feryquitous, 王陽", "1yReGHyOSa8LwAFuemxEXF"],
+      ["Butterfly in Ashes", "Metal Scar Radio, Aurora Sky, Lucien X", "4ZqySz7IHJyGcsS3Rtv6TS"],
+      ["Where the Light Is Taken", "Metal Scar Radio, Hyunmin Cho, 王陽", "3RVCk4oW6FvzLAwGUM7RYq"],
+      ["Keeper of My Heart", "Metal Scar Radio, MSR Studio", "3SBmFiIf302cz9R8jL0qNT"]
+    ]), "https://open.spotify.com/album/7oQIngNMaM8CNqfOdV5alW", "公式Spotifyアルバム"),
+   PL("ef-wake", "Endfield — At the Wake of Spring OST", "🌊", "aqua", ["Game","Endfield","Metal Scar Radio","Wake of Spring"],
+    endfieldOstTracks("At the Wake of Spring Original Soundtrack", [
+      ["Drowned in Depth", "Metal Scar Radio, Bleeding Fingers, Giovanni Rios", "7J44kY14TyaFxOLQqKVRpA"],
+      ["Evil-Sealing Pool", "Metal Scar Radio, BLEEDING FINGERS MUSIC, Martí Noguer", "5IbZUeHnQd765HoQtcChCU"],
+      ["Illusions, Begone", "Metal Scar Radio, N2V, VISION SOUND", "6T5ESNUjQDiEKLEPJXw6iI"],
+      ["Celestial Axis", "Metal Scar Radio, BLEEDING FINGERS MUSIC, Martí Noguer", "5sh7aqFWASUn1J0N7CMBXf"],
+      ["Beneath the Words", "Metal Scar Radio, 動點", "2zxgqmNobCCYqnbkmCgCyG"],
+      ["Blaze and Ruin", "Metal Scar Radio, KH", "6qSHPMR4yI7O59ltrOzsmK"],
+      ["Seize the Pass", "Metal Scar Radio, Unisonar, Nick Froud", "70onCdBvJk7DeVnErRsTi4"],
+      ["Blazing Hopes", "Metal Scar Radio, Unisonar, Nick Froud", "1xunSAkv7lZL4GtrqXfNc9"],
+      ["Array of Fates", "Metal Scar Radio, Unisonar, Nick Froud", "197Chn4ZrhbXdC6SWfoeal"],
+      ["Blooming Lanterns", "Metal Scar Radio, Unisonar, Nick Froud", "4Ya7F9gD9XSs5Ni9xKPAHc"],
+      ["Rewrite the Prophecy", "Metal Scar Radio, VISION SOUND, Salty Salt, Aurora Sky", "56FnXoQ7QWtA0q3DBJsSDX"],
+      ["Whispers of Decay", "Metal Scar Radio, Cody Matthew Johnson, Alec Justice, Will Chen", "3fPtedaOmPMXP21OhH6a6X"],
+      ["Shatter the Crown", "Metal Scar Radio, Cody Matthew Johnson, Alec Justice, Will Chen", "4qfiRQACYtdO6YQEu87d6S"],
+      ["Annihilation Response", "Metal Scar Radio, Cody Matthew Johnson, Alec Justice, Will Chen", "2FSLJPqx0JYnvHRynhFqbb"],
+      ["Wake the Sea", "Metal Scar Radio, Cody Matthew Johnson, Alec Justice, Will Chen", "2y4P0C6oz3xt4Lffx5f0Cn"],
+      ["Drawn by Spring", "Metal Scar Radio, WS Music, 乃工 Milkman", "1BpJUvKBIMKvVBPf6PLKwN"],
+      ["Skipping Through Light", "Metal Scar Radio, 動點", "3xbdArOQXxOMlZpClXBJ1c"]
+    ]), "https://open.spotify.com/album/3wxeHdhX8CWYyn10gAeFEE", "公式Spotifyアルバム"),
+   PL("ef-ccr", "Endfield — Contingency Contract Re-Ignition OST", "💥", "red", ["Game","Endfield","Metal Scar Radio","Re-Ignition"],
+    endfieldOstTracks("Contingency Contract Re-Ignition Experimental Operation Original Soundtrack", [
+      ["Rekindled", "Metal Scar Radio, Alec Justice, Keep Close, Chapters", "5aWMskK7XVKh0SmKBD7h84"],
+      ["Contract of Order", "Metal Scar Radio, Alec Justice", "4poeDOugwCenAMDD76w5Vt"],
+      ["Artificial Ruin", "Metal Scar Radio, VISION SOUND, Salty Salt", "0xKCSZjYssDeGDXs8ONzHG"],
+      ["Rekindled (Instrumental Version)", "Metal Scar Radio, Alec Justice, Keep Close, Chapters", "1nmZG5ln7TOHwzbrTQKT77"]
+    ]), "https://open.spotify.com/album/1qzlMIr2jwYizwY17Bseaa", "公式Spotifyアルバム"),
+   PL("ef-homecoming", "Endfield — Homecoming OST", "🏠", "green", ["Game","Endfield","Metal Scar Radio","Homecoming"],
+    endfieldOstTracks("Homecoming Original Soundtrack", [
+      ["Questioning the Veil", "Metal Scar Radio, INSPION", "45k4MS7tTg8s0Obmzt7ihn"],
+      ["Glorious Mountain Pass", "Metal Scar Radio, Ceru_", "60oNwqMHyZOJfTy062Zyt9"],
+      ["The Day After Tomorrow", "Metal Scar Radio, Ceru_", "3WPjEMfpaEo0qiWAazXqnl"],
+      ["A Life for a Shadow", "Metal Scar Radio, Ceru_", "2ELjsQsirLmkc7MFcK8P4b"],
+      ["The Painted World", "Metal Scar Radio, Hyunmin Cho", "0HsYy9dq4WDdIHfiD5xGMb"],
+      ["Inkwash Journey", "Metal Scar Radio, Hyunmin Cho", "1S6a4fdUYJbZEU5hv56e9Z"],
+      ["Blunted by Endless Trials", "Metal Scar Radio, 李化禹", "2o9tc7CgklORR7RyaXclL5"],
+      ["Parting the Miasma", "Metal Scar Radio, David Murillo, Moroi", "77iAGTWQ6KkbHexOGdFoT7"],
+      ["Guarding the Nexus", "Metal Scar Radio, LCwwww, Feryquitous", "23plnEDuyTZCdMDB4M3ZtA"],
+      ["Void Annihilation", "Metal Scar Radio, AION, Hahlweg", "4a7buJoufnwjYIhjTaTbA9"],
+      ["Exclusion Zone", "Metal Scar Radio, Lukas Knoebl", "7ITAo94sRZV9ygWhlmqiS0"],
+      ["Honed Blade Ascension", "Metal Scar Radio, Nick Froud", "7uSOYgjCn29hzbquKm1nHm"],
+      ["Tales of the Sword", "Metal Scar Radio, Nick Froud", "4PB31GLS6FIugHjwpLjG7D"],
+      ["Matters Before the Hall", "Metal Scar Radio, 湯湯", "5F73p8qhJm4pLycLWUFCx8"],
+      ["Lost in the Flux", "Metal Scar Radio, 明家歆, Jean-Gabriel Raynaud, 原田萌喜", "4SPcnQDo7MBUEJ7HCIk2C2"],
+      ["Toward the Dreamscape", "Metal Scar Radio, Hyunmin Cho", "3gtXhoK86da8pv9XvG8La5"],
+      ["The Heart Crumbles", "Metal Scar Radio, Ceru_", "25YiDTbYMaFo3UN3C5Liyl"],
+      ["My Former Home", "Metal Scar Radio, Hyunmin Cho", "4B5ktT0DWQ1Ej4WT8CHJPq"],
+      ["For your name", "Metal Scar Radio, Edine", "1I02UcCu4i0eRb5GM7WbLU"],
+      ["As Hope Fades", "Metal Scar Radio, 明家歆, Ceru_", "1K61OpMiLPjrqZjRNnuQbp"],
+      ["Anchor of Solitary Sea", "Metal Scar Radio, Runyu Qian, Salty Salt, Sephid", "7h0bcXX82WYkrUYwBIycSX"],
+      ["Eyes Bright Through the Haze", "Metal Scar Radio, N2V", "2PF6oTrlTjAZWC4XTHTi4H"],
+      ["ADELPHOCLAST", "Metal Scar Radio, Crywolf, YMIR, Tal Richards", "3H49F5DYiZ3KlslAe191Nf"],
+      ["ACHERON", "Metal Scar Radio, Crywolf, YMIR", "2v1dDhyTRfLEMh9P16KWPx"],
+      ["ABYSSUS, ABYSSUM, INVOCAT", "Metal Scar Radio, Crywolf, YMIR, Tal Richards", "4AMLteLKP1pEYZrKTycCev"],
+      ["REAPER", "Metal Scar Radio, Crywolf, YMIR", "5RbN3YkMdzBaMKyjyOyAwr"],
+      ["AMARANTHUS CAUDATUS", "Metal Scar Radio, Crywolf, YMIR, Tal Richards", "2MiM7YNCCHAPsVJCd0Hdw4"],
+      ["Echoes of the Deep", "Metal Scar Radio", "56IsNJwjZu0wKMJfAUX4b3"],
+      ["Reverberance of Forgotten Lands", "Metal Scar Radio, Alan@8:48, Breakfast@A8RECORDS", "0pgohm8s5PRc2VBHyPOM1S"],
+      ["Vermilion", "Metal Scar Radio, 明家歆, BLACK 0, Ceru_", "4PAnuVHeI6tUEIsbe1exQe"]
+    ]), "https://open.spotify.com/album/1OUsAGgNlKQWUWQ154UN2v", "公式Spotifyアルバム"),
+   PL("ef-dreamscape", "Endfield — Dreamscape of Wind and Snow OST", "🌨️", "blue", ["Game","Endfield","Metal Scar Radio","Wind and Snow"],
+    endfieldOstTracks("Dreamscape of Wind and Snow Original Soundtrack", [
+      ["Snowy Forest", "Metal Scar Radio, Adam Gubman", "5Vs88v4h48Mq8AxpVhMC27"],
+      ["Following the Story's Footsteps", "Metal Scar Radio, 紅唐", "2gJUHzPc2TyTSko5rHn61a"],
+      ["Hear the Singing Bowstring", "Metal Scar Radio, 封炫宇, Adam Gubman", "72Xu0IGcax8Bbql5LxIr9I"],
+      ["Arrows and Snowflakes", "Metal Scar Radio, 原田萌喜", "6T4hXrDU7juJbo3vu2uqlK"],
+      ["Child of the Snowy Forest", "Metal Scar Radio, 原田萌喜", "0Nk3QhIWsZTp22X2CLeqBt"],
+      ["Frozen Mist", "Metal Scar Radio, Robert Wolf", "3gKhHXczEy2SCcnBWXyqvn"],
+      ["Arrow Feathers Become Words", "Metal Scar Radio, Enzalla", "2dXm66A5akSbV3jSJTUG7G"],
+      ["The Hunt", "Metal Scar Radio, Martí Noguer", "1iDVSN9x1CozVHLuWWiJwa"],
+      ["Along the Traces of Never-Melting Snow", "Metal Scar Radio, 原田萌喜", "7odVcoSSbBhks1JhM8RT2Y"],
+      ["When Illusory Light Fades", "Metal Scar Radio, 工藤吉三", "4BfQLjhZVxPr9ukIYYrIHn"],
+      ["HER Guidance", "Metal Scar Radio, Vilma Jää", "6NX8KR65bWbiDN3tNs6mzX"],
+      ["Rage Ignited from Oblivion", "Metal Scar Radio, Elliot Hsu, Enzalla", "52toP8thZ3zrPvPzL5ivvg"],
+      ["Forward, My Child", "Metal Scar Radio, Elliot Hsu", "6PgwjrqWsYlgfDjGvHX2KY"],
+      ["Amma's Touch", "Metal Scar Radio, Elliot Hsu, Enzalla", "3K0dFWOR2IxxtihIsTdedR"],
+      ["Prophecy and Legend", "Metal Scar Radio, 原田萌喜", "39gMhBsuqgO6tUIvVuQXxz"],
+      ["HER Calling", "Metal Scar Radio, z1on", "5KAfy19XUphrZCdSejQt3n"]
+    ]), "https://open.spotify.com/album/36qyyiGRMbtktVXGptjZL6", "公式Spotifyアルバム"),
    PL("ef-signal", "Endfield — The Signal Is Still Pulsing", "📡", "green", ["Game","Endfield","Metal Scar Radio","Signal"],
     [T("The Signal Is Still Pulsing", "Metal Scar Radio #01", "Metal Scar Radio", "https://endfield.wiki.gg/wiki/Metal_Scar_Radio"),
      T("The Magic Radio", "Metal Scar Radio #02", "Metal Scar Radio", "https://endfield.wiki.gg/wiki/Metal_Scar_Radio"),

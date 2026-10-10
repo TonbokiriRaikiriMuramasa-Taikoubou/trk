@@ -61,6 +61,7 @@
 | 設定・Import検証 | `js/core.js`、`tools/check-security.mjs` |
 | MIDI/MIXとカタログの検査 | `tests/midi-player.test.mjs`、`tests/media-midi-integration.test.mjs`、`tests/midi-mix.test.mjs`、`tests/touhou-catalog.test.mjs` |
 | 利用者向けMIDI・権利案内 | `docs/guide/touhou-midi.md`、`docs/guide/sound.md`、`docs/guide/en.md` |
+| 🎓 OST手続き生成 | `tools/make-trk-ost.mjs`（出力は `assets/trk-ost/`・Git外。5ルール×2曲＝10曲のWAVスケッチ） |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
 | Service Worker | `sw.js`（現行cache名：`trk-v2026.10.11-trk112`） |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
@@ -75,6 +76,7 @@
 
 ## 7. 最近の変更
 
+- **trk113（2026-10-11）**：🎓 trk's OST Vol.1 用の手続き作曲スクリプト `tools/make-trk-ost.mjs` を追加。コード進行／確率・統計（マルコフ・ランダムウォーク）／進化的アルゴリズム（GA）／深層学習（tiny MLPを勾配降下で訓練）／自由作曲 の5ルール×2曲＝10曲を依存なしで合成し `assets/trk-ost/` へWAV出力（.gitignore でGit外・生成スクリプトのみ同梱）。試聴は `assets/trk-ost/index.html`。音源はアプリ未組込（将来 trk's OST Vol.1 へ追加予定）。
 - **trk112（2026-10-11）**：タブ挙動の改善。①デモ曲を🎓 trk's OST Vol.1 プレイリストへ移設（🐔 trk's playlist 内・Game Vol.1 の下、`js/library.js` の `ensureTrkOstPlaylist`／`TRK_OST_ID`。旧版の最上位タブからの移行あり）。②開いたフォルダ内プレイリストのタブを `settings.libOpenTabs` で永続化し、中クリックはタブを閉じるのみに（`plCloseOpenTab`）。ガイド（`appearance.md`・`en.md`）と `sw.js` cache名（`trk-v2026.10.11-trk112`）を更新。`npm run check` 全件通過・VMで新関数の挙動を確認。
 - **trk111（2026-10-11）**：エンドフィールド公式カタログにMetal Scar Radioの公式アルバム6作・計81曲を追加（Eve of Departure 5曲・Thunder's Legacy 9曲・At the Wake of Spring OST 17曲・Contingency Contract Re-Ignition OST 4曲・Homecoming OST 30曲・Dreamscape of Wind and Snow OST 16曲、いずれも公式Spotify収録順）。各曲は公式Spotify個別曲、各アルバムは公式Spotifyアルバムページへリンクし、取り込み時に `trk-ef-*` を自動作成。この6作の中国語公式曲名・ffm.to告知リンク（Homecoming 以外）・VGMdb照合は未確認（照合別名なし）。台帳 `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、fixture `tools/endfield-msr-albums-tracklist.json`、検査は `tools/check-repo.mjs` の🛰️MSR albumsブロックに追加。ガイド（`appearance.md`・`en.md`）とNOTICEを更新し、`sw.js` cache名を `trk-v2026.10.11-trk111` に更新。
 - **trk110（2026-10-10）**：エンドフィールド公式カタログに「初号指令OST」Zeroth Directive Vol.1（37曲）・Vol.2（23曲）を公式収録順で追加。各曲は公式Spotify個別曲、各巻は公式ffm.to配信一覧へリンクし、中国語公式曲名を照合別名に登録。旧4パート紹介版プレイリストは永続IDを保ったまま安全更新。権利調査は `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、fixtureは `tools/endfield-zeroth-directive-tracklist.json`、検査は `tools/check-repo.mjs` の🛰️ブロックに追加。ガイド（`appearance.md`・`en.md`）とNOTICEを更新し、`sw.js` cache名を `trk-v2026.10.10-trk110` に更新。

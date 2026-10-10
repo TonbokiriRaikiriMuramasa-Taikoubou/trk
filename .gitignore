@@ -1,6 +1,9 @@
 # 手元のテスト音源は無視し、任意同梱のチュートリアルデモだけを追跡します
 *.mp3
 !assets/optional-demo-audio/first-spark-tutorial.mp3
+
+# 🎓 trk's OST の手続き生成スケッチ（生成スクリプト tools/make-trk-ost.mjs の出力・Git外）
+assets/trk-ost/
 *.m4a
 *.aac
 *.wav

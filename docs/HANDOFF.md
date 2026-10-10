@@ -1,6 +1,8 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-11（trk112）**。現在の仕様・守る条件・未確認事項の要約です。細かな過去の作業履歴は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-11（trk113）**。現在の仕様・守る条件・未確認事項の要約です。細かな過去の作業履歴（trk110以前）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+>
+> **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝直近3回の変更、§8＝変更時の点検。
 
 ## 1. 作業の基本
 
@@ -26,11 +28,18 @@
 
 - LoLカタログはtrk108時点で18プレイリスト・456曲（Creator-Safe Sessions、Champion Themes、Worlds、MSI、K/DA、Season 1〜9 OST、Warsongs、人気曲）。Season 1〜9 OST 243曲とWarsongs 11曲はCreator-Safe Playlist掲載を確認済み。人気曲の共同制作曲などは対象外・要確認のままです。
 - 曲別出典、範囲、権利上の未確認事項は [`LEAGUE-OF-LEGENDS-MUSIC.md`](LEAGUE-OF-LEGENDS-MUSIC.md) と `tools/leagueoflegends-*-tracklist.json` を参照。音源はカタログにも同梱しません。
-- Endfieldカタログ（trk110〜trk111）は「初号指令OST」Zeroth Directive Vol.1 37曲＋Vol.2 23曲（各曲は公式Spotify個別曲、各巻は公式告知のffm.to配信一覧、中国語公式曲名を照合別名に登録）に加え、trk111で公式アルバム6作・計81曲を追加しました：Eve of Departure 5曲（2026-04-11）・Thunder's Legacy 9曲（2026-04-22）・At the Wake of Spring OST 17曲（2026-04-30）・Contingency Contract Re-Ignition OST 4曲（2026-06-20）・Homecoming OST 30曲（2026-07-31）・Dreamscape of Wind and Snow OST 16曲（2026-09-10）。6作は各曲を公式Spotify個別曲、各アルバムを公式Spotifyアルバムページへリンクし、取り込み時に `trk-ef-*` プレイリストとして自動作成されます。6作の中国語公式曲名・公式告知のffm.to配信一覧（Homecoming を除く）・VGMdb照合は未確認（照合別名なし・「配信なし」の断定はしない）。旧「初号指令 OST」4パート紹介版は永続ID `ef-firstorder` を保ったままVol.1全曲版へ安全更新されます（所持曲・ユーザー変更は維持）。キャラクターOST等5プレイリストの内容は不変。©/℗ GRYPHLINE（Hypergryph）、レーベルは Metal Scar Radio（鐵痕電台）。配信・購入は二次利用許諾ではなく、公式二次創作ガイドラインは公式素材のそのままの複製・抽出を禁止します。曲別出典と権利詳細は [`ARKNIGHTS-ENDFIELD-MUSIC.md`](ARKNIGHTS-ENDFIELD-MUSIC.md) と `tools/endfield-zeroth-directive-tracklist.json`・`tools/endfield-msr-albums-tracklist.json` を参照。音源は同梱しません。
+- **Endfieldカタログ**（trk110〜trk111）は初号指令OSTと公式アルバム6作の2系統です。いずれも公式Spotify収録順・各曲は公式Spotify個別曲ページへリンクし、取り込み時に自動でプレイリスト化します。音源は同梱しません。
+  - 初号指令OST「Zeroth Directive」：Vol.1 37曲＋Vol.2 23曲。各巻は公式告知のffm.to配信一覧へリンクし、中国語公式曲名を照合別名に登録済み。旧「初号指令 OST」4パート紹介版は永続ID `ef-firstorder` を保ったままVol.1全曲版へ安全更新されます（所持曲・ユーザー変更は維持）。キャラクターOST等5プレイリストの内容は不変。
+  - Metal Scar Radio 公式アルバム6作・計81曲（trk111）：Eve of Departure 5曲（2026-04-11）・Thunder's Legacy 9曲（2026-04-22）・At the Wake of Spring OST 17曲（2026-04-30）・Contingency Contract Re-Ignition OST 4曲（2026-06-20）・Homecoming OST 30曲（2026-07-31）・Dreamscape of Wind and Snow OST 16曲（2026-09-10）。各アルバムは公式Spotifyアルバムページへリンクし、`trk-ef-*` プレイリストとして自動作成。
+  - 権利表記：©/℗ GRYPHLINE（Hypergryph）、レーベルは Metal Scar Radio（鐵痕電台）。配信・購入は二次利用許諾ではなく、公式二次創作ガイドラインは公式素材のそのままの複製・抽出を禁止します。
+  - 未確認（断定しない）：6作の中国語公式曲名・公式告知のffm.to配信一覧（Homecoming を除く）・VGMdb照合・他ストアの曲別URL。照合別名は付けていません。「配信なし」とも書きません。
+  - 台帳とfixture：[`ARKNIGHTS-ENDFIELD-MUSIC.md`](ARKNIGHTS-ENDFIELD-MUSIC.md)、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`。
 
 ### 維持中の既存機能
 
-- **タブの挙動（trk112）**：チュートリアルのデモ曲は独立タブ（🎓デモ曲）をやめ、**🎓 trk's OST Vol.1** プレイリスト（🐔 trk's playlist の中・Game Vol.1 の下・オリジナル曲の置き場）にまとめました。開いたタブは libOpenTabs で残り、削除はタブの ⚙（長押し）設定から（曲はライブラリに残る）。**フォルダ内のプレイリストを開いたタブは閉じるまで残る**のが既定になり、フォルダ内タブの中クリックは「タブを閉じる」（本体は残す）に変更しました。
+- **🎓 trk's OST Vol.1（オリジナル曲の置き場）**：🐔 trk's playlist の中、Game Vol.1 の直下にあります（`TRK_OST_ID = "trk-ost-v1"`）。今はチュートリアルのデモ曲1曲のみ。trk113の手続き生成スケッチ（下記）はまだアプリ未組込で、将来ここへ増やしていく想定です。
+- **タブの挙動（trk112）**：チュートリアルのデモ曲は独立タブ（🎓デモ曲）をやめ、上記 trk's OST Vol.1 にまとめました。開いたタブは libOpenTabs で残り、削除はタブの ⚙（長押し）設定から（曲はライブラリに残る）。**フォルダ内のプレイリストを開いたタブは閉じるまで残る**のが既定になり、フォルダ内タブの中クリックは「タブを閉じる」（本体は残す）に変更しました。
+- **🎼 手続き作曲ツール（trk113）**：`node tools/make-trk-ost.mjs` で10曲のWAVスケッチを生成（5ルール×2曲＝コード進行／確率・統計／進化的アルゴリズム／深層学習／自由作曲）。出力は `assets/trk-ost/`（.gitignore でGit外・同梱するのは生成スクリプトのみ）で、試聴は同ディレクトリの `index.html`。外部ライブラリなし・決定的（毎回同じ音）です。**アプリ本体には組込んでいません。**
 - MMD内蔵モーションは**65種をすべて選択可能**。日常・休憩／ダンス・ステージ／ミク曲テンポ／ミク定番ポーズ／表情・演技／🎤 歌・口パクの6グループ。Latの表情モーフを含み、新規・リセット時の既定は `faceSing`。VMDはコードで生成し、第三者の振付データは同梱しません。
 
 ## 3. 維持するデータ・安全条件
@@ -48,7 +57,8 @@
 3. **音源ジャケット**（trk101〜106）：曲一覧のサムネイル表示は利用者確認済み（2026-10-09）。選択中バナー・TV・書斎、譜面中の右上配置、フィルター、画像なし、表示設定の優先順はPC／Androidの実曲で確認する。詳細は旧記録と [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照。
 4. **LoL外部ページ**：Season 4〜9・WarsongsのSoundCloudセット表示と、地域制限曲を含む人気曲リンクを実ブラウザで再確認する。曲別調査はLoL台帳を更新する。
 5. **Endfield配信リンク**：Zeroth Directive OST 60曲＋バッチ2の6作81曲のSpotify個別曲ページ、各巻のffm.toスマートリンクと网易云音乐アルバムの表示・地域差を実ブラウザで再確認する。バッチ2は個別曲IDの抜取確認が6曲のみで、残り75曲のIDは未個別確認。バッチ2の中国語公式曲名・ffm.to告知リンク（Homecoming 以外）・VGMdb照合・他ストアの曲別URLは未確認のまま。Zeroth Vol.1 は 2026-10-11 に Apple Music 掲載を確認済み（Vol.2 のアルバム別URLは未照合）。未収録の公式リリース（Yi／Old Deep Water Dies／Sketches of Lost Heirlooms／A Promise Makes a Home 等）は台帳の「調査中の他の公式リリース」表に確認状況を記録済み。曲別調査はエンドフィールド台帳を更新する。
-6. Android Chrome／PCでService Workerのsafe・オフライン、MMD／VRM、IndexedDBを確認する。Node・shim検査は実機確認の代用ではありません。
+6. **🎼 手続き生成10曲の聴取確認**（trk113）：自動検査は「無音でもクリップでもない」こと（peak 0.62〜0.72・RMS 0.08〜0.29）と決定的生成しか確認していません。曲として聴けるか・不快なノイズや耳障りな音がないか・音量バランスは、`assets/trk-ost/index.html` で実際に聴いて確認する。採用曲を決めたら、trk's OST Vol.1 への組込み方（音源の権利表記・同梱可否）を別途決める。
+7. Android Chrome／PCでService Workerのsafe・オフライン、MMD／VRM、IndexedDBを確認する。Node・shim検査は実機確認の代用ではありません。
 
 ## 5. 主なファイル
 
@@ -71,6 +81,7 @@
 - `npm run check`：成功。Static 0 failure／0 warning、`node:test` **202/202・28 suites**。リポジトリ、Security、a11y、vendor、MMD、Study Room、lite-mode検査を含む。
 - Endfield Zeroth Directiveカタログ検査（`check-repo.mjs`🛰️ブロック）：Vol.1 37曲＋Vol.2 23曲の順序・公式Spotify個別曲リンク・中国語別名・ffm.toガイド・既存取り込みの安全更新を確認。
 - Endfield Metal Scar Radioアルバム検査（`check-repo.mjs`🛰️バッチ2ブロック）：6作81曲（5+9+17+4+30+16）の順序・一意な公式Spotify個別曲リンク・照合別名なし・公式SpotifyアルバムのsourceUrl・権利表記・`trk-endfield` 配下への6プレイリスト自動作成を確認。曲名を1つ壊すとFAILすることを確認済み（改変検知の動作確認）。
+- 🎼 手続き生成（`tools/make-trk-ost.mjs`）：10曲すべて生成でき、WAVの peak 0.62〜0.72・RMS 0.08〜0.29（無音でもクリップでもない）。打楽器ノイズとMLPサンプリングをシード済みPRNG化したため **2回生成して全ファイルのmd5一致**を確認（決定的ビルド）。**実際に聴いての良否は未確認**（§4-6）。
 - `git diff --check`：成功。
 - 自動検査でローカル参照・構文・Stageの幾何・選曲画面のoverflowを確認。新しいMIDIの音質、通常ブラウザ上での聞こえ方、実機操作はまだ確認していません。Endfieldの配信リンク（Spotify・ffm.to・网易云音乐）の実ブラウザ表示も未確認です（§4-5）。バッチ2の曲順・曲名・アーティストは 2026-10-11 に公式Spotifyのアルバム埋め込みページで6作すべてを再確認し、Homecoming は公式ffm.toスマートリンクでも照合しましたが、個別曲IDの全数確認と実ブラウザ確認は未実施です。
 
@@ -79,9 +90,7 @@
 - **trk113（2026-10-11）**：🎓 trk's OST Vol.1 用の手続き作曲スクリプト `tools/make-trk-ost.mjs` を追加。コード進行／確率・統計（マルコフ・ランダムウォーク）／進化的アルゴリズム（GA）／深層学習（tiny MLPを勾配降下で訓練）／自由作曲 の5ルール×2曲＝10曲を依存なしで合成し `assets/trk-ost/` へWAV出力（.gitignore でGit外・生成スクリプトのみ同梱）。試聴は `assets/trk-ost/index.html`。音源はアプリ未組込（将来 trk's OST Vol.1 へ追加予定）。
 - **trk112（2026-10-11）**：タブ挙動の改善。①デモ曲を🎓 trk's OST Vol.1 プレイリストへ移設（🐔 trk's playlist 内・Game Vol.1 の下、`js/library.js` の `ensureTrkOstPlaylist`／`TRK_OST_ID`。旧版の最上位タブからの移行あり）。②開いたフォルダ内プレイリストのタブを `settings.libOpenTabs` で永続化し、中クリックはタブを閉じるのみに（`plCloseOpenTab`）。ガイド（`appearance.md`・`en.md`）と `sw.js` cache名（`trk-v2026.10.11-trk112`）を更新。`npm run check` 全件通過・VMで新関数の挙動を確認。
 - **trk111（2026-10-11）**：エンドフィールド公式カタログにMetal Scar Radioの公式アルバム6作・計81曲を追加（Eve of Departure 5曲・Thunder's Legacy 9曲・At the Wake of Spring OST 17曲・Contingency Contract Re-Ignition OST 4曲・Homecoming OST 30曲・Dreamscape of Wind and Snow OST 16曲、いずれも公式Spotify収録順）。各曲は公式Spotify個別曲、各アルバムは公式Spotifyアルバムページへリンクし、取り込み時に `trk-ef-*` を自動作成。この6作の中国語公式曲名・ffm.to告知リンク（Homecoming 以外）・VGMdb照合は未確認（照合別名なし）。台帳 `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、fixture `tools/endfield-msr-albums-tracklist.json`、検査は `tools/check-repo.mjs` の🛰️MSR albumsブロックに追加。ガイド（`appearance.md`・`en.md`）とNOTICEを更新し、`sw.js` cache名を `trk-v2026.10.11-trk111` に更新。
-- **trk110（2026-10-10）**：エンドフィールド公式カタログに「初号指令OST」Zeroth Directive Vol.1（37曲）・Vol.2（23曲）を公式収録順で追加。各曲は公式Spotify個別曲、各巻は公式ffm.to配信一覧へリンクし、中国語公式曲名を照合別名に登録。旧4パート紹介版プレイリストは永続IDを保ったまま安全更新。権利調査は `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、fixtureは `tools/endfield-zeroth-directive-tracklist.json`、検査は `tools/check-repo.mjs` の🛰️ブロックに追加。ガイド（`appearance.md`・`en.md`）とNOTICEを更新し、`sw.js` cache名を `trk-v2026.10.10-trk110` に更新。
-- **trk109（2026-10-10）**：TouhouThemeDBのローカル曲名カタログとID形式名の表示、実サンプルを使わない24種のコード生成MIDI音色、通常音声用・初期オフのTRK MIDI MIXを追加。詳細な権利・抽出注意は `guide/touhou-midi.md`。
-- **trk108以前**：LoLカタログ、音源ジャケット、TV、譜面生成、名前空間等の作業履歴は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) と各設計資料を参照。
+- **trk110以前**：Endfield初号指令OST、Touhouローカル曲名カタログと24種のコード生成MIDI音色・TRK MIDI MIX（trk109）、LoLカタログ、音源ジャケット、TV、譜面生成、名前空間等の作業履歴は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) と各設計資料を参照。
 
 ## 8. 変更時チェックリスト
 

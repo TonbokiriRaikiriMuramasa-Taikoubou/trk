@@ -679,7 +679,7 @@ function libTabsOf(all) {
   const plKeys = new Set(all.map(x => x.key));
   /* 📁 フォルダ（中のプレイリストの曲をぜんぶ）。🐔 trk's playlist は右端に表示名つきで出すので、ここでは出さない */
   for (const f of core.settings.plFolders) if (!f.parent && f.id !== TRK_FOLDER_ID) tabs.push({ id:"fld:" + f.id, icon: f.icon || "📁", label: f.name, n: [...plFolderUnionKeys(f.id)].filter(k => plKeys.has(k)).length, fld: f });
-  for (const p of core.settings.playlists) if (!p.folder && plVisible(p) && p.id !== "trk-playlist" && p.id !== "trk-classic" && p.id !== TRK_OST_ID) tabs.push({ id:"pl:" + p.id, icon: plIcon(p), label: p.name, n: plCount(p, plKeys), pl: p });   /* 🎧 フォルダに入っていないプレイリスト（👥投稿者で絞る。🐔🎻は右端に出すため除外） */
+  for (const p of core.settings.playlists) if (!p.folder && plVisible(p) && p.id !== "trk-playlist" && p.id !== "trk-classic") tabs.push({ id:"pl:" + p.id, icon: plIcon(p), label: p.name, n: plCount(p, plKeys), pl: p });   /* 🎧 フォルダに入っていないプレイリスト（👥投稿者で絞る。🐔🎻は右端に出すため除外） */
   if (core.settings.libTab.startsWith("pl:")) {   /* フォルダの中のプレイリストを見ているときは、そのタブも出す（戻れるように） */
     const cp = plById(core.settings.libTab.slice(3));
     if (cp && cp.folder && plVisible(cp) && !tabs.some(t => t.id === core.settings.libTab)) tabs.push({ id:"pl:" + cp.id, icon: plIcon(cp), label: cp.name, n: plCount(cp, plKeys), pl: cp, nested: true });
@@ -741,10 +741,6 @@ function libTabsOf(all) {
       if (tc && plVisible(tc) && !tabs.some(x => x.id === "pl:trk-classic")) tabs.push({ id:"pl:trk-classic", icon: plIcon(tc), label: tc.name, n: plCount(tc, plKeys), pl: tc });
     }
   }
-  /* 🎓 trk's OST Vol.1 — 一番下（右端）に出す。通常のプレイリストなので中クリックで削除できる */
-  const ostPl = core.settings.playlists.find(p => p.id === TRK_OST_ID);
-  if (ostPl && plVisible(ostPl) && !tabs.some(x => x.id === "pl:" + TRK_OST_ID))
-    tabs.push({ id:"pl:" + TRK_OST_ID, icon: plIcon(ostPl), label: ostPl.name, n: plCount(ostPl, plKeys), pl: ostPl, ost: true });
   return tabs;
 }
 function libTabMatch(it, id) {
@@ -1089,14 +1085,19 @@ function ensureTrkClassicPlaylist(opts) {
   return true;
 }
 /* 🎓 trk's OST Vol.1 — オリジナル曲とチュートリアルのデモ曲をまとめるプレイリスト。
-   通常のプレイリストタブとして一番下に出すので、他と同じく中クリックで削除できる
-   （タブを消しても曲自体はライブラリに残る＝参照リストのため）。フォルダには入れない。 */
+   🐔 trk's playlist の中（Game Vol.1 の下）に置く。開いたタブは libOpenTabs で残るため
+   行き止まりにならず、削除はタブの ⚙（長押し）設定から行える（曲はライブラリに残る）。 */
 function ensureTrkOstPlaylist(opts) {
   const o = opts || {};
   const doToast = o.toast !== false;
-  if (core.settings.playlists.some(p => p.id === TRK_OST_ID)) return false;
+  ensureTrkFolder();
+  const exist = core.settings.playlists.find(p => p.id === TRK_OST_ID);
+  if (exist) {   /* 旧版（trk112）で最上位に作ったものを trk フォルダへ移す */
+    if (exist.folder !== TRK_FOLDER_ID) { exist.folder = TRK_FOLDER_ID; core.saveUserPrefs(); }
+    return false;
+  }
   const p = plSanitize({ id: TRK_OST_ID, name: "trk's OST Vol.1", icon: "\uD83C\uDF93", color: "none",
-    folder: "", tags: ["trk", "OST"], wish: [], songs: [FIRST_SPARK_KEY], createdAt: Date.now() });
+    folder: TRK_FOLDER_ID, tags: ["trk", "OST"], wish: [], songs: [FIRST_SPARK_KEY], createdAt: Date.now() });
   if (!p) return false;
   core.settings.playlists.push(p);
   core.saveUserPrefs();

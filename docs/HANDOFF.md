@@ -30,7 +30,7 @@
 
 ### 維持中の既存機能
 
-- **タブの挙動（trk112）**：チュートリアルのデモ曲は独立タブ（🎓デモ曲）をやめ、**🎓 trk's OST Vol.1** プレイリスト（タブの一番下・オリジナル曲の置き場）にまとめました。通常のプレイリストなのでチュートリアル後は中クリックで削除できます（曲はライブラリに残る）。**フォルダ内のプレイリストを開いたタブは閉じるまで残る**のが既定になり、フォルダ内タブの中クリックは「タブを閉じる」（本体は残す）に変更しました。
+- **タブの挙動（trk112）**：チュートリアルのデモ曲は独立タブ（🎓デモ曲）をやめ、**🎓 trk's OST Vol.1** プレイリスト（🐔 trk's playlist の中・Game Vol.1 の下・オリジナル曲の置き場）にまとめました。開いたタブは libOpenTabs で残り、削除はタブの ⚙（長押し）設定から（曲はライブラリに残る）。**フォルダ内のプレイリストを開いたタブは閉じるまで残る**のが既定になり、フォルダ内タブの中クリックは「タブを閉じる」（本体は残す）に変更しました。
 - MMD内蔵モーションは**65種をすべて選択可能**。日常・休憩／ダンス・ステージ／ミク曲テンポ／ミク定番ポーズ／表情・演技／🎤 歌・口パクの6グループ。Latの表情モーフを含み、新規・リセット時の既定は `faceSing`。VMDはコードで生成し、第三者の振付データは同梱しません。
 
 ## 3. 維持するデータ・安全条件
@@ -75,7 +75,7 @@
 
 ## 7. 最近の変更
 
-- **trk112（2026-10-11）**：タブ挙動の改善。①デモ曲を🎓 trk's OST Vol.1 プレイリストへ移設（一番下・中クリックで削除可、`js/library.js` の `ensureTrkOstPlaylist`／`TRK_OST_ID`）。②開いたフォルダ内プレイリストのタブを `settings.libOpenTabs` で永続化し、中クリックはタブを閉じるのみに（`plCloseOpenTab`）。ガイド（`appearance.md`・`en.md`）と `sw.js` cache名（`trk-v2026.10.11-trk112`）を更新。`npm run check` 全件通過・VMで新関数の挙動を確認。
+- **trk112（2026-10-11）**：タブ挙動の改善。①デモ曲を🎓 trk's OST Vol.1 プレイリストへ移設（🐔 trk's playlist 内・Game Vol.1 の下、`js/library.js` の `ensureTrkOstPlaylist`／`TRK_OST_ID`。旧版の最上位タブからの移行あり）。②開いたフォルダ内プレイリストのタブを `settings.libOpenTabs` で永続化し、中クリックはタブを閉じるのみに（`plCloseOpenTab`）。ガイド（`appearance.md`・`en.md`）と `sw.js` cache名（`trk-v2026.10.11-trk112`）を更新。`npm run check` 全件通過・VMで新関数の挙動を確認。
 - **trk111（2026-10-11）**：エンドフィールド公式カタログにMetal Scar Radioの公式アルバム6作・計81曲を追加（Eve of Departure 5曲・Thunder's Legacy 9曲・At the Wake of Spring OST 17曲・Contingency Contract Re-Ignition OST 4曲・Homecoming OST 30曲・Dreamscape of Wind and Snow OST 16曲、いずれも公式Spotify収録順）。各曲は公式Spotify個別曲、各アルバムは公式Spotifyアルバムページへリンクし、取り込み時に `trk-ef-*` を自動作成。この6作の中国語公式曲名・ffm.to告知リンク（Homecoming 以外）・VGMdb照合は未確認（照合別名なし）。台帳 `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、fixture `tools/endfield-msr-albums-tracklist.json`、検査は `tools/check-repo.mjs` の🛰️MSR albumsブロックに追加。ガイド（`appearance.md`・`en.md`）とNOTICEを更新し、`sw.js` cache名を `trk-v2026.10.11-trk111` に更新。
 - **trk110（2026-10-10）**：エンドフィールド公式カタログに「初号指令OST」Zeroth Directive Vol.1（37曲）・Vol.2（23曲）を公式収録順で追加。各曲は公式Spotify個別曲、各巻は公式ffm.to配信一覧へリンクし、中国語公式曲名を照合別名に登録。旧4パート紹介版プレイリストは永続IDを保ったまま安全更新。権利調査は `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、fixtureは `tools/endfield-zeroth-directive-tracklist.json`、検査は `tools/check-repo.mjs` の🛰️ブロックに追加。ガイド（`appearance.md`・`en.md`）とNOTICEを更新し、`sw.js` cache名を `trk-v2026.10.10-trk110` に更新。
 - **trk109（2026-10-10）**：TouhouThemeDBのローカル曲名カタログとID形式名の表示、実サンプルを使わない24種のコード生成MIDI音色、通常音声用・初期オフのTRK MIDI MIXを追加。詳細な権利・抽出注意は `guide/touhou-midi.md`。

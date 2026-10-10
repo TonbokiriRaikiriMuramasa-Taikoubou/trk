@@ -200,6 +200,10 @@ const settings = {
   musicVolume: num(prefs.musicVolume, 0, 1, .7),
   musicVolumeRestore: num(prefs.musicVolumeRestore, .01, 1,
     typeof prefs.musicVolume === "number" && prefs.musicVolume > 0 ? prefs.musicVolume : .7),
+  midiSoundProfile: typeof prefs.midiSoundProfile === "string" ? prefs.midiSoundProfile.slice(0, 40) : "studio_gm", // 🎹 コード生成のMIDI音色プロフィール
+  midiMixEnabled: prefs.midiMixEnabled === true,                             // 🎚 通常音声にもかけるTRK MIDI MIX（初期オフ）
+  midiMixProfile: typeof prefs.midiMixProfile === "string" ? prefs.midiMixProfile.slice(0, 40) : "studio_gm",
+  midiMixOpen: prefs.midiMixOpen !== false,                                 // 左下パネルは初回に開く（処理自体はオフ）
   bannerPause: prefs.bannerPause === true,                                   // ⏯ 右上の曲名バナーをタップで一時停止（初期オフ）
   bannerSongBtns: prefs.bannerSongBtns !== false,                            // ◀▶ バナー右端の曲送りボタン（初期オン）
   bannerRandomBtn: prefs.bannerRandomBtn !== false,                          // 🎲 バナー右端のおまかせボタン（初期オン）
@@ -249,7 +253,7 @@ const settings = {
   libSort: pick(prefs.libSort, ["name", "plays", "recent", "best"], "name"),
   shortMode: pick(prefs.shortMode, ["off", "90", "120", "180"], "off"),      // 🕹️ ショートプレイ（後半だけ遊ぶ・初期オフ）
   libTab: typeof prefs.libTab === "string" ? prefs.libTab : "all",            // 📚 選んでいる棚（タブ）のID
-  playlists: (Array.isArray(prefs.playlists) ? prefs.playlists : []).filter(p => p && typeof p === "object").slice(0, 100),  // 🎧 ユーザー定義＋公式カタログ由来プレイリスト（library.js が読み込み時に検証）
+  playlists: (Array.isArray(prefs.playlists) ? prefs.playlists : []).filter(p => p && typeof p === "object").slice(0, 200),  // 🎧 ユーザー定義＋公式カタログ由来プレイリスト（広いカタログを保存できるよう上限200）
   plFolders: (Array.isArray(prefs.plFolders) ? prefs.plFolders : []).filter(f => f && typeof f === "object").slice(0, 12),  // 📁 プレイリストフォルダ（ネスト可。library.js が検証）
   playlistDelMode: prefs.playlistDelMode === "three" ? "three" : "one",       // 🎧 タブの中クリック削除を3回にするモード
   plAuthorTools: prefs.plAuthorTools === true,                                // 👥 投稿者ツール（初期オフ。library.js）
@@ -395,13 +399,19 @@ function resetVideoPrefs() {
 function resetAudioPrefs() {
   settings.musicVolume = 0.7; settings.musicVolumeRestore = 0.7; settings.seVolume = 0.28; settings.seEnabled = false; settings.bannerPause = false; settings.bannerSongBtns = true;
   settings.bannerRandomBtn = true; settings.bannerRandomTap = false;
+  settings.midiSoundProfile = "studio_gm"; settings.midiMixEnabled = false; settings.midiMixProfile = "studio_gm"; settings.midiMixOpen = true;
   settings.synthModeDisabled = false; settings.synthModeFastStart = false; settings.synthModeKeyboardLock = true; settings.synthModeWideKeyboard = false;
+  try {
+    if (window.TrkFX && typeof window.TrkFX.midiMixProfile === "function") window.TrkFX.midiMixProfile("studio_gm");
+    if (window.TrkFX && typeof window.TrkFX.midiMixOn === "function") window.TrkFX.midiMixOn(false);
+  } catch (_) {}
   // fx-dock / eq-dock の音まわりがあれば一緒に初期化
   if ("gameVolume" in settings) settings.gameVolume = 0.7;
   if ("eqEnabled" in settings) settings.eqEnabled = false;
   if ("eqLow" in settings) { settings.eqLow = 0; settings.eqMid = 0; settings.eqHigh = 0; }
   if ("compEnabled" in settings) settings.compEnabled = false;
   try { if (typeof window._trkSyncSynthModeSettings === "function") window._trkSyncSynthModeSettings(); } catch (_) {}
+  emit("audioPrefsReset");
 }
 function resetLitePrefs() {
   /* 🪶 軽量化（js/lite.js）。?reset=lite と trkReset('lite') から呼びます */
@@ -462,6 +472,8 @@ function enterSafeMode() {
   settings.synthModeWideKeyboard = false;
   settings.libKeepShared = false;        // 📤 セーフモードでは、端末に残した共有の曲も読み戻さない
   settings.fxPower = 0; settings.gameFxMode = "off"; settings.hideGameplayUI = false;
+  settings.midiMixEnabled = false; settings.midiMixOpen = false;
+  try { if (window.TrkFX && typeof window.TrkFX.midiMixOn === "function") window.TrkFX.midiMixOn(false); } catch (_) {}
   /* 🔥 TRKアンプも安全側へ（段は消さず、止めるだけ。fx.js が読み込み時に拾う） */
   if ("fxRackOn" in settings) settings.fxRackOn = false;
   markAmpReset("off");
@@ -511,6 +523,7 @@ function exportPrefs(kind) {
     out.hideArtworkDuringChart = settings.hideArtworkDuringChart; out.specArtwork = settings.specArtwork;
   } else if (kind === "audio") {
     out.musicVolume = settings.musicVolume; out.musicVolumeRestore = settings.musicVolumeRestore; out.seEnabled = settings.seEnabled; out.seVolume = settings.seVolume;
+    out.midiSoundProfile = settings.midiSoundProfile; out.midiMixEnabled = settings.midiMixEnabled; out.midiMixProfile = settings.midiMixProfile;
     out.synthModeDisabled = settings.synthModeDisabled; out.synthModeFastStart = settings.synthModeFastStart;
     out.synthModeKeyboardLock = settings.synthModeKeyboardLock;
     out.synthModeWideKeyboard = settings.synthModeWideKeyboard;
@@ -1167,7 +1180,7 @@ function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
       🪶 軽量化のように core.js で決め打ちできるものは LITE_ENUM_VALUES へ、
       🐔 タブ表示名のように UI 側の定数と対になるものは TRK_ENUM_VALUES へ寄せる（読み込み順に左右されない）。 */
 const SETTING_ENUM_KEYS = ["specStyle", "specTheme", "mmdMotionKind", "fxPreset",
-  "liteMode", "liteFps", "liteMascot", "liteScale", "liteLibRows", "trkTabName", "chartGen"];
+  "liteMode", "liteFps", "liteMascot", "liteScale", "liteLibRows", "trkTabName", "chartGen", "midiSoundProfile", "midiMixProfile"];
 /* Importで弾いた理由（対応が変わるので、表示では区別して出す） */
 const SKIP_WHY = { enum:"prefSkipWhyId", type:"prefSkipWhyType", unknown:"prefSkipWhyUnknown", failed:"prefSkipWhyType" };
 function validImportedSettingEnum(key, value) {
@@ -1184,6 +1197,11 @@ function validImportedSettingEnum(key, value) {
     if (key === "fxPreset") {
       const presets = window.TrkFX && window.TrkFX.list();
       return Array.isArray(presets) && presets.some(p => p && p.id === value);
+    }
+    if (key === "midiSoundProfile" || key === "midiMixProfile") {
+      const api = window.Trk && window.Trk.midiProfiles;
+      const profiles = api && typeof api.list === "function" ? api.list() : null;
+      return Array.isArray(profiles) && profiles.some(profile => profile && profile.id === value);
     }
   } catch (_) {}
   return false;

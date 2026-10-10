@@ -1,8 +1,14 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移したtrk70〜trk105の履歴です。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの §8 に短く記録し、詳細履歴が増えたら本書へ移します。
+> `docs/HANDOFF.md` から移したtrk70〜trk108の履歴です。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
 
 ## 旧 HANDOFF §11「最近の変更」
+
+### trk106〜trk108 の記録（2026-10-10。trk109のときに旧HANDOFF §8 から移動）
+
+- **trk106 — 譜面中のジャケット配置**：選曲中は従来どおり動画枠中央、譜面演奏中は右上タイマーの下（160×160px枠）へ配置。右余白とタイマー間隔を固定し、各レイアウトでレーン・ノーツに重ねない。元画像は拡大せず、全画面設定オンも従来どおり。実機確認は現行HANDOFF §4を参照。
+- **trk107 — LoLプレイリストの整理**：公式SoundCloudアルバムを1アルバム＝1プレイリストにし、Season 1〜9のゲームOST 243曲、Warsongs 11曲、公式人気曲30曲を追加。LoLは計18プレイリスト・456曲。音源は同梱せず、アルバムは公式SoundCloud、曲別は公式Spotify（人気曲は公式SoundCloud）へリンク。詳細と未確認事項は `docs/LEAGUE-OF-LEGENDS-MUSIC.md` とfixtureを参照。
+- **trk108 — LoL Creator-Safe対象の確認**：Riot公式Creator-Safe Playlistへの掲載を確認し、Season 1〜9のOST 243曲とWarsongs 11曲を対象として扱う。人気曲の共同制作曲、K/DA、Worlds 2026「Know My Name」等は対象外・要確認のまま。根拠と制限はLoL調査台帳を参照。
 
 ### trk100〜trk105 の記録（2026-10-10。trk108 のときに HANDOFF §8 から移動）
 

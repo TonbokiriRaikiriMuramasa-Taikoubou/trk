@@ -360,7 +360,7 @@ function matches(p, q) {
 }
 
 /* ============ ⑤ 音の部品 ============ */
-const G = { ac:null, src:null, ok:true, made:[], ticks:[], comps:0, eq:[], game:null, vol:null, lim:null, out:null, noise:{}, ir:new Map(), extra:new Map(),
+const G = { ac:null, src:null, ok:true, made:[], ticks:[], comps:0, eq:[], game:null, vol:null, lim:null, out:null, noise:{}, ir:new Map(), extra:new Map(), extraMix:new Map(),
   spectral:0, wk:null, wkLoad:null, denoiseNodes:new Set(), denoisePow:null, denoiseLearned:false, learnNode:null, rackNodes:[] };   /* 🎚 追加分 */
 let cur = null;                                       // 作り直すときに消すノードの一覧（rebuild 中だけ）
 let bypass = false;                                   // 👂 元の音と比べている間だけ true
@@ -617,6 +617,50 @@ function mk(ac, f) {
   return null;
 }
 
+/* 🎚 TRK MIDI MIX は SoundFont ではなく、通常の音声入力に重ねるコード生成DSPチェーン。 */
+function midiMixEffects() {
+  if (!settings.midiMixEnabled) return [];
+  const api = window.Trk && window.Trk.midiProfiles;
+  if (!api || typeof api.get !== "function" || typeof api.normalize !== "function") return [];
+  const id = api.normalize(settings.midiMixProfile);
+  const profile = api.get(id);
+  return profile && Array.isArray(profile.mixChain) ? profile.mixChain.slice(0, 16).map(cleanFx).filter(Boolean) : [];
+}
+function buildMidiMixPath(source, main = false) {
+  const nodes = [], ticks = [], previous = cur;
+  let last = source;
+  cur = main ? G.made : nodes;
+  try {
+    for (const f of midiMixEffects()) {
+      try {
+        const nd = mk(G.ac, f);
+        if (!nd || !nd.input || !nd.output) continue;
+        last.connect(nd.input); last = nd.output;
+        if (nd.tick) ticks.push(nd.tick);
+        if (main && f.type === "comp") G.comps++;
+      } catch (e) { console.error(e); }
+    }
+  } finally { cur = previous; }
+  return { last, nodes, ticks };
+}
+function disposeMidiMixPath(path) {
+  if (!path || !Array.isArray(path.nodes)) return;
+  for (const node of path.nodes) {
+    try { if (node.stop) node.stop(); } catch (_) {}
+    try { node.disconnect(); } catch (_) {}
+  }
+}
+function rebuildExtraMidiMix() {
+  if (!G.src) return;
+  for (const [el, src] of G.extra) {
+    try { src.disconnect(); } catch (_) {}
+    disposeMidiMixPath(G.extraMix.get(el));
+    const path = buildMidiMixPath(src, false);
+    try { path.last.connect(G.eq[0]); } catch (_) {}
+    G.extraMix.set(el, path);
+  }
+}
+
 /* ============ ⑦ 音の通り道 ============ */
 function ensureGraph() {
   if (G.src) return true;
@@ -666,6 +710,8 @@ function rebuild() {
     }
     cur = null;
   }
+  const mixPath = buildMidiMixPath(last, true); last = mixPath.last;
+  if (mixPath.ticks.length) G.ticks.push(...mixPath.ticks);
   last.connect(G.eq[0]);
   if (G.learnNode) { try { G.src.connect(G.learnNode); } catch (_) {} }   /* 🔇 学習用の素通しもつなぎ直す */
   syncEq();
@@ -702,7 +748,9 @@ function tapElement(el) {
   try {
     const src = G.ac.createMediaElementSource(el);
     G.extra.set(el, src);
-    src.connect(G.eq[0]);                    // プリセット → EQ → ゲーム連動 → 音量 → 出口
+    const path = buildMidiMixPath(src, false);
+    path.last.connect(G.eq[0]);               // MIDI MIX（オン時）→ EQ → ゲーム連動 → 音量 → 出口
+    G.extraMix.set(el, path);
     if (G.ac.state === "suspended") G.ac.resume().catch(() => {});
     el.addEventListener("play", () => { if (G.ac.state === "suspended") G.ac.resume(); });
     return src;
@@ -712,6 +760,8 @@ function untapElement(el) {
   const src = G.extra.get(el);
   if (!src) return false;
   try { src.disconnect(); } catch (_) {}
+  disposeMidiMixPath(G.extraMix.get(el));
+  G.extraMix.delete(el);
   G.extra.delete(el);
   return true;
 }
@@ -773,7 +823,7 @@ requestAnimationFrame(frame);
 /* ブラウザは、ユーザーの操作のあとでないと音を出せないので、最初の操作で準備する */
 function wakeAudio() {
   if (window._trkStudyRoomOpen) return;   // 書斎の閲覧中は音の準備をしない（読書を邪魔しない）
-  if (settings.fxOn) ensureGraph();
+  if (settings.fxOn || settings.midiMixEnabled) ensureGraph();
   if (G.ac && G.ac.state === "suspended") G.ac.resume();
 }
 addEventListener("pointerdown", wakeAudio, true);
@@ -782,9 +832,12 @@ addEventListener("blur", () => setBypass(false));
 
 /* ============ ⑩ 操作 ============ */
 function refresh() {
-  if (settings.fxOn && !ensureGraph()) { settings.fxOn = false; setStatus("sfxStatus", "sfxUnsupported"); }
+  if ((settings.fxOn || settings.midiMixEnabled) && !ensureGraph()) {
+    if (settings.fxOn) { settings.fxOn = false; setStatus("sfxStatus", "sfxUnsupported"); }
+    if (settings.midiMixEnabled) settings.midiMixEnabled = false;
+  }
   if (!settings.fxOn) bypass = false;
-  if (G.src) { rebuild(); applyOut(); }
+  if (G.src) { rebuild(); applyOut(); rebuildExtraMidiMix(); }
   saveUserPrefs(); syncUI();
   emit("fxRack");            /* 🔥 TRKアンプ（js/fx-dock.js）の段表示を同期 */
 }
@@ -1189,7 +1242,9 @@ on("language", syncUI);
    TrkFX.rackOn(v)     → ラックのオン／オフ（オンにするときはエフェクトも入れる）
    TrkFX.rackSet(list) → 段を丸ごと入れ替える（cleanFx で検証・最大 RACK_MAX 段）
    TrkFX.rackAdd(type) → 段を1つ足す（いっぱいなら -1）
-   TrkFX.rackClear()   → 段を全部外す */
+   TrkFX.rackClear()   → 段を全部外す
+   TrkFX.midiMixOn(v)  → 通常音声へのTRK MIDI MIX（初期オフ）
+   TrkFX.midiMixProfile(id) → 通常音声用MIXプロフィールを安全に選ぶ */
 window.TrkFX = Object.freeze({
   version:3,
   list:() => CATS.flatMap(c => presetsOf(c).map(p => ({ id:p.id, cat:p.cat, name:presetName(p) }))),
@@ -1214,6 +1269,12 @@ window.TrkFX = Object.freeze({
     settings.fxRack.push(cleanFx({ ...d })); refresh(); return settings.fxRack.length;
   },
   rackClear:() => { settings.fxRack = []; refresh(); return 0; },
+  midiMixOn:v => { settings.midiMixEnabled = !!v; refresh(); emit("midiMix"); return !!settings.midiMixEnabled; },
+  midiMixProfile:id => {
+    const api = window.Trk && window.Trk.midiProfiles;
+    settings.midiMixProfile = api && typeof api.normalize === "function" ? api.normalize(id) : "studio_gm";
+    refresh(); emit("midiMix"); return settings.midiMixProfile;
+  },
   tap,
   tapElement,
   untapElement

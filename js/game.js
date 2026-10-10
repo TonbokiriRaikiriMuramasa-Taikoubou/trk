@@ -493,7 +493,7 @@ function recordPlay(r) {
   s.history.unshift(entry); if (s.history.length > HIST_MAX) s.history.length = HIST_MAX;
   s.lastPlayed = entry.t;
   s.title = core.baseName(core.mediaName) || s.title;
-  if (core.currentSong && core.currentSong.title) s.display = core.currentSong.title;
+  if (core.currentSong && core.currentSong.title) s.display = typeof songDisplayTitle === "function" ? songDisplayTitle(core.currentSong) : core.currentSong.title;
   let out = {};
   if (!auto) {
     slot.plays = (slot.plays || 0) + 1;

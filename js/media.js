@@ -52,9 +52,28 @@ async function loadMedia(file, opts = {}) {
   core.videoReady = false; core.analysis = null; core.chart = []; core.chartMode = "generated"; core.fingerprint = "";
   core.setStatus("chartStatus", null); core.setStatus("importStatus", null); core.updateChartButtons();
   if (core.mediaURL) URL.revokeObjectURL(core.mediaURL);
-  core.mediaURL = URL.createObjectURL(file); core.mediaName = file.name || "song";
+  core.mediaName = file.name || "song";
   core.$("songTitle").textContent = opts.title || core.baseName(core.mediaName);
-  core.setStatus("loadStatus", "loading");
+  const midi = window.Trk && window.Trk.midi;
+  const midiInput = !!(midi && midi.isMidiFile(file));
+  let playbackFile = file;
+  core.setStatus("loadStatus", midiInput ? "midiRendering" : "loading");
+  if (midiInput) {
+    try { playbackFile = await midi.renderFile(file, { profileId:core.settings.midiSoundProfile }); }
+    catch (error) {
+      if (token !== core.loadToken) return false;
+      const status = error && error.code === "midi-too-large" ? "midiTooLarge"
+        : error && error.code === "midi-too-long" ? "midiTooLong"
+          : error && error.code === "midi-smpte-unsupported" ? "midiUnsupported"
+            : error && error.code === "midi-unsupported-format" ? "midiFormatUnsupported"
+              : error && ["midi-event-limit", "midi-track-limit", "midi-too-dense"].includes(error.code) ? "midiTooComplex" : "midiError";
+      core.setStatus("loadStatus", status);
+      core.updateChartButtons();
+      return false;
+    }
+  }
+  if (token !== core.loadToken) return false;
+  core.mediaURL = URL.createObjectURL(playbackFile);
   const ok = await new Promise(res => {
     const done = v => { core.video.removeEventListener("loadedmetadata", onOk); core.video.removeEventListener("error", onErr); res(v); };
     const onOk = () => done(true), onErr = () => done(false);
@@ -66,7 +85,7 @@ async function loadMedia(file, opts = {}) {
   core.videoReady = true; core.fingerprint = `${file.size}:${Math.round(core.video.duration * 10)}`;
   core.setStatus("loadStatus", "analyzing"); core.updateChartButtons();
   await new Promise(r => { setTimeout(r, 30); });
-  const tooBig = (Number(file.size) || 0) > ANALYZE_MAX;
+  const tooBig = (Number(playbackFile.size) || 0) > ANALYZE_MAX;
   const liteActive = typeof TrkLite === "object" && typeof TrkLite.active === "function" && TrkLite.active();
   const tooLong = core.video.duration > (liteActive ? ANALYZE_LITE_MAX_SEC : ANALYZE_MAX_SEC);
   const liteLong = liteActive && tooLong;
@@ -75,9 +94,9 @@ async function loadMedia(file, opts = {}) {
   const liteSkip = !tooBig && !tooLong && typeof TrkLite === "object" && typeof TrkLite.noAnalyze === "function" && TrkLite.noAnalyze();
   const skipAnalyze = tooBig || tooLong || liteSkip;
   if (skipAnalyze) core.analysis = null;
-  else { try { core.analysis = await analyzeAudioCached(file, core.fingerprint); } catch (_) { core.analysis = null; } }
+  else { try { core.analysis = await analyzeAudioCached(playbackFile, core.fingerprint); } catch (_) { core.analysis = null; } }
   if (token !== core.loadToken) return false;
-  core.setStatus("loadStatus", tooBig ? "analysisSkipped" : liteLong ? "analysisSkippedLiteLong" : tooLong ? "analysisSkippedLong" : liteSkip ? "analysisSkippedLite" : core.analysis ? "loaded" : "decodeFallback");
+  core.setStatus("loadStatus", midiInput ? "midiLoaded" : tooBig ? "analysisSkipped" : liteLong ? "analysisSkippedLiteLong" : tooLong ? "analysisSkippedLong" : liteSkip ? "analysisSkippedLite" : core.analysis ? "loaded" : "decodeFallback");
   let supplied = false;
   if (opts.onReady) { try { supplied = !!(await opts.onReady()); } catch (e) { console.error(e); } }
   if (token !== core.loadToken) return false;

@@ -816,7 +816,7 @@ if (!exists("js/fx-worklet.js") ||
       library.includes("guide: trkCatalogGuide(s, pl)") && library.includes("guide: trkCatalogGuide(s, pl, true)") &&
       library.includes("songs: p.songs, wish: p.wish, guide: p.guide, cat: p.cat, by: p.by, createdAt: p.createdAt") &&
       !/catb\.hidden\s*=\s*true/.test(library) &&
-      core.includes(".slice(0, 100)") && library.includes(".filter(Boolean).slice(0, 100)");
+      core.includes(".slice(0, 200)") && library.includes(".filter(Boolean).slice(0, 200)");
   } catch (error) {
     console.error(`WARN  Blue Archive catalog test setup failed: ${error.message}`);
   }

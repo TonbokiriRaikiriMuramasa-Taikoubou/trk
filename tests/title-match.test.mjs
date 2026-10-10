@@ -67,6 +67,16 @@ describe("カタログの別表記（matchAliases）", () => {
     const file = { key: "local-search-light", title: "SEARCH LIGHT.ogg", artist: "not 初星学園" };
     assert.equal(ctx.__match(wish, library(ctx, [file])), file);
   });
+  test("TouhouThemeDBの曲IDでローカルMIDIを対応づける（th06_05.mid → おてんば恋娘）", () => {
+    const wish = { t:"おてんば恋娘", al:"東方紅魔郷", ar:"ZUN", matchAliases:["th06_05"] };
+    const file = { key:"local-th06-05", title:"th06_05.mid" };
+    assert.equal(ctx.__match(wish, library(ctx, [file])), file);
+  });
+  test("th06_15.midもU.N.オーエンは彼女なのか？のカタログIDで照合する", () => {
+    const wish = { t:"U.N.オーエンは彼女なのか？", al:"東方紅魔郷", ar:"ZUN", matchAliases:["th06_15"] };
+    const file = { key:"local-th06-15", title:"th06_15.mid" };
+    assert.equal(ctx.__match(wish, library(ctx, [file])), file);
+  });
   test("別表記が無ければ SEARCH LIGHT は当たらない（別名を勝手に作らない）", () => {
     const wish = { t: "SEARCH RIGHT", al: "", ar: "" };
     const file = { key: "x", title: "SEARCH LIGHT.ogg", artist: "" };

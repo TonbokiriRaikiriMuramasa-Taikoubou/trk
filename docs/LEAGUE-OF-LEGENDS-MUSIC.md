@@ -12,14 +12,14 @@
 
 | 分類 | 収録内容 | 状態 |
 |---|---|---|
-| Sessions | Vi 36曲、Diana 43曲、Star Guardian Taliyah 29曲。計108曲 | Riotの公式Creator-Safe Sessions三作。公式SoundCloudアルバムと公式Spotify個別曲ページへリンク。既存収録・安全な更新は維持 |
-| Champion Themes | 公式単曲テーマ41曲（2019–2026年、2020年代中心。Lockeまで） | Riot公式Champion Theme記事とLeague of Legends公式YouTube個別投稿を照合。**全チャンピオンを網羅する一覧ではない** |
-| Worlds / WCS | 2014–2026年の公式アンセム13曲 | 公式League of Legends YouTube動画を個別確認。2026年は公式MVと公式Spotify個別曲リンクを照合して収録 |
-| MSI | 2019、2021、2022、2023年の確認済みアンセム4曲 | Riot／League of Legends公式公開先へリンク。未確認年にアンセムが存在しないとは結論しない |
-| K/DA | 「POP/STARS」＋「ALL OUT」EPの5曲。計6曲 | 公式Spotify個別曲ページとLeague of Legends公式YouTubeの曲別動画を照合。Champion Themeとは別の仮想アーティスト枠 |
-| ゲームOST（Season 1〜9） | 公式SoundCloudアルバム「The Music of League of Legends: Season 1〜9 (Original Game Soundtrack)」をシーズン別の9プレイリストに。計243曲（9／30／23／22／25／27／48／39／20） | プレイリストは公式SoundCloudアルバムへ、各曲は公式Spotify個別曲へリンク。曲順・曲数・曲名・アーティストは公式Spotifyアルバムページで確認 |
-| Warsongs | 公式リミックスアルバム「Warsongs」（2016年）11曲 | 公式SoundCloudアルバムと公式Spotifyアルバム／個別曲を照合 |
-| 人気曲 | 公式SoundCloud「Popular tracks」ページの30曲（2026-10-09時点のスナップショット） | 表示順のまま収録し、各曲は公式SoundCloudの個別曲ページへリンク。ページの内容・順序は時間で変わる |
+| Sessions | Vi 36曲、Diana 43曲、Star Guardian Taliyah 29曲。計108曲 | Riotの公式Creator-Safe Sessions三作。公式SoundCloudアルバムと公式Spotify個別曲ページへリンク。既存収録・安全な更新は維持。Creator-Safe Playlistでは Vi・Taliyah が全曲、Diana は43曲中42曲（trk116） |
+| Champion Themes | 公式単曲テーマ41曲（2019–2026年、2020年代中心。Lockeまで） | Riot公式Champion Theme記事とLeague of Legends公式YouTube個別投稿を照合。**全チャンピオンを網羅する一覧ではない**。Creator-Safe Playlistには41曲中39曲（trk116） |
+| Worlds / WCS | 2014–2026年の公式アンセム13曲 | 公式League of Legends YouTube動画を個別確認。2026年は公式MVと公式Spotify個別曲リンクを照合して収録。Creator-Safe Playlistには「Worlds Collide」（2015）だけ（trk116） |
+| MSI | 2019、2021、2022、2023年の確認済みアンセム4曲 | Riot／League of Legends公式公開先へリンク。未確認年にアンセムが存在しないとは結論しない。Creator-Safe Playlistには見当たらない（trk116） |
+| K/DA | 「POP/STARS」＋「ALL OUT」EPの5曲。計6曲 | 公式Spotify個別曲ページとLeague of Legends公式YouTubeの曲別動画を照合。Champion Themeとは別の仮想アーティスト枠。Creator-Safe Playlistには見当たらない（trk116） |
+| ゲームOST（Season 1〜9） | 公式SoundCloudアルバム「The Music of League of Legends: Season 1〜9 (Original Game Soundtrack)」をシーズン別の9プレイリストに。計243曲（9／30／23／22／25／27／48／39／20） | プレイリストは公式SoundCloudアルバムへ、各曲は公式Spotify個別曲へリンク。曲順・曲数・曲名・アーティストは公式Spotifyアルバムページで確認。Creator-Safe Playlistに全曲（trk115） |
+| Warsongs | 公式リミックスアルバム「Warsongs」（2016年）11曲 | 公式SoundCloudアルバムと公式Spotifyアルバム／個別曲を照合。Creator-Safe Playlistには11曲中10曲（Silver Scrapesは見当たらない） |
+| 人気曲 | 公式SoundCloud「Popular tracks」ページの30曲（2026-10-09時点のスナップショット） | 表示順のまま収録し、各曲は公式SoundCloudの個別曲ページへリンク。ページの内容・順序は時間で変わる。Creator-Safe Playlistには30曲中7曲（trk116） |
 
 2026 Worlds「Know My Name」は、**2026-10-08 18:00 PDT（2026-10-09 10:00 JST）**に公開された。公式League of Legends YouTubeの[公式ミュージックビデオ](https://www.youtube.com/watch?v=mlFxxNsExJc)と、動画説明欄から案内されるRiot Games名義の[公式Listen Now](https://truedamage.ffm.to/knowmyname)を照合。Listen Nowから開く[Spotify個別曲ページ](https://open.spotify.com/track/3s2YCL5LHLzXWbw7ezQru3)で曲名・2026年リリース・アーティスト欄を確認し、カタログのリンクを個別曲ページへ更新した。クレジット欄にはTrue Damage、League of Legends、Sofía Reyes、VIC MENSA、Coco Jones、SOYEON、i-dleが表示される。
 
@@ -38,7 +38,7 @@
 | DRUM GO DUM | [Spotify](https://open.spotify.com/track/3CEW3iffD2QvNZMK20sMqW) | [Official Concept Video](https://www.youtube.com/watch?v=E_PbH5y70Tc) |
 | I'LL SHOW YOU | [Spotify](https://open.spotify.com/track/497qmwcUsCv5hmMU0K8Hik) | [Official Concept Video](https://www.youtube.com/watch?v=WW1BpABbzHs) |
 
-K/DAの全関連コンテンツを網羅したという意味ではなく、Creator-Safe対象かも未確認。公式Spotify／YouTube掲載は二次利用や音源再配布の許可ではない。
+K/DAの全関連コンテンツを網羅したという意味ではない。Riot公式Creator-Safe Playlistには6曲とも見当たらない（trk116。Riotは2020年の説明でK/DAは許諾できないとしている）。公式Spotify／YouTube掲載は二次利用や音源再配布の許可ではない。
 
 ### Phase 3 追加：公式SoundCloudアルバム（Season 1〜9・Warsongs）と人気曲30曲
 
@@ -82,18 +82,35 @@ K/DAの全関連コンテンツを網羅したという意味ではなく、Crea
 | Season 3（23曲） | **照合済み**（verified・trk115） | 182〜204番目（songdata.io。200番目の区切りで先頭19曲／残り4曲） |
 | Season 2（30曲） | **照合済み**（verified・trk115） | 205〜234番目（songdata.io） |
 | Season 1（9曲） | **照合済み**（verified・trk115） | 235〜243番目（songdata.io） |
-| Warsongs（11曲） | **一部のみ照合済み**（partial・10/11・trk115） | 1〜10曲目が251〜300番目の区画にある（曲名は「Piercing Light」のように「(feat. …)」なし、アーティストは「League of Legends, Mako」など同じ）。**「Silver Scrapes」は1〜300番目に無く未照合**（301番目以降は読んでいない）。公式SoundCloudのCreator-Safe Playlist Pt. I でも11〜15番目が1〜5曲目（Remix版のアップロード） |
+| Warsongs（11曲） | **一部のみ照合済み**（partial・10/11・trk115） | 1〜10曲目が251〜300番目の区画にある（曲名は「Piercing Light」のように「(feat. …)」なし、アーティストは「League of Legends, Mako」など同じ）。**「Silver Scrapes」は見当たらない**（trk115 で1〜300番目、trk116 で表示される全977行を確認）。公式SoundCloudのCreator-Safe Playlist Pt. I でも11〜15番目が1〜5曲目（Remix版のアップロード） |
 
 **101番目以降の照合方法と注意（trk115・2026-10-12）**：
 
 - songdata.io はRiot・Spotifyの運営ではない第三者サイト。公開プレイリストの全曲を一覧にするが、**50件ごとの区画に分け、区画の中はSpotifyのトラックID順に並べ替えて表示する**ため、区画内の正確な順番は見えない。読んだのは51〜300番目。
 - 確かめたこと：①51〜100番目の区画は、公式埋め込みが同じ位置に表示する50曲（Season 8の最後の9曲＋Season 7の先頭41曲）と完全に一致した（第三者サイトの表示が公式と食い違わないことの確認）。②101〜150・151〜200・201〜250番目の各区画は、アルバム順に続けた場合の予測（Season 7の42〜48曲目、Season 6、Season 5、Season 4、Season 3、Season 2、Season 1）と過不足なく一致し、201〜250番目の区画の残り7件は単曲（Quinn and Valor、Tidecaller、Tales of the Rift、Braum、Demacia Rising、Tiny Masterpiece of Evil、The Curse of the Sad Mummy）だった。曲名は1文字単位で一致。表の位置はこの結果からアルバム順で書いたもの。
 - プレイリストに入っているのはSpotify上の**同じアルバムの別版**（トラックIDが本カタログの曲別リンクと違う）。曲名・アーティストで照合した。曲別リンクは公式アルバム側のまま差し替えない。
-- 251〜300番目の区画には Warsongs 10曲のほか、Pentakill、DJ Sona（Kinetic・Concussive・Ethereal）、Sett・Aphelios・Senna 等のChampion Themeも入っていた。これらのリストの照合は今回の範囲外（未照合のまま）。
+- 251〜300番目の区画には Warsongs 10曲のほか、Pentakill、DJ Sona（Kinetic・Concussive・Ethereal）、Sett・Aphelios・Senna 等のChampion Themeも入っていた。これらを含む残りのリストは trk116 で照合した（下の「残りのリストの照合」）。
 - 利用前に確実にするなら、Spotifyアプリでプレイリストを開き、プレイリスト内検索で曲名を確かめる。
 - 公式SoundCloudの [Creator-Safe Playlist Pt. I](https://soundcloud.com/leagueoflegends/sets/riot-games-creator-safe)（499曲）と [Pt. II](https://soundcloud.com/leagueoflegends/sets/riot-games-creator-safe-pt2)（230曲）は今もRiotのガイドラインからリンクされているが、更新は約4年前で、シーズン別アルバム版ではなく旧単曲・Remixのアップロードが入っている。JavaScriptなしでは先頭15曲しか出ないため全件は読んでいない（照合の主な根拠にはしていない）。
 
-照合状態はプレイリストのデータ（`js/catalog.js` の `LOL_CREATOR_SAFE`）に持たせ、設定ガイドの文言（`js/library.js` の `trkCatalogGuide`）はそこから選ぶ。根拠の詳細は `tools/leagueoflegends-soundcloud-albums-tracklist.json` の `creatorSafe`（`tools/check-repo.mjs` が両者の一致と照合曲数を検査）。trk108〜113 では「Season 1〜9・Warsongs は対象」と書いていたが、実際に照合したのは Season 9 だけだったため trk114 で訂正した。trk115 で101番目以降を照合して Season 1〜7 を照合済み、Warsongs を一部照合済み（10/11）にし、照合せず「可能性が高い」とした likely 状態は廃止した。Sessions 3作は、Riot が公開時に「Creator-Safe Collection」と説明したシリーズとして別に扱い、このプレイリストとは照合していない。
+**残りのリストの照合（trk116・2026-10-12）**：songdata.io が表示する全行（51〜977行目）を読み、LoLの残りのリストも1曲ずつ照合した。曲名は大文字小文字・アポストロフィ・末尾の「 - Champion Theme」の違いを無視して比べ、アーティストも確かめた。2XKO の「… - X Champion Theme」（格闘ゲームの曲）と「Spirit Blossom Springs Lofi Remix」などのリミックスは別曲として数えていない。
+
+| リスト | 状態（`LOL_CREATOR_SAFE`） | 結果 |
+|---|---|---|
+| Sessions: Vi（36曲） | **全曲あり**（verified） | 36/36。「Swing」「Abovve」（SwuM）はアーティストが League of Legends だけの表記 |
+| Sessions: Star Guardian Taliyah（29曲） | **全曲あり**（verified） | 29/29 |
+| Sessions: Diana（43曲） | **一部**（partial・42/43） | 「Oh Baby」（Engelwood）が見当たらない |
+| Champion Themes（41曲） | **一部**（links-partial・39/41） | 「Smolder, the Fiery Fledgling」（2024）と「Yunara, the Unbroken Faith」（Lofi Remix だけがある）が見当たらない。「Locke, the Ashen Exorcist」はクレジットが League of Legends, Pressure Cooker, Elben Schutte で、本カタログ（YouTube の表記）と違う |
+| Worlds / WCS（13曲） | **一部**（links-partial・1/13） | 「Worlds Collide」（2015、League of Legends, Nicki Taylor）だけ。器楽の「YYYY World Championship Theme」は別曲 |
+| MSI（4曲） | **見当たらない**（links-absent・0/4） | 器楽の「2016〜2018 Mid-Season Invitational Theme」はあるが、収録したアンセムは無い |
+| K/DA（6曲） | **見当たらない**（links-absent・0/6） | TFT のリミックス（「Out of Your League (K/DA)」等）だけで、K/DA の曲は無い |
+| 人気曲（30曲） | **一部**（mixed・7/30） | Get Jinxed（2件）、Piercing Light (Mako Remix)（＝Warsongs）、Still Here、Here, Tomorrow、Worlds Collide 2015、Lightbringer（2014年の Pentakill 曲。SoundCloud のページがアルバム「Pentakill - Smite and Ignite」に入っている） |
+| Warsongs（11曲） | **一部**（partial・10/11） | 「Silver Scrapes」は表示される全977行のどこにも無い |
+
+- **songdata.io に出ない2曲**：公式の曲数979に対して songdata.io の表示は977行。50件ごとの区画は700番目まで揃っていて、701〜750番目の区画だけ48行なので、出ない2曲は701〜750番目（Skarner・Lee Sin などがある2024年ごろの区画）にある。したがって「見当たらない」は「表示される977行に無い」という意味で、2024年の Smolder はこの2曲に含まれる可能性がある。
+- このプレイリストには、本カタログに入れていない Pentakill の3作、DJ Sona、Riot Forge の各作品のサウンドトラック、Wild Rift、Teamfight Tactics、2XKO、VALORANT の曲なども入っている（Wild Rift・TFT の一部は同じ曲が2回）。
+
+照合状態はプレイリストのデータ（`js/catalog.js` の `LOL_CREATOR_SAFE`）に持たせ、設定ガイドの文言（`js/library.js` の `trkCatalogGuide`）はそこから選ぶ。根拠の詳細は `tools/leagueoflegends-soundcloud-albums-tracklist.json` の `creatorSafe`（`tools/check-repo.mjs` が両者の一致と照合曲数を検査）。trk108〜113 では「Season 1〜9・Warsongs は対象」と書いていたが、実際に照合したのは Season 9 だけだったため trk114 で訂正した。trk115 で101番目以降を照合して Season 1〜7 を照合済み、Warsongs を一部照合済み（10/11）にし、照合せず「可能性が高い」とした likely 状態は廃止した。Sessions 3作は、Riot が公開時に「Creator-Safe Collection」と説明したシリーズで、trk116 でこのプレイリストとも照合した。根拠は3つの fixture（`tools/leagueoflegends-soundcloud-albums-tracklist.json`・`-music-tracklist.json`・`-sessions-tracklist.json`）の各リストの `creatorSafe` にあり、`tools/check-repo.mjs` が18リストすべての一致・曲数・根拠を検査する。
 
 対象であっても条件は残る。Riotの法務表記（Legal Jibber Jabber）に従うことが前提で、**音源の同梱・再配布・販売、企業広告での利用は別条件**。trk! はリンクの索引にとどめる。
 
@@ -113,8 +130,8 @@ K/DAの全関連コンテンツを網羅したという意味ではなく、Crea
 1. 実ブラウザで Season 4〜9 の公式SoundCloudセットページを開き、アルバム見出しの Season 表記と曲数を確認する（Spotifyとの差があれば台帳とfixtureを直す）。
 2. SoundCloud掲載音源の長さがSpotifyと違う件（Season 2 で確認）が他作でもあるか確認する。
 3. 人気曲ページのスナップショットは時期を見て更新する（更新時は取得日をfixtureの `asOf` に残す）。
-4. **Warsongs「Silver Scrapes」**がCreator-Safe Playlistにあるか、Spotifyアプリのプレイリスト内検索で確かめる。あれば Warsongs を verified（11/11）に、無ければ「プレイリストに無い」と台帳に書く（どちらも `LOL_CREATOR_SAFE` と fixture の `creatorSafe` を同時に直す）。
-5. 101番目以降は第三者サイト（songdata.io）の一覧で照合した。Spotifyアプリで全979曲を表示できる環境があれば、Season 1〜7 を1度だけ見直す（任意）。
+4. **見当たらなかった曲**（Warsongs「Silver Scrapes」、Champion Theme「Smolder, the Fiery Fledgling」「Yunara, the Unbroken Faith」、Sessions: Diana「Oh Baby」）を、Spotifyアプリのプレイリスト内検索で確かめる。songdata.io に出ない2曲は701〜750番目（2024年ごろの区画）にあるので、2024年の Smolder はそこに含まれる可能性がある。見つかったら、その fixture の `creatorSafe`（`matchedTracks`・`notFound`）と `LOL_CREATOR_SAFE` を同時に直す（`check-repo` が一致を見る）。
+5. 101番目以降は第三者サイト（songdata.io）の一覧で照合した。Spotifyアプリで全979曲を表示できる環境があれば、1度だけ見直す（任意）。
 
 ### データと検査
 
@@ -141,19 +158,19 @@ K/DAの全関連コンテンツを網羅したという意味ではなく、Crea
 
 - Riotの[Creator-Safeガイドライン](https://www.riotgames.com/en/riot-music-creator-safe-guidelines)は、RiotがCreator-Safeとして指定する**特定のプレイリスト内の曲**と利用条件を基準にしています。Riot自身の説明でも、外部アーティスト／出版社／レーベル等との共同制作曲には複雑な権利関係があり、Creator-Safeプレイリスト外の曲は一般に権利者のライセンスが必要で、配信・動画での利用が安全とは保証されないとされています。
 - Worlds／MSIアンセムは外部アーティストとの共同制作を含むため、公式YouTube／Spotify／SoundCloudで聴けることを**再利用の許可**と見なしません。創作動画・配信等に使う場合は、曲が現在のCreator-Safeリストに含まれるか、必要な権利者の許諾があるかを曲ごとに確認してください。企業広告・販売・音源再配布などは別条件です。
-- 「Know My Name」がRiotのCreator-Safeプレイリストに含まれることはこの調査で確認できていません。よってカタログではCreator-Safeと表示せず、利用条件は未確認として扱います。公式MV／配信先があることだけでは、動画・配信への利用や音源の再配布は許諾されません。
-- **Phase 3 のうち Creator-Safe 対象と照合できたのは Season 1〜9 の全243曲と Warsongs の10曲**です（根拠は上の「Creator-Safe の照合状態」。101番目以降は第三者サイトsongdata.ioの一覧で照合）。Warsongs の「Silver Scrapes」は未照合です。照合済みでも、Riotの法務表記に従うことが条件で、音源の同梱・再配布・販売や企業広告での利用は別条件です。Creator-Safe は trk! が音源を配布してよい意味にはなりません。
-- 人気曲30曲は**曲ごとに扱いが違います**。ゲーム音楽（チャンピオンテーマ等）は Creator-Safe 対象の可能性がありますが1曲ずつは照合しておらず、Worlds／MSIアンセム・K/DA・True Damage・HEARTSTEEL など外部アーティストとの共同制作曲は対象外・要確認です。人気曲ページには「日本では利用できません」と表示される曲もあり、リンク先の再生可否は地域と時期で変わります。
-- 収録したK/DA 6曲もCreator-Safe対象か・適用条件を確認できていません。Spotify個別曲ページとRiot公式動画を確認したことは、二次利用や音源同梱／再配布の許可を意味しません。
-- SessionsはCreator-Safe Sessionsとして提供された範囲で案内し、Riotの現行ガイドラインとクレジット／利用条件に従う前提です。Creator-Safeであることも、音源そのものの再配布を許す意味ではありません。
+- 「Know My Name」はRiotのCreator-Safeプレイリストに見当たりません（trk116で表示される全977行を照合）。よってカタログではCreator-Safeと表示せず、対象外・要確認として扱います。公式MV／配信先があることだけでは、動画・配信への利用や音源の再配布は許諾されません。
+- **Phase 3 のうち Creator-Safe 対象と照合できたのは Season 1〜9 の全243曲と Warsongs の10曲**です（根拠は上の「Creator-Safe の照合状態」。101番目以降は第三者サイトsongdata.ioの一覧で照合）。Warsongs の「Silver Scrapes」は見当たりません。Phase 1／2 のリスト（Sessions・Champion Theme・Worlds・MSI・K/DA）と人気曲の結果は上の「残りのリストの照合」の表のとおりです。照合済みでも、Riotの法務表記に従うことが条件で、音源の同梱・再配布・販売や企業広告での利用は別条件です。Creator-Safe は trk! が音源を配布してよい意味にはなりません。
+- 人気曲30曲は**曲ごとに扱いが違います**。trk116 で1曲ずつ照合し、Creator-Safe Playlistにあったのは7曲（Get Jinxed×2、Piercing Light (Mako Remix)、Still Here、Here, Tomorrow、Worlds Collide 2015、Lightbringer）。残る23曲（Worlds／MSIアンセム・K/DA・True Damage・HEARTSTEEL など外部アーティストとの共同制作曲やリミックス）は見当たらず、対象外・要確認です。人気曲ページには「日本では利用できません」と表示される曲もあり、リンク先の再生可否は地域と時期で変わります。
+- 収録したK/DA 6曲は、RiotのCreator-Safe Playlistに見当たりません（trk116）。Spotify個別曲ページとRiot公式動画を確認したことは、二次利用や音源同梱／再配布の許可を意味しません。
+- SessionsはCreator-Safe Sessionsとして提供された範囲で案内し、Riotの現行ガイドラインとクレジット／利用条件に従う前提です。Creator-Safe Playlistでは Vi・Star Guardian Taliyah が全曲、Diana は「Oh Baby」以外の42曲を確認しました（trk116）。Creator-Safeであることも、音源そのものの再配布を許す意味ではありません。
 - 本アプリは公式リンクを開くための索引です。音源をダウンロード・同梱・再配布せず、リンク先の内容・地域利用可否・権利状態も保証しません。利用直前に公式ガイドと該当曲の権利情報を確認してください。
 
 ## 参照先
 
 - [Riot Games — 法務表記（日本語）](https://www.riotgames.com/ja/legal)（一般的な法務案内。個別曲の利用条件はCreator-Safeガイド／権利者の条件で別途確認）
 - [Riot Games — Creator-Safe Guidelines](https://www.riotgames.com/en/riot-music-creator-safe-guidelines)
-- [Riot Games — Creator-Safe Playlist（Spotify）](https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N)（979曲・「100% Riot Games が権利を持つ曲」。埋め込み表示の先頭100件で Season 9・8 の全曲と Season 7 の41曲を照合（2026-10-11）。Know My Name・K/DAの収録は未確認）
-- [songdata.io — Riot Games Creator-Safe Playlist の一覧](https://songdata.io/playlist/5hDYD44imzFZEqTfAoco1N)（第三者サイト。101〜300番目で Season 7 の残り7曲・Season 1〜6 の全曲・Warsongs 10曲を照合（2026-10-12）。50件ごとの区画内はトラックID順）
+- [Riot Games — Creator-Safe Playlist（Spotify）](https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N)（979曲・「100% Riot Games が権利を持つ曲」。埋め込み表示の先頭100件で Season 9・8 の全曲と Season 7 の41曲を照合（2026-10-11）。Know My Name・K/DAは見当たらない（trk116）。101番目以降は下の songdata.io で照合）
+- [songdata.io — Riot Games Creator-Safe Playlist の一覧](https://songdata.io/playlist/5hDYD44imzFZEqTfAoco1N)（第三者サイト。trk115 で101〜300番目、trk116 で表示される全行（51〜977行目）を読み、LoLの全リストを照合（2026-10-12）。979曲中977曲を表示し、出ない2曲は701〜750番目。50件ごとの区画内はトラックID順）
 - [Riot Games Creator-Safe Playlist Pt. I](https://soundcloud.com/leagueoflegends/sets/riot-games-creator-safe)／[Pt. II](https://soundcloud.com/leagueoflegends/sets/riot-games-creator-safe-pt2)（公式SoundCloud。499曲／230曲・約4年前の更新。先頭15曲のみ確認）
 - [League of Legends — Champion Theme の公式記事一覧](https://www.leagueoflegends.com/en-us/news/tags/champion-theme/)
 - [League of Legends — Music の公式記事一覧](https://www.leagueoflegends.com/en-us/news/tags/music/)

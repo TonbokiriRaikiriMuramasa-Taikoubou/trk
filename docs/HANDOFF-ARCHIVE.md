@@ -1,8 +1,12 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移したtrk70〜trk112の履歴です。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
+> `docs/HANDOFF.md` から移したtrk70〜trk113の履歴です。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
 
 ## 旧 HANDOFF §11「最近の変更」
+
+### trk113 の記録（2026-10-11。trk116のときに HANDOFF §7 から移動）
+
+- **trk113（2026-10-11）**：🎓 trk's OST Vol.1 用の手続き作曲スクリプト `tools/make-trk-ost.mjs` を追加。コード進行／確率・統計（マルコフ・ランダムウォーク）／進化的アルゴリズム（GA）／深層学習（tiny MLPを勾配降下で訓練）／自由作曲 の5ルール×2曲＝10曲を依存なしで合成し `assets/trk-ost/` へWAV出力（.gitignore でGit外・生成スクリプトのみ同梱）。試聴は `assets/trk-ost/index.html`。音源はアプリ未組込（将来 trk's OST Vol.1 へ追加予定）。
 
 ### trk112 の記録（2026-10-11。trk115のときに HANDOFF §7 から移動）
 

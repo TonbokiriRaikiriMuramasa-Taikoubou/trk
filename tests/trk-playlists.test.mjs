@@ -21,6 +21,7 @@ const catalogContext = vm.createContext({});
 vm.runInContext(catalogSrc + "\nglobalThis.__catalog = TRK_CATALOG;", catalogContext);
 const catalog = catalogContext.__catalog;
 const lol = catalog.find(series => series.id === "lol");
+const valorant = catalog.find(series => series.id === "valorant");
 
 function sandbox(settings, { lang = "ja", series = [lol] } = {}) {
   const calls = { saves: 0, ensureGame: 0, ensureClassic: 0 };
@@ -150,17 +151,17 @@ describe("catalog guides follow the UI language", () => {
     assert.equal(keyOf("lol-svi"), "plGuideLolCsVerified");
     assert.equal(keyOf("lol-staliyah"), "plGuideLolCsVerified");
     assert.equal(keyOf("lol-sdiana"), "plGuideLolCsPartial");
-    assert.equal(keyOf("lol-champion-themes"), "plGuideLolLinksPartial");
-    assert.equal(keyOf("lol-worlds-anthems"), "plGuideLolLinksPartial");
-    assert.equal(keyOf("lol-msi-anthems"), "plGuideLolLinksAbsent");
-    assert.equal(keyOf("lol-kda-songs"), "plGuideLolLinksAbsent");
+    assert.equal(keyOf("lol-champion-themes"), "plGuideRiotLinksPartial");
+    assert.equal(keyOf("lol-worlds-anthems"), "plGuideRiotLinksPartial");
+    assert.equal(keyOf("lol-msi-anthems"), "plGuideRiotLinksAbsent");
+    assert.equal(keyOf("lol-kda-songs"), "plGuideRiotLinksAbsent");
     assert.equal(keyOf("lol-popular-tracks"), "plGuideLolPopular");
     assert.equal(api.trkCatalogGuide(lol, { id: "lol-mod-list", creatorSafe: "verified-by-mod?" }, true).key, "plGuideRiotLinks",
       "an unknown status never reads as Creator-Safe");
     assert.match(context.TEXT.ja.plGuideLolCsPartial, /一部の曲はCreator-Safe対象.*見当たらない・要確認/);
-    assert.match(context.TEXT.ja.plGuideLolLinksPartial, /^公式リンク集.*一部の曲はCreator-Safe対象.*見当たらない/);
-    assert.match(context.TEXT.ja.plGuideLolLinksAbsent, /^公式リンク集.*見当たらない.*Creator-Safe対象外・要確認/);
-    for (const key of ["plGuideLolCsPartial", "plGuideLolLinksPartial", "plGuideLolLinksAbsent", "plGuideLolPopular"]) {
+    assert.match(context.TEXT.ja.plGuideRiotLinksPartial, /^公式リンク集.*一部の曲はCreator-Safe対象.*見当たらない/);
+    assert.match(context.TEXT.ja.plGuideRiotLinksAbsent, /^公式リンク集.*見当たらない.*Creator-Safe対象外・要確認/);
+    for (const key of ["plGuideLolCsPartial", "plGuideRiotLinksPartial", "plGuideRiotLinksAbsent", "plGuideLolPopular"]) {
       assert.doesNotMatch(context.TEXT.ja[key], /可能性が高い/, key + " never claims the songs it did not find");
       for (const lang of ["en", "zh", "ko"]) assert.ok(context.TEXT[lang][key] && context.TEXT[lang][key] !== context.TEXT.ja[key], key + " " + lang);
     }
@@ -172,6 +173,17 @@ describe("catalog guides follow the UI language", () => {
       assert.equal(api.trkCatalogGuide(lol, { id: "lol-old", creatorSafe: retired }, true).key, "plGuideRiotLinks",
         "the retired '" + retired + "' status falls back to the links-only wording");
     assert.match(context.TEXT.ja.plGuideLolPopular, /一部だけCreator-Safe対象.*共同制作曲などは対象外・要確認/);
+    /* trk117：VALORANT も同じ状態と文言。公式Creator-Safe Playlist（全40曲）に収録の9曲は見当たらない */
+    for (const pl of valorant.playlists) {
+      assert.equal(pl.creatorSafe, "links-absent", pl.id);
+      const guide = api.trkCatalogGuide(valorant, pl);
+      assert.equal(guide.key, "plGuideRiotLinksAbsent", pl.id);
+      assert.equal(guide.url, "https://www.riotgames.com/en/riot-music-creator-safe-guidelines", pl.id);
+    }
+    assert.equal(api.trkCatalogGuide(valorant, { id: "val-mod", creatorSafe: "verified-by-mod?" }).key, "plGuideRiotLinks",
+      "an unknown VALORANT status never reads as Creator-Safe");
+    assert.equal(api.trkCatalogGuide(valorant).key, "plGuideRiotLinks", "the series itself keeps the links-only wording");
+    assert.doesNotMatch(context.TEXT.ja.plGuideRiotLinksAbsent, /LoL|League/, "the shared wording names no single game");
     assert.ok(context.TEXT.ja.plGuideLolPopular.length <= 80, "the popular-tracks note stays short");
   });
 

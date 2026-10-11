@@ -602,6 +602,7 @@ if (!exists("js/fx-worklet.js") ||
   const catalogSource = read("js/catalog.js");
   const library = read("js/library.js");
   let targetCatalogOk = false;
+  let valorantCsOk = false;
   let aliasBehaviorOk = false;
   let safeRefreshOk = false;
   try {
@@ -654,6 +655,32 @@ if (!exists("js/fx-worklet.js") ||
       !!oj && oj.playlists[0].songs.length === 15 &&
       oj.note.includes("個別公式曲ページや再利用許諾は未確認") &&
       [...sam.playlists, ...oj.playlists].every(pl => pl.songs.every(track => track.u === "https://fruitbatfactory.com/100orange/"));
+
+    /* 🎯 VALORANT Creator-Safe（trk117）：VALORANT公式Creator-Safe Playlist（Spotify・全40曲）の記録と、
+       catalog.js の VAL_CREATOR_SAFE・各リストの曲が矛盾しないこと。記録した40曲に入っている曲の数が
+       matchedTracks、入っていない曲が notFound（今は9曲とも入っていない＝links-absent）。 */
+    const valFixture = JSON.parse(read("tools/valorant-creator-safe.json"));
+    const valCs = valFixture.creatorSafe || {};
+    const normTitle = title => String(title).normalize("NFKC").replace(/[’‘]/g, "'").toLowerCase().replace(/\s+/g, " ").trim();
+    const valEntryTitles = new Set((valCs.entries || []).map(entry => normTitle(entry[0])));
+    valorantCsOk = !!valorant && valCs.playlist === "https://open.spotify.com/playlist/4tyTLcBxJnf7DcQcHjwt0W" &&
+      Array.isArray(valCs.entries) && valCs.entries.length === 40 &&
+      valCs.entries.every(entry => Array.isArray(entry) && entry.length === 2 && entry.every(part => typeof part === "string" && part)) &&
+      valCs.soundcloudPlaylist && valCs.soundcloudPlaylist.url === "https://soundcloud.com/valorant/sets/valorant-creator-safe-playlist" &&
+      Array.isArray(valFixture.lists) && valFixture.lists.length === valorant.playlists.length &&
+      valorant.playlists.every(pl => {
+        const listed = valFixture.lists.find(list => list.id === pl.id);
+        const c = (listed && listed.creatorSafe) || {};
+        const titles = pl.songs.map(track => track.t);
+        const found = titles.filter(title => valEntryTitles.has(normTitle(title)));
+        const missing = titles.filter(title => !valEntryTitles.has(normTitle(title)));
+        const statusFromEvidence = found.length === titles.length ? "verified" : found.length ? "links-partial" : "links-absent";
+        return c.status === statusFromEvidence && pl.creatorSafe === c.status && c.matchedTracks === found.length &&
+          (c.status === "verified" ? c.notFound === undefined : JSON.stringify(c.notFound) === JSON.stringify(missing)) &&
+          c.evidence === "embed" && /^2026-\d{2}-\d{2}$/.test(c.checkedAt || "");
+      }) &&
+      valorant.note.includes("VALORANT公式Creator-Safe Playlist") && valorant.note.includes("見当たりませんでした") &&
+      valorant.note.includes("Creator-Safe対象外・要確認");
 
     const wishHelperStart = library.indexOf("function trkWishFromTrack(");
     const wishHelperEnd = library.indexOf("\nfunction trkWishesFromCatalog", wishHelperStart);
@@ -737,9 +764,10 @@ if (!exists("js/fx-worklet.js") ||
     console.error(`WARN  targeted catalog test setup failed: ${error.message}`);
   }
   if (!targetCatalogOk) fail("VALORANT / Arknights / Genshin / OJ / Gakumas source, count, or rights-scope catalog checks failed");
+  else if (!valorantCsOk) fail("VALORANT Creator-Safe: js/catalog.js VAL_CREATOR_SAFE must follow tools/valorant-creator-safe.json (all 40 entries of the official VALORANT Creator-Safe Playlist; matchedTracks/notFound computed from them) and the series note must say the catalog songs were not found");
   else if (!aliasBehaviorOk) fail("Gakumas SEARCH RIGHT must retain its official title and match the verified SEARCH LIGHT Drive filename after wish sanitization");
   else if (!safeRefreshOk) fail("Gakumas refresh must carry aliases, preserve owned/custom data, migrate legacy wishes, and keep instrumental/discography lists separate");
-  else ok("VALORANT / Arknights / Genshin / OJ / Gakumas: official links, cautious rights notes, SEARCH RIGHT alias and safe list refresh");
+  else ok("VALORANT / Arknights / Genshin / OJ / Gakumas: official links, cautious rights notes, VALORANT Creator-Safe status (9 songs not in the 40-entry official playlist), SEARCH RIGHT alias and safe list refresh");
 }
 
 // 🎒 Blue Archive OST Vol.1–8: official order, track-level Apple Music IDs,
@@ -1429,7 +1457,7 @@ if (!exists("js/fx-worklet.js") ||
         !!createdPopular && createdPopular.folder === "trk-lol" &&
         JSON.stringify(createdPopular.wish) === JSON.stringify(wishOf(popular)) &&
         createdPopular.guide.url === popular.soundcloudUrl &&
-        library.includes("LOL_GUIDE_KEYS[pl.creatorSafe]");
+        library.includes("RIOT_GUIDE_KEYS[pl.creatorSafe]");
       /* ガイドは照合状態ごとの key と、その日本語の控え。4言語そろい、旧来の「Riotが権利を持つ曲でCreator-Safe対象」は使わない */
       const guideKeyFor = { verified: "plGuideLolCsVerified", partial: "plGuideLolCsPartial", unverified: "plGuideLolCsUnverified" };
       const wording = { verified: ["照合済み"], partial: ["一部の曲はCreator-Safe対象", "見当たらない・要確認"], unverified: ["未照合"] };
@@ -1438,17 +1466,17 @@ if (!exists("js/fx-worklet.js") ||
       const otherGuides = [["lol-svi", "plGuideLolCsVerified", ["公式SoundCloudアルバム", "照合済み"]],
         ["lol-staliyah", "plGuideLolCsVerified", ["公式SoundCloudアルバム", "照合済み"]],
         ["lol-sdiana", "plGuideLolCsPartial", ["公式SoundCloudアルバム", "一部の曲はCreator-Safe対象", "見当たらない"]],
-        ["lol-champion-themes", "plGuideLolLinksPartial", ["公式リンク集", "一部の曲はCreator-Safe対象", "見当たらない"]],
-        ["lol-worlds-anthems", "plGuideLolLinksPartial", ["公式リンク集", "一部の曲はCreator-Safe対象", "見当たらない"]],
-        ["lol-msi-anthems", "plGuideLolLinksAbsent", ["公式リンク集", "見当たらない", "Creator-Safe対象外・要確認"]],
-        ["lol-kda-songs", "plGuideLolLinksAbsent", ["公式リンク集", "見当たらない", "Creator-Safe対象外・要確認"]]];
+        ["lol-champion-themes", "plGuideRiotLinksPartial", ["公式リンク集", "一部の曲はCreator-Safe対象", "見当たらない"]],
+        ["lol-worlds-anthems", "plGuideRiotLinksPartial", ["公式リンク集", "一部の曲はCreator-Safe対象", "見当たらない"]],
+        ["lol-msi-anthems", "plGuideRiotLinksAbsent", ["公式リンク集", "見当たらない", "Creator-Safe対象外・要確認"]],
+        ["lol-kda-songs", "plGuideRiotLinksAbsent", ["公式リンク集", "見当たらない", "Creator-Safe対象外・要確認"]]];
       const otherGuidesOk = otherGuides.every(([id, key, words]) => {
         const guide = createdGuide(id);
         return guide.key === key && guide.note === LIBRARY_TEXT_FOR_CHECK.ja[key] && words.every(word => guide.note.includes(word)) &&
           guide.note.includes("二次利用許諾ではありません");
       });
       const guideOf = album => (album.id === seasonOne.id ? autoExisting : testSettings.playlists.find(p => p.id === "trk-" + album.id) || {}).guide || {};
-      const allGuideKeys = [...Object.values(guideKeyFor), "plGuideLolLinksPartial", "plGuideLolLinksAbsent", "plGuideLolPopular", "plGuideRiotLinks"];
+      const allGuideKeys = [...Object.values(guideKeyFor), "plGuideRiotLinksPartial", "plGuideRiotLinksAbsent", "plGuideLolPopular", "plGuideRiotLinks"];
       guideWordingOk = fixture.albums.every(album => {
         const guide = guideOf(album), status = album.creatorSafe.status;
         return guide.key === guideKeyFor[status] && guide.note === LIBRARY_TEXT_FOR_CHECK.ja[guide.key] &&

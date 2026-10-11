@@ -1,0 +1,215 @@
+{
+  "asOf": "2026-10-12",
+  "scope": "Creator-Safe matching for the two VALORANT lists in js/catalog.js: val-themes (VALORANT Champions anthems 2021-2026, 6 songs) and val-agent-themes (agent-related songs, 3 songs).",
+  "creatorSafe": {
+    "playlist": "https://open.spotify.com/playlist/4tyTLcBxJnf7DcQcHjwt0W",
+    "description": "VALORANT's official Spotify playlist 'VALORANT Creator-Safe Playlist': 'Welcome to the collection of all VALORANT Music that is 100% owned by Riot Games. It can be used in streams and content creation as long as it follows the \"Legal Jibber Jabber\" rules at riotgames.com/legal' (40 entries on 2026-10-12).",
+    "method": "Read all 40 entries on the official Spotify embed of the playlist (the embed lists up to 100 entries, so this is the whole playlist) and compared titles (case and apostrophes ignored) and artists. Also compared against the 977 rows of the Riot Games Creator-Safe Playlist read for League of Legends (tools/leagueoflegends-soundcloud-albums-tracklist.json creatorSafe.mirror): it lists 36 VALORANT rows, all of whose titles are also in the VALORANT playlist. None of the 9 catalog songs is in either playlist.",
+    "soundcloudPlaylist": {
+      "title": "VALORANT Creator-Safe Playlist",
+      "url": "https://soundcloud.com/valorant/sets/valorant-creator-safe-playlist",
+      "tracks": 38,
+      "note": "Official; updated about a year before 2026-10-12. Only the first 15 entries render without scrolling; all 15 are in the Spotify playlist. Not enumerated."
+    },
+    "entries": [
+      [
+        "MIND THE DROP",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "TRANQUIL",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "PRESTIGE",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "LA CRIATURA",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "CALAMITOUS",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "HEIST",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "LEGACY",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "LOUDER",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "GENESIS",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "DEAD ON ARRIVAL",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "Watch",
+        "VALORANT, Stella Mwangi"
+      ],
+      [
+        "Karanlığın",
+        "VALORANT, Helin, ARB4"
+      ],
+      [
+        "Casa de Vidro",
+        "VALORANT, Victor Pozas, Moonsailor, Bia Caboz"
+      ],
+      [
+        "Casa de Vidro - VALORANT REMIX",
+        "VALORANT, Victor Pozas, Moonsailor, Bia Caboz, Andre Oliveira, Ghostwriter"
+      ],
+      [
+        "RAJA",
+        "VALORANT, ARB4, Tienas, Mangal Suvarnan"
+      ],
+      [
+        "DIMENSIONAL",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "NIGHTFALL",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "CLIMB",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "ARSENAL",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "CLAIM IT",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "HEAD COUNT",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "HINDSIGHT",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "REFRESH",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "THE BAG",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "LOCK IT IN",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "REFLECTIONS",
+        "VALORANT, David Yousefi, Bryan Nguyen, Ghostwriter, SWEEP"
+      ],
+      [
+        "LIMITLESS",
+        "VALORANT, Shyloom"
+      ],
+      [
+        "Savior",
+        "VALORANT, One True God"
+      ],
+      [
+        "RENEGADE",
+        "VALORANT, 99 God, C-Low"
+      ],
+      [
+        "STANDING TALL",
+        "VALORANT, David Donges, Jason Chu"
+      ],
+      [
+        "Ignition",
+        "VALORANT, LICK"
+      ],
+      [
+        "VISIONS",
+        "VALORANT, eaJ, Safari Riot"
+      ],
+      [
+        "Míranos",
+        "VALORANT, SpreadLof"
+      ],
+      [
+        "Villain (Take the Shot)",
+        "VALORANT, Barns Courtney, ARB4, Eytan Peled"
+      ],
+      [
+        "Gotcha Back",
+        "VALORANT, ARB4, Tienas"
+      ],
+      [
+        "Stay Awake",
+        "VALORANT, Willim, HAOO"
+      ],
+      [
+        "Míranos",
+        "VALORANT, SpreadLof"
+      ],
+      [
+        "Closer",
+        "VALORANT, stains, Flaye"
+      ],
+      [
+        "Les rêves d’hier",
+        "VALORANT, VERDAUNT, Marylou Larson"
+      ],
+      [
+        "Villain (Take the Shot) - Mushkaa VCT EMEA Remix",
+        "VALORANT, ARB4, Barns Courtney, Mushkaa"
+      ]
+    ],
+    "catalogStatusSource": "js/catalog.js VAL_CREATOR_SAFE (must equal lists[].creatorSafe.status; checked by tools/check-repo.mjs)"
+  },
+  "lists": [
+    {
+      "id": "val-themes",
+      "name": "VALORANT Champions Anthems",
+      "creatorSafe": {
+        "status": "links-absent",
+        "matchedTracks": 0,
+        "checkedAt": "2026-10-12",
+        "evidence": "embed",
+        "notFound": [
+          "Die For You",
+          "Fire Again",
+          "Ticking Away",
+          "SUPERPOWER",
+          "Last Shot",
+          "If The Sun Burns Out Tonight"
+        ],
+        "note": "All six anthems are collaborations with external artists (Grabbitz, Ashnikko, bbno$, KISS OF LIFE, Mark Tuan, templuv, 347aidan, Oli Sykes, Courtney LaPlante). None is in the VALORANT or the Riot Games Creator-Safe Playlist."
+      }
+    },
+    {
+      "id": "val-agent-themes",
+      "name": "VALORANT Agent Themes",
+      "creatorSafe": {
+        "status": "links-absent",
+        "matchedTracks": 0,
+        "checkedAt": "2026-10-12",
+        "evidence": "embed",
+        "notFound": [
+          "Entertain Me",
+          "On My Level",
+          "greater than one"
+        ],
+        "note": "'Entertain Me' (Ylona Garcia), 'On My Level' (Ashley Warren, Bjorn Nilsson) and 'greater than one' (ericdoa, VALORANT) are not in the VALORANT or the Riot Games Creator-Safe Playlist."
+      }
+    }
+  ]
+}

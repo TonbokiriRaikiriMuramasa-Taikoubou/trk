@@ -657,8 +657,8 @@ Object.assign(TEXT.ja, {
   plGuideLolCsVerified:"公式SoundCloudアルバム（音源なし）。Creator-Safe対象（Riot公式Playlistと照合済み）。配信・購入は二次利用許諾ではありません。",
   plGuideLolCsPartial:"公式SoundCloudアルバム（音源なし）。一部の曲はCreator-Safe対象（Riot公式Playlistと照合済み）、残りはPlaylistに見当たらない・要確認。配信・購入は二次利用許諾ではありません。",
   plGuideLolCsUnverified:"公式SoundCloudアルバム（音源なし）。Creator-Safe対象かは未照合。配信・購入は二次利用許諾ではありません。",
-  plGuideLolLinksPartial:"公式リンク集（音源なし）。一部の曲はCreator-Safe対象（Riot公式Playlistと照合済み）、残りはPlaylistに見当たらない・要確認。配信・購入は二次利用許諾ではありません。",
-  plGuideLolLinksAbsent:"公式リンク集（音源なし）。Riot公式Creator-Safe Playlistに見当たらない曲です（Creator-Safe対象外・要確認）。配信・購入は二次利用許諾ではありません。",
+  plGuideRiotLinksPartial:"公式リンク集（音源なし）。一部の曲はCreator-Safe対象（Riot公式Playlistと照合済み）、残りはPlaylistに見当たらない・要確認。配信・購入は二次利用許諾ではありません。",
+  plGuideRiotLinksAbsent:"公式リンク集（音源なし）。Riot公式のCreator-Safeプレイリストに見当たらない曲です（Creator-Safe対象外・要確認）。配信・購入は二次利用許諾ではありません。",
   plGuideLolPopular:"公式SoundCloud人気曲ページ（音源なし）。一部だけCreator-Safe対象、共同制作曲などは対象外・要確認。配信・購入は二次利用許諾ではありません。",
   plGuideRiotLinks:"公式リンク集。配信・購入は二次利用許諾ではありません。Creator-Safeの対象と条件を要確認。",
   plGuideGakumasInst:"公式Driveで配布確認済み。DOWNLOAD規約はファン動画向けの限定条件で、全用途の許諾ではありません。",
@@ -683,8 +683,8 @@ Object.assign(TEXT.en, {
   plGuideLolCsVerified:"Official SoundCloud album (no audio included). Creator-Safe: matched against Riot's official Creator-Safe Playlist. Streaming or buying is not a license to reuse.",
   plGuideLolCsPartial:"Official SoundCloud album (no audio included). Some songs are Creator-Safe (matched against Riot's official Creator-Safe Playlist); the rest were not found in it, so check them. Streaming or buying is not a license to reuse.",
   plGuideLolCsUnverified:"Official SoundCloud album (no audio included). Creator-Safe status not yet matched. Streaming or buying is not a license to reuse.",
-  plGuideLolLinksPartial:"Official links only (no audio included). Some songs are Creator-Safe (matched against Riot's official Creator-Safe Playlist); the rest were not found in it, so check them. Streaming or buying is not a license to reuse.",
-  plGuideLolLinksAbsent:"Official links only (no audio included). These songs were not found in Riot's official Creator-Safe Playlist (outside Creator-Safe or unconfirmed). Streaming or buying is not a license to reuse.",
+  plGuideRiotLinksPartial:"Official links only (no audio included). Some songs are Creator-Safe (matched against Riot's official Creator-Safe Playlist); the rest were not found in it, so check them. Streaming or buying is not a license to reuse.",
+  plGuideRiotLinksAbsent:"Official links only (no audio included). These songs were not found in Riot's official Creator-Safe playlists (outside Creator-Safe or unconfirmed). Streaming or buying is not a license to reuse.",
   plGuideLolPopular:"Official SoundCloud popular-tracks page (no audio included). Only some songs are Creator-Safe (matched against Riot's official Creator-Safe Playlist); collaboration songs and the rest were not found in it (outside Creator-Safe or unconfirmed). Streaming or buying is not a license to reuse.",
   plGuideRiotLinks:"Official links only. Streaming or buying is not a license to reuse. Check Creator-Safe eligibility and conditions.",
   plGuideGakumasInst:"Confirmed on the official Drive. The DOWNLOAD terms are limited to fan videos and are not a license for every use.",
@@ -709,8 +709,8 @@ Object.assign(TEXT.zh, {
   plGuideLolCsVerified:"官方SoundCloud专辑（不含音源）。属于Creator-Safe（已与Riot官方Creator-Safe歌单核对）。播放或购买不等于二次使用许可。",
   plGuideLolCsPartial:"官方SoundCloud专辑（不含音源）。部分曲目属于Creator-Safe（已与Riot官方Creator-Safe歌单核对），其余未在歌单中找到，请先确认。播放或购买不等于二次使用许可。",
   plGuideLolCsUnverified:"官方SoundCloud专辑（不含音源）。是否属于Creator-Safe尚未核对。播放或购买不等于二次使用许可。",
-  plGuideLolLinksPartial:"官方链接合集（不含音源）。部分曲目属于Creator-Safe（已与Riot官方Creator-Safe歌单核对），其余未在歌单中找到，请先确认。播放或购买不等于二次使用许可。",
-  plGuideLolLinksAbsent:"官方链接合集（不含音源）。这些曲目未在Riot官方Creator-Safe歌单中找到（不属于Creator-Safe或尚待确认）。播放或购买不等于二次使用许可。",
+  plGuideRiotLinksPartial:"官方链接合集（不含音源）。部分曲目属于Creator-Safe（已与Riot官方Creator-Safe歌单核对），其余未在歌单中找到，请先确认。播放或购买不等于二次使用许可。",
+  plGuideRiotLinksAbsent:"官方链接合集（不含音源）。这些曲目未在Riot官方Creator-Safe歌单中找到（不属于Creator-Safe或尚待确认）。播放或购买不等于二次使用许可。",
   plGuideLolPopular:"官方SoundCloud热门曲目页面（不含音源）。仅部分曲目属于Creator-Safe（已与Riot官方Creator-Safe歌单核对），合作曲目等其余曲目未在歌单中找到（不属于Creator-Safe或尚待确认）。播放或购买不等于二次使用许可。",
   plGuideRiotLinks:"官方链接合集。播放或购买不等于二次使用许可。请确认是否属于Creator-Safe及其条件。",
   plGuideGakumasInst:"已在官方Drive确认发布。DOWNLOAD条款仅限粉丝视频，并非所有用途的许可。",
@@ -735,8 +735,8 @@ Object.assign(TEXT.ko, {
   plGuideLolCsVerified:"공식 SoundCloud 앨범(음원 없음). Creator-Safe 대상(Riot 공식 Creator-Safe 플레이리스트와 대조 완료). 스트리밍·구매는 2차 이용 허락이 아니에요.",
   plGuideLolCsPartial:"공식 SoundCloud 앨범(음원 없음). 일부 곡은 Creator-Safe 대상(Riot 공식 Creator-Safe 플레이리스트와 대조 완료)이고, 나머지는 플레이리스트에서 찾지 못했으니 확인이 필요해요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
   plGuideLolCsUnverified:"공식 SoundCloud 앨범(음원 없음). Creator-Safe 대상인지 아직 대조하지 않았어요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
-  plGuideLolLinksPartial:"공식 링크 모음(음원 없음). 일부 곡은 Creator-Safe 대상(Riot 공식 Creator-Safe 플레이리스트와 대조 완료)이고, 나머지는 플레이리스트에서 찾지 못했으니 확인이 필요해요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
-  plGuideLolLinksAbsent:"공식 링크 모음(음원 없음). Riot 공식 Creator-Safe 플레이리스트에서 찾지 못한 곡이에요(Creator-Safe 대상이 아니거나 확인이 필요해요). 스트리밍·구매는 2차 이용 허락이 아니에요.",
+  plGuideRiotLinksPartial:"공식 링크 모음(음원 없음). 일부 곡은 Creator-Safe 대상(Riot 공식 Creator-Safe 플레이리스트와 대조 완료)이고, 나머지는 플레이리스트에서 찾지 못했으니 확인이 필요해요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
+  plGuideRiotLinksAbsent:"공식 링크 모음(음원 없음). Riot 공식 Creator-Safe 플레이리스트에서 찾지 못한 곡이에요(Creator-Safe 대상이 아니거나 확인이 필요해요). 스트리밍·구매는 2차 이용 허락이 아니에요.",
   plGuideLolPopular:"공식 SoundCloud 인기곡 페이지(음원 없음). 일부 곡만 Creator-Safe 대상(Riot 공식 Creator-Safe 플레이리스트와 대조 완료)이고, 공동 제작곡 등 나머지는 플레이리스트에서 찾지 못했어요(Creator-Safe 대상이 아니거나 확인이 필요해요). 스트리밍·구매는 2차 이용 허락이 아니에요.",
   plGuideRiotLinks:"공식 링크 모음. 스트리밍·구매는 2차 이용 허락이 아니에요. Creator-Safe 대상 여부와 조건을 확인하세요.",
   plGuideGakumasInst:"공식 Drive에서 배포를 확인했어요. DOWNLOAD 규약은 팬 영상용 한정 조건이며 모든 용도의 허락이 아니에요.",
@@ -1288,7 +1288,7 @@ function trkCatalogGuide(s, pl, forDistributionPlaylist = false) {
   const isGakumasDiscography = s.id === "gakumas" && pl && pl.id === "gm-releases";
   const isTouhou = s.id === "touhou";
   const key = s.id === "bluearchive" && pl && pl.sourceUrl ? "plGuideBlueArchive"
-    : s.id === "lol" && pl ? (Object.prototype.hasOwnProperty.call(LOL_GUIDE_KEYS, pl.creatorSafe) ? LOL_GUIDE_KEYS[pl.creatorSafe] : "plGuideRiotLinks")
+    : (s.id === "lol" || s.id === "valorant") && pl ? (Object.prototype.hasOwnProperty.call(RIOT_GUIDE_KEYS, pl.creatorSafe) ? RIOT_GUIDE_KEYS[pl.creatorSafe] : "plGuideRiotLinks")
       : isGakumasInstrument ? "plGuideGakumasInst"
         : isGakumasDiscography ? "plGuideGakumasDisco"
           : isTouhou ? "touhouPlaylistGuide"
@@ -1327,10 +1327,10 @@ function plGuideJa(key) {
   return (typeof TEXT !== "undefined" && TEXT.ja && typeof TEXT.ja[key] === "string") ? TEXT.ja[key] : "";
 }
 function trkGuide(key, url) { return plGuideSanitize({ note: plGuideJa(key), url, key }); }
-/* LoL は catalog.js の LOL_CREATOR_SAFE（プレイリストごとの Creator-Safe 照合状態）から文言を選ぶ。
-   照合していないものを「対象」と書かない。表に無い状態は公式リンク集の文言（要確認）にする。 */
-const LOL_GUIDE_KEYS = Object.freeze({ verified: "plGuideLolCsVerified", partial: "plGuideLolCsPartial",
-  unverified: "plGuideLolCsUnverified", "links-partial": "plGuideLolLinksPartial", "links-absent": "plGuideLolLinksAbsent",
+/* LoL・VALORANT は catalog.js の LOL_CREATOR_SAFE／VAL_CREATOR_SAFE（プレイリストごとの Creator-Safe 照合状態）から
+   文言を選ぶ。照合していないものを「対象」と書かない。表に無い状態は公式リンク集の文言（要確認）にする。 */
+const RIOT_GUIDE_KEYS = Object.freeze({ verified: "plGuideLolCsVerified", partial: "plGuideLolCsPartial",
+  unverified: "plGuideLolCsUnverified", "links-partial": "plGuideRiotLinksPartial", "links-absent": "plGuideRiotLinksAbsent",
   mixed: "plGuideLolPopular" });
 /* 🗑 消した trk の自動リストの印（settings.trkRemoved。IDの配列）。印のあるIDは起動時に作り直さない。
    🐔 の設定の「♻ 消したリストを戻す」か、Game Vol.1／Classic Vol.1 の「開く」ボタンで印を外す。 */

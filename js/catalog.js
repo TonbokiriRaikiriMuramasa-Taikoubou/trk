@@ -1317,9 +1317,15 @@ S("lol", "League of Legends", "⚔️", "aqua", "PCゲーム", "🕹️",
 
 /* ================= 🎯 VALORANT（Riot Games） =================
    Championsアンセム（2021–2026）とエージェント関連曲を分ける。個別の公式公開先へのリンク集であり、
-   公開・購入・サブスクは二次利用許諾ではない。利用前にRiot Creator-Safeの対象曲・条件を確認。 */
+   公開・購入・サブスクは二次利用許諾ではない。利用前にRiot Creator-Safeの対象曲・条件を確認。
+   ✅ Creator-Safe の照合状態（trk117）：VALORANT公式Creator-Safe Playlist（Spotify・全40曲を公式の埋め込みで確認）と
+   Riot Games Creator-Safe Playlist（LoLで読んだ977行）のどちらにも、収録した9曲は見当たらない（links-absent）。
+   根拠は tools/valorant-creator-safe.json（check-repo が一致を見る）。状態の語彙と文言は LoL と同じ
+   （library.js の RIOT_GUIDE_KEYS）。 */
+const VAL_CREATOR_SAFE = Object.freeze({ "val-themes": "links-absent", "val-agent-themes": "links-absent" });
+const withValCreatorSafe = pl => Object.assign(pl, { creatorSafe: VAL_CREATOR_SAFE[pl.id] || "unknown" });
 S("valorant", "VALORANT", "🎯", "red", "PCゲーム", "🕹️",
-  "VALORANT公式音楽リンク集。Champions 2021–2026のアンセム6曲とエージェント関連曲3曲を分類。視聴・購入・公開リンクは二次利用許諾ではありません。利用前にRiot Creator-Safeガイドで対象曲と条件を確認してください。",
+  "VALORANT公式音楽リンク集。Champions 2021–2026のアンセム6曲とエージェント関連曲3曲を分類。視聴・購入・公開リンクは二次利用許諾ではありません。利用前にRiot Creator-Safeガイドで対象曲と条件を確認してください。VALORANT公式Creator-Safe Playlist（Riotが100%権利を持つVALORANT曲の集まり・40曲）とRiot Games Creator-Safe Playlistを照合し、収録したアンセム6曲とエージェント関連曲3曲はどちらにも見当たりませんでした（外部アーティストとの共同制作曲はCreator-Safe対象外・要確認）。",
   "https://www.riotgames.com/en/riot-music-creator-safe-guidelines",
   [PL("val-themes", "VALORANT Champions Anthems", "🏆", "red", ["Game","VALORANT","Champions","Riot Games"],
     [T("Die For You", "VALORANT Champions 2021 Anthem", "Grabbitz", "https://www.youtube.com/watch?v=h7MYJghRWt0"),
@@ -1333,7 +1339,7 @@ S("valorant", "VALORANT", "🎯", "red", "PCゲーム", "🕹️",
     [T("Entertain Me", "Neon Theme", "Ylona Garcia", "https://www.youtube.com/watch?v=B6eLbmLGUyc"),
      T("On My Level", "Phoenix Official Theme Song", "Ashley Warren, Bjorn Nilsson", "https://open.spotify.com/track/1Iq1WGYq6aury2COflOzT8"),
      T("greater than one", "Gekko Agent Theme", "ericdoa, VALORANT", "https://www.youtube.com/watch?v=MHxJXBLJW98")],
-    "https://music.youtube.com/playlist?list=PLJP5_qSxMbkL_D02wuRBMZ9Di2wer1Fj", "VALORANT公式音楽プレイリスト")]);
+    "https://music.youtube.com/playlist?list=PLJP5_qSxMbkL_D02wuRBMZ9Di2wer1Fj", "VALORANT公式音楽プレイリスト")].map(withValCreatorSafe));
 
 /* ================= ⚡ NoCopyrightSounds（イギリス発・世界的なフリーDLレーベル） =================
    NCSはクリエイター向けに楽曲を無料配布するレーベル。公式サイトの各曲ページから

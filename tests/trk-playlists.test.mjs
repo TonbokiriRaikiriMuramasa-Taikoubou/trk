@@ -145,17 +145,34 @@ describe("catalog guides follow the UI language", () => {
     /* trk115：101曲目以降（songdata.io の一覧）で Season 1〜7 を全曲照合。Warsongs は11曲中10曲 */
     for (let n = 1; n <= 7; n++) assert.equal(keyOf("lol-season-" + n), "plGuideLolCsVerified", "Season " + n);
     assert.equal(keyOf("lol-warsongs"), "plGuideLolCsPartial");
+    /* trk116：残りのリストも全件照合。Sessions は Vi・Taliyah が全曲、Diana が43曲中42曲。
+       公式リンク集は Champion Theme 39/41・Worlds 1/13 が一部、MSI・K/DA は見当たらない */
+    assert.equal(keyOf("lol-svi"), "plGuideLolCsVerified");
+    assert.equal(keyOf("lol-staliyah"), "plGuideLolCsVerified");
+    assert.equal(keyOf("lol-sdiana"), "plGuideLolCsPartial");
+    assert.equal(keyOf("lol-champion-themes"), "plGuideLolLinksPartial");
+    assert.equal(keyOf("lol-worlds-anthems"), "plGuideLolLinksPartial");
+    assert.equal(keyOf("lol-msi-anthems"), "plGuideLolLinksAbsent");
+    assert.equal(keyOf("lol-kda-songs"), "plGuideLolLinksAbsent");
     assert.equal(keyOf("lol-popular-tracks"), "plGuideLolPopular");
-    assert.equal(keyOf("lol-svi"), "plGuideLolSessions");
-    assert.equal(keyOf("lol-kda-songs"), "plGuideRiotLinks");
     assert.equal(api.trkCatalogGuide(lol, { id: "lol-mod-list", creatorSafe: "verified-by-mod?" }, true).key, "plGuideRiotLinks",
       "an unknown status never reads as Creator-Safe");
-    assert.match(context.TEXT.ja.plGuideLolCsPartial, /一部の曲はCreator-Safe対象.*未照合・要確認/);
-    assert.doesNotMatch(context.TEXT.ja.plGuideLolCsPartial, /可能性が高い/, "partial never claims the unmatched songs");
-    for (const lang of ["ja", "en", "zh", "ko"]) assert.equal(context.TEXT[lang].plGuideLolCsLikely, undefined, lang);
-    assert.equal(api.trkCatalogGuide(lol, { id: "lol-old", creatorSafe: "likely" }, true).key, "plGuideRiotLinks",
-      "the retired 'likely' status falls back to the links-only wording");
-    assert.match(context.TEXT.ja.plGuideLolPopular, /対象外・要確認/);
+    assert.match(context.TEXT.ja.plGuideLolCsPartial, /一部の曲はCreator-Safe対象.*見当たらない・要確認/);
+    assert.match(context.TEXT.ja.plGuideLolLinksPartial, /^公式リンク集.*一部の曲はCreator-Safe対象.*見当たらない/);
+    assert.match(context.TEXT.ja.plGuideLolLinksAbsent, /^公式リンク集.*見当たらない.*Creator-Safe対象外・要確認/);
+    for (const key of ["plGuideLolCsPartial", "plGuideLolLinksPartial", "plGuideLolLinksAbsent", "plGuideLolPopular"]) {
+      assert.doesNotMatch(context.TEXT.ja[key], /可能性が高い/, key + " never claims the songs it did not find");
+      for (const lang of ["en", "zh", "ko"]) assert.ok(context.TEXT[lang][key] && context.TEXT[lang][key] !== context.TEXT.ja[key], key + " " + lang);
+    }
+    for (const lang of ["ja", "en", "zh", "ko"]) {
+      assert.equal(context.TEXT[lang].plGuideLolCsLikely, undefined, lang);
+      assert.equal(context.TEXT[lang].plGuideLolSessions, undefined, lang);
+    }
+    for (const retired of ["likely", "sessions"])
+      assert.equal(api.trkCatalogGuide(lol, { id: "lol-old", creatorSafe: retired }, true).key, "plGuideRiotLinks",
+        "the retired '" + retired + "' status falls back to the links-only wording");
+    assert.match(context.TEXT.ja.plGuideLolPopular, /一部だけCreator-Safe対象.*共同制作曲などは対象外・要確認/);
+    assert.ok(context.TEXT.ja.plGuideLolPopular.length <= 80, "the popular-tracks note stays short");
   });
 
   test("Game Vol.1 / Classic Vol.1 created before trk114 get a key without losing their URL", () => {

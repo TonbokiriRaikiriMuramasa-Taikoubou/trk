@@ -264,7 +264,18 @@
         "artist": "Pressure Cooker, Asandisa Siswana, Zolina Ngejana",
         "url": "https://www.youtube.com/watch?v=nakzw9Y_CLI"
       }
-    ]
+    ],
+    "creatorSafe": {
+      "status": "links-partial",
+      "matchedTracks": 39,
+      "checkedAt": "2026-10-12",
+      "evidence": "mirror",
+      "notFound": [
+        "Smolder, the Fiery Fledgling",
+        "Yunara, the Unbroken Faith"
+      ],
+      "note": "Matched by title (case, apostrophe and a trailing ' - Champion Theme' ignored). 'Smolder, the Fiery Fledgling' (2024) is not among the 977 listed entries; the mirror omits 2 entries in positions 701-750, the 2024-era block where Skarner and Lee Sin sit, so it may be one of them. 'Yunara, the Unbroken Faith' is listed only as '(Spirit Blossom Springs Lofi Remix)'. Credits differ for 'Locke, the Ashen Exorcist' (playlist: League of Legends, Pressure Cooker, Elben Schutte) and slightly for Aphelios, Hwei and LeBlanc. 2XKO tracks titled '... - X Champion Theme' are different songs and were not counted."
+    }
   },
   "worldsAnthems": {
     "id": "lol-worlds-anthems",
@@ -349,7 +360,28 @@
         "url": "https://open.spotify.com/track/3s2YCL5LHLzXWbw7ezQru3",
         "status": "released"
       }
-    ]
+    ],
+    "creatorSafe": {
+      "status": "links-partial",
+      "matchedTracks": 1,
+      "checkedAt": "2026-10-12",
+      "evidence": "mirror",
+      "notFound": [
+        "Warriors",
+        "Ignite",
+        "Legends Never Die",
+        "RISE",
+        "Phoenix",
+        "Take Over",
+        "Burn It All Down",
+        "STAR WALKIN'",
+        "GODS",
+        "Heavy Is the Crown",
+        "Sacrifice",
+        "Know My Name"
+      ],
+      "note": "Only 'Worlds Collide' (Worlds 2015, listed as League of Legends, Nicki Taylor) is in the playlist. The playlist also lists the instrumental 'YYYY World Championship Theme' tracks, which are different from these vocal anthems. The other 12 anthems are not among the 977 listed entries."
+    }
   },
   "msiAnthems": {
     "id": "lol-msi-anthems",
@@ -379,7 +411,20 @@
         "artist": "Che Lingo",
         "url": "https://www.youtube.com/watch?v=kE19Ac234Zo"
       }
-    ]
+    ],
+    "creatorSafe": {
+      "status": "links-absent",
+      "matchedTracks": 0,
+      "checkedAt": "2026-10-12",
+      "evidence": "mirror",
+      "notFound": [
+        "Bring Home the Glory",
+        "Starts Right Here",
+        "Set It Off",
+        "Rules (Are Meant To Break)"
+      ],
+      "note": "None of the 4 anthems is among the 977 listed entries. The playlist lists instrumental '2016/2017/2018 Mid-Season Invitational Theme' tracks, which are different songs."
+    }
   },
   "kdaSongs": {
     "id": "lol-kda-songs",
@@ -427,6 +472,21 @@
         "url": "https://open.spotify.com/track/497qmwcUsCv5hmMU0K8Hik",
         "officialVideoUrl": "https://www.youtube.com/watch?v=WW1BpABbzHs"
       }
-    ]
+    ],
+    "creatorSafe": {
+      "status": "links-absent",
+      "matchedTracks": 0,
+      "checkedAt": "2026-10-12",
+      "evidence": "mirror",
+      "notFound": [
+        "POP/STARS",
+        "THE BADDEST",
+        "MORE",
+        "VILLAIN",
+        "DRUM GO DUM",
+        "I'LL SHOW YOU"
+      ],
+      "note": "None of the 6 K/DA songs is among the 977 listed entries (Riot's 2020 Creator-Safe post already said K/DA could not be cleared). Only Teamfight Tactics remixes such as 'Out of Your League (K/DA)' and 'Get Down, Get Down (K/DA)' appear, which are different tracks."
+    }
   }
 }

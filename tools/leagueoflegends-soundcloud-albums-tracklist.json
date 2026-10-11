@@ -5,11 +5,11 @@
   "creatorSafe": {
     "playlist": "https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N",
     "description": "Riot Games' official Spotify playlist 'Riot Games Creator-Safe Playlist', described as a collection of music that is 100% owned by Riot Games (979 songs at the trk108 check).",
-    "method": "Entries 1-100: matched title, artist and order against the official Spotify embed of the playlist, which shows only the first 100 entries: 1-20 = Season 9 (20/20), 21-59 = Season 8 (39/39), 60-100 = the first 41 of Season 7's 48 tracks (checked 2026-10-11; Season 9 was first matched on 2026-10-09 including durations). Entries 101+: the embed stops at 100, so the same playlist was read on songdata.io (see mirror), checked 2026-10-12. It lists the playlist in 50-entry blocks and sorts each block by Spotify track ID, so the exact order inside a block is not visible. Its 51-100 block holds exactly the 50 titles the official embed shows there (the last 9 of Season 8 and the first 41 of Season 7). Its 101-150, 151-200 and 201-250 blocks hold exactly the titles predicted by continuing in album order (Season 7 tracks 42-48, Season 6, Season 5 split 16/9 at 150/151, Season 4, Season 3 split 19/4 at 200/201, Season 2, Season 1), plus 7 singles in the 201-250 block. Every title matched character for character, so the Season 1-7 positions are given as album-order ranges. The playlist uses another Spotify release of these albums (its track IDs differ from the album track IDs linked here), so matching is by title and artist. Warsongs: 10 of 11 tracks are in the 251-300 block under plain titles with the same artists (e.g. 'Piercing Light' by 'League of Legends, Mako'). 'Silver Scrapes' was not in entries 1-300; entries 301+ were not read.",
+    "method": "Entries 1-100: matched title, artist and order against the official Spotify embed of the playlist, which shows only the first 100 entries: 1-20 = Season 9 (20/20), 21-59 = Season 8 (39/39), 60-100 = the first 41 of Season 7's 48 tracks (checked 2026-10-11; Season 9 was first matched on 2026-10-09 including durations). Entries 101+: the embed stops at 100, so the same playlist was read on songdata.io (see mirror), checked 2026-10-12. It lists the playlist in 50-entry blocks and sorts each block by Spotify track ID, so the exact order inside a block is not visible. Its 51-100 block holds exactly the 50 titles the official embed shows there (the last 9 of Season 8 and the first 41 of Season 7). Its 101-150, 151-200 and 201-250 blocks hold exactly the titles predicted by continuing in album order (Season 7 tracks 42-48, Season 6, Season 5 split 16/9 at 150/151, Season 4, Season 3 split 19/4 at 200/201, Season 2, Season 1), plus 7 singles in the 201-250 block. Every title matched character for character, so the Season 1-7 positions are given as album-order ranges. The playlist uses another Spotify release of these albums (its track IDs differ from the album track IDs linked here), so matching is by title and artist. Warsongs: 10 of 11 tracks are in the 251-300 block under plain titles with the same artists (e.g. 'Piercing Light' by 'League of Legends, Mako'). 'Silver Scrapes' is not among the listed entries. trk116 (2026-10-12) read every row the mirror shows (51-977) and matched all LoL lists: the mirror shows 977 of the 979 entries; its 50-entry blocks stay aligned up to 700 and the 701-750 block shows 48 rows, so the 2 entries it omits sit in positions 701-750 (a 2024-era block). 'Not found' therefore means not among the 977 listed entries.",
     "mirror": {
       "url": "https://songdata.io/playlist/5hDYD44imzFZEqTfAoco1N",
       "checkedAt": "2026-10-12",
-      "readEntries": "51-300",
+      "readEntries": "51-977 (every row the mirror shows: 977 of 979; 2 omitted in positions 701-750)",
       "note": "Third-party listing of the official playlist (not run by Riot or Spotify). Used only because the official embed shows 100 entries. Its 51-100 block matched the official embed exactly."
     },
     "soundcloudPlaylists": [
@@ -27,16 +27,24 @@
       }
     ],
     "statuses": {
-      "verified": "every track matched in the official playlist",
-      "partial": "only the first matchedTracks tracks (album order) matched; notYetMatched lists the rest",
-      "unverified": "not matched (kept for albums added later; no album uses it now)"
+      "verified": "every track found in the official playlist",
+      "partial": "album: matchedTracks found; notFound lists the titles not among the entries the mirror shows",
+      "links-partial": "official link list (tools/leagueoflegends-music-tracklist.json): matchedTracks found; notFound as above",
+      "links-absent": "official link list: no track found (matchedTracks 0; notFound lists every title)",
+      "mixed": "popular-tracks snapshot: matchedTracks found; notFound lists the rest (mostly collaboration songs)",
+      "unverified": "not matched (kept for lists added later; no list uses it now)"
     },
+    "statusFiles": [
+      "tools/leagueoflegends-soundcloud-albums-tracklist.json (albums, popularTracks)",
+      "tools/leagueoflegends-music-tracklist.json (Champion Themes, Worlds, MSI, K/DA)",
+      "tools/leagueoflegends-sessions-tracklist.json (Sessions albums)"
+    ],
     "evidence": {
       "embed": "official Spotify embed of the playlist (entries 1-100)",
       "mirror": "songdata.io listing of the same playlist (entries 101+)",
       "embed+mirror": "entries up to 100 from the official embed, the rest from songdata.io"
     },
-    "catalogStatusSource": "js/catalog.js LOL_CREATOR_SAFE (must equal albums[].creatorSafe.status; checked by tools/check-repo.mjs)"
+    "catalogStatusSource": "js/catalog.js LOL_CREATOR_SAFE (must equal every list's creatorSafe.status in the statusFiles; checked by tools/check-repo.mjs)"
   },
   "sources": {
     "soundcloudAlbumsPage": "https://soundcloud.com/leagueoflegends/albums",
@@ -1751,10 +1759,10 @@
         "checkedAt": "2026-10-12",
         "playlistBlock": "251-300",
         "evidence": "mirror",
-        "notYetMatched": [
+        "notFound": [
           "Silver Scrapes (feat. Proto Shredanoid)"
         ],
-        "note": "Tracks 1-10 are in the 251-300 block under plain titles with the same artists. 'Silver Scrapes' was not in entries 1-300; entries 301+ were not read. The official SoundCloud Creator-Safe Playlist Pt. I also lists tracks 1-5 (remix uploads) at entries 11-15."
+        "note": "Tracks 1-10 are listed in the 251-300 block under plain titles with the same artists. 'Silver Scrapes' is not among the 977 listed entries; the 2 entries the mirror omits sit in positions 701-750 (2024-era), far from the other Warsongs tracks. The official SoundCloud Creator-Safe Playlist Pt. I also lists tracks 1-5 (remix uploads) at entries 11-15."
       },
       "tracks": [
         [
@@ -2028,7 +2036,35 @@
     ],
     "creatorSafe": {
       "status": "mixed",
-      "note": "Snapshot of the official popular-tracks page. Collaboration songs (Worlds/MSI anthems, K/DA, True Damage, HEARTSTEEL and other external-artist tracks) are outside the Creator-Safe Playlist or unconfirmed; not matched song by song."
+      "matchedTracks": 7,
+      "checkedAt": "2026-10-12",
+      "evidence": "mirror",
+      "notFound": [
+        "Legends Never Die (ft. Against The Current) | Worlds 2017 - League of Legends",
+        "RISE (ft. The Glitch Mob, Mako, and The Word Alive) | Worlds 2018 - League of Legends",
+        "GODS",
+        "Phoenix (ft. Cailin Russo and Chrissy Costanza) | Worlds 2019",
+        "K/DA - POP/STARS (ft Madison Beer, (G)I-DLE, Jaira Burns)",
+        "K/DA - VILLAIN feat. Madison Beer and Kim Petras",
+        "Warriors (ft. 2WEI and Edda Hayes) | Season Start 2020",
+        "Awaken (ft. Valerie Broussard & Ray Chen)",
+        "K/DA - MORE (feat. Madison Beer, (G)I-DLE, Lexie Liu, Jaira Burns, Seraphine)",
+        "Legends Never Die [Alan Walker Remix] | Worlds 2017 - League of Legends",
+        "K/DA - THE BADDEST ft. (G)I-DLE, Bea Miller, Wolftyla",
+        "Bite Marks",
+        "Burn It All Down",
+        "Know My Name (feat. Coco Jones, SOYEON & i-dle)",
+        "True Damage - GIANTS (ft. Becky G, Keke Palmer, SOYEON, DUCKWRTH, Thutmose)",
+        "Take Over (ft. Jeremy McKinnon (A Day To Remember), MAX, Henry) | Worlds 2020",
+        "The Call",
+        "K/DA - DRUM GO DUM ft. Aluna, Wolftyla, Bekuh BOOM",
+        "PARANOIA",
+        "Live My Life (feat. Anderson .Paak & Nic D)",
+        "As We Fall",
+        "Legends Never Die",
+        "Ignite (Finals Remix – 2016 League Of Legends World Championship)"
+      ],
+      "note": "7 of 30 found: 'Get Jinxed' (both uploads; listed as League of Legends, Djerv), 'Piercing Light (Mako Remix)' (= Warsongs track 1), 'Still Here', 'Here, Tomorrow', 'Worlds Collide - 2015 World Championship' (listed as League of Legends, Nicki Taylor) and 'Lightbringer' (the 2014 Pentakill song; its SoundCloud page sits in the album 'Pentakill - Smite and Ignite'). The other 23 - Worlds/MSI anthems, K/DA, True Damage, HEARTSTEEL, remixes and other collaboration songs - are not among the 977 listed entries."
     }
   }
 }

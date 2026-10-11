@@ -767,22 +767,25 @@ S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber
    公式Spotifyアルバムで確認した（Season 1＝9曲・Season 2＝30曲は公式SoundCloudとも一致）。
    Creator-Safe（Riot公式Creator-Safe Playlist・979曲）との照合状態はプレイリストごとに下の
    LOL_CREATOR_SAFE に持たせ、設定ガイドの文言（library.js の trkCatalogGuide）はそこから選ぶ。
-   照合済みは Season 1〜9 の全243曲（公式の埋め込み表示は先頭100曲までなので、101曲目以降は
-   プレイリスト全体を表示する第三者サイト songdata.io で照合）。Warsongs は11曲中10曲で、Silver Scrapes は未照合。
+   全リストを照合済み（公式の埋め込み表示は先頭100曲までなので、101曲目以降はプレイリスト全体を
+   表示する第三者サイト songdata.io で照合。songdata.io に出ない2曲は701〜750番目）。全曲収録＝Season 1〜9・
+   Sessions: Vi・Star Guardian Taliyah。一部＝Champion Theme 39/41・Sessions: Diana 42/43・Warsongs 10/11・
+   Worlds 1/13・人気曲 7/30。MSIアンセムとK/DAは見当たらない。
    人気曲30曲はスナップショットで、Worlds／K/DA等の外部アーティスト共同制作曲はCreator-Safe対象外・要確認。
    音源は同梱せず、公式配信へのリンクを二次利用許諾とは扱わない。
    旧ログインテーマ、他の仮想アーティスト、残りChampion Theme、Skin／イベント曲、その他のOSTは未調査。
    Champion Themeは全チャンピオン分が存在するという意味ではなく、確認できた単独テーマのみ。 */
-/* ✅ Creator-Safe の照合状態（プレイリストごと）。根拠と日付は docs/LEAGUE-OF-LEGENDS-MUSIC.md と
-   tools/leagueoflegends-soundcloud-albums-tracklist.json の creatorSafe（check-repo が一致を見る）。
-   verified＝Riot公式Creator-Safe Playlistと全曲照合済み／partial＝アルバム順で先頭から一部の曲だけ照合済み／
-   unverified＝未照合（後から足すアルバム用。今は使っていない）／
-   sessions＝Riotが「Creator-Safe Collection」として出したSessions（Playlistとは未照合）／
-   mixed＝人気曲スナップショット（共同制作曲は対象外・要確認）／unknown＝対象か未確認の公式リンク集。
+/* ✅ Creator-Safe の照合状態（プレイリストごと）。根拠と日付は docs/LEAGUE-OF-LEGENDS-MUSIC.md と、
+   tools/leagueoflegends-soundcloud-albums-tracklist.json／-music-tracklist.json／-sessions-tracklist.json の
+   各リストの creatorSafe（check-repo が一致・曲数・根拠を見る）。
+   verified＝全曲がRiot公式Creator-Safe Playlistにある／partial＝アルバムの一部だけある（notFound＝見当たらない曲）／
+   links-partial・links-absent＝公式リンク集（Champion Theme・アンセム・K/DA）の一部だけある・1曲もない／
+   mixed＝人気曲スナップショット（一部だけある。共同制作曲など残りは対象外・要確認）／
+   unverified＝未照合（後から足すリスト用。今は使っていない）。
    ここに無いLoLのリストは unknown 扱い（照合していないものを対象と書かない）。 */
 const LOL_CREATOR_SAFE = Object.freeze({
-  "lol-svi": "sessions", "lol-sdiana": "sessions", "lol-staliyah": "sessions",
-  "lol-champion-themes": "unknown", "lol-worlds-anthems": "unknown", "lol-msi-anthems": "unknown", "lol-kda-songs": "unknown",
+  "lol-svi": "verified", "lol-sdiana": "partial", "lol-staliyah": "verified",
+  "lol-champion-themes": "links-partial", "lol-worlds-anthems": "links-partial", "lol-msi-anthems": "links-absent", "lol-kda-songs": "links-absent",
   "lol-season-1": "verified", "lol-season-2": "verified", "lol-season-3": "verified",
   "lol-season-4": "verified", "lol-season-5": "verified", "lol-season-6": "verified",
   "lol-season-7": "verified", "lol-season-8": "verified", "lol-season-9": "verified",
@@ -790,7 +793,7 @@ const LOL_CREATOR_SAFE = Object.freeze({
 });
 const withLolCreatorSafe = pl => Object.assign(pl, { creatorSafe: LOL_CREATOR_SAFE[pl.id] || "unknown" });
 S("lol", "League of Legends", "⚔️", "aqua", "PCゲーム", "🕹️",
-  "公式リンク集（音源なし）。配信・購入は二次利用許諾ではありません。利用前にCreator-Safe対象か公式ガイドで要確認。Sessions 3作・108曲、近年Champion Theme 41曲、Worlds/WCS 2014–26の公式アンセム13曲、確認できたMSIアンセム4曲、K/DAの公式曲6曲を分類して掲載。Worlds 2026「Know My Name」は公式MVとSpotify個別曲を確認。K/DAもCreator-Safe対象かは未確認です。Riot公式Creator-Safe Playlist（Riotが100%権利を持つ曲の集まり・979曲）と照合し、Season 1〜9の全243曲が収録されていることを確認しました（公式の埋め込み表示は先頭100曲までなので、101曲目以降はプレイリスト全体を表示する第三者サイトsongdata.ioで照合）。Warsongs（外部アーティスト参加）は11曲中10曲を確認済みで、「Silver Scrapes」は未照合です。Sessions 3作はRiotが「Creator-Safe Collection」として公開したものです。人気曲30曲のうちのWorlds／K/DA等の外部アーティスト共同制作曲はCreator-Safe対象外・要確認です。公式SoundCloudアルバムはSeason 1〜9のゲームOSTをシーズン別の9プレイリスト（計243曲）とWarsongs 11曲に分け、公式SoundCloudの人気曲30曲（2026-10-09時点のスナップショット・一部は地域により再生できません）も別リストにしました。アルバムは公式SoundCloud、各曲は公式Spotify個別曲へリンクします（人気曲は公式SoundCloudの個別曲へ）。これはLoL全楽曲ではなく、旧ログインテーマ、他の仮想アーティスト／Champion Theme、Skin／イベント曲、その他のゲームOSTなどは今後の調査対象です。Sessionsは各巻を公式SoundCloud、個別曲をSpotifyへリンク。Viは現行公式36曲を採用（旧37曲表記の二次資料にある『Take Your Time』は現行SoundCloud／Spotify／Apple Musicの掲載にないため含めません）。",
+  "公式リンク集（音源なし）。配信・購入は二次利用許諾ではありません。利用前にCreator-Safe対象か公式ガイドで要確認。Sessions 3作・108曲、近年Champion Theme 41曲、Worlds/WCS 2014–26の公式アンセム13曲、確認できたMSIアンセム4曲、K/DAの公式曲6曲を分類して掲載。Worlds 2026「Know My Name」は公式MVとSpotify個別曲を確認。Riot公式Creator-Safe Playlist（Riotが100%権利を持つ曲の集まり・979曲）と全リストを照合しました（公式の埋め込み表示は先頭100曲までなので、101曲目以降はプレイリスト全体を表示する第三者サイトsongdata.ioで照合。songdata.ioは979曲中977曲を表示し、出ない2曲は701〜750番目にあります）。全曲が収録されていたのは、Season 1〜9の全243曲とSessions: Vi・Star Guardian Taliyahです。一部だけ収録されていたのは、Champion Themeの41曲中39曲（SmolderとYunaraは見当たらない）、Sessions: Dianaの43曲中42曲（Oh Babyは見当たらない）、Warsongs（外部アーティスト参加）の11曲中10曲（「Silver Scrapes」は見当たらない）、Worlds/WCSアンセム13曲中の「Worlds Collide」（2015）だけ、人気曲の30曲中7曲です。MSIアンセム4曲とK/DA 6曲は見当たりませんでした。Sessions 3作はRiotが「Creator-Safe Collection」として公開したものです。人気曲30曲のうちのWorlds／K/DA等の外部アーティスト共同制作曲はCreator-Safe対象外・要確認です。公式SoundCloudアルバムはSeason 1〜9のゲームOSTをシーズン別の9プレイリスト（計243曲）とWarsongs 11曲に分け、公式SoundCloudの人気曲30曲（2026-10-09時点のスナップショット・一部は地域により再生できません）も別リストにしました。アルバムは公式SoundCloud、各曲は公式Spotify個別曲へリンクします（人気曲は公式SoundCloudの個別曲へ）。これはLoL全楽曲ではなく、旧ログインテーマ、他の仮想アーティスト／Champion Theme、Skin／イベント曲、その他のゲームOSTなどは今後の調査対象です。Sessionsは各巻を公式SoundCloud、個別曲をSpotifyへリンク。Viは現行公式36曲を採用（旧37曲表記の二次資料にある『Take Your Time』は現行SoundCloud／Spotify／Apple Musicの掲載にないため含めません）。",
   "https://www.riotgames.com/en/riot-music-creator-safe-guidelines",
   [
    PL("lol-svi", "Sessions: Vi", "🥊", "aqua", ["Game", "LoL", "Sessions:Vi", "Riot Games"],

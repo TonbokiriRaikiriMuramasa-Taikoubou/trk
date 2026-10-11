@@ -8,6 +8,13 @@
       "trackCount": 36,
       "soundcloudUrl": "https://soundcloud.com/leagueoflegends/sets/sessions-vi",
       "spotifyAlbumUrl": "https://open.spotify.com/album/4WvKA2Da1YSVLyrW6aTNaK",
+      "creatorSafe": {
+        "status": "verified",
+        "matchedTracks": 36,
+        "checkedAt": "2026-10-12",
+        "evidence": "mirror",
+        "note": "All 36 found. 'Swing' and 'Abovve' (SwuM) are listed with the artist 'League of Legends' only."
+      },
       "tracks": [
         ["Passengers.", "chromonicci", "71oYykt7RE79Qtac1uOwPL"],
         ["Sage", "junior state", "6wt9SmzqjUydcmXzkQ36wA"],
@@ -53,6 +60,16 @@
       "trackCount": 43,
       "soundcloudUrl": "https://soundcloud.com/leagueoflegends/sets/sessions-diana",
       "spotifyAlbumUrl": "https://open.spotify.com/album/7xhBr6txSs5ufgYlSXgwJL",
+      "creatorSafe": {
+        "status": "partial",
+        "matchedTracks": 42,
+        "checkedAt": "2026-10-12",
+        "evidence": "mirror",
+        "notFound": [
+          "Oh Baby"
+        ],
+        "note": "42 of 43 found. 'Oh Baby' (Engelwood) is not among the 977 listed entries (the 2 entries the mirror omits sit in the 2024-era positions 701-750)."
+      },
       "tracks": [
         ["Elysian", "Laxcity", "2l6lSP759Zjv0UanyQ2KWd"],
         ["fragments", "Idealism", "0vrVPbexx0ZrqSbPOEe0B4"],
@@ -105,6 +122,13 @@
       "trackCount": 29,
       "soundcloudUrl": "https://soundcloud.com/leagueoflegends/sets/sessions-star-guardian-taliyah",
       "spotifyAlbumUrl": "https://open.spotify.com/album/5a3R3wxx4SURufgfrgxwdV",
+      "creatorSafe": {
+        "status": "verified",
+        "matchedTracks": 29,
+        "checkedAt": "2026-10-12",
+        "evidence": "mirror",
+        "note": "All 29 found."
+      },
       "tracks": [
         ["i'll see you again", "suteki", "0hKEVtULEnaxvmlPj9jptC"],
         ["Courtwalk", "3D BLAST", "2izMj2l1Ljhx44BZ0Q5RCd"],

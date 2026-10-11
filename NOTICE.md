@@ -170,6 +170,8 @@ trk! is not affiliated with or endorsed by their authors.
 
 js/catalog.js (`TRK_CATALOG`) contains curated playlists for Blue Archive,
 Arknights, Arknights: Endfield, League of Legends "Sessions: Vi", VALORANT,
+Riot Games' Creator-Safe playlists (League of Legends, Teamfight Tactics, 2XKO,
+Wild Rift, Legends of Runeterra and the Riot Forge titles),
 Touhou Project, NoCopyrightSounds, Kevin MacLeod (incompetech), Genshin Impact,
 100% Orange Juice and Gakuen iDOLM@STER.
 It bundles **no audio files, charts, or copyrighted works** — only factual
@@ -214,6 +216,6 @@ ppy Pty Ltd (osu!), Bandai Namco (Taiko no Tatsujin), Crypton Future Media, INC.
 VRChat Inc., pixiv Inc., Nexon Games / Yostar (Blue Archive), Hypergravity /
 Hypergryph (Arknights / Monster-Siren Records), GRYPHLINE / GRYPH FRONTIER
 (Arknights: Endfield / Metal Scar Radio), Riot Games (League of Legends,
-VALORANT), Team Shanghai Alice / ZUN (Touhou Project), miHoYo / HOYO-MiX
+VALORANT, Teamfight Tactics, 2XKO, Wild Rift, Legends of Runeterra, Riot Forge), Team Shanghai Alice / ZUN (Touhou Project), miHoYo / HOYO-MiX
 (Genshin Impact), Orange-Juice / Fruitbat Factory (100% Orange Juice), or
 Bandai Namco Entertainment (Gakuen iDOLM@STER / THE iDOLM@STER).

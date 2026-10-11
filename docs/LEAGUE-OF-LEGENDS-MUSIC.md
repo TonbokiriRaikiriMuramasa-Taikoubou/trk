@@ -20,6 +20,7 @@
 | ゲームOST（Season 1〜9） | 公式SoundCloudアルバム「The Music of League of Legends: Season 1〜9 (Original Game Soundtrack)」をシーズン別の9プレイリストに。計243曲（9／30／23／22／25／27／48／39／20） | プレイリストは公式SoundCloudアルバムへ、各曲は公式Spotify個別曲へリンク。曲順・曲数・曲名・アーティストは公式Spotifyアルバムページで確認。Creator-Safe Playlistに全曲（trk115） |
 | Warsongs | 公式リミックスアルバム「Warsongs」（2016年）11曲 | 公式SoundCloudアルバムと公式Spotifyアルバム／個別曲を照合。Creator-Safe Playlistには11曲中10曲（Silver Scrapesは見当たらない） |
 | 人気曲 | 公式SoundCloud「Popular tracks」ページの30曲（2026-10-09時点のスナップショット） | 表示順のまま収録し、各曲は公式SoundCloudの個別曲ページへリンク。ページの内容・順序は時間で変わる。Creator-Safe Playlistには30曲中7曲（trk116） |
+| Creator-Safe Playlistから（trk118） | Creator-Safe Playlistにあってカタログに無かった曲から4リスト・158曲：Pentakill 29曲、ログイン／イベント／スキンのテーマ 53曲（DJ Sona・Spirit Blossom Springs Lofi Remixを含む）、eスポーツのテーマ 17曲、2025〜26年のサウンドトラック 59曲 | 全曲 links-verified。各曲はそのプレイリストにある公式Spotify個別曲へ（IDは `tools/riot-games-creator-safe-playlist.json` に記録）。下の「Creator-Safe Playlist から作ったリスト」 |
 
 2026 Worlds「Know My Name」は、**2026-10-08 18:00 PDT（2026-10-09 10:00 JST）**に公開された。公式League of Legends YouTubeの[公式ミュージックビデオ](https://www.youtube.com/watch?v=mlFxxNsExJc)と、動画説明欄から案内されるRiot Games名義の[公式Listen Now](https://truedamage.ffm.to/knowmyname)を照合。Listen Nowから開く[Spotify個別曲ページ](https://open.spotify.com/track/3s2YCL5LHLzXWbw7ezQru3)で曲名・2026年リリース・アーティスト欄を確認し、カタログのリンクを個別曲ページへ更新した。クレジット欄にはTrue Damage、League of Legends、Sofía Reyes、VIC MENSA、Coco Jones、SOYEON、i-dleが表示される。
 
@@ -125,6 +126,24 @@ K/DAの全関連コンテンツを網羅したという意味ではない。Riot
 
 **曲名照合の別名（matchAliases）**：OST曲の公式タイトルは「Jhin, the Virtuoso **(From League of Legends: Season 6)**」のように接尾辞が長く、そのままでは利用者のファイル名（例 `Jhin, the Virtuoso.mp3`）と照合しない。そこで**公式タイトルの前方一致になる切り詰めだけ**を別名として1件ずつ付けた（括弧 `(From …／ft. …／feat. …)`・` | Worlds 20XX …` を落とす）。新しい別名や通称は作っていない。検査で「別名は公式タイトルの先頭部分であること」を強制している。
 
+### Creator-Safe Playlist から作ったリスト（trk118・2026-10-12）
+
+照合で読んだ Creator-Safe Playlist の行（songdata.io の51〜977行目）のうち、カタログに無かった曲をリストにした。どの曲も「Riotが100%権利を持つ曲」のプレイリストにあるので、リストの状態は **links-verified**（全曲あり）で、入手先ガイドは「全曲がCreator-Safe対象（Riot公式のCreator-Safeプレイリストと照合済み）」になる。
+
+| リスト（`js/catalog.js`） | 曲数 | 中身 |
+|---|---|---|
+| Pentakill (Creator-Safe)（`lol-cs-pentakill`） | 29 | 『Smite and Ignite』8曲（Lightbringer を含む）、『Grasp of the Undying』10曲、『Lost Chapter』11曲。アルバム順、アルバム内は曲名順 |
+| LoL Login & Event Themes（`lol-cs-themes`） | 53 | 旧ログインテーマと単曲（Tidecaller、Welcome to Planet Urf の原曲、Bit Rush、Freljord など20曲）、2020〜2025年のイベント・スキンのテーマ（Sentinels of Light の3話、Space Groove、Porcelain、Everything Goes On など23曲）、DJ Sona の3曲、Spirit Blossom Springs Lofi Remix 7曲 |
+| LoL Esports Themes（`lol-cs-esports`） | 17 | World Championship Theme 2016〜2025（器楽。アンセムとは別曲）、Mid-Season Invitational Theme 2016〜2018、2018 Rift Rivals Theme、LTA／LTA North／LTA Sul Theme |
+| LoL Soundtracks 2025–26（`lol-cs-ost-2025`） | 59 | 2025年のノクサス関連（Welcome to Noxus、Grand Reckoning、Origins of Noxus など19曲）、Trials of Twilight 8曲、Summoner's Snowdrift 4曲、For Demacia 20曲、Pandemonium 8曲 |
+
+- **LoLの関連ゲーム**（Riot Forge の3作・Teamfight Tactics・2XKO・Wild Rift・Legends of Runeterra）の曲は、新しいシリーズ「🛡️ Riot Games — LoL関連ゲーム」（`riot-games`）の7リスト・342曲にした：Ruined King 60曲、The Mageseeker 57曲（「Lightbringer - The Mageseeker」を含む）、Hextech Mayhem 30曲、Teamfight Tactics Vol.1／Vol.2 各68曲（プレイリスト内の位置で古い半分／新しい半分）、2XKO 45曲、Wild Rift & Runeterra 14曲。LoLのリストと違って自動では作らず、🛒公式カタログから取り込む。
+- VALORANT 公式 Creator-Safe Playlist の39曲は VALORANT のシリーズの「VALORANT Creator-Safe」リストにした（[VALORANT楽曲台帳](VALORANT-MUSIC.md)）。
+- **入れていない行**：Warsongs の9行（`lol-warsongs` に「(feat. …)」の曲名で入っている）、「Salvation」の単曲版（For Demacia の版を入れた）、「Back from the Brink」の単曲版（Pandemonium の版を入れた）。Wild Rift・TFT の一部はプレイリストに同じ曲が2回あるので1回だけ。
+- **曲別リンク**：各曲はそのプレイリストにある Spotify のトラックID（`tools/riot-games-creator-safe-playlist.json` の `rows`）へリンクする。IDは songdata.io の表示から写したもので、VALORANT の36行は VALORANT プレイリストの一覧と1件ずつ一致、3件（Deathfire Grasp、Leilani、For Demacia!）は公式の Spotify 埋め込み表示で曲名・アーティスト・ジャケットが一致した。
+- **アルバム名**：Pentakill の3作と、For Demacia・Pandemonium・Summoner's Snowdrift・Trials of Twilight の各OST（公式SoundCloudのアルバム名）だけ入れた。ほかは確かめられていないので空欄。
+- **検査**：`tools/check-repo.mjs` が、新しい12リストの全曲が記録したトラックIDの曲名・アーティストと一致すること、記録した927行のすべてが LoL・VALORANT・Riot Games のどれかのリストにあること（IDか、アルバム側のリストは曲名で）を確かめる。
+
 ### 次の確認（Phase 3 の残作業）
 
 1. 実ブラウザで Season 4〜9 の公式SoundCloudセットページを開き、アルバム見出しの Season 表記と曲数を確認する（Spotifyとの差があれば台帳とfixtureを直す）。
@@ -135,7 +154,8 @@ K/DAの全関連コンテンツを網羅したという意味ではない。Riot
 
 ### データと検査
 
-- 実装：`js/catalog.js` の `lol-champion-themes`、`lol-worlds-anthems`、`lol-msi-anthems`、`lol-kda-songs`、`lol-season-1`〜`lol-season-9`、`lol-warsongs`、`lol-popular-tracks`。
+- 実装：`js/catalog.js` の `lol-champion-themes`、`lol-worlds-anthems`、`lol-msi-anthems`、`lol-kda-songs`、`lol-season-1`〜`lol-season-9`、`lol-warsongs`、`lol-popular-tracks`、`lol-cs-pentakill`・`lol-cs-themes`・`lol-cs-esports`・`lol-cs-ost-2025`（trk118）。LoL関連ゲームはシリーズ `riot-games`。
+- Creator-Safe Playlist の記録：`tools/riot-games-creator-safe-playlist.json`（51〜977行目の曲名・アーティスト・トラックIDと、そこから作ったリストの照合状態）。
 - 検査データ：`tools/leagueoflegends-music-tracklist.json`。
 - Phase 3 の検査データ：`tools/leagueoflegends-soundcloud-albums-tracklist.json`（アルバムごとの公式SoundCloud URL・公式SpotifyアルバムURL・曲順つきの全曲、人気曲30件、取得方法と地域制限の記録）。
 - Sessions の既存データ：`tools/leagueoflegends-sessions-tracklist.json`。
@@ -145,7 +165,7 @@ K/DAの全関連コンテンツを網羅したという意味ではない。Riot
 
 ## 未収録・次段階
 
-1. **旧Champion Theme／旧ログインテーマ**：2010年代の公開先・地域版・アルバム収録を照合し、個別の曲名と公式配信先が確認できたものから追加。曲が存在しないチャンピオンへテーマを割り当てない。
+1. **旧Champion Theme／旧ログインテーマ**：Creator-Safe Playlistにある旧ログインテーマは trk118 で `lol-cs-themes` に入れた。それ以外は、2010年代の公開先・地域版・アルバム収録を照合し、個別の曲名と公式配信先が確認できたものから追加。曲が存在しないチャンピオンへテーマを割り当てない。
 2. **その他のチャンピオン関連曲／バーチャルアーティスト**：K/DAは「POP/STARS」と「ALL OUT」収録5曲を別リストに追加済み。その他のK/DA作品、True Damageの他作品（Worlds 2026「Know My Name」はWorlds枠で収録済み）、HEARTSTEEL、PentakillなどはChampion Themeと混ぜず、プロジェクト／イベント別に調査・収録する。
 3. **Skin Theme／イベント曲**：Riot公式Musicタグの「Skin Theme」「Event Theme」や、季節イベント・ゲームモードの公式公開曲を別リストにする。現時点で候補を見つけても、分類・公式個別リンクを確認するまでは未収録。
 4. **ゲームOST／映像OST**：シーズン別OST「The Music of League of Legends: Season 1〜9」と「Warsongs」はアルバム別プレイリストとして収録済み（Phase 3）。残るは公式SoundCloudアルバム一覧に出ている他のOSTと Arcane 系の映像OSTで、収録順・重複・ゲーム内曲／映像曲の区別とともにアルバム別に照合する。手がかりとして確認済みの公式SpotifyアルバムID：`Pandemonium`（2026）`78RpNOe76RHMhCRZbJS68n`、`For Demacia`（2026）`4UPfbzGfDeKVC8wiMEwrJA`、`Trials of Twilight`（2025）`7mpX4l9M8bFRZOQb73qEbd`、`Spirit Blossom Beyond`（2025）`0mNCXeb7azjErkTqoaR4BA`、`Welcome to Noxus`（2025）`7oCUh77MwNd0x12QjA7F5K`、`Arcane`（2021）`0jV32pIk8l3vTaU3thTaW2`、`Arcane Season 2`（2024）`18r1yGUJUNHXYj1DQU0qIE`。

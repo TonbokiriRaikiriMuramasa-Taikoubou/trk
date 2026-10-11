@@ -1,6 +1,6 @@
 # VALORANT 楽曲カタログ調査台帳
 
-> 最終更新：2026-10-12（trk117）。trk! の 🛒 公式カタログ「🎯 VALORANT」の収録範囲・出典・Creator-Safe の照合状態の記録です。音源は同梱しません。LoL の記録は [LoL楽曲カタログ調査台帳](LEAGUE-OF-LEGENDS-MUSIC.md) にあります。
+> 最終更新：2026-10-12（trk118）。trk! の 🛒 公式カタログ「🎯 VALORANT」の収録範囲・出典・Creator-Safe の照合状態の記録です。音源は同梱しません。LoL の記録は [LoL楽曲カタログ調査台帳](LEAGUE-OF-LEGENDS-MUSIC.md) にあります。
 
 ## 収録範囲
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | VALORANT Champions Anthems（`val-themes`） | Champions 2021〜2026 のアンセム6曲：Die For You（Grabbitz）、Fire Again（Ashnikko）、Ticking Away（Grabbitz, bbno$）、SUPERPOWER（KISS OF LIFE, Mark Tuan）、Last Shot（templuv, 347aidan）、If The Sun Burns Out Tonight（Grabbitz, Oli Sykes, Courtney LaPlante） | 公式YouTube動画 |
 | VALORANT Agent Themes（`val-agent-themes`） | エージェント関連曲3曲：Entertain Me（Neon。Ylona Garcia）、On My Level（Phoenix。Ashley Warren, Bjorn Nilsson）、greater than one（Gekko。ericdoa, VALORANT） | 公式YouTube動画／公式Spotify個別曲 |
+| VALORANT Creator-Safe（`val-cs`・trk118） | VALORANT 公式 Creator-Safe Playlist の39曲（全40曲。「Míranos」は2つの版が入っているので1曲）。プレイリストの順 | 公式Spotify個別曲（そのプレイリストにあるトラックID） |
 
 これは VALORANT の全楽曲ではありません。
 
@@ -23,6 +24,7 @@ Riot の [Creator-Safe ガイドライン](https://www.riotgames.com/en/riot-mus
 |---|---|---|
 | Champions Anthems（6曲） | **見当たらない**（links-absent・0/6） | 6曲ともどちらのプレイリストにも無い。6曲とも外部アーティストとの共同制作曲 |
 | Agent Themes（3曲） | **見当たらない**（links-absent・0/3） | 3曲ともどちらのプレイリストにも無い |
+| VALORANT Creator-Safe（39曲・trk118） | **全曲あり**（links-verified・39/39） | プレイリストの曲から作ったリスト。トラックIDは `creatorSafe.entries` の3つ目の値（songdata.io の一覧から写し、うち36件は Riot Games プレイリストの行と一致） |
 
 プレイリストに入っているのは、Shyloom 名義のゲーム内曲（MIND THE DROP、TRANQUIL など）、VCT 関連曲（Karanlığın、RAJA、VISIONS、REFLECTIONS、Villain (Take the Shot) など）、Casa de Vidro、Savior、Les rêves d’hier などで、本カタログの9曲とは別の曲。
 
@@ -36,4 +38,5 @@ Riot の [Creator-Safe ガイドライン](https://www.riotgames.com/en/riot-mus
 
 ## 次の確認
 
-1. 新しいアンセムやエージェント曲を足すときは、同じプレイリストと照合して `tools/valorant-creator-safe.json` と `VAL_CREATOR_SAFE` を同時に更新する（`check-repo` が一致を見る）。
+1. プレイリストに曲が増えたら、`creatorSafe.entries` と「VALORANT Creator-Safe」リストを同時に更新する（`check-repo` が、リストの各曲が記録したトラックIDの曲名・アーティストと一致することを確かめる）。
+2. 新しいアンセムやエージェント曲を足すときは、同じプレイリストと照合して `tools/valorant-creator-safe.json` と `VAL_CREATOR_SAFE` を同時に更新する（`check-repo` が一致を見る）。

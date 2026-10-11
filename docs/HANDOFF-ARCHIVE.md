@@ -1,8 +1,12 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移したtrk70〜trk114の履歴です。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
+> `docs/HANDOFF.md` から移したtrk70〜trk115の履歴です。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
 
 ## 旧 HANDOFF §11「最近の変更」
+
+### trk115 の記録（2026-10-12。trk118のときに HANDOFF §7 から移動）
+
+- **trk115（2026-10-12）**：LoLのCreator-Safe照合を101曲目以降へ広げた。公式の埋め込み表示は先頭100曲までなので、プレイリスト全体を表示する第三者サイトsongdata.ioで51〜300番目を読み、Season 7の残り7曲・Season 1〜6の全136曲・Warsongs 10曲を照合（51〜100番目は公式の埋め込みと完全一致することを確認）。Season 1〜9を照合済み（verified）、Warsongsを一部照合済み（partial・10/11、「Silver Scrapes」は未照合）にし、推測で「可能性が高い」とした likely 状態と文言（4言語）を廃止。partialの文言は「一部の曲は対象（照合済み）、残りは未照合・要確認」に変更。fixtureに根拠（embed／mirror）と第三者サイトの記録、公式SoundCloudのCreator-Safe Playlist Pt. I／IIを追加し、`check-repo` で一致・曲数・根拠を検査（7通りの改変でFAILを確認）。台帳・ガイド（ja／en）・`sw.js` cache名（`trk-v2026.10.12-trk115`）を更新。
 
 ### trk114 の記録（2026-10-11。trk117のときに HANDOFF §7 から移動）
 

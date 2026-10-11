@@ -665,7 +665,8 @@ if (!exists("js/fx-worklet.js") ||
     const valEntryTitles = new Set((valCs.entries || []).map(entry => normTitle(entry[0])));
     valorantCsOk = !!valorant && valCs.playlist === "https://open.spotify.com/playlist/4tyTLcBxJnf7DcQcHjwt0W" &&
       Array.isArray(valCs.entries) && valCs.entries.length === 40 &&
-      valCs.entries.every(entry => Array.isArray(entry) && entry.length === 2 && entry.every(part => typeof part === "string" && part)) &&
+      valCs.entries.every(entry => Array.isArray(entry) && entry.length === 3 && entry.every(part => typeof part === "string" && part) &&
+        /^[A-Za-z0-9]{22}$/.test(entry[2])) &&
       valCs.soundcloudPlaylist && valCs.soundcloudPlaylist.url === "https://soundcloud.com/valorant/sets/valorant-creator-safe-playlist" &&
       Array.isArray(valFixture.lists) && valFixture.lists.length === valorant.playlists.length &&
       valorant.playlists.every(pl => {
@@ -674,9 +675,9 @@ if (!exists("js/fx-worklet.js") ||
         const titles = pl.songs.map(track => track.t);
         const found = titles.filter(title => valEntryTitles.has(normTitle(title)));
         const missing = titles.filter(title => !valEntryTitles.has(normTitle(title)));
-        const statusFromEvidence = found.length === titles.length ? "verified" : found.length ? "links-partial" : "links-absent";
+        const statusFromEvidence = found.length === titles.length ? "links-verified" : found.length ? "links-partial" : "links-absent";
         return c.status === statusFromEvidence && pl.creatorSafe === c.status && c.matchedTracks === found.length &&
-          (c.status === "verified" ? c.notFound === undefined : JSON.stringify(c.notFound) === JSON.stringify(missing)) &&
+          (c.status === "links-verified" ? c.notFound === undefined : JSON.stringify(c.notFound) === JSON.stringify(missing)) &&
           c.evidence === "embed" && /^2026-\d{2}-\d{2}$/.test(c.checkedAt || "");
       }) &&
       valorant.note.includes("VALORANT公式Creator-Safe Playlist") && valorant.note.includes("見当たりませんでした") &&
@@ -767,7 +768,7 @@ if (!exists("js/fx-worklet.js") ||
   else if (!valorantCsOk) fail("VALORANT Creator-Safe: js/catalog.js VAL_CREATOR_SAFE must follow tools/valorant-creator-safe.json (all 40 entries of the official VALORANT Creator-Safe Playlist; matchedTracks/notFound computed from them) and the series note must say the catalog songs were not found");
   else if (!aliasBehaviorOk) fail("Gakumas SEARCH RIGHT must retain its official title and match the verified SEARCH LIGHT Drive filename after wish sanitization");
   else if (!safeRefreshOk) fail("Gakumas refresh must carry aliases, preserve owned/custom data, migrate legacy wishes, and keep instrumental/discography lists separate");
-  else ok("VALORANT / Arknights / Genshin / OJ / Gakumas: official links, cautious rights notes, VALORANT Creator-Safe status (9 songs not in the 40-entry official playlist), SEARCH RIGHT alias and safe list refresh");
+  else ok("VALORANT / Arknights / Genshin / OJ / Gakumas: official links, cautious rights notes, VALORANT Creator-Safe status (9 catalog songs not in the 40-entry official playlist; the VALORANT Creator-Safe list holds its 39 songs), SEARCH RIGHT alias and safe list refresh");
 }
 
 // 🎒 Blue Archive OST Vol.1–8: official order, track-level Apple Music IDs,
@@ -1291,7 +1292,7 @@ if (!exists("js/fx-worklet.js") ||
     const actual = expected.map(list => (series ? series.playlists.find(pl => pl.id === list.id) : null));
     /* 既存の7リスト（Sessions 3＋Champion Themes／Worlds／MSI／K/DA）の後ろに、Season 1→9・Warsongs・人気曲の順 */
     const orderOk = !!series && actual.every(Boolean) &&
-      JSON.stringify(series.playlists.slice(7).map(pl => pl.id)) === JSON.stringify(expected.map(list => list.id));
+      JSON.stringify(series.playlists.slice(7, 7 + expected.length).map(pl => pl.id)) === JSON.stringify(expected.map(list => list.id));
     const trackUrl = (list, target) => list.id === popular.id
       ? "https://soundcloud.com/leagueoflegends/" + target
       : "https://open.spotify.com/track/" + target;
@@ -1353,7 +1354,7 @@ if (!exists("js/fx-worklet.js") ||
        101曲目以降は公式の埋め込みに出ないので songdata.io の一覧で照合した。mirror を使うならその記録を fixture に残す。
        シリーズの説明も「全曲」「一部」「見当たらない」を書き分ける（照合していないものを対象と書かない）。 */
     const statusOf = id => ((series && series.playlists.find(pl => pl.id === id)) || {}).creatorSafe;
-    const lolStatuses = new Set(["verified", "partial", "links-partial", "links-absent", "mixed", "unverified", "unknown"]);
+    const lolStatuses = new Set(["verified", "partial", "links-verified", "links-partial", "links-absent", "mixed", "unverified", "unknown"]);
     const evidenceKinds = new Set(["embed", "mirror", "embed+mirror"]);
     const mirrorOk = !!(fixture.creatorSafe && fixture.creatorSafe.mirror &&
       fixture.creatorSafe.mirror.url === "https://songdata.io/playlist/5hDYD44imzFZEqTfAoco1N" &&
@@ -1365,13 +1366,16 @@ if (!exists("js/fx-worklet.js") ||
       { id: popular.id, cs: popular.creatorSafe, titles: popular.tracks.map(track => track[0]) },
       ...["championThemes", "worldsAnthems", "msiAnthems", "kdaSongs"].map(key =>
         ({ id: musicFixture[key].id, cs: musicFixture[key].creatorSafe, titles: musicFixture[key].tracks.map(track => track.title) })),
-      ...sessionsFixture.albums.map(album => ({ id: album.id, cs: album.creatorSafe, titles: album.tracks.map(track => track[0]) }))
+      ...sessionsFixture.albums.map(album => ({ id: album.id, cs: album.creatorSafe, titles: album.tracks.map(track => track[0]) })),
+      /* trk118：プレイリストの曲から作った4リスト（曲名はカタログ側、根拠は riot-games-creator-safe-playlist.json） */
+      ...JSON.parse(read("tools/riot-games-creator-safe-playlist.json")).lists.filter(list => list.series === "lol").map(list =>
+        ({ id: list.id, cs: list.creatorSafe, titles: ((series && series.playlists.find(pl => pl.id === list.id)) || { songs: [] }).songs.map(track => track.t) }))
     ];
     const csListOk = ({ id, cs, titles }) => {
       const c = cs || {};
       const nf = c.notFound;
       const notFoundOk = n => Array.isArray(nf) && nf.length === n && new Set(nf).size === n && nf.every(title => titles.includes(title));
-      const countOk = c.status === "verified" ? c.matchedTracks === titles.length && nf === undefined
+      const countOk = (c.status === "verified" || c.status === "links-verified") ? c.matchedTracks === titles.length && titles.length > 0 && nf === undefined
         : (c.status === "partial" || c.status === "links-partial" || c.status === "mixed")
           ? c.matchedTracks > 0 && c.matchedTracks < titles.length && notFoundOk(titles.length - c.matchedTracks)
           : c.status === "links-absent" ? c.matchedTracks === 0 && notFoundOk(titles.length)
@@ -1385,14 +1389,15 @@ if (!exists("js/fx-worklet.js") ||
     creatorSafeOk = !!series && fixture.sources.creatorSafePlaylist === "https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N" &&
       fixture.creatorSafe && fixture.creatorSafe.playlist === fixture.sources.creatorSafePlaylist &&
       series.playlists.every(pl => lolStatuses.has(pl.creatorSafe)) &&
-      csLists.length === 18 && new Set(csLists.map(list => list.id)).size === 18 &&
-      series.playlists.length === 18 && series.playlists.every(pl => csLists.some(list => list.id === pl.id)) &&
+      csLists.length === 22 && new Set(csLists.map(list => list.id)).size === 22 &&
+      series.playlists.length === 22 && series.playlists.every(pl => csLists.some(list => list.id === pl.id)) &&
       csLists.every(csListOk) &&
       idsWith("verified") === [...seasonIds, "lol-svi", "lol-staliyah"].sort().join() &&
       idsWith("partial") === "lol-sdiana,lol-warsongs" &&
       idsWith("links-partial") === "lol-champion-themes,lol-worlds-anthems" &&
       idsWith("links-absent") === "lol-kda-songs,lol-msi-anthems" &&
       idsWith("mixed") === "lol-popular-tracks" &&
+      idsWith("links-verified") === "lol-cs-esports,lol-cs-ost-2025,lol-cs-pentakill,lol-cs-themes" &&
       ["Season 1〜9の全243曲", "songdata.io", "979曲中977曲", "41曲中39曲", "43曲中42曲", "11曲中10曲", "Silver Scrapes", "30曲中7曲",
         "MSIアンセム4曲とK/DA 6曲は見当たりませんでした", "Creator-Safe対象外・要確認"].every(word => series.note.includes(word)) &&
       !series.note.includes("の対象として扱います") && !series.note.includes("可能性が高い") && !series.note.includes("K/DAもCreator-Safe対象かは未確認");
@@ -1469,14 +1474,16 @@ if (!exists("js/fx-worklet.js") ||
         ["lol-champion-themes", "plGuideRiotLinksPartial", ["公式リンク集", "一部の曲はCreator-Safe対象", "見当たらない"]],
         ["lol-worlds-anthems", "plGuideRiotLinksPartial", ["公式リンク集", "一部の曲はCreator-Safe対象", "見当たらない"]],
         ["lol-msi-anthems", "plGuideRiotLinksAbsent", ["公式リンク集", "見当たらない", "Creator-Safe対象外・要確認"]],
-        ["lol-kda-songs", "plGuideRiotLinksAbsent", ["公式リンク集", "見当たらない", "Creator-Safe対象外・要確認"]]];
+        ["lol-kda-songs", "plGuideRiotLinksAbsent", ["公式リンク集", "見当たらない", "Creator-Safe対象外・要確認"]],
+        ...["lol-cs-pentakill", "lol-cs-themes", "lol-cs-esports", "lol-cs-ost-2025"].map(id =>
+          [id, "plGuideRiotLinksVerified", ["公式リンク集", "全曲がCreator-Safe対象", "照合済み"]])];
       const otherGuidesOk = otherGuides.every(([id, key, words]) => {
         const guide = createdGuide(id);
         return guide.key === key && guide.note === LIBRARY_TEXT_FOR_CHECK.ja[key] && words.every(word => guide.note.includes(word)) &&
           guide.note.includes("二次利用許諾ではありません");
       });
       const guideOf = album => (album.id === seasonOne.id ? autoExisting : testSettings.playlists.find(p => p.id === "trk-" + album.id) || {}).guide || {};
-      const allGuideKeys = [...Object.values(guideKeyFor), "plGuideRiotLinksPartial", "plGuideRiotLinksAbsent", "plGuideLolPopular", "plGuideRiotLinks"];
+      const allGuideKeys = [...Object.values(guideKeyFor), "plGuideRiotLinksVerified", "plGuideRiotLinksPartial", "plGuideRiotLinksAbsent", "plGuideLolPopular", "plGuideRiotLinks"];
       guideWordingOk = fixture.albums.every(album => {
         const guide = guideOf(album), status = album.creatorSafe.status;
         return guide.key === guideKeyFor[status] && guide.note === LIBRARY_TEXT_FOR_CHECK.ja[guide.key] &&
@@ -1500,7 +1507,72 @@ if (!exists("js/fx-worklet.js") ||
   else if (!safeRefreshOk) fail("LoL SoundCloud album imports must refresh wishes/guides, keep owned songs and customized name/icon/tags, create every Season/Warsongs/popular list under trk-lol, and describe the popular-tracks page as a page, not an album");
   else if (!creatorSafeOk) fail("LoL Creator-Safe status: js/catalog.js LOL_CREATOR_SAFE must match every list's creatorSafe in the three LoL fixtures (verified = all found: Season 1–9, Sessions Vi/Taliyah; partial = Warsongs, Sessions Diana; links-partial = Champion Themes, Worlds; links-absent = MSI, K/DA; mixed = popular tracks), with matched counts, notFound titles from the list, evidence (embed/mirror, songdata.io recorded), and a series note that keeps found, partly found and not-found lists apart");
   else if (!guideWordingOk) fail("LoL playlist guides must follow each playlist's Creator-Safe status (照合済み／一部の曲は対象・残りは見当たらない・要確認／公式リンク集の一部・見当たらない; popular tracks: 一部だけ・共同制作曲などは対象外・要確認) in all four languages, never the old blanket claim or the retired 'likely'/'sessions' wording");
-  else ok(`LoL SoundCloud albums: Season 1–9 (243 tracks) + Warsongs (11) + popular-tracks snapshot (30), official album/track links, ${autoCreated} auto-created trk playlists within the 100 cap, safe refresh, per-playlist Creator-Safe status for all 18 LoL lists (all found: Season 1–9 + Sessions Vi/Taliyah; partly: Champion Themes 39/41, Sessions Diana 42/43, Warsongs 10/11, Worlds 1/13, popular 7/30; none: MSI, K/DA)`);
+  else ok(`LoL SoundCloud albums: Season 1–9 (243 tracks) + Warsongs (11) + popular-tracks snapshot (30), official album/track links, ${autoCreated} auto-created trk playlists within the 100 cap, safe refresh, per-playlist Creator-Safe status for all 22 LoL lists (all found: Season 1–9 + Sessions Vi/Taliyah + the 4 lists built from the playlist; partly: Champion Themes 39/41, Sessions Diana 42/43, Warsongs 10/11, Worlds 1/13, popular 7/30; none: MSI, K/DA)`);
+}
+
+// 🛡️ Riot Creator-Safe lists (trk118): lists built from the official Creator-Safe playlists. Every song links to a
+// Spotify track ID recorded in tools/riot-games-creator-safe-playlist.json (Riot Games playlist, rows 51–977) or
+// tools/valorant-creator-safe.json (VALORANT playlist, all 40 entries) with the same title and artists, and every
+// row of the Riot Games playlist is now in some LoL / VALORANT / Riot Games list (by ID, or by title for the album lists).
+{
+  let csListsOk = false;
+  let coverageOk = false;
+  let coverageNote = "";
+  let songCount = 0;
+  try {
+    const catalogContext = vm.createContext({});
+    new vm.Script(read("js/catalog.js") + "\nglobalThis.__TRK_CATALOG_FOR_CHECK = TRK_CATALOG;").runInContext(catalogContext);
+    const all = catalogContext.__TRK_CATALOG_FOR_CHECK;
+    const fixture = JSON.parse(read("tools/riot-games-creator-safe-playlist.json"));
+    const valFixture = JSON.parse(read("tools/valorant-creator-safe.json"));
+    const lol = all.find(item => item.id === "lol"), val = all.find(item => item.id === "valorant"), rg = all.find(item => item.id === "riot-games");
+    const riotCs = "https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N", valCsUrl = "https://open.spotify.com/playlist/4tyTLcBxJnf7DcQcHjwt0W";
+    const guidelines = "https://www.riotgames.com/en/riot-music-creator-safe-guidelines";
+    const spotifyId = url => (/^https:\/\/open\.spotify\.com\/track\/([A-Za-z0-9]{22})$/.exec(url || "") || [])[1];
+    const rowById = new Map(fixture.rows.map(row => [row[1], { title: row[2], artists: row[3] }]));
+    const valById = new Map(valFixture.creatorSafe.entries.map(entry => [entry[2], { title: entry[0], artists: entry[1] }]));
+    const fxLists = new Map(fixture.lists.map(list => [list.id, list]));
+    const builtFrom = (pl, byId, sourceUrl) => {
+      const ids = pl.songs.map(track => spotifyId(track.u));
+      return pl.creatorSafe === "links-verified" && pl.songs.length > 0 && pl.songs.length <= 100 && pl.name.length <= 24 &&
+        pl.sourceUrl === sourceUrl && ids.every(Boolean) && new Set(ids).size === ids.length &&
+        pl.songs.every((track, i) => { const row = byId.get(ids[i]); return !!row && track.t === row.title && track.ar === row.artists; });
+    };
+    const recorded = (pl, series) => {
+      const listed = fxLists.get(pl.id), c = (listed && listed.creatorSafe) || {};
+      return !!listed && listed.series === series && c.status === "links-verified" && c.matchedTracks === pl.songs.length &&
+        c.evidence === "mirror" && /^2026-\d{2}-\d{2}$/.test(c.checkedAt || "");
+    };
+    const lolIds = ["lol-cs-pentakill", "lol-cs-themes", "lol-cs-esports", "lol-cs-ost-2025"];
+    const rgIds = ["riot-cs-ruined-king", "riot-cs-mageseeker", "riot-cs-hextech-mayhem", "riot-cs-tft-1", "riot-cs-tft-2", "riot-cs-2xko", "riot-cs-wild-rift"];
+    const lolLists = lol ? lol.playlists.slice(-4) : [];
+    const rgLists = rg ? rg.playlists : [];
+    const valCs = val && val.playlists.find(pl => pl.id === "val-cs");
+    songCount = [...lolLists, ...rgLists, ...(valCs ? [valCs] : [])].reduce((sum, pl) => sum + pl.songs.length, 0);
+    csListsOk = fixture.playlist === riotCs && Array.isArray(fixture.rows) && fixture.rows.length === 927 &&
+      fixture.rows.every(row => Array.isArray(row) && row.length === 4 && Number.isInteger(row[0]) && /^[A-Za-z0-9]{22}$/.test(row[1]) &&
+        typeof row[2] === "string" && row[2] && typeof row[3] === "string" && row[3]) &&
+      JSON.stringify(lolLists.map(pl => pl.id)) === JSON.stringify(lolIds) && lolLists.every(pl => builtFrom(pl, rowById, riotCs) && recorded(pl, "lol")) &&
+      !!rg && rg.url === guidelines && JSON.stringify(rgLists.map(pl => pl.id)) === JSON.stringify(rgIds) &&
+      rgLists.every(pl => builtFrom(pl, rowById, riotCs) && recorded(pl, "riot-games")) &&
+      fixture.lists.length === lolIds.length + rgIds.length &&
+      !!valCs && valCs.songs.length === 39 && builtFrom(valCs, valById, valCsUrl) &&
+      ["Riot公式Creator-Safe Playlist", "全曲がCreator-Safe対象", "songdata.io", "二次利用許諾ではありません", "Legal Jibber Jabber"].every(word => rg.note.includes(word)) &&
+      lol.note.includes("4リストを作りました") && val.note.includes("「VALORANT Creator-Safe」リスト");
+    const normTitle = title => String(title).normalize("NFKC").replace(/[’‘]/g, "'").toLowerCase()
+      .replace(/\s*\((?:feat\.|ft\.)[^)]*\)\s*$/, "").replace(/\s*[-–]\s*champion theme\s*$/, "").replace(/\s+/g, " ").trim();
+    const catalogSongs = [lol, val, rg].flatMap(item => (item ? item.playlists.flatMap(pl => pl.songs) : []));
+    const catalogIds = new Set(catalogSongs.map(track => spotifyId(track.u)).filter(Boolean));
+    const catalogTitles = new Set(catalogSongs.map(track => normTitle(track.t)));
+    const uncovered = fixture.rows.filter(row => !catalogIds.has(row[1]) && !catalogTitles.has(normTitle(row[2])));
+    coverageOk = uncovered.length === 0;
+    coverageNote = uncovered.slice(0, 5).map(row => row[0] + ":" + row[2]).join(", ");
+  } catch (error) {
+    console.error(`WARN  Riot Creator-Safe list test setup failed: ${error.message}`);
+  }
+  if (!csListsOk) fail("Riot Creator-Safe lists (trk118): the 4 LoL lists, the 7 Riot Games lists and VALORANT Creator-Safe must link only to recorded Spotify track IDs with the same title and artists (≤100 songs, no duplicates, official playlist as the source), be links-verified in the catalog and the fixture, and keep the rights notes");
+  else if (!coverageOk) fail(`Riot Creator-Safe coverage: rows of the Riot Games Creator-Safe Playlist that are in no LoL / VALORANT / Riot Games list: ${coverageNote}`);
+  else ok(`Riot Creator-Safe lists: 12 lists (${songCount} songs) built from the official Creator-Safe playlists, every song on a recorded Spotify track ID; all 927 recorded rows of the Riot Games playlist are in the catalog`);
 }
 
 // ⚠ el(tag, cls, text) は文字を1つしか入れられない（入れ子を渡すと "[object ...]" になる）。

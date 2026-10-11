@@ -22,6 +22,7 @@ vm.runInContext(catalogSrc + "\nglobalThis.__catalog = TRK_CATALOG;", catalogCon
 const catalog = catalogContext.__catalog;
 const lol = catalog.find(series => series.id === "lol");
 const valorant = catalog.find(series => series.id === "valorant");
+const riotGames = catalog.find(series => series.id === "riot-games");
 
 function sandbox(settings, { lang = "ja", series = [lol] } = {}) {
   const calls = { saves: 0, ensureGame: 0, ensureClassic: 0 };
@@ -174,7 +175,7 @@ describe("catalog guides follow the UI language", () => {
         "the retired '" + retired + "' status falls back to the links-only wording");
     assert.match(context.TEXT.ja.plGuideLolPopular, /一部だけCreator-Safe対象.*共同制作曲などは対象外・要確認/);
     /* trk117：VALORANT も同じ状態と文言。公式Creator-Safe Playlist（全40曲）に収録の9曲は見当たらない */
-    for (const pl of valorant.playlists) {
+    for (const pl of valorant.playlists.filter(list => list.id !== "val-cs")) {
       assert.equal(pl.creatorSafe, "links-absent", pl.id);
       const guide = api.trkCatalogGuide(valorant, pl);
       assert.equal(guide.key, "plGuideRiotLinksAbsent", pl.id);
@@ -184,6 +185,24 @@ describe("catalog guides follow the UI language", () => {
       "an unknown VALORANT status never reads as Creator-Safe");
     assert.equal(api.trkCatalogGuide(valorant).key, "plGuideRiotLinks", "the series itself keeps the links-only wording");
     assert.doesNotMatch(context.TEXT.ja.plGuideRiotLinksAbsent, /LoL|League/, "the shared wording names no single game");
+    /* trk118：Creator-Safe プレイリストの曲から作ったリストは「全曲が対象」の文言。LoL の4リストは自動作成、
+       VALORANT Creator-Safe と LoL関連ゲーム（riot-games）は🛒公式カタログから取り込む */
+    for (const id of ["lol-cs-pentakill", "lol-cs-themes", "lol-cs-esports", "lol-cs-ost-2025"]) {
+      assert.equal(keyOf(id), "plGuideRiotLinksVerified", id);
+      assert.equal(api.trkCatalogGuide(lol, lol.playlists.find(pl => pl.id === id), true).url, "https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N", id);
+    }
+    const valCs = valorant.playlists.find(pl => pl.id === "val-cs");
+    assert.equal(api.trkCatalogGuide(valorant, valCs).key, "plGuideRiotLinksVerified");
+    assert.equal(valCs.songs.length, 39);
+    assert.ok(riotGames && riotGames.playlists.length === 7, "the Riot Games series holds seven lists");
+    for (const pl of riotGames.playlists) {
+      const guide = api.trkCatalogGuide(riotGames, pl);
+      assert.equal(guide.key, "plGuideRiotLinksVerified", pl.id);
+      assert.equal(guide.url, "https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N", pl.id);
+      assert.ok(pl.songs.length <= 100 && pl.songs.every(track => /^https:\/\/open\.spotify\.com\/track\/[A-Za-z0-9]{22}$/.test(track.u)), pl.id);
+    }
+    assert.match(context.TEXT.ja.plGuideRiotLinksVerified, /^公式リンク集.*全曲がCreator-Safe対象.*照合済み/);
+    for (const lang of ["en", "zh", "ko"]) assert.ok(context.TEXT[lang].plGuideRiotLinksVerified !== context.TEXT.ja.plGuideRiotLinksVerified, lang);
     assert.ok(context.TEXT.ja.plGuideLolPopular.length <= 80, "the popular-tracks note stays short");
   });
 

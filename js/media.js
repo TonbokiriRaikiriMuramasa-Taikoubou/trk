@@ -59,14 +59,28 @@ async function loadMedia(file, opts = {}) {
   let playbackFile = file;
   core.setStatus("loadStatus", midiInput ? "midiRendering" : "loading");
   if (midiInput) {
-    try { playbackFile = await midi.renderFile(file, { profileId:core.settings.midiSoundProfile }); }
+    /* 長い・音の多いMIDIは変換に時間がかかるので、5%刻みで進み具合を出す。
+       別の曲を読み込んだら（loadToken が変わったら）次の区切りで変換を止める。 */
+    let shownPercent = 0;
+    const onProgress = fraction => {
+      if (token !== core.loadToken) return;
+      const percent = Math.floor(Math.max(0, Math.min(1, Number(fraction) || 0)) * 20) * 5;
+      if (percent <= shownPercent || percent >= 100) return;
+      shownPercent = percent;
+      core.setStatus("loadStatus", "midiRenderingProgress", { p:percent });
+    };
+    try {
+      playbackFile = await midi.renderFile(file, { profileId:core.settings.midiSoundProfile,
+        shouldAbort:() => token !== core.loadToken, onProgress });
+    }
     catch (error) {
       if (token !== core.loadToken) return false;
       const status = error && error.code === "midi-too-large" ? "midiTooLarge"
         : error && error.code === "midi-too-long" ? "midiTooLong"
           : error && error.code === "midi-smpte-unsupported" ? "midiUnsupported"
             : error && error.code === "midi-unsupported-format" ? "midiFormatUnsupported"
-              : error && ["midi-event-limit", "midi-track-limit", "midi-too-dense"].includes(error.code) ? "midiTooComplex" : "midiError";
+              : error && error.code === "midi-too-dense" ? "midiTooDense"
+                : error && ["midi-event-limit", "midi-track-limit"].includes(error.code) ? "midiTooComplex" : "midiError";
       core.setStatus("loadStatus", status);
       core.updateChartButtons();
       return false;

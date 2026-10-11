@@ -20,11 +20,11 @@ assert.ok(analysisConstants.every(Boolean), "media analysis caps are declared");
 assert.ok(loadStart >= 0 && loadEnd > loadStart, "loadMedia() can be isolated for a dependency-free behavior test");
 const loadMediaSource = media.slice(loadStart, loadEnd + 2);
 
-async function runMidi({ errorCode = "" } = {}) {
+async function runMidi({ errorCode = "", progress = [], loadAgainDuringRender = false } = {}) {
   const handlers = Object.create(null);
   const statuses = [];
   const objectUrlFiles = [];
-  const calls = { render:0, analyze:0, chart:0, analyzedFile:null, profileId:"" };
+  const calls = { render:0, analyze:0, chart:0, analyzedFile:null, profileId:"", abortBefore:null, abortAfter:null, percents:[] };
   const playbackFile = new Blob(["rendered wav"], { type:"audio/wav" });
   const video = {
     duration:2,
@@ -36,7 +36,8 @@ async function runMidi({ errorCode = "" } = {}) {
   };
   const core = {
     phase:"title", loadToken:0, video, videoReady:false, analysis:null, chart:[], chartMode:"generated", fingerprint:"",
-    mediaURL:"", mediaName:"", settings:{ midiSoundProfile:"trk_neon" }, emit(){}, setStatus(key, value){ if (key === "loadStatus") statuses.push(value); },
+    mediaURL:"", mediaName:"", settings:{ midiSoundProfile:"trk_neon" }, emit(){},
+    setStatus(key, value, vars){ if (key !== "loadStatus") return; statuses.push(value); if (value === "midiRenderingProgress") calls.percents.push(vars && vars.p); },
     updateChartButtons(){}, baseName(name){ return name.replace(/\.[^.]+$/, ""); },
     $(){ return { textContent:"" }; }
   };
@@ -45,6 +46,10 @@ async function runMidi({ errorCode = "" } = {}) {
     async renderFile(_file, options){
       calls.render++;
       calls.profileId = options && options.profileId;
+      for (const value of progress) options.onProgress(value);
+      calls.abortBefore = options.shouldAbort();
+      if (loadAgainDuringRender) core.loadToken++;   // the user picked another song while this one rendered
+      calls.abortAfter = options.shouldAbort();
       if (errorCode) { const error = new Error(errorCode); error.code = errorCode; throw error; }
       return playbackFile;
     }
@@ -93,7 +98,21 @@ test("loadMedia renders MIDI locally, then analyzes and plays the generated WAV"
 test("loadMedia gives bounded-render failures a localized status without creating a playback URL", async () => {
   const result = await runMidi({ errorCode:"midi-too-dense" });
   assert.equal(result.loaded, false);
-  assert.deepEqual(result.statuses, ["midiRendering", "midiTooComplex"]);
+  assert.deepEqual(result.statuses, ["midiRendering", "midiTooDense"], "length × polyphony has its own message");
   assert.equal(result.objectUrlFiles.length, 0);
   assert.equal(result.calls.analyze, 0);
+  for (const code of ["midi-event-limit", "midi-track-limit"]) {
+    assert.deepEqual((await runMidi({ errorCode:code })).statuses, ["midiRendering", "midiTooComplex"], code);
+  }
+});
+
+test("loadMedia shows MIDI render progress in 5% steps and aborts when another song is loaded", async () => {
+  const result = await runMidi({ progress:[0.01, 0.1, 0.12, 0.5, 0.49, 1] });
+  assert.deepEqual(result.calls.percents, [10, 50], "small, repeated, backwards and 100% updates are skipped");
+  assert.equal(result.calls.abortBefore, false);
+  assert.equal(result.statuses.at(-1), "midiLoaded");
+  const replaced = await runMidi({ loadAgainDuringRender:true, errorCode:"midi-aborted" });
+  assert.equal(replaced.calls.abortAfter, true, "the renderer is told to stop once loadToken changes");
+  assert.equal(replaced.loaded, false);
+  assert.deepEqual(replaced.statuses, ["midiRendering"], "an aborted render shows no error for the old song");
 });

@@ -1,5 +1,7 @@
 # 名前空間の整理（レビュー項目4）— 計画と安全網
 
+> **trk114（2026-10-11）**：`js/fx.js`／`js/fx-presets.js` の凍結は、空さんの判断で**解除**しました（trk109 で fx.js に足した MIDI MIX の経路も追認）。以下で「凍結」とあるのは、その段階を進めた当時の制約の記録です。fx.js のために残している互換名（`chartMeta`・`phase`・`prefs`・`stats`・`videoReady` と読み取り専用の `_trkStudyRoomOpen`）は、fx.js 側を `window.Trk.core` へ書き換えれば外せます（未着手。音の経路に触れるので、実機の音を確認できるときに別の変更として行う）。
+
 > 対象：レビュー `docs/REVIEW-2026-10-08.md` の項目 4「グローバル名前空間が限界に近い」。
 > 目的：名前空間整理自体は**動きを変えずに**大域の名前を減らし、外へ出すものを `window.Trk.*` に集める。新機能は入れない。trk90 には別途、再レビューで合意した自動譜面の静かな区間 cap 修正も含む（詳細は `docs/HANDOFF.md` §2.3）。
 
@@ -70,7 +72,7 @@ node tools/smoke-browser.mjs --compare
 - 公開名（他のファイルが裸の名前で読む）を包むときは、末尾で `window.NAME = NAME;` と据え置く。対象は `function`・`const`（再代入されないもの）だけ。`let`・`var` で再代入される名前は、値が古くなるので「据え置き」の代入では出さない。**実施：`Object.defineProperty(window, …)` の get/set で、元の変数を読み書きする形にした**（値は常に一致する）。当初の「後の段階へ回す」からの変更（理由：`core.js` など再代入の多いファイルで、後回しにすると B が終わらないため）。
 - 包んだ直後は、そのファイルの中身を文字列で読んでいる検査（`tools/check-*.mjs`）が「包みの先頭」で壊れないかを必ず確かめる。
 - 順番：`study-room.js`（公開は `window.TrkStudyRoom` だけ）→ `tv-rich.js` → `pad.js` → `main.js` → `library.js` の順に小さいものから。
-- **触らない**：`js/fx.js`・`js/fx-presets.js`（凍結）。
+- **触らない**（trk113まで）：`js/fx.js`・`js/fx-presets.js`（凍結）。trk114で凍結は解除済み（冒頭の注記）。
 - 各コミットの後：`npm run check`・`npm test`・スモーク `--compare`・監査の数の変化を記録。`sw.js` のキャッシュ名は、公開コードを変えたコミットごとに上げる。
 
 - **差し替えられる関数**（後から別のファイルが `名前 = function …` で上書きする）は、窓の名前を get/set のアクセサにする（`Object.defineProperty(window, "名前", { get, set })`）。値のコピー（`window.X = X;`）だと、ファイル内部の呼び出しに差し替えが届かない（B 段階の欠陥。下の「回帰修正」を参照）。`tools/check-repo.mjs` の `PATCHED_FUNCTIONS` が見張る。
@@ -144,6 +146,7 @@ node tools/smoke-browser.mjs --compare
 | core | `js/core.js` | 116 名（`let` 約 40 名はアクセサ、差し替えられる `activeMods`・`applySkin`・`videoFilter` などはアクセサ、残りは値のコピー）。`_trkStudyRoomOpen`（互換の読み取り専用）は登録しない | 6013 | trk68 | 登録は core.js の末尾（読み込み順で領域の最初。core 以外の領域の名前は、この後の登録で出る）。書き換え 6013（代入の左辺を含む。core.js より後に読み込まれるファイルだけ）。検査：check-repo・check-security・check-lite・check-study-room の文字列照合は window.Trk.<領域>. を除いた本文で見る（overlay は除かない）。check-lite の仮想環境に window.Trk.core を用意。1 名抜いた逆テストで失敗（確認）。スモーク OK。ヘッドレス（差し替え・書斎/シンス）OK |
 | screen（窓の別名を削除） | `js/core.js` | `Object.defineProperty(window, "screen", …)` を削除（ブラウザ標準の `window.screen` を隠さない）。`window.Trk.core.screen` は残す。trk70時点は単独の例外。その後、trk90で他の旧core aliasもconsumer確認のうえ28件削除 | 0 | trk70 | 検査（`check-repo.mjs`）：定義を戻すと失敗（確認）。`js/fx.js` に `screen` 参照なし。スモーク OK。**trk100 の追記**：当時の「裸の参照なし」の確認は `js/tv-dock.js` を見落としていた（`screenName()`・`menuVideoWanted()` の裸の `screen`。core.js を包んだあと `window.screen`（オブジェクト）に静かに当たり、選曲画面のTV映像・確認タブ・メニュー再生が停止＝エラーが出ないためスモークの未解決名検査でも検出できなかった）。trk100 で `core.screen` へ修正し、局所変数も改名（`tv-dock.js` の TV画面div `screen`→`screenDiv`、`study-room.js` の `screen`→`tvScreen`）。`check-repo.mjs` に「js/core.js 以外の classic script に裸の `screen` 識別子を置かない」自動ガードを追加（逆テストで失敗を確認）、`tests/tv-screen-state.test.mjs`（8件）で実ソース断片の liveOn／previewOn／menuVideoWanted を検査する |
 | study（別名） | `js/study-room.js` | `window.Trk.study = window.TrkStudyRoom;`（凍結のオブジェクトの同じ参照。登録ではなく別名） | 0 | trk69 | 検査（`check-repo.mjs` の別名検査）：無い状態で失敗→追加後に通る。行を消す逆テストで失敗（確認）。スモーク OK |
+| touhouThemeData・library追加（trk114） | `js/touhou-theme-data.js`、`js/library.js` | TouhouThemeDBの固定データを `window.Trk.touhouThemeData`（凍結オブジェクト）に登録し、trk109〜113の `window.TrkTouhouThemeData` を削除。trk112〜113の `window.TrkEnsureTrkOstPlaylist`・`window.TrkOstPlaylistId` も削除し、`window.Trk.library` の `ensureTrkOstPlaylist`・`trkOstPlaylistId`・`trkRestoreRemoved` にした（library.js の外に読み手は無かった） | 2（`js/catalog.js`・`js/library.js`）＋テスト1 | trk114 | 検査（`check-repo.mjs` の trk114 ブロック：旧名が戻ると失敗）。スモーク `--compare` OK |
 
 
 **現在の結果（trk90）：** 棚卸しは宣言 1189・private 1009・public 180・衝突0・大域に残る名前288・window経由連携25。領域登録（chart・pad・lite・main・custom・library・media・data・play・modes・core）とstudy別名は完了。`window.screen` はtrk70でブラウザ標準を優先して削除済み。互換名の期限超過後、33件の旧core window aliasから28件を外し、凍結 `js/fx.js` が読む5件だけ保留した。`window.Trk.core` の33 accessorは維持する。残るaliasの期限とconsumerは `docs/ADDONS.md` §0、実機確認は HANDOFF §7。
@@ -153,7 +156,7 @@ node tools/smoke-browser.mjs --compare
 - スモーク `--compare` が NG で、原因が説明できない。
 - `npm run check`・`npm test` が落ちる（文字列検査の変更を伴う場合を除く）。
 - 譜面（10 ケース）のハッシュが変わる。
-- `js/fx.js`・`js/fx-presets.js` に変更が必要になった。
+- ~~`js/fx.js`・`js/fx-presets.js` に変更が必要になった。~~（trk114で凍結解除。停止条件から外した）
 
 ## 5. 残るリスク（正直に）
 

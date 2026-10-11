@@ -40,7 +40,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* ===== 4. プレイ中のHUD ===== */
 .topline{position:absolute;z-index:5;top:34px;left:70px;right:70px;display:flex;justify-content:space-between;
   font-size:22px;letter-spacing:.16em;color:var(--hud-text);text-shadow:0 2px 8px var(--hud-shadow)}
-.topline strong{color:var(--ui-accent)}
+.topline strong{color:var(--ui-accent-ink,var(--ui-accent))}
 #songTitle{margin-left:14px;font-size:17px;letter-spacing:.04em;opacity:.8;display:inline-block;max-width:560px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
 #clock{font-variant-numeric:tabular-nums}
@@ -189,7 +189,7 @@ details.panel>summary::after{content:"＋";color:var(--ui-muted)}
 details.panel[open]>summary::after{content:"－"}
 details.panel[open]>summary{margin-bottom:14px}
 .subPanel{margin-top:12px;border:1px dashed var(--ui-border);border-radius:14px;padding:10px 14px;background:var(--ui-soft)}
-.subPanel>summary{cursor:pointer;font-weight:800;font-size:16px;color:var(--ui-accent);list-style:none;display:flex;justify-content:space-between;align-items:center}
+.subPanel>summary{cursor:pointer;font-weight:800;font-size:16px;color:var(--ui-accent-ink,var(--ui-accent));list-style:none;display:flex;justify-content:space-between;align-items:center}
 .subPanel>summary::-webkit-details-marker{display:none}
 .subPanel>summary::after{content:"＋";color:var(--ui-muted);font-weight:normal}
 .subPanel[open]>summary::after{content:"－"}
@@ -216,7 +216,7 @@ select{padding:8px 10px;border-radius:10px;background:var(--ui-field);color:var(
 .hint{color:var(--ui-muted);font-size:14px;margin:6px 0;line-height:1.5}
 .status{color:var(--ui-gold);font-weight:700}
 .center{text-align:center}
-#eggStatus.egg{color:var(--ui-accent);font-weight:800}
+#eggStatus.egg{color:var(--ui-accent-ink,var(--ui-accent));font-weight:800}
 .seg{display:flex;flex-wrap:wrap;gap:6px;padding:5px;border-radius:16px;background:var(--ui-field);border:1px solid var(--ui-border)}
 .seg button{flex:1 1 0;border:none;border-radius:12px;background:transparent;padding:11px 12px;font-size:16px;white-space:nowrap}
 .seg button:hover{background:var(--ui-button-hover);border:none}
@@ -313,7 +313,7 @@ body.trkLiteStill #tvDock *,body.trkLiteStill #tvDock *::before,body.trkLiteStil
 body.trkLiteStill .cornerAnt *{animation:none!important}
 body.trkNoMascot #mmdCanvas,body.trkNoMascot #mmdPreview,body.trkNoMascot #mmdQuickPreview,
 body.trkNoMascot #vrmCanvas,body.trkNoMascot #vrmPreview{display:none!important}
-#litePanel.liteOn>summary::after{content:"🪶 ON";margin-left:8px;font-size:12px;font-weight:800;color:var(--ui-accent)}
+#litePanel.liteOn>summary::after{content:"🪶 ON";margin-left:8px;font-size:12px;font-weight:800;color:var(--ui-accent-ink,var(--ui-accent))}
 .liteState{font-weight:800}
 
 /* ===== 9. プレイ記録 ===== */
@@ -324,7 +324,7 @@ body.trkNoMascot #vrmCanvas,body.trkNoMascot #vrmPreview{display:none!important}
 .recTable{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
 .recTable th{text-align:left;color:var(--ui-muted);font-weight:700;padding:4px 6px;border-bottom:1px solid var(--ui-border)}
 .recTable td{padding:5px 6px;border-bottom:1px solid var(--ui-border)}
-.recTable tr.cur td{color:var(--ui-accent);font-weight:800}
+.recTable tr.cur td{color:var(--ui-accent-ink,var(--ui-accent));font-weight:800}
 #recHistory{max-height:220px;overflow:auto;font-size:13px;font-variant-numeric:tabular-nums}
 .histRow{padding:4px 0;border-bottom:1px dashed var(--ui-border)}
 .histRow.auto{opacity:.6}
@@ -362,7 +362,7 @@ body.trkNoMascot #vrmCanvas,body.trkNoMascot #vrmPreview{display:none!important}
 .noteRow select{padding:6px 8px;border-radius:8px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border);font-size:14px}
 #notePresets{margin-top:10px}
 .mascotSelect{width:100%;padding:10px 12px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border);font-size:16px}
-.pclCredit a{color:var(--ui-accent);word-break:break-all}
+.pclCredit a{color:var(--ui-accent-ink,var(--ui-accent));word-break:break-all}
 
 /* ===== 11. 操作・サウンド ===== */
 .keyRows{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -383,7 +383,7 @@ body.trkNoMascot #vrmCanvas,body.trkNoMascot #vrmPreview{display:none!important}
 .packBadges{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
 .packBadge{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;background:var(--ui-field);border:1px solid var(--ui-border)}
 .packCard details{font-size:13px;color:var(--ui-muted);margin-top:4px;word-break:break-all}
-.packCard details a{color:var(--ui-accent)}
+.packCard details a{color:var(--ui-accent-ink,var(--ui-accent))}
 .packCreditCardBox{margin-top:8px;padding:8px 10px;border:1px solid rgba(255,209,102,.35);border-radius:10px;background:linear-gradient(135deg,rgba(255,209,102,.10),rgba(255,255,255,.025))}
 .packCreditCardBox summary{color:#ffe39a;font-weight:800;cursor:pointer}
 .packCreditCardInner{margin-top:8px;padding:9px;border-left:3px solid #ffd166;background:rgba(0,0,0,.14)}
@@ -400,7 +400,7 @@ body.trkNoMascot #vrmCanvas,body.trkNoMascot #vrmPreview{display:none!important}
 .packContributorName{color:var(--ui-text)}
 .packContributorRole{color:#ffd166;font-size:11px}
 .packContributorRights{color:#b8f0d0}.packContributorLicense{color:#bfe8ff}.packContributorHandle{color:#d7c1ff}
-.packContributorUrl{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ui-accent)}
+.packContributorUrl{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ui-accent-ink,var(--ui-accent))}
 .packCreditDownload{margin-top:10px;padding:6px 9px;font-size:12px}
 .incList{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
 .incList .check{font-size:15px;margin:6px 0}
@@ -411,7 +411,7 @@ body.trkNoMascot #vrmCanvas,body.trkNoMascot #vrmPreview{display:none!important}
   background:repeating-conic-gradient(var(--ui-soft) 0 25%,transparent 0 50%) 0 0/20px 20px}
 #vrmInfo{min-width:0;margin:0}
 #vrmInfo div{margin:2px 0;word-break:break-all}
-.vrmWarn{color:var(--ui-accent);font-weight:800}
+.vrmWarn{color:var(--ui-accent-ink,var(--ui-accent));font-weight:800}
 .vrmNote{opacity:.8}
 
 /* ===== 14. 一時停止・リザルト ===== */
@@ -439,7 +439,7 @@ body.trkNoMascot #vrmCanvas,body.trkNoMascot #vrmPreview{display:none!important}
 .fastSlowRow .fastBadge .fsVal{color:#7dd3fc}
 .fastSlowRow .slowBadge .fsVal{color:#fca5a5}
 .fastSlowRow .fsSub{font-size:12px;color:var(--ui-muted);font-weight:normal}
-.best{color:var(--ui-muted)}.best.new{color:var(--ui-accent);font-weight:900}
+.best{color:var(--ui-muted)}.best.new{color:var(--ui-accent-ink,var(--ui-accent));font-weight:900}
 #credits{margin-top:14px;color:var(--ui-muted);font-size:14px;line-height:1.7}
 
 /* ===== 15. 統合版で追加したもの ===== */
@@ -462,7 +462,7 @@ body.trkNoMascot #vrmCanvas,body.trkNoMascot #vrmPreview{display:none!important}
 #pauseScreen .hint.status{margin:8px 0}
 
 /* ===== 16. 感想・要望のリンク（選曲画面のいちばん下） ===== */
-.contactLine a{color:var(--ui-accent);font-weight:700;text-decoration:none}
+.contactLine a{color:var(--ui-accent-ink,var(--ui-accent));font-weight:700;text-decoration:none}
 .contactLine a:hover{text-decoration:underline}
 
 /* ===== 17. ✔ 公認パック（verified.js） ===== */
@@ -470,7 +470,7 @@ body.trkNoMascot #vrmCanvas,body.trkNoMascot #vrmPreview{display:none!important}
 .vfBadge.big{padding:3px 10px;border-radius:999px;background:var(--ui-gold);color:#1b1b22;font-size:14px;margin-right:8px}
 .vfBox{display:flex;flex-direction:column;gap:6px;text-align:left}
 .vfHead{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
-.vfCreator a{color:var(--ui-accent);text-decoration:none;font-weight:700}
+.vfCreator a{color:var(--ui-accent-ink,var(--ui-accent));text-decoration:none;font-weight:700}
 .vfLabel{font-size:13px;color:var(--ui-muted);font-weight:700;margin-top:4px}
 .vfComment{white-space:pre-wrap;word-break:break-word;padding:10px 14px;border-radius:12px;border-left:4px solid var(--ui-gold);background:var(--ui-field);font-size:16px;line-height:1.6}
 .vfNotice{font-size:12px}
@@ -1698,7 +1698,7 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
    ・くわしい欄の中の大きな画面（.specCanvas）と、📺 TVの画面に重ねるもの（.specTvCanvas）
    ・キャンバスは透明。背景はCSSで付ける（TVは映像が透けるように mix-blend-mode:screen） */
 .specBox{margin-top:10px;text-align:left}
-.specBox h3{margin:6px 0 0;font-size:16px;color:var(--ui-accent)}
+.specBox h3{margin:6px 0 0;font-size:16px;color:var(--ui-accent-ink,var(--ui-accent))}
 .specCanvas{display:block;width:100%;height:132px;margin-top:8px;border-radius:12px;border:1px solid var(--ui-border);
   background:radial-gradient(ellipse at 50% 130%,rgba(56,189,248,.20),rgba(0,0,0,.34) 72%),rgba(0,0,0,.18)}
 .specSeg{margin-top:4px}

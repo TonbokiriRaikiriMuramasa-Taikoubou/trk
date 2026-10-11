@@ -1072,6 +1072,9 @@
             <label class="check"><input id="trkSortAbcChk" type="checkbox"><span data-i18n="trkSortAbc"></span></label>
             <div class="hint" data-i18n="trkSortAbcHint"></div>
             <div id="trkOrderList" class="miniActions" style="flex-direction:column;align-items:stretch;gap:6px"></div>
+            <!-- 🗑 消した trk の自動リストは作り直さない。戻すときだけここから（消したものが無いときは隠す） -->
+            <div class="hint" data-i18n="trkRestoreHint"></div>
+            <div class="miniActions"><button id="trkRestoreBtn" type="button" hidden></button></div>
 
             <!-- 🎻 trk classic（ゲームとは別枠・クラシック名盤100選）＝ 🐔 trk's playlist の中に収納 -->
             <details class="subPanel" id="trkClassicPanel">

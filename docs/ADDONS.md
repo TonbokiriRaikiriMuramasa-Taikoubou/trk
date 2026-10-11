@@ -37,7 +37,7 @@ trk! 本体には入れられない機能を、あとから足せるしくみで
 |---|---|---|
 | `api`（`setup(api)` の引数） | §3〜§5 | 変えるときは `apiVersion` を上げ、旧い版も一定期間は動かします |
 | `TrkAddons`（コンソール・設定画面） | §8 | 同上 |
-| `TrkFX`（エフェクター） | `api.fx` を経由するのが基本。直接使うなら `TrkFX.tapElement(el)` と `TrkFX.untapElement(el)` | `js/fx.js` は凍結されていて、この2つは変わりにくい |
+| `TrkFX`（エフェクター） | `api.fx` を経由するのが基本。直接使うなら `TrkFX.tapElement(el)` と `TrkFX.untapElement(el)` | `js/fx.js` の凍結は trk114 で解除したが、この2つは公開窓口として変えずに維持する |
 
 次は**内部**です。予告なく変わることがあるので、アドオンは頼らないでください。
 
@@ -54,7 +54,7 @@ trk! 本体には入れられない機能を、あとから足せるしくみで
 **一覧の正は [`tools/compat-names.json`](../tools/compat-names.json) です。** この節の文言を変えても機械検査（`tools/check-repo.mjs`）は落ちません。一覧を変えるときはあちらの JSON を直してください。
 
 - **trk90で廃止（28件）** と **現存（5件）** の内訳は、同ファイルの `removed`／`retained` を参照してください。
-- 現存の5件（`chartMeta` `phase` `prefs` `stats` `videoReady`）は frozen `js/fx.js` が裸のグローバルとして読むため、fx.js を移行するまで保留します。削除時期は fx.js の移行リリースに合わせます（現時点で別の固定リリースは決めません）。
+- 現存の5件（`chartMeta` `phase` `prefs` `stats` `videoReady`）は `js/fx.js` が裸のグローバルとして読むため、fx.js を移行するまで保留します（fx.js の凍結は trk114 で解除済み。移行は未着手）。削除時期は fx.js の移行リリースに合わせます（現時点で別の固定リリースは決めません）。
 - **対象外（当面残す）：** `_trkStudyRoomOpen`（読み取り専用）。`js/fx.js` が読む既存の互換フラグで、33件の一覧には含めません（同ファイルの `exempt`）。
 
 > 作者向けの近道：`api` と `TrkAddons` だけで書けない機能が必要になったら、本体の内部に頼る前に、Issue で「どの窓口がほしいか」を書いてください。

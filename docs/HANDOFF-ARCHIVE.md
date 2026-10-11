@@ -1,8 +1,36 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移したtrk70〜trk110の履歴です。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
+> `docs/HANDOFF.md` から移したtrk70〜trk115の履歴と、trk114〜118の検証記録です。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
+
+## trk114〜118 の検証記録（trk118のマージ前に HANDOFF §6 から移動）
+
+- trk118のCreator-Safeリスト検査（`check-repo.mjs` の🛡️ブロック）：新しい12リスト・539曲の全曲が、記録したSpotifyトラックIDの曲名・アーティストと一致し（各100曲以下・重複なし・公式プレイリストが出典）、記録した927行のすべてが LoL・VALORANT・Riot Games のどれかのリストにあることを確認。曲名の書き換え、Riot Gamesリストの状態の変更、記録に無いトラックID、どのリストにも無い行、の4通りでFAILすることを確認済み。自動作成のtrkリストは65（上限100）。トラックIDは、VALORANTの36件が別の一覧と1件ずつ一致し、3件を公式のSpotify埋め込み表示で開いて確認。ブラウザ確認（Chromium 153 headless）：`tools/smoke-browser.mjs --compare` は boot 0・未解決0・譜面10件一致・decode error 0・click error 0・mobile/safe-offline OK。使い捨てのe2e（41項目・リポジトリ外）で、LoLの新しい4リストが自動作成され（29／53／17／59曲・`plGuideRiotLinksVerified`・入手先は公式プレイリスト）、🛒公式カタログから「VALORANT Creator-Safe」（39曲）・「2XKO」（45曲）・「Ruined King」（60曲）を取り込むと全曲Creator-Safeの文言になり、Riot Gamesのリストは専用フォルダに入ること、既存のLoL・VALORANTの表示とページエラーが無いことを確認。
+- trk117のVALORANT Creator-Safe照合（`check-repo.mjs` の🎯VALORANTほかの検査）：`tools/valorant-creator-safe.json` に記録した公式VALORANT Creator-Safe Playlistの40曲から、各リストの見つかった曲数・見当たらない曲を計算し直し、`VAL_CREATOR_SAFE` とシリーズ説明に一致することを確認。記録の1曲をカタログの曲名に変える、記録を39曲にする、見当たらない曲の順番を入れ替える、カタログ側の状態を変える、シリーズ説明の文言を変える、の5通りでFAILすることを確認済み。`tests/trk-playlists.test.mjs` で VALORANT の2リストが共通の文言（`plGuideRiotLinksAbsent`）になることも確認。ブラウザ確認（Chromium 153 headless）：`tools/smoke-browser.mjs --compare` は boot 0・未解決0・譜面10件一致・decode error 0・click error 0・mobile/safe-offline OK。使い捨てのe2e（30項目・リポジトリ外）で、LoL 12リストのガイドの鍵と4言語の表示に加え、📚すべての⚙→「🛒 公式カタログ」から VALORANT の2リストを実際に取り込み、入手先ガイドが `plGuideRiotLinksAbsent`（Creator-Safeガイドへのリンク付き）で表示されること、ページエラーが無いことを確認。
+- trk116のLoL Creator-Safe照合（`check-repo.mjs` のLoLアルバム検査）：LoLの18リストすべてで、`LOL_CREATOR_SAFE` と3つのfixture（SoundCloudアルバム・公式リンク集・Sessions）の `creatorSafe` が一致し、曲数・見当たらない曲（`notFound` はそのリストの曲名だけ）・根拠（embed／mirror）が矛盾しないことを確認。見当たらない曲の名前の取り違え、見当たらない状態なのに曲数1、K/DAの照合記録の削除、Dianaの曲数の食い違い、カタログ側の状態の食い違い、シリーズ説明の曲数の変更、廃止したSessions文言の復活、見当たらない状態を一部の文言に取り違えの8通りでFAILすることを確認済み。照合（songdata.io の51〜977行目の転記と曲名の突き合わせ）はリポジトリ外の作業メモで行い、結果をfixtureと台帳に記録した。ブラウザ確認（Chromium 153 headless）：`tools/smoke-browser.mjs --compare` は boot 0・未解決0・譜面10件一致・decode error 0・click error 0・mobile/safe-offline OK。使い捨てのe2e（22項目・リポジトリ外）で、LoL 12リストのガイドの鍵（Season・Sessions・公式リンク集・人気曲）、タブ帯の⚙→プレイリスト設定の「📄 入手先」が ja/en/zh/ko で切り替わること、trk115までに保存された廃止鍵（`plGuideLolSessions`）のガイドは保存した控えを表示し、起動時の更新で verified の鍵と文言に置き換わること、ページエラーが無いことを確認。
+- trk115のLoL Creator-Safe照合（`check-repo.mjs` のLoLアルバム検査）：Season 1〜9＝verified・Warsongs＝partial（10/11、未照合は「Silver Scrapes」）が `LOL_CREATOR_SAFE` とfixtureで一致し、照合済みの各アルバムが根拠（embed／mirror）を持ち、mirror の記録（songdata.io・確認日）があることを確認。根拠の削除・mirror URLの改変・Warsongsの未照合曲の取り違え・カタログ側の状態の食い違い・シリーズ説明の文言欠落・likely文言の復活・partial文言の過大表現の7通りでFAILすることを確認済み。照合そのもの（51〜300番目の転記と区画ごとの突き合わせ）はリポジトリ外の作業メモで行い、結果をfixtureと台帳に記録した。ブラウザ確認（Chromium 153 headless・リポジトリ外の `puppeteer-core`）：`tools/smoke-browser.mjs --compare` は boot 0・未解決0・譜面10件一致・decode error 0・click error 0・mobile/safe-offline OK。使い捨てのe2e（17項目・リポジトリ外）で、自動作成されたLoLリストのガイドの鍵（Season 1〜9＝verified・Warsongs＝partial）、タブ帯の⚙→プレイリスト設定の「📄 入手先」が ja/en/zh/ko で切り替わること、trk114までに保存された廃止鍵（`plGuideLolCsLikely`）のガイドは保存した控えを表示し、起動時の更新で verified の鍵と文言に置き換わること、ページエラーが無いことを確認。
+- trk114のブラウザ確認（リポジトリ外の `@sparticuz/chromium`＋`puppeteer-core`、Chromium 153 headless）：`tools/smoke-browser.mjs --compare` は boot 0・未解決0・譜面10件一致・decode error 0・click error 0・mobile/safe-offline OK。`tools/smoke-game-end.mjs` PASS。加えて一時スクリプトで23項目（ガイドの鍵と英語表示、削除→再起動で戻らない→♻で復元、移したOSTが戻らない、3スキンのaxe、MIDIの `midiLoaded`／`midiTooDense`、ページエラー0）を確認。半透明カードのスキンはaxeが「判定不能」になるため、16スキンの数値はNodeの計算（`tests/skin-contrast.test.mjs`）で確認。
 
 ## 旧 HANDOFF §11「最近の変更」
+
+### trk115 の記録（2026-10-12。trk118のときに HANDOFF §7 から移動）
+
+- **trk115（2026-10-12）**：LoLのCreator-Safe照合を101曲目以降へ広げた。公式の埋め込み表示は先頭100曲までなので、プレイリスト全体を表示する第三者サイトsongdata.ioで51〜300番目を読み、Season 7の残り7曲・Season 1〜6の全136曲・Warsongs 10曲を照合（51〜100番目は公式の埋め込みと完全一致することを確認）。Season 1〜9を照合済み（verified）、Warsongsを一部照合済み（partial・10/11、「Silver Scrapes」は未照合）にし、推測で「可能性が高い」とした likely 状態と文言（4言語）を廃止。partialの文言は「一部の曲は対象（照合済み）、残りは未照合・要確認」に変更。fixtureに根拠（embed／mirror）と第三者サイトの記録、公式SoundCloudのCreator-Safe Playlist Pt. I／IIを追加し、`check-repo` で一致・曲数・根拠を検査（7通りの改変でFAILを確認）。台帳・ガイド（ja／en）・`sw.js` cache名（`trk-v2026.10.12-trk115`）を更新。
+
+### trk114 の記録（2026-10-11。trk117のときに HANDOFF §7 から移動）
+
+- **trk114（2026-10-11）**：再レビュー（3a3a3db→2380d8b）への対応。①LoLのCreator-Safe表示を照合状態ごとに分けた（照合済み＝Season 9・8、一部照合済み＝Season 7、可能性が高い・未照合＝Season 1〜6、未照合＝Warsongs、人気曲＝共同制作曲は対象外・要確認）。公式埋め込み表示の先頭100件でSeason 8全曲とSeason 7の41曲を新たに照合し、台帳・fixture・ガイドの過大な記述を訂正。②`js/fx.js`／`js/fx-presets.js` の凍結を空さんの判断で解除し、NAMESPACE-PLAN・ADDONS・REVIEW記録の記述をそろえた。③MIDIの処理量：聞こえない余韻を数えず・描かず、合成ループを高速化、上限を2億に、`midiTooDense` の専用文言・進み具合・中止、`tools/midi-budget.mjs`。④消した自動リストを作り直さない印（`trkRemoved`）と♻復元ボタン、OSTの移動を守る。⑤入手先ガイドを4言語の辞書キーで表示。⑥`TrkEnsureTrkOstPlaylist`・`TrkOstPlaylistId`・`TrkTouhouThemeData` を `window.Trk.library`／`window.Trk.touhouThemeData` へ。⑦入れ子の見出しなど小さなアクセント文字に `--ui-accent-ink`（全スキン4.5:1）。`sw.js` cache名を `trk-v2026.10.11-trk114` に更新。
+
+### trk113 の記録（2026-10-11。trk116のときに HANDOFF §7 から移動）
+
+- **trk113（2026-10-11）**：🎓 trk's OST Vol.1 用の手続き作曲スクリプト `tools/make-trk-ost.mjs` を追加。コード進行／確率・統計（マルコフ・ランダムウォーク）／進化的アルゴリズム（GA）／深層学習（tiny MLPを勾配降下で訓練）／自由作曲 の5ルール×2曲＝10曲を依存なしで合成し `assets/trk-ost/` へWAV出力（.gitignore でGit外・生成スクリプトのみ同梱）。試聴は `assets/trk-ost/index.html`。音源はアプリ未組込（将来 trk's OST Vol.1 へ追加予定）。
+
+### trk112 の記録（2026-10-11。trk115のときに HANDOFF §7 から移動）
+
+- **trk112（2026-10-11）**：タブ挙動の改善。①デモ曲を🎓 trk's OST Vol.1 プレイリストへ移設（🐔 trk's playlist 内・Game Vol.1 の下、`js/library.js` の `ensureTrkOstPlaylist`／`TRK_OST_ID`。旧版の最上位タブからの移行あり）。②開いたフォルダ内プレイリストのタブを `settings.libOpenTabs` で永続化し、中クリックはタブを閉じるのみに（`plCloseOpenTab`）。ガイド（`appearance.md`・`en.md`）と `sw.js` cache名（`trk-v2026.10.11-trk112`）を更新。`npm run check` 全件通過・VMで新関数の挙動を確認。
+
+### trk111 の記録（2026-10-11。trk114のときに HANDOFF §7 から移動）
+
+- **trk111（2026-10-11）**：エンドフィールド公式カタログにMetal Scar Radioの公式アルバム6作・計81曲を追加（Eve of Departure 5曲・Thunder's Legacy 9曲・At the Wake of Spring OST 17曲・Contingency Contract Re-Ignition OST 4曲・Homecoming OST 30曲・Dreamscape of Wind and Snow OST 16曲、いずれも公式Spotify収録順）。各曲は公式Spotify個別曲、各アルバムは公式Spotifyアルバムページへリンクし、取り込み時に `trk-ef-*` を自動作成。この6作の中国語公式曲名・ffm.to告知リンク（Homecoming 以外）・VGMdb照合は未確認（照合別名なし）。台帳 `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、fixture `tools/endfield-msr-albums-tracklist.json`、検査は `tools/check-repo.mjs` の🛰️MSR albumsブロックに追加。ガイド（`appearance.md`・`en.md`）とNOTICEを更新し、`sw.js` cache名を `trk-v2026.10.11-trk111` に更新。
 
 ### trk109〜trk110 の記録（2026-10-10。trk113のときに HANDOFF §7 から移動）
 
@@ -13,7 +41,7 @@
 
 - **trk106 — 譜面中のジャケット配置**：選曲中は従来どおり動画枠中央、譜面演奏中は右上タイマーの下（160×160px枠）へ配置。右余白とタイマー間隔を固定し、各レイアウトでレーン・ノーツに重ねない。元画像は拡大せず、全画面設定オンも従来どおり。実機確認は現行HANDOFF §4を参照。
 - **trk107 — LoLプレイリストの整理**：公式SoundCloudアルバムを1アルバム＝1プレイリストにし、Season 1〜9のゲームOST 243曲、Warsongs 11曲、公式人気曲30曲を追加。LoLは計18プレイリスト・456曲。音源は同梱せず、アルバムは公式SoundCloud、曲別は公式Spotify（人気曲は公式SoundCloud）へリンク。詳細と未確認事項は `docs/LEAGUE-OF-LEGENDS-MUSIC.md` とfixtureを参照。
-- **trk108 — LoL Creator-Safe対象の確認**：Riot公式Creator-Safe Playlistへの掲載を確認し、Season 1〜9のOST 243曲とWarsongs 11曲を対象として扱う。人気曲の共同制作曲、K/DA、Worlds 2026「Know My Name」等は対象外・要確認のまま。根拠と制限はLoL調査台帳を参照。
+- **trk108 — LoL Creator-Safe対象の確認**（※trk114で訂正：実際に照合したのはSeason 9だけだった。trk114でSeason 8全曲とSeason 7の41曲を追加照合し、残りは「可能性が高い・未照合／未照合」と表示。trk115で101曲目以降も照合し、Season 1〜9全曲を照合済み・Warsongsを10/11にした）：Riot公式Creator-Safe Playlistへの掲載を確認し、Season 1〜9のOST 243曲とWarsongs 11曲を対象として扱う。人気曲の共同制作曲、K/DA、Worlds 2026「Know My Name」等は対象外・要確認のまま。根拠と制限はLoL調査台帳を参照。
 
 ### trk100〜trk105 の記録（2026-10-10。trk108 のときに HANDOFF §8 から移動）
 

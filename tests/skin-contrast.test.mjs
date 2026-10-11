@@ -108,6 +108,32 @@ describe("game UI contrast across the skin catalogue", () => {
     }
   });
 
+  test("small accent-colored text uses --ui-accent-ink, which reaches AA even inside nested settings panels", () => {
+    /* trk114: the nested "skin shelf" heading was 4.34 (cbLight), 3.88 (shojiLight) and 3.95 (morningKitchen) on the
+       opaque cards. Semi-transparent cards hid the same shortfall from the browser audit, so every skin is computed here
+       on the worst surface: card (--ui-panel) + panel (--ui-soft) + sub-panel (--ui-soft). */
+    const { accentInk, accentInkBackground } = sandbox.window.Trk.data;
+    const toHex = rgb => "#" + rgb.slice(0, 3).map(v => Math.round(v).toString(16).padStart(2, "0")).join("");
+    for (const [id, skin] of Object.entries(SKINS)) {
+      const ink = accentInk(skin.ui), back = toHex(accentInkBackground(skin.ui));
+      const inkHex = /^#[0-9a-f]{6}$/i.test(ink) ? ink : sandbox.window.Trk.data.toHex(ink);
+      assert.ok(contrast(inkHex, back) >= 4.5, `${id}: accent ink ${ink} on nested ${back} is ${contrast(inkHex, back).toFixed(2)}:1`);
+      if (contrast(sandbox.window.Trk.data.toHex(skin.ui["--ui-accent"]), back) >= 4.6) assert.equal(ink, skin.ui["--ui-accent"], `${id}: a passing accent is left unchanged`);
+    }
+    for (const id of ["cbLight", "shojiLight", "morningKitchen"]) assert.notEqual(accentInk(SKINS[id].ui), SKINS[id].ui["--ui-accent"], `${id} needed a darker ink`);
+    const core = fs.readFileSync(path.join(ROOT, "js/core.js"), "utf8");
+    assert.match(core, /root\.setProperty\("--ui-accent-ink", window\.Trk\.data\.accentInk\(s\.ui\)\)/, "applySkin sets the ink for every skin, custom ones included");
+    assert.match(css, /\.subPanel>summary\{[^}]*color:var\(--ui-accent-ink,var\(--ui-accent\)\)/);
+    const bareAccentText = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+      .filter(m => /(?:^|;)\s*color:\s*var\(--ui-accent\)\s*(?:;|$)/.test(m[2])).map(m => m[1].trim());
+    assert.deepEqual(bareAccentText, [".brand h1 span"], "only the 58px brand heading (large text, 3:1) may use the raw accent");
+    for (const accent of ["#b78be0", "#39c5bb", "#ffd166", "#e69f00"]) {
+      const custom = buildCustomSkin({ name: "ink test", colors: { bg: "#fbf8f1", bg2: "", panel: "#ffffff", text: "#2b2620", accent, gold: "#a67c2e" },
+        glow: false, scanlines: false, gradDir: "none", font: "default", video: "mono", mascot: "none" });
+      assert.ok(contrast(accentInk(custom.ui), toHex(accentInkBackground(custom.ui))) >= 4.5, `custom light skin with accent ${accent}`);
+    }
+  });
+
   test("custom-skin accent labels choose a black or white foreground with AA contrast", () => {
     const accents = ["#000000", "#101010", "#333333", "#767676", "#777777", "#808080", "#b78be0", "#e69f00", "#39c5bb", "#ff3b55", "#fefefe"];
     for (const accent of accents) {

@@ -359,7 +359,7 @@ assert.ok(library.includes("lastUseStudyArtwork") && library.includes('on("optio
   "changing Study cover preference reapplies the selected song background");
 
 /* 書斎を開いている間、ゲーム側のキーを止める（旗は window.Trk.overlay に集めた。旧 window._trk*Open は残さない） */
-/* js/fx.js は凍結（書き換えない）。その 1 箇所だけは、core.js の読み取り専用の互換アクセサ window._trkStudyRoomOpen を読む */
+/* js/fx.js（trk113まで凍結。trk114で解除、未移行）の 1 箇所だけは、core.js の読み取り専用の互換アクセサ window._trkStudyRoomOpen を読む */
 for (const file of ["player.js", "main.js", "media-player-mode.js", "catch.js", "modes.js", "stage.js", "truck.js", "speed.js", "extras.js", "video-max.js", "synth-mode.js", "fx.js"]) {
   const src = read(`js/${file}`);
   const yields = /Trk\.overlay\.(is\("study"\)|any\(\))/.test(src) || (file === "fx.js" && src.includes("window._trkStudyRoomOpen"));

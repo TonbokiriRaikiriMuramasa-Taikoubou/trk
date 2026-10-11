@@ -598,9 +598,9 @@ Object.assign(TEXT.ko, {
 
 /* 🎹 Touhou MIDI: only local files are synthesized; no game audio or extractor is bundled. */
 Object.assign(TEXT.ja, {
-  midiRendering:"選択したコード音色プロフィールでMIDIを準備中…", midiLoaded:"選択したコード音色プロフィールでMIDIを再生します（実サンプルなし・元ファイルは変更しません）。",
+  midiRendering:"選択したコード音色プロフィールでMIDIを準備中…", midiRenderingProgress:"選択したコード音色プロフィールでMIDIを準備中…{p}%", midiLoaded:"選択したコード音色プロフィールでMIDIを再生します（実サンプルなし・元ファイルは変更しません）。",
   midiTooLarge:"MIDIファイルが大きすぎます（上限8MB）。", midiTooLong:"MIDIが10分を超えるため再生を中止しました。",
-  midiUnsupported:"このMIDIの時間形式（SMPTE）は未対応です。", midiFormatUnsupported:"SMF 0/1以外の形式には対応していません。", midiTooComplex:"イベント数が多すぎるため安全に再生できません。", midiError:"MIDIを読めません。標準MIDIファイル（SMF）か確認してください。",
+  midiUnsupported:"このMIDIの時間形式（SMPTE）は未対応です。", midiFormatUnsupported:"SMF 0/1以外の形式には対応していません。", midiTooComplex:"イベント数またはトラック数が多すぎるため、安全に再生できません。", midiTooDense:"MIDIが長い、または同時に鳴る音が多すぎるため再生できません（変換の処理量が上限を超えました）。", midiError:"MIDIを読めません。標準MIDIファイル（SMF）か確認してください。",
   touhouCatalogNote:"TouhouThemeDB（Unlicense）のコミュニティ索引を使用。東方Project本体は{groups}グループ・{tracks} release ID（体験版・重複/編曲IDを含む）。手元の .mid/.midi は再生できますが、全曲にMIDIがあるわけではありません。正規に入手した自分のゲームから抽出し、ゲームデータや抽出物を再配布しないでください。thtk の上流 COPYING は二条件のBSD系文面ですが、Touhou Patch CenterのガイドではBGMアーカイブ抽出に非対応と明記されています。別ツールTouhou Music Room（GPL-3.0-or-later、追加許可あり）はWindows作品の音声を抽出しますが、MIDIは出力しません。ゲーム音源・抽出ツールは同梱しません。",
   zunOtherCatalogNote:"ここはSeihou、Torte Le Magic、Uwabami Breakers、神魔討綺伝など、TouhouThemeDBに関連作品として載る東方Project外の6作品（{groups}グループ・{tracks} release ID）。正史Touhouとは別枠です。コミュニティ索引は権利許諾を示しません。音源は同梱しません。",
   touhouPlaylistGuide:"手元のMIDIを再生。ID名（th06_05.mid）はカタログ曲名で表示。Music Roomは音声抽出用（MIDI非対応）。音源なし。",
@@ -610,9 +610,9 @@ Object.assign(TEXT.ja, {
   touhouMusicRoom:"Touhou Music Room 外部ツール", touhouMusicRoomLicense:"Touhou Music Room LICENSE（GPL-3.0-or-later・追加許可）"
 });
 Object.assign(TEXT.en, {
-  midiRendering:"Preparing MIDI with the selected code-generated timbre profile…", midiLoaded:"MIDI rendered with the selected procedural timbre (no samples; the original file is unchanged).",
+  midiRendering:"Preparing MIDI with the selected code-generated timbre profile…", midiRenderingProgress:"Preparing MIDI with the selected code-generated timbre profile… {p}%", midiLoaded:"MIDI rendered with the selected procedural timbre (no samples; the original file is unchanged).",
   midiTooLarge:"MIDI file is too large (8 MB maximum).", midiTooLong:"Playback stopped: this MIDI is longer than 10 minutes.",
-  midiUnsupported:"This MIDI timing mode (SMPTE) is not supported.", midiFormatUnsupported:"Only Standard MIDI File type 0/1 is supported.", midiTooComplex:"This MIDI has too many events to render safely.", midiError:"Could not read this file. Please check that it is a Standard MIDI File (SMF).",
+  midiUnsupported:"This MIDI timing mode (SMPTE) is not supported.", midiFormatUnsupported:"Only Standard MIDI File type 0/1 is supported.", midiTooComplex:"This MIDI has too many events or tracks to render safely.", midiTooDense:"This MIDI is too long or has too many notes sounding at once to render safely (over the processing limit).", midiError:"Could not read this file. Please check that it is a Standard MIDI File (SMF).",
   touhouCatalogNote:"Community-maintained Japanese title data from TouhouThemeDB (Unlicense): {groups} Touhou Project groups and {tracks} release IDs, including demos and duplicate/arranged entries. Local .mid/.midi files can be played, but not every track has MIDI. Extract only from a game you lawfully obtained; do not redistribute game data or rips. thtk's upstream COPYING has two-condition BSD-style terms, but the Touhou Patch Center guide says it cannot extract BGM archives. Touhou Music Room (GPL-3.0-or-later, additional permission) extracts game audio on Windows, not MIDI. No game audio or extractor is bundled.",
   zunOtherCatalogNote:"This separate section has {groups} associated games outside Touhou Project ({tracks} release IDs), as listed by TouhouThemeDB. It is not part of the Touhou Project canon. The community index grants no rights. No audio is bundled.",
   touhouPlaylistGuide:"Local MIDI only; ID filenames show catalogue titles. Music Room exports audio, not MIDI. No audio is bundled.",
@@ -622,9 +622,9 @@ Object.assign(TEXT.en, {
   touhouMusicRoom:"Touhou Music Room (external tool)", touhouMusicRoomLicense:"Touhou Music Room LICENSE (GPL-3.0-or-later + additional permission)"
 });
 Object.assign(TEXT.zh, {
-  midiRendering:"正在用所选代码音色配置准备MIDI…", midiLoaded:"已用所选代码合成音色渲染MIDI（不含采样，不会修改原文件）。",
+  midiRendering:"正在用所选代码音色配置准备MIDI…", midiRenderingProgress:"正在用所选代码音色配置准备MIDI…{p}%", midiLoaded:"已用所选代码合成音色渲染MIDI（不含采样，不会修改原文件）。",
   midiTooLarge:"MIDI文件过大（上限8 MB）。", midiTooLong:"MIDI超过10分钟，已停止播放。",
-  midiUnsupported:"暂不支持此MIDI时间格式（SMPTE）。", midiFormatUnsupported:"仅支持标准MIDI文件类型0/1。", midiTooComplex:"MIDI事件过多，无法安全渲染。", midiError:"无法读取文件，请确认它是标准MIDI文件（SMF）。",
+  midiUnsupported:"暂不支持此MIDI时间格式（SMPTE）。", midiFormatUnsupported:"仅支持标准MIDI文件类型0/1。", midiTooComplex:"MIDI事件或音轨过多，无法安全渲染。", midiTooDense:"MIDI过长或同时发声的音符过多，超出可安全渲染的处理量上限。", midiError:"无法读取文件，请确认它是标准MIDI文件（SMF）。",
   touhouCatalogNote:"日文曲名来自TouhouThemeDB（Unlicense，社区维护）：东方Project本体共{groups}组、{tracks}个release ID，含体验版及重复/改编条目。可播放本地.mid/.midi，但并非每首曲目都有MIDI。仅从自己合法取得的游戏中提取；请勿再分发游戏数据或提取物。thtk上游COPYING为BSD双条件风格条款，但Touhou Patch Center指南说明它不能提取BGM档案。Touhou Music Room（GPL-3.0-or-later，含附加许可）可在Windows提取游戏音频，不输出MIDI。不附带游戏音源或提取工具。",
   zunOtherCatalogNote:"此处单独列出TouhouThemeDB收录的{groups}组、{tracks}个东方式Project外相关游戏。它们不属于东方Project正史；社区索引不授予任何权利。不附带音源。",
   touhouPlaylistGuide:"仅播放本地MIDI；ID文件名显示曲名。Music Room提取音频，不输出MIDI；无音源。",
@@ -634,9 +634,9 @@ Object.assign(TEXT.zh, {
   touhouMusicRoom:"Touhou Music Room外部工具", touhouMusicRoomLicense:"Touhou Music Room LICENSE（GPL-3.0-or-later，附加许可）"
 });
 Object.assign(TEXT.ko, {
-  midiRendering:"선택한 코드 생성 음색 프로필로 MIDI 준비 중…", midiLoaded:"선택한 절차 생성 음색으로 MIDI를 렌더링했습니다 (샘플 없음, 원본 파일은 그대로예요).",
+  midiRendering:"선택한 코드 생성 음색 프로필로 MIDI 준비 중…", midiRenderingProgress:"선택한 코드 생성 음색 프로필로 MIDI 준비 중… {p}%", midiLoaded:"선택한 절차 생성 음색으로 MIDI를 렌더링했습니다 (샘플 없음, 원본 파일은 그대로예요).",
   midiTooLarge:"MIDI 파일이 너무 큽니다 (최대 8MB).", midiTooLong:"MIDI가 10분을 넘어 재생을 중단했어요.",
-  midiUnsupported:"이 MIDI 시간 형식(SMPTE)은 지원하지 않아요.", midiFormatUnsupported:"표준 MIDI 파일 형식 0/1만 지원해요.", midiTooComplex:"이 MIDI는 이벤트가 너무 많아 안전하게 렌더링할 수 없어요.", midiError:"파일을 읽을 수 없어요. 표준 MIDI 파일(SMF)인지 확인해 주세요.",
+  midiUnsupported:"이 MIDI 시간 형식(SMPTE)은 지원하지 않아요.", midiFormatUnsupported:"표준 MIDI 파일 형식 0/1만 지원해요.", midiTooComplex:"이 MIDI는 이벤트나 트랙이 너무 많아 안전하게 렌더링할 수 없어요.", midiTooDense:"MIDI가 너무 길거나 동시에 울리는 음이 너무 많아 안전하게 렌더링할 수 없어요 (처리량 상한 초과).", midiError:"파일을 읽을 수 없어요. 표준 MIDI 파일(SMF)인지 확인해 주세요.",
   touhouCatalogNote:"TouhouThemeDB(Unlicense)의 커뮤니티 일본어 곡명 색인: 동방 Project 본편 {groups}개 그룹, {tracks}개 release ID(체험판·중복/편곡 포함). 로컬 .mid/.midi는 재생하지만 모든 곡에 MIDI가 있는 것은 아니에요. 정식 취득한 본인 게임에서 추출하고 게임 데이터/추출물은 재배포하지 마세요. thtk의 upstream COPYING은 BSD 2조건 계열이지만 Touhou Patch Center 안내에 따르면 BGM 아카이브는 추출할 수 없어요. Touhou Music Room(GPL-3.0-or-later, 추가 허가 있음)은 Windows 게임 음원을 추출하지만 MIDI는 출력하지 않아요. 게임 음원/추출 도구는 포함하지 않아요.",
   zunOtherCatalogNote:"TouhouThemeDB가 관련 작품으로 분류한 동방 Project 외 게임 {groups}개 그룹, {tracks}개 release ID를 별도 표시해요. 동방 Project 정사가 아니며, 커뮤니티 색인은 권리를 허가하지 않아요. 음원은 포함하지 않아요.",
   touhouPlaylistGuide:"로컬 MIDI만 재생하며 ID 파일명은 곡명으로 표시해요. Music Room은 음원을 추출하지만 MIDI는 출력하지 않아요.",
@@ -644,6 +644,114 @@ Object.assign(TEXT.ko, {
   zunOtherPlaylistGuide:"동방 Project 정사가 아니에요. 로컬 MIDI만 재생; 게임 음원 미포함.",
   touhouToolkitDocs:"thtk 안내 (BGM 아카이브 추출 미지원)", touhouToolkitLicense:"thtk COPYING (라이선스 조건)",
   touhouMusicRoom:"Touhou Music Room 외부 도구", touhouMusicRoomLicense:"Touhou Music Room LICENSE (GPL-3.0-or-later, 추가 허가)"
+});
+
+/* 📄 プレイリストの入手先ガイド（公式カタログ由来）と、消した trk の自動リストを戻すボタン。
+   ガイドは保存データに key と日本語の控え（note）を持ち、表示は key から今の言語で引く
+   （英中韓のUIに日本語の注記が出ないように）。権利の書き方は4言語で同じ強さにそろえる。 */
+Object.assign(TEXT.ja, {
+  plGuideIntro:"非営利の紹介プレイリスト。音源は同梱しません。",
+  plGuideGameVol1:"非営利の紹介プレイリスト。音源は同梱しません。公式の入手先からどうぞ。",
+  plGuideClassic:"版権切れの名演をMusopenの公開録音で紹介。音源は同梱しません。",
+  plGuideBlueArchive:"NexTone.Link／Apple Music公式案内。音源なし。購入・サブスクは利用許諾ではありません。",
+  plGuideLolCsVerified:"公式SoundCloudアルバム（音源なし）。Creator-Safe対象（Riot公式Playlistと照合済み）。配信・購入は二次利用許諾ではありません。",
+  plGuideLolCsPartial:"公式SoundCloudアルバム（音源なし）。Creator-Safe対象の可能性が高い（一部の曲のみ照合済み）。配信・購入は二次利用許諾ではありません。",
+  plGuideLolCsLikely:"公式SoundCloudアルバム（音源なし）。Creator-Safe対象の可能性が高い・未照合。配信・購入は二次利用許諾ではありません。",
+  plGuideLolCsUnverified:"公式SoundCloudアルバム（音源なし）。Creator-Safe対象かは未照合。配信・購入は二次利用許諾ではありません。",
+  plGuideLolSessions:"公式SoundCloudアルバム（音源なし）。RiotのCreator-Safe Sessions（条件は公式ガイドで確認）。配信・購入は二次利用許諾ではありません。",
+  plGuideLolPopular:"公式SoundCloudの人気曲ページ（音源なし）。共同制作曲はCreator-Safe対象外・要確認。配信・購入は二次利用許諾ではありません。",
+  plGuideRiotLinks:"公式リンク集。配信・購入は二次利用許諾ではありません。Creator-Safeの対象と条件を要確認。",
+  plGuideGakumasInst:"公式Driveで配布確認済み。DOWNLOAD規約はファン動画向けの限定条件で、全用途の許諾ではありません。",
+  plGuideGakumasDisco:"公式ディスコグラフィ掲載曲。現行Driveで未確認の曲も含みます（配布不可の断定ではありません）。",
+  plGuideGakumasLegacy:"DOWNLOAD規約はファン動画向け限定。全用途の許諾ではありません。Drive未掲載は配布不可の証明ではありません。",
+  plGuideGenshin:"Apple Music公式配信への案内です。サブスク・購入は二次利用許諾ではありません。",
+  plGuideFruitbat:"公式ゲーム案内のみ。個別曲の公式配信先・使用許諾は未確認です。",
+  plGuideArknights:"Monster-Siren公式の曲／OSTページです。音源は同梱せず、リンクは利用許諾ではありません。",
+  plGuideEndfield:"公式Spotify個別曲・アルバムページとffm.to配信一覧への案内（音源なし）。配信・購入は二次利用許諾ではありません。利用前は公式二次創作ガイドラインを確認してください。",
+  plGuideNcs:"NCS公式サイトの各曲ページへの案内（音源なし）。クレジット表記などの条件は各曲ページで確認してください。",
+  plGuideMacleod:"incompetech公式ページへの案内（音源なし）。CC BY 4.0のクレジット表記など、条件は公式ページで確認してください。",
+  plOfficialLink:"公式リンク",
+  trkRestoreBtn:"♻ 消したtrkのリストを戻す（{n}件）",
+  trkRestoreHint:"trkが自動で作るリスト（Game Vol.1・Classic Vol.1・trk's OST Vol.1・カタログの各リスト）は、消すと次の起動でも作り直しません。戻すときはこのボタンを押してください。",
+  trkRestored:"♻ 消したリストを{n}件戻しました"
+});
+Object.assign(TEXT.en, {
+  plGuideIntro:"A non-commercial introduction playlist. No audio is included.",
+  plGuideGameVol1:"A non-commercial introduction playlist. No audio is included; please get songs from the official sources.",
+  plGuideClassic:"Public-domain masterpieces introduced through Musopen's public recordings. No audio is included.",
+  plGuideBlueArchive:"Official NexTone.Link / Apple Music pages. No audio included. Buying or subscribing is not a license to use.",
+  plGuideLolCsVerified:"Official SoundCloud album (no audio included). Creator-Safe: matched against Riot's official Creator-Safe Playlist. Streaming or buying is not a license to reuse.",
+  plGuideLolCsPartial:"Official SoundCloud album (no audio included). Likely Creator-Safe: only some songs have been matched so far. Streaming or buying is not a license to reuse.",
+  plGuideLolCsLikely:"Official SoundCloud album (no audio included). Likely Creator-Safe, not yet matched. Streaming or buying is not a license to reuse.",
+  plGuideLolCsUnverified:"Official SoundCloud album (no audio included). Creator-Safe status not yet matched. Streaming or buying is not a license to reuse.",
+  plGuideLolSessions:"Official SoundCloud album (no audio included). Riot's Creator-Safe Sessions; check the conditions in Riot's guidelines. Streaming or buying is not a license to reuse.",
+  plGuideLolPopular:"Official SoundCloud popular-tracks page (no audio included). Collaboration songs are outside Creator-Safe or unconfirmed. Streaming or buying is not a license to reuse.",
+  plGuideRiotLinks:"Official links only. Streaming or buying is not a license to reuse. Check Creator-Safe eligibility and conditions.",
+  plGuideGakumasInst:"Confirmed on the official Drive. The DOWNLOAD terms are limited to fan videos and are not a license for every use.",
+  plGuideGakumasDisco:"Songs from the official discography. Some are not found on the current Drive (this does not mean they cannot be distributed).",
+  plGuideGakumasLegacy:"The DOWNLOAD terms are limited to fan videos, not a license for every use. A song missing from the Drive does not prove it cannot be distributed.",
+  plGuideGenshin:"Links to the official Apple Music releases. Subscribing or buying is not a license to reuse.",
+  plGuideFruitbat:"Official game page only. Per-song official sources and usage permissions are unconfirmed.",
+  plGuideArknights:"Official Monster-Siren song / OST pages. No audio is included, and the links are not a license to use.",
+  plGuideEndfield:"Links to official Spotify song / album pages and ffm.to listings (no audio included). Streaming or buying is not a license to reuse. Check the official fan-content guidelines before use.",
+  plGuideNcs:"Links to each song's page on the official NCS site (no audio included). Check credit and other conditions on each song page.",
+  plGuideMacleod:"Links to the official incompetech pages (no audio included). Check the conditions, such as CC BY 4.0 credit, on the official pages.",
+  plOfficialLink:"Official link",
+  trkRestoreBtn:"♻ Restore deleted trk lists ({n})",
+  trkRestoreHint:"Lists that trk creates automatically (Game Vol.1, Classic Vol.1, trk's OST Vol.1 and the catalog lists) are not recreated at the next start once you delete them. Press this button to bring them back.",
+  trkRestored:"♻ Restored {n} deleted list(s)"
+});
+Object.assign(TEXT.zh, {
+  plGuideIntro:"非营利的介绍歌单。不附带音源。",
+  plGuideGameVol1:"非营利的介绍歌单。不附带音源，请从官方渠道获取。",
+  plGuideClassic:"通过Musopen的公开录音介绍版权已过期的名曲。不附带音源。",
+  plGuideBlueArchive:"NexTone.Link／Apple Music官方页面。不含音源。购买或订阅并不等于使用许可。",
+  plGuideLolCsVerified:"官方SoundCloud专辑（不含音源）。属于Creator-Safe（已与Riot官方Creator-Safe歌单核对）。播放或购买不等于二次使用许可。",
+  plGuideLolCsPartial:"官方SoundCloud专辑（不含音源）。很可能属于Creator-Safe（仅部分曲目已核对）。播放或购买不等于二次使用许可。",
+  plGuideLolCsLikely:"官方SoundCloud专辑（不含音源）。很可能属于Creator-Safe，尚未核对。播放或购买不等于二次使用许可。",
+  plGuideLolCsUnverified:"官方SoundCloud专辑（不含音源）。是否属于Creator-Safe尚未核对。播放或购买不等于二次使用许可。",
+  plGuideLolSessions:"官方SoundCloud专辑（不含音源）。Riot的Creator-Safe Sessions，条件请以Riot的指南为准。播放或购买不等于二次使用许可。",
+  plGuideLolPopular:"官方SoundCloud热门曲目页面（不含音源）。合作曲目不属于Creator-Safe或尚待确认。播放或购买不等于二次使用许可。",
+  plGuideRiotLinks:"官方链接合集。播放或购买不等于二次使用许可。请确认是否属于Creator-Safe及其条件。",
+  plGuideGakumasInst:"已在官方Drive确认发布。DOWNLOAD条款仅限粉丝视频，并非所有用途的许可。",
+  plGuideGakumasDisco:"官方唱片目录中的曲目。包含当前Drive中未确认的曲目（并不断定不可分发）。",
+  plGuideGakumasLegacy:"DOWNLOAD条款仅限粉丝视频，并非所有用途的许可。Drive未收录并不证明不可分发。",
+  plGuideGenshin:"指向Apple Music官方发行的链接。订阅或购买不等于二次使用许可。",
+  plGuideFruitbat:"仅为官方游戏介绍页面。各曲目的官方发行渠道与使用许可尚未确认。",
+  plGuideArknights:"Monster-Siren官方曲目／OST页面。不附带音源，链接并不等于使用许可。",
+  plGuideEndfield:"指向官方Spotify单曲／专辑页面与ffm.to发行列表（不含音源）。播放或购买不等于二次使用许可。使用前请确认官方二次创作指南。",
+  plGuideNcs:"指向NCS官网的各曲目页面（不含音源）。署名等条件请在各曲目页面确认。",
+  plGuideMacleod:"指向incompetech官方页面（不含音源）。CC BY 4.0署名等条件请在官方页面确认。",
+  plOfficialLink:"官方链接",
+  trkRestoreBtn:"♻ 恢复已删除的trk歌单（{n}个）",
+  trkRestoreHint:"trk自动创建的歌单（Game Vol.1、Classic Vol.1、trk's OST Vol.1及目录中的各歌单）删除后，下次启动也不会重新创建。需要恢复时请按此按钮。",
+  trkRestored:"♻ 已恢复{n}个已删除的歌单"
+});
+Object.assign(TEXT.ko, {
+  plGuideIntro:"비영리 소개 플레이리스트예요. 음원은 포함하지 않아요.",
+  plGuideGameVol1:"비영리 소개 플레이리스트예요. 음원은 포함하지 않으니 공식 경로에서 구해 주세요.",
+  plGuideClassic:"저작권이 만료된 명곡을 Musopen의 공개 녹음으로 소개해요. 음원은 포함하지 않아요.",
+  plGuideBlueArchive:"NexTone.Link／Apple Music 공식 안내. 음원 없음. 구매·구독은 이용 허락이 아니에요.",
+  plGuideLolCsVerified:"공식 SoundCloud 앨범(음원 없음). Creator-Safe 대상(Riot 공식 Creator-Safe 플레이리스트와 대조 완료). 스트리밍·구매는 2차 이용 허락이 아니에요.",
+  plGuideLolCsPartial:"공식 SoundCloud 앨범(음원 없음). Creator-Safe 대상일 가능성이 높아요(일부 곡만 대조 완료). 스트리밍·구매는 2차 이용 허락이 아니에요.",
+  plGuideLolCsLikely:"공식 SoundCloud 앨범(음원 없음). Creator-Safe 대상일 가능성이 높지만 아직 대조하지 않았어요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
+  plGuideLolCsUnverified:"공식 SoundCloud 앨범(음원 없음). Creator-Safe 대상인지 아직 대조하지 않았어요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
+  plGuideLolSessions:"공식 SoundCloud 앨범(음원 없음). Riot의 Creator-Safe Sessions예요. 조건은 Riot 가이드라인에서 확인하세요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
+  plGuideLolPopular:"공식 SoundCloud 인기곡 페이지(음원 없음). 공동 제작곡은 Creator-Safe 대상이 아니거나 확인이 필요해요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
+  plGuideRiotLinks:"공식 링크 모음. 스트리밍·구매는 2차 이용 허락이 아니에요. Creator-Safe 대상 여부와 조건을 확인하세요.",
+  plGuideGakumasInst:"공식 Drive에서 배포를 확인했어요. DOWNLOAD 규약은 팬 영상용 한정 조건이며 모든 용도의 허락이 아니에요.",
+  plGuideGakumasDisco:"공식 디스코그래피 수록곡이에요. 현재 Drive에서 확인되지 않은 곡도 있어요(배포 불가라고 단정하지 않아요).",
+  plGuideGakumasLegacy:"DOWNLOAD 규약은 팬 영상용 한정이며 모든 용도의 허락이 아니에요. Drive에 없다고 해서 배포 불가라는 증거는 아니에요.",
+  plGuideGenshin:"Apple Music 공식 배포로 안내해요. 구독·구매는 2차 이용 허락이 아니에요.",
+  plGuideFruitbat:"공식 게임 안내만 있어요. 곡별 공식 배포처와 사용 허락은 확인하지 않았어요.",
+  plGuideArknights:"Monster-Siren 공식 곡／OST 페이지예요. 음원은 포함하지 않으며 링크는 이용 허락이 아니에요.",
+  plGuideEndfield:"공식 Spotify 곡·앨범 페이지와 ffm.to 배포 목록으로 안내해요(음원 없음). 스트리밍·구매는 2차 이용 허락이 아니에요. 이용 전에 공식 2차 창작 가이드라인을 확인하세요.",
+  plGuideNcs:"NCS 공식 사이트의 곡별 페이지로 안내해요(음원 없음). 크레딧 표기 등 조건은 곡별 페이지에서 확인하세요.",
+  plGuideMacleod:"incompetech 공식 페이지로 안내해요(음원 없음). CC BY 4.0 크레딧 표기 등 조건은 공식 페이지에서 확인하세요.",
+  plOfficialLink:"공식 링크",
+  trkRestoreBtn:"♻ 삭제한 trk 목록 되돌리기 ({n}개)",
+  trkRestoreHint:"trk가 자동으로 만드는 목록(Game Vol.1, Classic Vol.1, trk's OST Vol.1, 카탈로그의 각 목록)은 삭제하면 다음 실행 때도 다시 만들지 않아요. 되돌리려면 이 버튼을 누르세요.",
+  trkRestored:"♻ 삭제한 목록 {n}개를 되돌렸어요"
 });
 
 
@@ -800,7 +908,7 @@ function metaOf(key) { const m = SONG_META[key]; return (m && typeof m === "obje
 /* A local Touhou MIDI file is often named by its stable ThemeDB ID (th06_15.mid).
    Keep the filename and metadata untouched, but show the community title anywhere the song appears. */
 function touhouCatalogTitle(it) {
-  const data = window.TrkTouhouThemeData;
+  const data = window.Trk && window.Trk.touhouThemeData;
   if (!data || !it) return "";
   const raw = String(it.base || it.title || (it.file && it.file.name) || "").trim();
   const id = raw.replace(/\.[a-z0-9]{1,5}$/i, "").toLowerCase();
@@ -938,8 +1046,7 @@ function plSanitize(raw) {
       }
       return out;
     }),   /* 🛒 未入手の欲しい曲 */
-    guide: (raw.guide && typeof raw.guide === "object") ? { note: String(raw.guide.note || "").trim().slice(0, 80),
-      url: /^https:\/\/\S+$/i.test(raw.guide.url || "") ? String(raw.guide.url).slice(0, 300) : "" } : null,
+    guide: (raw.guide && typeof raw.guide === "object") ? plGuideSanitize(raw.guide) : null,   /* 📄 入手先ガイド（trkCatalogGuide の近く） */
     cat: typeof raw.cat === "string" && /^[a-z0-9:-]{1,40}$/i.test(raw.cat) ? raw.cat : "",
     by: typeof raw.by === "string" ? raw.by.trim().slice(0, 24) : "",   /* 👤 投稿者（共有プレイリスト由来） */
     createdAt: (typeof raw.createdAt === "number" && raw.createdAt > 0 && raw.createdAt < 9e15) ? raw.createdAt : 0 };
@@ -1055,11 +1162,12 @@ function ensureTrkPlaylist(opts) {
   const doToast = o.toast !== false;
   const go = !!o.go;
   if (core.settings.trkPlaylist === false) return false;
+  if (trkIsRemoved(TRK_PLAYLIST_ID)) return false;   /* 🗑 利用者が消したものは作り直さない（⚙で戻せる） */
   if (core.settings.playlists.some(function(p){ return p.id === TRK_PLAYLIST_ID; })) return false;
   ensureTrkFolder();
   const wishes = trkWishesFromCatalog();
   if (!wishes.length) return false;
-  const p = plSanitize({ id: TRK_PLAYLIST_ID, name: "Game Vol.1", icon: "\uD83D\uDC14", color: "none", folder: TRK_FOLDER_ID, tags: ["Game","Vol.1"], wish: wishes, songs: [], guide: { note: "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8\u3002\u97F3\u6E90\u306F\u540C\u68B1\u3057\u307E\u305B\u3093\u3002\u516C\u5F0F\u306E\u5165\u624B\u5148\u304B\u3089\u3069\u3046\u305E\u3002", url: "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" }, cat: "trk:all", createdAt: Date.now() });
+  const p = plSanitize({ id: TRK_PLAYLIST_ID, name: "Game Vol.1", icon: "\uD83D\uDC14", color: "none", folder: TRK_FOLDER_ID, tags: ["Game","Vol.1"], wish: wishes, songs: [], guide: trkGuide("plGuideGameVol1", "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk"), cat: "trk:all", createdAt: Date.now() });
   if (!p) return false;
   core.settings.playlists.push(p);
   core.saveUserPrefs();
@@ -1072,11 +1180,12 @@ function ensureTrkClassicPlaylist(opts) {
   const doToast = o.toast !== false;
   const go = !!o.go;
   if (core.settings.trkClassic === false) return false;
+  if (trkIsRemoved(TRK_CLASSIC_ID)) return false;   /* 🗑 利用者が消したものは作り直さない（⚙で戻せる） */
   if (core.settings.playlists.some(function(p){ return p.id === TRK_CLASSIC_ID; })) return false;
   ensureTrkFolder();
   const wishes = trkClassicWishesFromCatalog();
   if (!wishes.length) return false;
-  const p = plSanitize({ id: TRK_CLASSIC_ID, name: "Classic Vol.1", icon: "\uD83C\uDFBB", color: "none", folder: "trk-classic", tags: ["Classic","Vol.1"], wish: wishes, songs: [], guide: { note: "\u7248\u6A29\u5207\u308C\u306E\u540D\u6F14\u3092Musopen\u306E\u516C\u958B\u9332\u97F3\u3067\u7D39\u4ECB\u3002\u97F3\u6E90\u306F\u540C\u68B1\u3057\u307E\u305B\u3093\u3002", url: "https://musopen.org/" }, cat: "trk:classic", createdAt: Date.now() });
+  const p = plSanitize({ id: TRK_CLASSIC_ID, name: "Classic Vol.1", icon: "\uD83C\uDFBB", color: "none", folder: "trk-classic", tags: ["Classic","Vol.1"], wish: wishes, songs: [], guide: trkGuide("plGuideClassic", "https://musopen.org/"), cat: "trk:classic", createdAt: Date.now() });
   if (!p) return false;
   core.settings.playlists.push(p);
   core.saveUserPrefs();
@@ -1086,30 +1195,51 @@ function ensureTrkClassicPlaylist(opts) {
 }
 /* 🎓 trk's OST Vol.1 — オリジナル曲とチュートリアルのデモ曲をまとめるプレイリスト。
    🐔 trk's playlist の中（Game Vol.1 の下）に置く。開いたタブは libOpenTabs で残るため
-   行き止まりにならず、削除はタブの ⚙（長押し）設定から行える（曲はライブラリに残る）。 */
+   行き止まりにならず、削除はタブの ⚙（長押し）設定から行える（曲はライブラリに残る）。
+   消したら settings.trkRemoved に印が残り、次の起動でも作り直さない（🐔 の設定の ♻ で戻せる）。 */
+const TRK_OST_CAT = "trk:ost";   /* 作成・移行済みの印。これが付いたら、利用者が動かした場所を守る */
 function ensureTrkOstPlaylist(opts) {
   const o = opts || {};
   const doToast = o.toast !== false;
-  ensureTrkFolder();
   const exist = core.settings.playlists.find(p => p.id === TRK_OST_ID);
-  if (exist) {   /* 旧版（trk112）で最上位に作ったものを trk フォルダへ移す */
-    if (exist.folder !== TRK_FOLDER_ID) { exist.folder = TRK_FOLDER_ID; core.saveUserPrefs(); }
+  if (exist) {
+    /* 旧版（trk112）が最上位に作ったものだけ、一度だけ trk フォルダへ移す。trk113 までは毎回戻していたので、
+       印（cat）が無いものは一度だけ見直し、以後は移動・削除をそのまま守る。 */
+    if (exist.cat !== TRK_OST_CAT) {
+      if (!exist.folder) { ensureTrkFolder(); exist.folder = TRK_FOLDER_ID; }
+      exist.cat = TRK_OST_CAT;
+      core.saveUserPrefs();
+    }
     return false;
   }
+  if (trkIsRemoved(TRK_OST_ID)) return false;
+  ensureTrkFolder();
   const p = plSanitize({ id: TRK_OST_ID, name: "trk's OST Vol.1", icon: "\uD83C\uDF93", color: "none",
-    folder: TRK_FOLDER_ID, tags: ["trk", "OST"], wish: [], songs: [FIRST_SPARK_KEY], createdAt: Date.now() });
+    folder: TRK_FOLDER_ID, tags: ["trk", "OST"], wish: [], songs: [FIRST_SPARK_KEY], cat: TRK_OST_CAT, createdAt: Date.now() });
   if (!p) return false;
   core.settings.playlists.push(p);
   core.saveUserPrefs();
   if (doToast) try { plToast(tr("trkAdded", { n: p.songs.length })); } catch(_){}
   return true;
 }
-window.TrkEnsureTrkOstPlaylist = ensureTrkOstPlaylist;
-window.TrkOstPlaylistId = TRK_OST_ID;
 window.TrkEnsureTrkPlaylist = ensureTrkPlaylist;
 window.TrkTrkPlaylistId = TRK_PLAYLIST_ID;
 window.TrkEnsureTrkClassicPlaylist = ensureTrkClassicPlaylist;
 window.TrkClassicId = TRK_CLASSIC_ID;
+/* 🌐 trk114 より前に作った Game Vol.1／Classic Vol.1／旧 Vol.1 のガイドに、表示用の key を足す（URL はそのまま）。
+   カタログ由来のリストは ensureTrkDistributionPlaylists の更新で key が付く。 */
+function trkGuideBackfill() {
+  let changed = false;
+  for (const p of core.settings.playlists) {
+    if (!p.guide || p.guide.key) continue;
+    const key = p.id === TRK_PLAYLIST_ID ? "plGuideGameVol1" : p.id === TRK_CLASSIC_ID ? "plGuideClassic"
+      : /^trk-(?:ba|touhou|arknights)-v1$/.test(p.id) && /^trk:[a-z]+$/.test(p.cat || "") ? "plGuideIntro" : "";
+    if (!key) continue;
+    p.guide = trkGuide(key, p.guide.url);
+    changed = true;
+  }
+  if (changed) core.saveUserPrefs();
+}
 function trkOrderedPlaylists(list) {
   if (core.settings.trkSortABC) return list.slice().sort((a,b) => a.name.localeCompare(b.name, 'ja'));
   const order = core.settings.playlistOrder || [];
@@ -1154,52 +1284,58 @@ function trkWishesForSeries(seriesId) {
   return out;
 }
 function trkCatalogGuide(s, pl, forDistributionPlaylist = false) {
-  const isBlueArchiveOst = s.id === "bluearchive" && pl && pl.sourceUrl;
-  /* 📻 LoLの人気曲リストはアルバムではなく公式SoundCloudの人気曲ページなので、案内文を分ける。 */
-  const isSoundCloudPopular = s.id === "lol" && !!pl && pl.id === "lol-popular-tracks";
-  const isSoundCloudAlbum = s.id === "lol" && pl && pl.sourceUrl && pl.sourceLabel === "SoundCloud" && !isSoundCloudPopular;
-  const isLoLLinkList = s.id === "lol" && pl && !isSoundCloudAlbum;
   const isGakumasInstrument = s.id === "gakumas" && pl && (pl.id === "gm-inst" || pl.id === "gm-inst2");
   const isGakumasDiscography = s.id === "gakumas" && pl && pl.id === "gm-releases";
   const isTouhou = s.id === "touhou";
-  const isTouhouOther = s.id === "zun-other";
-  const loLLinkNote = "公式リンク集。配信・購入は二次利用許諾ではありません。Creator-Safeの対象と条件を要確認。";
-  const note = isBlueArchiveOst
-    ? "NexTone.Link／Apple Music公式案内。音源なし。購入・サブスクは利用許諾ではありません。"
-    : isSoundCloudPopular
-      ? "公式SoundCloudの人気曲ページ（音源なし）。配信・購入は二次利用許諾ではありません。共同制作曲はCreator-Safe対象外。"
-      : isSoundCloudAlbum
-      ? "公式SoundCloudアルバム（音源なし）。Riotが権利を持つ曲でCreator-Safe対象。配信・購入は二次利用許諾ではありません。"
-      : isLoLLinkList
-        ? loLLinkNote
-        : isGakumasInstrument
-          ? "公式Driveで配布確認済み。DOWNLOAD規約はファン動画向けの限定条件で、全用途の許諾ではありません。"
-          : isGakumasDiscography
-            ? "公式ディスコグラフィ掲載曲。現行Driveで未確認の曲も含みます（配布不可の断定ではありません）。"
-            : isTouhou
-              ? tr("touhouPlaylistGuide")
-              : isTouhouOther
-                ? tr("zunOtherPlaylistGuide")
-                : s.id === "valorant"
-              ? "公式曲リンク集。配信・購入は二次利用許諾ではありません。Creator-Safeの対象と条件を要確認。"
-              : s.id === "genshin"
-                ? "Apple Music公式配信への案内です。サブスク・購入は二次利用許諾ではありません。"
-                : s.id === "oj" || s.id === "samfree"
-                  ? "公式ゲーム案内のみ。個別曲の公式配信先・使用許諾は未確認です。"
-                  : s.id === "arknights"
-                    ? "Monster-Siren公式の曲／OSTページです。音源は同梱せず、リンクは利用許諾ではありません。"
-                    : s.id === "endfield"
-                      ? "公式Spotify個別曲・アルバムページとffm.to配信一覧への案内（音源なし）。配信・購入は二次利用許諾ではありません。利用前は公式二次創作ガイドラインを確認してください。"
-                      : forDistributionPlaylist
-                      ? "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8。" + s.name + " の配布形態別フォルダに収容。"
-                      : (s.note || "");
+  const key = s.id === "bluearchive" && pl && pl.sourceUrl ? "plGuideBlueArchive"
+    : s.id === "lol" && pl ? (Object.prototype.hasOwnProperty.call(LOL_GUIDE_KEYS, pl.creatorSafe) ? LOL_GUIDE_KEYS[pl.creatorSafe] : "plGuideRiotLinks")
+      : isGakumasInstrument ? "plGuideGakumasInst"
+        : isGakumasDiscography ? "plGuideGakumasDisco"
+          : isTouhou ? "touhouPlaylistGuide"
+            : s.id === "zun-other" ? "zunOtherPlaylistGuide"
+              : s.id === "valorant" ? "plGuideRiotLinks"
+                : s.id === "genshin" ? "plGuideGenshin"
+                  : s.id === "oj" || s.id === "samfree" ? "plGuideFruitbat"
+                    : s.id === "arknights" ? "plGuideArknights"
+                      : s.id === "endfield" ? "plGuideEndfield"
+                        : s.id === "classical" ? "plGuideClassic"
+                          : s.id === "ncs" ? "plGuideNcs"
+                            : s.id === "macleod" ? "plGuideMacleod"
+                              : forDistributionPlaylist ? "plGuideIntro" : "";
+  /* 鍵の無いシリーズ（MODで足したもの等）は、従来どおりカタログの説明文を控えに使う */
+  const note = key ? plGuideJa(key) : (s.note || "");
   /* GakumasはDrive置場と規約ページを分離。VALORANTの設定ガイドはCreator-Safeへ直接案内。 */
   const guideUrl = isTouhou
     ? "https://github.com/DTM9025/musicroom/releases/latest"
     : (s.id === "gakumas" || s.id === "valorant")
       ? (s.url || "")
       : (pl && pl.sourceUrl) || s.url || "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk";
-  return { note, url: guideUrl };
+  return plGuideSanitize({ note, url: guideUrl, key });
+}
+/* 📄 入手先ガイドの検証（plSanitize と trkCatalogGuide の共通）。key は表示時に今の言語で引くための辞書キーで、
+   許可するのは plGuide…／touhouPlaylistGuide／zunOtherPlaylistGuide だけ。note は日本語の控え
+   （旧版・設定の書き出し用。表示は key が優先）。同じ形に通すので、起動ごとの比較で無駄な書き直しが起きない。
+   ⚠ check-repo は trkCatalogGuide〜plTighten を切り出して vm で動かすので、ガイドの部品はこの範囲に置く。 */
+function plGuideSanitize(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const guide = { note: String(raw.note || "").trim().slice(0, 160),
+    url: /^https:\/\/\S+$/i.test(raw.url || "") ? String(raw.url).slice(0, 300) : "" };
+  if (typeof raw.key === "string" && /^(?:plGuide[A-Za-z0-9]{1,40}|touhouPlaylistGuide|zunOtherPlaylistGuide)$/.test(raw.key)) guide.key = raw.key;
+  return guide;
+}
+function plGuideJa(key) {
+  return (typeof TEXT !== "undefined" && TEXT.ja && typeof TEXT.ja[key] === "string") ? TEXT.ja[key] : "";
+}
+function trkGuide(key, url) { return plGuideSanitize({ note: plGuideJa(key), url, key }); }
+/* LoL は catalog.js の LOL_CREATOR_SAFE（プレイリストごとの Creator-Safe 照合状態）から文言を選ぶ。
+   照合していないものを「対象」と書かない。表に無い状態は公式リンク集の文言（要確認）にする。 */
+const LOL_GUIDE_KEYS = Object.freeze({ verified: "plGuideLolCsVerified", partial: "plGuideLolCsPartial",
+  likely: "plGuideLolCsLikely", unverified: "plGuideLolCsUnverified", sessions: "plGuideLolSessions", mixed: "plGuideLolPopular" });
+/* 🗑 消した trk の自動リストの印（settings.trkRemoved。IDの配列）。印のあるIDは起動時に作り直さない。
+   🐔 の設定の「♻ 消したリストを戻す」か、Game Vol.1／Classic Vol.1 の「開く」ボタンで印を外す。 */
+function trkIsRemoved(id) {
+  const list = core.settings.trkRemoved;
+  return Array.isArray(list) && list.includes(id);
 }
 function ensureTrkDistributionPlaylists() {
   ensureTrkFolder();
@@ -1268,6 +1404,7 @@ function ensureTrkDistributionPlaylists() {
       for (let v = 0; v < vols; v++) {
         const vid = vols === 1 ? baseId : baseId + "-v" + (v+1);
         if (core.settings.playlists.some(p => p.id === vid)) continue;
+        if (trkIsRemoved(vid)) continue;   /* 🗑 利用者が消したリストは作り直さない */
         const slice = wishes.slice(v*100, (v+1)*100);
         const vTag = vols === 1 ? [] : ["Vol."+(v+1)];
         const vName = vols === 1 ? pl.name : pl.name + " Vol." + (v+1);
@@ -1282,7 +1419,7 @@ function ensureTrkDistributionPlaylists() {
   const legacyGakumas = core.settings.playlists.find(p => p.id === "trk-gakumas-v1" && p.cat === "trk:gakumas");
   if (gakumas && legacyGakumas) {
     const wishes = trkWishesForSeries("gakumas").slice(0, 100);
-    const guide = { note: "DOWNLOAD規約はファン動画向け限定。全用途の許諾ではありません。Drive未掲載は配布不可の証明ではありません。", url: gakumas.url };
+    const guide = trkGuide("plGuideGakumasLegacy", gakumas.url);
     if (JSON.stringify(legacyGakumas.wish) !== JSON.stringify(wishes)) { legacyGakumas.wish = wishes; changed = true; }
     if (JSON.stringify(legacyGakumas.guide || null) !== JSON.stringify(guide)) { legacyGakumas.guide = guide; changed = true; }
   }
@@ -1295,6 +1432,7 @@ function ensureTrkDistributionPlaylists() {
   ];
   for (const d of legacy) {
     if (core.settings.playlists.some(p => p.id === d.id)) continue;
+    if (trkIsRemoved(d.id)) continue;
     const s = cat.find(x=> x.id===d.series);
     if (!s) continue;
     // if new per-PL already cover, skip legacy creation
@@ -1302,7 +1440,7 @@ function ensureTrkDistributionPlaylists() {
     const wishesAll = trkWishesForSeries(d.series);
     if (!wishesAll.length) continue;
     const slice = wishesAll.slice(0,100);
-    const p = plSanitize({ id: d.id, name: s.name + " Vol.1", icon: s.icon, color: s.color, folder: d.folder, tags: ["Game", s.name, "Vol.1"], wish: slice, songs: [], guide: { note: "\u975E\u55B6\u5229\u306E\u7D39\u4ECB\u30D7\u30EC\u30A4\u30EA\u30B9\u30C8。", url: s.url || "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk" }, cat: "trk:" + d.series, createdAt: Date.now() });
+    const p = plSanitize({ id: d.id, name: s.name + " Vol.1", icon: s.icon, color: s.color, folder: d.folder, tags: ["Game", s.name, "Vol.1"], wish: slice, songs: [], guide: trkGuide("plGuideIntro", s.url || "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk"), cat: "trk:" + d.series, createdAt: Date.now() });
     if (p) { core.settings.playlists.push(p); changed = true; }
   }
   if (changed) core.saveUserPrefs();
@@ -1400,6 +1538,12 @@ function plCreate() {
   name.focus(); name.select();
 }
 
+/* 📄 入手先ガイドの表示文：key があれば今の言語で引き、無ければ保存した控え（note）をそのまま出す */
+function plGuideText(guide) {
+  if (!guide) return "";
+  if (guide.key && TEXT.ja && typeof TEXT.ja[guide.key] === "string") return tr(guide.key);
+  return guide.note || "";
+}
 /* プレイリスト1つの設定（タブの長押しで開く） */
 function plMenu(p) {
   const d = plDialog(tr("plSettings") + "：" + p.name);
@@ -1427,9 +1571,10 @@ function plMenu(p) {
   del.disabled = !!p.locked; del.title = p.locked ? tr("plLockedNo") : "";
   del.addEventListener("click", () => plDelete(p, d.close));
   lk.addEventListener("change", () => { del.disabled = lk.checked; del.title = lk.checked ? tr("plLockedNo") : ""; });
-  if (p.guide && (p.guide.note || p.guide.url)) {   /* 🛒 公式カタログから取り込んだ入手先 */
+  const guideNote = plGuideText(p.guide);
+  if (p.guide && (guideNote || p.guide.url)) {   /* 🛒 公式カタログから取り込んだ入手先 */
     d.card.append(el("div", "plSep"), el("b", "plCardTitle", tr("plGuideTitle")));
-    if (p.guide.note) d.card.append(el("div", "plHint", "📄 " + p.guide.note));
+    if (guideNote) d.card.append(el("div", "plHint", "📄 " + guideNote));
     if (p.guide.url) {
       const gb = el("button", "plBtn", tr("plLinkOpen")); gb.type = "button";
       gb.addEventListener("click", () => plOpenLink(p.guide.url));
@@ -1580,14 +1725,41 @@ function plFolderDelete(f, onClose) {
 }
 
 /* 🗑 削除（曲はライブラリに残る。🔒中は断る） */
+/* 🗑 trk が自動で作るリスト（ID が trk- で始まる）を消したら印を残し、次の起動で作り直さない。
+   利用者のリスト（pl…）やカタログから手で取り込んだリストには印を付けない。 */
+const TRK_AUTO_ID = /^trk-[A-Za-z0-9_-]{1,40}$/;
+function trkMarkRemoved(id) {
+  if (!TRK_AUTO_ID.test(id)) return;
+  const list = Array.isArray(core.settings.trkRemoved) ? core.settings.trkRemoved.filter(x => x !== id) : [];
+  list.push(id);
+  core.settings.trkRemoved = list.slice(-200);
+}
+function trkUnmarkRemoved(id) {
+  if (Array.isArray(core.settings.trkRemoved)) core.settings.trkRemoved = core.settings.trkRemoved.filter(x => x !== id);
+}
+/* ♻ 印をすべて外して、自動のリストを作り直す（Game Vol.1／Classic は 🐔／🎻 の表示がオンのときだけ）。
+   戻した数（印の付いていたIDのうち、作り直せたもの）を返す */
+function trkRestoreRemoved() {
+  const removed = new Set(Array.isArray(core.settings.trkRemoved) ? core.settings.trkRemoved : []);
+  core.settings.trkRemoved = [];
+  core.saveUserPrefs();
+  try { ensureTrkPlaylist({ toast: false }); } catch (_) {}
+  try { ensureTrkClassicPlaylist({ toast: false }); } catch (_) {}
+  try { ensureTrkOstPlaylist({ toast: false }); } catch (_) {}
+  try { ensureTrkDistributionPlaylists(); } catch (_) {}
+  core.saveUserPrefs();
+  return core.settings.playlists.filter(p => removed.has(p.id)).length;
+}
 function plDelete(p, onClose) {
   if (p.locked) { plToast(tr("plLockedNo")); return; }
   core.settings.playlists = core.settings.playlists.filter(x => x !== p);
+  trkMarkRemoved(p.id);
   core.settings.libOpenTabs = (Array.isArray(core.settings.libOpenTabs) ? core.settings.libOpenTabs : []).filter(x => x !== p.id);
   if (core.settings.libTab === "pl:" + p.id) core.settings.libTab = "all";
   core.saveUserPrefs();
   if (onClose) onClose();
   renderLib();
+  try { syncTrkUI(); } catch (_) {}   /* 🐔 の設定（♻ の件数・並び順の一覧）も今の状態に */
   plToast(tr("plDeleted"));
 }
 /* 📂 フォルダ内プレイリストのタブを閉じる（プレイリスト本体は消さない）。中クリックで使う */
@@ -1666,7 +1838,7 @@ function plCatalogMenu() {
       btn.addEventListener("click", () => { d.close(); plCatalogTake(s, pl); });
       row.append(el("span", "", `${pl.icon} ${pl.name}`));
       if (pl.sourceUrl) {
-        const source = el("button", "plBtn", "🔗 " + (pl.sourceLabel || "公式リンク")); source.type = "button";
+        const source = el("button", "plBtn", "🔗 " + (pl.sourceLabel || tr("plOfficialLink"))); source.type = "button";
         source.addEventListener("click", () => plOpenLink(pl.sourceUrl));
         row.append(source);
       }
@@ -1760,6 +1932,7 @@ function plGlobalMenu() {
   const trkb = el("button", "plBtn", tr("trkCatalogBtn")); trkb.type = "button";
   trkb.addEventListener("click", () => {
     d.close();
+    trkUnmarkRemoved(TRK_PLAYLIST_ID);   /* 自分で開く＝消した印は外す */
     const created = ensureTrkPlaylist({ toast: true });
     if (!created && core.settings.playlists.some(function(p){ return p.id === TRK_PLAYLIST_ID; })) {
       // 既にあるならそのタブへ
@@ -2844,7 +3017,8 @@ window.TrkSelectTutorialSong = async function() {
   const demo = builtInSongs.find(song => song.key === FIRST_SPARK_KEY);
   if (!demo || core.phase !== "title") return false;
   try { ensureTrkOstPlaylist({ toast: false }); } catch(_){}   /* 🎓 デモ曲の居所（trk's OST Vol.1）を用意 */
-  core.settings.libTab = "pl:" + TRK_OST_ID; core.saveUserPrefs(); renderLib();
+  /* 利用者が OST を消していたら作り直さず、📚すべて で見せる */
+  core.settings.libTab = plById(TRK_OST_ID) ? "pl:" + TRK_OST_ID : "all"; core.saveUserPrefs(); renderLib();
   await selectSong(demo);
   return !!(core.videoReady && core.currentSong && core.currentSong.key === FIRST_SPARK_KEY);
 };
@@ -3195,6 +3369,12 @@ function syncTrkUI() {
   if (nameSel) nameSel.value = trkNameMode();
   const chkAbc = core.$("trkSortAbcChk");
   if (chkAbc) chkAbc.checked = !!core.settings.trkSortABC;
+  const restore = core.$("trkRestoreBtn");
+  if (restore) {
+    const removed = Array.isArray(core.settings.trkRemoved) ? core.settings.trkRemoved.length : 0;
+    restore.hidden = !removed;
+    restore.textContent = tr("trkRestoreBtn", { n: removed });
+  }
   try { renderTrkSettings(); } catch(_){}
 }
 function trkFolderIdSet() { return plWishFolderIds(TRK_FOLDER_ID); }   /* 🐔 の階層に入るフォルダ（trk 自身と、その子孫） */
@@ -3249,6 +3429,7 @@ if (trkNameSel) trkNameSel.addEventListener("change", function(){
 });
 const trkOpenBtn = core.$("trkOpenBtn");
 if (trkOpenBtn) trkOpenBtn.addEventListener("click", function(){
+  trkUnmarkRemoved(TRK_PLAYLIST_ID);   /* 自分で開く＝消した印は外す */
   const created = ensureTrkPlaylist({ toast: true });
   core.settings.libTab = "pl:" + TRK_PLAYLIST_ID; core.saveUserPrefs(); renderLib();
   if (!created) plToast(tr("trkDup"));
@@ -3266,6 +3447,7 @@ if (trkClassicChk) trkClassicChk.addEventListener("change", function(){
 });
 const trkClassicOpenBtn = core.$("trkClassicOpenBtn");
 if (trkClassicOpenBtn) trkClassicOpenBtn.addEventListener("click", function(){
+  trkUnmarkRemoved(TRK_CLASSIC_ID);   /* 自分で開く＝消した印は外す */
   const created = ensureTrkClassicPlaylist({ toast: true });
   core.settings.libTab = "pl:" + TRK_CLASSIC_ID; core.saveUserPrefs(); renderLib();
   if (!created) plToast(tr("trkClassicDup"));
@@ -3273,6 +3455,11 @@ if (trkClassicOpenBtn) trkClassicOpenBtn.addEventListener("click", function(){
 const trkClassicHideBtn = core.$("trkClassicHideBtn");
 if (trkClassicHideBtn) trkClassicHideBtn.addEventListener("click", function(){
   core.settings.trkClassic = false; core.saveUserPrefs(); syncTrkUI(); renderLib(); plToast(tr("trkClassicHide"));
+});
+const trkRestoreBtn = core.$("trkRestoreBtn");
+if (trkRestoreBtn) trkRestoreBtn.addEventListener("click", function(){
+  const n = trkRestoreRemoved();
+  syncTrkUI(); renderLib(); plToast(tr("trkRestored", { n }));
 });
 if (typeof on === "function") on("language", syncTrkUI);
 const libKeepChk = core.$("libKeepSharedChk");
@@ -3390,8 +3577,9 @@ async function initLibrary() {
   if (core.settings.tutorialDone) {
     try { ensureTrkDistributionPlaylists(); } catch(_){}
   }
+  try { trkGuideBackfill(); } catch(_){}
   /* 旧「🎓デモ曲」タブ（builtin）を見ていた設定を、新しいOSTプレイリストへ移行 */
-  if (core.settings.libTab === "builtin") core.settings.libTab = "pl:" + TRK_OST_ID;
+  if (core.settings.libTab === "builtin") core.settings.libTab = plById(TRK_OST_ID) ? "pl:" + TRK_OST_ID : "all";
   syncTrkUI();
   renderLib();
   void initOptionalTutorialDemo();
@@ -3428,7 +3616,7 @@ window.startPreview = startPreview;
 window.trySongChart = trySongChart;
 /* 領域（window.Trk.library）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
 window.Trk = window.Trk || {};
-window.Trk.library = Object.assign(window.Trk.library || {}, { LIB_SHOW, addSongFiles, addVideoFiles, allSongs, bannerRandomBtn, bannerVolTip, ensureTrkDistributionPlaylists, initLibrary, nextSong, onLongPress, plToast, prevSong, previewStartFor, refreshPackSongs, saveSongPrefs, selectSong, setAddonSongs, songInfo, srcLabel, startPreview, trySongChart, plTitleKeys, plSongMatchKeys, plWishTitleKeys });
+window.Trk.library = Object.assign(window.Trk.library || {}, { LIB_SHOW, addSongFiles, addVideoFiles, allSongs, bannerRandomBtn, bannerVolTip, ensureTrkDistributionPlaylists, ensureTrkOstPlaylist, trkOstPlaylistId: TRK_OST_ID, trkRestoreRemoved, initLibrary, nextSong, onLongPress, plToast, prevSong, previewStartFor, refreshPackSongs, saveSongPrefs, selectSong, setAddonSongs, songInfo, srcLabel, startPreview, trySongChart, plTitleKeys, plSongMatchKeys, plWishTitleKeys });
 Object.defineProperty(window.Trk.library, "addonSongs", { configurable:true, get:() => addonSongs, set:v => { addonSongs = v; } });
 Object.defineProperty(window.Trk.library, "libView", { configurable:true, get:() => libView, set:v => { libView = v; } });
 Object.defineProperty(window.Trk.library, "renderBanner", { configurable:true, get:() => renderBanner, set:v => { renderBanner = v; } });

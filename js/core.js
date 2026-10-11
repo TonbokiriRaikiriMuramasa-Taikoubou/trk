@@ -86,6 +86,11 @@ function cleanTvParamFavorites(v) {
   }
   return out;
 }
+/* 🗑 消した trk の自動リストのID（library.js が作り直さないための印）。trk- で始まるIDだけ、重複なし・200件まで */
+function cleanTrkRemoved(v) {
+  if (!Array.isArray(v)) return [];
+  return [...new Set(v.filter(x => typeof x === "string" && /^trk-[A-Za-z0-9_-]{1,40}$/.test(x)))].slice(-200);
+}
 function guessLang() {
   const l = (navigator.language || "en").toLowerCase();
   return l.startsWith("ja") ? "ja" : l.startsWith("zh") ? "zh" : l.startsWith("ko") ? "ko" : "en";
@@ -266,6 +271,7 @@ const settings = {
   libKeepShared: prefs.libKeepShared === true,                                // 📤💾 共有で取り込んだ曲を端末に残す（初期オフ。library.js）
   trkPlaylist: prefs.trkPlaylist !== false,                               // 🐔 trk's playlist（右端のタブ。チュートリアル後に自動追加。設定で非表示可）
   trkClassic: prefs.trkClassic !== false,                                // 🎻 trk classic（クラシック名盤。ゲームとは別枠で100曲。設定で非表示可）
+  trkRemoved: cleanTrkRemoved(prefs.trkRemoved),                         // 🗑 消した trk の自動リスト（次の起動で作り直さない。🐔の設定の ♻ で戻す）
   trkSortABC: prefs.trkSortABC === true,                                 // 🔤 trk フォルダ内をABC順で並べる（初期オフ）
   trkTabName: pick(prefs.trkTabName, TRK_ENUM_VALUES.trkTabName, "full"), // 🐔 タブの表示名（full=trk's playlist／short=trk's／icon=🐔 だけ）
   playlistOrder: (Array.isArray(prefs.playlistOrder) ? prefs.playlistOrder : []).map(x => String(x).slice(0, 48)).filter(Boolean).slice(0, 200), // ↕ 自由並べ替え（初期は作成順）
@@ -497,6 +503,7 @@ function resetAllPrefs() {
   settings.tvParamFavs = []; // a factory reset clears the separately preserved TV bookmarks too
   settings.trkPlaylist = true; // 🐔 trk's playlistも初期状態に戻す（再表示）
   settings.trkClassic = true;  // 🎻 trk classic も初期状態に戻す
+  settings.trkRemoved = [];    // 🗑 消したリストの印も外す（プレイリストごと初期化するため）
   settings.trkSortABC = false; settings.playlistOrder = []; settings.trkTabName = "full"; settings.chartGen = "2";
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
@@ -1054,6 +1061,8 @@ function applySkin(id, persist = true) {
   settings.skin = has(window.Trk.data.SKINS, id) ? id : "shadow";
   const s = skin(), root = document.documentElement.style;
   for (const [k, v] of Object.entries(s.ui)) root.setProperty(k, v);
+  /* 🔤 小さな文字に使うアクセント色（入れ子の欄でも 4.5:1。足りているスキンは --ui-accent と同じ） */
+  root.setProperty("--ui-accent-ink", window.Trk.data.accentInk(s.ui));
   root.setProperty("--stage-bg", s.game.stage); root.setProperty("--hud-text", s.game.ink);
   root.setProperty("--hud-shadow", s.game.inkShadow); root.setProperty("--font", s.font || window.Trk.data.FONT_DEFAULT);
   root.setProperty("--j-perfect", s.game.perfect); root.setProperty("--j-good", s.game.good); root.setProperty("--j-miss", s.game.miss);
@@ -1256,6 +1265,8 @@ function validImportedSettingEnum(key, value) {
         if (hasImported("bgDim") && typeof data.bgDim === "number") { settings.bgDim = clampTvDim(data.bgDim); applied.push("bgDim"); }
         if (hasImported("bgBlur") && typeof data.bgBlur === "number") { settings.bgBlur = clampTvBlur(data.bgBlur); applied.push("bgBlur"); }
         if (hasImported("tvParamFavs")) { settings.tvParamFavs = cleanTvParamFavorites(data.tvParamFavs); applied.push("tvParamFavs"); }
+        /* 🗑 trk の消した印は、要素（trk- で始まるID）まで検証してから代入する */
+        if (hasImported("trkRemoved") && Array.isArray(data.trkRemoved)) { settings.trkRemoved = cleanTrkRemoved(data.trkRemoved); applied.push("trkRemoved"); }
         const importedTvDockSkin = hasImported("tvDockSkin") && typeof data.tvDockSkin === "string" && window.TrkTV && typeof window.TrkTV.skins === "function" &&
           window.TrkTV.skins().some(item => item && item.id === data.tvDockSkin) ? data.tvDockSkin : "";
         if (importedTvDockSkin) { settings.tvDockSkin = importedTvDockSkin; applied.push("tvDockSkin"); }
@@ -1279,7 +1290,7 @@ function validImportedSettingEnum(key, value) {
         // 既知キーだけを取り込み、型と列挙IDは代入前に検証する。
         // ⚠ 弾いたキーは黙って捨てない（「読み込みました」なのに反映されない事故を防ぐ）。最後にまとめて報告する。
         for (const k of Object.keys(data)) {
-          if (UNSAFE_KEYS.has(k) || ["notes", "videoStyle", "tvDockSkin", "bgDim", "bgBlur", "tvParamFavs", "musicVolume", "musicVolumeRestore"].includes(k) || applied.includes(k)) continue;
+          if (UNSAFE_KEYS.has(k) || ["notes", "videoStyle", "tvDockSkin", "bgDim", "bgBlur", "tvParamFavs", "trkRemoved", "musicVolume", "musicVolumeRestore"].includes(k) || applied.includes(k)) continue;
           if (!Object.prototype.hasOwnProperty.call(settings, k)) { reject(k, "unknown"); continue; }
           const current = settings[k], incoming = data[k];
           const sameShape = Array.isArray(current) ? Array.isArray(incoming)

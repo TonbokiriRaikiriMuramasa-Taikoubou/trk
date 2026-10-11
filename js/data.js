@@ -35,6 +35,45 @@ function luminance(hex) {
   const c = [n >> 16 & 255, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; });
   return .2126 * c[0] + .7152 * c[1] + .0722 * c[2];
 }
+/* 🔤 アクセント色を「小さな文字」に使うときの色（CSS変数 --ui-accent-ink。core.js の applySkin が毎回入れる）。
+   設定画面でいちばん濃く重なる面（カード --ui-panel の上に --ui-soft が2枚＝パネルの中の小欄）でも
+   4.5:1（WCAG AA）を満たすまで、アクセントを本文の色（--ui-text）へ5%ずつ寄せる。足りていれば元の色のまま。
+   --ui-bg がグラデーションのときは、ほぼ不透明なカードの色で代える（透ける分は数%）。 */
+function parseUiColor(v) {
+  const t = String(v || "").trim();
+  if (/^#[0-9a-f]{3}$/i.test(t) || /^#[0-9a-f]{6}$/i.test(t)) { const n = parseInt(toHex(t).slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255, 1]; }
+  const m = t.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+)\s*)?\)$/i);
+  if (!m) return null;
+  const c = m.slice(1, 4).map(x => Math.min(255, Number(x)));
+  return [c[0], c[1], c[2], m[4] === undefined ? 1 : Math.max(0, Math.min(1, Number(m[4])))];
+}
+function overUiColor(top, base) {
+  const a = top[3];
+  return [top[0] * a + base[0] * (1 - a), top[1] * a + base[1] * (1 - a), top[2] * a + base[2] * (1 - a), 1];
+}
+function uiContrast(a, b) {
+  const lum = c => { const v = c.slice(0, 3).map(x => { x /= 255; return x <= .03928 ? x / 12.92 : ((x + .055) / 1.055) ** 2.4; }); return .2126 * v[0] + .7152 * v[1] + .0722 * v[2]; };
+  const x = lum(a), y = lum(b);
+  return (Math.max(x, y) + .05) / (Math.min(x, y) + .05);
+}
+function accentInkBackground(ui) {
+  const panel = parseUiColor(ui["--ui-panel"]), soft = parseUiColor(ui["--ui-soft"]) || [0, 0, 0, 0];
+  if (!panel) return null;
+  const bg = parseUiColor(ui["--ui-bg"]);
+  const card = overUiColor(panel, bg && bg[3] === 1 ? bg : [panel[0], panel[1], panel[2], 1]);
+  return overUiColor(soft, overUiColor(soft, card));
+}
+function accentInk(ui) {
+  const accent = parseUiColor(ui && ui["--ui-accent"]), text = parseUiColor(ui && ui["--ui-text"]);
+  const back = ui && accentInkBackground(ui);
+  if (!accent || !text || !back) return (ui && (ui["--ui-accent"] || ui["--ui-text"])) || "#888888";
+  for (let step = 0; step <= 20; step++) {
+    const t = step / 20;
+    const ink = [0, 1, 2].map(i => Math.round(accent[i] + (text[i] - accent[i]) * t));
+    if (uiContrast(ink.concat(1), back) >= 4.6) return step ? "#" + ink.map(v => v.toString(16).padStart(2, "0")).join("") : ui["--ui-accent"];
+  }
+  return ui["--ui-text"];
+}
 function mixHex(a, b, t) {
   const ch = h => { const n = parseInt(toHex(h).slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
   const ca = ch(a), cb = ch(b);
@@ -726,5 +765,5 @@ window.sanitizeSkinDef = sanitizeSkinDef;
 window.toHex = toHex;
 /* 領域（window.Trk.data）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
 window.Trk = window.Trk || {};
-window.Trk.data = Object.assign(window.Trk.data || {}, { DIFFS, DIFF_IDS, EGG_KEYS, EGG_WORDS, FONT_DEFAULT, H, HEX, LAYOUTS, MASCOT_CAPTIONS, MASCOT_DEFS, MASCOT_FAMILY, MASCOT_IDS, MASCOT_POS, NOTE_PRESETS, NOTE_SHAPES, SKINS, TAU, VRM_RECT, W, buildCustomSkin, has, hexToRgba, luminance, mixHex, parseGrad, registerMascot, sanitizeNotes, sanitizeSkinDef, toHex });
+window.Trk.data = Object.assign(window.Trk.data || {}, { DIFFS, DIFF_IDS, EGG_KEYS, EGG_WORDS, FONT_DEFAULT, H, HEX, LAYOUTS, MASCOT_CAPTIONS, MASCOT_DEFS, MASCOT_FAMILY, MASCOT_IDS, MASCOT_POS, NOTE_PRESETS, NOTE_SHAPES, SKINS, TAU, VRM_RECT, W, accentInk, accentInkBackground, buildCustomSkin, has, hexToRgba, luminance, mixHex, parseGrad, registerMascot, sanitizeNotes, sanitizeSkinDef, toHex });
 })();

@@ -2,12 +2,25 @@
   "asOf": "2026-10-09",
   "scope": "Phase 3: the nine official SoundCloud albums 'The Music of League of Legends: Season 1-9 (Original Game Soundtrack)', the official 'Warsongs' album, and a snapshot of the official SoundCloud popular-tracks page. Not the complete LoL music catalog.",
   "method": "Playlist links point at the official SoundCloud album/page. Per-track links point at the official Spotify album tracks (same pattern as the Creator-Safe Sessions lists), because a SoundCloud set page only exposes its first 15 tracks without JavaScript. Track order/count/title/artist follow the official Spotify album page; Season 1 (9 tracks) and Season 2 (30 tracks) were additionally compared against the official SoundCloud set pages and matched title-for-title in the same order. matchAliases are mechanical prefix truncations of the official title (no invented names).",
+  "creatorSafe": {
+    "playlist": "https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N",
+    "description": "Riot Games' official Spotify playlist 'Riot Games Creator-Safe Playlist', described as a collection of music that is 100% owned by Riot Games (979 songs at the trk108 check).",
+    "method": "Matched title, artist and order against the official Spotify embed of the playlist, which shows only the first 100 entries: positions 1-20 = Season 9 (20/20), 21-59 = Season 8 (39/39), 60-100 = the first 41 of Season 7's 48 tracks (checked 2026-10-11; Season 9 was first matched on 2026-10-09 including durations). Entries after position 100 were not visible, so the rest of Season 7, Season 1-6 and Warsongs are not matched.",
+    "statuses": {
+      "verified": "every track matched in the official playlist",
+      "partial": "only matchedTracks tracks matched; the rest are not matched yet",
+      "likely": "same season-OST album series as the matched albums, not matched yet",
+      "unverified": "not matched; external artists are credited, so inclusion is not inferred"
+    },
+    "catalogStatusSource": "js/catalog.js LOL_CREATOR_SAFE (must equal albums[].creatorSafe.status; checked by tools/check-repo.mjs)"
+  },
   "sources": {
     "soundcloudAlbumsPage": "https://soundcloud.com/leagueoflegends/albums",
     "soundcloudPopularTracks": "https://soundcloud.com/leagueoflegends/popular-tracks",
     "soundcloudProfile": "https://soundcloud.com/leagueoflegends",
     "spotifyArtist": "https://open.spotify.com/artist/47mIJdHORyRerp4os813jD",
-    "creatorSafeGuidelines": "https://www.riotgames.com/en/riot-music-creator-safe-guidelines"
+    "creatorSafeGuidelines": "https://www.riotgames.com/en/riot-music-creator-safe-guidelines",
+    "creatorSafePlaylist": "https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N"
   },
   "albums": [
     {
@@ -25,6 +38,9 @@
       "soundcloudUrl": "https://soundcloud.com/leagueoflegends/sets/the-music-of-league-of-2",
       "spotifyAlbumUrl": "https://open.spotify.com/album/6GXIGoirm6W8EnwYytVj1j",
       "trackCount": 9,
+      "creatorSafe": {
+        "status": "likely"
+      },
       "tracks": [
         [
           "Welcome to League of Legends - Theme (From League of Legends: Season 1)",
@@ -97,6 +113,9 @@
       "soundcloudUrl": "https://soundcloud.com/leagueoflegends/sets/the-music-of-league-of-9",
       "spotifyAlbumUrl": "https://open.spotify.com/album/5tbKnlrYfWLOS2oDNVRG1I",
       "trackCount": 30,
+      "creatorSafe": {
+        "status": "likely"
+      },
       "tracks": [
         [
           "Battlecast Prime Cho Gath (From League of Legends: Season 2)",
@@ -295,6 +314,9 @@
       "soundcloudUrl": "https://soundcloud.com/leagueoflegends/sets/the-music-of-league-of-1",
       "spotifyAlbumUrl": "https://open.spotify.com/album/12Wkzjt1vkH0F5TLChsscq",
       "trackCount": 23,
+      "creatorSafe": {
+        "status": "likely"
+      },
       "tracks": [
         [
           "Aatrox, the Darkin Blade - Classic Login (From League of Legends: Season 3)",
@@ -451,6 +473,9 @@
       "soundcloudUrl": "https://soundcloud.com/leagueoflegends/sets/the-music-of-league-of-4",
       "spotifyAlbumUrl": "https://open.spotify.com/album/5yJhZ0IbtdXn8PatnYG8qf",
       "trackCount": 22,
+      "creatorSafe": {
+        "status": "likely"
+      },
       "tracks": [
         [
           "A New Dawn (From League of Legends: Season 4)",
@@ -601,6 +626,9 @@
       "soundcloudUrl": "https://soundcloud.com/leagueoflegends/sets/the-music-of-league-of-3",
       "spotifyAlbumUrl": "https://open.spotify.com/album/7KZ6m6G3EyNxahSR2HZ8h9",
       "trackCount": 25,
+      "creatorSafe": {
+        "status": "likely"
+      },
       "tracks": [
         [
           "Bard, the Wandering Caretaker (From League of Legends: Season 5)",
@@ -769,6 +797,9 @@
       "soundcloudUrl": "https://soundcloud.com/leagueoflegends/sets/the-music-of-league-of-7",
       "spotifyAlbumUrl": "https://open.spotify.com/album/6DK95stzKIJ8QFuN4rsc92",
       "trackCount": 27,
+      "creatorSafe": {
+        "status": "likely"
+      },
       "tracks": [
         [
           "Aurelion Sol, the Star Forger (From League of Legends: Season 6)",
@@ -949,6 +980,21 @@
       "soundcloudUrl": "https://soundcloud.com/leagueoflegends/sets/the-music-of-league-of-6",
       "spotifyAlbumUrl": "https://open.spotify.com/album/4ejVwiIVblKgKMspuxAAQ8",
       "trackCount": 48,
+      "creatorSafe": {
+        "status": "partial",
+        "matchedTracks": 41,
+        "checkedAt": "2026-10-11",
+        "playlistPositions": "60-100",
+        "notYetMatched": [
+          "Star Guardian: Invasion - We'll Get them Next Time (From League of Legends: Season 7)",
+          "Super Galaxy - 2017 - Trailer (From League of Legends: Season 7)",
+          "Urgot, the Dreadnought (From League of Legends: Season 7)",
+          "VS. 2017 - Yasuo vs Riven (From League of Legends: Season 7)",
+          "Warwick, the Uncaged Wrath of Zaun (From League of Legends: Season 7)",
+          "Zoe, the Aspect of Twilight (From League of Legends: Season 7)",
+          "Zoe, the Aspect of Twilight - Trailer (From League of Legends: Season 7)"
+        ]
+      },
       "tracks": [
         [
           "Arcade - 2017 (From League of Legends: Season 7)",
@@ -1255,6 +1301,12 @@
       "soundcloudUrl": "https://soundcloud.com/leagueoflegends/sets/the-music-of-league-473008103",
       "spotifyAlbumUrl": "https://open.spotify.com/album/5Qoly8Zj0HhJl8sc5rmplS",
       "trackCount": 39,
+      "creatorSafe": {
+        "status": "verified",
+        "matchedTracks": 39,
+        "checkedAt": "2026-10-11",
+        "playlistPositions": "21-59"
+      },
       "tracks": [
         [
           "Aatrox, the Darkin Blade (From League of Legends: Season 8)",
@@ -1507,6 +1559,12 @@
       "soundcloudUrl": "https://soundcloud.com/leagueoflegends/sets/the-music-of-league-of-5",
       "spotifyAlbumUrl": "https://open.spotify.com/album/3cYnSSnBe1akJwxv64PHOg",
       "trackCount": 20,
+      "creatorSafe": {
+        "status": "verified",
+        "matchedTracks": 20,
+        "checkedAt": "2026-10-11",
+        "playlistPositions": "1-20"
+      },
       "tracks": [
         [
           "Arcade 2019: ULTRACOMBO (From League of Legends: Season 9)",
@@ -1645,6 +1703,9 @@
       "soundcloudUrl": "https://soundcloud.com/leagueoflegends/sets/warsongs-7",
       "spotifyAlbumUrl": "https://open.spotify.com/album/1KHalUH2ZfT38gIdT8MJdn",
       "trackCount": 11,
+      "creatorSafe": {
+        "status": "unverified"
+      },
       "tracks": [
         [
           "Piercing Light (feat. Mako)",
@@ -1914,6 +1975,10 @@
         "lightbringer",
         ""
       ]
-    ]
+    ],
+    "creatorSafe": {
+      "status": "mixed",
+      "note": "Snapshot of the official popular-tracks page. Collaboration songs (Worlds/MSI anthems, K/DA, True Damage, HEARTSTEEL and other external-artist tracks) are outside the Creator-Safe Playlist or unconfirmed; not matched song by song."
+    }
   }
 }

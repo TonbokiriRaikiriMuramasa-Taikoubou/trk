@@ -159,3 +159,83 @@ describe("Local MIDI rendering", () => {
     assert.equal(wavFile.type, "audio/wav");
   });
 });
+
+/* trk114: the render budget counts only audible work, is checked before synthesis, and is
+   reported separately from the event/track limits ("too long or too many notes at once"). */
+const trackOf = rows => [...rows.flatMap(([delta, ...bytes]) => [...vlq(delta), ...bytes]), 0, 0xff, 0x2f, 0];
+const TICKS_PER_SECOND = 960; // division 480 at the default 120 BPM
+function chordLoop(minutes) {
+  const rows = [[0, 0xc0, 0]];
+  const shapes = [[60, 64, 67, 72], [57, 60, 64, 69], [62, 65, 69, 74], [55, 59, 62, 67]];
+  for (let i = 0; i < Math.round(minutes * 60 * 4); i++) {
+    const notes = shapes[i % 4];
+    for (const note of notes) rows.push([0, 0x90, note, 100]);
+    notes.forEach((note, k) => rows.push([k === 0 ? TICKS_PER_SECOND / 4 : 0, 0x80, note, 0]));
+  }
+  return midiFile(trackOf(rows));
+}
+
+describe("MIDI render budget", () => {
+  test("exports the limit and estimates without synthesizing audio", () => {
+    assert.equal(midi.maxVoiceSamples, 200 * 1000 * 1000);
+    const estimate = midi.estimateRender(oneNoteMidi());
+    assert.equal(estimate.notes, 1);
+    assert.equal(estimate.maxVoiceSamples, midi.maxVoiceSamples);
+    assert.ok(estimate.withinLimit && estimate.voiceSamples > 0 && estimate.voiceSamples < 22050);
+  });
+
+  test("a 9.5-minute four-note chord loop (rejected before trk114) is within the limit", () => {
+    const parsed = midi.parseMidi(chordLoop(9.5));
+    assert.ok(parsed.durationSeconds > 569 && parsed.durationSeconds < 600);
+    const estimate = midi.estimateRender(parsed);
+    assert.equal(estimate.notes, 9120);
+    assert.ok(estimate.withinLimit, `needs ${estimate.voiceSamples} voice-samples`);
+    assert.ok(estimate.voiceSamples > 80 * 1000 * 1000, "the old 80M budget really was exceeded");
+  });
+
+  test("many long simultaneous notes are rejected as midi-too-dense before any audio is made", async () => {
+    const rows = [];
+    for (let channel = 0; channel < 16; channel++) {
+      if (channel === 9) continue;
+      rows.push([0, 0xc0 | channel, 48]);
+      for (let note = 0; note < 16; note++) rows.push([0, 0x90 | channel, 40 + note, 90]);
+    }
+    let first = true;
+    for (let channel = 0; channel < 16; channel++) {
+      if (channel === 9) continue;
+      for (let note = 0; note < 16; note++) { rows.push([first ? 590 * TICKS_PER_SECOND : 0, 0x80 | channel, 40 + note, 0]); first = false; }
+    }
+    const parsed = midi.parseMidi(midiFile(trackOf(rows)));
+    const estimate = midi.estimateRender(parsed);
+    assert.equal(estimate.withinLimit, false);
+    assert.ok(estimate.voiceSamples > midi.maxVoiceSamples);
+    const started = Date.now();
+    await assert.rejects(midi.renderParsedMidi(parsed), error => error.code === "midi-too-dense");
+    assert.ok(Date.now() - started < 2000, "the budget is checked before synthesis");
+  });
+
+  test("inaudible tails are not counted: undamped drum hits and a held piano note", () => {
+    const drums = [];
+    for (let i = 0; i < 200; i++) drums.push([i ? TICKS_PER_SECOND * 0.3 : 0, 0x99, 42, 100]);   // closed hi-hat, never released
+    drums.push([TICKS_PER_SECOND * 3, 0x80, 60, 0]);
+    const drumEstimate = midi.estimateRender(midiFile(trackOf(drums)));
+    assert.ok(drumEstimate.voiceSamples < 200 * 0.5 * 22050, `drum work ${drumEstimate.voiceSamples}`);
+
+    const piano = midiFile(trackOf([[0, 0xc0, 0], [0, 0x90, 60, 100], [300 * TICKS_PER_SECOND, 0x80, 60, 0]]));
+    const pianoEstimate = midi.estimateRender(piano);
+    assert.ok(pianoEstimate.voiceSamples > 11 * 22050 && pianoEstimate.voiceSamples < 12 * 22050,
+      `the piano decay is 72 dB down after ~11.6 s (got ${pianoEstimate.voiceSamples / 22050} s)`);
+  });
+
+  test("reports progress and stops when the caller aborts", async () => {
+    const rows = [[0, 0xc0, 0]];
+    for (let i = 0; i < 600; i++) rows.push([i ? 48 : 0, 0x90, 48 + (i % 24), 100], [48, 0x80, 48 + (i % 24), 0]);
+    const parsed = midi.parseMidi(midiFile(trackOf(rows)));
+    const seen = [];
+    await midi.renderParsedMidi(parsed, { sampleRate: 8000, onProgress: value => seen.push(value) });
+    assert.ok(seen.length >= 2, "progress is reported at each yield");
+    assert.ok(seen.every((value, i) => value > 0 && value <= 1 && (i === 0 || value >= seen[i - 1])));
+    await assert.rejects(midi.renderParsedMidi(parsed, { sampleRate: 8000, shouldAbort: () => true }),
+      error => error.code === "midi-aborted");
+  });
+});

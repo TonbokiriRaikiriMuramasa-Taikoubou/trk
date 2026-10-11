@@ -14,7 +14,7 @@ const context = { window: {} };
 vm.createContext(context);
 vm.runInContext(themeDataSrc, context, { filename: "js/touhou-theme-data.js" });
 vm.runInContext(catalogSrc, context, { filename: "js/catalog.js" });
-const data = context.window.TrkTouhouThemeData;
+const data = context.window.Trk.touhouThemeData;
 const catalog = vm.runInContext("TRK_CATALOG", context);
 const main = catalog.find(series => series.id === "touhou");
 const adjacent = catalog.find(series => series.id === "zun-other");

@@ -9,7 +9,9 @@
  */
 (function () {
   "use strict";
-  window.TrkTouhouThemeData = Object.freeze({
+  /* Registered under the trk namespace (window.Trk.touhouThemeData); read by catalog.js and library.js. */
+  window.Trk = window.Trk || {};
+  window.Trk.touhouThemeData = Object.freeze({
     titles: Object.freeze(
 {
       "none": "(none)",

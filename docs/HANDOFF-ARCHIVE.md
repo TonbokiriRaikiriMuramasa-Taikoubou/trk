@@ -1,8 +1,12 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移したtrk70〜trk110の履歴です。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
+> `docs/HANDOFF.md` から移したtrk70〜trk111の履歴です。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
 
 ## 旧 HANDOFF §11「最近の変更」
+
+### trk111 の記録（2026-10-11。trk114のときに HANDOFF §7 から移動）
+
+- **trk111（2026-10-11）**：エンドフィールド公式カタログにMetal Scar Radioの公式アルバム6作・計81曲を追加（Eve of Departure 5曲・Thunder's Legacy 9曲・At the Wake of Spring OST 17曲・Contingency Contract Re-Ignition OST 4曲・Homecoming OST 30曲・Dreamscape of Wind and Snow OST 16曲、いずれも公式Spotify収録順）。各曲は公式Spotify個別曲、各アルバムは公式Spotifyアルバムページへリンクし、取り込み時に `trk-ef-*` を自動作成。この6作の中国語公式曲名・ffm.to告知リンク（Homecoming 以外）・VGMdb照合は未確認（照合別名なし）。台帳 `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、fixture `tools/endfield-msr-albums-tracklist.json`、検査は `tools/check-repo.mjs` の🛰️MSR albumsブロックに追加。ガイド（`appearance.md`・`en.md`）とNOTICEを更新し、`sw.js` cache名を `trk-v2026.10.11-trk111` に更新。
 
 ### trk109〜trk110 の記録（2026-10-10。trk113のときに HANDOFF §7 から移動）
 
@@ -13,7 +17,7 @@
 
 - **trk106 — 譜面中のジャケット配置**：選曲中は従来どおり動画枠中央、譜面演奏中は右上タイマーの下（160×160px枠）へ配置。右余白とタイマー間隔を固定し、各レイアウトでレーン・ノーツに重ねない。元画像は拡大せず、全画面設定オンも従来どおり。実機確認は現行HANDOFF §4を参照。
 - **trk107 — LoLプレイリストの整理**：公式SoundCloudアルバムを1アルバム＝1プレイリストにし、Season 1〜9のゲームOST 243曲、Warsongs 11曲、公式人気曲30曲を追加。LoLは計18プレイリスト・456曲。音源は同梱せず、アルバムは公式SoundCloud、曲別は公式Spotify（人気曲は公式SoundCloud）へリンク。詳細と未確認事項は `docs/LEAGUE-OF-LEGENDS-MUSIC.md` とfixtureを参照。
-- **trk108 — LoL Creator-Safe対象の確認**：Riot公式Creator-Safe Playlistへの掲載を確認し、Season 1〜9のOST 243曲とWarsongs 11曲を対象として扱う。人気曲の共同制作曲、K/DA、Worlds 2026「Know My Name」等は対象外・要確認のまま。根拠と制限はLoL調査台帳を参照。
+- **trk108 — LoL Creator-Safe対象の確認**（※trk114で訂正：実際に照合したのはSeason 9だけだった。trk114でSeason 8全曲とSeason 7の41曲を追加照合し、残りは「可能性が高い・未照合／未照合」と表示）：Riot公式Creator-Safe Playlistへの掲載を確認し、Season 1〜9のOST 243曲とWarsongs 11曲を対象として扱う。人気曲の共同制作曲、K/DA、Worlds 2026「Know My Name」等は対象外・要確認のまま。根拠と制限はLoL調査台帳を参照。
 
 ### trk100〜trk105 の記録（2026-10-10。trk108 のときに HANDOFF §8 から移動）
 

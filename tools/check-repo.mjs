@@ -47,6 +47,17 @@ function readReadme() {
   return [fs.readFileSync(path.join(root, "README.md"), "utf8"), ...guide].join("\n");
 }
 
+/* library.js の TEXT 断片（行頭の Object.assign(TEXT.xx, { … }); ）だけを評価した辞書。
+   入手先ガイドは日本語の控え（note）を TEXT.ja から引くので、trkCatalogGuide を vm で動かす検査に渡す。 */
+const LIBRARY_TEXT_FOR_CHECK = (() => {
+  const TEXT = { ja: {}, en: {}, zh: {}, ko: {} };
+  const context = vm.createContext({ TEXT });
+  for (const block of read("js/library.js").match(/^Object\.assign\(TEXT\.(?:ja|en|zh|ko), \{[\s\S]*?^\}\);$/gm) || []) {
+    new vm.Script(block).runInContext(context);
+  }
+  return TEXT;
+})();
+
 /* 曲名の照合（js/title-match.js の純関数）＋ plWishMatch（library.js）。
    check-repo の文字列検査と、vm での入出力検査が同じ定義を見るための共通の断片。 */
 const titleMatchSrc = read("js/title-match.js");
@@ -690,6 +701,7 @@ if (!exists("js/fx-worklet.js") ||
         settings:testSettings,
         ensureTrkFolder:() => {},
         trkCatalog:() => [gakumas],
+        TEXT: LIBRARY_TEXT_FOR_CHECK,
         plSanitize:raw => raw,
         saveUserPrefs:() => { saveCount++; },
         trkWishesForSeries:() => allGakumasWishes
@@ -788,6 +800,7 @@ if (!exists("js/fx-worklet.js") ||
         settings:testSettings,
         ensureTrkFolder:() => {},
         trkCatalog:() => [series],
+        TEXT: LIBRARY_TEXT_FOR_CHECK,
         plSanitize:raw => raw,
         saveUserPrefs:() => { saveCount++; },
         trkWishesForSeries:() => []
@@ -885,6 +898,7 @@ if (!exists("js/fx-worklet.js") ||
         settings:testSettings,
         ensureTrkFolder:() => {},
         trkCatalog:() => [series],
+        TEXT: LIBRARY_TEXT_FOR_CHECK,
         plSanitize:raw => raw,
         saveUserPrefs:() => { saveCount++; },
         trkWishesForSeries:() => []
@@ -976,6 +990,7 @@ if (!exists("js/fx-worklet.js") ||
         settings: testSettings,
         ensureTrkFolder: () => {},
         trkCatalog: () => [series],
+        TEXT: LIBRARY_TEXT_FOR_CHECK,
         plSanitize: raw => raw,
         saveUserPrefs: () => { saveCount++; },
         trkWishesForSeries: () => []
@@ -1059,6 +1074,7 @@ if (!exists("js/fx-worklet.js") ||
         settings:testSettings,
         ensureTrkFolder:() => {},
         trkCatalog:() => [series],
+        TEXT: LIBRARY_TEXT_FOR_CHECK,
         plSanitize:raw => raw,
         saveUserPrefs:() => { saveCount++; },
         trkWishesForSeries:() => []
@@ -1083,7 +1099,7 @@ if (!exists("js/fx-worklet.js") ||
       });
       safeRefreshOk = preservesCustomData && refreshesBothSources && createsOtherSessionsAlbums && saveCount > 0 &&
         library.includes('lol: "trk-lol"') && library.includes('ensureTrkSubfolder("trk-lol", "League of Legends", "⚔️")') &&
-        library.includes('pl.sourceLabel || "公式リンク"');
+        library.includes('pl.sourceLabel || tr("plOfficialLink")');
     }
   } catch (error) {
     console.error(`WARN  League of Legends Sessions test setup failed: ${error.message}`);
@@ -1188,6 +1204,7 @@ if (!exists("js/fx-worklet.js") ||
         settings:testSettings,
         ensureTrkFolder:() => {},
         trkCatalog:() => [series],
+        TEXT: LIBRARY_TEXT_FOR_CHECK,
         plSanitize:raw => raw,
         saveUserPrefs:() => { saveCount++; },
         trkWishesForSeries:() => []
@@ -1233,6 +1250,8 @@ if (!exists("js/fx-worklet.js") ||
   let catalogDataOk = false;
   let capacityOk = false;
   let safeRefreshOk = false;
+  let creatorSafeOk = false;
+  let guideWordingOk = false;
   let autoCreated = 0;
   try {
     const fixture = JSON.parse(read("tools/leagueoflegends-soundcloud-albums-tracklist.json"));
@@ -1299,6 +1318,28 @@ if (!exists("js/fx-worklet.js") ||
       series.note.includes("Season 1〜9") && series.note.includes("Warsongs 11曲") &&
       series.note.includes("人気曲30曲") && series.note.includes("二次利用許諾ではありません") &&
       series.note.includes("これはLoL全楽曲ではなく");
+    /* ✅ Creator-Safe：照合状態は catalog.js（LOL_CREATOR_SAFE）と fixture が一致し、照合した曲数と矛盾しないこと。
+       全曲照合済みは Season 9・8 だけ。シリーズの説明も「照合済み」と「未照合」を書き分ける（照合していないものを対象と書かない）。 */
+    const statusOf = id => ((series && series.playlists.find(pl => pl.id === id)) || {}).creatorSafe;
+    const lolStatuses = new Set(["verified", "partial", "likely", "unverified", "sessions", "mixed", "unknown"]);
+    creatorSafeOk = !!series && fixture.sources.creatorSafePlaylist === "https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N" &&
+      fixture.creatorSafe && fixture.creatorSafe.playlist === fixture.sources.creatorSafePlaylist &&
+      series.playlists.every(pl => lolStatuses.has(pl.creatorSafe)) &&
+      fixture.albums.every(album => {
+        const cs = album.creatorSafe || {};
+        const countOk = cs.status === "verified" ? cs.matchedTracks === album.trackCount
+          : cs.status === "partial" ? cs.matchedTracks > 0 && cs.matchedTracks < album.trackCount &&
+            Array.isArray(cs.notYetMatched) && cs.notYetMatched.length === album.trackCount - cs.matchedTracks &&
+            JSON.stringify(cs.notYetMatched) === JSON.stringify(album.tracks.slice(cs.matchedTracks).map(track => track[0]))
+            : (cs.status === "likely" || cs.status === "unverified") && cs.matchedTracks === undefined;
+        const dated = cs.status === "likely" || cs.status === "unverified" || /^2026-\d{2}-\d{2}$/.test(cs.checkedAt || "");
+        return countOk && dated && statusOf(album.id) === cs.status;
+      }) &&
+      popular.creatorSafe && popular.creatorSafe.status === "mixed" && statusOf(popular.id) === "mixed" &&
+      fixture.albums.filter(album => album.creatorSafe.status === "verified").map(album => album.id).join() === "lol-season-8,lol-season-9" &&
+      series.note.includes("照合済みなのはSeason 9・8の全曲だけ") && series.note.includes("Season 1〜6") &&
+      series.note.includes("未照合") && series.note.includes("Creator-Safe対象外・要確認") &&
+      !series.note.includes("の対象として扱います");
     catalogDataOk = listsMatch && rightsOk && trackTotal === 284 && spotifyIds.length === 254 &&
       soundcloudUrls.length === 30 && new Set(spotifyIds).size === 254 && new Set(soundcloudUrls).size === 30 &&
       JSON.stringify(fixture.albums.map(album => album.trackCount)) === JSON.stringify([9, 30, 23, 22, 25, 27, 48, 39, 20, 11]);
@@ -1333,6 +1374,7 @@ if (!exists("js/fx-worklet.js") ||
         settings: testSettings,
         ensureTrkFolder: () => {},
         trkCatalog: () => [series],
+        TEXT: LIBRARY_TEXT_FOR_CHECK,
         plSanitize: raw => raw,
         saveUserPrefs: () => { saveCount++; },
         trkWishesForSeries: () => []
@@ -1359,7 +1401,21 @@ if (!exists("js/fx-worklet.js") ||
         !!createdPopular && createdPopular.folder === "trk-lol" &&
         JSON.stringify(createdPopular.wish) === JSON.stringify(wishOf(popular)) &&
         createdPopular.guide.url === popular.soundcloudUrl &&
-        library.includes('pl.id === "lol-popular-tracks"');
+        library.includes("LOL_GUIDE_KEYS[pl.creatorSafe]");
+      /* ガイドは照合状態ごとの key と、その日本語の控え。4言語そろい、旧来の「Riotが権利を持つ曲でCreator-Safe対象」は使わない */
+      const guideKeyFor = { verified: "plGuideLolCsVerified", partial: "plGuideLolCsPartial", likely: "plGuideLolCsLikely", unverified: "plGuideLolCsUnverified" };
+      const wording = { verified: ["照合済み"], partial: ["可能性が高い", "一部の曲のみ照合済み"], likely: ["可能性が高い・未照合"], unverified: ["未照合"] };
+      const guideOf = album => (album.id === seasonOne.id ? autoExisting : testSettings.playlists.find(p => p.id === "trk-" + album.id) || {}).guide || {};
+      const allGuideKeys = [...Object.values(guideKeyFor), "plGuideLolSessions", "plGuideLolPopular", "plGuideRiotLinks"];
+      guideWordingOk = fixture.albums.every(album => {
+        const guide = guideOf(album), status = album.creatorSafe.status;
+        return guide.key === guideKeyFor[status] && guide.note === LIBRARY_TEXT_FOR_CHECK.ja[guide.key] &&
+          wording[status].every(word => guide.note.includes(word)) && guide.note.includes("二次利用許諾ではありません");
+      }) && createdPopular.guide.key === "plGuideLolPopular" && createdPopular.guide.note.includes("共同制作曲はCreator-Safe対象外・要確認") &&
+        manualPopular.guide.key === "plGuideLolPopular" &&
+        allGuideKeys.every(key => ["ja", "en", "zh", "ko"].every(lang => typeof LIBRARY_TEXT_FOR_CHECK[lang][key] === "string" && LIBRARY_TEXT_FOR_CHECK[lang][key].length > 20)) &&
+        !library.includes("Riotが権利を持つ曲でCreator-Safe対象") &&
+        !LIBRARY_TEXT_FOR_CHECK.ja.plGuideLolCsLikely.includes("照合済み") && !LIBRARY_TEXT_FOR_CHECK.ja.plGuideLolCsUnverified.includes("可能性が高い");
     }
   } catch (error) {
     console.error(`WARN  LoL SoundCloud album test setup failed: ${error.message}`);
@@ -1367,7 +1423,9 @@ if (!exists("js/fx-worklet.js") ||
   if (!catalogDataOk) fail("LoL SoundCloud album fixture/catalog mismatch (expected Season 1–9 as nine playlists with 9/30/23/22/25/27/48/39/20 ordered tracks, Warsongs with 11, the 30-track popular-tracks snapshot, official album links, prefix-only aliases, and the rights/scope notice)");
   else if (!capacityOk) fail(`LoL SoundCloud albums must fit the saved-playlist limits (100 wishes per playlist, ${autoCreated} auto-created trk playlists of 100 allowed)`);
   else if (!safeRefreshOk) fail("LoL SoundCloud album imports must refresh wishes/guides, keep owned songs and customized name/icon/tags, create every Season/Warsongs/popular list under trk-lol, and describe the popular-tracks page as a page, not an album");
-  else ok(`LoL SoundCloud albums: Season 1–9 (243 tracks) + Warsongs (11) + popular-tracks snapshot (30), official album/track links, ${autoCreated} auto-created trk playlists within the 100 cap, safe refresh`);
+  else if (!creatorSafeOk) fail("LoL Creator-Safe status: js/catalog.js LOL_CREATOR_SAFE must match the fixture (verified = all tracks matched: Season 9 and 8 only; partial = matched count + not-yet-matched titles; likely/unverified = no match claimed) and the series note must keep matched and unmatched albums apart");
+  else if (!guideWordingOk) fail("LoL playlist guides must follow each playlist's Creator-Safe status (照合済み／一部のみ照合済み／可能性が高い・未照合／未照合; popular tracks: 対象外・要確認) in all four languages, never the old blanket claim");
+  else ok(`LoL SoundCloud albums: Season 1–9 (243 tracks) + Warsongs (11) + popular-tracks snapshot (30), official album/track links, ${autoCreated} auto-created trk playlists within the 100 cap, safe refresh, per-playlist Creator-Safe status (verified: Season 9・8)`);
 }
 
 // ⚠ el(tag, cls, text) は文字を1つしか入れられない（入れ子を渡すと "[object ...]" になる）。
@@ -1445,6 +1503,39 @@ if (!exists("js/fx-worklet.js") ||
   else if (!panelOk) fail("the trk settings panel is missing the label select, read-only Music/trk folder guide, or nested trk classic panel");
   else if (!langOk) fail("trk tab/menu strings are missing from one of the four languages");
   else ok("🐔 trk's playlist: fixed name/icon, three labels, read-only Music/trk folder guide, long-press hierarchy, trk classic nested in settings");
+}
+
+// 🗑 trk114: deleting an automatic trk list leaves a validated marker (settings.trkRemoved) so the next start
+// does not recreate it, ♻ in the trk panel restores them, the OST is moved into the trk folder only once, and
+// playlist guides / MIDI limit messages exist in all four languages (guides are shown via their key, not a stored
+// Japanese sentence).
+{
+  const library = read("js/library.js"), core = read("js/core.js"), html = read("index.html"), media = read("js/media.js");
+  const guideKeys = [...new Set([...library.matchAll(/"(plGuide[A-Za-z0-9]+)"/g)].map(m => m[1]))];
+  const fourLanguages = key => (library.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4;
+  const stringsOk = guideKeys.length >= 20 && guideKeys.every(fourLanguages) &&
+    ["plOfficialLink", "trkRestoreBtn", "trkRestoreHint", "trkRestored", "midiTooDense", "midiRenderingProgress", "midiTooComplex"].every(fourLanguages) &&
+    guideKeys.every(key => typeof LIBRARY_TEXT_FOR_CHECK.ja[key] === "string" && typeof LIBRARY_TEXT_FOR_CHECK.en[key] === "string");
+  const markerOk = library.includes("trkMarkRemoved(p.id);") && library.includes("if (trkIsRemoved(TRK_PLAYLIST_ID)) return false;") &&
+    library.includes("if (trkIsRemoved(TRK_CLASSIC_ID)) return false;") && library.includes("if (trkIsRemoved(TRK_OST_ID)) return false;") &&
+    library.includes("if (trkIsRemoved(vid)) continue;") && library.includes("if (trkIsRemoved(d.id)) continue;") &&
+    library.includes("if (exist.cat !== TRK_OST_CAT) {") && !library.includes("if (exist.folder !== TRK_FOLDER_ID) { exist.folder = TRK_FOLDER_ID;") &&
+    core.includes("trkRemoved: cleanTrkRemoved(prefs.trkRemoved)") && core.includes("settings.trkRemoved = cleanTrkRemoved(data.trkRemoved)") &&
+    core.includes("settings.trkRemoved = [];") &&
+    html.includes('<button id="trkRestoreBtn" type="button" hidden></button>') && html.includes('data-i18n="trkRestoreHint"') &&
+    library.includes('const trkRestoreBtn = $("trkRestoreBtn");') && library.includes("restore.hidden = !removed;");
+  const displayOk = library.includes("const guideNote = plGuideText(p.guide);") && library.includes("return tr(guide.key);") &&
+    !/note:\s*"\\u975E/.test(library) && !library.includes('guide: { note: "DOWNLOAD規約');
+  const namespaceOk = !/window\.Trk(?:EnsureTrkOstPlaylist|OstPlaylistId|TouhouThemeData)\b/.test(library + read("js/catalog.js") + read("js/touhou-theme-data.js")) &&
+    library.includes("ensureTrkOstPlaylist, trkOstPlaylistId: TRK_OST_ID, trkRestoreRemoved") &&
+    read("js/touhou-theme-data.js").includes("window.Trk.touhouThemeData = Object.freeze({");
+  const midiOk = media.includes('error.code === "midi-too-dense" ? "midiTooDense"') && media.includes("shouldAbort:() => token !== loadToken");
+  if (!stringsOk) fail("trk114 strings (playlist guides, ♻ restore, MIDI limit/progress) must exist in all four languages");
+  else if (!markerOk) fail("deleted automatic trk lists must stay deleted (validated settings.trkRemoved marker, ♻ restore button) and trk's OST Vol.1 may be moved into the trk folder only once");
+  else if (!displayOk) fail("playlist guides must be shown from their dictionary key (no hard-coded Japanese guide sentences in library.js)");
+  else if (!namespaceOk) fail("TrkEnsureTrkOstPlaylist / TrkOstPlaylistId / TrkTouhouThemeData must live under window.Trk (library, touhouThemeData), not as new window names");
+  else if (!midiOk) fail("midi-too-dense needs its own message and loadMedia must abort a render when another song is loaded");
+  else ok(`trk114: ${guideKeys.length} playlist-guide keys in four languages, deleted trk lists stay deleted (♻ restore), OST moved once, window.Trk namespace, MIDI density message + abort`);
 }
 
 // 👥 Author tools for shared playlists (off by default; search/block/favorite).
@@ -2115,9 +2206,9 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
 }
 
 /* 互換名の段階的廃止：tools/compat-names.json を正とし、現存する window 別名・Trk.core の正規 accessor・
-   frozen js/fx.js の実際の読者を照合する。一覧は文書の文言からは読まず JSON から読む
+   js/fx.js（trk113まで凍結。trk114で解除したが、読み手はまだ移行していない）の実際の読者を照合する。一覧は文書の文言からは読まず JSON から読む
    （レビュー4回目の指摘：ADDONS.md の見出しを正規表現で拾っていたため、文を直すだけで検査が落ちた）。
-   fx.js が凍結中の5名を読むため、その5名だけは移行後まで保留する。 */
+   fx.js が5名を読むため、fx.js を書き換えるまでその5名だけは保留する。 */
 {
   const coreSrc = fs.readFileSync(path.join(root, "js/core.js"), "utf8");
   const fxSrc = fs.readFileSync(path.join(root, "js/fx.js"), "utf8");

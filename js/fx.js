@@ -1195,7 +1195,7 @@ function renderDesc(p) {
   desc.append(pText(p.label) + (d ? " — " + d : ""));
   if (p.url) {
     const a = safeLink("", p.url);   /* 🛡 https 以外はリンクにしない（共有プリセット対策） */
-    a.style.cssText = "margin-left:8px;color:var(--ui-accent);word-break:break-all";
+    a.style.cssText = "margin-left:8px;color:var(--ui-accent-ink,var(--ui-accent));word-break:break-all";
     desc.append(a);
   }
   favBtn.hidden = !!p.temp;

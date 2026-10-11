@@ -767,29 +767,30 @@ S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber
    公式Spotifyアルバムで確認した（Season 1＝9曲・Season 2＝30曲は公式SoundCloudとも一致）。
    Creator-Safe（Riot公式Creator-Safe Playlist・979曲）との照合状態はプレイリストごとに下の
    LOL_CREATOR_SAFE に持たせ、設定ガイドの文言（library.js の trkCatalogGuide）はそこから選ぶ。
-   照合済みは Season 9・8（全曲）だけ。Season 7 は48曲中41曲、Season 1〜6 と Warsongs は未照合。
+   照合済みは Season 1〜9 の全243曲（公式の埋め込み表示は先頭100曲までなので、101曲目以降は
+   プレイリスト全体を表示する第三者サイト songdata.io で照合）。Warsongs は11曲中10曲で、Silver Scrapes は未照合。
    人気曲30曲はスナップショットで、Worlds／K/DA等の外部アーティスト共同制作曲はCreator-Safe対象外・要確認。
    音源は同梱せず、公式配信へのリンクを二次利用許諾とは扱わない。
    旧ログインテーマ、他の仮想アーティスト、残りChampion Theme、Skin／イベント曲、その他のOSTは未調査。
    Champion Themeは全チャンピオン分が存在するという意味ではなく、確認できた単独テーマのみ。 */
 /* ✅ Creator-Safe の照合状態（プレイリストごと）。根拠と日付は docs/LEAGUE-OF-LEGENDS-MUSIC.md と
    tools/leagueoflegends-soundcloud-albums-tracklist.json の creatorSafe（check-repo が一致を見る）。
-   verified＝Riot公式Creator-Safe Playlistと全曲照合済み／partial＝一部の曲だけ照合済み／
-   likely＝同じシーズン別OSTで対象の可能性が高いが未照合／unverified＝未照合（外部アーティスト参加作など）／
+   verified＝Riot公式Creator-Safe Playlistと全曲照合済み／partial＝アルバム順で先頭から一部の曲だけ照合済み／
+   unverified＝未照合（後から足すアルバム用。今は使っていない）／
    sessions＝Riotが「Creator-Safe Collection」として出したSessions（Playlistとは未照合）／
    mixed＝人気曲スナップショット（共同制作曲は対象外・要確認）／unknown＝対象か未確認の公式リンク集。
    ここに無いLoLのリストは unknown 扱い（照合していないものを対象と書かない）。 */
 const LOL_CREATOR_SAFE = Object.freeze({
   "lol-svi": "sessions", "lol-sdiana": "sessions", "lol-staliyah": "sessions",
   "lol-champion-themes": "unknown", "lol-worlds-anthems": "unknown", "lol-msi-anthems": "unknown", "lol-kda-songs": "unknown",
-  "lol-season-1": "likely", "lol-season-2": "likely", "lol-season-3": "likely",
-  "lol-season-4": "likely", "lol-season-5": "likely", "lol-season-6": "likely",
-  "lol-season-7": "partial", "lol-season-8": "verified", "lol-season-9": "verified",
-  "lol-warsongs": "unverified", "lol-popular-tracks": "mixed"
+  "lol-season-1": "verified", "lol-season-2": "verified", "lol-season-3": "verified",
+  "lol-season-4": "verified", "lol-season-5": "verified", "lol-season-6": "verified",
+  "lol-season-7": "verified", "lol-season-8": "verified", "lol-season-9": "verified",
+  "lol-warsongs": "partial", "lol-popular-tracks": "mixed"
 });
 const withLolCreatorSafe = pl => Object.assign(pl, { creatorSafe: LOL_CREATOR_SAFE[pl.id] || "unknown" });
 S("lol", "League of Legends", "⚔️", "aqua", "PCゲーム", "🕹️",
-  "公式リンク集（音源なし）。配信・購入は二次利用許諾ではありません。利用前にCreator-Safe対象か公式ガイドで要確認。Sessions 3作・108曲、近年Champion Theme 41曲、Worlds/WCS 2014–26の公式アンセム13曲、確認できたMSIアンセム4曲、K/DAの公式曲6曲を分類して掲載。Worlds 2026「Know My Name」は公式MVとSpotify個別曲を確認。K/DAもCreator-Safe対象かは未確認です。Riot公式Creator-Safe Playlist（Riotが100%権利を持つ曲の集まり・979曲）と照合済みなのはSeason 9・8の全曲だけで、Creator-Safe対象と確認できています。Season 7は48曲中41曲を照合済み、Season 1〜6は同じシリーズで対象の可能性が高いものの未照合、Warsongs 11曲（外部アーティスト参加）は未照合です。Sessions 3作はRiotが「Creator-Safe Collection」として公開したものです。人気曲30曲のうちのWorlds／K/DA等の外部アーティスト共同制作曲はCreator-Safe対象外・要確認です。公式SoundCloudアルバムはSeason 1〜9のゲームOSTをシーズン別の9プレイリスト（計243曲）とWarsongs 11曲に分け、公式SoundCloudの人気曲30曲（2026-10-09時点のスナップショット・一部は地域により再生できません）も別リストにしました。アルバムは公式SoundCloud、各曲は公式Spotify個別曲へリンクします（人気曲は公式SoundCloudの個別曲へ）。これはLoL全楽曲ではなく、旧ログインテーマ、他の仮想アーティスト／Champion Theme、Skin／イベント曲、その他のゲームOSTなどは今後の調査対象です。Sessionsは各巻を公式SoundCloud、個別曲をSpotifyへリンク。Viは現行公式36曲を採用（旧37曲表記の二次資料にある『Take Your Time』は現行SoundCloud／Spotify／Apple Musicの掲載にないため含めません）。",
+  "公式リンク集（音源なし）。配信・購入は二次利用許諾ではありません。利用前にCreator-Safe対象か公式ガイドで要確認。Sessions 3作・108曲、近年Champion Theme 41曲、Worlds/WCS 2014–26の公式アンセム13曲、確認できたMSIアンセム4曲、K/DAの公式曲6曲を分類して掲載。Worlds 2026「Know My Name」は公式MVとSpotify個別曲を確認。K/DAもCreator-Safe対象かは未確認です。Riot公式Creator-Safe Playlist（Riotが100%権利を持つ曲の集まり・979曲）と照合し、Season 1〜9の全243曲が収録されていることを確認しました（公式の埋め込み表示は先頭100曲までなので、101曲目以降はプレイリスト全体を表示する第三者サイトsongdata.ioで照合）。Warsongs（外部アーティスト参加）は11曲中10曲を確認済みで、「Silver Scrapes」は未照合です。Sessions 3作はRiotが「Creator-Safe Collection」として公開したものです。人気曲30曲のうちのWorlds／K/DA等の外部アーティスト共同制作曲はCreator-Safe対象外・要確認です。公式SoundCloudアルバムはSeason 1〜9のゲームOSTをシーズン別の9プレイリスト（計243曲）とWarsongs 11曲に分け、公式SoundCloudの人気曲30曲（2026-10-09時点のスナップショット・一部は地域により再生できません）も別リストにしました。アルバムは公式SoundCloud、各曲は公式Spotify個別曲へリンクします（人気曲は公式SoundCloudの個別曲へ）。これはLoL全楽曲ではなく、旧ログインテーマ、他の仮想アーティスト／Champion Theme、Skin／イベント曲、その他のゲームOSTなどは今後の調査対象です。Sessionsは各巻を公式SoundCloud、個別曲をSpotifyへリンク。Viは現行公式36曲を採用（旧37曲表記の二次資料にある『Take Your Time』は現行SoundCloud／Spotify／Apple Musicの掲載にないため含めません）。",
   "https://www.riotgames.com/en/riot-music-creator-safe-guidelines",
   [
    PL("lol-svi", "Sessions: Vi", "🥊", "aqua", ["Game", "LoL", "Sessions:Vi", "Riot Games"],

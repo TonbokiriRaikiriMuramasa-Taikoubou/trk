@@ -655,8 +655,7 @@ Object.assign(TEXT.ja, {
   plGuideClassic:"版権切れの名演をMusopenの公開録音で紹介。音源は同梱しません。",
   plGuideBlueArchive:"NexTone.Link／Apple Music公式案内。音源なし。購入・サブスクは利用許諾ではありません。",
   plGuideLolCsVerified:"公式SoundCloudアルバム（音源なし）。Creator-Safe対象（Riot公式Playlistと照合済み）。配信・購入は二次利用許諾ではありません。",
-  plGuideLolCsPartial:"公式SoundCloudアルバム（音源なし）。Creator-Safe対象の可能性が高い（一部の曲のみ照合済み）。配信・購入は二次利用許諾ではありません。",
-  plGuideLolCsLikely:"公式SoundCloudアルバム（音源なし）。Creator-Safe対象の可能性が高い・未照合。配信・購入は二次利用許諾ではありません。",
+  plGuideLolCsPartial:"公式SoundCloudアルバム（音源なし）。一部の曲はCreator-Safe対象（Riot公式Playlistと照合済み）、残りは未照合・要確認。配信・購入は二次利用許諾ではありません。",
   plGuideLolCsUnverified:"公式SoundCloudアルバム（音源なし）。Creator-Safe対象かは未照合。配信・購入は二次利用許諾ではありません。",
   plGuideLolSessions:"公式SoundCloudアルバム（音源なし）。RiotのCreator-Safe Sessions（条件は公式ガイドで確認）。配信・購入は二次利用許諾ではありません。",
   plGuideLolPopular:"公式SoundCloudの人気曲ページ（音源なし）。共同制作曲はCreator-Safe対象外・要確認。配信・購入は二次利用許諾ではありません。",
@@ -681,8 +680,7 @@ Object.assign(TEXT.en, {
   plGuideClassic:"Public-domain masterpieces introduced through Musopen's public recordings. No audio is included.",
   plGuideBlueArchive:"Official NexTone.Link / Apple Music pages. No audio included. Buying or subscribing is not a license to use.",
   plGuideLolCsVerified:"Official SoundCloud album (no audio included). Creator-Safe: matched against Riot's official Creator-Safe Playlist. Streaming or buying is not a license to reuse.",
-  plGuideLolCsPartial:"Official SoundCloud album (no audio included). Likely Creator-Safe: only some songs have been matched so far. Streaming or buying is not a license to reuse.",
-  plGuideLolCsLikely:"Official SoundCloud album (no audio included). Likely Creator-Safe, not yet matched. Streaming or buying is not a license to reuse.",
+  plGuideLolCsPartial:"Official SoundCloud album (no audio included). Some songs are Creator-Safe (matched against Riot's official Creator-Safe Playlist); the rest are not matched yet, so check them. Streaming or buying is not a license to reuse.",
   plGuideLolCsUnverified:"Official SoundCloud album (no audio included). Creator-Safe status not yet matched. Streaming or buying is not a license to reuse.",
   plGuideLolSessions:"Official SoundCloud album (no audio included). Riot's Creator-Safe Sessions; check the conditions in Riot's guidelines. Streaming or buying is not a license to reuse.",
   plGuideLolPopular:"Official SoundCloud popular-tracks page (no audio included). Collaboration songs are outside Creator-Safe or unconfirmed. Streaming or buying is not a license to reuse.",
@@ -707,8 +705,7 @@ Object.assign(TEXT.zh, {
   plGuideClassic:"通过Musopen的公开录音介绍版权已过期的名曲。不附带音源。",
   plGuideBlueArchive:"NexTone.Link／Apple Music官方页面。不含音源。购买或订阅并不等于使用许可。",
   plGuideLolCsVerified:"官方SoundCloud专辑（不含音源）。属于Creator-Safe（已与Riot官方Creator-Safe歌单核对）。播放或购买不等于二次使用许可。",
-  plGuideLolCsPartial:"官方SoundCloud专辑（不含音源）。很可能属于Creator-Safe（仅部分曲目已核对）。播放或购买不等于二次使用许可。",
-  plGuideLolCsLikely:"官方SoundCloud专辑（不含音源）。很可能属于Creator-Safe，尚未核对。播放或购买不等于二次使用许可。",
+  plGuideLolCsPartial:"官方SoundCloud专辑（不含音源）。部分曲目属于Creator-Safe（已与Riot官方Creator-Safe歌单核对），其余尚未核对，请先确认。播放或购买不等于二次使用许可。",
   plGuideLolCsUnverified:"官方SoundCloud专辑（不含音源）。是否属于Creator-Safe尚未核对。播放或购买不等于二次使用许可。",
   plGuideLolSessions:"官方SoundCloud专辑（不含音源）。Riot的Creator-Safe Sessions，条件请以Riot的指南为准。播放或购买不等于二次使用许可。",
   plGuideLolPopular:"官方SoundCloud热门曲目页面（不含音源）。合作曲目不属于Creator-Safe或尚待确认。播放或购买不等于二次使用许可。",
@@ -733,8 +730,7 @@ Object.assign(TEXT.ko, {
   plGuideClassic:"저작권이 만료된 명곡을 Musopen의 공개 녹음으로 소개해요. 음원은 포함하지 않아요.",
   plGuideBlueArchive:"NexTone.Link／Apple Music 공식 안내. 음원 없음. 구매·구독은 이용 허락이 아니에요.",
   plGuideLolCsVerified:"공식 SoundCloud 앨범(음원 없음). Creator-Safe 대상(Riot 공식 Creator-Safe 플레이리스트와 대조 완료). 스트리밍·구매는 2차 이용 허락이 아니에요.",
-  plGuideLolCsPartial:"공식 SoundCloud 앨범(음원 없음). Creator-Safe 대상일 가능성이 높아요(일부 곡만 대조 완료). 스트리밍·구매는 2차 이용 허락이 아니에요.",
-  plGuideLolCsLikely:"공식 SoundCloud 앨범(음원 없음). Creator-Safe 대상일 가능성이 높지만 아직 대조하지 않았어요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
+  plGuideLolCsPartial:"공식 SoundCloud 앨범(음원 없음). 일부 곡은 Creator-Safe 대상(Riot 공식 Creator-Safe 플레이리스트와 대조 완료)이고, 나머지는 아직 대조하지 않아 확인이 필요해요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
   plGuideLolCsUnverified:"공식 SoundCloud 앨범(음원 없음). Creator-Safe 대상인지 아직 대조하지 않았어요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
   plGuideLolSessions:"공식 SoundCloud 앨범(음원 없음). Riot의 Creator-Safe Sessions예요. 조건은 Riot 가이드라인에서 확인하세요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
   plGuideLolPopular:"공식 SoundCloud 인기곡 페이지(음원 없음). 공동 제작곡은 Creator-Safe 대상이 아니거나 확인이 필요해요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
@@ -1330,7 +1326,7 @@ function trkGuide(key, url) { return plGuideSanitize({ note: plGuideJa(key), url
 /* LoL は catalog.js の LOL_CREATOR_SAFE（プレイリストごとの Creator-Safe 照合状態）から文言を選ぶ。
    照合していないものを「対象」と書かない。表に無い状態は公式リンク集の文言（要確認）にする。 */
 const LOL_GUIDE_KEYS = Object.freeze({ verified: "plGuideLolCsVerified", partial: "plGuideLolCsPartial",
-  likely: "plGuideLolCsLikely", unverified: "plGuideLolCsUnverified", sessions: "plGuideLolSessions", mixed: "plGuideLolPopular" });
+  unverified: "plGuideLolCsUnverified", sessions: "plGuideLolSessions", mixed: "plGuideLolPopular" });
 /* 🗑 消した trk の自動リストの印（settings.trkRemoved。IDの配列）。印のあるIDは起動時に作り直さない。
    🐔 の設定の「♻ 消したリストを戻す」か、Game Vol.1／Classic Vol.1 の「開く」ボタンで印を外す。 */
 function trkIsRemoved(id) {

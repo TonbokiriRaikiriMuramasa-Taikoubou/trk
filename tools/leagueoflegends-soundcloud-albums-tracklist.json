@@ -5,12 +5,36 @@
   "creatorSafe": {
     "playlist": "https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N",
     "description": "Riot Games' official Spotify playlist 'Riot Games Creator-Safe Playlist', described as a collection of music that is 100% owned by Riot Games (979 songs at the trk108 check).",
-    "method": "Matched title, artist and order against the official Spotify embed of the playlist, which shows only the first 100 entries: positions 1-20 = Season 9 (20/20), 21-59 = Season 8 (39/39), 60-100 = the first 41 of Season 7's 48 tracks (checked 2026-10-11; Season 9 was first matched on 2026-10-09 including durations). Entries after position 100 were not visible, so the rest of Season 7, Season 1-6 and Warsongs are not matched.",
+    "method": "Entries 1-100: matched title, artist and order against the official Spotify embed of the playlist, which shows only the first 100 entries: 1-20 = Season 9 (20/20), 21-59 = Season 8 (39/39), 60-100 = the first 41 of Season 7's 48 tracks (checked 2026-10-11; Season 9 was first matched on 2026-10-09 including durations). Entries 101+: the embed stops at 100, so the same playlist was read on songdata.io (see mirror), checked 2026-10-12. It lists the playlist in 50-entry blocks and sorts each block by Spotify track ID, so the exact order inside a block is not visible. Its 51-100 block holds exactly the 50 titles the official embed shows there (the last 9 of Season 8 and the first 41 of Season 7). Its 101-150, 151-200 and 201-250 blocks hold exactly the titles predicted by continuing in album order (Season 7 tracks 42-48, Season 6, Season 5 split 16/9 at 150/151, Season 4, Season 3 split 19/4 at 200/201, Season 2, Season 1), plus 7 singles in the 201-250 block. Every title matched character for character, so the Season 1-7 positions are given as album-order ranges. The playlist uses another Spotify release of these albums (its track IDs differ from the album track IDs linked here), so matching is by title and artist. Warsongs: 10 of 11 tracks are in the 251-300 block under plain titles with the same artists (e.g. 'Piercing Light' by 'League of Legends, Mako'). 'Silver Scrapes' was not in entries 1-300; entries 301+ were not read.",
+    "mirror": {
+      "url": "https://songdata.io/playlist/5hDYD44imzFZEqTfAoco1N",
+      "checkedAt": "2026-10-12",
+      "readEntries": "51-300",
+      "note": "Third-party listing of the official playlist (not run by Riot or Spotify). Used only because the official embed shows 100 entries. Its 51-100 block matched the official embed exactly."
+    },
+    "soundcloudPlaylists": [
+      {
+        "title": "Riot Games Creator-Safe Playlist Pt. I",
+        "url": "https://soundcloud.com/leagueoflegends/sets/riot-games-creator-safe",
+        "tracks": 499,
+        "note": "Official; linked from Riot's guidelines and the 2020 LoL news post. Last updated about 4 years before 2026-10-12, and holds the older single/remix uploads, not the Season album versions. Only the first 15 entries render; entries 11-15 are Warsongs tracks 1-5 as remix uploads (e.g. 'Piercing Light (Mako Remix)'). Not enumerated."
+      },
+      {
+        "title": "Riot Games Creator-Safe Playlist Pt. II",
+        "url": "https://soundcloud.com/leagueoflegends/sets/riot-games-creator-safe-pt2",
+        "tracks": 230,
+        "note": "Official; posted about 4 years before 2026-10-12. Not enumerated."
+      }
+    ],
     "statuses": {
       "verified": "every track matched in the official playlist",
-      "partial": "only matchedTracks tracks matched; the rest are not matched yet",
-      "likely": "same season-OST album series as the matched albums, not matched yet",
-      "unverified": "not matched; external artists are credited, so inclusion is not inferred"
+      "partial": "only the first matchedTracks tracks (album order) matched; notYetMatched lists the rest",
+      "unverified": "not matched (kept for albums added later; no album uses it now)"
+    },
+    "evidence": {
+      "embed": "official Spotify embed of the playlist (entries 1-100)",
+      "mirror": "songdata.io listing of the same playlist (entries 101+)",
+      "embed+mirror": "entries up to 100 from the official embed, the rest from songdata.io"
     },
     "catalogStatusSource": "js/catalog.js LOL_CREATOR_SAFE (must equal albums[].creatorSafe.status; checked by tools/check-repo.mjs)"
   },
@@ -39,7 +63,11 @@
       "spotifyAlbumUrl": "https://open.spotify.com/album/6GXIGoirm6W8EnwYytVj1j",
       "trackCount": 9,
       "creatorSafe": {
-        "status": "likely"
+        "status": "verified",
+        "matchedTracks": 9,
+        "checkedAt": "2026-10-12",
+        "playlistPositions": "235-243",
+        "evidence": "mirror"
       },
       "tracks": [
         [
@@ -114,7 +142,11 @@
       "spotifyAlbumUrl": "https://open.spotify.com/album/5tbKnlrYfWLOS2oDNVRG1I",
       "trackCount": 30,
       "creatorSafe": {
-        "status": "likely"
+        "status": "verified",
+        "matchedTracks": 30,
+        "checkedAt": "2026-10-12",
+        "playlistPositions": "205-234",
+        "evidence": "mirror"
       },
       "tracks": [
         [
@@ -315,7 +347,11 @@
       "spotifyAlbumUrl": "https://open.spotify.com/album/12Wkzjt1vkH0F5TLChsscq",
       "trackCount": 23,
       "creatorSafe": {
-        "status": "likely"
+        "status": "verified",
+        "matchedTracks": 23,
+        "checkedAt": "2026-10-12",
+        "playlistPositions": "182-204",
+        "evidence": "mirror"
       },
       "tracks": [
         [
@@ -474,7 +510,11 @@
       "spotifyAlbumUrl": "https://open.spotify.com/album/5yJhZ0IbtdXn8PatnYG8qf",
       "trackCount": 22,
       "creatorSafe": {
-        "status": "likely"
+        "status": "verified",
+        "matchedTracks": 22,
+        "checkedAt": "2026-10-12",
+        "playlistPositions": "160-181",
+        "evidence": "mirror"
       },
       "tracks": [
         [
@@ -627,7 +667,11 @@
       "spotifyAlbumUrl": "https://open.spotify.com/album/7KZ6m6G3EyNxahSR2HZ8h9",
       "trackCount": 25,
       "creatorSafe": {
-        "status": "likely"
+        "status": "verified",
+        "matchedTracks": 25,
+        "checkedAt": "2026-10-12",
+        "playlistPositions": "135-159",
+        "evidence": "mirror"
       },
       "tracks": [
         [
@@ -798,7 +842,11 @@
       "spotifyAlbumUrl": "https://open.spotify.com/album/6DK95stzKIJ8QFuN4rsc92",
       "trackCount": 27,
       "creatorSafe": {
-        "status": "likely"
+        "status": "verified",
+        "matchedTracks": 27,
+        "checkedAt": "2026-10-12",
+        "playlistPositions": "108-134",
+        "evidence": "mirror"
       },
       "tracks": [
         [
@@ -981,19 +1029,11 @@
       "spotifyAlbumUrl": "https://open.spotify.com/album/4ejVwiIVblKgKMspuxAAQ8",
       "trackCount": 48,
       "creatorSafe": {
-        "status": "partial",
-        "matchedTracks": 41,
-        "checkedAt": "2026-10-11",
-        "playlistPositions": "60-100",
-        "notYetMatched": [
-          "Star Guardian: Invasion - We'll Get them Next Time (From League of Legends: Season 7)",
-          "Super Galaxy - 2017 - Trailer (From League of Legends: Season 7)",
-          "Urgot, the Dreadnought (From League of Legends: Season 7)",
-          "VS. 2017 - Yasuo vs Riven (From League of Legends: Season 7)",
-          "Warwick, the Uncaged Wrath of Zaun (From League of Legends: Season 7)",
-          "Zoe, the Aspect of Twilight (From League of Legends: Season 7)",
-          "Zoe, the Aspect of Twilight - Trailer (From League of Legends: Season 7)"
-        ]
+        "status": "verified",
+        "matchedTracks": 48,
+        "checkedAt": "2026-10-12",
+        "playlistPositions": "60-107",
+        "evidence": "embed+mirror"
       },
       "tracks": [
         [
@@ -1305,7 +1345,8 @@
         "status": "verified",
         "matchedTracks": 39,
         "checkedAt": "2026-10-11",
-        "playlistPositions": "21-59"
+        "playlistPositions": "21-59",
+        "evidence": "embed"
       },
       "tracks": [
         [
@@ -1563,7 +1604,8 @@
         "status": "verified",
         "matchedTracks": 20,
         "checkedAt": "2026-10-11",
-        "playlistPositions": "1-20"
+        "playlistPositions": "1-20",
+        "evidence": "embed"
       },
       "tracks": [
         [
@@ -1704,7 +1746,15 @@
       "spotifyAlbumUrl": "https://open.spotify.com/album/1KHalUH2ZfT38gIdT8MJdn",
       "trackCount": 11,
       "creatorSafe": {
-        "status": "unverified"
+        "status": "partial",
+        "matchedTracks": 10,
+        "checkedAt": "2026-10-12",
+        "playlistBlock": "251-300",
+        "evidence": "mirror",
+        "notYetMatched": [
+          "Silver Scrapes (feat. Proto Shredanoid)"
+        ],
+        "note": "Tracks 1-10 are in the 251-300 block under plain titles with the same artists. 'Silver Scrapes' was not in entries 1-300; entries 301+ were not read. The official SoundCloud Creator-Safe Playlist Pt. I also lists tracks 1-5 (remix uploads) at entries 11-15."
       },
       "tracks": [
         [

@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-11（trk114）**。現在の仕様・守る条件・未確認事項の要約です。細かな過去の作業履歴（trk110以前）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-12（trk115）**。現在の仕様・守る条件・未確認事項の要約です。細かな過去の作業履歴（trk112以前）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝直近3回の変更、§8＝変更時の点検。
 
@@ -28,7 +28,7 @@
 
 ### その他のカタログ
 
-- LoLカタログはtrk108時点で18プレイリスト・456曲（Creator-Safe Sessions、Champion Themes、Worlds、MSI、K/DA、Season 1〜9 OST、Warsongs、人気曲）。**Creator-Safe Playlistと全曲照合済みなのはSeason 9・8だけ**（trk114で訂正。trk108〜113の「Season 1〜9・Warsongsは確認済み」は過大でした）。Season 7は48曲中41曲が照合済み、Season 1〜6は対象の可能性が高いが未照合、Warsongsは未照合、人気曲の共同制作曲などは対象外・要確認です。照合状態はプレイリストごとに `js/catalog.js` の `LOL_CREATOR_SAFE` に持たせ、入手先ガイドの文言はそこから選びます（fixtureの `creatorSafe` と `check-repo` で一致を検査）。
+- LoLカタログはtrk108時点で18プレイリスト・456曲（Creator-Safe Sessions、Champion Themes、Worlds、MSI、K/DA、Season 1〜9 OST、Warsongs、人気曲）。**Creator-Safe Playlistと全曲照合済みなのはSeason 1〜9（243曲）**、Warsongsは11曲中10曲（「Silver Scrapes」が未照合）。先頭100曲は公式の埋め込み表示（trk114）、101曲目以降は第三者サイトsongdata.ioの一覧で照合しました（trk115）。trk108〜113の「Season 1〜9・Warsongsは確認済み」は根拠の無いまま書いた過大表記で、trk114で訂正しています。人気曲の共同制作曲などは対象外・要確認です。照合状態はプレイリストごとに `js/catalog.js` の `LOL_CREATOR_SAFE` に持たせ、入手先ガイドの文言はそこから選びます（fixtureの `creatorSafe` と `check-repo` で一致を検査）。
 - 曲別出典、範囲、権利上の未確認事項は [`LEAGUE-OF-LEGENDS-MUSIC.md`](LEAGUE-OF-LEGENDS-MUSIC.md) と `tools/leagueoflegends-*-tracklist.json` を参照。音源はカタログにも同梱しません。
 - **Endfieldカタログ**（trk110〜trk111）は初号指令OSTと公式アルバム6作の2系統です。いずれも公式Spotify収録順・各曲は公式Spotify個別曲ページへリンクし、取り込み時に自動でプレイリスト化します。音源は同梱しません。
   - 初号指令OST「Zeroth Directive」：Vol.1 37曲＋Vol.2 23曲。各巻は公式告知のffm.to配信一覧へリンクし、中国語公式曲名を照合別名に登録済み。旧「初号指令 OST」4パート紹介版は永続ID `ef-firstorder` を保ったままVol.1全曲版へ安全更新されます（所持曲・ユーザー変更は維持）。キャラクターOST等5プレイリストの内容は不変。
@@ -62,7 +62,7 @@
 2. **カタログ名表示**：ユーザー設定名 → カタログ名 → 元ファイル名の優先順と、元ファイル名・保存名が変わらないことを実際のライブラリで確認する。
 3. **音源ジャケット**（trk101〜106）：曲一覧のサムネイル表示は利用者確認済み（2026-10-09）。選択中バナー・TV・書斎、譜面中の右上配置、フィルター、画像なし、表示設定の優先順はPC／Androidの実曲で確認する。詳細は旧記録と [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照。
 4. **LoL外部ページ**：Season 4〜9・WarsongsのSoundCloudセット表示と、地域制限曲を含む人気曲リンクを実ブラウザで再確認する。曲別調査はLoL台帳を更新する。
-   - trk114：Creator-Safe Playlistの**101番目以降**（Season 7の残り7曲・Season 1〜6・Warsongs）は、公式の埋め込み表示に出ないため未照合。Spotifyアプリ等で全979曲を表示して照合できたら、`js/catalog.js` の `LOL_CREATOR_SAFE` と fixture の `creatorSafe`（`matchedTracks`・`checkedAt`）を同時に更新する（`check-repo` が両者の一致を見る）。
+   - trk115：Creator-Safe Playlistの101番目以降は、第三者サイト [songdata.io](https://songdata.io/playlist/5hDYD44imzFZEqTfAoco1N) の一覧で照合した（Season 7の残り7曲・Season 1〜6全曲・Warsongs 10曲。方法と検証は台帳）。**残りはWarsongs「Silver Scrapes」1曲**：Spotifyアプリでプレイリストを開き、プレイリスト内検索で有無を確かめる。結果は `js/catalog.js` の `LOL_CREATOR_SAFE` と fixture の `creatorSafe` を同時に直す（`check-repo` が一致・曲数・根拠を見る）。第三者サイトでの照合なので、Spotifyアプリで全979曲を表示できる環境があれば1度見直すと確実（任意）。
 5. **Endfield配信リンク**：Zeroth Directive OST 60曲＋バッチ2の6作81曲のSpotify個別曲ページ、各巻のffm.toスマートリンクと网易云音乐アルバムの表示・地域差を実ブラウザで再確認する。バッチ2は個別曲IDの抜取確認が6曲のみで、残り75曲のIDは未個別確認。バッチ2の中国語公式曲名・ffm.to告知リンク（Homecoming 以外）・VGMdb照合・他ストアの曲別URLは未確認のまま。Zeroth Vol.1 は 2026-10-11 に Apple Music 掲載を確認済み（Vol.2 のアルバム別URLは未照合）。未収録の公式リリース（Yi／Old Deep Water Dies／Sketches of Lost Heirlooms／A Promise Makes a Home 等）は台帳の「調査中の他の公式リリース」表に確認状況を記録済み。曲別調査はエンドフィールド台帳を更新する。
 6. **🎼 手続き生成10曲の聴取確認**（trk113）：自動検査は「無音でもクリップでもない」こと（peak 0.62〜0.72・RMS 0.08〜0.29）と決定的生成しか確認していません。曲として聴けるか・不快なノイズや耳障りな音がないか・音量バランスは、`assets/trk-ost/index.html` で実際に聴いて確認する。採用曲を決めたら、trk's OST Vol.1 への組込み方（音源の権利表記・同梱可否）を別途決める。
 7. Android Chrome／PCでService Workerのsafe・オフライン、MMD／VRM、IndexedDBを確認する。Node・shim検査は実機確認の代用ではありません。
@@ -84,11 +84,12 @@
 | 利用者向けMIDI・権利案内 | `docs/guide/touhou-midi.md`、`docs/guide/sound.md`、`docs/guide/en.md` |
 | 🎓 OST手続き生成 | `tools/make-trk-ost.mjs`（出力は `assets/trk-ost/`・Git外。5ルール×2曲＝10曲のWAVスケッチ） |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.11-trk114`） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.12-trk115`） |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
 
+- trk115のLoL Creator-Safe照合（`check-repo.mjs` のLoLアルバム検査）：Season 1〜9＝verified・Warsongs＝partial（10/11、未照合は「Silver Scrapes」）が `LOL_CREATOR_SAFE` とfixtureで一致し、照合済みの各アルバムが根拠（embed／mirror）を持ち、mirror の記録（songdata.io・確認日）があることを確認。根拠の削除・mirror URLの改変・Warsongsの未照合曲の取り違え・カタログ側の状態の食い違い・シリーズ説明の文言欠落・likely文言の復活・partial文言の過大表現の7通りでFAILすることを確認済み。照合そのもの（51〜300番目の転記と区画ごとの突き合わせ）はリポジトリ外の作業メモで行い、結果をfixtureと台帳に記録した。
 - `npm run check`：成功。Static 0 failure／0 warning、`node:test` **218/218**（trk114で16件追加：MIDIの処理量・中止・進み具合、削除の印・OSTの移動・ガイドの言語、入れ子の欄のアクセント文字色）。リポジトリ、Security、a11y、vendor、MMD、Study Room、lite-mode検査を含む。
 - trk114のブラウザ確認（リポジトリ外の `@sparticuz/chromium`＋`puppeteer-core`、Chromium 153 headless）：`tools/smoke-browser.mjs --compare` は boot 0・未解決0・譜面10件一致・decode error 0・click error 0・mobile/safe-offline OK。`tools/smoke-game-end.mjs` PASS。加えて一時スクリプトで23項目（ガイドの鍵と英語表示、削除→再起動で戻らない→♻で復元、移したOSTが戻らない、3スキンのaxe、MIDIの `midiLoaded`／`midiTooDense`、ページエラー0）を確認。半透明カードのスキンはaxeが「判定不能」になるため、16スキンの数値はNodeの計算（`tests/skin-contrast.test.mjs`）で確認。
 - trk114のMIDI計測（開発コンテナのNode、`studio_gm`）：4和音・3分（2,880音）は7.9秒→3.3秒、合成した密な3分の曲（平均約37音）は36.3秒→21.3秒。4和音・9分半は8,650万（旧上限8,000万で拒否→可）、密な4分は1.96億（可）、密な5分は2.46億（不可）。実際の東方MIDIでは未計測（§4-1）。
@@ -100,10 +101,10 @@
 
 ## 7. 最近の変更
 
+- **trk115（2026-10-12）**：LoLのCreator-Safe照合を101曲目以降へ広げた。公式の埋め込み表示は先頭100曲までなので、プレイリスト全体を表示する第三者サイトsongdata.ioで51〜300番目を読み、Season 7の残り7曲・Season 1〜6の全136曲・Warsongs 10曲を照合（51〜100番目は公式の埋め込みと完全一致することを確認）。Season 1〜9を照合済み（verified）、Warsongsを一部照合済み（partial・10/11、「Silver Scrapes」は未照合）にし、推測で「可能性が高い」とした likely 状態と文言（4言語）を廃止。partialの文言は「一部の曲は対象（照合済み）、残りは未照合・要確認」に変更。fixtureに根拠（embed／mirror）と第三者サイトの記録、公式SoundCloudのCreator-Safe Playlist Pt. I／IIを追加し、`check-repo` で一致・曲数・根拠を検査（7通りの改変でFAILを確認）。台帳・ガイド（ja／en）・`sw.js` cache名（`trk-v2026.10.12-trk115`）を更新。
 - **trk114（2026-10-11）**：再レビュー（3a3a3db→2380d8b）への対応。①LoLのCreator-Safe表示を照合状態ごとに分けた（照合済み＝Season 9・8、一部照合済み＝Season 7、可能性が高い・未照合＝Season 1〜6、未照合＝Warsongs、人気曲＝共同制作曲は対象外・要確認）。公式埋め込み表示の先頭100件でSeason 8全曲とSeason 7の41曲を新たに照合し、台帳・fixture・ガイドの過大な記述を訂正。②`js/fx.js`／`js/fx-presets.js` の凍結を空さんの判断で解除し、NAMESPACE-PLAN・ADDONS・REVIEW記録の記述をそろえた。③MIDIの処理量：聞こえない余韻を数えず・描かず、合成ループを高速化、上限を2億に、`midiTooDense` の専用文言・進み具合・中止、`tools/midi-budget.mjs`。④消した自動リストを作り直さない印（`trkRemoved`）と♻復元ボタン、OSTの移動を守る。⑤入手先ガイドを4言語の辞書キーで表示。⑥`TrkEnsureTrkOstPlaylist`・`TrkOstPlaylistId`・`TrkTouhouThemeData` を `window.Trk.library`／`window.Trk.touhouThemeData` へ。⑦入れ子の見出しなど小さなアクセント文字に `--ui-accent-ink`（全スキン4.5:1）。`sw.js` cache名を `trk-v2026.10.11-trk114` に更新。
 - **trk113（2026-10-11）**：🎓 trk's OST Vol.1 用の手続き作曲スクリプト `tools/make-trk-ost.mjs` を追加。コード進行／確率・統計（マルコフ・ランダムウォーク）／進化的アルゴリズム（GA）／深層学習（tiny MLPを勾配降下で訓練）／自由作曲 の5ルール×2曲＝10曲を依存なしで合成し `assets/trk-ost/` へWAV出力（.gitignore でGit外・生成スクリプトのみ同梱）。試聴は `assets/trk-ost/index.html`。音源はアプリ未組込（将来 trk's OST Vol.1 へ追加予定）。
-- **trk112（2026-10-11）**：タブ挙動の改善。①デモ曲を🎓 trk's OST Vol.1 プレイリストへ移設（🐔 trk's playlist 内・Game Vol.1 の下、`js/library.js` の `ensureTrkOstPlaylist`／`TRK_OST_ID`。旧版の最上位タブからの移行あり）。②開いたフォルダ内プレイリストのタブを `settings.libOpenTabs` で永続化し、中クリックはタブを閉じるのみに（`plCloseOpenTab`）。ガイド（`appearance.md`・`en.md`）と `sw.js` cache名（`trk-v2026.10.11-trk112`）を更新。`npm run check` 全件通過・VMで新関数の挙動を確認。
-- **trk110以前**：Endfield初号指令OST、Touhouローカル曲名カタログと24種のコード生成MIDI音色・TRK MIDI MIX（trk109）、LoLカタログ、音源ジャケット、TV、譜面生成、名前空間等の作業履歴は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) と各設計資料を参照。
+- **trk112以前**：trk112（タブ挙動・デモ曲のOST移設）とtrk111は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)。Endfield初号指令OST、Touhouローカル曲名カタログと24種のコード生成MIDI音色・TRK MIDI MIX（trk109）、LoLカタログ、音源ジャケット、TV、譜面生成、名前空間等の作業履歴は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) と各設計資料を参照。
 
 ## 8. 変更時チェックリスト
 

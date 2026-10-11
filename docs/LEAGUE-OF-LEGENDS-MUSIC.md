@@ -64,22 +64,36 @@ K/DAの全関連コンテンツを網羅したという意味ではなく、Crea
 
 - 公式SoundCloudのセットページを直接開いて確認したのは **Season 1（9曲）** と **Season 2（30曲）**。どちらも曲数・曲名・曲順がSpotifyアルバムと一致した（Season 2は先頭15曲を1曲ずつ突き合わせ）。Season 3 のURL（`…/the-music-of-league-of-1`）はSoundCloud自身のページ見出しで確認。
 - SoundCloudのURLスラッグ末尾の数字はシーズン番号と**一致しない**（Season 1 → `…-of-2`、Season 9 → `…-of-5`）。アルバムの見出し（Season 表記）を正とし、スラッグから季節を推測しない。
-- **Season 4〜9 と Warsongs のSoundCloudセットページはこの作業では開けていない**（SoundCloudが自動アクセスに対して断続的に「非対応ブラウザ」エラーを返した）。URLは2026-10-09に公式アルバム一覧から取得したもので、曲順・曲数は同名・同アーティスト・同リリース年の公式Spotifyアルバムに依る。実ブラウザでの再確認は下記「次の確認」に残す。
+- **Season 4〜9 のSoundCloudセットページはこの作業では開けていない**（SoundCloudが自動アクセスに対して断続的に「非対応ブラウザ」エラーを返した）。URLは2026-10-09に公式アルバム一覧から取得したもので、曲順・曲数は同名・同アーティスト・同リリース年の公式Spotifyアルバムに依る。実ブラウザでの再確認は下記「次の確認」に残す。Warsongs のセット（`…/sets/warsongs-7`）は trk115（2026-10-12）に開けた：11曲・曲名と曲順はSpotifyと同じ「(feat. …)」表記（11曲目のSoundCloud表記は「Silver Scrapes (feat. Protoshredanoid)」）、アルバム公開日 2016-01-14。
 - Warsongs の11曲は Riot 公式の発表ページ（nexus.leagueoflegends.com）のトラックリストと一致。Spotifyの曲名は「Piercing Light (feat. Mako)」形式、Riot発表は「Piercing Light (Mako Remix)」形式で、**表記が違うだけ**の同一曲。カタログはリンク先のSpotify表記を採用した。
 - SoundCloud側の総再生時間はSpotifyより短い（Season 2 で 40:10 に対し Spotify は 69:42）。曲数・曲名・曲順は一致しているので、SoundCloud掲載音源の長さが違う可能性がある。この差は未確認。
 - Spotifyには**同一アルバムの別版（別のアルバムID）**がある。Season 9 では、アルバムURLに採用した `3cYnSSnBe1akJwxv64PHOg` とは別版（`2mW3TZ7nddsMIAYpw3Rbat`）のトラックIDを曲別リンクに採用した形になっている。曲名・アーティスト・曲順・再生時間は同一で、トラックID側のリンクは実際に開いて確認した（「Arcade 2019: ULTRACOMBO」、2026-10-10）。どちらも正規リンクなので差し替えない。
 
-**Creator-Safe の照合状態（2026-10-11 訂正）**：Riot公式の [Creator-Safe Playlist](https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N)（trk108時点で979曲・説明文は「This is a collection of music that is 100% owned by Riot Games. It can be used in streams or content creation as long as it follows the “Legal Jibber Jabber” rules on our website.」）と、曲名・アーティスト・曲順を突き合わせた。公式の埋め込み表示に出るのは先頭100件だけで、並びは Season 9 → 8 → 7 の順だった。
+**Creator-Safe の照合状態（2026-10-11 訂正・2026-10-12 追記）**：Riot公式の [Creator-Safe Playlist](https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N)（trk108時点で979曲・説明文は「This is a collection of music that is 100% owned by Riot Games. It can be used in streams or content creation as long as it follows the “Legal Jibber Jabber” rules on our website.」）と、曲名・アーティスト・曲順を突き合わせた。公式の埋め込み表示に出るのは先頭100件だけで、並びは Season 9 → 8 → 7 の順だった。101番目以降は、プレイリスト全体を表示する第三者サイト [songdata.io](https://songdata.io/playlist/5hDYD44imzFZEqTfAoco1N) で照合した（2026-10-12・方法と注意は表の下）。
 
-| アルバム | 状態（`js/catalog.js` の `LOL_CREATOR_SAFE`） | 根拠 |
+| アルバム | 状態（`js/catalog.js` の `LOL_CREATOR_SAFE`） | 根拠（プレイリスト内の位置） |
 |---|---|---|
-| Season 9（20曲） | **照合済み**（verified） | プレイリストの1〜20番目と全曲一致。2026-10-09に再生時間まで確認し、2026-10-11に再確認 |
-| Season 8（39曲） | **照合済み**（verified） | 21〜59番目と全曲一致（2026-10-11） |
-| Season 7（48曲） | **一部のみ照合済み**（partial・41/48） | 60〜100番目が先頭41曲と一致。残り7曲（`notYetMatched`）は101番目以降で表示されず未照合 |
-| Season 1〜6（計136曲） | **対象の可能性が高い・未照合**（likely） | 同じシーズン別OSTのシリーズで、照合できた範囲の並びから続きにあると見込むが、表示範囲外で未確認 |
-| Warsongs（11曲） | **未照合**（unverified） | 外部アーティスト参加（feat.表記）の作品なので、シーズン別OSTの並びからは推測しない |
+| Season 9（20曲） | **照合済み**（verified） | 1〜20番目と全曲一致（公式埋め込み）。2026-10-09に再生時間まで確認し、2026-10-11に再確認 |
+| Season 8（39曲） | **照合済み**（verified） | 21〜59番目と全曲一致（公式埋め込み・2026-10-11） |
+| Season 7（48曲） | **照合済み**（verified・trk115） | 60〜100番目＝先頭41曲（公式埋め込み・2026-10-11）、101〜107番目＝残り7曲（songdata.io・2026-10-12） |
+| Season 6（27曲） | **照合済み**（verified・trk115） | 108〜134番目（songdata.io） |
+| Season 5（25曲） | **照合済み**（verified・trk115） | 135〜159番目（songdata.io。150番目の区切りで先頭16曲／残り9曲に分かれる位置も予測どおり） |
+| Season 4（22曲） | **照合済み**（verified・trk115） | 160〜181番目（songdata.io） |
+| Season 3（23曲） | **照合済み**（verified・trk115） | 182〜204番目（songdata.io。200番目の区切りで先頭19曲／残り4曲） |
+| Season 2（30曲） | **照合済み**（verified・trk115） | 205〜234番目（songdata.io） |
+| Season 1（9曲） | **照合済み**（verified・trk115） | 235〜243番目（songdata.io） |
+| Warsongs（11曲） | **一部のみ照合済み**（partial・10/11・trk115） | 1〜10曲目が251〜300番目の区画にある（曲名は「Piercing Light」のように「(feat. …)」なし、アーティストは「League of Legends, Mako」など同じ）。**「Silver Scrapes」は1〜300番目に無く未照合**（301番目以降は読んでいない）。公式SoundCloudのCreator-Safe Playlist Pt. I でも11〜15番目が1〜5曲目（Remix版のアップロード） |
 
-照合状態はプレイリストのデータ（`js/catalog.js` の `LOL_CREATOR_SAFE`）に持たせ、設定ガイドの文言（`js/library.js` の `trkCatalogGuide`）はそこから選ぶ。根拠の詳細は `tools/leagueoflegends-soundcloud-albums-tracklist.json` の `creatorSafe`（`tools/check-repo.mjs` が両者の一致と照合曲数を検査）。trk108〜113 では「Season 1〜9・Warsongs は対象」と書いていたが、実際に照合したのは Season 9 だけだったため trk114 で訂正した。Sessions 3作は、Riot が公開時に「Creator-Safe Collection」と説明したシリーズとして別に扱い、このプレイリストとは照合していない。
+**101番目以降の照合方法と注意（trk115・2026-10-12）**：
+
+- songdata.io はRiot・Spotifyの運営ではない第三者サイト。公開プレイリストの全曲を一覧にするが、**50件ごとの区画に分け、区画の中はSpotifyのトラックID順に並べ替えて表示する**ため、区画内の正確な順番は見えない。読んだのは51〜300番目。
+- 確かめたこと：①51〜100番目の区画は、公式埋め込みが同じ位置に表示する50曲（Season 8の最後の9曲＋Season 7の先頭41曲）と完全に一致した（第三者サイトの表示が公式と食い違わないことの確認）。②101〜150・151〜200・201〜250番目の各区画は、アルバム順に続けた場合の予測（Season 7の42〜48曲目、Season 6、Season 5、Season 4、Season 3、Season 2、Season 1）と過不足なく一致し、201〜250番目の区画の残り7件は単曲（Quinn and Valor、Tidecaller、Tales of the Rift、Braum、Demacia Rising、Tiny Masterpiece of Evil、The Curse of the Sad Mummy）だった。曲名は1文字単位で一致。表の位置はこの結果からアルバム順で書いたもの。
+- プレイリストに入っているのはSpotify上の**同じアルバムの別版**（トラックIDが本カタログの曲別リンクと違う）。曲名・アーティストで照合した。曲別リンクは公式アルバム側のまま差し替えない。
+- 251〜300番目の区画には Warsongs 10曲のほか、Pentakill、DJ Sona（Kinetic・Concussive・Ethereal）、Sett・Aphelios・Senna 等のChampion Themeも入っていた。これらのリストの照合は今回の範囲外（未照合のまま）。
+- 利用前に確実にするなら、Spotifyアプリでプレイリストを開き、プレイリスト内検索で曲名を確かめる。
+- 公式SoundCloudの [Creator-Safe Playlist Pt. I](https://soundcloud.com/leagueoflegends/sets/riot-games-creator-safe)（499曲）と [Pt. II](https://soundcloud.com/leagueoflegends/sets/riot-games-creator-safe-pt2)（230曲）は今もRiotのガイドラインからリンクされているが、更新は約4年前で、シーズン別アルバム版ではなく旧単曲・Remixのアップロードが入っている。JavaScriptなしでは先頭15曲しか出ないため全件は読んでいない（照合の主な根拠にはしていない）。
+
+照合状態はプレイリストのデータ（`js/catalog.js` の `LOL_CREATOR_SAFE`）に持たせ、設定ガイドの文言（`js/library.js` の `trkCatalogGuide`）はそこから選ぶ。根拠の詳細は `tools/leagueoflegends-soundcloud-albums-tracklist.json` の `creatorSafe`（`tools/check-repo.mjs` が両者の一致と照合曲数を検査）。trk108〜113 では「Season 1〜9・Warsongs は対象」と書いていたが、実際に照合したのは Season 9 だけだったため trk114 で訂正した。trk115 で101番目以降を照合して Season 1〜7 を照合済み、Warsongs を一部照合済み（10/11）にし、照合せず「可能性が高い」とした likely 状態は廃止した。Sessions 3作は、Riot が公開時に「Creator-Safe Collection」と説明したシリーズとして別に扱い、このプレイリストとは照合していない。
 
 対象であっても条件は残る。Riotの法務表記（Legal Jibber Jabber）に従うことが前提で、**音源の同梱・再配布・販売、企業広告での利用は別条件**。trk! はリンクの索引にとどめる。
 
@@ -96,9 +110,11 @@ K/DAの全関連コンテンツを網羅したという意味ではなく、Crea
 
 ### 次の確認（Phase 3 の残作業）
 
-1. 実ブラウザで Season 4〜9 と Warsongs の公式SoundCloudセットページを開き、アルバム見出しの Season 表記と曲数を確認する（Spotifyとの差があれば台帳とfixtureを直す）。
+1. 実ブラウザで Season 4〜9 の公式SoundCloudセットページを開き、アルバム見出しの Season 表記と曲数を確認する（Spotifyとの差があれば台帳とfixtureを直す）。
 2. SoundCloud掲載音源の長さがSpotifyと違う件（Season 2 で確認）が他作でもあるか確認する。
 3. 人気曲ページのスナップショットは時期を見て更新する（更新時は取得日をfixtureの `asOf` に残す）。
+4. **Warsongs「Silver Scrapes」**がCreator-Safe Playlistにあるか、Spotifyアプリのプレイリスト内検索で確かめる。あれば Warsongs を verified（11/11）に、無ければ「プレイリストに無い」と台帳に書く（どちらも `LOL_CREATOR_SAFE` と fixture の `creatorSafe` を同時に直す）。
+5. 101番目以降は第三者サイト（songdata.io）の一覧で照合した。Spotifyアプリで全979曲を表示できる環境があれば、Season 1〜7 を1度だけ見直す（任意）。
 
 ### データと検査
 
@@ -126,7 +142,7 @@ K/DAの全関連コンテンツを網羅したという意味ではなく、Crea
 - Riotの[Creator-Safeガイドライン](https://www.riotgames.com/en/riot-music-creator-safe-guidelines)は、RiotがCreator-Safeとして指定する**特定のプレイリスト内の曲**と利用条件を基準にしています。Riot自身の説明でも、外部アーティスト／出版社／レーベル等との共同制作曲には複雑な権利関係があり、Creator-Safeプレイリスト外の曲は一般に権利者のライセンスが必要で、配信・動画での利用が安全とは保証されないとされています。
 - Worlds／MSIアンセムは外部アーティストとの共同制作を含むため、公式YouTube／Spotify／SoundCloudで聴けることを**再利用の許可**と見なしません。創作動画・配信等に使う場合は、曲が現在のCreator-Safeリストに含まれるか、必要な権利者の許諾があるかを曲ごとに確認してください。企業広告・販売・音源再配布などは別条件です。
 - 「Know My Name」がRiotのCreator-Safeプレイリストに含まれることはこの調査で確認できていません。よってカタログではCreator-Safeと表示せず、利用条件は未確認として扱います。公式MV／配信先があることだけでは、動画・配信への利用や音源の再配布は許諾されません。
-- **Phase 3 のうち Creator-Safe 対象と照合できたのは Season 9・8 の全曲だけ**です（根拠は上の「Creator-Safe の照合状態」）。Season 7 は48曲中41曲が照合済み、Season 1〜6 は対象の可能性が高いものの未照合、Warsongs は未照合です。照合済みでも、Riotの法務表記に従うことが条件で、音源の同梱・再配布・販売や企業広告での利用は別条件です。Creator-Safe は trk! が音源を配布してよい意味にはなりません。
+- **Phase 3 のうち Creator-Safe 対象と照合できたのは Season 1〜9 の全243曲と Warsongs の10曲**です（根拠は上の「Creator-Safe の照合状態」。101番目以降は第三者サイトsongdata.ioの一覧で照合）。Warsongs の「Silver Scrapes」は未照合です。照合済みでも、Riotの法務表記に従うことが条件で、音源の同梱・再配布・販売や企業広告での利用は別条件です。Creator-Safe は trk! が音源を配布してよい意味にはなりません。
 - 人気曲30曲は**曲ごとに扱いが違います**。ゲーム音楽（チャンピオンテーマ等）は Creator-Safe 対象の可能性がありますが1曲ずつは照合しておらず、Worlds／MSIアンセム・K/DA・True Damage・HEARTSTEEL など外部アーティストとの共同制作曲は対象外・要確認です。人気曲ページには「日本では利用できません」と表示される曲もあり、リンク先の再生可否は地域と時期で変わります。
 - 収録したK/DA 6曲もCreator-Safe対象か・適用条件を確認できていません。Spotify個別曲ページとRiot公式動画を確認したことは、二次利用や音源同梱／再配布の許可を意味しません。
 - SessionsはCreator-Safe Sessionsとして提供された範囲で案内し、Riotの現行ガイドラインとクレジット／利用条件に従う前提です。Creator-Safeであることも、音源そのものの再配布を許す意味ではありません。
@@ -136,7 +152,9 @@ K/DAの全関連コンテンツを網羅したという意味ではなく、Crea
 
 - [Riot Games — 法務表記（日本語）](https://www.riotgames.com/ja/legal)（一般的な法務案内。個別曲の利用条件はCreator-Safeガイド／権利者の条件で別途確認）
 - [Riot Games — Creator-Safe Guidelines](https://www.riotgames.com/en/riot-music-creator-safe-guidelines)
-- [Riot Games — Creator-Safe Playlist（Spotify）](https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N)（979曲・「100% Riot Games が権利を持つ曲」。埋め込み表示の先頭100件で Season 9・8 の全曲と Season 7 の41曲を照合（2026-10-11）。それ以降の曲・Know My Name・K/DAの収録は未確認）
+- [Riot Games — Creator-Safe Playlist（Spotify）](https://open.spotify.com/playlist/5hDYD44imzFZEqTfAoco1N)（979曲・「100% Riot Games が権利を持つ曲」。埋め込み表示の先頭100件で Season 9・8 の全曲と Season 7 の41曲を照合（2026-10-11）。Know My Name・K/DAの収録は未確認）
+- [songdata.io — Riot Games Creator-Safe Playlist の一覧](https://songdata.io/playlist/5hDYD44imzFZEqTfAoco1N)（第三者サイト。101〜300番目で Season 7 の残り7曲・Season 1〜6 の全曲・Warsongs 10曲を照合（2026-10-12）。50件ごとの区画内はトラックID順）
+- [Riot Games Creator-Safe Playlist Pt. I](https://soundcloud.com/leagueoflegends/sets/riot-games-creator-safe)／[Pt. II](https://soundcloud.com/leagueoflegends/sets/riot-games-creator-safe-pt2)（公式SoundCloud。499曲／230曲・約4年前の更新。先頭15曲のみ確認）
 - [League of Legends — Champion Theme の公式記事一覧](https://www.leagueoflegends.com/en-us/news/tags/champion-theme/)
 - [League of Legends — Music の公式記事一覧](https://www.leagueoflegends.com/en-us/news/tags/music/)
 - [League of Legends — 公式YouTubeチャンネル](https://www.youtube.com/@leagueoflegends)（Champion Theme個別投稿を確認。例：[Locke, the Ashen Exorcist](https://www.youtube.com/watch?v=nakzw9Y_CLI)、2026-06-26公開）

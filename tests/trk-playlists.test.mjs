@@ -142,15 +142,19 @@ describe("catalog guides follow the UI language", () => {
     const keyOf = id => api.trkCatalogGuide(lol, lol.playlists.find(pl => pl.id === id), true).key;
     assert.equal(keyOf("lol-season-9"), "plGuideLolCsVerified");
     assert.equal(keyOf("lol-season-8"), "plGuideLolCsVerified");
-    assert.equal(keyOf("lol-season-7"), "plGuideLolCsPartial");
-    assert.equal(keyOf("lol-season-1"), "plGuideLolCsLikely");
-    assert.equal(keyOf("lol-warsongs"), "plGuideLolCsUnverified");
+    /* trk115：101曲目以降（songdata.io の一覧）で Season 1〜7 を全曲照合。Warsongs は11曲中10曲 */
+    for (let n = 1; n <= 7; n++) assert.equal(keyOf("lol-season-" + n), "plGuideLolCsVerified", "Season " + n);
+    assert.equal(keyOf("lol-warsongs"), "plGuideLolCsPartial");
     assert.equal(keyOf("lol-popular-tracks"), "plGuideLolPopular");
     assert.equal(keyOf("lol-svi"), "plGuideLolSessions");
     assert.equal(keyOf("lol-kda-songs"), "plGuideRiotLinks");
     assert.equal(api.trkCatalogGuide(lol, { id: "lol-mod-list", creatorSafe: "verified-by-mod?" }, true).key, "plGuideRiotLinks",
       "an unknown status never reads as Creator-Safe");
-    assert.match(context.TEXT.ja.plGuideLolCsLikely, /可能性が高い・未照合/);
+    assert.match(context.TEXT.ja.plGuideLolCsPartial, /一部の曲はCreator-Safe対象.*未照合・要確認/);
+    assert.doesNotMatch(context.TEXT.ja.plGuideLolCsPartial, /可能性が高い/, "partial never claims the unmatched songs");
+    for (const lang of ["ja", "en", "zh", "ko"]) assert.equal(context.TEXT[lang].plGuideLolCsLikely, undefined, lang);
+    assert.equal(api.trkCatalogGuide(lol, { id: "lol-old", creatorSafe: "likely" }, true).key, "plGuideRiotLinks",
+      "the retired 'likely' status falls back to the links-only wording");
     assert.match(context.TEXT.ja.plGuideLolPopular, /対象外・要確認/);
   });
 

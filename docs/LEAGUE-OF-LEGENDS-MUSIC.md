@@ -130,7 +130,7 @@ K/DAの全関連コンテンツを網羅したという意味ではない。Riot
 1. 実ブラウザで Season 4〜9 の公式SoundCloudセットページを開き、アルバム見出しの Season 表記と曲数を確認する（Spotifyとの差があれば台帳とfixtureを直す）。
 2. SoundCloud掲載音源の長さがSpotifyと違う件（Season 2 で確認）が他作でもあるか確認する。
 3. 人気曲ページのスナップショットは時期を見て更新する（更新時は取得日をfixtureの `asOf` に残す）。
-4. **見当たらなかった曲**（Warsongs「Silver Scrapes」、Champion Theme「Smolder, the Fiery Fledgling」「Yunara, the Unbroken Faith」、Sessions: Diana「Oh Baby」）を、Spotifyアプリのプレイリスト内検索で確かめる。songdata.io に出ない2曲は701〜750番目（2024年ごろの区画）にあるので、2024年の Smolder はそこに含まれる可能性がある。見つかったら、その fixture の `creatorSafe`（`matchedTracks`・`notFound`）と `LOL_CREATOR_SAFE` を同時に直す（`check-repo` が一致を見る）。
+4. **見当たらなかった曲**（Warsongs「Silver Scrapes」、Champion Theme「Smolder, the Fiery Fledgling」「Yunara, the Unbroken Faith」、Sessions: Diana「Oh Baby」）の Spotify アプリでの追加確認は、管理者の判断で行わない（2026-10-12）。「見当たらない」のまま扱う（songdata.io に出ない2曲は701〜750番目にあり、2024年の Smolder が含まれる可能性は台帳に記録済み）。将来プレイリストに見つかったら、その fixture の `creatorSafe`（`matchedTracks`・`notFound`）と `LOL_CREATOR_SAFE` を同時に直す（`check-repo` が一致を見る）。
 5. 101番目以降は第三者サイト（songdata.io）の一覧で照合した。Spotifyアプリで全979曲を表示できる環境があれば、1度だけ見直す（任意）。
 
 ### データと検査

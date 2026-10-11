@@ -1,8 +1,12 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移したtrk70〜trk113の履歴です。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
+> `docs/HANDOFF.md` から移したtrk70〜trk114の履歴です。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
 
 ## 旧 HANDOFF §11「最近の変更」
+
+### trk114 の記録（2026-10-11。trk117のときに HANDOFF §7 から移動）
+
+- **trk114（2026-10-11）**：再レビュー（3a3a3db→2380d8b）への対応。①LoLのCreator-Safe表示を照合状態ごとに分けた（照合済み＝Season 9・8、一部照合済み＝Season 7、可能性が高い・未照合＝Season 1〜6、未照合＝Warsongs、人気曲＝共同制作曲は対象外・要確認）。公式埋め込み表示の先頭100件でSeason 8全曲とSeason 7の41曲を新たに照合し、台帳・fixture・ガイドの過大な記述を訂正。②`js/fx.js`／`js/fx-presets.js` の凍結を空さんの判断で解除し、NAMESPACE-PLAN・ADDONS・REVIEW記録の記述をそろえた。③MIDIの処理量：聞こえない余韻を数えず・描かず、合成ループを高速化、上限を2億に、`midiTooDense` の専用文言・進み具合・中止、`tools/midi-budget.mjs`。④消した自動リストを作り直さない印（`trkRemoved`）と♻復元ボタン、OSTの移動を守る。⑤入手先ガイドを4言語の辞書キーで表示。⑥`TrkEnsureTrkOstPlaylist`・`TrkOstPlaylistId`・`TrkTouhouThemeData` を `window.Trk.library`／`window.Trk.touhouThemeData` へ。⑦入れ子の見出しなど小さなアクセント文字に `--ui-accent-ink`（全スキン4.5:1）。`sw.js` cache名を `trk-v2026.10.11-trk114` に更新。
 
 ### trk113 の記録（2026-10-11。trk116のときに HANDOFF §7 から移動）
 

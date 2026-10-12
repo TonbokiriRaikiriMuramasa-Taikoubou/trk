@@ -566,25 +566,20 @@ S("arknights", "アークナイツ", "🩺", "amber", "ソーシャルゲーム"
    他の公式アルバム6作（Eve of Departure・Thunder's Legacy・At the Wake of Spring OST・Contingency Contract Re-Ignition OST・
    Homecoming OST・Dreamscape of Wind and Snow OST、計81曲）も各曲を公式Spotify個別曲、各アルバムを公式Spotifyアルバムページへリンクする
    （6作のffm.to告知リンク・中国語公式曲名は未確認＝次段階。tools/endfield-msr-albums-tracklist.json がデータの正）。
+   並び順（trk128）＝初号指令OST 上下（ゲームのオープニングBGM）→ 公式アルバム6作をリリース順（2026-04-11〜09-10）→
+   キャラクターテーマ曲4リスト（Blurring・ASHEN REMAINS・The Floaty Envelope・MAKER'S LUV）をネスト棚
+   「Endfield Character Theme」（trk-endfield-character）へ → 紹介リスト（ef-signal）を最後に。
    ©/℗ 2026 GRYPHLINE（上海鹰角网络科技有限公司）。音源は同梱せず、配信・購入は二次利用許諾ではない。
    公式二次創作ガイドラインは「公式素材をそのまま複製・抽出するなど創作性が著しく乏しいもの」を禁止している。 */
 S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber", "ソーシャルゲーム", "🎮",
-  "音楽レーベル「Metal Scar Radio（鐵痕電台）」の公式配信曲（音源は同梱せず、曲名などの事実情報と公式入手先のみ）。「初号指令OST」Zeroth Directive Vol.1 37曲・Vol.2 23曲は各曲を公式Spotify個別曲ページへ、各巻を公式告知のffm.to配信一覧（Spotify／YouTube／Amazon Music等、中国は网易云音乐）へリンクします。他の公式アルバム6作（Eve of Departure 5曲・Thunder's Legacy 9曲・At the Wake of Spring OST 17曲・Contingency Contract Re-Ignition OST 4曲・Homecoming OST 30曲・Dreamscape of Wind and Snow OST 16曲、計81曲）も各曲を公式Spotify個別曲ページへ、各アルバムを公式Spotifyアルバムページへリンクします（この6作の中国語公式曲名・公式告知のffm.to配信一覧は未確認＝照合別名なし）。キャラクターOST等はYouTube公式アートトラックや各種サブスクで試聴できます。配信・サブスク・購入は二次利用許諾ではありません。実況・動画投稿の条件と禁止事項（公式素材のそのままの複製・抽出など）は公式二次創作ガイドライン https://endfield.gryphline.com/ja-jp/news/4497 で利用前に確認してください。ツール https://github.com/2t3/endfield-ost-download はタイトル確認に便利です。",
+  "音楽レーベル「Metal Scar Radio（鐵痕電台）」の公式配信曲（音源は同梱せず、曲名などの事実情報と公式入手先のみ）。「初号指令OST」Zeroth Directive Vol.1 37曲・Vol.2 23曲は各曲を公式Spotify個別曲ページへ、各巻を公式告知のffm.to配信一覧（Spotify／YouTube／Amazon Music等、中国は网易云音乐）へリンクします。他の公式アルバム6作（Eve of Departure 5曲・Thunder's Legacy 9曲・At the Wake of Spring OST 17曲・Contingency Contract Re-Ignition OST 4曲・Homecoming OST 30曲・Dreamscape of Wind and Snow OST 16曲、計81曲）も各曲を公式Spotify個別曲ページへ、各アルバムを公式Spotifyアルバムページへリンクします（この6作の中国語公式曲名・公式告知のffm.to配信一覧は未確認＝照合別名なし）。初号指令OST 上下（ゲームのオープニングBGM）を最上に入れ、他の6作はリリース順に並べ、キャラクターテーマ曲4曲（Blurring・ASHEN REMAINS・The Floaty Envelope・MAKER'S LUV）は「Endfield Character Theme」の棚にまとめ、紹介リストを最後にします。キャラクターOST等はYouTube公式アートトラックや各種サブスクで試聴できます。配信・サブスク・購入は二次利用許諾ではありません。実況・動画投稿の条件と禁止事項（公式素材のそのままの複製・抽出など）は公式二次創作ガイドライン https://endfield.gryphline.com/ja-jp/news/4497 で利用前に確認してください。ツール https://github.com/2t3/endfield-ost-download はタイトル確認に便利です。",
   "https://endfield.gryphline.com/ja-jp/",
-  [PL("ef-blurring", "Endfield — Blurring", "🌫️", "gray", ["Game","Endfield","Metal Scar Radio","MSR Endfield"],
-    [T("Blurring", "Blurring", "Metal Scar Radio", "https://www.youtube.com/@ArknightsEndfield"),
-     T("Blurring (Instrumental)", "Blurring", "Metal Scar Radio", "https://endfield.hypergryph.com/")]),
-   PL("ef-ashen", "Endfield — ASHEN REMAINS", "🔥", "red", ["Game","Endfield","Metal Scar Radio","Levatein"],
-    [T("ASHEN REMAINS", "ASHEN REMAINS — Levatein OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2027624810168390017"),
-     T("ASHEN REMAINS (Instrumental)", "ASHEN REMAINS", "Metal Scar Radio", "https://endfield.hypergryph.com/")]),
-   PL("ef-floaty", "Endfield — The Floaty Envelope", "✉️", "blue", ["Game","Endfield","Metal Scar Radio","Gilberta"],
-    [T("The Floaty Envelope", "The Floaty Envelope — Gilberta OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2027624810168390017"),
-     T("The Floaty Envelope (Instrumental)", "The Floaty Envelope", "Metal Scar Radio", "https://endfield.hypergryph.com/")]),
-   PL("ef-makers", "Endfield — MAKER'S LUV", "💖", "pink", ["Game","Endfield","Metal Scar Radio","Yvonne"],
-    [T("MAKER'S LUV", "MAKER'S LUV — Yvonne OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2027624810168390017")]),
+  [/* 並び順（trk128）：初号指令OST 上下2巻を最上（ゲームのオープニングBGMがここにある）→ 公式アルバム6作をリリース順で →
+      キャラクターテーマ曲4リストをネスト棚「Endfield Character Theme」（trk-endfield-character）にまとめる → 紹介リストを最後に。
+      既存取り込みへの再並べ・キャラ棚への移動は js/library.js の trkEndfieldTidyOnce が1回だけ安全更新する。 */
    /* ef-firstorder は永続IDとして維持（旧・上下4パート紹介版 → 公式Vol.1全37曲へ既存取り込みをその場で更新）。
       曲順・曲名・アーティスト表記は公式Spotifyアルバム、中国語公式曲名は照合別名（网易云音乐／VGMdbで確認）。 */
-   PL("ef-firstorder", "Endfield — Zeroth Directive OST Vol.1（初号指令・上）", "📜", "amber", ["Game","Endfield","Zeroth Directive","Metal Scar Radio"],
+   PL("ef-firstorder", "初号指令 (上) ― Zeroth Directive Original Soundtrack Vol.1", "📜", "amber", ["Game","Endfield","Zeroth Directive","Metal Scar Radio"],
     endfieldOstTracks("Zeroth Directive Original Soundtrack, Vol. 1", [
       ["Protocol Flow", "Metal Scar Radio, Hybrid", "0NOD8FVBXkLbmrJSYCS3Aq", "协议流"],
       ["Initial Process", "Metal Scar Radio, Gareth Coker", "57d9mK6RV0bizpXK1Qn8Pr", "最初进程"],
@@ -624,7 +619,7 @@ S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber
       ["Joyous Now", "Metal Scar Radio, Hybrid", "1nwA4ElX1TOCCli3Hnornh", "庆乐此时"],
       ["Faith's Imprint", "Metal Scar Radio, Hybrid", "15gTGxr577tNJ2gZZXTfAG", "信念拓印"]
     ]), "https://ffm.to/ro6qjnl", "公式配信リンク（ffm.to）"),
-   PL("ef-firstorder2", "Endfield — Zeroth Directive OST Vol.2（初号指令・下）", "⛰️", "green", ["Game","Endfield","Zeroth Directive","Metal Scar Radio"],
+   PL("ef-firstorder2", "初号指令 (下) ― Zeroth Directive Original Soundtrack Vol.2", "⛰️", "green", ["Game","Endfield","Zeroth Directive","Metal Scar Radio"],
     endfieldOstTracks("Zeroth Directive Original Soundtrack, Vol. 2", [
       ["Wisdom of the Landscape", "Metal Scar Radio, Gareth Coker", "3Rg8XrRfqzePhy3cgoupOu", "知山水"],
       ["To Walk, To Cross", "Metal Scar Radio, Gareth Coker", "62nDuLgX0MvZVf2Jrz2cuX", "行渡"],
@@ -654,7 +649,8 @@ S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber
       各曲は公式Spotify個別曲、各アルバムは公式Spotifyアルバムページへリンクする。この6作は公式告知のffm.to配信一覧・中国語公式曲名・
       VGMdb照合が未確認（次段階の調査対象）なので、照合別名は登録していない。データの正は tools/endfield-msr-albums-tracklist.json。
       Eve of Departure（2026-04-11・EP5曲）／Thunder’s Legacy（2026-04-22・9曲）／At the Wake of Spring OST（2026-04-30・17曲）／
-      Contingency Contract Re-Ignition OST（2026-06-20・EP4曲）／Homecoming OST（2026-07-31・30曲）／Dreamscape of Wind and Snow OST（2026-09-10・16曲）。 */
+      Contingency Contract Re-Ignition OST（2026-06-20・EP4曲）／Homecoming OST（2026-07-31・30曲）／Dreamscape of Wind and Snow OST（2026-09-10・16曲）。
+      このブロックの順序＝リリース順（trk128）。 */
    PL("ef-eve", "Endfield — Eve of Departure", "🌅", "amber", ["Game","Endfield","Metal Scar Radio","Eve of Departure"],
     endfieldOstTracks("Eve of Departure", [
       ["PHEONIX ON THE RISE", "Metal Scar Radio, Hero Baldwin, Alexander Rudd", "2LMFipAOoaXiyLG5VI0Mg0"],
@@ -754,6 +750,21 @@ S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber
       ["Prophecy and Legend", "Metal Scar Radio, 原田萌喜", "39gMhBsuqgO6tUIvVuQXxz"],
       ["HER Calling", "Metal Scar Radio, z1on", "5KAfy19XUphrZCdSejQt3n"]
     ]), "https://open.spotify.com/album/36qyyiGRMbtktVXGptjZL6", "公式Spotifyアルバム"),
+   /* 🎭 キャラクターテーマ曲（trk128で Endfield Character Theme 棚へまとめた）。4リストとも紹介版（音源は同梱せず）。
+      登場キャラクターは Endfield Talos Wiki（コミュニティ運営・公式ページでの再確認は次段階）での分類：
+      Blurring・ASHEN REMAINS＝Laevatein（レヴェテナ）、The Floaty Envelope＝Gilberta、MAKER'S LUV＝Yvonne。
+      公式のアルバム版（Ashen Remains／Maker's Luv／The Floaty Envelope のSpotifyアルバム等）は台帳の「調査中の他の公式リリース」へ。 */
+   PL("ef-blurring", "Endfield — Blurring", "🌫️", "gray", ["Game","Endfield","Metal Scar Radio","MSR Endfield"],
+    [T("Blurring", "Blurring", "Metal Scar Radio", "https://www.youtube.com/@ArknightsEndfield"),
+     T("Blurring (Instrumental)", "Blurring", "Metal Scar Radio", "https://endfield.hypergryph.com/")]),
+   PL("ef-ashen", "Endfield — ASHEN REMAINS", "🔥", "red", ["Game","Endfield","Metal Scar Radio","Levatein"],
+    [T("ASHEN REMAINS", "ASHEN REMAINS — Levatein OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2027624810168390017"),
+     T("ASHEN REMAINS (Instrumental)", "ASHEN REMAINS", "Metal Scar Radio", "https://endfield.hypergryph.com/")]),
+   PL("ef-floaty", "Endfield — The Floaty Envelope", "✉️", "blue", ["Game","Endfield","Metal Scar Radio","Gilberta"],
+    [T("The Floaty Envelope", "The Floaty Envelope — Gilberta OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2027624810168390017"),
+     T("The Floaty Envelope (Instrumental)", "The Floaty Envelope", "Metal Scar Radio", "https://endfield.hypergryph.com/")]),
+   PL("ef-makers", "Endfield — MAKER'S LUV", "💖", "pink", ["Game","Endfield","Metal Scar Radio","Yvonne"],
+    [T("MAKER'S LUV", "MAKER'S LUV — Yvonne OST", "Metal Scar Radio", "https://x.com/AKEndfieldJP/status/2027624810168390017")]),
    PL("ef-signal", "Endfield — The Signal Is Still Pulsing", "📡", "green", ["Game","Endfield","Metal Scar Radio","Signal"],
     [T("The Signal Is Still Pulsing", "Metal Scar Radio #01", "Metal Scar Radio", "https://endfield.wiki.gg/wiki/Metal_Scar_Radio"),
      T("The Magic Radio", "Metal Scar Radio #02", "Metal Scar Radio", "https://endfield.wiki.gg/wiki/Metal_Scar_Radio"),

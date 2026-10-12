@@ -796,6 +796,11 @@ function libTabsOf(all) {
     const cp = plById(core.settings.libTab.slice(3));
     if (cp && cp.folder && plVisible(cp) && !tabs.some(t => t.id === core.settings.libTab)) tabs.push({ id:"pl:" + cp.id, icon: plIcon(cp), label: cp.name, n: plCount(cp, plKeys), pl: cp, nested: true });
   }
+  if (core.settings.libTab.startsWith("fld:")) {   /* サブフォルダ（🐔 の中や、🎭 棚など）を見ているときは、そのタブも出す（戻れるように）。
+     親フォルダがトップでなければ既存のタブに無いので、ここで出す。見なくなったら消える（ブラウザのタブに近い） */
+    const cf = plFolderById(core.settings.libTab.slice(4));
+    if (cf && cf.parent && !tabs.some(t => t.id === core.settings.libTab)) tabs.push({ id: "fld:" + cf.id, icon: cf.icon || "📁", label: cf.name, n: [...plFolderUnionKeys(cf.id)].filter(k => plKeys.has(k)).length, fld: cf, nested: true });
+  }
   /* 📂 開いたフォルダ内プレイリストのタブは残す（settings.libOpenTabs に永続化）。
      いま見ているフォルダ内プレイリストも記録し、閉じるまではタブ帯に残す＝ブラウザのタブに近い */
   const openIds = Array.isArray(core.settings.libOpenTabs) ? core.settings.libOpenTabs : [];
@@ -1091,10 +1096,10 @@ function trkFolderNormalize() {   /* 保存データ側も固定名・固定ア�
   if (ch) core.saveUserPrefs();
   return f;
 }
-function ensureTrkSubfolder(id, name, icon) {
+function ensureTrkSubfolder(id, name, icon, parent) {
   let f = core.settings.plFolders.find(x => x.id === id);
   if (f) return f;
-  f = plFolderSanitize({ id, name, icon, color: "none", parent: TRK_FOLDER_ID });
+  f = plFolderSanitize({ id, name, icon, color: "none", parent: parent || TRK_FOLDER_ID });
   if (!f) return null;
   core.settings.plFolders.push(f);
   core.saveUserPrefs();
@@ -1114,6 +1119,7 @@ function ensureTrkFolder() {
   ensureTrkSubfolder("trk-arknights", "Arknights", "🎮");
   ensureTrkSubfolder("trk-gakumas", "Gakum@s", "🎤");
   ensureTrkSubfolder("trk-endfield", "Endfield", "🛰️");
+  ensureTrkSubfolder("trk-endfield-character", "Endfield Character Theme", "🎭", "trk-endfield");   /* 🎭 キャラクターテーマ曲の棚（trk128） */
   trkFolderNormalize();   /* 旧データの「🐔 trk's playlist」もここで固定名に直す */
   return core.settings.plFolders.find(x => x.id === TRK_FOLDER_ID) || f || null;
 }
@@ -1342,6 +1348,59 @@ function trkIsRemoved(id) {
   const list = core.settings.trkRemoved;
   return Array.isArray(list) && list.includes(id);
 }
+/* 🎭 Endfieldのキャラクターテーマ曲（trk128）：カタログの4リストはネスト棚に作り、既存取り込みもそこに移す。 */
+const ENDFIELD_CHARACTER_FOLDER = "trk-endfield-character";
+const ENDFIELD_CHARACTER_PL = new Set(["ef-blurring", "ef-ashen", "ef-floaty", "ef-makers"]);
+/* 🛰️ Endfield整頓（trk128・一回限り）：公式リストを「初号指令OST 上下を最上 → 公式アルバム6作をリリース順」に並べ直し、
+   キャラクターテーマ曲4リスト（Blurring・ASHEN REMAINS・The Floaty Envelope・MAKER'S LUV）を
+   ネスト棚 trk-endfield-character（「Endfield Character Theme」）へ動かす。
+   settings.trkEndfieldTidy1 が付いたら以後は利用者の並び・配置を守る（二度と触らない）。
+   名前・アイコン・タグ・所持曲は触らない（既定の旧名からの改名は上のセーフリフレッシュが担当）。 */
+function trkEndfieldTidyOnce() {
+  const s = core.settings;
+  if (s.trkEndfieldTidy1) return;
+  const series = trkCatalog().find(x => x.id === "endfield");
+  if (!series || !(series.playlists || []).length) return;   /* カタログが無い起動では印をつけない */
+  const want = series.playlists.map(pl => "trk-" + pl.id);   /* 新しいカタログ順 */
+  const wantSet = new Set(want);
+  const ordered = want.map(id => s.playlists.find(p => p.id === id)).filter(Boolean);
+  if (!ordered.length) return;                               /* 整える対象がまだ無い */
+  let changed = false;
+  /* ① キャラクターテーマ → ネスト棚（まだ既定場所 trk-endfield にあるものだけ） */
+  for (const p of ordered) {
+    if (ENDFIELD_CHARACTER_PL.has(p.id.slice(4)) && p.folder === "trk-endfield") { p.folder = ENDFIELD_CHARACTER_FOLDER; changed = true; }
+  }
+  /* ② 配列順（Endfieldタブのチップ行）を、最初のEndfield位置に新しい順で置き直す */
+  const curSeq = s.playlists.filter(p => wantSet.has(p.id));
+  if (curSeq.length !== ordered.length || curSeq.some((p, i) => p.id !== ordered[i].id)) {
+    const first = s.playlists.findIndex(p => wantSet.has(p.id));
+    const rest = s.playlists.filter(p => !wantSet.has(p.id));
+    s.playlists = rest.slice(0, first).concat(ordered, rest.slice(first));
+    changed = true;
+  }
+  /* ③ 手動並べ替え（playlistOrder）があれば、その中のEndfield部分だけ新しい順に入れ替える */
+  if (Array.isArray(s.playlistOrder) && s.playlistOrder.length) {
+    const curSub = s.playlistOrder.filter(id => wantSet.has(id));
+    if (curSub.length && curSub.some((id, i) => id !== ordered[i].id)) {
+      const out = [];
+      let done = false;
+      for (const id of s.playlistOrder) {
+        if (wantSet.has(id)) { if (!done) { for (const p of ordered) out.push(p.id); done = true; } }
+        else out.push(id);
+      }
+      if (!done) for (const p of ordered) out.push(p.id);
+      s.playlistOrder = out.slice(0, 200);
+      changed = true;
+    }
+  }
+  /* ④ 既定の並べ（createdAt）でも同じ順になるようにする（trkOrderedPlaylists用） */
+  const base = Math.min(Date.now(), ...ordered.map(p => p.createdAt || 0));
+  for (let i = 0; i < ordered.length; i++) {
+    if (ordered[i].createdAt !== base + i) { ordered[i].createdAt = base + i; changed = true; }
+  }
+  s.trkEndfieldTidy1 = 1;
+  if (changed) core.saveUserPrefs();
+}
 function ensureTrkDistributionPlaylists() {
   ensureTrkFolder();
   const cat = trkCatalog();
@@ -1350,8 +1409,10 @@ function ensureTrkDistributionPlaylists() {
   for (const s of cat) {
     /* Only these series are auto-created under trk. Manually imported catalog entries
        from all other series still get safe metadata refreshes below. */
-    const folder = folderMap[s.id] || "";
+    const seriesFolder = folderMap[s.id] || "";
     for (const pl of (s.playlists || [])) {
+      /* 🎭 Endfield のキャラクターテーマ曲4リストはネスト棚へ（trk128） */
+      const folder = (s.id === "endfield" && ENDFIELD_CHARACTER_PL.has(pl.id)) ? ENDFIELD_CHARACTER_FOLDER : seriesFolder;
       const baseId = "trk-" + pl.id;
       const wishes = (pl.songs || []).map(trkWishFromTrack);
       const sourceCats = new Set([s.id + ":" + pl.id, "trk:" + s.id + ":" + pl.id]);
@@ -1392,13 +1453,21 @@ function ensureTrkDistributionPlaylists() {
             existing.tags = (pl.tags || []).slice(0,5); changed = true;
           }
         }
-        /* 🛰️ 初号指令OSTの旧4パート紹介版を、公式Vol.1全37曲版の既定名・タグへ更新する。
+        /* 🛰️ 初号指令OSTの旧版（4パート紹介版「Endfield — 初号指令 OST」と、trk110の
+           「Endfield — Zeroth Directive OST Vol.1（初号指令・上）」）の既定名を、trk128の名前へ更新する。
            wish と guide は上の共通処理で更新済み。所持曲とユーザー変更（名前・アイコン・タグ）は守る。 */
         if (pl.id === "ef-firstorder" && existing.cat === "trk:" + s.id + ":" + pl.id) {
-          if (existing.name === "Endfield — 初号指令 OST") { existing.name = pl.name; changed = true; }
+          /* 保存された名前は何も24文字に切られているので、フル名と切れた形（「Endfield — Zeroth Direct」）の両方で照合する。
+             旧4パート版「Endfield — 初号指令 OST」は24字未満なのでそのまま。 */
+          if (existing.name === "Endfield — 初号指令 OST" || existing.name === "Endfield — Zeroth Directive OST Vol.1（初号指令・上）" || existing.name === "Endfield — Zeroth Direct") { existing.name = pl.name; changed = true; }
           if (JSON.stringify(existing.tags) === JSON.stringify(["Game","Endfield","Metal Scar Radio","First Order"])) {
             existing.tags = (pl.tags || []).slice(0,5); changed = true;
           }
+        }
+        /* 🛰️ Vol.2（trk110で作った「Endfield — Zeroth Directive OST Vol.2（初号指令・下）」）の既定名を、trk128の名前へ。
+           上と同様に24文字切り「Endfield — Zeroth Direct」でも照合する（IDごとに別々の新名へ置かれる）。 */
+        if (pl.id === "ef-firstorder2" && existing.cat === "trk:" + s.id + ":" + pl.id) {
+          if (existing.name === "Endfield — Zeroth Directive OST Vol.2（初号指令・下）" || existing.name === "Endfield — Zeroth Direct") { existing.name = pl.name; changed = true; }
         }
         continue;
       }
@@ -1448,11 +1517,12 @@ function ensureTrkDistributionPlaylists() {
     const p = plSanitize({ id: d.id, name: s.name + " Vol.1", icon: s.icon, color: s.color, folder: d.folder, tags: ["Game", s.name, "Vol.1"], wish: slice, songs: [], guide: trkGuide("plGuideIntro", s.url || "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk"), cat: "trk:" + d.series, createdAt: Date.now() });
     if (p) { core.settings.playlists.push(p); changed = true; }
   }
+  trkEndfieldTidyOnce();   /* 🛰️ 初回起動だけ：初号指令を最上へ・リリース順・キャラクターテーマを棚へ（その後利用者の並びを守る） */
   if (changed) core.saveUserPrefs();
 }
 (function plTighten() {
   core.settings.playlists = (core.settings.playlists || []).map(plSanitize).filter(Boolean).slice(0, 200);
-  core.settings.plFolders = (core.settings.plFolders || []).map(plFolderSanitize).filter(Boolean).slice(0, 12);
+  core.settings.plFolders = (core.settings.plFolders || []).map(plFolderSanitize).filter(Boolean).slice(0, 13);   /* trk128：trk-endfield-character を加えたので +1 */
   const fids = new Set(core.settings.plFolders.map(f => f.id));
   for (const p of core.settings.playlists) if (p.folder && !fids.has(p.folder)) p.folder = "";
   for (const f of core.settings.plFolders) if (f.parent && (!fids.has(f.parent) || f.parent === f.id)) f.parent = "";
@@ -1639,8 +1709,9 @@ function plFolderMenu(f) {
   d.card.append(plRow(tr("plName"), name), plRow(tr("plIcon"), icon), plRow(tr("plColor"), color),
     plRow(tr("plFolderOf"), parent), save, del);
   // 🐔 trk folder special: show inner playlists (Game Vol.1, Classic Vol.1, BlueArchive etc.) for quick open
-  if (f.id === TRK_FOLDER_ID || f.id === "trk-classic" || f.id === "trk-ba" || f.id === "trk-touhou" || f.id === "trk-arknights" || f.id === "trk-gakumas" || f.id === "trk-endfield") {
-    const innerIds = f.id === TRK_FOLDER_ID ? [TRK_FOLDER_ID, "trk-classic", "trk-ba", "trk-touhou", "trk-arknights", "trk-gakumas", "trk-endfield"] : [f.id];
+  if (f.id === TRK_FOLDER_ID || f.id === "trk-classic" || f.id === "trk-ba" || f.id === "trk-touhou" || f.id === "trk-arknights" || f.id === "trk-gakumas" || f.id === "trk-endfield" || f.id === "trk-endfield-character") {
+    const innerIds = f.id === TRK_FOLDER_ID ? [TRK_FOLDER_ID, "trk-classic", "trk-ba", "trk-touhou", "trk-arknights", "trk-gakumas", "trk-endfield", "trk-endfield-character"]
+      : f.id === "trk-endfield" ? ["trk-endfield", "trk-endfield-character"] : [f.id];
     const allInner = core.settings.playlists.filter(p => innerIds.includes(p.folder) || (f.id===TRK_FOLDER_ID && core.settings.plFolders.some(ff=> innerIds.includes(ff.id) && ff.id===p.folder)) );
     if (allInner.length) {
       d.card.append(el("div", "plSep"));
@@ -1710,6 +1781,10 @@ function plTrkMenu() {
     for (const f of subs) {   /* 🎻 Classic など。中の Vol を並べる */
       listBox.append(el("div", "plSep"), groupHead(f));
       for (const p of trkOrderedPlaylists(core.settings.playlists.filter(p => plVisible(p) && p.folder === f.id))) listBox.append(rowOf(p));
+      for (const g of core.settings.plFolders.filter(x => x.parent === f.id)) {   /* 🎭 一段深い棚（trk-endfield-character 等） */
+        listBox.append(el("div", "plSep"), groupHead(g));
+        for (const p of trkOrderedPlaylists(core.settings.playlists.filter(p => plVisible(p) && p.folder === g.id))) listBox.append(rowOf(p));
+      }
     }
     if (core.settings.trkSortABC) listBox.append(el("div", "plHint", tr("trkOrderAbcOff")));
   };

@@ -1,6 +1,6 @@
 # アークナイツ：エンドフィールド 公式楽曲カタログ — 調査・実装台帳
 
-最終確認：**2026-10-11（UTC）**（trk111：Metal Scar Radio公式アルバム6作・81曲を追加）
+最終確認：**2026-10-12（UTC）**（trk128：初号指令OST 上下を最上へ・リリース順並び替え・キャラクターテーマ4リストを「Endfield Character Theme」棚へまとめ）
 
 ## 方針
 
@@ -28,20 +28,29 @@
 
 ## 収録したプレイリスト（js/catalog.js・シリーズ `endfield`）
 
+表の順序＝ `js/catalog.js` の `series.playlists` 順（＝Endfieldタブに表示される順。正： [`tools/endfield-zeroth-directive-tracklist.json`](../tools/endfield-zeroth-directive-tracklist.json) の `seriesPlaylistOrder`）。trk128 で**初号指令OST 上下を最上**（ゲームのオープニングBGMがここにある）にし、公式アルバム6作を**リリース順**で並べ、**キャラクターテーマ4リストをネスト棚「Endfield Character Theme」（`trk-endfield-character`）**にまとめ、紹介リストを最後にしました。
+
 | プレイリスト（ID・表示名） | 内容 | 曲数 | 曲別リンク | 巻のリンク（sourceUrl） |
 |---|---|---|---|---|
-| `ef-firstorder`「Endfield — Zeroth Directive OST Vol.1（初号指令・上）」 | 初号指令OST（上）＝Zeroth Directive Vol.1 全曲を公式収録順で | 37 | 公式Spotify個別曲 | 公式ffm.to配信一覧 |
-| `ef-firstorder2`「Endfield — Zeroth Directive OST Vol.2（初号指令・下）」 | 初号指令OST（下）＝Zeroth Directive Vol.2 全曲を公式収録順で | 23 | 公式Spotify個別曲 | 公式ffm.to配信一覧 |
+| `ef-firstorder`「初号指令 (上) ― Zeroth Directive Original Soundtrack Vol.1」 | 初号指令OST（上）＝Zeroth Directive Vol.1 全曲を公式収録順で（2026-02-15） | 37 | 公式Spotify個別曲 | 公式ffm.to配信一覧 |
+| `ef-firstorder2`「初号指令 (下) ― Zeroth Directive Original Soundtrack Vol.2」 | 初号指令OST（下）＝Zeroth Directive Vol.2 全曲を公式収録順で（2026-02-15） | 23 | 公式Spotify個別曲 | 公式ffm.to配信一覧 |
 | `ef-eve`「Endfield — Eve of Departure」 | EP全曲を公式収録順で（2026-04-11） | 5 | 公式Spotify個別曲 | 公式Spotifyアルバム |
 | `ef-thunder`「Endfield — Thunder's Legacy」 | アルバム全曲を公式収録順で（2026-04-22） | 9 | 公式Spotify個別曲 | 公式Spotifyアルバム |
 | `ef-wake`「Endfield — At the Wake of Spring OST」 | OST全曲を公式収録順で（2026-04-30） | 17 | 公式Spotify個別曲 | 公式Spotifyアルバム |
 | `ef-ccr`「Endfield — Contingency Contract Re-Ignition OST」 | EP全曲を公式収録順で（2026-06-20） | 4 | 公式Spotify個別曲 | 公式Spotifyアルバム |
 | `ef-homecoming`「Endfield — Homecoming OST」 | OST全曲を公式収録順で（2026-07-31） | 30 | 公式Spotify個別曲 | 公式Spotifyアルバム |
 | `ef-dreamscape`「Endfield — Dreamscape of Wind and Snow OST」 | OST全曲を公式収録順で（2026-09-10） | 16 | 公式Spotify個別曲 | 公式Spotifyアルバム |
+| `ef-blurring`「Endfield — Blurring」 | 紹介版（Laevateinのキャラクターテーマ。Talos Wikiでは2026-01-22のOperator EP） | 2 | 公式YouTube／公式サイト | — |
+| `ef-ashen`「Endfield — ASHEN REMAINS」 | 紹介版（Laevateinのキャラクターテーマ） | 2 | 公式X告知 | — |
+| `ef-floaty`「Endfield — The Floaty Envelope」 | 紹介版（Gilbertaのキャラクターテーマ） | 2 | 公式X告知 | — |
+| `ef-makers`「Endfield — MAKER'S LUV」 | 紹介版（Yvonneのキャラクターテーマ） | 1 | 公式X告知 | — |
+| `ef-signal`「Endfield — The Signal Is Still Pulsing」 | 紹介版（Metal Scar Radio関連ほか5項目） | 5 | wiki／YouTube／ツールページ | — |
 
-- 旧版の「初号指令 OST」プレイリスト（上・下それぞれ Part 1/2 の4項目紹介版）は、**永続ID `ef-firstorder` を保ったまま Vol.1 全37曲版へ更新**します。既存の取り込みは wish・ガイドと旧既定名／タグだけが更新され、所持曲・ユーザーが変えた名前／アイコン／タグはそのままです（`js/library.js` のセーフリフレッシュ、検査は `tools/check-repo.mjs`）。
+- 旧版の「初号指令 OST」プレイリスト（上・下それぞれ Part 1/2 の4項目紹介版）は、**永続ID `ef-firstorder` を保ったまま Vol.1 全37曲版へ更新**します。trk110 以降の旧既定名（「Endfield — Zeroth Directive OST Vol.1／Vol.2（初号指令・上／下）」）も、**trk128 の新名（「初号指令 (上／下) ― Zeroth Directive Original Soundtrack Vol.1／2」）へ既定名だけが更新**され、所持曲・ユーザーが変えた名前／アイコン／タグはそのままです（`js/library.js` のセーフリフレッシュ）。
+- **trk128 の一回限りの整頓（`trkEndfieldTidyOnce`・`settings.trkEndfieldTidy1`）**：既存の取り込みを上表の順へ並べ直し、キャラクターテーマ4リスト（まだ Endfield フォルダの既定場所にあるものだけ）をネスト棚 `trk-endfield-character`（「Endfield Character Theme」）へ移動します。利用者が別の場所へ動かしたものは守り、印が付いた後は並びも配置も二度と触りません（手動並べ替え `playlistOrder`・`createdAt`・配列順の3系統をすべて新しい順へ揃える）。
 - 中国語公式曲名（例：`协议流`＝Protocol Flow）は**照合別名（matchAliases）**として登録。中国語ファイル名の手元音源も曲名照合できます。表示曲名は公式英語名です。
-- キャラクターOST等の既存プレイリスト（`ef-blurring`・`ef-ashen`・`ef-floaty`・`ef-makers`・`ef-signal`）の内容は変更していません。紹介版の `ef-signal` には「Rekindled」「REAPER」が含まれており、本バッチの `ef-ccr`・`ef-homecoming` と曲が重複しますが、両方とも残しています（紹介版は変更しない方針）。
+- キャラクターOST等の既存プレイリスト（`ef-blurring`・`ef-ashen`・`ef-floaty`・`ef-makers`・`ef-signal`）の**内容**は変更していません（trk128 で棚へまとめたのは場所だけ）。紹介版の `ef-signal` には「Rekindled」「REAPER」が含まれており、本バッチの `ef-ccr`・`ef-homecoming` と曲が重複しますが、両方とも残しています（紹介版は変更しない方針）。
+- **キャラクターテーマの根拠（trk128 調査・2026-10-12）**：Endfield Talos Wiki（コミュニティ運営）では、`Blurring`・`ASHEN REMAINS`＝Laevatein（レヴェテナ）、`The Floaty Envelope`＝Gilberta、`MAKER'S LUV`＝Yvonne の Operator（キャラクター）関連楽曲と分類されています（Blurring は 2026-01-22 発売の Operator EP、Maria Nalyon & Chengcheng Tang 歌唱）。**公式ページでの再確認は次段階**（下の「調査中の他の公式リリース」参照）です。なお、同じ Wiki の分類では `Thunder's Legacy`・`Eve of Departure` もキャラクター関連／その他に載りますが、リリース順のアルバム一覧として本一覧に残しています（利用者指示：リリース順優先）。
 - データの正： [`tools/endfield-zeroth-directive-tracklist.json`](../tools/endfield-zeroth-directive-tracklist.json)（Zeroth Directive Vol.1–2）・[`tools/endfield-msr-albums-tracklist.json`](../tools/endfield-msr-albums-tracklist.json)（本バッチの6作81曲）
 
 ### Tracklist — Vol.1（初号指令OST 上 / 零号委托OST（上））
@@ -267,14 +276,17 @@
 | Snapshot | Single | 未確認 | 未確認 | Shazam のアーティストページに記載（Metal Scar Radio, Adam Gubman, Sorah Eun） | アルバムID・曲情報 |
 | My World (Blood Oath) | EP | 未確認 | 未確認 | Apple Music [1890100176](https://music.apple.com/us/album/my-world-blood-oath-tale-version/1890100176)（「Tale Version」を含む） | アルバムID・曲数 |
 | A Promise Makes a Home | Single | 2026-10-07 | 2 | Apple Music [6820048204](https://music.apple.com/us/album/a-promise-makes-a-home-single/6820048204)（2曲・レーベルページの「最新リリース」） | Spotify ID |
-| Ashen Remains | EP | 未確認 | 未確認 | Apple Music [1880258196](https://music.apple.com/us/album/sign-of-the-coming-flame/1880258196)（「Sign of the Coming Flame」を収録）。既存 `ef-ashen` は紹介版のまま | アルバムID・収録曲 |
-| Blurring | Single | 未確認 | 未確認 | Apple Music [1872026534](https://music.apple.com/us/album/blurring/1872026534)。既存 `ef-blurring` は紹介版のまま | アルバムID・収録曲 |
+| Ashen Remains | Operator OST（Laevatein） | 2026-02-28（Talos Wiki。要再確認） | 5（Talos Wiki） | Talos Wiki：Spotifyアルバム [`6aFenM2edcPyIfzg6ZtQnz`](https://open.spotify.com/album/6aFenM2edcPyIfzg6ZtQnz)、5曲（Sign of the Coming Flame／Frozen Embers／Aureole／Born of Bent Light／Backdraft。曲IDは Wiki 掲載の参考情報）。Apple Music [1880258196](https://music.apple.com/us/album/sign-of-the-coming-flame/1880258196)。既存 `ef-ashen` は紹介版のまま | 公式Spotifyページでの全曲順・曲別IDの再確認 |
+| Maker's Luv | Operator OST（Yvonne） | 未確認 | 未確認 | Talos Wiki：Spotifyアルバム [`4ZZOkqQONyAFHzEG31Qss4`](https://open.spotify.com/album/4ZZOkqQONyAFHzEG31Qss4)（2026-10-12 確認）。既存 `ef-makers` は紹介版のまま | 公式Spotifyページでの全曲順・曲別IDの再確認 |
+| The Floaty Envelope | Operator OST（Gilberta） | 未確認 | 未確認 | Talos Wiki：Spotifyアルバム [`44qElu191kLQ5fit5fAQ6g`](https://open.spotify.com/album/44qElu191kLQ5fit5fAQ6g)（2026-10-12 確認）。既存 `ef-floaty` は紹介版のまま | 公式Spotifyページでの全曲順・曲別IDの再確認 |
+| Blurring | Single／Operator EP（Laevatein） | 2026-01-22（Talos Wiki。要再確認） | 1（＋Instrumental） | Talos Wiki：Maria Nalyon & Chengcheng Tang 歌唱、Spotify曲 [`0QqtGr91Q6JxiUW7sCukIg`](https://open.spotify.com/track/0QqtGr91Q6JxiUW7sCukIg)（参考情報）。Apple Music [1872026534](https://music.apple.com/us/album/blurring/1872026534)。既存 `ef-blurring` は紹介版のまま | 公式Spotifyページでの再確認 |
 
 - Apple Music・Amazon Music のアルバムIDは**参考情報**です。カタログのリンクは公式Spotifyに統一する方針なので、追加前にSpotifyのアルバムIDと曲順を確認します。
 - 「未確認」は「存在しない」ではありません。曲数・曲順が公式ページで確認できないリリースはカタログに入れません。
 
 ## 未確認・次段階
 
+- **trk128（2026-10-12）**：①既存の取り込みに対する一回限りの整頓（`trkEndfieldTidyOnce`）は**Chromium headless の e2e（20項目・リポジトリ外）で確認済み**——新規取り込みの13リスト新順・キャラクター棚・改名・Endfieldタブのチップ行（🎭棚→初号指令(上)／(下)→リリース順6作→signal）・既存取り込みの移行（24文字切り旧名からの改名・並び直し・利用者の配置と所持曲の保持）・2度目の起動で並びが変わらないこと。実端末での確認は未実施。②Talos Wiki（コミュニティ）由来の情報（キャラクター分類・Blurring 2026-01-22／Ashen Remains 2026-02-28 の発売日・3アルバムのSpotifyID・曲ID）は**公式Spotifyページでの再確認が未実施**（カタログには入れていない）。③新表示名（「初号指令 (上) ― …」）は表示上限24文字で「初号指令 (上) ― Zeroth Direct」に切れる（全表示は🛒カタログ画面・プレイリスト設定で）。④e2eで発見・修正した2点：24文字切り旧名への改名不発（実アプリの保存名は24文字に切られている）・サブフォルダビューが「すべて」へフォールバックする既存欠陥（`libTabsOf` 修正。HANDOFF §7 参照）。
 - 60曲のSpotify個別曲URLは 2026-10-10 時点の公式アルバムページHTMLで確認しましたが、実ブラウザでの一括再確認（地域制限・ログイン要求の有無）は未実施です。抜取確認として同日、Vol.1 #37「Faith's Imprint」と Vol.2 #23「Forge」の個別曲ページを開き、曲名・収録アルバム・アーティスト・長さがカタログと一致することを確認しました。
 - Apple Music での Zeroth Directive Vol.1–2 のアルバム掲載は未確認（「配信なし」の断定ではありません）。
 - バッチ2（trk111）の6作81曲は、曲順・曲名・アーティストを 2026-10-11 に公式Spotifyのアルバム埋め込みページで6作すべて再確認し、Homecoming の30曲は公式ffm.toスマートリンクでも照合しました。個別曲IDの抜取確認は6曲（PHEONIX ON THE RISE／Drowned in Depth／Rekindled／Keeper of My Heart／Vermilion／HER Calling）で、**残り75曲のIDは個別に開いて確認していません**。実ブラウザでの地域制限・ログイン要求の確認も未実施です。

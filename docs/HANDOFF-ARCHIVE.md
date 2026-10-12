@@ -1,6 +1,6 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移したtrk70〜trk115の履歴と、trk114〜118の検証記録です。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
+> `docs/HANDOFF.md` から移したtrk70〜trk123の履歴と、trk114〜118の検証記録です（trk124以降の検証は HANDOFF §6）。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
 
 ## trk114〜118 の検証記録（trk118のマージ前に HANDOFF §6 から移動）
 
@@ -11,6 +11,38 @@
 - trk114のブラウザ確認（リポジトリ外の `@sparticuz/chromium`＋`puppeteer-core`、Chromium 153 headless）：`tools/smoke-browser.mjs --compare` は boot 0・未解決0・譜面10件一致・decode error 0・click error 0・mobile/safe-offline OK。`tools/smoke-game-end.mjs` PASS。加えて一時スクリプトで23項目（ガイドの鍵と英語表示、削除→再起動で戻らない→♻で復元、移したOSTが戻らない、3スキンのaxe、MIDIの `midiLoaded`／`midiTooDense`、ページエラー0）を確認。半透明カードのスキンはaxeが「判定不能」になるため、16スキンの数値はNodeの計算（`tests/skin-contrast.test.mjs`）で確認。
 
 ## 旧 HANDOFF §11「最近の変更」
+
+### trk123 の記録（2026-10-12。trk126のときに HANDOFF §7 から移動）
+
+- **trk123（2026-10-12）**：書斎の**本の端での「閉じる動作」**を追加した。拡大中の `PageDown`／`PageUp` は、画像の端→端でさらに押すと次の／前のページを続きの端から開き（trk122）、**本の端（1ページ目の上端・最終ページの下端）では折り返さず、閉じる動作**＝画像の全画面を終了して本棚（書斎のメニュー）へ戻る。次の本を選びやすくするため。拡大していないときはこれまでどおりページ送り。⚙の説明文は「本の端では、閉じる動作を行います」と簡略化した（4言語）。`docs/guide/study-room.md`・`docs/guide/en.md` の画像の項、`sw.js` cache名（`trk-v2026.10.12-trk123`）を更新。
+
+### trk122 の記録（2026-10-12。trk125のときに HANDOFF §7 から移動）
+
+- **trk122（2026-10-12）**：書斎の拡大中の `PageDown`／`PageUp` を、**「画像の端まで送り、端でさらに押したら次の／前のページを続きの端から開く」**動きにした（`PageDown`＝次のページの上端、`PageUp`＝前のページの下端。trk121の「端の次は反対の端」から変更）。`PageDown` を押し続けるだけで1冊を読み進め、`PageUp` で読み返せます。本の端（1ページ目の上端・最終ページの下端）では反対の端へ戻り、拡大していないときはこれまでどおりページ送り。ページを移ったあとは、**画像の高さが決まってから**続きの端を当てます（`studyImageReady` で読み込みを待ち、`studyApplyZoomLand` で位置を決める）。見開きは1回で2ページぶん進み、開く位置は左右それぞれの端です。文言（`studyZoomEdgeKeys`／`studyZoomEdgeKeysHint`／`studyHelpPg`）4言語とガイド（ja／en）、`sw.js` cache名（`trk-v2026.10.12-trk122`）を更新。
+
+### trk121 の記録（2026-10-12。trk124のときに HANDOFF §7 から移動）
+
+- **trk121（2026-10-12）**：書斎の画像リーダーに、**2つの設定**を足した。①**拡大中の `PageDown`／`PageUp` は、画像の下端／上端へ一度に飛ぶ**（初期オン。端に着いていたら反対の端へ。拡大していないときはこれまでどおり次のページ／前のページ）。②**マウスの中クリック＝次のページ**（初期オフ。オンにするとブラウザの自動スクロールも止める。画像の本のときだけ）。どちらも⚙上級者向けで切り替えられ、文言は4言語。`docs/guide/study-room.md`・`docs/guide/en.md` の画像の項に追記。`sw.js` cache名（`trk-v2026.10.12-trk121`）を更新。
+
+### trk120 の記録（2026-10-12。trk123のときに HANDOFF §7 から移動）
+
+- **trk120（2026-10-12）**：書斎の**拡大の送り幅を％で選べるようにした**（−／＋ボタン・`Ctrl+ホイール`・ピンチで同じ幅を使う）。初期値は **5%**（100%→200%が20回）で、⚙上級者向けの「拡大の送り幅」から **1／2／5／10／25%** を選べる（1%＝細かく、25%＝大きく）。以前は決め打ちの倍率（100→125→150→200→300→400%）だったので、マウスホイールで1回に大きく飛んでいた。倍率の刻みに乗っていないピンチ直後の倍率からは、進む向きの次の目盛りへ動く。`studyZoomStepLabel`／`studyZoomStepOption`／`studyZoomStepHint` と `studyHelpZoom` を4言語で更新し、ガイド（ja／en）にも追記。`sw.js` cache名（`trk-v2026.10.12-trk120`）を更新。
+
+### trk119 の記録（2026-10-12。trk122のときに HANDOFF §7 から移動）
+
+- **trk119（2026-10-12）**：📚 書斎の画像リーダーで、**拡大した画像を `↑`／`↓` で送れる**ようにした（マウスホイールが動かすのと同じ場所＝1枚ずつの台紙・見開きの各ページ）。1回押し＝表示高の84%、押しっぱなし（キーリピート）＝6%ずつ。上下の端に着いたらキーを返し、上級者向け設定「画像ページを ↑ / ↓ で移動する」のページ送り（既定はオフ）や既存のページ操作はそのまま効く。縦読みは台紙そのものがスクロールするので対象外。送りは滑らせず、押した回数どおりに動く（連打・長押しでも取りこぼさない）。`studyHelpZoom`／`studyZoomHint` の文言4言語と、ガイド（ja／en）を更新。`sw.js` cache名（`trk-v2026.10.12-trk119`）を更新。
+
+### trk118 の記録（2026-10-12。trk121のときに HANDOFF §7 から移動）
+
+- **trk118（2026-10-12）**：Creator-Safe Playlistの曲から、誰でも使いやすいリストを作った（新しい12リスト・539曲。全曲 links-verified＝「全曲がCreator-Safe対象（照合済み）」）。LoL（自動作成）：Pentakill 29曲・ログイン／イベント／スキンのテーマ 53曲・eスポーツのテーマ 17曲・2025〜26年のサウンドトラック 59曲。VALORANT：VALORANT Creator-Safe 39曲。新シリーズ「🛡️ Riot Games — LoL関連ゲーム」（🛒から取り込み）：Ruined King 60・The Mageseeker 57・Hextech Mayhem 30・Teamfight Tactics Vol.1／Vol.2 各68・2XKO 45・Wild Rift & Runeterra 14。各曲はプレイリストにあるSpotifyトラックIDへリンク（`tools/riot-games-creator-safe-playlist.json` に51〜977行目を記録、VALORANTのfixtureにIDを追加）。文言 `plGuideRiotLinksVerified` を4言語で追加。台帳・ガイド（ja／en）・NOTICE・`sw.js` cache名（`trk-v2026.10.12-trk118`）を更新。
+
+### trk117 の記録（2026-10-12。trk120のときに HANDOFF §7 から移動）
+
+- **trk117（2026-10-12）**：VALORANTのリストもCreator-Safeと照合。VALORANT公式Creator-Safe Playlist（Spotify）の全40曲を公式の埋め込み表示で読み（`tools/valorant-creator-safe.json` に記録）、LoLで読んだRiot Games Creator-Safe Playlistの977行とも照らした結果、Championsアンセム6曲・エージェント関連曲3曲はどちらにも見当たらない（`VAL_CREATOR_SAFE`＝links-absent）。公式リンク集の文言を LoL と共通の `plGuideRiotLinksPartial`／`plGuideRiotLinksAbsent` に改名し（特定のゲーム名を含まない文言に）、`LOL_GUIDE_KEYS` を `RIOT_GUIDE_KEYS` に。台帳 `docs/VALORANT-MUSIC.md` を新設。LoLで見当たらなかった4曲は、空さんの判断で追加確認をしない。ガイド（ja／en）・`sw.js` cache名（`trk-v2026.10.12-trk117`）を更新。
+
+### trk116 の記録（2026-10-12。trk119のときに HANDOFF §7 から移動）
+
+- **trk116（2026-10-12）**：LoLの残りのリストもRiot公式Creator-Safe Playlistと照合。songdata.io が表示する全977行（公式979曲。出ない2曲は701〜750番目）を読み、Sessions: Vi・Star Guardian Taliyahは全曲（verified）、Sessions: Dianaは42/43（「Oh Baby」が見当たらない）、Champion Themeは39/41（Smolder・Yunara）、Worlds/WCSアンセムは「Worlds Collide」（2015）だけ、人気曲は7/30、MSIアンセムとK/DAは見当たらない。Warsongs「Silver Scrapes」も全行に無かった。状態に links-partial／links-absent を足し（公式リンク集の文言 `plGuideLolLinksPartial`／`plGuideLolLinksAbsent` を4言語で追加）、Playlistと未照合だった sessions 状態とその文言を廃止。一部の文言は「残りはPlaylistに見当たらない・要確認」、人気曲は「一部だけ対象、共同制作曲などは対象外・要確認」に。`notYetMatched` を `notFound` に改め、公式リンク集・Sessionsのfixtureにも `creatorSafe` を追加し、`check-repo` で18リストを検査（8通りの改変でFAILを確認）。台帳・ガイド（ja／en）・`sw.js` cache名（`trk-v2026.10.12-trk116`）を更新。
 
 ### trk115 の記録（2026-10-12。trk118のときに HANDOFF §7 から移動）
 

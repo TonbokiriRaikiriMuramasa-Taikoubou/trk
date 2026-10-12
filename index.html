@@ -137,7 +137,7 @@
               <h2 class="libTitle"><button type="button" class="study-launch-title" data-i18n="libTitle" aria-haspopup="dialog"></button></h2>
               <span class="libHeadRight">
                 <span id="libCount" class="hint"></span>
-                <button id="studyOpenBtn" class="libSkinBtn moreBtn" type="button" aria-haspopup="dialog"></button>
+                <button id="studyOpenBtn" class="libSkinBtn studyHeadBtn" type="button" aria-haspopup="dialog"></button>
                 <button id="libSkinBtn" class="libSkinBtn" type="button" hidden></button>
               </span>
             </div>
@@ -1361,6 +1361,41 @@
             <span data-i18n="studyVerticalImageKeys">画像ページを↑ / ↓で移動する</span>
           </label>
           <p class="study-advanced-hint" data-i18n="studyKeyAssignmentHint">ボタンを押してから使いたいキーを押します。設定済みのショートカットは選べません。</p>
+          <div class="study-advanced-row">
+            <span id="studyZoomStepLabel" data-i18n="studyZoomStepLabel">拡大の送り幅</span>
+            <select id="studyZoomPercentStep" aria-labelledby="studyZoomStepLabel" aria-describedby="studyZoomStepHint">
+              <option value="1">1%</option>
+              <option value="2">2%</option>
+              <option value="5">5%</option>
+              <option value="10">10%</option>
+              <option value="25">25%</option>
+            </select>
+          </div>
+          <p id="studyZoomStepHint" class="study-advanced-hint" data-i18n="studyZoomStepHint">−／＋・Ctrl+ホイール・ピンチの1回ぶんです（初期値5%＝100%→200%が20回）。</p>
+          <label class="study-check-option">
+            <input id="studyZoomEdgeKeys" type="checkbox" checked>
+            <span data-i18n="studyZoomEdgeKeys">拡大中は PageDown / PageUp で画像の端とページを送る</span>
+          </label>
+          <p class="study-advanced-hint" data-i18n="studyZoomEdgeKeysHint">拡大した画像を一度に下端／上端へ送ります。端でさらにもう一度押すと、次の／前のページを続きの端から開きます。本の端では、閉じる動作を行います（全画面を終了して本棚へ）。拡大していないときは、これまでどおり次のページ／前のページです。</p>
+          <label class="study-check-option">
+            <input id="studyMouseClickPages" type="checkbox">
+            <span data-i18n="studyMouseClickPages">PCの簡易操作：左右クリックでページを送る</span>
+          </label>
+          <p class="study-advanced-hint" data-i18n="studyMouseClickPagesHint">左クリックで次のページ、右クリックで前のページ。画像の本のときだけ働きます（ページ上の位置は選びません）。</p>
+          <label class="study-check-option">
+            <input id="studyMouseClickFlip" type="checkbox">
+            <span data-i18n="studyMouseClickFlip">左右を反転（右クリックで進む・左クリックで戻る）</span>
+          </label>
+          <p class="study-advanced-hint" data-i18n="studyMouseClickFlipHint">トラックボールや左利きの人向け。上の「左右クリックでページを送る」がオンのときだけ選べます。</p>
+          <div class="study-advanced-row">
+            <span id="studyMiddleClickLabel" data-i18n="studyMiddleClickLabel">マウスの中クリック</span>
+            <select id="studyMiddleClickAction" aria-labelledby="studyMiddleClickLabel" aria-describedby="studyMiddleClickHint">
+              <option value="none" data-i18n="studyMiddleClickNone">何もしない</option>
+              <option value="next" data-i18n="studyMiddleClickNext">次のページへ</option>
+              <option value="close" data-i18n="studyMiddleClickClose">閉じて本棚へ（全画面を終了）</option>
+            </select>
+          </div>
+          <p id="studyMiddleClickHint" class="study-advanced-hint" data-i18n="studyMiddleClickNextHint">画像の本のときだけ働きます（ブラウザの自動スクロールは止めます）。</p>
           <div class="study-advanced-row">
             <span data-i18n="studyAlbumNestingLabel" id="studyAlbumNestingLabel">アルバムの分け方</span>
             <select id="studyAlbumNesting" aria-labelledby="studyAlbumNestingLabel">

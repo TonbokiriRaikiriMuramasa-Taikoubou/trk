@@ -9,7 +9,7 @@
 
 /* 文言はこの機能内で4言語そろえる（tools/check-study-room.mjs が4言語の抜けを検査します）。 */
 Object.assign(TEXT.ja, {
-  studyTitle:"📚 書斎", studyOpenBtn:"📚 書斎を開く", studyLaunchHint:"♫を長押しして書斎を開く（キーボードではEnter）",
+  studyTitle:"📚 書斎", studyOpenBtn:"📚 書斎", studyOpenBtnHint:"書斎（本棚・テレビ・画像リーダー）を開きます。曲リストの見出しを長押ししても開けます", studyLaunchHint:"♫を長押しして書斎を開く（キーボードではEnter）",
   studyClose:"✕ 書斎を閉じる", studyImportImages:"🖼 画像フォルダを取り込む",
   studyImportTextFiles:"＋ テキストを追加", studyImportTextFolder:"📄 テキストフォルダを取り込む",
   studyShelf:"本棚", studySearch:"タイトル・フォルダを検索…", studyShelfEmpty:"本棚は空です。画像フォルダか TXT / MD / JSON を取り込んでください。",
@@ -69,10 +69,10 @@ Object.assign(TEXT.ja, {
   studyProgressHint:"長押し中に開いたバーを動かすと、ページを移動できます。", studyBookmarked:"栞から再開しました。",
   studyMemoNeedText:"テキスト本でのみメモ帳を使えます。", studyFullscreenExit:"全画面を閉じる",
   studyHelp:"❓ キーの説明", studyHelpTitle:"書斎のキー操作", studyHelpClose:"閉じる",
-  studyHelpNav:"→で次へ・←で前へ（上級者向け設定で変更可）。画像の左右タップは綴じ方向に従います。テキストはスクロールします。",
+  studyHelpNav:"→で次へ・←で前へ（上級者向け設定で変更可）。画像の左右タップは綴じ方向に従います。テキストはスクロールします。マウスの中クリックで次へ進む設定もあります。",
   studyHelpSpace:"次のページへ。長押しすると、画像=ページ移動バー、テキスト=栞を挟みます。",
-  studyHelpPg:"前のページ／次のページ（Home / End で最初／最後へ）。",
-  studyHelpZoom:"画像の拡大・縮小・フィット（縦読みでは使いません）。Ctrl+ホイールやピンチでも変えられます。",
+  studyHelpPg:"前のページ／次のページ（Home / End で最初／最後へ）。拡大中は、設定がオンなら画像の下端／上端へ動き、端でさらに押すと次の／前のページを続きの端から開きます。本の端では閉じる動作です。",
+  studyHelpZoom:"画像の拡大・縮小・フィット（縦読みでは使いません）。Ctrl+ホイールやピンチでも変えられ、拡大した画像は↑ / ↓かホイールで送れます。1回の幅は⚙上級者向けで1〜25%（初期値5%）。",
   studyHelpSearch:"テキスト本の本文を検索（Enter=次の一致 / Shift+Enter=前の一致）。",
   studyHelpBookmark:"B=栞を挟む・外す、M=栞一覧の開閉。",
   studyHelpTv:"T=TVの表示切替（上→下→非表示）、F=画像の全画面表示。",
@@ -116,7 +116,13 @@ Object.assign(TEXT.ja, {
   studyTextSpacingTight:"詰める", studyTextSpacingNormal:"行間ふつう", studyTextSpacingLoose:"行間広め",
   studyTextWidthNarrow:"余白せまい", studyTextWidthNormal:"余白ふつう", studyTextWidthWide:"余白広い",
   studyTextTuneHint:"縦書き・ルーズリーフにも同じ設定が効きます。",
-  studyZoomFit:"フィット", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+ホイール・ピンチでも拡大できます。",
+  studyZoomFit:"フィット", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+ホイール・ピンチでも拡大できます。拡大した画像は↑ / ↓やホイールで送れます。",
+  studyZoomEdgeKeys:"拡大中は PageDown / PageUp で画像の端とページを送る", studyZoomEdgeKeysHint:"拡大した画像を一度に下端／上端へ送ります。端でさらにもう一度押すと、次の／前のページを続きの端から開きます。本の端では、閉じる動作を行います（全画面を終了して本棚へ）。拡大していないときは、これまでどおり次のページ／前のページです。",
+  studyMouseClickPages:"PCの簡易操作：左右クリックでページを送る", studyMouseClickPagesHint:"左クリックで次のページ、右クリックで前のページ。画像の本のときだけ働きます（ページ上の位置は選びません）。",
+  studyMouseClickFlip:"左右を反転（右クリックで進む・左クリックで戻る）", studyMouseClickFlipHint:"トラックボールや左利きの人向け。上の「左右クリックでページを送る」がオンのときだけ選べます。",
+  studyMiddleClickLabel:"マウスの中クリック", studyMiddleClickNone:"何もしない", studyMiddleClickNext:"次のページへ",
+  studyMiddleClickClose:"閉じて本棚へ（全画面を終了）", studyMiddleClickNextHint:"画像の本のときだけ働きます（ブラウザの自動スクロールは止めます）。",
+  studyZoomStepLabel:"拡大の送り幅", studyZoomStepOption:"{n}%", studyZoomStepHint:"−／＋・Ctrl+ホイール・ピンチの1回ぶんです（初期値5%＝100%→200%が20回）。",
   studyTvLookLabel:"TVの見た目", studyTvLookPlain:"素の画面", studyTvLookCrt:"ブラウン管", studyTvLookWood:"木枠",
   studyTvLookArcade:"アーケード", studyTvLookProjector:"プロジェクター", studyTvLookAquarium:"水槽",
   studyTvSizeLabel:"大きさ", studyTvSizeSmall:"小", studyTvSizeMedium:"中", studyTvSizeLarge:"大",
@@ -125,7 +131,7 @@ Object.assign(TEXT.ja, {
   studyImageOrderReverse:"逆順（右綴じ向け）", studyOrphanSweep:"未使用の画像データを整理しました（{n}件）。"
 });
 Object.assign(TEXT.en, {
-  studyTitle:"📚 Study", studyOpenBtn:"📚 Open Study", studyLaunchHint:"Hold ♫ Songs to open Study (press Enter when focused)",
+  studyTitle:"📚 Study", studyOpenBtn:"📚 Study", studyOpenBtnHint:"Open Study (shelf, TV and the image reader). You can also hold the Songs heading", studyLaunchHint:"Hold ♫ Songs to open Study (press Enter when focused)",
   studyClose:"✕ Close Study", studyImportImages:"🖼 Import image folder", studyImportTextFiles:"＋ Add text files",
   studyImportTextFolder:"📄 Import text folder", studyShelf:"Bookshelf", studySearch:"Search titles and folders…",
   studyShelfEmpty:"Your shelf is empty. Import an image folder or TXT / MD / JSON files.",
@@ -182,10 +188,10 @@ Object.assign(TEXT.en, {
   studySafeMode:"Study data is not loaded in safe mode. Open the app normally to use Study.", studyProgressHint:"Move the seek bar to jump to a page.",
   studyBookmarked:"Resumed from bookmark.", studyMemoNeedText:"Notepad editing is available for text books only.", studyFullscreenExit:"Close full screen",
   studyHelp:"❓ Shortcuts", studyHelpTitle:"Study shortcuts", studyHelpClose:"Close",
-  studyHelpNav:"→ goes forward and ← goes back (reassignable in Advanced settings). Tapping an image's left/right side follows the binding direction. Text scrolls instead.",
+  studyHelpNav:"→ goes forward and ← goes back (reassignable in Advanced settings). Tapping an image's left/right side follows the binding direction. Text scrolls instead. You can also make the middle mouse button go forward.",
   studyHelpSpace:"Next page. Hold for the page seek bar (images) or to save a bookmark (text).",
-  studyHelpPg:"Previous / next page (Home / End jump to the first / last page).",
-  studyHelpZoom:"Zoom in, out, and fit for images (not used in vertical comic mode). Ctrl+wheel and pinch work too.",
+  studyHelpPg:"Previous / next page (Home / End jump to the first / last page). While an image is zoomed, the keys can jump to its bottom / top, and pressing again at an edge opens the next / previous page from the far edge. At the ends of the book they close instead.",
+  studyHelpZoom:"Zoom in, out, and fit for images (not used in vertical comic mode). Ctrl+wheel and pinch work too; scroll a zoomed image with ↑ / ↓ or the wheel. The step size is in ⚙ Advanced (1–25%, 5% by default).",
   studyHelpSearch:"Search inside a text book (Enter = next match, Shift+Enter = previous match).",
   studyHelpBookmark:"B = add or remove a bookmark, M = toggle the bookmark list.",
   studyHelpTv:"T = cycle the TV (top → bottom → hidden), F = full-screen image.",
@@ -229,7 +235,13 @@ Object.assign(TEXT.en, {
   studyTextSpacingTight:"Tight", studyTextSpacingNormal:"Normal", studyTextSpacingLoose:"Loose",
   studyTextWidthNarrow:"Narrow", studyTextWidthNormal:"Normal", studyTextWidthWide:"Wide",
   studyTextTuneHint:"These also apply to manuscript paper and loose-leaf.",
-  studyZoomFit:"Fit", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+wheel and pinch also zoom.",
+  studyZoomFit:"Fit", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+wheel and pinch also zoom. Scroll a zoomed image with ↑ / ↓ or the wheel.",
+  studyZoomEdgeKeys:"While zoomed, PageDown / PageUp move to the image's edges and turn pages", studyZoomEdgeKeysHint:"Send the enlarged image straight to its bottom / top. Pressing again at an edge opens the next / previous page from the far edge. At the ends of the book it performs the close action (leaving full screen to the shelf). When nothing is zoomed, the keys still change pages as before.",
+  studyMouseClickPages:"Simple PC operation: the left / right click turns pages", studyMouseClickPagesHint:"Left click for the next page, right click for the previous page. Image books only (where you click does not matter).",
+  studyMouseClickFlip:"Swap the sides (right click forward, left click back)", studyMouseClickFlipHint:"For trackballs and left-handed use. Only available while the option above is on.",
+  studyMiddleClickLabel:"Middle mouse click", studyMiddleClickNone:"Nothing", studyMiddleClickNext:"Next page",
+  studyMiddleClickClose:"Close to the shelf (leave full screen)", studyMiddleClickNextHint:"Only for image books (the browser's auto-scroll is suppressed).",
+  studyZoomStepLabel:"Zoom step", studyZoomStepOption:"{n}%", studyZoomStepHint:"How much one press of − / ＋, Ctrl+wheel, or a pinch changes the zoom (default 5% = 20 steps from 100% to 200%).",
   studyTvLookLabel:"TV look", studyTvLookPlain:"Plain screen", studyTvLookCrt:"CRT", studyTvLookWood:"Wood frame",
   studyTvLookArcade:"Arcade", studyTvLookProjector:"Projector", studyTvLookAquarium:"Aquarium",
   studyTvSizeLabel:"Size", studyTvSizeSmall:"S", studyTvSizeMedium:"M", studyTvSizeLarge:"L",
@@ -238,7 +250,7 @@ Object.assign(TEXT.en, {
   studyImageOrderReverse:"Reversed (right-binding)", studyOrphanSweep:"Cleaned up {n} unused image(s)."
 });
 Object.assign(TEXT.zh, {
-  studyTitle:"📚 书斋", studyOpenBtn:"📚 打开书斋", studyLaunchHint:"长按♫歌曲列表打开书斋（键盘聚焦后按 Enter）",
+  studyTitle:"📚 书斋", studyOpenBtn:"📚 书斋", studyOpenBtnHint:"打开书斋（书架、电视和图片阅读器）。长按歌曲列表标题也可以打开", studyLaunchHint:"长按♫歌曲列表打开书斋（键盘聚焦后按 Enter）",
   studyClose:"✕ 关闭书斋", studyImportImages:"🖼 导入图片文件夹", studyImportTextFiles:"＋ 添加文本文件",
   studyImportTextFolder:"📄 导入文本文件夹", studyShelf:"书架", studySearch:"搜索标题或文件夹…",
   studyShelfEmpty:"书架为空。请导入图片文件夹或 TXT / MD / JSON。",
@@ -290,10 +302,10 @@ Object.assign(TEXT.zh, {
   studyImageLoadError:"无法加载此图片，请重新导入。", studySafeMode:"安全模式下不会读取书斋数据。请正常打开应用。",
   studyProgressHint:"拖动进度条可跳转页面。", studyBookmarked:"已从书签继续阅读。", studyMemoNeedText:"只有文本书籍可以用记事本编辑。",
   studyFullscreenExit:"退出全屏", studyHelp:"❓ 按键说明", studyHelpTitle:"书斋的按键操作", studyHelpClose:"关闭",
-  studyHelpNav:"→ 前进，← 后退（可在高级设置中重新指定）。点击图片左右侧仍按装订方向翻页。文本会滚动。",
+  studyHelpNav:"→ 前进，← 后退（可在高级设置中重新指定）。点击图片左右侧仍按装订方向翻页。文本会滚动。也可以设置用鼠标中键前进。",
   studyHelpSpace:"下一页。长按：图片=页码跳转条，文本=添加书签。",
-  studyHelpPg:"上一页／下一页（Home / End 跳到最前／最后）。",
-  studyHelpZoom:"图片的放大、缩小、适应（纵向漫画不使用）。也支持 Ctrl+滚轮和双指缩放。",
+  studyHelpPg:"上一页／下一页（Home / End 跳到最前／最后）。图片放大时，开启设置后跳到图片的下端／上端，在端点再按则从另一端打开下一页／上一页。到书的首尾时执行关闭动作。",
+  studyHelpZoom:"图片的放大、缩小、适应（纵向漫画不使用）。也支持 Ctrl+滚轮和双指缩放；放大的图片可用 ↑ / ↓ 或滚轮滚动。每次幅度在 ⚙ 高级设置中（1–25%，默认5%）。",
   studyHelpSearch:"在文本书中搜索（Enter=下一个匹配，Shift+Enter=上一个匹配）。",
   studyHelpBookmark:"B=添加或移除书签，M=开关书签列表。",
   studyHelpTv:"T=切换电视显示（上→下→隐藏），F=图片全屏。",
@@ -333,7 +345,13 @@ Object.assign(TEXT.zh, {
   studyTextTuneLabel:"文字", studyTextSizeSmall:"小", studyTextSizeNormal:"中", studyTextSizeLarge:"大", studyTextSizeHuge:"特大",
   studyTextSpacingTight:"紧凑", studyTextSpacingNormal:"行距普通", studyTextSpacingLoose:"行距宽松",
   studyTextWidthNarrow:"边距窄", studyTextWidthNormal:"边距普通", studyTextWidthWide:"边距宽",
-  studyTextTuneHint:"竖排与活页纸也同样生效。", studyZoomFit:"适应", studyZoomValue:"{n}%", studyZoomHint:"也可用 Ctrl+滚轮和双指缩放。",
+  studyTextTuneHint:"竖排与活页纸也同样生效。", studyZoomFit:"适应", studyZoomValue:"{n}%", studyZoomHint:"也可用 Ctrl+滚轮和双指缩放。放大的图片可用 ↑ / ↓ 或滚轮滚动。",
+  studyZoomEdgeKeys:"放大时，PageDown / PageUp 到达图片端点并翻页", studyZoomEdgeKeysHint:"把放大的图片一次跳到下端／上端。在端点再按一次，会从另一端打开下一页／上一页。到书的首尾时执行关闭动作（退出全屏返回书架）。未放大时仍与以往一样翻页。",
+  studyMouseClickPages:"PC 简易操作：左右键点击翻页", studyMouseClickPagesHint:"左键下一页，右键上一页。仅对图片书有效（点击位置不限）。",
+  studyMouseClickFlip:"左右互换（右键前进、左键后退）", studyMouseClickFlipHint:"适合轨迹球和左手使用。仅在上面的选项开启时可选。",
+  studyMiddleClickLabel:"鼠标中键", studyMiddleClickNone:"什么也不做", studyMiddleClickNext:"下一页",
+  studyMiddleClickClose:"关闭并返回书架（退出全屏）", studyMiddleClickNextHint:"仅对图片书有效（会关闭浏览器的自动滚动）。",
+  studyZoomStepLabel:"缩放步长", studyZoomStepOption:"{n}%", studyZoomStepHint:"−／＋、Ctrl+滚轮或双指缩放每次的幅度（默认5%＝从100%到200%需20次）。",
   studyTvLookLabel:"电视外观", studyTvLookPlain:"素屏", studyTvLookCrt:"显像管", studyTvLookWood:"木框", studyTvLookArcade:"街机",
   studyTvLookProjector:"投影仪", studyTvLookAquarium:"水族箱", studyTvSizeLabel:"大小", studyTvSizeSmall:"小", studyTvSizeMedium:"中", studyTvSizeLarge:"大",
   studyTvRatioLabel:"画面比", studyTvRatio169:"16:9", studyTvRatio43:"4:3", studyTvRatio219:"21:9", studyTvNameToggle:"显示曲名",
@@ -341,7 +359,7 @@ Object.assign(TEXT.zh, {
   studyImageOrderReverse:"倒序（右开本）", studyOrphanSweep:"已整理 {n} 个未使用的图片数据。"
 });
 Object.assign(TEXT.ko, {
-  studyTitle:"📚 서재", studyOpenBtn:"📚 서재 열기", studyLaunchHint:"♫ 곡 목록을 길게 눌러 서재 열기 (키보드에서는 Enter)",
+  studyTitle:"📚 서재", studyOpenBtn:"📚 서재", studyOpenBtnHint:"서재(책장, TV, 이미지 리더)를 엽니다. 곡 목록 제목을 길게 눌러도 열립니다", studyLaunchHint:"♫ 곡 목록을 길게 눌러 서재 열기 (키보드에서는 Enter)",
   studyClose:"✕ 서재 닫기", studyImportImages:"🖼 이미지 폴더 가져오기", studyImportTextFiles:"＋ 텍스트 파일 추가",
   studyImportTextFolder:"📄 텍스트 폴더 가져오기", studyShelf:"책장", studySearch:"제목·폴더 검색…",
   studyShelfEmpty:"책장이 비어 있습니다. 이미지 폴더 또는 TXT / MD / JSON을 가져오세요.",
@@ -396,10 +414,10 @@ Object.assign(TEXT.ko, {
   studyProgressHint:"탐색 막대를 움직여 페이지를 이동할 수 있습니다.", studyBookmarked:"책갈피 위치에서 다시 시작했습니다.",
   studyMemoNeedText:"텍스트 책에서만 메모장 편집을 사용할 수 있습니다.", studyFullscreenExit:"전체 화면 닫기",
   studyHelp:"❓ 키 설명", studyHelpTitle:"서재 키 조작", studyHelpClose:"닫기",
-  studyHelpNav:"→ 다음, ← 이전 (고급 설정에서 다시 지정할 수 있습니다). 이미지의 좌우를 누르면 제본 방향에 따라 넘깁니다. 텍스트는 스크롤합니다.",
+  studyHelpNav:"→ 다음, ← 이전 (고급 설정에서 다시 지정할 수 있습니다). 이미지의 좌우를 누르면 제본 방향에 따라 넘깁니다. 텍스트는 스크롤합니다. 마우스 가운데 버튼으로 다음으로 가는 설정도 있습니다.",
   studyHelpSpace:"다음 페이지. 길게 누르면 이미지=페이지 이동 막대, 텍스트=책갈피 저장입니다.",
-  studyHelpPg:"이전/다음 페이지 (Home / End 로 처음/마지막).",
-  studyHelpZoom:"이미지 확대·축소·맞춤 (세로형 만화에서는 사용하지 않습니다). Ctrl+휠과 핀치도 가능합니다.",
+  studyHelpPg:"이전/다음 페이지 (Home / End 로 처음/마지막). 확대 중에는 설정이 켜져 있으면 이미지의 아래끝/위끝으로 이동하고, 끝에서 한 번 더 누르면 다음/이전 페이지를 반대쪽 끝에서 엽니다. 책의 처음/끝에서는 닫기 동작입니다.",
+  studyHelpZoom:"이미지 확대·축소·맞춤 (세로형 만화에서는 사용하지 않습니다). Ctrl+휠과 핀치도 가능하며, 확대한 이미지는 ↑ / ↓ 또는 휠로 이동합니다. 한 번의 폭은 ⚙ 고급 설정 (1–25%, 기본 5%).",
   studyHelpSearch:"텍스트 책의 본문 검색 (Enter=다음 일치, Shift+Enter=이전 일치).",
   studyHelpBookmark:"B=책갈피 저장·해제, M=책갈피 목록 열기/닫기.",
   studyHelpTv:"T=TV 표시 전환 (위→아래→숨김), F=이미지 전체 화면.",
@@ -443,7 +461,13 @@ Object.assign(TEXT.ko, {
   studyTextSpacingTight:"좁게", studyTextSpacingNormal:"줄간격 보통", studyTextSpacingLoose:"줄간격 넓게",
   studyTextWidthNarrow:"여백 좁게", studyTextWidthNormal:"여백 보통", studyTextWidthWide:"여백 넓게",
   studyTextTuneHint:"세로쓰기와 루즈리프에도 함께 적용됩니다.",
-  studyZoomFit:"맞춤", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+휠과 핀치로도 확대할 수 있습니다.",
+  studyZoomFit:"맞춤", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+휠과 핀치로도 확대할 수 있습니다. 확대한 이미지는 ↑ / ↓ 또는 휠로 이동합니다.",
+  studyZoomEdgeKeys:"확대 중에는 PageDown / PageUp으로 이미지 끝과 페이지를 이동", studyZoomEdgeKeysHint:"확대한 이미지를 한 번에 아래끝/위끝으로 보냅니다. 끝에서 한 번 더 누르면 다음/이전 페이지를 반대쪽 끝에서 엽니다. 책의 처음/끝에서는 닫기 동작을 합니다 (전체 화면을 끝내고 책장으로). 확대하지 않았을 때는 이전과 같이 페이지를 넘깁니다.",
+  studyMouseClickPages:"PC 간편 조작: 좌우 클릭으로 페이지 넘기기", studyMouseClickPagesHint:"왼쪽 클릭은 다음 페이지, 오른쪽 클릭은 이전 페이지. 이미지 책에서만 동작합니다 (클릭 위치는 상관없습니다).",
+  studyMouseClickFlip:"좌우 반전 (오른쪽 클릭으로 앞으로, 왼쪽 클릭으로 뒤로)", studyMouseClickFlipHint:"트랙볼이나 왼손 사용자용. 위의 옵션이 켜져 있을 때만 고를 수 있습니다.",
+  studyMiddleClickLabel:"마우스 가운데 클릭", studyMiddleClickNone:"아무것도 안 함", studyMiddleClickNext:"다음 페이지",
+  studyMiddleClickClose:"닫고 책장으로 (전체 화면 종료)", studyMiddleClickNextHint:"이미지 책에서만 동작합니다 (브라우저 자동 스크롤은 막습니다).",
+  studyZoomStepLabel:"확대 폭", studyZoomStepOption:"{n}%", studyZoomStepHint:"− / ＋, Ctrl+휠, 핀치 한 번의 폭입니다 (기본 5% = 100%→200%가 20번).",
   studyTvLookLabel:"TV 외형", studyTvLookPlain:"기본 화면", studyTvLookCrt:"브라운관", studyTvLookWood:"나무 프레임",
   studyTvLookArcade:"아케이드", studyTvLookProjector:"프로젝터", studyTvLookAquarium:"수조",
   studyTvSizeLabel:"크기", studyTvSizeSmall:"작게", studyTvSizeMedium:"보통", studyTvSizeLarge:"크게",
@@ -458,7 +482,15 @@ const STUDY_STORES = ["books", "pages", "covers", "settings"];
 const STUDY_IMAGE_MAX_COUNT = 3000, STUDY_IMAGE_MAX_BYTES = 600 * 1024 * 1024, STUDY_IMAGE_FILE_MAX = 100 * 1024 * 1024;
 const STUDY_TEXT_FILE_MAX = 12 * 1024 * 1024, STUDY_TEXT_BATCH_MAX = 200, STUDY_BATCH_WRITE = 40;
 const STUDY_SHELF_MAX = 500, STUDY_SHELF_PAGE = 60, STUDY_SEARCH_MARK_MAX = 1500;
-const STUDY_ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4];
+const STUDY_ZOOM_MIN = 0.5, STUDY_ZOOM_MAX = 4;
+/* 拡大の送り幅（％）。−／＋・Ctrl+ホイール・ピンチの「1回ぶん」です。
+   既定は5%（100%→200%が20回）。1%＝細かく見たいとき〜25%＝大きく変えたいとき。 */
+const STUDY_ZOOM_PERCENT_STEPS = [1, 2, 5, 10, 25];
+const STUDY_ZOOM_PERCENT_DEFAULT = 5;
+function studyZoomPercentStep(value) {
+  const number = Math.round(Number(value));
+  return STUDY_ZOOM_PERCENT_STEPS.includes(number) ? number : STUDY_ZOOM_PERCENT_DEFAULT;
+}
 const STUDY_TEXT_SIZE = { small:0.88, normal:1, large:1.18, huge:1.4 };
 const STUDY_TEXT_LEADING = { tight:1.6, normal:1.9, loose:2.3 };
 const STUDY_TEXT_PAD = { narrow:0.5, normal:1, wide:1.7 };
@@ -474,6 +506,7 @@ const STUDY_THEMES = [
   "neon", "aurora", "sunset", "ocean", "mint", "dream", "prism", "staff"
 ];
 const STUDY_SORTS = ["updated", "added", "title", "type", "size"];
+const STUDY_MIDDLE_CLICK_ACTIONS = ["none", "next", "close"];   /* 中クリックの設定（trk124で選択式に） */
 const STUDY_FOLDER_MAX = 200;
 const STUDY_DEFAULT_NEXT_KEY = "ArrowRight", STUDY_DEFAULT_PREVIOUS_KEY = "ArrowLeft";
 const STUDY_RESERVED_KEYS = new Set(["Escape", "Tab", "Space", "Enter", "NumpadEnter", "KeyB", "KeyM", "KeyT", "KeyF",
@@ -491,23 +524,26 @@ function studyKeyCodeLabel(code) {
 let studyDbPromise = null;
 let studyBooks = [], studyCurrentBook = null, studyCurrentPage = 0;
 let studyVerticalBookId = "", studyVerticalObserver = null, studyVerticalScrollTimer = 0;
+let studyZoomLand = "";   /* ページを移ったあとに開く位置（top／bottom）。画像の高さが決まってから当てる */
 let studyMemoSaveTimer = 0, studyProgressTimer = 0, studyRenderToken = 0, studyImageLoadSeq = 0;
 let studyRoomOpen = false, studyClosePending = false, studyTVToken = 0, studyTVArtUrl = "", studyTVArtSong = "";
 let studyHoldTimer = 0, studyHeldCode = "", studyHoldAction = "", studySuppressTapUntil = 0;
-let studyPointerStart = null, studyLaunchTimer = 0, studyLaunchFired = false, studyLaunchPointerAt = 0;
+let studyPointerStart = null;
 let studyVideoHomeParent = null, studyVideoHomeNext = null, studyVideoHomeStyle = null, studyFullscreenFallback = false;
 let studyShelfShown = STUDY_SHELF_PAGE, studyBookmarkMode = false, studySweepBusy = false, studySweepAt = 0;
 let studyShelfFolders = [], studyBookFolder = Object.create(null), studyShelfOrder = Object.create(null), studyShelfViewFolder = "";
-let studyShelfDragged = null, studyShelfHoldTimer = 0, studyShelfHoldFired = false, studyDataReady = false;
+let studyShelfDragged = null, studyDataReady = false;
 let studyKeyCaptureAction = "", studyExportDirectory = null;
 let studyPointers = new Map(), studyPinchStart = 0, studyPinchZoom = 1;
+let studyLastPointerType = "";   /* 直前の pointerdown の種類（mouse／touch／pen）。PCの簡易操作はマウスだけに効かせる */
 let studySearchState = { query:"", marks:[], index:-1, capped:false };
 let studyImportState = { active:false, cancelled:false, total:0, added:0, kept:0, failed:0 };
 const studyObjectUrls = new Set();
-let studyPrefs = { imageMode:"single", imageOrder:"natural", american:false, zoom:1, theme:"plain",
+let studyPrefs = { imageMode:"single", imageOrder:"natural", american:false, zoom:1, zoomPercentStep:STUDY_ZOOM_PERCENT_DEFAULT, theme:"plain",
   textSize:"normal", textSpacing:"normal", textWidth:"normal", tvEnabled:false, tvPosition:"top", tvLook:"plain",
   tvSize:"medium", tvRatio:"16:9", tvLabelOn:true, shelfSort:"updated", albumNesting:"split",
-  manualShelfOrder:false, foldersFirst:false, skipDeleteConfirm:false, shelfVisible:true, verticalImageKeys:false, editedTextFolderId:"",
+  manualShelfOrder:false, foldersFirst:false, skipDeleteConfirm:false, shelfVisible:true, verticalImageKeys:false,
+  zoomEdgeKeys:true, mouseClickPages:false, mouseClickFlip:false, middleClickAction:"none", editedTextFolderId:"",
   studyNextKey:STUDY_DEFAULT_NEXT_KEY, studyPreviousKey:STUDY_DEFAULT_PREVIOUS_KEY, helpSeen:false };
 
 /* ============ 保存（IndexedDB） ============ */
@@ -656,7 +692,9 @@ function studyReadPrefs(raw) {
   studyPrefs.imageMode = STUDY_IMAGE_MODES.includes(raw.imageMode) ? raw.imageMode : "single";
   studyPrefs.imageOrder = raw.imageOrder === "reverse" ? "reverse" : "natural";
   studyPrefs.american = raw.american === true;
-  studyPrefs.zoom = STUDY_ZOOM_STEPS.includes(Number(raw.zoom)) ? Number(raw.zoom) : 1;
+  const rawZoom = Number(raw.zoom);
+  studyPrefs.zoom = Number.isFinite(rawZoom) ? Math.round(Math.max(STUDY_ZOOM_MIN, Math.min(STUDY_ZOOM_MAX, rawZoom)) * 100) / 100 : 1;
+  studyPrefs.zoomPercentStep = studyZoomPercentStep(raw.zoomPercentStep);
   studyPrefs.theme = STUDY_THEMES.includes(raw.theme) ? raw.theme : "plain";
   studyPrefs.textSize = ["small", "normal", "large", "huge"].includes(raw.textSize) ? raw.textSize : "normal";
   studyPrefs.textSpacing = ["tight", "normal", "loose"].includes(raw.textSpacing) ? raw.textSpacing : "normal";
@@ -675,6 +713,12 @@ function studyReadPrefs(raw) {
   studyPrefs.skipDeleteConfirm = raw.skipDeleteConfirm === true;
   studyPrefs.shelfVisible = raw.shelfVisible !== false;
   studyPrefs.verticalImageKeys = raw.verticalImageKeys === true;
+  studyPrefs.zoomEdgeKeys = raw.zoomEdgeKeys !== false;
+  studyPrefs.mouseClickPages = raw.mouseClickPages === true;
+  studyPrefs.mouseClickFlip = raw.mouseClickFlip === true;
+  /* trk123までの「中クリック＝次のページ」は、選択肢の "next" として引き継ぎます。 */
+  studyPrefs.middleClickAction = STUDY_MIDDLE_CLICK_ACTIONS.includes(raw.middleClickAction) ? raw.middleClickAction
+    : raw.middleClickNext === true ? "next" : "none";
   studyPrefs.editedTextFolderId = typeof raw.editedTextFolderId === "string" && raw.editedTextFolderId.length <= 128 ? raw.editedTextFolderId : "";
   studyPrefs.studyNextKey = studyKeyCodeAllowed(raw.studyNextKey) ? raw.studyNextKey : STUDY_DEFAULT_NEXT_KEY;
   const previousKey = studyKeyCodeAllowed(raw.studyPreviousKey) ? raw.studyPreviousKey : STUDY_DEFAULT_PREVIOUS_KEY;
@@ -863,7 +907,13 @@ function studyRefreshPrefsUI() {
   core.$("studyFoldersFirst").checked = studyPrefs.foldersFirst;
   core.$("studySkipDeleteConfirm").checked = studyPrefs.skipDeleteConfirm;
   core.$("studyVerticalImageKeys").checked = studyPrefs.verticalImageKeys;
+  core.$("studyZoomEdgeKeys").checked = studyPrefs.zoomEdgeKeys;
+  core.$("studyMouseClickPages").checked = studyPrefs.mouseClickPages;
+  core.$("studyMouseClickFlip").checked = studyPrefs.mouseClickFlip;
+  core.$("studyMouseClickFlip").disabled = !studyPrefs.mouseClickPages;
+  core.$("studyMiddleClickAction").value = studyPrefs.middleClickAction;
   core.$("studyShelfSort").disabled = studyPrefs.manualShelfOrder;
+  studySyncZoomStepRow();
   studyRefreshEditedTextFolderSelect(); studyRefreshExportFolderUI();
   studyApplyShelfVisibility();
   studyRefreshKeyAssignments();
@@ -1436,6 +1486,17 @@ function studySetImage(img, blob, alt) {
   studyObjectUrls.add(url); img.dataset.studyObjectUrl = url; img.alt = alt || ""; img.src = url; img.hidden = false;
   return true;
 }
+/* 画像の高さが決まるまで待ちます（拡大中の「続きの端から開く」ため。失敗・2秒で先へ進む）。 */
+function studyImageReady(img) {
+  if (!img || !img.src || (img.complete && img.naturalWidth > 0)) return Promise.resolve();
+  return new Promise(resolve => {
+    let settled = false;
+    const finish = () => { if (settled) return; settled = true; clearTimeout(timer); resolve(); };
+    const timer = setTimeout(finish, 2000);
+    img.addEventListener("load", finish, { once:true });
+    img.addEventListener("error", finish, { once:true });
+  });
+}
 function studyClearVerticalPages() {
   if (studyVerticalObserver) { studyVerticalObserver.disconnect(); studyVerticalObserver = null; }
   const box = core.$("studyVerticalPages");
@@ -1457,6 +1518,7 @@ async function studyLoadPageImage(img, index, book = studyCurrentBook) {
     if (img.dataset.studyLoadToken !== loadToken || book !== studyCurrentBook || renderToken !== studyRenderToken) return;
     if (!studyIsBlob(blob)) { studyClearImage(img); studySetStatus("studyImageLoadError"); return; }
     if (!studySetImage(img, blob, `${book.title} — ${page.name} (${index + 1})`)) studySetStatus("studyImageLoadError");
+    await studyImageReady(img);
   } catch (error) {
     if (img.dataset.studyLoadToken === loadToken) { studyClearImage(img); studyFail(error, "studyImageLoadError"); }
   }
@@ -1511,7 +1573,7 @@ async function studyRenderImagePage() {
     const target = core.$("studyVerticalPages").children[studyCurrentPage];
     if (target && typeof target.scrollIntoView === "function") requestAnimationFrame(() => { target.scrollIntoView({ block:"start", behavior:"auto" }); studyVerticalScroll(); });
     else studyVerticalScroll();
-    studySyncPageCount(); studyApplyZoom(false); return;
+    studyZoomLand = ""; studySyncPageCount(); studyApplyZoom(false); return;
   }
   studyClearVerticalPages();
   core.$("studyVerticalPages").hidden = true;
@@ -1527,7 +1589,7 @@ async function studyRenderImagePage() {
     core.$("studySingleWrap").hidden = false; core.$("studySpreadWrap").hidden = true;
     await studyLoadPageImage(core.$("studyPageSingle"), studyCurrentPage, book);
   }
-  if (token === studyRenderToken) { studySyncPageCount(); studyApplyZoom(false); }
+  if (token === studyRenderToken) { studySyncPageCount(); studyApplyZoom(false); studyApplyZoomLand(); }
 }
 function studyBuildVerticalPages() {
   const book = studyCurrentBook, box = core.$("studyVerticalPages");
@@ -1559,14 +1621,16 @@ function studyBuildVerticalPages() {
 }
 
 /* ============ 画像の拡大 ============ */
+function studyZoomStepPercent() { return studyZoomPercentStep(studyPrefs.zoomPercentStep); }
+/* いまの倍率を、選んだ送り幅（％）の刻みに丸めます。ピンチの終わりなどに使います。 */
 function studySnapZoom(value) {
-  const number = Number(value) || 1;
-  let best = STUDY_ZOOM_STEPS[0];
-  for (const step of STUDY_ZOOM_STEPS) if (Math.abs(step - number) < Math.abs(best - number)) best = step;
-  return best;
+  const step = studyZoomStepPercent();
+  const percent = Math.round((Number(value) || 1) * 100);
+  const zoom = Math.round(Math.max(STUDY_ZOOM_MIN * 100, Math.min(STUDY_ZOOM_MAX * 100, Math.round(percent / step) * step))) / 100;
+  return Math.round(zoom * 100) / 100;
 }
 function studyApplyZoomValue(value) {
-  const zoom = Math.max(STUDY_ZOOM_STEPS[0], Math.min(STUDY_ZOOM_STEPS[STUDY_ZOOM_STEPS.length - 1], Number(value) || 1));
+  const zoom = Math.max(STUDY_ZOOM_MIN, Math.min(STUDY_ZOOM_MAX, Number(value) || 1));
   studyPrefs.zoom = Math.round(zoom * 100) / 100;
   const stage = core.$("studyImageStage");
   stage.style.setProperty("--study-zoom", String(studyPrefs.zoom));
@@ -1574,17 +1638,25 @@ function studyApplyZoomValue(value) {
   stage.dataset.zoomActive = Math.abs(studyPrefs.zoom - 1) > .001 ? "1" : "0";
   const label = tr("studyZoomValue", { n:Math.round(studyPrefs.zoom * 100) });
   core.$("studyZoomLabel").textContent = label; core.$("studyZoomChip").textContent = label;
-  core.$("studyZoomOut").disabled = studyPrefs.zoom <= STUDY_ZOOM_STEPS[0] + .001;
-  core.$("studyZoomIn").disabled = studyPrefs.zoom >= STUDY_ZOOM_STEPS[STUDY_ZOOM_STEPS.length - 1] - .001;
+  core.$("studyZoomOut").disabled = studyPrefs.zoom <= STUDY_ZOOM_MIN + .001;
+  core.$("studyZoomIn").disabled = studyPrefs.zoom >= STUDY_ZOOM_MAX - .001;
 }
 function studyApplyZoom(notify) {
   studyApplyZoomValue(studyPrefs.zoom);
   if (notify && Math.abs(studyPrefs.zoom - 1) > .001) studySetStatus("studyZoomHint");
 }
 function studyStepZoom(direction) {
-  const index = STUDY_ZOOM_STEPS.indexOf(studySnapZoom(studyPrefs.zoom));
-  const next = STUDY_ZOOM_STEPS[Math.max(0, Math.min(STUDY_ZOOM_STEPS.length - 1, (index < 0 ? 2 : index) + direction))];
-  studySetZoom(next, true);
+  const step = studyZoomStepPercent();
+  const percent = Math.round(studyPrefs.zoom * 100);
+  /* いまの倍率が刻みに乗っていなければ、進む向きの次の目盛りへ（ピンチのあとの半端な倍率からも自然につながるように）。 */
+  const next = direction > 0 ? (Math.floor(percent / step) + 1) * step : Math.ceil(percent / step - 1) * step;
+  studySetZoom(Math.max(STUDY_ZOOM_MIN * 100, Math.min(STUDY_ZOOM_MAX * 100, next)) / 100, true);
+}
+/* ⚙の送り幅セレクト：選択肢の文字は言語ごとに作り直します（数字だけなので辞書は {n}% の1つ）。 */
+function studySyncZoomStepRow() {
+  const select = core.$("studyZoomPercentStep");
+  for (const option of select.options) option.textContent = tr("studyZoomStepOption", { n:studyZoomPercentStep(option.value) });
+  select.value = String(studyZoomStepPercent());
 }
 function studySetZoom(value, save = true) {
   studyApplyZoomValue(value);
@@ -1596,6 +1668,93 @@ function studySyncZoomRow() {
   const visible = !!studyCurrentBook && studyCurrentBook.kind === "image" && studyPrefs.imageMode !== "vertical";
   core.$("studyZoomGroup").hidden = !visible;
   if (visible) studyApplyZoomValue(studyPrefs.zoom);
+}
+/* 拡大してはみ出した画像を ↑ / ↓ で送る（マウスホイールが動かすのと同じ場所）。
+   縦読みは台紙（studyImageStage）そのものがスクロールするので対象外。端まで来たら false を返し、
+   下の「↑ / ↓でページを移動する」設定やページ送りにゆずります。
+   1回押し＝表示高の84%、押しっぱなし（キーリピート）＝6%ずつ。滑らせずにその場で動かします
+   （連打や長押しでも、押した回数どおりに進むように）。 */
+function studyZoomScrollNodes() {
+  if (!studyCurrentBook || studyCurrentBook.kind !== "image") return null;
+  if (studyPrefs.imageMode === "vertical" || studyPrefs.zoom <= 1.001) return null;
+  if (studyPrefs.imageMode === "spread") return [...core.$("studySpreadWrap").querySelectorAll(".study-spread-page")];
+  return [core.$("studySingleWrap")];
+}
+function studyScrollZoomedImage(direction, held) {
+  const nodes = studyZoomScrollNodes();
+  if (!nodes) return false;
+  let moved = false;
+  for (const node of nodes) {
+    if (!node) continue;
+    const extent = node.scrollHeight - node.clientHeight;
+    if (extent <= 1) continue;
+    const step = held ? Math.max(24, node.clientHeight * .06) : Math.max(48, node.clientHeight * .84);
+    const next = Math.max(0, Math.min(extent, node.scrollTop + direction * step));
+    if (next === node.scrollTop) continue;
+    moved = true;
+    node.scrollTop = next;
+  }
+  return moved;
+}
+/* 拡大した画像を、PageDown＝下端／PageUp＝上端へ一度に送ります。
+   もう端に着いていたときは、次の／前のページへ移り、続きの端から開きます
+   （PageDown＝次のページの上端、PageUp＝前のページの下端）。
+   本の端（1ページ目の上端・最終ページの下端）では、閉じる動作＝全画面を終了して本棚へ戻ります。
+   送り先が無いとき・拡大していないときは false を返し、ページ送りにゆずります。 */
+function studyJumpZoomEdge(direction) {
+  const nodes = studyZoomScrollNodes();
+  if (!nodes) return false;
+  const targets = nodes.filter(node => node && node.scrollHeight - node.clientHeight > 1);
+  if (!targets.length) return false;
+  const atEdge = targets.every(node => direction > 0 ? node.scrollTop >= node.scrollHeight - node.clientHeight - 1 : node.scrollTop <= 1);
+  if (!atEdge) {
+    let moved = false;
+    for (const node of targets) {
+      const extent = node.scrollHeight - node.clientHeight;
+      const next = direction > 0 ? extent : 0;
+      if (next === node.scrollTop) continue;
+      moved = true;
+      node.scrollTop = next;
+    }
+    return moved;
+  }
+  const step = studyPrefs.imageMode === "spread" ? 2 : 1;
+  const target = studyNormalizePage(studyCurrentPage + direction * step);
+  if (target !== studyCurrentPage) {
+    studyZoomLand = direction > 0 ? "top" : "bottom";
+    studyJumpToPage(target);
+    return true;
+  }
+  studyCloseToShelf();
+  return true;
+}
+/* 画像の全画面を終了して、本棚（書斎のメニュー）へ戻ります。
+   本の端でさらに押したとき（trk123）と、中クリックの「閉じて本棚へ」（trk124）で使います。 */
+function studyCloseToShelf() {
+  const room = core.$("studyRoom");
+  if (room.classList.contains("study-fullimage")) {
+    studyFullscreenFallback = false;
+    room.classList.remove("study-fullimage");
+    if (document.fullscreenElement === room && document.exitFullscreen) {
+      try { const done = document.exitFullscreen(); if (done && typeof done.catch === "function") done.catch(() => {}); } catch (_) {}
+    }
+    studySyncCurrentBookControls(); studySyncFindRow();
+  }
+  studyBackToShelf();
+}
+/* ページを移ったあとに開く位置（top＝上端／bottom＝下端）。画像の高さが決まってから当てます。 */
+function studyApplyZoomLand() {
+  const land = studyZoomLand;
+  studyZoomLand = "";
+  if (!land) return;
+  const nodes = studyZoomScrollNodes();
+  if (!nodes) return;
+  for (const node of nodes) {
+    if (!node) continue;
+    const extent = node.scrollHeight - node.clientHeight;
+    if (extent <= 1) continue;
+    node.scrollTop = land === "bottom" ? extent : 0;
+  }
 }
 
 /* ============ 文章の表示 ============ */
@@ -2306,9 +2465,18 @@ function studyKeyDown(event) {
   if (event.code === studyPrefs.studyNextKey || event.code === studyPrefs.studyPreviousKey) {
     event.preventDefault(); event.stopImmediatePropagation(); studyStep(event.code === studyPrefs.studyNextKey ? 1 : -1); return;
   }
+  /* 拡大した画像は、まず ↑ / ↓ で送ります（端に着いたときだけ、下のページ送りへゆずります）。 */
+  if ((event.code === "ArrowUp" || event.code === "ArrowDown") && studyScrollZoomedImage(event.code === "ArrowDown" ? 1 : -1, event.repeat)) {
+    event.preventDefault(); event.stopImmediatePropagation(); return;
+  }
   if (studyPrefs.verticalImageKeys && studyCurrentBook && studyCurrentBook.kind === "image" &&
       (event.code === "ArrowUp" || event.code === "ArrowDown")) {
     event.preventDefault(); event.stopImmediatePropagation(); studyStep(event.code === "ArrowDown" ? 1 : -1); return;
+  }
+  /* 拡大した画像では、PageDown＝下端／PageUp＝上端（端の次は反対の端）。設定がオフのときは下のページ送りへ。 */
+  if (studyPrefs.zoomEdgeKeys && (event.code === "PageDown" || event.code === "PageUp") &&
+      studyJumpZoomEdge(event.code === "PageDown" ? 1 : -1)) {
+    event.preventDefault(); event.stopImmediatePropagation(); return;
   }
   if (event.code === "PageDown") { event.preventDefault(); event.stopImmediatePropagation(); studyStep(1); return; }
   if (event.code === "PageUp") { event.preventDefault(); event.stopImmediatePropagation(); studyStep(-1); return; }
@@ -2357,6 +2525,7 @@ function studyKeyUp(event) {
 
 /* ============ ポインタ（タップ／スワイプ／長押し／ピンチ／拡大中の見回し） ============ */
 function studyImagePointerDown(event) {
+  if (event.pointerType) studyLastPointerType = event.pointerType;
   if (!studyRoomOpen || !studyCurrentBook || studyCurrentBook.kind !== "image" || (event.button != null && event.button !== 0)) return;
   studyPointers.set(event.pointerId, { x:event.clientX, y:event.clientY });
   try { event.currentTarget.setPointerCapture(event.pointerId); } catch (_) {}
@@ -2419,10 +2588,37 @@ function studyImagePointerEnd(event) {
   }
 }
 function studyImageTap(event) {
+  if (event.button) return;
   if (Date.now() < studySuppressTapUntil || (event.target && typeof event.target.closest === "function" && event.target.closest("button"))) return;
   if (!studyCurrentBook || studyCurrentBook.kind !== "image" || studyPrefs.imageMode === "vertical") return;
+  /* 設定がオンでマウスの左クリックなら、位置に関係なくページを送ります（反転で前のページ）。 */
+  if (studyMouseClickPage(0)) return;
   const rect = core.$("studyImageStage").getBoundingClientRect();
   studyStepPhysical(event.clientX < rect.left + rect.width / 2 ? "left" : "right");
+}
+/* PCの簡易操作（設定）：マウスの左クリック＝次のページ／右クリック＝前のページ（反転の設定で入れ替え）。
+   pointerdown で覚えた種類を見て、マウス以外（指・ペン）のタップはこれまでどおり左右の半分で送ります。
+   button＝0 が左、2 が右。実際に送ったときだけ true を返します。 */
+function studyMouseClickPage(button) {
+  const pointerType = studyLastPointerType;
+  studyLastPointerType = "";
+  if (pointerType !== "mouse") return false;
+  if (!studyPrefs.mouseClickPages || studyPrefs.imageMode === "vertical") return false;
+  if (!studyRoomOpen || !studyCurrentBook || studyCurrentBook.kind !== "image") return false;
+  const forward = (button === 0) !== studyPrefs.mouseClickFlip;
+  studyStep(forward ? 1 : -1);
+  return true;
+}
+/* マウスの中クリック（⚙で「次のページへ」か「閉じて本棚へ」を選ぶ。画像の本のときだけ）。
+   act=false は mousedown 用で、ブラウザの自動スクロールだけを止めます（実際の動作は auxclick で1回）。 */
+function studyMiddleClick(event, act) {
+  if (event.button !== 1 || studyPrefs.middleClickAction === "none") return false;
+  if (!studyRoomOpen || !studyCurrentBook || studyCurrentBook.kind !== "image") return false;
+  event.preventDefault();
+  if (!act) return true;
+  if (studyPrefs.middleClickAction === "close") studyCloseToShelf();
+  else studyStep(1);
+  return true;
 }
 function studyVerticalScroll() {
   clearTimeout(studyVerticalScrollTimer);
@@ -2470,7 +2666,7 @@ async function studyCloseRoom() {
   }
   editor.readOnly = false;
   clearTimeout(studyHoldTimer); studyHoldTimer = 0; studyHeldCode = ""; studyPointerStart = null;
-  clearTimeout(studyShelfHoldTimer); studyShelfHoldTimer = 0; studyShelfHoldFired = false;
+  studyShelfHold.cancel();
   studyPointers.clear(); studyPinchStart = 0;
   if (!core.$("studyHelp").hidden) core.$("studyHelp").hidden = true;
   studyEndSearch();
@@ -2511,25 +2707,50 @@ function studyTranslateNodes() {
 studyTranslateNodes();
 core.$("studySearch").placeholder = tr("studySearch");
 core.$("studyFindInput").placeholder = tr("studyBookSearchPlaceholder");
+/* 長押し（指・マウス）をまとめて扱います。ブラウザが自前の長押しやスクロールで pointercancel を出しても、
+   ポインタが動いていなければ取り消しません（Androidなどで長押しが効かなくなるのを防ぐ）。押したまま650msで発火し、
+   離したときに長押しぶん経っていればそこでも発火します（タイマーが遅れても開くように）。 */
+const STUDY_HOLD_MS = 650, STUDY_HOLD_MOVE_MAX = 14;
+function studyBindHoldPress(node, action) {
+  let timer = 0, start = null, moved = false, fired = false;
+  const clear = () => { clearTimeout(timer); timer = 0; start = null; };
+  const fire = () => { clear(); fired = true; setTimeout(() => { fired = false; }, 1200); action(); };
+  node.addEventListener("pointerdown", event => {
+    if (event.button != null && event.button !== 0) return;
+    clearTimeout(timer); fired = false; moved = false;
+    start = { x:event.clientX, y:event.clientY, at:Date.now() };
+    timer = setTimeout(() => { timer = 0; if (!start || moved) return; fire(); }, STUDY_HOLD_MS);
+  });
+  node.addEventListener("pointermove", event => {
+    if (!start || moved) return;
+    if (Math.abs(event.clientX - start.x) > STUDY_HOLD_MOVE_MAX || Math.abs(event.clientY - start.y) > STUDY_HOLD_MOVE_MAX) {
+      moved = true; clear();
+    }
+  });
+  /* ブラウザ都合の取り消し（pointercancel）は、動いたときだけ受け入れます。 */
+  node.addEventListener("pointercancel", event => {
+    if (!start) return;
+    const farX = Math.abs((event.clientX || start.x) - start.x), farY = Math.abs((event.clientY || start.y) - start.y);
+    if (moved || farX > STUDY_HOLD_MOVE_MAX || farY > STUDY_HOLD_MOVE_MAX) { moved = true; clear(); }
+  });
+  node.addEventListener("pointerleave", event => { if (start && event.pointerType === "mouse") { moved = true; clear(); } });
+  node.addEventListener("pointerup", () => {
+    if (!start) return;
+    const held = !moved && Date.now() - start.at >= STUDY_HOLD_MS;
+    if (held) fire(); else clear();
+  });
+  node.addEventListener("contextmenu", event => event.preventDefault());
+  return { fired:() => fired, reset:() => { fired = false; }, cancel:() => { clear(); fired = false; } };
+}
 const studyShelfTitle = core.$("studyShelfCreateFolder");
 function studySyncShelfTitleHint() {
   studyShelfTitle.title = tr("studyFolderCreateHint");
   studyShelfTitle.setAttribute("aria-label", `${tr("studyShelf")}. ${tr("studyFolderCreateHint")}`);
 }
 studySyncShelfTitleHint();
-studyShelfTitle.addEventListener("pointerdown", event => {
-  if (event.button != null && event.button !== 0) return;
-  clearTimeout(studyShelfHoldTimer); studyShelfHoldFired = false;
-  studyShelfHoldTimer = setTimeout(() => {
-    studyShelfHoldTimer = 0; studyShelfHoldFired = true; studyCreateFolder();
-    setTimeout(() => { studyShelfHoldFired = false; }, 1200);
-  }, 650);
-});
-const releaseShelfTitle = () => { clearTimeout(studyShelfHoldTimer); studyShelfHoldTimer = 0; };
-for (const type of ["pointerup", "pointercancel", "pointerleave"]) studyShelfTitle.addEventListener(type, releaseShelfTitle);
-studyShelfTitle.addEventListener("contextmenu", event => event.preventDefault());
+const studyShelfHold = studyBindHoldPress(studyShelfTitle, studyCreateFolder);
 studyShelfTitle.addEventListener("click", event => {
-  if (studyShelfHoldFired) { studyShelfHoldFired = false; event.preventDefault(); event.stopPropagation(); return; }
+  if (studyShelfHold.fired()) { studyShelfHold.reset(); event.preventDefault(); event.stopPropagation(); return; }
   studyCreateFolder();
 });
 core.$("studyShowShelfBtn").addEventListener("click", () => {
@@ -2611,6 +2832,15 @@ studyBindPref("studyShelfVisible", "shelfVisible", () => {
   if (!studyPrefs.shelfVisible) core.$("studyShowShelfBtn").focus({ preventScroll:true });
 });
 studyBindPref("studyVerticalImageKeys", "verticalImageKeys");
+studyBindPref("studyZoomEdgeKeys", "zoomEdgeKeys");
+studyBindPref("studyMouseClickPages", "mouseClickPages", () => { core.$("studyMouseClickFlip").disabled = !studyPrefs.mouseClickPages; });
+studyBindPref("studyMouseClickFlip", "mouseClickFlip");
+studyBindPref("studyMiddleClickAction", "middleClickAction");
+studyBindPref("studyZoomPercentStep", "zoomPercentStep", node => {
+  studyPrefs.zoomPercentStep = studyZoomPercentStep(node.value);
+  node.value = String(studyPrefs.zoomPercentStep);
+  if (studyCurrentBook && studyCurrentBook.kind === "image" && studyPrefs.imageMode !== "vertical") studySetZoom(studySnapZoom(studyPrefs.zoom), true);
+});
 studyBindPref("studyAlbumNesting", "albumNesting", () => studySetStatus("studyAlbumNestingHint"));
 studyBindPref("studyEditedTextFolder", "editedTextFolderId", () => {
   if (studyCurrentBook && studyCurrentBook.kind === "text" && !core.$("studyMemoEditor").hidden) studyFlushMemo();
@@ -2629,7 +2859,12 @@ core.$("studyImageStage").addEventListener("pointerdown", studyImagePointerDown)
 core.$("studyImageStage").addEventListener("pointermove", studyImagePointerMove);
 core.$("studyImageStage").addEventListener("pointerup", studyImagePointerEnd);
 core.$("studyImageStage").addEventListener("pointercancel", studyImagePointerEnd);
-core.$("studyImageStage").addEventListener("contextmenu", event => event.preventDefault());
+core.$("studyImageStage").addEventListener("contextmenu", event => {
+  event.preventDefault();
+  studyMouseClickPage(2);
+});
+core.$("studyImageStage").addEventListener("mousedown", event => { studyMiddleClick(event, false); });
+core.$("studyImageStage").addEventListener("auxclick", event => { studyMiddleClick(event, true); });
 core.$("studyImageStage").addEventListener("scroll", studyVerticalScroll, { passive:true });
 core.$("studyImageStage").addEventListener("wheel", event => {
   if (!event.ctrlKey && !event.metaKey) return;
@@ -2666,7 +2901,7 @@ core.on("language", () => {
   core.$("studyMemoBtn").textContent = tr(core.$("studyMemoEditor").hidden ? "studyMemoEdit" : "studyMemoDone");
   studySetEditorStatus(core.$("studyEditorSaveStatus").dataset.state || "studyEditorSaved", true); studyUpdateEditorStats();
   studyRenderShelf(); studyRenderBookmarks();
-  studySyncZoomRow(); studySyncLook();
+  studySyncZoomRow(); studySyncZoomStepRow(); studySyncLook();
   if (studyCurrentBook) {
     core.$("studyCurrentTitle").textContent = studyCurrentBook.title;
     core.$("studyCurrentMeta").textContent = studyCurrentBook.kind === "image" ? `${tr("studyBookImages")} · ${tr("studyPageCount", { n:studyCurrentBook.pages.length })}`
@@ -2677,40 +2912,31 @@ core.on("language", () => {
   }
 });
 
-/* 起動の長押し（曲リストの見出し） */
+/* 起動の長押し（曲リストの見出し。650ms） */
 const studyLaunchTitle = document.querySelector("#libPanel .libHead .study-launch-title");
+const studyLaunchPress = studyLaunchTitle ? studyBindHoldPress(studyLaunchTitle, studyOpenRoom) : null;
 if (studyLaunchTitle) {
-  /* 見出し(h3)の中の本物の <button>。role も tabindex も要らず、読み上げでは「ボタン」と分かります */
+  /* 見出し(h2)の中の本物の <button>。role も tabindex も要らず、読み上げでは「ボタン」と分かります */
   studyLaunchTitle.title = tr("studyLaunchHint"); studyLaunchTitle.setAttribute("aria-label", `${tr("libTitle")}. ${tr("studyLaunchHint")}`);
-  studyLaunchTitle.addEventListener("pointerdown", event => {
-    if (event.button != null && event.button !== 0) return;
-    studyLaunchPointerAt = Date.now();
-    clearTimeout(studyLaunchTimer); studyLaunchFired = false;
-    studyLaunchTimer = setTimeout(() => {
-      studyLaunchFired = true; studyOpenRoom();
-      setTimeout(() => { studyLaunchFired = false; }, 1200);
-    }, 650);
-  });
-  const releaseLaunch = () => { studyLaunchPointerAt = Date.now(); clearTimeout(studyLaunchTimer); studyLaunchTimer = 0; };
-  ["pointerup", "pointercancel", "pointerleave"].forEach(type => studyLaunchTitle.addEventListener(type, releaseLaunch));
-  studyLaunchTitle.addEventListener("contextmenu", event => event.preventDefault());
   studyLaunchTitle.addEventListener("click", event => {
-    if (studyLaunchFired) { studyLaunchFired = false; event.preventDefault(); event.stopPropagation(); return; }
-    /* 指やマウスのタップ（pointer が直前に動いた click）では開かず、キーボードや読み上げの click だけで開きます。 */
-    if (event.detail === 0 && Date.now() - studyLaunchPointerAt > 600) { event.preventDefault(); studyOpenRoom(); }
+    if (studyLaunchPress.fired()) { studyLaunchPress.reset(); event.preventDefault(); event.stopPropagation(); return; }
+    /* 指やマウスのタップでは開かず、キーボードや読み上げの click（detail 0）だけで開きます。 */
+    if (event.detail === 0) { event.preventDefault(); studyOpenRoom(); }
   });
   studyLaunchTitle.addEventListener("keydown", event => {
-    if (event.code === "Enter" || event.code === "Space") {
-      event.preventDefault(); studyLaunchFired = true; studyOpenRoom();
-      setTimeout(() => { studyLaunchFired = false; }, 900);
-    }
+    if (event.code === "Enter" || event.code === "Space") { event.preventDefault(); studyOpenRoom(); }
   });
 }
-/* 📚 書斎を開くボタン（見出しの長押しの代わり。タップで開く。設定 showMoreBtns で隠せる） */
+/* 📚 書斎を開くボタン（曲リストの右側。長押しに気づかなくても入れるように、設定に関係なく常に出します） */
 const studyOpenBtn = document.getElementById("studyOpenBtn");
-if (studyOpenBtn) { studyOpenBtn.textContent = tr("studyOpenBtn"); studyOpenBtn.addEventListener("click", () => studyOpenRoom()); }
+function studySyncOpenBtn() {
+  if (!studyOpenBtn) return;
+  studyOpenBtn.textContent = tr("studyOpenBtn");
+  studyOpenBtn.title = tr("studyOpenBtnHint");
+}
+if (studyOpenBtn) { studySyncOpenBtn(); studyOpenBtn.addEventListener("click", () => studyOpenRoom()); }
 core.on("language", () => {
-  if (studyOpenBtn) studyOpenBtn.textContent = tr("studyOpenBtn");
+  studySyncOpenBtn();
   if (!studyLaunchTitle) return;
   studyLaunchTitle.title = tr("studyLaunchHint");
   studyLaunchTitle.setAttribute("aria-label", `${tr("libTitle")}. ${tr("studyLaunchHint")}`);

@@ -1,6 +1,6 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移したtrk70〜trk128の履歴と、trk114〜118・trk125〜127の検証記録です（trk128以降の検証は HANDOFF §6。trk119〜124は下記）。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
+> `docs/HANDOFF.md` から移したtrk70〜trk129の履歴と、trk114〜118・trk125〜127の検証記録です（trk129以降の検証は HANDOFF §6。trk119〜124は下記）。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
 
 ## trk114〜118 の検証記録（trk118のマージ前に HANDOFF §6 から移動）
 
@@ -26,6 +26,10 @@
 - **trk125の書斎ボタンと長押しの強化（2026-10-12）**：`npm run check` 成功（Static 0 failure／0 warning、`node:test` 218/218）。`tools/check-study-room.mjs` に、2つの長押し（書斎の起動と本棚のフォルダ作成）が共有する `studyBindHoldPress`（650ms・14px超の移動で取り消し）のVM検査14通りを追加：押しっぱなしで1回だけ発火、長押しの直後のクリックを飲み込める、650ms未満は離しても発火しない、ドラッグで取り消し、**動いていない `pointercancel` では取り消さない**、離した時点で650ms経っていればタイマーが消えていても発火、右ボタンでは始まらない、タッチの `pointerleave` では取り消さない、フラグが自分で消える、など。新設のCSS検査も含め、**わざと壊す9通りでFAILを確認**。`tools/check-repo.mjs` の項目6は、📚 書斎ボタンが `studyHeadBtn` を持ち `moreBtn` を持たないこと（設定で隠れないこと）と、`studyOpenBtnHint` が4言語そろっていることを検査。ブラウザ確認（リポジトリ外の `@sparticuz/chromium`＋`puppeteer-core`、Chromium headless、1100×760・タッチ対応）：ボタンは初期状態から見え（`📚 Study`／`📚 書斎`、ヒント付き）、クリックで開く。**設定「長押しの代わりのボタンを出す」をオフにすると他の `moreBtn` 4つは隠れるのに、このボタンは出たまま**で開ける。曲リストの見出しの長押しはマウス・タッチとも開き、**動かないまま届いた `pointercancel` でも開き**、動かしてから取り消すと開かず、短いタップでも開かない。本棚の見出しは長押し・`pointercancel`・タップのいずれでもフォルダができる（1→2→3）。ページエラー0。**「長押しで書斎に行かない」という報告は、自動化ではタイトル／再生中／一時停止中・開いて閉じた後・ライトモードのオン／オフ・マウス／タッチのいずれでも再現しなかった**（Chromium）。実機でまだ起きるなら端末とブラウザを教えてほしい。
 
 ## 旧 HANDOFF §11「最近の変更」
+
+### trk129 の記録（2026-10-12。trk132のときに HANDOFF §7 から移動）
+
+- **trk129（2026-10-12）**：trk127・trk128の再レビューと外部コードレビューへの対応。①**F-33＝共有譜面JSONの `bpm` の範囲検証**（高）：有限数かどうかしか見ておらず、負の値で小節線の描画ループ（`render.js` の `drawMeasureLines`・`stage.js`・`modes.js` の ORBIT 拍線）が終わらず、1e9 でも毎フレーム数百万回回っていました。`validateChartData` で **0（小節線なし。bpmの無い譜面を書き出すと0）か1〜1000** に限定し、3つのループ側でも範囲を確かめます（`tests/chart-import-bpm.test.mjs`、`docs/SECURITY.md` のF-33）。②**フォルダ上限13→40（`PL_FOLDER_MAX`）**（中〜高）：上限13では、利用者のフォルダが4個以上あると末尾の🎭棚が起動のたびに切り捨てられ、キャラクターテーマ4リストがトップへ落ちていました（利用者のフォルダも末尾から消えていました）。上限を40にし、**作るときに**上限を確かめてトースト（`plFolderLimit`・4言語）で知らせ（`plFolderCreate`・`plCatalogFolder`）、上限を超えた配列は `plFolderTrim` が固定棚を先に残します。すでに落ちた配置は一回限りの `trkEndfieldShelfRestoreOnce`（`settings.trkEndfieldTidy2`）が、**こわれた形のときだけ**戻します（消えた利用者のフォルダは戻せません）。③**初号指令OSTの表示名を24文字に**：trk128の長い名前は保存時に語の途中で切れていたため「初号指令 (上) ZD OST Vol.1」／「(下) ZD OST Vol.2」へ改名（旧名の一覧は `ENDFIELD_FIRSTORDER_OLD_NAMES`）。④**記録・ゴーストのキーから MOD を外す**：`chartKeyOf` を `n.origLane ?? n.lane` にし、MIRROR／RANDOM で同じ譜面が同じ行に入るように（MOD 無しの既存記録のキーは不変。MIRRORの古い記録は行が分かれたまま）。⑤**index.html の重複を整理**：`og:*`・`twitter:card`・`rel="manifest"`・`rel="icon"` が2回あり、SNSが先の方の説明文を拾っていたため1回に（説明文は「手持ちの曲で、すぐ遊べるブラウザ音ゲー。譜面は自動生成、叩く・走る・回る・舞台・荷物運びの5モード。」）。⑥その他：`docs/SECURITY.md` §2の信頼表の jsDelivr 行を自前ホスティング（`assets/vendor/`・`tools/vendor-lock.json` のSHA-384照合）へ修正、`check-security.mjs` の説明コメントも追随、ショートプレイの体力が曲全体のノーツ数で決まることを `js/modes.js` に明記。`sw.js` cache名（`trk-v2026.10.12-trk129`）を更新。**実機・実ブラウザでの確認は未実施**（§4-12）。
 
 ### trk128 の記録（2026-10-12。trk131のときに HANDOFF §7 から移動）
 

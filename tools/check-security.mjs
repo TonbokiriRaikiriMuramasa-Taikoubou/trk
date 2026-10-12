@@ -455,7 +455,7 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   const packPrevSafe = corePrefs.includes("packPrev: cleanPackPrev(prefs.packPrev)") && corePrefs.includes("function cleanPackPrev(") &&
     corePrefs.includes('typeof v.skin !== "string"') && corePrefs.includes("!Array.isArray(v.notes) || v.notes.length !== 2") &&
     corePrefs.includes("settings.packPrev = null;") &&
-    js["js/custom.js"].includes("if (persist) packRestoreSettings();") && js["js/custom.js"].includes("if (!restore) packSnapshot();");
+    js["js/custom.js"].includes("if (persist) packRestoreSettings();") && js["js/custom.js"].includes("if (!restore) { packSnapshot(); packRebase(); }");
   rule(packPrevSafe, "the pack snapshot (packPrev) is shape-checked while loading preferences");
 
   const core = js["js/core.js"], tv = js["js/tv-dock.js"];

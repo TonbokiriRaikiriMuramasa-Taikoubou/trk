@@ -1238,6 +1238,56 @@ if (!exists("js/fx-worklet.js") ||
   else ok("playlists: ↕ moves inside the visible group and drops dead ids, shared-playlist import is size-capped before reading, title fallback takes only a unique match (trk130)");
 }
 
+/* 📦 trk132: スキンを持つパックAから、スキンを持たないパックBへ切り替えたときは、Aのスキンを消すときに
+   退避したスキン（prev.skin）へ移る（shadow へ移すと、Bを外しても元に戻らない）。Aを使っている間に利用者が
+   自分で変えた項目は、切り替えの直前に packRebase が prev へ取り込み、applied から外す。
+   譜面の書き出しは、記録のキー（chartKeyOf）と同じく、MODを掛ける前のレーンを使う。 */
+{
+  const custom = read("js/custom.js"), game = read("js/game.js"), media = read("js/media.js");
+  let rebaseOk = false, wiringOk = false, exportOk = false, descOk = false;
+  try {
+    /* packRebase だけを切り出して動かす（read() は core. の別名を外すので、本文は settings をそのまま読む） */
+    const a = custom.indexOf("function packRebase("), b = custom.indexOf("\n}\n", a);
+    const settings = { skin:"pack_A", notes:[{ color:"#111111", shape:"square" }, { color:"#222222", shape:"circle" }], fxPower:2, seEnabled:true,
+      packPrev:{ skin:"sakura", notes:[{ color:"#ffffff", shape:"circle" }, { color:"#000000", shape:"diamond" }], fxPower:1.25, seEnabled:false,
+        applied:{ skin:"pack_A", notes:[{ color:"#111111", shape:"square" }, { color:"#222222", shape:"circle" }], fxPower:2, seEnabled:true } } };
+    const ctx = vm.createContext({ settings, JSON, Array, Object, String });
+    new vm.Script(custom.slice(a, b + 3) + "\nglobalThis.__rebase = packRebase;").runInContext(ctx);
+    settings.skin = "forest"; settings.seEnabled = false;   /* Aを使いながら、利用者が自分で変えた2項目 */
+    vm.runInContext("__rebase()", ctx);
+    const p = settings.packPrev;
+    rebaseOk = a >= 0 && b > a && p.skin === "forest" && p.seEnabled === false &&
+      !("skin" in p.applied) && !("seEnabled" in p.applied) &&
+      p.applied.fxPower === 2 && p.applied.notes.length === 2 && p.fxPower === 1.25;
+
+    /* 配線：切り替えの前に packRebase。パックのスキンを消すときは退避したスキンへ移し、applied.skin を外す */
+    const act = custom.slice(custom.indexOf("async function activatePack("), custom.indexOf("function deactivatePack("));
+    const deact = custom.slice(custom.indexOf("function deactivatePack("), custom.indexOf("async function installAndUse("));
+    wiringOk = act.includes("if (!restore) { packSnapshot(); packRebase(); }") &&
+      act.indexOf("packRebase();") < act.indexOf("deactivatePack(false);") &&
+      deact.includes("const pv = settings.packPrev") && deact.includes('!pv.skin.startsWith("pack_")') &&
+      deact.includes("delete pv.applied.skin") &&
+      deact.indexOf("if (settings.skin === sid) {") < deact.indexOf("delete pv.applied.skin");
+
+    /* 書き出しは、記録のキーと同じ「MODを掛ける前のレーン」 */
+    const keyLine = game.split("\n").find(l => l.includes("const chartKeyOf ="));
+    exportOk = media.includes("notes:notes.map(n => [n.time, n.origLane ?? n.lane])") && !!keyLine && keyLine.includes("n.origLane ?? n.lane");
+
+    /* 検索結果に出る説明文（meta description）は、SNSカード（og:description）と同じ文面にする（trk132。別々に育つと方向がずれる） */
+    const html = read("index.html");
+    const metaDesc = (html.match(/<meta name="description" content="([^"]*)">/) || [])[1];
+    const ogDesc = (html.match(/<meta property="og:description" content="([^"]*)">/) || [])[1];
+    descOk = !!metaDesc && metaDesc === ogDesc;
+  } catch (error) {
+    console.error(`WARN  trk132 pack check setup failed: ${error.message}`);
+  }
+  if (!rebaseOk) fail("packRebase must lift only what the user changed while pack A was on into prev (and drop it from applied)");
+  else if (!wiringOk) fail("deactivatePack must fall back to the saved skin (not shadow) when a pack skin goes away, and activatePack must rebase before unloading");
+  else if (!exportOk) fail("chartToData must export the original lane (origLane), the same rule as the record key chartKeyOf");
+  else if (!descOk) fail("the meta description shown in search results must be the same wording as the og:description card");
+  else ok("packs: switching keeps the user's own choices and the skin to come back to, the chart export follows the record key, and the search/social description is one text (trk132)");
+}
+
 // ⚔️ LoL Creator-Safe Sessions: complete SoundCloud album order/count and one official song URL per track.
 {
   const catalogSource = read("js/catalog.js");

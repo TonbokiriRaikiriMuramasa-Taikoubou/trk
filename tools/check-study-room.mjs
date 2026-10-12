@@ -155,13 +155,18 @@ assert.ok(reader.includes("studyJumpZoomEdge") && reader.includes("studyPrefs.zo
 assert.ok(reader.includes("studyApplyZoomLand") && reader.includes("await studyImageReady(img)") &&
   reader.includes("studyApplyZoom(false); studyApplyZoomLand();"),
   "the page turn waits for the image height and then opens at the continued edge");
-assert.ok(reader.includes("function studyCloseAtBookEdge") && reader.includes("studyCloseAtBookEdge();") &&
+assert.ok(reader.includes("function studyCloseToShelf") && reader.includes("studyCloseToShelf();") &&
   reader.includes("studyBackToShelf();"),
   "at the ends of the book the keys close instead of wrapping");
-assert.ok(reader.includes("studyPrefs.middleClickNext") && reader.includes("studyMiddleClick(event, true)") &&
+assert.ok(reader.includes("function studyMouseClickPage") && reader.includes("studyMouseClickPage(0)") && reader.includes("studyMouseClickPage(2)") &&
+  reader.includes('if (event.pointerType) studyLastPointerType = event.pointerType;') && reader.includes('pointerType !== "mouse"') &&
+  reader.includes("studyPrefs.mouseClickPages") && reader.includes("studyPrefs.mouseClickFlip") && reader.includes("if (event.button) return;"),
+  "the left / right click turns pages behind its own setting (with a swap), for mouse pointers only, without disturbing the tap zones");
+assert.ok(reader.includes("function studyMiddleClick") && reader.includes("studyMiddleClick(event, true)") &&
   reader.includes('addEventListener("mousedown", event => { studyMiddleClick(event, false); })') &&
-  reader.includes('addEventListener("auxclick"') && reader.includes("if (event.button) return;"),
-  "middle click can advance the page, behind its own setting, without disturbing the tap zones");
+  reader.includes('addEventListener("auxclick"') && reader.includes('const STUDY_MIDDLE_CLICK_ACTIONS = ["none", "next", "close"]') &&
+  reader.includes('studyPrefs.middleClickAction === "close"') && reader.includes("studyCloseToShelf();"),
+  "middle click is a select (nothing / next page / close to the shelf), without disturbing the tap zones");
 assert.ok(reader.includes("studyRunSearch") && reader.includes("studyHighlightMatchesInNode") && reader.includes("STUDY_SEARCH_MARK_MAX"), "in-book search exists and is capped");
 assert.ok(reader.includes("STUDY_UTIL.bookmarkedBooks") && reader.includes("studyBookmarkOpenAt") && reader.includes("studyToggleBookmarkPanel"), "the bookmark list exists");
 assert.ok(reader.includes("STUDY_TV_LOOKS") && reader.includes("STUDY_TV_RATIO") && reader.includes("studyCycleTV"), "TV looks / aspect / cycling exist");
@@ -371,7 +376,7 @@ globalThis.flat = { scrollHeight:600, clientHeight:600, scrollTop:0 };
 globalThis.elems = { studySingleWrap: () => single, studySpreadWrap: () => ({ querySelectorAll: () => spread }) };
 globalThis.window = { Trk: { core: { $: id => elems[id]() } } };
 globalThis.closeCalls = 0;
-globalThis.studyCloseAtBookEdge = () => { closeCalls++; };
+globalThis.studyCloseToShelf = () => { closeCalls++; };
 globalThis.jumpEdge = studyJumpZoomEdge;
 globalThis.applyLand = studyApplyZoomLand;
 `, edgeContext);
@@ -431,8 +436,8 @@ assert.equal(edge("jumpEdge", 1), false, "text books keep their own key handling
 vm.runInContext("studyCurrentBook = { kind:\"image\", pages:[{ key:\"a\" }] }; single.scrollTop = 0; elems.studySingleWrap = () => flat;", edgeContext);
 assert.equal(edge("jumpEdge", 1), false, "an image that fits the screen has no edge to jump to");
 /* ---------- 本の端の「閉じる動作」（全画面を終了して本棚へ） ---------- */
-const closeEdgeFn = readerWithCore.match(/function studyCloseAtBookEdge\(\) \{[\s\S]*?\n\}/);
-assert.ok(closeEdgeFn, "the close-at-the-book-edge action is defined");
+const closeEdgeFn = readerWithCore.match(/function studyCloseToShelf\(\) \{[\s\S]*?\n\}/);
+assert.ok(closeEdgeFn, "the close-to-the-shelf action is defined");
 const closeContext = vm.createContext({});
 vm.runInContext(`${closeEdgeFn[0]}
 globalThis.studyFullscreenFallback = true;
@@ -444,7 +449,7 @@ globalThis.window = { Trk: { core: { $: () => room } } };
 globalThis.studySyncCurrentBookControls = () => { state.sync++; };
 globalThis.studySyncFindRow = () => { state.sync++; };
 globalThis.studyBackToShelf = () => { state.back++; return true; };
-globalThis.exitAtBookEdge = studyCloseAtBookEdge;
+globalThis.exitAtBookEdge = studyCloseToShelf;
 `, closeContext);
 const closeState = () => ({ ...vm.runInContext("state", closeContext), fallback:vm.runInContext("studyFullscreenFallback", closeContext) });
 vm.runInContext("exitAtBookEdge();", closeContext);
@@ -467,14 +472,94 @@ vm.runInContext("exitAtBookEdge();", closeContext);
 assert.deepEqual(closeState(), { fullimage:false, fallback:false, exit:0, back:1, sync:0 },
   "outside image full screen it only returns to the shelf");
 
+/* ---------- PCの簡易操作（左右クリック）と中クリックの選択 ---------- */
+const mouseFn = readerWithCore.match(/function studyMouseClickPage\(button\) \{[\s\S]*?\n\}/);
+assert.ok(mouseFn, "the mouse-click page turn is defined");
+const clickContext = vm.createContext({});
+vm.runInContext(`${mouseFn[0]}
+globalThis.studyLastPointerType = "";
+globalThis.studyPrefs = { mouseClickPages:true, mouseClickFlip:false, middleClickAction:"none", imageMode:"single" };
+globalThis.studyRoomOpen = true;
+globalThis.studyCurrentBook = { kind:"image", pages:[{ key:"a" }, { key:"b" }] };
+globalThis.steps = [];
+globalThis.studyStep = direction => { steps.push(direction); };
+globalThis.mouseClick = studyMouseClickPage;
+`, clickContext);
+/* pointerdown で覚えた種類を1回だけ使う（同じ種類のまま2回目は効かない＝合成 click を拾わない） */
+const clickRun = (button, pointerType) => Array.from(vm.runInContext(
+  `studyLastPointerType = ${JSON.stringify(pointerType)}; [studyMouseClickPage(${button}), studyMouseClickPage(${button})]`, clickContext));
+const clickSteps = () => Array.from(vm.runInContext("steps", clickContext));
+assert.deepEqual(clickRun(0, "mouse"), [true, false], "a mouse left click turns the page once, and the pointer type is consumed");
+assert.deepEqual(clickSteps(), [1], "the left click goes to the next page");
+assert.deepEqual(clickRun(2, "mouse"), [true, false], "a mouse right click turns the page back");
+assert.deepEqual(clickSteps(), [1, -1], "the right click goes to the previous page");
+assert.deepEqual(clickRun(0, "touch"), [false, false], "a touch tap keeps the tap zones");
+assert.deepEqual(clickRun(0, "pen"), [false, false], "a pen tap keeps the tap zones");
+assert.deepEqual(clickSteps(), [1, -1], "taps never use the mouse buttons");
+vm.runInContext("steps.length = 0; studyPrefs.mouseClickFlip = true;", clickContext);
+assert.deepEqual(clickRun(0, "mouse"), [true, false], "the swap keeps working");
+assert.deepEqual(clickSteps(), [-1], "with the swap on, the left click goes back");
+assert.deepEqual(clickRun(2, "mouse"), [true, false], "the swap applies to the right click too");
+assert.deepEqual(clickSteps(), [-1, 1], "with the swap on, the right click goes forward");
+vm.runInContext("steps.length = 0; studyPrefs.mouseClickFlip = false; studyPrefs.mouseClickPages = false;", clickContext);
+assert.deepEqual(clickRun(0, "mouse"), [false, false], "without the setting the mouse buttons do nothing");
+vm.runInContext("studyPrefs.mouseClickPages = true; studyPrefs.imageMode = \"vertical\";", clickContext);
+assert.deepEqual(clickRun(0, "mouse"), [false, false], "vertical comic mode keeps the stage's own scrolling");
+vm.runInContext("studyPrefs.imageMode = \"spread\"; studyCurrentBook = { kind:\"text\", pages:[] };", clickContext);
+assert.deepEqual(clickRun(0, "mouse"), [false, false], "text books keep their own click handling");
+vm.runInContext("studyCurrentBook = { kind:\"image\", pages:[] }; studyRoomOpen = false;", clickContext);
+assert.deepEqual(clickRun(0, "mouse"), [false, false], "outside the room the mouse buttons do nothing");
+assert.deepEqual(clickSteps(), [], "no page was turned in any of those cases");
+/* 中クリックの3択 */
+const middleFn = readerWithCore.match(/function studyMiddleClick\(event, act\) \{[\s\S]*?\n\}/);
+assert.ok(middleFn, "the middle-click action is defined");
+const middleContext = vm.createContext({});
+vm.runInContext(`${middleFn[0]}
+globalThis.studyPrefs = { middleClickAction:"next" };
+globalThis.studyRoomOpen = true;
+globalThis.studyCurrentBook = { kind:"image", pages:[] };
+globalThis.steps = 0; globalThis.closes = 0; globalThis.prevented = 0;
+globalThis.studyStep = direction => { steps += direction; };
+globalThis.studyCloseToShelf = () => { closes++; };
+globalThis.middle = (button, act) => studyMiddleClick({ button, preventDefault:() => { prevented++; } }, act);
+`, middleContext);
+const middleRun = (button, act) => vm.runInContext(`middle(${button}, ${act})`, middleContext);
+assert.equal(middleRun(1, false), true, "the middle button is recognized on mousedown");
+assert.equal(vm.runInContext("prevented", middleContext), 1, "the browser's auto-scroll is suppressed");
+assert.equal(vm.runInContext("steps", middleContext), 0, "mousedown only stops the auto-scroll");
+assert.equal(middleRun(1, true), true, "the middle click runs its action");
+assert.equal(vm.runInContext("steps", middleContext), 1, "the next-page choice turns the page");
+assert.equal(middleRun(1, true), true, "the action can repeat");
+assert.equal(vm.runInContext("steps", middleContext), 2, "every middle click turns one page");
+vm.runInContext("studyPrefs.middleClickAction = \"close\";", middleContext);
+assert.equal(middleRun(1, true), true, "the close choice is handled");
+assert.equal(vm.runInContext("closes", middleContext), 1, "the close choice returns to the shelf");
+assert.equal(vm.runInContext("steps", middleContext), 2, "the close choice does not also turn the page");
+vm.runInContext("studyPrefs.middleClickAction = \"none\";", middleContext);
+assert.equal(middleRun(1, true), false, "the default choice does nothing");
+assert.equal(middleRun(0, true), false, "the left button is left to the tap zones");
+vm.runInContext("studyPrefs.middleClickAction = \"next\"; studyCurrentBook = { kind:\"text\", pages:[] };", middleContext);
+assert.equal(middleRun(1, true), false, "text books keep their own middle click");
+vm.runInContext("studyCurrentBook = { kind:\"image\", pages:[] }; studyRoomOpen = false;", middleContext);
+assert.equal(middleRun(1, true), false, "outside the room the middle click does nothing");
+
 const advancedMarkup = html.slice(html.indexOf('<details class="study-advanced study-shelf-advanced">'), html.indexOf('<p id="studyShelfDragHelp"'));
 assert.ok(/<input id="studyZoomEdgeKeys" type="checkbox" checked>/.test(advancedMarkup),
   "the PageDown / PageUp edge jump is on by default and can be switched off");
-assert.ok(/<input id="studyMiddleClickNext" type="checkbox">/.test(advancedMarkup),
-  "the middle-click option is off by default");
-assert.ok(reader.includes('studyBindPref("studyZoomEdgeKeys", "zoomEdgeKeys")') && reader.includes('studyBindPref("studyMiddleClickNext", "middleClickNext")') &&
-  reader.includes("studyPrefs.zoomEdgeKeys = raw.zoomEdgeKeys !== false") && reader.includes("studyPrefs.middleClickNext = raw.middleClickNext === true"),
-  "both options are stored and read back with their intended defaults");
+assert.ok(/<input id="studyMouseClickPages" type="checkbox">/.test(advancedMarkup) && /<input id="studyMouseClickFlip" type="checkbox">/.test(advancedMarkup),
+  "the PC click options start off");
+assert.ok(/<select id="studyMiddleClickAction"[^>]*>[\s\S]*?<option value="none"[\s\S]*?<option value="next"[\s\S]*?<option value="close"/.test(advancedMarkup),
+  "the middle click selects nothing / the next page / closing to the shelf");
+assert.ok(reader.includes('studyBindPref("studyZoomEdgeKeys", "zoomEdgeKeys")') && reader.includes('studyBindPref("studyMouseClickPages", "mouseClickPages"') &&
+  reader.includes('studyBindPref("studyMouseClickFlip", "mouseClickFlip")') && reader.includes('studyBindPref("studyMiddleClickAction", "middleClickAction")') &&
+  reader.includes("studyPrefs.zoomEdgeKeys = raw.zoomEdgeKeys !== false") && reader.includes("studyPrefs.mouseClickPages = raw.mouseClickPages === true") &&
+  reader.includes("studyPrefs.mouseClickFlip = raw.mouseClickFlip === true") && reader.includes("STUDY_MIDDLE_CLICK_ACTIONS.includes(raw.middleClickAction)") &&
+  reader.includes('raw.middleClickNext === true ? "next" : "none"'),
+  "the options are stored and read back with their intended defaults (the old middle-click choice is carried over)");
+const clickUiFn = reader.match(/function studyRefreshPrefsUI\(\) \{[\s\S]*?\n\}/);
+assert.ok(reader.includes('$("studyMiddleClickAction").value = studyPrefs.middleClickAction') &&
+  clickUiFn && clickUiFn[0].includes('$("studyMouseClickFlip").disabled = !studyPrefs.mouseClickPages'),
+  "the swap option is only available while the click paging is on, and the middle click reads back its choice");
 
 assert.ok(reader.includes('studyBindPref("studyZoomPercentStep", "zoomPercentStep"'),
   "the zoom-step select is wired to the preference");
@@ -616,4 +701,4 @@ for (const file of ["player.js", "main.js", "media-player-mode.js", "catch.js", 
   assert.ok(!/_trk(MediaPlayer|SynthMode)Open/.test(core), "core.js has no old media／synth flag left");
 }
 
-console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring, ↑ / ↓ scrolling of a zoomed image (tap = one screen, hold = small steps, edges handed back to the page keys), percent zoom steps for the wheel / buttons / pinch (1 / 2 / 5 / 10 / 25 %, 5 % by default), PageDown / PageUp jumping to the bottom / top of a zoomed image and then turning the page at its edges (closing at the ends of the book), opt-in middle-click page turning`);
+console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring, ↑ / ↓ scrolling of a zoomed image (tap = one screen, hold = small steps, edges handed back to the page keys), percent zoom steps for the wheel / buttons / pinch (1 / 2 / 5 / 10 / 25 %, 5 % by default), PageDown / PageUp jumping to the bottom / top of a zoomed image and then turning the page at its edges (closing at the ends of the book), opt-in page turning by the mouse left / right click (with a swap for trackballs and left-handed use), middle click selectable between nothing / the next page / closing to the shelf`);

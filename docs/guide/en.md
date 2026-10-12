@@ -321,7 +321,7 @@ See what is playing on the song select screen. It reads **the sound after the ef
 
 ## Study Room
 
-Study Room is a local image and text viewer. Long-press the title at the top left of the song list (or focus it and press Enter / Space) to open it. Press Esc to close.
+Study Room is a local image and text viewer. Long-press the title at the top left of the song list (or focus it and press Enter / Space) to open it. You can also use the **📚 Study** button on the right of the heading, which stays visible even when “Show buttons instead of long-press” is off. Press Esc to close.
 
 Imported images, text, bookmarks, notes, and jacket assignments are saved **only in this browser** in IndexedDB `trk_study_room_v1`. Nothing is uploaded or sent over the network. Original files are not changed. `?safe=1` does not open Study Room and does not touch its storage.
 

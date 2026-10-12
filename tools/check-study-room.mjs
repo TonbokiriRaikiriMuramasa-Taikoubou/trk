@@ -172,9 +172,16 @@ assert.ok(reader.includes("STUDY_UTIL.bookmarkedBooks") && reader.includes("stud
 assert.ok(reader.includes("STUDY_TV_LOOKS") && reader.includes("STUDY_TV_RATIO") && reader.includes("studyCycleTV"), "TV looks / aspect / cycling exist");
 assert.ok(reader.includes("studyIsBlob(") && reader.includes('typeof URL.createObjectURL !== "function"'), "stored blobs and object URLs are handled defensively");
 assert.ok(reader.includes("studyTypingTarget") && reader.includes("studyActivateTarget"), "typing vs. activation targets are separated");
+assert.ok(reader.includes("function studyBindHoldPress(node, action)") && reader.includes("const STUDY_HOLD_MS = 650, STUDY_HOLD_MOVE_MAX = 14") &&
+  reader.includes("const studyLaunchPress = studyLaunchTitle ? studyBindHoldPress(studyLaunchTitle, studyOpenRoom) : null") &&
+  reader.includes("const studyShelfHold = studyBindHoldPress(studyShelfTitle, studyCreateFolder)") &&
+  reader.includes("studyShelfHold.cancel()") && reader.includes('event.pointerType === "mouse"'),
+  "the two long presses (opening Study / making a folder) share one helper that survives a browser-side pointercancel");
+assert.ok(reader.includes('$("studyOpenBtn")') === false && reader.includes('getElementById("studyOpenBtn")'),
+  "the Study button at the right of the song list is wired");
 assert.ok(reader.includes("studySyncWelcome") && reader.includes("STUDY_SHELF_PAGE = 60"), "the shelf hides the welcome panel when it has books and pages the list");
 assert.ok(reader.includes("studyNormalizeShelfMeta") && reader.includes('store.put(value, "shelf")'), "folder assignments and manual order persist separately without a DB version migration");
-assert.ok(reader.includes("function studyCreateFolder") && reader.includes("studyShelfTitle.addEventListener(\"pointerdown\""), "the bookshelf title supports long-press folder creation");
+assert.ok(reader.includes("function studyCreateFolder") && reader.includes("studyBindHoldPress(studyShelfTitle, studyCreateFolder)"), "the bookshelf title supports long-press folder creation");
 assert.ok(reader.includes("studyShelfDragOver") && reader.includes("studyShelfMoveItem") && reader.includes("studyBindShelfDropTarget"), "shelf items can be dragged to folders and manually reordered");
 assert.ok(reader.includes('handle.addEventListener("pointerdown"') && reader.includes("studyHighlightShelfTarget"), "shelf dragging also supports touch and pen pointers");
 assert.ok(reader.includes("studyPrefs.manualShelfOrder") && reader.includes("studyPrefs.foldersFirst") && reader.includes("studyPrefs.skipDeleteConfirm"), "the three advanced shelf checkboxes are wired");
@@ -472,6 +479,56 @@ vm.runInContext("exitAtBookEdge();", closeContext);
 assert.deepEqual(closeState(), { fullimage:false, fallback:false, exit:0, back:1, sync:0 },
   "outside image full screen it only returns to the shelf");
 
+/* ---------- 長押しの共通ヘルパー（trk125） ---------- */
+const holdFn = readerWithCore.match(/function studyBindHoldPress\(node, action\) \{[\s\S]*?\n\}/);
+assert.ok(holdFn, "the shared long-press helper is defined");
+const holdConsts = readerWithCore.match(/const STUDY_HOLD_MS = (\d+), STUDY_HOLD_MOVE_MAX = (\d+);/);
+assert.ok(holdConsts, "the long-press timing constants are defined");
+const holdContext = vm.createContext({});
+vm.runInContext(`${holdFn[0]}
+globalThis.STUDY_HOLD_MS = ${holdConsts[1]}; globalThis.STUDY_HOLD_MOVE_MAX = ${holdConsts[2]};
+globalThis.now = 0;
+globalThis.timers = new Map(); globalThis.seq = 1;
+globalThis.setTimeout = (fn, ms) => { const id = seq++; timers.set(id, { fn, at:now + ms }); return id; };
+globalThis.clearTimeout = id => { timers.delete(id); };
+globalThis.tick = ms => { now += ms; for (const [id, t] of [...timers]) { if (t.at <= now) { timers.delete(id); t.fn(); } } };
+globalThis.Date = { now:() => now };
+globalThis.calls = 0;
+globalThis.events = new Map();
+globalThis.node = { addEventListener:(type, fn) => events.set(type, fn) };
+globalThis.hold = studyBindHoldPress(node, () => { calls++; });
+globalThis.fire = (type, event) => { const fn = events.get(type); if (fn) fn(event); };
+globalThis.press = (x = 100, y = 50) => { fire("pointerdown", { button:0, pointerType:"mouse", clientX:x, clientY:y }); };
+`, holdContext);
+const holds = () => vm.runInContext("calls", holdContext);
+const holdRun = code => vm.runInContext(`calls = 0; hold.cancel(); ${code}`, holdContext);
+holdRun("press(); tick(650);");
+assert.equal(holds(), 1, "holding for 650ms fires once");
+assert.equal(vm.runInContext("hold.fired()", holdContext), true, "the click that follows a long press can be swallowed");
+holdRun("hold.reset(); press(); tick(640); fire(\"pointerup\", {}); tick(2000);");
+assert.equal(holds(), 0, "a press shorter than 650ms does not fire, even after the release");
+holdRun("press(); fire(\"pointermove\", { pointerType:\"touch\", clientX:140, clientY:50 }); tick(2000); fire(\"pointerup\", {});");
+assert.equal(holds(), 0, "dragging (the pointer moved) cancels the press");
+holdRun("press(); fire(\"pointercancel\", { pointerType:\"touch\", clientX:400, clientY:50 }); tick(2000);");
+assert.equal(holds(), 0, "a pointercancel that reports a moved pointer cancels the press");
+holdRun("press(); tick(300); fire(\"pointerleave\", { pointerType:\"mouse\" }); tick(2000); fire(\"pointerup\", {});");
+assert.equal(holds(), 0, "a mouse leaving the button cancels the press");
+holdRun("press(); fire(\"pointerleave\", { pointerType:\"touch\" }); tick(650);");
+assert.equal(holds(), 1, "a touch pointerleave does not cancel the press");
+holdRun("fire(\"pointerdown\", { button:2, pointerType:\"mouse\", clientX:100, clientY:50 }); tick(2000);");
+assert.equal(holds(), 0, "the right button does not start a long press");
+/* 状態を持ち越す検査（case をまたいで hold.cancel() しない） */
+vm.runInContext('calls = 0; hold.cancel(); press(); fire("pointercancel", { pointerType:"touch", clientX:100, clientY:50 }); tick(650);', holdContext);
+assert.equal(holds(), 1, "a browser-side pointercancel of a still pointer does not stop the long press");
+vm.runInContext('fire("pointerup", {}); tick(2000);', holdContext);
+assert.equal(holds(), 1, "the release after a cancelled press does not fire a second time");
+vm.runInContext('calls = 0; hold.cancel(); press(); timers.clear(); tick(700);', holdContext);
+assert.equal(holds(), 0, "a lost timer does not fire by itself");
+vm.runInContext('fire("pointerup", {});', holdContext);
+assert.equal(holds(), 1, "releasing after 650ms fires even if the timer was lost");
+vm.runInContext('calls = 0; hold.cancel(); press(); tick(650); tick(1200);', holdContext);
+assert.equal(vm.runInContext("hold.fired()", holdContext), false, "the swallow flag clears itself after the click");
+
 /* ---------- PCの簡易操作（左右クリック）と中クリックの選択 ---------- */
 const mouseFn = readerWithCore.match(/function studyMouseClickPage\(button\) \{[\s\S]*?\n\}/);
 assert.ok(mouseFn, "the mouse-click page turn is defined");
@@ -651,6 +708,9 @@ assert.ok(!/createMediaElementSource/.test(reader), "Study never re-routes the a
 const css = read("css/study-room.css");
 assert.ok(css.includes("background-color:var(--study-theme-page)") && css.includes("color:var(--study-theme-ink)") &&
   css.includes("font-family:var(--study-theme-font)"), "reader colors, backgrounds, and fonts use the active theme");
+assert.ok(/#libPanel \.libHeadRight #studyOpenBtn\{[^}]*border:1px solid var\(--ui-accent\)/.test(css) &&
+  /#libPanel \.libHeadRight #studyOpenBtn\{[^}]*padding:/.test(css),
+  "the Study button at the right of the song list keeps its own accent styling so it stands out");
 assert.ok(css.includes("background-color:var(--study-theme-editor)") && css.includes("color:var(--study-theme-editor-ink)") &&
   css.includes("font-family:var(--study-theme-editor-font)") && css.includes("font-size:calc(15px * var(--study-text-size))"),
   "the editing textarea also uses the active theme palette, font, and text sizing");
@@ -701,4 +761,4 @@ for (const file of ["player.js", "main.js", "media-player-mode.js", "catch.js", 
   assert.ok(!/_trk(MediaPlayer|SynthMode)Open/.test(core), "core.js has no old media／synth flag left");
 }
 
-console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring, ↑ / ↓ scrolling of a zoomed image (tap = one screen, hold = small steps, edges handed back to the page keys), percent zoom steps for the wheel / buttons / pinch (1 / 2 / 5 / 10 / 25 %, 5 % by default), PageDown / PageUp jumping to the bottom / top of a zoomed image and then turning the page at its edges (closing at the ends of the book), opt-in page turning by the mouse left / right click (with a swap for trackballs and left-handed use), middle click selectable between nothing / the next page / closing to the shelf`);
+console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring, ↑ / ↓ scrolling of a zoomed image (tap = one screen, hold = small steps, edges handed back to the page keys), percent zoom steps for the wheel / buttons / pinch (1 / 2 / 5 / 10 / 25 %, 5 % by default), PageDown / PageUp jumping to the bottom / top of a zoomed image and then turning the page at its edges (closing at the ends of the book), one long-press helper shared by the Study launch and the shelf folder (surviving a browser pointercancel), an always-visible 📚 Study button at the right of the song list, opt-in page turning by the mouse left / right click (with a swap for trackballs and left-handed use), middle click selectable between nothing / the next page / closing to the shelf`);

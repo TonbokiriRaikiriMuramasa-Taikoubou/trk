@@ -9,7 +9,7 @@
 
 /* 文言はこの機能内で4言語そろえる（tools/check-study-room.mjs が4言語の抜けを検査します）。 */
 Object.assign(TEXT.ja, {
-  studyTitle:"📚 書斎", studyOpenBtn:"📚 書斎を開く", studyLaunchHint:"♫を長押しして書斎を開く（キーボードではEnter）",
+  studyTitle:"📚 書斎", studyOpenBtn:"📚 書斎", studyOpenBtnHint:"書斎（本棚・テレビ・画像リーダー）を開きます。曲リストの見出しを長押ししても開けます", studyLaunchHint:"♫を長押しして書斎を開く（キーボードではEnter）",
   studyClose:"✕ 書斎を閉じる", studyImportImages:"🖼 画像フォルダを取り込む",
   studyImportTextFiles:"＋ テキストを追加", studyImportTextFolder:"📄 テキストフォルダを取り込む",
   studyShelf:"本棚", studySearch:"タイトル・フォルダを検索…", studyShelfEmpty:"本棚は空です。画像フォルダか TXT / MD / JSON を取り込んでください。",
@@ -131,7 +131,7 @@ Object.assign(TEXT.ja, {
   studyImageOrderReverse:"逆順（右綴じ向け）", studyOrphanSweep:"未使用の画像データを整理しました（{n}件）。"
 });
 Object.assign(TEXT.en, {
-  studyTitle:"📚 Study", studyOpenBtn:"📚 Open Study", studyLaunchHint:"Hold ♫ Songs to open Study (press Enter when focused)",
+  studyTitle:"📚 Study", studyOpenBtn:"📚 Study", studyOpenBtnHint:"Open Study (shelf, TV and the image reader). You can also hold the Songs heading", studyLaunchHint:"Hold ♫ Songs to open Study (press Enter when focused)",
   studyClose:"✕ Close Study", studyImportImages:"🖼 Import image folder", studyImportTextFiles:"＋ Add text files",
   studyImportTextFolder:"📄 Import text folder", studyShelf:"Bookshelf", studySearch:"Search titles and folders…",
   studyShelfEmpty:"Your shelf is empty. Import an image folder or TXT / MD / JSON files.",
@@ -250,7 +250,7 @@ Object.assign(TEXT.en, {
   studyImageOrderReverse:"Reversed (right-binding)", studyOrphanSweep:"Cleaned up {n} unused image(s)."
 });
 Object.assign(TEXT.zh, {
-  studyTitle:"📚 书斋", studyOpenBtn:"📚 打开书斋", studyLaunchHint:"长按♫歌曲列表打开书斋（键盘聚焦后按 Enter）",
+  studyTitle:"📚 书斋", studyOpenBtn:"📚 书斋", studyOpenBtnHint:"打开书斋（书架、电视和图片阅读器）。长按歌曲列表标题也可以打开", studyLaunchHint:"长按♫歌曲列表打开书斋（键盘聚焦后按 Enter）",
   studyClose:"✕ 关闭书斋", studyImportImages:"🖼 导入图片文件夹", studyImportTextFiles:"＋ 添加文本文件",
   studyImportTextFolder:"📄 导入文本文件夹", studyShelf:"书架", studySearch:"搜索标题或文件夹…",
   studyShelfEmpty:"书架为空。请导入图片文件夹或 TXT / MD / JSON。",
@@ -359,7 +359,7 @@ Object.assign(TEXT.zh, {
   studyImageOrderReverse:"倒序（右开本）", studyOrphanSweep:"已整理 {n} 个未使用的图片数据。"
 });
 Object.assign(TEXT.ko, {
-  studyTitle:"📚 서재", studyOpenBtn:"📚 서재 열기", studyLaunchHint:"♫ 곡 목록을 길게 눌러 서재 열기 (키보드에서는 Enter)",
+  studyTitle:"📚 서재", studyOpenBtn:"📚 서재", studyOpenBtnHint:"서재(책장, TV, 이미지 리더)를 엽니다. 곡 목록 제목을 길게 눌러도 열립니다", studyLaunchHint:"♫ 곡 목록을 길게 눌러 서재 열기 (키보드에서는 Enter)",
   studyClose:"✕ 서재 닫기", studyImportImages:"🖼 이미지 폴더 가져오기", studyImportTextFiles:"＋ 텍스트 파일 추가",
   studyImportTextFolder:"📄 텍스트 폴더 가져오기", studyShelf:"책장", studySearch:"제목·폴더 검색…",
   studyShelfEmpty:"책장이 비어 있습니다. 이미지 폴더 또는 TXT / MD / JSON을 가져오세요.",
@@ -528,11 +528,11 @@ let studyZoomLand = "";   /* ページを移ったあとに開く位置（top／
 let studyMemoSaveTimer = 0, studyProgressTimer = 0, studyRenderToken = 0, studyImageLoadSeq = 0;
 let studyRoomOpen = false, studyClosePending = false, studyTVToken = 0, studyTVArtUrl = "", studyTVArtSong = "";
 let studyHoldTimer = 0, studyHeldCode = "", studyHoldAction = "", studySuppressTapUntil = 0;
-let studyPointerStart = null, studyLaunchTimer = 0, studyLaunchFired = false, studyLaunchPointerAt = 0;
+let studyPointerStart = null;
 let studyVideoHomeParent = null, studyVideoHomeNext = null, studyVideoHomeStyle = null, studyFullscreenFallback = false;
 let studyShelfShown = STUDY_SHELF_PAGE, studyBookmarkMode = false, studySweepBusy = false, studySweepAt = 0;
 let studyShelfFolders = [], studyBookFolder = Object.create(null), studyShelfOrder = Object.create(null), studyShelfViewFolder = "";
-let studyShelfDragged = null, studyShelfHoldTimer = 0, studyShelfHoldFired = false, studyDataReady = false;
+let studyShelfDragged = null, studyDataReady = false;
 let studyKeyCaptureAction = "", studyExportDirectory = null;
 let studyPointers = new Map(), studyPinchStart = 0, studyPinchZoom = 1;
 let studyLastPointerType = "";   /* 直前の pointerdown の種類（mouse／touch／pen）。PCの簡易操作はマウスだけに効かせる */
@@ -2666,7 +2666,7 @@ async function studyCloseRoom() {
   }
   editor.readOnly = false;
   clearTimeout(studyHoldTimer); studyHoldTimer = 0; studyHeldCode = ""; studyPointerStart = null;
-  clearTimeout(studyShelfHoldTimer); studyShelfHoldTimer = 0; studyShelfHoldFired = false;
+  studyShelfHold.cancel();
   studyPointers.clear(); studyPinchStart = 0;
   if (!core.$("studyHelp").hidden) core.$("studyHelp").hidden = true;
   studyEndSearch();
@@ -2707,25 +2707,50 @@ function studyTranslateNodes() {
 studyTranslateNodes();
 core.$("studySearch").placeholder = tr("studySearch");
 core.$("studyFindInput").placeholder = tr("studyBookSearchPlaceholder");
+/* 長押し（指・マウス）をまとめて扱います。ブラウザが自前の長押しやスクロールで pointercancel を出しても、
+   ポインタが動いていなければ取り消しません（Androidなどで長押しが効かなくなるのを防ぐ）。押したまま650msで発火し、
+   離したときに長押しぶん経っていればそこでも発火します（タイマーが遅れても開くように）。 */
+const STUDY_HOLD_MS = 650, STUDY_HOLD_MOVE_MAX = 14;
+function studyBindHoldPress(node, action) {
+  let timer = 0, start = null, moved = false, fired = false;
+  const clear = () => { clearTimeout(timer); timer = 0; start = null; };
+  const fire = () => { clear(); fired = true; setTimeout(() => { fired = false; }, 1200); action(); };
+  node.addEventListener("pointerdown", event => {
+    if (event.button != null && event.button !== 0) return;
+    clearTimeout(timer); fired = false; moved = false;
+    start = { x:event.clientX, y:event.clientY, at:Date.now() };
+    timer = setTimeout(() => { timer = 0; if (!start || moved) return; fire(); }, STUDY_HOLD_MS);
+  });
+  node.addEventListener("pointermove", event => {
+    if (!start || moved) return;
+    if (Math.abs(event.clientX - start.x) > STUDY_HOLD_MOVE_MAX || Math.abs(event.clientY - start.y) > STUDY_HOLD_MOVE_MAX) {
+      moved = true; clear();
+    }
+  });
+  /* ブラウザ都合の取り消し（pointercancel）は、動いたときだけ受け入れます。 */
+  node.addEventListener("pointercancel", event => {
+    if (!start) return;
+    const farX = Math.abs((event.clientX || start.x) - start.x), farY = Math.abs((event.clientY || start.y) - start.y);
+    if (moved || farX > STUDY_HOLD_MOVE_MAX || farY > STUDY_HOLD_MOVE_MAX) { moved = true; clear(); }
+  });
+  node.addEventListener("pointerleave", event => { if (start && event.pointerType === "mouse") { moved = true; clear(); } });
+  node.addEventListener("pointerup", () => {
+    if (!start) return;
+    const held = !moved && Date.now() - start.at >= STUDY_HOLD_MS;
+    if (held) fire(); else clear();
+  });
+  node.addEventListener("contextmenu", event => event.preventDefault());
+  return { fired:() => fired, reset:() => { fired = false; }, cancel:() => { clear(); fired = false; } };
+}
 const studyShelfTitle = core.$("studyShelfCreateFolder");
 function studySyncShelfTitleHint() {
   studyShelfTitle.title = tr("studyFolderCreateHint");
   studyShelfTitle.setAttribute("aria-label", `${tr("studyShelf")}. ${tr("studyFolderCreateHint")}`);
 }
 studySyncShelfTitleHint();
-studyShelfTitle.addEventListener("pointerdown", event => {
-  if (event.button != null && event.button !== 0) return;
-  clearTimeout(studyShelfHoldTimer); studyShelfHoldFired = false;
-  studyShelfHoldTimer = setTimeout(() => {
-    studyShelfHoldTimer = 0; studyShelfHoldFired = true; studyCreateFolder();
-    setTimeout(() => { studyShelfHoldFired = false; }, 1200);
-  }, 650);
-});
-const releaseShelfTitle = () => { clearTimeout(studyShelfHoldTimer); studyShelfHoldTimer = 0; };
-for (const type of ["pointerup", "pointercancel", "pointerleave"]) studyShelfTitle.addEventListener(type, releaseShelfTitle);
-studyShelfTitle.addEventListener("contextmenu", event => event.preventDefault());
+const studyShelfHold = studyBindHoldPress(studyShelfTitle, studyCreateFolder);
 studyShelfTitle.addEventListener("click", event => {
-  if (studyShelfHoldFired) { studyShelfHoldFired = false; event.preventDefault(); event.stopPropagation(); return; }
+  if (studyShelfHold.fired()) { studyShelfHold.reset(); event.preventDefault(); event.stopPropagation(); return; }
   studyCreateFolder();
 });
 core.$("studyShowShelfBtn").addEventListener("click", () => {
@@ -2887,40 +2912,31 @@ core.on("language", () => {
   }
 });
 
-/* 起動の長押し（曲リストの見出し） */
+/* 起動の長押し（曲リストの見出し。650ms） */
 const studyLaunchTitle = document.querySelector("#libPanel .libHead .study-launch-title");
+const studyLaunchPress = studyLaunchTitle ? studyBindHoldPress(studyLaunchTitle, studyOpenRoom) : null;
 if (studyLaunchTitle) {
-  /* 見出し(h3)の中の本物の <button>。role も tabindex も要らず、読み上げでは「ボタン」と分かります */
+  /* 見出し(h2)の中の本物の <button>。role も tabindex も要らず、読み上げでは「ボタン」と分かります */
   studyLaunchTitle.title = tr("studyLaunchHint"); studyLaunchTitle.setAttribute("aria-label", `${tr("libTitle")}. ${tr("studyLaunchHint")}`);
-  studyLaunchTitle.addEventListener("pointerdown", event => {
-    if (event.button != null && event.button !== 0) return;
-    studyLaunchPointerAt = Date.now();
-    clearTimeout(studyLaunchTimer); studyLaunchFired = false;
-    studyLaunchTimer = setTimeout(() => {
-      studyLaunchFired = true; studyOpenRoom();
-      setTimeout(() => { studyLaunchFired = false; }, 1200);
-    }, 650);
-  });
-  const releaseLaunch = () => { studyLaunchPointerAt = Date.now(); clearTimeout(studyLaunchTimer); studyLaunchTimer = 0; };
-  ["pointerup", "pointercancel", "pointerleave"].forEach(type => studyLaunchTitle.addEventListener(type, releaseLaunch));
-  studyLaunchTitle.addEventListener("contextmenu", event => event.preventDefault());
   studyLaunchTitle.addEventListener("click", event => {
-    if (studyLaunchFired) { studyLaunchFired = false; event.preventDefault(); event.stopPropagation(); return; }
-    /* 指やマウスのタップ（pointer が直前に動いた click）では開かず、キーボードや読み上げの click だけで開きます。 */
-    if (event.detail === 0 && Date.now() - studyLaunchPointerAt > 600) { event.preventDefault(); studyOpenRoom(); }
+    if (studyLaunchPress.fired()) { studyLaunchPress.reset(); event.preventDefault(); event.stopPropagation(); return; }
+    /* 指やマウスのタップでは開かず、キーボードや読み上げの click（detail 0）だけで開きます。 */
+    if (event.detail === 0) { event.preventDefault(); studyOpenRoom(); }
   });
   studyLaunchTitle.addEventListener("keydown", event => {
-    if (event.code === "Enter" || event.code === "Space") {
-      event.preventDefault(); studyLaunchFired = true; studyOpenRoom();
-      setTimeout(() => { studyLaunchFired = false; }, 900);
-    }
+    if (event.code === "Enter" || event.code === "Space") { event.preventDefault(); studyOpenRoom(); }
   });
 }
-/* 📚 書斎を開くボタン（見出しの長押しの代わり。タップで開く。設定 showMoreBtns で隠せる） */
+/* 📚 書斎を開くボタン（曲リストの右側。長押しに気づかなくても入れるように、設定に関係なく常に出します） */
 const studyOpenBtn = document.getElementById("studyOpenBtn");
-if (studyOpenBtn) { studyOpenBtn.textContent = tr("studyOpenBtn"); studyOpenBtn.addEventListener("click", () => studyOpenRoom()); }
+function studySyncOpenBtn() {
+  if (!studyOpenBtn) return;
+  studyOpenBtn.textContent = tr("studyOpenBtn");
+  studyOpenBtn.title = tr("studyOpenBtnHint");
+}
+if (studyOpenBtn) { studySyncOpenBtn(); studyOpenBtn.addEventListener("click", () => studyOpenRoom()); }
 core.on("language", () => {
-  if (studyOpenBtn) studyOpenBtn.textContent = tr("studyOpenBtn");
+  studySyncOpenBtn();
   if (!studyLaunchTitle) return;
   studyLaunchTitle.title = tr("studyLaunchHint");
   studyLaunchTitle.setAttribute("aria-label", `${tr("libTitle")}. ${tr("studyLaunchHint")}`);

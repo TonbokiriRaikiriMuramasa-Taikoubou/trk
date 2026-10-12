@@ -149,6 +149,13 @@ assert.ok(reader.includes("STUDY_ZOOM_MIN") && reader.includes("STUDY_ZOOM_MAX")
 assert.ok(reader.includes("studyScrollZoomedImage") &&
   reader.includes('studyScrollZoomedImage(event.code === "ArrowDown" ? 1 : -1, event.repeat)'),
   "a zoomed image can also be scrolled with the up/down keys, like the wheel");
+assert.ok(reader.includes("studyJumpZoomEdge") && reader.includes("studyPrefs.zoomEdgeKeys &&") &&
+  reader.includes('studyJumpZoomEdge(event.code === "PageDown" ? 1 : -1)'),
+  "PageDown / PageUp can jump to the bottom / top of a zoomed image, behind their own setting");
+assert.ok(reader.includes("studyPrefs.middleClickNext") && reader.includes("studyMiddleClick(event, true)") &&
+  reader.includes('addEventListener("mousedown", event => { studyMiddleClick(event, false); })') &&
+  reader.includes('addEventListener("auxclick"') && reader.includes("if (event.button) return;"),
+  "middle click can advance the page, behind its own setting, without disturbing the tap zones");
 assert.ok(reader.includes("studyRunSearch") && reader.includes("studyHighlightMatchesInNode") && reader.includes("STUDY_SEARCH_MARK_MAX"), "in-book search exists and is capped");
 assert.ok(reader.includes("STUDY_UTIL.bookmarkedBooks") && reader.includes("studyBookmarkOpenAt") && reader.includes("studyToggleBookmarkPanel"), "the bookmark list exists");
 assert.ok(reader.includes("STUDY_TV_LOOKS") && reader.includes("STUDY_TV_RATIO") && reader.includes("studyCycleTV"), "TV looks / aspect / cycling exist");
@@ -336,6 +343,43 @@ for (let i = 0; i < 20; i++) zoomStep(1);
 assert.equal(zoomStepContext.studyPrefs.zoom, 4, "the 25 percent step stops at 400 percent");
 for (let i = 0; i < 30; i++) zoomStep(-1);
 assert.equal(zoomStepContext.studyPrefs.zoom, 0.5, "the 25 percent step stops at 50 percent");
+/* ---------- 拡大中の PageDown / PageUp（端へ・端の次は反対の端へ） ---------- */
+const jumpEdgeFn = readerWithCore.match(/function studyJumpZoomEdge\(direction\) \{[\s\S]*?\n\}/);
+assert.ok(jumpEdgeFn, "the PageDown / PageUp edge jump is defined");
+vm.runInContext(`${jumpEdgeFn[0]}\nglobalThis.jumpZoomEdge = studyJumpZoomEdge;`, scrollContext);
+scrollContext.studyPrefs.imageMode = "single"; scrollContext.studyPrefs.zoom = 2; scrollContext.studyCurrentBook = { kind:"image" };
+singleWrap.scrollTop = 0;
+assert.equal(scrollContext.jumpZoomEdge(1), true, "PageDown moves a zoomed image");
+assert.equal(singleWrap.scrollTop, 1800, "PageDown jumps to the bottom of the image");
+assert.equal(scrollContext.jumpZoomEdge(1), true, "PageDown at the bottom still moves");
+assert.equal(singleWrap.scrollTop, 0, "PageDown at the bottom wraps to the top");
+assert.equal(scrollContext.jumpZoomEdge(-1), true, "PageUp from the top still moves");
+assert.equal(singleWrap.scrollTop, 1800, "PageUp at the top wraps to the bottom");
+assert.equal(scrollContext.jumpZoomEdge(-1), true, "PageUp moves a zoomed image");
+assert.equal(singleWrap.scrollTop, 0, "PageUp jumps to the top of the image");
+scrollContext.studyPrefs.imageMode = "spread";
+spreadPages.forEach(node => { node.scrollTop = 0; });
+assert.equal(scrollContext.jumpZoomEdge(1), true, "a spread jumps too");
+assert.deepEqual(Array.from(spreadPages, node => node.scrollTop), [1800, 1800], "both spread pages jump to the bottom");
+scrollContext.studyPrefs.imageMode = "vertical";
+assert.equal(scrollContext.jumpZoomEdge(1), false, "vertical comic mode keeps the stage's own scrolling");
+scrollContext.studyPrefs.imageMode = "single"; scrollContext.studyPrefs.zoom = 1;
+assert.equal(scrollContext.jumpZoomEdge(1), false, "without zoom the keys keep changing pages");
+scrollContext.studyPrefs.zoom = 2; scrollContext.studyCurrentBook = { kind:"text" };
+assert.equal(scrollContext.jumpZoomEdge(1), false, "text books keep their own key handling");
+scrollContext.studyCurrentBook = { kind:"image" };
+const flatWrap = scrollNode(600, 600);
+scrollContext.window.Trk.core.$ = id => id === "studySingleWrap" ? flatWrap : { querySelectorAll: () => spreadPages };
+assert.equal(scrollContext.jumpZoomEdge(1), false, "an image that fits the screen has no edge to jump to");
+const advancedMarkup = html.slice(html.indexOf('<details class="study-advanced study-shelf-advanced">'), html.indexOf('<p id="studyShelfDragHelp"'));
+assert.ok(/<input id="studyZoomEdgeKeys" type="checkbox" checked>/.test(advancedMarkup),
+  "the PageDown / PageUp edge jump is on by default and can be switched off");
+assert.ok(/<input id="studyMiddleClickNext" type="checkbox">/.test(advancedMarkup),
+  "the middle-click option is off by default");
+assert.ok(reader.includes('studyBindPref("studyZoomEdgeKeys", "zoomEdgeKeys")') && reader.includes('studyBindPref("studyMiddleClickNext", "middleClickNext")') &&
+  reader.includes("studyPrefs.zoomEdgeKeys = raw.zoomEdgeKeys !== false") && reader.includes("studyPrefs.middleClickNext = raw.middleClickNext === true"),
+  "both options are stored and read back with their intended defaults");
+
 assert.ok(reader.includes('studyBindPref("studyZoomPercentStep", "zoomPercentStep"'),
   "the zoom-step select is wired to the preference");
 const prefsUiFn = reader.match(/function studyRefreshPrefsUI\(\) \{[\s\S]*?\n\}/);
@@ -476,4 +520,4 @@ for (const file of ["player.js", "main.js", "media-player-mode.js", "catch.js", 
   assert.ok(!/_trk(MediaPlayer|SynthMode)Open/.test(core), "core.js has no old media／synth flag left");
 }
 
-console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring, ↑ / ↓ scrolling of a zoomed image (tap = one screen, hold = small steps, edges handed back to the page keys), percent zoom steps for the wheel / buttons / pinch (1 / 2 / 5 / 10 / 25 %, 5 % by default)`);
+console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring, ↑ / ↓ scrolling of a zoomed image (tap = one screen, hold = small steps, edges handed back to the page keys), percent zoom steps for the wheel / buttons / pinch (1 / 2 / 5 / 10 / 25 %, 5 % by default), PageDown / PageUp jumping to the bottom / top of a zoomed image, opt-in middle-click page turning`);

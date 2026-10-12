@@ -1,6 +1,6 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移したtrk70〜trk117の履歴と、trk114〜118の検証記録です（trk119以降の検証は HANDOFF §6）。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
+> `docs/HANDOFF.md` から移したtrk70〜trk118の履歴と、trk114〜118の検証記録です（trk119以降の検証は HANDOFF §6）。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
 
 ## trk114〜118 の検証記録（trk118のマージ前に HANDOFF §6 から移動）
 
@@ -11,6 +11,10 @@
 - trk114のブラウザ確認（リポジトリ外の `@sparticuz/chromium`＋`puppeteer-core`、Chromium 153 headless）：`tools/smoke-browser.mjs --compare` は boot 0・未解決0・譜面10件一致・decode error 0・click error 0・mobile/safe-offline OK。`tools/smoke-game-end.mjs` PASS。加えて一時スクリプトで23項目（ガイドの鍵と英語表示、削除→再起動で戻らない→♻で復元、移したOSTが戻らない、3スキンのaxe、MIDIの `midiLoaded`／`midiTooDense`、ページエラー0）を確認。半透明カードのスキンはaxeが「判定不能」になるため、16スキンの数値はNodeの計算（`tests/skin-contrast.test.mjs`）で確認。
 
 ## 旧 HANDOFF §11「最近の変更」
+
+### trk118 の記録（2026-10-12。trk121のときに HANDOFF §7 から移動）
+
+- **trk118（2026-10-12）**：Creator-Safe Playlistの曲から、誰でも使いやすいリストを作った（新しい12リスト・539曲。全曲 links-verified＝「全曲がCreator-Safe対象（照合済み）」）。LoL（自動作成）：Pentakill 29曲・ログイン／イベント／スキンのテーマ 53曲・eスポーツのテーマ 17曲・2025〜26年のサウンドトラック 59曲。VALORANT：VALORANT Creator-Safe 39曲。新シリーズ「🛡️ Riot Games — LoL関連ゲーム」（🛒から取り込み）：Ruined King 60・The Mageseeker 57・Hextech Mayhem 30・Teamfight Tactics Vol.1／Vol.2 各68・2XKO 45・Wild Rift & Runeterra 14。各曲はプレイリストにあるSpotifyトラックIDへリンク（`tools/riot-games-creator-safe-playlist.json` に51〜977行目を記録、VALORANTのfixtureにIDを追加）。文言 `plGuideRiotLinksVerified` を4言語で追加。台帳・ガイド（ja／en）・NOTICE・`sw.js` cache名（`trk-v2026.10.12-trk118`）を更新。
 
 ### trk117 の記録（2026-10-12。trk120のときに HANDOFF §7 から移動）
 

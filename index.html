@@ -1372,6 +1372,16 @@
             </select>
           </div>
           <p id="studyZoomStepHint" class="study-advanced-hint" data-i18n="studyZoomStepHint">−／＋・Ctrl+ホイール・ピンチの1回ぶんです（初期値5%＝100%→200%が20回）。</p>
+          <label class="study-check-option">
+            <input id="studyZoomEdgeKeys" type="checkbox" checked>
+            <span data-i18n="studyZoomEdgeKeys">拡大中は PageDown / PageUp で画像の下端／上端へ</span>
+          </label>
+          <p class="study-advanced-hint" data-i18n="studyZoomEdgeKeysHint">拡大していないときは、これまでどおり次のページ／前のページに動きます。端に着いていたら反対の端へ戻ります。</p>
+          <label class="study-check-option">
+            <input id="studyMiddleClickNext" type="checkbox">
+            <span data-i18n="studyMiddleClickNext">マウスの中クリックで次のページへ</span>
+          </label>
+          <p class="study-advanced-hint" data-i18n="studyMiddleClickNextHint">画像の本のときだけ働きます（ブラウザの自動スクロールは止めます）。</p>
           <div class="study-advanced-row">
             <span data-i18n="studyAlbumNestingLabel" id="studyAlbumNestingLabel">アルバムの分け方</span>
             <select id="studyAlbumNesting" aria-labelledby="studyAlbumNestingLabel">

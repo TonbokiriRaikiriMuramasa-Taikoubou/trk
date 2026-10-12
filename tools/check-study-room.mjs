@@ -155,6 +155,9 @@ assert.ok(reader.includes("studyJumpZoomEdge") && reader.includes("studyPrefs.zo
 assert.ok(reader.includes("studyApplyZoomLand") && reader.includes("await studyImageReady(img)") &&
   reader.includes("studyApplyZoom(false); studyApplyZoomLand();"),
   "the page turn waits for the image height and then opens at the continued edge");
+assert.ok(reader.includes("function studyCloseAtBookEdge") && reader.includes("studyCloseAtBookEdge();") &&
+  reader.includes("studyBackToShelf();"),
+  "at the ends of the book the keys close instead of wrapping");
 assert.ok(reader.includes("studyPrefs.middleClickNext") && reader.includes("studyMiddleClick(event, true)") &&
   reader.includes('addEventListener("mousedown", event => { studyMiddleClick(event, false); })') &&
   reader.includes('addEventListener("auxclick"') && reader.includes("if (event.button) return;"),
@@ -367,6 +370,8 @@ globalThis.spread = [{ scrollHeight:2400, clientHeight:600, scrollTop:0 }, { scr
 globalThis.flat = { scrollHeight:600, clientHeight:600, scrollTop:0 };
 globalThis.elems = { studySingleWrap: () => single, studySpreadWrap: () => ({ querySelectorAll: () => spread }) };
 globalThis.window = { Trk: { core: { $: id => elems[id]() } } };
+globalThis.closeCalls = 0;
+globalThis.studyCloseAtBookEdge = () => { closeCalls++; };
 globalThis.jumpEdge = studyJumpZoomEdge;
 globalThis.applyLand = studyApplyZoomLand;
 `, edgeContext);
@@ -391,14 +396,20 @@ assert.deepEqual(Array.from(edgeState().jumps), [1, 0], "PageUp at the top turns
 assert.equal(edgeState().land, "bottom", "the previous page opens at its bottom");
 edge("applyLand");
 assert.equal(edgeState().top, 1800, "the landing opens the previous page at the bottom");
-vm.runInContext("studyCurrentPage = 2; single.scrollTop = 1800; pageJumps.length = 0;", edgeContext);
-assert.equal(edge("jumpEdge", 1), true, "at the end of the book PageDown still moves");
+vm.runInContext("studyCurrentPage = 2; single.scrollTop = 1800; pageJumps.length = 0; closeCalls = 0;", edgeContext);
+assert.equal(edge("jumpEdge", 1), true, "at the end of the book PageDown is still handled");
 assert.deepEqual(Array.from(edgeState().jumps), [], "the last page does not turn");
-assert.equal(edgeState().top, 0, "at the end of the book PageDown comes back to the top");
+assert.equal(edgeState().top, 1800, "at the end of the book the image no longer wraps to the top");
 assert.equal(edgeState().land, "", "no landing is left over at the end of the book");
-vm.runInContext("studyCurrentPage = 0; single.scrollTop = 0;", edgeContext);
-assert.equal(edge("jumpEdge", -1), true, "at the first page PageUp still moves");
-assert.equal(edgeState().top, 1800, "at the first page PageUp comes back to the bottom");
+assert.equal(vm.runInContext("closeCalls", edgeContext), 1, "PageDown at the end of the book closes instead");
+vm.runInContext("studyCurrentPage = 0; single.scrollTop = 0; closeCalls = 0;", edgeContext);
+assert.equal(edge("jumpEdge", -1), true, "at the first page PageUp is still handled");
+assert.equal(edgeState().top, 0, "at the first page the image no longer wraps to the bottom");
+assert.equal(vm.runInContext("closeCalls", edgeContext), 1, "PageUp at the first page closes instead");
+vm.runInContext("single.scrollTop = 300; closeCalls = 0;", edgeContext);
+assert.equal(edge("jumpEdge", -1), true, "PageUp away from the top keeps working");
+assert.equal(edgeState().top, 0, "PageUp away from the top goes to the top");
+assert.equal(vm.runInContext("closeCalls", edgeContext), 0, "closing only happens at the ends of the book");
 vm.runInContext("studyCurrentPage = 0; single.scrollTop = 0; studyPrefs.imageMode = \"spread\"; pageJumps.length = 0;", edgeContext);
 assert.equal(edge("jumpEdge", 1), true, "a spread moves too");
 assert.deepEqual(Array.from(edgeState().spread), [1800, 1800], "both spread pages jump to the bottom");
@@ -419,6 +430,43 @@ vm.runInContext("studyPrefs.zoom = 2; studyCurrentBook = { kind:\"text\", pages:
 assert.equal(edge("jumpEdge", 1), false, "text books keep their own key handling");
 vm.runInContext("studyCurrentBook = { kind:\"image\", pages:[{ key:\"a\" }] }; single.scrollTop = 0; elems.studySingleWrap = () => flat;", edgeContext);
 assert.equal(edge("jumpEdge", 1), false, "an image that fits the screen has no edge to jump to");
+/* ---------- 本の端の「閉じる動作」（全画面を終了して本棚へ） ---------- */
+const closeEdgeFn = readerWithCore.match(/function studyCloseAtBookEdge\(\) \{[\s\S]*?\n\}/);
+assert.ok(closeEdgeFn, "the close-at-the-book-edge action is defined");
+const closeContext = vm.createContext({});
+vm.runInContext(`${closeEdgeFn[0]}
+globalThis.studyFullscreenFallback = true;
+globalThis.state = { fullimage:true, exit:0, back:0, sync:0 };
+globalThis.room = { classList:{ contains:name => state.fullimage && name === "study-fullimage",
+  remove:name => { if (name !== "study-fullimage") throw new Error("removed the wrong class: " + name); state.fullimage = false; } } };
+globalThis.document = { fullscreenElement:null, exitFullscreen:() => { state.exit++; return Promise.resolve(); } };
+globalThis.window = { Trk: { core: { $: () => room } } };
+globalThis.studySyncCurrentBookControls = () => { state.sync++; };
+globalThis.studySyncFindRow = () => { state.sync++; };
+globalThis.studyBackToShelf = () => { state.back++; return true; };
+globalThis.exitAtBookEdge = studyCloseAtBookEdge;
+`, closeContext);
+const closeState = () => ({ ...vm.runInContext("state", closeContext), fallback:vm.runInContext("studyFullscreenFallback", closeContext) });
+vm.runInContext("exitAtBookEdge();", closeContext);
+assert.deepEqual(closeState(), { fullimage:false, fallback:false, exit:0, back:1, sync:2 },
+  "in image full screen it leaves full screen, clears the fallback flag, fixes the controls, and returns to the shelf");
+vm.runInContext("state.fullimage = true; state.exit = 0; state.back = 0; state.sync = 0; document.fullscreenElement = window.Trk.core.$();", closeContext);
+vm.runInContext("exitAtBookEdge();", closeContext);
+assert.deepEqual(closeState(), { fullimage:false, fallback:false, exit:1, back:1, sync:2 },
+  "a real browser full screen is exited through the API");
+vm.runInContext("state.fullimage = true; state.exit = 0; state.back = 0; state.sync = 0; document.fullscreenElement = null;", closeContext);
+vm.runInContext("exitAtBookEdge();", closeContext);
+assert.deepEqual(closeState(), { fullimage:false, fallback:false, exit:0, back:1, sync:2 },
+  "a CSS-only image full screen does not call the browser full-screen API");
+vm.runInContext("state.fullimage = true; state.back = 0; state.sync = 0; document.fullscreenElement = { other:true };", closeContext);
+vm.runInContext("exitAtBookEdge();", closeContext);
+assert.deepEqual(closeState(), { fullimage:false, fallback:false, exit:0, back:1, sync:2 },
+  "another element's full screen is left alone");
+vm.runInContext("state.fullimage = false; state.back = 0; state.sync = 0;", closeContext);
+vm.runInContext("exitAtBookEdge();", closeContext);
+assert.deepEqual(closeState(), { fullimage:false, fallback:false, exit:0, back:1, sync:0 },
+  "outside image full screen it only returns to the shelf");
+
 const advancedMarkup = html.slice(html.indexOf('<details class="study-advanced study-shelf-advanced">'), html.indexOf('<p id="studyShelfDragHelp"'));
 assert.ok(/<input id="studyZoomEdgeKeys" type="checkbox" checked>/.test(advancedMarkup),
   "the PageDown / PageUp edge jump is on by default and can be switched off");
@@ -568,4 +616,4 @@ for (const file of ["player.js", "main.js", "media-player-mode.js", "catch.js", 
   assert.ok(!/_trk(MediaPlayer|SynthMode)Open/.test(core), "core.js has no old media／synth flag left");
 }
 
-console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring, ↑ / ↓ scrolling of a zoomed image (tap = one screen, hold = small steps, edges handed back to the page keys), percent zoom steps for the wheel / buttons / pinch (1 / 2 / 5 / 10 / 25 %, 5 % by default), PageDown / PageUp jumping to the bottom / top of a zoomed image and then turning the page at its edges, opt-in middle-click page turning`);
+console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring, ↑ / ↓ scrolling of a zoomed image (tap = one screen, hold = small steps, edges handed back to the page keys), percent zoom steps for the wheel / buttons / pinch (1 / 2 / 5 / 10 / 25 %, 5 % by default), PageDown / PageUp jumping to the bottom / top of a zoomed image and then turning the page at its edges (closing at the ends of the book), opt-in middle-click page turning`);

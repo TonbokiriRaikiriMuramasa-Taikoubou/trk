@@ -1,6 +1,6 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移したtrk70〜trk119の履歴と、trk114〜118の検証記録です（trk120以降の検証は HANDOFF §6）。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
+> `docs/HANDOFF.md` から移したtrk70〜trk120の履歴と、trk114〜118の検証記録です（trk121以降の検証は HANDOFF §6）。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
 
 ## trk114〜118 の検証記録（trk118のマージ前に HANDOFF §6 から移動）
 
@@ -11,6 +11,10 @@
 - trk114のブラウザ確認（リポジトリ外の `@sparticuz/chromium`＋`puppeteer-core`、Chromium 153 headless）：`tools/smoke-browser.mjs --compare` は boot 0・未解決0・譜面10件一致・decode error 0・click error 0・mobile/safe-offline OK。`tools/smoke-game-end.mjs` PASS。加えて一時スクリプトで23項目（ガイドの鍵と英語表示、削除→再起動で戻らない→♻で復元、移したOSTが戻らない、3スキンのaxe、MIDIの `midiLoaded`／`midiTooDense`、ページエラー0）を確認。半透明カードのスキンはaxeが「判定不能」になるため、16スキンの数値はNodeの計算（`tests/skin-contrast.test.mjs`）で確認。
 
 ## 旧 HANDOFF §11「最近の変更」
+
+### trk120 の記録（2026-10-12。trk123のときに HANDOFF §7 から移動）
+
+- **trk120（2026-10-12）**：書斎の**拡大の送り幅を％で選べるようにした**（−／＋ボタン・`Ctrl+ホイール`・ピンチで同じ幅を使う）。初期値は **5%**（100%→200%が20回）で、⚙上級者向けの「拡大の送り幅」から **1／2／5／10／25%** を選べる（1%＝細かく、25%＝大きく）。以前は決め打ちの倍率（100→125→150→200→300→400%）だったので、マウスホイールで1回に大きく飛んでいた。倍率の刻みに乗っていないピンチ直後の倍率からは、進む向きの次の目盛りへ動く。`studyZoomStepLabel`／`studyZoomStepOption`／`studyZoomStepHint` と `studyHelpZoom` を4言語で更新し、ガイド（ja／en）にも追記。`sw.js` cache名（`trk-v2026.10.12-trk120`）を更新。
 
 ### trk119 の記録（2026-10-12。trk122のときに HANDOFF §7 から移動）
 

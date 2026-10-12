@@ -1716,6 +1716,61 @@ if (!read("js/library.js").includes("plAuthorMenu") ||
   }
 }
 
+// ⏯ Song banner: the play / pause button sits left of the volume button (same size, trk126).
+// The action is a pure function, run here in a VM; the icon, the tip and the
+// "a newly chosen song plays again" wiring are checked as text.
+{
+  const library = read("js/library.js");
+  const css = read("css/style.css");
+  const i18n = read("js/i18n.js");
+  const clickAt = library.indexOf('bannerPlayBtn.addEventListener("click"');
+  const clickEnd = clickAt >= 0 ? library.indexOf("\n});", clickAt) : -1;
+  const clickBlock = clickEnd > clickAt ? library.slice(clickAt, clickEnd) : "";
+  const clickOk = clickBlock.includes("pauseGame()") && clickBlock.includes("resumeGame()") &&
+    clickBlock.includes("video.pause()") && clickBlock.includes("video.volume = settings.musicVolume * 0.8;") &&
+    clickBlock.includes("video.play().catch(() => {});");
+  const wiringOk = library.includes('el("button", "bannerPlayBtn", "▶")') &&
+    library.includes("bannerMediaBar.append(bannerPlayBtn, bannerVolBtn)") &&
+    library.includes('const showsPause = act === "pause" || act === "preview-pause";') &&
+    library.includes('bannerPlayBtn.textContent = showsPause ? "\u23f8" : "\u25b6"') &&
+    library.includes('bannerPlayBtn.setAttribute("aria-label", tip)') &&
+    library.includes("bannerPlayBtn.disabled = !act") &&
+    library.includes('video.addEventListener("play", bannerPlaySync)') &&
+    library.includes('video.addEventListener("pause", bannerPlaySync)') &&
+    library.includes('on("phase", bannerPlaySync)') && library.includes('on("language", bannerPlaySync)') &&
+    library.includes("function bannerPreviewRestart() {\n  if (bannerPlayAction(bannerPlayState()) !== \"preview-play\") return;\n  startPreview();\n}") &&
+    library.includes("bannerPreviewRestart(); return; }") && clickOk;
+  const cssOk = css.includes(".bannerMediaBar{position:absolute;right:10px;bottom:10px") &&
+    css.includes(".bannerVolBtn,.bannerPlayBtn{") && css.includes(".bannerPlayBtn:disabled{");
+  const padOk = Number((css.match(/\.bannerText\{[^}]*padding-right:(\d+)px/) || [])[1] || 0) >= 96;
+  const tipCount = key => (i18n.match(new RegExp(key + ":", "g")) || []).length;
+  const tipsOk = tipCount("bannerPlayPauseTip") === 4 && tipCount("bannerPlayResumeTip") === 4;
+  const start = library.indexOf("function bannerPlayAction(st) {");
+  const end = library.indexOf("\nfunction bannerPlayState");
+  const source = start >= 0 && end > start ? library.slice(start, end) : "";
+  const context = vm.createContext({});
+  let action = null;
+  if (source) {
+    new vm.Script(source + "\nglobalThis.__bannerPlayAction = bannerPlayAction;").runInContext(context);
+    action = context.__bannerPlayAction;
+  }
+  const st = extra => Object.assign({ mediaMode:false, phase:"title", hasSong:true, previewEnabled:true, previewPlaying:true }, extra);
+  const results = action ? [
+    action(st({ phase:"playing" })), action(st({ phase:"paused" })),
+    action(st({})), action(st({ previewPlaying:false })),
+    action(st({ previewEnabled:false })), action(st({ hasSong:false })),
+    action(st({ mediaMode:true, phase:"playing" })), action(st({ phase:"ended" })),
+  ] : [];
+  const expected = ["pause", "resume", "preview-pause", "preview-play", null, null, null, null];
+  const logicOk = JSON.stringify(results) === JSON.stringify(expected);
+  if (!wiringOk || !cssOk || !padOk || !tipsOk || !logicOk) {
+    fail("song-banner play/pause button (left of the volume button, same size) is missing or miswired" +
+      (logicOk ? "" : ` — actions were ${JSON.stringify(results)}, expected ${JSON.stringify(expected)}`));
+  } else {
+    ok("song-banner play/pause sits left of the volume button with the same size, pauses preview and game, and a newly chosen song plays again (four-language tip)");
+  }
+}
+
 // ◀🎲▶ Song banner: the song controls ([◀][🎲][▶]) sit together at the right edge
 // so the left ◀ no longer covers the song title. 🎲 is long-press by default
 // (mis-tap safety) with an on/off switch and a tap-only option for people who

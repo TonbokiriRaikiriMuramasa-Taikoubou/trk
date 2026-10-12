@@ -1,6 +1,6 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移したtrk70〜trk122の履歴と、trk114〜118の検証記録です（trk123以降の検証は HANDOFF §6）。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
+> `docs/HANDOFF.md` から移したtrk70〜trk123の履歴と、trk114〜118の検証記録です（trk124以降の検証は HANDOFF §6）。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
 
 ## trk114〜118 の検証記録（trk118のマージ前に HANDOFF §6 から移動）
 
@@ -11,6 +11,10 @@
 - trk114のブラウザ確認（リポジトリ外の `@sparticuz/chromium`＋`puppeteer-core`、Chromium 153 headless）：`tools/smoke-browser.mjs --compare` は boot 0・未解決0・譜面10件一致・decode error 0・click error 0・mobile/safe-offline OK。`tools/smoke-game-end.mjs` PASS。加えて一時スクリプトで23項目（ガイドの鍵と英語表示、削除→再起動で戻らない→♻で復元、移したOSTが戻らない、3スキンのaxe、MIDIの `midiLoaded`／`midiTooDense`、ページエラー0）を確認。半透明カードのスキンはaxeが「判定不能」になるため、16スキンの数値はNodeの計算（`tests/skin-contrast.test.mjs`）で確認。
 
 ## 旧 HANDOFF §11「最近の変更」
+
+### trk123 の記録（2026-10-12。trk126のときに HANDOFF §7 から移動）
+
+- **trk123（2026-10-12）**：書斎の**本の端での「閉じる動作」**を追加した。拡大中の `PageDown`／`PageUp` は、画像の端→端でさらに押すと次の／前のページを続きの端から開き（trk122）、**本の端（1ページ目の上端・最終ページの下端）では折り返さず、閉じる動作**＝画像の全画面を終了して本棚（書斎のメニュー）へ戻る。次の本を選びやすくするため。拡大していないときはこれまでどおりページ送り。⚙の説明文は「本の端では、閉じる動作を行います」と簡略化した（4言語）。`docs/guide/study-room.md`・`docs/guide/en.md` の画像の項、`sw.js` cache名（`trk-v2026.10.12-trk123`）を更新。
 
 ### trk122 の記録（2026-10-12。trk125のときに HANDOFF §7 から移動）
 

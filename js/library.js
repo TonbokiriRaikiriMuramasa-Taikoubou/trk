@@ -2776,7 +2776,14 @@ const bannerVolSlider = el("input", "bannerVolSlider"); bannerVolSlider.type = "
 bannerVolSlider.min = "0"; bannerVolSlider.max = "1"; bannerVolSlider.step = "0.01";
 const bannerVolPanel = el("div", "bannerVolPanel"); bannerVolPanel.hidden = true;
 bannerVolPanel.append(bannerVolSlider);
-core.$("songBanner").append(bannerVolPanel, bannerVolBtn);
+/* ⏯ 再生／一時停止（音量ボタンの左。同じ大きさのアイコンだけのボタン。trk126）
+   ・選曲中＝プレビューの音を止める／鳴らす（プレビューを切っているときは押せません）
+   ・プレイ中＝一時停止／再開（ゲームの一時停止と同じ）
+   ・曲名に触れて曲を選び直すと一時停止は解除され、新しい曲のプレビューが鳴ります */
+const bannerPlayBtn = el("button", "bannerPlayBtn", "▶"); bannerPlayBtn.type = "button";
+const bannerMediaBar = el("div", "bannerMediaBar");
+bannerMediaBar.append(bannerPlayBtn, bannerVolBtn);   /* 左＝再生／一時停止、右＝音量 */
+core.$("songBanner").append(bannerVolPanel, bannerMediaBar);
 let bannerVolRestore = core.settings.musicVolume > 0 ? bannerVolClamp(core.settings.musicVolume) : bannerVolClamp(core.settings.musicVolumeRestore || 0.7);
 let bannerVolPressTimer = 0, bannerVolLongPressed = false, bannerVolPointer = null;
 let bannerVolDownX = 0, bannerVolDownY = 0;
@@ -2843,6 +2850,52 @@ bannerVolBtn.addEventListener("click", e => {
   bannerVolPanel.hidden = !bannerVolPanel.hidden; bannerVolSync();
 });
 bannerVolSlider.addEventListener("input", () => setBannerMusicVolume(bannerVolSlider.value));
+/* ---------- ⏯ 再生／一時停止（trk126。音量ボタンの左のアイコンだけのボタン） ---------- */
+function bannerPlayAction(st) {   /* 純粋関数（検査で確認）→ null / "pause" / "resume" / "preview-pause" / "preview-play" */
+  if (st.mediaMode) return null;
+  if (st.phase === "playing") return "pause";
+  if (st.phase === "paused") return "resume";
+  if (st.phase !== "title" || !st.hasSong || !st.previewEnabled) return null;   /* 選曲中はプレビューの音を止める／鳴らす */
+  return st.previewPlaying ? "preview-pause" : "preview-play";
+}
+function bannerPlayState() {
+  return { mediaMode: !!window._trkMediaPlayerMode, phase: core.phase, hasSong: !!(core.currentSong && video.src),
+    previewEnabled: !!core.settings.previewEnabled, previewPlaying: !video.paused };
+}
+function bannerPlaySync() {   /* アイコンと説明を「押すとどうなるか」に合わせる */
+  const act = bannerPlayAction(bannerPlayState());
+  const showsPause = act === "pause" || act === "preview-pause";
+  bannerPlayBtn.textContent = showsPause ? "⏸" : "▶";
+  const tip = tr(showsPause ? "bannerPlayPauseTip" : "bannerPlayResumeTip");
+  if (bannerPlayBtn.title !== tip) { bannerPlayBtn.title = tip; bannerPlayBtn.setAttribute("aria-label", tip); }
+  bannerPlayBtn.disabled = !act;   /* 止める音がないとき（曲未選択・プレビューオフ）は押せない */
+}
+/* 曲を選び直したとき：一時停止を解除して鳴らし直す（「次の曲名に触れたら再生に戻る」） */
+function bannerPreviewRestart() {
+  if (bannerPlayAction(bannerPlayState()) !== "preview-play") return;
+  startPreview();
+}
+bannerPlaySync();
+bannerPlayBtn.addEventListener("click", () => {
+  const act = bannerPlayAction(bannerPlayState());
+  if (act === "pause") window.Trk.play.pauseGame();
+  else if (act === "resume") window.Trk.play.resumeGame();
+  else if (act === "preview-pause") { cancelAnimationFrame(fadeRaf); video.pause(); }
+  else if (act === "preview-play") {   /* 止めたところから鳴らし直します（プレビューの頭には戻しません） */
+    cancelAnimationFrame(fadeRaf);
+    video.volume = core.settings.musicVolume * 0.8;   /* プレビューのフェードイン後の音量 */
+    video.play().catch(() => {});
+  }
+  bannerPlaySync();
+});
+video.addEventListener("play", bannerPlaySync);
+video.addEventListener("pause", bannerPlaySync);
+video.addEventListener("ended", bannerPlaySync);
+on("phase", bannerPlaySync);
+on("screen", bannerPlaySync);
+on("songSelected", bannerPlaySync);
+on("language", bannerPlaySync);
+on("settings", bannerPlaySync);
 /* ◀🎲▶ バナーの右端にまとめて曲送り（TVドックの◀▶と同じ仕組み。いま開いているタブの中を送る）
    ・左端に置くと曲名の頭に重なるので、曲の操作は右端の [◀][🎲][▶] に集める
    ・🎲 は誤操作を防ぐため、既定では長押し（650ms）で変える。設定でタップだけにも、🎲 自体を隠すこともできる */
@@ -2991,9 +3044,11 @@ async function selectSong(it) {
     }
     if (core.phase !== "title" || selection !== songSelectToken) return;
   }
-  if (core.currentSong && core.currentSong.key === it.key) { if (core.videoReady) startPreview(); return; }
+  /* trk126：一時停止のままにしない。曲名に触れたら（同じ曲でも）解除して鳴らし直す */
+  if (core.currentSong && core.currentSong.key === it.key) { if (core.videoReady) bannerPreviewRestart(); return; }
   if (core.currentSong && core.currentSong !== it && core.currentSong.artBlob) delete core.currentSong.artBlob; // 選曲を離れた縮小画像は有界キャッシュだけに残す
   core.currentSong = it;
+  /* 新しい曲のプレビューは読み込み後の canplay で鳴り直します（前の曲の一時停止は持ち越しません） */
   stopPreview(); renderLib(); renderBanner(); updateSpBuilder();
   core.emit("songSelected", it);
   /* 🧩 アドオンが連れてきた曲：ファイル読み込みは、アドオンに任せる（自前のプレイヤーで鳴らす） */

@@ -399,6 +399,7 @@ Object.assign(TEXT.ja, {
   plNewFolder:"📁 新規フォルダ", plDefaultFolderName:"フォルダ", plFolderSettings:"フォルダの設定",
   plFolderOf:"入れ物", plFolderRoot:"（なし・並びのトップ）",
   plFolderDel:"🗑 このフォルダを削除（中身は消えません）",
+  plFolderLimit:"📁 フォルダは{n}個までです。使っていないフォルダを消すと作れます",
   plFolderCreated:"📁 フォルダ「{name}」を作成しました", plFolderDeleted:"🗑 フォルダを削除しました（中身は上の階層へ）",
   fldTabHint:"このフォルダは空です。プレイリストの長押し → 設定の「入れ物」で、このフォルダへ移動できます。",
   plTags:"タグ（検索用）", plTagsPh:"esports 名場面 …（スペース区切り・5個まで）",
@@ -449,6 +450,7 @@ Object.assign(TEXT.en, {
   plNewFolder:"📁 New folder", plDefaultFolderName:"Folder", plFolderSettings:"Folder settings",
   plFolderOf:"Location", plFolderRoot:"(none — top level)",
   plFolderDel:"🗑 Delete this folder (contents are kept)",
+  plFolderLimit:"📁 Up to {n} folders. Delete one you no longer use to make room",
   plFolderCreated:"📁 Folder “{name}” created", plFolderDeleted:"🗑 Folder deleted (contents moved up)",
   fldTabHint:"This folder is empty. Move playlists here from their long-press settings (“Location”).",
   plTags:"Tags (for search)", plTagsPh:"esports highlights … (space-separated, up to 5)",
@@ -499,6 +501,7 @@ Object.assign(TEXT.zh, {
   plNewFolder:"📁 新建文件夹", plDefaultFolderName:"文件夹", plFolderSettings:"文件夹设置",
   plFolderOf:"所属位置", plFolderRoot:"（无·顶层）",
   plFolderDel:"🗑 删除此文件夹（内容不会消失）",
+  plFolderLimit:"📁 最多 {n} 个文件夹。删除不用的文件夹后即可创建",
   plFolderCreated:"📁 已创建文件夹「{name}」", plFolderDeleted:"🗑 已删除文件夹（内容移到上一层）",
   fldTabHint:"此文件夹为空。在播放列表的长按设置「所属位置」中即可移入。",
   plTags:"标签（搜索用）", plTagsPh:"esports 名场面 …（空格分隔·最多5个）",
@@ -549,6 +552,7 @@ Object.assign(TEXT.ko, {
   plNewFolder:"📁 새 폴더", plDefaultFolderName:"폴더", plFolderSettings:"폴더 설정",
   plFolderOf:"소속", plFolderRoot:"(없음·최상위)",
   plFolderDel:"🗑 이 폴더 삭제(내용은 지워지지 않아요)",
+  plFolderLimit:"📁 폴더는 {n}개까지예요. 쓰지 않는 폴더를 지우면 만들 수 있어요",
   plFolderCreated:"📁 폴더 '{name}'을(를) 만들었어요", plFolderDeleted:"🗑 폴더를 삭제했어요(내용은 위 계층으로)",
   fldTabHint:"이 폴더는 비어 있어요. 재생목록 길게 누른 설정의 '소속'에서 이 폴더로 옮길 수 있어요.",
   plTags:"태그(검색용)", plTagsPh:"esports 명장면 …(공백 구분·최대 5개)",
@@ -937,6 +941,18 @@ function songDisplayTitle(it, meta = metaOf(it && it.key) || {}) {
 
 /* 保存されていたプレイリスト1つの検証（読み込み時に全部に通す） */
 /* 📁 プレイリストフォルダ（ネスト可・深さは3階層まで） */
+/* 📁 フォルダの上限（core.js の読み込み上限と同じ値・40）。trk の固定棚（🐔・Classic・BA・LoL・東方・Touhou関連・Arknights・学マス・Endfield・🎭）で10個使うので、
+   利用者のぶんを十分に残す。上限に達したら**作るときに知らせ**、起動時に黙って切り捨てない（trk129：旧上限13では、利用者のフォルダが4個以上あると
+   🎭棚が末尾から切り捨てられ、中のキャラクターテーマ4リストがトップへ落ちていた）。 */
+const PL_FOLDER_MAX = 40;
+function plFolderRoom(n = 1) { return (core.settings.plFolders || []).length + n <= PL_FOLDER_MAX; }
+/* 📁 上限を超えたときの整理。trk の固定棚（id が `trk` で始まるもの）は自動で作られる棚なので先に残し、
+   利用者のフォルダを**後の順から**落とす（trk129：上限13のとき、配列の末尾に足された 🎭棚が毎回落ちていた）。 */
+function plFolderTrim(list) {
+  if (!Array.isArray(list) || list.length <= PL_FOLDER_MAX) return list;
+  const fixed = list.filter(f => String(f.id).startsWith("trk")), rest = list.filter(f => !String(f.id).startsWith("trk"));
+  return fixed.concat(rest).slice(0, PL_FOLDER_MAX);
+}
 function plFolderSanitize(raw) {
   if (!raw || typeof raw !== "object" || typeof raw.id !== "string" || !raw.id) return null;
   return { id: raw.id.slice(0, 24), name: String(raw.name || "").trim().slice(0, 24) || "Folder",
@@ -1351,6 +1367,16 @@ function trkIsRemoved(id) {
 /* 🎭 Endfieldのキャラクターテーマ曲（trk128）：カタログの4リストはネスト棚に作り、既存取り込みもそこに移す。 */
 const ENDFIELD_CHARACTER_FOLDER = "trk-endfield-character";
 const ENDFIELD_CHARACTER_PL = new Set(["ef-blurring", "ef-ashen", "ef-floaty", "ef-makers"]);
+/* 🛰️ 初号指令OSTの旧既定名（trk110〜trk128）。保存名は plSanitize が24文字に切るので、フル名と切れた形の両方を持つ。
+   切れた形はVol.1とVol.2で同じ（「初号指令 (上/下) ― Zeroth Direct」・「Endfield — Zeroth Direct」）だが、
+   照合はIDごとに別々の表なので取り違えない。利用者が自分で付けた名前はここに無いので触らない（trk129）。 */
+const ENDFIELD_FIRSTORDER_OLD_NAMES = Object.freeze({
+  "ef-firstorder": ["Endfield — 初号指令 OST",
+    "Endfield — Zeroth Directive OST Vol.1（初号指令・上）", "Endfield — Zeroth Direct",
+    "初号指令 (上) ― Zeroth Directive Original Soundtrack Vol.1", "初号指令 (上) ― Zeroth Direct"],
+  "ef-firstorder2": ["Endfield — Zeroth Directive OST Vol.2（初号指令・下）", "Endfield — Zeroth Direct",
+    "初号指令 (下) ― Zeroth Directive Original Soundtrack Vol.2", "初号指令 (下) ― Zeroth Direct"]
+});
 /* 🛰️ Endfield整頓（trk128・一回限り）：公式リストを「初号指令OST 上下を最上 → 公式アルバム6作をリリース順」に並べ直し、
    キャラクターテーマ曲4リスト（Blurring・ASHEN REMAINS・The Floaty Envelope・MAKER'S LUV）を
    ネスト棚 trk-endfield-character（「Endfield Character Theme」）へ動かす。
@@ -1400,6 +1426,30 @@ function trkEndfieldTidyOnce() {
   }
   s.trkEndfieldTidy1 = 1;
   if (changed) core.saveUserPrefs();
+}
+/* 🎭 棚の戻し（trk129・一回限り）：trk128 のフォルダ上限13は、利用者が自分のフォルダを4個以上持っていると、
+   配列の末尾に足された 🎭棚（trk-endfield-character）を起動のたびに切り捨て、そのとき中にあったキャラクターテーマ4リストを
+   トップ（入れ物なし）へ落としていた。起動のたびに棚を作り直すので、`trkEndfieldTidy1` が付いた後は元に戻らず、
+   利用者のフォルダも末尾から消えていた（消えたフォルダ自体は戻せない）。
+   上限を40にしても、すでに落ちた配置は戻らないので、**こわれた形のときだけ**動かし直す:
+   ①trk128 の整頓を通っている（＝この壊れ方が作られうる）②キャラクターテーマのリストが残っている
+   ③そのどれもがどこにも入っていない（folder が空。利用者が自分で置いたものは触らない）
+   ④🎭棚が空。当てはまれば棚を作り直して戻す。印（settings.trkEndfieldTidy2）が付いたら以後は二度と触らない。 */
+function trkEndfieldShelfRestoreOnce() {
+  const s = core.settings;
+  if (!s || s.trkEndfieldTidy2 || !s.trkEndfieldTidy1) return;
+  s.trkEndfieldTidy2 = 1;   /* 見た結果にかかわらず印を残す（利用者が後から動かした配置を勝手に戻さない） */
+  const listOf = id => (Array.isArray(s.playlists) ? s.playlists.find(p => p.id === "trk-" + id) : null);
+  const found = [...ENDFIELD_CHARACTER_PL].map(listOf).filter(Boolean);
+  const fellToTop = found.length > 0 && found.every(p => p.folder === "" && p.cat === "trk:endfield:" + p.id.slice(4));
+  const shelfEmpty = !(s.playlists || []).some(p => p.folder === ENDFIELD_CHARACTER_FOLDER);
+  if (fellToTop && shelfEmpty && Array.isArray(s.plFolders)) {
+    if (!s.plFolders.some(f => f.id === ENDFIELD_CHARACTER_FOLDER)) {
+      s.plFolders.push({ id: ENDFIELD_CHARACTER_FOLDER, name: "Endfield Character Theme", icon: "🎭", color: "none", parent: "trk-endfield", createdAt: 0 });
+    }
+    for (const p of found) p.folder = ENDFIELD_CHARACTER_FOLDER;
+  }
+  core.saveUserPrefs();
 }
 function ensureTrkDistributionPlaylists() {
   ensureTrkFolder();
@@ -1453,21 +1503,19 @@ function ensureTrkDistributionPlaylists() {
             existing.tags = (pl.tags || []).slice(0,5); changed = true;
           }
         }
-        /* 🛰️ 初号指令OSTの旧版（4パート紹介版「Endfield — 初号指令 OST」と、trk110の
-           「Endfield — Zeroth Directive OST Vol.1（初号指令・上）」）の既定名を、trk128の名前へ更新する。
-           wish と guide は上の共通処理で更新済み。所持曲とユーザー変更（名前・アイコン・タグ）は守る。 */
+        /* 🛰️ 初号指令OSTの旧既定名（4パート紹介版・trk110のフル名・trk128の長い名＝保存は24文字切り）を、
+           trk129の24文字に収まる名（「初号指令 (上) ZD OST Vol.1」）へ更新する。trk128の名は保存時に切れて
+           「初号指令 (上) ― Zeroth Direct」になっているため、切れた形も照合する（Vol.1とVol.2で同じ文字列になるので、
+           置き換え先はIDごとに決める）。wish と guide は上の共通処理で更新済み。所持曲とユーザー変更は守る。 */
         if (pl.id === "ef-firstorder" && existing.cat === "trk:" + s.id + ":" + pl.id) {
-          /* 保存された名前は何も24文字に切られているので、フル名と切れた形（「Endfield — Zeroth Direct」）の両方で照合する。
-             旧4パート版「Endfield — 初号指令 OST」は24字未満なのでそのまま。 */
-          if (existing.name === "Endfield — 初号指令 OST" || existing.name === "Endfield — Zeroth Directive OST Vol.1（初号指令・上）" || existing.name === "Endfield — Zeroth Direct") { existing.name = pl.name; changed = true; }
+          if (ENDFIELD_FIRSTORDER_OLD_NAMES["ef-firstorder"].includes(existing.name)) { existing.name = pl.name; changed = true; }
           if (JSON.stringify(existing.tags) === JSON.stringify(["Game","Endfield","Metal Scar Radio","First Order"])) {
             existing.tags = (pl.tags || []).slice(0,5); changed = true;
           }
         }
-        /* 🛰️ Vol.2（trk110で作った「Endfield — Zeroth Directive OST Vol.2（初号指令・下）」）の既定名を、trk128の名前へ。
-           上と同様に24文字切り「Endfield — Zeroth Direct」でも照合する（IDごとに別々の新名へ置かれる）。 */
+        /* 🛰️ Vol.2 も同じ（IDごとに別々の新名へ置かれる）。 */
         if (pl.id === "ef-firstorder2" && existing.cat === "trk:" + s.id + ":" + pl.id) {
-          if (existing.name === "Endfield — Zeroth Directive OST Vol.2（初号指令・下）" || existing.name === "Endfield — Zeroth Direct") { existing.name = pl.name; changed = true; }
+          if (ENDFIELD_FIRSTORDER_OLD_NAMES["ef-firstorder2"].includes(existing.name)) { existing.name = pl.name; changed = true; }
         }
         continue;
       }
@@ -1518,11 +1566,12 @@ function ensureTrkDistributionPlaylists() {
     if (p) { core.settings.playlists.push(p); changed = true; }
   }
   trkEndfieldTidyOnce();   /* 🛰️ 初回起動だけ：初号指令を最上へ・リリース順・キャラクターテーマを棚へ（その後利用者の並びを守る） */
+  trkEndfieldShelfRestoreOnce();   /* 🎭 一回限り：上限13のときに棚から落ちたキャラクターテーマ4リストを、こわれた形のときだけ棚へ戻す */
   if (changed) core.saveUserPrefs();
 }
 (function plTighten() {
   core.settings.playlists = (core.settings.playlists || []).map(plSanitize).filter(Boolean).slice(0, 200);
-  core.settings.plFolders = (core.settings.plFolders || []).map(plFolderSanitize).filter(Boolean).slice(0, 13);   /* trk128：trk-endfield-character を加えたので +1 */
+  core.settings.plFolders = plFolderTrim((core.settings.plFolders || []).map(plFolderSanitize).filter(Boolean));   /* 上限は作るときに確かめる（固定棚を末尾から捨てない） */
   const fids = new Set(core.settings.plFolders.map(f => f.id));
   for (const p of core.settings.playlists) if (p.folder && !fids.has(p.folder)) p.folder = "";
   for (const f of core.settings.plFolders) if (f.parent && (!fids.has(f.parent) || f.parent === f.id)) f.parent = "";
@@ -1672,6 +1721,8 @@ function plFolderCreate(defaultParent = "") {
   const color = plColorSwatches("none");
   const save = el("button", "plBtn", tr("plSave")); save.type = "button";
   save.addEventListener("click", () => {
+    /* 📁 上限に達していたら作らずに知らせる（黙って作って次の起動で切り捨てない） */
+    if (!plFolderRoom()) { plToast(tr("plFolderLimit", { n: PL_FOLDER_MAX })); return; }
     const f = plFolderSanitize({ id: "fl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       name: name.value || tr("plDefaultFolderName"), icon: icon.value, color: color.value,
       parent: plFolderById(defaultParent) ? defaultParent : "", createdAt: Date.now() });
@@ -1874,9 +1925,12 @@ function plDeleteGesture(p, btn) {
 /* ---------- 🛒 公式カタログ（音源は同梱しない。公式の入手先を案内するだけ） ---------- */
 function plCatalogFolder(s) {   /* シリーズのフォルダ（親カテゴリ → シリーズ。無ければ作る） */
   let parent = core.settings.plFolders.find(f => !f.parent && f.name === s.catName);
+  /* 📁 上限に達していたらフォルダを作らず、入りきらないリストはフォルダなし（並びのトップ）に置く（トーストで知らせる） */
+  if (!parent && !plFolderRoom(2)) { plToast(tr("plFolderLimit", { n: PL_FOLDER_MAX })); return ""; }
   if (!parent) { parent = plFolderSanitize({ id: "fl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
     name: s.catName, icon: s.catIcon || "🎮", color: "none", parent: "", createdAt: Date.now() }); core.settings.plFolders.push(parent); }
   let fld = core.settings.plFolders.find(f => f.parent === parent.id && f.name === s.name);
+  if (!fld && !plFolderRoom()) { plToast(tr("plFolderLimit", { n: PL_FOLDER_MAX })); return ""; }
   if (!fld) { fld = plFolderSanitize({ id: "fl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
     name: s.name, icon: s.icon, color: s.color, parent: parent.id, createdAt: Date.now() }); core.settings.plFolders.push(fld); }
   return fld.id;

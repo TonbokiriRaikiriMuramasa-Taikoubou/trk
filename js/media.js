@@ -295,8 +295,13 @@ function parseNote(n) {
 function validateChartData(data, checkFingerprint = true) {
   if (!data || typeof data !== "object" || (data.format && !String(data.format).startsWith("shadow-taiko"))) return { key:"importBad" };
   const has = key => Object.prototype.hasOwnProperty.call(data, key);
-  if ((has("bpm") && (typeof data.bpm !== "number" || !Number.isFinite(data.bpm))) ||
-      (has("offset") && (typeof data.offset !== "number" || !Number.isFinite(data.offset)))) return { key:"importInvalid" };
+  /* bpm は 0（小節線なし。bpm の無い譜面を chartToData が書き出すと 0 になる）か 1〜1000 に限る。
+     負の値は小節線の描画ループ（render.js の drawMeasureLines・stage.js・modes.js の ORBIT 拍線）が
+     終わらず、1e9 のような値も毎フレーム数百万回回るので、他人の譜面ファイル1つでタブが固まらないよう
+     入口で弾く（F-33。生成側は 60〜300 を強制している）。 */
+  const bpmOk = !has("bpm") || (typeof data.bpm === "number" && Number.isFinite(data.bpm) &&
+    (data.bpm === 0 || (data.bpm >= 1 && data.bpm <= 1000)));
+  if (!bpmOk || (has("offset") && (typeof data.offset !== "number" || !Number.isFinite(data.offset)))) return { key:"importInvalid" };
   if (!Array.isArray(data.notes) || data.notes.length > 50000) return { key:"importInvalid" };
   const notes = data.notes.map(parseNote);
   if (notes.some(n => !isFinite(n.time) || n.time < 0 || (n.lane !== 0 && n.lane !== 1))) return { key:"importInvalid" };

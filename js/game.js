@@ -464,7 +464,10 @@ let records = {};
 try { records = JSON.parse(localStorage.getItem(REC_KEY)) || {}; } catch (_) { records = {}; }
 if (!records || typeof records !== "object" || Array.isArray(records)) records = {};
 function saveRecords() { try { localStorage.setItem(REC_KEY, JSON.stringify(records)); } catch (_) {} }
-const chartKeyOf = () => core.hashString(core.chart.map(n => n.time + ":" + n.lane).join(",")).toString(36);
+/* 譜面の同一性（記録・ゴーストのキー）は MOD に依存させない。resetRun は MIRROR／RANDOM で n.lane を書き換えるので、
+   書き換える前のレーン（origLane。resetRun が最初に見た lane を残す）を使う。MOD 無しの既存の記録はキーが変わらない。
+   MOD ごとにベストを分けたくなったら、速度（slot.rates[rateKey()]）と同じように入れ物の側で分ける（trk129）。 */
+const chartKeyOf = () => core.hashString(core.chart.map(n => n.time + ":" + (n.origLane ?? n.lane)).join(",")).toString(36);
 const MODE_PLAYS = { truck:"truckPlays", orbit:"orbitPlays", stage:"stagePlays", catch:"catchPlays" };
 const PLAY_KEYS = ["plays", "truckPlays", "orbitPlays", "stagePlays", "catchPlays"];
 function songRec(create) {

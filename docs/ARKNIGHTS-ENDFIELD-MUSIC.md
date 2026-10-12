@@ -32,8 +32,8 @@
 
 | プレイリスト（ID・表示名） | 内容 | 曲数 | 曲別リンク | 巻のリンク（sourceUrl） |
 |---|---|---|---|---|
-| `ef-firstorder`「初号指令 (上) ― Zeroth Directive Original Soundtrack Vol.1」 | 初号指令OST（上）＝Zeroth Directive Vol.1 全曲を公式収録順で（2026-02-15） | 37 | 公式Spotify個別曲 | 公式ffm.to配信一覧 |
-| `ef-firstorder2`「初号指令 (下) ― Zeroth Directive Original Soundtrack Vol.2」 | 初号指令OST（下）＝Zeroth Directive Vol.2 全曲を公式収録順で（2026-02-15） | 23 | 公式Spotify個別曲 | 公式ffm.to配信一覧 |
+| `ef-firstorder`「初号指令 (上) ZD OST Vol.1」（ZD＝Zeroth Directive。trk129で24文字に収めた表示名。フル名はタグ） | 初号指令OST（上）＝Zeroth Directive Vol.1 全曲を公式収録順で（2026-02-15） | 37 | 公式Spotify個別曲 | 公式ffm.to配信一覧 |
+| `ef-firstorder2`「初号指令 (下) ZD OST Vol.2」（同上） | 初号指令OST（下）＝Zeroth Directive Vol.2 全曲を公式収録順で（2026-02-15） | 23 | 公式Spotify個別曲 | 公式ffm.to配信一覧 |
 | `ef-eve`「Endfield — Eve of Departure」 | EP全曲を公式収録順で（2026-04-11） | 5 | 公式Spotify個別曲 | 公式Spotifyアルバム |
 | `ef-thunder`「Endfield — Thunder's Legacy」 | アルバム全曲を公式収録順で（2026-04-22） | 9 | 公式Spotify個別曲 | 公式Spotifyアルバム |
 | `ef-wake`「Endfield — At the Wake of Spring OST」 | OST全曲を公式収録順で（2026-04-30） | 17 | 公式Spotify個別曲 | 公式Spotifyアルバム |
@@ -46,7 +46,8 @@
 | `ef-makers`「Endfield — MAKER'S LUV」 | 紹介版（Yvonneのキャラクターテーマ） | 1 | 公式X告知 | — |
 | `ef-signal`「Endfield — The Signal Is Still Pulsing」 | 紹介版（Metal Scar Radio関連ほか5項目） | 5 | wiki／YouTube／ツールページ | — |
 
-- 旧版の「初号指令 OST」プレイリスト（上・下それぞれ Part 1/2 の4項目紹介版）は、**永続ID `ef-firstorder` を保ったまま Vol.1 全37曲版へ更新**します。trk110 以降の旧既定名（「Endfield — Zeroth Directive OST Vol.1／Vol.2（初号指令・上／下）」）も、**trk128 の新名（「初号指令 (上／下) ― Zeroth Directive Original Soundtrack Vol.1／2」）へ既定名だけが更新**され、所持曲・ユーザーが変えた名前／アイコン／タグはそのままです（`js/library.js` のセーフリフレッシュ）。
+- 旧版の「初号指令 OST」プレイリスト（上・下それぞれ Part 1/2 の4項目紹介版）は、**永続ID `ef-firstorder` を保ったまま Vol.1 全37曲版へ更新**します。trk110 以降の旧既定名（「Endfield — Zeroth Directive OST Vol.1／Vol.2（初号指令・上／下）」＝保存は24文字切り「Endfield — Zeroth Direct」）と、**trk128 の名（「初号指令 (上／下) ― Zeroth Directive Original Soundtrack Vol.1／2」＝保存は「初号指令 (上／下) ― Zeroth Direct」）**は、trk129 で**24文字に収まる新名（「初号指令 (上／下) ZD OST Vol.1／2」）へ既定名だけが更新**され、所持曲・ユーザーが変えた名前／アイコン／タグはそのままです（`js/library.js` のセーフリフレッシュ。旧既定名の一覧は `ENDFIELD_FIRSTORDER_OLD_NAMES`）。
+- **trk129 の一回限りの戻し（`trkEndfieldShelfRestoreOnce`・`settings.trkEndfieldTidy2`）**：trk128 のフォルダ上限13は、利用者が自分のフォルダを4個以上持っていると、配列の末尾にあった 🎭棚を起動のたびに切り捨て、キャラクターテーマ4リストをトップへ落としていました。上限を40にして切り捨て自体を止め、**すでに落ちてしまった配置だけ**（棚が空・4リストがどこにも入っていない）を一回限りで棚へ戻します。利用者が自分で置いたリストは触りません。消えてしまった利用者のフォルダ自体は戻せません。
 - **trk128 の一回限りの整頓（`trkEndfieldTidyOnce`・`settings.trkEndfieldTidy1`）**：既存の取り込みを上表の順へ並べ直し、キャラクターテーマ4リスト（まだ Endfield フォルダの既定場所にあるものだけ）をネスト棚 `trk-endfield-character`（「Endfield Character Theme」）へ移動します。利用者が別の場所へ動かしたものは守り、印が付いた後は並びも配置も二度と触りません（手動並べ替え `playlistOrder`・`createdAt`・配列順の3系統をすべて新しい順へ揃える）。
 - 中国語公式曲名（例：`协议流`＝Protocol Flow）は**照合別名（matchAliases）**として登録。中国語ファイル名の手元音源も曲名照合できます。表示曲名は公式英語名です。
 - キャラクターOST等の既存プレイリスト（`ef-blurring`・`ef-ashen`・`ef-floaty`・`ef-makers`・`ef-signal`）の**内容**は変更していません（trk128 で棚へまとめたのは場所だけ）。紹介版の `ef-signal` には「Rekindled」「REAPER」が含まれており、本バッチの `ef-ccr`・`ef-homecoming` と曲が重複しますが、両方とも残しています（紹介版は変更しない方針）。
@@ -286,6 +287,7 @@
 
 ## 未確認・次段階
 
+- **trk129（2026-10-12）**：表示名を24文字に収まる「初号指令 (上) ZD OST Vol.1」／「初号指令 (下) ZD OST Vol.2」（ZD＝Zeroth Directive。フル名はタグ）へ改名。旧既定名（最古の紹介版・trk110のフル名と24文字切り・trk128のフル名と24文字切り）は `js/library.js` の `ENDFIELD_FIRSTORDER_OLD_NAMES` で照合し、既定名のときだけ更新します。フォルダ上限13のときに 🎭棚から落ちた4リストは、一回限りの `trkEndfieldShelfRestoreOnce` がこわれた形のときだけ棚へ戻します。自動検査（`tools/check-repo.mjs` の🛰️ブロック・`npm run check` 222/222）まで。**実ブラウザ・実端末での確認は未実施**（HANDOFF §4-12）。
 - **trk128（2026-10-12）**：①既存の取り込みに対する一回限りの整頓（`trkEndfieldTidyOnce`）は**Chromium headless の e2e（20項目・リポジトリ外）で確認済み**——新規取り込みの13リスト新順・キャラクター棚・改名・Endfieldタブのチップ行（🎭棚→初号指令(上)／(下)→リリース順6作→signal）・既存取り込みの移行（24文字切り旧名からの改名・並び直し・利用者の配置と所持曲の保持）・2度目の起動で並びが変わらないこと。実端末での確認は未実施。②Talos Wiki（コミュニティ）由来の情報（キャラクター分類・Blurring 2026-01-22／Ashen Remains 2026-02-28 の発売日・3アルバムのSpotifyID・曲ID）は**公式Spotifyページでの再確認が未実施**（カタログには入れていない）。③新表示名（「初号指令 (上) ― …」）は表示上限24文字で「初号指令 (上) ― Zeroth Direct」に切れる（全表示は🛒カタログ画面・プレイリスト設定で）。④e2eで発見・修正した2点：24文字切り旧名への改名不発（実アプリの保存名は24文字に切られている）・サブフォルダビューが「すべて」へフォールバックする既存欠陥（`libTabsOf` 修正。HANDOFF §7 参照）。
 - 60曲のSpotify個別曲URLは 2026-10-10 時点の公式アルバムページHTMLで確認しましたが、実ブラウザでの一括再確認（地域制限・ログイン要求の有無）は未実施です。抜取確認として同日、Vol.1 #37「Faith's Imprint」と Vol.2 #23「Forge」の個別曲ページを開き、曲名・収録アルバム・アーティスト・長さがカタログと一致することを確認しました。
 - Apple Music での Zeroth Directive Vol.1–2 のアルバム掲載は未確認（「配信なし」の断定ではありません）。

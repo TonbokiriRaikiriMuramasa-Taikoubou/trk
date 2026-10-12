@@ -912,18 +912,19 @@ if (!exists("js/fx-worklet.js") ||
     catalogDataOk = albumsMatch && characterOstsKept && rightsOk && trackTotal === 60 &&
       new Set(spotifyIds).size === 60 &&
       JSON.stringify(fixture.albums.map(album => album.tracks.length)) === JSON.stringify([37, 23]) &&
+      fixture.albums.every(album => [...album.name].length <= 24) &&   /* trk129: 24文字上限に収まる名（切れない） */
       JSON.stringify(series.playlists.map(pl => pl.id)) === JSON.stringify(fixture.seriesPlaylistOrder);
 
     const ensureStart = library.indexOf("function trkCatalogGuide(");
     const ensureEnd = library.indexOf("\n(function plTighten()", ensureStart);
     if (ensureStart >= 0 && ensureEnd > ensureStart) {
       /* trk110 以降の既存取り込みを再現：Vol.2（旧名・trk-endfield）を先に並べ、Vol.1 は実機で保存される
-         24文字切り旧名（「Endfield — Zeroth Direct」＝実アプリのplSanitizeの結果）の状態で渡す。
+         24文字切り旧名（trk128 の名が切れた「初号指令 (上) ― Zeroth Direct」）の状態で渡す。
          キャラクターテーマは1つは既定場所・1つは利用者が別のフォルダへ動かした状態で渡す。 */
       const oldVol2 = { id:"trk-ef-firstorder2", cat:"trk:endfield:ef-firstorder2", name:"Endfield — Zeroth Directive OST Vol.2（初号指令・下）", icon:"⛰️",
         tags:["Game","Endfield","Zeroth Directive","Metal Scar Radio"], wish:[{t:"obsolete", al:"", ar:"", u:""}],
         songs:[], folder:"trk-endfield", guide:{note:"old guide", url:"https://example.com/old"} };
-      const defaultImported = { id:"trk-ef-firstorder", cat:"trk:endfield:ef-firstorder", name:"Endfield — Zeroth Direct", icon:"📜",
+      const defaultImported = { id:"trk-ef-firstorder", cat:"trk:endfield:ef-firstorder", name:"初号指令 (上) ― Zeroth Direct", icon:"📜",
         tags:["Game","Endfield","Metal Scar Radio","First Order"], wish:[{t:"obsolete", al:"", ar:"", u:""}],
         songs:["owned-endfield-track"], folder:"trk-endfield", guide:{note:"old guide", url:"https://example.com/old"} };
       const customImported = { id:"pl-manual-ef", cat:"endfield:ef-firstorder", name:"My Endfield mix", icon:"🌸", tags:["personal"],
@@ -964,10 +965,19 @@ if (!exists("js/fx-worklet.js") ||
         JSON.stringify(customImported.tags) === JSON.stringify(["personal"]) &&
         JSON.stringify(customImported.songs) === JSON.stringify(["manual-owned-track"]) &&
         JSON.stringify(customImported.wish) === JSON.stringify(expectedWish);
-      /* 最古の旧名（trk110以前の紹介版「Endfield — 初号指令 OST」）でも改名が効くこと（2度目の実行で確認）。 */
-      defaultImported.name = "Endfield — 初号指令 OST";
+      /* trk129：これまでの既定名（trk128の長いフル名・trk110の24文字切り・最古の紹介版）からでも、
+         24文字に収まる今の名（初号指令 (上) ZD OST Vol.1）へ改名が効くこと。利用者が付けた名前は触らない。 */
+      const oldNames = ["初号指令 (上) ― Zeroth Directive Original Soundtrack Vol.1", "Endfield — Zeroth Direct", "Endfield — 初号指令 OST"];
+      let migratesOldNames = true;
+      for (const oldName of oldNames) {
+        defaultImported.name = oldName;
+        new vm.Script("ensureTrkDistributionPlaylists();").runInContext(runContext);
+        if (defaultImported.name !== fixture.albums[0].name) migratesOldNames = false;
+      }
+      defaultImported.name = "My own Zeroth mix";
       new vm.Script("ensureTrkDistributionPlaylists();").runInContext(runContext);
-      const migratesOldest = defaultImported.name === fixture.albums[0].name;
+      const keepsCustomName = defaultImported.name === "My own Zeroth mix";
+      const namesFit = fixture.albums.every(album => [...album.name].length <= 24);
       /* trk128 の一回限りの整頓：初号指令上下が最上（カタログ順）、キャラクターテーマは既定場所だけ棚へ移動、
          利用者が動かしたものはそのまま。印（trkEndfieldTidy1）が付く。
          このテストでは欠落の9リスト（ef-eve ほか）も自動作成されるので、配列は全13リスト＋手動リスト。 */
@@ -978,13 +988,13 @@ if (!exists("js/fx-worklet.js") ||
         idx("trk-ef-blurring") === 8 && idx("trk-ef-ashen") === 9 && idx("trk-ef-signal") === 12 &&
         idx("pl-manual-ef") === 13 &&
         charOnDefault.folder === "trk-endfield-character" && charUserMoved.folder === "my-folder";
-      safeRefreshOk = migratesDefault && migratesOldest && renamesVol2 && preservesCustom && tidyOk && saveCount > 0;
+      safeRefreshOk = migratesDefault && migratesOldNames && keepsCustomName && namesFit && renamesVol2 && preservesCustom && tidyOk && saveCount > 0;
     }
   } catch (error) {
     console.error(`WARN  Endfield catalog test setup failed: ${error.message}`);
   }
   if (!catalogDataOk) fail("Endfield Zeroth Directive fixture/catalog mismatch (expected Vol.1 37 + Vol.2 23 ordered tracks, unique official Spotify track links, Chinese-title match aliases, ffm.to album sources, the release-ordered series layout, and rights notes)");
-  else if (!safeRefreshOk) fail("Endfield refresh must migrate the old 初号指令 default names to the trk128 names, keep owned songs and custom data, and re-order / move to the character shelf once (trkEndfieldTidy1)");
+  else if (!safeRefreshOk) fail("Endfield refresh must migrate every old 初号指令 default name to the trk129 names (within the 24-character save limit, keeping a user-given name), keep owned songs and custom data, and re-order / move to the character shelf once (trkEndfieldTidy1)");
   else ok("Arknights: Endfield Zeroth Directive OST Vol.1–2: 60 ordered Spotify-linked tracks, Chinese-title aliases, ffm.to guides, release-ordered series with the character shelf, safe one-time tidy of existing imports");
 }
 
@@ -1087,6 +1097,78 @@ if (!exists("js/fx-worklet.js") ||
     library.includes("if (cf && cf.parent && !tabs.some(t => t.id === settings.libTab))");
   if (!nestedFolderTabOk) fail("Library must add the open nested folder to the tab list (libTabsOf fld: handling) so the folder view does not fall back to the all view");
   else ok("Library: open nested folder (trk subfolders / Endfield Character Theme shelf) is added to the tab bar so the folder view stays open");
+}
+
+/* 📁 trk129: フォルダの上限を13→40にし、**作るときに**上限を確かめて知らせる（黙って作って次の起動で切り捨てない）。
+   上限13のときは、利用者のフォルダが4個以上あると配列の末尾にあった 🎭棚（trk-endfield-character）が毎回切り捨てられ、
+   中に移したキャラクターテーマ4リストがトップへ落ちていた。上限を超えた配列は、trk の固定棚を先に残して
+   利用者のフォルダを後ろから落とし、こわれた形だけを一回限りの整頓（trkEndfieldShelfRestoreOnce）で戻す。 */
+{
+  const library = read("js/library.js"), coreSrc = read("js/core.js");
+  const fourLanguages = key => (library.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4;
+  let limitOk = false, restoreOk = false;
+  try {
+    /* 上限まわりの純関数だけを切り出して動かす（plFolderSanitize の直前までが、その範囲） */
+    const unit = library.slice(library.indexOf("/* 📁 フォルダの上限"), library.indexOf("function plFolderSanitize("));
+    const settings = { plFolders: [] };
+    const ctx = vm.createContext({ settings, saveUserPrefs: () => {} });
+    new vm.Script(unit + "\nglobalThis.__unit = { PL_FOLDER_MAX, plFolderRoom, plFolderTrim };").runInContext(ctx);
+    const { PL_FOLDER_MAX, plFolderRoom, plFolderTrim } = ctx.__unit;
+    const mk = id => ({ id, name: id, icon: "", color: "none", parent: "", createdAt: 0 });
+    const fixedIds = ["trk", "trk-classic", "trk-ba", "trk-lol", "trk-touhou", "trk-touhou-other", "trk-arknights", "trk-gakumas", "trk-endfield"];
+    const fixed = fixedIds.map(mk), users = n => Array.from({ length: n }, (_, i) => mk("fl" + i));
+    settings.plFolders = fixed.concat(users(31));                    /* 40個＝ちょうど上限 */
+    const atCap = !plFolderRoom() && !plFolderRoom(2) && plFolderRoom(0);
+    settings.plFolders = fixed.concat(users(30));                    /* 39個＝あと1つ作れる */
+    const oneLeft = plFolderRoom() && !plFolderRoom(2);
+    /* 41個（🎭棚が末尾）→ 固定棚10個は残り、利用者のフォルダが後ろから落ちる */
+    const over = fixed.concat(users(30), [mk("trk-endfield-character"), mk("fl-extra")]);
+    const trimmed = plFolderTrim(over);
+    const trimKeepsShelves = trimmed.length === PL_FOLDER_MAX && trimmed.filter(f => f.id.startsWith("trk")).length === 10 &&
+      trimmed.some(f => f.id === "trk-endfield-character") && !trimmed.some(f => f.id === "fl-extra") &&
+      plFolderTrim(fixed.concat(users(3))).length === 12;
+    limitOk = PL_FOLDER_MAX === 40 && atCap && oneLeft && trimKeepsShelves && coreSrc.includes("slice(0, 40)") &&
+      library.includes('if (!plFolderRoom()) { plToast(tr("plFolderLimit", { n: PL_FOLDER_MAX })); return; }') &&
+      library.includes("if (!parent && !plFolderRoom(2))") && library.includes("if (!fld && !plFolderRoom())") &&
+      library.includes("settings.plFolders = plFolderTrim(") && fourLanguages("plFolderLimit");
+
+    /* 🎭棚の戻し（一回限り）: 上限13でこわれた形（棚が消え、4リストがトップ）だけを戻す */
+    const restoreUnit = library.slice(library.indexOf("/* 🎭 Endfieldのキャラクターテーマ曲（trk128）"),
+      library.indexOf("function ensureTrkDistributionPlaylists()"));
+    const charIds = ["ef-blurring", "ef-ashen", "ef-floaty", "ef-makers"];
+    const lists = () => charIds.map(id => ({ id: "trk-" + id, cat: "trk:endfield:" + id, folder: "", songs: [] }));
+    const runRestore = state => {
+      const s = vm.createContext({ settings: state, saveUserPrefs: () => {} });
+      new vm.Script(restoreUnit + "\nglobalThis.__restore = trkEndfieldShelfRestoreOnce;").runInContext(s);
+      s.__restore();
+      return state;
+    };
+    const damaged = { playlists: lists(), plFolders: [], trkEndfieldTidy1: 1 };
+    runRestore(damaged);
+    const healed = damaged.playlists.every(p => p.folder === "trk-endfield-character") &&
+      damaged.plFolders.length === 1 && damaged.plFolders[0].id === "trk-endfield-character" &&
+      damaged.plFolders[0].parent === "trk-endfield" && damaged.plFolders[0].icon === "🎭" &&
+      damaged.playlists[0].folder === "trk-endfield-character" && damaged.trkEndfieldTidy2 === 1;
+    /* 一度きり：印が付いた後は、利用者がトップへ出した配置に触らない */
+    damaged.playlists[0].folder = "";
+    runRestore(damaged);
+    const onceOnly = damaged.playlists[0].folder === "" && damaged.playlists[1].folder === "trk-endfield-character";
+    /* 利用者が1つでも別の場所へ置いていれば、何も動かさない */
+    const moved = { playlists: lists(), plFolders: [], trkEndfieldTidy1: 1 };
+    moved.playlists[1].folder = "my-folder";
+    runRestore(moved);
+    const keepsUserPlacement = moved.playlists.every(p => p.folder === (p === moved.playlists[1] ? "my-folder" : ""));
+    /* trk128 の整頓を通っていない起動（印が無い）では触らない */
+    const before = { playlists: lists(), plFolders: [] };
+    runRestore(before);
+    const untouchedBeforeTidy1 = before.playlists.every(p => p.folder === "") && !before.trkEndfieldTidy2;
+    restoreOk = healed && onceOnly && keepsUserPlacement && untouchedBeforeTidy1;
+  } catch (error) {
+    console.error(`WARN  playlist-folder limit test setup failed: ${error.message}`);
+  }
+  if (!limitOk) fail("playlist folders must be capped at 40 with the creation paths checked (plFolderRoom + plFolderLimit in four languages), core.js must read the same 40, and an over-cap list must keep the trk shelves");
+  else if (!restoreOk) fail("trkEndfieldShelfRestoreOnce must move the four character-theme lists back under the Endfield Character Theme shelf exactly once (only when the shelf is empty and every remaining list sits outside every folder)");
+  else ok("playlist folders: cap 40 checked before creating, trk shelves survive an over-cap trim, character-theme lists restored to the 🎭 shelf once (trk129)");
 }
 
 // ⚔️ LoL Creator-Safe Sessions: complete SoundCloud album order/count and one official song URL per track.

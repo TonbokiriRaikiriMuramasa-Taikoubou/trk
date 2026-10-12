@@ -71,7 +71,7 @@ Object.assign(TEXT.ja, {
   studyHelp:"❓ キーの説明", studyHelpTitle:"書斎のキー操作", studyHelpClose:"閉じる",
   studyHelpNav:"→で次へ・←で前へ（上級者向け設定で変更可）。画像の左右タップは綴じ方向に従います。テキストはスクロールします。マウスの中クリックで次へ進む設定もあります。",
   studyHelpSpace:"次のページへ。長押しすると、画像=ページ移動バー、テキスト=栞を挟みます。",
-  studyHelpPg:"前のページ／次のページ（Home / End で最初／最後へ）。拡大中は、設定がオンなら画像の下端／上端へ動きます（端の次は反対の端）。",
+  studyHelpPg:"前のページ／次のページ（Home / End で最初／最後へ）。拡大中は、設定がオンなら画像の下端／上端へ動き、端でさらに押すと次の／前のページを続きの端から開きます。",
   studyHelpZoom:"画像の拡大・縮小・フィット（縦読みでは使いません）。Ctrl+ホイールやピンチでも変えられ、拡大した画像は↑ / ↓かホイールで送れます。1回の幅は⚙上級者向けで1〜25%（初期値5%）。",
   studyHelpSearch:"テキスト本の本文を検索（Enter=次の一致 / Shift+Enter=前の一致）。",
   studyHelpBookmark:"B=栞を挟む・外す、M=栞一覧の開閉。",
@@ -117,7 +117,7 @@ Object.assign(TEXT.ja, {
   studyTextWidthNarrow:"余白せまい", studyTextWidthNormal:"余白ふつう", studyTextWidthWide:"余白広い",
   studyTextTuneHint:"縦書き・ルーズリーフにも同じ設定が効きます。",
   studyZoomFit:"フィット", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+ホイール・ピンチでも拡大できます。拡大した画像は↑ / ↓やホイールで送れます。",
-  studyZoomEdgeKeys:"拡大中は PageDown / PageUp で画像の下端／上端へ", studyZoomEdgeKeysHint:"拡大していないときは、これまでどおり次のページ／前のページに動きます。端に着いていたら反対の端へ戻ります。",
+  studyZoomEdgeKeys:"拡大中は PageDown / PageUp で画像の端とページを送る", studyZoomEdgeKeysHint:"拡大した画像を一度に下端／上端へ送ります。端でさらにもう一度押すと、次の／前のページを続きの端から開きます（本の端では反対の端へ戻ります）。拡大していないときは、これまでどおり次のページ／前のページです。",
   studyMiddleClickNext:"マウスの中クリックで次のページへ", studyMiddleClickNextHint:"画像の本のときだけ働きます（ブラウザの自動スクロールは止めます）。",
   studyZoomStepLabel:"拡大の送り幅", studyZoomStepOption:"{n}%", studyZoomStepHint:"−／＋・Ctrl+ホイール・ピンチの1回ぶんです（初期値5%＝100%→200%が20回）。",
   studyTvLookLabel:"TVの見た目", studyTvLookPlain:"素の画面", studyTvLookCrt:"ブラウン管", studyTvLookWood:"木枠",
@@ -187,7 +187,7 @@ Object.assign(TEXT.en, {
   studyHelp:"❓ Shortcuts", studyHelpTitle:"Study shortcuts", studyHelpClose:"Close",
   studyHelpNav:"→ goes forward and ← goes back (reassignable in Advanced settings). Tapping an image's left/right side follows the binding direction. Text scrolls instead. You can also make the middle mouse button go forward.",
   studyHelpSpace:"Next page. Hold for the page seek bar (images) or to save a bookmark (text).",
-  studyHelpPg:"Previous / next page (Home / End jump to the first / last page). While an image is zoomed, the keys can jump to its bottom / top instead (then back to the other edge).",
+  studyHelpPg:"Previous / next page (Home / End jump to the first / last page). While an image is zoomed, the keys can jump to its bottom / top, and pressing again at an edge opens the next / previous page from the far edge.",
   studyHelpZoom:"Zoom in, out, and fit for images (not used in vertical comic mode). Ctrl+wheel and pinch work too; scroll a zoomed image with ↑ / ↓ or the wheel. The step size is in ⚙ Advanced (1–25%, 5% by default).",
   studyHelpSearch:"Search inside a text book (Enter = next match, Shift+Enter = previous match).",
   studyHelpBookmark:"B = add or remove a bookmark, M = toggle the bookmark list.",
@@ -233,7 +233,7 @@ Object.assign(TEXT.en, {
   studyTextWidthNarrow:"Narrow", studyTextWidthNormal:"Normal", studyTextWidthWide:"Wide",
   studyTextTuneHint:"These also apply to manuscript paper and loose-leaf.",
   studyZoomFit:"Fit", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+wheel and pinch also zoom. Scroll a zoomed image with ↑ / ↓ or the wheel.",
-  studyZoomEdgeKeys:"While zoomed, PageDown / PageUp jump to the bottom / top of the image", studyZoomEdgeKeysHint:"When nothing is zoomed, the keys still change pages as before. From an edge they come back to the other edge.",
+  studyZoomEdgeKeys:"While zoomed, PageDown / PageUp move to the image's edges and turn pages", studyZoomEdgeKeysHint:"Send the enlarged image straight to its bottom / top. Pressing again at an edge opens the next / previous page from the far edge (at the ends of the book it comes back to the other edge). When nothing is zoomed, the keys still change pages as before.",
   studyMiddleClickNext:"Middle click goes to the next page", studyMiddleClickNextHint:"Only for image books (the browser's auto-scroll is suppressed).",
   studyZoomStepLabel:"Zoom step", studyZoomStepOption:"{n}%", studyZoomStepHint:"How much one press of − / ＋, Ctrl+wheel, or a pinch changes the zoom (default 5% = 20 steps from 100% to 200%).",
   studyTvLookLabel:"TV look", studyTvLookPlain:"Plain screen", studyTvLookCrt:"CRT", studyTvLookWood:"Wood frame",
@@ -298,7 +298,7 @@ Object.assign(TEXT.zh, {
   studyFullscreenExit:"退出全屏", studyHelp:"❓ 按键说明", studyHelpTitle:"书斋的按键操作", studyHelpClose:"关闭",
   studyHelpNav:"→ 前进，← 后退（可在高级设置中重新指定）。点击图片左右侧仍按装订方向翻页。文本会滚动。也可以设置用鼠标中键前进。",
   studyHelpSpace:"下一页。长按：图片=页码跳转条，文本=添加书签。",
-  studyHelpPg:"上一页／下一页（Home / End 跳到最前／最后）。图片放大时，开启设置后跳到图片的下端／上端（到端点后再跳回另一端）。",
+  studyHelpPg:"上一页／下一页（Home / End 跳到最前／最后）。图片放大时，开启设置后跳到图片的下端／上端，在端点再按则从另一端打开下一页／上一页。",
   studyHelpZoom:"图片的放大、缩小、适应（纵向漫画不使用）。也支持 Ctrl+滚轮和双指缩放；放大的图片可用 ↑ / ↓ 或滚轮滚动。每次幅度在 ⚙ 高级设置中（1–25%，默认5%）。",
   studyHelpSearch:"在文本书中搜索（Enter=下一个匹配，Shift+Enter=上一个匹配）。",
   studyHelpBookmark:"B=添加或移除书签，M=开关书签列表。",
@@ -340,7 +340,7 @@ Object.assign(TEXT.zh, {
   studyTextSpacingTight:"紧凑", studyTextSpacingNormal:"行距普通", studyTextSpacingLoose:"行距宽松",
   studyTextWidthNarrow:"边距窄", studyTextWidthNormal:"边距普通", studyTextWidthWide:"边距宽",
   studyTextTuneHint:"竖排与活页纸也同样生效。", studyZoomFit:"适应", studyZoomValue:"{n}%", studyZoomHint:"也可用 Ctrl+滚轮和双指缩放。放大的图片可用 ↑ / ↓ 或滚轮滚动。",
-  studyZoomEdgeKeys:"放大时，PageDown / PageUp 跳到图片的下端／上端", studyZoomEdgeKeysHint:"未放大时仍与以往一样翻页。到端点后再跳回另一端。",
+  studyZoomEdgeKeys:"放大时，PageDown / PageUp 到达图片端点并翻页", studyZoomEdgeKeysHint:"把放大的图片一次跳到下端／上端。在端点再按一次，会从另一端打开下一页／上一页（到书的首尾时跳回另一端）。未放大时仍与以往一样翻页。",
   studyMiddleClickNext:"鼠标中键点击跳到下一页", studyMiddleClickNextHint:"仅对图片书有效（会关闭浏览器的自动滚动）。",
   studyZoomStepLabel:"缩放步长", studyZoomStepOption:"{n}%", studyZoomStepHint:"−／＋、Ctrl+滚轮或双指缩放每次的幅度（默认5%＝从100%到200%需20次）。",
   studyTvLookLabel:"电视外观", studyTvLookPlain:"素屏", studyTvLookCrt:"显像管", studyTvLookWood:"木框", studyTvLookArcade:"街机",
@@ -407,7 +407,7 @@ Object.assign(TEXT.ko, {
   studyHelp:"❓ 키 설명", studyHelpTitle:"서재 키 조작", studyHelpClose:"닫기",
   studyHelpNav:"→ 다음, ← 이전 (고급 설정에서 다시 지정할 수 있습니다). 이미지의 좌우를 누르면 제본 방향에 따라 넘깁니다. 텍스트는 스크롤합니다. 마우스 가운데 버튼으로 다음으로 가는 설정도 있습니다.",
   studyHelpSpace:"다음 페이지. 길게 누르면 이미지=페이지 이동 막대, 텍스트=책갈피 저장입니다.",
-  studyHelpPg:"이전/다음 페이지 (Home / End 로 처음/마지막). 확대 중에는 설정이 켜져 있으면 이미지의 아래끝/위끝으로 (끝에서는 반대 끝으로).",
+  studyHelpPg:"이전/다음 페이지 (Home / End 로 처음/마지막). 확대 중에는 설정이 켜져 있으면 이미지의 아래끝/위끝으로 이동하고, 끝에서 한 번 더 누르면 다음/이전 페이지를 반대쪽 끝에서 엽니다.",
   studyHelpZoom:"이미지 확대·축소·맞춤 (세로형 만화에서는 사용하지 않습니다). Ctrl+휠과 핀치도 가능하며, 확대한 이미지는 ↑ / ↓ 또는 휠로 이동합니다. 한 번의 폭은 ⚙ 고급 설정 (1–25%, 기본 5%).",
   studyHelpSearch:"텍스트 책의 본문 검색 (Enter=다음 일치, Shift+Enter=이전 일치).",
   studyHelpBookmark:"B=책갈피 저장·해제, M=책갈피 목록 열기/닫기.",
@@ -453,7 +453,7 @@ Object.assign(TEXT.ko, {
   studyTextWidthNarrow:"여백 좁게", studyTextWidthNormal:"여백 보통", studyTextWidthWide:"여백 넓게",
   studyTextTuneHint:"세로쓰기와 루즈리프에도 함께 적용됩니다.",
   studyZoomFit:"맞춤", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+휠과 핀치로도 확대할 수 있습니다. 확대한 이미지는 ↑ / ↓ 또는 휠로 이동합니다.",
-  studyZoomEdgeKeys:"확대 중에는 PageDown / PageUp으로 이미지 아래끝/위끝으로", studyZoomEdgeKeysHint:"확대하지 않았을 때는 이전과 같이 페이지를 넘깁니다. 끝에 닿아 있으면 반대 끝으로 돌아갑니다.",
+  studyZoomEdgeKeys:"확대 중에는 PageDown / PageUp으로 이미지 끝과 페이지를 이동", studyZoomEdgeKeysHint:"확대한 이미지를 한 번에 아래끝/위끝으로 보냅니다. 끝에서 한 번 더 누르면 다음/이전 페이지를 반대쪽 끝에서 엽니다 (책의 처음/끝에서는 반대 끝으로 돌아갑니다). 확대하지 않았을 때는 이전과 같이 페이지를 넘깁니다.",
   studyMiddleClickNext:"마우스 가운데 클릭으로 다음 페이지", studyMiddleClickNextHint:"이미지 책에서만 동작합니다 (브라우저 자동 스크롤은 막습니다).",
   studyZoomStepLabel:"확대 폭", studyZoomStepOption:"{n}%", studyZoomStepHint:"− / ＋, Ctrl+휠, 핀치 한 번의 폭입니다 (기본 5% = 100%→200%가 20번).",
   studyTvLookLabel:"TV 외형", studyTvLookPlain:"기본 화면", studyTvLookCrt:"브라운관", studyTvLookWood:"나무 프레임",
@@ -511,6 +511,7 @@ function studyKeyCodeLabel(code) {
 let studyDbPromise = null;
 let studyBooks = [], studyCurrentBook = null, studyCurrentPage = 0;
 let studyVerticalBookId = "", studyVerticalObserver = null, studyVerticalScrollTimer = 0;
+let studyZoomLand = "";   /* ページを移ったあとに開く位置（top／bottom）。画像の高さが決まってから当てる */
 let studyMemoSaveTimer = 0, studyProgressTimer = 0, studyRenderToken = 0, studyImageLoadSeq = 0;
 let studyRoomOpen = false, studyClosePending = false, studyTVToken = 0, studyTVArtUrl = "", studyTVArtSong = "";
 let studyHoldTimer = 0, studyHeldCode = "", studyHoldAction = "", studySuppressTapUntil = 0;
@@ -1464,6 +1465,17 @@ function studySetImage(img, blob, alt) {
   studyObjectUrls.add(url); img.dataset.studyObjectUrl = url; img.alt = alt || ""; img.src = url; img.hidden = false;
   return true;
 }
+/* 画像の高さが決まるまで待ちます（拡大中の「続きの端から開く」ため。失敗・2秒で先へ進む）。 */
+function studyImageReady(img) {
+  if (!img || !img.src || (img.complete && img.naturalWidth > 0)) return Promise.resolve();
+  return new Promise(resolve => {
+    let settled = false;
+    const finish = () => { if (settled) return; settled = true; clearTimeout(timer); resolve(); };
+    const timer = setTimeout(finish, 2000);
+    img.addEventListener("load", finish, { once:true });
+    img.addEventListener("error", finish, { once:true });
+  });
+}
 function studyClearVerticalPages() {
   if (studyVerticalObserver) { studyVerticalObserver.disconnect(); studyVerticalObserver = null; }
   const box = core.$("studyVerticalPages");
@@ -1485,6 +1497,7 @@ async function studyLoadPageImage(img, index, book = studyCurrentBook) {
     if (img.dataset.studyLoadToken !== loadToken || book !== studyCurrentBook || renderToken !== studyRenderToken) return;
     if (!studyIsBlob(blob)) { studyClearImage(img); studySetStatus("studyImageLoadError"); return; }
     if (!studySetImage(img, blob, `${book.title} — ${page.name} (${index + 1})`)) studySetStatus("studyImageLoadError");
+    await studyImageReady(img);
   } catch (error) {
     if (img.dataset.studyLoadToken === loadToken) { studyClearImage(img); studyFail(error, "studyImageLoadError"); }
   }
@@ -1539,7 +1552,7 @@ async function studyRenderImagePage() {
     const target = core.$("studyVerticalPages").children[studyCurrentPage];
     if (target && typeof target.scrollIntoView === "function") requestAnimationFrame(() => { target.scrollIntoView({ block:"start", behavior:"auto" }); studyVerticalScroll(); });
     else studyVerticalScroll();
-    studySyncPageCount(); studyApplyZoom(false); return;
+    studyZoomLand = ""; studySyncPageCount(); studyApplyZoom(false); return;
   }
   studyClearVerticalPages();
   core.$("studyVerticalPages").hidden = true;
@@ -1555,7 +1568,7 @@ async function studyRenderImagePage() {
     core.$("studySingleWrap").hidden = false; core.$("studySpreadWrap").hidden = true;
     await studyLoadPageImage(core.$("studyPageSingle"), studyCurrentPage, book);
   }
-  if (token === studyRenderToken) { studySyncPageCount(); studyApplyZoom(false); }
+  if (token === studyRenderToken) { studySyncPageCount(); studyApplyZoom(false); studyApplyZoomLand(); }
 }
 function studyBuildVerticalPages() {
   const book = studyCurrentBook, box = core.$("studyVerticalPages");
@@ -1662,23 +1675,46 @@ function studyScrollZoomedImage(direction, held) {
   }
   return moved;
 }
-/* 拡大した画像を、PageDown＝下端／PageUp＝上端へ一度に送る（端に着いていたら反対の端へ）。
+/* 拡大した画像を、PageDown＝下端／PageUp＝上端へ一度に送ります。
+   もう端に着いていたときは、次の／前のページへ移り、続きの端から開きます
+   （PageDown＝次のページの上端、PageUp＝前のページの下端）。本の端で動けないときは反対の端へ戻します。
    送り先が無いとき・拡大していないときは false を返し、ページ送りにゆずります。 */
 function studyJumpZoomEdge(direction) {
   const nodes = studyZoomScrollNodes();
   if (!nodes) return false;
+  const targets = nodes.filter(node => node && node.scrollHeight - node.clientHeight > 1);
+  if (!targets.length) return false;
+  const atEdge = targets.every(node => direction > 0 ? node.scrollTop >= node.scrollHeight - node.clientHeight - 1 : node.scrollTop <= 1);
+  const step = studyPrefs.imageMode === "spread" ? 2 : 1;
+  const target = studyCurrentPage + direction * step;
+  if (atEdge && studyNormalizePage(target) !== studyCurrentPage) {
+    studyZoomLand = direction > 0 ? "top" : "bottom";
+    studyJumpToPage(target);
+    return true;
+  }
   let moved = false;
-  for (const node of nodes) {
-    if (!node) continue;
+  for (const node of targets) {
     const extent = node.scrollHeight - node.clientHeight;
-    if (extent <= 1) continue;
-    const atEdge = direction > 0 ? node.scrollTop >= extent - 1 : node.scrollTop <= 1;
     const next = atEdge ? (direction > 0 ? 0 : extent) : (direction > 0 ? extent : 0);
     if (next === node.scrollTop) continue;
     moved = true;
     node.scrollTop = next;
   }
   return moved;
+}
+/* ページを移ったあとに開く位置（top＝上端／bottom＝下端）。画像の高さが決まってから当てます。 */
+function studyApplyZoomLand() {
+  const land = studyZoomLand;
+  studyZoomLand = "";
+  if (!land) return;
+  const nodes = studyZoomScrollNodes();
+  if (!nodes) return;
+  for (const node of nodes) {
+    if (!node) continue;
+    const extent = node.scrollHeight - node.clientHeight;
+    if (extent <= 1) continue;
+    node.scrollTop = land === "bottom" ? extent : 0;
+  }
 }
 
 /* ============ 文章の表示 ============ */

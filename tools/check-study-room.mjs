@@ -152,6 +152,9 @@ assert.ok(reader.includes("studyScrollZoomedImage") &&
 assert.ok(reader.includes("studyJumpZoomEdge") && reader.includes("studyPrefs.zoomEdgeKeys &&") &&
   reader.includes('studyJumpZoomEdge(event.code === "PageDown" ? 1 : -1)'),
   "PageDown / PageUp can jump to the bottom / top of a zoomed image, behind their own setting");
+assert.ok(reader.includes("studyApplyZoomLand") && reader.includes("await studyImageReady(img)") &&
+  reader.includes("studyApplyZoom(false); studyApplyZoomLand();"),
+  "the page turn waits for the image height and then opens at the continued edge");
 assert.ok(reader.includes("studyPrefs.middleClickNext") && reader.includes("studyMiddleClick(event, true)") &&
   reader.includes('addEventListener("mousedown", event => { studyMiddleClick(event, false); })') &&
   reader.includes('addEventListener("auxclick"') && reader.includes("if (event.button) return;"),
@@ -343,34 +346,79 @@ for (let i = 0; i < 20; i++) zoomStep(1);
 assert.equal(zoomStepContext.studyPrefs.zoom, 4, "the 25 percent step stops at 400 percent");
 for (let i = 0; i < 30; i++) zoomStep(-1);
 assert.equal(zoomStepContext.studyPrefs.zoom, 0.5, "the 25 percent step stops at 50 percent");
-/* ---------- 拡大中の PageDown / PageUp（端へ・端の次は反対の端へ） ---------- */
+/* ---------- 拡大中の PageDown / PageUp（端へ→端でさらに押すとページ送り） ---------- */
 const jumpEdgeFn = readerWithCore.match(/function studyJumpZoomEdge\(direction\) \{[\s\S]*?\n\}/);
-assert.ok(jumpEdgeFn, "the PageDown / PageUp edge jump is defined");
-vm.runInContext(`${jumpEdgeFn[0]}\nglobalThis.jumpZoomEdge = studyJumpZoomEdge;`, scrollContext);
-scrollContext.studyPrefs.imageMode = "single"; scrollContext.studyPrefs.zoom = 2; scrollContext.studyCurrentBook = { kind:"image" };
-singleWrap.scrollTop = 0;
-assert.equal(scrollContext.jumpZoomEdge(1), true, "PageDown moves a zoomed image");
-assert.equal(singleWrap.scrollTop, 1800, "PageDown jumps to the bottom of the image");
-assert.equal(scrollContext.jumpZoomEdge(1), true, "PageDown at the bottom still moves");
-assert.equal(singleWrap.scrollTop, 0, "PageDown at the bottom wraps to the top");
-assert.equal(scrollContext.jumpZoomEdge(-1), true, "PageUp from the top still moves");
-assert.equal(singleWrap.scrollTop, 1800, "PageUp at the top wraps to the bottom");
-assert.equal(scrollContext.jumpZoomEdge(-1), true, "PageUp moves a zoomed image");
-assert.equal(singleWrap.scrollTop, 0, "PageUp jumps to the top of the image");
-scrollContext.studyPrefs.imageMode = "spread";
-spreadPages.forEach(node => { node.scrollTop = 0; });
-assert.equal(scrollContext.jumpZoomEdge(1), true, "a spread jumps too");
-assert.deepEqual(Array.from(spreadPages, node => node.scrollTop), [1800, 1800], "both spread pages jump to the bottom");
-scrollContext.studyPrefs.imageMode = "vertical";
-assert.equal(scrollContext.jumpZoomEdge(1), false, "vertical comic mode keeps the stage's own scrolling");
-scrollContext.studyPrefs.imageMode = "single"; scrollContext.studyPrefs.zoom = 1;
-assert.equal(scrollContext.jumpZoomEdge(1), false, "without zoom the keys keep changing pages");
-scrollContext.studyPrefs.zoom = 2; scrollContext.studyCurrentBook = { kind:"text" };
-assert.equal(scrollContext.jumpZoomEdge(1), false, "text books keep their own key handling");
-scrollContext.studyCurrentBook = { kind:"image" };
-const flatWrap = scrollNode(600, 600);
-scrollContext.window.Trk.core.$ = id => id === "studySingleWrap" ? flatWrap : { querySelectorAll: () => spreadPages };
-assert.equal(scrollContext.jumpZoomEdge(1), false, "an image that fits the screen has no edge to jump to");
+const normalizeFn = readerWithCore.match(/function studyNormalizePage\(page\) \{[\s\S]*?\n\}/);
+const applyLandFn = readerWithCore.match(/function studyApplyZoomLand\(\) \{[\s\S]*?\n\}/);
+assert.ok(jumpEdgeFn && normalizeFn && applyLandFn, "the PageDown / PageUp edge jump and its landing are defined");
+const edgeContext = vm.createContext({});
+vm.runInContext(`${zoomNodesFn[0]}
+${normalizeFn[0]}
+${jumpEdgeFn[0]}
+${applyLandFn[0]}
+globalThis.studyZoomLand = "";
+globalThis.studyPrefs = { imageMode:"single", zoom:2 };
+globalThis.studyCurrentBook = { kind:"image", pages:[{ key:"a" }, { key:"b" }, { key:"c" }] };
+globalThis.studyCurrentPage = 0;
+globalThis.pageJumps = [];
+globalThis.studyJumpToPage = page => { studyCurrentPage = studyNormalizePage(page); pageJumps.push(studyCurrentPage); };
+globalThis.single = { scrollHeight:2400, clientHeight:600, scrollTop:0 };
+globalThis.spread = [{ scrollHeight:2400, clientHeight:600, scrollTop:0 }, { scrollHeight:2400, clientHeight:600, scrollTop:0 }];
+globalThis.flat = { scrollHeight:600, clientHeight:600, scrollTop:0 };
+globalThis.elems = { studySingleWrap: () => single, studySpreadWrap: () => ({ querySelectorAll: () => spread }) };
+globalThis.window = { Trk: { core: { $: id => elems[id]() } } };
+globalThis.jumpEdge = studyJumpZoomEdge;
+globalThis.applyLand = studyApplyZoomLand;
+`, edgeContext);
+const edge = (fn, ...args) => vm.runInContext(`${fn}(${args.join(",")})`, edgeContext);
+const edgeState = () => vm.runInContext("({ page:studyCurrentPage, jumps:pageJumps.slice(), land:studyZoomLand, top:single.scrollTop, spread:spread.map(n => n.scrollTop) })", edgeContext);
+assert.equal(edge("jumpEdge", 1), true, "PageDown moves a zoomed image");
+assert.equal(edgeState().top, 1800, "PageDown jumps to the bottom of the image");
+assert.deepEqual(Array.from(edgeState().jumps), [], "the first press stays inside the image");
+assert.equal(edge("jumpEdge", 1), true, "PageDown at the bottom still moves");
+assert.deepEqual(Array.from(edgeState().jumps), [1], "PageDown at the bottom turns to the next page");
+assert.equal(edgeState().land, "top", "the next page opens at its top");
+assert.equal(edgeState().top, 1800, "the page turn leaves the old scroll position to the landing step");
+edge("applyLand");
+assert.equal(edgeState().land, "", "the landing is applied once");
+assert.equal(edgeState().top, 0, "the landing opens the new page at the top");
+assert.equal(edge("jumpEdge", 1), true, "PageDown on the new page moves again");
+assert.equal(edgeState().top, 1800, "PageDown goes to the bottom again");
+assert.equal(edge("jumpEdge", -1), true, "PageUp at the bottom moves");
+assert.equal(edgeState().top, 0, "PageUp jumps to the top");
+assert.equal(edge("jumpEdge", -1), true, "PageUp at the top still moves");
+assert.deepEqual(Array.from(edgeState().jumps), [1, 0], "PageUp at the top turns to the previous page");
+assert.equal(edgeState().land, "bottom", "the previous page opens at its bottom");
+edge("applyLand");
+assert.equal(edgeState().top, 1800, "the landing opens the previous page at the bottom");
+vm.runInContext("studyCurrentPage = 2; single.scrollTop = 1800; pageJumps.length = 0;", edgeContext);
+assert.equal(edge("jumpEdge", 1), true, "at the end of the book PageDown still moves");
+assert.deepEqual(Array.from(edgeState().jumps), [], "the last page does not turn");
+assert.equal(edgeState().top, 0, "at the end of the book PageDown comes back to the top");
+assert.equal(edgeState().land, "", "no landing is left over at the end of the book");
+vm.runInContext("studyCurrentPage = 0; single.scrollTop = 0;", edgeContext);
+assert.equal(edge("jumpEdge", -1), true, "at the first page PageUp still moves");
+assert.equal(edgeState().top, 1800, "at the first page PageUp comes back to the bottom");
+vm.runInContext("studyCurrentPage = 0; single.scrollTop = 0; studyPrefs.imageMode = \"spread\"; pageJumps.length = 0;", edgeContext);
+assert.equal(edge("jumpEdge", 1), true, "a spread moves too");
+assert.deepEqual(Array.from(edgeState().spread), [1800, 1800], "both spread pages jump to the bottom");
+assert.equal(edge("jumpEdge", 1), true, "a spread turns by one opening");
+assert.deepEqual(Array.from(edgeState().jumps), [2], "a spread turns two pages at a time");
+vm.runInContext("spread.forEach(node => { node.scrollTop = 0; }); studyCurrentPage = 0; pageJumps.length = 0; studyPrefs.imageMode = \"spread\";", edgeContext);
+assert.equal(edge("jumpEdge", 1), true, "a spread with only one page scrolled moves the images");
+assert.deepEqual(Array.from(edgeState().jumps), [], "a half-scrolled spread jumps to the edge instead of turning");
+vm.runInContext("spread[0].scrollTop = 1800; spread[1].scrollTop = 900; pageJumps.length = 0;", edgeContext);
+assert.equal(edge("jumpEdge", 1), true, "a spread with one page already at the bottom still moves");
+assert.deepEqual(Array.from(edgeState().jumps), [], "the page turns only when every spread page is at the edge");
+assert.deepEqual(Array.from(edgeState().spread), [1800, 1800], "both spread pages align to the bottom");
+vm.runInContext("studyPrefs.imageMode = \"vertical\";", edgeContext);
+assert.equal(edge("jumpEdge", 1), false, "vertical comic mode keeps the stage's own scrolling");
+vm.runInContext("studyPrefs.imageMode = \"single\"; studyPrefs.zoom = 1;", edgeContext);
+assert.equal(edge("jumpEdge", 1), false, "without zoom the keys keep changing pages");
+vm.runInContext("studyPrefs.zoom = 2; studyCurrentBook = { kind:\"text\", pages:[] };", edgeContext);
+assert.equal(edge("jumpEdge", 1), false, "text books keep their own key handling");
+vm.runInContext("studyCurrentBook = { kind:\"image\", pages:[{ key:\"a\" }] }; single.scrollTop = 0; elems.studySingleWrap = () => flat;", edgeContext);
+assert.equal(edge("jumpEdge", 1), false, "an image that fits the screen has no edge to jump to");
 const advancedMarkup = html.slice(html.indexOf('<details class="study-advanced study-shelf-advanced">'), html.indexOf('<p id="studyShelfDragHelp"'));
 assert.ok(/<input id="studyZoomEdgeKeys" type="checkbox" checked>/.test(advancedMarkup),
   "the PageDown / PageUp edge jump is on by default and can be switched off");
@@ -520,4 +568,4 @@ for (const file of ["player.js", "main.js", "media-player-mode.js", "catch.js", 
   assert.ok(!/_trk(MediaPlayer|SynthMode)Open/.test(core), "core.js has no old media／synth flag left");
 }
 
-console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring, ↑ / ↓ scrolling of a zoomed image (tap = one screen, hold = small steps, edges handed back to the page keys), percent zoom steps for the wheel / buttons / pinch (1 / 2 / 5 / 10 / 25 %, 5 % by default), PageDown / PageUp jumping to the bottom / top of a zoomed image, opt-in middle-click page turning`);
+console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring, ↑ / ↓ scrolling of a zoomed image (tap = one screen, hold = small steps, edges handed back to the page keys), percent zoom steps for the wheel / buttons / pinch (1 / 2 / 5 / 10 / 25 %, 5 % by default), PageDown / PageUp jumping to the bottom / top of a zoomed image and then turning the page at its edges, opt-in middle-click page turning`);

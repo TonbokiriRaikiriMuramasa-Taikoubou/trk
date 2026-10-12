@@ -1,6 +1,6 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移したtrk70〜trk118の履歴と、trk114〜118の検証記録です（trk119以降の検証は HANDOFF §6）。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
+> `docs/HANDOFF.md` から移したtrk70〜trk119の履歴と、trk114〜118の検証記録です（trk120以降の検証は HANDOFF §6）。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
 
 ## trk114〜118 の検証記録（trk118のマージ前に HANDOFF §6 から移動）
 
@@ -11,6 +11,10 @@
 - trk114のブラウザ確認（リポジトリ外の `@sparticuz/chromium`＋`puppeteer-core`、Chromium 153 headless）：`tools/smoke-browser.mjs --compare` は boot 0・未解決0・譜面10件一致・decode error 0・click error 0・mobile/safe-offline OK。`tools/smoke-game-end.mjs` PASS。加えて一時スクリプトで23項目（ガイドの鍵と英語表示、削除→再起動で戻らない→♻で復元、移したOSTが戻らない、3スキンのaxe、MIDIの `midiLoaded`／`midiTooDense`、ページエラー0）を確認。半透明カードのスキンはaxeが「判定不能」になるため、16スキンの数値はNodeの計算（`tests/skin-contrast.test.mjs`）で確認。
 
 ## 旧 HANDOFF §11「最近の変更」
+
+### trk119 の記録（2026-10-12。trk122のときに HANDOFF §7 から移動）
+
+- **trk119（2026-10-12）**：📚 書斎の画像リーダーで、**拡大した画像を `↑`／`↓` で送れる**ようにした（マウスホイールが動かすのと同じ場所＝1枚ずつの台紙・見開きの各ページ）。1回押し＝表示高の84%、押しっぱなし（キーリピート）＝6%ずつ。上下の端に着いたらキーを返し、上級者向け設定「画像ページを ↑ / ↓ で移動する」のページ送り（既定はオフ）や既存のページ操作はそのまま効く。縦読みは台紙そのものがスクロールするので対象外。送りは滑らせず、押した回数どおりに動く（連打・長押しでも取りこぼさない）。`studyHelpZoom`／`studyZoomHint` の文言4言語と、ガイド（ja／en）を更新。`sw.js` cache名（`trk-v2026.10.12-trk119`）を更新。
 
 ### trk118 の記録（2026-10-12。trk121のときに HANDOFF §7 から移動）
 

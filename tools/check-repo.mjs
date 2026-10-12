@@ -1744,15 +1744,23 @@ if (!read("js/library.js").includes("plAuthorMenu") ||
     css.includes(".bannerVolBtn,.bannerPlayBtn{") && css.includes(".bannerPlayBtn:disabled{");
   const padOk = Number((css.match(/\.bannerText\{[^}]*padding-right:(\d+)px/) || [])[1] || 0) >= 96;
   const tipCount = key => (i18n.match(new RegExp(key + ":", "g")) || []).length;
-  const tipsOk = tipCount("bannerPlayPauseTip") === 4 && tipCount("bannerPlayResumeTip") === 4;
+  const tipsOk = tipCount("bannerPlayPauseTip") === 4 && tipCount("bannerPlayResumeTip") === 4 &&
+    tipCount("bannerPlayNoSongTip") === 4 && tipCount("bannerPlayPreviewOffTip") === 4 && tipCount("bannerPlayIdleTip") === 4;
   const start = library.indexOf("function bannerPlayAction(st) {");
   const end = library.indexOf("\nfunction bannerPlayState");
   const source = start >= 0 && end > start ? library.slice(start, end) : "";
+  const tipStart = library.indexOf("function bannerPlayTipKey(st, act) {");
+  const tipEnd = library.indexOf("\nfunction bannerPlaySync");
+  const tipSource = tipStart >= 0 && tipEnd > tipStart ? library.slice(tipStart, tipEnd) : "";
   const context = vm.createContext({});
-  let action = null;
+  let action = null, tipKey = null;
   if (source) {
     new vm.Script(source + "\nglobalThis.__bannerPlayAction = bannerPlayAction;").runInContext(context);
     action = context.__bannerPlayAction;
+  }
+  if (source && tipSource) {
+    new vm.Script(source + "\n" + tipSource + "\nglobalThis.__bannerPlayTipKey = bannerPlayTipKey;").runInContext(context);
+    tipKey = context.__bannerPlayTipKey;
   }
   const st = extra => Object.assign({ mediaMode:false, phase:"title", hasSong:true, previewEnabled:true, previewPlaying:true }, extra);
   const results = action ? [
@@ -1763,9 +1771,23 @@ if (!read("js/library.js").includes("plAuthorMenu") ||
   ] : [];
   const expected = ["pause", "resume", "preview-pause", "preview-play", null, null, null, null];
   const logicOk = JSON.stringify(results) === JSON.stringify(expected);
-  if (!wiringOk || !cssOk || !padOk || !tipsOk || !logicOk) {
+  /* 説明の文言：押せるときは押すとどうなるか、押せないときは理由（曲未選択／プレビューオフ／その他） */
+  const tipOf = extra => { const s = st(extra); return tipKey(s, action(s)); };
+  const tipResults = tipKey ? [
+    tipOf({ phase:"playing" }), tipOf({ phase:"paused" }), tipOf({ previewPlaying:false }),
+    tipOf({ previewPlaying:true }), tipOf({ hasSong:false }), tipOf({ previewEnabled:false }),
+    tipOf({ hasSong:false, previewEnabled:false }), tipOf({ mediaMode:true, phase:"playing" }),
+    tipOf({ phase:"ended" }), tipOf({ mediaMode:true, hasSong:false }),
+  ] : [];   /* メディアプレーヤー中は押せない（action が null）ので「今は押せない」 */
+  const tipExpected = ["bannerPlayPauseTip", "bannerPlayResumeTip", "bannerPlayResumeTip", "bannerPlayPauseTip",
+    "bannerPlayNoSongTip", "bannerPlayPreviewOffTip", "bannerPlayNoSongTip", "bannerPlayIdleTip",
+    "bannerPlayIdleTip", "bannerPlayIdleTip"];
+  const tipLogicOk = JSON.stringify(tipResults) === JSON.stringify(tipExpected) &&
+    library.includes("const tip = tr(bannerPlayTipKey(st, act));") && library.includes("bannerPlayBtn.disabled = !act");
+  if (!wiringOk || !cssOk || !padOk || !tipsOk || !logicOk || !tipLogicOk) {
     fail("song-banner play/pause button (left of the volume button, same size) is missing or miswired" +
-      (logicOk ? "" : ` — actions were ${JSON.stringify(results)}, expected ${JSON.stringify(expected)}`));
+      (logicOk ? "" : ` — actions were ${JSON.stringify(results)}, expected ${JSON.stringify(expected)}`) +
+      (tipLogicOk ? "" : ` — tips were ${JSON.stringify(tipResults)}, expected ${JSON.stringify(tipExpected)}`));
   } else {
     ok("song-banner play/pause sits left of the volume button with the same size, pauses preview and game, and a newly chosen song plays again (four-language tip)");
   }

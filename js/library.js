@@ -2862,11 +2862,21 @@ function bannerPlayState() {
   return { mediaMode: !!window._trkMediaPlayerMode, phase: core.phase, hasSong: !!(core.currentSong && video.src),
     previewEnabled: !!core.settings.previewEnabled, previewPlaying: !video.paused };
 }
+/* 説明の文言（純粋関数・検査で確認）。押せないときは、押せない理由を言う（曲未選択／プレビューオフ） */
+function bannerPlayTipKey(st, act) {
+  if (act === "pause" || act === "preview-pause") return "bannerPlayPauseTip";
+  if (act) return "bannerPlayResumeTip";
+  if (st.mediaMode || st.phase !== "title") return "bannerPlayIdleTip";
+  if (!st.hasSong) return "bannerPlayNoSongTip";
+  if (!st.previewEnabled) return "bannerPlayPreviewOffTip";
+  return "bannerPlayIdleTip";
+}
 function bannerPlaySync() {   /* アイコンと説明を「押すとどうなるか」に合わせる */
-  const act = bannerPlayAction(bannerPlayState());
+  const st = bannerPlayState();
+  const act = bannerPlayAction(st);
   const showsPause = act === "pause" || act === "preview-pause";
   bannerPlayBtn.textContent = showsPause ? "⏸" : "▶";
-  const tip = tr(showsPause ? "bannerPlayPauseTip" : "bannerPlayResumeTip");
+  const tip = tr(bannerPlayTipKey(st, act));
   if (bannerPlayBtn.title !== tip) { bannerPlayBtn.title = tip; bannerPlayBtn.setAttribute("aria-label", tip); }
   bannerPlayBtn.disabled = !act;   /* 止める音がないとき（曲未選択・プレビューオフ）は押せない */
 }

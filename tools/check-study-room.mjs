@@ -150,7 +150,8 @@ assert.ok(reader.includes("studyScrollZoomedImage") &&
   reader.includes('studyScrollZoomedImage(event.code === "ArrowDown" ? 1 : -1, event.repeat)'),
   "a zoomed image can also be scrolled with the up/down keys, like the wheel");
 assert.ok(reader.includes("studyJumpZoomEdge") && reader.includes("studyPrefs.zoomEdgeKeys &&") &&
-  reader.includes('studyJumpZoomEdge(event.code === "PageDown" ? 1 : -1)'),
+  reader.includes('studyJumpZoomEdge(event.code === "PageDown" ? 1 : -1, event.repeat)') &&
+  reader.includes("if (repeat) return true;"),
   "PageDown / PageUp can jump to the bottom / top of a zoomed image, behind their own setting");
 assert.ok(reader.includes("studyApplyZoomLand") && reader.includes("await studyImageReady(img)") &&
   reader.includes("studyApplyZoom(false); studyApplyZoomLand();"),
@@ -362,7 +363,7 @@ assert.equal(zoomStepContext.studyPrefs.zoom, 4, "the 25 percent step stops at 4
 for (let i = 0; i < 30; i++) zoomStep(-1);
 assert.equal(zoomStepContext.studyPrefs.zoom, 0.5, "the 25 percent step stops at 50 percent");
 /* ---------- 拡大中の PageDown / PageUp（端へ→端でさらに押すとページ送り） ---------- */
-const jumpEdgeFn = readerWithCore.match(/function studyJumpZoomEdge\(direction\) \{[\s\S]*?\n\}/);
+const jumpEdgeFn = readerWithCore.match(/function studyJumpZoomEdge\(direction, repeat = false\) \{[\s\S]*?\n\}/);
 const normalizeFn = readerWithCore.match(/function studyNormalizePage\(page\) \{[\s\S]*?\n\}/);
 const applyLandFn = readerWithCore.match(/function studyApplyZoomLand\(\) \{[\s\S]*?\n\}/);
 assert.ok(jumpEdgeFn && normalizeFn && applyLandFn, "the PageDown / PageUp edge jump and its landing are defined");
@@ -418,6 +419,23 @@ vm.runInContext("studyCurrentPage = 0; single.scrollTop = 0; closeCalls = 0;", e
 assert.equal(edge("jumpEdge", -1), true, "at the first page PageUp is still handled");
 assert.equal(edgeState().top, 0, "at the first page the image no longer wraps to the bottom");
 assert.equal(vm.runInContext("closeCalls", edgeContext), 1, "PageUp at the first page closes instead");
+/* 押しっぱなし（キーリピート）では端で止まる：ページ送りも閉じる動作もしない（押し直したときだけ） */
+vm.runInContext("studyCurrentPage = 2; single.scrollTop = 1800; pageJumps.length = 0; closeCalls = 0;", edgeContext);
+assert.equal(edge("jumpEdge", 1, true), true, "a held PageDown at the end of the book is swallowed");
+assert.equal(vm.runInContext("closeCalls", edgeContext), 0, "a held PageDown never closes the book");
+vm.runInContext("studyCurrentPage = 1; single.scrollTop = 1800;", edgeContext);
+assert.equal(edge("jumpEdge", 1, true), true, "a held PageDown at the bottom is swallowed");
+assert.deepEqual(Array.from(edgeState().jumps), [], "a held PageDown does not turn the page");
+vm.runInContext("single.scrollTop = 0;", edgeContext);
+edge("jumpEdge", 1, true);
+assert.equal(edgeState().top, 1800, "a held PageDown still reaches the bottom of the image");
+/* 次のページを描画中（scrollHeightがまだ0）：押しっぱなしはページを飛ばさず、押し直しだけページ送り */
+vm.runInContext("studyCurrentPage = 0; single.scrollTop = 0; single.scrollHeight = 0; pageJumps.length = 0;", edgeContext);
+assert.equal(edge("jumpEdge", 1, true), true, "a held PageDown while the next page is still rendering is swallowed");
+assert.deepEqual(Array.from(edgeState().jumps), [], "a held PageDown while rendering does not turn the page");
+assert.equal(edge("jumpEdge", 1, false), false, "a fresh PageDown while rendering falls back to the page turn");
+vm.runInContext("single.scrollHeight = 2400; single.scrollTop = 0;", edgeContext);
+vm.runInContext("studyCurrentPage = 0; single.scrollTop = 0; closeCalls = 0; pageJumps.length = 0;", edgeContext);
 vm.runInContext("single.scrollTop = 300; closeCalls = 0;", edgeContext);
 assert.equal(edge("jumpEdge", -1), true, "PageUp away from the top keeps working");
 assert.equal(edgeState().top, 0, "PageUp away from the top goes to the top");

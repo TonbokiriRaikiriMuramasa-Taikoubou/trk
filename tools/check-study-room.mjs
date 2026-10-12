@@ -144,7 +144,8 @@ assert.ok(reader.includes("studyCancelImport") && reader.includes("studyImportSt
 assert.ok(reader.includes("studyImportAsk") && reader.includes("studyQuotaError"), "bulk replace + quota errors are handled");
 assert.ok(reader.includes("studySweepOrphans") && reader.includes("studyDBDeleteMany"), "orphaned pages are swept");
 assert.ok(reader.includes("studyGetSongCoverInfo") && reader.includes("studyClearSongCover"), "covers can be inspected and removed");
-assert.ok(reader.includes("STUDY_ZOOM_STEPS") && reader.includes("studyApplyZoomValue") && reader.includes("studyPinchStart"), "image zoom (buttons / wheel / pinch) exists");
+assert.ok(reader.includes("STUDY_ZOOM_MIN") && reader.includes("STUDY_ZOOM_MAX") && reader.includes("studyApplyZoomValue") && reader.includes("studyPinchStart"),
+  "image zoom (buttons / wheel / pinch) exists between 50% and 400%");
 assert.ok(reader.includes("studyScrollZoomedImage") &&
   reader.includes('studyScrollZoomedImage(event.code === "ArrowDown" ? 1 : -1, event.repeat)'),
   "a zoomed image can also be scrolled with the up/down keys, like the wheel");
@@ -283,6 +284,66 @@ assert.equal(scrollContext.scrollZoomedImage(1, false), false, "without zoom the
 scrollContext.studyPrefs.zoom = 2;
 scrollContext.studyCurrentBook = { kind:"text" };
 assert.equal(scrollContext.scrollZoomedImage(1, false), false, "text books keep their own key handling");
+
+/* ---------- 拡大の送り幅（％・1/2/5/10/25・初期値5） ---------- */
+const zoomConstants = reader.match(/const STUDY_ZOOM_MIN = [\s\S]*?function studyZoomPercentStep\(value\) \{[\s\S]*?\n\}/);
+const zoomStepPercentFn = reader.match(/function studyZoomStepPercent\(\) \{[^\n]*\}/);
+const snapZoomFn = readerWithCore.match(/function studySnapZoom\(value\) \{[\s\S]*?\n\}/);
+const stepZoomFn = readerWithCore.match(/function studyStepZoom\(direction\) \{[\s\S]*?\n\}/);
+assert.ok(zoomConstants && zoomStepPercentFn && snapZoomFn && stepZoomFn, "the percent zoom-step helpers are defined");
+assert.ok(reader.includes("STUDY_ZOOM_PERCENT_STEPS = [1, 2, 5, 10, 25]") && reader.includes("STUDY_ZOOM_PERCENT_DEFAULT = 5"),
+  "the wheel / button / pinch zoom step offers 1, 2, 5, 10 and 25 percent, five by default");
+const zoomStepSelect = html.match(/<select id="studyZoomPercentStep"[^>]*>([\s\S]*?)<\/select>/);
+assert.ok(zoomStepSelect, "the advanced settings offer a zoom-step select");
+assert.deepEqual([...zoomStepSelect[1].matchAll(/<option value="(\d+)"/g)].map(match => Number(match[1])), [1, 2, 5, 10, 25],
+  "the select lists the same percentages as the code, smallest first");
+assert.ok(/aria-labelledby="studyZoomStepLabel"/.test(zoomStepSelect[0]) && /aria-describedby="studyZoomStepHint"/.test(zoomStepSelect[0]),
+  "the zoom-step select has an accessible label and hint");
+const zoomStepContext = vm.createContext({});
+vm.runInContext(`${zoomConstants[0]}
+${zoomStepPercentFn[0]}
+${snapZoomFn[0]}
+${stepZoomFn[0]}
+globalThis.studyPrefs = { zoom:1, zoomPercentStep:5 };
+globalThis.zoomCalls = [];
+globalThis.studySetZoom = (value, save) => { studyPrefs.zoom = value; zoomCalls.push(value); return value; };
+`, zoomStepContext);
+const zoomSnap = value => vm.runInContext(`studySnapZoom(${JSON.stringify(value)})`, zoomStepContext);
+const zoomStep = direction => vm.runInContext(`studyStepZoom(${JSON.stringify(direction)})`, zoomStepContext);
+assert.equal(zoomStepContext.studyPrefs.zoomPercentStep, 5, "the default in-memory preference is the 5 percent step");
+assert.equal(vm.runInContext("studyZoomPercentStep(undefined)", zoomStepContext), 5, "an unset zoom step falls back to 5 percent");
+assert.equal(vm.runInContext('studyZoomPercentStep("25")', zoomStepContext), 25, "a stored zoom step is read as a number");
+assert.equal(vm.runInContext("studyZoomPercentStep(7)", zoomStepContext), 5, "an unsupported zoom step falls back to 5 percent");
+for (const step of [1, 2, 5, 10, 25]) assert.equal(vm.runInContext(`studyZoomPercentStep(${step})`, zoomStepContext), step, `${step} percent is supported`);
+assert.equal(zoomSnap(1.14), 1.15, "a pinched zoom snaps to the chosen step (up)");
+assert.equal(zoomSnap(1.12), 1.1, "a pinched zoom snaps to the chosen step (down)");
+assert.equal(zoomSnap(0.2), 0.5, "the zoom never snaps below 50 percent");
+assert.equal(zoomSnap(9), 4, "the zoom never snaps above 400 percent");
+zoomStepContext.studyPrefs.zoomPercentStep = 25;
+assert.equal(zoomSnap(2.2), 2.25, "the 25 percent step snaps to quarter steps");
+zoomStepContext.studyPrefs.zoomPercentStep = 1;
+assert.equal(zoomSnap(1.37), 1.37, "the 1 percent step keeps a fine value");
+zoomStepContext.studyPrefs.zoomPercentStep = 5; zoomStepContext.studyPrefs.zoom = 1;
+zoomStep(1); assert.equal(zoomStepContext.studyPrefs.zoom, 1.05, "one press moves by the chosen 5 percent");
+zoomStep(1); assert.equal(zoomStepContext.studyPrefs.zoom, 1.1, "pressing again keeps the 5 percent grid");
+zoomStep(-1); assert.equal(zoomStepContext.studyPrefs.zoom, 1.05, "zoom out uses the same step");
+assert.deepEqual([...zoomStepContext.zoomCalls], [1.05, 1.1, 1.05], "each press applies and saves the new zoom");
+zoomStepContext.studyPrefs.zoomPercentStep = 10; zoomStepContext.studyPrefs.zoom = 1.37;
+zoomStep(1); assert.equal(zoomStepContext.studyPrefs.zoom, 1.4, "an off-grid zoom steps to the next grid point");
+zoomStep(-1); assert.equal(zoomStepContext.studyPrefs.zoom, 1.3, "an off-grid zoom steps back to the previous grid point");
+zoomStepContext.studyPrefs.zoomPercentStep = 25; zoomStepContext.studyPrefs.zoom = 1;
+for (let i = 0; i < 20; i++) zoomStep(1);
+assert.equal(zoomStepContext.studyPrefs.zoom, 4, "the 25 percent step stops at 400 percent");
+for (let i = 0; i < 30; i++) zoomStep(-1);
+assert.equal(zoomStepContext.studyPrefs.zoom, 0.5, "the 25 percent step stops at 50 percent");
+assert.ok(reader.includes('studyBindPref("studyZoomPercentStep", "zoomPercentStep"'),
+  "the zoom-step select is wired to the preference");
+const prefsUiFn = reader.match(/function studyRefreshPrefsUI\(\) \{[\s\S]*?\n\}/);
+assert.ok(prefsUiFn && prefsUiFn[0].includes("studySyncZoomStepRow()"),
+  "opening the room fills the zoom-step select from the saved preference");
+assert.ok(/on\("language",[\s\S]{0,900}?studySyncZoomStepRow\(\)/.test(reader),
+  "changing the app language relabels the zoom-step options");
+assert.ok(reader.includes('option.textContent = tr("studyZoomStepOption"'), "the select options are relabelled from the dictionary");
 assert.ok(reader.includes("sweepOrphans:studySweepOrphans") && reader.includes("toggle:() =>"), "the public API exposes sweepOrphans/toggle for hosts and tests");
 assert.ok(reader.includes("function studyHelpOpen") && reader.includes("studyHelpTitle"), "the shortcut help overlay exists");
 assert.ok(reader.includes("document.body") && reader.includes("isConnected"), "the live <video> is restored even if its old parent was replaced");
@@ -415,4 +476,4 @@ for (const file of ["player.js", "main.js", "media-player-mode.js", "catch.js", 
   assert.ok(!/_trk(MediaPlayer|SynthMode)Open/.test(core), "core.js has no old media／synth flag left");
 }
 
-console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring, ↑ / ↓ scrolling of a zoomed image (tap = one screen, hold = small steps, edges handed back to the page keys)`);
+console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring, ↑ / ↓ scrolling of a zoomed image (tap = one screen, hold = small steps, edges handed back to the page keys), percent zoom steps for the wheel / buttons / pinch (1 / 2 / 5 / 10 / 25 %, 5 % by default)`);

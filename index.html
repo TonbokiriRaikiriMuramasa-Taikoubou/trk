@@ -1362,6 +1362,17 @@
           </label>
           <p class="study-advanced-hint" data-i18n="studyKeyAssignmentHint">ボタンを押してから使いたいキーを押します。設定済みのショートカットは選べません。</p>
           <div class="study-advanced-row">
+            <span id="studyZoomStepLabel" data-i18n="studyZoomStepLabel">拡大の送り幅</span>
+            <select id="studyZoomPercentStep" aria-labelledby="studyZoomStepLabel" aria-describedby="studyZoomStepHint">
+              <option value="1">1%</option>
+              <option value="2">2%</option>
+              <option value="5">5%</option>
+              <option value="10">10%</option>
+              <option value="25">25%</option>
+            </select>
+          </div>
+          <p id="studyZoomStepHint" class="study-advanced-hint" data-i18n="studyZoomStepHint">−／＋・Ctrl+ホイール・ピンチの1回ぶんです（初期値5%＝100%→200%が20回）。</p>
+          <div class="study-advanced-row">
             <span data-i18n="studyAlbumNestingLabel" id="studyAlbumNestingLabel">アルバムの分け方</span>
             <select id="studyAlbumNesting" aria-labelledby="studyAlbumNestingLabel">
               <option value="split" data-i18n="studyAlbumNestingSplit">サブフォルダごとに1冊</option>

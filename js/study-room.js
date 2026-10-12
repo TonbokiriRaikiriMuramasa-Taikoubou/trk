@@ -72,7 +72,7 @@ Object.assign(TEXT.ja, {
   studyHelpNav:"→で次へ・←で前へ（上級者向け設定で変更可）。画像の左右タップは綴じ方向に従います。テキストはスクロールします。",
   studyHelpSpace:"次のページへ。長押しすると、画像=ページ移動バー、テキスト=栞を挟みます。",
   studyHelpPg:"前のページ／次のページ（Home / End で最初／最後へ）。",
-  studyHelpZoom:"画像の拡大・縮小・フィット（縦読みでは使いません）。Ctrl+ホイールやピンチでも変えられ、拡大した画像は↑ / ↓かホイールで送れます。",
+  studyHelpZoom:"画像の拡大・縮小・フィット（縦読みでは使いません）。Ctrl+ホイールやピンチでも変えられ、拡大した画像は↑ / ↓かホイールで送れます。1回の幅は⚙上級者向けで1〜25%（初期値5%）。",
   studyHelpSearch:"テキスト本の本文を検索（Enter=次の一致 / Shift+Enter=前の一致）。",
   studyHelpBookmark:"B=栞を挟む・外す、M=栞一覧の開閉。",
   studyHelpTv:"T=TVの表示切替（上→下→非表示）、F=画像の全画面表示。",
@@ -117,6 +117,7 @@ Object.assign(TEXT.ja, {
   studyTextWidthNarrow:"余白せまい", studyTextWidthNormal:"余白ふつう", studyTextWidthWide:"余白広い",
   studyTextTuneHint:"縦書き・ルーズリーフにも同じ設定が効きます。",
   studyZoomFit:"フィット", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+ホイール・ピンチでも拡大できます。拡大した画像は↑ / ↓やホイールで送れます。",
+  studyZoomStepLabel:"拡大の送り幅", studyZoomStepOption:"{n}%", studyZoomStepHint:"−／＋・Ctrl+ホイール・ピンチの1回ぶんです（初期値5%＝100%→200%が20回）。",
   studyTvLookLabel:"TVの見た目", studyTvLookPlain:"素の画面", studyTvLookCrt:"ブラウン管", studyTvLookWood:"木枠",
   studyTvLookArcade:"アーケード", studyTvLookProjector:"プロジェクター", studyTvLookAquarium:"水槽",
   studyTvSizeLabel:"大きさ", studyTvSizeSmall:"小", studyTvSizeMedium:"中", studyTvSizeLarge:"大",
@@ -185,7 +186,7 @@ Object.assign(TEXT.en, {
   studyHelpNav:"→ goes forward and ← goes back (reassignable in Advanced settings). Tapping an image's left/right side follows the binding direction. Text scrolls instead.",
   studyHelpSpace:"Next page. Hold for the page seek bar (images) or to save a bookmark (text).",
   studyHelpPg:"Previous / next page (Home / End jump to the first / last page).",
-  studyHelpZoom:"Zoom in, out, and fit for images (not used in vertical comic mode). Ctrl+wheel and pinch work too; scroll a zoomed image with ↑ / ↓ or the wheel.",
+  studyHelpZoom:"Zoom in, out, and fit for images (not used in vertical comic mode). Ctrl+wheel and pinch work too; scroll a zoomed image with ↑ / ↓ or the wheel. The step size is in ⚙ Advanced (1–25%, 5% by default).",
   studyHelpSearch:"Search inside a text book (Enter = next match, Shift+Enter = previous match).",
   studyHelpBookmark:"B = add or remove a bookmark, M = toggle the bookmark list.",
   studyHelpTv:"T = cycle the TV (top → bottom → hidden), F = full-screen image.",
@@ -230,6 +231,7 @@ Object.assign(TEXT.en, {
   studyTextWidthNarrow:"Narrow", studyTextWidthNormal:"Normal", studyTextWidthWide:"Wide",
   studyTextTuneHint:"These also apply to manuscript paper and loose-leaf.",
   studyZoomFit:"Fit", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+wheel and pinch also zoom. Scroll a zoomed image with ↑ / ↓ or the wheel.",
+  studyZoomStepLabel:"Zoom step", studyZoomStepOption:"{n}%", studyZoomStepHint:"How much one press of − / ＋, Ctrl+wheel, or a pinch changes the zoom (default 5% = 20 steps from 100% to 200%).",
   studyTvLookLabel:"TV look", studyTvLookPlain:"Plain screen", studyTvLookCrt:"CRT", studyTvLookWood:"Wood frame",
   studyTvLookArcade:"Arcade", studyTvLookProjector:"Projector", studyTvLookAquarium:"Aquarium",
   studyTvSizeLabel:"Size", studyTvSizeSmall:"S", studyTvSizeMedium:"M", studyTvSizeLarge:"L",
@@ -293,7 +295,7 @@ Object.assign(TEXT.zh, {
   studyHelpNav:"→ 前进，← 后退（可在高级设置中重新指定）。点击图片左右侧仍按装订方向翻页。文本会滚动。",
   studyHelpSpace:"下一页。长按：图片=页码跳转条，文本=添加书签。",
   studyHelpPg:"上一页／下一页（Home / End 跳到最前／最后）。",
-  studyHelpZoom:"图片的放大、缩小、适应（纵向漫画不使用）。也支持 Ctrl+滚轮和双指缩放；放大的图片可用 ↑ / ↓ 或滚轮滚动。",
+  studyHelpZoom:"图片的放大、缩小、适应（纵向漫画不使用）。也支持 Ctrl+滚轮和双指缩放；放大的图片可用 ↑ / ↓ 或滚轮滚动。每次幅度在 ⚙ 高级设置中（1–25%，默认5%）。",
   studyHelpSearch:"在文本书中搜索（Enter=下一个匹配，Shift+Enter=上一个匹配）。",
   studyHelpBookmark:"B=添加或移除书签，M=开关书签列表。",
   studyHelpTv:"T=切换电视显示（上→下→隐藏），F=图片全屏。",
@@ -334,6 +336,7 @@ Object.assign(TEXT.zh, {
   studyTextSpacingTight:"紧凑", studyTextSpacingNormal:"行距普通", studyTextSpacingLoose:"行距宽松",
   studyTextWidthNarrow:"边距窄", studyTextWidthNormal:"边距普通", studyTextWidthWide:"边距宽",
   studyTextTuneHint:"竖排与活页纸也同样生效。", studyZoomFit:"适应", studyZoomValue:"{n}%", studyZoomHint:"也可用 Ctrl+滚轮和双指缩放。放大的图片可用 ↑ / ↓ 或滚轮滚动。",
+  studyZoomStepLabel:"缩放步长", studyZoomStepOption:"{n}%", studyZoomStepHint:"−／＋、Ctrl+滚轮或双指缩放每次的幅度（默认5%＝从100%到200%需20次）。",
   studyTvLookLabel:"电视外观", studyTvLookPlain:"素屏", studyTvLookCrt:"显像管", studyTvLookWood:"木框", studyTvLookArcade:"街机",
   studyTvLookProjector:"投影仪", studyTvLookAquarium:"水族箱", studyTvSizeLabel:"大小", studyTvSizeSmall:"小", studyTvSizeMedium:"中", studyTvSizeLarge:"大",
   studyTvRatioLabel:"画面比", studyTvRatio169:"16:9", studyTvRatio43:"4:3", studyTvRatio219:"21:9", studyTvNameToggle:"显示曲名",
@@ -399,7 +402,7 @@ Object.assign(TEXT.ko, {
   studyHelpNav:"→ 다음, ← 이전 (고급 설정에서 다시 지정할 수 있습니다). 이미지의 좌우를 누르면 제본 방향에 따라 넘깁니다. 텍스트는 스크롤합니다.",
   studyHelpSpace:"다음 페이지. 길게 누르면 이미지=페이지 이동 막대, 텍스트=책갈피 저장입니다.",
   studyHelpPg:"이전/다음 페이지 (Home / End 로 처음/마지막).",
-  studyHelpZoom:"이미지 확대·축소·맞춤 (세로형 만화에서는 사용하지 않습니다). Ctrl+휠과 핀치도 가능하며, 확대한 이미지는 ↑ / ↓ 또는 휠로 이동합니다.",
+  studyHelpZoom:"이미지 확대·축소·맞춤 (세로형 만화에서는 사용하지 않습니다). Ctrl+휠과 핀치도 가능하며, 확대한 이미지는 ↑ / ↓ 또는 휠로 이동합니다. 한 번의 폭은 ⚙ 고급 설정 (1–25%, 기본 5%).",
   studyHelpSearch:"텍스트 책의 본문 검색 (Enter=다음 일치, Shift+Enter=이전 일치).",
   studyHelpBookmark:"B=책갈피 저장·해제, M=책갈피 목록 열기/닫기.",
   studyHelpTv:"T=TV 표시 전환 (위→아래→숨김), F=이미지 전체 화면.",
@@ -444,6 +447,7 @@ Object.assign(TEXT.ko, {
   studyTextWidthNarrow:"여백 좁게", studyTextWidthNormal:"여백 보통", studyTextWidthWide:"여백 넓게",
   studyTextTuneHint:"세로쓰기와 루즈리프에도 함께 적용됩니다.",
   studyZoomFit:"맞춤", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+휠과 핀치로도 확대할 수 있습니다. 확대한 이미지는 ↑ / ↓ 또는 휠로 이동합니다.",
+  studyZoomStepLabel:"확대 폭", studyZoomStepOption:"{n}%", studyZoomStepHint:"− / ＋, Ctrl+휠, 핀치 한 번의 폭입니다 (기본 5% = 100%→200%가 20번).",
   studyTvLookLabel:"TV 외형", studyTvLookPlain:"기본 화면", studyTvLookCrt:"브라운관", studyTvLookWood:"나무 프레임",
   studyTvLookArcade:"아케이드", studyTvLookProjector:"프로젝터", studyTvLookAquarium:"수조",
   studyTvSizeLabel:"크기", studyTvSizeSmall:"작게", studyTvSizeMedium:"보통", studyTvSizeLarge:"크게",
@@ -458,7 +462,15 @@ const STUDY_STORES = ["books", "pages", "covers", "settings"];
 const STUDY_IMAGE_MAX_COUNT = 3000, STUDY_IMAGE_MAX_BYTES = 600 * 1024 * 1024, STUDY_IMAGE_FILE_MAX = 100 * 1024 * 1024;
 const STUDY_TEXT_FILE_MAX = 12 * 1024 * 1024, STUDY_TEXT_BATCH_MAX = 200, STUDY_BATCH_WRITE = 40;
 const STUDY_SHELF_MAX = 500, STUDY_SHELF_PAGE = 60, STUDY_SEARCH_MARK_MAX = 1500;
-const STUDY_ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4];
+const STUDY_ZOOM_MIN = 0.5, STUDY_ZOOM_MAX = 4;
+/* 拡大の送り幅（％）。−／＋・Ctrl+ホイール・ピンチの「1回ぶん」です。
+   既定は5%（100%→200%が20回）。1%＝細かく見たいとき〜25%＝大きく変えたいとき。 */
+const STUDY_ZOOM_PERCENT_STEPS = [1, 2, 5, 10, 25];
+const STUDY_ZOOM_PERCENT_DEFAULT = 5;
+function studyZoomPercentStep(value) {
+  const number = Math.round(Number(value));
+  return STUDY_ZOOM_PERCENT_STEPS.includes(number) ? number : STUDY_ZOOM_PERCENT_DEFAULT;
+}
 const STUDY_TEXT_SIZE = { small:0.88, normal:1, large:1.18, huge:1.4 };
 const STUDY_TEXT_LEADING = { tight:1.6, normal:1.9, loose:2.3 };
 const STUDY_TEXT_PAD = { narrow:0.5, normal:1, wide:1.7 };
@@ -504,7 +516,7 @@ let studyPointers = new Map(), studyPinchStart = 0, studyPinchZoom = 1;
 let studySearchState = { query:"", marks:[], index:-1, capped:false };
 let studyImportState = { active:false, cancelled:false, total:0, added:0, kept:0, failed:0 };
 const studyObjectUrls = new Set();
-let studyPrefs = { imageMode:"single", imageOrder:"natural", american:false, zoom:1, theme:"plain",
+let studyPrefs = { imageMode:"single", imageOrder:"natural", american:false, zoom:1, zoomPercentStep:STUDY_ZOOM_PERCENT_DEFAULT, theme:"plain",
   textSize:"normal", textSpacing:"normal", textWidth:"normal", tvEnabled:false, tvPosition:"top", tvLook:"plain",
   tvSize:"medium", tvRatio:"16:9", tvLabelOn:true, shelfSort:"updated", albumNesting:"split",
   manualShelfOrder:false, foldersFirst:false, skipDeleteConfirm:false, shelfVisible:true, verticalImageKeys:false, editedTextFolderId:"",
@@ -656,7 +668,9 @@ function studyReadPrefs(raw) {
   studyPrefs.imageMode = STUDY_IMAGE_MODES.includes(raw.imageMode) ? raw.imageMode : "single";
   studyPrefs.imageOrder = raw.imageOrder === "reverse" ? "reverse" : "natural";
   studyPrefs.american = raw.american === true;
-  studyPrefs.zoom = STUDY_ZOOM_STEPS.includes(Number(raw.zoom)) ? Number(raw.zoom) : 1;
+  const rawZoom = Number(raw.zoom);
+  studyPrefs.zoom = Number.isFinite(rawZoom) ? Math.round(Math.max(STUDY_ZOOM_MIN, Math.min(STUDY_ZOOM_MAX, rawZoom)) * 100) / 100 : 1;
+  studyPrefs.zoomPercentStep = studyZoomPercentStep(raw.zoomPercentStep);
   studyPrefs.theme = STUDY_THEMES.includes(raw.theme) ? raw.theme : "plain";
   studyPrefs.textSize = ["small", "normal", "large", "huge"].includes(raw.textSize) ? raw.textSize : "normal";
   studyPrefs.textSpacing = ["tight", "normal", "loose"].includes(raw.textSpacing) ? raw.textSpacing : "normal";
@@ -864,6 +878,7 @@ function studyRefreshPrefsUI() {
   core.$("studySkipDeleteConfirm").checked = studyPrefs.skipDeleteConfirm;
   core.$("studyVerticalImageKeys").checked = studyPrefs.verticalImageKeys;
   core.$("studyShelfSort").disabled = studyPrefs.manualShelfOrder;
+  studySyncZoomStepRow();
   studyRefreshEditedTextFolderSelect(); studyRefreshExportFolderUI();
   studyApplyShelfVisibility();
   studyRefreshKeyAssignments();
@@ -1559,14 +1574,16 @@ function studyBuildVerticalPages() {
 }
 
 /* ============ 画像の拡大 ============ */
+function studyZoomStepPercent() { return studyZoomPercentStep(studyPrefs.zoomPercentStep); }
+/* いまの倍率を、選んだ送り幅（％）の刻みに丸めます。ピンチの終わりなどに使います。 */
 function studySnapZoom(value) {
-  const number = Number(value) || 1;
-  let best = STUDY_ZOOM_STEPS[0];
-  for (const step of STUDY_ZOOM_STEPS) if (Math.abs(step - number) < Math.abs(best - number)) best = step;
-  return best;
+  const step = studyZoomStepPercent();
+  const percent = Math.round((Number(value) || 1) * 100);
+  const zoom = Math.round(Math.max(STUDY_ZOOM_MIN * 100, Math.min(STUDY_ZOOM_MAX * 100, Math.round(percent / step) * step))) / 100;
+  return Math.round(zoom * 100) / 100;
 }
 function studyApplyZoomValue(value) {
-  const zoom = Math.max(STUDY_ZOOM_STEPS[0], Math.min(STUDY_ZOOM_STEPS[STUDY_ZOOM_STEPS.length - 1], Number(value) || 1));
+  const zoom = Math.max(STUDY_ZOOM_MIN, Math.min(STUDY_ZOOM_MAX, Number(value) || 1));
   studyPrefs.zoom = Math.round(zoom * 100) / 100;
   const stage = core.$("studyImageStage");
   stage.style.setProperty("--study-zoom", String(studyPrefs.zoom));
@@ -1574,17 +1591,25 @@ function studyApplyZoomValue(value) {
   stage.dataset.zoomActive = Math.abs(studyPrefs.zoom - 1) > .001 ? "1" : "0";
   const label = tr("studyZoomValue", { n:Math.round(studyPrefs.zoom * 100) });
   core.$("studyZoomLabel").textContent = label; core.$("studyZoomChip").textContent = label;
-  core.$("studyZoomOut").disabled = studyPrefs.zoom <= STUDY_ZOOM_STEPS[0] + .001;
-  core.$("studyZoomIn").disabled = studyPrefs.zoom >= STUDY_ZOOM_STEPS[STUDY_ZOOM_STEPS.length - 1] - .001;
+  core.$("studyZoomOut").disabled = studyPrefs.zoom <= STUDY_ZOOM_MIN + .001;
+  core.$("studyZoomIn").disabled = studyPrefs.zoom >= STUDY_ZOOM_MAX - .001;
 }
 function studyApplyZoom(notify) {
   studyApplyZoomValue(studyPrefs.zoom);
   if (notify && Math.abs(studyPrefs.zoom - 1) > .001) studySetStatus("studyZoomHint");
 }
 function studyStepZoom(direction) {
-  const index = STUDY_ZOOM_STEPS.indexOf(studySnapZoom(studyPrefs.zoom));
-  const next = STUDY_ZOOM_STEPS[Math.max(0, Math.min(STUDY_ZOOM_STEPS.length - 1, (index < 0 ? 2 : index) + direction))];
-  studySetZoom(next, true);
+  const step = studyZoomStepPercent();
+  const percent = Math.round(studyPrefs.zoom * 100);
+  /* いまの倍率が刻みに乗っていなければ、進む向きの次の目盛りへ（ピンチのあとの半端な倍率からも自然につながるように）。 */
+  const next = direction > 0 ? (Math.floor(percent / step) + 1) * step : Math.ceil(percent / step - 1) * step;
+  studySetZoom(Math.max(STUDY_ZOOM_MIN * 100, Math.min(STUDY_ZOOM_MAX * 100, next)) / 100, true);
+}
+/* ⚙の送り幅セレクト：選択肢の文字は言語ごとに作り直します（数字だけなので辞書は {n}% の1つ）。 */
+function studySyncZoomStepRow() {
+  const select = core.$("studyZoomPercentStep");
+  for (const option of select.options) option.textContent = tr("studyZoomStepOption", { n:studyZoomPercentStep(option.value) });
+  select.value = String(studyZoomStepPercent());
 }
 function studySetZoom(value, save = true) {
   studyApplyZoomValue(value);
@@ -2642,6 +2667,11 @@ studyBindPref("studyShelfVisible", "shelfVisible", () => {
   if (!studyPrefs.shelfVisible) core.$("studyShowShelfBtn").focus({ preventScroll:true });
 });
 studyBindPref("studyVerticalImageKeys", "verticalImageKeys");
+studyBindPref("studyZoomPercentStep", "zoomPercentStep", node => {
+  studyPrefs.zoomPercentStep = studyZoomPercentStep(node.value);
+  node.value = String(studyPrefs.zoomPercentStep);
+  if (studyCurrentBook && studyCurrentBook.kind === "image" && studyPrefs.imageMode !== "vertical") studySetZoom(studySnapZoom(studyPrefs.zoom), true);
+});
 studyBindPref("studyAlbumNesting", "albumNesting", () => studySetStatus("studyAlbumNestingHint"));
 studyBindPref("studyEditedTextFolder", "editedTextFolderId", () => {
   if (studyCurrentBook && studyCurrentBook.kind === "text" && !core.$("studyMemoEditor").hidden) studyFlushMemo();
@@ -2697,7 +2727,7 @@ core.on("language", () => {
   core.$("studyMemoBtn").textContent = tr(core.$("studyMemoEditor").hidden ? "studyMemoEdit" : "studyMemoDone");
   studySetEditorStatus(core.$("studyEditorSaveStatus").dataset.state || "studyEditorSaved", true); studyUpdateEditorStats();
   studyRenderShelf(); studyRenderBookmarks();
-  studySyncZoomRow(); studySyncLook();
+  studySyncZoomRow(); studySyncZoomStepRow(); studySyncLook();
   if (studyCurrentBook) {
     core.$("studyCurrentTitle").textContent = studyCurrentBook.title;
     core.$("studyCurrentMeta").textContent = studyCurrentBook.kind === "image" ? `${tr("studyBookImages")} · ${tr("studyPageCount", { n:studyCurrentBook.pages.length })}`

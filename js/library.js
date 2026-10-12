@@ -321,6 +321,7 @@ Object.assign(TEXT.ja, {
   plShareExported:"📤 書き出しました", plShareCopied:"📋 コピーしました",
   plShareTextHead:"trk!プレイリスト",
   plImport:"📥 共有プレイリストを読み込む", plImportTitle:"📥 共有プレイリスト",
+  plImportTooBig:"❌ ファイルが大きすぎます（共有プレイリストは{n}MBまで）",
   plImportBad:"❌ trk!の共有プレイリストではありません",
   plImportFound:"ライブラリに {n}／{m} 曲ありました",
   plImportTake:"📁 ある {n} 曲をプレイリストに取り込む",
@@ -343,6 +344,7 @@ Object.assign(TEXT.en, {
   plShareExported:"📤 Exported", plShareCopied:"📋 Copied",
   plShareTextHead:"trk! playlist",
   plImport:"📥 Load a shared playlist", plImportTitle:"📥 Shared playlist",
+  plImportTooBig:"❌ This file is too large (shared playlists are up to {n} MB)",
   plImportBad:"❌ Not a trk! shared playlist",
   plImportFound:"{n} of {m} songs are in your library",
   plImportTake:"📁 Import the {n} found songs as a playlist",
@@ -365,6 +367,7 @@ Object.assign(TEXT.zh, {
   plShareExported:"📤 已导出", plShareCopied:"📋 已复制",
   plShareTextHead:"trk!播放列表",
   plImport:"📥 读取共享播放列表", plImportTitle:"📥 共享播放列表",
+  plImportTooBig:"❌ 文件过大（共享播放列表最多 {n} MB）",
   plImportBad:"❌ 不是trk!的共享播放列表",
   plImportFound:"库中有 {n}／{m} 曲",
   plImportTake:"📁 将找到的 {n} 曲导入为播放列表",
@@ -387,6 +390,7 @@ Object.assign(TEXT.ko, {
   plShareExported:"📤 내보냈어요", plShareCopied:"📋 복사했어요",
   plShareTextHead:"trk! 재생목록",
   plImport:"📥 공유 재생목록 불러오기", plImportTitle:"📥 공유 재생목록",
+  plImportTooBig:"❌ 파일이 너무 커요 (공유 재생목록은 {n}MB까지)",
   plImportBad:"❌ trk! 공유 재생목록이 아니에요",
   plImportFound:"라이브러리에 {n}／{m}곡이 있어요",
   plImportTake:"📁 있는 {n}곡을 재생목록으로 가져오기",
@@ -1278,21 +1282,31 @@ function trkOrderedPlaylists(list) {
     return (a.createdAt||0)-(b.createdAt||0);
   });
 }
-function trkMovePlaylist(id, dir) {
-  let order = (core.settings.playlistOrder||[]).slice();
+/* ↕ 並べ替え：見えている並び（peers＝その画面で隣に並ぶプレイリストのID、表示順）の中で隣と入れ替える。
+   playlistOrder は全体で1本なので、まず🐔の今の表示順を全部書き出し（未登録分も含む）、その中で2件の位置を交換する。
+   🐔の階層メニューはフォルダごとのグループで並ぶので、「全体の隣」と入れ替えると画面が変わらない（空振り）。
+   消えたプレイリストのID（削除済み）もここで落とし、入れ替え相手にならないようにする（trk130）。 */
+function trkMovePlaylist(id, dir, peers) {
+  const exist = new Set(core.settings.playlists.map(p => p.id));
   const inTrk = trkFolderIdSet();
-  const ids = trkOrderedPlaylists(core.settings.playlists.filter(p => inTrk.has(p.folder))).map(p=>p.id);
-  // ensure order contains all ids
-  for (const pid of ids) if (!order.includes(pid)) order.push(pid);
-  const i = order.indexOf(id);
-  if (i < 0) return;
-  const j = i + dir;
-  if (j < 0 || j >= order.length) return;
-  [order[i], order[j]] = [order[j], order[i]];
-  core.settings.playlistOrder = order.slice(0,200);
+  const ids = trkOrderedPlaylists(core.settings.playlists.filter(p => inTrk.has(p.folder))).map(p => p.id);
+  const group = (Array.isArray(peers) && peers.length ? peers : ids).filter(x => exist.has(x));
+  const gi = group.indexOf(id), other = gi < 0 ? undefined : group[gi + dir];
+  if (other === undefined) return;
+  const a = ids.indexOf(id), b = ids.indexOf(other);
+  if (a < 0 || b < 0) return;
+  [ids[a], ids[b]] = [ids[b], ids[a]];
+  const rest = (core.settings.playlistOrder || []).filter(x => exist.has(x) && !ids.includes(x));
+  core.settings.playlistOrder = ids.concat(rest).slice(0, 200);
   core.saveUserPrefs();
   renderLib();
   try { if (typeof renderTrkSettings === "function") renderTrkSettings(); } catch(_){}
+}
+/* ↕ ボタンの有効・無効（ABC順のとき、並びの端のとき） */
+function trkMoveButtonsState(up, down, i, n) {
+  const abc = !!core.settings.trkSortABC;
+  up.disabled = abc || i <= 0; down.disabled = abc || i >= n - 1;
+  if (abc) { up.style.opacity = ".45"; down.style.opacity = ".45"; }
 }
 window.ensureTrkDistributionPlaylists = ensureTrkDistributionPlaylists;
 
@@ -1767,16 +1781,17 @@ function plFolderMenu(f) {
     if (allInner.length) {
       d.card.append(el("div", "plSep"));
       d.card.append(el("b", "plCardTitle", tr("plFolderContents") || "中のプレイリスト"));
-      const ordered = trkOrderedPlaylists(allInner);
-      for (const p of ordered) {
+      const ordered = trkOrderedPlaylists(allInner), peers = ordered.map(x => x.id);
+      for (const [i, p] of ordered.entries()) {
         const row = el("div"); row.style.cssText = "display:flex;gap:8px;align-items:center;margin:4px 0;flex-wrap:wrap";
         const open = el("button", "plBtn", (p.icon||"🎧")+" "+p.name+" ("+plCount(p, new Set((window.__libAll||[]).map(x=>x.key)))+")"); open.type="button";
         open.addEventListener("click", () => { d.close(); core.settings.libTab="pl:"+p.id; renderLib(); });
         const up = el("button", "plBtn small", "↑"); up.type="button"; up.title="上へ";
         const down = el("button", "plBtn small", "↓"); down.type="button"; down.title="下へ";
-        if (core.settings.trkSortABC) { up.disabled=true; down.disabled=true; up.style.opacity=".45"; down.style.opacity=".45"; }
-        up.addEventListener("click", () => trkMovePlaylist(p.id, -1));
-        down.addEventListener("click", () => trkMovePlaylist(p.id, 1));
+        trkMoveButtonsState(up, down, i, ordered.length);
+        /* 並べ替えたら表示を作り直す（この画面は中身を描き直す仕組みを持たないので、メニューを開き直す） */
+        up.addEventListener("click", () => { trkMovePlaylist(p.id, -1, peers); plFolderMenu(f); });
+        down.addEventListener("click", () => { trkMovePlaylist(p.id, 1, peers); plFolderMenu(f); });
         row.append(open, up, down);
         d.card.append(row);
       }
@@ -1796,15 +1811,16 @@ function plTrkMenu() {
   d.card.append(el("div", "plHint", tr("trkMenuHint")));
   const keys = (libAllKeys instanceof Set) ? libAllKeys : new Set();
   const listBox = el("div", "plTrkList");
-  const rowOf = p => {
+  const rowOf = (p, i, list) => {   /* list＝同じグループ（フォルダ）の表示順。↕はこの中でだけ動く */
+    const peers = list.map(x => x.id);
     const row = el("div", "plTrkRow");
     const open = el("button", "plBtn", (p.icon || "🎧") + " " + p.name + "（" + plCount(p, keys) + "）"); open.type = "button";
     open.addEventListener("click", () => { d.close(); core.settings.libTab = "pl:" + p.id; core.saveUserPrefs(); renderLib(); });
     const up = el("button", "plBtn small", "↑"); up.type = "button"; up.title = tr("trkMoveUp"); up.setAttribute("aria-label", tr("trkMoveUp") + " " + p.name);
     const down = el("button", "plBtn small", "↓"); down.type = "button"; down.title = tr("trkMoveDown"); down.setAttribute("aria-label", tr("trkMoveDown") + " " + p.name);
-    if (core.settings.trkSortABC) { up.disabled = true; down.disabled = true; up.style.opacity = ".45"; down.style.opacity = ".45"; }
-    up.addEventListener("click", () => { trkMovePlaylist(p.id, -1); paint(); });
-    down.addEventListener("click", () => { trkMovePlaylist(p.id, 1); paint(); });
+    trkMoveButtonsState(up, down, i, list.length);
+    up.addEventListener("click", () => { trkMovePlaylist(p.id, -1, peers); paint(); });
+    down.addEventListener("click", () => { trkMovePlaylist(p.id, 1, peers); paint(); });
     const gear = el("button", "plBtn small", "⚙"); gear.type = "button"; gear.title = tr("plSettings"); gear.setAttribute("aria-label", tr("plSettings") + " " + p.name);
     gear.addEventListener("click", () => plMenu(p));   /* plDialog が古いダイアログを閉じるので、そのまま開き替える */
     row.append(open, up, down, gear);
@@ -1827,14 +1843,14 @@ function plTrkMenu() {
     if (!direct.length && !subs.length) { listBox.append(el("div", "plHint", tr("trkOrderEmpty"))); return; }
     if (direct.length) {
       listBox.append(groupHead({ id: TRK_FOLDER_ID, icon: TRK_TAB_ICON, name: trkTabLabel() || tr("trkTabNameFull") }));
-      for (const p of trkOrderedPlaylists(direct)) listBox.append(rowOf(p));
+      trkOrderedPlaylists(direct).forEach((p, i, list) => listBox.append(rowOf(p, i, list)));
     }
     for (const f of subs) {   /* 🎻 Classic など。中の Vol を並べる */
       listBox.append(el("div", "plSep"), groupHead(f));
-      for (const p of trkOrderedPlaylists(core.settings.playlists.filter(p => plVisible(p) && p.folder === f.id))) listBox.append(rowOf(p));
+      trkOrderedPlaylists(core.settings.playlists.filter(p => plVisible(p) && p.folder === f.id)).forEach((p, i, list) => listBox.append(rowOf(p, i, list)));
       for (const g of core.settings.plFolders.filter(x => x.parent === f.id)) {   /* 🎭 一段深い棚（trk-endfield-character 等） */
         listBox.append(el("div", "plSep"), groupHead(g));
-        for (const p of trkOrderedPlaylists(core.settings.playlists.filter(p => plVisible(p) && p.folder === g.id))) listBox.append(rowOf(p));
+        trkOrderedPlaylists(core.settings.playlists.filter(p => plVisible(p) && p.folder === g.id)).forEach((p, i, list) => listBox.append(rowOf(p, i, list)));
       }
     }
     if (core.settings.trkSortABC) listBox.append(el("div", "plHint", tr("trkOrderAbcOff")));
@@ -2327,6 +2343,28 @@ function plSanitizeShared(raw) {
     createdAt: String(raw.createdAt || "").slice(0, 30),
     source: (note || url) ? { note, url } : null, songs };
 }
+/* 📥 共有プレイリストの曲を、手元の曲から曲名で探す（キーが合わなかったときの救済）。段階的に:
+   ① 曲名の完全一致（大きさが分かるときは大きさも合う曲を優先。今までどおり）
+   ② 表記ゆれ（区切り・拡張子・トラック番号）は、カタログ照合と同じ plTitleKeys／plSongMatchKeys で探し、
+      **候補が1曲に絞れたときだけ**採る。共有側に大きさがあれば大きさの一致も必須。
+      plTitleKeys は「08 sometimes」から番号まで外すので、そのまま採ると別のアルバムの「01 intro」と「03 intro」を
+      同じ曲として✅にしてしまう。取り違えるより❌のほうが害が小さい（trk130のレビュー指摘）。
+   ③ 索引（曲名キー → 曲）は曲リストごとに1度だけ作る（WeakMap＝曲リストが捨てられれば消える）。 */
+const plMatchIndexCache = new WeakMap();
+function plMatchIndex(all) {
+  const cached = plMatchIndexCache.get(all);
+  if (cached) return cached;
+  const idx = new Map();
+  for (const it of all) {
+    const m = metaOf(it.key) || {};
+    for (const k of plSongMatchKeys(m.title || it.title, m.matchHint)) {
+      const a = idx.get(k);
+      if (a) { if (!a.includes(it)) a.push(it); } else idx.set(k, [it]);
+    }
+  }
+  plMatchIndexCache.set(all, idx);
+  return idx;
+}
 function plMatchByTitle(s, all) {
   const t = s.title.trim().toLowerCase();
   let fallback = null;
@@ -2335,7 +2373,11 @@ function plMatchByTitle(s, all) {
     if (!fallback) fallback = it;
     if (!s.size || !it.size || s.size === it.size) return it;
   }
-  return fallback;
+  if (fallback) return fallback;
+  const idx = plMatchIndex(all), hits = new Set();
+  for (const k of plTitleKeys(s.title)) for (const it of idx.get(k) || []) hits.add(it);
+  const list = [...hits].filter(it => !s.size || it.size === s.size);
+  return list.length === 1 ? list[0] : null;
 }
 function plOpenLink(url) {   /* https限定＋開く前に確認（osu!の「入手先を明示」流・trk!は内容を保証しない） */
   /* 🛡 呼び出し側でも https を確かめているが、開く瞬間にもう一度通す。
@@ -2408,11 +2450,18 @@ function plViewer(v) {
   });
   d.card.append(el("div", "plSep"), el("div", "plHint", tr("plImportFound", { n: matched.length, m: v.songs.length })), take);
 }
+/* 🛡 共有プレイリストの大きさの上限。1000曲×長めの項目（曲名120字など）でも収まる大きさ。
+   読み込む前に確かめる（巨大なファイルを f.text()／JSON.parse に渡すと、他人のファイル1つでタブが固まるため。
+   設定Import 2 MiB・譜面JSON 2 MiB・スキンJSON 256 KiB と同じ形・F-34）。 */
+const PLAYLIST_IMPORT_MAX = 4 * 1024 * 1024;
 function plImportPick() {
   const inp = el("input"); inp.type = "file"; inp.accept = "application/json,.json";
   inp.addEventListener("change", async () => {
     const f = inp.files && inp.files[0]; inp.value = "";
     if (!f) return;
+    if (typeof f.size !== "number" || !Number.isFinite(f.size) || f.size < 0 || f.size > PLAYLIST_IMPORT_MAX) {
+      plToast(tr("plImportTooBig", { n: 4 })); return;
+    }
     let raw = null;
     try { raw = JSON.parse(await f.text()); } catch (_) {}
     const v = plSanitizeShared(raw);
@@ -3584,16 +3633,17 @@ function renderTrkSettings() {
   const ids = trkFolderIdSet();
   const trkList = core.settings.playlists.filter(p => ids.has(p.folder));
   if (!trkList.length) { box.append(el("div", "hint", tr("trkOrderEmpty"))); return; }
-  for (const p of trkOrderedPlaylists(trkList)) {
+  const ordered = trkOrderedPlaylists(trkList), peers = ordered.map(x => x.id);
+  for (const [i, p] of ordered.entries()) {
     const row = el("div", "plTrkRow"); row.style.cssText = "border:1px solid var(--ui-border);border-radius:10px;padding:6px 8px";
     const name = el("span", "", (p.icon || "\uD83C\uDFA7") + " " + p.name);
     const open = el("button", "plBtn small", tr("trkOpenItem")); open.type = "button";
     open.addEventListener("click", () => { core.settings.libTab = "pl:" + p.id; core.saveUserPrefs(); renderLib(); });
     const up = el("button", "plBtn small", "\u2191"); up.type = "button"; up.title = tr("trkMoveUp"); up.setAttribute("aria-label", tr("trkMoveUp") + " " + p.name);
     const down = el("button", "plBtn small", "\u2193"); down.type = "button"; down.title = tr("trkMoveDown"); down.setAttribute("aria-label", tr("trkMoveDown") + " " + p.name);
-    if (core.settings.trkSortABC) { up.disabled = true; down.disabled = true; up.style.opacity = ".45"; down.style.opacity = ".45"; }
-    up.addEventListener("click", () => trkMovePlaylist(p.id, -1));
-    down.addEventListener("click", () => trkMovePlaylist(p.id, 1));
+    trkMoveButtonsState(up, down, i, ordered.length);
+    up.addEventListener("click", () => trkMovePlaylist(p.id, -1, peers));
+    down.addEventListener("click", () => trkMovePlaylist(p.id, 1, peers));
     row.append(name, open, up, down);
     box.append(row);
   }

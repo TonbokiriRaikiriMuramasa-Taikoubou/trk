@@ -1171,6 +1171,73 @@ if (!exists("js/fx-worklet.js") ||
   else ok("playlist folders: cap 40 checked before creating, trk shelves survive an over-cap trim, character-theme lists restored to the 🎭 shelf once (trk129)");
 }
 
+/* 🔀📥 trk130: ↕は「いま見えている並び」（peers）の中で入れ替える。共有プレイリストの取り込みはファイルを読む前に
+   大きさを確かめ、曲名のゆるい照合は候補が1曲に絞れたときだけ採る（別のアルバムの「01 intro」と混ざらないように）。 */
+{
+  const library = read("js/library.js"), titleMatch = read("js/title-match.js");
+  const fourLanguages = key => (library.match(new RegExp("\\b" + key + ":", "g")) || []).length === 4;
+  const functionUnit = name => {
+    const a = library.indexOf(`function ${name}(`);
+    const b = library.indexOf("\n}\n", a);
+    return a >= 0 && b > a ? library.slice(a, b + 3) : "";
+  };
+  let moveOk = false, importOk = false, matchOk = false;
+  try {
+    /* ↕ の2関数だけを切り出して動かす（旧版は「全体の隣」と入れ替えるので、フォルダの中で押すと画面が変わらなかった） */
+    const a = library.indexOf("/* ↕ 並べ替え");
+    const b = library.indexOf("\n}\n", library.indexOf("function trkMoveButtonsState("));
+    const moveUnit = library.slice(a, b + 3);
+    const mk = (id, folder, createdAt) => ({ id, folder, name: id, createdAt });
+    const run = (settings, args) => {
+      /* read() は名前空間の接頭辞を外すので、切り出した本文は settings／saveUserPrefs などをそのまま読む */
+      const ctx = vm.createContext({ settings, saveUserPrefs() {}, renderLib() {}, trkFolderIdSet: () => new Set(["trk", "trk-classic"]) });
+      new vm.Script(functionUnit("trkOrderedPlaylists") + moveUnit + "\nglobalThis.__move = trkMovePlaylist;").runInContext(ctx);
+      const group = folder => { ctx.folder = folder; return vm.runInContext("trkOrderedPlaylists(settings.playlists.filter(p => p.folder === folder)).map(p => p.id)", ctx); };
+      const ids = grp => Array.from(grp);
+      ctx.args = args;
+      vm.runInContext("__move(...args)", ctx);
+      return { settings, group, ids };
+    };
+    const four = () => [mk("A1", "trk", 1), mk("B1", "trk-classic", 2), mk("A2", "trk", 3), mk("B2", "trk-classic", 4)];
+    const t1 = run({ trkSortABC: false, playlistOrder: [], playlists: four() }, ["A1", 1, ["A1", "A2"]]);
+    const swapOk = t1.ids(t1.group("trk")).join() === "A2,A1" && t1.ids(t1.group("trk-classic")).join() === "B1,B2";
+    const t2 = run({ trkSortABC: false, playlistOrder: [], playlists: four() }, ["A2", 1, ["A1", "A2"]]);
+    const endOk = t2.ids(t2.group("trk")).join() === "A1,A2" && t2.settings.playlistOrder.length === 0;
+    const t3 = run({ trkSortABC: false, playlistOrder: ["A1", "GHOST", "A2", "B1", "B2"], playlists: four() }, ["A1", 1, ["A1", "A2"]]);
+    const ghostOk = t3.ids(t3.group("trk")).join() === "A2,A1" && !t3.settings.playlistOrder.includes("GHOST");
+    const callSites = (library.match(/trkMovePlaylist\(p\.id, -?1, peers\)/g) || []).length === 6 &&
+      (library.match(/trkMoveButtonsState\(up, down, i, (?:ordered|list)\.length\)/g) || []).length === 3 &&
+      moveUnit.includes("up.disabled = abc || i <= 0") && moveUnit.includes("if (abc) { up.style.opacity");
+    moveOk = swapOk && endOk && ghostOk && callSites;
+
+    /* 📥 取り込みは「上限の判定 → ファイルを読む」の順（1000曲の上限は解析の後にしか効かない） */
+    const pick = functionUnit("plImportPick");
+    importOk = library.includes("const PLAYLIST_IMPORT_MAX = 4 * 1024 * 1024") &&
+      pick.includes("f.size > PLAYLIST_IMPORT_MAX") && pick.includes("await f.text()") &&
+      pick.indexOf("f.size > PLAYLIST_IMPORT_MAX") > 0 && pick.indexOf("f.size > PLAYLIST_IMPORT_MAX") < pick.indexOf("await f.text()") &&
+      pick.includes("typeof f.size !== \"number\"") && pick.includes('plToast(tr("plImportTooBig", { n: 4 }))') && fourLanguages("plImportTooBig");
+
+    /* 曲名のゆるい照合は、候補が1つに絞れて、大きさが分かるなら一致するときだけ */
+    const matchUnit = library.slice(library.indexOf("const plMatchIndexCache"), library.indexOf("function plOpenLink("));
+    const mctx = vm.createContext({ metaOf: () => null });
+    new vm.Script(titleMatch + "\n" + matchUnit + "\nglobalThis.__match = plMatchByTitle;").runInContext(mctx);
+    const song = (title, size) => ({ key: size + "|" + title, title, size });
+    const match = (q, all) => { mctx.q = q; mctx.all = all; return vm.runInContext("__match(q, all)", mctx); };
+    const local = song("08 sometimes", 1234);
+    matchOk = match({ title: "08_sometimes", size: 1234 }, [local]) === local ?
+      match({ title: "08_sometimes.flac", size: 1234 }, [local]) === local &&
+      match({ title: "08_sometimes", size: 999 }, [local]) === null &&
+      match({ title: "01 intro" }, [song("03 intro", 1), song("05 intro", 2)]) === null &&
+      match({ title: "sometimes", size: 200 }, [song("Sometimes", 100), song("sometimes", 200)]).size === 200 : false;
+  } catch (error) {
+    console.error(`WARN  trk130 playlist check setup failed: ${error.message}`);
+  }
+  if (!moveOk) fail("↕ must swap inside the visible group (peers) and hand the buttons to trkMoveButtonsState in all three lists");
+  else if (!importOk) fail("shared playlist import must reject files over PLAYLIST_IMPORT_MAX (4 MiB) before f.text(), with plImportTooBig in four languages");
+  else if (!matchOk) fail("plMatchByTitle must use plTitleKeys/plSongMatchKeys only for a unique, size-matching candidate");
+  else ok("playlists: ↕ moves inside the visible group and drops dead ids, shared-playlist import is size-capped before reading, title fallback takes only a unique match (trk130)");
+}
+
 // ⚔️ LoL Creator-Safe Sessions: complete SoundCloud album order/count and one official song URL per track.
 {
   const catalogSource = read("js/catalog.js");

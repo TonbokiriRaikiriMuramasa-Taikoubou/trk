@@ -430,11 +430,71 @@ function whenVrmReady(fn) {
   if (window.ShadowTaikoVRM) fn(window.ShadowTaikoVRM);
   else addEventListener("stvrm-ready", () => fn(window.ShadowTaikoVRM), { once:true });
 }
+/* 📦 パックが変えた設定の退避（trk130）。settings.packPrev（**保存される**）に
+   「パックを当てる前の値（prev）」と「パックが実際に当てた値（applied）」を控える。外すときは、
+   利用者がその間に自分で変えていない項目だけ prev へ戻す（自分で変えたなら、その変更が正）。
+   ・パックを使ったまま再起動しても、退避は設定に残っているので、あとから外したときも戻せる
+     （起動時に復元するパックでは退避を取り直さない＝すでにある packPrev を使う）
+   ・パックAからBへ切り替えたときは上書きしない（最初に退避した prev を保つ）
+   ・古い版で入れたパックの退避が無いときは、manifest から分かる範囲（applied）だけ控える（prev は今の値） */
+function packSnapshot() {
+  const s = core.settings;
+  if (s.packPrev && typeof s.packPrev === "object") return;
+  let skin = String(s.skin || "shadow");
+  if (skin.startsWith("pack_")) {   /* すでにパックのスキンが当たっている（古い版からの引き継ぎ） */
+    const boot = String(core.savedSkinAtBoot || "");
+    skin = (boot && !boot.startsWith("pack_")) ? boot : "shadow";
+  }
+  s.packPrev = { skin, notes: JSON.parse(JSON.stringify(s.notes || [])), fxPower: s.fxPower, seEnabled: !!s.seEnabled, applied: {} };
+}
+function packApplied(fields) {
+  const s = core.settings;
+  if (!s.packPrev || typeof s.packPrev !== "object") packSnapshot();
+  const p = s.packPrev; if (!p) return;
+  p.applied = Object.assign({}, p.applied, fields);
+}
+/* 自分で読み込んだSE（seFiles）に戻す。切り替えの途中では呼ばない（新しいパックの読み込みと競合するため） */
+function restoreOwnSounds() {
+  let any = false;
+  for (const i of [0, 1]) {
+    window.Trk.media.seBuffers[i] = null;
+    const f = window.Trk.media.seFiles && window.Trk.media.seFiles[i];
+    if (f) { any = true; try { window.Trk.media.loadSE(f, i); } catch (_) {} }
+  }
+  return any;
+}
+/* 📦 パックを外したとき、パックが変えた項目だけを退避した値へ戻す（戻したら packPrev は消す） */
+function packRestoreSettings() {
+  const s = core.settings, prev = (s.packPrev && typeof s.packPrev === "object") ? s.packPrev : null;
+  if (!prev) return false;
+  const ap = (prev.applied && typeof prev.applied === "object") ? prev.applied : {};
+  let changed = false;
+  if (typeof ap.skin === "string" && s.skin === ap.skin && typeof prev.skin === "string") { core.applySkin(prev.skin, false); changed = true; }
+  if (Array.isArray(ap.notes) && Array.isArray(prev.notes) && prev.notes.length === 2 &&
+      JSON.stringify(s.notes) === JSON.stringify(ap.notes)) { setNotes(prev.notes.map(n => ({ ...n })), false); changed = true; }
+  if (typeof ap.fxPower === "number" && s.fxPower === ap.fxPower && typeof prev.fxPower === "number") {
+    s.fxPower = prev.fxPower; const sl = core.$("fxPower"); if (sl) sl.value = prev.fxPower;
+    if (typeof showFxPower === "function") showFxPower();
+    changed = true;
+  }
+  if (ap.seEnabled === true && s.seEnabled === true) {
+    s.seEnabled = prev.seEnabled === true; const ck = core.$("seEnabled"); if (ck) ck.checked = s.seEnabled;
+    core.setStatus("seStatus", s.seEnabled ? "seOn" : "seOff");
+    changed = true;
+  }
+  delete s.packPrev;
+  return changed;
+}
 async function activatePack(id, { restore = false, skipConfirm = false } = {}) {
   let rec = null; try { rec = await packDB.get(id); } catch (_) {}
-  if (!rec || !hasLook(rec.manifest)) { if (restore) { core.settings.activePack = null; core.saveUserPrefs(); } return false; }
+  if (!rec || !hasLook(rec.manifest)) {
+    if (restore) { core.settings.activePack = null; packRestoreSettings(); core.saveUserPrefs(); }   /* パックが消えていれば、当てた設定も戻す */
+    return false;
+  }
   const m = rec.manifest, f = rec.files || {};
   if (!restore && !skipConfirm && m.mascot && m.mascot.vrm && !confirm(tr("packConfirm") + (m.license || "—"))) return false;
+  const prevHadSounds = packRuntime.hadSounds;   /* deactivatePack が消すので先に覚える（SEの戻し忘れ・競合よけ） */
+  if (!restore) packSnapshot();                  /* パックを当てる前の値を控える（A→Bの切り替えでは上書きしない） */
   deactivatePack(false);
   packRuntime.id = id;
   packRuntime.captions = (m.mascot && m.mascot.captions) || null;
@@ -444,11 +504,13 @@ async function activatePack(id, { restore = false, skipConfirm = false } = {}) {
     s.label = { en:m.name }; s.desc = { ja:"📦 パック", en:"📦 Pack", zh:"📦 资源包", ko:"📦 팩" };
     window.Trk.data.SKINS[sid] = s; packRuntime.skinId = sid; core.buildSkinGrid();
     if (!restore || core.savedSkinAtBoot === sid) core.applySkin(sid);
+    if (!restore) packApplied({ skin: sid });
   }
   if (m.notes) {
     if (!restore) {
       const cur = core.settings.notes;
       setNotes([0, 1].map(i => { const n = m.notes[i ? "ka" : "don"] || {}; return { color:n.color || cur[i].color, shape:n.shape || cur[i].shape }; }));
+      packApplied({ notes: JSON.parse(JSON.stringify(core.settings.notes)) });
     }
     for (const i of [0, 1]) {
       const n = m.notes[i ? "ka" : "don"];
@@ -460,9 +522,12 @@ async function activatePack(id, { restore = false, skipConfirm = false } = {}) {
       const p = m.sounds[i ? "ka" : "don"];
       if (p && f[p]) { try { window.Trk.media.seBuffers[i] = await window.Trk.media.decodeAudio(await f[p].arrayBuffer()); packRuntime.hadSounds = true; } catch (_) {} }
     }
-    if (packRuntime.hadSounds && !restore) { core.settings.seEnabled = true; core.$("seEnabled").checked = true; core.setStatus("seStatus", "seOn"); }
+    if (packRuntime.hadSounds && !restore) { core.settings.seEnabled = true; core.$("seEnabled").checked = true; core.setStatus("seStatus", "seOn"); packApplied({ seEnabled: true }); }
   }
-  if (m.fx && !restore) { core.settings.fxPower = m.fx.power; core.$("fxPower").value = m.fx.power; if (typeof showFxPower === "function") showFxPower(); }
+  /* 新しいパックに音が無い（または読み込めなかった）ときは、前のパックの音を消したままにせず自分のSEへ戻す。
+     切り替えの途中で deactivatePack 側が読み直すと、新しいパックの音と競合して上書きされる（trk130） */
+  if (!packRuntime.hadSounds && prevHadSounds) restoreOwnSounds();
+  if (m.fx && !restore) { core.settings.fxPower = m.fx.power; core.$("fxPower").value = m.fx.power; if (typeof showFxPower === "function") showFxPower(); packApplied({ fxPower: core.settings.fxPower }); }
   if (m.mascot && m.mascot.vrm && f[m.mascot.vrm]) {
     const mm = m.mascot;
     whenVrmReady(api => api.loadFromPack(f[mm.vrm], { name:m.name, motion:mm.motion ? f[mm.motion] : null,
@@ -475,14 +540,18 @@ async function activatePack(id, { restore = false, skipConfirm = false } = {}) {
 }
 function deactivatePack(persist = true) {
   if (packRuntime.id) {
+    if (persist) packRestoreSettings();   /* 📦 パックが変えた設定を戻す（利用者がその間に変えた項目は戻さない）。SKINS を消す前に */
     if (packRuntime.skinId) {
       const sid = packRuntime.skinId; delete window.Trk.data.SKINS[sid];
-      if (core.settings.skin === sid) core.applySkin("shadow", false);
+      if (core.settings.skin === sid) core.applySkin("shadow", false);   /* 退避が無い古いデータ用の控え */
       core.buildSkinGrid();
     }
     packRuntime.urls.forEach(u => URL.revokeObjectURL(u));
-    if (packRuntime.hadSounds) {   // 自分で読み込んだSEがあればそれに戻す
-      for (const i of [0, 1]) { window.Trk.media.seBuffers[i] = null; if (window.Trk.media.seFiles[i]) window.Trk.media.loadSE(window.Trk.media.seFiles[i], i); }
+    if (packRuntime.hadSounds) {
+      /* 自分で読み込んだSEがあればそれに戻す。ただしパックの切り替え中（persist=false）は読み直さない
+         （新しいパックの音と競合するので、音を持たないパックを当てた側で戻す） */
+      for (const i of [0, 1]) window.Trk.media.seBuffers[i] = null;
+      if (persist) restoreOwnSounds();
     }
     Object.assign(packRuntime, { id:null, captions:null, noteImages:[null, null], urls:[], skinId:null, hadSounds:false });
     if (window.ShadowTaikoVRM) window.ShadowTaikoVRM.unloadPack();
@@ -560,6 +629,8 @@ async function buildPack() {
     man.creditCard = { name:core.$("packAuthor").value.trim() || name, role:core.$("packRole").value, tagline:core.$("packDesc").value,
                        license:core.$("packLicense").value, rights:core.$("packRights").value, url:core.$("packUrl").value.trim() };
   }
+  /* vf（VRM／モーション）は ShadowTaikoVRM が**読み込み時に** MAX_VRM（200MB）／MAX_VRMA（30MB）を同じ `>` の形で
+     弾いたものだけを持つ。ここで大きさを測り直す必要はない（trk130のレビューで確認。ファイルの権利確認だけ行う）。 */
   const files = {}, vf = window.ShadowTaikoVRM ? window.ShadowTaikoVRM.getFiles() : {};
   if (core.$("incSkin").checked) { man.skin = defFromSkin(core.settings.skin); man.fx = { power:core.settings.fxPower }; }
   if (core.$("incNotes").checked) {

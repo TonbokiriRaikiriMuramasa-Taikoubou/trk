@@ -171,7 +171,8 @@ function drawVerticalField(L, now) {
   }
 }
 function drawMeasureLines(L, now) {
-  if (!core.chartMeta.bpm) return;
+  /* 小節線の間隔 m が負や 0 になると下のループが終わらない（F-33）。入口（validateChartData）でも弾くが、ここでも確かめる */
+  if (!(core.chartMeta.bpm >= 1 && core.chartMeta.bpm <= 1000)) return;
   const m = 240000 / core.chartMeta.bpm, travel = core.travelMs(), g = core.skin().game;
   core.ctx.fillStyle = g.track;
   for (let k = Math.ceil((now - core.chartMeta.offset) / m); ; k++) {

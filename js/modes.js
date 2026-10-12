@@ -204,6 +204,9 @@ const lifeState = { hp:0, max:0, heal:0, lostAt:-1e9, healAt:-1e9 };
 const lifeTags = () => Object.prototype.hasOwnProperty.call(LIFE_TAGS, core.settings.lives) ? [LIFE_TAGS[core.settings.lives]] : [];
 
 function resetLives() {
+  /* ⚠ 体力の基準は**曲全体**のノーツ数（core.chart.length）で決める＝ショートプレイでも窓の中のノーツ数ではない。
+     短い窓でも曲相応の体力を持たせ、曲の詰まった序盤でも足りるようにする今の仕様（trk129のレビュー記録）。
+     窓の中の数（game.js の runNoteTotal）へ変えるなら、ここが切り替え点。 */
   const r = lifeRule();
   lifeState.max = core.settings.autoPlay ? 0 : r.max;
   lifeState.hp = lifeState.max ? Math.min(lifeState.max, r.start ?? r.max) : 0;
@@ -617,7 +620,9 @@ function drawOrbitField(now) {   // render.js から呼ばれます
   strokeOrbitRange(now, tEnd, 46, g.lane, 1);
   strokeOrbitRange(now - 700, now, 4, g.track, .4);
   strokeOrbitRange(now, tEnd, 4, g.track, 1);
-  const beat = 60000 / (core.chartMeta.bpm || 120), off = core.chartMeta.offset || 0;
+  /* 拍線の間隔 beat が負・0 だと下のループが終わらないので、範囲外の bpm は 120 として描く（F-33） */
+  const bpmOk = core.chartMeta.bpm >= 1 && core.chartMeta.bpm <= 1000;
+  const beat = 60000 / (bpmOk ? core.chartMeta.bpm : 120), off = core.chartMeta.offset || 0;
   core.ctx.strokeStyle = g.track;
   for (let k = Math.ceil((now - off) / beat); ; k++) {
     const t = off + k * beat; if (t > tEnd) break;

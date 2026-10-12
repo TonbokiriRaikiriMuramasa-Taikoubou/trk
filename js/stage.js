@@ -278,8 +278,8 @@ function drawStageField(now) {
     core.ctx.stroke(); core.ctx.shadowBlur = 0; core.ctx.globalAlpha = 1;
   }
 
-  /* 小節線 */
-  if (core.chartMeta.bpm) {
+  /* 小節線（間隔が負・0・極端な値だとループが終わらないので範囲を確かめる・F-33） */
+  if (core.chartMeta.bpm >= 1 && core.chartMeta.bpm <= 1000) {
     const m = 240000 / core.chartMeta.bpm;
     core.ctx.fillStyle = g.track; core.ctx.globalAlpha = .5;
     for (let k = Math.ceil((now - core.chartMeta.offset) / m); ; k++) {

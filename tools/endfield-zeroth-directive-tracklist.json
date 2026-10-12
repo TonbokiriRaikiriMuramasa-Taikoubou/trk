@@ -1,6 +1,6 @@
 {
   "kind": "Arknights: Endfield — Zeroth Directive Original Soundtrack Vol.1–2 (初号指令OST 上・下)",
-  "sourceNote": "Track order, titles, and artist credits taken from the official Spotify album pages (©/℗ 2026 GRYPHLINE) announced by the Arknights: Endfield Japan X account on 2026-02-03 for a 2026-02-15 release. Chinese official titles and per-track composer credits cross-checked against VGMdb album pages 157312/157313 (label METAL SCAR RADIO, publisher 上海鹰角网络科技有限公司 / Hypergryph) and the official ffm.to smart links. Individual song links are official Spotify track pages. Checked 2026-10-10. Checked again 2026-10-12 (trk128): the official Spotify album URLs in this file were re-confirmed against the user-provided links (5qK87ACnKVHYKUWozTtXOA / 4msN2gQVhoyeSNxH5fp6RW) and the Endfield Talos Wiki; the two playlist names were changed to 初号指令 (上/下) ― Zeroth Directive Original Soundtrack Vol.1/2 and the series was reordered (see seriesPlaylistOrder).",
+  "sourceNote": "Track order, titles, and artist credits taken from the official Spotify album pages (©/℗ 2026 GRYPHLINE) announced by the Arknights: Endfield Japan X account on 2026-02-03 for a 2026-02-15 release. Chinese official titles and per-track composer credits cross-checked against VGMdb album pages 157312/157313 (label METAL SCAR RADIO, publisher 上海鹰角网络科技有限公司 / Hypergryph) and the official ffm.to smart links. Individual song links are official Spotify track pages. Checked 2026-10-10. Checked again 2026-10-12 (trk128): the official Spotify album URLs in this file were re-confirmed against the user-provided links (5qK87ACnKVHYKUWozTtXOA / 4msN2gQVhoyeSNxH5fp6RW) and the Endfield Talos Wiki; the two playlist names were changed to 初号指令 (上/下) ― Zeroth Directive Original Soundtrack Vol.1/2 and the series was reordered (see seriesPlaylistOrder). Checked again 2026-10-12 (trk129): the two playlist display names were shortened to fit the 24-character save limit (初号指令 (上/下) ZD OST Vol.1/2; ZD = Zeroth Directive - the full album title stays in the playlist tags).",
   "sources": {
     "jpAnnouncement": "https://x.com/AKEndfieldJP/status/2022928866638205084",
     "fanContentGuidelinesJa": "https://endfield.gryphline.com/ja-jp/news/4497",
@@ -10,7 +10,7 @@
   "albums": [
     {
       "id": "ef-firstorder",
-      "name": "初号指令 (上) ― Zeroth Directive Original Soundtrack Vol.1",
+      "name": "初号指令 (上) ZD OST Vol.1",
       "album": "Zeroth Directive Original Soundtrack, Vol. 1",
       "jpAlbumName": "初号指令OST（上）",
       "cnAlbumName": "零号委托OST（上）",
@@ -65,7 +65,7 @@
     },
     {
       "id": "ef-firstorder2",
-      "name": "初号指令 (下) ― Zeroth Directive Original Soundtrack Vol.2",
+      "name": "初号指令 (下) ZD OST Vol.2",
       "album": "Zeroth Directive Original Soundtrack, Vol. 2",
       "jpAlbumName": "初号指令OST（下）",
       "cnAlbumName": "零号委托OST（下）",

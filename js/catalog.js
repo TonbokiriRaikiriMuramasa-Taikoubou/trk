@@ -578,8 +578,9 @@ S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber
       キャラクターテーマ曲4リストをネスト棚「Endfield Character Theme」（trk-endfield-character）にまとめる → 紹介リストを最後に。
       既存取り込みへの再並べ・キャラ棚への移動は js/library.js の trkEndfieldTidyOnce が1回だけ安全更新する。 */
    /* ef-firstorder は永続IDとして維持（旧・上下4パート紹介版 → 公式Vol.1全37曲へ既存取り込みをその場で更新）。
-      曲順・曲名・アーティスト表記は公式Spotifyアルバム、中国語公式曲名は照合別名（网易云音乐／VGMdbで確認）。 */
-   PL("ef-firstorder", "初号指令 (上) ― Zeroth Directive Original Soundtrack Vol.1", "📜", "amber", ["Game","Endfield","Zeroth Directive","Metal Scar Radio"],
+      曲順・曲名・アーティスト表記は公式Spotifyアルバム、中国語公式曲名は照合別名（网易云音乐／VGMdbで確認）。
+      trk129：名前は保存の24文字上限に収めるため「ZD OST Vol.1/2」（ZD＝Zeroth Directive。タグにフル名が残る）。 */
+   PL("ef-firstorder", "初号指令 (上) ZD OST Vol.1", "📜", "amber", ["Game","Endfield","Zeroth Directive","Metal Scar Radio"],
     endfieldOstTracks("Zeroth Directive Original Soundtrack, Vol. 1", [
       ["Protocol Flow", "Metal Scar Radio, Hybrid", "0NOD8FVBXkLbmrJSYCS3Aq", "协议流"],
       ["Initial Process", "Metal Scar Radio, Gareth Coker", "57d9mK6RV0bizpXK1Qn8Pr", "最初进程"],
@@ -619,7 +620,7 @@ S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber
       ["Joyous Now", "Metal Scar Radio, Hybrid", "1nwA4ElX1TOCCli3Hnornh", "庆乐此时"],
       ["Faith's Imprint", "Metal Scar Radio, Hybrid", "15gTGxr577tNJ2gZZXTfAG", "信念拓印"]
     ]), "https://ffm.to/ro6qjnl", "公式配信リンク（ffm.to）"),
-   PL("ef-firstorder2", "初号指令 (下) ― Zeroth Directive Original Soundtrack Vol.2", "⛰️", "green", ["Game","Endfield","Zeroth Directive","Metal Scar Radio"],
+   PL("ef-firstorder2", "初号指令 (下) ZD OST Vol.2", "⛰️", "green", ["Game","Endfield","Zeroth Directive","Metal Scar Radio"],
     endfieldOstTracks("Zeroth Directive Original Soundtrack, Vol. 2", [
       ["Wisdom of the Landscape", "Metal Scar Radio, Gareth Coker", "3Rg8XrRfqzePhy3cgoupOu", "知山水"],
       ["To Walk, To Cross", "Metal Scar Radio, Gareth Coker", "62nDuLgX0MvZVf2Jrz2cuX", "行渡"],

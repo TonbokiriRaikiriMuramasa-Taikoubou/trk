@@ -12,7 +12,7 @@
  *   4. 設定の読み込みが __proto__ / constructor / prototype を踏まないか
  *   5. ZIP（.stpack）の展開が、宣言サイズを信用せず上限で止まるか
  *   6. アドオンが安全モードで止まり、遠隔のコードを取りに行かないか
- *   7. ページから出ていく通信が、許した相手だけか（同一オリジン / jsDelivr の import map のみ）
+ *   7. ページから出ていく通信が、許した相手だけか（同一オリジンのみ。ライブラリは assets/vendor に同梱＝F-5）
  *   8. 入力ファイルは読み取り専用で、明示的なStudy書き出しだけが選択先に新規コピーを作るか（既存ファイルを上書きしないか）
  *
  * 実行: node tools/check-security.mjs
@@ -432,8 +432,31 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     media.includes("file.size > CHART_FILE_MAX") && media.indexOf("file.size > CHART_FILE_MAX") < media.indexOf("file.text()") &&
     media.includes("!Number.isFinite(file.size)") && media.includes('typeof time === "number"') && media.includes('typeof lane === "number"') &&
     media.includes("DIFF_IDS.includes(data.difficulty)") && media.includes("!DIFF_IDS.includes(diff)") && media.includes('typeof data.bpm === "number"') &&
-    media.includes('has("bpm")') && media.includes('has("offset")') && media.includes("!Number.isFinite(data.offset)");
-  rule(chartCap, "standalone chart JSON is size-capped and note values must be numeric JSON values");
+    media.includes('has("bpm")') && media.includes('has("offset")') && media.includes("!Number.isFinite(data.offset)") &&
+    /* F-33: bpm は 0（小節線なし）か 1〜1000。範囲外だと小節線の描画ループが終わらない */
+    media.includes("(data.bpm === 0 || (data.bpm >= 1 && data.bpm <= 1000))") &&
+    /* 名前空間の別名を戻したあと、window.Trk.core. の接頭辞を外して照合するので、ここでは chartMeta.bpm で書く */
+    js["js/render.js"].includes("if (!(chartMeta.bpm >= 1 && chartMeta.bpm <= 1000)) return;") &&
+    js["js/stage.js"].includes("if (chartMeta.bpm >= 1 && chartMeta.bpm <= 1000) {") &&
+    js["js/modes.js"].includes("const bpmOk = chartMeta.bpm >= 1 && chartMeta.bpm <= 1000;");
+  rule(chartCap, "standalone chart JSON is size-capped, note/BPM values are bounded JSON numbers, and the measure-line loops refuse out-of-range BPM");
+
+  /* F-34: 共有プレイリストの取り込みも、読み込む前に大きさを確かめる（1000曲の上限は解析の後にしか効かない） */
+  const libSource = read("js/library.js");
+  const pickStart = libSource.indexOf("function plImportPick()");
+  const pickEnd = pickStart >= 0 ? libSource.indexOf("\n}\n", pickStart) : -1;
+  const pickSource = pickEnd > pickStart ? libSource.slice(pickStart, pickEnd) : "";
+  const playlistImportCap = libSource.includes("const PLAYLIST_IMPORT_MAX = 4 * 1024 * 1024") &&
+    pickSource.includes("f.size > PLAYLIST_IMPORT_MAX") && pickSource.includes("await f.text()") &&
+    pickSource.indexOf("f.size > PLAYLIST_IMPORT_MAX") < pickSource.indexOf("await f.text()") &&
+    (libSource.match(/\bplImportTooBig:/g) || []).length === 4;
+  rule(playlistImportCap, "shared playlist import is size-capped before the file is read (F-34, four languages)");
+  const corePrefs = js["js/core.js"];
+  const packPrevSafe = corePrefs.includes("packPrev: cleanPackPrev(prefs.packPrev)") && corePrefs.includes("function cleanPackPrev(") &&
+    corePrefs.includes('typeof v.skin !== "string"') && corePrefs.includes("!Array.isArray(v.notes) || v.notes.length !== 2") &&
+    corePrefs.includes("settings.packPrev = null;") &&
+    js["js/custom.js"].includes("if (persist) packRestoreSettings();") && js["js/custom.js"].includes("if (!restore) packSnapshot();");
+  rule(packPrevSafe, "the pack snapshot (packPrev) is shape-checked while loading preferences");
 
   const core = js["js/core.js"], tv = js["js/tv-dock.js"];
   const safeUrlSettings = core.includes("VIDEO_STYLE_IDS.includes(f)") && core.includes("pick(data.videoStyle, VIDEO_STYLE_IDS, \"\")") &&

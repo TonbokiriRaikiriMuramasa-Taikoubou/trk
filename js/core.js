@@ -91,6 +91,28 @@ function cleanTrkRemoved(v) {
   if (!Array.isArray(v)) return [];
   return [...new Set(v.filter(x => typeof x === "string" && /^trk-[A-Za-z0-9_-]{1,40}$/.test(x)))].slice(-200);
 }
+/* 📦 パックを外したときに戻すための退避（custom.js が使い、設定として保存する）。形が違うものは捨てる。
+   prev＝パックを当てる前の値、applied＝パックが実際に当てた値（利用者がその間に変えた項目は戻さないための目印）。 */
+function cleanPackPrev(v) {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return null;
+  if (typeof v.skin !== "string" || !v.skin || v.skin.length > 64) return null;
+  if (typeof v.fxPower !== "number" || !Number.isFinite(v.fxPower)) return null;
+  const fxPower = num(v.fxPower, 0, 3, null);   /* 設定画面のスライダーと同じ範囲（0〜3）に丸める */
+  if (fxPower === null) return null;
+  if (!Array.isArray(v.notes) || v.notes.length !== 2) return null;
+  const notes = v.notes.map(n => ({ color: (n && typeof n.color === "string") ? n.color.slice(0, 24) : "",
+    shape: (n && typeof n.shape === "string") ? n.shape.slice(0, 12) : "" }));
+  const rawApplied = (v.applied && typeof v.applied === "object" && !Array.isArray(v.applied)) ? v.applied : {};
+  const applied = {};
+  if (typeof rawApplied.skin === "string" && rawApplied.skin) applied.skin = rawApplied.skin.slice(0, 64);
+  if (typeof rawApplied.fxPower === "number" && Number.isFinite(rawApplied.fxPower)) applied.fxPower = num(rawApplied.fxPower, 0, 3, 1.5);
+  if (rawApplied.seEnabled === true) applied.seEnabled = true;
+  if (Array.isArray(rawApplied.notes) && rawApplied.notes.length === 2) {
+    applied.notes = rawApplied.notes.map(n => ({ color: (n && typeof n.color === "string") ? n.color.slice(0, 24) : "",
+      shape: (n && typeof n.shape === "string") ? n.shape.slice(0, 12) : "" }));
+  }
+  return { skin: v.skin, notes, fxPower, seEnabled: v.seEnabled === true, applied };
+}
 function guessLang() {
   const l = (navigator.language || "en").toLowerCase();
   return l.startsWith("ja") ? "ja" : l.startsWith("zh") ? "zh" : l.startsWith("ko") ? "ko" : "en";
@@ -254,12 +276,13 @@ const settings = {
   mmdMotionFavs: Array.isArray(prefs.mmdMotionFavs) ? prefs.mmdMotionFavs.filter(x => typeof x === "string").slice(0, 50) : [],  // 🩷 ⭐お気に入りモーション
   mmdCredit: typeof prefs.mmdCredit === "string" ? prefs.mmdCredit.slice(0, 120) : "",
   activePack: typeof prefs.activePack === "string" ? prefs.activePack : null,
+  packPrev: cleanPackPrev(prefs.packPrev),                                    // 📦 パックを外したときに戻すための退避（custom.js。trk130）
   previewEnabled: prefs.previewEnabled !== false,
   libSort: pick(prefs.libSort, ["name", "plays", "recent", "best"], "name"),
   shortMode: pick(prefs.shortMode, ["off", "90", "120", "180"], "off"),      // 🕹️ ショートプレイ（後半だけ遊ぶ・初期オフ）
   libTab: typeof prefs.libTab === "string" ? prefs.libTab : "all",            // 📚 選んでいる棚（タブ）のID
   playlists: (Array.isArray(prefs.playlists) ? prefs.playlists : []).filter(p => p && typeof p === "object").slice(0, 200),  // 🎧 ユーザー定義＋公式カタログ由来プレイリスト（広いカタログを保存できるよう上限200）
-  plFolders: (Array.isArray(prefs.plFolders) ? prefs.plFolders : []).filter(f => f && typeof f === "object").slice(0, 13),  // 📁 プレイリストフォルダ（ネスト可。library.js が検証。trk128：trk-endfield-character 対応で 12→13）
+  plFolders: (Array.isArray(prefs.plFolders) ? prefs.plFolders : []).filter(f => f && typeof f === "object").slice(0, 40),  // 📁 プレイリストフォルダ（ネスト可。library.js が検証。trk129：上限は library.js の PL_FOLDER_MAX＝40 と対。trk の固定棚が10個あるので利用者に十分残す。作成時に上限を確かめ、起動時に黙って捨てない）
   playlistDelMode: prefs.playlistDelMode === "three" ? "three" : "one",       // 🎧 タブの中クリック削除を3回にするモード
   plAuthorTools: prefs.plAuthorTools === true,                                // 👥 投稿者ツール（初期オフ。library.js）
   plAuthorName: typeof prefs.plAuthorName === "string" ? prefs.plAuthorName.slice(0, 24) : "",   // 👤 共有ファイルに添える投稿者名
@@ -498,6 +521,7 @@ function resetKeysPrefs() {
   settings.padConfirm = PAD_DEFAULTS.confirm; settings.padBack = PAD_DEFAULTS.back; settings.padPause = PAD_DEFAULTS.pause;
 }
 function resetAllPrefs() {
+  settings.packPrev = null;    // 📦 パックの退避も消す（全リセットのあとに古い値を戻さない。trk130）
   resetVideoPrefs(); resetAudioPrefs(); resetNotesPrefs(); resetLitePrefs(); resetKeysPrefs(); resetAmpPrefs();
   settings.liteSeen = false;   // 🪶 工場出荷状態では、スマホ向けの初回案内もやり直す
   settings.tvParamFavs = []; // a factory reset clears the separately preserved TV bookmarks too

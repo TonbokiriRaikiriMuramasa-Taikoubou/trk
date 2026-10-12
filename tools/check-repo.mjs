@@ -911,17 +911,28 @@ if (!exists("js/fx-worklet.js") ||
       fixture.albums.every(album => album.releaseDate === "2026-02-15" && album.trackCount === album.tracks.length);
     catalogDataOk = albumsMatch && characterOstsKept && rightsOk && trackTotal === 60 &&
       new Set(spotifyIds).size === 60 &&
-      JSON.stringify(fixture.albums.map(album => album.tracks.length)) === JSON.stringify([37, 23]);
+      JSON.stringify(fixture.albums.map(album => album.tracks.length)) === JSON.stringify([37, 23]) &&
+      JSON.stringify(series.playlists.map(pl => pl.id)) === JSON.stringify(fixture.seriesPlaylistOrder);
 
     const ensureStart = library.indexOf("function trkCatalogGuide(");
     const ensureEnd = library.indexOf("\n(function plTighten()", ensureStart);
     if (ensureStart >= 0 && ensureEnd > ensureStart) {
-      const defaultImported = { id:"trk-ef-firstorder", cat:"trk:endfield:ef-firstorder", name:"Endfield — 初号指令 OST", icon:"📜",
+      /* trk110 以降の既存取り込みを再現：Vol.2（旧名・trk-endfield）を先に並べ、Vol.1 は実機で保存される
+         24文字切り旧名（「Endfield — Zeroth Direct」＝実アプリのplSanitizeの結果）の状態で渡す。
+         キャラクターテーマは1つは既定場所・1つは利用者が別のフォルダへ動かした状態で渡す。 */
+      const oldVol2 = { id:"trk-ef-firstorder2", cat:"trk:endfield:ef-firstorder2", name:"Endfield — Zeroth Directive OST Vol.2（初号指令・下）", icon:"⛰️",
+        tags:["Game","Endfield","Zeroth Directive","Metal Scar Radio"], wish:[{t:"obsolete", al:"", ar:"", u:""}],
+        songs:[], folder:"trk-endfield", guide:{note:"old guide", url:"https://example.com/old"} };
+      const defaultImported = { id:"trk-ef-firstorder", cat:"trk:endfield:ef-firstorder", name:"Endfield — Zeroth Direct", icon:"📜",
         tags:["Game","Endfield","Metal Scar Radio","First Order"], wish:[{t:"obsolete", al:"", ar:"", u:""}],
-        songs:["owned-endfield-track"], guide:{note:"old guide", url:"https://example.com/old"} };
+        songs:["owned-endfield-track"], folder:"trk-endfield", guide:{note:"old guide", url:"https://example.com/old"} };
       const customImported = { id:"pl-manual-ef", cat:"endfield:ef-firstorder", name:"My Endfield mix", icon:"🌸", tags:["personal"],
         wish:[{t:"obsolete", al:"", ar:"", u:""}], songs:["manual-owned-track"], guide:{note:"old guide", url:"https://example.com/old"} };
-      const testSettings = { playlists:[defaultImported, customImported] };
+      const charOnDefault = { id:"trk-ef-blurring", cat:"trk:endfield:ef-blurring", name:"Endfield — Blurring", icon:"🌫️",
+        tags:["Game","Endfield","Metal Scar Radio","MSR Endfield"], wish:[{t:"obsolete", al:"", ar:"", u:""}], songs:[], folder:"trk-endfield" };
+      const charUserMoved = { id:"trk-ef-ashen", cat:"trk:endfield:ef-ashen", name:"Endfield — ASHEN REMAINS", icon:"🔥",
+        tags:["Game","Endfield","Metal Scar Radio","Levatein"], wish:[{t:"obsolete", al:"", ar:"", u:""}], songs:[], folder:"my-folder" };
+      const testSettings = { playlists:[oldVol2, defaultImported, customImported, charOnDefault, charUserMoved] };
       let saveCount = 0;
       const runContext = vm.createContext({
         settings:testSettings,
@@ -932,8 +943,9 @@ if (!exists("js/fx-worklet.js") ||
         saveUserPrefs:() => { saveCount++; },
         trkWishesForSeries:() => []
       });
-      new vm.Script(library.slice(library.indexOf("function trkWishFromTrack("), library.indexOf("\nfunction trkWishesFromCatalog")) + "\n" +
-        library.slice(ensureStart, ensureEnd) + "\nensureTrkDistributionPlaylists();").runInContext(runContext);
+      const ensureCode = library.slice(library.indexOf("function trkWishFromTrack("), library.indexOf("\nfunction trkWishesFromCatalog")) + "\n" +
+        library.slice(ensureStart, ensureEnd);
+      new vm.Script(ensureCode + "\nensureTrkDistributionPlaylists();").runInContext(runContext);
       const expectedWish = fixture.albums[0].tracks.map(([t, ar, id, cnTitle]) => ({
         t, al:fixture.albums[0].album, ar, u:"https://open.spotify.com/track/" + id, matchAliases:[cnTitle]
       }));
@@ -943,21 +955,37 @@ if (!exists("js/fx-worklet.js") ||
         JSON.stringify(defaultImported.wish) === JSON.stringify(expectedWish) &&
         defaultImported.guide.url === fixture.albums[0].ffmToUrl &&
         defaultImported.guide.note.includes("二次利用許諾ではありません");
+      const expectedWish2 = fixture.albums[1].tracks.map(([t, ar, id, cnTitle]) => ({
+        t, al:fixture.albums[1].album, ar, u:"https://open.spotify.com/track/" + id, matchAliases:[cnTitle]
+      }));
+      const renamesVol2 = oldVol2.name === fixture.albums[1].name && oldVol2.folder === "trk-endfield" &&
+        JSON.stringify(oldVol2.wish) === JSON.stringify(expectedWish2) && oldVol2.guide.url === fixture.albums[1].ffmToUrl;
       const preservesCustom = customImported.name === "My Endfield mix" && customImported.icon === "🌸" &&
         JSON.stringify(customImported.tags) === JSON.stringify(["personal"]) &&
         JSON.stringify(customImported.songs) === JSON.stringify(["manual-owned-track"]) &&
         JSON.stringify(customImported.wish) === JSON.stringify(expectedWish);
-      const createdVol2 = testSettings.playlists.find(pl => pl.id === "trk-ef-firstorder2");
-      const createsVol2 = !!createdVol2 && createdVol2.folder === "trk-endfield" && createdVol2.wish.length === 23 &&
-        createdVol2.guide.url === fixture.albums[1].ffmToUrl;
-      safeRefreshOk = migratesDefault && preservesCustom && createsVol2 && saveCount > 0;
+      /* 最古の旧名（trk110以前の紹介版「Endfield — 初号指令 OST」）でも改名が効くこと（2度目の実行で確認）。 */
+      defaultImported.name = "Endfield — 初号指令 OST";
+      new vm.Script("ensureTrkDistributionPlaylists();").runInContext(runContext);
+      const migratesOldest = defaultImported.name === fixture.albums[0].name;
+      /* trk128 の一回限りの整頓：初号指令上下が最上（カタログ順）、キャラクターテーマは既定場所だけ棚へ移動、
+         利用者が動かしたものはそのまま。印（trkEndfieldTidy1）が付く。
+         このテストでは欠落の9リスト（ef-eve ほか）も自動作成されるので、配列は全13リスト＋手動リスト。 */
+      const idx = id => testSettings.playlists.findIndex(pl => pl.id === id);
+      const tidyOk = testSettings.trkEndfieldTidy1 === 1 &&
+        idx("trk-ef-firstorder") === 0 && idx("trk-ef-firstorder2") === 1 &&
+        idx("trk-ef-eve") === 2 && idx("trk-ef-dreamscape") === 7 &&
+        idx("trk-ef-blurring") === 8 && idx("trk-ef-ashen") === 9 && idx("trk-ef-signal") === 12 &&
+        idx("pl-manual-ef") === 13 &&
+        charOnDefault.folder === "trk-endfield-character" && charUserMoved.folder === "my-folder";
+      safeRefreshOk = migratesDefault && migratesOldest && renamesVol2 && preservesCustom && tidyOk && saveCount > 0;
     }
   } catch (error) {
     console.error(`WARN  Endfield catalog test setup failed: ${error.message}`);
   }
-  if (!catalogDataOk) fail("Endfield Zeroth Directive fixture/catalog mismatch (expected Vol.1 37 + Vol.2 23 ordered tracks, unique official Spotify track links, Chinese-title match aliases, ffm.to album sources, and rights notes)");
-  else if (!safeRefreshOk) fail("Endfield refresh must migrate the old 初号指令 default name/tags to Vol.1, keep owned songs and custom data, and create the Vol.2 playlist");
-  else ok("Arknights: Endfield Zeroth Directive OST Vol.1–2: 60 ordered Spotify-linked tracks, Chinese-title aliases, ffm.to guides, safe existing-playlist refresh");
+  if (!catalogDataOk) fail("Endfield Zeroth Directive fixture/catalog mismatch (expected Vol.1 37 + Vol.2 23 ordered tracks, unique official Spotify track links, Chinese-title match aliases, ffm.to album sources, the release-ordered series layout, and rights notes)");
+  else if (!safeRefreshOk) fail("Endfield refresh must migrate the old 初号指令 default names to the trk128 names, keep owned songs and custom data, and re-order / move to the character shelf once (trkEndfieldTidy1)");
+  else ok("Arknights: Endfield Zeroth Directive OST Vol.1–2: 60 ordered Spotify-linked tracks, Chinese-title aliases, ffm.to guides, release-ordered series with the character shelf, safe one-time tidy of existing imports");
 }
 
 // 🛰️ Arknights: Endfield — Metal Scar Radio official albums (batch 2): six albums (Eve of Departure,
@@ -1013,7 +1041,9 @@ if (!exists("js/fx-worklet.js") ||
     const ensureStart = library.indexOf("function trkCatalogGuide(");
     const ensureEnd = library.indexOf("\n(function plTighten()", ensureStart);
     if (ensureStart >= 0 && ensureEnd > ensureStart) {
-      const testSettings = { playlists: [] };
+      /* trkEndfieldTidy1 を先に付ける＝一回限りの整頓をスキップし、作成パスそのものが
+         キャラクターテーマを trk-endfield-character へ置くことを検査する。 */
+      const testSettings = { playlists: [], trkEndfieldTidy1: 1 };
       let saveCount = 0;
       const runContext = vm.createContext({
         settings: testSettings,
@@ -1026,7 +1056,11 @@ if (!exists("js/fx-worklet.js") ||
       });
       new vm.Script(library.slice(library.indexOf("function trkWishFromTrack("), library.indexOf("\nfunction trkWishesFromCatalog")) + "\n" +
         library.slice(ensureStart, ensureEnd) + "\nensureTrkDistributionPlaylists();").runInContext(runContext);
-      autoCreateOk = saveCount > 0 && fixture.albums.every(expected => {
+      const characterOnShelf = ["ef-blurring", "ef-ashen", "ef-floaty", "ef-makers"].every(id => {
+        const created = testSettings.playlists.find(pl => pl.id === "trk-" + id);
+        return !!created && created.folder === "trk-endfield-character" && created.cat === "trk:endfield:" + id;
+      });
+      autoCreateOk = saveCount > 0 && characterOnShelf && fixture.albums.every(expected => {
         const created = testSettings.playlists.find(pl => pl.id === "trk-" + expected.id);
         return !!created && created.folder === "trk-endfield" && created.cat === "trk:endfield:" + expected.id &&
           created.name === expected.name && created.wish.length === expected.tracks.length &&
@@ -1039,8 +1073,20 @@ if (!exists("js/fx-worklet.js") ||
     console.error(`WARN  Endfield MSR albums test setup failed: ${error.message}`);
   }
   if (!catalogDataOk) fail("Endfield MSR albums fixture/catalog mismatch (expected 6 albums with 5+9+17+4+30+16 ordered tracks, unique official Spotify track links, Spotify album-page sources, and rights notes)");
-  else if (!autoCreateOk) fail("Endfield MSR albums must auto-create the six playlists under trk-endfield with full wishes and official Spotify album guides");
-  else ok("Arknights: Endfield Metal Scar Radio albums (batch 2): 81 ordered Spotify-linked tracks across Eve of Departure, Thunder's Legacy, At the Wake of Spring, Re-Ignition, Homecoming, Dreamscape");
+  else if (!autoCreateOk) fail("Endfield MSR albums must auto-create the six playlists under trk-endfield with full wishes and official Spotify album guides, and the four character-theme lists under trk-endfield-character");
+  else ok("Arknights: Endfield Metal Scar Radio albums (batch 2): 81 ordered Spotify-linked tracks across Eve of Departure, Thunder's Legacy, At the Wake of Spring, Re-Ignition, Homecoming, Dreamscape, plus the character-theme shelf");
+}
+
+/* 📁 trk128: サブフォルダ（🐔 の中・🎭 棚など）を見ているときは、そのフォルダをタブ帯に出す。
+   出さないと呼び出し側のフォールバックで表示が「すべて」に戻ってしまう（実ブラウザで確認した既存の欠陥の修正）。 */
+{
+  const library = read("js/library.js");   /* read() の結果では core. 別名が完全に落ちる（settings.libTab になる） */
+  const nestedFolderTabOk =
+    library.includes('if (settings.libTab.startsWith("fld:")) {') &&
+    library.includes("const cf = plFolderById(settings.libTab.slice(4));") &&
+    library.includes("if (cf && cf.parent && !tabs.some(t => t.id === settings.libTab))");
+  if (!nestedFolderTabOk) fail("Library must add the open nested folder to the tab list (libTabsOf fld: handling) so the folder view does not fall back to the all view");
+  else ok("Library: open nested folder (trk subfolders / Endfield Character Theme shelf) is added to the tab bar so the folder view stays open");
 }
 
 // ⚔️ LoL Creator-Safe Sessions: complete SoundCloud album order/count and one official song URL per track.

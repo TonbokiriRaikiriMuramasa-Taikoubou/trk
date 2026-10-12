@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-12（trk127）**。現在の仕様・守る条件・未確認事項の要約です。細かな過去の作業履歴（trk123以前）と trk114〜118 の検証の詳細は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-12（trk128）**。現在の仕様・守る条件・未確認事項の要約です。細かな過去の作業履歴（trk123以前）と trk114〜118 の検証の詳細は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝直近3回の変更、§8＝変更時の点検。
 
@@ -53,11 +53,14 @@
 
 ### その他のカタログ
 
-- **Endfieldカタログ**（trk110〜trk111）は初号指令OSTと公式アルバム6作の2系統です。いずれも公式Spotify収録順・各曲は公式Spotify個別曲ページへリンクし、取り込み時に自動でプレイリスト化します。音源は同梱しません。
-  - 初号指令OST「Zeroth Directive」：Vol.1 37曲＋Vol.2 23曲。各巻は公式告知のffm.to配信一覧へリンクし、中国語公式曲名を照合別名に登録済み。旧「初号指令 OST」4パート紹介版は永続ID `ef-firstorder` を保ったままVol.1全曲版へ安全更新されます（所持曲・ユーザー変更は維持）。キャラクターOST等5プレイリストの内容は不変。
-  - Metal Scar Radio 公式アルバム6作・計81曲（trk111）：Eve of Departure 5曲（2026-04-11）・Thunder's Legacy 9曲（2026-04-22）・At the Wake of Spring OST 17曲（2026-04-30）・Contingency Contract Re-Ignition OST 4曲（2026-06-20）・Homecoming OST 30曲（2026-07-31）・Dreamscape of Wind and Snow OST 16曲（2026-09-10）。各アルバムは公式Spotifyアルバムページへリンクし、`trk-ef-*` プレイリストとして自動作成。
+- **Endfieldカタログ**（trk110〜trk111・trk128で整頓）は初号指令OSTと公式アルバム6作の2系統です。いずれも公式Spotify収録順・各曲は公式Spotify個別曲ページへリンクし、取り込み時に自動でプレイリスト化します。音源は同梱しません。
+  - **並び順（trk128）**：①初号指令OST 上下2巻を**最上**（ゲームのオープニングBGMがここにある）。表示名は「初号指令 (上) ― Zeroth Directive Original Soundtrack Vol.1」／「初号指令 (下) ― … Vol.2」（表示は24文字上限で「初号指令 (上) ― Zeroth Direct」。旧既定名からの改名はセーフリフレッシュ）。②公式アルバム6作を**リリース順**（Eve of Departure 2026-04-11 → Thunder's Legacy 2026-04-22 → At the Wake of Spring OST 2026-04-30 → Contingency Contract Re-Ignition OST 2026-06-20 → Homecoming OST 2026-07-31 → Dreamscape of Wind and Snow OST 2026-09-10）。③**キャラクターテーマ4リスト**（ef-blurring・ef-ashen・ef-floaty・ef-makers。Talos Wiki（コミュニティ）では Laevatein×2・Gilberta・Yvonne のOperatorテーマ）をネスト棚 **`trk-endfield-character`「Endfield Character Theme」（🎭、trk-endfieldの子）**にまとめる。④紹介リスト ef-signal を最後に。順序の正は `tools/endfield-zeroth-directive-tracklist.json` の `seriesPlaylistOrder`（check-repo がシリーズ全13リストの順を検査）。
+  - **一回限りの整頓（trk128）**：`js/library.js` の `trkEndfieldTidyOnce` が初回起動だけ、既存取り込みを上記の順へ並べ替え（配列順・`playlistOrder`・`createdAt` の3系統）し、キャラクターテーマ4リストをまだ既定場所（trk-endfield）にあるものだけ棚へ移動する。`settings.trkEndfieldTidy1` の印が付いた後は並び・配置とも二度と触らない（利用者の配置・手動並べ替えを守る）。改名は**保存データに実際にある24文字切り名「Endfield — Zeroth Direct」にも命中**する（実アプリでは保存名が `plSanitize` で24文字に切られ、trk110の上下の名前が同じ文字列になる）。フォルダ上限は 12→13（`plTighten`・`core.js`）。🐔階層メニュー（plTrkMenu）は一段深い棚も表示する。
+  - **trk128で修正した既存欠陥**：サブフォルダ（🐔 の中の棚など）を開いたとき、そのフォルダがタブ帯に無かったため表示が「すべて」へフォールバックしていた。`libTabsOf` が見ているサブフォルダのタブを出すようにした（`plNested` 付き・見なくなったら消える＝フォルダ内プレイリストタブと同パターン）。
+  - 初号指令OST「Zeroth Directive」：Vol.1 37曲＋Vol.2 23曲（2026-02-15 配信開始）。各巻は公式告知のffm.to配信一覧へリンクし、中国語公式曲名を照合別名に登録済み。旧「初号指令 OST」4パート紹介版は永続ID `ef-firstorder` を保ったままVol.1全曲版へ、trk110の名前も trk128 の名前に安全更新されます（所持曲・ユーザー変更は維持）。
+  - Metal Scar Radio 公式アルバム6作・計81曲（trk111）：各アルバムは公式Spotifyアルバムページへリンクし、`trk-ef-*` プレイリストとして自動作成。
   - 権利表記：©/℗ GRYPHLINE（Hypergryph）、レーベルは Metal Scar Radio（鐵痕電台）。配信・購入は二次利用許諾ではなく、公式二次創作ガイドラインは公式素材のそのままの複製・抽出を禁止します。
-  - 未確認（断定しない）：6作の中国語公式曲名・公式告知のffm.to配信一覧（Homecoming を除く）・VGMdb照合・他ストアの曲別URL。照合別名は付けていません。「配信なし」とも書きません。
+  - 未確認（断定しない）：6作の中国語公式曲名・公式告知のffm.to配信一覧（Homecoming を除く）・VGMdb照合・他ストアの曲別URL。照合別名は付けていません。「配信なし」とも書きません。trk128 で Talos Wiki（コミュニティ運営）から確認したキャラクター分類・発売日・3アルバムのSpotifyID（Ashen Remains 6aFenM2edcPyIfzg6ZtQnz／Maker's Luv 4ZZOkqQONyAFHzEG31Qss4／The Floaty Envelope 44qElu191kLQ5fit5fAQ6g・Blurring曲 0QqtGr91Q6JxiUW7sCukIg）は**公式ページでの再確認が未実施**＝台帳の「調査中の他の公式リリース」へ記録。
   - 台帳とfixture：[`ARKNIGHTS-ENDFIELD-MUSIC.md`](ARKNIGHTS-ENDFIELD-MUSIC.md)、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`。
 
 ### 維持中の既存機能
@@ -110,11 +113,12 @@
 | 利用者向けMIDI・権利案内 | `docs/guide/touhou-midi.md`、`docs/guide/sound.md`、`docs/guide/en.md` |
 | 🎓 OST手続き生成 | `tools/make-trk-ost.mjs`（出力は `assets/trk-ost/`・Git外。5ルール×2曲＝10曲のWAVスケッチ） |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.12-trk127`） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.12-trk128`） |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
 
+- **trk128（Endfield整頓）**：`npm run check` 成功（Static 0 failure／0 warning、`node:test` 218/218）。`git diff --check` 成功。`tools/check-repo.mjs` の🛰️ブロックに、シリーズ全13リストの並び検査（`seriesPlaylistOrder`）、旧名の改名検査（Vol.1＝最古名＋24文字切り名＋trk110フル名／Vol.2＝trk110フル名＋24文字切り名）、一回限りの整頓の3系統（配列の並べ替え・キャラクター棚への移動と利用者の配置保持・`trkEndfieldTidy1` の印）検査、MSRブロックにキャラクター棚の自動作成検査（tidyをスキップして作成パス単体で検査）、ネストフォルダタブ追加の静的検査を追加。**わざと壊す5通り（ef-eve／ef-thunderの順序交換・キャラクター棚の作成分岐削除・印の付与削除・24文字切り名の照合削除・ネストフォルダタブ削除）でFAILを確認済み**。**実ブラウザe2e（Chromium headless・20項目）で全項目PASS**：新規取り込み（13リストの新順作成・キャラクター棚・改名・印・Endfieldタブのチップ行＝🎭棚→初号指令(上)(下)→リリース順6作→signal）、既存取り込みの移行（24文字切り旧名からの改名・並び直し・既定場所のキャラクターリストだけ棚へ・利用者の配置・所持曲・手動リストの保持・2度目の起動で並びが変わらない）、ページエラー0。このe2eで**24文字切り名への改名不発**と**サブフォルダビューが「すべて」へフォールバックする既存欠陥**を発見し修正（§2・§7）。実端末での確認は未実施（§4-5と台帳のtrk128未確認事項）。
 - trk119〜124の検証記録（ページ送り・マウス・書斎ボタンの詳細）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) に移しました。
 - `npm run check`：成功。Static 0 failure／0 warning、`node:test` **218/218**（リポジトリ、Security、a11y、vendor、MMD、Study Room、lite-mode検査を含む）。`git diff --check`：成功。
 - **Creator-Safe（`check-repo.mjs`）**：LoL 22リストの状態・曲数・見当たらない曲・根拠の一致、VALORANT（記録した40曲から状態を計算し直す）、trk118の12リスト・539曲（全曲が記録したトラックIDの曲名・アーティストと一致、各100曲以下・重複なし）と記録した927行の網羅を検査。各ブロックとも、わざと壊すとFAILすること（改変検知）を確認済み（trk115：7通り、trk116：8通り、trk117：5通り、trk118：4通り）。自動作成のtrkリストは65（上限100）。照合作業そのもの（songdata.io の51〜977行目の転記と突き合わせ）はリポジトリ外で行い、結果をfixtureと台帳に記録した。トラックIDは、VALORANTの36件が別の一覧と1件ずつ一致し、3件を公式のSpotify埋め込み表示で開いて確認。
@@ -131,6 +135,7 @@
 
 ## 7. 最近の変更
 
+- **trk128（2026-10-12）**：Endfieldプレイリストの整頓（利用者指示）。①**初号指令OST 上下2巻をEndfieldタブの最上へ**し、表示名を「初号指令 (上) ― Zeroth Directive Original Soundtrack Vol.1」／「初号指令 (下) ― … Vol.2」に変更（ユーザー提示のSpotifyアルバムリンク 5qK87ACnKVHYKUWozTtXOA／4msN2gQVhoyeSNxH5fp6RW はfixtureの `spotifyAlbumUrl` と一致を確認。旧既定名からの改名はセーフリフレッシュ。表示は24文字上限で「初号指令 (上) ― Zeroth Direct」に切れる＝従来どおり）。②**公式アルバム6作をリリース順に**（2026-04-11→09-10。既にその順だったことを公式Spotify配信日で再確認）。③**キャラクターテーマ4リストをネスト棚「Endfield Character Theme」（`trk-endfield-character`・🎭）にまとめ**、紹介リスト ef-signal を最後に。Talos Wiki（コミュニティ）で Blurring・ASHEN REMAINS＝Laevatein、The Floaty Envelope＝Gilberta、MAKER'S LUV＝Yvonne のOperatorテーマと確認（公式ページでの再確認は次段階）。Thunder's Legacy／Eve of Departure はリリース順優先でアルバム一覧に残す（利用者指示）。④**一回限りの整頓 `trkEndfieldTidyOnce`**（`settings.trkEndfieldTidy1`）で既存取り込みを新順へ並べ替え（配列・playlistOrder・createdAtの3系統）し、キャラクターテーマを既定場所にあるものだけ棚へ移動（利用者の配置・手動並べ替えは印付き後に二度と触らない）。`ensureTrkSubfolder` に親フォルダ引数を追加、フォルダ上限12→13（plTighten・core.js）、🐔階層メニューで一段深い棚を表示、フォルダ設定ダイアログにcharacter棚を追加。⑤**実ブラウザe2e（20項目）で発見した2つの実害を修正**：(a) 実アプリでは保存名が24文字に切られるためtrk110名は**「Endfield — Zeroth Direct」に切り上がっている**（上下で同一文字列）——フル名のみの照合では改名が永遠に命中しない欠陥を、上下とも切り上がった形の照合を追加して修正（最古の旧名「Endfield — 初号指令 OST」は別実行で検査）。(b) **サブフォルダビューの既存欠陥**（ベースラインで再現確認）——フォルダ内のサブフォルダを開くとタブ帯に無いため表示が「すべて」へフォールバックしていた。`libTabsOf` に見ているサブフォルダのタブ追加（`plNested`・見なくなったら消える）を修正として追加。fixture（`seriesPlaylistOrder`・新名）・check-repo（並び・改名・棚・印・ネストタブ。改変検知5通り）・台帳・ガイドja/enを更新。`sw.js` cache名（`trk-v2026.10.12-trk128`）を更新。
 - **trk127（2026-10-12）**：trk126の再レビューへの対応。①**書斎の拡大中の PageDown／PageUp を押しっぱなし（キーリピート）にしても、端で止まる**（`studyJumpZoomEdge(direction, repeat)`）。押しっぱなしは画像の端まで送るだけで、次のページへの送りと本を閉じる動作は押し直したときだけ。次のページを描画している間（scrollHeightがまだ0）のリピートもページ送りに落とさない。②**⏯ の説明文を押せない理由に合わせた**：曲未選択＝「曲を選ぶと、ここで再生・一時停止できます」、プレビューオフ＝「プレビューがオフなので押せません（設定の「選曲中に曲のプレビューを再生する」をオンに）」、それ以外（メディアプレーヤー中など）＝「今は再生・一時停止できません」（`bannerPlayTipKey`、4言語の `bannerPlayNoSongTip`／`bannerPlayPreviewOffTip`／`bannerPlayIdleTip`）。③**レビューの指摘2（止めたプレビューは選曲画面に戻ると鳴り直す）は意図どおり**として、仕様を §2 とガイドに明記（止めた状態を保つ変更はしない）。`docs/guide/study-room.md`・`docs/guide/en.md`（押しっぱなし）、`docs/guide/appearance.md`・`docs/guide/en.md`（説明文・鳴り直し）を更新、`sw.js` cache名（`trk-v2026.10.12-trk127`）を更新。**2026-10-12の確認**：自動検査（§6）とヘッドレスChromiumのみ。⏯の説明文は英語表示で確認し、日本語・中国語・韓国語は文言の数の検査だけです。実機での確認は未実施。
 - **trk126（2026-10-12）**：曲名バナーの**右下に再生／一時停止のボタン**を足した（**音量ボタンの左**。アイコンだけの同じ大きさのボタン）。**選曲中＝プレビューの音を止める／鳴らす**（止めたところから鳴り直します）。ゲームの再生中・一時停止中は同じボタンが一時停止／再開（ゲームの一時停止と同じ）に働きますが、**プレイ中は選曲画面ごと隠れる**ので、ふだん見えるのは選曲中のプレビュー操作です。**曲名に触れて曲を選び直すと一時停止は解除され、新しい曲のプレビューが鳴ります**（止まったままにならない）。止める音がないとき（曲未選択・プレビューオフ）は押せない状態にしてあります。文言（`bannerPlayPauseTip`／`bannerPlayResumeTip`）は4言語。`docs/guide/appearance.md`・`docs/guide/en.md` を更新、`sw.js` cache名（`trk-v2026.10.12-trk126`）を更新。**2026-10-12に実機で動作確認済み**（空さん。配置も了承。§4-11）。
 - **trk125（2026-10-12）**：①曲リストの右側の **📚 書斎** ボタンを**常時表示**にした（`#studyOpenBtn`。件数の隣。trk73のボタンは設定「👆 長押しの代わりのボタンを出す」で隠れていたので、そこから外した。ラベルは4言語、ヒント付き）。②書斎を開く長押しと本棚のフォルダを作る長押しを**同じヘルパー**（`studyBindHoldPress`、650ms・14px超の移動で取り消し）にまとめ、**ブラウザ都合の `pointercancel`（指が動いていないのに届くもの）では取り消さず**、離した時点で650ms経っていればタイマーが消えていても開くようにした（「長押しで書斎に行かなくなった」という報告への備え。自動化では再現しませんでした）。`docs/LONG-PRESS-AUDIT.md`・`docs/guide/study-room.md`・`docs/guide/en.md` を更新、`sw.js` cache名（`trk-v2026.10.12-trk125`）を更新。

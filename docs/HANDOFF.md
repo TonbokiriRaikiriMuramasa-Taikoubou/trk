@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-12（trk118・mainへのマージ前に整理）**。現在の仕様・守る条件・未確認事項の要約です。細かな過去の作業履歴（trk115以前）と trk114〜118 の検証の詳細は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-12（trk119）**。現在の仕様・守る条件・未確認事項の要約です。細かな過去の作業履歴（trk116以前）と trk114〜118 の検証の詳細は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝直近3回の変更、§8＝変更時の点検。
 
@@ -89,7 +89,8 @@
 6. **🎼 手続き生成10曲の聴取確認**（trk113）：自動検査は「無音でもクリップでもない」こと（peak 0.62〜0.72・RMS 0.08〜0.29）と決定的生成しか確認していません。曲として聴けるか・不快なノイズや耳障りな音がないか・音量バランスは、`assets/trk-ost/index.html` で実際に聴いて確認する。採用曲を決めたら、trk's OST Vol.1 への組込み方（音源の権利表記・同梱可否）を別途決める。
 7. Android Chrome／PCでService Workerのsafe・オフライン、MMD／VRM、IndexedDBを確認する。Node・shim検査は実機確認の代用ではありません。
 8. **trk114の画面確認**：①自動リスト（例：LoLのSeason 3）を消して再起動しても戻らないこと、♻ボタンの件数表示と復元、trk's OST Vol.1を別フォルダへ動かして再起動しても戻らないこと。②英・中・韓のUIで入手先ガイド（タブの長押し）が各言語で出ること。③色が変わった16スキン（shadow・daylight・sakura・snowfield・garden・strawberry・melonberry・dawn・midnightsun・pastelloop・wagara・showacafe・cbLight・shojiLight・morningKitchen・mikuClassic）で、スキンの棚の見出しやリンクの色が見やすく、スキンの雰囲気を壊していないこと。ヘッドレスChromiumでは①②とcbLight・shojiLight・morningKitchenのaxe（4.61〜4.62:1）を確認済み。
-9. **Riot系カタログの画面確認**（trk116〜118）：🛒公式カタログに「🛡️ Riot Games — LoL関連ゲーム」と「VALORANT Creator-Safe」が出て取り込めること、LoLフォルダに4リスト（Pentakill など）が増えたこと、各リストの入手先ガイド（全曲／一部／見当たらない）が4言語で出ることを実機で確認する。新しい539曲のSpotifyリンクは、トラックIDの抜き取り確認が3件（VALORANTの36件は別の一覧と照合）なので、数件開いて確かめると確実。ヘッドレスChromiumでは取り込みとガイド表示を確認済み。
+9. **書斎の拡大画像のキー送り（trk119）**：拡大した画像を `↑`／`↓` で送る動きは、ヘッドレスChromium（PCの画面比・全画面モード）で確認済み。PC・Androidの実機で、トラックパッドやノートPCのキーボード、日本語配列、`←`／`→`のページ送りと混ぜて使ったときの体感、および長い本（縦読み）での手ざわりは未確認。実際に読みながら「1回押しの送り幅（画面の84%）」が多すぎ／少なすぎないかも見てほしい。
+10. **Riot系カタログの画面確認**（trk116〜118）：🛒公式カタログに「🛡️ Riot Games — LoL関連ゲーム」と「VALORANT Creator-Safe」が出て取り込めること、LoLフォルダに4リスト（Pentakill など）が増えたこと、各リストの入手先ガイド（全曲／一部／見当たらない）が4言語で出ることを実機で確認する。新しい539曲のSpotifyリンクは、トラックIDの抜き取り確認が3件（VALORANTの36件は別の一覧と照合）なので、数件開いて確かめると確実。ヘッドレスChromiumでは取り込みとガイド表示を確認済み。
 
 ## 5. 主なファイル
 
@@ -107,7 +108,7 @@
 | 利用者向けMIDI・権利案内 | `docs/guide/touhou-midi.md`、`docs/guide/sound.md`、`docs/guide/en.md` |
 | 🎓 OST手続き生成 | `tools/make-trk-ost.mjs`（出力は `assets/trk-ost/`・Git外。5ルール×2曲＝10曲のWAVスケッチ） |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.12-trk118`） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.12-trk119`） |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
@@ -115,6 +116,7 @@
 - `npm run check`：成功。Static 0 failure／0 warning、`node:test` **218/218**（リポジトリ、Security、a11y、vendor、MMD、Study Room、lite-mode検査を含む）。`git diff --check`：成功。
 - **Creator-Safe（`check-repo.mjs`）**：LoL 22リストの状態・曲数・見当たらない曲・根拠の一致、VALORANT（記録した40曲から状態を計算し直す）、trk118の12リスト・539曲（全曲が記録したトラックIDの曲名・アーティストと一致、各100曲以下・重複なし）と記録した927行の網羅を検査。各ブロックとも、わざと壊すとFAILすること（改変検知）を確認済み（trk115：7通り、trk116：8通り、trk117：5通り、trk118：4通り）。自動作成のtrkリストは65（上限100）。照合作業そのもの（songdata.io の51〜977行目の転記と突き合わせ）はリポジトリ外で行い、結果をfixtureと台帳に記録した。トラックIDは、VALORANTの36件が別の一覧と1件ずつ一致し、3件を公式のSpotify埋め込み表示で開いて確認。
 - **ブラウザ**（リポジトリ外の `@sparticuz/chromium`＋`puppeteer-core`、Chromium 153 headless、trk118時点）：`tools/smoke-browser.mjs --compare` は boot 0・未解決0・譜面10件一致・decode error 0・click error 0・mobile/safe-offline OK。`tools/smoke-game-end.mjs` PASS（trk114）。使い捨てのe2e（最新41項目）で、LoLリストの入手先ガイドの鍵と ja/en/zh/ko の表示、廃止した鍵（`plGuideLolCsLikely`・`plGuideLolSessions`）の保存データが起動時に置き換わること、LoLの新しい4リストの自動作成、🛒公式カタログからの VALORANT・LoL関連ゲームのリストの取り込みとガイド、ページエラー0を確認。trk114では削除の印・♻復元・OSTの移動・3スキンのaxe・MIDIの文言も確認（23項目）。各回の詳細は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) の「trk114〜118 の検証記録」。
+- **trk119の書斎キー送り**：`npm run check` 成功（Static 0 failure／0 warning、`node:test` 218/218。`tools/check-study-room.mjs` に、`js/study-room.js` から `studyZoomScrollNodes`／`studyScrollZoomedImage` を取り出して動かすVM検査を追加：1回押し＝84%、押しっぱなし＝6%、上下の端で `false` を返してページ送りにゆずること、見開きは左右が同じだけ動くこと、縦読み・等倍・文章の本では動かないこと）。わざと壊す3通り（配線の削除・送り幅の変更・縦読み／等倍の除外の削除）でFAILすることを確認。ブラウザ確認（リポジトリ外の `@sparticuz/chromium`＋`puppeteer-core`、Chromium headless）：①900×600の窓と全画面（`F`）で、ズーム2倍の画像が `↑`／`↓` で送られ（48px／504px＝そのときの表示高の84%）、ページ番号が動かないこと、②見開きは左右のページが同じだけ動き、`↑` で両方が戻ること、③「画像ページを ↑ / ↓ で移動する」設定では、端まで送った次の押下でページが進み、その続きを送れること、④拡大していないときは、この設定がオフなら何も起きない（従来どおり）こと、⑤マウスホイールの動き（送り先・ページ番号不変）とページエラー0を確認。`docs/guide/study-room.md`・`docs/guide/en.md` の画像・キー操作の項に追記。
 - trk114のMIDI計測（開発コンテナのNode、`studio_gm`）：4和音・3分（2,880音）は7.9秒→3.3秒、合成した密な3分の曲（平均約37音）は36.3秒→21.3秒。4和音・9分半は8,650万（旧上限8,000万で拒否→可）、密な4分は1.96億（可）、密な5分は2.46億（不可）。実際の東方MIDIでは未計測（§4-1）。
 - Endfield Zeroth Directiveカタログ検査（`check-repo.mjs`🛰️ブロック）：Vol.1 37曲＋Vol.2 23曲の順序・公式Spotify個別曲リンク・中国語別名・ffm.toガイド・既存取り込みの安全更新を確認。
 - Endfield Metal Scar Radioアルバム検査（`check-repo.mjs`🛰️バッチ2ブロック）：6作81曲（5+9+17+4+30+16）の順序・一意な公式Spotify個別曲リンク・照合別名なし・公式SpotifyアルバムのsourceUrl・権利表記・`trk-endfield` 配下への6プレイリスト自動作成を確認。曲名を1つ壊すとFAILすることを確認済み（改変検知の動作確認）。
@@ -123,10 +125,10 @@
 
 ## 7. 最近の変更
 
+- **trk119（2026-10-12）**：📚 書斎の画像リーダーで、**拡大した画像を `↑`／`↓` で送れる**ようにした（マウスホイールが動かすのと同じ場所＝1枚ずつの台紙・見開きの各ページ）。1回押し＝表示高の84%、押しっぱなし（キーリピート）＝6%ずつ。上下の端に着いたらキーを返し、上級者向け設定「画像ページを ↑ / ↓ で移動する」のページ送り（既定はオフ）や既存のページ操作はそのまま効く。縦読みは台紙そのものがスクロールするので対象外。送りは滑らせず、押した回数どおりに動く（連打・長押しでも取りこぼさない）。`studyHelpZoom`／`studyZoomHint` の文言4言語と、ガイド（ja／en）を更新。`sw.js` cache名（`trk-v2026.10.12-trk119`）を更新。
 - **trk118（2026-10-12）**：Creator-Safe Playlistの曲から、誰でも使いやすいリストを作った（新しい12リスト・539曲。全曲 links-verified＝「全曲がCreator-Safe対象（照合済み）」）。LoL（自動作成）：Pentakill 29曲・ログイン／イベント／スキンのテーマ 53曲・eスポーツのテーマ 17曲・2025〜26年のサウンドトラック 59曲。VALORANT：VALORANT Creator-Safe 39曲。新シリーズ「🛡️ Riot Games — LoL関連ゲーム」（🛒から取り込み）：Ruined King 60・The Mageseeker 57・Hextech Mayhem 30・Teamfight Tactics Vol.1／Vol.2 各68・2XKO 45・Wild Rift & Runeterra 14。各曲はプレイリストにあるSpotifyトラックIDへリンク（`tools/riot-games-creator-safe-playlist.json` に51〜977行目を記録、VALORANTのfixtureにIDを追加）。文言 `plGuideRiotLinksVerified` を4言語で追加。台帳・ガイド（ja／en）・NOTICE・`sw.js` cache名（`trk-v2026.10.12-trk118`）を更新。
 - **trk117（2026-10-12）**：VALORANTのリストもCreator-Safeと照合。VALORANT公式Creator-Safe Playlist（Spotify）の全40曲を公式の埋め込み表示で読み（`tools/valorant-creator-safe.json` に記録）、LoLで読んだRiot Games Creator-Safe Playlistの977行とも照らした結果、Championsアンセム6曲・エージェント関連曲3曲はどちらにも見当たらない（`VAL_CREATOR_SAFE`＝links-absent）。公式リンク集の文言を LoL と共通の `plGuideRiotLinksPartial`／`plGuideRiotLinksAbsent` に改名し（特定のゲーム名を含まない文言に）、`LOL_GUIDE_KEYS` を `RIOT_GUIDE_KEYS` に。台帳 `docs/VALORANT-MUSIC.md` を新設。LoLで見当たらなかった4曲は、空さんの判断で追加確認をしない。ガイド（ja／en）・`sw.js` cache名（`trk-v2026.10.12-trk117`）を更新。
-- **trk116（2026-10-12）**：LoLの残りのリストもRiot公式Creator-Safe Playlistと照合。songdata.io が表示する全977行（公式979曲。出ない2曲は701〜750番目）を読み、Sessions: Vi・Star Guardian Taliyahは全曲（verified）、Sessions: Dianaは42/43（「Oh Baby」が見当たらない）、Champion Themeは39/41（Smolder・Yunara）、Worlds/WCSアンセムは「Worlds Collide」（2015）だけ、人気曲は7/30、MSIアンセムとK/DAは見当たらない。Warsongs「Silver Scrapes」も全行に無かった。状態に links-partial／links-absent を足し（公式リンク集の文言 `plGuideLolLinksPartial`／`plGuideLolLinksAbsent` を4言語で追加）、Playlistと未照合だった sessions 状態とその文言を廃止。一部の文言は「残りはPlaylistに見当たらない・要確認」、人気曲は「一部だけ対象、共同制作曲などは対象外・要確認」に。`notYetMatched` を `notFound` に改め、公式リンク集・Sessionsのfixtureにも `creatorSafe` を追加し、`check-repo` で18リストを検査（8通りの改変でFAILを確認）。台帳・ガイド（ja／en）・`sw.js` cache名（`trk-v2026.10.12-trk116`）を更新。
-- **trk115以前**：trk115（LoL Creator-Safe照合を101曲目以降へ）・trk114（再レビュー対応：LoL Creator-Safe表示の訂正・MIDI処理量・削除の印ほか）・trk113（trk's OST用の手続き作曲スクリプト）・trk112（タブ挙動・デモ曲のOST移設）・trk111は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)。Endfield初号指令OST、Touhouローカル曲名カタログと24種のコード生成MIDI音色・TRK MIDI MIX（trk109）、LoLカタログ、音源ジャケット、TV、譜面生成、名前空間等の作業履歴は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) と各設計資料を参照。
+- **trk116以前**：trk116（LoLの残りリストのCreator-Safe照合・`notFound`・links-partial／links-absent）・trk115（LoL Creator-Safe照合を101曲目以降へ）・trk114（再レビュー対応：LoL Creator-Safe表示の訂正・MIDI処理量・削除の印ほか）・trk113（trk's OST用の手続き作曲スクリプト）・trk112（タブ挙動・デモ曲のOST移設）・trk111は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)。Endfield初号指令OST、Touhouローカル曲名カタログと24種のコード生成MIDI音色・TRK MIDI MIX（trk109）、LoLカタログ、音源ジャケット、TV、譜面生成、名前空間等の作業履歴は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) と各設計資料を参照。
 
 ## 8. 変更時チェックリスト
 

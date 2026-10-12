@@ -72,7 +72,7 @@ Object.assign(TEXT.ja, {
   studyHelpNav:"→で次へ・←で前へ（上級者向け設定で変更可）。画像の左右タップは綴じ方向に従います。テキストはスクロールします。",
   studyHelpSpace:"次のページへ。長押しすると、画像=ページ移動バー、テキスト=栞を挟みます。",
   studyHelpPg:"前のページ／次のページ（Home / End で最初／最後へ）。",
-  studyHelpZoom:"画像の拡大・縮小・フィット（縦読みでは使いません）。Ctrl+ホイールやピンチでも変えられます。",
+  studyHelpZoom:"画像の拡大・縮小・フィット（縦読みでは使いません）。Ctrl+ホイールやピンチでも変えられ、拡大した画像は↑ / ↓かホイールで送れます。",
   studyHelpSearch:"テキスト本の本文を検索（Enter=次の一致 / Shift+Enter=前の一致）。",
   studyHelpBookmark:"B=栞を挟む・外す、M=栞一覧の開閉。",
   studyHelpTv:"T=TVの表示切替（上→下→非表示）、F=画像の全画面表示。",
@@ -116,7 +116,7 @@ Object.assign(TEXT.ja, {
   studyTextSpacingTight:"詰める", studyTextSpacingNormal:"行間ふつう", studyTextSpacingLoose:"行間広め",
   studyTextWidthNarrow:"余白せまい", studyTextWidthNormal:"余白ふつう", studyTextWidthWide:"余白広い",
   studyTextTuneHint:"縦書き・ルーズリーフにも同じ設定が効きます。",
-  studyZoomFit:"フィット", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+ホイール・ピンチでも拡大できます。",
+  studyZoomFit:"フィット", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+ホイール・ピンチでも拡大できます。拡大した画像は↑ / ↓やホイールで送れます。",
   studyTvLookLabel:"TVの見た目", studyTvLookPlain:"素の画面", studyTvLookCrt:"ブラウン管", studyTvLookWood:"木枠",
   studyTvLookArcade:"アーケード", studyTvLookProjector:"プロジェクター", studyTvLookAquarium:"水槽",
   studyTvSizeLabel:"大きさ", studyTvSizeSmall:"小", studyTvSizeMedium:"中", studyTvSizeLarge:"大",
@@ -185,7 +185,7 @@ Object.assign(TEXT.en, {
   studyHelpNav:"→ goes forward and ← goes back (reassignable in Advanced settings). Tapping an image's left/right side follows the binding direction. Text scrolls instead.",
   studyHelpSpace:"Next page. Hold for the page seek bar (images) or to save a bookmark (text).",
   studyHelpPg:"Previous / next page (Home / End jump to the first / last page).",
-  studyHelpZoom:"Zoom in, out, and fit for images (not used in vertical comic mode). Ctrl+wheel and pinch work too.",
+  studyHelpZoom:"Zoom in, out, and fit for images (not used in vertical comic mode). Ctrl+wheel and pinch work too; scroll a zoomed image with ↑ / ↓ or the wheel.",
   studyHelpSearch:"Search inside a text book (Enter = next match, Shift+Enter = previous match).",
   studyHelpBookmark:"B = add or remove a bookmark, M = toggle the bookmark list.",
   studyHelpTv:"T = cycle the TV (top → bottom → hidden), F = full-screen image.",
@@ -229,7 +229,7 @@ Object.assign(TEXT.en, {
   studyTextSpacingTight:"Tight", studyTextSpacingNormal:"Normal", studyTextSpacingLoose:"Loose",
   studyTextWidthNarrow:"Narrow", studyTextWidthNormal:"Normal", studyTextWidthWide:"Wide",
   studyTextTuneHint:"These also apply to manuscript paper and loose-leaf.",
-  studyZoomFit:"Fit", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+wheel and pinch also zoom.",
+  studyZoomFit:"Fit", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+wheel and pinch also zoom. Scroll a zoomed image with ↑ / ↓ or the wheel.",
   studyTvLookLabel:"TV look", studyTvLookPlain:"Plain screen", studyTvLookCrt:"CRT", studyTvLookWood:"Wood frame",
   studyTvLookArcade:"Arcade", studyTvLookProjector:"Projector", studyTvLookAquarium:"Aquarium",
   studyTvSizeLabel:"Size", studyTvSizeSmall:"S", studyTvSizeMedium:"M", studyTvSizeLarge:"L",
@@ -293,7 +293,7 @@ Object.assign(TEXT.zh, {
   studyHelpNav:"→ 前进，← 后退（可在高级设置中重新指定）。点击图片左右侧仍按装订方向翻页。文本会滚动。",
   studyHelpSpace:"下一页。长按：图片=页码跳转条，文本=添加书签。",
   studyHelpPg:"上一页／下一页（Home / End 跳到最前／最后）。",
-  studyHelpZoom:"图片的放大、缩小、适应（纵向漫画不使用）。也支持 Ctrl+滚轮和双指缩放。",
+  studyHelpZoom:"图片的放大、缩小、适应（纵向漫画不使用）。也支持 Ctrl+滚轮和双指缩放；放大的图片可用 ↑ / ↓ 或滚轮滚动。",
   studyHelpSearch:"在文本书中搜索（Enter=下一个匹配，Shift+Enter=上一个匹配）。",
   studyHelpBookmark:"B=添加或移除书签，M=开关书签列表。",
   studyHelpTv:"T=切换电视显示（上→下→隐藏），F=图片全屏。",
@@ -333,7 +333,7 @@ Object.assign(TEXT.zh, {
   studyTextTuneLabel:"文字", studyTextSizeSmall:"小", studyTextSizeNormal:"中", studyTextSizeLarge:"大", studyTextSizeHuge:"特大",
   studyTextSpacingTight:"紧凑", studyTextSpacingNormal:"行距普通", studyTextSpacingLoose:"行距宽松",
   studyTextWidthNarrow:"边距窄", studyTextWidthNormal:"边距普通", studyTextWidthWide:"边距宽",
-  studyTextTuneHint:"竖排与活页纸也同样生效。", studyZoomFit:"适应", studyZoomValue:"{n}%", studyZoomHint:"也可用 Ctrl+滚轮和双指缩放。",
+  studyTextTuneHint:"竖排与活页纸也同样生效。", studyZoomFit:"适应", studyZoomValue:"{n}%", studyZoomHint:"也可用 Ctrl+滚轮和双指缩放。放大的图片可用 ↑ / ↓ 或滚轮滚动。",
   studyTvLookLabel:"电视外观", studyTvLookPlain:"素屏", studyTvLookCrt:"显像管", studyTvLookWood:"木框", studyTvLookArcade:"街机",
   studyTvLookProjector:"投影仪", studyTvLookAquarium:"水族箱", studyTvSizeLabel:"大小", studyTvSizeSmall:"小", studyTvSizeMedium:"中", studyTvSizeLarge:"大",
   studyTvRatioLabel:"画面比", studyTvRatio169:"16:9", studyTvRatio43:"4:3", studyTvRatio219:"21:9", studyTvNameToggle:"显示曲名",
@@ -399,7 +399,7 @@ Object.assign(TEXT.ko, {
   studyHelpNav:"→ 다음, ← 이전 (고급 설정에서 다시 지정할 수 있습니다). 이미지의 좌우를 누르면 제본 방향에 따라 넘깁니다. 텍스트는 스크롤합니다.",
   studyHelpSpace:"다음 페이지. 길게 누르면 이미지=페이지 이동 막대, 텍스트=책갈피 저장입니다.",
   studyHelpPg:"이전/다음 페이지 (Home / End 로 처음/마지막).",
-  studyHelpZoom:"이미지 확대·축소·맞춤 (세로형 만화에서는 사용하지 않습니다). Ctrl+휠과 핀치도 가능합니다.",
+  studyHelpZoom:"이미지 확대·축소·맞춤 (세로형 만화에서는 사용하지 않습니다). Ctrl+휠과 핀치도 가능하며, 확대한 이미지는 ↑ / ↓ 또는 휠로 이동합니다.",
   studyHelpSearch:"텍스트 책의 본문 검색 (Enter=다음 일치, Shift+Enter=이전 일치).",
   studyHelpBookmark:"B=책갈피 저장·해제, M=책갈피 목록 열기/닫기.",
   studyHelpTv:"T=TV 표시 전환 (위→아래→숨김), F=이미지 전체 화면.",
@@ -443,7 +443,7 @@ Object.assign(TEXT.ko, {
   studyTextSpacingTight:"좁게", studyTextSpacingNormal:"줄간격 보통", studyTextSpacingLoose:"줄간격 넓게",
   studyTextWidthNarrow:"여백 좁게", studyTextWidthNormal:"여백 보통", studyTextWidthWide:"여백 넓게",
   studyTextTuneHint:"세로쓰기와 루즈리프에도 함께 적용됩니다.",
-  studyZoomFit:"맞춤", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+휠과 핀치로도 확대할 수 있습니다.",
+  studyZoomFit:"맞춤", studyZoomValue:"{n}%", studyZoomHint:"Ctrl+휠과 핀치로도 확대할 수 있습니다. 확대한 이미지는 ↑ / ↓ 또는 휠로 이동합니다.",
   studyTvLookLabel:"TV 외형", studyTvLookPlain:"기본 화면", studyTvLookCrt:"브라운관", studyTvLookWood:"나무 프레임",
   studyTvLookArcade:"아케이드", studyTvLookProjector:"프로젝터", studyTvLookAquarium:"수조",
   studyTvSizeLabel:"크기", studyTvSizeSmall:"작게", studyTvSizeMedium:"보통", studyTvSizeLarge:"크게",
@@ -1597,6 +1597,33 @@ function studySyncZoomRow() {
   core.$("studyZoomGroup").hidden = !visible;
   if (visible) studyApplyZoomValue(studyPrefs.zoom);
 }
+/* 拡大してはみ出した画像を ↑ / ↓ で送る（マウスホイールが動かすのと同じ場所）。
+   縦読みは台紙（studyImageStage）そのものがスクロールするので対象外。端まで来たら false を返し、
+   下の「↑ / ↓でページを移動する」設定やページ送りにゆずります。
+   1回押し＝表示高の84%、押しっぱなし（キーリピート）＝6%ずつ。滑らせずにその場で動かします
+   （連打や長押しでも、押した回数どおりに進むように）。 */
+function studyZoomScrollNodes() {
+  if (!studyCurrentBook || studyCurrentBook.kind !== "image") return null;
+  if (studyPrefs.imageMode === "vertical" || studyPrefs.zoom <= 1.001) return null;
+  if (studyPrefs.imageMode === "spread") return [...core.$("studySpreadWrap").querySelectorAll(".study-spread-page")];
+  return [core.$("studySingleWrap")];
+}
+function studyScrollZoomedImage(direction, held) {
+  const nodes = studyZoomScrollNodes();
+  if (!nodes) return false;
+  let moved = false;
+  for (const node of nodes) {
+    if (!node) continue;
+    const extent = node.scrollHeight - node.clientHeight;
+    if (extent <= 1) continue;
+    const step = held ? Math.max(24, node.clientHeight * .06) : Math.max(48, node.clientHeight * .84);
+    const next = Math.max(0, Math.min(extent, node.scrollTop + direction * step));
+    if (next === node.scrollTop) continue;
+    moved = true;
+    node.scrollTop = next;
+  }
+  return moved;
+}
 
 /* ============ 文章の表示 ============ */
 function studySegments(book) { return STUDY_UTIL.aozoraSegments(book && book.content || ""); }
@@ -2305,6 +2332,10 @@ function studyKeyDown(event) {
   if (key === "?" || (event.code === "Slash" && event.shiftKey)) { event.preventDefault(); event.stopImmediatePropagation(); studyToggleHelp(); return; }
   if (event.code === studyPrefs.studyNextKey || event.code === studyPrefs.studyPreviousKey) {
     event.preventDefault(); event.stopImmediatePropagation(); studyStep(event.code === studyPrefs.studyNextKey ? 1 : -1); return;
+  }
+  /* 拡大した画像は、まず ↑ / ↓ で送ります（端に着いたときだけ、下のページ送りへゆずります）。 */
+  if ((event.code === "ArrowUp" || event.code === "ArrowDown") && studyScrollZoomedImage(event.code === "ArrowDown" ? 1 : -1, event.repeat)) {
+    event.preventDefault(); event.stopImmediatePropagation(); return;
   }
   if (studyPrefs.verticalImageKeys && studyCurrentBook && studyCurrentBook.kind === "image" &&
       (event.code === "ArrowUp" || event.code === "ArrowDown")) {

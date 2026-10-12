@@ -145,6 +145,9 @@ assert.ok(reader.includes("studyImportAsk") && reader.includes("studyQuotaError"
 assert.ok(reader.includes("studySweepOrphans") && reader.includes("studyDBDeleteMany"), "orphaned pages are swept");
 assert.ok(reader.includes("studyGetSongCoverInfo") && reader.includes("studyClearSongCover"), "covers can be inspected and removed");
 assert.ok(reader.includes("STUDY_ZOOM_STEPS") && reader.includes("studyApplyZoomValue") && reader.includes("studyPinchStart"), "image zoom (buttons / wheel / pinch) exists");
+assert.ok(reader.includes("studyScrollZoomedImage") &&
+  reader.includes('studyScrollZoomedImage(event.code === "ArrowDown" ? 1 : -1, event.repeat)'),
+  "a zoomed image can also be scrolled with the up/down keys, like the wheel");
 assert.ok(reader.includes("studyRunSearch") && reader.includes("studyHighlightMatchesInNode") && reader.includes("STUDY_SEARCH_MARK_MAX"), "in-book search exists and is capped");
 assert.ok(reader.includes("STUDY_UTIL.bookmarkedBooks") && reader.includes("studyBookmarkOpenAt") && reader.includes("studyToggleBookmarkPanel"), "the bookmark list exists");
 assert.ok(reader.includes("STUDY_TV_LOOKS") && reader.includes("STUDY_TV_RATIO") && reader.includes("studyCycleTV"), "TV looks / aspect / cycling exist");
@@ -243,6 +246,43 @@ assert.equal(keyTestContext.label("ArrowRight"), "→");
 assert.equal(keyTestContext.label("KeyA"), "A");
 assert.equal(keyTestContext.label("Numpad4"), "Num 4");
 assert.ok(reader.includes('typeof node.scrollBy === "function"') && reader.includes('typeof node.scrollTo === "function"'), "scrollBy/scrollTo have fallbacks for older webviews");
+
+/* ---------- 拡大した画像のキー送り（↑ / ↓） ---------- */
+/* 取り出すときだけ、別名（core.）を残した本文を使います（この2つは core.$ を読むため）。 */
+const readerWithCore = sourceOf("js/study-room.js", fs.readFileSync(new URL("../js/study-room.js", import.meta.url), "utf8"));
+const zoomNodesFn = readerWithCore.match(/function studyZoomScrollNodes\(\) \{[\s\S]*?\n\}/);
+const zoomScrollFn = readerWithCore.match(/function studyScrollZoomedImage\(direction, held\) \{[\s\S]*?\n\}/);
+assert.ok(zoomNodesFn && zoomScrollFn, "the arrow-key scrolling of a zoomed image is defined");
+const scrollContext = vm.createContext({});
+vm.runInContext(`${zoomNodesFn[0]}\n${zoomScrollFn[0]}\nglobalThis.scrollZoomedImage = studyScrollZoomedImage;`, scrollContext);
+const scrollNode = (scrollHeight, clientHeight, scrollTop = 0) => ({ scrollHeight, clientHeight, scrollTop });
+const singleWrap = scrollNode(2400, 600), spreadPages = [scrollNode(2400, 600), scrollNode(2400, 600)];
+scrollContext.window = { Trk: { core: { $: id => id === "studySingleWrap" ? singleWrap : { querySelectorAll: () => spreadPages } } } };
+scrollContext.studyCurrentBook = { kind:"image" };
+scrollContext.studyPrefs = { imageMode:"single", zoom:2 };
+assert.equal(scrollContext.scrollZoomedImage(1, false), true, "the down key moves a zoomed image");
+assert.equal(singleWrap.scrollTop, 504, "one press moves 84% of the visible height");
+assert.equal(scrollContext.scrollZoomedImage(-1, false), true, "the up key goes back");
+assert.equal(singleWrap.scrollTop, 0, "the up key comes back to the top");
+assert.equal(scrollContext.scrollZoomedImage(-1, false), false, "at the top the key is handed back to the page keys");
+singleWrap.scrollTop = 1800;
+assert.equal(scrollContext.scrollZoomedImage(1, false), false, "at the bottom the key is handed back to the page keys");
+assert.equal(singleWrap.scrollTop, 1800, "a press at the bottom does not move the image");
+singleWrap.scrollTop = 0;
+assert.equal(scrollContext.scrollZoomedImage(1, true), true, "holding the key keeps moving");
+assert.equal(singleWrap.scrollTop, 36, "a held key moves in small steps (6% of the visible height)");
+scrollContext.studyPrefs.imageMode = "spread";
+singleWrap.scrollTop = 0;
+assert.equal(scrollContext.scrollZoomedImage(1, false), true, "a spread moves too");
+assert.deepEqual(Array.from(spreadPages, node => node.scrollTop), [504, 504], "both spread pages move together");
+scrollContext.studyPrefs.imageMode = "vertical";
+assert.equal(scrollContext.scrollZoomedImage(1, false), false, "vertical comic mode keeps the stage's own scrolling");
+scrollContext.studyPrefs.imageMode = "single";
+scrollContext.studyPrefs.zoom = 1;
+assert.equal(scrollContext.scrollZoomedImage(1, false), false, "without zoom there is nothing to scroll");
+scrollContext.studyPrefs.zoom = 2;
+scrollContext.studyCurrentBook = { kind:"text" };
+assert.equal(scrollContext.scrollZoomedImage(1, false), false, "text books keep their own key handling");
 assert.ok(reader.includes("sweepOrphans:studySweepOrphans") && reader.includes("toggle:() =>"), "the public API exposes sweepOrphans/toggle for hosts and tests");
 assert.ok(reader.includes("function studyHelpOpen") && reader.includes("studyHelpTitle"), "the shortcut help overlay exists");
 assert.ok(reader.includes("document.body") && reader.includes("isConnected"), "the live <video> is restored even if its old parent was replaced");
@@ -375,4 +415,4 @@ for (const file of ["player.js", "main.js", "media-player-mode.js", "catch.js", 
   assert.ok(!/_trk(MediaPlayer|SynthMode)Open/.test(core), "core.js has no old media／synth flag left");
 }
 
-console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring`);
+console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring, ↑ / ↓ scrolling of a zoomed image (tap = one screen, hold = small steps, edges handed back to the page keys)`);

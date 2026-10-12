@@ -1700,12 +1700,15 @@ function studyScrollZoomedImage(direction, held) {
    もう端に着いていたときは、次の／前のページへ移り、続きの端から開きます
    （PageDown＝次のページの上端、PageUp＝前のページの下端）。
    本の端（1ページ目の上端・最終ページの下端）では、閉じる動作＝全画面を終了して本棚へ戻ります。
-   送り先が無いとき・拡大していないときは false を返し、ページ送りにゆずります。 */
-function studyJumpZoomEdge(direction) {
+   送り先が無いとき・拡大していないときは false を返し、ページ送りにゆずります。
+   キーリピート（repeat＝押しっぱなし）のときは、端まで送ったところで止まります。
+   次のページへの送り・本を閉じる動作は押し直したときだけで、押しっぱなしでは届きません。
+   次のページを描画している間（scrollHeightがまだ0）も、ページ送りに落とさずに止まります。 */
+function studyJumpZoomEdge(direction, repeat = false) {
   const nodes = studyZoomScrollNodes();
   if (!nodes) return false;
   const targets = nodes.filter(node => node && node.scrollHeight - node.clientHeight > 1);
-  if (!targets.length) return false;
+  if (!targets.length) return !!repeat;   /* 押しっぱなし中は、次のページの描画待ちでページを飛ばさない */
   const atEdge = targets.every(node => direction > 0 ? node.scrollTop >= node.scrollHeight - node.clientHeight - 1 : node.scrollTop <= 1);
   if (!atEdge) {
     let moved = false;
@@ -1718,6 +1721,7 @@ function studyJumpZoomEdge(direction) {
     }
     return moved;
   }
+  if (repeat) return true;   /* 端での「次の／前のページ」と「閉じる」は、押し直したときだけ（キーリピートでは端で止まる） */
   const step = studyPrefs.imageMode === "spread" ? 2 : 1;
   const target = studyNormalizePage(studyCurrentPage + direction * step);
   if (target !== studyCurrentPage) {
@@ -2475,7 +2479,7 @@ function studyKeyDown(event) {
   }
   /* 拡大した画像では、PageDown＝下端／PageUp＝上端（端の次は反対の端）。設定がオフのときは下のページ送りへ。 */
   if (studyPrefs.zoomEdgeKeys && (event.code === "PageDown" || event.code === "PageUp") &&
-      studyJumpZoomEdge(event.code === "PageDown" ? 1 : -1)) {
+      studyJumpZoomEdge(event.code === "PageDown" ? 1 : -1, event.repeat)) {
     event.preventDefault(); event.stopImmediatePropagation(); return;
   }
   if (event.code === "PageDown") { event.preventDefault(); event.stopImmediatePropagation(); studyStep(1); return; }

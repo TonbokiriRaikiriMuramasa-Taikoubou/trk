@@ -136,6 +136,7 @@
   - `tools/check-security.mjs` の配線検査（`packPrev` の形）を `if (!restore) { packSnapshot(); packRebase(); }` に追随（58 check のまま）。
   - `tools/check-repo.mjs`：trk132のブロック（`packRebase` が「利用者が自分で変えた項目だけ」を `prev` へ取り込んで `applied` から外すこと・切り替えの前に呼ぶ配線・パックのスキンを消すときは退避したスキンへ戻して `applied.skin` を外すこと・`chartToData` と `chartKeyOf` が同じ `origLane` を読むこと・`meta name="description"`（検索結果）と `og:description`（SNSカード）が同じ文面であること）を追加し、**わざと壊す4通りでFAIL**。
   - **スモーク（実ブラウザ）は未実施**：この開発コンテナには Chromium が無く（`SMOKE_CHROME` が必要）、`tools/smoke-browser.mjs --compare`／`tools/smoke-game-end.mjs` は動かせませんでした。**実機・実ブラウザでの確認も未実施**（§4-12の⑧⑨）。
+  - main へは **PR #59** で反映（2026-10-13）。
 - **trk129〜131（外部レビュー第1〜3弾への対応。中心は安全・堅牢化）**：`npm run check` 成功（**Static 0 failure／0 warning、Security 58 check、a11y 8 check、vendor 100 module、`node:test` 238/238**）。`git diff --check` 成功。**他者のファイルでタブが固まる問題の除去**（trk129＝F-33：共有譜面JSONの `bpm` を 0 か 1〜1000 に限定し、描画ループ3か所でも確認。trk130＝F-34：📥共有プレイリストを**読む前に**4MiB上限）が中心で、ほかに ↕の並べ替え・共有プレイリストの曲名照合・📦パックを外したときの復元を行いました（内容は §7）。trk131は文面（`og:description`）の差し替えだけで、検査結果は同じ。main へは PR #58 で反映。
   - 新しい回帰テストは5本：trk129が `tests/chart-import-bpm.test.mjs`・`tests/chart-key-mods.test.mjs`、trk130が `tests/trk-move-order.test.mjs`（5件）・`tests/playlist-import.test.mjs`（4件）・`tests/pack-unapply.test.mjs`（7件）で、**222→238件（+16件）**。
   - **どれも修正前のコードでFAILすることを確認**：media.js／render.js を戻すと2件（bpm）／`n.origLane ?? n.lane` を `n.lane` に戻すと2件／↕の旧版に戻すと3件／取り込みの上限判定を消すと1件／ゆるい照合を「最初の候補」にすると1件／`packRestoreSettings()` の呼び出しを消すと1件。

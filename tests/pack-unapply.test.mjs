@@ -31,7 +31,7 @@ function setup({ prev = null, savedSkinAtBoot = "shadow", seFiles = [null, null]
     showFxPower() {},
     window: { Trk: { media: { seBuffers:[{}, {}], seFiles, loadSE(file, lane) { calls.loadedSE.push([file, lane]); } } } }
   });
-  vm.runInContext(src + "\nglobalThis.__api = { packSnapshot, packApplied, packRestoreSettings, restoreOwnSounds };", ctx);
+  vm.runInContext(src + "\nglobalThis.__api = { packSnapshot, packApplied, packRebase, packRestoreSettings, restoreOwnSounds };", ctx);
   return { settings, els, calls, api: ctx.__api };
 }
 
@@ -105,7 +105,7 @@ test("a missing snapshot falls back to the default skin (old data)", () => {
 test("the wiring: snapshot before applying, restore only when the pack is really removed", () => {
   const act = custom.slice(custom.indexOf("async function activatePack("), custom.indexOf("function deactivatePack("));
   const deact = custom.slice(custom.indexOf("function deactivatePack("), custom.indexOf("async function installAndUse("));
-  const iSnap = act.indexOf("if (!restore) packSnapshot();"), iUnload = act.indexOf("deactivatePack(false);");
+  const iSnap = act.indexOf("if (!restore) { packSnapshot(); packRebase(); }"), iUnload = act.indexOf("deactivatePack(false);");
   assert.ok(iSnap >= 0 && iUnload > iSnap, "the snapshot is taken before the old pack is unloaded (the unload can reset the skin)");
   assert.ok(act.indexOf("packSnapshot();") < act.indexOf("packApplied("), "prev is captured before applied");
   for (const mark of ["packApplied({ skin: sid })", "packApplied({ notes:", "packApplied({ seEnabled: true })", "packApplied({ fxPower: core.settings.fxPower })"])
@@ -124,4 +124,59 @@ test("own sound effects come back, and only the sound-less pack reads them", () 
   assert.deepEqual(calls.loadedSE, [[don, 0]]);
   assert.equal(api.restoreOwnSounds(), true, "no own sound file for the ka lane leaves it null");
   assert.deepEqual(calls.loadedSE, [[don, 0], [don, 0]]);
+});
+
+test("trk132: what the user changed while pack A was on survives a switch to pack B", () => {
+  const { settings, api } = setup();
+  api.packSnapshot();
+  api.packApplied({ skin:"pack_p1", fxPower:2, seEnabled:true });
+  settings.skin = "pack_p1"; settings.fxPower = 2; settings.seEnabled = true;
+  settings.skin = "forest";       /* A を使いながら、自分でスキンを選び直した */
+  settings.seEnabled = false;     /* SE も自分で切った */
+  api.packSnapshot(); api.packRebase();   /* B を当てる直前（activatePack の順） */
+  assert.equal(settings.packPrev.skin, "forest", "the user's newer choice becomes the value to come back to");
+  assert.equal(settings.packPrev.seEnabled, false);
+  assert.equal(settings.packPrev.applied.skin, undefined, "A's skin is no longer something the pack set");
+  assert.equal(settings.packPrev.applied.fxPower, 2, "untouched fields stay as applied");
+  assert.equal(settings.packPrev.fxPower, 1.25);
+});
+
+/* ①スキンを持つパックAから、スキンを持たないパックBへ切り替えるとき、Aのスキンを消すだけだと
+     「Aのスキン（applied）と今のスキン（shadow）が食い違って」Bを外しても戻らなかった。
+   ②退避の無い古いデータは、これまでどおり shadow へ。 */
+const deactSrc = custom.slice(custom.indexOf("function deactivatePack("), custom.indexOf("async function installAndUse("));
+assert.ok(deactSrc.includes("const pv = core.settings.packPrev"), "deactivatePack can be isolated for the switch case");
+
+function loadSwitch({ skin, prev = null, skinId = "pack_p1" }) {
+  const calls = { skins: [] };
+  const settings = { skin, activePack:"p1", notes:[{ color:"#ffcc00", shape:"circle" }, { color:"#00ccff", shape:"diamond" }],
+    fxPower:1.25, seEnabled:false, packPrev:prev ? JSON.parse(JSON.stringify(prev)) : null };
+  const ctx = vm.createContext({
+    JSON, Array, Object, String,
+    core: { settings, applySkin(id, persist) { calls.skins.push([id, persist]); settings.skin = id; },
+      buildSkinGrid() {}, saveUserPrefs() {}, setStatus() {}, $: () => null },
+    setNotes(list) { settings.notes = list; }, showFxPower() {},
+    URL: { revokeObjectURL() {} },
+    window: { Trk: { data: { SKINS: { shadow:{}, sakura:{}, forest:{}, pack_p1:{}, pack_p2:{} } },
+      media: { seBuffers:[{}, {}], seFiles:[null, null], loadSE() {} } } },
+    restoreOwnSounds: () => false, updateMascotUI() {}, renderPackList() {},
+    packRuntime: { id:"p1", captions:null, noteImages:[null, null], urls:[], skinId, hadSounds:false }
+  });
+  vm.runInContext(src + "\n" + deactSrc + "\nglobalThis.__deactivatePack = deactivatePack;", ctx);
+  return { settings, calls, deactivatePack: ctx.__deactivatePack };
+}
+
+test("trk132: a skin-less pack B leaves the skin the user had before pack A", () => {
+  const { settings, calls, deactivatePack } = loadSwitch({ skin:"pack_p1",
+    prev:{ skin:"sakura", notes:[{ color:"#ffcc00", shape:"circle" }, { color:"#00ccff", shape:"diamond" }], fxPower:1.25, seEnabled:false, applied:{ skin:"pack_p1" } } });
+  deactivatePack(false);   /* A→B の切り替え（persist=false＝本当には外していない） */
+  assert.equal(settings.skin, "sakura", "going to shadow here was the bug: B could not give this back");
+  assert.deepEqual(calls.skins, [["sakura", false]], "the saved skin is applied without saving over the user's choice");
+  assert.equal(settings.packPrev.applied.skin, undefined, "A's applied skin is forgotten, so removing B keeps the value");
+});
+
+test("trk132: with no snapshot at all (old data) the fallback stays shadow", () => {
+  const { settings, deactivatePack } = loadSwitch({ skin:"pack_p1", prev:null });
+  deactivatePack(false);
+  assert.equal(settings.skin, "shadow");
 });

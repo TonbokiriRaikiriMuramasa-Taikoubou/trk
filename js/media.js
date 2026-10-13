@@ -268,7 +268,9 @@ function chartToData(notes, diff, meta = core.chartMeta) {
     format:"shadow-taiko-chart", version:2, app:"trk!",
     media:{ name:core.mediaName, fingerprint: core.fingerprint, duration:+(core.video.duration || 0).toFixed(3) },
     bpm:meta.bpm, offset:meta.offset, seed:core.$("seed").value.trim(), difficulty:diff, level:estimateLevel(notes),
-    notes:notes.map(n => [n.time, n.lane])
+    /* MIRROR／RANDOM は resetRun が n.lane を書き換える（元は origLane）。MOD を掛けて遊んだ後に書き出しても、
+       元の譜面を書き出す（chartKeyOf と同じ考え方。trk132） */
+    notes:notes.map(n => [n.time, n.origLane ?? n.lane])
   };
 }
 function exportChart(statusId) {

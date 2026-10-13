@@ -436,7 +436,9 @@ function whenVrmReady(fn) {
    ・パックを使ったまま再起動しても、退避は設定に残っているので、あとから外したときも戻せる
      （起動時に復元するパックでは退避を取り直さない＝すでにある packPrev を使う）
    ・パックAからBへ切り替えたときは上書きしない（最初に退避した prev を保つ）
-   ・古い版で入れたパックの退避が無いときは、manifest から分かる範囲（applied）だけ控える（prev は今の値） */
+     （Aを使っている間に利用者が自分で変えた項目は packRebase が prev へ取り込む）
+   ・trk130より前から当てたままのパックには退避が無い（当てる前の値はもう分からない）。その場合は外したときに
+     従来どおりスキンだけ shadow へ移し、ほかは今の値のまま（起動時の復元 restore:true では退避を作らない） */
 function packSnapshot() {
   const s = core.settings;
   if (s.packPrev && typeof s.packPrev === "object") return;
@@ -452,6 +454,18 @@ function packApplied(fields) {
   if (!s.packPrev || typeof s.packPrev !== "object") packSnapshot();
   const p = s.packPrev; if (!p) return;
   p.applied = Object.assign({}, p.applied, fields);
+}
+/* 📦 パックAからBへ切り替える直前に、Aを使っている間に利用者が自分で変えた項目を「当てる前の値」へ取り込む（trk132）。
+   退避（prev）を上書きしない方針のままだと、Aの中で選び直したスキンなどが、Bを外したときに「A以前の値」で上書きされる。
+   変えた項目は applied からも外す＝Bが触らなければ、Bを外したときも利用者の値のまま残る。 */
+function packRebase() {
+  const s = core.settings, p = s.packPrev;
+  if (!p || typeof p !== "object" || !p.applied || typeof p.applied !== "object") return;
+  const ap = p.applied;
+  if (typeof ap.skin === "string" && s.skin !== ap.skin) { p.skin = String(s.skin || p.skin); delete ap.skin; }
+  if (Array.isArray(ap.notes) && JSON.stringify(s.notes) !== JSON.stringify(ap.notes)) { p.notes = JSON.parse(JSON.stringify(s.notes || p.notes)); delete ap.notes; }
+  if (typeof ap.fxPower === "number" && s.fxPower !== ap.fxPower) { p.fxPower = s.fxPower; delete ap.fxPower; }
+  if (ap.seEnabled === true && s.seEnabled !== true) { p.seEnabled = false; delete ap.seEnabled; }
 }
 /* 自分で読み込んだSE（seFiles）に戻す。切り替えの途中では呼ばない（新しいパックの読み込みと競合するため） */
 function restoreOwnSounds() {
@@ -494,7 +508,7 @@ async function activatePack(id, { restore = false, skipConfirm = false } = {}) {
   const m = rec.manifest, f = rec.files || {};
   if (!restore && !skipConfirm && m.mascot && m.mascot.vrm && !confirm(tr("packConfirm") + (m.license || "—"))) return false;
   const prevHadSounds = packRuntime.hadSounds;   /* deactivatePack が消すので先に覚える（SEの戻し忘れ・競合よけ） */
-  if (!restore) packSnapshot();                  /* パックを当てる前の値を控える（A→Bの切り替えでは上書きしない） */
+  if (!restore) { packSnapshot(); packRebase(); }   /* パックを当てる前の値を控える（A→Bの切り替えでは上書きせず、A中に自分で変えた項目だけ取り込む） */
   deactivatePack(false);
   packRuntime.id = id;
   packRuntime.captions = (m.mascot && m.mascot.captions) || null;
@@ -543,7 +557,16 @@ function deactivatePack(persist = true) {
     if (persist) packRestoreSettings();   /* 📦 パックが変えた設定を戻す（利用者がその間に変えた項目は戻さない）。SKINS を消す前に */
     if (packRuntime.skinId) {
       const sid = packRuntime.skinId; delete window.Trk.data.SKINS[sid];
-      if (core.settings.skin === sid) core.applySkin("shadow", false);   /* 退避が無い古いデータ用の控え */
+      if (core.settings.skin === sid) {
+        /* パックのスキンが消えるので別のスキンへ移す。外したとき（persist）は packRestoreSettings が先に戻している。
+           ここへ来るのは①退避が無い古いデータ ②スキンを持つパックAから、スキンを持たないパックBへ切り替えたとき。
+           ②で shadow へ飛ばすと、Bを外しても戻らない（applied.skin がAのままで一致しない）ので退避したスキンへ戻し、
+           applied.skin を外しておく（Bはスキンを当てないので、外したときにこの値がそのまま残る）（trk132） */
+        const pv = core.settings.packPrev;
+        const back = (pv && typeof pv.skin === "string" && pv.skin && !pv.skin.startsWith("pack_")) ? pv.skin : "shadow";
+        core.applySkin(back, false);
+        if (pv && pv.applied && typeof pv.applied === "object") delete pv.applied.skin;
+      }
       core.buildSkinGrid();
     }
     packRuntime.urls.forEach(u => URL.revokeObjectURL(u));

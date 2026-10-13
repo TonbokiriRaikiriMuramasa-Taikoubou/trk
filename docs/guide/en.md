@@ -105,7 +105,7 @@ Sixteenth notes from Advanced upward (94–75 ms apart at 160–200 BPM) are abo
 
 ## Records and titles
 
-- Records are kept per song, per chart, per mode, and per speed: high score, accuracy, most PERFECTs, play count, and the last 30 plays.
+- Records are kept per song, per chart, per mode, and per speed: high score, accuracy, most PERFECTs, play count, and the last 30 plays. **A MIRROR / RANDOM run counts as the same chart**, and an exported chart keeps the original lanes rather than the ones the MOD produced (trk129 / trk132).
 - **PERFECT✦**: a PERFECT that landed especially close to the exact timing. It does not change the score.
 - **Titles** appear next to song names in the song list.
 
@@ -341,6 +341,7 @@ Imported images, text, bookmarks, notes, and jacket assignments are saved **only
 Like osu! skins, you can share many things in one file (`.stpack`). There is no server; share through Discord, cloud storage, or similar.
 
 - **Look packs:** skins, note colors / shapes / images, sound effects, VRM, motions, and mascot lines.
+- **Removing a pack puts things back:** the skin, note colors / shapes, effect strength, and SE-on that a pack set return to their values from before the pack (saved as `packPrev`, so it also works after a restart with the pack still on). **Items you changed yourself while the pack was on are kept** — your change is newer. Switching from pack A to pack B follows the same idea: what you changed yourself while A was on becomes the value B hands back to when it is removed (trk132).
 - **Song packs:** audio, charts, background images, BPM, chart creator names, and a creator's message (up to 50 songs per pack).
 - How to make one: "+ Make a pack from current settings" in Settings, or "📦 Make this song a song pack" on the song select screen.
 - How to install: drop the file onto the screen.

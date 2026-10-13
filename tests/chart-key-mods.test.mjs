@@ -58,3 +58,23 @@ test("resetRun still records origLane before it mirrors, and the key reads it", 
   const extras = fs.readFileSync(`${ROOT}/js/extras.js`, "utf8");
   assert.ok(extras.includes('core.on("beforePlay", () => {') && extras.includes("window.Trk.play.chartKeyOf()"), "the ghost looks the key up in beforePlay");
 });
+/* trk132: 譜面の書き出し（chartToData）も、遊んだ後の lane ではなく元のレーンを書く。
+   resetRun は MIRROR／RANDOM で n.lane を書き換えるので、結果画面から書き出したり曲パックに入れたりすると
+   MOD 後の譜面が共有されていた（chartKeyOf と同じ問題）。 */
+test("trk132: exporting after a MIRROR/RANDOM play writes the original lanes", () => {
+  const media = fs.readFileSync(`${ROOT}/js/media.js`, "utf8");
+  const a = media.indexOf("function chartToData("), b = media.indexOf("\n}\n", a);
+  assert.ok(a >= 0 && b > a, "chartToData can be isolated from js/media.js");
+  const ctx = vm.createContext({ core: { mediaName:"x", fingerprint:"", video:{ duration:1 }, chartMeta:{ bpm:120, offset:0 }, $: () => ({ value:"" }) }, estimateLevel: () => 1 });
+  vm.runInContext(media.slice(a, b + 3), ctx);
+  const exportLanes = notes => { ctx.__n = notes; return Array.from(vm.runInContext("chartToData(__n, 'normal').notes", ctx), n => n[1]); };
+  const original = chart().map(n => n.lane);
+  assert.deepEqual(exportLanes(applyMods(chart(), { mirror:true })), original, "MIRROR must not change the exported chart");
+  /* RANDOM は乱数で並ぶので、元と違う並びになる例をその場で作って確かめる（同じ並びだと検査にならない） */
+  const randomized = chart(); randomized.forEach((n, i) => { n.origLane = n.lane; n.lane = i < 2 ? 1 : 0; });
+  assert.notDeepEqual(randomized.map(n => n.lane), original, "the RANDOM example really differs from the original");
+  assert.deepEqual(exportLanes(randomized), original, "RANDOM must not change the exported chart");
+  assert.deepEqual(exportLanes(chart()), original, "a chart that was never played is written as it is");
+  /* 曲パックの書き出し（custom.js）も同じ関数を通る＝そちらも直っている */
+  assert.ok(fs.readFileSync(`${ROOT}/js/custom.js`, "utf8").includes("window.Trk.media.chartToData("), "the song pack shares this function");
+});

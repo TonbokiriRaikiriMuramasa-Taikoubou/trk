@@ -4,24 +4,16 @@
    ・プレイオプションの文章は i18n-options.js、各モードの細かい設定の文章は各モードのファイルにあります。
    ・初音ミクの名前とPCLクレジットは js/characters/miku.js にあります（ミクなしの版でも残りません）。 */
 "use strict";
-
 const TEXT = {
   /* ==================== 日本語 ==================== */
   ja: {
     /* 選曲画面 */
     tagline:"trk! — AGRG",
-    guideTitle:"🧭 まずは3分チュートリアル", guideHint:"曲を選ぶ・見た目を変える・1曲遊ぶ・設定を開く——試した瞬間にスタンプが押されます。5つ目は Seed欄に trk! 。全部揃うと、ごほうびがあります！",
-    guideSongTitle:"1. 曲を入れる", guideSong:"自分に権利のある音源を選びます（デモ音源を同梱している場合は、30秒デモも使えます）。",
-    guideLookTitle:"2. スキンと音", guideLook:"⚙設定の見た目でスキン、🎛サウンドエフェクトで音を変えられます。",
-    guideTruckTitle:"3. 走る", guideTruck:"TRUCKは↑↓でレーン移動。CATCHは荷物を受け、🚀ニトロで一気に加速します。",
-    guideSafeTitle:"4. 無理なく遊ぶ", guideSafe:"演出は「控えめ」や「追加演出オフ」にできます。音ズレはオフセットで調整します。",
-    guideSeedTitle:"5. Seedで譜面を変える", guideSeed:"譜面はSeed値で乱数生成しています。Seedには文字も入力できます。trk! と打ち込んでみてください！（デモ曲の初・中・上級は trk! 手づくりの譜面です。↺ を押すと自動生成に戻ります）",
-    guideDemoBtn:"🎵 30秒デモを選ぶ", guideDemoLoading:"🎵 FIRST SPARKを読み込み中…", guideDemoReady:"デモ曲を選びました。PLAYを押すと30秒遊べます。", guideDemoUnavailable:"デモ曲を読み込めませんでした。少し待って再試行してください。", demoSongUnavailable:"デモ曲を読み込めませんでした。ページを再読み込みしてもう一度お試しください。",
-    guideSkip:"スキップ", tutorialReplay:"🧭 チュートリアルをもう一度",
+    demoSongUnavailable:"デモ曲を読み込めませんでした。ページを再読み込みしてもう一度お試しください。",
+    tutorialReplay:"🧭 チュートリアルをもう一度",
     guideEggSkip:"🥾 チュートリアルを蹴り飛ばしました！", guideEggCheat:"🫠 チュートリアルは溶けてなくなりました…", guideEggGod:"👼 チュートリアルは昇天しました…",
-    guideStampSong:"🎵 スタンプ：曲を選びました！", guideStampLook:"🎨 スタンプ：見た目を変えました！", guideStampPlay:"🎮 スタンプ：1曲遊びました！", guideStampSafe:"⚙ スタンプ：設定を見ました！",
-    guideDone:"🎉 チュートリアル完了！", guideDoneMsg:"スタンプを5つ集めると、なにかもらえるかも…？",
-    guideReward:"🎓 スタンプコンプリート！", guideRewardMsg:"ごほうびスキン「グラデュエーション」が解禁！スキンの棚から選んでみてね",
+    guideDone:"🎉 チュートリアル完了！",
+    guideReward:"🎓 スタンプコンプリート！", guideTitle:"🧭 チュートリアル", guideHint:"全部で8つ。一通り触れると、ごほうびがあります。順番は自由です。", guideStart:"▶ チュートリアルを開始", guideStartClose:"▲ 手順を閉じる", guideSkip:"スキップ", guideStampPlay:"🎵 スタンプ：曲を流しました！", guideStampLook:"🎨 スタンプ：見た目を変えました！", guideStampSafe:"⚙ スタンプ：設定を開きました！", guideStampBack:"← スタンプ：メイン画面に戻りました！", guideStampAmp:"🔥 スタンプ：TRKアンプをONにしました！", guideStampStudy:"📚 スタンプ：書斎に入りました！", guideStampStudyBack:"📚 スタンプ：書斎から戻りました！", guidePlayTitle:"🎵 曲を流す", guidePlay:"曲を選んで、再生します。", guideLookTitle:"🎨 見た目を変える", guideLook:"スキンや、エフェクトを一つ変えます。", guideSafeTitle:"⚙ 設定を開く", guideSafe:"⚙ 設定の画面を開きます。", guideBackTitle:"← メイン画面に戻る", guideBack:"設定を閉じて、選曲の画面に戻ります。", guideAmpTitle:"🔥 TRKアンプをON", guideAmp:"下へスクロールして「TRKアンプを使う」にチェックします。", guideStudyTitle:"📚 書斎に行く", guideStudy:"曲リストの 📚 書斎 を開きます。", guideStudyBackTitle:"📚 書斎から戻る", guideStudyBack:"書斎を閉じて、選曲の画面に戻ります。", guideSeedTitle:"🌱 trk! と打つ", guideSeed:"Seed欄に trk! と入力します。これで完了です。", guideDoneMsg:"スタンプを8つ集めると、なにかもらえるかも…？", guideRewardMsg:"ごほうびスキン「グラデュエーション」が解禁！スキンの棚から選んでみてね",
     skinLockedHint:"スタンプを5つ集めると…？",
     language:"言語 / Language", openSettings:"⚙ 設定", settingsTitle:"⚙ 設定", closeSettings:"← 選曲に戻る", navKeysTitle:"⌨ 移動キー", menuReturnKey:"メニュー画面へ戻る", mediaExitKey:"プレーヤーを終了", menuReturnConfirmToggle:"メニューへ戻る前に確認する", mediaExitConfirmToggle:"プレーヤー終了前に確認する", navKeysHint:"メニューへ戻るキーの初期値は M、プレーヤー終了キーの初期値は ESCです。確認はオフにもできます。", menuReturnConfirm:"メニュー画面に戻りますか？プレイ中の記録は保存されません。", mediaExitConfirm:"メディアプレーヤーを終了しますか？", helpText:"ヘルプ・説明文を表示", helpTextHint:"オフにすると、チュートリアルや補足説明を隠して、ボタンと曲リスト中心の画面にします。",
     dropHint:"曲・.stpack・.vrm・.vrma・譜面JSONは、画面にドラッグ＆ドロップしても読み込めます。",
@@ -154,7 +146,6 @@ const TEXT = {
     playStart:"▶ PLAY — 曲の最初から", importChart:"⇧ 譜面をImport", regenerate:"↺ 自動生成に戻す", export:"⇩ 譜面をExport",
     controlsHint:"MANUAL：設定したキーで叩く · TRUCK：↑↓／←→でレーン移動 · ORBIT：どのキーでも1ボタン · STAGE：レーンのキーかタップ · CATCH：←→で荷物を受け止める · P/ESC：一時停止",
     feedbackLabel:"感想・要望・不具合はこちらへ",
-
     /* 見た目 */
     secDisplay:"🎨 見た目", skin:"スキン", skinShelf:"🖼 スキンの棚", catAll:"すべて", catBasic:"定番", catMiku:"ミク", catDark:"ダーク", catLight:"ライト", catGrad:"グラデ", catFun:"遊び心", catAccess:"見やすさ", catLife:"生活", catCustom:"マイスキン", gameLayout:"ゲームレイアウト",
     secModes:"🚚🪐🎪 各モードの専用設定（TRUCK・ORBIT・STAGE）",
@@ -180,13 +171,11 @@ const TEXT = {
     skinBad:"スキンファイルの形式が正しくありません。", skinExported:"スキンJSONを書き出しました。",
     builtinLocked:"内蔵スキンは変更・削除できません。「新規保存」で複製してください。", skinLimit:"カスタムスキンは20個までです。",
     confirmDelete:"このカスタムスキンを削除しますか？", customTag:"CUSTOM", remix:"リミックス",
-
     /* マスコット（キャラクターの名前は js/characters/*.js が追加します） */
     mascotSel:"マスコット", mascotSkin:"スキン標準", mascotNone:"なし", mascotBuddy:"オレンジ相棒", mascotVrm:"VRMモデル（自分のモデル）", mascotMmd:"MMDモデル（自分のモデル）",
     mascotHint:"マスコットはプレイ中に画面の隅で応援してくれます。「VRMモデル」を選ぶと、自分のモデルも使えます。",
     capStart:"はい、よーいスタート。", capCombo:"{n}コンボ達成。いい感じですね。", capBreak:"あっ…コンボが途切れました（痛恨）",
     speakerA:"解説", speakerB:"実況",
-
     /* VRM */
     vrmTitle:"🧍 VRMモデル（VRM 1.0）",
     vrmHint:"VRM 1.0（.vrm）専用です。自分のモデルを、プレイ中のマスコットとして動かせます。ファイルはこのブラウザ内だけで使い、アップロードしません。初回だけ表示用のライブラリをインターネットから読み込みます。",
@@ -211,7 +200,6 @@ const TEXT = {
     warnOnlyAuthor:"⚠ このモデルは「作者のみ使用可」です。作者本人でない場合は使わないでください。",
     warnLicensed:"⚠ 「個別に許諾された人のみ」です。購入時の規約などで許可されているか確認してください。",
     vrmConvertNote:"※VRChatアバターを変換したVRMは、ここの情報より元の規約（VN3ライセンスなど）が優先されます。",
-
     /* パック */
     secPacks:"📦 カスタムパック",
     packHint:"osu!のスキンのように、見た目・ノーツ・効果音・VRM・モーション・セリフ・曲をひとまとめにした「.stpack」を入れられます。画面にドロップするか、下から選んでください。保存済みパックは合計1GiBまで（端末の空き容量が少ない場合はそれより小さくなります）。",
@@ -244,7 +232,6 @@ const TEXT = {
     packImgBad:"ノーツ画像は PNG／WebP／JPG（4MBまで）にしてください。",
     badgeSkin:"スキン", badgeNotes:"ノーツ", badgeSounds:"SE", badgeVrm:"VRM", badgeMotion:"モーション", badgeCaptions:"セリフ",
     badgeSongs:"曲 {n}", badgeCreditCard:"💳 権利カード", packCreditTitle:"💳 権利カード（名刺）", packContributors:"共同制作者（{n}人）", packCreditDownload:"名刺SVGをダウンロード", packCreditDisclaimer:"作者申告の要約です。正式なライセンス／ReadMeを優先してください。", packLicenseLabel:"利用条件",
-
     /* 曲パック */
     spTitle:"📦 この曲を曲パックにする",
     spHint:"音源・譜面・背景画像・BPMをまとめて .stpack にします。自分に再配布の権利がある曲（自作曲や配布許可のある素材）だけにしてください。",
@@ -255,7 +242,6 @@ const TEXT = {
     spNoSong:"先に曲を選んでください。", spBgBad:"背景画像は PNG／WebP／JPG（8MBまで）にしてください。",
     spSongTooBig:"音源が大きすぎます（250MBまで）。", spNoCharts:"入れる譜面がありません。",
     packChartLoaded:"曲パックの譜面（{d}）を読み込みました。", builtinChartLoaded:"デモ用の手づくり譜面（{d}）を読み込みました。達人は自動生成です。", songBy:"アーティスト", chartBy:"譜面", songLicense:"利用条件",
-
     /* 操作・サウンド */
     secControls:"⌨ 操作", leftKey:"左キー", rightKey:"右キー", assign:"変更", reverseHands:"左右反転（左利き用）",
     latency:"タイミング補正 (ms)", latencyHint:"ノーツが音より早く感じるなら＋に。Bluetoothイヤホンは＋150〜250msが目安です。",
@@ -285,7 +271,6 @@ const TEXT = {
     seOn:"ヒットSEオン。追加音声がなければ内蔵SEを使います。", seOff:"ヒットSEオフ。判定表示とヒット演出はそのまま動きます。",
     seLoadedDon:"ドンSEを読み込みました。", seLoadedKa:"カッSEを読み込みました。",
     seLoadError:"音声を読み込めませんでした。別の形式をお試しください。", seUnavailable:"このブラウザはWeb Audioに対応していません。",
-
     /* プレイ中・一時停止・リザルト */
     musicVolume:"曲音量", bannerVolTip:"短押し：スライダーを表示／長押し：ミュート・音量を復元", bannerPlayPauseTip:"一時停止（もう一度押すと再生）", bannerPlayResumeTip:"再生（もう一度押すと一時停止）", bannerPlayNoSongTip:"曲を選ぶと、ここで再生・一時停止できます", bannerPlayPreviewOffTip:"プレビューがオフなので押せません（設定の「選曲中に曲のプレビューを再生する」をオンにすると使えます）", bannerPlayIdleTip:"今は再生・一時停止できません", pause:"Ⅱ 一時停止", fullscreen:"⛶ 全画面",
     paused:"一時停止中", pauseText:"再開・やり直し・譜面Export・選曲へ戻るを選べます。",
@@ -300,7 +285,6 @@ const TEXT = {
     failed:"FAILED", failedNote:"体力がなくなりました", starCount:"✦ {n}", newSpeed:"🏁 NEW SPEED {r}",
     creditNote:"※選択されたローカルファイルを再生しています。データはアップロードされません。",
     feedbackLink:"💬 感想・苦情・意見を送る（GitHub Issues）", chartFeedbackLink:"🎵 譜面の意見を送る",
-
     /* 読み込み・譜面 */
     loading:"読み込み中…", analyzing:"音声を解析中…（長い曲は数秒かかります）", loaded:"読み込み完了 · 音声解析済み",
     loadError:"読み込めませんでした。別のファイルをお試しください。",
@@ -318,7 +302,6 @@ const TEXT = {
     importBad:"対応していない譜面ファイルです。", importInvalid:"譜面データの形式が正しくありません。",
     importEmpty:"譜面にノーツがありません。", importTooLong:"譜面の時間が音源の長さを超えています。",
     importSuccess:"Import完了：同じ譜面でプレイできます。", exportNone:"Exportできる譜面がありません。", exportDone:"譜面JSONをExportしました。",
-
     /* プレイ記録・称号 */
     recTitle:"📊 この曲のプレイ記録", recNone:"まだ記録がありません。最後まで遊ぶと記録されます。",
     recPlays:"プレイ回数", recPerfTotal:"累計PERFECT", recLast:"最終プレイ",
@@ -334,22 +317,14 @@ const TEXT = {
     prefSkipWhyId:"{k}（この端末に無いID）", prefSkipWhyType:"{k}（型が違う）", prefSkipWhyUnknown:"{k}（この設定に無いキー）",
     recBad:"記録ファイルの形式が正しくありません。", recCleared:"この曲の記録を消しました。"
   },
-
   /* ==================== English ==================== */
   en: {
     tagline:"trk! — AGRG",
-    guideTitle:"🧭 3-minute quick guide", guideHint:"Pick a song, change the look, play a chart, open the settings — each try earns a stamp. The fifth is typing trk! in the Seed field. Collect all five for a reward!",
-    guideSongTitle:"1. Add a song", guideSong:"Choose a song you have rights to use; the optional 30-second demo appears when its audio folder is included.",
-    guideLookTitle:"2. Change the vibe", guideLook:"Use ⚙ Settings for skins and 🎛 Sound effects for the audio chain.",
-    guideTruckTitle:"3. Hit the road", guideTruck:"Use ↑↓ in TRUCK. In CATCH, grab parcels and collect 🚀 Nitro for a burst of speed.",
-    guideSafeTitle:"4. Tune it to you", guideSafe:"Choose Soft or Extra effects off if you want less motion. Use the offset tool when timing feels late.",
-    guideSeedTitle:"5. Change the chart with a Seed", guideSeed:"Charts are generated from the Seed value. It also accepts letters — try typing trk! to finish this tutorial. (On the bundled demo, Easy / Normal / Hard use handmade trk! charts — press ↺ to generate from the seed.)",
-    guideDemoBtn:"🎵 Choose the 30-second demo", guideDemoLoading:"🎵 Loading FIRST SPARK…", guideDemoReady:"Demo selected. Press PLAY to try the 30-second track.", guideDemoUnavailable:"Could not load the demo. Please wait a moment and try again.", demoSongUnavailable:"Could not load the demo track. Reload the page and try again.",
-    guideSkip:"Skip", tutorialReplay:"🧭 Replay the tutorial",
+    demoSongUnavailable:"Could not load the demo track. Reload the page and try again.",
+    tutorialReplay:"🧭 Replay the tutorial",
     guideEggSkip:"🥾 You kicked the tutorial away!", guideEggCheat:"🫠 The tutorial melted away…", guideEggGod:"👼 The tutorial ascended to heaven…",
-    guideStampSong:"🎵 Stamp: picked a song!", guideStampLook:"🎨 Stamp: changed the look!", guideStampPlay:"🎮 Stamp: played a chart!", guideStampSafe:"⚙ Stamp: opened the settings!",
-    guideDone:"🎉 Tutorial complete!", guideDoneMsg:"Collect all five stamps and there might be a reward…",
-    guideReward:"🎓 All stamps collected!", guideRewardMsg:"Reward skin “Graduation” unlocked! Pick it from the skin shelf",
+    guideDone:"🎉 Tutorial complete!",
+    guideReward:"🎓 All stamps collected!", guideTitle:"🧭 Tutorial", guideHint:"Eight steps in total. Try them all and there is a reward. Any order is fine.", guideStart:"▶ Start the tutorial", guideStartClose:"▲ Hide steps", guideSkip:"Skip", guideStampPlay:"🎵 Stamp: played a song!", guideStampLook:"🎨 Stamp: changed the look!", guideStampSafe:"⚙ Stamp: opened Settings!", guideStampBack:"← Stamp: back on the main screen!", guideStampAmp:"🔥 Stamp: TRK amp is on!", guideStampStudy:"📚 Stamp: entered Study Room!", guideStampStudyBack:"📚 Stamp: back from Study Room!", guidePlayTitle:"🎵 Play a song", guidePlay:"Pick a song and press play.", guideLookTitle:"🎨 Change the look", guideLook:"Change one skin or effect.", guideSafeTitle:"⚙ Open Settings", guideSafe:"Open the Settings screen.", guideBackTitle:"← Back to the main screen", guideBack:"Close Settings and return to song select.", guideAmpTitle:"🔥 Turn the TRK amp on", guideAmp:"Scroll down and tick “Use the TRK amp”.", guideStudyTitle:"📚 Open Study Room", guideStudy:"Open 📚 Study from the song list.", guideStudyBackTitle:"📚 Back from Study Room", guideStudyBack:"Close Study Room and return to song select.", guideSeedTitle:"🌱 Type trk!", guideSeed:"Type trk! in the Seed field. That completes the tutorial.", guideDoneMsg:"Collect all eight stamps and there might be a reward…?", guideRewardMsg:"Reward skin “Graduation” unlocked! Pick it from the skin shelf",
     skinLockedHint:"Collect all five stamps and…?",
     language:"Language", openSettings:"⚙ Settings", settingsTitle:"⚙ Settings", closeSettings:"← Back to song select", navKeysTitle:"⌨ Navigation keys", menuReturnKey:"Return to menu", mediaExitKey:"Exit player", menuReturnConfirmToggle:"Confirm before returning to menu", mediaExitConfirmToggle:"Confirm before exiting player", navKeysHint:"The default menu key is M and the default player-exit key is ESC. Confirmation can be turned off.", menuReturnConfirm:"Return to the menu? The current play will not be saved.", mediaExitConfirm:"Exit the media player?", helpText:"Show help and descriptions", helpTextHint:"Turn this off to hide tutorials and supporting text, leaving a cleaner song-and-button view.",
     dropHint:"You can also drag & drop songs, .stpack, .vrm, .vrma and chart JSON onto the window.",
@@ -482,7 +457,6 @@ const TEXT = {
     playStart:"▶ PLAY — from the top", importChart:"⇧ Import chart", regenerate:"↺ Back to generated chart", export:"⇩ Export chart",
     controlsHint:"MANUAL: hit with your keys · TRUCK: ↑↓ / ←→ change lanes · ORBIT: any key (one button) · STAGE: lane keys or tap · CATCH: ←→ to catch parcels · P/ESC: pause",
     feedbackLabel:"Feedback, requests and bug reports:",
-
     secDisplay:"🎨 Appearance", skin:"Skin", skinShelf:"🖼 Skin shelf", catAll:"All", catBasic:"Classics", catMiku:"Miku", catDark:"Dark", catLight:"Light", catGrad:"Gradients", catFun:"Playful", catAccess:"Accessibility", catLife:"Everyday", catCustom:"My skins", gameLayout:"Playfield layout",
     secModes:"🚚🪐🎪 Mode settings (TRUCK / ORBIT / STAGE)",
     modeKeysTitle:"🚚🎪🚛 Mode keys (TRUCK / STAGE / CATCH / Speed)",
@@ -507,12 +481,10 @@ const TEXT = {
     skinBad:"Invalid skin file.", skinExported:"Skin JSON exported.",
     builtinLocked:"Built-in skins can't be edited or deleted. Use “Save as new” to copy one.", skinLimit:"You can have up to 20 custom skins.",
     confirmDelete:"Delete this custom skin?", customTag:"CUSTOM", remix:"Remix",
-
     mascotSel:"Mascot", mascotSkin:"Skin default", mascotNone:"None", mascotBuddy:"Orange Buddy", mascotVrm:"VRM model (your own)", mascotMmd:"MMD model (your own)",
     mascotHint:"Mascots cheer you on from the corner during play. Choose “VRM model” to use your own model.",
     capStart:"Alright, timer starts now.", capCombo:"{n} combo. Looking clean.", capBreak:"Oof… combo dropped.",
     speakerA:"Narrator", speakerB:"Player",
-
     vrmTitle:"🧍 VRM model (VRM 1.0)",
     vrmHint:"VRM 1.0 (.vrm) only. Use your own model as a mascot during play. Files stay in this browser and are never uploaded. The 3D library is downloaded the first time.",
     vrmAgree:"I have checked this model's terms and it may be displayed in this game",
@@ -536,7 +508,6 @@ const TEXT = {
     warnOnlyAuthor:"⚠ This model is marked “author only”. Don't use it unless you are the author.",
     warnLicensed:"⚠ “Licensed persons only”. Make sure your purchase terms allow this use.",
     vrmConvertNote:"Note: for VRMs converted from VRChat avatars, the original terms (e.g. VN3 license) take priority over this info.",
-
     secPacks:"📦 Custom packs",
     packHint:"Like osu! skins: one .stpack can bundle a skin, notes, hit sounds, a VRM, a motion, lines and songs. Drop it onto the window or choose it below. Installed packs are limited to 1 GiB total (less if your browser storage is limited).",
     packChoose:"📂 Choose pack", packOff:"↺ Remove pack", packEmpty:"No packs yet.",
@@ -568,7 +539,6 @@ const TEXT = {
     packImgBad:"Note images must be PNG/WebP/JPG (max 4 MB).",
     badgeSkin:"Skin", badgeNotes:"Notes", badgeSounds:"SE", badgeVrm:"VRM", badgeMotion:"Motion", badgeCaptions:"Lines",
     badgeSongs:"{n} songs", badgeCreditCard:"💳 Rights card", packCreditTitle:"💳 Rights card / name card", packContributors:"Contributors ({n})", packCreditDownload:"Download shareable SVG card", packCreditDisclaimer:"Creator-provided summary; keep and follow the original license / ReadMe.", packLicenseLabel:"Terms",
-
     spTitle:"📦 Make a song pack from this song",
     spHint:"Bundles the audio, charts, background image and BPM into a .stpack. Only do this for songs you have the right to redistribute (your own music or assets that allow it).",
     spArtist:"Artist", spCharter:"Charter", spLicense:"Song terms / credits", spBg:"Background image (optional, PNG/WebP/JPG)",
@@ -578,7 +548,6 @@ const TEXT = {
     spNoSong:"Pick a song first.", spBgBad:"Background images must be PNG/WebP/JPG (max 8 MB).",
     spSongTooBig:"The audio file is too large (max 250 MB).", spNoCharts:"There are no charts to include.",
     packChartLoaded:"Loaded the song pack chart ({d}).", builtinChartLoaded:"Loaded the handmade demo chart ({d}). Master stays generated from the seed.", songBy:"Artist", chartBy:"Chart", songLicense:"Terms",
-
     secControls:"⌨ Controls", leftKey:"Left key", rightKey:"Right key", assign:"Change", reverseHands:"Swap left/right (left-handed)",
     latency:"Audio latency (ms)", latencyHint:"If notes feel early compared to the music, increase this. Bluetooth earbuds usually need +150–250 ms.",
     captureLeft:"Press a key for the left position. ESC cancels.", captureRight:"Press a key for the right position. ESC cancels.",
@@ -607,7 +576,6 @@ const TEXT = {
     seOn:"Hit SE on. Built-in sounds are used unless custom audio is loaded.", seOff:"Hit SE off. Judgements and hit effects still work.",
     seLoadedDon:"Don SE loaded.", seLoadedKa:"Ka SE loaded.",
     seLoadError:"Could not decode this audio. Try another format.", seUnavailable:"Web Audio is not available in this browser.",
-
     musicVolume:"Music", bannerVolTip:"Tap: show slider · Hold: mute or restore volume", bannerPlayPauseTip:"Pause (press again to play)", bannerPlayResumeTip:"Play (press again to pause)", bannerPlayNoSongTip:"Choose a song, then you can play or pause its preview here", bannerPlayPreviewOffTip:"Previews are off, so this is unavailable (turn on 'Play song previews in song select' in Settings)", bannerPlayIdleTip:"Play / pause is not available right now", pause:"Ⅱ Pause", fullscreen:"⛶ Fullscreen",
     paused:"PAUSED", pauseText:"Resume, restart, export the chart, or return to song select.",
     resume:"▶ Resume", retry:"↻ Restart", title:"⌂ Song select", finished:"FINISH!", replay:"↻ Play again",
@@ -621,7 +589,6 @@ const TEXT = {
     failed:"FAILED", failedNote:"Out of lives", starCount:"✦ {n}", newSpeed:"🏁 NEW SPEED {r}",
     creditNote:"Playing a locally selected file. Nothing is uploaded.",
     feedbackLink:"💬 Feedback, Complaints & Requests (GitHub Issues)", chartFeedbackLink:"🎵 Chart & Balance feedback",
-
     loading:"Loading…", analyzing:"Analyzing audio… (long tracks take a few seconds)", loaded:"Ready · audio analyzed",
     loadError:"Could not load the file. Try another one.",
     decodeFallback:"Audio analysis unavailable — using a BPM-grid chart.",
@@ -638,7 +605,6 @@ const TEXT = {
     importBad:"Unsupported chart file.", importInvalid:"Invalid chart data.",
     importEmpty:"The chart contains no notes.", importTooLong:"The chart extends beyond the audio length.",
     importSuccess:"Chart imported — ready to play the same chart.", exportNone:"There is no chart to export.", exportDone:"Chart JSON exported.",
-
     recTitle:"📊 Play records for this song", recNone:"No records yet. Finish a play to record it.",
     recPlays:"Plays", recPerfTotal:"Total PERFECT", recLast:"Last played",
     recDiff:"Chart", recBest:"High score", recAcc:"Acc", recBestP:"Most PERFECT", recCount:"Plays",
@@ -653,22 +619,14 @@ const TEXT = {
     prefSkipWhyId:"{k} (ID not available on this device)", prefSkipWhyType:"{k} (wrong type)", prefSkipWhyUnknown:"{k} (unknown setting)",
     recBad:"Invalid records file.", recCleared:"Records for this song cleared."
   },
-
   /* ==================== 简体中文 ==================== */
   zh: {
     tagline:"trk! — AGRG",
-    guideTitle:"🧭 3分钟快速指南", guideHint:"选一首歌、换个外观、玩一谱、打开设置——每试一项就盖一枚印章。第五枚是在Seed栏输入 trk!。集齐五枚就有奖励！",
-    guideSongTitle:"1. 加入歌曲", guideSong:"选择有权使用的歌曲；包含可选演示音频文件夹时，也可以使用30秒演示曲。",
-    guideLookTitle:"2. 改变风格", guideLook:"在⚙设置中更换皮肤，在🎛音效中改变声音链。",
-    guideTruckTitle:"3. 上路", guideTruck:"TRUCK使用↑↓换道。CATCH接住包裹，收集🚀氮气获得加速。",
-    guideSafeTitle:"4. 按自己的方式玩", guideSafe:"想减少动态效果时选择“柔和”或关闭额外演出；感觉延迟时使用偏移测量。",
-    guideSeedTitle:"5. 用Seed改变谱面", guideSeed:"谱面由Seed值生成。Seed也可以输入文字——试试输入 trk! 完成教程吧！（演示曲的初级／中级／高级使用手工谱面，按 ↺ 可切回自动生成。）",
-    guideDemoBtn:"🎵 选择30秒演示曲", guideDemoLoading:"🎵 正在读取 FIRST SPARK…", guideDemoReady:"已选择演示曲。按 PLAY 即可体验30秒。", guideDemoUnavailable:"无法读取演示曲，请稍候再试。", demoSongUnavailable:"无法读取演示曲，请重新加载页面后再试。",
-    guideSkip:"跳过", tutorialReplay:"🧭 重播教程",
+    demoSongUnavailable:"无法读取演示曲，请重新加载页面后再试。",
+    tutorialReplay:"🧭 重播教程",
     guideEggSkip:"🥾 你把教程踢飞了！", guideEggCheat:"🫠 教程融化消失了…", guideEggGod:"👼 教程升天了…",
-    guideStampSong:"🎵 印章：选好歌曲！", guideStampLook:"🎨 印章：换了外观！", guideStampPlay:"🎮 印章：玩了一谱！", guideStampSafe:"⚙ 印章：打开了设置！",
-    guideDone:"🎉 教程完成！", guideDoneMsg:"集齐5枚印章，也许会有奖励…",
-    guideReward:"🎓 印章全部集齐！", guideRewardMsg:"奖励皮肤「毕业典礼」已解锁！快去皮肤架看看吧",
+    guideDone:"🎉 教程完成！",
+    guideReward:"🎓 印章全部集齐！", guideTitle:"🧭 教程", guideHint:"共8项。都试一遍就有奖励。顺序不限。", guideStart:"▶ 开始教程", guideStartClose:"▲ 收起步骤", guideSkip:"跳过", guideStampPlay:"🎵 印章：播放了一首歌！", guideStampLook:"🎨 印章：更换了外观！", guideStampSafe:"⚙ 印章：打开了设置！", guideStampBack:"← 印章：回到了主界面！", guideStampAmp:"🔥 印章：TRK 功放已开启！", guideStampStudy:"📚 印章：进入了书斋！", guideStampStudyBack:"📚 印章：从书斋返回！", guidePlayTitle:"🎵 播放一首歌", guidePlay:"选一首歌并开始播放。", guideLookTitle:"🎨 更换外观", guideLook:"更换一个皮肤或效果。", guideSafeTitle:"⚙ 打开设置", guideSafe:"打开设置画面。", guideBackTitle:"← 回到主界面", guideBack:"关闭设置，回到选曲画面。", guideAmpTitle:"🔥 开启 TRK 功放", guideAmp:"向下滚动，勾选“使用 TRK 功放”。", guideStudyTitle:"📚 进入书斋", guideStudy:"从曲目列表打开 📚 书斋。", guideStudyBackTitle:"📚 从书斋返回", guideStudyBack:"关闭书斋，回到选曲画面。", guideSeedTitle:"🌱 输入 trk!", guideSeed:"在 Seed 栏输入 trk!，即完成教程。", guideDoneMsg:"集齐8个印章，说不定有好东西…？", guideRewardMsg:"奖励皮肤「毕业典礼」已解锁！快去皮肤架看看吧",
     skinLockedHint:"集齐5枚印章就会…？",
     language:"语言", openSettings:"⚙ 设置", settingsTitle:"⚙ 设置", closeSettings:"← 返回选曲", navKeysTitle:"⌨ 导航按键", menuReturnKey:"返回菜单", mediaExitKey:"退出播放器", menuReturnConfirmToggle:"返回菜单前确认", mediaExitConfirmToggle:"退出播放器前确认", navKeysHint:"菜单按键默认为 M，播放器退出按键默认为 ESC。可以关闭确认。", menuReturnConfirm:"要返回菜单吗？当前游玩不会保存。", mediaExitConfirm:"要退出媒体播放器吗？", helpText:"显示帮助和说明", helpTextHint:"关闭后隐藏教程和补充说明，让画面更简洁，只保留歌曲和按钮。",
     dropHint:"歌曲、.stpack、.vrm、.vrma和谱面JSON也可以直接拖放到窗口中。",
@@ -801,7 +759,6 @@ const TEXT = {
     playStart:"▶ PLAY — 从头开始", importChart:"⇧ 导入谱面", regenerate:"↺ 恢复自动生成", export:"⇩ 导出谱面",
     controlsHint:"MANUAL：用设定的按键敲击 · TRUCK：↑↓／←→切换车道 · ORBIT：任意键（单键） · STAGE：轨道按键或点击 · CATCH：←→接住包裹 · P/ESC：暂停",
     feedbackLabel:"感想、建议与问题反馈：",
-
     secDisplay:"🎨 外观", skin:"皮肤", skinShelf:"🖼 皮肤架", catAll:"全部", catBasic:"经典", catMiku:"初音", catDark:"深色", catLight:"浅色", catGrad:"渐变", catFun:"趣味", catAccess:"易读性", catLife:"生活", catCustom:"我的皮肤", gameLayout:"游戏布局",
     secModes:"🚚🪐🎪 各模式专用设置（TRUCK・ORBIT・STAGE）",
     modeKeysTitle:"🚚🎪🚛 各模式按键（TRUCK・STAGE・CATCH・速度）",
@@ -826,12 +783,10 @@ const TEXT = {
     skinBad:"皮肤文件格式不正确。", skinExported:"已导出皮肤JSON。",
     builtinLocked:"内置皮肤无法修改或删除，请用“另存为新皮肤”复制。", skinLimit:"自定义皮肤最多20个。",
     confirmDelete:"要删除这个自定义皮肤吗？", customTag:"CUSTOM", remix:"混搭",
-
     mascotSel:"吉祥物", mascotSkin:"皮肤默认", mascotNone:"无", mascotBuddy:"橙色搭档", mascotVrm:"VRM模型（自己的模型）", mascotMmd:"MMD模型（自己的模型）",
     mascotHint:"吉祥物会在游戏中于画面角落为你加油。选择“VRM模型”即可使用自己的模型。",
     capStart:"好，计时开始。", capCombo:"{n}连击达成，状态不错。", capBreak:"啊…连击断了（痛恨）",
     speakerA:"解说", speakerB:"实况",
-
     vrmTitle:"🧍 VRM模型（VRM 1.0）",
     vrmHint:"仅支持VRM 1.0（.vrm）。可将自己的模型作为游戏中的吉祥物。文件只在本浏览器中使用，不会上传。首次使用时从网络加载3D库。",
     vrmAgree:"我已确认此模型的使用条款，允许在本游戏中显示",
@@ -855,7 +810,6 @@ const TEXT = {
     warnOnlyAuthor:"⚠ 此模型标注为“仅作者可用”。如果您不是作者，请勿使用。",
     warnLicensed:"⚠ “仅获得单独许可者”。请确认购买时的条款是否允许。",
     vrmConvertNote:"※由VRChat头像转换的VRM，以原始条款（如VN3许可）为准。",
-
     secPacks:"📦 自定义资源包",
     packHint:"像osu!皮肤一样，一个.stpack可以打包皮肤、音符、打击音效、VRM、动作、台词和歌曲。拖放到窗口或在下方选择。已安装资源包总量上限为1 GiB（浏览器存储有限时上限更低）。",
     packChoose:"📂 选择资源包", packOff:"↺ 取消资源包", packEmpty:"还没有资源包。",
@@ -887,7 +841,6 @@ const TEXT = {
     packImgBad:"音符图片须为PNG/WebP/JPG（最大4MB）。",
     badgeSkin:"皮肤", badgeNotes:"音符", badgeSounds:"音效", badgeVrm:"VRM", badgeMotion:"动作", badgeCaptions:"台词",
     badgeSongs:"歌曲 {n}", badgeCreditCard:"💳 权利卡片", packCreditTitle:"💳 权利卡片／名片", packContributors:"共同创作者（{n}人）", packCreditDownload:"下载可分享的 SVG 名片", packCreditDisclaimer:"这是作者提供的摘要；请保留并遵守原始许可证／ReadMe。", packLicenseLabel:"使用条款",
-
     spTitle:"📦 把这首歌做成歌曲包",
     spHint:"将音源、谱面、背景图和BPM打包成.stpack。请只对您有权再分发的歌曲使用（原创曲或允许分发的素材）。",
     spArtist:"艺术家", spCharter:"谱面作者", spLicense:"歌曲使用条款・署名", spBg:"背景图（可选，PNG/WebP/JPG）",
@@ -897,7 +850,6 @@ const TEXT = {
     spNoSong:"请先选择歌曲。", spBgBad:"背景图须为PNG/WebP/JPG（最大8MB）。",
     spSongTooBig:"音源过大（最大250MB）。", spNoCharts:"没有可包含的谱面。",
     packChartLoaded:"已读取歌曲包中的谱面（{d}）。", builtinChartLoaded:"已读取演示用的手工谱面（{d}）。达人难度仍为自动生成。", songBy:"艺术家", chartBy:"谱面", songLicense:"使用条款",
-
     secControls:"⌨ 操作", leftKey:"左键位", rightKey:"右键位", assign:"更改", reverseHands:"左右反转（左撇子）",
     latency:"延迟补偿 (ms)", latencyHint:"如果感觉音符比音乐早，请调大。蓝牙耳机一般需要 +150〜250 ms。",
     captureLeft:"请按下要分配给左键位的按键。ESC取消。", captureRight:"请按下要分配给右键位的按键。ESC取消。",
@@ -926,7 +878,6 @@ const TEXT = {
     seOn:"打击音效已开启。未加载自定义音效时使用内置音效。", seOff:"打击音效已关闭。判定与视觉效果照常。",
     seLoadedDon:"已加载Don音效。", seLoadedKa:"已加载Ka音效。",
     seLoadError:"无法解码该音频，请尝试其他格式。", seUnavailable:"此浏览器不支持Web Audio。",
-
     musicVolume:"音乐", bannerVolTip:"短按：显示滑块 · 长按：静音／恢复音量", bannerPlayPauseTip:"暂停（再按一次继续播放）", bannerPlayResumeTip:"播放（再按一次暂停）", bannerPlayNoSongTip:"选择一首歌后，可在此播放或暂停试听", bannerPlayPreviewOffTip:"试听已关闭，无法使用（请在设置中开启“选曲时播放歌曲试听”）", bannerPlayIdleTip:"目前无法播放或暂停", pause:"Ⅱ 暂停", fullscreen:"⛶ 全屏",
     paused:"已暂停", pauseText:"可以继续、重新开始、导出谱面或返回选曲。",
     resume:"▶ 继续", retry:"↻ 重新开始", title:"⌂ 选曲", finished:"完成！", replay:"↻ 再玩一次",
@@ -940,7 +891,6 @@ const TEXT = {
     failed:"FAILED", failedNote:"体力耗尽", starCount:"✦ {n}", newSpeed:"🏁 NEW SPEED {r}",
     creditNote:"正在播放本地选择的文件，不会上传任何数据。",
     feedbackLink:"💬 意见・反馈・吐槽（GitHub Issues）", chartFeedbackLink:"🎵 谱面与难度反馈",
-
     loading:"正在读取…", analyzing:"正在分析音频…（长曲目需要几秒）", loaded:"已就绪 · 音频已分析",
     loadError:"读取失败，请尝试其他文件。", decodeFallback:"无法分析音频，改用BPM网格谱面。",
     factoryAskTitle:"要初始化全部设置吗？", factoryAskBody:"?reset=all 会把保存的设置（谱面、音量、影像、按键、播放列表、放大器）全部恢复到出厂状态，且无法撤销。如果不放心，请先导出设置。",
@@ -956,7 +906,6 @@ const TEXT = {
     importBad:"不支持的谱面文件。", importInvalid:"谱面数据无效。", importEmpty:"谱面中没有音符。",
     importTooLong:"谱面超出了音频时长。", importSuccess:"导入完成，可以游玩同一谱面。",
     exportNone:"没有可导出的谱面。", exportDone:"已导出谱面JSON。",
-
     recTitle:"📊 本曲游玩记录", recNone:"还没有记录。完整玩一次就会记录。",
     recPlays:"游玩次数", recPerfTotal:"累计完美", recLast:"最近游玩",
     recDiff:"谱面", recBest:"最高分", recAcc:"准确率", recBestP:"最多完美", recCount:"次数",
@@ -971,22 +920,14 @@ const TEXT = {
     prefSkipWhyId:"{k}（此设备不存在的ID）", prefSkipWhyType:"{k}（类型不符）", prefSkipWhyUnknown:"{k}（未知的设置项）",
     recBad:"记录文件格式不正确。", recCleared:"已清除本曲记录。"
   },
-
   /* ==================== 한국어 ==================== */
   ko: {
     tagline:"trk! — AGRG",
-    guideTitle:"🧭 3분 빠른 안내", guideHint:"곡 고르기・모양 바꾸기・한 판 플레이・설정 열기 — 하나씩 해볼 때마다 스탬프가 찍힙니다. 다섯 번째는 시드 창에 trk! 입력. 다 모으면 선물이 있어요!",
-    guideSongTitle:"1. 곡 넣기", guideSong:"사용 권리가 있는 곡을 선택합니다. 선택 데모 오디오 폴더가 포함된 경우 30초 데모도 사용할 수 있습니다.",
-    guideLookTitle:"2. 분위기 바꾸기", guideLook:"⚙ 설정에서 스킨을, 🎛 사운드 이펙트에서 소리를 바꿉니다.",
-    guideTruckTitle:"3. 출발", guideTruck:"TRUCK은 ↑↓로 레인을 이동합니다. CATCH는 짐을 받고 🚀 니트로로 가속합니다.",
-    guideSafeTitle:"4. 편하게 조절하기", guideSafe:"움직임을 줄이려면 ‘약하게’ 또는 추가 연출 끄기를 선택하고, 타이밍은 오프셋으로 맞춥니다.",
-    guideSeedTitle:"5. 시드로 채보 바꾸기", guideSeed:"채보는 시드 값으로 만들어집니다. 시드에는 문자도 입력할 수 있어요. trk!을 입력해 보세요! (동봉 데모 곡의 초·중·상은 수작업 채보를 써요. ↺를 누르면 자동 생성으로 바뀝니다)",
-    guideDemoBtn:"🎵 30초 데모 선택", guideDemoLoading:"🎵 FIRST SPARK 불러오는 중…", guideDemoReady:"데모를 선택했어요. PLAY를 누르면 30초를 플레이할 수 있어요.", guideDemoUnavailable:"데모를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.", demoSongUnavailable:"데모를 불러오지 못했어요. 페이지를 새로고침한 뒤 다시 시도해 주세요.",
-    guideSkip:"건너뛰기", tutorialReplay:"🧭 튜토리얼 다시 보기",
+    demoSongUnavailable:"데모를 불러오지 못했어요. 페이지를 새로고침한 뒤 다시 시도해 주세요.",
+    tutorialReplay:"🧭 튜토리얼 다시 보기",
     guideEggSkip:"🥾 튜토리얼을 걷어차 버렸어요!", guideEggCheat:"🫠 튜토리얼이 녹아 사라졌어요…", guideEggGod:"👼 튜토리얼이 승천했어요…",
-    guideStampSong:"🎵 스탬프: 곡을 골랐어요!", guideStampLook:"🎨 스탬프: 모양을 바꿨어요!", guideStampPlay:"🎮 스탬프: 한 판 플레이했어요!", guideStampSafe:"⚙ 스탬프: 설정을 열었어요!",
-    guideDone:"🎉 튜토리얼 완료!", guideDoneMsg:"스탬프 5개를 모으면 선물이 있을지도…",
-    guideReward:"🎓 스탬프 컴플리트!", guideRewardMsg:"보상 스킨 '졸업'이 해금되었어요! 스킨 선반에서 골라 보세요",
+    guideDone:"🎉 튜토리얼 완료!",
+    guideReward:"🎓 스탬프 컴플리트!", guideTitle:"🧭 튜토리얼", guideHint:"총 8개입니다. 하나씩 해 보면 보상이 있어요. 순서는 자유예요.", guideStart:"▶ 튜토리얼 시작", guideStartClose:"▲ 단계 접기", guideSkip:"건너뛰기", guideStampPlay:"🎵 스탬프: 곡을 재생했어요!", guideStampLook:"🎨 스탬프: 모양을 바꿨어요!", guideStampSafe:"⚙ 스탬프: 설정을 열었어요!", guideStampBack:"← 스탬프: 메인 화면으로 돌아왔어요!", guideStampAmp:"🔥 스탬프: TRK 앰프를 켰어요!", guideStampStudy:"📚 스탬프: 서재에 들어갔어요!", guideStampStudyBack:"📚 스탬프: 서재에서 돌아왔어요!", guidePlayTitle:"🎵 곡 재생하기", guidePlay:"곡을 골라 재생해 보세요.", guideLookTitle:"🎨 모양 바꾸기", guideLook:"스킨이나 이펙트를 하나 바꿔 보세요.", guideSafeTitle:"⚙ 설정 열기", guideSafe:"설정 화면을 열어 보세요.", guideBackTitle:"← 메인 화면으로", guideBack:"설정을 닫고 곡 선택 화면으로 돌아가요.", guideAmpTitle:"🔥 TRK 앰프 켜기", guideAmp:"아래로 스크롤해서 “TRK 앰프 사용”에 체크하세요.", guideStudyTitle:"📚 서재에 가기", guideStudy:"곡 목록의 📚 서재를 열어 보세요.", guideStudyBackTitle:"📚 서재에서 돌아오기", guideStudyBack:"서재를 닫고 곡 선택 화면으로 돌아가요.", guideSeedTitle:"🌱 trk! 입력하기", guideSeed:"Seed 칸에 trk! 를 입력하면 완료예요.", guideDoneMsg:"스탬프 8개를 모으면 뭔가 받을 수 있을지도…?", guideRewardMsg:"보상 스킨 '졸업'이 해금되었어요! 스킨 선반에서 골라 보세요",
     skinLockedHint:"스탬프 5개를 모으면…?",
     language:"언어", openSettings:"⚙ 설정", settingsTitle:"⚙ 설정", closeSettings:"← 곡 선택으로", navKeysTitle:"⌨ 이동 키", menuReturnKey:"메뉴로 돌아가기", mediaExitKey:"플레이어 종료", menuReturnConfirmToggle:"메뉴로 돌아가기 전에 확인", mediaExitConfirmToggle:"플레이어 종료 전에 확인", navKeysHint:"메뉴 키 기본값은 M, 플레이어 종료 키 기본값은 ESC입니다. 확인은 끌 수 있습니다.", menuReturnConfirm:"메뉴로 돌아갈까요? 현재 플레이는 저장되지 않습니다.", mediaExitConfirm:"미디어 플레이어를 종료할까요?", helpText:"도움말과 설명 표시", helpTextHint:"끄면 튜토리얼과 보충 설명을 숨겨 곡과 버튼 중심의 깔끔한 화면으로 만듭니다.",
     dropHint:"곡・.stpack・.vrm・.vrma・채보 JSON은 창에 드래그 앤 드롭해도 불러올 수 있습니다.",
@@ -1119,7 +1060,6 @@ const TEXT = {
     playStart:"▶ PLAY — 처음부터", importChart:"⇧ 채보 가져오기", regenerate:"↺ 자동 생성으로 돌아가기", export:"⇩ 채보 내보내기",
     controlsHint:"MANUAL: 설정한 키로 두드리기 · TRUCK: ↑↓／←→로 레인 이동 · ORBIT: 아무 키 (원버튼) · STAGE: 레인 키 또는 탭 · CATCH: ←→로 짐 받기 · P/ESC: 일시정지",
     feedbackLabel:"감상・요청・버그 제보는 이쪽으로",
-
     secDisplay:"🎨 외관", skin:"스킨", skinShelf:"🖼 스킨 선반", catAll:"전체", catBasic:"기본", catMiku:"미쿠", catDark:"다크", catLight:"라이트", catGrad:"그라데이션", catFun:"장난기", catAccess:"접근성", catLife:"생활", catCustom:"내 스킨", gameLayout:"게임 레이아웃",
     secModes:"🚚🪐🎪 각 모드 전용 설정 (TRUCK・ORBIT・STAGE)",
     modeKeysTitle:"🚚🎪🚛 각 모드 조작 키 (TRUCK・STAGE・CATCH・속도)",
@@ -1144,12 +1084,10 @@ const TEXT = {
     skinBad:"스킨 파일 형식이 올바르지 않습니다.", skinExported:"스킨 JSON을 내보냈습니다.",
     builtinLocked:"내장 스킨은 수정・삭제할 수 없습니다. '새로 저장'으로 복제하세요.", skinLimit:"커스텀 스킨은 최대 20개입니다.",
     confirmDelete:"이 커스텀 스킨을 삭제할까요?", customTag:"CUSTOM", remix:"리믹스",
-
     mascotSel:"마스코트", mascotSkin:"스킨 기본", mascotNone:"없음", mascotBuddy:"오렌지 버디", mascotVrm:"VRM 모델 (내 모델)", mascotMmd:"MMD 모델 (내 모델)",
     mascotHint:"마스코트가 플레이 중 화면 구석에서 응원해 줍니다. 'VRM 모델'을 고르면 내 모델도 쓸 수 있어요.",
     capStart:"자, 타이머 시작합니다.", capCombo:"{n} 콤보 달성. 순조롭네요.", capBreak:"앗… 콤보가 끊겼습니다(통한).",
     speakerA:"해설", speakerB:"실황",
-
     vrmTitle:"🧍 VRM 모델 (VRM 1.0)",
     vrmHint:"VRM 1.0 (.vrm) 전용입니다. 내 모델을 플레이 중 마스코트로 움직일 수 있습니다. 파일은 이 브라우저 안에서만 쓰이며 업로드되지 않습니다. 처음 한 번만 3D 라이브러리를 인터넷에서 불러옵니다.",
     vrmAgree:"이 모델의 이용 약관을 확인했으며, 이 게임에서 표시해도 됨을 확인했습니다",
@@ -1173,7 +1111,6 @@ const TEXT = {
     warnOnlyAuthor:"⚠ 이 모델은 '제작자만 사용 가능'입니다. 제작자 본인이 아니라면 사용하지 마세요.",
     warnLicensed:"⚠ '개별 허락받은 사람만'입니다. 구매 시 약관에서 허용되는지 확인해 주세요.",
     vrmConvertNote:"※VRChat 아바타를 변환한 VRM은 여기 정보보다 원래 약관(VN3 라이선스 등)이 우선합니다.",
-
     secPacks:"📦 커스텀 팩",
     packHint:"osu! 스킨처럼 스킨・노트・효과음・VRM・모션・대사・곡을 하나로 묶은 .stpack을 넣을 수 있습니다. 창에 드롭하거나 아래에서 선택하세요. 설치된 팩의 총 용량은 1 GiB까지이며 브라우저 저장 공간이 적으면 더 낮을 수 있습니다.",
     packChoose:"📂 팩 선택", packOff:"↺ 팩 해제", packEmpty:"아직 팩이 없습니다.",
@@ -1205,7 +1142,6 @@ const TEXT = {
     packImgBad:"노트 이미지는 PNG/WebP/JPG (최대 4MB)여야 합니다.",
     badgeSkin:"스킨", badgeNotes:"노트", badgeSounds:"효과음", badgeVrm:"VRM", badgeMotion:"모션", badgeCaptions:"대사",
     badgeSongs:"곡 {n}", badgeCreditCard:"💳 권리 카드", packCreditTitle:"💳 권리 카드／명함", packContributors:"공동 제작자 ({n}명)", packCreditDownload:"공유용 SVG 명함 다운로드", packCreditDisclaimer:"제작자가 제공한 요약입니다. 원본 라이선스／ReadMe를 보관하고 따르세요.", packLicenseLabel:"이용 조건",
-
     spTitle:"📦 이 곡을 곡 팩으로 만들기",
     spHint:"음원・채보・배경 이미지・BPM을 .stpack으로 묶습니다. 재배포 권리가 있는 곡(자작곡이나 배포가 허용된 소재)만 사용하세요.",
     spArtist:"아티스트", spCharter:"채보 제작자", spLicense:"곡 이용 조건・크레딧", spBg:"배경 이미지 (선택, PNG/WebP/JPG)",
@@ -1215,7 +1151,6 @@ const TEXT = {
     spNoSong:"먼저 곡을 골라 주세요.", spBgBad:"배경 이미지는 PNG/WebP/JPG (최대 8MB)여야 합니다.",
     spSongTooBig:"음원이 너무 큽니다 (최대 250MB).", spNoCharts:"넣을 채보가 없습니다.",
     packChartLoaded:"곡 팩의 채보({d})를 불러왔습니다.", builtinChartLoaded:"데모용 수작업 채보({d})를 불러왔습니다. 마스터는 자동 생성이에요.", songBy:"아티스트", chartBy:"채보", songLicense:"이용 조건",
-
     secControls:"⌨ 조작", leftKey:"왼쪽 키", rightKey:"오른쪽 키", assign:"변경", reverseHands:"좌우 반전 (왼손잡이용)",
     latency:"지연 보정 (ms)", latencyHint:"노트가 음악보다 빠르게 느껴지면 값을 올리세요. 블루투스 이어폰은 보통 +150~250 ms가 필요합니다.",
     captureLeft:"왼쪽 키로 지정할 키를 누르세요. ESC로 취소.", captureRight:"오른쪽 키로 지정할 키를 누르세요. ESC로 취소.",
@@ -1244,7 +1179,6 @@ const TEXT = {
     seOn:"히트 효과음 켜짐. 사용자 효과음이 없으면 내장음을 사용합니다.", seOff:"히트 효과음 꺼짐. 판정과 시각 효과는 그대로입니다.",
     seLoadedDon:"Don 효과음을 불러왔습니다.", seLoadedKa:"Ka 효과음을 불러왔습니다.",
     seLoadError:"오디오를 해독할 수 없습니다. 다른 형식을 시도하세요.", seUnavailable:"이 브라우저는 Web Audio를 지원하지 않습니다.",
-
     musicVolume:"음악", bannerVolTip:"짧게 누르기: 슬라이더 · 길게 누르기: 음소거/복원", bannerPlayPauseTip:"일시정지 (다시 누르면 재생)", bannerPlayResumeTip:"재생 (다시 누르면 일시정지)", bannerPlayNoSongTip:"곡을 고르면 여기서 미리듣기를 재생·일시정지할 수 있습니다", bannerPlayPreviewOffTip:"미리듣기가 꺼져 있어 누를 수 없습니다 (설정의 '곡 선택 중 미리듣기 재생'을 켜세요)", bannerPlayIdleTip:"지금은 재생·일시정지할 수 없습니다", pause:"Ⅱ 일시정지", fullscreen:"⛶ 전체 화면",
     paused:"일시정지", pauseText:"계속하기, 다시 시작, 채보 내보내기, 곡 선택으로 돌아가기를 고를 수 있습니다.",
     resume:"▶ 계속하기", retry:"↻ 다시 시작", title:"⌂ 곡 선택", finished:"완료!", replay:"↻ 한 번 더",
@@ -1258,7 +1192,6 @@ const TEXT = {
     failed:"FAILED", failedNote:"체력이 다 떨어졌습니다", starCount:"✦ {n}", newSpeed:"🏁 NEW SPEED {r}",
     creditNote:"로컬에서 선택한 파일을 재생 중이며, 어떤 데이터도 업로드되지 않습니다.",
     feedbackLink:"💬 소감・불만・개선 요청 (GitHub Issues)", chartFeedbackLink:"🎵 채보 및 난이도 의견",
-
     loading:"불러오는 중…", analyzing:"오디오 분석 중… (긴 곡은 몇 초 걸립니다)", loaded:"준비 완료 · 오디오 분석됨",
     loadError:"불러오지 못했습니다. 다른 파일을 시도해 주세요.", decodeFallback:"오디오를 분석할 수 없어 BPM 그리드 채보를 사용합니다.",
     factoryAskTitle:"모든 설정을 초기화할까요?", factoryAskBody:"?reset=all 은 저장한 설정(노트·음량·영상·키·재생목록·앰프)을 모두 공장 초기 상태로 되돌립니다. 되돌릴 수 없으니 먼저 설정을 내보내 두면 안전합니다.",
@@ -1274,7 +1207,6 @@ const TEXT = {
     importBad:"지원하지 않는 채보 파일입니다.", importInvalid:"채보 데이터 형식이 올바르지 않습니다.",
     importEmpty:"채보에 노트가 없습니다.", importTooLong:"채보가 오디오 길이를 넘습니다.",
     importSuccess:"가져오기 완료: 같은 채보로 플레이할 수 있습니다.", exportNone:"내보낼 채보가 없습니다.", exportDone:"채보 JSON을 내보냈습니다.",
-
     recTitle:"📊 이 곡의 플레이 기록", recNone:"아직 기록이 없습니다. 끝까지 플레이하면 기록됩니다.",
     recPlays:"플레이 횟수", recPerfTotal:"누적 PERFECT", recLast:"마지막 플레이",
     recDiff:"채보", recBest:"최고 점수", recAcc:"정확도", recBestP:"최다 PERFECT", recCount:"횟수",
@@ -1290,7 +1222,6 @@ const TEXT = {
     recBad:"기록 파일 형식이 올바르지 않습니다.", recCleared:"이 곡의 기록을 삭제했습니다."
   }
 };
-
 /* ---- 翻訳の取り出し（その言語になければ英語→日本語→キー名の順） ---- */
 let lang = "ja";
 function tr(key, vars) {

@@ -2145,9 +2145,8 @@ if (!read("js/main.js").includes("guideEggKind") ||
         manifest.version === 1 && manifest.enabled === true && manifest.file === "first-spark-tutorial.mp3";
     } catch { optionalFolderOk = false; }
   }
-  const keys = ["guideDemoBtn", "guideDemoLoading", "guideDemoReady", "guideDemoUnavailable", "demoSongUnavailable"];
-  const wired = optionalFolderOk && html.includes('id="guideDemoBtn"') && html.includes('id="guideDemoBtn" class="guideDemoBtn" type="button" data-i18n="guideDemoBtn" hidden') &&
-    main.includes("TrkSelectTutorialSong") && library.includes('source:"builtin"') &&
+  const keys = ["demoSongUnavailable", "guideStart", "guideSkip"];   /* trk140: the guide no longer has a demo button; its start/skip are checked here */
+  const wired = optionalFolderOk && html.includes('id="guideStartBtn"') && html.includes('id="guideSkip"') && library.includes('source:"builtin"') &&
     library.includes('const FIRST_SPARK_MANIFEST = "./assets/optional-demo-audio/manifest.json";') &&
     library.includes('const FIRST_SPARK_ASSET = "./assets/optional-demo-audio/first-spark-tutorial.mp3";') &&
     library.includes("void initOptionalTutorialDemo()") && library.includes('id === "builtin"') &&

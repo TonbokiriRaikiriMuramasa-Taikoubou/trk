@@ -101,22 +101,30 @@
         </div>
       </header>
 
-      <details id="quickGuide" class="panel quickGuide" open>
-        <summary><span data-i18n="guideTitle"></span> <span id="guideProgress" class="guideProgress"></span></summary>
-        <p class="hint" data-i18n="guideHint"></p>
-        <div class="guideGrid">
-          <div class="guideStep" data-mission="song"><i class="guideStamp"></i><b data-i18n="guideSongTitle"></b><span data-i18n="guideSong"></span></div>
-          <div class="guideStep" data-mission="look"><i class="guideStamp"></i><b data-i18n="guideLookTitle"></b><span data-i18n="guideLook"></span></div>
-          <div class="guideStep" data-mission="play"><i class="guideStamp"></i><b data-i18n="guideTruckTitle"></b><span data-i18n="guideTruck"></span></div>
-          <div class="guideStep" data-mission="safe"><i class="guideStamp"></i><b data-i18n="guideSafeTitle"></b><span data-i18n="guideSafe"></span></div>
-          <div class="guideStep" data-mission="seed"><i class="guideStamp"></i><b data-i18n="guideSeedTitle"></b><span data-i18n="guideSeed"></span></div>
-        </div>
-        <div class="guideFoot">
-          <button id="guideDemoBtn" class="guideDemoBtn" type="button" data-i18n="guideDemoBtn" hidden></button>
+      <section id="quickGuide" class="panel quickGuide" aria-labelledby="guideTitleText">
+        <div class="guideBar">
+          <b id="guideTitleText" class="guideBarTitle" data-i18n="guideTitle"></b>
+          <span id="guideProgress" class="guideProgress"></span>
           <span id="guideNote" class="guideNote" role="status" aria-live="polite" hidden></span>
-          <button id="guideSkip" class="guideSkip" type="button" data-i18n="guideSkip"></button>
+          <span class="guideBarActions">
+            <button id="guideStartBtn" class="guideStart" type="button" aria-expanded="false" aria-controls="guideSteps" data-i18n="guideStart"></button>
+            <button id="guideSkip" class="guideSkip" type="button" data-i18n="guideSkip"></button>
+          </span>
         </div>
-      </details>
+        <div id="guideSteps" class="guideSteps" hidden>
+          <p class="hint" data-i18n="guideHint"></p>
+          <div class="guideGrid">
+            <div class="guideStep" data-mission="play"><i class="guideStamp"></i><b data-i18n="guidePlayTitle"></b><span data-i18n="guidePlay"></span></div>
+            <div class="guideStep" data-mission="look"><i class="guideStamp"></i><b data-i18n="guideLookTitle"></b><span data-i18n="guideLook"></span></div>
+            <div class="guideStep" data-mission="safe"><i class="guideStamp"></i><b data-i18n="guideSafeTitle"></b><span data-i18n="guideSafe"></span></div>
+            <div class="guideStep" data-mission="back"><i class="guideStamp"></i><b data-i18n="guideBackTitle"></b><span data-i18n="guideBack"></span></div>
+            <div class="guideStep" data-mission="amp"><i class="guideStamp"></i><b data-i18n="guideAmpTitle"></b><span data-i18n="guideAmp"></span></div>
+            <div class="guideStep" data-mission="study"><i class="guideStamp"></i><b data-i18n="guideStudyTitle"></b><span data-i18n="guideStudy"></span></div>
+            <div class="guideStep" data-mission="studyBack"><i class="guideStamp"></i><b data-i18n="guideStudyBackTitle"></b><span data-i18n="guideStudyBack"></span></div>
+            <div class="guideStep" data-mission="seed"><i class="guideStamp"></i><b data-i18n="guideSeedTitle"></b><span data-i18n="guideSeed"></span></div>
+          </div>
+        </div>
+      </section>
 
       <div id="guideCelebrate" hidden>
         <div class="guideCelebCard"><b id="guideCelebTitle"></b><span id="guideCelebMsg"></span></div>

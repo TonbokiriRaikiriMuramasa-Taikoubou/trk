@@ -206,7 +206,7 @@ const settings = {
   playerMode: !!prefs.playerMode,
   helpText: prefs.helpText !== false,
   tutorialDone: prefs.tutorialDone === true,
-  tutorialStamps: (Array.isArray(prefs.tutorialStamps) ? prefs.tutorialStamps : []).filter(x => ["song", "look", "play", "safe", "seed"].includes(x)),   /* 🧭 スタンプラリー（順番自由・5つでごほうび） */
+  tutorialStamps: [...new Set((Array.isArray(prefs.tutorialStamps) ? prefs.tutorialStamps : []).map(x => x === "song" ? "play" : x))].filter(x => ["play", "look", "safe", "back", "amp", "study", "studyBack", "seed"].includes(x)),   /* 🧭 スタンプ（順番自由・8つでごほうび。旧「曲を選ぶ」は「曲を流す」へ引き継ぐ） */
   skinGradUnlocked: prefs.skinGradUnlocked === true,
   menuKey: validCode(prefs.menuKey) ? prefs.menuKey : "KeyM",
   menuConfirm: prefs.menuConfirm !== false,
@@ -1206,7 +1206,7 @@ function showScreen(id) {
   emit("screen", id);
 }
 function openSettings() { if (phase === "title") { showScreen("settingsScreen"); emit("settings"); } }   /* 🧭 スタンプ「設定を見た」の検知 */
-function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
+function closeSettings() { if (phase === "title") { showScreen("selectScreen"); emit("settingsClose"); } }   /* 🧭 スタンプ「メイン画面に戻った」の検知 */
 
 /* Emergency settings imports validate enum IDs at the boundary, before live settings are changed.
    列挙IDの検証対象（増やしたら tools/check-security.mjs も更新）。

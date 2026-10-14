@@ -2829,6 +2829,7 @@ function studyOpenRoom() {
   if (studyRoomOpen) return;
   studyRoomOpen = true; window.Trk.overlay.set("study", true);
   core.$("studyRoom").hidden = false; document.body.classList.add("study-room-open");
+  core.emit("studyOpen");   /* 🧭 スタンプ「書斎に行った」 */
   studyRefreshPrefsUI();
   studyReadyPromise.then(() => {
     studyRenderShelf(); studyRenderBookmarks(); studyRefreshShelfFoot();
@@ -2862,6 +2863,7 @@ async function studyCloseRoom() {
   studyTVToken++; studyRestoreVideoHome();
   studyClearImage(core.$("studyTvArt")); studyTVArtUrl = ""; studyTVArtSong = "";
   const title = document.querySelector("#libPanel .libHead .study-launch-title"); if (title) title.focus({ preventScroll:true });
+  core.emit("studyClose");   /* 🧭 スタンプ「書斎から戻った」 */
   studyClosePending = false;
 }
 async function studyToggleFullscreen() {

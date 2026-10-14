@@ -54,7 +54,7 @@ function requestMenuReturn() {
    Seed欄に trk! を打ち込んだ瞬間に完了（取り逃しなし・スキップも自由）。
    スタンプは「おまけの実績」で、曲を選ぶ・見た目を変える・1曲遊ぶ・設定を開く＋trk! の
    5つを揃えると、ごほうびスキン「🎓グラデュエーション」が解禁されます（順番自由）。 */
-const GUIDE_STAMPS = ["song", "look", "play", "safe", "seed"];
+const GUIDE_STAMPS = ["play", "look", "safe", "back", "amp", "study", "studyBack", "seed"];   /* 8つの手順（trk140） */
 let guideNoteTimer = 0, guideCelebTimer = 0, guideCelebPending = null;
 function syncTutorialUI() {
   const g = core.$("quickGuide");
@@ -81,6 +81,15 @@ function maybeAddTrkPlaylist() {
   } catch(_){}
 }
 function guideStampsDone() { return GUIDE_STAMPS.every(id => core.settings.tutorialStamps.includes(id)); }
+/* 手順（8つ）の表示・たたみ。ボタンの文言は data-i18n を付け替えて、言語を変えても正しく出る */
+function guideSetOpen(open) {
+  const steps = core.$("guideSteps"), start = core.$("guideStartBtn");
+  if (!steps || !start) return;
+  steps.hidden = !open;
+  start.setAttribute("aria-expanded", open ? "true" : "false");
+  start.dataset.i18n = open ? "guideStartClose" : "guideStart";
+  start.textContent = tr(start.dataset.i18n);
+}
 function renderGuideStamps() {
   const g = core.$("quickGuide"); if (!g) return;
   const prog = core.$("guideProgress");
@@ -154,13 +163,18 @@ function celebrateGuide(titleKey, msgKey) {   /* 🎉 お祝いポップアッ�
   clearTimeout(guideCelebTimer);
   guideCelebTimer = setTimeout(() => { box.hidden = true; box.classList.remove("play"); }, 4500);
 }
-/* スタンプの検知：曲を選ぶ／1曲遊ぶ／設定を開く */
-core.on("songSelected", () => guideStamp("song", "guideStampSong"));
+/* スタンプの検知：曲を流す／設定を開く・閉じる／書斎に出入りする／TRKアンプをONにする */
 core.on("phase", p => {
   if (p === "playing") guideStamp("play", "guideStampPlay");
   if (p === "title" && guideCelebPending) { const c = guideCelebPending; guideCelebPending = null; celebrateGuide(c[0], c[1]); }
 });
 core.on("settings", () => guideStamp("safe", "guideStampSafe"));
+core.on("settingsClose", () => guideStamp("back", "guideStampBack"));
+core.on("studyOpen", () => guideStamp("study", "guideStampStudy"));
+core.on("studyClose", () => guideStamp("studyBack", "guideStampStudyBack"));
+document.addEventListener("change", e => {   /* 🔥 TRKアンプの「使う」にチェックしたとき */
+  if (e.target && e.target.id === "ampUseInp" && e.target.checked) guideStamp("amp", "guideStampAmp");
+});
 /* スタンプの検知：見た目を変える（スキンは保存するときだけ・エフェクトは選んだ瞬間） */
 {
   const applySkinOrig = core.applySkin;
@@ -180,21 +194,12 @@ core.on("settings", () => guideStamp("safe", "guideStampSafe"));
       guideStamp("look", "guideStampLook");
   });
 }
-/* スキップ（もう知っている人へ）ともう一度（⚙設定の見た目から） */
-core.$("guideDemoBtn").addEventListener("click", async () => {
-  const button = core.$("guideDemoBtn");
-  button.disabled = true;
-  guideNote("guideDemoLoading");
-  try {
-    const ready = window.TrkSelectTutorialSong && await window.TrkSelectTutorialSong();
-    guideNote(ready ? "guideDemoReady" : "guideDemoUnavailable");
-  } catch (_) { guideNote("guideDemoUnavailable"); }
-  finally { button.disabled = false; }
-});
+/* 手順の開閉・スキップ・もう一度（⚙設定の見た目から） */
+core.$("guideStartBtn").addEventListener("click", () => guideSetOpen(core.$("guideSteps").hidden));
 core.$("guideSkip").addEventListener("click", () => { core.settings.tutorialDone = true; core.saveUserPrefs(); syncTutorialUI(); maybeAddTrkPlaylist(); });
 core.$("tutorialReplayBtn").addEventListener("click", () => {
   core.settings.tutorialDone = false; core.saveUserPrefs(); syncTutorialUI();
-  const g = core.$("quickGuide"); if (g) g.open = true;
+  guideSetOpen(true);
   if (typeof closeSettings === "function") core.closeSettings();
 });
 

@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-14（trk139）**。現在の仕様・守る条件・未確認事項の要約です。細かな過去の作業履歴（trk123以前）と trk114〜118 の検証の詳細は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-14（trk140）**。現在の仕様・守る条件・未確認事項の要約です。細かな過去の作業履歴（trk123以前）と trk114〜118 の検証の詳細は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検。
 
@@ -63,6 +63,12 @@
   - 権利表記：©/℗ GRYPHLINE（Hypergryph）、レーベルは Metal Scar Radio（鐵痕電台）。配信・購入は二次利用許諾ではなく、公式二次創作ガイドラインは公式素材のそのままの複製・抽出を禁止します。
   - 未確認（断定しない）：6作の中国語公式曲名・公式告知のffm.to配信一覧（Homecoming を除く）・VGMdb照合・他ストアの曲別URL。照合別名は付けていません。「配信なし」とも書きません。trk128 で Talos Wiki（コミュニティ運営）から確認したキャラクター分類・発売日・3アルバムのSpotifyID（Ashen Remains 6aFenM2edcPyIfzg6ZtQnz／Maker's Luv 4ZZOkqQONyAFHzEG31Qss4／The Floaty Envelope 44qElu191kLQ5fit5fAQ6g・Blurring曲 0QqtGr91Q6JxiUW7sCukIg）は**公式ページでの再確認が未実施**＝台帳の「調査中の他の公式リリース」へ記録。
   - 台帳とfixture：[`ARKNIGHTS-ENDFIELD-MUSIC.md`](ARKNIGHTS-ENDFIELD-MUSIC.md)、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`。
+
+### 初回の案内（trk140）
+
+- 1行のバー（`#quickGuide`）＋開くと出る8つの手順（`#guideSteps`）。スタンプは `GUIDE_STAMPS`（js/main.js）。完了は Seed 欄の `trk!`（演出つき 🥚 の言葉も残す）。
+- 検知：設定の開閉（`settings`／`settingsClose`）、書斎の開閉（`studyOpen`／`studyClose`）、TRKアンプの `#ampUseInp`、スキンは `applySkin`、曲は `phase` が playing。
+- 保存：`tutorialStamps`（js/core.js）。旧 `song` は `play` に移し、未知の値は捨てる。
 
 ### 書斎のCBZ／ZIP（trk138）
 
@@ -184,6 +190,7 @@
 
 ## 7. 最近の変更
 
+- **trk140（2026-10-14）**：**初回入口の整理**（利用者の指示：仕組みを減らし、いろいろな機能に一通り触れてもらう）。①ガイドを1行のバーにした（左＝「▶ チュートリアルを開始」、右＝「スキップ」）。手順は開いたときだけ出す（以前は大きなカードが常に開いていた）。②手順を8つにした：🎵曲を流す（旧「曲を選ぶ」と「1曲遊ぶ」を統合。保存済みの `song` は `play` へ移す）・🎨見た目を変える・⚙設定を開く・←メイン画面に戻る（設定を閉じる）・🔥TRKアンプをON（`#ampUseInp`）・📚書斎に行く・📚書斎から戻る・🌱trk!と打つ（完了）。③30秒デモのボタンを外した（ガイドから曲を遊ばせる部分をなくした）。デモ機構（`library.js` の `TrkSelectTutorialSong`・`initOptionalTutorialDemo`）は呼び出し元がなくなったが残してある（保守候補）。④ごほうび「グラデュエーション」は8つ全部で解禁（残す、の判断）。Seed欄の skip／cheat／god mode の演出（🥚）は残した。文言は4言語（`guide*` キー。旧キー14個は削除）。README の案内文も新しい名前に。検査：`/tmp/pp/e2e-guide.cjs` 17件 pass（検査は `npm run check` 280 pass。`tools/check-repo.mjs` の30秒デモの確認は、ボタンを外したので開始・スキップの確認に置き換えた）（初回の状態、開閉、設定・書斎・TRKアンプ・スキン・曲を流す・trk!の各スタンプ、旧保存値の移行、8つ目でのごほうび）。ページエラー0。
 - **trk139（2026-10-14）**：**画像フォルダの上限を実際に確かめるようにした**。ガイドは「アルバム最大3000枚・合計600MB・1ファイル100MB」と書いていたが、画像フォルダの取り込みはこの上限を確かめておらず（`studyTooMany`・`studyFileTooBig` は文言だけで未使用）、読み込み時に3000ページで切るだけだった。判定を `STUDY_UTIL.albumProblem`（純粋関数）にまとめ、画像フォルダと CBZ/ZIP の両方で使う。超えたアルバムは作らず、ほかのアルバムは続けて取り込む。「容量の上限を無視」をオンのときは外れる。**取り込みの結果の表示を直した**：全部が上限で止まったとき、理由が状態欄に出ていなかった（取り込みの開始が状態欄を空にし、本を開く処理もそうするため）。1冊も入らなければ理由だけを、途中まで入ればその集計の後ろに理由を添えて出す。検査：`tests/study-archive.test.mjs` 7件（判定の境界：3000枚・600MB・100MB、無視時の無制限）。実ブラウザ（`/tmp/pp/e2e-folder-limit.cjs`）：3001枚は拒否（本なし・文言あり）、3000枚は取り込み、100MB超の1枚は拒否（ファイル名入りの文言）、無視オンの3001枚は取り込み。CBZ/ZIP の E2E 13件も pass（理由の表示を含む）。`npm run check` 280 pass。**確認の注意**：この Chromium では `uploadFile` がフォルダ選択の入力欄で change を発火しないため、E2E は `DataTransfer` で File を入れて実際の change ハンドラを動かした（フォルダの選択窓だけを省いている）。
 - **trk138（2026-10-14）**：**書斎のCBZ／ZIP取り込み**（📚 書斎の取り込み欄の「🗜 CBZ/ZIPを取り込む」）。1ファイル＝1冊（題名はファイル名）。中の画像（`jpg/jpeg/png/webp/gif/avif/bmp`）だけを自然順のページにし、`__MACOSX/` と「.」で始まる名前は除く（`study-room-utils.js` の `archivePages`）。保存は画像フォルダと同じ `pages` の Blob。ページごとに `zip-io` で1枚ずつ解凍し、CRC と大きさを確かめてから、40枚ずつバッチで保存する。取り込み前に、ページ数（3000）・合計（600MB）・1ページ（100MB）を確かめる（上限は「容量の上限を無視」で外れる）。壊れた・暗号化された・画像のないファイルは、そのファイルだけ失敗にして続行する。途中で失敗したときは、そのファイルのページを消す。置き換え・残す・中止は画像フォルダと同じ。画像の保存と置き換えの後片付けは `studyWriteImageRecord` に共通化した（フォルダ取り込みの挙動は変えていない）。検査：`tests/study-archive.test.mjs`（4件）。実ブラウザ（Chromium headless・`/tmp/pp/e2e-archive.cjs`）で、4ファイル同時の取り込み（正常・画像なし・壊れた・CRC不一致）→本1冊・3ページ・PNGとして復元できる・失敗3件の表示と「Done: 1 added · 0 kept · 3 failed」・再取り込みで置き換えを聞く・キャンセルで残る、を確認（ページエラー0）。`npm run check` 277 pass。
 - **trk137（2026-10-14）**：**まるごとバックアップ／復元**（設定の「💾 端末の保存」の下）。対象は設定・記録・プレイリスト・書斎（本・画像・栞・メモ）・カスタムパック。曲・VRM・MMDなどのメディアは既定で除外し、チェックで含められる（曲は参照のまま ZIP へ書き、読み取り専用）。形式は ZIP（`js/zip-io.js`：ZIP64・deflate・CRC・展開上限）。復元は確認ダイアログのあとに、既知のキーと型だけを書き戻す（`js/backup.js`）。**「容量の上限を無視」**（設定・既定オフ・保存は `settings.ignoreStorageLimits`）：アプリ側の上限（書斎の本棚500・1冊3000ページ・テキスト12MB、パックの合計と1件）を外す。ブラウザ側の割り当て（IndexedDB・保存の固定）は回避できないため、画面に明記。凍結防止のガードは残す。書斎の上限は `window.Trk.studyLimits`（読み取り専用）へ公開し、復元とパックで同じ判定を使う。検査：`tests/zip-io.test.mjs`（6）・`tests/backup-codec.test.mjs`（6）・`tests/storage-limits.test.mjs`（4）。実ブラウザ（Chromium headless）で、書き出し→外部 Python `zipfile` の検査（13エントリ・testzip OK）→全消去→復元（localStorage・本・Blob画像・曲・ライブラリ・パック）が戻ること、上限オフの3001ページは拒否（書き込みなし）・上限オンで復元、不正ファイルは拒否されることを確認（ページエラー0）。UI（作成ボタン・上限の切り替えの保存・ファイル選択→確認ダイアログ）も確認。**未確認**：実機（Android Chrome・Safari）での大きい書き出し、書斎の読み込み（UI経路）の上限の実機確認、復元時に途中で容量が尽きた場合の表示。**既知の注意**：localStorageの値は許可リストのキーだけを文字列のまま書き戻す。中身の型・範囲は Import の検証関数を通さず、各機能の読み込み側に任せている（Import と同じ検証へ寄せるかは次の候補として未決定）。

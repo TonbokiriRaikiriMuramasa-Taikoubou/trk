@@ -146,7 +146,14 @@ input[type=color]{width:52px;height:34px;padding:2px;border:1px solid var(--ui-b
 @media (prefers-reduced-motion: reduce) {   /* 負担を減らしたい設定では、そっと短く */
   #quickGuide.eggSkip, #quickGuide.eggCheat, #quickGuide.eggGod { animation-duration: .35s }
 }
-.guideGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px}
+.guideGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+/* 🧭 初回入口（trk140）：1行のバー（開始＝左、スキップ＝右）。手順は開いたときだけ */
+.quickGuide[hidden]{display:none}
+.guideBar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.guideBarTitle{color:var(--ui-gold);font-weight:850}
+.guideBarActions{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.guideStart{padding:6px 14px;font-size:12.5px;font-weight:800}
+.guideSteps{margin-top:6px}
 .guideStep{display:flex;flex-direction:column;gap:4px;padding:10px;border:1px solid var(--ui-border);border-radius:12px;background:rgba(0,0,0,.12);font-size:13px;line-height:1.45}
 .guideStep b{color:var(--ui-text);font-size:14px}.guideStep span{color:var(--ui-muted)}
 /* 🧭 チュートリアルのスタンプラリー（試した瞬間にスタンプが押される） */
@@ -160,7 +167,7 @@ input[type=color]{width:52px;height:34px;padding:2px;border:1px solid var(--ui-b
 .guideFoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;min-height:30px}
 .guideNote{font-size:12.5px;color:var(--ui-gold);font-weight:700;animation:guideNoteIn .3s ease}
 @keyframes guideNoteIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-.guideDemoBtn{padding:7px 13px;font-size:12.5px}.guideSkip{padding:6px 14px;font-size:12.5px;opacity:.85;margin-left:auto}
+.guideSkip{padding:6px 14px;font-size:12.5px;opacity:.85;margin-left:auto}
 @media(max-width:720px){.guideFoot{flex-wrap:wrap;justify-content:flex-start}.guideNote{flex:1 1 100%;order:3}.guideSkip{margin-left:auto}}
 /* 🎉 チュートリアル完了／ごほうび解禁のお祝い */
 #guideCelebrate{position:fixed;inset:0;z-index:90;display:grid;place-items:center;pointer-events:none;background:rgba(0,0,0,.35);opacity:0;transition:opacity .25s}

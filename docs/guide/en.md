@@ -147,7 +147,7 @@ Sixteenth notes from Advanced upward (94–75 ms apart at 160–200 BPM) are abo
 
 Touch is supported too: MANUAL, TRUCK and ORBIT use left and right buttons, STAGE uses tapping lanes, and CATCH uses swiping.
 
-CATCH “Blast” (triggered by a 🚀 nitro can) lasts **10 seconds** by default, and overlapping blasts add up. Turn on “Blast lasts until the next parcel” in the CATCH settings to keep it going until the next parcel is caught or dropped.
+CATCH “Blast” (triggered by a 🚀 nitro can) lasts **10 seconds** by default. Taking another nitro can during a blast clears the parcels on screen and ends the blast. Turn on “Blast lasts until the next parcel” in the CATCH settings to keep it going until the next parcel is caught or dropped.
 
 ### 🎮 Pads, controllers, and TV remotes
 

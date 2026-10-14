@@ -22,7 +22,7 @@ Object.assign(TEXT.ja, {
   blastToast:"🚀 ぶっ飛ばし！", blastLabel:"🚀 BLAST", blastCount:"🚀 ぶっ飛ばし：{n}回",
   eggNitro:"✦ NITRO：CATCHがずっとぶっ飛ばしモードになります（練習扱い・ハイスコア対象外）",
   catchNitroBonus:"🚀 ニトロ中は得点1.1倍", catchNitroBonusHint:"オンにすると、ニトロ中に受け止めたノーツの得点が少し上がります。",
-  catchBlastNext:"🚀 ぶっ飛ばしは「次の荷物を取る（落とす）まで」", catchBlastNextHint:"オフ：10秒間（重なると足されます）。オン：次の荷物が判定されるまで続きます。",
+  blastOverlapToast:"💥 重なった！画面の荷物を消して終了", catchBlastNext:"🚀 ぶっ飛ばしは「次の荷物を取る（落とす）まで」", catchBlastNextHint:"オフ：10秒間。重なると画面の荷物を消して終わります。オン：次の荷物が判定されるまで続きます。",
 });
 Object.assign(TEXT.en, {
   catchHint:"Catch the falling parcels in your truck bed. Move with ← → (or A / D), or drag on the screen. Grab a nitro can 🚀 on the road to enter Blast mode for a while (double catch width, faster moves).",
@@ -32,7 +32,7 @@ Object.assign(TEXT.en, {
   blastToast:"🚀 BLAST!", blastLabel:"🚀 BLAST", blastCount:"🚀 Blasts: {n}",
   eggNitro:"✦ NITRO: CATCH stays in Blast mode the whole song (practice — no high score)",
   catchNitroBonus:"🚀 Score x1.1 during Nitro", catchNitroBonusHint:"When on, notes caught during Nitro give a small score bonus.",
-  catchBlastNext:"🚀 Blast lasts until the next parcel", catchBlastNextHint:"Off: 10 seconds (stacks when overlapped). On: lasts until the next parcel is caught or dropped.",
+  blastOverlapToast:"💥 Overlap! Screen cleared, blast ended", catchBlastNext:"🚀 Blast lasts until the next parcel", catchBlastNextHint:"Off: 10 seconds. Overlapping (taking another nitro can) clears the screen and ends the blast. On: lasts until the next parcel is caught or dropped.",
 });
 Object.assign(TEXT.zh, {
   catchHint:"用货斗接住落下的包裹。用 ← →（或 A·D）左右移动，也可以在画面上拖动。拿到路上的氮气罐🚀，会进入一段时间的“狂飙模式”（接取范围2倍·移动更快）。",
@@ -42,7 +42,7 @@ Object.assign(TEXT.zh, {
   blastToast:"🚀 狂飙！", blastLabel:"🚀 BLAST", blastCount:"🚀 狂飙：{n}次",
   eggNitro:"✦ NITRO：CATCH整首歌都是狂飙模式（练习·不计最高分）",
   catchNitroBonus:"🚀 氮气中得分×1.1", catchNitroBonusHint:"开启后，在氮气期间接住音符会获得少量分数加成。",
-  catchBlastNext:"🚀 冲刺持续到下一个包裹", catchBlastNextHint:"关闭：10 秒（重叠时累加）。开启：持续到下一个包裹被判定为止。",
+  blastOverlapToast:"💥 重叠！画面已清空，冲刺结束", catchBlastNext:"🚀 冲刺持续到下一个包裹", catchBlastNextHint:"关闭：10 秒。重叠（再取一个氮气罐）会清空画面并结束冲刺。开启：持续到下一个包裹被判定为止。",
 });
 Object.assign(TEXT.ko, {
   catchHint:"떨어지는 짐을 짐칸으로 받습니다. ← →(A·D도 가능)로 좌우로 움직이고, 화면을 드래그해도 됩니다. 길 위의 니트로 캔🚀을 먹으면 잠시 '폭주 모드'(받는 폭 2배·이동이 빨라짐)가 됩니다.",
@@ -52,7 +52,7 @@ Object.assign(TEXT.ko, {
   blastToast:"🚀 폭주!", blastLabel:"🚀 BLAST", blastCount:"🚀 폭주: {n}회",
   eggNitro:"✦ NITRO: CATCH가 곡 내내 폭주 모드가 됩니다 (연습 취급·최고 점수 제외)",
   catchNitroBonus:"🚀 니트로 중 점수×1.1", catchNitroBonusHint:"켜면 니트로 중 받은 노트에 작은 점수 보너스가 붙습니다.",
-  catchBlastNext:"🚀 돌진은 다음 짐까지 지속", catchBlastNextHint:"끄기: 10초(겹치면 더해짐). 켜기: 다음 짐이 판정될 때까지 계속됩니다.",
+  blastOverlapToast:"💥 겹침! 화면을 비우고 종료", catchBlastNext:"🚀 돌진은 다음 짐까지 지속", catchBlastNextHint:"끄기: 10초. 겹치면(니트로 캔을 또 잡으면) 화면을 비우고 끝납니다. 켜기: 다음 짐이 판정될 때까지 계속됩니다.",
 });
 
 /* ============ 設定 ============ */
@@ -131,7 +131,33 @@ function blastSound() {
   g.gain.setValueAtTime(Math.max(.03, core.settings.seVolume * .5), t); g.gain.exponentialRampToValueAtTime(.0001, t + .45);
   o.connect(g).connect(ac.destination); o.start(t); o.stop(t + .5);
 }
+/* ぶっ飛ばし中にニトロ缶を取った（重なった）：画面に見えている荷物を取った扱いで消して、ぶっ飛ばしを終える（trk149）。
+   AUTO のときは荷物の判定を AUTO に任せ、ニトロ缶と終了だけ行う。 */
+function clearScreenOnOverlap(now) {
+  ensureCatchMap();
+  const travel = core.travelMs();
+  for (const it of catchMap.items) {
+    if (it.done || it.time <= now || it.time - now > travel) continue;
+    it.done = true;
+  }
+  if (core.settings.autoPlay) return;
+  for (let i = core.nextIdx; i < core.chart.length; i++) {
+    const n = core.chart[i];
+    if (n.time - now > travel) break;
+    if (n.judged || n.time <= now) continue;
+    window.Trk.play.judgeNote(n, "perfect", 0);
+    launchParcel(catchMap.xs[i], n.lane);
+  }
+}
 function triggerBlast(now, it) {
+  if (isBlast(now)) {                                               // 重なった：画面の荷物を消して終わる
+    clearScreenOnOverlap(now);
+    catchState.blastUntil = now;
+    core.stats.blasts = (core.stats.blasts || 0) + 1;
+    core.effects.push({ x:catchX(it.x), y:CATCH.lineY - 20, c:"#ffb000", t:performance.now(), kind:"perfect", seed:Math.random() * window.Trk.data.TAU });
+    window.Trk.play.showToast(tr("blastOverlapToast")); blastSound();
+    return;
+  }
   if (core.settings.catchBlastNext) {                               // 「次の荷物まで」：次の荷物を判定するまで続く
     catchState.blastUntil = Infinity; catchState.blastLen = Infinity;
   } else {

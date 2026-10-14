@@ -25,6 +25,7 @@ function loadCatch(seedValue = "") {
   });
   const core = new Proxy({}, {
     get: (t, k) => {
+      if (Object.prototype.hasOwnProperty.call(t, k)) return t[k];
       if (k === "settings") return settings;
       if (k === "prefs") return prefs;
       if (k === "stats") return t.stats || (t.stats = { perfect: 0, combo: 0 });
@@ -108,15 +109,17 @@ test("範囲の外は miss", () => {
   assert.equal(judgeAt(0.2)[0].kind, "miss");
 });
 
-test("ぶっ飛ばしは10秒（BPMに関係なく固定）。重なると足される", () => {
-  const { ctx } = loadCatch();
+test("ぶっ飛ばしは10秒（BPMに関係なく固定）", () => {
+  const env = loadCatch();
+  const { ctx } = env;
   const w = ctx.window;
   w.catchState.blastUntil = -1e9;
   w.__triggerBlast(1000, { x: 0.5 });
   assert.equal(w.catchState.blastUntil - 1000, 10000);
   assert.equal(w.__CATCH.blastMs, 10000);
+  env.core.chart = []; env.core.nextIdx = 0;       // 画面の荷物はない譜面
   w.__triggerBlast(2000, { x: 0.5 });
-  assert.equal(w.catchState.blastUntil - 2000, 9000 + 10000);
+  assert.equal(w.catchState.blastUntil, 2000, "重なると、ぶっ飛ばしは終わる（足されない）");
 });
 
 // trk146：「ぶっ飛ばしは次の荷物まで」オプション（既定はオフ＝10秒）
@@ -157,4 +160,36 @@ test("次の荷物まで：発動後は続き（Infinity）、次の荷物を判
 test("次の荷物まで：ゲージは壊れない（無限でも NaN にならない）", () => {
   const src = fs.readFileSync(path.join(root, "js/catch.js"), "utf8");
   assert.ok(src.includes("isFinite(catchState.blastLen)"));
+});
+
+// trk149：ぶっ飛ばし中にニトロ缶を取った（重なった）→ 画面に見えている荷物を消して終わる
+test("重なると、見えている荷物を取った扱いで消して、ぶっ飛ばしが終わる", () => {
+  const env = loadCatch();
+  const { ctx, judged, core } = env;
+  const w = ctx.window;
+  core.travelMs = () => 5000;               // 画面に見える時間（描画と同じ幅）
+  w.catchState.blastUntil = -1e9;
+  w.__triggerBlast(500, { x: 0.5 });
+  assert.equal(w.catchState.blastUntil - 500, 10000);
+  core.chart = [
+    { time: 1500, lane: 0, judged: false },   // 見えている → 消える
+    { time: 2000, lane: 1, judged: false },   // 見えている → 消える
+    { time: 40000, lane: 0, judged: false },  // 画面の外 → 残る
+  ];
+  core.nextIdx = 0;
+  const map = w.__catchMap;
+  map.src = core.chart; map.len = 3; map.key = "|easy|120"; map.xs = new ctx.Float32Array([0.3, 0.6, 0.5]);
+  w.__triggerBlast(1000, { x: 0.5 });
+  assert.equal(w.catchState.blastUntil, 1000, "終わる");
+  assert.equal(judged.length, 2, "見えている2つだけ");
+  assert.deepEqual(judged.map(j => j.kind), ["perfect", "perfect"]);
+  assert.ok(judged.every(j => j.delta === 0), "消した荷物は★扱い");
+});
+
+test("重なりは、ぶっ飛ばし中のときだけ。ぶっ飛ばし前のニトロ缶は通常どおり発動", () => {
+  const { ctx } = loadCatch();
+  const w = ctx.window;
+  w.catchState.blastUntil = -1e9;
+  w.__triggerBlast(1000, { x: 0.5 });
+  assert.equal(w.catchState.blastUntil - 1000, 10000);
 });

@@ -360,4 +360,13 @@ for (const [name, fn, rule] of tracks) {
   console.log("wrote", name + ".wav", (wav.length / 1024).toFixed(0) + "KB", rule);
 }
 fs.writeFileSync(path.join(OUT, "tracklist.json"), JSON.stringify({ kind: "trk's OST Vol.1 procedural sketches", tracks: meta }, null, 2));
+/* アプリ（js/library.js の initAgentOstTracks）が読むマニフェスト。音源と同じ Git 外フォルダに置く */
+const manifest = {
+  version: 1, enabled: true, kind: "trk-agent-ost-v1",
+  tracks: meta.map((m, i) => ({
+    key: String(i + 1).padStart(2, "0"), file: m.file,
+    title: `Original ${String(i + 1).padStart(2, "0")} — ${m.rule}`,
+  })),
+};
+fs.writeFileSync(path.join(OUT, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
 console.log("done ->", OUT);

@@ -140,15 +140,72 @@ async function initOptionalTutorialDemo() {
     /* manifest.charts === false なら音源だけ同梱した構成（譜面は自動生成） */
     firstSparkChartMap = manifest.charts === false ? {} :
       Object.fromEntries(FIRST_SPARK_CHART_DIFFS.map(d => [d, FIRST_SPARK_CHART_DIR + firstSparkChartFile(d)]));
-    builtInSongs = [{
+    const firstSpark = {
       key:FIRST_SPARK_KEY, source:"builtin", file:null, fileName:"FIRST_SPARK_Tutorial_30s.mp3",
       title:"FIRST SPARK — Tutorial", base:"FIRST SPARK — Tutorial", artist:"trk!", size:0, bpm:128, offset:0,
       charter:Object.keys(firstSparkChartMap).length ? "trk!" : "", builtinDemo:true
-    }];
+    };
+    builtInSongs = [firstSpark, ...builtInSongs.filter(song => song.key !== FIRST_SPARK_KEY)];
     renderLib();
   } catch (_) { /* no manifest = intentional lightweight build or an offline optional asset */ }
 }
-/* 📤 ミュージックフォルダを共有（許可は1回。中身のリストをぜんぶ取り込む）まわりの状態 */
+/* 🎼 trk Agent's Original Vol.1 — 手続き生成の10曲（tools/make-trk-ost.mjs）。
+   音源とマニフェストは assets/trk-ost/（Git外）。マニフェストが無ければ曲もプレイリストも作らない。
+   音源は選んだときに読む（materializeAgentOst）。消したら trkRemoved に印が残る（🐔 の ♻ で戻せる）。 */
+const AGENT_OST_ID = "trk-agent-ost-v1";
+const AGENT_OST_CAT = "trk:agent-ost";
+const AGENT_OST_NAME = "trk Agent's Original Vol.1";
+const AGENT_OST_DIR = "./assets/trk-ost/";
+const AGENT_OST_MAX_BYTES = 4 * 1024 * 1024;   /* 1曲 約0.9〜1MB。上限は余裕を見た値 */
+const AGENT_OST_KEY_PREFIX = "builtin:trk-agent-ost:";
+const agentOstUrls = new Map();                 /* key → 音源の URL */
+async function initAgentOstTracks() {
+  try {
+    const response = await fetch(AGENT_OST_DIR + "manifest.json", { credentials:"same-origin" });
+    if (!response.ok) return;
+    const manifest = await response.json();
+    if (!manifest || manifest.version !== 1 || manifest.enabled !== true || !Array.isArray(manifest.tracks)) return;
+    const songs = manifest.tracks.slice(0, 20).filter(t => t && /^[\w-]{1,32}$/.test(String(t.key)) && /^[\w.-]{1,80}\.wav$/.test(String(t.file)))
+      .map(t => {
+        const key = AGENT_OST_KEY_PREFIX + t.key, title = String(t.title || t.key).trim().slice(0, 120) || t.key;
+        agentOstUrls.set(key, AGENT_OST_DIR + t.file);
+        return { key, source:"builtin", file:null, fileName:t.file, title, base:title, artist:"trk Agent", size:0, bpm:0, offset:0, charter:"", license:"" };
+      });
+    if (!songs.length) return;
+    builtInSongs = [...builtInSongs.filter(song => !song.key.startsWith(AGENT_OST_KEY_PREFIX)), ...songs];
+    renderLib();
+    ensureAgentOstPlaylist(songs.map(song => song.key));
+  } catch (_) { /* 無ければ何もしない（音源は Git の外にある） */ }
+}
+function ensureAgentOstPlaylist(keys) {
+  if (core.settings.playlists.some(p => p.id === AGENT_OST_ID)) return false;
+  if (trkIsRemoved(AGENT_OST_ID)) return false;
+  ensureTrkFolder();
+  const p = plSanitize({ id:AGENT_OST_ID, name:AGENT_OST_NAME, icon:"\uD83C\uDFBC", color:"none",
+    folder:TRK_FOLDER_ID, tags:["trk", "OST", "Agent"], wish:[], songs:keys.slice(), cat:AGENT_OST_CAT, createdAt:Date.now() });
+  if (!p) return false;
+  core.settings.playlists.push(p);
+  core.saveUserPrefs();
+  return true;
+}
+async function materializeAgentOst(it) {
+  const url = agentOstUrls.get(it.key);
+  if (!url) throw new Error("agent-ost-unknown");
+  const response = await fetch(url, { credentials:"same-origin" });
+  if (!response.ok) { const error = new Error("agent-ost-unavailable"); error.code = response.status === 404 ? "not-found" : "http-error"; throw error; }
+  const declared = Number(response.headers.get("Content-Length") || 0);
+  if (declared > AGENT_OST_MAX_BYTES) throw new Error("agent-ost-too-large");
+  const blob = await response.blob();
+  if (!blob.size || blob.size > AGENT_OST_MAX_BYTES) throw new Error("agent-ost-size-invalid");
+  const file = new File([blob], it.fileName, { type:"audio/wav" });
+  const ready = { ...it, file, size:file.size };
+  const idx = builtInSongs.findIndex(song => song.key === it.key);
+  if (idx >= 0) builtInSongs[idx] = ready;
+  renderLib();
+  return ready;
+}
+
+/* 📤 ミュージックフォルダを共有
 let sharedSongs = [];        /* 💾 端末に残してある共有の曲（リロード後も残る） */
 let libShared = false;       /* いまの libHandle が「📤 共有」でもらったものか（📁 開く と区別するため） */
 let shareRemembered = false; /* 共有の許可を覚えているか（まだつながっていなくても 🚫 を出せるように） */
@@ -3195,8 +3252,10 @@ bannerSongBtnsSync();   /* 初回の表示あわせ（renderBanner が先に走�
 
 /* ---------- 曲を選ぶ ---------- */
 async function materializeBuiltinSong(it) {
-  if (it.source !== "builtin" || it.key !== FIRST_SPARK_KEY) return it;
+  if (it.source !== "builtin") return it;
   if (it.file) return it;
+  if (it.key.startsWith(AGENT_OST_KEY_PREFIX)) return materializeAgentOst(it);
+  if (it.key !== FIRST_SPARK_KEY) return it;
   if (!firstSparkFilePromise) {
     firstSparkFilePromise = (async () => {
       const response = await fetch(FIRST_SPARK_ASSET, { credentials:"same-origin" });
@@ -3224,7 +3283,7 @@ async function selectSong(it) {
       if (selection === songSelectToken) {
         console.error("tutorial audio load failed", error);
         if (error && error.code === "not-found") {
-          builtInSongs = builtInSongs.filter(song => song.key !== FIRST_SPARK_KEY);
+          builtInSongs = builtInSongs.filter(song => song.key !== it.key);
           renderLib();
         }
         core.setStatus("loadStatus", "demoSongUnavailable");
@@ -3824,6 +3883,7 @@ async function initLibrary() {
   syncTrkUI();
   renderLib();
   void initOptionalTutorialDemo();
+  void initAgentOstTracks();
 }
 /* ✅ library.js 完了 */
 

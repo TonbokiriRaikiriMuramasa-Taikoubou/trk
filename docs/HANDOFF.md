@@ -217,6 +217,7 @@
 
 ## 7. 最近の変更
 
+- **trk148（2026-10-14）**：TRUCK の A（上）・Space（下）。ユーザー回答は「追加しない、説明だけ分かりやすくする」。既存の「通常の叩くキーでもレーンを移動する」（既定オン）で、通常キーが既定（A＝ドン、Space＝カッ）のとき TRUCK では既に A・Space で動くため、文言を「（既定は A・Space）」に直した（4言語）。追加のチェックは作っていない。
 - **trk147（2026-10-14）**：①CATCH の「ぶっ飛ばしは次の荷物を取る（落とす）まで」（既定オフ＝10秒）。オンのとき発動は `blastUntil = Infinity`、次の荷物を判定した時点で終わり、判定ループを抜ける（同じフレームの残りは次のフレームで通常判定）。ゲージは無限のとき満タン表示。設定は `settings.catchBlastNext`（core.prefs で正規化）。4言語の文言・操作ガイド（controls・en）を更新。②「Silver Scrapes」（Danny McCarthy・Worlds 2012 Anthem）を WCS アンセムに追加。リンクは NCS Release の YouTube（第三者投稿、Riot公式チャンネルではない）。Creator-Safe 一覧では未確認（`notFound` に記録）。`tools/leagueoflegends-music-tracklist.json` と check-repo（14曲・合計65）を合わせた。検査：npm run check 293 pass、0 fail。`tests/catch-judge.test.mjs` 9 pass。
 - **trk146（2026-10-14）**：**すぐできるもの**。①§4 の項目7 にオフライン確認（利用者の実機確認）を記録。②ガイド（ja・en）に「ようこそ」を反映。③緊急復旧に「👋 ようこそをもう一度」を追加（4言語）。ようこそは**セーフモード（`core.safeModeOn`）のときは出さない**。④4言語の文言レビュー一覧 `docs/I18N-REVIEW.md`（46キー）を作成。検査：npm run check 290 pass、0 fail。ブラウザE2Eは環境の都合で未実行。
 - **trk145（2026-10-14）**：**CATCHの判定・ぶっ飛ばし・既定キー**（実機テストの指摘）。①CATCHの判定から good を消した（捕まえたら必ず perfect）。②ぶっ飛ばし中は常に★（精度完璧＝delta 0）。③ぶっ飛ばし時間は 8拍（138BPMで約3.5秒）→ **10秒（固定。重なると足される）**。④CATCHの既定キーは 左＝A（ドン）、右＝Space（カッ）。← → は別の割り当てとして残す（操作ヒント・既定に戻すボタンの文言も4言語で更新）。参考：osu!catch のハイパーダッシュは時間では切れず、次の果物を取る（落とす）まで続く。今回は時間制（ご希望どおり）。検査：tests/catch-judge.test.mjs（vm で js/catch.js を動かす・6件 pass）。既存のブラウザE2Eは環境の都合（/tmp/pp・ブラウザ）で再実行できず、未確認。注意：保存済みの catchKeys は変えていない（既定に戻す操作、または初期化で新しい既定になる）。TRUCKの既定は ↑↓ のまま（利用者の判断）。A（上）・Space（下）は、TRUCK設定の「通常の叩くキーでもレーンを移動する」（truckHitKeys、既定オン。既存の機能）で使える。

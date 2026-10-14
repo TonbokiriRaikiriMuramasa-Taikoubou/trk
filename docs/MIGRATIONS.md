@@ -14,6 +14,7 @@
 | `trkEndfieldTidy1` | 一回限りの印 | trk128 | 2027-01-14 | 期限後、作業者が削除を提案し、利用者の確認を得てから消す | js/library.js `trkEndfieldTidyOnce` |
 | `trkEndfieldTidy2` | 一回限りの印 | trk129 | 2027-01-14 | 同上 | js/library.js `trkEndfieldShelfRestoreOnce` |
 | `ENDFIELD_FIRSTORDER_OLD_NAMES` | 旧名の表（毎回照合） | trk129 | 2027-01-14 | 同上（旧既定名は、更新で一度直れば不要になる） | js/library.js |
+| `BA_MIKA_LEGACY_PL` | 旧名の表（毎回照合） | trk159 | 2027-01-14 | 同上（trk157〜158の旧3リストを「聖園ミカ」1つへ統合） | js/library.js |
 | `trkRemoved` | 保存データ（消さない） | — | なし | 利用者が消したリストを覚える。移行ではない | js/core.js、js/library.js |
 | `trk-ba-v1` | 毎回の補完（対象外） | — | なし | 既存の4リストが無いときに作る。一回限りではない | js/library.js（legacy） |
 | `tutorialStampsFrom` | 読み替え（対象外） | trk140 | なし | 旧スタンプ `song` を `play` へ読み替える。保存値を読むために残す | js/core.js |

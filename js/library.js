@@ -728,9 +728,7 @@ Object.assign(TEXT.ja, {
   plGuideGameVol1:"非営利の紹介プレイリスト。音源は同梱しません。公式の入手先からどうぞ。",
   plGuideClassic:"版権切れの名演をMusopenの公開録音で紹介。音源は同梱しません。",
   plGuideBlueArchive:"NexTone.Link／Apple Music公式案内。音源なし。購入・サブスクは利用許諾ではありません。",
-  plGuideBlueArchiveMika:"公式PV2本＋Apple Music中国ストアの音源3曲。Short単独配信は未確認・未収録。地域差あり。配信ページは読込用ファイルを保証しません。音源なし。公開・購入・サブスクは二次利用許諾ではありません。",
-  plGuideBlueArchiveMikaAria:"韓国語曲2曲＋グローバル公式本編MV。英語掲載名は英語歌唱の意味ではありません。音源はApple Music英国ストア（地域差あり）。配信は読込用ファイルを保証しません。音声・映像なし。公開・購入・サブスクは二次利用許諾ではありません。",
-  plGuideBlueArchiveMikaVocals:"ミカのソロ「幸せになるよ」＋歌唱参加曲2曲＋公式MV1本。合唱のアーティスト欄はCV表記を省略。音源はApple Music日本ストアへ。音声・映像なし。配信は読込用ファイルを保証せず、購入・サブスクは二次利用許諾ではありません。",
+  plGuideBlueArchiveMika:"メモロビ2曲（mora／You’re My Princessは配信未確認で作曲家Xの1分投稿へ）、kiss angel（Short未収録）、Aria（韓国語2曲＋Global本編MV、英語名は英語歌唱ではない）、日本語3曲＋MV。地域差あり。音源・映像なし。配信・公開は読込用ファイルや二次利用許諾を保証しません。",
   plGuideLolCsVerified:"公式SoundCloudアルバム（音源なし）。Creator-Safe対象（Riot公式Playlistと照合済み）。配信・購入は二次利用許諾ではありません。",
   plGuideLolCsPartial:"公式SoundCloudアルバム（音源なし）。一部の曲はCreator-Safe対象（Riot公式Playlistと照合済み）、残りはPlaylistに見当たらない・要確認。配信・購入は二次利用許諾ではありません。",
   plGuideLolCsUnverified:"公式SoundCloudアルバム（音源なし）。Creator-Safe対象かは未照合。配信・購入は二次利用許諾ではありません。",
@@ -758,9 +756,7 @@ Object.assign(TEXT.en, {
   plGuideGameVol1:"A non-commercial introduction playlist. No audio is included; please get songs from the official sources.",
   plGuideClassic:"Public-domain masterpieces introduced through Musopen's public recordings. No audio is included.",
   plGuideBlueArchive:"Official NexTone.Link / Apple Music pages. No audio included. Buying or subscribing is not a license to use.",
-  plGuideBlueArchiveMika:"Two official PVs and three audio tracks on Apple Music China. Standalone Short releases are unconfirmed and omitted. Availability varies by region; streaming does not guarantee an importable file. No media included. Publication, purchase or subscription does not grant reuse rights.",
-  plGuideBlueArchiveMikaAria:"Two Korean songs and the full mini musical on the official Global channel. English titles do not imply English vocals. Audio links use Apple Music UK; availability varies by region. Streaming does not guarantee importable files. No media included; publication, purchase or subscription is not a reuse license.",
-  plGuideBlueArchiveMikaVocals:"Mika’s solo Shiawase ni Naru yo, two ensemble songs featuring Mika, and one official MV. Ensemble credits show character names without voice actors. Audio links use Apple Music Japan. No media included. Streaming does not guarantee importable files; buying or subscribing is not a reuse license.",
+  plGuideBlueArchiveMika:"Two Memorial Lobby tracks (mora / You’re My Princess links to composer EmoCosine's 1-min X post as official streaming is unconfirmed as of Oct 2026), kiss angel (Short omitted), Aria (2 KR songs + Global MV; English titles != English vocals), and 3 JP songs + MV. Apple Music CN/UK/JP links vary by region. No media included; not a reuse license or importable file guarantee.",
   plGuideLolCsVerified:"Official SoundCloud album (no audio included). Creator-Safe: matched against Riot's official Creator-Safe Playlist. Streaming or buying is not a license to reuse.",
   plGuideLolCsPartial:"Official SoundCloud album (no audio included). Some songs are Creator-Safe (matched against Riot's official Creator-Safe Playlist); the rest were not found in it, so check them. Streaming or buying is not a license to reuse.",
   plGuideLolCsUnverified:"Official SoundCloud album (no audio included). Creator-Safe status not yet matched. Streaming or buying is not a license to reuse.",
@@ -788,9 +784,7 @@ Object.assign(TEXT.zh, {
   plGuideGameVol1:"非营利的介绍歌单。不附带音源，请从官方渠道获取。",
   plGuideClassic:"通过Musopen的公开录音介绍版权已过期的名曲。不附带音源。",
   plGuideBlueArchive:"NexTone.Link／Apple Music官方页面。不含音源。购买或订阅并不等于使用许可。",
-  plGuideBlueArchiveMika:"官方PV两部及Apple Music中国大陆商店三首音轨。Short音频的单独发行未确认，未收录。地区可用性不同，流媒体不保证可取得能导入的文件。不附带音视频。公开、购买或订阅不等于二次使用许可。",
-  plGuideBlueArchiveMikaAria:"韩语歌曲两首＋全球官方频道完整音乐剧MV。英文标题不代表英语演唱。音源链接为Apple Music英国商店，地区可用性不同。流媒体不保证可取得能导入的文件。不附带音视频，公开、购买或订阅不等于二次使用许可。",
-  plGuideBlueArchiveMikaVocals:"未花独唱《幸せになるよ》、参与合唱的两首歌曲及一部官方MV。合唱艺人栏保留角色名，省略声优名。音源链接为Apple Music日本商店。不附带音视频。流媒体不保证可取得能导入的文件，购买或订阅不等于二次使用许可。",
+  plGuideBlueArchiveMika:"纪念大厅两曲（mora／You’re My Princess截至2026年10月官方发行未确认，指向作曲家X的1分钟试听）、kiss angel（Short未收录）、Aria（韩语歌两首＋全球MV，英文名不代表英语演唱）及日语歌三首＋MV。Apple Music中／英／日商店等存在地区差异。不附带音视频，公开或购买不保证可导入文件或二次使用许可。",
   plGuideLolCsVerified:"官方SoundCloud专辑（不含音源）。属于Creator-Safe（已与Riot官方Creator-Safe歌单核对）。播放或购买不等于二次使用许可。",
   plGuideLolCsPartial:"官方SoundCloud专辑（不含音源）。部分曲目属于Creator-Safe（已与Riot官方Creator-Safe歌单核对），其余未在歌单中找到，请先确认。播放或购买不等于二次使用许可。",
   plGuideLolCsUnverified:"官方SoundCloud专辑（不含音源）。是否属于Creator-Safe尚未核对。播放或购买不等于二次使用许可。",
@@ -818,9 +812,7 @@ Object.assign(TEXT.ko, {
   plGuideGameVol1:"비영리 소개 플레이리스트예요. 음원은 포함하지 않으니 공식 경로에서 구해 주세요.",
   plGuideClassic:"저작권이 만료된 명곡을 Musopen의 공개 녹음으로 소개해요. 음원은 포함하지 않아요.",
   plGuideBlueArchive:"NexTone.Link／Apple Music 공식 안내. 음원 없음. 구매·구독은 이용 허락이 아니에요.",
-  plGuideBlueArchiveMika:"공식 PV 2편과 Apple Music 중국 스토어 음원 3곡. Short 음원의 별도 발매는 미확인으로 제외했어요. 지역별 이용 조건이 다르며, 스트리밍이 가져올 수 있는 파일을 보장하지 않아요. 음원·영상은 미포함. 공개·구매·구독은 재이용 허가가 아니에요.",
-  plGuideBlueArchiveMikaAria:"한국어 노래 2곡과 글로벌 공식 채널의 미니 뮤지컬 본편 MV. 영어 제목은 영어 가창을 뜻하지 않아요. 음원은 Apple Music 영국 스토어로 안내하며 지역별 이용 조건이 달라요. 스트리밍이 가져올 파일을 보장하지 않아요. 미디어 미포함. 공개·구매·구독은 재이용 허가가 아니에요.",
-  plGuideBlueArchiveMikaVocals:"미카의 솔로곡 幸せになるよ, 가창에 참여한 합창곡 2곡과 공식 MV 1편. 합창 크레딧은 성우명 없이 캐릭터명으로 표시해요. 음원은 Apple Music 일본 스토어로 안내해요. 미디어 미포함. 스트리밍은 가져올 파일을 보장하지 않으며 구매·구독은 재이용 허가가 아니에요.",
+  plGuideBlueArchiveMika:"메모리얼 로비 2곡(mora / You’re My Princess는 2026년 10월 기준 공식 음원 발매 미확인으로 작곡가 X의 1분 게시물로 안내), kiss angel(Short 제외), Aria(한국어 2곡+글로벌 MV, 영어 제목은 영어 가창 의미 아님), 일본어 3곡+MV. Apple Music 중·영·일 스토어 등 지역별 조건 상이. 미디어 미포함, 공개·구매는 가져올 파일이나 재이용 허가를 보장하지 않아요.",
   plGuideLolCsVerified:"공식 SoundCloud 앨범(음원 없음). Creator-Safe 대상(Riot 공식 Creator-Safe 플레이리스트와 대조 완료). 스트리밍·구매는 2차 이용 허락이 아니에요.",
   plGuideLolCsPartial:"공식 SoundCloud 앨범(음원 없음). 일부 곡은 Creator-Safe 대상(Riot 공식 Creator-Safe 플레이리스트와 대조 완료)이고, 나머지는 플레이리스트에서 찾지 못했으니 확인이 필요해요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
   plGuideLolCsUnverified:"공식 SoundCloud 앨범(음원 없음). Creator-Safe 대상인지 아직 대조하지 않았어요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
@@ -1414,9 +1406,7 @@ function trkCatalogGuide(s, pl, forDistributionPlaylist = false) {
   const isGakumasInstrument = s.id === "gakumas" && pl && (pl.id === "gm-inst" || pl.id === "gm-inst2");
   const isGakumasDiscography = s.id === "gakumas" && pl && pl.id === "gm-releases";
   const isTouhou = s.id === "touhou";
-  const key = s.id === "bluearchive" && pl && pl.id === "ba-mika-vocals" ? "plGuideBlueArchiveMikaVocals"
-    : s.id === "bluearchive" && pl && pl.id === "ba-mika-aria" ? "plGuideBlueArchiveMikaAria"
-    : s.id === "bluearchive" && pl && pl.id === "ba-mika-kiss" ? "plGuideBlueArchiveMika"
+  const key = s.id === "bluearchive" && pl && pl.id === "ba-mika" ? "plGuideBlueArchiveMika"
     : s.id === "bluearchive" && pl && pl.sourceUrl ? "plGuideBlueArchive"
     : (s.id === "lol" || s.id === "valorant" || s.id === "riot-games") && pl ? (Object.prototype.hasOwnProperty.call(RIOT_GUIDE_KEYS, pl.creatorSafe) ? RIOT_GUIDE_KEYS[pl.creatorSafe] : "plGuideRiotLinks")
       : isGakumasInstrument ? "plGuideGakumasInst"
@@ -1481,6 +1471,18 @@ const ENDFIELD_FIRSTORDER_OLD_NAMES = Object.freeze({
     "初号指令 (上) ― Zeroth Directive Original Soundtrack Vol.1", "初号指令 (上) ― Zeroth Direct"],
   "ef-firstorder2": ["Endfield — Zeroth Directive OST Vol.2（初号指令・下）", "Endfield — Zeroth Direct",
     "初号指令 (下) ― Zeroth Directive Original Soundtrack Vol.2", "初号指令 (下) ― Zeroth Direct"]
+});
+/* 🪽 ミカの旧3リスト（trk157〜158）を1つの「聖園ミカ」（trk-ba-mika）へ統合する。削除予定日：2027-01-14（docs/MIGRATIONS.md）。 */
+const BA_MIKA_LEGACY_PL = Object.freeze({
+  ids: ["trk-ba-mika-kiss", "trk-ba-mika-aria", "trk-ba-mika-vocals"],
+  cats: ["trk:bluearchive:ba-mika-kiss", "trk:bluearchive:ba-mika-aria", "trk:bluearchive:ba-mika-vocals",
+    "bluearchive:ba-mika-kiss", "bluearchive:ba-mika-aria", "bluearchive:ba-mika-vocals"],
+  names: ["ミカ — kiss angel", "ミカ — Aria to the Star", "ミカ — ソロ＆参加曲"],
+  tags: [
+    JSON.stringify(["Blue Archive", "Mika", "CN", "PV", "Vocal"]),
+    JSON.stringify(["Blue Archive", "Mika", "KR", "Musical", "PV"]),
+    JSON.stringify(["Blue Archive", "Mika", "JP", "Vocal", "PV"])
+  ]
 });
 /* 🛰️ Endfield整頓（trk128・一回限り）：公式リストを「初号指令OST 上下を最上 → 公式アルバム6作をリリース順」に並べ直し、
    キャラクターテーマ曲4リスト（Blurring・ASHEN REMAINS・The Floaty Envelope・MAKER'S LUV）を
@@ -1572,8 +1574,45 @@ function ensureTrkDistributionPlaylists() {
       const folder = (s.id === "endfield" && ENDFIELD_CHARACTER_PL.has(pl.id)) ? ENDFIELD_CHARACTER_FOLDER : seriesFolder;
       const baseId = "trk-" + pl.id;
       const wishes = (pl.songs || []).map(trkWishFromTrack);
-      const sourceCats = new Set([s.id + ":" + pl.id, "trk:" + s.id + ":" + pl.id]);
+      const sourceCats = new Set([s.id + ":" + pl.id, "trk:" + s.id + ":" + pl.id,
+        ...(s.id === "bluearchive" && pl.id === "ba-mika" ? BA_MIKA_LEGACY_PL.cats : [])]);
       const guide = trkCatalogGuide(s, pl);
+      if (s.id === "bluearchive" && pl.id === "ba-mika") {
+        const legacyMika = core.settings.playlists.filter(p => BA_MIKA_LEGACY_PL.ids.includes(p.id));
+        if (legacyMika.length) {
+          const target = core.settings.playlists.find(p => p.id === baseId) || legacyMika[0];
+          const mergedSongs = [...new Set([target, ...legacyMika].flatMap(p => Array.isArray(p.songs) ? p.songs : []))];
+          const customName = [target, ...legacyMika].map(p => p.name).find(n => n && n !== pl.name && !BA_MIKA_LEGACY_PL.names.includes(n));
+          const customIcon = [target, ...legacyMika].map(p => p.icon).find(ic => ic && ic !== (pl.icon || s.icon));
+          const customColor = [target, ...legacyMika].map(p => p.color).find(c => c && c !== (pl.color || s.color));
+          const customFolder = [target, ...legacyMika].map(p => p.folder).find(f => f !== undefined && f !== folder);
+          const customTags = [target, ...legacyMika].map(p => p.tags).find(t => Array.isArray(t) &&
+            JSON.stringify(t) !== JSON.stringify((pl.tags || []).slice(0, 5)) && !BA_MIKA_LEGACY_PL.tags.includes(JSON.stringify(t)));
+          target.id = baseId;
+          target.cat = "trk:" + s.id + ":" + pl.id;
+          target.name = customName || pl.name;
+          target.icon = customIcon || pl.icon || s.icon;
+          target.color = customColor || pl.color || s.color;
+          if (customFolder !== undefined) target.folder = customFolder;
+          target.tags = customTags ? customTags.slice(0, 5) : (pl.tags || []).slice(0, 5);
+          if (legacyMika.some(p => p.frozen)) target.frozen = true;
+          if (legacyMika.some(p => p.locked)) target.locked = true;
+          target.songs = mergedSongs;
+          target.wish = wishes;
+          target.guide = guide;
+          core.settings.playlists = core.settings.playlists.filter(p => p === target || !BA_MIKA_LEGACY_PL.ids.includes(p.id));
+          if (typeof core.settings.libTab === "string" && BA_MIKA_LEGACY_PL.ids.includes(core.settings.libTab.slice(3))) core.settings.libTab = "pl:" + baseId;
+          if (Array.isArray(core.settings.libOpenTabs)) core.settings.libOpenTabs = [...new Set(core.settings.libOpenTabs.map(id => BA_MIKA_LEGACY_PL.ids.includes(id) ? baseId : id))];
+          if (Array.isArray(core.settings.playlistOrder)) core.settings.playlistOrder = [...new Set(core.settings.playlistOrder.map(id => BA_MIKA_LEGACY_PL.ids.includes(id) ? baseId : id))];
+          if (Array.isArray(core.settings.trkRemoved)) core.settings.trkRemoved = core.settings.trkRemoved.filter(id => !BA_MIKA_LEGACY_PL.ids.includes(id));
+          changed = true;
+        } else if (Array.isArray(core.settings.trkRemoved) && BA_MIKA_LEGACY_PL.ids.some(id => core.settings.trkRemoved.includes(id))) {
+          const allThreeRemoved = BA_MIKA_LEGACY_PL.ids.every(id => core.settings.trkRemoved.includes(id));
+          core.settings.trkRemoved = core.settings.trkRemoved.filter(id => !BA_MIKA_LEGACY_PL.ids.includes(id));
+          if (allThreeRemoved && !core.settings.trkRemoved.includes(baseId)) core.settings.trkRemoved.push(baseId);
+          changed = true;
+        }
+      }
       /* Refresh catalog-owned wish/guide fields only. Never replace owned songs or
          user-edited name, icon, or tags. */
       for (const imported of core.settings.playlists) {
@@ -1590,6 +1629,7 @@ function ensureTrkDistributionPlaylists() {
         if (!sourceCats.has(imported.cat)) continue;
         if (JSON.stringify(imported.wish) !== JSON.stringify(wishes)) { imported.wish = wishes; changed = true; }
         if (JSON.stringify(imported.guide || null) !== JSON.stringify(guide)) { imported.guide = guide; changed = true; }
+        if (s.id === "bluearchive" && pl.id === "ba-mika" && BA_MIKA_LEGACY_PL.names.includes(imported.name)) { imported.name = pl.name; changed = true; }
         if (s.id === "lol" && pl.id === "lol-svi" && imported.name === "Sessions: Vi 厳選") { imported.name = pl.name; changed = true; }
         if (s.id === "valorant" && pl.id === "val-themes" && imported.name === "VALORANT テーマ厳選") { imported.name = pl.name; changed = true; }
         if (s.id === "gakumas" && pl.id === "gm-inst" && imported.name === "学マス インスト厳選 — キャラ別 Vol.1") { imported.name = pl.name; changed = true; }

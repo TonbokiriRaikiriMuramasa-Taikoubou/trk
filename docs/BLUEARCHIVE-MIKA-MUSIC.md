@@ -8,7 +8,7 @@
 
 利用者の選択（2026-10-14）に従い、**確認済みの5項目を作り、Short音声2項目は調査候補に残しました**。Wiki上の音声を公式ダウンロード先にはしません。
 
-trk157でブルアカの9番目のリスト **「ミカ — kiss angel」**（`ba-mika-kiss`）として実装しました。チュートリアル完了済みなら既存のブルアカ棚へ `trk-ba-mika-kiss` として自動作成し、🛒カタログからも取り込めます。消したリストは勝手に戻しません。既存のOST Vol.1〜8・225曲は変更せず、trk157時点ではブルアカ全体で230項目。trk158のAriaと日本語ソロ／参加曲追加後は237項目です（[ミカ全体の索引](BLUEARCHIVE-MIKA-INDEX.md)）。カタログと突き合わせる固定記録は [`../tools/bluearchive-mika-tracklist.json`](../tools/bluearchive-mika-tracklist.json)。
+trk157でブルアカの9番目のリスト「ミカ — kiss angel」（`ba-mika-kiss`）として実装し、trk159でメモリアルロビー2曲・Aria・日本語ソロ／参加曲と合わせた1つのリスト **「🪽 聖園ミカ」**（`ba-mika`、自動作成ID `trk-ba-mika`、色 `pink`）の3〜7番目へ統合しました。チュートリアル完了済みなら既存のブルアカ棚へ自動作成し、🛒カタログからも取り込めます。消したリストは勝手に戻しません。既存のOST Vol.1〜8・225曲は変更せず、ブルアカ全体は9リスト・239項目です（[ミカ全体の索引](BLUEARCHIVE-MIKA-INDEX.md)）。カタログと突き合わせる固定記録は [`../tools/bluearchive-mika-tracklist.json`](../tools/bluearchive-mika-tracklist.json)。
 
 ## 7枠の整理
 

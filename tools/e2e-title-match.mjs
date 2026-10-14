@@ -147,72 +147,68 @@ try {
   console.log("OK  ブルアカ実カタログ：高音質・Theme番号・作者クレジットの照合／作者違いの拒否／元の名前維持");
 
   const mikaWishes = await page.evaluate(() => {
-    const p = window.Trk.core.settings.playlists.find(p => p.id === "trk-ba-mika-kiss");
+    const p = window.Trk.core.settings.playlists.find(p => p.id === "trk-ba-mika");
     window.Trk.core.settings.libTab = "pl:" + p.id;
     window.Trk.library.renderLib();
     return p.wish;
   });
-  assert.equal(mikaWishes.length, 5);
-  assert.equal((await baRows()).filter(row => row.grey).length, 5);
+  assert.equal(mikaWishes.length, 14);
+  // Daily Routine 247 は直前のブルアカVol.1テストで追加済みなので、最初から1件所持・残り13件が灰色。
+  assert.equal((await baRows()).filter(row => row.grey).length, 13);
+  assert.equal((await baRows()).filter(row => !row.grey).length, 1);
+  await add("You're My Princess");
+  assert.equal((await baRows()).filter(row => row.grey).length, 12);
+  assert.equal((await baRows()).filter(row => !row.grey).length, 2);
   // PVと同じ名前のWAVでも、映像を所持した扱いにしない。
-  await add(mikaWishes[0].t);
-  assert.equal((await baRows()).filter(row => row.grey).length, 5);
-  for (const wish of mikaWishes.filter(w => w.matchMedia === "audio")) await add(wish.t);
-  assert.equal((await baRows()).filter(row => row.grey).length, 2);
-  assert.equal((await baRows()).filter(row => !row.grey).length, 3);
+  await add(mikaWishes[2].t);
+  assert.equal((await baRows()).filter(row => row.grey).length, 12);
+  for (const wish of mikaWishes.slice(2, 7).filter(w => w.matchMedia === "audio")) await add(wish.t);
+  assert.equal((await baRows()).filter(row => row.grey).length, 9);
+  assert.equal((await baRows()).filter(row => !row.grey).length, 5);
   await page.reload({ waitUntil: "load" });
   await page.waitForFunction(() => window.Trk?.library?.allSongs().some(s => s.title === "Do you wanna kiss angel (伴奏版)"));
   const restored = await page.evaluate(() => {
-    const p = window.Trk.core.settings.playlists.find(p => p.id === "trk-ba-mika-kiss");
+    const p = window.Trk.core.settings.playlists.find(p => p.id === "trk-ba-mika");
     window.Trk.core.settings.libTab = "pl:" + p.id; window.Trk.library.renderLib();
-    return { name: p.name, media: p.wish.map(w => w.matchMedia), owned: p.songs.length, guide: p.guide.key };
+    return { name: p.name, icon: p.icon, color: p.color, media: p.wish.map(w => w.matchMedia), owned: p.songs.length, guide: p.guide.key };
   });
-  assert.deepEqual(restored, { name: "ミカ — kiss angel", media: ["video", "video", "audio", "audio", "audio"], owned: 3, guide: "plGuideBlueArchiveMika" });
-  assert.equal((await baRows()).filter(row => row.grey).length, 2);
-  assert.equal((await baRows()).filter(row => !row.grey).length, 3);
+  assert.deepEqual(restored, {
+    name: "聖園ミカ", icon: "🪽", color: "pink",
+    media: ["audio", "audio", "video", "video", "audio", "audio", "audio", "audio", "audio", "video", "audio", "audio", "audio", "video"],
+    owned: 5, guide: "plGuideBlueArchiveMika"
+  });
+  assert.equal((await baRows()).filter(row => row.grey).length, 9);
+  assert.equal((await baRows()).filter(row => !row.grey).length, 5);
   assert.deepEqual(errors, [], "pageerror / console.error");
-  console.log("OK  ミカの5項目：音源3つだけ所持・同名音声でPVを埋めない・再起動後も媒体条件維持・ページエラー0");
-  const ariaWishes = await page.evaluate(() => {
-    const p = window.Trk.core.settings.playlists.find(p => p.id === "trk-ba-mika-aria");
-    window.Trk.core.settings.libTab = "pl:" + p.id; window.Trk.library.renderLib();
-    return p.wish;
-  });
-  assert.equal(ariaWishes.length, 3);
-  assert.equal((await baRows()).filter(row => row.grey).length, 3);
-  await add(ariaWishes[2].t);
-  await add(ariaWishes[0].t + " (Instrumental)");
-  assert.equal((await baRows()).filter(row => row.grey).length, 3);
-  await add(ariaWishes[0].t);
-  await add(ariaWishes[1].matchAliases[0]); // 韓国語の公式曲名でも音源を拾う。
-  assert.equal((await baRows()).filter(row => row.grey).length, 1);
-  assert.equal((await baRows()).filter(row => !row.grey).length, 2);
+  console.log("OK  🪽聖園ミカ（14項目）：メモロビ2曲＋kiss angel音源3つ所持・同名音声でPVを埋めない・再起動後も媒体条件維持・ページエラー0");
+  await add(mikaWishes[9].t);
+  await add(mikaWishes[7].t + " (Instrumental)");
+  assert.equal((await baRows()).filter(row => row.grey).length, 9);
+  await add(mikaWishes[7].t);
+  await add(mikaWishes[8].matchAliases[0]); // 韓国語の公式曲名でも音源を拾う。
+  assert.equal((await baRows()).filter(row => row.grey).length, 7);
+  assert.equal((await baRows()).filter(row => !row.grey).length, 7);
   await page.reload({ waitUntil: "load" });
   await page.waitForFunction(() => window.Trk?.library?.allSongs().some(s => s.title === "따뜻한 푸름과 꼬리별"));
   const ariaRestored = await page.evaluate(() => {
-    const p = window.Trk.core.settings.playlists.find(p => p.id === "trk-ba-mika-aria");
+    const p = window.Trk.core.settings.playlists.find(p => p.id === "trk-ba-mika");
     window.Trk.core.settings.libTab = "pl:" + p.id; window.Trk.library.renderLib();
-    return { media: p.wish.map(w => w.matchMedia), owned: p.songs.length, guide: p.guide.key, url: p.wish[2].u };
+    return { media: p.wish.slice(7, 10).map(w => w.matchMedia), owned: p.songs.length, guide: p.guide.key, url: p.wish[9].u };
   });
-  assert.deepEqual(ariaRestored, { media: ["audio", "audio", "video"], owned: 2,
-    guide: "plGuideBlueArchiveMikaAria", url: "https://www.youtube.com/watch?v=wsq-I61IvwE" });
-  assert.equal((await baRows()).filter(row => row.grey).length, 1);
-  assert.equal((await baRows()).filter(row => !row.grey).length, 2);
+  assert.deepEqual(ariaRestored, { media: ["audio", "audio", "video"], owned: 7,
+    guide: "plGuideBlueArchiveMika", url: "https://www.youtube.com/watch?v=wsq-I61IvwE" });
+  assert.equal((await baRows()).filter(row => row.grey).length, 7);
+  assert.equal((await baRows()).filter(row => !row.grey).length, 7);
   assert.deepEqual(errors, [], "pageerror / console.error after Aria tests");
   console.log("OK  Aria：音源2曲＋Global本編MV、伴奏・同名音声による誤一致なし、韓国語曲名・再起動保持・ページエラー0");
-  const jpWishes = await page.evaluate(() => {
-    const p = window.Trk.core.settings.playlists.find(p => p.id === "trk-ba-mika-vocals");
-    window.Trk.core.settings.libTab = "pl:" + p.id; window.Trk.library.renderLib();
-    return p.wish;
-  });
-  assert.equal(jpWishes.length, 4);
-  await add(jpWishes[3].t);
-  await add(jpWishes[1].t + "(Short Ver.)");
+  await add(mikaWishes[13].t);
+  await add(mikaWishes[11].t + "(Short Ver.)");
+  assert.equal((await baRows()).filter(row => row.grey).length, 7);
+  for (const wish of mikaWishes.slice(10, 14).filter(w => w.matchMedia === "audio")) await add(wish.t);
   assert.equal((await baRows()).filter(row => row.grey).length, 4);
-  for (const wish of jpWishes.filter(w => w.matchMedia === "audio")) await add(wish.t);
-  assert.equal((await baRows()).filter(row => row.grey).length, 1);
-  assert.equal((await baRows()).filter(row => !row.grey).length, 3);
+  assert.equal((await baRows()).filter(row => !row.grey).length, 10);
   assert.deepEqual(errors, [], "pageerror / console.error after Japanese vocals tests");
-  console.log("OK  日本語ソロ＆参加曲：歌入り3曲だけ所持、Short・同名音声でMVを埋めない、ページエラー0");
+  console.log("OK  日本語ソロ＆参加曲：歌入り3曲だけ所持（音源計10項目所持／映像4項目は未所持維持）、ページエラー0");
   if (optional404s.length) console.log(`NOTE  未生成の任意OST manifestの404: ${optional404s.length}件（想定内・別記録）`);
 } finally {
   if (browser) await browser.close();

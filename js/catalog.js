@@ -435,11 +435,20 @@ S("bluearchive", "ブルーアーカイブ", "🎒", "blue", "ソーシャルゲ
      T("The Loop of Life", "Blue Archive Original Soundtrack Vol.8 ～Dreaming for the Melody of Revolution～", "KARUT", "https://music.apple.com/jp/song/the-loop-of-life/1864085784"),
      T("Funk 4 Dummies", "Blue Archive Original Soundtrack Vol.8 ～Dreaming for the Melody of Revolution～", "Aiobahn +81", "https://music.apple.com/jp/song/funk-4-dummies/1864085785")
     ], "https://nex-tone.link/A00209490"),
-   /* trk157：確認済みのPV2本＋配信3曲。Short音声は公式の個別配信先未確認につき収録しない。
-      出典・公式名・区分の根拠：docs/BLUEARCHIVE-MIKA-MUSIC.md / tools/bluearchive-mika-tracklist.json。
-      MV/JP/CN/Instrumentalの英語別名はtrkの整理用。無印の曲名・by angel・Shortは別名にしない。 */
-   PL("ba-mika-kiss", "ミカ — kiss angel", "🪽", "pink", ["Blue Archive", "Mika", "CN", "PV", "Vocal"],
-    [T("【中】圣园未花角色曲【Do you wanna kiss angel】", "Do you wanna kiss angel — Official PV", "", "https://www.bilibili.com/video/BV1zGD1YFEaS/",
+   /* trk157〜160：ミカのメモリアルロビー2曲＋旧3リスト（kiss angel 5項目／Aria to the Star 3項目／日本語ソロ＆参加曲 4項目）を
+      1つのプレイリスト「聖園ミカ」（アイコン 🪽・色 pink）へ統合。
+      並び順：メモリアルロビー2曲（Daily Routine 24/7 → You’re My Princess）→ kiss angel → Aria to the Star → ソロ＆参加曲（計14項目）。
+      You’re My Princess は2026年10月時点で公式音楽配信先が未確認のため、作曲家 EmoCosine 氏のX投稿（1分）へ案内。
+      Short音声は公式の個別配信先未確認につき収録しない。英語の掲載名を英語歌唱版とは扱わない。
+      合唱のarはCV表記だけ省略し、全員のキャラクター名を残す。映像だけの出演は歌唱参加に数えない。
+      出典・根拠：docs/BLUEARCHIVE-MIKA-INDEX.md / docs/BLUEARCHIVE-MIKA-MUSIC.md / docs/BLUEARCHIVE-MIKA-ARIA.md
+      / tools/bluearchive-mika-tracklist.json / tools/bluearchive-mika-aria-tracklist.json。 */
+   PL("ba-mika", "聖園ミカ", "🪽", "pink", ["Blue Archive", "Mika", "Vocal", "PV", "Musical"],
+    [T("Daily Routine 24/7", "Blue Archive Original Soundtrack Vol.1 ~Longing for the memorable days~", "Nor",
+       "https://mora.jp/package/43000033/PA00094941-1-1/", ["Daily Routine 247"], "audio"),
+     T("You’re My Princess", "", "EmoCosine",
+       "https://x.com/EmoCosine/status/1950427696582054373", ["You're My Princess"], "audio"),
+     T("【中】圣园未花角色曲【Do you wanna kiss angel】", "Do you wanna kiss angel — Official PV", "", "https://www.bilibili.com/video/BV1zGD1YFEaS/",
        ["Do you wanna kiss angel (CN MV)", "Do you wanna kiss angel - CN MV"], "video"),
      T("【日】圣园未花角色曲【Do you wanna kiss angel】", "Do you wanna kiss angel — Official PV", "", "https://www.bilibili.com/video/BV1zGD1YFEaS/?p=2",
        ["Do you wanna kiss angel (JP MV)", "Do you wanna kiss angel - JP MV"], "video"),
@@ -448,23 +457,14 @@ S("bluearchive", "ブルーアーカイブ", "🎒", "blue", "ソーシャルゲ
      T("Do you wanna kiss angel (日文版)", "Do you wanna kiss angel (《蔚蓝档案》圣园未花角色曲) - Single", "xTOx, Luna Safari, Sakula小舞 & 东山奈央", "https://music.apple.com/cn/song/do-you-wanna-kiss-angel-%E6%97%A5%E6%96%87%E7%89%88/1777997425",
        ["Do you wanna kiss angel (JP Ver.)", "Do you wanna kiss angel - JP Ver."], "audio"),
      T("Do you wanna kiss angel (伴奏版)", "Do you wanna kiss angel (《蔚蓝档案》圣园未花角色曲) - Single", "xTOx, Luna Safari, Sakula小舞 & 何方", "https://music.apple.com/cn/song/do-you-wanna-kiss-angel-%E4%BC%B4%E5%A5%8F%E7%89%88/1777997427",
-       ["Do you wanna kiss angel (Instrumental Ver.)", "Do you wanna kiss angel - Instrumental Ver."], "audio")],
-    "https://www.taptap.cn/moment/603897878431138731", "蔚蓝档案 / TapTap"),
-   /* trk158：音源2曲＋グローバル公式のミニミュージカル本編1本。
-      英語の掲載名を英語歌唱版とは扱わない。会話・伴奏・曲別MVは今回の3枠に含めない。
-      出典：docs/BLUEARCHIVE-MIKA-ARIA.md / tools/bluearchive-mika-aria-tracklist.json */
-   PL("ba-mika-aria", "ミカ — Aria to the Star", "🪽", "pink", ["Blue Archive", "Mika", "KR", "Musical", "PV"],
-    [T("Prismatic Diary", "Aria to the Star - Memories in Melody (Mika) [Blue Archive]", "Mika (CV. Kang Eunae)",
+       ["Do you wanna kiss angel (Instrumental Ver.)", "Do you wanna kiss angel - Instrumental Ver."], "audio"),
+     T("Prismatic Diary", "Aria to the Star - Memories in Melody (Mika) [Blue Archive]", "Mika (CV. Kang Eunae)",
        "https://music.apple.com/gb/song/prismatic-diary/1872315029", ["무지개빛 다이어리"], "audio"),
      T("The Incandescent Blue and the Comet", "Aria to the Star - Memories in Melody (Mika) [Blue Archive]", "Mika (CV. Kang Eunae)",
        "https://music.apple.com/gb/song/the-incandescent-blue-and-the-comet/1872315037", ["따뜻한 푸름과 꼬리별"], "audio"),
      T("[Blue Archive] Aria to the Star | Memories in Melody「Mika」", "", "",
-       "https://www.youtube.com/watch?v=wsq-I61IvwE", [], "video")],
-    "https://forum.nexon.com/bluearchive-en/board_view?board=3218&thread=3303925", "Nexon / Blue Archive"),
-   /* trk158：ミカの日本語ソロ／歌唱参加曲。合唱のarはCV表記だけ省略し、全員のキャラクター名を残す。
-      元のフルクレジットと根拠：docs/BLUEARCHIVE-MIKA-INDEX.md。映像だけの出演は歌唱参加に数えない。 */
-   PL("ba-mika-vocals", "ミカ — ソロ＆参加曲", "🪽", "pink", ["Blue Archive", "Mika", "JP", "Vocal", "PV"],
-    [T("幸せになるよ", "ブルーアーカイブ 絆ダイアローグ Vol.21 「ミカ」 - EP", "ミカ(CV:東山奈央)",
+       "https://www.youtube.com/watch?v=wsq-I61IvwE", [], "video"),
+     T("幸せになるよ", "ブルーアーカイブ 絆ダイアローグ Vol.21 「ミカ」 - EP", "ミカ(CV:東山奈央)",
        "https://music.apple.com/jp/song/%E5%B9%B8%E3%81%9B%E3%81%AB%E3%81%AA%E3%82%8B%E3%82%88/1867673117", [], "audio"),
      T("ワンダー・ファニー・ハーモニー", "ブルーアーカイブ「ワンダー・ファニー・ハーモニー」 - Single", "サクラコ、ヒナタ、マリー、ウイ、シミコ、ヒフミ、アズサ、ハナコ、コハル、ミカ、ツルギ、イチカ",
        "https://music.apple.com/jp/song/%E3%83%AF%E3%83%B3%E3%83%80%E3%83%BC-%E3%83%95%E3%82%A1%E3%83%8B%E3%83%BC-%E3%83%8F%E3%83%BC%E3%83%A2%E3%83%8B%E3%83%BC/1697260292", [], "audio"),
@@ -472,7 +472,7 @@ S("bluearchive", "ブルーアーカイブ", "🎒", "blue", "ソーシャルゲ
        "https://music.apple.com/jp/song/lets-go-with/1861397911", [], "audio"),
      T("【ブルアカ】5周年記念楽曲「Let's Go With…」MV", "", "アスナ、キララ、スバル、ミカ、ミヨ、ユカリ",
        "https://www.youtube.com/watch?v=PdnDedDp-5A", [], "video")],
-    "https://bluearchive.jp/", "Blue Archive / Yostar")]);
+    "https://bluearchive.jp/", "Blue Archive")]);
 
 /* ================= 🩺 アークナイツ（Hypergravity / Yostar） =================
    公式レーベル「Monster-Siren Records（塞壬唱片）」は全楽曲を公式サイトで公開・販売。

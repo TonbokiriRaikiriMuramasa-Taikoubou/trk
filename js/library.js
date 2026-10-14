@@ -154,7 +154,7 @@ async function initOptionalTutorialDemo() {
    音源は選んだときに読む（materializeAgentOst）。消したら trkRemoved に印が残る（🐔 の ♻ で戻せる）。 */
 const AGENT_OST_ID = "trk-agent-ost-v1";
 const AGENT_OST_CAT = "trk:agent-ost";
-const AGENT_OST_NAME = "trk Agent's Original Vol.1";
+const AGENT_OST_NAME = "trk Agent's Orig. Vol.1";   /* 名前は24文字まで（plSanitize）。正式名は "trk Agent's Original Vol.1" */
 const AGENT_OST_DIR = "./assets/trk-ost/";
 const AGENT_OST_MAX_BYTES = 4 * 1024 * 1024;   /* 1曲 約0.9〜1MB。上限は余裕を見た値 */
 const AGENT_OST_KEY_PREFIX = "builtin:trk-agent-ost:";
@@ -205,7 +205,7 @@ async function materializeAgentOst(it) {
   return ready;
 }
 
-/* 📤 ミュージックフォルダを共有
+/* 📤 ミュージックフォルダを共有（許可は1回。中身のリストをぜんぶ取り込む）まわりの状態 */
 let sharedSongs = [];        /* 💾 端末に残してある共有の曲（リロード後も残る） */
 let libShared = false;       /* いまの libHandle が「📤 共有」でもらったものか（📁 開く と区別するため） */
 let shareRemembered = false; /* 共有の許可を覚えているか（まだつながっていなくても 🚫 を出せるように） */

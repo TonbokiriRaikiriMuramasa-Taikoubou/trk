@@ -170,6 +170,12 @@ const TRK_ENUM_VALUES = {
   chartGen: ["1", "2"]          // 🎼 自動譜面の作り方（1＝旧方式、2＝新方式・既定。js/chart-gen.js）
 };
 
+/* 🧭 チュートリアルのスタンプを読み込む（trk140）。既知の8つだけを残し、重複を除く。旧「曲を選ぶ」song は play へ引き継ぐ。 */
+function tutorialStampsFrom(raw) {
+  const known = ["play", "look", "safe", "back", "amp", "study", "studyBack", "seed"];
+  const list = Array.isArray(raw) ? raw : [];
+  return [...new Set(list.map(x => x === "song" ? "play" : x))].filter(x => known.includes(x));
+}
 const settings = {
   language: pick(prefs.language, ["ja", "en", "zh", "ko"], guessLang()),
   skin: has(window.Trk.data.SKINS, prefs.skin) ? prefs.skin : (prefs.skin === "dark" ? "shadow" : prefs.skin === "light" ? "daylight" : "shadow"),
@@ -206,7 +212,7 @@ const settings = {
   playerMode: !!prefs.playerMode,
   helpText: prefs.helpText !== false,
   tutorialDone: prefs.tutorialDone === true,
-  tutorialStamps: [...new Set((Array.isArray(prefs.tutorialStamps) ? prefs.tutorialStamps : []).map(x => x === "song" ? "play" : x))].filter(x => ["play", "look", "safe", "back", "amp", "study", "studyBack", "seed"].includes(x)),   /* 🧭 スタンプ（順番自由・8つでごほうび。旧「曲を選ぶ」は「曲を流す」へ引き継ぐ） */
+  tutorialStamps: tutorialStampsFrom(prefs.tutorialStamps),   /* 🧭 スタンプ（順番自由・8つでごほうび。旧「曲を選ぶ」は「曲を流す」へ引き継ぐ） */
   skinGradUnlocked: prefs.skinGradUnlocked === true,
   menuKey: validCode(prefs.menuKey) ? prefs.menuKey : "KeyM",
   menuConfirm: prefs.menuConfirm !== false,

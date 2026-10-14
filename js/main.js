@@ -213,7 +213,13 @@ function welcomeClose(openGuide) {
 core.$("welcomeCloseBtn").addEventListener("click", () => welcomeClose(false));
 core.$("welcomeGuideBtn").addEventListener("click", () => welcomeClose(true));
 core.$("welcomeBox").addEventListener("click", e => { if (e.target === e.currentTarget) welcomeClose(false); });
-if (!core.settings.welcomeSeen && !core.settings.tutorialDone) { core.$("welcomeBox").hidden = false; core.$("welcomeCloseBtn").focus(); }
+/* 緊急復旧（セーフモード）のときは出さない。緊急復旧の「ようこそをもう一度」から再表示できる */
+function welcomeShow() {
+  const box = core.$("welcomeBox"); if (!box) return;
+  box.hidden = false; core.$("welcomeCloseBtn").focus();
+}
+core.$("emergencyWelcomeBtn").addEventListener("click", () => { core.settings.welcomeSeen = false; core.saveUserPrefs(); welcomeShow(); });
+if (!core.settings.welcomeSeen && !core.settings.tutorialDone && !core.safeModeOn) welcomeShow();
 
 /* ---------- 全画面 ---------- */
 const fullscreenSupported = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);

@@ -25,6 +25,8 @@
 
 ## Media player only, and lighter builds
 
+On the first launch, a “Welcome to trk!” box appears once (rhythm game, music player, video, Study Room for picture books and text, and everything works without an internet connection). You can show it again from **⚙ Settings → 🛟 Emergency Recovery → 👋 Show the welcome again**.
+
 Press **Skip** in the quick guide if you do not need the tutorial. To listen without starting a game, long-press the TV dock's **⏻ power** button and load your own music.
 
 The optional FIRST SPARK demo lives in `assets/optional-demo-audio/` (about 704 KiB; the MP3 is fetched only when selected). It ships **handmade Easy / Normal / Hard charts** (27 / 54 / 111 notes on the song's 128 BPM four-on-the-floor grid) as plain `shadow-taiko-chart` JSON, fetched only when that difficulty is used; MASTER and RUSH stay generated from the seed. For a lighter build, delete the **entire folder**; without its `manifest.json`, the demo entry and button stay hidden. Set `"charts": false` (or remove only the chart JSON files) to keep the audio with generated charts. This does not affect the media player or your own songs. If the audio was already cached, clear the site's data/service-worker cache to reclaim that stored copy.

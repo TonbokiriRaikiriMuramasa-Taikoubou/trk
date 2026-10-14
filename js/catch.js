@@ -15,7 +15,7 @@
 /* ============ 文章 ============ */
 Object.assign(TEXT.ja, {
   catchHint:"落ちてくる荷物を荷台で受け止めます。←→（A・Dでも可）で左右に動き、画面をなぞっても動かせます。道の上のニトロ缶🚀を取ると、しばらく「ぶっ飛ばしモード」（受け止める幅2倍・移動が速くなる）になります。",
-  catchKeysTitle:"🚛 CATCHのキー", catchLeft:"左へ", catchRight:"右へ", catchKeyReset:"↺ ← ／ → に戻す",
+  catchKeysTitle:"🚛 CATCHのキー", catchLeft:"左へ", catchRight:"右へ", catchKeyReset:"↺ A ／ Space に戻す",
   catchCapture0:"「左へ」に割り当てるキーを押してください。ESCでキャンセル。",
   catchCapture1:"「右へ」に割り当てるキーを押してください。ESCでキャンセル。",
   catchAssigned:"CATCHのキーを設定しました。",
@@ -25,7 +25,7 @@ Object.assign(TEXT.ja, {
 });
 Object.assign(TEXT.en, {
   catchHint:"Catch the falling parcels in your truck bed. Move with ← → (or A / D), or drag on the screen. Grab a nitro can 🚀 on the road to enter Blast mode for a while (double catch width, faster moves).",
-  catchKeysTitle:"🚛 CATCH keys", catchLeft:"Left", catchRight:"Right", catchKeyReset:"↺ Back to ← / →",
+  catchKeysTitle:"🚛 CATCH keys", catchLeft:"Left", catchRight:"Right", catchKeyReset:"↺ Back to A / Space",
   catchCapture0:"Press a key for “Left”. ESC cancels.", catchCapture1:"Press a key for “Right”. ESC cancels.",
   catchAssigned:"CATCH key assigned.",
   blastToast:"🚀 BLAST!", blastLabel:"🚀 BLAST", blastCount:"🚀 Blasts: {n}",
@@ -34,7 +34,7 @@ Object.assign(TEXT.en, {
 });
 Object.assign(TEXT.zh, {
   catchHint:"用货斗接住落下的包裹。用 ← →（或 A·D）左右移动，也可以在画面上拖动。拿到路上的氮气罐🚀，会进入一段时间的“狂飙模式”（接取范围2倍·移动更快）。",
-  catchKeysTitle:"🚛 CATCH 按键", catchLeft:"向左", catchRight:"向右", catchKeyReset:"↺ 恢复为 ← ／ →",
+  catchKeysTitle:"🚛 CATCH 按键", catchLeft:"向左", catchRight:"向右", catchKeyReset:"↺ 恢复为 A ／ Space",
   catchCapture0:"请按下“向左”的按键。ESC取消。", catchCapture1:"请按下“向右”的按键。ESC取消。",
   catchAssigned:"已设置CATCH按键。",
   blastToast:"🚀 狂飙！", blastLabel:"🚀 BLAST", blastCount:"🚀 狂飙：{n}次",
@@ -43,7 +43,7 @@ Object.assign(TEXT.zh, {
 });
 Object.assign(TEXT.ko, {
   catchHint:"떨어지는 짐을 짐칸으로 받습니다. ← →(A·D도 가능)로 좌우로 움직이고, 화면을 드래그해도 됩니다. 길 위의 니트로 캔🚀을 먹으면 잠시 '폭주 모드'(받는 폭 2배·이동이 빨라짐)가 됩니다.",
-  catchKeysTitle:"🚛 CATCH 키", catchLeft:"왼쪽", catchRight:"오른쪽", catchKeyReset:"↺ ← ／ → 로 되돌리기",
+  catchKeysTitle:"🚛 CATCH 키", catchLeft:"왼쪽", catchRight:"오른쪽", catchKeyReset:"↺ A ／ Space 로 되돌리기",
   catchCapture0:"'왼쪽'으로 지정할 키를 누르세요. ESC로 취소.", catchCapture1:"'오른쪽'으로 지정할 키를 누르세요. ESC로 취소.",
   catchAssigned:"CATCH 키를 설정했습니다.",
   blastToast:"🚀 폭주!", blastLabel:"🚀 BLAST", blastCount:"🚀 폭주: {n}회",
@@ -52,7 +52,7 @@ Object.assign(TEXT.ko, {
 });
 
 /* ============ 設定 ============ */
-const CATCH_DEFAULT_KEYS = ["ArrowLeft", "ArrowRight"], CATCH_ALT = ["KeyA", "KeyD"];
+const CATCH_DEFAULT_KEYS = ["KeyA", "Space"], CATCH_ALT = ["ArrowLeft", "ArrowRight"];   /* 既定：左＝A（ドン）、右＝Space（カッ）。← → も使える */
 core.settings.catchKeys = (Array.isArray(core.prefs.catchKeys) && core.prefs.catchKeys.length === 2 && core.prefs.catchKeys.every(core.validCode) && core.prefs.catchKeys[0] !== core.prefs.catchKeys[1])
   ? core.prefs.catchKeys.slice() : CATCH_DEFAULT_KEYS.slice();
 const isCatch = () => core.settings.playMode === "catch";
@@ -75,7 +75,7 @@ const alwaysBlast = () => NITRO_SEEDS.includes((core.$("seed").value || "").trim
 core.on("phase", p => { if (p === "playing" && isCatch() && alwaysBlast() && !core.settings.autoPlay) core.practice = true; });
 
 /* ============ 形（1920×1080の座標）と状態 ============ */
-const CATCH = { left:410, width:1100, topY:70, lineY:880, speed:1.5, half:.085, perfect:.05, item:.11, boost:1.6, blastBeats:8 };
+const CATCH = { left:410, width:1100, topY:70, lineY:880, speed:1.5, half:.085, perfect:.05, item:.11, boost:1.6, blastMs:10000 };   /* ぶっ飛ばし：10秒（固定。重なれば足される） */
 const catchX = x => CATCH.left + x * CATCH.width;
 const catchState = { x:.5, target:null, held:[false, false], last:0, blastUntil:-1e9, blastLen:1, trail:[] };
 const catchMap = { src:null, len:0, key:"", xs:new Float32Array(0), items:[] };
@@ -128,7 +128,7 @@ function blastSound() {
   o.connect(g).connect(ac.destination); o.start(t); o.stop(t + .5);
 }
 function triggerBlast(now, it) {
-  const len = 60000 / (core.chartMeta.bpm || 120) * CATCH.blastBeats;
+  const len = CATCH.blastMs;
   const start = Math.max(catchState.blastUntil, now);
   catchState.blastUntil = start + len;
   catchState.blastLen = catchState.blastUntil - now;
@@ -179,10 +179,10 @@ function catchJudge(now) {
     if (n.judged) continue;
     const dx = Math.abs(catchMap.xs[i] - catchState.x);
     if (dx <= CATCH.half * k) {
-      const kind = dx <= CATCH.perfect * k ? "perfect" : "good";
-      if (bonus) core.stats.blastBonus = (core.stats.blastBonus || 0) + (kind === "perfect" ? 1 : .5);
+      /* CATCHは good を持たない：捕まえたら必ず perfect。ぶっ飛ばし中は常に★（精度完璧）扱い */
+      if (bonus) core.stats.blastBonus = (core.stats.blastBonus || 0) + 1;
       window.Trk.media.playSE(n.lane);
-      window.Trk.play.judgeNote(n, kind, dx <= CATCH.perfect * k * .5 ? 0 : null);
+      window.Trk.play.judgeNote(n, "perfect", (k > 1 || dx <= CATCH.perfect * .5) ? 0 : null);
       if (k > 1) launchParcel(catchMap.xs[i], n.lane);
     } else window.Trk.play.judgeNote(n, "miss", null);
     if (core.phase !== "playing") return;
@@ -319,7 +319,7 @@ function drawCatchField(now) {
   }
   if (!core.settings.hideGameplayUI && !core.settings.autoPlay) {
     core.ctx.font = `800 20px ${core.fontFamily()}`; core.ctx.textAlign = "center"; core.ctx.textBaseline = "middle"; core.ctx.fillStyle = g.ink;
-    core.ctx.fillText(`◀ ${core.formatKey(core.settings.catchKeys[0])} / A      D / ${core.formatKey(core.settings.catchKeys[1])} ▶`, 960, window.Trk.data.H - 30);
+    core.ctx.fillText(`◀ ${core.formatKey(core.settings.catchKeys[0])} / ${core.formatKey(CATCH_ALT[0])}      ${core.formatKey(CATCH_ALT[1])} / ${core.formatKey(core.settings.catchKeys[1])} ▶`, 960, window.Trk.data.H - 30);
   }
   core.ctx.restore();
 }

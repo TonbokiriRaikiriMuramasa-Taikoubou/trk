@@ -131,7 +131,7 @@ Sixteenth notes from Advanced upward (94–75 ms apart at 160–200 BPM) are abo
 | Key | Action |
 |---|---|
 | A / Space | Don / Ka (MANUAL; changeable) |
-| ↑↓ / ←→ | TRUCK lane change / CATCH movement |
+| ↑↓ / ←→ / A・Space | TRUCK lane change / CATCH movement (CATCH defaults: A = left, Space = right; ← → also work) |
 | D F J K etc. | STAGE lanes |
 | Any key | ORBIT |
 | P / Esc | Pause and resume |

@@ -7,7 +7,7 @@
 | キー | 動作 |
 |---|---|
 | A ／ Space | ドン ／ カッ（MANUAL。変更可） |
-| ↑↓ ／ ←→ | TRUCKのレーン移動 ／ CATCHの移動 |
+| ↑↓ ／ ←→ ／ A・Space | TRUCKのレーン移動 ／ CATCHの移動（CATCHの既定は A＝左、Space＝右。← → も使えます） |
 | D F J K など | STAGEのレーン |
 | どのキーでも | ORBIT |
 | P ／ Esc | 一時停止・再開 |

@@ -203,6 +203,18 @@ core.$("tutorialReplayBtn").addEventListener("click", () => {
   if (typeof closeSettings === "function") core.closeSettings();
 });
 
+/* 👋 はじめての「trk!にようこそ！」（trk144）：一度だけ。チュートリアルを済ませた人・スキップした人には出さない。 */
+function welcomeClose(openGuide) {
+  const box = core.$("welcomeBox"); if (!box) return;
+  box.hidden = true;
+  core.settings.welcomeSeen = true; core.saveUserPrefs();
+  if (openGuide) guideSetOpen(true);
+}
+core.$("welcomeCloseBtn").addEventListener("click", () => welcomeClose(false));
+core.$("welcomeGuideBtn").addEventListener("click", () => welcomeClose(true));
+core.$("welcomeBox").addEventListener("click", e => { if (e.target === e.currentTarget) welcomeClose(false); });
+if (!core.settings.welcomeSeen && !core.settings.tutorialDone) { core.$("welcomeBox").hidden = false; core.$("welcomeCloseBtn").focus(); }
+
 /* ---------- 全画面 ---------- */
 const fullscreenSupported = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
 function toggleFullscreen() {

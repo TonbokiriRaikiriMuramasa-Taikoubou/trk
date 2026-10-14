@@ -1858,3 +1858,17 @@ body.noMoreBtns .moreBtn { display:none !important; }
 
 /* 🔧 開発者表示（設定 devView がオフのとき隠す） */
 body.noDev .devOnly { display: none !important; }
+
+/* 👋 はじめての「trk!にようこそ！」（trk144）。一度だけ出る。背景を押すか、ボタンで閉じる。 */
+.welcomeBox{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.6)}
+.welcomeBox[hidden]{display:none}
+.welcomeCard{max-width:460px;width:100%;max-height:calc(100vh - 36px);overflow:auto;padding:24px 26px;border:1px solid var(--ui-border);border-radius:16px;background:var(--ui-panel);box-shadow:var(--ui-shadow);color:var(--ui-text)}
+.welcomeCard h2{margin:0 0 8px;font-size:22px;color:var(--ui-gold)}
+.welcomeLead{margin:0 0 12px;font-size:14px;line-height:1.6}
+.welcomeList{margin:0 0 12px;padding:0;list-style:none;display:grid;gap:8px}
+.welcomeList li{font-size:14px;line-height:1.5;padding:8px 10px;border-radius:10px;background:var(--ui-soft)}
+.welcomeHint{margin:0 0 16px;font-size:12px;opacity:.75}
+.welcomeActions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.welcomeBtn{min-height:40px;padding:8px 16px;border-radius:999px;border:1px solid var(--ui-border);background:var(--ui-soft);color:var(--ui-text);font:inherit;font-weight:700;cursor:pointer}
+.welcomeBtn.primary{background:var(--ui-gold);border-color:var(--ui-gold);color:#15111a}
+.welcomeBtn:focus-visible{outline:2px solid var(--ui-gold);outline-offset:2px}

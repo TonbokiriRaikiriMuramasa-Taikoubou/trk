@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-14（trk143）**。現在の仕様・守る条件・未確認事項の要約です。細かな過去の作業履歴（trk123以前）と trk114〜118 の検証の詳細は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-14（trk144）**。現在の仕様・守る条件・未確認事項の要約です。細かな過去の作業履歴（trk123以前）と trk114〜118 の検証の詳細は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検。
 
@@ -216,6 +216,7 @@
 
 ## 7. 最近の変更
 
+- **trk144（2026-10-14）**：**初回の入口：「trk!にようこそ！」**。初回だけ出る案内（index.html `#welcomeBox`）。5つの強み（音ゲー・再生プレイヤー・動画・書斎・インターネット接続なしで遊べ、曲や記録は外へ送られない）と、「チュートリアルを開く」「閉じて遊ぶ」。保存は `settings.welcomeSeen`（保存データ。移行ではないので登録簿の対象外）。チュートリアルを済ませた人・スキップした人には出さない。4言語をそろえた。README に「ひとつの箱で、いろいろ遊べます」の節を追加。E2E（/tmp/pp/e2e-guide.cjs）18件 pass ×2。注意：「インターネットに繋がなくても遊べる」は、外部への通信がないこと（SECURITY.md）と、SW の仕組みに基づく。オフライン動作の実機確認は §4 の7で未了。未決：ギミックボックス（意図して残す仕掛けの範囲と見つけ方）は、利用者の判断待ち。
 - **trk143（2026-10-14）**：**一回限りの移行・印の整理**。`docs/MIGRATIONS.md` を登録簿にした（`trkEndfieldTidy1`・`trkEndfieldTidy2`・旧名の表は削除予定日 2027-01-14。3か月後の提案）。`trkRemoved` は利用者の操作を覚える保存データなので対象外。`tools/check-repo.mjs` に登録簿の検査を追加（表とコードのずれ＝失敗、期限切れ＝警告）。コードは消していない（期限まで残す）。コメントの参照先を登録簿へ。
 - **trk142（2026-10-14）**：**保守の三点**。①§4を一覧表にした（原文は §4.1 に一字も変えずに残した。状態：11は実機で確認済み（2026-10-12）、ほかは未確認）。②一回限りの移行の一覧を §4.2 に追加し、削除予定（trk150以降、条件つき）を関数のコメントに書いた。③30秒デモの残骸を削除：`window.TrkSelectTutorialSong`（呼び出しはなくなっていた）と、ボタンを触る処理。同梱の FIRST SPARK 曲（`optional-demo-audio/`）と、その読み込みは残す（曲リストに出る）。`tests/fixtures/globals-baseline.json` を `node tools/globals-audit.mjs --write` で更新（以前の変更の分もまとめて反映）。`smoke-baseline.json` から該当名を1つ削除。注意：監査の「重複宣言 1（api）」は誤検出（midi-profiles・midi-player・midi-settings の `api` はどれも IIFE の中）。監査ツールの改善は未着手。検査：npm run check 284 pass、0 fail。
 - **trk141（2026-10-14）**：**保守①（文字列一致の検査を、動きの検査へ）の最初の一件**。チュートリアルのスタンプ読み込みを `tutorialStampsFrom(raw)`（js/core.js）として切り出し、`tests/tutorial-stamps.test.mjs`（4件）で入出力を確かめる。動作は変えない（旧 `song`→`play`、重複除去、8つ以外を捨てる）。残り：`tools/check-repo.mjs`（約2800行・文字列検査が多い）、`check-security.mjs`、`check-study-room.mjs` の文字列検査は未着手。次は、保存値の読み込み・移行の関数から順に、同じ形（区切り文字で切り出し＋vm）へ置き換える。

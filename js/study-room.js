@@ -1403,9 +1403,10 @@ async function studyImportImageGroup(group, id, position, total) {
     return "error";
   }
 }
-/* アルバム（1冊）の上限（trk139）。画像フォルダと CBZ/ZIP で同じ判定。「容量の上限を無視」で外れる。 */
-function studyAlbumLimits() {
-  return { count:studyCap(STUDY_IMAGE_MAX_COUNT), bytes:studyCap(STUDY_IMAGE_MAX_BYTES), file:studyCap(STUDY_IMAGE_FILE_MAX) };
+/* アルバム（1冊）のアプリ上限（trk139）。archive の1ページ上限は圧縮爆弾対策として常に固定する。 */
+function studyAlbumLimits({ archive = false } = {}) {
+  return { count:studyCap(STUDY_IMAGE_MAX_COUNT), bytes:studyCap(STUDY_IMAGE_MAX_BYTES),
+    file:archive ? STUDY_IMAGE_FILE_MAX : studyCap(STUDY_IMAGE_FILE_MAX) };
 }
 /* 上限で止めた理由の文言（{key, vars}）。取り込みの開始で状態欄が消えるため、集計のあとに出す。 */
 function studyAlbumMessage(problem) {
@@ -1465,15 +1466,15 @@ async function studyImportArchiveBook(job, position, total) {
   const { file, zip, pages, id } = job;
   const old = await studyExistingBook(id);
   const generation = studyNewGeneration(), refs = [];
-  const zipIO = window.Trk.zipIO, pageMax = studyCap(STUDY_IMAGE_FILE_MAX);
+  const zipIO = window.Trk.zipIO, pageMax = STUDY_IMAGE_FILE_MAX;   /* 圧縮爆弾対策の展開上限は「無視」設定でも残す */
   try {
     for (let i = 0; i < pages.length; i += STUDY_BATCH_WRITE) {
       if (studyImportState.cancelled) throw Object.assign(new Error("Study import cancelled"), { studyCancelled:true });
       const batch = [];
       for (let j = i; j < Math.min(i + STUDY_BATCH_WRITE, pages.length); j++) {
         const entry = pages[j], key = `page:${id}:${generation}:${j}`, type = STUDY_UTIL.mimeOf(entry.name);
-        const blob = await zipIO.zipEntryBlob(zip, entry, pageMax);
-        if (blob.size !== entry.usize || zipIO.crc32(new Uint8Array(await blob.arrayBuffer())) !== entry.crc) throw new zipIO.ZipIOError("zipCorrupt");
+        const blob = await zipIO.zipEntryBlob(zip, entry, pageMax, true);
+        if (blob.size !== entry.usize) throw new zipIO.ZipIOError("zipCorrupt");
         refs.push({ key, name:String(entry.name).split("/").pop().slice(0, 240), path:String(entry.name).slice(0, 500), size:entry.usize, type });
         batch.push([key, new Blob([blob], { type })]);
       }
@@ -1500,7 +1501,7 @@ async function studyImportArchives(files) {
   const zipIO = window.Trk.zipIO;
   const jobs = [], notes = [];
   let listFailed = 0;
-  const limits = studyAlbumLimits();
+  const limits = studyAlbumLimits({ archive:true });   /* 展開後の1ページ上限だけは常に固定 */
   for (const file of files) {
     try {
       const zip = await zipIO.zipOpen(file);
@@ -3174,5 +3175,6 @@ window.TrkStudyRoom = Object.freeze({
 window.Trk = window.Trk || {};
 window.Trk.study = window.TrkStudyRoom;
 /* 書斎の上限の値（trk137）。復元の事前確認（backup.js）が同じ数字で判定するために公開する */
-window.Trk.studyLimits = Object.freeze({ shelf:STUDY_SHELF_MAX, pages:STUDY_IMAGE_MAX_COUNT, textBytes:STUDY_TEXT_FILE_MAX });
+window.Trk.studyLimits = Object.freeze({ shelf:STUDY_SHELF_MAX, pages:STUDY_IMAGE_MAX_COUNT, imageBytes:STUDY_IMAGE_MAX_BYTES,
+  imageFileBytes:STUDY_IMAGE_FILE_MAX, textBytes:STUDY_TEXT_FILE_MAX });
 })();

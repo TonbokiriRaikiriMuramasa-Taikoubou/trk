@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-14（trk159）**。現在の仕様・守る条件・未確認事項の要約です。過去の変更履歴（trk154以前）と検証記録（trk158以前）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-15（trk162）**。現在の仕様・守る条件・未確認事項の要約です。過去の変更履歴（trk154以前）と検証記録（trk158以前）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検。
 
@@ -99,9 +99,17 @@
 ### 書斎のCBZ／ZIP（trk138）
 
 - 1ファイル＝1冊の画像の本。ページは `page:{id}:{generation}:{n}` のキーで保存し、置き換えは画像フォルダと同じ `studyWriteImageRecord` を使う。
-- 上限は書斎の画像と同じ（3000ページ・合計600MB・1ページ100MB）。上限の判定は取り込み前に行い、超えるファイルは作らない。
+- 通常上限は書斎の画像と同じ（3000ページ・合計600MiB・1ページ100MiB）。「容量の上限を無視」で冊数・ページ数・合計容量・通常画像の単体上限は外せますが、圧縮爆弾対策の **CBZ／ZIP内1ページ100MiB展開上限は常に残す**。ZIP読取の固定構造上限（1アーカイブ25万項目・中央目録64MiB）も設定では解除されません。上限の判定は取り込み前に行い、超えるファイルは作らない。
 - 失敗の理由は、1冊も入らなかったときは状態欄に、途中まで入ったときは集計の後ろに添えて出す（取り込みの開始と本を開く処理は状態欄を消すため、その後に出す）。
 - 失敗の表示は、ファイルごとの文言が最後の集計（`Done: …`）で上書きされる。画像フォルダと同じ動き。
+
+### 📦 まるごとバックアップ・端末保存（trk136〜137・160〜162）
+
+- 設定画面から `navigator.storage.persist()` を要求／状態表示します（`?safe=1` は要求しない）。まるごとバックアップは core（localStorage許可リスト＋ライブラリ）・書斎・パックを既定で含み、曲・VRM・MMDなど大きいmediaは任意です。ZIP64対応、復元前に全エントリーのCRC・サイズをストリームで確認し、宣言サイズを超えた展開はその場で止めます。localStorageは `LS_KEYS` の許可リストだけを読み書きします。
+- 書き出し側のCRCもBlobの `stream()` で計算し、ファイル全体を `arrayBuffer()` にしません。復元のBlob参照はZIP内のsliceで保持します（JSON化・IndexedDB書込み自体は必要な箇所で行います）。`.stpack`の読み込み・生成も共通ZIP経路を使い、パック全体を`ArrayBuffer`へ載せず、個々の展開ファイルもCRC・実サイズを確認します。
+- **固定の解析安全上限（trk162）**：共通ZIP reader/writerは1アーカイブ250,000項目・中央目録64MiB。バックアップはさらにメタデータ1MiB、設定JSON20MiB、DBストアJSON64MiB／250,000レコード／ストア、圧縮エントリー展開64MiBまで（backup.jsonは1MiB・local.jsonは20MiB）。書き出し側も早めに検査し、「容量の上限を無視」では外しません。CBZ／ZIPはこの構造上限に加え、展開後1ページ100MiBを維持します。
+- 復元時のアプリ上限（無視設定がオフのとき）は、書斎500冊・1冊3000ページ・画像アルバム600MiB／100MiB/画像・文章12MiB、パック500MiB/件・合計1GiB。画像サイズは `page.size` ではなくZIPの検証済みBlobエントリー実サイズを確認。すべての上限を無視してもブラウザ容量・メモリ上限は残ります。
+- パック領域の復元は、先に既存インストーラで各パックを試し、最後にバックアップに無いIDだけ削除します。IDは正規化後の名前＋作者から算出。対象パックの導入失敗時は同じIDの既存版を残し、manifestから全IDを特定できないバックアップでは削除処理をしません。完了時に導入・失敗・削除件数と、同一ID保護／整理見送りをダイアログで表示し、確認後に再読み込みします。保存容量不足時に成功を保証するものではありません。
 
 ### 書斎の設定と画像キー（trk133〜135）
 
@@ -112,13 +120,13 @@
 
 ### 維持中の既存機能
 
-- **🎓 trk's OST Vol.1（オリジナル曲の置き場）**：🐔 trk's playlist の中、Game Vol.1 の直下にあります（`TRK_OST_ID = "trk-ost-v1"`）。今はチュートリアルのデモ曲1曲のみ。trk113の手続き生成スケッチ（下記）はまだアプリ未組込で、将来ここへ増やしていく想定です。trk112が最上位に作ったものだけを一度trkフォルダへ移し（印は `cat: "trk:ost"`）、以後は利用者が動かした場所を守ります。
-- **消した自動リストは作り直さない（trk114）**：trk!が自動で作るリスト（IDが `trk-` で始まる Game Vol.1・Classic Vol.1・trk's OST Vol.1・カタログの各リスト）を消すと、`settings.trkRemoved` に印が残り、次の起動で作り直しません。設定「🐔 trk's playlist」の **♻ 消したtrkのリストを戻す（n件）**で印を外して作り直します（Game Vol.1／Classic Vol.1の「開く」ボタンもその1件の印を外す）。印は `trk-` で始まるIDだけ・200件までに検証し、全リセットで空に戻ります。
+- **🎓 trk's OST Vol.1（`trk-ost-v1`）**：🐔 trk's playlist の Game Vol.1 直下。今は FIRST SPARK のデモ1曲を置く棚です。手続き生成曲は別の **trk Agent's OST Vol.1（`trk-agent-ost-v1`）** にmanifest経由で接続済み（下記）。trk112が最上位に作った本棚だけを一度trkフォルダへ移し（印は `cat: "trk:ost"`）、以後は利用者が動かした場所を守ります。
+- **🎼 手続き作曲ツール／任意のAgent OST（trk113・trk149〜151）**：`node tools/make-trk-ost.mjs` で5ルール×2曲＝10曲のWAVスケッチと `assets/trk-ost/manifest.json` を生成（外部ライブラリなし・決定的）。アプリ側にはmanifest読込み・専用リスト作成・選択時の音源読込みを実装済みです。ただし音源とmanifestは `.gitignore` 対象で、公開リポジトリには入っていません。既定コードの `AGENT_OST_MANIFEST_INCLUDED=false` は任意資産をfetchしない印です。音源を意図的に含める配布／試験ビルドだけ true にし、生成したmanifest・WAVと一緒に配布します。10曲の実聴取・品質評価は未確認（§4-6）。
+- **消した自動リストは作り直さない（trk114）**：trk!が自動で作るリスト（IDが `trk-` で始まる Game Vol.1・Classic Vol.1・trk's OST Vol.1・Agent's OST Vol.1・カタログの各リスト）を消すと、`settings.trkRemoved` に印が残り、次の起動で作り直しません。設定「🐔 trk's playlist」の **♻ 消したtrkのリストを戻す（n件）**で印を外して作り直します（Game Vol.1／Classic Vol.1の「開く」ボタンもその1件の印を外す）。印は `trk-` で始まるIDだけ・200件までに検証し、全リセットで空に戻ります。
 - **入手先ガイドは表示言語で出す（trk114）**：公式カタログ由来のガイドは辞書キー（`plGuide…`）と日本語の控えを保存し、表示時に今の言語で引きます（LoL・Endfield・ブルアカ・学マス・Game／Classic Vol.1など21キー×4言語）。既存の保存データは起動時に自動で鍵が付きます。カタログ本体の各シリーズ説明文（`js/catalog.js` の `note`）はまだ日本語だけです。
 - **小さなアクセント文字の色（trk114）**：`--ui-accent-ink`（`js/data.js` の `accentInk`、`applySkin` が毎回設定）。設定画面の入れ子の欄（カード＋パネル＋小欄の重なり）でも4.5:1になるまで、アクセントを本文の色へ5%ずつ寄せます。足りているスキンは元の色のまま。44スキン中16スキンで色が少し変わりました（スキンの棚の見出し、リンク、記録表の選択行など13ルール＋fx.jsのリンク1箇所）。
 - **曲名バナーの操作（trk73・trk126）**：バナーの**右端に [◀][🎲][▶]**（前後の曲・おまかせ。🎲 は既定で長押し650ms、設定で「タップだけ」「非表示」を選べる）、**右下に [⏯][🔊]**（同じ大きさのアイコンだけのボタンを並べた `.bannerMediaBar`）。🔊 は短押しでスライダー・長押しでミュート／復元。**⏯ は選曲中にプレビューの音を止める／鳴らす**（止めたところから鳴り直す）、曲の再生中・一時停止中はゲームの一時停止／再開（プレイ中は選曲画面ごと隠れるので、ふだん見えるのは選曲中）。**曲名に触れて曲を選び直すと一時停止は解除されて鳴り直す**（止まったままにならない）。設定などへ行って選曲画面に戻ったときも、プレビューは開始位置から鳴り直します（`library.js` の `screen` → `startPreview`）。**これは意図どおり**（2026-10-12のレビューで確認）：一時停止は「いまだけ止める」もので、次に曲を選ぶのは音を鳴らしたいという判断のため。止めた状態を保つ仕様ではありません（「ユーザーが止めた」フラグは持たせない）。止める音がないとき（曲未選択・プレビューオフ）は押せない状態で、ボタンの説明（ホバー・読み上げ）が理由を出します（trk127：曲を選ぶ／プレビューをオンにする／その他。`bannerPlayTipKey`）。設定「右上の曲名をタップで一時停止／再生」（初期オフ）はバナー全体のタップとして別に残ります。
 - **タブの挙動（trk112）**：チュートリアルのデモ曲は独立タブ（🎓デモ曲）をやめ、上記 trk's OST Vol.1 にまとめました。開いたタブは libOpenTabs で残り、削除はタブの ⚙（長押し）設定から（曲はライブラリに残る）。**フォルダ内のプレイリストを開いたタブは閉じるまで残る**のが既定になり、フォルダ内タブの中クリックは「タブを閉じる」（本体は残す）に変更しました。
-- **🎼 手続き作曲ツール（trk113）**：`node tools/make-trk-ost.mjs` で10曲のWAVスケッチを生成（5ルール×2曲＝コード進行／確率・統計／進化的アルゴリズム／深層学習／自由作曲）。出力は `assets/trk-ost/`（.gitignore でGit外・同梱するのは生成スクリプトのみ）で、試聴は同ディレクトリの `index.html`。外部ライブラリなし・決定的（毎回同じ音）です。**アプリ本体には組込んでいません。**
 - **📁 プレイリストフォルダの上限は40（trk129）**：`PL_FOLDER_MAX`（`js/library.js`）と `js/core.js` の読み込み上限（`slice(0, 40)`）が対です。trk の固定棚（🐔・Classic・BA・LoL・東方・Touhou関連・Arknights・学マス・Endfield・🎭）で10個使うので、利用者のぶんを十分に残します。**作るときに上限を確かめ**、いっぱいならトースト（`plFolderLimit`・4言語・`{n}`）で知らせて作りません（カタログ取り込みでは入りきらないリストをフォルダなし＝トップへ置きます）。上限を超えた配列は `plFolderTrim` が trk の固定棚を先に残して利用者のフォルダを後ろから落とします（trk128 の上限13では、利用者のフォルダが4個以上あると 🎭棚が起動のたびに切り捨てられ、キャラクターテーマ4リストがトップへ落ちていました）。
 - **記録とゴーストのキーは MOD に依存しない（trk129）**：`chartKeyOf` は MIRROR／RANDOM を掛ける**前**のレーン（`resetRun` が残す `origLane`）で作ります。掛けた後で作っていたため、同じ譜面でも MOD の有無で記録の行が分かれ、ゴースト（`beforePlay` でキーを引くので `resetRun` の前）は MOD を変えた直後に出ませんでした。MOD 無しの既存の記録のキーは変わりません（MIRROR を掛けた古い記録は行が分かれたまま残ります＝戻しません。レビュー第4弾に「左右反転したキーも引けばMIRRORの分だけ救える」との提案がありましたが、RANDOMの分は救えず数も少ないため、**2026-10-13 利用者の判断で救わない**）。MOD ごとにベストを分けたくなったら速度別（`slot.rates[rateKey()]`）と同じように入れ物側で分けます（**2026-10-13 利用者確認済み：この方針で確定**）。**譜面の書き出しも同じ考え方（trk132）**：`chartToData`（`js/media.js`）は `n.origLane ?? n.lane` を書き、一時停止画面・結果画面からの書き出し（`exportChart`）と曲パック（`custom.js` の `buildSongPack`）に MOD 後の譜面が入りません。
 - **↕（並べ替え）は「いま見えている並び」で動く（trk130）**：`trkMovePlaylist(id, dir, peers)` は `peers`（その画面で隣に並ぶプレイリストのID＝表示順）の中だけで隣と入れ替え、`playlistOrder` は trk の表示順を全部書き出した形に組み直します。**消えたプレイリストのIDはここで落とします**（旧版は `playlistOrder` に残った削除済みIDと入れ替えて、押しても画面が変わらないことがありました）。端と🔤ABC順では `trkMoveButtonsState` が↑↓を押せなくします（3つの一覧＝🐔の階層メニュー・フォルダ設定・🐔の設定画面すべてが `peers` を渡し、フォルダ設定は並べ替え後に開き直します）。
@@ -138,7 +146,7 @@
 
 ## 4. 未完了の確認
 
-一覧（状態は 2026-10-14 時点）。詳細は下の「4.1 詳細」にあります。既存項目の番号は維持しています。
+一覧（状態は 2026-10-15 時点）。詳細は下の「4.1 詳細」にあります。既存項目の番号は維持しています。
 
 | # | 項目 | 状態 | 次の一手 |
 |---|---|---|---|
@@ -147,7 +155,7 @@
 | 3 | 音源ジャケット（trk101〜106） | 一覧のサムネイルは利用者確認済み（2026-10-09）。ほかは未確認 | 選択中バナー・TV・書斎・譜面中の配置を実曲で確認 |
 | 4 | LoL外部ページ（Season 4〜9 の SoundCloud セット、人気曲リンク） | 未確認 | 実ブラウザで再確認、LoL台帳を更新 |
 | 5 | Endfield配信リンク（Spotify個別曲・ffm.to・網易云） | 一部未確認（バッチ2の残り75曲のIDなど） | 実ブラウザで確認、エンドフィールド台帳を更新 |
-| 6 | 🎼 手続き生成10曲の聴取（trk113） | 自動検査のみ（聴いていない） | `assets/trk-ost/index.html` で聴いて採否を決める |
+| 6 | 🎼 手続き生成10曲の聴取（trk113） | manifest経由のアプリ連携は実装済み。10曲の実聴取・品質評価は未確認 | `assets/trk-ost/index.html` で聴く。任意音源ビルドでは専用リスト・選曲再生も確認 |
 | 7 | Android Chrome／PCの Service Worker、MMD／VRM、IndexedDB | オフライン動作は利用者確認済み（2026-10-14）。safe・MMD／VRM・IndexedDBは未確認 | 残る項目を実機で確認 |
 | 8 | trk114 の画面（自動リストの復元、入手先ガイド、16スキンの色） | ヘッドレスで一部確認 | 実機で確認 |
 | 9 | 書斎の設定と画像キー（trk133〜135） | ヘッドレスで確認、実機は未確認 | 全画面フィット、上部の設定入口、拡大の送り幅を実機で |
@@ -157,6 +165,13 @@
 | 13 | trk136（全画面フィットの PageDown 長押し、💾端末の保存） | 実機未確認 | PC・Android で確認 |
 | 14 | 曲名照合・ミカ音源／映像（trk155〜159） | Node/VM・合成WAVのヘッドレス検査済み。実曲・実動画・実機は未確認 | 実ファイルで照合・再生、配信ページの地域差を確認（購入・抽出を自動実行しない） |
 
+#### 実ブラウザsmoke／CIの容量（trk162調査）
+
+- **実行環境**：`npm run check` は実ブラウザsmokeを実行しません。GitHub ActionsはGitHub Pagesの静的コピー／公開のみです。`package.json`／lockfileにPuppeteerはなく、smokeスクリプトは `SMOKE_CHROME`／`SMOKE_PUPPETEER` で外部インストール済みブラウザを指定するため、自動ダウンロードはしません。この環境にChromium／Chromeはなく、実ブラウザsmokeは未実施。
+- **既知のサイズ**：npm registryの `puppeteer-core@25.13.0` は単体の展開後6,010,962 bytes（約5.73 MiB、927 files）。リポジトリ依存には含まれず、推移依存はこの値に含みません。Chrome／Chromium本体、CIキャッシュ、一時ディスク、実転送量は未計測です。
+- **ソース差分**：HEAD比でHTML／JS／SWが非圧縮約17.7 kB増、テスト・ガイド等を含む全ファイルは約64.7 kB増。Pages workflowはリポジトリ一式をartifactへコピーしますが、圧縮後サイズは未計測です。
+- **上限設計のNode目安**：10万項目・約9.08 MBの合成ZIPを作成・読込すると約2.44秒、強制GC後のJS heapは処理前比約10.7 MiB増でした。ピークRSSやChrome／モバイルのメモリ測定ではありません。この目安から、ZIP64の65,535件境界を十分に超える250,000項目・64 MiBの上限にしています。
+
 ### 4.1 詳細
 
 1. **MIDI／MIXの実ブラウザ・実音声確認**（PC・Android）：有効なSMF 0/1の読込、24音色の違い、プロフィール選択が次の読込に反映されること、形式・サイズ・長さ制限を確認。MP3/WAVでMIX初期オフ／オン／プロファイル切替を確認し、セーフモード・Audioリセットで停止することも確認する。現時点では自動テスト済み・実音声未確認。
@@ -165,7 +180,7 @@
 3. **音源ジャケット**（trk101〜106）：曲一覧のサムネイル表示は利用者確認済み（2026-10-09）。選択中バナー・TV・書斎、譜面中の右上配置、フィルター、画像なし、表示設定の優先順はPC／Androidの実曲で確認する。詳細は旧記録と [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) を参照。
 4. **LoL外部ページ**：Season 4〜9 のSoundCloudセット表示と、地域制限曲を含む人気曲リンクを実ブラウザで再確認する（Warsongsのセットはtrk115で確認済み）。曲別調査はLoL台帳を更新する。
 5. **Endfield配信リンク**：Zeroth Directive OST 60曲＋バッチ2の6作81曲のSpotify個別曲ページ、各巻のffm.toスマートリンクと网易云音乐アルバムの表示・地域差を実ブラウザで再確認する。バッチ2は個別曲IDの抜取確認が6曲のみで、残り75曲のIDは未個別確認。バッチ2の中国語公式曲名・ffm.to告知リンク（Homecoming 以外）・VGMdb照合・他ストアの曲別URLは未確認のまま。Zeroth Vol.1 は 2026-10-11 に Apple Music 掲載を確認済み（Vol.2 のアルバム別URLは未照合）。未収録の公式リリース（Yi／Old Deep Water Dies／Sketches of Lost Heirlooms／A Promise Makes a Home 等）は台帳の「調査中の他の公式リリース」表に確認状況を記録済み。曲別調査はエンドフィールド台帳を更新する。trk128 の並び・棚・改名はヘッドレスChromiumのe2e（20項目）で確認済みだが、**実端末でのEndfieldタブの見た目（並び・「Endfield Character Theme」棚）は未確認**。
-6. **🎼 手続き生成10曲の聴取確認**（trk113）：自動検査は「無音でもクリップでもない」こと（peak 0.62〜0.72・RMS 0.08〜0.29）と決定的生成しか確認していません。曲として聴けるか・不快なノイズや耳障りな音がないか・音量バランスは、`assets/trk-ost/index.html` で実際に聴いて確認する。採用曲を決めたら、trk's OST Vol.1 への組込み方（音源の権利表記・同梱可否）を別途決める。
+6. **🎼 手続き生成10曲の聴取確認**（trk113）：自動検査は「無音でもクリップでもない」こと（peak 0.62〜0.72・RMS 0.08〜0.29）と決定的生成を確認しただけで、音楽としての良否は未確認。`assets/trk-ost/index.html` で曲として聴けるか、耳障りなノイズや音量バランスを確認する。アプリ連携先は別棚 `trk-agent-ost-v1` として実装済みだが、公開リポジトリにWAV／manifestは同梱しない。任意音源を含める検証ビルドでは `AGENT_OST_MANIFEST_INCLUDED=true` にして専用リストと選曲時の読込みを確認する。品質評価・公開配布への同梱判断は別。
 7. Android Chrome／PCでService Workerのsafe・オフライン、MMD／VRM、IndexedDBを確認する。Node・shim検査は実機確認の代用ではありません。
    - **2026-10-14 更新**：オフラインで動くことは利用者が実機で確認済み（「インターネットに繋がなくても遊べる」の文言の根拠）。MMD／VRM、IndexedDB、safe の実機確認は未了。
 8. **trk114の画面確認**：①自動リスト（例：LoLのSeason 3）を消して再起動しても戻らないこと、♻ボタンの件数表示と復元、trk's OST Vol.1を別フォルダへ動かして再起動しても戻らないこと。②英・中・韓のUIで入手先ガイド（タブの長押し）が各言語で出ること。③色が変わった16スキン（shadow・daylight・sakura・snowfield・garden・strawberry・melonberry・dawn・midnightsun・pastelloop・wagara・showacafe・cbLight・shojiLight・morningKitchen・mikuClassic）で、スキンの棚の見出しやリンクの色が見やすく、スキンの雰囲気を壊していないこと。ヘッドレスChromiumでは①②とcbLight・shojiLight・morningKitchenのaxe（4.61〜4.62:1）を確認済み。
@@ -202,18 +217,32 @@
 | 自動リストの削除の印・ガイドの言語 | `js/library.js`（`trkRemoved`・`trkRestoreRemoved`・`trkCatalogGuide`・`plGuideText`）、`js/core.js`（`cleanTrkRemoved`）、`tests/trk-playlists.test.mjs` |
 | Riot系カタログ（LoL・VALORANT・LoL関連ゲーム）のCreator-Safe照合状態 | `js/catalog.js`（`LOL_CREATOR_SAFE`・`VAL_CREATOR_SAFE`・`RIOT_GAMES_CREATOR_SAFE`）、`js/library.js`（`RIOT_GUIDE_KEYS`）、`tools/leagueoflegends-*-tracklist.json`（各リストの `creatorSafe`）、`tools/riot-games-creator-safe-playlist.json`（Riot Games Creator-Safe Playlistの記録）、`tools/valorant-creator-safe.json`、`docs/LEAGUE-OF-LEGENDS-MUSIC.md`、`docs/VALORANT-MUSIC.md` |
 | 利用者向けMIDI・権利案内 | `docs/guide/touhou-midi.md`、`docs/guide/sound.md`、`docs/guide/en.md` |
-| 🎓 OST手続き生成 | `tools/make-trk-ost.mjs`（出力は `assets/trk-ost/`・Git外。5ルール×2曲＝10曲のWAVスケッチ） |
+| 🎼 Agent OSTの任意連携／生成 | `js/library.js`（`AGENT_OST_MANIFEST_INCLUDED`・`initAgentOstTracks`）、`tools/make-trk-ost.mjs`（10曲＋manifestを `assets/trk-ost/`・Git外へ生成）、`tools/e2e-trk149.mjs`、`tests/agent-ost.test.mjs` |
+| 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
+| CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.14-trk159`） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.15-trk162`） |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
+
+- **trk162（ZIP／バックアップ容量境界、2026-10-15）**：`npm run check` 成功（Static 0 failure／0 warning、Security 59 check／0 warning、`node:test` **398/398**）、`git diff --check` 成功。ZIP64 unsafe値・偽EOCD・名前／件数／64MiB中央目録境界・256回決定的ヘッダfuzz、バックアップ復元のZIP上限案内、書斎復元の実Blob画像容量、容量上限を無視してもCBZ1ページ100MiBが残ることをNode/VM・静的検査で確認。**実ブラウザsmokeは未実施**（Chromium/Chrome未導入、`npm run check` とPages workflowにブラウザ取得処理なし）。
+
+- **trk161（バックアップ復元結果の表示、2026-10-14）**：`npm run check` 成功（Static 0 failure／0 warning、Security 58 check、`node:test` **390/390**）、`git diff --check` 成功。パック領域を含む／含まない場合の表示、導入・失敗・削除数、同一ID保護、ID不明時の整理見送りと、確認後の再読み込みをNode/VM・静的検査で確認。**実ブラウザsmokeは未実施**（この環境にChromium/ChromeとPuppeteerがない）。
+
+- **trk160（ZIP／バックアップのレビュー対応、2026-10-14）**：`npm run check` 成功（Static 0 failure／0 warning、Security 58 check、`node:test` **387/387**）、`git diff --check` 成功。ZIP CRC・サイズ確認、ZIP作成と `.stpack` の読み書き、ZIP64追加フィールド境界、パス名、バックアップ復元時の同一ID保護、`__proto__` codec、Agent OST既定manifest非取得、容量設定を無視したCBZページ100MB上限をNode/VM・静的検査で確認。**実ブラウザsmoke／PC・Android実機は未実施**（この環境にChromium/ChromeとPuppeteerがなく、`tools/smoke-game-end.mjs`／`tools/e2e-trk149.mjs`／`tools/e2e-title-match.mjs`は未実行）。
 
 - **trk159（ミカ3リストを「🪽 聖園ミカ」1つへ統合＋メモロビ2曲追加、2026-10-14）**：`npm run check` 成功（Static 0 failure／0 warning、`node:test` **371/371**）、`git diff --check` 成功。`ba-mika`（`🪽 聖園ミカ`、色 `pink`、14項目：メモリアルロビー2曲 `Daily Routine 24/7`・`You’re My Princess` → `kiss angel` 5項目 → `Aria to the Star` 3項目 → `ソロ＆参加曲` 4項目の順）、`Daily Routine 24/7` ↔ `Daily Routine 247` の表記ゆれ照合、旧3リスト（`trk-ba-mika-kiss`／`trk-ba-mika-aria`／`trk-ba-mika-vocals`）からの所持曲・開いているタブ・ユーザー編集を引き継ぐ統合、公式名・媒体・URL・全員の簡略クレジット、4言語ガイド、保存／再読込・削除尊重をNode/VMで検査（`tools/e2e-title-match.mjs` も統合リスト `trk-ba-mika` の14項目に追随更新済み）。**実ブラウザでの再実行・実曲の聴取・実動画再生・Android実機の確認は未実施。**
 
 過去の検証件数・個別E2E・旧ブラウザ環境の回避手順は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) の「trk158整理時に移した検証記録」へ移しました。上記が現在の結果です。利用者の実機確認済み事項と残る確認項目は§4を正とします。
 
 ## 7. 最近の変更
+
+- **trk162（2026-10-15）**：ZIP reader/writerの固定上限を1アーカイブ250,000項目・中央目録64MiBへ設定。バックアップ生成／復元にはJSON・レコード固定上限を追加し、無視設定でも解除しないエラー案内を4言語化。書斎復元はアルバム合計・画像単体・文章等の通常上限を、ページBlobの実サイズと合わせて検査。日本語・英語ガイドと `docs/SECURITY.md` を更新。smoke／CI容量の内訳と未計測項目は§4へ整理。`sw.js` cacheを`trk-v2026.10.15-trk162`へ更新。
+
+- **trk161（2026-10-14）**：バックアップ復元の完了ダイアログにパックの導入・失敗・削除件数を表示し、失敗時の同一ID保護、IDを全件確認できず整理を見送った状態、パック領域をバックアップに含めていない状態も明示。確認後に再読み込み。日本語・英語ガイドを追記し、`sw.js` cacheを`trk-v2026.10.14-trk161`へ更新。
+
+- **trk160（2026-10-14）**：ZIP書出し・CRC／実サイズ確認をストリーム化し、ZIP64フィールド長とパス名を検査。バックアップだけでなく `.stpack` の読書きも共通のZIP経路へ移し、巨大パック全体の `ArrayBuffer` 化を避ける。復元はパック導入を試してから不要IDを整理し、失敗した同一IDの既存版を保護（ID不明時はpruneしない）。`decodeValue`の`__proto__`をデータとして保持。Agent OSTの既定ビルドはmanifestを要求せず、CBZ／ZIPは「容量の上限を無視」でも展開後1ページ100MBを維持。`smoke-game-end`の`welcomeSeen`、対象の日本語・英語ガイド、`docs/SECURITY.md`、この引継ぎ、`sw.js` cache（`trk-v2026.10.14-trk160`）を更新。自動検証は§6。
 
 - **trk159（2026-10-14）**：ブルアカのミカ3プレイリスト（`ba-mika-kiss`／`ba-mika-aria`／`ba-mika-vocals`）を1つの「🪽 聖園ミカ」（`ba-mika`、自動作成ID `trk-ba-mika`、タブ色 `pink`）に統合し、先頭にメモリアルロビー2曲（1番目：`Daily Routine 24/7`（`Daily Routine 247` でも照合）→ mora、2番目：`You’re My Princess` → 2026年10月時点で公式配信未確認のため作曲家EmoCosine氏のX 1分投稿へ案内）を追加。曲の並び順をメモロビ2曲 → `kiss angel`（5項目）→ `Aria to the Star`（3項目）→ `ソロ＆参加曲`（4項目）の計14項目とし、旧3リストの保存データも自動統合（`BA_MIKA_LEGACY_PL`）。cacheをtrk159へ。
 

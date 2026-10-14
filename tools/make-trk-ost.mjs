@@ -360,7 +360,7 @@ for (const [name, fn, rule] of tracks) {
   console.log("wrote", name + ".wav", (wav.length / 1024).toFixed(0) + "KB", rule);
 }
 fs.writeFileSync(path.join(OUT, "tracklist.json"), JSON.stringify({ kind: "trk's OST Vol.1 procedural sketches", tracks: meta }, null, 2));
-/* アプリ（js/library.js の initAgentOstTracks）が読むマニフェスト。音源と同じ Git 外フォルダに置く */
+/* 任意OSTビルドのマニフェスト。アプリは js/library.js の AGENT_OST_MANIFEST_INCLUDED=true の場合だけ読む。 */
 const manifest = {
   version: 1, enabled: true, kind: "trk-agent-ost-v1",
   tracks: meta.map((m, i) => ({
@@ -370,3 +370,4 @@ const manifest = {
 };
 fs.writeFileSync(path.join(OUT, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
 console.log("done ->", OUT);
+console.log("任意の試験／配布ビルドで再生する場合は、音源とmanifestを同梱したうえで js/library.js の AGENT_OST_MANIFEST_INCLUDED を true にしてください。");

@@ -64,7 +64,7 @@ try {
     await new Promise(r => setTimeout(r, 1500));
     await page.evaluate(m => {
       const p = JSON.parse(localStorage.getItem("shadow_taiko_preferences_v2") || "{}");
-      p.autoPlay = m === "auto"; p.playMode = "manual"; p.countdown = false; p.playerMode = false;
+      p.autoPlay = m === "auto"; p.playMode = "manual"; p.countdown = false; p.playerMode = false; p.welcomeSeen = true;   /* 初回案内が #playBtn のクリックを受け止めないように */
       localStorage.setItem("shadow_taiko_preferences_v2", JSON.stringify(p));
     }, mode);
     await page.reload({ waitUntil: "load" });

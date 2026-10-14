@@ -32,17 +32,11 @@ try {
   browser = await puppeteer.launch({ executablePath: process.env.SMOKE_CHROME, headless: true,
     args: JSON.parse(process.env.SMOKE_CHROME_ARGS || "[]") });
   const page = await browser.newPage();
-  const errors = [], optional404s = [];
-  const optionalOstMissing = !fs.existsSync(path.join(ROOT, "assets/trk-ost/manifest.json"));
+  const errors = [];
   page.on("pageerror", error => errors.push(error.message));
   page.on("console", msg => {
     if (msg.type() !== "error") return;
-    const url = msg.location().url || "";
-    // 未生成の任意OSTは本体が404を許容する。ほかの404・例外は隠さない。
-    if (optionalOstMissing && url.endsWith("/assets/trk-ost/manifest.json") && /status of 404/.test(msg.text())) {
-      optional404s.push(url); return;
-    }
-    errors.push(msg.text() + " " + url);
+    errors.push(msg.text() + " " + (msg.location().url || ""));
   });
   await page.setViewport({ width: 1280, height: 900 });
   await page.evaluateOnNewDocument(() => {
@@ -209,7 +203,6 @@ try {
   assert.equal((await baRows()).filter(row => !row.grey).length, 10);
   assert.deepEqual(errors, [], "pageerror / console.error after Japanese vocals tests");
   console.log("OK  日本語ソロ＆参加曲：歌入り3曲だけ所持（音源計10項目所持／映像4項目は未所持維持）、ページエラー0");
-  if (optional404s.length) console.log(`NOTE  未生成の任意OST manifestの404: ${optional404s.length}件（想定内・別記録）`);
 } finally {
   if (browser) await browser.close();
   await new Promise(r => server.close(r));

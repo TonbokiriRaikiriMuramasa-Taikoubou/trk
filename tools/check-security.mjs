@@ -257,11 +257,24 @@ const occurrences = (text, re) => [...text.matchAll(re)];
 {
   const custom = js["js/custom.js"];
   const core = js["js/core.js"];
-  const capped = custom.includes("async function inflateEntry(e, limit = 0, label = \"\")") &&
-    custom.includes("const reader = stream.getReader(), chunks = []") &&
-    custom.includes("if (size > limit) throw new PackError(\"packFileTooBig\"") &&
-    custom.includes("await inflateEntry(ent, lim, path)") && custom.includes("await inflateEntry(entries[mf], PACK_MB, mf)");
-  rule(capped, "pack entries are inflated with a streaming size cap (a lying usize cannot exhaust memory)");
+  const zipIO = js["js/zip-io.js"];
+  const capped = custom.includes("async function readZip(blob)") && custom.includes("zip = await zipIO.zipOpen(blob)") &&
+    custom.includes("async function inflateEntry(e, limit = 0, label = \"\")") &&
+    custom.includes("if (limit > 0 && e.usize > limit) throw new PackError(\"packFileTooBig\"") &&
+    custom.includes("zipIO.zipEntryBlob(e.zip, e.entry, limit > 0 ? limit : Infinity, true)") &&
+    custom.includes("if (err.key === \"zipTooBig\") throw new PackError(\"packFileTooBig\"") &&
+    custom.includes("await inflateEntry(ent, lim, path)") && custom.includes("await inflateEntry(entries[mf], PACK_MB, mf)") &&
+    zipIO.includes("if (size > Math.min(limit, e.usize))") && zipIO.includes("if (verifyCrc && (size !== e.usize") &&
+    custom.includes("return await zipIO.zipWrite(entries)") && zipIO.includes("crc32Stream(raw.stream())");
+  rule(capped, "pack ZIP I/O uses streaming CRC checks and declared/actual size caps (lying usize cannot exhaust memory)");
+
+  const backup = js["js/backup.js"], i18n = js["js/i18n.js"];
+  const boundedArchive = zipIO.includes("ZIP_LIMITS = Object.freeze({ entries:250000, centralBytes:64 * 1048576 })") &&
+    zipIO.includes('ZipIOError("zipLimit")') && backup.includes("MAX_RECORDS = 250000") &&
+    backup.includes("MAX_DB_JSON = 64 * 1048576") && backup.includes("Z.limits.entries - 1") &&
+    backup.includes('new BackupError("backupHardLimit")') && backup.includes("utf8LengthWithin(rec, remaining)") &&
+    (i18n.match(/backupHardLimit:/g) || []).length === 4;
+  rule(boundedArchive, "ZIP entry/central-directory and backup JSON/record safety ceilings are fixed, early, and translated in all UI locales");
 
   const recordStart = custom.indexOf("function packRecordBytes(");
   const recordEnd = custom.indexOf("\nasync function checkPackStorageCapacity", recordStart);

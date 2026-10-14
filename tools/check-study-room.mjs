@@ -142,6 +142,8 @@ assert.ok(reader.includes("STUDY_IMAGE_MAX_COUNT = 3000") && reader.includes("ST
 assert.ok(reader.includes("studySafeMode()") && reader.includes("window.TrkSafeMode"), "safe mode is respected");
 assert.ok(reader.includes("studyCancelImport") && reader.includes("studyImportState.cancelled"), "imports can be cancelled");
 assert.ok(reader.includes("studyImportAsk") && reader.includes("studyQuotaError"), "bulk replace + quota errors are handled");
+assert.ok(reader.includes("imageBytes:STUDY_IMAGE_MAX_BYTES") && reader.includes("imageFileBytes:STUDY_IMAGE_FILE_MAX"),
+  "backup restore can apply the same album byte caps as normal image import");
 assert.ok(reader.includes("studySweepOrphans") && reader.includes("studyDBDeleteMany"), "orphaned pages are swept");
 assert.ok(reader.includes("studyGetSongCoverInfo") && reader.includes("studyClearSongCover"), "covers can be inspected and removed");
 assert.ok(reader.includes("STUDY_ZOOM_MIN") && reader.includes("STUDY_ZOOM_MAX") && reader.includes("studyApplyZoomValue") && reader.includes("studyPinchStart"),

@@ -6,9 +6,10 @@
      ・packs（既定ON）：📦 カスタムパック。本体を .stpack に組み直し、復元は既存のインストーラで**検証を通す**
      ・media（既定OFF）：🎵 曲・VRM・MMD のファイル（大きい）
    含めないもの：解析の結果（再生成できる）、一度きりの印、フォルダの権限（ブラウザごとの許可なので書き出せない）。
-   復元は「選んだ項目を置き換える」。バックアップに無い項目には触らない。
-   「容量の上限を無視」（設定）は、アプリが決めた上限（本棚500冊・1冊3000ページ・テキスト12MB・パック1GiB／1件500MB）だけを外す。
-   ブラウザの空き容量は外せない（足りなければブラウザが保存を断る）。
+   復元は選んだ領域を置き換え、選んでいない領域には触らない。パックは先に導入を試し、成功後にバックアップに無いIDを削除する。
+   バックアップに含まれるパックの導入に失敗した場合、同じIDの既存パックがあれば残す。
+   「容量の上限を無視」（設定）は、書斎・パックの保存量上限だけを外す。ブラウザの空き容量は外せない。
+   バックアップのZIP構造・JSON展開量・レコード数には別の固定安全上限を設け、設定で解除できない（250,000エントリー／中央ディレクトリ64 MiB、JSON 64 MiB／ストア、250,000レコード／ストア）。
    公開先：window.Trk.backup（テスト用の純粋関数も含む） */
 (function () {
   "use strict";
@@ -16,7 +17,22 @@
   const Z = window.Trk.zipIO;
   const FORMAT = "trk-backup", VERSION = 1, APP = "trk";
   const BLOB_PREFIX = "blobs/", PACK_PREFIX = "packs/", DB_PREFIX = "db/";
-  const MAX_META = 1 << 20, MAX_RECORDS = 1000000, MAX_LS_VALUE = 20 * 1048576;
+  /* Hard parsing limits do not follow "ignore storage limits": bounded ZIP metadata and JSON are needed before any app-level quota can be checked. */
+  const MAX_META = 1 << 20, MAX_RECORDS = 250000, MAX_LS_VALUE = 20 * 1048576, MAX_DB_JSON = 64 * 1048576;
+  /* Count UTF-8 bytes without allocating a second full-sized buffer for a large JSON row. */
+  function utf8LengthWithin(text, limit) {
+    let bytes = 0;
+    for (let i = 0; i < text.length; i++) {
+      const c = text.charCodeAt(i);
+      if (c < 0x80) bytes++;
+      else if (c < 0x800) bytes += 2;
+      else if (c >= 0xd800 && c <= 0xdbff && i + 1 < text.length && text.charCodeAt(i + 1) >= 0xdc00 && text.charCodeAt(i + 1) <= 0xdfff) {
+        bytes += 4; i++;
+      } else bytes += 3;
+      if (bytes > limit) return bytes;
+    }
+    return bytes;
+  }
 
   /* localStorage の許可リスト。ここに無いキーは書き出さない・復元もしない。 */
   const LS_KEYS = [
@@ -71,7 +87,11 @@
     if (typeof FileSystemHandle !== "undefined" && v instanceof FileSystemHandle) throw new SkipValue();
     if (typeof v === "object") {
       const o = {};
-      for (const k of Object.keys(v)) { if (v[k] !== undefined) o[encName(k)] = encodeValue(v[k], add, depth + 1); }
+      for (const k of Object.keys(v)) {
+        if (v[k] !== undefined) Object.defineProperty(o, encName(k), {
+          value:encodeValue(v[k], add, depth + 1), enumerable:true, writable:true, configurable:true,
+        });
+      }
       return o;
     }
     throw new SkipValue();   /* function・symbol・bigint など */
@@ -90,7 +110,10 @@
       return new Blob([b], { type });
     }
     const o = {};
-    for (const k of Object.keys(j)) o[decName(k)] = decodeValue(j[k], resolve, depth + 1);
+    /* 「__proto__」という名前は代入するとプロトタイプが替わる。JSON.parse の自前キーもデータとして安全に置く。 */
+    for (const k of Object.keys(j)) Object.defineProperty(o, decName(k), {
+      value:decodeValue(j[k], resolve, depth + 1), enumerable:true, writable:true, configurable:true,
+    });
     return o;
   }
 
@@ -119,18 +142,35 @@
   function readStoreJson(db, store, skip, add) {
     return new Promise((resolve, reject) => {
       const parts = ["["];
-      let first = true, count = 0, skipped = 0;
+      let first = true, count = 0, skipped = 0, jsonBytes = 2;
       const tx = db.transaction(store, "readonly");
       const req = tx.objectStore(store).openCursor();
       req.onsuccess = () => {
         const cur = req.result;
         if (!cur) return;
         if (!(skip && skip.includes(cur.key))) {
+          if (count >= MAX_RECORDS) {
+            reject(new BackupError("backupHardLimit"));
+            try { tx.abort(); } catch (_) {}
+            return;
+          }
           try {
             const rec = JSON.stringify({ k:encKey(cur.key), v:encodeValue(cur.value, add) });
-            parts.push(first ? rec : "," + rec); first = false; count++;
+            const separatorBytes = first ? 0 : 1, remaining = MAX_DB_JSON - jsonBytes - separatorBytes;
+            const recordBytes = utf8LengthWithin(rec, remaining);
+            if (recordBytes > remaining) {
+              reject(new BackupError("backupHardLimit"));
+              try { tx.abort(); } catch (_) {}
+              return;
+            }
+            parts.push(first ? rec : "," + rec); first = false; count++; jsonBytes += recordBytes + separatorBytes;
           } catch (e) {
-            if (e instanceof SkipValue) skipped++; else throw e;
+            if (e instanceof SkipValue) skipped++;
+            else {
+              reject(e instanceof BackupError ? e : new BackupError("backupFail"));
+              try { tx.abort(); } catch (_) {}
+              return;
+            }
           }
         }
         cur.continue();
@@ -153,12 +193,40 @@
       tx.onerror = tx.onabort = () => reject(tx.error || new Error("write failed"));
     });
   }
+  /* パックの復元では成功したものを入れた後、バックアップに無いIDだけを取り除く。 */
+  function deleteStoreExcept(db, store, keep) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(store, "readwrite"), os = tx.objectStore(store);
+      let removed = 0;
+      const keysReq = os.getAllKeys();
+      keysReq.onsuccess = () => {
+        try {
+          for (const key of keysReq.result) if (!keep.has(key)) { os.delete(key); removed++; }
+        } catch (error) {
+          reject(error);
+          try { tx.abort(); } catch (_) {}
+        }
+      };
+      keysReq.onerror = () => reject(keysReq.error || tx.error || new Error("read keys failed"));
+      tx.oncomplete = () => resolve(removed);
+      tx.onerror = tx.onabort = () => reject(tx.error || new Error("delete failed"));
+    });
+  }
   function readAllValues(db, store) {
     return new Promise((resolve, reject) => {
       const out = [];
       const tx = db.transaction(store, "readonly");
       const req = tx.objectStore(store).openCursor();
-      req.onsuccess = () => { const c = req.result; if (!c) return; out.push(c.value); c.continue(); };
+      req.onsuccess = () => {
+        const c = req.result;
+        if (!c) return;
+        if (out.length >= MAX_RECORDS) {
+          reject(new BackupError("backupHardLimit"));
+          try { tx.abort(); } catch (_) {}
+          return;
+        }
+        out.push(c.value); c.continue();
+      };
       tx.oncomplete = () => resolve(out);
       tx.onerror = tx.onabort = () => reject(tx.error || new Error("read failed"));
     });
@@ -169,14 +237,20 @@
     const want = { study:opts.study !== false, packs:opts.packs !== false, media:opts.media === true };
     const entries = [], counts = { ls:0, library:0, study:{ books:0, pages:0 }, packs:0, media:0 };
     let skipped = 0, blobN = 0;
-    const add = (blob) => { const name = BLOB_PREFIX + String(++blobN).padStart(7, "0"); entries.push({ name, blob }); return name; };
+    const pushOutput = (entry) => {
+      if (entries.length >= Z.limits.entries - 1) throw new BackupError("backupHardLimit");
+      entries.push(entry);
+    };
+    const add = (blob) => { const name = BLOB_PREFIX + String(++blobN).padStart(7, "0"); pushOutput({ name, blob }); return name; };
     const note = () => {};   /* 進み具合の表示は作成中の一文だけ（段階名は出さない） */
 
     /* core：localStorage の許可リストと、ライブラリ */
     const items = {};
     for (const key of LS_KEYS) { const v = localStorage.getItem(key); if (v !== null) items[key] = v; }
     counts.ls = Object.keys(items).length;
-    entries.push({ name:"local.json", blob:new Blob([JSON.stringify({ items })]), deflate:true });
+    const localJson = JSON.stringify({ items }), localBlob = new Blob([localJson]);
+    if (localBlob.size > MAX_LS_VALUE) throw new BackupError("backupHardLimit");
+    pushOutput({ name:"local.json", blob:localBlob, deflate:true });
     note("core");
     async function dumpStore(spec, store, into) {
       if (!(await dbExists(spec.db))) return null;
@@ -184,7 +258,9 @@
       try {
         const r = await readStoreJson(db, store, (spec.skip && spec.skip[store]) || null, add);
         skipped += r.skipped;
-        entries.push({ name:`${DB_PREFIX}${spec.db}/${store}.json`, blob:new Blob([r.text]), deflate:true });
+        const jsonBlob = new Blob([r.text]);
+        if (jsonBlob.size > MAX_DB_JSON) throw new BackupError("backupHardLimit");
+        pushOutput({ name:`${DB_PREFIX}${spec.db}/${store}.json`, blob:jsonBlob, deflate:true });
         return r.count;
       } finally { db.close(); }
     }
@@ -214,7 +290,7 @@
           const inner = [{ name:"pack.json", blob:new Blob([JSON.stringify(rec.manifest)]), deflate:true }];
           for (const [path, blob] of Object.entries(rec.files)) if (blob instanceof Blob) inner.push({ name:path, blob });
           const zipped = await Z.zipWrite(inner);
-          entries.push({ name:`${PACK_PREFIX}${String(++i).padStart(4, "0")}.stpack`, blob:zipped });
+          pushOutput({ name:`${PACK_PREFIX}${String(++i).padStart(4, "0")}.stpack`, blob:zipped });
         }
         counts.packs = i;
       }
@@ -232,37 +308,87 @@
   /* ---------- 復元 ---------- */
   /* 中身を読まずに、backup.json だけ確かめる（確認画面に出す用）。 */
   async function readBackupMeta(file) {
-    const zip = await Z.zipOpen(file);
+    let zip;
+    try { zip = await Z.zipOpen(file); }
+    catch (error) {
+      if (error && (error.key === "zipLimit" || error.key === "zipTooBig")) throw new BackupError("backupHardLimit");
+      throw error;
+    }
     const e = zip.byName.get("backup.json");
     if (!e) throw new BackupError("backupRestoreBad");
+    let raw;
+    try { raw = await Z.zipEntryBlob(zip, e, MAX_META); }
+    catch (error) {
+      if (error && error.key === "zipTooBig") throw new BackupError("backupHardLimit");
+      throw new BackupError("backupRestoreBad");
+    }
     let meta;
-    try { meta = JSON.parse(await (await Z.zipEntryBlob(zip, e, MAX_META)).text()); }
+    try { meta = JSON.parse(await raw.text()); }
     catch (_) { throw new BackupError("backupRestoreBad"); }
     if (!meta || meta.format !== FORMAT || meta.version !== VERSION || meta.app !== APP) throw new BackupError("backupRestoreBad");
     return { zip, meta };
   }
-  /* 上限の確認（上限を無視しないとき）。書斎の本棚・1冊のページ数・テキストの大きさ。 */
-  function checkStudyLimits(books) {
+  /* 上限の確認（上限を無視しないとき）。通常の画像取り込みと同じく、冊数・枚数・1冊の合計・1画像・文章を見る。 */
+  function checkStudyLimits(books, pageBlobSizes = new Map()) {
     if (core.storageLimitsIgnored()) return;
     const L = window.Trk.studyLimits;
-    if (!L) throw new BackupError("backupRestoreFail");   /* 書斎の上限が読めないときは、確かめられないので止める */
+    if (!L || !Number.isSafeInteger(L.shelf) || !Number.isSafeInteger(L.pages) ||
+        !Number.isSafeInteger(L.imageBytes) || !Number.isSafeInteger(L.imageFileBytes) || !Number.isSafeInteger(L.textBytes)) {
+      throw new BackupError("backupRestoreFail");   /* 書斎の上限が読めないときは、確かめられないので止める */
+    }
     if (books.length > L.shelf) throw new BackupError("backupRestoreLimit");
     for (const b of books) {
-      const pages = b && Array.isArray(b.v && b.v.pages) ? b.v.pages.length : 0;
-      if (pages > L.pages) throw new BackupError("backupRestoreLimit");
-      const text = b && b.v && typeof b.v.content === "string" ? b.v.content : "";
+      const value = b && b.v;
+      const pages = value && Array.isArray(value.pages) ? value.pages : [];
+      if (pages.length > L.pages) throw new BackupError("backupRestoreLimit");
+      if (value && value.kind === "image") {
+        let bytes = 0;
+        for (const page of pages) {
+          const actual = page && pageBlobSizes.has(page.key) ? pageBlobSizes.get(page.key) : page && page.size;
+          const size = actual === undefined ? 0 : actual;
+          if (!Number.isSafeInteger(size) || size < 0 || size > L.imageFileBytes || bytes > L.imageBytes - size) {
+            throw new BackupError("backupRestoreLimit");
+          }
+          bytes += size;
+        }
+      }
+      const text = value && typeof value.content === "string" ? value.content : "";
       if (text && new Blob([text]).size > L.textBytes) throw new BackupError("backupRestoreLimit");
     }
   }
+  /* 1件の stpack から安全にIDを得る。バックアップ生成物は外側ZIPで無圧縮のため、巨大パック本体はBlob参照のまま。
+     IDの計算は custom.js の検証・正規化と同じ関数を使う。分からないときは後続の削除をしない。 */
+  async function backupPackId(zip, entry) {
+    const custom = window.Trk.custom;
+    if (!custom || typeof custom.packIdentityFromManifest !== "function" || entry.method !== 0 || typeof entry.start !== "number") return null;
+    try {
+      const packBlob = zip.file.slice(entry.start, entry.start + entry.csize);
+      const inner = await Z.zipOpen(packBlob);
+      const manifests = inner.entries.filter(e => !e.name.startsWith("__MACOSX/") && /(^|\/)pack\.json$/.test(e.name))
+        .sort((a, b) => a.name.length - b.name.length);
+      const manifestEntry = manifests[0];
+      if (!manifestEntry) return null;
+      await Z.zipVerifyEntry(inner, manifestEntry, MAX_META);
+      const raw = JSON.parse(await (await Z.zipEntryBlob(inner, manifestEntry, MAX_META)).text());
+      const identity = custom.packIdentityFromManifest(raw);
+      return identity && typeof identity.id === "string" ? identity.id : null;
+    } catch (_) { return null; }
+  }
   async function restoreBackup(file, opts = {}) {
     const { zip, meta } = await readBackupMeta(file);
-    /* 1) 全件の中身を確かめる（CRC・大きさ）。書く前に終えて、壊れた中身で途中まで書き換えないため。 */
+    /* 1) 全件の中身を確かめる（CRC・大きさ）。書く前に終えて、壊れた中身で途中まで書き換えないため。
+       圧縮エントリはJSON等だけのはずなので、展開処理量にも固定上限を置く。 */
     for (const e of zip.entries) {
-      try { await Z.zipVerifyEntry(zip, e); }
+      const limit = e.name === "backup.json" ? MAX_META : e.name === "local.json" ? MAX_LS_VALUE :
+        e.name.startsWith(DB_PREFIX) && e.name.endsWith(".json") || e.method === 8 ? MAX_DB_JSON : Infinity;
+      if (e.usize > limit) throw new BackupError("backupHardLimit");
+      try { await Z.zipVerifyEntry(zip, e, limit); }
       catch (_) { throw new BackupError("backupCorrupt"); }
     }
     /* 2) 読んで、書くものを用意する（まだ書かない）。blob の参照は同期で取れるよう先に位置を覚える。 */
-    for (const e of zip.entries) if (e.method === 0 && e.name.startsWith(BLOB_PREFIX)) e.start = await Z.zipDataStart(zip, e);
+    for (const e of zip.entries) if (e.method === 0 && (e.name.startsWith(BLOB_PREFIX) || e.name.startsWith(PACK_PREFIX))) {
+      e.start = await Z.zipDataStart(zip, e);
+    }
     const resolve = (name) => {
       const e = zip.byName.get(name);
       if (!e || !name.startsWith(BLOB_PREFIX) || e.method !== 0 || typeof e.start !== "number") throw new BackupError("backupCorrupt");
@@ -286,15 +412,35 @@
       if (!e.name.startsWith(DB_PREFIX) || !e.name.endsWith(".json")) continue;
       const key = e.name.slice(DB_PREFIX.length, -".json".length);
       if (!wanted.has(key)) continue;   /* 知らない名前は読まない */
-      const arr = JSON.parse(await (await Z.zipEntryBlob(zip, e)).text());
-      if (!Array.isArray(arr) || arr.length > MAX_RECORDS) throw new BackupError("backupCorrupt");
+      const arr = JSON.parse(await (await Z.zipEntryBlob(zip, e, MAX_DB_JSON)).text());
+      if (!Array.isArray(arr)) throw new BackupError("backupCorrupt");
+      if (arr.length > MAX_RECORDS) throw new BackupError("backupHardLimit");
       const spec = ALL_DBS.find(d => key.startsWith(d.db + "/"));
       const store = key.slice(spec.db.length + 1);
       plan.dbs.push({ spec, store, arr, key });
     }
     const studyBooks = plan.dbs.filter(p => p.key === `${DB_STUDY.db}/books`).flatMap(p => p.arr);
-    checkStudyLimits(studyBooks);
-    const packEntries = zip.entries.filter(e => e.name.startsWith(PACK_PREFIX) && e.name.endsWith(".stpack"));
+    const studyPageBlobSizes = new Map();
+    for (const p of plan.dbs) if (p.key === `${DB_STUDY.db}/pages`) for (const row of p.arr) {
+      const key = decKey(row.k), ref = row.v && row.v.$blob;
+      if (typeof ref !== "string") continue;
+      const entry = zip.byName.get(ref);
+      if (!ref.startsWith(BLOB_PREFIX) || !entry || entry.method !== 0 || !Number.isSafeInteger(entry.usize)) throw new BackupError("backupCorrupt");
+      studyPageBlobSizes.set(key, entry.usize);
+    }
+    checkStudyLimits(studyBooks, studyPageBlobSizes);
+    const wantsPacks = !!(meta.areas && meta.areas.packs);
+    const packEntries = wantsPacks ? zip.entries.filter(e => e.name.startsWith(PACK_PREFIX) && e.name.endsWith(".stpack")) : [];
+    const install = wantsPacks && window.Trk.custom && window.Trk.custom.installPackFile;
+    const backupPackIds = new Set();
+    let packInventoryKnown = !!(install && window.Trk.custom && typeof window.Trk.custom.packIdentityFromManifest === "function");
+    if (packInventoryKnown) {
+      for (const e of packEntries) {
+        const id = await backupPackId(zip, e);
+        if (!id) { packInventoryKnown = false; break; }
+        backupPackIds.add(id);
+      }
+    }
     /* 3) 書く */
     for (const p of plan.dbs) {
       const pairs = p.arr.map(r => [decKey(r.k), decodeValue(r.v, resolve)]);
@@ -306,18 +452,36 @@
       for (const k of LS_KEYS) { try { localStorage.removeItem(k); } catch (_) {} }
       for (const [k, v] of plan.ls) { try { localStorage.setItem(k, v); } catch (_) { throw new BackupError("backupRestoreFail"); } }
     }
-    let packsOk = 0, packsFailed = 0;
-    if (meta.areas && meta.areas.packs) {
-      const db = await openDb(DB_PACKS, true);
-      try { await replaceStore(db, "packs", [], null); } finally { db.close(); }
-      const install = window.Trk.custom && window.Trk.custom.installPackFile;
+    let packsOk = 0, packsFailed = 0, packsRemoved = 0;
+    if (wantsPacks) {
       for (const e of packEntries) {
-        const blob = await Z.zipEntryBlob(zip, e);
+        const blob = e.method === 0 && typeof e.start === "number"
+          ? zip.file.slice(e.start, e.start + e.csize) : await Z.zipEntryBlob(zip, e, MAX_DB_JSON);
         const r = install ? await install(new File([blob], e.name.split("/").pop(), { type:"application/zip" })) : null;
-        if (r) packsOk++; else packsFailed++;
+        if (r) {
+          packsOk++;
+          if (typeof r.id === "string") backupPackIds.add(r.id);
+        } else packsFailed++;
+      }
+      /* 失敗したパックの既存IDは、バックアップに含まれる限り残す。全IDを確かめられた場合だけ、最後に不在IDを消す。 */
+      if (packInventoryKnown) {
+        const db = await openDb(DB_PACKS, true);
+        try { packsRemoved = await deleteStoreExcept(db, "packs", backupPackIds); }
+        finally { db.close(); }
       }
     }
-    return { meta, packsOk, packsFailed };
+    return { meta, packsOk, packsFailed, packsRemoved, packCleanupSkipped:wantsPacks && !packInventoryKnown };
+  }
+  function formatRestoreDetails(result) {
+    const areas = result && result.meta && result.meta.areas;
+    if (!areas || !areas.packs) return window.tr("backupRestorePacksNotIncluded");
+    const count = value => Number.isSafeInteger(value) && value >= 0 ? value : 0;
+    const parts = [window.tr("backupRestorePackCounts", {
+      ok:count(result.packsOk), failed:count(result.packsFailed), removed:count(result.packsRemoved),
+    })];
+    if (result.packsFailed > 0) parts.push(window.tr("backupRestorePackFailedKept"));
+    if (result.packCleanupSkipped) parts.push(window.tr("backupRestorePackCleanupSkipped"));
+    return parts.join("\n");
   }
 
   /* ---------- 画面 ---------- */
@@ -346,7 +510,7 @@
         say("backupDone", { size: sizeText(blob.size), books: meta.counts.study.books, packs: meta.counts.packs });
       } catch (e) {
         console.error(e);
-        say("backupFail");
+        say(e instanceof BackupError ? e.key : e && e.key === "zipLimit" ? "backupHardLimit" : "backupFail");
       } finally { make.disabled = false; }
     });
     file.addEventListener("change", async () => {
@@ -355,17 +519,18 @@
       if (!f) return;
       let info;
       try { info = await readBackupMeta(f); }
-      catch (_) { say("backupRestoreBad"); return; }
+      catch (error) { say(keyOfError(error)); return; }
       const m = info.meta;
       const date = (() => { const d = new Date(m.createdAt); return isNaN(d) ? "?" : d.toLocaleString(); })();
       const ask = window.tr("backupRestoreAsk", { date, books: m.counts && m.counts.study ? m.counts.study.books : 0, packs: m.counts ? m.counts.packs || 0 : 0, media: m.counts ? m.counts.media || 0 : 0 });
       if (!confirm(ask)) return;
       say("backupRestoreWorking");
       try {
-        const r = await restoreBackup(f);
-        if (r.packsFailed) say("backupRestorePackFail", { n: r.packsFailed });
-        else say("backupRestoreDone");
-        setTimeout(() => location.reload(), 1200);
+        const r = await restoreBackup(f), vars = { details:formatRestoreDetails(r) };
+        say("backupRestoreDone", vars);
+        /* 結果には導入失敗時の保護・prune見送りも含める。確認してから画面を反映する。 */
+        window.alert(window.tr("backupRestoreDone", vars));
+        location.reload();
       } catch (e) {
         console.error(e);
         say(keyOfError(e));
@@ -375,12 +540,13 @@
   /* 画面に出すキー。ZIP の層の失敗は「壊れている・バックアップではない」にまとめる */
   function keyOfError(e) {
     if (e instanceof BackupError) return e.key;
+    if (e && (e.key === "zipLimit" || e.key === "zipTooBig")) return "backupHardLimit";
     if (e && typeof e.key === "string" && e.key.startsWith("zip")) return "backupCorrupt";
     return "backupRestoreFail";
   }
 
   window.Trk.backup = Object.assign(window.Trk.backup || {}, {
-    buildBackup, restoreBackup, readBackupMeta, encodeValue, decodeValue, encKey, decKey, encName, decName, LS_KEYS, BackupError,
+    buildBackup, restoreBackup, readBackupMeta, formatRestoreDetails, checkStudyLimits, encodeValue, decodeValue, encKey, decKey, encName, decName, LS_KEYS, BackupError,
   });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setup);
   else setup();

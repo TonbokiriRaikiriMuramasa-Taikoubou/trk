@@ -150,12 +150,14 @@ async function initOptionalTutorialDemo() {
   } catch (_) { /* no manifest = intentional lightweight build or an offline optional asset */ }
 }
 /* 🎼 trk Agent's OST Vol.1 — 手続き生成の10曲（tools/make-trk-ost.mjs）。
-   音源とマニフェストは assets/trk-ost/（Git外）。マニフェストが無ければ曲もプレイリストも作らない。
-   音源は選んだときに読む（materializeAgentOst）。消したら trkRemoved に印が残る（🐔 の ♻ で戻せる）。 */
+   音源とマニフェストは assets/trk-ost/（Git外）。公開コード側の AGENT_OST_MANIFEST_INCLUDED が false の間は、manifestを取りに行かない。
+   有効なビルドではmanifestの曲を登録し、音源は選んだときに読む（materializeAgentOst）。消したら trkRemoved に印が残る（🐔 の ♻ で戻せる）。 */
 const AGENT_OST_ID = "trk-agent-ost-v1";
 const AGENT_OST_CAT = "trk:agent-ost";
 const AGENT_OST_NAME = "trk Agent's OST Vol.1";   /* 名前は24文字まで（plSanitize） */
 const AGENT_OST_DIR = "./assets/trk-ost/";
+/* 公開リポジトリには音源／manifestを同梱しない。配布ビルドに任意OSTを含めるときだけ true にする。 */
+const AGENT_OST_MANIFEST_INCLUDED = false;
 const AGENT_OST_MAX_BYTES = 4 * 1024 * 1024;   /* 1曲 約0.9〜1MB。上限は余裕を見た値 */
 const AGENT_OST_KEY_PREFIX = "builtin:trk-agent-ost:";
 const agentOstUrls = new Map();                 /* key → 音源の URL */
@@ -166,6 +168,7 @@ function renameAgentOstPlaylist() {
 }
 async function initAgentOstTracks() {
   try { renameAgentOstPlaylist(); } catch (_) {}
+  if (!AGENT_OST_MANIFEST_INCLUDED) return;   /* GitHub Pages等の既定ビルドはoptional資産が無いので404要求もしない */
   try {
     const response = await fetch(AGENT_OST_DIR + "manifest.json", { credentials:"same-origin" });
     if (!response.ok) return;

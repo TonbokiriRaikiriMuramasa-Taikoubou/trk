@@ -1291,6 +1291,7 @@
           <input id="studyTextFolderInput" type="file" webkitdirectory multiple accept=".txt,.md,.markdown,.json,.csv,.log,.html,.htm,.xml,.yaml,.yml,.ini,.css,.js,.ts,text/plain,application/json" hidden>
           <span data-i18n="studyImportTextFolder">📄 テキストフォルダを取り込む</span>
         </label>
+        <button id="studyHeaderSettingsBtn" type="button" class="study-file-btn" aria-haspopup="dialog" aria-controls="studySettings" data-i18n="studySettings">⚙ 設定</button>
         <button id="studyHelpBtn" type="button" class="study-close-btn" data-i18n="studyHelp">❓ キーの説明</button>
         <button id="studyCloseBtn" type="button" class="study-close-btn" data-i18n="studyClose">✕ 書斎を閉じる</button>
       </div>
@@ -1317,103 +1318,7 @@
             <option value="size" data-i18n="studySortSize">大きい順</option>
           </select>
         </div>
-        <details class="study-advanced study-shelf-advanced">
-          <summary data-i18n="studyAdvanced">⚙ 上級者向け</summary>
-          <label class="study-check-option">
-            <input id="studyShelfVisible" type="checkbox" checked>
-            <span data-i18n="studyKeepShelfVisible">全画面以外では本棚を表示する</span>
-          </label>
-          <p class="study-advanced-hint" data-i18n="studyShelfVisibilityHint">チェックを外しても、上の「本棚を表示」からいつでも戻せます。</p>
-          <label class="study-check-option">
-            <input id="studyManualShelfOrder" type="checkbox">
-            <span data-i18n="studyNoSort">並び替えを使わない。</span>
-          </label>
-          <p class="study-advanced-hint" data-i18n="studyManualOrderHint">自動並び替えを止め、ドラッグでフォルダや本を自由に配置します。</p>
-          <label class="study-check-option">
-            <input id="studyFoldersFirst" type="checkbox">
-            <span data-i18n="studyFoldersFirst">フォルダを上に表示する。</span>
-          </label>
-          <label class="study-check-option">
-            <input id="studySkipDeleteConfirm" type="checkbox">
-            <span data-i18n="studyNoDeleteConfirm">削除の時、確認をしない。</span>
-          </label>
-          <div class="study-advanced-row study-key-row">
-            <span id="studyNextKeyLabel" data-i18n="studyNextKeyLabel">次へ</span>
-            <button id="studyNextKeyBtn" type="button" class="study-key-capture" aria-pressed="false">
-              <kbd id="studyNextKeyValue">→</kbd><span id="studyNextKeyAction" data-i18n="studyKeyChange">変更</span>
-            </button>
-          </div>
-          <div class="study-advanced-row study-key-row">
-            <span id="studyPreviousKeyLabel" data-i18n="studyPreviousKeyLabel">前へ</span>
-            <button id="studyPreviousKeyBtn" type="button" class="study-key-capture" aria-pressed="false">
-              <kbd id="studyPreviousKeyValue">←</kbd><span id="studyPreviousKeyAction" data-i18n="studyKeyChange">変更</span>
-            </button>
-          </div>
-          <label class="study-check-option">
-            <input id="studyVerticalImageKeys" type="checkbox">
-            <span data-i18n="studyVerticalImageKeys">画像ページを↑ / ↓で移動する</span>
-          </label>
-          <p class="study-advanced-hint" data-i18n="studyKeyAssignmentHint">ボタンを押してから使いたいキーを押します。設定済みのショートカットは選べません。</p>
-          <div class="study-advanced-row">
-            <span id="studyZoomStepLabel" data-i18n="studyZoomStepLabel">拡大の送り幅</span>
-            <select id="studyZoomPercentStep" aria-labelledby="studyZoomStepLabel" aria-describedby="studyZoomStepHint">
-              <option value="1">1%</option>
-              <option value="2">2%</option>
-              <option value="5">5%</option>
-              <option value="10">10%</option>
-              <option value="25">25%</option>
-            </select>
-          </div>
-          <p id="studyZoomStepHint" class="study-advanced-hint" data-i18n="studyZoomStepHint">−／＋・Ctrl+ホイール・ピンチの1回ぶんです（初期値5%＝100%→200%が20回）。</p>
-          <label class="study-check-option">
-            <input id="studyZoomEdgeKeys" type="checkbox" checked>
-            <span data-i18n="studyZoomEdgeKeys">拡大中は PageDown / PageUp で画像の端とページを送る</span>
-          </label>
-          <p class="study-advanced-hint" data-i18n="studyZoomEdgeKeysHint">拡大した画像を一度に下端／上端へ送ります。端でさらにもう一度押すと、次の／前のページを続きの端から開きます。本の端では、閉じる動作を行います（全画面を終了して本棚へ）。拡大していないときは、これまでどおり次のページ／前のページです。</p>
-          <label class="study-check-option">
-            <input id="studyMouseClickPages" type="checkbox">
-            <span data-i18n="studyMouseClickPages">PCの簡易操作：左右クリックでページを送る</span>
-          </label>
-          <p class="study-advanced-hint" data-i18n="studyMouseClickPagesHint">左クリックで次のページ、右クリックで前のページ。画像の本のときだけ働きます（ページ上の位置は選びません）。</p>
-          <label class="study-check-option">
-            <input id="studyMouseClickFlip" type="checkbox">
-            <span data-i18n="studyMouseClickFlip">左右を反転（右クリックで進む・左クリックで戻る）</span>
-          </label>
-          <p class="study-advanced-hint" data-i18n="studyMouseClickFlipHint">トラックボールや左利きの人向け。上の「左右クリックでページを送る」がオンのときだけ選べます。</p>
-          <div class="study-advanced-row">
-            <span id="studyMiddleClickLabel" data-i18n="studyMiddleClickLabel">マウスの中クリック</span>
-            <select id="studyMiddleClickAction" aria-labelledby="studyMiddleClickLabel" aria-describedby="studyMiddleClickHint">
-              <option value="none" data-i18n="studyMiddleClickNone">何もしない</option>
-              <option value="next" data-i18n="studyMiddleClickNext">次のページへ</option>
-              <option value="close" data-i18n="studyMiddleClickClose">閉じて本棚へ（全画面を終了）</option>
-            </select>
-          </div>
-          <p id="studyMiddleClickHint" class="study-advanced-hint" data-i18n="studyMiddleClickNextHint">画像の本のときだけ働きます（ブラウザの自動スクロールは止めます）。</p>
-          <div class="study-advanced-row">
-            <span data-i18n="studyAlbumNestingLabel" id="studyAlbumNestingLabel">アルバムの分け方</span>
-            <select id="studyAlbumNesting" aria-labelledby="studyAlbumNestingLabel">
-              <option value="split" data-i18n="studyAlbumNestingSplit">サブフォルダごとに1冊</option>
-              <option value="flat" data-i18n="studyAlbumNestingFlat">フォルダ全体で1冊</option>
-            </select>
-          </div>
-          <p class="study-advanced-hint" data-i18n="studyAlbumNestingHint">次の取り込みから反映します。</p>
-          <div class="study-advanced-row study-edited-text-folder-row">
-            <span id="studyEditedTextFolderLabel" data-i18n="studyEditedTextFolderLabel">編集した文章の本棚フォルダ</span>
-            <select id="studyEditedTextFolder" aria-labelledby="studyEditedTextFolderLabel" aria-describedby="studyEditedTextFolderHint">
-              <option value="" data-i18n="studyEditedTextFolderKeep">自動で移動しない（今の場所）</option>
-            </select>
-          </div>
-          <p id="studyEditedTextFolderHint" class="study-advanced-hint" data-i18n="studyEditedTextFolderHint">選ぶと、編集内容を保存した本をこのフォルダへ整理します。本文は端末内の書斎に保存し、元ファイルは変更しません。</p>
-          <div class="study-advanced-row study-export-folder-row">
-            <span id="studyExportFolderLabel" data-i18n="studyExportFolderLabel">書き出し先（端末）</span>
-            <div class="study-export-folder-controls">
-              <button id="studyChooseExportFolderBtn" type="button" class="study-small-btn" aria-describedby="studyExportFolderHint" data-i18n="studyChooseExportFolder">書き出しフォルダを選ぶ</button>
-              <button id="studyClearExportFolderBtn" type="button" class="study-small-btn" data-i18n="studyClearExportFolder" hidden>解除</button>
-            </div>
-          </div>
-          <p id="studyExportFolderName" class="study-export-folder-name" role="status" aria-live="polite">未選択（ブラウザの通常ダウンロード先）</p>
-          <p id="studyExportFolderHint" class="study-advanced-hint" data-i18n="studyExportFolderHint">選んだフォルダに新しいファイルを作成します。同名があれば別名にし、既存ファイルは上書きしません。未対応ブラウザでは通常のダウンロードを使います。</p>
-        </details>
+        <button id="studyShelfSettingsBtn" type="button" class="study-icon-btn study-shelf-settings" aria-haspopup="dialog" aria-controls="studySettings" data-i18n="studySettings">⚙ 設定</button>
         <p id="studyShelfDragHelp" class="study-shelf-draghint" data-i18n="studyShelfDragHint" hidden></p>
         <div id="studyShelfList" class="study-shelf-list"></div>
         <div id="studyBookmarkPanel" class="study-bookmark-list" hidden></div>
@@ -1444,6 +1349,7 @@
               <h3 id="studyCurrentTitle"></h3>
               <div id="studyCurrentMeta" class="study-current-meta"></div>
             </div>
+            <button id="studySettingsBtn" type="button" class="study-small-btn" aria-haspopup="dialog" aria-controls="studySettings" data-i18n="studySettings">⚙ 設定</button>
             <button id="studyFullscreenBtn" type="button" class="study-small-btn" data-i18n="studyFullscreen">⛶ 画像を全画面化</button>
           </header>
 
@@ -1650,6 +1556,121 @@
           </footer>
         </section>
       </main>
+    </div>
+  </div>
+
+  <div id="studySettings" class="study-help" hidden role="dialog" aria-modal="true" aria-labelledby="studySettingsTitle">
+    <div class="study-help-card study-settings-card">
+      <div class="study-settings-heading">
+        <h3 id="studySettingsTitle" data-i18n="studySettings">⚙ 設定</h3>
+        <button id="studySettingsCloseBtn" type="button" class="study-small-btn" data-i18n="studyHelpClose">閉じる</button>
+      </div>
+      <div class="study-settings-options">
+          <label class="study-check-option">
+            <input id="studyFullscreenFit" type="checkbox" aria-describedby="studyFullscreenFitHint">
+            <span data-i18n="studyFullscreenFit">全画面時に強制的に画面にフィットにする</span>
+          </label>
+          <p id="studyFullscreenFitHint" class="study-advanced-hint" data-i18n="studyFullscreenFitHint">初期オフ。オンにすると全画面中は画像全体を縦横比を保って表示し、拡大・縮小操作を無効にします。見開きは左右それぞれ、縦読みは1枚ずつ画面に収めます。全画面を閉じると元の拡大率に戻ります。</p>
+          <label class="study-check-option">
+            <input id="studyShelfVisible" type="checkbox" checked>
+            <span data-i18n="studyKeepShelfVisible">全画面以外では本棚を表示する</span>
+          </label>
+          <p class="study-advanced-hint" data-i18n="studyShelfVisibilityHint">チェックを外しても、上の「本棚を表示」からいつでも戻せます。</p>
+          <label class="study-check-option">
+            <input id="studyManualShelfOrder" type="checkbox">
+            <span data-i18n="studyNoSort">並び替えを使わない。</span>
+          </label>
+          <p class="study-advanced-hint" data-i18n="studyManualOrderHint">自動並び替えを止め、ドラッグでフォルダや本を自由に配置します。</p>
+          <label class="study-check-option">
+            <input id="studyFoldersFirst" type="checkbox">
+            <span data-i18n="studyFoldersFirst">フォルダを上に表示する。</span>
+          </label>
+          <label class="study-check-option">
+            <input id="studySkipDeleteConfirm" type="checkbox">
+            <span data-i18n="studyNoDeleteConfirm">削除の時、確認をしない。</span>
+          </label>
+          <div class="study-advanced-row study-key-row">
+            <span id="studyNextKeyLabel" data-i18n="studyNextKeyLabel">次へ</span>
+            <button id="studyNextKeyBtn" type="button" class="study-key-capture" aria-pressed="false">
+              <kbd id="studyNextKeyValue">→</kbd><span id="studyNextKeyAction" data-i18n="studyKeyChange">変更</span>
+            </button>
+          </div>
+          <div class="study-advanced-row study-key-row">
+            <span id="studyPreviousKeyLabel" data-i18n="studyPreviousKeyLabel">前へ</span>
+            <button id="studyPreviousKeyBtn" type="button" class="study-key-capture" aria-pressed="false">
+              <kbd id="studyPreviousKeyValue">←</kbd><span id="studyPreviousKeyAction" data-i18n="studyKeyChange">変更</span>
+            </button>
+          </div>
+          <label class="study-check-option">
+            <input id="studyVerticalImageKeys" type="checkbox">
+            <span data-i18n="studyVerticalImageKeys">画像ページを↑ / ↓で移動する</span>
+          </label>
+          <p class="study-advanced-hint" data-i18n="studyKeyAssignmentHint">ボタンを押してから使いたいキーを押します。設定済みのショートカットは選べません。</p>
+          <div class="study-advanced-row">
+            <span id="studyZoomStepLabel" data-i18n="studyZoomStepLabel">拡大の送り幅</span>
+            <select id="studyZoomPercentStep" aria-labelledby="studyZoomStepLabel" aria-describedby="studyZoomStepHint">
+              <option value="1">1%</option>
+              <option value="2">2%</option>
+              <option value="5">5%</option>
+              <option value="10">10%</option>
+              <option value="25">25%</option>
+            </select>
+          </div>
+          <p id="studyZoomStepHint" class="study-advanced-hint" data-i18n="studyZoomStepHint">−／＋・Ctrl+ホイール・ピンチの1回ぶんです（初期値5%＝100%→200%が20回）。</p>
+          <label class="study-check-option">
+            <input id="studyPageKeysTurnPages" type="checkbox">
+            <span data-i18n="studyPageKeysTurnPages">PageUP、PageDownをページ動作にする</span>
+          </label>
+          <p class="study-advanced-hint" data-i18n="studyPageKeysTurnPagesHint">オフ（初期値）では、倍率に関係なく、はみ出した画像の上端／下端へ移動します。端で押し直すと前／次のページを続きの端から開き、本の端では全画面を終了して本棚へ戻ります（最後のページで閉じるかは下の設定で変更できます）。オンでは直接ページを送ります。縦読み・テキスト・画面に収まる画像は従来どおりです。</p>
+          <label class="study-check-option">
+            <input id="studyCloseOnLastPageDown" type="checkbox" checked aria-describedby="studyCloseOnLastPageDownHint">
+            <span data-i18n="studyCloseOnLastPageDown">最後のページ時PageDownで本を閉じる</span>
+          </label>
+          <p id="studyCloseOnLastPageDownHint" class="study-advanced-hint" data-i18n="studyCloseOnLastPageDownHint">画像の端へ移動する操作で、最後のページの下端からもう一度PageDownを押すと、本を閉じて全画面を終了します（初期オン）。オフなら下端で止まります。先頭ページでのPageUp・中クリックの設定は変更しません。</p>
+          <label class="study-check-option">
+            <input id="studyMouseClickPages" type="checkbox">
+            <span data-i18n="studyMouseClickPages">PCの簡易操作：左右クリックでページを送る</span>
+          </label>
+          <p class="study-advanced-hint" data-i18n="studyMouseClickPagesHint">左クリックで次のページ、右クリックで前のページ。画像の本のときだけ働きます（ページ上の位置は選びません）。</p>
+          <label class="study-check-option">
+            <input id="studyMouseClickFlip" type="checkbox">
+            <span data-i18n="studyMouseClickFlip">左右を反転（右クリックで進む・左クリックで戻る）</span>
+          </label>
+          <p class="study-advanced-hint" data-i18n="studyMouseClickFlipHint">トラックボールや左利きの人向け。上の「左右クリックでページを送る」がオンのときだけ選べます。</p>
+          <div class="study-advanced-row">
+            <span id="studyMiddleClickLabel" data-i18n="studyMiddleClickLabel">マウスの中クリック</span>
+            <select id="studyMiddleClickAction" aria-labelledby="studyMiddleClickLabel" aria-describedby="studyMiddleClickHint">
+              <option value="none" data-i18n="studyMiddleClickNone">何もしない</option>
+              <option value="next" data-i18n="studyMiddleClickNext">次のページへ</option>
+              <option value="close" data-i18n="studyMiddleClickClose">閉じて本棚へ（全画面を終了）</option>
+            </select>
+          </div>
+          <p id="studyMiddleClickHint" class="study-advanced-hint" data-i18n="studyMiddleClickNextHint">画像の本のときだけ働きます（ブラウザの自動スクロールは止めます）。</p>
+          <div class="study-advanced-row">
+            <span data-i18n="studyAlbumNestingLabel" id="studyAlbumNestingLabel">アルバムの分け方</span>
+            <select id="studyAlbumNesting" aria-labelledby="studyAlbumNestingLabel">
+              <option value="split" data-i18n="studyAlbumNestingSplit">サブフォルダごとに1冊</option>
+              <option value="flat" data-i18n="studyAlbumNestingFlat">フォルダ全体で1冊</option>
+            </select>
+          </div>
+          <p class="study-advanced-hint" data-i18n="studyAlbumNestingHint">次の取り込みから反映します。</p>
+          <div class="study-advanced-row study-edited-text-folder-row">
+            <span id="studyEditedTextFolderLabel" data-i18n="studyEditedTextFolderLabel">編集した文章の本棚フォルダ</span>
+            <select id="studyEditedTextFolder" aria-labelledby="studyEditedTextFolderLabel" aria-describedby="studyEditedTextFolderHint">
+              <option value="" data-i18n="studyEditedTextFolderKeep">自動で移動しない（今の場所）</option>
+            </select>
+          </div>
+          <p id="studyEditedTextFolderHint" class="study-advanced-hint" data-i18n="studyEditedTextFolderHint">選ぶと、編集内容を保存した本をこのフォルダへ整理します。本文は端末内の書斎に保存し、元ファイルは変更しません。</p>
+          <div class="study-advanced-row study-export-folder-row">
+            <span id="studyExportFolderLabel" data-i18n="studyExportFolderLabel">書き出し先（端末）</span>
+            <div class="study-export-folder-controls">
+              <button id="studyChooseExportFolderBtn" type="button" class="study-small-btn" aria-describedby="studyExportFolderHint" data-i18n="studyChooseExportFolder">書き出しフォルダを選ぶ</button>
+              <button id="studyClearExportFolderBtn" type="button" class="study-small-btn" data-i18n="studyClearExportFolder" hidden>解除</button>
+            </div>
+          </div>
+          <p id="studyExportFolderName" class="study-export-folder-name" role="status" aria-live="polite">未選択（ブラウザの通常ダウンロード先）</p>
+          <p id="studyExportFolderHint" class="study-advanced-hint" data-i18n="studyExportFolderHint">選んだフォルダに新しいファイルを作成します。同名があれば別名にし、既存ファイルは上書きしません。未対応ブラウザでは通常のダウンロードを使います。</p>
+      </div>
     </div>
   </div>
 

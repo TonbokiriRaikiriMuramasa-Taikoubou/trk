@@ -1,9 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-/* 📦 trk137: js/backup.js の値の変換（IndexedDB の値 ⇄ JSON。Blob は zip の中の名前で参照する）。
-   ・Blob／File（名前・型・更新時刻）、Date、NaN・Infinity、配列の undefined を往復できる
-   ・利用者のキーが「$」で始まっても、マーカー（$blob など）と混ざらない
-   ・書き出せないもの（関数・FileSystemHandle）は、その行だけ飛ばす（SkipValue）
-   ・キーは文字列と数値だけ */
+/* 📦 trk137／160: js/backup.js の値変換（IndexedDB ⇄ JSON）。Blob・File・Date、特殊キーを安全に往復する。 */
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -82,4 +78,15 @@ test("an array of many pages keeps the order and every Blob", () => {
   const { back } = roundTrip({ pages });
   assert.deepEqual(plain(back.pages.map(p => p.key)), pages.map(p => p.key));
   assert.equal(back.pages[49].file.name, "p49.jpg");
+});
+
+test("a __proto__ key round-trips as own data without changing the prototype", () => {
+  const source = JSON.parse('{"title":"t","__proto__":{"kind":"ordinary data"}}');
+  const c = collector();
+  const encoded = JSON.parse(JSON.stringify(B.encodeValue(source, c.add)));
+  const back = B.decodeValue(encoded, c.resolve);
+  assert.equal(Object.getPrototypeOf(back).kind, undefined);
+  assert.equal(back.kind, undefined);
+  assert.ok(Object.prototype.hasOwnProperty.call(back, "__proto__"));
+  assert.deepEqual(plain(back), JSON.parse('{"title":"t","__proto__":{"kind":"ordinary data"}}'));
 });

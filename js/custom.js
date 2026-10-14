@@ -131,76 +131,39 @@ core.$("makerDeleteBtn").addEventListener("click", () => {
 /* ============ ZIP（.stpack の中身） ============ */
 class PackError extends Error { constructor(key, vars) { super(key); this.key = key; this.vars = vars; } }
 async function readZip(blob) {
-  const buf = new Uint8Array(await blob.arrayBuffer()), dv = new DataView(buf.buffer);
-  if (buf.length < 22) throw new PackError("packBadZip");
-  let eocd = -1;
-  for (let i = buf.length - 22; i >= Math.max(0, buf.length - 65557); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
-  if (eocd < 0) throw new PackError("packBadZip");
-  const count = dv.getUint16(eocd + 10, true), files = {}, dec = new TextDecoder();
-  let p = dv.getUint32(eocd + 16, true);
-  for (let n = 0; n < count; n++) {
-    if (p + 46 > buf.length || dv.getUint32(p, true) !== 0x02014b50) throw new PackError("packBadZip");
-    const flags = dv.getUint16(p + 8, true), method = dv.getUint16(p + 10, true);
-    const csize = dv.getUint32(p + 20, true), usize = dv.getUint32(p + 24, true);
-    const nlen = dv.getUint16(p + 28, true), xlen = dv.getUint16(p + 30, true), clen = dv.getUint16(p + 32, true);
-    const loff = dv.getUint32(p + 42, true), name = dec.decode(buf.subarray(p + 46, p + 46 + nlen));
-    p += 46 + nlen + xlen + clen;
-    if (name.endsWith("/")) continue;
-    if ((flags & 1) || csize === 0xffffffff || loff + 30 > buf.length) throw new PackError("packBadZip");
-    const start = loff + 30 + dv.getUint16(loff + 26, true) + dv.getUint16(loff + 28, true);
-    if (start + csize > buf.length) throw new PackError("packBadZip");
-    files[name] = { method, usize, data:buf.subarray(start, start + csize) };
-  }
+  const zipIO = window.Trk.zipIO;
+  if (!zipIO) throw new PackError("packUnsupported");
+  let zip;
+  try { zip = await zipIO.zipOpen(blob); }
+  catch (_) { throw new PackError("packBadZip"); }
+  /* 中身はまだ読まず、ZIP中央ディレクトリとBlob参照だけを保持する。 */
+  const files = Object.create(null);
+  for (const entry of zip.entries) files[entry.name] = { method:entry.method, usize:entry.usize, zip, entry };
   return files;
 }
 async function inflateEntry(e, limit = 0, label = "") {
-  if (e.method === 0) {
-    if (limit > 0 && e.data.byteLength > limit) throw new PackError("packFileTooBig", { f:label });
-    return new Blob([e.data]);
-  }
-  if (e.method !== 8) throw new PackError("packBadZip");
-  if (typeof DecompressionStream === "undefined") throw new PackError("packUnsupported");
-  const stream = new Blob([e.data]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
-  if (!(limit > 0)) return new Response(stream).blob();
-  /* 🛡 圧縮爆弾よけ：ZIPの「展開後の大きさ（usize）」は作り手が自由に書けるので信用しない。
-     展開しながら数えて、上限を超えた時点でその場で止める（展開しきってから測ると、測る前にメモリを食われる）。 */
-  const reader = stream.getReader(), chunks = [];
-  let size = 0;
-  try {
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      size += value.byteLength;
-      if (size > limit) throw new PackError("packFileTooBig", { f:label });
-      chunks.push(value);
+  if (!e || !e.zip || !e.entry) throw new PackError("packBadZip");
+  if (limit > 0 && e.usize > limit) throw new PackError("packFileTooBig", { f:label });
+  const zipIO = window.Trk.zipIO;
+  if (!zipIO) throw new PackError("packUnsupported");
+  if (e.method === 8 && typeof DecompressionStream === "undefined") throw new PackError("packUnsupported");
+  try { return await zipIO.zipEntryBlob(e.zip, e.entry, limit > 0 ? limit : Infinity, true); }
+  catch (err) {
+    if (err instanceof zipIO.ZipIOError) {
+      if (err.key === "zipTooBig") throw new PackError("packFileTooBig", { f:label });
+      throw new PackError("packBadZip");
     }
-  } catch (err) {
-    try { await reader.cancel(); } catch (_) {}
     throw err;
   }
-  return new Blob(chunks);
 }
-const CRC_TABLE = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
-function crc32(u8) { let c = 0xffffffff; for (let i = 0; i < u8.length; i++) c = CRC_TABLE[(c ^ u8[i]) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; }
-async function writeZip(entries) {          // 無圧縮で書き出し（PNG・音源・VRMはもともと圧縮済み）
-  const enc = new TextEncoder(), parts = [], central = []; let off = 0;
-  for (const e of entries) {
-    const data = new Uint8Array(await e.blob.arrayBuffer()), name = enc.encode(e.name), crc = crc32(data);
-    const lh = new DataView(new ArrayBuffer(30));
-    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(12, 0x21, true);
-    lh.setUint32(14, crc, true); lh.setUint32(18, data.length, true); lh.setUint32(22, data.length, true); lh.setUint16(26, name.length, true);
-    parts.push(lh, name, data);
-    const ch = new DataView(new ArrayBuffer(46));
-    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(14, 0x21, true);
-    ch.setUint32(16, crc, true); ch.setUint32(20, data.length, true); ch.setUint32(24, data.length, true);
-    ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
-    central.push(ch, name);
-    off += 30 + name.length + data.length;
+async function writeZip(entries) {
+  const zipIO = window.Trk.zipIO;
+  if (!zipIO) throw new PackError("packUnsupported");
+  try { return await zipIO.zipWrite(entries); }
+  catch (err) {
+    if (err instanceof zipIO.ZipIOError) throw new PackError("packBadZip");
+    throw err;
   }
-  const cdSize = central.reduce((s, x) => s + x.byteLength, 0), end = new DataView(new ArrayBuffer(22));
-  end.setUint32(0, 0x06054b50, true); end.setUint16(8, entries.length, true); end.setUint16(10, entries.length, true);
-  end.setUint32(12, cdSize, true); end.setUint32(16, off, true);
-  return new Blob([...parts, ...central, end], { type:"application/zip" });
 }
 
 /* ============ pack.json の検証（決められた項目と形式だけを受け付ける） ============ */
@@ -313,6 +276,11 @@ function sanitizeManifest(raw) {
   }
   return m;
 }
+function packIdentityFromManifest(raw) {
+  const man = sanitizeManifest(raw);
+  if (!man) return null;
+  return { id:"p" + core.hashString(`${man.name}|${man.author}`).toString(36), man };
+}
 function manifestPaths(m) {
   const out = [];
   if (m.notes) for (const k of ["don", "ka"]) if (m.notes[k] && m.notes[k].image) out.push({ path:m.notes[k].image, kind:"image" });
@@ -387,8 +355,9 @@ async function installPackFileSerial(file) {
     const root = mf.slice(0, mf.length - "pack.json".length);
     let raw = null;
     try { raw = JSON.parse(await (await inflateEntry(entries[mf], PACK_MB, mf)).text()); } catch (e) { if (e instanceof PackError) throw e; }
-    const man = sanitizeManifest(raw);
-    if (!man) throw new PackError("packBadManifest");
+    const identity = packIdentityFromManifest(raw);
+    if (!identity) throw new PackError("packBadManifest");
+    const { id, man } = identity;
     const files = {}; let total = 0;
     for (const { path, kind } of manifestPaths(man)) {
       if (files[path]) continue;
@@ -400,7 +369,6 @@ async function installPackFileSerial(file) {
       total += blob.size; if (total > packCap(PACK_MAX)) throw new PackError("packTooBig");
       files[path] = new Blob([blob], { type:MIME[core.extOf(path)] || "" });
     }
-    const id = "p" + core.hashString(`${man.name}|${man.author}`).toString(36);
     await checkPackStorageCapacity(id, total);
     const record = { id, manifest:man, files, size:total, installedAt:Date.now() };
     /* 最終的な上限判定と保存を**同じ readwrite トランザクション**で行う（複数タブ間の競合を防ぐ）。
@@ -917,7 +885,7 @@ window.syncNoteUI = syncNoteUI;
 window.updateMascotUI = updateMascotUI;
 /* 領域（window.Trk.custom）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
 window.Trk = window.Trk || {};
-window.Trk.custom = Object.assign(window.Trk.custom || {}, { initPacks, noteImage, packDB, packRuntime, skinShelf, syncNoteUI, updateMascotUI });
+window.Trk.custom = Object.assign(window.Trk.custom || {}, { initPacks, noteImage, packDB, packRuntime, packIdentityFromManifest, skinShelf, syncNoteUI, updateMascotUI });
 Object.defineProperty(window.Trk.custom, "getPackSongs", { configurable:true, get:() => getPackSongs, set:v => { getPackSongs = v; } });
 Object.defineProperty(window.Trk.custom, "installPackFile", { configurable:true, get:() => installPackFile, set:v => { installPackFile = v; } });
 Object.defineProperty(window.Trk.custom, "renderPackList", { configurable:true, get:() => renderPackList, set:v => { renderPackList = v; } });

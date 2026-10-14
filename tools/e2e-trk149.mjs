@@ -7,8 +7,8 @@
  *
  * 見ること：
  *   1. ようこそ：初回に出る → 閉じる → 緊急復旧の「ようこそをもう一度」で再び出る
- *   2. trk Agent's OST Vol.1：assets/trk-ost/manifest.json があれば、10曲はこのプレイリストの中だけに出て、
- *      プレイリストが作られ、02番を選ぶと音源の読み込みと解析まで進む（無ければ飛ばす）
+ *   2. trk Agent's OST Vol.1：ビルド側の AGENT_OST_MANIFEST_INCLUDED が true で、manifestもある場合だけ、
+ *      10曲が専用プレイリストに出て、02番の音源読み込み・解析まで進む（既定ビルドでは飛ばす）
  *   3. 書斎：CBZ（3ページ）と ZIP（2ページ）を取り込むと、2冊・5ページになる
  *   4. CATCH の設定：「次の荷物まで」のチェックがある
  *   5. どの確認でも、ページの例外・console.error が無い
@@ -95,7 +95,8 @@ try {
 
   // 2. trk Agent's OST Vol.1（音源があるときだけ）
   const manifestPath = path.join(ROOT, "assets/trk-ost/manifest.json");
-  if (fs.existsSync(manifestPath)) {
+  const agentOstEnabled = /const AGENT_OST_MANIFEST_INCLUDED\s*=\s*true/.test(fs.readFileSync(path.join(ROOT, "js/library.js"), "utf8"));
+  if (agentOstEnabled && fs.existsSync(manifestPath)) {
     const playlists = await page.evaluate(() => (window.Trk.core.settings.playlists || []).map(p => ({ id: p.id, name: p.name, songs: p.songs.length })));
     const pl = playlists.find(p => p.id === "trk-agent-ost-v1");
     const songs = await page.evaluate(() => window.Trk.library.allSongs().filter(s => s.key.startsWith("builtin:trk-agent-ost:")).length);
@@ -107,7 +108,8 @@ try {
     const status = await page.evaluate(() => (document.getElementById("loadStatus") || {}).textContent || "");
     check("agentOst", !!pl && pl.songs === 10 && songs === 10 && !sel && /analy|解析|Ready/i.test(status), { playlist: pl, songs, selectError: sel, status });
   } else {
-    results.agentOst = { ok: true, skipped: "assets/trk-ost/manifest.json が無い（tools/make-trk-ost.mjs を先に実行）" };
+    const ok = !agentOstEnabled;
+    results.agentOst = { ok, skipped: ok ? "既定ビルドは AGENT_OST_MANIFEST_INCLUDED=false（任意資産を要求しない）" : "AGENT_OST_MANIFEST_INCLUDED=true ですが assets/trk-ost/manifest.json がありません" };
   }
 
   // 3. 書斎：CBZ と ZIP の取り込み

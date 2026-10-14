@@ -467,7 +467,7 @@ Object.assign(TEXT.ko, {
 });
 Object.assign(TEXT.ja, {
   plNewFolder:"📁 新規フォルダ", plDefaultFolderName:"フォルダ", plFolderSettings:"フォルダの設定",
-  plFolderOf:"入れ物", plFolderRoot:"（なし・並びのトップ）",
+  plFolderOf:"入れ物", trkCopiedToFolder:"「{name}」を複製して入れました（元のリストは 🐔 に残ります）", plFolderRoot:"（なし・並びのトップ）",
   plFolderDel:"🗑 このフォルダを削除（中身は消えません）",
   plFolderLimit:"📁 フォルダは{n}個までです。使っていないフォルダを消すと作れます",
   plFolderCreated:"📁 フォルダ「{name}」を作成しました", plFolderDeleted:"🗑 フォルダを削除しました（中身は上の階層へ）",
@@ -518,7 +518,7 @@ Object.assign(TEXT.ja, {
 });
 Object.assign(TEXT.en, {
   plNewFolder:"📁 New folder", plDefaultFolderName:"Folder", plFolderSettings:"Folder settings",
-  plFolderOf:"Location", plFolderRoot:"(none — top level)",
+  plFolderOf:"Location", trkCopiedToFolder:"Copied \"{name}\" into the folder (the original stays in 🐔)", plFolderRoot:"(none — top level)",
   plFolderDel:"🗑 Delete this folder (contents are kept)",
   plFolderLimit:"📁 Up to {n} folders. Delete one you no longer use to make room",
   plFolderCreated:"📁 Folder “{name}” created", plFolderDeleted:"🗑 Folder deleted (contents moved up)",
@@ -569,7 +569,7 @@ Object.assign(TEXT.en, {
 });
 Object.assign(TEXT.zh, {
   plNewFolder:"📁 新建文件夹", plDefaultFolderName:"文件夹", plFolderSettings:"文件夹设置",
-  plFolderOf:"所属位置", plFolderRoot:"（无·顶层）",
+  plFolderOf:"所属位置", trkCopiedToFolder:"已将「{name}」复制到文件夹（原列表保留在 🐔 中）", plFolderRoot:"（无·顶层）",
   plFolderDel:"🗑 删除此文件夹（内容不会消失）",
   plFolderLimit:"📁 最多 {n} 个文件夹。删除不用的文件夹后即可创建",
   plFolderCreated:"📁 已创建文件夹「{name}」", plFolderDeleted:"🗑 已删除文件夹（内容移到上一层）",
@@ -620,7 +620,7 @@ Object.assign(TEXT.zh, {
 });
 Object.assign(TEXT.ko, {
   plNewFolder:"📁 새 폴더", plDefaultFolderName:"폴더", plFolderSettings:"폴더 설정",
-  plFolderOf:"소속", plFolderRoot:"(없음·최상위)",
+  plFolderOf:"소속", trkCopiedToFolder:"\"{name}\"을(를) 복제해서 넣었어요（원래 목록은 🐔에 남아요）", plFolderRoot:"(없음·최상위)",
   plFolderDel:"🗑 이 폴더 삭제(내용은 지워지지 않아요)",
   plFolderLimit:"📁 폴더는 {n}개까지예요. 쓰지 않는 폴더를 지우면 만들 수 있어요",
   plFolderCreated:"📁 폴더 '{name}'을(를) 만들었어요", plFolderDeleted:"🗑 폴더를 삭제했어요(내용은 위 계층으로)",
@@ -1769,6 +1769,18 @@ function plMenu(p) {
   const lk = el("input"); lk.type = "checkbox"; lk.checked = !!p.locked;
   const save = el("button", "plBtn", tr("plSave")); save.type = "button";
   save.addEventListener("click", () => {
+    /* 🐔 の中（trk のリスト）を別の入れ物へ入れるときは、移動せず複製する。元のリストは 🐔 に残る。
+       複製は利用者のリストになる（カタログとの紐づけ・自動更新は付けない）。入れ物は1つに限らず、複製で何か所にも置ける */
+    if (fldSel.value !== (p.folder || "") && plIsTrkManaged(p)) {
+      const copy = plSanitize({ id: "pl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        name: name.value || p.name, icon: icon.value, color: color.value, frozen: false, locked: false,
+        songs: p.songs.slice(), wish: p.wish ? p.wish.slice() : [], guide: p.guide || null, folder: fldSel.value,
+        tags: tags.value.split(/[\s、，,]+/).map(x => x.trim().slice(0, 16)).filter(Boolean).slice(0, 5), createdAt: Date.now() });
+      if (!copy) return;
+      core.settings.playlists.push(copy); core.saveUserPrefs(); d.close(); renderLib();
+      plToast(tr("trkCopiedToFolder", { name: copy.name }));
+      return;
+    }
     const t = plSanitize({ id: p.id, name: name.value || p.name, icon: icon.value, color: color.value, frozen: fz.checked, locked: lk.checked,
       songs: p.songs, wish: p.wish, guide: p.guide, cat: p.cat, by: p.by, createdAt: p.createdAt,
       folder: fldSel.value, tags: tags.value.split(/[\s、，,]+/).map(x => x.trim().slice(0, 16)).filter(Boolean).slice(0, 5) });
@@ -3700,7 +3712,9 @@ function syncTrkUI() {
   }
   try { renderTrkSettings(); } catch(_){}
 }
-function trkFolderIdSet() { return plWishFolderIds(TRK_FOLDER_ID); }   /* 🐔 の階層に入るフォルダ（trk 自身と、その子孫） */
+function trkFolderIdSet() { return plWishFolderIds(TRK_FOLDER_ID); }
+/* 🐔 の中のリスト（trk が作ったもの、または 🐔 のフォルダ内にあるもの）か */
+function plIsTrkManaged(p) { return TRK_AUTO_ID.test(p.id) || trkFolderIdSet().has(p.folder); }   /* 🐔 の階層に入るフォルダ（trk 自身と、その子孫） */
 function renderTrkSettings() {
   const box = core.$("trkOrderList");
   if (!box) return;

@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-14（trk158）**。現在の仕様・守る条件・未確認事項の要約です。過去の変更履歴（trk149以前）と検証記録（trk157以前）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-14（trk159）**。現在の仕様・守る条件・未確認事項の要約です。過去の変更履歴（trk154以前）と検証記録（trk158以前）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検。
 
@@ -51,26 +51,28 @@
 - trk108〜113の「Season 1〜9・Warsongsは確認済み」は根拠の無い過大表記で、trk114で訂正した（経緯はアーカイブ）。
 - Creator-Safe でも Riot の法務表記（Legal Jibber Jabber）に従うことが条件で、音源の同梱・再配布・販売や企業広告での利用は別条件。音源はカタログにも同梱しない。曲別出典・範囲・権利上の注意は [`LEAGUE-OF-LEGENDS-MUSIC.md`](LEAGUE-OF-LEGENDS-MUSIC.md) と [`VALORANT-MUSIC.md`](VALORANT-MUSIC.md)。
 
-### ブルーアーカイブ・ミカ（trk157〜158）
+### ブルーアーカイブ・ミカ（trk157〜159）
 
-既存OST Vol.1〜8・225曲は維持。別枠のミカ3リストを合わせ、**BA全体は11リスト・237項目**です。ミカ部分は6楽曲を言語・媒体・伴奏で分けた12項目（音源8／映像4）であり、「12曲」でも全作品の網羅数でもありません。
+既存OST Vol.1〜8・225曲は維持。メモリアルロビー2曲と旧3リスト（kiss angel／Aria to the Star／ソロ＆参加曲）を1つのプレイリスト **`ba-mika`（自動作成ID `trk-ba-mika`）「🪽 聖園ミカ」**（タブ色 `pink`）にまとめ、**BA全体は9リスト・239項目**です。ミカ部分はメモリアルロビーBGM2曲と歌唱6楽曲を言語・媒体・伴奏で分けた14項目（音源10／映像4）であり、「14曲」でも全作品の網羅数でもありません。
 
-| カタログID（自動作成IDは先頭に `trk-`） | 表示名 | 収録範囲・案内先 |
+| 曲の並び（`ba-mika`「🪽 聖園ミカ」内） | 項目数 | 収録範囲・案内先 |
 |---|---|---|
-| `ba-mika-kiss` | ミカ — kiss angel | PV2本（中／日、公式bilibili）＋音源3曲（中文版／日文版／伴奏版、Apple Music中国ストア） |
-| `ba-mika-aria` | ミカ — Aria to the Star | Prismatic Diary／The Incandescent Blue and the Cometの音源2曲（Apple Music英国ストア）＋グローバル公式ミニミュージカル本編（YouTube） |
-| `ba-mika-vocals` | ミカ — ソロ＆参加曲 | 幸せになるよ／ワンダー・ファニー・ハーモニー／Let's Go With...の歌入り3曲（Apple Music日本ストア）＋最後の曲の公式MV（YouTube） |
+| 1〜2：メモリアルロビー曲 | 2項目 | Daily Routine 24/7（Nor、OST Vol.1／mora、`Daily Routine 247` も照合）＋You’re My Princess（EmoCosine、2026年10月時点で公式配信先未確認のため作曲家Xの1分投稿へ案内） |
+| 3〜7：kiss angel | 5項目 | PV2本（中／日、公式bilibili）＋音源3曲（中文版／日文版／伴奏版、Apple Music中国ストア） |
+| 8〜10：Aria to the Star | 3項目 | Prismatic Diary／The Incandescent Blue and the Cometの音源2曲（Apple Music英国ストア）＋グローバル公式ミニミュージカル本編（YouTube） |
+| 11〜14：ソロ＆参加曲 | 4項目 | 幸せになるよ／ワンダー・ファニー・ハーモニー／Let's Go With...の歌入り3曲（Apple Music日本ストア）＋最後の曲の公式MV（YouTube） |
 
-- 既存ブルアカ棚 `trk-ba` に自動作成し、共通タグは `Mika`。新しいMikaフォルダへの移動はしません。利用者の配置・名前・所持曲・凍結状態・削除を尊重します。
-- 案内キーは `plGuideBlueArchiveMika`／`plGuideBlueArchiveMikaAria`／`plGuideBlueArchiveMikaVocals`（4言語）。地域差、ローカルファイル提供の保証なし、配信・購入は二次利用許諾ではないことを明記。
+- 既存ブルアカ棚 `trk-ba` に自動作成し、共通タグは `Mika`。新しいMikaフォルダへの移動はしません。trk157〜158の旧3リスト（`trk-ba-mika-kiss`／`trk-ba-mika-aria`／`trk-ba-mika-vocals`）が保存されている場合は、所持曲・開いているタブ・ユーザー編集・削除状態を引き継いで `trk-ba-mika` 1つへ自動統合します（`BA_MIKA_LEGACY_PL`、削除予定日 2027-01-14）。
+- 案内キーは `plGuideBlueArchiveMika`（4言語）。地域差、ローカルファイル提供の保証なし、配信・購入は二次利用許諾ではないことを明記。
 - **英語掲載名≠英語歌唱**。Ariaの韓国語公式曲名は音源の照合別名。本編と曲別MV、音源と映像は分け、英韓チャンネルの投稿数を楽曲数に加算しません。合唱クレジットはCV括弧のみ省略し、全キャラクター名を80文字内に保持。
 - kiss angelのShort音声2版は公式の単独配信先未確認で未収録。Ariaの会話・伴奏・曲別MV、日本語曲の別バージョン、映像出演だけの候補は今回の収録対象外（存在未確認とは区別）。
 - 出典・各曲の範囲は [`BLUEARCHIVE-MIKA-INDEX.md`](BLUEARCHIVE-MIKA-INDEX.md)、作品別は [`BLUEARCHIVE-MIKA-MUSIC.md`](BLUEARCHIVE-MIKA-MUSIC.md)／[`BLUEARCHIVE-MIKA-ARIA.md`](BLUEARCHIVE-MIKA-ARIA.md)。音源・動画・歌詞は同梱しません。
 
-### 曲名と媒体の照合（trk155〜158）
+### 曲名と媒体の照合（trk155〜159）
 
 - **元ファイル名・表示名は変更しない**。公式タイトルと根拠のある `matchAliases` で照合します。方針はREADME（日英）、仕様と未対応例は [`TITLE-MATCH.md`](TITLE-MATCH.md)。
 - クラシックは `Cm`／`C minor`・空白・句読点を吸収し、調・作品番号・楽章は保持。BeethovenのMusopen掲載名を別名として登録し、保存済みClassic Vol.1へも同じ曲の別名だけを補います。全クラシックの配布名を確認したわけではありません。
+- `24/7`（半角 `/`・全角 `／`）を含む曲名からは `247` の照合キーも生成し、`Daily Routine 24/7` と `Daily Routine 247` のどちらの表記でも整合します。
 - 装飾救済は `【高音質】`／`[HQ]`／`[High Quality]`／先頭🎧／`Theme 数字 -` に限定。通常照合の後、全候補が一意なときだけ採用。作者クレジットはカタログのartistを含む完全なキーと照合し、ローカル名のbyを推測で削りません。
 - JP／CN／Short／Instrumental等の版名は保持。版やクラシックの見出しを左右に分割して別曲を拾わず、装飾救済を共有プレイリストの取り込みに広げません。旧テストの `Do you wanna kiss by angel` は仮想例で、公式曲名・別名には登録していません。
 - ミカの項目は `matchMedia: audio | video` を指定。通常／別名／装飾／照合メモの候補を媒体で絞ります。動画取込flag→実FileのMIME→実ファイル名の拡張子の順に判定し、媒体不明は未一致。`trkWishFromTrack`／`plSanitize`で条件を保存します。**内容の鑑定ではなく、誤った形式情報や録音・歌唱言語を検証するものではありません。** 条件のない既存項目は従来どおり。
@@ -153,7 +155,7 @@
 | 11 | 入口まわり（📚書斎ボタン・⏯再生ボタン、trk125・126） | **2026-10-12 に実機で動作確認済み** | 押しやすさ（大きさ・位置）だけ引き続き見る。再発時は端末・押し方を聞く |
 | 12 | trk129〜132 の確認（↕並べ替え、パック外し、共有プレイリスト、MIRROR、Endfield、フォルダ上限40、🎭棚の戻し、パックとスキン、MOD後の書き出し） | 実機未確認（自動検査のみ。⑧⑨はヘッドレス17項目で確認） | 見てほしい順（①〜⑨）で実機確認 |
 | 13 | trk136（全画面フィットの PageDown 長押し、💾端末の保存） | 実機未確認 | PC・Android で確認 |
-| 14 | 曲名照合・ミカ音源／映像（trk155〜158） | Node/VM・合成WAVのヘッドレス検査済み。実曲・実動画・実機は未確認 | 実ファイルで照合・再生、配信ページの地域差を確認（購入・抽出を自動実行しない） |
+| 14 | 曲名照合・ミカ音源／映像（trk155〜159） | Node/VM・合成WAVのヘッドレス検査済み。実曲・実動画・実機は未確認 | 実ファイルで照合・再生、配信ページの地域差を確認（購入・抽出を自動実行しない） |
 
 ### 4.1 詳細
 
@@ -202,17 +204,18 @@
 | 利用者向けMIDI・権利案内 | `docs/guide/touhou-midi.md`、`docs/guide/sound.md`、`docs/guide/en.md` |
 | 🎓 OST手続き生成 | `tools/make-trk-ost.mjs`（出力は `assets/trk-ost/`・Git外。5ルール×2曲＝10曲のWAVスケッチ） |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.14-trk158`） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.14-trk159`） |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
 
-- **trk158（ミカのAria・日本語ソロ／参加曲、2026-10-14）**：`npm run check` 成功（Static 0 failure／0 warning、`node:test` **369/369**）、`git diff --check` 成功。Ariaの3項目、日本語の4項目、公式名・媒体・URL・全員の簡略クレジット、4言語ガイド、保存／再読込・削除尊重を検査。`tools/e2e-title-match.mjs` はChromium 153で全項目成功：Classic・既存BA・kiss angelに加え、Ariaの音源2曲（韓国語名でも一致）、伴奏と本編名WAVの拒否、再起動後の条件保持、日本語3曲の所持行化とShort／同名音声でMVが埋まらないことを確認。ページ例外0。未生成の任意OST manifestの404は4件を別記録。**合成WAVを使った照合・保存の検査であり、実曲の聴取や実動画再生、Android実機の確認ではない。**
-  - ブラウザ用の除外ディレクトリは環境復元時に失われることがある。今回は `node_modules/.browser-tools` に `@sparticuz/chromium@153.0.0`／`puppeteer-core@25` を再配置。Chromiumの `bin/al2023.tar.br` をNodeのbrotliで展開し、tar内の実ライブラリを `libs` へ展開、`LD_LIBRARY_PATH=.../libs/lib` を指定して実行成功（NSSの自作スタブは不要）。プロジェクトのpackage.json／lockやGitにブラウザ依存を追加していない。
+- **trk159（ミカ3リストを「🪽 聖園ミカ」1つへ統合＋メモロビ2曲追加、2026-10-14）**：`npm run check` 成功（Static 0 failure／0 warning、`node:test` **371/371**）、`git diff --check` 成功。`ba-mika`（`🪽 聖園ミカ`、色 `pink`、14項目：メモリアルロビー2曲 `Daily Routine 24/7`・`You’re My Princess` → `kiss angel` 5項目 → `Aria to the Star` 3項目 → `ソロ＆参加曲` 4項目の順）、`Daily Routine 24/7` ↔ `Daily Routine 247` の表記ゆれ照合、旧3リスト（`trk-ba-mika-kiss`／`trk-ba-mika-aria`／`trk-ba-mika-vocals`）からの所持曲・開いているタブ・ユーザー編集を引き継ぐ統合、公式名・媒体・URL・全員の簡略クレジット、4言語ガイド、保存／再読込・削除尊重をNode/VMで検査（`tools/e2e-title-match.mjs` も統合リスト `trk-ba-mika` の14項目に追随更新済み）。**実ブラウザでの再実行・実曲の聴取・実動画再生・Android実機の確認は未実施。**
 
 過去の検証件数・個別E2E・旧ブラウザ環境の回避手順は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) の「trk158整理時に移した検証記録」へ移しました。上記が現在の結果です。利用者の実機確認済み事項と残る確認項目は§4を正とします。
 
 ## 7. 最近の変更
+
+- **trk159（2026-10-14）**：ブルアカのミカ3プレイリスト（`ba-mika-kiss`／`ba-mika-aria`／`ba-mika-vocals`）を1つの「🪽 聖園ミカ」（`ba-mika`、自動作成ID `trk-ba-mika`、タブ色 `pink`）に統合し、先頭にメモリアルロビー2曲（1番目：`Daily Routine 24/7`（`Daily Routine 247` でも照合）→ mora、2番目：`You’re My Princess` → 2026年10月時点で公式配信未確認のため作曲家EmoCosine氏のX 1分投稿へ案内）を追加。曲の並び順をメモロビ2曲 → `kiss angel`（5項目）→ `Aria to the Star`（3項目）→ `ソロ＆参加曲`（4項目）の計14項目とし、旧3リストの保存データも自動統合（`BA_MIKA_LEGACY_PL`）。cacheをtrk159へ。
 
 - **trk158（2026-10-14）**：ミカのAria（2音源＋本編映像）と日本語ソロ／歌唱参加（3音源＋MV）を追加。地域・歌唱言語・媒体を区別した4言語ガイド、出典台帳、回帰テスト。cacheをtrk158へ。
 
@@ -222,12 +225,7 @@
 
 - **trk155（2026-10-14）**：クラシック曲名の表記ゆれ対策。Musopenの利用者提供名をカタログ別名へ、意味を保つ表記の正規化・部分一致の抑止・末尾の作品番号を拡張子と誤認する問題を修正。保存済みClassic Vol.1の別名も更新。`sw.js` cacheをtrk155へ。合成WAVでのブラウザE2Eは§6参照。Musopenの実ダウンロード音源／PC・Android実機は未確認。
 
-- **trk154（2026-10-14）**：プレイリストの「入れ物」（フォルダ）まわりの整理。**🐔 の中のリストを別の入れ物（またはルート）へ入れるときは、移動せず複製**（`plMenu` の保存。判定は `plIsTrkManaged`＝`TRK_AUTO_ID` の id、または 🐔 のフォルダ内）。元のリストは 🐔 に残り、複製は利用者のリスト（`cat`・`wish` の自動更新は付けない。`guide` と `wish` は控えとして写す）。入れ物は1つに限らず、複製で何か所にも置ける。`sw.js` は trk154。
-- **trk153（2026-10-14）**：🐔 の階層（Vol 一覧）を、フォルダ中心の操作に変更。①**見出しのタイトルを押すと、そのフォルダを開く**（右の「フォルダを開く」も同じ）。②▸／▾ の開閉は外し、中の Vol は常に並べる（`folderBlock`）。③**Vol の名前を押すと、その Vol のフォルダを開く**。④**右の ✓ で、プレイリストの詳細（`pl:` の画面）を開く**（文言 `trkMenuOpenList`、4言語）。`sw.js` は trk153（後に trk154）。
-- **trk152（2026-10-14）**：①**チュートリアル完了時に Game Vol.1・Classic Vol.1 を自動で作らない**。`TRK_AUTO_GAME_CLASSIC = false`（`js/library.js`）と、`js/main.js` の自動作成ブロックの削除で止めた。手動の作成・🐔 の ♻ 戻しは残す。既に作られている利用者のリストは消さない（⚙ から削除できる）。②🐔 の階層の初版（▸▾の開閉）。`sw.js` は trk152。
-- **trk151（2026-10-14）**：古い名前（「trk Agent's Orig. Vol.1」）で保存されたプレイリストを、起動時に「trk Agent's OST Vol.1」へ直す（`renameAgentOstPlaylist`。音源マニフェストの有無に関係なく実行）。`sw.js` は trk151。
-- **trk150（2026-10-14）**：①初期の「すべて」一覧は **FIRST SPARK だけ**。手続き生成10曲（Original 01〜10）は「🎼 trk Agent's OST Vol.1」の中にだけ出す（`trkOnly` 印。すべて・件数・検索からは除外）。②プレイリスト名は **「trk Agent's OST Vol.1」**（起動時に既存の名前も直す）。③「開けない」の原因は、フォルダ（🐔）を作る前に一覧を描いていたため 🐔 タブが出ていなかったこと。起動時にプレイリストを先に作り、そのあと描き直すよう修正。④🐔 タブを押すと Vol の階層（一覧）が開き、Vol を選ぶと以前の形（曲の一覧）で開く。sw.js は trk150。
-- **trk149以前**：詳細を [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) へ移しました。既存の安全対策・利用者判断は削除せず履歴に保存し、現在の仕様と未確認事項は§2〜4を参照します。
+- **trk154以前**：詳細を [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) へ移しました。既存の安全対策・利用者判断は削除せず履歴に保存し、現在の仕様と未確認事項は§2〜4を参照します。
 
 ## 8. 変更時チェックリスト
 

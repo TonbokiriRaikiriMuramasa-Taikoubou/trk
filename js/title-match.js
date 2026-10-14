@@ -32,8 +32,14 @@ function plTitleKeys(t) {
   if (!base) return out;
   out.push(base);
   /* .67 は拡張子ではなく Op.67 の番号かもしれないので、数字だけの末尾は残す。 */
-  const sep = base.replace(/\.[a-z][a-z0-9]{0,4}$/, "").replace(/[._\-\u30FB\uFF65\uFF0F\/]+/g, " ").replace(/\s+/g, " ").trim();
+  const noExt = base.replace(/\.[a-z][a-z0-9]{0,4}$/, "");
+  const sep = noExt.replace(/[._\-\u30FB\uFF65\uFF0F\/]+/g, " ").replace(/\s+/g, " ").trim();
   if (sep && !out.includes(sep)) out.push(sep);
+  /* 「24/7」↔「247」（Daily Routine 24/7 ↔ Daily Routine 247）の表記ゆれを吸収する。 */
+  if (/\b24\s*[/\uFF0F]\s*7\b/.test(noExt)) {
+    const compact = noExt.replace(/\b24\s*[/\uFF0F]\s*7\b/g, "247").replace(/[._\-\u30FB\uFF65\uFF0F\/]+/g, " ").replace(/\s+/g, " ").trim();
+    if (compact && !out.includes(compact)) out.push(compact);
+  }
   const noNum = sep.replace(/^(?:vol\.?\s*)?\d{1,3}\s+/, "");   /* 「08 sometimes」→「sometimes」 */
   if (noNum && !out.includes(noNum)) out.push(noNum);
   if (plIsClassicalTitle(base)) {

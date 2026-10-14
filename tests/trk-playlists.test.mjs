@@ -296,75 +296,64 @@ describe("Classicの配布名を既存の棚にも補う", () => {
   });
 });
 
-test("Mika playlist is created under Blue Archive, refreshes safely, and respects deletion", () => {
+test("unified 🪽聖園ミカ playlist is created under Blue Archive with pink color, 14 ordered wishes, 4-language guide, and deletion respect", () => {
   const ba = catalog.find(s => s.id === "bluearchive"), settings = fresh();
   const { api, context } = sandbox(settings, { series: [ba] });
   api.ensureTrkDistributionPlaylists();
-  const p = settings.playlists.find(p => p.id === "trk-ba-mika-kiss");
+  const p = settings.playlists.find(p => p.id === "trk-ba-mika");
+  assert.equal(p.name, "聖園ミカ");
+  assert.equal(p.icon, "🪽");
+  assert.equal(p.color, "pink");
   assert.equal(p.folder, "trk-ba");
-  assert.equal(p.wish.length, 5);
+  assert.equal(p.wish.length, 14);
+  assert.deepEqual([...p.wish.map(w => w.matchMedia)], ["audio", "audio", "video", "video", "audio", "audio", "audio", "audio", "audio", "video", "audio", "audio", "audio", "video"]);
   assert.equal(p.guide.key, "plGuideBlueArchiveMika");
-  assert.equal(p.guide.url, "https://www.taptap.cn/moment/603897878431138731");
+  assert.equal(p.guide.url, "https://bluearchive.jp/");
+  assert.ok(p.guide.note.length <= 160);
   for (const lang of ["ja", "en", "zh", "ko"]) {
     context.lang = lang;
     assert.equal(api.plGuideText(p.guide), context.TEXT[lang].plGuideBlueArchiveMika);
     assert.match(api.plGuideText(p.guide), /Short/);
+    assert.match(api.plGuideText(p.guide), /Princess/);
   }
   p.name = "my Mika"; p.songs.push("owned"); p.frozen = true;
-  delete p.wish[0].matchMedia;
+  delete p.wish[2].matchMedia;
   api.ensureTrkDistributionPlaylists();
-  assert.equal(p.wish[0].matchMedia, "video");
+  assert.equal(p.wish[2].matchMedia, "video");
   assert.equal(p.name, "my Mika");
   assert.equal(p.frozen, true);
   assert.deepEqual([...p.songs], ["owned"]);
   api.plDelete(p);
   api.ensureTrkDistributionPlaylists();
-  assert.ok(!settings.playlists.some(p => p.id === "trk-ba-mika-kiss"));
+  assert.ok(!settings.playlists.some(p => p.id === "trk-ba-mika"));
 });
 
-test("Aria's three-item list has localized guidance and respects saved user edits and deletion", () => {
+test("legacy three Mika playlists (trk157–158) consolidate into a single trk-ba-mika while preserving owned songs, open tab, and user edits", () => {
   const ba = catalog.find(s => s.id === "bluearchive"), settings = fresh();
-  const { api, context } = sandbox(settings, { series: [ba] });
+  settings.playlists.push(
+    { id: "trk-ba-mika-kiss", name: "ミカ — kiss angel", icon: "🪽", color: "pink", folder: "trk-ba",
+      tags: ["Blue Archive", "Mika", "CN", "PV", "Vocal"], wish: [], songs: ["kiss-cn", "shared"], cat: "trk:bluearchive:ba-mika-kiss" },
+    { id: "trk-ba-mika-aria", name: "ミカ — Aria to the Star", icon: "🪽", color: "pink", folder: "trk-ba",
+      tags: ["Blue Archive", "Mika", "KR", "Musical", "PV"], wish: [], songs: ["aria-1", "shared"], frozen: true, cat: "trk:bluearchive:ba-mika-aria" },
+    { id: "trk-ba-mika-vocals", name: "ミカ — ソロ＆参加曲", icon: "🪽", color: "pink", folder: "trk-ba",
+      tags: ["Blue Archive", "Mika", "JP", "Vocal", "PV"], wish: [], songs: ["jp-1"], cat: "trk:bluearchive:ba-mika-vocals" }
+  );
+  settings.libTab = "pl:trk-ba-mika-aria";
+  settings.libOpenTabs = ["trk-ba-mika-kiss", "trk-ba-mika-aria"];
+  settings.playlistOrder = ["trk-ba-v1", "trk-ba-mika-kiss", "trk-ba-mika-aria", "trk-ba-mika-vocals"];
+  const { api } = sandbox(settings, { series: [ba] });
   api.ensureTrkDistributionPlaylists();
-  const p = settings.playlists.find(p => p.id === "trk-ba-mika-aria");
-  assert.equal(p.folder, "trk-ba");
-  assert.equal(p.wish.length, 3);
-  assert.deepEqual([...p.wish.map(w => w.matchMedia)], ["audio", "audio", "video"]);
-  assert.equal(p.guide.key, "plGuideBlueArchiveMikaAria");
-  assert.match(p.guide.url, /thread=3303925$/);
-  assert.ok(p.guide.note.length <= 160);
-  for (const lang of ["ja", "en", "zh", "ko"]) {
-    context.lang = lang;
-    assert.equal(api.plGuideText(p.guide), context.TEXT[lang].plGuideBlueArchiveMikaAria);
-    assert.match(api.plGuideText(p.guide), /Apple Music/);
-  }
-  p.name = "My musical"; p.songs.push("owned"); p.frozen = true;
-  delete p.wish[2].matchMedia;
-  api.ensureTrkDistributionPlaylists();
-  assert.equal(p.wish[2].matchMedia, "video");
-  assert.equal(p.name, "My musical");
+  const mikaLists = settings.playlists.filter(p => p.id.startsWith("trk-ba-mika"));
+  assert.equal(mikaLists.length, 1);
+  const p = mikaLists[0];
+  assert.equal(p.id, "trk-ba-mika");
+  assert.equal(p.name, "聖園ミカ");
+  assert.equal(p.icon, "🪽");
+  assert.equal(p.color, "pink");
   assert.equal(p.frozen, true);
-  assert.deepEqual([...p.songs], ["owned"]);
-  api.plDelete(p);
-  api.ensureTrkDistributionPlaylists();
-  assert.ok(!settings.playlists.some(p => p.id === "trk-ba-mika-aria"));
-  assert.ok(settings.playlists.some(p => p.id === "trk-ba-mika-kiss"));
-});
-
-test("Japanese Mika list has four rows, a four-language guide, and no resurrection after deletion", () => {
-  const ba = catalog.find(s => s.id === "bluearchive"), settings = fresh();
-  const { api, context } = sandbox(settings, { series: [ba] });
-  api.ensureTrkDistributionPlaylists();
-  const p = settings.playlists.find(p => p.id === "trk-ba-mika-vocals");
-  assert.equal(p.folder, "trk-ba");
-  assert.equal(p.wish.length, 4);
-  assert.equal(p.guide.key, "plGuideBlueArchiveMikaVocals");
-  for (const lang of ["ja", "en", "zh", "ko"]) {
-    context.lang = lang;
-    assert.equal(api.plGuideText(p.guide), context.TEXT[lang].plGuideBlueArchiveMikaVocals);
-    assert.match(api.plGuideText(p.guide), /Apple Music/);
-  }
-  api.plDelete(p); api.ensureTrkDistributionPlaylists();
-  assert.ok(!settings.playlists.some(p => p.id === "trk-ba-mika-vocals"));
-  assert.ok(settings.playlists.some(p => p.id === "trk-ba-mika-aria"));
+  assert.equal(p.wish.length, 14);
+  assert.deepEqual([...p.songs], ["kiss-cn", "shared", "aria-1", "jp-1"]);
+  assert.equal(settings.libTab, "pl:trk-ba-mika");
+  assert.deepEqual([...settings.libOpenTabs], ["trk-ba-mika"]);
+  assert.deepEqual([...settings.playlistOrder], ["trk-ba-v1", "trk-ba-mika"]);
 });

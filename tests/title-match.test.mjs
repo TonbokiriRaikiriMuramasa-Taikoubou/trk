@@ -207,11 +207,14 @@ describe("ブルアカの装飾付きファイル名（カタログ限定・一�
 
   for (const [wish, title] of [
     [daily, "Daily Routine 247.m4a"],
+    [daily, "Daily Routine 24/7.m4a"],
     [constant, "【高音質】Constant Moderato.m4a"],
     [constant, "[HQ] Constant Moderato.m4a"],
     [daily, "🎧Theme 22 - Daily Routine 247 by Nor"],
     [daily, "🎧Theme 22 - Daily Routine 247 by Nor.m4a"],
+    [daily, "🎧Theme 22 - Daily Routine 24/7 by Nor.m4a"],
     [daily, "【高音質】🎧 Theme 22 — Daily Routine 247 by Nor.m4a"],
+    [daily, "【高音質】Daily Routine 24/7.m4a"],
     [daily, "[High Quality] Theme 22 - Daily Routine 247.m4a"],
     [piano, "【高音質】Constant Moderato Piano Arrange.m4a"]
   ]) test(`対応できる装飾: ${title}`, () => {

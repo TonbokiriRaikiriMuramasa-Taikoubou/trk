@@ -1,6 +1,6 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移したtrk149以前の変更履歴と、trk157以前の検証記録です。各記録は当時の状態であり、古いテスト件数やブラウザ用スタブの手順を現在の結果・推奨手順として扱わないでください。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
+> `docs/HANDOFF.md` から移したtrk154以前の変更履歴と、trk158以前の検証記録です。各記録は当時の状態であり、古いテスト件数やブラウザ用スタブの手順を現在の結果・推奨手順として扱わないでください。現在の状態・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。新しい変更は同ファイルの「最近の変更」に短く記録し、詳細履歴が増えたら本書へ移します。
 
 ## trk114〜118 の検証記録（trk118のマージ前に HANDOFF §6 から移動）
 
@@ -224,6 +224,8 @@
 
 2026-10-14にHANDOFF §6の旧記録を移動。節番号（§2／§4／§6／§7）は記録当時のHANDOFFを指します。最新検証はHANDOFF §6を参照してください。
 
+- **trk158（ミカのAria・日本語ソロ／参加曲、2026-10-14）**：`npm run check` 成功（Static 0 failure／0 warning、`node:test` **369/369**）、`git diff --check` 成功。Ariaの3項目、日本語の4項目、公式名・媒体・URL・全員の簡略クレジット、4言語ガイド、保存／再読込・削除尊重を検査。`tools/e2e-title-match.mjs` はChromium 153で全項目成功：Classic・既存BA・kiss angelに加え、Ariaの音源2曲（韓国語名でも一致）、伴奏と本編名WAVの拒否、再起動後の条件保持、日本語3曲の所持行化とShort／同名音声でMVが埋まらないことを確認。ページ例外0。未生成の任意OST manifestの404は4件を別記録。**合成WAVを使った照合・保存の検査であり、実曲の聴取や実動画再生、Android実機の確認ではない。**
+
 - **trk157（ミカ曲の5項目・2026-10-14）**：`npm run check` 成功（Static 0 failure／0 warning、`node:test` **362/362**）、`git diff --check` 成功。`tests/bluearchive-mika.test.mjs` と `tests/trk-playlists.test.mjs` で公式ページ記録との5項目の一致、既存OST225曲の維持、言語・媒体・Short・無印の取り違え防止、媒体条件の保存／再読込・不正型の除去、4言語ガイド、カスタム情報保持・削除尊重を確認。`tools/e2e-title-match.mjs` はヘッドレスChromium 153で成功：新リストの5灰色行、合成WAV3曲だけが所持行になること、PV名を付けたWAVがPVを埋めないこと、再起動後の媒体条件維持。ページ例外0（未生成の任意OST manifestの404は別記録）。**実曲の聴取・実動画の取り込み／再生・全地域でのリンク利用は未確認**。
 
 - **trk156（ブルアカの曲名照合・2026-10-14）**：`npm run check` 成功（Static 0 failure／0 warning、`node:test` **351/351**）、`git diff --check` 成功。追加30テストで実カタログ225曲に対して対象だけに当たること、別曲・数字・作者・編曲・版の違いを拾わないこと、複数候補の拒否、元の曲名優先、照合メモ、共有取り込みへの非波及を確認。`tools/e2e-title-match.mjs` もヘッドレスChromium 153で成功：Classicの既存確認に加え、ブルアカVol.1で装飾付きのConstant Moderato／Daily Routine 247だけが灰色→所持行になること、作者違いの拒否、元のファイル名維持・選曲／デコードを確認。ページ例外0（未生成の任意OST manifestの想定内404は2件を別記録）。合成WAVを用いた検査であり、購入音源・YouTube由来の実ファイル・m4aデコード・スマホ実機・聴取は未確認。
@@ -267,10 +269,15 @@
 - 自動検査でローカル参照・構文・Stageの幾何・選曲画面のoverflowを確認。新しいMIDIの音質、通常ブラウザ上での聞こえ方、実機操作はまだ確認していません。
 - **利用者の実機確認（2026-10-12、trk125・trk126）**：曲リスト右の 📚 書斎 ボタン（常時表示）と、曲名バナーの右下の ⏯ 再生／一時停止（音量ボタンの左）が実機で動作（空さん）。一時停止＝プレビューが止まり、曲名に触れると鳴り直すこと、書斎ボタンで書斎に入れることを確認。配置も了承。Endfieldの配信リンク（Spotify・ffm.to・网易云音乐）の実ブラウザ表示も未確認です（§4-5）。バッチ2の曲順・曲名・アーティストは 2026-10-11 に公式Spotifyのアルバム埋め込みページで6作すべてを再確認し、Homecoming は公式ffm.toスマートリンクでも照合しましたが、個別曲IDの全数確認と実ブラウザ確認は未実施です。
 
-## trk130〜149の変更履歴（trk158で移動）
+## trk130〜154の変更履歴（trk158〜159で移動）
 
 2026-10-14にHANDOFF §7から移動。下記の暫定仕様や未確認事項は後続変更で更新されている場合があります。
 
+- **trk154（2026-10-14）**：プレイリストの「入れ物」（フォルダ）まわりの整理。**🐔 の中のリストを別の入れ物（またはルート）へ入れるときは、移動せず複製**（`plMenu` の保存。判定は `plIsTrkManaged`＝`TRK_AUTO_ID` の id、または 🐔 のフォルダ内）。元のリストは 🐔 に残り、複製は利用者のリスト（`cat`・`wish` の自動更新は付けない。`guide` と `wish` は控えとして写す）。入れ物は1つに限らず、複製で何か所にも置ける。`sw.js` は trk154。
+- **trk153（2026-10-14）**：🐔 の階層（Vol 一覧）を、フォルダ中心の操作に変更。①**見出しのタイトルを押すと、そのフォルダを開く**（右の「フォルダを開く」も同じ）。②▸／▾ の開閉は外し、中の Vol は常に並べる（`folderBlock`）。③**Vol の名前を押すと、その Vol のフォルダを開く**。④**右の ✓ で、プレイリストの詳細（`pl:` の画面）を開く**（文言 `trkMenuOpenList`、4言語）。`sw.js` は trk153（後に trk154）。
+- **trk152（2026-10-14）**：①**チュートリアル完了時に Game Vol.1・Classic Vol.1 を自動で作らない**。`TRK_AUTO_GAME_CLASSIC = false`（`js/library.js`）と、`js/main.js` の自動作成ブロックの削除で止めた。手動の作成・🐔 の ♻ 戻しは残す。既に作られている利用者のリストは消さない（⚙ から削除できる）。②🐔 の階層の初版（▸▾の開閉）。`sw.js` は trk152。
+- **trk151（2026-10-14）**：古い名前（「trk Agent's Orig. Vol.1」）で保存されたプレイリストを、起動時に「trk Agent's OST Vol.1」へ直す（`renameAgentOstPlaylist`。音源マニフェストの有無に関係なく実行）。`sw.js` は trk151。
+- **trk150（2026-10-14）**：①初期の「すべて」一覧は **FIRST SPARK だけ**。手続き生成10曲（Original 01〜10）は「🎼 trk Agent's OST Vol.1」の中にだけ出す（`trkOnly` 印。すべて・件数・検索からは除外）。②プレイリスト名は **「trk Agent's OST Vol.1」**（起動時に既存の名前も直す）。③「開けない」の原因は、フォルダ（🐔）を作る前に一覧を描いていたため 🐔 タブが出ていなかったこと。起動時にプレイリストを先に作り、そのあと描き直すよう修正。④🐔 タブを押すと Vol の階層（一覧）が開き、Vol を選ぶと以前の形（曲の一覧）で開く。sw.js は trk150。
 - **trk149（2026-10-14）**：①**Silver Scrapes** は公式のオーケストラ版（LoL Esports 公式チャンネル `21hQsnpdNpA`、原曲 Danny McCarthy & Patrick Cunningham）に差し替え。第三者の League of Leaks 版（`VPZFRvMRY20`）は使わない。②**trk Agent's Original Vol.1**：`tools/make-trk-ost.mjs` が `assets/trk-ost/manifest.json` も書く（Git外）。`js/library.js` の `initAgentOstTracks()` が、あれば10曲を builtin として登録し、trk フォルダにプレイリストを作る（無ければ何もしない）。音源は選んだときに読み込み（上限4MB/曲、`materializeAgentOst`）。音源は Git に入れない。③**ぶっ飛ばしの重なり**：ぶっ飛ばし中にニトロ缶を取ったら、画面に見えている荷物（`core.travelMs()` の範囲）を取った扱い（perfect・★）で消して、ぶっ飛ばしを終える。AUTO では荷物は消さずニトロ缶と終了だけ。文言 `blastOverlapToast` を4言語。テスト：`tests/catch-judge.test.mjs` 11 pass。
 - **trk149 の追補（同日）**：プレイリスト名は24文字まで（`plSanitize`・入力欄）のため、「trk Agent's Original Vol.1」（26文字）は **「trk Agent's Orig. Vol.1」** で登録（正式名は `AGENT_OST_NAME` の注釈）。ブラウザ確認 `tools/e2e-trk149.mjs` を新設（ようこそ・10曲・CBZ/ZIP・CATCH設定・エラー無し）。Chromium は `@sparticuz/chromium`（npm、`/tmp` 展開）を使い、`LD_LIBRARY_PATH=/tmp/libs/lib` が要る。実行結果は全項目 OK。`tools/smoke-browser.mjs --compare` も OK。途中で `js/library.js` のコメント（`/* 📤 …まわりの状態 */`）を壊していた（`node --check` は通るが実行時に落ちる）→ smoke で検出して修正。
 - **trk148（2026-10-14）**：TRUCK の A（上）・Space（下）。ユーザー回答は「追加しない、説明だけ分かりやすくする」。既存の「通常の叩くキーでもレーンを移動する」（既定オン）で、通常キーが既定（A＝ドン、Space＝カッ）のとき TRUCK では既に A・Space で動くため、文言を「（既定は A・Space）」に直した（4言語）。追加のチェックは作っていない。

@@ -786,7 +786,7 @@ if (!exists("js/fx-worklet.js") ||
     new vm.Script(catalogSource + "\nglobalThis.__TRK_CATALOG_FOR_CHECK = TRK_CATALOG;").runInContext(catalogContext);
     const series = catalogContext.__TRK_CATALOG_FOR_CHECK.find(item => item.id === "bluearchive");
     const expectedAlbumIds = fixture.albums.map(album => album.id);
-    const playlistOrderOk = !!series && JSON.stringify(series.playlists.map(pl => pl.id)) === JSON.stringify([...expectedAlbumIds, "ba-mika-kiss", "ba-mika-aria", "ba-mika-vocals"]);
+    const playlistOrderOk = !!series && JSON.stringify(series.playlists.map(pl => pl.id)) === JSON.stringify([...expectedAlbumIds, "ba-mika"]);
     let trackTotal = 0;
     let tracksMatch = playlistOrderOk;
     const appleIds = [];

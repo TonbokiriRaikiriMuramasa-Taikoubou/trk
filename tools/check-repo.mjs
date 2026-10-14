@@ -2777,5 +2777,25 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   else ok("sw.js: ハッシュ固定の vendor は cache-first で、SHA-384 が合うものだけ使う（VENDOR_PINS は vendor-lock.json と一致）");
 }
 
+/* 🗂 一回限りの移行・印・旧名の登録簿（docs/MIGRATIONS.md）。表とコードのずれは失敗、期限切れは警告。 */
+{
+  const registry = fs.readFileSync(path.join(root, "docs/MIGRATIONS.md"), "utf8");
+  const jsAll = fs.readdirSync(path.join(root, "js")).filter(f => f.endsWith(".js"))
+    .map(f => fs.readFileSync(path.join(root, "js", f), "utf8")).join("\n");
+  const rows = registry.split("\n").filter(line => /^\|\s*`[^`]+`\s*\|/.test(line)).map(line => {
+    const cells = line.split("|").slice(1, -1).map(c => c.trim());
+    return { id: cells[0].replace(/`/g, ""), kind: cells[1], date: cells[3] };
+  });
+  const today = new Date().toISOString().slice(0, 10);
+  let registryOk = rows.length >= 4;
+  for (const row of rows) {
+    if (!jsAll.includes(row.id)) { registryOk = false; fail(`登録簿の「${row.id}」がコードに見つからない（表を直すか、コードの名前を確かめる）`); }
+    const needsDate = /一回限り|旧名/.test(row.kind || "");
+    if (needsDate && !/^\d{4}-\d{2}-\d{2}$/.test(row.date || "")) { registryOk = false; fail(`登録簿の「${row.id}」に削除予定日（YYYY-MM-DD）がない`); }
+    if (needsDate && row.date < today) warn(`「${row.id}」の削除予定日（${row.date}）を過ぎています。消すか、理由を書いて日付を延ばしてください（docs/MIGRATIONS.md）`);
+  }
+  if (registryOk) ok(`一回限りの移行の登録簿（${rows.length}項目）とコードが一致し、削除予定日がそろっている`);
+}
+
 console.log(`\nStatic check: ${failures ? "FAILED" : "passed"} · ${failures} failure(s) · ${warnings} warning(s)`);
 if (failures) process.exitCode = 1;

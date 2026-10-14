@@ -1380,7 +1380,8 @@ function trkIsRemoved(id) {
 /* 🎭 Endfieldのキャラクターテーマ曲（trk128）：カタログの4リストはネスト棚に作り、既存取り込みもそこに移す。 */
 const ENDFIELD_CHARACTER_FOLDER = "trk-endfield-character";
 const ENDFIELD_CHARACTER_PL = new Set(["ef-blurring", "ef-ashen", "ef-floaty", "ef-makers"]);
-/* 🛰️ 初号指令OSTの旧既定名（trk110〜trk128）。保存名は plSanitize が24文字に切るので、フル名と切れた形の両方を持つ。
+/* 🛰️ 初号指令OSTの旧既定名（trk110〜trk128）。削除予定日：2027-01-14（docs/MIGRATIONS.md）。
+   保存名は plSanitize が24文字に切るので、フル名と切れた形の両方を持つ。
    切れた形はVol.1とVol.2で同じ（「初号指令 (上/下) ― Zeroth Direct」・「Endfield — Zeroth Direct」）だが、
    照合はIDごとに別々の表なので取り違えない。利用者が自分で付けた名前はここに無いので触らない（trk129）。 */
 const ENDFIELD_FIRSTORDER_OLD_NAMES = Object.freeze({
@@ -1395,7 +1396,7 @@ const ENDFIELD_FIRSTORDER_OLD_NAMES = Object.freeze({
    ネスト棚 trk-endfield-character（「Endfield Character Theme」）へ動かす。
    settings.trkEndfieldTidy1 が付いたら以後は利用者の並び・配置を守る（二度と触らない）。
    名前・アイコン・タグ・所持曲は触らない（既定の旧名からの改名は上のセーフリフレッシュが担当）。
-   削除予定：trk150 以降。条件は「trk128 より前の版から更新した利用者がいないと判断できること」。判断できるまで残す（HANDOFF §4.2）。 */
+   削除予定日：2027-01-14（docs/MIGRATIONS.md）。 */
 function trkEndfieldTidyOnce() {
   const s = core.settings;
   if (s.trkEndfieldTidy1) return;
@@ -1449,7 +1450,7 @@ function trkEndfieldTidyOnce() {
    ①trk128 の整頓を通っている（＝この壊れ方が作られうる）②キャラクターテーマのリストが残っている
    ③そのどれもがどこにも入っていない（folder が空。利用者が自分で置いたものは触らない）
    ④🎭棚が空。当てはまれば棚を作り直して戻す。印（settings.trkEndfieldTidy2）が付いたら以後は二度と触らない。
-   削除予定：trk150 以降。条件は trkEndfieldTidyOnce と同じ（HANDOFF §4.2）。 */
+   削除予定日：2027-01-14（docs/MIGRATIONS.md）。 */
 function trkEndfieldShelfRestoreOnce() {
   const s = core.settings;
   if (!s || s.trkEndfieldTidy2 || !s.trkEndfieldTidy1) return;

@@ -217,6 +217,12 @@
 
 ## 7. 最近の変更
 
+- **trk154（2026-10-14）**：プレイリストの「入れ物」（フォルダ）まわりの整理。**🐔 の中のリストを別の入れ物（またはルート）へ入れるときは、移動せず複製**（`plMenu` の保存。判定は `plIsTrkManaged`＝`TRK_AUTO_ID` の id、または 🐔 のフォルダ内）。元のリストは 🐔 に残り、複製は利用者のリスト（`cat`・`wish` の自動更新は付けない。`guide` と `wish` は控えとして写す）。入れ物は1つに限らず、複製で何か所にも置ける。`sw.js` は trk154。
+- **trk153（2026-10-14）**：🐔 の階層（Vol 一覧）を、フォルダ中心の操作に変更。①**見出しのタイトルを押すと、そのフォルダを開く**（右の「フォルダを開く」も同じ）。②▸／▾ の開閉は外し、中の Vol は常に並べる（`folderBlock`）。③**Vol の名前を押すと、その Vol のフォルダを開く**。④**右の ✓ で、プレイリストの詳細（`pl:` の画面）を開く**（文言 `trkMenuOpenList`、4言語）。`sw.js` は trk153（後に trk154）。
+- **trk152（2026-10-14）**：①**チュートリアル完了時に Game Vol.1・Classic Vol.1 を自動で作らない**。`TRK_AUTO_GAME_CLASSIC = false`（`js/library.js`）と、`js/main.js` の自動作成ブロックの削除で止めた。手動の作成・🐔 の ♻ 戻しは残す。既に作られている利用者のリストは消さない（⚙ から削除できる）。②🐔 の階層の初版（▸▾の開閉）。`sw.js` は trk152。
+- **trk151（2026-10-14）**：古い名前（「trk Agent's Orig. Vol.1」）で保存されたプレイリストを、起動時に「trk Agent's OST Vol.1」へ直す（`renameAgentOstPlaylist`。音源マニフェストの有無に関係なく実行）。`sw.js` は trk151。
+- **trk150（2026-10-14）**：①初期の「すべて」一覧は **FIRST SPARK だけ**。手続き生成10曲（Original 01〜10）は「🎼 trk Agent's OST Vol.1」の中にだけ出す（`trkOnly` 印。すべて・件数・検索からは除外）。②プレイリスト名は **「trk Agent's OST Vol.1」**（起動時に既存の名前も直す）。③「開けない」の原因は、フォルダ（🐔）を作る前に一覧を描いていたため 🐔 タブが出ていなかったこと。起動時にプレイリストを先に作り、そのあと描き直すよう修正。④🐔 タブを押すと Vol の階層（一覧）が開き、Vol を選ぶと以前の形（曲の一覧）で開く。sw.js は trk150。
+- **trk150 の補足（2026-10-14）**：「開けない」の原因は、🐔 のフォルダ（`trk`）を作る前に一覧を描いていたため 🐔 のタブが出ていなかったこと（`renderLib()` の前に `ensureAgentOstPlaylist()` を実行する順に直した）。
 - **trk149（2026-10-14）**：①**Silver Scrapes** は公式のオーケストラ版（LoL Esports 公式チャンネル `21hQsnpdNpA`、原曲 Danny McCarthy & Patrick Cunningham）に差し替え。第三者の League of Leaks 版（`VPZFRvMRY20`）は使わない。②**trk Agent's Original Vol.1**：`tools/make-trk-ost.mjs` が `assets/trk-ost/manifest.json` も書く（Git外）。`js/library.js` の `initAgentOstTracks()` が、あれば10曲を builtin として登録し、trk フォルダにプレイリストを作る（無ければ何もしない）。音源は選んだときに読み込み（上限4MB/曲、`materializeAgentOst`）。音源は Git に入れない。③**ぶっ飛ばしの重なり**：ぶっ飛ばし中にニトロ缶を取ったら、画面に見えている荷物（`core.travelMs()` の範囲）を取った扱い（perfect・★）で消して、ぶっ飛ばしを終える。AUTO では荷物は消さずニトロ缶と終了だけ。文言 `blastOverlapToast` を4言語。テスト：`tests/catch-judge.test.mjs` 11 pass。
 - **trk149 の追補（同日）**：プレイリスト名は24文字まで（`plSanitize`・入力欄）のため、「trk Agent's Original Vol.1」（26文字）は **「trk Agent's Orig. Vol.1」** で登録（正式名は `AGENT_OST_NAME` の注釈）。ブラウザ確認 `tools/e2e-trk149.mjs` を新設（ようこそ・10曲・CBZ/ZIP・CATCH設定・エラー無し）。Chromium は `@sparticuz/chromium`（npm、`/tmp` 展開）を使い、`LD_LIBRARY_PATH=/tmp/libs/lib` が要る。実行結果は全項目 OK。`tools/smoke-browser.mjs --compare` も OK。途中で `js/library.js` のコメント（`/* 📤 …まわりの状態 */`）を壊していた（`node --check` は通るが実行時に落ちる）→ smoke で検出して修正。
 - **trk148（2026-10-14）**：TRUCK の A（上）・Space（下）。ユーザー回答は「追加しない、説明だけ分かりやすくする」。既存の「通常の叩くキーでもレーンを移動する」（既定オン）で、通常キーが既定（A＝ドン、Space＝カッ）のとき TRUCK では既に A・Space で動くため、文言を「（既定は A・Space）」に直した（4言語）。追加のチェックは作っていない。
@@ -252,5 +258,3 @@
 - [ ] 関連テスト、`npm run check`、`git diff --check` を通した。
 - [ ] README／NOTICE／handoff と `sw.js` cache名を確認した。
 - [ ] 日本語ガイドを変更した場合、英語ガイドの対応箇所も更新した。
-
-- **trk150（2026-10-14）**：①初期の「すべて」一覧は **FIRST SPARK だけ**。手続き生成10曲（Original 01〜10）は「🎼 trk Agent's OST Vol.1」の中にだけ出す（`trkOnly` 印。すべて・件数・検索からは除外）。②プレイリスト名は **「trk Agent's OST Vol.1」**（起動時に既存の名前も直す）。③「開けない」の原因は、フォルダ（🐔）を作る前に一覧を描いていたため 🐔 タブが出ていなかったこと。起動時にプレイリストを先に作り、そのあと描き直すよう修正。④🐔 タブを押すと Vol の階層（一覧）が開き、Vol を選ぶと以前の形（曲の一覧）で開く。sw.js は trk150。

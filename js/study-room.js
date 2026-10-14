@@ -1318,6 +1318,8 @@ async function studySweepOrphans() {
 /* ============ 取り込み ============ */
 function studyImportStart(total) {
   studyImportState = { active:true, cancelled:false, total, added:0, kept:0, failed:0 };
+  /* 書斎の取り込みでも保存の固定を求める（trk136）。取り込みは待たせない */
+  if (core.requestStoragePersist) core.requestStoragePersist().then(core.renderStoragePersist).catch(() => {});
   core.$("studyImportWrap").hidden = false; core.$("studyImportFill").style.width = "0%";
   core.$("studyImportCancelBtn").disabled = false;
   core.$("studyImportLabel").textContent = tr("studyImportProgress", { n:0, total });
@@ -1730,7 +1732,10 @@ function studyJumpZoomEdge(direction, repeat = false) {
   const nodes = studyZoomScrollNodes(true);
   if (!nodes) return false;
   const targets = nodes.filter(node => node && node.scrollHeight - node.clientHeight > 1);
-  if (!targets.length) return !!repeat;   /* 押しっぱなし中は、次のページの描画待ちでページを飛ばさない */
+  /* はみ出していない（画面に収まる・全画面フィット中）なら、押しっぱなしでも従来どおりページ送りへゆずる。
+     止めるのは、次のページを描画している間（端からの送りの着地 studyZoomLand が残っている・台紙の高さがまだ0）だけ。
+     trk135 で倍率に関係なく端へ送るようにしたとき、収まる画像でも repeat を握りつぶし、長押しで1ページしか進まなくなっていた（trk136） */
+  if (!targets.length) return !!repeat && (!!studyZoomLand || nodes.some(node => !node || node.scrollHeight === 0));
   const atEdge = targets.every(node => direction > 0 ? node.scrollTop >= node.scrollHeight - node.clientHeight - 1 : node.scrollTop <= 1);
   if (!atEdge) {
     let moved = false;

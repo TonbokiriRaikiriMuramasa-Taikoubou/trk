@@ -584,6 +584,8 @@ function deactivatePack(persist = true) {
 async function installAndUse(file, skipConfirm = false) {
   const r = await installPackFile(file);
   if (!r) return;
+  /* 保存の固定を求める（trk136）。取り込みを待たせない・既に固定済みなら何もしない */
+  if (core.requestStoragePersist) core.requestStoragePersist().then(core.renderStoragePersist).catch(() => {});
   if (r.man.songs) core.setStatus("libStatus", "packSongsAdded", { n:r.man.songs.length });
   if (hasLook(r.man)) await activatePack(r.id, { skipConfirm });
 }

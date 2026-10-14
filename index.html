@@ -1019,6 +1019,16 @@
             </details>
           </details>
 
+          <!-- 💾 端末の保存（trk136）。書斎・パック・記録の保存を、ブラウザに消されにくい状態へ固定する -->
+          <details class="panel" id="storagePanel">
+            <summary data-i18n="secStorage"></summary>
+            <div class="hint" data-i18n="storagePersistHint"></div>
+            <div id="storagePersistState" class="hint status" role="status" aria-live="polite"></div>
+            <div class="miniActions">
+              <button id="storagePersistBtn" type="button" data-i18n="storagePersistBtn" hidden></button>
+            </div>
+          </details>
+
           <!-- 📤 ミュージックフォルダの共有（配線は library.js。許可は1回だけ・中身を一気に取り込む） -->
           <details class="panel" id="libSharePanel">
             <summary data-i18n="secShare"></summary>

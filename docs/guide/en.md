@@ -399,6 +399,8 @@ The latest **Chrome or Edge** is recommended. Firefox and Safari (16.4 and later
 
 **About saving:** settings, records, packs, added songs, and personal presets are stored **only in this browser** (localStorage and IndexedDB). Analysis results (numbers such as loudness) are kept in the same places. The ♻️ factory reset does not delete them (only settings return to defaults). Clearing browser data deletes everything, so back up your records from time to time.
 
+In Settings, **💾 Device storage** shows whether the browser has agreed to keep your data. When you import Study Room books or custom packs, the app asks the browser to keep them persistently. The browser decides whether to allow it; if it does not, export anything important as a backup.
+
 ## Making mods
 
 trk! is split into files by feature, so it is easy to mod.

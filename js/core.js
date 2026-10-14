@@ -1240,6 +1240,42 @@ function validImportedSettingEnum(key, value) {
   return false;
 }
 
+/* ---------- 端末の保存を固定する（trk136） ----------
+   書斎・パック・記録は IndexedDB に入る。容量が逼迫すると、ブラウザが黙って消すことがある（主に Android Chrome）。
+   navigator.storage.persist() は「消されにくい保存」を求める。許可するかはブラウザが決めるので、結果をそのまま表示する。
+   ?safe=1 では保存領域に触らない方針のため、要求もしない（表示だけ）。 */
+function storagePersistApi() {
+  const storage = typeof navigator !== "undefined" ? navigator.storage : null;
+  return storage && typeof storage.persisted === "function" && typeof storage.persist === "function" ? storage : null;
+}
+async function storagePersistState() {
+  const storage = storagePersistApi();
+  if (!storage) return "unsupported";
+  try { return (await storage.persisted()) ? "on" : "off"; } catch (_) { return "unsupported"; }
+}
+async function requestStoragePersist() {
+  const storage = storagePersistApi();
+  if (!storage) return "unsupported";
+  if (typeof window.TrkSafeMode === "function" && window.TrkSafeMode()) return storagePersistState();
+  try {
+    if (await storage.persisted()) return "on";
+    return (await storage.persist()) ? "on" : "off";
+  } catch (_) { return "unsupported"; }
+}
+function renderStoragePersist(state) {
+  const n = document.getElementById("storagePersistState");
+  const btn = document.getElementById("storagePersistBtn");
+  if (n) n.textContent = tr(state === "on" ? "storagePersistOn" : state === "off" ? "storagePersistOff" : "storagePersistUnsupported");
+  if (btn) { btn.hidden = state === "on"; btn.disabled = state === "unsupported"; }
+  return state;
+}
+(function setupStoragePersistPanel(){
+  const btn = document.getElementById("storagePersistBtn");
+  if (!btn) return;
+  btn.addEventListener("click", () => { requestStoragePersist().then(renderStoragePersist); });
+  storagePersistState().then(renderStoragePersist);
+})();
+
 /* ---------- 緊急復旧パネルのボタン ---------- */
 (function setupEmergencyPanel(){
   const bind = (id, fn) => {
@@ -1485,7 +1521,7 @@ window.view = view;
 window.windows = windows;
 /* 領域（window.Trk.core）：コア状態の正規の場所。window直下の旧互換名は frozen js/fx.js が読む5件だけ。 */
 window.Trk = window.Trk || {};
-window.Trk.core = Object.assign(window.Trk.core || {}, { $, BEST_KEY, CAPTION_MS, CUSTOM_SKIN_MAX, KEY_PRESETS, PAD_DEFAULTS, SKIN_FORMAT, TRK_ENUM_VALUES, TV_PARAM_FAV_MAX, VIDEO_KEY_DEFAULTS, activeMascot, applyLanguage, applyNoteVars, baseName, buildSkinGrid, buildSkinNow, chartSummary, clampTvBlur, clampTvDim, cleanTvParamFavorites, closeSettings, ctx, customSkinDefs, downloadBlob, downloadJSON, el, emit, esc, extOf, fmtDate, fmtTime, fontFamily, formatKey, formatPadBind, fx, gameplayFxMultiplier, gameplayFxPower, hashString, idbStore, isPclMascot, keyCodeOf, keysLabel, laneCol, laneColor, laneName, modsUnranked, mulberry32, noteShape, num, on, openSettings, pick, refreshSeedSecrets, rememberMusicVolume, renderAllStatuses, renderStatus, safeHttpUrl, safeLink, safeName, saveCustomSkins, saveUserPrefs, savedSkinAtBoot, setPhase, setStatus, settings, showScreen, skin, slotLane, slotOfKey, stage, syncPickers, takeAmpReset, travelMs, updateChartButtons, updateKeyUI, updateTouchKeys, validCode, validPadBind, vctx, video, view, windows });
+window.Trk.core = Object.assign(window.Trk.core || {}, { $, renderStoragePersist, requestStoragePersist, storagePersistState, BEST_KEY, CAPTION_MS, CUSTOM_SKIN_MAX, KEY_PRESETS, PAD_DEFAULTS, SKIN_FORMAT, TRK_ENUM_VALUES, TV_PARAM_FAV_MAX, VIDEO_KEY_DEFAULTS, activeMascot, applyLanguage, applyNoteVars, baseName, buildSkinGrid, buildSkinNow, chartSummary, clampTvBlur, clampTvDim, cleanTvParamFavorites, closeSettings, ctx, customSkinDefs, downloadBlob, downloadJSON, el, emit, esc, extOf, fmtDate, fmtTime, fontFamily, formatKey, formatPadBind, fx, gameplayFxMultiplier, gameplayFxPower, hashString, idbStore, isPclMascot, keyCodeOf, keysLabel, laneCol, laneColor, laneName, modsUnranked, mulberry32, noteShape, num, on, openSettings, pick, refreshSeedSecrets, rememberMusicVolume, renderAllStatuses, renderStatus, safeHttpUrl, safeLink, safeName, saveCustomSkins, saveUserPrefs, savedSkinAtBoot, setPhase, setStatus, settings, showScreen, skin, slotLane, slotOfKey, stage, syncPickers, takeAmpReset, travelMs, updateChartButtons, updateKeyUI, updateTouchKeys, validCode, validPadBind, vctx, video, view, windows });
 /* catch.js／stage.js はこの正規アクセサを差し替える（旧window.activeMods別名はtrk90で廃止）。 */
 Object.defineProperty(window.Trk.core, "activeMods", { configurable:true, get:() => activeMods, set:v => { activeMods = v; } });
 Object.defineProperty(window.Trk.core, "analysis", { configurable:true, get:() => analysis, set:v => { analysis = v; } });

@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-15（trk162）**。現在の仕様・守る条件・未確認事項の要約です。過去の変更履歴（trk154以前）と検証記録（trk158以前）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-15（trk163）**。現在の仕様・守る条件・未確認事項の要約です。過去の変更履歴（trk154以前）と検証記録（trk158以前）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検。
 
@@ -103,11 +103,13 @@
 - 失敗の理由は、1冊も入らなかったときは状態欄に、途中まで入ったときは集計の後ろに添えて出す（取り込みの開始と本を開く処理は状態欄を消すため、その後に出す）。
 - 失敗の表示は、ファイルごとの文言が最後の集計（`Done: …`）で上書きされる。画像フォルダと同じ動き。
 
-### 📦 まるごとバックアップ・端末保存（trk136〜137・160〜162）
+### 📦 まるごとバックアップ・端末保存（trk136〜137・160〜163）
 
 - 設定画面から `navigator.storage.persist()` を要求／状態表示します（`?safe=1` は要求しない）。まるごとバックアップは core（localStorage許可リスト＋ライブラリ）・書斎・パックを既定で含み、曲・VRM・MMDなど大きいmediaは任意です。ZIP64対応、復元前に全エントリーのCRC・サイズをストリームで確認し、宣言サイズを超えた展開はその場で止めます。localStorageは `LS_KEYS` の許可リストだけを読み書きします。
 - 書き出し側のCRCもBlobの `stream()` で計算し、ファイル全体を `arrayBuffer()` にしません。復元のBlob参照はZIP内のsliceで保持します（JSON化・IndexedDB書込み自体は必要な箇所で行います）。`.stpack`の読み込み・生成も共通ZIP経路を使い、パック全体を`ArrayBuffer`へ載せず、個々の展開ファイルもCRC・実サイズを確認します。
 - **固定の解析安全上限（trk162）**：共通ZIP reader/writerは1アーカイブ250,000項目・中央目録64MiB。バックアップはさらにメタデータ1MiB、設定JSON20MiB、DBストアJSON64MiB／250,000レコード／ストア、圧縮エントリー展開64MiBまで（backup.jsonは1MiB・local.jsonは20MiB）。書き出し側も早めに検査し、「容量の上限を無視」では外しません。CBZ／ZIPはこの構造上限に加え、展開後1ページ100MiBを維持します。
+- **ZIP作り手の互換性（trk163・F-37）**：Info-ZIPが標準入力・パイプからメンバーを読むZIP（`printf abc | zip - - > x.cbz` など）は、大きさが事前に分からないため32bitで足りていてもZIP64終端レコード＋ロケーターを必ず置きます（trk162はこれを`zipBad`で拒否する回帰でした）。ロケーターが正しく指し、終端レコードの中身（ディスク番号・件数・中央目録の大きさ／位置）がEOCDと一致するときだけ、その位置を中央目録の終わりとして認めます。中身が食い違うファイルは従来どおり拒否し、読む値は常にEOCD側だけ＝二重解釈は許しません。実Info-ZIP 3.0出力（store・deflate）の受理と嘘ロケーター／中身違いの拒否fixtureは `tests/zip-io.test.mjs` に固定。**ローカルヘッダと中央目録の `flags` 完全一致の要求は緩めていません**（実機確認は§4-15）。
+- **書斎ストアの復元順（trk163）**：参照される側から書きます（pages→covers→books→settings）。容量不足などで途中失敗しても本側は無傷のままで、残る不整合は「参照されないページ」（書斎の整理で消せる）になり、「存在しないページを指す本」にはなりません。失敗時の案内に逃げ道も明記（4言語）：固定上限を超えたとき（backupHardLimit）は「作成時に📚書斎などの領域のチェックを外す／範囲を分ける」、パック導入失敗の内訳（backupRestorePackFailedKept）は「空き容量が足りないときは不要なパックを削除してからもう一度復元」。
 - 復元時のアプリ上限（無視設定がオフのとき）は、書斎500冊・1冊3000ページ・画像アルバム600MiB／100MiB/画像・文章12MiB、パック500MiB/件・合計1GiB。画像サイズは `page.size` ではなくZIPの検証済みBlobエントリー実サイズを確認。すべての上限を無視してもブラウザ容量・メモリ上限は残ります。
 - パック領域の復元は、先に既存インストーラで各パックを試し、最後にバックアップに無いIDだけ削除します。IDは正規化後の名前＋作者から算出。対象パックの導入失敗時は同じIDの既存版を残し、manifestから全IDを特定できないバックアップでは削除処理をしません。完了時に導入・失敗・削除件数と、同一ID保護／整理見送りをダイアログで表示し、確認後に再読み込みします。保存容量不足時に成功を保証するものではありません。
 
@@ -164,6 +166,7 @@
 | 12 | trk129〜132 の確認（↕並べ替え、パック外し、共有プレイリスト、MIRROR、Endfield、フォルダ上限40、🎭棚の戻し、パックとスキン、MOD後の書き出し） | 実機未確認（自動検査のみ。⑧⑨はヘッドレス17項目で確認） | 見てほしい順（①〜⑨）で実機確認 |
 | 13 | trk136（全画面フィットの PageDown 長押し、💾端末の保存） | 実機未確認 | PC・Android で確認 |
 | 14 | 曲名照合・ミカ音源／映像（trk155〜159） | Node/VM・合成WAVのヘッドレス検査済み。実曲・実動画・実機は未確認 | 実ファイルで照合・再生、配信ページの地域差を確認（購入・抽出を自動実行しない） |
+| 15 | ZIP作り手の互換性（trk163：Info-ZIP標準入力出力の受理、`flags`完全一致） | 実Info-ZIP 3.0出力（store・deflate・パイプ）とレビューでのPython zipfileはNode検査済み。Windowsのエクスプローラー／macOSの圧縮／スマホアプリのCBZは実機未確認 | 各で作ったCBZを実機で一度ずつ書斎に取り込んでみる。読めないCBZが出たら `flags` の食い違いを疑い、緩めるなら暗号化ビット（bit0）＋圧縮方式だけの比較にする（現時点では緩めていない） |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -191,6 +194,8 @@
 13. **trk136の確認（実機で見てほしいこと）**：①全画面フィットをオンにして **PageDown を長押し** すると、ページが連続して進むこと（描画が追いつかないときは止まり、追いついたら続く）。はみ出す画像では、長押しが端で止まること（従来どおり）。②設定の **💾 端末の保存** が、PC・Android Chromeで「固定されています」と出るか（Androidでは利用の状況により固定されないことがあり得ます。その場合は表示どおり書き出しで控える）。
 
 14. **曲名照合とミカの案内**：Musopen等の実ダウンロード音源、ミカの実音源・実動画、PC／Androidの実際のフォルダ選択・聴取・再生は未確認。リンクの公開メタデータ取得を、全地域・全アカウントでの再生可否やローカルファイルの入手許諾と扱わない。範囲・未収録候補はミカ索引と `TITLE-MATCH.md` に残し、確認できた根拠だけを個別に更新する。
+
+15. **ZIP作り手の互換性（trk163・レビュー【情報】）**：Info-ZIP 3.0 の標準入力メンバー出力（`printf abc | zip - -` のstore版・deflate版）、パイプ出力（アーカイブ自体を標準出力へ）、通常の一時ファイル出力は、実物のバイト列をNode fixtureにして受理・展開（CRC込み）を確認済み。2026-10-15 のレビューでは Info-ZIP（通常）・Python zipfile（deflate・UTF-8フラグ・ストリーム書き）もOKと確認されている。**未確認（実機で一度ずつ試してほしい）**：Windowsのエクスプローラー「圧縮フォルダー」、macOS「圧縮」、スマホアプリで作ったCBZを書斎に取り込めるか。注意点：**ローカルヘッダと中央目録の `flags` が完全一致すること**を求めており、試した作り手では問題なかったが、一部の作り手では両者がずれることが知られている。実機で読めないCBZが出たら、まず `flags` の食い違いを疑うこと。緩める場合は `flags` 全体ではなく**暗号化ビット（bit0）と圧縮方式だけの比較**にするのが安全（`js/zip-io.js` の `zipDataStart`。現時点では緩めていない）。
 
 ### 4.2 一回限りの移行・印（削除予定）
 
@@ -221,10 +226,12 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.15-trk162`） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.15-trk163`） |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
+
+- **trk163（ZIP／バックアップのレビュー対応、2026-10-15）**：`npm run check` 成功（Static 0 failure／0 warning、Security **61 check**／0 warning、`node:test` **401/401**）、`git diff --check` 成功。実 Info-ZIP 3.0 の標準入力メンバー出力（`printf abc | zip - -` と時刻欄を除きバイト一致の199／203バイトfixture）の受理・CRC込み展開、嘘ロケーター・終端レコード中身の食い違い（二重解釈）の `zipBad` 拒否、書斎復元のストア書き込み順（pages→covers→books→settings）をNode/VM・静的検査で確認。この環境の Info-ZIP で生成したパイプ出力CBZ（一時ファイル経由・真のパイプの両方）も受理。**実ブラウザsmokeは未実施**（Chromium/Chrome未導入）。
 
 - **trk162（ZIP／バックアップ容量境界、2026-10-15）**：`npm run check` 成功（Static 0 failure／0 warning、Security 59 check／0 warning、`node:test` **398/398**）、`git diff --check` 成功。ZIP64 unsafe値・偽EOCD・名前／件数／64MiB中央目録境界・256回決定的ヘッダfuzz、バックアップ復元のZIP上限案内、書斎復元の実Blob画像容量、容量上限を無視してもCBZ1ページ100MiBが残ることをNode/VM・静的検査で確認。**実ブラウザsmokeは未実施**（Chromium/Chrome未導入、`npm run check` とPages workflowにブラウザ取得処理なし）。
 
@@ -237,6 +244,8 @@
 過去の検証件数・個別E2E・旧ブラウザ環境の回避手順は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) の「trk158整理時に移した検証記録」へ移しました。上記が現在の結果です。利用者の実機確認済み事項と残る確認項目は§4を正とします。
 
 ## 7. 最近の変更
+
+- **trk163（2026-10-15）**：trk162のレビュー対応。①**【中・回帰】**Info-ZIPが標準入力から書いたZIP（パイプで作ったCBZ・パック）を丸ごと`zipBad`で拒否していた問題を修正（F-37）：ZIP64が不要でも置かれる終端レコード＋ロケーターを、ロケーターが正しく指し終端レコードの中身（ディスク番号・件数・中央目録の大きさ／位置）がEOCDと一致するときだけ中央目録の終わりとして受理。食い違いは従来どおり拒否＝二重解釈は引き続き塞いだまま。②**【低】**書斎ストアの復元を参照される側から（pages→covers→books→settings）に組み替え、途中失敗時に「存在しないページを指す本」が残らないように。③**【低】**固定上限（backupHardLimit）の案内に「作成時に書斎などの領域を外す／範囲を分ける」、パック導入失敗の内訳に「不要なパックを削除してからもう一度復元」の逃げ道を4言語で追記。④**【情報】**ZIP作り手互換性（エクスプローラー／macOS／スマホのCBZ、`flags`完全一致）の実機確認を§4-15に登録（`flags`は緩めていない）。`tools/check-security.mjs` に見張り2ルール追加（61 check）。日英ガイド・`docs/SECURITY.md`・この引継ぎを更新し、`sw.js` cacheを`trk-v2026.10.15-trk163`へ。自動検証は§6。
 
 - **trk162（2026-10-15）**：ZIP reader/writerの固定上限を1アーカイブ250,000項目・中央目録64MiBへ設定。バックアップ生成／復元にはJSON・レコード固定上限を追加し、無視設定でも解除しないエラー案内を4言語化。書斎復元はアルバム合計・画像単体・文章等の通常上限を、ページBlobの実サイズと合わせて検査。日本語・英語ガイドと `docs/SECURITY.md` を更新。smoke／CI容量の内訳と未計測項目は§4へ整理。`sw.js` cacheを`trk-v2026.10.15-trk162`へ更新。
 

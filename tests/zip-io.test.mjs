@@ -245,3 +245,38 @@ test("deterministic ZIP-header fuzzing never leaks RangeError or unchecked offse
     }
   }
 });
+
+/* trk163（レビュー）：Info-ZIP が標準入力からメンバーを読むZIP（`printf abc | zip - - > x.zip`）は、大きさが事前に
+   分からないためローカルヘッダを ZIP64 拡張にし、32bit で足りていても ZIP64 の終端レコードとロケーターを置く。
+   ロケーターが正しく指していて終端レコードの中身も EOCD と一致していれば読む（パイプで作った CBZ・パックが読めるように）。
+   fixture は実 Info-ZIP 3.0 の出力（`printf abc | zip - -` と時刻欄を除きバイト一致・199バイト）。 */
+const INFOZIP_STDIN_B64 = "UEsDBC0AAAAAAFGATl3CQSQ1//////////8BABQALQEAEAADAAAAAAAAAAMAAAAAAAAAYWJjUEsBAh4DLQAAAAAAUYBOXcJBJDUDAAAAAwAAAAEAAAAAAAAAAQAAAIARAAAAAC1QSwYGLAAAAAAAAAAeAy0AAAAAAAAAAAABAAAAAAAAAAEAAAAAAAAALwAAAAAAAAA2AAAAAAAAAFBLBgcAAAAAZQAAAAAAAAABAAAAUEsFBgAAAAABAAEALwAAADYAAAAAAA==";
+/* 同じ入力の deflate 版（`printf abcabc… | zip -9 - -`・203バイト）。flags bit1（最大圧縮）がローカルと中央目録で一致する例 */
+const INFOZIP_STDIN_DEFLATE_B64 = "UEsDBC0AAgAIACKGTl03DyAB//////////8BABQALQEAEAAYAAAAAAAAAAcAAAAAAAAAS0xKTsSGAFBLAQIeAy0AAgAIACKGTl03DyABBwAAABgAAAABAAAAAAAAAAEAAACAEQAAAAAtUEsGBiwAAAAAAAAAHgMtAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAC8AAAAAAAAAOgAAAAAAAABQSwYHAAAAAGkAAAAAAAAAAQAAAFBLBQYAAAAAAQABAC8AAAA6AAAAAAA=";
+const infoZipBytes = (b64) => Uint8Array.from(Buffer.from(b64, "base64"));
+
+test("an optional ZIP64 end record written by Info-ZIP from stdin is accepted", async () => {
+  const zip = await Z.zipOpen(new Blob([infoZipBytes(INFOZIP_STDIN_B64)]));
+  assert.equal(zip.entries.length, 1);
+  assert.equal(zip.entries[0].name, "-");
+  assert.equal(await text(await Z.zipEntryBlob(zip, zip.entries[0], 100, true)), "abc");
+  const deflated = await Z.zipOpen(new Blob([infoZipBytes(INFOZIP_STDIN_DEFLATE_B64)]));
+  assert.equal(await text(await Z.zipEntryBlob(deflated, deflated.entries[0], 100, true)), "abc".repeat(8));
+  /* ロケーターが嘘の位置を指すときは、従来どおり拒否する */
+  const bad = infoZipBytes(INFOZIP_STDIN_B64); const eocd = bad.length - 22, loc = eocd - 20;
+  new DataView(bad.buffer).setUint32(loc + 8, 1, true);
+  await assert.rejects(Z.zipOpen(new Blob([bad])), e => e.key === "zipBad");
+});
+
+test("an optional ZIP64 end record that disagrees with the EOCD is refused (no dual interpretation)", async () => {
+  const bytes = infoZipBytes(INFOZIP_STDIN_B64);
+  const record = findSignature(bytes, 0x06064b50);
+  assert.ok(record >= 0, "the Info-ZIP fixture carries an optional ZIP64 end record");
+  /* 終端レコードの中身（件数・中央目録の大きさ／位置・ディスク番号）の1つでも EOCD と食い違えば zipBad。
+     読む値は常に EOCD 側なので、食い違うファイルは「別の読み手には別の中央目録が見える」二重解釈になり得る＝受け取らない */
+  for (const [at, value] of [[record + 32, 2n], [record + 40, 48n], [record + 48, 55n], [record + 16, 1n], [record + 24, 2n]]) {
+    const bad = bytes.slice();
+    new DataView(bad.buffer).setBigUint64(at, value, true);
+    await assert.rejects(Z.zipOpen(new Blob([bad])), e => e.key === "zipBad", `mutation at +${at}`);
+  }
+});

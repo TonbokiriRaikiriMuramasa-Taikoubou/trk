@@ -129,9 +129,9 @@ async function firstSparkChartData(diff) {
     return data;
   } catch (_) { return null; }   /* 通信・JSONの失敗は自動生成で遊ぶ（デモを止めない） */
 }
+/* 同梱の FIRST SPARK（任意の音源フォルダ optional-demo-audio/）を、あれば曲リストへ入れる。
+   ガイドの「30秒デモ」ボタンは trk140 で外した。曲そのものは残す（フォルダごと消せば曲も消える）。 */
 async function initOptionalTutorialDemo() {
-  const button = core.$("guideDemoBtn");
-  if (button) button.hidden = true;
   try {
     const response = await fetch(FIRST_SPARK_MANIFEST, { credentials:"same-origin" });
     if (!response.ok) return;
@@ -145,7 +145,6 @@ async function initOptionalTutorialDemo() {
       title:"FIRST SPARK — Tutorial", base:"FIRST SPARK — Tutorial", artist:"trk!", size:0, bpm:128, offset:0,
       charter:Object.keys(firstSparkChartMap).length ? "trk!" : "", builtinDemo:true
     }];
-    if (button) button.hidden = false;
     renderLib();
   } catch (_) { /* no manifest = intentional lightweight build or an offline optional asset */ }
 }
@@ -1395,7 +1394,8 @@ const ENDFIELD_FIRSTORDER_OLD_NAMES = Object.freeze({
    キャラクターテーマ曲4リスト（Blurring・ASHEN REMAINS・The Floaty Envelope・MAKER'S LUV）を
    ネスト棚 trk-endfield-character（「Endfield Character Theme」）へ動かす。
    settings.trkEndfieldTidy1 が付いたら以後は利用者の並び・配置を守る（二度と触らない）。
-   名前・アイコン・タグ・所持曲は触らない（既定の旧名からの改名は上のセーフリフレッシュが担当）。 */
+   名前・アイコン・タグ・所持曲は触らない（既定の旧名からの改名は上のセーフリフレッシュが担当）。
+   削除予定：trk150 以降。条件は「trk128 より前の版から更新した利用者がいないと判断できること」。判断できるまで残す（HANDOFF §4.2）。 */
 function trkEndfieldTidyOnce() {
   const s = core.settings;
   if (s.trkEndfieldTidy1) return;
@@ -1448,7 +1448,8 @@ function trkEndfieldTidyOnce() {
    上限を40にしても、すでに落ちた配置は戻らないので、**こわれた形のときだけ**動かし直す:
    ①trk128 の整頓を通っている（＝この壊れ方が作られうる）②キャラクターテーマのリストが残っている
    ③そのどれもがどこにも入っていない（folder が空。利用者が自分で置いたものは触らない）
-   ④🎭棚が空。当てはまれば棚を作り直して戻す。印（settings.trkEndfieldTidy2）が付いたら以後は二度と触らない。 */
+   ④🎭棚が空。当てはまれば棚を作り直して戻す。印（settings.trkEndfieldTidy2）が付いたら以後は二度と触らない。
+   削除予定：trk150 以降。条件は trkEndfieldTidyOnce と同じ（HANDOFF §4.2）。 */
 function trkEndfieldShelfRestoreOnce() {
   const s = core.settings;
   if (!s || s.trkEndfieldTidy2 || !s.trkEndfieldTidy1) return;
@@ -3223,7 +3224,6 @@ async function selectSong(it) {
         console.error("tutorial audio load failed", error);
         if (error && error.code === "not-found") {
           builtInSongs = builtInSongs.filter(song => song.key !== FIRST_SPARK_KEY);
-          const button = core.$("guideDemoBtn"); if (button) button.hidden = true;
           renderLib();
         }
         core.setStatus("loadStatus", "demoSongUnavailable");
@@ -3261,15 +3261,6 @@ async function selectSong(it) {
   if (!ok || core.currentSong !== it) return;
   renderLib(); renderBanner(); updateSpBuilder(); renderSeedTools();
 }
-window.TrkSelectTutorialSong = async function() {
-  const demo = builtInSongs.find(song => song.key === FIRST_SPARK_KEY);
-  if (!demo || core.phase !== "title") return false;
-  try { ensureTrkOstPlaylist({ toast: false }); } catch(_){}   /* 🎓 デモ曲の居所（trk's OST Vol.1）を用意 */
-  /* 利用者が OST を消していたら作り直さず、📚すべて で見せる */
-  core.settings.libTab = plById(TRK_OST_ID) ? "pl:" + TRK_OST_ID : "all"; core.saveUserPrefs(); renderLib();
-  await selectSong(demo);
-  return !!(core.videoReady && core.currentSong && core.currentSong.key === FIRST_SPARK_KEY);
-};
 /* 解析後・譜面を作る前に呼ばれる。true を返すと自動生成を省略 */
 async function restoreSongState(it) {
   if (core.currentSong !== it) return false;

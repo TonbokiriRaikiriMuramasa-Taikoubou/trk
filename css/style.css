@@ -146,7 +146,14 @@ input[type=color]{width:52px;height:34px;padding:2px;border:1px solid var(--ui-b
 @media (prefers-reduced-motion: reduce) {   /* 負担を減らしたい設定では、そっと短く */
   #quickGuide.eggSkip, #quickGuide.eggCheat, #quickGuide.eggGod { animation-duration: .35s }
 }
-.guideGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px}
+.guideGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+/* 🧭 初回入口（trk140）：1行のバー（開始＝左、スキップ＝右）。手順は開いたときだけ */
+.quickGuide[hidden]{display:none}
+.guideBar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.guideBarTitle{color:var(--ui-gold);font-weight:850}
+.guideBarActions{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.guideStart{padding:6px 14px;font-size:12.5px;font-weight:800}
+.guideSteps{margin-top:6px}
 .guideStep{display:flex;flex-direction:column;gap:4px;padding:10px;border:1px solid var(--ui-border);border-radius:12px;background:rgba(0,0,0,.12);font-size:13px;line-height:1.45}
 .guideStep b{color:var(--ui-text);font-size:14px}.guideStep span{color:var(--ui-muted)}
 /* 🧭 チュートリアルのスタンプラリー（試した瞬間にスタンプが押される） */
@@ -160,7 +167,7 @@ input[type=color]{width:52px;height:34px;padding:2px;border:1px solid var(--ui-b
 .guideFoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;min-height:30px}
 .guideNote{font-size:12.5px;color:var(--ui-gold);font-weight:700;animation:guideNoteIn .3s ease}
 @keyframes guideNoteIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-.guideDemoBtn{padding:7px 13px;font-size:12.5px}.guideSkip{padding:6px 14px;font-size:12.5px;opacity:.85;margin-left:auto}
+.guideSkip{padding:6px 14px;font-size:12.5px;opacity:.85;margin-left:auto}
 @media(max-width:720px){.guideFoot{flex-wrap:wrap;justify-content:flex-start}.guideNote{flex:1 1 100%;order:3}.guideSkip{margin-left:auto}}
 /* 🎉 チュートリアル完了／ごほうび解禁のお祝い */
 #guideCelebrate{position:fixed;inset:0;z-index:90;display:grid;place-items:center;pointer-events:none;background:rgba(0,0,0,.35);opacity:0;transition:opacity .25s}
@@ -1308,6 +1315,10 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
 .plTrkRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .plTrkRow>span{flex:1;min-width:120px}
 .plTrkGroup{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.plTrkTitle{background:none;border:0;padding:0;font:inherit;font-weight:700;color:inherit;cursor:pointer;text-align:left}
+.plTrkTitle:hover{text-decoration:underline}
+.plTrkCheck{min-width:2.4em}
+.plTrkBody{display:flex;flex-direction:column;gap:6px;margin-top:6px}
 /* 📤 共有プレイリスト（ビューア） */
 .plShareComment{font-size:13.5px;color:var(--ui-text);line-height:1.5}
 .plShareSrc{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
@@ -1851,3 +1862,17 @@ body.noMoreBtns .moreBtn { display:none !important; }
 
 /* 🔧 開発者表示（設定 devView がオフのとき隠す） */
 body.noDev .devOnly { display: none !important; }
+
+/* 👋 はじめての「trk!にようこそ！」（trk144）。一度だけ出る。背景を押すか、ボタンで閉じる。 */
+.welcomeBox{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:18px;background:rgba(0,0,0,.6)}
+.welcomeBox[hidden]{display:none}
+.welcomeCard{max-width:460px;width:100%;max-height:calc(100vh - 36px);overflow:auto;padding:24px 26px;border:1px solid var(--ui-border);border-radius:16px;background:var(--ui-panel);box-shadow:var(--ui-shadow);color:var(--ui-text)}
+.welcomeCard h2{margin:0 0 8px;font-size:22px;color:var(--ui-gold)}
+.welcomeLead{margin:0 0 12px;font-size:14px;line-height:1.6}
+.welcomeList{margin:0 0 12px;padding:0;list-style:none;display:grid;gap:8px}
+.welcomeList li{font-size:14px;line-height:1.5;padding:8px 10px;border-radius:10px;background:var(--ui-soft)}
+.welcomeHint{margin:0 0 16px;font-size:12px;opacity:.75}
+.welcomeActions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.welcomeBtn{min-height:40px;padding:8px 16px;border-radius:999px;border:1px solid var(--ui-border);background:var(--ui-soft);color:var(--ui-text);font:inherit;font-weight:700;cursor:pointer}
+.welcomeBtn.primary{background:var(--ui-gold);border-color:var(--ui-gold);color:#15111a}
+.welcomeBtn:focus-visible{outline:2px solid var(--ui-gold);outline-offset:2px}

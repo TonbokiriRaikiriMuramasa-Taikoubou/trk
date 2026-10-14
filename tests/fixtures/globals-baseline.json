@@ -1,11 +1,11 @@
 {
  "totals": {
-  "scripts": 46,
-  "windowProps": 283,
-  "duplicates": 0,
-  "declarations": 1203,
-  "private": 1021,
-  "public": 182,
+  "scripts": 53,
+  "windowProps": 282,
+  "duplicates": 1,
+  "declarations": 1439,
+  "private": 1229,
+  "public": 210,
   "globalNames": 288
  },
  "files": [
@@ -33,8 +33,8 @@
   },
   {
    "file": "js/data.js",
-   "decls": 33,
-   "private": 28,
+   "decls": 38,
+   "private": 33,
    "public": [
     "H",
     "NOTE_PRESETS",
@@ -59,8 +59,8 @@
   },
   {
    "file": "js/core.js",
-   "decls": 162,
-   "private": 119,
+   "decls": 170,
+   "private": 127,
    "public": [
     "$",
     "TRK_ENUM_VALUES",
@@ -132,16 +132,66 @@
    "public": []
   },
   {
+   "file": "js/midi-profiles.js",
+   "decls": 18,
+   "private": 3,
+   "public": [
+    "api",
+    "band",
+    "chorus",
+    "comp",
+    "delay",
+    "drive",
+    "eq",
+    "get",
+    "list",
+    "lofi",
+    "name",
+    "profiles",
+    "room",
+    "synth",
+    "width"
+   ]
+  },
+  {
+   "file": "js/midi-player.js",
+   "decls": 72,
+   "private": 69,
+   "public": [
+    "api",
+    "midiError",
+    "releaseVoice"
+   ]
+  },
+  {
+   "file": "js/midi-settings.js",
+   "decls": 5,
+   "private": 1,
+   "public": [
+    "api",
+    "core",
+    "render",
+    "select"
+   ]
+  },
+  {
    "file": "js/media.js",
    "decls": 37,
-   "private": 31,
+   "private": 32,
    "public": [
     "applyChartData",
     "audioCtx",
     "chartToData",
     "decodeAudio",
-    "getAC",
-    "setBackground"
+    "getAC"
+   ]
+  },
+  {
+   "file": "js/audio-art.js",
+   "decls": 32,
+   "private": 31,
+   "public": [
+    "candidate"
    ]
   },
   {
@@ -186,8 +236,8 @@
   },
   {
    "file": "js/render.js",
-   "decls": 39,
-   "private": 32,
+   "decls": 40,
+   "private": 33,
    "public": [
     "drawVideo",
     "hitPos",
@@ -200,9 +250,11 @@
   },
   {
    "file": "js/custom.js",
-   "decls": 65,
-   "private": 62,
+   "decls": 71,
+   "private": 66,
    "public": [
+    "CRC_TABLE",
+    "crc32",
     "noteImage",
     "packRuntime",
     "skinShelf"
@@ -353,6 +405,12 @@
    "public": []
   },
   {
+   "file": "js/touhou-theme-data.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
    "file": "js/catalog.js",
    "decls": 1,
    "private": 0,
@@ -373,14 +431,15 @@
   },
   {
    "file": "js/library.js",
-   "decls": 253,
-   "private": 237,
+   "decls": 313,
+   "private": 295,
    "public": [
     "addonSongs",
     "allSongs",
     "bannerRandomBtn",
     "bannerVolTip",
     "ensureTrkDistributionPlaylists",
+    "lastUseStudyArtwork",
     "nextSong",
     "plToast",
     "prevSong",
@@ -389,6 +448,7 @@
     "renderLib",
     "selectSong",
     "setAddonSongs",
+    "songDisplayTitle",
     "songInfo",
     "srcLabel",
     "startPreview"
@@ -414,10 +474,11 @@
   },
   {
    "file": "js/main.js",
-   "decls": 45,
+   "decls": 46,
    "private": 41,
    "public": [
     "RESERVED",
+    "guideNote",
     "idleTimer",
     "poke",
     "showFxPower"
@@ -482,8 +543,22 @@
   },
   {
    "file": "js/study-room.js",
-   "decls": 243,
-   "private": 243,
+   "decls": 271,
+   "private": 270,
+   "public": [
+    "studyBooks"
+   ]
+  },
+  {
+   "file": "js/zip-io.js",
+   "decls": 0,
+   "private": 0,
+   "public": []
+  },
+  {
+   "file": "js/backup.js",
+   "decls": 0,
+   "private": 0,
    "public": []
   }
  ],
@@ -749,20 +824,26 @@
     "js/core.js",
     "js/lite.js",
     "js/chart-gen.js",
+    "js/midi-profiles.js",
+    "js/midi-player.js",
     "js/media.js",
+    "js/audio-art.js",
     "js/judge-match.js",
     "js/render.js",
     "js/custom.js",
     "js/modes.js",
     "js/catch.js",
+    "js/touhou-theme-data.js",
     "js/library.js",
     "js/main.js",
     "js/pad.js",
-    "js/study-room.js"
+    "js/study-room.js",
+    "js/zip-io.js"
    ],
    "readers": [
     "js/characters/miku.js",
     "js/player.js",
+    "js/midi-settings.js",
     "js/game.js",
     "js/truck.js",
     "js/stage.js",
@@ -772,8 +853,10 @@
     "js/tv-dock.js",
     "js/tv-rich.js",
     "js/video-max.js",
+    "js/fx.js",
     "js/fx-synth.js",
     "js/favs.js",
+    "js/catalog.js",
     "js/verified.js",
     "js/lib-skins.js",
     "js/addons.js",
@@ -783,7 +866,8 @@
     "js/spectrum.js",
     "js/synth-mode.js",
     "js/frame-interp.js",
-    "js/media-player-mode.js"
+    "js/media-player-mode.js",
+    "js/backup.js"
    ]
   },
   {
@@ -916,15 +1000,6 @@
     "js/synth-mode.js",
     "js/media-player-mode.js",
     "js/study-room.js"
-   ]
-  },
-  {
-   "name": "TrkSelectTutorialSong",
-   "writers": [
-    "js/library.js"
-   ],
-   "readers": [
-    "js/main.js"
    ]
   },
   {

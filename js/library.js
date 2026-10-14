@@ -129,9 +129,9 @@ async function firstSparkChartData(diff) {
     return data;
   } catch (_) { return null; }   /* 通信・JSONの失敗は自動生成で遊ぶ（デモを止めない） */
 }
+/* 同梱の FIRST SPARK（任意の音源フォルダ optional-demo-audio/）を、あれば曲リストへ入れる。
+   ガイドの「30秒デモ」ボタンは trk140 で外した。曲そのものは残す（フォルダごと消せば曲も消える）。 */
 async function initOptionalTutorialDemo() {
-  const button = core.$("guideDemoBtn");
-  if (button) button.hidden = true;
   try {
     const response = await fetch(FIRST_SPARK_MANIFEST, { credentials:"same-origin" });
     if (!response.ok) return;
@@ -140,15 +140,81 @@ async function initOptionalTutorialDemo() {
     /* manifest.charts === false なら音源だけ同梱した構成（譜面は自動生成） */
     firstSparkChartMap = manifest.charts === false ? {} :
       Object.fromEntries(FIRST_SPARK_CHART_DIFFS.map(d => [d, FIRST_SPARK_CHART_DIR + firstSparkChartFile(d)]));
-    builtInSongs = [{
+    const firstSpark = {
       key:FIRST_SPARK_KEY, source:"builtin", file:null, fileName:"FIRST_SPARK_Tutorial_30s.mp3",
       title:"FIRST SPARK — Tutorial", base:"FIRST SPARK — Tutorial", artist:"trk!", size:0, bpm:128, offset:0,
       charter:Object.keys(firstSparkChartMap).length ? "trk!" : "", builtinDemo:true
-    }];
-    if (button) button.hidden = false;
+    };
+    builtInSongs = [firstSpark, ...builtInSongs.filter(song => song.key !== FIRST_SPARK_KEY)];
     renderLib();
   } catch (_) { /* no manifest = intentional lightweight build or an offline optional asset */ }
 }
+/* 🎼 trk Agent's OST Vol.1 — 手続き生成の10曲（tools/make-trk-ost.mjs）。
+   音源とマニフェストは assets/trk-ost/（Git外）。マニフェストが無ければ曲もプレイリストも作らない。
+   音源は選んだときに読む（materializeAgentOst）。消したら trkRemoved に印が残る（🐔 の ♻ で戻せる）。 */
+const AGENT_OST_ID = "trk-agent-ost-v1";
+const AGENT_OST_CAT = "trk:agent-ost";
+const AGENT_OST_NAME = "trk Agent's OST Vol.1";   /* 名前は24文字まで（plSanitize） */
+const AGENT_OST_DIR = "./assets/trk-ost/";
+const AGENT_OST_MAX_BYTES = 4 * 1024 * 1024;   /* 1曲 約0.9〜1MB。上限は余裕を見た値 */
+const AGENT_OST_KEY_PREFIX = "builtin:trk-agent-ost:";
+const agentOstUrls = new Map();                 /* key → 音源の URL */
+/* 古い名前（Orig.）で保存されていても、起動時に正しい名前へ直す（音源の有無に関係なく） */
+function renameAgentOstPlaylist() {
+  const p = core.settings.playlists.find(x => x.id === AGENT_OST_ID || x.cat === AGENT_OST_CAT);
+  if (p && p.name !== AGENT_OST_NAME) { p.name = AGENT_OST_NAME; core.saveUserPrefs(); }
+}
+async function initAgentOstTracks() {
+  try { renameAgentOstPlaylist(); } catch (_) {}
+  try {
+    const response = await fetch(AGENT_OST_DIR + "manifest.json", { credentials:"same-origin" });
+    if (!response.ok) return;
+    const manifest = await response.json();
+    if (!manifest || manifest.version !== 1 || manifest.enabled !== true || !Array.isArray(manifest.tracks)) return;
+    const songs = manifest.tracks.slice(0, 20).filter(t => t && /^[\w-]{1,32}$/.test(String(t.key)) && /^[\w.-]{1,80}\.wav$/.test(String(t.file)))
+      .map(t => {
+        const key = AGENT_OST_KEY_PREFIX + t.key, title = String(t.title || t.key).trim().slice(0, 120) || t.key;
+        agentOstUrls.set(key, AGENT_OST_DIR + t.file);
+        return { key, source:"builtin", file:null, fileName:t.file, title, base:title, artist:"trk Agent", size:0, bpm:0, offset:0, charter:"", license:"", trkOnly:AGENT_OST_ID };
+      });
+    if (!songs.length) return;
+    builtInSongs = [...builtInSongs.filter(song => !song.key.startsWith(AGENT_OST_KEY_PREFIX)), ...songs];
+    ensureAgentOstPlaylist(songs.map(song => song.key));   /* フォルダ（🐔）を先に作る。描き直しは後 */
+    renderLib();
+  } catch (_) { /* 無ければ何もしない（音源は Git の外にある） */ }
+}
+function ensureAgentOstPlaylist(keys) {
+  ensureTrkFolder();
+  const exist = core.settings.playlists.find(p => p.id === AGENT_OST_ID);
+  if (exist) {
+    if (exist.cat === AGENT_OST_CAT && exist.name !== AGENT_OST_NAME) { exist.name = AGENT_OST_NAME; core.saveUserPrefs(); }
+    return false;
+  }
+  if (trkIsRemoved(AGENT_OST_ID)) return false;
+  const p = plSanitize({ id:AGENT_OST_ID, name:AGENT_OST_NAME, icon:"\uD83C\uDFBC", color:"none",
+    folder:TRK_FOLDER_ID, tags:["trk", "OST", "Agent"], wish:[], songs:keys.slice(), cat:AGENT_OST_CAT, createdAt:Date.now() });
+  if (!p) return false;
+  core.settings.playlists.push(p);
+  core.saveUserPrefs();
+  return true;
+}
+async function materializeAgentOst(it) {
+  const url = agentOstUrls.get(it.key);
+  if (!url) throw new Error("agent-ost-unknown");
+  const response = await fetch(url, { credentials:"same-origin" });
+  if (!response.ok) { const error = new Error("agent-ost-unavailable"); error.code = response.status === 404 ? "not-found" : "http-error"; throw error; }
+  const declared = Number(response.headers.get("Content-Length") || 0);
+  if (declared > AGENT_OST_MAX_BYTES) throw new Error("agent-ost-too-large");
+  const blob = await response.blob();
+  if (!blob.size || blob.size > AGENT_OST_MAX_BYTES) throw new Error("agent-ost-size-invalid");
+  const file = new File([blob], it.fileName, { type:"audio/wav" });
+  const ready = { ...it, file, size:file.size };
+  const idx = builtInSongs.findIndex(song => song.key === it.key);
+  if (idx >= 0) builtInSongs[idx] = ready;
+  renderLib();
+  return ready;
+}
+
 /* 📤 ミュージックフォルダを共有（許可は1回。中身のリストをぜんぶ取り込む）まわりの状態 */
 let sharedSongs = [];        /* 💾 端末に残してある共有の曲（リロード後も残る） */
 let libShared = false;       /* いまの libHandle が「📤 共有」でもらったものか（📁 開く と区別するため） */
@@ -401,7 +467,7 @@ Object.assign(TEXT.ko, {
 });
 Object.assign(TEXT.ja, {
   plNewFolder:"📁 新規フォルダ", plDefaultFolderName:"フォルダ", plFolderSettings:"フォルダの設定",
-  plFolderOf:"入れ物", plFolderRoot:"（なし・並びのトップ）",
+  plFolderOf:"入れ物", trkCopiedToFolder:"「{name}」を複製して入れました（元のリストは 🐔 に残ります）", plFolderRoot:"（なし・並びのトップ）",
   plFolderDel:"🗑 このフォルダを削除（中身は消えません）",
   plFolderLimit:"📁 フォルダは{n}個までです。使っていないフォルダを消すと作れます",
   plFolderCreated:"📁 フォルダ「{name}」を作成しました", plFolderDeleted:"🗑 フォルダを削除しました（中身は上の階層へ）",
@@ -439,7 +505,7 @@ Object.assign(TEXT.ja, {
   trkTabNameLabel:"タブの表示名", trkTabNameFull:"trk's playlist", trkTabNameShort:"trk's", trkTabNameIcon:"🐔（アイコンのみ）",
   trkTabNameNote:"🐔 のアイコンと色は固定です。タブの名前はこの3つから選べます（タップ＝中身、長押し＝階層）。",
   trkMenuTitle:"🐔 階層（Vol 一覧）", trkMenuHint:"タブの長押しで開く 🐔 trk's playlist の中身です。Vol やシリーズを選べます。名前と色は変えられません。",
-  trkMenuOpenFolder:"フォルダを開く", trkOpenItem:"開く", trkMoveUp:"上へ", trkMoveDown:"下へ",
+  trkMenuOpenFolder:"フォルダを開く", trkMenuOpenList:"プレイリストを開く", trkOpenItem:"開く", trkMoveUp:"上へ", trkMoveDown:"下へ",
   trkOrderEmpty:"（まだプレイリストがありません。チュートリアルを完了すると自動作成されます）",
   trkOrderAbcOff:"🔤 ABC順がオンのため、手動の ↑↓ は無効です。",
   trkSortAbc:"🔤 ABC順に並べる", trkSortAbcHint:"オフのときは下のリストの ↑↓ で自由に並べ替えできます。長押しで開く 🐔 の階層にも反映されます。",
@@ -452,7 +518,7 @@ Object.assign(TEXT.ja, {
 });
 Object.assign(TEXT.en, {
   plNewFolder:"📁 New folder", plDefaultFolderName:"Folder", plFolderSettings:"Folder settings",
-  plFolderOf:"Location", plFolderRoot:"(none — top level)",
+  plFolderOf:"Location", trkCopiedToFolder:"Copied \"{name}\" into the folder (the original stays in 🐔)", plFolderRoot:"(none — top level)",
   plFolderDel:"🗑 Delete this folder (contents are kept)",
   plFolderLimit:"📁 Up to {n} folders. Delete one you no longer use to make room",
   plFolderCreated:"📁 Folder “{name}” created", plFolderDeleted:"🗑 Folder deleted (contents moved up)",
@@ -490,7 +556,7 @@ Object.assign(TEXT.en, {
   trkTabNameLabel:"Tab label", trkTabNameFull:"trk's playlist", trkTabNameShort:"trk's", trkTabNameIcon:"🐔 (icon only)",
   trkTabNameNote:"The 🐔 icon and color are fixed. Choose one of these three labels (tap = songs, long-press = hierarchy).",
   trkMenuTitle:"🐔 Hierarchy (Vol list)", trkMenuHint:"Opened by long-pressing 🐔 trk's playlist. Pick a Vol or series here. Name and color are fixed.",
-  trkMenuOpenFolder:"Open folder", trkOpenItem:"Open", trkMoveUp:"Move up", trkMoveDown:"Move down",
+  trkMenuOpenFolder:"Open folder", trkMenuOpenList:"Open playlist", trkOpenItem:"Open", trkMoveUp:"Move up", trkMoveDown:"Move down",
   trkOrderEmpty:"(No playlists yet. They are created automatically when you finish the tutorial.)",
   trkOrderAbcOff:"🔤 Manual ↑↓ is disabled while ABC order is on.",
   trkSortAbc:"🔤 Sort A–Z", trkSortAbcHint:"When off, use ↑↓ in the list below to arrange freely. It also applies to the 🐔 hierarchy opened by long-press.",
@@ -503,7 +569,7 @@ Object.assign(TEXT.en, {
 });
 Object.assign(TEXT.zh, {
   plNewFolder:"📁 新建文件夹", plDefaultFolderName:"文件夹", plFolderSettings:"文件夹设置",
-  plFolderOf:"所属位置", plFolderRoot:"（无·顶层）",
+  plFolderOf:"所属位置", trkCopiedToFolder:"已将「{name}」复制到文件夹（原列表保留在 🐔 中）", plFolderRoot:"（无·顶层）",
   plFolderDel:"🗑 删除此文件夹（内容不会消失）",
   plFolderLimit:"📁 最多 {n} 个文件夹。删除不用的文件夹后即可创建",
   plFolderCreated:"📁 已创建文件夹「{name}」", plFolderDeleted:"🗑 已删除文件夹（内容移到上一层）",
@@ -541,7 +607,7 @@ Object.assign(TEXT.zh, {
   trkTabNameLabel:"标签显示名", trkTabNameFull:"trk's playlist", trkTabNameShort:"trk's", trkTabNameIcon:"🐔（仅图标）",
   trkTabNameNote:"🐔 图标与颜色固定。名称可从这3种中选择（点击＝内容，长按＝层级）。",
   trkMenuTitle:"🐔 层级（Vol 列表）", trkMenuHint:"长按 🐔 trk's playlist 打开的内容。可选择 Vol 或系列。名称与颜色不可更改。",
-  trkMenuOpenFolder:"打开文件夹", trkOpenItem:"打开", trkMoveUp:"上移", trkMoveDown:"下移",
+  trkMenuOpenFolder:"打开文件夹", trkMenuOpenList:"打开歌单", trkOpenItem:"打开", trkMoveUp:"上移", trkMoveDown:"下移",
   trkOrderEmpty:"（还没有播放列表。完成教程后会自动创建）",
   trkOrderAbcOff:"🔤 ABC顺序开启时，手动 ↑↓ 无效。",
   trkSortAbc:"🔤 按ABC顺序排列", trkSortAbcHint:"关闭时可用下方列表的 ↑↓ 自由排序。长按打开的 🐔 层级也会同步。",
@@ -554,7 +620,7 @@ Object.assign(TEXT.zh, {
 });
 Object.assign(TEXT.ko, {
   plNewFolder:"📁 새 폴더", plDefaultFolderName:"폴더", plFolderSettings:"폴더 설정",
-  plFolderOf:"소속", plFolderRoot:"(없음·최상위)",
+  plFolderOf:"소속", trkCopiedToFolder:"\"{name}\"을(를) 복제해서 넣었어요（원래 목록은 🐔에 남아요）", plFolderRoot:"(없음·최상위)",
   plFolderDel:"🗑 이 폴더 삭제(내용은 지워지지 않아요)",
   plFolderLimit:"📁 폴더는 {n}개까지예요. 쓰지 않는 폴더를 지우면 만들 수 있어요",
   plFolderCreated:"📁 폴더 '{name}'을(를) 만들었어요", plFolderDeleted:"🗑 폴더를 삭제했어요(내용은 위 계층으로)",
@@ -592,7 +658,7 @@ Object.assign(TEXT.ko, {
   trkTabNameLabel:"탭 표시 이름", trkTabNameFull:"trk's playlist", trkTabNameShort:"trk's", trkTabNameIcon:"🐔(아이콘만)",
   trkTabNameNote:"🐔 아이콘과 색은 고정이에요. 탭 이름은 이 3가지 중에서 고를 수 있어요(탭＝내용, 길게 누르기＝계층).",
   trkMenuTitle:"🐔 계층(Vol 목록)", trkMenuHint:"탭을 길게 눌러 여는 🐔 trk's playlist 내용이에요. Vol이나 시리즈를 고를 수 있어요. 이름과 색은 바꿀 수 없어요.",
-  trkMenuOpenFolder:"폴더 열기", trkOpenItem:"열기", trkMoveUp:"위로", trkMoveDown:"아래로",
+  trkMenuOpenFolder:"폴더 열기", trkMenuOpenList:"플레이리스트 열기", trkOpenItem:"열기", trkMoveUp:"위로", trkMoveDown:"아래로",
   trkOrderEmpty:"(아직 재생목록이 없어요. 튜토리얼을 마치면 자동으로 만들어져요)",
   trkOrderAbcOff:"🔤 ABC순이 켜져 있어서 수동 ↑↓는 사용할 수 없어요.",
   trkSortAbc:"🔤 ABC순으로 정렬", trkSortAbcHint:"끄면 아래 목록의 ↑↓로 자유롭게 정렬할 수 있어요. 길게 눌러 여는 🐔 계층에도 반영돼요.",
@@ -793,7 +859,7 @@ function libFavKeys(all) {
 }
 /* タブの一覧（順番：すべて → ⭐お気に入り → プレイリスト → パック／アドオン／フォルダー → デモ曲 → 追加した曲 → 公認） */
 function libTabsOf(all) {
-  const tabs = [{ id:"all", icon:"📚", label:tr("libTabAll"), n:all.length }];
+  const tabs = [{ id:"all", icon:"📚", label:tr("libTabAll"), n:all.filter(x => !x.trkOnly).length }];
   const favN = libFavKeys(all).n;
   if (favN) tabs.push({ id:"fav", icon:"⭐", label:tr("favTab"), n:favN });
   const plKeys = new Set(all.map(x => x.key));
@@ -869,6 +935,7 @@ function libTabsOf(all) {
   return tabs;
 }
 function libTabMatch(it, id) {
+  if (it.trkOnly && id !== "pl:" + it.trkOnly) return false;   /* 🎼 trk Agent's OST：その Vol を開いたときだけ */
   if (!id || id === "all") return true;
   if (id === "fav") { const F = window.TrkFavs; return !!(F && F.inGroup("song", F.activeOf("song"), it.key)); }
   if (id.startsWith("pl:")) { const p = plById(id.slice(3)); return !!p && p.songs.includes(it.key); }
@@ -1187,6 +1254,8 @@ function trkClassicWishesFromCatalog() {
   }
   return out;
 }
+/* チュートリアル完了時に Game Vol.1／Classic Vol.1 を自動で作るか。false＝作らない（手動の作成・♻ の戻しは使える） */
+const TRK_AUTO_GAME_CLASSIC = false;
 function ensureTrkPlaylist(opts) {
   const o = opts || {};
   const doToast = o.toast !== false;
@@ -1381,7 +1450,8 @@ function trkIsRemoved(id) {
 /* 🎭 Endfieldのキャラクターテーマ曲（trk128）：カタログの4リストはネスト棚に作り、既存取り込みもそこに移す。 */
 const ENDFIELD_CHARACTER_FOLDER = "trk-endfield-character";
 const ENDFIELD_CHARACTER_PL = new Set(["ef-blurring", "ef-ashen", "ef-floaty", "ef-makers"]);
-/* 🛰️ 初号指令OSTの旧既定名（trk110〜trk128）。保存名は plSanitize が24文字に切るので、フル名と切れた形の両方を持つ。
+/* 🛰️ 初号指令OSTの旧既定名（trk110〜trk128）。削除予定日：2027-01-14（docs/MIGRATIONS.md）。
+   保存名は plSanitize が24文字に切るので、フル名と切れた形の両方を持つ。
    切れた形はVol.1とVol.2で同じ（「初号指令 (上/下) ― Zeroth Direct」・「Endfield — Zeroth Direct」）だが、
    照合はIDごとに別々の表なので取り違えない。利用者が自分で付けた名前はここに無いので触らない（trk129）。 */
 const ENDFIELD_FIRSTORDER_OLD_NAMES = Object.freeze({
@@ -1395,7 +1465,8 @@ const ENDFIELD_FIRSTORDER_OLD_NAMES = Object.freeze({
    キャラクターテーマ曲4リスト（Blurring・ASHEN REMAINS・The Floaty Envelope・MAKER'S LUV）を
    ネスト棚 trk-endfield-character（「Endfield Character Theme」）へ動かす。
    settings.trkEndfieldTidy1 が付いたら以後は利用者の並び・配置を守る（二度と触らない）。
-   名前・アイコン・タグ・所持曲は触らない（既定の旧名からの改名は上のセーフリフレッシュが担当）。 */
+   名前・アイコン・タグ・所持曲は触らない（既定の旧名からの改名は上のセーフリフレッシュが担当）。
+   削除予定日：2027-01-14（docs/MIGRATIONS.md）。 */
 function trkEndfieldTidyOnce() {
   const s = core.settings;
   if (s.trkEndfieldTidy1) return;
@@ -1448,7 +1519,8 @@ function trkEndfieldTidyOnce() {
    上限を40にしても、すでに落ちた配置は戻らないので、**こわれた形のときだけ**動かし直す:
    ①trk128 の整頓を通っている（＝この壊れ方が作られうる）②キャラクターテーマのリストが残っている
    ③そのどれもがどこにも入っていない（folder が空。利用者が自分で置いたものは触らない）
-   ④🎭棚が空。当てはまれば棚を作り直して戻す。印（settings.trkEndfieldTidy2）が付いたら以後は二度と触らない。 */
+   ④🎭棚が空。当てはまれば棚を作り直して戻す。印（settings.trkEndfieldTidy2）が付いたら以後は二度と触らない。
+   削除予定日：2027-01-14（docs/MIGRATIONS.md）。 */
 function trkEndfieldShelfRestoreOnce() {
   const s = core.settings;
   if (!s || s.trkEndfieldTidy2 || !s.trkEndfieldTidy1) return;
@@ -1697,6 +1769,18 @@ function plMenu(p) {
   const lk = el("input"); lk.type = "checkbox"; lk.checked = !!p.locked;
   const save = el("button", "plBtn", tr("plSave")); save.type = "button";
   save.addEventListener("click", () => {
+    /* 🐔 の中（trk のリスト）を別の入れ物へ入れるときは、移動せず複製する。元のリストは 🐔 に残る。
+       複製は利用者のリストになる（カタログとの紐づけ・自動更新は付けない）。入れ物は1つに限らず、複製で何か所にも置ける */
+    if (fldSel.value !== (p.folder || "") && plIsTrkManaged(p)) {
+      const copy = plSanitize({ id: "pl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        name: name.value || p.name, icon: icon.value, color: color.value, frozen: false, locked: false,
+        songs: p.songs.slice(), wish: p.wish ? p.wish.slice() : [], guide: p.guide || null, folder: fldSel.value,
+        tags: tags.value.split(/[\s、，,]+/).map(x => x.trim().slice(0, 16)).filter(Boolean).slice(0, 5), createdAt: Date.now() });
+      if (!copy) return;
+      core.settings.playlists.push(copy); core.saveUserPrefs(); d.close(); renderLib();
+      plToast(tr("trkCopiedToFolder", { name: copy.name }));
+      return;
+    }
     const t = plSanitize({ id: p.id, name: name.value || p.name, icon: icon.value, color: color.value, frozen: fz.checked, locked: lk.checked,
       songs: p.songs, wish: p.wish, guide: p.guide, cat: p.cat, by: p.by, createdAt: p.createdAt,
       folder: fldSel.value, tags: tags.value.split(/[\s、，,]+/).map(x => x.trim().slice(0, 16)).filter(Boolean).slice(0, 5) });
@@ -1815,7 +1899,10 @@ function plTrkMenu() {
     const peers = list.map(x => x.id);
     const row = el("div", "plTrkRow");
     const open = el("button", "plBtn", (p.icon || "🎧") + " " + p.name + "（" + plCount(p, keys) + "）"); open.type = "button";
-    open.addEventListener("click", () => { d.close(); core.settings.libTab = "pl:" + p.id; core.saveUserPrefs(); renderLib(); });
+    open.title = tr("trkMenuOpenFolder");   /* 名前を押すと、その Vol のフォルダを開く（既定の動作） */
+    open.addEventListener("click", () => { d.close(); core.settings.libTab = "fld:" + (p.folder || TRK_FOLDER_ID); core.saveUserPrefs(); renderLib(); });
+    const check = el("button", "plBtn small plTrkCheck", "✓"); check.type = "button"; check.title = tr("trkMenuOpenList"); check.setAttribute("aria-label", tr("trkMenuOpenList") + " " + p.name);
+    check.addEventListener("click", () => { d.close(); core.settings.libTab = "pl:" + p.id; core.saveUserPrefs(); renderLib(); });   /* ✓＝プレイリストの詳細 */
     const up = el("button", "plBtn small", "↑"); up.type = "button"; up.title = tr("trkMoveUp"); up.setAttribute("aria-label", tr("trkMoveUp") + " " + p.name);
     const down = el("button", "plBtn small", "↓"); down.type = "button"; down.title = tr("trkMoveDown"); down.setAttribute("aria-label", tr("trkMoveDown") + " " + p.name);
     trkMoveButtonsState(up, down, i, list.length);
@@ -1823,36 +1910,42 @@ function plTrkMenu() {
     down.addEventListener("click", () => { trkMovePlaylist(p.id, 1, peers); paint(); });
     const gear = el("button", "plBtn small", "⚙"); gear.type = "button"; gear.title = tr("plSettings"); gear.setAttribute("aria-label", tr("plSettings") + " " + p.name);
     gear.addEventListener("click", () => plMenu(p));   /* plDialog が古いダイアログを閉じるので、そのまま開き替える */
-    row.append(open, up, down, gear);
+    row.append(open, up, down, check, gear);
     return row;
   };
+  /* 見出しのタイトルを押すと、そのフォルダを開く（既定の動作）。中の Vol は常に並べる */
   const groupHead = f => {
     const head = el("div", "plTrkGroup");
-    head.append(el("b", "plCardTitle", (f.icon || "📁") + " " + f.name));
-    if (f.id !== TRK_FOLDER_ID) {   /* サブフォルダ（Classic／Blue Archive など）は、その棚を開ける */
-      const fo = el("button", "plBtn small", tr("trkMenuOpenFolder")); fo.type = "button";
-      fo.addEventListener("click", () => { d.close(); core.settings.libTab = "fld:" + f.id; core.saveUserPrefs(); renderLib(); });
-      head.append(fo);
-    }
+    const title = el("button", "plTrkTitle", (f.icon || "📁") + " " + (f.id === TRK_FOLDER_ID ? (trkTabLabel() || tr("trkTabNameFull")) : f.name));
+    title.type = "button"; title.title = tr("trkMenuOpenFolder");
+    title.addEventListener("click", () => { d.close(); core.settings.libTab = "fld:" + f.id; core.saveUserPrefs(); renderLib(); });
+    head.append(title);
+    const fo = el("button", "plBtn small", tr("trkMenuOpenFolder")); fo.type = "button";
+    fo.addEventListener("click", () => { d.close(); core.settings.libTab = "fld:" + f.id; core.saveUserPrefs(); renderLib(); });
+    head.append(fo);
     return head;
+  };
+  /* フォルダの中の Vol（と一段深い棚）を並べる */
+  const folderBlock = (f, depth) => {
+    const wrap = el("div", "plTrkBlock");
+    wrap.append(el("div", "plSep"), groupHead(f));
+    const body = el("div", "plTrkBody");
+    if (depth) body.style.marginLeft = (depth * 14) + "px";
+    trkOrderedPlaylists(core.settings.playlists.filter(p => plVisible(p) && p.folder === f.id)).forEach((p, i, list) => body.append(rowOf(p, i, list)));
+    for (const g of core.settings.plFolders.filter(x => x.parent === f.id)) body.append(folderBlock(g, depth + 1));
+    wrap.append(body);
+    return wrap;
   };
   const paint = () => {
     listBox.replaceChildren();
     const direct = core.settings.playlists.filter(p => plVisible(p) && p.folder === TRK_FOLDER_ID);
     const subs = core.settings.plFolders.filter(f => f.parent === TRK_FOLDER_ID);
     if (!direct.length && !subs.length) { listBox.append(el("div", "plHint", tr("trkOrderEmpty"))); return; }
-    if (direct.length) {
-      listBox.append(groupHead({ id: TRK_FOLDER_ID, icon: TRK_TAB_ICON, name: trkTabLabel() || tr("trkTabNameFull") }));
+    if (direct.length) {   /* 🐔 直下の Vol（Agent など）は、いつも並べる */
+      listBox.append(groupHead({ id: TRK_FOLDER_ID, icon: TRK_TAB_ICON }));
       trkOrderedPlaylists(direct).forEach((p, i, list) => listBox.append(rowOf(p, i, list)));
     }
-    for (const f of subs) {   /* 🎻 Classic など。中の Vol を並べる */
-      listBox.append(el("div", "plSep"), groupHead(f));
-      trkOrderedPlaylists(core.settings.playlists.filter(p => plVisible(p) && p.folder === f.id)).forEach((p, i, list) => listBox.append(rowOf(p, i, list)));
-      for (const g of core.settings.plFolders.filter(x => x.parent === f.id)) {   /* 🎭 一段深い棚（trk-endfield-character 等） */
-        listBox.append(el("div", "plSep"), groupHead(g));
-        trkOrderedPlaylists(core.settings.playlists.filter(p => plVisible(p) && p.folder === g.id)).forEach((p, i, list) => listBox.append(rowOf(p, i, list)));
-      }
-    }
+    for (const f of subs) listBox.append(folderBlock(f, 0));   /* 🎻 Classic・🎮 Blue Archive… は ▸ で開く */
     if (core.settings.trkSortABC) listBox.append(el("div", "plHint", tr("trkOrderAbcOff")));
   };
   d.card.append(listBox);
@@ -2507,6 +2600,7 @@ function renderLibTabs(tabs) {
     b.append(el("span", "libTabIcon", t.icon), el("span", "libTabName", t.label), el("i", "libTabN", String(t.n)));
     b.addEventListener("click", () => {
       if (plSuppressClick()) return;
+      if (t.trk) { plTrkMenu(); return; }   /* 🐔：階層（Vol 一覧）を開く。選んだ Vol は、その中で開く */
       if (core.settings.libTab === t.id) return;
       core.settings.libTab = t.id; core.saveUserPrefs(); renderLib();
     });
@@ -2697,7 +2791,8 @@ function renderLib() {
   const box = core.$("libList"); box.textContent = "";
   const all = allSongs();
   libAllKeys = new Set(all.map(x => x.key));
-  core.$("libCount").textContent = all.length ? tr("libCount", { n:all.length }) : "";
+  const shownN = all.filter(x => !x.trkOnly).length;   /* プレイリストの中だけの曲は数えない */
+  core.$("libCount").textContent = shownN ? tr("libCount", { n:shownN }) : "";
   const byTitle = new Map();   /* 🛒 カタログ照合用（曲名の照合キー → 曲のリスト） */
   const byTitleAdd = (k, it) => { const a = byTitle.get(k); if (a) { if (!a.includes(it)) a.push(it); } else byTitle.set(k, [it]); };
   for (const it of all) {
@@ -3193,8 +3288,10 @@ bannerSongBtnsSync();   /* 初回の表示あわせ（renderBanner が先に走�
 
 /* ---------- 曲を選ぶ ---------- */
 async function materializeBuiltinSong(it) {
-  if (it.source !== "builtin" || it.key !== FIRST_SPARK_KEY) return it;
+  if (it.source !== "builtin") return it;
   if (it.file) return it;
+  if (it.key.startsWith(AGENT_OST_KEY_PREFIX)) return materializeAgentOst(it);
+  if (it.key !== FIRST_SPARK_KEY) return it;
   if (!firstSparkFilePromise) {
     firstSparkFilePromise = (async () => {
       const response = await fetch(FIRST_SPARK_ASSET, { credentials:"same-origin" });
@@ -3222,8 +3319,7 @@ async function selectSong(it) {
       if (selection === songSelectToken) {
         console.error("tutorial audio load failed", error);
         if (error && error.code === "not-found") {
-          builtInSongs = builtInSongs.filter(song => song.key !== FIRST_SPARK_KEY);
-          const button = core.$("guideDemoBtn"); if (button) button.hidden = true;
+          builtInSongs = builtInSongs.filter(song => song.key !== it.key);
           renderLib();
         }
         core.setStatus("loadStatus", "demoSongUnavailable");
@@ -3261,15 +3357,6 @@ async function selectSong(it) {
   if (!ok || core.currentSong !== it) return;
   renderLib(); renderBanner(); updateSpBuilder(); renderSeedTools();
 }
-window.TrkSelectTutorialSong = async function() {
-  const demo = builtInSongs.find(song => song.key === FIRST_SPARK_KEY);
-  if (!demo || core.phase !== "title") return false;
-  try { ensureTrkOstPlaylist({ toast: false }); } catch(_){}   /* 🎓 デモ曲の居所（trk's OST Vol.1）を用意 */
-  /* 利用者が OST を消していたら作り直さず、📚すべて で見せる */
-  core.settings.libTab = plById(TRK_OST_ID) ? "pl:" + TRK_OST_ID : "all"; core.saveUserPrefs(); renderLib();
-  await selectSong(demo);
-  return !!(core.videoReady && core.currentSong && core.currentSong.key === FIRST_SPARK_KEY);
-};
 /* 解析後・譜面を作る前に呼ばれる。true を返すと自動生成を省略 */
 async function restoreSongState(it) {
   if (core.currentSong !== it) return false;
@@ -3625,7 +3712,9 @@ function syncTrkUI() {
   }
   try { renderTrkSettings(); } catch(_){}
 }
-function trkFolderIdSet() { return plWishFolderIds(TRK_FOLDER_ID); }   /* 🐔 の階層に入るフォルダ（trk 自身と、その子孫） */
+function trkFolderIdSet() { return plWishFolderIds(TRK_FOLDER_ID); }
+/* 🐔 の中のリスト（trk が作ったもの、または 🐔 のフォルダ内にあるもの）か */
+function plIsTrkManaged(p) { return TRK_AUTO_ID.test(p.id) || trkFolderIdSet().has(p.folder); }   /* 🐔 の階層に入るフォルダ（trk 自身と、その子孫） */
 function renderTrkSettings() {
   const box = core.$("trkOrderList");
   if (!box) return;
@@ -3811,11 +3900,11 @@ async function initLibrary() {
   }
   syncShareUI();
   // 🐔 trk's playlist — チュートリアル済みなら初回だけ自動で1タブ追加（設定で非表示なら作らない・トーストなし）
-  if (core.settings.tutorialDone && core.settings.trkPlaylist !== false) {
+  if (TRK_AUTO_GAME_CLASSIC && core.settings.tutorialDone && core.settings.trkPlaylist !== false) {
     try { ensureTrkPlaylist({ toast: false }); } catch(_){}
   }
   // 🎻 trk classic — 同上。ゲームとは別枠で100曲。設定で非表示なら作らない
-  if (core.settings.tutorialDone && core.settings.trkClassic !== false) {
+  if (TRK_AUTO_GAME_CLASSIC && core.settings.tutorialDone && core.settings.trkClassic !== false) {
     try { ensureTrkClassicPlaylist({ toast: false }); } catch(_){}
   }
   // 🎓 trk's OST Vol.1 — オリジナル曲＋デモ曲のリスト（一番下・中クリックで消せる）
@@ -3832,6 +3921,7 @@ async function initLibrary() {
   syncTrkUI();
   renderLib();
   void initOptionalTutorialDemo();
+  void initAgentOstTracks();
 }
 /* ✅ library.js 完了 */
 

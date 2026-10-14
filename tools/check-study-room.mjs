@@ -459,6 +459,12 @@ vm.runInContext("studyCurrentPage = 0; single.scrollTop = 0; single.scrollHeight
 assert.equal(edge("jumpEdge", 1, true), true, "a held PageDown while the next page is still rendering is swallowed");
 assert.deepEqual(Array.from(edgeState().jumps), [], "a held PageDown while rendering does not turn the page");
 assert.equal(edge("jumpEdge", 1, false), false, "a fresh PageDown while rendering falls back to the page turn");
+/* trk136：画面に収まる画像（はみ出し無し・高さは0でない）では、押しっぱなしもページ送りへゆずる（長押しで連続して進む） */
+vm.runInContext('single.scrollHeight = 900; single.clientHeight = 900; studyZoomLand = "";', edgeContext);
+assert.equal(edge("jumpEdge", 1, true), false, "a held PageDown on an image that fits falls through to the page turn");
+vm.runInContext('studyZoomLand = "top";', edgeContext);
+assert.equal(edge("jumpEdge", 1, true), true, "but not while a landing from an edge jump is still pending");
+vm.runInContext('studyZoomLand = ""; single.clientHeight = 600;', edgeContext);
 vm.runInContext("single.scrollHeight = 2400; single.scrollTop = 0;", edgeContext);
 vm.runInContext("studyCurrentPage = 0; single.scrollTop = 0; closeCalls = 0; pageJumps.length = 0;", edgeContext);
 vm.runInContext("single.scrollTop = 300; closeCalls = 0;", edgeContext);

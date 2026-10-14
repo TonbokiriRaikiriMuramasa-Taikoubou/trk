@@ -170,9 +170,16 @@ const TRK_ENUM_VALUES = {
   chartGen: ["1", "2"]          // 🎼 自動譜面の作り方（1＝旧方式、2＝新方式・既定。js/chart-gen.js）
 };
 
+/* 🧭 チュートリアルのスタンプを読み込む（trk140）。既知の8つだけを残し、重複を除く。旧「曲を選ぶ」song は play へ引き継ぐ。 */
+function tutorialStampsFrom(raw) {
+  const known = ["play", "look", "safe", "back", "amp", "study", "studyBack", "seed"];
+  const list = Array.isArray(raw) ? raw : [];
+  return [...new Set(list.map(x => x === "song" ? "play" : x))].filter(x => known.includes(x));
+}
 const settings = {
   language: pick(prefs.language, ["ja", "en", "zh", "ko"], guessLang()),
   skin: has(window.Trk.data.SKINS, prefs.skin) ? prefs.skin : (prefs.skin === "dark" ? "shadow" : prefs.skin === "light" ? "daylight" : "shadow"),
+  ignoreStorageLimits: prefs.ignoreStorageLimits === true,   // 📦 容量の上限を無視（trk137。既定オフ。アプリが決めた上限だけを外す）
   skinShelfOpen: prefs.skinShelfOpen !== false,      // 🖼 スキンの棚の開閉（30種＋カスタムでも設定画面が膨らまないように）
   skinShelfCat: pick(prefs.skinShelfCat, ["all","basic","miku","dark","light","grad","fun","access","life","custom"], "all"),
   layout: pick(prefs.layout ?? prefs.gameplayLayout, Object.keys(window.Trk.data.LAYOUTS), "classic"),
@@ -205,7 +212,8 @@ const settings = {
   playerMode: !!prefs.playerMode,
   helpText: prefs.helpText !== false,
   tutorialDone: prefs.tutorialDone === true,
-  tutorialStamps: (Array.isArray(prefs.tutorialStamps) ? prefs.tutorialStamps : []).filter(x => ["song", "look", "play", "safe", "seed"].includes(x)),   /* 🧭 スタンプラリー（順番自由・5つでごほうび） */
+  welcomeSeen: prefs.welcomeSeen === true,   /* 👋 「trk!にようこそ！」を閉じた（一度だけ出す） */
+  tutorialStamps: tutorialStampsFrom(prefs.tutorialStamps),   /* 🧭 スタンプ（順番自由・8つでごほうび。旧「曲を選ぶ」は「曲を流す」へ引き継ぐ） */
   skinGradUnlocked: prefs.skinGradUnlocked === true,
   menuKey: validCode(prefs.menuKey) ? prefs.menuKey : "KeyM",
   menuConfirm: prefs.menuConfirm !== false,
@@ -324,6 +332,7 @@ const settings = {
   modRandom: !!prefs.modRandom,
   cover: num(prefs.cover, .2, .7, .4),
   catchNitroBonus: prefs.catchNitroBonus !== false,
+  catchBlastNext: prefs.catchBlastNext === true,
   /* ▶ メディアプレーヤー（TV電源長押し） */
   mediaRepeat: pick(prefs.mediaRepeat, ["off", "one", "all"], "off"),
   mediaShuffle: prefs.mediaShuffle === true,
@@ -531,7 +540,7 @@ function resetAllPrefs() {
   settings.trkSortABC = false; settings.playlistOrder = []; settings.trkTabName = "full"; settings.chartGen = "2";
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
-  settings.catchNitroBonus = true; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();
+  settings.catchNitroBonus = true; settings.catchBlastNext = false; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();
   settings.judge = "standard"; settings.rate = 1; settings.shortMode = "off"; settings.shortMode = "off";
   settings.hidden = false; settings.sudden = false; settings.modMirror = false; settings.modRandom = false; settings.showMasterDiff = false; settings.escNoReturn = false; settings.judgeOrdered = false;
   settings.mascot = "skin"; settings.vrmFrame = "full";
@@ -1205,7 +1214,7 @@ function showScreen(id) {
   emit("screen", id);
 }
 function openSettings() { if (phase === "title") { showScreen("settingsScreen"); emit("settings"); } }   /* 🧭 スタンプ「設定を見た」の検知 */
-function closeSettings() { if (phase === "title") showScreen("selectScreen"); }
+function closeSettings() { if (phase === "title") { showScreen("selectScreen"); emit("settingsClose"); } }   /* 🧭 スタンプ「メイン画面に戻った」の検知 */
 
 /* Emergency settings imports validate enum IDs at the boundary, before live settings are changed.
    列挙IDの検証対象（増やしたら tools/check-security.mjs も更新）。
@@ -1239,6 +1248,44 @@ function validImportedSettingEnum(key, value) {
   } catch (_) {}
   return false;
 }
+
+/* 容量の上限を無視するか（trk137）。外すのはアプリが決めた上限だけ。ブラウザの空き容量は外せない。 */
+function storageLimitsIgnored() { return settings.ignoreStorageLimits === true; }
+/* ---------- 端末の保存を固定する（trk136） ----------
+   書斎・パック・記録は IndexedDB に入る。容量が逼迫すると、ブラウザが黙って消すことがある（主に Android Chrome）。
+   navigator.storage.persist() は「消されにくい保存」を求める。許可するかはブラウザが決めるので、結果をそのまま表示する。
+   ?safe=1 では保存領域に触らない方針のため、要求もしない（表示だけ）。 */
+function storagePersistApi() {
+  const storage = typeof navigator !== "undefined" ? navigator.storage : null;
+  return storage && typeof storage.persisted === "function" && typeof storage.persist === "function" ? storage : null;
+}
+async function storagePersistState() {
+  const storage = storagePersistApi();
+  if (!storage) return "unsupported";
+  try { return (await storage.persisted()) ? "on" : "off"; } catch (_) { return "unsupported"; }
+}
+async function requestStoragePersist() {
+  const storage = storagePersistApi();
+  if (!storage) return "unsupported";
+  if (typeof window.TrkSafeMode === "function" && window.TrkSafeMode()) return storagePersistState();
+  try {
+    if (await storage.persisted()) return "on";
+    return (await storage.persist()) ? "on" : "off";
+  } catch (_) { return "unsupported"; }
+}
+function renderStoragePersist(state) {
+  const n = document.getElementById("storagePersistState");
+  const btn = document.getElementById("storagePersistBtn");
+  if (n) n.textContent = tr(state === "on" ? "storagePersistOn" : state === "off" ? "storagePersistOff" : "storagePersistUnsupported");
+  if (btn) { btn.hidden = state === "on"; btn.disabled = state === "unsupported"; }
+  return state;
+}
+(function setupStoragePersistPanel(){
+  const btn = document.getElementById("storagePersistBtn");
+  if (!btn) return;
+  btn.addEventListener("click", () => { requestStoragePersist().then(renderStoragePersist); });
+  storagePersistState().then(renderStoragePersist);
+})();
 
 /* ---------- 緊急復旧パネルのボタン ---------- */
 (function setupEmergencyPanel(){
@@ -1485,7 +1532,7 @@ window.view = view;
 window.windows = windows;
 /* 領域（window.Trk.core）：コア状態の正規の場所。window直下の旧互換名は frozen js/fx.js が読む5件だけ。 */
 window.Trk = window.Trk || {};
-window.Trk.core = Object.assign(window.Trk.core || {}, { $, BEST_KEY, CAPTION_MS, CUSTOM_SKIN_MAX, KEY_PRESETS, PAD_DEFAULTS, SKIN_FORMAT, TRK_ENUM_VALUES, TV_PARAM_FAV_MAX, VIDEO_KEY_DEFAULTS, activeMascot, applyLanguage, applyNoteVars, baseName, buildSkinGrid, buildSkinNow, chartSummary, clampTvBlur, clampTvDim, cleanTvParamFavorites, closeSettings, ctx, customSkinDefs, downloadBlob, downloadJSON, el, emit, esc, extOf, fmtDate, fmtTime, fontFamily, formatKey, formatPadBind, fx, gameplayFxMultiplier, gameplayFxPower, hashString, idbStore, isPclMascot, keyCodeOf, keysLabel, laneCol, laneColor, laneName, modsUnranked, mulberry32, noteShape, num, on, openSettings, pick, refreshSeedSecrets, rememberMusicVolume, renderAllStatuses, renderStatus, safeHttpUrl, safeLink, safeName, saveCustomSkins, saveUserPrefs, savedSkinAtBoot, setPhase, setStatus, settings, showScreen, skin, slotLane, slotOfKey, stage, syncPickers, takeAmpReset, travelMs, updateChartButtons, updateKeyUI, updateTouchKeys, validCode, validPadBind, vctx, video, view, windows });
+window.Trk.core = Object.assign(window.Trk.core || {}, { $, renderStoragePersist, storageLimitsIgnored, requestStoragePersist, storagePersistState, BEST_KEY, CAPTION_MS, CUSTOM_SKIN_MAX, KEY_PRESETS, PAD_DEFAULTS, SKIN_FORMAT, TRK_ENUM_VALUES, TV_PARAM_FAV_MAX, VIDEO_KEY_DEFAULTS, activeMascot, applyLanguage, applyNoteVars, baseName, buildSkinGrid, buildSkinNow, chartSummary, clampTvBlur, clampTvDim, cleanTvParamFavorites, closeSettings, ctx, customSkinDefs, downloadBlob, downloadJSON, el, emit, esc, extOf, fmtDate, fmtTime, fontFamily, formatKey, formatPadBind, fx, gameplayFxMultiplier, gameplayFxPower, hashString, idbStore, isPclMascot, keyCodeOf, keysLabel, laneCol, laneColor, laneName, modsUnranked, mulberry32, noteShape, num, on, openSettings, pick, refreshSeedSecrets, rememberMusicVolume, renderAllStatuses, renderStatus, safeHttpUrl, safeLink, safeName, saveCustomSkins, saveUserPrefs, savedSkinAtBoot, setPhase, setStatus, settings, showScreen, skin, slotLane, slotOfKey, stage, syncPickers, takeAmpReset, travelMs, updateChartButtons, updateKeyUI, updateTouchKeys, validCode, validPadBind, vctx, video, view, windows });
 /* catch.js／stage.js はこの正規アクセサを差し替える（旧window.activeMods別名はtrk90で廃止）。 */
 Object.defineProperty(window.Trk.core, "activeMods", { configurable:true, get:() => activeMods, set:v => { activeMods = v; } });
 Object.defineProperty(window.Trk.core, "analysis", { configurable:true, get:() => analysis, set:v => { analysis = v; } });

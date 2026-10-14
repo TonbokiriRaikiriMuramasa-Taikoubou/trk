@@ -114,7 +114,7 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   rule(missing.length === 0, "validators for every shared file format are present", missing.join(", "));
 
   const packGuards = js["js/custom.js"].includes('!p.includes("..")') && js["js/custom.js"].includes("PATH_RE.test(p)") &&
-    js["js/custom.js"].includes("file.size > PACK_MAX");
+    js["js/custom.js"].includes("file.size > packCap(PACK_MAX)");
   rule(packGuards, "pack paths and size caps are enforced (no zip-slip, no 500MB+ packs)");
 
   const httpsOnly = js["js/library.js"].includes("/^https:\\/\\/\\S+$/i") && js["js/verified.js"].includes("/^https:\\/\\/[^\\s\"'<>]+$/");

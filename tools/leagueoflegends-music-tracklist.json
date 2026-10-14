@@ -282,6 +282,12 @@
     "name": "Worlds / WCS Anthems",
     "tracks": [
       {
+        "title": "Silver Scrapes (Orchestral Theme)",
+        "album": "Worlds 2025 Orchestral Anthem",
+        "artist": "Danny McCarthy & Patrick Cunningham",
+        "url": "https://www.youtube.com/watch?v=21hQsnpdNpA"
+      },
+      {
         "title": "Warriors",
         "album": "Worlds 2014 Anthem",
         "artist": "Imagine Dragons",
@@ -367,6 +373,7 @@
       "checkedAt": "2026-10-12",
       "evidence": "mirror",
       "notFound": [
+        "Silver Scrapes (Orchestral Theme)",
         "Warriors",
         "Ignite",
         "Legends Never Die",
@@ -380,7 +387,7 @@
         "Sacrifice",
         "Know My Name"
       ],
-      "note": "Only 'Worlds Collide' (Worlds 2015, listed as League of Legends, Nicki Taylor) is in the playlist. The playlist also lists the instrumental 'YYYY World Championship Theme' tracks, which are different from these vocal anthems. The other 12 anthems are not among the 977 listed entries."
+      "note": "Only 'Worlds Collide' (Worlds 2015, listed as League of Legends, Nicki Taylor) is in the playlist. The playlist also lists the instrumental 'YYYY World Championship Theme' tracks, which are different from these vocal anthems. The other 12 anthems are not among the 977 listed entries. Silver Scrapes (Orchestral Theme, added 2026-10-14) is not checked against this list yet. Its link is the LoL Esports official YouTube channel (@lolesports, 2025-10-28). The song is not an NCS track; commercial use (for example in monetised videos) needs the rights holder's permission, so check before use."
     }
   },
   "msiAnthems": {

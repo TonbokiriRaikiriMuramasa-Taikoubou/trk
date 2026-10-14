@@ -605,7 +605,7 @@ addEventListener("DOMContentLoaded", () => {
   amp.open = core.settings.ampOpen;
   amp.addEventListener("toggle", () => { core.settings.ampOpen = amp.open; core.saveUserPrefs(); if (amp.open) renderAmp(); });
   const ampUseLab = core.el("label", "check"), ampUseInp = document.createElement("input");
-  ampUseInp.type = "checkbox"; ampUseLab.append(ampUseInp, tx("span", "ampUse"));
+  ampUseInp.type = "checkbox"; ampUseInp.id = "ampUseInp"; ampUseLab.append(ampUseInp, tx("span", "ampUse"));
   const ampState = core.el("div", "hint status"); ampState.id = "ampState";
   const ampStacks = core.el("div", "seg ampStacks"); ampStacks.id = "ampStacks";
   const ampStages = core.el("div", "ampStages");

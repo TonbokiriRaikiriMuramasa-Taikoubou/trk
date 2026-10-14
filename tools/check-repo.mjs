@@ -1458,7 +1458,7 @@ if (!exists("js/fx-worklet.js") ||
       series.note.includes("二次利用許諾ではありません") && series.note.includes("Creator-Safe対象") &&
       series.note.includes("K/DAの公式曲6曲") && series.note.includes("これはLoL全楽曲ではなく") &&
       series.note.includes("今後の調査対象");
-    catalogDataOk = tracksMatch && kdaSourcesOk && trackTotal === 64 && worlds2026ReleasedCount === 1 &&
+    catalogDataOk = tracksMatch && kdaSourcesOk && trackTotal === 65 && worlds2026ReleasedCount === 1 &&
       new Set(allUrls).size === allUrls.length && rightsAndScopeOk;
 
     const ensureStart = library.indexOf("function trkCatalogGuide(");
@@ -1510,9 +1510,9 @@ if (!exists("js/fx-worklet.js") ||
   } catch (error) {
     console.error(`WARN  LoL catalogue test setup failed: ${error.message}`);
   }
-  if (!catalogDataOk) fail("LoL fixture/catalog mismatch (expected 41 modern Champion Themes, 13 released Worlds anthems, four MSI anthems, six K/DA songs, official track/video sources, and rights/scope notice)");
+  if (!catalogDataOk) fail("LoL fixture/catalog mismatch (expected 41 modern Champion Themes, 14 released Worlds anthems, four MSI anthems, six K/DA songs, official track/video sources, and rights/scope notice)");
   else if (!safeRefreshOk) fail("LoL playlist refresh must update wishes/guides, preserve user-owned songs/customized fields, and create missing MSI/K/DA lists in trk-lol");
-  else ok("LoL catalog: Sessions 108 + Champion Themes 41 + Worlds 13 + MSI 4 + K/DA 6; official links, rights notices, safe refresh");
+  else ok("LoL catalog: Sessions 108 + Champion Themes 41 + Worlds 14 + MSI 4 + K/DA 6; official links, rights notices, safe refresh");
 }
 
 // 🎧 LoL Phase 3 (SoundCloud albums): one playlist per official album — Season 1–9 + Warsongs — plus the
@@ -2145,9 +2145,8 @@ if (!read("js/main.js").includes("guideEggKind") ||
         manifest.version === 1 && manifest.enabled === true && manifest.file === "first-spark-tutorial.mp3";
     } catch { optionalFolderOk = false; }
   }
-  const keys = ["guideDemoBtn", "guideDemoLoading", "guideDemoReady", "guideDemoUnavailable", "demoSongUnavailable"];
-  const wired = optionalFolderOk && html.includes('id="guideDemoBtn"') && html.includes('id="guideDemoBtn" class="guideDemoBtn" type="button" data-i18n="guideDemoBtn" hidden') &&
-    main.includes("TrkSelectTutorialSong") && library.includes('source:"builtin"') &&
+  const keys = ["demoSongUnavailable", "guideStart", "guideSkip"];   /* trk140: the guide no longer has a demo button; its start/skip are checked here */
+  const wired = optionalFolderOk && html.includes('id="guideStartBtn"') && html.includes('id="guideSkip"') && library.includes('source:"builtin"') &&
     library.includes('const FIRST_SPARK_MANIFEST = "./assets/optional-demo-audio/manifest.json";') &&
     library.includes('const FIRST_SPARK_ASSET = "./assets/optional-demo-audio/first-spark-tutorial.mp3";') &&
     library.includes("void initOptionalTutorialDemo()") && library.includes('id === "builtin"') &&
@@ -2776,6 +2775,26 @@ for (const [rel, area] of Object.entries(TRK_REGISTRARS)) {
   const safeInitialNavigation = /const safeClient = safeClients\.has\(event\.clientId\)\s*\|\|\s*\(request\.mode === "navigate" && safeWanted\(url\)\);/.test(swSrc);
   if (!pinsFresh || !cacheFirst || !offlineVerified || !digestUsed || !safeIdFromNavigation || !safeInitialNavigation) fail("sw.js の vendor の cache-first（SHA-384 照合・初回ナビゲーションを含めセーフモードはキャッシュを読まない）が欠けている、または VENDOR_PINS が lock とずれている");
   else ok("sw.js: ハッシュ固定の vendor は cache-first で、SHA-384 が合うものだけ使う（VENDOR_PINS は vendor-lock.json と一致）");
+}
+
+/* 🗂 一回限りの移行・印・旧名の登録簿（docs/MIGRATIONS.md）。表とコードのずれは失敗、期限切れは警告。 */
+{
+  const registry = fs.readFileSync(path.join(root, "docs/MIGRATIONS.md"), "utf8");
+  const jsAll = fs.readdirSync(path.join(root, "js")).filter(f => f.endsWith(".js"))
+    .map(f => fs.readFileSync(path.join(root, "js", f), "utf8")).join("\n");
+  const rows = registry.split("\n").filter(line => /^\|\s*`[^`]+`\s*\|/.test(line)).map(line => {
+    const cells = line.split("|").slice(1, -1).map(c => c.trim());
+    return { id: cells[0].replace(/`/g, ""), kind: cells[1], date: cells[3] };
+  });
+  const today = new Date().toISOString().slice(0, 10);
+  let registryOk = rows.length >= 4;
+  for (const row of rows) {
+    if (!jsAll.includes(row.id)) { registryOk = false; fail(`登録簿の「${row.id}」がコードに見つからない（表を直すか、コードの名前を確かめる）`); }
+    const needsDate = /一回限り|旧名/.test(row.kind || "");
+    if (needsDate && !/^\d{4}-\d{2}-\d{2}$/.test(row.date || "")) { registryOk = false; fail(`登録簿の「${row.id}」に削除予定日（YYYY-MM-DD）がない`); }
+    if (needsDate && row.date < today) warn(`「${row.id}」の削除予定日（${row.date}）を過ぎています。消すか、理由を書いて日付を延ばしてください（docs/MIGRATIONS.md）`);
+  }
+  if (registryOk) ok(`一回限りの移行の登録簿（${rows.length}項目）とコードが一致し、削除予定日がそろっている`);
 }
 
 console.log(`\nStatic check: ${failures ? "FAILED" : "passed"} · ${failures} failure(s) · ${warnings} warning(s)`);

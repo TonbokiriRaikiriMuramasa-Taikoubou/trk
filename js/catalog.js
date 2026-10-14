@@ -775,7 +775,7 @@ S("endfield", "アークナイツ：エンドフィールド", "🛰️", "amber
 
 /* ================= ⚔️ League of Legends（Riot Games） =================
    Phase 1: Creator-Safe Sessions 3作・108曲、近年の公式Champion Theme 41曲、
-   Worlds/WCS公式アンセム13曲、確認済みMSIアンセム4曲。
+   Worlds/WCS公式アンセム14曲（Silver Scrapes のオーケストラ版を追加。リンクは LoL Esports 公式チャンネル）、確認済みMSIアンセム4曲。
    Phase 2: 公式K/DA曲（POP/STARS＋ALL OUT収録曲）6曲を別リストに追加。
    Phase 3: 公式SoundCloudアルバム「The Music of League of Legends: Season 1〜9」をシーズン別の
    9プレイリスト（計243曲）、「Warsongs」11曲、公式SoundCloudの人気曲30曲を別リストで追加。
@@ -976,6 +976,7 @@ S("lol", "League of Legends", "⚔️", "aqua", "PCゲーム", "🕹️",
      T("Locke, the Ashen Exorcist", "Locke, the Ashen Exorcist", "Pressure Cooker, Asandisa Siswana, Zolina Ngejana", "https://www.youtube.com/watch?v=nakzw9Y_CLI")
     ]),
    PL("lol-worlds-anthems", "Worlds / WCS Anthems", "🏆", "amber", ["Game", "LoL", "Worlds", "Anthem"], [
+     T("Silver Scrapes (Orchestral Theme)", "Worlds 2025 Orchestral Anthem", "Danny McCarthy & Patrick Cunningham", "https://www.youtube.com/watch?v=21hQsnpdNpA"),
      T("Warriors", "Worlds 2014 Anthem", "Imagine Dragons", "https://www.youtube.com/watch?v=fmI_Ndrxy14"),
      T("Worlds Collide", "Worlds 2015 Anthem", "Nicki Taylor", "https://www.youtube.com/watch?v=4Twd965VzX4"),
      T("Ignite", "Worlds 2016 Anthem", "Zedd", "https://www.youtube.com/watch?v=Zasx9hjo4WY"),

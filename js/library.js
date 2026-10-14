@@ -728,6 +728,9 @@ Object.assign(TEXT.ja, {
   plGuideGameVol1:"非営利の紹介プレイリスト。音源は同梱しません。公式の入手先からどうぞ。",
   plGuideClassic:"版権切れの名演をMusopenの公開録音で紹介。音源は同梱しません。",
   plGuideBlueArchive:"NexTone.Link／Apple Music公式案内。音源なし。購入・サブスクは利用許諾ではありません。",
+  plGuideBlueArchiveMika:"公式PV2本＋Apple Music中国ストアの音源3曲。Short単独配信は未確認・未収録。地域差あり。配信ページは読込用ファイルを保証しません。音源なし。公開・購入・サブスクは二次利用許諾ではありません。",
+  plGuideBlueArchiveMikaAria:"韓国語曲2曲＋グローバル公式本編MV。英語掲載名は英語歌唱の意味ではありません。音源はApple Music英国ストア（地域差あり）。配信は読込用ファイルを保証しません。音声・映像なし。公開・購入・サブスクは二次利用許諾ではありません。",
+  plGuideBlueArchiveMikaVocals:"ミカのソロ「幸せになるよ」＋歌唱参加曲2曲＋公式MV1本。合唱のアーティスト欄はCV表記を省略。音源はApple Music日本ストアへ。音声・映像なし。配信は読込用ファイルを保証せず、購入・サブスクは二次利用許諾ではありません。",
   plGuideLolCsVerified:"公式SoundCloudアルバム（音源なし）。Creator-Safe対象（Riot公式Playlistと照合済み）。配信・購入は二次利用許諾ではありません。",
   plGuideLolCsPartial:"公式SoundCloudアルバム（音源なし）。一部の曲はCreator-Safe対象（Riot公式Playlistと照合済み）、残りはPlaylistに見当たらない・要確認。配信・購入は二次利用許諾ではありません。",
   plGuideLolCsUnverified:"公式SoundCloudアルバム（音源なし）。Creator-Safe対象かは未照合。配信・購入は二次利用許諾ではありません。",
@@ -755,6 +758,9 @@ Object.assign(TEXT.en, {
   plGuideGameVol1:"A non-commercial introduction playlist. No audio is included; please get songs from the official sources.",
   plGuideClassic:"Public-domain masterpieces introduced through Musopen's public recordings. No audio is included.",
   plGuideBlueArchive:"Official NexTone.Link / Apple Music pages. No audio included. Buying or subscribing is not a license to use.",
+  plGuideBlueArchiveMika:"Two official PVs and three audio tracks on Apple Music China. Standalone Short releases are unconfirmed and omitted. Availability varies by region; streaming does not guarantee an importable file. No media included. Publication, purchase or subscription does not grant reuse rights.",
+  plGuideBlueArchiveMikaAria:"Two Korean songs and the full mini musical on the official Global channel. English titles do not imply English vocals. Audio links use Apple Music UK; availability varies by region. Streaming does not guarantee importable files. No media included; publication, purchase or subscription is not a reuse license.",
+  plGuideBlueArchiveMikaVocals:"Mika’s solo Shiawase ni Naru yo, two ensemble songs featuring Mika, and one official MV. Ensemble credits show character names without voice actors. Audio links use Apple Music Japan. No media included. Streaming does not guarantee importable files; buying or subscribing is not a reuse license.",
   plGuideLolCsVerified:"Official SoundCloud album (no audio included). Creator-Safe: matched against Riot's official Creator-Safe Playlist. Streaming or buying is not a license to reuse.",
   plGuideLolCsPartial:"Official SoundCloud album (no audio included). Some songs are Creator-Safe (matched against Riot's official Creator-Safe Playlist); the rest were not found in it, so check them. Streaming or buying is not a license to reuse.",
   plGuideLolCsUnverified:"Official SoundCloud album (no audio included). Creator-Safe status not yet matched. Streaming or buying is not a license to reuse.",
@@ -782,6 +788,9 @@ Object.assign(TEXT.zh, {
   plGuideGameVol1:"非营利的介绍歌单。不附带音源，请从官方渠道获取。",
   plGuideClassic:"通过Musopen的公开录音介绍版权已过期的名曲。不附带音源。",
   plGuideBlueArchive:"NexTone.Link／Apple Music官方页面。不含音源。购买或订阅并不等于使用许可。",
+  plGuideBlueArchiveMika:"官方PV两部及Apple Music中国大陆商店三首音轨。Short音频的单独发行未确认，未收录。地区可用性不同，流媒体不保证可取得能导入的文件。不附带音视频。公开、购买或订阅不等于二次使用许可。",
+  plGuideBlueArchiveMikaAria:"韩语歌曲两首＋全球官方频道完整音乐剧MV。英文标题不代表英语演唱。音源链接为Apple Music英国商店，地区可用性不同。流媒体不保证可取得能导入的文件。不附带音视频，公开、购买或订阅不等于二次使用许可。",
+  plGuideBlueArchiveMikaVocals:"未花独唱《幸せになるよ》、参与合唱的两首歌曲及一部官方MV。合唱艺人栏保留角色名，省略声优名。音源链接为Apple Music日本商店。不附带音视频。流媒体不保证可取得能导入的文件，购买或订阅不等于二次使用许可。",
   plGuideLolCsVerified:"官方SoundCloud专辑（不含音源）。属于Creator-Safe（已与Riot官方Creator-Safe歌单核对）。播放或购买不等于二次使用许可。",
   plGuideLolCsPartial:"官方SoundCloud专辑（不含音源）。部分曲目属于Creator-Safe（已与Riot官方Creator-Safe歌单核对），其余未在歌单中找到，请先确认。播放或购买不等于二次使用许可。",
   plGuideLolCsUnverified:"官方SoundCloud专辑（不含音源）。是否属于Creator-Safe尚未核对。播放或购买不等于二次使用许可。",
@@ -809,6 +818,9 @@ Object.assign(TEXT.ko, {
   plGuideGameVol1:"비영리 소개 플레이리스트예요. 음원은 포함하지 않으니 공식 경로에서 구해 주세요.",
   plGuideClassic:"저작권이 만료된 명곡을 Musopen의 공개 녹음으로 소개해요. 음원은 포함하지 않아요.",
   plGuideBlueArchive:"NexTone.Link／Apple Music 공식 안내. 음원 없음. 구매·구독은 이용 허락이 아니에요.",
+  plGuideBlueArchiveMika:"공식 PV 2편과 Apple Music 중국 스토어 음원 3곡. Short 음원의 별도 발매는 미확인으로 제외했어요. 지역별 이용 조건이 다르며, 스트리밍이 가져올 수 있는 파일을 보장하지 않아요. 음원·영상은 미포함. 공개·구매·구독은 재이용 허가가 아니에요.",
+  plGuideBlueArchiveMikaAria:"한국어 노래 2곡과 글로벌 공식 채널의 미니 뮤지컬 본편 MV. 영어 제목은 영어 가창을 뜻하지 않아요. 음원은 Apple Music 영국 스토어로 안내하며 지역별 이용 조건이 달라요. 스트리밍이 가져올 파일을 보장하지 않아요. 미디어 미포함. 공개·구매·구독은 재이용 허가가 아니에요.",
+  plGuideBlueArchiveMikaVocals:"미카의 솔로곡 幸せになるよ, 가창에 참여한 합창곡 2곡과 공식 MV 1편. 합창 크레딧은 성우명 없이 캐릭터명으로 표시해요. 음원은 Apple Music 일본 스토어로 안내해요. 미디어 미포함. 스트리밍은 가져올 파일을 보장하지 않으며 구매·구독은 재이용 허가가 아니에요.",
   plGuideLolCsVerified:"공식 SoundCloud 앨범(음원 없음). Creator-Safe 대상(Riot 공식 Creator-Safe 플레이리스트와 대조 완료). 스트리밍·구매는 2차 이용 허락이 아니에요.",
   plGuideLolCsPartial:"공식 SoundCloud 앨범(음원 없음). 일부 곡은 Creator-Safe 대상(Riot 공식 Creator-Safe 플레이리스트와 대조 완료)이고, 나머지는 플레이리스트에서 찾지 못했으니 확인이 필요해요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
   plGuideLolCsUnverified:"공식 SoundCloud 앨범(음원 없음). Creator-Safe 대상인지 아직 대조하지 않았어요. 스트리밍·구매는 2차 이용 허락이 아니에요.",
@@ -1057,7 +1069,7 @@ function plFolderContext() {   /* いま見ている場所のフォルダ（新�
 /* 曲名の照合キー（plNormTitle／plTitleKeys／plSongMatchKeys／plWishTitleKeys）は js/title-match.js にある */
 function plWishMatch(w, byTitle) {
   for (const k of plWishTitleKeys(w)) {
-    const cands = byTitle.get(k);
+    const cands = (byTitle.get(k) || []).filter(it => plWishMediaMatches(w, it));
     if (!cands || !cands.length) continue;
     if (cands.length === 1) return cands[0];
     const al = plNormTitle(w.al), ar = plNormTitle(w.ar);   /* 同名が複数ならアルバム→アーティストで当たりをつける */
@@ -1065,7 +1077,11 @@ function plWishMatch(w, byTitle) {
     if (ar) { const hit = cands.find(it => plNormTitle((metaOf(it.key) || {}).artist || it.artist) === ar); if (hit) return hit; }
     return cands[0];
   }
-  return null;
+  /* 装飾付きファイル名は最後の救済。複数キーをまとめて一意か確認し、先着を選ばない。
+     byクレジットはカタログのartistを含むキーだけが当たり、未知の版名は残る。 */
+  const decorated = new Set();
+  for (const key of plWishDecoratedKeys(w)) for (const it of byTitle.get(key) || []) if (plWishMediaMatches(w, it)) decorated.add(it);
+  return decorated.size === 1 ? decorated.values().next().value : null;
 }
 function plSyncWishes(p, byTitle) {
   let ch = false;
@@ -1140,6 +1156,7 @@ function plSanitize(raw) {
         const aliases = [...new Set(w.matchAliases.filter(a => typeof a === "string").map(a => a.trim().slice(0, 120)).filter(Boolean))].slice(0, 8);
         if (aliases.length) out.matchAliases = aliases;
       }
+      if (w.matchMedia === "audio" || w.matchMedia === "video") out.matchMedia = w.matchMedia;
       return out;
     }),   /* 🛒 未入手の欲しい曲 */
     guide: (raw.guide && typeof raw.guide === "object") ? plGuideSanitize(raw.guide) : null,   /* 📄 入手先ガイド（trkCatalogGuide の近く） */
@@ -1220,6 +1237,7 @@ function trkWishFromTrack(tt) {
       .map(alias => alias.trim().slice(0, 120)).filter(Boolean))].slice(0, 8);
     if (aliases.length) wish.matchAliases = aliases;
   }
+  if (tt.matchMedia === "audio" || tt.matchMedia === "video") wish.matchMedia = tt.matchMedia;
   return wish;
 }
 function trkWishesFromCatalog() {
@@ -1396,7 +1414,10 @@ function trkCatalogGuide(s, pl, forDistributionPlaylist = false) {
   const isGakumasInstrument = s.id === "gakumas" && pl && (pl.id === "gm-inst" || pl.id === "gm-inst2");
   const isGakumasDiscography = s.id === "gakumas" && pl && pl.id === "gm-releases";
   const isTouhou = s.id === "touhou";
-  const key = s.id === "bluearchive" && pl && pl.sourceUrl ? "plGuideBlueArchive"
+  const key = s.id === "bluearchive" && pl && pl.id === "ba-mika-vocals" ? "plGuideBlueArchiveMikaVocals"
+    : s.id === "bluearchive" && pl && pl.id === "ba-mika-aria" ? "plGuideBlueArchiveMikaAria"
+    : s.id === "bluearchive" && pl && pl.id === "ba-mika-kiss" ? "plGuideBlueArchiveMika"
+    : s.id === "bluearchive" && pl && pl.sourceUrl ? "plGuideBlueArchive"
     : (s.id === "lol" || s.id === "valorant" || s.id === "riot-games") && pl ? (Object.prototype.hasOwnProperty.call(RIOT_GUIDE_KEYS, pl.creatorSafe) ? RIOT_GUIDE_KEYS[pl.creatorSafe] : "plGuideRiotLinks")
       : isGakumasInstrument ? "plGuideGakumasInst"
         : isGakumasDiscography ? "plGuideGakumasDisco"
@@ -1556,6 +1577,16 @@ function ensureTrkDistributionPlaylists() {
       /* Refresh catalog-owned wish/guide fields only. Never replace owned songs or
          user-edited name, icon, or tags. */
       for (const imported of core.settings.playlists) {
+        /* Classic Vol.1 は複数のカタログを集めた保存済みwishなので、通常のcat更新を通らない。
+           同じ曲の別名だけを補う。曲順・所持曲・ユーザー編集・凍結状態には触らない。 */
+        if (s.id === "classical" && imported.cat === "trk:classic") {
+          for (const old of (imported.wish || [])) {
+            const fresh = wishes.find(w => w.t === old.t && w.al === old.al && w.ar === old.ar);
+            if (fresh && fresh.matchAliases && JSON.stringify(old.matchAliases) !== JSON.stringify(fresh.matchAliases)) {
+              old.matchAliases = fresh.matchAliases.slice(); changed = true;
+            }
+          }
+        }
         if (!sourceCats.has(imported.cat)) continue;
         if (JSON.stringify(imported.wish) !== JSON.stringify(wishes)) { imported.wish = wishes; changed = true; }
         if (JSON.stringify(imported.guide || null) !== JSON.stringify(guide)) { imported.guide = guide; changed = true; }
@@ -3955,7 +3986,7 @@ window.startPreview = startPreview;
 window.trySongChart = trySongChart;
 /* 領域（window.Trk.library）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
 window.Trk = window.Trk || {};
-window.Trk.library = Object.assign(window.Trk.library || {}, { LIB_SHOW, addSongFiles, addVideoFiles, allSongs, bannerRandomBtn, bannerVolTip, ensureTrkDistributionPlaylists, ensureTrkOstPlaylist, trkOstPlaylistId: TRK_OST_ID, trkRestoreRemoved, initLibrary, nextSong, onLongPress, plToast, prevSong, previewStartFor, refreshPackSongs, saveSongPrefs, selectSong, setAddonSongs, songInfo, srcLabel, startPreview, trySongChart, plTitleKeys, plSongMatchKeys, plWishTitleKeys });
+window.Trk.library = Object.assign(window.Trk.library || {}, { LIB_SHOW, addSongFiles, addVideoFiles, allSongs, bannerRandomBtn, bannerVolTip, ensureTrkDistributionPlaylists, ensureTrkOstPlaylist, trkOstPlaylistId: TRK_OST_ID, trkRestoreRemoved, initLibrary, nextSong, onLongPress, plToast, prevSong, previewStartFor, refreshPackSongs, saveSongPrefs, selectSong, setAddonSongs, songInfo, srcLabel, startPreview, trySongChart, plTitleKeys, plSongMatchKeys, plWishTitleKeys, plIsClassicalTitle, plClassicalTitleKey, plDecoratedTitleKeys, plWishDecoratedKeys, plHasVersionTag, plWishMediaMatches });
 Object.defineProperty(window.Trk.library, "addonSongs", { configurable:true, get:() => addonSongs, set:v => { addonSongs = v; } });
 Object.defineProperty(window.Trk.library, "libView", { configurable:true, get:() => libView, set:v => { libView = v; } });
 Object.defineProperty(window.Trk.library, "renderBanner", { configurable:true, get:() => renderBanner, set:v => { renderBanner = v; } });

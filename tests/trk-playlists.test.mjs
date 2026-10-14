@@ -233,3 +233,138 @@ describe("settings: the deletion marker is validated", () => {
     assert.match(coreSrc, /settings\.trkRemoved = cleanTrkRemoved\(data\.trkRemoved\)/);
   });
 });
+
+describe("Classicの配布名を既存の棚にも補う", () => {
+  const classical = catalog.find(s => s.id === "classical");
+  const track = classical.playlists.find(p => p.id === "classic-beethoven").songs[0];
+  const oldWish = () => ({ t: track.t, al: track.al, ar: track.ar, u: track.u });
+
+  test("保存済みClassic Vol.1の別名だけを更新し、順序・所持曲・利用者設定を守る", () => {
+    const settings = fresh();
+    const editedWish = { ...oldWish(), t: "自分で変えた曲名" };
+    const p = { id: "trk-classic", cat: "trk:classic", name: "お気に入り", icon: "🎵", tags: ["mine"],
+      frozen: true, folder: "my-folder", songs: ["my-audio"], wish: [editedWish, oldWish()] };
+    settings.playlists.push(p);
+    const before = JSON.stringify(p);
+    const { api, calls } = sandbox(settings, { series: [classical] });
+    api.ensureTrkDistributionPlaylists();
+    assert.deepEqual([...p.wish[1].matchAliases], [...track.matchAliases]);
+    const updated = JSON.parse(JSON.stringify(p));
+    delete updated.wish[1].matchAliases;
+    assert.equal(JSON.stringify(updated), before);
+    const saves = calls.saves;
+    api.ensureTrkDistributionPlaylists();
+    assert.equal(calls.saves, saves, "2回目は保存し直さない");
+  });
+
+  test("新規Classicのwishにも別名が入る", () => {
+    const { context } = sandbox(fresh(), { series: [classical] });
+    vm.runInContext(between(library, "function trkClassicWishesFromCatalog(", "/* チュートリアル完了時"), context);
+    const wishes = vm.runInContext("trkClassicWishesFromCatalog()", context);
+    assert.deepEqual([...wishes[0].matchAliases], [...track.matchAliases]);
+  });
+
+  test("保存済みwishの更新から照合・所持曲への追加までつながる", () => {
+    const settings = fresh();
+    const p = { id: "trk-classic", cat: "trk:classic", songs: ["already-owned"], wish: [oldWish()] };
+    settings.playlists.push(p);
+    const { api, context } = sandbox(settings, { series: [classical] });
+    vm.runInContext(fs.readFileSync(`${ROOT}/js/title-match.js`, "utf8") + "\n" +
+      between(library, "function plWishMatch(", "/* 🛒 「集める棚」"), context);
+    context.metaOf = () => null;
+    context.local = { key: "musopen-local", title: "Symphony no. 5 in Cm, Op. 67 - I. Allegro con brio.mp3" };
+    context.p = p;
+    vm.runInContext("globalThis.byTitle = new Map(plSongMatchKeys(local.title, '').map(k => [k, [local]]));", context);
+    assert.equal(vm.runInContext("plSyncWishes(p, byTitle)", context), false, "更新前は一致しない");
+    api.ensureTrkDistributionPlaylists();
+    assert.equal(vm.runInContext("plSyncWishes(p, byTitle)", context), true);
+    assert.deepEqual(p.songs, ["already-owned", "musopen-local"]);
+    assert.equal(vm.runInContext("plSyncWishes(p, byTitle)", context), false, "再描画しても重複追加しない");
+  });
+
+  test("個別に取り込んだBeethovenリストにも届き、自分のリストは触らない", () => {
+    const settings = fresh();
+    const imported = { id: "my-import", cat: "classical:classic-beethoven", name: "my name", songs: ["own"], wish: [oldWish()] };
+    const own = { id: "own", cat: "", wish: [oldWish()] };
+    settings.playlists.push(imported, own);
+    const { api } = sandbox(settings, { series: [classical] });
+    api.ensureTrkDistributionPlaylists();
+    assert.deepEqual([...imported.wish[0].matchAliases], [...track.matchAliases]);
+    assert.equal(imported.name, "my name");
+    assert.deepEqual(imported.songs, ["own"]);
+    assert.ok(!own.wish[0].matchAliases);
+  });
+});
+
+test("Mika playlist is created under Blue Archive, refreshes safely, and respects deletion", () => {
+  const ba = catalog.find(s => s.id === "bluearchive"), settings = fresh();
+  const { api, context } = sandbox(settings, { series: [ba] });
+  api.ensureTrkDistributionPlaylists();
+  const p = settings.playlists.find(p => p.id === "trk-ba-mika-kiss");
+  assert.equal(p.folder, "trk-ba");
+  assert.equal(p.wish.length, 5);
+  assert.equal(p.guide.key, "plGuideBlueArchiveMika");
+  assert.equal(p.guide.url, "https://www.taptap.cn/moment/603897878431138731");
+  for (const lang of ["ja", "en", "zh", "ko"]) {
+    context.lang = lang;
+    assert.equal(api.plGuideText(p.guide), context.TEXT[lang].plGuideBlueArchiveMika);
+    assert.match(api.plGuideText(p.guide), /Short/);
+  }
+  p.name = "my Mika"; p.songs.push("owned"); p.frozen = true;
+  delete p.wish[0].matchMedia;
+  api.ensureTrkDistributionPlaylists();
+  assert.equal(p.wish[0].matchMedia, "video");
+  assert.equal(p.name, "my Mika");
+  assert.equal(p.frozen, true);
+  assert.deepEqual([...p.songs], ["owned"]);
+  api.plDelete(p);
+  api.ensureTrkDistributionPlaylists();
+  assert.ok(!settings.playlists.some(p => p.id === "trk-ba-mika-kiss"));
+});
+
+test("Aria's three-item list has localized guidance and respects saved user edits and deletion", () => {
+  const ba = catalog.find(s => s.id === "bluearchive"), settings = fresh();
+  const { api, context } = sandbox(settings, { series: [ba] });
+  api.ensureTrkDistributionPlaylists();
+  const p = settings.playlists.find(p => p.id === "trk-ba-mika-aria");
+  assert.equal(p.folder, "trk-ba");
+  assert.equal(p.wish.length, 3);
+  assert.deepEqual([...p.wish.map(w => w.matchMedia)], ["audio", "audio", "video"]);
+  assert.equal(p.guide.key, "plGuideBlueArchiveMikaAria");
+  assert.match(p.guide.url, /thread=3303925$/);
+  assert.ok(p.guide.note.length <= 160);
+  for (const lang of ["ja", "en", "zh", "ko"]) {
+    context.lang = lang;
+    assert.equal(api.plGuideText(p.guide), context.TEXT[lang].plGuideBlueArchiveMikaAria);
+    assert.match(api.plGuideText(p.guide), /Apple Music/);
+  }
+  p.name = "My musical"; p.songs.push("owned"); p.frozen = true;
+  delete p.wish[2].matchMedia;
+  api.ensureTrkDistributionPlaylists();
+  assert.equal(p.wish[2].matchMedia, "video");
+  assert.equal(p.name, "My musical");
+  assert.equal(p.frozen, true);
+  assert.deepEqual([...p.songs], ["owned"]);
+  api.plDelete(p);
+  api.ensureTrkDistributionPlaylists();
+  assert.ok(!settings.playlists.some(p => p.id === "trk-ba-mika-aria"));
+  assert.ok(settings.playlists.some(p => p.id === "trk-ba-mika-kiss"));
+});
+
+test("Japanese Mika list has four rows, a four-language guide, and no resurrection after deletion", () => {
+  const ba = catalog.find(s => s.id === "bluearchive"), settings = fresh();
+  const { api, context } = sandbox(settings, { series: [ba] });
+  api.ensureTrkDistributionPlaylists();
+  const p = settings.playlists.find(p => p.id === "trk-ba-mika-vocals");
+  assert.equal(p.folder, "trk-ba");
+  assert.equal(p.wish.length, 4);
+  assert.equal(p.guide.key, "plGuideBlueArchiveMikaVocals");
+  for (const lang of ["ja", "en", "zh", "ko"]) {
+    context.lang = lang;
+    assert.equal(api.plGuideText(p.guide), context.TEXT[lang].plGuideBlueArchiveMikaVocals);
+    assert.match(api.plGuideText(p.guide), /Apple Music/);
+  }
+  api.plDelete(p); api.ensureTrkDistributionPlaylists();
+  assert.ok(!settings.playlists.some(p => p.id === "trk-ba-mika-vocals"));
+  assert.ok(settings.playlists.some(p => p.id === "trk-ba-mika-aria"));
+});

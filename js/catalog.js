@@ -20,9 +20,10 @@ const TRK_CATALOG = [];
 const S = (id, name, icon, color, catName, catIcon, note, url, playlists) =>
   TRK_CATALOG.push({ id, name, icon, color, catName, catIcon, note, url, playlists });
 const PL = (id, name, icon, color, tags, songs, sourceUrl = "", sourceLabel = "") => ({ id, name, icon, color, tags, songs, sourceUrl, sourceLabel: sourceLabel || (sourceUrl.startsWith("https://nex-tone.link/") ? "NexTone.Link" : "") });
-const T = (t, al, ar, u, matchAliases = []) => {
+const T = (t, al, ar, u, matchAliases = [], matchMedia = "") => {
   const track = { t, al: al || "", ar: ar || "", u: u || "" };
   if (Array.isArray(matchAliases) && matchAliases.length) track.matchAliases = matchAliases.slice(0, 8);
+  if (matchMedia === "audio" || matchMedia === "video") track.matchMedia = matchMedia;
   return track;
 };
 const spotifyTrackUrl = id => "https://open.spotify.com/track/" + id;
@@ -64,7 +65,10 @@ S("classical", "クラシック名盤 — 版権切れの名演", "🎻", "purpl
   "バッハからドビュッシーまで、作曲の著作権が切れた名曲をMusopenのPublic Domain録音とIMSLPの楽譜で紹介。音源は同梱しません。個人でご用意のうえ 📁 Musicフォルダへ。単曲で有名な作曲家は Popular にまとめています。",
   "https://musopen.org/",
   [PL("classic-beethoven", "Beethoven — 運命と月光とエリーゼ", "🎹", "amber", ["Classic","Beethoven","Symphony","Piano"],
-    [T("Symphony No.5 - I. Allegro con brio", "Symphony No.5 Op.67", "Beethoven", "https://musopen.org/music/2567-symphony-no-5-in-c-minor-op-67/"),
+    /* 別名は利用者提供のMusopen掲載名（2026-10-14）。ページ／実DL名の再確認は未実施。
+       調・作品番号を一般ルールで削らず、この曲の配布表記を明示して結ぶ。 */
+    [T("Symphony No.5 - I. Allegro con brio", "Symphony No.5 Op.67", "Beethoven", "https://musopen.org/music/2567-symphony-no-5-in-c-minor-op-67/",
+      ["Symphony no. 5 in Cm, Op. 67 - I. Allegro con brio"]),
      T("Symphony No.9 - Ode to Joy", "Symphony No.9 Op.125", "Beethoven", "https://musopen.org/music/2553-symphony-no-9-in-d-minor-op-125/"),
      T("Für Elise - Bagatelle No.25", "Bagatelle", "Beethoven", "https://musopen.org/music/4545-fur-elise-bagatelle-no-25-in-a-minor/"),
      T("Moonlight Sonata - I. Adagio sostenuto", "Piano Sonata No.14", "Beethoven", "https://musopen.org/music/2549-piano-sonata-no-14-in-c-sharp-minor-moonlight-op-27-no-2/")]),
@@ -179,7 +183,7 @@ S("classical", "クラシック名盤 — 版権切れの名演", "🎻", "purpl
 
 /* ================= 🎒 ブルーアーカイブ（Nexon / Yostar） ================= */
 S("bluearchive", "ブルーアーカイブ", "🎒", "blue", "ソーシャルゲーム", "🎮",
-  "公式OST Vol.1〜8の各配信・購入先はプレイリストごとのNexTone.Linkから選べます。曲リンクはApple Musicの公式曲ページです。音源は同梱しません。Yostar公式ガイドラインは音声・楽曲等の直接的なコピー・使用を禁止しています。購入・サブスクだけで二次創作に音源を使えるわけではありません。詳しくは公式ガイドラインをご確認ください。",
+  "公式OST Vol.1〜8はNexTone.Link／Apple Musicで案内します。別枠のミカ曲はkiss angel・Aria to the Star・ソロ＆参加曲の音源・公式映像を案内（地域差あり）。音源は同梱しません。Yostar公式ガイドラインは音声・楽曲等の直接的なコピー・使用を禁止しています。購入・サブスクだけで二次創作に音源を使えるわけではありません。詳しくは公式ガイドラインをご確認ください。",
   "https://bluearchive.jp/fankit/guidelines",
   [
    PL("ba-v1", "ブルアカ OST Vol.1", "💿", "blue", ["Game", "Blue Archive", "OST", "Vol.1"],
@@ -430,7 +434,45 @@ S("bluearchive", "ブルーアーカイブ", "🎒", "blue", "ソーシャルゲ
      T("Sweet Allegro", "Blue Archive Original Soundtrack Vol.8 ～Dreaming for the Melody of Revolution～", "EmoCosine", "https://music.apple.com/jp/song/sweet-allegro/1864085588"),
      T("The Loop of Life", "Blue Archive Original Soundtrack Vol.8 ～Dreaming for the Melody of Revolution～", "KARUT", "https://music.apple.com/jp/song/the-loop-of-life/1864085784"),
      T("Funk 4 Dummies", "Blue Archive Original Soundtrack Vol.8 ～Dreaming for the Melody of Revolution～", "Aiobahn +81", "https://music.apple.com/jp/song/funk-4-dummies/1864085785")
-    ], "https://nex-tone.link/A00209490")]);
+    ], "https://nex-tone.link/A00209490"),
+   /* trk157：確認済みのPV2本＋配信3曲。Short音声は公式の個別配信先未確認につき収録しない。
+      出典・公式名・区分の根拠：docs/BLUEARCHIVE-MIKA-MUSIC.md / tools/bluearchive-mika-tracklist.json。
+      MV/JP/CN/Instrumentalの英語別名はtrkの整理用。無印の曲名・by angel・Shortは別名にしない。 */
+   PL("ba-mika-kiss", "ミカ — kiss angel", "🪽", "pink", ["Blue Archive", "Mika", "CN", "PV", "Vocal"],
+    [T("【中】圣园未花角色曲【Do you wanna kiss angel】", "Do you wanna kiss angel — Official PV", "", "https://www.bilibili.com/video/BV1zGD1YFEaS/",
+       ["Do you wanna kiss angel (CN MV)", "Do you wanna kiss angel - CN MV"], "video"),
+     T("【日】圣园未花角色曲【Do you wanna kiss angel】", "Do you wanna kiss angel — Official PV", "", "https://www.bilibili.com/video/BV1zGD1YFEaS/?p=2",
+       ["Do you wanna kiss angel (JP MV)", "Do you wanna kiss angel - JP MV"], "video"),
+     T("Do you wanna kiss angel (中文版)", "Do you wanna kiss angel (《蔚蓝档案》圣园未花角色曲) - Single", "xTOx, Luna Safari, Sakula小舞 & 龟娘", "https://music.apple.com/cn/song/do-you-wanna-kiss-angel-%E4%B8%AD%E6%96%87%E7%89%88/1777997422",
+       ["Do you wanna kiss angel (CN Ver.)", "Do you wanna kiss angel - CN Ver."], "audio"),
+     T("Do you wanna kiss angel (日文版)", "Do you wanna kiss angel (《蔚蓝档案》圣园未花角色曲) - Single", "xTOx, Luna Safari, Sakula小舞 & 东山奈央", "https://music.apple.com/cn/song/do-you-wanna-kiss-angel-%E6%97%A5%E6%96%87%E7%89%88/1777997425",
+       ["Do you wanna kiss angel (JP Ver.)", "Do you wanna kiss angel - JP Ver."], "audio"),
+     T("Do you wanna kiss angel (伴奏版)", "Do you wanna kiss angel (《蔚蓝档案》圣园未花角色曲) - Single", "xTOx, Luna Safari, Sakula小舞 & 何方", "https://music.apple.com/cn/song/do-you-wanna-kiss-angel-%E4%BC%B4%E5%A5%8F%E7%89%88/1777997427",
+       ["Do you wanna kiss angel (Instrumental Ver.)", "Do you wanna kiss angel - Instrumental Ver."], "audio")],
+    "https://www.taptap.cn/moment/603897878431138731", "蔚蓝档案 / TapTap"),
+   /* trk158：音源2曲＋グローバル公式のミニミュージカル本編1本。
+      英語の掲載名を英語歌唱版とは扱わない。会話・伴奏・曲別MVは今回の3枠に含めない。
+      出典：docs/BLUEARCHIVE-MIKA-ARIA.md / tools/bluearchive-mika-aria-tracklist.json */
+   PL("ba-mika-aria", "ミカ — Aria to the Star", "🪽", "pink", ["Blue Archive", "Mika", "KR", "Musical", "PV"],
+    [T("Prismatic Diary", "Aria to the Star - Memories in Melody (Mika) [Blue Archive]", "Mika (CV. Kang Eunae)",
+       "https://music.apple.com/gb/song/prismatic-diary/1872315029", ["무지개빛 다이어리"], "audio"),
+     T("The Incandescent Blue and the Comet", "Aria to the Star - Memories in Melody (Mika) [Blue Archive]", "Mika (CV. Kang Eunae)",
+       "https://music.apple.com/gb/song/the-incandescent-blue-and-the-comet/1872315037", ["따뜻한 푸름과 꼬리별"], "audio"),
+     T("[Blue Archive] Aria to the Star | Memories in Melody「Mika」", "", "",
+       "https://www.youtube.com/watch?v=wsq-I61IvwE", [], "video")],
+    "https://forum.nexon.com/bluearchive-en/board_view?board=3218&thread=3303925", "Nexon / Blue Archive"),
+   /* trk158：ミカの日本語ソロ／歌唱参加曲。合唱のarはCV表記だけ省略し、全員のキャラクター名を残す。
+      元のフルクレジットと根拠：docs/BLUEARCHIVE-MIKA-INDEX.md。映像だけの出演は歌唱参加に数えない。 */
+   PL("ba-mika-vocals", "ミカ — ソロ＆参加曲", "🪽", "pink", ["Blue Archive", "Mika", "JP", "Vocal", "PV"],
+    [T("幸せになるよ", "ブルーアーカイブ 絆ダイアローグ Vol.21 「ミカ」 - EP", "ミカ(CV:東山奈央)",
+       "https://music.apple.com/jp/song/%E5%B9%B8%E3%81%9B%E3%81%AB%E3%81%AA%E3%82%8B%E3%82%88/1867673117", [], "audio"),
+     T("ワンダー・ファニー・ハーモニー", "ブルーアーカイブ「ワンダー・ファニー・ハーモニー」 - Single", "サクラコ、ヒナタ、マリー、ウイ、シミコ、ヒフミ、アズサ、ハナコ、コハル、ミカ、ツルギ、イチカ",
+       "https://music.apple.com/jp/song/%E3%83%AF%E3%83%B3%E3%83%80%E3%83%BC-%E3%83%95%E3%82%A1%E3%83%8B%E3%83%BC-%E3%83%8F%E3%83%BC%E3%83%A2%E3%83%8B%E3%83%BC/1697260292", [], "audio"),
+     T("Let's Go With...", "ブルーアーカイブ「Let's Go With...」 - Single", "アスナ、キララ、スバル、ミカ、ミヨ、ユカリ",
+       "https://music.apple.com/jp/song/lets-go-with/1861397911", [], "audio"),
+     T("【ブルアカ】5周年記念楽曲「Let's Go With…」MV", "", "アスナ、キララ、スバル、ミカ、ミヨ、ユカリ",
+       "https://www.youtube.com/watch?v=PdnDedDp-5A", [], "video")],
+    "https://bluearchive.jp/", "Blue Archive / Yostar")]);
 
 /* ================= 🩺 アークナイツ（Hypergravity / Yostar） =================
    公式レーベル「Monster-Siren Records（塞壬唱片）」は全楽曲を公式サイトで公開・販売。

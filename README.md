@@ -38,6 +38,10 @@ trk!（トラック）は、ブラウザだけで動く**非営利のリズム�
 
 まだ見つかっていない仕掛けも、いくつかあります。
 
+### 🎵 カタログと曲名の照合
+
+**曲名の表記ゆれは自動で照合します。カタログの曲名は公式タイトルを基準に、出典で確認した別表記にも対応します。** すべての名前に対応するものではなく、言語・Short・Instrumentalなどの版違いは区別します。元ファイルや表示名を自動で書き換えることはありません。一致しない場合は、曲プロフィールの「カタログ照合メモ」で補えます。詳しくは[曲名の照合方針](docs/TITLE-MATCH.md)へ。
+
 ### 自分のPCで動かす
 ビルドは不要です。ただし、フォルダの記憶・VRM・公認パックの確認には **http(s) で開く**必要があるので、簡単なサーバーを使ってください。
 
@@ -95,6 +99,8 @@ python -m http.server 8000
 
 **trk! is AGRG!** — an All-Generation Rhythm Game that runs entirely in your browser.
 Load your own music or video and trk! **auto-generates a chart** for it. Nothing is uploaded.
+
+Catalog matching automatically handles supported title variations, using official titles and documented aliases as its reference. Language, Short and Instrumental versions remain distinct; original files and display names are not renamed. Use the song profile’s catalog match note for unsupported names.
 
 ▶ **Play:** https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/
 

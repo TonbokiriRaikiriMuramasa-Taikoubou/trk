@@ -173,6 +173,7 @@ const TRK_ENUM_VALUES = {
 const settings = {
   language: pick(prefs.language, ["ja", "en", "zh", "ko"], guessLang()),
   skin: has(window.Trk.data.SKINS, prefs.skin) ? prefs.skin : (prefs.skin === "dark" ? "shadow" : prefs.skin === "light" ? "daylight" : "shadow"),
+  ignoreStorageLimits: prefs.ignoreStorageLimits === true,   // 📦 容量の上限を無視（trk137。既定オフ。アプリが決めた上限だけを外す）
   skinShelfOpen: prefs.skinShelfOpen !== false,      // 🖼 スキンの棚の開閉（30種＋カスタムでも設定画面が膨らまないように）
   skinShelfCat: pick(prefs.skinShelfCat, ["all","basic","miku","dark","light","grad","fun","access","life","custom"], "all"),
   layout: pick(prefs.layout ?? prefs.gameplayLayout, Object.keys(window.Trk.data.LAYOUTS), "classic"),
@@ -1240,6 +1241,8 @@ function validImportedSettingEnum(key, value) {
   return false;
 }
 
+/* 容量の上限を無視するか（trk137）。外すのはアプリが決めた上限だけ。ブラウザの空き容量は外せない。 */
+function storageLimitsIgnored() { return settings.ignoreStorageLimits === true; }
 /* ---------- 端末の保存を固定する（trk136） ----------
    書斎・パック・記録は IndexedDB に入る。容量が逼迫すると、ブラウザが黙って消すことがある（主に Android Chrome）。
    navigator.storage.persist() は「消されにくい保存」を求める。許可するかはブラウザが決めるので、結果をそのまま表示する。
@@ -1521,7 +1524,7 @@ window.view = view;
 window.windows = windows;
 /* 領域（window.Trk.core）：コア状態の正規の場所。window直下の旧互換名は frozen js/fx.js が読む5件だけ。 */
 window.Trk = window.Trk || {};
-window.Trk.core = Object.assign(window.Trk.core || {}, { $, renderStoragePersist, requestStoragePersist, storagePersistState, BEST_KEY, CAPTION_MS, CUSTOM_SKIN_MAX, KEY_PRESETS, PAD_DEFAULTS, SKIN_FORMAT, TRK_ENUM_VALUES, TV_PARAM_FAV_MAX, VIDEO_KEY_DEFAULTS, activeMascot, applyLanguage, applyNoteVars, baseName, buildSkinGrid, buildSkinNow, chartSummary, clampTvBlur, clampTvDim, cleanTvParamFavorites, closeSettings, ctx, customSkinDefs, downloadBlob, downloadJSON, el, emit, esc, extOf, fmtDate, fmtTime, fontFamily, formatKey, formatPadBind, fx, gameplayFxMultiplier, gameplayFxPower, hashString, idbStore, isPclMascot, keyCodeOf, keysLabel, laneCol, laneColor, laneName, modsUnranked, mulberry32, noteShape, num, on, openSettings, pick, refreshSeedSecrets, rememberMusicVolume, renderAllStatuses, renderStatus, safeHttpUrl, safeLink, safeName, saveCustomSkins, saveUserPrefs, savedSkinAtBoot, setPhase, setStatus, settings, showScreen, skin, slotLane, slotOfKey, stage, syncPickers, takeAmpReset, travelMs, updateChartButtons, updateKeyUI, updateTouchKeys, validCode, validPadBind, vctx, video, view, windows });
+window.Trk.core = Object.assign(window.Trk.core || {}, { $, renderStoragePersist, storageLimitsIgnored, requestStoragePersist, storagePersistState, BEST_KEY, CAPTION_MS, CUSTOM_SKIN_MAX, KEY_PRESETS, PAD_DEFAULTS, SKIN_FORMAT, TRK_ENUM_VALUES, TV_PARAM_FAV_MAX, VIDEO_KEY_DEFAULTS, activeMascot, applyLanguage, applyNoteVars, baseName, buildSkinGrid, buildSkinNow, chartSummary, clampTvBlur, clampTvDim, cleanTvParamFavorites, closeSettings, ctx, customSkinDefs, downloadBlob, downloadJSON, el, emit, esc, extOf, fmtDate, fmtTime, fontFamily, formatKey, formatPadBind, fx, gameplayFxMultiplier, gameplayFxPower, hashString, idbStore, isPclMascot, keyCodeOf, keysLabel, laneCol, laneColor, laneName, modsUnranked, mulberry32, noteShape, num, on, openSettings, pick, refreshSeedSecrets, rememberMusicVolume, renderAllStatuses, renderStatus, safeHttpUrl, safeLink, safeName, saveCustomSkins, saveUserPrefs, savedSkinAtBoot, setPhase, setStatus, settings, showScreen, skin, slotLane, slotOfKey, stage, syncPickers, takeAmpReset, travelMs, updateChartButtons, updateKeyUI, updateTouchKeys, validCode, validPadBind, vctx, video, view, windows });
 /* catch.js／stage.js はこの正規アクセサを差し替える（旧window.activeMods別名はtrk90で廃止）。 */
 Object.defineProperty(window.Trk.core, "activeMods", { configurable:true, get:() => activeMods, set:v => { activeMods = v; } });
 Object.defineProperty(window.Trk.core, "analysis", { configurable:true, get:() => analysis, set:v => { analysis = v; } });

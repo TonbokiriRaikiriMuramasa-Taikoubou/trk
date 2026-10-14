@@ -205,6 +205,8 @@ async function writeZip(entries) {          // 無圧縮で書き出し（PNG・
 
 /* ============ pack.json の検証（決められた項目と形式だけを受け付ける） ============ */
 const PACK_FORMAT = "shadow-taiko-pack", PACK_MB = 1048576, PACK_MAX = 500 * PACK_MB, PACK_STORE_MAX = 1024 * PACK_MB, PACK_SONG_MAX = 50;
+/* 容量の上限（trk137）：「容量の上限を無視」がオンなら、パックの上限（1件・合計）を外す。ブラウザの空き容量は別。 */
+const packCap = (max) => (core.storageLimitsIgnored() ? Infinity : max);
 const IMG_EXT = ["png", "webp", "jpg", "jpeg"], SND_EXT = ["wav", "mp3", "ogg", "m4a"];
 const SONG_EXT = ["mp3", "m4a", "ogg", "oga", "opus", "wav", "flac", "aac", "mp4", "webm"];
 const PACK_LIMIT = { image:4, bg:8, sound:5, vrm:200, vrma:30, audio:250, chart:2 };
@@ -354,7 +356,7 @@ async function checkPackStorageCapacity(id, incoming) {
   catch (_) { throw new PackError("packStorageCheckFailed"); }
   try { prev = await packDB.get(id); } catch (_) { prev = null; }   /* 置き換えられる分（1件だけ読む） */
   const replacing = prev ? packRecordBytes(prev) : 0;
-  if (packProjected({ stored:stats.stored, replacing }, incoming) > PACK_STORE_MAX) {
+  if (packProjected({ stored:stats.stored, replacing }, incoming) > packCap(PACK_STORE_MAX)) {
     throw new PackError("packStoreLimit", { max:PACK_STORE_MAX / PACK_MB });
   }
   try {
@@ -378,7 +380,7 @@ function installPackFile(file) {
 async function installPackFileSerial(file) {
   core.setStatus("packStatus", "packReading");
   try {
-    if (file.size > PACK_MAX) throw new PackError("packTooBig");
+    if (file.size > packCap(PACK_MAX)) throw new PackError("packTooBig");
     const entries = await readZip(file);
     const mf = Object.keys(entries).filter(n => !n.startsWith("__MACOSX/") && /(^|\/)pack\.json$/.test(n)).sort((a, b) => a.length - b.length)[0];
     if (!mf) throw new PackError("packNoManifest");
@@ -395,7 +397,7 @@ async function installPackFileSerial(file) {
       if (ent.usize > lim) throw new PackError("packFileTooBig", { f:path });
       const blob = await inflateEntry(ent, lim, path);   /* 🛡 展開中に上限で止める */
       if (blob.size > lim) throw new PackError("packFileTooBig", { f:path });
-      total += blob.size; if (total > PACK_MAX) throw new PackError("packTooBig");
+      total += blob.size; if (total > packCap(PACK_MAX)) throw new PackError("packTooBig");
       files[path] = new Blob([blob], { type:MIME[core.extOf(path)] || "" });
     }
     const id = "p" + core.hashString(`${man.name}|${man.author}`).toString(36);
@@ -403,7 +405,7 @@ async function installPackFileSerial(file) {
     const record = { id, manifest:man, files, size:total, installedAt:Date.now() };
     /* 最終的な上限判定と保存を**同じ readwrite トランザクション**で行う（複数タブ間の競合を防ぐ）。
        ここでも合計は index のキーだけで数えるので、Blob を復元せずロック時間も短い。 */
-    const stored = await packDB.putIf(id, record, stats => packProjected(stats, total) <= PACK_STORE_MAX);
+    const stored = await packDB.putIf(id, record, stats => packProjected(stats, total) <= packCap(PACK_STORE_MAX));
     if (!stored) throw new PackError("packStoreLimit", { max:PACK_STORE_MAX / PACK_MB });
     core.setStatus("packStatus", "packInstalled", { name:man.name });
     await renderPackList();

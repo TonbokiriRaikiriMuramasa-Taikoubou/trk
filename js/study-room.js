@@ -490,6 +490,8 @@ const STUDY_STORES = ["books", "pages", "covers", "settings"];
 const STUDY_IMAGE_MAX_COUNT = 3000, STUDY_IMAGE_MAX_BYTES = 600 * 1024 * 1024, STUDY_IMAGE_FILE_MAX = 100 * 1024 * 1024;
 const STUDY_TEXT_FILE_MAX = 12 * 1024 * 1024, STUDY_TEXT_BATCH_MAX = 200, STUDY_BATCH_WRITE = 40;
 const STUDY_SHELF_MAX = 500, STUDY_SHELF_PAGE = 60, STUDY_SEARCH_MARK_MAX = 1500;
+/* 容量の上限（trk137）：設定「容量の上限を無視」がオンなら、アプリが決めた上限を外す。ブラウザの空き容量は別。 */
+function studyCap(max) { return core.storageLimitsIgnored() ? Infinity : max; }
 const STUDY_ZOOM_MIN = 0.5, STUDY_ZOOM_MAX = 4;
 /* 拡大の送り幅（％）。−／＋・Ctrl+ホイール・ピンチの「1回ぶん」です。
    既定は5%（100%→200%が20回）。1%＝細かく見たいとき〜25%＝大きく変えたいとき。 */
@@ -780,7 +782,7 @@ function studyReadShelfMeta(raw) {
   }
   const folderIds = new Set(studyShelfFolders.map(folder => folder.id));
   if (raw.bookFolder && typeof raw.bookFolder === "object" && !Array.isArray(raw.bookFolder)) {
-    for (const [bookId, folderId] of Object.entries(raw.bookFolder).slice(0, STUDY_SHELF_MAX)) {
+    for (const [bookId, folderId] of Object.entries(raw.bookFolder).slice(0, studyCap(STUDY_SHELF_MAX))) {
       if (typeof bookId === "string" && bookId.length <= 100 && folderIds.has(String(folderId))) studyBookFolder[bookId] = String(folderId);
     }
   }
@@ -789,7 +791,7 @@ function studyReadShelfMeta(raw) {
       if (container !== "root" && !folderIds.has(container)) continue;
       if (!Array.isArray(values)) continue;
       const keys = [], used = new Set();
-      for (const value of values.slice(0, STUDY_SHELF_MAX + STUDY_FOLDER_MAX)) {
+      for (const value of values.slice(0, studyCap(STUDY_SHELF_MAX + STUDY_FOLDER_MAX))) {
         const key = String(value || "").slice(0, 240);
         if (!/^(?:book|folder):/.test(key) || used.has(key)) continue;
         used.add(key); keys.push(key);
@@ -937,20 +939,20 @@ function studyRefreshPrefsUI() {
 /* ============ 本のデータ ============ */
 function studyBookClean(raw) {
   if (!raw || typeof raw !== "object" || typeof raw.id !== "string" || !raw.id || !["image", "text"].includes(raw.kind)) return null;
-  const pages = (Array.isArray(raw.pages) ? raw.pages : []).slice(0, STUDY_IMAGE_MAX_COUNT).map(p => {
+  const pages = (Array.isArray(raw.pages) ? raw.pages : []).slice(0, studyCap(STUDY_IMAGE_MAX_COUNT)).map(p => {
     if (!p || typeof p !== "object" || typeof p.key !== "string") return null;
     return { key:p.key.slice(0, 240), name:String(p.name || "page").slice(0, 240), path:String(p.path || p.name || "").slice(0, 500),
       size:Math.max(0, Number(p.size) || 0), type:String(p.type || "").slice(0, 100) };
   }).filter(Boolean);
   const bookmark = raw.bookmark && typeof raw.bookmark === "object" ? {
-    index:Math.max(0, Math.min(STUDY_IMAGE_MAX_COUNT - 1, Number(raw.bookmark.index) || 0)),
+    index:Math.max(0, Math.min(studyCap(STUDY_IMAGE_MAX_COUNT) - 1, Number(raw.bookmark.index) || 0)),
     top:Math.max(0, Number(raw.bookmark.top) || 0), left:Number(raw.bookmark.left) || 0,
     ratio:Math.max(0, Math.min(1, Number(raw.bookmark.ratio) || 0)),
     savedAt:Math.max(0, Number(raw.bookmark.savedAt) || 0)
   } : null;
   return { id:raw.id.slice(0, 100), kind:raw.kind, title:String(raw.title || "Untitled").trim().slice(0, 160) || "Untitled",
     sourcePath:String(raw.sourcePath || "").slice(0, 1000), generation:String(raw.generation || "").slice(0, 100),
-    pages, content:typeof raw.content === "string" ? raw.content.slice(0, STUDY_TEXT_FILE_MAX) : "",
+    pages, content:typeof raw.content === "string" ? raw.content.slice(0, studyCap(STUDY_TEXT_FILE_MAX)) : "",
     extension:String(raw.extension || "").slice(0, 16), bookmark, createdAt:Math.max(0, Number(raw.createdAt) || Date.now()),
     updatedAt:Math.max(0, Number(raw.updatedAt) || Date.now()) };
 }
@@ -1405,7 +1407,7 @@ async function studyImportImages(files) {
   try {
     for (const task of tasks) {
       if (studyImportState.cancelled) break;
-      if (!known.has(task.id) && known.size >= STUDY_SHELF_MAX) { studyImportState.failed++; studySetStatus("studyShelfLimit"); position += task.group.files.length; studyImportTick(position, total); continue; }
+      if (!known.has(task.id) && known.size >= studyCap(STUDY_SHELF_MAX)) { studyImportState.failed++; studySetStatus("studyShelfLimit"); position += task.group.files.length; studyImportTick(position, total); continue; }
       if (!replace && known.has(task.id)) { studyImportState.kept++; position += task.group.files.length; studyImportTick(position, total); continue; }
       const result = await studyImportImageGroup(task.group, task.id, position, total);
       if (result === "ok") { studyImportState.added++; known.add(task.id); lastId = task.id; }
@@ -1423,7 +1425,7 @@ async function studyImportImages(files) {
 }
 async function studyImportTextEntry(entry, id, position, total) {
   const file = entry.file, size = Number(file.size) || 0;
-  if (size > STUDY_TEXT_FILE_MAX) { studySetStatus("studyTextTooBig", { name:file.name, mb:Math.round(STUDY_TEXT_FILE_MAX / 1048576) }); return "error"; }
+  if (size > studyCap(STUDY_TEXT_FILE_MAX)) { studySetStatus("studyTextTooBig", { name:file.name, mb:Math.round(STUDY_TEXT_FILE_MAX / 1048576) }); return "error"; }
   if (studyCurrentBook && studyCurrentBook.id === id && !core.$("studyMemoEditor").hidden) {
     if (!await studyFlushMemo(true)) return "error";
     core.$("studyMemoEditor").readOnly = false; core.$("studyMemoEditor").hidden = true;
@@ -1452,7 +1454,7 @@ async function studyImportTexts(files) {
   if (studyImportState.active) return;
   const entries = STUDY_UTIL.listTextFiles(files);
   if (!entries.length) { studyNotify("studyNoTextFiles"); return; }
-  if (entries.length > STUDY_TEXT_BATCH_MAX) { studySetStatus("studyTextBatchLimit"); return; }
+  if (entries.length > studyCap(STUDY_TEXT_BATCH_MAX)) { studySetStatus("studyTextBatchLimit"); return; }
   const tasks = entries.map(entry => ({ entry, id:STUDY_UTIL.stableId("text", entry.path) }));
   const known = new Set(studyBooks.map(book => book.id));
   const replaceCount = tasks.filter(task => known.has(task.id)).length;
@@ -1463,7 +1465,7 @@ async function studyImportTexts(files) {
     for (let i = 0; i < tasks.length; i++) {
       if (studyImportState.cancelled) break;
       const task = tasks[i];
-      if (!known.has(task.id) && known.size >= STUDY_SHELF_MAX) { studyImportState.failed++; studySetStatus("studyShelfLimit"); continue; }
+      if (!known.has(task.id) && known.size >= studyCap(STUDY_SHELF_MAX)) { studyImportState.failed++; studySetStatus("studyShelfLimit"); continue; }
       if (!replace && known.has(task.id)) { studyImportState.kept++; studyImportTick(i + 1, entries.length); continue; }
       const result = await studyImportTextEntry(task.entry, task.id, i, entries.length);
       if (result === "ok") { studyImportState.added++; known.add(task.id); lastId = task.id; }
@@ -3046,4 +3048,6 @@ window.TrkStudyRoom = Object.freeze({
 /* 領域（window.Trk.study）：書斎の公開面は凍結の window.TrkStudyRoom。同じ参照を領域の名前でも出す（旧名は残す） */
 window.Trk = window.Trk || {};
 window.Trk.study = window.TrkStudyRoom;
+/* 書斎の上限の値（trk137）。復元の事前確認（backup.js）が同じ数字で判定するために公開する */
+window.Trk.studyLimits = Object.freeze({ shelf:STUDY_SHELF_MAX, pages:STUDY_IMAGE_MAX_COUNT, textBytes:STUDY_TEXT_FILE_MAX });
 })();

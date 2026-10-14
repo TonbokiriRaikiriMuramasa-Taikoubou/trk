@@ -1027,6 +1027,25 @@
             <div class="miniActions">
               <button id="storagePersistBtn" type="button" data-i18n="storagePersistBtn" hidden></button>
             </div>
+            <label class="check"><input id="ignoreLimitsChk" type="checkbox"><span data-i18n="ignoreLimits"></span></label>
+            <div class="hint" data-i18n="ignoreLimitsHint"></div>
+          </details>
+
+          <!-- 📦 まるごとバックアップ（trk137）。書き出しと復元は js/backup.js。含める項目は選べる -->
+          <details class="panel" id="backupPanel">
+            <summary data-i18n="backupPanelTitle"></summary>
+            <div class="hint" data-i18n="backupHint"></div>
+            <label class="check"><input id="backupAreaStudy" type="checkbox" checked><span data-i18n="backupAreaStudy"></span></label>
+            <label class="check"><input id="backupAreaPacks" type="checkbox" checked><span data-i18n="backupAreaPacks"></span></label>
+            <label class="check"><input id="backupAreaMedia" type="checkbox"><span data-i18n="backupAreaMedia"></span></label>
+            <div class="miniActions">
+              <button id="backupMakeBtn" type="button" data-i18n="backupMake"></button>
+              <label class="fileBtn small">
+                <input id="backupRestoreFile" type="file" accept=".zip,application/zip" hidden>
+                <span data-i18n="backupRestorePick"></span>
+              </label>
+            </div>
+            <div id="backupStatus" class="hint status" role="status" aria-live="polite"></div>
           </details>
 
           <!-- 📤 ミュージックフォルダの共有（配線は library.js。許可は1回だけ・中身を一気に取り込む） -->
@@ -1792,5 +1811,8 @@
 <!-- 📚 端末内の画像・テキスト閲覧モード（外部ライブラリ／アップロードなし） -->
 <script src="js/study-room-utils.js"></script>
 <script src="js/study-room.js"></script>
+<!-- 📦 trk137：ZIP の入出力（Blob のまま）→ まるごとバックアップ。書斎・パックの後に読む -->
+<script src="js/zip-io.js"></script>
+<script src="js/backup.js"></script>
 </body>
 </html>

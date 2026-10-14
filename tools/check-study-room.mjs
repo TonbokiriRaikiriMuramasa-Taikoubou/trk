@@ -149,7 +149,7 @@ assert.ok(reader.includes("STUDY_ZOOM_MIN") && reader.includes("STUDY_ZOOM_MAX")
 assert.ok(reader.includes("studyScrollZoomedImage") &&
   reader.includes('studyScrollZoomedImage(event.code === "ArrowDown" ? 1 : -1, event.repeat)'),
   "a zoomed image can also be scrolled with the up/down keys, like the wheel");
-assert.ok(reader.includes("studyJumpZoomEdge") && reader.includes("studyPrefs.zoomEdgeKeys &&") &&
+assert.ok(reader.includes("studyJumpZoomEdge") && reader.includes("!studyPrefs.pageKeysTurnPages &&") &&
   reader.includes('studyJumpZoomEdge(event.code === "PageDown" ? 1 : -1, event.repeat)') &&
   reader.includes("if (repeat) return true;"),
   "PageDown / PageUp can jump to the bottom / top of a zoomed image, behind their own setting");
@@ -277,7 +277,7 @@ assert.ok(reader.includes('typeof node.scrollBy === "function"') && reader.inclu
 /* ---------- 拡大した画像のキー送り（↑ / ↓） ---------- */
 /* 取り出すときだけ、別名（core.）を残した本文を使います（この2つは core.$ を読むため）。 */
 const readerWithCore = sourceOf("js/study-room.js", fs.readFileSync(new URL("../js/study-room.js", import.meta.url), "utf8"));
-const zoomNodesFn = readerWithCore.match(/function studyZoomScrollNodes\(\) \{[\s\S]*?\n\}/);
+const zoomNodesFn = readerWithCore.match(/function studyZoomScrollNodes\(includeUnzoomed = false\) \{[\s\S]*?\n\}/);
 const zoomScrollFn = readerWithCore.match(/function studyScrollZoomedImage\(direction, held\) \{[\s\S]*?\n\}/);
 assert.ok(zoomNodesFn && zoomScrollFn, "the arrow-key scrolling of a zoomed image is defined");
 const scrollContext = vm.createContext({});
@@ -373,7 +373,7 @@ ${normalizeFn[0]}
 ${jumpEdgeFn[0]}
 ${applyLandFn[0]}
 globalThis.studyZoomLand = "";
-globalThis.studyPrefs = { imageMode:"single", zoom:2 };
+globalThis.studyPrefs = { imageMode:"single", zoom:2, closeOnLastPageDown:true };
 globalThis.studyCurrentBook = { kind:"image", pages:[{ key:"a" }, { key:"b" }, { key:"c" }] };
 globalThis.studyCurrentPage = 0;
 globalThis.pageJumps = [];
@@ -419,6 +419,31 @@ vm.runInContext("studyCurrentPage = 0; single.scrollTop = 0; closeCalls = 0;", e
 assert.equal(edge("jumpEdge", -1), true, "at the first page PageUp is still handled");
 assert.equal(edgeState().top, 0, "at the first page the image no longer wraps to the bottom");
 assert.equal(vm.runInContext("closeCalls", edgeContext), 1, "PageUp at the first page closes instead");
+/* 最後で閉じる設定は単ページ／見開きの両方に効き、PageUpや途中のページ送りを変えない。 */
+for (const mode of ["single", "spread"]) {
+  vm.runInContext(`studyPrefs.imageMode = "${mode}"; studyPrefs.closeOnLastPageDown = false;
+    studyCurrentPage = 2; single.scrollTop = 1800; spread.forEach(n => n.scrollTop = 1800);
+    closeCalls = 0; pageJumps.length = 0;`, edgeContext);
+  assert.equal(edge("jumpEdge", 1), true, `${mode}: last-page PageDown is consumed when closing is off`);
+  assert.equal(vm.runInContext("closeCalls", edgeContext), 0);
+  assert.equal(edgeState().page, 2);
+  assert.deepEqual(Array.from(edgeState().jumps), []);
+  assert.equal(edgeState().top, 1800);
+  assert.equal(edge("jumpEdge", 1, true), true);
+  assert.equal(vm.runInContext("closeCalls", edgeContext), 0);
+  vm.runInContext("studyCurrentPage = 0; single.scrollTop = 0; spread.forEach(n => n.scrollTop = 0);", edgeContext);
+  assert.equal(edge("jumpEdge", -1), true);
+  assert.equal(vm.runInContext("closeCalls", edgeContext), 1, "PageUp at the start remains unchanged");
+  vm.runInContext("closeCalls = 0; single.scrollTop = 1800; spread.forEach(n => n.scrollTop = 1800);", edgeContext);
+  edge("jumpEdge", 1);
+  assert.equal(edgeState().page, mode === "spread" ? 2 : 1, "normal page turns still work");
+  vm.runInContext('studyZoomLand = ""; studyCurrentPage = 2; studyPrefs.closeOnLastPageDown = true;', edgeContext);
+  edge("jumpEdge", 1, true);
+  assert.equal(vm.runInContext("closeCalls", edgeContext), 0, "even when on, holding never closes");
+  edge("jumpEdge", 1);
+  assert.equal(vm.runInContext("closeCalls", edgeContext), 1, "re-enabling closes on a fresh press");
+}
+vm.runInContext('studyPrefs.imageMode = "single";', edgeContext);
 /* 押しっぱなし（キーリピート）では端で止まる：ページ送りも閉じる動作もしない（押し直したときだけ） */
 vm.runInContext("studyCurrentPage = 2; single.scrollTop = 1800; pageJumps.length = 0; closeCalls = 0;", edgeContext);
 assert.equal(edge("jumpEdge", 1, true), true, "a held PageDown at the end of the book is swallowed");
@@ -455,7 +480,20 @@ assert.deepEqual(Array.from(edgeState().spread), [1800, 1800], "both spread page
 vm.runInContext("studyPrefs.imageMode = \"vertical\";", edgeContext);
 assert.equal(edge("jumpEdge", 1), false, "vertical comic mode keeps the stage's own scrolling");
 vm.runInContext("studyPrefs.imageMode = \"single\"; studyPrefs.zoom = 1;", edgeContext);
-assert.equal(edge("jumpEdge", 1), false, "without zoom the keys keep changing pages");
+assert.equal(edge("jumpEdge", 1), true, "at 100% overflowing images jump to the edge too");
+assert.equal(edgeState().top, 1800);
+vm.runInContext("studyCurrentPage = 1; single.scrollTop = 0; pageJumps.length = 0;", edgeContext);
+assert.equal(edge("jumpEdge", -1), true, "at 100% PageUp at the top goes to the previous page");
+assert.equal(edgeState().land, "bottom");
+edge("applyLand");
+assert.equal(edgeState().top, 1800, "at 100% the previous page opens at the bottom");
+vm.runInContext("studyPrefs.zoom = 0.5; single.scrollTop = 0;", edgeContext);
+assert.equal(edge("jumpEdge", 1), true, "at 50% an overflowing image still jumps to the edge");
+assert.equal(edge("jumpEdge", 1, true), true, "holding at 50% still stops at the edge");
+vm.runInContext("studyPrefs.zoom = 1; studyPrefs.imageMode = 'spread'; spread.forEach(n => n.scrollTop = 0);", edgeContext);
+assert.equal(edge("jumpEdge", 1), true);
+assert.deepEqual(Array.from(edgeState().spread), [1800, 1800], "unzoomed spread pages jump together");
+vm.runInContext("studyPrefs.imageMode = 'single';", edgeContext);
 vm.runInContext("studyPrefs.zoom = 2; studyCurrentBook = { kind:\"text\", pages:[] };", edgeContext);
 assert.equal(edge("jumpEdge", 1), false, "text books keep their own key handling");
 vm.runInContext("studyCurrentBook = { kind:\"image\", pages:[{ key:\"a\" }] }; single.scrollTop = 0; elems.studySingleWrap = () => flat;", edgeContext);
@@ -618,16 +656,16 @@ assert.equal(middleRun(1, true), false, "text books keep their own middle click"
 vm.runInContext("studyCurrentBook = { kind:\"image\", pages:[] }; studyRoomOpen = false;", middleContext);
 assert.equal(middleRun(1, true), false, "outside the room the middle click does nothing");
 
-const advancedMarkup = html.slice(html.indexOf('<details class="study-advanced study-shelf-advanced">'), html.indexOf('<p id="studyShelfDragHelp"'));
-assert.ok(/<input id="studyZoomEdgeKeys" type="checkbox" checked>/.test(advancedMarkup),
-  "the PageDown / PageUp edge jump is on by default and can be switched off");
+const advancedMarkup = html.slice(html.indexOf('<div id="studySettings"'), html.indexOf('<div id="studyHelp"'));
+assert.ok(/<input id="studyPageKeysTurnPages" type="checkbox">/.test(advancedMarkup),
+  "direct page turning is opt-in; the image edge jump is the default");
 assert.ok(/<input id="studyMouseClickPages" type="checkbox">/.test(advancedMarkup) && /<input id="studyMouseClickFlip" type="checkbox">/.test(advancedMarkup),
   "the PC click options start off");
 assert.ok(/<select id="studyMiddleClickAction"[^>]*>[\s\S]*?<option value="none"[\s\S]*?<option value="next"[\s\S]*?<option value="close"/.test(advancedMarkup),
   "the middle click selects nothing / the next page / closing to the shelf");
-assert.ok(reader.includes('studyBindPref("studyZoomEdgeKeys", "zoomEdgeKeys")') && reader.includes('studyBindPref("studyMouseClickPages", "mouseClickPages"') &&
+assert.ok(reader.includes('studyBindPref("studyPageKeysTurnPages", "pageKeysTurnPages")') && reader.includes('studyBindPref("studyMouseClickPages", "mouseClickPages"') &&
   reader.includes('studyBindPref("studyMouseClickFlip", "mouseClickFlip")') && reader.includes('studyBindPref("studyMiddleClickAction", "middleClickAction")') &&
-  reader.includes("studyPrefs.zoomEdgeKeys = raw.zoomEdgeKeys !== false") && reader.includes("studyPrefs.mouseClickPages = raw.mouseClickPages === true") &&
+  reader.includes("raw.zoomEdgeKeys === false") && reader.includes("studyPrefs.mouseClickPages = raw.mouseClickPages === true") &&
   reader.includes("studyPrefs.mouseClickFlip = raw.mouseClickFlip === true") && reader.includes("STUDY_MIDDLE_CLICK_ACTIONS.includes(raw.middleClickAction)") &&
   reader.includes('raw.middleClickNext === true ? "next" : "none"'),
   "the options are stored and read back with their intended defaults (the old middle-click choice is carried over)");
@@ -745,7 +783,7 @@ for (const theme of studyThemes.filter(id => id !== "plain")) {
 assert.ok(css.includes("AI／プロンプト作業をイメージした装飾テーマ（AI処理・通信機能はありません）"), "AI-themed skins are presentation only");
 for (const selector of ['.study-tv-screen[data-look="crt"]', '.study-tv-screen[data-look="aquarium"]', "mark.study-search-hit",
   "--study-zoom", "--study-text-size", "--study-tv-ratio", ".study-bookmark-card", ".study-import-track", ".study-help-card",
-  ".study-folder-card", ".study-drop-target", ".study-shelf-title", ".study-shelf-advanced", ".study-key-capture", ".study-shelf-hidden",
+  ".study-folder-card", ".study-drop-target", ".study-shelf-title", ".study-settings-card", ".study-key-capture", ".study-shelf-hidden",
   ".study-editor-notice", ".study-editor-save-status", ".study-memo-editor", ".study-export-folder-controls", ".study-export-folder-name"])
   assert.ok(css.includes(selector), `css is missing ${selector}`);
 assert.ok(css.includes("grid-template-rows:minmax(220px,44vh)") && css.includes("grid-template-rows:minmax(210px,42vh)"),
@@ -779,4 +817,4 @@ for (const file of ["player.js", "main.js", "media-player-mode.js", "catch.js", 
   assert.ok(!/_trk(MediaPlayer|SynthMode)Open/.test(core), "core.js has no old media／synth flag left");
 }
 
-console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring, ↑ / ↓ scrolling of a zoomed image (tap = one screen, hold = small steps, edges handed back to the page keys), percent zoom steps for the wheel / buttons / pinch (1 / 2 / 5 / 10 / 25 %, 5 % by default), PageDown / PageUp jumping to the bottom / top of a zoomed image and then turning the page at its edges (closing at the ends of the book), one long-press helper shared by the Study launch and the shelf folder (surviving a browser pointercancel), an always-visible 📚 Study button at the right of the song list, opt-in page turning by the mouse left / right click (with a swap for trackballs and left-handed use), middle click selectable between nothing / the next page / closing to the shelf`);
+console.log(`OK    Study reader: ${localizedKeys.ja.size} strings × 4 languages, 30 text themes / 4 groups / reader-editor styling, shelf folders/drag ordering/visibility, configurable navigation keys, inert text editing/export, data safety, zoom/search/bookmarks/TV wiring, ↑ / ↓ scrolling of a zoomed image (tap = one screen, hold = small steps, edges handed back to the page keys), percent zoom steps for the wheel / buttons / pinch (1 / 2 / 5 / 10 / 25 %, 5 % by default), PageDown / PageUp jumping to the bottom / top of overflowing images at any zoom and then turning the page at its edges (closing at the ends of the book), one long-press helper shared by the Study launch and the shelf folder (surviving a browser pointercancel), an always-visible 📚 Study button at the right of the song list, opt-in page turning by the mouse left / right click (with a swap for trackballs and left-handed use), middle click selectable between nothing / the next page / closing to the shelf`);

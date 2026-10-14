@@ -282,6 +282,12 @@
     "name": "Worlds / WCS Anthems",
     "tracks": [
       {
+        "title": "Silver Scrapes",
+        "album": "Worlds 2012 Anthem",
+        "artist": "Danny McCarthy",
+        "url": "https://www.youtube.com/watch?v=MJzqr9qdopQ"
+      },
+      {
         "title": "Warriors",
         "album": "Worlds 2014 Anthem",
         "artist": "Imagine Dragons",
@@ -367,6 +373,7 @@
       "checkedAt": "2026-10-12",
       "evidence": "mirror",
       "notFound": [
+        "Silver Scrapes",
         "Warriors",
         "Ignite",
         "Legends Never Die",
@@ -380,7 +387,7 @@
         "Sacrifice",
         "Know My Name"
       ],
-      "note": "Only 'Worlds Collide' (Worlds 2015, listed as League of Legends, Nicki Taylor) is in the playlist. The playlist also lists the instrumental 'YYYY World Championship Theme' tracks, which are different from these vocal anthems. The other 12 anthems are not among the 977 listed entries."
+      "note": "Only 'Worlds Collide' (Worlds 2015, listed as League of Legends, Nicki Taylor) is in the playlist. The playlist also lists the instrumental 'YYYY World Championship Theme' tracks, which are different from these vocal anthems. The other 12 anthems are not among the 977 listed entries. Silver Scrapes (Worlds 2012, added 2026-10-14) is not checked against this list yet; its link is a YouTube upload (NCS Release) by a third party, not a Riot official channel."
     }
   },
   "msiAnthems": {

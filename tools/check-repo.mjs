@@ -1458,7 +1458,7 @@ if (!exists("js/fx-worklet.js") ||
       series.note.includes("二次利用許諾ではありません") && series.note.includes("Creator-Safe対象") &&
       series.note.includes("K/DAの公式曲6曲") && series.note.includes("これはLoL全楽曲ではなく") &&
       series.note.includes("今後の調査対象");
-    catalogDataOk = tracksMatch && kdaSourcesOk && trackTotal === 64 && worlds2026ReleasedCount === 1 &&
+    catalogDataOk = tracksMatch && kdaSourcesOk && trackTotal === 65 && worlds2026ReleasedCount === 1 &&
       new Set(allUrls).size === allUrls.length && rightsAndScopeOk;
 
     const ensureStart = library.indexOf("function trkCatalogGuide(");
@@ -1510,9 +1510,9 @@ if (!exists("js/fx-worklet.js") ||
   } catch (error) {
     console.error(`WARN  LoL catalogue test setup failed: ${error.message}`);
   }
-  if (!catalogDataOk) fail("LoL fixture/catalog mismatch (expected 41 modern Champion Themes, 13 released Worlds anthems, four MSI anthems, six K/DA songs, official track/video sources, and rights/scope notice)");
+  if (!catalogDataOk) fail("LoL fixture/catalog mismatch (expected 41 modern Champion Themes, 14 released Worlds anthems, four MSI anthems, six K/DA songs, official track/video sources, and rights/scope notice)");
   else if (!safeRefreshOk) fail("LoL playlist refresh must update wishes/guides, preserve user-owned songs/customized fields, and create missing MSI/K/DA lists in trk-lol");
-  else ok("LoL catalog: Sessions 108 + Champion Themes 41 + Worlds 13 + MSI 4 + K/DA 6; official links, rights notices, safe refresh");
+  else ok("LoL catalog: Sessions 108 + Champion Themes 41 + Worlds 14 + MSI 4 + K/DA 6; official links, rights notices, safe refresh");
 }
 
 // 🎧 LoL Phase 3 (SoundCloud albums): one playlist per official album — Season 1–9 + Warsongs — plus the

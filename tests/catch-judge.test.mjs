@@ -118,3 +118,43 @@ test("ぶっ飛ばしは10秒（BPMに関係なく固定）。重なると足さ
   w.__triggerBlast(2000, { x: 0.5 });
   assert.equal(w.catchState.blastUntil - 2000, 9000 + 10000);
 });
+
+// trk146：「ぶっ飛ばしは次の荷物まで」オプション（既定はオフ＝10秒）
+test("既定はオフ：ぶっ飛ばしは10秒（catchBlastNext は false）", () => {
+  const { ctx, settings } = loadCatch();
+  assert.equal(settings.catchBlastNext, undefined);
+  ctx.window.catchState.blastUntil = -1e9;
+  ctx.window.__triggerBlast(1000, { x: 0.5 });
+  assert.equal(ctx.window.catchState.blastUntil - 1000, 10000);
+});
+
+test("次の荷物まで：発動後は続き（Infinity）、次の荷物を判定した時点で終わる", () => {
+  const env = loadCatch();
+  const { ctx, judged, core, settings } = env;
+  settings.catchBlastNext = true;
+  const w = ctx.window;
+  w.catchState.blastUntil = -1e9;
+  w.__triggerBlast(500, { x: 0.5 });
+  assert.equal(w.catchState.blastUntil, Infinity);
+  // 時間が経っても続く
+  assert.ok(w.catchState.blastUntil > 60000);
+  // 次の荷物が2つある譜面。1つ目を判定すると終わるので、2つ目は ★ にならない
+  core.chart = [{ time: 1000, lane: 0, judged: false }, { time: 2000, lane: 0, judged: false }];
+  core.nextIdx = 0;
+  const map = w.__catchMap;
+  map.src = core.chart; map.len = 2; map.key = "|easy|120"; map.xs = new ctx.Float32Array([0.5, 0.57]);   // 2つ目は少しずらす（ぶっ飛ばしが終われば ★ にならない）
+  w.catchState.x = 0.5;
+  w.catchJudge(2500);
+  assert.equal(judged.length, 1, "判定は1つで止まる（同じフレームの残りは次へ）");
+  assert.equal(judged[0].delta, 0, "1つ目はぶっ飛ばし中の★");
+  assert.equal(w.catchState.blastUntil, 2500, "判定で終わる");
+  core.chart[0].judged = true; core.nextIdx = 1;   // 実際の判定と同じく、判定済みにしてから次のフレーム
+  w.catchJudge(2600);
+  assert.equal(judged.length, 2);
+  assert.equal(judged[1].delta, null, "2つ目はもう ★ ではない");
+});
+
+test("次の荷物まで：ゲージは壊れない（無限でも NaN にならない）", () => {
+  const src = fs.readFileSync(path.join(root, "js/catch.js"), "utf8");
+  assert.ok(src.includes("isFinite(catchState.blastLen)"));
+});

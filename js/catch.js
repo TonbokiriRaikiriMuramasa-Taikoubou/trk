@@ -22,6 +22,7 @@ Object.assign(TEXT.ja, {
   blastToast:"🚀 ぶっ飛ばし！", blastLabel:"🚀 BLAST", blastCount:"🚀 ぶっ飛ばし：{n}回",
   eggNitro:"✦ NITRO：CATCHがずっとぶっ飛ばしモードになります（練習扱い・ハイスコア対象外）",
   catchNitroBonus:"🚀 ニトロ中は得点1.1倍", catchNitroBonusHint:"オンにすると、ニトロ中に受け止めたノーツの得点が少し上がります。",
+  catchBlastNext:"🚀 ぶっ飛ばしは「次の荷物を取る（落とす）まで」", catchBlastNextHint:"オフ：10秒間（重なると足されます）。オン：次の荷物が判定されるまで続きます。",
 });
 Object.assign(TEXT.en, {
   catchHint:"Catch the falling parcels in your truck bed. Move with ← → (or A / D), or drag on the screen. Grab a nitro can 🚀 on the road to enter Blast mode for a while (double catch width, faster moves).",
@@ -31,6 +32,7 @@ Object.assign(TEXT.en, {
   blastToast:"🚀 BLAST!", blastLabel:"🚀 BLAST", blastCount:"🚀 Blasts: {n}",
   eggNitro:"✦ NITRO: CATCH stays in Blast mode the whole song (practice — no high score)",
   catchNitroBonus:"🚀 Score x1.1 during Nitro", catchNitroBonusHint:"When on, notes caught during Nitro give a small score bonus.",
+  catchBlastNext:"🚀 Blast lasts until the next parcel", catchBlastNextHint:"Off: 10 seconds (stacks when overlapped). On: lasts until the next parcel is caught or dropped.",
 });
 Object.assign(TEXT.zh, {
   catchHint:"用货斗接住落下的包裹。用 ← →（或 A·D）左右移动，也可以在画面上拖动。拿到路上的氮气罐🚀，会进入一段时间的“狂飙模式”（接取范围2倍·移动更快）。",
@@ -40,6 +42,7 @@ Object.assign(TEXT.zh, {
   blastToast:"🚀 狂飙！", blastLabel:"🚀 BLAST", blastCount:"🚀 狂飙：{n}次",
   eggNitro:"✦ NITRO：CATCH整首歌都是狂飙模式（练习·不计最高分）",
   catchNitroBonus:"🚀 氮气中得分×1.1", catchNitroBonusHint:"开启后，在氮气期间接住音符会获得少量分数加成。",
+  catchBlastNext:"🚀 冲刺持续到下一个包裹", catchBlastNextHint:"关闭：10 秒（重叠时累加）。开启：持续到下一个包裹被判定为止。",
 });
 Object.assign(TEXT.ko, {
   catchHint:"떨어지는 짐을 짐칸으로 받습니다. ← →(A·D도 가능)로 좌우로 움직이고, 화면을 드래그해도 됩니다. 길 위의 니트로 캔🚀을 먹으면 잠시 '폭주 모드'(받는 폭 2배·이동이 빨라짐)가 됩니다.",
@@ -49,6 +52,7 @@ Object.assign(TEXT.ko, {
   blastToast:"🚀 폭주!", blastLabel:"🚀 BLAST", blastCount:"🚀 폭주: {n}회",
   eggNitro:"✦ NITRO: CATCH가 곡 내내 폭주 모드가 됩니다 (연습 취급·최고 점수 제외)",
   catchNitroBonus:"🚀 니트로 중 점수×1.1", catchNitroBonusHint:"켜면 니트로 중 받은 노트에 작은 점수 보너스가 붙습니다.",
+  catchBlastNext:"🚀 돌진은 다음 짐까지 지속", catchBlastNextHint:"끄기: 10초(겹치면 더해짐). 켜기: 다음 짐이 판정될 때까지 계속됩니다.",
 });
 
 /* ============ 設定 ============ */
@@ -128,10 +132,14 @@ function blastSound() {
   o.connect(g).connect(ac.destination); o.start(t); o.stop(t + .5);
 }
 function triggerBlast(now, it) {
-  const len = CATCH.blastMs;
-  const start = Math.max(catchState.blastUntil, now);
-  catchState.blastUntil = start + len;
-  catchState.blastLen = catchState.blastUntil - now;
+  if (core.settings.catchBlastNext) {                               // 「次の荷物まで」：次の荷物を判定するまで続く
+    catchState.blastUntil = Infinity; catchState.blastLen = Infinity;
+  } else {
+    const len = CATCH.blastMs;
+    const start = Math.max(catchState.blastUntil, now);
+    catchState.blastUntil = start + len;
+    catchState.blastLen = catchState.blastUntil - now;
+  }
   core.stats.blasts = (core.stats.blasts || 0) + 1;
   core.effects.push({ x:catchX(it.x), y:CATCH.lineY - 20, c:"#ffb000", t:performance.now(), kind:"perfect", seed:Math.random() * window.Trk.data.TAU });
   window.Trk.play.showToast(tr("blastToast")); blastSound();
@@ -185,6 +193,7 @@ function catchJudge(now) {
       window.Trk.play.judgeNote(n, "perfect", (k > 1 || dx <= CATCH.perfect * .5) ? 0 : null);
       if (k > 1) launchParcel(catchMap.xs[i], n.lane);
     } else window.Trk.play.judgeNote(n, "miss", null);
+    if (k > 1 && core.settings.catchBlastNext) { catchState.blastUntil = now; break; }   // 次の荷物（取った・落とした）で終わり。同じフレームの残りは次のフレームで通常どおり判定
     if (core.phase !== "playing") return;
   }
 }
@@ -239,7 +248,7 @@ function drawCatchTruck(x, y, p, blast, now) {
     core.ctx.globalCompositeOperation = "source-over"; core.ctx.globalAlpha = 1;
   }
   if (blast && !alwaysBlast()) {                                     // 残り時間のゲージ
-    const k = Math.max(0, Math.min(1, (catchState.blastUntil - now) / catchState.blastLen));
+    const k = isFinite(catchState.blastLen) ? Math.max(0, Math.min(1, (catchState.blastUntil - now) / catchState.blastLen)) : 1;
     window.Trk.play.rr(-60, -66, 120, 8, 4); core.ctx.fillStyle = "rgba(0,0,0,.5)"; core.ctx.fill();
     window.Trk.play.rr(-60, -66, 120 * k, 8, 4); core.ctx.fillStyle = "#ffb000"; core.ctx.fill();
   }
@@ -384,8 +393,16 @@ let syncCatchKeyUI = () => {};
   const bonusHint = core.el("div", "hint", tr("catchNitroBonusHint")); bonusHint.dataset.i18n = "catchNitroBonusHint";
   anchor.after(h3, rows, reset, status, hint, bonus, bonusHint);
   bonusInput.addEventListener("change", () => { core.settings.catchNitroBonus = bonusInput.checked; core.saveUserPrefs(); });
+  const nextLabel = core.el("label", "check");
+  const nextInput = document.createElement("input"); nextInput.type = "checkbox"; nextInput.id = "catchBlastNext"; nextInput.checked = core.settings.catchBlastNext;
+  const nextText = core.el("span", "", tr("catchBlastNext")); nextText.dataset.i18n = "catchBlastNext";
+  nextLabel.append(nextInput, nextText);
+  const nextHint = core.el("div", "hint", tr("catchBlastNextHint")); nextHint.dataset.i18n = "catchBlastNextHint";
+  bonusHint.after(nextLabel, nextHint);
+  nextInput.addEventListener("change", () => { core.settings.catchBlastNext = nextInput.checked; core.saveUserPrefs(); });
   syncCatchKeyUI = () => {
     bonusInput.checked = core.settings.catchNitroBonus;
+    nextInput.checked = core.settings.catchBlastNext;
     rows.textContent = "";
     ["catchLeft", "catchRight"].forEach((key, i) => {
       const row = core.el("div", "keyRow"), b = core.el("button", "", tr("assign"));

@@ -246,7 +246,20 @@ window.TrkStudyUtils = (() => {
     return `${kind}-${(hash >>> 0).toString(36)}`;
   }
 
+  /* CBZ／ZIP の中から、ページになる画像だけを選んで自然順に並べる（trk138）。
+     入力は zip-io の中央ディレクトリの項目（name・usize…）。Mac が付ける __MACOSX/ と「.」で始まる名前は除く。 */
+  const ARCHIVE_MIME = Object.freeze({ jpg:"image/jpeg", jpeg:"image/jpeg", png:"image/png", webp:"image/webp", gif:"image/gif", avif:"image/avif", bmp:"image/bmp" });
+  function archivePages(entries) {
+    return (Array.isArray(entries) ? entries : []).filter(entry => {
+      const name = String(entry && entry.name || "");
+      const parts = name.split("/").filter(Boolean);
+      if (!parts.length || parts.some(part => part === "__MACOSX" || part.startsWith("."))) return false;
+      return IMAGE_EXTS.has(extension(name));
+    }).sort((a, b) => comparePath(a.name, b.name));
+  }
+  function mimeOf(name) { return ARCHIVE_MIME[extension(name)] || "application/octet-stream"; }
+
   return Object.freeze({ IMAGE_EXTS, TEXT_EXTS, ROOT_ALBUM, MAX_MATCHES, extension, baseName, relativePath, isImageFile, isTextFile,
     comparePath, groupImageFiles, listTextFiles, decodeTextBuffer, normalizeText, aozoraSegments, findMatches, snippetAt, textStats,
-    bookSize, sortBooks, sortShelfItems, formatBytes, bookmarkedBooks, orderPages, stableId });
+    bookSize, sortBooks, sortShelfItems, formatBytes, bookmarkedBooks, orderPages, stableId, archivePages, mimeOf });
 })();

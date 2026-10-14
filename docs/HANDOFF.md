@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-14（trk137）**。現在の仕様・守る条件・未確認事項の要約です。細かな過去の作業履歴（trk123以前）と trk114〜118 の検証の詳細は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-14（trk138）**。現在の仕様・守る条件・未確認事項の要約です。細かな過去の作業履歴（trk123以前）と trk114〜118 の検証の詳細は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検。
 
@@ -63,6 +63,13 @@
   - 権利表記：©/℗ GRYPHLINE（Hypergryph）、レーベルは Metal Scar Radio（鐵痕電台）。配信・購入は二次利用許諾ではなく、公式二次創作ガイドラインは公式素材のそのままの複製・抽出を禁止します。
   - 未確認（断定しない）：6作の中国語公式曲名・公式告知のffm.to配信一覧（Homecoming を除く）・VGMdb照合・他ストアの曲別URL。照合別名は付けていません。「配信なし」とも書きません。trk128 で Talos Wiki（コミュニティ運営）から確認したキャラクター分類・発売日・3アルバムのSpotifyID（Ashen Remains 6aFenM2edcPyIfzg6ZtQnz／Maker's Luv 4ZZOkqQONyAFHzEG31Qss4／The Floaty Envelope 44qElu191kLQ5fit5fAQ6g・Blurring曲 0QqtGr91Q6JxiUW7sCukIg）は**公式ページでの再確認が未実施**＝台帳の「調査中の他の公式リリース」へ記録。
   - 台帳とfixture：[`ARKNIGHTS-ENDFIELD-MUSIC.md`](ARKNIGHTS-ENDFIELD-MUSIC.md)、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`。
+
+### 書斎のCBZ／ZIP（trk138）
+
+- 1ファイル＝1冊の画像の本。ページは `page:{id}:{generation}:{n}` のキーで保存し、置き換えは画像フォルダと同じ `studyWriteImageRecord` を使う。
+- 上限は書斎の画像と同じ（3000ページ・合計600MB・1ページ100MB）。上限の判定は取り込み前に行い、超えるファイルは作らない。
+- 既知の注意：画像フォルダの取り込みは、ページ数・合計の上限を取り込み時には確かめていない（読み込み時に3000ページで切るだけ）。CBZ側はそろえていないので、統一するかは次の候補。
+- 失敗の表示は、ファイルごとの文言が最後の集計（`Done: …`）で上書きされる。画像フォルダと同じ動き。
 
 ### 書斎の設定と画像キー（trk133〜135）
 
@@ -177,6 +184,7 @@
 
 ## 7. 最近の変更
 
+- **trk138（2026-10-14）**：**書斎のCBZ／ZIP取り込み**（📚 書斎の取り込み欄の「🗜 CBZ/ZIPを取り込む」）。1ファイル＝1冊（題名はファイル名）。中の画像（`jpg/jpeg/png/webp/gif/avif/bmp`）だけを自然順のページにし、`__MACOSX/` と「.」で始まる名前は除く（`study-room-utils.js` の `archivePages`）。保存は画像フォルダと同じ `pages` の Blob。ページごとに `zip-io` で1枚ずつ解凍し、CRC と大きさを確かめてから、40枚ずつバッチで保存する。取り込み前に、ページ数（3000）・合計（600MB）・1ページ（100MB）を確かめる（上限は「容量の上限を無視」で外れる）。壊れた・暗号化された・画像のないファイルは、そのファイルだけ失敗にして続行する。途中で失敗したときは、そのファイルのページを消す。置き換え・残す・中止は画像フォルダと同じ。画像の保存と置き換えの後片付けは `studyWriteImageRecord` に共通化した（フォルダ取り込みの挙動は変えていない）。検査：`tests/study-archive.test.mjs`（4件）。実ブラウザ（Chromium headless・`/tmp/pp/e2e-archive.cjs`）で、4ファイル同時の取り込み（正常・画像なし・壊れた・CRC不一致）→本1冊・3ページ・PNGとして復元できる・失敗3件の表示と「Done: 1 added · 0 kept · 3 failed」・再取り込みで置き換えを聞く・キャンセルで残る、を確認（ページエラー0）。`npm run check` 277 pass。
 - **trk137（2026-10-14）**：**まるごとバックアップ／復元**（設定の「💾 端末の保存」の下）。対象は設定・記録・プレイリスト・書斎（本・画像・栞・メモ）・カスタムパック。曲・VRM・MMDなどのメディアは既定で除外し、チェックで含められる（曲は参照のまま ZIP へ書き、読み取り専用）。形式は ZIP（`js/zip-io.js`：ZIP64・deflate・CRC・展開上限）。復元は確認ダイアログのあとに、既知のキーと型だけを書き戻す（`js/backup.js`）。**「容量の上限を無視」**（設定・既定オフ・保存は `settings.ignoreStorageLimits`）：アプリ側の上限（書斎の本棚500・1冊3000ページ・テキスト12MB、パックの合計と1件）を外す。ブラウザ側の割り当て（IndexedDB・保存の固定）は回避できないため、画面に明記。凍結防止のガードは残す。書斎の上限は `window.Trk.studyLimits`（読み取り専用）へ公開し、復元とパックで同じ判定を使う。検査：`tests/zip-io.test.mjs`（6）・`tests/backup-codec.test.mjs`（6）・`tests/storage-limits.test.mjs`（4）。実ブラウザ（Chromium headless）で、書き出し→外部 Python `zipfile` の検査（13エントリ・testzip OK）→全消去→復元（localStorage・本・Blob画像・曲・ライブラリ・パック）が戻ること、上限オフの3001ページは拒否（書き込みなし）・上限オンで復元、不正ファイルは拒否されることを確認（ページエラー0）。UI（作成ボタン・上限の切り替えの保存・ファイル選択→確認ダイアログ）も確認。**未確認**：実機（Android Chrome・Safari）での大きい書き出し、書斎の読み込み（UI経路）の上限の実機確認、復元時に途中で容量が尽きた場合の表示。**既知の注意**：localStorageの値は許可リストのキーだけを文字列のまま書き戻す。中身の型・範囲は Import の検証関数を通さず、各機能の読み込み側に任せている（Import と同じ検証へ寄せるかは次の候補として未決定）。
 - **trk136（2026-10-14）**：①外部レビュー（trk135）の**PageDown長押し**の指摘を反映。収まる画像（全画面フィット中を含む）では押しっぱなしでもページ送りへ戻し、止めるのは「端からの送りの着地待ち（`studyZoomLand`）」と「台紙の高さが0（描画中）」だけに。`check-study-room` に回帰2件（配線を含め `npm run check` 250 pass）。②**💾 端末の保存**（設定の新しい欄）：`navigator.storage.persist()` で保存の固定を求め、状態（固定済み／固定されていない／このブラウザでは確認できない）を表示。書斎の取り込み開始時・パックの取り込み成功時に静かに要求し、`?safe=1` では要求しない（表示のみ）。`tests/storage-persist.test.mjs` 7件。4言語・日英ガイド（`environment.md`）・`sw.js` cache名（trk136）を更新。③レビューの「製品の顔」のうち `meta description` と `og:description` は trk132・131 で既に同じ文面。残る `manifest.webmanifest` と README の音ゲー主語は trk131 の利用者判断どおり据え置き。
 - **実ブラウザ（trk136）**：Chromium 153 headless（`@sparticuz/chromium` を `/tmp` へ取得し、NSS／NSPR のスタブ共有ライブラリで起動）。`tools/smoke-browser.mjs --compare` は OK（boot 0・未解決0・譜面10件一致・decode error 0・click error 0・mobile/safe-offline OK）。設定の「💾 端末の保存」欄の表示と押下後の再描画を確認（ページエラー0）。

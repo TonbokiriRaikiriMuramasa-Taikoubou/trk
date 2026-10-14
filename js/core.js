@@ -342,6 +342,8 @@ const settings = {
   mediaWallStyle: pick(prefs.mediaWallStyle, ["midnight", "aurora", "paper", "custom"], "midnight"),
   mediaWallClock: prefs.mediaWallClock !== false,
   mediaWallStopsVideo: prefs.mediaWallStopsVideo !== false,
+  mediaResumeRewind: pick(prefs.mediaResumeRewind, [0, 3, 5, 10, 15, 30], 0),  // ⏪ スマート巻き戻し：再生再開時にN秒戻す（0=オフ。trk164）
+  mediaWakeLock: prefs.mediaWakeLock !== false,                                // 🔆 Wake Lock：動画再生中に画面を消灯させない（初期オン。trk164）
   /* ✨ フレーム補完（js/frame-interp.js）。既定はオフ（重いので） */
   frameInterp: pick(prefs.frameInterp, ["off", "blend", "flow"], "off"),
   frameInterpStrength: num(prefs.frameInterpStrength, 0, 1, .85)
@@ -415,7 +417,7 @@ function askFactoryReset(onYes, onNo) {
 }
 function resetVideoPrefs() {
   settings.videoStyle = "color";
-  settings.videoZoom = 1; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.castPolicy = "off"; settings.backgroundPolicy = "off"; settings.fxAntenna = false; settings.fxAntennaShape = "rod"; settings.fxAntennaCustomOn = ""; settings.fxAntennaCustomOff = ""; settings.mediaLoopTrigger = "toggle"; settings.mediaWallTrigger = "toggle"; settings.mediaWallStyle = "midnight"; settings.mediaWallClock = true; settings.mediaWallStopsVideo = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true;
+  settings.videoZoom = 1; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.castPolicy = "off"; settings.backgroundPolicy = "off"; settings.fxAntenna = false; settings.fxAntennaShape = "rod"; settings.fxAntennaCustomOn = ""; settings.fxAntennaCustomOff = ""; settings.mediaLoopTrigger = "toggle"; settings.mediaWallTrigger = "toggle"; settings.mediaWallStyle = "midnight"; settings.mediaWallClock = true; settings.mediaWallStopsVideo = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.mediaResumeRewind = 0; settings.mediaWakeLock = true;
   settings.bgDim = 0; settings.bgBlur = 0;
   /* ✨ TRKエフェクト（リッチ映像。js/tv-rich.js）の記憶も一緒に戻す */
   settings.tvRichId = "portrait_natural"; settings.tvRichPrev = ""; settings.tvRichCat = "portrait"; settings.tvRichOpen = true;   /* 初期状態に戻す＝欄は開いておく */
@@ -540,7 +542,7 @@ function resetAllPrefs() {
   settings.trkSortABC = false; settings.playlistOrder = []; settings.trkTabName = "full"; settings.chartGen = "2";
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
-  settings.catchNitroBonus = true; settings.catchBlastNext = false; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice();
+  settings.catchNitroBonus = true; settings.catchBlastNext = false; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.mediaResumeRewind = 0; settings.mediaWakeLock = true;
   settings.judge = "standard"; settings.rate = 1; settings.shortMode = "off"; settings.shortMode = "off";
   settings.hidden = false; settings.sudden = false; settings.modMirror = false; settings.modRandom = false; settings.showMasterDiff = false; settings.escNoReturn = false; settings.judgeOrdered = false;
   settings.mascot = "skin"; settings.vrmFrame = "full";

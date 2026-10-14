@@ -2308,12 +2308,49 @@ if (!read("js/main.js").includes("guideEggKind") ||
              !tv.includes('tvVideoMax:"') || !/top\.append\(pow, prevSongBtn, lcd, nextSongBtn, pauseBtn\)/.test(tv)) {
     fail("TV dock video-maximize key (right of the next-song key) is missing");
   } else if (!media.includes("maxNode = makeButton(\"mediaVideoMax\"") ||
-             !media.includes("controls.append(prev, playNode, next, reverseNode, maxNode, wallNode, restart)") ||
+             !media.includes("controls.append(prev, playNode, next, reverseNode, maxNode, pipNode, wallNode, restart)") ||
              !media.includes('mediaVideoMax:"')) {
     fail("media player full-screen button (right of reverse, wallpaper shifted right) is missing");
   } else {
     ok("full-screen video viewer is wired (TV dock ⛶ + media player, wallpaper stays one step right)");
   }
+}
+
+// trk164: ▶ メディアプレーヤーの🥇4点（📌画中画／🔆Wake Lock／⏪スマート巻き戻し／💤スリープ強化）
+// の配線が消えていないことを確認する。決定ロジック本体は tests/trk164-media-controls.test.mjs（実ソースをvmで実行）。
+{
+  const media = read("js/media-player-mode.js");
+  const core = read("js/core.js");
+  /* ⚠ read() は `core.X` を正規化したあとの本文を返す（js-source.mjs）＝`core.video` → `video`、
+     `core.settings` → `settings` になる。期待文字列は正規化後の綴りで書く（lane sway の検査と同じ慣習）。 */
+  const pipOk = media.includes("async function togglePip()") &&
+    media.includes("document.pictureInPictureEnabled") &&
+    media.includes('pipNode = makeButton("mediaPip", "mediaSmallBtn")') &&
+    media.includes('video.addEventListener("enterpictureinpicture"') &&
+    media.includes("document.exitPictureInPicture()") &&
+    (media.match(/mediaPip:"/g) || []).length >= 4;
+  const wakeOk = media.includes("async function updateWakeLock()") &&
+    media.includes('navigator.wakeLock.request("screen")') &&
+    media.includes("settings.mediaWakeLock !== false") &&
+    media.includes('wakePanel.id = "mediaWakePanel"') &&
+    (media.match(/mediaWakeLockTitle:"/g) || []).length >= 4 &&
+    core.includes("mediaWakeLock: prefs.mediaWakeLock !== false");
+  const rewindOk = media.includes("function resumeRewindSeconds(v)") &&
+    media.includes("function rewindResumePosition(p, seconds)") &&
+    (media.match(/savedMediaPosition\(\{ resume: true \}\)/g) || []).length >= 2 &&
+    media.includes("settings.mediaResumeRewind = resumeRewindSeconds(resumeNode.value)") &&
+    core.includes("mediaResumeRewind: pick(prefs.mediaResumeRewind, [0, 3, 5, 10, 15, 30], 0)") &&
+    (core.match(/settings\.mediaResumeRewind = 0/g) || []).length >= 2;
+  const sleepOk = media.includes("function planSleepFade(totalSeconds, fadeSeconds)") &&
+    media.includes("sleepTrackMode") &&
+    media.includes('o.value = "track"') &&
+    media.includes("restoreSleepFadeVolume()") &&
+    (media.match(/mediaSleepTrack:"/g) || []).length >= 4;
+  if (!pipOk) fail("trk164 📌 picture-in-picture wiring is missing (media-player-mode.js)");
+  else if (!wakeOk) fail("trk164 🔆 wake-lock wiring is missing (media-player-mode.js + core.js)");
+  else if (!rewindOk) fail("trk164 ⏪ resume-rewind wiring is missing (media-player-mode.js + core.js)");
+  else if (!sleepOk) fail("trk164 💤 sleep-timer upgrade wiring is missing (fade + end-of-track)");
+  else ok("trk164: media player 📌 PiP / 🔆 Wake Lock / ⏪ resume rewind / 💤 sleep (fade + end of track) are wired, in four languages");
 }
 
 // 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own

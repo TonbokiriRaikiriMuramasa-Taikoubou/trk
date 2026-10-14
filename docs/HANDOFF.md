@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-15（trk163）**。現在の仕様・守る条件・未確認事項の要約です。過去の変更履歴（trk154以前）と検証記録（trk158以前）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-15（trk164）**。現在の仕様・守る条件・未確認事項の要約です。過去の変更履歴（trk154以前）と検証記録（trk158以前）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検。
 
@@ -167,6 +167,7 @@
 | 13 | trk136（全画面フィットの PageDown 長押し、💾端末の保存） | 実機未確認 | PC・Android で確認 |
 | 14 | 曲名照合・ミカ音源／映像（trk155〜159） | Node/VM・合成WAVのヘッドレス検査済み。実曲・実動画・実機は未確認 | 実ファイルで照合・再生、配信ページの地域差を確認（購入・抽出を自動実行しない） |
 | 15 | ZIP作り手の互換性（trk163：Info-ZIP標準入力出力の受理、`flags`完全一致） | 実Info-ZIP 3.0出力（store・deflate・パイプ）とレビューでのPython zipfileはNode検査済み。Windowsのエクスプローラー／macOSの圧縮／スマホアプリのCBZは実機未確認 | 各で作ったCBZを実機で一度ずつ書斎に取り込んでみる。読めないCBZが出たら `flags` の食い違いを疑い、緩めるなら暗号化ビット（bit0）＋圧縮方式だけの比較にする（現時点では緩めていない） |
+| 16 | ▶ メディアプレーヤーの新機能（trk164：📌画中画・🔆Wake Lock・⏪スマート巻き戻し・💤スリープのフェードアウト＋この曲の終わり） | 純関数の決定（巻き戻しの計算・フェード計画・endedMediaの優先順・タイマーの掃除）はNode/VM検査済み。実機挙動は未確認 | Android Chrome／PCで📌画中画の継続と復帰、🔆動画再生中に画面が消えないこと（音声だけ・タブ裏では消えること）、⏪続き再生の戻し幅が実際的な不快感にならないか、💤フェード後に音量が戻った状態で次の再生が始まるかを確認。iOSはPiP／Wake Lockの対応差（SafariのPiPはvideo要素のみ可など）を見て非対応時のボタン無効＋案内が出ればよい |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -244,6 +245,8 @@
 過去の検証件数・個別E2E・旧ブラウザ環境の回避手順は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) の「trk158整理時に移した検証記録」へ移しました。上記が現在の結果です。利用者の実機確認済み事項と残る確認項目は§4を正とします。
 
 ## 7. 最近の変更
+
+- **trk164（2026-10-15）**：▶ メディアプレーヤーの強化第1弾。`docs/PLAYER-ROADMAP.md`（ユニバーサルプレーヤー調査の台帳）の🥇最優先4項目（#1〜#4）を実装。①**📌画中画（PiP）**：コントロール列の「全画面で表示」の右にボタンを追加。`document.pictureInPictureEnabled`＋`requestPictureInPicture` の実在だけを見て、非対応ブラウザでは無効化＋タイトルで理由を表示（案内は4言語）。enter/leaveイベントで表示状態を追従させ、プレーヤーを閉じるときは `exitPictureInPicture()` で浮き窓を一緒に終える。②**🔆 Screen Wake Lock**：「動画の再生中」だけ取得する（`hasVideoFrames()` があり、再生中で、タブが表で、設定オンのとき）。音声だけの再生では画面消灯を妨げない。renderMedia の250ms周期と visibilitychange 復帰で取得／解放を監視し、ブラウザ側解放（releaseイベント）にも追従、closeMedia で即解放。設定は 🎬 動画キー／壁紙パネルの隣に「🔆 画面を消灯させない」パネルを追加（`mediaWakeLock`、既定オン＝`!== false` 方式）。③**⏪スマート巻き戻し**：`mediaResumeRewind`（0/3/5/10/15/30秒、既定オフ＝プロジェクトのオプトイン慣習）。「続きから再生」の入口（プレーヤーを開いたとき・キューから曲を選んだとき）だけ保存位置からN秒戻す（`savedMediaPosition({resume:true})`）。一時停止からの再開では戻さない。あわせて openMedia の続き位置シークを「止まっている／終わっているときだけ」に変更（再生中の飛び防止）。④**💤スリープタイマー強化**：分数（15/30/60分）に「この曲の終わり」モードを追加（selectの `track` → `setSleep(-1)` → `sleepTrackMode`）。曲終わりで endedMedia がリピート／シャッフルより優先して、続き位置を消して停止する（手で別の曲を選ぶと解除）。分数モードは停止15秒前から音量をフェードアウト（`planSleepFade` が「フェードがタイマーに入りきるか」を判定。逆再生中は逆再生側の音量管理を尊重して触らない）、停止・解除時は設定音量へ戻す。設定登録は core.js サニタイザー（`mediaResumeRewind: pick(...)`・`mediaWakeLock: !== false`）＋ resetVideoPrefs／resetAllPrefs の両リセット。テストは `tests/trk164-media-controls.test.mjs`（13件）：実ソースから純関数（巻き戻しの計算・フェード計画・savedMediaPosition のガード・setSleep／stopSleepTimer のタイマー掃除・endedMedia の優先順）を vm で切り出して検証＋TEXT 4言語・core.js 登録・配線のsource-scan。新TEXTキー11個×4言語、日英ガイド（play.md／en.md）を更新し、`sw.js` cacheを`trk-v2026.10.15-trk164`へ。実機確認は§4-16に登録。
 
 - **trk163（2026-10-15）**：trk162のレビュー対応。①**【中・回帰】**Info-ZIPが標準入力から書いたZIP（パイプで作ったCBZ・パック）を丸ごと`zipBad`で拒否していた問題を修正（F-37）：ZIP64が不要でも置かれる終端レコード＋ロケーターを、ロケーターが正しく指し終端レコードの中身（ディスク番号・件数・中央目録の大きさ／位置）がEOCDと一致するときだけ中央目録の終わりとして受理。食い違いは従来どおり拒否＝二重解釈は引き続き塞いだまま。②**【低】**書斎ストアの復元を参照される側から（pages→covers→books→settings）に組み替え、途中失敗時に「存在しないページを指す本」が残らないように。③**【低】**固定上限（backupHardLimit）の案内に「作成時に書斎などの領域を外す／範囲を分ける」、パック導入失敗の内訳に「不要なパックを削除してからもう一度復元」の逃げ道を4言語で追記。④**【情報】**ZIP作り手互換性（エクスプローラー／macOS／スマホのCBZ、`flags`完全一致）の実機確認を§4-15に登録（`flags`は緩めていない）。`tools/check-security.mjs` に見張り2ルール追加（61 check）。日英ガイド・`docs/SECURITY.md`・この引継ぎを更新し、`sw.js` cacheを`trk-v2026.10.15-trk163`へ。自動検証は§6。
 

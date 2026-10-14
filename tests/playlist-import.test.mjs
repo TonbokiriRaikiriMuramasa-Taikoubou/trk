@@ -32,6 +32,16 @@ test("a loose match with a different size, or two candidates, is not taken", () 
   assert.equal(match({ title: "01 intro" }, [song("03 intro", 1), song("05 intro", 2)]), null, "two albums' intros stay unmatched");
 });
 
+test("classical typography fallback still requires a unique candidate and matching size", () => {
+  const title = "Symphony No.5 in Cm, Op.67 - I. Allegro con brio";
+  const local = song(title + ".mp3", 1234);
+  const shared = { title: "Symphony no. 5 in C minor, Op. 67 — I. Allegro con brio", size: 1234 };
+  assert.equal(match(shared, [local]), local);
+  assert.equal(match({ ...shared, size: 999 }, [local]), null);
+  assert.equal(match({ title: shared.title }, [local, song(title + ".flac", 5678)]), null);
+  assert.equal(match({ title: shared.title.replace("Op. 67", "Op. 68") }, [local]), null);
+});
+
 test("the import reads the file only after the size check", () => {
   const pick = between("function plImportPick()", "\n}\n");
   assert.ok(/PLAYLIST_IMPORT_MAX = 4 \* 1024 \* 1024/.test(library));
@@ -40,4 +50,12 @@ test("the import reads the file only after the size check", () => {
     const blocks = library.match(new RegExp(`Object\\.assign\\(TEXT\\.${lang}, \\{[\\s\\S]*?\\n\\}\\);`, "g")) || [];
     assert.ok(blocks.some(b => b.includes("plImportTooBig:")), `plImportTooBig in ${lang}`);
   }
+});
+
+test("catalog-only decoration fallback does not loosen shared playlist import", () => {
+  const decorated = song("🎧Theme 22 - Daily Routine 247 by Nor.m4a", 1234);
+  assert.equal(match({ title: "Daily Routine 247", size: 1234 }, [decorated]), null);
+  const hq = song("【高音質】Constant Moderato.m4a", 5678);
+  assert.equal(match({ title: "Constant Moderato", size: 5678 }, [hq]), null);
+  assert.equal(match({ title: hq.title, size: 5678 }, [hq]), hq, "exact decorated titles still work");
 });

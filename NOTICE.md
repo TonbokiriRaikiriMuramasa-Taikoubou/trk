@@ -196,6 +196,19 @@ GRYPHLINE's fan-content guidelines prohibit copying or extracting official
 assets and streaming or buying is not a reuse license — see
 https://endfield.gryphline.com/ja-jp/news/4497 and
 docs/ARKNIGHTS-ENDFIELD-MUSIC.md.
+Blue Archive’s Mika playlists include two official game PV links (bilibili, with
+the official TapTap announcement) and three Apple Music China audio links for
+“Do you wanna kiss angel” (℗ 2024 NEXON Games Co., Ltd.). No media is included.
+Availability is region-dependent; streaming/subscription access does not
+guarantee an importable local file or grant reuse rights. See
+docs/BLUEARCHIVE-MIKA-MUSIC.md for the source ledger and the distinction
+between official titles and trk’s organizational aliases.
+The Aria to the Star list adds two Apple Music UK audio links (Mika, CV. Kang
+Eunae; ℗ 2026 Quarter Music) and the full mini musical on the official Global
+YouTube channel. Japanese solo/ensemble songs link to Apple Music Japan;
+Let's Go With... also links to the official Japanese MV. Ensemble display
+credits retain every character name but omit the voice-actor parentheses.
+See docs/BLUEARCHIVE-MIKA-ARIA.md and docs/BLUEARCHIVE-MIKA-INDEX.md.
 Per the same principle, trk! never implies that any of these publishers
 officially distribute, endorse, or bundle anything with this app, and users
 are directed to obtain the music themselves from the linked official stores.

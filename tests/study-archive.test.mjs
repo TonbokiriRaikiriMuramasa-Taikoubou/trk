@@ -31,3 +31,22 @@ test("MIME follows the extension and falls back to octet-stream", () => {
   assert.equal(U.mimeOf("p.png"), "image/png");
   assert.equal(U.mimeOf("p.bin"), "application/octet-stream");
 });
+
+// vm の別の実行環境で作られた値は厳密比較で型が違うので、JSON にしてから比べる
+const problem = (...args) => JSON.parse(JSON.stringify(U.albumProblem(...args)));
+const LIM = { count: 3000, bytes: 600 * 1048576, file: 100 * 1048576 };
+test("album limits: at the limit is fine, over it is refused", () => {
+  assert.equal(problem([{ name: "a", size: 1 }], LIM), null);
+  assert.equal(problem(Array.from({ length: 3000 }, (_, i) => ({ name: "p" + i, size: 1 })), LIM), null);
+  assert.deepEqual(problem(Array.from({ length: 3001 }, (_, i) => ({ name: "p" + i, size: 1 })), LIM), { kind: "album" });
+  // 7 × 90MB = 630MB：1枚は100MB以内でも、合計が600MBを超える
+  assert.deepEqual(problem(Array.from({ length: 7 }, (_, i) => ({ name: "v" + i, size: 90 * 1048576 })), LIM), { kind: "album" });
+});
+test("one page over 100 MB is refused and named", () => {
+  assert.deepEqual(problem([{ name: "ok", size: 5 }, { name: "big.png", size: 100 * 1048576 + 1 }], LIM),
+    { kind: "file", name: "big.png", max: 100 * 1048576 });
+});
+test("with the limit ignored (Infinity) nothing is refused", () => {
+  const off = { count: Infinity, bytes: Infinity, file: Infinity };
+  assert.equal(problem(Array.from({ length: 3500 }, (_, i) => ({ name: "p" + i, size: 500 * 1048576 })), off), null);
+});

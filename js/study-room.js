@@ -13,6 +13,7 @@ Object.assign(TEXT.ja, {
   studyClose:"✕ 書斎を閉じる", studyImportImages:"🖼 画像フォルダを取り込む",
   studyImportTextFiles:"＋ テキストを追加", studyImportTextFolder:"📄 テキストフォルダを取り込む",
   studyImportArchives:"🗜 CBZ/ZIPを取り込む", studyArchiveBad:"「{name}」は読み込めませんでした（壊れているか、暗号化されています）。", studyArchiveNoImages:"「{name}」の中に対応画像がありません。",
+  studyImportWithNote:"{summary}（{note}）",
   studyShelf:"本棚", studySearch:"タイトル・フォルダを検索…", studyShelfEmpty:"本棚は空です。画像フォルダか TXT / MD / JSON を取り込んでください。",
   studyWelcomeTitle:"読みたいものを選ぶ", studyWelcomeHint:"画像はフォルダ単位、テキストはファイルごとにこの端末内へ保存します。外へアップロードしません。",
   studyWelcomeHelp:"操作が分からなくなったら、右上の「❓ キーの説明」を開いてください。",
@@ -138,6 +139,7 @@ Object.assign(TEXT.en, {
   studyClose:"✕ Close Study", studyImportImages:"🖼 Import image folder", studyImportTextFiles:"＋ Add text files",
   studyImportTextFolder:"📄 Import text folder", studyShelf:"Bookshelf", studySearch:"Search titles and folders…",
   studyImportArchives:"🗜 Import CBZ/ZIP", studyArchiveBad:"“{name}” could not be read (it may be damaged or encrypted).", studyArchiveNoImages:"No supported images were found in “{name}”.",
+  studyImportWithNote:"{summary} ({note})",
   studyShelfEmpty:"Your shelf is empty. Import an image folder or TXT / MD / JSON files.",
   studyWelcomeTitle:"Choose something to read", studyWelcomeHint:"Images are saved by folder and text files individually on this device. Nothing is uploaded.",
   studyWelcomeHelp:"If you get lost, open “❓ Shortcuts” at the top right.",
@@ -260,6 +262,7 @@ Object.assign(TEXT.zh, {
   studyClose:"✕ 关闭书斋", studyImportImages:"🖼 导入图片文件夹", studyImportTextFiles:"＋ 添加文本文件",
   studyImportTextFolder:"📄 导入文本文件夹", studyShelf:"书架", studySearch:"搜索标题或文件夹…",
   studyImportArchives:"🗜 导入 CBZ/ZIP", studyArchiveBad:"无法读取“{name}”（可能已损坏或已加密）。", studyArchiveNoImages:"“{name}”中没有受支持的图片。",
+  studyImportWithNote:"{summary}（{note}）",
   studyShelfEmpty:"书架为空。请导入图片文件夹或 TXT / MD / JSON。",
   studyWelcomeTitle:"选择要阅读的内容", studyWelcomeHint:"图片按文件夹、文本按文件分别保存在本设备中，不会上传。",
   studyWelcomeHelp:"如果忘记操作，请打开右上角的「❓ 按键说明」。",
@@ -372,6 +375,7 @@ Object.assign(TEXT.ko, {
   studyClose:"✕ 서재 닫기", studyImportImages:"🖼 이미지 폴더 가져오기", studyImportTextFiles:"＋ 텍스트 파일 추가",
   studyImportTextFolder:"📄 텍스트 폴더 가져오기", studyShelf:"책장", studySearch:"제목·폴더 검색…",
   studyImportArchives:"🗜 CBZ/ZIP 가져오기", studyArchiveBad:"“{name}”을(를) 읽을 수 없습니다 (손상되었거나 암호화되었을 수 있습니다).", studyArchiveNoImages:"“{name}”에서 지원되는 이미지를 찾지 못했습니다.",
+  studyImportWithNote:"{summary} ({note})",
   studyShelfEmpty:"책장이 비어 있습니다. 이미지 폴더 또는 TXT / MD / JSON을 가져오세요.",
   studyWelcomeTitle:"읽을 항목을 선택하세요", studyWelcomeHint:"이미지는 폴더별로, 텍스트는 파일별로 이 기기에 저장합니다. 업로드하지 않습니다.",
   studyWelcomeHelp:"조작이 헷갈리면 오른쪽 위의 「❓ 키 설명」을 열어 보세요.",
@@ -1399,18 +1403,43 @@ async function studyImportImageGroup(group, id, position, total) {
     return "error";
   }
 }
+/* アルバム（1冊）の上限（trk139）。画像フォルダと CBZ/ZIP で同じ判定。「容量の上限を無視」で外れる。 */
+function studyAlbumLimits() {
+  return { count:studyCap(STUDY_IMAGE_MAX_COUNT), bytes:studyCap(STUDY_IMAGE_MAX_BYTES), file:studyCap(STUDY_IMAGE_FILE_MAX) };
+}
+/* 上限で止めた理由の文言（{key, vars}）。取り込みの開始で状態欄が消えるため、集計のあとに出す。 */
+function studyAlbumMessage(problem) {
+  if (problem.kind === "file") return { key:"studyFileTooBig", vars:{ name:problem.name, mb:Math.round(problem.max / 1048576) } };
+  return { key:"studyTooMany", vars:{ max:STUDY_IMAGE_MAX_COUNT, mb:Math.round(STUDY_IMAGE_MAX_BYTES / 1048576) } };
+}
+/* 止めた理由を状態欄に出す。1冊も入らなかったときは最初の理由だけ。途中まで入ったときは、集計に理由を添える（trk139）。 */
+function studyShowNotes(notes) {
+  if (!notes.length) return;
+  const st = studyImportState;
+  if (!st.added && !st.kept) { studySetStatus(notes[0].key, notes[0].vars); return; }
+  const note = notes.slice(0, 2).map(item => tr(item.key, item.vars)).join(" / ") + (notes.length > 2 ? " …" : "");
+  studySetStatus("studyImportWithNote", { summary:tr("studyImportSummary", { added:st.added, kept:st.kept, failed:st.failed }), note });
+}
 async function studyImportImages(files) {
   if (studySafeMode()) { studyNotify("studySafeMode"); return; }
   if (studyImportState.active) return;
   const groups = STUDY_UTIL.groupImageFiles(files, studyPrefs.albumNesting);
   if (!groups.length) { studyNotify("studyNoImageFiles"); return; }
-  const tasks = groups.map(group => ({ group, id:STUDY_UTIL.stableId("image", group.sourcePath) }));
+  const limits = studyAlbumLimits(), accepted = [], notes = [];
+  let rejected = 0;
+  for (const group of groups) {
+    const problem = STUDY_UTIL.albumProblem(group.files.map(item => ({ name:item.file.name || item.path, size:item.file.size })), limits);
+    if (problem) { notes.push(studyAlbumMessage(problem)); rejected++; continue; }
+    accepted.push(group);
+  }
+  const tasks = accepted.map(group => ({ group, id:STUDY_UTIL.stableId("image", group.sourcePath) }));
   const known = new Set(studyBooks.map(book => book.id));
   const replaceCount = tasks.filter(task => known.has(task.id)).length;
   const replace = !replaceCount || confirm(tr("studyImportAsk", { count:replaceCount }));
-  const total = groups.reduce((sum, group) => sum + group.files.length, 0);
+  const total = tasks.reduce((sum, task) => sum + task.group.files.length, 0);
   let position = 0, lastId = "";
   studyImportStart(total);
+  studyImportState.failed += rejected;
   try {
     for (const task of tasks) {
       if (studyImportState.cancelled) break;
@@ -1429,6 +1458,7 @@ async function studyImportImages(files) {
   if (cancelled) { const added = studyImportState.added; studyImportEnd("studyImportCancelled", { n:added }); }
   else await studyImportSummary();
   if (lastId && !cancelled) { const newest = studyBooks.find(book => book.id === lastId); if (newest) studyOpenBook(newest); }
+  if (!cancelled) studyShowNotes(notes);   /* 本を開くと状態欄が消えるので、開いたあとに出す */
 }
 /* CBZ／ZIP（trk138）。1ファイル＝1冊。中の画像を自然順のページにし、1枚ずつ解凍して CRC を確かめ、バッチで保存する。 */
 async function studyImportArchiveBook(job, position, total) {
@@ -1468,21 +1498,20 @@ async function studyImportArchives(files) {
   if (studySafeMode()) { studyNotify("studySafeMode"); return; }
   if (studyImportState.active) return;
   const zipIO = window.Trk.zipIO;
-  const jobs = [];
+  const jobs = [], notes = [];
   let listFailed = 0;
-  const sizeMax = studyCap(STUDY_IMAGE_MAX_BYTES), countMax = studyCap(STUDY_IMAGE_MAX_COUNT);
+  const limits = studyAlbumLimits();
   for (const file of files) {
     try {
-      if (file.size > sizeMax) { studySetStatus("studyTooMany", { max:STUDY_IMAGE_MAX_COUNT, mb:Math.round(STUDY_IMAGE_MAX_BYTES / 1048576) }); listFailed++; continue; }
       const zip = await zipIO.zipOpen(file);
       const pages = STUDY_UTIL.archivePages(zip.entries);
-      if (!pages.length) { studySetStatus("studyArchiveNoImages", { name:file.name }); listFailed++; continue; }
-      const bytes = pages.reduce((sum, entry) => sum + entry.usize, 0);
-      if (pages.length > countMax || bytes > sizeMax) { studySetStatus("studyTooMany", { max:STUDY_IMAGE_MAX_COUNT, mb:Math.round(STUDY_IMAGE_MAX_BYTES / 1048576) }); listFailed++; continue; }
+      if (!pages.length) { notes.push({ key:"studyArchiveNoImages", vars:{ name:file.name } }); listFailed++; continue; }
+      const problem = STUDY_UTIL.albumProblem(pages.map(entry => ({ name:entry.name, size:entry.usize })), limits);
+      if (problem) { notes.push(studyAlbumMessage(problem)); listFailed++; continue; }
       jobs.push({ file, zip, pages, id:STUDY_UTIL.stableId("archive", file.name) });
     } catch (error) {
-      if (error instanceof zipIO.ZipIOError) studySetStatus("studyArchiveBad", { name:file.name });
-      else studyFail(error);
+      if (error instanceof zipIO.ZipIOError) notes.push({ key:"studyArchiveBad", vars:{ name:file.name } });
+      else { console.error(error); notes.push({ key:"studyStorageError" }); }
       listFailed++;
     }
   }
@@ -1512,6 +1541,7 @@ async function studyImportArchives(files) {
   if (cancelled) { const added = studyImportState.added; studyImportEnd("studyImportCancelled", { n:added }); }
   else await studyImportSummary();
   if (lastId && !cancelled) { const newest = studyBooks.find(book => book.id === lastId); if (newest) studyOpenBook(newest); }
+  if (!cancelled) studyShowNotes(notes);   /* 本を開くと状態欄が消えるので、開いたあとに出す */
 }
 async function studyImportTextEntry(entry, id, position, total) {
   const file = entry.file, size = Number(file.size) || 0;

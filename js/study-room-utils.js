@@ -258,8 +258,22 @@ window.TrkStudyUtils = (() => {
     }).sort((a, b) => comparePath(a.name, b.name));
   }
   function mimeOf(name) { return ARCHIVE_MIME[extension(name)] || "application/octet-stream"; }
+  /* 1冊（アルバム）の上限を確かめる（trk139）。画像フォルダと CBZ/ZIP で共用。
+     entries は { name, size }（size は1ページの大きさ）、limits は { count, bytes, file }（Infinity で無制限）。
+     問題が無ければ null。1枚が file を超えれば { kind:"file", name, max }、枚数か合計が超えれば { kind:"album" }。 */
+  function albumProblem(entries, limits) {
+    const list = Array.isArray(entries) ? entries : [], L = limits || {};
+    let bytes = 0;
+    for (const entry of list) {
+      const size = Math.max(0, Number(entry && entry.size) || 0);
+      if (size > L.file) return { kind:"file", name:String(entry.name || ""), max:L.file };
+      bytes += size;
+    }
+    if (list.length > L.count || bytes > L.bytes) return { kind:"album" };
+    return null;
+  }
 
   return Object.freeze({ IMAGE_EXTS, TEXT_EXTS, ROOT_ALBUM, MAX_MATCHES, extension, baseName, relativePath, isImageFile, isTextFile,
     comparePath, groupImageFiles, listTextFiles, decodeTextBuffer, normalizeText, aozoraSegments, findMatches, snippetAt, textStats,
-    bookSize, sortBooks, sortShelfItems, formatBytes, bookmarkedBooks, orderPages, stableId, archivePages, mimeOf });
+    bookSize, sortBooks, sortShelfItems, formatBytes, bookmarkedBooks, orderPages, stableId, archivePages, mimeOf, albumProblem });
 })();

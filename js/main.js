@@ -63,18 +63,7 @@ function syncTutorialUI() {
 }
 function maybeAddTrkPlaylist() {
   try {
-    if (window.TrkEnsureTrkPlaylist && core.settings.tutorialDone) {
-      const created = window.TrkEnsureTrkPlaylist({ toast: true, go: false });
-      if (created) {
-        setTimeout(function(){ try { if (window.TrkTrkPlaylistId && typeof renderLib === "function") { core.settings.libTab = "pl:" + window.TrkTrkPlaylistId; core.saveUserPrefs(); window.Trk.library.renderLib(); } } catch(_){} }, 900);
-      }
-    }
-    if (window.TrkEnsureTrkClassicPlaylist && core.settings.tutorialDone) {
-      const createdC = window.TrkEnsureTrkClassicPlaylist({ toast: true, go: false });
-      if (createdC) {
-        setTimeout(function(){ try { if (window.TrkClassicId && typeof renderLib === "function") { core.settings.libTab = "pl:" + window.TrkClassicId; core.saveUserPrefs(); window.Trk.library.renderLib(); } } catch(_){} }, 1300);
-      }
-    }
+    /* Game Vol.1・Classic Vol.1 は、チュートリアル完了時に自動では作らない（trk150）。手動の作成・♻ の戻しで作る */
     if (window.ensureTrkDistributionPlaylists && core.settings.tutorialDone) {
       try { window.ensureTrkDistributionPlaylists(); } catch(_){}
     }

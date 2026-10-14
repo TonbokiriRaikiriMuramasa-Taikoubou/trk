@@ -1315,6 +1315,9 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
 .plTrkRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .plTrkRow>span{flex:1;min-width:120px}
 .plTrkGroup{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.plTrkHeadL{display:flex;gap:8px;align-items:center;min-width:0}
+.plTrkToggle{min-width:2.4em}
+.plTrkBody{display:flex;flex-direction:column;gap:6px;margin-top:6px}
 /* 📤 共有プレイリスト（ビューア） */
 .plShareComment{font-size:13.5px;color:var(--ui-text);line-height:1.5}
 .plShareSrc{display:flex;flex-direction:column;gap:6px;align-items:flex-start}

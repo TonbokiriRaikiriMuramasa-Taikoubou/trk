@@ -1254,6 +1254,8 @@ function trkClassicWishesFromCatalog() {
   }
   return out;
 }
+/* チュートリアル完了時に Game Vol.1／Classic Vol.1 を自動で作るか。false＝作らない（手動の作成・♻ の戻しは使える） */
+const TRK_AUTO_GAME_CLASSIC = false;
 function ensureTrkPlaylist(opts) {
   const o = opts || {};
   const doToast = o.toast !== false;
@@ -1896,33 +1898,49 @@ function plTrkMenu() {
     row.append(open, up, down, gear);
     return row;
   };
-  const groupHead = f => {
+  /* 📂 フォルダの開閉（このダイアログの中だけ）。▸ で中の Vol を並べ、▾ で畳む。「フォルダを開く」は棚をそのまま開く */
+  const openSet = new Set();
+  const groupHead = (f, isOpen) => {
     const head = el("div", "plTrkGroup");
-    head.append(el("b", "plCardTitle", (f.icon || "📁") + " " + f.name));
-    if (f.id !== TRK_FOLDER_ID) {   /* サブフォルダ（Classic／Blue Archive など）は、その棚を開ける */
+    const left = el("div", "plTrkHeadL");
+    if (f.id !== TRK_FOLDER_ID) {   /* サブフォルダ（Classic／Blue Archive など）は開閉できる */
+      const tg = el("button", "plBtn small plTrkToggle", isOpen ? "▾" : "▸"); tg.type = "button";
+      tg.setAttribute("aria-expanded", String(isOpen)); tg.setAttribute("aria-label", (f.name || "") + (isOpen ? " ▾" : " ▸"));
+      tg.addEventListener("click", () => { if (openSet.has(f.id)) openSet.delete(f.id); else openSet.add(f.id); paint(); });
+      left.append(tg);
+    }
+    left.append(el("b", "plCardTitle", (f.icon || "📁") + " " + (f.id === TRK_FOLDER_ID ? (trkTabLabel() || tr("trkTabNameFull")) : f.name)));
+    head.append(left);
+    if (f.id !== TRK_FOLDER_ID) {
       const fo = el("button", "plBtn small", tr("trkMenuOpenFolder")); fo.type = "button";
       fo.addEventListener("click", () => { d.close(); core.settings.libTab = "fld:" + f.id; core.saveUserPrefs(); renderLib(); });
       head.append(fo);
     }
     return head;
   };
+  /* 開いたフォルダ：中の Vol を並べ、さらに下の棚（一段深い）も同じ開閉で続く */
+  const folderBlock = (f, depth) => {
+    const wrap = el("div", "plTrkBlock");
+    const isOpen = openSet.has(f.id);
+    wrap.append(el("div", "plSep"), groupHead(f, isOpen));
+    if (!isOpen) return wrap;
+    const body = el("div", "plTrkBody");
+    if (depth) body.style.marginLeft = (depth * 14) + "px";
+    trkOrderedPlaylists(core.settings.playlists.filter(p => plVisible(p) && p.folder === f.id)).forEach((p, i, list) => body.append(rowOf(p, i, list)));
+    for (const g of core.settings.plFolders.filter(x => x.parent === f.id)) body.append(folderBlock(g, depth + 1));
+    wrap.append(body);
+    return wrap;
+  };
   const paint = () => {
     listBox.replaceChildren();
     const direct = core.settings.playlists.filter(p => plVisible(p) && p.folder === TRK_FOLDER_ID);
     const subs = core.settings.plFolders.filter(f => f.parent === TRK_FOLDER_ID);
     if (!direct.length && !subs.length) { listBox.append(el("div", "plHint", tr("trkOrderEmpty"))); return; }
-    if (direct.length) {
-      listBox.append(groupHead({ id: TRK_FOLDER_ID, icon: TRK_TAB_ICON, name: trkTabLabel() || tr("trkTabNameFull") }));
+    if (direct.length) {   /* 🐔 直下の Vol（Agent など）は、いつも並べる */
+      listBox.append(groupHead({ id: TRK_FOLDER_ID }, true));
       trkOrderedPlaylists(direct).forEach((p, i, list) => listBox.append(rowOf(p, i, list)));
     }
-    for (const f of subs) {   /* 🎻 Classic など。中の Vol を並べる */
-      listBox.append(el("div", "plSep"), groupHead(f));
-      trkOrderedPlaylists(core.settings.playlists.filter(p => plVisible(p) && p.folder === f.id)).forEach((p, i, list) => listBox.append(rowOf(p, i, list)));
-      for (const g of core.settings.plFolders.filter(x => x.parent === f.id)) {   /* 🎭 一段深い棚（trk-endfield-character 等） */
-        listBox.append(el("div", "plSep"), groupHead(g));
-        trkOrderedPlaylists(core.settings.playlists.filter(p => plVisible(p) && p.folder === g.id)).forEach((p, i, list) => listBox.append(rowOf(p, i, list)));
-      }
-    }
+    for (const f of subs) listBox.append(folderBlock(f, 0));   /* 🎻 Classic・🎮 Blue Archive… は ▸ で開く */
     if (core.settings.trkSortABC) listBox.append(el("div", "plHint", tr("trkOrderAbcOff")));
   };
   d.card.append(listBox);
@@ -3875,11 +3893,11 @@ async function initLibrary() {
   }
   syncShareUI();
   // 🐔 trk's playlist — チュートリアル済みなら初回だけ自動で1タブ追加（設定で非表示なら作らない・トーストなし）
-  if (core.settings.tutorialDone && core.settings.trkPlaylist !== false) {
+  if (TRK_AUTO_GAME_CLASSIC && core.settings.tutorialDone && core.settings.trkPlaylist !== false) {
     try { ensureTrkPlaylist({ toast: false }); } catch(_){}
   }
   // 🎻 trk classic — 同上。ゲームとは別枠で100曲。設定で非表示なら作らない
-  if (core.settings.tutorialDone && core.settings.trkClassic !== false) {
+  if (TRK_AUTO_GAME_CLASSIC && core.settings.tutorialDone && core.settings.trkClassic !== false) {
     try { ensureTrkClassicPlaylist({ toast: false }); } catch(_){}
   }
   // 🎓 trk's OST Vol.1 — オリジナル曲＋デモ曲のリスト（一番下・中クリックで消せる）

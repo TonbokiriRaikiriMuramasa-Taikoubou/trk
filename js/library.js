@@ -159,7 +159,13 @@ const AGENT_OST_DIR = "./assets/trk-ost/";
 const AGENT_OST_MAX_BYTES = 4 * 1024 * 1024;   /* 1曲 約0.9〜1MB。上限は余裕を見た値 */
 const AGENT_OST_KEY_PREFIX = "builtin:trk-agent-ost:";
 const agentOstUrls = new Map();                 /* key → 音源の URL */
+/* 古い名前（Orig.）で保存されていても、起動時に正しい名前へ直す（音源の有無に関係なく） */
+function renameAgentOstPlaylist() {
+  const p = core.settings.playlists.find(x => x.id === AGENT_OST_ID || x.cat === AGENT_OST_CAT);
+  if (p && p.name !== AGENT_OST_NAME) { p.name = AGENT_OST_NAME; core.saveUserPrefs(); }
+}
 async function initAgentOstTracks() {
+  try { renameAgentOstPlaylist(); } catch (_) {}
   try {
     const response = await fetch(AGENT_OST_DIR + "manifest.json", { credentials:"same-origin" });
     if (!response.ok) return;

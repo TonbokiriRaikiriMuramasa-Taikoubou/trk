@@ -7,7 +7,7 @@
  *
  * 見ること：
  *   1. ようこそ：初回に出る → 閉じる → 緊急復旧の「ようこそをもう一度」で再び出る
- *   2. trk Agent's Original Vol.1：assets/trk-ost/manifest.json があれば、10曲が曲一覧に入り、
+ *   2. trk Agent's OST Vol.1：assets/trk-ost/manifest.json があれば、10曲はこのプレイリストの中だけに出て、
  *      プレイリストが作られ、02番を選ぶと音源の読み込みと解析まで進む（無ければ飛ばす）
  *   3. 書斎：CBZ（3ページ）と ZIP（2ページ）を取り込むと、2冊・5ページになる
  *   4. CATCH の設定：「次の荷物まで」のチェックがある
@@ -93,7 +93,7 @@ try {
   await page.evaluate(() => document.getElementById("welcomeCloseBtn").click());
   check("welcome", firstShown && closed && replayed, { firstShown, closed, replayed });
 
-  // 2. trk Agent's Original Vol.1（音源があるときだけ）
+  // 2. trk Agent's OST Vol.1（音源があるときだけ）
   const manifestPath = path.join(ROOT, "assets/trk-ost/manifest.json");
   if (fs.existsSync(manifestPath)) {
     const playlists = await page.evaluate(() => (window.Trk.core.settings.playlists || []).map(p => ({ id: p.id, name: p.name, songs: p.songs.length })));

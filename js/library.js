@@ -149,12 +149,12 @@ async function initOptionalTutorialDemo() {
     renderLib();
   } catch (_) { /* no manifest = intentional lightweight build or an offline optional asset */ }
 }
-/* 🎼 trk Agent's Original Vol.1 — 手続き生成の10曲（tools/make-trk-ost.mjs）。
+/* 🎼 trk Agent's OST Vol.1 — 手続き生成の10曲（tools/make-trk-ost.mjs）。
    音源とマニフェストは assets/trk-ost/（Git外）。マニフェストが無ければ曲もプレイリストも作らない。
    音源は選んだときに読む（materializeAgentOst）。消したら trkRemoved に印が残る（🐔 の ♻ で戻せる）。 */
 const AGENT_OST_ID = "trk-agent-ost-v1";
 const AGENT_OST_CAT = "trk:agent-ost";
-const AGENT_OST_NAME = "trk Agent's Orig. Vol.1";   /* 名前は24文字まで（plSanitize）。正式名は "trk Agent's Original Vol.1" */
+const AGENT_OST_NAME = "trk Agent's OST Vol.1";   /* 名前は24文字まで（plSanitize） */
 const AGENT_OST_DIR = "./assets/trk-ost/";
 const AGENT_OST_MAX_BYTES = 4 * 1024 * 1024;   /* 1曲 約0.9〜1MB。上限は余裕を見た値 */
 const AGENT_OST_KEY_PREFIX = "builtin:trk-agent-ost:";
@@ -169,18 +169,22 @@ async function initAgentOstTracks() {
       .map(t => {
         const key = AGENT_OST_KEY_PREFIX + t.key, title = String(t.title || t.key).trim().slice(0, 120) || t.key;
         agentOstUrls.set(key, AGENT_OST_DIR + t.file);
-        return { key, source:"builtin", file:null, fileName:t.file, title, base:title, artist:"trk Agent", size:0, bpm:0, offset:0, charter:"", license:"" };
+        return { key, source:"builtin", file:null, fileName:t.file, title, base:title, artist:"trk Agent", size:0, bpm:0, offset:0, charter:"", license:"", trkOnly:AGENT_OST_ID };
       });
     if (!songs.length) return;
     builtInSongs = [...builtInSongs.filter(song => !song.key.startsWith(AGENT_OST_KEY_PREFIX)), ...songs];
+    ensureAgentOstPlaylist(songs.map(song => song.key));   /* フォルダ（🐔）を先に作る。描き直しは後 */
     renderLib();
-    ensureAgentOstPlaylist(songs.map(song => song.key));
   } catch (_) { /* 無ければ何もしない（音源は Git の外にある） */ }
 }
 function ensureAgentOstPlaylist(keys) {
-  if (core.settings.playlists.some(p => p.id === AGENT_OST_ID)) return false;
-  if (trkIsRemoved(AGENT_OST_ID)) return false;
   ensureTrkFolder();
+  const exist = core.settings.playlists.find(p => p.id === AGENT_OST_ID);
+  if (exist) {
+    if (exist.cat === AGENT_OST_CAT && exist.name !== AGENT_OST_NAME) { exist.name = AGENT_OST_NAME; core.saveUserPrefs(); }
+    return false;
+  }
+  if (trkIsRemoved(AGENT_OST_ID)) return false;
   const p = plSanitize({ id:AGENT_OST_ID, name:AGENT_OST_NAME, icon:"\uD83C\uDFBC", color:"none",
     folder:TRK_FOLDER_ID, tags:["trk", "OST", "Agent"], wish:[], songs:keys.slice(), cat:AGENT_OST_CAT, createdAt:Date.now() });
   if (!p) return false;
@@ -849,7 +853,7 @@ function libFavKeys(all) {
 }
 /* タブの一覧（順番：すべて → ⭐お気に入り → プレイリスト → パック／アドオン／フォルダー → デモ曲 → 追加した曲 → 公認） */
 function libTabsOf(all) {
-  const tabs = [{ id:"all", icon:"📚", label:tr("libTabAll"), n:all.length }];
+  const tabs = [{ id:"all", icon:"📚", label:tr("libTabAll"), n:all.filter(x => !x.trkOnly).length }];
   const favN = libFavKeys(all).n;
   if (favN) tabs.push({ id:"fav", icon:"⭐", label:tr("favTab"), n:favN });
   const plKeys = new Set(all.map(x => x.key));
@@ -925,6 +929,7 @@ function libTabsOf(all) {
   return tabs;
 }
 function libTabMatch(it, id) {
+  if (it.trkOnly && id !== "pl:" + it.trkOnly) return false;   /* 🎼 trk Agent's OST：その Vol を開いたときだけ */
   if (!id || id === "all") return true;
   if (id === "fav") { const F = window.TrkFavs; return !!(F && F.inGroup("song", F.activeOf("song"), it.key)); }
   if (id.startsWith("pl:")) { const p = plById(id.slice(3)); return !!p && p.songs.includes(it.key); }
@@ -2566,6 +2571,7 @@ function renderLibTabs(tabs) {
     b.append(el("span", "libTabIcon", t.icon), el("span", "libTabName", t.label), el("i", "libTabN", String(t.n)));
     b.addEventListener("click", () => {
       if (plSuppressClick()) return;
+      if (t.trk) { plTrkMenu(); return; }   /* 🐔：階層（Vol 一覧）を開く。選んだ Vol は、その中で開く */
       if (core.settings.libTab === t.id) return;
       core.settings.libTab = t.id; core.saveUserPrefs(); renderLib();
     });
@@ -2756,7 +2762,8 @@ function renderLib() {
   const box = core.$("libList"); box.textContent = "";
   const all = allSongs();
   libAllKeys = new Set(all.map(x => x.key));
-  core.$("libCount").textContent = all.length ? tr("libCount", { n:all.length }) : "";
+  const shownN = all.filter(x => !x.trkOnly).length;   /* プレイリストの中だけの曲は数えない */
+  core.$("libCount").textContent = shownN ? tr("libCount", { n:shownN }) : "";
   const byTitle = new Map();   /* 🛒 カタログ照合用（曲名の照合キー → 曲のリスト） */
   const byTitleAdd = (k, it) => { const a = byTitle.get(k); if (a) { if (!a.includes(it)) a.push(it); } else byTitle.set(k, [it]); };
   for (const it of all) {

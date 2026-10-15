@@ -2390,6 +2390,40 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else ok("trk165: 📥 share_target + file_handlers merge into the existing import paths (no new validation entry), in four languages");
 }
 
+// trk166: 🎤 歌詞（LRC＋埋め込み歌詞）。読み取り専用＝元ファイルへの書き戻し経路が無く、外へも送らない。
+{
+  const html = read("index.html");
+  const art = read("js/audio-art.js");
+  const lyrics = read("js/lyrics.js");
+  const player = read("js/media-player-mode.js");
+  const library = read("js/library.js");
+  const core = read("js/core.js");
+  const css = read("css/style.css");
+  const sw = read("sw.js");
+  const lyricsTag = '<script src="js/lyrics.js"></script>';
+  /* ⚠ read("js/…") は `window.Trk.lyrics.` などの接頭辞を落として返す（先頭の trk165 ブロックの注意と同じ） */
+  if (!html.includes(lyricsTag) || html.indexOf(lyricsTag) < html.indexOf('<script src="js/audio-art.js"></script>') ||
+      html.indexOf(lyricsTag) > html.indexOf('<script src="js/library.js"></script>')) fail("js/lyrics.js must load right after js/audio-art.js (before library.js / media-player-mode.js)");
+  else if (!art.includes("extract, extractLyrics, thumbnail") || !art.includes("lyricsBytes:MAX_LYRICS_BYTES") ||
+           !art.includes('type === "\\xA9lyr"') || !art.includes("parseSyltFrame") || !art.includes("parseLyricsTextFrame") ||
+           !art.includes("UNSYNCEDLYRICS") || art.includes("createWritable")) fail("audio-art.js extractLyrics (USLT/SYLT/©lyr/Vorbis LYRICS, read-only) is missing");
+  else if (!lyrics.includes("function parseLrc(src)") || !lyrics.includes("function activeLineIndex(lines, seconds)") ||
+           !lyrics.includes("function normalizeLyrics(source)") || !lyrics.includes("async function resolveLyrics(song)") ||
+           !lyrics.includes('const LYRICS_KEY = "trk_lyrics_v1"') || !lyrics.includes("manualLyrics(song.key)") ||
+           !lyrics.includes("song.lyricsFile") || !lyrics.includes("extractLyrics(song.file)") ||
+           !lyrics.includes("window.Trk.lyrics = Object.freeze({")) fail("lyrics.js parser / manual store / resolution chain is missing");
+  else if (!library.includes('it.lyricsFile = lyrics[it.dir + "/" + it.base] || null') || !library.includes('n.endsWith(".lrc")')) fail("the folder scan must attach same-named .lrc files to songs");
+  else if (!core.includes("mediaLyricsOpen: prefs.mediaLyricsOpen === true") || (core.match(/settings\.mediaLyricsOpen = false/g) || []).length < 2) fail("mediaLyricsOpen setting (and its two reset paths) is missing in core.js");
+  else if (!player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, interpBox, loopBox, options, queuePanel, footer)") ||
+           !player.includes("renderLyrics();   /* 🎤") || !player.includes('lyricsFileNode.accept = ".lrc,.txt,text/plain"') ||
+           !player.includes("on(\"songSelected\", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics(); })") ||   /* core. は正規化で外れる */
+           !player.includes("api.saveManualLyrics(song.key, r.text, file.name)") ||
+           (player.match(/mediaLyricsTitle:"/g) || []).length < 4 || (player.match(/mediaLyricsNeedSong:"/g) || []).length < 4) fail("media-player lyrics panel wiring or 4-language strings are missing");
+  else if (!css.includes(".mediaLyricsBox") || !css.includes(".lyricLineActive") || !css.includes("body.helpTextOff .mediaLyricsBox>.hint")) fail("lyrics panel styles are missing");
+  else ok("trk166: 🎤 lyrics — LRC parser + embedded tags (read-only), folder .lrc, manual pick, synced highlight, in four languages");
+  /* sw.js の cache 版数は固定しない：別の「service-worker cache」見張りが現在の版を確認している */
+}
+
 // 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own
 // "don't sway" option, plus the ❓ mystery switch that outranks both.
 {
@@ -2442,7 +2476,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
   const offlineOk = !fi.includes("fetch(") && !fi.includes("import ") && !fi.includes("Worker(");
   const uiOk = html.includes('<script src="js/frame-interp.js"></script>') &&
     player.includes("const FI = window.TrkFrameInterp;") &&
-    player.includes("dialog.append(header, display, stageWrap, controls, progressRow, interpBox, loopBox, options, queuePanel, footer)") &&
+    player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, interpBox, loopBox, options, queuePanel, footer)") &&
     player.includes('FI.attach("media", stageCanvas)') && player.includes('FI.detach("media")') &&
     max.includes('window.TrkFrameInterp.attach("max", canvas)') && max.includes('window.TrkFrameInterp.detach("max")');
   const langOk = (fi.match(/mediaInterpTitle:/g) || []).length === 4 &&

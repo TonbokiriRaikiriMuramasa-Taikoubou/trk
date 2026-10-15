@@ -36,6 +36,7 @@ Object.assign(TEXT.ja, {
   mediaResumeRewind:"⏪ 再開時の巻き戻し", mediaResumeOff:"オフ", mediaResumeSet:"再開時に{s}秒巻き戻します",
   mediaSleepTrack:"💤 この曲の終わり", mediaSleepTrackSet:"この曲の終わりで再生を止めます",
   mediaWakeLockTitle:"🔆 画面を消灯させない", mediaWakeLockHint:"動画の再生中に画面が暗くなるのを防ぎます（音声だけの再生では防ぎません）。対応していないブラウザでは何もしません。", mediaWakeLockToggle:"動画の再生中は画面をつけたままにする",
+  mediaLyricsTitle:"🎤 歌詞", mediaLyricsHint:"埋め込み歌詞（ID3 USLT/SYLT・MP4 ©lyr・FLAC/Ogg LYRICS）・フォルダの同名 .lrc・選んだ歌詞ファイルを、再生位置に合わせて表示します。同期歌詞は行をクリックするとその位置へ移動します。選んだ歌詞は曲ごとに端末内へ保存され、外へは送信しません。", mediaLyricsNone:"この曲の歌詞は見つかりませんでした。", mediaLyricsLoading:"歌詞を読み込み中…", mediaLyricsSourceEmbedded:"出典：埋め込みタグ", mediaLyricsSourceFile:"出典：フォルダの .lrc（{name}）", mediaLyricsSourceManual:"出典：選んだファイル（{name}）", mediaLyricsPlain:"※ 時刻のない歌詞なので、そのまま表示します", mediaLyricsChoose:"📄 歌詞ファイルを選ぶ", mediaLyricsClear:"✖ 選んだ歌詞を消す", mediaLyricsSaved:"歌詞をこの曲に保存しました（{n}行）", mediaLyricsTooBig:"この歌詞ファイルは大きすぎます（256KBまで）。", mediaLyricsReadFailed:"この歌詞ファイルは読めませんでした。", mediaLyricsNeedSong:"先に曲を再生してください。",
   mediaModeStatus:"メディアプレーヤー中（ゲームの記録には影響しません）"
 });
 Object.assign(TEXT.en, {
@@ -66,6 +67,7 @@ Object.assign(TEXT.en, {
   mediaResumeRewind:"⏪ Resume rewind", mediaResumeOff:"Off", mediaResumeSet:"Resume rewind: {s}s",
   mediaSleepTrack:"💤 End of this track", mediaSleepTrackSet:"Playback will stop when this track ends",
   mediaWakeLockTitle:"🔆 Keep screen on", mediaWakeLockHint:"Prevents the screen from dimming while a video plays (audio-only playback won't). Does nothing on browsers without support.", mediaWakeLockToggle:"Keep the screen on while a video plays",
+  mediaLyricsTitle:"🎤 Lyrics", mediaLyricsHint:"Shows embedded lyrics (ID3 USLT/SYLT, MP4 ©lyr, FLAC/Ogg LYRICS), a same-named .lrc from the folder, or a file you choose, in sync with playback. With synced lyrics, click a line to jump there. Chosen lyrics are saved on this device per song and never uploaded.", mediaLyricsNone:"No lyrics found for this song.", mediaLyricsLoading:"Loading lyrics…", mediaLyricsSourceEmbedded:"Source: embedded tags", mediaLyricsSourceFile:"Source: folder .lrc ({name})", mediaLyricsSourceManual:"Source: chosen file ({name})", mediaLyricsPlain:"· not time-synced (shown as-is)", mediaLyricsChoose:"📄 Choose lyrics file", mediaLyricsClear:"✖ Remove chosen lyrics", mediaLyricsSaved:"Lyrics saved for this song ({n} lines)", mediaLyricsTooBig:"That lyrics file is too big (up to 256 KB).", mediaLyricsReadFailed:"Could not read that lyrics file.", mediaLyricsNeedSong:"Load a song first.",
   mediaModeStatus:"Media player (does not affect game records)"
 });
 Object.assign(TEXT.zh, {
@@ -94,6 +96,7 @@ Object.assign(TEXT.zh, {
   mediaResumeRewind:"⏪ 继续播放时倒回", mediaResumeOff:"关闭", mediaResumeSet:"继续播放时倒回{s}秒",
   mediaSleepTrack:"💤 本曲结束时", mediaSleepTrackSet:"将在本曲结束时停止播放",
   mediaWakeLockTitle:"🔆 保持屏幕常亮", mediaWakeLockHint:"播放视频时防止屏幕变暗（纯音频播放不会阻止熄屏）。浏览器不支持时无效果。", mediaWakeLockToggle:"播放视频时保持屏幕常亮",
+  mediaLyricsTitle:"🎤 歌词", mediaLyricsHint:"跟随播放位置显示内嵌歌词（ID3 USLT/SYLT、MP4 ©lyr、FLAC/Ogg LYRICS）、文件夹中同名的 .lrc 或你选择的歌词文件。同步歌词可点击某行跳转到该位置。选择的歌词按歌曲保存在本机，不会上传。", mediaLyricsNone:"没有找到这首歌的歌词。", mediaLyricsLoading:"正在读取歌词…", mediaLyricsSourceEmbedded:"来源：内嵌标签", mediaLyricsSourceFile:"来源：文件夹中的 .lrc（{name}）", mediaLyricsSourceManual:"来源：选择的文件（{name}）", mediaLyricsPlain:"※ 非同步歌词，原样显示", mediaLyricsChoose:"📄 选择歌词文件", mediaLyricsClear:"✖ 清除选择的歌词", mediaLyricsSaved:"已为这首歌保存歌词（{n} 行）", mediaLyricsTooBig:"这个歌词文件太大（上限 256KB）。", mediaLyricsReadFailed:"无法读取这个歌词文件。", mediaLyricsNeedSong:"请先播放歌曲。",
   mediaModeStatus:"媒体播放器中（不影响游戏记录）"
 });
 Object.assign(TEXT.ko, {
@@ -122,6 +125,7 @@ Object.assign(TEXT.ko, {
   mediaResumeRewind:"⏪ 다시 재생 시 되감기", mediaResumeOff:"끔", mediaResumeSet:"다시 재생 시 {s}초 되감기",
   mediaSleepTrack:"💤 이번 곡 끝날 때", mediaSleepTrackSet:"이번 곡이 끝날 때 재생을 멈춥니다",
   mediaWakeLockTitle:"🔆 화면 켜짐 유지", mediaWakeLockHint:"동영상 재생 중 화면이 어두워지는 것을 막습니다(오디오만 재생할 때는 막지 않습니다). 지원하지 않는 브라우저에서는 아무것도 하지 않습니다.", mediaWakeLockToggle:"동영상 재생 중 화면 켜짐 유지",
+  mediaLyricsTitle:"🎤 가사", mediaLyricsHint:"재생 위치에 맞춰 내장 가사(ID3 USLT/SYLT, MP4 ©lyr, FLAC/Ogg LYRICS), 폴더의 같은 이름 .lrc, 또는 선택한 가사 파일을 표시합니다. 동기 가사는 줄을 클릭해 그 위치로 이동할 수 있습니다. 선택한 가사는 곡별로 기기에만 저장되며 업로드되지 않습니다.", mediaLyricsNone:"이 곡의 가사를 찾지 못했습니다.", mediaLyricsLoading:"가사를 불러오는 중…", mediaLyricsSourceEmbedded:"출처: 내장 태그", mediaLyricsSourceFile:"출처: 폴더의 .lrc ({name})", mediaLyricsSourceManual:"출처: 선택한 파일 ({name})", mediaLyricsPlain:"※ 동기화되지 않은 가사 (그대로 표시)", mediaLyricsChoose:"📄 가사 파일 선택", mediaLyricsClear:"✖ 선택한 가사 지우기", mediaLyricsSaved:"이 곡의 가사를 저장했습니다 ({n}줄)", mediaLyricsTooBig:"이 가사 파일은 너무 큽니다 (최대 256KB).", mediaLyricsReadFailed:"이 가사 파일을 읽을 수 없습니다.", mediaLyricsNeedSong:"먼저 곡을 재생해 주세요.",
   mediaModeStatus:"미디어 플레이어 중 (게임 기록에 영향 없음)"
 });
 
@@ -141,6 +145,8 @@ let maxNode = null;   /* 🖥 「全画面で表示」（js/video-max.js） */
 let pipNode = null, pipActive = false;                /* 📌 画中画（trk164） */
 let resumeNode = null;                                /* ⏪ スマート巻き戻しの選択（trk164） */
 let wakeLock = null, wakeRequested = false;           /* 🔆 Screen Wake Lock（trk164） */
+let lyricsBox = null, lyricsListNode = null, lyricsSourceNode = null, lyricsFileNode = null, lyricsClearNode = null;  /* 🎤 歌詞パネル（trk166） */
+let lyricsState = { key:"", request:0, data:null, active:-2, loading:false };  /* 🎤 歌詞の状態（active=-2 は「次の描画で必ず付け直す」印） */
 let sleepTrackMode = false, sleepFadeArm = 0, sleepFadeTimer = 0, sleepFadeBase = 1;  /* 💤 スリープタイマー強化（trk164） */
 const SLEEP_FADE_SECONDS = 15;                        /* 💤 停止前のフェードアウト秒数 */
 /* ✨ フレーム補完（js/frame-interp.js）：区間ループのすぐ上に置く設定と、映像エリア */
@@ -838,6 +844,84 @@ async function updateWakeLock() {
     try { await lock.release(); } catch (_) {}
   }
 }
+/* ================= 🎤 歌詞（trk166：js/lyrics.js ＋ audio-art.js extractLyrics） =================
+   歌詞は読むだけ：埋め込みタグ（ID3 USLT/SYLT・MP4 ©lyr・FLAC/Ogg LYRICS）→ フォルダの同名 .lrc →
+   手で選んだファイルの順に探す（選んだ歌詞は localStorage に曲単位で残る）。
+   ハイライトは renderMedia の 250ms 周期に相乗り。行のクリックでその位置へシークする。
+   ⚠ ファイルは端末から出さない。元ファイルへの書き戻しもしない。 */
+function lyricsBoxOpen() { return !!(lyricsBox && lyricsBox.open); }
+async function loadLyrics(force = false) {
+  const api = window.Trk.lyrics; if (!api) return;
+  const s = core.currentSong;
+  if (!s) { lyricsState = { key:"", request:lyricsState.request, data:null, active:-2, loading:false }; renderLyrics(); return; }
+  if (!force && lyricsState.key === s.key && (lyricsState.data || lyricsState.loading)) return;
+  const request = ++lyricsState.request, key = s.key;
+  lyricsState = { key, request, data:null, active:-2, loading:true };
+  renderLyrics();
+  let data = null;
+  try { data = await api.resolveLyrics(s); } catch (_) { data = null; }
+  if (request !== lyricsState.request) return;          /* 読み込み中に曲が変わったら古い結果は無視 */
+  lyricsState.loading = false; lyricsState.data = data;
+  renderLyrics();
+}
+function lyricSourceText() {
+  const d = lyricsState.data;
+  if (lyricsState.loading) return tr("mediaLyricsLoading");
+  if (!d) return tr("mediaLyricsNone");
+  const base = d.source === "manual" ? tr("mediaLyricsSourceManual", { name: d.name })
+    : d.source === "folder" ? tr("mediaLyricsSourceFile", { name: d.name })
+    : tr("mediaLyricsSourceEmbedded");
+  return d.synced ? base : `${base} ${tr("mediaLyricsPlain")}`;
+}
+function renderLyrics() {
+  if (!lyricsBox) return;
+  const api = window.Trk.lyrics; if (!api) return;
+  if (lyricsSourceNode) lyricsSourceNode.textContent = lyricSourceText();
+  if (lyricsClearNode) lyricsClearNode.disabled = !api.manualLyrics(core.currentSong && core.currentSong.key);
+  if (!lyricsBoxOpen() || !lyricsListNode) return;
+  const d = lyricsState.data;
+  const sig = d ? `${lyricsState.key}|${d.source}|${d.lines.length}` : "none";
+  if (lyricsListNode.dataset.sig !== sig) {
+    lyricsListNode.dataset.sig = sig;
+    lyricsListNode.textContent = "";
+    lyricsState.active = -2;
+    if (d) for (const line of d.lines) {
+      const clickable = d.synced && Number.isFinite(line.t);
+      const node = clickable ? core.el("button", "lyricLine") : core.el("div", "lyricLine lyricLineStatic");
+      if (clickable) { node.type = "button"; node.title = mpFmt(line.t); node.addEventListener("click", () => seekToLyric(line.t)); }
+      node.textContent = line.text || "♪";              /* 時刻だけ的行（間奏）は ♪ で置く */
+      lyricsListNode.append(node);
+    }
+  }
+  if (!d || !d.synced) return;
+  if (reverseActive || reverseLoading || !core.videoReady) return;   /* 逆再生中は時計が違うので付けない */
+  const idx = api.activeLineIndex(d.lines, core.video.currentTime || 0);
+  if (idx === lyricsState.active) return;
+  lyricsState.active = idx;
+  const nodes = lyricsListNode.children;
+  for (let i = 0; i < nodes.length; i++) nodes[i].classList.toggle("lyricLineActive", i === idx);
+  const activeNode = idx >= 0 ? nodes[idx] : null;
+  if (activeNode && typeof activeNode.scrollIntoView === "function") activeNode.scrollIntoView({ block:"center", behavior:"smooth" });
+}
+function seekToLyric(t) {
+  if (!core.videoReady || !Number.isFinite(t)) return;
+  if (reverseActive || reverseLoading) stopReverse(false, true);
+  try { core.video.currentTime = t; } catch (_) {}
+  lyricsState.active = -2;                               /* 次の描画でハイライトを付け直す */
+  renderLyrics();
+}
+async function chooseLyricsFile(file) {
+  const api = window.Trk.lyrics; if (!api || !file) return;
+  const toast = m => { if (typeof showToast === "function") window.Trk.play.showToast(m); };
+  const song = core.currentSong;
+  if (!song) { toast(tr("mediaLyricsNeedSong")); return; }
+  const r = await api.readLyricsFile(file);
+  if (r.error === "tooBig") { toast(tr("mediaLyricsTooBig")); return; }
+  if (r.error) { toast(tr("mediaLyricsReadFailed")); return; }
+  api.saveManualLyrics(song.key, r.text, file.name);
+  await loadLyrics(true);
+  toast(tr("mediaLyricsSaved", { n: lyricsState.data ? lyricsState.data.lines.length : 0 }));
+}
 function renderInterp() {
   const FI = window.TrkFrameInterp;
   if (!interpBox) return;
@@ -957,6 +1041,7 @@ function renderMedia() {
     statusNode.textContent = tr(statusKey); statusNode.dataset.i18n = "";
   }
   renderLoopUI();
+  renderLyrics();   /* 🎤 歌詞のハイライト（250ms周期に相乗り。パネルが閉じているときは状態表示だけ） */
   renderWall();
   renderQueue();
   syncMediaStage();
@@ -993,6 +1078,7 @@ function openMedia() {
   if (core.currentSong && core.videoReady && (core.video.paused || core.video.ended)) { try { core.video.currentTime = savedMediaPosition({ resume: true }); } catch (_) {} }
   tickTimer = setInterval(renderMedia, 250); loopTimer = setInterval(checkMediaLoop, 40);
   renderMedia(); updateMediaSession(); syncMediaStage();
+  if (lyricsBoxOpen()) loadLyrics();   /* 🎤 開いたままだった歌詞パネルの読み直し（trk166） */
   const focus = playNode || closeNode; if (focus) focus.focus();
 }
 let closeNode;
@@ -1102,6 +1188,31 @@ function buildMedia() {
   loopLabBox.append(loopLabHeading, loopQuickHint, loopQuickButtons, loopSaveRow, loopPresetHeading, loopPresetListNode);
   loopBox.append(loopHeading, loopStatusNode, loopHint, loopButtons, loopModeLabel, loopLabBox);
 
+  /* 🎤 歌詞（trk166）：折りたたみパネル。開いたときだけ歌詞を読む（埋め込みタグはファイルに触るので） */
+  lyricsBox = core.el("details", "mediaLyricsBox"); lyricsBox.id = "mediaLyricsBox";
+  if (core.settings.mediaLyricsOpen) lyricsBox.open = true;
+  lyricsBox.append(tx("summary", "mediaLyricsTitle"), tx("p", "mediaLyricsHint", "hint"));
+  lyricsSourceNode = core.el("div", "hint mediaLyricsSource", tr("mediaLyricsNone"));
+  const lyricsActions = core.el("div", "miniActions");
+  const lyricsUploadRow = core.el("label", "mediaLyricsUploadRow"); lyricsUploadRow.append(tx("span", "mediaLyricsChoose"));
+  lyricsFileNode = document.createElement("input"); lyricsFileNode.type = "file"; lyricsFileNode.accept = ".lrc,.txt,text/plain";
+  lyricsUploadRow.append(lyricsFileNode);
+  lyricsClearNode = makeButton("mediaLyricsClear", "mediaSmallBtn"); lyricsClearNode.disabled = true;
+  lyricsClearNode.addEventListener("click", () => {
+    const api = window.Trk.lyrics, song = core.currentSong;
+    if (!api || !song) return;
+    api.clearManualLyrics(song.key);
+    loadLyrics(true);
+  });
+  lyricsActions.append(lyricsUploadRow, lyricsClearNode);
+  lyricsListNode = core.el("div", "mediaLyricsList");
+  lyricsBox.append(lyricsSourceNode, lyricsActions, lyricsListNode);
+  lyricsBox.addEventListener("toggle", () => {
+    core.settings.mediaLyricsOpen = lyricsBox.open; core.saveUserPrefs();
+    if (lyricsBox.open) loadLyrics(); else lyricsState.active = -2;
+  });
+  lyricsFileNode.addEventListener("change", () => { const f = lyricsFileNode.files && lyricsFileNode.files[0]; lyricsFileNode.value = ""; if (f) chooseLyricsFile(f); });
+
   const options = core.el("div", "mediaOptions");
   const volumeRow = core.el("label", "mediaOption mediaVolumeRow"); volumeRow.append(tx("span", "mediaVolume"));
   volumeNode = document.createElement("input"); volumeNode.type = "range"; volumeNode.min = "0"; volumeNode.max = "1"; volumeNode.step = "0.01"; volumeRow.append(volumeNode);
@@ -1142,7 +1253,7 @@ function buildMedia() {
   queueNode = core.el("div", "mediaQueueList"); queuePanel.append(qhead, searchNode, queueNode);
 
   const footer = core.el("footer", "instFooter mediaFooter"); footer.append(tx("span", "mediaModeStatus"), tx("span", "mediaKeyboard", "instKeyHint"));
-  dialog.append(header, display, stageWrap, controls, progressRow, interpBox, loopBox, options, queuePanel, footer);
+  dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, interpBox, loopBox, options, queuePanel, footer);
   wallOverlay = core.el("section", "mediaWall"); wallOverlay.hidden = true; wallOverlay.setAttribute("role", "dialog"); wallOverlay.setAttribute("aria-modal", "true"); wallOverlay.setAttribute("aria-label", tr("mediaWall"));
   const wallTop = core.el("div", "mediaWallTop"); wallTop.append(tx("strong", "mediaWall"));
   const wallClose = makeButton("mediaWallHide", "mediaWallClose"); wallClose.addEventListener("click", () => deactivateWall(true)); wallTop.append(wallClose);
@@ -1203,7 +1314,8 @@ function buildMedia() {
     if (type === "ended") endedMedia(); else renderMedia();
   });
   core.on("beforeLoad", () => { if (clipAbort) clipAbort(); stopReverse(false, true); clearMediaLoop(true); reverseBuffer = null; reverseBufferKey = ""; });
-  core.on("songSelected", renderMedia); core.on("mediaReady", () => { if (mediaOpen) renderMedia(); updateMediaSession(); });
+  core.on("songSelected", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics(); });   /* 🎤 曲が変わったら歌詞も（trk166） */
+  core.on("mediaReady", () => { if (mediaOpen) renderMedia(); updateMediaSession(); });
   core.on("records", renderQueue); core.on("packsChanged", renderQueue); core.on("language", () => {
     if (stageNote) { stageNote.textContent = tr("mediaStageNoVideo"); stageNote.dataset.i18n = "mediaStageNoVideo"; }
     renderInterp();
@@ -1211,6 +1323,7 @@ function buildMedia() {
     if (searchNode) searchNode.placeholder = tr("mediaSearch");
     if (progressNode) progressNode.setAttribute("aria-label", tr("mediaSeek"));
     if (wallOverlay) wallOverlay.setAttribute("aria-label", tr("mediaWall"));
+    if (lyricsListNode) lyricsListNode.dataset.sig = "";   /* 🎤 言語が変わったら歌詞リストを作り直す（trk166） */
     if (mediaOpen) renderMedia();
   });
   core.on("phase", p => { if (p !== "title" && mediaOpen) closeMedia(false); });

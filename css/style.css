@@ -1810,6 +1810,7 @@ body.helpTextOff .hint:not(.status),
 body.helpTextOff .instSubtitle,
 body.helpTextOff .mediaQueueHead p,
 body.helpTextOff .mediaLoopBox>.hint,
+body.helpTextOff .mediaLyricsBox>.hint,
 body.helpTextOff .mediaWallHintText{display:none!important}
 
 /* ▶ 動画の全画面表示（js/video-max.js ／ TVドックの⛶・メディアプレーヤーの「全画面で表示」） */
@@ -1856,6 +1857,23 @@ body.helpTextOff .videoMaxHint{display:none!important}
 .mediaInterpRow input[type=range]{width:100%;accent-color:#75e4ff}
 .mediaInterpStatus{min-height:1em;color:#9fe8ff}
 @media(max-width:680px){.mediaStageCanvas{height:clamp(130px,22vh,220px)}}
+
+/* 🎤 歌詞（trk166）：折りたたみパネル＋再生位置に追随するリスト */
+.mediaLyricsBox{margin:0 14px 2px;padding:10px 12px;border:1px solid rgba(255,170,220,.22);border-radius:12px;
+  background:rgba(255,170,220,.045)}
+.mediaLyricsBox summary{cursor:pointer;font-size:14px;font-weight:800;color:#ffc7e6;list-style-position:inside}
+.mediaLyricsBox>.hint{margin:5px 0;font-size:11px;line-height:1.45}
+.mediaLyricsSource{color:var(--ui-muted);min-height:1em}
+.mediaLyricsUploadRow{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ui-muted);font-weight:750}
+.mediaLyricsUploadRow input[type=file]{max-width:210px;font-size:11px;color:var(--ui-muted)}
+.mediaLyricsList{max-height:32vh;overflow-y:auto;margin-top:8px;padding:6px 8px;
+  border:1px solid rgba(255,170,220,.16);border-radius:10px;background:rgba(0,0,0,.18);overscroll-behavior:contain}
+.lyricLine{display:block;width:100%;margin:1px 0;padding:5px 10px;border:0;border-radius:8px;background:none;
+  color:var(--ui-muted);font:inherit;font-size:13px;line-height:1.55;text-align:center;cursor:pointer}
+button.lyricLine:hover{color:#ffe6f3;background:rgba(255,170,220,.08)}
+.lyricLineStatic{cursor:default}
+.lyricLineActive,.lyricLineActive:hover{color:#fff;background:rgba(255,110,199,.2);font-weight:800;font-size:15px}
+@media(max-width:680px){.mediaLyricsList{max-height:26vh}}
 
 /* 👆 長押しの代わりのボタン（設定 showMoreBtns をオフにすると隠れる） */
 body.noMoreBtns .moreBtn { display:none !important; }

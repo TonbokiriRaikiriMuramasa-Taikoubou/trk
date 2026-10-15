@@ -330,7 +330,7 @@ test("wiring: script order, exported entry points, worker cleanup whitelist, fou
   assert.ok(customSrc.includes("updateMascotUI, installAndUse"), "custom exposes installAndUse (the pack-file input's own path)");
   assert.ok(swSrc.includes("key !== SHARE_CACHE"), "the activate cleanup spares the share inbox");
   assert.ok(swSrc.includes('if (request.method === "POST")'), "the fetch handler branches on POST before the GET-only logic");
-  assert.ok(swSrc.includes('const CACHE = "trk-v2026.10.15-trk165"'), "cache bumped");
+  /* sw.js の cache 版数はリリースごとに進むので、ここでは固定しない（check-repo.mjs が確認する） */
   for (const key of ["shareInboundNone", "shareInboundError", "shareInboundUnsupported"]) {
     assert.equal(count(shareSrc, `${key}:`), 4, `${key} exists in ja/en/zh/ko`);
   }

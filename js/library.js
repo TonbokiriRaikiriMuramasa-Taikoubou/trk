@@ -3605,18 +3605,20 @@ on("packsChanged", refreshPackSongs);
              許可なしでも遊べるようにする。上限は SHARED_MAX 曲・SHARED_MB MB（空き容量を守るため）
    ⚠ 曲は端末の外へ送りません（読むだけ。アップロードはしません） */
 function ingestFolder(list, dirName, shared, skipped) {
-  folderSongs = []; const charts = {};
+  folderSongs = []; const charts = {}; const lyrics = {};
   for (const { file, rel } of list) {
     const dir = rel.includes("/") ? rel.slice(0, rel.lastIndexOf("/")) : "", lower = file.name.toLowerCase();
     if (lower.endsWith(CHART_SUFFIX)) {
       const base = file.name.slice(0, -CHART_SUFFIX.length).replace(/-(easy|normal|hard|master|rush)$/i, "");
       (charts[dir + "/" + base] ||= []).push(file);
+    } else if (lower.endsWith(".lrc")) {
+      lyrics[dir + "/" + core.baseName(file.name)] = file;   /* 🎤 同じフォルダの同名 .lrc（trk166） */
     } else if (MEDIA_EXT.includes(core.extOf(file.name)) && folderSongs.length < LIB_MAX) {
       const base = core.baseName(file.name);
       folderSongs.push({ key:`${file.size}|${base}`, source:"folder", file, title:base, base, size:file.size, dir });
     }
   }
-  for (const it of folderSongs) it.charts = charts[it.dir + "/" + it.base] || null;
+  for (const it of folderSongs) { it.charts = charts[it.dir + "/" + it.base] || null; it.lyricsFile = lyrics[it.dir + "/" + it.base] || null; }
   /* 📤 共有のときは「何曲きたか」と「対象外が何件あったか」を両方出す（変なファイルも見て分かるように） */
   if (shared) core.setStatus("libStatus", "libShareFound", { dir:dirName || "", n:folderSongs.length, skip:skipped || 0 });
   else core.setStatus("libStatus", folderSongs.length ? "libFound" : "libEmpty", { n:folderSongs.length, dir:dirName || "" });
@@ -3630,8 +3632,8 @@ async function scanHandle(h, onProgress) {
     for await (const e of dir.values()) {
       if (e.kind === "file") {
         const n = e.name.toLowerCase();
-        if (MEDIA_EXT.includes(core.extOf(n)) || n.endsWith(CHART_SUFFIX)) {
-          files.push({ file:await e.getFile(), rel:`${path}/${e.name}` });
+        if (MEDIA_EXT.includes(core.extOf(n)) || n.endsWith(CHART_SUFFIX) || n.endsWith(".lrc")) {
+          files.push({ file:await e.getFile(), rel:`${path}/${e.name}` });   /* 🎤 .lrc も集める（trk166） */
           if (onProgress && !(files.length % 25)) onProgress(files.length);
         } else skipped++;                       /* 曲でも譜面でもないファイル（写真・テキストなど） */
       } else if (e.kind === "directory" && !e.name.startsWith(".")) await walk(e, `${path}/${e.name}`, depth + 1);

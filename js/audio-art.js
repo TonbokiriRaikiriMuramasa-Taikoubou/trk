@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-/* ローカル音源に埋め込まれたジャケット画像を読む（通信・保存なし）。
-   対応: ID3 APIC/PIC、MP4/M4A covr、FLAC picture、Ogg Vorbis/Opus picture comments。
+/* ローカル音源に埋め込まれたジャケット画像と歌詞を読む（通信・保存なし）。
+   画像: ID3 APIC/PIC、MP4/M4A covr、FLAC picture、Ogg Vorbis/Opus picture comments。
+   歌詞（trk166・読み取りだけ）: ID3 USLT/ULT・SYLT/SLT、MP4 ©lyr、FLAC/Ogg の LYRICS/UNSYNCEDLYRICS。
    読み出すメタデータと画像サイズを制限し、サムネイルだけをメモリ上で作る。 */
 (() => {
 "use strict";
@@ -9,6 +10,8 @@ const MAX_ART_BYTES = 6 * 1024 * 1024;
 const MAX_IMAGE_EDGE = 8192;
 const MAX_IMAGE_PIXELS = 12_000_000;
 const THUMB_EDGE = 256;
+const MAX_LYRICS_BYTES = 256 * 1024;   /* 🎤 埋め込み歌詞の上限（表示用のテキストとしては十分すぎる大きさ） */
+const MAX_SYLT_LINES = 5000;           /* 🎤 SYLT の時刻付き行の上限 */
 const textDecoder = typeof TextDecoder === "function" ? new TextDecoder("utf-8") : null;
 
 function ascii(bytes, start, length) {
@@ -87,7 +90,53 @@ function removeUnsynchronisation(data) {
   }
   return out.subarray(0, n);
 }
-async function extractID3(file) {
+/* 🎤 歌詞（trk166）：ID3 のテキスト符号化（0=Latin-1、1=UTF-16+BOM、2=UTF-16BE、3=UTF-8）で復号する。
+   歌詞は表示専用のテキストなので、復号に失敗したら空文字（= 歌詞なし）として扱う。 */
+function decodeID3Text(bytes, encoding) {
+  if (!bytes || !bytes.length || typeof TextDecoder !== "function") return "";
+  let label = "utf-8", data = bytes;
+  try {
+    if (encoding === 0) label = "iso-8859-1";
+    else if (encoding === 1 || encoding === 2) {
+      let be = encoding === 2;
+      if (data.length >= 2) {
+        if (data[0] === 0xff && data[1] === 0xfe) { be = false; data = data.subarray(2); }
+        else if (data[0] === 0xfe && data[1] === 0xff) { be = true; data = data.subarray(2); }
+      }
+      label = be ? "utf-16be" : "utf-16le";
+    }
+    return new TextDecoder(label).decode(data).replace(/\0+$/g, "");
+  } catch (_) { return ""; }
+}
+function parseLyricsTextFrame(data) {   /* USLT / ULT：encoding(1)+言語(3)+説明(ヌル終端)+歌詞本文 */
+  if (!data || data.length < 6) return null;
+  const encoding = data[0];
+  const descEnd = findTextEnd(data, 4, encoding);
+  if (descEnd < 0 || descEnd >= data.length) return null;   /* 説明の終端がない／本文が空 → 歌詞なし */
+  const text = decodeID3Text(data.subarray(descEnd, data.length), encoding);
+  return text && text.trim() ? text.slice(0, MAX_LYRICS_BYTES) : null;
+}
+function parseSyltFrame(data) {         /* SYLT / SLT：説明のあと「テキスト(ヌル終端)+時刻(4バイト)」の繰り返し */
+  if (!data || data.length < 8) return null;
+  const encoding = data[0], format = data[4];
+  if (format !== 2) return null;        /* 時刻はミリ秒（形式2）だけ。MIDIフレーム形式はテンポ情報がないと秒に直せない */
+  let p = findTextEnd(data, 6, encoding);   /* 内容タイプ(1)+説明を飛ばす */
+  if (p < 0) return null;
+  const termLen = encoding === 1 || encoding === 2 ? 2 : 1;
+  const lines = [];
+  while (p + 4 <= data.length && lines.length < MAX_SYLT_LINES) {
+    const textEnd = findTextEnd(data, p, encoding);
+    if (textEnd < termLen || textEnd + 4 > data.length) break;
+    const text = decodeID3Text(data.subarray(p, textEnd - termLen), encoding);
+    lines.push({ t: u32be(data, textEnd) / 1000, text });
+    p = textEnd + 4;
+  }
+  if (!lines.length) return null;
+  lines.sort((a, b) => a.t - b.t);      /* SYLT の時刻は並び順が保証されないので整列する */
+  return { lines };
+}
+/* mode: "art"（ジャケット・従来どおり）／ "lyrics"（🎤 USLT/ULT・SYLT/SLT。trk166） */
+async function extractID3(file, mode = "art") {
   const header = await readRange(file, 0, 10, 10);
   if (!header || ascii(header, 0, 3) !== "ID3") return null;
   const version = header[3], flags = header[5];
@@ -104,7 +153,7 @@ async function extractID3(file) {
     if (extSize < 4 || extSize > tag.length) return null;
     p = version === 4 ? extSize : 4 + extSize;
   }
-  let first = null;
+  let first = null, uslt = null, sylt = null;
   const frameHeader = version === 2 ? 6 : 10;
   while (p + frameHeader <= tag.length) {
     const idLength = version === 2 ? 3 : 4;
@@ -117,7 +166,10 @@ async function extractID3(file) {
     if (version !== 2) flags2 = tag[p + 9];
     const bodyStart = p + frameHeader, bodyEnd = bodyStart + size;
     const unsupportedFlags = version === 3 ? (flags2 & 0xe0) : version === 4 ? (flags2 & 0x4f) : 0;
-    if ((id === "APIC" || id === "PIC") && !unsupportedFlags) {
+    if (mode === "lyrics") {
+      if ((id === "SYLT" || id === "SLT") && !unsupportedFlags && !sylt) sylt = parseSyltFrame(tag.subarray(bodyStart, bodyEnd));
+      else if ((id === "USLT" || id === "ULT") && !unsupportedFlags && !uslt) uslt = parseLyricsTextFrame(tag.subarray(bodyStart, bodyEnd));
+    } else if ((id === "APIC" || id === "PIC") && !unsupportedFlags) {
       const found = parsePictureFrame(tag.subarray(bodyStart, bodyEnd), version);
       if (found && found.blob) {
         if (found.pictureType === 3) return found.blob; // front cover wins
@@ -126,6 +178,7 @@ async function extractID3(file) {
     }
     p = bodyEnd;
   }
+  if (mode === "lyrics") return sylt || (uslt ? { text: uslt } : null);   /* 🎤 同期歌詞（SYLT）があれば優先 */
   return first;
 }
 function parseFlacPicture(data, start = 0, end = data.length) {
@@ -142,7 +195,7 @@ function parseFlacPicture(data, start = 0, end = data.length) {
   if (!imageLen || imageLen > MAX_ART_BYTES || p + imageLen > end) return null;
   return candidate(data.subarray(p, p + imageLen));
 }
-async function extractFlac(file) {
+async function extractFlac(file, mode = "art") {
   const signature = await readRange(file, 0, 4, 4);
   if (!signature || ascii(signature, 0, 4) !== "fLaC") return null;
   let p = 4;
@@ -151,10 +204,14 @@ async function extractFlac(file) {
     if (!header) return null;
     const h = header[0], type = h & 0x7f, size = u24be(header, 1), start = p + 4, end = start + size;
     if (end > file.size || end > MAX_TAG_BYTES) return null;
-    if (type === 6) {
+    if (type === 6 && mode !== "lyrics") {
       const block = await readRange(file, start, end, MAX_ART_BYTES + 128 * 1024);
       if (!block) return null;
       const blob = parseFlacPicture(block); if (blob) return blob;
+    } else if (type === 4 && mode === "lyrics") {   /* 🎤 VORBIS_COMMENT ブロックに LYRICS がある */
+      const block = await readRange(file, start, end, MAX_TAG_BYTES);
+      if (!block) return null;
+      const found = parseVorbisLyrics(block, 0); if (found) return found;
     }
     p = end;
     if (h & 0x80) break;
@@ -197,12 +254,42 @@ function parseCommentPacket(packet) {
   if (packet.length >= 8 && ascii(packet, 0, 8) === "OpusTags") return parseVorbisComments(packet, 8);
   return null;
 }
+/* 🎤 Vorbis コメントから LYRICS / UNSYNCEDLYRICS を探す（trk166）。FLAC のブロックにも同じ形が使われる */
+function parseVorbisLyrics(packet, start) {
+  let p = start;
+  if (!textDecoder || p + 8 > packet.length) return null;
+  const vendorLength = u32le(packet, p); p += 4;
+  if (vendorLength > packet.length - p - 4) return null;
+  p += vendorLength;
+  const count = u32le(packet, p); p += 4;
+  if (count > 100_000) return null;
+  for (let i = 0; i < count && p + 4 <= packet.length; i++) {
+    const length = u32le(packet, p); p += 4;
+    if (!length || length > packet.length - p) return null;
+    if (length <= MAX_LYRICS_BYTES) {
+      const text = textDecoder.decode(packet.subarray(p, p + length));
+      const equal = text.indexOf("=");
+      if (equal > 0) {
+        const key = text.slice(0, equal).toUpperCase(), value = text.slice(equal + 1);
+        if ((key === "LYRICS" || key === "UNSYNCEDLYRICS") && value && value.trim()) return { text: value };
+      }
+    }
+    p += length;
+  }
+  return null;
+}
+function parseCommentLyricsPacket(packet) {
+  if (packet.length >= 7 && packet[0] === 3 && ascii(packet, 1, 6) === "vorbis") return parseVorbisLyrics(packet, 7);
+  if (packet.length >= 8 && ascii(packet, 0, 8) === "OpusTags") return parseVorbisLyrics(packet, 8);
+  return null;
+}
 function joinChunks(chunks, length) {
   const out = new Uint8Array(length); let p = 0;
   for (const chunk of chunks) { out.set(chunk, p); p += chunk.length; }
   return out;
 }
-async function extractOgg(file) {
+/* parse = コメントパケットから欲しいものを取り出す関数（既定はジャケット。🎤 歌詞は parseCommentLyricsPacket を渡す） */
+async function extractOgg(file, parse = parseCommentPacket) {
   let p = 0, serial = null, packetChunks = [], packetLength = 0, packetTooLarge = false;
   for (let pages = 0; pages < 4096 && p + 27 <= file.size && p < MAX_TAG_BYTES; pages++) {
     const header = await readRange(file, p, p + 27, 27);
@@ -228,8 +315,8 @@ async function extractOgg(file) {
         bodyOffset = end;
         if (length < 255) {
           if (!packetTooLarge && packetLength) {
-            const blob = parseCommentPacket(joinChunks(packetChunks, packetLength));
-            if (blob) return blob;
+            const found = parse(joinChunks(packetChunks, packetLength));
+            if (found) return found;
           }
           packetChunks = []; packetLength = 0; packetTooLarge = false;
         }
@@ -267,7 +354,35 @@ function findMp4Cover(data, start = 0, end = data.length, depth = 0, inCovr = fa
   }
   return null;
 }
-async function extractMp4(file) {
+/* 🎤 MP4/M4A の ©lyr ボックス（UTF-8 テキスト）を探す（trk166）。covr と同じ入れ子（moov→udta→meta→ilst）を歩く */
+function findMp4Lyrics(data, start = 0, end = data.length, depth = 0, inLyrics = false) {
+  if (depth > 10 || !textDecoder) return null;
+  let p = start, count = 0;
+  while (p + 8 <= end && count++ < 8192) {
+    const size32 = u32be(data, p), type = ascii(data, p + 4, 4);
+    let size = size32, header = 8;
+    if (size32 === 1) { if (p + 16 > end) break; size = u64be(data, p + 8); header = 16; }
+    else if (size32 === 0) size = end - p;
+    if (!Number.isSafeInteger(size) || size < header || p + size > end) break;
+    const payload = p + header, atomEnd = p + size;
+    if (type === "data" && inLyrics && atomEnd - payload >= 8) {
+      const kind = u32be(data, payload);
+      if (kind === 1 || kind === 0) {           /* 1 = UTF-8 テキスト。0（暗黙）も UTF-8 として読む */
+        const text = textDecoder.decode(data.subarray(payload + 8, atomEnd)).replace(/\0+$/g, "");
+        if (text.trim()) return { text: text.slice(0, MAX_LYRICS_BYTES) };
+      }
+    } else if (type === "\xA9lyr") {
+      const found = findMp4Lyrics(data, payload, atomEnd, depth + 1, true); if (found) return found;
+    } else if (MP4_CONTAINERS.has(type)) {
+      const childStart = type === "meta" ? payload + 4 : payload; // full-box version/flags
+      if (childStart <= atomEnd) { const found = findMp4Lyrics(data, childStart, atomEnd, depth + 1, inLyrics); if (found) return found; }
+    }
+    p = atomEnd;
+    if (size32 === 0) break;
+  }
+  return null;
+}
+async function extractMp4(file, mode = "art") {
   let offset = 0;
   for (let boxes = 0; boxes < 512 && offset + 8 <= file.size; boxes++) {
     const header = await readRange(file, offset, Math.min(file.size, offset + 16), 16);
@@ -280,7 +395,8 @@ async function extractMp4(file) {
     if (type === "moov") {
       if (size - headerSize > MAX_TAG_BYTES) return null;
       const moov = await readRange(file, offset + headerSize, offset + size, MAX_TAG_BYTES);
-      return moov ? findMp4Cover(moov) : null;
+      if (!moov) return null;
+      return mode === "lyrics" ? findMp4Lyrics(moov) : findMp4Cover(moov);
     }
     if (size32 === 0) return null;
     offset += size;
@@ -295,6 +411,20 @@ async function extract(file) {
     if (["m4a", "m4b", "mp4"].includes(ext)) return await extractMp4(file);
     if (ext === "flac") return await extractFlac(file);
     if (["ogg", "oga", "opus"].includes(ext)) return await extractOgg(file);
+  } catch (_) { return null; }
+  return null;
+}
+/* 🎤 埋め込み歌詞を読む（trk166）。戻り値: { text }（非同期テキスト。LRC形式のこともあるので
+   呼び出し側で parseLrc にかける）／ { lines:[{t,text}] }（SYLT の同期歌詞・秒）／ null。
+   ⚠ 歌詞は表示のために読むだけで、ファイルには書き戻さない（読み取り専用方針）。 */
+async function extractLyrics(file) {
+  if (!file || !Number.isFinite(file.size) || file.size < 12) return null;
+  const ext = String(file.name || "").split(".").pop().toLowerCase();
+  try {
+    if (["mp3", "aac", "wav"].includes(ext)) return await extractID3(file, "lyrics");
+    if (["m4a", "m4b", "mp4"].includes(ext)) return await extractMp4(file, "lyrics");
+    if (ext === "flac") return await extractFlac(file, "lyrics");
+    if (["ogg", "oga", "opus"].includes(ext)) return await extractOgg(file, parseCommentLyricsPacket);
   } catch (_) { return null; }
   return null;
 }
@@ -355,5 +485,5 @@ async function thumbnail(blob) {
 }
 window.Trk = window.Trk || {};
 window.Trk.media = window.Trk.media || {};
-window.Trk.media.audioArt = Object.freeze({ extract, thumbnail, limits:Object.freeze({ metadataBytes:MAX_TAG_BYTES, artBytes:MAX_ART_BYTES, edge:THUMB_EDGE }) });
+window.Trk.media.audioArt = Object.freeze({ extract, extractLyrics, thumbnail, limits:Object.freeze({ metadataBytes:MAX_TAG_BYTES, artBytes:MAX_ART_BYTES, edge:THUMB_EDGE, lyricsBytes:MAX_LYRICS_BYTES }) });
 })();

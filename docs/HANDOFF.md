@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-15（trk165）**。現在の仕様・守る条件・未確認事項の要約です。過去の変更履歴（trk154以前）と検証記録（trk158以前）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-15（trk166）**。現在の仕様・守る条件・未確認事項の要約です。過去の変更履歴（trk154以前）と検証記録（trk158以前）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検。
 
@@ -169,6 +169,7 @@
 | 15 | ZIP作り手の互換性（trk163：Info-ZIP標準入力出力の受理、`flags`完全一致） | 実Info-ZIP 3.0出力（store・deflate・パイプ）とレビューでのPython zipfileはNode検査済み。Windowsのエクスプローラー／macOSの圧縮／スマホアプリのCBZは実機未確認 | 各で作ったCBZを実機で一度ずつ書斎に取り込んでみる。読めないCBZが出たら `flags` の食い違いを疑い、緩めるなら暗号化ビット（bit0）＋圧縮方式だけの比較にする（現時点では緩めていない） |
 | 16 | ▶ メディアプレーヤーの新機能（trk164：📌画中画・🔆Wake Lock・⏪スマート巻き戻し・💤スリープのフェードアウト＋この曲の終わり） | 純関数の決定（巻き戻しの計算・フェード計画・endedMediaの優先順・タイマーの掃除）はNode/VM検査済み。実機挙動は未確認 | Android Chrome／PCで📌画中画の継続と復帰、🔆動画再生中に画面が消えないこと（音声だけ・タブ裏では消えること）、⏪続き再生の戻し幅が実際的な不快感にならないか、💤フェード後に音量が戻った状態で次の再生が始まるかを確認。iOSはPiP／Wake Lockの対応差（SafariのPiPはvideo要素のみ可など）を見て非対応時のボタン無効＋案内が出ればよい |
 | 17 | 📥 OSの共有／「このアプリで開く」（trk165：share_target＋file_handlers） | 振り分け・SWの一時保存・manifestの整合はNode/VM検査済み。**インストール済みPWAが前提**なので実機は未確認 | Android Chromeで共有シート→trk!（曲・動画・CBZ/ZIP・.stpack・pack.json入りZIP）、デスクトップで「このアプリで開く」を確認。非対応形式の案内、複数ファイル、容量超過時の案内（?shared=partial/error）、アプリ更新をまたいで受け取りが残ること（inboxはactivateの掃除から除外）も。iOS Safariは非対応＝何も出ないのが仕様 |
+| 18 | 🎤 歌詞（trk166：LRC同期歌詞＋埋め込み歌詞 USLT/SYLT/©lyr/LYRICS） | LRCパーサ・合成バイナリからの埋め込み歌詞読取・優先順（手動→フォルダ.lrc→埋め込み）はNode/VM検査済み。実音源での確認は未了 | 手持ちの実ファイルで: ①歌詞タグ入り mp3/m4a/flac/ogg で 🎤 パネルに出典「埋め込みタグ」と出るか（USLT と SYLT、UTF-16 タグ含む）②フォルダ共有で同名 .lrc を置いた曲が同期するか ③「📄 歌詞ファイルを選ぶ」で選んだ .lrc/.txt が曲ごとに保存され、再起動後も残るか ④行クリックのシーク、ハイライト追従、スクロールの見た目 ⑤時刻なし歌詞の素の表示 |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -208,6 +209,8 @@
 
 17. **📥 OSの共有／「このアプリで開く」（trk165で実機で見てほしいこと）**：**インストール済みPWA**（「ホーム画面に追加」／デスクトップの「インストール」）が前提のため、ヘッドレスでは一切確認できない。見てほしいこと：①Android Chrome の共有シートに trk! が出ること（曲 mp3 等・動画・CBZ／ZIP・.stpack を1つずつ共有して、それぞれ既存の取り込みと同じ案内・検証で入ること。pack.json を含む .zip がパックとして入ること＝画像ZIPは書斎へ）。②デスクトップ（Chrome／Edge）でファイルを右クリック→「このアプリで開く」に trk! が出ること。③受け取れない形式（.txt など）を「📥 受け取れないファイル：名前」で知らせること。④複数ファイルの同時共有、空き容量不足（?shared=partial／error の案内）。⑤アプリの更新（SWのactivate）をまたいで一時置き場（trk-share-inbox-v1）が消えず、次の起動で取り込まれること。⑥起動中に共有されたとき（single-client の launchQueue 経路）。**iOS Safari は share_target／file_handlers 非対応＝共有シートに trk! が出ないのが仕様**（Capacitor ビルドで必要になったら別対応。PLAYER-ROADMAP #5 の記録どおり）。
 
+18. **🎤 歌詞（trk166で実機で見てほしいこと）**：合成バイナリのテストは緑だが、**世の中の本物のタグは癖が強い**ので実ファイルで見てほしい。①手持ちの歌詞タグ入り mp3（USLT・SYLT の両方、UTF-16 エンコードのタグ）／m4a（©lyr）／flac・ogg（LYRICS / UNSYNCEDLYRICS）を再生して、メディアプレーヤーの 🎤 パネルに「出典：埋め込みタグ」と歌詞が出ること。②フォルダ共有（📤）で曲と同じ名前の .lrc を同じフォルダに置くと「出典：フォルダの .lrc（名前）」になること（優先順：手で選んだ歌詞 → フォルダの .lrc → 埋め込みタグ）。③「📄 歌詞ファイルを選ぶ」で .lrc/.txt を選ぶと曲ごとに保存され、**ページをリロードしても残る**こと（localStorage trk_lyrics_v1・1曲256KB/合計512KBで古い順に追い出し）。「✖ 選んだ歌詞を消す」で消えること。④同期歌詞のハイライトが再生位置に追随し、行のクリックでその位置へシークすること（逆再生中はハイライトを止めてある）。⑤時刻タグのない歌詞は「※ 時刻のない歌詞なので、そのまま表示します」と出てスクロールなしの素の表示になること。⑥歌詞は**読むだけ**：元ファイルは書き換わらない（書き戻し経路そのものが無い）。文字化けを見つけたら符号化（Latin-1/UTF-16/UTF-8）のどれだったか控えておいてほしい。
+
 ### 4.2 一回限りの移行・印（削除予定）
 
 一覧と削除予定日は **[`docs/MIGRATIONS.md`](MIGRATIONS.md)** にあります（trk143 で登録簿にした）。
@@ -228,6 +231,7 @@
 | 共有プレイリスト（📥）の取り込み・曲名照合 | `js/library.js`（`plImportPick`・`PLAYLIST_IMPORT_MAX`・`plMatchIndex`・`plMatchByTitle`）、`js/title-match.js`、`tests/playlist-import.test.mjs` |
 | 🐔の並べ替え（↕） | `js/library.js`（`trkMovePlaylist`・`trkMoveButtonsState`・`trkOrderedPlaylists`）、`tests/trk-move-order.test.mjs` |
 | 📥 OSの共有／「このアプリで開く」の受け口 | `js/share-inbox.js`（振り分け）、`sw.js`（`handleShareTarget`・inboxキャッシュ）、`manifest.webmanifest`（share_target／file_handlers）、`tests/trk165-share-inbox.test.mjs` |
+| 🎤 歌詞（LRC・埋め込み歌詞） | `js/lyrics.js`（パーサ・保存・解決）、`js/audio-art.js`（`extractLyrics`）、`js/media-player-mode.js`（パネル）、`css/style.css`（`.mediaLyricsBox`）、`tests/trk166-lyrics.test.mjs` |
 | 📦パックを外したときの復元 | `js/custom.js`（`packSnapshot`・`packRebase`・`packApplied`・`packRestoreSettings`・`restoreOwnSounds`）、`js/core.js`（`cleanPackPrev`・`settings.packPrev`）、`tests/pack-unapply.test.mjs` |
 | MIDI/MIXとカタログの検査 | `tests/midi-player.test.mjs`、`tests/media-midi-integration.test.mjs`、`tests/midi-mix.test.mjs`、`tests/touhou-catalog.test.mjs` |
 | MIDIの処理量の測定（手元のファイル用） | `tools/midi-budget.mjs`（`estimateRender` を使う。読むだけ） |
@@ -256,6 +260,8 @@
 過去の検証件数・個別E2E・旧ブラウザ環境の回避手順は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) の「trk158整理時に移した検証記録」へ移しました。上記が現在の結果です。利用者の実機確認済み事項と残る確認項目は§4を正とします。
 
 ## 7. 最近の変更
+
+- **trk166（2026-10-15）**：🎤 歌詞表示（PLAYER-ROADMAP #6）。①**js/lyrics.js**（新規・audio-art.js の直後に読込）：LRCパーサ `parseLrc`（[mm:ss.xx]／[mm:ss]／[mm:ss.xxx]／[mm:ss:xx]、1行複数時刻、時刻順不同の整列、`[offset:±N]`＝仕様どおり「+で早く」、拡張LRCの `<mm:ss.xx>` 単語タグは行単位に丸める、ti/ar/al/by/re/ve のIDタグはメタへ・知らない [xx:yy] 行は歌詞として残す、時刻タグが無ければ synced:false の素のテキスト）。上限（10万字・1000行・1行50時刻）。`activeLineIndex`（二分探索）。**解決の優先順**＝手で選んだ歌詞 → フォルダの同名 .lrc → 埋め込みタグ（`resolveLyrics`）。手で選んだ歌詞は localStorage `trk_lyrics_v1` に曲キー単位で保存（1曲256KB・合計512KB、超えたら古い順に追い出し＝今の曲は残す）。②**audio-art.js に `extractLyrics`**（extract のジャケット経路は無変更）：ID3 USLT/ULT（Latin-1/UTF-16±BOM/UTF-16BE/UTF-8）＋ SYLT/SLT（ミリ秒形式だけ→秒の `lines` に正規化・整列。MIDI形式はテンポ無しでは秒に直せないので読み飛ばし）、MP4 `©lyr`（data kind 1/0）、FLAC/Ogg Vorbisコメント LYRICS/UNSYNCEDLYRICS（大文字小文字区別なし）。歌詞は256KB上限。**読み取り専用**＝書き戻し経路は無い（createWritable 不在を見張りで担保）。③**library.js**：フォルダのスキャン（📁開く／📤共有）が `.lrc` も集め、同じフォルダの同名曲に `it.lyricsFile` を付ける（💾端末に残す曲には付かない＝手動選択の保存で代替）。④**media-player-mode.js**：🎤 パネル（`<details>`、シーークバーの直下）＝出典表示（埋め込み／フォルダ／手動＋非同期歌詞の注記）・「📄 歌詞ファイルを選ぶ」（.lrc/.txt）・「✖ 選んだ歌詞を消す」・同期リスト。ハイライトは renderMedia の250ms周期に相乗り（行が変わったときだけ class 付け替え＋`scrollIntoView(center,smooth)`）、行クリックでシーク（`seekToLyric`＝逆再生中は止めてから）。**逆再生中はハイライトを止める**（時計が違うため）。曲変更（songSelected）・プレーヤー起動（openMedia）・言語変更で作り直し。開閉は設定 `mediaLyricsOpen` に記憶。パネルを開いたときだけ歌詞を読む（埋め込みタグはファイルアクセスを伴うので）。TEXT 14キー×4言語。⑤テスト `tests/trk166-lyrics.test.mjs`（11件）：lyrics.js と audio-art.js は**実ファイル全体を vm で実行**し、合成バイナリ（ID3v2.3/2.4 USLT・UTF-16、SYLT（整列・UTF-16・MIDI形式スキップ）、MP4 ©lyr の入れ子ボックス、FLAC/Ogg/Opus コメント）から実際に読むところまで検証。ジャケット経路の回帰テスト付き。⑥`tools/check-repo.mjs` 見張り追加＋既存の dialog.append 見張りを新しい並びへ更新。日英ガイド（play.md／en.md のメディアプレーヤー行）・§4-18・§4.1-18・§5・PLAYER-ROADMAP #6→[x]、`sw.js` cache を `trk-v2026.10.15-trk166` へ。**実ファイルでの確認は§4-18に登録**。
 
 - **trk165（2026-10-15）**：📥 OSの共有／「このアプリで開く」の受け口（PLAYER-ROADMAP #5＝🥈最優先）。①**share_target**（manifest.webmanifest）：共有シートからのPOSTを `sw.js` の `handleShareTarget` が受け、ファイルだけ（title/text/urlは無視）を CacheStorage `trk-share-inbox-v1` に一時保存して `index.html?shared=…` へ303で戻す。一時保存は1件ずつ try/catch（容量不足等は partial/error で合図）。**inboxキャッシュは activate のバージョン掃除から除外**（更新をまたいで受け取りが消えない）。②**file_handlers**（デスクトップ）：`launchQueue.setConsumer` で File を直接受け取り、同じ振り分けへ（single-client＝起動中でも届く）。③**js/share-inbox.js**（新規・backup.js の後ろで読込）：起動時（load後）に inbox を読んで File に戻し、**既存の取り込み経路だけ**へ渡す＝曲→`Trk.library.addSongFiles`／動画→`addVideoFiles`（拡張子表 MEDIA_EXT・VIDEO_EXT を library から公開）／CBZ・ZIP→`Trk.study.importArchives`（書斎の凍結APIに追加）／.stpack と **pack.json を含む ZIP**→`Trk.custom.installAndUse`（パックインストーラの入口そのまま。ZIPの判定は `/(^|\/)pack\.json$/` の存在だけを見る振り分け専用ののぞき見で、検証は既存のインストーラが行う）。**新しい検証入口は作っていない**（上限・形式検査はすべて既存経路）。受け取れない形式は「📥 受け取れないファイル：名前（先頭3件＋件数）」で案内（4言語。core.js の Import 報告と同じ作法）。処理後に inbox は削除（再処理ループ防止）、`?shared=` は history.replaceState で掃除。④テスト `tests/trk165-share-inbox.test.mjs`（10件）：実ソースvm抽出で振り分け（拡張子優先・動画MIME・音声MIME単独は正直に拒否・m4bは現行 MEDIA_EXT に無いので非対応扱い＝ROADMAP #10 領域）、pack.json のぞき見（壊れたZIPは書斎側へ）、ルーティング先、SWの一時保存とリダイレクト合図（empty/partial/error）、ページの引き取り（prefix外は触らない・壊れたX-Share-Nameの名前フォールバック・全件削除）、manifest整合、配線。⑤`tools/check-repo.mjs` に見張り追加（manifest・スクリプト順・SW分岐・公開API・4言語）。日英ガイド（mobile.md／en.md「スマホで遊ぶ」）・この引継ぎ（§4-17・§4.1-17・§5）・PLAYER-ROADMAP #5 を更新し、`sw.js` cacheを`trk-v2026.10.15-trk165`へ。**実機確認はインストール済みPWAが前提のため§4-17に登録（ヘッドレス不可）。iOS Safariは非対応＝仕様**（Capacitor側は別対応）。
 

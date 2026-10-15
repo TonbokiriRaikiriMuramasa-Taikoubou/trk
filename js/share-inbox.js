@@ -18,22 +18,26 @@
 Object.assign(TEXT.ja, {
   shareInboundNone:"📥 共有されたファイルを受け取れませんでした",
   shareInboundError:"📥 共有されたファイルを受け取れませんでした（もう一度お試しください）",
-  shareInboundUnsupported:"📥 受け取れないファイル：{names}"
+  shareInboundUnsupported:"📥 受け取れないファイル：{names}",
+  shareInboundAsk:"📥 共有で届いたファイルを trk! に取り込みますか？（{n}件：{names}）\n\n共有の受け口は、ほかのサイトからも送り込めます。自分で共有した覚えがなければ「キャンセル」を押してください。"
 });
 Object.assign(TEXT.en, {
   shareInboundNone:"📥 No shared files could be received",
   shareInboundError:"📥 Shared files could not be received. Please try again",
-  shareInboundUnsupported:"📥 Not accepted: {names}"
+  shareInboundUnsupported:"📥 Not accepted: {names}",
+  shareInboundAsk:"📥 Add the shared files to trk!? ({n}: {names})\n\nOther websites can also send files to this share target. If you did not share them yourself, choose Cancel."
 });
 Object.assign(TEXT.zh, {
   shareInboundNone:"📥 未能接收到分享的文件",
   shareInboundError:"📥 未能接收到分享的文件（请重试）",
-  shareInboundUnsupported:"📥 无法接收的文件：{names}"
+  shareInboundUnsupported:"📥 无法接收的文件：{names}",
+  shareInboundAsk:"📥 要将分享来的文件导入 trk! 吗？（{n} 个：{names}）\n\n其他网站也可以向这个分享入口发送文件。如果不是你自己分享的，请选择“取消”。"
 });
 Object.assign(TEXT.ko, {
   shareInboundNone:"📥 공유된 파일을 받지 못했습니다",
   shareInboundError:"📥 공유된 파일을 받지 못했습니다(다시 시도해 주세요)",
-  shareInboundUnsupported:"📥 받을 수 없는 파일: {names}"
+  shareInboundUnsupported:"📥 받을 수 없는 파일: {names}",
+  shareInboundAsk:"📥 공유된 파일을 trk!에 가져올까요? ({n}개: {names})\n\n다른 웹사이트도 이 공유 입구로 파일을 보낼 수 있습니다. 직접 공유한 기억이 없다면 '취소'를 누르세요."
 });
 
 const SHARE_CACHE = "trk-share-inbox-v1";
@@ -44,6 +48,11 @@ function shareToast(key, vars) {
 }
 function shareInboxPrefix() {
   try { return new URL("share-inbox/", document.baseURI).pathname; } catch (_) { return ""; }
+}
+/* Confirmation text is a UI surface: keep untrusted file names short and remove controls/bidi overrides. */
+function shareDisplayName(name) {
+  const clean = String(name || "").replace(/[\u0000-\u001f\u007f-\u009f\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, " ").replace(/\s+/g, " ").trim();
+  return Array.from(clean).slice(0, 80).join("") || "shared-file";
 }
 /* 振り分け（純関数）。拡張子を正とし、動画だけ MIME でも拾う（addVideoFiles の受理条件と同じ）。
    音声系は MIME だけ（拡張子が対応表に無い）だと addSongFiles が黙って落とすため、
@@ -127,7 +136,15 @@ async function drainShareInbox() {
     } catch (err) { console.error("[share] inbox read:", err); }
   }
   try { for (const req of inbox) await cache.delete(req); } catch (_) {}
-  if (files.length) { try { await routeInboundFiles(files); } catch (err) { console.error("[share] route:", err); } }
+  if (!files.length) return 0;
+  /* share_target はただの POST の受け口なので、ほかのサイトのフォームからも届く（ブラウザは送り元を区別しない）。
+     取り込む自由はそのままに、取り込む前に「何が・何件」を見せて利用者が決める（trk177・レビュー：信頼境界の明示）。
+     launchQueue（OSの「このアプリで開く」）は利用者の操作そのものなので尋ねない。 */
+  const names = files.map(f => shareDisplayName(f.name)).slice(0, 3).join(", ") + (files.length > 3 ? ` …+${files.length - 3}` : "");
+  let ok = false;
+  try { ok = typeof confirm === "function" && confirm(tr("shareInboundAsk", { n: files.length, names })); } catch (_) { ok = false; }
+  if (!ok) return -1;   /* 断った：中身は上で消してある。「受け取れなかった」の案内も出さない */
+  try { await routeInboundFiles(files); } catch (err) { console.error("[share] route:", err); }
   return files.length;
 }
 function shareStartup() {
@@ -138,7 +155,7 @@ function shareStartup() {
     try { history.replaceState(null, "", location.pathname + location.hash); } catch (_) {}
   }
   drainShareInbox().then(count => {
-    if (count) return;
+    if (count) return;   /* 取り込んだ（>0）／断った（-1） */
     if (shared === "empty" || shared === "partial") shareToast("shareInboundNone");
     else if (shared === "error") shareToast("shareInboundError");
   }).catch(err => {

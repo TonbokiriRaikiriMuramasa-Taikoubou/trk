@@ -27,6 +27,7 @@ const grab = (src, pattern, label) => {
 const packJsonRe = grab(shareSrc, /const PACK_JSON_RE = [^;]+;/, "PACK_JSON_RE");
 const fnShareToast = grab(shareSrc, /function shareToast\(key, vars\) \{[\s\S]*?\n\}/, "shareToast()");
 const fnInboxPrefix = grab(shareSrc, /function shareInboxPrefix\(\) \{[\s\S]*?\n\}/, "shareInboxPrefix()");
+const fnDisplayName = grab(shareSrc, /function shareDisplayName\(name\) \{[\s\S]*?\n\}/, "shareDisplayName()");
 const fnClassify = grab(shareSrc, /function classifyInboundFile\(name, type\) \{[\s\S]*?\n\}/, "classifyInboundFile()");
 const fnZipProbe = grab(shareSrc, /async function zipLooksLikePack\(file\) \{[\s\S]*?\n\}/, "zipLooksLikePack()");
 const fnRoute = grab(shareSrc, /async function routeInboundFiles\(files\) \{[\s\S]*?\n\}/, "routeInboundFiles()");
@@ -148,7 +149,7 @@ test("the unsupported report shows at most three names, then a count (core.js Im
 });
 
 /* ---------- SWの一時保存 → ページ側の引き取り ---------- */
-function drainSandbox({ inbox = [], extraUrls = [], withCaches = true } = {}) {
+function drainSandbox({ inbox = [], extraUrls = [], withCaches = true, confirmAnswer, withoutConfirm = false } = {}) {
   const state = { deleted: [], routed: [], opened: [] };
   const cache = {
     keys: async () => [...inbox.map(e => ({ url: e.url })), ...extraUrls.map(url => ({ url }))],
@@ -170,10 +171,16 @@ function drainSandbox({ inbox = [], extraUrls = [], withCaches = true } = {}) {
     window: {},
   };
   if (withCaches) sandbox.caches = { open: async name => { state.opened.push(name); return cache; } };
+  if (!withoutConfirm) {
+    state.asked = [];
+    sandbox.tr = (key, vars) => `${key}:${vars.n}:${vars.names}`;
+    sandbox.confirm = (msg) => { state.asked.push(msg); return confirmAnswer !== false; };
+  }
   vm.createContext(sandbox);
   vm.runInContext(`
 ${shareCacheConst}
 ${fnInboxPrefix}
+${fnDisplayName}
 ${fnDrain}
 var routed = [];
 function routeInboundFiles(files) { routed.push(files); return Promise.resolve({}); }
@@ -331,9 +338,43 @@ test("wiring: script order, exported entry points, worker cleanup whitelist, fou
   assert.ok(swSrc.includes("key !== SHARE_CACHE"), "the activate cleanup spares the share inbox");
   assert.ok(swSrc.includes('if (request.method === "POST")'), "the fetch handler branches on POST before the GET-only logic");
   /* sw.js の cache 版数はリリースごとに進むので、ここでは固定しない（check-repo.mjs が確認する） */
-  for (const key of ["shareInboundNone", "shareInboundError", "shareInboundUnsupported"]) {
+  for (const key of ["shareInboundNone", "shareInboundError", "shareInboundUnsupported", "shareInboundAsk"]) {
     assert.equal(count(shareSrc, `${key}:`), 4, `${key} exists in ja/en/zh/ko`);
   }
+  const launchStart = shareSrc.indexOf('if ("launchQueue" in window');
+  const launchEnd = shareSrc.indexOf("/* 取り込みはアプリの初期化", launchStart);
+  assert.ok(launchStart >= 0 && launchEnd > launchStart, "launchQueue consumer can be isolated");
+  assert.doesNotMatch(shareSrc.slice(launchStart, launchEnd), /confirm\s*\(/, "explicit Open-with-this-app does not get a second confirmation");
   assert.ok(shareSrc.includes("window.TrkShareInbox = Object.freeze({ classifyInboundFile, zipLooksLikePack, routeInboundFiles, drainShareInbox, SHARE_CACHE })"), "test handles are exported");
   assert.equal(swCacheConst, shareCacheConst, "worker and page agree on the inbox cache name");
+});
+
+/* trk177（レビュー）：share_target はほかのサイトのフォームからも届くので、取り込む前に件数と名前を見せて尋ねる */
+test("drainShareInbox() asks before routing, and a refusal routes nothing but still clears the inbox", async () => {
+  const inbox = [{ url: "https://x/trk/share-inbox/9-0", encodedName: "a.stpack", type: "" }];
+  const no = drainSandbox({ inbox, confirmAnswer: false });
+  assert.equal(await no.__drain(), -1);
+  assert.equal(no.__routed().length, 0, "refused files are not imported");
+  assert.deepEqual(no.__state.deleted, ["https://x/trk/share-inbox/9-0"], "refused files do not linger in the inbox");
+  assert.equal(no.__state.asked[0], "shareInboundAsk:1:a.stpack");
+  const yes = drainSandbox({ inbox, confirmAnswer: true });
+  assert.equal(await yes.__drain(), 1);
+  assert.equal(yes.__routed().length, 1);
+
+  const unavailable = drainSandbox({ inbox, withoutConfirm: true });
+  assert.equal(await unavailable.__drain(), -1, "missing confirmation support fails closed");
+  assert.equal(unavailable.__routed().length, 0);
+  assert.deepEqual(unavailable.__state.deleted, ["https://x/trk/share-inbox/9-0"]);
+});
+
+test("share confirmation bounds and sanitizes untrusted file names", async () => {
+  const name = `x\n\u202ey${"z".repeat(100)}`;
+  const api = drainSandbox({ inbox:[{
+    url:"https://x/trk/share-inbox/10-0", encodedName:encodeURIComponent(name), type:"application/octet-stream",
+  }], confirmAnswer:false });
+  assert.equal(await api.__drain(), -1);
+  const shown = api.__state.asked[0].slice("shareInboundAsk:1:".length);
+  assert.equal(shown.length, 80);
+  assert.match(shown, /^x y/);
+  assert.doesNotMatch(shown, /[\n\u202e]/);
 });

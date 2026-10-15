@@ -26,6 +26,13 @@ async function backupFile(entries = [], { packs = true } = {}) {
     ...entries.map((blob, i) => ({ name:`packs/${String(i + 1).padStart(4, "0")}.stpack`, blob })),
   ]);
 }
+async function backupWithLocalItems(items) {
+  const meta = freshMeta(); meta.areas = { core:true, study:false, packs:false, media:false };
+  return Z.zipWrite([
+    { name:"backup.json", blob:new Blob([JSON.stringify(meta)]), deflate:true },
+    { name:"local.json", blob:new Blob([JSON.stringify({ items })]), deflate:true },
+  ]);
+}
 test("backup restore reports ZIP entry-count safety caps as non-bypassable", async () => {
   const restore = loadBackup({ idb:mockIDB(new Map(), []), custom:{}, limitsIgnored:true });
   const valid = await Z.zipWrite([
@@ -95,13 +102,14 @@ function mockIDB(packStore, events, extraStores = new Map()) {
   };
 }
 function loadBackup({ idb, custom, tr = (key, vars = {}) => `${key}:${JSON.stringify(vars)}`, elements = {},
-  confirmFn = () => true, alertFn = () => {}, reloadFn = () => {}, limitsIgnored = true,
+  confirmFn = () => true, alertFn = () => {}, reloadFn = () => {}, limitsIgnored = true, localStore = new Map(),
   studyLimits = { shelf:500, pages:3000, imageBytes:600 * 1048576, imageFileBytes:100 * 1048576, textBytes:12 * 1048576 } }) {
   const window = { tr, alert:alertFn, Trk:{ core:{ storageLimitsIgnored:() => limitsIgnored, $:() => null, setStatus() {} }, custom, zipIO:Z, studyLimits } };
   const sandbox = {
     window, document:{ readyState:"complete", getElementById:id => elements[id] || null, addEventListener() {} },
     confirm:confirmFn, location:{ reload:reloadFn },
-    indexedDB:idb, localStorage:{ getItem:() => null, setItem() {}, removeItem() {} },
+    indexedDB:idb, localStorage:{ getItem:key => localStore.has(key) ? localStore.get(key) : null,
+      setItem:(key, value) => localStore.set(key, String(value)), removeItem:key => localStore.delete(key) },
     console, Blob, File, Date, Number, String, Array, Object, JSON, Math, Error, Promise, ArrayBuffer, Uint8Array, DataView, Map, Set,
   };
   vm.createContext(sandbox);
@@ -232,6 +240,75 @@ test("the completion details report counts, failed-version protection and skippe
     "counts:2/1/3\nbackupRestorePackFailedKept\nbackupRestorePackCleanupSkipped");
   assert.equal(restore.formatRestoreDetails({ meta:{ areas:{ packs:false } }, packsOk:0, packsFailed:0, packsRemoved:0 }),
     "backupRestorePacksNotIncluded");
+});
+
+test("manual lyrics and subtitle storage (including delay) are in the backup allowlist and restore", async () => {
+  const lyrics = JSON.stringify({ "song-key":{ text:"[00:01.00]hello" } });
+  const subtitles = JSON.stringify({ "song-key":{ text:"00:00:01.000 --> 00:00:02.000\\nline", offsetMs:250 } });
+  const localStore = new Map();
+  const restore = loadBackup({ idb:mockIDB(new Map(), []), custom:{}, localStore });
+  assert.ok(restore.LS_KEYS.includes("trk_lyrics_v1"));
+  assert.ok(restore.LS_KEYS.includes("trk_subs_v1"));
+  const file = await backupWithLocalItems({
+    trk_lyrics_v1:lyrics, trk_subs_v1:subtitles, trk_not_allowed_v1:"must not be restored",
+  });
+  await restore.restoreBackup(file);
+  assert.equal(localStore.get("trk_lyrics_v1"), lyrics);
+  assert.equal(localStore.get("trk_subs_v1"), subtitles, "the subtitle offset lives in the same v1 value");
+  assert.equal(localStore.has("trk_not_allowed_v1"), false, "unlisted localStorage keys stay excluded");
+});
+
+test("restored add-ons are previewed by name and count, sanitized for the prompt, and forced off", async () => {
+  const addons = {
+    "addon-a":{ id:"addon-a", name:"Alpha\n\u0085\u202eInjected", enabled:true, code:"register-a", consentAt:100, consentSha:"sha256:keep" },
+    "addon-b":{ id:"addon-b", name:"Beta", enabled:false, code:"register-b" },
+    "addon-c":{ id:"addon-c", name:"Gamma", enabled:true, code:"register-c" },
+    "addon-d":{ id:"addon-d", name:"Delta", enabled:true, code:"register-d" },
+  };
+  const localStore = new Map([["trk_addons_v1", "current-addons"]]);
+  const restore = loadBackup({ idb:mockIDB(new Map(), []), custom:{}, localStore });
+  const file = await backupWithLocalItems({ trk_addons_v1:JSON.stringify(addons) });
+  const info = await restore.readBackupMeta(file);
+  assert.equal(info.addons.known, true);
+  assert.equal(info.addons.count, 4);
+  assert.deepEqual(Array.from(info.addons.names), ["Alpha Injected", "Beta", "Gamma"]);
+  assert.equal(info.addons.omitted, 1);
+
+  await restore.restoreBackup(file, { info });
+  const stored = JSON.parse(localStore.get("trk_addons_v1"));
+  assert.equal(stored["addon-a"].enabled, false);
+  assert.equal(stored["addon-b"].enabled, false);
+  assert.equal(stored["addon-c"].enabled, false);
+  assert.equal(stored["addon-d"].enabled, false);
+  assert.equal(stored["addon-a"].code, "register-a", "the installed code remains available for explicit later enablement");
+  assert.equal(stored["addon-a"].consentSha, "sha256:keep", "the original consent fingerprint is retained but cannot auto-run while disabled");
+});
+
+test("restore confirmation includes add-on count, names, and the disabled-by-default rule", async () => {
+  const element = () => ({ checked:false, disabled:false, files:[], value:"", handlers:{},
+    addEventListener(type, handler) { this.handlers[type] = handler; } });
+  const input = element(), prompts = [];
+  input.files = [await backupWithLocalItems({ trk_addons_v1:JSON.stringify({
+    "addon-one":{ id:"addon-one", name:"Echo", enabled:true, code:"code" },
+  }) })];
+  const restore = loadBackup({
+    idb:mockIDB(new Map(), []), custom:{},
+    elements:{ backupMakeBtn:element(), backupRestoreFile:input, ignoreLimitsChk:element() },
+    tr:(key, vars = {}) => key === "backupRestoreAsk"
+      ? `ask:${vars.addonCount}:${vars.addonNames}` : key,
+    confirmFn:text => { prompts.push(text); return false; },
+  });
+  await input.handlers.change();
+  assert.deepEqual(prompts, ["ask:1:Echo"], "the native confirmation receives the count and add-on name list");
+
+  const i18nSource = fs.readFileSync(`${ROOT}/js/i18n.js`, "utf8");
+  assert.equal((i18nSource.match(/backupRestoreAsk:/g) || []).length, 4, "confirmation text exists in all four locales");
+  for (const phrase of [
+    "復元したアドオンはすべてオフになります。",
+    "Restored add-ons will all be disabled.",
+    "恢复的插件都会处于关闭状态。",
+    "복원된 애드온은 모두 꺼진 상태입니다.",
+  ]) assert.ok(i18nSource.includes(phrase), `disabled-by-default explanation exists: ${phrase}`);
 });
 
 test("the restore completion report is acknowledged before the page reloads", async () => {

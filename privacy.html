@@ -20,7 +20,7 @@
     <p class="eyebrow">PRIVACY</p>
     <h1>プライバシーについて</h1>
     <p class="lead">trk! は、手持ちの曲で遊ぶための、サーバーを持たないブラウザ音ゲーです。現在のWeb版とPWA版では、アカウント登録・広告・行動分析を使いません。</p>
-    <p class="updated">最終更新：2026年10月6日</p>
+    <p class="updated">最終更新：2026年10月15日</p>
 
     <nav class="toc" aria-label="このページの項目">
       <a href="#collect">収集する情報</a>
@@ -45,32 +45,37 @@
 
     <section id="local">
       <h2>2. 端末内に保存される情報</h2>
-      <p>ゲームを動かすため、次の情報がブラウザの <code>localStorage</code>、IndexedDB、またはCache Storageに保存されることがあります。これらはtrk!のサーバーには送信されません。</p>
+      <p>ゲームを動かすため、次の情報がブラウザの <code>localStorage</code>、IndexedDB、またはCache Storageに保存されることがあります。trk! はこれらを運営者のサーバーへ送信しません。</p>
       <ul>
         <li>音量、言語、スキン、キー割り当て、シンセの設定</li>
         <li>スコア、記録、お気に入り、カスタムスキン、エフェクト設定</li>
         <li>ユーザーが明示的に「端末に残す」を選んだ共有曲のファイルとメタデータ</li>
-        <li>📚 書斎へ取り込んだ画像・テキストのコピー、栞と栞一覧、書き出し前のメモ、曲へ割り当てたジャケット、書斎の表示設定（並べ替え・文字組み・TVの見た目など。IndexedDB <code>trk_study_room_v1</code>）</li>
+        <li>📚 書斎へ取り込んだ画像・テキストのコピー、栞と栞一覧、書き出し前のメモ、曲へ割り当てたジャケット、書斎の表示設定（IndexedDB <code>trk_study_room_v1</code>）。CBZ／ZIPを取り込む場合も、展開したページ画像をこの端末の書斎へコピーします。元のアーカイブやファイルは変更しません。</li>
+        <li>手で選んだ歌詞（<code>trk_lyrics_v1</code>）、字幕と字幕の遅延（<code>trk_subs_v1</code>）。ファイルの内容は表示のために端末内へ保存され、元ファイルには書き戻しません。</li>
+        <li>ユーザーが追加したアドオンのコードや設定。バックアップにも含まれる場合があります。</li>
         <li>PWAをオフラインで起動するためのアプリファイルのキャッシュ</li>
       </ul>
       <p>曲の端末保存は初期状態ではオフです。保存した曲や設定は、ゲーム内の削除操作、設定のリセット、ブラウザのサイトデータ削除で消せます。ブラウザの保存容量やOSの判断により、保存が拒否・削除されることがあります。</p>
-      <p>書斎へ取り込んだ本も端末内だけに保存され、外部へ送信・アップロードしません。本棚の「この本を削除」またはブラウザのサイトデータ削除で消せます。元のファイルは変更しません。栞・メモのコピー・ジャケットの割り当て・表示設定も同じ場所に保存され、同じ操作で消せます。</p>
+      <p>📚 書斎の本・画像・文章・栞・メモや、パックを取り込むとき、または設定の「💾 端末の保存」から、ブラウザに保存領域の固定（<code>navigator.storage.persist()</code>）を求めることがあります。許可するかどうかはブラウザが決めます。許可されても、ユーザーがサイトデータを削除した場合などの消失を防ぐ保証にはなりません。</p>
+      <p>設定の「📦 まるごとバックアップ」は、選んだ端末内データからZIPをブラウザ内で作成してダウンロードします。設定・記録・プレイリスト・書斎・カスタムパックなどが含まれ、曲・VRM・MMDなどの大きなファイルは任意で追加できます。復元時は、バックアップに含まれる領域を置き換えます。復元されたアドオンは安全のためオフで戻ります。バックアップファイルはユーザーのダウンロード先に保存され、trk!から自動送信されません。個人データやアドオンコードを含むことがあるため、ファイル自体を安全に保管してください。</p>
+      <p>書斎へ取り込んだ本やメディアのコピーは端末内だけに保存され、外部へ送信・アップロードしません。本棚の「この本を削除」またはブラウザのサイトデータ削除で消せます。栞・メモ・ジャケットの割り当て・手動で選んだ歌詞や字幕は、各機能の削除操作またはブラウザのサイトデータ削除で消せます。</p>
     </section>
 
     <section id="permissions">
       <h2>3. ファイルと権限</h2>
       <p>曲やモデルを選ぶときだけ、ブラウザが提供するファイル選択機能を使います。フォルダ共有を使う場合は、ブラウザの許可ダイアログが表示されます。許可を取り消す方法はブラウザまたはOSの設定に従います。</p>
-      <p>trk! は、選択されたファイルを配布・公開・アップロードすることを前提にしていません。ユーザーが書き出し機能で作成したパックや譜面を、自分で共有する場合は、含まれる素材の権利と配布先の規約を確認してください。</p>
+      <p>インストール済みPWAのOS共有シート（<code>share_target</code>）から届いたファイルは、Service Worker が Cache Storage の一時領域（<code>trk-share-inbox-v1</code>）に置き、取り込む前にファイル名と件数を表示して確認します。確認をキャンセルした場合は取り込まず、一時領域から削除します。共有のPOST受け口は他のWebサイトのフォームからも呼び出せます。ブラウザはOS共有とWebフォームを区別しないため、心当たりのないファイルはキャンセルしてください。デスクトップの「このアプリで開く」はユーザーがOSで選んだ操作なので、別の確認は出しません。共有されたURL・タイトル・文章は取り込みません。</p>
+      <p>受け取ったファイルは、曲・動画・書斎の本・パックの既存の取り込み処理を通り、この端末内で使います。ファイル自体を他の利用者へ配布・公開・アップロードすることを前提にしていません。ユーザーが書き出し機能で作成したパックや譜面を自分で共有する場合は、含まれる素材の権利と配布先の規約を確認してください。</p>
     </section>
 
     <section id="network">
       <h2>4. ネットワーク通信と外部サービス</h2>
       <ul>
         <li>GitHub Pagesから、trk!のHTML、CSS、JavaScript、画像などを配信します。GitHub Pages側のアクセスログ等については、GitHubのポリシーが適用されます。</li>
-        <li>VRM／MMDマスコットを使うとき、three.jsなどのライブラリをjsDelivr CDNから読み込む場合があります。その場合、CDNへの通信が発生します。使わないときは、これらのライブラリを読み込みません。</li>
+        <li>VRM／MMDマスコットを使うとき、three.jsなどのライブラリをこのアプリに同梱したファイルから読み込みます（同一オリジン）。使わないときは、これらのライブラリを読み込みません。</li>
         <li>GitHub Issues、X、その他の外部リンクを開いた場合は、そのサービスへ移動します。投稿内容は公開される可能性があるため、個人情報を含めないでください。</li>
       </ul>
-      <p>曲の再生、譜面生成、Web Audioによる音声合成は、外部の音楽サービスへ送信せずに行います。外部CDNの提供状況やポリシーはtrk!の管理外です。</p>
+      <p>曲の再生、譜面生成、Web Audioによる音声合成は、外部の音楽サービスへ送信せずに行います。サーバー側のアクセスログ等や、GitHub Issues・Xなど外部リンク先の扱いは、各サービスのポリシーに従います。</p>
     </section>
 
     <section id="delete">
@@ -100,10 +105,12 @@
   <article class="card english" lang="en">
     <p class="eyebrow">ENGLISH SUMMARY</p>
     <h2>Privacy summary</h2>
-    <p>trk! is a local-first browser rhythm game. The current web and PWA versions do not require an account and do not use advertising, analytics, or telemetry. User-selected songs, charts, settings, scores, favorites, and optional saved music stay in the browser or app storage and are not uploaded by trk!.</p>
-    <p>The app may request file or folder access when you choose music. VRM/MMD features may load three.js-related libraries from jsDelivr. GitHub Pages, GitHub Issues, X, jsDelivr, and other external services have their own policies when you visit them.</p>
+    <p>trk! is a local-first browser rhythm game. The current web and PWA versions do not require an account and do not use advertising, analytics, or telemetry. User-selected songs, charts, settings, scores, favorites, manually selected lyrics/subtitles, and optional saved media stay in browser or app storage; trk! does not upload them to an operator server. Imported CBZ/ZIP pages are copied into the local Study Room without changing the source archive.</p>
+    <p>When you import Study Room books or custom packs, or use the storage setting, trk! may request persistent browser storage with <code>navigator.storage.persist()</code>. The browser decides whether to grant it; this is not a guarantee against data loss or deliberate deletion. A full backup is built locally and downloaded as a ZIP. It may contain personal data and add-on code; media files are optional. Restored add-ons start disabled.</p>
+    <p>An installed PWA can receive files through the OS share sheet. The Service Worker temporarily keeps incoming files in Cache Storage and asks before importing, showing names and a count. A website can also submit to the share-target endpoint, and the browser cannot distinguish that from OS sharing; cancel unexpected requests. “Open with this app” is an explicit OS action and does not show another prompt. Shared URLs and text are ignored; files are handled locally.</p>
+    <p>The app may request file or folder access when you choose music. VRM/MMD features load bundled three.js-related libraries from the app's same origin. GitHub Pages access logs and external destinations such as GitHub Issues and X are governed by their respective policies.</p>
     <p>The APK build is not distributed yet. This repository contains a Capacitor preparation path for packaging the same web assets; any future native media permissions will be documented here before release.</p>
-    <p>See the Japanese sections above for the full current policy. Last updated: October 6, 2026.</p>
+    <p>See the Japanese sections above for the full current policy. Last updated: October 15, 2026.</p>
   </article>
 </main>
 

@@ -744,7 +744,8 @@ function updateMediaSession() {
   if (!ms) return;
   const s = core.currentSong || {};
   if (typeof MediaMetadata !== "undefined" && s) {
-    try { ms.metadata = new MediaMetadata({ title:s.title || core.baseName(core.mediaName) || "trk!", artist:s.artist || "trk!", album:s.packName || "trk!", artwork:[{ src:"icons/icon-512.png", sizes:"512x512", type:"image/png" }] }); } catch (_) {}
+    const d = trackDisplayMeta(core.currentSong);   /* 🏷 ロック画面・通知もタグ込みの表示名に揃える（trk167） */
+    try { ms.metadata = new MediaMetadata({ title:d.title || s.title || core.baseName(core.mediaName) || "trk!", artist:d.artist || s.artist || "trk!", album:d.album || s.packName || "trk!", artwork:[{ src:"icons/icon-512.png", sizes:"512x512", type:"image/png" }] }); } catch (_) {}
   }
   try {
     if (core.videoReady && Number.isFinite(core.video.duration) && core.video.duration > 0 && typeof ms.setPositionState === "function") {
@@ -777,10 +778,17 @@ let reverseNode, loopStatusNode, loopSetANode, loopSetBNode, loopClearNode, loop
 let loopPresetRenderKey = null, loopPresetRenderSig = null, loopQuickNodes = [];
 function tx(tag, key, cls) { const n = core.el(tag, cls || "", tr(key)); n.dataset.i18n = key; return n; }
 function makeButton(key, cls = "mediaSmallBtn") { const b = core.el("button", cls, tr(key)); b.type = "button"; b.dataset.i18n = key; return b; }
+function trackDisplayMeta(s) {
+  /* 🏷 表示名は library の優先順（ユーザー設定名→タグ→カタログ曲名→ファイル名）に揃える（trk167） */
+  const lib = window.Trk.library;
+  if (s && lib && typeof lib.songDisplayMeta === "function") { try { return lib.songDisplayMeta(s); } catch (_) {} }
+  return { title: s ? s.title : "", artist: s ? s.artist || "" : "", album: "" };
+}
 function updateTrackText() {
   const s = core.currentSong;
-  titleNode.textContent = s ? s.title : tr("mediaNoTrack");
-  subNode.textContent = s ? [s.artist, s.packName, srcLabelSafe(s)].filter(Boolean).join(" · ") : tr("mediaModeStatus");
+  const d = trackDisplayMeta(s);
+  titleNode.textContent = s ? (d.title || s.title) : tr("mediaNoTrack");
+  subNode.textContent = s ? [d.artist || s.artist, d.album, s.packName, srcLabelSafe(s)].filter(Boolean).join(" · ") : tr("mediaModeStatus");
   titleNode.dataset.i18n = s ? "" : "mediaNoTrack";
   if (!s) delete titleNode.dataset.i18n;
 }
@@ -795,8 +803,9 @@ function renderQueue() {
   for (const it of all.slice(0, 300)) {
     const b = core.el("button", "mediaQueueItem" + (core.currentSong && core.currentSong.key === it.key ? " selected" : ""));
     b.type = "button"; b.dataset.key = it.key;
-    const name = core.el("strong", "mediaQueueName", it.title || "song");
-    const meta = core.el("span", "mediaQueueMeta", [it.artist, srcLabelSafe(it)].filter(Boolean).join(" · "));
+    const d = trackDisplayMeta(it);   /* 🏷 キューもタグ込みの表示名（trk167） */
+    const name = core.el("strong", "mediaQueueName", d.title || it.title || "song");
+    const meta = core.el("span", "mediaQueueMeta", [d.artist || it.artist, d.album, srcLabelSafe(it)].filter(Boolean).join(" · "));
     b.append(name, meta);
     b.addEventListener("click", () => playSong(it, true));
     queueNode.append(b);
@@ -1316,7 +1325,8 @@ function buildMedia() {
   core.on("beforeLoad", () => { if (clipAbort) clipAbort(); stopReverse(false, true); clearMediaLoop(true); reverseBuffer = null; reverseBufferKey = ""; });
   core.on("songSelected", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics(); });   /* 🎤 曲が変わったら歌詞も（trk166） */
   core.on("mediaReady", () => { if (mediaOpen) renderMedia(); updateMediaSession(); });
-  core.on("records", renderQueue); core.on("packsChanged", renderQueue); core.on("language", () => {
+  core.on("records", renderQueue); core.on("packsChanged", renderQueue);
+  core.on("songTags", () => { renderQueue(); if (mediaOpen) renderMedia(); });   /* 🏷 タグが届いたら表示名を追従（trk167） */ core.on("language", () => {
     if (stageNote) { stageNote.textContent = tr("mediaStageNoVideo"); stageNote.dataset.i18n = "mediaStageNoVideo"; }
     renderInterp();
     loopPresetRenderKey = loopPresetRenderSig = null;

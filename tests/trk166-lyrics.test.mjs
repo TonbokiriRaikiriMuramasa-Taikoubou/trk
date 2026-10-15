@@ -351,7 +351,7 @@ test("wiring: script order, folder .lrc pickup, settings key, panel, four langua
   assert.ok(playerSrc.includes("seekToLyric(line.t)"), "clicking a synced line seeks");
   assert.ok(!playerSrc.includes("writeLyrics") && !lyricsSrc.includes("writable"), "lyrics are read-only — no write-back path");
 
-  assert.ok(artSrc.includes("extract, extractLyrics, thumbnail"), "extractLyrics is exported");
+  assert.ok(/audioArt = Object\.freeze\(\{[^}]*extractLyrics/.test(artSrc), "extractLyrics is exported");   /* export 行の完全一致は将来の追加で割れるので名前だけで見る */
   assert.ok(artSrc.includes("lyricsBytes:MAX_LYRICS_BYTES"), "the lyrics cap is documented in limits");
   assert.ok(artSrc.includes('type === "\\xA9lyr"'), "MP4 ©lyr marker");
   assert.ok(artSrc.includes("USLT") && artSrc.includes("SYLT") && artSrc.includes("UNSYNCEDLYRICS"), "ID3 and Vorbis lyric keys");

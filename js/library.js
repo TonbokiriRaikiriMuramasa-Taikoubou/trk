@@ -1013,8 +1013,10 @@ function touhouCatalogTitle(it) {
   }
   return hasTitle(key) ? data.titles[key] : "";
 }
+/* 表示名の優先順：🎶 ユーザー設定名 → 🏷 埋め込みタグ（trk167）→ カタログ曲名 → 元ファイル名。
+   ⚠ 表示と検索・並び替えだけ。カタログ照合のキー（plWish系）はファイル名側のまま＝タグは照合に影響しない */
 function songDisplayTitle(it, meta = metaOf(it && it.key) || {}) {
-  return meta.title || touhouCatalogTitle(it) || (it && it.title) || "";
+  return meta.title || songTagField(it, "title") || touhouCatalogTitle(it) || (it && it.title) || "";
 }
 
 /* 保存されていたプレイリスト1つの検証（読み込み時に全部に通す） */
@@ -2798,6 +2800,60 @@ async function loadSongArtwork(it) {
   songArtPending.set(key, job);
   try { return await job; } finally { if (songArtPending.get(key) === job) songArtPending.delete(key); }
 }
+/* ---------- 🏷 埋め込みテキストタグ（trk167）：表示だけ。元ファイルは書き換えない ----------
+   サムネイルと同じタイミング（行が見えたとき・曲を選んだとき）に並行して読む。
+   結果はメモリの Map だけ（リロード後は読み直す）。タグの正はファイルの中にあるので、
+   別の場所に複製してファイルとズレた表示を出さない。 */
+const songTags = new Map();               /* song key -> { title, artist, album, albumArtist, genre, track, trackTotal } | null */
+const songTagsPending = new Map();        /* song key -> Promise（二重読み込み防止） */
+function songTagsOf(it) { return (it && songTags.get(it.key)) || null; }
+function songTagField(it, field) { const t = songTagsOf(it); return (t && t[field]) || ""; }
+/* 表示用のまとめ（優先順：🎶 ユーザー設定 → 🏷 タグ → 曲オブジェクトの値） */
+function songDisplayMeta(it) {
+  const m = metaOf(it && it.key) || {}, t = songTagsOf(it);
+  return { title: songDisplayTitle(it, m),
+    artist: m.artist || (t && t.artist) || (it && it.artist) || "",
+    album: m.album || (t && t.album) || "" };
+}
+async function loadSongTags(it) {
+  if (!it || !it.file || !canExtractSongArt(it)) return null;
+  if (songTags.has(it.key)) return songTags.get(it.key);
+  if (songTagsPending.has(it.key)) return songTagsPending.get(it.key);
+  const job = withSongArtSlot(async () => {
+    const api = window.Trk.media && window.Trk.media.audioArt;
+    if (!api || typeof api.extractTags !== "function") return null;
+    try { return await api.extractTags(it.file); } catch (_) { return null; }
+  }).then(tags => {
+    songTags.set(it.key, tags || null);
+    if (tags) onSongTagsLoaded(it);
+    return tags || null;
+  }).catch(() => { songTags.set(it.key, null); return null; });
+  songTagsPending.set(it.key, job);
+  try { return await job; } finally { if (songTagsPending.get(it.key) === job) songTagsPending.delete(it.key); }
+}
+function onSongTagsLoaded(it) {
+  refreshRowTags(it);                              /* 一覧の行はその場で更新（ぜんぶ描き直さない） */
+  if (core.currentSong === it) renderBanner();     /* 選曲中の曲ならバナーも */
+  core.emit("songTags", it);                       /* メディアプレーヤー側は queue／表示を追従させる */
+}
+function refreshRowTags(it) {
+  const box = core.$("libList");
+  if (!box || typeof box.querySelectorAll !== "function") return;
+  for (const node of box.querySelectorAll(".libRow[data-song-key]")) {
+    if (node.dataset.songKey !== it.key) continue;
+    const name = node.querySelector(".libName"), sub = node.querySelector(".libSub");
+    if (name) name.textContent = libRowNameText(it, node.__trkRowInfo || null);
+    if (sub) sub.textContent = libRowSubText(it);
+    return;
+  }
+}
+function libRowNameText(it, info) {
+  return (it.video ? "🎬 " : "") + songDisplayTitle(it) + (info && info.title ? " " + info.title : "");
+}
+function libRowSubText(it) {
+  const m = metaOf(it.key) || {}, d = songDisplayMeta(it);
+  return [d.artist, d.album, m.matchHint ? `${tr("plMatchMemo")}: ${m.matchHint}` : "", srcLabel(it)].filter(Boolean).join(" · ");
+}
 let songBackgroundRequest = 0;
 async function applySongBackground(it) {
   const request = ++songBackgroundRequest;
@@ -2827,7 +2883,7 @@ function beginLibArtworkRender() {
         if (!entry.isIntersecting && entry.intersectionRatio <= 0) continue;
         const img = entry.target, job = img.__trkSongArtJob;
         if (libArtworkObserver) libArtworkObserver.unobserve(img);
-        if (job) loadSongArtwork(job.it).then(blob => showSongArtwork(job, blob)).catch(() => {});
+        if (job) { loadSongArtwork(job.it).then(blob => showSongArtwork(job, blob)).catch(() => {}); void loadSongTags(job.it); }   /* 🏷 タグも同じ可視タイミングで読む（trk167） */
       }
     }, { root:box, rootMargin:"140px 0px" });
   }
@@ -2854,7 +2910,7 @@ function watchSongArtwork(img, fallback, it, generation, eager = false) {
   const job = { img, fallback, it, generation };
   img.__trkSongArtJob = job;
   if (libArtworkObserver) libArtworkObserver.observe(img);
-  else if (eager) loadSongArtwork(it).then(blob => showSongArtwork(job, blob)).catch(() => {});
+  else if (eager) { loadSongArtwork(it).then(blob => showSongArtwork(job, blob)).catch(() => {}); void loadSongTags(it); }   /* 🏷 タグも（trk167） */
 }
 
 function renderLib() {
@@ -2952,14 +3008,15 @@ function renderLib() {
     const wrap = el("div"); wrap.style.cssText = "display:flex;gap:6px;align-items:stretch";
     const cur = core.currentSong && core.currentSong.key === it.key;
     const b = el("button", `libRow src-${it.source}` + (cur ? " cur" : "")); b.type = "button"; b.style.flex = "1"; b.style.minWidth = "0";
+    b.dataset.songKey = it.key; b.__trkRowInfo = info || null;   /* 🏷 タグが届いたら行だけその場で更新するため（trk167） */
     const left = el("span", "libLeft"), meta = el("span", "libMeta");
     const thumb = el("span", "libThumb"), thumbImg = el("img", ""), thumbFallback = el("span", "libThumbFallback", "♫");
     thumb.setAttribute("aria-hidden", "true"); thumbImg.alt = ""; thumbImg.decoding = "async"; thumbImg.hidden = true;
     thumb.append(thumbImg, thumbFallback);
     const text = el("span", "libText"), m = metaOf(it.key) || {};   /* 🎶 曲プロフィール（長押しで編集） */
     const displayTitle = songDisplayTitle(it, m);
-    text.append(el("span", "libName", (it.video ? "🎬 " : "") + displayTitle + (info && info.title ? " " + info.title : "")),   // 例：🎬 動画 / 曲名 🥁🐔🚚⚔🎪🚛
-                el("span", "libSub", [m.artist || it.artist, m.album, m.matchHint ? `${tr("plMatchMemo")}: ${m.matchHint}` : "", srcLabel(it)].filter(Boolean).join(" · ")));
+    text.append(el("span", "libName", libRowNameText(it, info)),   // 例：🎬 動画 / 曲名 🥁🐔🚚⚔🎪🚛
+                el("span", "libSub", libRowSubText(it)));
     left.append(thumb, text);
     if (it.charts) meta.append(el("i", "libTag", "📄"));
     if (it.shared) { const st = el("i", "libTag", "📤"); st.title = tr("libKeepShared"); meta.append(st); }   /* 💾 端末に残した共有の曲 */
@@ -3023,8 +3080,9 @@ function renderBanner() {
     core.$("songTitleBig").textContent = tr("songNone"); core.$("songSub").textContent = tr("songNoneSub");
   } else {
     const m = metaOf(s.key) || {};   /* 🎶 曲プロフィール */
+    const t = songTagsOf(s);         /* 🏷 埋め込みテキストタグ（trk167） */
     core.$("songTitleBig").textContent = songDisplayTitle(s, m);
-    core.$("songSub").textContent = [m.artist || s.artist, m.album, m.composer ? `${tr("plComposer")}: ${m.composer}` : "",
+    core.$("songSub").textContent = [m.artist || (t && t.artist) || s.artist, m.album || (t && t.album), m.composer ? `${tr("plComposer")}: ${m.composer}` : "",
       m.matchHint ? `${tr("plMatchMemo")}: ${m.matchHint}` : "", s.charter ? `${tr("chartBy")}: ${s.charter}` : "", srcLabel(s)].filter(Boolean).join(" · ");
     const art = s.bgBlob || s.artBlob || null;
     if (art) { try { bannerUrl = URL.createObjectURL(art); b.style.backgroundImage = `url("${bannerUrl}")`; b.classList.add("hasImg"); } catch (_) {} }
@@ -3424,6 +3482,8 @@ async function selectSong(it) {
       renderLib(); renderBanner(); core.emit("songArtwork", it);
     }).catch(() => {});
   }
+  /* 🏷 埋め込みテキストタグも再生準備と並行して読む（表示だけ。行とバナーは onSongTagsLoaded が更新。trk167） */
+  if (canExtractSongArt(it)) void loadSongTags(it);
   await applySongBackground(it);
   if (core.currentSong !== it) return;
   previewPending = true;
@@ -4026,12 +4086,13 @@ window.saveSongPrefs = saveSongPrefs;
 window.selectSong = selectSong;
 window.setAddonSongs = setAddonSongs;
 window.songInfo = songInfo;
+window.songDisplayTitle = songDisplayTitle;   /* 🏷 表示名（ユーザー設定名→タグ→カタログ曲名→ファイル名）。favs.js・game.js・study-room.js・video-max.js の typeof ガードが実際に届くようになる（trk167） */
 window.srcLabel = srcLabel;
 window.startPreview = startPreview;
 window.trySongChart = trySongChart;
 /* 領域（window.Trk.library）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
 window.Trk = window.Trk || {};
-window.Trk.library = Object.assign(window.Trk.library || {}, { LIB_SHOW, MEDIA_EXT, VIDEO_EXT, addSongFiles, addVideoFiles, allSongs, bannerRandomBtn, bannerVolTip, ensureTrkDistributionPlaylists, ensureTrkOstPlaylist, trkOstPlaylistId: TRK_OST_ID, trkRestoreRemoved, initLibrary, nextSong, onLongPress, plToast, prevSong, previewStartFor, refreshPackSongs, saveSongPrefs, selectSong, setAddonSongs, songInfo, srcLabel, startPreview, trySongChart, plTitleKeys, plSongMatchKeys, plWishTitleKeys, plIsClassicalTitle, plClassicalTitleKey, plDecoratedTitleKeys, plWishDecoratedKeys, plHasVersionTag, plWishMediaMatches });
+window.Trk.library = Object.assign(window.Trk.library || {}, { LIB_SHOW, MEDIA_EXT, VIDEO_EXT, addSongFiles, addVideoFiles, allSongs, bannerRandomBtn, bannerVolTip, ensureTrkDistributionPlaylists, ensureTrkOstPlaylist, trkOstPlaylistId: TRK_OST_ID, trkRestoreRemoved, initLibrary, nextSong, onLongPress, plToast, prevSong, previewStartFor, refreshPackSongs, saveSongPrefs, selectSong, setAddonSongs, songInfo, songDisplayTitle, songDisplayMeta, songTagsOf, loadSongTags, srcLabel, startPreview, trySongChart, plTitleKeys, plSongMatchKeys, plWishTitleKeys, plIsClassicalTitle, plClassicalTitleKey, plDecoratedTitleKeys, plWishDecoratedKeys, plHasVersionTag, plWishMediaMatches });
 Object.defineProperty(window.Trk.library, "addonSongs", { configurable:true, get:() => addonSongs, set:v => { addonSongs = v; } });
 Object.defineProperty(window.Trk.library, "libView", { configurable:true, get:() => libView, set:v => { libView = v; } });
 Object.defineProperty(window.Trk.library, "renderBanner", { configurable:true, get:() => renderBanner, set:v => { renderBanner = v; } });

@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-/* ローカル音源に埋め込まれたジャケット画像と歌詞を読む（通信・保存なし）。
+/* ローカル音源に埋め込まれたジャケット画像・歌詞・テキストタグを読む（通信・保存なし）。
    画像: ID3 APIC/PIC、MP4/M4A covr、FLAC picture、Ogg Vorbis/Opus picture comments。
    歌詞（trk166・読み取りだけ）: ID3 USLT/ULT・SYLT/SLT、MP4 ©lyr、FLAC/Ogg の LYRICS/UNSYNCEDLYRICS。
+   タグ（trk167・読み取りだけ）: ID3 TIT2/TPE1/TALB/TPE2/TRCK/TCON、MP4 ©nam/©ART/©alb/aART/trkn/©gen、
+     FLAC/Ogg の TITLE/ARTIST/ALBUM/ALBUMARTIST/TRACKNUMBER/TRACKTOTAL/GENRE。編集（書き戻し）はしない。
    読み出すメタデータと画像サイズを制限し、サムネイルだけをメモリ上で作る。 */
 (() => {
 "use strict";
@@ -12,6 +14,13 @@ const MAX_IMAGE_PIXELS = 12_000_000;
 const THUMB_EDGE = 256;
 const MAX_LYRICS_BYTES = 256 * 1024;   /* 🎤 埋め込み歌詞の上限（表示用のテキストとしては十分すぎる大きさ） */
 const MAX_SYLT_LINES = 5000;           /* 🎤 SYLT の時刻付き行の上限 */
+const MAX_TAG_TEXT = 200;              /* 🏷 テキストタグ1項目の上限（表示用。trk167） */
+/* 🏷 埋め込みテキストタグ（trk167・表示だけ。編集はしない＝読み取り専用方針）の対応表 */
+const ID3_TAG_FRAMES = { TIT2:"title", TT2:"title", TPE1:"artist", TP1:"artist", TALB:"album", TAL:"album",
+  TPE2:"albumArtist", TP2:"albumArtist", TRCK:"track", TRK:"track", TCON:"genre", TCO:"genre" };
+const MP4_TAG_BOXES = { "\xA9nam":"title", "\xA9ART":"artist", "\xA9alb":"album", "aART":"albumArtist", "trkn":"track", "\xA9gen":"genre" };
+const VORBIS_TAG_KEYS = { TITLE:"title", ARTIST:"artist", ALBUM:"album", ALBUMARTIST:"albumArtist",
+  TRACKNUMBER:"track", TRACKTOTAL:"trackTotal", GENRE:"genre" };
 const textDecoder = typeof TextDecoder === "function" ? new TextDecoder("utf-8") : null;
 
 function ascii(bytes, start, length) {
@@ -132,8 +141,24 @@ function parseSyltFrame(data) {         /* SYLT / SLT：説明のあと「テキ
     p = textEnd + 4;
   }
   if (!lines.length) return null;
-  lines.sort((a, b) => a.t - b.t);      /* SYLT の時刻は並び順が保証されないので整列する */
+  lines.sort((a, b) => a.t - b.t);            /* SYLT の時刻は並び順が保証されないので整列する */
   return { lines };
+}
+/* 🏷 生タグ → 表示用の形にそろえる（trk167）。空白だけ・空の項目は落とし、トラック番号は "3/12" を分解する。
+   全部空なら null（＝タグなし＝表示はファイル名のまま）。 */
+function normalizeTags(t) {
+  if (!t) return null;
+  const out = {};
+  for (const k of ["title", "artist", "album", "albumArtist", "genre"]) {
+    const v = String(t[k] == null ? "" : t[k]).trim();
+    if (v) out[k] = v.slice(0, MAX_TAG_TEXT);
+  }
+  const trk = String(t.track == null ? "" : t.track).trim();
+  const m = /^(\d{1,4})(?:\s*\/\s*(\d{1,4}))?$/.exec(trk);
+  const total = m && m[2] ? Number(m[2]) : Number(String(t.trackTotal == null ? "" : t.trackTotal).trim());
+  if (m) out.track = Number(m[1]);
+  if (Number.isFinite(total) && total > 0 && total <= 9999) out.trackTotal = total;
+  return Object.keys(out).length ? out : null;
 }
 /* mode: "art"（ジャケット・従来どおり）／ "lyrics"（🎤 USLT/ULT・SYLT/SLT。trk166） */
 async function extractID3(file, mode = "art") {
@@ -154,6 +179,7 @@ async function extractID3(file, mode = "art") {
     p = version === 4 ? extSize : 4 + extSize;
   }
   let first = null, uslt = null, sylt = null;
+  const tags = {};                      /* 🏷 テキストタグ（trk167） */
   const frameHeader = version === 2 ? 6 : 10;
   while (p + frameHeader <= tag.length) {
     const idLength = version === 2 ? 3 : 4;
@@ -169,6 +195,15 @@ async function extractID3(file, mode = "art") {
     if (mode === "lyrics") {
       if ((id === "SYLT" || id === "SLT") && !unsupportedFlags && !sylt) sylt = parseSyltFrame(tag.subarray(bodyStart, bodyEnd));
       else if ((id === "USLT" || id === "ULT") && !unsupportedFlags && !uslt) uslt = parseLyricsTextFrame(tag.subarray(bodyStart, bodyEnd));
+    } else if (mode === "tags") {
+      const field = ID3_TAG_FRAMES[id];   /* 🏷 TIT2/TPE1/TALB/TPE2/TRCK/TCON（v2.2 の TT2 等も） */
+      if (field && !tags[field] && !unsupportedFlags) {
+        const body = tag.subarray(bodyStart, bodyEnd);
+        if (body.length >= 2) {           /* encoding(1) + テキスト */
+          const text = decodeID3Text(body.subarray(1), body[0]).trim();
+          if (text) tags[field] = text.slice(0, MAX_TAG_TEXT);
+        }
+      }
     } else if ((id === "APIC" || id === "PIC") && !unsupportedFlags) {
       const found = parsePictureFrame(tag.subarray(bodyStart, bodyEnd), version);
       if (found && found.blob) {
@@ -179,6 +214,7 @@ async function extractID3(file, mode = "art") {
     p = bodyEnd;
   }
   if (mode === "lyrics") return sylt || (uslt ? { text: uslt } : null);   /* 🎤 同期歌詞（SYLT）があれば優先 */
+  if (mode === "tags") return normalizeTags(tags);                        /* 🏷 全部空なら null */
   return first;
 }
 function parseFlacPicture(data, start = 0, end = data.length) {
@@ -208,10 +244,11 @@ async function extractFlac(file, mode = "art") {
       const block = await readRange(file, start, end, MAX_ART_BYTES + 128 * 1024);
       if (!block) return null;
       const blob = parseFlacPicture(block); if (blob) return blob;
-    } else if (type === 4 && mode === "lyrics") {   /* 🎤 VORBIS_COMMENT ブロックに LYRICS がある */
+    } else if (type === 4 && (mode === "lyrics" || mode === "tags")) {   /* 🎤🏷 VORBIS_COMMENT ブロック（歌詞とテキストタグ） */
       const block = await readRange(file, start, end, MAX_TAG_BYTES);
       if (!block) return null;
-      const found = parseVorbisLyrics(block, 0); if (found) return found;
+      const found = mode === "lyrics" ? parseVorbisLyrics(block, 0) : parseVorbisTags(block, 0);
+      if (found) return found;
     }
     p = end;
     if (h & 0x80) break;
@@ -281,6 +318,39 @@ function parseVorbisLyrics(packet, start) {
 function parseCommentLyricsPacket(packet) {
   if (packet.length >= 7 && packet[0] === 3 && ascii(packet, 1, 6) === "vorbis") return parseVorbisLyrics(packet, 7);
   if (packet.length >= 8 && ascii(packet, 0, 8) === "OpusTags") return parseVorbisLyrics(packet, 8);
+  return null;
+}
+/* 🏷 Vorbis コメントからテキストタグを拾う（trk167）。FLAC の VORBIS_COMMENT ブロックも同じ形 */
+function parseVorbisTags(packet, start) {
+  let p = start;
+  if (!textDecoder || p + 8 > packet.length) return null;
+  const vendorLength = u32le(packet, p); p += 4;
+  if (vendorLength > packet.length - p - 4) return null;
+  p += vendorLength;
+  const count = u32le(packet, p); p += 4;
+  if (count > 100_000) return null;
+  const out = {};
+  for (let i = 0; i < count && p + 4 <= packet.length; i++) {
+    const length = u32le(packet, p); p += 4;
+    if (!length || length > packet.length - p) return null;
+    if (length <= MAX_TAG_BYTES) {
+      const text = textDecoder.decode(packet.subarray(p, p + length));
+      const equal = text.indexOf("=");
+      if (equal > 0) {
+        const field = VORBIS_TAG_KEYS[text.slice(0, equal).toUpperCase()];
+        if (field && !out[field]) {
+          const value = text.slice(equal + 1).trim();
+          if (value) out[field] = value.slice(0, MAX_TAG_TEXT);
+        }
+      }
+    }
+    p += length;
+  }
+  return normalizeTags(out);
+}
+function parseCommentTagsPacket(packet) {
+  if (packet.length >= 7 && packet[0] === 3 && ascii(packet, 1, 6) === "vorbis") return parseVorbisTags(packet, 7);
+  if (packet.length >= 8 && ascii(packet, 0, 8) === "OpusTags") return parseVorbisTags(packet, 8);
   return null;
 }
 function joinChunks(chunks, length) {
@@ -382,6 +452,42 @@ function findMp4Lyrics(data, start = 0, end = data.length, depth = 0, inLyrics =
   }
   return null;
 }
+/* 🏷 MP4/M4A のテキストタグ（©nam/©ART/©alb/aART/trkn/©gen）を ilst から拾う（trk167）。
+   trkn だけはバイナリ（8バイト：予約2・トラック2・総数2・予約2）なので、そこで "3/12" 形に直す */
+function findMp4Tags(data, start = 0, end = data.length, depth = 0, field = "") {
+  if (depth > 10) return null;
+  const out = {};
+  let p = start, count = 0;
+  while (p + 8 <= end && count++ < 8192) {
+    const size32 = u32be(data, p), type = ascii(data, p + 4, 4);
+    let size = size32, header = 8;
+    if (size32 === 1) { if (p + 16 > end) break; size = u64be(data, p + 8); header = 16; }
+    else if (size32 === 0) size = end - p;
+    if (!Number.isSafeInteger(size) || size < header || p + size > end) break;
+    const payload = p + header, atomEnd = p + size;
+    if (type === "data" && field && atomEnd - payload >= 8) {
+      const kind = u32be(data, payload);
+      if (field === "track") {
+        if (kind === 0 && atomEnd - payload >= 14) {
+          const n = (data[payload + 10] << 8) | data[payload + 11], total = (data[payload + 12] << 8) | data[payload + 13];
+          if (n > 0) out.track = total > 0 ? `${n}/${total}` : `${n}`;
+        }
+      } else if ((kind === 1 || kind === 0) && textDecoder) {
+        const text = textDecoder.decode(data.subarray(payload + 8, atomEnd)).replace(/\0+$/g, "").trim();
+        if (text) out[field] = text.slice(0, MAX_TAG_TEXT);
+      }
+    } else if (MP4_TAG_BOXES[type]) {
+      const found = findMp4Tags(data, payload, atomEnd, depth + 1, MP4_TAG_BOXES[type]);
+      if (found) Object.assign(out, found);
+    } else if (MP4_CONTAINERS.has(type)) {
+      const childStart = type === "meta" ? payload + 4 : payload; // full-box version/flags
+      if (childStart <= atomEnd) { const found = findMp4Tags(data, childStart, atomEnd, depth + 1, field); if (found) Object.assign(out, found); }
+    }
+    p = atomEnd;
+    if (size32 === 0) break;
+  }
+  return out;
+}
 async function extractMp4(file, mode = "art") {
   let offset = 0;
   for (let boxes = 0; boxes < 512 && offset + 8 <= file.size; boxes++) {
@@ -396,7 +502,9 @@ async function extractMp4(file, mode = "art") {
       if (size - headerSize > MAX_TAG_BYTES) return null;
       const moov = await readRange(file, offset + headerSize, offset + size, MAX_TAG_BYTES);
       if (!moov) return null;
-      return mode === "lyrics" ? findMp4Lyrics(moov) : findMp4Cover(moov);
+      if (mode === "lyrics") return findMp4Lyrics(moov);
+      if (mode === "tags") return normalizeTags(findMp4Tags(moov));
+      return findMp4Cover(moov);
     }
     if (size32 === 0) return null;
     offset += size;
@@ -425,6 +533,19 @@ async function extractLyrics(file) {
     if (["m4a", "m4b", "mp4"].includes(ext)) return await extractMp4(file, "lyrics");
     if (ext === "flac") return await extractFlac(file, "lyrics");
     if (["ogg", "oga", "opus"].includes(ext)) return await extractOgg(file, parseCommentLyricsPacket);
+  } catch (_) { return null; }
+  return null;
+}
+/* 🏷 埋め込みテキストタグを読む（trk167）。戻り値: { title, artist, album, albumArtist, genre, track, trackTotal } の一部か null。
+   ⚠ 表示のために読むだけで、ファイルには書き戻さない（タグ編集はしない＝読み取り専用方針）。 */
+async function extractTags(file) {
+  if (!file || !Number.isFinite(file.size) || file.size < 12) return null;
+  const ext = String(file.name || "").split(".").pop().toLowerCase();
+  try {
+    if (["mp3", "aac", "wav"].includes(ext)) return await extractID3(file, "tags");
+    if (["m4a", "m4b", "mp4"].includes(ext)) return await extractMp4(file, "tags");
+    if (ext === "flac") return await extractFlac(file, "tags");
+    if (["ogg", "oga", "opus"].includes(ext)) return await extractOgg(file, parseCommentTagsPacket);
   } catch (_) { return null; }
   return null;
 }
@@ -485,5 +606,5 @@ async function thumbnail(blob) {
 }
 window.Trk = window.Trk || {};
 window.Trk.media = window.Trk.media || {};
-window.Trk.media.audioArt = Object.freeze({ extract, extractLyrics, thumbnail, limits:Object.freeze({ metadataBytes:MAX_TAG_BYTES, artBytes:MAX_ART_BYTES, edge:THUMB_EDGE, lyricsBytes:MAX_LYRICS_BYTES }) });
+window.Trk.media.audioArt = Object.freeze({ extract, extractLyrics, extractTags, thumbnail, limits:Object.freeze({ metadataBytes:MAX_TAG_BYTES, artBytes:MAX_ART_BYTES, edge:THUMB_EDGE, lyricsBytes:MAX_LYRICS_BYTES, tagText:MAX_TAG_TEXT }) });
 })();

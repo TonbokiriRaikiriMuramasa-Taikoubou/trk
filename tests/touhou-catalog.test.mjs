@@ -97,7 +97,8 @@ describe("TouhouThemeDB snapshot and complete release-ID coverage", () => {
     assert.ok(start >= 0 && end > start, "the filename-title helper can be isolated");
     const displayContext = vm.createContext({
       window: context.window,
-      metaOf:key => key === "custom" ? { title:"My own title" } : null
+      metaOf:key => key === "custom" ? { title:"My own title" } : null,
+      songTagField: () => ""   /* 🏷 タグ無し相当（trk167 で表示名の鎖に入った。タグ優先順は tests/trk167-audio-tags.test.mjs が見る） */
     });
     vm.runInContext(librarySrc.slice(start, end) + "\nglobalThis.__songDisplayTitle = songDisplayTitle;", displayContext);
     const displayTitle = displayContext.__songDisplayTitle;
@@ -110,7 +111,8 @@ describe("TouhouThemeDB snapshot and complete release-ID coverage", () => {
     assert.equal(displayTitle({ file:{ name:"th06_06.MID" }, key:"th06_06" }), data.titles.th06_06);
     assert.equal(displayTitle({ base:"th06_15", title:"th06_15", key:"custom" }), "My own title", "manual profile titles remain authoritative");
     assert.equal(displayTitle({ base:"unrelated_track", title:"unrelated_track", key:"other" }), "unrelated_track");
-    assert.match(librarySrc, /libName.*displayTitle/);
+    assert.match(librarySrc, /libName", libRowNameText/);   /* trk167: 行の曲名は libRowNameText 経由（中身は songDisplayTitle） */
+    assert.match(librarySrc, /function libRowNameText\(it, info\) \{[\s\S]{0,140}songDisplayTitle\(it\)/);
     assert.match(librarySrc, /songTitleBig.*songDisplayTitle\(s, m\)/);
   });
 

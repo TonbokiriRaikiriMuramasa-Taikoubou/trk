@@ -27,7 +27,7 @@
 | 4 | **スリープタイマー強化**（フェードアウト＋「今の曲の終わりまで」） | 🥇 | 小 | [x] trk164 | 実装済み：off/15/30/60に「💤 この曲の終わり」を追加（endedMediaでリピート／シャッフルより優先し、続き位置を消して停止。手動選曲で解除）。分数モードは停止15秒前からフェードアウト（逆再生中は音量に触れない。停止・解除時は設定音量へ戻す） |
 | 5 | **share_target / file_handlers**（OSの共有シート・「このアプリで開く」からCBZ/曲/パックを受け取る） | 🥈 | 中〜低 | [x] trk165 | 実装済み（Web側）：manifest 宣言＋`sw.js` の `handleShareTarget`（POST→CacheStorage `trk-share-inbox-v1` に一時保存→303でアプリへ。activate の掃除から除外）＋`launchQueue`（file_handlers・デスクトップ、single-client）。`js/share-inbox.js` が**既存の検証経路だけ**へ合流（曲→addSongFiles／動画→addVideoFiles／CBZ・ZIP→study.importArchives／.stpack・pack.json入りZIP→custom.installAndUse）＝新しい入口は作っていない。受け取れない形式は4言語で案内。**残るは実機確認（インストール済みPWA前提・HANDOFF §4-17）と、iOS で必要になった場合の Capacitor ビルド側対応（先行事例：quire#143）** |
 | 6 | **歌詞表示**（ID3埋め込み歌詞＋`.lrc` 同期歌詞） | 🥈 | 低〜中 | [x] trk166 | 実装済み：`audio-art.js` に `extractLyrics`（USLT/ULT・SYLT/SLT＝ミリ秒形式・`©lyr`・Vorbis LYRICS/UNSYNCEDLYRICS。ジャケット経路は無変更）＋`js/lyrics.js`（LRCパーサ：複数時刻・offset・拡張LRC・IDタグ。優先順＝手動選択→フォルダの同名.lrc→埋め込み）＋メディアプレーヤーの 🎤 パネル（250ms周期でハイライト追従・行クリックでシーク・選んだ歌詞は trk_lyrics_v1 に曲単位保存）。**読み取り専用**（書き戻しなし）。**残るは実ファイルでの確認（HANDOFF §4-18）** |
-| 7 | **埋め込みテキストタグの表示**（ID3 TIT2/TPE1/TALB/TRCK 等）→ アーティスト／アルバム视图の土台 | 🥈 | 中 | [ ] | 同じく `audio-art.js` 拡張（読み取りだけ・**タグ編集はしない**＝読み取り専用方針）。表示名の優先順「ユーザー設定名→**タグ**→カタログ曲名→元ファイル名」への挿入は `TITLE-MATCH.md` の方針更新とセットで。アルバム別/アーティスト別のグルーピング表示・トラック番号順は次段 |
+| 7 | **埋め込みテキストタグの表示**（ID3 TIT2/TPE1/TALB/TRCK 等）→ アーティスト／アルバム视图の土台 | 🥈 | 中 | [x] trk167 | 実装済み：`audio-art.js` に `extractTags`（ID3 TIT2/TPE1/TALB/TPE2/TRCK/TCON＋v2.2、MP4 ©nam/©ART/©alb/aART/trkn（バイナリ分解）/©gen、FLAC/Ogg/Opus の TITLE/ARTIST/ALBUM/ALBUMARTIST/TRACKNUMBER/TRACKTOTAL/GENRE）＝**読み取りだけ**（書き戻し経路なし）。表示名の優先順「🎶 ユーザー設定名 → 🏷 タグ → カタログ曲名 → 元ファイル名」を `songDisplayTitle` に挿入（`TITLE-MATCH.md` に方針記録済み）。アーティスト／アルバムはリストのサブ行・選曲バナー・メディアプレーヤー・Media Session へ。**カタログ照合はファイル名側のまま＝タグは照合に関与しない**。読み込みは行の可視化（サムネイルと同じ observer）と選曲時、行の更新はその場で行うだけ。グルーピング表示・トラック番号順は #16 へ。残るは実音源確認（HANDOFF §4-19） |
 | 8 | **ReplayGain／音量正規化** | 🥉 | 中 | [ ] | 既存の `analyzeAudio`＋`trk_analysis_cache_v1`（解析キャッシュ）に loudness 項目を足し、TRKアンプの gain ノードで適用。ファイルへのタグ書き込みはしない（読み取り専用方針）＝端末内計算のみ |
 | 9 | **字幕（SRT/VTT）** | 🥉 | 中 | [ ] | `<track>`＋WebVTT はブラウザネイティブ。SRT→VTT 変換は自前数十行。外部字幕ファイルの読み込み（フォルダ共有に相乗り or 手動選択）＋遅延調整。埋め込み字幕トラックはブラウザ制約で読めない場合がある（Safari系限定の textTracks）＝外部ファイル優先 |
 | 10 | **M4Bチャプター**（一覧・ジャンプ） | 🥉 | 中〜高 | [ ] | HTMLMediaElement はチャプターを露出しないので MP4 の `chpl`/`©chm` ボックスを自前パース。`audio-art.js` の MP4 ボックス解析が足場になる。チャプター境界はスリープタイマー「曲の終わりまで」とも接続 |
@@ -36,6 +36,7 @@
 | 13 | 書斎：明るさ/コントラスト調整（読書用フィルタ） | 🥉 | 小 | [ ] | CSS filter（brightness/contrast/invert系）を設定に。既存の全画面フィット・拡大率とは独立 |
 | 14 | 波形シークバー／ホバーサムネイル | 🥉 | 中 | [ ] | 解析キャッシュの rms データをそのまま描画に使える |
 | 15 | 進捗フィルター（未聴/継続/完了） | 🥉 | 小 | [ ] | 位置記憶＋duration で算出。表示層だけ |
+| 16 | **アルバム別／アーティスト別のグルーピング表示＋トラック番号順**（#7 の次段） | 🥉 | 中 | [ ] | 土台は trk167 で済み（`extractTags` の album/albumArtist/track/trackTotal ＋ `songDisplayMeta`）。曲リストのタブに「アルバム」「アーティスト」の棚を増やし、アルバム内はトラック番号順で並べる。タグの無い曲は「タグなし」の棚へ |
 
 ## 3. 安定版の後へ見送り（記録だけ）
 

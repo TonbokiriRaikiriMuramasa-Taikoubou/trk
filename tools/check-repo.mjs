@@ -2404,7 +2404,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
   /* ⚠ read("js/…") は `window.Trk.lyrics.` などの接頭辞を落として返す（先頭の trk165 ブロックの注意と同じ） */
   if (!html.includes(lyricsTag) || html.indexOf(lyricsTag) < html.indexOf('<script src="js/audio-art.js"></script>') ||
       html.indexOf(lyricsTag) > html.indexOf('<script src="js/library.js"></script>')) fail("js/lyrics.js must load right after js/audio-art.js (before library.js / media-player-mode.js)");
-  else if (!art.includes("extract, extractLyrics, thumbnail") || !art.includes("lyricsBytes:MAX_LYRICS_BYTES") ||
+  else if (!art.includes("extractLyrics") || !art.includes("lyricsBytes:MAX_LYRICS_BYTES") ||   /* ⚠ export 行の完全一致は trk167 で割れたので名前だけで見る */
            !art.includes('type === "\\xA9lyr"') || !art.includes("parseSyltFrame") || !art.includes("parseLyricsTextFrame") ||
            !art.includes("UNSYNCEDLYRICS") || art.includes("createWritable")) fail("audio-art.js extractLyrics (USLT/SYLT/©lyr/Vorbis LYRICS, read-only) is missing");
   else if (!lyrics.includes("function parseLrc(src)") || !lyrics.includes("function activeLineIndex(lines, seconds)") ||
@@ -2422,6 +2422,34 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else if (!css.includes(".mediaLyricsBox") || !css.includes(".lyricLineActive") || !css.includes("body.helpTextOff .mediaLyricsBox>.hint")) fail("lyrics panel styles are missing");
   else ok("trk166: 🎤 lyrics — LRC parser + embedded tags (read-only), folder .lrc, manual pick, synced highlight, in four languages");
   /* sw.js の cache 版数は固定しない：別の「service-worker cache」見張りが現在の版を確認している */
+}
+
+// trk167: 🏷 埋め込みテキストタグ（ID3 TIT2/TPE1/TALB/TPE2/TRCK/TCON・MP4 ©nam/©ART/©alb/aART/trkn/©gen・
+// Vorbis TITLE/ARTIST/ALBUM/ALBUMARTIST/TRACKNUMBER/TRACKTOTAL/GENRE）の表示。
+// 読み取り専用＝書き戻し経路（createWritable）を許さない。カタログ照合キーには触れない。
+{
+  const art = read("js/audio-art.js");
+  const library = read("js/library.js");
+  const player = read("js/media-player-mode.js");
+  const sw = read("sw.js");
+  /* ⚠ read("js/…") は正規化後の本文：`core.emit(` は `emit(`、`window.Trk.media.audioArt` は `media.audioArt` に見える */
+  if (!art.includes("extract, extractLyrics, extractTags, thumbnail") || !art.includes("tagText:MAX_TAG_TEXT") ||
+      !art.includes("ID3_TAG_FRAMES") || !art.includes("MP4_TAG_BOXES") || !art.includes("VORBIS_TAG_KEYS") ||
+      !art.includes("async function extractTags(file)") || art.includes("createWritable")) fail("audio-art.js extractTags (read-only text tags) is missing");
+  else if (!library.includes("const songTags = new Map()") ||
+           !library.includes("return meta.title || songTagField(it, \"title\") || touhouCatalogTitle(it) || (it && it.title) || \"\"") ||
+           !library.includes("async function loadSongTags(it)") || !library.includes("function songDisplayMeta(it)") ||
+           !library.includes("void loadSongTags(job.it)") || !library.includes("if (canExtractSongArt(it)) void loadSongTags(it);") ||
+           !library.includes("b.dataset.songKey = it.key") || !library.includes("emit(\"songTags\", it)") ||
+           !library.includes("window.songDisplayTitle = songDisplayTitle") ||
+           !library.includes("songDisplayTitle, songDisplayMeta, songTagsOf, loadSongTags") ||
+           !library.includes("plNormTitle((metaOf(it.key) || {}).artist || it.artist)") ||
+           library.includes("createWritable")) fail("library.js tag store / display priority / matching separation is missing");
+  else if (!player.includes("function trackDisplayMeta(s)") ||
+           !player.includes("on(\"songTags\", () => { renderQueue(); if (mediaOpen) renderMedia(); })") ||
+           !player.includes("title:d.title || s.title || baseName(mediaName) || \"trk!\"")) fail("the media player must follow the tag display title (header, queue, Media Session)");   /* core. は正規化で外れる */
+  else if (!/^const CACHE = "trk-v[\d.]+-trk\d+";$/m.test(sw)) fail("sw.js cache name lost its versioned shape");
+  else ok("trk167: 🏷 embedded text tags feed the display-name chain (read-only, catalog matching untouched)");
 }
 
 // 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own

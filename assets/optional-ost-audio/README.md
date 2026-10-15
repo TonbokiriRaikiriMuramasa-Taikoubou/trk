@@ -14,6 +14,8 @@ makes a lighter build, and the game simply shows no OST songs.
   pops, ~61 s). Same lazy loading.
 - `ost-03-moonlit-lullaby.mp3` — track 03 **MOONLIT LULLABY** (92 BPM,
   nocturne, ~84 s). Same lazy loading.
+- `ost-04-crimson-blaze.mp3` — track 04 **CRIMSON BLAZE** (160 BPM,
+  minor-key rock, ~49 s). Same lazy loading.
 
 Every track keeps its editable score in `tools/ost-scores/`:
 

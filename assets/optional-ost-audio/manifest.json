@@ -26,6 +26,14 @@
       "artist": "trk!",
       "bpm": 92,
       "offset": 0
+    },
+    {
+      "key": "ost-04-crimson-blaze",
+      "file": "ost-04-crimson-blaze.mp3",
+      "title": "CRIMSON BLAZE",
+      "artist": "trk!",
+      "bpm": 160,
+      "offset": 0
     }
   ]
 }

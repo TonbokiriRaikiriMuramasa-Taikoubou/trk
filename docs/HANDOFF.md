@@ -147,9 +147,9 @@
 
 ### 維持中の既存機能
 
-- **🎓 trk's OST Vol.1（`trk-ost-v1`）**：🐔 trk's playlist の Game Vol.1 直下。FIRST SPARK のデモに加え、trk179〜181 からオリジナル曲（1曲目 SUNRISE DASH・2曲目 POPCORN SMILE・3曲目 MOONLIT LULLABY）を置く棚です。新曲は manifest の未見キーだけ足し（`trkOstSeenKeys`）、利用者が外した曲は戻しません。手続き生成曲は別の **trk Agent's OST Vol.1（`trk-agent-ost-v1`）** にmanifest経由で接続済み（下記）。trk112が最上位に作った本棚だけを一度trkフォルダへ移し（印は `cat: "trk:ost"`）、以後は利用者が動かした場所を守ります。
+- **🎓 trk's OST Vol.1（`trk-ost-v1`）**：🐔 trk's playlist の Game Vol.1 直下。FIRST SPARK のデモに加え、trk179〜182 からオリジナル曲4曲（1曲目 SUNRISE DASH・2曲目 POPCORN SMILE・3曲目 MOONLIT LULLABY・4曲目 CRIMSON BLAZE）を置く棚です。Vol.1 全4曲そろいました。新曲は manifest の未見キーだけ足し（`trkOstSeenKeys`）、利用者が外した曲は戻しません。手続き生成曲は別の **trk Agent's OST Vol.1（`trk-agent-ost-v1`）** にmanifest経由で接続済み（下記）。trk112が最上位に作った本棚だけを一度trkフォルダへ移し（印は `cat: "trk:ost"`）、以後は利用者が動かした場所を守ります。
 - **🎼 手続き作曲ツール／任意のAgent OST（trk113・trk149〜151）**：`node tools/make-trk-ost.mjs` で5ルール×2曲＝10曲のWAVスケッチと `assets/trk-ost/manifest.json` を生成（外部ライブラリなし・決定的）。アプリ側にはmanifest読込み・専用リスト作成・選択時の音源読込みを実装済みです。ただし音源とmanifestは `.gitignore` 対象で、公開リポジトリには入っていません。既定コードの `AGENT_OST_MANIFEST_INCLUDED=false` は任意資産をfetchしない印です。音源を意図的に含める配布／試験ビルドだけ true にし、生成したmanifest・WAVと一緒に配布します。10曲の実聴取・品質評価は未確認（§4-6）。
-- **🎵 OSTオリジナル曲の作曲パイプライン（trk179〜）**：`tools/ost-scores/<key>.json` に作曲（テンポ・形式・コード・全メロディ・編曲）→ `node tools/make-trk-song.mjs` で決定論的チップシンセ描画（WAVはGit外）＋ABC譜を生成 → `node tools/encode-ost-mp3.mjs` でMP3化 → `assets/optional-ost-audio/` に manifest と同梱。MP3は全てスコア付きが check-repo の検査条件。1曲目は SUNRISE DASH（150 BPM・32小節・intro-A-B-サビ-outro＋終止・約53秒・823 KiB）。2曲目は POPCORN SMILE（128 BPM・Gメジャー・三角波リード・約61秒・960 KiB）。調は C/G/F 長調（ABC の臨時記号と下方3度は調に従う）、リード音色は pulse/tri/square/saw から選べる（trk180）。3曲目は MOONLIT LULLABY（92 BPM・Fメジャー・約84秒・1.29 MiB）。静かな曲用に `leadVib`・`bassStyle`（soft）・`bassWave`・`arpRate`（8）・`padWave`・ドラム `soft`／`lullaby`・リード `sine` を追加（trk181）。YuE2 本体はこの環境で動かない（GPU＋HuggingFace要）ため自前パイプラインとし、ABC は将来 YuE2 の `abc=` へ渡せる形。
+- **🎵 OSTオリジナル曲の作曲パイプライン（trk179〜）**：`tools/ost-scores/<key>.json` に作曲（テンポ・形式・コード・全メロディ・編曲）→ `node tools/make-trk-song.mjs` で決定論的チップシンセ描画（WAVはGit外）＋ABC譜を生成 → `node tools/encode-ost-mp3.mjs` でMP3化 → `assets/optional-ost-audio/` に manifest と同梱。MP3は全てスコア付きが check-repo の検査条件。1曲目は SUNRISE DASH（150 BPM・32小節・intro-A-B-サビ-outro＋終止・約53秒・823 KiB）。2曲目は POPCORN SMILE（128 BPM・Gメジャー・三角波リード・約61秒・960 KiB）。調は C/G/F 長調（ABC の臨時記号と下方3度は調に従う）、リード音色は pulse/tri/square/saw から選べる（trk180）。3曲目は MOONLIT LULLABY（92 BPM・Fメジャー・約84秒・1.29 MiB）。静かな曲用に `leadVib`・`bassStyle`（soft）・`bassWave`・`arpRate`（8）・`padWave`・ドラム `soft`／`lullaby`・リード `sine` を追加（trk181）。4曲目は CRIMSON BLAZE（160 BPM・Aマイナー響き・約49秒・770 KiB）。ドラム `blaze`（16分ハット＋強フィル）を追加（trk182）。短調は調号Cのまま Am 中心進行＋終止 A で書く（ハモリ適用のサビはダイアトニック限定）。YuE2 本体はこの環境で動かない（GPU＋HuggingFace要）ため自前パイプラインとし、ABC は将来 YuE2 の `abc=` へ渡せる形。
 - **消した自動リストは作り直さない（trk114）**：trk!が自動で作るリスト（IDが `trk-` で始まる Game Vol.1・Classic Vol.1・trk's OST Vol.1・Agent's OST Vol.1・カタログの各リスト）を消すと、`settings.trkRemoved` に印が残り、次の起動で作り直しません。設定「🐔 trk's playlist」の **♻ 消したtrkのリストを戻す（n件）**で印を外して作り直します（Game Vol.1／Classic Vol.1の「開く」ボタンもその1件の印を外す）。印は `trk-` で始まるIDだけ・200件までに検証し、全リセットで空に戻ります。
 - **入手先ガイドは表示言語で出す（trk114）**：公式カタログ由来のガイドは辞書キー（`plGuide…`）と日本語の控えを保存し、表示時に今の言語で引きます（LoL・Endfield・ブルアカ・学マス・Game／Classic Vol.1など21キー×4言語）。既存の保存データは起動時に自動で鍵が付きます。カタログ本体の各シリーズ説明文（`js/catalog.js` の `note`）はまだ日本語だけです。
 - **小さなアクセント文字の色（trk114）**：`--ui-accent-ink`（`js/data.js` の `accentInk`、`applySkin` が毎回設定）。設定画面の入れ子の欄（カード＋パネル＋小欄の重なり）でも4.5:1になるまで、アクセントを本文の色へ5%ずつ寄せます。足りているスキンは元の色のまま。44スキン中16スキンで色が少し変わりました（スキンの棚の見出し、リンク、記録表の選択行など13ルール＋fx.jsのリンク1箇所）。
@@ -309,6 +309,11 @@
 
 ## 6. 直近の検証
 
+- **trk182（2026-10-16・OST 4曲目 CRIMSON BLAZE・Vol.1 完成）**
+  - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **520/520**）。`git diff --check` も成功。
+  - **作曲**：Aマイナー響き・160 BPM・32小節（約49秒・クリップ0・サビが最大の勾配・無音穴なし・末尾の無音0.58秒・G# 導音は ABC `^g` 1箇所きっかり）。
+  - **`sw.js` は据え置き**：任意アセットの追加だけ（trk180 の確認どおり）。
+  - **未完了**：実聴取での品質評価、実ブラウザsmoke2件（§8の条件どおりレビュー側で確認）。実機確認は§4のまま。
 - **trk181（2026-10-16・OST 3曲目 MOONLIT LULLABY）**
   - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **520/520**）。`git diff --check` も成功。
   - **作曲**：Fメジャー・92 BPM・32小節（約84秒・クリップ0・再現部が最大の緩い勾配・無音穴なし・末尾の無音は0.56秒に調整・Bb は K:F の調号どおり素の B で ABC 化）。
@@ -332,6 +337,10 @@
 
 ## 7. 最近の変更
 
+- **trk182（2026-10-16・OST 4曲目・Vol.1 完成）**
+  - **CRIMSON BLAZE 作曲・同梱**：短調バトルロック（160 BPM・Aマイナー響き・32小節・約49秒）。スコア（JSON＋ABC）→描画→MP3（770 KiB）を manifest へ追加。読み込み側の変更は不要。これで Vol.1 全4曲（ゲーム／Pops／ノクターン／短調ロック）がそろった。
+  - **描画の拡張**：ドラム `blaze`（16分ハット・強フィル・サビ用）。既存曲の再描画は不変。
+  - **ガイド（日英）・NOTICE・フォルダ README・`.gitignore` を追補。`sw.js` は据え置き。**
 - **trk181（2026-10-16・OST 3曲目）**
   - **MOONLIT LULLABY 作曲・同梱**：ノクターン（92 BPM・Fメジャー・32小節・約84秒）。スコア（JSON＋ABC）→描画→MP3（1.29 MiB）を manifest へ追加。読み込み側の変更は不要。
   - **描画の拡張**：静かな曲の語彙（`soft`／`lullaby` ドラム・`soft` ベース・8分アルペジオ・`padWave`・`leadVib`・リード `sine`）、F調 ABC の冗長な臨時記号を修正。既存曲の再描画は不変（bright 既定）。

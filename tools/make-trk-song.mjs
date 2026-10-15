@@ -34,7 +34,7 @@ const CHORDS = {
   A: { root: 45, triad: [0, 4, 7] }, Bm: { root: 47, triad: [0, 3, 7] },
   Bb: { root: 46, triad: [0, 4, 7] }, Gm: { root: 43, triad: [0, 3, 7] },
 };
-const DRUM_PATTERNS = ["build", "drive", "outro", "soft", "lullaby"];
+const DRUM_PATTERNS = ["build", "drive", "outro", "soft", "lullaby", "blaze"];
 /* 長調のキー。ABC の臨時記号と下方3度ハーモニーはここから決まる（C/G/F だけ。増やすときは表を足す）。 */
 const KEY_PCS = { C: [0, 2, 4, 5, 7, 9, 11], G: [0, 2, 4, 6, 7, 9, 11], F: [0, 2, 4, 5, 7, 9, 10] };
 /* pc → ABC の音字。調号でまかなえる音に臨時記号は付けない（G の F# は素の F、F の Bb は素の B）。 */
@@ -262,6 +262,11 @@ function renderDrums(tr, score, bar, sec, spb) {
     else if (at === 1) { kick4(); for (let i = 0; i < 8; i++) tr.snare(e(i), i % 2 ? 0.3 : 0.42); hats8(0.11); }
     else if (at === 2) { kick4(); for (let i = 0; i < 8; i++) tr.snare(e(i), 0.45); hats8(0.14); }
     else { tr.kick(e(0), 1); tr.crash(e(0), 0.34); }
+  } else if (sec.drums === "blaze") {
+    kick4(); backbeat();
+    for (let i = 0; i < 16; i++) tr.hat(t0 + i * spb * 0.25, i % 2 ? 0.06 : 0.085);
+    if (isLast) { for (let i = 4; i < 8; i++) tr.snare(e(i), 0.45); }
+    if (isFirst && sec.crashIn) tr.crash(t0);
   } else if (sec.drums === "soft") {
     tr.kick(e(0), 0.55);
     for (const i of [0, 2, 4, 6]) tr.hat(e(i), 0.055);

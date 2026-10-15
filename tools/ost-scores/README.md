@@ -9,9 +9,9 @@ note is written in the plan below.
   drum/arp/harmony arrangement per section. Keys are C/G/F major;
   `leadWave` picks the lead timbre (`pulse` default, `tri` for a
   softer pops lead).
-  Calm songs add `leadVib`, `bassStyle`/`bassWave`, `arpRate`, `padWave`,
-  and the `soft`/`lullaby` drum patterns
-  (see `ost-03-moonlit-lullaby.json`).
+  More voices: `leadVib`, `bassStyle`/`bassWave`, `arpRate`, `padWave`,
+  and the `soft`/`lullaby`/`blaze` drum patterns
+  (see `ost-03-moonlit-lullaby.json` and `ost-04-crimson-blaze.json`).
   See `ost-01-sunrise-dash.json` for the format.
 - `<key>.abc` — generated from the JSON by the renderer: melody plus
   chord symbols in ABC notation. Human-readable, and usable as `abc=`

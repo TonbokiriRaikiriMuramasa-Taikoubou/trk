@@ -483,6 +483,28 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     pickSource.indexOf("f.size > PLAYLIST_IMPORT_MAX") < pickSource.indexOf("await f.text()") &&
     (libSource.match(/\bplImportTooBig:/g) || []).length === 4;
   rule(playlistImportCap, "shared playlist import is size-capped before the file is read (F-34, four languages)");
+
+  /* F-38: share_target is an ordinary POST endpoint; the browser cannot identify OS shares versus cross-site forms.
+     Consume the inbox before confirmation, refuse without routing, and keep file_handlers as the explicit-user-action path. */
+  const shareInbox = js["js/share-inbox.js"], backupSource = js["js/backup.js"], i18nSource = js["js/i18n.js"];
+  const drainStart = shareInbox.indexOf("async function drainShareInbox()");
+  const drainEnd = shareInbox.indexOf("\n}\nfunction shareStartup", drainStart);
+  const drainSource = drainStart >= 0 && drainEnd >= 0 ? shareInbox.slice(drainStart, drainEnd) : "";
+  const shareConsent = drainSource.includes('confirm(tr("shareInboundAsk"') &&
+    drainSource.includes("if (!ok) return -1") &&
+    drainSource.indexOf("await cache.delete(req)") < drainSource.indexOf('confirm(tr("shareInboundAsk"') &&
+    drainSource.indexOf('confirm(tr("shareInboundAsk"') < drainSource.indexOf("await routeInboundFiles(files)") &&
+    shareInbox.includes("function shareDisplayName(name)") && drainSource.includes("files.map(f => shareDisplayName(f.name))") &&
+    shareInbox.includes("launchQueue.setConsumer") && (shareInbox.match(/shareInboundAsk:/g) || []).length === 4;
+  rule(shareConsent, "OS share inbox explains cross-site delivery, asks before routing, clears refusals, and keeps launchQueue user-initiated (F-38)");
+
+  const backupAddonGuard = backupSource.includes("function disableRestoredAddons(raw)") &&
+    backupSource.includes("addonRow[1] = disableRestoredAddons(addonRow[1])") &&
+    backupSource.includes("addonCount, addonNames") && (i18nSource.match(/backupRestoreAsk:/g) || []).length === 4;
+  rule(backupAddonGuard, "backup restore previews add-ons and forces restored add-ons off before writing them");
+  const backupLocalTextKeys = backupSource.includes('"trk_lyrics_v1", "trk_subs_v1"');
+  rule(backupLocalTextKeys, "manually selected lyrics and subtitle files (including delay) remain in the backup localStorage allowlist");
+
   const corePrefs = js["js/core.js"];
   const packPrevSafe = corePrefs.includes("packPrev: cleanPackPrev(prefs.packPrev)") && corePrefs.includes("function cleanPackPrev(") &&
     corePrefs.includes('typeof v.skin !== "string"') && corePrefs.includes("!Array.isArray(v.notes) || v.notes.length !== 2") &&

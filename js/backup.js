@@ -40,7 +40,50 @@
     "shadow_taiko_records_v1", "shadow_taiko_song_prefs_v1", "shadow_taiko_songmeta_v1", "shadow_taiko_played_v1",
     "trk_media_positions_v1", "trk_media_loop_presets_v1", "trk_fx_presets_v1", "trk_addons_v1",
     "trk_synth_mode_v1", "trk_synth_patches_v1", "trk_tv_skins_v1",
+    "trk_lyrics_v1", "trk_subs_v1",   /* 手で選んだ歌詞・字幕と遅延（trk166・169）。trk177 のレビューで追加 */
   ];
+  const ADDONS_KEY = "trk_addons_v1";
+  const ADDON_PREVIEW_NAMES = 3, ADDON_PREVIEW_NAME_MAX = 80;
+  function safeAddonName(value) {
+    const clean = String(value || "")
+      .replace(/[\u0000-\u001f\u007f-\u009f\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, " ")
+      .replace(/\s+/g, " ").trim();
+    return Array.from(clean).slice(0, ADDON_PREVIEW_NAME_MAX).join("") || "(unnamed)";
+  }
+  function summarizeAddonStore(raw) {
+    if (raw == null) return { known:true, count:0, names:[], omitted:0 };
+    if (typeof raw !== "string") return { known:false, count:0, names:[], omitted:0 };
+    let store;
+    try { store = JSON.parse(raw); } catch (_) { return { known:false, count:0, names:[], omitted:0 }; }
+    if (!store || typeof store !== "object" || Array.isArray(store)) return { known:false, count:0, names:[], omitted:0 };
+    let count = 0;
+    const names = [];
+    for (const id of Object.keys(store)) {
+      const entry = store[id];
+      if (!entry || typeof entry !== "object" || Array.isArray(entry)) continue;
+      count++;
+      if (names.length < ADDON_PREVIEW_NAMES) names.push(safeAddonName(entry.name || entry.id || id));
+    }
+    return { known:true, count, names, omitted:Math.max(0, count - names.length) };
+  }
+  /* バックアップから戻したコードは、元の同意指紋が有効でも初期状態では実行しない。 */
+  function disableRestoredAddons(raw) {
+    if (typeof raw !== "string") return raw;
+    let store;
+    try { store = JSON.parse(raw); } catch (_) { return "{}"; }
+    if (!store || typeof store !== "object" || Array.isArray(store)) return "{}";
+    const out = Object.create(null);
+    for (const [id, entry] of Object.entries(store)) {
+      if (!entry || typeof entry !== "object" || Array.isArray(entry)) continue;
+      const disabled = Object.create(null);
+      for (const key of Object.keys(entry)) Object.defineProperty(disabled, key, {
+        value:entry[key], enumerable:true, writable:true, configurable:true,
+      });
+      disabled.enabled = false;
+      Object.defineProperty(out, id, { value:disabled, enumerable:true, writable:true, configurable:true });
+    }
+    return JSON.stringify(out);
+  }
   /* IndexedDB の対象。skip はそのストアで書き出さないキー（FileSystemHandle などを持つ） */
   const DB_LIBRARY = { db:"shadow_taiko_library", version:2, stores:["kv"], skip:{ kv:["dir", "share"] } };
   const DB_STUDY = { db:"trk_study_room_v1", version:1, stores:["books", "pages", "covers", "settings"] };
@@ -319,7 +362,20 @@
   }
 
   /* ---------- 復元 ---------- */
-  /* 中身を読まずに、backup.json だけ確かめる（確認画面に出す用）。 */
+  /* 確認画面に出すアドオン一覧（バックアップのコードは実行せず、名前だけを読む）。 */
+  async function readBackupAddonSummary(zip, meta) {
+    if (!meta || !meta.areas || !meta.areas.core) return { known:true, count:0, names:[], omitted:0 };
+    const entry = zip.byName.get("local.json");
+    if (!entry || !Number.isSafeInteger(entry.usize) || entry.usize > MAX_LS_VALUE) return { known:false, count:0, names:[], omitted:0 };
+    try {
+      const local = JSON.parse(await (await Z.zipEntryBlob(zip, entry, MAX_LS_VALUE)).text());
+      const items = local && local.items;
+      if (!items || typeof items !== "object" || Array.isArray(items)) return { known:false, count:0, names:[], omitted:0 };
+      if (!Object.prototype.hasOwnProperty.call(items, ADDONS_KEY)) return { known:true, count:0, names:[], omitted:0 };
+      return summarizeAddonStore(items[ADDONS_KEY]);
+    } catch (_) { return { known:false, count:0, names:[], omitted:0 }; }
+  }
+  /* backup.json と、確認に必要なアドオン名だけを読む。コードは実行しない。 */
   async function readBackupMeta(file) {
     let zip;
     try { zip = await Z.zipOpen(file); }
@@ -339,7 +395,8 @@
     try { meta = JSON.parse(await raw.text()); }
     catch (_) { throw new BackupError("backupRestoreBad"); }
     if (!meta || meta.format !== FORMAT || meta.version !== VERSION || meta.app !== APP) throw new BackupError("backupRestoreBad");
-    return { zip, meta };
+    const addons = await readBackupAddonSummary(zip, meta);
+    return { zip, meta, addons };
   }
   /* 上限の確認（上限を無視しないとき）。通常の画像取り込みと同じく、冊数・枚数・1冊の合計・1画像・文章を見る。 */
   function checkStudyLimits(books, pageBlobSizes = new Map()) {
@@ -388,7 +445,8 @@
     } catch (_) { return null; }
   }
   async function restoreBackup(file, opts = {}) {
-    const { zip, meta } = await readBackupMeta(file);
+    const prepared = opts.info && opts.info.zip && opts.info.meta ? opts.info : await readBackupMeta(file);
+    const { zip, meta } = prepared;
     /* 1) 全件の中身を確かめる（CRC・大きさ）。書く前に終えて、壊れた中身で途中まで書き換えないため。
        圧縮エントリはJSON等だけのはずなので、展開処理量にも固定上限を置く。 */
     for (const e of zip.entries) {
@@ -416,6 +474,8 @@
         for (const [k, v] of Object.entries(j && j.items || {})) {
           if (LS_KEYS.includes(k) && typeof v === "string" && v.length <= MAX_LS_VALUE) out.push([k, v]);
         }
+        const addonRow = out.find(row => row[0] === ADDONS_KEY);
+        if (addonRow) addonRow[1] = disableRestoredAddons(addonRow[1]);
         plan.ls = out;
       }
     }
@@ -536,11 +596,20 @@
       catch (error) { say(keyOfError(error)); return; }
       const m = info.meta;
       const date = (() => { const d = new Date(m.createdAt); return isNaN(d) ? "?" : d.toLocaleString(); })();
-      const ask = window.tr("backupRestoreAsk", { date, books: m.counts && m.counts.study ? m.counts.study.books : 0, packs: m.counts ? m.counts.packs || 0 : 0, media: m.counts ? m.counts.media || 0 : 0 });
+      const addons = info.addons || { known:false, count:0, names:[], omitted:0 };
+      const addonCount = addons.known ? addons.count : window.tr("backupRestoreAddonCountUnknown");
+      const addonNames = !addons.known ? window.tr("backupRestoreAddonListUnknown") : addons.count
+        ? addons.names.join("、") + (addons.omitted ? " " + window.tr("backupRestoreAddonMore", { n:addons.omitted }) : "")
+        : window.tr("backupRestoreNoAddons");
+      const ask = window.tr("backupRestoreAsk", {
+        date, books:m.counts && m.counts.study ? m.counts.study.books : 0,
+        packs:m.counts ? m.counts.packs || 0 : 0, media:m.counts ? m.counts.media || 0 : 0,
+        addonCount, addonNames,
+      });
       if (!confirm(ask)) return;
       say("backupRestoreWorking");
       try {
-        const r = await restoreBackup(f), vars = { details:formatRestoreDetails(r) };
+        const r = await restoreBackup(f, { info }), vars = { details:formatRestoreDetails(r) };
         say("backupRestoreDone", vars);
         /* 結果には導入失敗時の保護・prune見送りも含める。確認してから画面を反映する。 */
         window.alert(window.tr("backupRestoreDone", vars));
@@ -560,7 +629,8 @@
   }
 
   window.Trk.backup = Object.assign(window.Trk.backup || {}, {
-    buildBackup, restoreBackup, readBackupMeta, formatRestoreDetails, checkStudyLimits, encodeValue, decodeValue, encKey, decKey, encName, decName, LS_KEYS, BackupError,
+    buildBackup, restoreBackup, readBackupMeta, readBackupAddonSummary, formatRestoreDetails, checkStudyLimits,
+    summarizeAddonStore, disableRestoredAddons, encodeValue, decodeValue, encKey, decKey, encName, decName, LS_KEYS, BackupError,
   });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setup);
   else setup();

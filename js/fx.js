@@ -773,6 +773,11 @@ function applyOut() {
    曲の読み込み（mediaReady）とタグの到着（songTags）でも呼び直される。エフェクトがオフでも働く。 */
 function applyNorm() {
   if (!G.src || !G.norm) return;
+  /* fx.js には core の束縛が無い（ほかは settings・video などの共有名だけを使う）。
+     trk168 では素の core を参照して ReferenceError になり、平準化が一度も効かず、
+     ensureGraph／refresh／selectPreset の途中で例外が出ていた（trk177・レビュー） */
+  const core = window.Trk && window.Trk.core;
+  if (!core) return;
   const lib = window.Trk && window.Trk.library;
   const song = core.currentSong;
   const tags = song && lib && typeof lib.songTagsOf === "function" ? lib.songTagsOf(song) : null;

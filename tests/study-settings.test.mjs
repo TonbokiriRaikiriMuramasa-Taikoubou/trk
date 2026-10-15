@@ -60,6 +60,9 @@ function harness() {
     function tr(key) { return key; }
     function studyEditorHandleTab() { return false; }
     function studyTypingTarget() { return false; }
+    function studyAutoScrollActive() { return false; }
+    function studyStopAutoScroll() {}
+    function studyToggleAutoScroll() {}
     function studyStep(dir) { steps.push(dir); }
     function studyJumpZoomEdge(dir, repeat) { edges.push([dir, repeat]); return true; }
     function studyCloseRoom() { studyRoomOpen = false; }

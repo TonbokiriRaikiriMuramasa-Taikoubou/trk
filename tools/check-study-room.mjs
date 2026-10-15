@@ -267,9 +267,10 @@ const keyLabel = reader.match(/function studyKeyCodeLabel\(code\) \{[\s\S]*?\n\}
 assert.ok(reservedKeys && keyAllowed && keyLabel, "navigation key validation and labels are defined");
 const keyTestContext = vm.createContext({});
 vm.runInContext(`${reservedKeys[0]}\n${keyAllowed[0]}\n${keyLabel[0]}\nglobalThis.allowed = studyKeyCodeAllowed; globalThis.label = studyKeyCodeLabel;`, keyTestContext);
-for (const code of ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "KeyA", "Digit3", "Numpad4", "PageUp", "PageDown", "Home", "End"])
+for (const code of ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "KeyZ", "Digit3", "Numpad4", "PageUp", "PageDown", "Home", "End"])
   assert.equal(keyTestContext.allowed(code), true, `${code} is a supported navigation key`);
-for (const code of ["Escape", "Tab", "Space", "Enter", "KeyB", "KeyM", "KeyT", "KeyF", "Digit0", "Unknown"])
+/* KeyA は trk175 から自動スクロールのトグル＝割り当て不可の予約キー */
+for (const code of ["Escape", "Tab", "Space", "Enter", "KeyA", "KeyB", "KeyM", "KeyT", "KeyF", "Digit0", "Unknown"])
   assert.equal(keyTestContext.allowed(code), false, `${code} is reserved or unsupported`);
 assert.equal(keyTestContext.label("ArrowRight"), "→");
 assert.equal(keyTestContext.label("KeyA"), "A");

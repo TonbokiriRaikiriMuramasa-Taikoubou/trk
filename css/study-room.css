@@ -129,6 +129,8 @@
 .study-small-btn:hover{border-color:rgba(255,209,102,.55);background:rgba(255,209,102,.12);color:#ffe4ac}
 .study-small-btn:disabled{opacity:.36}
 .study-small-btn.study-danger-btn{color:#ffc9c9;border-color:rgba(255,130,140,.28)}
+/* trk175: ⏩ 自動スクロール（縦読み）の実行中ボタン。アンバーで「動いている」を示す */
+.study-auto-scroll-btn[aria-pressed="true"]{border-color:rgba(255,209,102,.75);background:rgba(255,209,102,.18);color:#ffe4ac}
 .study-toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:7px 8px;margin-bottom:8px;border:1px solid rgba(255,255,255,.09);
   border-radius:11px;background:rgba(255,255,255,.035)}
 .study-option{display:inline-flex;align-items:center;gap:6px;min-width:0;color:#c4c8d1;font-size:11px;font-weight:750}

@@ -1447,6 +1447,7 @@
               <button id="studyZoomIn" type="button" class="study-small-btn" aria-label="Zoom in">＋</button>
               <button id="studyZoomFit" type="button" class="study-small-btn" data-i18n="studyZoomFit">フィット</button>
             </span>
+            <button id="studyAutoScrollBtn" type="button" class="study-small-btn study-auto-scroll-btn" aria-pressed="false" data-i18n="studyAutoScrollStart" hidden>⏩ 自動スクロール</button>
             <label id="studyThemeRow" class="study-option">
               <span data-i18n="studyThemeLabel">文字のスキン</span>
               <select id="studyTheme">
@@ -1685,6 +1686,17 @@
             </select>
           </div>
           <p id="studyZoomStepHint" class="study-advanced-hint" data-i18n="studyZoomStepHint">−／＋・Ctrl+ホイール・ピンチの1回ぶんです（初期値5%＝100%→200%が20回）。</p>
+          <div class="study-advanced-row">
+            <span id="studyAutoScrollSpeedLabel" data-i18n="studyAutoScrollSpeedLabel">自動スクロールの速度</span>
+            <select id="studyAutoScrollSpeed" aria-labelledby="studyAutoScrollSpeedLabel" aria-describedby="studyAutoScrollSpeedHint">
+              <option value="20" data-i18n="studyAutoSpeedSlowest">いちばん遅い</option>
+              <option value="45" data-i18n="studyAutoSpeedSlow">遅い</option>
+              <option value="75" data-i18n="studyAutoSpeedNormal">普通</option>
+              <option value="120" data-i18n="studyAutoSpeedFast">速い</option>
+              <option value="180" data-i18n="studyAutoSpeedFastest">いちばん速い</option>
+            </select>
+          </div>
+          <p id="studyAutoScrollSpeedHint" class="study-advanced-hint" data-i18n="studyAutoScrollSpeedHint">縦読みモードの「⏩ 自動スクロール」の速さ（1秒あたりのピクセル）。動いている最中の変更もすぐ効きます。タップや移動キー（↑↓・Space・PageUp / PageDown など）で止まります。</p>
           <label class="study-check-option">
             <input id="studyPageKeysTurnPages" type="checkbox">
             <span data-i18n="studyPageKeysTurnPages">PageUP、PageDownをページ動作にする</span>
@@ -1753,6 +1765,7 @@
         <dt>/ または Ctrl+F</dt><dd data-i18n="studyHelpSearch"></dd>
         <dt>B ／ M</dt><dd data-i18n="studyHelpBookmark"></dd>
         <dt>T ／ F</dt><dd data-i18n="studyHelpTv"></dd>
+        <dt>A</dt><dd data-i18n="studyHelpAuto"></dd>
         <dt>? ／ Esc</dt><dd data-i18n="studyHelpEsc"></dd>
       </dl>
       <div class="study-help-foot">

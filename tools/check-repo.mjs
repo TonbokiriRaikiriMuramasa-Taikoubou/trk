@@ -2647,6 +2647,37 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else ok("trk174: 📈 progress filter (unplayed / in progress / finished) narrows the row list from position memory + play counts — display layer only, never writes");
 }
 
+// trk175: 📜 書斎の自動スクロール（PLAYER-ROADMAP #12・ハンズフリー縦読み）。縦読み漫画モードだけの等速スクロール。
+// 開始/停止は ⏩ ボタンと A キー、停止はタップ（pointerdown）・ホイール・移動キーでも起きる。下端で自動停止。
+// 表示だけの機能＝栞・位置・DB 保存には触れない。A は予約キー（割り当て変更できない）。
+{
+  const study = read("js/study-room.js");
+  const html = read("index.html");
+  const css = read("css/study-room.css");
+  /* ⚠ read() は正規化後の本文：core.$( は $( に見える */
+  if (!study.includes("const STUDY_AUTO_SCROLL_SPEEDS = [20, 45, 75, 120, 180], STUDY_AUTO_SCROLL_SPEED_DEFAULT = 75;") ||
+      !study.includes('"KeyA", "KeyB"') ||
+      !study.includes("function studyAutoScrollFrame(now)") || !study.includes("function studyToggleAutoScroll()") ||
+      !study.includes("if (!eligible) studyAutoScrollHalt();") ||
+      !study.includes('studyNotify("studyAutoScrollEnd")') ||
+      !study.includes("STUDY_AUTO_SCROLL_STOP_CODES.has(event.code) || event.code === studyPrefs.studyNextKey || event.code === studyPrefs.studyPreviousKey") ||
+      !study.includes('function studyImagePointerDown(event) {\n  studyStopAutoScroll();') ||
+      !study.includes('addEventListener("wheel", event => {\n  studyStopAutoScroll();') ||
+      !study.includes('$("studyAutoScrollBtn").addEventListener("click", studyToggleAutoScroll);') ||
+      !study.includes('studyBindPref("studyAutoScrollSpeed", "studyAutoScrollSpeed", node => {') ||
+      (study.match(/studyStopAutoScroll\(\);/g) || []).length < 5 ||
+      (study.match(/studyAutoScrollStart:"/g) || []).length !== 4 ||
+      (study.match(/studyAutoScrollEnd:"/g) || []).length !== 4 ||
+      (study.match(/studyAutoScrollNeedVertical:"/g) || []).length !== 4 ||
+      (study.match(/studyHelpAuto:"/g) || []).length !== 4) fail("study-room.js auto-scroll (vertical-mode constant speed, tap/wheel/key stop, bottom auto-stop, four-language texts) is missing");
+  else if (!html.includes('<button id="studyAutoScrollBtn"') || !html.includes('<select id="studyAutoScrollSpeed"') ||
+           !html.includes('<option value="180" data-i18n="studyAutoSpeedFastest">') ||
+           !html.includes('<dt>A</dt><dd data-i18n="studyHelpAuto"></dd>') ||
+           !(html.indexOf('id="studyZoomGroup"') < html.indexOf('id="studyAutoScrollBtn"'))) fail("the ⏩ auto-scroll button (toolbar), speed select (settings) and A row (help) are missing");
+  else if (!css.includes('.study-auto-scroll-btn[aria-pressed="true"]{')) fail("the running-state style for the auto-scroll button is missing");
+  else ok("trk175: 📜 study auto-scroll — constant-speed hands-free vertical reading (⏩ button / A key, speed setting, tap·wheel·navigation keys stop it, auto-stop at the last page)");
+}
+
 // 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own
 // "don't sway" option, plus the ❓ mystery switch that outranks both.
 {

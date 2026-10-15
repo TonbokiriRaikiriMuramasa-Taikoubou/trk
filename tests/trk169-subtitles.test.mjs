@@ -214,7 +214,7 @@ test("wiring: folder pickup, media-player panel + overlay + hooks (four language
   assert.ok(librarySrc.includes("it.subsFile = subs[it.dir + \"/\" + it.base] || null"), "sidecar is attached to the song");
   assert.ok(librarySrc.includes('n.endsWith(".srt") || n.endsWith(".vtt")'), "the recursive picker collects them too");
   /* media-player-mode.js：パネル・オーバーレイ・フック */
-  assert.ok(playerSrc.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)"), "panel sits right after the lyrics panel");
+  assert.ok(playerSrc.includes("body.append(display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)"), "panel sits right after the lyrics panel");
   assert.ok(playerSrc.includes("stageWrap.append(stageCanvas, subsOverlay, stageNote)"), "overlay lives on the video stage");
   assert.ok(playerSrc.includes("renderSubsOverlay();"), "overlay updates on the 250ms media tick");
   assert.ok(playerSrc.includes("if (lyricsBoxOpen()) loadLyrics(); loadSubs(true); });"), "song changes reload subtitles (even with the panel closed)");

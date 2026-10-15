@@ -137,7 +137,7 @@ test("library.js: MEDIA_EXT に m4b が入った（オーディオブックの�
 
 test("media-player-mode.js: 🔖 チャプターの配線（パネル・スリープ・4言語テキスト）", () => {
   /* パネルとダイアログの並び */
-  assert.ok(playerSrc.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)"));
+  assert.ok(playerSrc.includes("body.append(display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)"));
   for (const fn of ["function chapsAllowed()", "async function ensureChapters()", "async function loadChapters(",
     "function renderChapters()", "function renderChaptersActive()", "function chapterIndexAt(",
     "function seekToChapter(t)", "function stepChapter(delta)", "function checkChapterSleep()"]) {

@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-16（trk185）**。現在の仕様・守る条件・未確認事項の要約です。trk177以前の変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-16（trk189）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検。
 
@@ -127,6 +127,13 @@
 - **🌗 読書用フィルタ（trk176・明るさ/コントラスト/反転系）**：**読書面だけに CSS filter**＝`studyApplyReadFilter` が `#studyRoom` に CSS 変数 `--study-read-filter` を入れ、`.study-image-stage,.study-text-stage` だけが `filter:var(--study-read-filter,none)` で受ける。**本棚・ツールバー・メニュー・TVペイン・プレーヤーは変わらない**（意図＝操作系の見た目を変えず、読書面だけ調整する）。**全画面フィット（trk135）・拡大率とは独立**＝filter はステージ全体、拡大は中の寸法/transform なのでどの組み合わせでも干渉しない（ROADMAP #13 の要件どおり）。明るさ・コントラストは **50〜150%・刻み5のスライダー**（`studyReadFilterPercent` がクランプ、数値以外は100へ）、特殊フィルタは **なし／反転 `invert(1)`／グレースケール `grayscale(1)`／セピア `sepia(.8)`** の4候補（`STUDY_READ_SPECIALS`・セピアは強すぎない .8）。**初期値（100%/100%/なし）では "none" を入れる**＝フィルタ自体がかからず合成コストゼロ（`studyReadFilterCss` が最初に判定）。スライダーは **input＝見た目だけ（保存しない）／change＝保存** の2段＝ドラッグ中に毎コマ IndexedDB へ書かないため（意図）。% 値のラベル（`studyReadBrightnessValue`/`studyReadContrastValue`）は適用のたびに同期。テキストのスキン（和紙・古書・作文用紙など）や検索マークの色も読書面の一部なのでフィルタ込みで変わる＝意図どおり。選択は studyPrefs（書斎専用 IndexedDB の `settings/ui`）に残りリロード後も続く。壊れた保存値はクランプ／候補検証で既定へ戻る。
 - **共通の意図**：どちらも**純粋に表示層**＝栞・位置・本・プレイ記録などの保存データを変えない（自動スクロールは check-repo 見張り＋テストで状態機を実動検証、フィルタは css 構築とクランプを vm で実動検証）。新しい UI 文言は4言語（TEXT 13＋8キー×4）。実機での確認は §4-27／§4-28 に登録済み。
 
+### 🎥 基地・退出・全画面ジェスチャー（trk186〜189）
+
+- 曲リストの📚書斎の隣の **🎥基地**をタップすると既存プレーヤーを開く（PC／スマホ共通、4言語）。TV電源の長押しも残す。
+- 上部の **← 曲リストに戻る**で再生を止め、位置を保存して退出。ヘッダーはスクロール面の外に残す。Esc等は既存の退出確認設定を維持し、明示ボタンは従来どおり即退出。
+- 全画面の映像エリアの左右長押しで加速シーク（左＝戻す、右＝進む）。再生倍率は変更せず、短タップは従来どおり。指離し・中断・曲切替・closeで止める。閾値・掃除の詳細は§7。
+- **HEVC**：今回は対応を見送り。スマホで再生できたとの利用者報告あり。ただし端末／OS／ブラウザ差があるため一般化しない。形式検出・未復号フラグ・案内UI・ソフトデコーダー・変換は追加していない。
+
 ### ▶ メディアプレーヤー強化（trk164〜174・PLAYER-ROADMAP #1〜#11・#14〜#16）
 
 台帳は [`PLAYER-ROADMAP.md`](PLAYER-ROADMAP.md)（#1〜#16 の状態と実装メモ）。**共通の意図**：「ふつうの視聴」の機能を、**外部送信なし・元ファイルへの書き込みなし・保存データの書き換えなし**（プライバシー方針：曲/データは端末から出ない、ファイルは読み取り専用）でそろえる。実機確認は §4-17〜§4-29。
@@ -147,7 +154,7 @@
 
 ### 維持中の既存機能
 
-- **🎓 trk's OST Vol.1（`trk-ost-v1`）**：🐔 trk's playlist の Game Vol.1 直下。**trk185 から音源5曲（SUNRISE DASH・POPCORN SMILE・MOONLIT LULLABY・CRIMSON BLAZE・ボーナス NEON DIVE）は同梱をやめ、別リポジトリ music-library の `.stpack`（CC BY 4.0）で別配布**。FIRST SPARK のデモは同梱のまま残す。プレイリストには別配布の案内（`plGuideTrkOst`・4言語・music-library Releases へのリンク）を持ち、公式パック（名前 `trk's OST Vol.1`／作者 `TRMTKB` から算出するパックID）を入れた利用者には `syncTrkOstPackSongs` が曲キー `pack:<ID>/s01〜s05` を未見だけ足す（`trkOstSeenKeys` 共用・利用者が外した曲は戻さない・外部通信なし）。同梱経路は `TRK_OST_MANIFEST_INCLUDED=false` の印で manifest を取りに行かない（同梱ビルドだけ true）。手続き生成曲は別の **trk Agent's OST Vol.1（`trk-agent-ost-v1`）** にmanifest経由で接続済み（下記）。trk112が最上位に作った本棚だけを一度trkフォルダへ移し（印は `cat: "trk:ost"`）、以後は利用者が動かした場所を守ります。
+- **🎓 trk's OST Vol.1（`trk-ost-v1`）**：🐔 trk's playlist の Game Vol.1 直下。**trk185 から音源5曲（SUNRISE DASH・POPCORN SMILE・MOONLIT LULLABY・CRIMSON BLAZE・ボーナス NEON DIVE）は同梱をやめ、別リポジトリ music-library の `.stpack`（CC BY 4.0）で別配布**。FIRST SPARK のデモは同梱のまま残す。プレイリストには別配布の案内（`plGuideTrkOst`・4言語・music-library Releases へのリンク）を持ち、公式パック（名前 `trk's OST Vol.1`／作者 `TRMTKB` から算出するパックID）を入れた利用者には `syncTrkOstPackSongs` が曲キー `pack:<ID>/s01〜s05` を未見だけ足す（`trkOstSeenKeys` 共用・利用者が外した曲は戻さない・外部通信なし）。trk189で旧同梱キーだけを一回掃除（`trkOstLegacyClean1`）、見た曲の印は起動時にも読み戻します。同梱経路は `TRK_OST_MANIFEST_INCLUDED=false` の印で manifest を取りに行かない（同梱ビルドだけ true）。手続き生成曲は別の **trk Agent's OST Vol.1（`trk-agent-ost-v1`）** にmanifest経由で接続済み（下記）。trk112が最上位に作った本棚だけを一度trkフォルダへ移し（印は `cat: "trk:ost"`）、以後は利用者が動かした場所を守ります。
 - **🎼 手続き作曲ツール／任意のAgent OST（trk113・trk149〜151）**：`node tools/make-trk-ost.mjs` で5ルール×2曲＝10曲のWAVスケッチと `assets/trk-ost/manifest.json` を生成（外部ライブラリなし・決定的）。アプリ側にはmanifest読込み・専用リスト作成・選択時の音源読込みを実装済みです。ただし音源とmanifestは `.gitignore` 対象で、公開リポジトリには入っていません。既定コードの `AGENT_OST_MANIFEST_INCLUDED=false` は任意資産をfetchしない印です。音源を意図的に含める配布／試験ビルドだけ true にし、生成したmanifest・WAVと一緒に配布します。10曲の実聴取・品質評価は未確認（§4-6）。
 - **🎵 OSTオリジナル曲の作曲パイプライン（trk179〜）**：`tools/ost-scores/<key>.json` に作曲（テンポ・形式・コード・全メロディ・編曲）→ `node tools/make-trk-song.mjs` で決定論的チップシンセ描画（WAVはGit外）＋ABC譜を生成 → `node tools/encode-ost-mp3.mjs` でMP3化 → **trk185 からは同梱せず music-library の `.stpack` で配布**（スコアは本Repo `tools/ost-scores/` と music-library `scores/` の両方に残す。全スコアが描画できることが check-repo／ost-render の検査条件）。1曲目は SUNRISE DASH（150 BPM・32小節・intro-A-B-サビ-outro＋終止・約53秒・823 KiB）。2曲目は POPCORN SMILE（128 BPM・Gメジャー・三角波リード・約61秒・960 KiB）。調は C/G/F 長調（ABC の臨時記号と下方3度は調に従う）、リード音色は pulse/tri/square/saw から選べる（trk180）。3曲目は MOONLIT LULLABY（92 BPM・Fメジャー・約84秒・1.29 MiB）。静かな曲用に `leadVib`・`bassStyle`（soft）・`bassWave`・`arpRate`（8）・`padWave`・ドラム `soft`／`lullaby`・リード `sine` を追加（trk181）。4曲目は CRIMSON BLAZE（160 BPM・Aマイナー響き・約49秒・770 KiB）。ドラム `blaze`（16分ハット＋強フィル）を追加（trk182）。短調は調号Cのまま Am 中心進行＋終止 A で書く（ハモリ適用のサビはダイアトニック限定）。ボーナスは NEON DIVE（240 BPM・Dメジャー・56小節2番形式・約57秒・892 KiB）。BPM上限260・Dメジャー・ドラム `vocaloid`（ハーフタイム＋16分ハット）・メロディ16分 grid・最終スタブのテンポ追従を追加（trk183）。YuE2 本体はこの環境で動かない（GPU＋HuggingFace要）ため自前パイプラインとし、ABC は将来 YuE2 の `abc=` へ渡せる形。
 - **消した自動リストは作り直さない（trk114）**：trk!が自動で作るリスト（IDが `trk-` で始まる Game Vol.1・Classic Vol.1・trk's OST Vol.1・Agent's OST Vol.1・カタログの各リスト）を消すと、`settings.trkRemoved` に印が残り、次の起動で作り直しません。設定「🐔 trk's playlist」の **♻ 消したtrkのリストを戻す（n件）**で印を外して作り直します（Game Vol.1／Classic Vol.1の「開く」ボタンもその1件の印を外す）。印は `trk-` で始まるIDだけ・200件までに検証し、全リセットで空に戻ります。
@@ -174,7 +181,7 @@
 
 ## 4. 未完了の確認
 
-一覧（状態は 2026-10-15 時点）。詳細は下の「4.1 詳細」にあります。既存項目の番号は維持しています。
+一覧（状態は 2026-10-16 時点）。詳細は下の「4.1 詳細」にあります。既存項目の番号は維持しています。
 
 | # | 項目 | 状態 | 次の一手 |
 |---|---|---|---|
@@ -207,10 +214,11 @@
 | 27 | 📜 書斎の自動スクロール（trk175：縦読みモード・等速・ハンズフリー） | 状態機（開始条件・等速＋端数・下端停止・停止/トグル・速度の生きた変更）と配線（Aキー・タップ・ホイール・ボタン・設定・4言語）はNode/VM検査済み。実機での確認は未了 | ①縦読み漫画モードだけ ⏩ ボタンが出て、ボタン/A で等速で下へ進むか ②タップ・ホイール・移動キー（↑↓/Space/PageUp・PageDown/Home・End/割り当ての次へ・前へ）で一回で止まるか ③下端で自動停止して案内が出るか ④速度5段階（20/45/75/120/180 px/秒）が実行中でもすぐ効き、選択が残るか ⑤全画面で続き、モード変更・本を閉じる・書斎を閉じるで静かに止まるか ⑥スクロール中もページの遅延読み込みとページ数の追従が正常か |
 | 28 | 🌗 読書用フィルタ（trk176：明るさ/コントラスト/反転系・読書面だけ） | css 構築（初期値は "none"）・クランプ（50〜150）・読み込み検証・配線はNode/VM検査済み。実機での確認は未了 | ①⚙ 設定のスライダー2本と特殊フィルタ（なし/反転/グレースケール/セピア）が出るか ②ドラッグ中にすぐ見た目に効き、離すと保存されるか ③画像と文章の読書面だけ変わり、本棚・メニュー・TVペインは変わらないか ④全画面フィットや拡大率と独立して併用できるか ⑤初期値に戻すと "none"（フィルタなし）になるか ⑥選択がリロード後も続くか |
 | 29 | trk177レビュー回帰（core束縛・音量平準化・バックアップのアドオン・受信確認） | 関連Node/VMテストとSecurity検査で確認済み。実ブラウザ・実機は未確認 | ①ReplayGainタグ付き曲で平準化オン、タグ由来の補正が効き例外が出ないこと（PC・Android） ②タグ無しの曲で端末内解析由来の補正が効き例外が出ないこと ③アドオン入りバックアップの確認で件数・名前・無効化の説明が見え、復元後は全部オフで手動有効化まで動かないこと ④手動歌詞・字幕・字幕遅延を含むバックアップの復元 ⑤インストール済みPWAの共有を承認し、名前・件数を確かめた後に既存経路へ入ること ⑥共有を拒否した場合は何も取り込まずinboxから消え、デスクトップの明示的な「このアプリで開く」は確認が重ならないこと（詳細は #17） |
+| 30 | trk186〜189：🎥基地・退出・左右長押し・旧OSTキー移行 | Node/VM＋共通smoke2件は成功。今回の実機操作は未確認 | PC／スマホ縦横・4言語で基地入口、戻るボタンの常時表示、下部スクロール、左右長押しと離した後の停止・短タップ・中断を確認。旧版データからの移行と、外したパック曲が再起動後も戻らないことも確認 |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
-- **実行環境**：`npm run check` は実ブラウザsmokeを実行しません。GitHub ActionsはGitHub Pagesの静的コピー／公開のみです。`package.json`／lockfileにPuppeteerはなく、smokeスクリプトは `SMOKE_CHROME`／`SMOKE_PUPPETEER` で外部インストール済みブラウザを指定するため、自動ダウンロードはしません。この環境にChromium／Chromeはなく、実ブラウザsmokeは未実施。
+- **実行環境**：`npm run check` は実ブラウザsmokeを実行しません。GitHub ActionsはGitHub Pagesの静的コピー／公開のみです。`package.json`／lockfileにPuppeteerはなく、smokeスクリプトは `SMOKE_CHROME`／`SMOKE_PUPPETEER` で外部インストール済みブラウザを指定するため、自動ダウンロードはしません。trk189の最終確認ではRepo外にChromiumを用意し、smoke2件を実行済み（§6）。実機確認とは区別する。
 - **既知のサイズ**：npm registryの `puppeteer-core@25.13.0` は単体の展開後6,010,962 bytes（約5.73 MiB、927 files）。リポジトリ依存には含まれず、推移依存はこの値に含みません。Chrome／Chromium本体、CIキャッシュ、一時ディスク、実転送量は未計測です。
 - **ソース差分**：HEAD比でHTML／JS／SWが非圧縮約17.7 kB増、テスト・ガイド等を含む全ファイルは約64.7 kB増。Pages workflowはリポジトリ一式をartifactへコピーしますが、圧縮後サイズは未計測です。
 - **上限設計のNode目安**：10万項目・約9.08 MBの合成ZIPを作成・読込すると約2.44秒、強制GC後のJS heapは処理前比約10.7 MiB増でした。ピークRSSやChrome／モバイルのメモリ測定ではありません。この目安から、ZIP64の65,535件境界を十分に超える250,000項目・64 MiBの上限にしています。
@@ -304,36 +312,48 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.15-trk179`） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.16-trk189`） |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
 
-- **trk185（2026-10-16・OST を music-library へ分離）**
-  - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **523/523**）。`git diff --check` も成功。
-  - **分離**：`assets/optional-ost-audio/`（5曲・約4.7 MiB）を削除し、`TRK_OST_MANIFEST_INCLUDED=false` で既定ビルドは manifest を取得しない。FIRST SPARK は同梱のまま。公式パック導入で `syncTrkOstPackSongs` がプレイリストへ未見キーだけ接続し、案内 `plGuideTrkOst`（4言語）を新規・既存リストへ付与。`ost-render` はスコア一覧から全曲描画を確認。README／NOTICE／ガイド／`tools/ost-scores/README.md` を別配布（CC BY 4.0）に更新し、`sw.js` cache を `trk-v2026.10.16-trk185` へ。
-  - **music-library Release**：`trk-ost-vol1.stpack` の SHA256 が `SHA256SUMS.txt`（`32a5d4fd…d44fb4`）と一致し、全エントリーCRC正常・曲ID `s01`〜`s05` が連携コードと一致することを確認。ただし **Release `v1` の作成は、この作業環境のGitHub連携が trk Repo 限定のため 403 で未実施**（music-library 側で Release を作り `release-assets/` の2ファイルを添付する手作業が残る）。
-  - **未完了**：実ブラウザsmoke2件（§8の条件・レビュー側で確認）。実機確認は§4のまま。
+**trk186〜189・2026-10-16の最終確認**（作業途中の記録はアーカイブへ移動）
 
-過去の検証ログは [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) に移しました。現在の仕様・実機確認状況は§2〜4を正とします。
+| 検査 | 結果 | 範囲・注意 |
+|---|---|---|
+| `npm run check` | **534 pass / 0 fail** | 静的・安全・アクセシビリティ等＋Node/VMテスト |
+| `git diff --check` | 成功 | 空白等の差分検査 |
+| `tools/smoke-browser.mjs --compare` | **OK** | boot 0・未解決0・譜面10＋実デコード10・decode error 0・クリック86件/error 0・mobileStage/safeOffline OK |
+| `tools/smoke-game-end.mjs` | **MANUAL / AUTOともPASS** | 結果画面表示・pageerror 0 |
+| PC／スマホ実機で今回のUIを操作 | **未確認** | ヘッドレスsmokeは実機のタッチ・見た目・実音声の保証ではない（§4 #30） |
+
+- **ブラウザ実行環境**：Repo外の `/home/user/browser-tools` に `puppeteer-core` と `@sparticuz/chromium` を用意し、Chromium `/tmp/chromium` と共有ライブラリ `/tmp/al2023/lib` を使用。package.json／lockfile／smoke基準値は変更していない。再実行例：
+  ```sh
+  LD_LIBRARY_PATH=/tmp/al2023/lib:/tmp \
+    SMOKE_CHROME=/tmp/chromium \
+    SMOKE_PUPPETEER=/home/user/browser-tools/node_modules/puppeteer-core/lib/puppeteer/puppeteer-core.js \
+    node tools/smoke-browser.mjs --compare
+  # 同じ環境変数で node tools/smoke-game-end.mjs も実行
+  ```
+  これらは一時的な検査環境のパスであり、別環境ではブラウザを別途用意する。
+- **追加Node/VM検査**：基地入口と4言語更新、退出ボタンとスクロール面の分離、退出確認のキャンセル／無効設定、長押しの開始待ち・左右・加速・曲端・中断・タイマー掃除、旧OSTキー掃除の対象限定／一回限り、JSON保存→core読み戻し→外したパック曲を復活させないこと。
+- **利用者提供のPR #69レビュー**：523 pass、smoke比較OK、game-end両モードOK。公式 `.stpack` を入れるとFIRST SPARK＋s01〜s05・案内が表示され、再読込後も維持したとのヘッドレス報告。今回の最終smokeとは別の確認。
+- **music-library**：GitHubでRelease **v1（公開済み）**と添付 `trk-ost-vol1.stpack`／`SHA256SUMS.txt` を確認。README（最終変更 `56587c66f7c91bd7110a1705f17e2841d3580262`）の日英にname/author固定の注記あり。pack.jsonも `trk's OST Vol.1` / `TRMTKB` で連携定数と一致。別Repoの変更は不要・未実施。
 
 ## 7. 最近の変更
 
-- **trk185（2026-10-16・OST の music-library 分離）**
-  - **曲の削除＋fetch停止**：`assets/optional-ost-audio/` を削除し `.gitignore` の例外も除去。同梱の印 `TRK_OST_MANIFEST_INCLUDED=false`（Agent OST と同じ形）で、起動時に manifest の404要求をしなくなった（smoke `--compare` の NG 対策）。同梱ビルド向けの経路自体は残す。
-  - **プレイリストと案内（レビュー (b) 採用）**：プレイリスト「🎓 trk's OST Vol.1」は FIRST SPARK の受け皿として残し、別配布の案内（`plGuideTrkOst`・4言語・Releasesリンク）を新規作成時と既存リスト（ガイド無しの場合だけ）へ付与。公式OSTパックを入れると `syncTrkOstPackSongs`（パックID＝`名前|作者` ハッシュで照合）が s01〜s05 を未見だけ追加し、利用者が外した曲は戻さない。パックの曲として曲リストにも並ぶ。
-  - **文書**：README（日英）・NOTICE・ガイド（start／en／files）・`tools/ost-scores/README.md` を TRK-SIDE 確定文（CC BY 4.0・© 2026 TRMTKB・クレジット例・自動通信なし）に更新。スコアは「出どころの証拠」として trk! 側にも残置。
-- **trk184（2026-10-16・保存場所の案内）**
-  - **README に同梱曲と保存場所を明記（日英）**：楽曲ファイル2フォルダ（計約5.3 MiB）・アプリ内プレイリスト（localStorage）・スコアの場所。プレイヤーだけ使いたい人は2フォルダ削除でOK（影響範囲つき）。ガイド（files.md の構成図・start.md／en.md の軽量版説明）は既存のまま。
-  - **検査**：OST ブロックに root README の2フォルダ言及を固定。
-- **過去の履歴**：trk183以前の詳細な変更・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) に移動しました。現在の仕様は§2、未確認事項は§4を正とします。
+- **trk186〜187：プレーヤーの入口と退出**：曲リストの📚書斎の隣に **🎥基地**（PC／スマホ共通・4言語）を追加。電源長押しも維持。「閉じる」は **← 曲リストに戻る**へ変更し44px以上の強調ボタンに。ヘッダーをスクロール面の外に残し、閉じると実際の入口へフォーカスを戻す。重複openのタイマー増殖も防止。
+- **trk188：全画面の長押しシーク**：左半分＝巻き戻し、右半分＝早送り。450ms後から250msごと、2秒/回→2秒ごとに2秒/回ずつ加速し最大20秒/回。再生倍率を変えずcurrentTimeを移動。中央に方向と秒数。指離し・中断・移動・blur・タブ非表示・曲切替・closeで停止し、長押し後のclickを遮断。contextmenu／touch-action／タッチコールアウト抑止は映像面だけ。
+- **trk189：PR #69の残件**：`trkOstLegacyCleanOnce` が初回だけ `trk-ost-v1.songs` と見た曲の印から旧 `builtin:trk-ost-song:` 参照を掃除（FIRST SPARK・パック曲・他リスト・名前・配置・削除状態は維持）。safe／任意同梱ビルドでは実施しない。印と削除予定日は `MIGRATIONS.md` に登録。`core.js` で印と `trkOstSeenKeys` の起動時読み戻しも修正。music-libraryの固定注記は対応済みを確認。
+- 日英ガイド、関連テスト、Service Worker cache **`trk-v2026.10.16-trk189`** を更新。HEVCは今回見送り（§2）。
+- trk185のOST分離を含む過去の詳細は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)。現在の仕様・未確認事項は§2〜4を正とする。
 
 ## 8. 変更時チェックリスト
 
-- [ ] 作業前にstatus／diffを確認し、既存変更と利用者指定を保持した。
+- [x] 作業前にstatus／diffを確認し、既存変更と利用者指定を保持した。
 - [ ] UI・設定は4言語、既定値、リセット、Import/Export、`?safe=1` を確認した。
 - [ ] 外部URL・データ・素材の権利条件を確認し、未確認事項を許諾済みと表現していない。
-- [ ] 関連テスト、`npm run check`、`git diff --check` を通した。
-- [ ] 実ブラウザのスモーク2件（`tools/smoke-browser.mjs --compare`・`tools/smoke-game-end.mjs`）を通した。取り込みの条件（`npm run check` には含まれない）。
-- [ ] README／NOTICE／handoff と `sw.js` cache名を確認した。
-- [ ] 日本語ガイドを変更した場合、英語ガイドの対応箇所も更新した。
+- [x] 関連テスト、`npm run check`、`git diff --check` を通した。
+- [x] 実ブラウザのスモーク2件（`tools/smoke-browser.mjs --compare`・`tools/smoke-game-end.mjs`）を通した。取り込みの条件（`npm run check` には含まれない）。
+- [x] README／NOTICE／handoff と `sw.js` cache名を確認した。
+- [x] 日本語ガイドを変更した場合、英語ガイドの対応箇所も更新した。

@@ -161,6 +161,19 @@ const TRK_OST_SONG_MANIFEST = "./assets/optional-ost-audio/manifest.json";
 const TRK_OST_SONG_KEY_PREFIX = "builtin:trk-ost-song:";
 const TRK_OST_SONG_MAX_BYTES = 2 * 1024 * 1024;
 const trkOstSongUrls = new Map();   /* key → 音源の URL */
+/* trk189：分離前の参照だけを一度掃除する。曲やプレイリスト自体は消さない。
+   任意同梱ビルドでは掃除も印付けもしない。削除予定日：2027-01-16（docs/MIGRATIONS.md）。 */
+function trkOstLegacyCleanOnce() {
+  const s = core.settings;
+  if (TRK_OST_MANIFEST_INCLUDED || s.trkOstLegacyClean1 === 1 || (window.TrkSafeMode && window.TrkSafeMode())) return false;
+  const p = s.playlists.find(p => p.id === TRK_OST_ID);
+  const keep = key => typeof key !== "string" || !key.startsWith(TRK_OST_SONG_KEY_PREFIX);
+  if (p && Array.isArray(p.songs)) p.songs = p.songs.filter(keep);
+  if (Array.isArray(s.trkOstSeenKeys)) s.trkOstSeenKeys = s.trkOstSeenKeys.filter(keep);
+  s.trkOstLegacyClean1 = 1;
+  core.saveUserPrefs();
+  return true;
+}
 async function initTrkOstSongs() {
   if (!TRK_OST_MANIFEST_INCLUDED) return;   /* 既定ビルドは同梱OSTが無いので404要求もしない */
   try {
@@ -4359,6 +4372,7 @@ async function initLibrary() {
   if (TRK_AUTO_GAME_CLASSIC && core.settings.tutorialDone && core.settings.trkClassic !== false) {
     try { ensureTrkClassicPlaylist({ toast: false }); } catch(_){}
   }
+  trkOstLegacyCleanOnce();   /* trk189：旧同梱キーだけを初回に掃除（チュートリアル未完了でも実施） */
   // 🎓 trk's OST Vol.1 — オリジナル曲＋デモ曲のリスト（一番下・中クリックで消せる）
   if (core.settings.tutorialDone) {
     try { ensureTrkOstPlaylist({ toast: false }); } catch(_){}

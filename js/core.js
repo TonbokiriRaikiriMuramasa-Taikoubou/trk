@@ -304,6 +304,9 @@ const settings = {
   trkPlaylist: prefs.trkPlaylist !== false,                               // 🐔 trk's playlist（右端のタブ。チュートリアル後に自動追加。設定で非表示可）
   trkClassic: prefs.trkClassic !== false,                                // 🎻 trk classic（クラシック名盤。ゲームとは別枠で100曲。設定で非表示可）
   trkRemoved: cleanTrkRemoved(prefs.trkRemoved),                         // 🗑 消した trk の自動リスト（次の起動で作り直さない。🐔の設定の ♻ で戻す）
+  trkOstLegacyClean1: prefs.trkOstLegacyClean1 === 1 ? 1 : 0,           // trk189・一回限りの旧同梱OSTキー掃除
+  trkOstSeenKeys: [...new Set((Array.isArray(prefs.trkOstSeenKeys) ? prefs.trkOstSeenKeys : [])
+    .filter(k => typeof k === "string" && /^(?:builtin:trk-ost-song:[\w-]{1,32}|pack:p[a-z0-9]+\/s0[1-5])$/.test(k)).slice(0, 100))],
   trkSortABC: prefs.trkSortABC === true,                                 // 🔤 trk フォルダ内をABC順で並べる（初期オフ）
   trkTabName: pick(prefs.trkTabName, TRK_ENUM_VALUES.trkTabName, "full"), // 🐔 タブの表示名（full=trk's playlist／short=trk's／icon=🐔 だけ）
   playlistOrder: (Array.isArray(prefs.playlistOrder) ? prefs.playlistOrder : []).map(x => String(x).slice(0, 48)).filter(Boolean).slice(0, 200), // ↕ 自由並べ替え（初期は作成順）

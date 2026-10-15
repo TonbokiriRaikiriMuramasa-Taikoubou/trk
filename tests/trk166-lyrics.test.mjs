@@ -344,7 +344,7 @@ test("wiring: script order, folder .lrc pickup, settings key, panel, four langua
   assert.equal((coreSrc.match(/settings\.mediaLyricsOpen = false/g) || []).length, 2, "both reset paths clear it");
 
   assert.ok(playerSrc.includes("renderLyrics();   /* 🎤"), "the 250ms tick renders lyrics");
-  assert.ok(playerSrc.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)"), "the panel sits under the progress row (trk169: the 💬 panel follows it)");
+  assert.ok(playerSrc.includes("body.append(display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)"), "the panel sits under the progress row (trk169: the 💬 panel follows it)");
   assert.ok(playerSrc.includes('lyricsFileNode.accept = ".lrc,.txt,text/plain"'), "manual lyrics picker accepts .lrc/.txt");
   assert.ok(playerSrc.includes("core.on(\"songSelected\", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics();"), "a new song reloads lyrics (the line may carry more followers)");
   assert.ok(playerSrc.includes("api.saveManualLyrics(song.key, r.text, file.name)"), "chosen lyrics persist per song");

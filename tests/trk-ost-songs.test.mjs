@@ -28,6 +28,7 @@ function setup({ manifest = null, ok = true, playlists = [], seen = [], included
   const src = included ? source.replace("const TRK_OST_MANIFEST_INCLUDED = false;", "const TRK_OST_MANIFEST_INCLUDED = true;") : source;
   vm.runInContext(`let builtInSongs = []; let packSongs = ${JSON.stringify(packSongs)};\n${src}\nglobalThis.__api = {
     initTrkOstSongs,
+    trkOstLegacyCleanOnce,
     appendTrkOstSongs,
     syncTrkOstPackSongs,
     trkOstPackId,
@@ -139,4 +140,51 @@ test("no official pack installed: the playlist keeps only what it had", async ()
   const { api } = setup({ playlists: [ost], packSongs: [{ key: "pack:pxyz/s01" }] });
   assert.equal(api.syncTrkOstPackSongs(), false);
   assert.deepEqual(Array.from(ost.songs), ["builtin:first-spark-tutorial-v1"]);
+});
+
+
+test("legacy cleanup removes only bundled OST references once, preserving user data and pack removal history", () => {
+  const legacy = "builtin:trk-ost-song:ost-01-sunrise-dash";
+  const songs = ["builtin:first-spark-tutorial-v1", legacy, "pack:pabc/s01", "local:mine"];
+  const ost = { id: "trk-ost-v1", songs: [...songs], name: "My OST", folder: "mine" };
+  const other = { id: "mine", songs: [...songs] };
+  const { api, settings, calls } = setup({ included: false, playlists: [ost, other], seen: [legacy, "pack:pabc/s02"] });
+  assert.equal(api.trkOstLegacyCleanOnce(), true);
+  assert.deepEqual(Array.from(ost.songs), songs.filter(k => k !== legacy));
+  assert.deepEqual(other.songs, songs, "other user playlists are not modified");
+  assert.equal(ost.name, "My OST"); assert.equal(ost.folder, "mine");
+  assert.deepEqual(Array.from(settings.trkOstSeenKeys), ["pack:pabc/s02"]);
+  assert.equal(settings.trkOstLegacyClean1, 1); assert.equal(calls.saves, 1);
+  ost.songs.push(legacy);
+  assert.equal(api.trkOstLegacyCleanOnce(), false);
+  assert.ok(ost.songs.includes(legacy), "later user edits are not swept again");
+  assert.equal(calls.saves, 1);
+});
+
+test("cleanup respects included builds, safe mode and deleted playlists", () => {
+  const included = setup();
+  assert.equal(included.api.trkOstLegacyCleanOnce(), false);
+  assert.equal(included.settings.trkOstLegacyClean1, undefined);
+  const safe = setup({ included: false }); safe.ctx.window.TrkSafeMode = () => true;
+  assert.equal(safe.api.trkOstLegacyCleanOnce(), false); assert.equal(safe.calls.saves, 0);
+  const removed = setup({ included: false }); removed.settings.trkRemoved = ["trk-ost-v1"];
+  assert.equal(removed.api.trkOstLegacyCleanOnce(), true);
+  assert.equal(removed.settings.playlists.length, 0);
+  assert.deepEqual(removed.settings.trkRemoved, ["trk-ost-v1"]);
+});
+
+test("OST migration mark and seen keys survive JSON save and core settings reload", () => {
+  const core = fs.readFileSync(`${ROOT}/js/core.js`, "utf8");
+  const fields = core.slice(core.indexOf("  trkOstLegacyClean1:"), core.indexOf("  trkSortABC:"));
+  const prefs = { trkOstLegacyClean1: 1, trkOstSeenKeys: ["pack:pabc/s02", "pack:pabc/s02", null, {}, "bad"] };
+  const ctx = vm.createContext({ prefs: JSON.parse(JSON.stringify(prefs)) });
+  const restored = vm.runInContext(`({${fields}})`, ctx);
+  assert.equal(restored.trkOstLegacyClean1, 1);
+  assert.deepEqual(Array.from(restored.trkOstSeenKeys), ["pack:pabc/s02"]);
+  const ost = { id: "trk-ost-v1", songs: [] };
+  const app = setup({ included: false, playlists: [ost], seen: Array.from(restored.trkOstSeenKeys) });
+  app.settings.trkOstLegacyClean1 = restored.trkOstLegacyClean1;
+  assert.equal(app.api.trkOstLegacyCleanOnce(), false);
+  app.api.appendTrkOstSongs(["pack:pabc/s02"]);
+  assert.deepEqual(ost.songs, [], "a previously removed pack song stays removed after reload");
 });

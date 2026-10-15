@@ -279,22 +279,26 @@ function songInfo(it, idx) {
 Object.assign(TEXT.ja, {
   libTabAll:"すべて", libTabFiles:"追加した曲", libTabVerified:"公認", libTabPackNone:"曲パック", libTabFolderTop:"フォルダ（直下）", libTabAddon:"アドオン", libTabDemo:"デモ曲",
   srcBuiltin:"trk! 同梱デモ",
-  libTabGo:"この棚に {n}曲", libTabEmpty:"このタブには曲がありません。ほかのタブを見てみてください。"
+  libTabGo:"この棚に {n}曲", libTabEmpty:"このタブには曲がありません。ほかのタブを見てみてください。",
+  libTabAlbums:"アルバム", libTabArtists:"アーティスト", libNoTagsGroup:"タグなし", libGroupCount:"{n}曲", libGroupTagsLoading:"🏷 タグを読み込み中…（読み終わると並べ直します）"
 });
 Object.assign(TEXT.en, {
   libTabAll:"All", libTabFiles:"Added", libTabVerified:"Verified", libTabPackNone:"Song pack", libTabFolderTop:"Folder (top level)", libTabAddon:"Add-on", libTabDemo:"Demo track",
   srcBuiltin:"Bundled trk! demo",
-  libTabGo:"{n} songs in this shelf", libTabEmpty:"No songs in this tab. Try another tab."
+  libTabGo:"{n} songs in this shelf", libTabEmpty:"No songs in this tab. Try another tab.",
+  libTabAlbums:"Albums", libTabArtists:"Artists", libNoTagsGroup:"No tags", libGroupCount:"{n} songs", libGroupTagsLoading:"🏷 Reading tags… (the list re-sorts when they arrive)"
 });
 Object.assign(TEXT.zh, {
   libTabAll:"全部", libTabFiles:"已添加", libTabVerified:"认证", libTabPackNone:"歌曲包", libTabFolderTop:"文件夹（顶层）", libTabAddon:"插件", libTabDemo:"演示曲",
   srcBuiltin:"trk! 内置演示曲",
-  libTabGo:"这个架子有 {n} 首", libTabEmpty:"此标签内没有歌曲。请看看其他标签。"
+  libTabGo:"这个架子有 {n} 首", libTabEmpty:"此标签内没有歌曲。请看看其他标签。",
+  libTabAlbums:"专辑", libTabArtists:"艺术家", libNoTagsGroup:"无标签", libGroupCount:"{n} 首", libGroupTagsLoading:"🏷 正在读取标签…（读完后会重新排序）"
 });
 Object.assign(TEXT.ko, {
   libTabAll:"전체", libTabFiles:"추가한 곡", libTabVerified:"공인", libTabPackNone:"곡 팩", libTabFolderTop:"폴더 (최상위)", libTabAddon:"애드온", libTabDemo:"데모 곡",
   srcBuiltin:"trk! 내장 데모",
-  libTabGo:"이 선반에 {n}곡", libTabEmpty:"이 탭에는 곡이 없습니다. 다른 탭을 봐 주세요."
+  libTabGo:"이 선반에 {n}곡", libTabEmpty:"이 탭에는 곡이 없습니다. 다른 탭을 봐 주세요.",
+  libTabAlbums:"앨범", libTabArtists:"아티스트", libNoTagsGroup:"태그 없음", libGroupCount:"{n}곡", libGroupTagsLoading:"🏷 태그 읽는 중…(다 읽으면 다시 정렬합니다)"
 });
 Object.assign(TEXT.ja, {
   plNewTab:"📁 新規プレイリスト", plDefaultName:"プレイリスト{n}", plGlobalTitle:"📚 プレイリスト",
@@ -915,6 +919,20 @@ function libTabsOf(all) {
   for (const t of packs.values()) tabs.push(t);
   for (const t of addons.values()) tabs.push(t);          // 🧩 アドオンが足した曲
   for (const t of folders.values()) tabs.push(t);
+  /* 💿 アルバム／🎤 アーティストの棚（trk171）：アルバム名／アーティスト名を持つ曲が1つでもあれば出す。
+     棚の中はぜんぶの曲（グループの無い曲は「タグなし」グループ＝最後）。曲数は棚に出る曲ぜんぶ */
+  {
+    let nAlbum = 0, nArtist = 0;
+    for (const it of all) {
+      if (it.trkOnly) continue;
+      const d = songDisplayMeta(it);
+      if (d.album) nAlbum++;
+      if (d.artist) nArtist++;
+    }
+    const shelfN = all.filter(x => !x.trkOnly).length;
+    if (nAlbum) tabs.push({ id:"albums", icon:"💿", label:tr("libTabAlbums"), n:shelfN });
+    if (nArtist) tabs.push({ id:"artists", icon:"🎤", label:tr("libTabArtists"), n:shelfN });
+  }
   /* 🎓 デモ曲は独立タブにせず「trk's OST Vol.1」プレイリストへ（一番下に出す。中クリックで消せる） */
   if (nFiles) tabs.push({ id:"file", icon:"📄", label:tr("libTabFiles"), n:nFiles });
   const nv = all.filter(it => it.source === "pack" && libIsVerified(it)).length;
@@ -954,6 +972,7 @@ function libTabMatch(it, id) {
   if (id.startsWith("addon:")) return it.source === "addon" && "addon:" + (it.addonId || "") === id;
   if (id.startsWith("folder:")) return it.source === "folder" && libFolderSeg(it) === id.slice(7);
   if (id === "folder") return it.source === "folder" && !libFolderSeg(it);
+  if (id === "albums" || id === "artists") return true;   /* 💿🎤 グループ棚はぜんぶの曲を見せる（trk171・グループの無い曲は「タグなし」へ） */
   return true;
 }
 
@@ -2834,6 +2853,8 @@ async function loadSongTags(it) {
 function onSongTagsLoaded(it) {
   refreshRowTags(it);                              /* 一覧の行はその場で更新（ぜんぶ描き直さない） */
   if (core.currentSong === it) renderBanner();     /* 選曲中の曲ならバナーも */
+  /* 💿🎤 グループ棚を見ているときは、タグが届くたびに（250ms ためて）並び直す（trk171） */
+  if (core.settings.libTab === "albums" || core.settings.libTab === "artists") libGroupRerenderSoon();
   core.emit("songTags", it);                       /* メディアプレーヤー側は queue／表示を追従させる */
 }
 function refreshRowTags(it) {
@@ -2853,6 +2874,40 @@ function libRowNameText(it, info) {
 function libRowSubText(it) {
   const m = metaOf(it.key) || {}, d = songDisplayMeta(it);
   return [d.artist, d.album, m.matchHint ? `${tr("plMatchMemo")}: ${m.matchHint}` : "", srcLabel(it)].filter(Boolean).join(" · ");
+}
+/* 💿🎤 アルバム別／アーティスト別のグループ表示＋トラック番号順（trk171・PLAYER-ROADMAP #16）
+   材料は songDisplayMeta（🎶 曲プロフィール → 🏷 埋め込みタグ → カタログ）。トラック番号はタグの TRCK 等から。
+   グループの無い曲（タグなし）は「タグなし」グループ＝いちばん最後。読み取りだけで書き戻し・送信はしない。 */
+function libTrackNoOf(it) {
+  const t = songTagsOf(it);
+  return t && Number.isFinite(t.track) && t.track > 0 && t.track < 10000 ? t.track : null;
+}
+function libGroupKeyOf(it, mode) {
+  const d = songDisplayMeta(it);
+  return (mode === "artists" ? d.artist : d.album) || "";
+}
+function libGroupCmp(mode, fallback) {
+  const byTrack = (a, b) => {
+    const ta = libTrackNoOf(a.it), tb = libTrackNoOf(b.it);
+    if (ta != null && tb != null && ta !== tb) return ta - tb;
+    if (ta != null && tb == null) return -1;      /* 番号あり → なし の順 */
+    if (tb != null && ta == null) return 1;
+    return 0;
+  };
+  const byName = (x, y) => String(x || "").localeCompare(String(y || ""), undefined, { numeric:true });
+  return (a, b) => {
+    const ga = libGroupKeyOf(a.it, mode), gb = libGroupKeyOf(b.it, mode);
+    if (!ga && gb) return 1;                      /* 「タグなし」は最後 */
+    if (!gb && ga) return -1;
+    if (ga !== gb) return byName(ga, gb);
+    if (mode === "artists") {                     /* アーティスト内はアルバム名順でまとめて */
+      const aa = libGroupKeyOf(a.it, "albums"), ab = libGroupKeyOf(b.it, "albums");
+      if (aa && !ab) return -1;
+      if (ab && !aa) return 1;
+      if (aa !== ab) return byName(aa, ab);
+    }
+    return byTrack(a, b) || fallback(a, b);       /* 同じグループ内はトラック番号 → 選んでいる並び順 */
+  };
 }
 let songBackgroundRequest = 0;
 async function applySongBackground(it) {
@@ -2913,6 +2968,28 @@ function watchSongArtwork(img, fallback, it, generation, eager = false) {
   else if (eager) { loadSongArtwork(it).then(blob => showSongArtwork(job, blob)).catch(() => {}); void loadSongTags(it); }   /* 🏷 タグも（trk167） */
 }
 
+/* 💿🎤 グループ棚（アルバム／アーティスト）のタグ先読みと並び直し（trk171）。
+   タグは普段「行が見えたとき」に読むが、グループ棚は読み終わるまで分け方を決められないので、
+   見える行数ぶん（LIB_SHOW）を先に読みはじめる。1件届くごとに 250ms ためて並び直す（描き直し storm 防止）。 */
+let libGroupRerenderTimer = 0;
+function libGroupRerenderSoon() {
+  clearTimeout(libGroupRerenderTimer);
+  libGroupRerenderTimer = setTimeout(() => {
+    libGroupRerenderTimer = 0;
+    const t = core.settings.libTab;
+    if (t === "albums" || t === "artists") renderLib();
+  }, 250);
+}
+function libEnsureGroupTags(items) {
+  let pending = 0;
+  const done = () => { if (--pending === 0) libGroupRerenderSoon(); };
+  for (const x of items.slice(0, LIB_SHOW)) {
+    const it = x.it;
+    if (!it || !it.file || songTags.has(it.key) || songTagsPending.has(it.key) || !canExtractSongArt(it)) continue;
+    pending++;
+    loadSongTags(it).then(done, done);
+  }
+}
 function renderLib() {
   const artworkGeneration = beginLibArtworkRender();
   let eagerArtworkCount = 0;
@@ -2953,6 +3030,22 @@ function renderLib() {
     best:(a, b) => v(b, "best") - v(a, "best")
   }[core.settings.libSort] || (() => 0);
   items.sort(cmp);
+  /* 💿🎤 グループ棚（trk171）：アルバム別／アーティスト別に並べ直し、見出し行の材料（曲数・アーティスト名）を集める */
+  const grouped = tabId === "albums" || tabId === "artists";
+  const groupCounts = new Map(), groupArtist = new Map();
+  if (grouped) {
+    items.sort(libGroupCmp(tabId, cmp));
+    for (const x of items) {
+      const g = libGroupKeyOf(x.it, tabId);
+      groupCounts.set(g, (groupCounts.get(g) || 0) + 1);
+      if (tabId === "albums" && g && !groupArtist.has(g)) {
+        const t = songTagsOf(x.it), d = songDisplayMeta(x.it);
+        const ar = (t && (t.albumArtist || t.artist)) || d.artist || "";
+        if (ar) groupArtist.set(g, ar);
+      }
+    }
+    libEnsureGroupTags(items);   /* 🏷 タグの先読み（読み終わると libGroupRerenderSoon で並び直す） */
+  }
   if (tabId === "fav") {
     const F = window.TrkFavs;
     if (F) {
@@ -3002,8 +3095,23 @@ function renderLib() {
   /* 🪶 軽量化：初回に描く行数をへらす（行にはボタン・長押し・ドラッグの監視がたくさん付くので、
      長い棚ではここが端末いちばんの待ち時間になります）。棚自体とランダム選曲は全曲のままです */
   const libShow = (typeof TrkLite === "object" && typeof TrkLite.libRows === "function") ? TrkLite.libRows(LIB_SHOW) : LIB_SHOW;
+  if (grouped && items.some(x => x.it.file && !songTags.has(x.it.key) && canExtractSongArt(x.it)))
+    box.append(el("div", "hint libGroupLoadingHint", tr("libGroupTagsLoading")));   /* 🏷 タグ読み込み中（trk171） */
+  let lastGroupHead = null;   /* 💿🎤 いまの見出し（グループが変わったときだけ見出し行を出す・trk171） */
   for (const row of rows.slice(0, libShow)) {
     if (!row.it) { box.append(plWishRow(row.w)); continue; }   /* 🛒 まだ持っていない曲（灰色）＝タップで入手先 */
+    if (grouped) {
+      const g = libGroupKeyOf(row.it, tabId);
+      if (g !== lastGroupHead) {
+        lastGroupHead = g;
+        const head = el("div", "libGroupHead");
+        head.append(el("span", "libGroupName", (tabId === "albums" ? "💿 " : "🎤 ") + (g || tr("libNoTagsGroup"))));
+        const ar = tabId === "albums" ? groupArtist.get(g) || "" : "";
+        if (ar) head.append(el("span", "libGroupSub", ar));
+        head.append(el("span", "libGroupN", tr("libGroupCount", { n: groupCounts.get(g) || 0 })));
+        box.append(head);
+      }
+    }
     const { it, info } = row;
     const wrap = el("div"); wrap.style.cssText = "display:flex;gap:6px;align-items:stretch";
     const cur = core.currentSong && core.currentSong.key === it.key;

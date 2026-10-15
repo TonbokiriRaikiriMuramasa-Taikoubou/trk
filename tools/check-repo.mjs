@@ -2545,6 +2545,29 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else ok("trk170: 🔖 M4B chapters (chpl, read-only) show in a jump-list panel, highlight the current chapter, and feed a \"sleep: end of chapter\" mode; m4b joins MEDIA_EXT");
 }
 
+// trk171: 💿🎤 アルバム別／アーティスト別のグループ表示＋トラック番号順（PLAYER-ROADMAP #16・trk167 のタグ土台の上）。
+// 棚はアルバム名／アーティスト名を持つ曲があれば出る。グループの無い曲は「タグなし」で最後。表示だけ＝保存データもタグも触らない。
+{
+  const library = read("js/library.js");
+  const css = read("css/style.css");
+  /* ⚠ read() は正規化後の本文：core.settings は settings に、window.Trk.library 前置は外れて見える */
+  if (!library.includes("function libTrackNoOf(it)") || !library.includes("function libGroupKeyOf(it, mode)") ||
+      !library.includes("function libGroupCmp(mode, fallback)") ||
+      !library.includes("function libEnsureGroupTags(items)") || !library.includes("function libGroupRerenderSoon()") ||
+      !library.includes('tabs.push({ id:"albums", icon:"💿", label:tr("libTabAlbums"), n:shelfN });') ||
+      !library.includes('tabs.push({ id:"artists", icon:"🎤", label:tr("libTabArtists"), n:shelfN });') ||
+      !library.includes('if (id === "albums" || id === "artists") return true;') ||
+      !library.includes('const grouped = tabId === "albums" || tabId === "artists";') ||
+      !library.includes("items.sort(libGroupCmp(tabId, cmp));") ||
+      !library.includes('el("div", "libGroupHead")') || !library.includes("libEnsureGroupTags(items);") ||
+      !library.includes('if (settings.libTab === "albums" || settings.libTab === "artists") libGroupRerenderSoon();') ||
+      (library.match(/libTabAlbums:/g) || []).length !== 4 ||
+      (library.match(/libNoTagsGroup:/g) || []).length !== 4 ||
+      (library.match(/libGroupTagsLoading:/g) || []).length !== 4) fail("library.js album/artist group shelves (sorting, sticky headers, tag pre-load, four-language texts) are missing");
+  else if (!css.includes(".libGroupHead{position:sticky;top:0;") || !css.includes(".libGroupName{") || !css.includes(".libGroupN{")) fail("group header styles are missing");
+  else ok("trk171: 💿🎤 album/artist shelves group the song list (track-number order inside, no-tags group last, sticky headers, tag pre-load)");
+}
+
 // 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own
 // "don't sway" option, plus the ❓ mystery switch that outranks both.
 {

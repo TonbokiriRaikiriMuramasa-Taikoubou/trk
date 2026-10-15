@@ -268,6 +268,13 @@ select{padding:8px 10px;border-radius:10px;background:var(--ui-field);color:var(
 .libName{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .libSub{font-size:12px;color:var(--ui-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .libMeta{display:flex;gap:5px;flex:none}
+/* 💿🎤 アルバム／アーティストの棚のグループ見出し（trk171）：スクロール中はリストの上端に張りつく */
+.libGroupHead{position:sticky;top:0;z-index:2;display:flex;align-items:baseline;gap:8px;margin:6px 0 1px;padding:7px 12px;
+  border-radius:10px;background:var(--ui-panel);border:1px solid var(--ui-border);font-size:14px;font-weight:800;color:var(--ui-text)}
+.libGroupName{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.libGroupSub{flex:none;max-width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:700;color:var(--ui-muted)}
+.libGroupN{flex:none;margin-left:auto;font-size:11px;font-weight:750;color:var(--ui-muted)}
+.libGroupLoadingHint{margin:2px 0}
 .libTag{font-style:normal;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;background:var(--ui-field);border:1px solid var(--ui-border)}
 .libEmpty{padding:40px 10px;text-align:center;color:var(--ui-muted)}
 .banner{position:relative;height:190px;border-radius:18px;overflow:hidden;border:1px solid var(--ui-border);

@@ -36,9 +36,12 @@ test("rendering the same score twice produces identical bytes without clipping",
   }
 });
 
-test("every bundled track renders from its committed score and its ABC bars match the chords", () => {
-  const manifest = JSON.parse(fs.readFileSync(`${ROOT}/assets/optional-ost-audio/manifest.json`, "utf8"));
-  assert.ok(manifest.tracks.length > 0);
+test("every OST track renders from its committed score and its ABC bars match the chords", () => {
+  /* trk185: the audio moved to music-library; the scores stay here (tools/ost-scores/)
+     and are the track list. The same scores ship in music-library's scores/. */
+  const keys = fs.readdirSync(`${ROOT}/tools/ost-scores`).filter(f => f.endsWith(".json")).map(f => f.slice(0, -5)).sort();
+  assert.ok(keys.length >= 5);
+  const manifest = { tracks: keys.map(key => ({ key })) };
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "trk-ost-pair-"));
   try {
     for (const t of manifest.tracks) {

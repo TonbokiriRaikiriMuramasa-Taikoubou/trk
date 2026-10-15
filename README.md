@@ -56,11 +56,24 @@ python -m http.server 8000
 
 ダウンロードにはオリジナル曲が付いてきます。場所は次のとおりです。
 
-- **楽曲ファイル**：`assets/optional-demo-audio/`（FIRST SPARKデモ約704 KiB）・`assets/optional-ost-audio/`（trk's OST Vol.1：4曲＋ボーナス1曲、計約4.7 MiB）。起動時は小さな `manifest.json` だけ読み、音源は選んだときにだけ読み込みます。
+- **楽曲ファイル**：`assets/optional-demo-audio/`（FIRST SPARKデモ約704 KiB）だけです。起動時は小さな `manifest.json` だけ読み、音源は選んだときにだけ読み込みます。
 - **プレイリスト**：アプリ内の「🐔 trk's playlist」→「🎓 trk's OST Vol.1」に自動で並びます（ブラウザの localStorage に保存）。
 - **スコア**：全曲の作曲データ（JSON＋ABC譜）が `tools/ost-scores/` にあります。
 
-プレイヤーとしてだけ使いたい場合は、上の2フォルダーを**削除してOK**です（計約5.3 MiBの軽量化。ゲーム・プレイヤー・自分の曲の再生には影響しません）。曲なしのプレイリストが残ったら、中クリック／長押しメニューで消せます（一度消したリストは作り直しません）。
+プレイヤーとしてだけ使いたい場合は、上のフォルダーを**削除してOK**です（約704 KiBの軽量化。ゲーム・プレイヤー・自分の曲の再生には影響しません）。曲なしのプレイリストが残ったら、中クリック／長押しメニューで消せます（一度消したリストは作り直しません）。
+
+### 🎵 trk's OST Vol.1 は music-library で配布しています
+
+trk! 本体を軽く保つため、オリジナル曲集「trk's OST Vol.1」は別のリポジトリ [music-library](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/music-library) に移しました。チュートリアル曲「FIRST SPARK」は、これまでどおり trk! に入っています。
+
+1. music-library の [Releases](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/music-library/releases) から `trk-ost-vol1.stpack` をダウンロードします。
+2. trk! で **設定 → 📦 カスタムパック → 📂 パックを選ぶ** を開き、そのファイルを選びます（画面へのドロップ、Android の共有メニューからでも入ります）。
+3. 曲リストと「🎓 trk's OST Vol.1」プレイリストに OST の曲が並びます。譜面は端末の中で自動生成されます。
+
+- 曲はこの端末のブラウザに保存され、trk! がどこかへ送信することはありません。trk! が music-library へ自動で接続することもありません。
+- 「📦 まるごとバックアップ」にパックを含めれば、端末を替えても持ち運べます。要らなくなったら、📦 カスタムパックの一覧から削除できます。
+- 音源は © 2026 TRMTKB、**CC BY 4.0** です。クレジットを表示すれば、配信や動画のBGM・改変・再配布・商用利用ができます（例：`"SUNRISE DASH" by TRMTKB (trk's OST Vol.1), CC BY 4.0`）。trk! 本体の GPL-3.0 はアプリのコードの許諾で、曲の利用条件ではありません。
+- 第三者の録音・サンプル・引用メロディは使っていません。music-library には他の人の曲を置きません。
 
 ---
 
@@ -118,7 +131,9 @@ Catalog matching automatically handles supported title variations, using officia
 
 Five play styles (MANUAL, TRUCK, ORBIT, STAGE, CATCH), Study Room, verified packs and lighter builds are described in the **[full English guide](docs/guide/en.md)**.
 
-Bundled songs live in `assets/optional-demo-audio/` (FIRST SPARK demo, about 704 KiB) and `assets/optional-ost-audio/` (trk's OST Vol.1: four songs plus a bonus track, about 4.7 MiB); the app reads only a small `manifest.json` at startup and fetches each MP3 when selected. For a player-only lightweight build, delete both folders (about 5.3 MiB smaller) — the game, the player, and your own songs are unaffected. An empty leftover playlist can be deleted and will not come back.
+The bundled song is the FIRST SPARK demo in `assets/optional-demo-audio/` (about 704 KiB); the app reads only a small `manifest.json` at startup and fetches the MP3 when selected. For a player-only lightweight build, delete that folder — the game, the player, and your own songs are unaffected. An empty leftover playlist can be deleted and will not come back.
+
+**trk's OST Vol.1 is distributed from music-library.** To keep trk! small, the original album "trk's OST Vol.1" now lives in [music-library](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/music-library). The tutorial song "FIRST SPARK" is still bundled. Download `trk-ost-vol1.stpack` from its [Releases](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/music-library/releases), then in trk! open **Settings → 📦 Custom packs → 📂 Choose pack** (or drop the file onto the window). The songs also appear in the "🎓 trk's OST Vol.1" playlist. Songs are stored only on your device; trk! never uploads them or connects to music-library by itself. The audio is © 2026 TRMTKB under **CC BY 4.0** — share, adapt and use it (including commercially) with credit. trk!'s GPL-3.0 covers the app's code, not the music.
 
 **Feedback:** [@ttrk143](https://x.com/ttrk143) (hashtag **#trkAGRG**), bugs and ideas on [GitHub Issues](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues).
 

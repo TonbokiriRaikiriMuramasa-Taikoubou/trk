@@ -24,13 +24,17 @@ note is written in the plan below.
 # WAV preview (git-ignored) + ABC (committed) from the score
 node tools/make-trk-song.mjs tools/ost-scores/ost-01-sunrise-dash.json
 
-# MP3 for the game bundle (lamejs lives outside the repo on purpose)
+# MP3 for distribution (lamejs lives outside the repo on purpose)
 npm install --prefix /tmp/mp3enc lamejs
 node tools/encode-ost-mp3.mjs assets/trk-ost-preview/ost-01-sunrise-dash.wav \
-  assets/optional-ost-audio/ost-01-sunrise-dash.mp3
+  /tmp/ost-01-sunrise-dash.mp3
 ```
 
-Then add the track to `assets/optional-ost-audio/manifest.json`, add a
-per-file `!...` exception in `.gitignore` (like FIRST SPARK), and note
-the provenance in `NOTICE.md`. `tools/check-repo.mjs` verifies that
-every bundled MP3 has its score committed.
+Since trk185 the audio is NOT bundled with trk!. It is distributed as
+`trk-ost-vol1.stpack` from the music-library repository
+(https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/music-library,
+CC BY 4.0); the same scores live in that repository's `scores/`.
+To add a track: update the pack there (and the scores in both places),
+and note the provenance in `NOTICE.md`. `tools/check-repo.mjs` verifies
+that every score here still has its JSON plan + ABC pair and renders
+without clipping (`tests/ost-render.test.mjs`).

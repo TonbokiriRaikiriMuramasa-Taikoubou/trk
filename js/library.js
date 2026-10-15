@@ -149,15 +149,20 @@ async function initOptionalTutorialDemo() {
     renderLib();
   } catch (_) { /* no manifest = intentional lightweight build or an offline optional asset */ }
 }
-/* 🎵 trk's OST Vol.1 のオリジナル曲（任意同梱）。小さな manifest に列挙された MP3 を曲リストへ入れ、
-   プレイリストには「未見のキーだけ」足す（trkOstSeenKeys）。音源は選んだときに読む（materializeTrkOstSong）。
-   スコアは tools/ost-scores/（JSON＋ABC）にあり、MP3 はそこから描いたもの。フォルダごと消せば曲も消える。 */
+/* 🎵 trk's OST Vol.1 のオリジナル曲。trk185 から同梱をやめ、別リポジトリ music-library の
+   Release に添えた .stpack（CC BY 4.0）で配る。trk! は実行時に外部へ取りに行かない
+   （プライバシー方針）。下の同梱経路は、音源を意図的に同梱する配布／試験ビルドだけが
+   TRK_OST_MANIFEST_INCLUDED=true にして使う（AGENT_OST と同じ印）。既定では manifest の
+   404 要求すらしない。パックで入れた曲は syncTrkOstPackSongs がプレイリストへつなぐ。
+   スコアは tools/ost-scores/（JSON＋ABC）にも残す（music-library の scores/ と同じもの）。 */
+const TRK_OST_MANIFEST_INCLUDED = false;
 const TRK_OST_SONG_DIR = "./assets/optional-ost-audio/";
 const TRK_OST_SONG_MANIFEST = "./assets/optional-ost-audio/manifest.json";
 const TRK_OST_SONG_KEY_PREFIX = "builtin:trk-ost-song:";
 const TRK_OST_SONG_MAX_BYTES = 2 * 1024 * 1024;
 const trkOstSongUrls = new Map();   /* key → 音源の URL */
 async function initTrkOstSongs() {
+  if (!TRK_OST_MANIFEST_INCLUDED) return;   /* 既定ビルドは同梱OSTが無いので404要求もしない */
   try {
     const response = await fetch(TRK_OST_SONG_MANIFEST, { credentials:"same-origin" });
     if (!response.ok) return;
@@ -192,6 +197,25 @@ function appendTrkOstSongs(keys) {
   }
   if (changed) { core.settings.trkOstSeenKeys = [...seen]; core.saveUserPrefs(); }
   return changed;
+}
+/* 🎵 公式OSTパック（music-library の trk-ost-vol1.stpack）を入れたら、trk's OST Vol.1 の
+   リストへその曲をつなぐ（レビュー (b)）。パックIDは custom.js の packIdentityFromManifest と
+   同じ算出（名前|作者のハッシュ）。キーは pack:<パックID>/<曲ID>。未見のキーだけ足すので、
+   利用者が外した曲はパックを入れ直しても戻らない。パックを消すと曲実体は消え、キーは残るが
+   再導入で同じキーに戻る。外部通信はしない（端末内のパックだけを見る）。 */
+const TRK_OST_PACK_NAME = "trk's OST Vol.1";
+const TRK_OST_PACK_AUTHOR = "TRMTKB";
+const TRK_OST_PACK_SONG_IDS = ["s01", "s02", "s03", "s04", "s05"];
+function trkOstPackId() {
+  try { return "p" + core.hashString(`${TRK_OST_PACK_NAME}|${TRK_OST_PACK_AUTHOR}`).toString(36); } catch (_) { return ""; }
+}
+function syncTrkOstPackSongs() {
+  const pid = trkOstPackId();
+  if (!pid || !Array.isArray(packSongs) || !packSongs.length) return false;
+  const keys = TRK_OST_PACK_SONG_IDS.map(id => `pack:${pid}/${id}`)
+    .filter(k => packSongs.some(song => song && song.key === k));
+  if (!keys.length) return false;
+  return appendTrkOstSongs(keys);
 }
 async function materializeTrkOstSong(it) {
   const url = trkOstSongUrls.get(it.key);
@@ -800,6 +824,7 @@ Object.assign(TEXT.ja, {
   plGuideIntro:"非営利の紹介プレイリスト。音源は同梱しません。",
   plGuideGameVol1:"非営利の紹介プレイリスト。音源は同梱しません。公式の入手先からどうぞ。",
   plGuideClassic:"版権切れの名演をMusopenの公開録音で紹介。音源は同梱しません。",
+  plGuideTrkOst:"🎵 trk's OST Vol.1は別配布です。music-libraryのReleasesから.stpackをダウンロードし、「📂 パックを選ぶ」で読み込むと曲が並びます（端末内に保存・自動通信なし・CC BY 4.0）。",
   plGuideBlueArchive:"NexTone.Link／Apple Music公式案内。音源なし。購入・サブスクは利用許諾ではありません。",
   plGuideBlueArchiveMika:"メモロビ2曲（mora／You’re My Princessは配信未確認で作曲家Xの1分投稿へ）、kiss angel（Short未収録）、Aria（韓国語2曲＋Global本編MV、英語名は英語歌唱ではない）、日本語3曲＋MV。地域差あり。音源・映像なし。配信・公開は読込用ファイルや二次利用許諾を保証しません。",
   plGuideLolCsVerified:"公式SoundCloudアルバム（音源なし）。Creator-Safe対象（Riot公式Playlistと照合済み）。配信・購入は二次利用許諾ではありません。",
@@ -828,6 +853,7 @@ Object.assign(TEXT.en, {
   plGuideIntro:"A non-commercial introduction playlist. No audio is included.",
   plGuideGameVol1:"A non-commercial introduction playlist. No audio is included; please get songs from the official sources.",
   plGuideClassic:"Public-domain masterpieces introduced through Musopen's public recordings. No audio is included.",
+  plGuideTrkOst:"🎵 trk's OST Vol.1 is a separate download. Get the .stpack from the music-library Releases page and load it with \"📂 Choose pack\" (stored on this device, no automatic downloads, CC BY 4.0).",
   plGuideBlueArchive:"Official NexTone.Link / Apple Music pages. No audio included. Buying or subscribing is not a license to use.",
   plGuideBlueArchiveMika:"Two Memorial Lobby tracks (mora / You’re My Princess links to composer EmoCosine's 1-min X post as official streaming is unconfirmed as of Oct 2026), kiss angel (Short omitted), Aria (2 KR songs + Global MV; English titles != English vocals), and 3 JP songs + MV. Apple Music CN/UK/JP links vary by region. No media included; not a reuse license or importable file guarantee.",
   plGuideLolCsVerified:"Official SoundCloud album (no audio included). Creator-Safe: matched against Riot's official Creator-Safe Playlist. Streaming or buying is not a license to reuse.",
@@ -856,6 +882,7 @@ Object.assign(TEXT.zh, {
   plGuideIntro:"非营利的介绍歌单。不附带音源。",
   plGuideGameVol1:"非营利的介绍歌单。不附带音源，请从官方渠道获取。",
   plGuideClassic:"通过Musopen的公开录音介绍版权已过期的名曲。不附带音源。",
+  plGuideTrkOst:"🎵 trk's OST Vol.1 需单独下载。从 music-library 的 Releases 下载 .stpack，用“📂 选择资源包”导入即可（保存在本设备，不会自动联网下载，CC BY 4.0）。",
   plGuideBlueArchive:"NexTone.Link／Apple Music官方页面。不含音源。购买或订阅并不等于使用许可。",
   plGuideBlueArchiveMika:"纪念大厅两曲（mora／You’re My Princess截至2026年10月官方发行未确认，指向作曲家X的1分钟试听）、kiss angel（Short未收录）、Aria（韩语歌两首＋全球MV，英文名不代表英语演唱）及日语歌三首＋MV。Apple Music中／英／日商店等存在地区差异。不附带音视频，公开或购买不保证可导入文件或二次使用许可。",
   plGuideLolCsVerified:"官方SoundCloud专辑（不含音源）。属于Creator-Safe（已与Riot官方Creator-Safe歌单核对）。播放或购买不等于二次使用许可。",
@@ -884,6 +911,7 @@ Object.assign(TEXT.ko, {
   plGuideIntro:"비영리 소개 플레이리스트예요. 음원은 포함하지 않아요.",
   plGuideGameVol1:"비영리 소개 플레이리스트예요. 음원은 포함하지 않으니 공식 경로에서 구해 주세요.",
   plGuideClassic:"저작권이 만료된 명곡을 Musopen의 공개 녹음으로 소개해요. 음원은 포함하지 않아요.",
+  plGuideTrkOst:"🎵 trk's OST Vol.1은 별도 배포입니다. music-library의 Releases에서 .stpack을 내려받아 '📂 팩 선택'으로 불러오면 곡이 추가됩니다(이 기기에 저장, 자동 다운로드 없음, CC BY 4.0).",
   plGuideBlueArchive:"NexTone.Link／Apple Music 공식 안내. 음원 없음. 구매·구독은 이용 허락이 아니에요.",
   plGuideBlueArchiveMika:"메모리얼 로비 2곡(mora / You’re My Princess는 2026년 10월 기준 공식 음원 발매 미확인으로 작곡가 X의 1분 게시물로 안내), kiss angel(Short 제외), Aria(한국어 2곡+글로벌 MV, 영어 제목은 영어 가창 의미 아님), 일본어 3곡+MV. Apple Music 중·영·일 스토어 등 지역별 조건 상이. 미디어 미포함, 공개·구매는 가져올 파일이나 재이용 허가를 보장하지 않아요.",
   plGuideLolCsVerified:"공식 SoundCloud 앨범(음원 없음). Creator-Safe 대상(Riot 공식 Creator-Safe 플레이리스트와 대조 완료). 스트리밍·구매는 2차 이용 허락이 아니에요.",
@@ -1414,6 +1442,7 @@ function ensureTrkClassicPlaylist(opts) {
    行き止まりにならず、削除はタブの ⚙（長押し）設定から行える（曲はライブラリに残る）。
    消したら settings.trkRemoved に印が残り、次の起動でも作り直さない（🐔 の設定の ♻ で戻せる）。 */
 const TRK_OST_CAT = "trk:ost";   /* 作成・移行済みの印。これが付いたら、利用者が動かした場所を守る */
+const TRK_OST_GUIDE_URL = "https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/music-library/releases";
 function ensureTrkOstPlaylist(opts) {
   const o = opts || {};
   const doToast = o.toast !== false;
@@ -1426,15 +1455,20 @@ function ensureTrkOstPlaylist(opts) {
       exist.cat = TRK_OST_CAT;
       core.saveUserPrefs();
     }
+    /* trk185: 別配布の案内が無い既存リストへガイドを足す（利用者が付けたガイドは触らない） */
+    if (!exist.guide) { exist.guide = trkGuide("plGuideTrkOst", TRK_OST_GUIDE_URL); core.saveUserPrefs(); }
+    try { syncTrkOstPackSongs(); } catch (_) {}   /* 公式OSTパック導入済みなら曲もつなぐ */
     return false;
   }
   if (trkIsRemoved(TRK_OST_ID)) return false;
   ensureTrkFolder();
   const p = plSanitize({ id: TRK_OST_ID, name: "trk's OST Vol.1", icon: "\uD83C\uDF93", color: "none",
-    folder: TRK_FOLDER_ID, tags: ["trk", "OST"], wish: [], songs: [FIRST_SPARK_KEY], cat: TRK_OST_CAT, createdAt: Date.now() });
+    folder: TRK_FOLDER_ID, tags: ["trk", "OST"], wish: [], songs: [FIRST_SPARK_KEY],
+    guide: trkGuide("plGuideTrkOst", TRK_OST_GUIDE_URL), cat: TRK_OST_CAT, createdAt: Date.now() });
   if (!p) return false;
   core.settings.playlists.push(p);
   core.saveUserPrefs();
+  try { syncTrkOstPackSongs(); } catch (_) {}   /* 公式OSTパック導入済みなら曲もつなぐ */
   if (doToast) try { plToast(tr("trkAdded", { n: p.songs.length })); } catch(_){}
   return true;
 }
@@ -3925,6 +3959,7 @@ function removeAdded(it) {
 /* ---------- 曲パックの曲 ---------- */
 async function refreshPackSongs() {
   try { packSongs = (await window.Trk.custom.getPackSongs()).map(packItem); } catch (e) { console.error(e); packSongs = []; }
+  try { syncTrkOstPackSongs(); } catch (_) {}   /* 🎵 公式OSTパックの曲を trk's OST Vol.1 へつなぐ */
   renderLib();
 }
 on("packsChanged", refreshPackSongs);

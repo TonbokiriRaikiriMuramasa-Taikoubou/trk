@@ -8,25 +8,29 @@ import vm from "node:vm";
 import { ROOT } from "./helpers/browser-data.mjs";
 
 const library = fs.readFileSync(`${ROOT}/js/library.js`, "utf8");
-const start = library.indexOf("const TRK_OST_SONG_DIR =");
+const start = library.indexOf("const TRK_OST_MANIFEST_INCLUDED =");
 const end = library.indexOf("async function materializeTrkOstSong(", start);
 assert.ok(start >= 0 && end > start, "the optional OST song initializer can be isolated");
 const source = library.slice(start, end);
 
-function setup({ manifest = null, ok = true, playlists = [], seen = [] } = {}) {
+function setup({ manifest = null, ok = true, playlists = [], seen = [], included = true, packSongs = [] } = {}) {
   const calls = { fetch: [], renders: 0, saves: 0 };
   const settings = { playlists, trkRemoved: [], trkOstSeenKeys: seen };
   const ctx = vm.createContext({
-    window: { Trk: {} }, core: { settings, saveUserPrefs() { calls.saves++; } },
+    window: { Trk: {} }, core: { settings, saveUserPrefs() { calls.saves++; },
+      hashString(str) { let h = 0; for (const c of String(str)) h = (h * 31 + c.codePointAt(0)) >>> 0; return h; } },
     calls, console, Map, String, Number, Object, Array, Date, Math, Promise,
     TRK_FOLDER_ID: "trk", TRK_OST_ID: "trk-ost-v1",
     trkIsRemoved(id) { return settings.trkRemoved.includes(id); },
     renderLib() { calls.renders++; },
     fetch: async (url) => { calls.fetch.push(url); return { ok, json: async () => manifest }; },
   });
-  vm.runInContext(`let builtInSongs = [];\n${source}\nglobalThis.__api = {
+  const src = included ? source.replace("const TRK_OST_MANIFEST_INCLUDED = false;", "const TRK_OST_MANIFEST_INCLUDED = true;") : source;
+  vm.runInContext(`let builtInSongs = []; let packSongs = ${JSON.stringify(packSongs)};\n${src}\nglobalThis.__api = {
     initTrkOstSongs,
     appendTrkOstSongs,
+    syncTrkOstPackSongs,
+    trkOstPackId,
     songs: () => builtInSongs,
     urls: () => [...trkOstSongUrls.entries()],
   };`, ctx);
@@ -40,7 +44,15 @@ const demoManifest = () => ({
   ],
 });
 
-test("a missing manifest means a lightweight build: no songs, no crash", async () => {
+test("the default build does not fetch the OST manifest at all (trk185: separate distribution)", async () => {
+  const { api, calls } = setup({ ok: false, included: false });
+  await api.initTrkOstSongs();
+  assert.deepEqual(calls.fetch, [], "no 404 request for the removed bundled OST");
+  assert.equal(api.songs().length, 0);
+  assert.equal(calls.renders, 0);
+});
+
+test("an included build with a missing manifest means a lightweight build: no songs, no crash", async () => {
   const { api, calls } = setup({ ok: false });
   await api.initTrkOstSongs();
   assert.deepEqual(calls.fetch, ["./assets/optional-ost-audio/manifest.json"]);
@@ -105,4 +117,26 @@ test("a deleted playlist is respected: songs stay in the library, no list is reb
   assert.equal(api.songs().length, 2, "library registration does not depend on the playlist");
   assert.equal(settings.playlists.length, 0, "the initializer never recreates a removed list");
   assert.equal(settings.trkOstSeenKeys.length, 0, "unseen keys stay unseen until a list exists to hold them");
+});
+
+test("the official OST pack fills the playlist with unseen pack keys only (trk185)", async () => {
+  const ost = { id: "trk-ost-v1", name: "trk's OST Vol.1", songs: ["builtin:first-spark-tutorial-v1"] };
+  const probe = setup({ playlists: [ost] });
+  const pid = probe.api.trkOstPackId();
+  assert.ok(pid.startsWith("p"), "pack id follows packIdentityFromManifest (name|author hash)");
+  const packSongs = ["s01", "s02", "s03", "s04", "s05"].map(id => ({ key: `pack:${pid}/${id}` }));
+  packSongs.push({ key: "pack:pother/s01" });
+  const { api, settings } = setup({ playlists: [ost], packSongs, seen: [`pack:${pid}/s02`] });
+  assert.equal(api.syncTrkOstPackSongs(), true);
+  assert.deepEqual(Array.from(ost.songs), ["builtin:first-spark-tutorial-v1",
+    `pack:${pid}/s01`, `pack:${pid}/s03`, `pack:${pid}/s04`, `pack:${pid}/s05`],
+    "only the official pack's unseen songs are appended, in pack order");
+  assert.equal(api.syncTrkOstPackSongs(), false, "a second sync changes nothing");
+});
+
+test("no official pack installed: the playlist keeps only what it had", async () => {
+  const ost = { id: "trk-ost-v1", name: "trk's OST Vol.1", songs: ["builtin:first-spark-tutorial-v1"] };
+  const { api } = setup({ playlists: [ost], packSongs: [{ key: "pack:pxyz/s01" }] });
+  assert.equal(api.syncTrkOstPackSongs(), false);
+  assert.deepEqual(Array.from(ost.songs), ["builtin:first-spark-tutorial-v1"]);
 });

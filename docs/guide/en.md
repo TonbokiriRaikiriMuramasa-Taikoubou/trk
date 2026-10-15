@@ -222,6 +222,15 @@ trk! also works as a music player. Open "🎛 Sound effects" in Settings or from
 
 Below it is the **🎚 Effect rack**, where you can stack effects **in up to eight stages**, like a portable amp chain. Stages run after the preset and are included in saved presets and exports. Available stages are: **🚪 Noise gate** (closes when the signal falls below a threshold); **🧹 Noise reduction** (during a quiet passage, press "🔇 Learn the current sound as noise"; it learns that spectrum for two seconds and removes it, a self-made version of the approaches in Audacity, ReaFir, and Bertom Denoiser Classic); **🎚 Dynamic EQ** (reduces a band only when that band is loud, after TDR Nova and Ozone); **✨ Exciter** (adds harmonics to the highs); **🧲 Compressor**; and **📢 Volume**. Noise reduction is heard about 20 ms late, which the automatic timing compensation absorbs.
 
+### 🔊 Volume leveling (ReplayGain style, off by default)
+
+In "🎛 Sound effects", below "Prevent clipping (limiter)", **"Level the volume across songs"** turns loud songs down and quiet songs up toward one listening level, so you do not have to reach for the volume between songs. It works **independently of the effects switch** (while leveling is on, audio runs through WebAudio — the same behavior as turning effects on).
+
+- **Two sources, in priority order:** if the file carries a ReplayGain tag (`REPLAYGAIN_TRACK_GAIN` — ID3 TXXX in MP3-like files, Vorbis comments in FLAC/Ogg/Opus, the `----:com.apple.iTunes` freeform box in M4A/MP4), **that value is used as-is**; otherwise the loudness from the on-device analysis that already runs when a song loads (a gated RMS average in dB, silence excluded) is pulled toward a −16 dB target.
+- **Kept safe:** the correction is clamped to −18…+9 dB, and boosting is capped so the loudest sample never passes full scale (no clipping). Huge files whose analysis is skipped, and songs with neither tag nor analysis, **pass through unchanged**. The status line under the switch shows the current correction and its source ("from tag" / "from analysis").
+- **Files are never modified** — tags and analysis are read on this device only (read-only policy). Tags arrive when a song-list row becomes visible or a song is selected, so if a tag turns up during playback the volume follows it.
+- Loudness and peak ride along in the on-device analysis cache (`trk_analysis_cache_v1`), so replays do not re-analyze (older cache entries stay valid and are recomputed on the fly).
+
 ### 🔥 Using TRK amp (own section, bottom-left)
 
 On the song select screen, **directly below "🎛 Details (EQ, skins, menu)"** in the bottom-left is **🔥 Use TRK amp**. It is an entry point to the rack above (the stage-stacking system), so you can use it on the spot without opening Settings. It is the same rack and stays in sync with "🎚 Effect rack" in Settings.

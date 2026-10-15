@@ -158,7 +158,7 @@ function loadCache({ safe = false } = {}) {
 }
 function makeAnalysis(n, seed = 1) {
   const f = (k) => Float32Array.from({ length: n }, (_, i) => Math.sin(i * k + seed) * 0.5 + 0.5);
-  return { rms: f(0.1), onset: f(0.2), ratio: f(0.3), frames: n, frameMs: 10, maxRms: 0.9, scale: 0.25 };
+  return { rms: f(0.1), onset: f(0.2), ratio: f(0.3), frames: n, frameMs: 10, maxRms: 0.9, scale: 0.25, loudness: -12.5, peak: 0.8 };   /* 🔊 trk168: 平準化の材料も数値で入る */
 }
 /* 同じ大きさの2つの「ファイル」。中身の先頭・末尾が違うと鍵も違う */
 const fileOf = (bytes) => new Blob([bytes]);
@@ -172,9 +172,9 @@ describe("解析結果のキャッシュ（js/media.js）", () => {
     await C.analysisCachePut(key, a);
     const got = await C.analysisCacheGet(key);
     assert.deepEqual(Array.from(got.rms), Array.from(a.rms));
-    assert.deepEqual([got.frames, got.frameMs, got.maxRms, got.scale], [50, 10, 0.9, 0.25]);
+    assert.deepEqual([got.frames, got.frameMs, got.maxRms, got.scale, got.loudness, got.peak], [50, 10, 0.9, 0.25, -12.5, 0.8]);
     const rec = fake.dbs.get(ANALYSIS_DB).stores.get("analysis").records.get(key);
-    assert.deepEqual(Object.keys(rec).sort(), ["frameMs", "frames", "key", "maxRms", "onset", "ratio", "rms", "savedAt", "scale", "version"]);
+    assert.deepEqual(Object.keys(rec).sort(), ["frameMs", "frames", "key", "loudness", "maxRms", "onset", "peak", "ratio", "rms", "savedAt", "scale", "version"]);
     assert.ok(rec.rms instanceof vm.runInContext("Float32Array", ctx), "配列は Float32Array として戻る");
   });
 

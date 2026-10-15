@@ -144,8 +144,15 @@ function parseSyltFrame(data) {         /* SYLT / SLT：説明のあと「テキ
   lines.sort((a, b) => a.t - b.t);            /* SYLT の時刻は並び順が保証されないので整列する */
   return { lines };
 }
+/* 🔊 ReplayGain の値（"-6.53 dB" 等）→ dB の数。±24dB を超えたら壊れた値として無視（trk168） */
+function parseRgDb(v) {
+  const m = /^\s*([+-]?\d{1,3}(?:[.,]\d{1,3})?)\s*(?:dB\s*)?$/i.exec(String(v == null ? "" : v));
+  if (!m) return null;
+  const db = Number(m[1].replace(",", "."));
+  return Number.isFinite(db) && db >= -24 && db <= 24 ? db : null;
+}
 /* 🏷 生タグ → 表示用の形にそろえる（trk167）。空白だけ・空の項目は落とし、トラック番号は "3/12" を分解する。
-   全部空なら null（＝タグなし＝表示はファイル名のまま）。 */
+   全部空なら null（＝タグなし＝表示はファイル名のまま）。🔊 rgTrackGain（trk168）は数だけ通す。 */
 function normalizeTags(t) {
   if (!t) return null;
   const out = {};
@@ -158,6 +165,7 @@ function normalizeTags(t) {
   const total = m && m[2] ? Number(m[2]) : Number(String(t.trackTotal == null ? "" : t.trackTotal).trim());
   if (m) out.track = Number(m[1]);
   if (Number.isFinite(total) && total > 0 && total <= 9999) out.trackTotal = total;
+  if (Number.isFinite(t.rgTrackGain)) out.rgTrackGain = Math.min(24, Math.max(-24, t.rgTrackGain));
   return Object.keys(out).length ? out : null;
 }
 /* mode: "art"（ジャケット・従来どおり）／ "lyrics"（🎤 USLT/ULT・SYLT/SLT。trk166） */
@@ -196,12 +204,25 @@ async function extractID3(file, mode = "art") {
       if ((id === "SYLT" || id === "SLT") && !unsupportedFlags && !sylt) sylt = parseSyltFrame(tag.subarray(bodyStart, bodyEnd));
       else if ((id === "USLT" || id === "ULT") && !unsupportedFlags && !uslt) uslt = parseLyricsTextFrame(tag.subarray(bodyStart, bodyEnd));
     } else if (mode === "tags") {
-      const field = ID3_TAG_FRAMES[id];   /* 🏷 TIT2/TPE1/TALB/TPE2/TRCK/TCON（v2.2 の TT2 等も） */
-      if (field && !tags[field] && !unsupportedFlags) {
+      if ((id === "TXXX" || id === "TXX") && !unsupportedFlags && !Number.isFinite(tags.rgTrackGain)) {
+        /* 🔊 ReplayGain タグ（trk168）：TXXX の説明が REPLAYGAIN_TRACK_GAIN のものだけ読む（読み取り専用） */
         const body = tag.subarray(bodyStart, bodyEnd);
-        if (body.length >= 2) {           /* encoding(1) + テキスト */
-          const text = decodeID3Text(body.subarray(1), body[0]).trim();
-          if (text) tags[field] = text.slice(0, MAX_TAG_TEXT);
+        const enc = body[0], descEnd = findTextEnd(body, 1, enc);
+        if (descEnd > 0) {
+          const desc = decodeID3Text(body.subarray(1, descEnd), enc).replace(/\0+$/g, "").trim().toUpperCase();
+          if (desc === "REPLAYGAIN_TRACK_GAIN") {
+            const g = parseRgDb(decodeID3Text(body.subarray(descEnd), enc));
+            if (g != null) tags.rgTrackGain = g;
+          }
+        }
+      } else {
+        const field = ID3_TAG_FRAMES[id];   /* 🏷 TIT2/TPE1/TALB/TPE2/TRCK/TCON（v2.2 の TT2 等も） */
+        if (field && !tags[field] && !unsupportedFlags) {
+          const body = tag.subarray(bodyStart, bodyEnd);
+          if (body.length >= 2) {           /* encoding(1) + テキスト */
+            const text = decodeID3Text(body.subarray(1), body[0]).trim();
+            if (text) tags[field] = text.slice(0, MAX_TAG_TEXT);
+          }
         }
       }
     } else if ((id === "APIC" || id === "PIC") && !unsupportedFlags) {
@@ -337,10 +358,14 @@ function parseVorbisTags(packet, start) {
       const text = textDecoder.decode(packet.subarray(p, p + length));
       const equal = text.indexOf("=");
       if (equal > 0) {
-        const field = VORBIS_TAG_KEYS[text.slice(0, equal).toUpperCase()];
+        const key = text.slice(0, equal).toUpperCase();
+        const field = VORBIS_TAG_KEYS[key];
         if (field && !out[field]) {
           const value = text.slice(equal + 1).trim();
           if (value) out[field] = value.slice(0, MAX_TAG_TEXT);
+        } else if (key === "REPLAYGAIN_TRACK_GAIN" && !Number.isFinite(out.rgTrackGain)) {   /* 🔊 trk168（読み取りだけ） */
+          const g = parseRgDb(text.slice(equal + 1));
+          if (g != null) out.rgTrackGain = g;
         }
       }
     }
@@ -452,6 +477,27 @@ function findMp4Lyrics(data, start = 0, end = data.length, depth = 0, inLyrics =
   }
   return null;
 }
+/* 🔊 MP4 freeform ボックス（"----" の中に mean/name/data）から REPLAYGAIN_TRACK_GAIN を読む（trk168・読み取りだけ）。
+   mean（ふつう com.apple.iTunes）と name を確かめてから、data のテキストを dB の数にする */
+function parseMp4FreeformRg(data, start, end) {
+  if (!textDecoder) return null;
+  let mean = "", name = "", value = null, p = start, count = 0;
+  while (p + 8 <= end && count++ < 16) {
+    const size = u32be(data, p), type = ascii(data, p + 4, 4);
+    if (!Number.isSafeInteger(size) || size < 8 || p + size > end) break;
+    const payload = p + 8, atomEnd = p + size;
+    if ((type === "mean" || type === "name") && atomEnd - payload >= 4) {
+      const s = textDecoder.decode(data.subarray(payload + 4, atomEnd)).replace(/\0+$/g, "").trim().toUpperCase();
+      if (type === "mean") mean = s; else name = s;
+    } else if (type === "data" && atomEnd - payload >= 8) {
+      value = textDecoder.decode(data.subarray(payload + 8, atomEnd)).replace(/\0+$/g, "").trim();
+    }
+    p = atomEnd;
+  }
+  if (value == null || name !== "REPLAYGAIN_TRACK_GAIN") return null;
+  if (mean && mean !== "COM.APPLE.ITUNES") return null;
+  return parseRgDb(value);
+}
 /* 🏷 MP4/M4A のテキストタグ（©nam/©ART/©alb/aART/trkn/©gen）を ilst から拾う（trk167）。
    trkn だけはバイナリ（8バイト：予約2・トラック2・総数2・予約2）なので、そこで "3/12" 形に直す */
 function findMp4Tags(data, start = 0, end = data.length, depth = 0, field = "") {
@@ -475,6 +521,12 @@ function findMp4Tags(data, start = 0, end = data.length, depth = 0, field = "") 
       } else if ((kind === 1 || kind === 0) && textDecoder) {
         const text = textDecoder.decode(data.subarray(payload + 8, atomEnd)).replace(/\0+$/g, "").trim();
         if (text) out[field] = text.slice(0, MAX_TAG_TEXT);
+      }
+    } else if (type === "----") {
+      /* 🔊 freeform ボックス（----:com.apple.iTunes:REPLAYGAIN_TRACK_GAIN）→ 音量の平準化に使う（trk168） */
+      if (!Number.isFinite(out.rgTrackGain)) {
+        const g = parseMp4FreeformRg(data, payload, atomEnd);
+        if (g != null) out.rgTrackGain = g;
       }
     } else if (MP4_TAG_BOXES[type]) {
       const found = findMp4Tags(data, payload, atomEnd, depth + 1, MP4_TAG_BOXES[type]);
@@ -537,6 +589,7 @@ async function extractLyrics(file) {
   return null;
 }
 /* 🏷 埋め込みテキストタグを読む（trk167）。戻り値: { title, artist, album, albumArtist, genre, track, trackTotal } の一部か null。
+   🔊 rgTrackGain（trk168）: REPLAYGAIN_TRACK_GAIN タグがあれば dB の数（音量の平準化が優先して使う）。
    ⚠ 表示のために読むだけで、ファイルには書き戻さない（タグ編集はしない＝読み取り専用方針）。 */
 async function extractTags(file) {
   if (!file || !Number.isFinite(file.size) || file.size < 12) return null;

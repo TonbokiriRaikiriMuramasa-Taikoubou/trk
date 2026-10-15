@@ -2452,6 +2452,35 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else ok("trk167: 🏷 embedded text tags feed the display-name chain (read-only, catalog matching untouched)");
 }
 
+// trk168: 🔊 音量の平準化（ReplayGain方式）。通り道の G.norm（音量 → 平準化 → リミッター/出口）は常設で、
+// 材料は「タグの REPLAYGAIN_TRACK_GAIN → 解析の loudness（ゲート付きRMS）」。どちらも無ければ素通し。
+// 解析キャッシュは後方互換（analysisCacheValid は loudness を要求しない＝古い記録も読める）で、
+// ファイルは読み取りだけ（書き戻しは trk167 の見張りが createWritable 不在で担保）。
+{
+  const fx = read("js/fx.js");
+  const media = read("js/media.js");
+  const art = read("js/audio-art.js");
+  /* ⚠ read() 正規化後：fx.js の `window.Trk.media.loudnessDb(a)` は `loudnessDb(a)` に見える */
+  if (!fx.includes("G.norm = gainN(ac, 1)") || !fx.includes("G.vol.connect(G.norm)") ||
+      !fx.includes("G.norm.connect(G.lim); G.lim.connect(G.out)") || !fx.includes("else G.norm.connect(G.out)") ||
+      !fx.includes("const NORM_TARGET_DB = -16, NORM_DB_MIN = -18, NORM_DB_MAX = 9, NORM_LIN_CAP = 2;") ||
+      !fx.includes("function normPlan(") || !fx.includes("settings.fxNorm = prefs.fxNorm === true") ||
+      !fx.includes("on(\"mediaReady\", () => { if (settings.fxNorm && !G.src && G.ok) ensureGraph(); applyNorm(); })") ||
+      !fx.includes("on(\"songTags\", () => { if (settings.fxNorm && !G.src && G.ok) ensureGraph(); applyNorm(); })") ||
+      !fx.includes("loudnessDb(a) : NaN") || !fx.includes("lib.songTagsOf(song)") ||
+      !fx.includes("normInfo:() => ({ on:!!settings.fxNorm") ||
+      (fx.match(/sfxNormTitle:/g) || []).length !== 4) fail("fx.js loudness leveling (norm node, plan, hooks, four languages) is missing");
+  else if (!media.includes("maxRms: maxRms || 1, scale: scale || 1, loudness, peak") ||
+           !media.includes("function loudnessDb(a)") ||
+           !media.includes("loudness: a.loudness, peak: a.peak") ||
+           !media.includes("loudness: rec.loudness, peak: rec.peak") ||
+           !media.includes("loadSE, loudnessDb, playSE")) fail("media.js analysis loudness/peak + cache + loudnessDb export is missing");
+  else if (/function analysisCacheValid\(r\) \{[\s\S]*?\n\}/.exec(media)?.[0].includes("loudness")) fail("analysisCacheValid must stay backward compatible (old cache records without loudness must remain valid)");
+  else if (!art.includes("function parseRgDb(") || !art.includes("function parseMp4FreeformRg(") ||
+           (art.match(/REPLAYGAIN_TRACK_GAIN/g) || []).length < 3 || !art.includes("out.rgTrackGain")) fail("audio-art.js ReplayGain tag reading (ID3 TXXX / Vorbis / MP4 freeform) is missing");
+  else ok("trk168: 🔊 loudness leveling reads ReplayGain tags or measured loudness, applies via the always-in-path norm gain (read-only)");
+}
+
 // 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own
 // "don't sway" option, plus the ❓ mystery switch that outranks both.
 {

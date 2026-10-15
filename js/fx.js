@@ -10,7 +10,7 @@
      ⑬ 選曲画面のメニュー ⑭ 表示の同期      ⑮ 窓口（window.TrkFX）  ⑯ 起動
 
    【音の通り道】
-     video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動] → [音量] → ([リミッター]) → [出口 G.out] → スピーカー
+     video → [プリセット] → [かんたんEQ 5バンド] → [ゲーム連動] → [音量] → [🔊 平準化] → ([リミッター]) → [出口 G.out] → スピーカー
 
    【約束】
    ・オンにするまでは音の通り道を変えない。createMediaElementSource(video) は一度だけ（2回目はエラー）
@@ -40,6 +40,10 @@ Object.assign(TEXT.ja, {
   sfxPrev:"前のプリセット", sfxNext:"次のプリセット", sfxRandom:"おまかせ（ランダム）",
   sfxCompare:"👂 押している間だけ元の音", sfxCompareHint:"押している間だけ、エフェクトなしの音になります",
   sfxEqLabel:"かんたんEQ（プリセットとラックに重ねてかかります）", sfxEqReset:"↺ EQをリセット", sfxVolume:"エフェクト後の音量", sfxLimiter:"音割れを防ぐ（リミッター）",
+  sfxNormTitle:"🔊 音量の平準化（曲ごとの音量をそろえる）", sfxNorm:"曲ごとの音量をそろえる（ReplayGain方式）",
+  sfxNormHint:"大きい曲は下げて、小さい曲は標準の聴こえの音量に近づけます。曲が変わるたびに音量を触らなくて済みます。ファイルに ReplayGain タグがあればそれを優先し、無ければ端末内の解析結果を使います。ファイルは一切変更しません。",
+  sfxNormWait:"音を再生すると効きます（音の通り道を作ります）。", sfxNormNone:"この曲は使える情報がありません（解析もタグもなし）——素通しです。",
+  sfxNormNow:"いま：{db} dB（{src}）", sfxNormSrcTag:"タグ", sfxNormSrcMeasured:"解析",
   sfxGameTitle:"🎮 ゲーム連動エフェクト（プレイ中だけ）", sfxGameMiss:"ミスすると一瞬こもる", sfxGameCombo:"コンボが続くと音が華やかになる",
   sfxGamePinch:"体力が少ないと、こもって心音のように揺れる", sfxGameBlast:"🚀 ぶっ飛ばし中は音が明るく派手になる（CATCH）",
   sfxGamePan:"トラックの位置に合わせて左右に動く（CATCH）",
@@ -82,6 +86,10 @@ Object.assign(TEXT.en, {
   sfxPrev:"Previous preset", sfxNext:"Next preset", sfxRandom:"Surprise me (random)",
   sfxCompare:"👂 Hold to hear the original", sfxCompareHint:"While held, you hear the song without effects",
   sfxEqLabel:"Quick EQ (applied on top of the preset and rack)", sfxEqReset:"↺ Reset EQ", sfxVolume:"Output volume", sfxLimiter:"Prevent clipping (limiter)",
+  sfxNormTitle:"🔊 Volume leveling (match loudness across songs)", sfxNorm:"Level the volume across songs (ReplayGain style)",
+  sfxNormHint:"Turns loud songs down and quiet songs up toward one listening level, so you do not have to reach for the volume between songs. Uses the file's ReplayGain tag when present, otherwise the on-device analysis. Files are never modified.",
+  sfxNormWait:"Applies once audio plays (building the sound path).", sfxNormNone:"Nothing to use for this song (no analysis or tag) — passthrough.",
+  sfxNormNow:"Now: {db} dB ({src})", sfxNormSrcTag:"from tag", sfxNormSrcMeasured:"from analysis",
   sfxGameTitle:"🎮 Game-reactive effects (during play only)", sfxGameMiss:"Muffle briefly on a miss", sfxGameCombo:"Get brighter as your combo grows",
   sfxGamePinch:"Muffle and pulse like a heartbeat when lives are low", sfxGameBlast:"🚀 Brighter and bolder during Blast mode (CATCH)",
   sfxGamePan:"Pan with the truck's position (CATCH)",
@@ -124,6 +132,10 @@ Object.assign(TEXT.zh, {
   sfxPrev:"上一个预设", sfxNext:"下一个预设", sfxRandom:"随机",
   sfxCompare:"👂 按住听原声", sfxCompareHint:"按住期间播放没有音效的原声",
   sfxEqLabel:"简易均衡器（叠加在预设和机架上）", sfxEqReset:"↺ 重置均衡器", sfxVolume:"输出音量", sfxLimiter:"防止破音（限幅器）",
+  sfxNormTitle:"🔊 音量平衡（统一歌曲响度）", sfxNorm:"平衡歌曲之间的音量（ReplayGain 方式）",
+  sfxNormHint:"响的歌曲调低、轻的歌曲调高，接近标准听感音量，换歌时不用总去动音量键。文件里有 ReplayGain 标签时优先使用，否则用本机分析结果。不会修改文件。",
+  sfxNormWait:"播放声音后生效（正在建立声音通路）。", sfxNormNone:"这首歌没有可用信息（无分析和标签）——保持原样。",
+  sfxNormNow:"当前：{db} dB（{src}）", sfxNormSrcTag:"来自标签", sfxNormSrcMeasured:"来自分析",
   sfxGameTitle:"🎮 游戏联动音效（仅游戏中）", sfxGameMiss:"失误时声音短暂变闷", sfxGameCombo:"连击越多声音越华丽",
   sfxGamePinch:"体力低时声音变闷并像心跳一样起伏", sfxGameBlast:"🚀 狂飙中声音更明亮（CATCH）",
   sfxGamePan:"声音随卡车位置左右移动（CATCH）",
@@ -166,6 +178,10 @@ Object.assign(TEXT.ko, {
   sfxPrev:"이전 프리셋", sfxNext:"다음 프리셋", sfxRandom:"랜덤",
   sfxCompare:"👂 누르는 동안 원음", sfxCompareHint:"누르고 있는 동안 이펙트 없는 소리가 납니다",
   sfxEqLabel:"간단 EQ (프리셋과 랙 위에 겹쳐 적용)", sfxEqReset:"↺ EQ 초기화", sfxVolume:"출력 음량", sfxLimiter:"소리 깨짐 방지 (리미터)",
+  sfxNormTitle:"🔊 음량 균일화 (노래마다 음량 맞추기)", sfxNorm:"노래 사이 음량 균일화 (ReplayGain 방식)",
+  sfxNormHint:"큰 노래는 낮추고 작은 노래는 올려 표준 청취 음량에 가깝게 맞춥니다. 곡을 바꿀 때마다 음량을 만지지 않아도 됩니다. 파일에 ReplayGain 태그가 있으면 우선 사용하고, 없으면 기기 내 분석 결과를 씁니다. 파일은 절대 수정하지 않습니다.",
+  sfxNormWait:"소리 재생 후 적용됩니다(음성 경로를 만드는 중).", sfxNormNone:"이 곡은 사용 가능한 정보가 없습니다(분석·태그 없음) — 그대로 재생.",
+  sfxNormNow:"현재: {db} dB ({src})", sfxNormSrcTag:"태그 기준", sfxNormSrcMeasured:"분석 기준",
   sfxGameTitle:"🎮 게임 연동 이펙트 (플레이 중에만)", sfxGameMiss:"미스하면 잠깐 소리가 먹먹해짐", sfxGameCombo:"콤보가 이어지면 소리가 화려해짐",
   sfxGamePinch:"체력이 적으면 먹먹해지고 심장 소리처럼 울림", sfxGameBlast:"🚀 폭주 중에는 소리가 밝고 화려해짐 (CATCH)",
   sfxGamePan:"트럭 위치에 맞춰 좌우로 이동 (CATCH)",
@@ -217,6 +233,7 @@ if (settings.fxPreset === TEMP_ID) settings.fxPreset = "flat";   // 一時プリ
 settings.fxEq = Array.isArray(prefs.fxEq) && prefs.fxEq.length === 5 ? prefs.fxEq.map(v => num(v, -12, 12, 0)) : [0, 0, 0, 0, 0];
 settings.fxVolume = num(prefs.fxVolume, -12, 6, 0);
 settings.fxLimiter = prefs.fxLimiter !== false;
+settings.fxNorm = prefs.fxNorm === true;   /* 🔊 音量の平準化（trk168）：初期オフ */
 settings.fxComp = prefs.fxComp !== false;
 settings.fxCompExtra = num(prefs.fxCompExtra, -50, 50, 0);
 settings.fxRecord = prefs.fxRecord !== false;
@@ -360,13 +377,32 @@ function matches(p, q) {
 }
 
 /* ============ ⑤ 音の部品 ============ */
-const G = { ac:null, src:null, ok:true, made:[], ticks:[], comps:0, eq:[], game:null, vol:null, lim:null, out:null, noise:{}, ir:new Map(), extra:new Map(), extraMix:new Map(),
-  spectral:0, wk:null, wkLoad:null, denoiseNodes:new Set(), denoisePow:null, denoiseLearned:false, learnNode:null, rackNodes:[] };   /* 🎚 追加分 */
+const G = { ac:null, src:null, ok:true, made:[], ticks:[], comps:0, eq:[], game:null, vol:null, norm:null, lim:null, out:null, noise:{}, ir:new Map(), extra:new Map(), extraMix:new Map(),
+  spectral:0, wk:null, wkLoad:null, denoiseNodes:new Set(), denoisePow:null, denoiseLearned:false, learnNode:null, rackNodes:[] };   /* 🎚 追加分・🔊 norm（trk168） */
 let cur = null;                                       // 作り直すときに消すノードの一覧（rebuild 中だけ）
 let bypass = false;                                   // 👂 元の音と比べている間だけ true
+let lastNormPlan = { lin:1, db:0, src:"" };           // 🔊 いまの平準化の補正（表示にも使う）
+let normNow = null;                                   // 🔊 平準化の状態行（設定パネルが出来たら入る）
 const active = () => settings.fxOn && !bypass;
 const T = n => { if (cur) cur.push(n); return n; };
 const dbToGain = d => Math.pow(10, d / 20);
+/* 🔊 音量の平準化（ReplayGain方式・trk168）の定数と補正量の計算（純関数）。
+   ・ファイルにタグ（REPLAYGAIN_TRACK_GAIN）があればその dB をそのまま、無ければ解析の loudness を目標に寄せる
+   ・補正量は NORM_DB_MIN〜NORM_DB_MAX に収め、上げるときは一番大きいサンプルがフルスケールを超えないように天井をかける
+   ・どちらも無ければ素通し（lin 1）。ファイルは一切変更しない（読み取り専用方針）＝計算は端末内だけ */
+const NORM_TARGET_DB = -16, NORM_DB_MIN = -18, NORM_DB_MAX = 9, NORM_LIN_CAP = 2;
+function normPlan({ on, rgDb, loudness, peak } = {}) {
+  if (!on) return { lin:1, db:0, src:"" };
+  let db = null, src = "";
+  if (Number.isFinite(rgDb)) { db = rgDb; src = "tag"; }
+  else if (Number.isFinite(loudness)) { db = NORM_TARGET_DB - loudness; src = "measured"; }
+  if (db == null) return { lin:1, db:0, src:"" };
+  db = Math.min(NORM_DB_MAX, Math.max(NORM_DB_MIN, db));
+  let lin = dbToGain(db);
+  if (Number.isFinite(peak) && peak > 1e-4) lin = Math.min(lin, .98 / peak);   /* 音割れ防止の天井 */
+  else lin = Math.min(lin, NORM_LIN_CAP);                                        /* 解析が無い曲の上げすぎ防止 */
+  return { lin, db: 20 * Math.log10(lin), src };
+}
 const gainN = (ac, v) => { const g = T(ac.createGain()); g.gain.value = v; return g; };
 const biq = (ac, type, f, q, gain = 0) => { const n = T(ac.createBiquadFilter()); n.type = type; n.frequency.value = f; n.Q.value = q; n.gain.value = gain; return n; };
 function stereoIn(ac) { const g = gainN(ac, 1); g.channelCount = 2; g.channelCountMode = "explicit"; g.channelInterpretation = "speakers"; return g; }
@@ -675,8 +711,9 @@ function ensureGraph() {
   const gm = G.game = { lp:biq(ac, "lowpass", 22000, .7), low:biq(ac, "lowshelf", 120, .7), high:biq(ac, "highshelf", 6000, .7),
     amp:gainN(ac, 1), pan:ac.createStereoPanner ? ac.createStereoPanner() : null };
   G.eq[G.eq.length - 1].connect(gm.lp); gm.lp.connect(gm.low); gm.low.connect(gm.high); gm.high.connect(gm.amp);
-  /* 音量 → (リミッター) → 出口 → スピーカー */
+  /* 音量 → 🔊 平準化 → (リミッター) → 出口 → スピーカー */
   G.vol = gainN(ac, 1);
+  G.norm = gainN(ac, 1);   /* 🔊 音量の平準化（trk168）：通り道に常にある。オフ・情報なしのときは gain 1 の素通し */
   if (gm.pan) { gm.amp.connect(gm.pan); gm.pan.connect(G.vol); } else gm.amp.connect(G.vol);
   G.lim = ac.createDynamicsCompressor();
   G.lim.threshold.value = -1; G.lim.knee.value = 0; G.lim.ratio.value = 20; G.lim.attack.value = .003; G.lim.release.value = .1;
@@ -723,10 +760,38 @@ function syncEq() {
 function applyOut() {
   if (!G.src) return;
   try { G.vol.disconnect(); } catch (_) {}
+  try { G.norm.disconnect(); } catch (_) {}
   try { G.lim.disconnect(); } catch (_) {}
-  if (active() && settings.fxLimiter) { G.vol.connect(G.lim); G.lim.connect(G.out); }
-  else G.vol.connect(G.out);
+  G.vol.connect(G.norm);   /* 🔊 平準化は通り道に常にある（trk168）。オフ・情報なしのときは gain 1 */
+  if (active() && settings.fxLimiter) { G.norm.connect(G.lim); G.lim.connect(G.out); }
+  else G.norm.connect(G.out);
   G.vol.gain.setTargetAtTime(active() ? dbToGain(settings.fxVolume) : 1, G.ac.currentTime, .03);
+  applyNorm();
+}
+/* 🔊 音量の平準化（trk168）：今の曲について補正量を計算し、G.norm に入れる。
+   材料の優先順は「ファイルの ReplayGain タグ（library.js の songTagsOf 経由）→ 解析の loudness（media.js）」。
+   曲の読み込み（mediaReady）とタグの到着（songTags）でも呼び直される。エフェクトがオフでも働く。 */
+function applyNorm() {
+  if (!G.src || !G.norm) return;
+  const lib = window.Trk && window.Trk.library;
+  const song = core.currentSong;
+  const tags = song && lib && typeof lib.songTagsOf === "function" ? lib.songTagsOf(song) : null;
+  const a = core.analysis;
+  lastNormPlan = normPlan({
+    on: settings.fxNorm,
+    rgDb: tags ? tags.rgTrackGain : NaN,
+    loudness: a && typeof window.Trk.media.loudnessDb === "function" ? window.Trk.media.loudnessDb(a) : NaN,
+    peak: a && Number.isFinite(a.peak) ? a.peak : NaN
+  });
+  try { G.norm.gain.setTargetAtTime(lastNormPlan.lin, G.ac.currentTime, .08); } catch (_) {}
+  syncNormStatus();
+}
+function syncNormStatus() {
+  if (!normNow) return;
+  if (!settings.fxNorm) normNow.textContent = "";
+  else if (!G.src) normNow.textContent = tr("sfxNormWait");
+  else if (!lastNormPlan.src) normNow.textContent = tr("sfxNormNone");
+  else normNow.textContent = tr("sfxNormNow", { db: lastNormPlan.db.toFixed(1), src: tr(lastNormPlan.src === "tag" ? "sfxNormSrcTag" : "sfxNormSrcMeasured") });
 }
 /* 👂 元の音と比べる（押している間だけ素通しにする） */
 function setBypass(v) {
@@ -1078,6 +1143,16 @@ const vol = range(tx("span", "sfxVolume"), -12, 6, .5, v => { settings.fxVolume 
 const limCk = check("sfxLimiter", setPref("fxLimiter", applyOut));
 add(...eqRows.map(r => r.row), eqReset, vol.row, limCk.lab);
 
+/* 🔊 音量の平準化（trk168）：エフェクトのオン／オフと独立に働く。オンにした瞬間に通り道を作る（音は変わらない） */
+add(tx("h3", "sfxNormTitle"));
+const normCk = check("sfxNorm", v => {
+  settings.fxNorm = v;
+  if (v && !G.src && G.ok) ensureGraph();
+  applyNorm(); saveUserPrefs(); syncNormStatus();
+});
+normNow = el("div", "hint status");
+add(normCk.lab, tx("div", "sfxNormHint", "hint"), normNow);
+
 /* ゲーム連動 */
 add(tx("h3", "sfxGameTitle"));
 const gameCks = [["miss", "sfxGameMiss"], ["combo", "sfxGameCombo"], ["pinch", "sfxGamePinch"], ["blast", "sfxGameBlast"], ["pan", "sfxGamePan"]]
@@ -1216,13 +1291,19 @@ function syncUI() {
   search.placeholder = tr("sfxSearch");
   renderGrid(); renderQuick(); renderDesc(p); syncValues();
   limCk.inp.checked = settings.fxLimiter;
+  normCk.inp.checked = settings.fxNorm;   /* 🔊 trk168 */
   for (const [k, inp] of gameCks) inp.checked = !!settings.fxGame[k];
   rackCk.inp.checked = settings.fxRackOn;
   renderRack();
   compCk.inp.checked = settings.fxComp; recCk.inp.checked = settings.fxRecord; loadCk.inp.checked = settings.fxChartLoad;
   delBtn.hidden = !p.custom;
+  syncNormStatus();
 }
 on("language", syncUI);
+/* 🔊 音量の平準化（trk168）：曲の読み込み（解析の到着）とタグの到着についていく。
+   平準化がオンで通り道がまだ無いときは、ここで作る（エフェクトがオフでも平準化は働く） */
+on("mediaReady", () => { if (settings.fxNorm && !G.src && G.ok) ensureGraph(); applyNorm(); });
+on("songTags", () => { if (settings.fxNorm && !G.src && G.ok) ensureGraph(); applyNorm(); });
 
 /* ============ ⑮ 窓口（MOD・ほかの機能から使う） ============
    TrkFX.list()        → [{ id, cat, name }]
@@ -1243,6 +1324,7 @@ on("language", syncUI);
    TrkFX.rackSet(list) → 段を丸ごと入れ替える（cleanFx で検証・最大 RACK_MAX 段）
    TrkFX.rackAdd(type) → 段を1つ足す（いっぱいなら -1）
    TrkFX.rackClear()   → 段を全部外す
+   TrkFX.normInfo()    → 🔊 音量の平準化のいま（{ on, lin, db, src:"tag"|"measured"|"" }。trk168）
    TrkFX.midiMixOn(v)  → 通常音声へのTRK MIDI MIX（初期オフ）
    TrkFX.midiMixProfile(id) → 通常音声用MIXプロフィールを安全に選ぶ */
 window.TrkFX = Object.freeze({
@@ -1269,6 +1351,7 @@ window.TrkFX = Object.freeze({
     settings.fxRack.push(cleanFx({ ...d })); refresh(); return settings.fxRack.length;
   },
   rackClear:() => { settings.fxRack = []; refresh(); return 0; },
+  normInfo:() => ({ on:!!settings.fxNorm, lin:lastNormPlan.lin, db:lastNormPlan.db, src:lastNormPlan.src }),
   midiMixOn:v => { settings.midiMixEnabled = !!v; refresh(); emit("midiMix"); return !!settings.midiMixEnabled; },
   midiMixProfile:id => {
     const api = window.Trk && window.Trk.midiProfiles;

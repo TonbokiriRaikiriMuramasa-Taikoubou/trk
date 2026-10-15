@@ -763,6 +763,8 @@ function showMediaStatus(key, vars) {
 }
 function endedMedia() {
   if (!mediaActive()) return;
+  mediaPlayNotedKey = "";   /* 🎧 最後まで再生＝「ちゃんと聴いた」（trk172・リピートで何周しても周ごとに数える） */
+  noteMediaPlay();
   /* 🔖「チャプターの終わりで止める」で最終チャプターが曲の終わりと一致するとき（trk170） */
   if (sleepChapterEnd) {
     saveMediaPosition(true);
@@ -1157,6 +1159,19 @@ function stepChapter(delta) {
   else target = idx - 1 >= 0 ? d[idx - 1].t : 0;
   if (target != null) seekToChapter(target);
 }
+/* 🎧「ちゃんと聴いた」計数（trk172・⚡スマート棚の材料）：30秒（短い曲は半分）を超えて再生したら
+   1曲につき1回だけ library.noteMediaPlayed へ。逆再生中は数えない（時計が違うため）。 */
+let mediaPlayNotedKey = "";
+function noteMediaPlay() {
+  const s = core.currentSong;
+  if (!s || !s.key || !core.videoReady || reverseActive || reverseLoading) return;
+  if (mediaPlayNotedKey === s.key) return;
+  const t = core.video.currentTime || 0, d = core.video.duration || 0;
+  if (t < 30 && !(d > 0 && t >= d / 2)) return;
+  mediaPlayNotedKey = s.key;
+  const lib = window.Trk.library;
+  if (lib && typeof lib.noteMediaPlayed === "function") lib.noteMediaPlayed(s.key);
+}
 /* 💤「チャプターの終わり」スリープの見張り（250ms周期に相乗り）。境界に達したら曲の終わりモードと同じ形で止まる */
 function checkChapterSleep() {
   if (!sleepChapterEnd || !core.videoReady || reverseActive || reverseLoading) return;
@@ -1290,6 +1305,7 @@ function renderMedia() {
   renderSubsOverlay();   /* 💬 字幕オーバーレイ（trk169・同じ周期に相乗り。変わったときだけDOMを触る） */
   renderChaptersActive();   /* 🔖 チャプターのハイライト（trk170・行が変わったときだけ付け替え） */
   checkChapterSleep();      /* 💤「チャプターの終わりで止める」の見張り（trk170） */
+  noteMediaPlay();          /* 🎧「ちゃんと聴いた」計数（trk172・30秒/半分を超えたら1回だけ） */
   renderWall();
   renderQueue();
   syncMediaStage();
@@ -1329,6 +1345,7 @@ function openMedia() {
   if (lyricsBoxOpen()) loadLyrics();   /* 🎤 開いたままだった歌詞パネルの読み直し（trk166） */
   loadSubs(true);   /* 💬 字幕はパネルが閉じていても読む（オーバーレイ表示のため・trk169） */
   loadChapters(true);   /* 🔖 チャプターも先に読む（「チャプターの終わりで止める」がパネルを閉じていても使えるように・trk170） */
+  mediaPlayNotedKey = "";   /* 🎧 開き直しも新しい再生として数え直す（trk172） */
   const focus = playNode || closeNode; if (focus) focus.focus();
 }
 let closeNode;
@@ -1629,6 +1646,7 @@ function buildMedia() {
   core.on("songSelected", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics(); loadSubs(true); });   /* 🎤 曲が変わったら歌詞も（trk166）💬 字幕も（trk169） */
   core.on("mediaReady", () => { if (mediaOpen) renderMedia(); updateMediaSession(); });
   core.on("songSelected", () => { loadChapters(true); });   /* 🔖 曲が変わったらチャプターも（trk170・上の歌詞/字幕の行とは別に購読） */
+  core.on("songSelected", () => { mediaPlayNotedKey = ""; });   /* 🎧 新しい曲の「ちゃんと聴いた」計数は最初から（trk172・これも別購読） */
   core.on("records", renderQueue); core.on("packsChanged", renderQueue);
   core.on("songTags", () => { renderQueue(); if (mediaOpen) renderMedia(); });   /* 🏷 タグが届いたら表示名を追従（trk167） */ core.on("language", () => {
     if (stageNote) { stageNote.textContent = tr("mediaStageNoVideo"); stageNote.dataset.i18n = "mediaStageNoVideo"; }

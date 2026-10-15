@@ -2568,6 +2568,34 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else ok("trk171: 💿🎤 album/artist shelves group the song list (track-number order inside, no-tags group last, sticky headers, tag pre-load)");
 }
 
+// trk172: ⚡ スマート棚（PLAYER-ROADMAP #11）。材料は端末内の記録だけ（PLAYED・records・songDB の addedAt）＝送信なし。
+// 🎧 プレーヤー再生は PLAYED.media に別途計上（30秒/半分ルール）。証明（plProof＝共有の ▶AUTO 印）は auto/manual のまま＝media を知らない。
+{
+  const library = read("js/library.js");
+  const player = read("js/media-player-mode.js");
+  /* ⚠ read() は正規化後の本文：core.on( は on( 、window.Trk.play. 前置は外れて見える */
+  if (!library.includes("function libSmartLast(x)") || !library.includes("function libSmartPlays(x)") ||
+      !library.includes("function libSmartSections(items, labeler, cap = 50)") ||
+      !library.includes("function noteMediaPlayed(key)") || !library.includes("function libSectionHead(label, n)") ||
+      !library.includes('tabs.push({ id:"smart", icon:"⚡", label:tr("libTabSmart"), n:nSmart });') ||
+      !library.includes('if (id === "smart") return true;') ||
+      !library.includes('const smartSections = tabId === "smart" ? libSmartSections(items, k => tr(k)) : null;') ||
+      !library.includes("if (row.sec) { pendingSec = row; continue; }") ||
+      !library.includes("box.append(libSectionHead(pendingSec.sec, pendingSec.n))") ||
+      !library.includes("if (r.it && !seenKeys.has(r.it.key))") ||
+      !library.includes("function addedItem(file, video, addedAt)") ||
+      !library.includes("initLibrary, nextSong, noteMediaPlayed, onLongPress") ||
+      (library.match(/libTabSmart:/g) || []).length !== 4 ||
+      (library.match(/libSmartRecent:/g) || []).length !== 4 ||
+      (library.match(/libSmartTop:/g) || []).length !== 4 ||
+      (library.match(/libSmartAdded:/g) || []).length !== 4) fail("library.js smart shelf (sections, media-play counter, addedAt carry, four-language texts) is missing");
+  else if (/function plProof\(it, idx\) \{[\s\S]*?\n\}/.exec(library)[0].includes("media")) fail("plProof must not learn about PLAYED.media (player listens are not a share proof)");
+  else if (!player.includes("let mediaPlayNotedKey") || !player.includes("function noteMediaPlay()") ||
+           !player.includes("noteMediaPlay();") || !player.includes("noteMediaPlayed(s.key)") ||
+           !player.includes('on("songSelected", () => { mediaPlayNotedKey = ""; });')) fail("the media player must count real listens (30s/half rule) into library.noteMediaPlayed");
+  else ok("trk172: ⚡ smart shelf (recently played / most played / recently added) runs on device-only records; player listens count separately and never become a share proof");
+}
+
 // 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own
 // "don't sway" option, plus the ❓ mystery switch that outranks both.
 {

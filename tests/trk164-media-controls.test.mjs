@@ -243,10 +243,11 @@ function endedHarness({ track = false, chapter = false, repeat = "off", shuffle 
     tr: key => key,
     renderMedia: () => {},
     updateMediaSession: () => {},
+    noteMediaPlay: () => { state.noted = (state.noted || 0) + 1; },   /* 🎧 trk172: endedMedia counts a finished listen first */
     console,
   };
   vm.createContext(sandbox);
-  vm.runInContext(`let sleepTrackMode = ${track}, sleepChapterEnd = ${chapter ? 60 : 0};\n${fnEnded}\nwindow.__ended = endedMedia;`, sandbox,
+  vm.runInContext(`let sleepTrackMode = ${track}, sleepChapterEnd = ${chapter ? 60 : 0}, mediaPlayNotedKey = "";\n${fnEnded}\nwindow.__ended = endedMedia;`, sandbox,
     { filename: "js/media-player-mode.js#ended" });
   return { state, ended: sandbox.window.__ended };
 }
@@ -287,6 +288,7 @@ test("🔖 sleep “end of chapter” (trk170): the guard in endedMedia() outran
   assert.equal(h.state.stopped, 1, "stopSleepTimer() runs");
   assert.equal(h.state.steps, 0, "repeat/shuffle do not advance the queue");
   assert.equal(h.state.plays, 0);
+  assert.equal(h.state.noted, 1, "🎧 trk172: the finished listen is counted before the sleep guard");
   assert.deepEqual(h.state.toasts, ["mediaSleepDone"]);
 });
 

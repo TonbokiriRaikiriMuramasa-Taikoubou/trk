@@ -2414,7 +2414,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
            !lyrics.includes("window.Trk.lyrics = Object.freeze({")) fail("lyrics.js parser / manual store / resolution chain is missing");
   else if (!library.includes('it.lyricsFile = lyrics[it.dir + "/" + it.base] || null') || !library.includes('n.endsWith(".lrc")')) fail("the folder scan must attach same-named .lrc files to songs");
   else if (!core.includes("mediaLyricsOpen: prefs.mediaLyricsOpen === true") || (core.match(/settings\.mediaLyricsOpen = false/g) || []).length < 2) fail("mediaLyricsOpen setting (and its two reset paths) is missing in core.js");
-  else if (!player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, interpBox, loopBox, options, queuePanel, footer)") ||
+  else if (!player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") ||
            !player.includes("renderLyrics();   /* 🎤") || !player.includes('lyricsFileNode.accept = ".lrc,.txt,text/plain"') ||
            !player.includes("on(\"songSelected\", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics();") ||   /* core. は正規化で外れる。末尾は trk169 で loadSubs が増えたので閉じ括弧まで固定しない */
            !player.includes("api.saveManualLyrics(song.key, r.text, file.name)") ||
@@ -2433,7 +2433,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
   const player = read("js/media-player-mode.js");
   const sw = read("sw.js");
   /* ⚠ read("js/…") は正規化後の本文：`core.emit(` は `emit(`、`window.Trk.media.audioArt` は `media.audioArt` に見える */
-  if (!art.includes("extract, extractLyrics, extractTags, thumbnail") || !art.includes("tagText:MAX_TAG_TEXT") ||
+  if (!art.includes("extractTags,") || !art.includes("extractLyrics,") || !art.includes("tagText:MAX_TAG_TEXT") ||   /* ⚠ export 行の完全一致は trk170（extractChapters 追加）で再び割れたので名前だけで見る */
       !art.includes("ID3_TAG_FRAMES") || !art.includes("MP4_TAG_BOXES") || !art.includes("VORBIS_TAG_KEYS") ||
       !art.includes("async function extractTags(file)") || art.includes("createWritable")) fail("audio-art.js extractTags (read-only text tags) is missing");
   else if (!library.includes("const songTags = new Map()") ||
@@ -2500,7 +2500,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else if (!library.includes('} else if (lower.endsWith(".srt") || lower.endsWith(".vtt")) {') ||
            !library.includes('it.subsFile = subs[it.dir + "/" + it.base] || null') ||
            !library.includes('n.endsWith(".srt") || n.endsWith(".vtt")')) fail("library.js must pick up folder sidecar .srt/.vtt into it.subsFile");
-  else if (!player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, interpBox, loopBox, options, queuePanel, footer)") ||
+  else if (!player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") ||
            !player.includes("stageWrap.append(stageCanvas, subsOverlay, stageNote)") ||
            !player.includes("renderSubsOverlay();") ||
            !player.includes("on(\"songSelected\", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics(); loadSubs(true); });") ||
@@ -2514,6 +2514,35 @@ if (!read("js/main.js").includes("guideEggKind") ||
            !(html.indexOf("js/lyrics.js") < html.indexOf("js/subtitles.js") && html.indexOf("js/subtitles.js") < html.indexOf("js/judge-match.js"))) fail("subtitles.js must load right after lyrics.js");
   else if (!css.includes(".mediaSubs{") || !css.includes(".videoMaxSubs{") || !css.includes(".mediaSubsBox{")) fail("subtitle overlay/panel styles are missing");
   else ok("trk169: 💬 SRT/VTT subtitles ride the folder pickup, show as a DOM overlay (+ PiP <track>), delay-adjustable, read-only");
+}
+
+// trk170: 🔖 M4Bチャプター。chpl(Nero) ボックスを読み取りだけ（js/audio-art.js・FFmpeg mov.c と同じ並び）、
+// m4b/m4a/mp4/mov の曲だけチャプターパネルが出る。クリックでジャンプ、いまのチャプターはハイライト。
+// 💤 スリープに「チャプターの終わりで止める」を追加。m4b がフォルダ取込の対象（MEDIA_EXT）。書き戻し・送信なし。
+{
+  const art = read("js/audio-art.js");
+  const library = read("js/library.js");
+  const player = read("js/media-player-mode.js");
+  const css = read("css/style.css");
+  /* ⚠ read() は正規化後の本文：window.Trk.audioArt. 前置は外れ、core.video は video に見える */
+  if (!art.includes("function parseChplBox(") || !art.includes("function findChpl(") ||
+      !art.includes("function extractChapters(") || !art.includes("extractChapters,") ||
+      !art.includes("chapters:MAX_CHAPTERS") || !art.includes('mode === "chapters"') ||
+      art.includes("createWritable") || art.includes("fetch(")) fail("audio-art.js chpl chapter reader/export is missing (or grew a write/network path)");
+  else if (!/const MEDIA_EXT = \[[^\]]*"m4b"[^\]]*\]/.test(library)) fail("library.js MEDIA_EXT must include m4b (audiobook folder)");
+  else if (!player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") ||
+           !player.includes("function chapsAllowed()") || !player.includes("async function ensureChapters()") ||
+           !player.includes("function renderChapters()") || !player.includes("function renderChaptersActive()") ||
+           !player.includes("function seekToChapter(t)") || !player.includes("function stepChapter(delta)") ||
+           !player.includes("function checkChapterSleep()") ||
+           !player.includes("api.extractChapters(s.file)") || !player.includes("sleepChapterEnd") ||
+           !player.includes("renderChaptersActive();") || !player.includes("checkChapterSleep();") ||
+           !player.includes('on("songSelected", () => { loadChapters(true); });') ||
+           !player.includes("chapBox.hidden = !chapsAllowed();") ||
+           (player.match(/mediaChapTitle:/g) || []).length !== 4 ||
+           (player.match(/mediaSleepChapter:/g) || []).length !== 4) fail("the media player must wire the 🔖 chapter panel, tick hooks, chapter sleep and four-language texts");
+  else if (!css.includes(".mediaChapBox{") || !css.includes(".mediaChapList{") || !css.includes(".chapLine{") || !css.includes(".chapLineActive")) fail("chapter panel styles are missing");
+  else ok("trk170: 🔖 M4B chapters (chpl, read-only) show in a jump-list panel, highlight the current chapter, and feed a \"sleep: end of chapter\" mode; m4b joins MEDIA_EXT");
 }
 
 // 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own
@@ -2568,7 +2597,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
   const offlineOk = !fi.includes("fetch(") && !fi.includes("import ") && !fi.includes("Worker(");
   const uiOk = html.includes('<script src="js/frame-interp.js"></script>') &&
     player.includes("const FI = window.TrkFrameInterp;") &&
-    player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, interpBox, loopBox, options, queuePanel, footer)") &&
+    player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") &&
     player.includes('FI.attach("media", stageCanvas)') && player.includes('FI.detach("media")') &&
     max.includes('window.TrkFrameInterp.attach("max", canvas)') && max.includes('window.TrkFrameInterp.detach("max")');
   const langOk = (fi.match(/mediaInterpTitle:/g) || []).length === 4 &&

@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-/* ローカル音源に埋め込まれたジャケット画像・歌詞・テキストタグを読む（通信・保存なし）。
+/* ローカル音源に埋め込まれたジャケット画像・歌詞・テキストタグ・チャプターを読む（通信・保存なし）。
    画像: ID3 APIC/PIC、MP4/M4A covr、FLAC picture、Ogg Vorbis/Opus picture comments。
    歌詞（trk166・読み取りだけ）: ID3 USLT/ULT・SYLT/SLT、MP4 ©lyr、FLAC/Ogg の LYRICS/UNSYNCEDLYRICS。
    タグ（trk167・読み取りだけ）: ID3 TIT2/TPE1/TALB/TPE2/TRCK/TCON、MP4 ©nam/©ART/©alb/aART/trkn/©gen、
      FLAC/Ogg の TITLE/ARTIST/ALBUM/ALBUMARTIST/TRACKNUMBER/TRACKTOTAL/GENRE。編集（書き戻し）はしない。
+   チャプター（trk170・読み取りだけ）: MP4 系の chpl（Nero 形式＝M4B の定番）。iTunes 方式のチャプタートラックは対象外。
    読み出すメタデータと画像サイズを制限し、サムネイルだけをメモリ上で作る。 */
 (() => {
 "use strict";
@@ -540,6 +541,55 @@ function findMp4Tags(data, start = 0, end = data.length, depth = 0, field = "") 
   }
   return out;
 }
+/* 🔖 M4B チャプター（trk170）：Nero 形式の chpl ボックス（ふつう moov→udta→chpl）。
+   形は FFmpeg の mov_read_chpl に合わせた：version(1)+flags(3)、version が 0 以外なら予約の 4 バイト、
+   個数(1)、項目＝[時刻(8バイト big-endian・100ナノ秒単位) + 名前の長さ(1バイト) + UTF-8 の名前]。
+   読み取りだけ。iTunes 方式のチャプタートラック（サンプルテーブルの解析が要る）は対象外。 */
+const MAX_CHAPTERS = 255;              /* 個数が 1 バイトなので、構造的な上限も 255 */
+function parseChplBox(data, payload, end) {
+  if (!textDecoder || end - payload < 6) return null;
+  let p = payload;
+  const version = data[p]; p += 4;                 /* version(1) + flags(3) */
+  if (version) p += 4;                             /* version!=0 のときの追加 4 バイト（FFmpeg で予約扱い） */
+  if (p >= end) return null;
+  const count = data[p]; p += 1;
+  if (!count || p >= end) return null;
+  const out = [];
+  for (let i = 0; i < count && i < MAX_CHAPTERS && p + 9 <= end; i++) {
+    const ts = u64be(data, p); p += 8;
+    const len = data[p]; p += 1;
+    if (p + len > end) break;
+    const text = len ? textDecoder.decode(data.subarray(p, p + len)).trim() : "";   /* 空の名前は項目ごと飛ばす（後続は生かす） */
+    p += len;
+    const t = ts / 10000000;                       /* 100ナノ秒 → 秒 */
+    if (text && Number.isFinite(t) && t >= 0 && t < 86400) out.push({ t, text: text.slice(0, MAX_TAG_TEXT) });
+  }
+  if (!out.length) return null;
+  out.sort((a, b) => a.t - b.t);
+  return out;
+}
+function findChpl(data, start = 0, end = data.length, depth = 0) {
+  if (depth > 10) return null;
+  let p = start, count = 0;
+  while (p + 8 <= end && count++ < 8192) {
+    const size32 = u32be(data, p), type = ascii(data, p + 4, 4);
+    let size = size32, header = 8;
+    if (size32 === 1) { if (p + 16 > end) break; size = u64be(data, p + 8); header = 16; }
+    else if (size32 === 0) size = end - p;
+    if (!Number.isSafeInteger(size) || size < header || p + size > end) break;
+    const payload = p + header, atomEnd = p + size;
+    if (type === "chpl") {
+      const found = parseChplBox(data, payload, atomEnd);
+      if (found) return found;
+    } else if (MP4_CONTAINERS.has(type)) {
+      const childStart = type === "meta" ? payload + 4 : payload; // full-box version/flags
+      if (childStart <= atomEnd) { const found = findChpl(data, childStart, atomEnd, depth + 1); if (found) return found; }
+    }
+    p = atomEnd;
+    if (size32 === 0) break;
+  }
+  return null;
+}
 async function extractMp4(file, mode = "art") {
   let offset = 0;
   for (let boxes = 0; boxes < 512 && offset + 8 <= file.size; boxes++) {
@@ -556,6 +606,7 @@ async function extractMp4(file, mode = "art") {
       if (!moov) return null;
       if (mode === "lyrics") return findMp4Lyrics(moov);
       if (mode === "tags") return normalizeTags(findMp4Tags(moov));
+      if (mode === "chapters") return findChpl(moov);   /* 🔖 trk170 */
       return findMp4Cover(moov);
     }
     if (size32 === 0) return null;
@@ -599,6 +650,16 @@ async function extractTags(file) {
     if (["m4a", "m4b", "mp4"].includes(ext)) return await extractMp4(file, "tags");
     if (ext === "flac") return await extractFlac(file, "tags");
     if (["ogg", "oga", "opus"].includes(ext)) return await extractOgg(file, parseCommentTagsPacket);
+  } catch (_) { return null; }
+  return null;
+}
+/* 🔖 チャプターを読む（trk170）。戻り値: [{ t:秒, text }]（時刻の昇順）か null。
+   対応は MP4 系の chpl（Nero 形式）だけ＝M4B オーディオブックの定番。読み取り専用。 */
+async function extractChapters(file) {
+  if (!file || !Number.isFinite(file.size) || file.size < 12) return null;
+  const ext = String(file.name || "").split(".").pop().toLowerCase();
+  try {
+    if (["m4b", "m4a", "mp4", "mov"].includes(ext)) return await extractMp4(file, "chapters");
   } catch (_) { return null; }
   return null;
 }
@@ -659,5 +720,5 @@ async function thumbnail(blob) {
 }
 window.Trk = window.Trk || {};
 window.Trk.media = window.Trk.media || {};
-window.Trk.media.audioArt = Object.freeze({ extract, extractLyrics, extractTags, thumbnail, limits:Object.freeze({ metadataBytes:MAX_TAG_BYTES, artBytes:MAX_ART_BYTES, edge:THUMB_EDGE, lyricsBytes:MAX_LYRICS_BYTES, tagText:MAX_TAG_TEXT }) });
+window.Trk.media.audioArt = Object.freeze({ extract, extractLyrics, extractTags, extractChapters, thumbnail, limits:Object.freeze({ metadataBytes:MAX_TAG_BYTES, artBytes:MAX_ART_BYTES, edge:THUMB_EDGE, lyricsBytes:MAX_LYRICS_BYTES, tagText:MAX_TAG_TEXT, chapters:MAX_CHAPTERS }) });
 })();

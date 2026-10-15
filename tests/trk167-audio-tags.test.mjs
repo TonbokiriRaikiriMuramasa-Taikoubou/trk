@@ -237,7 +237,7 @@ test("songDisplayTitle(): user setting beats tag beats catalog beat the file nam
 
 /* ---------- 配線（ソース走査） ---------- */
 test("wiring: read-only tag pipeline, lazy loading, display hooks, exports", () => {
-  assert.ok(artSrc.includes("extract, extractLyrics, extractTags, thumbnail"), "extractTags is exported");
+  assert.ok(artSrc.includes("extractTags,") && artSrc.includes("extractLyrics,"), "extractTags is exported");   /* ⚠ export 行の完全一致は trk170（extractChapters 追加）で割れるので名前だけで見る */
   assert.ok(artSrc.includes("tagText:MAX_TAG_TEXT"), "the tag text cap is in limits");
   assert.ok(artSrc.includes("ID3_TAG_FRAMES") && artSrc.includes("MP4_TAG_BOXES") && artSrc.includes("VORBIS_TAG_KEYS"), "all three tag vocabularies exist");
   assert.ok(!artSrc.includes("createWritable") && !librarySrc.includes("createWritable"), "no write-back path anywhere (tags are read-only)");

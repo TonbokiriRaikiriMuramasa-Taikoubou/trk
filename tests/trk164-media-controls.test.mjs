@@ -24,7 +24,7 @@ const fnPlanFade = grab(/function planSleepFade\(totalSeconds, fadeSeconds\) \{[
 const fnSavedPosition = grab(/function savedMediaPosition\(opts = \{\}\) \{[\s\S]*?\n\}/, "savedMediaPosition()");
 const fnStopSleep = grab(/function stopSleepTimer\(silent = true\) \{[\s\S]*?\n\}/, "stopSleepTimer()");
 const fnRestoreVolume = grab(/function restoreSleepFadeVolume\(\) \{[\s\S]*?\n\}/, "restoreSleepFadeVolume()");
-const fnSetSleep = grab(/function setSleep\(minutes\) \{[\s\S]*?\n\}/, "setSleep()");
+const fnSetSleep = grab(/(?:async )?function setSleep\(minutes\) \{[\s\S]*?\n\}/, "setSleep()");   /* trk170: setSleep は async（「チャプターの終わり」で await するため）。async 前置ごと抜き出す */
 const fnEnded = grab(/function endedMedia\(\) \{[\s\S]*?\n\}/, "endedMedia()");
 const fadeConst = grab(/const SLEEP_FADE_SECONDS = [^;]+;/, "SLEEP_FADE_SECONDS");
 
@@ -142,7 +142,7 @@ function sleepHarness(opts = {}) {
   };
   vm.createContext(sandbox);
   vm.runInContext(`
-let sleepTimer = 0, sleepUntil = 0, sleepTrackMode = false, sleepFadeArm = 0, sleepFadeTimer = 0, sleepFadeBase = 1;
+let sleepTimer = 0, sleepUntil = 0, sleepTrackMode = false, sleepChapterEnd = 0, sleepFadeArm = 0, sleepFadeTimer = 0, sleepFadeBase = 1;
 ${fadeConst}
 ${fnPlanFade}
 ${fnRestoreVolume}
@@ -228,7 +228,7 @@ test("the fade stays away while reverse playback owns the volume, and short time
 });
 
 /* ---------- 💤 endedMedia()：この曲の終わり ＞ リピート／シャッフル ---------- */
-function endedHarness({ track = false, repeat = "off", shuffle = false } = {}) {
+function endedHarness({ track = false, chapter = false, repeat = "off", shuffle = false } = {}) {
   const state = { paused: 0, cleared: 0, steps: 0, plays: 0, stopped: 0, toasts: [] };
   const sandbox = {
     mediaActive: () => true,
@@ -246,7 +246,7 @@ function endedHarness({ track = false, repeat = "off", shuffle = false } = {}) {
     console,
   };
   vm.createContext(sandbox);
-  vm.runInContext(`let sleepTrackMode = ${track};\n${fnEnded}\nwindow.__ended = endedMedia;`, sandbox,
+  vm.runInContext(`let sleepTrackMode = ${track}, sleepChapterEnd = ${chapter ? 60 : 0};\n${fnEnded}\nwindow.__ended = endedMedia;`, sandbox,
     { filename: "js/media-player-mode.js#ended" });
   return { state, ended: sandbox.window.__ended };
 }
@@ -277,6 +277,17 @@ test("without the track flag endedMedia() keeps the classic repeat/shuffle behav
   assert.equal(off.state.cleared, 1);
   assert.equal(off.state.steps, 0);
   assert.equal(off.state.paused, 0);
+});
+
+test("🔖 sleep “end of chapter” (trk170): the guard in endedMedia() outranks repeat/shuffle like the track flag", () => {
+  const h = endedHarness({ chapter: true, repeat: "one", shuffle: true });
+  h.ended();
+  assert.equal(h.state.paused, 1, "stops");
+  assert.equal(h.state.cleared, 1, "the resume position is cleared");
+  assert.equal(h.state.stopped, 1, "stopSleepTimer() runs");
+  assert.equal(h.state.steps, 0, "repeat/shuffle do not advance the queue");
+  assert.equal(h.state.plays, 0);
+  assert.deepEqual(h.state.toasts, ["mediaSleepDone"]);
 });
 
 /* ---------- 登録もれ防止：TEXT 4言語・core.js・sw.js・配線 ---------- */

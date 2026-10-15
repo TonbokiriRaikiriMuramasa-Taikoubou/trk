@@ -7,7 +7,7 @@
    文章は i18n.js にあります。 */
 "use strict";
 
-const MEDIA_EXT = ["mp4", "m4a", "mp3", "ogg", "oga", "opus", "wav", "webm", "flac", "aac", "mov", "mid", "midi"];
+const MEDIA_EXT = ["mp4", "m4a", "m4b", "mp3", "ogg", "oga", "opus", "wav", "webm", "flac", "aac", "mov", "mid", "midi"];   /* 🔖 m4b（オーディオブック）も曲として扱う（trk170） */
 const LIB_MAX = 3000, LIB_SHOW = 300, ADDED_MAX = 50, CHART_SUFFIX = ".shadow-taiko.json";
 const LIB_DEPTH = 8;                        /* 📤 共有は「一気に全部」が売りなので、フォルダの深さも広く歩く（旧 6） */
 const SHARED_MAX = 150;                     /* 💾 端末に残す共有の曲の上限（空き容量を守るため） */

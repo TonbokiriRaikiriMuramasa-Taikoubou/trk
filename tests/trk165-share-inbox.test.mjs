@@ -92,7 +92,7 @@ test("classifyInboundFile() routes by extension first, video MIME second, and re
   assert.equal(api.__classify("pack.stpack", ""), "pack");
   assert.equal(api.__classify("notes.txt", "text/plain"), "unsupported");
   assert.equal(api.__classify("weird.xyz", "audio/mpeg"), "unsupported", "audio MIME alone is refused honestly instead of being dropped silently");
-  assert.equal(api.__classify("book.m4b", "audio/mp4"), "unsupported", "m4b is not in MEDIA_EXT today (roadmap #10 territory)");
+  assert.equal(api.__classify("book.m4b", "audio/mp4"), "audio", "m4b joined MEDIA_EXT in trk170 (roadmap #10 shipped) — audiobooks are accepted as songs");
   assert.equal(api.__classify("", ""), "unsupported");
 });
 

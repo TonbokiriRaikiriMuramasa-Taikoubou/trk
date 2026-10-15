@@ -147,8 +147,9 @@
 
 ### 維持中の既存機能
 
-- **🎓 trk's OST Vol.1（`trk-ost-v1`）**：🐔 trk's playlist の Game Vol.1 直下。今は FIRST SPARK のデモ1曲を置く棚です。手続き生成曲は別の **trk Agent's OST Vol.1（`trk-agent-ost-v1`）** にmanifest経由で接続済み（下記）。trk112が最上位に作った本棚だけを一度trkフォルダへ移し（印は `cat: "trk:ost"`）、以後は利用者が動かした場所を守ります。
+- **🎓 trk's OST Vol.1（`trk-ost-v1`）**：🐔 trk's playlist の Game Vol.1 直下。FIRST SPARK のデモに加え、trk179 からオリジナル曲（1曲目 SUNRISE DASH）を置く棚です。新曲は manifest の未見キーだけ足し（`trkOstSeenKeys`）、利用者が外した曲は戻しません。手続き生成曲は別の **trk Agent's OST Vol.1（`trk-agent-ost-v1`）** にmanifest経由で接続済み（下記）。trk112が最上位に作った本棚だけを一度trkフォルダへ移し（印は `cat: "trk:ost"`）、以後は利用者が動かした場所を守ります。
 - **🎼 手続き作曲ツール／任意のAgent OST（trk113・trk149〜151）**：`node tools/make-trk-ost.mjs` で5ルール×2曲＝10曲のWAVスケッチと `assets/trk-ost/manifest.json` を生成（外部ライブラリなし・決定的）。アプリ側にはmanifest読込み・専用リスト作成・選択時の音源読込みを実装済みです。ただし音源とmanifestは `.gitignore` 対象で、公開リポジトリには入っていません。既定コードの `AGENT_OST_MANIFEST_INCLUDED=false` は任意資産をfetchしない印です。音源を意図的に含める配布／試験ビルドだけ true にし、生成したmanifest・WAVと一緒に配布します。10曲の実聴取・品質評価は未確認（§4-6）。
+- **🎵 OSTオリジナル曲の作曲パイプライン（trk179〜）**：`tools/ost-scores/<key>.json` に作曲（テンポ・形式・コード・全メロディ・編曲）→ `node tools/make-trk-song.mjs` で決定論的チップシンセ描画（WAVはGit外）＋ABC譜を生成 → `node tools/encode-ost-mp3.mjs` でMP3化 → `assets/optional-ost-audio/` に manifest と同梱。MP3は全てスコア付きが check-repo の検査条件。1曲目は SUNRISE DASH（150 BPM・32小節・intro-A-B-サビ-outro＋終止・約53秒・823 KiB）。YuE2 本体はこの環境で動かない（GPU＋HuggingFace要）ため自前パイプラインとし、ABC は将来 YuE2 の `abc=` へ渡せる形。
 - **消した自動リストは作り直さない（trk114）**：trk!が自動で作るリスト（IDが `trk-` で始まる Game Vol.1・Classic Vol.1・trk's OST Vol.1・Agent's OST Vol.1・カタログの各リスト）を消すと、`settings.trkRemoved` に印が残り、次の起動で作り直しません。設定「🐔 trk's playlist」の **♻ 消したtrkのリストを戻す（n件）**で印を外して作り直します（Game Vol.1／Classic Vol.1の「開く」ボタンもその1件の印を外す）。印は `trk-` で始まるIDだけ・200件までに検証し、全リセットで空に戻ります。
 - **入手先ガイドは表示言語で出す（trk114）**：公式カタログ由来のガイドは辞書キー（`plGuide…`）と日本語の控えを保存し、表示時に今の言語で引きます（LoL・Endfield・ブルアカ・学マス・Game／Classic Vol.1など21キー×4言語）。既存の保存データは起動時に自動で鍵が付きます。カタログ本体の各シリーズ説明文（`js/catalog.js` の `note`）はまだ日本語だけです。
 - **小さなアクセント文字の色（trk114）**：`--ui-accent-ink`（`js/data.js` の `accentInk`、`applySkin` が毎回設定）。設定画面の入れ子の欄（カード＋パネル＋小欄の重なり）でも4.5:1になるまで、アクセントを本文の色へ5%ずつ寄せます。足りているスキンは元の色のまま。44スキン中16スキンで色が少し変わりました（スキンの棚の見出し、リンク、記録表の選択行など13ルール＋fx.jsのリンク1箇所）。
@@ -299,14 +300,19 @@
 | Riot系カタログ（LoL・VALORANT・LoL関連ゲーム）のCreator-Safe照合状態 | `js/catalog.js`（`LOL_CREATOR_SAFE`・`VAL_CREATOR_SAFE`・`RIOT_GAMES_CREATOR_SAFE`）、`js/library.js`（`RIOT_GUIDE_KEYS`）、`tools/leagueoflegends-*-tracklist.json`（各リストの `creatorSafe`）、`tools/riot-games-creator-safe-playlist.json`（Riot Games Creator-Safe Playlistの記録）、`tools/valorant-creator-safe.json`、`docs/LEAGUE-OF-LEGENDS-MUSIC.md`、`docs/VALORANT-MUSIC.md` |
 | 利用者向けMIDI・権利案内 | `docs/guide/touhou-midi.md`、`docs/guide/sound.md`、`docs/guide/en.md` |
 | 🎼 Agent OSTの任意連携／生成 | `js/library.js`（`AGENT_OST_MANIFEST_INCLUDED`・`initAgentOstTracks`）、`tools/make-trk-ost.mjs`（10曲＋manifestを `assets/trk-ost/`・Git外へ生成）、`tools/e2e-trk149.mjs`、`tests/agent-ost.test.mjs` |
+| 🎵 trk's OST Vol.1 オリジナル曲 | `js/library.js`（`initTrkOstSongs`・`appendTrkOstSongs`・`materializeTrkOstSong`・`trkOstSeenKeys`）、`assets/optional-ost-audio/`（manifest＋MP3・任意同梱）、`tools/ost-scores/`（JSON作曲＋ABC）、`tools/make-trk-song.mjs`（描画）、`tools/encode-ost-mp3.mjs`（MP3化・lamejsはRepo外）、`tests/trk-ost-songs.test.mjs` |
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.15-trk178`） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.15-trk179`） |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
 
+- **trk179（2026-10-15・OST 1曲目 SUNRISE DASH）**
+  - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **518/518**）。`git diff --check` も成功。
+  - **作曲**：32小節の全メロディ＋コードをJSONに作曲し、決定論的シンセで描画（52.6秒・クリップ0・サビが最大のエネルギー勾配・無音穴なし・余韻は自然減衰を数値QA）。ABC 32小節と突き合わせ済み。
+  - **未完了**：実聴取での品質評価（この環境に音が出ない）、実ブラウザsmoke2件（Chromiumなし・§8の条件どおりレビュー側で確認）。実機確認は§4のまま。
 - **trk178レビュー対応（2026-10-15）**
   - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **513/513**）。`git diff --check` も成功。
   - **区切り文字**：復元確認の複数アドオン名が `", "` で区切られることを、確認ダイアログの実動テスト（2件のアドオン）で固定。
@@ -316,6 +322,10 @@
 
 ## 7. 最近の変更
 
+- **trk179（2026-10-15・OST 1曲目）**
+  - **SUNRISE DASH 作曲・同梱**：ゲーム音楽風オリジナル（150 BPM・Cメジャー・32小節・約53秒）。スコア（JSON＋ABC）を Git に入れ、決定論的シンセ描画→MP3（823 KiB）を `assets/optional-ost-audio/` に同梱。YuE2 は sandbox で動かないため「記号で作曲・音で創造」の自前パイプラインとし、ABC は将来 YuE2 の `abc=` へ渡せる形。
+  - **読み込み**：manifest 駆動の複数曲対応（`initTrkOstSongs`・選択時遅延読込・2 MiB上限・key/file 正規表現検証）。プレイリストへは未見キーだけ追加（`trkOstSeenKeys`・外した曲を復活させない・消したリストを作り直さない）。
+  - **`sw.js`（`trk-v2026.10.15-trk179`）を更新。ガイド（日英）・NOTICE・`.gitignore` を追補。**
 - **trk178（2026-10-15・1291209再レビュー追補）**
   - **復元確認のアドオン名の区切り**：`js/backup.js` の `addons.names.join("、")` を `join(", ")` に。英中韓でも「、」で区切られていた見た目の指摘。`js/share-inbox.js` の名前一覧と同じ区切りにそろえ、辞書は増やさない。確認ダイアログの区切りをテストで固定。
   - **変更時チェックリスト**：§8に実ブラウザのスモーク2件（`smoke-browser.mjs --compare`・`smoke-game-end.mjs`）の緑を**取り込みの条件**として追加。`sw.js`（`trk-v2026.10.15-trk178`）を更新。

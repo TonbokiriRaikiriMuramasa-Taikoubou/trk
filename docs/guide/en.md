@@ -29,7 +29,7 @@ On the first launch, a “Welcome to trk!” box appears once (rhythm game, musi
 
 Press **Skip** in the quick guide if you do not need the tutorial. To listen without starting a game, long-press the TV dock's **⏻ power** button and load your own music.
 
-The optional FIRST SPARK demo lives in `assets/optional-demo-audio/` (about 704 KiB; the MP3 is fetched only when selected). It ships **handmade Easy / Normal / Hard charts** (27 / 54 / 111 notes on the song's 128 BPM four-on-the-floor grid) as plain `shadow-taiko-chart` JSON, fetched only when that difficulty is used; MASTER and RUSH stay generated from the seed. For a lighter build, delete the **entire folder**; without its `manifest.json`, the demo entry and button stay hidden. Set `"charts": false` (or remove only the chart JSON files) to keep the audio with generated charts. This does not affect the media player or your own songs. If the audio was already cached, clear the site's data/service-worker cache to reclaim that stored copy.
+The optional FIRST SPARK demo lives in `assets/optional-demo-audio/` (about 704 KiB; the MP3 is fetched only when selected). It ships **handmade Easy / Normal / Hard charts** (27 / 54 / 111 notes on the song's 128 BPM four-on-the-floor grid) as plain `shadow-taiko-chart` JSON, fetched only when that difficulty is used; MASTER and RUSH stay generated from the seed. For a lighter build, delete the **entire folder**; without its `manifest.json`, the demo entry and button stay hidden. Set `"charts": false` (or remove only the chart JSON files) to keep the audio with generated charts. This does not affect the media player or your own songs. If the audio was already cached, clear the site's data/service-worker cache to reclaim that stored copy. The original songs of **trk's OST Vol.1** live in `assets/optional-ost-audio/` (track 01 SUNRISE DASH, about 823 KiB) and work the same way: delete the whole folder for a lighter build; each MP3 is fetched only when selected, with generated charts.
 
 The media player supports a play queue, next/previous track, repeat, shuffle, playback speed, resuming from the last position (optionally rewound 3–30 s so you never miss a word), a sleep timer (15 / 30 / 60 minutes with a 15-second fade-out, or stop at the end of the current track), 📌 picture-in-picture, 🔆 keeping the screen on while a video plays (Wake Lock; audio-only playback won't), and Media Session. Reverse playback (with audio reversed where the browser allows it) and A-B section looping are also available.
 
@@ -452,6 +452,7 @@ trk/
 ├─ css/style.css  css/study-room.css  … looks for the shelf, reader, and TV
 ├─ icons/                        … app icons
 ├─ assets/optional-demo-audio/   … optional First Spark demo audio + three handmade charts (the whole folder can be deleted in lightweight builds)
+├─ assets/optional-ost-audio/    … optional trk's OST Vol.1 original songs (manifest + MP3s; the whole folder can be deleted in lightweight builds)
 ├─ js/
 │  ├─ i18n.js  i18n-options.js   … text in four languages
 │  ├─ data.js                    … registration of skins, layouts, difficulties, and mascots

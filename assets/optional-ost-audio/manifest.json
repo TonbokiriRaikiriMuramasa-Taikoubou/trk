@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "enabled": true,
+  "_note": "trk's OST Vol.1 optional tracks. The game fetches this small file at startup and lazy-loads each MP3 when selected. Delete the whole folder for a lighter build. Every track keeps its committed score in tools/ost-scores/<key>.json + <key>.abc.",
+  "tracks": [
+    {
+      "key": "ost-01-sunrise-dash",
+      "file": "ost-01-sunrise-dash.mp3",
+      "title": "SUNRISE DASH",
+      "artist": "trk!",
+      "bpm": 150,
+      "offset": 0
+    }
+  ]
+}

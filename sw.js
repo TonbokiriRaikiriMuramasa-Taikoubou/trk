@@ -2,10 +2,16 @@
 /* trk! offline shell: network first, cached same-origin app files as a fallback.
    Exception: the hash-pinned vendor files (assets/vendor, tools/vendor-lock.json) are cache-first,
    but a cached copy is used only when its SHA-384 matches the pin below. */
-const CACHE = "trk-v2026.10.15-trk164";
+const CACHE = "trk-v2026.10.15-trk165";
 const CACHE_PREFIX = "trk-";
 const SCOPE = new URL(self.registration.scope);
 const VENDOR_PREFIX = "assets/vendor/";
+/* 📥 share_target（trk165）：OSの共有シートで受け取ったファイルの一時置き場。
+   名前が trk- 始まりでもバージョン別キャッシュではないので、activate の掃除から除外する（下記）。
+   中身は js/share-inbox.js が起動時に読んで、既存の取り込み経路へ渡したあと消す。 */
+const SHARE_CACHE = "trk-share-inbox-v1";
+const SHARE_PATH = new URL("share-target/", SCOPE).pathname;
+const SHARE_INBOX_PREFIX = new URL("share-inbox/", SCOPE).pathname;
 
 // BEGIN VENDOR PINS（tools/sw-vendor-pins.mjs が tools/vendor-lock.json から生成。手で編集しない）
 const VENDOR_PINS = {
@@ -119,7 +125,7 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE).map(key => caches.delete(key)));
+    await Promise.all(keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE && key !== SHARE_CACHE).map(key => caches.delete(key)));
     await self.clients.claim();
   })());
 });
@@ -154,8 +160,51 @@ async function pinnedMatches(response, rel) {
   }
 }
 
+/* 📥 share_target（trk165）：OSの共有シートはPOSTで届く（manifest.webmanifest の share_target）。
+   ファイルは CacheStorage（trk-share-inbox-v1）に一時保存し、303でアプリ本体へ戻す。
+   ページ側（js/share-inbox.js）が起動時に読んで、既存の取り込み経路（曲・CBZ・パック）へ渡す。
+   検証も上限もすべて既存経路側＝ここは新しい入口を作らない。ファイルは端末から出さない。
+   title/text/url のフィールドは無視する（trk! は外部リンクを取り込まない）。 */
+async function handleShareTarget(request) {
+  const home = new URL("index.html", SCOPE).href;
+  try {
+    const form = await request.formData();
+    const files = [];
+    for (const field of ["media", "packs", "books"]) {
+      for (const value of form.getAll(field)) {
+        /* FormData の値は文字列か File。File だけを拾う（instanceof は realm 差で外すことがあるので形で見分ける） */
+        if (value && typeof value === "object" && typeof value.name === "string" && typeof value.size === "number") files.push(value);
+      }
+    }
+    if (!files.length) return Response.redirect(`${home}?shared=empty`, 303);
+    const cache = await caches.open(SHARE_CACHE);
+    const stamp = Date.now();
+    let saved = 0, failed = 0;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      try {
+        const slot = new Request(new URL(`${SHARE_INBOX_PREFIX}${stamp}-${i}`, SCOPE).href);
+        await cache.put(slot, new Response(file, { headers: {
+          "Content-Type": file.type || "application/octet-stream",
+          "X-Share-Name": encodeURIComponent(file.name)   /* ファイル名はヘッダーで運ぶ（URLに載せると壊れるため） */
+        } }));
+        saved++;
+      } catch { failed++; }   /* 空き容量不足などは1件だけ失敗扱い（全体は止めない） */
+    }
+    return Response.redirect(`${home}?shared=${failed ? (saved ? "partial" : "error") : "1"}`, 303);
+  } catch {
+    return Response.redirect(`${home}?shared=error`, 303);
+  }
+}
+
 self.addEventListener("fetch", event => {
   const request = event.request;
+  /* 📥 share_target（trk165）：このパスへのPOSTだけ受け取る。ほかのPOSTは従来どおり関与しない */
+  if (request.method === "POST") {
+    const postUrl = new URL(request.url);
+    if (postUrl.origin === SCOPE.origin && postUrl.pathname === SHARE_PATH) event.respondWith(handleShareTarget(request));
+    return;
+  }
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);

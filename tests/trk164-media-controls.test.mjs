@@ -10,7 +10,6 @@ import { ROOT } from "./helpers/browser-data.mjs";
 
 const src = fs.readFileSync(`${ROOT}/js/media-player-mode.js`, "utf8");
 const coreSrc = fs.readFileSync(`${ROOT}/js/core.js`, "utf8");
-const swSrc = fs.readFileSync(`${ROOT}/sw.js`, "utf8");
 const count = (hay, needle) => hay.split(needle).length - 1;
 
 const grab = (pattern, label) => {
@@ -298,11 +297,11 @@ test("the new settings are sanitized and reset in core.js", () => {
   assert.equal(count(coreSrc, "settings.mediaWakeLock = true"), 2, "reset in resetVideoPrefs and resetAllPrefs");
 });
 
-test("player wiring: PiP button in the controls row, resume-aware seeks, exported helpers, cache bump", () => {
+test("player wiring: PiP button in the controls row, resume-aware seeks, exported helpers", () => {
   assert.ok(src.includes("controls.append(prev, playNode, next, reverseNode, maxNode, pipNode, wallNode, restart)"), "📌 sits between full screen and wallpaper");
   assert.equal(count(src, "savedMediaPosition({ resume: true })"), 2, "playSong() and openMedia() rewind on resume");
   assert.ok(src.includes("core.video.paused || core.video.ended"), "openMedia() only seeks while not playing");
   assert.ok(src.includes("resumeRewindSeconds, rewindResumePosition, planSleepFade, pipSupported, wakeLockSupported"), "pure helpers are exported for tests");
   assert.ok(src.includes("updateWakeLock();   /* 🔆 再生状態に合わせて取得／解放"), "the 250ms tick maintains the wake lock");
-  assert.ok(swSrc.includes("trk-v2026.10.15-trk164"), "service-worker cache is bumped");
+  /* sw.js の cache 版数はリリースごとに進むので、ここでは固定しない（check-repo.mjs が確認する） */
 });

@@ -885,7 +885,7 @@ window.syncNoteUI = syncNoteUI;
 window.updateMascotUI = updateMascotUI;
 /* 領域（window.Trk.custom）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
 window.Trk = window.Trk || {};
-window.Trk.custom = Object.assign(window.Trk.custom || {}, { initPacks, noteImage, packDB, packRuntime, packIdentityFromManifest, skinShelf, syncNoteUI, updateMascotUI });
+window.Trk.custom = Object.assign(window.Trk.custom || {}, { initPacks, noteImage, packDB, packRuntime, packIdentityFromManifest, skinShelf, syncNoteUI, updateMascotUI, installAndUse });
 Object.defineProperty(window.Trk.custom, "getPackSongs", { configurable:true, get:() => getPackSongs, set:v => { getPackSongs = v; } });
 Object.defineProperty(window.Trk.custom, "installPackFile", { configurable:true, get:() => installPackFile, set:v => { installPackFile = v; } });
 Object.defineProperty(window.Trk.custom, "renderPackList", { configurable:true, get:() => renderPackList, set:v => { renderPackList = v; } });

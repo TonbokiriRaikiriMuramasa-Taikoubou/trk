@@ -3161,6 +3161,7 @@ window.TrkStudyRoom = Object.freeze({
   close:studyCloseRoom,
   toggle:() => { if (studyRoomOpen) studyCloseRoom(); else studyOpenRoom(); },
   isOpen:() => studyRoomOpen,
+  importArchives:studyImportArchives,   /* 📥 OS共有（js/share-inbox.js）からも同じ検証経路へ合流させる（trk165） */
   refreshTV:studyRefreshTV,
   assignCover:studyAssignCurrentCover,
   sweepOrphans:studySweepOrphans,

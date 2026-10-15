@@ -2353,6 +2353,43 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else ok("trk164: media player 📌 PiP / 🔆 Wake Lock / ⏪ resume rewind / 💤 sleep (fade + end of track) are wired, in four languages");
 }
 
+// trk165: 📥 OSの共有／「このアプリで開く」（share_target＋file_handlers）の配線。
+// ファイルは必ず既存の取り込み経路（library／study-room／custom）へ合流する＝新しい検証入口を作らない。
+{
+  const html = read("index.html");
+  const sw = read("sw.js");
+  const share = read("js/share-inbox.js");
+  const library = read("js/library.js");
+  const study = read("js/study-room.js");
+  const custom = read("js/custom.js");
+  let manifestOk = false;
+  try {
+    const manifest = JSON.parse(read("manifest.webmanifest"));
+    manifestOk = !!manifest.share_target && manifest.share_target.method === "POST" &&
+      manifest.share_target.enctype === "multipart/form-data" &&
+      manifest.share_target.action === "./share-target/" &&
+      ((manifest.share_target.params || {}).files || []).map(f => f.name).join(",") === "media,packs,books" &&
+      Array.isArray(manifest.file_handlers) && manifest.file_handlers.length === 1 &&
+      manifest.file_handlers[0].launch_type === "single-client";
+  } catch (_) {}
+  const shareTag = '<script src="js/share-inbox.js"></script>';
+  /* ⚠ read("js/…") は別名正規化後の本文を返す（tools/lib/js-source.mjs）：
+     `window.Trk.library.addSongFiles(…)` は `addSongFiles(…)` のように見える。期待文字列は正規化後の綴りで書く */
+  if (!manifestOk) fail("manifest share_target / file_handlers (trk165) are missing or malformed");
+  else if (!html.includes(shareTag) || html.indexOf(shareTag) < html.indexOf('<script src="js/backup.js"></script>')) fail("js/share-inbox.js must load after js/backup.js (all import entry points ready)");
+  else if (!sw.includes("async function handleShareTarget(request)") || !sw.includes('const SHARE_CACHE = "trk-share-inbox-v1"') ||
+           !sw.includes("key !== SHARE_CACHE") || !sw.includes('if (request.method === "POST")') ||
+           !sw.includes('new URL("share-target/", SCOPE).pathname')) fail("sw.js share-target POST handling / inbox-cache whitelist is missing");
+  else if (!share.includes("async function routeInboundFiles(files)") || !share.includes("addSongFiles(groups.audio)") ||
+           !share.includes("addVideoFiles(groups.video)") || !share.includes("importArchives(groups.book)") ||
+           !share.includes("installAndUse(file)") || !share.includes('window.launchQueue.setConsumer') && !share.includes('"launchQueue" in window') ||
+           (share.match(/shareInboundNone:"/g) || []).length < 4 || (share.match(/shareInboundUnsupported:"/g) || []).length < 4) fail("share-inbox.js routing (existing paths only), launchQueue consumer or 4-language strings are missing");
+  else if (!library.includes("LIB_SHOW, MEDIA_EXT, VIDEO_EXT, addSongFiles") ||
+           !study.includes("importArchives:studyImportArchives") ||
+           !custom.includes("updateMascotUI, installAndUse")) fail("import entry points are not exported for the share inbox (library / study / custom)");
+  else ok("trk165: 📥 share_target + file_handlers merge into the existing import paths (no new validation entry), in four languages");
+}
+
 // 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own
 // "don't sway" option, plus the ❓ mystery switch that outranks both.
 {

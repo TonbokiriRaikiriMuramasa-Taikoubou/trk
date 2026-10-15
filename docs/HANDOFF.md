@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-15（trk164）**。現在の仕様・守る条件・未確認事項の要約です。過去の変更履歴（trk154以前）と検証記録（trk158以前）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-15（trk165）**。現在の仕様・守る条件・未確認事項の要約です。過去の変更履歴（trk154以前）と検証記録（trk158以前）は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検。
 
@@ -168,6 +168,7 @@
 | 14 | 曲名照合・ミカ音源／映像（trk155〜159） | Node/VM・合成WAVのヘッドレス検査済み。実曲・実動画・実機は未確認 | 実ファイルで照合・再生、配信ページの地域差を確認（購入・抽出を自動実行しない） |
 | 15 | ZIP作り手の互換性（trk163：Info-ZIP標準入力出力の受理、`flags`完全一致） | 実Info-ZIP 3.0出力（store・deflate・パイプ）とレビューでのPython zipfileはNode検査済み。Windowsのエクスプローラー／macOSの圧縮／スマホアプリのCBZは実機未確認 | 各で作ったCBZを実機で一度ずつ書斎に取り込んでみる。読めないCBZが出たら `flags` の食い違いを疑い、緩めるなら暗号化ビット（bit0）＋圧縮方式だけの比較にする（現時点では緩めていない） |
 | 16 | ▶ メディアプレーヤーの新機能（trk164：📌画中画・🔆Wake Lock・⏪スマート巻き戻し・💤スリープのフェードアウト＋この曲の終わり） | 純関数の決定（巻き戻しの計算・フェード計画・endedMediaの優先順・タイマーの掃除）はNode/VM検査済み。実機挙動は未確認 | Android Chrome／PCで📌画中画の継続と復帰、🔆動画再生中に画面が消えないこと（音声だけ・タブ裏では消えること）、⏪続き再生の戻し幅が実際的な不快感にならないか、💤フェード後に音量が戻った状態で次の再生が始まるかを確認。iOSはPiP／Wake Lockの対応差（SafariのPiPはvideo要素のみ可など）を見て非対応時のボタン無効＋案内が出ればよい |
+| 17 | 📥 OSの共有／「このアプリで開く」（trk165：share_target＋file_handlers） | 振り分け・SWの一時保存・manifestの整合はNode/VM検査済み。**インストール済みPWAが前提**なので実機は未確認 | Android Chromeで共有シート→trk!（曲・動画・CBZ/ZIP・.stpack・pack.json入りZIP）、デスクトップで「このアプリで開く」を確認。非対応形式の案内、複数ファイル、容量超過時の案内（?shared=partial/error）、アプリ更新をまたいで受け取りが残ること（inboxはactivateの掃除から除外）も。iOS Safariは非対応＝何も出ないのが仕様 |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -205,6 +206,8 @@
    - **💤 フェード後に音量が戻った状態で次の再生が始まるか**：分数スリープのフェードアウトで停止したあと、次に再生したときに音量が絞られたままになっていないこと。「この曲の終わり」で、リピート／シャッフルより優先して停止することも。
    - **iOS**：PiP／Wake Lockは**非対応時にボタンが無効＋案内（タイトル）が出ればOK**（動作の確認までは求めない。SafariのPiPは対応していれば動く、くらいで見る）。
 
+17. **📥 OSの共有／「このアプリで開く」（trk165で実機で見てほしいこと）**：**インストール済みPWA**（「ホーム画面に追加」／デスクトップの「インストール」）が前提のため、ヘッドレスでは一切確認できない。見てほしいこと：①Android Chrome の共有シートに trk! が出ること（曲 mp3 等・動画・CBZ／ZIP・.stpack を1つずつ共有して、それぞれ既存の取り込みと同じ案内・検証で入ること。pack.json を含む .zip がパックとして入ること＝画像ZIPは書斎へ）。②デスクトップ（Chrome／Edge）でファイルを右クリック→「このアプリで開く」に trk! が出ること。③受け取れない形式（.txt など）を「📥 受け取れないファイル：名前」で知らせること。④複数ファイルの同時共有、空き容量不足（?shared=partial／error の案内）。⑤アプリの更新（SWのactivate）をまたいで一時置き場（trk-share-inbox-v1）が消えず、次の起動で取り込まれること。⑥起動中に共有されたとき（single-client の launchQueue 経路）。**iOS Safari は share_target／file_handlers 非対応＝共有シートに trk! が出ないのが仕様**（Capacitor ビルドで必要になったら別対応。PLAYER-ROADMAP #5 の記録どおり）。
+
 ### 4.2 一回限りの移行・印（削除予定）
 
 一覧と削除予定日は **[`docs/MIGRATIONS.md`](MIGRATIONS.md)** にあります（trk143 で登録簿にした）。
@@ -224,6 +227,7 @@
 | 設定・Import検証 | `js/core.js`、`tools/check-security.mjs` |
 | 共有プレイリスト（📥）の取り込み・曲名照合 | `js/library.js`（`plImportPick`・`PLAYLIST_IMPORT_MAX`・`plMatchIndex`・`plMatchByTitle`）、`js/title-match.js`、`tests/playlist-import.test.mjs` |
 | 🐔の並べ替え（↕） | `js/library.js`（`trkMovePlaylist`・`trkMoveButtonsState`・`trkOrderedPlaylists`）、`tests/trk-move-order.test.mjs` |
+| 📥 OSの共有／「このアプリで開く」の受け口 | `js/share-inbox.js`（振り分け）、`sw.js`（`handleShareTarget`・inboxキャッシュ）、`manifest.webmanifest`（share_target／file_handlers）、`tests/trk165-share-inbox.test.mjs` |
 | 📦パックを外したときの復元 | `js/custom.js`（`packSnapshot`・`packRebase`・`packApplied`・`packRestoreSettings`・`restoreOwnSounds`）、`js/core.js`（`cleanPackPrev`・`settings.packPrev`）、`tests/pack-unapply.test.mjs` |
 | MIDI/MIXとカタログの検査 | `tests/midi-player.test.mjs`、`tests/media-midi-integration.test.mjs`、`tests/midi-mix.test.mjs`、`tests/touhou-catalog.test.mjs` |
 | MIDIの処理量の測定（手元のファイル用） | `tools/midi-budget.mjs`（`estimateRender` を使う。読むだけ） |
@@ -252,6 +256,8 @@
 過去の検証件数・個別E2E・旧ブラウザ環境の回避手順は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) の「trk158整理時に移した検証記録」へ移しました。上記が現在の結果です。利用者の実機確認済み事項と残る確認項目は§4を正とします。
 
 ## 7. 最近の変更
+
+- **trk165（2026-10-15）**：📥 OSの共有／「このアプリで開く」の受け口（PLAYER-ROADMAP #5＝🥈最優先）。①**share_target**（manifest.webmanifest）：共有シートからのPOSTを `sw.js` の `handleShareTarget` が受け、ファイルだけ（title/text/urlは無視）を CacheStorage `trk-share-inbox-v1` に一時保存して `index.html?shared=…` へ303で戻す。一時保存は1件ずつ try/catch（容量不足等は partial/error で合図）。**inboxキャッシュは activate のバージョン掃除から除外**（更新をまたいで受け取りが消えない）。②**file_handlers**（デスクトップ）：`launchQueue.setConsumer` で File を直接受け取り、同じ振り分けへ（single-client＝起動中でも届く）。③**js/share-inbox.js**（新規・backup.js の後ろで読込）：起動時（load後）に inbox を読んで File に戻し、**既存の取り込み経路だけ**へ渡す＝曲→`Trk.library.addSongFiles`／動画→`addVideoFiles`（拡張子表 MEDIA_EXT・VIDEO_EXT を library から公開）／CBZ・ZIP→`Trk.study.importArchives`（書斎の凍結APIに追加）／.stpack と **pack.json を含む ZIP**→`Trk.custom.installAndUse`（パックインストーラの入口そのまま。ZIPの判定は `/(^|\/)pack\.json$/` の存在だけを見る振り分け専用ののぞき見で、検証は既存のインストーラが行う）。**新しい検証入口は作っていない**（上限・形式検査はすべて既存経路）。受け取れない形式は「📥 受け取れないファイル：名前（先頭3件＋件数）」で案内（4言語。core.js の Import 報告と同じ作法）。処理後に inbox は削除（再処理ループ防止）、`?shared=` は history.replaceState で掃除。④テスト `tests/trk165-share-inbox.test.mjs`（10件）：実ソースvm抽出で振り分け（拡張子優先・動画MIME・音声MIME単独は正直に拒否・m4bは現行 MEDIA_EXT に無いので非対応扱い＝ROADMAP #10 領域）、pack.json のぞき見（壊れたZIPは書斎側へ）、ルーティング先、SWの一時保存とリダイレクト合図（empty/partial/error）、ページの引き取り（prefix外は触らない・壊れたX-Share-Nameの名前フォールバック・全件削除）、manifest整合、配線。⑤`tools/check-repo.mjs` に見張り追加（manifest・スクリプト順・SW分岐・公開API・4言語）。日英ガイド（mobile.md／en.md「スマホで遊ぶ」）・この引継ぎ（§4-17・§4.1-17・§5）・PLAYER-ROADMAP #5 を更新し、`sw.js` cacheを`trk-v2026.10.15-trk165`へ。**実機確認はインストール済みPWAが前提のため§4-17に登録（ヘッドレス不可）。iOS Safariは非対応＝仕様**（Capacitor側は別対応）。
 
 - **trk164（2026-10-15）**：▶ メディアプレーヤーの強化第1弾。`docs/PLAYER-ROADMAP.md`（ユニバーサルプレーヤー調査の台帳）の🥇最優先4項目（#1〜#4）を実装。①**📌画中画（PiP）**：コントロール列の「全画面で表示」の右にボタンを追加。`document.pictureInPictureEnabled`＋`requestPictureInPicture` の実在だけを見て、非対応ブラウザでは無効化＋タイトルで理由を表示（案内は4言語）。enter/leaveイベントで表示状態を追従させ、プレーヤーを閉じるときは `exitPictureInPicture()` で浮き窓を一緒に終える。②**🔆 Screen Wake Lock**：「動画の再生中」だけ取得する（`hasVideoFrames()` があり、再生中で、タブが表で、設定オンのとき）。音声だけの再生では画面消灯を妨げない。renderMedia の250ms周期と visibilitychange 復帰で取得／解放を監視し、ブラウザ側解放（releaseイベント）にも追従、closeMedia で即解放。設定は 🎬 動画キー／壁紙パネルの隣に「🔆 画面を消灯させない」パネルを追加（`mediaWakeLock`、既定オン＝`!== false` 方式）。③**⏪スマート巻き戻し**：`mediaResumeRewind`（0/3/5/10/15/30秒、既定オフ＝プロジェクトのオプトイン慣習）。「続きから再生」の入口（プレーヤーを開いたとき・キューから曲を選んだとき）だけ保存位置からN秒戻す（`savedMediaPosition({resume:true})`）。一時停止からの再開では戻さない。あわせて openMedia の続き位置シークを「止まっている／終わっているときだけ」に変更（再生中の飛び防止）。④**💤スリープタイマー強化**：分数（15/30/60分）に「この曲の終わり」モードを追加（selectの `track` → `setSleep(-1)` → `sleepTrackMode`）。曲終わりで endedMedia がリピート／シャッフルより優先して、続き位置を消して停止する（手で別の曲を選ぶと解除）。分数モードは停止15秒前から音量をフェードアウト（`planSleepFade` が「フェードがタイマーに入りきるか」を判定。逆再生中は逆再生側の音量管理を尊重して触らない）、停止・解除時は設定音量へ戻す。設定登録は core.js サニタイザー（`mediaResumeRewind: pick(...)`・`mediaWakeLock: !== false`）＋ resetVideoPrefs／resetAllPrefs の両リセット。テストは `tests/trk164-media-controls.test.mjs`（13件）：実ソースから純関数（巻き戻しの計算・フェード計画・savedMediaPosition のガード・setSleep／stopSleepTimer のタイマー掃除・endedMedia の優先順）を vm で切り出して検証＋TEXT 4言語・core.js 登録・配線のsource-scan。新TEXTキー11個×4言語、日英ガイド（play.md／en.md）を更新し、`sw.js` cacheを`trk-v2026.10.15-trk164`へ。実機確認は§4-16に登録。
 

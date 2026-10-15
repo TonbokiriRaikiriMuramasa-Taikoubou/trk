@@ -2160,7 +2160,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
 
 // 🎵 trk's OST Vol.1 optional songs: manifest-driven MP3 tracks with committed scores, lazy-loaded like the demo.
 {
-  const library = read("js/library.js"), notice = read("NOTICE.md"), ignore = read(".gitignore");
+  const library = read("js/library.js"), notice = read("NOTICE.md"), ignore = read(".gitignore"), readmeRoot = read("README.md");
   const ostDir = path.join(root, "assets/optional-ost-audio");
   const ostReadme = fs.existsSync(path.join(ostDir, "README.md")) ? read("assets/optional-ost-audio/README.md").replace(/\r/g, "") : "";
   let optionalOstOk = !fs.existsSync(ostDir);
@@ -2187,6 +2187,8 @@ if (!read("js/main.js").includes("guideEggKind") ||
     library.includes("void initTrkOstSongs()") &&
     library.includes("async function materializeTrkOstSong(it)") &&
     library.includes("trkOstSeenKeys") &&
+    readmeRoot.includes("assets/optional-ost-audio/") &&
+    readmeRoot.includes("assets/optional-demo-audio/") &&
     notice.includes("assets/optional-ost-audio/") &&
     ignore.includes("!assets/optional-ost-audio/ost-01-sunrise-dash.mp3");
   if (!wired) fail("the optional OST song folder, lazy-load path, unseen-only playlist append, renderer, rights note, or score pairing is missing");

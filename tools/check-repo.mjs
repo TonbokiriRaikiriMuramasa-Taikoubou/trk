@@ -2448,7 +2448,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
            !lyrics.includes("window.Trk.lyrics = Object.freeze({")) fail("lyrics.js parser / manual store / resolution chain is missing");
   else if (!library.includes('it.lyricsFile = lyrics[it.dir + "/" + it.base] || null') || !library.includes('n.endsWith(".lrc")')) fail("the folder scan must attach same-named .lrc files to songs");
   else if (!core.includes("mediaLyricsOpen: prefs.mediaLyricsOpen === true") || (core.match(/settings\.mediaLyricsOpen = false/g) || []).length < 2) fail("mediaLyricsOpen setting (and its two reset paths) is missing in core.js");
-  else if (!player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") ||
+  else if (!player.includes("body.append(display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") ||
            !player.includes("renderLyrics();   /* 🎤") || !player.includes('lyricsFileNode.accept = ".lrc,.txt,text/plain"') ||
            !player.includes("on(\"songSelected\", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics();") ||   /* core. は正規化で外れる。末尾は trk169 で loadSubs が増えたので閉じ括弧まで固定しない */
            !player.includes("api.saveManualLyrics(song.key, r.text, file.name)") ||
@@ -2534,7 +2534,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else if (!library.includes('} else if (lower.endsWith(".srt") || lower.endsWith(".vtt")) {') ||
            !library.includes('it.subsFile = subs[it.dir + "/" + it.base] || null') ||
            !library.includes('n.endsWith(".srt") || n.endsWith(".vtt")')) fail("library.js must pick up folder sidecar .srt/.vtt into it.subsFile");
-  else if (!player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") ||
+  else if (!player.includes("body.append(display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") ||
            !player.includes("stageWrap.append(stageCanvas, subsOverlay, stageNote)") ||
            !player.includes("renderSubsOverlay();") ||
            !player.includes("on(\"songSelected\", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics(); loadSubs(true); });") ||
@@ -2564,7 +2564,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
       !art.includes("chapters:MAX_CHAPTERS") || !art.includes('mode === "chapters"') ||
       art.includes("createWritable") || art.includes("fetch(")) fail("audio-art.js chpl chapter reader/export is missing (or grew a write/network path)");
   else if (!/const MEDIA_EXT = \[[^\]]*"m4b"[^\]]*\]/.test(library)) fail("library.js MEDIA_EXT must include m4b (audiobook folder)");
-  else if (!player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") ||
+  else if (!player.includes("body.append(display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") ||
            !player.includes("function chapsAllowed()") || !player.includes("async function ensureChapters()") ||
            !player.includes("function renderChapters()") || !player.includes("function renderChaptersActive()") ||
            !player.includes("function seekToChapter(t)") || !player.includes("function stepChapter(delta)") ||
@@ -2794,7 +2794,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
   const offlineOk = !fi.includes("fetch(") && !fi.includes("import ") && !fi.includes("Worker(");
   const uiOk = html.includes('<script src="js/frame-interp.js"></script>') &&
     player.includes("const FI = window.TrkFrameInterp;") &&
-    player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") &&
+    player.includes("body.append(display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") &&
     player.includes('FI.attach("media", stageCanvas)') && player.includes('FI.detach("media")') &&
     max.includes('window.TrkFrameInterp.attach("max", canvas)') && max.includes('window.TrkFrameInterp.detach("max")');
   const langOk = (fi.match(/mediaInterpTitle:/g) || []).length === 4 &&

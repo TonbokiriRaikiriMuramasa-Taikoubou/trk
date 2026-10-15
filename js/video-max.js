@@ -20,7 +20,7 @@ Object.assign(TEXT.ja, {
   videoMaxPlay: "▶ 再生", videoMaxPause: "⏸ 一時停止",
   videoMaxFull: "⛶ ブラウザーの全画面", videoMaxExitFull: "⛶ ブラウザーの全画面を終了",
   videoMaxNoVideo: "まだ動画がありません。曲を選ぶと、ここに全画面で映します。",
-  videoMaxHint: "動画をクリック：再生／一時停止　←→：10秒　⛶：ブラウザーの全画面　ESC か ✕ で閉じます"
+  videoMaxHint: "左右を長押し：巻き戻し／早送り（徐々に加速）　動画をクリック：再生／一時停止　←→：10秒　⛶：ブラウザーの全画面　ESC か ✕ で閉じます"
 });
 Object.assign(TEXT.en, {
   videoMaxTitle: "🖥 Full-screen video",
@@ -29,7 +29,7 @@ Object.assign(TEXT.en, {
   videoMaxPlay: "▶ Play", videoMaxPause: "⏸ Pause",
   videoMaxFull: "⛶ Browser full screen", videoMaxExitFull: "⛶ Exit browser full screen",
   videoMaxNoVideo: "No video yet. Pick a song and it plays here full screen.",
-  videoMaxHint: "Click the video: play / pause · ←→: 10 s · ⛶: browser full screen · ESC or ✕ closes"
+  videoMaxHint: "Hold left / right: rewind / forward (accelerates) · Click the video: play / pause · ←→: 10 s · ⛶: browser full screen · ESC or ✕ closes"
 });
 Object.assign(TEXT.zh, {
   videoMaxTitle: "🖥 视频全屏显示",
@@ -38,7 +38,7 @@ Object.assign(TEXT.zh, {
   videoMaxPlay: "▶ 播放", videoMaxPause: "⏸ 暂停",
   videoMaxFull: "⛶ 浏览器全屏", videoMaxExitFull: "⛶ 退出浏览器全屏",
   videoMaxNoVideo: "还没有视频。选择歌曲后会在这里全屏播放。",
-  videoMaxHint: "点击视频：播放／暂停　←→：10秒　⛶：浏览器全屏　按 ESC 或 ✕ 关闭"
+  videoMaxHint: "长按左侧／右侧：快退／快进（逐渐加速）　点击视频：播放／暂停　←→：10秒　⛶：浏览器全屏　按 ESC 或 ✕ 关闭"
 });
 Object.assign(TEXT.ko, {
   videoMaxTitle: "🖥 영상 전체 화면",
@@ -47,7 +47,7 @@ Object.assign(TEXT.ko, {
   videoMaxPlay: "▶ 재생", videoMaxPause: "⏸ 일시정지",
   videoMaxFull: "⛶ 브라우저 전체 화면", videoMaxExitFull: "⛶ 브라우저 전체 화면 끝내기",
   videoMaxNoVideo: "아직 영상이 없습니다. 곡을 고르면 여기 전체 화면으로 보여 줍니다.",
-  videoMaxHint: "영상을 클릭: 재생／일시정지　←→: 10초　⛶: 브라우저 전체 화면　ESC 또는 ✕ 로 닫습니다"
+  videoMaxHint: "왼쪽／오른쪽 길게 누르기: 되감기／빨리 감기 (점점 가속)　영상을 클릭: 재생／일시정지　←→: 10초　⛶: 브라우저 전체 화면　ESC 또는 ✕ 로 닫습니다"
 });
 
 const videoEl = document.getElementById("video");
@@ -55,7 +55,7 @@ if (!videoEl) return;
 
 let root = null, canvas = null, ctx = null, stage = null;
 let topBar = null, titleNode = null, playNode = null, fsNode = null, closeNode = null;
-let noteNode = null, hintNode = null;
+let noteNode = null, hintNode = null, seekNode = null;
 let subsNode = null;   /* 💬 字幕オーバーレイ（trk169・映像は canvas 描画なので字幕は DOM で重ねる） */
 let raf = 0, isOn = false, playedByUs = false, idleTimer = 0;
 const watchers = new Set();
@@ -107,6 +107,48 @@ function seekBy(delta) {
     if (!Number.isFinite(videoEl.duration)) return;
     videoEl.currentTime = Math.max(0, Math.min(videoEl.duration, (videoEl.currentTime || 0) + delta));
   } catch (_) {}
+}
+/* 長押しは再生倍率を変えず、450ms後から250msごとにシークする。
+   pointerを一つだけ所有し、中断後の合成clickも再生/閉じるへ流さない。 */
+let holdPointer = null, holdStartX = 0, holdStartY = 0, holdDirection = 0;
+let holdTimer = 0, holdTicks = 0, suppressHoldClick = false;
+function holdSeekStep(ticks) {
+  return Math.min(20, 2 + Math.floor(Math.max(0, ticks) / 8) * 2);
+}
+function stopHoldSeek() {
+  clearTimeout(holdTimer); holdTimer = 0;
+  holdPointer = null;
+  if (seekNode) seekNode.hidden = true;
+}
+function tickHoldSeek() {
+  if (!isOn || holdPointer === null || document.hidden) { stopHoldSeek(); return; }
+  suppressHoldClick = true;
+  const seconds = holdSeekStep(holdTicks++);
+  seekBy(holdDirection * seconds);
+  playedByUs = false;
+  if (seekNode) { seekNode.hidden = false; seekNode.textContent = `${holdDirection < 0 ? "⏪ −" : "⏩ +"}${seconds}s`; }
+  pokeChrome();
+  holdTimer = setTimeout(tickHoldSeek, 250);
+}
+function startHoldSeek(e) {
+  if (!isOn) return;
+  if (holdPointer !== null) { stopHoldSeek(); suppressHoldClick = true; return; }
+  suppressHoldClick = false;
+  if (e.isPrimary === false || (e.button != null && e.button !== 0) || !Number.isFinite(videoEl.duration) || videoEl.duration <= 0) return;
+  const rect = stage.getBoundingClientRect();
+  holdPointer = e.pointerId; holdStartX = e.clientX; holdStartY = e.clientY;
+  holdDirection = e.clientX < rect.left + rect.width / 2 ? -1 : 1;
+  holdTicks = 0;
+  holdTimer = setTimeout(tickHoldSeek, 450);
+}
+function moveHoldSeek(e) {
+  if (e.pointerId !== holdPointer) return;
+  if (Math.hypot(e.clientX - holdStartX, e.clientY - holdStartY) > 24) {
+    suppressHoldClick = true; stopHoldSeek();
+  }
+}
+function endHoldSeek(e) {
+  if (e.pointerId === holdPointer) stopHoldSeek();
 }
 function pokeChrome() {
   if (!root) return;
@@ -187,6 +229,7 @@ function openMax() {
 function closeMax() {
   if (!isOn) return;
   isOn = false;
+  stopHoldSeek();
   if (window.TrkFrameInterp) { try { window.TrkFrameInterp.detach("max"); } catch (_) {} }
   stopLoop();
   clearTimeout(idleTimer);
@@ -227,7 +270,9 @@ function build() {
   canvas = document.createElement("canvas"); canvas.className = "videoMaxCanvas";
   noteNode = core.el("p", "videoMaxNote hint", tr("videoMaxNoVideo")); noteNode.dataset.i18n = "videoMaxNoVideo";
   subsNode = core.el("div", "videoMaxSubs"); subsNode.hidden = true;   /* 💬 クリックは通す（pointer-events:none） */
+  seekNode = core.el("div", "videoMaxSeek"); seekNode.hidden = true;
   stage.append(canvas, subsNode, noteNode);
+  stage.append(seekNode);
 
   hintNode = core.el("p", "videoMaxHint hint", tr("videoMaxHint")); hintNode.dataset.i18n = "videoMaxHint";
 
@@ -235,6 +280,22 @@ function build() {
   document.body.append(root);
 
   ctx = canvas.getContext("2d");
+  stage.addEventListener("pointerdown", startHoldSeek);
+  stage.addEventListener("pointermove", moveHoldSeek);
+  stage.addEventListener("pointerleave", () => { if (holdPointer !== null) { suppressHoldClick = true; stopHoldSeek(); } });
+  stage.addEventListener("contextmenu", e => e.preventDefault());
+  stage.addEventListener("click", e => {
+    if (!suppressHoldClick || e.detail === 0) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+  }, true);
+  addEventListener("pointerup", endHoldSeek);
+  addEventListener("pointercancel", e => {
+    if (e.pointerId === holdPointer) { suppressHoldClick = true; stopHoldSeek(); }
+  });
+  addEventListener("blur", stopHoldSeek);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) stopHoldSeek(); });
+  videoEl.addEventListener("emptied", stopHoldSeek);
+  videoEl.addEventListener("loadstart", stopHoldSeek);
   canvas.addEventListener("click", togglePlay);
   stage.addEventListener("click", e => {
     /* 動画の外側（黒いところ）をクリックしたら閉じる。動画が無いときは画面のどこでも閉じる */
@@ -264,6 +325,7 @@ addEventListener("keydown", e => {
 }, true);
 
 /* ゲームが始まったら閉じる（判定や記録には影響しない） */
+on("songSelected", stopHoldSeek);
 on("phase", p => { if (p === "playing" && isOn) closeMax(); });
 on("language", () => { if (isOn || root) applyTexts(); });
 

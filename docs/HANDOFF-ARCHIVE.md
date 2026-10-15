@@ -1,6 +1,6 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移した過去の変更履歴・検証記録です（trk183以前を収録）。各記録は当時の状態であり、古いテスト件数やブラウザ用スタブの手順を現在の結果・推奨手順として扱わないでください。現在の仕様・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。最新の変更は同ファイルの「最近の変更」に要点を記し、詳細な履歴は本書に保管します。
+> `docs/HANDOFF.md` から移した過去の変更履歴・検証記録です（trk189までの詳細記録を収録）。各記録は当時の状態であり、古いテスト件数やブラウザ用スタブの手順を現在の結果・推奨手順として扱わないでください。現在の仕様・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。最新の変更は同ファイルの「最近の変更」に要点を記し、詳細な履歴は本書に保管します。
 
 ## trk114〜118 の検証記録（trk118のマージ前に HANDOFF §6 から移動）
 
@@ -446,3 +446,61 @@
 - **trk178（2026-10-15・1291209再レビュー追補）**
   - **復元確認のアドオン名の区切り**：`js/backup.js` の `addons.names.join("、")` を `join(", ")` に。英中韓でも「、」で区切られていた見た目の指摘。`js/share-inbox.js` の名前一覧と同じ区切りにそろえ、辞書は増やさない。確認ダイアログの区切りをテストで固定。
   - **変更時チェックリスト**：§8に実ブラウザのスモーク2件（`smoke-browser.mjs --compare`・`smoke-game-end.mjs`）の緑を**取り込みの条件**として追加。`sw.js`（`trk-v2026.10.15-trk178`）を更新。
+
+
+## trk184〜189 の詳細記録（2026-10-16に整理）
+
+> 以下は作業途中の記録です。「未着手」「ブラウザ不足」「Release未作成」などの状態はその後更新されています。最新の結果はHANDOFF §6を参照してください。
+
+### 当時の検証記録
+
+- **trk189（2026-10-16・PR #69の低優先度指摘を整理）**
+  - **旧キー掃除**：`trkOstLegacyCleanOnce` が初回だけ、`trk-ost-v1` の `songs` と共通の `trkOstSeenKeys` から `builtin:trk-ost-song:` 参照を削除。FIRST SPARK・公式パック・ローカル曲・ほかのプレイリスト・利用者の名前/配置/削除状態は保持。曲ファイルや曲の記録は削除しない。リストが消されていても作り直さず印だけ保存。セーフモード・任意同梱ビルドでは実施も印付けもしない。
+  - **永続化の補修**：`core.js` が `trkOstLegacyClean1` と `trkOstSeenKeys` を型・キー形式検証付きで読み戻す。以前は見た曲の印を起動時に読み戻していなかったので、再起動後に外した公式パック曲が復活しうる経路も修正。`docs/MIGRATIONS.md` に印と削除予定日2027-01-16を登録（削除には利用者の確認が必要）。
+  - **music-library側は対応済みを確認**：GitHub APIで現行README（最終変更 `56587c66f7c91bd7110a1705f17e2841d3580262`）の日英両方に「`pack/pack.json` のname/authorを変えない」と記載済み。実際のpack.jsonも `name: "trk's OST Vol.1"` / `author: "TRMTKB"` で連携定数と一致。本作業では別Repoを変更していない。
+  - **検証**：`npm run check` 成功（534 pass / 0 fail）、`git diff --check` 成功。追加テストは掃除対象の限定、一回限り、任意同梱・safe・削除済みリスト、JSON保存→core設定読み戻し→外した曲を復活させないことを検査。
+  - **残る確認**：今回のUI3点と移行の実機・ブラウザsmoke2件（環境にChrome/puppeteer-coreが無く未実施）。HEVCは見送りのまま。下のtrk186〜188の「次の作業・未着手」は当時の記録で、この項が現状。
+
+- **trk188（2026-10-16・全画面の左右長押しシーク）**
+  - `video-max.js` の映像エリア：左半分を長押しで巻き戻し、右半分で早送り。450ms後に開始し250msごと、2秒/回から2秒ごとに2秒/回ずつ加速（最大20秒/回）。`currentTime` の移動だけで負の再生倍率・再生速度設定の変更はしない。中央に方向と移動秒数を表示。
+  - 長押し後のclickをcaptureで遮断し、再生切替や全画面終了への誤操作を防ぐ。短いタップは従来どおり。contextmenu抑止・touch-action:none・選択/タッチコールアウト抑止は映像面に限定。
+  - 指を離す／pointercancel／エリア外／24px超の移動／別pointer／blur／タブ非表示／曲切替・読み込み／全画面ビューを閉じると停止。ゲーム開始によるcloseも同じ掃除を通る。UIのボタン操作は長押し対象外。
+  - Node/VMで待ち時間・左右・加速上限・曲端クランプ・短タップ・中断・タイマー掃除を検査。4言語のヒント・日英ガイド・cache名を更新。
+  - `npm run check` 成功（531 pass / 0 fail）、`git diff --check` 成功。
+  - ブラウザsmoke2件とPC/スマホ実機確認は未実施（Chrome/puppeteer-core不足）。取り込み前に縦横・アプリ内全画面/ブラウザ全画面で長押し、離した後の停止、短タップ、画面を離れた際の停止を確認する。
+  - 今回の主な3点は実装済み。レビュー低優先度2点（旧OSTキーの移行掃除、music-libraryのname/author固定注記）はまだ未着手。HEVCは見送りのまま。
+
+- **trk187（2026-10-16・退出入口を明確化）**
+  - 「閉じる」を「← 曲リストに戻る」（4言語）へ変更。専用の強調ボタン・高さ44px以上。ヘッダーを縮まない領域とし、その下の内容を `.instBody.mediaBody` でスクロールする構造へ変更（上部の戻る入口を残す）。既存の退出処理・位置保存・フォーカス復帰は維持。明示ボタンは従来どおり即退出、Esc等は既存の確認設定を維持。
+  - 日英ガイド・cache名を更新。パネル順を検査する既存テスト／静的検査は新しいbody内の順序へ更新し、ヘッダーとスクロール面の分離・4言語・確認キャンセル／無効設定を追加テスト。
+  - `npm run check` 成功（528 pass / 0 fail）、`git diff --check` 成功。
+  - 実ブラウザsmoke2件・実機確認は未実施（前回同様、Chromeとpuppeteer-coreが環境に無い）。スマホ縦横・PC・4言語で、戻るボタンが見えて押せること、下部までスクロールできることを取り込み前に確認する。
+  - 次は③全画面の左右長押しシーク。レビュー低優先度2点は未着手、HEVCは引き続き見送り。
+
+- **trk186（2026-10-15・🎥 基地入口）**
+  - 曲リストの📚書斎の隣に🎥基地を追加（PC・スマホ共通、4言語、44px以上の高さ、狭い見出し内は折り返し）。既存の `openMedia` を使い、電源長押しも維持。閉じると実際の入口へフォーカスを戻し、重複openのタイマー増殖を防止。
+  - `npm run check` 成功（525 pass / 0 fail）、`git diff --check` 成功。
+  - 新規Node/VMテスト：入口の接続・4言語の表示と更新・ボタン不在時の安全性。実機の配置・タップ・フォーカスは未確認。
+  - ブラウザsmokeはこの環境に `puppeteer-core` とChromeが無いため未実施（`--compare` は依存不足で停止）。取り込み前に2件とも実行する。
+  - **利用者提供のPR #69レビュー結果**：523 pass、smoke `--compare` OK、game-end MANUAL/AUTO OK。公式 `.stpack` のFIRST SPARK＋s01〜s05・再読込・案内もヘッドレス確認済みとの報告（本作業での再実測ではない）。PC・スマホで確認したとの報告はあるが、個別項目の確認範囲は未特定のため§4を一括で確認済みにはしない。
+  - **次の作業**：②プレーヤーからの退出操作を明確化 → ③全画面の左右長押しシーク（加速、contextmenu抑止、touch-action、終了/中断時の掃除）。レビュー低優先度2点：旧 `builtin:trk-ost-song:` キーを一回限り移行で掃除（MIGRATIONS登録）、music-library側へ公式パックのname/author固定を明記（この作業では未変更）。
+  - **HEVC方針**：利用者判断で今回は対応を見送り。スマホでは再生できたとの報告あり。デコーダー同梱・変換・形式検出・未復号フラグ等は追加していない。ブラウザ/OS/端末ごとの対応差があるため、スマホ全般で必ず再生可能とは扱わない。
+
+- **trk185（2026-10-16・OST を music-library へ分離）**
+  - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **523/523**）。`git diff --check` も成功。
+  - **分離**：`assets/optional-ost-audio/`（5曲・約4.7 MiB）を削除し、`TRK_OST_MANIFEST_INCLUDED=false` で既定ビルドは manifest を取得しない。FIRST SPARK は同梱のまま。公式パック導入で `syncTrkOstPackSongs` がプレイリストへ未見キーだけ接続し、案内 `plGuideTrkOst`（4言語）を新規・既存リストへ付与。`ost-render` はスコア一覧から全曲描画を確認。README／NOTICE／ガイド／`tools/ost-scores/README.md` を別配布（CC BY 4.0）に更新し、`sw.js` cache を `trk-v2026.10.16-trk185` へ。
+  - **music-library Release**：`trk-ost-vol1.stpack` の SHA256 が `SHA256SUMS.txt`（`32a5d4fd…d44fb4`）と一致し、全エントリーCRC正常・曲ID `s01`〜`s05` が連携コードと一致することを確認。ただし **Release `v1` の作成は、この作業環境のGitHub連携が trk Repo 限定のため 403 で未実施**（music-library 側で Release を作り `release-assets/` の2ファイルを添付する手作業が残る）。
+  - **未完了**：実ブラウザsmoke2件（§8の条件・レビュー側で確認）。実機確認は§4のまま。
+
+過去の検証ログは [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) に移しました。現在の仕様・実機確認状況は§2〜4を正とします。
+
+### 当時の変更記録
+
+- **trk185（2026-10-16・OST の music-library 分離）**
+  - **曲の削除＋fetch停止**：`assets/optional-ost-audio/` を削除し `.gitignore` の例外も除去。同梱の印 `TRK_OST_MANIFEST_INCLUDED=false`（Agent OST と同じ形）で、起動時に manifest の404要求をしなくなった（smoke `--compare` の NG 対策）。同梱ビルド向けの経路自体は残す。
+  - **プレイリストと案内（レビュー (b) 採用）**：プレイリスト「🎓 trk's OST Vol.1」は FIRST SPARK の受け皿として残し、別配布の案内（`plGuideTrkOst`・4言語・Releasesリンク）を新規作成時と既存リスト（ガイド無しの場合だけ）へ付与。公式OSTパックを入れると `syncTrkOstPackSongs`（パックID＝`名前|作者` ハッシュで照合）が s01〜s05 を未見だけ追加し、利用者が外した曲は戻さない。パックの曲として曲リストにも並ぶ。
+  - **文書**：README（日英）・NOTICE・ガイド（start／en／files）・`tools/ost-scores/README.md` を TRK-SIDE 確定文（CC BY 4.0・© 2026 TRMTKB・クレジット例・自動通信なし）に更新。スコアは「出どころの証拠」として trk! 側にも残置。
+- **trk184（2026-10-16・保存場所の案内）**
+  - **README に同梱曲と保存場所を明記（日英）**：楽曲ファイル2フォルダ（計約5.3 MiB）・アプリ内プレイリスト（localStorage）・スコアの場所。プレイヤーだけ使いたい人は2フォルダ削除でOK（影響範囲つき）。ガイド（files.md の構成図・start.md／en.md の軽量版説明）は既存のまま。
+  - **検査**：OST ブロックに root README の2フォルダ言及を固定。
+- **過去の履歴**：trk183以前の詳細な変更・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) に移動しました。現在の仕様は§2、未確認事項は§4を正とします。

@@ -9,11 +9,12 @@
   const core = window.Trk.core;
 
 Object.assign(TEXT.ja, {
+  mediaOpenBtn:"🎥 基地", mediaOpenBtnHint:"メディアプレーヤーを開きます（音楽・動画の再生）",
   tvMediaHoldHint:"電源長押しでメディアプレーヤー",
   dockCastPolicy:"キャストアンテナ", dockCastOff:"キャストしない（キャストアンテナを隠す）", dockCastAntenna:"キャストアンテナを表示", dockCastHint:"キャストアンテナはバックグラウンド再生のアンテナと別々に表示/非表示できます。ここで消しても、曲の再生用のアンテナは消えません。自動接続はせず、クリックしたときだけ対応ブラウザーの選択画面を開きます。", dockCastUnsupported:"このブラウザは外部出力選択に対応していません。", dockCastOn:"📡 キャスト先の選択を開きました", dockCastOffDone:"📡 キャストを切断しました", dockCastFailed:"外部出力を開始できませんでした。", dockCastButton:"キャスト", dockBackgroundPolicy:"バックグラウンド再生アンテナ", dockBackgroundOff:"表示しない（バックグラウンド再生なし）", dockBackgroundAntenna:"ドックにアンテナを表示", dockBackgroundCorner:"右上に置く（言語の左・コンパクト）", dockBackgroundHint:"キャストとは別に、バックグラウンド再生だけを許可します。「ドックにアンテナを表示」か「右上に置く」のときONにすると、裏にしても再生を続けます。",
   mediaTitle:"▶ メディアプレーヤー",
   mediaSubtitle:"ゲームを始めずに、曲を聴くための再生画面です。曲送り・リピート・シャッフル・速度・スリープタイマーを使えます。",
-  mediaClose:"閉じる", mediaNoTrack:"曲を選ぶと、ここでフル再生できます。",
+  mediaClose:"← 曲リストに戻る", mediaNoTrack:"曲を選ぶと、ここでフル再生できます。",
   mediaNow:"再生中", mediaPaused:"一時停止", mediaEnded:"再生終了",
   mediaPrev:"前の曲", mediaNext:"次の曲", mediaPlay:"再生", mediaPause:"一時停止", mediaRestart:"最初から",
   mediaVolume:"音量", mediaMute:"ミュート", mediaUnmute:"ミュート解除", mediaSeek:"再生位置",
@@ -43,11 +44,12 @@ Object.assign(TEXT.ja, {
   mediaModeStatus:"メディアプレーヤー中（ゲームの記録には影響しません）"
 });
 Object.assign(TEXT.en, {
+  mediaOpenBtn:"🎥 Base", mediaOpenBtnHint:"Open the media player for music and video",
   tvMediaHoldHint:"Long-press power for media player",
   dockCastPolicy:"Cast antenna", dockCastOff:"Don't cast (hide the cast antenna)", dockCastAntenna:"Show the cast antenna", dockCastHint:"The cast antenna is toggled separately from the background playback antenna — hiding it never hides the playback one. It never auto-connects; clicking it opens the picker on supported browsers only.", dockCastUnsupported:"This browser doesn't support the external playback picker.", dockCastOn:"📡 Opened the cast picker", dockCastOffDone:"📡 Cast disconnected", dockCastFailed:"Couldn't start external playback.", dockCastButton:"Cast", dockBackgroundPolicy:"Background playback antenna", dockBackgroundOff:"Hide (no background playback)", dockBackgroundAntenna:"Show on the dock", dockBackgroundCorner:"Top-right (left of Language, compact)", dockBackgroundHint:"Background playback can be allowed separately from casting. With \"Show on the dock\" or \"Top-right\", turning it on keeps playing in the background.",
   mediaTitle:"▶ Media player",
   mediaSubtitle:"Listen without starting a game. Use track controls, repeat, shuffle, playback speed, and a sleep timer.",
-  mediaClose:"Close", mediaNoTrack:"Choose a song to play it here in full.",
+  mediaClose:"← Back to song list", mediaNoTrack:"Choose a song to play it here in full.",
   mediaNow:"Playing", mediaPaused:"Paused", mediaEnded:"Finished",
   mediaPrev:"Previous", mediaNext:"Next", mediaPlay:"Play", mediaPause:"Pause", mediaRestart:"Restart",
   mediaVolume:"Volume", mediaMute:"Mute", mediaUnmute:"Unmute", mediaSeek:"Position",
@@ -77,10 +79,11 @@ Object.assign(TEXT.en, {
   mediaModeStatus:"Media player (does not affect game records)"
 });
 Object.assign(TEXT.zh, {
+  mediaOpenBtn:"🎥 基地", mediaOpenBtnHint:"打开媒体播放器（音乐和视频）",
   tvMediaHoldHint:"长按电源打开媒体播放器",
   dockCastPolicy:"投放天线", dockCastOff:"不投放（隐藏投放天线）", dockCastAntenna:"显示投放天线", dockCastHint:"投放天线与后台播放的天线分别开关，在这里隐藏也不会隐藏播放用的天线。不会自动连接，只在点击时于支持的浏览器打开选择画面。", dockCastUnsupported:"此浏览器不支持外部输出选择。", dockCastOn:"📡 已打开投放选择", dockCastOffDone:"📡 已断开投放", dockCastFailed:"无法开始外部输出。", dockCastButton:"投放", dockBackgroundPolicy:"后台播放天线", dockBackgroundOff:"不显示（无后台播放）", dockBackgroundAntenna:"在机台上显示天线", dockBackgroundCorner:"放到右上角（语言左侧·紧凑）", dockBackgroundHint:"可以与投放分开，只允许后台播放。选择「在机台上显示」或「放到右上角」并开启后，切到后台也会继续播放。",
   mediaTitle:"▶ 媒体播放器", mediaSubtitle:"不开始游戏也能听歌。支持切歌、循环、随机、播放速度和睡眠定时器。",
-  mediaClose:"关闭", mediaNoTrack:"选择歌曲后，就能在这里完整播放。", mediaNow:"正在播放", mediaPaused:"已暂停", mediaEnded:"播放结束",
+  mediaClose:"← 返回歌曲列表", mediaNoTrack:"选择歌曲后，就能在这里完整播放。", mediaNow:"正在播放", mediaPaused:"已暂停", mediaEnded:"播放结束",
   mediaPrev:"上一首", mediaNext:"下一首", mediaPlay:"播放", mediaPause:"暂停", mediaRestart:"从头播放",
   mediaVolume:"音量", mediaMute:"静音", mediaUnmute:"取消静音", mediaSeek:"播放位置",
   mediaShuffle:"随机", mediaRepeat:"循环", mediaRepeatOff:"关闭", mediaRepeatOne:"单曲", mediaRepeatAll:"全部",
@@ -109,10 +112,11 @@ Object.assign(TEXT.zh, {
   mediaModeStatus:"媒体播放器中（不影响游戏记录）"
 });
 Object.assign(TEXT.ko, {
+  mediaOpenBtn:"🎥 기지", mediaOpenBtnHint:"미디어 플레이어 열기 (음악·동영상 재생)",
   tvMediaHoldHint:"전원 길게 눌러 미디어 플레이어",
   dockCastPolicy:"캐스트 안테나", dockCastOff:"캐스트 안 함 (캐스트 안테나 숨기기)", dockCastAntenna:"캐스트 안테나 표시", dockCastHint:"캐스트 안테나는 백그라운드 재생 안테나와 별도로 켜고 끌 수 있으며, 여기서 숨겨도 재생용 안테나는 사라지지 않습니다. 자동 연결 없이 클릭할 때만 지원 브라우저의 선택기를 엽니다.", dockCastUnsupported:"이 브라우저는 외부 출력 선택을 지원하지 않습니다.", dockCastOn:"📡 캐스트 선택을 열었습니다", dockCastOffDone:"📡 캐스트 연결을 끊었습니다", dockCastFailed:"외부 출력을 시작하지 못했습니다.", dockCastButton:"캐스트", dockBackgroundPolicy:"백그라운드 재생 안테나", dockBackgroundOff:"표시하지 않기 (백그라운드 재생 없음)", dockBackgroundAntenna:"독에 안테나 표시", dockBackgroundCorner:"오른쪽 상단에 두기 (언어 왼쪽·컴팩트)", dockBackgroundHint:"캐스트와 별도로 백그라운드 재생만 허용할 수 있습니다. 독에 안테나 표시 또는 오른쪽 상단에 두기를 켜면 백그라운드에서도 계속 재생합니다.",
   mediaTitle:"▶ 미디어 플레이어", mediaSubtitle:"게임을 시작하지 않고 음악을 듣습니다. 곡 넘기기·반복·셔플·재생 속도·취침 타이머를 지원합니다.",
-  mediaClose:"닫기", mediaNoTrack:"곡을 고르면 여기서 전체 재생할 수 있습니다.", mediaNow:"재생 중", mediaPaused:"일시정지", mediaEnded:"재생 완료",
+  mediaClose:"← 곡 목록으로 돌아가기", mediaNoTrack:"곡을 고르면 여기서 전체 재생할 수 있습니다.", mediaNow:"재생 중", mediaPaused:"일시정지", mediaEnded:"재생 완료",
   mediaPrev:"이전 곡", mediaNext:"다음 곡", mediaPlay:"재생", mediaPause:"일시정지", mediaRestart:"처음부터",
   mediaVolume:"볼륨", mediaMute:"음소거", mediaUnmute:"음소거 해제", mediaSeek:"재생 위치",
   mediaShuffle:"셔플", mediaRepeat:"반복", mediaRepeatOff:"끔", mediaRepeatOne:"한 곡", mediaRepeatAll:"전체",
@@ -144,6 +148,7 @@ Object.assign(TEXT.ko, {
 const HOLD_MS = 650;
 if (!Array.isArray(core.settings.videoKeys) || core.settings.videoKeys.length !== core.VIDEO_KEY_DEFAULTS.length || core.settings.videoKeys.some(k => !core.validCode(k)) || new Set(core.settings.videoKeys).size !== core.VIDEO_KEY_DEFAULTS.length) core.settings.videoKeys = core.VIDEO_KEY_DEFAULTS.slice();
 let overlay, dialog, powerButton;
+let mediaReturnFocus = null;
 let mediaOpen = false, holdTimer = 0, longPressed = false;
 let repeatMode = core.settings.mediaRepeat || "off", shuffle = !!core.settings.mediaShuffle;
 let mediaRate = Number(core.settings.mediaRate) || 1, sleepTimer = 0, sleepUntil = 0, tickTimer = 0;
@@ -1382,10 +1387,12 @@ function closeMedia(restore = true) {
   if (stageWrap) stageWrap.hidden = true;
   overlay.hidden = true; document.body.classList.remove("mediaOpen");
   if (restore && core.phase === "title" && core.settings.previewEnabled && typeof startPreview === "function") setTimeout(window.Trk.library.startPreview, 50);
-  if (powerButton) powerButton.focus();
+  if (mediaReturnFocus && mediaReturnFocus.isConnected) mediaReturnFocus.focus();
+  else if (powerButton) powerButton.focus();
 }
 function openMedia() {
-  if (!overlay || (window.TrkSafeMode && TrkSafeMode())) return;
+  if (!overlay || mediaOpen || (window.TrkSafeMode && TrkSafeMode())) return;
+  mediaReturnFocus = document.activeElement;
   if (window.Trk.overlay.is("synth") && typeof window._trkCloseSynth === "function") window._trkCloseSynth();
   mediaOpen = true; window.Trk.overlay.set("media", true); window._trkMediaPlayerMode = true;
   overlay.hidden = false; document.body.classList.add("mediaOpen");
@@ -1400,17 +1407,29 @@ function openMedia() {
   mediaPlayNotedKey = "";   /* 🎧 開き直しも新しい再生として数え直す（trk172） */
   const focus = playNode || closeNode; if (focus) focus.focus();
 }
+/* 書斎と並ぶタップ入口。TV電源の長押しは引き続き使える。 */
+function syncMediaOpenBtn() {
+  const button = document.getElementById("mediaOpenBtn");
+  if (!button) return;
+  button.textContent = tr("mediaOpenBtn");
+  button.title = tr("mediaOpenBtnHint");
+}
 let closeNode;
 function buildMedia() {
   powerButton = document.querySelector("#tvDock .tvPow");
   if (!powerButton) return false;
+  const mediaOpenBtn = document.getElementById("mediaOpenBtn");
+  if (mediaOpenBtn) {
+    syncMediaOpenBtn();
+    mediaOpenBtn.addEventListener("click", openMedia);
+  }
   overlay = core.el("div", "instOverlay mediaOverlay"); overlay.id = "mediaPlayerMode"; overlay.hidden = true;
   const backdrop = core.el("div", "instBackdrop");
   dialog = core.el("section", "instDialog mediaDialog"); dialog.setAttribute("role", "dialog"); dialog.setAttribute("aria-modal", "true"); dialog.setAttribute("aria-labelledby", "mediaTitle");
   const header = core.el("header", "instHeader mediaHeader");
   const hwrap = core.el("div"); const h = tx("h2", "mediaTitle"); h.id = "mediaTitle";
   hwrap.append(h, tx("p", "mediaSubtitle", "instSubtitle"));
-  closeNode = makeButton("mediaClose", "instClose"); closeNode.addEventListener("click", () => closeMedia());
+  closeNode = makeButton("mediaClose", "instClose mediaExitBtn"); closeNode.addEventListener("click", () => closeMedia());
   header.append(hwrap, closeNode);
 
   const display = core.el("div", "mediaDisplay");
@@ -1654,7 +1673,10 @@ function buildMedia() {
   queueNode = core.el("div", "mediaQueueList"); queuePanel.append(qhead, searchNode, queueNode);
 
   const footer = core.el("footer", "instFooter mediaFooter"); footer.append(tx("span", "mediaModeStatus"), tx("span", "mediaKeyboard", "instKeyHint"));
-  dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer);
+  /* 戻る入口はスクロール面の外へ。小さい画面でも常に上部に残す。 */
+  const body = core.el("div", "instBody mediaBody");
+  body.append(display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer);
+  dialog.append(header, body);
   wallOverlay = core.el("section", "mediaWall"); wallOverlay.hidden = true; wallOverlay.setAttribute("role", "dialog"); wallOverlay.setAttribute("aria-modal", "true"); wallOverlay.setAttribute("aria-label", tr("mediaWall"));
   const wallTop = core.el("div", "mediaWallTop"); wallTop.append(tx("strong", "mediaWall"));
   const wallClose = makeButton("mediaWallHide", "mediaWallClose"); wallClose.addEventListener("click", () => deactivateWall(true)); wallTop.append(wallClose);
@@ -1721,6 +1743,7 @@ function buildMedia() {
   core.on("songSelected", () => { mediaPlayNotedKey = ""; });   /* 🎧 新しい曲の「ちゃんと聴いた」計数は最初から（trk172・これも別購読） */
   core.on("records", renderQueue); core.on("packsChanged", renderQueue);
   core.on("songTags", () => { renderQueue(); if (mediaOpen) renderMedia(); });   /* 🏷 タグが届いたら表示名を追従（trk167） */ core.on("language", () => {
+    syncMediaOpenBtn();
     if (stageNote) { stageNote.textContent = tr("mediaStageNoVideo"); stageNote.dataset.i18n = "mediaStageNoVideo"; }
     renderInterp();
     loopPresetRenderKey = loopPresetRenderSig = null;

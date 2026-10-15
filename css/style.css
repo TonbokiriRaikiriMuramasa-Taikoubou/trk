@@ -1266,7 +1266,8 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
    📚 曲のタブ（棚）と、棚スキン16種（js/lib-skins.js / js/library.js）
    ・#libPanel[data-lib-skin="…"] を付け替えるだけで見た目が変わる
    ============================================================ */
-.libHeadRight{display:flex;align-items:baseline;gap:8px}
+.libHeadRight{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:baseline;gap:8px;min-width:0}
+.studyHeadBtn{min-height:44px;white-space:nowrap}
 .libSkinBtn{padding:4px 10px;font-size:15px;line-height:1.1;border-radius:10px;opacity:.9}
 .libSkinBtn:hover{opacity:1}
 .libSkinBar{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding:10px;border-radius:14px;
@@ -1770,6 +1771,12 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
 
 /* ▶ メディアプレーヤーモード（TV電源長押し） */
 .mediaDialog{width:min(920px,100%);border-color:rgba(255,209,102,.32);background:linear-gradient(155deg,rgba(33,29,22,.98),rgba(10,12,20,.99) 60%)}
+/* 退出ボタンはスクロールしないヘッダーに置く。説明文だけ縮め、ボタンを押せる高さを保つ。 */
+.mediaHeader{flex:none;align-items:center;flex-wrap:wrap}
+.mediaHeader>div{flex:1 1 200px;min-width:0}
+.mediaExitBtn{min-height:44px;max-width:100%;white-space:normal;font-weight:800;
+  color:var(--ui-on-accent);background:var(--ui-accent);border-color:var(--ui-accent)}
+.mediaBody{padding:0;flex:1 1 auto}
 .mediaDisplay{position:relative;display:flex;flex-direction:column;justify-content:center;gap:7px;min-height:116px;padding:18px 22px;overflow:hidden;border-bottom:1px solid rgba(255,209,102,.18);background:radial-gradient(circle at 75% 20%,rgba(255,209,102,.2),transparent 32%),linear-gradient(120deg,#101a25,#211a16 55%,#0a1119);text-shadow:0 2px 10px #000}
 .mediaDisplay::before{content:"♪  ♫  ♪  ♫  ♪";position:absolute;right:18px;bottom:-12px;color:rgba(255,209,102,.12);font-size:64px;letter-spacing:12px;white-space:nowrap;pointer-events:none}
 .mediaDisplayTitle{position:relative;z-index:1;max-width:78%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff3c4;font-size:clamp(18px,3vw,28px)}
@@ -1843,7 +1850,12 @@ body.helpTextOff .mediaWallHintText{display:none!important}
   background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);color:#fff}
 .videoMaxBtn:hover{background:rgba(255,255,255,.22);border-color:#ffd166;color:#ffd166}
 .videoMaxBtn.selected{background:#ffd166;border-color:#ffd166;color:#19130b}
-.videoMaxStage{position:relative;flex:1;min-height:0}
+.videoMaxStage{position:relative;flex:1;min-height:0;touch-action:none;
+  user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.videoMaxSeek{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  pointer-events:none;padding:12px 20px;border-radius:16px;background:rgba(0,0,0,.75);
+  color:#fff;font-size:24px;font-weight:800}
+.videoMaxSeek[hidden]{display:none!important}
 .videoMaxCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;background:#000;cursor:pointer}
 .videoMaxNote{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;max-width:80%;
   text-align:center;color:rgba(255,255,255,.78)}

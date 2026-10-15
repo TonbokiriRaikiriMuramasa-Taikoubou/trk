@@ -63,6 +63,7 @@ function harness() {
     function studyAutoScrollActive() { return false; }
     function studyStopAutoScroll() {}
     function studyToggleAutoScroll() {}
+    function studyApplyReadFilter() {}
     function studyStep(dir) { steps.push(dir); }
     function studyJumpZoomEdge(dir, repeat) { edges.push([dir, repeat]); return true; }
     function studyCloseRoom() { studyRoomOpen = false; }

@@ -2678,6 +2678,36 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else ok("trk175: 📜 study auto-scroll — constant-speed hands-free vertical reading (⏩ button / A key, speed setting, tap·wheel·navigation keys stop it, auto-stop at the last page)");
 }
 
+// trk176: 🌗 書斎の明るさ/コントラスト調整（PLAYER-ROADMAP #13・読書用フィルタ）。
+// 読書面（.study-image-stage / .study-text-stage）だけに CSS filter＝本棚やメニューは変わらない。
+// 全画面フィット・拡大率とは独立。初期値（100/100/none）は "none" を入れるので見た目のコストゼロ。
+{
+  const study = read("js/study-room.js");
+  const html = read("index.html");
+  const css = read("css/study-room.css");
+  if (!study.includes('const STUDY_READ_SPECIALS = ["none", "invert", "grayscale", "sepia"];') ||
+      !study.includes("function studyReadFilterPercent(value)") || !study.includes("function studyReadFilterCss()") ||
+      !study.includes("function studyApplyReadFilter()") ||
+      !study.includes('if (studyPrefs.readBrightness === 100 && studyPrefs.readContrast === 100 && studyPrefs.readSpecial === "none") return "none";') ||
+      !study.includes('room.style.setProperty("--study-read-filter", studyReadFilterCss())') ||
+      !study.includes('readBrightness:100, readContrast:100, readSpecial:"none",') ||
+      !study.includes("studyPrefs.readBrightness = Number.isFinite(rawBrightness) ? Math.min(150, Math.max(50, Math.round(rawBrightness))) : 100;") ||
+      !study.includes('studyBindPref("studyReadSpecial", "readSpecial", () => studyApplyReadFilter());') ||
+      !study.includes('for (const [id, key] of [["studyReadBrightness", "readBrightness"], ["studyReadContrast", "readContrast"]]) {') ||
+      !study.includes('node.addEventListener("input", () => {') ||
+      !study.includes("studyPrefs[key] = studyReadFilterPercent(node.value); studySavePrefs(); studyApplyReadFilter();") ||
+      (study.match(/studyReadFilterHint:"/g) || []).length !== 4 ||
+      (study.match(/studyReadSpecialSepia:"/g) || []).length !== 4) fail("study-room.js read filter (brightness/contrast clamped 50–150, invert/grayscale/sepia, default none, live input + saved change) is missing");
+  else if (!html.includes('<input id="studyReadBrightness" type="range" min="50" max="150" step="5"') ||
+           !html.includes('<input id="studyReadContrast" type="range" min="50" max="150" step="5"') ||
+           !html.includes('<select id="studyReadSpecial"') ||
+           !html.includes('<option value="sepia" data-i18n="studyReadSpecialSepia">') ||
+           !html.includes('<span id="studyReadBrightnessValue" class="study-read-filter-value">')) fail("the 🌗 read-filter controls (two ranges + special select + value labels) are missing from the settings dialog");
+  else if (!css.includes(".study-image-stage,.study-text-stage{filter:var(--study-read-filter,none)}") ||
+           !css.includes(".study-read-filter-row input[type=range]{")) fail("the read filter must apply to the reading surfaces only (.study-image-stage / .study-text-stage)");
+  else ok("trk176: 🌗 study read filter — brightness/contrast sliders + invert/grayscale/sepia on the reading surfaces only, independent of full-screen fit and zoom, none by default");
+}
+
 // 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own
 // "don't sway" option, plus the ❓ mystery switch that outranks both.
 {

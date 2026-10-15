@@ -1697,6 +1697,26 @@
             </select>
           </div>
           <p id="studyAutoScrollSpeedHint" class="study-advanced-hint" data-i18n="studyAutoScrollSpeedHint">縦読みモードの「⏩ 自動スクロール」の速さ（1秒あたりのピクセル）。動いている最中の変更もすぐ効きます。タップや移動キー（↑↓・Space・PageUp / PageDown など）で止まります。</p>
+          <div class="study-advanced-row study-read-filter-row">
+            <span id="studyReadBrightnessLabel" data-i18n="studyReadBrightnessLabel">明るさ（読書）</span>
+            <input id="studyReadBrightness" type="range" min="50" max="150" step="5" value="100" aria-labelledby="studyReadBrightnessLabel" aria-describedby="studyReadFilterHint">
+            <span id="studyReadBrightnessValue" class="study-read-filter-value">100%</span>
+          </div>
+          <div class="study-advanced-row study-read-filter-row">
+            <span id="studyReadContrastLabel" data-i18n="studyReadContrastLabel">コントラスト（読書）</span>
+            <input id="studyReadContrast" type="range" min="50" max="150" step="5" value="100" aria-labelledby="studyReadContrastLabel" aria-describedby="studyReadFilterHint">
+            <span id="studyReadContrastValue" class="study-read-filter-value">100%</span>
+          </div>
+          <div class="study-advanced-row">
+            <span id="studyReadSpecialLabel" data-i18n="studyReadSpecialLabel">特殊フィルタ（読書）</span>
+            <select id="studyReadSpecial" aria-labelledby="studyReadSpecialLabel" aria-describedby="studyReadFilterHint">
+              <option value="none" data-i18n="studyReadSpecialNone">なし</option>
+              <option value="invert" data-i18n="studyReadSpecialInvert">反転</option>
+              <option value="grayscale" data-i18n="studyReadSpecialGrayscale">グレースケール</option>
+              <option value="sepia" data-i18n="studyReadSpecialSepia">セピア</option>
+            </select>
+          </div>
+          <p id="studyReadFilterHint" class="study-advanced-hint" data-i18n="studyReadFilterHint">読書面（画像と文章）だけに CSS filter を当てます。全画面フィットや拡大率とは独立で、本棚やメニューは変わりません。初期値は 100% / 100% / なし。</p>
           <label class="study-check-option">
             <input id="studyPageKeysTurnPages" type="checkbox">
             <span data-i18n="studyPageKeysTurnPages">PageUP、PageDownをページ動作にする</span>

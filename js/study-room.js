@@ -28,6 +28,9 @@ Object.assign(TEXT.ja, {
   studyAutoScrollEnd:"最後のページに着きました · 自動スクロールを停止しました",
   studyAutoScrollNeedVertical:"自動スクロールは縦読み漫画モードだけで使えます",
   studyHelpAuto:"縦読みの自動スクロール 開始／停止（縦読み漫画モードだけ）",
+  studyReadBrightnessLabel:"明るさ（読書）", studyReadContrastLabel:"コントラスト（読書）", studyReadSpecialLabel:"特殊フィルタ（読書）",
+  studyReadSpecialNone:"なし", studyReadSpecialInvert:"反転", studyReadSpecialGrayscale:"グレースケール", studyReadSpecialSepia:"セピア",
+  studyReadFilterHint:"読書面（画像と文章）だけに CSS filter を当てます。全画面フィットや拡大率とは独立で、本棚やメニューは変わりません。初期値は 100% / 100% / なし。",
   studyBack:"← 本棚", studyFullscreen:"⛶ 画像を全画面化", studyModeLabel:"画像の並べ方",
   studyModeSingle:"一枚ずつ（中央）", studyModeSpread:"見開き（右が1ページ目）", studyModeVertical:"縦読み漫画",
   studyAmerican:"🇺🇸 アメリカン（左右・順序反転）", studyThemeLabel:"文字のスキン",
@@ -162,6 +165,9 @@ Object.assign(TEXT.en, {
   studyAutoScrollEnd:"Last page reached · auto-scroll stopped",
   studyAutoScrollNeedVertical:"Auto-scroll is only available in vertical comic mode",
   studyHelpAuto:"Start / stop auto-scroll for vertical reading (vertical comic mode only)",
+  studyReadBrightnessLabel:"Brightness (reading)", studyReadContrastLabel:"Contrast (reading)", studyReadSpecialLabel:"Special filter (reading)",
+  studyReadSpecialNone:"None", studyReadSpecialInvert:"Invert", studyReadSpecialGrayscale:"Grayscale", studyReadSpecialSepia:"Sepia",
+  studyReadFilterHint:"Applies a CSS filter to the reading surfaces only (images and text). Independent of the full-screen fit and the zoom. The shelf and menus are unchanged. Defaults: 100% / 100% / none.",
   studyBack:"← Bookshelf", studyFullscreen:"⛶ Full-screen image", studyModeLabel:"Image layout",
   studyModeSingle:"Single page (centered)", studyModeSpread:"Two-page spread (page 1 on right)", studyModeVertical:"Vertical comic",
   studyAmerican:"🇺🇸 American mode (reverse sides and order)", studyThemeLabel:"Text skin",
@@ -293,6 +299,9 @@ Object.assign(TEXT.zh, {
   studyAutoScrollEnd:"已到最后一页 · 自动滚动已停止",
   studyAutoScrollNeedVertical:"自动滚动仅在纵向漫画模式下可用",
   studyHelpAuto:"开始 / 停止纵向阅读的自动滚动（仅纵向漫画模式）",
+  studyReadBrightnessLabel:"亮度（阅读）", studyReadContrastLabel:"对比度（阅读）", studyReadSpecialLabel:"特殊滤镜（阅读）",
+  studyReadSpecialNone:"无", studyReadSpecialInvert:"反色", studyReadSpecialGrayscale:"灰度", studyReadSpecialSepia:"棕褐",
+  studyReadFilterHint:"仅对阅读表面（图片和文字）应用 CSS 滤镜。与全屏适应和缩放倍率无关，书架和菜单不变。默认为 100% / 100% / 无。",
   studyBack:"← 书架", studyFullscreen:"⛶ 图片全屏", studyModeLabel:"图片排列方式", studyModeSingle:"单页（居中）",
   studyModeSpread:"双页（第一页在右）", studyModeVertical:"纵向漫画", studyAmerican:"🇺🇸 美式模式（左右与顺序反转）",
   studyThemeLabel:"文字主题", studyThemePlain:"普通文本", studyThemeDark:"深色模式", studyThemeNeon:"霓虹",
@@ -414,6 +423,9 @@ Object.assign(TEXT.ko, {
   studyAutoScrollEnd:"마지막 페이지에 도착 · 자동 스크롤을 중지했습니다",
   studyAutoScrollNeedVertical:"자동 스크롤은 세로형 만화 모드에서만 사용할 수 있습니다",
   studyHelpAuto:"세로 읽기 자동 스크롤 시작 / 중지(세로형 만화 모드 전용)",
+  studyReadBrightnessLabel:"밝기(독서)", studyReadContrastLabel:"명암 대비(독서)", studyReadSpecialLabel:"특수 필터(독서)",
+  studyReadSpecialNone:"없음", studyReadSpecialInvert:"반전", studyReadSpecialGrayscale:"그레이스케일", studyReadSpecialSepia:"세피아",
+  studyReadFilterHint:"읽는 화면(이미지와 텍스트)에만 CSS 필터를 적용합니다. 전체 화면 맞춤 및 확대율과는 독립이며 책장과 메뉴는 변하지 않습니다. 기본값은 100% / 100% / 없음.",
   studyBack:"← 책장", studyFullscreen:"⛶ 이미지 전체 화면", studyModeLabel:"이미지 배열", studyModeSingle:"한 페이지 (중앙)",
   studyModeSpread:"두 페이지 (첫 페이지 오른쪽)", studyModeVertical:"세로형 만화", studyAmerican:"🇺🇸 미국식 (좌우와 순서 반전)",
   studyThemeLabel:"텍스트 스킨", studyThemePlain:"일반 텍스트", studyThemeDark:"다크 모드", studyThemeNeon:"네온",
@@ -565,6 +577,8 @@ const STUDY_RESERVED_KEYS = new Set(["Escape", "Tab", "Space", "Enter", "NumpadE
 const STUDY_AUTO_SCROLL_SPEEDS = [20, 45, 75, 120, 180], STUDY_AUTO_SCROLL_SPEED_DEFAULT = 75;
 /* 押したら自動スクロールを止めるキー（A 自身はトグルなので studyKeyDown で別扱い）。 */
 const STUDY_AUTO_SCROLL_STOP_CODES = new Set(["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", "Space", "Enter", "NumpadEnter"]);
+/* trk175-176: 読書用フィルタ（明るさ/コントラスト/反転系）の候補。百分率は 50〜150 にクランプする。 */
+const STUDY_READ_SPECIALS = ["none", "invert", "grayscale", "sepia"];
 function studyKeyCodeAllowed(code) {
   return typeof code === "string" && !STUDY_RESERVED_KEYS.has(code) &&
     (/^Arrow(?:Left|Right|Up|Down)$/.test(code) || /^Key[A-Z]$/.test(code) || /^Digit[1-9]$/.test(code) ||
@@ -597,6 +611,7 @@ let studyPrefs = { imageMode:"single", imageOrder:"natural", american:false, zoo
   textSize:"normal", textSpacing:"normal", textWidth:"normal", tvEnabled:false, tvPosition:"top", tvLook:"plain",
   tvSize:"medium", tvRatio:"16:9", tvLabelOn:true, shelfSort:"updated", albumNesting:"split",
   manualShelfOrder:false, foldersFirst:false, skipDeleteConfirm:false, shelfVisible:true, verticalImageKeys:false, studyAutoScrollSpeed:STUDY_AUTO_SCROLL_SPEED_DEFAULT,
+  readBrightness:100, readContrast:100, readSpecial:"none",
   fullscreenFit:false, pageKeysTurnPages:false, closeOnLastPageDown:true, mouseClickPages:false, mouseClickFlip:false, middleClickAction:"none", editedTextFolderId:"",
   studyNextKey:STUDY_DEFAULT_NEXT_KEY, studyPreviousKey:STUDY_DEFAULT_PREVIOUS_KEY, helpSeen:false };
 
@@ -769,6 +784,10 @@ function studyReadPrefs(raw) {
   studyPrefs.verticalImageKeys = raw.verticalImageKeys === true;
   const rawAutoSpeed = Number(raw.studyAutoScrollSpeed);
   studyPrefs.studyAutoScrollSpeed = STUDY_AUTO_SCROLL_SPEEDS.includes(rawAutoSpeed) ? rawAutoSpeed : STUDY_AUTO_SCROLL_SPEED_DEFAULT;
+  const rawBrightness = Number(raw.readBrightness), rawContrast = Number(raw.readContrast);
+  studyPrefs.readBrightness = Number.isFinite(rawBrightness) ? Math.min(150, Math.max(50, Math.round(rawBrightness))) : 100;
+  studyPrefs.readContrast = Number.isFinite(rawContrast) ? Math.min(150, Math.max(50, Math.round(rawContrast))) : 100;
+  studyPrefs.readSpecial = STUDY_READ_SPECIALS.includes(raw.readSpecial) ? raw.readSpecial : "none";
   /* 旧「画像の端へ送る」をオフにしていた人は、直接ページ送りの選択を引き継ぐ。 */
   studyPrefs.pageKeysTurnPages = typeof raw.pageKeysTurnPages === "boolean" ? raw.pageKeysTurnPages : raw.zoomEdgeKeys === false;
   studyPrefs.fullscreenFit = raw.fullscreenFit === true;
@@ -967,6 +986,10 @@ function studyRefreshPrefsUI() {
   core.$("studySkipDeleteConfirm").checked = studyPrefs.skipDeleteConfirm;
   core.$("studyVerticalImageKeys").checked = studyPrefs.verticalImageKeys;
   core.$("studyAutoScrollSpeed").value = String(studyPrefs.studyAutoScrollSpeed);
+  core.$("studyReadBrightness").value = String(studyPrefs.readBrightness);
+  core.$("studyReadContrast").value = String(studyPrefs.readContrast);
+  core.$("studyReadSpecial").value = studyPrefs.readSpecial;
+  studyApplyReadFilter();
   core.$("studyPageKeysTurnPages").checked = studyPrefs.pageKeysTurnPages;
   core.$("studyFullscreenFit").checked = studyPrefs.fullscreenFit;
   core.$("studyCloseOnLastPageDown").checked = studyPrefs.closeOnLastPageDown;
@@ -2934,6 +2957,28 @@ function studyToggleAutoScroll() {
   else studyStartAutoScroll();
 }
 
+/* ============ 読書用フィルタ（明るさ/コントラスト/反転系・trk176） ============ */
+/* 読書面（.study-image-stage / .study-text-stage）だけに CSS filter を当てる。全画面フィット・拡大率とは独立。
+   初期値（100/100/なし）では "none" を入れるので、ふつうは見た目のコストゼロ。本棚やメニューは変わらない。 */
+function studyReadFilterPercent(value) {
+  const percent = Math.round(Number(value));
+  return Number.isFinite(percent) ? Math.min(150, Math.max(50, percent)) : 100;
+}
+function studyReadFilterCss() {
+  if (studyPrefs.readBrightness === 100 && studyPrefs.readContrast === 100 && studyPrefs.readSpecial === "none") return "none";
+  let css = `brightness(${studyPrefs.readBrightness}%) contrast(${studyPrefs.readContrast}%)`;
+  if (studyPrefs.readSpecial === "invert") css += " invert(1)";
+  else if (studyPrefs.readSpecial === "grayscale") css += " grayscale(1)";
+  else if (studyPrefs.readSpecial === "sepia") css += " sepia(.8)";
+  return css;
+}
+function studyApplyReadFilter() {
+  const room = core.$("studyRoom");
+  if (room && room.style && typeof room.style.setProperty === "function") room.style.setProperty("--study-read-filter", studyReadFilterCss());
+  core.$("studyReadBrightnessValue").textContent = `${studyPrefs.readBrightness}%`;
+  core.$("studyReadContrastValue").textContent = `${studyPrefs.readContrast}%`;
+}
+
 /* ============ 開く・閉じる ============ */
 function studyOpenRoom() {
   if (studySafeMode()) { studyNotify("studySafeMode"); return; }
@@ -3143,6 +3188,15 @@ studyBindPref("studyAutoScrollSpeed", "studyAutoScrollSpeed", node => {
   node.value = String(studyPrefs.studyAutoScrollSpeed);   /* 保存も走る（studyBindPref 共通）。動いていれば次のコマから新速度 */
 });
 core.$("studyAutoScrollBtn").addEventListener("click", studyToggleAutoScroll);
+studyBindPref("studyReadSpecial", "readSpecial", () => studyApplyReadFilter());
+for (const [id, key] of [["studyReadBrightness", "readBrightness"], ["studyReadContrast", "readContrast"]]) {
+  const node = core.$(id);
+  node.addEventListener("input", () => {   /* ドラッグ中は保存せず、見た目だけ生かす */
+    studyPrefs[key] = studyReadFilterPercent(node.value);
+    node.value = String(studyPrefs[key]); studyApplyReadFilter();
+  });
+  node.addEventListener("change", () => { studyPrefs[key] = studyReadFilterPercent(node.value); studySavePrefs(); studyApplyReadFilter(); });
+}
 studyBindPref("studyFullscreenFit", "fullscreenFit", () => studyApplyZoom(false));
 studyBindPref("studyPageKeysTurnPages", "pageKeysTurnPages");
 studyBindPref("studyCloseOnLastPageDown", "closeOnLastPageDown");

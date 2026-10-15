@@ -36,6 +36,7 @@ Object.assign(TEXT.ja, {
   mediaResumeRewind:"⏪ 再開時の巻き戻し", mediaResumeOff:"オフ", mediaResumeSet:"再開時に{s}秒巻き戻します",
   mediaSleepTrack:"💤 この曲の終わり", mediaSleepTrackSet:"この曲の終わりで再生を止めます",
   mediaWakeLockTitle:"🔆 画面を消灯させない", mediaWakeLockHint:"動画の再生中に画面が暗くなるのを防ぎます（音声だけの再生では防ぎません）。対応していないブラウザでは何もしません。", mediaWakeLockToggle:"動画の再生中は画面をつけたままにする",
+  mediaWaveTitle:"🌊 波形シークバー", mediaWaveHint:"シークバーに音量の包絡（波形）を描きます。ポインターを乗せると、その位置の時刻が出ます。材料は端末内の解析結果（trk_analysis_cache_v1）だけ＝解析が無い曲（長い曲・軽量化設定など）ではふつうのバーのままです。", mediaWaveToggle:"シークバーに波形を表示する",
   mediaLyricsTitle:"🎤 歌詞", mediaLyricsHint:"埋め込み歌詞（ID3 USLT/SYLT・MP4 ©lyr・FLAC/Ogg LYRICS）・フォルダの同名 .lrc・選んだ歌詞ファイルを、再生位置に合わせて表示します。同期歌詞は行をクリックするとその位置へ移動します。選んだ歌詞は曲ごとに端末内へ保存され、外へは送信しません。", mediaLyricsNone:"この曲の歌詞は見つかりませんでした。", mediaLyricsLoading:"歌詞を読み込み中…", mediaLyricsSourceEmbedded:"出典：埋め込みタグ", mediaLyricsSourceFile:"出典：フォルダの .lrc（{name}）", mediaLyricsSourceManual:"出典：選んだファイル（{name}）", mediaLyricsPlain:"※ 時刻のない歌詞なので、そのまま表示します", mediaLyricsChoose:"📄 歌詞ファイルを選ぶ", mediaLyricsClear:"✖ 選んだ歌詞を消す", mediaLyricsSaved:"歌詞をこの曲に保存しました（{n}行）", mediaLyricsTooBig:"この歌詞ファイルは大きすぎます（256KBまで）。", mediaLyricsReadFailed:"この歌詞ファイルは読めませんでした。", mediaLyricsNeedSong:"先に曲を再生してください。",
   mediaSubsTitle:"💬 字幕", mediaSubsHint:"選んだ SRT/VTT ファイルか、フォルダの同名 .srt/.vtt を動画の上に表示します。表示の遅れ・早すぎは「遅延」で調整できます。選んだ字幕と遅延は曲ごとに端末内へ保存され、外へは送信しません。📌 画中画でも字幕が付きます。", mediaSubsNone:"この動画の字幕は見つかりませんでした。", mediaSubsLoading:"字幕を読み込み中…", mediaSubsSourceFile:"出典：フォルダの字幕（{name}）", mediaSubsSourceManual:"出典：選んだファイル（{name}）", mediaSubsChoose:"📄 字幕ファイルを選ぶ", mediaSubsClear:"✖ 選んだ字幕を消す", mediaSubsSaved:"字幕をこの曲に保存しました（{n}件）", mediaSubsTooBig:"この字幕ファイルは大きすぎます（512KBまで）。", mediaSubsReadFailed:"この字幕ファイルは読めませんでした。", mediaSubsNeedSong:"先に動画を再生してください。", mediaSubsOn:"字幕を表示する", mediaSubsOffset:"遅延", mediaSubsEarlier:"− 早く", mediaSubsLater:"＋ 遅く", mediaSubsReset:"↺ 0", mediaSubsOffsetNow:"いま：{s}秒",
   mediaChapTitle:"🔖 チャプター", mediaChapHint:"M4B/MP4 等に埋め込まれたチャプター（chpl）の一覧です。クリックでその位置へ移動します。チャプターは読むだけで、ファイルへの書き戻しや外部への送信はしません。iTunes方式のチャプタートラックは対応していません。", mediaChapNone:"チャプターは見つかりませんでした。", mediaChapLoading:"チャプターを読み込み中…", mediaChapCount:"チャプター {n} 件", mediaChapNow:"▶ {name}", mediaChapPrev:"⏮ 前のチャプター", mediaChapNext:"次のチャプター ⏭", mediaSleepChapter:"チャプターの終わりで止める", mediaSleepChapterSet:"チャプターの終わりで止めます（{m}）", mediaSleepChapterNone:"この曲にチャプターがありません。",
@@ -69,6 +70,7 @@ Object.assign(TEXT.en, {
   mediaResumeRewind:"⏪ Resume rewind", mediaResumeOff:"Off", mediaResumeSet:"Resume rewind: {s}s",
   mediaSleepTrack:"💤 End of this track", mediaSleepTrackSet:"Playback will stop when this track ends",
   mediaWakeLockTitle:"🔆 Keep screen on", mediaWakeLockHint:"Prevents the screen from dimming while a video plays (audio-only playback won't). Does nothing on browsers without support.", mediaWakeLockToggle:"Keep the screen on while a video plays",
+  mediaWaveTitle:"🌊 Waveform seek bar", mediaWaveHint:"Draws the loudness envelope (waveform) on the seek bar and shows the time at the pointer. The material is the on-device analysis cache only — songs without analysis (long tracks, lite settings) keep the plain bar.", mediaWaveToggle:"Show the waveform on the seek bar",
   mediaLyricsTitle:"🎤 Lyrics", mediaLyricsHint:"Shows embedded lyrics (ID3 USLT/SYLT, MP4 ©lyr, FLAC/Ogg LYRICS), a same-named .lrc from the folder, or a file you choose, in sync with playback. With synced lyrics, click a line to jump there. Chosen lyrics are saved on this device per song and never uploaded.", mediaLyricsNone:"No lyrics found for this song.", mediaLyricsLoading:"Loading lyrics…", mediaLyricsSourceEmbedded:"Source: embedded tags", mediaLyricsSourceFile:"Source: folder .lrc ({name})", mediaLyricsSourceManual:"Source: chosen file ({name})", mediaLyricsPlain:"· not time-synced (shown as-is)", mediaLyricsChoose:"📄 Choose lyrics file", mediaLyricsClear:"✖ Remove chosen lyrics", mediaLyricsSaved:"Lyrics saved for this song ({n} lines)", mediaLyricsTooBig:"That lyrics file is too big (up to 256 KB).", mediaLyricsReadFailed:"Could not read that lyrics file.", mediaLyricsNeedSong:"Load a song first.",
   mediaSubsTitle:"💬 Subtitles", mediaSubsHint:"Shows an SRT/VTT file you choose, or a same-named .srt/.vtt from the folder, over the video. Adjust timing with “Delay”. Chosen subtitles and the delay are saved on this device per song and never uploaded. Subtitles also appear in picture-in-picture.", mediaSubsNone:"No subtitles found for this video.", mediaSubsLoading:"Loading subtitles…", mediaSubsSourceFile:"Source: folder subtitle ({name})", mediaSubsSourceManual:"Source: chosen file ({name})", mediaSubsChoose:"📄 Choose subtitle file", mediaSubsClear:"✖ Remove chosen subtitles", mediaSubsSaved:"Subtitles saved for this song ({n} cues)", mediaSubsTooBig:"That subtitle file is too big (up to 512 KB).", mediaSubsReadFailed:"Could not read that subtitle file.", mediaSubsNeedSong:"Load a video first.", mediaSubsOn:"Show subtitles", mediaSubsOffset:"Delay", mediaSubsEarlier:"− Earlier", mediaSubsLater:"＋ Later", mediaSubsReset:"↺ 0", mediaSubsOffsetNow:"Now: {s}s",
   mediaChapTitle:"🔖 Chapters", mediaChapHint:"Lists the chapters (chpl) embedded in M4B/MP4 files; click one to jump there. Chapters are read-only — no write-back, no upload. iTunes-style chapter tracks are not supported.", mediaChapNone:"No chapters found.", mediaChapLoading:"Loading chapters…", mediaChapCount:"{n} chapters", mediaChapNow:"▶ {name}", mediaChapPrev:"⏮ Previous chapter", mediaChapNext:"Next chapter ⏭", mediaSleepChapter:"Stop at the end of the chapter", mediaSleepChapterSet:"Will stop at the end of the chapter ({m})", mediaSleepChapterNone:"This song has no chapters.",
@@ -100,6 +102,7 @@ Object.assign(TEXT.zh, {
   mediaResumeRewind:"⏪ 继续播放时倒回", mediaResumeOff:"关闭", mediaResumeSet:"继续播放时倒回{s}秒",
   mediaSleepTrack:"💤 本曲结束时", mediaSleepTrackSet:"将在本曲结束时停止播放",
   mediaWakeLockTitle:"🔆 保持屏幕常亮", mediaWakeLockHint:"播放视频时防止屏幕变暗（纯音频播放不会阻止熄屏）。浏览器不支持时无效果。", mediaWakeLockToggle:"播放视频时保持屏幕常亮",
+  mediaWaveTitle:"🌊 波形进度条", mediaWaveHint:"在进度条上绘制音量包络（波形），指针悬停时显示该位置的时间。材料仅来自设备内的解析缓存——没有解析结果的歌曲（长曲、轻量化设置等）保持普通进度条。", mediaWaveToggle:"在进度条上显示波形",
   mediaLyricsTitle:"🎤 歌词", mediaLyricsHint:"跟随播放位置显示内嵌歌词（ID3 USLT/SYLT、MP4 ©lyr、FLAC/Ogg LYRICS）、文件夹中同名的 .lrc 或你选择的歌词文件。同步歌词可点击某行跳转到该位置。选择的歌词按歌曲保存在本机，不会上传。", mediaLyricsNone:"没有找到这首歌的歌词。", mediaLyricsLoading:"正在读取歌词…", mediaLyricsSourceEmbedded:"来源：内嵌标签", mediaLyricsSourceFile:"来源：文件夹中的 .lrc（{name}）", mediaLyricsSourceManual:"来源：选择的文件（{name}）", mediaLyricsPlain:"※ 非同步歌词，原样显示", mediaLyricsChoose:"📄 选择歌词文件", mediaLyricsClear:"✖ 清除选择的歌词", mediaLyricsSaved:"已为这首歌保存歌词（{n} 行）", mediaLyricsTooBig:"这个歌词文件太大（上限 256KB）。", mediaLyricsReadFailed:"无法读取这个歌词文件。", mediaLyricsNeedSong:"请先播放歌曲。",
   mediaSubsTitle:"💬 字幕", mediaSubsHint:"在视频上显示你选择的 SRT/VTT 字幕文件，或文件夹中同名的 .srt/.vtt。可用“延迟”调整字幕的快慢。选择的字幕和延迟按歌曲保存在本机，不会上传。画中画时也会显示字幕。", mediaSubsNone:"没有找到这个视频的字幕。", mediaSubsLoading:"正在读取字幕…", mediaSubsSourceFile:"来源：文件夹中的字幕（{name}）", mediaSubsSourceManual:"来源：选择的文件（{name}）", mediaSubsChoose:"📄 选择字幕文件", mediaSubsClear:"✖ 清除选择的字幕", mediaSubsSaved:"已为这首歌保存字幕（{n} 条）", mediaSubsTooBig:"这个字幕文件太大（上限 512KB）。", mediaSubsReadFailed:"无法读取这个字幕文件。", mediaSubsNeedSong:"请先播放视频。", mediaSubsOn:"显示字幕", mediaSubsOffset:"延迟", mediaSubsEarlier:"− 提前", mediaSubsLater:"＋ 延后", mediaSubsReset:"↺ 0", mediaSubsOffsetNow:"当前：{s} 秒",
   mediaChapTitle:"🔖 章节", mediaChapHint:"列出 M4B/MP4 等文件内嵌的章节（chpl），点击即可跳到该位置。章节仅读取，不会写回文件或上传。不支持 iTunes 式章节轨道。", mediaChapNone:"没有找到章节。", mediaChapLoading:"正在读取章节…", mediaChapCount:"{n} 个章节", mediaChapNow:"▶ {name}", mediaChapPrev:"⏮ 上一章", mediaChapNext:"下一章 ⏭", mediaSleepChapter:"在本章结束时停止", mediaSleepChapterSet:"将在本章结束时停止（{m}）", mediaSleepChapterNone:"这首歌没有章节。",
@@ -131,6 +134,7 @@ Object.assign(TEXT.ko, {
   mediaResumeRewind:"⏪ 다시 재생 시 되감기", mediaResumeOff:"끔", mediaResumeSet:"다시 재생 시 {s}초 되감기",
   mediaSleepTrack:"💤 이번 곡 끝날 때", mediaSleepTrackSet:"이번 곡이 끝날 때 재생을 멈춥니다",
   mediaWakeLockTitle:"🔆 화면 켜짐 유지", mediaWakeLockHint:"동영상 재생 중 화면이 어두워지는 것을 막습니다(오디오만 재생할 때는 막지 않습니다). 지원하지 않는 브라우저에서는 아무것도 하지 않습니다.", mediaWakeLockToggle:"동영상 재생 중 화면 켜짐 유지",
+  mediaWaveTitle:"🌊 파형 탐색 표시줄", mediaWaveHint:"탐색 표시줄에 음량 포락선(파형)을 그립니다. 포인터를 올리면 해당 위치의 시간이 표시됩니다. 재료는 기기 내 분석 캐시뿐이며, 분석이 없는 곡(긴 곡, 경량화 설정 등)은 일반 표시줄로 남습니다.", mediaWaveToggle:"탐색 표시줄에 파형 표시",
   mediaLyricsTitle:"🎤 가사", mediaLyricsHint:"재생 위치에 맞춰 내장 가사(ID3 USLT/SYLT, MP4 ©lyr, FLAC/Ogg LYRICS), 폴더의 같은 이름 .lrc, 또는 선택한 가사 파일을 표시합니다. 동기 가사는 줄을 클릭해 그 위치로 이동할 수 있습니다. 선택한 가사는 곡별로 기기에만 저장되며 업로드되지 않습니다.", mediaLyricsNone:"이 곡의 가사를 찾지 못했습니다.", mediaLyricsLoading:"가사를 불러오는 중…", mediaLyricsSourceEmbedded:"출처: 내장 태그", mediaLyricsSourceFile:"출처: 폴더의 .lrc ({name})", mediaLyricsSourceManual:"출처: 선택한 파일 ({name})", mediaLyricsPlain:"※ 동기화되지 않은 가사 (그대로 표시)", mediaLyricsChoose:"📄 가사 파일 선택", mediaLyricsClear:"✖ 선택한 가사 지우기", mediaLyricsSaved:"이 곡의 가사를 저장했습니다 ({n}줄)", mediaLyricsTooBig:"이 가사 파일은 너무 큽니다 (최대 256KB).", mediaLyricsReadFailed:"이 가사 파일을 읽을 수 없습니다.", mediaLyricsNeedSong:"먼저 곡을 재생해 주세요.",
   mediaSubsTitle:"💬 자막", mediaSubsHint:"선택한 SRT/VTT 자막 파일 또는 폴더의 같은 이름 .srt/.vtt를 영상 위에 표시합니다. '지연'으로 자막의 빠르기·느리기를 조정할 수 있습니다. 선택한 자막과 지연은 곡별로 기기에만 저장되며 업로드되지 않습니다. PIP 중에도 자막이 표시됩니다.", mediaSubsNone:"이 영상의 자막을 찾지 못했습니다.", mediaSubsLoading:"자막을 불러오는 중…", mediaSubsSourceFile:"출처: 폴더의 자막 ({name})", mediaSubsSourceManual:"출처: 선택한 파일 ({name})", mediaSubsChoose:"📄 자막 파일 선택", mediaSubsClear:"✖ 선택한 자막 지우기", mediaSubsSaved:"이 곡의 자막을 저장했습니다 ({n}개 큐)", mediaSubsTooBig:"이 자막 파일은 너무 큽니다 (최대 512KB).", mediaSubsReadFailed:"이 자막 파일을 읽을 수 없습니다.", mediaSubsNeedSong:"먼저 영상을 재생해 주세요.", mediaSubsOn:"자막 표시", mediaSubsOffset:"지연", mediaSubsEarlier:"− 앞당기기", mediaSubsLater:"＋ 늦추기", mediaSubsReset:"↺ 0", mediaSubsOffsetNow:"현재: {s}초",
   mediaChapTitle:"🔖 챕터", mediaChapHint:"M4B/MP4 등에 내장된 챕터(chpl) 목록입니다. 클릭하면 그 위치로 이동합니다. 챕터는 읽기 전용이며 파일에 기록하거나 업로드하지 않습니다. iTunes 방식 챕터 트랙은 지원하지 않습니다.", mediaChapNone:"챕터를 찾지 못했습니다.", mediaChapLoading:"챕터를 불러오는 중…", mediaChapCount:"챕터 {n}개", mediaChapNow:"▶ {name}", mediaChapPrev:"⏮ 이전 챕터", mediaChapNext:"다음 챕터 ⏭", mediaSleepChapter:"이번 챕터 끝에서 정지", mediaSleepChapterSet:"챕터 끝에서 정지합니다 ({m})", mediaSleepChapterNone:"이 곡에는 챕터가 없습니다.",
@@ -161,6 +165,7 @@ let subsOnNode = null, subsOffsetNode = null, subsEarlierNode = null, subsLaterN
 let subsState = { key:"", request:0, data:null, loading:false, texts:"" };
 /* 🔖 チャプター（trk170）：パネル・一覧・状態と、「チャプターの終わり」スリープの停止位置 */
 let chapBox = null, chapListNode = null, chapSourceNode = null, chapNowNode = null, chapPrevNode = null, chapNextNode = null;
+let waveNode = null, waveTipNode = null, waveWrapNode = null, waveCols = null, waveSig = "";   /* 🌊 波形シークバー（trk173） */
 let chapState = { key:"", request:0, data:null, active:-2, loading:false };  /* active=-2 は「次の描画で必ず付け直す」印 */
 let sleepChapterEnd = 0;   /* 💤 停止する再生位置（秒）。0＝未設定 */
 const chapCache = new Map();   /* 曲キー → チャプター|null（メモリだけ。正はファイルの中にあるので保存しない） */
@@ -1172,6 +1177,52 @@ function noteMediaPlay() {
   const lib = window.Trk.library;
   if (lib && typeof lib.noteMediaPlayed === "function") lib.noteMediaPlayed(s.key);
 }
+/* 🌊 波形シークバー（trk173・PLAYER-ROADMAP #14）：解析キャッシュ（core.analysis＝端末内・trk_analysis_cache_v1）の
+   rms 包絡をシークバーに重ねて描く。解析が無い曲（長い曲・🪶軽量化・大きなファイル）では何も描かない＝ふつうのバーのまま。
+   ホバーサムネ（動画フレーム）は別のデコード経路が要るので今回は見送り＝代わりに「その位置の時刻」の吹き出しを出す。 */
+function waveColumns(a, cols) {
+  if (!a || !a.rms || !(a.frames > 0) || !(cols > 0)) return null;
+  const rms = a.rms, frames = a.frames;
+  const max = Number.isFinite(a.maxRms) && a.maxRms > 0 ? a.maxRms : 1;
+  const out = new Float32Array(cols);
+  for (let x = 0; x < cols; x++) {
+    const f0 = Math.floor(x * frames / cols), f1 = Math.min(frames, Math.max(f0 + 1, Math.ceil((x + 1) * frames / cols)));
+    let m = 0;
+    for (let f = f0; f < f1; f++) { const v = rms[f]; if (v > m) m = v; }
+    out[x] = Math.min(1, Math.pow(m / max, 0.7));   /* ガンマ補正：静かな部分も見えるように */
+  }
+  return out;
+}
+function drawWave() {
+  if (!waveNode) return;
+  const a = core.settings.mediaWave !== false ? core.analysis : null;
+  if (!a || !a.rms || !(a.frames > 0) || !core.videoReady || !Number.isFinite(core.video.duration) || core.video.duration <= 0) {
+    waveNode.hidden = true;
+    if (waveTipNode) waveTipNode.hidden = true;
+    return;
+  }
+  const w = waveNode.clientWidth, h = waveNode.clientHeight;
+  if (w < 8 || h < 4) return;
+  const dpr = window.devicePixelRatio || 1;
+  const pw = Math.max(1, Math.round(w * dpr)), ph = Math.max(1, Math.round(h * dpr));
+  if (waveNode.width !== pw || waveNode.height !== ph) { waveNode.width = pw; waveNode.height = ph; waveCols = null; }
+  const s = core.currentSong;
+  const sig = `${s ? s.key : ""}|${a.frames}|${pw}`;
+  if (waveSig !== sig || !waveCols) { waveCols = waveColumns(a, pw); waveSig = sig; }
+  const ctx = waveNode.getContext("2d");
+  if (!ctx || !waveCols) return;
+  waveNode.hidden = false;
+  ctx.clearRect(0, 0, pw, ph);
+  const progress = Math.min(1, Math.max(0, (core.video.currentTime || 0) / core.video.duration));
+  const playedTo = Math.round(progress * pw), mid = ph / 2;
+  for (let x = 0; x < pw; x++) {
+    const v = waveCols[x];
+    if (v <= 0.005) continue;
+    const bh = Math.max(1, Math.round(v * (ph - 2)));
+    ctx.fillStyle = x < playedTo ? "rgba(255,209,102,.75)" : "rgba(160,190,255,.32)";
+    ctx.fillRect(x, Math.round(mid - bh / 2), 1, bh);
+  }
+}
 /* 💤「チャプターの終わり」スリープの見張り（250ms周期に相乗り）。境界に達したら曲の終わりモードと同じ形で止まる */
 function checkChapterSleep() {
   if (!sleepChapterEnd || !core.videoReady || reverseActive || reverseLoading) return;
@@ -1306,6 +1357,7 @@ function renderMedia() {
   renderChaptersActive();   /* 🔖 チャプターのハイライト（trk170・行が変わったときだけ付け替え） */
   checkChapterSleep();      /* 💤「チャプターの終わりで止める」の見張り（trk170） */
   noteMediaPlay();          /* 🎧「ちゃんと聴いた」計数（trk172・30秒/半分を超えたら1回だけ） */
+  drawWave();               /* 🌊 波形シークバー（trk173・再生位置の塗り分けを250ms周期で更新） */
   renderWall();
   renderQueue();
   syncMediaStage();
@@ -1397,7 +1449,27 @@ function buildMedia() {
   const progressRow = core.el("div", "mediaProgressRow");
   progressNode = document.createElement("input"); progressNode.type = "range"; progressNode.min = "0"; progressNode.step = "0.1"; progressNode.value = "0"; progressNode.className = "mediaProgress"; progressNode.setAttribute("aria-label", tr("mediaSeek"));
   timeNode = core.el("span", "mono mediaTime", "0:00 / 0:00");
-  progressRow.append(progressNode, timeNode);
+  /* 🌊 波形シークバー（trk173）：range の上に canvas を重ねる（pointer-events:none＝操作は range のまま）。
+     吹き出しはホバー位置の時刻（動画フレームのサムネはデコード経路が別なので今回は見送り） */
+  waveWrapNode = core.el("div", "mediaProgressWrap");
+  waveNode = document.createElement("canvas"); waveNode.className = "mediaWave"; waveNode.setAttribute("aria-hidden", "true"); waveNode.hidden = true;
+  waveTipNode = core.el("div", "mediaWaveTip"); waveTipNode.hidden = true;
+  waveWrapNode.append(waveNode, progressNode, waveTipNode);
+  progressRow.append(waveWrapNode, timeNode);
+  waveWrapNode.addEventListener("pointermove", e => {
+    if (!waveTipNode || core.settings.mediaWave === false || !core.videoReady || !Number.isFinite(core.video.duration) || core.video.duration <= 0) return;
+    const r = waveWrapNode.getBoundingClientRect();
+    if (!r.width) return;
+    const ratio = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+    waveTipNode.textContent = mpFmt(ratio * core.video.duration);
+    waveTipNode.style.left = (ratio * 100) + "%";
+    waveTipNode.hidden = false;
+  });
+  waveWrapNode.addEventListener("pointerleave", () => { if (waveTipNode) waveTipNode.hidden = true; });
+  if (typeof ResizeObserver === "function") {   /* 幅が変わったら包絡を計算し直す（Dialog のリサイズ・端末回転） */
+    const ro = new ResizeObserver(() => { waveCols = null; waveSig = ""; drawWave(); });
+    ro.observe(waveWrapNode);
+  }
   progressNode.addEventListener("pointerdown", () => { seeking = true; });
   progressNode.addEventListener("pointerup", () => { seeking = false; });
   progressNode.addEventListener("input", () => { if (core.videoReady && core.video.duration) { if (reverseActive || reverseLoading) stopReverse(false, true); core.video.currentTime = Number(progressNode.value); timeNode.textContent = `${mpFmt(core.video.currentTime)} / ${mpFmt(core.video.duration)}`; } });
@@ -1730,7 +1802,16 @@ function buildMedia() {
     wakeCheck.addEventListener("change", () => { core.settings.mediaWakeLock = wakeCheck.checked; core.saveUserPrefs(); updateWakeLock(); });
     wakeCheckLabel.append(wakeCheck, tx("span", "mediaWakeLockToggle"));
     wakePanel.append(wakeHeading, wakeHint, wakeCheckLabel);
-    anchor.after(panel, wallPanel, wakePanel);
+    /* 🌊 波形シークバー（trk173）：🔆 の隣に置く小さな設定 */
+    const wavePanel = core.el("details", "subPanel mediaWavePanel"); wavePanel.id = "mediaWavePanel";
+    const waveHeading = tx("summary", "mediaWaveTitle");
+    const waveHint = tx("div", "mediaWaveHint", "hint");
+    const waveCheckLabel = core.el("label", "checkLine");
+    const waveCheck = document.createElement("input"); waveCheck.type = "checkbox"; waveCheck.checked = core.settings.mediaWave !== false;
+    waveCheck.addEventListener("change", () => { core.settings.mediaWave = waveCheck.checked; core.saveUserPrefs(); drawWave(); });
+    waveCheckLabel.append(waveCheck, tx("span", "mediaWaveToggle"));
+    wavePanel.append(waveHeading, waveHint, waveCheckLabel);
+    anchor.after(panel, wallPanel, wakePanel, wavePanel);
     core.on("language", () => { syncVideoKeysUI(); syncWallSettingsUI(); });
     syncVideoKeysUI(); syncWallSettingsUI();
   }

@@ -2596,6 +2596,31 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else ok("trk172: ⚡ smart shelf (recently played / most played / recently added) runs on device-only records; player listens count separately and never become a share proof");
 }
 
+// trk173: 🌊 波形シークバー（PLAYER-ROADMAP #14）。解析キャッシュ（core.analysis＝端末内）の rms 包絡を range の上に
+// canvas で重ねる（pointer-events:none＝操作は range のまま）。ホバーは時刻の吹き出し（動画フレームのサムネは見送り）。
+// 解析が無い曲・設定オフでは隠す＝ふつうのバーのまま。新しい読み取り・送信なし（描画は既存の解析を読むだけ）。
+{
+  const player = read("js/media-player-mode.js");
+  const core = read("js/core.js");
+  const css = read("css/style.css");
+  /* ⚠ read() は正規化後の本文：core.settings は settings に、window.devicePixelRatio は devicePixelRatio に見える */
+  if (!player.includes("function waveColumns(a, cols)") || !player.includes("function drawWave()") ||
+      !player.includes("waveWrapNode.append(waveNode, progressNode, waveTipNode)") ||
+      !player.includes("progressRow.append(waveWrapNode, timeNode)") ||
+      !player.includes('waveNode.setAttribute("aria-hidden", "true")') ||
+      !player.includes('waveWrapNode.addEventListener("pointermove"') ||
+      !player.includes('waveWrapNode.addEventListener("pointerleave"') ||
+      !player.includes("new ResizeObserver(() => { waveCols = null; waveSig = \"\"; drawWave(); })") ||
+      !player.includes("drawWave();") || !player.includes("settings.mediaWave = waveCheck.checked; saveUserPrefs(); drawWave();") ||
+      !player.includes("anchor.after(panel, wallPanel, wakePanel, wavePanel)") ||
+      (player.match(/mediaWaveTitle:/g) || []).length !== 4 ||
+      (player.match(/mediaWaveHint:/g) || []).length !== 4 ||
+      (player.match(/mediaWaveToggle:/g) || []).length !== 4) fail("media-player-mode.js waveform seek bar (envelope, overlay canvas, time bubble, toggle, four-language texts) is missing");
+  else if (!core.includes("mediaWave: prefs.mediaWave !== false,") || (core.match(/settings\.mediaWave = true;/g) || []).length !== 2) fail("core.js must default mediaWave on (and both reset lists must restore it)");
+  else if (!css.includes(".mediaWave{position:absolute;") || !css.includes(".mediaProgressWrap{position:relative;") || !css.includes(".mediaWaveTip{")) fail("waveform overlay/bubble styles are missing");
+  else ok("trk173: 🌊 the seek bar draws the cached rms envelope behind an aria-hidden overlay canvas (time bubble on hover, toggle next to 🔆, plain bar without analysis)");
+}
+
 // 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own
 // "don't sway" option, plus the ❓ mystery switch that outranks both.
 {

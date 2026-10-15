@@ -2308,12 +2308,404 @@ if (!read("js/main.js").includes("guideEggKind") ||
              !tv.includes('tvVideoMax:"') || !/top\.append\(pow, prevSongBtn, lcd, nextSongBtn, pauseBtn\)/.test(tv)) {
     fail("TV dock video-maximize key (right of the next-song key) is missing");
   } else if (!media.includes("maxNode = makeButton(\"mediaVideoMax\"") ||
-             !media.includes("controls.append(prev, playNode, next, reverseNode, maxNode, wallNode, restart)") ||
+             !media.includes("controls.append(prev, playNode, next, reverseNode, maxNode, pipNode, wallNode, restart)") ||
              !media.includes('mediaVideoMax:"')) {
     fail("media player full-screen button (right of reverse, wallpaper shifted right) is missing");
   } else {
     ok("full-screen video viewer is wired (TV dock ⛶ + media player, wallpaper stays one step right)");
   }
+}
+
+// trk164: ▶ メディアプレーヤーの🥇4点（📌画中画／🔆Wake Lock／⏪スマート巻き戻し／💤スリープ強化）
+// の配線が消えていないことを確認する。決定ロジック本体は tests/trk164-media-controls.test.mjs（実ソースをvmで実行）。
+{
+  const media = read("js/media-player-mode.js");
+  const core = read("js/core.js");
+  /* ⚠ read() は `core.X` を正規化したあとの本文を返す（js-source.mjs）＝`core.video` → `video`、
+     `core.settings` → `settings` になる。期待文字列は正規化後の綴りで書く（lane sway の検査と同じ慣習）。 */
+  const pipOk = media.includes("async function togglePip()") &&
+    media.includes("document.pictureInPictureEnabled") &&
+    media.includes('pipNode = makeButton("mediaPip", "mediaSmallBtn")') &&
+    media.includes('video.addEventListener("enterpictureinpicture"') &&
+    media.includes("document.exitPictureInPicture()") &&
+    (media.match(/mediaPip:"/g) || []).length >= 4;
+  const wakeOk = media.includes("async function updateWakeLock()") &&
+    media.includes('navigator.wakeLock.request("screen")') &&
+    media.includes("settings.mediaWakeLock !== false") &&
+    media.includes('wakePanel.id = "mediaWakePanel"') &&
+    (media.match(/mediaWakeLockTitle:"/g) || []).length >= 4 &&
+    core.includes("mediaWakeLock: prefs.mediaWakeLock !== false");
+  const rewindOk = media.includes("function resumeRewindSeconds(v)") &&
+    media.includes("function rewindResumePosition(p, seconds)") &&
+    (media.match(/savedMediaPosition\(\{ resume: true \}\)/g) || []).length >= 2 &&
+    media.includes("settings.mediaResumeRewind = resumeRewindSeconds(resumeNode.value)") &&
+    core.includes("mediaResumeRewind: pick(prefs.mediaResumeRewind, [0, 3, 5, 10, 15, 30], 0)") &&
+    (core.match(/settings\.mediaResumeRewind = 0/g) || []).length >= 2;
+  const sleepOk = media.includes("function planSleepFade(totalSeconds, fadeSeconds)") &&
+    media.includes("sleepTrackMode") &&
+    media.includes('o.value = "track"') &&
+    media.includes("restoreSleepFadeVolume()") &&
+    (media.match(/mediaSleepTrack:"/g) || []).length >= 4;
+  if (!pipOk) fail("trk164 📌 picture-in-picture wiring is missing (media-player-mode.js)");
+  else if (!wakeOk) fail("trk164 🔆 wake-lock wiring is missing (media-player-mode.js + core.js)");
+  else if (!rewindOk) fail("trk164 ⏪ resume-rewind wiring is missing (media-player-mode.js + core.js)");
+  else if (!sleepOk) fail("trk164 💤 sleep-timer upgrade wiring is missing (fade + end-of-track)");
+  else ok("trk164: media player 📌 PiP / 🔆 Wake Lock / ⏪ resume rewind / 💤 sleep (fade + end of track) are wired, in four languages");
+}
+
+// trk165: 📥 OSの共有／「このアプリで開く」（share_target＋file_handlers）の配線。
+// ファイルは必ず既存の取り込み経路（library／study-room／custom）へ合流する＝新しい検証入口を作らない。
+{
+  const html = read("index.html");
+  const sw = read("sw.js");
+  const share = read("js/share-inbox.js");
+  const library = read("js/library.js");
+  const study = read("js/study-room.js");
+  const custom = read("js/custom.js");
+  let manifestOk = false;
+  try {
+    const manifest = JSON.parse(read("manifest.webmanifest"));
+    manifestOk = !!manifest.share_target && manifest.share_target.method === "POST" &&
+      manifest.share_target.enctype === "multipart/form-data" &&
+      manifest.share_target.action === "./share-target/" &&
+      ((manifest.share_target.params || {}).files || []).map(f => f.name).join(",") === "media,packs,books" &&
+      Array.isArray(manifest.file_handlers) && manifest.file_handlers.length === 1 &&
+      manifest.file_handlers[0].launch_type === "single-client";
+  } catch (_) {}
+  const shareTag = '<script src="js/share-inbox.js"></script>';
+  /* ⚠ read("js/…") は別名正規化後の本文を返す（tools/lib/js-source.mjs）：
+     `window.Trk.library.addSongFiles(…)` は `addSongFiles(…)` のように見える。期待文字列は正規化後の綴りで書く */
+  if (!manifestOk) fail("manifest share_target / file_handlers (trk165) are missing or malformed");
+  else if (!html.includes(shareTag) || html.indexOf(shareTag) < html.indexOf('<script src="js/backup.js"></script>')) fail("js/share-inbox.js must load after js/backup.js (all import entry points ready)");
+  else if (!sw.includes("async function handleShareTarget(request)") || !sw.includes('const SHARE_CACHE = "trk-share-inbox-v1"') ||
+           !sw.includes("key !== SHARE_CACHE") || !sw.includes('if (request.method === "POST")') ||
+           !sw.includes('new URL("share-target/", SCOPE).pathname')) fail("sw.js share-target POST handling / inbox-cache whitelist is missing");
+  else if (!share.includes("async function routeInboundFiles(files)") || !share.includes("addSongFiles(groups.audio)") ||
+           !share.includes("addVideoFiles(groups.video)") || !share.includes("importArchives(groups.book)") ||
+           !share.includes("installAndUse(file)") || !share.includes('window.launchQueue.setConsumer') && !share.includes('"launchQueue" in window') ||
+           (share.match(/shareInboundNone:"/g) || []).length < 4 || (share.match(/shareInboundUnsupported:"/g) || []).length < 4) fail("share-inbox.js routing (existing paths only), launchQueue consumer or 4-language strings are missing");
+  else if (!library.includes("LIB_SHOW, MEDIA_EXT, VIDEO_EXT, addSongFiles") ||
+           !study.includes("importArchives:studyImportArchives") ||
+           !custom.includes("updateMascotUI, installAndUse")) fail("import entry points are not exported for the share inbox (library / study / custom)");
+  else ok("trk165: 📥 share_target + file_handlers merge into the existing import paths (no new validation entry), in four languages");
+}
+
+// trk166: 🎤 歌詞（LRC＋埋め込み歌詞）。読み取り専用＝元ファイルへの書き戻し経路が無く、外へも送らない。
+{
+  const html = read("index.html");
+  const art = read("js/audio-art.js");
+  const lyrics = read("js/lyrics.js");
+  const player = read("js/media-player-mode.js");
+  const library = read("js/library.js");
+  const core = read("js/core.js");
+  const css = read("css/style.css");
+  const sw = read("sw.js");
+  const lyricsTag = '<script src="js/lyrics.js"></script>';
+  /* ⚠ read("js/…") は `window.Trk.lyrics.` などの接頭辞を落として返す（先頭の trk165 ブロックの注意と同じ） */
+  if (!html.includes(lyricsTag) || html.indexOf(lyricsTag) < html.indexOf('<script src="js/audio-art.js"></script>') ||
+      html.indexOf(lyricsTag) > html.indexOf('<script src="js/library.js"></script>')) fail("js/lyrics.js must load right after js/audio-art.js (before library.js / media-player-mode.js)");
+  else if (!art.includes("extractLyrics") || !art.includes("lyricsBytes:MAX_LYRICS_BYTES") ||   /* ⚠ export 行の完全一致は trk167 で割れたので名前だけで見る */
+           !art.includes('type === "\\xA9lyr"') || !art.includes("parseSyltFrame") || !art.includes("parseLyricsTextFrame") ||
+           !art.includes("UNSYNCEDLYRICS") || art.includes("createWritable")) fail("audio-art.js extractLyrics (USLT/SYLT/©lyr/Vorbis LYRICS, read-only) is missing");
+  else if (!lyrics.includes("function parseLrc(src)") || !lyrics.includes("function activeLineIndex(lines, seconds)") ||
+           !lyrics.includes("function normalizeLyrics(source)") || !lyrics.includes("async function resolveLyrics(song)") ||
+           !lyrics.includes('const LYRICS_KEY = "trk_lyrics_v1"') || !lyrics.includes("manualLyrics(song.key)") ||
+           !lyrics.includes("song.lyricsFile") || !lyrics.includes("extractLyrics(song.file)") ||
+           !lyrics.includes("window.Trk.lyrics = Object.freeze({")) fail("lyrics.js parser / manual store / resolution chain is missing");
+  else if (!library.includes('it.lyricsFile = lyrics[it.dir + "/" + it.base] || null') || !library.includes('n.endsWith(".lrc")')) fail("the folder scan must attach same-named .lrc files to songs");
+  else if (!core.includes("mediaLyricsOpen: prefs.mediaLyricsOpen === true") || (core.match(/settings\.mediaLyricsOpen = false/g) || []).length < 2) fail("mediaLyricsOpen setting (and its two reset paths) is missing in core.js");
+  else if (!player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") ||
+           !player.includes("renderLyrics();   /* 🎤") || !player.includes('lyricsFileNode.accept = ".lrc,.txt,text/plain"') ||
+           !player.includes("on(\"songSelected\", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics();") ||   /* core. は正規化で外れる。末尾は trk169 で loadSubs が増えたので閉じ括弧まで固定しない */
+           !player.includes("api.saveManualLyrics(song.key, r.text, file.name)") ||
+           (player.match(/mediaLyricsTitle:"/g) || []).length < 4 || (player.match(/mediaLyricsNeedSong:"/g) || []).length < 4) fail("media-player lyrics panel wiring or 4-language strings are missing");
+  else if (!css.includes(".mediaLyricsBox") || !css.includes(".lyricLineActive") || !css.includes("body.helpTextOff .mediaLyricsBox>.hint")) fail("lyrics panel styles are missing");
+  else ok("trk166: 🎤 lyrics — LRC parser + embedded tags (read-only), folder .lrc, manual pick, synced highlight, in four languages");
+  /* sw.js の cache 版数は固定しない：別の「service-worker cache」見張りが現在の版を確認している */
+}
+
+// trk167: 🏷 埋め込みテキストタグ（ID3 TIT2/TPE1/TALB/TPE2/TRCK/TCON・MP4 ©nam/©ART/©alb/aART/trkn/©gen・
+// Vorbis TITLE/ARTIST/ALBUM/ALBUMARTIST/TRACKNUMBER/TRACKTOTAL/GENRE）の表示。
+// 読み取り専用＝書き戻し経路（createWritable）を許さない。カタログ照合キーには触れない。
+{
+  const art = read("js/audio-art.js");
+  const library = read("js/library.js");
+  const player = read("js/media-player-mode.js");
+  const sw = read("sw.js");
+  /* ⚠ read("js/…") は正規化後の本文：`core.emit(` は `emit(`、`window.Trk.media.audioArt` は `media.audioArt` に見える */
+  if (!art.includes("extractTags,") || !art.includes("extractLyrics,") || !art.includes("tagText:MAX_TAG_TEXT") ||   /* ⚠ export 行の完全一致は trk170（extractChapters 追加）で再び割れたので名前だけで見る */
+      !art.includes("ID3_TAG_FRAMES") || !art.includes("MP4_TAG_BOXES") || !art.includes("VORBIS_TAG_KEYS") ||
+      !art.includes("async function extractTags(file)") || art.includes("createWritable")) fail("audio-art.js extractTags (read-only text tags) is missing");
+  else if (!library.includes("const songTags = new Map()") ||
+           !library.includes("return meta.title || songTagField(it, \"title\") || touhouCatalogTitle(it) || (it && it.title) || \"\"") ||
+           !library.includes("async function loadSongTags(it)") || !library.includes("function songDisplayMeta(it)") ||
+           !library.includes("void loadSongTags(job.it)") || !library.includes("if (canExtractSongArt(it)) void loadSongTags(it);") ||
+           !library.includes("b.dataset.songKey = it.key") || !library.includes("emit(\"songTags\", it)") ||
+           !library.includes("window.songDisplayTitle = songDisplayTitle") ||
+           !library.includes("songDisplayTitle, songDisplayMeta, songTagsOf, loadSongTags") ||
+           !library.includes("plNormTitle((metaOf(it.key) || {}).artist || it.artist)") ||
+           library.includes("createWritable")) fail("library.js tag store / display priority / matching separation is missing");
+  else if (!player.includes("function trackDisplayMeta(s)") ||
+           !player.includes("on(\"songTags\", () => { renderQueue(); if (mediaOpen) renderMedia(); })") ||
+           !player.includes("title:d.title || s.title || baseName(mediaName) || \"trk!\"")) fail("the media player must follow the tag display title (header, queue, Media Session)");   /* core. は正規化で外れる */
+  else if (!/^const CACHE = "trk-v[\d.]+-trk\d+";$/m.test(sw)) fail("sw.js cache name lost its versioned shape");
+  else ok("trk167: 🏷 embedded text tags feed the display-name chain (read-only, catalog matching untouched)");
+}
+
+// trk168: 🔊 音量の平準化（ReplayGain方式）。通り道の G.norm（音量 → 平準化 → リミッター/出口）は常設で、
+// 材料は「タグの REPLAYGAIN_TRACK_GAIN → 解析の loudness（ゲート付きRMS）」。どちらも無ければ素通し。
+// 解析キャッシュは後方互換（analysisCacheValid は loudness を要求しない＝古い記録も読める）で、
+// ファイルは読み取りだけ（書き戻しは trk167 の見張りが createWritable 不在で担保）。
+{
+  const fx = read("js/fx.js");
+  const media = read("js/media.js");
+  const art = read("js/audio-art.js");
+  /* ⚠ read() 正規化後：fx.js の `window.Trk.media.loudnessDb(a)` は `loudnessDb(a)` に見える */
+  if (!fx.includes("G.norm = gainN(ac, 1)") || !fx.includes("G.vol.connect(G.norm)") ||
+      !fx.includes("G.norm.connect(G.lim); G.lim.connect(G.out)") || !fx.includes("else G.norm.connect(G.out)") ||
+      !fx.includes("const NORM_TARGET_DB = -16, NORM_DB_MIN = -18, NORM_DB_MAX = 9, NORM_LIN_CAP = 2;") ||
+      !fx.includes("function normPlan(") || !fx.includes("settings.fxNorm = prefs.fxNorm === true") ||
+      !fx.includes("on(\"mediaReady\", () => { if (settings.fxNorm && !G.src && G.ok) ensureGraph(); applyNorm(); })") ||
+      !fx.includes("on(\"songTags\", () => { if (settings.fxNorm && !G.src && G.ok) ensureGraph(); applyNorm(); })") ||
+      !fx.includes("loudnessDb(a) : NaN") || !fx.includes("lib.songTagsOf(song)") ||
+      !fx.includes("normInfo:() => ({ on:!!settings.fxNorm") ||
+      (fx.match(/sfxNormTitle:/g) || []).length !== 4) fail("fx.js loudness leveling (norm node, plan, hooks, four languages) is missing");
+  else if (!media.includes("maxRms: maxRms || 1, scale: scale || 1, loudness, peak") ||
+           !media.includes("function loudnessDb(a)") ||
+           !media.includes("loudness: a.loudness, peak: a.peak") ||
+           !media.includes("loudness: rec.loudness, peak: rec.peak") ||
+           !media.includes("loadSE, loudnessDb, playSE")) fail("media.js analysis loudness/peak + cache + loudnessDb export is missing");
+  else if (/function analysisCacheValid\(r\) \{[\s\S]*?\n\}/.exec(media)?.[0].includes("loudness")) fail("analysisCacheValid must stay backward compatible (old cache records without loudness must remain valid)");
+  else if (!art.includes("function parseRgDb(") || !art.includes("function parseMp4FreeformRg(") ||
+           (art.match(/REPLAYGAIN_TRACK_GAIN/g) || []).length < 3 || !art.includes("out.rgTrackGain")) fail("audio-art.js ReplayGain tag reading (ID3 TXXX / Vorbis / MP4 freeform) is missing");
+  else ok("trk168: 🔊 loudness leveling reads ReplayGain tags or measured loudness, applies via the always-in-path norm gain (read-only)");
+}
+
+// trk169: 💬 字幕（SRT/VTT）。外部字幕ファイル優先（埋め込み字幕トラックはブラウザ制約で対象外）。
+// 優先順：手で選んだファイル → フォルダの同名 .srt/.vtt。表示は DOM オーバーレイ（映像は canvas 描画のため）、
+// 画中画だけ同じ内容の WebVTT を <track> で。読み取りだけ＝書き戻し・送信なし。
+{
+  const subs = read("js/subtitles.js");
+  const library = read("js/library.js");
+  const player = read("js/media-player-mode.js");
+  const max = read("js/video-max.js");
+  const html = read("index.html");
+  const css = read("css/style.css");
+  /* ⚠ read("js/…") は正規化後の本文：`core.on(` は `on(`、`window.Trk.<module>.` 前置は外れて見える */
+  if (!subs.includes('const SUBS_KEY = "trk_subs_v1"') || !subs.includes("function parseSubtitles(") ||
+      !subs.includes("function stampSeconds(") || !subs.includes("function toVtt(") ||
+      !subs.includes("function activeCues(") || !subs.includes("async function resolveSubs(song)") ||
+      !subs.includes("function attachTrack(") || !subs.includes("Trk.subtitles = Object.freeze") ||
+      subs.includes("createWritable") || subs.includes("fetch(")) fail("subtitles.js parser/store/PiP-track module is missing (or grew a write/network path)");
+  else if (!library.includes('} else if (lower.endsWith(".srt") || lower.endsWith(".vtt")) {') ||
+           !library.includes('it.subsFile = subs[it.dir + "/" + it.base] || null') ||
+           !library.includes('n.endsWith(".srt") || n.endsWith(".vtt")')) fail("library.js must pick up folder sidecar .srt/.vtt into it.subsFile");
+  else if (!player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") ||
+           !player.includes("stageWrap.append(stageCanvas, subsOverlay, stageNote)") ||
+           !player.includes("renderSubsOverlay();") ||
+           !player.includes("on(\"songSelected\", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics(); loadSubs(true); });") ||
+           !player.includes("subsBox.hidden = !subsAllowed();") ||
+           !player.includes("attachTrack(video, d.cues, d.offsetMs") ||   /* core.video は正規化で video になる */
+           (player.match(/mediaSubsTitle:/g) || []).length !== 4 ||
+           (player.match(/mediaSubsOffsetNow:/g) || []).length !== 4) fail("the media player must wire the 💬 panel, overlay, PiP track and four-language texts");
+  else if (!max.includes("stage.append(canvas, subsNode, noteNode)") ||
+           !max.includes('api.currentTexts(videoEl.currentTime || 0).join("\\n")')) fail("video-max fullscreen must show the subtitle overlay");
+  else if (!html.includes('<script src="js/subtitles.js"></script>') ||
+           !(html.indexOf("js/lyrics.js") < html.indexOf("js/subtitles.js") && html.indexOf("js/subtitles.js") < html.indexOf("js/judge-match.js"))) fail("subtitles.js must load right after lyrics.js");
+  else if (!css.includes(".mediaSubs{") || !css.includes(".videoMaxSubs{") || !css.includes(".mediaSubsBox{")) fail("subtitle overlay/panel styles are missing");
+  else ok("trk169: 💬 SRT/VTT subtitles ride the folder pickup, show as a DOM overlay (+ PiP <track>), delay-adjustable, read-only");
+}
+
+// trk170: 🔖 M4Bチャプター。chpl(Nero) ボックスを読み取りだけ（js/audio-art.js・FFmpeg mov.c と同じ並び）、
+// m4b/m4a/mp4/mov の曲だけチャプターパネルが出る。クリックでジャンプ、いまのチャプターはハイライト。
+// 💤 スリープに「チャプターの終わりで止める」を追加。m4b がフォルダ取込の対象（MEDIA_EXT）。書き戻し・送信なし。
+{
+  const art = read("js/audio-art.js");
+  const library = read("js/library.js");
+  const player = read("js/media-player-mode.js");
+  const css = read("css/style.css");
+  /* ⚠ read() は正規化後の本文：window.Trk.audioArt. 前置は外れ、core.video は video に見える */
+  if (!art.includes("function parseChplBox(") || !art.includes("function findChpl(") ||
+      !art.includes("function extractChapters(") || !art.includes("extractChapters,") ||
+      !art.includes("chapters:MAX_CHAPTERS") || !art.includes('mode === "chapters"') ||
+      art.includes("createWritable") || art.includes("fetch(")) fail("audio-art.js chpl chapter reader/export is missing (or grew a write/network path)");
+  else if (!/const MEDIA_EXT = \[[^\]]*"m4b"[^\]]*\]/.test(library)) fail("library.js MEDIA_EXT must include m4b (audiobook folder)");
+  else if (!player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") ||
+           !player.includes("function chapsAllowed()") || !player.includes("async function ensureChapters()") ||
+           !player.includes("function renderChapters()") || !player.includes("function renderChaptersActive()") ||
+           !player.includes("function seekToChapter(t)") || !player.includes("function stepChapter(delta)") ||
+           !player.includes("function checkChapterSleep()") ||
+           !player.includes("api.extractChapters(s.file)") || !player.includes("sleepChapterEnd") ||
+           !player.includes("renderChaptersActive();") || !player.includes("checkChapterSleep();") ||
+           !player.includes('on("songSelected", () => { loadChapters(true); });') ||
+           !player.includes("chapBox.hidden = !chapsAllowed();") ||
+           (player.match(/mediaChapTitle:/g) || []).length !== 4 ||
+           (player.match(/mediaSleepChapter:/g) || []).length !== 4) fail("the media player must wire the 🔖 chapter panel, tick hooks, chapter sleep and four-language texts");
+  else if (!css.includes(".mediaChapBox{") || !css.includes(".mediaChapList{") || !css.includes(".chapLine{") || !css.includes(".chapLineActive")) fail("chapter panel styles are missing");
+  else ok("trk170: 🔖 M4B chapters (chpl, read-only) show in a jump-list panel, highlight the current chapter, and feed a \"sleep: end of chapter\" mode; m4b joins MEDIA_EXT");
+}
+
+// trk171: 💿🎤 アルバム別／アーティスト別のグループ表示＋トラック番号順（PLAYER-ROADMAP #16・trk167 のタグ土台の上）。
+// 棚はアルバム名／アーティスト名を持つ曲があれば出る。グループの無い曲は「タグなし」で最後。表示だけ＝保存データもタグも触らない。
+{
+  const library = read("js/library.js");
+  const css = read("css/style.css");
+  /* ⚠ read() は正規化後の本文：core.settings は settings に、window.Trk.library 前置は外れて見える */
+  if (!library.includes("function libTrackNoOf(it)") || !library.includes("function libGroupKeyOf(it, mode)") ||
+      !library.includes("function libGroupCmp(mode, fallback)") ||
+      !library.includes("function libEnsureGroupTags(items)") || !library.includes("function libGroupRerenderSoon()") ||
+      !library.includes('tabs.push({ id:"albums", icon:"💿", label:tr("libTabAlbums"), n:shelfN });') ||
+      !library.includes('tabs.push({ id:"artists", icon:"🎤", label:tr("libTabArtists"), n:shelfN });') ||
+      !library.includes('if (id === "albums" || id === "artists") return true;') ||
+      !library.includes('const grouped = tabId === "albums" || tabId === "artists";') ||
+      !library.includes("items.sort(libGroupCmp(tabId, cmp));") ||
+      !library.includes('el("div", "libGroupHead")') || !library.includes("libEnsureGroupTags(items);") ||
+      !library.includes('if (settings.libTab === "albums" || settings.libTab === "artists") libGroupRerenderSoon();') ||
+      (library.match(/libTabAlbums:/g) || []).length !== 4 ||
+      (library.match(/libNoTagsGroup:/g) || []).length !== 4 ||
+      (library.match(/libGroupTagsLoading:/g) || []).length !== 4) fail("library.js album/artist group shelves (sorting, sticky headers, tag pre-load, four-language texts) are missing");
+  else if (!css.includes(".libGroupHead{position:sticky;top:0;") || !css.includes(".libGroupName{") || !css.includes(".libGroupN{")) fail("group header styles are missing");
+  else ok("trk171: 💿🎤 album/artist shelves group the song list (track-number order inside, no-tags group last, sticky headers, tag pre-load)");
+}
+
+// trk172: ⚡ スマート棚（PLAYER-ROADMAP #11）。材料は端末内の記録だけ（PLAYED・records・songDB の addedAt）＝送信なし。
+// 🎧 プレーヤー再生は PLAYED.media に別途計上（30秒/半分ルール）。証明（plProof＝共有の ▶AUTO 印）は auto/manual のまま＝media を知らない。
+{
+  const library = read("js/library.js");
+  const player = read("js/media-player-mode.js");
+  /* ⚠ read() は正規化後の本文：core.on( は on( 、window.Trk.play. 前置は外れて見える */
+  if (!library.includes("function libSmartLast(x)") || !library.includes("function libSmartPlays(x)") ||
+      !library.includes("function libSmartSections(items, labeler, cap = 50)") ||
+      !library.includes("function noteMediaPlayed(key)") || !library.includes("function libSectionHead(label, n)") ||
+      !library.includes('tabs.push({ id:"smart", icon:"⚡", label:tr("libTabSmart"), n:nSmart });') ||
+      !library.includes('if (id === "smart") return true;') ||
+      !library.includes('const smartSections = tabId === "smart" ? libSmartSections(items, k => tr(k)) : null;') ||
+      !library.includes("if (row.sec) { pendingSec = row; continue; }") ||
+      !library.includes("box.append(libSectionHead(pendingSec.sec, pendingSec.n))") ||
+      !library.includes("if (r.it && !seenKeys.has(r.it.key))") ||
+      !library.includes("function addedItem(file, video, addedAt)") ||
+      !library.includes("initLibrary, nextSong, noteMediaPlayed, onLongPress") ||
+      (library.match(/libTabSmart:/g) || []).length !== 4 ||
+      (library.match(/libSmartRecent:/g) || []).length !== 4 ||
+      (library.match(/libSmartTop:/g) || []).length !== 4 ||
+      (library.match(/libSmartAdded:/g) || []).length !== 4) fail("library.js smart shelf (sections, media-play counter, addedAt carry, four-language texts) is missing");
+  else if (/function plProof\(it, idx\) \{[\s\S]*?\n\}/.exec(library)[0].includes("media")) fail("plProof must not learn about PLAYED.media (player listens are not a share proof)");
+  else if (!player.includes("let mediaPlayNotedKey") || !player.includes("function noteMediaPlay()") ||
+           !player.includes("noteMediaPlay();") || !player.includes("noteMediaPlayed(s.key)") ||
+           !player.includes('on("songSelected", () => { mediaPlayNotedKey = ""; });')) fail("the media player must count real listens (30s/half rule) into library.noteMediaPlayed");
+  else ok("trk172: ⚡ smart shelf (recently played / most played / recently added) runs on device-only records; player listens count separately and never become a share proof");
+}
+
+// trk173: 🌊 波形シークバー（PLAYER-ROADMAP #14）。解析キャッシュ（core.analysis＝端末内）の rms 包絡を range の上に
+// canvas で重ねる（pointer-events:none＝操作は range のまま）。ホバーは時刻の吹き出し（動画フレームのサムネは見送り）。
+// 解析が無い曲・設定オフでは隠す＝ふつうのバーのまま。新しい読み取り・送信なし（描画は既存の解析を読むだけ）。
+{
+  const player = read("js/media-player-mode.js");
+  const core = read("js/core.js");
+  const css = read("css/style.css");
+  /* ⚠ read() は正規化後の本文：core.settings は settings に、window.devicePixelRatio は devicePixelRatio に見える */
+  if (!player.includes("function waveColumns(a, cols)") || !player.includes("function drawWave()") ||
+      !player.includes("waveWrapNode.append(waveNode, progressNode, waveTipNode)") ||
+      !player.includes("progressRow.append(waveWrapNode, timeNode)") ||
+      !player.includes('waveNode.setAttribute("aria-hidden", "true")') ||
+      !player.includes('waveWrapNode.addEventListener("pointermove"') ||
+      !player.includes('waveWrapNode.addEventListener("pointerleave"') ||
+      !player.includes("new ResizeObserver(() => { waveCols = null; waveSig = \"\"; drawWave(); })") ||
+      !player.includes("drawWave();") || !player.includes("settings.mediaWave = waveCheck.checked; saveUserPrefs(); drawWave();") ||
+      !player.includes("anchor.after(panel, wallPanel, wakePanel, wavePanel)") ||
+      (player.match(/mediaWaveTitle:/g) || []).length !== 4 ||
+      (player.match(/mediaWaveHint:/g) || []).length !== 4 ||
+      (player.match(/mediaWaveToggle:/g) || []).length !== 4) fail("media-player-mode.js waveform seek bar (envelope, overlay canvas, time bubble, toggle, four-language texts) is missing");
+  else if (!core.includes("mediaWave: prefs.mediaWave !== false,") || (core.match(/settings\.mediaWave = true;/g) || []).length !== 2) fail("core.js must default mediaWave on (and both reset lists must restore it)");
+  else if (!css.includes(".mediaWave{position:absolute;") || !css.includes(".mediaProgressWrap{position:relative;") || !css.includes(".mediaWaveTip{")) fail("waveform overlay/bubble styles are missing");
+  else ok("trk173: 🌊 the seek bar draws the cached rms envelope behind an aria-hidden overlay canvas (time bubble on hover, toggle next to 🔆, plain bar without analysis)");
+}
+
+// trk174: 📈 進捗フィルター（PLAYER-ROADMAP #15・未聴/継続/完了）。**表示層だけ**＝行を絞るだけで保存データは触らない。
+// 判定は位置記憶（trk_media_positions_v1・曲キー or 指紋 keyFp）→ 再生回数（PLAYED manual/auto/media・records plays）。
+// library.js が位置記憶へ書き込むようになったら失敗（読み取り専用の表示層であることの監視）。
+{
+  const library = read("js/library.js");
+  const core = read("js/core.js");
+  const i18n = read("js/i18n.js");
+  const html = read("index.html");
+  /* ⚠ read() は正規化後の本文：core.$( は $( 、core.settings は settings 、core.saveUserPrefs() は saveUserPrefs() に見える */
+  if (!library.includes("function libPositions()") || !library.includes("function libProgressOf(x, positions)") ||
+      !library.includes('const progMode = settings.libProgress || "all";') ||
+      !library.includes("items = items.filter(x => libProgressOf(x, pos) === progMode);") ||
+      !library.includes('$("libProgress").addEventListener("change", e => { settings.libProgress = e.target.value; saveUserPrefs(); renderLib(); });') ||
+      !library.includes('$("libProgress").value = settings.libProgress || "all";') ||
+      library.includes('localStorage.setItem("trk_media_positions_v1"')) fail("library.js progress filter (display-layer only) is missing or grew a write into the position store");
+  else if (!html.includes('<select id="libProgress" data-i18n-aria="libProgressLabel">') ||
+           !html.includes('<option value="progress" data-i18n="progProgress">') ||
+           !(html.indexOf('id="libSort"') < html.indexOf('id="libProgress"'))) fail("the 📈 select must sit right after the sort select in libTools");
+  else if (!core.includes('libProgress: pick(prefs.libProgress, ["all", "new", "progress", "done"], "all"),') ||
+           (core.match(/settings\.libProgress = "all";/g) || []).length !== 2) fail("core.js must validate the libProgress default and restore it in both reset lists");
+  else if ((i18n.match(/progAll:/g) || []).length !== 4 || (i18n.match(/progNew:/g) || []).length !== 4 ||
+           (i18n.match(/progProgress:/g) || []).length !== 4 || (i18n.match(/progDone:/g) || []).length !== 4 ||
+           (i18n.match(/libProgressLabel:/g) || []).length !== 4) fail("progress filter texts must exist in all four languages");
+  else ok("trk174: 📈 progress filter (unplayed / in progress / finished) narrows the row list from position memory + play counts — display layer only, never writes");
+}
+
+// trk175: 📜 書斎の自動スクロール（PLAYER-ROADMAP #12・ハンズフリー縦読み）。縦読み漫画モードだけの等速スクロール。
+// 開始/停止は ⏩ ボタンと A キー、停止はタップ（pointerdown）・ホイール・移動キーでも起きる。下端で自動停止。
+// 表示だけの機能＝栞・位置・DB 保存には触れない。A は予約キー（割り当て変更できない）。
+{
+  const study = read("js/study-room.js");
+  const html = read("index.html");
+  const css = read("css/study-room.css");
+  /* ⚠ read() は正規化後の本文：core.$( は $( に見える */
+  if (!study.includes("const STUDY_AUTO_SCROLL_SPEEDS = [20, 45, 75, 120, 180], STUDY_AUTO_SCROLL_SPEED_DEFAULT = 75;") ||
+      !study.includes('"KeyA", "KeyB"') ||
+      !study.includes("function studyAutoScrollFrame(now)") || !study.includes("function studyToggleAutoScroll()") ||
+      !study.includes("if (!eligible) studyAutoScrollHalt();") ||
+      !study.includes('studyNotify("studyAutoScrollEnd")') ||
+      !study.includes("STUDY_AUTO_SCROLL_STOP_CODES.has(event.code) || event.code === studyPrefs.studyNextKey || event.code === studyPrefs.studyPreviousKey") ||
+      !study.includes('function studyImagePointerDown(event) {\n  studyStopAutoScroll();') ||
+      !study.includes('addEventListener("wheel", event => {\n  studyStopAutoScroll();') ||
+      !study.includes('$("studyAutoScrollBtn").addEventListener("click", studyToggleAutoScroll);') ||
+      !study.includes('studyBindPref("studyAutoScrollSpeed", "studyAutoScrollSpeed", node => {') ||
+      (study.match(/studyStopAutoScroll\(\);/g) || []).length < 5 ||
+      (study.match(/studyAutoScrollStart:"/g) || []).length !== 4 ||
+      (study.match(/studyAutoScrollEnd:"/g) || []).length !== 4 ||
+      (study.match(/studyAutoScrollNeedVertical:"/g) || []).length !== 4 ||
+      (study.match(/studyHelpAuto:"/g) || []).length !== 4) fail("study-room.js auto-scroll (vertical-mode constant speed, tap/wheel/key stop, bottom auto-stop, four-language texts) is missing");
+  else if (!html.includes('<button id="studyAutoScrollBtn"') || !html.includes('<select id="studyAutoScrollSpeed"') ||
+           !html.includes('<option value="180" data-i18n="studyAutoSpeedFastest">') ||
+           !html.includes('<dt>A</dt><dd data-i18n="studyHelpAuto"></dd>') ||
+           !(html.indexOf('id="studyZoomGroup"') < html.indexOf('id="studyAutoScrollBtn"'))) fail("the ⏩ auto-scroll button (toolbar), speed select (settings) and A row (help) are missing");
+  else if (!css.includes('.study-auto-scroll-btn[aria-pressed="true"]{')) fail("the running-state style for the auto-scroll button is missing");
+  else ok("trk175: 📜 study auto-scroll — constant-speed hands-free vertical reading (⏩ button / A key, speed setting, tap·wheel·navigation keys stop it, auto-stop at the last page)");
+}
+
+// trk176: 🌗 書斎の明るさ/コントラスト調整（PLAYER-ROADMAP #13・読書用フィルタ）。
+// 読書面（.study-image-stage / .study-text-stage）だけに CSS filter＝本棚やメニューは変わらない。
+// 全画面フィット・拡大率とは独立。初期値（100/100/none）は "none" を入れるので見た目のコストゼロ。
+{
+  const study = read("js/study-room.js");
+  const html = read("index.html");
+  const css = read("css/study-room.css");
+  if (!study.includes('const STUDY_READ_SPECIALS = ["none", "invert", "grayscale", "sepia"];') ||
+      !study.includes("function studyReadFilterPercent(value)") || !study.includes("function studyReadFilterCss()") ||
+      !study.includes("function studyApplyReadFilter()") ||
+      !study.includes('if (studyPrefs.readBrightness === 100 && studyPrefs.readContrast === 100 && studyPrefs.readSpecial === "none") return "none";') ||
+      !study.includes('room.style.setProperty("--study-read-filter", studyReadFilterCss())') ||
+      !study.includes('readBrightness:100, readContrast:100, readSpecial:"none",') ||
+      !study.includes("studyPrefs.readBrightness = Number.isFinite(rawBrightness) ? Math.min(150, Math.max(50, Math.round(rawBrightness))) : 100;") ||
+      !study.includes('studyBindPref("studyReadSpecial", "readSpecial", () => studyApplyReadFilter());') ||
+      !study.includes('for (const [id, key] of [["studyReadBrightness", "readBrightness"], ["studyReadContrast", "readContrast"]]) {') ||
+      !study.includes('node.addEventListener("input", () => {') ||
+      !study.includes("studyPrefs[key] = studyReadFilterPercent(node.value); studySavePrefs(); studyApplyReadFilter();") ||
+      (study.match(/studyReadFilterHint:"/g) || []).length !== 4 ||
+      (study.match(/studyReadSpecialSepia:"/g) || []).length !== 4) fail("study-room.js read filter (brightness/contrast clamped 50–150, invert/grayscale/sepia, default none, live input + saved change) is missing");
+  else if (!html.includes('<input id="studyReadBrightness" type="range" min="50" max="150" step="5"') ||
+           !html.includes('<input id="studyReadContrast" type="range" min="50" max="150" step="5"') ||
+           !html.includes('<select id="studyReadSpecial"') ||
+           !html.includes('<option value="sepia" data-i18n="studyReadSpecialSepia">') ||
+           !html.includes('<span id="studyReadBrightnessValue" class="study-read-filter-value">')) fail("the 🌗 read-filter controls (two ranges + special select + value labels) are missing from the settings dialog");
+  else if (!css.includes(".study-image-stage,.study-text-stage{filter:var(--study-read-filter,none)}") ||
+           !css.includes(".study-read-filter-row input[type=range]{")) fail("the read filter must apply to the reading surfaces only (.study-image-stage / .study-text-stage)");
+  else ok("trk176: 🌗 study read filter — brightness/contrast sliders + invert/grayscale/sepia on the reading surfaces only, independent of full-screen fit and zoom, none by default");
 }
 
 // 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own
@@ -2368,7 +2760,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
   const offlineOk = !fi.includes("fetch(") && !fi.includes("import ") && !fi.includes("Worker(");
   const uiOk = html.includes('<script src="js/frame-interp.js"></script>') &&
     player.includes("const FI = window.TrkFrameInterp;") &&
-    player.includes("dialog.append(header, display, stageWrap, controls, progressRow, interpBox, loopBox, options, queuePanel, footer)") &&
+    player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer)") &&
     player.includes('FI.attach("media", stageCanvas)') && player.includes('FI.detach("media")') &&
     max.includes('window.TrkFrameInterp.attach("max", canvas)') && max.includes('window.TrkFrameInterp.detach("max")');
   const langOk = (fi.match(/mediaInterpTitle:/g) || []).length === 4 &&

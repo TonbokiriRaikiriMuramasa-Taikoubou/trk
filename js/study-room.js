@@ -19,7 +19,18 @@ Object.assign(TEXT.ja, {
   studyWelcomeHelp:"操作が分からなくなったら、右上の「❓ キーの説明」を開いてください。",
   studySupported:"画像: JPG / PNG / WebP / GIF / AVIF / BMP · 文章: TXT / MD / JSON / CSV / HTML / XML など",
   studyTapHint:"画像の左側タップ／→で次へ · 右側タップ／←で前へ（🇺🇸ではタップ位置を反転） · Space / Enterで次へ · Enter長押しで栞 · Space長押しでページ移動 · Escで終了",
-  studyVerticalHint:"縦にスクロール／フリックして読み進める · Space / Enterで次へ · Enter長押しで栞 · Escで終了",
+  studyVerticalHint:"縦にスクロール／フリックして読み進める · Space / Enterで次へ · Enter長押しで栞 · Aで自動スクロール · Escで終了",
+  studyAutoScrollStart:"⏩ 自動スクロール", studyAutoScrollStop:"⏸ 自動スクロール停止",
+  studyAutoScrollSpeedLabel:"自動スクロールの速度",
+  studyAutoSpeedSlowest:"いちばん遅い", studyAutoSpeedSlow:"遅い", studyAutoSpeedNormal:"普通", studyAutoSpeedFast:"速い", studyAutoSpeedFastest:"いちばん速い",
+  studyAutoScrollSpeedHint:"縦読みモードの「⏩ 自動スクロール」の速さ（1秒あたりのピクセル）。動いている最中の変更もすぐ効きます。タップや移動キー（↑↓・Space・PageUp / PageDown など）で止まります。",
+  studyAutoScrollStarted:"自動スクロールを開始しました · タップか ↑↓ / Space / PageUp・PageDown で停止",
+  studyAutoScrollEnd:"最後のページに着きました · 自動スクロールを停止しました",
+  studyAutoScrollNeedVertical:"自動スクロールは縦読み漫画モードだけで使えます",
+  studyHelpAuto:"縦読みの自動スクロール 開始／停止（縦読み漫画モードだけ）",
+  studyReadBrightnessLabel:"明るさ（読書）", studyReadContrastLabel:"コントラスト（読書）", studyReadSpecialLabel:"特殊フィルタ（読書）",
+  studyReadSpecialNone:"なし", studyReadSpecialInvert:"反転", studyReadSpecialGrayscale:"グレースケール", studyReadSpecialSepia:"セピア",
+  studyReadFilterHint:"読書面（画像と文章）だけに CSS filter を当てます。全画面フィットや拡大率とは独立で、本棚やメニューは変わりません。初期値は 100% / 100% / なし。",
   studyBack:"← 本棚", studyFullscreen:"⛶ 画像を全画面化", studyModeLabel:"画像の並べ方",
   studyModeSingle:"一枚ずつ（中央）", studyModeSpread:"見開き（右が1ページ目）", studyModeVertical:"縦読み漫画",
   studyAmerican:"🇺🇸 アメリカン（左右・順序反転）", studyThemeLabel:"文字のスキン",
@@ -145,7 +156,18 @@ Object.assign(TEXT.en, {
   studyWelcomeHelp:"If you get lost, open “❓ Shortcuts” at the top right.",
   studySupported:"Images: JPG / PNG / WebP / GIF / AVIF / BMP · Text: TXT / MD / JSON / CSV / HTML / XML, and more",
   studyTapHint:"Tap left / → for next · tap right / ← for previous (🇺🇸 reverses tap sides) · Space / Enter for next · hold Enter for a bookmark · hold Space for page seek · Esc to exit",
-  studyVerticalHint:"Scroll or swipe vertically to read · Space / Enter for next · hold Enter for a bookmark · Esc to exit",
+  studyVerticalHint:"Scroll or swipe vertically to read · Space / Enter for next · hold Enter for a bookmark · A for auto-scroll · Esc to exit",
+  studyAutoScrollStart:"⏩ Auto-scroll", studyAutoScrollStop:"⏸ Stop auto-scroll",
+  studyAutoScrollSpeedLabel:"Auto-scroll speed",
+  studyAutoSpeedSlowest:"Slowest", studyAutoSpeedSlow:"Slow", studyAutoSpeedNormal:"Normal", studyAutoSpeedFast:"Fast", studyAutoSpeedFastest:"Fastest",
+  studyAutoScrollSpeedHint:"Speed of “⏩ Auto-scroll” in vertical comic mode, in pixels per second. Changes apply live while it runs. A tap or a navigation key (↑↓, Space, Page Up / Down …) stops it.",
+  studyAutoScrollStarted:"Auto-scroll started · tap or press ↑↓ / Space / Page Up·Down to stop",
+  studyAutoScrollEnd:"Last page reached · auto-scroll stopped",
+  studyAutoScrollNeedVertical:"Auto-scroll is only available in vertical comic mode",
+  studyHelpAuto:"Start / stop auto-scroll for vertical reading (vertical comic mode only)",
+  studyReadBrightnessLabel:"Brightness (reading)", studyReadContrastLabel:"Contrast (reading)", studyReadSpecialLabel:"Special filter (reading)",
+  studyReadSpecialNone:"None", studyReadSpecialInvert:"Invert", studyReadSpecialGrayscale:"Grayscale", studyReadSpecialSepia:"Sepia",
+  studyReadFilterHint:"Applies a CSS filter to the reading surfaces only (images and text). Independent of the full-screen fit and the zoom. The shelf and menus are unchanged. Defaults: 100% / 100% / none.",
   studyBack:"← Bookshelf", studyFullscreen:"⛶ Full-screen image", studyModeLabel:"Image layout",
   studyModeSingle:"Single page (centered)", studyModeSpread:"Two-page spread (page 1 on right)", studyModeVertical:"Vertical comic",
   studyAmerican:"🇺🇸 American mode (reverse sides and order)", studyThemeLabel:"Text skin",
@@ -268,7 +290,18 @@ Object.assign(TEXT.zh, {
   studyWelcomeHelp:"如果忘记操作，请打开右上角的「❓ 按键说明」。",
   studySupported:"图片: JPG / PNG / WebP / GIF / AVIF / BMP · 文本: TXT / MD / JSON / CSV / HTML / XML 等",
   studyTapHint:"点击图片左侧／→ 下一页 · 点击右侧／← 上一页（🇺🇸模式会反转点击位置） · Space / Enter 下一页 · 长按 Enter 添加书签 · 长按 Space 跳页 · Esc 退出",
-  studyVerticalHint:"上下滚动或滑动阅读 · Space / Enter 下一页 · 长按 Enter 书签 · Esc 退出",
+  studyVerticalHint:"上下滚动或滑动阅读 · Space / Enter 下一页 · 长按 Enter 书签 · A 自动滚动 · Esc 退出",
+  studyAutoScrollStart:"⏩ 自动滚动", studyAutoScrollStop:"⏸ 停止自动滚动",
+  studyAutoScrollSpeedLabel:"自动滚动速度",
+  studyAutoSpeedSlowest:"最慢", studyAutoSpeedSlow:"较慢", studyAutoSpeedNormal:"普通", studyAutoSpeedFast:"较快", studyAutoSpeedFastest:"最快",
+  studyAutoScrollSpeedHint:"纵向阅读模式下“⏩ 自动滚动”的速度（像素/秒）。运行中更改会立即生效。轻触屏幕或按移动键（↑↓、Space、Page Up / Down 等）即可停止。",
+  studyAutoScrollStarted:"自动滚动已开始 · 轻触或按 ↑↓ / Space / PageUp·PageDown 停止",
+  studyAutoScrollEnd:"已到最后一页 · 自动滚动已停止",
+  studyAutoScrollNeedVertical:"自动滚动仅在纵向漫画模式下可用",
+  studyHelpAuto:"开始 / 停止纵向阅读的自动滚动（仅纵向漫画模式）",
+  studyReadBrightnessLabel:"亮度（阅读）", studyReadContrastLabel:"对比度（阅读）", studyReadSpecialLabel:"特殊滤镜（阅读）",
+  studyReadSpecialNone:"无", studyReadSpecialInvert:"反色", studyReadSpecialGrayscale:"灰度", studyReadSpecialSepia:"棕褐",
+  studyReadFilterHint:"仅对阅读表面（图片和文字）应用 CSS 滤镜。与全屏适应和缩放倍率无关，书架和菜单不变。默认为 100% / 100% / 无。",
   studyBack:"← 书架", studyFullscreen:"⛶ 图片全屏", studyModeLabel:"图片排列方式", studyModeSingle:"单页（居中）",
   studyModeSpread:"双页（第一页在右）", studyModeVertical:"纵向漫画", studyAmerican:"🇺🇸 美式模式（左右与顺序反转）",
   studyThemeLabel:"文字主题", studyThemePlain:"普通文本", studyThemeDark:"深色模式", studyThemeNeon:"霓虹",
@@ -381,7 +414,18 @@ Object.assign(TEXT.ko, {
   studyWelcomeHelp:"조작이 헷갈리면 오른쪽 위의 「❓ 키 설명」을 열어 보세요.",
   studySupported:"이미지: JPG / PNG / WebP / GIF / AVIF / BMP · 텍스트: TXT / MD / JSON / CSV / HTML / XML 등",
   studyTapHint:"이미지 왼쪽 누르기／→ 다음 · 오른쪽 누르기／← 이전 (🇺🇸에서는 누르는 위치 반전) · Space / Enter 다음 · Enter 길게 눌러 책갈피 · Space 길게 눌러 이동 · Esc 종료",
-  studyVerticalHint:"위아래로 스크롤하거나 밀어서 읽기 · Space / Enter 다음 · Enter 길게 눌러 책갈피 · Esc 종료",
+  studyVerticalHint:"위아래로 스크롤하거나 밀어서 읽기 · Space / Enter 다음 · Enter 길게 눌러 책갈피 · A 자동 스크롤 · Esc 종료",
+  studyAutoScrollStart:"⏩ 자동 스크롤", studyAutoScrollStop:"⏸ 자동 스크롤 중지",
+  studyAutoScrollSpeedLabel:"자동 스크롤 속도",
+  studyAutoSpeedSlowest:"가장 느림", studyAutoSpeedSlow:"느림", studyAutoSpeedNormal:"보통", studyAutoSpeedFast:"빠름", studyAutoSpeedFastest:"가장 빠름",
+  studyAutoScrollSpeedHint:"세로 읽기 모드에서 “⏩ 자동 스크롤”의 속도(초당 픽셀). 실행 중에 바꿔도 바로 적용됩니다. 화면을 터치하거나 이동 키(↑↓, Space, Page Up / Down 등)로 중지할 수 있습니다.",
+  studyAutoScrollStarted:"자동 스크롤 시작 · 탭 또는 ↑↓ / Space / PageUp·PageDown으로 중지",
+  studyAutoScrollEnd:"마지막 페이지에 도착 · 자동 스크롤을 중지했습니다",
+  studyAutoScrollNeedVertical:"자동 스크롤은 세로형 만화 모드에서만 사용할 수 있습니다",
+  studyHelpAuto:"세로 읽기 자동 스크롤 시작 / 중지(세로형 만화 모드 전용)",
+  studyReadBrightnessLabel:"밝기(독서)", studyReadContrastLabel:"명암 대비(독서)", studyReadSpecialLabel:"특수 필터(독서)",
+  studyReadSpecialNone:"없음", studyReadSpecialInvert:"반전", studyReadSpecialGrayscale:"그레이스케일", studyReadSpecialSepia:"세피아",
+  studyReadFilterHint:"읽는 화면(이미지와 텍스트)에만 CSS 필터를 적용합니다. 전체 화면 맞춤 및 확대율과는 독립이며 책장과 메뉴는 변하지 않습니다. 기본값은 100% / 100% / 없음.",
   studyBack:"← 책장", studyFullscreen:"⛶ 이미지 전체 화면", studyModeLabel:"이미지 배열", studyModeSingle:"한 페이지 (중앙)",
   studyModeSpread:"두 페이지 (첫 페이지 오른쪽)", studyModeVertical:"세로형 만화", studyAmerican:"🇺🇸 미국식 (좌우와 순서 반전)",
   studyThemeLabel:"텍스트 스킨", studyThemePlain:"일반 텍스트", studyThemeDark:"다크 모드", studyThemeNeon:"네온",
@@ -527,8 +571,14 @@ const STUDY_SORTS = ["updated", "added", "title", "type", "size"];
 const STUDY_MIDDLE_CLICK_ACTIONS = ["none", "next", "close"];   /* 中クリックの設定（trk124で選択式に） */
 const STUDY_FOLDER_MAX = 200;
 const STUDY_DEFAULT_NEXT_KEY = "ArrowRight", STUDY_DEFAULT_PREVIOUS_KEY = "ArrowLeft";
-const STUDY_RESERVED_KEYS = new Set(["Escape", "Tab", "Space", "Enter", "NumpadEnter", "KeyB", "KeyM", "KeyT", "KeyF",
+const STUDY_RESERVED_KEYS = new Set(["Escape", "Tab", "Space", "Enter", "NumpadEnter", "KeyA", "KeyB", "KeyM", "KeyT", "KeyF",
   "Equal", "NumpadAdd", "Minus", "NumpadSubtract", "Digit0", "Numpad0", "Slash"]);
+/* trk175: 縦読みの自動スクロール（PLAYER-ROADMAP #12）。速度は px/秒の決まった候補だけ。 */
+const STUDY_AUTO_SCROLL_SPEEDS = [20, 45, 75, 120, 180], STUDY_AUTO_SCROLL_SPEED_DEFAULT = 75;
+/* 押したら自動スクロールを止めるキー（A 自身はトグルなので studyKeyDown で別扱い）。 */
+const STUDY_AUTO_SCROLL_STOP_CODES = new Set(["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", "Space", "Enter", "NumpadEnter"]);
+/* trk175-176: 読書用フィルタ（明るさ/コントラスト/反転系）の候補。百分率は 50〜150 にクランプする。 */
+const STUDY_READ_SPECIALS = ["none", "invert", "grayscale", "sepia"];
 function studyKeyCodeAllowed(code) {
   return typeof code === "string" && !STUDY_RESERVED_KEYS.has(code) &&
     (/^Arrow(?:Left|Right|Up|Down)$/.test(code) || /^Key[A-Z]$/.test(code) || /^Digit[1-9]$/.test(code) ||
@@ -560,7 +610,8 @@ const studyObjectUrls = new Set();
 let studyPrefs = { imageMode:"single", imageOrder:"natural", american:false, zoom:1, zoomPercentStep:STUDY_ZOOM_PERCENT_DEFAULT, theme:"plain",
   textSize:"normal", textSpacing:"normal", textWidth:"normal", tvEnabled:false, tvPosition:"top", tvLook:"plain",
   tvSize:"medium", tvRatio:"16:9", tvLabelOn:true, shelfSort:"updated", albumNesting:"split",
-  manualShelfOrder:false, foldersFirst:false, skipDeleteConfirm:false, shelfVisible:true, verticalImageKeys:false,
+  manualShelfOrder:false, foldersFirst:false, skipDeleteConfirm:false, shelfVisible:true, verticalImageKeys:false, studyAutoScrollSpeed:STUDY_AUTO_SCROLL_SPEED_DEFAULT,
+  readBrightness:100, readContrast:100, readSpecial:"none",
   fullscreenFit:false, pageKeysTurnPages:false, closeOnLastPageDown:true, mouseClickPages:false, mouseClickFlip:false, middleClickAction:"none", editedTextFolderId:"",
   studyNextKey:STUDY_DEFAULT_NEXT_KEY, studyPreviousKey:STUDY_DEFAULT_PREVIOUS_KEY, helpSeen:false };
 
@@ -731,6 +782,12 @@ function studyReadPrefs(raw) {
   studyPrefs.skipDeleteConfirm = raw.skipDeleteConfirm === true;
   studyPrefs.shelfVisible = raw.shelfVisible !== false;
   studyPrefs.verticalImageKeys = raw.verticalImageKeys === true;
+  const rawAutoSpeed = Number(raw.studyAutoScrollSpeed);
+  studyPrefs.studyAutoScrollSpeed = STUDY_AUTO_SCROLL_SPEEDS.includes(rawAutoSpeed) ? rawAutoSpeed : STUDY_AUTO_SCROLL_SPEED_DEFAULT;
+  const rawBrightness = Number(raw.readBrightness), rawContrast = Number(raw.readContrast);
+  studyPrefs.readBrightness = Number.isFinite(rawBrightness) ? Math.min(150, Math.max(50, Math.round(rawBrightness))) : 100;
+  studyPrefs.readContrast = Number.isFinite(rawContrast) ? Math.min(150, Math.max(50, Math.round(rawContrast))) : 100;
+  studyPrefs.readSpecial = STUDY_READ_SPECIALS.includes(raw.readSpecial) ? raw.readSpecial : "none";
   /* 旧「画像の端へ送る」をオフにしていた人は、直接ページ送りの選択を引き継ぐ。 */
   studyPrefs.pageKeysTurnPages = typeof raw.pageKeysTurnPages === "boolean" ? raw.pageKeysTurnPages : raw.zoomEdgeKeys === false;
   studyPrefs.fullscreenFit = raw.fullscreenFit === true;
@@ -928,6 +985,11 @@ function studyRefreshPrefsUI() {
   core.$("studyFoldersFirst").checked = studyPrefs.foldersFirst;
   core.$("studySkipDeleteConfirm").checked = studyPrefs.skipDeleteConfirm;
   core.$("studyVerticalImageKeys").checked = studyPrefs.verticalImageKeys;
+  core.$("studyAutoScrollSpeed").value = String(studyPrefs.studyAutoScrollSpeed);
+  core.$("studyReadBrightness").value = String(studyPrefs.readBrightness);
+  core.$("studyReadContrast").value = String(studyPrefs.readContrast);
+  core.$("studyReadSpecial").value = studyPrefs.readSpecial;
+  studyApplyReadFilter();
   core.$("studyPageKeysTurnPages").checked = studyPrefs.pageKeysTurnPages;
   core.$("studyFullscreenFit").checked = studyPrefs.fullscreenFit;
   core.$("studyCloseOnLastPageDown").checked = studyPrefs.closeOnLastPageDown;
@@ -2052,6 +2114,7 @@ function studyFocusSearch() {
 function studyRenderCurrentBook() {
   const book = studyCurrentBook;
   if (!book) return;
+  studyStopAutoScroll();
   studyClearPageImages(); studyEndSearch();
   const isImage = book.kind === "image";
   core.$("studyImageStage").hidden = !isImage; core.$("studyTextStage").hidden = isImage;
@@ -2094,6 +2157,7 @@ function studySyncCurrentBookControls() {
   core.$("studyMemoBtn").hidden = !book || book.kind !== "text";
   core.$("studyFullscreenBtn").textContent = tr(core.$("studyRoom").classList.contains("study-fullimage") ? "studyFullscreenExit" : "studyFullscreen");
   core.$("studyFullscreenBtn").hidden = !book || book.kind !== "image";
+  studySyncAutoScrollBtn();
   studySyncZoomRow();
   if (book && book.kind === "image") studySyncPageCount();
 }
@@ -2118,6 +2182,7 @@ async function studyBackToShelf() {
     core.$("studyMemoBtn").textContent = tr("studyMemoEdit");
   }
   studyEndSearch(); studyCurrentBook = null; studyClearPageImages();
+  studyStopAutoScroll();
   core.$("studyBookView").hidden = true;
   studySyncWelcome();
   studyApplyTVLayout();
@@ -2646,6 +2711,13 @@ function studyKeyDown(event) {
   const key = event.key || "";
   if ((event.ctrlKey || event.metaKey) && event.code === "KeyF") { event.preventDefault(); event.stopImmediatePropagation(); studyFocusSearch(); return; }
   if (key === "?" || (event.code === "Slash" && event.shiftKey)) { event.preventDefault(); event.stopImmediatePropagation(); studyToggleHelp(); return; }
+  /* 自動スクロール中：A でトグル、移動キー（↑↓・Space・PageUp/Down・Home/End・次へ/前へ）はまず停止だけする。 */
+  if (studyAutoScrollActive()) {
+    if (event.code === "KeyA") { event.preventDefault(); event.stopImmediatePropagation(); studyToggleAutoScroll(); return; }
+    if (STUDY_AUTO_SCROLL_STOP_CODES.has(event.code) || event.code === studyPrefs.studyNextKey || event.code === studyPrefs.studyPreviousKey) {
+      event.preventDefault(); event.stopImmediatePropagation(); studyStopAutoScroll(); return;
+    }
+  }
   if (event.code === studyPrefs.studyNextKey || event.code === studyPrefs.studyPreviousKey) {
     event.preventDefault(); event.stopImmediatePropagation(); studyStep(event.code === studyPrefs.studyNextKey ? 1 : -1); return;
   }
@@ -2674,6 +2746,7 @@ function studyKeyDown(event) {
   if (event.code === "Minus" || event.code === "NumpadSubtract") { event.preventDefault(); event.stopImmediatePropagation(); studyStepZoom(-1); return; }
   if (event.code === "Digit0" || event.code === "Numpad0") { event.preventDefault(); event.stopImmediatePropagation(); studyZoomReset(); return; }
   if (event.repeat) { event.stopImmediatePropagation(); return; }
+  if (event.code === "KeyA") { event.preventDefault(); event.stopImmediatePropagation(); studyToggleAutoScroll(); return; }
   if (event.code === "KeyB") { event.preventDefault(); event.stopImmediatePropagation(); studyToggleBookmark(); return; }
   if (event.code === "KeyM") { event.preventDefault(); event.stopImmediatePropagation(); studyToggleBookmarkPanel(); return; }
   if (event.code === "KeyT") { event.preventDefault(); event.stopImmediatePropagation(); studyCycleTV(); return; }
@@ -2709,6 +2782,7 @@ function studyKeyUp(event) {
 
 /* ============ ポインタ（タップ／スワイプ／長押し／ピンチ／拡大中の見回し） ============ */
 function studyImagePointerDown(event) {
+  studyStopAutoScroll();   /* タップ＝自動スクロール停止（縦読み以外ではもともと動いていない） */
   if (event.pointerType) studyLastPointerType = event.pointerType;
   if (!studyRoomOpen || !studyCurrentBook || studyCurrentBook.kind !== "image" || (event.button != null && event.button !== 0)) return;
   studyPointers.set(event.pointerId, { x:event.clientX, y:event.clientY });
@@ -2824,6 +2898,87 @@ function studyVerticalScroll() {
   }, 90);
 }
 
+/* ============ 自動スクロール（ハンズフリー縦読み・trk175） ============ */
+/* 縦読み漫画モードだけ。等速（px/秒）で台紙を scrollTop させ、タップ・ホイール・移動キーで止まる。
+   最後のページ（下端）に着いたら自分で止まり、栞や位置の保存には触らない＝表示だけの機能。 */
+let studyAutoScrollRaf = 0, studyAutoScrollLast = 0, studyAutoScrollCarry = 0;
+function studyAutoScrollSpeedValue(value) {
+  const speed = Number(value);
+  return STUDY_AUTO_SCROLL_SPEEDS.includes(speed) ? speed : STUDY_AUTO_SCROLL_SPEED_DEFAULT;
+}
+function studyAutoScrollActive() { return studyAutoScrollRaf !== 0; }
+function studyAutoScrollEligible() {
+  return studyRoomOpen && !!studyCurrentBook && studyCurrentBook.kind === "image" && studyPrefs.imageMode === "vertical";
+}
+/* rAF を止めて状態だけをリセット（通知・ボタン同期は呼び出し側）。何回呼んでも安全。 */
+function studyAutoScrollHalt() {
+  if (studyAutoScrollRaf) cancelAnimationFrame(studyAutoScrollRaf);
+  studyAutoScrollRaf = 0; studyAutoScrollLast = 0; studyAutoScrollCarry = 0;
+}
+function studySyncAutoScrollBtn() {
+  const btn = core.$("studyAutoScrollBtn"); if (!btn) return;
+  const eligible = studyAutoScrollEligible();
+  if (!eligible) studyAutoScrollHalt();   /* 縦読みをやめた・本を閉じた＝静かに止まる */
+  const active = studyAutoScrollActive();
+  btn.hidden = !eligible;
+  if (typeof btn.setAttribute === "function") btn.setAttribute("aria-pressed", String(active));
+  const key = active ? "studyAutoScrollStop" : "studyAutoScrollStart";
+  btn.dataset.i18n = key; btn.textContent = tr(key);
+}
+function studyAutoScrollFrame(now) {
+  studyAutoScrollRaf = 0;
+  const stage = core.$("studyImageStage");
+  if (!studyAutoScrollEligible() || !stage) { studySyncAutoScrollBtn(); return; }
+  const last = studyAutoScrollLast || now;
+  const dt = Math.min(Math.max(now - last, 0), 100);   /* タブ復帰などの大きな差は 100ms までに丸める */
+  studyAutoScrollLast = now;
+  studyAutoScrollCarry += studyPrefs.studyAutoScrollSpeed * dt / 1000;
+  const px = Math.floor(studyAutoScrollCarry);
+  if (px > 0) { studyAutoScrollCarry -= px; stage.scrollTop += px; }
+  if (stage.scrollTop + stage.clientHeight >= stage.scrollHeight - 1) {
+    studyAutoScrollHalt(); studySyncAutoScrollBtn(); studyNotify("studyAutoScrollEnd"); return;
+  }
+  studyAutoScrollRaf = requestAnimationFrame(studyAutoScrollFrame);
+}
+function studyStartAutoScroll() {
+  if (studyAutoScrollActive()) return;
+  if (!studyAutoScrollEligible()) { studyNotify("studyAutoScrollNeedVertical"); return; }
+  studyAutoScrollLast = 0; studyAutoScrollCarry = 0;
+  studyAutoScrollRaf = requestAnimationFrame(studyAutoScrollFrame);
+  studySyncAutoScrollBtn(); studyNotify("studyAutoScrollStarted");
+}
+/* 停止そのものは通知しない（スクロールが止まること自体が目印）。下端到達だけ studyAutoScrollFrame が通知する。 */
+function studyStopAutoScroll() {
+  if (!studyAutoScrollActive()) return;
+  studyAutoScrollHalt(); studySyncAutoScrollBtn();
+}
+function studyToggleAutoScroll() {
+  if (studyAutoScrollActive()) studyStopAutoScroll();
+  else studyStartAutoScroll();
+}
+
+/* ============ 読書用フィルタ（明るさ/コントラスト/反転系・trk176） ============ */
+/* 読書面（.study-image-stage / .study-text-stage）だけに CSS filter を当てる。全画面フィット・拡大率とは独立。
+   初期値（100/100/なし）では "none" を入れるので、ふつうは見た目のコストゼロ。本棚やメニューは変わらない。 */
+function studyReadFilterPercent(value) {
+  const percent = Math.round(Number(value));
+  return Number.isFinite(percent) ? Math.min(150, Math.max(50, percent)) : 100;
+}
+function studyReadFilterCss() {
+  if (studyPrefs.readBrightness === 100 && studyPrefs.readContrast === 100 && studyPrefs.readSpecial === "none") return "none";
+  let css = `brightness(${studyPrefs.readBrightness}%) contrast(${studyPrefs.readContrast}%)`;
+  if (studyPrefs.readSpecial === "invert") css += " invert(1)";
+  else if (studyPrefs.readSpecial === "grayscale") css += " grayscale(1)";
+  else if (studyPrefs.readSpecial === "sepia") css += " sepia(.8)";
+  return css;
+}
+function studyApplyReadFilter() {
+  const room = core.$("studyRoom");
+  if (room && room.style && typeof room.style.setProperty === "function") room.style.setProperty("--study-read-filter", studyReadFilterCss());
+  core.$("studyReadBrightnessValue").textContent = `${studyPrefs.readBrightness}%`;
+  core.$("studyReadContrastValue").textContent = `${studyPrefs.readContrast}%`;
+}
+
 /* ============ 開く・閉じる ============ */
 function studyOpenRoom() {
   if (studySafeMode()) { studyNotify("studySafeMode"); return; }
@@ -2851,6 +3006,7 @@ async function studyCloseRoom() {
   }
   editor.readOnly = false;
   clearTimeout(studyHoldTimer); studyHoldTimer = 0; studyHeldCode = ""; studyPointerStart = null;
+  studyStopAutoScroll();
   studyShelfHold.cancel();
   studyPointers.clear(); studyPinchStart = 0;
   studyCloseSettings(false);
@@ -3027,6 +3183,20 @@ studyBindPref("studyShelfVisible", "shelfVisible", () => {
   if (!studyPrefs.shelfVisible && core.$("studySettings").hidden) core.$("studyShowShelfBtn").focus({ preventScroll:true });
 });
 studyBindPref("studyVerticalImageKeys", "verticalImageKeys");
+studyBindPref("studyAutoScrollSpeed", "studyAutoScrollSpeed", node => {
+  studyPrefs.studyAutoScrollSpeed = studyAutoScrollSpeedValue(node.value);
+  node.value = String(studyPrefs.studyAutoScrollSpeed);   /* 保存も走る（studyBindPref 共通）。動いていれば次のコマから新速度 */
+});
+core.$("studyAutoScrollBtn").addEventListener("click", studyToggleAutoScroll);
+studyBindPref("studyReadSpecial", "readSpecial", () => studyApplyReadFilter());
+for (const [id, key] of [["studyReadBrightness", "readBrightness"], ["studyReadContrast", "readContrast"]]) {
+  const node = core.$(id);
+  node.addEventListener("input", () => {   /* ドラッグ中は保存せず、見た目だけ生かす */
+    studyPrefs[key] = studyReadFilterPercent(node.value);
+    node.value = String(studyPrefs[key]); studyApplyReadFilter();
+  });
+  node.addEventListener("change", () => { studyPrefs[key] = studyReadFilterPercent(node.value); studySavePrefs(); studyApplyReadFilter(); });
+}
 studyBindPref("studyFullscreenFit", "fullscreenFit", () => studyApplyZoom(false));
 studyBindPref("studyPageKeysTurnPages", "pageKeysTurnPages");
 studyBindPref("studyCloseOnLastPageDown", "closeOnLastPageDown");
@@ -3064,6 +3234,7 @@ core.$("studyImageStage").addEventListener("mousedown", event => { studyMiddleCl
 core.$("studyImageStage").addEventListener("auxclick", event => { studyMiddleClick(event, true); });
 core.$("studyImageStage").addEventListener("scroll", studyVerticalScroll, { passive:true });
 core.$("studyImageStage").addEventListener("wheel", event => {
+  studyStopAutoScroll();   /* ホイール＝手動で読む意思表示なので止める（Ctrl+ホイールの拡大はそのまま続く） */
   if (!event.ctrlKey && !event.metaKey) return;
   event.preventDefault();
   studyStepZoom(event.deltaY > 0 ? -1 : 1);
@@ -3161,6 +3332,7 @@ window.TrkStudyRoom = Object.freeze({
   close:studyCloseRoom,
   toggle:() => { if (studyRoomOpen) studyCloseRoom(); else studyOpenRoom(); },
   isOpen:() => studyRoomOpen,
+  importArchives:studyImportArchives,   /* 📥 OS共有（js/share-inbox.js）からも同じ検証経路へ合流させる（trk165） */
   refreshTV:studyRefreshTV,
   assignCover:studyAssignCurrentCover,
   sweepOrphans:studySweepOrphans,

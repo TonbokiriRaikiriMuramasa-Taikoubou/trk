@@ -268,6 +268,13 @@ select{padding:8px 10px;border-radius:10px;background:var(--ui-field);color:var(
 .libName{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .libSub{font-size:12px;color:var(--ui-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .libMeta{display:flex;gap:5px;flex:none}
+/* 💿🎤 アルバム／アーティストの棚のグループ見出し（trk171）：スクロール中はリストの上端に張りつく */
+.libGroupHead{position:sticky;top:0;z-index:2;display:flex;align-items:baseline;gap:8px;margin:6px 0 1px;padding:7px 12px;
+  border-radius:10px;background:var(--ui-panel);border:1px solid var(--ui-border);font-size:14px;font-weight:800;color:var(--ui-text)}
+.libGroupName{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.libGroupSub{flex:none;max-width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:700;color:var(--ui-muted)}
+.libGroupN{flex:none;margin-left:auto;font-size:11px;font-weight:750;color:var(--ui-muted)}
+.libGroupLoadingHint{margin:2px 0}
 .libTag{font-style:normal;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;background:var(--ui-field);border:1px solid var(--ui-border)}
 .libEmpty{padding:40px 10px;text-align:center;color:var(--ui-muted)}
 .banner{position:relative;height:190px;border-radius:18px;overflow:hidden;border:1px solid var(--ui-border);
@@ -1772,7 +1779,16 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
 .mediaControlBtn{min-width:86px;padding:10px 14px;border-radius:12px;font-weight:800}
 .mediaPlayBtn{min-width:124px;background:linear-gradient(135deg,#ffd166,#ff9f43);border-color:transparent;color:#19130b}
 .mediaProgressRow{display:flex;align-items:center;gap:10px;padding:4px 18px 10px}
+.mediaProgressWrap{position:relative;flex:1;min-width:0;display:flex;align-items:center;min-height:22px}
 .mediaProgress{flex:1;min-width:0;accent-color:#ffd166;touch-action:pan-y}
+/* 🌊 波形シークバー（trk173）：canvas は range の上に重ねる（pointer-events:none＝ドラッグ・クリックは range のまま）。
+   バーは半透明＝ネイティブのトラックとつまみが透けて見える。吹き出し＝ホバー位置の時刻（動画フレームのサムネは見送り）。 */
+.mediaWave{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.mediaWave[hidden]{display:none}
+.mediaWaveTip{position:absolute;bottom:calc(100% + 4px);transform:translateX(-50%);padding:2px 8px;border-radius:8px;
+  background:rgba(10,12,20,.92);border:1px solid rgba(255,209,102,.4);color:#ffe1a0;font-size:12px;font-weight:750;
+  white-space:nowrap;pointer-events:none;z-index:5}
+.mediaWaveTip[hidden]{display:none}
 .mediaTime{min-width:92px;text-align:right;font-size:12px;color:#ffe6a3}
 .mediaLoopBox{margin:0 14px 2px;padding:10px 12px;border:1px solid rgba(255,209,102,.18);border-radius:12px;background:rgba(255,209,102,.045)}
 .mediaLoopBox h3{margin:0 0 5px;font-size:14px;color:#ffe6a3}.mediaLoopBox h4{margin:12px 0 4px;font-size:13px;color:#ffe6a3}.mediaLoopBox>.hint{margin:4px 0;font-size:11px;line-height:1.4}.mediaLoopBox .miniActions{margin:7px 0;justify-content:flex-start}.mediaLoopBox .mediaOption{max-width:260px}.mediaLoopPresetHeading{margin-top:8px;color:var(--ui-muted);font-size:11px;font-weight:800}.mediaLoopPresetList{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}.mediaLoopPresetRow{display:flex;align-items:center;gap:3px}.mediaLoopPreset{padding:5px 8px;border:1px solid rgba(255,209,102,.28);border-radius:7px;background:rgba(255,209,102,.08);color:#ffe6a3;font:700 11px ui-monospace,monospace}.mediaLoopPreset:hover,.mediaLoopPreset.selected{border-color:#ffd166;background:rgba(255,209,102,.2);box-shadow:0 0 0 1px rgba(255,209,102,.18) inset}.mediaLoopPresetDelete{padding:3px 5px!important;min-width:0!important;border-color:rgba(255,110,110,.3)!important;color:#ffaaa0!important}
@@ -1810,6 +1826,8 @@ body.helpTextOff .hint:not(.status),
 body.helpTextOff .instSubtitle,
 body.helpTextOff .mediaQueueHead p,
 body.helpTextOff .mediaLoopBox>.hint,
+body.helpTextOff .mediaLyricsBox>.hint,
+body.helpTextOff .mediaSubsBox>.hint,
 body.helpTextOff .mediaWallHintText{display:none!important}
 
 /* ▶ 動画の全画面表示（js/video-max.js ／ TVドックの⛶・メディアプレーヤーの「全画面で表示」） */
@@ -1856,6 +1874,65 @@ body.helpTextOff .videoMaxHint{display:none!important}
 .mediaInterpRow input[type=range]{width:100%;accent-color:#75e4ff}
 .mediaInterpStatus{min-height:1em;color:#9fe8ff}
 @media(max-width:680px){.mediaStageCanvas{height:clamp(130px,22vh,220px)}}
+
+/* 🎤 歌詞（trk166）：折りたたみパネル＋再生位置に追随するリスト */
+.mediaLyricsBox{margin:0 14px 2px;padding:10px 12px;border:1px solid rgba(255,170,220,.22);border-radius:12px;
+  background:rgba(255,170,220,.045)}
+.mediaLyricsBox summary{cursor:pointer;font-size:14px;font-weight:800;color:#ffc7e6;list-style-position:inside}
+.mediaLyricsBox>.hint{margin:5px 0;font-size:11px;line-height:1.45}
+.mediaLyricsSource{color:var(--ui-muted);min-height:1em}
+.mediaLyricsUploadRow{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ui-muted);font-weight:750}
+.mediaLyricsUploadRow input[type=file]{max-width:210px;font-size:11px;color:var(--ui-muted)}
+.mediaLyricsList{max-height:32vh;overflow-y:auto;margin-top:8px;padding:6px 8px;
+  border:1px solid rgba(255,170,220,.16);border-radius:10px;background:rgba(0,0,0,.18);overscroll-behavior:contain}
+.lyricLine{display:block;width:100%;margin:1px 0;padding:5px 10px;border:0;border-radius:8px;background:none;
+  color:var(--ui-muted);font:inherit;font-size:13px;line-height:1.55;text-align:center;cursor:pointer}
+button.lyricLine:hover{color:#ffe6f3;background:rgba(255,170,220,.08)}
+.lyricLineStatic{cursor:default}
+.lyricLineActive,.lyricLineActive:hover{color:#fff;background:rgba(255,110,199,.2);font-weight:800;font-size:15px}
+@media(max-width:680px){.mediaLyricsList{max-height:26vh}}
+
+/* 💬 字幕（trk169）：映像枠の下のほうに出すオーバーレイ＋折りたたみパネル。
+   映像は canvas に描くのでネイティブ <track> は画面に出ない＝DOM で重ねる（クリックは通す） */
+.mediaSubs{position:absolute;left:8%;right:8%;bottom:10%;max-height:42%;overflow:hidden;pointer-events:none;
+  text-align:center;font-size:clamp(12px,2.2vh,18px);line-height:1.4;color:#fff;white-space:pre-line;
+  text-shadow:0 1px 3px #000,0 0 2px #000;background:rgba(0,0,0,.38);border-radius:8px;padding:2px 8px}
+.mediaSubs[hidden]{display:none!important}
+.videoMaxSubs{position:absolute;left:5%;right:5%;bottom:6%;max-height:40%;overflow:hidden;pointer-events:none;
+  text-align:center;font-size:clamp(16px,3.4vh,36px);line-height:1.35;color:#fff;white-space:pre-line;
+  text-shadow:0 2px 5px #000,0 0 3px #000}
+.videoMaxSubs[hidden]{display:none!important}
+.mediaSubsBox{margin:0 14px 2px;padding:10px 12px;border:1px solid rgba(150,220,255,.22);border-radius:12px;
+  background:rgba(150,220,255,.045)}
+.mediaSubsBox[hidden]{display:none!important}
+.mediaSubsBox summary{cursor:pointer;font-size:14px;font-weight:800;color:#cdeeff;list-style-position:inside}
+.mediaSubsBox>.hint{margin:5px 0;font-size:11px;line-height:1.45}
+.mediaSubsSource{color:var(--ui-muted);min-height:1em}
+.mediaSubsUploadRow{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ui-muted);font-weight:750}
+.mediaSubsUploadRow input[type=file]{max-width:210px;font-size:11px;color:var(--ui-muted)}
+.mediaSubsOffsetRow{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--ui-muted);font-weight:750}
+.mediaSubsOffsetRow .mono{min-width:7em;color:#cdeeff}
+
+/* 🔖 チャプターパネル（js/media-player-mode.js ＋ js/audio-art.js の chpl 読み・trk170）
+   M4B などのチャプター印の一覧。クリックでそこへ飛ぶ。見た目は歌詞／字幕パネルを踏襲（アンバー系）。 */
+.mediaChapBox{margin:0 14px 2px;padding:10px 12px;border:1px solid rgba(255,209,102,.22);border-radius:12px;
+  background:rgba(255,209,102,.045)}
+.mediaChapBox[hidden]{display:none!important}
+.mediaChapBox summary{cursor:pointer;font-size:14px;font-weight:800;color:#ffe1a0;list-style-position:inside}
+.mediaChapBox>.hint{margin:5px 0;font-size:11px;line-height:1.45}
+.mediaChapSource{color:var(--ui-muted);min-height:1em}
+.mediaChapNow{margin-top:4px;color:#ffe1a0;font-size:12px;font-weight:750;min-height:1em}
+.mediaChapList{max-height:32vh;overflow-y:auto;margin-top:8px;padding:6px 8px;
+  border:1px solid rgba(255,209,102,.16);border-radius:10px;background:rgba(0,0,0,.18);overscroll-behavior:contain}
+.mediaChapList:empty{display:none}
+.chapLine{display:flex;width:100%;margin:1px 0;padding:5px 10px;border:0;border-radius:8px;background:none;
+  color:var(--ui-muted);font:inherit;font-size:13px;line-height:1.5;text-align:left;cursor:pointer;gap:8px;align-items:baseline}
+button.chapLine:hover{color:#ffe6b8;background:rgba(255,209,102,.08)}
+.chapLineActive,.chapLineActive:hover{color:#fff;background:rgba(255,190,60,.2);font-weight:800}
+.chapTime{flex:none;min-width:4.5em;font-size:12px;color:#ffe1a0}
+.chapText{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:680px){.mediaChapList{max-height:26vh}}
+body.helpTextOff .mediaChapBox>.hint{display:none!important}
 
 /* 👆 長押しの代わりのボタン（設定 showMoreBtns をオフにすると隠れる） */
 body.noMoreBtns .moreBtn { display:none !important; }

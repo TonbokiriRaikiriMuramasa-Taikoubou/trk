@@ -122,6 +122,7 @@ async function loadMedia(file, opts = {}) {
 /* ---------- 解析結果のキャッシュ（IndexedDB・この端末の中だけ） ----------
    同じ曲をもう一度読み込んだとき、デコードと解析を飛ばすためのもの。
    保存するのは解析の配列（rms・onset・ratio）と数値だけ。PCM（音声の波形）は保存しない。
+   🔊 loudness・peak（trk168・音量の平準化の材料）も数値なので一緒に保存する（古い記録に無くても読める）。
    鍵は fingerprint（サイズ・長さ）＋先頭と末尾 64KB の SHA-256 ＋ 解析のバージョン。
    解析の式を変えたら ANALYSIS_CACHE_VERSION を上げる（古い結果は読まれなくなる）。
    セーフモードでは読まない・書かない。失敗しても普通に解析する（キャッシュは速さのためだけ）。 */
@@ -171,12 +172,14 @@ async function analysisCacheGet(key) {
   if (!analysisCacheValid(rec)) { tx.abort(); return null; }
   os.put({ ...rec, savedAt: Date.now() });
   await new Promise((res, rej) => { tx.oncomplete = () => res(); tx.onerror = tx.onabort = () => rej(tx.error); });
-  return { rms: rec.rms, onset: rec.onset, ratio: rec.ratio, frames: rec.frames, frameMs: rec.frameMs, maxRms: rec.maxRms, scale: rec.scale };
+  /* 🔊 loudness/peak（trk168）は古い記録に無いことがある（undefined）。使う側（loudnessDb）が rms から計算し直す */
+  return { rms: rec.rms, onset: rec.onset, ratio: rec.ratio, frames: rec.frames, frameMs: rec.frameMs, maxRms: rec.maxRms, scale: rec.scale, loudness: rec.loudness, peak: rec.peak };
 }
 async function analysisCachePut(key, a) {
   const db = await analysisCacheOpen();
   const rec = { key, version: ANALYSIS_CACHE_VERSION, savedAt: Date.now(), frames: a.frames, frameMs: a.frameMs,
-    maxRms: a.maxRms, scale: a.scale, rms: a.rms, onset: a.onset, ratio: a.ratio };
+    maxRms: a.maxRms, scale: a.scale, rms: a.rms, onset: a.onset, ratio: a.ratio,
+    loudness: a.loudness, peak: a.peak };   /* 🔊 音量の平準化（trk168）の材料も一緒に保存 */
   await new Promise((res, rej) => {
     const tx = db.transaction("analysis", "readwrite");
     tx.objectStore("analysis").put(rec);
@@ -212,12 +215,13 @@ async function analyzeAudio(file) {
   const c0 = audio.getChannelData(0), c1 = audio.numberOfChannels > 1 ? audio.getChannelData(1) : null;
   const hop = Math.max(1, Math.round(sr * 0.01)), frames = Math.floor(n / hop), frameMs = hop / sr * 1000;
   const rms = new Float32Array(frames), hf = new Float32Array(frames);
-  let prev = 0, maxRms = 0;
+  let prev = 0, maxRms = 0, peak = 0;
   for (let f = 0; f < frames; f++) {
     let e = 0, h = 0; const s0 = f * hop;
     for (let i = s0; i < s0 + hop; i++) {
       const x = c1 ? (c0[i] + c1[i]) * .5 : c0[i];
       e += x * x; const d = x - prev; h += d * d; prev = x;
+      const ax = x < 0 ? -x : x; if (ax > peak) peak = ax;   /* 🔊 音量の平準化（trk168）：いちばん大きいサンプル */
     }
     rms[f] = Math.sqrt(e / hop); hf[f] = Math.sqrt(h / hop);
     if (rms[f] > maxRms) maxRms = rms[f];
@@ -234,7 +238,25 @@ async function analyzeAudio(file) {
   }
   const nz = Array.from(onset).filter(v => v > 0).sort((a, b) => a - b);
   const scale = nz.length ? nz[Math.floor(nz.length * .95)] || nz[nz.length - 1] : 1;
-  return { rms, onset, ratio, frames, frameMs, maxRms: maxRms || 1, scale: scale || 1 };
+  /* 🔊 音量の平準化（trk168）：曲全体の loudness＝ゲート（いちばん大きいフレームの15%）以上のフレームだけの
+     エネルギー平均を dB にしたもの（無音の頭・間奏・フェードアウトに平均を引っ張られないための粗い近似） */
+  const gate = Math.max(maxRms * .15, 1e-4);
+  let gsum = 0, gn = 0;
+  for (let f = 0; f < frames; f++) { const v = rms[f]; if (v > gate) { gsum += v * v; gn++; } }
+  const loudness = gn ? 20 * Math.log10(Math.sqrt(gsum / gn)) : -60;
+  return { rms, onset, ratio, frames, frameMs, maxRms: maxRms || 1, scale: scale || 1, loudness, peak };
+}
+/* 🔊 音量の平準化（trk168）：解析結果から曲全体の loudness（dB）を返す。
+   古いキャッシュ記録（loudness が入る前のもの）では rms から計算し直す。無ければ null＝この曲は素通し。
+   計算はこの端末の中だけ。ファイルは変更しない（読み取り専用方針）。 */
+function loudnessDb(a) {
+  if (!a || !(a.rms instanceof Float32Array) || !a.rms.length) return null;
+  if (Number.isFinite(a.loudness)) return a.loudness;
+  const max = Number.isFinite(a.maxRms) && a.maxRms > 0 ? a.maxRms : 1;
+  const gate = Math.max(max * .15, 1e-4);
+  let sum = 0, n = 0;
+  for (let i = 0; i < a.rms.length; i++) { const v = a.rms[i]; if (v > gate) { sum += v * v; n++; } }
+  return n ? 20 * Math.log10(Math.sqrt(sum / n)) : null;
 }
 const frameAt = t => Math.round(t / core.analysis.frameMs);
 function rmsAt(t) { return core.analysis.rms[Math.min(core.analysis.frames - 1, Math.max(0, frameAt(t)))]; }
@@ -403,7 +425,7 @@ window.seFiles = seFiles;
 window.setBackground = setBackground;
 /* 領域（window.Trk.media）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
 window.Trk = window.Trk || {};
-window.Trk.media = Object.assign(window.Trk.media || {}, { CHART_FILE_MAX, buildChart, decodeAudio, estimateLevel, exportChart, generateNotes, getAC, importChartFile, loadMedia, loadSE, playSE, rmsAt, seBuffers, seFiles, setBackground });
+window.Trk.media = Object.assign(window.Trk.media || {}, { CHART_FILE_MAX, buildChart, decodeAudio, estimateLevel, exportChart, generateNotes, getAC, importChartFile, loadMedia, loadSE, loudnessDb, playSE, rmsAt, seBuffers, seFiles, setBackground });
 Object.defineProperty(window.Trk.media, "applyChartData", { configurable:true, get:() => applyChartData, set:v => { applyChartData = v; } });
 Object.defineProperty(window.Trk.media, "audioCtx", { configurable:true, get:() => audioCtx, set:v => { audioCtx = v; } });
 Object.defineProperty(window.Trk.media, "chartToData", { configurable:true, get:() => chartToData, set:v => { chartToData = v; } });

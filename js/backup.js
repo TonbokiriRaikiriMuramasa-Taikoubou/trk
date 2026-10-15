@@ -44,6 +44,19 @@
   /* IndexedDB の対象。skip はそのストアで書き出さないキー（FileSystemHandle などを持つ） */
   const DB_LIBRARY = { db:"shadow_taiko_library", version:2, stores:["kv"], skip:{ kv:["dir", "share"] } };
   const DB_STUDY = { db:"trk_study_room_v1", version:1, stores:["books", "pages", "covers", "settings"] };
+  /* 復元で書斎のストアを書く順（trk163・レビュー【低】③）：参照される側を先に（pages→covers→books→settings）。
+     一番大きな書き込み（pages）が先なので、容量不足などで途中失敗したときに本・カバー側は無傷のまま＝残る不整合は
+     「参照されないページ」（書斎の整理で消せる）になり、「存在しないページを指す本」にはならない。 */
+  const STUDY_WRITE_ORDER = ["pages", "covers", "books", "settings"];
+  /* 書斎のストアだけを、plan.dbs の中の書斎の位置同士で並べ替える（ほかのDBの相対順は保つ） */
+  function orderStudyStores(dbs) {
+    const slots = [];
+    dbs.forEach((p, i) => { if (p.spec === DB_STUDY) slots.push(i); });
+    if (slots.length < 2) return;
+    const rank = (p) => { const at = STUDY_WRITE_ORDER.indexOf(p.store); return at === -1 ? STUDY_WRITE_ORDER.length : at; };
+    const ordered = slots.map(i => dbs[i]).sort((a, b) => rank(a) - rank(b));
+    slots.forEach((slot, n) => { dbs[slot] = ordered[n]; });
+  }
   const DB_PACKS = { db:"shadow_taiko_packs", version:2, stores:["packs"], index:{ packs:"size" } };
   const DB_MEDIA = [
     { db:"shadow_taiko_songs", version:2, stores:["files"] },
@@ -441,7 +454,8 @@
         backupPackIds.add(id);
       }
     }
-    /* 3) 書く */
+    /* 3) 書く。書斎は参照される側から（pages→covers→books、trk163・レビュー【低】③） */
+    orderStudyStores(plan.dbs);
     for (const p of plan.dbs) {
       const pairs = p.arr.map(r => [decKey(r.k), decodeValue(r.v, resolve)]);
       const db = await openDb(p.spec, true);

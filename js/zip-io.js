@@ -177,6 +177,26 @@
       if (diskCount16 !== U16 && diskCount16 !== count ||
           tail.getUint16(eocd + 10, true) !== U16 && tail.getUint16(eocd + 10, true) !== count) throw new ZipIOError("zipBad");
     }
+    /* 32bit で足りていても、ZIP64 の終端レコード＋ロケーターを置く作り手がある（Info-ZIP が標準入力からメンバーを
+       読むとき＝ `printf abc | zip - - > x.cbz` など。大きさが事前に分からないためローカルヘッダを ZIP64 拡張にし、
+       その結果として終端レコードも必ず書く）。その場合、中央目録の直後は ZIP64 の終端レコードで、trk162 の厳密な
+       「中央目録の終わり＝EOCD の位置」検査はこれを zipBad にしていた（旧 readZip は読めたのでパック・CBZ では回帰）。
+       ロケーターが正しく指していて、終端レコードの中身（ディスク番号・件数・中央目録の大きさ／位置）も EOCD と
+       一致するときだけ、その位置を中央目録の終わりとして認める（trk163・レビュー）。一致しなければ zip64Off は
+       null のままで下の cdEnd 検査が zipBad にする＝「EOCD と ZIP64 の中身を食い違わせる二重解釈」は許さない
+       （実 Info-ZIP 出力は両者が一致する。この経路でも読む値は EOCD 側だけで、終端レコードの中身は使わない） */
+    if (zip64Off === null && eocd >= 20 && tail.getUint32(eocd - 20, true) === 0x07064b50 &&
+        tail.getUint32(eocd - 16, true) === 0 && tail.getUint32(eocd - 4, true) === 1) {
+      const optional = tail.getBigUint64(eocd - 12, true), locatorAbs = tailOff + eocd - 20;
+      if (optional <= BigInt(Number.MAX_SAFE_INTEGER) && Number(optional) + 56 <= locatorAbs) {
+        const z = new DataView(await file.slice(Number(optional), Number(optional) + 56).arrayBuffer());
+        if (z.byteLength === 56 && z.getUint32(0, true) === 0x06064b50 &&
+            BigInt(optional) + 12n + z.getBigUint64(4, true) === BigInt(locatorAbs) &&
+            z.getUint32(16, true) === 0 && z.getUint32(20, true) === 0 &&
+            z.getBigUint64(24, true) === z.getBigUint64(32, true) && z.getBigUint64(32, true) === BigInt(count) &&
+            z.getBigUint64(40, true) === BigInt(cdSize) && z.getBigUint64(48, true) === BigInt(cdOff)) zip64Off = Number(optional);
+      }
+    }
     const cdEnd = cdOff + cdSize, expectedCdEnd = zip64Off === null ? eocdAbs : zip64Off;
     if (!Number.isSafeInteger(count) || count < 0 ||
         !Number.isSafeInteger(cdSize) || cdSize < 0 ||

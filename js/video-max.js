@@ -56,6 +56,7 @@ if (!videoEl) return;
 let root = null, canvas = null, ctx = null, stage = null;
 let topBar = null, titleNode = null, playNode = null, fsNode = null, closeNode = null;
 let noteNode = null, hintNode = null;
+let subsNode = null;   /* 💬 字幕オーバーレイ（trk169・映像は canvas 描画なので字幕は DOM で重ねる） */
 let raf = 0, isOn = false, playedByUs = false, idleTimer = 0;
 const watchers = new Set();
 
@@ -154,6 +155,13 @@ function paint() {
   }
   const key = videoEl.paused ? "videoMaxPlay" : "videoMaxPause";
   if (playNode && playNode.dataset.i18n !== key) setI18n(playNode, key);
+  /* 💬 字幕（trk169）：いまの再生位置のキューをオーバーレイに出す。文言は subtitles.js（読み込みはメディアプレーヤー側） */
+  if (subsNode) {
+    const api = window.Trk.subtitles;
+    const texts = api ? api.currentTexts(videoEl.currentTime || 0).join("\n") : "";
+    if (subsNode.textContent !== texts) subsNode.textContent = texts;
+    subsNode.hidden = !texts;
+  }
 }
 function startLoop() { if (!raf) raf = requestAnimationFrame(paint); }
 function stopLoop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
@@ -218,7 +226,8 @@ function build() {
   stage = core.el("div", "videoMaxStage");
   canvas = document.createElement("canvas"); canvas.className = "videoMaxCanvas";
   noteNode = core.el("p", "videoMaxNote hint", tr("videoMaxNoVideo")); noteNode.dataset.i18n = "videoMaxNoVideo";
-  stage.append(canvas, noteNode);
+  subsNode = core.el("div", "videoMaxSubs"); subsNode.hidden = true;   /* 💬 クリックは通す（pointer-events:none） */
+  stage.append(canvas, subsNode, noteNode);
 
   hintNode = core.el("p", "videoMaxHint hint", tr("videoMaxHint")); hintNode.dataset.i18n = "videoMaxHint";
 

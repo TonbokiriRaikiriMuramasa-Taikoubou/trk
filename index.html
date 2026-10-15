@@ -191,6 +191,13 @@
                 <option value="recent" data-i18n="sortRecent"></option>
                 <option value="best" data-i18n="sortBest"></option>
               </select>
+              <!-- 📈 進捗フィルター（trk174）：未聴/継続/完了で曲リストを絞る（表示層だけ） -->
+              <select id="libProgress" data-i18n-aria="libProgressLabel">
+                <option value="all" data-i18n="progAll"></option>
+                <option value="new" data-i18n="progNew"></option>
+                <option value="progress" data-i18n="progProgress"></option>
+                <option value="done" data-i18n="progDone"></option>
+              </select>
               <button id="libRandomBtn" type="button" data-i18n="libRandom"></button>
             </div>
             <div id="libSkinBar" class="libSkinBar" hidden></div>
@@ -1440,6 +1447,7 @@
               <button id="studyZoomIn" type="button" class="study-small-btn" aria-label="Zoom in">＋</button>
               <button id="studyZoomFit" type="button" class="study-small-btn" data-i18n="studyZoomFit">フィット</button>
             </span>
+            <button id="studyAutoScrollBtn" type="button" class="study-small-btn study-auto-scroll-btn" aria-pressed="false" data-i18n="studyAutoScrollStart" hidden>⏩ 自動スクロール</button>
             <label id="studyThemeRow" class="study-option">
               <span data-i18n="studyThemeLabel">文字のスキン</span>
               <select id="studyTheme">
@@ -1678,6 +1686,37 @@
             </select>
           </div>
           <p id="studyZoomStepHint" class="study-advanced-hint" data-i18n="studyZoomStepHint">−／＋・Ctrl+ホイール・ピンチの1回ぶんです（初期値5%＝100%→200%が20回）。</p>
+          <div class="study-advanced-row">
+            <span id="studyAutoScrollSpeedLabel" data-i18n="studyAutoScrollSpeedLabel">自動スクロールの速度</span>
+            <select id="studyAutoScrollSpeed" aria-labelledby="studyAutoScrollSpeedLabel" aria-describedby="studyAutoScrollSpeedHint">
+              <option value="20" data-i18n="studyAutoSpeedSlowest">いちばん遅い</option>
+              <option value="45" data-i18n="studyAutoSpeedSlow">遅い</option>
+              <option value="75" data-i18n="studyAutoSpeedNormal">普通</option>
+              <option value="120" data-i18n="studyAutoSpeedFast">速い</option>
+              <option value="180" data-i18n="studyAutoSpeedFastest">いちばん速い</option>
+            </select>
+          </div>
+          <p id="studyAutoScrollSpeedHint" class="study-advanced-hint" data-i18n="studyAutoScrollSpeedHint">縦読みモードの「⏩ 自動スクロール」の速さ（1秒あたりのピクセル）。動いている最中の変更もすぐ効きます。タップや移動キー（↑↓・Space・PageUp / PageDown など）で止まります。</p>
+          <div class="study-advanced-row study-read-filter-row">
+            <span id="studyReadBrightnessLabel" data-i18n="studyReadBrightnessLabel">明るさ（読書）</span>
+            <input id="studyReadBrightness" type="range" min="50" max="150" step="5" value="100" aria-labelledby="studyReadBrightnessLabel" aria-describedby="studyReadFilterHint">
+            <span id="studyReadBrightnessValue" class="study-read-filter-value">100%</span>
+          </div>
+          <div class="study-advanced-row study-read-filter-row">
+            <span id="studyReadContrastLabel" data-i18n="studyReadContrastLabel">コントラスト（読書）</span>
+            <input id="studyReadContrast" type="range" min="50" max="150" step="5" value="100" aria-labelledby="studyReadContrastLabel" aria-describedby="studyReadFilterHint">
+            <span id="studyReadContrastValue" class="study-read-filter-value">100%</span>
+          </div>
+          <div class="study-advanced-row">
+            <span id="studyReadSpecialLabel" data-i18n="studyReadSpecialLabel">特殊フィルタ（読書）</span>
+            <select id="studyReadSpecial" aria-labelledby="studyReadSpecialLabel" aria-describedby="studyReadFilterHint">
+              <option value="none" data-i18n="studyReadSpecialNone">なし</option>
+              <option value="invert" data-i18n="studyReadSpecialInvert">反転</option>
+              <option value="grayscale" data-i18n="studyReadSpecialGrayscale">グレースケール</option>
+              <option value="sepia" data-i18n="studyReadSpecialSepia">セピア</option>
+            </select>
+          </div>
+          <p id="studyReadFilterHint" class="study-advanced-hint" data-i18n="studyReadFilterHint">読書面（画像と文章）だけに CSS filter を当てます。全画面フィットや拡大率とは独立で、本棚やメニューは変わりません。初期値は 100% / 100% / なし。</p>
           <label class="study-check-option">
             <input id="studyPageKeysTurnPages" type="checkbox">
             <span data-i18n="studyPageKeysTurnPages">PageUP、PageDownをページ動作にする</span>
@@ -1746,6 +1785,7 @@
         <dt>/ または Ctrl+F</dt><dd data-i18n="studyHelpSearch"></dd>
         <dt>B ／ M</dt><dd data-i18n="studyHelpBookmark"></dd>
         <dt>T ／ F</dt><dd data-i18n="studyHelpTv"></dd>
+        <dt>A</dt><dd data-i18n="studyHelpAuto"></dd>
         <dt>? ／ Esc</dt><dd data-i18n="studyHelpEsc"></dd>
       </dl>
       <div class="study-help-foot">
@@ -1799,6 +1839,8 @@
 <script src="js/midi-settings.js"></script>
 <script src="js/media.js"></script>
 <script src="js/audio-art.js"></script>
+<script src="js/lyrics.js"></script>
+<script src="js/subtitles.js"></script>
 <script src="js/judge-match.js"></script>
 <script src="js/game.js"></script>
 <script src="js/render.js"></script>
@@ -1846,5 +1888,6 @@
 <!-- 📦 trk160：BlobストリームのZIP入出力（バックアップ／.stpack共用）。書斎・パック定義の後に読む -->
 <script src="js/zip-io.js"></script>
 <script src="js/backup.js"></script>
+<script src="js/share-inbox.js"></script>
 </body>
 </html>

@@ -276,6 +276,25 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     (i18n.match(/backupHardLimit:/g) || []).length === 4;
   rule(boundedArchive, "ZIP entry/central-directory and backup JSON/record safety ceilings are fixed, early, and translated in all UI locales");
 
+  /* trk163：Info-ZIP の標準入力メンバー出力は、32bit で足りていても ZIP64 終端レコード＋ロケーターを必ず置く。
+     ロケーターが正しく指し、終端レコードの中身（件数・中央目録の大きさ／位置）が EOCD と一致するときだけ
+     中央目録の終わりとして認める＝「EOCD と ZIP64 の中身を食い違わせる二重解釈」は引き続き拒否する */
+  const optionalZip64 = zipIO.includes("zip64Off === null && eocd >= 20") &&
+    zipIO.includes("z.getBigUint64(24, true) === z.getBigUint64(32, true)") &&
+    zipIO.includes("z.getBigUint64(32, true) === BigInt(count)") &&
+    zipIO.includes("z.getBigUint64(40, true) === BigInt(cdSize)") &&
+    zipIO.includes("z.getBigUint64(48, true) === BigInt(cdOff)") &&
+    zipIO.includes("expectedCdEnd = zip64Off === null ? eocdAbs : zip64Off");
+  rule(optionalZip64, "an optional ZIP64 end record (Info-ZIP stdin output) is accepted only when its contents match the EOCD (no dual interpretation)");
+
+  /* trk163：書斎の復元は参照される側から書く（pages→covers→books→settings）。
+     容量不足などで途中失敗しても「存在しないページを指す本」にならない。案内文言（領域を外す・不要パックを消す）は4言語 */
+  const studyOrder = backup.includes('STUDY_WRITE_ORDER = ["pages", "covers", "books", "settings"]') &&
+    backup.includes("orderStudyStores(plan.dbs)") && backup.includes("p.spec === DB_STUDY") &&
+    (i18n.match(/backupRestorePackFailedKept:/g) || []).length === 4 &&
+    i18n.includes("導入に失敗したパックと同じIDの既存パックは削除していません。空き容量が足りなかったときは");
+  rule(studyOrder, "study-room restore writes referenced stores first (pages→covers→books), and pack-failure reporting keeps its space hint in four languages");
+
   const recordStart = custom.indexOf("function packRecordBytes(");
   const recordEnd = custom.indexOf("\nasync function checkPackStorageCapacity", recordStart);
   const budgetSource = recordStart >= 0 && recordEnd >= 0 ? custom.slice(recordStart, recordEnd) : "";

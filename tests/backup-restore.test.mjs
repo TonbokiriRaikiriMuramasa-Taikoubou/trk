@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-/* trk160–162: ZIP/backup hard limits, pack restore ordering, and user-visible restore reporting. */
+/* trk160–163: ZIP/backup hard limits, pack restore ordering, study store write ordering, and user-visible restore reporting. */
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -52,28 +52,36 @@ async function studyBackup({ pageBytes = 101, declaredPageSize = 1 } = {}) {
     { name:"blobs/0000001", blob:new Blob([new Uint8Array(pageBytes)]) },
   ]);
 }
-function mockIDB(packStore, events) {
-  const stores = new Map([["packs", packStore]]);
+function mockIDB(packStore, events, extraStores = new Map()) {
+  const stores = new Map([["packs", packStore], ...extraStores]);
   const db = {
     objectStoreNames:{ contains:name => stores.has(name) },
     createObjectStore(name) { const store = new Map(); stores.set(name, store); return { createIndex() {} }; },
     close() {},
     transaction(name) {
       const map = stores.get(name);
+      /* リクエスト（getAllKeys）が無いトランザクション（clear+put だけ）でも oncomplete へ進む。
+         リクエストがあるときは、そのコールバックが終わってから完了する（delete→complete の順を保つ） */
+      let pending = 0, finished = false;
+      const complete = () => { if (!pending && !finished) { finished = true; setTimeout(() => tx.oncomplete?.(), 0); } };
       const tx = { error:null, oncomplete:null, onerror:null, onabort:null, abort() { this.onabort?.(); } };
       const os = {
         getAllKeys() {
+          pending++;
           const req = { result:null, onsuccess:null, onerror:null };
           setTimeout(() => {
             req.result = [...map.keys()];
             req.onsuccess?.();
-            setTimeout(() => tx.oncomplete?.(), 0);
+            pending--; complete();
           }, 0);
           return req;
         },
+        put(value, key) { events.push(`put:${name}:${String(key)}`); map.set(key, value); },
+        clear() { events.push(`clear:${name}`); map.clear(); },
         delete(key) { events.push(`delete:${key}`); map.delete(key); },
       };
       tx.objectStore = () => os;
+      setTimeout(complete, 0);
       return tx;
     },
   };
@@ -244,4 +252,41 @@ test("the restore completion report is acknowledged before the page reloads", as
     ["alert", "done:backupRestorePacksNotIncluded"],
     ["reload"],
   ]);
+});
+
+/* trk163（レビュー【低】③）：書斎のストアは参照される側から置き換える（pages→covers→books→settings）。
+   一番大きな書き込み（pages）が先なので、容量不足などで途中失敗したときに本側は無傷＝残るのは「参照されないページ」。
+   「本は新しいのにページは古い」（存在しないページを指す本）にはならない。 */
+async function studyOrderBackup() {
+  const meta = freshMeta(); meta.areas = { core:false, study:true, packs:false, media:false };
+  const json = (name, rows) => ({ name:`db/trk_study_room_v1/${name}.json`, blob:new Blob([JSON.stringify(rows)]), deflate:true });
+  return Z.zipWrite([
+    { name:"backup.json", blob:new Blob([JSON.stringify(meta)]), deflate:true },
+    /* ZIP のエントリー順は書き出し時と同じ（books が先・DB_STUDY.stores 順）。復元側で書き順を組み替える */
+    json("books", [{ k:{ s:"book-1" }, v:{ id:"book-1", kind:"image", pages:[{ key:"page-1", size:3 }] } }]),
+    json("pages", [{ k:{ s:"page-1" }, v:{ $blob:"blobs/0000001", type:"image/png", file:false, name:"", mtime:0 } }]),
+    json("covers", [{ k:{ s:"song-1" }, v:{ bookId:"book-1", pageKey:"page-1", pageIndex:0 } }]),
+    json("settings", [{ k:{ s:"ui" }, v:{ zoom:1 } }]),
+    { name:"blobs/0000001", blob:new Blob([new Uint8Array(3)]) },
+  ]);
+}
+
+test("study stores are replaced referenced-side first (pages→covers→books→settings)", async () => {
+  const events = [];
+  const study = new Map([
+    ["books", new Map([["book-old", { id:"book-old" }]])],
+    ["pages", new Map([["page-old", {}]])],
+    ["covers", new Map()],
+    ["settings", new Map()],
+  ]);
+  const restore = loadBackup({ idb:mockIDB(new Map(), events, study), custom:{} });
+  await restore.restoreBackup(await studyOrderBackup());
+  assert.deepEqual(events, [
+    "clear:pages", "put:pages:page-1",
+    "clear:covers", "put:covers:song-1",
+    "clear:books", "put:books:book-1",
+    "clear:settings", "put:settings:ui",
+  ], "the ZIP carries books.json first, but referenced stores are written before the books that point at them");
+  assert.deepEqual([...study.get("books").keys()], ["book-1"]);
+  assert.deepEqual([...study.get("pages").keys()], ["page-1"]);
 });

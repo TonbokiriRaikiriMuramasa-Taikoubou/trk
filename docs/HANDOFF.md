@@ -147,9 +147,9 @@
 
 ### 維持中の既存機能
 
-- **🎓 trk's OST Vol.1（`trk-ost-v1`）**：🐔 trk's playlist の Game Vol.1 直下。FIRST SPARK のデモに加え、trk179 からオリジナル曲（1曲目 SUNRISE DASH）を置く棚です。新曲は manifest の未見キーだけ足し（`trkOstSeenKeys`）、利用者が外した曲は戻しません。手続き生成曲は別の **trk Agent's OST Vol.1（`trk-agent-ost-v1`）** にmanifest経由で接続済み（下記）。trk112が最上位に作った本棚だけを一度trkフォルダへ移し（印は `cat: "trk:ost"`）、以後は利用者が動かした場所を守ります。
+- **🎓 trk's OST Vol.1（`trk-ost-v1`）**：🐔 trk's playlist の Game Vol.1 直下。FIRST SPARK のデモに加え、trk179〜180 からオリジナル曲（1曲目 SUNRISE DASH・2曲目 POPCORN SMILE）を置く棚です。新曲は manifest の未見キーだけ足し（`trkOstSeenKeys`）、利用者が外した曲は戻しません。手続き生成曲は別の **trk Agent's OST Vol.1（`trk-agent-ost-v1`）** にmanifest経由で接続済み（下記）。trk112が最上位に作った本棚だけを一度trkフォルダへ移し（印は `cat: "trk:ost"`）、以後は利用者が動かした場所を守ります。
 - **🎼 手続き作曲ツール／任意のAgent OST（trk113・trk149〜151）**：`node tools/make-trk-ost.mjs` で5ルール×2曲＝10曲のWAVスケッチと `assets/trk-ost/manifest.json` を生成（外部ライブラリなし・決定的）。アプリ側にはmanifest読込み・専用リスト作成・選択時の音源読込みを実装済みです。ただし音源とmanifestは `.gitignore` 対象で、公開リポジトリには入っていません。既定コードの `AGENT_OST_MANIFEST_INCLUDED=false` は任意資産をfetchしない印です。音源を意図的に含める配布／試験ビルドだけ true にし、生成したmanifest・WAVと一緒に配布します。10曲の実聴取・品質評価は未確認（§4-6）。
-- **🎵 OSTオリジナル曲の作曲パイプライン（trk179〜）**：`tools/ost-scores/<key>.json` に作曲（テンポ・形式・コード・全メロディ・編曲）→ `node tools/make-trk-song.mjs` で決定論的チップシンセ描画（WAVはGit外）＋ABC譜を生成 → `node tools/encode-ost-mp3.mjs` でMP3化 → `assets/optional-ost-audio/` に manifest と同梱。MP3は全てスコア付きが check-repo の検査条件。1曲目は SUNRISE DASH（150 BPM・32小節・intro-A-B-サビ-outro＋終止・約53秒・823 KiB）。YuE2 本体はこの環境で動かない（GPU＋HuggingFace要）ため自前パイプラインとし、ABC は将来 YuE2 の `abc=` へ渡せる形。
+- **🎵 OSTオリジナル曲の作曲パイプライン（trk179〜）**：`tools/ost-scores/<key>.json` に作曲（テンポ・形式・コード・全メロディ・編曲）→ `node tools/make-trk-song.mjs` で決定論的チップシンセ描画（WAVはGit外）＋ABC譜を生成 → `node tools/encode-ost-mp3.mjs` でMP3化 → `assets/optional-ost-audio/` に manifest と同梱。MP3は全てスコア付きが check-repo の検査条件。1曲目は SUNRISE DASH（150 BPM・32小節・intro-A-B-サビ-outro＋終止・約53秒・823 KiB）。2曲目は POPCORN SMILE（128 BPM・Gメジャー・三角波リード・約61秒・960 KiB）。調は C/G/F 長調（ABC の臨時記号と下方3度は調に従う）、リード音色は pulse/tri/square/saw から選べる（trk180）。YuE2 本体はこの環境で動かない（GPU＋HuggingFace要）ため自前パイプラインとし、ABC は将来 YuE2 の `abc=` へ渡せる形。
 - **消した自動リストは作り直さない（trk114）**：trk!が自動で作るリスト（IDが `trk-` で始まる Game Vol.1・Classic Vol.1・trk's OST Vol.1・Agent's OST Vol.1・カタログの各リスト）を消すと、`settings.trkRemoved` に印が残り、次の起動で作り直しません。設定「🐔 trk's playlist」の **♻ 消したtrkのリストを戻す（n件）**で印を外して作り直します（Game Vol.1／Classic Vol.1の「開く」ボタンもその1件の印を外す）。印は `trk-` で始まるIDだけ・200件までに検証し、全リセットで空に戻ります。
 - **入手先ガイドは表示言語で出す（trk114）**：公式カタログ由来のガイドは辞書キー（`plGuide…`）と日本語の控えを保存し、表示時に今の言語で引きます（LoL・Endfield・ブルアカ・学マス・Game／Classic Vol.1など21キー×4言語）。既存の保存データは起動時に自動で鍵が付きます。カタログ本体の各シリーズ説明文（`js/catalog.js` の `note`）はまだ日本語だけです。
 - **小さなアクセント文字の色（trk114）**：`--ui-accent-ink`（`js/data.js` の `accentInk`、`applySkin` が毎回設定）。設定画面の入れ子の欄（カード＋パネル＋小欄の重なり）でも4.5:1になるまで、アクセントを本文の色へ5%ずつ寄せます。足りているスキンは元の色のまま。44スキン中16スキンで色が少し変わりました（スキンの棚の見出し、リンク、記録表の選択行など13ルール＋fx.jsのリンク1箇所）。
@@ -309,6 +309,11 @@
 
 ## 6. 直近の検証
 
+- **trk180（2026-10-16・OST 2曲目 POPCORN SMILE）**
+  - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **520/520**）。`git diff --check` も成功。
+  - **作曲**：Gメジャー・128 BPM・32小節（約61秒・クリップ0・サビが最大のエネルギー勾配・無音穴なし・F# は K:G の調号どおり素の F で ABC 化）。1曲目の再描画は統計値まで一致（回帰なし）。
+  - **`sw.js` は据え置き**：同ファイルにプリキャッシュは無く全面 network-first のため、任意アセットの追加だけでは cache 名の更新は要らない（確認済み）。
+  - **未完了**：実聴取での品質評価、実ブラウザsmoke2件（§8の条件どおりレビュー側で確認）。実機確認は§4のまま。
 - **trk179（2026-10-15・OST 1曲目 SUNRISE DASH）**
   - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **518/518**）。`git diff --check` も成功。
   - **作曲**：32小節の全メロディ＋コードをJSONに作曲し、決定論的シンセで描画（52.6秒・クリップ0・サビが最大のエネルギー勾配・無音穴なし・余韻は自然減衰を数値QA）。ABC 32小節と突き合わせ済み。
@@ -322,6 +327,10 @@
 
 ## 7. 最近の変更
 
+- **trk180（2026-10-16・OST 2曲目）**
+  - **POPCORN SMILE 作曲・同梱**：Pops（128 BPM・Gメジャー・32小節・約61秒）。スコア（JSON＋ABC）→描画→MP3（960 KiB）を manifest へ追加。読み込み側の変更は不要（trk179 の manifest 駆動が複数曲対応済み）。
+  - **描画の拡張**：C/G/F 長調（ABC・下方3度が調に従う）、`leadWave`（pulse/tri/square/saw＋既定の大きさ）、`--out` の絶対パス対応。描画の決定論とスコア対を `tests/ost-render.test.mjs`（2件）で固定。
+  - **ガイド（日英）・NOTICE・フォルダ README・`.gitignore` を追補。`sw.js` は据え置き（上記§6の確認）。**
 - **trk179（2026-10-15・OST 1曲目）**
   - **SUNRISE DASH 作曲・同梱**：ゲーム音楽風オリジナル（150 BPM・Cメジャー・32小節・約53秒）。スコア（JSON＋ABC）を Git に入れ、決定論的シンセ描画→MP3（823 KiB）を `assets/optional-ost-audio/` に同梱。YuE2 は sandbox で動かないため「記号で作曲・音で創造」の自前パイプラインとし、ABC は将来 YuE2 の `abc=` へ渡せる形。
   - **読み込み**：manifest 駆動の複数曲対応（`initTrkOstSongs`・選択時遅延読込・2 MiB上限・key/file 正規表現検証）。プレイリストへは未見キーだけ追加（`trkOstSeenKeys`・外した曲を復活させない・消したリストを作り直さない）。

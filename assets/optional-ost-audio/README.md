@@ -10,6 +10,8 @@ makes a lighter build, and the game simply shows no OST songs.
 - `ost-01-sunrise-dash.mp3` — track 01 **SUNRISE DASH** (150 BPM,
   game-style, ~53 s). Loaded lazily when selected, same as the
   FIRST SPARK tutorial demo.
+- `ost-02-popcorn-smile.mp3` — track 02 **POPCORN SMILE** (128 BPM,
+  pops, ~61 s). Same lazy loading.
 
 Every track keeps its editable score in `tools/ost-scores/`:
 

@@ -35,6 +35,20 @@ const CHORDS = {
   Bb: { root: 46, triad: [0, 4, 7] }, Gm: { root: 43, triad: [0, 3, 7] },
 };
 const DRUM_PATTERNS = ["build", "drive", "outro"];
+/* 長調のキー。ABC の臨時記号と下方3度ハーモニーはここから決まる（C/G/F だけ。増やすときは表を足す）。 */
+const KEY_PCS = { C: [0, 2, 4, 5, 7, 9, 11], G: [0, 2, 4, 6, 7, 9, 11], F: [0, 2, 4, 5, 7, 9, 10] };
+/* pc → ABC の音字。調号でまかなえる音に臨時記号は付けない（G の F# は素の F、F の Bb は素の B）。 */
+const KEY_PITCH = {
+  C: ["C", "^C", "D", "^D", "E", "F", "^F", "G", "^G", "A", "^A", "B"],
+  G: ["C", "^C", "D", "^D", "E", "=F", "F", "G", "^G", "A", "^A", "B"],
+  F: ["C", "^C", "D", "_E", "E", "F", "^F", "G", "_A", "A", "_B", "=B"],
+};
+const LEAD_WAVES = { pulse: 0.15, tri: 0.26, square: 0.1, saw: 0.09 };   /* リードの波形 → 既定の大きさ */
+function parseKey(key) {
+  const m = /^([A-G])\s+major$/.exec(String(key || ""));
+  if (!m || !KEY_PCS[m[1]]) fail(`only C/G/F major for now (got ${JSON.stringify(key)})`);
+  return m[1];
+}
 
 /* ---------- Track（tools/make-trk-ost.mjs と同型＋ビブラート/クラッシュ） ---------- */
 class Track {
@@ -161,6 +175,10 @@ function loadScore(file) {
   if (!/^[a-z0-9][a-z0-9-]{0,47}$/.test(s.id)) fail(`score.id must be [a-z0-9-] (≤48): ${s.id}`);
   if (!isNum(s.bpm) || s.bpm < 60 || s.bpm > 220) fail("score.bpm must be 60..220");
   if (s.beatsPerBar !== 4) fail("only 4/4 (beatsPerBar: 4) is supported for now");
+  const keyName = parseKey(s.key);
+  if (s.leadWave != null && !LEAD_WAVES[s.leadWave]) {
+    fail(`leadWave must be one of ${Object.keys(LEAD_WAVES).join("/")} (got ${JSON.stringify(s.leadWave)})`);
+  }
   if (!Array.isArray(s.chords) || !s.chords.length) fail("score.chords must be a non-empty array");
   s.chords.forEach((c, i) => { if (!CHORDS[c]) fail(`unknown chord at bar ${i}: ${JSON.stringify(c)}`); });
   const nBars = s.chords.length;
@@ -194,17 +212,17 @@ function loadScore(file) {
   }
   const ring = s.ending?.ringOutSec ?? 1.2;
   if (!isNum(ring) || ring < 0 || ring > 5) fail("ending.ringOutSec must be 0..5");
-  return { s, nBars, ring };
+  return { s, nBars, ring, keyName };
 }
 
-/* Cメジャーの下方3度ハーモニー（ダイアトニック限定。外れたら失敗） */
-const MAJ_PCS = [0, 2, 4, 5, 7, 9, 11];
-function thirdBelow(midi) {
+/* 調の下方3度ハーモニー（ダイアトニック限定。外れたら失敗） */
+function thirdBelow(midi, keyName) {
+  const pcs = KEY_PCS[keyName];
   const pc = ((midi % 12) + 12) % 12, oct = Math.floor(midi / 12);
-  const idx = MAJ_PCS.indexOf(pc);
-  if (idx < 0) fail(`thirdBelow needs C-major diatonic notes (got midi ${midi})`);
+  const idx = pcs.indexOf(pc);
+  if (idx < 0) fail(`thirdBelow needs ${keyName}-major diatonic notes (got midi ${midi})`);
   const ni = (((idx - 2) % 7) + 7) % 7, no = oct + (idx - 2 < 0 ? -1 : 0);
-  return no * 12 + MAJ_PCS[ni];
+  return no * 12 + pcs[ni];
 }
 
 /* ---------- 編曲 ---------- */
@@ -234,7 +252,7 @@ function renderDrums(tr, score, bar, sec, spb) {
   }
 }
 
-function renderBar(tr, score, bar, sec, spb) {
+function renderBar(tr, score, bar, sec, spb, keyName) {
   const t0 = bar * 4 * spb;
   const ch = CHORDS[score.chords[bar]];
   const isFinalBar = bar === score.chords.length - 1;
@@ -264,11 +282,12 @@ function renderBar(tr, score, bar, sec, spb) {
     if (ev[0] !== bar) continue;
     const [, beat, , len, midi] = ev;
     const t = t0 + beat * spb, dur = len * spb;
-    tr.tone(t, midi, dur * 0.94, 0.15, "pulse", {
+    const leadWave = score.leadWave || "pulse";
+    tr.tone(t, midi, dur * 0.94, LEAD_WAVES[leadWave], leadWave, {
       a: 0.008, r: isFinalBar ? 0.9 : 0.07, vib: { rate: 5.5, cents: 14 },
     });
     if (sec.harmony === "thirdBelow") {
-      tr.tone(t, thirdBelow(midi), dur * 0.94, 0.07, "square", { a: 0.008, r: 0.07 });
+      tr.tone(t, thirdBelow(midi, keyName), dur * 0.94, 0.07, "square", { a: 0.008, r: 0.07 });
     }
   }
   /* サビ頭のスタブ＋最終小節のトニック強打 */
@@ -279,19 +298,14 @@ function renderBar(tr, score, bar, sec, spb) {
 }
 
 /* ---------- ABC ---------- */
-const ABC_PITCH = ["C", null, "D", null, "E", "F", null, "G", null, "A", null, "B"];
-function midiToAbc(midi) {
+function midiToAbc(midi, keyName) {
   const pc = ((midi % 12) + 12) % 12, oct = Math.floor(midi / 12) - 1;
-  let acc = "", base = ABC_PITCH[pc];
-  if (!base) { /* 黒鍵：#で表す（C側に寄せる） */
-    const flat = { 1: "D", 3: "E", 6: "G", 8: "A", 10: "B" }[pc];
-    acc = "_"; base = flat;
-  }
+  const m = /^([\^_=]*)([A-G])$/.exec(KEY_PITCH[keyName][pc]);
   const abcOct = (b, o) => {
     if (o >= 5) return b.toLowerCase() + "'".repeat(Math.max(0, o - 5));
     return b + ",".repeat(Math.max(0, 4 - o));
   };
-  return acc + abcOct(base, oct);
+  return m[1] + abcOct(m[2], oct);
 }
 function abcLen(lenBeats) {
   const eighths = Math.round(lenBeats * 2);
@@ -300,9 +314,10 @@ function abcLen(lenBeats) {
 }
 function toAbc(score) {
   const nBars = score.chords.length;
+  const keyName = parseKey(score.key);
   const lines = [
     "X:1", `T:${score.title}`, `C:${score.artist}`, "M:4/4", "L:1/8",
-    `Q:1/4=${score.bpm}`, `K:${String(score.key).split(" ")[0]}`,
+    `Q:1/4=${score.bpm}`, `K:${keyName}`,
   ];
   const body = [];
   for (let bar = 0; bar < nBars; bar++) {
@@ -310,7 +325,7 @@ function toAbc(score) {
     let cur = 0, txt = `"${score.chords[bar]}" `;
     for (const [, beat, , len, midi] of evs) {
       if (beat > cur + 1e-9) txt += `z${abcLen(beat - cur)}`;
-      txt += `${midiToAbc(midi)}${abcLen(len)} `;
+      txt += `${midiToAbc(midi, keyName)}${abcLen(len)} `;
       cur = beat + len;
     }
     if (cur < 4 - 1e-9) txt += `z${abcLen(4 - cur)}`;
@@ -333,10 +348,10 @@ function main(argv) {
   const force = args.includes("--force");
   const absScore = path.isAbsolute(scorePath) ? scorePath : path.join(root, scorePath);
 
-  const { s, nBars, ring } = loadScore(absScore);
+  const { s, nBars, ring, keyName } = loadScore(absScore);
   const spb = 60 / s.bpm, musicEnd = nBars * 4 * spb;
   const tr = new Track(musicEnd + ring);
-  for (let bar = 0; bar < nBars; bar++) renderBar(tr, s, bar, sectionOf(s.form, bar), spb);
+  for (let bar = 0; bar < nBars; bar++) renderBar(tr, s, bar, sectionOf(s.form, bar), spb, keyName);
   tr.space(0.16);
 
   /* 腕試し：セクションごとの無音チェック（作曲ミス・描画ミスを落とす） */
@@ -345,7 +360,7 @@ function main(argv) {
     if (!(rms > 1e-4)) fail(`section ${sec.name} is silent (arrangement bug?)`);
   }
   const fin = tr.finalize(0.88);
-  const wavPath = path.join(root, outDir, `${s.id}.wav`);
+  const wavPath = path.resolve(root, outDir, `${s.id}.wav`);
   const wrote = tr.writeWav(wavPath, force);
   let abcPath = null;
   if (!noAbc) {

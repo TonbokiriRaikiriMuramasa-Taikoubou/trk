@@ -2,6 +2,7 @@
 *.mp3
 !assets/optional-demo-audio/first-spark-tutorial.mp3
 !assets/optional-ost-audio/ost-01-sunrise-dash.mp3
+!assets/optional-ost-audio/ost-02-popcorn-smile.mp3
 
 # 🎓 trk's OST の手続き生成スケッチ（生成スクリプト tools/make-trk-ost.mjs の出力・Git外）
 assets/trk-ost/

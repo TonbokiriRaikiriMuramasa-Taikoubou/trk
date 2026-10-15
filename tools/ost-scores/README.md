@@ -6,7 +6,9 @@ note is written in the plan below.
 
 - `<key>.json` — the composition plan: tempo, form (sections), one chord
   per bar, the full melody as `[bar, beat, note, lenBeats]`, and the
-  drum/arp/harmony arrangement per section.
+  drum/arp/harmony arrangement per section. Keys are C/G/F major;
+  `leadWave` picks the lead timbre (`pulse` default, `tri` for a
+  softer pops lead).
   See `ost-01-sunrise-dash.json` for the format.
 - `<key>.abc` — generated from the JSON by the renderer: melody plus
   chord symbols in ABC notation. Human-readable, and usable as `abc=`

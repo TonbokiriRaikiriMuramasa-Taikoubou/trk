@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "enabled": true,
+  "_note": "trk's OST Vol.1 optional tracks. The game fetches this small file at startup and lazy-loads each MP3 when selected. Delete the whole folder for a lighter build. Every track keeps its committed score in tools/ost-scores/<key>.json + <key>.abc.",
+  "tracks": [
+    {
+      "key": "ost-01-sunrise-dash",
+      "file": "ost-01-sunrise-dash.mp3",
+      "title": "SUNRISE DASH",
+      "artist": "trk!",
+      "bpm": 150,
+      "offset": 0
+    },
+    {
+      "key": "ost-02-popcorn-smile",
+      "file": "ost-02-popcorn-smile.mp3",
+      "title": "POPCORN SMILE",
+      "artist": "trk!",
+      "bpm": 128,
+      "offset": 0
+    },
+    {
+      "key": "ost-03-moonlit-lullaby",
+      "file": "ost-03-moonlit-lullaby.mp3",
+      "title": "MOONLIT LULLABY",
+      "artist": "trk!",
+      "bpm": 92,
+      "offset": 0
+    },
+    {
+      "key": "ost-04-crimson-blaze",
+      "file": "ost-04-crimson-blaze.mp3",
+      "title": "CRIMSON BLAZE",
+      "artist": "trk!",
+      "bpm": 160,
+      "offset": 0
+    },
+    {
+      "key": "ost-05-neon-dive",
+      "file": "ost-05-neon-dive.mp3",
+      "title": "NEON DIVE",
+      "artist": "trk!",
+      "bpm": 240,
+      "offset": 0
+    }
+  ]
+}

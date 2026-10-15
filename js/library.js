@@ -149,6 +149,66 @@ async function initOptionalTutorialDemo() {
     renderLib();
   } catch (_) { /* no manifest = intentional lightweight build or an offline optional asset */ }
 }
+/* 🎵 trk's OST Vol.1 のオリジナル曲（任意同梱）。小さな manifest に列挙された MP3 を曲リストへ入れ、
+   プレイリストには「未見のキーだけ」足す（trkOstSeenKeys）。音源は選んだときに読む（materializeTrkOstSong）。
+   スコアは tools/ost-scores/（JSON＋ABC）にあり、MP3 はそこから描いたもの。フォルダごと消せば曲も消える。 */
+const TRK_OST_SONG_DIR = "./assets/optional-ost-audio/";
+const TRK_OST_SONG_MANIFEST = "./assets/optional-ost-audio/manifest.json";
+const TRK_OST_SONG_KEY_PREFIX = "builtin:trk-ost-song:";
+const TRK_OST_SONG_MAX_BYTES = 2 * 1024 * 1024;
+const trkOstSongUrls = new Map();   /* key → 音源の URL */
+async function initTrkOstSongs() {
+  try {
+    const response = await fetch(TRK_OST_SONG_MANIFEST, { credentials:"same-origin" });
+    if (!response.ok) return;
+    const manifest = await response.json();
+    if (!manifest || manifest.version !== 1 || manifest.enabled !== true || !Array.isArray(manifest.tracks)) return;
+    const songs = manifest.tracks.slice(0, 20).filter(t => t && /^[\w-]{1,32}$/.test(String(t.key)) && /^[\w.-]{1,80}\.mp3$/.test(String(t.file)))
+      .map(t => {
+        const key = TRK_OST_SONG_KEY_PREFIX + t.key, title = String(t.title || t.key).trim().slice(0, 120) || t.key;
+        trkOstSongUrls.set(key, TRK_OST_SONG_DIR + t.file);
+        const bpm = Number(t.bpm) > 0 ? Number(t.bpm) : 0;
+        const offset = Number.isFinite(Number(t.offset)) ? Number(t.offset) : 0;
+        return { key, source:"builtin", file:null, fileName:t.file, title, base:title,
+          artist:String(t.artist || "trk!").trim().slice(0, 120) || "trk!", size:0, bpm, offset, charter:"", license:"" };
+      });
+    if (!songs.length) return;
+    builtInSongs = [...builtInSongs.filter(song => !song.key.startsWith(TRK_OST_SONG_KEY_PREFIX)), ...songs];
+    appendTrkOstSongs(songs.map(song => song.key));
+    renderLib();
+  } catch (_) { /* no manifest = intentional lightweight build or an offline optional asset */ }
+}
+/* 未見のキーだけプレイリストへ足す。利用者が外した曲（見た印あり）は戻さない。消したリストは作り直さない。 */
+function appendTrkOstSongs(keys) {
+  const p = core.settings.playlists.find(p => p.id === TRK_OST_ID);
+  if (!p || !Array.isArray(p.songs)) return false;
+  const seen = new Set(core.settings.trkOstSeenKeys || []);
+  let changed = false;
+  for (const k of keys) {
+    if (seen.has(k)) continue;
+    seen.add(k);
+    if (!p.songs.includes(k)) p.songs.push(k);
+    changed = true;
+  }
+  if (changed) { core.settings.trkOstSeenKeys = [...seen]; core.saveUserPrefs(); }
+  return changed;
+}
+async function materializeTrkOstSong(it) {
+  const url = trkOstSongUrls.get(it.key);
+  if (!url) throw new Error("trk-ost-song-unknown");
+  const response = await fetch(url, { credentials:"same-origin" });
+  if (!response.ok) { const error = new Error("trk-ost-song-unavailable"); error.code = response.status === 404 ? "not-found" : "http-error"; throw error; }
+  const declared = Number(response.headers.get("Content-Length") || 0);
+  if (declared > TRK_OST_SONG_MAX_BYTES) throw new Error("trk-ost-song-too-large");
+  const blob = await response.blob();
+  if (!blob.size || blob.size > TRK_OST_SONG_MAX_BYTES) throw new Error("trk-ost-song-size-invalid");
+  const file = new File([blob], it.fileName, { type:"audio/mpeg" });
+  const ready = { ...it, file, size:file.size };
+  const idx = builtInSongs.findIndex(song => song.key === it.key);
+  if (idx >= 0) builtInSongs[idx] = ready;
+  renderLib();
+  return ready;
+}
 /* 🎼 trk Agent's OST Vol.1 — 手続き生成の10曲（tools/make-trk-ost.mjs）。
    音源とマニフェストは assets/trk-ost/（Git外）。公開コード側の AGENT_OST_MANIFEST_INCLUDED が false の間は、manifestを取りに行かない。
    有効なビルドではmanifestの曲を登録し、音源は選んだときに読む（materializeAgentOst）。消したら trkRemoved に印が残る（🐔 の ♻ で戻せる）。 */
@@ -3633,6 +3693,7 @@ async function materializeBuiltinSong(it) {
   if (it.source !== "builtin") return it;
   if (it.file) return it;
   if (it.key.startsWith(AGENT_OST_KEY_PREFIX)) return materializeAgentOst(it);
+  if (it.key.startsWith(TRK_OST_SONG_KEY_PREFIX)) return materializeTrkOstSong(it);
   if (it.key !== FIRST_SPARK_KEY) return it;
   if (!firstSparkFilePromise) {
     firstSparkFilePromise = (async () => {
@@ -4277,6 +4338,7 @@ async function initLibrary() {
   syncTrkUI();
   renderLib();
   void initOptionalTutorialDemo();
+  void initTrkOstSongs();
   void initAgentOstTracks();
 }
 /* ✅ library.js 完了 */

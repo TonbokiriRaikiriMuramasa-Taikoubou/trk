@@ -290,6 +290,7 @@ test("restore confirmation includes add-on count, names, and the disabled-by-def
   const input = element(), prompts = [];
   input.files = [await backupWithLocalItems({ trk_addons_v1:JSON.stringify({
     "addon-one":{ id:"addon-one", name:"Echo", enabled:true, code:"code" },
+    "addon-two":{ id:"addon-two", name:"Foxtrot", enabled:true, code:"code" },
   }) })];
   const restore = loadBackup({
     idb:mockIDB(new Map(), []), custom:{},
@@ -299,7 +300,7 @@ test("restore confirmation includes add-on count, names, and the disabled-by-def
     confirmFn:text => { prompts.push(text); return false; },
   });
   await input.handlers.change();
-  assert.deepEqual(prompts, ["ask:1:Echo"], "the native confirmation receives the count and add-on name list");
+  assert.deepEqual(prompts, ["ask:2:Echo, Foxtrot"], "the native confirmation receives the count and add-on name list (comma-separated in every locale)");
 
   const i18nSource = fs.readFileSync(`${ROOT}/js/i18n.js`, "utf8");
   assert.equal((i18nSource.match(/backupRestoreAsk:/g) || []).length, 4, "confirmation text exists in all four locales");

@@ -52,6 +52,16 @@ python -m http.server 8000
 # → http://localhost:8000 を開く
 ```
 
+### 📦 同梱曲と保存場所（プレイヤーだけ使いたい人へ）
+
+ダウンロードにはオリジナル曲が付いてきます。場所は次のとおりです。
+
+- **楽曲ファイル**：`assets/optional-demo-audio/`（FIRST SPARKデモ約704 KiB）・`assets/optional-ost-audio/`（trk's OST Vol.1：4曲＋ボーナス1曲、計約4.7 MiB）。起動時は小さな `manifest.json` だけ読み、音源は選んだときにだけ読み込みます。
+- **プレイリスト**：アプリ内の「🐔 trk's playlist」→「🎓 trk's OST Vol.1」に自動で並びます（ブラウザの localStorage に保存）。
+- **スコア**：全曲の作曲データ（JSON＋ABC譜）が `tools/ost-scores/` にあります。
+
+プレイヤーとしてだけ使いたい場合は、上の2フォルダーを**削除してOK**です（計約5.3 MiBの軽量化。ゲーム・プレイヤー・自分の曲の再生には影響しません）。曲なしのプレイリストが残ったら、中クリック／長押しメニューで消せます（一度消したリストは作り直しません）。
+
 ---
 
 ---
@@ -107,6 +117,8 @@ Catalog matching automatically handles supported title variations, using officia
 **Run locally:** `python -m http.server 8000`, then open `http://localhost:8000`.
 
 Five play styles (MANUAL, TRUCK, ORBIT, STAGE, CATCH), Study Room, verified packs and lighter builds are described in the **[full English guide](docs/guide/en.md)**.
+
+Bundled songs live in `assets/optional-demo-audio/` (FIRST SPARK demo, about 704 KiB) and `assets/optional-ost-audio/` (trk's OST Vol.1: four songs plus a bonus track, about 4.7 MiB); the app reads only a small `manifest.json` at startup and fetches each MP3 when selected. For a player-only lightweight build, delete both folders (about 5.3 MiB smaller) — the game, the player, and your own songs are unaffected. An empty leftover playlist can be deleted and will not come back.
 
 **Feedback:** [@ttrk143](https://x.com/ttrk143) (hashtag **#trkAGRG**), bugs and ideas on [GitHub Issues](https://github.com/TonbokiriRaikiriMuramasa-Taikoubou/trk/issues).
 

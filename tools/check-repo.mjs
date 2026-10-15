@@ -2158,6 +2158,43 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else ok("First Spark: optional 30-second demo folder is lazy-loaded and can be removed without affecting the media player");
 }
 
+// 🎵 trk's OST Vol.1 optional songs: manifest-driven MP3 tracks with committed scores, lazy-loaded like the demo.
+{
+  const library = read("js/library.js"), notice = read("NOTICE.md"), ignore = read(".gitignore"), readmeRoot = read("README.md");
+  const ostDir = path.join(root, "assets/optional-ost-audio");
+  const ostReadme = fs.existsSync(path.join(ostDir, "README.md")) ? read("assets/optional-ost-audio/README.md").replace(/\r/g, "") : "";
+  let optionalOstOk = !fs.existsSync(ostDir);
+  if (fs.existsSync(ostDir)) {
+    try {
+      const manifest = JSON.parse(fs.readFileSync(path.join(ostDir, "manifest.json"), "utf8"));
+      const tracks = manifest.tracks || [];
+      optionalOstOk = manifest.version === 1 && manifest.enabled === true && tracks.length > 0 && tracks.length <= 20 &&
+        tracks.every(t => t && /^[\w-]{1,32}$/.test(t.key) && /^[\w.-]{1,80}\.mp3$/.test(t.file)) &&
+        tracks.every(t => {
+          const size = fs.statSync(path.join(ostDir, t.file)).size;
+          return size > 0 && size <= 2 * 1024 * 1024;
+        }) &&
+        /* every bundled track keeps its committed score (JSON plan + ABC) next to the renderer */
+        tracks.every(t => fs.existsSync(path.join(root, "tools/ost-scores", `${t.key}.json`)) &&
+          fs.existsSync(path.join(root, "tools/ost-scores", `${t.key}.abc`))) &&
+        fs.existsSync(path.join(root, "tools/make-trk-song.mjs")) &&
+        ostReadme.includes("manifest.json");
+    } catch { optionalOstOk = false; }
+  }
+  const wired = optionalOstOk &&
+    library.includes('const TRK_OST_SONG_MANIFEST = "./assets/optional-ost-audio/manifest.json";') &&
+    library.includes('const TRK_OST_SONG_KEY_PREFIX = "builtin:trk-ost-song:";') &&
+    library.includes("void initTrkOstSongs()") &&
+    library.includes("async function materializeTrkOstSong(it)") &&
+    library.includes("trkOstSeenKeys") &&
+    readmeRoot.includes("assets/optional-ost-audio/") &&
+    readmeRoot.includes("assets/optional-demo-audio/") &&
+    notice.includes("assets/optional-ost-audio/") &&
+    ignore.includes("!assets/optional-ost-audio/ost-01-sunrise-dash.mp3");
+  if (!wired) fail("the optional OST song folder, lazy-load path, unseen-only playlist append, renderer, rights note, or score pairing is missing");
+  else ok("trk's OST Vol.1: optional song folder is lazy-loaded, appends unseen keys only, and every MP3 has a committed score");
+}
+
 // 🎼 First Spark handmade demo charts: easy / normal / hard ship as authored JSON, master stays generated.
 {
   const library = read("js/library.js"), core = read("js/core.js"), i18n = read("js/i18n.js");

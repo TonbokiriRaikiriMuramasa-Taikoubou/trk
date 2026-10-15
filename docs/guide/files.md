@@ -11,6 +11,7 @@ trk/
 ├─ css/style.css  css/study-room.css  … 書斎の見た目（本棚・リーダー・TV）
 ├─ icons/                        … アプリのアイコン
 ├─ assets/optional-demo-audio/   … 任意の First Spark デモ音源＋手づくり譜面3種（軽量版ではフォルダーごと削除可）
+├─ assets/optional-ost-audio/    … 任意の trk's OST Vol.1 オリジナル曲（manifest＋MP3。軽量版ではフォルダーごと削除可）
 ├─ js/
 │  ├─ i18n.js  i18n-options.js   … 4言語の文章
 │  ├─ data.js                    … スキン・レイアウト・難易度・マスコット登録

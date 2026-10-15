@@ -312,35 +312,8 @@
 - **trk184（2026-10-16・同梱曲の保存場所を README に明記）**
   - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **520/520**）。`git diff --check` も成功。
   - **文書のみ**：動作の変更なし。`sw.js` は据え置き。
-  - **未完了**：実ブラウザsmoke2件（§8の条件どおりレビュー側で確認）。実機確認は§4のまま。
-- **trk183（2026-10-16・OST ボーナス NEON DIVE）**
-  - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **520/520**）。`git diff --check` も成功。
-  - **作曲**：Dメジャー・240 BPM・56小節（約57秒・クリップ0・両サビが頂点・無音穴なし・末尾の無音0.29秒・16分ラン3箇所・C# は K:D の調号どおり素の C）。既存4曲の再描画＋再MP3化はバイト一致（無回帰）。
-  - **`sw.js` は据え置き**：任意アセットの追加だけ（trk180 の確認どおり）。
-  - **未完了**：実聴取での品質評価、実ブラウザsmoke2件（§8の条件どおりレビュー側で確認）。実機確認は§4のまま。
-- **trk182（2026-10-16・OST 4曲目 CRIMSON BLAZE・Vol.1 完成）**
-  - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **520/520**）。`git diff --check` も成功。
-  - **作曲**：Aマイナー響き・160 BPM・32小節（約49秒・クリップ0・サビが最大の勾配・無音穴なし・末尾の無音0.58秒・G# 導音は ABC `^g` 1箇所きっかり）。
-  - **`sw.js` は据え置き**：任意アセットの追加だけ（trk180 の確認どおり）。
-  - **未完了**：実聴取での品質評価、実ブラウザsmoke2件（§8の条件どおりレビュー側で確認）。実機確認は§4のまま。
-- **trk181（2026-10-16・OST 3曲目 MOONLIT LULLABY）**
-  - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **520/520**）。`git diff --check` も成功。
-  - **作曲**：Fメジャー・92 BPM・32小節（約84秒・クリップ0・再現部が最大の緩い勾配・無音穴なし・末尾の無音は0.56秒に調整・Bb は K:F の調号どおり素の B で ABC 化）。
-  - **`sw.js` は据え置き**：任意アセットの追加だけ（trk180 の確認どおり）。
-  - **未完了**：実聴取での品質評価、実ブラウザsmoke2件（§8の条件どおりレビュー側で確認）。実機確認は§4のまま。
-- **trk180（2026-10-16・OST 2曲目 POPCORN SMILE）**
-  - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **520/520**）。`git diff --check` も成功。
-  - **作曲**：Gメジャー・128 BPM・32小節（約61秒・クリップ0・サビが最大のエネルギー勾配・無音穴なし・F# は K:G の調号どおり素の F で ABC 化）。1曲目の再描画は統計値まで一致（回帰なし）。
-  - **`sw.js` は据え置き**：同ファイルにプリキャッシュは無く全面 network-first のため、任意アセットの追加だけでは cache 名の更新は要らない（確認済み）。
-  - **未完了**：実聴取での品質評価、実ブラウザsmoke2件（§8の条件どおりレビュー側で確認）。実機確認は§4のまま。
-- **trk179（2026-10-15・OST 1曲目 SUNRISE DASH）**
-  - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **518/518**）。`git diff --check` も成功。
-  - **作曲**：32小節の全メロディ＋コードをJSONに作曲し、決定論的シンセで描画（52.6秒・クリップ0・サビが最大のエネルギー勾配・無音穴なし・余韻は自然減衰を数値QA）。ABC 32小節と突き合わせ済み。
-  - **未完了**：実聴取での品質評価（この環境に音が出ない）、実ブラウザsmoke2件（Chromiumなし・§8の条件どおりレビュー側で確認）。実機確認は§4のまま。
-- **trk178レビュー対応（2026-10-15）**
-  - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **513/513**）。`git diff --check` も成功。
-  - **区切り文字**：復元確認の複数アドオン名が `", "` で区切られることを、確認ダイアログの実動テスト（2件のアドオン）で固定。
-  - **未完了**：実ブラウザsmoke2件はこの環境にChromiumがなく未実行（§8の条件どおり、レビュー側で確認）。実機確認は§4のまま。
+  - **試聴**：OST 5曲は利用者が各曲のWAV試聴で了承（2026-10-16）。アプリ内での再生確認は smoke とあわせてレビュー側。
+  - **未完了**：実ブラウザsmoke2件（§8の条件・レビュー側で確認）。実機確認は§4のまま。
 
 過去の検証ログは [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) に移しました。現在の仕様・実機確認状況は§2〜4を正とします。
 
@@ -349,30 +322,7 @@
 - **trk184（2026-10-16・保存場所の案内）**
   - **README に同梱曲と保存場所を明記（日英）**：楽曲ファイル2フォルダ（計約5.3 MiB）・アプリ内プレイリスト（localStorage）・スコアの場所。プレイヤーだけ使いたい人は2フォルダ削除でOK（影響範囲つき）。ガイド（files.md の構成図・start.md／en.md の軽量版説明）は既存のまま。
   - **検査**：OST ブロックに root README の2フォルダ言及を固定。
-- **trk183（2026-10-16・OST ボーナス曲）**
-  - **NEON DIVE 作曲・同梱**：高速シンセ（240 BPM・Dメジャー・56小節2番形式・約57秒）。スコア（JSON＋ABC）→描画→MP3（892 KiB）を manifest へ追加。読み込み側の変更は不要。
-  - **描画の拡張**：BPM上限260・Dメジャー（ABC・下方3度）・ドラム `vocaloid`・メロディ16分 grid・最終スタブ長のテンポ追従（速い曲の尻切れ防止）。既存曲は再MP3化までバイト一致。
-  - **ガイド（日英）・NOTICE・フォルダ README・`.gitignore` を追補。`sw.js` は据え置き。**
-- **trk182（2026-10-16・OST 4曲目・Vol.1 完成）**
-  - **CRIMSON BLAZE 作曲・同梱**：短調バトルロック（160 BPM・Aマイナー響き・32小節・約49秒）。スコア（JSON＋ABC）→描画→MP3（770 KiB）を manifest へ追加。読み込み側の変更は不要。これで Vol.1 全4曲（ゲーム／Pops／ノクターン／短調ロック）がそろった。
-  - **描画の拡張**：ドラム `blaze`（16分ハット・強フィル・サビ用）。既存曲の再描画は不変。
-  - **ガイド（日英）・NOTICE・フォルダ README・`.gitignore` を追補。`sw.js` は据え置き。**
-- **trk181（2026-10-16・OST 3曲目）**
-  - **MOONLIT LULLABY 作曲・同梱**：ノクターン（92 BPM・Fメジャー・32小節・約84秒）。スコア（JSON＋ABC）→描画→MP3（1.29 MiB）を manifest へ追加。読み込み側の変更は不要。
-  - **描画の拡張**：静かな曲の語彙（`soft`／`lullaby` ドラム・`soft` ベース・8分アルペジオ・`padWave`・`leadVib`・リード `sine`）、F調 ABC の冗長な臨時記号を修正。既存曲の再描画は不変（bright 既定）。
-  - **ガイド（日英）・NOTICE・フォルダ README・`.gitignore` を追補。`sw.js` は据え置き。**
-- **trk180（2026-10-16・OST 2曲目）**
-  - **POPCORN SMILE 作曲・同梱**：Pops（128 BPM・Gメジャー・32小節・約61秒）。スコア（JSON＋ABC）→描画→MP3（960 KiB）を manifest へ追加。読み込み側の変更は不要（trk179 の manifest 駆動が複数曲対応済み）。
-  - **描画の拡張**：C/G/F 長調（ABC・下方3度が調に従う）、`leadWave`（pulse/tri/square/saw＋既定の大きさ）、`--out` の絶対パス対応。描画の決定論とスコア対を `tests/ost-render.test.mjs`（2件）で固定。
-  - **ガイド（日英）・NOTICE・フォルダ README・`.gitignore` を追補。`sw.js` は据え置き（上記§6の確認）。**
-- **trk179（2026-10-15・OST 1曲目）**
-  - **SUNRISE DASH 作曲・同梱**：ゲーム音楽風オリジナル（150 BPM・Cメジャー・32小節・約53秒）。スコア（JSON＋ABC）を Git に入れ、決定論的シンセ描画→MP3（823 KiB）を `assets/optional-ost-audio/` に同梱。YuE2 は sandbox で動かないため「記号で作曲・音で創造」の自前パイプラインとし、ABC は将来 YuE2 の `abc=` へ渡せる形。
-  - **読み込み**：manifest 駆動の複数曲対応（`initTrkOstSongs`・選択時遅延読込・2 MiB上限・key/file 正規表現検証）。プレイリストへは未見キーだけ追加（`trkOstSeenKeys`・外した曲を復活させない・消したリストを作り直さない）。
-  - **`sw.js`（`trk-v2026.10.15-trk179`）を更新。ガイド（日英）・NOTICE・`.gitignore` を追補。**
-- **trk178（2026-10-15・1291209再レビュー追補）**
-  - **復元確認のアドオン名の区切り**：`js/backup.js` の `addons.names.join("、")` を `join(", ")` に。英中韓でも「、」で区切られていた見た目の指摘。`js/share-inbox.js` の名前一覧と同じ区切りにそろえ、辞書は増やさない。確認ダイアログの区切りをテストで固定。
-  - **変更時チェックリスト**：§8に実ブラウザのスモーク2件（`smoke-browser.mjs --compare`・`smoke-game-end.mjs`）の緑を**取り込みの条件**として追加。`sw.js`（`trk-v2026.10.15-trk178`）を更新。
-- **過去の履歴**：trk177以前の詳細な変更・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) に移動しました。現在の仕様は§2、未確認事項は§4を正とします。
+- **過去の履歴**：trk183以前の詳細な変更・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) に移動しました。現在の仕様は§2、未確認事項は§4を正とします。
 
 ## 8. 変更時チェックリスト
 

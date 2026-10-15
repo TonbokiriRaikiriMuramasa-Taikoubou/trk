@@ -3665,7 +3665,7 @@ on("packsChanged", refreshPackSongs);
              許可なしでも遊べるようにする。上限は SHARED_MAX 曲・SHARED_MB MB（空き容量を守るため）
    ⚠ 曲は端末の外へ送りません（読むだけ。アップロードはしません） */
 function ingestFolder(list, dirName, shared, skipped) {
-  folderSongs = []; const charts = {}; const lyrics = {};
+  folderSongs = []; const charts = {}; const lyrics = {}; const subs = {};
   for (const { file, rel } of list) {
     const dir = rel.includes("/") ? rel.slice(0, rel.lastIndexOf("/")) : "", lower = file.name.toLowerCase();
     if (lower.endsWith(CHART_SUFFIX)) {
@@ -3673,12 +3673,16 @@ function ingestFolder(list, dirName, shared, skipped) {
       (charts[dir + "/" + base] ||= []).push(file);
     } else if (lower.endsWith(".lrc")) {
       lyrics[dir + "/" + core.baseName(file.name)] = file;   /* 🎤 同じフォルダの同名 .lrc（trk166） */
+    } else if (lower.endsWith(".srt") || lower.endsWith(".vtt")) {
+      /* 💬 同じフォルダの同名 .srt/.vtt（trk169）。両方あったら .vtt を優先する */
+      const k = dir + "/" + core.baseName(file.name);
+      if (!subs[k] || lower.endsWith(".vtt")) subs[k] = file;
     } else if (MEDIA_EXT.includes(core.extOf(file.name)) && folderSongs.length < LIB_MAX) {
       const base = core.baseName(file.name);
       folderSongs.push({ key:`${file.size}|${base}`, source:"folder", file, title:base, base, size:file.size, dir });
     }
   }
-  for (const it of folderSongs) { it.charts = charts[it.dir + "/" + it.base] || null; it.lyricsFile = lyrics[it.dir + "/" + it.base] || null; }
+  for (const it of folderSongs) { it.charts = charts[it.dir + "/" + it.base] || null; it.lyricsFile = lyrics[it.dir + "/" + it.base] || null; it.subsFile = subs[it.dir + "/" + it.base] || null; }
   /* 📤 共有のときは「何曲きたか」と「対象外が何件あったか」を両方出す（変なファイルも見て分かるように） */
   if (shared) core.setStatus("libStatus", "libShareFound", { dir:dirName || "", n:folderSongs.length, skip:skipped || 0 });
   else core.setStatus("libStatus", folderSongs.length ? "libFound" : "libEmpty", { n:folderSongs.length, dir:dirName || "" });
@@ -3692,8 +3696,8 @@ async function scanHandle(h, onProgress) {
     for await (const e of dir.values()) {
       if (e.kind === "file") {
         const n = e.name.toLowerCase();
-        if (MEDIA_EXT.includes(core.extOf(n)) || n.endsWith(CHART_SUFFIX) || n.endsWith(".lrc")) {
-          files.push({ file:await e.getFile(), rel:`${path}/${e.name}` });   /* 🎤 .lrc も集める（trk166） */
+        if (MEDIA_EXT.includes(core.extOf(n)) || n.endsWith(CHART_SUFFIX) || n.endsWith(".lrc") || n.endsWith(".srt") || n.endsWith(".vtt")) {
+          files.push({ file:await e.getFile(), rel:`${path}/${e.name}` });   /* 🎤 .lrc・💬 .srt/.vtt も集める（trk166/169） */
           if (onProgress && !(files.length % 25)) onProgress(files.length);
         } else skipped++;                       /* 曲でも譜面でもないファイル（写真・テキストなど） */
       } else if (e.kind === "directory" && !e.name.startsWith(".")) await walk(e, `${path}/${e.name}`, depth + 1);

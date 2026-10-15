@@ -2414,9 +2414,9 @@ if (!read("js/main.js").includes("guideEggKind") ||
            !lyrics.includes("window.Trk.lyrics = Object.freeze({")) fail("lyrics.js parser / manual store / resolution chain is missing");
   else if (!library.includes('it.lyricsFile = lyrics[it.dir + "/" + it.base] || null') || !library.includes('n.endsWith(".lrc")')) fail("the folder scan must attach same-named .lrc files to songs");
   else if (!core.includes("mediaLyricsOpen: prefs.mediaLyricsOpen === true") || (core.match(/settings\.mediaLyricsOpen = false/g) || []).length < 2) fail("mediaLyricsOpen setting (and its two reset paths) is missing in core.js");
-  else if (!player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, interpBox, loopBox, options, queuePanel, footer)") ||
+  else if (!player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, interpBox, loopBox, options, queuePanel, footer)") ||
            !player.includes("renderLyrics();   /* 🎤") || !player.includes('lyricsFileNode.accept = ".lrc,.txt,text/plain"') ||
-           !player.includes("on(\"songSelected\", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics(); })") ||   /* core. は正規化で外れる */
+           !player.includes("on(\"songSelected\", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics();") ||   /* core. は正規化で外れる。末尾は trk169 で loadSubs が増えたので閉じ括弧まで固定しない */
            !player.includes("api.saveManualLyrics(song.key, r.text, file.name)") ||
            (player.match(/mediaLyricsTitle:"/g) || []).length < 4 || (player.match(/mediaLyricsNeedSong:"/g) || []).length < 4) fail("media-player lyrics panel wiring or 4-language strings are missing");
   else if (!css.includes(".mediaLyricsBox") || !css.includes(".lyricLineActive") || !css.includes("body.helpTextOff .mediaLyricsBox>.hint")) fail("lyrics panel styles are missing");
@@ -2481,6 +2481,41 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else ok("trk168: 🔊 loudness leveling reads ReplayGain tags or measured loudness, applies via the always-in-path norm gain (read-only)");
 }
 
+// trk169: 💬 字幕（SRT/VTT）。外部字幕ファイル優先（埋め込み字幕トラックはブラウザ制約で対象外）。
+// 優先順：手で選んだファイル → フォルダの同名 .srt/.vtt。表示は DOM オーバーレイ（映像は canvas 描画のため）、
+// 画中画だけ同じ内容の WebVTT を <track> で。読み取りだけ＝書き戻し・送信なし。
+{
+  const subs = read("js/subtitles.js");
+  const library = read("js/library.js");
+  const player = read("js/media-player-mode.js");
+  const max = read("js/video-max.js");
+  const html = read("index.html");
+  const css = read("css/style.css");
+  /* ⚠ read("js/…") は正規化後の本文：`core.on(` は `on(`、`window.Trk.<module>.` 前置は外れて見える */
+  if (!subs.includes('const SUBS_KEY = "trk_subs_v1"') || !subs.includes("function parseSubtitles(") ||
+      !subs.includes("function stampSeconds(") || !subs.includes("function toVtt(") ||
+      !subs.includes("function activeCues(") || !subs.includes("async function resolveSubs(song)") ||
+      !subs.includes("function attachTrack(") || !subs.includes("Trk.subtitles = Object.freeze") ||
+      subs.includes("createWritable") || subs.includes("fetch(")) fail("subtitles.js parser/store/PiP-track module is missing (or grew a write/network path)");
+  else if (!library.includes('} else if (lower.endsWith(".srt") || lower.endsWith(".vtt")) {') ||
+           !library.includes('it.subsFile = subs[it.dir + "/" + it.base] || null') ||
+           !library.includes('n.endsWith(".srt") || n.endsWith(".vtt")')) fail("library.js must pick up folder sidecar .srt/.vtt into it.subsFile");
+  else if (!player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, interpBox, loopBox, options, queuePanel, footer)") ||
+           !player.includes("stageWrap.append(stageCanvas, subsOverlay, stageNote)") ||
+           !player.includes("renderSubsOverlay();") ||
+           !player.includes("on(\"songSelected\", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics(); loadSubs(true); });") ||
+           !player.includes("subsBox.hidden = !subsAllowed();") ||
+           !player.includes("attachTrack(video, d.cues, d.offsetMs") ||   /* core.video は正規化で video になる */
+           (player.match(/mediaSubsTitle:/g) || []).length !== 4 ||
+           (player.match(/mediaSubsOffsetNow:/g) || []).length !== 4) fail("the media player must wire the 💬 panel, overlay, PiP track and four-language texts");
+  else if (!max.includes("stage.append(canvas, subsNode, noteNode)") ||
+           !max.includes('api.currentTexts(videoEl.currentTime || 0).join("\\n")')) fail("video-max fullscreen must show the subtitle overlay");
+  else if (!html.includes('<script src="js/subtitles.js"></script>') ||
+           !(html.indexOf("js/lyrics.js") < html.indexOf("js/subtitles.js") && html.indexOf("js/subtitles.js") < html.indexOf("js/judge-match.js"))) fail("subtitles.js must load right after lyrics.js");
+  else if (!css.includes(".mediaSubs{") || !css.includes(".videoMaxSubs{") || !css.includes(".mediaSubsBox{")) fail("subtitle overlay/panel styles are missing");
+  else ok("trk169: 💬 SRT/VTT subtitles ride the folder pickup, show as a DOM overlay (+ PiP <track>), delay-adjustable, read-only");
+}
+
 // 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own
 // "don't sway" option, plus the ❓ mystery switch that outranks both.
 {
@@ -2533,7 +2568,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
   const offlineOk = !fi.includes("fetch(") && !fi.includes("import ") && !fi.includes("Worker(");
   const uiOk = html.includes('<script src="js/frame-interp.js"></script>') &&
     player.includes("const FI = window.TrkFrameInterp;") &&
-    player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, interpBox, loopBox, options, queuePanel, footer)") &&
+    player.includes("dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, interpBox, loopBox, options, queuePanel, footer)") &&
     player.includes('FI.attach("media", stageCanvas)') && player.includes('FI.detach("media")') &&
     max.includes('window.TrkFrameInterp.attach("max", canvas)') && max.includes('window.TrkFrameInterp.detach("max")');
   const langOk = (fi.match(/mediaInterpTitle:/g) || []).length === 4 &&

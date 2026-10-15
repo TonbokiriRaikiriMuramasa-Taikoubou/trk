@@ -1811,6 +1811,7 @@ body.helpTextOff .instSubtitle,
 body.helpTextOff .mediaQueueHead p,
 body.helpTextOff .mediaLoopBox>.hint,
 body.helpTextOff .mediaLyricsBox>.hint,
+body.helpTextOff .mediaSubsBox>.hint,
 body.helpTextOff .mediaWallHintText{display:none!important}
 
 /* ▶ 動画の全画面表示（js/video-max.js ／ TVドックの⛶・メディアプレーヤーの「全画面で表示」） */
@@ -1874,6 +1875,27 @@ button.lyricLine:hover{color:#ffe6f3;background:rgba(255,170,220,.08)}
 .lyricLineStatic{cursor:default}
 .lyricLineActive,.lyricLineActive:hover{color:#fff;background:rgba(255,110,199,.2);font-weight:800;font-size:15px}
 @media(max-width:680px){.mediaLyricsList{max-height:26vh}}
+
+/* 💬 字幕（trk169）：映像枠の下のほうに出すオーバーレイ＋折りたたみパネル。
+   映像は canvas に描くのでネイティブ <track> は画面に出ない＝DOM で重ねる（クリックは通す） */
+.mediaSubs{position:absolute;left:8%;right:8%;bottom:10%;max-height:42%;overflow:hidden;pointer-events:none;
+  text-align:center;font-size:clamp(12px,2.2vh,18px);line-height:1.4;color:#fff;white-space:pre-line;
+  text-shadow:0 1px 3px #000,0 0 2px #000;background:rgba(0,0,0,.38);border-radius:8px;padding:2px 8px}
+.mediaSubs[hidden]{display:none!important}
+.videoMaxSubs{position:absolute;left:5%;right:5%;bottom:6%;max-height:40%;overflow:hidden;pointer-events:none;
+  text-align:center;font-size:clamp(16px,3.4vh,36px);line-height:1.35;color:#fff;white-space:pre-line;
+  text-shadow:0 2px 5px #000,0 0 3px #000}
+.videoMaxSubs[hidden]{display:none!important}
+.mediaSubsBox{margin:0 14px 2px;padding:10px 12px;border:1px solid rgba(150,220,255,.22);border-radius:12px;
+  background:rgba(150,220,255,.045)}
+.mediaSubsBox[hidden]{display:none!important}
+.mediaSubsBox summary{cursor:pointer;font-size:14px;font-weight:800;color:#cdeeff;list-style-position:inside}
+.mediaSubsBox>.hint{margin:5px 0;font-size:11px;line-height:1.45}
+.mediaSubsSource{color:var(--ui-muted);min-height:1em}
+.mediaSubsUploadRow{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ui-muted);font-weight:750}
+.mediaSubsUploadRow input[type=file]{max-width:210px;font-size:11px;color:var(--ui-muted)}
+.mediaSubsOffsetRow{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--ui-muted);font-weight:750}
+.mediaSubsOffsetRow .mono{min-width:7em;color:#cdeeff}
 
 /* 👆 長押しの代わりのボタン（設定 showMoreBtns をオフにすると隠れる） */
 body.noMoreBtns .moreBtn { display:none !important; }

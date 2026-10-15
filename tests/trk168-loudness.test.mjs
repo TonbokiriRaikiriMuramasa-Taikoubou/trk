@@ -237,6 +237,6 @@ test("wiring: G.norm in the signal path, mediaReady/songTags hooks, four languag
   assert.ok(artSrc.includes("function parseMp4FreeformRg("), "the MP4 freeform reader");
   assert.ok((artSrc.match(/REPLAYGAIN_TRACK_GAIN/g) || []).length >= 3, "ID3 + Vorbis + MP4 paths");
   assert.ok(!artSrc.includes("createWritable"), "read-only: no write path");
-  /* sw.js：キャッシュ名は trk168 系（版数は固定しない） */
-  assert.match(swSrc, /^const CACHE = "trk-v[\d.]+-trk168";$/m);
+  /* sw.js：キャッシュ名の形だけ（版数はリリースごとに進むので固定しない） */
+  assert.match(swSrc, /^const CACHE = "trk-v[\d.]+-trk\d+";$/m);
 });

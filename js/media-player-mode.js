@@ -37,6 +37,7 @@ Object.assign(TEXT.ja, {
   mediaSleepTrack:"💤 この曲の終わり", mediaSleepTrackSet:"この曲の終わりで再生を止めます",
   mediaWakeLockTitle:"🔆 画面を消灯させない", mediaWakeLockHint:"動画の再生中に画面が暗くなるのを防ぎます（音声だけの再生では防ぎません）。対応していないブラウザでは何もしません。", mediaWakeLockToggle:"動画の再生中は画面をつけたままにする",
   mediaLyricsTitle:"🎤 歌詞", mediaLyricsHint:"埋め込み歌詞（ID3 USLT/SYLT・MP4 ©lyr・FLAC/Ogg LYRICS）・フォルダの同名 .lrc・選んだ歌詞ファイルを、再生位置に合わせて表示します。同期歌詞は行をクリックするとその位置へ移動します。選んだ歌詞は曲ごとに端末内へ保存され、外へは送信しません。", mediaLyricsNone:"この曲の歌詞は見つかりませんでした。", mediaLyricsLoading:"歌詞を読み込み中…", mediaLyricsSourceEmbedded:"出典：埋め込みタグ", mediaLyricsSourceFile:"出典：フォルダの .lrc（{name}）", mediaLyricsSourceManual:"出典：選んだファイル（{name}）", mediaLyricsPlain:"※ 時刻のない歌詞なので、そのまま表示します", mediaLyricsChoose:"📄 歌詞ファイルを選ぶ", mediaLyricsClear:"✖ 選んだ歌詞を消す", mediaLyricsSaved:"歌詞をこの曲に保存しました（{n}行）", mediaLyricsTooBig:"この歌詞ファイルは大きすぎます（256KBまで）。", mediaLyricsReadFailed:"この歌詞ファイルは読めませんでした。", mediaLyricsNeedSong:"先に曲を再生してください。",
+  mediaSubsTitle:"💬 字幕", mediaSubsHint:"選んだ SRT/VTT ファイルか、フォルダの同名 .srt/.vtt を動画の上に表示します。表示の遅れ・早すぎは「遅延」で調整できます。選んだ字幕と遅延は曲ごとに端末内へ保存され、外へは送信しません。📌 画中画でも字幕が付きます。", mediaSubsNone:"この動画の字幕は見つかりませんでした。", mediaSubsLoading:"字幕を読み込み中…", mediaSubsSourceFile:"出典：フォルダの字幕（{name}）", mediaSubsSourceManual:"出典：選んだファイル（{name}）", mediaSubsChoose:"📄 字幕ファイルを選ぶ", mediaSubsClear:"✖ 選んだ字幕を消す", mediaSubsSaved:"字幕をこの曲に保存しました（{n}件）", mediaSubsTooBig:"この字幕ファイルは大きすぎます（512KBまで）。", mediaSubsReadFailed:"この字幕ファイルは読めませんでした。", mediaSubsNeedSong:"先に動画を再生してください。", mediaSubsOn:"字幕を表示する", mediaSubsOffset:"遅延", mediaSubsEarlier:"− 早く", mediaSubsLater:"＋ 遅く", mediaSubsReset:"↺ 0", mediaSubsOffsetNow:"いま：{s}秒",
   mediaModeStatus:"メディアプレーヤー中（ゲームの記録には影響しません）"
 });
 Object.assign(TEXT.en, {
@@ -68,6 +69,7 @@ Object.assign(TEXT.en, {
   mediaSleepTrack:"💤 End of this track", mediaSleepTrackSet:"Playback will stop when this track ends",
   mediaWakeLockTitle:"🔆 Keep screen on", mediaWakeLockHint:"Prevents the screen from dimming while a video plays (audio-only playback won't). Does nothing on browsers without support.", mediaWakeLockToggle:"Keep the screen on while a video plays",
   mediaLyricsTitle:"🎤 Lyrics", mediaLyricsHint:"Shows embedded lyrics (ID3 USLT/SYLT, MP4 ©lyr, FLAC/Ogg LYRICS), a same-named .lrc from the folder, or a file you choose, in sync with playback. With synced lyrics, click a line to jump there. Chosen lyrics are saved on this device per song and never uploaded.", mediaLyricsNone:"No lyrics found for this song.", mediaLyricsLoading:"Loading lyrics…", mediaLyricsSourceEmbedded:"Source: embedded tags", mediaLyricsSourceFile:"Source: folder .lrc ({name})", mediaLyricsSourceManual:"Source: chosen file ({name})", mediaLyricsPlain:"· not time-synced (shown as-is)", mediaLyricsChoose:"📄 Choose lyrics file", mediaLyricsClear:"✖ Remove chosen lyrics", mediaLyricsSaved:"Lyrics saved for this song ({n} lines)", mediaLyricsTooBig:"That lyrics file is too big (up to 256 KB).", mediaLyricsReadFailed:"Could not read that lyrics file.", mediaLyricsNeedSong:"Load a song first.",
+  mediaSubsTitle:"💬 Subtitles", mediaSubsHint:"Shows an SRT/VTT file you choose, or a same-named .srt/.vtt from the folder, over the video. Adjust timing with “Delay”. Chosen subtitles and the delay are saved on this device per song and never uploaded. Subtitles also appear in picture-in-picture.", mediaSubsNone:"No subtitles found for this video.", mediaSubsLoading:"Loading subtitles…", mediaSubsSourceFile:"Source: folder subtitle ({name})", mediaSubsSourceManual:"Source: chosen file ({name})", mediaSubsChoose:"📄 Choose subtitle file", mediaSubsClear:"✖ Remove chosen subtitles", mediaSubsSaved:"Subtitles saved for this song ({n} cues)", mediaSubsTooBig:"That subtitle file is too big (up to 512 KB).", mediaSubsReadFailed:"Could not read that subtitle file.", mediaSubsNeedSong:"Load a video first.", mediaSubsOn:"Show subtitles", mediaSubsOffset:"Delay", mediaSubsEarlier:"− Earlier", mediaSubsLater:"＋ Later", mediaSubsReset:"↺ 0", mediaSubsOffsetNow:"Now: {s}s",
   mediaModeStatus:"Media player (does not affect game records)"
 });
 Object.assign(TEXT.zh, {
@@ -97,6 +99,7 @@ Object.assign(TEXT.zh, {
   mediaSleepTrack:"💤 本曲结束时", mediaSleepTrackSet:"将在本曲结束时停止播放",
   mediaWakeLockTitle:"🔆 保持屏幕常亮", mediaWakeLockHint:"播放视频时防止屏幕变暗（纯音频播放不会阻止熄屏）。浏览器不支持时无效果。", mediaWakeLockToggle:"播放视频时保持屏幕常亮",
   mediaLyricsTitle:"🎤 歌词", mediaLyricsHint:"跟随播放位置显示内嵌歌词（ID3 USLT/SYLT、MP4 ©lyr、FLAC/Ogg LYRICS）、文件夹中同名的 .lrc 或你选择的歌词文件。同步歌词可点击某行跳转到该位置。选择的歌词按歌曲保存在本机，不会上传。", mediaLyricsNone:"没有找到这首歌的歌词。", mediaLyricsLoading:"正在读取歌词…", mediaLyricsSourceEmbedded:"来源：内嵌标签", mediaLyricsSourceFile:"来源：文件夹中的 .lrc（{name}）", mediaLyricsSourceManual:"来源：选择的文件（{name}）", mediaLyricsPlain:"※ 非同步歌词，原样显示", mediaLyricsChoose:"📄 选择歌词文件", mediaLyricsClear:"✖ 清除选择的歌词", mediaLyricsSaved:"已为这首歌保存歌词（{n} 行）", mediaLyricsTooBig:"这个歌词文件太大（上限 256KB）。", mediaLyricsReadFailed:"无法读取这个歌词文件。", mediaLyricsNeedSong:"请先播放歌曲。",
+  mediaSubsTitle:"💬 字幕", mediaSubsHint:"在视频上显示你选择的 SRT/VTT 字幕文件，或文件夹中同名的 .srt/.vtt。可用“延迟”调整字幕的快慢。选择的字幕和延迟按歌曲保存在本机，不会上传。画中画时也会显示字幕。", mediaSubsNone:"没有找到这个视频的字幕。", mediaSubsLoading:"正在读取字幕…", mediaSubsSourceFile:"来源：文件夹中的字幕（{name}）", mediaSubsSourceManual:"来源：选择的文件（{name}）", mediaSubsChoose:"📄 选择字幕文件", mediaSubsClear:"✖ 清除选择的字幕", mediaSubsSaved:"已为这首歌保存字幕（{n} 条）", mediaSubsTooBig:"这个字幕文件太大（上限 512KB）。", mediaSubsReadFailed:"无法读取这个字幕文件。", mediaSubsNeedSong:"请先播放视频。", mediaSubsOn:"显示字幕", mediaSubsOffset:"延迟", mediaSubsEarlier:"− 提前", mediaSubsLater:"＋ 延后", mediaSubsReset:"↺ 0", mediaSubsOffsetNow:"当前：{s} 秒",
   mediaModeStatus:"媒体播放器中（不影响游戏记录）"
 });
 Object.assign(TEXT.ko, {
@@ -126,6 +129,7 @@ Object.assign(TEXT.ko, {
   mediaSleepTrack:"💤 이번 곡 끝날 때", mediaSleepTrackSet:"이번 곡이 끝날 때 재생을 멈춥니다",
   mediaWakeLockTitle:"🔆 화면 켜짐 유지", mediaWakeLockHint:"동영상 재생 중 화면이 어두워지는 것을 막습니다(오디오만 재생할 때는 막지 않습니다). 지원하지 않는 브라우저에서는 아무것도 하지 않습니다.", mediaWakeLockToggle:"동영상 재생 중 화면 켜짐 유지",
   mediaLyricsTitle:"🎤 가사", mediaLyricsHint:"재생 위치에 맞춰 내장 가사(ID3 USLT/SYLT, MP4 ©lyr, FLAC/Ogg LYRICS), 폴더의 같은 이름 .lrc, 또는 선택한 가사 파일을 표시합니다. 동기 가사는 줄을 클릭해 그 위치로 이동할 수 있습니다. 선택한 가사는 곡별로 기기에만 저장되며 업로드되지 않습니다.", mediaLyricsNone:"이 곡의 가사를 찾지 못했습니다.", mediaLyricsLoading:"가사를 불러오는 중…", mediaLyricsSourceEmbedded:"출처: 내장 태그", mediaLyricsSourceFile:"출처: 폴더의 .lrc ({name})", mediaLyricsSourceManual:"출처: 선택한 파일 ({name})", mediaLyricsPlain:"※ 동기화되지 않은 가사 (그대로 표시)", mediaLyricsChoose:"📄 가사 파일 선택", mediaLyricsClear:"✖ 선택한 가사 지우기", mediaLyricsSaved:"이 곡의 가사를 저장했습니다 ({n}줄)", mediaLyricsTooBig:"이 가사 파일은 너무 큽니다 (최대 256KB).", mediaLyricsReadFailed:"이 가사 파일을 읽을 수 없습니다.", mediaLyricsNeedSong:"먼저 곡을 재생해 주세요.",
+  mediaSubsTitle:"💬 자막", mediaSubsHint:"선택한 SRT/VTT 자막 파일 또는 폴더의 같은 이름 .srt/.vtt를 영상 위에 표시합니다. '지연'으로 자막의 빠르기·느리기를 조정할 수 있습니다. 선택한 자막과 지연은 곡별로 기기에만 저장되며 업로드되지 않습니다. PIP 중에도 자막이 표시됩니다.", mediaSubsNone:"이 영상의 자막을 찾지 못했습니다.", mediaSubsLoading:"자막을 불러오는 중…", mediaSubsSourceFile:"출처: 폴더의 자막 ({name})", mediaSubsSourceManual:"출처: 선택한 파일 ({name})", mediaSubsChoose:"📄 자막 파일 선택", mediaSubsClear:"✖ 선택한 자막 지우기", mediaSubsSaved:"이 곡의 자막을 저장했습니다 ({n}개 큐)", mediaSubsTooBig:"이 자막 파일은 너무 큽니다 (최대 512KB).", mediaSubsReadFailed:"이 자막 파일을 읽을 수 없습니다.", mediaSubsNeedSong:"먼저 영상을 재생해 주세요.", mediaSubsOn:"자막 표시", mediaSubsOffset:"지연", mediaSubsEarlier:"− 앞당기기", mediaSubsLater:"＋ 늦추기", mediaSubsReset:"↺ 0", mediaSubsOffsetNow:"현재: {s}초",
   mediaModeStatus:"미디어 플레이어 중 (게임 기록에 영향 없음)"
 });
 
@@ -147,6 +151,10 @@ let resumeNode = null;                                /* ⏪ スマート巻き�
 let wakeLock = null, wakeRequested = false;           /* 🔆 Screen Wake Lock（trk164） */
 let lyricsBox = null, lyricsListNode = null, lyricsSourceNode = null, lyricsFileNode = null, lyricsClearNode = null;  /* 🎤 歌詞パネル（trk166） */
 let lyricsState = { key:"", request:0, data:null, active:-2, loading:false };  /* 🎤 歌詞の状態（active=-2 は「次の描画で必ず付け直す」印） */
+/* 💬 字幕（trk169）：パネル・オーバーレイ・PiP用トラックの部品と状態 */
+let subsBox = null, subsOverlay = null, subsSourceNode = null, subsFileNode = null, subsClearNode = null;
+let subsOnNode = null, subsOffsetNode = null, subsEarlierNode = null, subsLaterNode = null, subsResetNode = null;
+let subsState = { key:"", request:0, data:null, loading:false, texts:"" };
 let sleepTrackMode = false, sleepFadeArm = 0, sleepFadeTimer = 0, sleepFadeBase = 1;  /* 💤 スリープタイマー強化（trk164） */
 const SLEEP_FADE_SECONDS = 15;                        /* 💤 停止前のフェードアウト秒数 */
 /* ✨ フレーム補完（js/frame-interp.js）：区間ループのすぐ上に置く設定と、映像エリア */
@@ -931,6 +939,88 @@ async function chooseLyricsFile(file) {
   await loadLyrics(true);
   toast(tr("mediaLyricsSaved", { n: lyricsState.data ? lyricsState.data.lines.length : 0 }));
 }
+/* ================= 💬 字幕（trk169：js/subtitles.js ＋ オーバーレイ ＋ PiP用トラック） =================
+   映像は canvas に描いて表示するので、画面の字幕は DOM オーバーレイ（この下の renderSubsOverlay）。
+   📌 画中画だけはビデオ要素そのものが出るので、同じ内容の WebVTT を <track> で付けておく。
+   読み込み：動画の曲が変わったとき・プレーヤーを開いたとき・パネルを開いたとき。動画の曲だけ（it.video）。 */
+function subsAllowed() { const s = core.currentSong; return !!(s && s.video); }
+function subsOffsetText(off) { const s = (Math.round(Number(off) || 0) / 1000).toFixed(2); return `${off > 0 ? "+" : ""}${s}`; }
+async function loadSubs(force = false) {
+  const api = window.Trk.subtitles; if (!api) return;
+  const s = core.currentSong;
+  if (!subsAllowed()) {
+    subsState = { key:"", request:subsState.request, data:null, loading:false, texts:subsState.texts };
+    api.setCurrent(null); api.detachTrack(core.video);
+    renderSubsOverlay(); renderSubs(); return;
+  }
+  if (!force && subsState.key === s.key && (subsState.data || subsState.loading)) return;
+  const request = ++subsState.request, key = s.key;
+  subsState = { key, request, data:null, loading:true, texts:"" };
+  renderSubs();
+  let data = null;
+  try { data = await api.resolveSubs(s); } catch (_) { data = null; }
+  if (request !== subsState.request) return;          /* 読み込み中に曲が変わったら古い結果は無視 */
+  subsState.loading = false; subsState.data = data;
+  applySubs();
+  renderSubs();
+}
+function applySubs() {
+  const api = window.Trk.subtitles; if (!api) return;
+  const d = subsState.data;
+  api.setCurrent(d, core.settings.mediaSubsOn !== false);
+  if (d && core.settings.mediaSubsOn !== false) api.attachTrack(core.video, d.cues, d.offsetMs, d.name || tr("mediaSubsTitle"));
+  else api.detachTrack(core.video);
+  subsState.texts = "";                                /* オーバーレイを次の描画で必ず付け直す */
+}
+function subsSourceText() {
+  if (subsState.loading) return tr("mediaSubsLoading");
+  const d = subsState.data;
+  if (!d) return tr("mediaSubsNone");
+  return d.source === "manual" ? tr("mediaSubsSourceManual", { name: d.name }) : tr("mediaSubsSourceFile", { name: d.name });
+}
+function renderSubs() {
+  if (!subsBox) return;
+  const api = window.Trk.subtitles;
+  subsBox.hidden = !subsAllowed();
+  if (subsSourceNode) subsSourceNode.textContent = subsSourceText();
+  if (subsClearNode) subsClearNode.disabled = !(api && api.manualSubs(core.currentSong && core.currentSong.key));
+  if (subsOnNode) subsOnNode.checked = core.settings.mediaSubsOn !== false;
+  if (subsOffsetNode) subsOffsetNode.textContent = api && subsState.data ? tr("mediaSubsOffsetNow", { s: subsOffsetText(subsState.data.offsetMs) }) : "";
+  for (const b of [subsEarlierNode, subsLaterNode, subsResetNode]) if (b) b.disabled = !subsState.data;
+}
+function renderSubsOverlay() {
+  if (!subsOverlay) return;
+  const api = window.Trk.subtitles; if (!api) return;
+  if (reverseActive || reverseLoading || !core.videoReady) {   /* 逆再生中は時計が違うので隠す（歌詞と同じ理由） */
+    api.pauseOverlay(true);
+    if (subsState.texts !== "") { subsState.texts = ""; subsOverlay.textContent = ""; subsOverlay.hidden = true; }
+    return;
+  }
+  api.pauseOverlay(false);
+  const texts = api.currentTexts(core.video.currentTime || 0).join("\n");
+  if (texts !== subsState.texts) { subsState.texts = texts; subsOverlay.textContent = texts; subsOverlay.hidden = !texts; }
+}
+function shiftSubsOffset(deltaMs) {
+  const api = window.Trk.subtitles; const song = core.currentSong;
+  if (!api || !song || !subsState.data) return;
+  const off = api.clampOffset(subsState.data.offsetMs + deltaMs);
+  api.saveSubsOffset(song.key, off);
+  subsState.data = { ...subsState.data, offsetMs: off };
+  applySubs();
+  renderSubs();
+}
+async function chooseSubsFile(file) {
+  const api = window.Trk.subtitles; if (!api || !file) return;
+  const toast = m => { if (typeof showToast === "function") window.Trk.play.showToast(m); };
+  const song = core.currentSong;
+  if (!song) { toast(tr("mediaSubsNeedSong")); return; }
+  const r = await api.readSubsFile(file);
+  if (r.error === "tooBig") { toast(tr("mediaSubsTooBig")); return; }
+  if (r.error) { toast(tr("mediaSubsReadFailed")); return; }
+  api.saveManualSubs(song.key, r.text, file.name, api.subsOffset(song.key));
+  await loadSubs(true);
+  toast(tr("mediaSubsSaved", { n: subsState.data ? subsState.data.cues.length : 0 }));
+}
 function renderInterp() {
   const FI = window.TrkFrameInterp;
   if (!interpBox) return;
@@ -1051,6 +1141,7 @@ function renderMedia() {
   }
   renderLoopUI();
   renderLyrics();   /* 🎤 歌詞のハイライト（250ms周期に相乗り。パネルが閉じているときは状態表示だけ） */
+  renderSubsOverlay();   /* 💬 字幕オーバーレイ（trk169・同じ周期に相乗り。変わったときだけDOMを触る） */
   renderWall();
   renderQueue();
   syncMediaStage();
@@ -1088,6 +1179,7 @@ function openMedia() {
   tickTimer = setInterval(renderMedia, 250); loopTimer = setInterval(checkMediaLoop, 40);
   renderMedia(); updateMediaSession(); syncMediaStage();
   if (lyricsBoxOpen()) loadLyrics();   /* 🎤 開いたままだった歌詞パネルの読み直し（trk166） */
+  loadSubs(true);   /* 💬 字幕はパネルが閉じていても読む（オーバーレイ表示のため・trk169） */
   const focus = playNode || closeNode; if (focus) focus.focus();
 }
 let closeNode;
@@ -1113,7 +1205,8 @@ function buildMedia() {
   stageWrap = core.el("div", "mediaStage"); stageWrap.hidden = true;
   stageCanvas = document.createElement("canvas"); stageCanvas.className = "mediaStageCanvas"; stageCanvas.hidden = true;
   stageNote = core.el("div", "mediaStageNote hint", tr("mediaStageNoVideo")); stageNote.dataset.i18n = "mediaStageNoVideo";
-  stageWrap.append(stageCanvas, stageNote);
+  subsOverlay = core.el("div", "mediaSubs"); subsOverlay.hidden = true;   /* 💬 字幕オーバーレイ（trk169・クリックは通す） */
+  stageWrap.append(stageCanvas, subsOverlay, stageNote);
 
   const controls = core.el("div", "mediaControls");
   const prev = makeButton("mediaPrev", "mediaControlBtn");
@@ -1222,6 +1315,47 @@ function buildMedia() {
   });
   lyricsFileNode.addEventListener("change", () => { const f = lyricsFileNode.files && lyricsFileNode.files[0]; lyricsFileNode.value = ""; if (f) chooseLyricsFile(f); });
 
+  /* 💬 字幕（trk169）：折りたたみパネル（動画の曲だけ表示）。オーバーレイはパネルの開閉に関係なく働く */
+  subsBox = core.el("details", "mediaSubsBox"); subsBox.id = "mediaSubsBox"; subsBox.hidden = true;
+  if (core.settings.mediaSubsOpen) subsBox.open = true;
+  subsBox.append(tx("summary", "mediaSubsTitle"), tx("p", "mediaSubsHint", "hint"));
+  subsSourceNode = core.el("div", "hint mediaSubsSource", tr("mediaSubsNone"));
+  const subsActions = core.el("div", "miniActions");
+  const subsUploadRow = core.el("label", "mediaSubsUploadRow"); subsUploadRow.append(tx("span", "mediaSubsChoose"));
+  subsFileNode = document.createElement("input"); subsFileNode.type = "file"; subsFileNode.accept = ".srt,.vtt,text/plain";
+  subsUploadRow.append(subsFileNode);
+  subsClearNode = makeButton("mediaSubsClear", "mediaSmallBtn"); subsClearNode.disabled = true;
+  subsClearNode.addEventListener("click", () => {
+    const api = window.Trk.subtitles, song = core.currentSong;
+    if (!api || !song) return;
+    api.clearManualSubs(song.key);
+    loadSubs(true);
+  });
+  subsActions.append(subsUploadRow, subsClearNode);
+  const subsOnLab = core.el("label", "check");
+  subsOnNode = document.createElement("input"); subsOnNode.type = "checkbox"; subsOnNode.checked = core.settings.mediaSubsOn !== false;
+  subsOnLab.append(subsOnNode, tx("span", "mediaSubsOn"));
+  subsOnNode.addEventListener("change", () => {
+    core.settings.mediaSubsOn = subsOnNode.checked; core.saveUserPrefs();
+    applySubs(); renderSubs();
+  });
+  const subsOffsetRow = core.el("div", "mediaSubsOffsetRow");
+  subsOffsetRow.append(tx("span", "mediaSubsOffset"));
+  subsEarlierNode = makeButton("mediaSubsEarlier", "mediaSmallBtn");
+  subsResetNode = makeButton("mediaSubsReset", "mediaSmallBtn");
+  subsLaterNode = makeButton("mediaSubsLater", "mediaSmallBtn");
+  subsEarlierNode.addEventListener("click", () => shiftSubsOffset(-250));
+  subsLaterNode.addEventListener("click", () => shiftSubsOffset(250));
+  subsResetNode.addEventListener("click", () => shiftSubsOffset(-(subsState.data ? subsState.data.offsetMs : 0)));
+  subsOffsetNode = core.el("span", "mono", "");
+  subsOffsetRow.append(subsEarlierNode, subsResetNode, subsLaterNode, subsOffsetNode);
+  subsBox.append(subsSourceNode, subsActions, subsOnLab, subsOffsetRow);
+  subsBox.addEventListener("toggle", () => {
+    core.settings.mediaSubsOpen = subsBox.open; core.saveUserPrefs();
+    if (subsBox.open) loadSubs();
+  });
+  subsFileNode.addEventListener("change", () => { const f = subsFileNode.files && subsFileNode.files[0]; subsFileNode.value = ""; if (f) chooseSubsFile(f); });
+
   const options = core.el("div", "mediaOptions");
   const volumeRow = core.el("label", "mediaOption mediaVolumeRow"); volumeRow.append(tx("span", "mediaVolume"));
   volumeNode = document.createElement("input"); volumeNode.type = "range"; volumeNode.min = "0"; volumeNode.max = "1"; volumeNode.step = "0.01"; volumeRow.append(volumeNode);
@@ -1262,7 +1396,7 @@ function buildMedia() {
   queueNode = core.el("div", "mediaQueueList"); queuePanel.append(qhead, searchNode, queueNode);
 
   const footer = core.el("footer", "instFooter mediaFooter"); footer.append(tx("span", "mediaModeStatus"), tx("span", "mediaKeyboard", "instKeyHint"));
-  dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, interpBox, loopBox, options, queuePanel, footer);
+  dialog.append(header, display, stageWrap, controls, progressRow, lyricsBox, subsBox, interpBox, loopBox, options, queuePanel, footer);
   wallOverlay = core.el("section", "mediaWall"); wallOverlay.hidden = true; wallOverlay.setAttribute("role", "dialog"); wallOverlay.setAttribute("aria-modal", "true"); wallOverlay.setAttribute("aria-label", tr("mediaWall"));
   const wallTop = core.el("div", "mediaWallTop"); wallTop.append(tx("strong", "mediaWall"));
   const wallClose = makeButton("mediaWallHide", "mediaWallClose"); wallClose.addEventListener("click", () => deactivateWall(true)); wallTop.append(wallClose);
@@ -1323,7 +1457,7 @@ function buildMedia() {
     if (type === "ended") endedMedia(); else renderMedia();
   });
   core.on("beforeLoad", () => { if (clipAbort) clipAbort(); stopReverse(false, true); clearMediaLoop(true); reverseBuffer = null; reverseBufferKey = ""; });
-  core.on("songSelected", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics(); });   /* 🎤 曲が変わったら歌詞も（trk166） */
+  core.on("songSelected", () => { renderMedia(); if (lyricsBoxOpen()) loadLyrics(); loadSubs(true); });   /* 🎤 曲が変わったら歌詞も（trk166）💬 字幕も（trk169） */
   core.on("mediaReady", () => { if (mediaOpen) renderMedia(); updateMediaSession(); });
   core.on("records", renderQueue); core.on("packsChanged", renderQueue);
   core.on("songTags", () => { renderQueue(); if (mediaOpen) renderMedia(); });   /* 🏷 タグが届いたら表示名を追従（trk167） */ core.on("language", () => {
@@ -1334,6 +1468,7 @@ function buildMedia() {
     if (progressNode) progressNode.setAttribute("aria-label", tr("mediaSeek"));
     if (wallOverlay) wallOverlay.setAttribute("aria-label", tr("mediaWall"));
     if (lyricsListNode) lyricsListNode.dataset.sig = "";   /* 🎤 言語が変わったら歌詞リストを作り直す（trk166） */
+    renderSubs();   /* 💬 字幕パネルの出典・状態の文章を新しい言語で（trk169） */
     if (mediaOpen) renderMedia();
   });
   core.on("phase", p => { if (p !== "title" && mediaOpen) closeMedia(false); });

@@ -16,6 +16,8 @@ makes a lighter build, and the game simply shows no OST songs.
   nocturne, ~84 s). Same lazy loading.
 - `ost-04-crimson-blaze.mp3` — track 04 **CRIMSON BLAZE** (160 BPM,
   minor-key rock, ~49 s). Same lazy loading.
+- `ost-05-neon-dive.mp3` — bonus track **NEON DIVE** (240 BPM,
+  high-speed synth, ~57 s). Same lazy loading.
 
 Every track keeps its editable score in `tools/ost-scores/`:
 

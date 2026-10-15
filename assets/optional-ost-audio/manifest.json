@@ -34,6 +34,14 @@
       "artist": "trk!",
       "bpm": 160,
       "offset": 0
+    },
+    {
+      "key": "ost-05-neon-dive",
+      "file": "ost-05-neon-dive.mp3",
+      "title": "NEON DIVE",
+      "artist": "trk!",
+      "bpm": 240,
+      "offset": 0
     }
   ]
 }

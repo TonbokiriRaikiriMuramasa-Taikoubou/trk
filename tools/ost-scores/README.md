@@ -5,13 +5,14 @@ rendered to audio by a deterministic synth. Nothing is recorded: every
 note is written in the plan below.
 
 - `<key>.json` — the composition plan: tempo, form (sections), one chord
-  per bar, the full melody as `[bar, beat, note, lenBeats]`, and the
-  drum/arp/harmony arrangement per section. Keys are C/G/F major;
-  `leadWave` picks the lead timbre (`pulse` default, `tri` for a
-  softer pops lead).
+  per bar, the full melody as `[bar, beat, note, lenBeats]` (16th-note
+  grid), and the drum/arp/harmony arrangement per section.
+  Keys are C/D/F/G major; `leadWave` picks the lead timbre
+  (`pulse` default, `tri` for a softer pops lead).
   More voices: `leadVib`, `bassStyle`/`bassWave`, `arpRate`, `padWave`,
-  and the `soft`/`lullaby`/`blaze` drum patterns
-  (see `ost-03-moonlit-lullaby.json` and `ost-04-crimson-blaze.json`).
+  and the `soft`/`lullaby`/`blaze`/`vocaloid` drum patterns
+  (see `ost-03-moonlit-lullaby.json`, `ost-04-crimson-blaze.json`,
+  and `ost-05-neon-dive.json`).
   See `ost-01-sunrise-dash.json` for the format.
 - `<key>.abc` — generated from the JSON by the renderer: melody plus
   chord symbols in ABC notation. Human-readable, and usable as `abc=`

@@ -34,14 +34,15 @@ const CHORDS = {
   A: { root: 45, triad: [0, 4, 7] }, Bm: { root: 47, triad: [0, 3, 7] },
   Bb: { root: 46, triad: [0, 4, 7] }, Gm: { root: 43, triad: [0, 3, 7] },
 };
-const DRUM_PATTERNS = ["build", "drive", "outro", "soft", "lullaby", "blaze"];
+const DRUM_PATTERNS = ["build", "drive", "outro", "soft", "lullaby", "blaze", "vocaloid"];
 /* 長調のキー。ABC の臨時記号と下方3度ハーモニーはここから決まる（C/G/F だけ。増やすときは表を足す）。 */
-const KEY_PCS = { C: [0, 2, 4, 5, 7, 9, 11], G: [0, 2, 4, 6, 7, 9, 11], F: [0, 2, 4, 5, 7, 9, 10] };
+const KEY_PCS = { C: [0, 2, 4, 5, 7, 9, 11], G: [0, 2, 4, 6, 7, 9, 11], F: [0, 2, 4, 5, 7, 9, 10], D: [1, 2, 4, 6, 7, 9, 11] };
 /* pc → ABC の音字。調号でまかなえる音に臨時記号は付けない（G の F# は素の F、F の Bb は素の B）。 */
 const KEY_PITCH = {
   C: ["C", "^C", "D", "^D", "E", "F", "^F", "G", "^G", "A", "^A", "B"],
   G: ["C", "^C", "D", "^D", "E", "=F", "F", "G", "^G", "A", "^A", "B"],
   F: ["C", "^C", "D", "_E", "E", "F", "^F", "G", "_A", "A", "B", "=B"],
+  D: ["=C", "C", "D", "^D", "E", "=F", "F", "G", "^G", "A", "^A", "B"],
 };
 const LEAD_WAVES = { pulse: 0.15, tri: 0.26, square: 0.1, saw: 0.09, sine: 0.3 };   /* リードの波形 → 既定の大きさ */
 const BASS_WAVES = { saw: 0.15, tri: 0.3, sine: 0.32, square: 0.09, pulse: 0.13 };   /* ベースの波形 → 既定の大きさ */
@@ -49,7 +50,7 @@ const PAD_WAVES = ["square", "tri", "sine"];   /* スタブ（コードの強打
 const BASS_STYLES = ["drive8", "soft"];   /* drive8＝8分刻み、soft＝1・3拍の全音符寄り */
 function parseKey(key) {
   const m = /^([A-G])\s+major$/.exec(String(key || ""));
-  if (!m || !KEY_PCS[m[1]]) fail(`only C/G/F major for now (got ${JSON.stringify(key)})`);
+  if (!m || !KEY_PCS[m[1]]) fail(`only C/D/F/G major for now (got ${JSON.stringify(key)})`);
   return m[1];
 }
 
@@ -176,7 +177,7 @@ function loadScore(file) {
     if (typeof s[k] !== "string" || !s[k].trim()) fail(`score.${k} must be a non-empty string`);
   }
   if (!/^[a-z0-9][a-z0-9-]{0,47}$/.test(s.id)) fail(`score.id must be [a-z0-9-] (≤48): ${s.id}`);
-  if (!isNum(s.bpm) || s.bpm < 60 || s.bpm > 220) fail("score.bpm must be 60..220");
+  if (!isNum(s.bpm) || s.bpm < 60 || s.bpm > 260) fail("score.bpm must be 60..260");
   if (s.beatsPerBar !== 4) fail("only 4/4 (beatsPerBar: 4) is supported for now");
   const keyName = parseKey(s.key);
   if (s.leadWave != null && !LEAD_WAVES[s.leadWave]) {
@@ -267,6 +268,12 @@ function renderDrums(tr, score, bar, sec, spb) {
     for (let i = 0; i < 16; i++) tr.hat(t0 + i * spb * 0.25, i % 2 ? 0.06 : 0.085);
     if (isLast) { for (let i = 4; i < 8; i++) tr.snare(e(i), 0.45); }
     if (isFirst && sec.crashIn) tr.crash(t0);
+  } else if (sec.drums === "vocaloid") {
+    tr.kick(e(0), 0.95);
+    tr.snare(e(4), 0.55);
+    for (let i = 0; i < 16; i++) tr.hat(t0 + i * spb * 0.25, i % 4 === 0 ? 0.1 : 0.065);
+    if (isLast) { for (let i = 4; i < 8; i++) tr.snare(e(i), 0.5); tr.kick(e(2), 0.8); }
+    if (isFirst && sec.crashIn) tr.crash(t0);
   } else if (sec.drums === "soft") {
     tr.kick(e(0), 0.55);
     for (const i of [0, 2, 4, 6]) tr.hat(e(i), 0.055);
@@ -337,7 +344,9 @@ function renderBar(tr, score, bar, sec, spb, keyName) {
   /* サビ頭のスタブ＋最終小節のトニック強打 */
   if ((sec.stabIn && bar === sec.bars[0]) || isFinalBar) {
     const padWave = score.padWave || "square";
-    for (const off of ch.triad) tr.tone(t0, ch.root + 12 + off, isFinalBar ? 1.6 : 0.4, 0.1, padWave, { a: 0.004, r: 0.3 });
+    /* 最終小節の強打はテンポに追従（速い曲で ring をはみ出して尻切れにならないよう） */
+    const stabLen = isFinalBar ? Math.min(1.6, spb * 4 * 1.2) : 0.4;
+    for (const off of ch.triad) tr.tone(t0, ch.root + 12 + off, stabLen, 0.1, padWave, { a: 0.004, r: 0.3 });
     if (!isFinalBar && sec.drums !== "soft" && sec.drums !== "lullaby") tr.kick(t0, 0.9);
   }
 }
@@ -353,9 +362,12 @@ function midiToAbc(midi, keyName) {
   return m[1] + abcOct(m[2], oct);
 }
 function abcLen(lenBeats) {
-  const eighths = Math.round(lenBeats * 2);
-  if (Math.abs(eighths - lenBeats * 2) > 1e-9) fail(`ABC needs 8th-note grid (len ${lenBeats})`);
-  return eighths === 1 ? "" : String(eighths);
+  const sixteenths = Math.round(lenBeats * 4);
+  if (Math.abs(sixteenths - lenBeats * 4) > 1e-9) fail(`ABC needs 16th-note grid (len ${lenBeats})`);
+  if (sixteenths === 2) return "";
+  if (sixteenths === 1) return "/";
+  if (sixteenths % 2 === 0) return String(sixteenths / 2);
+  return `${sixteenths}/2`;
 }
 function toAbc(score) {
   const nBars = score.chords.length;

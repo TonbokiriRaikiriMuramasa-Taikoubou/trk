@@ -1,6 +1,6 @@
 # trk! 開発履歴アーカイブ（HANDOFF「最近の変更」の旧記録）
 
-> `docs/HANDOFF.md` から移した過去の変更履歴・検証記録です（trk176以前を収録）。各記録は当時の状態であり、古いテスト件数やブラウザ用スタブの手順を現在の結果・推奨手順として扱わないでください。現在の仕様・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。最新の変更は同ファイルの「最近の変更」に要点を記し、詳細な履歴は本書に保管します。
+> `docs/HANDOFF.md` から移した過去の変更履歴・検証記録です（trk177以前を収録）。各記録は当時の状態であり、古いテスト件数やブラウザ用スタブの手順を現在の結果・推奨手順として扱わないでください。現在の仕様・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。最新の変更は同ファイルの「最近の変更」に要点を記し、詳細な履歴は本書に保管します。
 
 ## trk114〜118 の検証記録（trk118のマージ前に HANDOFF §6 から移動）
 
@@ -310,7 +310,9 @@
 
 以下は、引継ぎ本文を現行仕様・未確認事項・最新対応に集中させるため移した記録です。記述とテスト結果は移動時点のものです。実機確認の現在の状態は [`HANDOFF.md` §4](HANDOFF.md#4-未完了の確認)、最新の自動検証は [`HANDOFF.md` §6](HANDOFF.md#6-直近の検証) を参照してください。旧§6／§7の節番号は移動当時のHANDOFFを指します。
 
-### 旧§6：trk159〜163、trk170〜176の検証記録
+### 旧§6：trk159〜163、trk170〜177の検証記録
+
+- **trk177（trk163〜176レビュー追補、2026-10-15）**：`npm run check` 成功（Static 0 failure／0 warning、Security 64 checks／0 warning、`node:test` 513/513）、`git diff --check` 成功。`applyNorm()` の未取得時return／正常時の補正値適用を関数VMで実動検証し、`core.*` を使うJSファイル全体の束縛走査も確認。共有受信は承認時だけルーティング（拒否・確認不能時はinbox削除）、名前の無害化・80文字上限・4言語・`launchQueue` 非重複をNode/VMとSecurity F-38で確認。バックアップは歌詞・字幕キーの許可と復元、未許可キーの除外、アドオン概要の件数・名前・無害化、復元アドオン全件 `enabled:false`、4言語の確認文をNode/VMとSecurityで確認。**実音声・実機・インストール済みPWAでの確認6項目（§4-29）と共有受信の実機確認（§4-17）は未実施**。
 
 - **trk176（🌗 読書用フィルタ、2026-10-15）**：`npm run check` 成功（Static 0 failure／0 warning、Security **61 check**／0 warning、`node:test` **506/506**）、`git diff --check` 成功。vm 抜き出しの実動検査で、クランプ（studyReadFilterPercent＝50〜150・数値以外は100）、読み込み検証（文字列の数値・範囲外・候補外の特殊フィルタは "none"・未設定は初期値）、css 構築（初期値は "none"・brightness/contrast の %・invert(1)/grayscale(1)/sepia(.8) の付加）、適用（#studyRoom の `--study-read-filter` と横の % 表示の同期）を確認。配線（スライダーの input＝見た目だけ/change＝保存、特殊フィルタの studyBindPref、studyRefreshPrefsUI の同期、CSS の対象が `.study-image-stage,.study-text-stage` だけ、HTML の2スライダー＋セレクト＋値ラベル、TEXT 8キー×4言語）は静的検査で確認。**実機での確認は未実施**（§4-28 に登録）。
 
@@ -338,7 +340,9 @@
 
 過去の検証件数・個別E2E・旧ブラウザ環境の回避手順は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) の「trk158整理時に移した検証記録」へ移しました。上記が現在の結果です。利用者の実機確認済み事項と残る確認項目は§4を正とします。
 
-### 旧§7：trk155〜176の変更記録
+### 旧§7：trk155〜177の変更記録
+
+- **trk177（2026-10-15）**：trk163〜176のレビュー追補。①**音量の平準化**：`js/fx.js` の `applyNorm()` が `window.Trk.core` をローカルに束縛し、core未取得時は安全にreturn（未束縛 `core` の `ReferenceError` 対策）。`core.*` を使うJSファイル全体の束縛を回帰テストで見張る。②**共有受信**：`share_target` inbox のファイル名・件数・注意を示す確認を取り込み前に表示。拒否時はルーティングせず一時cacheを削除し、確認手段がない場合もfail closed。ファイル名は制御文字・双方向制御文字を除去して80文字まで。OS `launchQueue` は明示操作のため二重確認しない。③**バックアップ**：許可リストに `trk_lyrics_v1` と `trk_subs_v1`（字幕遅延を含む）を追加。復元前にアドオン名・件数（最大3名＋省略数）を表示し、コードは実行せず、復元後のアドオンは全件 `enabled:false`（コード・同意指紋は保持）。④`privacy.html`、日本語／英語モバイルガイド、`docs/SECURITY.md`（F-38）、`docs/PLAYER-ROADMAP.md`（#5／#8）、`sw.js`（`trk-v2026.10.15-trk177`）を更新。
 
 - **trk176（2026-10-15）**：🌗 書斎の明るさ/コントラスト調整（PLAYER-ROADMAP #13・読書用フィルタ）。①**js/study-room.js**：`STUDY_READ_SPECIALS = ["none","invert","grayscale","sepia"]`、`studyReadFilterPercent`（50〜150 にクランプ・数値以外は100）、`studyReadFilterCss`（**初期値 100/100/none なら "none"**＝コストゼロ。それ以外は `brightness(X%) contrast(Y%)` ＋特殊フィルタ＝`invert(1)`/`grayscale(1)`/`sepia(.8)`）、`studyApplyReadFilter`（#studyRoom に CSS 変数 `--study-read-filter` を入れ、横の % 表示も同期）。`studyPrefs.readBrightness/readContrast/readSpecial`（既定＋studyReadPrefs のクランプ/候補検証＋studyRefreshPrefsUI の同期）。バインド＝特殊フィルタは `studyBindPref`、スライダー2本は **input（ドラッグ中＝見た目だけ・保存しない）と change（保存）** の2段。TEXT 8キー×4言語。②**index.html**：⚙ 設定（自動スクロールの速度の直後）にスライダー2本（min50/max150/step5・aria-labelledby＋aria-describedby・% 値ラベル付き）と特殊フィルタのセレクト（4候補・data-i18n）＋ヒント。③**css/study-room.css**：`.study-image-stage,.study-text-stage{filter:var(--study-read-filter,none)}`＝**読書面だけ**（本棚・メニュー・TVペインは変わらない）＋スライダー/値ラベルのスタイル。**全画面フィット・拡大率とは独立**（filter は stage 全体、拡大は中の寸法/transform なので干渉しない）。④テスト `tests/trk176-read-filter.test.mjs`（5件）＝vm 実動（クランプ・読み込み・css 構築・適用）＋配線/HTML/CSS/4言語走査。`tests/study-settings.test.mjs` の harness に `studyApplyReadFilter` スタブ追加（studyRefreshPrefsUI が新参照を持ったため）。⑤check-repo に trk176 見張り追加。⑥日英ガイド（study-room.md／en.md に 🌗 の項目）、§4-28・§4.1-28・§5（sw 行の cache 名も更新）・PLAYER-ROADMAP #13→[x]、`sw.js` cache を `trk-v2026.10.15-trk176` へ。**実機での確認は §4-28 に登録**。これで ROADMAP のプレイヤー/書斎系（#1〜#16）はすべて消化＝残りは安定版プレーヤー後の gapless+crossfade と範囲外の記録のみ。
 

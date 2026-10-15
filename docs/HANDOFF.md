@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-15（trk177）**。現在の仕様・守る条件・未確認事項の要約です。trk176以前の変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-15（trk178）**。現在の仕様・守る条件・未確認事項の要約です。trk177以前の変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検。
 
@@ -302,28 +302,24 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.15-trk177`） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.15-trk178`） |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
 
-- **trk177レビュー対応（2026-10-15）**
-  - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **513/513**）。関連テスト **27/27**、`git diff --check` も成功。
-  - **core束縛**：`applyNorm()` の未取得時return／正常取得時の補正値適用を関数VMで実動検証し、`core.*` を使うJSファイル全体の束縛走査も確認。
-  - **共有受信**：承認時だけルーティング。拒否・確認不能時はルーティングせずinboxを削除。名前の制御・双方向制御文字除去、80文字上限、4言語、`launchQueue` に確認を重ねないことをNode/VMとSecurity F-38で確認。
-  - **バックアップ**：歌詞・字幕キーの許可と復元、未許可キーの除外、アドオン概要の件数・名前・無害化、復元アドオン全件 `enabled:false`、4言語の確認文をNode/VMとSecurityで確認。
-  - **未完了**：実音声・実機・インストール済みPWAでの確認6項目（§4-29）と共有受信の実機確認（§4-17）。
+- **trk178レビュー対応（2026-10-15）**
+  - **全体検証**：`npm run check` 成功（Static **0 failure／0 warning**、Security **64 checks／0 warning**、`node:test` **513/513**）。`git diff --check` も成功。
+  - **区切り文字**：復元確認の複数アドオン名が `", "` で区切られることを、確認ダイアログの実動テスト（2件のアドオン）で固定。
+  - **未完了**：実ブラウザsmoke2件はこの環境にChromiumがなく未実行（§8の条件どおり、レビュー側で確認）。実機確認は§4のまま。
 
 過去の検証ログは [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) に移しました。現在の仕様・実機確認状況は§2〜4を正とします。
 
 ## 7. 最近の変更
 
-- **trk177（2026-10-15・trk163〜176レビュー追補）**
-  - **音量の平準化**：`js/fx.js` の `applyNorm()` が `window.Trk.core` をローカルに束縛し、core未取得時は安全にreturn。未束縛 `core` による `ReferenceError` を防ぎ、実動回帰テストを追加。
-  - **共有受信**：`share_target` inbox のファイル名・件数・注意を示す確認を取り込み前に表示。拒否時はルーティングせず一時cacheを削除し、確認手段がない場合もfail closed。ファイル名は制御文字・双方向制御文字を除去して80文字まで。OS `launchQueue` は明示操作のため二重確認しない。
-  - **バックアップ**：許可リストに `trk_lyrics_v1` と `trk_subs_v1`（字幕遅延を含む）を追加。復元前にアドオン名・件数（最大3名＋省略数）を表示し、コードは実行せず、復元後のアドオンは全件 `enabled:false`（コード・同意指紋は保持）。
-  - **資料・cache**：`privacy.html`、日本語／英語モバイルガイド、`docs/SECURITY.md`（F-38）、`docs/PLAYER-ROADMAP.md`（#5／#8）、`sw.js`（`trk-v2026.10.15-trk177`）を更新。
-- **過去の履歴**：trk176以前の詳細な変更・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) に移動しました。現在の仕様は§2、未確認事項は§4を正とします。
+- **trk178（2026-10-15・1291209再レビュー追補）**
+  - **復元確認のアドオン名の区切り**：`js/backup.js` の `addons.names.join("、")` を `join(", ")` に。英中韓でも「、」で区切られていた見た目の指摘。`js/share-inbox.js` の名前一覧と同じ区切りにそろえ、辞書は増やさない。確認ダイアログの区切りをテストで固定。
+  - **変更時チェックリスト**：§8に実ブラウザのスモーク2件（`smoke-browser.mjs --compare`・`smoke-game-end.mjs`）の緑を**取り込みの条件**として追加。`sw.js`（`trk-v2026.10.15-trk178`）を更新。
+- **過去の履歴**：trk177以前の詳細な変更・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) に移動しました。現在の仕様は§2、未確認事項は§4を正とします。
 
 ## 8. 変更時チェックリスト
 
@@ -331,5 +327,6 @@
 - [ ] UI・設定は4言語、既定値、リセット、Import/Export、`?safe=1` を確認した。
 - [ ] 外部URL・データ・素材の権利条件を確認し、未確認事項を許諾済みと表現していない。
 - [ ] 関連テスト、`npm run check`、`git diff --check` を通した。
+- [ ] 実ブラウザのスモーク2件（`tools/smoke-browser.mjs --compare`・`tools/smoke-game-end.mjs`）を通した。取り込みの条件（`npm run check` には含まれない）。
 - [ ] README／NOTICE／handoff と `sw.js` cache名を確認した。
 - [ ] 日本語ガイドを変更した場合、英語ガイドの対応箇所も更新した。

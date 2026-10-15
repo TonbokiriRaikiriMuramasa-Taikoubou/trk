@@ -599,7 +599,7 @@
       const addons = info.addons || { known:false, count:0, names:[], omitted:0 };
       const addonCount = addons.known ? addons.count : window.tr("backupRestoreAddonCountUnknown");
       const addonNames = !addons.known ? window.tr("backupRestoreAddonListUnknown") : addons.count
-        ? addons.names.join("、") + (addons.omitted ? " " + window.tr("backupRestoreAddonMore", { n:addons.omitted }) : "")
+        ? addons.names.join(", ") + (addons.omitted ? " " + window.tr("backupRestoreAddonMore", { n:addons.omitted }) : "")
         : window.tr("backupRestoreNoAddons");
       const ask = window.tr("backupRestoreAsk", {
         date, books:m.counts && m.counts.study ? m.counts.study.books : 0,

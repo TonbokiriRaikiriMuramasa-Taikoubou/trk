@@ -12,6 +12,8 @@ makes a lighter build, and the game simply shows no OST songs.
   FIRST SPARK tutorial demo.
 - `ost-02-popcorn-smile.mp3` — track 02 **POPCORN SMILE** (128 BPM,
   pops, ~61 s). Same lazy loading.
+- `ost-03-moonlit-lullaby.mp3` — track 03 **MOONLIT LULLABY** (92 BPM,
+  nocturne, ~84 s). Same lazy loading.
 
 Every track keeps its editable score in `tools/ost-scores/`:
 

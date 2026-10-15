@@ -34,16 +34,19 @@ const CHORDS = {
   A: { root: 45, triad: [0, 4, 7] }, Bm: { root: 47, triad: [0, 3, 7] },
   Bb: { root: 46, triad: [0, 4, 7] }, Gm: { root: 43, triad: [0, 3, 7] },
 };
-const DRUM_PATTERNS = ["build", "drive", "outro"];
+const DRUM_PATTERNS = ["build", "drive", "outro", "soft", "lullaby"];
 /* 長調のキー。ABC の臨時記号と下方3度ハーモニーはここから決まる（C/G/F だけ。増やすときは表を足す）。 */
 const KEY_PCS = { C: [0, 2, 4, 5, 7, 9, 11], G: [0, 2, 4, 6, 7, 9, 11], F: [0, 2, 4, 5, 7, 9, 10] };
 /* pc → ABC の音字。調号でまかなえる音に臨時記号は付けない（G の F# は素の F、F の Bb は素の B）。 */
 const KEY_PITCH = {
   C: ["C", "^C", "D", "^D", "E", "F", "^F", "G", "^G", "A", "^A", "B"],
   G: ["C", "^C", "D", "^D", "E", "=F", "F", "G", "^G", "A", "^A", "B"],
-  F: ["C", "^C", "D", "_E", "E", "F", "^F", "G", "_A", "A", "_B", "=B"],
+  F: ["C", "^C", "D", "_E", "E", "F", "^F", "G", "_A", "A", "B", "=B"],
 };
-const LEAD_WAVES = { pulse: 0.15, tri: 0.26, square: 0.1, saw: 0.09 };   /* リードの波形 → 既定の大きさ */
+const LEAD_WAVES = { pulse: 0.15, tri: 0.26, square: 0.1, saw: 0.09, sine: 0.3 };   /* リードの波形 → 既定の大きさ */
+const BASS_WAVES = { saw: 0.15, tri: 0.3, sine: 0.32, square: 0.09, pulse: 0.13 };   /* ベースの波形 → 既定の大きさ */
+const PAD_WAVES = ["square", "tri", "sine"];   /* スタブ（コードの強打・パッド）の波形 */
+const BASS_STYLES = ["drive8", "soft"];   /* drive8＝8分刻み、soft＝1・3拍の全音符寄り */
 function parseKey(key) {
   const m = /^([A-G])\s+major$/.exec(String(key || ""));
   if (!m || !KEY_PCS[m[1]]) fail(`only C/G/F major for now (got ${JSON.stringify(key)})`);
@@ -179,6 +182,16 @@ function loadScore(file) {
   if (s.leadWave != null && !LEAD_WAVES[s.leadWave]) {
     fail(`leadWave must be one of ${Object.keys(LEAD_WAVES).join("/")} (got ${JSON.stringify(s.leadWave)})`);
   }
+  if (s.leadVib != null && (!isNum(s.leadVib.rate) || !isNum(s.leadVib.cents) ||
+      s.leadVib.rate < 0 || s.leadVib.rate > 12 || s.leadVib.cents < 0 || s.leadVib.cents > 50)) {
+    fail("leadVib must be { rate: 0..12, cents: 0..50 }");
+  }
+  if (s.bassStyle != null && !BASS_STYLES.includes(s.bassStyle)) fail(`bassStyle must be drive8/soft (got ${JSON.stringify(s.bassStyle)})`);
+  if (s.bassWave != null && !BASS_WAVES[s.bassWave]) {
+    fail(`bassWave must be one of ${Object.keys(BASS_WAVES).join("/")} (got ${JSON.stringify(s.bassWave)})`);
+  }
+  if (s.arpRate != null && s.arpRate !== 8 && s.arpRate !== 16) fail("arpRate must be 8 or 16");
+  if (s.padWave != null && !PAD_WAVES.includes(s.padWave)) fail(`padWave must be square/tri/sine (got ${JSON.stringify(s.padWave)})`);
   if (!Array.isArray(s.chords) || !s.chords.length) fail("score.chords must be a non-empty array");
   s.chords.forEach((c, i) => { if (!CHORDS[c]) fail(`unknown chord at bar ${i}: ${JSON.stringify(c)}`); });
   const nBars = s.chords.length;
@@ -249,6 +262,17 @@ function renderDrums(tr, score, bar, sec, spb) {
     else if (at === 1) { kick4(); for (let i = 0; i < 8; i++) tr.snare(e(i), i % 2 ? 0.3 : 0.42); hats8(0.11); }
     else if (at === 2) { kick4(); for (let i = 0; i < 8; i++) tr.snare(e(i), 0.45); hats8(0.14); }
     else { tr.kick(e(0), 1); tr.crash(e(0), 0.34); }
+  } else if (sec.drums === "soft") {
+    tr.kick(e(0), 0.55);
+    for (const i of [0, 2, 4, 6]) tr.hat(e(i), 0.055);
+    tr.snare(e(4), 0.22);
+    if (isLast) tr.snare(e(6), 0.18);
+  } else if (sec.drums === "lullaby") {
+    const at = bar - sec.bars[0];
+    for (const i of [0, 2, 4, 6]) tr.hat(e(i), 0.05);
+    tr.kick(e(0), at === 3 ? 0.6 : 0.5);
+    if (at === 1 || at === 2) tr.snare(e(4), 0.2);
+    /* 最終小節にクラッシュは無し。共有のトニック強打＋リードの保持で静かに閉じる */
   }
 }
 
@@ -257,10 +281,17 @@ function renderBar(tr, score, bar, sec, spb, keyName) {
   const ch = CHORDS[score.chords[bar]];
   const isFinalBar = bar === score.chords.length - 1;
   renderDrums(tr, score, bar, sec, spb);
-  /* ベース：8分刻み R R 8va R …（最終小節は全音符で踏む） */
-  if (isFinalBar) {
+  /* ベース：drive8＝8分刻み R R 8va R …／soft＝1・3拍に根音・5度を長く置く（最終小節は全音符で踏む） */
+  const bassWave = score.bassWave || "saw";
+  const bassGain = BASS_WAVES[bassWave];
+  if (isFinalBar && (score.bassStyle || "drive8") === "soft") {
+    tr.tone(t0, ch.root, 4 * spb, bassGain * 1.2, bassWave, { a: 0.01, r: 1.2 });
+  } else if (isFinalBar) {
     tr.tone(t0, ch.root, 4 * spb, 0.2, "saw", { a: 0.01, r: 1.0 });
     tr.tone(t0, ch.root, 4 * spb, 0.25, "sine", { a: 0.01, r: 1.0 });
+  } else if ((score.bassStyle || "drive8") === "soft") {
+    tr.tone(t0, ch.root, spb * 1.9, bassGain, bassWave, { a: 0.01, r: 0.15 });
+    tr.tone(t0 + 2 * spb, ch.root + 7, spb * 1.9, bassGain * 0.9, bassWave, { a: 0.01, r: 0.15 });
   } else {
     const pat = [0, 0, 12, 0, 0, 0, 12, 7];
     for (let i = 0; i < 8; i++) {
@@ -272,9 +303,16 @@ function renderBar(tr, score, bar, sec, spb, keyName) {
   const arpOn = sec.arp === "all" || (sec.arp === "first2" && bar - sec.bars[0] < 2);
   if (arpOn && !isFinalBar) {
     const tones = [ch.root + 24, ch.root + 24 + ch.triad[1], ch.root + 24 + 7, ch.root + 36];
-    const cyc = [0, 1, 2, 3, 2, 1];
-    for (let i = 0; i < 16; i++) {
-      tr.tone(t0 + i * spb * 0.25, tones[cyc[i % 6]], spb * 0.23, 0.045, "square", { a: 0.003, r: 0.02 });
+    if ((score.arpRate || 16) === 8) {
+      const cyc8 = [0, 1, 2, 1];
+      for (let i = 0; i < 8; i++) {
+        tr.tone(t0 + i * spb * 0.5, tones[cyc8[i % 4]], spb * 0.46, 0.05, "tri", { a: 0.005, r: 0.05 });
+      }
+    } else {
+      const cyc = [0, 1, 2, 3, 2, 1];
+      for (let i = 0; i < 16; i++) {
+        tr.tone(t0 + i * spb * 0.25, tones[cyc[i % 6]], spb * 0.23, 0.045, "square", { a: 0.003, r: 0.02 });
+      }
     }
   }
   /* リード＋（コーラスのみ）下方3度 */
@@ -283,8 +321,9 @@ function renderBar(tr, score, bar, sec, spb, keyName) {
     const [, beat, , len, midi] = ev;
     const t = t0 + beat * spb, dur = len * spb;
     const leadWave = score.leadWave || "pulse";
+    const leadVib = score.leadVib || { rate: 5.5, cents: 14 };
     tr.tone(t, midi, dur * 0.94, LEAD_WAVES[leadWave], leadWave, {
-      a: 0.008, r: isFinalBar ? 0.9 : 0.07, vib: { rate: 5.5, cents: 14 },
+      a: 0.008, r: isFinalBar ? 0.9 : 0.07, vib: leadVib,
     });
     if (sec.harmony === "thirdBelow") {
       tr.tone(t, thirdBelow(midi, keyName), dur * 0.94, 0.07, "square", { a: 0.008, r: 0.07 });
@@ -292,8 +331,9 @@ function renderBar(tr, score, bar, sec, spb, keyName) {
   }
   /* サビ頭のスタブ＋最終小節のトニック強打 */
   if ((sec.stabIn && bar === sec.bars[0]) || isFinalBar) {
-    for (const off of ch.triad) tr.tone(t0, ch.root + 12 + off, isFinalBar ? 1.6 : 0.4, 0.1, "square", { a: 0.004, r: 0.3 });
-    if (!isFinalBar) tr.kick(t0, 0.9);
+    const padWave = score.padWave || "square";
+    for (const off of ch.triad) tr.tone(t0, ch.root + 12 + off, isFinalBar ? 1.6 : 0.4, 0.1, padWave, { a: 0.004, r: 0.3 });
+    if (!isFinalBar && sec.drums !== "soft" && sec.drums !== "lullaby") tr.kick(t0, 0.9);
   }
 }
 

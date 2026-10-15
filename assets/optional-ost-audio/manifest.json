@@ -18,6 +18,14 @@
       "artist": "trk!",
       "bpm": 128,
       "offset": 0
+    },
+    {
+      "key": "ost-03-moonlit-lullaby",
+      "file": "ost-03-moonlit-lullaby.mp3",
+      "title": "MOONLIT LULLABY",
+      "artist": "trk!",
+      "bpm": 92,
+      "offset": 0
     }
   ]
 }

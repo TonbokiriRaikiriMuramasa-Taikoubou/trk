@@ -191,6 +191,13 @@
                 <option value="recent" data-i18n="sortRecent"></option>
                 <option value="best" data-i18n="sortBest"></option>
               </select>
+              <!-- 📈 進捗フィルター（trk174）：未聴/継続/完了で曲リストを絞る（表示層だけ） -->
+              <select id="libProgress" data-i18n-aria="libProgressLabel">
+                <option value="all" data-i18n="progAll"></option>
+                <option value="new" data-i18n="progNew"></option>
+                <option value="progress" data-i18n="progProgress"></option>
+                <option value="done" data-i18n="progDone"></option>
+              </select>
               <button id="libRandomBtn" type="button" data-i18n="libRandom"></button>
             </div>
             <div id="libSkinBar" class="libSkinBar" hidden></div>

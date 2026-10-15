@@ -2969,6 +2969,26 @@ function libSectionHead(label, n) {
   head.append(el("span", "libGroupName", label), el("span", "libGroupN", tr("libGroupCount", { n })));
   return head;
 }
+/* 📈 進捗フィルター（trk174・PLAYER-ROADMAP #15）：**表示層だけ**＝行を絞るだけで、保存データは何も触らない。
+   材料は位置記憶（trk_media_positions_v1・メディアプレーヤーが 5 秒以上の再生位置を保存し、最後まで聴くと消える設計）と
+   再生回数（PLAYED＝🎮 クリア/視聴＋🎧 プレーヤー計数・records）。位置が消えている＝聴き終わった可能性なので、
+   「完了」は一度通して聴いた回数で見る（位置記憶だけでは完了と未聴を区別できないため）。 */
+function libPositions() {
+  try {
+    const raw = JSON.parse(localStorage.getItem("trk_media_positions_v1")) || {};
+    return raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  } catch (_) { return {}; }
+}
+function libProgressOf(x, positions) {
+  const key = x.it.key;
+  const pos0 = positions && typeof positions === "object" ? positions : {};   /* 表示層なので壊れた材料でも絶対に投げない */
+  const fp = songPrefs.keyFp[key];   /* 位置はふつう指紋（size:duration）で保存される。選曲時に覚えた対応を引く */
+  const pos = Number(pos0[key]) > 0 ? Number(pos0[key]) : (fp && Number(pos0[fp]) > 0 ? Number(pos0[fp]) : 0);
+  if (pos > 0) return "progress";
+  const p = PLAYED[key];
+  if ((p && ((p.manual || 0) + (p.auto || 0) + (p.media || 0) > 0)) || (x.info && x.info.plays > 0)) return "done";
+  return "new";
+}
 let songBackgroundRequest = 0;
 async function applySongBackground(it) {
   const request = ++songBackgroundRequest;
@@ -3078,10 +3098,13 @@ function renderLib() {
   const scope = all.filter(it => libTabMatch(it, tabId));
   const q = core.$("libSearch").value.trim().toLowerCase(), idx = {};
   for (const r of Object.values(window.Trk.play.records)) if (r && r.title != null) idx[`${r.size}|${r.title}`] = r;
-  const items = scope
+  let items = scope
     .filter(it => { if (!q) return true; const m = metaOf(it.key) || {};   /* 🎶 プロフィール情報と曲ID由来のカタログ名も検索対象 */
       return `${songDisplayTitle(it, m)} ${it.dir || ""} ${m.artist || it.artist || ""} ${m.album || ""} ${m.matchHint || ""} ${it.packName || ""}`.toLowerCase().includes(q); })
     .map(it => ({ it, info:songInfo(it, idx) }));
+  /* 📈 進捗フィルター（trk174）：未聴/継続/完了で絞る（検索・タブ・グループ棚のすべてと組み合わせられる。表示層だけ） */
+  const progMode = core.settings.libProgress || "all";
+  if (progMode !== "all") { const pos = libPositions(); items = items.filter(x => libProgressOf(x, pos) === progMode); }
   const v = (x, k) => (x.info ? x.info[k] : 0);
   const cmp = {
     name:(a, b) => songDisplayTitle(a.it).localeCompare(songDisplayTitle(b.it), undefined, { numeric:true }),
@@ -4172,6 +4195,7 @@ core.$("libReconnectBtn").addEventListener("click", async () => {
 let libSearchTimer = 0;
 core.$("libSearch").addEventListener("input", () => { clearTimeout(libSearchTimer); libSearchTimer = setTimeout(renderLib, 150); });
 core.$("libSort").addEventListener("change", e => { core.settings.libSort = e.target.value; core.saveUserPrefs(); renderLib(); });
+core.$("libProgress").addEventListener("change", e => { core.settings.libProgress = e.target.value; core.saveUserPrefs(); renderLib(); });   /* 📈 進捗フィルター（trk174） */
 core.$("libRandomBtn").addEventListener("click", () => {
   /* 🎲 おまかせ：いまの一覧 ＋ 📌ピンの曲（ほかのタブにいても、必ず候補に入る）
      ＝ 曲名バナーの🎲（長押し／タップ）と同じ抽選を使う */
@@ -4202,6 +4226,7 @@ function syncVideoButton() { const label = core.$("libVideoLabel"); if (label) l
 /* ---------- 起動時（main.js から呼びます） ---------- */
 async function initLibrary() {
   core.$("libSort").value = core.settings.libSort;
+  core.$("libProgress").value = core.settings.libProgress || "all";   /* 📈 進捗フィルター（trk174） */
   core.$("previewEnabled").checked = core.settings.previewEnabled;
   core.$("libSearch").placeholder = tr("libSearch");
   syncVideoButton();

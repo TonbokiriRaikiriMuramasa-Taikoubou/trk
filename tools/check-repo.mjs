@@ -2621,6 +2621,32 @@ if (!read("js/main.js").includes("guideEggKind") ||
   else ok("trk173: 🌊 the seek bar draws the cached rms envelope behind an aria-hidden overlay canvas (time bubble on hover, toggle next to 🔆, plain bar without analysis)");
 }
 
+// trk174: 📈 進捗フィルター（PLAYER-ROADMAP #15・未聴/継続/完了）。**表示層だけ**＝行を絞るだけで保存データは触らない。
+// 判定は位置記憶（trk_media_positions_v1・曲キー or 指紋 keyFp）→ 再生回数（PLAYED manual/auto/media・records plays）。
+// library.js が位置記憶へ書き込むようになったら失敗（読み取り専用の表示層であることの監視）。
+{
+  const library = read("js/library.js");
+  const core = read("js/core.js");
+  const i18n = read("js/i18n.js");
+  const html = read("index.html");
+  /* ⚠ read() は正規化後の本文：core.$( は $( 、core.settings は settings 、core.saveUserPrefs() は saveUserPrefs() に見える */
+  if (!library.includes("function libPositions()") || !library.includes("function libProgressOf(x, positions)") ||
+      !library.includes('const progMode = settings.libProgress || "all";') ||
+      !library.includes("items = items.filter(x => libProgressOf(x, pos) === progMode);") ||
+      !library.includes('$("libProgress").addEventListener("change", e => { settings.libProgress = e.target.value; saveUserPrefs(); renderLib(); });') ||
+      !library.includes('$("libProgress").value = settings.libProgress || "all";') ||
+      library.includes('localStorage.setItem("trk_media_positions_v1"')) fail("library.js progress filter (display-layer only) is missing or grew a write into the position store");
+  else if (!html.includes('<select id="libProgress" data-i18n-aria="libProgressLabel">') ||
+           !html.includes('<option value="progress" data-i18n="progProgress">') ||
+           !(html.indexOf('id="libSort"') < html.indexOf('id="libProgress"'))) fail("the 📈 select must sit right after the sort select in libTools");
+  else if (!core.includes('libProgress: pick(prefs.libProgress, ["all", "new", "progress", "done"], "all"),') ||
+           (core.match(/settings\.libProgress = "all";/g) || []).length !== 2) fail("core.js must validate the libProgress default and restore it in both reset lists");
+  else if ((i18n.match(/progAll:/g) || []).length !== 4 || (i18n.match(/progNew:/g) || []).length !== 4 ||
+           (i18n.match(/progProgress:/g) || []).length !== 4 || (i18n.match(/progDone:/g) || []).length !== 4 ||
+           (i18n.match(/libProgressLabel:/g) || []).length !== 4) fail("progress filter texts must exist in all four languages");
+  else ok("trk174: 📈 progress filter (unplayed / in progress / finished) narrows the row list from position memory + play counts — display layer only, never writes");
+}
+
 // 🌀 Lane sway: on by default for TRUCK and ORBIT only, each with its own
 // "don't sway" option, plus the ❓ mystery switch that outranks both.
 {

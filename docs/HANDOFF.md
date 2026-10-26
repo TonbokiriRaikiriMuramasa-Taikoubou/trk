@@ -218,6 +218,7 @@
 | 31 | trk195：🎞 `.mkv`/`.mpg` の取込と「再生できない理由」 | 合成した先頭バイトでのVM検査と `npm run check`（565 pass）は成功。実ファイルでの確認は未了 | ①H.264＋AAC の MKV が Chrome で選曲→メディアプレーヤーまで通ること ②MPEG-2/AC3 の MKV で理由（コーデック名）が出ること ③`.mpg` で「MPEG-PS は再生できない＋MP4 に変換」が出ること ④フォルダー取込に `.mkv`/`.mpg` が 🎬 付きで並ぶこと（PC・Android） |
 | 32 | trk196：🎞 形式まわりの仕上げ（理由の表示・拡張子・⚠・説明） | Node/VM と `npm run check` は成功。実ファイル・実機は未了 | ①`.m2ts`/`.avi` が一覧に出て ⚠ が付くこと ②メディアプレーヤーを開いたときにも理由が出ること ③設定「📖 再生できる形式」が4言語で読めること（PC・Android） |
 | 33 | trk197・trk198：🔓 拒否時の案内／🔍 設定の検索 | Node/VM（偽のDOM）で確認済み。実機は未了 | ①サイト設定で許可を切って起動→設定に理由が出るか ②検索で欄が絞られ、空にすると元の開閉に戻るか ③スマホの狭い画面で検索欄と件数が崩れないか |
+| 34 | trk199：1.0.7 レビューの修正版（一覧が空になる不具合・選び直し・タッチの許可確認） | Node/VM（偽のDOM・偽の navigator）で確認済み。**タッチの `requestPermission` は実機で未確認** | ①曲を1つも選ばずにリロードして一覧が出るか（以前は真っ白） ②📄 参照の行を押すと選び直しが開くか ③動画の参照を選び直すと 🎬（動画）のままか ④選び直したあとリロードしても 📄 参照が残る（消えない）か ⑤スマホで最初のタップ→「許可」の確認が出て曲が出るか（「拒否」と誤表示しないか） ⑥PC のマウス・キーでも従来どおりか |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -315,7 +316,7 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk198`） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk199`） |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
@@ -324,7 +325,7 @@
 
 | 検査 | 結果 | 範囲・注意 |
 |---|---|---|
-| `npm run check` | **581 pass / 0 fail** | 静的・安全・a11y・vendor・MMD・書斎・軽量化＋Node/VMテスト |
+| `npm run check` | **588 pass / 0 fail** | 静的・安全・a11y・vendor・MMD・書斎・軽量化＋Node/VMテスト（trk199 の7件を含む） |
 | `git diff --check` | 成功 | 空白等の差分検査 |
 | `tools/smoke-browser.mjs --compare` / `tools/smoke-game-end.mjs` | **未実行** | この環境にはChromium／Puppeteerが無い。下の前回手順（Repo外の `/home/user/browser-tools`）で再実行する |
 | PC／スマホ実機で今回のUIを操作 | **未確認** | 長押しバーと3か所のチェックの同期は、実機のタッチ・読み上げで確認する |
@@ -358,12 +359,24 @@
 
 ## 7. 最近の変更
 
-- **📦 1.0.7 の slim 配布ZIP（Google Drive に追加済み）**：`trk-slim-win-linux-1.0.7.zip`（225ファイル・3.65 MiB・zip）を Drive の `trk-1.0.7` フォルダ（親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu`）へ、`SHA256SUMS-1.0.7.txt` と一緒に置いた。中身は 1.0.6 slim のツリーに **trk193〜198 のアプリ本体**（`index.html`・`sw.js`・`css/*.css`・`js/*.js`）を載せ替えたもの。
+- **📦 1.0.7 修正版の slim 配布ZIP（win/linux・mac の2本／Google Drive の `trk-1.0.7` に追加）**：レビューの修正版パッチ（trk199）を当てた配布物。アプリ本体はリポジトリの `index.html`・`sw.js`・`css/*.css`・`js/*.js` とバイト同一。
+  - `trk-slim-win-linux-1.0.7-fixed.zip`＝3,825,096 bytes・225ファイル・展開 10,473,822 bytes・`sha256 182f2431eba228300fa88a2b6557b7c48d3999a3f7bf937a95b2f176b8aa0d49`
+  - `trk-slim-mac-1.0.7-fixed.zip`＝3,822,307 bytes・225ファイル・展開 10,473,359 bytes・`sha256 fb8c1059e243e4ea41a6cde7c306af35891a824367e4252c7b5b308d28e695b6`（1.0.6 の mac 版 `trk-slim-mac-1.0.6.zip` を土台に、win/linux と同じアプリ本体＋mac 用の `00_START_HERE.html`／`01_README_MAC.txt` を入れた）
+  - 全エントリ `2026-10-27 12:00`、`unzip -t` 破損なし、`release-manifest.json` の `service_worker_cache`＝`sw.js` の `CACHE`＝`trk-v2026.10.27-trk199`（`archive` も `*-fixed.zip` に合わせた）。
+  - レビュー同梱の `trk-slim-win-linux-1.0.7-fixed.zip` と中身を突き合わせ、差は **README 群・`00_START_HERE.html`／`01_README_*.txt`・`release-manifest.json`・`sw.js`（cache 名）・`js/library.js` の `typeof navigator` 1行**だけであることを確認した（他はバイト同一）。
+  - レビュー指摘の README 3点も直した：①冒頭の「1.0.6 更新」2本を 1.0.7 の後ろへ移して箇条書きに整理 ②「曲・動画・**画像**の参照」→「**曲・動画**の参照」（画像の参照は実装していない）③`file://` の記述に切り分けを追加（開くだけで使えるもの／ローカルHTTPサーバーが要るもの）。同じ切り分けを `01_README_WIN_LINUX.txt`・`01_README_MAC.txt`・`00_START_HERE.html` にも入れた。
+  - **原本（`trk-slim-win-linux-1.0.7.zip`・`SHA256SUMS-1.0.7.txt`）は Drive の同じフォルダー内の `old-1.0.7-original`（提出しないでください）へ移した**。レビューは「原本のまま提出は不可」のため。
+
+- **📦 1.0.7 の slim 配布ZIP（初回配布・修正前）**：`trk-slim-win-linux-1.0.7.zip`（225ファイル・3.65 MiB・zip）を Drive の `trk-1.0.7` フォルダ（親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu`）へ、`SHA256SUMS-1.0.7.txt` と一緒に置いた。中身は 1.0.6 slim のツリーに **trk193〜198 のアプリ本体**（`index.html`・`sw.js`・`css/*.css`・`js/*.js`）を載せ替えたもの。
   - `release-manifest.json` は `version:"1.0.7"` / `service_worker_cache:"trk-v2026.10.27-trk198"` / `archive:"trk-slim-win-linux-1.0.7.zip"`。
   - 直した食い違い：`README-SLIM.md` が「1.0.4」のままだった（cache 名・archive 名・README 参照を 1.0.7 に）。`README.md` が本文だけ 1.0.4 のままだったので `README-1.0.7.md` と同じ内容に統一。`README-1.0.6.md` は `README-1.0.7.md` へ改名し、1.0.7 の更新点（⏮・🔓・🎞・⚠・📖・🔍）を追記。`privacy.html` の「1.0.4のポータブルZIP」は版に依存しない言い方へ。
   - 作らなかったもの：**mac 版**（1.0.6 の mac パッケージが手元に無く、起動案内だけが異なるため。アプリ本体は同じなので win/linux の ZIP から作れる）と **full 版**（`trk-1.0.6.zip`）。必要になったら同じツリーから。
   - ⚠ 実機での確認は未実施（§4 の 31〜33）。ZIP は `unzip -t` で破損なし、`release-manifest.json` と `sw.js` の cache 名が一致することを確認済み。
 
+- **trk199：1.0.7 レビューの修正版パッチを取り込む（同梱 `trk107-fix.patch`）**：レビューは「原本のまま提出は不可／同梱の修正版なら提出可」だったので、パッチをそのまま当てた。`js/library.js` の5点＝①`renderLib` で `displayTitle` を**使う前**に宣言（リロードで一覧が空になっていた `ReferenceError` の原因）②選び直しの 2 経路（`ghostRelinkAll`・`relinkGhost`）から `songRefDB.del(key)` のループを撤去（参照が消えて次回以降 📄 行が戻らなかった）③新 `addRelinkFiles(files, ghost)` が参照の `video` を見て `addVideoFiles`／`addSongFiles` へ振り分け（動画を選び直すと音声として扱われていた）④`selectSong` の冒頭で `if (it.ghost) { void relinkGhost(it); return; }`（📄 行を押しても選び直しが開かなかった）⑤`disarm/armFolderAutoRead` に `pointerup`、`folderAutoKick` の冒頭に `navigator.userActivation.isActive` の待ち（タッチの `pointerdown` は「ユーザー操作」に数えられず、確認が失敗して「拒否」と誤表示＋待ちが解除されていた）。VM では `navigator` が無い場合に落ちないよう `typeof navigator !== "undefined"` を足した（パッチからの唯一の追加で、挙動は変えない）。
+  - **cache 名はパッチの `trk-v2026.10.27-trk198-fix1` ではなく `trk-v2026.10.27-trk199` にした**：`tools/check-repo.mjs` と既存テスト8件が `trk-v<日付>-trk<番号>` の形を要求するため（同じくキャッシュを割る目的は満たす）。
+  - `tests/trk199-relink-fix.test.mjs`（7件・宣言順・参照を消さないこと・動画／曲の振り分け・📄 行の分岐・`isActive` 待ち・`pointerup` の付け外し・cache 名）。
+  - **残した穴（1.0.8 候補）**：`js/main.js` のウィンドウ全体へのドロップは今も `addSongFiles` だけを呼ぶ（🎬 判定を通らない）。
 - **trk198：🔍 ⚙設定を言葉で絞り込む**：設定の上部に検索欄（`#settingsSearch`・件数 `#settingsSearchStatus`）。details（欄）と行を言葉で隠し、一致した中身は開く。隠した `hidden`/`open` は覚えておき、空にしたら元どおりに戻す（勝手に閉じたままにしない）。設定を閉じる・Esc・言語の切り替えにも追随（`data-i18n-placeholder` を `core.applyLanguage` が訳す）。文言は4言語。`tests/trk198-settings-search.test.mjs`（5件・偽のDOMで絞り込みと復元）。
 - **trk197：🔓 フォルダーの読み取りが拒否されたとき、理由と直し方を出す**：`folderPermissionOf` が直近の答えを `folderLastPermission` に残し、`syncShareUI` が「自動オフ」ではなく「ブラウザーの設定で許可し直す → 🔗 再接続」と案内（フォルダー名つき・4言語 `folderPermDenied`）。起動時に拒否されていたら `libStatus` でも同じ案内（設定オフのときは黙る）。`tests/trk197-folder-perm-hint.test.mjs`（4件）。
 - **trk196：🎞 形式まわりの仕上げ（trk195 の続き）**：

@@ -434,21 +434,21 @@ async function ghostRelinkAll(){
   inp.addEventListener("change", async()=>{
     const files = Array.from(inp.files||[]);
     if(!files.length) return;
-    await addSongFiles(files);
-    const liveKeys = new Set([...folderSongs, ...addedSongs, ...savedSongs].map(s=>s.key));
-    for(const f of files){
-      const base = core.baseName(f.name);
-      const key = `${f.size}|${base}`;
-      if(liveKeys.has(key)){
-        try{ await songRefDB.del(key); }catch(_){}
-      }
-    }
+    /* 参照（ref）は消さない：次回リロード後もまた📄参照として残すため。動画だった参照は動画として選び直す */
+    await addRelinkFiles(files);
     await loadGhostSongs();
     syncGhostUI();
     renderLib();
     core.setStatus("ghostStatus","ghostRelinked",{name: files.length>1 ? `${files.length} files` : files[0].name});
   });
   inp.click();
+}
+/* 選び直したファイルを、参照が動画なら動画の経路へ、それ以外は曲の経路へ渡す */
+async function addRelinkFiles(files, ghost = null){
+  const isVid = f => { const key = `${f.size}|${core.baseName(f.name)}`; const g = ghost && ghost.key === key ? ghost : ghostSongs.find(x => x.key === key); return g ? !!g.video : false; };
+  const vids = files.filter(isVid), songs = files.filter(f => !isVid(f));
+  if (songs.length) await addSongFiles(songs);
+  if (vids.length) await addVideoFiles(vids);
 }
 async function setupGhostPanel(){
   const btnRelink = document.getElementById("ghostRelinkBtn");
@@ -469,19 +469,8 @@ async function relinkGhost(ghost){
   inp.addEventListener("change", async()=>{
     const files = Array.from(inp.files||[]);
     if(!files.length) return;
-    // addedSongsとして追加（内部でrememberもされる）
-    await addSongFiles(files);
-    // 動画としてprobeが必要なものは別途
-    // ゴーストが生き返れば allSongs の重複排除で見えなくなる
-    // 明示的にゴーストDBから消さなくても良いが、生き返ったものはゴーストを消せる
-    for(const f of files){
-      const base = core.baseName(f.name);
-      const key = `${f.size}|${base}`;
-      if(ghostSongs.some(g=>g.key===key)){
-        try{ await songRefDB.del(key); }catch(_){}
-        ghostSongs = ghostSongs.filter(g=>g.key!==key);
-      }
-    }
+    /* 参照（ref）は消さない（次回もまた📄参照として残る）。生きた実体ができれば一覧の重複排除で参照行は隠れる */
+    await addRelinkFiles(files, ghost);
     renderLib();
     if(files.length===1) plToast(tr("ghostRelinked",{name:files[0].name}));
   });
@@ -3870,13 +3859,13 @@ function renderLib() {
     const cur = core.currentSong && core.currentSong.key === it.key;
     const b = el("button", `libRow src-${it.source}` + (cur ? " cur" : "") + (it.ghost ? " ghost" : "")); b.type = "button"; b.style.flex = "1"; b.style.minWidth = "0";
     b.dataset.songKey = it.key; b.__trkRowInfo = info || null;   /* 🏷 タグが届いたら行だけその場で更新するため（trk167） */
-    if(it.ghost) b.setAttribute("aria-label", displayTitle + " — " + tr("srcGhost"));
     const left = el("span", "libLeft"), meta = el("span", "libMeta");
     const thumb = el("span", "libThumb"), thumbImg = el("img", ""), thumbFallback = el("span", "libThumbFallback", "♫");
     thumb.setAttribute("aria-hidden", "true"); thumbImg.alt = ""; thumbImg.decoding = "async"; thumbImg.hidden = true;
     thumb.append(thumbImg, thumbFallback);
     const text = el("span", "libText"), m = metaOf(it.key) || {};   /* 🎶 曲プロフィール（長押しで編集） */
     const displayTitle = songDisplayTitle(it, m);
+    if(it.ghost) b.setAttribute("aria-label", displayTitle + " — " + tr("srcGhost"));
     text.append(el("span", "libName", libRowNameText(it, info)),   // 例：🎬 動画 / 曲名 🥁🐔🚚⚔🎪🚛
                 el("span", "libSub", libRowSubText(it)));
     left.append(thumb, text);
@@ -4482,6 +4471,7 @@ async function materializeBuiltinSong(it) {
 }
 async function selectSong(it) {
   if (core.phase !== "title" || !it) return;
+  if (it.ghost) { void relinkGhost(it); return; }   /* 📄参照のみ（本体なし）は、選ぶと選び直しを開く */
   const selection = ++songSelectToken;
   if (it.source === "builtin" && !it.file) {
     try { it = await materializeBuiltinSong(it); }
@@ -4795,6 +4785,7 @@ async function folderPermissionOf(h) {
 function disarmFolderAutoRead() {
   folderAutoArmed = false;
   document.removeEventListener("pointerdown", folderAutoKick, true);
+  document.removeEventListener("pointerup", folderAutoKick, true);
   document.removeEventListener("keydown", folderAutoKick, true);
 }
 /* 最初のタップ／キー入力の「中」で許可を確認する。ブラウザーはクリックの中でしか確認を出せないため、
@@ -4805,6 +4796,9 @@ const FOLDER_MANUAL_SELECTOR = "#libOpenBtn, #libShareBtn, #libShareSettingsBtn,
 async function folderAutoKick(e) {
   if (e && e.target && typeof e.target.closest === "function" && e.target.closest(FOLDER_MANUAL_SELECTOR)) return;
   if (folderAutoBusy) return;
+  /* タッチの pointerdown や Esc キーは「ユーザー操作」として数えられず、requestPermission が失敗する。
+     その場合は待ち合わせを外さず、次の pointerup／click／キーを待つ（「拒否された」と誤表示しない） */
+  if (e && typeof navigator !== "undefined" && navigator.userActivation && !navigator.userActivation.isActive) return;
   if (!libHandle) { disarmFolderAutoRead(); core.setStatus("libShareStatus", "folderPermNone"); return; }
   folderAutoBusy = true;
   const h = libHandle, wasShared = libShared;
@@ -4827,6 +4821,7 @@ function armFolderAutoRead() {
   if (folderAutoArmed) return;
   folderAutoArmed = true;
   document.addEventListener("pointerdown", folderAutoKick, true);
+  document.addEventListener("pointerup", folderAutoKick, true);   /* タッチは pointerup でユーザー操作になる */
   document.addEventListener("keydown", folderAutoKick, true);
   showReconnect();
 }

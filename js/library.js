@@ -348,6 +348,7 @@ let sharedSongs = [];        /* 💾 端末に残してある共有の曲（リ�
 let libShared = false;       /* いまの libHandle が「📤 共有」でもらったものか（📁 開く と区別するため） */
 let shareRemembered = false; /* 共有の許可を覚えているか（まだつながっていなくても 🚫 を出せるように） */
 let folderAccessPersisted = false; /* trk194: 起動した時点で許可が生きていた（＝ブラウザーが「常に許可」を覚えている） */
+let folderAccessSession = false;   /* trk194: この起動の中で許可した（「今回だけ」かもしれないので言い方を変える） */
 let folderAutoArmed = false;       /* trk194: 最初のタップで許可を確認する待ち合わせが動いているか */
 let lastScan = [];           /* 直近のスキャン結果（💾 をあとからオンにしたときに使う） */
 let libAllKeys = new Set();  /* いまのライブラリの曲キー（🐔 階層などの件数表示に使う。renderLib が更新） */
@@ -4776,11 +4777,11 @@ async function folderAutoKick(e) {
   try {
     core.setStatus("libStatus", "folderAutoChecking", { name:h.name });
     const p = await folderPermissionOf(h);
-    if (p === "granted") { await useHandle(h, false, wasShared); markFolderAccess(); return; }
+    if (p === "granted") { await useHandle(h, false, wasShared); markFolderAccess(true); return; }
     if (p === "denied") { core.setStatus("libShareStatus", "libDenied"); syncShareUI(); return; }
     /* ここはクリック／キー入力の中。ブラウザーの確認は、この中でしか出せない */
     const r = await h.requestPermission({ mode:"read" });
-    if (r === "granted") { await useHandle(h, false, wasShared); markFolderAccess(); }
+    if (r === "granted") { await useHandle(h, false, wasShared); markFolderAccess(false); }   /* 今回の許可（毎回許可かは分からない） */
     else { core.setStatus("libShareStatus", "libDenied"); core.$("libReconnectBtn").hidden = false; showReconnect(); syncShareUI(); }
   } catch (_) {
     core.setStatus("libShareStatus", "libDenied");
@@ -4795,7 +4796,11 @@ function armFolderAutoRead() {
   showReconnect();
 }
 /* 許可が生きていることを覚えて、設定の表示とボタンの文言を合わせる */
-function markFolderAccess() { folderAccessPersisted = true; syncShareUI(); }
+function markFolderAccess(persisted) {
+  folderAccessPersisted = persisted === true;
+  folderAccessSession = persisted !== true;
+  syncShareUI();
+}
 /* 起動時の入口。許可が生きていれば読み取り、確認が必要なら最初のタップを待つ */
 async function restoreFolderAccess() {
   if (!libHandle) { syncShareUI(); return "none"; }
@@ -4804,7 +4809,7 @@ async function restoreFolderAccess() {
     autoRead: core.settings.folderAutoRead !== false,
     safe: !!(window.TrkSafeMode && window.TrkSafeMode()) });
   if (plan === "scan") {
-    folderAccessPersisted = true;
+    folderAccessPersisted = true; folderAccessSession = false;
     await useHandle(libHandle, false, libShared);
     core.setStatus("libStatus", libShared ? "libShareAutoRestored" : "libAutoRestored", { name:libHandle.name });
   } else if (plan === "ask") {
@@ -4865,7 +4870,7 @@ async function stopSharing() {
   try { await libKV.del("share"); } catch (_) {}
   try { await libKV.del("dir"); } catch (_) {}
   shareRemembered = false;
-  folderAccessPersisted = false; disarmFolderAutoRead();   /* trk194：自動の待ち合わせも解除 */
+  folderAccessPersisted = false; folderAccessSession = false; disarmFolderAutoRead();   /* trk194：自動の待ち合わせも解除 */
   await clearSharedSongs();
   if (libShared) {
     folderSongs = []; libHandle = null; libShared = false; lastScan = [];
@@ -4942,6 +4947,7 @@ function syncShareUI() {
   if (autoChk) autoChk.checked = core.settings.folderAutoRead !== false;
   if (autoHint) autoHint.textContent = tr("folderAutoReadHint");
   if (permState) permState.textContent = folderAccessPersisted ? tr("folderPermPersisted")
+    : folderAccessSession ? tr("folderPermSession")
     : !libHandle ? tr("folderPermNone")
     : folderAutoArmed ? tr("folderPermNeedsTap", { name:libHandle.name })
     : tr("folderPermManual");

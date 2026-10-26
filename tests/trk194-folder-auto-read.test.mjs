@@ -114,6 +114,15 @@ test("trk194: startup uses the plan instead of just showing a reconnect button",
   assert.ok(stop.includes("disarmFolderAutoRead()"), "共有をやめたら待ち合わせも止める");
 });
 
+test("trk194: a grant made in this session is not described as permanent", () => {
+  const mark = libSrc.match(/function markFolderAccess\(persisted\) \{[\s\S]*?\n\}/)[0];
+  assert.ok(mark.includes("folderAccessSession = persisted !== true"), "今回の許可は「次回も自動」と言い切らない");
+  const restore = libSrc.match(/async function restoreFolderAccess\(\) \{[\s\S]*?\n\}/)[0];
+  assert.ok(restore.includes("folderAccessPersisted = true"), "起動時点で granted なら覚えている");
+  const sync = libSrc.match(/function syncShareUI\(\) \{[\s\S]*?\n\}/)[0];
+  assert.ok(sync.includes("folderPermSession"), "今回だけの許可には専用の説明を出す");
+});
+
 test("trk194: the setting panel shows the switch and the current permission state", () => {
   assert.ok(html.includes('id="folderAutoReadChk"'), "設定のチェック");
   assert.ok(html.includes('id="folderAutoReadHint"'), "説明");
@@ -134,7 +143,7 @@ test("trk194: the tap-to-read button says what will happen", () => {
 test("trk194: every new label exists in all four languages", () => {
   for (const key of ["folderAutoRead", "folderAutoReadHint", "folderAutoNow", "folderAutoChecking",
     "folderAutoNeedsTap", "folderPermPersisted", "folderPermNeedsTap", "folderPermManual", "folderPermNone",
-    "libAutoRestored", "libShareAutoRestored", "libReconnectAuto", "libShareStateOpened"]) {
+    "libAutoRestored", "libShareAutoRestored", "libReconnectAuto", "libShareStateOpened", "folderPermSession"]) {
     const n = (i18nSrc.match(new RegExp(`(^|[\\s,{])${key}:`, "g")) || []).length;
     assert.equal(n, 4, `${key} は4言語`);
   }

@@ -321,7 +321,7 @@
 
 | 検査 | 結果 | 範囲・注意 |
 |---|---|---|
-| `npm run check` | **552 pass / 0 fail** | 静的・安全・a11y・vendor・MMD・書斎・軽量化＋Node/VMテスト |
+| `npm run check` | **553 pass / 0 fail** | 静的・安全・a11y・vendor・MMD・書斎・軽量化＋Node/VMテスト |
 | `git diff --check` | 成功 | 空白等の差分検査 |
 | `tools/smoke-browser.mjs --compare` / `tools/smoke-game-end.mjs` | **未実行** | この環境にはChromium／Puppeteerが無い。下の前回手順（Repo外の `/home/user/browser-tools`）で再実行する |
 | PC／スマホ実機で今回のUIを操作 | **未確認** | 長押しバーと3か所のチェックの同期は、実機のタッチ・読み上げで確認する |
@@ -360,7 +360,7 @@
   - ブラウザーは許可の確認をクリックの中でしか出せないため、`document` の `pointerdown`／`keydown`（capture）で `folderAutoKick` を1回だけ動かし、その中で `requestPermission` を呼ぶ。確認で「**Allow on every visit**」を選べば、次回からはタップも確認も不要（Chrome 122以降。アプリとしてインストールすると自動で覚える）。3回断ると3択の確認は出なくなる（ブラウザーの仕様）。
   - 二重読み取りの防止：`folderAutoBusy`（pointerdown とボタンの click が続いても1回）、`FOLDER_MANUAL_SELECTOR`（📁/📤/再接続/いま読み取る等のボタン自身のタップはスキップ）、`openFolder`・`shareMusicFolder`・再接続ボタン・`stopSharing` で `disarmFolderAutoRead`。
   - 設定「📤 ミュージックフォルダの共有」に **チェック・説明・「いま読み取る」・いまの許可の状態**（`#folderAutoReadChk`／`#folderAutoNowBtn`／`#folderPermState`）。`📁 開く` で覚えたフォルダーも「📁 読み取り中」（`libShareStateOpened`）と表示。再接続ボタンはタップ待ちのとき「🔓 「{name}」を読み取る（タップ）」（`libReconnectAuto`）。
-  - 日英ガイド（`docs/guide/appearance.md`・`docs/guide/en.md`）、`tests/trk194-folder-auto-read.test.mjs`（11件）を追加。
+  - 日英ガイド（`docs/guide/appearance.md`・`docs/guide/en.md`）、`tests/trk194-folder-auto-read.test.mjs`（12件）を追加。今回の許可は「次回も自動」と言い切らず、`folderPermSession` で言い方を分ける。
 - **trk190〜192：1.0.6 slim との同期**：Driveの配布ZIP（1.0.6）を正として `js/`・`css/style.css`・`index.html`・`sw.js` を取り込み。譜面生成の方式3／4（Aタイプ＝標準・既定、Bタイプ＝試験中）、保存棚の上限（`mediaKeepLimit`）、📄参照のみ（ゴースト）の保存と再リンク、アドオンAPI v2（購読解除・`nowPlaying`・`drawer`）、`sw.js` の再検証つきnetwork-first。配布ZIP専用の文面・リンク・同梱構成の変更は取り込まない（§6）。
 - **trk193：⏮ 常に最初から再生する（プレビュー＋メディアプレーヤーの続きから）**：`core.settings.mediaStartFromZero`（初期オフ・初期化とセーフモードでオフ）を1つだけ持ち、**3か所**から同じ値を変えられる。
   1. ⚙ 設定 → 🎵 サウンド（`#mediaStartFromZero`＋説明 `#mediaStartFromZeroHint`）

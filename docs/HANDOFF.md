@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-27（trk195・.mkv/.mpg の対応と再生できない理由の表示）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-27（trk195〜198・形式の仕上げと設定の検索）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検。
 
@@ -216,6 +216,8 @@
 | 29 | trk177レビュー回帰（core束縛・音量平準化・バックアップのアドオン・受信確認） | 関連Node/VMテストとSecurity検査で確認済み。実ブラウザ・実機は未確認 | ①ReplayGainタグ付き曲で平準化オン、タグ由来の補正が効き例外が出ないこと（PC・Android） ②タグ無しの曲で端末内解析由来の補正が効き例外が出ないこと ③アドオン入りバックアップの確認で件数・名前・無効化の説明が見え、復元後は全部オフで手動有効化まで動かないこと ④手動歌詞・字幕・字幕遅延を含むバックアップの復元 ⑤インストール済みPWAの共有を承認し、名前・件数を確かめた後に既存経路へ入ること ⑥共有を拒否した場合は何も取り込まずinboxから消え、デスクトップの明示的な「このアプリで開く」は確認が重ならないこと（詳細は #17） |
 | 30 | trk186〜189：🎥基地・退出・左右長押し・旧OSTキー移行 | Node/VM＋共通smoke2件は成功。今回の実機操作は未確認 | PC／スマホ縦横・4言語で基地入口、戻るボタンの常時表示、下部スクロール、左右長押しと離した後の停止・短タップ・中断を確認。旧版データからの移行と、外したパック曲が再起動後も戻らないことも確認 |
 | 31 | trk195：🎞 `.mkv`/`.mpg` の取込と「再生できない理由」 | 合成した先頭バイトでのVM検査と `npm run check`（565 pass）は成功。実ファイルでの確認は未了 | ①H.264＋AAC の MKV が Chrome で選曲→メディアプレーヤーまで通ること ②MPEG-2/AC3 の MKV で理由（コーデック名）が出ること ③`.mpg` で「MPEG-PS は再生できない＋MP4 に変換」が出ること ④フォルダー取込に `.mkv`/`.mpg` が 🎬 付きで並ぶこと（PC・Android） |
+| 32 | trk196：🎞 形式まわりの仕上げ（理由の表示・拡張子・⚠・説明） | Node/VM と `npm run check` は成功。実ファイル・実機は未了 | ①`.m2ts`/`.avi` が一覧に出て ⚠ が付くこと ②メディアプレーヤーを開いたときにも理由が出ること ③設定「📖 再生できる形式」が4言語で読めること（PC・Android） |
+| 33 | trk197・trk198：🔓 拒否時の案内／🔍 設定の検索 | Node/VM（偽のDOM）で確認済み。実機は未了 | ①サイト設定で許可を切って起動→設定に理由が出るか ②検索で欄が絞られ、空にすると元の開閉に戻るか ③スマホの狭い画面で検索欄と件数が崩れないか |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -313,7 +315,7 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk195`） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk198`） |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
@@ -322,7 +324,7 @@
 
 | 検査 | 結果 | 範囲・注意 |
 |---|---|---|
-| `npm run check` | **565 pass / 0 fail** | 静的・安全・a11y・vendor・MMD・書斎・軽量化＋Node/VMテスト |
+| `npm run check` | **581 pass / 0 fail** | 静的・安全・a11y・vendor・MMD・書斎・軽量化＋Node/VMテスト |
 | `git diff --check` | 成功 | 空白等の差分検査 |
 | `tools/smoke-browser.mjs --compare` / `tools/smoke-game-end.mjs` | **未実行** | この環境にはChromium／Puppeteerが無い。下の前回手順（Repo外の `/home/user/browser-tools`）で再実行する |
 | PC／スマホ実機で今回のUIを操作 | **未確認** | 長押しバーと3か所のチェックの同期は、実機のタッチ・読み上げで確認する |
@@ -356,6 +358,14 @@
 
 ## 7. 最近の変更
 
+- **trk198：🔍 ⚙設定を言葉で絞り込む**：設定の上部に検索欄（`#settingsSearch`・件数 `#settingsSearchStatus`）。details（欄）と行を言葉で隠し、一致した中身は開く。隠した `hidden`/`open` は覚えておき、空にしたら元どおりに戻す（勝手に閉じたままにしない）。設定を閉じる・Esc・言語の切り替えにも追随（`data-i18n-placeholder` を `core.applyLanguage` が訳す）。文言は4言語。`tests/trk198-settings-search.test.mjs`（5件・偽のDOMで絞り込みと復元）。
+- **trk197：🔓 フォルダーの読み取りが拒否されたとき、理由と直し方を出す**：`folderPermissionOf` が直近の答えを `folderLastPermission` に残し、`syncShareUI` が「自動オフ」ではなく「ブラウザーの設定で許可し直す → 🔗 再接続」と案内（フォルダー名つき・4言語 `folderPermDenied`）。起動時に拒否されていたら `libStatus` でも同じ案内（設定オフのときは黙る）。`tests/trk197-folder-perm-hint.test.mjs`（4件）。
+- **trk196：🎞 形式まわりの仕上げ（trk195 の続き）**：
+  - 再生できない理由をメディアプレーヤーにも出す：`loadMedia` が `core.mediaLoadFailure` に理由（i18n キー＋変数）を残し、プレーヤーの状態行と `showMediaStatus` が読む（分かる理由のときだけ差し替え）。
+  - `.m2ts`/`.m2v`/`.mpe` を `MEDIA_EXT`/`VIDEO_EXT`/`VIDEO_ONLY_EXT` と accept に追加（`.ts` は TypeScript と紛れるので入れない）＋ MIME（`video/mp2t`・`video/mpeg`）。
+  - 一覧の行に ⚠（`MAYBE_UNPLAYABLE_EXT`＝mpg/mpeg/mpe/m2v/m2ts/avi）。mkv は H.264＋AAC なら再生できるので対象外。
+  - ⚙ 設定「🎵 サウンド」に「📖 再生できる形式」の説明（4言語・変換は元ファイルを書き換えないと明記）。
+  - `tests/trk196-formats-finish.test.mjs`（7件）。
 - **trk195：🎞 `.mkv`（Matroska）と `.mpg`（MPEG-PS）を扱えるようにする＋再生できない理由を言う**：
   - 取込の対象に追加：`js/library.js` の `MEDIA_EXT` に `mkv`/`mpg`/`mpeg`、`VIDEO_EXT` に `mpg`/`mpeg`（`mkv` は元から）。`index.html` の `#videoFile`・`#mediaFile` の accept にも追加。共有シート（`js/share-inbox.js`）は `MEDIA_EXT`/`VIDEO_EXT` を参照するので自動で対象になる。
   - フォルダーから取り込んだ `.mkv`/`.mpg`/`.avi` などは、重い下調べをせず拡張子だけで 🎬（`VIDEO_ONLY_EXT`）を付ける（`mp4`/`mov`/`webm` は音だけのこともあるので入れない）。

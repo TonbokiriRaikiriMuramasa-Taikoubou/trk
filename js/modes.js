@@ -348,53 +348,83 @@ core.$("livesPicker").addEventListener("click", e => {
   syncLivesUI();
 })();
 
-/* ============ 🏅 称号（曲ごと・モードごとに3段階） ============
-   0＝なし、1＝クリア、2＝⚔ Sランク以上（精度95%以上）、3＝🐔 ノーミス
-   記録（game.js のハイスコア・FC）から計算します。1.05x以上の速度別記録も含みます。
-   CATCHでぶつかったプレイは game.js がFCにしないので、🐔になりません。 */
+/* ============ 🏅 称号（曲ごと・ゲームモードごとに3種類） ============
+   0＝なし、1＝Standard（モードアイコン）、2＝Knight（アイコン＋🛡）、3＝trk!（アイコン＋🐔）。
+   クリアした体力モードから獲得し、曲ごと・ゲームモードごとに最高の称号を保存します。
+   Infinite／AUTO／📻ラジオ／一度でも一時停止／FAILED／練習・未ランク扱いは対象外です。 */
 const TITLE_MODES = [["manual", "🥁"], ["truck", "🚚"], ["orbit", "🪐"], ["stage", "🎪"], ["catch", "🚛"]];
-const TIER_MARK = ["", "", "⚔", "🐔"];
+const LIFE_TITLE_TIER = Object.freeze({ standard:1, knight:2, chicken:3 });
+const TIER_MARK = ["", "", "🛡", "🐔"];
 const TIER_TEXT = ["", "tier1", "tier2", "tier3"];
-function slotTier(s) {
-  if (!s) return 0;
-  if (s.fc) return 3;
-  if (s.best) return Number(s.best.acc) >= 95 ? 2 : 1;
-  return 0;
+function titleTierForRun({ lifeMode, failed, auto, radio, pauseUsed, unranked } = {}) {
+  const tier = LIFE_TITLE_TIER[lifeMode] || 0;
+  if (!tier || failed || auto || radio || pauseUsed || unranked) return 0;
+  return tier;
 }
-const slotTierAll = s => s ? Math.max(slotTier(s), ...Object.values(s.rates || {}).map(slotTier)) : 0;
 function songTitles(r) {
-  const t = {}; for (const [m] of TITLE_MODES) t[m] = 0;
-  if (!r || !r.charts) return t;
-  for (const c of Object.values(r.charts)) {
-    for (const [m] of TITLE_MODES) t[m] = Math.max(t[m], slotTierAll(m === "manual" ? c : c[m]));
+  const t = Object.fromEntries(TITLE_MODES.map(([m]) => [m, 0]));
+  if (!r || typeof r !== "object") return t;
+  const saved = r.titles;
+  if (saved && typeof saved === "object" && !Array.isArray(saved)) {
+    for (const [m] of TITLE_MODES) {
+      const tier = Number(saved[m]);
+      if (Number.isInteger(tier) && tier >= 1 && tier <= 3) t[m] = tier;
+    }
+  }
+  /* 新形式の履歴にも称号ランクを持たせ、インポート時に集計を復元できます。 */
+  if (Array.isArray(r.history)) {
+    for (const h of r.history) {
+      if (!h || !Object.prototype.hasOwnProperty.call(LIFE_TITLE_TIER, h.lifeMode)) continue;
+      const tier = Number(h.titleTier);
+      if (!Number.isInteger(tier) || tier !== LIFE_TITLE_TIER[h.lifeMode] || !h.title) continue;
+      if (!TITLE_MODES.some(([m]) => m === h.mode) || h.failed || h.auto || h.radio || h.pauseUsed || h.practice) continue;
+      t[h.mode] = Math.max(t[h.mode], tier);
+    }
   }
   return t;
 }
-function titleString(r) {   // 例：🥁🐔🚚⚔🪐🎪🐔🚛（library.js からも使います）
+function titleString(r) {   // 例：🥁🐔🚚🛡🪐🛡🎪🛡🚛🛡（library.js からも使います）
   const t = songTitles(r);
   return TITLE_MODES.map(([m, icon]) => t[m] ? icon + TIER_MARK[t[m]] : "").join("");
 }
-let titleSnap = null;
-on("beforePlay", () => { titleSnap = songTitles(window.Trk.play.songRec(false)); });
-on("resultRecorded", () => {   /* 記録を保存した後（履歴の先頭がこの曲）に、リザルトへ称号（ランク）を足す */
+let titleSnap = null, titleRunConfig = null, titleAwardProcessed = false;
+on("beforePlay", () => {
+  titleSnap = songTitles(window.Trk.play.songRec(false));
+  titleRunConfig = { lifeMode:core.settings.lives || "standard", radio:!!core.settings.radio };
+  titleAwardProcessed = false;
+});
+on("resultRecorded", rec => {   /* 記録保存後、条件を満たしたクリアにだけ称号を付ける */
+  if (titleAwardProcessed) return;
+  titleAwardProcessed = true;
   const pair = TITLE_MODES.find(([m]) => m === core.settings.playMode); if (!pair) return;
   const [mode, icon] = pair;
-  if ((lifeState.max > 0 && lifeState.hp <= 0) || window.Trk.play.runUnranked()) return;   // FAILED・AUTO・練習扱いは対象外
-  const noMiss = core.stats.miss === 0 && !(core.stats.crash > 0) && core.stats.perfect + core.stats.good > 0;
-  const tier = noMiss ? 3 : window.Trk.play.currentAcc() >= 95 ? 2 : 1;
   const s = window.Trk.play.songRec(false);
-  const now = songTitles(s)[mode], prev = titleSnap ? titleSnap[mode] : 0;
+  const h = s && Array.isArray(s.history) ? s.history[0] : null;
+  if (!s || !h || h.mode !== mode || !rec || rec.mode !== mode) return;
+  const lifeMode = h.lifeMode || (titleRunConfig && titleRunConfig.lifeMode) || core.settings.lives || "standard";
+  const paused = (typeof window.Trk.play.runWasPaused === "function" && window.Trk.play.runWasPaused()) || !!h.pauseUsed;
+  const tier = titleTierForRun({
+    lifeMode,
+    failed:!!(rec.failed || h.failed),
+    auto:!!(core.settings.autoPlay || h.auto),
+    radio:!!(core.settings.radio || (titleRunConfig && titleRunConfig.radio) || h.radio),
+    pauseUsed:paused,
+    unranked:!!(window.Trk.play.runUnranked() || h.practice)
+  });
+  if (!tier) return;
+  const prev = titleSnap ? titleSnap[mode] : 0;
+  const saved = s.titles && typeof s.titles === "object" && !Array.isArray(s.titles) ? s.titles : (s.titles = {});
+  const oldTier = Number(saved[mode]);
+  saved[mode] = Math.max(Number.isInteger(oldTier) && oldTier >= 1 && oldTier <= 3 ? oldTier : 0, tier);
+  h.title = icon + TIER_MARK[tier];
+  h.titleTier = tier;
+  const now = songTitles(s)[mode];
   const b = core.$("result").querySelector(".badges");
   if (b) {
-    b.append(core.el("span", "badge", `${icon}${TIER_MARK[tier]} ${tr(TIER_TEXT[tier])}`));
+    b.append(core.el("span", "badge", `${h.title} ${tr(TIER_TEXT[tier])}`));
     if (now > prev) b.append(core.el("span", "badge", tr("newTitle")));
   }
-  const h = s && s.history && s.history[0];
-  if (h && h.mode === mode) {
-    h.title = icon + TIER_MARK[tier];
-    h.mods = [...(Array.isArray(h.mods) ? h.mods : []), h.title];
-    window.Trk.play.saveRecords(); window.Trk.play.renderRecords(); core.emit("records");
-  }
+  window.Trk.play.saveRecords(); window.Trk.play.renderRecords(); core.emit("records");
 });
 function renderTitles() {
   if (!core.videoReady) return;

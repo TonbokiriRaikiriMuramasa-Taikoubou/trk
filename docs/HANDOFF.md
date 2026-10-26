@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-16（trk189）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-26（trk193・1.0.6 slimとの同期）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検。
 
@@ -312,12 +312,25 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.16-trk189`） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.26-trk193`） |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
 
-**trk186〜189・2026-10-16の最終確認**（作業途中の記録はアーカイブへ移動）
+**trk190〜193・2026-10-26の確認**（作業途中の記録はアーカイブへ移動）
+
+| 検査 | 結果 | 範囲・注意 |
+|---|---|---|
+| `npm run check` | **541 pass / 0 fail** | 静的・安全・a11y・vendor・MMD・書斎・軽量化＋Node/VMテスト |
+| `git diff --check` | 成功 | 空白等の差分検査 |
+| `tools/smoke-browser.mjs --compare` / `tools/smoke-game-end.mjs` | **未実行** | この環境にはChromium／Puppeteerが無い。下の前回手順（Repo外の `/home/user/browser-tools`）で再実行する |
+| PC／スマホ実機で今回のUIを操作 | **未確認** | 長押しバーと3か所のチェックの同期は、実機のタッチ・読み上げで確認する |
+
+- **1.0.6 slim との同期**：Google Driveの `trk-slim-win-linux-1.0.6.zip`（`release-manifest.json`＝1.0.6／`sw.js` cache `trk-v2026.10.20-1.0.6`）を展開し、リポジトリのアプリ本体と突き合わせて取り込んだ（差分のあった app 側 20ファイル）。配布ZIP向けの書き換え（`og:url`／`og:image` の削除、GitHub Issues → 夢現の作品ページ、READMEの配布文面、`.github/`・`tests/`・`tools/*.mjs` を同梱しない構成）は**リポジトリには持ち込まない**方針で、SNSカードと GitHub Issues のリンクは元のまま残した。
+- **取り込んだ主な機能（trk190〜192）**：`chartGen` に方式3（Aタイプ・既定）と方式4（Bタイプ・試験中）を追加し、設定の🎼欄へ移動（旧方式1／2は再生成用に維持）、`mediaKeepLimit`（1GiB／5GiB／無制限）と📄参照のみ（ゴースト）の保存、アドオンのAPI v2（`api.on` の解除関数・`api.nowPlaying()`・`drawer` slot）、`library.js` の `addedItem(file, video, addedAt, flags)`、Service Worker のオンライン時 `cache:"no-cache"` 再検証。
+- **追随した検査**：`tools/check-repo.mjs` の `addedItem` 署名と `docs/ADDONS.md`（API v2の説明）、`tools/check-security.mjs` の `readStats(os, v && v[idKey], …)`、`tests/ranked-option.test.mjs`（`core.on` と `runAutoUsed` の初期化）、`tests/trk172-smart-shelf.test.mjs`（`addedItem` 呼び出し）、`tests/trk187-media-exit.test.mjs`（2行に分かれた配線）を更新した。
+
+**trk186〜189・2026-10-16の最終確認**
 
 | 検査 | 結果 | 範囲・注意 |
 |---|---|---|
@@ -342,6 +355,13 @@
 
 ## 7. 最近の変更
 
+- **trk190〜192：1.0.6 slim との同期**：Driveの配布ZIP（1.0.6）を正として `js/`・`css/style.css`・`index.html`・`sw.js` を取り込み。譜面生成の方式3／4（Aタイプ＝標準・既定、Bタイプ＝試験中）、保存棚の上限（`mediaKeepLimit`）、📄参照のみ（ゴースト）の保存と再リンク、アドオンAPI v2（購読解除・`nowPlaying`・`drawer`）、`sw.js` の再検証つきnetwork-first。配布ZIP専用の文面・リンク・同梱構成の変更は取り込まない（§6）。
+- **trk193：⏮ 常に最初から再生する（プレビュー＋メディアプレーヤーの続きから）**：`core.settings.mediaStartFromZero`（初期オフ・初期化とセーフモードでオフ）を1つだけ持ち、**3か所**から同じ値を変えられる。
+  1. ⚙ 設定 → 🎵 サウンド（`#mediaStartFromZero`＋説明 `#mediaStartFromZeroHint`）
+  2. ▶ メディアプレーヤーのオプション行（`#mediaStartFromZeroPlayer`。`mediaCheckRow`）
+  3. 曲名タブ右上の **⏱ ここをプレビュー開始位置にする** を**長押し（650ms・12px動いたら取りやめ）**で開く **開始位置のバー**（`#bannerStartZero`）
+  オンのときは `previewStartFor()` と `savedMediaPosition()` が 0 を返す＝プレビューも「続きから」もしない。曲ごとの `previewStart` と保存位置は消さない（オフに戻せば今までどおり）。バーのつまみは 0.1秒きざみで、動かすとその位置を試せる。保存は「この位置を保存」を押したときだけ、`曲の既定に戻す` で `previewStart` を削除。長押しのあとの click は保存しない（`previewSetLongPressed`）。
+- 日英ガイド、`tests/trk193-start-from-zero.test.mjs`、Service Worker cache **`trk-v2026.10.26-trk193`** を更新。
 - **trk186〜187：プレーヤーの入口と退出**：曲リストの📚書斎の隣に **🎥基地**（PC／スマホ共通・4言語）を追加。電源長押しも維持。「閉じる」は **← 曲リストに戻る**へ変更し44px以上の強調ボタンに。ヘッダーをスクロール面の外に残し、閉じると実際の入口へフォーカスを戻す。重複openのタイマー増殖も防止。
 - **trk188：全画面の長押しシーク**：左半分＝巻き戻し、右半分＝早送り。450ms後から250msごと、2秒/回→2秒ごとに2秒/回ずつ加速し最大20秒/回。再生倍率を変えずcurrentTimeを移動。中央に方向と秒数。指離し・中断・移動・blur・タブ非表示・曲切替・closeで停止し、長押し後のclickを遮断。contextmenu／touch-action／タッチコールアウト抑止は映像面だけ。
 - **trk189：PR #69の残件**：`trkOstLegacyCleanOnce` が初回だけ `trk-ost-v1.songs` と見た曲の印から旧 `builtin:trk-ost-song:` 参照を掃除（FIRST SPARK・パック曲・他リスト・名前・配置・削除状態は維持）。safe／任意同梱ビルドでは実施しない。印と削除予定日は `MIGRATIONS.md` に登録。`core.js` で印と `trkOstSeenKeys` の起動時読み戻しも修正。music-libraryの固定注記は対応済みを確認。

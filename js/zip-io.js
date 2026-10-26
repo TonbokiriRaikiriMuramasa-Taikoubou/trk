@@ -20,6 +20,19 @@
     constructor(key) { super(key); this.key = key; }
   }
 
+  /* Convert a Unix millisecond timestamp to ZIP's local-time DOS fields (2-second precision).
+     If no mtime is supplied, callers retain the deterministic 1980-01-01 default. */
+  function zipDosDateTime(timestamp) {
+    if (!Number.isFinite(timestamp)) throw new ZipIOError("zipBad");
+    const d = new Date(timestamp);
+    if (!Number.isFinite(d.getTime())) throw new ZipIOError("zipBad");
+    const year = Math.min(2107, Math.max(1980, d.getFullYear()));
+    const month = d.getMonth() + 1, day = d.getDate();
+    const time = (d.getHours() << 11) | (d.getMinutes() << 5) | Math.floor(d.getSeconds() / 2);
+    const date = ((year - 1980) << 9) | (month << 5) | day;
+    return { time, date };
+  }
+
   const CRC_TABLE = (() => {
     const t = new Uint32Array(256);
     for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; }
@@ -62,13 +75,15 @@
   }
 
   /* entries：[{ name, blob, deflate? }]。戻り値は ZIP の Blob。
-     opts.forceZip64 はテスト用（ZIP64 の構造を小さなデータで通すため）。 */
+     opts.forceZip64 はテスト用。opts.mtime は全エントリ共通の Unix 時刻(ms)（配布ZIPのビルド時刻用）。 */
   async function zipWrite(entries, opts = {}) {
     if (!Array.isArray(entries)) throw new ZipIOError("zipBad");
     if (entries.length > MAX_ENTRIES) throw new ZipIOError("zipLimit");
     const parts = [], central = [];
     let off = 0, cdSize = 0;
-    const DOS_TIME = 0, DOS_DATE = 0x21;   /* 1980-01-01 固定（決定的な出力のため） */
+    const { time:DOS_TIME, date:DOS_DATE } = opts.mtime === undefined
+      ? { time:0, date:0x21 }   /* 1980-01-01 固定（通常のbackup/.stpackは決定的な出力） */
+      : zipDosDateTime(opts.mtime);
     for (const e of entries) {
       if (!e || typeof e.name !== "string" || !e.name || e.name.includes("\\") || e.name.startsWith("/") ||
           /^[A-Za-z]:/.test(e.name) || e.name.split("/").includes("..") || !e.blob || typeof e.blob.stream !== "function") throw new ZipIOError("zipBad");

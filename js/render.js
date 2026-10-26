@@ -537,7 +537,7 @@ Object.defineProperty(window, "toast", { configurable:true, get:() => toast, set
 window.vrmState = vrmState;
 /* 領域（window.Trk.play）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
 window.Trk = window.Trk || {};
-window.Trk.play = Object.assign(window.Trk.play || {}, { PLAY_KEYS, autoPlay, chartKeyOf, currentAcc, currentScore, endGame, handleInput, judgeNote, pauseGame, rateKey, renderRecords, resumeGame, runUnranked, saveRecords, seekTo, songRec, startGame, sweepMisses, tickClock, toTitle, beatPulse, hitPos, layout, loop, noteAlpha, ownField, rr, showToast, vrmState });
+window.Trk.play = Object.assign(window.Trk.play || {}, { PLAY_KEYS, autoPlay, chartKeyOf, currentAcc, currentScore, endGame, handleInput, judgeNote, pauseGame, rateKey, renderRecords, resumeGame, runUnranked, runWasPaused:window.runWasPaused, saveRecords, seekTo, songRec, startGame, sweepMisses, tickClock, toTitle, beatPulse, hitPos, layout, loop, noteAlpha, ownField, rr, showToast, vrmState });
 Object.defineProperty(window.Trk.play, "gameTime", { configurable:true, get:() => gameTime, set:v => { gameTime = v; } });
 Object.defineProperty(window.Trk.play, "goAt", { configurable:true, get:() => goAt, set:v => { goAt = v; } });
 Object.defineProperty(window.Trk.play, "leadIn", { configurable:true, get:() => leadIn, set:v => { leadIn = v; } });

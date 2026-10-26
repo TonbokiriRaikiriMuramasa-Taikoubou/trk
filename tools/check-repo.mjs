@@ -2617,7 +2617,7 @@ if (!read("js/main.js").includes("guideEggKind") ||
       !library.includes("if (row.sec) { pendingSec = row; continue; }") ||
       !library.includes("box.append(libSectionHead(pendingSec.sec, pendingSec.n))") ||
       !library.includes("if (r.it && !seenKeys.has(r.it.key))") ||
-      !library.includes("function addedItem(file, video, addedAt)") ||
+      !library.includes("function addedItem(file, video, addedAt, flags = {})") ||
       !library.includes("initLibrary, nextSong, noteMediaPlayed, onLongPress") ||
       (library.match(/libTabSmart:/g) || []).length !== 4 ||
       (library.match(/libSmartRecent:/g) || []).length !== 4 ||

@@ -148,7 +148,7 @@ Object.assign(TEXT.ko, {
 const HOLD_MS = 650;
 if (!Array.isArray(core.settings.videoKeys) || core.settings.videoKeys.length !== core.VIDEO_KEY_DEFAULTS.length || core.settings.videoKeys.some(k => !core.validCode(k)) || new Set(core.settings.videoKeys).size !== core.VIDEO_KEY_DEFAULTS.length) core.settings.videoKeys = core.VIDEO_KEY_DEFAULTS.slice();
 let overlay, dialog, powerButton;
-let mediaReturnFocus = null;
+let mediaReturnFocus = null;   /* 🎥 基地から開いたときの戻り先（trk186） */
 let mediaOpen = false, holdTimer = 0, longPressed = false;
 let repeatMode = core.settings.mediaRepeat || "off", shuffle = !!core.settings.mediaShuffle;
 let mediaRate = Number(core.settings.mediaRate) || 1, sleepTimer = 0, sleepUntil = 0, tickTimer = 0;
@@ -161,6 +161,7 @@ let wallOverlay, wallClockNode, wallDateNode, wallNode, wallStyleNode, wallClock
 let maxNode = null;   /* 🖥 「全画面で表示」（js/video-max.js） */
 let pipNode = null, pipActive = false;                /* 📌 画中画（trk164） */
 let resumeNode = null;                                /* ⏪ スマート巻き戻しの選択（trk164） */
+let startZeroNode = null;                             /* ⏮ 常に最初から再生のチェック（trk193） */
 let wakeLock = null, wakeRequested = false;           /* 🔆 Screen Wake Lock（trk164） */
 let lyricsBox = null, lyricsListNode = null, lyricsSourceNode = null, lyricsFileNode = null, lyricsClearNode = null;  /* 🎤 歌詞パネル（trk166） */
 let lyricsState = { key:"", request:0, data:null, active:-2, loading:false };  /* 🎤 歌詞の状態（active=-2 は「次の描画で必ず付け直す」印） */
@@ -209,6 +210,9 @@ function planSleepFade(totalSeconds, fadeSeconds) {
   return { startAfter: total - fade, fade };
 }
 function savedMediaPosition(opts = {}) {
+  /* ⏮ 常に最初から再生（trk193）：オンなら保存位置を使わず、開いたときも曲を選んだときも 0:00 から。
+     保存した位置そのものは消さない（オフに戻せば、また続きから再生できる）。 */
+  if (core.settings.mediaStartFromZero === true) return 0;
   const p = Number(mediaPositions[mediaPositionKey()]);
   if (!(Number.isFinite(p) && p > 5 && core.video.duration > p + 5)) return 0;
   /* ⏪ スマート巻き戻し（trk164）：「続きから再生」のときだけ数秒戻す。一時停止からの再開では戻さない */
@@ -1387,7 +1391,7 @@ function closeMedia(restore = true) {
   if (stageWrap) stageWrap.hidden = true;
   overlay.hidden = true; document.body.classList.remove("mediaOpen");
   if (restore && core.phase === "title" && core.settings.previewEnabled && typeof startPreview === "function") setTimeout(window.Trk.library.startPreview, 50);
-  if (mediaReturnFocus && mediaReturnFocus.isConnected) mediaReturnFocus.focus();
+  if (mediaReturnFocus && mediaReturnFocus.isConnected) mediaReturnFocus.focus();   /* 🎥 開いた入口へ焦点を戻す（trk186） */
   else if (powerButton) powerButton.focus();
 }
 function openMedia() {
@@ -1407,8 +1411,7 @@ function openMedia() {
   mediaPlayNotedKey = "";   /* 🎧 開き直しも新しい再生として数え直す（trk172） */
   const focus = playNode || closeNode; if (focus) focus.focus();
 }
-/* 書斎と並ぶタップ入口。TV電源の長押しは引き続き使える。 */
-function syncMediaOpenBtn() {
+function syncMediaOpenBtn() {   /* 🎥 基地ボタンの文言（trk186） */
   const button = document.getElementById("mediaOpenBtn");
   if (!button) return;
   button.textContent = tr("mediaOpenBtn");
@@ -1418,7 +1421,7 @@ let closeNode;
 function buildMedia() {
   powerButton = document.querySelector("#tvDock .tvPow");
   if (!powerButton) return false;
-  const mediaOpenBtn = document.getElementById("mediaOpenBtn");
+  const mediaOpenBtn = document.getElementById("mediaOpenBtn");   /* 🎥 常時入口（trk186） */
   if (mediaOpenBtn) {
     syncMediaOpenBtn();
     mediaOpenBtn.addEventListener("click", openMedia);
@@ -1429,7 +1432,8 @@ function buildMedia() {
   const header = core.el("header", "instHeader mediaHeader");
   const hwrap = core.el("div"); const h = tx("h2", "mediaTitle"); h.id = "mediaTitle";
   hwrap.append(h, tx("p", "mediaSubtitle", "instSubtitle"));
-  closeNode = makeButton("mediaClose", "instClose mediaExitBtn"); closeNode.addEventListener("click", () => closeMedia());
+  closeNode = makeButton("mediaClose", "instClose mediaExitBtn");   /* ← 曲リストに戻る（trk187・明示ボタンは即退出） */
+  closeNode.addEventListener("click", () => closeMedia());
   header.append(hwrap, closeNode);
 
   const display = core.el("div", "mediaDisplay");
@@ -1651,6 +1655,20 @@ function buildMedia() {
   { const o = document.createElement("option"); o.value = "chapter"; o.dataset.i18n = "mediaSleepChapter"; o.textContent = tr("mediaSleepChapter"); sleepNode.append(o); }  /* 🔖 チャプターの終わりで止める（trk170） */
   sleepLabel.append(sleepNode); sleepNode.addEventListener("change", () => setSleep(sleepNode.value === "track" ? -1 : sleepNode.value === "chapter" ? -2 : sleepNode.value));
   /* ⏪ スマート巻き戻し（trk164）：続きから再生するときだけ数秒戻す。オーディオブックの定番。初期オフ */
+  /* ⏮ 常に最初から再生（trk193）：設定画面・曲名タブのバーと同じ1つの値を、ここからも変えられる）
+     メディアプレーヤーの中に置くことで「続きから」の設定がその場で見つかる。 */
+  const zeroRow = core.el("label", "mediaOption mediaCheckRow");
+  startZeroNode = document.createElement("input"); startZeroNode.type = "checkbox"; startZeroNode.id = "mediaStartFromZeroPlayer";
+  const zeroText = document.createElement("span"); zeroText.dataset.i18n = "mediaStartFromZero"; zeroText.textContent = tr("mediaStartFromZero");
+  zeroRow.append(startZeroNode, zeroText);
+  startZeroNode.checked = core.settings.mediaStartFromZero === true;
+  startZeroNode.addEventListener("change", () => {
+    core.settings.mediaStartFromZero = startZeroNode.checked === true;
+    core.saveUserPrefs();
+    if (typeof window.Trk.library.setStartFromZero === "function") window.Trk.library.setStartFromZero(startZeroNode.checked);
+    else if (typeof window.Trk.library.syncStartZeroInputs === "function") window.Trk.library.syncStartZeroInputs();
+    if (startZeroNode.checked) { try { core.video.currentTime = 0; } catch (_) {} }
+  });
   const resumeLabel = core.el("label", "mediaOption"); resumeLabel.append(tx("span", "mediaResumeRewind"));
   resumeNode = document.createElement("select");
   for (const [v, key] of [[0, "mediaResumeOff"], [3, ""], [5, ""], [10, ""], [15, ""], [30, ""]]) {
@@ -1665,7 +1683,7 @@ function buildMedia() {
     if (typeof showToast === "function") window.Trk.play.showToast(tr("mediaResumeSet", { s: core.settings.mediaResumeRewind }));
   });
   resumeLabel.append(resumeNode);
-  options.append(volumeRow, muteNode, shuffleNode, repeatLabel, rateLabel, sleepLabel, resumeLabel);
+  options.append(volumeRow, muteNode, shuffleNode, repeatLabel, rateLabel, sleepLabel, resumeLabel, zeroRow);
 
   const queuePanel = core.el("section", "mediaQueuePanel");
   const qhead = core.el("div", "mediaQueueHead"); qhead.append(tx("h3", "mediaQueue"), tx("p", "mediaQueueHint", "hint"));
@@ -1673,7 +1691,8 @@ function buildMedia() {
   queueNode = core.el("div", "mediaQueueList"); queuePanel.append(qhead, searchNode, queueNode);
 
   const footer = core.el("footer", "instFooter mediaFooter"); footer.append(tx("span", "mediaModeStatus"), tx("span", "mediaKeyboard", "instKeyHint"));
-  /* 戻る入口はスクロール面の外へ。小さい画面でも常に上部に残す。 */
+  /* 📜 ヘッダー（← 曲リストに戻る）はスクロール面の外に置き、中身だけ .mediaBody でスクロールさせる（trk187）。
+     インラインのパネル順は従来どおり変えない。 */
   const body = core.el("div", "instBody mediaBody");
   body.append(display, stageWrap, controls, progressRow, lyricsBox, subsBox, chapBox, interpBox, loopBox, options, queuePanel, footer);
   dialog.append(header, body);
@@ -1743,7 +1762,7 @@ function buildMedia() {
   core.on("songSelected", () => { mediaPlayNotedKey = ""; });   /* 🎧 新しい曲の「ちゃんと聴いた」計数は最初から（trk172・これも別購読） */
   core.on("records", renderQueue); core.on("packsChanged", renderQueue);
   core.on("songTags", () => { renderQueue(); if (mediaOpen) renderMedia(); });   /* 🏷 タグが届いたら表示名を追従（trk167） */ core.on("language", () => {
-    syncMediaOpenBtn();
+    syncMediaOpenBtn();   /* 🎥 基地ボタンの文言も追従（trk186） */
     if (stageNote) { stageNote.textContent = tr("mediaStageNoVideo"); stageNote.dataset.i18n = "mediaStageNoVideo"; }
     renderInterp();
     loopPresetRenderKey = loopPresetRenderSig = null;
@@ -1858,6 +1877,8 @@ addEventListener("DOMContentLoaded", () => {
 window.TrkMediaPlayer = { open:openMedia, close:closeMedia, isOpen:mediaActive,
   /* trk164: テスト用の素の関数（DOM不要の決定だけを取り出して検証できる） */
   resumeRewindSeconds, rewindResumePosition, planSleepFade, pipSupported, wakeLockSupported };
+/* ⏮ 常に最初から再生（trk193）：設定画面や曲名タブのバーで変わった値を、ここへも反映する */
+window.TrkMediaStartZeroSync = on => { if (startZeroNode) startZeroNode.checked = on === true; };
 window.Trk.overlay.set("media", false);
 window._trkMediaPlayerMode = false;
 })();

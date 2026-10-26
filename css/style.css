@@ -298,6 +298,21 @@ select{padding:8px 10px;border-radius:10px;background:var(--ui-field);color:var(
   padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.28)}
 .bannerVolPanel[hidden]{display:none}
 .bannerVolPanel input{width:120px}
+/* ⏮ プレビュー開始位置のバー（trk193）。曲名タブの「⏱ ここをプレビュー開始位置にする」を長押しすると開く。
+   つまみで開始位置を選び、チェックで「常に最初から再生する」を切り替える。 */
+/* 位置は startBarPlace() がボタンのすぐ下（入らなければ上）へ決める＝バナーの overflow:hidden で切れない */
+.bannerStartPanel{position:fixed;z-index:400;width:min(320px,92vw);
+  display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:12px;
+  background:rgba(0,0,0,.92);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:13px;text-align:left;
+  box-shadow:0 12px 30px rgba(0,0,0,.5)}
+.bannerStartPanel[hidden]{display:none}
+.bannerStartHead{font-size:13px;font-weight:800}
+.bannerStartRange{width:100%;accent-color:#ffd166}
+.bannerStartTime{font-variant-numeric:tabular-nums;font-size:12px;color:var(--ui-muted)}
+.bannerStartZeroRow{display:flex;align-items:center;gap:8px;min-height:32px;font-size:12px;font-weight:700}
+.bannerStartZeroRow input{width:auto}
+.bannerStartActions{display:flex;flex-wrap:wrap;gap:6px;margin-top:0}
+.bannerStartActions button{min-height:36px;padding:6px 10px;font-size:12px;border-radius:9px}
 /* ◀🎲▶ バナー右端の曲送り（左端に置くと曲名の頭に重なるので、右端にまとめる） */
 .bannerSongBar{position:absolute;top:50%;right:10px;transform:translateY(-50%);z-index:3;
   display:flex;align-items:center;gap:6px}
@@ -1267,7 +1282,7 @@ body.instOpen{overflow:hidden;overscroll-behavior:none}
    ・#libPanel[data-lib-skin="…"] を付け替えるだけで見た目が変わる
    ============================================================ */
 .libHeadRight{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:baseline;gap:8px;min-width:0}
-.studyHeadBtn{min-height:44px;white-space:nowrap}
+.studyHeadBtn{min-height:44px;white-space:nowrap}   /* 🎥📚 見出しの入口ボタン：折り返しても44px以上（trk186） */
 .libSkinBtn{padding:4px 10px;font-size:15px;line-height:1.1;border-radius:10px;opacity:.9}
 .libSkinBtn:hover{opacity:1}
 .libSkinBar{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding:10px;border-radius:14px;
@@ -1645,6 +1660,11 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
 .addonErr{color:#ff8a8a}
 .addonSlot{margin-top:10px}
 .addonSlots>.addonSlot:empty{display:none}
+/* 💬 trk191: アドオン引き出し（slot "drawer"・API v2）＝画面右端の常設置き場所。
+   空のときは場所ごと隠れ、ホストはクリックを通す（pointer-events:none） */
+.addonDrawerHost{position:fixed;right:10px;top:50%;transform:translateY(-50%);width:min(380px,94vw);max-height:86vh;overflow:auto;z-index:300;pointer-events:none}
+.addonDrawerHost>.addonSlot{pointer-events:auto;margin-top:0}
+.addonDrawerHost>.addonSlot:empty{display:none}
 #addonStatus.ng{color:#ff8a8a}
 
 /* ============================================================
@@ -1771,7 +1791,7 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
 
 /* ▶ メディアプレーヤーモード（TV電源長押し） */
 .mediaDialog{width:min(920px,100%);border-color:rgba(255,209,102,.32);background:linear-gradient(155deg,rgba(33,29,22,.98),rgba(10,12,20,.99) 60%)}
-/* 退出ボタンはスクロールしないヘッダーに置く。説明文だけ縮め、ボタンを押せる高さを保つ。 */
+/* 📜 ヘッダーは縮ませず、中身（.mediaBody＝既存 .instBody）だけがスクロールする（trk187） */
 .mediaHeader{flex:none;align-items:center;flex-wrap:wrap}
 .mediaHeader>div{flex:1 1 200px;min-width:0}
 .mediaExitBtn{min-height:44px;max-width:100%;white-space:normal;font-weight:800;
@@ -1808,6 +1828,10 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
 .mediaOption>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mediaOption input[type=range]{width:100%;accent-color:#ffd166}
 .mediaOption select{width:100%;min-width:0;padding:6px 7px}
+/* ⏮ 常に最初から再生（trk193）：メディアプレーヤーのオプション行に置くチェック */
+.mediaOption.mediaCheckRow{flex-direction:row;align-items:center;gap:8px;font-size:12px;line-height:1.35}
+.mediaOption.mediaCheckRow input{width:auto;min-width:0;margin:0;accent-color:#ffd166}
+.mediaOption.mediaCheckRow>span{white-space:normal;overflow:visible;text-overflow:clip}
 .mediaVolumeRow{flex-direction:row;align-items:center;gap:8px}.mediaVolumeRow>span{flex:none}.mediaVolumeRow input{min-width:50px}
 .mediaSmallBtn{padding:7px 10px!important;border-radius:9px!important;font-size:12px!important;white-space:nowrap}
 .mediaSmallBtn.selected{background:linear-gradient(130deg,#4ae4ff,#5e8bff);border-color:transparent;color:#03101a}
@@ -1965,3 +1989,9 @@ body.noDev .devOnly { display: none !important; }
 .welcomeBtn{min-height:40px;padding:8px 16px;border-radius:999px;border:1px solid var(--ui-border);background:var(--ui-soft);color:var(--ui-text);font:inherit;font-weight:700;cursor:pointer}
 .welcomeBtn.primary{background:var(--ui-gold);border-color:var(--ui-gold);color:#15111a}
 .welcomeBtn:focus-visible{outline:2px solid var(--ui-gold);outline-offset:2px}
+
+/* 📄参照のみ（ゴースト）— 1.0.6 : 本体なしでも“あったこと”を薄く残す */
+.libRow.ghost{opacity:.62;border-style:dashed;border-color:var(--ui-border);background:repeating-linear-gradient(45deg,rgba(255,255,255,.02) 0 8px,transparent 8px 16px)}
+.libRow.ghost .libName::after{content:" \u25CB";font-size:11px;opacity:.6}
+.ghostBadge{font-size:11px;padding:2px 6px;border-radius:999px;background:var(--ui-field);border:1px dashed var(--ui-border);color:var(--ui-muted)}
+.ghostActions{display:flex;gap:6px;flex-wrap:wrap}

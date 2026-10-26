@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /* ============ 📦 まるごとバックアップ（trk137） ============
    1つのZIPに、この端末の trk! の保存内容をまとめます。
-     ・core（常に）：設定・記録・プレイリスト・スキン・音量など（localStorage の許可リスト）＋ライブラリ（IndexedDB shadow_taiko_library）
+     ・core（常に）：設定・記録・プレイリスト・スキン・音量など（localStorage の許可リスト）＋ライブラリ（IndexedDB shadow_taiko_library）＋軽量参照（shadow_taiko_song_refs）
      ・study（既定ON）：📚 書斎（本・画像・栞・メモ・設定）
      ・packs（既定ON）：📦 カスタムパック。本体を .stpack に組み直し、復元は既存のインストーラで**検証を通す**
-     ・media（既定OFF）：🎵 曲・VRM・MMD のファイル（大きい）
+     ・media（既定OFF）：🎵 保存棚の曲・動画・共有曲・VRM・MMD のファイル（大きい）
    含めないもの：解析の結果（再生成できる）、一度きりの印、フォルダの権限（ブラウザごとの許可なので書き出せない）。
    復元は選んだ領域を置き換え、選んでいない領域には触らない。パックは先に導入を試し、成功後にバックアップに無いIDを削除する。
    バックアップに含まれるパックの導入に失敗した場合、同じIDの既存パックがあれば残す。
@@ -107,7 +107,8 @@
     { db:"shadow_taiko_vrm", version:2, stores:["files"] },
     { db:"shadow_taiko_mmd", version:2, stores:["files"] },
   ];
-  const ALL_DBS = [DB_LIBRARY, DB_STUDY, DB_PACKS, ...DB_MEDIA];
+  const DB_REFS = { db:"shadow_taiko_song_refs", version:2, stores:["refs"] };
+  const ALL_DBS = [DB_LIBRARY, DB_STUDY, DB_PACKS, ...DB_MEDIA, DB_REFS];
 
   class BackupError extends Error { constructor(key, vars) { super(key); this.key = key; this.vars = vars; } }
   class SkipValue extends Error { constructor() { super("skip"); this.name = "SkipValue"; } }   /* この行だけ書き出さない */
@@ -321,6 +322,7 @@
       } finally { db.close(); }
     }
     counts.library = (await dumpStore(DB_LIBRARY, "kv")) || 0;
+    counts.refs = (await dumpStore(DB_REFS, "refs")) || 0;
 
     if (want.study) {
       note("study");
@@ -426,6 +428,19 @@
       if (text && new Blob([text]).size > L.textBytes) throw new BackupError("backupRestoreLimit");
     }
   }
+  /* 🎵 曲・動画の保存棚上限（restore は明示操作だが、通常の保存と同じ合計上限を確認する）。
+     old data is never pruned here; an over-cap backup is rejected before any store is replaced. */
+  function checkMediaShelfLimit(pairs) {
+    const pref = core.settings && core.settings.mediaKeepLimit;
+    const cap = pref === "unlimited" ? Infinity : pref === "5g" ? 5 * 1024 ** 3 : 1024 ** 3;
+    let total = 0;
+    for (const [, rec] of pairs) {
+      const size = rec && rec.file && Number(rec.file.size);
+      if (!Number.isFinite(size) || size < 0) continue;
+      if (total > cap - size) throw new BackupError("backupMediaLimit");
+      total += size;
+    }
+  }
   /* 1件の stpack から安全にIDを得る。バックアップ生成物は外側ZIPで無圧縮のため、巨大パック本体はBlob参照のまま。
      IDの計算は custom.js の検証・正規化と同じ関数を使う。分からないときは後続の削除をしない。 */
   async function backupPackId(zip, entry) {
@@ -514,6 +529,9 @@
         backupPackIds.add(id);
       }
     }
+    /* 曲・動画の合計上限も、どのDBにも書き込む前に確認する（途中まで復元してから拒否しない）。 */
+    const songMediaPlan = plan.dbs.find(p => p.spec.db === "shadow_taiko_songs" && p.store === "files");
+    if (songMediaPlan) checkMediaShelfLimit(songMediaPlan.arr.map(r => [decKey(r.k), decodeValue(r.v, resolve)]));
     /* 3) 書く。書斎は参照される側から（pages→covers→books、trk163・レビュー【低】③） */
     orderStudyStores(plan.dbs);
     for (const p of plan.dbs) {

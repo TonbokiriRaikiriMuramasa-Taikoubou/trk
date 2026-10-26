@@ -25,7 +25,16 @@ fitStage();
 
 /* ---------- 合図（イベント） ---------- */
 const HOOKS = {};
-function on(name, fn) { (HOOKS[name] ||= []).push(fn); }
+/* trk191: 購読の解除関数を返す（アドオンが teardown で離脱できるように・API v2）。
+   戻り値を無視する従来の呼び出しはそのまま動く＝後方互換。 */
+function on(name, fn) {
+  (HOOKS[name] ||= []).push(fn);
+  return () => {
+    const a = HOOKS[name];
+    const i = a ? a.indexOf(fn) : -1;
+    if (i >= 0) a.splice(i, 1);
+  };
+}
 function emit(name, ...args) {
   for (const fn of HOOKS[name] || []) { try { fn(...args); } catch (e) { console.error(e); } }
 }
@@ -167,7 +176,8 @@ const LITE_ENUM_VALUES = {
    "icon" は文字を出さない（🐔 のアイコンだけ）。名前と色は固定なので、ここで選べるのは表示名だけ。 */
 const TRK_ENUM_VALUES = {
   trkTabName: ["full", "short", "icon"],
-  chartGen: ["1", "2"]          // 🎼 自動譜面の作り方（1＝旧方式、2＝新方式・既定。js/chart-gen.js）
+  chartGen: ["1", "2", "3", "4"], // 🎼 1・2は旧方式、3は新方式（既定）、4は遊びの文法（試験中。js/chart-gen.js）
+  mediaKeepLimit: ["1g", "5g", "unlimited"] // 🎵 保存棚の上限（ブラウザー側の容量上限は別に適用）
 };
 
 /* 🧭 チュートリアルのスタンプを読み込む（trk140）。既知の8つだけを残し、重複を除く。旧「曲を選ぶ」song は play へ引き継ぐ。 */
@@ -180,6 +190,8 @@ const settings = {
   language: pick(prefs.language, ["ja", "en", "zh", "ko"], guessLang()),
   skin: has(window.Trk.data.SKINS, prefs.skin) ? prefs.skin : (prefs.skin === "dark" ? "shadow" : prefs.skin === "light" ? "daylight" : "shadow"),
   ignoreStorageLimits: prefs.ignoreStorageLimits === true,   // 📦 容量の上限を無視（trk137。既定オフ。アプリが決めた上限だけを外す）
+  mediaKeepLimit: pick(prefs.mediaKeepLimit, TRK_ENUM_VALUES.mediaKeepLimit, "1g"), // 🎵 明示保存する曲・動画の合計上限
+  mediaKeepOverCapNotice1: prefs.mediaKeepOverCapNotice1 === 1 ? 1 : 0, // 既存保存棚が新上限を超える場合の一度限りの起動通知
   skinShelfOpen: prefs.skinShelfOpen !== false,      // 🖼 スキンの棚の開閉（30種＋カスタムでも設定画面が膨らまないように）
   skinShelfCat: pick(prefs.skinShelfCat, ["all","basic","miku","dark","light","grad","fun","access","life","custom"], "all"),
   layout: pick(prefs.layout ?? prefs.gameplayLayout, Object.keys(window.Trk.data.LAYOUTS), "classic"),
@@ -203,7 +215,7 @@ const settings = {
   artWallpaperBg: prefs.artWallpaperBg === true,                     // 🖼 静止画を全画面へ拡大（オフは譜面中は右上、他は原寸以下で動画枠中央）
   useStudyArtwork: prefs.useStudyArtwork === true,                   // 📚 書斎で割り当てた画像をTV／ゲーム背景にも使う（既定オフ）
   hideArtworkDuringChart: prefs.hideArtworkDuringChart === true,     // 🎼 譜面中は静止画を隠す（既定オフ）
-  chartGen: pick(prefs.chartGen, ["1", "2"], "2"),                        // 🎼 自動譜面の作り方（既定は新方式。旧方式「1」へ戻せば、旧譜面の記録もそのまま開ける）
+  chartGen: pick(prefs.chartGen, ["1", "2", "3", "4"], "3"),             // 🎼 自動譜面の作り方（既定は新方式。旧方式1・2は旧譜面の再生成用、4は試験中）
   seed: typeof prefs.seed === "string" ? prefs.seed.slice(0, 32) : "834271",   // 曲ごとの設定がない曲の初期値
   bpm: num(prefs.bpm, 60, 300, 138),
   offset: num(prefs.offset, -5000, 5000, 0),
@@ -286,6 +298,10 @@ const settings = {
   activePack: typeof prefs.activePack === "string" ? prefs.activePack : null,
   packPrev: cleanPackPrev(prefs.packPrev),                                    // 📦 パックを外したときに戻すための退避（custom.js。trk130）
   previewEnabled: prefs.previewEnabled !== false,
+  /* ⏮ 常に最初から再生する（trk193）。オンのときは選曲中のプレビューも、メディアプレーヤーの
+     「続きから」も使わず、いつも 0:00 から鳴らす。曲ごとのプレビュー開始位置（previewStart）や
+     保存した再生位置は消さない＝オフに戻せば今までどおり使える。初期オフ（今までの動きを変えない）。 */
+  mediaStartFromZero: prefs.mediaStartFromZero === true,
   libSort: pick(prefs.libSort, ["name", "plays", "recent", "best"], "name"),
   libProgress: pick(prefs.libProgress, ["all", "new", "progress", "done"], "all"),   // 📈 進捗フィルター：未聴/継続/完了で絞る（表示層だけ。trk174）
   shortMode: pick(prefs.shortMode, ["off", "90", "120", "180"], "off"),      // 🕹️ ショートプレイ（後半だけ遊ぶ・初期オフ）
@@ -304,9 +320,13 @@ const settings = {
   trkPlaylist: prefs.trkPlaylist !== false,                               // 🐔 trk's playlist（右端のタブ。チュートリアル後に自動追加。設定で非表示可）
   trkClassic: prefs.trkClassic !== false,                                // 🎻 trk classic（クラシック名盤。ゲームとは別枠で100曲。設定で非表示可）
   trkRemoved: cleanTrkRemoved(prefs.trkRemoved),                         // 🗑 消した trk の自動リスト（次の起動で作り直さない。🐔の設定の ♻ で戻す）
-  trkOstLegacyClean1: prefs.trkOstLegacyClean1 === 1 ? 1 : 0,           // trk189・一回限りの旧同梱OSTキー掃除
+  /* 🎓 trk's OST Vol.1（music-library へ分離。trk185〜189）。
+     settings は prefs 全体を自動コピーしないので、読み戻す字段はここで明示する。
+     trkOstSeenKeys は保存するだけで起動時に読み戻していなかったため、利用者が外した
+     公式パックの曲が再起動後に復活し得た（trk189 で読み戻しを追加）。 */
+  trkOstLegacyClean1: prefs.trkOstLegacyClean1 === 1 ? 1 : 0,             // 一回限りの掃除の印（trk189・削除予定 2027-01-16）
   trkOstSeenKeys: [...new Set((Array.isArray(prefs.trkOstSeenKeys) ? prefs.trkOstSeenKeys : [])
-    .filter(k => typeof k === "string" && /^(?:builtin:trk-ost-song:[\w-]{1,32}|pack:p[a-z0-9]+\/s0[1-5])$/.test(k)).slice(0, 100))],
+    .filter(k => typeof k === "string" && /^(?:builtin:trk-ost-song:[\w-]{1,32}|pack:p[a-z0-9]+\/s0[1-5])$/.test(k)).slice(0, 100))],   // 見た曲キー（重複・異形は除く）
   trkSortABC: prefs.trkSortABC === true,                                 // 🔤 trk フォルダ内をABC順で並べる（初期オフ）
   trkTabName: pick(prefs.trkTabName, TRK_ENUM_VALUES.trkTabName, "full"), // 🐔 タブの表示名（full=trk's playlist／short=trk's／icon=🐔 だけ）
   playlistOrder: (Array.isArray(prefs.playlistOrder) ? prefs.playlistOrder : []).map(x => String(x).slice(0, 48)).filter(Boolean).slice(0, 200), // ↕ 自由並べ替え（初期は作成順）
@@ -430,7 +450,7 @@ function resetVideoPrefs() {
   settings.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs); // user bookmarks survive a TV-only reset
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = true;
-  settings.tvPowerPrev = "color"; settings.previewEnabled = true;
+  settings.tvPowerPrev = "color"; settings.previewEnabled = true; settings.mediaStartFromZero = false;   /* ⏮ 常に最初から再生（trk193）も初期値へ */
   settings.tvSongWhilePlaying = false;   /* ◀▶ を演奏中も効かせる設定も一緒に戻す */
   /* tv-dock.js の「選曲中に映像を流す」も一緒に戻す */
   settings.tvMenuPreview = true; settings.tvMenuVideo = false;
@@ -508,7 +528,7 @@ function enterSafeMode() {
   settings.tvParamFavs = []; // safe mode starts with no saved TV adjustment pairs
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = false;
-  settings.previewEnabled = false;
+  settings.previewEnabled = false; settings.mediaStartFromZero = false;
   settings.tvMenuPreview = false; settings.tvMenuVideo = false;   // セーフモードは映像を流さない
   settings.tvSongWhilePlaying = false;                            // セーフモードでは演奏中の曲送りもしない
   settings.specOn = false; settings.specTv = false;               // 📊 スペクトラムも出さない（音の通り道を作らない）
@@ -545,7 +565,7 @@ function resetAllPrefs() {
   settings.trkPlaylist = true; // 🐔 trk's playlistも初期状態に戻す（再表示）
   settings.trkClassic = true;  // 🎻 trk classic も初期状態に戻す
   settings.trkRemoved = [];    // 🗑 消したリストの印も外す（プレイリストごと初期化するため）
-  settings.trkSortABC = false; settings.playlistOrder = []; settings.trkTabName = "full"; settings.chartGen = "2";
+  settings.trkSortABC = false; settings.playlistOrder = []; settings.trkTabName = "full"; settings.chartGen = "3"; settings.mediaKeepLimit = "1g";
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
   settings.catchNitroBonus = true; settings.catchBlastNext = false; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.mediaResumeRewind = 0; settings.mediaWakeLock = true; settings.mediaWave = true; settings.libProgress = "all"; settings.mediaLyricsOpen = false;
@@ -882,13 +902,15 @@ function downloadJSON(obj, name) { downloadBlob(new Blob([JSON.stringify(obj, nu
    opts（省略可）：
      sizeKey … レコードのサイズを入れているキー名。これを渡すと**そのキーに index を張り**、
                合計を「index のキー（数値）だけ」で数えられるようになる（レコード本体＝Blob を復元しない）。
-     sizeOf  … sizeKey が無い古いレコードからサイズを計算する関数（index への移行と、数え直しの両方で使う）。 */
+     sizeOf  … sizeKey が無い古いレコードからサイズを計算する関数（index への移行と、数え直しの両方で使う）。
+     idKey   … 主キーをレコード内に持つキー名（未指定は id）。putIf の置換判定に使う。 */
 const IDB_VERSION = 2;   /* v2＝サイズ index。v1→v2 の移行で size を持たない古いレコードへ書き戻す */
 function idbStore(dbName, store = "kv", opts = null) {
   const opt = opts || {};
   const sizeKey = opt.sizeKey || "";
   const sizeOf = typeof opt.sizeOf === "function" ? opt.sizeOf
     : (rec => (rec && Number.isFinite(rec[sizeKey]) ? rec[sizeKey] : 0));
+  const idKey = typeof opt.idKey === "string" && opt.idKey ? opt.idKey : "id";
   let p = null;
   const open = () => p || (p = new Promise((res, rej) => {
     const r = indexedDB.open(dbName, IDB_VERSION);
@@ -945,7 +967,7 @@ function idbStore(dbName, store = "kv", opts = null) {
       const list = req.result || [];
       cb({
         stored: list.reduce((a, r) => a + sizeOf(r), 0),
-        replacing: list.reduce((a, r) => a + (r && replacingId != null && r.id === replacingId ? sizeOf(r) : 0), 0),
+        replacing: list.reduce((a, r) => a + (r && replacingId != null && r[idKey] === replacingId ? sizeOf(r) : 0), 0),
         count: list.length, fast: false
       });
     };
@@ -981,11 +1003,11 @@ function idbStore(dbName, store = "kv", opts = null) {
       tx.onerror = tx.onabort = () => rej(tx.error || new Error("IndexedDB usage read failed"));
     })),
     /* 上限の判定と put を**同じ readwrite トランザクション内**で一体化する（複数タブ間の競合を防ぐ）。
-       predicate には全レコードではなく**集計値** { stored, replacing, count, fast } を渡す。 */
+       predicate には全レコードではなく**集計値** { stored, replacing, count, fast } を渡す。opts.idKey を使う場合はそのキーで置換分を差し引く。 */
     putIf: (k, v, predicate) => open().then(db => new Promise((res, rej) => {
       const tx = db.transaction(store, "readwrite"), os = tx.objectStore(store);
       let permitted = false, checkError = null;
-      readStats(os, v && v.id, stats => {
+      readStats(os, v && v[idKey], stats => {
         try {
           permitted = predicate(stats) === true;
           if (permitted) os.put(v, k);
@@ -1230,7 +1252,7 @@ function closeSettings() { if (phase === "title") { showScreen("selectScreen"); 
       🪶 軽量化のように core.js で決め打ちできるものは LITE_ENUM_VALUES へ、
       🐔 タブ表示名のように UI 側の定数と対になるものは TRK_ENUM_VALUES へ寄せる（読み込み順に左右されない）。 */
 const SETTING_ENUM_KEYS = ["specStyle", "specTheme", "mmdMotionKind", "fxPreset",
-  "liteMode", "liteFps", "liteMascot", "liteScale", "liteLibRows", "trkTabName", "chartGen", "midiSoundProfile", "midiMixProfile"];
+  "liteMode", "liteFps", "liteMascot", "liteScale", "liteLibRows", "trkTabName", "chartGen", "mediaKeepLimit", "midiSoundProfile", "midiMixProfile"];
 /* Importで弾いた理由（対応が変わるので、表示では区別して出す） */
 const SKIP_WHY = { enum:"prefSkipWhyId", type:"prefSkipWhyType", unknown:"prefSkipWhyUnknown", failed:"prefSkipWhyType" };
 function validImportedSettingEnum(key, value) {

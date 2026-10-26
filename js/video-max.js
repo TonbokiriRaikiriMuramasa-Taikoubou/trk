@@ -55,7 +55,7 @@ if (!videoEl) return;
 
 let root = null, canvas = null, ctx = null, stage = null;
 let topBar = null, titleNode = null, playNode = null, fsNode = null, closeNode = null;
-let noteNode = null, hintNode = null, seekNode = null;
+let noteNode = null, hintNode = null, seekNode = null;   /* ⏩ 長押しシークの中央表示（trk188） */
 let subsNode = null;   /* 💬 字幕オーバーレイ（trk169・映像は canvas 描画なので字幕は DOM で重ねる） */
 let raf = 0, isOn = false, playedByUs = false, idleTimer = 0;
 const watchers = new Set();
@@ -108,8 +108,11 @@ function seekBy(delta) {
     videoEl.currentTime = Math.max(0, Math.min(videoEl.duration, (videoEl.currentTime || 0) + delta));
   } catch (_) {}
 }
-/* 長押しは再生倍率を変えず、450ms後から250msごとにシークする。
-   pointerを一つだけ所有し、中断後の合成clickも再生/閉じるへ流さない。 */
+
+/* ---- ⏩ 全画面の左右長押しシーク（trk188）----
+   映像エリア（stage）の左半分＝巻き戻し、右半分＝早送り。負の playbackRate は使わず
+   currentTime の移動だけで行う。450ms 後に 2 秒/回で開始し、250ms ごとに、8 回（＝2 秒）
+   ごとに 2 秒/回ずつ加速して 20 秒/回で頭打ち。上部のボタンは長押し対象外。 */
 let holdPointer = null, holdStartX = 0, holdStartY = 0, holdDirection = 0;
 let holdTimer = 0, holdTicks = 0, suppressHoldClick = false;
 function holdSeekStep(ticks) {
@@ -122,7 +125,7 @@ function stopHoldSeek() {
 }
 function tickHoldSeek() {
   if (!isOn || holdPointer === null || document.hidden) { stopHoldSeek(); return; }
-  suppressHoldClick = true;
+  suppressHoldClick = true;   /* 離したときに出る click で画面を閉じさせない */
   const seconds = holdSeekStep(holdTicks++);
   seekBy(holdDirection * seconds);
   playedByUs = false;
@@ -132,7 +135,7 @@ function tickHoldSeek() {
 }
 function startHoldSeek(e) {
   if (!isOn) return;
-  if (holdPointer !== null) { stopHoldSeek(); suppressHoldClick = true; return; }
+  if (holdPointer !== null) { stopHoldSeek(); suppressHoldClick = true; return; }   /* 2本目：増やさない */
   suppressHoldClick = false;
   if (e.isPrimary === false || (e.button != null && e.button !== 0) || !Number.isFinite(videoEl.duration) || videoEl.duration <= 0) return;
   const rect = stage.getBoundingClientRect();
@@ -143,7 +146,7 @@ function startHoldSeek(e) {
 }
 function moveHoldSeek(e) {
   if (e.pointerId !== holdPointer) return;
-  if (Math.hypot(e.clientX - holdStartX, e.clientY - holdStartY) > 24) {
+  if (Math.hypot(e.clientX - holdStartX, e.clientY - holdStartY) > 24) {   /* 指を大きく動かしたら中止 */
     suppressHoldClick = true; stopHoldSeek();
   }
 }
@@ -229,7 +232,7 @@ function openMax() {
 function closeMax() {
   if (!isOn) return;
   isOn = false;
-  stopHoldSeek();
+  stopHoldSeek();   /* ⏩ 長押しシークも止める（trk188） */
   if (window.TrkFrameInterp) { try { window.TrkFrameInterp.detach("max"); } catch (_) {} }
   stopLoop();
   clearTimeout(idleTimer);
@@ -270,7 +273,7 @@ function build() {
   canvas = document.createElement("canvas"); canvas.className = "videoMaxCanvas";
   noteNode = core.el("p", "videoMaxNote hint", tr("videoMaxNoVideo")); noteNode.dataset.i18n = "videoMaxNoVideo";
   subsNode = core.el("div", "videoMaxSubs"); subsNode.hidden = true;   /* 💬 クリックは通す（pointer-events:none） */
-  seekNode = core.el("div", "videoMaxSeek"); seekNode.hidden = true;
+  seekNode = core.el("div", "videoMaxSeek"); seekNode.hidden = true;   /* ⏩ 長押しの方向と秒数（trk188） */
   stage.append(canvas, subsNode, noteNode);
   stage.append(seekNode);
 
@@ -280,12 +283,15 @@ function build() {
   document.body.append(root);
 
   ctx = canvas.getContext("2d");
+  /* ⏩ 左右長押しシーク（trk188）。pointer capture は stage へ単純に取らない：
+     短タップの click target が stage になり「黒いところをクリックで閉じる」と衝突し得るため、
+     window 側の pointerup / pointerleave で掃除する。 */
   stage.addEventListener("pointerdown", startHoldSeek);
   stage.addEventListener("pointermove", moveHoldSeek);
   stage.addEventListener("pointerleave", () => { if (holdPointer !== null) { suppressHoldClick = true; stopHoldSeek(); } });
   stage.addEventListener("contextmenu", e => e.preventDefault());
   stage.addEventListener("click", e => {
-    if (!suppressHoldClick || e.detail === 0) return;
+    if (!suppressHoldClick || e.detail === 0) return;   /* e.detail===0 はキーボード等の click なので通す */
     e.preventDefault(); e.stopImmediatePropagation();
   }, true);
   addEventListener("pointerup", endHoldSeek);
@@ -325,7 +331,7 @@ addEventListener("keydown", e => {
 }, true);
 
 /* ゲームが始まったら閉じる（判定や記録には影響しない） */
-on("songSelected", stopHoldSeek);
+on("songSelected", stopHoldSeek);   /* ⏩ 曲が替わったら長押しシークを止める（trk188） */
 on("phase", p => { if (p === "playing" && isOn) closeMax(); });
 on("language", () => { if (isOn || root) applyTexts(); });
 

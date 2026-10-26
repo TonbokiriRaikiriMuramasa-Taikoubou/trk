@@ -7,10 +7,17 @@
    再生速度：1.00x＝通常のハイスコア／1.05x以上＝速度ごとに別記録＋🏁最高クリア速度／1.00x未満＝練習扱い */
 "use strict";
 
+let runPaused = false, runLifeMode = "standard", runRadioUsed = false, runAutoUsed = false;
+
 /* ---------- 記録の対象外 ---------- */
 const rateKey = () => core.settings.rate !== 1 ? core.settings.rate.toFixed(2) : null;
 const rateUnranked = () => core.modsUnranked();                                   // ゆるめ判定・1.00x未満
-const runUnranked = () => core.practice || rateUnranked() || !!core.settings.autoPlay;  // AUTOも記録・称号の対象外
+const runUnranked = () => core.practice || rateUnranked() || !!core.settings.autoPlay || runAutoUsed;  // AUTOも記録・称号の対象外
+core.on("options", () => {
+  if (core.phase !== "playing") return;
+  if (core.settings.autoPlay) runAutoUsed = true;
+  if (core.settings.radio) runRadioUsed = true;
+});
 
 /* ---------- カウントダウン（3・2・1・GO!） ---------- */
 let leadIn = null, goAt = 0, pausedInLeadIn = false, autoplayBlocked = false;
@@ -74,6 +81,10 @@ function shortCleanup() { if (shortAn) { try { shortAn.disconnect(); } catch (_)
 
 /* ---------- 進行 ---------- */
 function resetRun() {
+  runPaused = false;
+  runLifeMode = core.settings.lives || "standard";
+  runRadioUsed = !!core.settings.radio;
+  runAutoUsed = !!core.settings.autoPlay;
   const rand = core.settings.modRandom ? core.mulberry32(core.hashString(`trkRand|${core.$("seed")?.value || 0}|${core.chartDiff}|${core.chart.length}`)) : null;
   core.chart.forEach(n => {
     n.judged = false; n.result = null;
@@ -130,6 +141,7 @@ async function startGame() {
 }
 function pauseGame() {
   if (core.phase !== "playing") return;
+  runPaused = true;
   pausedInLeadIn = !!(leadIn && !leadIn.resume);
   leadIn = null;
   core.setPhase("paused"); core.video.pause(); core.setStatus("pauseStatus", null); core.showScreen("pauseScreen");
@@ -170,13 +182,13 @@ function updateHud() {
 }
 const MODE_LABEL = { truck:"truckPlay", orbit:"orbitPlay", stage:"stagePlay", catch:"catchPlay" };
 const MODE_ICON = { truck:"🚚", orbit:"🪐", stage:"🎪", catch:"🚛" };
-const modeLabel = () => tr(MODE_LABEL[core.settings.playMode] || "manualPlay") + (core.settings.autoPlay ? " · " + tr("autoPlay") : "");
+const modeLabel = () => tr(MODE_LABEL[core.settings.playMode] || "manualPlay") + (core.settings.autoPlay || runAutoUsed ? " · " + tr("autoPlay") : "");
 const modeIcon = m => MODE_ICON[m] || "";
 const runMods = () => [...core.activeMods(), ...window.Trk.modes.lifeTags(),
   ...(core.settings.playMode === "catch" && core.settings.catchNitroBonus && core.stats.blastBonus > 0 ? ["NITRO×1.1"] : []),
   ...(core.settings.playMode === "stage" && core.settings.stageMirror && !core.settings.modMirror ? ["MIRROR"] : []),
   ...(core.settings.playMode === "stage" && core.settings.stageRandom === "random" && !core.settings.modRandom ? ["RANDOM"] : []),
-  ...(core.settings.autoPlay ? ["AUTO"] : [])];
+  ...(core.settings.autoPlay || runAutoUsed ? ["AUTO"] : [])];
 const showStar = () => core.settings.perfectStar !== false;
 
 /* ---------- リザルト ---------- */
@@ -481,7 +493,7 @@ function songRec(create) {
 const newSlot = () => ({ plays:0, best:null, ap:false, fc:false, bestPerfect:0 });
 function recordPlay(r) {
   const s = songRec(true); if (!s) return {};
-  const mode = core.settings.playMode, auto = !!core.settings.autoPlay;
+  const mode = core.settings.playMode, auto = !!(core.settings.autoPlay || runAutoUsed);
   const unranked = runUnranked() || !!r.failed;
   const ck = chartKeyOf(), rk = rateKey();
   const c = s.charts[ck] || (s.charts[ck] = { diff:core.chartDiff, level:core.currentLevel, ...(core.chartMode === "generated" ? { gen:String(core.settings.chartGen) } : {}), ...newSlot() });
@@ -491,7 +503,8 @@ function recordPlay(r) {
   if (r.short) slot = ((c.short ||= {})[r.short] ||= newSlot());   /* 🕹️ ショートプレイは独立の記録に */
   const entry = { t:Date.now(), diff:core.chartDiff, score:r.score, acc:+r.acc.toFixed(2), grade:r.grade,
     perfect:core.stats.perfect, star:core.stats.star || 0, good:core.stats.good, miss:core.stats.miss, crash:core.stats.crash || 0, maxCombo:core.stats.maxCombo,
-    mode, auto, short:r.short || 0, truck:mode === "truck", orbit:mode === "orbit", stage:mode === "stage", catch:mode === "catch",
+    mode, lifeMode:runLifeMode, radio:runRadioUsed, pauseUsed:runPaused,
+    auto, short:r.short || 0, truck:mode === "truck", orbit:mode === "orbit", stage:mode === "stage", catch:mode === "catch",
     failed:!!r.failed, rate:core.settings.rate, practice:core.practice || rateUnranked(), ap:r.ap, fc:r.fc, mods:runMods() };
   s.history.unshift(entry); if (s.history.length > HIST_MAX) s.history.length = HIST_MAX;
   s.lastPlayed = entry.t;
@@ -548,9 +561,10 @@ function renderRecords() {
   const charts = Object.entries(s.charts || {}).sort(([, a], [, b]) => window.Trk.data.DIFF_IDS.indexOf(a.diff) - window.Trk.data.DIFF_IDS.indexOf(b.diff));
   charts.forEach(([key, c]) => {
     const row = core.el("tr", key === ck ? "cur" : ""), badge = c.ap ? " ⭐" : c.fc ? " FC" : "";
+    const genName = String(c.gen) === "1" ? tr("recOldGen1") : String(c.gen) === "2" ? tr("recOldGen2") : String(c.gen) === "3" ? tr("recGen3") : String(c.gen) === "4" ? tr("recGen4") : "";
     const bestMods = c.best && Array.isArray(c.best.mods) && c.best.mods.length ? ` [${c.best.mods.join(" ")}]` : "";
     row.append(
-      core.el("td", "", `${tr(c.diff)} Lv.${c.level}${badge}${c.gen === "1" ? " · " + tr("recOldGen") : ""}`),
+      core.el("td", "", `${tr(c.diff)} Lv.${c.level}${badge}${genName ? " · " + genName : ""}`),
       core.el("td", "", c.best ? Number(c.best.score).toLocaleString() + bestMods : "—"),
       core.el("td", "", c.best ? Number(c.best.acc).toFixed(2) + "%" : "—"),
       core.el("td", "", String(c.bestPerfect || 0)),
@@ -576,8 +590,10 @@ function renderRecords() {
   sum.append(core.el("div", "hint", tr("recStarHint")));
   for (const h of s.history) {
     const icon = MODE_ICON[h.mode] || "";
-    const mark = (h.short ? `🕹️${h.short}s ` : "") + (h.failed ? tr("recFailed") : h.auto ? icon : h.ap ? `${icon}⭐` : h.fc ? `${icon} FC`.trim() : icon);
-    const mods = Array.isArray(h.mods) && h.mods.length ? h.mods.filter(m => m !== "AUTO").join(" ") : "";
+    const savedTitle = h.titleTier && h.lifeMode && h.title && !h.failed && !h.auto && !h.radio && !h.pauseUsed && !h.practice ? h.title : "";
+    const mark = (h.short ? `🕹️${h.short}s ` : "") + (h.failed ? tr("recFailed") : savedTitle || (h.auto ? icon : h.ap ? `${icon}⭐` : h.fc ? `${icon} FC`.trim() : icon));
+    const oldTitleMark = /^(?:🥁|🚚|🪐|🎪|🚛)(?:⚔|🛡|🐔)$/u;
+    const mods = Array.isArray(h.mods) && h.mods.length ? h.mods.filter(m => m !== "AUTO" && !oldTitleMark.test(m)).join(" ") : "";
     const star = h.star ? ` ✦${h.star}` : "", crash = h.crash ? ` 💥${h.crash}` : "";
     const tags = [mark, mods, h.auto ? tr("recAuto") : "", h.practice && !h.failed && !h.auto ? tr("recPractice") : ""].filter(Boolean).join(" · ");
     hist.append(core.el("div", "histRow" + (h.auto || h.failed ? " auto" : ""),
@@ -637,6 +653,7 @@ window.renderRecords = renderRecords;
 window.resumeGame = resumeGame;
 Object.defineProperty(window, "runShort", { configurable:true, get:() => runShort, set:v => { runShort = v; } });
 window.runUnranked = runUnranked;
+window.runWasPaused = () => runPaused;
 window.saveRecords = saveRecords;
 window.seekTo = seekTo;
 /* 後から読み込まれるファイルがこの名前を差し替える（window.showJudge の代入）。内部の呼び出しにも届くよう、アクセサで同じ束縛を指す */

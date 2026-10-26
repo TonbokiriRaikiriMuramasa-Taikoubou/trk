@@ -7,7 +7,7 @@ Object.assign(TEXT.ja, {
   secOptions:"🎯 プレイオプション",
   /* 体力モード */
   secLives:"❤ 体力モード", livesStandard:"Standard", livesKnight:"Knight", livesChicken:"trk!", livesNone:"Infinite",
-  livesHint:"Standard＝曲のノーツ数に合わせて初期体力15〜35・コンボ回復8〜22・最大25〜60でゆったり完走を目指せます。Knight＝ノーツ数に応じた初期体力5〜10・コンボ回復20〜45・最大7〜14の引き締まったハードサバイバル（クリアでKNIGHT称号）。trk!＝1ミスで即終了。Infinite＝ミスしても最後まで遊べます。AUTOには体力はありません。称号はどの体力モードでも取れます。",
+  livesHint:"Standard＝曲のノーツ数に合わせて初期体力15〜35・コンボ回復8〜22・最大25〜60でゆったり完走を目指せます（クリアでモードアイコン称号）。Knight＝ノーツ数に応じた初期体力5〜10・コンボ回復20〜45・最大7〜14のハードサバイバル（クリアでモードアイコン＋🛡）。trk!＝1ミスで即終了（クリアでモードアイコン＋🐔）。Infinite＝ミスしても最後まで遊べます（称号なし）。AUTO・📻ラジオ・一時停止したプレイ・練習／未ランク扱いは称号対象外です。",
   lifeNumber:"体力の数字も表示する", lifeHeal:"❤ +1", lifeSkinLabel:"体力の表示スタイル",
   lifeSkinHeart:"❤ ハート", lifeSkinBar:"━ シンプルゲージ", lifeSkinSegments:"▰ セグメント", lifeSkinBattery:"▣ バッテリー",
   lifeSkinShield:"🛡 シールド", lifeSkinMode:"モードアイコン", lifeSkinCustom:"カスタム絵文字", lifeEmojiLabel:"表示する絵文字",
@@ -61,7 +61,7 @@ Object.assign(TEXT.ja, {
 Object.assign(TEXT.en, {
   secOptions:"🎯 Play options",
   secLives:"❤ Life mode", livesStandard:"Standard", livesKnight:"Knight", livesChicken:"trk!", livesNone:"Infinite",
-  livesHint:"Standard: Dynamically scaled by chart note count (15–35 start, +1 every 8–22 combo, max 25–60) for balanced survival on any song length. Knight: Hardcore survival scaled by note count (5–10 start, +1 every 20–45 combo, max 7–14; awards KNIGHT badge). trk!: Sudden death (1 miss). Infinite: Play to the end no matter what. AUTO has no lives. Titles can be earned in any mode.",
+  livesHint:"Standard: Dynamically scaled by chart note count (15–35 start, +1 every 8–22 combo, max 25–60); a clear earns the mode icon. Knight: Hardcore survival scaled by note count (5–10 start, +1 every 20–45 combo, max 7–14); a clear earns the mode icon + 🛡. trk!: Sudden death (1 miss); a clear earns the mode icon + 🐔. Infinite: Play to the end no matter what (no title). AUTO, 📻 Radio, any run that was paused, and practice/unranked runs do not earn titles.",
   lifeNumber:"Also show the life number", lifeHeal:"❤ +1", lifeSkinLabel:"Life display style",
   lifeSkinHeart:"❤ Hearts", lifeSkinBar:"━ Simple bar", lifeSkinSegments:"▰ Segments", lifeSkinBattery:"▣ Battery",
   lifeSkinShield:"🛡 Shield", lifeSkinMode:"Mode icon", lifeSkinCustom:"Custom emoji", lifeEmojiLabel:"Display emoji",
@@ -108,7 +108,7 @@ Object.assign(TEXT.en, {
 Object.assign(TEXT.zh, {
   secOptions:"🎯 游玩选项",
   secLives:"❤ 体力模式", livesStandard:"标准", livesKnight:"骑士", livesChicken:"trk!", livesNone:"无限",
-  livesHint:"Standard（标准）：根据谱面音符数动态缩放（初始15〜35、每8〜22连击+1、上限25〜60），短曲长曲均能平稳完走。Knight（骑士）：根据音符数缩放的硬核生存挑战（初始5〜10、每20〜45连击+1、上限7〜14，通关获得KNIGHT称号）。trk!：1次失误即结束。无限：失误也能玩到最后。AUTO没有体力。任何体力模式都能获得称号。",
+  livesHint:"Standard（标准）：根据谱面音符数动态缩放（初始15〜35、每8〜22连击+1、上限25〜60），通关获得对应模式图标称号。Knight（骑士）：根据音符数缩放的硬核生存挑战（初始5〜10、每20〜45连击+1、上限7〜14），通关获得模式图标＋🛡。trk!：1次失误即结束，通关获得模式图标＋🐔。Infinite（无限）：失误也能玩到最后（不获得称号）。AUTO、📻电台、曾暂停的游玩以及练习／未排名的游玩均不能获得称号。",
   lifeNumber:"同时显示体力数字", lifeHeal:"❤ +1", lifeSkinLabel:"体力显示样式",
   lifeSkinHeart:"❤ 爱心", lifeSkinBar:"━ 简洁进度条", lifeSkinSegments:"▰ 分段", lifeSkinBattery:"▣ 电池",
   lifeSkinShield:"🛡 盾牌", lifeSkinMode:"模式图标", lifeSkinCustom:"自定义表情", lifeEmojiLabel:"显示的表情",
@@ -155,7 +155,7 @@ Object.assign(TEXT.zh, {
 Object.assign(TEXT.ko, {
   secOptions:"🎯 플레이 옵션",
   secLives:"❤ 체력 모드", livesStandard:"스탠다드", livesKnight:"나이트", livesChicken:"trk!", livesNone:"무한",
-  livesHint:"Standard: 악보 노트 수에 맞춰 초기 체력 15~35, 콤보 회복 8~22, 최대 25~60으로 자동 조절되어 안정적으로 완주를 노릴 수 있습니다. Knight: 노트 수에 맞춘 하드 서바이벌 (초기 5~10, 콤보 회복 20~45, 최대 7~14, 클리어 시 KNIGHT 칭호). trk!: 1미스 시 즉시 종료. 무한: 미스해도 끝까지 플레이. AUTO에는 체력이 없습니다. 모든 모드에서 칭호를 받을 수 있습니다.",
+  livesHint:"Standard: 악보 노트 수에 맞춰 초기 체력 15~35, 콤보 회복 8~22, 최대 25~60으로 자동 조절되어 안정적으로 완주를 노릴 수 있습니다 (클리어 시 모드 아이콘 칭호). Knight: 노트 수에 맞춘 하드 서바이벌 (초기 5~10, 콤보 회복 20~45, 최대 7~14; 클리어 시 모드 아이콘+🛡). trk!: 1미스 시 즉시 종료 (클리어 시 모드 아이콘+🐔). Infinite: 미스해도 끝까지 플레이 (칭호 없음). AUTO, 📻 라디오, 한 번이라도 일시정지한 플레이, 연습/비랭킹 플레이에서는 칭호를 얻을 수 없습니다.",
   lifeNumber:"체력 숫자도 표시", lifeHeal:"❤ +1", lifeSkinLabel:"체력 표시 스타일",
   lifeSkinHeart:"❤ 하트", lifeSkinBar:"━ 심플 게이지", lifeSkinSegments:"▰ 분할 게이지", lifeSkinBattery:"▣ 배터리",
   lifeSkinShield:"🛡 방패", lifeSkinMode:"모드 아이콘", lifeSkinCustom:"사용자 지정 이모지", lifeEmojiLabel:"표시할 이모지",

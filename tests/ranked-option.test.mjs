@@ -13,6 +13,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const coreSource = fs.readFileSync(path.join(root, "js/core.js"), "utf8");
 const gameSource = fs.readFileSync(path.join(root, "js/game.js"), "utf8");
 const modsLine = coreSource.match(/^const modsUnranked = .*$/m)[0];
+/* trk19x: 記録の判定は「その回にAUTOを使ったか」も見る（runAutoUsed）。宣言は記録ブロックの外にある。 */
+const runStateLine = gameSource.match(/^let runPaused = .*$/m)[0];
 const a = gameSource.indexOf("const rateKey = ");
 const b = gameSource.indexOf("function slotCell(");
 assert.ok(a > 0 && b > a, "game.js record block must be found");
@@ -31,6 +33,7 @@ function run({ judge = "standard", rate = 1, autoPlay = false, score = 1000, pre
     modsUnranked: null,
     activeMods: () => [],
     emit() {},
+    on() { return () => {}; },
   };
   const context = vm.createContext({
     core, settings: core.settings,
@@ -38,7 +41,7 @@ function run({ judge = "standard", rate = 1, autoPlay = false, score = 1000, pre
     console, renderRecords() {}, window: { Trk: { modes: { lifeTags: () => [] } } },
   });
   vm.runInContext(`${modsLine}\ncore.modsUnranked = modsUnranked;`, context);
-  vm.runInContext(`${recordBlock}\nglobalThis.recordPlay = recordPlay; globalThis.songRec = songRec; globalThis.runUnranked = runUnranked;`, context);
+  vm.runInContext(`${runStateLine}\n${recordBlock}\nglobalThis.recordPlay = recordPlay; globalThis.songRec = songRec; globalThis.runUnranked = runUnranked;`, context);
   if (prev !== null) {
     // 前回のプレイを先に記録しておく（同じ譜面・同じ設定）
     core.settings.judge = prevJudge;

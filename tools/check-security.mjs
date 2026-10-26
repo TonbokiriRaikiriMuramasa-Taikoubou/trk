@@ -323,7 +323,7 @@ const occurrences = (text, re) => [...text.matchAll(re)];
   const idbIndexed = core.includes("const IDB_VERSION = 2") &&
     core.includes("os.createIndex(sizeKey, sizeKey)") &&
     core.includes("readStats(os, null, res)") &&
-    core.includes("readStats(os, v && v.id, stats =>") &&
+    core.includes("readStats(os, v && v[idKey], stats =>") &&
     custom.includes('idbStore("shadow_taiko_packs", "packs", { sizeKey:"size", sizeOf:packRecordBytes })');
   rule(idbIndexed, "pack totals come from a size index (no blob deserialization) instead of reading every record");
 

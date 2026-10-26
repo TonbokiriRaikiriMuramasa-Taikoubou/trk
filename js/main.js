@@ -322,7 +322,8 @@ core.$("bpm").addEventListener("change", () => {
   if (core.videoReady && core.chartMode === "generated") window.Trk.media.buildChart();
 });
 core.$("chartGen").addEventListener("change", () => {
-  core.settings.chartGen = core.$("chartGen").value === "2" ? "2" : "1"; core.saveUserPrefs();   // 譜面の作り方は全曲共通の設定
+  const value = core.$("chartGen").value;
+  core.settings.chartGen = ["1", "2", "3", "4"].includes(value) ? value : "3"; core.saveUserPrefs();   // 譜面の作り方は全曲共通の設定
   if (core.videoReady && core.chartMode === "generated") window.Trk.media.buildChart();
 });
 core.$("offset").addEventListener("change", () => {
@@ -566,7 +567,7 @@ packsReady.then(() => window.Trk.library.initLibrary()).catch(e => console.error
 /* PWA：オフラインでも開けるようにする（HTTPS か localhost のときだけ）。
    キャッシュの整理は sw.js が trk- で始まる名前だけを消すので、ほかのサイトに影響しません。 */
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
-  navigator.serviceWorker.register("./sw.js", { scope: "./" })
+  navigator.serviceWorker.register("./sw.js", { scope: "./", updateViaCache:"none" })
     .catch(() => { /* オフライン用のキャッシュが無くても、ゲームはそのまま遊べます */ });
 }
 /* ✅ main.js 完了 */

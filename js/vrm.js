@@ -27,7 +27,8 @@ let libsP = null, animP = null, L = null, A = null;
 function libs() {
   if (!libsP) libsP = Promise.all([import("three"), import("three/addons/loaders/GLTFLoader.js"), import("@pixiv/three-vrm")])
     .then(([THREE, G, V]) => ({ THREE, GLTFLoader:G.GLTFLoader, VRMLoaderPlugin:V.VRMLoaderPlugin, VRMUtils:V.VRMUtils }))
-    .catch(e => { libsP = null; throw e; });
+    /* trk190：3D部品を同梱しない軽量配布（slim-min）では「VRMを読み込めませんでした」ではなく理由を出す */
+    .catch(e => { libsP = null; if (e && !e.key) { try { e.key = "vrmNoEngine"; } catch (_) {} } throw e; });
   return libsP;
 }
 function animLibs() {

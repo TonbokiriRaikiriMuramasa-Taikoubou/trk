@@ -391,9 +391,13 @@ async function loadGhostSongs(){
   }catch(e){ ghostSongs=[]; }
   return ghostSongs;
 }
+/* 🗂 trk201：参照（📄）を残すのは「曲ファイルを追加したもの」だけ。
+   フォルダーの曲は**フォルダー自体**を覚えているので、起動のたびに最大3000件を1件ずつ
+   保存し直すのは重いだけで、フォルダーを替えたときに古い参照が残る原因にもなっていた。 */
 async function rememberSongRef(it){
   if(!it||!it.key) return;
   if(it.source==="builtin"||it.source==="pack") return;
+  if(it.source==="folder") return;   /* フォルダー曲は保存しない（trk201） */
   if(it.ghost) return;
   const ref = { key: it.key, name: (it.file&&it.file.name)||it.base||it.title||"", base: it.base||core.baseName((it.file&&it.file.name)||it.title||""), size: Number(it.size||(it.file&&it.file.size)||0)||0, video: !!it.video, dir: it.dir||"", addedAt: it.addedAt||Date.now(), source: it.source||"file" };
   try{ await songRefDB.put(ref.key, ref); }catch(_){}
@@ -405,6 +409,21 @@ async function rememberSongRef(it){
 async function rememberRefsForList(list){
   if(!Array.isArray(list)||!list.length) return;
   for(const it of list) await rememberSongRef(it);
+}
+/* 🗂 trk201：以前の版が保存した「フォルダー曲の参照」を掃除する（一回限り・docs/MIGRATIONS.md）。
+   消すのは参照のレコードだけで、曲・プレイリスト・保存棚には触らない。
+   戻り値＝消した件数（0 なら何もしなかった）。 */
+async function pruneFolderRefsOnce(force){
+  try{
+    const s = core.settings;
+    if(!force && s.trkFolderRefsPrune1 === 1) return 0;
+    const recs = await songRefDB.all();
+    const stale = (Array.isArray(recs)?recs:[]).filter(r => r && r.source === "folder");
+    for(const r of stale){ try{ await songRefDB.del(r.key); }catch(_){} }
+    if(stale.length){ ghostSongs = ghostSongs.filter(g => g.source !== "folder"); }
+    if(!force){ s.trkFolderRefsPrune1 = 1; core.saveUserPrefs(); }
+    return stale.length;
+  }catch(_){ return 0; }
 }
 async function clearGhostSongs(){
   try{ const keys = await songRefDB.keys(); for(const k of keys) await songRefDB.del(k); }catch(_){}
@@ -4654,7 +4673,8 @@ function probeVideoFile(file) {
     try { url = URL.createObjectURL(hinted); el.src = url; el.load(); } catch (_) { finish(false); }
   });
 }
-async function addVideoFiles(list) {
+async function addVideoFiles(list, opts) {
+  const options = opts || {};
   const files = Array.from(list || []).filter(f => f && (VIDEO_EXT.includes(core.extOf(f.name)) || /^video\//i.test(f.type || "") || MEDIA_EXT.includes(core.extOf(f.name))));
   if (!files.length) return;
   let first = null;
@@ -4683,7 +4703,7 @@ async function addVideoFiles(list) {
   renderLib();
   if (!first) return;
   selectSong(first);
-  if (!first.video) return;
+  if (!first.video || options.openViewer === false) return;
   /* 映像の準備ができたら、そのまま全画面ビューアを開く（見たかった映画をすぐ見られるように） */
   let waited = 0;
   const openWhenReady = () => {
@@ -4742,8 +4762,9 @@ function ingestFolder(list, dirName, shared, skipped) {
   /* 📤 共有のときは「何曲きたか」と「対象外が何件あったか」を両方出す（変なファイルも見て分かるように） */
   if (shared) core.setStatus("libStatus", "libShareFound", { dir:dirName || "", n:folderSongs.length, skip:skipped || 0 });
   else core.setStatus("libStatus", folderSongs.length ? "libFound" : "libEmpty", { n:folderSongs.length, dir:dirName || "" });
-  // 📄フォルダの参照も別枠で永続化
-  rememberRefsForList(folderSongs);
+  /* 🗂 trk201：フォルダーの曲の参照は保存しない（フォルダー自体を覚えている）。
+     以前の版が残したフォルダー曲の参照があれば、ここで掃除する。 */
+  void pruneFolderRefsOnce();
   renderLib();
 }
 /* フォルダの中を歩く。読み込んだ曲数は onProgress に出す（大きなフォルダでも待てるように） */
@@ -5255,6 +5276,8 @@ async function initLibrary() {
   syncShareUI();
   // 📄ゴースト（参照のみ）を復元 — 本体が無くても“あったこと”を表示
   try{ await loadGhostSongs(); }catch(_){}
+  /* 🗂 trk201：以前の版が保存した「フォルダー曲の参照」を一度だけ掃除する（起動が軽くなる） */
+  try{ await pruneFolderRefsOnce(); }catch(_){}
   try{ setupGhostPanel(); syncGhostUI(); }catch(_){}
   // 🐔 trk's playlist — チュートリアル済みなら初回だけ自動で1タブ追加（設定で非表示なら作らない・トーストなし）
   if (TRK_AUTO_GAME_CLASSIC && core.settings.tutorialDone && core.settings.trkPlaylist !== false) {
@@ -5320,7 +5343,7 @@ window.Trk = window.Trk || {};
 core.on("phase", () => core.emit("nowPlaying", nowPlaying()));
 core.on("mediaReady", () => core.emit("nowPlaying", nowPlaying()));
 
-window.Trk.library = Object.assign(window.Trk.library || {}, { LIB_SHOW, MEDIA_EXT, VIDEO_EXT, addSongFiles, addVideoFiles, allSongs, bannerRandomBtn, bannerVolTip, ensureTrkDistributionPlaylists, ensureTrkOstPlaylist, trkOstPlaylistId: TRK_OST_ID, trkRestoreRemoved, initLibrary, nextSong, noteMediaPlayed, onLongPress, setStartFromZero, syncStartZeroInputs, startBarOpen, restoreFolderAccess, folderReadPlan, plToast, prevSong, previewStartFor, refreshPackSongs, saveSongPrefs, selectSong, setAddonSongs, songInfo, songDisplayTitle, songDisplayMeta, songTagsOf, loadSongTags, srcLabel, nowPlaying, startPreview, trySongChart, plTitleKeys, plSongMatchKeys, plWishTitleKeys, plIsClassicalTitle, plClassicalTitleKey, plDecoratedTitleKeys, plWishDecoratedKeys, plHasVersionTag, plWishMediaMatches });
+window.Trk.library = Object.assign(window.Trk.library || {}, { LIB_SHOW, MEDIA_EXT, VIDEO_EXT, addSongFiles, addVideoFiles, allSongs, bannerRandomBtn, bannerVolTip, ensureTrkDistributionPlaylists, ensureTrkOstPlaylist, trkOstPlaylistId: TRK_OST_ID, trkRestoreRemoved, initLibrary, nextSong, noteMediaPlayed, onLongPress, setStartFromZero, syncStartZeroInputs, startBarOpen, restoreFolderAccess, folderReadPlan, plToast, prevSong, previewStartFor, pruneFolderRefsOnce, refreshPackSongs, saveSongPrefs, selectSong, setAddonSongs, songInfo, songDisplayTitle, songDisplayMeta, songTagsOf, loadSongTags, srcLabel, nowPlaying, startPreview, trySongChart, plTitleKeys, plSongMatchKeys, plWishTitleKeys, plIsClassicalTitle, plClassicalTitleKey, plDecoratedTitleKeys, plWishDecoratedKeys, plHasVersionTag, plWishMediaMatches });
 Object.defineProperty(window.Trk.library, "addonSongs", { configurable:true, get:() => addonSongs, set:v => { addonSongs = v; } });
 Object.defineProperty(window.Trk.library, "libView", { configurable:true, get:() => libView, set:v => { libView = v; } });
 Object.defineProperty(window.Trk.library, "renderBanner", { configurable:true, get:() => renderBanner, set:v => { renderBanner = v; } });

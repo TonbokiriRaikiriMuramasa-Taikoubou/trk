@@ -581,7 +581,17 @@ addEventListener("drop", async e => {
   if (!files.length || core.phase !== "title") return;
   const json = files.find(f => /\.json$/i.test(f.name) || f.type === "application/json");
   if (json) { await window.Trk.media.importChartFile(json); return; }
-  window.Trk.library.addSongFiles(files);
+  /* 🎬 trk203：画面にドロップした動画も「🎬 動画を読み込む」と同じ道を通す。
+     いままでは全部 addSongFiles に渡していて、映像の下調べ（videoWidth）を通らず
+     .mkv/.mpg が音として扱われていた。映像らしいものだけ addVideoFiles へ分ける。 */
+  const lib = window.Trk.library;
+  const videoExts = Array.isArray(lib.VIDEO_EXT) ? lib.VIDEO_EXT : [];
+  const isVideoish = f => /^video\//i.test((f && f.type) || "") || videoExts.includes(core.extOf((f && f.name) || ""));
+  const vids = files.filter(isVideoish);
+  const songs = files.filter(f => !isVideoish(f));
+  if (songs.length) await lib.addSongFiles(songs);
+  /* ドロップでは全画面ビューアを勝手に開かない（一覧に足すだけ。開くのは 🎬 ボタンから） */
+  if (vids.length) await lib.addVideoFiles(vids, { openViewer:false });
 });
 
 /* ============ 起動 ============ */

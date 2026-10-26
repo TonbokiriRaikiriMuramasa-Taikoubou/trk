@@ -1363,7 +1363,11 @@ function renderMedia() {
     const statusKey = reverseLoading ? "mediaReverseLoading" : reverseActive ? "mediaReverse" : core.videoReady && core.currentSong ? (core.video.ended ? "mediaEnded" : core.video.paused ? "mediaPaused" : "mediaNow") : "mediaNoTrack";
     /* 🎞 trk196：曲は選べたが読み込めなかったときは「曲がありません」ではなく、その理由を出す */
     const failure = !core.videoReady && core.currentSong && core.mediaLoadFailure;
+    /* 🎞 trk200：映像は出るが音が出ない入れ物（AC3・DTS の .mkv など）は、止まっているあいだ理由を出す。
+       再生中は「再生中」のままにして、状態行を理由で埋めない（音が出ないことには変わりがないが、操作の邪魔をしない） */
+    const silent = core.videoReady && core.video.paused && core.mediaLoadWarning;
     if (failure && failure.known) { statusNode.textContent = tr(failure.key, failure.vars); statusNode.dataset.i18n = ""; }
+    else if (silent) { statusNode.textContent = tr(silent.key, silent.vars); statusNode.dataset.i18n = ""; }
     else { statusNode.textContent = tr(statusKey); statusNode.dataset.i18n = ""; }
   }
   renderLoopUI();

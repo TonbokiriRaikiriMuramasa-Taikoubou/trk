@@ -139,5 +139,6 @@ test("trk199: the worker cache is bumped so the fixed files are served", () => {
   const swSrc = fs.readFileSync(`${ROOT}/sw.js`, "utf8");
   const m = swSrc.match(/^const CACHE = "trk-v([\d.]+)-trk(\d+)";$/m);
   assert.ok(m, "版数つきの名前を保つ");
-  assert.equal(m[2], "199", "trk198 から割る（古いキャッシュを配り続けない）");
+  /* 版数は固定しない（次のリリースで割れるため）。trk198 より新しい番号であることだけ見る */
+  assert.ok(Number(m[2]) > 198, `trk198 より新しい番号で割る（今は ${m[2]}）`);
 });

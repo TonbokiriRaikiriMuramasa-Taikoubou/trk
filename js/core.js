@@ -329,6 +329,7 @@ const settings = {
      trkOstSeenKeys は保存するだけで起動時に読み戻していなかったため、利用者が外した
      公式パックの曲が再起動後に復活し得た（trk189 で読み戻しを追加）。 */
   trkOstLegacyClean1: prefs.trkOstLegacyClean1 === 1 ? 1 : 0,             // 一回限りの掃除の印（trk189・削除予定 2027-01-16）
+  trkFolderRefsPrune1: prefs.trkFolderRefsPrune1 === 1 ? 1 : 0,           // 🗂 フォルダー曲の参照を一度だけ掃除した印（trk201・削除予定 2027-01-27）
   trkOstSeenKeys: [...new Set((Array.isArray(prefs.trkOstSeenKeys) ? prefs.trkOstSeenKeys : [])
     .filter(k => typeof k === "string" && /^(?:builtin:trk-ost-song:[\w-]{1,32}|pack:p[a-z0-9]+\/s0[1-5])$/.test(k)).slice(0, 100))],   // 見た曲キー（重複・異形は除く）
   trkSortABC: prefs.trkSortABC === true,                                 // 🔤 trk フォルダ内をABC順で並べる（初期オフ）
@@ -378,7 +379,30 @@ const settings = {
   frameInterp: pick(prefs.frameInterp, ["off", "blend", "flow"], "off"),
   frameInterpStrength: num(prefs.frameInterpStrength, 0, 1, .85)
 };
-function saveUserPrefs() { try { localStorage.setItem(PREFS_KEY, JSON.stringify(settings)); } catch (_) {} }
+function saveUserPrefs() { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefsForSave())); } catch (_) {} }
+/* 🛟 trk202：セーフモードが安全側に倒した値を、保存に持ち込まない。
+   いまは ?safe=1 で入っても、そのあと何か設定を保存すると folderAutoRead・mediaStartFromZero・
+   previewEnabled が false のまま残り、通常の URL で開き直しても戻らなかった（1.0.7 レビューの指摘）。
+   倒す前の値を覚えておき、保存のときだけ元の値に差し替える。セーフモード自体は URL の ?safe=1 の
+   あいだだけ続くので、通常の URL で開き直せば元どおりになる。 */
+function prefsForSave() {
+  if (!safeModeOn || !safePrevValues) return settings;
+  const out = Object.assign({}, settings);
+  for (const k of SAFE_SESSION_KEYS) if (k in safePrevValues) out[k] = safePrevValues[k];
+  return out;
+}
+/* セーフモードのまま再読み込みする（URL から ?safe=1 が消えているので付け直す） */
+function safeModeHref() {
+  try {
+    const url = new URL(location.href);
+    url.searchParams.set("safe", "1");
+    url.hash = "";
+    return url.href;
+  } catch (_) { return "?safe=1"; }
+}
+function reloadInSafeMode() {
+  try { location.replace(safeModeHref()); } catch (_) { try { location.reload(); } catch (__) {} }
+}
 function rememberMusicVolume(value) {
   const volume = Number(value);
   if (Number.isFinite(volume) && volume > 0) settings.musicVolumeRestore = Math.min(1, Math.max(.01, volume));
@@ -524,8 +548,18 @@ function resetAmpPrefs() {
    URLは処理のあと掃除されるので、印を残しておく必要があります。 */
 let safeModeOn = false;
 window.TrkSafeMode = () => safeModeOn;
+/* 🛟 trk202：セーフモードが倒す「自動で何かをする」4つの設定。倒す前の値を覚えておき、
+   保存のときだけ元の値に戻す（保存に持ち込まない＝通常のURLで開き直せば元どおり）。 */
+const SAFE_SESSION_KEYS = ["previewEnabled", "mediaStartFromZero", "folderAutoRead", "libKeepShared"];
+let safePrevValues = null;
+function rememberSafePrev() {
+  if (safePrevValues) return;
+  safePrevValues = {};
+  for (const k of SAFE_SESSION_KEYS) if (k in settings) safePrevValues[k] = settings[k];
+}
 function enterSafeMode() {
   safeModeOn = true;
+  rememberSafePrev();   /* 🛟 倒す前の値（保存に持ち込まないために覚えておく・trk202） */
   settings.videoStyle = "off";
   settings.videoZoom = 1; settings.castPolicy = "off"; settings.backgroundPolicy = "off"; settings.fxAntenna = false;
   settings.bgDim = 0; settings.bgBlur = 0;
@@ -706,7 +740,7 @@ function parseHashParams(hash) {
         if (doExport) exportPrefs(doExport);
         if (!didReset) return;
         const msg = {
-          safe: "🛟 セーフモード：映像OFF・ぼかし無し・TVを初期化しました（?safe）",
+          safe: tr("safeModeNotice"),
           tv: "📺 映像・TV設定を初期化しました（?reset=tv）",
           audio: "🔊 音量・SE設定を初期化しました（?reset=audio）",
           notes: "🎨 ノーツ設定を初期化しました（?reset=notes）",
@@ -718,7 +752,7 @@ function parseHashParams(hash) {
         // 既存のcaptionシステムがあれば使う、なければalert風div
         if (typeof caption !== "undefined") { caption = { text: msg, t: performance.now() }; }
         const b = document.createElement("div");
-        b.textContent = msg + " — ページを再読み込みせずに復旧しました。URLパラメータは自動で削除されました。";
+        b.textContent = msg + (didReset === "safe" ? "" : " — ページを再読み込みせずに復旧しました。URLパラメータは自動で削除されました。");
         b.style.cssText = "position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:99999;background:#111;color:#fff;border:2px solid #0f0;padding:10px 16px;border-radius:10px;max-width:90vw;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.6)";
         document.body.appendChild(b);
         setTimeout(()=> b.remove(), 6000);
@@ -733,7 +767,8 @@ function parseHashParams(hash) {
         return;
       }
       if (k==="safe") enterSafeMode(); else if (["tv","video"].includes(k)) resetVideoPrefs(); else if (["audio","sound"].includes(k)) resetAudioPrefs(); else if (k==="notes") resetNotesPrefs(); else if (["lite","light"].includes(k)) resetLitePrefs(); else if (["keys","key","pad","controller","input"].includes(k)) resetKeysPrefs(); else if (["amp","rack"].includes(k)) resetAmpPrefs(); else resetVideoPrefs();
-      saveUserPrefs(); location.reload();
+      saveUserPrefs();
+      if (k==="safe") reloadInSafeMode(); else location.reload();
     };
     window.trkExport = (k="all") => exportPrefs(String(k).toLowerCase());
   } catch(e) { console.error("url command failed", e); }
@@ -1338,8 +1373,8 @@ function renderStoragePersist(state) {
   };
   bind("emergencySafeBtn", () => {
     enterSafeMode(); saveUserPrefs();
-    setSt(() => "🛟 セーフモードにしました。映像OFF・ぼかし無し・TV初期化。ページを再読み込みします…");
-    setTimeout(()=> location.reload(), 800);
+    setSt(() => "🛟 セーフモードにしました。映像OFF・ぼかし無し・TV初期化。ページを再読み込みします…（保存した設定は書き換えません）");
+    setTimeout(()=> reloadInSafeMode(), 800);
   });
   bind("emergencyTvResetBtn", () => {
     resetVideoPrefs(); saveUserPrefs();
@@ -1445,7 +1480,7 @@ function renderStoragePersist(state) {
         if (clicks >= 5) {
           clicks = 0;
           if (confirm("🛟 セーフモードに入りますか？\n映像OFF・ぼかし0・TV初期化で操作可能にします。\n\n?safe=1 と同じ効果です。")) {
-            enterSafeMode(); saveUserPrefs(); location.reload();
+            enterSafeMode(); saveUserPrefs(); reloadInSafeMode();
           }
         }
       });
@@ -1455,7 +1490,7 @@ function renderStoragePersist(state) {
       if (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === "s" || e.key === "?" || e.key === "/")) {
         e.preventDefault();
         if (confirm("🛟 セーフモードに入りますか？ (Ctrl+Shift+S)")) {
-          enterSafeMode(); saveUserPrefs(); location.reload();
+          enterSafeMode(); saveUserPrefs(); reloadInSafeMode();
         }
       }
       // Esc を3秒長押しでセーフモード（画面が真っ暗でボタン押せない時用）
@@ -1465,7 +1500,7 @@ function renderStoragePersist(state) {
         if (window._escHold > 60) { // 約1秒以上押しっぱなしを想定、keydownリピートでカウント
           window._escHold = 0;
           if (confirm("🛟 Esc長押しを検出：セーフモードに入りますか？")) {
-            enterSafeMode(); saveUserPrefs(); location.reload();
+            enterSafeMode(); saveUserPrefs(); reloadInSafeMode();
           }
         }
         setTimeout(()=>{ window._escHold = Math.max(0, (window._escHold||0)-1); }, 100);
@@ -1567,7 +1602,7 @@ window.view = view;
 window.windows = windows;
 /* 領域（window.Trk.core）：コア状態の正規の場所。window直下の旧互換名は frozen js/fx.js が読む5件だけ。 */
 window.Trk = window.Trk || {};
-window.Trk.core = Object.assign(window.Trk.core || {}, { $, renderStoragePersist, storageLimitsIgnored, requestStoragePersist, storagePersistState, BEST_KEY, CAPTION_MS, CUSTOM_SKIN_MAX, KEY_PRESETS, PAD_DEFAULTS, SKIN_FORMAT, TRK_ENUM_VALUES, TV_PARAM_FAV_MAX, VIDEO_KEY_DEFAULTS, activeMascot, applyLanguage, applyNoteVars, baseName, buildSkinGrid, buildSkinNow, chartSummary, clampTvBlur, clampTvDim, cleanTvParamFavorites, closeSettings, ctx, customSkinDefs, downloadBlob, downloadJSON, el, emit, esc, extOf, fmtDate, fmtTime, fontFamily, formatKey, formatPadBind, fx, gameplayFxMultiplier, gameplayFxPower, hashString, idbStore, isPclMascot, keyCodeOf, keysLabel, laneCol, laneColor, laneName, modsUnranked, mulberry32, noteShape, num, on, openSettings, pick, refreshSeedSecrets, rememberMusicVolume, renderAllStatuses, renderStatus, safeHttpUrl, safeLink, safeName, saveCustomSkins, saveUserPrefs, savedSkinAtBoot, setPhase, setStatus, settings, showScreen, skin, slotLane, slotOfKey, stage, syncPickers, takeAmpReset, travelMs, updateChartButtons, updateKeyUI, updateTouchKeys, validCode, validPadBind, vctx, video, view, windows });
+window.Trk.core = Object.assign(window.Trk.core || {}, { $, renderStoragePersist, storageLimitsIgnored, requestStoragePersist, storagePersistState, BEST_KEY, CAPTION_MS, CUSTOM_SKIN_MAX, KEY_PRESETS, PAD_DEFAULTS, SKIN_FORMAT, TRK_ENUM_VALUES, TV_PARAM_FAV_MAX, VIDEO_KEY_DEFAULTS, activeMascot, applyLanguage, applyNoteVars, baseName, buildSkinGrid, buildSkinNow, chartSummary, clampTvBlur, clampTvDim, cleanTvParamFavorites, closeSettings, ctx, customSkinDefs, downloadBlob, downloadJSON, el, emit, esc, extOf, fmtDate, fmtTime, fontFamily, formatKey, formatPadBind, fx, gameplayFxMultiplier, gameplayFxPower, hashString, idbStore, isPclMascot, keyCodeOf, keysLabel, laneCol, laneColor, laneName, modsUnranked, mulberry32, noteShape, num, on, openSettings, pick, prefsForSave, refreshSeedSecrets, rememberMusicVolume, renderAllStatuses, renderStatus, safeHttpUrl, safeLink, safeModeHref, safeName, saveCustomSkins, saveUserPrefs, savedSkinAtBoot, setPhase, setStatus, settings, showScreen, skin, slotLane, slotOfKey, stage, syncPickers, takeAmpReset, travelMs, updateChartButtons, updateKeyUI, updateTouchKeys, validCode, validPadBind, vctx, video, view, windows });
 /* catch.js／stage.js はこの正規アクセサを差し替える（旧window.activeMods別名はtrk90で廃止）。 */
 Object.defineProperty(window.Trk.core, "activeMods", { configurable:true, get:() => activeMods, set:v => { activeMods = v; } });
 Object.defineProperty(window.Trk.core, "analysis", { configurable:true, get:() => analysis, set:v => { analysis = v; } });

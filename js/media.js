@@ -81,6 +81,27 @@ const CODEC_OK = new Set([
   "A_AAC", "A_AAC/MPEG4/LC", "A_AAC/MPEG4/LC/SBR", "A_OPUS", "A_VORBIS", "A_MPEG/L3", "A_FLAC", "A_PCM/INT/LIT",
 ]);
 function codecLabel(id) { return CODEC_LABEL[id] || id; }
+/* 🎞 trk200：音として鳴らせる見込みのコーデック（CODEC_OK のうち音声のもの）。
+   AC3・E-AC3・DTS・TrueHD・MLP は「映像は出るが無音」になる代表。 */
+const AUDIO_CODEC_OK = new Set(["A_AAC", "A_AAC/MPEG4/LC", "A_AAC/MPEG4/LC/SBR", "A_OPUS", "A_VORBIS", "A_MPEG/L3", "A_FLAC", "A_PCM/INT/LIT"]);
+const isAudioCodecId = id => /^A_/i.test(String(id || ""));
+/* 読み込めて再生もできるのに音だけ出ない、と分かったときの理由（分からなければ null＝何も言わない） */
+function explainAudioWarning(probe) {
+  if (!probe) return null;
+  const audio = (probe.audioCodecs && probe.audioCodecs.length ? probe.audioCodecs
+    : (probe.codecs || []).filter(isAudioCodecId));
+  if (!audio.length) return null;                      /* 音声トラックが読めない＝判断しない */
+  if (audio.some(id => AUDIO_CODEC_OK.has(id))) return null;
+  const container = CONTAINER_LABEL[probe.container] || "";
+  return { key:"loadAudioUnsupported", vars:{ container, codec: audio.map(codecLabel).join("・") } };
+}
+/* 先頭だけを見て、音が出ない見込みの理由を返す（読み込みに成功したあとに使う） */
+async function explainAudioFailure(file) {
+  try {
+    const head = new Uint8Array(await file.slice(0, PROBE_BYTES).arrayBuffer());
+    return explainAudioWarning(probeContainer(head));
+  } catch (_) { return null; }
+}
 /* ---- EBML（Matroska/WebM）の最小の読み取り：ID は印を含む vint、サイズは印を外す vint ---- */
 function ebmlVint(u8, pos, keepMarker) {
   if (pos < 0 || pos >= u8.length) return null;
@@ -103,9 +124,11 @@ function ebmlUint(u8, start, end) {
   for (let i = start; i < Math.min(end, start + 8); i++) v = v * 256 + u8[i];
   return v;
 }
-/* Matroska の Tracks（0x1654AE6B）→ TrackEntry（0xAE）→ CodecID（0x86）を拾う */
+/* Matroska の Tracks（0x1654AE6B）→ TrackEntry（0xAE）→ CodecID（0x86）を拾う。
+   🎞 trk200：TrackType（0x83・1=映像 2=音声）も見て、**音声だけ**を取り出せるようにする
+   （映像は出るのに音が出ない .mkv を、読み込めたときにも言い当てるため） */
 function probeMatroska(u8) {
-  const out = { container:"matroska", docType:"", codecs:[] };
+  const out = { container:"matroska", docType:"", codecs:[], audioCodecs:[], videoCodecs:[] };
   const isUnknownSize = size => {
     /* サイズの全ビットが 1 ＝ 長さ未定（Segment などで使われる） */
     if (!size) return false;
@@ -139,7 +162,14 @@ function probeMatroska(u8) {
       const dEnd = unknown ? stop : Math.min(dStart + size.value, stop);
       if (id.value === 0x4282) out.docType = ebmlAscii(u8, dStart, dEnd);
       else if (id.value === 0x1A45DFA3 || id.value === 0x18538067 || id.value === 0x1654AE6B) walk(dStart, dEnd, depth + 1);
-      else if (id.value === 0xAE) { const t = readEntry(dStart, dEnd); if (t) out.codecs.push(t.codec); }
+      else if (id.value === 0xAE) {
+        const t = readEntry(dStart, dEnd);
+        if (t) {
+          out.codecs.push(t.codec);
+          if (t.type === 2) out.audioCodecs.push(t.codec);
+          else if (t.type === 1) out.videoCodecs.push(t.codec);
+        }
+      }
       pos = Math.max(dEnd, pos + id.len + size.len);
     }
   };
@@ -214,6 +244,7 @@ async function loadMedia(file, opts = {}) {
   core.videoReady = false; core.analysis = null; core.chart = []; core.chartMode = "generated"; core.fingerprint = "";
   core.setStatus("chartStatus", null); core.setStatus("importStatus", null); core.updateChartButtons();
   core.mediaLoadFailure = null;   /* 🎞 前の曲の失敗理由を持ち越さない（メディアプレーヤーが読む） */
+  core.mediaLoadWarning = null;   /* 🎞 trk200：音だけ出ない見込みの理由も持ち越さない */
   if (core.mediaURL) URL.revokeObjectURL(core.mediaURL);
   core.mediaName = file.name || "song";
   core.$("songTitle").textContent = opts.title || core.baseName(core.mediaName);
@@ -272,6 +303,14 @@ async function loadMedia(file, opts = {}) {
     core.updateChartButtons(); return false;
   }
   core.videoReady = true; core.fingerprint = `${file.size}:${Math.round(core.video.duration * 10)}`;
+  /* 🎞 trk200：映像は出るが音が出ない入れ物（.mkv の AC3・DTS など）は、
+     再生はじまってから「無音だ」と気づくことになる。先頭を見て分かったら、その場で言う。
+     （解析は無音のまま進み、譜面は BPM グリッドになる。理由が分かれば納得できる） */
+  if (!midiInput) {
+    const warn = await explainAudioFailure(file);
+    if (token !== core.loadToken) return false;
+    if (warn) core.mediaLoadWarning = { key:warn.key, vars:warn.vars, name:file.name || "" };
+  }
   core.setStatus("loadStatus", "analyzing"); core.updateChartButtons();
   await new Promise(r => { setTimeout(r, 30); });
   const tooBig = (Number(playbackFile.size) || 0) > ANALYZE_MAX;
@@ -285,7 +324,13 @@ async function loadMedia(file, opts = {}) {
   if (skipAnalyze) core.analysis = null;
   else { try { core.analysis = await analyzeAudioCached(playbackFile, core.fingerprint); } catch (_) { core.analysis = null; } }
   if (token !== core.loadToken) return false;
-  core.setStatus("loadStatus", midiInput ? "midiLoaded" : tooBig ? "analysisSkipped" : liteLong ? "analysisSkippedLiteLong" : tooLong ? "analysisSkippedLong" : liteSkip ? "analysisSkippedLite" : core.analysis ? "loaded" : "decodeFallback");
+  const warn = core.mediaLoadWarning;
+  core.setStatus("loadStatus", warn ? warn.key : midiInput ? "midiLoaded" : tooBig ? "analysisSkipped" : liteLong ? "analysisSkippedLiteLong" : tooLong ? "analysisSkippedLong" : liteSkip ? "analysisSkippedLite" : core.analysis ? "loaded" : "decodeFallback",
+    warn ? warn.vars : undefined);
+  /* 選曲画面の状態行は次に何かをすると消えるので、その場でも一度だけ知らせる */
+  if (warn && window.Trk && window.Trk.play && typeof window.Trk.play.showToast === "function") {
+    try { window.Trk.play.showToast(tr(warn.key, warn.vars)); } catch (_) {}
+  }
   let supplied = false;
   if (opts.onReady) { try { supplied = !!(await opts.onReady()); } catch (e) { console.error(e); } }
   if (token !== core.loadToken) return false;
@@ -600,7 +645,7 @@ window.seFiles = seFiles;
 window.setBackground = setBackground;
 /* 領域（window.Trk.media）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
 window.Trk = window.Trk || {};
-window.Trk.media = Object.assign(window.Trk.media || {}, { CHART_FILE_MAX, buildChart, decodeAudio, estimateLevel, exportChart, generateNotes, getAC, importChartFile, loadMedia, loadSE, loudnessDb, playSE, rmsAt, seBuffers, seFiles, setBackground, codecLabel, explainLoadFailure, explainProbe, mimeHintFor, probeContainer, withMimeHint });
+window.Trk.media = Object.assign(window.Trk.media || {}, { CHART_FILE_MAX, buildChart, decodeAudio, estimateLevel, exportChart, generateNotes, getAC, importChartFile, loadMedia, loadSE, loudnessDb, playSE, rmsAt, seBuffers, seFiles, setBackground, codecLabel, explainAudioFailure, explainAudioWarning, explainLoadFailure, explainProbe, mimeHintFor, probeContainer, withMimeHint });
 Object.defineProperty(window.Trk.media, "applyChartData", { configurable:true, get:() => applyChartData, set:v => { applyChartData = v; } });
 Object.defineProperty(window.Trk.media, "audioCtx", { configurable:true, get:() => audioCtx, set:v => { audioCtx = v; } });
 Object.defineProperty(window.Trk.media, "chartToData", { configurable:true, get:() => chartToData, set:v => { chartToData = v; } });

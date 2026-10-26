@@ -302,6 +302,10 @@ const settings = {
      「続きから」も使わず、いつも 0:00 から鳴らす。曲ごとのプレビュー開始位置（previewStart）や
      保存した再生位置は消さない＝オフに戻せば今までどおり使える。初期オフ（今までの動きを変えない）。 */
   mediaStartFromZero: prefs.mediaStartFromZero === true,
+  /* 🔓 覚えているミュージックフォルダーを、起動したら自動で読み取る（trk194。初期オン）。
+     granted なら起動しただけで曲が並ぶ。prompt のときは最初のタップで1回だけ許可を確認する
+     （ブラウザーはクリックの中でしか確認を出せないため）。オフにすると今までどおり手動で再接続。 */
+  folderAutoRead: prefs.folderAutoRead !== false,
   libSort: pick(prefs.libSort, ["name", "plays", "recent", "best"], "name"),
   libProgress: pick(prefs.libProgress, ["all", "new", "progress", "done"], "all"),   // 📈 進捗フィルター：未聴/継続/完了で絞る（表示層だけ。trk174）
   shortMode: pick(prefs.shortMode, ["off", "90", "120", "180"], "off"),      // 🕹️ ショートプレイ（後半だけ遊ぶ・初期オフ）
@@ -450,7 +454,7 @@ function resetVideoPrefs() {
   settings.tvParamFavs = cleanTvParamFavorites(settings.tvParamFavs); // user bookmarks survive a TV-only reset
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = true;
-  settings.tvPowerPrev = "color"; settings.previewEnabled = true; settings.mediaStartFromZero = false;   /* ⏮ 常に最初から再生（trk193）も初期値へ */
+  settings.tvPowerPrev = "color"; settings.previewEnabled = true; settings.mediaStartFromZero = false; settings.folderAutoRead = true;   /* ⏮ 常に最初から再生（trk193）も初期値へ */
   settings.tvSongWhilePlaying = false;   /* ◀▶ を演奏中も効かせる設定も一緒に戻す */
   /* tv-dock.js の「選曲中に映像を流す」も一緒に戻す */
   settings.tvMenuPreview = true; settings.tvMenuVideo = false;
@@ -528,7 +532,7 @@ function enterSafeMode() {
   settings.tvParamFavs = []; // safe mode starts with no saved TV adjustment pairs
   settings.tvDockSkin = "cinema"; settings.tvDockFive = false;
   settings.tvOrder = "tv-first"; settings.tvOverlay = false;
-  settings.previewEnabled = false; settings.mediaStartFromZero = false;
+  settings.previewEnabled = false; settings.mediaStartFromZero = false; settings.folderAutoRead = false;   /* セーフモードは自動の読み取りもしない */
   settings.tvMenuPreview = false; settings.tvMenuVideo = false;   // セーフモードは映像を流さない
   settings.tvSongWhilePlaying = false;                            // セーフモードでは演奏中の曲送りもしない
   settings.specOn = false; settings.specTv = false;               // 📊 スペクトラムも出さない（音の通り道を作らない）

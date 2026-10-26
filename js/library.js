@@ -347,6 +347,8 @@ async function materializeAgentOst(it) {
 let sharedSongs = [];        /* 💾 端末に残してある共有の曲（リロード後も残る） */
 let libShared = false;       /* いまの libHandle が「📤 共有」でもらったものか（📁 開く と区別するため） */
 let shareRemembered = false; /* 共有の許可を覚えているか（まだつながっていなくても 🚫 を出せるように） */
+let folderAccessPersisted = false; /* trk194: 起動した時点で許可が生きていた（＝ブラウザーが「常に許可」を覚えている） */
+let folderAutoArmed = false;       /* trk194: 最初のタップで許可を確認する待ち合わせが動いているか */
 let lastScan = [];           /* 直近のスキャン結果（💾 をあとからオンにしたときに使う） */
 let libAllKeys = new Set();  /* いまのライブラリの曲キー（🐔 階層などの件数表示に使う。renderLib が更新） */
 let dirInputMode = "open";   /* フォールバックの <input webkitdirectory> を 📁/📤 のどちらが開いたか */
@@ -4739,6 +4741,85 @@ async function scanHandle(h, onProgress) {
   await walk(h, h.name, 0);
   return { files, skipped };
 }
+/* 🔓 覚えているフォルダーを起動時にどう扱うか（trk194。純関数＝テストで確認）
+   "scan" … 許可が生きている＝そのまま読み取る（クリック不要・VLCのように開けば曲がある）
+   "ask"  … 確認が必要＝最初のタップ（クリック）の中で1回だけ requestPermission する
+   "none" … 何もしない（設定オフ・セーフモード・許可が拒否済み・覚えたフォルダーが無い） */
+function folderReadPlan(st) {
+  if (!st || !st.hasHandle) return "none";
+  if (st.safe || st.autoRead === false) return "none";   /* 設定オフ・セーフモードは手動だけ */
+  if (st.permission === "denied") return "none";         /* 断られたら、こちらからは聞き直さない */
+  if (st.permission === "granted") return "scan";        /* 許可が生きている＝そのまま読む */
+  return "ask";                                          /* 最初のタップの中で1回だけ確認 */
+}
+async function folderPermissionOf(h) {
+  try { return await h.queryPermission({ mode:"read" }); } catch (_) { return "denied"; }
+}
+/* 🚫 自動の待ち合わせを解除する（read の確認は1回だけ。要らなくなったら確実に外す） */
+function disarmFolderAutoRead() {
+  folderAutoArmed = false;
+  document.removeEventListener("pointerdown", folderAutoKick, true);
+  document.removeEventListener("keydown", folderAutoKick, true);
+}
+/* 最初のタップ／キー入力の「中」で許可を確認する。ブラウザーはクリックの中でしか確認を出せないため、
+   起動時のタイマーでは出せない（ここが VLC との違い。1タップだけ我慢してもらう）。 */
+let folderAutoBusy = false;   /* 最初の pointerdown とボタンの click が続けて来ても、確認は1回だけ */
+/* フォルダーを選ぶボタン自身を押したときは、自動の確認より手動の流れ（選び直し）を優先する */
+const FOLDER_MANUAL_SELECTOR = "#libOpenBtn, #libShareBtn, #libShareSettingsBtn, #libReconnectBtn, #trkMusicFolderBtn, #libDirInput, .fileBtn, #folderAutoNowBtn";
+async function folderAutoKick(e) {
+  if (e && e.target && typeof e.target.closest === "function" && e.target.closest(FOLDER_MANUAL_SELECTOR)) return;
+  if (folderAutoBusy) return;
+  if (!libHandle) { disarmFolderAutoRead(); core.setStatus("libShareStatus", "folderPermNone"); return; }
+  folderAutoBusy = true;
+  const h = libHandle, wasShared = libShared;
+  disarmFolderAutoRead();
+  try {
+    core.setStatus("libStatus", "folderAutoChecking", { name:h.name });
+    const p = await folderPermissionOf(h);
+    if (p === "granted") { await useHandle(h, false, wasShared); markFolderAccess(); return; }
+    if (p === "denied") { core.setStatus("libShareStatus", "libDenied"); syncShareUI(); return; }
+    /* ここはクリック／キー入力の中。ブラウザーの確認は、この中でしか出せない */
+    const r = await h.requestPermission({ mode:"read" });
+    if (r === "granted") { await useHandle(h, false, wasShared); markFolderAccess(); }
+    else { core.setStatus("libShareStatus", "libDenied"); core.$("libReconnectBtn").hidden = false; showReconnect(); syncShareUI(); }
+  } catch (_) {
+    core.setStatus("libShareStatus", "libDenied");
+    core.$("libReconnectBtn").hidden = false; showReconnect(); syncShareUI();
+  } finally { folderAutoBusy = false; }
+}
+function armFolderAutoRead() {
+  if (folderAutoArmed) return;
+  folderAutoArmed = true;
+  document.addEventListener("pointerdown", folderAutoKick, true);
+  document.addEventListener("keydown", folderAutoKick, true);
+  showReconnect();
+}
+/* 許可が生きていることを覚えて、設定の表示とボタンの文言を合わせる */
+function markFolderAccess() { folderAccessPersisted = true; syncShareUI(); }
+/* 起動時の入口。許可が生きていれば読み取り、確認が必要なら最初のタップを待つ */
+async function restoreFolderAccess() {
+  if (!libHandle) { syncShareUI(); return "none"; }
+  const permission = await folderPermissionOf(libHandle);
+  const plan = folderReadPlan({ hasHandle:true, permission,
+    autoRead: core.settings.folderAutoRead !== false,
+    safe: !!(window.TrkSafeMode && window.TrkSafeMode()) });
+  if (plan === "scan") {
+    folderAccessPersisted = true;
+    await useHandle(libHandle, false, libShared);
+    core.setStatus("libStatus", libShared ? "libShareAutoRestored" : "libAutoRestored", { name:libHandle.name });
+  } else if (plan === "ask") {
+    folderAccessPersisted = false;
+    core.$("libReconnectBtn").hidden = false; showReconnect();
+    armFolderAutoRead();
+    core.setStatus("libStatus", "folderAutoNeedsTap", { name:libHandle.name });
+  } else {
+    folderAccessPersisted = false;
+    core.$("libReconnectBtn").hidden = false; showReconnect();
+  }
+  syncShareUI();
+  return plan;
+}
+
 async function useHandle(h, remember, shared) {
   libShared = !!shared;
   core.setStatus("libStatus", shared ? "libShareScanning" : "libScanning", { n:0 });
@@ -4754,6 +4835,7 @@ async function useHandle(h, remember, shared) {
 }
 async function openFolder() {
   dirInputMode = "open";
+  disarmFolderAutoRead();   /* trk194：自分で選び直すときは、自動の待ち合わせを先に止める（二重に読まない） */
   if (!canPickDir) { core.$("libDirInput").click(); return; }
   try { await useHandle(await showDirectoryPicker({ id:"trk-music", mode:"read", startIn:"music" }), true, false); }
   catch (e) { if (e.name !== "AbortError") { console.error(e); core.$("libDirInput").click(); } }
@@ -4761,6 +4843,7 @@ async function openFolder() {
 /* 📤 ミュージックフォルダを共有：端末に1回許可してもらうと、中身のリストをぜんぶ引き受けます */
 async function shareMusicFolder() {
   dirInputMode = "share";
+  disarmFolderAutoRead();   /* trk194：同上 */
   if (!canPickDir) { core.setStatus("libShareStatus", "libShareUnsupported"); core.$("libDirInput").click(); return; }
   try {
     /* startIn:"music" で、端末のミュージックフォルダを最初から開きます（スマホは SAF のフォルダ選びになります） */
@@ -4782,6 +4865,7 @@ async function stopSharing() {
   try { await libKV.del("share"); } catch (_) {}
   try { await libKV.del("dir"); } catch (_) {}
   shareRemembered = false;
+  folderAccessPersisted = false; disarmFolderAutoRead();   /* trk194：自動の待ち合わせも解除 */
   await clearSharedSongs();
   if (libShared) {
     folderSongs = []; libHandle = null; libShared = false; lastScan = [];
@@ -4792,7 +4876,10 @@ async function stopSharing() {
 }
 function showReconnect() {
   const b = core.$("libReconnectBtn");
-  if (libHandle && b && !b.hidden) b.textContent = tr(libShared ? "libShareResume" : "libReconnect", { name:libHandle.name });
+  if (!libHandle || !b || b.hidden) return;
+  /* 🔓 trk194：最初のタップ待ちのときは「読み取る」と書く（何が起きるか分かるように） */
+  const key = folderAutoArmed ? "libReconnectAuto" : libShared ? "libShareResume" : "libReconnect";
+  b.textContent = tr(key, { name:libHandle.name });
 }
 
 /* ---------- 💾 共有した曲を端末に残す（settings.libKeepShared） ---------- */
@@ -4850,8 +4937,17 @@ function syncShareUI() {
   const chk = core.$("libKeepSharedChk"), hint = core.$("libKeepSharedHint"), state = core.$("libShareState"), stop = core.$("libShareStopBtn");
   if (chk) chk.checked = !!core.settings.libKeepShared;
   if (hint) hint.textContent = tr("libKeepSharedHint", { max:SHARED_MAX, mb:SHARED_MB });
-  const sharing = !!libHandle && libShared;
+  /* 🔓 trk194：自動の読み取りの設定と、いまの許可の状態（次回も自動で読めるか） */
+  const autoChk = core.$("folderAutoReadChk"), autoHint = core.$("folderAutoReadHint"), permState = core.$("folderPermState");
+  if (autoChk) autoChk.checked = core.settings.folderAutoRead !== false;
+  if (autoHint) autoHint.textContent = tr("folderAutoReadHint");
+  if (permState) permState.textContent = folderAccessPersisted ? tr("folderPermPersisted")
+    : !libHandle ? tr("folderPermNone")
+    : folderAutoArmed ? tr("folderPermNeedsTap", { name:libHandle.name })
+    : tr("folderPermManual");
+  const sharing = !!libHandle && libShared, opened = !!libHandle && !libShared;
   if (state) state.textContent = sharing ? tr("libShareStateShared", { name:libHandle.name, n:folderSongs.length })
+    : opened ? tr("libShareStateOpened", { name:libHandle.name, n:folderSongs.length })   /* 📁 開く で覚えたフォルダー（trk194） */
     : sharedSongs.length ? tr("libKeepSharedRestored", { n:sharedSongs.length }) : tr("libShareStateNone");
   if (stop) stop.hidden = !(sharing || shareRemembered || sharedSongs.length);
   showReconnect();
@@ -4920,6 +5016,17 @@ const libOpenBtn = core.$("libOpenBtn"); if (libOpenBtn) libOpenBtn.addEventList
 const libShareBtn = core.$("libShareBtn"); if (libShareBtn) libShareBtn.addEventListener("click", shareMusicFolder);
 const libShareSettingsBtn = core.$("libShareSettingsBtn"); if (libShareSettingsBtn) libShareSettingsBtn.addEventListener("click", shareMusicFolder);
 const libShareStopBtn = core.$("libShareStopBtn"); if (libShareStopBtn) libShareStopBtn.addEventListener("click", stopSharing);
+/* 🔓 trk194：起動したら自動で読み取る（オフにすると今までどおり手動の再接続だけ） */
+const folderAutoReadChk = core.$("folderAutoReadChk");
+if (folderAutoReadChk) folderAutoReadChk.addEventListener("change", async () => {
+  core.settings.folderAutoRead = !!folderAutoReadChk.checked;
+  core.saveUserPrefs();
+  if (core.settings.folderAutoRead && libHandle) await restoreFolderAccess();
+  else { disarmFolderAutoRead(); syncShareUI(); }
+});
+/* 「いま読み取る」ボタン：確認が必要なときに、タップの中で許可を求める（自動の待ち合わせと同じ道） */
+const folderAutoNowBtn = core.$("folderAutoNowBtn");
+if (folderAutoNowBtn) folderAutoNowBtn.addEventListener("click", () => { void folderAutoKick(); });
 const trkMusicFolderBtn = core.$("trkMusicFolderBtn");
 if (trkMusicFolderBtn) trkMusicFolderBtn.addEventListener("click", openFolder);   /* 📁 自分で作った Music/trk を読み取り専用で選ぶ */
 const trkChk = core.$("trkPlaylistChk");
@@ -5026,6 +5133,7 @@ core.$("libDirInput").addEventListener("change", e => {
   syncShareUI();
 });
 core.$("libReconnectBtn").addEventListener("click", async () => {
+  disarmFolderAutoRead();   /* trk194：ボタンから読むときも、自動の待ち合わせと重ねない */
   if (!libHandle) return;
   try {
     let p = await libHandle.queryPermission({ mode:"read" });
@@ -5063,7 +5171,7 @@ on("options", () => {
   const song = core.currentSong;
   if (song) applySongBackground(song).then(ok => { if (ok && core.currentSong === song) core.emit("songArtwork", song); }).catch(() => {});
 });
-on("language", () => { core.$("libSearch").placeholder = tr("libSearch"); showReconnect(); syncShareUI(); syncTrkUI(); syncGhostUI(); renderLib(); renderBanner(); syncVideoButton(); syncMediaKeepCurrentButton(); void renderMediaKeep();
+on("language", () => { core.$("libSearch").placeholder = tr("libSearch"); showReconnect(); syncShareUI();   /* syncShareUI が trk194 の文言も更新 */ syncTrkUI(); syncGhostUI(); renderLib(); renderBanner(); syncVideoButton(); syncMediaKeepCurrentButton(); void renderMediaKeep();
   const hint = core.$("mediaStartFromZeroHint"); if (hint) hint.textContent = tr("mediaStartFromZeroHint");
   if (!bannerStartPanel.hidden) { startBarLabels(); startBarSyncText(); }   /* 開いているバーの文言も今の言語へ（trk193） */
 });
@@ -5092,6 +5200,9 @@ async function initLibrary() {
       if (h && h.kind === "directory") {
         libHandle = h; libShared = !!hs; shareRemembered = !!hs;
         core.$("libReconnectBtn").hidden = false; showReconnect();
+        /* 🔓 trk194：許可が生きていれば、ここで自動的に読み取る（クリック不要）。
+           確認が必要なら、最初のタップで1回だけ確認する待ち合わせに入る。 */
+        await restoreFolderAccess();
       }
     } catch (_) {}
   } else core.setStatus("libStatus", "libFallbackNote");
@@ -5168,7 +5279,7 @@ window.Trk = window.Trk || {};
 core.on("phase", () => core.emit("nowPlaying", nowPlaying()));
 core.on("mediaReady", () => core.emit("nowPlaying", nowPlaying()));
 
-window.Trk.library = Object.assign(window.Trk.library || {}, { LIB_SHOW, MEDIA_EXT, VIDEO_EXT, addSongFiles, addVideoFiles, allSongs, bannerRandomBtn, bannerVolTip, ensureTrkDistributionPlaylists, ensureTrkOstPlaylist, trkOstPlaylistId: TRK_OST_ID, trkRestoreRemoved, initLibrary, nextSong, noteMediaPlayed, onLongPress, setStartFromZero, syncStartZeroInputs, startBarOpen, plToast, prevSong, previewStartFor, refreshPackSongs, saveSongPrefs, selectSong, setAddonSongs, songInfo, songDisplayTitle, songDisplayMeta, songTagsOf, loadSongTags, srcLabel, nowPlaying, startPreview, trySongChart, plTitleKeys, plSongMatchKeys, plWishTitleKeys, plIsClassicalTitle, plClassicalTitleKey, plDecoratedTitleKeys, plWishDecoratedKeys, plHasVersionTag, plWishMediaMatches });
+window.Trk.library = Object.assign(window.Trk.library || {}, { LIB_SHOW, MEDIA_EXT, VIDEO_EXT, addSongFiles, addVideoFiles, allSongs, bannerRandomBtn, bannerVolTip, ensureTrkDistributionPlaylists, ensureTrkOstPlaylist, trkOstPlaylistId: TRK_OST_ID, trkRestoreRemoved, initLibrary, nextSong, noteMediaPlayed, onLongPress, setStartFromZero, syncStartZeroInputs, startBarOpen, restoreFolderAccess, folderReadPlan, plToast, prevSong, previewStartFor, refreshPackSongs, saveSongPrefs, selectSong, setAddonSongs, songInfo, songDisplayTitle, songDisplayMeta, songTagsOf, loadSongTags, srcLabel, nowPlaying, startPreview, trySongChart, plTitleKeys, plSongMatchKeys, plWishTitleKeys, plIsClassicalTitle, plClassicalTitleKey, plDecoratedTitleKeys, plWishDecoratedKeys, plHasVersionTag, plWishMediaMatches });
 Object.defineProperty(window.Trk.library, "addonSongs", { configurable:true, get:() => addonSongs, set:v => { addonSongs = v; } });
 Object.defineProperty(window.Trk.library, "libView", { configurable:true, get:() => libView, set:v => { libView = v; } });
 Object.defineProperty(window.Trk.library, "renderBanner", { configurable:true, get:() => renderBanner, set:v => { renderBanner = v; } });

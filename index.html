@@ -1138,6 +1138,13 @@
             <label class="check"><input id="libKeepSharedChk" type="checkbox"><span data-i18n="libKeepShared"></span></label>
             <!-- 上限の数字を入れるので、このヒントだけ library.js が tr(…, {max, mb}) で書き換えます -->
             <div id="libKeepSharedHint" class="hint"></div>
+            <!-- 🔓 trk194：覚えたフォルダーを起動したら自動で読み取る（許可が生きていればクリック不要） -->
+            <label class="check"><input id="folderAutoReadChk" type="checkbox"><span data-i18n="folderAutoRead"></span></label>
+            <div id="folderAutoReadHint" class="hint" data-i18n="folderAutoReadHint"></div>
+            <div class="miniActions">
+              <button id="folderAutoNowBtn" type="button" data-i18n="folderAutoNow"></button>
+            </div>
+            <div id="folderPermState" class="hint" role="status" aria-live="polite"></div>
             <div id="libShareState" class="hint"></div>
             <div id="libShareStatus" class="hint status"></div>
           </details>

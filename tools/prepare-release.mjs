@@ -99,8 +99,10 @@ export function checkLayout(dir) {
     for (const need of ["index.html", "sw.js", "release-manifest.json"]) {
       if (!fs.existsSync(path.join(app, need))) problems.push(`${APP_DIR}/${need} がありません`);
     }
-    const stray = fs.readdirSync(app).filter(n => n.toLowerCase().startsWith("readme") && n !== "README.md" && n !== "README-SLIM.md");
-    if (stray.length) problems.push(`${APP_DIR}/ に配布用の README が残っています: ${stray.join(", ")}（かんたん起動はルートの ${WRAPPER_README}）`);
+    /* 1.0.7 までの配布用の起動案内（OS別の 00_START_HERE.html / 01_README_*.txt）はルートの README.txt に集約する。
+       アプリ自身の README（README-*.md）は中身の説明なので残す。 */
+    const stray = fs.readdirSync(app).filter(n => n === "00_START_HERE.html" || /^0\d_README_.*\.txt$/i.test(n));
+    if (stray.length) problems.push(`${APP_DIR}/ に配布用の起動案内が残っています: ${stray.join(", ")}（かんたん起動はルートの ${WRAPPER_README}）`);
     if (fs.existsSync(path.join(app, "release-manifest.json"))) {
       try {
         const m = JSON.parse(fs.readFileSync(path.join(app, "release-manifest.json"), "utf8"));

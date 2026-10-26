@@ -84,6 +84,11 @@ test("trk204: the layout check refuses stray files, a missing app and a stale ca
   fs.rmSync(path.join(missing, "trk-files/sw.js"));
   assert.match(checkLayout(missing).problems.join(" "), /trk-files\/sw\.js がありません/);
 
+  const guide = path.join(f.dir, "guide");
+  fs.cpSync(stage, guide, { recursive: true });
+  fs.writeFileSync(path.join(guide, "trk-files/01_README_WIN_LINUX.txt"), "x");
+  assert.match(checkLayout(guide).problems.join(" "), /配布用の起動案内が残っています/);
+
   const stale = path.join(f.dir, "stale");
   fs.cpSync(stage, stale, { recursive: true });
   const mp = path.join(stale, "trk-files/release-manifest.json");

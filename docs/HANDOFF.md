@@ -181,7 +181,7 @@
 
 ## 4. 未完了の確認
 
-一覧（状態は 2026-10-16 時点）。詳細は下の「4.1 詳細」にあります。既存項目の番号は維持しています。
+一覧（状態は 2026-10-27 時点）。詳細は下の「4.1 詳細」にあります。既存項目の番号は維持しています。
 
 | # | 項目 | 状態 | 次の一手 |
 |---|---|---|---|
@@ -219,6 +219,11 @@
 | 32 | trk196：🎞 形式まわりの仕上げ（理由の表示・拡張子・⚠・説明） | Node/VM と `npm run check` は成功。実ファイル・実機は未了 | ①`.m2ts`/`.avi` が一覧に出て ⚠ が付くこと ②メディアプレーヤーを開いたときにも理由が出ること ③設定「📖 再生できる形式」が4言語で読めること（PC・Android） |
 | 33 | trk197・trk198：🔓 拒否時の案内／🔍 設定の検索 | Node/VM（偽のDOM）で確認済み。実機は未了 | ①サイト設定で許可を切って起動→設定に理由が出るか ②検索で欄が絞られ、空にすると元の開閉に戻るか ③スマホの狭い画面で検索欄と件数が崩れないか |
 | 34 | trk199：1.0.7 レビューの修正版（一覧が空になる不具合・選び直し・タッチの許可確認） | Node/VM（偽のDOM・偽の navigator）で確認済み。**タッチの `requestPermission` は実機で未確認** | ①曲を1つも選ばずにリロードして一覧が出るか（以前は真っ白） ②📄 参照の行を押すと選び直しが開くか ③動画の参照を選び直すと 🎬（動画）のままか ④選び直したあとリロードしても 📄 参照が残る（消えない）か ⑤スマホで最初のタップ→「許可」の確認が出て曲が出るか（「拒否」と誤表示しないか） ⑥PC のマウス・キーでも従来どおりか |
+| 35 | trk200：🔊 `.mkv` の音が出ない理由（AC3/DTS/TrueHD） | 合成 MKV の CodecID で Node/VM 検査済み。実ファイル・実機は未了 | ①AC3 の MKV を選曲→状態行とトーストに「この音声は鳴りません＋MP4 に変換」が出るか ②H.264＋AAC の MKV では出ないこと ③再生中に「読み込めません」と出ない（停止中だけ理由を出す）こと ④4言語で読めること |
+| 36 | trk201：🗂 フォルダー参照の保存停止と一度だけの掃除 | VM の偽 IndexedDB で確認済み。実機は未了 | ①3000曲のフォルダーで起動が軽くなったか ②追加した曲・動画の 📄 参照はこれまでどおり残るか ③1.0.7 から上げたとき、フォルダー曲の古い 📄 行が1回だけ消えるか（`trkFolderRefsPrune1`） |
+| 37 | trk202：🛟 セーフモードの設定を持ち越さない | `?safe=1` の保存内容を VM で確認済み。実機は未了 | ①`?safe=1` で自動読み取りなどを変えて保存→URLから `?safe=1` を消して開き直すと元の設定か ②セーフモード中の見た目（videoStyle 等）は安全側で保存されること ③緊急パネル・リセット（safe）から戻るときも案内どおりか |
+| 38 | trk203：🎬 ドロップした動画を 🎬 と同じ道へ | VM（偽の window）で確認済み。実ブラウザは未了 | ①`.mkv` をウィンドウにドロップすると 🎬 として一覧に入り、全画面ビューアが開かないこと ②音源のドロップは従来どおり ③`.json`（譜面）のドロップは取り込みのまま |
+| 39 | trk204：📦 配布ZIPの形（`index.html`＋`README.txt`＋`trk-files/`）と Drive への追加 | ZIP の組み立て・検査・`unzip -t`・ローカルサーバーでの 200 応答まで確認。**`file://` の実機操作と Drive 追加は未了** | ①ZIPを展開して `index.html` をダブルクリック→ゲームが始まるか（Chrome/Edge・Windows/macOS） ②`http://127.0.0.1:8000/` で開いたとき、1.0.7 の古い画面ではなく 1.0.8 が出るか ③`?safe=1` が入口を通っても消えないか ④保存データが 1.0.7 のまま（同じオリジンなら引き継がれる）見えるか ⑤Drive の `trk-1.0.8` にZIPと `SHA256SUMS-1.0.8.txt` を置く |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -316,12 +321,23 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk199`） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk204`） |
+| 📦 配布ZIPの組み立て（1.0.8〜） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`tests/release-layout.test.mjs` |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
 
-**trk190〜193・2026-10-26の確認**（作業途中の記録はアーカイブへ移動）
+**trk200〜204・2026-10-27の確認**（作業途中の記録はアーカイブへ移動）
+
+| 検査 | 結果 | 範囲・注意 |
+|---|---|---|
+| `npm run check` | **614 pass / 0 fail** | 静的・安全・a11y・vendor・MMD・書斎・軽量化＋Node/VMテスト（trk200 の6件・trk201 の5件・trk202 の5件・trk203 の4件・release-layout の6件を含む） |
+| `tools/prepare-release.mjs --check` | **OK** | 1.0.8 の組み上がりが `index.html`・`README.txt`・`trk-files/` の3つだけであること、manifest と `sw.js` の cache 名が一致すること |
+| 配布ZIP（1.0.8） | 3,874,247 bytes・225ファイル・展開 10,484,830 bytes・`unzip -t` 破損なし | 全エントリ `2026-10-27 12:00`。`sha256 ca716c3429eca34fb475f4dc074044b2c92f1a5878f9ca8605dcced69af6769b`（README.txt の文面を直したら取り直す） |
+| ローカルサーバーで `/` → `trk-files/index.html` | **OK** | `python3 -m http.server` で `/`・`trk-files/index.html`・`js/main.js`・`sw.js`・vendor の three が 200（`file://` の実機操作は未確認） |
+| PC／スマホ実機で1.0.8のUIを操作 | **未確認** | ヘッドレスsmokeは実機のタッチ・見た目・実音声の保証ではない（§4 #30） |
+
+**trk190〜193・2026-10-26の確認**
 
 | 検査 | 結果 | 範囲・注意 |
 |---|---|---|
@@ -359,6 +375,17 @@
 
 ## 7. 最近の変更
 
+- **📦 1.0.8 の配布ZIPを「index.html・README.txt・trk-files/」の形に統一（trk204／同日の仕上げ）**：レビューで「ZIPを開いたときの見た目を 1.0.6 の試作（Drive `trk-1.0.6-layout-proto.zip`＝`10OA-XMjyJJbvdAFB6cNebO8KQLC78U0A`）にそろえる」と決めたので、**配布物の形を本番にした**。ルートは `index.html`（入口）・`README.txt`（かんたん起動）・`trk-files/`（アプリ本体）の3つだけで、OS別のZIPは作らない（同じアプリ本体で Windows・macOS・Linux が動く）。§9 に手順、`tools/prepare-release.mjs`（`npm run release`）に組み立てと検査。
+  - **リポジトリの形は変えない**：GitHub Pages と開発は今までどおりルート直下の `index.html`。変えるのは配布ZIPの中だけ（`trk-files/` の中で相対URLが閉じるので、`sw.js` の `scope:"./"` も `manifest.webmanifest` もそのまま動く）。
+  - 入口 `index.html` は 1.0.6 試作とほぼ同じ：meta refresh と `<a>`（JavaScript が動かないとき）＋ `location.replace(dest)`（`?safe=1` などを渡す）。**`file://` では Service Worker を触らない**、`http` のときは**ルート直下に残った 1.0.7 以前の worker だけ**を `unregister()` してから進む（新しい `trk-files/` 側の worker は外さない）。
+  - `README.txt` は 1.0.6 試作の文面（かんたん起動／index.html だけでできること／ローカルサーバーで増えるもの／注意／中身／ライセンス＋English）を下敷きに 1.0.8 向けへ。**古い `00_START_HERE.html`・`01_README_*.txt` は廃止**（検査が残存を fail にする。`README-1.0.8.md` などのアプリ内 README は残す）。
+  - `release-manifest.json` に `layout:"wrapper"` と `wrapper{launcher,readme,app,platforms}`・`archive:"trk-1.0.8.zip"` を記録し、`platform` は消した（OS別に分けない）。`service_worker_cache` は `sw.js` の `CACHE` を書き写す（ずれていたら検査が fail）。
+  - 組み立ては `js/zip-io.js` の `zipWrite` をそのまま使う（新しいZIP実装を増やさない）。全エントリ同じ mtime。出力は `dist/`（`.gitignore` 済み）。
+  - 1.0.8 のZIPは `/home/user/work/build108/dist/trk-1.0.8.zip`（3,874,247 bytes・`sha256 ca716c34…769b`）。素材のアプリ本体は `/home/user/work/build108/app`（1.0.7 slim のツリーにリポジトリの `index.html`・`sw.js`・`css/*.css`・`js/*.js` を載せ替え、`README-1.0.8.md` 化）。⚠ Drive への追加はまだ（§4）。
+- **trk200：🔊 「映像は出るのに音が出ない」理由を先に言う**：`.mkv` の AC3・E-AC3・DTS・TrueHD などは映像だけ流れて無音になる。`js/media.js` の `probeMatroska` が `audioCodecs`／`videoCodecs` を返し、`AUDIO_CODEC_OK`（AAC・Opus・Vorbis・MP3・FLAC・PCM）に1つも入っていないときだけ `explainAudioWarning` が `loadAudioUnsupported`（`{container}`・`{codec}`）を作る。`explainAudioFailure(file)` は先頭 2MB を読むだけ。`loadMedia` が `core.mediaLoadWarning` に残し、プレーヤーの状態行（**停止中だけ**理由を出す＝再生中に「読み込めません」と言わない）と `window.Trk.play.showToast` が出す。⚙設定「📖 再生できる形式」にも1行。4言語。`tests/trk200-audio-codec.test.mjs`（6件）。
+- **trk201：🗂 フォルダー曲の📄参照を毎回保存しない＋旧版の参照を一度だけ掃除**：`rememberSongRef` が `source==="folder"` を保存しなくなった（起動のたびに最大3000件を書いていた。フォルダーは選び直せば戻るので参照は要らない）。フォルダーを替えたときに古い参照が残る問題も同時に解消。`pruneFolderRefsOnce(force)` が `songRefDB` の folder レコードだけを消し、`ghostSongs` からも外して `trkFolderRefsPrune1=1`＋`saveUserPrefs()`（失敗したら 0 に戻して次回再挑戦）。`ingestFolder` は起動直後の1回、`initLibrary` は `loadGhostSongs()` の直後に `await`。印と削除予定日（2027-01-27）は `docs/MIGRATIONS.md`。**追加した曲・動画の参照はこれまでどおり残る**。`tests/trk201-folder-refs.test.mjs`（5件・VMの偽 IndexedDB）。
+- **trk202：🛟 セーフモードの安全値を保存に持ち越さない**：`?safe=1` は「そのURLのあいだだけ」にした。`saveUserPrefs()` は `prefsForSave()` を保存し、セーフモード中は `SAFE_SESSION_KEYS`（`previewEnabled`・`mediaStartFromZero`・`folderAutoRead`・`libKeepShared`）だけ**倒す前の値に戻したコピー**を書く（`settings` 自体は汚さない＝その場の安全動作は保つ）。`rememberSafePrev()` が最初の1回だけ元の値を控える（セーフモード節の中で定義＝`tests/core-safety.test.mjs` の切片でも動く）。自動リロード3箇所・緊急パネル・`trkReset("safe")` を `reloadInSafeMode()`（`safeModeHref()`＝`?safe=1` を付け直して hash を落とす→`location.replace`）に集約。`videoStyle` などの見た目は安全側のまま保存する。案内は `safeModeNotice`（4言語・`didReset==="safe"` では「URLを消すと戻る」の一文を出さない）。`tests/trk202-safe-mode-prefs.test.mjs`（5件）。
+- **trk203：🎬 画面にドロップした動画も 🎬 と同じ道へ**：`js/main.js` のウィンドウ全体の `drop` が `addSongFiles` だけを呼んでいた（1.0.7 レビューの残件）。`VIDEO_EXT` か `video/` MIME で振り分け、`addVideoFiles(vids, { openViewer:false })` は**全画面ビューアを勝手に開かない**（一覧に足してから選んでもらう）。JSON のドロップ（譜面の取り込み）とタイトル画面以外のガードはそのまま。`tests/trk203-drop-video.test.mjs`（4件）。
 - **📦 1.0.7 修正版の slim 配布ZIP（win/linux・mac の2本／Google Drive の `trk-1.0.7` に追加）**：Drive の id＝win/linux `1SpVyy_Bxv-atg7M5PSa8u003Wkeo5dLW`／mac `1jm03Y5jl120h7F_d0yxO0jrhgafUjP6T`／`SHA256SUMS-1.0.7-fixed.txt` `1Oe2-f8xRfIfrp55ZXjzNw4PHpYx7iZQm`、原本の退避先 `1qSnvDAI-t4apbo7SB9RlMcJLyReYgJvF`。：レビューの修正版パッチ（trk199）を当てた配布物。アプリ本体はリポジトリの `index.html`・`sw.js`・`css/*.css`・`js/*.js` とバイト同一。
   - `trk-slim-win-linux-1.0.7-fixed.zip`＝3,825,096 bytes・225ファイル・展開 10,473,822 bytes・`sha256 182f2431eba228300fa88a2b6557b7c48d3999a3f7bf937a95b2f176b8aa0d49`
   - `trk-slim-mac-1.0.7-fixed.zip`＝3,822,307 bytes・225ファイル・展開 10,473,359 bytes・`sha256 fb8c1059e243e4ea41a6cde7c306af35891a824367e4252c7b5b308d28e695b6`（1.0.6 の mac 版 `trk-slim-mac-1.0.6.zip` を土台に、win/linux と同じアプリ本体＋mac 用の `00_START_HERE.html`／`01_README_MAC.txt` を入れた）
@@ -422,3 +449,43 @@
 - [x] 実ブラウザのスモーク2件（`tools/smoke-browser.mjs --compare`・`tools/smoke-game-end.mjs`）を通した。取り込みの条件（`npm run check` には含まれない）。
 - [x] README／NOTICE／handoff と `sw.js` cache名を確認した。
 - [x] 日本語ガイドを変更した場合、英語ガイドの対応箇所も更新した。
+- [ ] 配布物を作るときは §9 の手順で `tools/prepare-release.mjs --check` を通し、`index.html`・`README.txt`・`trk-files/` 以外がルートに出ていないことを確かめた。
+
+## 9. 配布物の形（1.0.8〜：`index.html`＋`README.txt`＋`trk-files/`）
+
+**決めたこと（2026-10-26／1.0.8）**：ZIPを開いたときに **`index.html`・`README.txt`・`trk-files/` の3つだけ**が見える形にする（1.0.6 のころの試作 `trk-1.0.6-layout-proto.zip` と同じ見た目。利用者からの指定）。**OS別のZIPは作らない**——Windows・macOS・Linux は同じアプリ本体で動くので、1本で足りる（1.0.7 までの win/linux・mac の2本は廃止）。
+
+```
+trk-1.0.8.zip
+└ trk-1.0.8/
+   ├ index.html   … 入口（meta refresh＋<a>＋location.replace で trk-files/index.html へ）
+   ├ README.txt   … かんたん起動・index.html だけでできること・ローカルサーバーの使い方・注意・権利
+   └ trk-files/   … アプリ本体（リポジトリのルートと同じ中身。README-1.0.8.md・LICENSE・docs/ を含む）
+```
+
+- **リポジトリの形は変えない**：GitHub Pages も開発も今までどおりルート直下の `index.html`。`trk-files/` に移すと相対URLが全部そのまま解決される（`sw.js` の `scope:"./"`・`manifest.webmanifest`・`assets/vendor` の importmap はすべて相対）。
+- **`file://` で開いたとき**：入口が `location.replace` で `trk-files/index.html` へ進む（Service Worker は `file:` では触らない）。`index.html` をダブルクリックするだけでゲーム・譜面・プレーヤー・書斎・保存が動く。
+- **`http://127.0.0.1:8000/` で開いたとき**：入口がルート直下に残った **1.0.7 以前の worker だけ**を `unregister()` してから進む（`trk-files/sw.js` は残す）。アプリの worker のスコープは `/trk-files/` になる。
+- **保存データは「開き方」ごとに別**（`file://` と `http://127.0.0.1:8000/` は別のオリジン）。これは 1.0.6 試作の README.txt と同じ注意書きを残している。
+- **`00_START_HERE.html` と `01_README_WIN_LINUX.txt`／`01_README_MAC.txt` は廃止**。起動案内は `README.txt` に集約（`--check` がアプリ側に残っていると fail にする。`README-1.0.8.md` などアプリ自身の README は残す）。
+- **`release-manifest.json`**（`trk-files/` の中）に `version`・`archive:"trk-1.0.8.zip"`・`layout:"wrapper"`・`wrapper{launcher:"index.html", readme:"README.txt", app:"trk-files", platforms:["win","linux","mac"]}`・`service_worker_cache`（`sw.js` の `CACHE` を書き写す）を記録。`platform` は持たない。
+
+**作り方**
+
+```sh
+# 1. アプリ本体を用意する（1.0.7 slim のツリーに、リポジトリのアプリ本体を載せ替える）
+#    例：/home/user/work/build108/app に index.html・sw.js・css/*.css・js/*.js をコピーし、
+#        README-1.0.7.md → README-1.0.8.md に改名して 1.0.8 の更新点を書く
+# 2. ルートの README.txt（かんたん起動）を用意する
+# 3. 組み立て＋検査＋ZIP（出力は dist/ で Git 管理外）
+npm run release -- --app=/home/user/work/build108/app --readme=/home/user/work/build108/README.txt   --version=1.0.8 --out=/home/user/work/build108/dist --zip --date=2026-10-27T12:00:00Z
+# 4. 形だけを検査（手で組み上げたときも同じ検査）
+node tools/prepare-release.mjs --check=/home/user/work/build108/dist/trk-1.0.8
+# 5. 破損・ハッシュ（Drive の SHA256SUMS 用）
+unzip -t dist/trk-1.0.8.zip && sha256sum dist/trk-1.0.8.zip
+```
+
+- 組み立ては **`js/zip-io.js` の `zipWrite` をそのまま使う**（新しいZIP実装を増やさない）。全エントリ同じ mtime（`--date`）で、並びは名前順＝決定的。
+- `.gitignore` に `dist/` を入れてある（ZIPは Git に入れない）。
+- **1.0.8 の実績**：225ファイル・3,874,247 bytes・展開 10,484,830 bytes・`sha256 ca716c3429eca34fb475f4dc074044b2c92f1a5878f9ca8605dcced69af6769b`（`README.txt` の文面を変えたら取り直す）。素材＝`/home/user/work/build108/app` と `build108/README.txt`。
+- ⚠ **Drive への追加は未実施**（`trk-1.0.8` フォルダーを作り、ZIPと `SHA256SUMS-1.0.8.txt` を置く。§4）。

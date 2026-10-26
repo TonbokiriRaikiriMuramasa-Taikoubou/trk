@@ -353,6 +353,7 @@ let shareRemembered = false; /* 共有の許可を覚えているか（まだつ
 let folderAccessPersisted = false; /* trk194: 起動した時点で許可が生きていた（＝ブラウザーが「常に許可」を覚えている） */
 let folderAccessSession = false;   /* trk194: この起動の中で許可した（「今回だけ」かもしれないので言い方を変える） */
 let folderAutoArmed = false;       /* trk194: 最初のタップで許可を確認する待ち合わせが動いているか */
+let folderLastPermission = "";     /* trk197: 直近の queryPermission の答え（denied のときは理由と直し方を出す） */
 let lastScan = [];           /* 直近のスキャン結果（💾 をあとからオンにしたときに使う） */
 let libAllKeys = new Set();  /* いまのライブラリの曲キー（🐔 階層などの件数表示に使う。renderLib が更新） */
 let dirInputMode = "open";   /* フォールバックの <input webkitdirectory> を 📁/📤 のどちらが開いたか */
@@ -4785,7 +4786,10 @@ function folderReadPlan(st) {
   return "ask";                                          /* 最初のタップの中で1回だけ確認 */
 }
 async function folderPermissionOf(h) {
-  try { return await h.queryPermission({ mode:"read" }); } catch (_) { return "denied"; }
+  let p = "denied";
+  try { p = await h.queryPermission({ mode:"read" }); } catch (_) { p = "denied"; }
+  folderLastPermission = p;
+  return p;
 }
 /* 🚫 自動の待ち合わせを解除する（read の確認は1回だけ。要らなくなったら確実に外す） */
 function disarmFolderAutoRead() {
@@ -4851,6 +4855,9 @@ async function restoreFolderAccess() {
   } else {
     folderAccessPersisted = false;
     core.$("libReconnectBtn").hidden = false; showReconnect();
+    /* 🚫 trk197：起動したときに許可が拒否されていたら、黙って何もしないのではなく理由と直し方を出す */
+    if (permission === "denied" && core.settings.folderAutoRead !== false)
+      core.setStatus("libStatus", "folderPermDenied", { name:libHandle.name });
   }
   syncShareUI();
   return plan;
@@ -4980,6 +4987,8 @@ function syncShareUI() {
   if (permState) permState.textContent = folderAccessPersisted ? tr("folderPermPersisted")
     : folderAccessSession ? tr("folderPermSession")
     : !libHandle ? tr("folderPermNone")
+    /* 🚫 trk197：拒否されているときは「自動オフ」ではなく、なぜ曲が出ないかと直し方を出す */
+    : folderLastPermission === "denied" ? tr("folderPermDenied", { name:libHandle.name })
     : folderAutoArmed ? tr("folderPermNeedsTap", { name:libHandle.name })
     : tr("folderPermManual");
   const sharing = !!libHandle && libShared, opened = !!libHandle && !libShared;

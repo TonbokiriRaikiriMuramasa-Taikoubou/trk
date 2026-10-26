@@ -1042,6 +1042,7 @@ function applyLanguage(code) {
   document.querySelectorAll("[data-i18n]").forEach(n => { n.textContent = tr(n.dataset.i18n); });
   /* 読み上げ名（aria-label）も同じ辞書から。data-i18n-aria="key" と書く */
   document.querySelectorAll("[data-i18n-aria]").forEach(n => { n.setAttribute("aria-label", tr(n.dataset.i18nAria)); });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(n => { n.placeholder = tr(n.dataset.i18nPlaceholder); });
   buildSkinGrid(); updateKeyUI(); updateTouchKeys(); refreshSeedSecrets(); syncPickers(); renderAllStatuses();
   if (typeof updatePadUI === "function") updatePadUI();   // 🎮 pad.js（読み込み前は何もしない）
   emit("language");

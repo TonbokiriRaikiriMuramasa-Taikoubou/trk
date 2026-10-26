@@ -275,6 +275,10 @@ select{padding:8px 10px;border-radius:10px;background:var(--ui-field);color:var(
 .libGroupSub{flex:none;max-width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:700;color:var(--ui-muted)}
 .libGroupN{flex:none;margin-left:auto;font-size:11px;font-weight:750;color:var(--ui-muted)}
 .libGroupLoadingHint{margin:2px 0}
+/* 🔍 trk198：設定の絞り込み欄（設定カードの上・全幅） */
+.setSearch{display:flex;gap:8px;align-items:center;margin:0 0 10px}
+.setSearch input{flex:1;min-width:0;padding:9px 12px;border-radius:10px;background:var(--ui-field);color:var(--ui-text);border:1px solid var(--ui-border)}
+.setSearch .hint{margin:0;white-space:nowrap}
 .libTag{font-style:normal;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;background:var(--ui-field);border:1px solid var(--ui-border)}
 /* 🎞 trk196：再生できない場合がある形式の印（一覧の行）。目立たせすぎず、色だけで伝える */
 .libTag.libWarnTag{background:rgba(255,183,77,.16);border-color:rgba(255,183,77,.5);color:#ffcf7a}

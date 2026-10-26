@@ -355,6 +355,13 @@
         <button id="closeSettingsBtn" type="button" class="primary slim" data-i18n="closeSettings"></button>
       </header>
 
+      <!-- 🔍 trk198：設定を言葉で絞り込む（欄が104個まで増えたので、探さずに届くように） -->
+      <div class="setSearch">
+        <input id="settingsSearch" type="search" autocomplete="off" spellcheck="false"
+               data-i18n-placeholder="settingsSearchPlaceholder" data-i18n-aria="settingsSearchPlaceholder">
+        <span id="settingsSearchStatus" class="hint" role="status" aria-live="polite"></span>
+      </div>
+
       <div class="grid">
         <!-- 左：見た目 -->
         <div class="col">

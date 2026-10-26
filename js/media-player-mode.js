@@ -772,6 +772,9 @@ function seekBy(delta) {
 }
 function showMediaStatus(key, vars) {
   if (!statusNode) return;
+  /* 🎞 trk196：読み込みに失敗した理由が分かっているなら、ひとことの「読み込めませんでした」ではなく理由を出す */
+  const failure = key === "mediaLoadFailed" && core.mediaLoadFailure;
+  if (failure && failure.known) { statusNode.textContent = tr(failure.key, failure.vars); statusNode.dataset.i18n = ""; return; }
   statusNode.textContent = tr(key, vars);
   statusNode.dataset.i18n = key;
 }
@@ -1358,7 +1361,10 @@ function renderMedia() {
   if (sleepNode) sleepNode.value = sleepTrackMode ? "track" : sleepChapterEnd ? "chapter" : sleepUntil ? String(Math.max(1, Math.round((sleepUntil - Date.now()) / 60000))) : "0";
   if (statusNode) {
     const statusKey = reverseLoading ? "mediaReverseLoading" : reverseActive ? "mediaReverse" : core.videoReady && core.currentSong ? (core.video.ended ? "mediaEnded" : core.video.paused ? "mediaPaused" : "mediaNow") : "mediaNoTrack";
-    statusNode.textContent = tr(statusKey); statusNode.dataset.i18n = "";
+    /* 🎞 trk196：曲は選べたが読み込めなかったときは「曲がありません」ではなく、その理由を出す */
+    const failure = !core.videoReady && core.currentSong && core.mediaLoadFailure;
+    if (failure && failure.known) { statusNode.textContent = tr(failure.key, failure.vars); statusNode.dataset.i18n = ""; }
+    else { statusNode.textContent = tr(statusKey); statusNode.dataset.i18n = ""; }
   }
   renderLoopUI();
   renderLyrics();   /* 🎤 歌詞のハイライト（250ms周期に相乗り。パネルが閉じているときは状態表示だけ） */

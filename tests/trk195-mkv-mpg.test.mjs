@@ -65,7 +65,7 @@ test("trk195: the file pickers and the shared-file router know the new extension
   assert.ok(mediaInput.includes(".mkv") && mediaInput.includes(".mpg"), "＋ 曲ファイルを追加 の accept にも");
   /* share-inbox は lib.MEDIA_EXT / lib.VIDEO_EXT を参照するので、一覧に足せば共有シートからも届く */
   assert.ok(fs.readFileSync(`${ROOT}/js/share-inbox.js`, "utf8").includes("lib.VIDEO_EXT"));
-  assert.ok(titleSrc.includes("|mpg|mpeg)"), "曲プロフィールの音/映像の見分けにも .mpg");
+  assert.ok(/\|mpg\|mpeg(?:\||\))/.test(titleSrc), "曲プロフィールの音/映像の見分けにも .mpg");
 });
 
 test("trk195: folder imports mark .mkv/.mpg as video (🎬) without probing every file", () => {

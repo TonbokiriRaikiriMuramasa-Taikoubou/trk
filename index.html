@@ -173,12 +173,12 @@
               <button id="libReconnectBtn" type="button" hidden></button>
               <button id="libRescanBtn" type="button" hidden data-i18n="libRescan"></button>
               <label class="fileBtn small">
-                <input id="mediaFile" type="file" accept="video/*,audio/*,.mid,.midi,.mkv,.mpg,.mpeg" multiple hidden>
+                <input id="mediaFile" type="file" accept="video/*,audio/*,.mid,.midi,.mkv,.mpg,.mpeg,.mpe,.m2v,.m2ts" multiple hidden>
                 <span data-i18n="libAddFile"></span>
               </label>
               <!-- 🎬 動画を読み込む：最初のフレームまで確かめて「映像つき」として記録し、そのまま全画面で流す -->
               <label class="fileBtn small" id="libVideoLabel">
-                <input id="videoFile" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.mkv,.avi,.mpg,.mpeg" multiple hidden>
+                <input id="videoFile" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.mkv,.avi,.mpg,.mpeg,.mpe,.m2v,.m2ts" multiple hidden>
                 <span data-i18n="libAddVideo"></span>
               </label>
               <label class="fileBtn small">
@@ -1273,6 +1273,15 @@
             <!-- ⏮ trk193：常に最初から再生する（プレビュー＋メディアプレーヤーの続きから）。メディアプレーヤーと曲名タブの長押しバーにも同じものがある -->
             <label class="check"><input id="mediaStartFromZero" type="checkbox"><span data-i18n="mediaStartFromZero"></span></label>
             <div id="mediaStartFromZeroHint" class="hint" data-i18n="mediaStartFromZeroHint"></div>
+            <!-- 📖 trk196：再生できる形式の説明（形式で迷ったとき、ここを見れば分かるように） -->
+            <details id="formatHelpPanel" class="subPanel">
+              <summary data-i18n="formatHelpTitle"></summary>
+              <div class="hint" data-i18n="formatHelpMusic"></div>
+              <div class="hint" data-i18n="formatHelpMidi"></div>
+              <div class="hint" data-i18n="formatHelpVideo"></div>
+              <div class="hint" data-i18n="formatHelpUnplayable"></div>
+              <div class="hint" data-i18n="formatHelpConvert"></div>
+            </details>
             <label class="check"><input id="bannerPause" type="checkbox"><span data-i18n="bannerPause"></span></label>
             <label class="check"><input id="bannerSongBtns" type="checkbox"><span data-i18n="bannerSongBtns"></span></label>
             <label class="check"><input id="bannerRandomBtn" type="checkbox"><span data-i18n="bannerRandomBtn"></span></label>

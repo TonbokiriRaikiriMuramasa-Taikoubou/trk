@@ -49,7 +49,8 @@ const PROBE_BYTES = 2 * 1024 * 1024;
 /* 拡張子から MIME の見当をつける（ブラウザーが type を空で渡してきたときの補助） */
 const MIME_BY_EXT = {
   mp4:"video/mp4", m4v:"video/mp4", mov:"video/quicktime", webm:"video/webm", mkv:"video/x-matroska",
-  mpg:"video/mpeg", mpeg:"video/mpeg", mpe:"video/mpeg", m2v:"video/mpeg", avi:"video/x-msvideo", ogv:"video/ogg", "3gp":"video/3gpp",
+  mpg:"video/mpeg", mpeg:"video/mpeg", mpe:"video/mpeg", m2v:"video/mpeg", m2ts:"video/mp2t", ts:"video/mp2t",
+  avi:"video/x-msvideo", ogv:"video/ogg", "3gp":"video/3gpp",
   m4a:"audio/mp4", m4b:"audio/mp4", mp3:"audio/mpeg", flac:"audio/flac", ogg:"audio/ogg", oga:"audio/ogg",
   opus:"audio/ogg", wav:"audio/wav", aac:"audio/aac", mid:"audio/midi", midi:"audio/midi",
 };
@@ -212,6 +213,7 @@ async function loadMedia(file, opts = {}) {
   core.video.pause();
   core.videoReady = false; core.analysis = null; core.chart = []; core.chartMode = "generated"; core.fingerprint = "";
   core.setStatus("chartStatus", null); core.setStatus("importStatus", null); core.updateChartButtons();
+  core.mediaLoadFailure = null;   /* 🎞 前の曲の失敗理由を持ち越さない（メディアプレーヤーが読む） */
   if (core.mediaURL) URL.revokeObjectURL(core.mediaURL);
   core.mediaName = file.name || "song";
   core.$("songTitle").textContent = opts.title || core.baseName(core.mediaName);
@@ -264,6 +266,9 @@ async function loadMedia(file, opts = {}) {
     if (token !== core.loadToken) return false;
     if (why && why.key && why.key !== "loadError") core.setStatus("loadStatus", why.key, why.vars);
     else core.setStatus("loadStatus", "loadError");
+    /* 🎞 理由は core にも残す：選曲画面のバナーだけでなく、メディアプレーヤーや曲追加の案内でも同じことを言う */
+    core.mediaLoadFailure = { key: why && why.key ? why.key : "loadError", vars: (why && why.vars) || {},
+      name: file.name || "", known: !!(why && why.key && why.key !== "loadError") };
     core.updateChartButtons(); return false;
   }
   core.videoReady = true; core.fingerprint = `${file.size}:${Math.round(core.video.duration * 10)}`;

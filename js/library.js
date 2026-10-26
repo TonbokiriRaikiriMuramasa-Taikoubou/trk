@@ -7,7 +7,7 @@
    文章は i18n.js にあります。 */
 "use strict";
 
-const MEDIA_EXT = ["mp4", "m4a", "m4b", "mp3", "ogg", "oga", "opus", "wav", "webm", "flac", "aac", "mov", "mkv", "mpg", "mpeg", "mid", "midi"];   /* 🔖 m4b（オーディオブック）も曲として扱う（trk170）
+const MEDIA_EXT = ["mp4", "m4a", "m4b", "mp3", "ogg", "oga", "opus", "wav", "webm", "flac", "aac", "mov", "mkv", "mpg", "mpeg", "mpe", "m2v", "m2ts", "mid", "midi"];   /* 🔖 m4b（オーディオブック）も曲として扱う（trk170）
    🎞 trk195：.mkv（Matroska）と .mpg（MPEG-PS）を一覧・フォルダーの取り込みに加えた。
    ただし「取り込める＝再生できる」ではありません。中身のコーデックがブラウザーに無ければ再生は失敗するので、
    そのときは media.js が理由（例：MPEG-2 映像・AC3 音声）を出します。 */
@@ -3879,6 +3879,11 @@ function renderLib() {
     text.append(el("span", "libName", libRowNameText(it, info)),   // 例：🎬 動画 / 曲名 🥁🐔🚚⚔🎪🚛
                 el("span", "libSub", libRowSubText(it)));
     left.append(thumb, text);
+    if (maybeUnplayable(it)) {
+      /* 🎞 trk196：選ぶ前に「再生できない場合がある」と分かるように（理由と直し方は長押し先・説明に書いてある） */
+      const warn = el("i", "libTag libWarnTag", "⚠"); warn.title = tr("libMaybeUnplayableHint");
+      warn.setAttribute("aria-label", tr("libMaybeUnplayableHint")); meta.append(warn);
+    }
     if (it.charts) meta.append(el("i", "libTag", "📄"));
     if (it.shared) { const st = el("i", "libTag", "📤"); st.title = tr("libKeepShared"); meta.append(st); }   /* 💾 端末に残した共有の曲 */
     if (it.source === "file" && savedSongs.some(song => song.key === it.key)) { const st = el("i", "libTag", "💾"); st.title = tr("srcStored"); meta.append(st); }
@@ -4618,11 +4623,17 @@ async function addSongFiles(list) {
    ② 確かめられたものだけこのタブの曲リストで 🎬 として扱う（本体は保存しない。大きいファイルの音声解析は media.js 側で省略）
    ③ 読み込み後、そのまま全画面ビューア（🖥）で流す
    ※ 端末が映像を解釈できない形式なら「音として読み込みました」と出します（無理に動かさない）。 */
-const VIDEO_EXT = ["mp4", "m4v", "mov", "webm", "mkv", "avi", "ogv", "3gp", "mpg", "mpeg"];
+const VIDEO_EXT = ["mp4", "m4v", "mov", "webm", "mkv", "avi", "ogv", "3gp", "mpg", "mpeg", "mpe", "m2v", "m2ts"];
 /* 拡張子だけで「映像」と決められるもの（mp4/mov/webm は音だけのこともあるので入れない）。
    フォルダーから取り込んだ .mkv/.mpg に 🎬 を付けるためだけに使う（重い下調べはしない） */
-const VIDEO_ONLY_EXT = ["m4v", "mkv", "avi", "ogv", "3gp", "mpg", "mpeg", "mpe"];
+const VIDEO_ONLY_EXT = ["m4v", "mkv", "avi", "ogv", "3gp", "mpg", "mpeg", "mpe", "m2v", "m2ts"];
 const VIDEO_PROBE_MS = 15000;   /* 最初のフレームを待つ上限 */
+/* 🎞 trk196：ブラウザー（Chrome/Firefox）が中身を再生できないことが多い入れ物。
+   一覧の行に ⚠ を付けて、開いてから驚かないようにする（判定は拡張子だけ＝重くしない）。
+   mpg/mpeg/mpe/m2v＝MPEG-1/2、m2ts＝MPEG-TS（TV録画）、avi＝DivX/Xvid が多い。
+   mkv は H.264＋AAC なら再生できるので、ここには入れない。 */
+const MAYBE_UNPLAYABLE_EXT = ["mpg", "mpeg", "mpe", "m2v", "m2ts", "avi"];
+const maybeUnplayable = it => !!(it && it.file && MAYBE_UNPLAYABLE_EXT.includes(core.extOf(it.file.name)));
 function probeVideoFile(file) {
   return new Promise(resolve => {
     const el = document.createElement("video");

@@ -276,6 +276,8 @@ select{padding:8px 10px;border-radius:10px;background:var(--ui-field);color:var(
 .libGroupN{flex:none;margin-left:auto;font-size:11px;font-weight:750;color:var(--ui-muted)}
 .libGroupLoadingHint{margin:2px 0}
 .libTag{font-style:normal;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;background:var(--ui-field);border:1px solid var(--ui-border)}
+/* 🎞 trk196：再生できない場合がある形式の印（一覧の行）。目立たせすぎず、色だけで伝える */
+.libTag.libWarnTag{background:rgba(255,183,77,.16);border-color:rgba(255,183,77,.5);color:#ffcf7a}
 .libEmpty{padding:40px 10px;text-align:center;color:var(--ui-muted)}
 .banner{position:relative;height:190px;border-radius:18px;overflow:hidden;border:1px solid var(--ui-border);
   background:linear-gradient(135deg,var(--ui-glow),transparent),var(--ui-field);background-size:cover;background-position:center}

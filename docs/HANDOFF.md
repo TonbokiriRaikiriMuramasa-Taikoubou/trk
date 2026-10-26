@@ -358,6 +358,12 @@
 
 ## 7. 最近の変更
 
+- **📦 1.0.7 の slim 配布ZIP（Google Drive に追加済み）**：`trk-slim-win-linux-1.0.7.zip`（225ファイル・3.65 MiB・zip）を Drive の `trk-1.0.7` フォルダ（親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu`）へ、`SHA256SUMS-1.0.7.txt` と一緒に置いた。中身は 1.0.6 slim のツリーに **trk193〜198 のアプリ本体**（`index.html`・`sw.js`・`css/*.css`・`js/*.js`）を載せ替えたもの。
+  - `release-manifest.json` は `version:"1.0.7"` / `service_worker_cache:"trk-v2026.10.27-trk198"` / `archive:"trk-slim-win-linux-1.0.7.zip"`。
+  - 直した食い違い：`README-SLIM.md` が「1.0.4」のままだった（cache 名・archive 名・README 参照を 1.0.7 に）。`README.md` が本文だけ 1.0.4 のままだったので `README-1.0.7.md` と同じ内容に統一。`README-1.0.6.md` は `README-1.0.7.md` へ改名し、1.0.7 の更新点（⏮・🔓・🎞・⚠・📖・🔍）を追記。`privacy.html` の「1.0.4のポータブルZIP」は版に依存しない言い方へ。
+  - 作らなかったもの：**mac 版**（1.0.6 の mac パッケージが手元に無く、起動案内だけが異なるため。アプリ本体は同じなので win/linux の ZIP から作れる）と **full 版**（`trk-1.0.6.zip`）。必要になったら同じツリーから。
+  - ⚠ 実機での確認は未実施（§4 の 31〜33）。ZIP は `unzip -t` で破損なし、`release-manifest.json` と `sw.js` の cache 名が一致することを確認済み。
+
 - **trk198：🔍 ⚙設定を言葉で絞り込む**：設定の上部に検索欄（`#settingsSearch`・件数 `#settingsSearchStatus`）。details（欄）と行を言葉で隠し、一致した中身は開く。隠した `hidden`/`open` は覚えておき、空にしたら元どおりに戻す（勝手に閉じたままにしない）。設定を閉じる・Esc・言語の切り替えにも追随（`data-i18n-placeholder` を `core.applyLanguage` が訳す）。文言は4言語。`tests/trk198-settings-search.test.mjs`（5件・偽のDOMで絞り込みと復元）。
 - **trk197：🔓 フォルダーの読み取りが拒否されたとき、理由と直し方を出す**：`folderPermissionOf` が直近の答えを `folderLastPermission` に残し、`syncShareUI` が「自動オフ」ではなく「ブラウザーの設定で許可し直す → 🔗 再接続」と案内（フォルダー名つき・4言語 `folderPermDenied`）。起動時に拒否されていたら `libStatus` でも同じ案内（設定オフのときは黙る）。`tests/trk197-folder-perm-hint.test.mjs`（4件）。
 - **trk196：🎞 形式まわりの仕上げ（trk195 の続き）**：

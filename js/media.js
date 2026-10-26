@@ -41,6 +41,167 @@ const ANALYZE_MAX_SEC = 20 * 60;
 /* 🪶 軽量化が有効な端末では、PCM のピークを抑えるため解析を10分までにする */
 const ANALYZE_LITE_MAX_SEC = 10 * 60;
 
+/* ---------- 🎞 コンテナとコーデックの下調べ（trk195） ----------
+   .mkv（Matroska）や .mpg（MPEG-PS）は、ブラウザーが「中身のコーデック次第」で再生できたりできなかったりする。
+   読み込めなかったときに理由を言えるよう、先頭だけを見てコンテナとコーデックを取り出す。
+   読むのは先頭の PROBE_BYTES バイトだけで、元ファイルは書き換えない・外部へも送らない。 */
+const PROBE_BYTES = 2 * 1024 * 1024;
+/* 拡張子から MIME の見当をつける（ブラウザーが type を空で渡してきたときの補助） */
+const MIME_BY_EXT = {
+  mp4:"video/mp4", m4v:"video/mp4", mov:"video/quicktime", webm:"video/webm", mkv:"video/x-matroska",
+  mpg:"video/mpeg", mpeg:"video/mpeg", mpe:"video/mpeg", m2v:"video/mpeg", avi:"video/x-msvideo", ogv:"video/ogg", "3gp":"video/3gpp",
+  m4a:"audio/mp4", m4b:"audio/mp4", mp3:"audio/mpeg", flac:"audio/flac", ogg:"audio/ogg", oga:"audio/ogg",
+  opus:"audio/ogg", wav:"audio/wav", aac:"audio/aac", mid:"audio/midi", midi:"audio/midi",
+};
+function mimeHintFor(name) {
+  const ext = String(name || "").split(".").pop().toLowerCase();
+  return MIME_BY_EXT[ext] || "";
+}
+/* type が空のときだけ、拡張子から MIME を付けた File を作る（中身はコピーしない） */
+function withMimeHint(file) {
+  if (!file || file.type) return file;
+  const type = mimeHintFor(file.name);
+  if (!type) return file;
+  try { return new File([file], file.name, { type, lastModified: Number(file.lastModified) || Date.now() }); } catch (_) { return file; }
+}
+/* 表示用の名前。知らない ID はそのまま出す（推測で「対応」と言わない） */
+const CONTAINER_LABEL = { matroska:"MKV（Matroska）", webm:"WebM", "mpeg-ps":"MPEG-PS（.mpg）", "mpeg-ts":"MPEG-TS", mp4:"MP4", ogg:"Ogg", unknown:"" };
+const CODEC_LABEL = {
+  "V_MPEG4/ISO/AVC":"H.264", "V_MPEGH/ISO/HEVC":"HEVC（H.265）", "V_VP8":"VP8", "V_VP9":"VP9", "V_AV1":"AV1",
+  "V_THEORA":"Theora", "V_MPEG1":"MPEG-1 映像", "V_MPEG2":"MPEG-2 映像", "V_MPEG4/ISO/ASP":"MPEG-4（DivX 系）映像",
+  "V_MS/VFW/FOURCC":"AVI 由来の映像（Xvid など）", "V_QUICKTIME":"QuickTime 映像", "V_PRORES":"ProRes",
+  "A_AAC":"AAC", "A_AAC/MPEG4/LC":"AAC", "A_AAC/MPEG4/LC/SBR":"AAC", "A_OPUS":"Opus", "A_VORBIS":"Vorbis",
+  "A_MPEG/L3":"MP3", "A_MPEG/L2":"MP2", "A_MPEG/L1":"MP1", "A_FLAC":"FLAC", "A_PCM/INT/LIT":"PCM",
+  "A_AC3":"AC3", "A_EAC3":"E-AC3", "A_DTS":"DTS", "A_TRUEHD":"TrueHD", "A_MLP":"MLP",
+};
+/* ブラウザー（Chromium 系）がそのまま再生できる見込みのコーデック。ここに無いものは「非対応の見込み」 */
+const CODEC_OK = new Set([
+  "V_MPEG4/ISO/AVC", "V_VP8", "V_VP9", "V_AV1", "V_THEORA",
+  "A_AAC", "A_AAC/MPEG4/LC", "A_AAC/MPEG4/LC/SBR", "A_OPUS", "A_VORBIS", "A_MPEG/L3", "A_FLAC", "A_PCM/INT/LIT",
+]);
+function codecLabel(id) { return CODEC_LABEL[id] || id; }
+/* ---- EBML（Matroska/WebM）の最小の読み取り：ID は印を含む vint、サイズは印を外す vint ---- */
+function ebmlVint(u8, pos, keepMarker) {
+  if (pos < 0 || pos >= u8.length) return null;
+  const first = u8[pos];
+  if (!first) return null;
+  let len = 1, mask = 0x80;
+  while (!(first & mask)) { len++; mask >>= 1; if (len > 8) return null; }
+  if (pos + len > u8.length) return null;
+  let value = keepMarker ? first : (first & (mask - 1));
+  for (let i = 1; i < len; i++) value = value * 256 + u8[pos + i];
+  return { len, value };
+}
+function ebmlAscii(u8, start, end) {
+  let out = "";
+  for (let i = start; i < end && out.length < 64; i++) { const c = u8[i]; if (!c) break; out += String.fromCharCode(c); }
+  return out;
+}
+function ebmlUint(u8, start, end) {
+  let v = 0;
+  for (let i = start; i < Math.min(end, start + 8); i++) v = v * 256 + u8[i];
+  return v;
+}
+/* Matroska の Tracks（0x1654AE6B）→ TrackEntry（0xAE）→ CodecID（0x86）を拾う */
+function probeMatroska(u8) {
+  const out = { container:"matroska", docType:"", codecs:[] };
+  const isUnknownSize = size => {
+    /* サイズの全ビットが 1 ＝ 長さ未定（Segment などで使われる） */
+    if (!size) return false;
+    const len = size.len, bytes = [];
+    let v = size.value;
+    for (let i = 0; i < len; i++) { bytes.unshift(v & 0xff); v = Math.floor(v / 256); }
+    const firstMask = 0x80 >> (len - 1);
+    return (bytes[0] & (firstMask - 1)) === (firstMask - 1) && bytes.slice(1).every(b => b === 0xff);
+  };
+  const readEntry = (start, end) => {
+    let pos = start, codec = "", type = 0, guard = 0;
+    while (pos < end && guard++ < 64) {
+      const id = ebmlVint(u8, pos, true); if (!id) break;
+      const size = ebmlVint(u8, pos + id.len, false); if (!size) break;
+      const dStart = pos + id.len + size.len;
+      const dEnd = Math.min(dStart + size.value, end);
+      if (id.value === 0x86) codec = ebmlAscii(u8, dStart, dEnd);
+      else if (id.value === 0x83) type = ebmlUint(u8, dStart, dEnd);
+      pos = Math.max(dEnd, pos + id.len + size.len);
+    }
+    return codec ? { codec, type } : null;
+  };
+  const walk = (start, stop, depth) => {
+    if (depth > 5) return;
+    let pos = start, guard = 0;
+    while (pos < stop && guard++ < 256) {
+      const id = ebmlVint(u8, pos, true); if (!id) return;
+      const size = ebmlVint(u8, pos + id.len, false); if (!size) return;
+      const dStart = pos + id.len + size.len;
+      const unknown = isUnknownSize(size);
+      const dEnd = unknown ? stop : Math.min(dStart + size.value, stop);
+      if (id.value === 0x4282) out.docType = ebmlAscii(u8, dStart, dEnd);
+      else if (id.value === 0x1A45DFA3 || id.value === 0x18538067 || id.value === 0x1654AE6B) walk(dStart, dEnd, depth + 1);
+      else if (id.value === 0xAE) { const t = readEntry(dStart, dEnd); if (t) out.codecs.push(t.codec); }
+      pos = Math.max(dEnd, pos + id.len + size.len);
+    }
+  };
+  walk(0, u8.length, 0);
+  if (out.docType === "webm") out.container = "webm";
+  return out;
+}
+/* MPEG-PS（.mpg）／MPEG-TS の見分け。コーデックまでは踏み込まず、形式の名前を返す */
+function probeMpeg(u8) {
+  let ps = false, video = false, audio = false, seq = false;
+  for (let i = 0; i + 3 < u8.length; i++) {
+    if (u8[i] || u8[i + 1] || u8[i + 2] !== 1) continue;
+    const c = u8[i + 3];
+    if (c === 0xba) ps = true;
+    else if (c >= 0xe0 && c <= 0xef) video = true;
+    else if (c >= 0xc0 && c <= 0xdf) audio = true;
+    else if (c === 0xbd) audio = true;          /* private_stream_1（AC3/DTS など） */
+    else if (c === 0xb3) seq = true;            /* MPEG-1/2 のシーケンスヘッダー */
+    if (ps && (video || seq)) break;
+  }
+  if (ps) return { container:"mpeg-ps", docType:"", codecs:[], note:{ video:video || seq, audio } };
+  /* TS：188 バイトごとに 0x47 が並ぶ */
+  for (const step of [188, 192]) {
+    let ok = 0;
+    for (let i = 0; i < Math.min(u8.length, step * 8); i += step) if (u8[i] === 0x47) ok++;
+    if (ok >= 4) return { container:"mpeg-ts", docType:"", codecs:[], note:{} };
+  }
+  return null;
+}
+/* 先頭バイトからコンテナとコーデックを推定する（純関数・テストで確認） */
+function probeContainer(bytes) {
+  const u8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes || []);
+  const unknown = { container:"unknown", docType:"", codecs:[] };
+  if (u8.length < 12) return unknown;
+  if (u8[0] === 0x1a && u8[1] === 0x45 && u8[2] === 0xdf && u8[3] === 0xa3) return probeMatroska(u8);
+  /* MP4 は 4バイト目の "ftyp" で決まる（先に見る＝映像データ中の 00 00 01 を MPEG と取り違えない） */
+  if (u8[4] === 0x66 && u8[5] === 0x74 && u8[6] === 0x79 && u8[7] === 0x70) return { container:"mp4", docType:"", codecs:[] };
+  if (u8[0] === 0x4f && u8[1] === 0x67 && u8[2] === 0x67 && u8[3] === 0x53) return { container:"ogg", docType:"", codecs:[] };
+  const mpeg = probeMpeg(u8);
+  if (mpeg) return mpeg;
+  return unknown;
+}
+/* 読み込めなかった理由を、画面に出す言葉（i18n のキー）にする */
+function explainProbe(probe, ext) {
+  if (!probe) return { key:"loadError", vars:{} };
+  const container = CONTAINER_LABEL[probe.container] || "";
+  const bad = (probe.codecs || []).filter(id => !CODEC_OK.has(id));
+  const good = (probe.codecs || []).filter(id => CODEC_OK.has(id));
+  if (probe.container === "mpeg-ps") return { key:"loadMpegPsUnsupported", vars:{ container } };
+  if (probe.container === "mpeg-ts") return { key:"loadMpegTsUnsupported", vars:{ container } };
+  if (bad.length) return { key:"loadCodecUnsupported", vars:{ container, codec: bad.map(codecLabel).join("・") } };
+  if (probe.container === "matroska" || probe.container === "webm")
+    return { key:"loadContainerUnreadable", vars:{ container, codec: good.map(codecLabel).join("・") || "—" } };
+  return { key:"loadError", vars:{ container, ext: String(ext || "") } };
+}
+async function explainLoadFailure(file) {
+  try {
+    const head = new Uint8Array(await file.slice(0, PROBE_BYTES).arrayBuffer());
+    const ext = String((file && file.name) || "").split(".").pop().toLowerCase();
+    return explainProbe(probeContainer(head), ext);
+  } catch (_) { return { key:"loadError", vars:{} }; }
+}
+
 /* ---------- 曲の読み込み ----------
    opts.title   : 表示名
    opts.onReady : 解析後・譜面生成前に呼ばれる。true を返すと自動生成を省略（曲パックの譜面など） */
@@ -56,7 +217,9 @@ async function loadMedia(file, opts = {}) {
   core.$("songTitle").textContent = opts.title || core.baseName(core.mediaName);
   const midi = window.Trk && window.Trk.midi;
   const midiInput = !!(midi && midi.isMidiFile(file));
-  let playbackFile = file;
+  /* type が空のファイル（フォルダー共有・PC のドラッグなどでよくある）は、拡張子から MIME を補って渡す。
+     .mkv・.mpg はブラウザーが「中身を見ないと分からない」形式なので、これが効くことがある */
+  let playbackFile = withMimeHint(file);
   core.setStatus("loadStatus", midiInput ? "midiRendering" : "loading");
   if (midiInput) {
     /* 長い・音の多いMIDIは変換に時間がかかるので、5%刻みで進み具合を出す。
@@ -95,7 +258,14 @@ async function loadMedia(file, opts = {}) {
     core.video.src = core.mediaURL; core.video.load();
   });
   if (token !== core.loadToken) return false;
-  if (!ok || !isFinite(core.video.duration) || core.video.duration <= 0) { core.setStatus("loadStatus", "loadError"); core.updateChartButtons(); return false; }
+  if (!ok || !isFinite(core.video.duration) || core.video.duration <= 0) {
+    /* なぜ読めなかったのかを、先頭だけ見て言い当てる（言えないときは今までどおりの一文） */
+    const why = await explainLoadFailure(file);
+    if (token !== core.loadToken) return false;
+    if (why && why.key && why.key !== "loadError") core.setStatus("loadStatus", why.key, why.vars);
+    else core.setStatus("loadStatus", "loadError");
+    core.updateChartButtons(); return false;
+  }
   core.videoReady = true; core.fingerprint = `${file.size}:${Math.round(core.video.duration * 10)}`;
   core.setStatus("loadStatus", "analyzing"); core.updateChartButtons();
   await new Promise(r => { setTimeout(r, 30); });
@@ -425,7 +595,7 @@ window.seFiles = seFiles;
 window.setBackground = setBackground;
 /* 領域（window.Trk.media）：公開名の正規の場所。旧名（window.X）は別名として残す（利用者の決定） */
 window.Trk = window.Trk || {};
-window.Trk.media = Object.assign(window.Trk.media || {}, { CHART_FILE_MAX, buildChart, decodeAudio, estimateLevel, exportChart, generateNotes, getAC, importChartFile, loadMedia, loadSE, loudnessDb, playSE, rmsAt, seBuffers, seFiles, setBackground });
+window.Trk.media = Object.assign(window.Trk.media || {}, { CHART_FILE_MAX, buildChart, decodeAudio, estimateLevel, exportChart, generateNotes, getAC, importChartFile, loadMedia, loadSE, loudnessDb, playSE, rmsAt, seBuffers, seFiles, setBackground, codecLabel, explainLoadFailure, explainProbe, mimeHintFor, probeContainer, withMimeHint });
 Object.defineProperty(window.Trk.media, "applyChartData", { configurable:true, get:() => applyChartData, set:v => { applyChartData = v; } });
 Object.defineProperty(window.Trk.media, "audioCtx", { configurable:true, get:() => audioCtx, set:v => { audioCtx = v; } });
 Object.defineProperty(window.Trk.media, "chartToData", { configurable:true, get:() => chartToData, set:v => { chartToData = v; } });

@@ -131,7 +131,9 @@ test("library.js: MEDIA_EXT に m4b が入った（オーディオブックの�
   assert.match(librarySrc, /const MEDIA_EXT = \[[^\]]*"m4b"[^\]]*\]/);
   const m = librarySrc.match(/const MEDIA_EXT = \[([^\]]*)\]/);
   const exts = m[1].split(",").map(s => s.trim().replace(/"/g, "")).filter(Boolean);
-  assert.deepEqual(exts, ["mp4", "m4a", "m4b", "mp3", "ogg", "oga", "opus", "wav", "webm", "flac", "aac", "mov", "mid", "midi"]);
+  /* 並びは問わない（trk195 が .mkv/.mpg/.mpeg を足した）。m4b と既存の音声が残っていることだけ見る */
+  for (const ext of ["mp4", "m4a", "m4b", "mp3", "ogg", "oga", "opus", "wav", "webm", "flac", "aac", "mov", "mid", "midi"])
+    assert.ok(exts.includes(ext), `${ext} stays in MEDIA_EXT`);
   assert.ok(!exts.includes("srt") && !exts.includes("vtt"), "subtitle files stay out of MEDIA_EXT (they ride it.subsFile)");
 });
 

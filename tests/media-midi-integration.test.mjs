@@ -19,6 +19,11 @@ const loadEnd = media.indexOf("\n}\n\n/* ---------- 解析結果", loadStart);
 assert.ok(analysisConstants.every(Boolean), "media analysis caps are declared");
 assert.ok(loadStart >= 0 && loadEnd > loadStart, "loadMedia() can be isolated for a dependency-free behavior test");
 const loadMediaSource = media.slice(loadStart, loadEnd + 2);
+/* loadMedia() は失敗時に理由を調べる（trk195）。その下調べ一式も同じ VM に入れて、本物の関数を動かす。 */
+const probeSource = media.slice(
+  media.indexOf("/* ---------- 🎞 コンテナとコーデックの下調べ"),
+  media.indexOf("/* ---------- 曲の読み込み ----------"),
+);
 
 async function runMidi({ errorCode = "", progress = [], loadAgainDuringRender = false } = {}) {
   const handlers = Object.create(null);
@@ -67,7 +72,7 @@ async function runMidi({ errorCode = "", progress = [], loadAgainDuringRender = 
     console
   };
   vm.createContext(sandbox);
-  vm.runInContext(`${analysisConstants.join("\n")}\n${loadMediaSource}\nwindow.__loadMedia = loadMedia;`, sandbox, { filename:"js/media.js#loadMedia" });
+  vm.runInContext(`${analysisConstants.join("\n")}\n${probeSource}\n${loadMediaSource}\nwindow.__loadMedia = loadMedia;`, sandbox, { filename:"js/media.js#loadMedia" });
   const loaded = await sandbox.window.__loadMedia({ name:"th06_01.mid", size:128, type:"audio/midi" });
   return { loaded, statuses, objectUrlFiles, playbackFile, calls, core };
 }
@@ -80,7 +85,7 @@ test("index wires MIDI parsing before media playback and accepts MIDI in the loc
   const catalog = index.indexOf('<script src="js/catalog.js"></script>');
   assert.ok(midiProfiles >= 0 && midiProfiles < midiPlayer && midiPlayer < mediaPlayer, "MIDI profiles and parser load before media.js");
   assert.ok(themeData >= 0 && themeData < catalog, "pinned titles load before the catalogue");
-  assert.match(index, /accept="video\/\*,audio\/\*,\.mid,\.midi"/);
+  assert.match(index, /accept="video\/\*,audio\/\*,\.mid,\.midi(?:,\.[a-z0-9]+)*"/);
   assert.match(library, /const MEDIA_EXT = \[[^\]]*"mid", "midi"\]/);
 });
 

@@ -17,6 +17,11 @@ const loadEnd = media.indexOf("\n}\n\n/* ---------- 解析結果", loadStart);
 assert.ok(constants.every(Boolean), "media analysis caps are declared");
 assert.ok(loadStart >= 0 && loadEnd > loadStart, "loadMedia() can be isolated for a dependency-free behavior test");
 const loadMediaSource = media.slice(loadStart, loadEnd + 2);
+/* loadMedia() は失敗時に理由を調べる（trk195）。その下調べ一式も同じ VM に入れて、本物の関数を動かす。 */
+const probeSource = media.slice(
+  media.indexOf("/* ---------- 🎞 コンテナとコーデックの下調べ"),
+  media.indexOf("/* ---------- 曲の読み込み ----------"),
+);
 
 async function run({ minutes, lite = false, noAnalyze = false, size = 1024 }) {
   const handlers = Object.create(null);
@@ -40,7 +45,7 @@ async function run({ minutes, lite = false, noAnalyze = false, size = 1024 }) {
     window:{}, console,
   };
   vm.createContext(sandbox);
-  vm.runInContext(`${constants.join("\n")}\n${loadMediaSource}\nwindow.__loadMedia = loadMedia;`, sandbox, { filename:"js/media.js#loadMedia" });
+  vm.runInContext(`${constants.join("\n")}\n${probeSource}\n${loadMediaSource}\nwindow.__loadMedia = loadMedia;`, sandbox, { filename:"js/media.js#loadMedia" });
   const loaded = await sandbox.window.__loadMedia({ name:"test audio", size });
   return { loaded, status:status.at(-1), analysis:core.analysis, calls };
 }

@@ -7,7 +7,10 @@
    文章は i18n.js にあります。 */
 "use strict";
 
-const MEDIA_EXT = ["mp4", "m4a", "m4b", "mp3", "ogg", "oga", "opus", "wav", "webm", "flac", "aac", "mov", "mid", "midi"];   /* 🔖 m4b（オーディオブック）も曲として扱う（trk170） */
+const MEDIA_EXT = ["mp4", "m4a", "m4b", "mp3", "ogg", "oga", "opus", "wav", "webm", "flac", "aac", "mov", "mkv", "mpg", "mpeg", "mid", "midi"];   /* 🔖 m4b（オーディオブック）も曲として扱う（trk170）
+   🎞 trk195：.mkv（Matroska）と .mpg（MPEG-PS）を一覧・フォルダーの取り込みに加えた。
+   ただし「取り込める＝再生できる」ではありません。中身のコーデックがブラウザーに無ければ再生は失敗するので、
+   そのときは media.js が理由（例：MPEG-2 映像・AC3 音声）を出します。 */
 const LIB_MAX = 3000, LIB_SHOW = 300, ADDED_MAX = 50, CHART_SUFFIX = ".shadow-taiko.json"; /* ADDED_MAX はセッション内リストのみ */
 const MEDIA_KEEP_BYTES_1G = 1024 ** 3, MEDIA_KEEP_BYTES_5G = 5 * 1024 ** 3;
 const TRK_PUBLIC_PAGE_URL = "https://freegame-mugen.jp/puzzle/game_15772.html";
@@ -4615,7 +4618,10 @@ async function addSongFiles(list) {
    ② 確かめられたものだけこのタブの曲リストで 🎬 として扱う（本体は保存しない。大きいファイルの音声解析は media.js 側で省略）
    ③ 読み込み後、そのまま全画面ビューア（🖥）で流す
    ※ 端末が映像を解釈できない形式なら「音として読み込みました」と出します（無理に動かさない）。 */
-const VIDEO_EXT = ["mp4", "m4v", "mov", "webm", "mkv", "avi", "ogv", "3gp"];
+const VIDEO_EXT = ["mp4", "m4v", "mov", "webm", "mkv", "avi", "ogv", "3gp", "mpg", "mpeg"];
+/* 拡張子だけで「映像」と決められるもの（mp4/mov/webm は音だけのこともあるので入れない）。
+   フォルダーから取り込んだ .mkv/.mpg に 🎬 を付けるためだけに使う（重い下調べはしない） */
+const VIDEO_ONLY_EXT = ["m4v", "mkv", "avi", "ogv", "3gp", "mpg", "mpeg", "mpe"];
 const VIDEO_PROBE_MS = 15000;   /* 最初のフレームを待つ上限 */
 function probeVideoFile(file) {
   return new Promise(resolve => {
@@ -4641,7 +4647,9 @@ function probeVideoFile(file) {
     el.addEventListener("playing", () => { try { el.pause(); } catch (_) {} check(); });
     el.addEventListener("error", () => finish(false));
     timer = setTimeout(() => finish(el.videoWidth > 0), VIDEO_PROBE_MS);
-    try { url = URL.createObjectURL(file); el.src = url; el.load(); } catch (_) { finish(false); }
+    /* type が空の .mkv/.mpg は、拡張子から MIME を補ってから渡す（下調べの取りこぼしを減らす） */
+    const hinted = window.Trk.media && typeof window.Trk.media.withMimeHint === "function" ? window.Trk.media.withMimeHint(file) : file;
+    try { url = URL.createObjectURL(hinted); el.src = url; el.load(); } catch (_) { finish(false); }
   });
 }
 async function addVideoFiles(list) {
@@ -4656,7 +4664,17 @@ async function addVideoFiles(list) {
     const it = addedItem(f, isVideo, addedAt, { sessionOnly:true }), at = addedSongs.findIndex(x => x.key === it.key);
     if (at >= 0) addedSongs.splice(at, 1);
     addedSongs.unshift(it); first = first || it;
-    core.setStatus("libStatus", isVideo ? "libVideoYes" : "libVideoNo", { name:f.name });
+    if (isVideo) core.setStatus("libStatus", "libVideoYes", { name:f.name });
+    else {
+      /* 🎞 映像として開けなかったとき：.mkv/.mpg などは「音として読み込みました」だけだと理由が分からない。
+         中身のコーデックが原因だと分かったときだけ、その理由（MP4 に変換すると再生できる）を出す。
+         分からないとき（音だけの MP4 など）は今までどおり「音として読み込みました」。 */
+      const why = window.Trk.media && typeof window.Trk.media.explainLoadFailure === "function"
+        ? await window.Trk.media.explainLoadFailure(f) : null;
+      const known = why && ["loadCodecUnsupported", "loadMpegPsUnsupported", "loadMpegTsUnsupported"].includes(why.key);
+      if (known) core.setStatus("libStatus", why.key, { ...why.vars, name:f.name });
+      else core.setStatus("libStatus", "libVideoNo", { name:f.name });
+    }
   }
   while (addedSongs.length > ADDED_MAX) addedSongs.pop();
   for(const it of addedSongs.slice(0, files.length)) rememberSongRef(it);
@@ -4712,8 +4730,10 @@ function ingestFolder(list, dirName, shared, skipped) {
       const k = dir + "/" + core.baseName(file.name);
       if (!subs[k] || lower.endsWith(".vtt")) subs[k] = file;
     } else if (MEDIA_EXT.includes(core.extOf(file.name)) && folderSongs.length < LIB_MAX) {
-      const base = core.baseName(file.name);
-      folderSongs.push({ key:`${file.size}|${base}`, source:"folder", file, title:base, base, size:file.size, dir });
+      const base = core.baseName(file.name), ext = core.extOf(file.name);
+      /* 🎞 .mkv/.mpg/.avi などは拡張子だけで映像と分かるので 🎬 を付ける（下調べはしない＝大きいフォルダーでも速い） */
+      folderSongs.push({ key:`${file.size}|${base}`, source:"folder", file, title:base, base, size:file.size, dir,
+        video:VIDEO_ONLY_EXT.includes(ext) });
     }
   }
   for (const it of folderSongs) { it.charts = charts[it.dir + "/" + it.base] || null; it.lyricsFile = lyrics[it.dir + "/" + it.base] || null; it.subsFile = subs[it.dir + "/" + it.base] || null; }

@@ -359,7 +359,7 @@
 
 ## 7. 最近の変更
 
-- **📦 1.0.7 修正版の slim 配布ZIP（win/linux・mac の2本／Google Drive の `trk-1.0.7` に追加）**：レビューの修正版パッチ（trk199）を当てた配布物。アプリ本体はリポジトリの `index.html`・`sw.js`・`css/*.css`・`js/*.js` とバイト同一。
+- **📦 1.0.7 修正版の slim 配布ZIP（win/linux・mac の2本／Google Drive の `trk-1.0.7` に追加）**：Drive の id＝win/linux `1SpVyy_Bxv-atg7M5PSa8u003Wkeo5dLW`／mac `1jm03Y5jl120h7F_d0yxO0jrhgafUjP6T`／`SHA256SUMS-1.0.7-fixed.txt` `1Oe2-f8xRfIfrp55ZXjzNw4PHpYx7iZQm`、原本の退避先 `1qSnvDAI-t4apbo7SB9RlMcJLyReYgJvF`。：レビューの修正版パッチ（trk199）を当てた配布物。アプリ本体はリポジトリの `index.html`・`sw.js`・`css/*.css`・`js/*.js` とバイト同一。
   - `trk-slim-win-linux-1.0.7-fixed.zip`＝3,825,096 bytes・225ファイル・展開 10,473,822 bytes・`sha256 182f2431eba228300fa88a2b6557b7c48d3999a3f7bf937a95b2f176b8aa0d49`
   - `trk-slim-mac-1.0.7-fixed.zip`＝3,822,307 bytes・225ファイル・展開 10,473,359 bytes・`sha256 fb8c1059e243e4ea41a6cde7c306af35891a824367e4252c7b5b308d28e695b6`（1.0.6 の mac 版 `trk-slim-mac-1.0.6.zip` を土台に、win/linux と同じアプリ本体＋mac 用の `00_START_HERE.html`／`01_README_MAC.txt` を入れた）
   - 全エントリ `2026-10-27 12:00`、`unzip -t` 破損なし、`release-manifest.json` の `service_worker_cache`＝`sw.js` の `CACHE`＝`trk-v2026.10.27-trk199`（`archive` も `*-fixed.zip` に合わせた）。

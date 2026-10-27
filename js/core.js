@@ -1373,7 +1373,7 @@ function renderStoragePersist(state) {
   };
   bind("emergencySafeBtn", () => {
     enterSafeMode(); saveUserPrefs();
-    setSt(() => "🛟 セーフモードにしました。映像OFF・ぼかし無し・TV初期化。ページを再読み込みします…（保存した設定は書き換えません）");
+    setSt(() => "🛟 セーフモードにしました。映像OFF・ぼかし無し・TV初期化。ページを再読み込みします…（自動読み取り・プレビューなどは ?safe=1 のあいだだけ止めます）");
     setTimeout(()=> reloadInSafeMode(), 800);
   });
   bind("emergencyTvResetBtn", () => {

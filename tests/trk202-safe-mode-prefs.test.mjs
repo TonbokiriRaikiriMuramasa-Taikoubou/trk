@@ -98,10 +98,11 @@ test("trk202: every reload that enters safe mode goes through the URL helper", (
   assert.ok(/setTimeout\(\(\)=> reloadInSafeMode\(\), 800\)/.test(coreSrc), "緊急復旧パネルのボタンも同じ");
 });
 
-test("trk202: the notice explains that safe mode lasts only while the URL says so, in four languages", () => {
+test("trk202: the notice says what is saved (video/TV reset) and what lasts only while ?safe=1, in four languages", () => {
   assert.equal(i18nSrc.split("\n    safeModeNotice:").length - 1, 4, "safeModeNotice は4言語");
   assert.ok(/safe: tr\("safeModeNotice"\)/.test(coreSrc), "起動の案内は i18n から引く");
   const ja = i18nSrc.match(/safeModeNotice:"([^"]*)"/)[1];
   assert.match(ja, /\?safe=1/, "戻し方（URL）まで言う");
-  assert.match(ja, /元の設定/, "設定は消えていないと分かる");
+  assert.match(ja, /保存されます/, "映像・TVなどの戻しは保存されると正直に言う（enterSafeMode は SAFE_SESSION_KEYS 以外も保存する）");
+  assert.match(ja, /元に戻ります/, "自動読み取りなどは開き直すと戻ると分かる");
 });

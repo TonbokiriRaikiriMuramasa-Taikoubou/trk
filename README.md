@@ -52,6 +52,8 @@ python -m http.server 8000
 # → http://localhost:8000 を開く
 ```
 
+配布ZIPは `index.html`・`README.txt`・`trk-files/` の3つだけの形で作ります（OS共通の1本）。`npm run release`（手順は [docs/HANDOFF.md](docs/HANDOFF.md) の §9）。
+
 ### 📦 同梱曲と保存場所（プレイヤーだけ使いたい人へ）
 
 ダウンロードにはオリジナル曲が付いてきます。場所は次のとおりです。
@@ -128,6 +130,8 @@ Catalog matching automatically handles supported title variations, using officia
 ▶ **Play:** https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/
 
 **Run locally:** `python -m http.server 8000`, then open `http://localhost:8000`.
+
+**Release ZIP:** one archive for all desktop OSes; unzipping shows only `index.html`, `README.txt` and `trk-files/`. `npm run release` (§9 of [docs/HANDOFF.md](docs/HANDOFF.md)).
 
 Five play styles (MANUAL, TRUCK, ORBIT, STAGE, CATCH), Study Room, verified packs and lighter builds are described in the **[full English guide](docs/guide/en.md)**.
 

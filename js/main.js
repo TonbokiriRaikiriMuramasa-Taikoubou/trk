@@ -316,13 +316,76 @@ core.$("videoFile").addEventListener("change", e => { const fs = Array.from(e.ta
 core.$("openSettingsBtn").addEventListener("click", core.openSettings);
 core.$("closeSettingsBtn").addEventListener("click", core.closeSettings);
 
+/* ---------- 🔍 設定の絞り込み（trk198） ----------
+   設定は details 13個・入力104個まで増えたので、言葉で絞れるようにする。
+   隠したものは全部覚えておき、空にしたら元の開閉状態へ戻す（勝手に閉じたままにしない）。
+   見るのは画面の文字だけ（i18n の訳文もそのまま当たる）。 */
+const setSearchSaved = new Map();          /* node → { hidden, open } */
+function setSearchRestore() {
+  for (const [node, st] of setSearchSaved) {
+    node.hidden = st.hidden;
+    if (st.open !== undefined) node.open = st.open;
+  }
+  setSearchSaved.clear();
+}
+function setSearchClear() {
+  setSearchRestore();
+  const box = core.$("settingsSearch"), status = core.$("settingsSearchStatus");
+  if (box) box.value = "";
+  if (status) status.textContent = "";
+}
+function applySettingsSearch() {
+  const box = core.$("settingsSearch"), status = core.$("settingsSearchStatus");
+  if (!box) return;
+  const q = String(box.value || "").trim().toLowerCase();
+  setSearchRestore();
+  if (!q) { if (status) status.textContent = ""; return; }
+  const remember = node => { if (!setSearchSaved.has(node)) setSearchSaved.set(node, { hidden: node.hidden, open: node.tagName === "DETAILS" ? node.open : undefined }); };
+  const has = node => String(node.textContent || "").toLowerCase().includes(q);
+  const panels = Array.from(document.querySelectorAll("#settingsScreen .grid details.panel"));
+  let hits = 0;
+  for (const panel of panels) {
+    remember(panel);
+    if (!has(panel)) { panel.hidden = true; panel.open = false; continue; }
+    panel.hidden = false; panel.open = true;
+    let found = 0;
+    for (const sub of Array.from(panel.querySelectorAll("details.subPanel"))) {
+      remember(sub);
+      const hit = has(sub);
+      sub.hidden = !hit;
+      if (hit) { sub.open = true; found++; }
+    }
+    for (const row of Array.from(panel.children)) {
+      if (row.tagName === "SUMMARY" || row.tagName === "DETAILS") continue;
+      remember(row);
+      const hit = has(row);
+      row.hidden = !hit;
+      if (hit) found++;
+    }
+    hits += found || 1;   /* 見出し（summary）だけが一致した欄も「1件」と数える */
+  }
+  if (status) status.textContent = hits ? tr("settingsSearchCount", { n:hits }) : tr("settingsSearchNoResults");
+}
+(() => {
+  const box = core.$("settingsSearch");
+  if (!box) return;
+  let timer = 0;
+  box.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(applySettingsSearch, 120); });
+  box.addEventListener("keydown", e => { if (e.key === "Escape") { e.stopPropagation(); setSearchClear(); box.blur(); } });
+  /* 設定を閉じたら元に戻す（次に開いたとき、絞ったままにしない） */
+  core.on("screen", id => { if (id !== "settings") setSearchClear(); });
+  /* 言語を変えたら、いまの絞り込みを新しい言葉でやり直す */
+  core.on("language", () => { if (String(box.value || "").trim()) applySettingsSearch(); });
+})();
+
 core.$("bpm").addEventListener("change", () => {
   const v = Number(core.$("bpm").value);
   if (v >= 60 && v <= 300) { if (!window.Trk.library.saveSongPrefs()) { core.settings.bpm = v; core.saveUserPrefs(); } }
   if (core.videoReady && core.chartMode === "generated") window.Trk.media.buildChart();
 });
 core.$("chartGen").addEventListener("change", () => {
-  core.settings.chartGen = core.$("chartGen").value === "2" ? "2" : "1"; core.saveUserPrefs();   // 譜面の作り方は全曲共通の設定
+  const value = core.$("chartGen").value;
+  core.settings.chartGen = ["1", "2", "3", "4"].includes(value) ? value : "3"; core.saveUserPrefs();   // 譜面の作り方は全曲共通の設定
   if (core.videoReady && core.chartMode === "generated") window.Trk.media.buildChart();
 });
 core.$("offset").addEventListener("change", () => {
@@ -518,7 +581,17 @@ addEventListener("drop", async e => {
   if (!files.length || core.phase !== "title") return;
   const json = files.find(f => /\.json$/i.test(f.name) || f.type === "application/json");
   if (json) { await window.Trk.media.importChartFile(json); return; }
-  window.Trk.library.addSongFiles(files);
+  /* 🎬 trk203：画面にドロップした動画も「🎬 動画を読み込む」と同じ道を通す。
+     いままでは全部 addSongFiles に渡していて、映像の下調べ（videoWidth）を通らず
+     .mkv/.mpg が音として扱われていた。映像らしいものだけ addVideoFiles へ分ける。 */
+  const lib = window.Trk.library;
+  const videoExts = Array.isArray(lib.VIDEO_EXT) ? lib.VIDEO_EXT : [];
+  const isVideoish = f => /^video\//i.test((f && f.type) || "") || videoExts.includes(core.extOf((f && f.name) || ""));
+  const vids = files.filter(isVideoish);
+  const songs = files.filter(f => !isVideoish(f));
+  if (songs.length) await lib.addSongFiles(songs);
+  /* ドロップでは全画面ビューアを勝手に開かない（一覧に足すだけ。開くのは 🎬 ボタンから） */
+  if (vids.length) await lib.addVideoFiles(vids, { openViewer:false });
 });
 
 /* ============ 起動 ============ */
@@ -566,7 +639,7 @@ packsReady.then(() => window.Trk.library.initLibrary()).catch(e => console.error
 /* PWA：オフラインでも開けるようにする（HTTPS か localhost のときだけ）。
    キャッシュの整理は sw.js が trk- で始まる名前だけを消すので、ほかのサイトに影響しません。 */
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
-  navigator.serviceWorker.register("./sw.js", { scope: "./" })
+  navigator.serviceWorker.register("./sw.js", { scope: "./", updateViaCache:"none" })
     .catch(() => { /* オフライン用のキャッシュが無くても、ゲームはそのまま遊べます */ });
 }
 /* ✅ main.js 完了 */

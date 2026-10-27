@@ -11,7 +11,8 @@
 - **音質**：5バンドEQ＋FXラック全体（TRKアンプ）、左右バランス（StereoPanner）、MIDI音色プロフィール24種、MIDI MIX
 - **見た目の楽しさ**：スペクトラムビジュアライザ、フレーム補間、壁紙／スクリーンセーバー
 - **他プレイヤーに無い強み**：A-Bループ＋ループ・ラボ（保存・ランダム区間）、逆再生、区間の映像クリップ書き出し、MIDI合成、 rhythm game 連携そのもの
-- **形式**：mp3/m4a/m4b/aac/flac/ogg/oga/opus/wav/webm ＋ mid/midi（合成）、動画 mp4/m4v/mov/webm/mkv/avi/ogv/3gp（実際の再生はブラウザのコーデック依存）
+- **形式**：mp3/m4a/m4b/aac/flac/ogg/oga/opus/wav/webm ＋ mid/midi（合成）、動画 mp4/m4v/mov/webm/mkv/avi/ogv/3gp/mpg/mpeg（実際の再生はブラウザのコーデック依存）
+  - trk195：`.mkv`・`.mpg` を一覧・フォルダー取込に加えた。取り込めたかどうかと再生できるかどうかは別で、再生できないときは先頭 2MB を見て理由（MPEG-PS・MPEG-2/AC3 など）を出す（`js/media.js` の `probeContainer`／`explainProbe`）
 - **書斎（コミックリーダー）**：見開き（右綴じ）／縦読み（webtoon）／1枚表示、しおり・読書位置、全画面フィット、拡大縮小・ページ送りキー、サムネイル一覧、埋め込みジャケット読取（ID3 APIC／MP4 covr／FLAC picture／Ogg）
 - **スリープタイマー**：15/30/60分（→ trk164 で強化予定：下表#2）
 

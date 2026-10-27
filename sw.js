@@ -2,7 +2,7 @@
 /* trk! offline shell: network first, cached same-origin app files as a fallback.
    Exception: the hash-pinned vendor files (assets/vendor, tools/vendor-lock.json) are cache-first,
    but a cached copy is used only when its SHA-384 matches the pin below. */
-const CACHE = "trk-v2026.10.16-trk189";
+const CACHE = "trk-v2026.10.27-trk204";
 const CACHE_PREFIX = "trk-";
 const SCOPE = new URL(self.registration.scope);
 const VENDOR_PREFIX = "assets/vendor/";
@@ -226,7 +226,8 @@ self.addEventListener("fetch", event => {
       } catch { /* storage may be unavailable; go to the network */ }
     }
     try {
-      const response = await fetch(request);
+      /* Revalidate the browser's HTTP cache on each online request. CacheStorage remains the offline fallback. */
+      const response = await fetch(request, { cache:"no-cache" });
       if (response.ok && response.type === "basic") {
         try {
           const cache = await caches.open(CACHE);

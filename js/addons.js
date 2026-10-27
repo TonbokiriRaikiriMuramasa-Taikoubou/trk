@@ -25,8 +25,10 @@
      api.el(tag, cls, text)   … 要素を作る
      api.$(id)                … id で要素を取る
      api.addStyle(css)        … <style> を足す（見た目を足す用）
-     api.on(event, fn) / api.emit(event, data) … 本体のイベント（language / tvChange / packsChanged / addonSelect など）
-     api.slot(name)           … 置き場所。name は "settings" / "libPanel" / "tvMore" / "rackMore"
+     api.on(event, fn) / api.emit(event, data) … 本体のイベント（language / tvChange / packsChanged / addonSelect / nowPlaying など）
+                                  ※ apiVersion 2: api.on は**解除関数**を返します（teardown で購読を外せます）
+     api.nowPlaying()         … 💬 いまの曲のスナップショット（trk-now-playing/1・曲が無ければ null・API v2）
+     api.slot(name)           … 置き場所。name は "settings" / "libPanel" / "tvMore" / "rackMore" / "drawer"（API v2・画面右端の引き出し）
      api.say(text)            … 設定画面のアドオン欄に、そのままの文字を出す
      api.settings / api.savePrefs() … 設定（shadow_taiko_preferences_v2）
      api.video() / api.phase()      … 本体の <video> と、いまの画面（"title" など）
@@ -54,7 +56,7 @@
 
 const ADDONS_KEY = "trk_addons_v1";       // 新しい保存キー（既存のキーは触りません）
 const ADDON_FORMAT = "trk-addon";         // 配布ファイルの形式名
-const API_VERSION = 1;                    // このファイルが提供するAPIの版
+const API_VERSION = 2;                    // このファイルが提供するAPIの版（trk191: nowPlaying / drawer / on の解除関数）
 const MAX_CODE = 512 * 1024;              // 1つのアドオンコードの上限（512KiB）
 const MAX_ADDON_FILE = 4 * 1024 * 1024;   // JSONラッパーを含む入力ファイルの上限（4MiB）
 const SAMPLE_URL = "js/addons/example.js";
@@ -236,6 +238,8 @@ function mountSlots() {
   /* 📺🎛 の「くわしい」は、並べ替えで列の下のほうへ移ることがある（Task E）。どちらでも見つける */
   mk("tvMore", document.querySelector("#tvDock .tvMore") || document.querySelector(".songCol > details.tvMore"), (h, d) => h.append(d));
   mk("rackMore", document.querySelector("#fxDock .dockMore") || document.querySelector(".songCol > details.dockMore"), (h, d) => h.append(d));
+  /* 💬 trk191: 画面右端の引き出し（チャット等の常設UI用・API v2）。中身が無いときは場所ごと隠れる */
+  mk("drawer", core.$("addonDrawerHost"), (h, d) => h.append(d));
   /* 置き場所に何も無いときは、場所ごと隠す（画面を静かに保つ） */
   const hide = () => slots.forEach(box => { box.hidden = !box.children.length; });
   hide();
@@ -287,13 +291,15 @@ function makeApi(id) {
       s.dataset.addon = id; s.textContent = String(css || "");
       document.head.append(s); return s;
     },
-    on: (ev, fn) => on(ev, fn),
+    on: (ev, fn) => on(ev, fn),   /* trk191（API v2）: 解除関数を返す（core.on の戻り値をそのまま渡す） */
     emit: (ev, data) => core.emit(ev, data),
     slot: name => slots.get(name) || null,
     say: text => say("🧩 " + id + "：" + text),
     settings: core.settings, savePrefs: () => core.saveUserPrefs(),
     video: () => document.getElementById("video"),
     phase: appPhase,
+    /* trk191（API v2）: 💬 いまの曲のスナップショット（trk-now-playing/1）。曲が無ければ null */
+    nowPlaying: () => { const L = window.Trk.library; return L && typeof L.nowPlaying === "function" ? L.nowPlaying() : null; },
     addSongs: list => setSongs(id, list),
     fx: {
       available: () => !!(window.TrkFX && typeof window.TrkFX.tapElement === "function"),

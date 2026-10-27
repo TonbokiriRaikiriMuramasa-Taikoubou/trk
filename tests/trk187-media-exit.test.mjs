@@ -12,7 +12,7 @@ test('media exit names its destination in all four languages', () => {
     const block = src.split(`Object.assign(TEXT.${lang}, {`)[1].split('\n});')[0];
     assert.ok(block.includes(`mediaClose:"← ${label}"`));
   }
-  assert.match(src, /closeNode = makeButton\("mediaClose", "instClose mediaExitBtn"\); closeNode.addEventListener\("click", \(\) => closeMedia\(\)\)/);
+  assert.match(src, /closeNode = makeButton\("mediaClose", "instClose mediaExitBtn"\);[\s\S]{0,200}?closeNode\.addEventListener\("click", \(\) => closeMedia\(\)\)/);
 });
 
 test('media header remains outside the scrollable body', () => {

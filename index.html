@@ -9,7 +9,8 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/study-room.css">
 <!-- SNSで共有したときのカード（画像は https:// から始まる完全なURLにする）。
-     ⚠ 同じ名前のmeta・linkは1回だけ書く（trk129：同じ名前が2回あり、SNSが先の方の説明文を拾っていた） -->
+     ⚠ 同じ名前のmeta・linkは1回だけ書く（trk129：同じ名前が2回あり、SNSが先の方の説明文を拾っていた）
+     ※ 配布ZIP用ビルドでは og:url／og:image を外すが、GitHub Pages版は公開URLがあるので残す -->
 <meta property="og:title" content="trk! — AGRG">
 <meta property="og:description" content="万能なブラウザ再生プレイヤー。完全無料。手持ちの音楽、画像、漫画、小説、そして音ゲーを楽しめます。データは、端末の中だけ。">
 <meta property="og:url" content="https://tonbokiriraikirimuramasa-taikoubou.github.io/trk/">
@@ -42,6 +43,8 @@
 </head>
 
 <body>
+<!-- 💬 trk191: アドオン引き出しの置き場所（slot "drawer"・API v2）。中身が無いときは非表示で、クリックも妨げない -->
+<div id="addonDrawerHost" class="addonDrawerHost"></div>
 <div id="stage" data-layout="classic" data-phase="title">
   <canvas id="view" width="1920" height="1080"></canvas>
   <canvas id="fx" width="1920" height="1080"></canvas>
@@ -157,6 +160,7 @@
               <h2 class="libTitle"><button type="button" class="study-launch-title" data-i18n="libTitle" aria-haspopup="dialog"></button></h2>
               <span class="libHeadRight">
                 <span id="libCount" class="hint"></span>
+                <!-- 🎥 基地：メディアプレーヤーへの常時入口（trk186。TV電源長押しも従来どおり使える） -->
                 <button id="mediaOpenBtn" class="libSkinBtn studyHeadBtn" type="button" aria-haspopup="dialog" aria-controls="mediaPlayerMode" data-i18n="mediaOpenBtn"></button>
                 <button id="studyOpenBtn" class="libSkinBtn studyHeadBtn" type="button" aria-haspopup="dialog"></button>
                 <button id="libSkinBtn" class="libSkinBtn" type="button" hidden></button>
@@ -169,12 +173,12 @@
               <button id="libReconnectBtn" type="button" hidden></button>
               <button id="libRescanBtn" type="button" hidden data-i18n="libRescan"></button>
               <label class="fileBtn small">
-                <input id="mediaFile" type="file" accept="video/*,audio/*,.mid,.midi" multiple hidden>
+                <input id="mediaFile" type="file" accept="video/*,audio/*,.mid,.midi,.mkv,.mpg,.mpeg,.mpe,.m2v,.m2ts" multiple hidden>
                 <span data-i18n="libAddFile"></span>
               </label>
               <!-- 🎬 動画を読み込む：最初のフレームまで確かめて「映像つき」として記録し、そのまま全画面で流す -->
               <label class="fileBtn small" id="libVideoLabel">
-                <input id="videoFile" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.mkv,.avi" multiple hidden>
+                <input id="videoFile" type="file" accept="video/*,.mp4,.mov,.m4v,.webm,.mkv,.avi,.mpg,.mpeg,.mpe,.m2v,.m2ts" multiple hidden>
                 <span data-i18n="libAddVideo"></span>
               </label>
               <label class="fileBtn small">
@@ -217,6 +221,9 @@
               <div id="songTitleBig" class="bannerTitle"></div>
               <div id="songSub" class="bannerSub"></div>
               <div id="loadStatus" class="hint status"></div>
+              <div id="mediaKeepCurrentActions" class="miniActions" hidden>
+                <button id="mediaKeepCurrentBtn" type="button"></button>
+              </div>
             </div>
           </section>
           <!-- verified.js がここに「✔公認・譜面作者・BPM・💬 作者のことば」の欄を追加します -->
@@ -234,13 +241,6 @@
               <label class="field">
                 <span data-i18n="seed">Seed</span>
                 <input id="seed" type="text" maxlength="32" autocomplete="off">
-              </label>
-              <label class="field">
-                <span data-i18n="chartGen">自動譜面の作り方</span>
-                <select id="chartGen">
-                  <option value="2" data-i18n="chartGen2">新方式（おすすめ・既定）</option>
-                  <option value="1" data-i18n="chartGen1">旧方式（今までどおり）</option>
-                </select>
               </label>
             </div>
             <div id="songPrefsStatus" class="hint"></div>
@@ -354,6 +354,13 @@
         <h2 class="setTitle" data-i18n="settingsTitle"></h2>
         <button id="closeSettingsBtn" type="button" class="primary slim" data-i18n="closeSettings"></button>
       </header>
+
+      <!-- 🔍 trk198：設定を言葉で絞り込む（欄が104個まで増えたので、探さずに届くように） -->
+      <div class="setSearch">
+        <input id="settingsSearch" type="search" autocomplete="off" spellcheck="false"
+               data-i18n-placeholder="settingsSearchPlaceholder" data-i18n-aria="settingsSearchPlaceholder">
+        <span id="settingsSearchStatus" class="hint" role="status" aria-live="polite"></span>
+      </div>
 
       <div class="grid">
         <!-- 左：見た目 -->
@@ -875,6 +882,16 @@
             <div class="hint" data-i18n="useStudyArtworkHint"></div>
             <label class="check"><input id="hideArtworkDuringChart" type="checkbox"><span data-i18n="hideArtworkDuringChart"></span></label>
             <div class="hint" data-i18n="hideArtworkDuringChartHint"></div>
+            <label class="field">
+              <span data-i18n="chartGen">🎼 譜面生成方式</span>
+              <select id="chartGen">
+                <option value="3" data-i18n="chartGen3">Aタイプ（標準・方式3）</option>
+                <option value="4" data-i18n="chartGen4">Bタイプ（試験中・方式4）</option>
+                <option value="1" data-i18n="chartGen1">旧方式1</option>
+                <option value="2" data-i18n="chartGen2">旧方式2</option>
+              </select>
+            </label>
+            <div class="hint" data-i18n="chartGenHint"></div>
           </details>
 
           <details class="panel" open>
@@ -1066,6 +1083,40 @@
             <div class="hint" data-i18n="ignoreLimitsHint"></div>
           </details>
 
+          <!-- 🎵 明示的に保存した曲・動画だけを IndexedDB の仮想棚へ置く（trk1.0.4候補） -->
+          <details class="panel" id="mediaKeepPanel">
+            <summary data-i18n="mediaKeepTitle"></summary>
+            <div class="hint" data-i18n="mediaKeepHint"></div>
+            <label class="field">
+              <span data-i18n="mediaKeepLimitLabel"></span>
+              <select id="mediaKeepLimit">
+                <option value="1g" data-i18n="mediaKeepLimit1"></option>
+                <option value="5g" data-i18n="mediaKeepLimit5"></option>
+                <option value="unlimited" data-i18n="mediaKeepLimitUnlimited"></option>
+              </select>
+            </label>
+            <div id="mediaKeepLimitWarning" class="hint" data-i18n="mediaKeepUnlimitedWarning" hidden></div>
+            <div id="mediaKeepStats" class="hint status" role="status" aria-live="polite"></div>
+            <div id="mediaKeepQuota" class="hint"></div>
+            <div class="miniActions">
+              <button id="mediaKeepReviewBtn" type="button" data-i18n="mediaKeepReview" disabled></button>
+              <button id="mediaKeepClearBtn" type="button" data-i18n="mediaKeepClear" disabled></button>
+            </div>
+            <div id="mediaKeepStatus" class="hint status" role="status" aria-live="polite"></div>
+          </details>
+
+          <!-- 📄 参照のみの保存（1.0.6） — 本体がなくても“あったこと”を残す -->
+          <details class="panel" id="ghostPanel">
+            <summary data-i18n="ghostPanelTitle"></summary>
+            <div class="hint" data-i18n="ghostHint"></div>
+            <div id="ghostStats" class="hint"></div>
+            <div class="miniActions">
+              <button id="ghostRelinkBtn" type="button" data-i18n="ghostRelinkAll"></button>
+              <button id="ghostClearBtn" type="button" data-i18n="ghostClear"></button>
+            </div>
+            <div id="ghostStatus" class="hint status" role="status" aria-live="polite"></div>
+          </details>
+
           <!-- 📦 まるごとバックアップ（trk137）。書き出しと復元は js/backup.js。含める項目は選べる -->
           <details class="panel" id="backupPanel">
             <summary data-i18n="backupPanelTitle"></summary>
@@ -1094,6 +1145,13 @@
             <label class="check"><input id="libKeepSharedChk" type="checkbox"><span data-i18n="libKeepShared"></span></label>
             <!-- 上限の数字を入れるので、このヒントだけ library.js が tr(…, {max, mb}) で書き換えます -->
             <div id="libKeepSharedHint" class="hint"></div>
+            <!-- 🔓 trk194：覚えたフォルダーを起動したら自動で読み取る（許可が生きていればクリック不要） -->
+            <label class="check"><input id="folderAutoReadChk" type="checkbox"><span data-i18n="folderAutoRead"></span></label>
+            <div id="folderAutoReadHint" class="hint" data-i18n="folderAutoReadHint"></div>
+            <div class="miniActions">
+              <button id="folderAutoNowBtn" type="button" data-i18n="folderAutoNow"></button>
+            </div>
+            <div id="folderPermState" class="hint" role="status" aria-live="polite"></div>
             <div id="libShareState" class="hint"></div>
             <div id="libShareStatus" class="hint status"></div>
           </details>
@@ -1219,6 +1277,19 @@
             </div>
             <div id="seStatus" class="hint status"></div>
             <label class="check"><input id="previewEnabled" type="checkbox"><span data-i18n="previewEnabled"></span></label>
+            <!-- ⏮ trk193：常に最初から再生する（プレビュー＋メディアプレーヤーの続きから）。メディアプレーヤーと曲名タブの長押しバーにも同じものがある -->
+            <label class="check"><input id="mediaStartFromZero" type="checkbox"><span data-i18n="mediaStartFromZero"></span></label>
+            <div id="mediaStartFromZeroHint" class="hint" data-i18n="mediaStartFromZeroHint"></div>
+            <!-- 📖 trk196：再生できる形式の説明（形式で迷ったとき、ここを見れば分かるように） -->
+            <details id="formatHelpPanel" class="subPanel">
+              <summary data-i18n="formatHelpTitle"></summary>
+              <div class="hint" data-i18n="formatHelpMusic"></div>
+              <div class="hint" data-i18n="formatHelpMidi"></div>
+              <div class="hint" data-i18n="formatHelpVideo"></div>
+              <div class="hint" data-i18n="formatHelpAudio"></div>
+              <div class="hint" data-i18n="formatHelpUnplayable"></div>
+              <div class="hint" data-i18n="formatHelpConvert"></div>
+            </details>
             <label class="check"><input id="bannerPause" type="checkbox"><span data-i18n="bannerPause"></span></label>
             <label class="check"><input id="bannerSongBtns" type="checkbox"><span data-i18n="bannerSongBtns"></span></label>
             <label class="check"><input id="bannerRandomBtn" type="checkbox"><span data-i18n="bannerRandomBtn"></span></label>

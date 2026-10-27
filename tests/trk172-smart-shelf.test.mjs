@@ -152,10 +152,10 @@ test("library.js: ⚡ 棚の配線（タブ・フィルター・セクション�
   assert.ok(librarySrc.includes("function libSectionHead(label, n)") && librarySrc.includes('el("div", "libGroupHead")'), "headers reuse the 💿🎤 sticky look");
   assert.ok(librarySrc.includes("if (r.it && !seenKeys.has(r.it.key))"), "libView dedupes songs that appear in two sections");
   /* 最近追加の材料：addedAt が it まで届く（📄 追加曲と 💾 共有曲） */
-  assert.ok(librarySrc.includes("function addedItem(file, video, addedAt)"), "addedItem carries addedAt");
+  assert.ok(librarySrc.includes("function addedItem(file, video, addedAt, flags = {})"), "addedItem carries addedAt");
   assert.ok(librarySrc.includes("addedAt: Number(r.addedAt) > 0 ? Number(r.addedAt) : 0"), "sharedItem carries addedAt");
-  assert.ok(librarySrc.includes(".map(r => addedItem(r.file instanceof File ? r.file : new File([r.file], r.name || \"song\"), r.video, r.addedAt))"), "restart restores addedAt from songDB");
-  assert.ok(librarySrc.includes("const it = addedItem(f, false, addedAt)") && librarySrc.includes("const it = addedItem(f, isVideo, addedAt)"), "both add paths stamp the same addedAt into the row and songDB");
+  assert.ok(librarySrc.includes(".map(r => addedItem(r.file instanceof File ? r.file : new File([r.file], r.name || \"song\", { type:r.file.type || \"\" }), r.video, r.addedAt, { stored:true }))"), "restart restores addedAt from songDB");
+  assert.ok(librarySrc.includes("const it = addedItem(f, false, addedAt, { sessionOnly:true })") && librarySrc.includes("const it = addedItem(f, isVideo, addedAt, { sessionOnly:true })"), "both add paths stamp the same addedAt into the row and songDB");
   /* 書き出しと証明の分離：noteMediaPlayed は公開、plProof は media を知らない（▶AUTO 印の意味は変わらない） */
   assert.ok(librarySrc.includes("initLibrary, nextSong, noteMediaPlayed, onLongPress"), "noteMediaPlayed is exported for the media player");
   const proof = grabFrom(librarySrc, /function plProof\(it, idx\) \{[\s\S]*?\n\}/, "plProof()");

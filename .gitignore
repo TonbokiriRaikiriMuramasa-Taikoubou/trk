@@ -36,3 +36,6 @@ node_modules/
 Thumbs.db
 .vscode/
 .idea/
+
+# 配布ZIPの組み立て（tools/prepare-release.mjs）の出力・Git外
+dist/

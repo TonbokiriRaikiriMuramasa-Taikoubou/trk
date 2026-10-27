@@ -90,7 +90,7 @@ function plWishMediaMatches(wish, item) {
   const name = String(file && file.name || "").toLowerCase();
   const kind = item && item.video === true ? "video"
     : mime.startsWith("video/") ? "video" : mime.startsWith("audio/") ? "audio"
-      : /\.(?:mp4|m4v|mov|webm|mkv|avi|ogv|3gp)$/.test(name) ? "video"
+      : /\.(?:mp4|m4v|mov|webm|mkv|avi|ogv|3gp|mpg|mpeg|mpe|m2v|m2ts)$/.test(name) ? "video"
         : /\.(?:mp3|m4a|aac|ogg|oga|opus|wav|flac|fla|aif|aiff|mid|midi)$/.test(name) ? "audio" : "";
   return kind === want;
 }

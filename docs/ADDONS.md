@@ -132,7 +132,8 @@ TrkAddons.register({
 | `api.el(tag, cls, text)` | 要素を作る（本体の書き方と同じ） |
 | `api.$(id)` | id で要素を取る |
 | `api.addStyle(css)` | `<style>` を1つ足す（`data-addon="id"` が付きます） |
-| `api.on(ev, fn)` / `api.emit(ev, data)` | 本体のイベントを拾う／流す |
+| `api.on(ev, fn)` / `api.emit(ev, data)` | 本体のイベントを拾う／流す。**apiVersion 2: `api.on` は解除関数を返します**（`const off = api.on(…)` → `off()` で購読を外す・teardown で必ず外す） |
+| `api.nowPlaying()` | 💬 **いまの曲のスナップショット**（`trk-now-playing/1`・apiVersion 2）。`key`・`title`・`artist`・`album`・`pack`・`source`・`sourceUrl`・`bpm`・`position`・`duration`・`phase`・`at`。曲が無ければ `null`。**読むだけで、本体は外部へ何も送りません**（送るかはアドオン側の判断） |
 | `api.slot(name)` | 置き場所（下の表）。無ければ `null` |
 | `api.say(text)` | 設定画面のアドオン欄に、そのままの文字を出す |
 | `api.settings` / `api.savePrefs()` | 設定（`shadow_taiko_preferences_v2`）を読み書きする |
@@ -141,7 +142,7 @@ TrkAddons.register({
 | `api.fx.available()` | エフェクター（`TrkFX`）が使えるか |
 | `api.fx.tapElement(el)` | 自分の `<audio>` / `<video>` を、本体のエフェクターに通す |
 | `api.log(...)` | コンソールに出す（`[addon:id]` が付きます） |
-| `api.id` / `api.apiVersion` | 自分の `id`、いま使っている API の版（いまは 1） |
+| `api.id` / `api.apiVersion` | 自分の `id`、いま使っている API の版（**いまは 2**・trk191） |
 
 ### 置き場所（slot）
 
@@ -151,6 +152,7 @@ TrkAddons.register({
 | `libPanel` | 曲リスト（`#libPanel`）の中。検索・並べ替えの下 |
 | `tvMore` | 📺 テレビの「くわしい」の中 |
 | `rackMore` | 🎛 ラックの「くわしい」の中 |
+| `drawer` | 💬 **画面右端の引き出し**（apiVersion 2・trk191）。チャット等の常設UI用。縦 `max-height:86vh`・横 `min(380px,94vw)`・中身が無いときは場所ごと隠れ、ホストはクリックを通します |
 
 置き場所が空のときは、場所ごと隠れます（画面は静かなまま）。
 
@@ -164,6 +166,7 @@ TrkAddons.register({
 
 | `packsChanged` | 曲パックが増減した |
 | `songSelected` | 曲が選ばれた（`data` は曲の情報） |
+| `nowPlaying` | 💬 **いまの曲が変わった**（apiVersion 2・trk191）。選曲・フェーズ変わり・媒体の準備完了で出ます。`data` は `trk-now-playing/1` のスナップショット（新しい値は `api.nowPlaying()` で都度読めます） |
 | `addonSelect` | **アドオンの曲**が選ばれた（自前のプレイヤーで鳴らす合図） |
 
 ---

@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-27（trk199〜204・1.0.8：音が出ない理由・フォルダー参照・セーフモード・ドロップ・配布ZIPの形）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-27（trk199〜205・1.0.8：音が出ない理由・フォルダー参照・セーフモード・ドロップ・配布ZIPの形・配布ZIPの時刻）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検、§9＝配布ZIPの形と作り方（1.0.8〜）。
 
@@ -19,7 +19,7 @@
 
 - **🔊 音が出ない理由を先に言う（trk200）**：`.mkv` の AC3・E-AC3・DTS・TrueHD などは映像が出ても音が鳴らない。`js/media.js` の `probeMatroska` が `audioCodecs`／`videoCodecs` を返し、`AUDIO_CODEC_OK`（AAC・Opus・Vorbis・MP3・FLAC・PCM）に1つも入っていないときだけ `explainAudioWarning` が `loadAudioUnsupported` を作る。`loadMedia` が `core.mediaLoadWarning` に残し、プレーヤーの状態行（**停止中だけ**）とトーストで案内する。再生中に「読み込めません」とは言わない。
 - **🗂 フォルダー曲の📄参照は保存しない（trk201）**：`rememberSongRef` は `source==="folder"` を書かない（起動のたびに最大3000件を保存していた）。フォルダーは選び直せば戻るので参照は持たない。**追加した曲・動画の参照は従来どおり**。旧版が残したフォルダー参照は `pruneFolderRefsOnce(force)` が**一度だけ**消す（`trkFolderRefsPrune1`・`docs/MIGRATIONS.md` に削除予定日）。
-- **🛟 セーフモードはURLのあいだだけ（trk202）**：`saveUserPrefs()` は `prefsForSave()` を保存し、セーフモード中は `SAFE_SESSION_KEYS`（`previewEnabled`・`mediaStartFromZero`・`folderAutoRead`・`libKeepShared`）だけ**倒す前の値に戻したコピー**を書く（`settings` 自体は汚さない＝その場の安全動作は保つ）。自動リロード・緊急パネル・`trkReset("safe")` は `reloadInSafeMode()`（`?safe=1` を付け直す）を通る。
+- **🛟 セーフモードはURLのあいだだけ（trk202）／保存されるもの・されないもの（trk205）**：`saveUserPrefs()` は `prefsForSave()` を保存し、セーフモード中は `SAFE_SESSION_KEYS`（`previewEnabled`・`mediaStartFromZero`・`folderAutoRead`・`libKeepShared`）だけ**倒す前の値に戻したコピー**を書く（`settings` 自体は汚さない＝その場の安全動作は保つ）。自動リロード・緊急パネル・`trkReset("safe")` は `reloadInSafeMode()`（`?safe=1` を付け直す）を通る。**映像スタイル・TVのお気に入り・演出の強さ・TVスキンなどは安全側の値のまま保存される**（壊れた見た目の設定から立ち直るのがセーフモードの役目なので、これは意図どおり）。案内文（`safeModeNotice`・4言語）と緊急パネルの文面もこの区別どおりに書く（trk205）。
 - **🎬 ドロップした動画も 🎬 と同じ道（trk203）**：`js/main.js` のウィンドウ全体の `drop` が `VIDEO_EXT`／`video/` MIME で振り分け、`addVideoFiles(vids, { openViewer:false })` で**全画面ビューアを勝手に開かない**。JSON（譜面）のドロップとタイトル画面以外のガードは従来どおり。
 - **📦 配布ZIPの形（trk204）**：`index.html`＋`README.txt`＋`trk-files/` の3つだけ、**OS共通の1本**。ルートの `index.html` は入口。詳しくは §9。
 
@@ -231,7 +231,8 @@
 | 36 | trk201：🗂 フォルダー参照の保存停止と一度だけの掃除 | VM の偽 IndexedDB で確認済み。実機は未了 | ①3000曲のフォルダーで起動が軽くなったか ②追加した曲・動画の 📄 参照はこれまでどおり残るか ③1.0.7 から上げたとき、フォルダー曲の古い 📄 行が1回だけ消えるか（`trkFolderRefsPrune1`） |
 | 37 | trk202：🛟 セーフモードの設定を持ち越さない | `?safe=1` の保存内容を VM で確認済み。実機は未了 | ①`?safe=1` で自動読み取りなどを変えて保存→URLから `?safe=1` を消して開き直すと元の設定か ②セーフモード中の見た目（videoStyle 等）は安全側で保存されること ③緊急パネル・リセット（safe）から戻るときも案内どおりか |
 | 38 | trk203：🎬 ドロップした動画を 🎬 と同じ道へ | VM（偽の window）で確認済み。実ブラウザは未了 | ①`.mkv` をウィンドウにドロップすると 🎬 として一覧に入り、全画面ビューアが開かないこと ②音源のドロップは従来どおり ③`.json`（譜面）のドロップは取り込みのまま |
-| 39 | trk204：📦 配布ZIPの形（`index.html`＋`README.txt`＋`trk-files/`）と Drive への追加 | **利用者が起動（ゲーム開始）を確認（2026-10-27）**。組み立て・検査・`unzip -t`・ローカルサーバーでの 200 応答・Drive 追加まで完了 | ①`?safe=1` が入口を通っても消えないか ②1.0.7 と同じ場所に重ねて展開したとき古い画面が残らないか ③保存データ（同じオリジン）が引き継がれるか |
+| 39 | trk204：📦 配布ZIPの形（`index.html`＋`README.txt`＋`trk-files/`）と Drive への追加 | **利用者が起動（ゲーム開始）を確認（2026-10-27）**。レビューでも ①`?safe=1` が入口を通っても消えない ②`file://` で `trk-files/` へ進み FIRST SPARK が出る ③時刻を新しくすれば古い画面が残らずデータも引き継がれる を確認済み | — |
+| 40 | trk205：🕒 配布ZIPの時刻（同じ時刻だと 304 で旧版が残る） | 1.0.7 と 1.0.8 が同じ `2026-10-27 12:00` で、同じポートの `python -m http.server` が 304 を返して 1.0.7 の `index.html`（旧アプリ）が使われた（2026-10-27 レビュー・必須）。**1.0.8 を `2026-10-27 13:00`（UTC）で組み直し**、`If-Modified-Since: 12:00` → **200**／`13:00` → 304 をローカルで確認 | 実際のブラウザーで 1.0.7 のキャッシュを持ったまま開き直し、`GET / 200` で入口が出ることを実機で見る（実測はレビュー側で確認済み） |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -330,7 +331,7 @@
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
 | Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk204`） |
-| 📦 配布ZIPの組み立て（1.0.8〜） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`tests/release-layout.test.mjs` |
+| 📦 配布ZIPの組み立て（1.0.8〜） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`release/README.txt`（配布用のかんたん起動。`--readme` を省くとこれが入る）、`tests/release-layout.test.mjs` |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
@@ -339,15 +340,22 @@
 
 | 検査 | 結果 | 範囲・注意 |
 |---|---|---|
-| `npm run check` | **614 pass / 0 fail** | 静的・安全・a11y・vendor・MMD・書斎・軽量化＋Node/VMテスト（trk200 の6件・trk201 の5件・trk202 の5件・trk203 の4件・release-layout の6件を含む） |
+| `npm run check` | **617 pass / 0 fail** | 静的・安全・a11y・vendor・MMD・書斎・軽量化＋Node/VMテスト（trk200 の6件・trk201 の5件・trk202 の5件・trk203 の4件・release-layout の9件を含む） |
 | `tools/prepare-release.mjs --check` | **OK** | 1.0.8 の組み上がりが `index.html`・`README.txt`・`trk-files/` の3つだけであること、manifest と `sw.js` の cache 名が一致すること |
 | 配布ZIP（1.0.8） | 225ファイル・`unzip -t` 破損なし | 全エントリ `2026-10-27 12:00`。**バイト数と `sha256` は Drive `trk-1.0.8` の `SHA256SUMS-1.0.8.txt` を正とする**（配布ZIPには開発用の `docs/HANDOFF.md`・`MIGRATIONS.md`・`tests/` を入れないが、`README.txt`・`trk-files/README-*.md` を直すと値が変わる。本書に固定値を書かない） |
-| ローカルサーバーで `/` → `trk-files/index.html` | **OK** | `python3 -m http.server` で `/`・`trk-files/index.html`・`js/main.js`・`sw.js`・vendor の three が 200（`file://` の実機操作は未確認） |
+| ローカルサーバーで `/` → `trk-files/index.html` | **OK** | `python3 -m http.server` で `/`・`trk-files/index.html`・`js/main.js`・`sw.js`・vendor の three が 200（`file://` はレビューで確認済み） |
+| 再検証（304）の切り分け（trk205） | **OK** | `If-Modified-Since: 2026-10-27 12:00`（1.0.7 の時刻）→ **200**、`13:00`（1.0.8 の時刻）→ 304。`--newer-than` が同じ／古い時刻を拒否することをテストで確認 |
 | 利用者による起動確認 | **起動（ゲーム開始）を確認（2026-10-27）** | 配布ZIPの新しい形で起動できること。`file://` のダブルクリックかプレビューかは未切り分け |
 | PC／スマホ実機で1.0.8のUIを操作 | **未確認** | ヘッドレスsmokeは実機のタッチ・見た目・実音声の保証ではない（§4 #30） |
 
 ## 7. 最近の変更
 
+- **🕒 trk205：配布ZIPの時刻を前の版より新しくする（2026-10-27 レビューの必須）**：1.0.7 と 1.0.8 のZIPがどちらも `2026-10-27 12:00` で組まれていたため、1.0.7 を使っていた人が同じポートの `python -m http.server` で 1.0.8 を開くと、`If-Modified-Since` に **304** が返り、ブラウザーは HTTP キャッシュの **1.0.7 の `index.html`（入口ではなく旧アプリ）** を使い続けた（`/js/…` が無いので一覧が空の壊れた画面になり、入口の Service Worker 解除も走らない）。`file://` と別ポートは影響なし。
+  - `tools/prepare-release.mjs` の既定時刻を **「いま（分まで）」**（`defaultReleaseDate()`）にし、`release-manifest.json` に **`built_at`** を記録する。`--newer-than=<前の版の built_at>` を渡すと、それ以前の時刻では**組み立てを止める**（同じ時刻は必ず失敗）。`--readme` を省くと **`release/README.txt`**（リポジトリ同梱のかんたん起動）を使う。
+  - **1.0.8 を `2026-10-27 13:00`（UTC）で組み直した**（1.0.7 の `12:00` より新しい）。ローカルで `If-Modified-Since: 12:00` → **200**、`13:00` → 304 を確認。225ファイル・`unzip -t` 破損なし。
+  - **セーフモードの案内文を実際の動きに合わせた**：`safeModeNotice`（4言語）と緊急パネルの文面が「開き直すと元の設定に戻る／保存した設定は書き換えません」と言っていたが、実際に保存を免れるのは `SAFE_SESSION_KEYS` の4項目だけで、映像スタイル・TVのお気に入り・演出の強さ・TVスキンは**安全側の値のまま保存**される（壊れた見た目から立ち直るのが役目なので挙動は変えない）。文面を「映像・TV・演出は安全側で保存／自動読み取りなどは `?safe=1` のあいだだけ」に直した（`tests/trk202-safe-mode-prefs.test.mjs` の期待も更新）。
+  - 配布用の **`release/README.txt`** をリポジトリに置いた（Drive にだけあったため、ZIPを同じ内容で作り直せなかった。2026-10-27 レビューの指摘）。
+  - `sw.js` cache＝**`trk-v2026.10.27-trk205`**。`tests/release-layout.test.mjs` に3件追加（既定時刻・`built_at`／`--newer-than` の拒否／`release/README.txt` が既定になること）。**617 pass / 0 fail**。
 - **📦 1.0.8 の配布ZIPを「index.html・README.txt・trk-files/」の形に統一（trk204／同日の仕上げ）**：レビューで「ZIPを開いたときの見た目を 1.0.6 の試作（Drive `trk-1.0.6-layout-proto.zip`＝`10OA-XMjyJJbvdAFB6cNebO8KQLC78U0A`）にそろえる」と決めたので、**配布物の形を本番にした**。ルートは `index.html`（入口）・`README.txt`（かんたん起動）・`trk-files/`（アプリ本体）の3つだけで、OS別のZIPは作らない（同じアプリ本体で Windows・macOS・Linux が動く）。§9 に手順、`tools/prepare-release.mjs`（`npm run release`）に組み立てと検査。
   - **リポジトリの形は変えない**：GitHub Pages と開発は今までどおりルート直下の `index.html`。変えるのは配布ZIPの中だけ（`trk-files/` の中で相対URLが閉じるので、`sw.js` の `scope:"./"` も `manifest.webmanifest` もそのまま動く）。
   - 入口 `index.html` は 1.0.6 試作とほぼ同じ：meta refresh と `<a>`（JavaScript が動かないとき）＋ `location.replace(dest)`（`?safe=1` などを渡す）。**`file://` では Service Worker を触らない**、`http` のときは**ルート直下に残った 1.0.7 以前の worker だけ**を `unregister()` してから進む（新しい `trk-files/` 側の worker は外さない）。
@@ -446,9 +454,12 @@ trk-1.0.8.zip
 # 1. アプリ本体を用意する（1.0.7 slim のツリーに、リポジトリのアプリ本体を載せ替える）
 #    例：/home/user/work/build108/app に index.html・sw.js・css/*.css・js/*.js をコピーし、
 #        README-1.0.7.md → README-1.0.8.md に改名して 1.0.8 の更新点を書く
-# 2. ルートの README.txt（かんたん起動）を用意する
+# 2. かんたん起動の README はリポジトリの release/README.txt（版が変わったら文面を直す）
 # 3. 組み立て＋検査＋ZIP（出力は dist/ で Git 管理外）
-npm run release -- --app=/home/user/work/build108/app --readme=/home/user/work/build108/README.txt   --version=1.0.8 --out=/home/user/work/build108/dist --zip --date=2026-10-27T12:00:00Z
+#    --date は前の版の built_at より新しくする（--newer-than で機械的に確かめる）
+npm run release -- --app=/home/user/work/build108/app --version=1.0.8 \
+  --out=/home/user/work/build108/dist --zip \
+  --date=2026-10-27T13:00:00Z --newer-than=2026-10-27T12:00:00Z
 # 4. 形だけを検査（手で組み上げたときも同じ検査）
 node tools/prepare-release.mjs --check=/home/user/work/build108/dist/trk-1.0.8
 # 5. 破損・ハッシュ（Drive の SHA256SUMS 用）
@@ -456,6 +467,7 @@ unzip -t dist/trk-1.0.8.zip && sha256sum dist/trk-1.0.8.zip
 ```
 
 - 組み立ては **`js/zip-io.js` の `zipWrite` をそのまま使う**（新しいZIP実装を増やさない）。全エントリ同じ mtime（`--date`）で、並びは名前順＝決定的。
+- **🕒 時刻は前の版より新しくする（必須・trk205）**：`--date` を省くと**組み立てた時刻（分まで）**になる。同じ時刻のZIPを配ると、同じポートの `python -m http.server` が `If-Modified-Since` に **304** を返し、ブラウザーは HTTP キャッシュにある**前の版の `index.html`（入口ではなく旧アプリ）**を使い続ける（`/js/…` が無いので一覧が空の壊れた画面になり、入口の Service Worker 解除も走らない。`file://` と別ポートは影響なし）。1.0.7 と 1.0.8 がどちらも `2026-10-27 12:00` で組まれていたため実際に起きた（2026-10-27 レビュー・必須）。`--newer-than=<前の版の built_at>` を渡すと、それ以前の時刻では組み立てを止める。`release-manifest.json` の **`built_at`** が次の版の基準になる。
 - `.gitignore` に `dist/` を入れてある（ZIPは Git に入れない）。
-- **1.0.8 の実績**：225ファイル・`unzip -t` 破損なし・全エントリ同日時。**バイト数と `sha256` は Drive の `SHA256SUMS-1.0.8.txt` を正とする**（`README.txt`・`trk-files/README-*.md` を直すと変わる。固定値をここに書かない）。素材＝`/home/user/work/build108/app` と `build108/README.txt`。
+- **1.0.8 の実績**：225ファイル・`unzip -t` 破損なし・全エントリ **`2026-10-27 13:00`（UTC）**（1.0.7 の `12:00` より新しい）。**バイト数と `sha256` は Drive の `SHA256SUMS-1.0.8.txt` を正とする**（`README.txt`・`trk-files/README-*.md` を直すと変わる。固定値をここに書かない）。素材＝`/home/user/work/build108/app` と `release/README.txt`。
 - **Drive**：`trk-1.0.8`（`1vSUJ_acZ3QR7ekIVOTG13KvqmHS8DtvD`、親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu`）に `trk-1.0.8.zip`（`1_k5u_ddJoFUq-Jcz00DeGSQcRYmLnREl`）と `SHA256SUMS-1.0.8.txt`（`1kAn3Q35QdgEjLLlqXUR-MenSnUeYI_mw`）を置いた。**中身を直したら同じ名前で差し替え、SHA256SUMS も取り直す**（1.0.7 のときは原本を `old-1.0.7-original` に退避した）。

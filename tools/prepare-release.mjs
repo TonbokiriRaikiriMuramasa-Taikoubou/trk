@@ -24,6 +24,9 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const WRAPPER_INDEX = "index.html";
 export const WRAPPER_README = "README.txt";
 export const APP_DIR = "trk-files";
+/* 配布用の「かんたん起動」README.txt はリポジトリにも置く（release/README.txt）。
+   これがあればDriveを見なくても同じZIPを作り直せる。--readme を省いたときはこれを使う。 */
+export const DEFAULT_README = path.join(ROOT, "release", "README.txt");
 /* ルートに見えてよいもの（これ以外がルートにあったら失敗＝「index.html と README だけ」を守る） */
 export const WRAPPER_ENTRIES = [WRAPPER_INDEX, WRAPPER_README, APP_DIR];
 /* ルートの入口。アプリ本体は trk-files/ にある（1.0.6 の試作と同じ作り）。
@@ -64,6 +67,24 @@ export const LAUNCHER_HTML = `<!doctype html>
 </html>
 `;
 
+/* ⏱ 既定の時刻は「いま」（分まで）。前の版と同じ時刻にすると、同じポートのローカルサーバーが
+   If-Modified-Since に 304 を返し、ブラウザーが前の版の index.html（入口ではなく旧アプリ）を使い続ける。
+   1.0.7 と 1.0.8 がどちらも 2026-10-27 12:00 だったため、1.0.7 を使っていた人は 1.0.8 の入口が開かなかった（2026-10-27 レビュー）。
+   --date を渡すときも、必ず前の版より新しい時刻にする。 */
+export function defaultReleaseDate(now = new Date()) {
+  const d = new Date(now.getTime()); d.setSeconds(0, 0);
+  return d.toISOString();
+}
+/* ⏱ 前の版と同じ時刻のZIPを作らない。python -m http.server は If-Modified-Since に 304 を返すため、
+   同じ時刻だとブラウザーが前の版の index.html（入口ではなく旧アプリ）を使い続け、一覧が空の壊れた画面になる。
+   --newer-than=<前の版の built_at> を渡すと、それ以前の時刻では組み立てない。 */
+export function assertNewerThan(date, newerThan) {
+  if (!newerThan) return;
+  const d = new Date(date).getTime(), n = new Date(newerThan).getTime();
+  if (!Number.isFinite(n)) fail(`--newer-than を読めません: ${newerThan}`);
+  if (!Number.isFinite(d)) fail(`--date を読めません: ${date}`);
+  if (d <= n) fail(`--date（${new Date(d).toISOString()}）は前の版（${new Date(n).toISOString()}）より新しくしてください（同じ時刻だと 304 で旧版が残ります）`);
+}
 const VALID_VERSION = /^\d+\.\d+\.\d+$/;
 /* 既に圧縮されている形式は deflate しない（時間とサイズの無駄） */
 const STORE_EXT = new Set(["mp3", "m4a", "aac", "ogg", "oga", "opus", "flac", "wav", "mp4", "mov", "webm", "mkv", "png", "jpg", "jpeg", "gif", "webp", "woff", "woff2", "zip", "stpack", "pmd", "vmd", "vrm"]);
@@ -140,10 +161,11 @@ export async function writeZip(entries, mtime) {
   return Buffer.from(await blob.arrayBuffer());
 }
 
-export async function buildRelease({ app, readme, version, out, date = "2026-10-27T12:00:00Z", zip = false }) {
+export async function buildRelease({ app, readme = DEFAULT_README, version, out, date = defaultReleaseDate(), newerThan = "", zip = false }) {
   if (!app || !fs.existsSync(app)) fail(`--app のディレクトリがありません: ${app}`);
   if (!readme || !fs.existsSync(readme)) fail(`--readme がありません: ${readme}`);
   if (!VALID_VERSION.test(String(version || ""))) fail(`--version は x.y.z の形で: ${version}`);
+  assertNewerThan(date, newerThan);
   const stage = path.join(out, `trk-${version}`);
   fs.rmSync(stage, { recursive: true, force: true });
   fs.mkdirSync(path.join(stage, APP_DIR), { recursive: true });
@@ -167,6 +189,7 @@ export async function buildRelease({ app, readme, version, out, date = "2026-10-
     service_worker_cache: swCache ? swCache[1] : manifest.service_worker_cache,
     archive: `trk-${version}.zip`,
     layout: "wrapper",
+    built_at: new Date(date).toISOString(),   /* ⏱ 次の版はこれより新しい時刻で組む（304 で旧版が残らないように） */
     wrapper: { launcher: WRAPPER_INDEX, readme: WRAPPER_README, app: APP_DIR, platforms: ["win", "linux", "mac"] },
   });
   delete manifest.platform;   /* 1.0.8 からOS別に分けない（同じアプリ本体で動く） */
@@ -213,13 +236,15 @@ if (isMain) {
     if (!result.ok) { console.error("❌ 形が違います:\n - " + result.problems.join("\n - ")); process.exitCode = 1; }
     else console.log(`✅ ${WRAPPER_INDEX} / ${WRAPPER_README} / ${APP_DIR}/ の形です`);
   } else if (!args.app) {
-    console.error("使い方: node tools/prepare-release.mjs --app=<アプリ> --readme=<README.txt> --version=1.0.8 --out=dist [--zip] [--date=...]");
+    console.error("使い方: node tools/prepare-release.mjs --app=<アプリ> [--readme=<README.txt>] --version=1.0.8 --out=dist [--zip] [--date=...] [--newer-than=...]");
+    console.error("  --readme を省くと release/README.txt（リポジトリ同梱の配布用README）を使います。");
+    console.error("  --date は前の版の built_at より新しくしてください（同じ時刻だとブラウザーが旧版を使い続けます）。");
     process.exitCode = 2;
   } else {
     const out = path.resolve(args.out || "dist");
     buildRelease({
-      app: path.resolve(args.app), readme: path.resolve(args.readme), version: args.version,
-      out, date: args.date || "2026-10-27T12:00:00Z", zip: !!args.zip,
+      app: path.resolve(args.app), readme: path.resolve(args.readme || DEFAULT_README), version: args.version,
+      out, date: args.date || defaultReleaseDate(), newerThan: args["newer-than"] || "", zip: !!args.zip,
     }).then(({ stage, zipPath, files }) => {
       console.log(`📦 ${stage}（${files.length} files）`);
       if (zipPath) {

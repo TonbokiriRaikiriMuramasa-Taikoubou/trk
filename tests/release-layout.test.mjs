@@ -12,11 +12,11 @@ import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { ROOT } from "./helpers/browser-data.mjs";
-import { buildRelease, checkLayout, LAUNCHER_HTML, WRAPPER_ENTRIES } from "../tools/prepare-release.mjs";
+import { buildRelease, checkLayout, LAUNCHER_HTML, WRAPPER_ENTRIES, assertNewerThan, defaultReleaseDate, DEFAULT_README } from "../tools/prepare-release.mjs";
 
 const TOOL = path.join(ROOT, "tools/prepare-release.mjs");
 
-function fixture({ cache = "trk-v2026.10.27-trk204" } = {}) {
+function fixture({ cache = "trk-v2026.10.27-trk205" } = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "trk-release-"));
   const app = path.join(dir, "app");
   fs.mkdirSync(path.join(app, "js"), { recursive: true });
@@ -122,4 +122,56 @@ test("trk204: the CLI writes the same layout, and the output is git-ignored", ()
   const ignored = fs.readFileSync(path.join(ROOT, ".gitignore"), "utf8");
   assert.match(ignored, /^dist\/$/m, "組み立ての出力は Git に入れない");
   assert.ok(fs.readFileSync(path.join(ROOT, "package.json"), "utf8").includes("prepare-release"), "npm からも呼べる");
+});
+
+test("trk205: a release is dated now (to the minute) and records built_at", async () => {
+  const f = fixture();
+  const { stage } = await buildRelease({ app: f.app, readme: f.readme, version: "1.0.8", out: path.join(f.dir, "dist"), date: "2026-10-27T13:00:00Z" });
+  const m = JSON.parse(fs.readFileSync(path.join(stage, "trk-files/release-manifest.json"), "utf8"));
+  assert.equal(m.built_at, "2026-10-27T13:00:00.000Z", "組んだ時刻を manifest に残す（次の版はこれより新しく）");
+
+  const now = new Date("2026-10-27T00:41:37.123Z");
+  assert.equal(defaultReleaseDate(now), "2026-10-27T00:41:00.000Z", "既定は「いま」を分まで丸める（固定値にしない）");
+  const f2 = fixture();
+  const auto = await buildRelease({ app: f2.app, readme: f2.readme, version: "1.0.8", out: path.join(f2.dir, "dist") });
+  const m2 = JSON.parse(fs.readFileSync(path.join(auto.stage, "trk-files/release-manifest.json"), "utf8"));
+  assert.ok(Math.abs(Date.parse(m2.built_at) - Date.now()) < 5 * 60_000, "既定の built_at は組み立てた時刻");
+  assert.equal(new Date(m2.built_at).getSeconds(), 0, "分まで丸める（ZIP の DOS 時刻は2秒きざみ）");
+});
+
+test("trk205: a release must be newer than the previous one, or 304 keeps the old app", async () => {
+  /* 1.0.7 と 1.0.8 が同じ 2026-10-27 12:00 で組まれ、同じポートの python http.server が 304 を返して
+     旧 index.html（旧アプリ）が残った（2026-10-27 レビュー）。同じ時刻は必ず失敗させる。 */
+  assert.throws(() => assertNewerThan("2026-10-27T12:00:00Z", "2026-10-27T12:00:00Z"), /304/, "同じ時刻は不可");
+  assert.throws(() => assertNewerThan("2026-10-27T11:59:00Z", "2026-10-27T12:00:00Z"), /304/, "古い時刻も不可");
+  assert.throws(() => assertNewerThan("2026-10-27T12:00:00Z", "not-a-date"), /newer-than/);
+  assert.doesNotThrow(() => assertNewerThan("2026-10-27T13:00:00Z", "2026-10-27T12:00:00Z"), "新しい時刻は通る");
+  assert.doesNotThrow(() => assertNewerThan("2026-10-27T00:00:00Z", undefined), "--newer-than が無ければ検査しない");
+
+  const f = fixture();
+  await assert.rejects(
+    buildRelease({ app: f.app, readme: f.readme, version: "1.0.8", out: path.join(f.dir, "dist"), date: "2026-10-27T12:00:00Z", newerThan: "2026-10-27T12:00:00Z" }),
+    /304/,
+    "組み立てでも止める",
+  );
+});
+
+test("trk205: the quick-start README lives in the repo, so the zip can be rebuilt", async () => {
+  assert.equal(DEFAULT_README, path.join(ROOT, "release", "README.txt"), "既定は release/README.txt");
+  const readme = fs.readFileSync(DEFAULT_README, "utf8");
+  assert.match(readme, /trk! 1\.0\.8/, "版を書く");
+  assert.match(readme, /index\.html をダブルクリック/, "かんたん起動");
+  assert.match(readme, /trk-files\//, "アプリ本体の置き場所");
+  assert.match(readme, /python3? -m http\.server --bind 127\.0\.0\.1 8000/, "ローカルサーバーの方法");
+  assert.match(readme, /GPL-3\.0-or-later/, "ライセンス");
+  assert.match(readme, /English/, "英語の短い案内");
+
+  const f = fixture();
+  const out = path.join(f.dir, "dist");
+  execFileSync(process.execPath, [TOOL, `--app=${f.app}`, "--version=1.0.8", `--out=${out}`, "--zip"], { encoding:"utf8" });
+  assert.equal(
+    fs.readFileSync(path.join(out, "trk-1.0.8/README.txt"), "utf8"),
+    readme,
+    "--readme を省いてもリポジトリの README.txt がそのまま入る",
+  );
 });

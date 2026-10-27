@@ -7,7 +7,7 @@
 
    使い方：
      node tools/prepare-release.mjs --app=<アプリのディレクトリ> --readme=<README.txt> \
-       --version=1.0.8 --out=dist [--zip] [--date=2026-10-27T12:00:00Z]
+       --version=1.0.9 --out=dist [--zip] [--date=2026-10-27T15:00:00Z]
      node tools/prepare-release.mjs --check=<組み上がったディレクトリ>   （形だけを検査）
 
    ・アプリのディレクトリは「index.html・sw.js・release-manifest.json がある場所」。
@@ -236,7 +236,7 @@ if (isMain) {
     if (!result.ok) { console.error("❌ 形が違います:\n - " + result.problems.join("\n - ")); process.exitCode = 1; }
     else console.log(`✅ ${WRAPPER_INDEX} / ${WRAPPER_README} / ${APP_DIR}/ の形です`);
   } else if (!args.app) {
-    console.error("使い方: node tools/prepare-release.mjs --app=<アプリ> [--readme=<README.txt>] --version=1.0.8 --out=dist [--zip] [--date=...] [--newer-than=...]");
+    console.error("使い方: node tools/prepare-release.mjs --app=<アプリ> [--readme=<README.txt>] --version=1.0.9 --out=dist [--zip] [--date=...] [--newer-than=...]");
     console.error("  --readme を省くと release/README.txt（リポジトリ同梱の配布用README）を使います。");
     console.error("  --date は前の版の built_at より新しくしてください（同じ時刻だとブラウザーが旧版を使い続けます）。");
     process.exitCode = 2;

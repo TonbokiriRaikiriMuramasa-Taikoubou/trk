@@ -159,8 +159,9 @@ test("trk205: a release must be newer than the previous one, or 304 keeps the ol
 test("trk205: the quick-start README lives in the repo, so the zip can be rebuilt", async () => {
   assert.equal(DEFAULT_README, path.join(ROOT, "release", "README.txt"), "既定は release/README.txt");
   const readme = fs.readFileSync(DEFAULT_README, "utf8");
-  assert.match(readme, /trk! 1\.0\.8/, "版を書く");
+  assert.match(readme, /trk! 1\.0\.[0-9]+/, "版を書く（版を上げたら release/README.txt も上げる）");
   assert.match(readme, /index\.html をダブルクリック/, "かんたん起動");
+  assert.match(readme, /README-1\.0\.[0-9]+\.md/, "アプリ内READMEの名前も版に合わせる");
   assert.match(readme, /trk-files\//, "アプリ本体の置き場所");
   assert.match(readme, /python3? -m http\.server --bind 127\.0\.0\.1 8000/, "ローカルサーバーの方法");
   assert.match(readme, /GPL-3\.0-or-later/, "ライセンス");

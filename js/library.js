@@ -362,6 +362,7 @@ let dirInputMode = "open";   /* フォールバックの <input webkitdirectory>
    ⚠ ハンドルは IndexedDB に構造化複製でそのまま入る。曲も動画も端末の外へは送らない（読むだけ）。 */
 let sharedFolders = [];
 let sharedLabels = [];     /* 登録簿と同じ順番のフォルダー名（同名フォルダーは「名前 (2)」になる・表示用） */
+let sharedPendingName = "";   /* trk210：まだ許可が要る先頭のフォルダー名（🔓 の文面を「その1本」に向ける） */
 /* 🧩 アドオン（js/addons.js）が足した曲。setAddonSongs() で入れ替わります */
 let addonSongs = [];
 function setAddonSongs(list) {
@@ -4949,7 +4950,8 @@ function showReconnect() {
   if (!libHandle || !b || b.hidden) return;
   /* 🔓 trk194：最初のタップ待ちのときは「読み取る」と書く（何が起きるか分かるように） */
   const key = folderAutoArmed ? "libReconnectAuto" : libShared ? "libShareResume" : "libReconnect";
-  b.textContent = tr(key, { name:libHandle.name });
+  /* trk210：共有フォルダーが複数あるときは「まだ許可が要る1本」の名前を出す（1タップ＝1本で聞くため） */
+  b.textContent = tr(key, { name:sharedPendingName || libHandle.name });
 }
 
 /* ---------- 📤 trk208：共有フォルダーの登録簿（音楽も動画も、いくつでも） ----------
@@ -5043,10 +5045,11 @@ async function readSharedFolders() {
   if (!sharedFolders.length) return { granted:0 };
   core.setStatus("libStatus", "libShareScanning", { n:0 });
   const scans = [];
+  const pending = [];
   let granted = 0;
   for (const f of sharedFolders) {
     const p = await folderPermissionOf(f.handle).catch(() => "prompt");
-    if (p !== "granted") { scans.push({ name:f.name, files:[], skipped:0 }); continue; }
+    if (p !== "granted") { pending.push(f); scans.push({ name:f.name, files:[], skipped:0 }); continue; }
     granted++;
     try {
       const r = await scanHandle(f.handle, n => core.setStatus("libStatus", "libShareScanning", { n }));
@@ -5054,6 +5057,7 @@ async function readSharedFolders() {
     } catch (e) { console.warn("shared folder could not be read", e); scans.push({ name:f.name, files:[], skipped:0 }); }
   }
   const merged = TrkSharedFolders.mergeScans(scans);
+  sharedPendingName = pending.length ? pending[0].name : "";
   /* 同名フォルダーの「(2)」を、次回も同じ名前で出せるように覚える（dir の見分けが毎回変わらないように） */
   sharedLabels = merged.labels;
   let renamed = false;
@@ -5064,7 +5068,9 @@ async function readSharedFolders() {
   shareRemembered = true;
   lastScan = merged.files;
   ingestFolder(merged.files, merged.label, true, merged.skipped);
-  core.$("libReconnectBtn").hidden = granted > 0;
+  /* trk210：1本でも許可待ち（確認が必要・拒否）が残っている間は 🔓 を出したままにする。
+     許可が生きているフォルダーは、残りを待たずにここで読めている。 */
+  core.$("libReconnectBtn").hidden = granted >= sharedFolders.length;
   core.$("libRescanBtn").hidden = sharedFolders.length === 0;
   if (libShared && core.settings.libKeepShared) await keepSharedSongs(merged.files);
   syncShareUI();
@@ -5088,7 +5094,14 @@ async function restoreSharedFolders() {
   folderLastPermission = need.some(n => n.permission === "denied") ? "denied"
     : need.length ? "prompt" : "granted";
   const plan = TrkSharedFolders.plan({ hasHandle:true, permission:folderLastPermission, autoRead, safe:false });
+  sharedPendingName = need.length ? need[0].folder.name : "";
   core.$("libReconnectBtn").hidden = false; showReconnect();
+  /* trk210：1本でも「確認が必要」「拒否」があると、許可が生きているフォルダーの曲まで
+     最初のタップ（拒否なら手動）まで出なかった。生きているフォルダーは先に読む。 */
+  if (plan !== "scan" && autoRead && need.length < sharedFolders.length) {
+    folderAccessPersisted = true; folderAccessSession = false;
+    await readSharedFolders();
+  }
   if (plan === "scan") {
     folderAccessPersisted = true; folderAccessSession = false;
     const r = await readSharedFolders();
@@ -5132,7 +5145,11 @@ async function removeSharedFolder(id) {
   if (sharedFolders.length === before) return;
   await saveSharedFolders();
   if (!sharedFolders.length) {
-    /* 最後の1本を外したら、📁 開く で覚えたフォルダーに戻す（共有の曲は消す） */
+    /* 最後の1本を外したら、📁 開く で覚えたフォルダーに戻す（共有の曲は消す）。
+       trk210：trk194〜207 の "share"（1本だけの共有）も一緒に消す。残すと登録簿が空なので、
+       次の起動で loadSharedFolders が "share" を移し直し、外したはずのフォルダーが戻ってくる。 */
+    try { await libKV.del("share"); } catch (_) {}
+    sharedPendingName = "";
     await clearSharedSongs().catch(() => {});
     folderSongs = []; libHandle = null; libShared = false; lastScan = [];
     shareRemembered = false;
@@ -5452,15 +5469,29 @@ core.$("libDirInput").addEventListener("change", e => {
 });
 core.$("libReconnectBtn").addEventListener("click", async () => {
   disarmFolderAutoRead();   /* trk194：ボタンから読むときも、自動の待ち合わせと重ねない */
-  /* 📤 trk208：登録簿があるときは、許可を1本ずつ確かめてから全部読む（「あとN本」を出さない） */
+  /* 📤 trk208：登録簿があるときは、許可を確かめてから全部読む。
+     trk210：**1タップ＝1本**にした。Chrome は1回の操作で requestPermission を何本も出すと
+     2本目以降が NotAllowedError（ユーザー操作が必要）になることがあるため、自動の流れ
+     （folderAutoKickShared）と同じく、まだ許可が要る先頭の1本だけを聞く。 */
   if (sharedFolders.length) {
     try {
-      for (const f of sharedFolders) {
-        let p = await f.handle.queryPermission({ mode:"read" }).catch(() => "prompt");
-        if (p === "prompt") p = await f.handle.requestPermission({ mode:"read" });
-        if (p !== "granted") { core.setStatus("libStatus", "libShareDenied"); syncShareUI(); break; }
+      const need = await foldersNeedingPermission();
+      const target = need.find(n => n.permission !== "denied");
+      if (target) {
+        const answer = await target.folder.handle.requestPermission({ mode:"read" }).catch(() => "denied");
+        if (answer !== "granted") {
+          sharedPendingName = target.folder.name;
+          core.$("libReconnectBtn").hidden = false; showReconnect(); syncShareUI();
+          core.setStatus("libStatus", "libShareDenied");
+          /* まだ聞ける1本が残っていれば、次のタップでもう1本（拒否した1本は手動まで待つ） */
+          if ((await foldersNeedingPermission()).some(n => n.permission === "prompt")) armFolderAutoRead();
+          return;
+        }
+        markFolderAccess(false);
       }
       await readSharedFolders();
+      const rest = await foldersNeedingPermission();
+      if (rest.some(n => n.permission === "prompt")) armFolderAutoRead();
     } catch (e) { console.error(e); core.setStatus("libStatus", "libShareDenied"); }
     return;
   }

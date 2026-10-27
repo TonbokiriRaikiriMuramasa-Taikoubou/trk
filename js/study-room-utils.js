@@ -52,6 +52,14 @@ window.TrkStudyUtils = (() => {
     })).sort((a, b) => comparePath(a.sourcePath, b.sourcePath));
   }
 
+  /* 📂 trk210：本棚のリンク本がまだ使っている共有フォルダーの名前（登録の後始末に使う）。 */
+  function sharedFoldersInUse(books) {
+    const out = new Set();
+    for (const book of Array.isArray(books) ? books : []) {
+      if (book && book.linked === true && typeof book.sharedFolder === "string" && book.sharedFolder) out.add(book.sharedFolder);
+    }
+    return [...out];
+  }
   /* 📂 trk208：共有フォルダー（フォルダのまま読む本）の本分け。
      entries = [{ path:"Pictures/Book/01.jpg", name:"01.jpg", size:123 }]（フォルダーから見た相対パス）。
      nesting:"split"（既定）は「1フォルダ＝1冊」でサブフォルダは別の本、"flat" は選んだフォルダ全体を1冊。
@@ -296,6 +304,6 @@ window.TrkStudyUtils = (() => {
   }
 
   return Object.freeze({ IMAGE_EXTS, TEXT_EXTS, ROOT_ALBUM, MAX_MATCHES, extension, baseName, relativePath, isImageFile, isTextFile,
-    comparePath, groupImageFiles, folderBookGroups, listTextFiles, decodeTextBuffer, normalizeText, aozoraSegments, findMatches, snippetAt, textStats,
+    comparePath, groupImageFiles, folderBookGroups, sharedFoldersInUse, listTextFiles, decodeTextBuffer, normalizeText, aozoraSegments, findMatches, snippetAt, textStats,
     bookSize, sortBooks, sortShelfItems, formatBytes, bookmarkedBooks, orderPages, stableId, archivePages, mimeOf, albumProblem });
 })();

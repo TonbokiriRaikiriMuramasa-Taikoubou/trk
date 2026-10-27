@@ -1,8 +1,8 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-27（trk195〜198・形式の仕上げと設定の検索）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-27（trk199〜204・1.0.8：音が出ない理由・フォルダー参照・セーフモード・ドロップ・配布ZIPの形）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
-> **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検。
+> **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検、§9＝配布ZIPの形と作り方（1.0.8〜）。
 
 ## 1. 作業の基本
 
@@ -14,6 +14,14 @@
 - `js/fx.js`／`js/fx-presets.js` の凍結は **trk114で解除**しました（2026-10-11、空さんの判断。trk109でfx.jsに足したMIDI MIXの経路も追認）。ほかのファイルと同じく、変更時はテスト・文書・実音声で確認します。fx.jsが読むための互換名（`chartMeta`・`phase`・`prefs`・`stats`・`videoReady`、読み取り専用の `_trkStudyRoomOpen`）はまだ残っていて、fx.jsを書き換えれば外せます（`docs/ADDONS.md` §0、`docs/NAMESPACE-PLAN.md`）。
 
 ## 2. 現在の実装状態
+
+### 1.0.8 の仕様（trk200〜trk204）
+
+- **🔊 音が出ない理由を先に言う（trk200）**：`.mkv` の AC3・E-AC3・DTS・TrueHD などは映像が出ても音が鳴らない。`js/media.js` の `probeMatroska` が `audioCodecs`／`videoCodecs` を返し、`AUDIO_CODEC_OK`（AAC・Opus・Vorbis・MP3・FLAC・PCM）に1つも入っていないときだけ `explainAudioWarning` が `loadAudioUnsupported` を作る。`loadMedia` が `core.mediaLoadWarning` に残し、プレーヤーの状態行（**停止中だけ**）とトーストで案内する。再生中に「読み込めません」とは言わない。
+- **🗂 フォルダー曲の📄参照は保存しない（trk201）**：`rememberSongRef` は `source==="folder"` を書かない（起動のたびに最大3000件を保存していた）。フォルダーは選び直せば戻るので参照は持たない。**追加した曲・動画の参照は従来どおり**。旧版が残したフォルダー参照は `pruneFolderRefsOnce(force)` が**一度だけ**消す（`trkFolderRefsPrune1`・`docs/MIGRATIONS.md` に削除予定日）。
+- **🛟 セーフモードはURLのあいだだけ（trk202）**：`saveUserPrefs()` は `prefsForSave()` を保存し、セーフモード中は `SAFE_SESSION_KEYS`（`previewEnabled`・`mediaStartFromZero`・`folderAutoRead`・`libKeepShared`）だけ**倒す前の値に戻したコピー**を書く（`settings` 自体は汚さない＝その場の安全動作は保つ）。自動リロード・緊急パネル・`trkReset("safe")` は `reloadInSafeMode()`（`?safe=1` を付け直す）を通る。
+- **🎬 ドロップした動画も 🎬 と同じ道（trk203）**：`js/main.js` のウィンドウ全体の `drop` が `VIDEO_EXT`／`video/` MIME で振り分け、`addVideoFiles(vids, { openViewer:false })` で**全画面ビューアを勝手に開かない**。JSON（譜面）のドロップとタイトル画面以外のガードは従来どおり。
+- **📦 配布ZIPの形（trk204）**：`index.html`＋`README.txt`＋`trk-files/` の3つだけ、**OS共通の1本**。ルートの `index.html` は入口。詳しくは §9。
 
 ### TouhouカタログとローカルMIDI
 
@@ -223,7 +231,7 @@
 | 36 | trk201：🗂 フォルダー参照の保存停止と一度だけの掃除 | VM の偽 IndexedDB で確認済み。実機は未了 | ①3000曲のフォルダーで起動が軽くなったか ②追加した曲・動画の 📄 参照はこれまでどおり残るか ③1.0.7 から上げたとき、フォルダー曲の古い 📄 行が1回だけ消えるか（`trkFolderRefsPrune1`） |
 | 37 | trk202：🛟 セーフモードの設定を持ち越さない | `?safe=1` の保存内容を VM で確認済み。実機は未了 | ①`?safe=1` で自動読み取りなどを変えて保存→URLから `?safe=1` を消して開き直すと元の設定か ②セーフモード中の見た目（videoStyle 等）は安全側で保存されること ③緊急パネル・リセット（safe）から戻るときも案内どおりか |
 | 38 | trk203：🎬 ドロップした動画を 🎬 と同じ道へ | VM（偽の window）で確認済み。実ブラウザは未了 | ①`.mkv` をウィンドウにドロップすると 🎬 として一覧に入り、全画面ビューアが開かないこと ②音源のドロップは従来どおり ③`.json`（譜面）のドロップは取り込みのまま |
-| 39 | trk204：📦 配布ZIPの形（`index.html`＋`README.txt`＋`trk-files/`）と Drive への追加 | ZIP の組み立て・検査・`unzip -t`・ローカルサーバーでの 200 応答・Drive 追加まで完了。**`file://` の実機操作は未了** | ①ZIPを展開して `index.html` をダブルクリック→ゲームが始まるか（Chrome/Edge・Windows/macOS） ②`http://127.0.0.1:8000/` で開いたとき、1.0.7 の古い画面ではなく 1.0.8 が出るか ③`?safe=1` が入口を通っても消えないか ④保存データが 1.0.7 のまま（同じオリジンなら引き継がれる）見えるか ⑤Drive の `trk-1.0.8` にZIPと `SHA256SUMS-1.0.8.txt` を置く |
+| 39 | trk204：📦 配布ZIPの形（`index.html`＋`README.txt`＋`trk-files/`）と Drive への追加 | **利用者が起動（ゲーム開始）を確認（2026-10-27）**。組み立て・検査・`unzip -t`・ローカルサーバーでの 200 応答・Drive 追加まで完了 | ①`?safe=1` が入口を通っても消えないか ②1.0.7 と同じ場所に重ねて展開したとき古い画面が残らないか ③保存データ（同じオリジン）が引き継がれるか |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -333,45 +341,10 @@
 |---|---|---|
 | `npm run check` | **614 pass / 0 fail** | 静的・安全・a11y・vendor・MMD・書斎・軽量化＋Node/VMテスト（trk200 の6件・trk201 の5件・trk202 の5件・trk203 の4件・release-layout の6件を含む） |
 | `tools/prepare-release.mjs --check` | **OK** | 1.0.8 の組み上がりが `index.html`・`README.txt`・`trk-files/` の3つだけであること、manifest と `sw.js` の cache 名が一致すること |
-| 配布ZIP（1.0.8） | 3,874,247 bytes・225ファイル・展開 10,484,830 bytes・`unzip -t` 破損なし | 全エントリ `2026-10-27 12:00`。`sha256 ca716c3429eca34fb475f4dc074044b2c92f1a5878f9ca8605dcced69af6769b`（README.txt の文面を直したら取り直す） |
+| 配布ZIP（1.0.8） | 225ファイル・`unzip -t` 破損なし | 全エントリ `2026-10-27 12:00`。**バイト数と `sha256` は Drive `trk-1.0.8` の `SHA256SUMS-1.0.8.txt` を正とする**（配布ZIPには開発用の `docs/HANDOFF.md`・`MIGRATIONS.md`・`tests/` を入れないが、`README.txt`・`trk-files/README-*.md` を直すと値が変わる。本書に固定値を書かない） |
 | ローカルサーバーで `/` → `trk-files/index.html` | **OK** | `python3 -m http.server` で `/`・`trk-files/index.html`・`js/main.js`・`sw.js`・vendor の three が 200（`file://` の実機操作は未確認） |
+| 利用者による起動確認 | **起動（ゲーム開始）を確認（2026-10-27）** | 配布ZIPの新しい形で起動できること。`file://` のダブルクリックかプレビューかは未切り分け |
 | PC／スマホ実機で1.0.8のUIを操作 | **未確認** | ヘッドレスsmokeは実機のタッチ・見た目・実音声の保証ではない（§4 #30） |
-
-**trk190〜193・2026-10-26の確認**
-
-| 検査 | 結果 | 範囲・注意 |
-|---|---|---|
-| `npm run check` | **588 pass / 0 fail** | 静的・安全・a11y・vendor・MMD・書斎・軽量化＋Node/VMテスト（trk199 の7件を含む） |
-| `git diff --check` | 成功 | 空白等の差分検査 |
-| `tools/smoke-browser.mjs --compare` / `tools/smoke-game-end.mjs` | **未実行** | この環境にはChromium／Puppeteerが無い。下の前回手順（Repo外の `/home/user/browser-tools`）で再実行する |
-| PC／スマホ実機で今回のUIを操作 | **未確認** | 長押しバーと3か所のチェックの同期は、実機のタッチ・読み上げで確認する |
-
-- **1.0.6 slim との同期**：Google Driveの `trk-slim-win-linux-1.0.6.zip`（`release-manifest.json`＝1.0.6／`sw.js` cache `trk-v2026.10.20-1.0.6`）を展開し、リポジトリのアプリ本体と突き合わせて取り込んだ（差分のあった app 側 20ファイル）。配布ZIP向けの書き換え（`og:url`／`og:image` の削除、GitHub Issues → 夢現の作品ページ、READMEの配布文面、`.github/`・`tests/`・`tools/*.mjs` を同梱しない構成）は**リポジトリには持ち込まない**方針で、SNSカードと GitHub Issues のリンクは元のまま残した。
-- **取り込んだ主な機能（trk190〜192）**：`chartGen` に方式3（Aタイプ・既定）と方式4（Bタイプ・試験中）を追加し、設定の🎼欄へ移動（旧方式1／2は再生成用に維持）、`mediaKeepLimit`（1GiB／5GiB／無制限）と📄参照のみ（ゴースト）の保存、アドオンのAPI v2（`api.on` の解除関数・`api.nowPlaying()`・`drawer` slot）、`library.js` の `addedItem(file, video, addedAt, flags)`、Service Worker のオンライン時 `cache:"no-cache"` 再検証。
-- **追随した検査**：`tools/check-repo.mjs` の `addedItem` 署名と `docs/ADDONS.md`（API v2の説明）、`tools/check-security.mjs` の `readStats(os, v && v[idKey], …)`、`tests/ranked-option.test.mjs`（`core.on` と `runAutoUsed` の初期化）、`tests/trk172-smart-shelf.test.mjs`（`addedItem` 呼び出し）、`tests/trk187-media-exit.test.mjs`（2行に分かれた配線）を更新した。
-
-**trk186〜189・2026-10-16の最終確認**
-
-| 検査 | 結果 | 範囲・注意 |
-|---|---|---|
-| `npm run check` | **534 pass / 0 fail** | 静的・安全・アクセシビリティ等＋Node/VMテスト |
-| `git diff --check` | 成功 | 空白等の差分検査 |
-| `tools/smoke-browser.mjs --compare` | **OK** | boot 0・未解決0・譜面10＋実デコード10・decode error 0・クリック86件/error 0・mobileStage/safeOffline OK |
-| `tools/smoke-game-end.mjs` | **MANUAL / AUTOともPASS** | 結果画面表示・pageerror 0 |
-| PC／スマホ実機で今回のUIを操作 | **未確認** | ヘッドレスsmokeは実機のタッチ・見た目・実音声の保証ではない（§4 #30） |
-
-- **ブラウザ実行環境**：Repo外の `/home/user/browser-tools` に `puppeteer-core` と `@sparticuz/chromium` を用意し、Chromium `/tmp/chromium` と共有ライブラリ `/tmp/al2023/lib` を使用。package.json／lockfile／smoke基準値は変更していない。再実行例：
-  ```sh
-  LD_LIBRARY_PATH=/tmp/al2023/lib:/tmp \
-    SMOKE_CHROME=/tmp/chromium \
-    SMOKE_PUPPETEER=/home/user/browser-tools/node_modules/puppeteer-core/lib/puppeteer/puppeteer-core.js \
-    node tools/smoke-browser.mjs --compare
-  # 同じ環境変数で node tools/smoke-game-end.mjs も実行
-  ```
-  これらは一時的な検査環境のパスであり、別環境ではブラウザを別途用意する。
-- **追加Node/VM検査**：基地入口と4言語更新、退出ボタンとスクロール面の分離、退出確認のキャンセル／無効設定、長押しの開始待ち・左右・加速・曲端・中断・タイマー掃除、旧OSTキー掃除の対象限定／一回限り、JSON保存→core読み戻し→外したパック曲を復活させないこと。
-- **利用者提供のPR #69レビュー**：523 pass、smoke比較OK、game-end両モードOK。公式 `.stpack` を入れるとFIRST SPARK＋s01〜s05・案内が表示され、再読込後も維持したとのヘッドレス報告。今回の最終smokeとは別の確認。
-- **music-library**：GitHubでRelease **v1（公開済み）**と添付 `trk-ost-vol1.stpack`／`SHA256SUMS.txt` を確認。README（最終変更 `56587c66f7c91bd7110a1705f17e2841d3580262`）の日英にname/author固定の注記あり。pack.jsonも `trk's OST Vol.1` / `TRMTKB` で連携定数と一致。別Repoの変更は不要・未実施。
 
 ## 7. 最近の変更
 
@@ -381,7 +354,7 @@
   - `README.txt` は 1.0.6 試作の文面（かんたん起動／index.html だけでできること／ローカルサーバーで増えるもの／注意／中身／ライセンス＋English）を下敷きに 1.0.8 向けへ。**古い `00_START_HERE.html`・`01_README_*.txt` は廃止**（検査が残存を fail にする。`README-1.0.8.md` などのアプリ内 README は残す）。
   - `release-manifest.json` に `layout:"wrapper"` と `wrapper{launcher,readme,app,platforms}`・`archive:"trk-1.0.8.zip"` を記録し、`platform` は消した（OS別に分けない）。`service_worker_cache` は `sw.js` の `CACHE` を書き写す（ずれていたら検査が fail）。
   - 組み立ては `js/zip-io.js` の `zipWrite` をそのまま使う（新しいZIP実装を増やさない）。全エントリ同じ mtime。出力は `dist/`（`.gitignore` 済み）。
-  - 1.0.8 のZIPは `/home/user/work/build108/dist/trk-1.0.8.zip`（3,874,247 bytes・`sha256 ca716c34…769b`）。素材のアプリ本体は `/home/user/work/build108/app`（1.0.7 slim のツリーにリポジトリの `index.html`・`sw.js`・`css/*.css`・`js/*.js` を載せ替え、`README-1.0.8.md` 化）。**Google Drive の `trk-1.0.8` フォルダー**（`1vSUJ_acZ3QR7ekIVOTG13KvqmHS8DtvD`）へ `trk-1.0.8.zip`（`1_k5u_ddJoFUq-Jcz00DeGSQcRYmLnREl`）と `SHA256SUMS-1.0.8.txt`（`1kAn3Q35QdgEjLLlqXUR-MenSnUeYI_mw`）を置いた。⚠ 実機（`file://`）の確認はまだ（§4 #39）。
+  - 1.0.8 のZIPは `/home/user/work/build108/dist/trk-1.0.8.zip`（225ファイル。バイト数と `sha256` は Drive の `SHA256SUMS-1.0.8.txt`）。素材のアプリ本体は `/home/user/work/build108/app`（1.0.7 slim のツリーにリポジトリの `index.html`・`sw.js`・`css/*.css`・`js/*.js` を載せ替え、`README-1.0.8.md` 化）。**Google Drive の `trk-1.0.8` フォルダー**（`1vSUJ_acZ3QR7ekIVOTG13KvqmHS8DtvD`）へ `trk-1.0.8.zip`（`1_k5u_ddJoFUq-Jcz00DeGSQcRYmLnREl`）と `SHA256SUMS-1.0.8.txt`（`1kAn3Q35QdgEjLLlqXUR-MenSnUeYI_mw`）を置いた。⚠ 実機（`file://`）の確認はまだ（§4 #39）。
 - **trk200：🔊 「映像は出るのに音が出ない」理由を先に言う**：`.mkv` の AC3・E-AC3・DTS・TrueHD などは映像だけ流れて無音になる。`js/media.js` の `probeMatroska` が `audioCodecs`／`videoCodecs` を返し、`AUDIO_CODEC_OK`（AAC・Opus・Vorbis・MP3・FLAC・PCM）に1つも入っていないときだけ `explainAudioWarning` が `loadAudioUnsupported`（`{container}`・`{codec}`）を作る。`explainAudioFailure(file)` は先頭 2MB を読むだけ。`loadMedia` が `core.mediaLoadWarning` に残し、プレーヤーの状態行（**停止中だけ**理由を出す＝再生中に「読み込めません」と言わない）と `window.Trk.play.showToast` が出す。⚙設定「📖 再生できる形式」にも1行。4言語。`tests/trk200-audio-codec.test.mjs`（6件）。
 - **trk201：🗂 フォルダー曲の📄参照を毎回保存しない＋旧版の参照を一度だけ掃除**：`rememberSongRef` が `source==="folder"` を保存しなくなった（起動のたびに最大3000件を書いていた。フォルダーは選び直せば戻るので参照は要らない）。フォルダーを替えたときに古い参照が残る問題も同時に解消。`pruneFolderRefsOnce(force)` が `songRefDB` の folder レコードだけを消し、`ghostSongs` からも外して `trkFolderRefsPrune1=1`＋`saveUserPrefs()`（失敗したら 0 に戻して次回再挑戦）。`ingestFolder` は起動直後の1回、`initLibrary` は `loadGhostSongs()` の直後に `await`。印と削除予定日（2027-01-27）は `docs/MIGRATIONS.md`。**追加した曲・動画の参照はこれまでどおり残る**。`tests/trk201-folder-refs.test.mjs`（5件・VMの偽 IndexedDB）。
 - **trk202：🛟 セーフモードの安全値を保存に持ち越さない**：`?safe=1` は「そのURLのあいだだけ」にした。`saveUserPrefs()` は `prefsForSave()` を保存し、セーフモード中は `SAFE_SESSION_KEYS`（`previewEnabled`・`mediaStartFromZero`・`folderAutoRead`・`libKeepShared`）だけ**倒す前の値に戻したコピー**を書く（`settings` 自体は汚さない＝その場の安全動作は保つ）。`rememberSafePrev()` が最初の1回だけ元の値を控える（セーフモード節の中で定義＝`tests/core-safety.test.mjs` の切片でも動く）。自動リロード3箇所・緊急パネル・`trkReset("safe")` を `reloadInSafeMode()`（`safeModeHref()`＝`?safe=1` を付け直して hash を落とす→`location.replace`）に集約。`videoStyle` などの見た目は安全側のまま保存する。案内は `safeModeNotice`（4言語・`didReset==="safe"` では「URLを消すと戻る」の一文を出さない）。`tests/trk202-safe-mode-prefs.test.mjs`（5件）。
@@ -434,11 +407,7 @@
   3. 曲名タブ右上の **⏱ ここをプレビュー開始位置にする** を**長押し（650ms・12px動いたら取りやめ）**で開く **開始位置のバー**（`#bannerStartZero`）
   オンのときは `previewStartFor()` と `savedMediaPosition()` が 0 を返す＝プレビューも「続きから」もしない。曲ごとの `previewStart` と保存位置は消さない（オフに戻せば今までどおり）。バーのつまみは 0.1秒きざみで、動かすとその位置を試せる。保存は「この位置を保存」を押したときだけ、`曲の既定に戻す` で `previewStart` を削除。長押しのあとの click は保存しない（`previewSetLongPressed`）。
 - 日英ガイド、`tests/trk193-start-from-zero.test.mjs`、Service Worker cache **`trk-v2026.10.26-trk193`** を更新。
-- **trk186〜187：プレーヤーの入口と退出**：曲リストの📚書斎の隣に **🎥基地**（PC／スマホ共通・4言語）を追加。電源長押しも維持。「閉じる」は **← 曲リストに戻る**へ変更し44px以上の強調ボタンに。ヘッダーをスクロール面の外に残し、閉じると実際の入口へフォーカスを戻す。重複openのタイマー増殖も防止。
-- **trk188：全画面の長押しシーク**：左半分＝巻き戻し、右半分＝早送り。450ms後から250msごと、2秒/回→2秒ごとに2秒/回ずつ加速し最大20秒/回。再生倍率を変えずcurrentTimeを移動。中央に方向と秒数。指離し・中断・移動・blur・タブ非表示・曲切替・closeで停止し、長押し後のclickを遮断。contextmenu／touch-action／タッチコールアウト抑止は映像面だけ。
-- **trk189：PR #69の残件**：`trkOstLegacyCleanOnce` が初回だけ `trk-ost-v1.songs` と見た曲の印から旧 `builtin:trk-ost-song:` 参照を掃除（FIRST SPARK・パック曲・他リスト・名前・配置・削除状態は維持）。safe／任意同梱ビルドでは実施しない。印と削除予定日は `MIGRATIONS.md` に登録。`core.js` で印と `trkOstSeenKeys` の起動時読み戻しも修正。music-libraryの固定注記は対応済みを確認。
-- 日英ガイド、関連テスト、Service Worker cache **`trk-v2026.10.16-trk189`** を更新。HEVCは今回見送り（§2）。
-- trk185のOST分離を含む過去の詳細は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)。現在の仕様・未確認事項は§2〜4を正とする。
+- **trk186〜189（🎥基地・退出・全画面シーク・旧OSTキー掃除）の詳細**、trk185 以前の記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)（trk186〜189 は 2026-10-16 に整理済み・今回の要約はここまで）。現在の仕様・未確認事項は §2〜4 を正とする。
 
 ## 8. 変更時チェックリスト
 
@@ -463,6 +432,7 @@ trk-1.0.8.zip
    └ trk-files/   … アプリ本体（リポジトリのルートと同じ中身。README-1.0.8.md・LICENSE・docs/ を含む）
 ```
 
+- **配布ZIPに入れないもの**：`.github/`・`tests/`・`tools/*.mjs`・開発用の `docs/HANDOFF.md`／`HANDOFF-ARCHIVE.md`／`MIGRATIONS.md` など（1.0.7 と同じ切り分け。アプリ本体の `docs/guide/`・`SECURITY.md`・`QUALITY-CHECKS.md` などは入る）。
 - **リポジトリの形は変えない**：GitHub Pages も開発も今までどおりルート直下の `index.html`。`trk-files/` に移すと相対URLが全部そのまま解決される（`sw.js` の `scope:"./"`・`manifest.webmanifest`・`assets/vendor` の importmap はすべて相対）。
 - **`file://` で開いたとき**：入口が `location.replace` で `trk-files/index.html` へ進む（Service Worker は `file:` では触らない）。`index.html` をダブルクリックするだけでゲーム・譜面・プレーヤー・書斎・保存が動く。
 - **`http://127.0.0.1:8000/` で開いたとき**：入口がルート直下に残った **1.0.7 以前の worker だけ**を `unregister()` してから進む（`trk-files/sw.js` は残す）。アプリの worker のスコープは `/trk-files/` になる。
@@ -487,5 +457,5 @@ unzip -t dist/trk-1.0.8.zip && sha256sum dist/trk-1.0.8.zip
 
 - 組み立ては **`js/zip-io.js` の `zipWrite` をそのまま使う**（新しいZIP実装を増やさない）。全エントリ同じ mtime（`--date`）で、並びは名前順＝決定的。
 - `.gitignore` に `dist/` を入れてある（ZIPは Git に入れない）。
-- **1.0.8 の実績**：225ファイル・3,874,247 bytes・展開 10,484,830 bytes・`sha256 ca716c3429eca34fb475f4dc074044b2c92f1a5878f9ca8605dcced69af6769b`（`README.txt` の文面を変えたら取り直す）。素材＝`/home/user/work/build108/app` と `build108/README.txt`。
+- **1.0.8 の実績**：225ファイル・`unzip -t` 破損なし・全エントリ同日時。**バイト数と `sha256` は Drive の `SHA256SUMS-1.0.8.txt` を正とする**（`README.txt`・`trk-files/README-*.md` を直すと変わる。固定値をここに書かない）。素材＝`/home/user/work/build108/app` と `build108/README.txt`。
 - **Drive**：`trk-1.0.8`（`1vSUJ_acZ3QR7ekIVOTG13KvqmHS8DtvD`、親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu`）に `trk-1.0.8.zip`（`1_k5u_ddJoFUq-Jcz00DeGSQcRYmLnREl`）と `SHA256SUMS-1.0.8.txt`（`1kAn3Q35QdgEjLLlqXUR-MenSnUeYI_mw`）を置いた。**中身を直したら同じ名前で差し替え、SHA256SUMS も取り直す**（1.0.7 のときは原本を `old-1.0.7-original` に退避した）。

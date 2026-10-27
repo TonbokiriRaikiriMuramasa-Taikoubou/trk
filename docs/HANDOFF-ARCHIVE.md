@@ -504,3 +504,41 @@
   - **README に同梱曲と保存場所を明記（日英）**：楽曲ファイル2フォルダ（計約5.3 MiB）・アプリ内プレイリスト（localStorage）・スコアの場所。プレイヤーだけ使いたい人は2フォルダ削除でOK（影響範囲つき）。ガイド（files.md の構成図・start.md／en.md の軽量版説明）は既存のまま。
   - **検査**：OST ブロックに root README の2フォルダ言及を固定。
 - **過去の履歴**：trk183以前の詳細な変更・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md) に移動しました。現在の仕様は§2、未確認事項は§4を正とします。
+
+## trk186〜193 の検証記録（trk204のときに HANDOFF §6 から移動）
+
+### trk190〜193・2026-10-26の確認
+
+| 検査 | 結果 | 範囲・注意 |
+|---|---|---|
+| `npm run check` | **588 pass / 0 fail** | 静的・安全・a11y・vendor・MMD・書斎・軽量化＋Node/VMテスト（trk199 の7件を含む） |
+| `git diff --check` | 成功 | 空白等の差分検査 |
+| `tools/smoke-browser.mjs --compare` / `tools/smoke-game-end.mjs` | **未実行** | この環境にはChromium／Puppeteerが無い。下の前回手順（Repo外の `/home/user/browser-tools`）で再実行する |
+| PC／スマホ実機で今回のUIを操作 | **未確認** | 長押しバーと3か所のチェックの同期は、実機のタッチ・読み上げで確認する |
+
+- **1.0.6 slim との同期**：Google Driveの `trk-slim-win-linux-1.0.6.zip`（`release-manifest.json`＝1.0.6／`sw.js` cache `trk-v2026.10.20-1.0.6`）を展開し、リポジトリのアプリ本体と突き合わせて取り込んだ（差分のあった app 側 20ファイル）。配布ZIP向けの書き換え（`og:url`／`og:image` の削除、GitHub Issues → 夢現の作品ページ、READMEの配布文面、`.github/`・`tests/`・`tools/*.mjs` を同梱しない構成）は**リポジトリには持ち込まない**方針で、SNSカードと GitHub Issues のリンクは元のまま残した。
+- **取り込んだ主な機能（trk190〜192）**：`chartGen` に方式3（Aタイプ・既定）と方式4（Bタイプ・試験中）を追加し、設定の🎼欄へ移動（旧方式1／2は再生成用に維持）、`mediaKeepLimit`（1GiB／5GiB／無制限）と📄参照のみ（ゴースト）の保存、アドオンのAPI v2（`api.on` の解除関数・`api.nowPlaying()`・`drawer` slot）、`library.js` の `addedItem(file, video, addedAt, flags)`、Service Worker のオンライン時 `cache:"no-cache"` 再検証。
+- **追随した検査**：`tools/check-repo.mjs` の `addedItem` 署名と `docs/ADDONS.md`（API v2の説明）、`tools/check-security.mjs` の `readStats(os, v && v[idKey], …)`、`tests/ranked-option.test.mjs`（`core.on` と `runAutoUsed` の初期化）、`tests/trk172-smart-shelf.test.mjs`（`addedItem` 呼び出し）、`tests/trk187-media-exit.test.mjs`（2行に分かれた配線）を更新した。
+
+### trk186〜189・2026-10-16の最終確認
+
+| 検査 | 結果 | 範囲・注意 |
+|---|---|---|
+| `npm run check` | **534 pass / 0 fail** | 静的・安全・アクセシビリティ等＋Node/VMテスト |
+| `git diff --check` | 成功 | 空白等の差分検査 |
+| `tools/smoke-browser.mjs --compare` | **OK** | boot 0・未解決0・譜面10＋実デコード10・decode error 0・クリック86件/error 0・mobileStage/safeOffline OK |
+| `tools/smoke-game-end.mjs` | **MANUAL / AUTOともPASS** | 結果画面表示・pageerror 0 |
+| PC／スマホ実機で今回のUIを操作 | **未確認** | ヘッドレスsmokeは実機のタッチ・見た目・実音声の保証ではない（§4 #30） |
+
+- **ブラウザ実行環境**：Repo外の `/home/user/browser-tools` に `puppeteer-core` と `@sparticuz/chromium` を用意し、Chromium `/tmp/chromium` と共有ライブラリ `/tmp/al2023/lib` を使用。package.json／lockfile／smoke基準値は変更していない。再実行例：
+  ```sh
+  LD_LIBRARY_PATH=/tmp/al2023/lib:/tmp \
+    SMOKE_CHROME=/tmp/chromium \
+    SMOKE_PUPPETEER=/home/user/browser-tools/node_modules/puppeteer-core/lib/puppeteer/puppeteer-core.js \
+    node tools/smoke-browser.mjs --compare
+  # 同じ環境変数で node tools/smoke-game-end.mjs も実行
+  ```
+  これらは一時的な検査環境のパスであり、別環境ではブラウザを別途用意する。
+- **追加Node/VM検査**：基地入口と4言語更新、退出ボタンとスクロール面の分離、退出確認のキャンセル／無効設定、長押しの開始待ち・左右・加速・曲端・中断・タイマー掃除、旧OSTキー掃除の対象限定／一回限り、JSON保存→core読み戻し→外したパック曲を復活させないこと。
+- **利用者提供のPR #69レビュー**：523 pass、smoke比較OK、game-end両モードOK。公式 `.stpack` を入れるとFIRST SPARK＋s01〜s05・案内が表示され、再読込後も維持したとのヘッドレス報告。今回の最終smokeとは別の確認。
+- **music-library**：GitHubでRelease **v1（公開済み）**と添付 `trk-ost-vol1.stpack`／`SHA256SUMS.txt` を確認。README（最終変更 `56587c66f7c91bd7110a1705f17e2841d3580262`）の日英にname/author固定の注記あり。pack.jsonも `trk's OST Vol.1` / `TRMTKB` で連携定数と一致。別Repoの変更は不要・未実施。

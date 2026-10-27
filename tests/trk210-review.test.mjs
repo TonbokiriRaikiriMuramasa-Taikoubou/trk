@@ -57,7 +57,8 @@ test("trk210: folders whose permission is alive are read at start, and 🔓 stay
   assert.match(restore, /plan !== "scan" && autoRead && need\.length < sharedFolders\.length/,
     "partly granted folders are read before the first tap");
   assert.match(restore, /await readSharedFolders\(\)/);
-  assert.match(restore, /sharedPendingName = need\.length \? need\[0\]\.folder\.name : ""/);
+  /* trk211 でヘルパーに集約（意味は同じ＝「まだ許可が要る先頭の1本」を文面に出す） */
+  assert.match(restore, /sharedPendingName = sharedPendingNameFrom\(need\)/);
 
   const readFn = body(libSrc, "async function readSharedFolders()");
   assert.match(readFn, /hidden = granted >= sharedFolders\.length/,
@@ -123,6 +124,9 @@ test("trk210: the reconnect button asks for one folder per tap (a loop of reques
 
 /* ---------- キャッシュ名（変更したので上げる） ---------- */
 test("trk210: the service worker cache name moves on for this change", () => {
-  assert.match(swSrc, /^const CACHE = "trk-v2026\.10\.27-trk210";$/m);
+  /* trk211 で番号が進むので「trk210 以降」で見る（名前そのものは後の版が持つ） */
+  const cache = swSrc.match(/^const CACHE = "trk-v([\d.]+)-trk(\d+)";$/m);
+  assert.ok(cache, "版数つきの名前");
+  assert.ok(Number(cache[2]) >= 210, `trk210 以降の番号で割る（今は ${cache[2]}）`);
   assert.ok(html.includes("js/shared-folders.js"), "the shared folder helper is still loaded");
 });

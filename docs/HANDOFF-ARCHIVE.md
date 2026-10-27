@@ -646,3 +646,20 @@
   - `tests/trk206-media-exit.test.mjs`（5件）＝抜け方・`closeMedia` の分岐・`previewContinue` が位置を動かさないこと・設定と4言語の配線・cache名。**622 pass / 0 fail**。
   - ⚠ 実機の音は未確認（§4 #41）。1.0.8 のZIPもこの修正を含めて `14:00` で組み直した（記録はアーカイブ）。
 - trk193〜trk205（1.0.7／1.0.8 の配布ZIP・時刻・セーフモードの文面・trk200〜trk204 の詳細）と trk186〜189 以前の記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)。
+
+## 1.1.1 の配布と trk210（1.1.2 のときに HANDOFF §7 から移動）
+
+> 2026-10-27 に `docs/HANDOFF.md` §7 から移した記録です。1.1.1 の配布ZIP（アプリ本体 trk210）の組み立てと、1.1.0 レビュー反映（trk210）の詳細を収録しています。現在の仕様・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします。
+
+- **📦 1.1.1：trk210 を配る版（2026-10-27）**：**アプリ本体は trk210**（下の trk210 の4点＝1.1.0 レビューの反映）。1.1.0 の配布ZIPの `trk-files/` を土台に、trk210 で変えた **4ファイル**（`js/library.js`・`js/study-room.js`・`js/study-room-utils.js`・`sw.js`）だけを差し替え、`README-1.0.9.md` → **`README-1.1.1.md`**（`README.md` も同内容）・`README-SLIM.md`・`release/README.txt` の版を 1.1.1 にそろえた。**ZIPの形は 1.1.0 と同じ**（`index.html`＋`README.txt`＋`trk-files/`）。
+  - ZIP は **`2026-10-27 19:00`（UTC）** で組み立て（1.1.0 の `18:00` より新しい）＝**226エントリ・3,898,214 bytes**・`unzip -t` 破損なし・全エントリ同時刻・`sha256 1a6f8a800886aa1da9436c8d046e3ed390a3e0a5018c12d57f17f71a0514ef43`。
+  - `prepare-release --check` **OK**（3つだけ・`service_worker_cache` と `sw.js` の `CACHE`＝`trk-v2026.10.27-trk210` が一致）・ローカル配信で `/` 200・再検証は `18:00` で **200**／`19:00` で **304**。
+  - **1.1.0 のZIPと Drive の `trk-1.1.0` はそのまま**（同じ名前で作り直さない）。1.1.1 は別ZIP・別フォルダー（`trk-1.1.1`）で配る。
+
+- **🔍 trk210：1.1.0 レビューの反映（共有フォルダーの × と 🔓・書斎の同名フォルダー・2026-10-27）**：レビューは「**1.1.0 はこのまま配って大丈夫**（SHA256 一致・304 問題なし・`?safe=1`／`file://` も確認）」で、直したほうがよい点が共有フォルダーまわりに3つ。実機の許可ダイアログが試せないぶんの危険（🔓 の連続 `requestPermission`）も先に手当てした。
+  - **× で外したフォルダーが戻る**：`removeSharedFolder` が最後の1本を外したときに旧 `"share"` も削除（`libKV.del("share")`）。
+  - **1本の確認待ちで全部止まる**：`restoreSharedFolders` が、許可が生きているフォルダーを先に `readSharedFolders()` で読む。`readSharedFolders` は `libReconnectBtn.hidden = granted >= sharedFolders.length`＝**許可待ちが残っている間だけ 🔓**。
+  - **🔓 は1タップ＝1本**：クリックの中で `foldersNeedingPermission()` の先頭1本だけ `requestPermission` し、残りは `armFolderAutoRead()` で次のタップへ。文面は `sharedPendingName`（まだ許可が要る1本）を出す。
+  - **書斎の同名フォルダー**：`studySharedFolderNameFor(handle)` が `isSameEntry` で見分け、別のフォルダーは `Manga (2)`。同じフォルダーの選び直しは同じ本・しおりのまま。
+  - **後始末**：`STUDY_UTIL.sharedFoldersInUse(books)`＋`studySharedFoldersPrune()`（本を消したとき、リンク本が無いフォルダーの記録を外す）。
+  - `sw.js` の cache を **`trk-v2026.10.27-trk210`** に。`tests/trk210-review.test.mjs`（6件）を追加し **650 pass / 0 fail**。⚠ 実機の許可ダイアログは未確認（§4 #43）。**trk210 はまだ配布ZIPに入っていない**（1.1.0 のZIPは trk208 のまま）。

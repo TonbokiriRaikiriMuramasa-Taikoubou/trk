@@ -4945,6 +4945,16 @@ async function stopSharing() {
   renderLib(); syncShareUI();
   core.setStatus("libShareStatus", "libShareStopped");
 }
+/* trk211：🔓 の文面に出す「次に聞く1本」を決める。
+   まだ許可待ち（prompt）の先頭を選び、全部が拒否なら先頭の1本を出す
+   （空にして libHandle.name に落ちると、別のフォルダー名が出てしまうため）。
+   引数は {folder, permission} の配列（foldersNeedingPermission）と、フォルダーの配列（readSharedFolders の pending）の両方。 */
+function sharedPendingNameFrom(list) {
+  const need = Array.isArray(list) ? list : [];
+  const pick = need.find(n => n && n.permission && n.permission !== "denied") || need[0];
+  const folder = pick && (pick.folder || pick);
+  return folder && folder.name ? folder.name : "";
+}
 function showReconnect() {
   const b = core.$("libReconnectBtn");
   if (!libHandle || !b || b.hidden) return;
@@ -5057,7 +5067,7 @@ async function readSharedFolders() {
     } catch (e) { console.warn("shared folder could not be read", e); scans.push({ name:f.name, files:[], skipped:0 }); }
   }
   const merged = TrkSharedFolders.mergeScans(scans);
-  sharedPendingName = pending.length ? pending[0].name : "";
+  sharedPendingName = sharedPendingNameFrom(pending);   /* trk211：ヘルパーに集約 */
   /* 同名フォルダーの「(2)」を、次回も同じ名前で出せるように覚える（dir の見分けが毎回変わらないように） */
   sharedLabels = merged.labels;
   let renamed = false;
@@ -5094,7 +5104,7 @@ async function restoreSharedFolders() {
   folderLastPermission = need.some(n => n.permission === "denied") ? "denied"
     : need.length ? "prompt" : "granted";
   const plan = TrkSharedFolders.plan({ hasHandle:true, permission:folderLastPermission, autoRead, safe:false });
-  sharedPendingName = need.length ? need[0].folder.name : "";
+  sharedPendingName = sharedPendingNameFrom(need);   /* trk211：次に聞く1本（拒否は後ろ） */
   core.$("libReconnectBtn").hidden = false; showReconnect();
   /* trk210：1本でも「確認が必要」「拒否」があると、許可が生きているフォルダーの曲まで
      最初のタップ（拒否なら手動）まで出なかった。生きているフォルダーは先に読む。 */
@@ -5109,10 +5119,10 @@ async function restoreSharedFolders() {
   } else if (plan === "ask") {
     folderAccessPersisted = false;
     armFolderAutoRead();
-    core.setStatus("libStatus", "folderAutoNeedsTap", { name:need[0].folder.name });
+    core.setStatus("libStatus", "folderAutoNeedsTap", { name:sharedPendingName });
   } else if (folderLastPermission === "denied" && autoRead) {
     folderAccessPersisted = false;
-    core.setStatus("libStatus", "folderPermDenied", { name:need[0].folder.name });
+    core.setStatus("libStatus", "folderPermDenied", { name:sharedPendingName });
   }
   syncShareUI();
   return plan;
@@ -5125,9 +5135,13 @@ async function folderAutoKickShared() {
     core.setStatus("libStatus", "folderAutoChecking", { name:target.folder.name });
     const answer = await target.folder.handle.requestPermission({ mode:"read" });
     if (answer !== "granted") {
-      core.setStatus("libShareStatus", "libDenied");
-      core.$("libReconnectBtn").hidden = false; showReconnect(); syncShareUI();
+      /* trk211：断られたら、まず残りを数え直してから文面を合わせる。
+         以前は sharedPendingName を更新せずに showReconnect() していたので、
+         🔓 に「いま断った1本」か、その前のフォルダー名が残ることがあった。 */
       const rest = await foldersNeedingPermission();
+      sharedPendingName = sharedPendingNameFrom(rest);
+      core.setStatus("libShareStatus", "libDenied");
+      core.$("libReconnectBtn").hidden = false; syncShareUI();
       if (rest.some(n => n.permission === "prompt")) armFolderAutoRead();   /* ほかのフォルダーは次のタップで */
       return;
     }
@@ -5135,7 +5149,9 @@ async function folderAutoKickShared() {
   }
   await readSharedFolders();
   const rest = await foldersNeedingPermission();
+  sharedPendingName = sharedPendingNameFrom(rest);   /* trk211：読み終えた後も残りの1本に合わせる */
   if (rest.some(n => n.permission === "prompt")) armFolderAutoRead();
+  syncShareUI();
 }
 /* 登録簿から1本を外す（📤 共有をぜんぶやめるのは stopSharing） */
 async function removeSharedFolder(id) {
@@ -5480,18 +5496,22 @@ core.$("libReconnectBtn").addEventListener("click", async () => {
       if (target) {
         const answer = await target.folder.handle.requestPermission({ mode:"read" }).catch(() => "denied");
         if (answer !== "granted") {
-          sharedPendingName = target.folder.name;
+          /* trk211：断られた1本ではなく、次に聞く1本（残りの先頭）を文面に出す */
+          const rest = await foldersNeedingPermission();
+          sharedPendingName = sharedPendingNameFrom(rest);
           core.$("libReconnectBtn").hidden = false; showReconnect(); syncShareUI();
           core.setStatus("libStatus", "libShareDenied");
           /* まだ聞ける1本が残っていれば、次のタップでもう1本（拒否した1本は手動まで待つ） */
-          if ((await foldersNeedingPermission()).some(n => n.permission === "prompt")) armFolderAutoRead();
+          if (rest.some(n => n.permission === "prompt")) armFolderAutoRead();
           return;
         }
         markFolderAccess(false);
       }
       await readSharedFolders();
       const rest = await foldersNeedingPermission();
+      sharedPendingName = sharedPendingNameFrom(rest);   /* trk211 */
       if (rest.some(n => n.permission === "prompt")) armFolderAutoRead();
+      syncShareUI();
     } catch (e) { console.error(e); core.setStatus("libStatus", "libShareDenied"); }
     return;
   }

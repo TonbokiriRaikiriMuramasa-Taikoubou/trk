@@ -357,6 +357,11 @@ let folderLastPermission = "";     /* trk197: 直近の queryPermission の答�
 let lastScan = [];           /* 直近のスキャン結果（💾 をあとからオンにしたときに使う） */
 let libAllKeys = new Set();  /* いまのライブラリの曲キー（🐔 階層などの件数表示に使う。renderLib が更新） */
 let dirInputMode = "open";   /* フォールバックの <input webkitdirectory> を 📁/📤 のどちらが開いたか */
+/* 📤 trk208：共有フォルダーの登録簿。trk207 までは1本だけ（libKV の "share"）だったのを、
+   音楽も動画も**いくつでも**覚えられるようにした（{ id, name, kind:"music"|"video", handle, addedAt }）。
+   ⚠ ハンドルは IndexedDB に構造化複製でそのまま入る。曲も動画も端末の外へは送らない（読むだけ）。 */
+let sharedFolders = [];
+let sharedLabels = [];     /* 登録簿と同じ順番のフォルダー名（同名フォルダーは「名前 (2)」になる・表示用） */
 /* 🧩 アドオン（js/addons.js）が足した曲。setAddonSongs() で入れ替わります */
 let addonSongs = [];
 function setAddonSongs(list) {
@@ -4824,18 +4829,21 @@ function disarmFolderAutoRead() {
    起動時のタイマーでは出せない（ここが VLC との違い。1タップだけ我慢してもらう）。 */
 let folderAutoBusy = false;   /* 最初の pointerdown とボタンの click が続けて来ても、確認は1回だけ */
 /* フォルダーを選ぶボタン自身を押したときは、自動の確認より手動の流れ（選び直し）を優先する */
-const FOLDER_MANUAL_SELECTOR = "#libOpenBtn, #libShareBtn, #libShareSettingsBtn, #libReconnectBtn, #trkMusicFolderBtn, #libDirInput, .fileBtn, #folderAutoNowBtn";
+const FOLDER_MANUAL_SELECTOR = "#libOpenBtn, #libShareBtn, #libShareSettingsBtn, #libShareVideoBtn, #libSharedFolderList, #libReconnectBtn, #libRescanBtn, #trkMusicFolderBtn, #libDirInput, .fileBtn, #folderAutoNowBtn";
 async function folderAutoKick(e) {
   if (e && e.target && typeof e.target.closest === "function" && e.target.closest(FOLDER_MANUAL_SELECTOR)) return;
   if (folderAutoBusy) return;
   /* タッチの pointerdown や Esc キーは「ユーザー操作」として数えられず、requestPermission が失敗する。
      その場合は待ち合わせを外さず、次の pointerup／click／キーを待つ（「拒否された」と誤表示しない） */
   if (e && typeof navigator !== "undefined" && navigator.userActivation && !navigator.userActivation.isActive) return;
-  if (!libHandle) { disarmFolderAutoRead(); core.setStatus("libShareStatus", "folderPermNone"); return; }
+  /* 📤 trk208：共有フォルダーを登録しているときは登録簿のほうを（1本だけなら下の今までの道と同じ結果になる） */
+  const registry = typeof sharedFolders === "undefined" ? [] : sharedFolders;
+  if (!libHandle && !registry.length) { disarmFolderAutoRead(); core.setStatus("libShareStatus", "folderPermNone"); return; }
   folderAutoBusy = true;
   const h = libHandle, wasShared = libShared;
   disarmFolderAutoRead();
   try {
+    if (registry.length) { await folderAutoKickShared(); return; }
     core.setStatus("libStatus", "folderAutoChecking", { name:h.name });
     const p = await folderPermissionOf(h);
     if (p === "granted") { await useHandle(h, false, wasShared); markFolderAccess(true); return; }
@@ -4865,6 +4873,8 @@ function markFolderAccess(persisted) {
 }
 /* 起動時の入口。許可が生きていれば読み取り、確認が必要なら最初のタップを待つ */
 async function restoreFolderAccess() {
+  /* 📤 trk208：登録簿にフォルダーがあるときは、そちらで許可を確かめる（音楽・動画をまとめて） */
+  if (typeof sharedFolders !== "undefined" && sharedFolders.length) return restoreSharedFolders();
   if (!libHandle) { syncShareUI(); return "none"; }
   const permission = await folderPermissionOf(libHandle);
   const plan = folderReadPlan({ hasHandle:true, permission,
@@ -4910,22 +4920,9 @@ async function openFolder() {
   try { await useHandle(await showDirectoryPicker({ id:"trk-music", mode:"read", startIn:"music" }), true, false); }
   catch (e) { if (e.name !== "AbortError") { console.error(e); core.$("libDirInput").click(); } }
 }
-/* 📤 ミュージックフォルダを共有：端末に1回許可してもらうと、中身のリストをぜんぶ引き受けます */
-async function shareMusicFolder() {
-  dirInputMode = "share";
-  disarmFolderAutoRead();   /* trk194：同上 */
-  if (!canPickDir) { core.setStatus("libShareStatus", "libShareUnsupported"); core.$("libDirInput").click(); return; }
-  try {
-    /* startIn:"music" で、端末のミュージックフォルダを最初から開きます（スマホは SAF のフォルダ選びになります） */
-    const h = await showDirectoryPicker({ id:"trk-music-share", mode:"read", startIn:"music" });
-    await useHandle(h, true, true);
-  } catch (e) {
-    if (e.name === "AbortError") { dirInputMode = "open"; return; }   /* キャンセルは何もしない */
-    console.error(e);
-    core.setStatus("libStatus", "libShareDenied"); core.setStatus("libShareStatus", "libShareUnsupported");
-    core.$("libDirInput").click();
-  }
-}
+/* 📤 ミュージックフォルダを共有：端末に1回許可してもらうと、中身のリストをぜんぶ引き受けます。
+   trk208：選んだフォルダーは登録簿に**追加**します（もう1本、動画フォルダーも、書斎のフォルダーも並べて覚えられる）。 */
+async function shareMusicFolder() { return addSharedFolder("music"); }
 /* 🚫 共有をやめる：覚えた許可と、端末に残した曲をぜんぶ消します */
 async function stopSharing() {
   /* 🛡 覚えてあるフォルダの鍵（📤 共有の "share" と 📁 開くの "dir"）を、両方とも IndexedDB から消す。
@@ -4934,10 +4931,13 @@ async function stopSharing() {
        権限の取り消しはブラウザの設定（サイトデータ）側で行うもので、こちらからは触らない。 */
   try { await libKV.del("share"); } catch (_) {}
   try { await libKV.del("dir"); } catch (_) {}
+  try { await libKV.del("folders"); } catch (_) {}   /* trk208：登録した共有フォルダー（音楽・動画）もぜんぶ忘れる */
+  const hadRegistry = sharedFolders.length > 0;
+  sharedFolders = []; sharedLabels = [];
   shareRemembered = false;
   folderAccessPersisted = false; folderAccessSession = false; disarmFolderAutoRead();   /* trk194：自動の待ち合わせも解除 */
   await clearSharedSongs();
-  if (libShared) {
+  if (libShared || hadRegistry) {
     folderSongs = []; libHandle = null; libShared = false; lastScan = [];
     core.$("libReconnectBtn").hidden = true; core.$("libRescanBtn").hidden = true;
   }
@@ -4950,6 +4950,234 @@ function showReconnect() {
   /* 🔓 trk194：最初のタップ待ちのときは「読み取る」と書く（何が起きるか分かるように） */
   const key = folderAutoArmed ? "libReconnectAuto" : libShared ? "libShareResume" : "libReconnect";
   b.textContent = tr(key, { name:libHandle.name });
+}
+
+/* ---------- 📤 trk208：共有フォルダーの登録簿（音楽も動画も、いくつでも） ----------
+   trk207 までは「📤 共有」＝1本のフォルダーだけだった。書斎のようにフォルダーが何本もある使い方に
+   合わせて、**覚えたフォルダーを一覧で持つ**ようにした。中身は1本のときと同じで、
+   「1回許可 → 一覧に取り込む → 次回は起動しただけで読む（許可が生きていれば）」。
+   ・音楽フォルダー … startIn:"music" ／ 動画フォルダー … startIn:"videos"
+   ・フォルダーは「読むだけ」。曲も動画も端末の外へ送らない。 */
+const FOLDER_KIND_START = { music:"music", video:"videos" };
+const FOLDER_KIND_MAX = 8;   /* 覚えるフォルダーの本数（多すぎると起動の走査が重くなる） */
+function sharedFolderLabel(f, index) {
+  const name = String(f && f.name || "").trim() || "Folder";
+  return sharedLabels[index] || name;
+}
+function sharedFolderNames() {
+  return sharedFolders.map((f, i) => sharedFolderLabel(f, i)).join("・");
+}
+/* 登録簿を IndexedDB から読む。無ければ trk194〜207 の "share"（1本）をここへ移す（後方互換） */
+async function loadSharedFolders() {
+  let list = [];
+  try { list = await libKV.get("folders") || []; } catch (_) { list = []; }
+  const kept = [];
+  for (const item of Array.isArray(list) ? list : []) {
+    const h = item && item.handle;
+    if (!h || h.kind !== "directory" || typeof item.name !== "string" || !item.name) continue;
+    kept.push({ id:String(item.id || item.name).slice(0, 200), name:String(item.name).slice(0, 200),
+      kind:item.kind === "video" ? "video" : "music", handle:h, addedAt:Math.max(0, Number(item.addedAt) || 0),
+      label:String(item.label || "").slice(0, 200) });
+  }
+  if (!kept.length) {
+    try {
+      const legacy = await libKV.get("share");
+      if (legacy && legacy.kind === "directory" && legacy.name) {
+        kept.push({ id:legacy.name, name:legacy.name, kind:"music", handle:legacy, addedAt:0, label:"" });
+        await libKV.put("folders", kept).catch(() => {});   /* 移せたら登録簿が本籍（"share" は消さない＝読めない環境でも失わない） */
+      }
+    } catch (_) {}
+  }
+  sharedFolders = kept; sharedLabels = kept.map(f => f.label);
+  return kept;
+}
+async function saveSharedFolders() {
+  try { await libKV.put("folders", sharedFolders); return true; } catch (e) { console.warn("shared folders could not be saved", e); return false; }
+}
+/* 同じフォルダーを2回登録しない（isSameEntry があればそれで、無ければ名前と種類で見る） */
+async function sameFolder(a, b) {
+  if (!a || !b) return false;
+  try { if (typeof a.isSameEntry === "function") return await a.isSameEntry(b); } catch (_) {}
+  return String(a.name || "") === String(b.name || "");
+}
+/* 📤 フォルダーを登録して、すぐ読む（音楽／動画で startIn だけ変える） */
+async function addSharedFolder(kind) {
+  const video = kind === "video";
+  dirInputMode = "share";
+  disarmFolderAutoRead();   /* trk194：自分で選び直すときは自動の待ち合わせを先に止める */
+  if (!canPickDir) { core.setStatus("libShareStatus", "libShareUnsupported"); core.$("libDirInput").click(); return; }
+  let handle = null;
+  try {
+    handle = await showDirectoryPicker({ id:video ? "trk-video-share" : "trk-music-share", mode:"read",
+      startIn:FOLDER_KIND_START[video ? "video" : "music"] });
+  } catch (e) {
+    if (e && e.name === "AbortError") { dirInputMode = "open"; return; }   /* キャンセルは何もしない */
+    console.error(e);
+    core.setStatus("libStatus", "libShareDenied"); core.setStatus("libShareStatus", "libShareUnsupported");
+    core.$("libDirInput").click();
+    return;
+  }
+  try {
+    for (const f of sharedFolders) if (await sameFolder(f.handle, handle)) {
+      core.setStatus("libShareStatus", "libShareAlready", { name:handle.name });
+      await readSharedFolders();
+      return;
+    }
+    if (sharedFolders.length >= FOLDER_KIND_MAX) { core.setStatus("libShareStatus", "libShareFolderMax", { max:FOLDER_KIND_MAX }); return; }
+    const entry = { id:`${video ? "video" : "music"}:${handle.name}:${Date.now().toString(36)}`, name:handle.name,
+      kind:video ? "video" : "music", handle, addedAt:Date.now(), label:"" };
+    sharedFolders.push(entry);
+    sharedLabels = sharedFolders.map((f, i) => sharedFolderLabel(f, i));
+    shareRemembered = true;
+    await saveSharedFolders();
+    await readSharedFolders();
+    core.setStatus("libShareStatus", "libShareAdded", { name:handle.name, folders:sharedFolders.length });
+  } catch (e) {
+    console.error(e);
+    core.setStatus("libStatus", "libShareDenied");
+    core.setStatus("libShareStatus", "libShareDenied");
+  }
+}
+/* 登録したフォルダーを、いま許可が生きているものだけ読む（1本だけのときもここを通る） */
+async function readSharedFolders() {
+  if (!sharedFolders.length) return { granted:0 };
+  core.setStatus("libStatus", "libShareScanning", { n:0 });
+  const scans = [];
+  let granted = 0;
+  for (const f of sharedFolders) {
+    const p = await folderPermissionOf(f.handle).catch(() => "prompt");
+    if (p !== "granted") { scans.push({ name:f.name, files:[], skipped:0 }); continue; }
+    granted++;
+    try {
+      const r = await scanHandle(f.handle, n => core.setStatus("libStatus", "libShareScanning", { n }));
+      scans.push({ name:f.name, files:r.files, skipped:r.skipped });
+    } catch (e) { console.warn("shared folder could not be read", e); scans.push({ name:f.name, files:[], skipped:0 }); }
+  }
+  const merged = TrkSharedFolders.mergeScans(scans);
+  /* 同名フォルダーの「(2)」を、次回も同じ名前で出せるように覚える（dir の見分けが毎回変わらないように） */
+  sharedLabels = merged.labels;
+  let renamed = false;
+  sharedFolders.forEach((f, i) => { const next = merged.labels[i] || ""; if (next && f.label !== next) { f.label = next; renamed = true; } });
+  if (renamed) void saveSharedFolders();
+  libShared = granted > 0;
+  libHandle = sharedFolders[0].handle;
+  shareRemembered = true;
+  lastScan = merged.files;
+  ingestFolder(merged.files, merged.label, true, merged.skipped);
+  core.$("libReconnectBtn").hidden = granted > 0;
+  core.$("libRescanBtn").hidden = sharedFolders.length === 0;
+  if (libShared && core.settings.libKeepShared) await keepSharedSongs(merged.files);
+  syncShareUI();
+  return { granted, total:sharedFolders.length };
+}
+/* 🔓 登録簿のフォルダーで、まだ許可が要るもの（起動時と最初のタップで使う） */
+async function foldersNeedingPermission() {
+  const out = [];
+  for (const f of sharedFolders) {
+    const permission = await folderPermissionOf(f.handle).catch(() => "prompt");
+    if (permission !== "granted") out.push({ folder:f, permission });
+  }
+  return out;
+}
+/* 起動時の入口（登録簿があるとき）。1本だけのときは restoreFolderAccess の元の道を通る */
+async function restoreSharedFolders() {
+  libHandle = sharedFolders[0].handle;
+  shareRemembered = true;
+  const autoRead = core.settings.folderAutoRead !== false && !(window.TrkSafeMode && window.TrkSafeMode());
+  const need = await foldersNeedingPermission();
+  folderLastPermission = need.some(n => n.permission === "denied") ? "denied"
+    : need.length ? "prompt" : "granted";
+  const plan = TrkSharedFolders.plan({ hasHandle:true, permission:folderLastPermission, autoRead, safe:false });
+  core.$("libReconnectBtn").hidden = false; showReconnect();
+  if (plan === "scan") {
+    folderAccessPersisted = true; folderAccessSession = false;
+    const r = await readSharedFolders();
+    if (r.granted) core.setStatus("libStatus", "libShareAutoRestored", { name:sharedFolderNames(), n:folderSongs.length });
+  } else if (plan === "ask") {
+    folderAccessPersisted = false;
+    armFolderAutoRead();
+    core.setStatus("libStatus", "folderAutoNeedsTap", { name:need[0].folder.name });
+  } else if (folderLastPermission === "denied" && autoRead) {
+    folderAccessPersisted = false;
+    core.setStatus("libStatus", "folderPermDenied", { name:need[0].folder.name });
+  }
+  syncShareUI();
+  return plan;
+}
+/* 最初のタップの中で、許可が要るフォルダーを1本ずつ確かめる（1タップ＝1本。確認をまとめて出さない） */
+async function folderAutoKickShared() {
+  const need = await foldersNeedingPermission();
+  const target = need.find(n => n.permission !== "denied");
+  if (target) {
+    core.setStatus("libStatus", "folderAutoChecking", { name:target.folder.name });
+    const answer = await target.folder.handle.requestPermission({ mode:"read" });
+    if (answer !== "granted") {
+      core.setStatus("libShareStatus", "libDenied");
+      core.$("libReconnectBtn").hidden = false; showReconnect(); syncShareUI();
+      const rest = await foldersNeedingPermission();
+      if (rest.some(n => n.permission === "prompt")) armFolderAutoRead();   /* ほかのフォルダーは次のタップで */
+      return;
+    }
+    markFolderAccess(false);   /* 今回の許可（毎回許可かは分からない） */
+  }
+  await readSharedFolders();
+  const rest = await foldersNeedingPermission();
+  if (rest.some(n => n.permission === "prompt")) armFolderAutoRead();
+}
+/* 登録簿から1本を外す（📤 共有をぜんぶやめるのは stopSharing） */
+async function removeSharedFolder(id) {
+  const before = sharedFolders.length;
+  sharedFolders = sharedFolders.filter(f => f.id !== id);
+  sharedLabels = sharedFolders.map((f, i) => sharedFolderLabel(f, i));
+  if (sharedFolders.length === before) return;
+  await saveSharedFolders();
+  if (!sharedFolders.length) {
+    /* 最後の1本を外したら、📁 開く で覚えたフォルダーに戻す（共有の曲は消す） */
+    await clearSharedSongs().catch(() => {});
+    folderSongs = []; libHandle = null; libShared = false; lastScan = [];
+    shareRemembered = false;
+    core.$("libReconnectBtn").hidden = true; core.$("libRescanBtn").hidden = true;
+    try {
+      const hd = await libKV.get("dir");
+      if (hd && hd.kind === "directory") { libHandle = hd; libShared = false; }
+    } catch (_) {}
+    renderLib(); syncShareUI();
+    core.setStatus("libShareStatus", "libShareRemoved", { name:"" });
+    return;
+  }
+  await readSharedFolders();
+  core.setStatus("libShareStatus", "libShareRemoved", { name:"" });
+}
+/* 共有フォルダーの一覧（📤 パネル）。フォルダーごとの曲数と、× で外すボタンを出す */
+function renderSharedFolderList() {
+  const box = core.$("libSharedFolderList");
+  if (!box) return;
+  box.textContent = "";
+  if (!sharedFolders.length) { box.hidden = true; return; }
+  box.hidden = false;
+  const counts = new Map();
+  for (const song of folderSongs) {
+    const dir = String(song.dir || ""), head = dir.split("/")[0];
+    if (head) counts.set(head, (counts.get(head) || 0) + 1);
+  }
+  sharedFolders.forEach((f, index) => {
+    const label = sharedFolderLabel(f, index), row = document.createElement("div");
+    row.className = "libSharedFolderRow";
+    const name = document.createElement("span");
+    name.className = "libSharedFolderName";
+    name.textContent = `${f.kind === "video" ? "🎬" : "🎵"} ${label}`;
+    const n = document.createElement("span");
+    n.className = "libSharedFolderCount";
+    n.textContent = tr("libShareFolderCount", { n:counts.get(label) || 0 });
+    const off = document.createElement("button");
+    off.type = "button"; off.className = "libSharedFolderOff";
+    off.dataset.folderId = f.id;
+    off.textContent = "×";
+    off.title = tr("libShareFolderRemoveHint", { name:label });
+    off.setAttribute("aria-label", tr("libShareFolderRemoveHint", { name:label }));
+    row.append(name, n, off);
+    box.append(row);
+  });
 }
 
 /* ---------- 💾 共有した曲を端末に残す（settings.libKeepShared） ---------- */
@@ -5019,10 +5247,15 @@ function syncShareUI() {
     : folderAutoArmed ? tr("folderPermNeedsTap", { name:libHandle.name })
     : tr("folderPermManual");
   const sharing = !!libHandle && libShared, opened = !!libHandle && !libShared;
-  if (state) state.textContent = sharing ? tr("libShareStateShared", { name:libHandle.name, n:folderSongs.length })
+  /* 📤 trk208：フォルダーを登録しているときは「何本・何曲」を出す（1本だけなら今までと同じ言い方） */
+  const multi = typeof sharedFolders !== "undefined" ? sharedFolders.length : 0;
+  if (state) state.textContent = multi
+    ? tr("libShareStateMulti", { folders:multi, songs:folderSongs.length, names:sharedFolderNames() })
+    : sharing ? tr("libShareStateShared", { name:libHandle.name, n:folderSongs.length })
     : opened ? tr("libShareStateOpened", { name:libHandle.name, n:folderSongs.length })   /* 📁 開く で覚えたフォルダー（trk194） */
     : sharedSongs.length ? tr("libKeepSharedRestored", { n:sharedSongs.length }) : tr("libShareStateNone");
-  if (stop) stop.hidden = !(sharing || shareRemembered || sharedSongs.length);
+  if (stop) stop.hidden = !(multi || sharing || shareRemembered || sharedSongs.length);
+  renderSharedFolderList();
   showReconnect();
 }
 function syncTrkUI() {
@@ -5088,6 +5321,17 @@ function renderTrkSettings() {
 const libOpenBtn = core.$("libOpenBtn"); if (libOpenBtn) libOpenBtn.addEventListener("click", openFolder);
 const libShareBtn = core.$("libShareBtn"); if (libShareBtn) libShareBtn.addEventListener("click", shareMusicFolder);
 const libShareSettingsBtn = core.$("libShareSettingsBtn"); if (libShareSettingsBtn) libShareSettingsBtn.addEventListener("click", shareMusicFolder);
+/* 🎬 trk208：動画フォルダーも同じやり方で共有できる（startIn:"videos"） */
+const libShareVideoBtn = core.$("libShareVideoBtn"); if (libShareVideoBtn) libShareVideoBtn.addEventListener("click", () => addSharedFolder("video"));
+/* 📤 一覧の × は1本だけ外す（登録簿から消す。押した拍子に自動の許可確認を出さないよう、タップは止める） */
+const libSharedFolderList = core.$("libSharedFolderList");
+if (libSharedFolderList) libSharedFolderList.addEventListener("click", e => {
+  const off = e.target && typeof e.target.closest === "function" ? e.target.closest(".libSharedFolderOff") : null;
+  if (!off) return;
+  e.preventDefault(); e.stopPropagation();
+  const id = off.dataset.folderId || "";
+  if (id) void removeSharedFolder(id);
+});
 const libShareStopBtn = core.$("libShareStopBtn"); if (libShareStopBtn) libShareStopBtn.addEventListener("click", stopSharing);
 /* 🔓 trk194：起動したら自動で読み取る（オフにすると今までどおり手動の再接続だけ） */
 const folderAutoReadChk = core.$("folderAutoReadChk");
@@ -5191,7 +5435,8 @@ if (mediaKeepCurrentBtn) mediaKeepCurrentBtn.addEventListener("click", () => {
 });
 on("songSelected", syncMediaKeepCurrentButton);
 core.$("libRescanBtn").addEventListener("click", () => {
-  if (libHandle) useHandle(libHandle, false, libShared);
+  if (sharedFolders.length) void readSharedFolders();
+  else if (libHandle) useHandle(libHandle, false, libShared);
   else { dirInputMode = libShared ? "share" : "open"; core.$("libDirInput").click(); }
 });
 core.$("libDirInput").addEventListener("change", e => {
@@ -5207,6 +5452,18 @@ core.$("libDirInput").addEventListener("change", e => {
 });
 core.$("libReconnectBtn").addEventListener("click", async () => {
   disarmFolderAutoRead();   /* trk194：ボタンから読むときも、自動の待ち合わせと重ねない */
+  /* 📤 trk208：登録簿があるときは、許可を1本ずつ確かめてから全部読む（「あとN本」を出さない） */
+  if (sharedFolders.length) {
+    try {
+      for (const f of sharedFolders) {
+        let p = await f.handle.queryPermission({ mode:"read" }).catch(() => "prompt");
+        if (p === "prompt") p = await f.handle.requestPermission({ mode:"read" });
+        if (p !== "granted") { core.setStatus("libStatus", "libShareDenied"); syncShareUI(); break; }
+      }
+      await readSharedFolders();
+    } catch (e) { console.error(e); core.setStatus("libStatus", "libShareDenied"); }
+    return;
+  }
   if (!libHandle) return;
   try {
     let p = await libHandle.queryPermission({ mode:"read" });
@@ -5267,15 +5524,23 @@ async function initLibrary() {
   await refreshPackSongs();
   if (canPickDir) {
     try {
-      /* 📤 共有の許可があれば優先（無ければ 📁 開く で覚えたフォルダ） */
-      const hs = await libKV.get("share"), hd = hs ? null : await libKV.get("dir");
-      const h = hs || hd;
-      if (h && h.kind === "directory") {
-        libHandle = h; libShared = !!hs; shareRemembered = !!hs;
+      /* 📤 trk208：まず登録簿（音楽・動画・何本でも）を読む。空なら 📁 開く で覚えたフォルダー1本。 */
+      await loadSharedFolders();
+      if (sharedFolders.length) {
+        libHandle = sharedFolders[0].handle; libShared = true; shareRemembered = true;
         core.$("libReconnectBtn").hidden = false; showReconnect();
-        /* 🔓 trk194：許可が生きていれば、ここで自動的に読み取る（クリック不要）。
-           確認が必要なら、最初のタップで1回だけ確認する待ち合わせに入る。 */
         await restoreFolderAccess();
+      } else {
+        /* 📤 共有の許可があれば優先（無ければ 📁 開く で覚えたフォルダ） */
+        const hs = await libKV.get("share"), hd = hs ? null : await libKV.get("dir");
+        const h = hs || hd;
+        if (h && h.kind === "directory") {
+          libHandle = h; libShared = !!hs; shareRemembered = !!hs;
+          core.$("libReconnectBtn").hidden = false; showReconnect();
+          /* 🔓 trk194：許可が生きていれば、ここで自動的に読み取る（クリック不要）。
+             確認が必要なら、最初のタップで1回だけ確認する待ち合わせに入る。 */
+          await restoreFolderAccess();
+        }
       }
     } catch (_) {}
   } else core.setStatus("libStatus", "libFallbackNote");

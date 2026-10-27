@@ -4000,12 +4000,12 @@ function renderBanner() {
   previewSetBtn.textContent = tr("previewSet");
   previewSetBtn.title = tr("previewSetLongPress");
   previewSetBtn.setAttribute("aria-label", `${tr("previewSet")}. ${tr("previewSetLongPress")}`);
-  previewSetBtn.hidden = !(s && core.videoReady);
+  syncPreviewSetBtn();
   if (typeof bannerSongBtnsSync === "function") bannerSongBtnsSync();
 }
 function updateSpBuilder() {
   core.$("songPackBuilder").hidden = !(core.currentSong && core.videoReady);
-  previewSetBtn.hidden = !(core.currentSong && core.videoReady);
+  syncPreviewSetBtn();
 }
 previewSetBtn.addEventListener("click", () => {
   /* 長押し（650ms）で開始位置のバーを開いたときは、指を離した click で保存しない（trk193） */
@@ -4112,6 +4112,20 @@ bannerStartReset.addEventListener("click", () => {
   core.setStatus("songPrefsStatus", "startBarResetDone");
 });
 bannerStartClose.addEventListener("click", startBarClose);
+
+/* ⏱ trk213：「ここをプレビュー開始位置にする」は、設定（📊 スペクトラム）で
+   オンにしたときだけ出す。初期はオフ＝使わない人が誤って触らない。
+   オン/オフが変わったら spectrum.js が window.Trk.library.syncPreviewSetBtn() を呼ぶ。 */
+function previewSetShown() {
+  return core.settings.previewStartShow === true && !!core.currentSong && !!core.videoReady;
+}
+function syncPreviewSetBtn() {
+  if (!previewSetBtn) return;
+  const show = previewSetShown();
+  previewSetBtn.hidden = !show;
+  /* 出さなくなったら、開いていた開始位置のバーも閉じる（置き去りにしない） */
+  if (!show && bannerStartPanel && !bannerStartPanel.hidden) startBarClose();
+}
 bannerStartZero.addEventListener("change", () => { setStartFromZero(bannerStartZero.checked); startBarSyncText(); });
 /* 「常に最初から再生する」を1か所で受けて、3つの置き場所（設定／メディアプレーヤー／バー）へ配る */
 function setStartFromZero(on) {
@@ -5670,7 +5684,7 @@ window.Trk = window.Trk || {};
 core.on("phase", () => core.emit("nowPlaying", nowPlaying()));
 core.on("mediaReady", () => core.emit("nowPlaying", nowPlaying()));
 
-window.Trk.library = Object.assign(window.Trk.library || {}, { LIB_SHOW, MEDIA_EXT, VIDEO_EXT, addSongFiles, addVideoFiles, allSongs, bannerRandomBtn, bannerVolTip, ensureTrkDistributionPlaylists, ensureTrkOstPlaylist, trkOstPlaylistId: TRK_OST_ID, trkRestoreRemoved, initLibrary, nextSong, noteMediaPlayed, onLongPress, setStartFromZero, syncStartZeroInputs, startBarOpen, restoreFolderAccess, folderReadPlan, plToast, prevSong, previewStartFor, previewContinue, pruneFolderRefsOnce, refreshPackSongs, saveSongPrefs, selectSong, setAddonSongs, songInfo, songDisplayTitle, songDisplayMeta, songTagsOf, loadSongTags, srcLabel, nowPlaying, startPreview, trySongChart, plTitleKeys, plSongMatchKeys, plWishTitleKeys, plIsClassicalTitle, plClassicalTitleKey, plDecoratedTitleKeys, plWishDecoratedKeys, plHasVersionTag, plWishMediaMatches });
+window.Trk.library = Object.assign(window.Trk.library || {}, { LIB_SHOW, MEDIA_EXT, VIDEO_EXT, addSongFiles, addVideoFiles, allSongs, bannerRandomBtn, bannerVolTip, ensureTrkDistributionPlaylists, ensureTrkOstPlaylist, trkOstPlaylistId: TRK_OST_ID, trkRestoreRemoved, initLibrary, nextSong, noteMediaPlayed, onLongPress, setStartFromZero, syncStartZeroInputs, startBarOpen, syncPreviewSetBtn, restoreFolderAccess, folderReadPlan, plToast, prevSong, previewStartFor, previewContinue, pruneFolderRefsOnce, refreshPackSongs, saveSongPrefs, selectSong, setAddonSongs, songInfo, songDisplayTitle, songDisplayMeta, songTagsOf, loadSongTags, srcLabel, nowPlaying, startPreview, trySongChart, plTitleKeys, plSongMatchKeys, plWishTitleKeys, plIsClassicalTitle, plClassicalTitleKey, plDecoratedTitleKeys, plWishDecoratedKeys, plHasVersionTag, plWishMediaMatches });
 Object.defineProperty(window.Trk.library, "addonSongs", { configurable:true, get:() => addonSongs, set:v => { addonSongs = v; } });
 Object.defineProperty(window.Trk.library, "libView", { configurable:true, get:() => libView, set:v => { libView = v; } });
 Object.defineProperty(window.Trk.library, "renderBanner", { configurable:true, get:() => renderBanner, set:v => { renderBanner = v; } });

@@ -77,6 +77,17 @@
 - **文言は4言語**（`videoMaxZoomReset`・`videoMaxZoomHint`・`videoMaxHint` の追記・`videoMaxWheelStep`）。`sw.js` の cache は **`trk-v2026.10.27-trk212`**。`tests/trk212-video-zoom.test.mjs`（11件）を追加。
 - **未確認**：実機のホイール・トラックパッド・ピンチの感触（サンドボックスにブラウザーが無い）。
 
+### ⏱ 曲名タブの「ここをプレビュー開始位置にする」を設定で出す（trk213・未配布）
+
+**曲名タブ右上の「⏱ ここをプレビュー開始位置にする」を、初期状態では出さない**（2026-10-27）。使わない人が誤って触り、その曲のプレビュー開始位置（`previewStart`）が変わるのを避けるため。出すかどうかは**設定**で持ち、**初期オフ**。
+
+- **設定**：`core.settings.previewStartShow`（`prefs.previewStartShow === true`・初期オフ）。`resetVideoPrefs()` で `false` に戻す（📊 スペクトラムの初期化と同じ場所）。
+- **置き場所**：📊 スペクトラムの設定（`js/spectrum.js` の `buildBox`）に **「⏱ 「ここをプレビュー開始位置にする」を表示」**（`specPreviewSet`／説明 `specPreviewSetHint`・4言語）。⚙ 設定 →「📊 スペクトラム（音の見える化）」と、ラックの「くわしい設定」の両方に出る（同じ `buildBox`）。設定の検索でも「プレビュー開始位置」で見つかる。
+- **出し入れ**：`js/library.js` の `previewSetShown()`（設定オン＋曲＋音源の準備完了）と `syncPreviewSetBtn()` が1か所で決める。`renderBanner()`・`updateSpBuilder()` が通り、チェックを変えたときは `window.Trk.library.syncPreviewSetBtn()` でその場で合わせる。**オフにしたら、開いていた開始位置のバーも閉じる**。
+- **今までどおり使えるもの**：曲ごとの `previewStart` は消さない（オンにすれば使える）。**「⏮ 常に最初から再生する」は ⚙ 設定 → 🎵 サウンドとメディアプレーヤーから**、ボタンを隠していても切り替えられる（開始位置のバーは3か所のうちの1つだったため、隠しても残り2か所で足りる）。
+- **文言は4言語**（`specPreviewSet`・`specPreviewSetHint`）。`sw.js` の cache は **`trk-v2026.10.27-trk213`**。`tests/trk213-preview-set-toggle.test.mjs`（6件）。ガイド（`docs/guide/start.md`・`docs/guide/en.md`）にも「初期は出ていない・オンにする場所」を書いた。
+- **未確認**：実機での見え方（曲名タブの右上が空くこと・チェックの位置）。
+
 ### TouhouカタログとローカルMIDI
 
 - `js/touhou-theme-data.js` はTouhouThemeDBの固定スナップショット（commit `e70e645`、The Unlicense）。カタログは曲名等のメタデータだけで、ゲーム音源や抽出物は含みません。904 release IDのうち862をTouhou Project、関連ゲーム42 IDを別系列として扱います。完全性を保証する数字ではありません。
@@ -293,6 +304,7 @@
 | 44 | 1.1.1 の配布ZIP（trk210 入り・2026-10-27） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻・`--check`・再検証（304）は確認済み（§6）。**利用者の実機での起動と、📂 共有の許可ダイアログは未確認** | ①1.1.0 のZIPを置き換える形で 1.1.1 を展開し、`index.html` から起動できること ②開いたあと `sw.js` の cache が `trk-v2026.10.27-trk210` になり、旧 `trk208` のキャッシュが残らないこと ③#43 の5点（× で外したフォルダーが戻らない・許可が生きている側は先に読める・🔓 は1タップ1本・同名フォルダーは `Manga (2)`・リンク本が無くなったフォルダーの後始末） |
 | 45 | trk211：🔓 の文面（断ったあとに「次に聞く1本」の名前を出す） | `tests/trk211-review.test.mjs` の6件で確認済み（純関数・4か所の経路・cache）。**実機の許可ダイアログは未確認** | PC の Chrome／Edge で: ①フォルダーを2本共有し、片方だけ許可を切って起動 ②最初のタップで出た 🔓 を押して**断る** ③🔓 の文面が**さっき断った1本ではなく、次に聞く1本**の名前になっていること ④もう一度押すと2本目だけ確認が出ること ⑤全部を拒否にしても 🔓 の文面が空にならず、フォルダー名が出ていること |
 | 46 | trk212：🖥 全画面の動画をホイール／ドラッグ／ピンチで拡大・縮小（100〜500%・ポインター中心・1回 2/5/10%） | `tests/trk212-video-zoom.test.mjs` の11件で確認済み（純関数・`paint()` の矩形・FI の `setTransform`・4言語・cache）。**実機のホイール・トラックパッド・ピンチの感触は未確認** | PC の Chrome で全画面を開き、①ホイール上／下で拡大・縮小し、指した場所が動かないか ②⚙ 設定 → 🎨 見た目で 2%／5%／10% を切り替えて1ノッチの量が変わるか ③拡大中にドラッグで端まで動かせるか ④100% では左右長押しシークが今までどおりか ⑤スマホで2本指のピンチ |
+| 47 | trk213：⏱ 「ここをプレビュー開始位置にする」を設定で出し入れ（初期オフ） | `tests/trk213-preview-set-toggle.test.mjs` の6件で確認済み（設定の初期値と初期化・純関数・バナー2経路・バーを閉じる・スペクトラムのチェック・4言語・cache）。**実機の見え方は未確認** | ①初期状態で曲名タブの右上にボタンが無いこと ②⚙ 設定 → 📊 スペクトラム のチェックを入れると、曲を選んだときボタンが出ること ③外すと消えること ④ボタンを隠したままでも 🎵 サウンドの「常に最初から再生する」が使えること |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -390,15 +402,26 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk212`＝trk212。**配布ZIP（1.1.2）は `trk211`**。1.1.1 のZIPは `trk210`、1.1.0 のZIPは `trk208`、1.0.9 のZIPは `trk207`。trk212 の次に配る版では `trk212` を cache 名にする） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk213`＝trk213。**配布ZIP（1.1.2）は `trk211`**。1.1.1 のZIPは `trk210`、1.1.0 のZIPは `trk208`、1.0.9 のZIPは `trk207`。trk213 の次に配る版では `trk213` を cache 名にする） |
 | 🚪 メディアプレイヤーの抜け方（trk206） | `js/media-player-mode.js`（`mediaExitPlan`・`closeMedia`）、`js/library.js`（`previewContinue`）、`js/core.js`（`mediaReloadOnExit`）、`js/i18n-options.js`＋`index.html`（❓謎設定）、`tests/trk206-media-exit.test.mjs` |
 | 📦 配布ZIPの組み立て（1.0.8〜・現在 1.1.2） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`release/README.txt`（配布用のかんたん起動。`--readme` を省くとこれが入る。**版と `README-1.x.y.md` の名前は `--version` とそろえる**）、`tests/release-layout.test.mjs`（形・時刻・README の版） |
 | 📂 フォルダー共有の共通部品（trk208） | `js/shared-folders.js`（`window.TrkSharedFolders`＝`plan`／`uniqueLabel`／`mergeScans`／`walk`／`pathParts`／`readFileAt`。DOM・IndexedDB・書き込みなし）、`js/library.js`（登録簿 `"folders"`・`addSharedFolder`／`readSharedFolders`／`restoreSharedFolders`／`folderAutoKickShared`／`removeSharedFolder`／`renderSharedFolderList`）、`index.html`（`#libShareVideoBtn`・`#libSharedFolderList`）、`tests/trk208-shared-folders.test.mjs` |
 | 📂 書斎の「フォルダーのまま読む本」（trk208） | `js/study-room.js`（`studyShareImageFolder`／`studyImportSharedFolder`／`studySharedPageBlob`／`studySharedFolderEnsure`・`studyBookClean` の `linked`／`sharedFolder`）、`js/study-room-utils.js`（`folderBookGroups`・`bookSize` の linked 扱い）、`js/backup.js`（`skip` と `checkStudyLimits`）、`index.html`（`#studyShareFolderBtn`） |
 | 🖥 全画面の動画の拡大・縮小（trk212） | `js/video-max.js`（`zoomStepPercent`・`containSize`・`panLimit`／`clampPan`・`accumulateWheel`・`zoomAround`・`zoomFrame`・`paint` の `drawImage`）、`js/core.js`（`videoMaxWheelStep`）、`js/main.js`（`#videoMaxWheelStep`）、`index.html`、`css/style.css`（`.videoMaxZoom`・`.zoomed` のカーソル）、`tests/trk212-video-zoom.test.mjs` |
+| ⏱ 曲名タブの開始位置ボタン（trk213） | `js/core.js`（`previewStartShow`・`resetVideoPrefs`）、`js/library.js`（`previewSetShown`・`syncPreviewSetBtn`・`renderBanner`／`updateSpBuilder`）、`js/spectrum.js`（`buildBox` の `specPreviewSet`・TEXT 8キー）、`tests/trk213-preview-set-toggle.test.mjs` |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
+
+**trk213（2026-10-27・未配布）の確認**
+
+| 検査 | 結果 | 範囲・注意 |
+|---|---|---|
+| `npm run check` | **673 pass / 0 fail**（trk213 の6件を含む） | 静的 `check-repo` 0 failure・0 warning（`sw.js` の cache は `trk-v2026.10.27-trk213`）・`check-security` 64・`check-a11y` 8・`check-lite` 123 |
+| 設定の初期値 | **OK** | `previewStartShow` は `prefs.previewStartShow === true`（未設定・旧版の 1 などは出さない）。`resetVideoPrefs()` で `false` に戻る |
+| 出し入れ（VM） | **OK** | オン＋曲＋準備完了で出る／オフ・曲なし・準備前・`1`（真偽値でない）では出ない。オフにすると開いているバーを1回だけ閉じる |
+| 置き場所 | **OK** | `buildBox` の1か所（設定画面の 📊 スペクトラムとラックの「くわしい設定」の両方）・4言語・その場で `syncPreviewSetBtn()` |
+| 実機でボタンの出方・チェックの位置 | **未確認** | `node_modules` もブラウザーも無いため、見え方は利用者に確認してもらう |
 
 **trk212（2026-10-27・未配布）の確認**
 
@@ -427,6 +450,12 @@
 
 ## 7. 最近の変更
 
+- **⏱ trk213：「ここをプレビュー開始位置にする」を初期は出さない（2026-10-27・未配布）**：使わない人が誤って触り、曲ごとのプレビュー開始位置が変わるリスクを減らす。
+  - 設定 `core.settings.previewStartShow`（**初期オフ**）を追加。`resetVideoPrefs()` で `false` に戻す。
+  - 📊 スペクトラムの設定（⚙ 設定の「📊 スペクトラム（音の見える化）」とラックの「くわしい設定」）に **「⏱ 「ここをプレビュー開始位置にする」を表示」** のチェックを追加（`specPreviewSet`・説明つき・4言語）。
+  - `js/library.js` の `previewSetShown()`／`syncPreviewSetBtn()` が1か所で決め、`renderBanner()`・`updateSpBuilder()` とチェックの変更が通る。**オフにしたら開いている開始位置のバーも閉じる**。
+  - 曲ごとの `previewStart` は消さない。「⏮ 常に最初から再生する」は 🎵 サウンドとメディアプレーヤーから今までどおり。
+  - `sw.js` の cache は **`trk-v2026.10.27-trk213`**、`tests/trk213-preview-set-toggle.test.mjs`（6件）で **673 pass**。
 - **🖥 trk212：全画面の動画をホイールで拡大・縮小（2026-10-27・未配布）**：「全画面中の拡大・縮小が意図どおりに動かない」との指摘を受け、**全画面の中だけ**に効くズームを作り直した。
   - **ホイール上＝拡大／下＝縮小**、**ポインターの位置を中心**、**1回 2%／5%（既定）／10%**（⚙ 設定 → 🎨 見た目）。**100%＝従来の全体表示**で、上限は 500%。
   - **拡大中はドラッグでつまんで移動**（6px から）。**100% では効かせない**（左右の長押しシークと衝突させない）。**2本指のピンチ**も同じ。押すと 100% に戻る **🔍 {n}%** ボタンを上部に足した。

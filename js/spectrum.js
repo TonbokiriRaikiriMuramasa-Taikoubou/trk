@@ -57,6 +57,8 @@ Object.assign(TEXT.ja, {
   specSkinHint:"曲名バナーの左上の「＋」を押すと、大きく開きます（ここでも切り替えられます）。",
   specArtwork:"🎨 楽曲のサムネイルを表示する",
   specArtworkHint:"スペクトラムの右上に、現在の曲のジャケットを小さく表示します（初期はオフ）。",
+  specPreviewSet:"⏱ 「ここをプレビュー開始位置にする」を表示",
+  specPreviewSetHint:"曲名タブの右上に、その曲のプレビュー開始位置を決めるボタンを出します（初期はオフ）。使わないときはオフのままで、誤って触って開始位置が変わるのを防げます。「⏮ 常に最初から再生する」は設定とメディアプレーヤーからいつでも切り替えられます。",
   specSkinOpenTip:"📊 スペクトラムを大きく開く", specSkinCloseTip:"📊 スペクトラムを小さく閉じる",
   specNextStyle:"次の見え方",
   specOpenSettings:"⚙ くわしい設定",
@@ -99,6 +101,8 @@ Object.assign(TEXT.en, {
   specSkinHint:"Press “＋” at the top-left of the song banner to open it wider (you can also switch it here).",
   specArtwork:"🎨 Show the song thumbnail",
   specArtworkHint:"Show a small cover for the current song in the top-right corner of the spectrum (off by default).",
+  specPreviewSet:"⏱ Show “Set the preview start here”",
+  specPreviewSetHint:"Shows the button in the top-right of the song tab that sets where this song's preview starts (off by default). Leave it off if you don't use it, so a stray tap cannot change the start point. “Always start from the beginning” is still available in Settings and the media player.",
   specSkinOpenTip:"📊 Open the spectrum wider", specSkinCloseTip:"📊 Close the spectrum",
   specNextStyle:"Next style",
   specOpenSettings:"⚙ More settings",
@@ -140,6 +144,8 @@ Object.assign(TEXT.zh, {
   specSkinHint:"按曲名横幅左上角的「＋」可以放大（在这里也能切换）。",
   specArtwork:"🎨 显示歌曲封面缩略图",
   specArtworkHint:"在频谱右上角显示当前歌曲的小封面（默认关闭）。",
+  specPreviewSet:"⏱ 显示“将此处设为预览起始位置”",
+  specPreviewSetHint:"在曲名标签右上角显示用于设置该曲预览起始位置的按钮（默认关闭）。不用时保持关闭，可避免误触改变起始位置。“总是从头开始播放”仍可在设置和媒体播放器中切换。",
   specSkinOpenTip:"📊 放大频谱", specSkinCloseTip:"📊 收小频谱",
   specNextStyle:"下一个样式",
   specOpenSettings:"⚙ 详细设置",
@@ -181,6 +187,8 @@ Object.assign(TEXT.ko, {
   specSkinHint:"곡명 배너 왼쪽 위의 「＋」를 누르면 크게 열립니다 (여기서도 전환할 수 있습니다).",
   specArtwork:"🎨 곡 썸네일 표시",
   specArtworkHint:"스펙트럼 오른쪽 위에 현재 곡의 작은 표지를 표시합니다 (기본 꺼짐).",
+  specPreviewSet:"⏱ “여기를 미리보기 시작 위치로” 표시",
+  specPreviewSetHint:"곡 이름 탭 오른쪽 위에 이 곡의 미리보기 시작 위치를 정하는 버튼을 표시합니다(기본 꺼짐). 쓰지 않을 때는 꺼 두면 잘못 눌러 시작 위치가 바뀌는 것을 막을 수 있습니다. “항상 처음부터 재생”은 설정과 미디어 플레이어에서 언제든 바꿀 수 있습니다.",
   specSkinOpenTip:"📊 스펙트럼 크게 열기", specSkinCloseTip:"📊 스펙트럼 작게 닫기",
   specNextStyle:"다음 모양",
   specOpenSettings:"⚙ 자세한 설정",
@@ -1307,6 +1315,14 @@ function buildBox(host, withCanvas) {
   host.append(tx("div", "specTvHint", "hint specTvHint"));
   host.append(mkCheck("specSkin", () => core.settings.specSkin, v => { core.settings.specSkin = v; core.saveUserPrefs(); syncAll(); }));
   host.append(tx("div", "specSkinHint", "hint specSkinHint"));
+  /* ⏱ trk213：曲名タブの「ここをプレビュー開始位置にする」を出すか（初期オフ）。
+     使わない人が誤って触って、その曲の開始位置を変えてしまうのを避ける。 */
+  host.append(mkCheck("specPreviewSet", () => core.settings.previewStartShow === true, v => {
+    core.settings.previewStartShow = v === true;
+    core.saveUserPrefs();
+    if (window.Trk && window.Trk.library && typeof window.Trk.library.syncPreviewSetBtn === "function") window.Trk.library.syncPreviewSetBtn();
+  }));
+  host.append(tx("div", "specPreviewSetHint", "hint specPreviewSetHint"));
   host.append(mkCheck("specArtwork", () => core.settings.specArtwork, v => { core.settings.specArtwork = v; core.saveUserPrefs(); syncAll(); }));
   host.append(tx("div", "specArtworkHint", "hint specArtworkHint"));
   SYNCS.push(() => host.classList.toggle("specOff", !core.settings.specOn));

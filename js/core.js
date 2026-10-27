@@ -305,6 +305,11 @@ const settings = {
   activePack: typeof prefs.activePack === "string" ? prefs.activePack : null,
   packPrev: cleanPackPrev(prefs.packPrev),                                    // 📦 パックを外したときに戻すための退避（custom.js。trk130）
   previewEnabled: prefs.previewEnabled !== false,
+  /* ⏱ trk213：曲名タブの「⏱ ここをプレビュー開始位置にする」を出すか（初期オフ）。
+     使わない人が誤って触り、その曲のプレビュー開始位置を変えてしまうのを避ける。
+     出す/出さないは 📊 スペクトラムの設定（曲名バナーの見た目のそば）で切り替える。
+     曲ごとの開始位置（previewStart）は消さない＝オンにすれば今までどおり使える。 */
+  previewStartShow: prefs.previewStartShow === true,
   /* ⏮ 常に最初から再生する（trk193）。オンのときは選曲中のプレビューも、メディアプレーヤーの
      「続きから」も使わず、いつも 0:00 から鳴らす。曲ごとのプレビュー開始位置（previewStart）や
      保存した再生位置は消さない＝オフに戻せば今までどおり使える。初期オフ（今までの動きを変えない）。 */
@@ -494,6 +499,7 @@ function resetVideoPrefs() {
   settings.specOn = true; settings.specStyle = "ring"; settings.specTheme = "neon";
   settings.specGain = 1; settings.specPeaks = true; settings.specTv = false;
   settings.specSkin = true; settings.specSkinOpen = false; settings.specArtwork = false;
+  settings.previewStartShow = false;   /* ⏱ trk213：開始位置ボタンも初期値（出さない）へ */
   if (typeof view !== "undefined" && view) { try { view.style.filter = videoFilter(); } catch(_) {} }
   if (typeof menuVideoTick === "function") { try { menuVideoTick(); } catch(_) {} }
 }

@@ -171,6 +171,8 @@ function pokeChrome() {
 /* ---- 🔍 拡大・縮小（trk212） ----
    全画面の動画を、**マウスホイール**（ポインターの位置を中心）・**ドラッグ**（つまんで移動）・
    **2本指のピンチ**で拡大・縮小する。100%＝動画の全体が入る大きさ（従来どおり）、上限は500%。
+   trk214：ドラッグ中・ピンチ中はポインターを捕まえて、画面の外へ出てもずらしを続ける。
+   ピンチのあとに1本だけ残ったときは、そのまま「つまんで移動」に切り替える。
    1ホイールあたりの量は ⚙ 設定 → 🎨 見た目 →「全画面の拡大・縮小（ホイール1回）」の
    2%／5%（既定）／10%。表示位置（ずらし）は「画面の幅・高さに対する割合」で持つので、
    ウィンドウの大きさが変わっても同じ見え方になる。 */
@@ -183,6 +185,23 @@ const zoomView = { zoom:1, panX:0, panY:0 };      /* panX/panY は画面の幅�
 let wheelAcc = 0;                                 /* ホイールの積み上げ（トラックパッドの細かい動き用） */
 let dragState = null, pinchState = null;
 const zoomPointers = new Map();
+const capturedPointers = new Set();               /* trk214：捕まえているポインター（画面の外でも追う） */
+
+/* trk214：ドラッグ・ピンチが始まったら**そのポインターを stage に捕まえる**。
+   捕まえている間は、指やマウスが動画の外（ウィンドウの外）へ出ても pointermove /
+   pointerup が stage に届くので、ずらしが途中で止まらない。
+   押しただけ（長押しシーク）のときは捕まえない＝外へ出たら長押しシークを止める
+   従来の動き（trk188）をそのまま残す。 */
+function captureZoomPointer(id) {
+  if (id == null || capturedPointers.has(id)) return;
+  if (!stage || typeof stage.setPointerCapture !== "function") return;
+  try { stage.setPointerCapture(id); capturedPointers.add(id); } catch (_) {}
+}
+function releaseZoomPointer(id) {
+  if (!capturedPointers.has(id)) return;
+  capturedPointers.delete(id);
+  try { if (stage && typeof stage.releasePointerCapture === "function") stage.releasePointerCapture(id); } catch (_) {}
+}
 
 /* 設定の値を 2／5／10 のどれかに寄せる（未設定・壊れた値は既定の5） */
 function zoomStepPercent(value) {
@@ -310,6 +329,7 @@ function startZoomGesture(e) {
     pinchState = { dist:Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)), zoom:zoomView.zoom };
     dragState = null;
     if (stage) stage.classList.remove("panning");
+    for (const id of zoomPointers.keys()) captureZoomPointer(id);   /* trk214：2本とも捕まえる */
     stopHoldSeek();                 /* 2本指：長押しシークは止める */
     suppressHoldClick = true;       /* ピンチのあとの click で再生／停止しない */
     return;
@@ -333,6 +353,7 @@ function moveZoomGesture(e) {
     if (zoomView.zoom <= 1.0001) return;          /* 100% では動かせない（左右長押しシークを邪魔しない） */
     if (Math.hypot(dx, dy) < DRAG_START) return;
     dragState.active = true;
+    captureZoomPointer(e.pointerId);              /* trk214：掴んだら画面の外へ出ても追う */
     stopHoldSeek();
     suppressHoldClick = true;                     /* 離したときの click で再生／停止しない */
     if (stage) stage.classList.add("panning");
@@ -345,14 +366,26 @@ function moveZoomGesture(e) {
 }
 function endZoomGesture(e) {
   if (!zoomPointers.has(e.pointerId)) return;
+  const wasPinching = !!pinchState;
   zoomPointers.delete(e.pointerId);
+  releaseZoomPointer(e.pointerId);
   if (zoomPointers.size < 2) pinchState = null;
   if (dragState && dragState.id === e.pointerId) {
     if (dragState.active && stage) stage.classList.remove("panning");
     dragState = null;
   }
+  /* trk214：ピンチのあとに1本だけ残ったら、そのまま「つまんで移動」に切り替える
+     （指を置き直さなくても、残った1本でずらせる）。 */
+  if (wasPinching && zoomPointers.size === 1 && zoomView.zoom > 1.0001) {
+    const [id, p] = [...zoomPointers.entries()][0];
+    dragState = { id, x:p.x, y:p.y, panX:zoomView.panX, panY:zoomView.panY, active:true };
+    if (stage) stage.classList.add("panning");
+    captureZoomPointer(id);
+    suppressHoldClick = true;                     /* 離したときの click で再生／停止しない */
+  }
 }
 function clearZoomGesture() {
+  for (const id of [...capturedPointers]) releaseZoomPointer(id);
   zoomPointers.clear(); dragState = null; pinchState = null;
   if (stage) stage.classList.remove("panning");
 }
@@ -512,9 +545,11 @@ function build() {
   document.body.append(root);
 
   ctx = canvas.getContext("2d");
-  /* ⏩ 左右長押しシーク（trk188）。pointer capture は stage へ単純に取らない：
+  /* ⏩ 左右長押しシーク（trk188）。pointerdown でいきなり pointer capture は取らない：
      短タップの click target が stage になり「黒いところをクリックで閉じる」と衝突し得るため、
-     window 側の pointerup / pointerleave で掃除する。 */
+     window 側の pointerup / pointerleave で掃除する。
+     🔍 trk214：**ドラッグ・ピンチが始まったときだけ**（captureZoomPointer）捕まえる。
+     そのときは suppressHoldClick が立っているので click の取り違えは起きない。 */
   stage.addEventListener("pointerdown", startHoldSeek);
   stage.addEventListener("pointermove", moveHoldSeek);
   /* 🔍 trk212：ホイールで拡大・縮小（ポインターの位置が中心）、つまんで移動、2本指のピンチ。
@@ -528,6 +563,7 @@ function build() {
     if (!suppressHoldClick || e.detail === 0) return;   /* e.detail===0 はキーボード等の click なので通す */
     e.preventDefault(); e.stopImmediatePropagation();
   }, true);
+  stage.addEventListener("lostpointercapture", e => capturedPointers.delete(e.pointerId));
   addEventListener("pointerup", endHoldSeek);
   addEventListener("pointerup", endZoomGesture);
   addEventListener("pointercancel", endZoomGesture);

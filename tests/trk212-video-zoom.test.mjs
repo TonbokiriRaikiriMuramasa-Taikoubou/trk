@@ -26,6 +26,7 @@ function sandbox(extra = {}) {
   const code = src.slice(src.indexOf("/* ---- 🔍 拡大・縮小（trk212） ----"), src.indexOf("/* ---- 描画 ---- */"));
   assert.ok(code.length > 1000, "the zoom block is extractable");
   const classes = new Set();
+  const captures = [];
   const box = {
     window: {}, console, Math, Number, Map,
     isOn: true, root: null, zoomChip: null, suppressHoldClick: false,
@@ -38,7 +39,10 @@ function sandbox(extra = {}) {
     core: { settings: { videoMaxWheelStep: 5 } },
     stage: {
       getBoundingClientRect: () => ({ left: 0, top: 0, width: 1600, height: 1000 }),
-      classList: { add: c => classes.add(c), remove: c => classes.delete(c) }
+      classList: { add: c => classes.add(c), remove: c => classes.delete(c) },
+      /* trk214：pointer capture の受け皿（呼ばれた順に記録する） */
+      setPointerCapture(id) { captures.push(["set", id]); },
+      releasePointerCapture(id) { captures.push(["release", id]); }
     },
     ...extra,
   };
@@ -46,7 +50,7 @@ function sandbox(extra = {}) {
   vm.runInContext(`${code}
 ;globalThis.api = { zoomStepPercent, containSize, panLimit, clampPan, accumulateWheel, zoomAround,
   zoomView, onZoomWheel, zoomFrame, resetZoomView, zoomTo, startZoomGesture, moveZoomGesture, endZoomGesture, clearZoomGesture };`, box);
-  return { box, api: box.api, classes };
+  return { box, api: box.api, classes, captures };
 }
 const pointer = (id, x, y, extra = {}) => ({ pointerId: id, clientX: x, clientY: y, pointerType: "mouse", button: 0, isPrimary: id === 1, ...extra });
 
@@ -321,4 +325,87 @@ test("trk212: the service worker cache name moves on for this change", () => {
   const m = swSrc.match(/^const CACHE = "trk-v([\d.]+)-trk(\d+)";$/m);
   assert.ok(m, "cache 名の形");
   assert.ok(Number(m[2]) >= 212, `cache は trk212 以降（いまは trk${m[2]}）`);
+});
+
+/* ---------- 11. trk214：ピンチのあと・画面の外へ出たとき（レビュー反映） ---------- */
+test("trk214: a pinch hands the remaining finger over to dragging without lifting it", () => {
+  const { api, classes, box } = sandbox();
+  api.resetZoomView();
+  /* 2本指で広げて 2倍にする */
+  api.startZoomGesture(pointer(1, 700, 500, { pointerType: "touch" }));
+  api.startZoomGesture(pointer(2, 900, 500, { pointerType: "touch", isPrimary: false }));
+  api.moveZoomGesture(pointer(1, 600, 500, { pointerType: "touch" }));
+  api.moveZoomGesture(pointer(2, 1000, 500, { pointerType: "touch", isPrimary: false }));
+  assert.ok(Math.abs(api.zoomView.zoom - 2) < 1e-9, "2本指を広げると拡大");
+  /* 1本離す → 残った1本がそのまま掴んだ状態になる */
+  api.endZoomGesture(pointer(2, 1000, 500, { pointerType: "touch", isPrimary: false }));
+  assert.equal(classes.has("panning"), true, "残った1本は掴んでいる扱い");
+  assert.equal(box.suppressHoldClick, true, "離したときの click で再生／停止しない");
+  /* 置き直さずに動かせる（右へ100px＝画面幅の 6.25%） */
+  const before = api.zoomView.panX;
+  api.moveZoomGesture(pointer(1, 600, 500, { pointerType: "touch" }));
+  api.moveZoomGesture(pointer(1, 700, 500, { pointerType: "touch" }));
+  assert.ok(Math.abs(api.zoomView.panX - (before + 0.0625)) < 1e-9, `動いた（${before}→${api.zoomView.panX}）`);
+  /* 離すと後片付け */
+  api.endZoomGesture(pointer(1, 700, 500, { pointerType: "touch" }));
+  assert.equal(classes.has("panning"), false);
+});
+
+test("trk214: the pinch handoff only happens above 100%, and the last finger still pans", () => {
+  const { api, classes } = sandbox();
+  api.resetZoomView();
+  /* 100% まで縮めてから1本離す → 掴んだ扱いにはしない（動かす余地が無い） */
+  api.startZoomGesture(pointer(1, 700, 500, { pointerType: "touch" }));
+  api.startZoomGesture(pointer(2, 900, 500, { pointerType: "touch", isPrimary: false }));
+  api.endZoomGesture(pointer(2, 900, 500, { pointerType: "touch", isPrimary: false }));
+  assert.equal(classes.has("panning"), false, "100% では掴んだ扱いにしない");
+  api.endZoomGesture(pointer(1, 700, 500, { pointerType: "touch" }));
+  api.clearZoomGesture();
+});
+
+test("trk214: dragging and pinching capture the pointer so it keeps tracking outside the video", () => {
+  const { api, captures } = sandbox();
+  api.resetZoomView();
+  /* 押しただけ（100%・長押しシーク）では捕まえない＝外へ出たら長押しシークを止める従来の動き */
+  api.startZoomGesture(pointer(1, 800, 500));
+  api.moveZoomGesture(pointer(1, 802, 500));
+  assert.deepEqual(captures, [], "押しただけでは捕まえない");
+  api.endZoomGesture(pointer(1, 802, 500));
+  assert.deepEqual(captures, [], "離しても捕まえていないので何もしない");
+  /* 拡大してドラッグを始めたら捕まえる（6px を越えた時点） */
+  api.zoomTo(2, 0.5, 0.5);
+  api.startZoomGesture(pointer(1, 800, 500));
+  api.moveZoomGesture(pointer(1, 803, 500));
+  assert.deepEqual(captures, [], "まだ動かし始めていない");
+  api.moveZoomGesture(pointer(1, 900, 500));
+  assert.deepEqual(captures, [["set", 1]], "掴んだら捕まえる");
+  /* 画面の外（動画の外）でさらに動かしても届く＝ずらしが続く */
+  const before = api.zoomView.panX;
+  api.moveZoomGesture(pointer(1, 1900, 500));
+  assert.ok(api.zoomView.panX > before, "外へ出てもずらしが続く");
+  api.endZoomGesture(pointer(1, 1900, 500));
+  assert.deepEqual(captures, [["set", 1], ["release", 1]], "離したら返す");
+  /* ピンチは2本とも捕まえ、離したほうから返す */
+  api.resetZoomView();
+  api.startZoomGesture(pointer(1, 700, 500, { pointerType: "touch" }));
+  api.startZoomGesture(pointer(2, 900, 500, { pointerType: "touch", isPrimary: false }));
+  assert.deepEqual(captures.slice(-2), [["set", 1], ["set", 2]], "2本とも捕まえる");
+  api.endZoomGesture(pointer(1, 700, 500, { pointerType: "touch" }));
+  assert.deepEqual(captures.slice(-1), [["release", 1]], "離したほうを返す");
+  api.endZoomGesture(pointer(2, 900, 500, { pointerType: "touch", isPrimary: false }));
+});
+
+test("trk214: blur/release clears every captured pointer", () => {
+  const { api, captures, classes } = sandbox();
+  api.resetZoomView();
+  api.zoomTo(2, 0.5, 0.5);
+  api.startZoomGesture(pointer(1, 800, 500));
+  api.moveZoomGesture(pointer(1, 900, 500));
+  api.startZoomGesture(pointer(2, 1000, 500, { pointerType: "touch", isPrimary: false }));
+  assert.deepEqual(captures.filter(c => c[0] === "set").map(c => c[1]), [1, 2], "掴んだ1本目と2本目（同じ指を二重に捕まえない）");
+  api.clearZoomGesture();
+  assert.deepEqual(captures.filter(c => c[0] === "release").map(c => c[1]).sort(), [1, 2], "全部返す");
+  assert.equal(classes.has("panning"), false);
+  /* 捕まえていない id を渡しても落ちない */
+  api.endZoomGesture(pointer(9, 0, 0));
 });

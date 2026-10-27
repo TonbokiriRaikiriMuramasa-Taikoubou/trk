@@ -317,5 +317,8 @@ test("trk212: frame interpolation follows the same zoom through the canvas trans
 
 /* ---------- 10. cache 名 ---------- */
 test("trk212: the service worker cache name moves on for this change", () => {
-  assert.match(swSrc, /^const CACHE = "trk-v2026\.10\.27-trk212";$/m);
+  /* 版が進むたびに直さなくてよいよう「trk212 以降」で見る（trk211 のテストと同じ） */
+  const m = swSrc.match(/^const CACHE = "trk-v([\d.]+)-trk(\d+)";$/m);
+  assert.ok(m, "cache 名の形");
+  assert.ok(Number(m[2]) >= 212, `cache は trk212 以降（いまは trk${m[2]}）`);
 });

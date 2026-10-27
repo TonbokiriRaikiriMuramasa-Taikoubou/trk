@@ -63,6 +63,20 @@
 - **決め方は1か所（`sharedPendingNameFrom(list)`）**：🔓 に出すのは**次に聞く1本**＝まだ許可待ち（`prompt`）の先頭。残りが全部「拒否」のときは先頭の1本を出す（空にして `libHandle.name` に落ち、別のフォルダー名が出るのを避ける）。`readSharedFolders`・`restoreSharedFolders`・`folderAutoKickShared`（拒否の後と読んだ後）・🔓 ボタン（拒否の後と成功後）がこの関数を通る。
 - **`sw.js` の cache は `trk-v2026.10.27-trk211`**。`tests/trk211-review.test.mjs`（6件）を追加（純関数の選び方・断ったとき／全部拒否のとき／許可できたときの文面・🔓 側の配線・cache）。trk208 のサンプルは新しい関数も読み込むようにし、trk210 の cache 検査は「trk210 以降」に緩めた（版が進むたびに直さないため）。
 
+### 🖥 全画面の動画をホイールで拡大・縮小（trk212・未配布）
+
+**全画面ビューア（`#videoMaxView`）で、再生中の動画をマウスホイールで拡大・縮小できるようにした**（2026-10-27）。背景映像の `videoZoom`（0.5〜3x）とは別で、**全画面の中だけ**に効く。
+
+- **操作**：映像の上で**ホイール上＝拡大／下＝縮小**。**ポインターが合っている位置を中心**に寄る（指した場所が動かない）。**1回あたりは 2%／5%（既定）／10%** から選ぶ（⚙ 設定 → 🎨 見た目 →「全画面の拡大・縮小（ホイール1回）」＝`#videoMaxWheelStep`・`core.settings.videoMaxWheelStep`。工場出荷に戻すと5%）。
+- **100%＝従来の全体表示**（`containSize` がアスペクトを保って枠に収める）。範囲は **100〜500%**（`ZOOM_MIN=1`／`ZOOM_MAX=5`）。
+- **ドラッグで移動**：**拡大中だけ**、6px 以上動かしたら「つまんで移動」（`DRAG_START=6`・カーソルは `grab`／`grabbing`）。**100% ではわざと効かせない**（左右の長押しシークとぶつけない）。離したときの click は `suppressHoldClick` で再生／停止にしない。
+- **2本指のピンチ**も同じ倍率で効く（`zoomPointers`）。上部の **🔍 ボタン**（`.videoMaxZoom`）は拡大中は「🔍 {n}%（クリックで100%に戻す）」、100% ではホイールの案内を出し、押すと 100% に戻る。
+- **戻るタイミング**：全画面を開くたび・曲が替わるたび（`songSelected` → `resetZoomView`）に 100%。`panX`／`panY` は**画面の幅・高さに対する割合**で持つので、ウィンドウの大きさが変わっても同じ見え方になる。
+- **実装**：`js/video-max.js` の純関数（`zoomStepPercent`・`containSize`・`panLimit`／`clampPan`・`accumulateWheel`・`zoomAround`・`zoomFrame`）＋ `paint()` が `zoomFrame(W,H)` の矩形で `drawImage`。FI（`TrkFrameInterp.drawTo`）も同じ矩形へ `setTransform` で掛ける。**パック画像（映像が無い曲）は拡大・縮小しない**（従来の全体表示）。
+- **ホイールの量の数え方**：`WHEEL_NOTCH=100`（px 相当）でノッチに直す。`deltaMode` は **行（1）＝1行34px・ページ（2）＝100px**。`accumulateWheel` は同符号で積み上げ、1イベントで動かすのは ±4段まで（トラックパッドの細かい動きも合計で1段ずつになる）。ホイールの既定動作は全画面の中だけ `preventDefault` で止める。`touch-action:none` と長押しシーク（trk188）はそのまま。
+- **文言は4言語**（`videoMaxZoomReset`・`videoMaxZoomHint`・`videoMaxHint` の追記・`videoMaxWheelStep`）。`sw.js` の cache は **`trk-v2026.10.27-trk212`**。`tests/trk212-video-zoom.test.mjs`（11件）を追加。
+- **未確認**：実機のホイール・トラックパッド・ピンチの感触（サンドボックスにブラウザーが無い）。
+
 ### TouhouカタログとローカルMIDI
 
 - `js/touhou-theme-data.js` はTouhouThemeDBの固定スナップショット（commit `e70e645`、The Unlicense）。カタログは曲名等のメタデータだけで、ゲーム音源や抽出物は含みません。904 release IDのうち862をTouhou Project、関連ゲーム42 IDを別系列として扱います。完全性を保証する数字ではありません。
@@ -278,6 +292,7 @@
 | 43 | trk210：📤 共有フォルダーの × と 🔓（レビュー反映）・📚 同名フォルダー | `tests/trk210-review.test.mjs` の6件で確認済み（最後の1本で `"share"` も消える・許可が生きているフォルダーを先に読む・🔓 は1タップ1本・同名の別フォルダーは `Manga (2)`・リンク本が無くなったフォルダーの後始末）。**実機の許可ダイアログは未確認** | PC の Chrome／Edge で: ①1.0.x から上げた状態で共有フォルダーを1本だけ × で外し、**再読み込みしても戻らない**こと ②フォルダーを2本登録し、片方だけ許可を切って起動→**許可が生きている側の曲はすぐ出る**こと、🔓 が残りの1本の名前で出ること ③🔓 を1回押して**1本だけ**確認が出ること（2本目は次のタップ） ④書斎で `Manga` を選んだあと、**別の場所の同名フォルダー**を選ぶと `Manga (2)` として増えること（前の本としおりが消えない） ⑤リンク本を全部消すと、フォルダーの記録も消えること |
 | 44 | 1.1.1 の配布ZIP（trk210 入り・2026-10-27） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻・`--check`・再検証（304）は確認済み（§6）。**利用者の実機での起動と、📂 共有の許可ダイアログは未確認** | ①1.1.0 のZIPを置き換える形で 1.1.1 を展開し、`index.html` から起動できること ②開いたあと `sw.js` の cache が `trk-v2026.10.27-trk210` になり、旧 `trk208` のキャッシュが残らないこと ③#43 の5点（× で外したフォルダーが戻らない・許可が生きている側は先に読める・🔓 は1タップ1本・同名フォルダーは `Manga (2)`・リンク本が無くなったフォルダーの後始末） |
 | 45 | trk211：🔓 の文面（断ったあとに「次に聞く1本」の名前を出す） | `tests/trk211-review.test.mjs` の6件で確認済み（純関数・4か所の経路・cache）。**実機の許可ダイアログは未確認** | PC の Chrome／Edge で: ①フォルダーを2本共有し、片方だけ許可を切って起動 ②最初のタップで出た 🔓 を押して**断る** ③🔓 の文面が**さっき断った1本ではなく、次に聞く1本**の名前になっていること ④もう一度押すと2本目だけ確認が出ること ⑤全部を拒否にしても 🔓 の文面が空にならず、フォルダー名が出ていること |
+| 46 | trk212：🖥 全画面の動画をホイール／ドラッグ／ピンチで拡大・縮小（100〜500%・ポインター中心・1回 2/5/10%） | `tests/trk212-video-zoom.test.mjs` の11件で確認済み（純関数・`paint()` の矩形・FI の `setTransform`・4言語・cache）。**実機のホイール・トラックパッド・ピンチの感触は未確認** | PC の Chrome で全画面を開き、①ホイール上／下で拡大・縮小し、指した場所が動かないか ②⚙ 設定 → 🎨 見た目で 2%／5%／10% を切り替えて1ノッチの量が変わるか ③拡大中にドラッグで端まで動かせるか ④100% では左右長押しシークが今までどおりか ⑤スマホで2本指のピンチ |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -375,14 +390,25 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk211`＝trk211。**配布ZIP（1.1.2）も `trk211`**。1.1.1 のZIPは `trk210`、1.1.0 のZIPは `trk208`、1.0.9 のZIPは `trk207`） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk212`＝trk212。**配布ZIP（1.1.2）は `trk211`**。1.1.1 のZIPは `trk210`、1.1.0 のZIPは `trk208`、1.0.9 のZIPは `trk207`。trk212 の次に配る版では `trk212` を cache 名にする） |
 | 🚪 メディアプレイヤーの抜け方（trk206） | `js/media-player-mode.js`（`mediaExitPlan`・`closeMedia`）、`js/library.js`（`previewContinue`）、`js/core.js`（`mediaReloadOnExit`）、`js/i18n-options.js`＋`index.html`（❓謎設定）、`tests/trk206-media-exit.test.mjs` |
 | 📦 配布ZIPの組み立て（1.0.8〜・現在 1.1.2） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`release/README.txt`（配布用のかんたん起動。`--readme` を省くとこれが入る。**版と `README-1.x.y.md` の名前は `--version` とそろえる**）、`tests/release-layout.test.mjs`（形・時刻・README の版） |
 | 📂 フォルダー共有の共通部品（trk208） | `js/shared-folders.js`（`window.TrkSharedFolders`＝`plan`／`uniqueLabel`／`mergeScans`／`walk`／`pathParts`／`readFileAt`。DOM・IndexedDB・書き込みなし）、`js/library.js`（登録簿 `"folders"`・`addSharedFolder`／`readSharedFolders`／`restoreSharedFolders`／`folderAutoKickShared`／`removeSharedFolder`／`renderSharedFolderList`）、`index.html`（`#libShareVideoBtn`・`#libSharedFolderList`）、`tests/trk208-shared-folders.test.mjs` |
 | 📂 書斎の「フォルダーのまま読む本」（trk208） | `js/study-room.js`（`studyShareImageFolder`／`studyImportSharedFolder`／`studySharedPageBlob`／`studySharedFolderEnsure`・`studyBookClean` の `linked`／`sharedFolder`）、`js/study-room-utils.js`（`folderBookGroups`・`bookSize` の linked 扱い）、`js/backup.js`（`skip` と `checkStudyLimits`）、`index.html`（`#studyShareFolderBtn`） |
+| 🖥 全画面の動画の拡大・縮小（trk212） | `js/video-max.js`（`zoomStepPercent`・`containSize`・`panLimit`／`clampPan`・`accumulateWheel`・`zoomAround`・`zoomFrame`・`paint` の `drawImage`）、`js/core.js`（`videoMaxWheelStep`）、`js/main.js`（`#videoMaxWheelStep`）、`index.html`、`css/style.css`（`.videoMaxZoom`・`.zoomed` のカーソル）、`tests/trk212-video-zoom.test.mjs` |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
+
+**trk212（2026-10-27・未配布）の確認**
+
+| 検査 | 結果 | 範囲・注意 |
+|---|---|---|
+| `npm run check` | **667 pass / 0 fail**（trk212 の11件を含む） | 静的 `check-repo` 0 failure・0 warning（`sw.js` の cache は `trk-v2026.10.27-trk212`）・`check-security` 64・`check-a11y` 8・`check-lite` 123・`git diff --check` OK |
+| 回帰の確かめ | **OK** | `paint()` の `const w = baseW * z` を `baseW` に戻すと trk212 の描画2件が失敗し、戻すと 11/11 が通る（ズームが実際に描画へ届いていることを確認） |
+| ズームの計算 | **OK（vm で単体確認）** | 100%→5%で `1.05`／2%で `1.02`／10%で `1.1`・200段で上限 `5.0`・`zoomAround({1,0,0},2,.25,.5,{1,.5625})`＝`{zoom:2,panX:.25,panY:0}`（ポインター点が動かない）・2倍＋右100px ドラッグ＝`panX 0.0625`・±0.5 で停止・ピンチ 200→400px＝2倍 |
+| 壊れた値の扱い | **OK** | `videoMaxWheelStep` が未設定・NaN・範囲外でも `zoomStepPercent` が 5（2/5/10 の最近傍・7→5・9→10）・`panLimit(NaN)`＝0・`accumulateWheel` の `-0` は 0 |
+| PC／スマホ実機でホイール・ドラッグ・ピンチ | **未確認** | `node_modules` もブラウザーも無いため、感触は利用者に確認してもらう |
 
 **trk211・1.1.2（2026-10-27）の確認**（trk193〜210 の途中の記録はアーカイブへ移動）
 
@@ -401,6 +427,11 @@
 
 ## 7. 最近の変更
 
+- **🖥 trk212：全画面の動画をホイールで拡大・縮小（2026-10-27・未配布）**：「全画面中の拡大・縮小が意図どおりに動かない」との指摘を受け、**全画面の中だけ**に効くズームを作り直した。
+  - **ホイール上＝拡大／下＝縮小**、**ポインターの位置を中心**、**1回 2%／5%（既定）／10%**（⚙ 設定 → 🎨 見た目）。**100%＝従来の全体表示**で、上限は 500%。
+  - **拡大中はドラッグでつまんで移動**（6px から）。**100% では効かせない**（左右の長押しシークと衝突させない）。**2本指のピンチ**も同じ。押すと 100% に戻る **🔍 {n}%** ボタンを上部に足した。
+  - 純関数（`zoomStepPercent`／`containSize`／`panLimit`・`clampPan`／`accumulateWheel`／`zoomAround`／`zoomFrame`）と `paint()` の `drawImage` 矩形、FI の `setTransform` を同じ矩形にそろえた。**パック画像は対象外**。
+  - 全画面を開くたび・曲が替わるたびに 100%。`panX`／`panY` は画面に対する割合で保持。文言は4言語、`sw.js` の cache は **`trk-v2026.10.27-trk212`**、`tests/trk212-video-zoom.test.mjs`（11件）で **667 pass**。
 - **📦 1.1.2：trk211 を配る版（2026-10-27）**：**アプリ本体は trk211**（1.1.1 のレビューで見つかった 🔓 の文面＝下の項目）。1.1.1 の配布ZIPの `trk-files/` を土台に、変わった **2ファイル**（`js/library.js`・`sw.js`）だけを差し替え、`README-1.1.1.md` → **`README-1.1.2.md`**（`README.md` も同内容）・`README-SLIM.md`・`release/README.txt` の版を 1.1.2 にそろえた。**ZIPの形は 1.1.1 と同じ**（`index.html`＋`README.txt`＋`trk-files/`）。
   - ZIP は **`2026-10-27 20:00`（UTC）** で組み立て（1.1.1 の `19:00` より新しい）＝**226エントリ・3,899,166 bytes**・`unzip -t` 破損なし・全エントリ同時刻・`sha256 837086d22d73f6fdea0952dc4293d27871aa3acfb33bd0fa79c5e4781906556c`。
   - `prepare-release --check` **OK**・ローカル配信で `/` 200・再検証は `19:00` で **200**／`20:00` で **304**。

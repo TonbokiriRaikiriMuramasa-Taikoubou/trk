@@ -85,7 +85,8 @@
     return JSON.stringify(out);
   }
   /* IndexedDB の対象。skip はそのストアで書き出さないキー（FileSystemHandle などを持つ） */
-  const DB_LIBRARY = { db:"shadow_taiko_library", version:2, stores:["kv"], skip:{ kv:["dir", "share"] } };
+  /* 📂 trk208：フォルダーのハンドル（dir／share／folders／studyFolders）は端末ごとの値なので、バックアップには入れない */
+  const DB_LIBRARY = { db:"shadow_taiko_library", version:2, stores:["kv"], skip:{ kv:["dir", "share", "folders", "studyFolders"] } };
   const DB_STUDY = { db:"trk_study_room_v1", version:1, stores:["books", "pages", "covers", "settings"] };
   /* 復元で書斎のストアを書く順（trk163・レビュー【低】③）：参照される側を先に（pages→covers→books→settings）。
      一番大きな書き込み（pages）が先なので、容量不足などで途中失敗したときに本・カバー側は無傷のまま＝残る不整合は
@@ -413,7 +414,9 @@
       const value = b && b.v;
       const pages = value && Array.isArray(value.pages) ? value.pages : [];
       if (pages.length > L.pages) throw new BackupError("backupRestoreLimit");
-      if (value && value.kind === "image") {
+      /* 📂 trk208：フォルダーのまま読む本は、画像の実体をこの端末に持っていない（pages ストアに入れない）。
+         数えると「入っていない容量」で上限に引っかかってしまうので、ここは数えない。 */
+      if (value && value.kind === "image" && value.linked !== true) {
         let bytes = 0;
         for (const page of pages) {
           const actual = page && pageBlobSizes.has(page.key) ? pageBlobSizes.get(page.key) : page && page.size;

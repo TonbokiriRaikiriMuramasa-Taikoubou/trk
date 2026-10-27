@@ -1142,8 +1142,12 @@
             <div class="hint" data-i18n="libShareHint"></div>
             <div class="miniActions">
               <button id="libShareSettingsBtn" type="button" data-i18n="libShare"></button>
+              <!-- 🎬 trk208：動画フォルダーも同じやり方で共有（startIn:"videos"） -->
+              <button id="libShareVideoBtn" type="button" data-i18n="libShareVideo"></button>
               <button id="libShareStopBtn" type="button" data-i18n="libShareStop" hidden></button>
             </div>
+            <!-- 📤 trk208：覚えている共有フォルダーの一覧（フォルダーごとの曲数と × を library.js が作ります） -->
+            <div id="libSharedFolderList" class="libSharedFolders" role="list" hidden></div>
             <label class="check"><input id="libKeepSharedChk" type="checkbox"><span data-i18n="libKeepShared"></span></label>
             <!-- 上限の数字を入れるので、このヒントだけ library.js が tr(…, {max, mb}) で書き換えます -->
             <div id="libKeepSharedHint" class="hint"></div>
@@ -1421,6 +1425,8 @@
           <input id="studyImageFolderInput" type="file" webkitdirectory multiple accept="image/*" hidden>
           <span data-i18n="studyImportImages">🖼 画像フォルダを取り込む</span>
         </label>
+        <!-- 📂 trk208：フォルダーを共有して「フォルダのまま読む」（端末へコピーしない＝大量の画像でも容量を食わない） -->
+        <button id="studyShareFolderBtn" type="button" class="study-file-btn" data-i18n="studyShareFolder">📂 フォルダを共有して読む</button>
         <label class="study-file-btn">
           <input id="studyTextFilesInput" type="file" multiple accept=".txt,.md,.markdown,.json,.csv,.log,.html,.htm,.xml,.yaml,.yml,.ini,.css,.js,.ts,text/plain,application/json" hidden>
           <span data-i18n="studyImportTextFiles">＋ テキストを追加</span>
@@ -1941,6 +1947,7 @@
 <script src="js/touhou-theme-data.js"></script>
 <script src="js/catalog.js"></script>
 <script src="js/title-match.js"></script>
+<script src="js/shared-folders.js"></script>
 <script src="js/library.js"></script>
 <script src="js/verified.js"></script>
 <script src="js/lib-skins.js"></script>

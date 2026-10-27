@@ -52,6 +52,27 @@ window.TrkStudyUtils = (() => {
     })).sort((a, b) => comparePath(a.sourcePath, b.sourcePath));
   }
 
+  /* 📂 trk208：共有フォルダー（フォルダのまま読む本）の本分け。
+     entries = [{ path:"Pictures/Book/01.jpg", name:"01.jpg", size:123 }]（フォルダーから見た相対パス）。
+     nesting:"split"（既定）は「1フォルダ＝1冊」でサブフォルダは別の本、"flat" は選んだフォルダ全体を1冊。
+     groupImageFiles と違うのは、**ページにフォルダー内のフルパスを残す**こと（読むときに開き直すため）。
+     戻り値 [{ title, sourcePath, pages:[{ name, path, size }] }]（ページは自然順）。 */
+  function folderBookGroups(entries, nesting) {
+    const split = nesting !== "flat", grouped = new Map();
+    for (const entry of Array.isArray(entries) ? entries : []) {
+      const name = String(entry && entry.name || ""), path = String(entry && entry.path || name).replace(/\\/g, "/");
+      if (!IMAGE_EXTS.has(extension(name))) continue;
+      const parts = path.split("/").filter(Boolean);
+      if (!parts.length) continue;
+      const hasFolder = parts.length > 1;
+      const parentPath = hasFolder ? parts.slice(0, -1).join("/") : "";
+      const key = hasFolder ? (split ? parentPath : parts[0]) : ROOT_ALBUM;
+      if (!grouped.has(key)) grouped.set(key, { title:key.split("/").pop() || key, sourcePath:key, pages:[] });
+      grouped.get(key).pages.push({ name, path:parts.join("/"), size:Math.max(0, Number(entry && entry.size) || 0) });
+    }
+    return [...grouped.values()].map(group => ({ ...group, pages:group.pages.sort((a, b) => comparePath(a.path, b.path)) }))
+      .sort((a, b) => comparePath(a.sourcePath, b.sourcePath));
+  }
   function listTextFiles(files) {
     return Array.from(files || []).filter(isTextFile).map(file => ({
       file,
@@ -170,8 +191,9 @@ window.TrkStudyUtils = (() => {
   }
 
   /* ---------- 本棚・本の情報 ---------- */
+  /* この端末に保存している大きさ。📂 フォルダーのまま読む本（linked）は実体を持たないので 0（trk208）。 */
   function bookSize(book) {
-    if (!book || typeof book !== "object") return 0;
+    if (!book || typeof book !== "object" || book.linked === true) return 0;
     if (book.kind === "text") return typeof book.content === "string" ? book.content.length : 0;
     return (Array.isArray(book.pages) ? book.pages : []).reduce((sum, page) => sum + Math.max(0, Number(page && page.size) || 0), 0);
   }
@@ -274,6 +296,6 @@ window.TrkStudyUtils = (() => {
   }
 
   return Object.freeze({ IMAGE_EXTS, TEXT_EXTS, ROOT_ALBUM, MAX_MATCHES, extension, baseName, relativePath, isImageFile, isTextFile,
-    comparePath, groupImageFiles, listTextFiles, decodeTextBuffer, normalizeText, aozoraSegments, findMatches, snippetAt, textStats,
+    comparePath, groupImageFiles, folderBookGroups, listTextFiles, decodeTextBuffer, normalizeText, aozoraSegments, findMatches, snippetAt, textStats,
     bookSize, sortBooks, sortShelfItems, formatBytes, bookmarkedBooks, orderPages, stableId, archivePages, mimeOf, albumProblem });
 })();

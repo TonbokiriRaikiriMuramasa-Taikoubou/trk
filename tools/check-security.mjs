@@ -604,6 +604,11 @@ const occurrences = (text, re) => [...text.matchAll(re)];
 /* ---------- 8. ローカル入力は読み取り専用、書き出しは明示的な新規コピーだけ ---------- */
 {
   const writes = [], study = js["js/study-room.js"];
+  /* 📂 trk208：共有フォルダーは**読むだけ**。readFileAt の中の getFileHandle は create 無しの取得だけで、
+     すぐ getFile() で読む（＝書き込みの口ではない）。ここだけを例外として認める。 */
+  const sharedFolders = js["js/shared-folders.js"] || "";
+  const readAt = sharedFolders.match(/async function readFileAt\(handle, path\) \{[\s\S]*?^  \}/m);
+  const readOnlyReadAt = !!readAt && !/create\s*:/.test(readAt[0]) && !/removeEntry/.test(readAt[0]) && readAt[0].includes(".getFile()");
   const exportWriter = study.match(/async function studyWriteExportCopy\(directory, blob, title, extension\) \{[\s\S]*?^\}/m);
   const exportText = study.match(/async function studyExportText\(\) \{[\s\S]*?^\}/m);
   const exportPicker = study.match(/async function studyChooseExportDirectory\(\) \{[\s\S]*?^\}/m);
@@ -612,6 +617,7 @@ const occurrences = (text, re) => [...text.matchAll(re)];
     for (const re of [/createWritable\s*\(/g, /\.write\s*\(\s*[a-zA-Z]/g, /removeEntry\s*\(/g, /getFileHandle\s*\(/g]) {
       for (const m of occurrences(text, re)) {
         if (file === "js/study-room.js" && inBlock(exportWriter, m.index) && !/removeEntry/.test(m[0])) continue;
+        if (file === "js/shared-folders.js" && readOnlyReadAt && inBlock(readAt, m.index) && m[0].trim() === "getFileHandle(") continue;
         writes.push(file + ": " + m[0].trim());
       }
     }

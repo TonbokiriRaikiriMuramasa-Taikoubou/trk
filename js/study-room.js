@@ -10,6 +10,16 @@
 /* 文言はこの機能内で4言語そろえる（tools/check-study-room.mjs が4言語の抜けを検査します）。 */
 Object.assign(TEXT.ja, {
   studyTitle:"📚 書斎", studyOpenBtn:"📚 書斎", studyOpenBtnHint:"書斎（本棚・テレビ・画像リーダー）を開きます。曲リストの見出しを長押ししても開けます", studyLaunchHint:"♫を長押しして書斎を開く（キーボードではEnter）",
+  /* 📂 trk208：フォルダーを共有して「フォルダのまま読む」（コピーしない） */
+  studyShareFolder:"📂 フォルダを共有して読む",
+  studyFolderScanning:"📂 「{name}」を調べています… {n}枚",
+  studyFolderAdded:"📂 「{name}」から {books}冊（{pages}ページ）を本棚に並べました。ページはフォルダーから直接読みます（端末へコピーしません）。",
+  studyFolderDenied:"📂 フォルダーの読み取りが許可されませんでした（キャンセルしたときは何も変わりません）。",
+  studyFolderUnsupported:"このブラウザーではフォルダーを覚えられません。「🖼 画像フォルダを取り込む」からコピーして取り込んでください（Chrome／Edgeなら共有できます）。",
+  studyFolderMissing:"📂 「{name}」フォルダーが見つかりません。📂 から同じフォルダーをもう一度選ぶと、同じ本として読めます。",
+  studyFolderPermission:"📂 「{name}」の読み取り許可が切れています。📂 から同じフォルダーをもう一度選んでください。",
+  studyFolderPageMissing:"「{name}」を読み込めませんでした（フォルダーの中で移動・削除された可能性があります）。",
+  studyLinkedBadge:"📂 {name}（フォルダのまま）",
   studyClose:"✕ 書斎を閉じる", studyImportImages:"🖼 画像フォルダを取り込む",
   studyImportTextFiles:"＋ テキストを追加", studyImportTextFolder:"📄 テキストフォルダを取り込む",
   studyImportArchives:"🗜 CBZ/ZIPを取り込む", studyArchiveBad:"「{name}」は読み込めませんでした（壊れているか、暗号化されています）。", studyArchiveNoImages:"「{name}」の中に対応画像がありません。",
@@ -147,6 +157,16 @@ Object.assign(TEXT.ja, {
 });
 Object.assign(TEXT.en, {
   studyTitle:"📚 Study", studyOpenBtn:"📚 Study", studyOpenBtnHint:"Open Study (shelf, TV and the image reader). You can also hold the Songs heading", studyLaunchHint:"Hold ♫ Songs to open Study (press Enter when focused)",
+  /* 📂 trk208: share a folder and read it in place (no copy) */
+  studyShareFolder:"📂 Share a folder and read it",
+  studyFolderScanning:"📂 Scanning “{name}”… {n} images",
+  studyFolderAdded:"📂 Added {books} books ({pages} pages) from “{name}”. Pages are read straight from the folder — nothing is copied onto this device.",
+  studyFolderDenied:"📂 Permission to read the folder was not granted (cancelling changes nothing).",
+  studyFolderUnsupported:"This browser cannot remember a folder. Use “🖼 Import image folder” to copy the images instead (Chrome/Edge can share a folder).",
+  studyFolderMissing:"📂 The folder “{name}” was not found. Pick the same folder again with 📂 and these books will read it.",
+  studyFolderPermission:"📂 Reading “{name}” is no longer permitted. Pick the same folder again with 📂.",
+  studyFolderPageMissing:"“{name}” could not be loaded (it may have been moved or deleted inside the folder).",
+  studyLinkedBadge:"📂 {name} (read in place)",
   studyClose:"✕ Close Study", studyImportImages:"🖼 Import image folder", studyImportTextFiles:"＋ Add text files",
   studyImportTextFolder:"📄 Import text folder", studyShelf:"Bookshelf", studySearch:"Search titles and folders…",
   studyImportArchives:"🗜 Import CBZ/ZIP", studyArchiveBad:"“{name}” could not be read (it may be damaged or encrypted).", studyArchiveNoImages:"No supported images were found in “{name}”.",
@@ -281,6 +301,16 @@ Object.assign(TEXT.en, {
 });
 Object.assign(TEXT.zh, {
   studyTitle:"📚 书斋", studyOpenBtn:"📚 书斋", studyOpenBtnHint:"打开书斋（书架、电视和图片阅读器）。长按歌曲列表标题也可以打开", studyLaunchHint:"长按♫歌曲列表打开书斋（键盘聚焦后按 Enter）",
+  /* 📂 trk208：共享文件夹并“就地阅读”（不复制） */
+  studyShareFolder:"📂 共享文件夹并阅读",
+  studyFolderScanning:"📂 正在检查「{name}」… {n}张",
+  studyFolderAdded:"📂 已从「{name}」把 {books}本书（{pages}页）放上书架。页面直接从文件夹读取（不复制到设备）。",
+  studyFolderDenied:"📂 未获得读取文件夹的许可（取消时不会有任何改变）。",
+  studyFolderUnsupported:"此浏览器无法记住文件夹。请使用「🖼 导入图片文件夹」复制导入（Chrome／Edge 可以共享）。",
+  studyFolderMissing:"📂 找不到文件夹「{name}」。请用 📂 再次选择同一个文件夹，就能以同一本书阅读。",
+  studyFolderPermission:"📂 「{name}」的读取许可已失效。请用 📂 再次选择同一个文件夹。",
+  studyFolderPageMissing:"无法读取「{name}」（可能已在文件夹中被移动或删除）。",
+  studyLinkedBadge:"📂 {name}（原地阅读）",
   studyClose:"✕ 关闭书斋", studyImportImages:"🖼 导入图片文件夹", studyImportTextFiles:"＋ 添加文本文件",
   studyImportTextFolder:"📄 导入文本文件夹", studyShelf:"书架", studySearch:"搜索标题或文件夹…",
   studyImportArchives:"🗜 导入 CBZ/ZIP", studyArchiveBad:"无法读取“{name}”（可能已损坏或已加密）。", studyArchiveNoImages:"“{name}”中没有受支持的图片。",
@@ -405,6 +435,16 @@ Object.assign(TEXT.zh, {
 });
 Object.assign(TEXT.ko, {
   studyTitle:"📚 서재", studyOpenBtn:"📚 서재", studyOpenBtnHint:"서재(책장, TV, 이미지 리더)를 엽니다. 곡 목록 제목을 길게 눌러도 열립니다", studyLaunchHint:"♫ 곡 목록을 길게 눌러 서재 열기 (키보드에서는 Enter)",
+  /* 📂 trk208: 폴더를 공유해 '폴더 그대로' 읽기(복사 없음) */
+  studyShareFolder:"📂 폴더를 공유해서 읽기",
+  studyFolderScanning:"📂 '{name}'을(를) 살펴보는 중… {n}장",
+  studyFolderAdded:"📂 '{name}'에서 {books}권({pages}쪽)을 책장에 올렸습니다. 페이지는 폴더에서 바로 읽습니다(기기로 복사하지 않음).",
+  studyFolderDenied:"📂 폴더 읽기 권한이 허용되지 않았습니다(취소하면 아무것도 바뀌지 않습니다).",
+  studyFolderUnsupported:"이 브라우저는 폴더를 기억할 수 없습니다. '🖼 이미지 폴더 가져오기'로 복사해 주세요(Chrome/Edge는 공유 가능).",
+  studyFolderMissing:"📂 '{name}' 폴더를 찾을 수 없습니다. 📂로 같은 폴더를 다시 고르면 같은 책으로 읽을 수 있습니다.",
+  studyFolderPermission:"📂 '{name}'의 읽기 권한이 만료되었습니다. 📂로 같은 폴더를 다시 골라 주세요.",
+  studyFolderPageMissing:"'{name}'을(를) 읽지 못했습니다(폴더 안에서 이동·삭제되었을 수 있습니다).",
+  studyLinkedBadge:"📂 {name} (폴더 그대로)",
   studyClose:"✕ 서재 닫기", studyImportImages:"🖼 이미지 폴더 가져오기", studyImportTextFiles:"＋ 텍스트 파일 추가",
   studyImportTextFolder:"📄 텍스트 폴더 가져오기", studyShelf:"책장", studySearch:"제목·폴더 검색…",
   studyImportArchives:"🗜 CBZ/ZIP 가져오기", studyArchiveBad:"“{name}”을(를) 읽을 수 없습니다 (손상되었거나 암호화되었을 수 있습니다).", studyArchiveNoImages:"“{name}”에서 지원되는 이미지를 찾지 못했습니다.",
@@ -1021,6 +1061,8 @@ function studyBookClean(raw) {
     savedAt:Math.max(0, Number(raw.bookmark.savedAt) || 0)
   } : null;
   return { id:raw.id.slice(0, 100), kind:raw.kind, title:String(raw.title || "Untitled").trim().slice(0, 160) || "Untitled",
+    /* 📂 trk208：フォルダーのまま読む本（ページの実体はユーザーのフォルダー側・pages ストアには入れない） */
+    linked:raw.linked === true, sharedFolder:raw.linked === true ? String(raw.sharedFolder || "").slice(0, 200) : "",
     sourcePath:String(raw.sourcePath || "").slice(0, 1000), generation:String(raw.generation || "").slice(0, 100),
     pages, content:typeof raw.content === "string" ? raw.content.slice(0, studyCap(STUDY_TEXT_FILE_MAX)) : "",
     extension:String(raw.extension || "").slice(0, 16), bookmark, createdAt:Math.max(0, Number(raw.createdAt) || Date.now()),
@@ -1249,7 +1291,8 @@ function studyRenderBookCard(book) {
   const title = core.el("strong", "study-book-title", book.title);
   const detail = book.kind === "image" ? `${tr("studyBookImages")} · ${tr("studyPageCount", { n:book.pages.length })}`
     : `${tr("studyBookText")} · ${String(book.extension || "TXT").toUpperCase()} · ${tr("studyTextStats", STUDY_UTIL.textStats(book.content))}`;
-  const sub = core.el("span", "study-book-sub", detail + (folder ? ` · 📁 ${folder.name}` : "") + (book.bookmark ? " · 🔖" : ""));
+  const sub = core.el("span", "study-book-sub", detail + (folder ? ` · 📁 ${folder.name}` : "")
+    + (book.linked ? ` · ${tr("studyLinkedBadge", { name:book.sharedFolder })}` : "") + (book.bookmark ? " · 🔖" : ""));
   text.append(title, sub);
   if (book.kind === "text" && book.content) {
     const ratio = book.bookmark && book.bookmark.ratio ? book.bookmark.ratio : 0;
@@ -1430,7 +1473,8 @@ async function studyWriteImageRecord(id, record, old, refs) {
     const changed = [];
     for (const [songKey, art] of await studyDBPairs("covers")) if (art && art.bookId === id) {
       const pageIndex = Math.max(0, Math.floor(Number(art.pageIndex) || 0));
-      if (pageIndex < refs.length) await studyDBRun("covers", "readwrite", store => store.put({ ...art, pageKey:refs[pageIndex].key, pageIndex, title:record.title, updatedAt:Date.now() }, songKey));
+      if (pageIndex < refs.length) await studyDBRun("covers", "readwrite", store => store.put({ ...art, pageKey:refs[pageIndex].key, pageIndex, title:record.title, updatedAt:Date.now(),
+        ...(art.linked ? { path:refs[pageIndex].path } : {}) }, songKey));
       else await studyDBRun("covers", "readwrite", store => store.delete(songKey));
       changed.push(songKey);
     }
@@ -1523,6 +1567,135 @@ async function studyImportImages(files) {
   if (lastId && !cancelled) { const newest = studyBooks.find(book => book.id === lastId); if (newest) studyOpenBook(newest); }
   if (!cancelled) studyShowNotes(notes);   /* 本を開くと状態欄が消えるので、開いたあとに出す */
 }
+/* ============ 📂 共有フォルダー（フォルダのまま読む本）・trk208 ============
+   これまでの画像の取り込みは「端末の中へコピーする」方式だったので、何千枚もあるフォルダーでは
+   容量を大きく食っていた。ここでは**フォルダーを1回選んで覚える**だけにして、ページは開くたびに
+   そのフォルダーから読む（＝本棚には「目次」だけを置く）。
+   ・ハンドルは shadow_taiko_library の kv（"studyFolders"）へ構造化複製で保存 → 次回も同じフォルダー
+   ・本の id は「フォルダー名＋フォルダー内のパス」から作るので、端末が変わっても同じ本として扱える
+   ・pages ストアには何も入れない（バックアップにも実体は入らない＝容量を食わない）
+   ・許可が切れていたら、📂 からもう一度選んでもらう（読み取り専用。フォルダーは書き換えない）
+   ⚠ 画像は端末の外へ送りません（読むだけ）。 */
+let studySharedFolders = [];   /* [{ id, name, handle, addedAt }] */
+let studySharedLoaded = false, studySharedKV = null;
+function studySharedStore() { return studySharedKV || (studySharedKV = core.idbStore("shadow_taiko_library", "kv")); }
+function studyCanPickFolder() {
+  return typeof window.showDirectoryPicker === "function" && window.isSecureContext && window.self === window.top;
+}
+async function studySharedFoldersLoad() {
+  if (studySafeMode()) { studySharedFolders = []; studySharedLoaded = true; return []; }
+  let list = [];
+  try { list = await studySharedStore().get("studyFolders") || []; } catch (_) { list = []; }
+  const kept = [];
+  for (const item of Array.isArray(list) ? list : []) {
+    const handle = item && item.handle;
+    if (!handle || handle.kind !== "directory" || typeof item.name !== "string" || !item.name) continue;
+    kept.push({ id:String(item.id || item.name).slice(0, 200), name:String(item.name).slice(0, 200),
+      handle, addedAt:Math.max(0, Number(item.addedAt) || 0) });
+  }
+  studySharedFolders = kept; studySharedLoaded = true;
+  return kept;
+}
+async function studySharedFoldersSave() {
+  try { await studySharedStore().put("studyFolders", studySharedFolders); return true; }
+  catch (error) { console.warn("Study shared folders could not be saved", error); return false; }
+}
+function studySharedFolderByName(name) {
+  const want = String(name || "");
+  return want ? studySharedFolders.find(folder => folder.name === want) || null : null;
+}
+/* 許可が生きているか確かめる。prompt のときは**クリックの中**でだけ確認を出す（force） */
+async function studySharedFolderPermission(entry, force) {
+  if (!entry || !entry.handle) return "denied";
+  let permission = await entry.handle.queryPermission({ mode:"read" }).catch(() => "prompt");
+  if (permission === "prompt" && force) permission = await entry.handle.requestPermission({ mode:"read" }).catch(() => "denied");
+  return permission;
+}
+/* 開くときに呼ぶ。許可が切れていれば、その場で1回だけ確認を出す */
+async function studySharedFolderEnsure(book) {
+  const entry = studySharedFolderByName(book && book.sharedFolder);
+  if (!entry) { studySetStatus("studyFolderMissing", { name:String(book && book.sharedFolder || "") }); return null; }
+  const permission = await studySharedFolderPermission(entry, true);
+  if (permission !== "granted") { studySetStatus("studyFolderPermission", { name:entry.name }); return null; }
+  return entry;
+}
+/* 1ページをフォルダーから読む（読めなければ null＝表示側が理由を出す） */
+async function studySharedPageBlob(book, page) {
+  if (!book || !book.linked || !page) return null;
+  const entry = studySharedFolderByName(book.sharedFolder);
+  if (!entry || !TrkSharedFolders) return null;
+  try {
+    if (await studySharedFolderPermission(entry, false) !== "granted") return null;
+    return await TrkSharedFolders.readFileAt(entry.handle, page.path);
+  } catch (_) { return null; }
+}
+/* 📂 フォルダーを選んで、フォルダのまま読む本として本棚に並べる */
+async function studyShareImageFolder() {
+  if (studySafeMode()) { studyNotify("studySafeMode"); return; }
+  if (studyImportState.active) return;
+  if (!studyCanPickFolder()) { studyNotify("studyFolderUnsupported"); core.$("studyImageFolderInput").click(); return; }
+  let handle = null;
+  try { handle = await window.showDirectoryPicker({ id:"trk-study-folder", mode:"read", startIn:"pictures" }); }
+  catch (error) {
+    if (error && error.name === "AbortError") return;   /* キャンセルは何もしない */
+    studySetStatus("studyFolderDenied"); return;
+  }
+  await studyImportSharedFolder(handle);
+}
+async function studyImportSharedFolder(handle) {
+  const name = String(handle && handle.name || "Folder").slice(0, 200);
+  const entry = { id:`study:${name}`, name, handle, addedAt:Date.now() };
+  if (await studySharedFolderPermission(entry, true) !== "granted") { studySetStatus("studyFolderDenied"); return; }
+  studySetStatus("studyFolderScanning", { name, n:0 });
+  let walked = { entries:[], skipped:0 };
+  try {
+    walked = await TrkSharedFolders.walk(handle, { read:false, maxFiles:TrkSharedFolders.MAX_IMAGES,
+      accept:leaf => STUDY_UTIL.isImageFile({ name:leaf }),
+      onProgress:n => studySetStatus("studyFolderScanning", { name, n }) });
+  } catch (error) { studyFail(error, "studyFolderDenied"); return; }
+  const groups = STUDY_UTIL.folderBookGroups(walked.entries, studyPrefs.albumNesting);
+  if (!groups.length) { studySetStatus("studyNoImageFiles"); return; }
+  if (!studySharedLoaded) await studySharedFoldersLoad();
+  const known = new Set(studyBooks.map(book => book.id)), now = Date.now();
+  const items = groups.map(group => ({ group, id:STUDY_UTIL.stableId("link", `${name}:${group.sourcePath}`) }));
+  let added = 0, replaced = 0, pages = 0, full = 0;
+  const ids = new Set();
+  for (const item of items) {
+    if (!known.has(item.id) && known.size >= studyCap(STUDY_SHELF_MAX)) { full++; continue; }
+    const old = await studyExistingBook(item.id);
+    const refs = item.group.pages.map((page, index) => ({
+      key:`link:${item.id}:${index}`,
+      name:String(page.name || "page").slice(0, 240), path:String(page.path || page.name).slice(0, 500),
+      size:Math.max(0, Number(page.size) || 0), type:String(STUDY_UTIL.mimeOf(page.name) || "").slice(0, 100)
+    }));
+    const record = { id:item.id, kind:"image", linked:true, sharedFolder:name,
+      title:String(item.group.title || tr("studyBookImages")).slice(0, 160),
+      sourcePath:String(item.group.sourcePath || "").slice(0, 1000), generation:"", pages:refs,
+      content:"", extension:"", bookmark:old && old.bookmark ? old.bookmark : null,
+      createdAt:old ? old.createdAt : now, updatedAt:now };
+    /* 保存の口は画像の本と同じ（ジャケットの付け替え・古い参照の掃除もここで揃う）。
+       📂 の本は pages に実体が無いので、消すものは何も無い。 */
+    try { await studyWriteImageRecord(item.id, record, old, refs); }
+    catch (error) { studyFail(error); return; }
+    ids.add(item.id); pages += refs.length;
+    if (known.has(item.id)) replaced++; else { added++; known.add(item.id); }
+  }
+  /* フォルダーから消えた本（このフォルダーのリンク本だけ）は本棚から外す。保存した実体は無いので消すものは無い */
+  const gone = studyBooks.filter(book => book.linked && book.sharedFolder === name && !ids.has(book.id));
+  for (const book of gone) {
+    try { await studyDBRun("books", "readwrite", store => store.delete(book.id)); } catch (_) {}
+    for (const [songKey, art] of await studyDBPairs("covers")) if (art && art.bookId === book.id) {
+      try { await studyDBRun("covers", "readwrite", store => store.delete(songKey)); core.emit("studyCoverChanged", songKey); } catch (_) {}
+    }
+  }
+  const stored = studySharedFolderByName(name);
+  if (stored) { stored.handle = handle; stored.addedAt = now; }
+  else studySharedFolders.push(entry);
+  await studySharedFoldersSave();
+  await studyRefreshBooks();
+  studySetStatus("studyFolderAdded", { name, books:added + replaced, pages, gone:gone.length, skipped:walked.skipped, full });
+}
+
 /* CBZ／ZIP（trk138）。1ファイル＝1冊。中の画像を自然順のページにし、1枚ずつ解凍して CRC を確かめ、バッチで保存する。 */
 async function studyImportArchiveBook(job, position, total) {
   const { file, zip, pages, id } = job;
@@ -1714,9 +1887,14 @@ async function studyLoadPageImage(img, index, book = studyCurrentBook) {
   const renderToken = studyRenderToken, loadToken = String(++studyImageLoadSeq);
   img.dataset.studyLoadToken = loadToken;
   try {
-    const blob = await studyDBRun("pages", "readonly", store => store.get(page.key));
+    /* 📂 trk208：フォルダーのまま読む本は、保存せずに毎回フォルダーから読む */
+    const blob = book.linked ? await studySharedPageBlob(book, page) : await studyDBRun("pages", "readonly", store => store.get(page.key));
     if (img.dataset.studyLoadToken !== loadToken || book !== studyCurrentBook || renderToken !== studyRenderToken) return;
-    if (!studyIsBlob(blob)) { studyClearImage(img); studySetStatus("studyImageLoadError"); return; }
+    if (!studyIsBlob(blob)) {
+      studyClearImage(img);
+      if (book.linked) studySetStatus("studyFolderPageMissing", { name:page.name }); else studySetStatus("studyImageLoadError");
+      return;
+    }
     if (!studySetImage(img, blob, `${book.title} — ${page.name} (${index + 1})`)) studySetStatus("studyImageLoadError");
     await studyImageReady(img);
   } catch (error) {
@@ -2167,11 +2345,14 @@ async function studyOpenBook(book) {
     if (studyCurrentBook.id === book.id) return;
     if (!await studyFlushMemo(true)) { core.$("studyMemoEditor").focus({ preventScroll:true }); return; }
   }
+  /* 📂 trk208：フォルダーのまま読む本は、開く操作の中で許可を確かめる（ブラウザーはクリックの中でしか確認を出せない）。
+     確かめられなかったときは、下の studySetStatus(null) で理由を消さない。 */
+  const sharedReady = book.linked ? !!(await studySharedFolderEnsure(book)) : true;
   studyCurrentBook = book;
   core.$("studyBookView").hidden = false; studySyncWelcome();
   studyRenderCurrentBook();
   (book.kind === "image" ? core.$("studyImageStage") : core.$("studyTextPage")).focus({ preventScroll:true });
-  studySetStatus(null);
+  if (sharedReady) studySetStatus(null);
 }
 async function studyBackToShelf() {
   if (studyClosePending) return false;
@@ -2330,9 +2511,12 @@ async function studyAssignCurrentCover() {
   const index = Math.max(0, Math.min(book.pages.length - 1, studyCurrentPage)), page = studyPageAt(book, index);
   if (!page) { studyNotify("studyCoverNeedImage"); return; }
   try {
-    const blob = await studyDBRun("pages", "readonly", store => store.get(page.key));
+    const blob = book.linked ? await studySharedPageBlob(book, page) : await studyDBRun("pages", "readonly", store => store.get(page.key));
     if (!blob) throw new Error("Missing Study image");
-    await studyDBRun("covers", "readwrite", store => store.put({ bookId:book.id, pageKey:page.key, pageIndex:index, title:book.title, updatedAt:Date.now() }, songKey));
+    /* 📂 trk208：フォルダーのまま読む本のジャケットは、どのフォルダーのどのパスかも覚える（pages に実体が無いため） */
+    const art = { bookId:book.id, pageKey:page.key, pageIndex:index, title:book.title, updatedAt:Date.now() };
+    if (book.linked) { art.linked = true; art.sharedFolder = book.sharedFolder; art.path = page.path; }
+    await studyDBRun("covers", "readwrite", store => store.put(art, songKey));
     core.emit("studyCoverChanged", songKey);
     studyNotify("studyCoverAssigned", { title:songTitle });
     studyRefreshTV(); studyRefreshCoverButtons();
@@ -2352,6 +2536,15 @@ async function studyGetSongCoverBlob(songKey) {
   try {
     const art = await studyDBRun("covers", "readonly", store => store.get(songKey));
     if (!art || typeof art.pageKey !== "string") return null;
+    /* 📂 trk208：フォルダーのまま読む本のジャケット（許可が切れていれば、静かに出さない） */
+    if (art.linked) {
+      const entry = studySharedFolderByName(art.sharedFolder);
+      if (!entry) return null;
+      const permission = await entry.handle.queryPermission({ mode:"read" }).catch(() => "prompt");
+      if (permission !== "granted") return null;
+      const file = await TrkSharedFolders.readFileAt(entry.handle, String(art.path || ""));
+      return studyIsBlob(file) ? file : null;
+    }
     const page = await studyDBRun("pages", "readonly", store => store.get(art.pageKey));
     return studyIsBlob(page) ? page : null;
   } catch (_) { return null; }
@@ -3134,6 +3327,8 @@ const studyShelfList = core.$("studyShelfList");
 studyShelfList.addEventListener("dragover", event => studyShelfDragOver(event, { type:"container", folderId:studyShelfViewFolder }, studyShelfList));
 studyShelfList.addEventListener("dragleave", event => { if (!studyShelfList.contains(event.relatedTarget)) studyShelfList.classList.remove("study-drop-target"); });
 studyShelfList.addEventListener("drop", event => studyShelfDrop(event, { type:"container", folderId:studyShelfViewFolder }));
+/* 📂 trk208：フォルダーを共有して、フォルダのまま読む（コピーしない）。許可は1回だけ・読むだけ。 */
+core.$("studyShareFolderBtn").addEventListener("click", () => { void studyShareImageFolder(); });
 core.$("studyImageFolderInput").addEventListener("change", event => {
   const files = Array.from(event.target.files || []); event.target.value = ""; if (files.length) studyImportImages(files);
 });
@@ -3319,7 +3514,9 @@ async function studyInit() {
       studyDBRun("settings", "readonly", store => store.get("ui")),
       studyDBRun("settings", "readonly", store => store.get("shelf"))
     ]);
-    studyReadPrefs(saved); studyReadShelfMeta(shelf); studyRefreshPrefsUI(); await studyRefreshBooks();
+    studyReadPrefs(saved); studyReadShelfMeta(shelf); studyRefreshPrefsUI();
+    await studySharedFoldersLoad();   /* 📂 trk208：覚えている共有フォルダー（フォルダのまま読む本） */
+    await studyRefreshBooks();
     studyDataReady = true;
     const cleaned = await studySweepOrphans();
     if (cleaned) studySetStatus("studyOrphanSweep", { n:cleaned });

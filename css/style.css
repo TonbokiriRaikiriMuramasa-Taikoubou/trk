@@ -493,6 +493,13 @@ body.trkNoMascot #vrmCanvas,body.trkNoMascot #vrmPreview{display:none!important}
 /* シードを探す道具・小さいボタンの並び */
 .miniActions .hint{margin:0}
 .miniActions button.selected{border-color:var(--ui-accent);color:var(--ui-text)}
+/* 📤 trk208：共有フォルダーの一覧（写真フォルダーを何本も覚えたときに、どれが生きているか一目で） */
+.libSharedFolders{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.libSharedFolders[hidden]{display:none}
+.libSharedFolderRow{display:flex;align-items:center;gap:8px;font-size:14px;padding:4px 6px;border:1px solid var(--ui-border);border-radius:8px}
+.libSharedFolderName{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.libSharedFolderCount{flex:0 0 auto;opacity:.75;font-size:13px}
+.libSharedFolderOff{flex:0 0 auto;padding:2px 8px;line-height:1.2;font-size:14px}
 /* 🔁 区間リピート：再生バーの上に範囲を表示（player.js が --ab-a / --ab-b を設定） */
 #seekBar.ab{background:linear-gradient(90deg,transparent var(--ab-a),rgba(255,209,102,.35) var(--ab-a),rgba(255,209,102,.35) var(--ab-b),transparent var(--ab-b));border-radius:999px}
 /* 🎯 オフセット測定のタップボタン（extras.js） */

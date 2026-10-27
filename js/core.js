@@ -211,6 +211,10 @@ const settings = {
   difficulty: pick(prefs.difficulty, window.Trk.data.DIFF_IDS, "normal"),
   showMasterDiff: !!prefs.showMasterDiff,
   escNoReturn: prefs.escNoReturn === true,   /* ❓謎設定：Esc長押しで選曲へ戻らない（既定はオフ＝長押しで戻る） */
+  /* 🚪 メディアプレイヤーを抜けたときに曲を読み込み直すか（trk206）。既定はオフ＝そのまま流れ続ける
+     （メディアプレイヤーへ入るときと同じで、曲が途切れない。エフェクトを触っても音が消えない）。
+     オンにすると昔の動き＝閉じたときに止めて、プレビューの開始位置から鳴らし直す（不具合の再現用）。 */
+  mediaReloadOnExit: prefs.mediaReloadOnExit === true,
   judgeOrdered: prefs.judgeOrdered === true, /* ❓謎設定：MANUALの判定を昔のやり方（時刻順・色違いは常にMISS）にする（既定はオフ＝js/judge-match.js の "smart"） */
   artWallpaperBg: prefs.artWallpaperBg === true,                     // 🖼 静止画を全画面へ拡大（オフは譜面中は右上、他は原寸以下で動画枠中央）
   useStudyArtwork: prefs.useStudyArtwork === true,                   // 📚 書斎で割り当てた画像をTV／ゲーム背景にも使う（既定オフ）
@@ -608,7 +612,7 @@ function resetAllPrefs() {
   settings.scroll = 1.2; settings.latency = 0;
   settings.catchNitroBonus = true; settings.catchBlastNext = false; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.mediaResumeRewind = 0; settings.mediaWakeLock = true; settings.mediaWave = true; settings.libProgress = "all"; settings.mediaLyricsOpen = false;
   settings.judge = "standard"; settings.rate = 1; settings.shortMode = "off"; settings.shortMode = "off";
-  settings.hidden = false; settings.sudden = false; settings.modMirror = false; settings.modRandom = false; settings.showMasterDiff = false; settings.escNoReturn = false; settings.judgeOrdered = false;
+  settings.hidden = false; settings.sudden = false; settings.modMirror = false; settings.modRandom = false; settings.showMasterDiff = false; settings.escNoReturn = false; settings.judgeOrdered = false; settings.mediaReloadOnExit = false;
   settings.mascot = "skin"; settings.vrmFrame = "full";
   settings.mmdScale = 1; settings.mmdTurn = 0; settings.mmdMotionBpm = 0; settings.mmdMotionKind = "faceSing";
   settings.mmdQuickUI = true; settings.mmdMotionFavs = [];

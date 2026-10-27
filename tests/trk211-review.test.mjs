@@ -156,5 +156,8 @@ test("trk211: the 🔓 button recomputes the label after a refusal instead of ke
 
 /* ---------- 6. cache 名 ---------- */
 test("trk211: the service worker cache name moves on for this change", () => {
-  assert.match(swSrc, /^const CACHE = "trk-v2026\.10\.27-trk211";$/m);
+  /* 後の版で番号が進むので「trk211 以降」で見る（名前そのものは後の版が持つ） */
+  const m = swSrc.match(/^const CACHE = "trk-v([\d.]+)-trk(\d+)";$/m);
+  assert.ok(m, "版数つきの名前");
+  assert.ok(Number(m[2]) >= 211, `trk211 以降の番号で割る（今は ${m[2]}）`);
 });

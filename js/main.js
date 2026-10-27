@@ -433,6 +433,17 @@ core.$("layoutPicker").addEventListener("click", e => {
 core.$("videoStyle").addEventListener("change", () => { core.settings.videoStyle = core.$("videoStyle").value; core.view.style.filter = core.videoFilter(); core.saveUserPrefs(); });
 function showVideoZoom() { core.$("videoZoomVal").textContent = core.settings.videoZoom.toFixed(1) + "x"; }
 core.$("videoZoom").addEventListener("input", e => { core.settings.videoZoom = Number(e.target.value) || 1; showVideoZoom(); core.saveUserPrefs(); });
+/* 🔍 trk212：全画面表示の動画を、ホイール1回で何%拡大・縮小するか（2／5／10。既定5） */
+function showVideoMaxWheelStep() {
+  const sel = core.$("videoMaxWheelStep"), now = [2, 5, 10].includes(Number(core.settings.videoMaxWheelStep)) ? Number(core.settings.videoMaxWheelStep) : 5;
+  if (sel) sel.value = String(now);
+  core.settings.videoMaxWheelStep = now;
+}
+core.$("videoMaxWheelStep").addEventListener("change", e => {
+  const v = Number(e.target.value);
+  core.settings.videoMaxWheelStep = [2, 5, 10].includes(v) ? v : 5;
+  core.saveUserPrefs();
+});
 core.$("scroll").addEventListener("input", () => {
   core.settings.scroll = Number(core.$("scroll").value) || 1;
   core.$("scrollVal").textContent = core.settings.scroll.toFixed(1) + "x"; core.saveUserPrefs();
@@ -613,6 +624,7 @@ core.$("latency").value = core.settings.latency;
 core.$("videoStyle").value = core.settings.videoStyle;
 core.$("videoZoom").value = core.settings.videoZoom;
 showVideoZoom();
+showVideoMaxWheelStep();
 core.$("fxPower").value = core.settings.fxPower;
 core.$("gameFxMode").value = core.settings.gameFxMode;
 core.video.volume = core.settings.musicVolume;

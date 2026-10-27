@@ -612,3 +612,37 @@
   3. 曲名タブ右上の **⏱ ここをプレビュー開始位置にする** を**長押し（650ms・12px動いたら取りやめ）**で開く **開始位置のバー**（`#bannerStartZero`）
   オンのときは `previewStartFor()` と `savedMediaPosition()` が 0 を返す＝プレビューも「続きから」もしない。曲ごとの `previewStart` と保存位置は消さない（オフに戻せば今までどおり）。バーのつまみは 0.1秒きざみで、動かすとその位置を試せる。保存は「この位置を保存」を押したときだけ、`曲の既定に戻す` で `previewStart` を削除。長押しのあとの click は保存しない（`previewSetLongPressed`）。
 - 日英ガイド、`tests/trk193-start-from-zero.test.mjs`、Service Worker cache **`trk-v2026.10.26-trk193`** を更新。
+
+## trk206〜trk208 と 1.1.0 の配布（1.1.1 のときに HANDOFF §7 から移動）
+
+> 2026-10-27 に `docs/HANDOFF.md` §7 から移した記録です。trk206（1.0.9）・trk208（1.1.0）の詳細と、1.1.0 の配布ZIPの組み立て・検証を収録しています。当時の状態であり、現在の仕様・未確認事項は [`HANDOFF.md`](HANDOFF.md) を正とします（trk210 の記録と 1.1.1 の配布は HANDOFF §7 にあります）。
+
+- **📦 1.1.0：trk208 を配る版（2026-10-27）**：**アプリ本体は trk208 のまま**（コードの変更なし）。配布物の名前・アプリ内 README・`release/README.txt`・`release-manifest.json` の版を 1.1.0 にし、`sw.js` の cache は trk208 の `trk-v2026.10.27-trk208` のまま（1.0.9 のZIPは `trk207` だったので、配布物としては上がる）。
+  - ZIP は **`2026-10-27 18:00`（UTC）** で組み直し（1.0.9 の `15:00` より新しい）＝**226ファイル・3,895,300 bytes・`sha256 0bf813ee…693eec`**（完全な値は Drive の `SHA256SUMS-1.1.0.txt`）。`unzip -t` 破損なし、`--check` OK、ローカルサーバーで `If-Modified-Since: 15:00` → **200**／`18:00` → **304**（§6）。
+  - 素材＝`/home/user/work/build110/app`：**1.0.9 の配布ZIPの `trk-files/` を土台**に、trk208 で変えた9ファイル（`css/style.css`・`index.html`・`js/backup.js`・`js/i18n.js`・`js/library.js`・`js/shared-folders.js`（新規）・`js/study-room-utils.js`・`js/study-room.js`・`sw.js`）だけを載せ替え、配布版ガイド3ファイル（`docs/guide/appearance.md`・`study-room.md`・`en.md`）へ 📂 の項と 🎬 動画フォルダの説明を差し込んだ。開発用の `tests/`・`tools/*.mjs`・`docs/HANDOFF*` は入れない（1.0.9 と同じ切り分け）。
+  - `README-1.0.9.md` → **`README-1.1.0.md`**（`README.md` も同内容）。先頭に「1.1.0 更新（今回）」＝📂 書斎はフォルダのまま読む／🎬 動画フォルダ／📤 最大8本・× で1本／ZIPの形は 1.0.9 と同じ、を追加し、1.0.9 の見出しを「前回」へ。本文に残っていた `trk-files/README-1.0.8.md` の参照も 1.1.0 に直した。`README-SLIM.md` は版・cache・archive 名・ファイル数・"What changed in 1.1.0" を更新。
+  - `release/README.txt` は**版と `README-1.1.0.md` の参照**を更新し、「📚書斎（画像はフォルダのまま読めます）」「ミュージック／動画フォルダーの読み込み（共有は最大8本まで）」を足した（構成・注意書きは変えない）。
+  - `tests/release-layout.test.mjs` の版の検査を **`1.x.y`** に広げた（`1.0.x` 固定だと 1.1.0 で落ちる。1.1.0 からは第2位が上がる）。
+  - `npm run check` **644 pass / 0 fail**。⚠ 実機のフォルダー選択・許可・大量画像は未確認（§4 #42）。
+
+- **📂 trk208：フォルダー共有の拡張（動画フォルダ・何本でも・書斎はフォルダのまま読む・2026-10-27）**：「ミュージックフォルダの共有が便利」という評価から、①**動画フォルダ**も同じやり方で共有したい ②書斎では**特定のフォルダ**（画像が大量）を共有対象にして読ませたい、に対応した。**1.1.0 の配布ZIPに収録**（1.0.9 のZIPは trk207 のままで、trk208 は入っていない）。
+  - 新規 `js/shared-folders.js`（`index.html` で `js/library.js` の直前）。`plan`（trk194 と同じ決まり）／`uniqueLabel`（同名フォルダーは `Music (2)`）／`mergeScans`／`walk`（深さ8・3000件／`read:false` なら名前だけ）／`readFileAt`（**読み取り専用**。`create` 無し。先頭のフォルダー名は外す・`..` は捨てる）。
+  - 曲リスト：`libKV` **`"folders"`** の登録簿（`kind:"music"|"video"`）へ。`startIn` は音楽 `music`／動画 `videos`。`#libShareVideoBtn` と一覧 `#libSharedFolderList`（× は1本だけ外す）を追加。**旧 `"share"` は起動時に登録簿へ移す**ので、既存の共有はそのまま使える。最初のタップの確認は `folderAutoKickShared()` が1本ずつ。
+  - 書斎：`#studyShareFolderBtn`（`startIn:"pictures"`）。`STUDY_UTIL.folderBookGroups` で本に分け、`linked:true`／`sharedFolder`／`pages[].path` だけを持つ本を作る（**pages ストアに実体を入れない**）。ページとジャケットは `TrkSharedFolders.readFileAt` で毎回読む。`bookSize` は linked を0に、`checkStudyLimits` は linked を数えない、`DB_LIBRARY.skip.kv` に `"folders"`・`"studyFolders"` を追加。
+  - `sw.js` の cache を **`trk-v2026.10.27-trk208`** に。`npm run check` **644 pass / 0 fail**（trk208 の22件）。⚠ 実ブラウザでのフォルダー選択・許可・大量画像の実測は未確認（§4 #42）。
+- - **📦 1.0.9：配布名と文書を 1.0.9 にそろえる（2026-10-27）**：**アプリ本体は trk206 のまま**（1.0.8 の配布ZIPと同一のコード）。配布物の名前・アプリ内 README・`release/README.txt`・`release-manifest.json` の版を 1.0.9 にし、`sw.js` の cache を **`trk-v2026.10.27-trk207`** に上げた。
+  - ZIP は **`2026-10-27 15:00`（UTC）** で組み直し（1.0.8 の `14:00` より新しい）＝225ファイル・3,878,131 bytes・`sha256 39153c95…83fb6`。`unzip -t` 破損なし、`--check` OK。
+  - ローカルサーバーで `If-Modified-Since: 14:00` → **200**、`15:00` → 304、`/trk-files/index.html` → 200、`/trk-files/sw.js` の `CACHE` が `trk207` であることを確認（§6）。
+  - `README-1.0.8.md` → **`README-1.0.9.md`**（`README.md` も同内容）。先頭に「1.0.9 更新（今回）」＝🚪 メディアプレイヤーを抜けても曲が続く／ZIPの形は 1.0.8 と同じ、を追加し、1.0.8 の見出しを「前回」へ。`README-SLIM.md` も版・cache・archive 名と "What changed in 1.0.9" を更新。
+  - `release/README.txt` は**版と `README-1.0.9.md` の参照だけ**を更新（構成・注意書きは変えない）。
+  - `tests/release-layout.test.mjs` の版の検査を `1.0.x` の形にし、`README-1.0.x.md` の名前も見るようにした（版を上げたら `release/README.txt` も上げる、が検査で分かる）。
+  - `npm run check` **622 pass / 0 fail**。
+  - Drive の `trk-1.0.9` へ `trk-1.0.9.zip`（`1nE51uWzl6W53nWlTH1U5jEvDnHP9y-eo`）と `SHA256SUMS-1.0.9.txt`（`1-Y65YPg1-WMu1EGCRqYxHhCQlUkkfYeZ`）を置き、**落とし直してバイト一致**を確認（§9）。
+- **🚪 trk206：メディアプレイヤーを抜けても曲が続く（既定を変更・2026-10-27）**：これまでは 🎥基地を閉じるたびに `core.video.pause()` → プレビューを鳴らし直していた（開始位置へ飛ぶ＝読み込み直したように聞こえ、曲リストでエフェクトや設定を触ると音が消えた）。**既定を「そのまま流し続ける」に変更**。
+  - `js/media-player-mode.js`：`closeMedia(restore)` の抜け方を純粋関数 **`mediaExitPlan({close, phase, reloadOnExit, previewEnabled})`** が `keep`／`reload`／`pause` で決める（`keep` では止めない）。ゲーム開始などで閉じる（`restore === false`）・タイトル以外・プレビューがオフは `pause`。`window.TrkMediaPlayer.mediaExitPlan` として公開。
+  - `js/library.js`：**`previewContinue()`**（`window.Trk.library` に公開）＝`currentTime` を書かず `play()` もしない（＝読み込み直さない）。音量だけ `musicVolume × 0.8` へ600msで戻し、プレイヤーで消音していたら鳴らす。
+  - **❓謎設定「🚪 メディアプレイヤーを抜けた時に曲を再読込する」**（`core.settings.mediaReloadOnExit`・`#mediaReloadOnExit`・**既定オフ**・全リセットでオフ）。オン＝`reload`（昔の動き：止めて `startPreview()` でプレビュー開始位置から鳴らし直す）。4言語（`mediaReloadOnExit`／`mediaReloadOnExitHint`）。
+  - 日英ガイド（`docs/guide/start.md`・`docs/guide/en.md`）の「← 曲リストに戻る」を新しい動きに合わせた（止めたいときは ⏯／プレイヤー内で一時停止）。
+  - `tests/trk206-media-exit.test.mjs`（5件）＝抜け方・`closeMedia` の分岐・`previewContinue` が位置を動かさないこと・設定と4言語の配線・cache名。**622 pass / 0 fail**。
+  - ⚠ 実機の音は未確認（§4 #41）。1.0.8 のZIPもこの修正を含めて `14:00` で組み直した（記録はアーカイブ）。
+- trk193〜trk205（1.0.7／1.0.8 の配布ZIP・時刻・セーフモードの文面・trk200〜trk204 の詳細）と trk186〜189 以前の記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)。

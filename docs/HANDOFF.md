@@ -407,7 +407,7 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk213`＝trk213。**配布ZIP（1.1.3）は `trk213`**。1.1.2 は `trk211`、1.1.1 は `trk210`、1.1.0 は `trk208`、1.0.9 は `trk207`。trk213 の次に配る版では `trk213` を cache 名にする） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk213`＝trk213。**配布ZIP（1.1.3）は `trk213`**。1.1.2 は `trk211`、1.1.1 は `trk210`、1.1.0 は `trk208`、1.0.9 は `trk207`。アプリ本体が変わらない版では cache 名を上げない） |
 | 🚪 メディアプレイヤーの抜け方（trk206） | `js/media-player-mode.js`（`mediaExitPlan`・`closeMedia`）、`js/library.js`（`previewContinue`）、`js/core.js`（`mediaReloadOnExit`）、`js/i18n-options.js`＋`index.html`（❓謎設定）、`tests/trk206-media-exit.test.mjs` |
 | 📦 配布ZIPの組み立て（1.0.8〜・現在 1.1.3） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`release/README.txt`（配布用のかんたん起動。`--readme` を省くとこれが入る。**版と `README-1.x.y.md` の名前は `--version` とそろえる**）、`tests/release-layout.test.mjs`（形・時刻・README の版） |
 | 📂 フォルダー共有の共通部品（trk208） | `js/shared-folders.js`（`window.TrkSharedFolders`＝`plan`／`uniqueLabel`／`mergeScans`／`walk`／`pathParts`／`readFileAt`。DOM・IndexedDB・書き込みなし）、`js/library.js`（登録簿 `"folders"`・`addSharedFolder`／`readSharedFolders`／`restoreSharedFolders`／`folderAutoKickShared`／`removeSharedFolder`／`renderSharedFolderList`）、`index.html`（`#libShareVideoBtn`・`#libSharedFolderList`）、`tests/trk208-shared-folders.test.mjs` |
@@ -427,7 +427,7 @@
 | 1.1.2 のZIPとの差分 | **9ファイル＋ガイド2＋README 4＋manifest** | `index.html`・`css/style.css`・`js/core.js`・`js/i18n.js`・`js/library.js`・`js/main.js`・`js/spectrum.js`・`js/video-max.js`・`sw.js`。`README-1.1.2.md` → `README-1.1.3.md`・`README.md`・`README-SLIM.md`・`README.txt`。`docs/guide/start.md`・`docs/guide/en.md` は trk212／trk213 の段落だけ追加。`credits.html`・`privacy.html`・`assets/mmd/lat-miku/*` などは 1.1.2 と同一（`cmp`） |
 | ローカルサーバーで配信 | **OK** | `/`・`trk-files/index.html`・`trk-files/js/spectrum.js`・`trk-files/sw.js`・`trk-files/release-manifest.json` がすべて 200 |
 | 再検証（304）の切り分け | **OK** | 1.1.3 のZIPを配信し、`If-Modified-Since: Tue, 27 Oct 2026 20:00:00 GMT`（1.1.2）では **200**、`21:00:00 GMT`（1.1.3）では **304** |
-| Drive への追加（1.1.3） | **未（HANDOFF を merge してから up する）** | 順序は「HANDOFF → merge → Drive」。up したら `trk-1.1.3` フォルダーと2ファイルの ID を §9 に追記する |
+| Drive への追加（1.1.3） | **OK（2026-10-27）** | 順序は「HANDOFF → merge → Drive」。`trk-1.1.3` フォルダー（`1RDDIa7yJcwGx_rbslCqUF33MgE_mdi1K`）に `trk-1.1.3.zip`（`1Bi9FPArUNopM_UDKDVqPDTr0D-mbGN4Q`・3,908,257 bytes）と `SHA256SUMS-1.1.3.txt`（`1GN1LHx1I1orY2YIJDvCqgOM2ADqU1DMr`）。Drive の `sha256Checksum` が手元の `sha256`（`7f4c04a9…1df3f5`）と一致 |
 | 利用者による起動確認 | **1.0.9 で確認済み（2026-10-27）** | 1.1.3 は同じ入口・同じ形（`index.html`＋`README.txt`＋`trk-files/`）。1.1.2 からの差し替えは 9ファイル＋ガイド＋README |
 | PC／スマホ実機で 1.1.3 のUI（🖥 のズーム・⏱ のチェック） | **未確認** | ヘッドレスsmokeは実機のホイール・タッチを再現しない。§4-46・§4-47・§4-48 の手順で確認する |
 
@@ -522,7 +522,7 @@ trk-1.1.3.zip
 - **`file://` で開いたとき**：入口が `location.replace` で `trk-files/index.html` へ進む（Service Worker は `file:` では触らない）。`index.html` をダブルクリックするだけでゲーム・譜面・プレーヤー・書斎・保存が動く。**📂 のフォルダー共有は `file://` でも動く**（`showDirectoryPicker` は安全なコンテキストを要求しない）が、許可の記憶はブラウザー次第。
 - **`http://127.0.0.1:8000/` で開いたとき**：入口がルート直下に残った **1.0.7 以前の worker だけ**を `unregister()` してから進む（`trk-files/sw.js` は残す）。アプリの worker のスコープは `/trk-files/` になる。
 - **保存データは「開き方」ごとに別**（`file://` と `http://127.0.0.1:8000/` は別のオリジン）。これは 1.0.6 試作の README.txt と同じ注意書きを残している。
-- **`00_START_HERE.html` と `01_README_WIN_LINUX.txt`／`01_README_MAC.txt` は廃止**。起動案内は `README.txt` に集約（`--check` がアプリ側に残っていると fail にする。`README-1.1.2.md` などアプリ自身の README は残す）。
+- **`00_START_HERE.html` と `01_README_WIN_LINUX.txt`／`01_README_MAC.txt` は廃止**。起動案内は `README.txt` に集約（`--check` がアプリ側に残っていると fail にする。`README-1.1.3.md` などアプリ自身の README は残す）。
 - **`release-manifest.json`**（`trk-files/` の中）に `version`・`archive:"trk-1.1.3.zip"`・`layout:"wrapper"`・`wrapper{launcher:"index.html", readme:"README.txt", app:"trk-files", platforms:["win","linux","mac"]}`・`service_worker_cache`（`sw.js` の `CACHE` を書き写す）・`built_at` を記録。`platform` は持たない。**このファイルは `--version` から作る（手で書かない）**。
 
 **版を上げるときに直す場所（1.1.3 で実施した順）**
@@ -536,7 +536,7 @@ trk-1.1.3.zip
 
 ```sh
 # 1. アプリ本体を用意する（直前の配布ZIPの trk-files/ を土台にする。ほかの差分を混ぜない）
-#    例：/home/user/work/rel112/app に 1.1.1 のZIPの trk-files/ を展開し、
+#    例：/home/user/work/rel113/app113 に 1.1.2 のZIPの trk-files/ を展開し、
 #        変えたファイル（1.1.3 なら9ファイル＝index.html・css/style.css・js/*.js・sw.js）・README-1.1.3.md・
 #        配布版ガイドの該当行だけを載せ替える
 # 2. かんたん起動の README はリポジトリの release/README.txt（版と README-1.x.y.md の名前を直す）
@@ -562,4 +562,5 @@ unzip -t /home/user/work/rel113/dist/trk-1.1.3.zip && sha256sum /home/user/work/
 - **Drive（1.0.9）**：`trk-1.0.9.zip`（`1nE51uWzl6W53nWlTH1U5jEvDnHP9y-eo`・3,878,131 bytes・`sha256 39153c95…83fb6`・`built_at 2026-10-27T15:00:00Z`）と `SHA256SUMS-1.0.9.txt`（`1-Y65YPg1-WMu1EGCRqYxHhCQlUkkfYeZ`）。落とし直してバイト一致・`sha256sum -c` OK・`unzip -t` 破損なしを確認済み。
 - **Drive（1.1.0）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.1.0` フォルダー**（`1w4gOka3GSKmBJMpbcNWz2ET6CbQAtRK4`）を作り、**`trk-1.1.0.zip`（`1pilYb6W84XlePkmECBERpD4coZIGEV_K`・3,895,300 bytes・`sha256 0bf813eec5137ad14cea6dd36f4f807ad84b8d447e96206c4dd8356b12693eec`・`built_at 2026-10-27T18:00:00Z`）** と **`SHA256SUMS-1.1.0.txt`（`1XB-yCD4TlLEv2Rroa7bqYUMKlaa0cvF5`・80 bytes・新しいハッシュ1行）** を置いた。**落とし直してローカルとバイト一致（ZIP・SHA256SUMS とも）・`sha256sum -c` OK・`unzip -t` 破損なし（226エントリ）**を確認済み。
 - **Drive（1.1.1）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.1.1` フォルダー**（`17XhNIUAqrQK33Mi-8X6ByeztpNFm-HQO`）を作り、**`trk-1.1.1.zip`（`17pDUAR7xp4pxW6RZTWSV6Up0ZCs6XTD6`・3,898,214 bytes・`sha256 1a6f8a800886aa1da9436c8d046e3ed390a3e0a5018c12d57f17f71a0514ef43`・`built_at 2026-10-27T19:00:00Z`）** と **`SHA256SUMS-1.1.1.txt`（`1U6EbFCrOpTC4x4SVmF9a5iYvweJFH13o`）** を置いた。Drive 側の `sha256Checksum` が手元の値と一致することを確認済み（再ダウンロードはしていない）。**1.1.0 のフォルダーとZIPはそのまま**（同じ名前で差し替えない）。
-- **Drive（1.1.2）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.1.2` フォルダー**（`1JTdv1S0tMb7dlxV93E-ywgUjmcTLy1-x`）を作り、**`trk-1.1.2.zip`（`1KuN9vGcQq40dU5mTKnm3K0cCc4RD-X6w`・3,899,166 bytes・`sha256 837086d22d73f6fdea0952dc4293d27871aa3acfb33bd0fa79c5e4781906556c`・`built_at 2026-10-27T20:00:00Z`）** と **`SHA256SUMS-1.1.2.txt`（`14TmPwEblMf4QUkm5VWrWm0Vz5nfFZKz_`）** を置いた。Drive 側の `sha256Checksum` が手元の値と一致することを確認済み。**1.1.0・1.1.1 のフォルダーとZIPはそのまま**。
+- **Drive（1.1.2）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.1.2` フォルダー**（`1JTdv1S0tMb7dlxV93E-ywgUjmcTLy1-x`）を作り、**`trk-1.1.2.zip`（`1KuN9vGcQq40dU5mTKnm3K0cCc4RD-X6w`・3,899,166 bytes・`sha256 837086d22d73f6fdea0952dc4293d27871aa3acfb33bd0fa79c5e4781906556c`・`built_at 2026-10-27T20:00:00Z`）** と **`SHA256SUMS-1.1.2.txt`（`14TmPwEblMf4QUkm5VWrWm0Vz5nfFZKz_`）** を置いた。Drive 側の `sha256Checksum` が手元の値と一致することを確認済み。**1.1.0・1.1.1 のフォルダーとZIPはそのまま**。- **Drive（1.1.2）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.1.2` フォルダー**（`1JTdv1S0tMb7dlxV93E-ywgUjmcTLy1-x`）を作り、**`trk-1.1.2.zip`（`1KuN9vGcQq40dU5mTKnm3K0cCc4RD-X6w`・3,899,166 bytes・`sha256 837086d22d73f6fdea0952dc4293d27871aa3acfb33bd0fa79c5e4781906556c`・`built_at 2026-10-27T20:00:00Z`）** と **`SHA256SUMS-1.1.2.txt`（`14TmPwEblMf4QUkm5VWrWm0Vz5nfFZKz_`）** を置いた。Drive 側の `sha256Checksum` が手元の値と一致することを確認済み。**1.1.0・1.1.1 のフォルダーとZIPはそのまま**。
+- **Drive（1.1.3）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.1.3` フォルダー**（`1RDDIa7yJcwGx_rbslCqUF33MgE_mdi1K`）を作り、**`trk-1.1.3.zip`（`1Bi9FPArUNopM_UDKDVqPDTr0D-mbGN4Q`・3,908,257 bytes・`sha256 7f4c04a964d681ad450eaf90749e4fb624e465fd7e84bbbcb2da50037f1df3f5`・`built_at 2026-10-27T21:00:00Z`）** と **`SHA256SUMS-1.1.3.txt`（`1GN1LHx1I1orY2YIJDvCqgOM2ADqU1DMr`）** を置いた。Drive 側の `sha256Checksum` が手元の値と一致することを確認済み。**1.1.0〜1.1.2 のフォルダーとZIPはそのまま**。

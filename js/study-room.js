@@ -1642,8 +1642,34 @@ async function studyShareImageFolder() {
   }
   await studyImportSharedFolder(handle);
 }
+/* 📂 trk210：同じ名前の**別の**フォルダー（D:\\Manga と E:\\Manga など）を選んだときに、
+   前のフォルダーの本を「フォルダーから消えた本」として外してしまわないよう、別の名前で並べる。
+   isSameEntry で同じフォルダーだと分かったとき（許可が切れて選び直したときなど）は今までどおり同じ名前。 */
+async function studySharedFolderNameFor(handle) {
+  const base = String(handle && handle.name || "Folder").slice(0, 190);
+  if (!studySharedLoaded) await studySharedFoldersLoad();
+  for (let n = 1; n < 100; n++) {
+    const candidate = n === 1 ? base : `${base} (${n})`;
+    const existing = studySharedFolderByName(candidate);
+    if (!existing) return candidate;
+    let same = true;   /* isSameEntry が無い環境では今までどおり（名前で同じとみなす） */
+    try { if (typeof existing.handle.isSameEntry === "function") same = await existing.handle.isSameEntry(handle); } catch (_) {}
+    if (same) return candidate;
+  }
+  return base;
+}
+/* 📂 trk210：本棚からリンク本が全部消えたフォルダーは、覚えているハンドルも外す。
+   （本を消してもフォルダーの記録だけ残る、を防ぐ。1冊でも残っていれば何もしない） */
+async function studySharedFoldersPrune() {
+  if (!studySharedFolders.length) return;
+  const inUse = new Set(STUDY_UTIL.sharedFoldersInUse(studyBooks));
+  const kept = studySharedFolders.filter(folder => inUse.has(folder.name));
+  if (kept.length === studySharedFolders.length) return;
+  studySharedFolders = kept;
+  await studySharedFoldersSave();
+}
 async function studyImportSharedFolder(handle) {
-  const name = String(handle && handle.name || "Folder").slice(0, 200);
+  const name = await studySharedFolderNameFor(handle);
   const entry = { id:`study:${name}`, name, handle, addedAt:Date.now() };
   if (await studySharedFolderPermission(entry, true) !== "granted") { studySetStatus("studyFolderDenied"); return; }
   studySetStatus("studyFolderScanning", { name, n:0 });
@@ -2642,6 +2668,7 @@ async function studyDeleteBook(book) {
       removedSongs.push(songKey); await studyDBRun("covers", "readwrite", store => store.delete(songKey));
     }
     await studyRefreshBooks();
+    await studySharedFoldersPrune();   /* trk210：リンク本が無くなったフォルダーの記録を外す */
     for (const songKey of removedSongs) core.emit("studyCoverChanged", songKey);
     studyNotify("studyDeleted");
   } catch (error) { studyFail(error); }

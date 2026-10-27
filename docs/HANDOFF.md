@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-27（trk212・trk213・**1.1.3**：🖥 全画面の動画をホイール／ドラッグ／ピンチで拡大・縮小（100〜500%・ポインター中心・1回 2/5/10%）、⏱ 曲名タブの「ここをプレビュー開始位置にする」を設定で出す（**初期オフ**）。**1.1.3 は trk213 を配る版**。1.1.0→1.1.1→1.1.2 のレビュー反映もそれぞれのZIPに同梱済み。1.0.9〜1.1.2 の配布ZIPの形と時刻もここに集約）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-27（trk214＝1.1.3 レビュー反映：🖥 ドラッグ中はポインターを掴んで外へ出てもずらす・ピンチのあと残った1本指でそのまま動かす・配布物のリンク切れ検査。trk212・trk213・**1.1.3**：🖥 全画面の動画をホイール／ドラッグ／ピンチで拡大・縮小（100〜500%・ポインター中心・1回 2/5/10%）、⏱ 曲名タブの「ここをプレビュー開始位置にする」を設定で出す（**初期オフ**）。**1.1.3 は trk213 を配る版**。1.1.0→1.1.1→1.1.2 のレビュー反映もそれぞれのZIPに同梱済み。1.0.9〜1.1.2 の配布ZIPの形と時刻もここに集約）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検、§9＝配布ZIPの形と作り方（1.0.8〜・現在 1.1.3）。
 
@@ -76,6 +76,27 @@
 - **ホイールの量の数え方**：`WHEEL_NOTCH=100`（px 相当）でノッチに直す。`deltaMode` は **行（1）＝1行34px・ページ（2）＝100px**。`accumulateWheel` は同符号で積み上げ、1イベントで動かすのは ±4段まで（トラックパッドの細かい動きも合計で1段ずつになる）。ホイールの既定動作は全画面の中だけ `preventDefault` で止める。`touch-action:none` と長押しシーク（trk188）はそのまま。
 - **文言は4言語**（`videoMaxZoomReset`・`videoMaxZoomHint`・`videoMaxHint` の追記・`videoMaxWheelStep`）。`sw.js` の cache は **`trk-v2026.10.27-trk212`**。`tests/trk212-video-zoom.test.mjs`（11件）を追加。
 - **未確認**：実機のホイール・トラックパッド・ピンチの感触（サンドボックスにブラウザーが無い）。
+
+### 🔍 全画面ズームの仕上げ（trk214・未配布）
+
+1.1.3 の実機レビューで出た2点（配布の妨げにはならない軽微）を直した（2026-10-27）。**倍率・操作・見た目は trk212 のまま**で、指を離したとき／外へ出たときの続き方だけが変わる。
+
+- **ドラッグ中はポインターを掴む**：`stage.setPointerCapture(pointerId)`（`captureZoomPointer`／`releaseZoomPointer`・`capturedPointers`）。これまでは映像の外へマウスが出ると `pointermove` が届かず、ずらしが止まっていた。捕まえている間はウィンドウの外へ出ても追い続ける。
+  - **押しただけ（長押しシーク）では捕まえない**：trk188 の「外へ出たら長押しシークを止める」をそのまま残すため、捕まえるのは**ドラッグが始まった（6px を越えた）とき**と**2本目の指が触れたとき**だけ。掴んだあとは `suppressHoldClick` が立っているので、click の取り違え（黒いところで閉じる／再生の切り替え）は起きない。
+  - 離す・取り消す・`blur` で必ず返す（`lostpointercapture` でも `capturedPointers` から外す）。
+- **ピンチのあと、残った1本指でそのまま動かせる**：`endZoomGesture` で「2本→1本」になったとき、残った指を**その場で掴み直した状態**（`dragState` を `active:true` で作り直す）に切り替える。置き直さなくてもずらせる。100%（動かす余地が無い）ときは切り替えない。
+- **自動検査**：`npm run check` は 673→**680 pass**（`tests/trk212-video-zoom.test.mjs` に trk214 の4件）。`sw.js` の cache は **`trk-v2026.10.27-trk214`**。
+- **未確認**：実機のトラックパッド・スマホのピンチ（ヘッドレスでは触れない）。
+
+### 📄 配布物の文書のリンク切れを見つける（trk214・未配布）
+
+1.1.3 のレビューで、配布版だけの文書に**古い版の表記とリンク切れ**が残っていると指摘された（`docs/guide/{files,mods,appearance,en,start}.md`・`CONTRIBUTING.md`・`docs/SECURITY.md`・`privacy.html` に「1.0.4 ポータブルZIP」、`README-1.0.4.md`／`README-1.0.8.md` への参照）。原因は「前の版の `trk-files/` に変わったファイルだけを載せ替える」作り方。**表記そのものは文脈が要るので人が直し**（§9 の手順）、**名前の取り違えは機械で止める**ようにした。
+
+- `tools/prepare-release.mjs` に **`checkDocLinks(dir)`** を追加し、`checkLayout()` から呼ぶ（`--check` と組み立ての両方で効く）。見るのは `trk-files/` の中の `.md`／`.html`／`.txt`。
+  - **相対リンクの先が実在するか**（`](…)` と `href="…"`。`http(s)`・`mailto`・`#アンカー`・`/絶対`・`../` で配布物の外は見ない）。
+  - **本文に書いただけの `README-x.y.z.md`** も、同じ名前のファイルが配布物のどこかに入っているか。
+- 1.1.3 のZIPに当てると **8件**（`CONTRIBUTING.md`・`README-1.1.3.md`／`README.md` の `trk-files/README-1.0.8.md`・`trk-files/README-1.1.1.md`・`docs/guide/en.md`・`files.md`・`mods.md`）が出る。**1.1.4 を組むときに全部直す**（§9 の「配布版だけの文書」）。
+- `tests/release-layout.test.mjs` に3件（リンク切れを拾う・見逃す種類を拾わない・cache が trk214 以降）。
 
 ### ⏱ 曲名タブの「ここをプレビュー開始位置にする」を設定で出す（trk213・1.1.3 で配布）
 
@@ -310,6 +331,8 @@
 | 46 | trk212：🖥 全画面の動画をホイール／ドラッグ／ピンチで拡大・縮小（100〜500%・ポインター中心・1回 2/5/10%） | `tests/trk212-video-zoom.test.mjs` の11件で確認済み（純関数・`paint()` の矩形・FI の `setTransform`・4言語・cache）。**実機のホイール・トラックパッド・ピンチの感触は未確認** | PC の Chrome で全画面を開き、①ホイール上／下で拡大・縮小し、指した場所が動かないか ②⚙ 設定 → 🎨 見た目で 2%／5%／10% を切り替えて1ノッチの量が変わるか ③拡大中にドラッグで端まで動かせるか ④100% では左右長押しシークが今までどおりか ⑤スマホで2本指のピンチ |
 | 47 | trk213：⏱ 「ここをプレビュー開始位置にする」を設定で出し入れ（初期オフ） | `tests/trk213-preview-set-toggle.test.mjs` の6件で確認済み（設定の初期値と初期化・純関数・バナー2経路・バーを閉じる・スペクトラムのチェック・4言語・cache）。**実機の見え方は未確認** | ①初期状態で曲名タブの右上にボタンが無いこと ②⚙ 設定 → 📊 スペクトラム のチェックを入れると、曲を選んだときボタンが出ること ③外すと消えること ④ボタンを隠したままでも 🎵 サウンドの「常に最初から再生する」が使えること |
 | 48 | 1.1.3 の配布ZIP（trk212・trk213 入り・2026-10-27） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻・`--check`・再検証（304）・ローカル配信（`/` 200）は確認済み（§6・§7）。**利用者の実機での起動と、🖥 のホイール／ドラッグ／ピンチ・⏱ のチェックの見え方は未確認** | ①1.1.2 のフォルダーに重ねず、新しいフォルダーへ展開して `index.html` から起動 ②全画面でホイール・ドラッグ・ピンチ ③⚙ 設定 → 📊 スペクトラム の「⏱ 「ここをプレビュー開始位置にする」を表示」のオン／オフ |
+| 49 | trk214：🔍 ドラッグ中に外へ出てもずらせる（ポインターを掴む）・ピンチのあと残った1本指で動かせる | VM の偽 stage（`setPointerCapture`／`releasePointerCapture`）で確認済み（`tests/trk212-video-zoom.test.mjs` の trk214 4件）。捕まえるのはドラッグ開始と2本目の指からで、押しただけでは捕まえないことも確認 | ①全画面で拡大し、動画の外（ウィンドウの外）までドラッグしても止まらない ②スマホでピンチのあと1本離し、そのまま動かせる ③押しただけ（長押しシーク）は従来どおり外で止まる |
+| 50 | trk214：📄 配布物の文書のリンク切れ検査（`checkDocLinks`） | 1.1.3 のZIPに当てて8件を検出（`CONTRIBUTING.md`・`README*.md`・`docs/guide/{en,files,mods}.md`）・`tests/release-layout.test.mjs` の3件は確認済み | 1.1.4 を組むときに8件を直す（§9）。直したあとは `--check` が緑になる |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -407,7 +430,7 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk213`＝trk213。**配布ZIP（1.1.3）は `trk213`**。1.1.2 は `trk211`、1.1.1 は `trk210`、1.1.0 は `trk208`、1.0.9 は `trk207`。アプリ本体が変わらない版では cache 名を上げない） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk214`＝trk214。**配布ZIP（1.1.3）は `trk213`**、次の版は `trk214`。1.1.2 は `trk211`、1.1.1 は `trk210`、1.1.0 は `trk208`、1.0.9 は `trk207`。アプリ本体が変わらない版では cache 名を上げない） |
 | 🚪 メディアプレイヤーの抜け方（trk206） | `js/media-player-mode.js`（`mediaExitPlan`・`closeMedia`）、`js/library.js`（`previewContinue`）、`js/core.js`（`mediaReloadOnExit`）、`js/i18n-options.js`＋`index.html`（❓謎設定）、`tests/trk206-media-exit.test.mjs` |
 | 📦 配布ZIPの組み立て（1.0.8〜・現在 1.1.3） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`release/README.txt`（配布用のかんたん起動。`--readme` を省くとこれが入る。**版と `README-1.x.y.md` の名前は `--version` とそろえる**）、`tests/release-layout.test.mjs`（形・時刻・README の版） |
 | 📂 フォルダー共有の共通部品（trk208） | `js/shared-folders.js`（`window.TrkSharedFolders`＝`plan`／`uniqueLabel`／`mergeScans`／`walk`／`pathParts`／`readFileAt`。DOM・IndexedDB・書き込みなし）、`js/library.js`（登録簿 `"folders"`・`addSharedFolder`／`readSharedFolders`／`restoreSharedFolders`／`folderAutoKickShared`／`removeSharedFolder`／`renderSharedFolderList`）、`index.html`（`#libShareVideoBtn`・`#libSharedFolderList`）、`tests/trk208-shared-folders.test.mjs` |
@@ -417,6 +440,14 @@
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
+
+**trk214（2026-10-27）の確認**
+
+| 検査 | 結果 | 範囲・注意 |
+|---|---|---|
+| `npm run check` | **680 pass / 0 fail** | Static 0・Security 64・a11y 8・lite 123。内訳 +7＝`tests/trk212-video-zoom.test.mjs` の trk214 4件（ピンチのあと1本指・100%では切り替えない・捕まえる/返す・blur で全部返す）と `tests/release-layout.test.mjs` の3件（リンク切れ・見逃す種類・cache） |
+| `checkDocLinks()` を 1.1.3 のZIPに当てる | **8件を検出** | `CONTRIBUTING.md`・`README-1.1.3.md`／`README.md`（`trk-files/README-1.0.8.md`・`trk-files/README-1.1.1.md`）・`docs/guide/en.md`・`files.md`・`mods.md`。**1.1.4 を組むときに直す**（§9） |
+| 実機のドラッグ（外へ出る）・ピンチのあとの1本指 | **未確認** | ヘッドレスでは触れない。VM の偽 stage で `setPointerCapture`／`releasePointerCapture` の呼び出しまで確認済み（§4-49） |
 
 **1.1.3 の配布ZIP（2026-10-27）の確認**
 
@@ -468,6 +499,9 @@
 
 ## 7. 最近の変更
 
+- **🔍 trk214：全画面ズームの仕上げと、配布物の文書のリンク切れ検査（2026-10-27・1.1.3 のレビュー反映）**：**配布の妨げにならない軽微2点**を直した。(1) ドラッグ中は `stage.setPointerCapture` でポインターを掴み、**映像の外（ウィンドウの外）へ出てもずらしが続く**（押しただけの長押しシークは従来どおり外で止まる）。(2) **ピンチのあとに1本指を離しても、残った指でそのまま動かせる**（`endZoomGesture` が「2本→1本」で `dragState` を作り直す。100% では切り替えない）。
+  - 配布版だけの文書に残っていた**古い版の表記とリンク切れ**（「1.0.4 ポータブルZIP」・`README-1.0.4.md`／`README-1.0.8.md`／`README-1.1.1.md` への参照）を機械で見つけられるように `tools/prepare-release.mjs` に **`checkDocLinks()`** を足し、`--check` と組み立ての両方で走らせた。1.1.3 のZIPでは **8件**（§2・§9）。
+  - `sw.js` の cache は **`trk-v2026.10.27-trk214`**。`npm run check` は **680 pass**（+7：`tests/trk212-video-zoom.test.mjs` の trk214 4件・`tests/release-layout.test.mjs` の3件）。**1.1.3 のZIPは trk213 のまま**（配り直さない。次の 1.1.4 が trk214）。
 - **📦 1.1.3：trk213 を配る版（2026-10-27）**：**アプリ本体は trk213**（trk212＝全画面のズーム、trk213＝開始位置ボタンの初期オフ）。1.1.2 の配布ZIPの `trk-files/` を土台に、変わった **9ファイル**（`index.html`・`css/style.css`・`js/core.js`・`js/i18n.js`・`js/library.js`・`js/main.js`・`js/spectrum.js`・`js/video-max.js`・`sw.js`）だけを差し替え、配布版ガイドの `docs/guide/start.md`・`docs/guide/en.md` には trk212・trk213 の段落だけを足した。`README-1.1.2.md` → **`README-1.1.3.md`**（`README.md` も同内容）・`README-SLIM.md`・`release/README.txt` の版を 1.1.3 にそろえた。**ZIPの形は 1.1.2 と同じ**（`index.html`＋`README.txt`＋`trk-files/`）。
   - ZIP は **`2026-10-27 21:00`（UTC）** で組み立て（1.1.2 の `20:00` より新しい）＝**226エントリ・3,908,257 bytes**・`unzip -t` 破損なし・全エントリ同時刻・`sha256 7f4c04a964d681ad450eaf90749e4fb624e465fd7e84bbbcb2da50037f1df3f5`。
   - `prepare-release --check` **OK**・ローカル配信で `/`・`trk-files/index.html`・`js/spectrum.js`・`sw.js`・`release-manifest.json` が 200・再検証は `20:00` で **200**／`21:00` で **304**。
@@ -529,8 +563,20 @@ trk-1.1.3.zip
 
 1. `release/README.txt` — 1行目の版と、末尾の `README-1.x.y.md` の参照（`tests/release-layout.test.mjs` が「版が書いてあること」「アプリ内READMEの名前」を見る）。
 2. 配布アプリの `README-1.x.y.md` — 前の版から改名し、先頭に「今回」の更新点を足して、前回の見出しを「前回」へ。`README.md` も同じ内容にする。`README-SLIM.md` の版・cache・archive 名・ファイル数も直す。
-3. `sw.js` の `CACHE` — `trk-v<日付>-trk<番号>`（**1.1.3 は trk213 の `trk-v2026.10.27-trk213`**。アプリ本体が変わらない版では上げない＝1.1.0 は trk208、1.1.1 は trk210 のまま）。`release-manifest.json` は `--version` から作られる。
+3. `sw.js` の `CACHE` — `trk-v<日付>-trk<番号>`（**1.1.3 は trk213 の `trk-v2026.10.27-trk213`**、**次に配る 1.1.4 は trk214 の `trk-v2026.10.27-trk214`**。アプリ本体が変わらない版では上げない＝1.1.0 は trk208、1.1.1 は trk210 のまま）。`release-manifest.json` は `--version` から作られる。
 4. 本書 — ヘッダ・§2（版の説明）・§4（新しい版の #）・§5（cache 名）・§6・§7・§9。
+5. **配布版だけの文書** — 下の「配布版だけの文書（毎版そろえる）」を読む。`--check` がリンク切れ（`README-1.x.y.md` の名前違い）を止める。
+
+**配布版だけの文書（毎版そろえる）**
+
+配布ZIPの `trk-files/` には、リポジトリと同じ名前でも**中身が配布向けに書き換えられた文書**がある（GitHub の URL や開発用の `docs/HANDOFF.md` を出さないため）。前の版の `trk-files/` を土台に差分だけを載せ替える作り方なので、ここは**放っておくと古い版のまま残る**（1.1.3 のレビューで指摘。1.1.1 にもあった）。
+
+- `docs/guide/files.md` — 1行目の見出し（`📁 ファイル構成（1.0.4 ポータブルZIP）`）・`README 1.0.4` のリンク・`README-1.0.4.md` の行。**さらに 1.0.7 までの `00_START_HERE.html` / `01_README_*.txt` の行が残っている**（1.0.8 で廃止。ルートの `README.txt` に集約）。
+- `docs/guide/appearance.md`（5行目 `1.0.4ポータブルZIPはslim版で`）・`docs/guide/en.md`（3行目と454行目の `1.0.4`）・`docs/guide/mods.md`（17行目）・`docs/guide/start.md`（11行目）
+- `CONTRIBUTING.md`（26行目の `[README 1.0.4](README-1.0.4.md)`）・`docs/SECURITY.md`（20行目の `1.0.4デスクトップ版`）
+- `README-1.x.y.md` と `README.md`（35行目の `trk-files/README-1.0.8.md`・64行目の `trk-files/README-1.1.1.md`）・`privacy.html`（111行目の `The 1.0.4 portable ZIP`）・`NOTICE.md`（138・140行目の `The 1.0.3 slim desktop ZIP`）
+- **直し方**：版の名前は**書かない**（`README.md` のように、版が変わらない名前へ）。「1.0.4 ポータブルZIP」のような**版入りの言い方もやめて**「このZIP」「配布ZIP」にする。リンクは `[README](../../README.md)` のように**入っているファイル**を指す。
+- **確かめ方**：`node tools/prepare-release.mjs --check=<組み上がったフォルダー>`。`checkDocLinks()` が、実在しない相対リンクと、入っていない `README-x.y.z.md` の名前を列挙する（1.1.3 のZIPでは8件）。
 
 **作り方**
 

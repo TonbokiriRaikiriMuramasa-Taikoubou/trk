@@ -107,6 +107,63 @@ export function walkFiles(dir, prefix = "") {
   return out;
 }
 
+/* ---------- 配布物の中の文書（trk214） ----------
+   前の版の trk-files/ に「変わったファイル」だけを載せ替える作り方なので、配布版だけの
+   文書（docs/guide/*.md・CONTRIBUTING.md・docs/SECURITY.md・privacy.html・README-1.x.y.md）は
+   版が上がっても古いまま残りやすい。1.1.3 では「1.0.4 ポータブルZIP」の表記と、
+   入っていない README-1.0.4.md / README-1.0.8.md への参照が残っていた（2026-10-27 レビュー）。
+   ここでは、組み上がった配布物の中の .md / .html / .txt を読んで
+   ・相対リンクの先が実在するか
+   ・README-x.y.z.md の名前が実在するか（リンクでなく本文に書いてあるだけでも）
+   を見る。版の表記そのもの（「1.0.4」など）は文脈が要るので人（§9 の手順）で直す。 */
+const DOC_EXT = new Set([".md", ".html", ".htm", ".txt"]);
+const DOC_URL = /^[a-z][a-z0-9+.-]*:/i;
+function docTarget(base, raw) {
+  const clean = String(raw || "").trim().replace(/^<|>$/g, "").split("#")[0].split("?")[0];
+  if (!clean || DOC_URL.test(clean) || clean.startsWith("//") || clean.startsWith("/")) return "";
+  let decoded = clean;
+  try { decoded = decodeURIComponent(clean); } catch (_) {}
+  return path.posix.normalize(base === "." ? decoded : `${base}/${decoded}`);
+}
+export function checkDocLinks(dir) {
+  const problems = [];
+  if (!fs.existsSync(dir)) return problems;
+  /* 見るのはアプリ本体（trk-files/）。ルートの README.txt は release/README.txt が元で、
+     版の名前は組み立てのたびに人が直す（§9）。 */
+  const root = fs.existsSync(path.join(dir, APP_DIR)) ? path.join(dir, APP_DIR) : dir;
+  const files = walkFiles(root);
+  /* 配布物の外（../）を指すものは、ここでは見ない（配布物の中で閉じているかは別の話） */
+  const outside = rel => !rel || rel === ".." || rel.startsWith("../");
+  const exists = rel => outside(rel) || fs.existsSync(path.join(root, rel));
+  const basenames = new Set(files.map(f => path.posix.basename(f)));
+  for (const rel of files) {
+    if (!DOC_EXT.has(path.extname(rel).toLowerCase())) continue;
+    const text = fs.readFileSync(path.join(root, rel), "utf8");
+    const base = rel.includes("/") ? path.posix.dirname(rel) : ".";
+    const seen = new Set(), flagged = new Set();
+    const report = (raw, resolved) => {
+      if (!resolved || seen.has(resolved)) return;
+      seen.add(resolved);
+      if (exists(resolved)) return;
+      flagged.add(path.posix.basename(resolved));
+      problems.push(`${rel}: ${raw} が見つかりません（配布物に入っていない名前を指しています）`);
+    };
+    for (const m of text.matchAll(/\]\(([^)\s]+)/g)) report(m[1], docTarget(base, m[1]));
+    for (const m of text.matchAll(/\bhref="([^"]+)"/g)) report(m[1], docTarget(base, m[1]));
+    /* リンクでなく本文に書いてある README-x.y.z.md は、同じ名前のファイルが
+       配布物のどこかに入っていれば通す（書き方の場所は問わない）。 */
+    for (const m of text.matchAll(/[\w./-]*README-\d+\.\d+\.\d+\.md/g)) {
+      const name = path.posix.basename(m[0]);
+      if (basenames.has(name) || flagged.has(name)) continue;
+      if (seen.has(`name:${name}`)) continue;
+      seen.add(`name:${name}`);
+      flagged.add(name);
+      problems.push(`${rel}: ${m[0]} が見つかりません（配布物に入っていない名前を指しています）`);
+    }
+  }
+  return problems;
+}
+
 /** 組み上がったディレクトリが「決められた形」か検査する（人が作っても同じ検査を通す） */
 export function checkLayout(dir) {
   const problems = [];
@@ -133,6 +190,7 @@ export function checkLayout(dir) {
       } catch (error) { problems.push(`release-manifest.json を読めません: ${error.message}`); }
     }
   }
+  for (const p of checkDocLinks(dir)) problems.push(p);
   const index = path.join(dir, WRAPPER_INDEX);
   if (fs.existsSync(index)) {
     const html = fs.readFileSync(index, "utf8");

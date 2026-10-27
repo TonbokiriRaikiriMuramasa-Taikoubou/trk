@@ -12,7 +12,7 @@ import os from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { ROOT } from "./helpers/browser-data.mjs";
-import { buildRelease, checkLayout, LAUNCHER_HTML, WRAPPER_ENTRIES, assertNewerThan, defaultReleaseDate, DEFAULT_README } from "../tools/prepare-release.mjs";
+import { buildRelease, checkLayout, checkDocLinks, LAUNCHER_HTML, WRAPPER_ENTRIES, assertNewerThan, defaultReleaseDate, DEFAULT_README } from "../tools/prepare-release.mjs";
 
 const TOOL = path.join(ROOT, "tools/prepare-release.mjs");
 
@@ -175,4 +175,48 @@ test("trk205: the quick-start README lives in the repo, so the zip can be rebuil
     readme,
     "--readme を省いてもリポジトリの README.txt がそのまま入る",
   );
+});
+
+/* ---------- trk214：配布物の中の文書のリンク切れ ---------- */
+test("trk214: the release check finds documents that point at files the ZIP does not contain", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "trk-docs-"));
+  fs.mkdirSync(path.join(dir, "trk-files/docs/guide"), { recursive: true });
+  fs.writeFileSync(path.join(dir, "index.html"), '<meta http-equiv="refresh" content="0;url=trk-files/index.html"><script>location.replace("trk-files/index.html")</script>\n');
+  fs.writeFileSync(path.join(dir, "README.txt"), "同梱の `trk-files/README-1.1.4.md` を読んでください。\n");
+  fs.writeFileSync(path.join(dir, "trk-files/sw.js"), 'const CACHE = "trk-v2026.10.27-trk214";\n');
+  fs.writeFileSync(path.join(dir, "trk-files/release-manifest.json"),
+    JSON.stringify({ version:"1.1.4", layout:"wrapper", service_worker_cache:"trk-v2026.10.27-trk214" }, null, 2) + "\n");
+  fs.writeFileSync(path.join(dir, "trk-files/index.html"), '<a href="docs/guide/files.md">guide</a>\n');
+  fs.writeFileSync(path.join(dir, "trk-files/README-1.1.4.md"), "使い方は [ガイド](docs/guide/files.md) に。\n");
+  fs.writeFileSync(path.join(dir, "trk-files/docs/guide/index.md"), "# 📚 ガイド目次\n");
+  fs.writeFileSync(path.join(dir, "trk-files/docs/guide/files.md"),
+    "# ファイル構成\n\n← [ガイド目次](index.md)／[README](../../README-1.1.4.md)\n\n- `README-1.1.4.md` — 利用者向けREADME\n");
+  assert.deepEqual(checkDocLinks(dir), [], "入っている物だけを指していれば通る");
+  assert.equal(checkLayout(dir).ok, true, "形の検査も通る");
+
+  /* 1.1.3 で実際にあった2種類の取りこぼし */
+  fs.writeFileSync(path.join(dir, "trk-files/docs/guide/files.md"),
+    "# 📁 ファイル構成（1.0.4 ポータブルZIP）\n\n← [README 1.0.4](../../README-1.0.4.md)\n\n- `README-1.0.4.md` — 利用者向けREADME\n");
+  fs.writeFileSync(path.join(dir, "trk-files/README-1.1.4.md"),
+    "古い説明：[README 1.0.8](trk-files/README-1.0.8.md) を見てください。\n");
+  const problems = checkDocLinks(dir);
+  assert.ok(problems.some(p => p.includes("docs/guide/files.md") && p.includes("README-1.0.4.md")), problems.join(" / "));
+  assert.ok(problems.some(p => p.includes("README-1.1.4.md") && p.includes("README-1.0.8.md")), "本文に書いただけの名前も拾う");
+  assert.match(checkLayout(dir).problems.join(" "), /見つかりません/, "形の検査は赤くなる");
+  assert.equal(checkLayout(dir).ok, false);
+});
+
+test("trk214: http(s)・mailto・ページ内アンカー・配布物の外は見にいかない", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "trk-docs2-"));
+  fs.writeFileSync(path.join(dir, "doc.md"),
+    "[a](https://example.com/x.md) [b](mailto:a@example.com) [c](#ここ) [d](../../outside.md)\n" +
+    '[e](<https://example.com/y z>) <a href="https://example.com/z.html">z</a>\n');
+  assert.deepEqual(checkDocLinks(dir), []);
+});
+
+test("trk214: the cache name moves on with the zoom fixes", () => {
+  const sw = fs.readFileSync(path.join(ROOT, "sw.js"), "utf8");
+  const m = sw.match(/^const CACHE = "trk-v([\d.]+)-trk(\d+)";$/m);
+  assert.ok(m, "cache 名の形");
+  assert.ok(Number(m[2]) >= 214, `cache は trk214 以降（いまは trk${m[2]}）`);
 });

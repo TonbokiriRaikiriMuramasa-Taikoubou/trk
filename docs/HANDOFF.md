@@ -362,6 +362,7 @@
   - `release/README.txt` は**版と `README-1.0.9.md` の参照だけ**を更新（構成・注意書きは変えない）。
   - `tests/release-layout.test.mjs` の版の検査を `1.0.x` の形にし、`README-1.0.x.md` の名前も見るようにした（版を上げたら `release/README.txt` も上げる、が検査で分かる）。
   - `npm run check` **622 pass / 0 fail**。
+  - Drive の `trk-1.0.9` へ `trk-1.0.9.zip`（`1nE51uWzl6W53nWlTH1U5jEvDnHP9y-eo`）と `SHA256SUMS-1.0.9.txt`（`1-Y65YPg1-WMu1EGCRqYxHhCQlUkkfYeZ`）を置き、**落とし直してバイト一致**を確認（§9）。
 - **🚪 trk206：メディアプレイヤーを抜けても曲が続く（既定を変更・2026-10-27）**：これまでは 🎥基地を閉じるたびに `core.video.pause()` → プレビューを鳴らし直していた（開始位置へ飛ぶ＝読み込み直したように聞こえ、曲リストでエフェクトや設定を触ると音が消えた）。**既定を「そのまま流し続ける」に変更**。
   - `js/media-player-mode.js`：`closeMedia(restore)` の抜け方を純粋関数 **`mediaExitPlan({close, phase, reloadOnExit, previewEnabled})`** が `keep`／`reload`／`pause` で決める（`keep` では止めない）。ゲーム開始などで閉じる（`restore === false`）・タイトル以外・プレビューがオフは `pause`。`window.TrkMediaPlayer.mediaExitPlan` として公開。
   - `js/library.js`：**`previewContinue()`**（`window.Trk.library` に公開）＝`currentTime` を書かず `play()` もしない（＝読み込み直さない）。音量だけ `musicVolume × 0.8` へ600msで戻し、プレイヤーで消音していたら鳴らす。
@@ -434,4 +435,4 @@ unzip -t dist/trk-1.0.9.zip && sha256sum dist/trk-1.0.9.zip
 - `.gitignore` に `dist/` を入れてある（ZIPは Git に入れない）。
 - **1.0.9 の実績**：225ファイル・3,878,131 bytes・`unzip -t` 破損なし・全エントリ **`2026-10-27 15:00`（UTC）**（1.0.7 の `12:00`、1.0.8 の `14:00` より新しい）。`sha256 39153c95…83fb6`（完全な値は Drive の `SHA256SUMS-1.0.9.txt`）。素材＝`/home/user/work/build109/app`（前のZIPの `trk-files/` に `sw.js`・README だけを載せ替え）と `release/README.txt`。
 - **Drive**：`trk-1.0.8`（`1vSUJ_acZ3QR7ekIVOTG13KvqmHS8DtvD`、親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu`）に **`trk-1.0.8.zip`（`1nDM-ptqu795wCCyLkEQ9YxYgVb2vgeAj`・3,877,707 bytes・`sha256 e973b7a1…87e34e`・`built_at 2026-10-27T14:00:00Z`・trk206）** と `SHA256SUMS-1.0.8.txt`（`1kAn3Q35QdgEjLLlqXUR-MenSnUeYI_mw`）を置いた。**同じ時刻（12:00）で組んだ最初のZIPは `old-1.0.8-same-mtime（配らないでください）`（`1TFWlaO_-CseRC4_jk8-4kwCF9-IPmN15`）、trk205 の `13:00` のZIPは `old-1.0.8-trk205（配らないでください）`（`1A4mk_7QIaJN7eC9TAMbIWMz5WDrKjegm`）へ退避**。**中身を直したら同じ名前で差し替え、SHA256SUMS も取り直す**（1.0.7 のときは原本を `old-1.0.7-original` に退避した）。
-- **1.0.9 の置き場所**：1.0.8 と同じ親（`10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu`）の下に **`trk-1.0.9` フォルダー**を作り、`trk-1.0.9.zip` と `SHA256SUMS-1.0.9.txt` を置く。落とし直してバイト一致を確かめる（1.0.7・1.0.8 と同じ手順）。
+- **Drive（1.0.9）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.0.9` フォルダー**（`1sOqj7fcMPNlCcSV77YCklSCEkt7jqmaM`）を作り、**`trk-1.0.9.zip`（`1nE51uWzl6W53nWlTH1U5jEvDnHP9y-eo`・3,878,131 bytes・`sha256 39153c95ee23522580ea6d90d4755a90e9cd53063be7f3157d8c4a64eff83fb6`・`built_at 2026-10-27T15:00:00Z`）** と **`SHA256SUMS-1.0.9.txt`（`1-Y65YPg1-WMu1EGCRqYxHhCQlUkkfYeZ`・80 bytes・新しいハッシュ1行）** を置いた。**落とし直してローカルとバイト一致・`sha256sum -c` OK・`unzip -t` 破損なし**を確認済み。

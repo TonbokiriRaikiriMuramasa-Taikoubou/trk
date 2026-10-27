@@ -1384,6 +1384,17 @@ function renderMedia() {
   updateMediaSession();
   updateWakeLock();   /* 🔆 再生状態に合わせて取得／解放（250ms周期。非対応では即return） */
 }
+/* 🚪 メディアプレイヤーを抜けたときの続き方（trk206）＝ 純粋関数（DOMなしで決まる）。
+   "keep"   … そのまま流し続ける（既定。メディアプレイヤーへ入るときと同じで曲が途切れない）
+   "reload" … いったん止めて、プレビューの開始位置から鳴らし直す（❓謎設定 mediaReloadOnExit＝昔の動き）
+   "pause"  … 止める（ゲーム開始などで閉じるとき／プレビューがオフのとき）
+   2026-10-27 のプレイフィール改善：既定を "reload" から "keep" に変えた。 */
+function mediaExitPlan(st) {
+  if (!st || st.close !== true) return "pause";     /* ゲーム開始（phase が変わった）ときは止める */
+  if (st.phase !== "title") return "pause";
+  if (st.reloadOnExit === true) return "reload";    /* ❓謎設定（不具合の再現） */
+  return st.previewEnabled === true ? "keep" : "pause";   /* プレビューがオフならタイトルでは鳴らさない */
+}
 function closeMedia(restore = true) {
   if (!mediaOpen) return;
   if (window.TrkVideoMax && window.TrkVideoMax.isOpen()) window.TrkVideoMax.close();   /* 🖥 全画面表示も一緒に閉じる */
@@ -1394,13 +1405,22 @@ function closeMedia(restore = true) {
   mediaOpen = false; window.Trk.overlay.set("media", false); window._trkMediaPlayerMode = false;
   clearInterval(tickTimer); tickTimer = 0; stopSleepTimer(true); seeking = false;
   clearInterval(loopTimer); loopTimer = 0; stopReverse(false, true); clearMediaLoop(true);
-  saveMediaPosition(); core.video.pause(); core.video.playbackRate = 1;
+  saveMediaPosition(); core.video.playbackRate = 1;
+  /* 🚪 抜け方（trk206）。既定は「そのまま流す」＝プレイヤーで聴いていた曲が曲リストでも途切れない */
+  const exitPlan = mediaExitPlan({
+    close: restore === true, phase: core.phase,
+    reloadOnExit: core.settings.mediaReloadOnExit === true,
+    previewEnabled: core.settings.previewEnabled === true,
+  });
+  if (exitPlan !== "keep") core.video.pause();
   updateWakeLock();   /* 🔆 閉じたら即解放（mediaOpen=false → 不要） */
   if (stageRaf) { cancelAnimationFrame(stageRaf); stageRaf = 0; }
   if (window.TrkFrameInterp) window.TrkFrameInterp.detach("media");
   if (stageWrap) stageWrap.hidden = true;
   overlay.hidden = true; document.body.classList.remove("mediaOpen");
-  if (restore && core.phase === "title" && core.settings.previewEnabled && typeof startPreview === "function") setTimeout(window.Trk.library.startPreview, 50);
+  if (exitPlan === "reload" && typeof startPreview === "function") setTimeout(window.Trk.library.startPreview, 50);
+  /* 流し続けるときは位置を動かさず、音量だけ選曲中のプレビュー相当へ静かに戻す（library.js） */
+  else if (exitPlan === "keep" && window.Trk.library && typeof window.Trk.library.previewContinue === "function") window.Trk.library.previewContinue();
   if (mediaReturnFocus && mediaReturnFocus.isConnected) mediaReturnFocus.focus();   /* 🎥 開いた入口へ焦点を戻す（trk186） */
   else if (powerButton) powerButton.focus();
 }
@@ -1886,7 +1906,8 @@ addEventListener("DOMContentLoaded", () => {
 });
 window.TrkMediaPlayer = { open:openMedia, close:closeMedia, isOpen:mediaActive,
   /* trk164: テスト用の素の関数（DOM不要の決定だけを取り出して検証できる） */
-  resumeRewindSeconds, rewindResumePosition, planSleepFade, pipSupported, wakeLockSupported };
+  resumeRewindSeconds, rewindResumePosition, planSleepFade, pipSupported, wakeLockSupported,
+  mediaExitPlan };
 /* ⏮ 常に最初から再生（trk193）：設定画面や曲名タブのバーで変わった値を、ここへも反映する */
 window.TrkMediaStartZeroSync = on => { if (startZeroNode) startZeroNode.checked = on === true; };
 window.Trk.overlay.set("media", false);

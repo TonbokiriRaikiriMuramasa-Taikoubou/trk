@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-27（trk199〜205・1.0.8：音が出ない理由・フォルダー参照・セーフモード・ドロップ・配布ZIPの形・配布ZIPの時刻）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-27（trk199〜206・1.0.8：音が出ない理由・フォルダー参照・セーフモード・ドロップ・配布ZIPの形と時刻・プレイフィール）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検、§9＝配布ZIPの形と作り方（1.0.8〜）。
 
@@ -21,6 +21,7 @@
 - **🗂 フォルダー曲の📄参照は保存しない（trk201）**：`rememberSongRef` は `source==="folder"` を書かない（起動のたびに最大3000件を保存していた）。フォルダーは選び直せば戻るので参照は持たない。**追加した曲・動画の参照は従来どおり**。旧版が残したフォルダー参照は `pruneFolderRefsOnce(force)` が**一度だけ**消す（`trkFolderRefsPrune1`・`docs/MIGRATIONS.md` に削除予定日）。
 - **🛟 セーフモードはURLのあいだだけ（trk202）／保存されるもの・されないもの（trk205）**：`saveUserPrefs()` は `prefsForSave()` を保存し、セーフモード中は `SAFE_SESSION_KEYS`（`previewEnabled`・`mediaStartFromZero`・`folderAutoRead`・`libKeepShared`）だけ**倒す前の値に戻したコピー**を書く（`settings` 自体は汚さない＝その場の安全動作は保つ）。自動リロード・緊急パネル・`trkReset("safe")` は `reloadInSafeMode()`（`?safe=1` を付け直す）を通る。**映像スタイル・TVのお気に入り・演出の強さ・TVスキンなどは安全側の値のまま保存される**（壊れた見た目の設定から立ち直るのがセーフモードの役目なので、これは意図どおり）。案内文（`safeModeNotice`・4言語）と緊急パネルの文面もこの区別どおりに書く（trk205）。
 - **🎬 ドロップした動画も 🎬 と同じ道（trk203）**：`js/main.js` のウィンドウ全体の `drop` が `VIDEO_EXT`／`video/` MIME で振り分け、`addVideoFiles(vids, { openViewer:false })` で**全画面ビューアを勝手に開かない**。JSON（譜面）のドロップとタイトル画面以外のガードは従来どおり。
+- **🚪 メディアプレイヤーを抜けても曲はそのまま（trk206）**：`closeMedia()` の抜け方を純粋関数 `mediaExitPlan()` が決める。**既定は `keep`＝止めない・読み込み直さない**（メディアプレイヤーへ入るときと同じで曲が途切れず、曲リストでエフェクトや設定を触っても音が消えない）。流し続けるときは位置を動かさず、`library.js` の `previewContinue()` が音量だけプレビュー相当（`musicVolume × 0.8`）へ600msで戻す。ゲーム開始などで閉じる（`closeMedia(false)`）ときと、プレビューがオフのときは従来どおり止める。**❓謎設定「🚪 メディアプレイヤーを抜けた時に曲を再読込する」**（`core.settings.mediaReloadOnExit`・**既定オフ**）をオンにすると昔の動き＝いったん止めてプレビューの開始位置から鳴らし直す（不具合の再現用）。
 - **📦 配布ZIPの形（trk204）**：`index.html`＋`README.txt`＋`trk-files/` の3つだけ、**OS共通の1本**。ルートの `index.html` は入口。詳しくは §9。
 
 ### TouhouカタログとローカルMIDI
@@ -232,6 +233,7 @@
 | 37 | trk202：🛟 セーフモードの設定を持ち越さない | `?safe=1` の保存内容を VM で確認済み。実機は未了 | ①`?safe=1` で自動読み取りなどを変えて保存→URLから `?safe=1` を消して開き直すと元の設定か ②セーフモード中の見た目（videoStyle 等）は安全側で保存されること ③緊急パネル・リセット（safe）から戻るときも案内どおりか |
 | 38 | trk203：🎬 ドロップした動画を 🎬 と同じ道へ | VM（偽の window）で確認済み。実ブラウザは未了 | ①`.mkv` をウィンドウにドロップすると 🎬 として一覧に入り、全画面ビューアが開かないこと ②音源のドロップは従来どおり ③`.json`（譜面）のドロップは取り込みのまま |
 | 39 | trk204：📦 配布ZIPの形（`index.html`＋`README.txt`＋`trk-files/`）と Drive への追加 | **利用者が起動（ゲーム開始）を確認（2026-10-27）**。レビューでも ①`?safe=1` が入口を通っても消えない ②`file://` で `trk-files/` へ進み FIRST SPARK が出る ③時刻を新しくすれば古い画面が残らずデータも引き継がれる を確認済み | — |
+| 41 | trk206：🚪 メディアプレイヤーを抜けたあとも曲が続く（既定）／❓謎設定で昔の動き | 純粋関数 `mediaExitPlan`（VM）・`previewContinue` が位置を動かさないこと・4言語の文言・配線は自動検査済み。**実機の音は未確認** | ①🎥基地で曲を流し、← で戻ると**途切れずに続く**こと（音量が少し下がる） ②曲リスト側でエフェクト・設定を触っても音が消えないこと ③⚙設定 → ❓謎設定 の **「🚪 メディアプレイヤーを抜けた時に曲を再読込する」** をオンにすると、閉じたときに止まってプレビュー位置から鳴り直す（不具合の再現）こと ④プレイヤーで一時停止してから閉じると、タイトルでも止まったままであること ⑤プレビューがオフの設定では閉じると止まること |
 | 40 | trk205：🕒 配布ZIPの時刻（同じ時刻だと 304 で旧版が残る） | 1.0.7 と 1.0.8 が同じ `2026-10-27 12:00` で、同じポートの `python -m http.server` が 304 を返して 1.0.7 の `index.html`（旧アプリ）が使われた（2026-10-27 レビュー・必須）。**1.0.8 を `2026-10-27 13:00`（UTC）で組み直し**、`If-Modified-Since: 12:00` → **200**／`13:00` → 304 をローカルで確認 | 実際のブラウザーで 1.0.7 のキャッシュを持ったまま開き直し、`GET / 200` で入口が出ることを実機で見る（実測はレビュー側で確認済み） |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
@@ -331,6 +333,7 @@
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
 | Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk204`） |
+| 🚪 メディアプレイヤーの抜け方（trk206） | `js/media-player-mode.js`（`mediaExitPlan`・`closeMedia`）、`js/library.js`（`previewContinue`）、`js/core.js`（`mediaReloadOnExit`）、`js/i18n-options.js`＋`index.html`（❓謎設定）、`tests/trk206-media-exit.test.mjs` |
 | 📦 配布ZIPの組み立て（1.0.8〜） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`release/README.txt`（配布用のかんたん起動。`--readme` を省くとこれが入る）、`tests/release-layout.test.mjs` |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
@@ -340,7 +343,7 @@
 
 | 検査 | 結果 | 範囲・注意 |
 |---|---|---|
-| `npm run check` | **617 pass / 0 fail** | 静的・安全・a11y・vendor・MMD・書斎・軽量化＋Node/VMテスト（trk200 の6件・trk201 の5件・trk202 の5件・trk203 の4件・release-layout の9件を含む） |
+| `npm run check` | **622 pass / 0 fail** | 静的・安全・a11y・vendor・MMD・書斎・軽量化＋Node/VMテスト（trk200 の6件・trk201 の5件・trk202 の5件・trk203 の4件・release-layout の9件・trk206 の5件を含む） |
 | `tools/prepare-release.mjs --check` | **OK** | 1.0.8 の組み上がりが `index.html`・`README.txt`・`trk-files/` の3つだけであること、manifest と `sw.js` の cache 名が一致すること |
 | 配布ZIP（1.0.8） | 225ファイル・`unzip -t` 破損なし | 全エントリ `2026-10-27 12:00`。**バイト数と `sha256` は Drive `trk-1.0.8` の `SHA256SUMS-1.0.8.txt` を正とする**（配布ZIPには開発用の `docs/HANDOFF.md`・`MIGRATIONS.md`・`tests/` を入れないが、`README.txt`・`trk-files/README-*.md` を直すと値が変わる。本書に固定値を書かない） |
 | ローカルサーバーで `/` → `trk-files/index.html` | **OK** | `python3 -m http.server` で `/`・`trk-files/index.html`・`js/main.js`・`sw.js`・vendor の three が 200（`file://` はレビューで確認済み） |
@@ -350,6 +353,13 @@
 
 ## 7. 最近の変更
 
+- **🚪 trk206：メディアプレイヤーを抜けても曲を続ける（プレイフィール改善・既定を変更／2026-10-27）**：これまでは 🎥基地を閉じるたびに `core.video.pause()` → プレビューを鳴らし直していた（開始位置へ飛ぶ＝読み込み直したように聞こえる）。曲リスト側でエフェクトや設定を触ると音が消えてしまうため、**既定を「そのまま流し続ける」に変更**した。
+  - `js/media-player-mode.js`：`closeMedia(restore)` が純粋関数 **`mediaExitPlan({close, phase, reloadOnExit, previewEnabled})`** で `keep`／`reload`／`pause` を決める。`keep` のときは止めない。ゲーム開始などで閉じる（`restore === false`）・タイトル以外・プレビューがオフのときは `pause`。テスト用に `window.TrkMediaPlayer.mediaExitPlan` として公開。
+  - `js/library.js`：**`previewContinue()`**（`window.Trk.library` に公開）＝位置は動かさず（`currentTime` を書かない・`play()` もしない）、音量だけ `musicVolume × 0.8` へ600msで戻す。止まっている曲は勝手に鳴らさない。
+  - **❓謎設定「🚪 メディアプレイヤーを抜けた時に曲を再読込する」**（`core.settings.mediaReloadOnExit`・`index.html` の `#mediaReloadOnExit`・**既定オフ**・全リセットでオフへ）。オンにすると `reload`＝昔の動き（止めて `startPreview()` でプレビュー位置から鳴らし直す）。4言語（`mediaReloadOnExit`／`mediaReloadOnExitHint`）。
+  - 日英ガイド（`docs/guide/start.md`・`docs/guide/en.md`）の「← 曲リストに戻る」の説明を新しい動きに合わせた（止めたいときは ⏯ か、プレイヤー内で一時停止してから退出）。
+  - `sw.js` cache＝**`trk-v2026.10.27-trk206`**。`tests/trk206-media-exit.test.mjs`（5件＝抜け方の決定・`closeMedia` の分岐・`previewContinue` が位置を動かさないこと・設定と4言語の配線・cache名）。**622 pass / 0 fail**。
+  - ⚠ 音の途切れ方は実機で確認していない（§4 #41）。
 - **🕒 trk205：配布ZIPの時刻を前の版より新しくする（2026-10-27 レビューの必須）**：1.0.7 と 1.0.8 のZIPがどちらも `2026-10-27 12:00` で組まれていたため、1.0.7 を使っていた人が同じポートの `python -m http.server` で 1.0.8 を開くと、`If-Modified-Since` に **304** が返り、ブラウザーは HTTP キャッシュの **1.0.7 の `index.html`（入口ではなく旧アプリ）** を使い続けた（`/js/…` が無いので一覧が空の壊れた画面になり、入口の Service Worker 解除も走らない）。`file://` と別ポートは影響なし。
   - `tools/prepare-release.mjs` の既定時刻を **「いま（分まで）」**（`defaultReleaseDate()`）にし、`release-manifest.json` に **`built_at`** を記録する。`--newer-than=<前の版の built_at>` を渡すと、それ以前の時刻では**組み立てを止める**（同じ時刻は必ず失敗）。`--readme` を省くと **`release/README.txt`**（リポジトリ同梱のかんたん起動）を使う。
   - **1.0.8 を `2026-10-27 13:00`（UTC）で組み直した**（1.0.7 の `12:00` より新しい）。ローカルで `If-Modified-Since: 12:00` → **200**、`13:00` → 304 を確認。225ファイル・`unzip -t` 破損なし。

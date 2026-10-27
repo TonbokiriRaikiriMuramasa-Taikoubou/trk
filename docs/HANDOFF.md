@@ -386,6 +386,7 @@
 | ローカルサーバーで `/` → `trk-files/index.html` | **OK** | `python3 -m http.server` で `/`・`trk-files/index.html`・`trk-files/js/shared-folders.js`・`trk-files/sw.js` がすべて 200 |
 | 再検証（304）の切り分け（trk205 の決まりを 1.1.1 でも確認） | **OK** | 1.1.1 のZIPを配信し、`If-Modified-Since: 2026-10-27 18:00`（1.1.0）では **200**、`19:00`（1.1.1）では **304**。前の版と同時刻にしない決まりが効いている |
 | 利用者による起動確認 | **1.0.9 で確認済み（2026-10-27）** | 1.1.1 は同じ入口・同じ形（`index.html`＋`README.txt`＋`trk-files/`）。1.1.1 自体の起動は §4 #44 |
+| Drive への追加（1.1.1） | **OK** | `trk-1.1.1` フォルダーに `trk-1.1.1.zip`（3,898,214 bytes）と `SHA256SUMS-1.1.1.txt`。Drive の `sha256Checksum`＝手元の `sha256`（`1a6f8a80…14ef43`）で一致 |
 | PC／スマホ実機で 1.1.1 のUIを操作（📂 の共有・書斎） | **未確認** | ヘッドレスsmokeは実機のタッチ・許可ダイアログを再現しない。#43・#44 の手順で確認する |
 
 ## 7. 最近の変更
@@ -471,3 +472,4 @@ unzip -t /home/user/work/rel111/dist/trk-1.1.1.zip && sha256sum /home/user/work/
 - **Drive（古い版）**：`trk-1.0.8`（`1vSUJ_acZ3QR7ekIVOTG13KvqmHS8DtvD`）／`trk-1.0.9`（`1sOqj7fcMPNlCcSV77YCklSCEkt7jqmaM`）、親は `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu`。**中身を直したら同じ名前で差し替え、SHA256SUMS も取り直す**（1.0.7 の原本は `old-1.0.7-original`、1.0.8 の同時刻版は `old-1.0.8-same-mtime（配らないでください）` へ退避）。
 - **Drive（1.0.9）**：`trk-1.0.9.zip`（`1nE51uWzl6W53nWlTH1U5jEvDnHP9y-eo`・3,878,131 bytes・`sha256 39153c95…83fb6`・`built_at 2026-10-27T15:00:00Z`）と `SHA256SUMS-1.0.9.txt`（`1-Y65YPg1-WMu1EGCRqYxHhCQlUkkfYeZ`）。落とし直してバイト一致・`sha256sum -c` OK・`unzip -t` 破損なしを確認済み。
 - **Drive（1.1.0）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.1.0` フォルダー**（`1w4gOka3GSKmBJMpbcNWz2ET6CbQAtRK4`）を作り、**`trk-1.1.0.zip`（`1pilYb6W84XlePkmECBERpD4coZIGEV_K`・3,895,300 bytes・`sha256 0bf813eec5137ad14cea6dd36f4f807ad84b8d447e96206c4dd8356b12693eec`・`built_at 2026-10-27T18:00:00Z`）** と **`SHA256SUMS-1.1.0.txt`（`1XB-yCD4TlLEv2Rroa7bqYUMKlaa0cvF5`・80 bytes・新しいハッシュ1行）** を置いた。**落とし直してローカルとバイト一致（ZIP・SHA256SUMS とも）・`sha256sum -c` OK・`unzip -t` 破損なし（226エントリ）**を確認済み。
+- **Drive（1.1.1）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.1.1` フォルダー**（`17XhNIUAqrQK33Mi-8X6ByeztpNFm-HQO`）を作り、**`trk-1.1.1.zip`（`17pDUAR7xp4pxW6RZTWSV6Up0ZCs6XTD6`・3,898,214 bytes・`sha256 1a6f8a800886aa1da9436c8d046e3ed390a3e0a5018c12d57f17f71a0514ef43`・`built_at 2026-10-27T19:00:00Z`）** と **`SHA256SUMS-1.1.1.txt`（`1U6EbFCrOpTC4x4SVmF9a5iYvweJFH13o`）** を置いた。Drive 側の `sha256Checksum` が手元の値と一致することを確認済み（再ダウンロードはしていない）。**1.1.0 のフォルダーとZIPはそのまま**（同じ名前で差し替えない）。

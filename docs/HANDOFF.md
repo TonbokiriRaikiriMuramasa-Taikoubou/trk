@@ -1,8 +1,8 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-27（trk199〜210・**1.1.0**：📂 フォルダー共有の拡張＝🎬 動画フォルダ・何本でも・📚 書斎はフォルダーのまま読む。**レビュー反映の trk210 は未配布**。1.0.9 の配布ZIPの形と時刻もここに集約）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-27（trk199〜210・**1.1.1**：📂 フォルダー共有の拡張＝🎬 動画フォルダ・何本でも・📚 書斎はフォルダーのまま読む。**1.1.0 のレビュー反映（trk210）は 1.1.1 のZIPに同梱して配布**。1.0.9 の配布ZIPの形と時刻もここに集約）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
-> **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検、§9＝配布ZIPの形と作り方（1.0.8〜・現在 1.1.0）。
+> **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検、§9＝配布ZIPの形と作り方（1.0.8〜・現在 1.1.1）。
 
 ## 1. 作業の基本
 
@@ -26,7 +26,7 @@
 - **🚪 メディアプレイヤーを抜けても曲はそのまま（trk206）**：`closeMedia()` の抜け方を純粋関数 `mediaExitPlan()` が決める。**既定は `keep`＝止めない・読み込み直さない**（メディアプレイヤーへ入るときと同じで曲が途切れず、曲リストでエフェクトや設定を触っても音が消えない）。流し続けるときは位置を動かさず、`library.js` の `previewContinue()` が音量だけプレビュー相当（`musicVolume × 0.8`）へ600msで戻す。ゲーム開始などで閉じる（`closeMedia(false)`）ときと、プレビューがオフのときは従来どおり止める。**❓謎設定「🚪 メディアプレイヤーを抜けた時に曲を再読込する」**（`core.settings.mediaReloadOnExit`・**既定オフ**）をオンにすると昔の動き＝いったん止めてプレビューの開始位置から鳴らし直す（不具合の再現用）。
 - **📦 配布ZIPの形（trk204）**：`index.html`＋`README.txt`＋`trk-files/` の3つだけ、**OS共通の1本**。ルートの `index.html` は入口。詳しくは §9。
 
-### 1.1.0 の仕様（trk208）
+### 📂 フォルダー共有の仕様（trk208〜trk210・1.1.1 で配布）
 
 **📂 フォルダー共有の拡張（trk208）**：trk194 の「📤 ミュージックフォルダを共有」を、**何本でも・動画も・書斎の画像も**に広げた。共通部品は新しい `js/shared-folders.js`（`window.TrkSharedFolders`＝純関数とフォルダーの歩き方だけ。DOM も IndexedDB も触らない）。
 - **📤 曲リストは登録簿で覚える**：`shadow_taiko_library` の `kv` キー **`"folders"`** に `[{id,name,kind:"music"|"video",handle,addedAt,label}]` を保存（従来の `"share"` 1本は起動時にここへ移す＝**後方互換**。`"share"` は消さない）。`libKV` キー `"dir"`（📁 開く）はそのまま。
@@ -41,11 +41,13 @@
   - `studyBookClean` は `linked`／`sharedFolder` を保持。一覧の印は `studyLinkedBadge`（📂 …（フォルダのまま））。`STUDY_UTIL.bookSize` は linked を **0** と数える（端末に実体が無い）。
   - バックアップ：`DB_LIBRARY.skip.kv` に `"folders"`・`"studyFolders"` を追加（ハンドルは端末ごとの値）。`checkStudyLimits` は **`linked !== true` の本だけ**数える（実体が無いページで上限に引っかからないように）。
 
-**1.1.0 は「trk208 を配るための版」**：配布ZIPのアプリ本体は trk208 のまま（`sw.js` の cache も `trk-v2026.10.27-trk208`）。**リポジトリはいま trk210**（レビュー反映・未配布）で、cache は `trk-v2026.10.27-trk210`。配布ZIP・`README-1.1.0.md`・`release/README.txt`・`release-manifest.json` の版を 1.1.0 にそろえ、ZIP を **`2026-10-27 18:00`（UTC）** で組み直した（§6・§7・§9）。
+**1.1.1 は「trk210 を配るための版」**：アプリ本体は **trk210**（1.1.0 の配布ZIPの `trk-files/` を土台に、trk210 で変えた4ファイル＝`js/library.js`・`js/study-room.js`・`js/study-room-utils.js`・`sw.js` を差し替え）。配布ZIP・`README-1.1.1.md`・`release/README.txt`・`release-manifest.json` の版を 1.1.1 にそろえ、ZIP を **`2026-10-27 19:00`（UTC）** で組んだ（1.1.0 の `18:00` より新しい。§6・§7・§9）。`sw.js` の cache は **`trk-v2026.10.27-trk210`**。
 
-### 1.1.0 のレビュー反映（trk210・未配布）
+**1.1.0 の ZIP と Drive の `trk-1.1.0` はそのまま残す**（同じ名前で作り直さない）。1.1.1 は別のZIP・別のフォルダー（Drive の `trk-1.1.1`）として配る。
 
-**1.1.0 の配布ZIPレビュー（2026-10-27）で見つかった共有フォルダーまわりの3点**を直した。🔓 の扱いも「1タップ＝1本」にそろえている。実機で見つかった不具合ではなく、**1.1.0 を配ったままでよいとレビューで確認済み**（SHA256 一致・304 問題なし・`?safe=1` と `file://` も確認済み）。
+### 1.1.1 のレビュー反映（trk210・配布済み）
+
+**1.1.0 の配布ZIPレビュー（2026-10-27）で見つかった共有フォルダーまわりの3点**を直した。🔓 の扱いも「1タップ＝1本」にそろえている。実機で見つかった不具合ではなく、**1.1.0 を配ったままでよいとレビューで確認済み**（SHA256 一致・304 問題なし・`?safe=1` と `file://` も確認済み）。この4点は **1.1.1 のZIPに入れて配る**（1.1.0 のZIPはそのまま）。
 
 - **📤 × で外したフォルダーが次の起動で戻る（trk210）**：1.0.x の `"share"`（1本だけの共有）は登録簿へ移したあとも残していた（読めない環境でも失わないため）。そのため最後の1本を × で外すと登録簿が空になり、次の起動の `loadSharedFolders` が `"share"` を**移し直して**戻してしまっていた。`removeSharedFolder` が最後の1本を外したときに `"share"` も消す（🚫 共有をやめる は前から両方消している）。
 - **📤 1本でも「確認が必要」「拒否」だと、ほかのフォルダーの曲も出ない（trk210）**：`restoreSharedFolders` は「1本でも許可待ちなら、起動時は読まない（最初のタップ待ち）」だった。**許可が生きているフォルダーは先に読む**ようにし（`plan !== "scan" && autoRead && need.length < sharedFolders.length` のとき `readSharedFolders()`）、**🔓 は許可待ちが残っている間だけ**出す（`readSharedFolders` の `hidden = granted >= sharedFolders.length`）。
@@ -266,6 +268,7 @@
 | 41 | trk206：🚪 メディアプレイヤーを抜けたあとも曲が続く（既定）／❓謎設定で昔の動き | 純粋関数 `mediaExitPlan`（VM）・`previewContinue` が位置を動かさないこと・4言語の文言・配線は自動検査済み。**実機の音は未確認** | ①🎥基地で曲を流し、← で戻ると**途切れずに続く**こと（音量が少し下がる） ②曲リスト側でエフェクト・設定を触っても音が消えないこと ③⚙設定 → ❓謎設定 の **「🚪 メディアプレイヤーを抜けた時に曲を再読込する」** をオンにすると、閉じたときに止まってプレビュー位置から鳴り直す（不具合の再現）こと ④プレイヤーで一時停止してから閉じると、タイトルでも止まったままであること ⑤プレビューがオフの設定では閉じると止まること |
 | 42 | trk208：📂 フォルダー共有の拡張（動画フォルダ・複数登録・書斎の「フォルダのまま読む本」） | 純関数（`plan`／`uniqueLabel`／`mergeScans`／`walk`／`readFileAt`／`folderBookGroups`）と配線は Node/VM で確認済み（`tests/trk208-shared-folders.test.mjs` の22件）。**実ブラウザのフォルダー選択・許可・実画像は未確認** | PC の Chrome／Edge で: ①📤 共有でミュージックと動画フォルダを**両方**追加し、一覧に2本出て曲が混ざらずに並ぶか ②リロードして許可が生きていれば自動で読めるか（切れていれば最初のタップで1本ずつ確認が出るか） ③× で1本だけ外せるか ④書斎の 📂 で画像が大量にあるフォルダーを選び、**保存容量が増えない**こと（`navigator.storage.estimate()`） ⑤本を開いてページが読めるか、フォルダー内で画像を消すと「読み込めません」の理由が出るか ⑥Android Chrome で同じ操作（`startIn` は無視されるが、フォルダー選択と許可は同じ） ⑦バックアップを取って別の端末で復元し、リンク本が「フォルダーが見つかりません」と出て、📂 で同じ名前のフォルダーを選び直すと読めるか |
 | 43 | trk210：📤 共有フォルダーの × と 🔓（レビュー反映）・📚 同名フォルダー | `tests/trk210-review.test.mjs` の6件で確認済み（最後の1本で `"share"` も消える・許可が生きているフォルダーを先に読む・🔓 は1タップ1本・同名の別フォルダーは `Manga (2)`・リンク本が無くなったフォルダーの後始末）。**実機の許可ダイアログは未確認** | PC の Chrome／Edge で: ①1.0.x から上げた状態で共有フォルダーを1本だけ × で外し、**再読み込みしても戻らない**こと ②フォルダーを2本登録し、片方だけ許可を切って起動→**許可が生きている側の曲はすぐ出る**こと、🔓 が残りの1本の名前で出ること ③🔓 を1回押して**1本だけ**確認が出ること（2本目は次のタップ） ④書斎で `Manga` を選んだあと、**別の場所の同名フォルダー**を選ぶと `Manga (2)` として増えること（前の本としおりが消えない） ⑤リンク本を全部消すと、フォルダーの記録も消えること |
+| 44 | 1.1.1 の配布ZIP（trk210 入り・2026-10-27） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻・`--check`・再検証（304）は確認済み（§6）。**利用者の実機での起動と、📂 共有の許可ダイアログは未確認** | ①1.1.0 のZIPを置き換える形で 1.1.1 を展開し、`index.html` から起動できること ②開いたあと `sw.js` の cache が `trk-v2026.10.27-trk210` になり、旧 `trk208` のキャッシュが残らないこと ③#43 の5点（× で外したフォルダーが戻らない・許可が生きている側は先に読める・🔓 は1タップ1本・同名フォルダーは `Manga (2)`・リンク本が無くなったフォルダーの後始末） |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -363,29 +366,34 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk210`＝trk210。**配布ZIP（1.1.0）は `trk208` のまま**＝trk210 は未配布。1.0.9 のZIPは `trk207`） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk210`＝trk210。**配布ZIP（1.1.1）も `trk210`**。1.1.0 のZIPは `trk208`、1.0.9 のZIPは `trk207`） |
 | 🚪 メディアプレイヤーの抜け方（trk206） | `js/media-player-mode.js`（`mediaExitPlan`・`closeMedia`）、`js/library.js`（`previewContinue`）、`js/core.js`（`mediaReloadOnExit`）、`js/i18n-options.js`＋`index.html`（❓謎設定）、`tests/trk206-media-exit.test.mjs` |
-| 📦 配布ZIPの組み立て（1.0.8〜・現在 1.1.0） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`release/README.txt`（配布用のかんたん起動。`--readme` を省くとこれが入る。**版と `README-1.x.y.md` の名前は `--version` とそろえる**）、`tests/release-layout.test.mjs`（形・時刻・README の版） |
+| 📦 配布ZIPの組み立て（1.0.8〜・現在 1.1.1） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`release/README.txt`（配布用のかんたん起動。`--readme` を省くとこれが入る。**版と `README-1.x.y.md` の名前は `--version` とそろえる**）、`tests/release-layout.test.mjs`（形・時刻・README の版） |
 | 📂 フォルダー共有の共通部品（trk208） | `js/shared-folders.js`（`window.TrkSharedFolders`＝`plan`／`uniqueLabel`／`mergeScans`／`walk`／`pathParts`／`readFileAt`。DOM・IndexedDB・書き込みなし）、`js/library.js`（登録簿 `"folders"`・`addSharedFolder`／`readSharedFolders`／`restoreSharedFolders`／`folderAutoKickShared`／`removeSharedFolder`／`renderSharedFolderList`）、`index.html`（`#libShareVideoBtn`・`#libSharedFolderList`）、`tests/trk208-shared-folders.test.mjs` |
 | 📂 書斎の「フォルダーのまま読む本」（trk208） | `js/study-room.js`（`studyShareImageFolder`／`studyImportSharedFolder`／`studySharedPageBlob`／`studySharedFolderEnsure`・`studyBookClean` の `linked`／`sharedFolder`）、`js/study-room-utils.js`（`folderBookGroups`・`bookSize` の linked 扱い）、`js/backup.js`（`skip` と `checkStudyLimits`）、`index.html`（`#studyShareFolderBtn`） |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
 
-**trk208・1.1.0（2026-10-27）の確認**（trk193〜207 の作業途中の記録はアーカイブへ移動）
+**trk210・1.1.1（2026-10-27）の確認**（trk193〜208 の作業途中の記録はアーカイブへ移動）
 
 | 検査 | 結果 | 範囲・注意 |
 |---|---|---|
-| `npm run check` | **650 pass / 0 fail**（trk208 の22件＋trk210 の6件） | 静的 `check-repo` 0 fail（`sw.js` の cache は `trk-v2026.10.27-trk210`・`index.html` のタグ整合エラー0）／安全 **64 pass**（§8 に `js/shared-folders.js` の読み取り専用 `getFileHandle(` だけを例外）／a11y **8 pass**／vendor 100 modules 4.98 MB／MMD OK／lite 123 assertions／書斎 **314 strings × 4言語**。Node/VM は trk208 の22件・trk210 の6件・release-layout 9件・trk206 5件などを含む |
-| `git diff --check` | **OK** | 空白・行末の指摘なし |
-| `tools/prepare-release.mjs --check` | **OK** | 1.1.0 の組み上がりが `index.html`・`README.txt`・`trk-files/` の3つだけであること、`release-manifest.json`（`version 1.1.0`・`archive trk-1.1.0.zip`・`built_at 2026-10-27T18:00:00Z`）と `sw.js` の cache 名（`trk-v2026.10.27-trk208`）が一致すること |
-| 配布ZIP（1.1.0） | **226ファイル・3,895,300 bytes・`unzip -t` 破損なし** | 全エントリ **`2026-10-27 18:00`（UTC）**（1.0.9 の `15:00` より新しい）。`sha256 0bf813ee…693eec`（完全な値は Drive の `SHA256SUMS-1.1.0.txt` を正とする）。`trk-files/` の `sw.js`・`index.html`・`js/*`・`README-1.1.0.md`、配布版ガイドの 📂 の項はリポジトリとバイト一致。`README-1.0.9.md` は残っていない |
-| ローカルサーバーで `/` → `trk-files/index.html` | **OK** | `python3 -m http.server` で `/`・`trk-files/index.html`・`trk-files/js/shared-folders.js`・`sw.js` が **200**、`CACHE` は `trk208` |
-| 再検証（304）の切り分け（trk205 の決まりを 1.1.0 でも確認） | **OK** | 1.1.0 のZIPを配信し、`If-Modified-Since: 2026-10-27 15:00`（1.0.9 の時刻）→ **200**、`18:00`（1.1.0 の時刻）→ **304**。`--newer-than` が同じ／古い時刻を拒否することはテストで固定 |
-| 利用者による起動確認 | **1.0.9 で確認済み（2026-10-27）** | 1.1.0 は同じ入口・同じ形（`index.html`＋`README.txt`＋`trk-files/`）なので、起動の形は変わっていない |
-| PC／スマホ実機で 1.1.0 のUIを操作（📂 の共有・書斎） | **未確認** | ヘッドレスsmokeは実機のタッチ・見た目・実音声の保証ではない。**フォルダー選択・許可・大量画像は §4 #42** |
+| `npm run check` | **650 pass / 0 fail**（trk208 の22件＋trk210 の6件） | 静的 `check-repo` 0 fail（`sw.js` の cache は `trk-v2026.10.27-trk210`・配布READMEの版は 1.1.1）・`check-security` 64 pass / 0 fail・`git diff --check` OK |
+| `tools/prepare-release.mjs --check` | **OK** | 1.1.1 の組み上がりが `index.html`・`README.txt`・`trk-files/` の3つだけ。`trk-files/index.html`・`sw.js`・`release-manifest.json` があり配布用の起動案内の残骸なし・`service_worker_cache` と `sw.js` の `CACHE` が一致（`trk-v2026.10.27-trk210`）・`layout:"wrapper"`・入口に `location.replace` |
+| 配布ZIP（1.1.1） | **226エントリ・3,898,214 bytes・`unzip -t` 破損なし** | 全エントリ **`2026-10-27 19:00`（UTC）**（1.1.0 の `18:00` より新しい）・`sha256 1a6f8a80…14ef43`・`trk-files/` は224ファイル |
+| 1.1.0 のZIPとの差分 | **4ファイル＋README 3本だけ** | `js/library.js`・`js/study-room.js`・`js/study-room-utils.js`・`sw.js` が trk210（`js/shared-folders.js` は 1.1.0 と同一）。`README-1.1.1.md`・`README.md`・`README-SLIM.md` が 1.1.1 表記 |
+| ローカルサーバーで `/` → `trk-files/index.html` | **OK** | `python3 -m http.server` で `/`・`trk-files/index.html`・`trk-files/js/shared-folders.js`・`trk-files/sw.js` がすべて 200 |
+| 再検証（304）の切り分け（trk205 の決まりを 1.1.1 でも確認） | **OK** | 1.1.1 のZIPを配信し、`If-Modified-Since: 2026-10-27 18:00`（1.1.0）では **200**、`19:00`（1.1.1）では **304**。前の版と同時刻にしない決まりが効いている |
+| 利用者による起動確認 | **1.0.9 で確認済み（2026-10-27）** | 1.1.1 は同じ入口・同じ形（`index.html`＋`README.txt`＋`trk-files/`）。1.1.1 自体の起動は §4 #44 |
+| PC／スマホ実機で 1.1.1 のUIを操作（📂 の共有・書斎） | **未確認** | ヘッドレスsmokeは実機のタッチ・許可ダイアログを再現しない。#43・#44 の手順で確認する |
 
 ## 7. 最近の変更
+
+- **📦 1.1.1：trk210 を配る版（2026-10-27）**：**アプリ本体は trk210**（下の trk210 の4点＝1.1.0 レビューの反映）。1.1.0 の配布ZIPの `trk-files/` を土台に、trk210 で変えた **4ファイル**（`js/library.js`・`js/study-room.js`・`js/study-room-utils.js`・`sw.js`）だけを差し替え、`README-1.0.9.md` → **`README-1.1.1.md`**（`README.md` も同内容）・`README-SLIM.md`・`release/README.txt` の版を 1.1.1 にそろえた。**ZIPの形は 1.1.0 と同じ**（`index.html`＋`README.txt`＋`trk-files/`）。
+  - ZIP は **`2026-10-27 19:00`（UTC）** で組み立て（1.1.0 の `18:00` より新しい）＝**226エントリ・3,898,214 bytes**・`unzip -t` 破損なし・全エントリ同時刻・`sha256 1a6f8a800886aa1da9436c8d046e3ed390a3e0a5018c12d57f17f71a0514ef43`。
+  - `prepare-release --check` **OK**（3つだけ・`service_worker_cache` と `sw.js` の `CACHE`＝`trk-v2026.10.27-trk210` が一致）・ローカル配信で `/` 200・再検証は `18:00` で **200**／`19:00` で **304**。
+  - **1.1.0 のZIPと Drive の `trk-1.1.0` はそのまま**（同じ名前で作り直さない）。1.1.1 は別ZIP・別フォルダー（`trk-1.1.1`）で配る。
 
 - **🔍 trk210：1.1.0 レビューの反映（共有フォルダーの × と 🔓・書斎の同名フォルダー・2026-10-27）**：レビューは「**1.1.0 はこのまま配って大丈夫**（SHA256 一致・304 問題なし・`?safe=1`／`file://` も確認）」で、直したほうがよい点が共有フォルダーまわりに3つ。実機の許可ダイアログが試せないぶんの危険（🔓 の連続 `requestPermission`）も先に手当てした。
   - **× で外したフォルダーが戻る**：`removeSharedFolder` が最後の1本を外したときに旧 `"share"` も削除（`libKV.del("share")`）。
@@ -394,35 +402,6 @@
   - **書斎の同名フォルダー**：`studySharedFolderNameFor(handle)` が `isSameEntry` で見分け、別のフォルダーは `Manga (2)`。同じフォルダーの選び直しは同じ本・しおりのまま。
   - **後始末**：`STUDY_UTIL.sharedFoldersInUse(books)`＋`studySharedFoldersPrune()`（本を消したとき、リンク本が無いフォルダーの記録を外す）。
   - `sw.js` の cache を **`trk-v2026.10.27-trk210`** に。`tests/trk210-review.test.mjs`（6件）を追加し **650 pass / 0 fail**。⚠ 実機の許可ダイアログは未確認（§4 #43）。**trk210 はまだ配布ZIPに入っていない**（1.1.0 のZIPは trk208 のまま）。
-- **📦 1.1.0：trk208 を配る版（2026-10-27）**：**アプリ本体は trk208 のまま**（コードの変更なし）。配布物の名前・アプリ内 README・`release/README.txt`・`release-manifest.json` の版を 1.1.0 にし、`sw.js` の cache は trk208 の `trk-v2026.10.27-trk208` のまま（1.0.9 のZIPは `trk207` だったので、配布物としては上がる）。
-  - ZIP は **`2026-10-27 18:00`（UTC）** で組み直し（1.0.9 の `15:00` より新しい）＝**226ファイル・3,895,300 bytes・`sha256 0bf813ee…693eec`**（完全な値は Drive の `SHA256SUMS-1.1.0.txt`）。`unzip -t` 破損なし、`--check` OK、ローカルサーバーで `If-Modified-Since: 15:00` → **200**／`18:00` → **304**（§6）。
-  - 素材＝`/home/user/work/build110/app`：**1.0.9 の配布ZIPの `trk-files/` を土台**に、trk208 で変えた9ファイル（`css/style.css`・`index.html`・`js/backup.js`・`js/i18n.js`・`js/library.js`・`js/shared-folders.js`（新規）・`js/study-room-utils.js`・`js/study-room.js`・`sw.js`）だけを載せ替え、配布版ガイド3ファイル（`docs/guide/appearance.md`・`study-room.md`・`en.md`）へ 📂 の項と 🎬 動画フォルダの説明を差し込んだ。開発用の `tests/`・`tools/*.mjs`・`docs/HANDOFF*` は入れない（1.0.9 と同じ切り分け）。
-  - `README-1.0.9.md` → **`README-1.1.0.md`**（`README.md` も同内容）。先頭に「1.1.0 更新（今回）」＝📂 書斎はフォルダのまま読む／🎬 動画フォルダ／📤 最大8本・× で1本／ZIPの形は 1.0.9 と同じ、を追加し、1.0.9 の見出しを「前回」へ。本文に残っていた `trk-files/README-1.0.8.md` の参照も 1.1.0 に直した。`README-SLIM.md` は版・cache・archive 名・ファイル数・"What changed in 1.1.0" を更新。
-  - `release/README.txt` は**版と `README-1.1.0.md` の参照**を更新し、「📚書斎（画像はフォルダのまま読めます）」「ミュージック／動画フォルダーの読み込み（共有は最大8本まで）」を足した（構成・注意書きは変えない）。
-  - `tests/release-layout.test.mjs` の版の検査を **`1.x.y`** に広げた（`1.0.x` 固定だと 1.1.0 で落ちる。1.1.0 からは第2位が上がる）。
-  - `npm run check` **644 pass / 0 fail**。⚠ 実機のフォルダー選択・許可・大量画像は未確認（§4 #42）。
-
-- **📂 trk208：フォルダー共有の拡張（動画フォルダ・何本でも・書斎はフォルダのまま読む・2026-10-27）**：「ミュージックフォルダの共有が便利」という評価から、①**動画フォルダ**も同じやり方で共有したい ②書斎では**特定のフォルダ**（画像が大量）を共有対象にして読ませたい、に対応した。**1.1.0 の配布ZIPに収録**（1.0.9 のZIPは trk207 のままで、trk208 は入っていない）。
-  - 新規 `js/shared-folders.js`（`index.html` で `js/library.js` の直前）。`plan`（trk194 と同じ決まり）／`uniqueLabel`（同名フォルダーは `Music (2)`）／`mergeScans`／`walk`（深さ8・3000件／`read:false` なら名前だけ）／`readFileAt`（**読み取り専用**。`create` 無し。先頭のフォルダー名は外す・`..` は捨てる）。
-  - 曲リスト：`libKV` **`"folders"`** の登録簿（`kind:"music"|"video"`）へ。`startIn` は音楽 `music`／動画 `videos`。`#libShareVideoBtn` と一覧 `#libSharedFolderList`（× は1本だけ外す）を追加。**旧 `"share"` は起動時に登録簿へ移す**ので、既存の共有はそのまま使える。最初のタップの確認は `folderAutoKickShared()` が1本ずつ。
-  - 書斎：`#studyShareFolderBtn`（`startIn:"pictures"`）。`STUDY_UTIL.folderBookGroups` で本に分け、`linked:true`／`sharedFolder`／`pages[].path` だけを持つ本を作る（**pages ストアに実体を入れない**）。ページとジャケットは `TrkSharedFolders.readFileAt` で毎回読む。`bookSize` は linked を0に、`checkStudyLimits` は linked を数えない、`DB_LIBRARY.skip.kv` に `"folders"`・`"studyFolders"` を追加。
-  - `sw.js` の cache を **`trk-v2026.10.27-trk208`** に。`npm run check` **644 pass / 0 fail**（trk208 の22件）。⚠ 実ブラウザでのフォルダー選択・許可・大量画像の実測は未確認（§4 #42）。
-- - **📦 1.0.9：配布名と文書を 1.0.9 にそろえる（2026-10-27）**：**アプリ本体は trk206 のまま**（1.0.8 の配布ZIPと同一のコード）。配布物の名前・アプリ内 README・`release/README.txt`・`release-manifest.json` の版を 1.0.9 にし、`sw.js` の cache を **`trk-v2026.10.27-trk207`** に上げた。
-  - ZIP は **`2026-10-27 15:00`（UTC）** で組み直し（1.0.8 の `14:00` より新しい）＝225ファイル・3,878,131 bytes・`sha256 39153c95…83fb6`。`unzip -t` 破損なし、`--check` OK。
-  - ローカルサーバーで `If-Modified-Since: 14:00` → **200**、`15:00` → 304、`/trk-files/index.html` → 200、`/trk-files/sw.js` の `CACHE` が `trk207` であることを確認（§6）。
-  - `README-1.0.8.md` → **`README-1.0.9.md`**（`README.md` も同内容）。先頭に「1.0.9 更新（今回）」＝🚪 メディアプレイヤーを抜けても曲が続く／ZIPの形は 1.0.8 と同じ、を追加し、1.0.8 の見出しを「前回」へ。`README-SLIM.md` も版・cache・archive 名と "What changed in 1.0.9" を更新。
-  - `release/README.txt` は**版と `README-1.0.9.md` の参照だけ**を更新（構成・注意書きは変えない）。
-  - `tests/release-layout.test.mjs` の版の検査を `1.0.x` の形にし、`README-1.0.x.md` の名前も見るようにした（版を上げたら `release/README.txt` も上げる、が検査で分かる）。
-  - `npm run check` **622 pass / 0 fail**。
-  - Drive の `trk-1.0.9` へ `trk-1.0.9.zip`（`1nE51uWzl6W53nWlTH1U5jEvDnHP9y-eo`）と `SHA256SUMS-1.0.9.txt`（`1-Y65YPg1-WMu1EGCRqYxHhCQlUkkfYeZ`）を置き、**落とし直してバイト一致**を確認（§9）。
-- **🚪 trk206：メディアプレイヤーを抜けても曲が続く（既定を変更・2026-10-27）**：これまでは 🎥基地を閉じるたびに `core.video.pause()` → プレビューを鳴らし直していた（開始位置へ飛ぶ＝読み込み直したように聞こえ、曲リストでエフェクトや設定を触ると音が消えた）。**既定を「そのまま流し続ける」に変更**。
-  - `js/media-player-mode.js`：`closeMedia(restore)` の抜け方を純粋関数 **`mediaExitPlan({close, phase, reloadOnExit, previewEnabled})`** が `keep`／`reload`／`pause` で決める（`keep` では止めない）。ゲーム開始などで閉じる（`restore === false`）・タイトル以外・プレビューがオフは `pause`。`window.TrkMediaPlayer.mediaExitPlan` として公開。
-  - `js/library.js`：**`previewContinue()`**（`window.Trk.library` に公開）＝`currentTime` を書かず `play()` もしない（＝読み込み直さない）。音量だけ `musicVolume × 0.8` へ600msで戻し、プレイヤーで消音していたら鳴らす。
-  - **❓謎設定「🚪 メディアプレイヤーを抜けた時に曲を再読込する」**（`core.settings.mediaReloadOnExit`・`#mediaReloadOnExit`・**既定オフ**・全リセットでオフ）。オン＝`reload`（昔の動き：止めて `startPreview()` でプレビュー開始位置から鳴らし直す）。4言語（`mediaReloadOnExit`／`mediaReloadOnExitHint`）。
-  - 日英ガイド（`docs/guide/start.md`・`docs/guide/en.md`）の「← 曲リストに戻る」を新しい動きに合わせた（止めたいときは ⏯／プレイヤー内で一時停止）。
-  - `tests/trk206-media-exit.test.mjs`（5件）＝抜け方・`closeMedia` の分岐・`previewContinue` が位置を動かさないこと・設定と4言語の配線・cache名。**622 pass / 0 fail**。
-  - ⚠ 実機の音は未確認（§4 #41）。1.0.8 のZIPもこの修正を含めて `14:00` で組み直した（記録はアーカイブ）。
-- trk193〜trk205（1.0.7／1.0.8 の配布ZIP・時刻・セーフモードの文面・trk200〜trk204 の詳細）と trk186〜189 以前の記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)。
 
 ## 8. 変更時チェックリスト
 
@@ -437,16 +416,16 @@
 - [ ] 版を上げたときは §9 の「版を上げるときに直す場所」を全部直し、`release/README.txt`・配布アプリの `README-1.x.y.md`・`sw.js` の `CACHE`・`release-manifest.json` の `version` がそろっていることを確かめた。
 - [ ] Drive へ上げたら、**落とし直してバイト一致**を確かめ、`SHA256SUMS` を新しいハッシュで上書きした（§9）。
 
-## 9. 配布物の形（1.0.8〜／現在 **1.1.0**：`index.html`＋`README.txt`＋`trk-files/`）
+## 9. 配布物の形（1.0.8〜／現在 **1.1.1**：`index.html`＋`README.txt`＋`trk-files/`）
 
-**決めたこと（2026-10-26／1.0.8〜1.1.0）**：ZIPを開いたときに **`index.html`・`README.txt`・`trk-files/` の3つだけ**が見える形にする（1.0.6 のころの試作 `trk-1.0.6-layout-proto.zip` と同じ見た目。利用者からの指定）。**OS別のZIPは作らない**——Windows・macOS・Linux は同じアプリ本体で動くので、1本で足りる（1.0.7 までの win/linux・mac の2本は廃止）。
+**決めたこと（2026-10-26／1.0.8〜1.1.1）**：ZIPを開いたときに **`index.html`・`README.txt`・`trk-files/` の3つだけ**が見える形にする（1.0.6 のころの試作 `trk-1.0.6-layout-proto.zip` と同じ見た目。利用者からの指定）。**OS別のZIPは作らない**——Windows・macOS・Linux は同じアプリ本体で動くので、1本で足りる（1.0.7 までの win/linux・mac の2本は廃止）。
 
 ```
-trk-1.1.0.zip
-└ trk-1.1.0/
+trk-1.1.1.zip
+└ trk-1.1.1/
    ├ index.html   … 入口（meta refresh＋<a>＋location.replace で trk-files/index.html へ）
    ├ README.txt   … かんたん起動・index.html だけでできること・ローカルサーバーの使い方・注意・権利
-   └ trk-files/   … アプリ本体（リポジトリのルートと同じ中身。README-1.1.0.md・LICENSE・docs/ を含む）
+   └ trk-files/   … アプリ本体（リポジトリのルートと同じ中身。README-1.1.1.md・LICENSE・docs/ を含む）
 ```
 
 - **配布ZIPに入れないもの**：`.github/`・`tests/`・`tools/*.mjs`・開発用の `docs/HANDOFF.md`／`HANDOFF-ARCHIVE.md`／`MIGRATIONS.md` など（1.0.7 と同じ切り分け。アプリ本体の `docs/guide/`・`SECURITY.md`・`QUALITY-CHECKS.md` などは入る）。
@@ -454,38 +433,40 @@ trk-1.1.0.zip
 - **`file://` で開いたとき**：入口が `location.replace` で `trk-files/index.html` へ進む（Service Worker は `file:` では触らない）。`index.html` をダブルクリックするだけでゲーム・譜面・プレーヤー・書斎・保存が動く。**📂 のフォルダー共有は `file://` でも動く**（`showDirectoryPicker` は安全なコンテキストを要求しない）が、許可の記憶はブラウザー次第。
 - **`http://127.0.0.1:8000/` で開いたとき**：入口がルート直下に残った **1.0.7 以前の worker だけ**を `unregister()` してから進む（`trk-files/sw.js` は残す）。アプリの worker のスコープは `/trk-files/` になる。
 - **保存データは「開き方」ごとに別**（`file://` と `http://127.0.0.1:8000/` は別のオリジン）。これは 1.0.6 試作の README.txt と同じ注意書きを残している。
-- **`00_START_HERE.html` と `01_README_WIN_LINUX.txt`／`01_README_MAC.txt` は廃止**。起動案内は `README.txt` に集約（`--check` がアプリ側に残っていると fail にする。`README-1.1.0.md` などアプリ自身の README は残す）。
-- **`release-manifest.json`**（`trk-files/` の中）に `version`・`archive:"trk-1.1.0.zip"`・`layout:"wrapper"`・`wrapper{launcher:"index.html", readme:"README.txt", app:"trk-files", platforms:["win","linux","mac"]}`・`service_worker_cache`（`sw.js` の `CACHE` を書き写す）・`built_at` を記録。`platform` は持たない。**このファイルは `--version` から作る（手で書かない）**。
+- **`00_START_HERE.html` と `01_README_WIN_LINUX.txt`／`01_README_MAC.txt` は廃止**。起動案内は `README.txt` に集約（`--check` がアプリ側に残っていると fail にする。`README-1.1.1.md` などアプリ自身の README は残す）。
+- **`release-manifest.json`**（`trk-files/` の中）に `version`・`archive:"trk-1.1.1.zip"`・`layout:"wrapper"`・`wrapper{launcher:"index.html", readme:"README.txt", app:"trk-files", platforms:["win","linux","mac"]}`・`service_worker_cache`（`sw.js` の `CACHE` を書き写す）・`built_at` を記録。`platform` は持たない。**このファイルは `--version` から作る（手で書かない）**。
 
-**版を上げるときに直す場所（1.1.0 で実施した順）**
+**版を上げるときに直す場所（1.1.1 で実施した順）**
 
 1. `release/README.txt` — 1行目の版と、末尾の `README-1.x.y.md` の参照（`tests/release-layout.test.mjs` が「版が書いてあること」「アプリ内READMEの名前」を見る）。
 2. 配布アプリの `README-1.x.y.md` — 前の版から改名し、先頭に「今回」の更新点を足して、前回の見出しを「前回」へ。`README.md` も同じ内容にする。`README-SLIM.md` の版・cache・archive 名・ファイル数も直す。
-3. `sw.js` の `CACHE` — `trk-v<日付>-trk<番号>`（**1.1.0 は trk208 の `trk-v2026.10.27-trk208` のまま**。アプリ本体が変わらない版では上げない。**trk210 を配るときは `trk-v2026.10.27-trk210`**）。`release-manifest.json` は `--version` から作られる。
-4. 本書 — ヘッダ・§2（版の説明）・§4 #42・§5（cache 名）・§6・§7・§9。
+3. `sw.js` の `CACHE` — `trk-v<日付>-trk<番号>`（**1.1.1 は trk210 の `trk-v2026.10.27-trk210`**。アプリ本体が変わらない版では上げない＝1.1.0 は trk208 のまま `trk-v2026.10.27-trk208` だった）。`release-manifest.json` は `--version` から作られる。
+4. 本書 — ヘッダ・§2（版の説明）・§4（新しい版の #）・§5（cache 名）・§6・§7・§9。
 
 **作り方**
 
 ```sh
 # 1. アプリ本体を用意する（直前の配布ZIPの trk-files/ を土台にする。ほかの差分を混ぜない）
-#    例：/home/user/work/build110/app に 1.0.9 のZIPの trk-files/ を展開し、
-#        変えたファイル（trk208 なら9ファイル＝js/shared-folders.js を含む）・README-1.1.0.md・
+#    例：/home/user/work/rel111/app に 1.1.0 のZIPの trk-files/ を展開し、
+#        変えたファイル（1.1.1 なら4ファイル＝js/library.js・js/study-room.js・
+#        js/study-room-utils.js・sw.js）・README-1.1.1.md・
 #        配布版ガイドの該当行だけを載せ替える
 # 2. かんたん起動の README はリポジトリの release/README.txt（版と README-1.x.y.md の名前を直す）
 # 3. 組み立て＋検査＋ZIP（出力は dist/ で Git 管理外）
 #    --date は前の版の built_at より新しくする（--newer-than で機械的に確かめる）
-npm run release -- --app=/home/user/work/build110/app --version=1.1.0 \
-  --out=/home/user/work/build110/dist --zip \
-  --date=2026-10-27T18:00:00Z --newer-than=2026-10-27T15:00:00Z
+npm run release -- --app=/home/user/work/rel111/app --version=1.1.1 \
+  --out=/home/user/work/rel111/dist --zip \
+  --date=2026-10-27T19:00:00Z --newer-than=2026-10-27T18:00:00Z
 # 4. 形だけを検査（手で組み上げたときも同じ検査）
-node tools/prepare-release.mjs --check=/home/user/work/build110/dist/trk-1.1.0
+node tools/prepare-release.mjs --check=/home/user/work/rel111/dist/trk-1.1.1
 # 5. 破損・ハッシュ（Drive の SHA256SUMS 用）
-unzip -t /home/user/work/build110/dist/trk-1.1.0.zip && sha256sum /home/user/work/build110/dist/trk-1.1.0.zip
+unzip -t /home/user/work/rel111/dist/trk-1.1.1.zip && sha256sum /home/user/work/rel111/dist/trk-1.1.1.zip
 ```
 
 - 組み立ては **`js/zip-io.js` の `zipWrite` をそのまま使う**（新しいZIP実装を増やさない）。全エントリ同じ mtime（`--date`）で、並びは名前順＝決定的。
 - **🕒 時刻は前の版より新しくする（必須・trk205）**：`--date` を省くと**組み立てた時刻（分まで）**になる。同じ時刻のZIPを配ると、同じポートの `python -m http.server` が `If-Modified-Since` に **304** を返し、ブラウザーは HTTP キャッシュにある**前の版の `index.html`（入口ではなく旧アプリ）**を使い続ける（`/js/…` が無いので一覧が空の壊れた画面になり、入口の Service Worker 解除も走らない。`file://` と別ポートは影響なし）。1.0.7 と 1.0.8 がどちらも `2026-10-27 12:00` で組まれていたため実際に起きた（2026-10-27 レビュー・必須）。`--newer-than=<前の版の built_at>` を渡すと、それ以前の時刻では組み立てを止める。`release-manifest.json` の **`built_at`** が次の版の基準になる。
 - `.gitignore` に `dist/` を入れてある（ZIPは Git に入れない）。
+- **1.1.1 の実績**：**226エントリ・3,898,214 bytes・`unzip -t` 破損なし**・全エントリ **`2026-10-27 19:00`（UTC）**（1.1.0 の `18:00` より新しい）。`sha256 1a6f8a800886aa1da9436c8d046e3ed390a3e0a5018c12d57f17f71a0514ef43`（完全な値は Drive の `SHA256SUMS-1.1.1.txt` を正とする）。素材＝`/home/user/work/rel111/app`（**1.1.0 のZIPの `trk-files/` を土台**に、trk210 の4ファイルと `README-1.1.1.md`・`README.md`・`README-SLIM.md` だけを載せ替え＝ほかの差分は混ぜていない）。
 - **1.1.0 の実績**：**226ファイル・3,895,300 bytes・`unzip -t` 破損なし**・全エントリ **`2026-10-27 18:00`（UTC）**（1.0.9 の `15:00` より新しい）。`sha256 0bf813eec5137ad14cea6dd36f4f807ad84b8d447e96206c4dd8356b12693eec`（完全な値は Drive の `SHA256SUMS-1.1.0.txt` を正とする）。素材＝`/home/user/work/build110/app`（1.0.9 のZIPの `trk-files/` に trk208 の9ファイル＋README＋配布版ガイドの追記）と `release/README.txt`。
 - **Drive（古い版）**：`trk-1.0.8`（`1vSUJ_acZ3QR7ekIVOTG13KvqmHS8DtvD`）／`trk-1.0.9`（`1sOqj7fcMPNlCcSV77YCklSCEkt7jqmaM`）、親は `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu`。**中身を直したら同じ名前で差し替え、SHA256SUMS も取り直す**（1.0.7 の原本は `old-1.0.7-original`、1.0.8 の同時刻版は `old-1.0.8-same-mtime（配らないでください）` へ退避）。
 - **Drive（1.0.9）**：`trk-1.0.9.zip`（`1nE51uWzl6W53nWlTH1U5jEvDnHP9y-eo`・3,878,131 bytes・`sha256 39153c95…83fb6`・`built_at 2026-10-27T15:00:00Z`）と `SHA256SUMS-1.0.9.txt`（`1-Y65YPg1-WMu1EGCRqYxHhCQlUkkfYeZ`）。落とし直してバイト一致・`sha256sum -c` OK・`unzip -t` 破損なしを確認済み。

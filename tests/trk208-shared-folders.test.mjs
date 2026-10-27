@@ -200,7 +200,7 @@ function registryWith({ stored = null, legacy = null, folders = [], permissions 
     renderSharedFolderList: () => {},
   });
   vm.runInContext("let sharedFolders = __folders;\nlet libShared2 = false;", context);
-  const names = ["sharedFolderLabel", "sharedFolderNames", "loadSharedFolders", "saveSharedFolders", "readSharedFolders", "foldersNeedingPermission"];
+  const names = ["sharedFolderLabel", "sharedFolderNames", "sharedPendingNameFrom", "loadSharedFolders", "saveSharedFolders", "readSharedFolders", "foldersNeedingPermission"];
   for (const name of names) {
     const re = name.startsWith("sharedFolder") && !name.startsWith("sharedFolderNames")
       ? /function sharedFolderLabel\(f, index\) \{[\s\S]*?\n\}/

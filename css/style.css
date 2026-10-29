@@ -1350,6 +1350,8 @@ body.plDragging .libTab[data-pl]{outline:1px dashed var(--ui-border);outline-off
 .plTrkList{display:flex;flex-direction:column;gap:6px}
 .plTrkRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .plTrkRow>span{flex:1;min-width:120px}
+/* 🐔 trk218：曲画面の一覧に出していない（🗑 で隠した）リストの 👁 は控えめに */
+.plTrkRow .plTrkHidden{opacity:.6}
 .plTrkGroup{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .plTrkTitle{background:none;border:0;padding:0;font:inherit;font-weight:700;color:inherit;cursor:pointer;text-align:left}
 .plTrkTitle:hover{text-decoration:underline}

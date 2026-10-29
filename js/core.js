@@ -346,6 +346,8 @@ const settings = {
   trkPlaylist: prefs.trkPlaylist !== false,                               // 🐔 trk's playlist（右端のタブ。チュートリアル後に自動追加。設定で非表示可）
   trkClassic: prefs.trkClassic !== false,                                // 🎻 trk classic（クラシック名盤。ゲームとは別枠で100曲。設定で非表示可）
   trkRemoved: cleanTrkRemoved(prefs.trkRemoved),                         // 🗑 消した trk の自動リスト（次の起動で作り直さない。🐔の設定の ♻ で戻す）
+  trkListed: cleanTrkRemoved(prefs.trkListed),                           // 👁 曲画面の「プレイリストに入れる」に出す trk のリスト（初期は空＝出さない。trk218）
+  trkFixedNotice: prefs.trkFixedNotice === 1 ? 1 : 0,                    // 📢 固定の案内を一度だけ出した印（trk218・削除予定 2027-02-28）
   /* 🎓 trk's OST Vol.1（music-library へ分離。trk185〜189）。
      settings は prefs 全体を自動コピーしないので、読み戻す字段はここで明示する。
      trkOstSeenKeys は保存するだけで起動時に読み戻していなかったため、利用者が外した
@@ -626,6 +628,8 @@ function resetAllPrefs() {
   settings.trkPlaylist = true; // 🐔 trk's playlistも初期状態に戻す（再表示）
   settings.trkClassic = true;  // 🎻 trk classic も初期状態に戻す
   settings.trkRemoved = [];    // 🗑 消したリストの印も外す（プレイリストごと初期化するため）
+  settings.trkListed = [];     // 👁 曲画面の一覧に出す trk のリストも初期状態（出さない）へ
+  settings.trkFixedNotice = 0; // 📢 固定の案内もやり直す
   settings.trkSortABC = false; settings.playlistOrder = []; settings.trkTabName = "full"; settings.chartGen = "4"; settings.chartGenChosen = false; settings.mediaKeepLimit = "1g";
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
@@ -1433,6 +1437,8 @@ function renderStoragePersist(state) {
         if (hasImported("tvParamFavs")) { settings.tvParamFavs = cleanTvParamFavorites(data.tvParamFavs); applied.push("tvParamFavs"); }
         /* 🗑 trk の消した印は、要素（trk- で始まるID）まで検証してから代入する */
         if (hasImported("trkRemoved") && Array.isArray(data.trkRemoved)) { settings.trkRemoved = cleanTrkRemoved(data.trkRemoved); applied.push("trkRemoved"); }
+        /* 👁 trk218：曲画面の一覧に出す trk のリストも、ID を検証してから代入する */
+        if (hasImported("trkListed") && Array.isArray(data.trkListed)) { settings.trkListed = cleanTrkRemoved(data.trkListed); applied.push("trkListed"); }
         const importedTvDockSkin = hasImported("tvDockSkin") && typeof data.tvDockSkin === "string" && window.TrkTV && typeof window.TrkTV.skins === "function" &&
           window.TrkTV.skins().some(item => item && item.id === data.tvDockSkin) ? data.tvDockSkin : "";
         if (importedTvDockSkin) { settings.tvDockSkin = importedTvDockSkin; applied.push("tvDockSkin"); }
@@ -1456,7 +1462,7 @@ function renderStoragePersist(state) {
         // 既知キーだけを取り込み、型と列挙IDは代入前に検証する。
         // ⚠ 弾いたキーは黙って捨てない（「読み込みました」なのに反映されない事故を防ぐ）。最後にまとめて報告する。
         for (const k of Object.keys(data)) {
-          if (UNSAFE_KEYS.has(k) || ["notes", "videoStyle", "tvDockSkin", "bgDim", "bgBlur", "tvParamFavs", "trkRemoved", "musicVolume", "musicVolumeRestore"].includes(k) || applied.includes(k)) continue;
+          if (UNSAFE_KEYS.has(k) || ["notes", "videoStyle", "tvDockSkin", "bgDim", "bgBlur", "tvParamFavs", "trkRemoved", "trkListed", "trkFixedNotice", "musicVolume", "musicVolumeRestore"].includes(k) || applied.includes(k)) continue;
           if (!Object.prototype.hasOwnProperty.call(settings, k)) { reject(k, "unknown"); continue; }
           const current = settings[k], incoming = data[k];
           const sameShape = Array.isArray(current) ? Array.isArray(incoming)

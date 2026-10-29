@@ -969,6 +969,13 @@ Object.assign(TEXT.ja, {
   trkPickHint:"選んだリストだけを追加します。消したリストもここから戻せます。カタログの曲は音源を含みません。",
   trkPickLabel:"プレイリストを選択", trkPickAdd:"選んだリストを追加", trkPickAdded:"追加済み",
   trkPickOk:"追加しました", trkPickFail:"追加できません。プレイリストまたはフォルダーの上限を確認してください。", trkPickOriginals:"trk オリジナル",
+  trkListShow:"👁 曲画面の一覧に出す", trkListHide:"🗑 曲画面の一覧から隠す",
+  trkListShown:"👁 {name} を曲画面の一覧に出しました", trkListHidden:"🗑 {name} を曲画面の一覧から隠しました",
+  trkListNote:"🗑 は曲画面の「プレイリストに入れる」から隠すだけです（リストは消えません）。📋 は中身をそのままに、編集できるコピーを作ります。",
+  trkCopyBtn:"📋 編集できるコピーを作る", trkCopyDone:"📋 編集できるコピーを作りました：{name}",
+  trkCopyFail:"プレイリストは{n}本までです。使っていないものを消すと作れます", trkCopySuffix:"（コピー）",
+  plInListsHidden:"🐔 trk が追加したリスト（{n}件）は、⚙ 設定 → 🐔 trk's playlist の 👁 でこの一覧に出せます。",
+  trkFixedNotice:"🐔 trk のリストは、曲画面の「プレイリストに入れる」に出さなくなりました。編集したいときは ⚙ → 🐔 trk's playlist の 📋 でコピーを作れます。",
   trkCatalogBtn:"🐔 trk's playlist", trkCatalogTitle:"🐔 trk's playlist（非営利の紹介プレイリスト）",
   trkCatalogHint:"最初の10曲はSAM Free Music — 100% Orange Juice! で出会える曲です。東方・ブルアカ・アークナイツも収録！音源は同梱しません。（著作権は放棄されていません）",
   trkTab:"🐔 trk's playlist",
@@ -1023,6 +1030,13 @@ Object.assign(TEXT.en, {
   trkPickHint:"Add only the playlists you choose. Deleted lists can be re-added here. Catalog lists do not include audio files.",
   trkPickLabel:"Choose a playlist", trkPickAdd:"Add selected playlist", trkPickAdded:"Added",
   trkPickOk:"Playlist added", trkPickFail:"Could not add it. Check the playlist and folder limits.", trkPickOriginals:"trk originals",
+  trkListShow:"👁 Show in the song list", trkListHide:"🗑 Hide from the song list",
+  trkListShown:"👁 {name} is shown in the song list", trkListHidden:"🗑 {name} is hidden from the song list",
+  trkListNote:"🗑 only hides the list from “Add to playlists” in the song screen (nothing is deleted). 📋 makes an editable copy with the same songs.",
+  trkCopyBtn:"📋 Make an editable copy", trkCopyDone:"📋 Made an editable copy: {name}",
+  trkCopyFail:"Up to {n} playlists. Delete one you no longer use to make room", trkCopySuffix:" (copy)",
+  plInListsHidden:"{n} list(s) added by trk are hidden here. Show them from ⚙ Settings → 🐔 trk's playlist with 👁.",
+  trkFixedNotice:"🐔 trk lists no longer appear under “Add to playlists”. To edit one, open ⚙ → 🐔 trk's playlist and press 📋 for an editable copy.",
   trkCatalogBtn:"🐔 trk's playlist", trkCatalogTitle:"🐔 trk's playlist (non-commercial intro)",
   trkCatalogHint:"First 10 are SAM Free Music — tracks from 100% Orange Juice! Touhou, Blue Archive, Arknights and more inside! No audio bundled. (Copyright not waived.)",
   trkTab:"🐔 trk's playlist",
@@ -1077,6 +1091,13 @@ Object.assign(TEXT.zh, {
   trkPickHint:"只添加选中的歌单。已删除的歌单也可在此重新添加。目录不包含音频文件。",
   trkPickLabel:"选择歌单", trkPickAdd:"添加所选歌单", trkPickAdded:"已添加",
   trkPickOk:"已添加歌单", trkPickFail:"无法添加。请检查歌单或文件夹数量上限。", trkPickOriginals:"trk 原创",
+  trkListShow:"👁 在歌曲画面中显示", trkListHide:"🗑 从歌曲画面中隐藏",
+  trkListShown:"👁 已在歌曲画面中显示 {name}", trkListHidden:"🗑 已从歌曲画面中隐藏 {name}",
+  trkListNote:"🗑 只是把歌单从歌曲画面的「加入播放列表」中隐藏（不会删除歌单）。📋 会保留内容，创建一个可编辑的副本。",
+  trkCopyBtn:"📋 创建可编辑的副本", trkCopyDone:"📋 已创建可编辑的副本：{name}",
+  trkCopyFail:"最多 {n} 个歌单。删除不用的歌单后即可创建", trkCopySuffix:"（副本）",
+  plInListsHidden:"trk 添加的 {n} 个歌单在此不显示。可在 ⚙ 设置 → 🐔 trk's playlist 中用 👁 显示。",
+  trkFixedNotice:"🐔 trk 的歌单已不再显示在歌曲画面的「加入播放列表」中。想编辑时，请在 ⚙ → 🐔 trk's playlist 按 📋 创建副本。",
   trkCatalogBtn:"🐔 trk's playlist", trkCatalogTitle:"🐔 trk's playlist（非营利介绍）",
   trkCatalogHint:"前10首是SAM Free Music — 在100% Orange Juice! 中相遇的曲目。东方、碧蓝档案、明日方舟也有收录！不含音源。（版权未放弃）",
   trkTab:"🐔 trk's playlist",
@@ -1131,6 +1152,13 @@ Object.assign(TEXT.ko, {
   trkPickHint:"선택한 재생목록만 추가합니다. 삭제한 목록도 여기에서 다시 추가할 수 있습니다. 카탈로그에는 음원 파일이 없습니다.",
   trkPickLabel:"재생목록 선택", trkPickAdd:"선택한 목록 추가", trkPickAdded:"추가됨",
   trkPickOk:"재생목록을 추가했습니다", trkPickFail:"추가할 수 없습니다. 재생목록과 폴더의 한도를 확인하세요.", trkPickOriginals:"trk 오리지널",
+  trkListShow:"👁 곡 화면 목록에 표시", trkListHide:"🗑 곡 화면 목록에서 숨기기",
+  trkListShown:"👁 {name}을(를) 곡 화면 목록에 표시했어요", trkListHidden:"🗑 {name}을(를) 곡 화면 목록에서 숨겼어요",
+  trkListNote:"🗑은 곡 화면의 「재생목록에 넣기」에서 숨기기만 해요(목록은 지워지지 않아요). 📋은 내용을 그대로 둔 채 편집할 수 있는 복사본을 만들어요.",
+  trkCopyBtn:"📋 편집할 수 있는 복사본 만들기", trkCopyDone:"📋 편집할 수 있는 복사본을 만들었어요: {name}",
+  trkCopyFail:"재생목록은 {n}개까지예요. 쓰지 않는 것을 지우면 만들 수 있어요", trkCopySuffix:" (복사)",
+  plInListsHidden:"trk가 추가한 목록 {n}개는 여기에 표시하지 않아요. ⚙ 설정 → 🐔 trk's playlist의 👁로 표시할 수 있어요.",
+  trkFixedNotice:"🐔 trk 목록은 곡 화면의 「재생목록에 넣기」에 나오지 않아요. 편집하려면 ⚙ → 🐔 trk's playlist에서 📋로 복사본을 만드세요.",
   trkCatalogBtn:"🐔 trk's playlist", trkCatalogTitle:"🐔 trk's playlist(비영리 소개 플레이리스트)",
   trkCatalogHint:"처음 10곡은 SAM Free Music — 100% Orange Juice! 에서 만난 곡들이에요. 동방·블루 아카이브·명일방주도 들어 있어요! 음원은 들어 있지 않아요. (저작권 포기 아님)",
   trkTab:"🐔 trk's playlist",
@@ -2646,6 +2674,7 @@ function plDelete(p, onClose) {
   if (p.locked) { plToast(tr("plLockedNo")); return; }
   core.settings.playlists = core.settings.playlists.filter(x => x !== p);
   trkMarkRemoved(p.id);
+  if (Array.isArray(core.settings.trkListed)) core.settings.trkListed = core.settings.trkListed.filter(id => id !== p.id);   /* 👁 の記録も消す */
   core.settings.libOpenTabs = (Array.isArray(core.settings.libOpenTabs) ? core.settings.libOpenTabs : []).filter(x => x !== p.id);
   if (core.settings.libTab === "pl:" + p.id) core.settings.libTab = "all";
   core.saveUserPrefs();
@@ -2902,9 +2931,13 @@ function songProfile(it) {
   const matchMemoRow = plRow(tr("plMatchMemo"), matchMemo);
   const matchMemoHelp = el("div", "plHint", tr("plMatchMemoNote")); matchMemoHelp.id = "plMatchMemoHelp";
   d.card.append(matchMemoRow, matchMemoHelp);
-  if (core.settings.playlists.length) {
+  /* 🐔 trk218：trk が追加した（配布の）リストは、初期状態ではここに出さない（並ぶと圧迫するため）。
+     出すかどうかは ⚙ → 🐔 trk's playlist の 👁 で選ぶ。利用者のリストはいつも出す。 */
+  const shownLists = core.settings.playlists.filter(trkListShown);
+  const hiddenLists = core.settings.playlists.length - shownLists.length;
+  if (shownLists.length || hiddenLists) {
     d.card.append(el("div", "plSep"), el("b", "plCardTitle", tr("plInLists")));
-    for (const p of core.settings.playlists) {
+    for (const p of shownLists) {
       const c = el("input"); c.type = "checkbox"; c.checked = p.songs.includes(it.key); c.disabled = !!p.frozen;
       c.addEventListener("change", () => {
         const n = p.songs.length;
@@ -2916,6 +2949,7 @@ function songProfile(it) {
       if (p.frozen) r.classList.add("plRowDim");
       d.card.append(r);
     }
+    if (hiddenLists) d.card.append(el("div", "plHint", tr("plInListsHidden", { n: hiddenLists })));
   }
   const save = el("button", "plBtn", tr("plProfileSave")); save.type = "button";
   save.addEventListener("click", () => {
@@ -5412,6 +5446,46 @@ function syncTrkUI() {
 function trkFolderIdSet() { return plWishFolderIds(TRK_FOLDER_ID); }
 /* 🐔 の中のリスト（trk が作ったもの、または 🐔 のフォルダ内にあるもの）か */
 function plIsTrkManaged(p) { return TRK_AUTO_ID.test(p.id) || trkFolderIdSet().has(p.folder); }   /* 🐔 の階層に入るフォルダ（trk 自身と、その子孫） */
+/* 🐔 trk218：trk が作った（配布の）リストか。ID が trk- で始まるものだけ。
+   利用者が 📋 で作ったコピーは pl… なので、🐔 の中にあっても利用者のリストとして扱う */
+function trkIsFixedList(p) { return !!p && TRK_AUTO_ID.test(p.id); }
+/* 👁 曲画面の「プレイリストに入れる」に出すか。trk のリストは初期状態では出さない（並ぶと圧迫するため） */
+function trkListShown(p) {
+  if (!trkIsFixedList(p)) return true;
+  return Array.isArray(core.settings.trkListed) && core.settings.trkListed.includes(p.id);
+}
+/* 🗑／👁 を切り替える（リストそのものは消さない） */
+function trkListSetShown(p, on) {
+  if (!p) return;
+  const ids = new Set(Array.isArray(core.settings.trkListed) ? core.settings.trkListed : []);
+  if (on) ids.add(p.id); else ids.delete(p.id);
+  core.settings.trkListed = [...ids].slice(-200);
+  core.saveUserPrefs();
+}
+/* 📋 編集できるコピー＝通常のプレイリスト（中クリックで消せる・名前や色も変えられる）。
+   カタログとの紐づけ（cat）は付けないので、起動時の更新で中身を上書きされない。 */
+function trkCopyAsUser(p) {
+  if (!p || core.settings.playlists.length >= TRK_LIST_MAX) return null;
+  const suffix = tr("trkCopySuffix");
+  const base = String(p.name || "").slice(0, Math.max(1, 24 - suffix.length));
+  const copy = plSanitize({ id: "pl" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    name: base + suffix, icon: p.icon, color: p.color, frozen: false, locked: false,
+    songs: (p.songs || []).slice(), wish: (p.wish || []).slice(), guide: p.guide || null,
+    folder: p.folder || "", tags: (p.tags || []).slice(), cat: "", createdAt: Date.now() });
+  if (!copy) return null;
+  core.settings.playlists.push(copy);
+  core.saveUserPrefs();
+  return copy;
+}
+/* 📢 固定の案内（アップデート後に一度だけ）。trk のリストがある人にだけ出す */
+function trkFixedNoticeOnce() {
+  if (core.settings.trkFixedNotice === 1) return false;
+  if (!core.settings.playlists.some(trkIsFixedList)) return false;
+  core.settings.trkFixedNotice = 1;
+  core.saveUserPrefs();
+  try { plToast(tr("trkFixedNotice")); } catch (_) {}
+  return true;
+}
 function renderTrkSettings() {
   const box = core.$("trkOrderList");
   if (!box) return;
@@ -5430,9 +5504,34 @@ function renderTrkSettings() {
     trkMoveButtonsState(up, down, i, ordered.length);
     up.addEventListener("click", () => trkMovePlaylist(p.id, -1, peers));
     down.addEventListener("click", () => trkMovePlaylist(p.id, 1, peers));
+    /* 🗑 曲画面の「プレイリストに入れる」から隠す／👁 また出す。trk のリストは初期状態では隠れている（trk218）。
+       📋 で作ったコピー（pl…）は利用者のリストなので、この2つは出さない（元から一覧に出る・そのまま編集できる） */
+    const listed = trkListShown(p);
+    const eye = el("button", "plBtn small", listed ? "\uD83D\uDDD1" : "\uD83D\uDC41");
+    eye.type = "button";
+    eye.title = listed ? tr("trkListHide") : tr("trkListShow");
+    eye.setAttribute("aria-label", (listed ? tr("trkListHide") : tr("trkListShow")) + " " + p.name);
+    eye.setAttribute("aria-pressed", listed ? "true" : "false");
+    if (!listed) eye.classList.add("plTrkHidden");
+    eye.addEventListener("click", () => {
+      trkListSetShown(p, !listed);
+      plToast(listed ? tr("trkListHidden", { name: p.name }) : tr("trkListShown", { name: p.name }));
+      renderTrkSettings();
+    });
+    /* 📋 編集できるコピー（通常のプレイリスト）を作る。元のリストはそのまま */
+    const copyBtn = el("button", "plBtn small", "\uD83D\uDCCB");
+    copyBtn.type = "button"; copyBtn.title = tr("trkCopyBtn"); copyBtn.setAttribute("aria-label", tr("trkCopyBtn") + " " + p.name);
+    copyBtn.addEventListener("click", () => {
+      const copy = trkCopyAsUser(p);
+      if (!copy) { plToast(tr("trkCopyFail", { n: TRK_LIST_MAX })); return; }
+      plToast(tr("trkCopyDone", { name: copy.name }));
+      renderTrkSettings(); renderLib();
+    });
     row.append(name, open, up, down);
+    if (trkIsFixedList(p)) row.append(eye, copyBtn);
     box.append(row);
   }
+  box.append(el("div", "hint", tr("trkListNote")));
   if (core.settings.trkSortABC) box.append(el("div", "hint", tr("trkOrderAbcOff")));
 }
 
@@ -5851,6 +5950,8 @@ async function initLibrary() {
   if (core.settings.libTab === "builtin") core.settings.libTab = plById(TRK_OST_ID) ? "pl:" + TRK_OST_ID : "all";
   syncTrkUI();
   renderLib();
+  /* 📢 trk218：trk のリストが「曲画面の一覧に出ない」既定へ変わったことを、一度だけ伝える */
+  try { trkFixedNoticeOnce(); } catch(_){}
   void initOptionalTutorialDemo();
   void initTrkOstSongs();
   void initAgentOstTracks();

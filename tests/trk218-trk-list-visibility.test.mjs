@@ -192,6 +192,9 @@ describe("trk218 配線", () => {
 
   test("Service Worker の cache を上げている", () => {
     const sw = fs.readFileSync(`${ROOT}/sw.js`, "utf8");
-    assert.match(sw, /^const CACHE = "trk-v2026\.10\.29-trk218";$/m);
+    /* 後の版で番号が進むので「trk218 以降」で見る（名前そのものは後の版が持つ） */
+    const m = sw.match(/^const CACHE = "trk-v([\d.]+)-trk(\d+)";$/m);
+    assert.ok(m, "版数つきの名前");
+    assert.ok(Number(m[2]) >= 218, `trk218 以降の番号で割る（今は ${m[2]}）`);
   });
 });

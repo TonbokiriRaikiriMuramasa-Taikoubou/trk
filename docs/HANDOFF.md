@@ -91,7 +91,7 @@
 - **入れなかったもの**（APK 専用）：`core.audioSafety`・`keepInBackground`・`TrkApkPip`・下部ナビ・Back の段階処理・向きの10秒長押しなど。カタログの音源を同梱しない方針も従来どおり。
 - **未確認**：実ブラウザでのピッカーの操作感（サンドボックスにブラウザーが無い）。
 
-### 🔈 出力デバイスを切り替えても、再生を止めない（trk219）
+### 🔈 出力デバイスを切り替えても、再生を止めない（trk219・1.1.8 で配布）
 
 Windows の「サウンド」などで**音の出力先（スピーカー／ヘッドホン／HDMI など）を切り替えると、再生が止まったまま戻らない**という実機の指摘への対応。ブラウザーが音の出口を作り直すときに、`<video>`（全曲・動画・プレビューで使う**唯一の再生要素**）が勝手に一時停止したり、Web Audio の出口が黙ることがあるため、**「利用者が止めたのではない停止」を見つけて続きから鳴らし直す**。
 
@@ -402,6 +402,7 @@ Windows の「サウンド」などで**音の出力先（スピーカー／ヘ�
 | 57 | trk218：🐔 trk のリストを曲画面に出さない（👁／🗑／📋） | `tests/trk218-trk-list-visibility.test.mjs` の14件＋`npm run check` 729 pass で確認済み（1.1.7 の配布ZIPに同梱）（初期は出さない・`trkListed` の検証・リストは消えない・📋 の `cat:""` と24文字・上限200本・案内は1回だけ）。**実ブラウザでの 👁／🗑／📋 の操作感は未確認** |
 | 58 | 1.1.7 の配布ZIP（trk218 入り・2026-10-29） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻（`2026-10-29 13:00` UTC）・`--check`・ローカル配信は確認済み（§6）。**実ブラウザで 👁／🗑／📋 を触っての確認は未了**（§4-57） |
 | 59 | trk219：🔈 出力デバイスの切り替えで再生を止めない | `tests/trk219-audio-output-keep.test.mjs` の17件＋`npm run check` 746 pass で確認済み（偽の再生要素・時計・AudioContext で実動）。**実機で出力デバイスを切り替えての確認は未了**（§4-59 の手順で確認する） |
+| 60 | 1.1.8 の配布ZIP（trk219 入り・2026-10-29） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻（`2026-10-29 14:00` UTC）・`--check`・ローカル配信・差分を当てて完全一致は確認済み（§6）。**実機で出力デバイスを切り替えての確認は未了**（§4-59） |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -526,6 +527,19 @@ Windows の「サウンド」などで**音の出力先（スピーカー／ヘ�
 | Web Audio の出口（VM） | **OK** | `AudioContext.state` が `suspended` なら `resume()`。`devicechange` では `TrkFX.wake(true)`（出口のつなぎ直し）を呼ぶ |
 | 実機で出力デバイスを切り替える | **未確認** | サンドボックスに音声デバイスもブラウザーも無い。§4-59 の手順（曲を再生 → Windows の「サウンド」で出力先を変える → 止まらず続くこと、⏯ で止めたときは止まったままなこと）で確認する |
 
+**1.1.8 の配布ZIP（2026-10-29）の確認**
+
+| 検査 | 結果 | 範囲・注意 |
+|---|---|---|
+| `npm run check` | **747 pass / 0 fail** | Static・Security・a11y・lite も緑。`git diff --check` OK |
+| 土台 | **1.1.7 の配布ZIP（Drive `trk-1.1.7`）** | `sha256 482a27ad…c184a` を確かめて展開した `trk-files/`（224ファイル）に、変わった**コード4ファイル**（`index.html`・`js/audio-keep.js`＝新規・`js/fx.js`・`sw.js`）と**配布版のガイド2本**（`docs/guide/sound.md`・`docs/guide/en.md`）だけを載せ替え＝ほかの差分は混ぜていない |
+| `tools/prepare-release.mjs` | **OK** | `--version=1.1.8 --date=2026-10-29T14:00:00Z --newer-than=2026-10-29T13:00:00Z`。`--check` で `index.html`・`README.txt`・`trk-files/` の形を確認（`checkDocLinks` の指摘なし） |
+| 配布ZIP（1.1.8） | **227エントリ・3,933,293 bytes・`unzip -t` 破損なし** | 全エントリ **`2026-10-29 14:00`（UTC）**（1.1.7 の `13:00` より新しい）。**`sha256 8075ce5bc3a15af65273455b5f29ed9be9657283ecf9b61dedda9d80274be9c2`** |
+| 1.1.7 のZIPとの差分 | **コード4ファイル＋配布版の文書6本** | `index.html`・`js/audio-keep.js`（新規）・`js/fx.js`・`sw.js`、`README-1.1.7.md`→`README-1.1.8.md`（改名＋追記）・`README.md`・`README-SLIM.md`・`docs/guide/sound.md`・`docs/guide/en.md`・ルートの `README.txt`（＋`release-manifest.json`） |
+| 差分の当てやすさ | **OK** | 1.1.7 の展開物（README を `README-1.1.8.md` に改名）へコード／文書の2本を当てると、**配布物と完全一致**（`diff -rq`） |
+| ローカルサーバーで配信 | **OK** | `/`・`trk-1.1.8/`・`trk-1.1.8/index.html`・`trk-1.1.8/trk-files/{index.html,js/audio-keep.js,js/fx.js,sw.js,README-1.1.8.md,release-manifest.json}`・`README.txt` がすべて 200 |
+| 実機で出力デバイスを切り替える | **未確認** | サンドボックスに音声デバイスもブラウザーも無い。§4-59 の手順で確認する |
+
 **1.1.7 の配布ZIP（2026-10-29）の確認**
 
 | 検査 | 結果 | 範囲・注意 |
@@ -647,6 +661,9 @@ Windows の「サウンド」などで**音の出力先（スピーカー／ヘ�
 
 ## 7. 最近の変更
 
+- **📦 1.1.8：trk219 を配る版（2026-10-29）**：**アプリ本体は trk219**（出力デバイスを切り替えても再生を止めない）。1.1.7 の配布ZIPの `trk-files/` を土台に、**コード4ファイル**（`index.html`・`js/audio-keep.js`＝新規・`js/fx.js`・`sw.js`）と**配布版のガイド2本**（`docs/guide/sound.md`・`docs/guide/en.md`）を差し替え、`README-1.1.7.md` を `README-1.1.8.md` に改名して今回の内容を追記、`README.md`・`README-SLIM.md`・`release/README.txt` を 1.1.8 に（`README-SLIM.md` のファイル数も 225 に）。
+  - ZIP は **`2026-10-29 14:00`（UTC）** で組み立て＝**227エントリ・3,933,293 bytes**・`unzip -t` 破損なし・全エントリ同時刻・**`sha256 8075ce5bc3a15af65273455b5f29ed9be9657283ecf9b61dedda9d80274be9c2`**。`--check` OK・ローカル配信 200・差分は 1.1.7 に当てると配布物と完全一致。
+  - **1.1.0〜1.1.7 のZIPと Drive の `trk-1.1.0`〜`trk-1.1.7` はそのまま**（同じ名前で作り直さない）。
 - **🔈 trk219：出力デバイスを切り替えても再生を止めない（2026-10-29）**：実機で「Windows のサウンドで出力先を切り替えると止まる」との指摘への対応。**`js/audio-keep.js`（新規）**が `#video` の `play()`／`pause()` を包んで「アプリが頼んだ停止」を記録し、**頼まれていない `pause`**（出力デバイスの切り替えでブラウザーが止めた場合など）を見つけたら **250ms 後に続きから鳴らし直す**。`readyState >= 3` なのに `currentTime` が 2.6 秒進まない「詰まり」も `play()` のやり直しで解く。**画面が隠れているとき・終端では再開しない**、**60秒に6回まで**、**3回続けて失敗したら30秒休む**。`js/fx.js` に **`TrkFX.context()`／`TrkFX.wake(force)`**（`wakeAudioHard`）を足し、`AudioContext` の `resume()` と、デバイスの切り替え時の**出口（`G.out`）のつなぎ直し**を行う。`mediaDevices` の `devicechange` と `AudioContext` の `statechange` も見る。設定は増やしていない。文言（`docs/guide/sound.md`・`docs/guide/en.md`）に1節ずつ、`sw.js` の cache は **`trk-v2026.10.29-trk219`**、`tests/trk219-audio-output-keep.test.mjs`（17件）で **746 pass**。**実機での確認は未了**（§4-59）。
 - **📦 1.1.7：trk218 を配る版（2026-10-29）**：**アプリ本体は trk218**（🐔 trk のリストを曲画面に出さない・👁／🗑／📋）。1.1.6 の配布ZIPの `trk-files/` を土台に、**コード4ファイル**（`css/style.css`・`js/core.js`・`js/library.js`・`sw.js`）を差し替え、`README-1.1.6.md` を `README-1.1.7.md` に改名して今回の内容を追記、`README.md`・`README-SLIM.md`・`release/README.txt` を 1.1.7 に（`release-manifest.json` は `--version` から作られる）。
   - ZIP は **`2026-10-29 13:00`（UTC）** で組み立て＝**226エントリ・3,926,426 bytes**・`unzip -t` 破損なし・全エントリ同時刻・**`sha256 482a27adb35eda2f63abca08c2684e583460b441c0ac7a31658d7e35380c184a`**。`--check` OK・ローカル配信 200・差分は 1.1.6 に `patch -p1 --dry-run` で通る。
@@ -715,16 +732,16 @@ Windows の「サウンド」などで**音の出力先（スピーカー／ヘ�
 - [ ] 版を上げたときは §9 の「版を上げるときに直す場所」を全部直し、`release/README.txt`・配布アプリの `README-1.x.y.md`・`sw.js` の `CACHE`・`release-manifest.json` の `version` がそろっていることを確かめた。
 - [ ] Drive へ上げたら、**落とし直してバイト一致**を確かめ、`SHA256SUMS` を新しいハッシュで上書きした（§9）。
 
-## 9. 配布物の形（1.0.8〜／現在 **1.1.7**：`index.html`＋`README.txt`＋`trk-files/`）
+## 9. 配布物の形（1.0.8〜／現在 **1.1.8**：`index.html`＋`README.txt`＋`trk-files/`）
 
-**決めたこと（2026-10-26／1.0.8〜1.1.7）**：ZIPを開いたときに **`index.html`・`README.txt`・`trk-files/` の3つだけ**が見える形にする（1.0.6 のころの試作 `trk-1.0.6-layout-proto.zip` と同じ見た目。利用者からの指定）。**OS別のZIPは作らない**——Windows・macOS・Linux は同じアプリ本体で動くので、1本で足りる（1.0.7 までの win/linux・mac の2本は廃止）。
+**決めたこと（2026-10-26／1.0.8〜1.1.8）**：ZIPを開いたときに **`index.html`・`README.txt`・`trk-files/` の3つだけ**が見える形にする（1.0.6 のころの試作 `trk-1.0.6-layout-proto.zip` と同じ見た目。利用者からの指定）。**OS別のZIPは作らない**——Windows・macOS・Linux は同じアプリ本体で動くので、1本で足りる（1.0.7 までの win/linux・mac の2本は廃止）。
 
 ```
-trk-1.1.7.zip
-└ trk-1.1.7/
+trk-1.1.8.zip
+└ trk-1.1.8/
    ├ index.html   … 入口（meta refresh＋<a>＋location.replace で trk-files/index.html へ）
    ├ README.txt   … かんたん起動・index.html だけでできること・ローカルサーバーの使い方・注意・権利
-   └ trk-files/   … アプリ本体（リポジトリのルートと同じ中身。README-1.1.6.md・LICENSE・docs/ を含む）
+   └ trk-files/   … アプリ本体（リポジトリのルートと同じ中身。README-1.1.8.md・LICENSE・docs/ を含む）
 ```
 
 - **配布ZIPに入れないもの**：`.github/`・`tests/`・`tools/*.mjs`・開発用の `docs/HANDOFF.md`／`HANDOFF-ARCHIVE.md`／`MIGRATIONS.md` など（1.0.7 と同じ切り分け。アプリ本体の `docs/guide/`・`SECURITY.md`・`QUALITY-CHECKS.md` などは入る）。
@@ -733,13 +750,13 @@ trk-1.1.7.zip
 - **`http://127.0.0.1:8000/` で開いたとき**：入口がルート直下に残った **1.0.7 以前の worker だけ**を `unregister()` してから進む（`trk-files/sw.js` は残す）。アプリの worker のスコープは `/trk-files/` になる。
 - **保存データは「開き方」ごとに別**（`file://` と `http://127.0.0.1:8000/` は別のオリジン）。これは 1.0.6 試作の README.txt と同じ注意書きを残している。
 - **`00_START_HERE.html` と `01_README_WIN_LINUX.txt`／`01_README_MAC.txt` は廃止**。起動案内は `README.txt` に集約（`--check` がアプリ側に残っていると fail にする。`README-1.1.4.md` などアプリ自身の README は残す）。
-- **`release-manifest.json`**（`trk-files/` の中）に `version`・`archive:"trk-1.1.7.zip"`・`layout:"wrapper"`・`wrapper{launcher:"index.html", readme:"README.txt", app:"trk-files", platforms:["win","linux","mac"]}`・`service_worker_cache`（`sw.js` の `CACHE` を書き写す）・`built_at` を記録。`platform` は持たない。**このファイルは `--version` から作る（手で書かない）**。
+- **`release-manifest.json`**（`trk-files/` の中）に `version`・`archive:"trk-1.1.8.zip"`・`layout:"wrapper"`・`wrapper{launcher:"index.html", readme:"README.txt", app:"trk-files", platforms:["win","linux","mac"]}`・`service_worker_cache`（`sw.js` の `CACHE` を書き写す）・`built_at` を記録。`platform` は持たない。**このファイルは `--version` から作る（手で書かない）**。
 
-**版を上げるときに直す場所（1.1.7 で実施した順）**
+**版を上げるときに直す場所（1.1.8 で実施した順）**
 
 1. `release/README.txt` — 1行目の版と、末尾の `README-1.x.y.md` の参照（`tests/release-layout.test.mjs` が「版が書いてあること」「アプリ内READMEの名前」を見る）。
 2. 配布アプリの `README-1.x.y.md` — 前の版から改名し、先頭に「今回」の更新点を足して、前回の見出しを「前回」へ。`README.md` も同じ内容にする。`README-SLIM.md` の版・cache・archive 名・ファイル数も直す。
-3. `sw.js` の `CACHE` — `trk-v<日付>-trk<番号>`（**1.1.7 は trk218 の `trk-v2026.10.29-trk218`**、1.1.5 は trk216 の `trk-v2026.10.29-trk216`、1.1.4 は trk214 の `trk-v2026.10.27-trk214`、1.1.3 は trk213 の `trk-v2026.10.27-trk213`。アプリ本体が変わらない版では上げない＝1.1.0 は trk208、1.1.1 は trk210 のまま）。`release-manifest.json` は `--version` から作られる。
+3. `sw.js` の `CACHE` — `trk-v<日付>-trk<番号>`（**1.1.8 は trk219 の `trk-v2026.10.29-trk219`**、1.1.7 は trk218 の `trk-v2026.10.29-trk218`、1.1.5 は trk216 の `trk-v2026.10.29-trk216`、1.1.4 は trk214 の `trk-v2026.10.27-trk214`、1.1.3 は trk213 の `trk-v2026.10.27-trk213`。アプリ本体が変わらない版では上げない＝1.1.0 は trk208、1.1.1 は trk210 のまま）。`release-manifest.json` は `--version` から作られる。
 4. 本書 — ヘッダ・§2（版の説明）・§4（新しい版の #）・§5（cache 名）・§6・§7・§9。
 5. **配布版だけの文書** — 下の「配布版だけの文書（毎版そろえる）」を読む。`--check` がリンク切れ（`README-1.x.y.md` の名前違い）を止める。
 
@@ -777,6 +794,7 @@ unzip -t /home/user/work/rel114/dist/trk-1.1.4.zip && sha256sum /home/user/work/
 - 組み立ては **`js/zip-io.js` の `zipWrite` をそのまま使う**（新しいZIP実装を増やさない）。全エントリ同じ mtime（`--date`）で、並びは名前順＝決定的。
 - **🕒 時刻は前の版より新しくする（必須・trk205）**：`--date` を省くと**組み立てた時刻（分まで）**になる。同じ時刻のZIPを配ると、同じポートの `python -m http.server` が `If-Modified-Since` に **304** を返し、ブラウザーは HTTP キャッシュにある**前の版の `index.html`（入口ではなく旧アプリ）**を使い続ける（`/js/…` が無いので一覧が空の壊れた画面になり、入口の Service Worker 解除も走らない。`file://` と別ポートは影響なし）。1.0.7 と 1.0.8 がどちらも `2026-10-27 12:00` で組まれていたため実際に起きた（2026-10-27 レビュー・必須）。`--newer-than=<前の版の built_at>` を渡すと、それ以前の時刻では組み立てを止める。`release-manifest.json` の **`built_at`** が次の版の基準になる。
 - `.gitignore` に `dist/` を入れてある（ZIPは Git に入れない）。
+- **1.1.8 の実績**：**227エントリ・3,933,293 bytes**・`unzip -t` 破損なし・全エントリ **`2026-10-29 14:00`（UTC）**（1.1.7 の `13:00` より新しい）・`--check` OK・`sha256 8075ce5bc3a15af65273455b5f29ed9be9657283ecf9b61dedda9d80274be9c2`。**コード4ファイル**（`index.html`・`js/audio-keep.js`＝新規・`js/fx.js`・`sw.js`）＋配布版の文書6本（`README-1.1.7.md`→`README-1.1.8.md`・`README.md`・`README-SLIM.md`・`docs/guide/{sound,en}.md`・`README.txt`）。
 - **1.1.7 の実績**：**226エントリ・3,926,426 bytes**・`unzip -t` 破損なし・全エントリ **`2026-10-29 13:00`（UTC）**（1.1.6 の `12:00` より新しい）・`--check` OK・`sha256 482a27adb35eda2f63abca08c2684e583460b441c0ac7a31658d7e35380c184a`。**コード4ファイル**（`css/style.css`・`js/core.js`・`js/library.js`・`sw.js`）＋配布版の文書4本（`README-1.1.6.md`→`README-1.1.7.md`・`README.md`・`README-SLIM.md`・`README.txt`）。
 - **1.1.6 の実績**：**226エントリ・3,922,091 bytes・`unzip -t` 破損なし**・全エントリ **`2026-10-29 12:00`（UTC）**（1.1.5 の `10:00` より新しい）・`--check` OK（`checkDocLinks` 0件）・`sha256 7f856d9f4f9d1a507047fcfd223de966e904a711a1f87c2f66aeed87bc47f5f9`。**コード3ファイル**（`index.html`・`sw.js`・`js/library.js`）＋配布版の文書3本（`README-1.1.5.md`→`README-1.1.6.md`・`README.md`・`README-SLIM.md`）。
 - **1.1.5 の実績**：**226エントリ・3,916,257 bytes・`unzip -t` 破損なし**・全エントリ **`2026-10-29 10:00`（UTC）**（1.1.4 の `2026-10-27 22:00` より新しい）。`sha256 0b12ae8c35062910aa5c66e2c027c7a85670bd5204e5ee9abc6a2fbd4c8f8599`。1.1.4 のZIPの `trk-files/` を土台に、**コード11ファイル**（trk215＋trk216）＋`README-1.1.5.md`（改名）・`README.md`・`README-SLIM.md`・`docs/guide/files.md`。`checkDocLinks()` は **0件**。

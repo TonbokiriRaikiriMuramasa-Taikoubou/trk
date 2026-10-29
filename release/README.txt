@@ -1,4 +1,4 @@
-trk! 1.1.7 — 手持ちの曲で遊べるブラウザ音ゲー＆プレイヤー
+trk! 1.1.8 — 手持ちの曲で遊べるブラウザ音ゲー＆プレイヤー
 制作：trk（TRMTKB） ／ 非営利・無料 ／ Windows・macOS・Linux 共通（ZIPは1つ）
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -9,10 +9,9 @@ trk! 1.1.7 — 手持ちの曲で遊べるブラウザ音ゲー＆プレイヤ�
 
 インストールもアカウントも不要です。曲・動画・記録は端末の中だけで扱い、外部へ送りません。
 
-■ 1.1.7 の変更（要点）
-  ・🐔 trk's playlist のリストは、曲の長押し「プレイリストに入れる」に初期状態では出なくなりました
-    （並ぶと一覧が埋まるため）。⚙ 設定 → 🐔 trk's playlist の 👁／🗑 で出し入れでき、
-    📋 で中身をそのままに、編集できる通常のプレイリストへコピーできます（リストは消えません）。
+■ 1.1.8 の変更（要点）
+  ・OS の音の出力先（スピーカー／ヘッドホン／HDMI など）を切り替えても、曲が止まらず続くようになりました
+    （止まったことを見つけて、続きから鳴らし直します。⏯ で止めたときは止まったまま）。
 
 ■ index.html だけでできること（Chrome / Edge で確認）
   ・5つのゲームモードと、手持ちの曲・動画からの自動譜面
@@ -60,7 +59,7 @@ Python は同梱していません。127.0.0.1 にだけ待ち受けるので、
 ■ 権利・ライセンス
   プログラム：GPL-3.0-or-later（trk-files/LICENSE）。デモ曲 FIRST SPARK はオリジナル。
   3Dモデル本体・第三者の音源は同梱していません。詳しくは trk-files/credits.html、trk-files/NOTICE.md、
-  プライバシー方針は trk-files/privacy.html、使い方の詳細は trk-files/README-1.1.7.md と trk-files/docs/guide/ を見てください。
+  プライバシー方針は trk-files/privacy.html、使い方の詳細は trk-files/README-1.1.8.md と trk-files/docs/guide/ を見てください。
   感想・不具合：フリーゲーム夢現の作品ページのコメント欄、または X（@ttrk143）
 
 ────────────────────────────
@@ -70,4 +69,4 @@ reader and saving work this way. 3D mascots, three advanced effects, verified-pa
 offline cache/PWA need a local server: run "python3 -m http.server --bind 127.0.0.1 8000"
 (Windows: "py -m ...") in this folder and open http://127.0.0.1:8000/.
 Saved data is separate between the two ways of opening. The app lives in trk-files/ —
-keep it next to this file. Details: trk-files/README-1.1.7.md
+keep it next to this file. Details: trk-files/README-1.1.8.md

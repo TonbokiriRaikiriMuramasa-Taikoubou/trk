@@ -82,7 +82,7 @@
 **trk-apk（`37405fa`）の `docs/APK-SPEC-2026-10-29.md` の「trk's playlist」の行**を、このリポジトリに取り込んだ版。精査の記録は [`PLAYLIST-CATALOG-REVIEW.md`](PLAYLIST-CATALOG-REVIEW.md)。
 
 - **起動時に作らない**：`ensureTrkDistributionPlaylists({ create: false })` で、既にあるリストの**曲目・ガイド・旧データの移行だけ**を行う（新規作成はしない）。`🎓 trk's OST Vol.1` も**あるときだけ**更新する。`ensureTrkFolder()` は 🐔 の棚だけを用意する（`TRK_SHELVES` の一覧を `for` で作る形に整理）。
-- **設定の 🐔 に「プレイリストを選択」**（`#trkPickSelect`／`#trkPickAdd`／`#trkPickHint`／`#trkPickStatus`）：`trk オリジナル`（🎓 OST・🐔 Game Vol.1・🎻 Classic Vol.1・🎼 Agent OST は曲があるときだけ）＋カタログの全リストを `optgroup`（シリーズごと）で並べ、**追加済みは選べない**（`trkPickHas`：ID 一致、または `cat` が `series:playlist`／`trk:series:playlist`）。
+- **設定の 🐔 に「プレイリストを選択」**（`#trkPickSelect`／`#trkPickAdd`／`#trkPickHint`／`#trkPickStatus`）：`trk オリジナル`（🎓 OST・🐔 Game Vol.1・🎻 Classic Vol.1・🎼 Agent OST は曲があるときだけ）＋カタログの全リスト（曲の無い2本は出さない）を `optgroup`（シリーズごと）で並べ、**追加済みは選べない**（`trkPickHas`：ID 一致、または `cat` が `series:playlist`／`trk:series:playlist`）。
 - **ID は `("trk-" + playlist.id).slice(0, 24 - suffix) + suffix`**（`plSanitize` の24文字に収める。100曲を超えるリストは `-v1`／`-v2` に分かれ、接尾辞は削らない）。**上限は200本**（`TRK_LIST_MAX`）と棚の数（`plFolderRoom`）を**作る前に**確かめる。
 - **棚は要るものだけ**：追加中は `trkSelectedFoldersOnly` を立て、`ensureTrkFolder()` がシリーズの棚をいっせいに作らないようにする。🎭 Endfield のキャラクターテーマは `trk-endfield` → `trk-endfield-character` の順に作る。
 - **消したリストの戻し**：`trkPickAdd` が `trkUnmarkRemoved` してから作る。**♻ ボタンは出さない**（`restore.hidden = true`。`trkRestoreRemoved()` は残すが UI からは呼ばない）。`trkRestoreHint` の文言もピッカーへ案内する形に変更。

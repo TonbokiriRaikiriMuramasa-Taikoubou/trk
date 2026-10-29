@@ -78,7 +78,9 @@ describe("trk217 カタログから選んだリストだけを追加する", () 
     const entries = api.trkPickEntries();
     const specials = entries.filter(e => e.special);
     assert.deepEqual([...specials.map(e => e.id)], ["trk-ost-v1", "trk-playlist", "trk-classic", "trk-agent-ost-v1"]);
-    assert.equal(entries.filter(e => e.playlist).length, catalog.reduce((n, s) => n + (s.playlists || []).length, 0));
+    const withSongs = catalog.reduce((n, s) => n + (s.playlists || []).filter(pl => (pl.songs || []).length).length, 0);
+    assert.equal(entries.filter(e => e.playlist).length, withSongs);
+    assert.ok(!entries.some(e => e.playlist && !(e.playlist.songs || []).length), "曲の無い項目は出さない");
     const ids = entries.map(e => e.id);
     assert.equal(new Set(ids).size, ids.length, "ID が重ならない");
     assert.ok(ids.every(id => id.length <= 24), "plSanitize の24文字に収まる");

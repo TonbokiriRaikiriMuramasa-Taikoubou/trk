@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-29（trk216・**1.1.5**＝🎼 譜面生成方式の既定を **Bタイプ（方式4）** に（触った感触で B が良い、という利用者の判断。**設定で選んだ人＝`chartGenChosen` はそのまま**・アップデート後に B へ移るのは選んだ印が無い人だけ）。trk215・⭐ お気に入りの4フォルダ（⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り）を全部使えるようにした：2軍〜元お気に入り・ピン・🧊凍結・選んでいたフォルダを `settings.favs` に保存（1.1.4 までは保存していなかったので、0個の2軍を選ぶとタブごと消え、リロードで戻っていた）、⭐タブはどのフォルダかに入っていれば出し、凍結の解除は 🧊／🔒 の3秒長押し（❓謎設定「フリーズの解除をワンタップにする」＝**既定オフ**で1タップ）。2026-10-27（trk214・**1.1.4**＝1.1.3 レビュー反映：🖥 ドラッグ中はポインターを掴んで外へ出てもずらす・ピンチのあと残った1本指でそのまま動かす・配布物のリンク切れ検査。trk212・trk213・**1.1.3**：🖥 全画面の動画をホイール／ドラッグ／ピンチで拡大・縮小（100〜500%・ポインター中心・1回 2/5/10%）、⏱ 曲名タブの「ここをプレビュー開始位置にする」を設定で出す（**初期オフ**）。**1.1.3 は trk213 を配る版**。1.1.0→1.1.1→1.1.2 のレビュー反映もそれぞれのZIPに同梱済み。1.0.9〜1.1.2 の配布ZIPの形と時刻もここに集約）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-29（trk217・🐔 trk's playlist を **trk-apk の新基準**に揃えた＝起動時にカタログを一括で作らず、設定の「プレイリストを選択」から**選んだリストだけ**を追加する（`create:false` の起動・100曲ごとの Vol 分割・24文字の ID・消したリストもここから戻す・♻ は出さない）。trk216・**1.1.5**＝🎼 譜面生成方式の既定を **Bタイプ（方式4）** に（触った感触で B が良い、という利用者の判断。**設定で選んだ人＝`chartGenChosen` はそのまま**・アップデート後に B へ移るのは選んだ印が無い人だけ）。trk215・⭐ お気に入りの4フォルダ（⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り）を全部使えるようにした：2軍〜元お気に入り・ピン・🧊凍結・選んでいたフォルダを `settings.favs` に保存（1.1.4 までは保存していなかったので、0個の2軍を選ぶとタブごと消え、リロードで戻っていた）、⭐タブはどのフォルダかに入っていれば出し、凍結の解除は 🧊／🔒 の3秒長押し（❓謎設定「フリーズの解除をワンタップにする」＝**既定オフ**で1タップ）。2026-10-27（trk214・**1.1.4**＝1.1.3 レビュー反映：🖥 ドラッグ中はポインターを掴んで外へ出てもずらす・ピンチのあと残った1本指でそのまま動かす・配布物のリンク切れ検査。trk212・trk213・**1.1.3**：🖥 全画面の動画をホイール／ドラッグ／ピンチで拡大・縮小（100〜500%・ポインター中心・1回 2/5/10%）、⏱ 曲名タブの「ここをプレビュー開始位置にする」を設定で出す（**初期オフ**）。**1.1.3 は trk213 を配る版**。1.1.0→1.1.1→1.1.2 のレビュー反映もそれぞれのZIPに同梱済み。1.0.9〜1.1.2 の配布ZIPの形と時刻もここに集約）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検、§9＝配布ZIPの形と作り方（1.0.8〜・現在 1.1.4）。
 
@@ -77,7 +77,21 @@
 - **文言は4言語**（`videoMaxZoomReset`・`videoMaxZoomHint`・`videoMaxHint` の追記・`videoMaxWheelStep`）。`sw.js` の cache は **`trk-v2026.10.27-trk212`**。`tests/trk212-video-zoom.test.mjs`（11件）を追加。
 - **未確認**：実機のホイール・トラックパッド・ピンチの感触（サンドボックスにブラウザーが無い）。
 
-### ⭐ お気に入りの4フォルダを、どれも使えるようにする（trk215・未配布）
+### 🐔 trk's playlist：カタログから選んだリストだけを追加（trk217・未配布）
+
+**trk-apk（`37405fa`）の `docs/APK-SPEC-2026-10-29.md` の「trk's playlist」の行**を、このリポジトリに取り込んだ版。精査の記録は [`PLAYLIST-CATALOG-REVIEW.md`](PLAYLIST-CATALOG-REVIEW.md)。
+
+- **起動時に作らない**：`ensureTrkDistributionPlaylists({ create: false })` で、既にあるリストの**曲目・ガイド・旧データの移行だけ**を行う（新規作成はしない）。`🎓 trk's OST Vol.1` も**あるときだけ**更新する。`ensureTrkFolder()` は 🐔 の棚だけを用意する（`TRK_SHELVES` の一覧を `for` で作る形に整理）。
+- **設定の 🐔 に「プレイリストを選択」**（`#trkPickSelect`／`#trkPickAdd`／`#trkPickHint`／`#trkPickStatus`）：`trk オリジナル`（🎓 OST・🐔 Game Vol.1・🎻 Classic Vol.1・🎼 Agent OST は曲があるときだけ）＋カタログの全リストを `optgroup`（シリーズごと）で並べ、**追加済みは選べない**（`trkPickHas`：ID 一致、または `cat` が `series:playlist`／`trk:series:playlist`）。
+- **ID は `("trk-" + playlist.id).slice(0, 24 - suffix) + suffix`**（`plSanitize` の24文字に収める。100曲を超えるリストは `-v1`／`-v2` に分かれ、接尾辞は削らない）。**上限は200本**（`TRK_LIST_MAX`）と棚の数（`plFolderRoom`）を**作る前に**確かめる。
+- **棚は要るものだけ**：追加中は `trkSelectedFoldersOnly` を立て、`ensureTrkFolder()` がシリーズの棚をいっせいに作らないようにする。🎭 Endfield のキャラクターテーマは `trk-endfield` → `trk-endfield-character` の順に作る。
+- **消したリストの戻し**：`trkPickAdd` が `trkUnmarkRemoved` してから作る。**♻ ボタンは出さない**（`restore.hidden = true`。`trkRestoreRemoved()` は残すが UI からは呼ばない）。`trkRestoreHint` の文言もピッカーへ案内する形に変更。
+- **表示チェック（`trkPlaylistChk`／`trkClassicChk`）は表示だけ**（リストを作らない）。
+- **文言は4言語**（`trkPickHint`・`trkPickLabel`・`trkPickAdd`・`trkPickAdded`・`trkPickOk`・`trkPickFail`・`trkPickOriginals`、`trkPanelHint`／`trkPlaylistNote`／`trkClassicNote`／`trkClassicPanelHint`／`trkOrderEmpty`／`trkRestoreHint` の改訂）。`sw.js` の cache は **`trk-v2026.10.29-trk217`**。
+- **入れなかったもの**（APK 専用）：`core.audioSafety`・`keepInBackground`・`TrkApkPip`・下部ナビ・Back の段階処理・向きの10秒長押しなど。カタログの音源を同梱しない方針も従来どおり。
+- **未確認**：実ブラウザでのピッカーの操作感（サンドボックスにブラウザーが無い）。
+
+### ⭐ お気に入りの4フォルダを、どれも使えるようにする（trk215・1.1.5 で配布）
 
 1.1.4 で「⭐1軍 以外が正常に動かない」と確認された（2026-10-29）。原因は**保存する場所が無かったこと**と、**タブをいまのフォルダの曲数だけで出し入れしていたこと**。4フォルダ（⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り）を同じように使えるように直した。
 
@@ -358,6 +372,7 @@
 | 52 | trk215：⭐ お気に入りの4フォルダ（2軍／🧊フリーズ／📤元お気に入り・📌ピン・🔒凍結・選んでいたフォルダの保存、⭐タブの出し入れ、3秒長押しでの解除） | `tests/trk215-favs.test.mjs` の17件で確認済み（謎設定の既定オフ／`settings.favs` の形／凍結は最初からオフ／1軍→2軍→リロード／5つの状態のリロード／1軍の配列を差し替えない／凍結中の追加・削除を止める／🎲のピン／3秒長押しと1タップ／⭐タブ／空表示／行の☆／4言語／cache）。**実機の見た目と3秒長押しの感触は未確認** | ①⭐タブで 2軍／🧊フリーズ／📤元お気に入り を選んでもお気に入りが消えないこと ②2軍へ入れて再読み込みしても残ること ③🔒 と 🧊 を3秒長押しで解除できること ④❓謎設定のチェックで1タップになること |
 | 53 | trk216：🎼 譜面生成方式の既定を Bタイプ（方式4）へ | `tests/trk216-chartgen-default.test.mjs` の7件＋`npm run check` 704 pass で確認済み（既定の決まり方・印がある人の尊重・工場出荷・4言語・cache）。**実機での譜面の感触（Bが既定として良いか）は利用者の判断を仰ぐ** | ①新規（または設定を触っていない）状態で B になっていること ②一度 A を選ぶと、再読み込みしても A のままであること ③工場出荷で B に戻ること |
 | 54 | 1.1.5 の配布ZIP（trk215・trk216 入り・2026-10-29） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻（`2026-10-29 10:00` UTC）・`--check`（`checkDocLinks` 0件）・ローカル配信・落とし直してのバイト一致は確認済み（§6・§9）。**利用者の実機での起動と、Bタイプの譜面の感触は未確認** | ①1.1.4 のフォルダーに重ねず新しいフォルダーへ展開して `index.html` から起動 ②⚙ 設定 → 🎼 譜面生成方式 が **Bタイプ（標準・方式4）** になっていること ③曲を選んで譜面ができること ④⭐ のお気に入り（2軍／🧊／📤）が再読み込みで残ること |
+| 55 | trk217：🐔 trk's playlist のリスト選択（起動時に作らない・カタログから追加・♻ を出さない） | `tests/trk217-playlist-catalog.test.mjs` の11件＋`npm run check` 715 pass で確認済み（ID の24文字・Vol 分割・追加済み判定・要る棚だけ作る・上限・表示フラグの戻し・起動の `create:false`・4言語）。**実ブラウザでの操作感は未確認** | ⚙ → 🐔 trk's playlist を開き、①リストを1本追加して 🐔 の階層に入るか ②同じものを選ぶと「追加済み」になるか ③🗑 で消したリストを選び直すと戻るか ④必要な棚だけが増えるか ⑤言語を切り替えても選択肢の名前が変わるか |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -455,7 +470,7 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.29-trk216`＝trk216。**配布ZIP（1.1.5）は `trk216`**、配布済みの 1.1.4 は `trk214`、1.1.4 の前の trk215 は未配布。1.1.2 は `trk211`、1.1.1 は `trk210`、1.1.0 は `trk208`、1.0.9 は `trk207`。アプリ本体が変わらない版では cache 名を上げない） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.29-trk217`＝trk217・未配布。**配布ZIP（1.1.5）は `trk216`**、配布済みの 1.1.4 は `trk214`、1.1.4 の前の trk215 は未配布。1.1.2 は `trk211`、1.1.1 は `trk210`、1.1.0 は `trk208`、1.0.9 は `trk207`。アプリ本体が変わらない版では cache 名を上げない） |
 | 🚪 メディアプレイヤーの抜け方（trk206） | `js/media-player-mode.js`（`mediaExitPlan`・`closeMedia`）、`js/library.js`（`previewContinue`）、`js/core.js`（`mediaReloadOnExit`）、`js/i18n-options.js`＋`index.html`（❓謎設定）、`tests/trk206-media-exit.test.mjs` |
 | 📦 配布ZIPの組み立て（1.0.8〜・現在 1.1.5） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`release/README.txt`（配布用のかんたん起動。`--readme` を省くとこれが入る。**版と `README-1.x.y.md` の名前は `--version` とそろえる**）、`tests/release-layout.test.mjs`（形・時刻・README の版） |
 | 📂 フォルダー共有の共通部品（trk208） | `js/shared-folders.js`（`window.TrkSharedFolders`＝`plan`／`uniqueLabel`／`mergeScans`／`walk`／`pathParts`／`readFileAt`。DOM・IndexedDB・書き込みなし）、`js/library.js`（登録簿 `"folders"`・`addSharedFolder`／`readSharedFolders`／`restoreSharedFolders`／`folderAutoKickShared`／`removeSharedFolder`／`renderSharedFolderList`）、`index.html`（`#libShareVideoBtn`・`#libSharedFolderList`）、`tests/trk208-shared-folders.test.mjs` |
@@ -463,6 +478,7 @@
 | 🖥 全画面の動画の拡大・縮小（trk212） | `js/video-max.js`（`zoomStepPercent`・`containSize`・`panLimit`／`clampPan`・`accumulateWheel`・`zoomAround`・`zoomFrame`・`paint` の `drawImage`）、`js/core.js`（`videoMaxWheelStep`）、`js/main.js`（`#videoMaxWheelStep`）、`index.html`、`css/style.css`（`.videoMaxZoom`・`.zoomed` のカーソル）、`tests/trk212-video-zoom.test.mjs` |
 | 🎼 譜面生成方式の既定（trk216） | `js/core.js`（`chartGen` の既定 `"4"`・`chartGenChosen`・`resetAllPrefs`）、`js/main.js`（`#chartGen` の change で印を付ける・想定外値の寄せ先 `"4"`）、`js/i18n.js`（`chartGen3`／`chartGen4`／`chartGenHint` の4言語）、`index.html`（セレクトのラベル）、`tests/trk216-chartgen-default.test.mjs` |
 | ⭐ お気に入りの4フォルダ（trk215） | `js/favs.js`（`stored`／`snapshot`／`save`＝`settings.favs`・`quickUnfreeze`／`holdButton`／`chips`）、`js/core.js`（`favs`・`favQuickUnfreeze`・`resetAllPrefs`）、`js/library.js`（`libFavKeys`・`libFavTab`・`libTabMatch`・行の ☆／📌／🧊）、`js/i18n-options.js`＋`index.html`（❓謎設定）、`css/style.css`（`.holding`・`.favPinN`）、`tests/trk215-favs.test.mjs` |
+| 🐔 カタログのリスト選択（trk217・未配布） | `js/library.js`（`trkPickEntries`／`trkPickHas`／`trkPickAdd`／`trkPickRender`・`TRK_SHELVES`／`TRK_SERIES_FOLDER`・`trkSelectedFoldersOnly`・`ensureTrkDistributionPlaylists({ create:false })`）、`index.html`（`#trkPickSelect`／`#trkPickAdd`／`#trkPickHint`／`#trkPickStatus`）、`sw.js`（`trk217`）、`tests/trk217-playlist-catalog.test.mjs`、`docs/PLAYLIST-CATALOG-REVIEW.md`（trk-apk との突き合わせ） |
 | ⏱ 曲名タブの開始位置ボタン（trk213） | `js/core.js`（`previewStartShow`・`resetVideoPrefs`）、`js/library.js`（`previewSetShown`・`syncPreviewSetBtn`・`renderBanner`／`updateSpBuilder`）、`js/spectrum.js`（`buildBox` の `specPreviewSet`・TEXT 8キー）、`tests/trk213-preview-set-toggle.test.mjs` |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
@@ -552,6 +568,7 @@
 
 ## 7. 最近の変更
 
+- **🐔 trk217：trk's playlist を trk-apk の新基準へ（2026-10-29・未配布）**：起動時の一括作成をやめ（`create:false`＝既存の更新と移行だけ）、設定の 🐔 に**リスト選択**（`trkPick*`）を足した。消したリストはピッカーから1本ずつ戻し（♻ は出さない）、表示チェックは表示だけ。棚は `TRK_SHELVES` に集約し、追加したリストに要る棚だけを作る。`tests/trk217-playlist-catalog.test.mjs`（11件）で **715 pass**。精査は [`PLAYLIST-CATALOG-REVIEW.md`](PLAYLIST-CATALOG-REVIEW.md)。
 - **📦 1.1.5：trk215・trk216 を配る版（2026-10-29）**：**アプリ本体は trk216**（お気に入りの4フォルダ＋譜面生成の既定を Bタイプへ）。1.1.4 の配布ZIPの `trk-files/` を土台に、**コード11ファイル**＋`README-1.1.5.md`（改名）・`README.md`・`README-SLIM.md`・`docs/guide/files.md` を差し替え、`release/README.txt` の版と README 名も 1.1.5 へ。
   - ZIP は **`2026-10-29 10:00`（UTC）** で組み立て＝**226エントリ・3,916,257 bytes**・`unzip -t` 破損なし・全エントリ同時刻・**`sha256 0b12ae8c35062910aa5c66e2c027c7a85670bd5204e5ee9abc6a2fbd4c8f8599`**。
   - `--check` **OK**（`checkDocLinks` 0件）・落とし直してバイト一致。Drive は **`trk-1.1.5`**（`1j9mIFWIW5m7ZQSwXiy2OaqviT7JiXghw`）に **ZIP＋SHA256SUMS＋今回の diff 2本＋説明**（APK が 1.0.4 ベースで並行開発中のため）。

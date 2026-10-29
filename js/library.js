@@ -960,12 +960,15 @@ Object.assign(TEXT.ja, {
   plAuthorHidden:"🚫 非表示 {n} 件（ブロック中または絞り込み中）", plAuthorBy:"投稿者",
   plAuthorBlockedView:"ブロック中の投稿者です",
   trkPlaylistTitle:"🐔 trk's playlist", trkPlaylistHint:"ゲーム音楽の紹介プレイリスト（非営利・音源は同梱しません。公式の入手先からどうぞ）",
-  trkPlaylistToggle:"🐔 trk's playlist タブを表示", trkPlaylistNote:"右端に出るゲーム音楽の紹介タブです。OFFで隠せます。チュートリアルを終えると自動で追加されます。",
+  trkPlaylistToggle:"🐔 trk's playlist タブを表示", trkPlaylistNote:"右端に出るゲーム音楽の紹介タブです。OFFで隠せます。リストは下の「プレイリストを選択」から必要なものだけ追加できます。",
   trkMusicFolderHint:"Musicフォルダ内に「trk」フォルダを自分で作り、曲をまとめておくと整理しやすくなります。下のボタンで選ぶと、ライブラリの読み込み先がそのフォルダに切り替わり、中だけを読み込みます（trk!はフォルダ作成・曲の移動をせず読み取りのみ。Music全体に戻すときは通常のフォルダ選択でMusicを選び直してください）。",
   trkMusicFolderBtn:"📂 Music内のtrkフォルダを読み込む",
   trkOpen:"🐔 開く", trkAdded:"🐔 trk's playlist を追加しました（{n}曲）— 右端のタブをどうぞ",
   trkDup:"🐔 trk's playlist はすでに入っています", trkShow:"🐔 trk's playlist を表示", trkHide:"🐔 trk's playlist を非表示",
-  trkPanelTitle:"🐔 trk's playlist", trkPanelHint:"チュートリアルを終えると右端に現れるゲーム音楽の紹介（非営利・音源なし）。",
+  trkPanelTitle:"🐔 trk's playlist", trkPanelHint:"ゲーム音楽の紹介（非営利・音源なし）。下の「プレイリストを選択」から、必要なリストだけを追加します。",
+  trkPickHint:"選んだリストだけを追加します。消したリストもここから戻せます。カタログの曲は音源を含みません。",
+  trkPickLabel:"プレイリストを選択", trkPickAdd:"選んだリストを追加", trkPickAdded:"追加済み",
+  trkPickOk:"追加しました", trkPickFail:"追加できません。プレイリストまたはフォルダーの上限を確認してください。", trkPickOriginals:"trk オリジナル",
   trkCatalogBtn:"🐔 trk's playlist", trkCatalogTitle:"🐔 trk's playlist（非営利の紹介プレイリスト）",
   trkCatalogHint:"最初の10曲はSAM Free Music — 100% Orange Juice! で出会える曲です。東方・ブルアカ・アークナイツも収録！音源は同梱しません。（著作権は放棄されていません）",
   trkTab:"🐔 trk's playlist",
@@ -973,14 +976,14 @@ Object.assign(TEXT.ja, {
   trkTabNameNote:"🐔 のアイコンと色は固定です。タブの名前はこの3つから選べます（タップ＝中身、長押し＝階層）。",
   trkMenuTitle:"🐔 階層（Vol 一覧）", trkMenuHint:"タブの長押しで開く 🐔 trk's playlist の中身です。Vol やシリーズを選べます。名前と色は変えられません。",
   trkMenuOpenFolder:"フォルダを開く", trkMenuOpenList:"プレイリストを開く", trkOpenItem:"開く", trkMoveUp:"上へ", trkMoveDown:"下へ",
-  trkOrderEmpty:"（まだプレイリストがありません。チュートリアルを完了すると自動作成されます）",
+  trkOrderEmpty:"（まだプレイリストがありません。上の「プレイリストを選択」から追加できます）",
   trkOrderAbcOff:"🔤 ABC順がオンのため、手動の ↑↓ は無効です。",
   trkSortAbc:"🔤 ABC順に並べる", trkSortAbcHint:"オフのときは下のリストの ↑↓ で自由に並べ替えできます。長押しで開く 🐔 の階層にも反映されます。",
   trkClassicTitle:"🎻 trk classic", trkClassicHint:"クラシック名盤100選（版権切れの名演をMusopenのPublic Domain録音で紹介）",
-  trkClassicToggle:"🎻 trk classic タブを表示", trkClassicNote:"右端に出るクラシックの紹介タブです。OFFで隠せます。チュートリアルを終えると自動で追加されます。",
+  trkClassicToggle:"🎻 trk classic タブを表示", trkClassicNote:"右端に出るクラシックの紹介タブです。OFFで隠せます。リストは同じ設定の「プレイリストを選択」から追加できます。",
   trkClassicAdded:"🎻 trk classic を追加しました（{n}曲）— 右端のタブをどうぞ",
   trkClassicDup:"🎻 trk classic はすでに入っています", trkClassicShow:"🎻 trk classic を表示", trkClassicHide:"🎻 trk classic を非表示",
-  trkClassicPanelTitle:"🎻 trk classic", trkClassicPanelHint:"チュートリアルを終えると右端に現れるクラシック名盤（版権切れ・音源なし）。Princess Tutuでも聴ける名曲も収録。",
+  trkClassicPanelTitle:"🎻 trk classic", trkClassicPanelHint:"クラシック名盤（版権切れ・音源なし）。Princess Tutuでも聴ける名曲も収録。",
   trkClassicBtn:"🎻 trk classic", trkClassicTab:"🎻 trk classic"
 });
 Object.assign(TEXT.en, {
@@ -1011,12 +1014,15 @@ Object.assign(TEXT.en, {
   plAuthorHidden:"🚫 {n} hidden (blocked or filtered out)", plAuthorBy:"Author",
   plAuthorBlockedView:"This author is blocked",
   trkPlaylistTitle:"🐔 trk's playlist", trkPlaylistHint:"A curated game-music intro playlist (non-commercial, no audio bundled — get it from official sources).",
-  trkPlaylistToggle:"Show 🐔 trk's playlist tab", trkPlaylistNote:"Game-music intro tab at the far right. Turn off to hide. Added automatically after the tutorial.",
+  trkPlaylistToggle:"Show 🐔 trk's playlist tab", trkPlaylistNote:"Game-music intro tab at the far right. Turn off to hide. Add only the lists you need with “Choose a playlist” below.",
   trkMusicFolderHint:"Create a trk folder inside Music yourself and put the tracks you want there. Choosing it below switches the active library folder to trk and scans only it; select Music again in the regular folder picker to switch back. trk! only reads files—it never creates folders or moves tracks.",
   trkMusicFolderBtn:"📂 Choose the trk folder in Music",
   trkOpen:"🐔 Open", trkAdded:"Added 🐔 trk's playlist ({n} songs) — find it at the far right",
   trkDup:"🐔 trk's playlist is already there", trkShow:"Show 🐔 trk's playlist", trkHide:"Hide 🐔 trk's playlist",
-  trkPanelTitle:"🐔 trk's playlist", trkPanelHint:"Appears at the far right after the tutorial (non-commercial, no audio).",
+  trkPanelTitle:"🐔 trk's playlist", trkPanelHint:"Game-music intro (non-commercial, no audio). Add only the lists you need with “Choose a playlist” below.",
+  trkPickHint:"Add only the playlists you choose. Deleted lists can be re-added here. Catalog lists do not include audio files.",
+  trkPickLabel:"Choose a playlist", trkPickAdd:"Add selected playlist", trkPickAdded:"Added",
+  trkPickOk:"Playlist added", trkPickFail:"Could not add it. Check the playlist and folder limits.", trkPickOriginals:"trk originals",
   trkCatalogBtn:"🐔 trk's playlist", trkCatalogTitle:"🐔 trk's playlist (non-commercial intro)",
   trkCatalogHint:"First 10 are SAM Free Music — tracks from 100% Orange Juice! Touhou, Blue Archive, Arknights and more inside! No audio bundled. (Copyright not waived.)",
   trkTab:"🐔 trk's playlist",
@@ -1024,14 +1030,14 @@ Object.assign(TEXT.en, {
   trkTabNameNote:"The 🐔 icon and color are fixed. Choose one of these three labels (tap = songs, long-press = hierarchy).",
   trkMenuTitle:"🐔 Hierarchy (Vol list)", trkMenuHint:"Opened by long-pressing 🐔 trk's playlist. Pick a Vol or series here. Name and color are fixed.",
   trkMenuOpenFolder:"Open folder", trkMenuOpenList:"Open playlist", trkOpenItem:"Open", trkMoveUp:"Move up", trkMoveDown:"Move down",
-  trkOrderEmpty:"(No playlists yet. They are created automatically when you finish the tutorial.)",
+  trkOrderEmpty:"(No playlists yet. Add one with “Choose a playlist” above.)",
   trkOrderAbcOff:"🔤 Manual ↑↓ is disabled while ABC order is on.",
   trkSortAbc:"🔤 Sort A–Z", trkSortAbcHint:"When off, use ↑↓ in the list below to arrange freely. It also applies to the 🐔 hierarchy opened by long-press.",
   trkClassicTitle:"🎻 trk classic", trkClassicHint:"100 Classical masterpieces (public-domain recordings via Musopen)",
-  trkClassicToggle:"Show 🎻 trk classic tab", trkClassicNote:"Classical intro tab at the far right. Turn off to hide. Added automatically after the tutorial.",
+  trkClassicToggle:"Show 🎻 trk classic tab", trkClassicNote:"Classical intro tab at the far right. Turn off to hide. Add the list with “Choose a playlist” in the same settings.",
   trkClassicAdded:"Added 🎻 trk classic ({n} songs) — find it at the far right",
   trkClassicDup:"🎻 trk classic is already there", trkClassicShow:"Show 🎻 trk classic", trkClassicHide:"Hide 🎻 trk classic",
-  trkClassicPanelTitle:"🎻 trk classic", trkClassicPanelHint:"Appears at the far right after the tutorial (public-domain, no audio). Gems from Princess Tutu too.",
+  trkClassicPanelTitle:"🎻 trk classic", trkClassicPanelHint:"Classical favourites (public-domain, no audio). Gems from Princess Tutu too.",
   trkClassicBtn:"🎻 trk classic", trkClassicTab:"🎻 trk classic"
 });
 Object.assign(TEXT.zh, {
@@ -1062,12 +1068,15 @@ Object.assign(TEXT.zh, {
   plAuthorHidden:"🚫 已隐藏 {n} 件（屏蔽中或筛选中）", plAuthorBy:"投稿者",
   plAuthorBlockedView:"该投稿者已被屏蔽",
   trkPlaylistTitle:"🐔 trk's playlist", trkPlaylistHint:"游戏音乐介绍播放列表（非营利、不含音源，请从官方渠道获取）。",
-  trkPlaylistToggle:"显示 🐔 trk's playlist 标签", trkPlaylistNote:"位于最右侧的游戏音乐介绍标签。关闭可隐藏，完成教程后自动添加。",
+  trkPlaylistToggle:"显示 🐔 trk's playlist 标签", trkPlaylistNote:"位于最右侧的游戏音乐介绍标签。关闭可隐藏。用下面的「选择歌单」只添加需要的歌单。",
   trkMusicFolderHint:"请在 Music 文件夹内手动新建 trk 文件夹并放入想听的音乐。点击下方按钮会把当前曲库切换到 trk，只扫描其中内容；要切回整个 Music，请在常规文件夹选择中重新选择 Music。trk! 只读取，不会创建文件夹或移动歌曲。",
   trkMusicFolderBtn:"📂 选择 Music 内的 trk 文件夹",
   trkOpen:"🐔 打开", trkAdded:"已添加 🐔 trk's playlist（{n}首）— 请到最右侧查看",
   trkDup:"🐔 trk's playlist 已在列表中", trkShow:"显示 🐔 trk's playlist", trkHide:"隐藏 🐔 trk's playlist",
-  trkPanelTitle:"🐔 trk's playlist", trkPanelHint:"完成教程后出现在最右侧的游戏音乐介绍（非营利、不含音源）。",
+  trkPanelTitle:"🐔 trk's playlist", trkPanelHint:"游戏音乐介绍（非营利、不含音源）。用下面的「选择歌单」只添加需要的歌单。",
+  trkPickHint:"只添加选中的歌单。已删除的歌单也可在此重新添加。目录不包含音频文件。",
+  trkPickLabel:"选择歌单", trkPickAdd:"添加所选歌单", trkPickAdded:"已添加",
+  trkPickOk:"已添加歌单", trkPickFail:"无法添加。请检查歌单或文件夹数量上限。", trkPickOriginals:"trk 原创",
   trkCatalogBtn:"🐔 trk's playlist", trkCatalogTitle:"🐔 trk's playlist（非营利介绍）",
   trkCatalogHint:"前10首是SAM Free Music — 在100% Orange Juice! 中相遇的曲目。东方、碧蓝档案、明日方舟也有收录！不含音源。（版权未放弃）",
   trkTab:"🐔 trk's playlist",
@@ -1075,14 +1084,14 @@ Object.assign(TEXT.zh, {
   trkTabNameNote:"🐔 图标与颜色固定。名称可从这3种中选择（点击＝内容，长按＝层级）。",
   trkMenuTitle:"🐔 层级（Vol 列表）", trkMenuHint:"长按 🐔 trk's playlist 打开的内容。可选择 Vol 或系列。名称与颜色不可更改。",
   trkMenuOpenFolder:"打开文件夹", trkMenuOpenList:"打开歌单", trkOpenItem:"打开", trkMoveUp:"上移", trkMoveDown:"下移",
-  trkOrderEmpty:"（还没有播放列表。完成教程后会自动创建）",
+  trkOrderEmpty:"（还没有播放列表。可用上面的「选择歌单」添加）",
   trkOrderAbcOff:"🔤 ABC顺序开启时，手动 ↑↓ 无效。",
   trkSortAbc:"🔤 按ABC顺序排列", trkSortAbcHint:"关闭时可用下方列表的 ↑↓ 自由排序。长按打开的 🐔 层级也会同步。",
   trkClassicTitle:"🎻 trk classic", trkClassicHint:"经典名盘100首（通过Musopen公共领域录音介绍）",
-  trkClassicToggle:"显示 🎻 trk classic 标签", trkClassicNote:"位于最右侧的经典介绍标签。关闭可隐藏，完成教程后自动添加。",
+  trkClassicToggle:"显示 🎻 trk classic 标签", trkClassicNote:"位于最右侧的经典介绍标签。关闭可隐藏。歌单可在同一设置中用「选择歌单」添加。",
   trkClassicAdded:"已添加 🎻 trk classic（{n}首）— 请到最右侧查看",
   trkClassicDup:"🎻 trk classic 已在列表中", trkClassicShow:"显示 🎻 trk classic", trkClassicHide:"隐藏 🎻 trk classic",
-  trkClassicPanelTitle:"🎻 trk classic", trkClassicPanelHint:"完成教程后出现在最右侧的经典名盘（公共领域、不含音源）。",
+  trkClassicPanelTitle:"🎻 trk classic", trkClassicPanelHint:"经典名盘（公共领域、不含音源）。",
   trkClassicBtn:"🎻 trk classic", trkClassicTab:"🎻 trk classic"
 });
 Object.assign(TEXT.ko, {
@@ -1113,12 +1122,15 @@ Object.assign(TEXT.ko, {
   plAuthorHidden:"🚫 숨김 {n}건(차단 중 또는 필터 중)", plAuthorBy:"올린이",
   plAuthorBlockedView:"차단 중인 올린이예요",
   trkPlaylistTitle:"🐔 trk's playlist", trkPlaylistHint:"게임 음악 소개 플레이리스트(비영리·음원 미포함, 공식 입수처에서 받아 주세요).",
-  trkPlaylistToggle:"🐔 trk's playlist 탭 표시", trkPlaylistNote:"맨 오른쪽에 나타나는 게임 음악 소개 탭이에요. 끄면 숨길 수 있고, 튜토리얼을 마치면 자동으로 추가돼요.",
+  trkPlaylistToggle:"🐔 trk's playlist 탭 표시", trkPlaylistNote:"맨 오른쪽에 나타나는 게임 음악 소개 탭이에요. 끄면 숨길 수 있고, 목록은 아래 「재생목록 선택」에서 필요한 것만 추가해요.",
   trkMusicFolderHint:"Music 폴더 안에 trk 폴더를 직접 만들고 곡을 넣어 주세요. 아래 버튼으로 선택하면 라이브러리 폴더가 trk로 바뀌어 그 안만 읽어요. Music 전체로 돌아가려면 일반 폴더 선택에서 Music을 다시 선택하세요. trk!는 폴더를 만들거나 곡을 옮기지 않고 읽기만 해요.",
   trkMusicFolderBtn:"📂 Music 안의 trk 폴더 선택",
   trkOpen:"🐔 열기", trkAdded:"🐔 trk's playlist를 추가했어요({n}곡) — 맨 오른쪽 탭을 확인해 주세요",
   trkDup:"🐔 trk's playlist는 이미 있어요", trkShow:"🐔 trk's playlist 표시", trkHide:"🐔 trk's playlist 숨기기",
-  trkPanelTitle:"🐔 trk's playlist", trkPanelHint:"튜토리얼을 마치면 맨 오른쪽에 나타나는 게임 음악 소개(비영리·음원 없음).",
+  trkPanelTitle:"🐔 trk's playlist", trkPanelHint:"게임 음악 소개(비영리·음원 없음). 아래 「재생목록 선택」에서 필요한 목록만 추가해요.",
+  trkPickHint:"선택한 재생목록만 추가합니다. 삭제한 목록도 여기에서 다시 추가할 수 있습니다. 카탈로그에는 음원 파일이 없습니다.",
+  trkPickLabel:"재생목록 선택", trkPickAdd:"선택한 목록 추가", trkPickAdded:"추가됨",
+  trkPickOk:"재생목록을 추가했습니다", trkPickFail:"추가할 수 없습니다. 재생목록과 폴더의 한도를 확인하세요.", trkPickOriginals:"trk 오리지널",
   trkCatalogBtn:"🐔 trk's playlist", trkCatalogTitle:"🐔 trk's playlist(비영리 소개 플레이리스트)",
   trkCatalogHint:"처음 10곡은 SAM Free Music — 100% Orange Juice! 에서 만난 곡들이에요. 동방·블루 아카이브·명일방주도 들어 있어요! 음원은 들어 있지 않아요. (저작권 포기 아님)",
   trkTab:"🐔 trk's playlist",
@@ -1126,14 +1138,14 @@ Object.assign(TEXT.ko, {
   trkTabNameNote:"🐔 아이콘과 색은 고정이에요. 탭 이름은 이 3가지 중에서 고를 수 있어요(탭＝내용, 길게 누르기＝계층).",
   trkMenuTitle:"🐔 계층(Vol 목록)", trkMenuHint:"탭을 길게 눌러 여는 🐔 trk's playlist 내용이에요. Vol이나 시리즈를 고를 수 있어요. 이름과 색은 바꿀 수 없어요.",
   trkMenuOpenFolder:"폴더 열기", trkMenuOpenList:"플레이리스트 열기", trkOpenItem:"열기", trkMoveUp:"위로", trkMoveDown:"아래로",
-  trkOrderEmpty:"(아직 재생목록이 없어요. 튜토리얼을 마치면 자동으로 만들어져요)",
+  trkOrderEmpty:"(아직 재생목록이 없어요. 위의 「재생목록 선택」에서 추가할 수 있어요)",
   trkOrderAbcOff:"🔤 ABC순이 켜져 있어서 수동 ↑↓는 사용할 수 없어요.",
   trkSortAbc:"🔤 ABC순으로 정렬", trkSortAbcHint:"끄면 아래 목록의 ↑↓로 자유롭게 정렬할 수 있어요. 길게 눌러 여는 🐔 계층에도 반영돼요.",
   trkClassicTitle:"🎻 trk classic", trkClassicHint:"클래식 명반 100곡(공공 영역 음원은 Musopen으로 소개)",
-  trkClassicToggle:"🎻 trk classic 탭 표시", trkClassicNote:"맨 오른쪽에 나타나는 클래식 소개 탭이에요. 꺼면 숨길 수 있고, 튜토리얼을 마치면 자동으로 추가돼요.",
+  trkClassicToggle:"🎻 trk classic 탭 표시", trkClassicNote:"맨 오른쪽에 나타나는 클래식 소개 탭이에요. 끄면 숨길 수 있고, 목록은 같은 설정의 「재생목록 선택」에서 추가해요.",
   trkClassicAdded:"🎻 trk classic를 추가했어요({n}곡) — 맨 오른쪽 탭을 확인해 주세요",
   trkClassicDup:"🎻 trk classic는 이미 있어요", trkClassicShow:"🎻 trk classic 표시", trkClassicHide:"🎻 trk classic 숨기기",
-  trkClassicPanelTitle:"🎻 trk classic", trkClassicPanelHint:"튜토리얼을 마치면 맨 오른쪽에 나타나는 클래식 명반(공공 영역·음원 없음).",
+  trkClassicPanelTitle:"🎻 trk classic", trkClassicPanelHint:"클래식 명반(공공 영역·음원 없음).",
   trkClassicBtn:"🎻 trk classic", trkClassicTab:"🎻 trk classic"
 });
 
@@ -1216,7 +1228,7 @@ Object.assign(TEXT.ja, {
   plGuideMacleod:"incompetech公式ページへの案内（音源なし）。CC BY 4.0のクレジット表記など、条件は公式ページで確認してください。",
   plOfficialLink:"公式リンク",
   trkRestoreBtn:"♻ 消したtrkのリストを戻す（{n}件）",
-  trkRestoreHint:"trkが自動で作るリスト（Game Vol.1・Classic Vol.1・trk's OST Vol.1・カタログの各リスト）は、消すと次の起動でも作り直しません。戻すときはこのボタンを押してください。",
+  trkRestoreHint:"消したリストは、上の「プレイリストを選択」で同じものを選び直すと戻ります（曲そのものは消えません）。",
   trkRestored:"♻ 消したリストを{n}件戻しました"
 });
 Object.assign(TEXT.en, {
@@ -1245,7 +1257,7 @@ Object.assign(TEXT.en, {
   plGuideMacleod:"Links to the official incompetech pages (no audio included). Check the conditions, such as CC BY 4.0 credit, on the official pages.",
   plOfficialLink:"Official link",
   trkRestoreBtn:"♻ Restore deleted trk lists ({n})",
-  trkRestoreHint:"Lists that trk creates automatically (Game Vol.1, Classic Vol.1, trk's OST Vol.1 and the catalog lists) are not recreated at the next start once you delete them. Press this button to bring them back.",
+  trkRestoreHint:"To bring back a deleted list, pick the same one again in “Choose a playlist” above (the songs themselves are kept).",
   trkRestored:"♻ Restored {n} deleted list(s)"
 });
 Object.assign(TEXT.zh, {
@@ -1274,7 +1286,7 @@ Object.assign(TEXT.zh, {
   plGuideMacleod:"指向incompetech官方页面（不含音源）。CC BY 4.0署名等条件请在官方页面确认。",
   plOfficialLink:"官方链接",
   trkRestoreBtn:"♻ 恢复已删除的trk歌单（{n}个）",
-  trkRestoreHint:"trk自动创建的歌单（Game Vol.1、Classic Vol.1、trk's OST Vol.1及目录中的各歌单）删除后，下次启动也不会重新创建。需要恢复时请按此按钮。",
+  trkRestoreHint:"要恢复已删除的歌单，请在上面的「选择歌单」中再次选择同一个（歌曲本身不会被删除）。",
   trkRestored:"♻ 已恢复{n}个已删除的歌单"
 });
 Object.assign(TEXT.ko, {
@@ -1303,7 +1315,7 @@ Object.assign(TEXT.ko, {
   plGuideMacleod:"incompetech 공식 페이지로 안내해요(음원 없음). CC BY 4.0 크레딧 표기 등 조건은 공식 페이지에서 확인하세요.",
   plOfficialLink:"공식 링크",
   trkRestoreBtn:"♻ 삭제한 trk 목록 되돌리기 ({n}개)",
-  trkRestoreHint:"trk가 자동으로 만드는 목록(Game Vol.1, Classic Vol.1, trk's OST Vol.1, 카탈로그의 각 목록)은 삭제하면 다음 실행 때도 다시 만들지 않아요. 되돌리려면 이 버튼을 누르세요.",
+  trkRestoreHint:"삭제한 목록은 위의 「재생목록 선택」에서 같은 것을 다시 고르면 돌아와요(곡 자체는 지워지지 않아요).",
   trkRestored:"♻ 삭제한 목록 {n}개를 되돌렸어요"
 });
 
@@ -1682,6 +1694,7 @@ const TRK_PLAYLIST_ID = "trk-playlist";
 const TRK_FOLDER_ID = "trk";
 const TRK_CLASSIC_ID = "trk-classic";
 const TRK_OST_ID = "trk-ost-v1";   /* 🎓 オリジナル曲リスト（チュートリアルのデモ曲もここに入る。タブは一番下） */
+const TRK_LIST_MAX = 200;          /* 🐔 プレイリストの上限（plTighten と同じ） */
 /* 🐔 trk's playlist ＝ 右端のタブ（実体は trk フォルダ）。
    ・名前（タブの文字）は settings.trkTabName の3種類から選ぶ。空文字＝🐔 のアイコンだけ
    ・アイコン（🐔）と色（標準）とフォルダ名は固定＝利用者は変えられない（plFolderMenu も開かせない）
@@ -1723,21 +1736,28 @@ function ensureTrkSubfolder(id, name, icon, parent) {
   core.saveUserPrefs();
   return f;
 }
+/* 🐔 の下に置く固定の棚。ensureTrkFolder() がいっせいに作り、カタログから1本だけ作るときは
+   そのリストに要る棚だけを作る（trk217）。 */
+const TRK_SHELVES = [
+  { id: "trk-classic", name: "Classic", icon: "🎻" },
+  { id: "trk-ba", name: "Blue Archive", icon: "🎮" },
+  { id: "trk-lol", name: "League of Legends", icon: "⚔️" },
+  { id: "trk-touhou", name: "Touhou", icon: "⛩️" },
+  { id: "trk-touhou-other", name: "Related games (not Touhou)", icon: "🪐" },
+  { id: "trk-arknights", name: "Arknights", icon: "🎮" },
+  { id: "trk-gakumas", name: "Gakum@s", icon: "🎤" },
+  { id: "trk-endfield", name: "Endfield", icon: "🛰️" },
+  { id: "trk-endfield-character", name: "Endfield Character Theme", icon: "🎭", parent: "trk-endfield" },   /* 🎭 キャラクターテーマ曲の棚（trk128） */
+];
 function ensureTrkFolder() {
   let f = core.settings.plFolders.find(x => x.id === TRK_FOLDER_ID);
   if (!f) {
     f = plFolderSanitize({ id: TRK_FOLDER_ID, name: TRK_FOLDER_NAME, icon: TRK_TAB_ICON, color: "none", parent: "" });
     if (f) { core.settings.plFolders.push(f); core.saveUserPrefs(); }
   }
-  ensureTrkSubfolder("trk-classic", "Classic", "🎻");
-  ensureTrkSubfolder("trk-ba", "Blue Archive", "🎮");
-  ensureTrkSubfolder("trk-lol", "League of Legends", "⚔️");
-  ensureTrkSubfolder("trk-touhou", "Touhou", "⛩️");
-  ensureTrkSubfolder("trk-touhou-other", "Related games (not Touhou)", "🪐");
-  ensureTrkSubfolder("trk-arknights", "Arknights", "🎮");
-  ensureTrkSubfolder("trk-gakumas", "Gakum@s", "🎤");
-  ensureTrkSubfolder("trk-endfield", "Endfield", "🛰️");
-  ensureTrkSubfolder("trk-endfield-character", "Endfield Character Theme", "🎭", "trk-endfield");   /* 🎭 キャラクターテーマ曲の棚（trk128） */
+  /* 🐔 trk217：カタログから1本だけ作るときは、棚は 🐔 だけ。シリーズの棚は要るときに作る */
+  if (trkSelectedFoldersOnly) return f;
+  for (const sh of TRK_SHELVES) ensureTrkSubfolder(sh.id, sh.name, sh.icon, sh.parent);
   trkFolderNormalize();   /* 旧データの「🐔 trk's playlist」もここで固定名に直す */
   return core.settings.plFolders.find(x => x.id === TRK_FOLDER_ID) || f || null;
 }
@@ -1788,6 +1808,10 @@ function trkClassicWishesFromCatalog() {
 }
 /* チュートリアル完了時に Game Vol.1／Classic Vol.1 を自動で作るか。false＝作らない（手動の作成・♻ の戻しは使える） */
 const TRK_AUTO_GAME_CLASSIC = false;
+/* 🐔 trk217：設定のリスト選択（カタログ）から1本だけ作るときに立てる。
+   この間の ensureTrkFolder() は 🐔 の棚だけを用意し、シリーズの棚（🎮 ブルアカ…）をまとめて作らない
+   （trk-apk の apkTrkSelectedFoldersOnly と同じ考え方）。 */
+let trkSelectedFoldersOnly = false;
 function ensureTrkPlaylist(opts) {
   const o = opts || {};
   const doToast = o.toast !== false;
@@ -2107,18 +2131,27 @@ function trkEndfieldShelfRestoreOnce() {
   }
   core.saveUserPrefs();
 }
-function ensureTrkDistributionPlaylists() {
+/* 🐔 trk217：カタログのリストを「作る」のと「既にある物を最新に保つ」のを分ける。
+   create:false＝作らない（起動時はこちら。旧データの移行・曲目の更新だけ行う）。
+   create:true ＝まだ無いものも作る（設定のリスト選択から1本だけ作るとき）。 */
+const TRK_SERIES_FOLDER = { bluearchive: "trk-ba", lol: "trk-lol", touhou: "trk-touhou", "zun-other": "trk-touhou-other", arknights: "trk-arknights", gakumas: "trk-gakumas", endfield: "trk-endfield" };
+/* 🐔 そのシリーズのリストを入れる棚（🎭 Endfield のキャラクターテーマだけは別の棚） */
+function trkShelfFor(seriesId, playlistId) {
+  if (seriesId === "endfield" && ENDFIELD_CHARACTER_PL.has(playlistId)) return ENDFIELD_CHARACTER_FOLDER;
+  return TRK_SERIES_FOLDER[seriesId] || "";
+}
+function ensureTrkDistributionPlaylists(opts) {
+  const create = !opts || opts.create !== false;
   ensureTrkFolder();
   const cat = trkCatalog();
-  const folderMap = { bluearchive: "trk-ba", lol: "trk-lol", touhou: "trk-touhou", "zun-other": "trk-touhou-other", arknights: "trk-arknights", gakumas: "trk-gakumas", endfield: "trk-endfield" };
   let changed = false;
   for (const s of cat) {
     /* Only these series are auto-created under trk. Manually imported catalog entries
        from all other series still get safe metadata refreshes below. */
-    const seriesFolder = folderMap[s.id] || "";
+    const seriesFolder = TRK_SERIES_FOLDER[s.id] || "";
     for (const pl of (s.playlists || [])) {
       /* 🎭 Endfield のキャラクターテーマ曲4リストはネスト棚へ（trk128） */
-      const folder = (s.id === "endfield" && ENDFIELD_CHARACTER_PL.has(pl.id)) ? ENDFIELD_CHARACTER_FOLDER : seriesFolder;
+      const folder = (s.id === "endfield" && ENDFIELD_CHARACTER_PL.has(pl.id)) ? ENDFIELD_CHARACTER_FOLDER : seriesFolder;   /* trkShelfFor と同じ規則 */
       const baseId = "trk-" + pl.id;
       const wishes = (pl.songs || []).map(trkWishFromTrack);
       const sourceCats = new Set([s.id + ":" + pl.id, "trk:" + s.id + ":" + pl.id,
@@ -2224,6 +2257,7 @@ function ensureTrkDistributionPlaylists() {
         continue;
       }
       if (!folder || !wishes.length) continue;
+      if (!create) continue;   /* 🐔 trk217：起動時は作らない（ピッカーから選んだリストだけ作る） */
       // respect 100 limit per Vol, split if needed into Vol.1 / Vol.2 etc.
       const total = wishes.length;
       const vols = Math.ceil(total / 100) || 1;
@@ -2250,12 +2284,12 @@ function ensureTrkDistributionPlaylists() {
     if (JSON.stringify(legacyGakumas.guide || null) !== JSON.stringify(guide)) { legacyGakumas.guide = guide; changed = true; }
   }
   // legacy: ensure old 4 generic still migrate if missing (for existing users)
-  const legacy = [
+  const legacy = create ? [
     { id: "trk-ba-v1", folder: "trk-ba", series: "bluearchive" },
     { id: "trk-touhou-v1", folder: "trk-touhou", series: "touhou" },
     { id: "trk-arknights-v1", folder: "trk-arknights", series: "arknights" },
     { id: "trk-gakumas-v1", folder: "trk-gakumas", series: "gakumas" },
-  ];
+  ] : [];
   for (const d of legacy) {
     if (core.settings.playlists.some(p => p.id === d.id)) continue;
     if (trkIsRemoved(d.id)) continue;
@@ -5369,7 +5403,8 @@ function syncTrkUI() {
   const restore = core.$("trkRestoreBtn");
   if (restore) {
     const removed = Array.isArray(core.settings.trkRemoved) ? core.settings.trkRemoved.length : 0;
-    restore.hidden = !removed;
+    /* 🐔 trk217：戻すのは上の「リスト選択」から1本ずつ（trk-apk と同じ）。♻ は出さない */
+    restore.hidden = true;
     restore.textContent = tr("trkRestoreBtn", { n: removed });
   }
   try { renderTrkSettings(); } catch(_){}
@@ -5399,6 +5434,139 @@ function renderTrkSettings() {
     box.append(row);
   }
   if (core.settings.trkSortABC) box.append(el("div", "hint", tr("trkOrderAbcOff")));
+}
+
+/* 🐔 trk217：カタログから「選んだリストだけ」を追加する（trk-apk の新基準）。
+   起動時に何十本も作らず、要るものだけを設定の 🐔 から入れる。消したリストもここから戻せる。 */
+function trkPickEntries() {
+  const originals = tr("trkPickOriginals");
+  const list = [
+    { id: TRK_OST_ID, name: "🎓 trk's OST Vol.1", group: originals, special: "ost" },
+    { id: TRK_PLAYLIST_ID, name: "🐔 Game Vol.1", group: originals, special: "game" },
+    { id: TRK_CLASSIC_ID, name: "🎻 Classic Vol.1", group: originals, special: "classic" },
+  ];
+  if (builtInSongs.some(song => String(song.key).startsWith(AGENT_OST_KEY_PREFIX)))
+    list.push({ id: AGENT_OST_ID, name: "🎼 " + AGENT_OST_NAME, group: originals, special: "agent" });
+  for (const series of trkCatalog()) for (const playlist of (series.playlists || [])) {
+    const songs = playlist.songs || [];
+    const volumes = Math.max(1, Math.ceil(songs.length / 100));   /* 1本100曲まで。超えるものは Vol に分ける */
+    for (let i = 0; i < volumes; i++) {
+      const suffix = volumes > 1 ? "-v" + (i + 1) : "";
+      /* plSanitize は ID を24文字までにする。Vol の接尾辞は削らない */
+      const id = ("trk-" + playlist.id).slice(0, 24 - suffix.length) + suffix;
+      list.push({ id, series, playlist, index: i, volumes,
+        name: (playlist.icon || series.icon || "🎵") + " " + playlist.name + (volumes > 1 ? " Vol." + (i + 1) : ""),
+        group: (series.icon || "🎵") + " " + series.name });
+    }
+  }
+  return list;
+}
+function trkPickHas(entry) {
+  if (!entry) return true;
+  if (core.settings.playlists.some(p => p.id === entry.id)) return true;
+  if (!entry.playlist) return false;
+  const cats = [entry.series.id + ":" + entry.playlist.id, "trk:" + entry.series.id + ":" + entry.playlist.id];
+  return entry.volumes === 1 && core.settings.playlists.some(p => cats.includes(p.cat));
+}
+function trkPickAdd(entry) {
+  if (!entry || trkPickHas(entry) || core.settings.playlists.length >= TRK_LIST_MAX) return false;
+  const hasFolder = id => core.settings.plFolders.some(f => f.id === id);
+  if (entry.special) {
+    /* 🐔（Classic は 🎻 も）が要る。作る前に数を確かめる */
+    const need = (entry.special === "classic" ? [TRK_FOLDER_ID, "trk-classic"] : [TRK_FOLDER_ID]).filter(id => !hasFolder(id));
+    if (!plFolderRoom(need.length)) return false;
+    if (entry.special === "game" && !trkWishesFromCatalog().length) return false;
+    if (entry.special === "classic" && !trkClassicWishesFromCatalog().length) return false;
+    /* 「表示オフ」で止まらないよう、作る前に一時的にオンへ（失敗したら元に戻す） */
+    const before = { trkPlaylist: core.settings.trkPlaylist, trkClassic: core.settings.trkClassic };
+    trkUnmarkRemoved(entry.id);
+    if (entry.special === "game" || entry.special === "classic") core.settings.trkPlaylist = true;
+    if (entry.special === "classic") core.settings.trkClassic = true;
+    let made = false;
+    trkSelectedFoldersOnly = true;
+    try {
+      if (entry.special === "classic") { ensureTrkFolder(); ensureTrkSubfolder("trk-classic", "Classic", "🎻"); }
+      if (entry.special === "ost") made = !!ensureTrkOstPlaylist({ toast: false });
+      else if (entry.special === "game") made = !!ensureTrkPlaylist({ toast: false });
+      else if (entry.special === "classic") made = !!ensureTrkClassicPlaylist({ toast: false });
+      else made = !!ensureAgentOstPlaylist(builtInSongs.filter(song => String(song.key).startsWith(AGENT_OST_KEY_PREFIX)).map(song => song.key));
+    } finally { trkSelectedFoldersOnly = false; }
+    if (!made) { core.settings.trkPlaylist = before.trkPlaylist; core.settings.trkClassic = before.trkClassic; return false; }
+    core.settings.trkPlaylist = true;   /* 追加したリストが見えるよう、🐔 のタブは出す */
+    core.saveUserPrefs();
+    return true;
+  }
+  const series = entry.series, pl = entry.playlist;
+  const shelf = trkShelfFor(series.id, pl.id);
+  const need = [TRK_FOLDER_ID, shelf && shelf === ENDFIELD_CHARACTER_FOLDER ? "trk-endfield" : "", shelf]
+    .filter((id, i, arr) => id && !hasFolder(id) && arr.indexOf(id) === i);
+  if (!plFolderRoom(need.length)) return false;
+  trkSelectedFoldersOnly = true;
+  try {
+    ensureTrkFolder();
+    for (const sh of TRK_SHELVES) if (need.includes(sh.id)) ensureTrkSubfolder(sh.id, sh.name, sh.icon, sh.parent);
+  } finally { trkSelectedFoldersOnly = false; }
+  const folder = shelf && hasFolder(shelf) ? shelf : TRK_FOLDER_ID;
+  const p = plSanitize({ id: entry.id, name: pl.name + (entry.volumes > 1 ? " Vol." + (entry.index + 1) : ""),
+    icon: pl.icon || series.icon, color: pl.color || series.color, folder, tags: pl.tags,
+    wish: (pl.songs || []).slice(entry.index * 100, (entry.index + 1) * 100).map(trkWishFromTrack),
+    guide: trkCatalogGuide(series, pl, true), cat: "trk:" + series.id + ":" + pl.id, songs: [], createdAt: Date.now() });
+  if (!p) return false;
+  trkUnmarkRemoved(entry.id);
+  core.settings.playlists.push(p);
+  core.settings.trkPlaylist = true;
+  core.saveUserPrefs();
+  return true;
+}
+function trkPickRender() {
+  const select = core.$("trkPickSelect"), button = core.$("trkPickAdd");
+  if (!select || !button) return;
+  const hint = core.$("trkPickHint"), status = core.$("trkPickStatus");
+  if (hint) hint.textContent = tr("trkPickHint");
+  const label = core.$("trkPickLabel");
+  if (label) label.textContent = tr("trkPickLabel");
+  button.textContent = tr("trkPickAdd");
+  if (status && !status.dataset.keep) status.textContent = "";
+  const previous = select.value, entries = trkPickEntries();
+  select.replaceChildren();
+  let group = null, groupName = "";
+  for (const [i, entry] of entries.entries()) {
+    if (entry.group !== groupName) { groupName = entry.group; group = el("optgroup"); group.label = groupName; select.append(group); }
+    const taken = trkPickHas(entry);
+    const option = el("option", "", entry.name + (taken ? " — " + tr("trkPickAdded") : ""));
+    option.value = String(i); option.disabled = taken; group.append(option);
+  }
+  if (previous && select.querySelector('option[value="' + previous + '"]:not(:disabled)')) select.value = previous;
+  /* 先頭が「追加済み」で選べないときは、選べる最初のものへ寄せる（押せないボタンで止まらない） */
+  if (select.selectedIndex < 0 || select.options[select.selectedIndex].disabled) {
+    const first = Array.prototype.findIndex.call(select.options, o => !o.disabled);
+    if (first >= 0) select.selectedIndex = first;
+  }
+  button.disabled = select.selectedIndex < 0 || select.options[select.selectedIndex].disabled;
+}
+function trkPickSay(key) {
+  const status = core.$("trkPickStatus");
+  if (!status) return;
+  status.textContent = tr(key);
+  status.dataset.keep = "1";
+  setTimeout(() => { delete status.dataset.keep; }, 1200);
+}
+const trkPickSelect = core.$("trkPickSelect"), trkPickAddBtn = core.$("trkPickAdd");
+if (trkPickSelect && trkPickAddBtn) {
+  trkPickSelect.addEventListener("change", () => {
+    trkPickAddBtn.disabled = trkPickSelect.selectedIndex < 0 || trkPickSelect.options[trkPickSelect.selectedIndex].disabled;
+  });
+  trkPickAddBtn.addEventListener("click", () => {
+    const entry = trkPickEntries()[Number(trkPickSelect.value)];
+    const ok = trkPickAdd(entry);
+    trkPickSay(ok ? "trkPickOk" : "trkPickFail");
+    if (ok) { core.saveUserPrefs(); syncTrkUI(); renderLib(); }
+    trkPickRender();
+  });
+  if (typeof on === "function") on("language", trkPickRender);
+  const panel = core.$("trkPanel");
+  if (panel) panel.addEventListener("toggle", () => { if (panel.open) trkPickRender(); });
+  trkPickRender();
 }
 
 
@@ -5433,8 +5601,8 @@ const trkMusicFolderBtn = core.$("trkMusicFolderBtn");
 if (trkMusicFolderBtn) trkMusicFolderBtn.addEventListener("click", openFolder);   /* 📁 自分で作った Music/trk を読み取り専用で選ぶ */
 const trkChk = core.$("trkPlaylistChk");
 if (trkChk) trkChk.addEventListener("change", function(){
+  /* 🐔 trk217：ここは「タブを出すか」だけ。リストは ⚙ のリスト選択から追加する */
   core.settings.trkPlaylist = !!trkChk.checked; core.saveUserPrefs();
-  if (core.settings.trkPlaylist) try { ensureTrkPlaylist({ toast: false }); } catch(_){}
   syncTrkUI(); renderLib();
   core.setStatus("trkStatus", core.settings.trkPlaylist ? "trkShow" : "trkHide");
 });
@@ -5462,8 +5630,8 @@ if (trkHideBtn) trkHideBtn.addEventListener("click", function(){
 });
 const trkClassicChk = core.$("trkClassicChk");
 if (trkClassicChk) trkClassicChk.addEventListener("change", function(){
+  /* 🎻 trk217：ここも表示だけ（リストは ⚙ のリスト選択から） */
   core.settings.trkClassic = !!trkClassicChk.checked; core.saveUserPrefs();
-  if (core.settings.trkClassic) try { ensureTrkClassicPlaylist({ toast: false }); } catch(_){}
   syncTrkUI(); renderLib();
   core.setStatus("trkClassicStatus", core.settings.trkClassic ? "trkClassicShow" : "trkClassicHide");
 });
@@ -5667,13 +5835,13 @@ async function initLibrary() {
     try { ensureTrkClassicPlaylist({ toast: false }); } catch(_){}
   }
   trkOstLegacyCleanOnce();   /* 🎓 分離前の旧OST参照を一度だけ掃除（trk189・未チュートリアルでも移行する） */
-  // 🎓 trk's OST Vol.1 — オリジナル曲＋デモ曲のリスト（一番下・中クリックで消せる）
-  if (core.settings.tutorialDone) {
+  // 🎓 trk's OST Vol.1 — あるときだけ曲目を最新に保つ。無ければ ⚙ のリスト選択から追加する（trk217）
+  if (core.settings.tutorialDone && core.settings.playlists.some(p => p.id === TRK_OST_ID)) {
     try { ensureTrkOstPlaylist({ toast: false }); } catch(_){}
   }
-  // 配布形態で分類: 各タイトル別 Vol を作る（長押しで開くリスト）
+  // 🐔 trk217：起動時は「作らない」。既にあるリストの曲目・ガイド・旧データだけ最新に保つ
   if (core.settings.tutorialDone) {
-    try { ensureTrkDistributionPlaylists(); } catch(_){}
+    try { ensureTrkDistributionPlaylists({ create: false }); } catch(_){}
   }
   try { trkGuideBackfill(); } catch(_){}
   try { repairDefaultTrkGuideLinks(); } catch(_){}

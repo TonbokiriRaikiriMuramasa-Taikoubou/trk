@@ -1177,6 +1177,17 @@
             <summary data-i18n="trkPanelTitle"></summary>
             <div class="hint" data-i18n="trkPanelHint"></div>
             <div class="hint" data-i18n="trkPlaylistHint"></div>
+
+            <!-- 🐔 trk217：カタログから選んだリストだけを追加（起動時に一括作成しない・trk-apk の新基準） -->
+            <div id="trkPick" class="trkPick">
+              <div class="hint" id="trkPickHint" data-i18n="trkPickHint"></div>
+              <label class="field"><span data-i18n="trkPickLabel"></span>
+                <select id="trkPickSelect" data-i18n-aria="trkPickLabel"></select>
+              </label>
+              <div class="miniActions"><button id="trkPickAdd" type="button" data-i18n="trkPickAdd"></button></div>
+              <div id="trkPickStatus" class="hint status" role="status" aria-live="polite"></div>
+            </div>
+
             <label class="check"><input id="trkPlaylistChk" type="checkbox"><span data-i18n="trkPlaylistToggle"></span></label>
             <div class="hint" data-i18n="trkPlaylistNote"></div>
             <div class="hint" data-i18n="trkMusicFolderHint"></div>

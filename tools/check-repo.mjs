@@ -1134,7 +1134,7 @@ if (!exists("js/fx-worklet.js") ||
 
     /* 🎭棚の戻し（一回限り）: 上限13でこわれた形（棚が消え、4リストがトップ）だけを戻す */
     const restoreUnit = library.slice(library.indexOf("/* 🎭 Endfieldのキャラクターテーマ曲（trk128）"),
-      library.indexOf("function ensureTrkDistributionPlaylists()"));
+      library.indexOf("function ensureTrkDistributionPlaylists("));
     const charIds = ["ef-blurring", "ef-ashen", "ef-floaty", "ef-makers"];
     const lists = () => charIds.map(id => ({ id: "trk-" + id, cat: "trk:endfield:" + id, folder: "", songs: [] }));
     const runRestore = state => {
@@ -1372,7 +1372,8 @@ if (!exists("js/fx-worklet.js") ||
           created.guide.url === album.soundcloudUrl && created.guide.note.includes("SoundCloud");
       });
       safeRefreshOk = preservesCustomData && refreshesBothSources && createsOtherSessionsAlbums && saveCount > 0 &&
-        library.includes('lol: "trk-lol"') && library.includes('ensureTrkSubfolder("trk-lol", "League of Legends", "⚔️")') &&
+        library.includes('lol: "trk-lol"') && library.includes('{ id: "trk-lol", name: "League of Legends", icon: "⚔️" }') &&
+        library.includes("for (const sh of TRK_SHELVES) ensureTrkSubfolder(sh.id, sh.name, sh.icon, sh.parent)") &&
         library.includes('pl.sourceLabel || tr("plOfficialLink")');
     }
   } catch (error) {
@@ -1915,7 +1916,11 @@ if (!exists("js/fx-worklet.js") ||
     core.includes("trkRemoved: cleanTrkRemoved(prefs.trkRemoved)") && core.includes("settings.trkRemoved = cleanTrkRemoved(data.trkRemoved)") &&
     core.includes("settings.trkRemoved = [];") &&
     html.includes('<button id="trkRestoreBtn" type="button" hidden></button>') && html.includes('data-i18n="trkRestoreHint"') &&
-    library.includes('const trkRestoreBtn = $("trkRestoreBtn");') && library.includes("restore.hidden = !removed;");
+    library.includes('const trkRestoreBtn = $("trkRestoreBtn");') &&
+    /* trk217：♻ は出さず、消したリストは設定のリスト選択（trkPickAdd）から1本ずつ戻す */
+    library.includes("restore.hidden = true;") && library.includes("function trkPickAdd(entry)") &&
+    library.includes("if (!entry || trkPickHas(entry) || settings.playlists.length >= TRK_LIST_MAX) return false;") &&
+    library.includes("trkUnmarkRemoved(entry.id);") && html.includes('id="trkPickSelect"');
   const displayOk = library.includes("const guideNote = plGuideText(p.guide);") && library.includes("return tr(guide.key);") &&
     !/note:\s*"\\u975E/.test(library) && !library.includes('guide: { note: "DOWNLOAD規約');
   const namespaceOk = !/window\.Trk(?:EnsureTrkOstPlaylist|OstPlaylistId|TouhouThemeData)\b/.test(library + read("js/catalog.js") + read("js/touhou-theme-data.js")) &&

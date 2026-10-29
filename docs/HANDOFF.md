@@ -91,7 +91,7 @@
 - **入れなかったもの**（APK 専用）：`core.audioSafety`・`keepInBackground`・`TrkApkPip`・下部ナビ・Back の段階処理・向きの10秒長押しなど。カタログの音源を同梱しない方針も従来どおり。
 - **未確認**：実ブラウザでのピッカーの操作感（サンドボックスにブラウザーが無い）。
 
-### 🐔 trk's playlist：曲画面の一覧に出さない・編集できるコピー（trk218）
+### 🐔 trk's playlist：曲画面の一覧に出さない・編集できるコピー（trk218・1.1.7 で配布）
 
 実機でピッカー（trk217）を触った利用者からの UX 改善。**trk のリストが「プレイリストに入れる」に並ぶと画面が埋まる**ため、初期は出さず、要るときだけ出せるようにした。
 
@@ -386,6 +386,8 @@
 | 54 | 1.1.5 の配布ZIP（trk215・trk216 入り・2026-10-29） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻（`2026-10-29 10:00` UTC）・`--check`（`checkDocLinks` 0件）・ローカル配信・落とし直してのバイト一致は確認済み（§6・§9）。**利用者の実機での起動と、Bタイプの譜面の感触は未確認** | ①1.1.4 のフォルダーに重ねず新しいフォルダーへ展開して `index.html` から起動 ②⚙ 設定 → 🎼 譜面生成方式 が **Bタイプ（標準・方式4）** になっていること ③曲を選んで譜面ができること ④⭐ のお気に入り（2軍／🧊／📤）が再読み込みで残ること |
 | 55 | trk217：🐔 trk's playlist のリスト選択（起動時に作らない・カタログから追加・♻ を出さない） | `tests/trk217-playlist-catalog.test.mjs` の11件＋`npm run check` 715 pass で確認済み（1.1.6 の配布ZIPに同梱）（ID の24文字・Vol 分割・追加済み判定・要る棚だけ作る・上限・表示フラグの戻し・起動の `create:false`・4言語）。**実ブラウザでの操作感は未確認** | ⚙ → 🐔 trk's playlist を開き、①リストを1本追加して 🐔 の階層に入るか ②同じものを選ぶと「追加済み」になるか ③🗑 で消したリストを選び直すと戻るか ④必要な棚だけが増えるか ⑤言語を切り替えても選択肢の名前が変わるか |
 | 56 | 1.1.6 の配布ZIP（trk217 入り・2026-10-29） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻（`2026-10-29 12:00` UTC）・`--check`（`checkDocLinks` 0件）・ローカル配信・落とし直してのバイト一致は確認済み（§6・§9）。**実ブラウザでのピッカーの操作感は未確認** | ①1.1.5 のフォルダーに上書きせず、1.1.6 のZIPを別の場所へ展開する ②⚙ → 🐔 trk's playlist →「プレイリストを選択」で1本追加し、🐔 の階層（タブ長押し）に入るか ③同じリストが「追加済み」になって選べないか ④🗑 で消したリストを選び直すと戻るか |
+| 57 | trk218：🐔 trk のリストを曲画面に出さない（👁／🗑／📋） | `tests/trk218-trk-list-visibility.test.mjs` の14件＋`npm run check` 729 pass で確認済み（1.1.7 の配布ZIPに同梱）（初期は出さない・`trkListed` の検証・リストは消えない・📋 の `cat:""` と24文字・上限200本・案内は1回だけ）。**実ブラウザでの 👁／🗑／📋 の操作感は未確認** |
+| 58 | 1.1.7 の配布ZIP（trk218 入り・2026-10-29） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻（`2026-10-29 13:00` UTC）・`--check`・ローカル配信は確認済み（§6）。**実ブラウザで 👁／🗑／📋 を触っての確認は未了**（§4-57） |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -497,6 +499,19 @@
 
 ## 6. 直近の検証
 
+**1.1.7 の配布ZIP（2026-10-29）の確認**
+
+| 検査 | 結果 | 範囲・注意 |
+|---|---|---|
+| `npm run check` | **729 pass / 0 fail** | Static・Security・a11y・lite も緑。`git diff --check` OK |
+| 土台 | **1.1.6 の配布ZIP（Drive `trk-1.1.6`）** | `sha256 7f856d9f…47f5f9` を確かめて展開した `trk-files/`（224ファイル）に、変わった**4ファイル**（`js/core.js`・`js/library.js`・`sw.js`・`css/style.css`）を載せ替え＝ほかの差分は混ぜていない |
+| `tools/prepare-release.mjs` | **OK** | `--version=1.1.7 --date=2026-10-29T13:00:00Z --newer-than=2026-10-29T12:00:00Z`。`--check` で `index.html`・`README.txt`・`trk-files/` の形を確認（`checkDocLinks` の指摘なし） |
+| 配布ZIP（1.1.7） | **226エントリ・3,926,426 bytes・`unzip -t` 破損なし** | 全エントリ **`2026-10-29 13:00`（UTC）**（1.1.6 の `12:00` より新しい）。**`sha256 482a27adb35eda2f63abca08c2684e583460b441c0ac7a31658d7e35380c184a`** |
+| 1.1.6 のZIPとの差分 | **コード4ファイル＋配布版の文書4本** | `css/style.css`・`js/core.js`・`js/library.js`・`sw.js`、`README-1.1.6.md`→`README-1.1.7.md`（改名＋追記）・`README.md`・`README-SLIM.md`・ルートの `README.txt`（＋`release-manifest.json`） |
+| 差分の当てやすさ | **OK** | 1.1.6 の `trk-files/` に `patch -p1 --dry-run` でコード／文書の2本とも「checking file」だけ（失敗なし） |
+| ローカルサーバーで配信 | **OK** | `/`・`trk-1.1.7/`・`trk-1.1.7/index.html`・`trk-1.1.7/trk-files/{index.html,js/library.js,js/core.js,sw.js,README-1.1.7.md,release-manifest.json}`・`README.txt` がすべて 200 |
+| 実ブラウザで 👁／🗑／📋 | **未確認** | サンドボックスにブラウザーが無い。§4-57 の手順で確認する |
+
 **trk218（2026-10-29）の確認**
 
 | 検査 | 結果 | 範囲・注意 |
@@ -604,6 +619,9 @@
 
 ## 7. 最近の変更
 
+- **📦 1.1.7：trk218 を配る版（2026-10-29）**：**アプリ本体は trk218**（🐔 trk のリストを曲画面に出さない・👁／🗑／📋）。1.1.6 の配布ZIPの `trk-files/` を土台に、**コード4ファイル**（`css/style.css`・`js/core.js`・`js/library.js`・`sw.js`）を差し替え、`README-1.1.6.md` を `README-1.1.7.md` に改名して今回の内容を追記、`README.md`・`README-SLIM.md`・`release/README.txt` を 1.1.7 に（`release-manifest.json` は `--version` から作られる）。
+  - ZIP は **`2026-10-29 13:00`（UTC）** で組み立て＝**226エントリ・3,926,426 bytes**・`unzip -t` 破損なし・全エントリ同時刻・**`sha256 482a27adb35eda2f63abca08c2684e583460b441c0ac7a31658d7e35380c184a`**。`--check` OK・ローカル配信 200・差分は 1.1.6 に `patch -p1 --dry-run` で通る。
+  - **1.1.0〜1.1.6 のZIPと Drive の `trk-1.1.0`〜`trk-1.1.6` はそのまま**（同じ名前で作り直さない）。
 - **🐔 trk218：trk のリストを初期は曲画面に出さない／🗑・👁・📋（2026-10-29）**：実機でピッカーを触った利用者の「並ぶと圧迫する」という声への対応。**曲画面の「プレイリストに入れる」には trk のリスト（`trk-…`）を初期状態では出さない**（`settings.trkListed`＝出すIDの一覧・初期 `[]`。隠した件数は `plInListsHidden` で 👁 の場所を案内）。⚙ → 🐔 の一覧に **👁／🗑**（`trkListSetShown`・**リストは消さない**・隠れている 👁 は `.plTrkHidden` で淡く・`aria-pressed`）と **📋**（`trkCopyAsUser`＝`pl…` の通常プレイリスト・`cat:""` で自動更新と切る・24文字以内の「（コピー）」・同じ棚・中身とガイドを引き継ぐ・上限200本）を足した。ボタンは **`trk-…` のリストだけ**に出す。**既に編集していた人には起動時に1回だけ** `trkFixedNotice` で固定の旨を伝える（`trkFixedNoticeOnce`・`resetAllPrefs`／設定Import対応・MIGRATIONS に登録）。`plDelete` は `trkListed` からも ID を消す。文言は4言語、`sw.js` の cache は **`trk-v2026.10.29-trk218`**、`tests/trk218-trk-list-visibility.test.mjs`（14件）で **729 pass**。
 - **📦 1.1.6：trk217 を配る版（2026-10-29）**：**アプリ本体は trk217**（🐔 trk's playlist のリスト選択）。1.1.5 の配布ZIPの `trk-files/` を土台に、**コード3ファイル**（`index.html`・`sw.js`・`js/library.js`）を差し替え、`README-1.1.5.md` を `README-1.1.6.md` に改名して今回の内容を追記、`README.md`・`README-SLIM.md`・`release/README.txt` を 1.1.6 に。
   - ZIP は **`2026-10-29 12:00`（UTC）** で組み立て＝**226エントリ・3,922,091 bytes**・`unzip -t` 破損なし・**`sha256 7f856d9f4f9d1a507047fcfd223de966e904a711a1f87c2f66aeed87bc47f5f9`**。ダウンロード欄に残っていた「1.1.4の配布物」「`trk-1.1.4.zip`」も 1.1.6 に直した。
@@ -668,13 +686,13 @@
 - [ ] 版を上げたときは §9 の「版を上げるときに直す場所」を全部直し、`release/README.txt`・配布アプリの `README-1.x.y.md`・`sw.js` の `CACHE`・`release-manifest.json` の `version` がそろっていることを確かめた。
 - [ ] Drive へ上げたら、**落とし直してバイト一致**を確かめ、`SHA256SUMS` を新しいハッシュで上書きした（§9）。
 
-## 9. 配布物の形（1.0.8〜／現在 **1.1.6**：`index.html`＋`README.txt`＋`trk-files/`）
+## 9. 配布物の形（1.0.8〜／現在 **1.1.7**：`index.html`＋`README.txt`＋`trk-files/`）
 
-**決めたこと（2026-10-26／1.0.8〜1.1.6）**：ZIPを開いたときに **`index.html`・`README.txt`・`trk-files/` の3つだけ**が見える形にする（1.0.6 のころの試作 `trk-1.0.6-layout-proto.zip` と同じ見た目。利用者からの指定）。**OS別のZIPは作らない**——Windows・macOS・Linux は同じアプリ本体で動くので、1本で足りる（1.0.7 までの win/linux・mac の2本は廃止）。
+**決めたこと（2026-10-26／1.0.8〜1.1.7）**：ZIPを開いたときに **`index.html`・`README.txt`・`trk-files/` の3つだけ**が見える形にする（1.0.6 のころの試作 `trk-1.0.6-layout-proto.zip` と同じ見た目。利用者からの指定）。**OS別のZIPは作らない**——Windows・macOS・Linux は同じアプリ本体で動くので、1本で足りる（1.0.7 までの win/linux・mac の2本は廃止）。
 
 ```
-trk-1.1.6.zip
-└ trk-1.1.6/
+trk-1.1.7.zip
+└ trk-1.1.7/
    ├ index.html   … 入口（meta refresh＋<a>＋location.replace で trk-files/index.html へ）
    ├ README.txt   … かんたん起動・index.html だけでできること・ローカルサーバーの使い方・注意・権利
    └ trk-files/   … アプリ本体（リポジトリのルートと同じ中身。README-1.1.6.md・LICENSE・docs/ を含む）
@@ -686,13 +704,13 @@ trk-1.1.6.zip
 - **`http://127.0.0.1:8000/` で開いたとき**：入口がルート直下に残った **1.0.7 以前の worker だけ**を `unregister()` してから進む（`trk-files/sw.js` は残す）。アプリの worker のスコープは `/trk-files/` になる。
 - **保存データは「開き方」ごとに別**（`file://` と `http://127.0.0.1:8000/` は別のオリジン）。これは 1.0.6 試作の README.txt と同じ注意書きを残している。
 - **`00_START_HERE.html` と `01_README_WIN_LINUX.txt`／`01_README_MAC.txt` は廃止**。起動案内は `README.txt` に集約（`--check` がアプリ側に残っていると fail にする。`README-1.1.4.md` などアプリ自身の README は残す）。
-- **`release-manifest.json`**（`trk-files/` の中）に `version`・`archive:"trk-1.1.6.zip"`・`layout:"wrapper"`・`wrapper{launcher:"index.html", readme:"README.txt", app:"trk-files", platforms:["win","linux","mac"]}`・`service_worker_cache`（`sw.js` の `CACHE` を書き写す）・`built_at` を記録。`platform` は持たない。**このファイルは `--version` から作る（手で書かない）**。
+- **`release-manifest.json`**（`trk-files/` の中）に `version`・`archive:"trk-1.1.7.zip"`・`layout:"wrapper"`・`wrapper{launcher:"index.html", readme:"README.txt", app:"trk-files", platforms:["win","linux","mac"]}`・`service_worker_cache`（`sw.js` の `CACHE` を書き写す）・`built_at` を記録。`platform` は持たない。**このファイルは `--version` から作る（手で書かない）**。
 
-**版を上げるときに直す場所（1.1.6 で実施した順）**
+**版を上げるときに直す場所（1.1.7 で実施した順）**
 
 1. `release/README.txt` — 1行目の版と、末尾の `README-1.x.y.md` の参照（`tests/release-layout.test.mjs` が「版が書いてあること」「アプリ内READMEの名前」を見る）。
 2. 配布アプリの `README-1.x.y.md` — 前の版から改名し、先頭に「今回」の更新点を足して、前回の見出しを「前回」へ。`README.md` も同じ内容にする。`README-SLIM.md` の版・cache・archive 名・ファイル数も直す。
-3. `sw.js` の `CACHE` — `trk-v<日付>-trk<番号>`（**1.1.5 は trk216 の `trk-v2026.10.29-trk216`**、1.1.4 は trk214 の `trk-v2026.10.27-trk214`、1.1.3 は trk213 の `trk-v2026.10.27-trk213`。アプリ本体が変わらない版では上げない＝1.1.0 は trk208、1.1.1 は trk210 のまま）。`release-manifest.json` は `--version` から作られる。
+3. `sw.js` の `CACHE` — `trk-v<日付>-trk<番号>`（**1.1.7 は trk218 の `trk-v2026.10.29-trk218`**、1.1.5 は trk216 の `trk-v2026.10.29-trk216`、1.1.4 は trk214 の `trk-v2026.10.27-trk214`、1.1.3 は trk213 の `trk-v2026.10.27-trk213`。アプリ本体が変わらない版では上げない＝1.1.0 は trk208、1.1.1 は trk210 のまま）。`release-manifest.json` は `--version` から作られる。
 4. 本書 — ヘッダ・§2（版の説明）・§4（新しい版の #）・§5（cache 名）・§6・§7・§9。
 5. **配布版だけの文書** — 下の「配布版だけの文書（毎版そろえる）」を読む。`--check` がリンク切れ（`README-1.x.y.md` の名前違い）を止める。
 
@@ -730,6 +748,7 @@ unzip -t /home/user/work/rel114/dist/trk-1.1.4.zip && sha256sum /home/user/work/
 - 組み立ては **`js/zip-io.js` の `zipWrite` をそのまま使う**（新しいZIP実装を増やさない）。全エントリ同じ mtime（`--date`）で、並びは名前順＝決定的。
 - **🕒 時刻は前の版より新しくする（必須・trk205）**：`--date` を省くと**組み立てた時刻（分まで）**になる。同じ時刻のZIPを配ると、同じポートの `python -m http.server` が `If-Modified-Since` に **304** を返し、ブラウザーは HTTP キャッシュにある**前の版の `index.html`（入口ではなく旧アプリ）**を使い続ける（`/js/…` が無いので一覧が空の壊れた画面になり、入口の Service Worker 解除も走らない。`file://` と別ポートは影響なし）。1.0.7 と 1.0.8 がどちらも `2026-10-27 12:00` で組まれていたため実際に起きた（2026-10-27 レビュー・必須）。`--newer-than=<前の版の built_at>` を渡すと、それ以前の時刻では組み立てを止める。`release-manifest.json` の **`built_at`** が次の版の基準になる。
 - `.gitignore` に `dist/` を入れてある（ZIPは Git に入れない）。
+- **1.1.7 の実績**：**226エントリ・3,926,426 bytes**・`unzip -t` 破損なし・全エントリ **`2026-10-29 13:00`（UTC）**（1.1.6 の `12:00` より新しい）・`--check` OK・`sha256 482a27adb35eda2f63abca08c2684e583460b441c0ac7a31658d7e35380c184a`。**コード4ファイル**（`css/style.css`・`js/core.js`・`js/library.js`・`sw.js`）＋配布版の文書4本（`README-1.1.6.md`→`README-1.1.7.md`・`README.md`・`README-SLIM.md`・`README.txt`）。
 - **1.1.6 の実績**：**226エントリ・3,922,091 bytes・`unzip -t` 破損なし**・全エントリ **`2026-10-29 12:00`（UTC）**（1.1.5 の `10:00` より新しい）・`--check` OK（`checkDocLinks` 0件）・`sha256 7f856d9f4f9d1a507047fcfd223de966e904a711a1f87c2f66aeed87bc47f5f9`。**コード3ファイル**（`index.html`・`sw.js`・`js/library.js`）＋配布版の文書3本（`README-1.1.5.md`→`README-1.1.6.md`・`README.md`・`README-SLIM.md`）。
 - **1.1.5 の実績**：**226エントリ・3,916,257 bytes・`unzip -t` 破損なし**・全エントリ **`2026-10-29 10:00`（UTC）**（1.1.4 の `2026-10-27 22:00` より新しい）。`sha256 0b12ae8c35062910aa5c66e2c027c7a85670bd5204e5ee9abc6a2fbd4c8f8599`。1.1.4 のZIPの `trk-files/` を土台に、**コード11ファイル**（trk215＋trk216）＋`README-1.1.5.md`（改名）・`README.md`・`README-SLIM.md`・`docs/guide/files.md`。`checkDocLinks()` は **0件**。
 - **1.1.4 の実績**：**226エントリ・3,910,309 bytes・`unzip -t` 破損なし**・全エントリ **`2026-10-27 22:00`（UTC）**（1.1.3 の `21:00` より新しい）。`sha256 b8050bc55fa499472079be2ebea3ea190bdd5d1bd408780c4804506a638501b2`。1.1.3 のZIPの `trk-files/` を土台に、**コード2ファイル**（`js/video-max.js`・`sw.js`）＋ガイド2本の1文＋**配布版の文書9本**＋README を差し替え。`checkDocLinks()` は **0件**。

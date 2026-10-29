@@ -232,6 +232,15 @@ trk! also works as a music player. Open "🎛 Sound effects" in Settings or from
 
 Below it is the **🎚 Effect rack**, where you can stack effects **in up to eight stages**, like a portable amp chain. Stages run after the preset and are included in saved presets and exports. Available stages are: **🚪 Noise gate** (closes when the signal falls below a threshold); **🧹 Noise reduction** (during a quiet passage, press "🔇 Learn the current sound as noise"; it learns that spectrum for two seconds and removes it, a self-made version of the approaches in Audacity, ReaFir, and Bertom Denoiser Classic); **🎚 Dynamic EQ** (reduces a band only when that band is loud, after TDR Nova and Ozone); **✨ Exciter** (adds harmonics to the highs); **🧲 Compressor**; and **📢 Volume**. Noise reduction is heard about 20 ms late, which the automatic timing compensation absorbs.
 
+### 🔈 Switching the sound output does not stop the song (trk219)
+
+When you change the system output device (Windows “Sound”, speakers / headphones / HDMI and so on), the browser rebuilds its audio path. Playback used to stop and stay stopped, so trk! now **notices the stop and starts the song again from where it was**.
+
+- **A stop you asked for stays stopped**: pausing with ⏯, the lock screen, or a keyboard pause key is never undone.
+- **Nothing resumes in the background**: while the tab is hidden or the window is minimized, playback is not restarted.
+- **Restarts are kept modest**: if playback keeps stopping, trk! waits instead of retrying forever (up to six times a minute; after three failed tries it rests for 30 seconds).
+- Audio stays on this device; nothing new is saved or sent.
+
 ### 🔊 Volume leveling (ReplayGain style, off by default)
 
 In "🎛 Sound effects", below "Prevent clipping (limiter)", **"Level the volume across songs"** turns loud songs down and quiet songs up toward one listening level, so you do not have to reach for the volume between songs. It works **independently of the effects switch** (while leveling is on, audio runs through WebAudio — the same behavior as turning effects on).

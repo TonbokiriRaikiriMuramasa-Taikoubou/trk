@@ -900,6 +900,31 @@ addEventListener("pointerdown", wakeAudio, true);
 addEventListener("keyup", wakeAudio, true);
 addEventListener("blur", () => setBypass(false));
 
+/* 🔈 trk219：出力デバイス（スピーカー／ヘッドホン／HDMI など）を切り替えると、
+   音の出口が作り直される。そのとき AudioContext が止まったままになったり、
+   出口（G.out → destination）がつながったまま黙ることがあるので、起こし直す。
+   ・resume できたときだけ、出口を一度つなぎ直す（鳴っている最中の切り替えで音が途切れないように、
+     つなぎ直しは resume の少しあとで1回だけ）。 */
+function wakeAudioHard(force) {
+  if (!G.ac || G.ac.state === "closed") return false;
+  let woke = false;
+  if (G.ac.state !== "running") {
+    try {
+      const p = G.ac.resume();
+      if (p && typeof p.catch === "function") p.catch(() => {});
+      woke = true;
+    } catch (_) {}
+  }
+  if ((woke || force) && G.out) {
+    setTimeout(() => {
+      if (!G.ac || G.ac.state === "closed") return;
+      try { G.out.disconnect(); } catch (_) {}
+      try { G.out.connect(G.ac.destination); } catch (_) {}
+    }, 120);
+  }
+  return woke;
+}
+
 /* ============ ⑩ 操作 ============ */
 function refresh() {
   if ((settings.fxOn || settings.midiMixEnabled) && !ensureGraph()) {
@@ -1363,6 +1388,8 @@ window.TrkFX = Object.freeze({
     settings.midiMixProfile = api && typeof api.normalize === "function" ? api.normalize(id) : "studio_gm";
     refresh(); emit("midiMix"); return settings.midiMixProfile;
   },
+  context: () => G.ac,
+  wake: wakeAudioHard,
   tap,
   tapElement,
   untapElement

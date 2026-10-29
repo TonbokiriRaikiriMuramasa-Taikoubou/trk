@@ -91,6 +91,19 @@
 - **入れなかったもの**（APK 専用）：`core.audioSafety`・`keepInBackground`・`TrkApkPip`・下部ナビ・Back の段階処理・向きの10秒長押しなど。カタログの音源を同梱しない方針も従来どおり。
 - **未確認**：実ブラウザでのピッカーの操作感（サンドボックスにブラウザーが無い）。
 
+### 🔈 出力デバイスを切り替えても、再生を止めない（trk219）
+
+Windows の「サウンド」などで**音の出力先（スピーカー／ヘッドホン／HDMI など）を切り替えると、再生が止まったまま戻らない**という実機の指摘への対応。ブラウザーが音の出口を作り直すときに、`<video>`（全曲・動画・プレビューで使う**唯一の再生要素**）が勝手に一時停止したり、Web Audio の出口が黙ることがあるため、**「利用者が止めたのではない停止」を見つけて続きから鳴らし直す**。
+
+- **`js/audio-keep.js`（新規）**：`#video` の `play()`／`pause()` を**その要素だけ**包み、`pause()` を呼んだ時刻（`askedPauseAt`）を記録する＝**アプリが頼んだ停止**と区別する。`media.js` の次に読む（`index.html`）。
+- **判断は純関数 `keepPlan(state)`**：`want`（アプリが再生を望んでいる）・`hidden`（別タブ・最小化）・`ended`・`paused`・`stalled`・`contextRunning`・予算（60秒に6回）・休み（3回続けて失敗で30秒）で `"play"`／`"context"`／`"none"` を返す。
+- **見張り（1秒ごと）**：①アプリが頼んでいない `pause` → 250ms 後に再開（位置はそのまま）②`readyState >= 3` なのに `currentTime` が 2.6 秒進まない → `play()` をやり直す ③`AudioContext` が running でない → `resume()` ④`mediaDevices` の `devicechange` → 出口を起こし、🎛 の出口もつなぎ直す。
+- **守る約束**：画面が隠れているときは再開しない／終端では再開しない／1分に6回まで／3回続けて失敗したら30秒休む／**`window.Trk.audioKeep`** に `plan`・`recover`・`state`・`limits` を出す（テスト用）。
+- **`js/fx.js`**：`wakeAudioHard(force)` を足して **`TrkFX.context()`／`TrkFX.wake(force)`** を公開。`AudioContext` が running でないときに `resume()` し、`wake(true)`（デバイスの切り替え）では**出口 `G.out` を destination へつなぎ直す**（つなぎ直しは 120ms 後・1回）。
+- **ロック画面・キーボードの停止キーは今までどおり**：`Media Session` の `pause` ハンドラ（`fx-dock.js`・`media-player-mode.js`）がアプリ側で `pause()` を呼ぶので「頼まれた停止」＝再開しない。
+- 設定は増やさない（UI・i18n の追加なし）。`sw.js` の cache は **`trk-v2026.10.29-trk219`**、`tests/trk219-audio-output-keep.test.mjs`（17件）で **746 pass**。利用者向けの説明は `docs/guide/sound.md`・`docs/guide/en.md` に1節ずつ。
+- **未確認**：実ブラウザ／実機で出力デバイスを切り替えたときの挙動（サンドボックスに音声デバイスもブラウザーも無い）。
+
 ### 🐔 trk's playlist：曲画面の一覧に出さない・編集できるコピー（trk218・1.1.7 で配布）
 
 実機でピッカー（trk217）を触った利用者からの UX 改善。**trk のリストが「プレイリストに入れる」に並ぶと画面が埋まる**ため、初期は出さず、要るときだけ出せるようにした。
@@ -388,6 +401,7 @@
 | 56 | 1.1.6 の配布ZIP（trk217 入り・2026-10-29） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻（`2026-10-29 12:00` UTC）・`--check`（`checkDocLinks` 0件）・ローカル配信・落とし直してのバイト一致は確認済み（§6・§9）。**実ブラウザでのピッカーの操作感は未確認** | ①1.1.5 のフォルダーに上書きせず、1.1.6 のZIPを別の場所へ展開する ②⚙ → 🐔 trk's playlist →「プレイリストを選択」で1本追加し、🐔 の階層（タブ長押し）に入るか ③同じリストが「追加済み」になって選べないか ④🗑 で消したリストを選び直すと戻るか |
 | 57 | trk218：🐔 trk のリストを曲画面に出さない（👁／🗑／📋） | `tests/trk218-trk-list-visibility.test.mjs` の14件＋`npm run check` 729 pass で確認済み（1.1.7 の配布ZIPに同梱）（初期は出さない・`trkListed` の検証・リストは消えない・📋 の `cat:""` と24文字・上限200本・案内は1回だけ）。**実ブラウザでの 👁／🗑／📋 の操作感は未確認** |
 | 58 | 1.1.7 の配布ZIP（trk218 入り・2026-10-29） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻（`2026-10-29 13:00` UTC）・`--check`・ローカル配信は確認済み（§6）。**実ブラウザで 👁／🗑／📋 を触っての確認は未了**（§4-57） |
+| 59 | trk219：🔈 出力デバイスの切り替えで再生を止めない | `tests/trk219-audio-output-keep.test.mjs` の17件＋`npm run check` 746 pass で確認済み（偽の再生要素・時計・AudioContext で実動）。**実機で出力デバイスを切り替えての確認は未了**（§4-59 の手順で確認する） |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -485,19 +499,32 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.29-trk217`＝trk217。**配布ZIP（1.1.6）は `trk217`**、配布済みの 1.1.5 は `trk216`。**配布ZIP（1.1.5）は `trk216`**、配布済みの 1.1.4 は `trk214`、1.1.4 の前の trk215 は未配布。1.1.2 は `trk211`、1.1.1 は `trk210`、1.1.0 は `trk208`、1.0.9 は `trk207`。アプリ本体が変わらない版では cache 名を上げない） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.29-trk219`＝trk219。**配布ZIP（1.1.7）は `trk218`**、配布済みの 1.1.6 は `trk217`、1.1.5 は `trk216`、1.1.4 は `trk214`。1.1.2 は `trk211`、1.1.1 は `trk210`、1.1.0 は `trk208`、1.0.9 は `trk207`。アプリ本体が変わらない版では cache 名を上げない） |
 | 🚪 メディアプレイヤーの抜け方（trk206） | `js/media-player-mode.js`（`mediaExitPlan`・`closeMedia`）、`js/library.js`（`previewContinue`）、`js/core.js`（`mediaReloadOnExit`）、`js/i18n-options.js`＋`index.html`（❓謎設定）、`tests/trk206-media-exit.test.mjs` |
-| 📦 配布ZIPの組み立て（1.0.8〜・現在 1.1.5） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`release/README.txt`（配布用のかんたん起動。`--readme` を省くとこれが入る。**版と `README-1.x.y.md` の名前は `--version` とそろえる**）、`tests/release-layout.test.mjs`（形・時刻・README の版） |
+| 📦 配布ZIPの組み立て（1.0.8〜・現在 1.1.7） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`release/README.txt`（配布用のかんたん起動。`--readme` を省くとこれが入る。**版と `README-1.x.y.md` の名前は `--version` とそろえる**）、`tests/release-layout.test.mjs`（形・時刻・README の版） |
 | 📂 フォルダー共有の共通部品（trk208） | `js/shared-folders.js`（`window.TrkSharedFolders`＝`plan`／`uniqueLabel`／`mergeScans`／`walk`／`pathParts`／`readFileAt`。DOM・IndexedDB・書き込みなし）、`js/library.js`（登録簿 `"folders"`・`addSharedFolder`／`readSharedFolders`／`restoreSharedFolders`／`folderAutoKickShared`／`removeSharedFolder`／`renderSharedFolderList`）、`index.html`（`#libShareVideoBtn`・`#libSharedFolderList`）、`tests/trk208-shared-folders.test.mjs` |
 | 📂 書斎の「フォルダーのまま読む本」（trk208） | `js/study-room.js`（`studyShareImageFolder`／`studyImportSharedFolder`／`studySharedPageBlob`／`studySharedFolderEnsure`・`studyBookClean` の `linked`／`sharedFolder`）、`js/study-room-utils.js`（`folderBookGroups`・`bookSize` の linked 扱い）、`js/backup.js`（`skip` と `checkStudyLimits`）、`index.html`（`#studyShareFolderBtn`） |
 | 🖥 全画面の動画の拡大・縮小（trk212） | `js/video-max.js`（`zoomStepPercent`・`containSize`・`panLimit`／`clampPan`・`accumulateWheel`・`zoomAround`・`zoomFrame`・`paint` の `drawImage`）、`js/core.js`（`videoMaxWheelStep`）、`js/main.js`（`#videoMaxWheelStep`）、`index.html`、`css/style.css`（`.videoMaxZoom`・`.zoomed` のカーソル）、`tests/trk212-video-zoom.test.mjs` |
 | 🎼 譜面生成方式の既定（trk216） | `js/core.js`（`chartGen` の既定 `"4"`・`chartGenChosen`・`resetAllPrefs`）、`js/main.js`（`#chartGen` の change で印を付ける・想定外値の寄せ先 `"4"`）、`js/i18n.js`（`chartGen3`／`chartGen4`／`chartGenHint` の4言語）、`index.html`（セレクトのラベル）、`tests/trk216-chartgen-default.test.mjs` |
 | ⭐ お気に入りの4フォルダ（trk215） | `js/favs.js`（`stored`／`snapshot`／`save`＝`settings.favs`・`quickUnfreeze`／`holdButton`／`chips`）、`js/core.js`（`favs`・`favQuickUnfreeze`・`resetAllPrefs`）、`js/library.js`（`libFavKeys`・`libFavTab`・`libTabMatch`・行の ☆／📌／🧊）、`js/i18n-options.js`＋`index.html`（❓謎設定）、`css/style.css`（`.holding`・`.favPinN`）、`tests/trk215-favs.test.mjs` |
 | 🐔 カタログのリスト選択（trk217・未配布） | `js/library.js`（`trkPickEntries`／`trkPickHas`／`trkPickAdd`／`trkPickRender`・`TRK_SHELVES`／`TRK_SERIES_FOLDER`・`trkSelectedFoldersOnly`・`ensureTrkDistributionPlaylists({ create:false })`）、`index.html`（`#trkPickSelect`／`#trkPickAdd`／`#trkPickHint`／`#trkPickStatus`）、`sw.js`（`trk217`）、`tests/trk217-playlist-catalog.test.mjs`、`docs/PLAYLIST-CATALOG-REVIEW.md`（trk-apk との突き合わせ） |
+| 🔈 出力デバイスの切り替えで止まらない（trk219） | `js/audio-keep.js`（`keepPlan`・`recover`・1秒の見張り・`#video` の `play()`／`pause()` を包む）、`js/fx.js`（`wakeAudioHard(force)`・`TrkFX.context()`／`TrkFX.wake(force)`）、`index.html`（`media.js` の次の1行）、`tests/trk219-audio-output-keep.test.mjs`、`docs/guide/sound.md`・`docs/guide/en.md` |
 | ⏱ 曲名タブの開始位置ボタン（trk213） | `js/core.js`（`previewStartShow`・`resetVideoPrefs`）、`js/library.js`（`previewSetShown`・`syncPreviewSetBtn`・`renderBanner`／`updateSpBuilder`）、`js/spectrum.js`（`buildBox` の `specPreviewSet`・TEXT 8キー）、`tests/trk213-preview-set-toggle.test.mjs` |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
+
+**trk219（2026-10-29）の確認**
+
+| 検査 | 結果 | 範囲・注意 |
+|---|---|---|
+| `npm run check` | **746 pass / 0 fail** | 745→+17（`tests/trk219-audio-output-keep.test.mjs`）。Static 0 failure・0 warning |
+| 止まったら続きから再開（VM） | **OK** | 偽の再生要素・時計・タイマーで、アプリ外の `pause` → 250ms 後に `play()`（`currentTime` はそのまま）を実測 |
+| 誤爆しないこと（VM） | **OK** | アプリの `pause()`（利用者の停止・Media Session）／`document.hidden`／`ended` では再開しない |
+| 予算と休み（VM） | **OK** | 60秒に6回で打ち切り／`play()` が3回続けて失敗したら30秒休む |
+| 詰まった再生（VM） | **OK** | `paused=false` のまま `currentTime` が 2.6 秒進まないと `play()` をやり直す。`readyState < 3`（読み込み待ち）では動かない |
+| Web Audio の出口（VM） | **OK** | `AudioContext.state` が `suspended` なら `resume()`。`devicechange` では `TrkFX.wake(true)`（出口のつなぎ直し）を呼ぶ |
+| 実機で出力デバイスを切り替える | **未確認** | サンドボックスに音声デバイスもブラウザーも無い。§4-59 の手順（曲を再生 → Windows の「サウンド」で出力先を変える → 止まらず続くこと、⏯ で止めたときは止まったままなこと）で確認する |
 
 **1.1.7 の配布ZIP（2026-10-29）の確認**
 
@@ -620,6 +647,7 @@
 
 ## 7. 最近の変更
 
+- **🔈 trk219：出力デバイスを切り替えても再生を止めない（2026-10-29）**：実機で「Windows のサウンドで出力先を切り替えると止まる」との指摘への対応。**`js/audio-keep.js`（新規）**が `#video` の `play()`／`pause()` を包んで「アプリが頼んだ停止」を記録し、**頼まれていない `pause`**（出力デバイスの切り替えでブラウザーが止めた場合など）を見つけたら **250ms 後に続きから鳴らし直す**。`readyState >= 3` なのに `currentTime` が 2.6 秒進まない「詰まり」も `play()` のやり直しで解く。**画面が隠れているとき・終端では再開しない**、**60秒に6回まで**、**3回続けて失敗したら30秒休む**。`js/fx.js` に **`TrkFX.context()`／`TrkFX.wake(force)`**（`wakeAudioHard`）を足し、`AudioContext` の `resume()` と、デバイスの切り替え時の**出口（`G.out`）のつなぎ直し**を行う。`mediaDevices` の `devicechange` と `AudioContext` の `statechange` も見る。設定は増やしていない。文言（`docs/guide/sound.md`・`docs/guide/en.md`）に1節ずつ、`sw.js` の cache は **`trk-v2026.10.29-trk219`**、`tests/trk219-audio-output-keep.test.mjs`（17件）で **746 pass**。**実機での確認は未了**（§4-59）。
 - **📦 1.1.7：trk218 を配る版（2026-10-29）**：**アプリ本体は trk218**（🐔 trk のリストを曲画面に出さない・👁／🗑／📋）。1.1.6 の配布ZIPの `trk-files/` を土台に、**コード4ファイル**（`css/style.css`・`js/core.js`・`js/library.js`・`sw.js`）を差し替え、`README-1.1.6.md` を `README-1.1.7.md` に改名して今回の内容を追記、`README.md`・`README-SLIM.md`・`release/README.txt` を 1.1.7 に（`release-manifest.json` は `--version` から作られる）。
   - ZIP は **`2026-10-29 13:00`（UTC）** で組み立て＝**226エントリ・3,926,426 bytes**・`unzip -t` 破損なし・全エントリ同時刻・**`sha256 482a27adb35eda2f63abca08c2684e583460b441c0ac7a31658d7e35380c184a`**。`--check` OK・ローカル配信 200・差分は 1.1.6 に `patch -p1 --dry-run` で通る。
   - **1.1.0〜1.1.6 のZIPと Drive の `trk-1.1.0`〜`trk-1.1.6` はそのまま**（同じ名前で作り直さない）。

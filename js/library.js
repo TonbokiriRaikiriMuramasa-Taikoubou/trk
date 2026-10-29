@@ -708,6 +708,7 @@ Object.assign(TEXT.ja, {
   libTabAll:"すべて", libTabFiles:"追加した曲", libTabKept:"保存棚", libTabVerified:"公認", libTabPackNone:"曲パック", libTabFolderTop:"フォルダ（直下）", libTabAddon:"アドオン", libTabDemo:"デモ曲",
   srcBuiltin:"trk! 同梱デモ",
   libTabGo:"この棚に {n}曲", libTabEmpty:"このタブには曲がありません。ほかのタブを見てみてください。",
+  libFavEmpty:"このフォルダは空です。上の ⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り で切り替えるか、曲の ☆ でこのフォルダに入れられます。",
   libTabAlbums:"アルバム", libTabArtists:"アーティスト", libNoTagsGroup:"タグなし", libGroupCount:"{n}曲", libGroupTagsLoading:"🏷 タグを読み込み中…（読み終わると並べ直します）",
   libTabSmart:"スマート", libSmartRecent:"🕒 最近再生", libSmartTop:"🔥 よく再生", libSmartAdded:"➕ 最近追加"
 });
@@ -715,6 +716,7 @@ Object.assign(TEXT.en, {
   libTabAll:"All", libTabFiles:"Added", libTabKept:"Saved shelf", libTabVerified:"Verified", libTabPackNone:"Song pack", libTabFolderTop:"Folder (top level)", libTabAddon:"Add-on", libTabDemo:"Demo track",
   srcBuiltin:"Bundled trk! demo",
   libTabGo:"{n} songs in this shelf", libTabEmpty:"No songs in this tab. Try another tab.",
+  libFavEmpty:"This folder is empty. Switch with the ⭐1st / ⭐2nd / 🧊Frozen / 📤Former chips above, or press ☆ on a song to add it here.",
   libTabAlbums:"Albums", libTabArtists:"Artists", libNoTagsGroup:"No tags", libGroupCount:"{n} songs", libGroupTagsLoading:"🏷 Reading tags… (the list re-sorts when they arrive)",
   libTabSmart:"Smart", libSmartRecent:"🕒 Recently played", libSmartTop:"🔥 Most played", libSmartAdded:"➕ Recently added"
 });
@@ -722,6 +724,7 @@ Object.assign(TEXT.zh, {
   libTabAll:"全部", libTabFiles:"已添加", libTabKept:"已保存", libTabVerified:"认证", libTabPackNone:"歌曲包", libTabFolderTop:"文件夹（顶层）", libTabAddon:"插件", libTabDemo:"演示曲",
   srcBuiltin:"trk! 内置演示曲",
   libTabGo:"这个架子有 {n} 首", libTabEmpty:"此标签内没有歌曲。请看看其他标签。",
+  libFavEmpty:"此文件夹为空。请用上方的 ⭐一军／⭐二军／🧊冻结／📤原收藏 切换，或点歌曲的 ☆ 加入此文件夹。",
   libTabAlbums:"专辑", libTabArtists:"艺术家", libNoTagsGroup:"无标签", libGroupCount:"{n} 首", libGroupTagsLoading:"🏷 正在读取标签…（读完后会重新排序）",
   libTabSmart:"智能", libSmartRecent:"🕒 最近播放", libSmartTop:"🔥 常播放", libSmartAdded:"➕ 最近添加"
 });
@@ -729,6 +732,7 @@ Object.assign(TEXT.ko, {
   libTabAll:"전체", libTabFiles:"추가한 곡", libTabKept:"저장 선반", libTabVerified:"공인", libTabPackNone:"곡 팩", libTabFolderTop:"폴더 (최상위)", libTabAddon:"애드온", libTabDemo:"데모 곡",
   srcBuiltin:"trk! 내장 데모",
   libTabGo:"이 선반에 {n}곡", libTabEmpty:"이 탭에는 곡이 없습니다. 다른 탭을 봐 주세요.",
+  libFavEmpty:"이 폴더는 비어 있습니다. 위의 ⭐1군／⭐2군／🧊동결／📤원래 즐겨찾기로 바꾸거나, 곡의 ☆로 이 폴더에 넣을 수 있습니다.",
   libTabAlbums:"앨범", libTabArtists:"아티스트", libNoTagsGroup:"태그 없음", libGroupCount:"{n}곡", libGroupTagsLoading:"🏷 태그 읽는 중…(다 읽으면 다시 정렬합니다)",
   libTabSmart:"스마트", libSmartRecent:"🕒 최근 재생", libSmartTop:"🔥 자주 재생", libSmartAdded:"➕ 최근 추가"
 });
@@ -1319,20 +1323,34 @@ function libTabIdOf(it) {
   const seg = libFolderSeg(it);
   return seg ? "folder:" + seg : "folder";
 }
-/* ⭐ お気に入り（js/favs.js）。いま選んでいるフォルダの曲を数える */
+/* ⭐ お気に入り（js/favs.js）。いま選んでいるフォルダの曲を数える。
+   any＝1軍／2軍／🧊フリーズのどれかに入っている曲の数（⭐タブを出すかの判断に使う） */
 function libFavKeys(all) {
   const F = window.TrkFavs;
-  if (!F) return { n:0 };
+  if (!F) return { n:0, any:0, group:"main" };
   const g = F.activeOf("song");
-  let n = 0;
-  for (const it of all) if (F.inGroup("song", g, it.key)) n++;
-  return { n, group:g };
+  let n = 0, any = 0;
+  for (const it of all) {
+    if (F.inGroup("song", g, it.key)) n++;
+    if (F.has("song", it.key)) any++;
+  }
+  return { n, any, group:g };
+}
+/* ⭐ お気に入りタブ（trk215）。**どのフォルダかに1曲でも入っていれば出す**。
+   1.1.4 までは「いま選んでいるフォルダの曲数」で出し入れしていたので、空の2軍／フリーズを
+   選んだだけでタブが消え、お気に入りが無くなったように見えた（戻る道も無かった）。
+   いま見ているタブが ⭐ なら、1曲も無くても出す（選んだ直後に消えない）。 */
+function libFavTab(all) {
+  if (!window.TrkFavs) return null;
+  const fav = libFavKeys(all);
+  if (!fav.any && !fav.n && core.settings.libTab !== "fav") return null;
+  return { id:"fav", icon:"⭐", label:tr("favTab"), n:fav.n };
 }
 /* タブの一覧（順番：すべて → ⭐お気に入り → プレイリスト → パック／アドオン／フォルダー → デモ曲 → 追加した曲 → 公認） */
 function libTabsOf(all) {
   const tabs = [{ id:"all", icon:"📚", label:tr("libTabAll"), n:all.filter(x => !x.trkOnly).length }];
-  const favN = libFavKeys(all).n;
-  if (favN) tabs.push({ id:"fav", icon:"⭐", label:tr("favTab"), n:favN });
+  const favTab = libFavTab(all);
+  if (favTab) tabs.push(favTab);
   /* ⚡ スマート棚（trk172）：再生履歴（🎮 リザルト・🎧 プレーヤー）か追加日時の材料があれば出す。
      中身は renderLib の libSmartSections（最近再生／よく再生／最近追加）。曲数はセクションに出る曲の延べではなく「材料を持つ曲」 */
   {
@@ -3851,7 +3869,7 @@ function renderLib() {
       : tr("plWishHead", { n: totalAll })));
   }
   if (!rows.length) {
-    box.append(el("div", "libEmpty", tr(scope.length ? "libNoMatch" : (tabId.startsWith("pl:") ? "plTabHint" : tabId.startsWith("fld:") ? "fldTabHint" : "libTabEmpty")))); return;
+    box.append(el("div", "libEmpty", tr(scope.length ? "libNoMatch" : tabId === "fav" ? "libFavEmpty" : (tabId.startsWith("pl:") ? "plTabHint" : tabId.startsWith("fld:") ? "fldTabHint" : "libTabEmpty")))); return;
   }
   /* 🪶 軽量化：初回に描く行数をへらす（行にはボタン・長押し・ドラッグの監視がたくさん付くので、
      長い棚ではここが端末いちばんの待ち時間になります）。棚自体とランダム選曲は全曲のままです */
@@ -3906,6 +3924,21 @@ function renderLib() {
     if (it.builtinDemo && Object.keys(firstSparkChartMap).length) meta.append(el("i", "libTag", "🎼"));   /* 🎼 trk!手づくりのデモ譜面がいっしょに入っている印 */
     if (info && info.plays) meta.append(el("i", "libTag", tr("libPlays", { n:info.plays })));
     if (info && info.best) meta.append(el("i", "libTag", info.best.toLocaleString()));
+    {   /* ⭐ trk215：お気に入りのフォルダの状態を、行にも出す（📌ピン／🧊フリーズ） */
+      const F = window.TrkFavs;
+      if (F) {
+        if (F.pinned("song", it.key)) {
+          const pin = el("i", "libTag favTag", "📌");
+          pin.title = tr("favPin"); pin.setAttribute("aria-label", tr("favPin"));
+          meta.append(pin);
+        }
+        if (F.inGroup("song", "frozen", it.key)) {
+          const fz = el("i", "libTag favTag", "🧊");
+          fz.title = tr("favFrozenBadge"); fz.setAttribute("aria-label", tr("favFrozenBadge"));
+          meta.append(fz);
+        }
+      }
+    }
     b.append(left, meta);
     b.addEventListener("click", () => { if (!plSuppressClick()) selectSong(it); });
     b.draggable = true;   /* 🎧 プレイリストタブへドラッグして追加 */
@@ -3930,7 +3963,12 @@ function renderLib() {
       sb.addEventListener("click", e => {
         e.stopPropagation();
         if (inFav) { const r = F.remove("song", it.key); if (!r.ok) F.toast(F.msg(r.why, r.g)); }
-        else F.add("song", it.key, { group:"main", append:false });
+        /* ⭐ trk215：いま開いているフォルダ（2軍／🧊フリーズ）に入れる。📤元お気に入りを見ているときは1軍へ */
+        else {
+          const g = F.activeOf("song");
+          const r = F.add("song", it.key, { group:(g === "sub" || g === "frozen") ? g : "main", append:false });
+          if (!r.ok) F.toast(F.msg(r.why, r.g));
+        }
         renderLib();
       });
       wrap.append(sb);
@@ -4403,7 +4441,7 @@ function randomSongPool() {
   const F = window.TrkFavs;
   if (F) {
     for (const key of F.state("song").pins) {
-      if (F.groupOf("song", key) === "former") continue;
+      if (!F.has("song", key)) continue;      /* 1軍／2軍／🧊 のピンだけ（📤元お気に入りは抽選に出さない） */
       const it = allSongs().find(x => x.key === key);
       if (it && !pool.includes(it)) pool.push(it);
     }

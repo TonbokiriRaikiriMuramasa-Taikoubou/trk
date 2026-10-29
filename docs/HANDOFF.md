@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-27（trk214・**1.1.4**＝1.1.3 レビュー反映：🖥 ドラッグ中はポインターを掴んで外へ出てもずらす・ピンチのあと残った1本指でそのまま動かす・配布物のリンク切れ検査。trk212・trk213・**1.1.3**：🖥 全画面の動画をホイール／ドラッグ／ピンチで拡大・縮小（100〜500%・ポインター中心・1回 2/5/10%）、⏱ 曲名タブの「ここをプレビュー開始位置にする」を設定で出す（**初期オフ**）。**1.1.3 は trk213 を配る版**。1.1.0→1.1.1→1.1.2 のレビュー反映もそれぞれのZIPに同梱済み。1.0.9〜1.1.2 の配布ZIPの形と時刻もここに集約）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-29（trk215・⭐ お気に入りの4フォルダ（⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り）を全部使えるようにした：2軍〜元お気に入り・ピン・🧊凍結・選んでいたフォルダを `settings.favs` に保存（1.1.4 までは保存していなかったので、0個の2軍を選ぶとタブごと消え、リロードで戻っていた）、⭐タブはどのフォルダかに入っていれば出し、凍結の解除は 🧊／🔒 の3秒長押し（❓謎設定「フリーズの解除をワンタップにする」＝**既定オフ**で1タップ）。2026-10-27（trk214・**1.1.4**＝1.1.3 レビュー反映：🖥 ドラッグ中はポインターを掴んで外へ出てもずらす・ピンチのあと残った1本指でそのまま動かす・配布物のリンク切れ検査。trk212・trk213・**1.1.3**：🖥 全画面の動画をホイール／ドラッグ／ピンチで拡大・縮小（100〜500%・ポインター中心・1回 2/5/10%）、⏱ 曲名タブの「ここをプレビュー開始位置にする」を設定で出す（**初期オフ**）。**1.1.3 は trk213 を配る版**。1.1.0→1.1.1→1.1.2 のレビュー反映もそれぞれのZIPに同梱済み。1.0.9〜1.1.2 の配布ZIPの形と時刻もここに集約）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検、§9＝配布ZIPの形と作り方（1.0.8〜・現在 1.1.4）。
 
@@ -76,6 +76,21 @@
 - **ホイールの量の数え方**：`WHEEL_NOTCH=100`（px 相当）でノッチに直す。`deltaMode` は **行（1）＝1行34px・ページ（2）＝100px**。`accumulateWheel` は同符号で積み上げ、1イベントで動かすのは ±4段まで（トラックパッドの細かい動きも合計で1段ずつになる）。ホイールの既定動作は全画面の中だけ `preventDefault` で止める。`touch-action:none` と長押しシーク（trk188）はそのまま。
 - **文言は4言語**（`videoMaxZoomReset`・`videoMaxZoomHint`・`videoMaxHint` の追記・`videoMaxWheelStep`）。`sw.js` の cache は **`trk-v2026.10.27-trk212`**。`tests/trk212-video-zoom.test.mjs`（11件）を追加。
 - **未確認**：実機のホイール・トラックパッド・ピンチの感触（サンドボックスにブラウザーが無い）。
+
+### ⭐ お気に入りの4フォルダを、どれも使えるようにする（trk215・未配布）
+
+1.1.4 で「⭐1軍 以外が正常に動かない」と確認された（2026-10-29）。原因は**保存する場所が無かったこと**と、**タブをいまのフォルダの曲数だけで出し入れしていたこと**。4フォルダ（⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り）を同じように使えるように直した。
+
+- **保存**：1軍は今までどおり `settings.tvFav`／`fxFav`／`songFav`。**2軍〜元お気に入り・📌ピン・🔒凍結・選んでいたフォルダは `settings.favs[kind]`** に保存する（`core.js` の既定に `favs`、`save()` は `snapshot()` を書いて `saveUserPrefs()`）。1.1.4 までは `core.prefs.favs` を読むだけで、どこにも書いていなかった＝**2軍に入れてもリロードで消え、曲は元お気に入りへ落ちていた**。
+  - **凍結は最初からオンにしない**（`boot()` の `locks` 既定を `["frozen"]` → `[]`）。1.1.4 までは 🧊フリーズが最初から凍結されていて、そこへ入れられなかった。
+  - `tidy()` は `st.main` などを**別の配列に差し替えない**（`rewrite()` で中身だけ入れ替える）。1軍の配列は `settings.songFav` と同じものなので、差し替えると次の `state()` の `syncMain` が古い配列に戻してしまう。
+- **⭐タブの出し入れ**（`js/library.js` の `libFavTab`）：1軍／2軍／🧊のどれかに1曲でも入っていれば出す。数は、いま選んでいるフォルダの曲数。**いま ⭐ を見ているなら0曲でも出す**（フォルダを選んだ直後にタブごと消えない）。0曲のときは `libFavEmpty` で「上のチップで切り替える／☆で入れる」と案内する。
+- **フォルダの切り替え**：⭐タブの上のチップ（`js/favs.js` の `chips`）は常に **⭐1軍／⭐2軍／🧊フリーズ**（＋📤元お気に入り）を出す。選ぶと `settings.favs[kind].active` に覚える。**曲の行の ☆ は、いま開いているフォルダへ入れる**（📤元お気に入りを見ているときは1軍へ戻す）。行には 📌ピンと 🧊フリーズの印を出す。
+- **凍結の解除は3秒長押し**：🔒（凍結中）と、凍結中の 🧊 のチップを**3秒押し続ける**と解除する（`holdButton`。押している間はチップの下に3秒ぶんのバーが伸びる＝CSS `.holding`）。短く押したときは「3秒長押しで解除」と伝える（`favLockHint`）。凍結するほうは安全側なので1タップ。
+  - ❓謎設定「**🧊 フリーズ（凍結）の解除をワンタップにする**」（`settings.favQuickUnfreeze`・**既定オフ**）を入れると、🔒／🧊 の1タップで解除できる（`quickUnfreeze()`）。一括で管理・解除したいときの暫定的な逃げ道。
+  - 凍結中は、そのフォルダへの**追加・削除を止める**（`add`／`remove` が `why:"locked"`）。
+- **文言は4言語**（`favs.js` の `favLockHint`・`favLockHintQuick`・`favPinCount`・`favFrozenBadge`・`favUnlockHold`・`favLock`／`favIntro` の改訂、`library.js` の `libFavEmpty`、`i18n-options.js` の `favQuickUnfreeze`・`favQuickUnfreezeHint`）。`sw.js` の cache は **`trk-v2026.10.27-trk215`**。`tests/trk215-favs.test.mjs`（17件）。
+- **未確認**：実機での3秒長押しの感触（サンドボックスにブラウザーが無い）。**配布（ZIP・Drive）は未指示**。
 
 ### 🔍 全画面ズームの仕上げ（trk214・1.1.4 で配布）
 
@@ -338,6 +353,7 @@
 | 48 | 1.1.3 の配布ZIP（trk212・trk213 入り・2026-10-27） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻・`--check`・再検証（304）・ローカル配信（`/` 200）は確認済み（§6・§7）。**利用者の実機での起動と、🖥 のホイール／ドラッグ／ピンチ・⏱ のチェックの見え方は未確認** | ①1.1.2 のフォルダーに重ねず、新しいフォルダーへ展開して `index.html` から起動 ②全画面でホイール・ドラッグ・ピンチ ③⚙ 設定 → 📊 スペクトラム の「⏱ 「ここをプレビュー開始位置にする」を表示」のオン／オフ |
 | 49 | trk214：🔍 ドラッグ中に外へ出てもずらせる（ポインターを掴む）・ピンチのあと残った1本指で動かせる | VM の偽 stage（`setPointerCapture`／`releasePointerCapture`）で確認済み（`tests/trk212-video-zoom.test.mjs` の trk214 4件）。捕まえるのはドラッグ開始と2本目の指からで、押しただけでは捕まえないことも確認 | ①全画面で拡大し、動画の外（ウィンドウの外）までドラッグしても止まらない ②スマホでピンチのあと1本離し、そのまま動かせる ③押しただけ（長押しシーク）は従来どおり外で止まる |
 | 50 | trk214：📄 配布物の文書のリンク切れ検査（`checkDocLinks`） | 1.1.3 のZIPに当てて8件を検出（`CONTRIBUTING.md`・`README*.md`・`docs/guide/{en,files,mods}.md`）・`tests/release-layout.test.mjs` の3件は確認済み | 1.1.4 を組むときに8件を直す（§9）。直したあとは `--check` が緑になる |
+| 52 | trk215：⭐ お気に入りの4フォルダ（2軍／🧊フリーズ／📤元お気に入り・📌ピン・🔒凍結・選んでいたフォルダの保存、⭐タブの出し入れ、3秒長押しでの解除） | `tests/trk215-favs.test.mjs` の17件で確認済み（謎設定の既定オフ／`settings.favs` の形／凍結は最初からオフ／1軍→2軍→リロード／5つの状態のリロード／1軍の配列を差し替えない／凍結中の追加・削除を止める／🎲のピン／3秒長押しと1タップ／⭐タブ／空表示／行の☆／4言語／cache）。**実機の見た目と3秒長押しの感触は未確認** | ①⭐タブで 2軍／🧊フリーズ／📤元お気に入り を選んでもお気に入りが消えないこと ②2軍へ入れて再読み込みしても残ること ③🔒 と 🧊 を3秒長押しで解除できること ④❓謎設定のチェックで1タップになること |
 | 51 | 1.1.4 の配布ZIP（trk214 入り・2026-10-27） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻・`--check`（`checkDocLinks` **0件**）・再検証（304）・ローカル配信は確認済み（§6）。**利用者の実機での起動と、外へ出るドラッグ・ピンチ→1本指の感触は未確認** | ①1.1.3 のフォルダーに重ねず新しいフォルダーへ展開して `index.html` から起動 ②全画面で拡大し、映像の外までドラッグ／ピンチのあと1本指 ③同梱の `docs/guide/`・`README-1.1.4.md` に「1.0.4」が残っていないこと |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
@@ -436,12 +452,13 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk214`＝trk214。**配布ZIP（1.1.4）は `trk214`**。1.1.2 は `trk211`、1.1.1 は `trk210`、1.1.0 は `trk208`、1.0.9 は `trk207`。アプリ本体が変わらない版では cache 名を上げない） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk215`＝trk215。**配布済みの 1.1.4 は `trk214`**。**配布ZIP（1.1.4）は `trk214`**。1.1.2 は `trk211`、1.1.1 は `trk210`、1.1.0 は `trk208`、1.0.9 は `trk207`。アプリ本体が変わらない版では cache 名を上げない） |
 | 🚪 メディアプレイヤーの抜け方（trk206） | `js/media-player-mode.js`（`mediaExitPlan`・`closeMedia`）、`js/library.js`（`previewContinue`）、`js/core.js`（`mediaReloadOnExit`）、`js/i18n-options.js`＋`index.html`（❓謎設定）、`tests/trk206-media-exit.test.mjs` |
 | 📦 配布ZIPの組み立て（1.0.8〜・現在 1.1.4） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`release/README.txt`（配布用のかんたん起動。`--readme` を省くとこれが入る。**版と `README-1.x.y.md` の名前は `--version` とそろえる**）、`tests/release-layout.test.mjs`（形・時刻・README の版） |
 | 📂 フォルダー共有の共通部品（trk208） | `js/shared-folders.js`（`window.TrkSharedFolders`＝`plan`／`uniqueLabel`／`mergeScans`／`walk`／`pathParts`／`readFileAt`。DOM・IndexedDB・書き込みなし）、`js/library.js`（登録簿 `"folders"`・`addSharedFolder`／`readSharedFolders`／`restoreSharedFolders`／`folderAutoKickShared`／`removeSharedFolder`／`renderSharedFolderList`）、`index.html`（`#libShareVideoBtn`・`#libSharedFolderList`）、`tests/trk208-shared-folders.test.mjs` |
 | 📂 書斎の「フォルダーのまま読む本」（trk208） | `js/study-room.js`（`studyShareImageFolder`／`studyImportSharedFolder`／`studySharedPageBlob`／`studySharedFolderEnsure`・`studyBookClean` の `linked`／`sharedFolder`）、`js/study-room-utils.js`（`folderBookGroups`・`bookSize` の linked 扱い）、`js/backup.js`（`skip` と `checkStudyLimits`）、`index.html`（`#studyShareFolderBtn`） |
 | 🖥 全画面の動画の拡大・縮小（trk212） | `js/video-max.js`（`zoomStepPercent`・`containSize`・`panLimit`／`clampPan`・`accumulateWheel`・`zoomAround`・`zoomFrame`・`paint` の `drawImage`）、`js/core.js`（`videoMaxWheelStep`）、`js/main.js`（`#videoMaxWheelStep`）、`index.html`、`css/style.css`（`.videoMaxZoom`・`.zoomed` のカーソル）、`tests/trk212-video-zoom.test.mjs` |
+| ⭐ お気に入りの4フォルダ（trk215） | `js/favs.js`（`stored`／`snapshot`／`save`＝`settings.favs`・`quickUnfreeze`／`holdButton`／`chips`）、`js/core.js`（`favs`・`favQuickUnfreeze`・`resetAllPrefs`）、`js/library.js`（`libFavKeys`・`libFavTab`・`libTabMatch`・行の ☆／📌／🧊）、`js/i18n-options.js`＋`index.html`（❓謎設定）、`css/style.css`（`.holding`・`.favPinN`）、`tests/trk215-favs.test.mjs` |
 | ⏱ 曲名タブの開始位置ボタン（trk213） | `js/core.js`（`previewStartShow`・`resetVideoPrefs`）、`js/library.js`（`previewSetShown`・`syncPreviewSetBtn`・`renderBanner`／`updateSpBuilder`）、`js/spectrum.js`（`buildBox` の `specPreviewSet`・TEXT 8キー）、`tests/trk213-preview-set-toggle.test.mjs` |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
@@ -519,6 +536,13 @@
 
 ## 7. 最近の変更
 
+- **⭐ trk215：お気に入りの4フォルダを、どれも使えるようにする（2026-10-29・未配布）**：1.1.4 の実機レビューで「⭐1軍 以外が正常に動かない」と確認された4点を直した。
+  - **保存する場所が無かった**：2軍〜元お気に入り・📌ピン・🔒凍結・選んでいたフォルダを `settings.favs` に保存する（`save()` が `snapshot()` を書いて `saveUserPrefs()`）。1軍は今までどおり `tvFav`／`fxFav`／`songFav`。**`tidy()` は1軍の配列を差し替えない**（`rewrite()` で中身だけ入れ替える＝`syncMain` に戻されない）。
+  - **凍結は最初からオンにしない**（`locks` の既定を `["frozen"]` → `[]`）。🧊フリーズへ、そのまま入れられる。
+  - **⭐タブは、どのフォルダかに1曲でも入っていれば出す**（`libFavTab`）。⭐ を見ているなら0曲でも出す＝**フォルダを選んだだけでタブごと消えない**。チップで4フォルダを行き来でき、0曲のときは `libFavEmpty` で案内する。
+  - **凍結の解除は3秒長押し**（🔒 と、凍結中の 🧊 のチップ）。押している間は3秒ぶんのバーが出る。❓謎設定「🧊 フリーズ（凍結）の解除をワンタップにする」（`favQuickUnfreeze`・**既定オフ**）で1タップにもできる。
+  - 曲の行の ☆ は**いま開いているフォルダ**へ入れる（📤を見ているときは1軍へ）。行に 📌／🧊 の印、チップに 📌 の数。
+  - `sw.js` の cache は **`trk-v2026.10.27-trk215`**、`tests/trk215-favs.test.mjs`（17件）で **697 pass**。
 - **📦 1.1.4：trk214 を配る版（2026-10-27）**：**アプリ本体は trk214**（ドラッグ中に外へ出てもずらせる・ピンチのあと残った1本指で動かせる）＋**配布版の文書を現在の形に**（「1.0.4 ポータブルZIP」等の表記・入っていない `README-1.0.x.md` への参照を削除）。1.1.3 の配布ZIPの `trk-files/` を土台に、**アプリのコードは2ファイル**（`js/video-max.js`・`sw.js`）だけ差し替え、ガイド2本に1文ずつ足し、文書9本を直した。**ZIPの形は 1.1.3 と同じ**。
   - ZIP は **`2026-10-27 22:00`（UTC）** で組み立て＝**226エントリ・3,910,309 bytes**・`unzip -t` 破損なし・全エントリ同時刻・`sha256 b8050bc55fa499472079be2ebea3ea190bdd5d1bd408780c4804506a638501b2`。
   - `prepare-release --check` **OK**（`checkDocLinks` **0件**＝1.1.3 の8件を解消）・配信は 200×6・再検証は `21:00` で **200**／`22:00` で **304**。

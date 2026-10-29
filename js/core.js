@@ -219,6 +219,12 @@ const settings = {
      オンにすると昔の動き＝閉じたときに止めて、プレビューの開始位置から鳴らし直す（不具合の再現用）。 */
   mediaReloadOnExit: prefs.mediaReloadOnExit === true,
   judgeOrdered: prefs.judgeOrdered === true, /* ❓謎設定：MANUALの判定を昔のやり方（時刻順・色違いは常にMISS）にする（既定はオフ＝js/judge-match.js の "smart"） */
+  /* ❓謎設定：🧊フリーズ（凍結）の解除をワンタップにする（trk215）。既定はオフ＝🔒を3秒長押しで解除する。
+     凍結は「守る」ための仕組みなので、一括で管理・解除したい人向けの暫定の抜け道として置く。 */
+  favQuickUnfreeze: prefs.favQuickUnfreeze === true,
+  /* ⭐ お気に入りのフォルダ（1軍／2軍／🧊フリーズ／📤元お気に入り・📌ピン・凍結）の保存先（trk215）。
+     1軍だけはこれまでどおり tvFav／fxFav／songFav。js/favs.js が保存のたびに書き込みます。 */
+  favs: (prefs.favs && typeof prefs.favs === "object" && !Array.isArray(prefs.favs)) ? prefs.favs : {},
   artWallpaperBg: prefs.artWallpaperBg === true,                     // 🖼 静止画を全画面へ拡大（オフは譜面中は右上、他は原寸以下で動画枠中央）
   useStudyArtwork: prefs.useStudyArtwork === true,                   // 📚 書斎で割り当てた画像をTV／ゲーム背景にも使う（既定オフ）
   hideArtworkDuringChart: prefs.hideArtworkDuringChart === true,     // 🎼 譜面中は静止画を隠す（既定オフ）
@@ -622,6 +628,8 @@ function resetAllPrefs() {
   settings.catchNitroBonus = true; settings.catchBlastNext = false; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.mediaResumeRewind = 0; settings.mediaWakeLock = true; settings.mediaWave = true; settings.libProgress = "all"; settings.mediaLyricsOpen = false;
   settings.judge = "standard"; settings.rate = 1; settings.shortMode = "off"; settings.shortMode = "off";
   settings.hidden = false; settings.sudden = false; settings.modMirror = false; settings.modRandom = false; settings.showMasterDiff = false; settings.escNoReturn = false; settings.judgeOrdered = false; settings.mediaReloadOnExit = false;
+  settings.favQuickUnfreeze = false;   /* ⭐ trk215：凍結の解除は3秒長押しへ戻す */
+  settings.favs = {}; settings.songFav = [];   /* ⭐ trk215：お気に入りのフォルダ（2軍〜ピン・凍結）も工場出荷状態へ */
   settings.mascot = "skin"; settings.vrmFrame = "full";
   settings.mmdScale = 1; settings.mmdTurn = 0; settings.mmdMotionBpm = 0; settings.mmdMotionKind = "faceSing";
   settings.mmdQuickUI = true; settings.mmdMotionFavs = [];

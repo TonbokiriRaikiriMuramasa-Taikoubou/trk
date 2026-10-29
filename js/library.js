@@ -5449,6 +5449,7 @@ function trkPickEntries() {
     list.push({ id: AGENT_OST_ID, name: "🎼 " + AGENT_OST_NAME, group: originals, special: "agent" });
   for (const series of trkCatalog()) for (const playlist of (series.playlists || [])) {
     const songs = playlist.songs || [];
+    if (!songs.length) continue;   /* 曲の無いカタログ項目は出さない（作っても空になる） */
     const volumes = Math.max(1, Math.ceil(songs.length / 100));   /* 1本100曲まで。超えるものは Vol に分ける */
     for (let i = 0; i < volumes; i++) {
       const suffix = volumes > 1 ? "-v" + (i + 1) : "";
@@ -5497,6 +5498,7 @@ function trkPickAdd(entry) {
     return true;
   }
   const series = entry.series, pl = entry.playlist;
+  if (!(pl.songs || []).length) return false;
   const shelf = trkShelfFor(series.id, pl.id);
   const need = [TRK_FOLDER_ID, shelf && shelf === ENDFIELD_CHARACTER_FOLDER ? "trk-endfield" : "", shelf]
     .filter((id, i, arr) => id && !hasFolder(id) && arr.indexOf(id) === i);

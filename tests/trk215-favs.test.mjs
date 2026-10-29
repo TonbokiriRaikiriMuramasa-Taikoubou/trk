@@ -244,5 +244,8 @@ test("trk215: the new wording is in all four languages", () => {
 });
 
 test("trk215: the service worker cache name moves on so the new files are fetched", () => {
-  assert.ok(swSrc.includes("trk-v2026.10.27-trk215"), "CACHE を trk215 に");
+  /* trk216 で 1.1.5 の配布に合わせて上げるので、trk215 以降（この変更より新しい）であることだけを見る */
+  const m = swSrc.match(/const CACHE = "trk-v(\d{4})\.(\d{2})\.(\d{2})-trk(\d+)";/);
+  assert.ok(m, "CACHE がある");
+  assert.ok(Number(m[4]) >= 215, `trk215 以降（いまは trk${m[4]}）`);
 });

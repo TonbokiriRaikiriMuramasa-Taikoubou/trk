@@ -91,6 +91,18 @@
 - **入れなかったもの**（APK 専用）：`core.audioSafety`・`keepInBackground`・`TrkApkPip`・下部ナビ・Back の段階処理・向きの10秒長押しなど。カタログの音源を同梱しない方針も従来どおり。
 - **未確認**：実ブラウザでのピッカーの操作感（サンドボックスにブラウザーが無い）。
 
+### 🐔 trk's playlist：曲画面の一覧に出さない・編集できるコピー（trk218）
+
+実機でピッカー（trk217）を触った利用者からの UX 改善。**trk のリストが「プレイリストに入れる」に並ぶと画面が埋まる**ため、初期は出さず、要るときだけ出せるようにした。
+
+- **② 初期状態では出さない**：曲画面の「プレイリストに入れる」（`songProfile`）は `core.settings.playlists.filter(trkListShown)` で絞る。**trk のリスト（`trk-…`）は `settings.trkListed` に入っているものだけ**を出し、利用者のリスト（`pl…`）はいつも出す。隠した件数は `plInListsHidden`（`{n}`）で「⚙ → 🐔 の 👁 で出せます」と案内する。**リストは消さない**。
+- **① ⚙ → 🐔 trk's playlist の一覧に 👁／🗑**：`settings.trkListed`（出すIDの一覧・初期 `[]`）を `trkListSetShown(p, on)` が出し入れする。隠れているときは 👁 を `.plTrkHidden` で淡くし、`aria-pressed` で押下状態を読み上げに出す。**ボタンを出すのは `trkIsFixedList(p)`＝`trk-…` のリストだけ**（📋 のコピーは利用者のリストなので、この2つは出さず・いつもの開く／↑↓だけ）。
+- **③ 📋 編集できるコピー**：`trkCopyAsUser(p)` が**通常のプレイリスト**（`pl…` の ID・`frozen/locked:false`＝中クリックで消せる）を作る。`cat:""` で**カタログの自動更新と切る**（次の起動で中身を上書きされない）。名前は `trkCopySuffix`（「〜（コピー）」）を足して**24文字以内**、同じ棚に置き、`songs`／`wish`／`guide`／`tags` を引き継ぐ。上限は `TRK_LIST_MAX`（200本）で、超えるときは `trkCopyFail`。
+- **既に編集していた人への案内**：`settings.trkFixedNotice`（0/1）。`initLibrary` の起動時に `trkFixedNoticeOnce()` が、**trk のリストを持つ人に1回だけ** `trkFixedNotice` をトーストする。`resetAllPrefs` で 0 に戻り、設定Importでも `trkListed`（`cleanTrkRemoved` で ID を検証）と `trkFixedNotice` を扱う。登録簿は [`MIGRATIONS.md`](MIGRATIONS.md)（削除予定 2027-02-28）。
+- `plDelete` は `settings.trkListed` からも同じ ID を消す（消したリストの 👁 が残らない）。
+- 文言は4言語（`trkListShow`／`trkListHide`／`trkListShown`／`trkListHidden`／`trkListNote`／`trkCopyBtn`／`trkCopyDone`／`trkCopyFail`／`trkCopySuffix`／`plInListsHidden`／`trkFixedNotice`）、`sw.js` の cache は **`trk-v2026.10.29-trk218`**、`tests/trk218-trk-list-visibility.test.mjs`（14件）で **729 pass**。
+- **未確認**：実ブラウザでの 👁／🗑／📋 の操作感（サンドボックスにブラウザーが無い）。
+
 ### ⭐ お気に入りの4フォルダを、どれも使えるようにする（trk215・1.1.5 で配布）
 
 1.1.4 で「⭐1軍 以外が正常に動かない」と確認された（2026-10-29）。原因は**保存する場所が無かったこと**と、**タブをいまのフォルダの曲数だけで出し入れしていたこと**。4フォルダ（⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り）を同じように使えるように直した。
@@ -485,6 +497,17 @@
 
 ## 6. 直近の検証
 
+**trk218（2026-10-29）の確認**
+
+| 検査 | 結果 | 範囲・注意 |
+|---|---|---|
+| `npm run check` | **729 pass / 0 fail** | 715→+14（`tests/trk218-trk-list-visibility.test.mjs`）。Static 0 failure・0 warning（`docs/MIGRATIONS.md` とコードの一致も緑）・`git diff --check` OK |
+| 初期状態で出さない（VM） | **OK** | `trkListShown(trk-…)`＝false／`pl…`＝true。`songProfile` は `filter(trkListShown)` で並べ、隠した件数を `plInListsHidden` で案内する |
+| 👁／🗑 の出し入れ（VM） | **OK** | `trkListSetShown` で `settings.trkListed` に出し入れ・`saveUserPrefs()` 1回・**リストは消えない**。設定Importの `cleanTrkRemoved` は `trk-…` だけ残し、重複を落とし、200件で切る |
+| 📋 のコピー（VM） | **OK** | `pl…` の ID・名前「（コピー）」付き24文字以内・同じ棚・`songs`／`wish`／`guide`／`tags` を引き継ぐ・`cat:""`・`frozen/locked:false`・元のリストは残る。200本に達していたら作らず `null` |
+| 固定の案内 | **OK** | trk のリストが無ければ出さず印も立てない／あれば1回だけトーストし `trkFixedNotice=1`、2回目は出さない |
+| 実ブラウザで 👁／🗑／📋 | **未確認** | サンドボックスにブラウザーが無い。§4 の手順で確認する |
+
 **1.1.6 の配布ZIP（2026-10-29）の確認**
 
 | 検査 | 結果 | 範囲・注意 |
@@ -581,6 +604,7 @@
 
 ## 7. 最近の変更
 
+- **🐔 trk218：trk のリストを初期は曲画面に出さない／🗑・👁・📋（2026-10-29）**：実機でピッカーを触った利用者の「並ぶと圧迫する」という声への対応。**曲画面の「プレイリストに入れる」には trk のリスト（`trk-…`）を初期状態では出さない**（`settings.trkListed`＝出すIDの一覧・初期 `[]`。隠した件数は `plInListsHidden` で 👁 の場所を案内）。⚙ → 🐔 の一覧に **👁／🗑**（`trkListSetShown`・**リストは消さない**・隠れている 👁 は `.plTrkHidden` で淡く・`aria-pressed`）と **📋**（`trkCopyAsUser`＝`pl…` の通常プレイリスト・`cat:""` で自動更新と切る・24文字以内の「（コピー）」・同じ棚・中身とガイドを引き継ぐ・上限200本）を足した。ボタンは **`trk-…` のリストだけ**に出す。**既に編集していた人には起動時に1回だけ** `trkFixedNotice` で固定の旨を伝える（`trkFixedNoticeOnce`・`resetAllPrefs`／設定Import対応・MIGRATIONS に登録）。`plDelete` は `trkListed` からも ID を消す。文言は4言語、`sw.js` の cache は **`trk-v2026.10.29-trk218`**、`tests/trk218-trk-list-visibility.test.mjs`（14件）で **729 pass**。
 - **📦 1.1.6：trk217 を配る版（2026-10-29）**：**アプリ本体は trk217**（🐔 trk's playlist のリスト選択）。1.1.5 の配布ZIPの `trk-files/` を土台に、**コード3ファイル**（`index.html`・`sw.js`・`js/library.js`）を差し替え、`README-1.1.5.md` を `README-1.1.6.md` に改名して今回の内容を追記、`README.md`・`README-SLIM.md`・`release/README.txt` を 1.1.6 に。
   - ZIP は **`2026-10-29 12:00`（UTC）** で組み立て＝**226エントリ・3,922,091 bytes**・`unzip -t` 破損なし・**`sha256 7f856d9f4f9d1a507047fcfd223de966e904a711a1f87c2f66aeed87bc47f5f9`**。ダウンロード欄に残っていた「1.1.4の配布物」「`trk-1.1.4.zip`」も 1.1.6 に直した。
   - **1.1.0〜1.1.5 のZIPと Drive の `trk-1.1.0`〜`trk-1.1.5` はそのまま**（同じ名前で作り直さない）。

@@ -385,7 +385,9 @@ core.$("bpm").addEventListener("change", () => {
 });
 core.$("chartGen").addEventListener("change", () => {
   const value = core.$("chartGen").value;
-  core.settings.chartGen = ["1", "2", "3", "4"].includes(value) ? value : "3"; core.saveUserPrefs();   // 譜面の作り方は全曲共通の設定
+  core.settings.chartGen = ["1", "2", "3", "4"].includes(value) ? value : "4";   // 譜面の作り方は全曲共通の設定（既定は Bタイプ＝方式4）
+  core.settings.chartGenChosen = true;   // 自分で選んだ以上、アップデートで既定が変わっても、この選択を尊重する
+  core.saveUserPrefs();
   if (core.videoReady && core.chartMode === "generated") window.Trk.media.buildChart();
 });
 core.$("offset").addEventListener("change", () => {

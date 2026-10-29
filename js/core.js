@@ -176,7 +176,7 @@ const LITE_ENUM_VALUES = {
    "icon" は文字を出さない（🐔 のアイコンだけ）。名前と色は固定なので、ここで選べるのは表示名だけ。 */
 const TRK_ENUM_VALUES = {
   trkTabName: ["full", "short", "icon"],
-  chartGen: ["1", "2", "3", "4"], // 🎼 1・2は旧方式、3は新方式（既定）、4は遊びの文法（試験中。js/chart-gen.js）
+  chartGen: ["1", "2", "3", "4"], // 🎼 1・2は旧方式、3はAタイプ（従来）、4はBタイプ（既定。遊びの文法。js/chart-gen.js）
   mediaKeepLimit: ["1g", "5g", "unlimited"] // 🎵 保存棚の上限（ブラウザー側の容量上限は別に適用）
 };
 
@@ -228,7 +228,11 @@ const settings = {
   artWallpaperBg: prefs.artWallpaperBg === true,                     // 🖼 静止画を全画面へ拡大（オフは譜面中は右上、他は原寸以下で動画枠中央）
   useStudyArtwork: prefs.useStudyArtwork === true,                   // 📚 書斎で割り当てた画像をTV／ゲーム背景にも使う（既定オフ）
   hideArtworkDuringChart: prefs.hideArtworkDuringChart === true,     // 🎼 譜面中は静止画を隠す（既定オフ）
-  chartGen: pick(prefs.chartGen, ["1", "2", "3", "4"], "3"),             // 🎼 自動譜面の作り方（既定は新方式。旧方式1・2は旧譜面の再生成用、4は試験中）
+  /* 🎼 自動譜面の作り方（trk216）：既定は **Bタイプ＝方式4**。3は Aタイプ（従来）、旧方式1・2は旧譜面の再生成用。
+     一度でもこの設定を選んだ人（chartGenChosen）は、その選択をそのまま使う。既定が A だったころの保存値
+     （"3"）は「選んだ」とみなさない＝アップデート後は B へ移る（A のままにしたい人は設定で選び直せる）。 */
+  chartGenChosen: prefs.chartGenChosen === true,
+  chartGen: prefs.chartGenChosen === true ? pick(prefs.chartGen, ["1", "2", "3", "4"], "4") : "4",
   seed: typeof prefs.seed === "string" ? prefs.seed.slice(0, 32) : "834271",   // 曲ごとの設定がない曲の初期値
   bpm: num(prefs.bpm, 60, 300, 138),
   offset: num(prefs.offset, -5000, 5000, 0),
@@ -622,7 +626,7 @@ function resetAllPrefs() {
   settings.trkPlaylist = true; // 🐔 trk's playlistも初期状態に戻す（再表示）
   settings.trkClassic = true;  // 🎻 trk classic も初期状態に戻す
   settings.trkRemoved = [];    // 🗑 消したリストの印も外す（プレイリストごと初期化するため）
-  settings.trkSortABC = false; settings.playlistOrder = []; settings.trkTabName = "full"; settings.chartGen = "3"; settings.mediaKeepLimit = "1g";
+  settings.trkSortABC = false; settings.playlistOrder = []; settings.trkTabName = "full"; settings.chartGen = "4"; settings.chartGenChosen = false; settings.mediaKeepLimit = "1g";
   settings.fxPower = 1.5; settings.gameFxMode = "full"; settings.hideGameplayUI = false; settings.helpText = true; settings.tutorialDone = false; settings.tutorialStamps = []; settings.skinGradUnlocked = false; settings.playlists = []; settings.plFolders = []; settings.playlistDelMode = "one"; settings.plAuthorTools = false; settings.plAuthorName = ""; settings.plAuthorBlock = []; settings.plAuthorFav = []; settings.plAuthorOnly = false; settings.menuKey = "KeyM"; settings.menuConfirm = true; settings.mediaExitKey = "Escape"; settings.mediaExitConfirm = true; settings.errorMeter = true;
   settings.scroll = 1.2; settings.latency = 0;
   settings.catchNitroBonus = true; settings.catchBlastNext = false; settings.mediaRepeat = "off"; settings.mediaShuffle = false; settings.mediaRate = 1; settings.mediaLoopTrigger = "toggle"; settings.videoKeys = VIDEO_KEY_DEFAULTS.slice(); settings.mediaResumeRewind = 0; settings.mediaWakeLock = true; settings.mediaWave = true; settings.libProgress = "all"; settings.mediaLyricsOpen = false;

@@ -1,6 +1,6 @@
 # trk! 開発引き継ぎ
 
-> **最終更新：2026-10-29（trk215・⭐ お気に入りの4フォルダ（⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り）を全部使えるようにした：2軍〜元お気に入り・ピン・🧊凍結・選んでいたフォルダを `settings.favs` に保存（1.1.4 までは保存していなかったので、0個の2軍を選ぶとタブごと消え、リロードで戻っていた）、⭐タブはどのフォルダかに入っていれば出し、凍結の解除は 🧊／🔒 の3秒長押し（❓謎設定「フリーズの解除をワンタップにする」＝**既定オフ**で1タップ）。2026-10-27（trk214・**1.1.4**＝1.1.3 レビュー反映：🖥 ドラッグ中はポインターを掴んで外へ出てもずらす・ピンチのあと残った1本指でそのまま動かす・配布物のリンク切れ検査。trk212・trk213・**1.1.3**：🖥 全画面の動画をホイール／ドラッグ／ピンチで拡大・縮小（100〜500%・ポインター中心・1回 2/5/10%）、⏱ 曲名タブの「ここをプレビュー開始位置にする」を設定で出す（**初期オフ**）。**1.1.3 は trk213 を配る版**。1.1.0→1.1.1→1.1.2 のレビュー反映もそれぞれのZIPに同梱済み。1.0.9〜1.1.2 の配布ZIPの形と時刻もここに集約）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
+> **最終更新：2026-10-29（trk216・**1.1.5**＝🎼 譜面生成方式の既定を **Bタイプ（方式4）** に（触った感触で B が良い、という利用者の判断。**設定で選んだ人＝`chartGenChosen` はそのまま**・アップデート後に B へ移るのは選んだ印が無い人だけ）。trk215・⭐ お気に入りの4フォルダ（⭐1軍／⭐2軍／🧊フリーズ／📤元お気に入り）を全部使えるようにした：2軍〜元お気に入り・ピン・🧊凍結・選んでいたフォルダを `settings.favs` に保存（1.1.4 までは保存していなかったので、0個の2軍を選ぶとタブごと消え、リロードで戻っていた）、⭐タブはどのフォルダかに入っていれば出し、凍結の解除は 🧊／🔒 の3秒長押し（❓謎設定「フリーズの解除をワンタップにする」＝**既定オフ**で1タップ）。2026-10-27（trk214・**1.1.4**＝1.1.3 レビュー反映：🖥 ドラッグ中はポインターを掴んで外へ出てもずらす・ピンチのあと残った1本指でそのまま動かす・配布物のリンク切れ検査。trk212・trk213・**1.1.3**：🖥 全画面の動画をホイール／ドラッグ／ピンチで拡大・縮小（100〜500%・ポインター中心・1回 2/5/10%）、⏱ 曲名タブの「ここをプレビュー開始位置にする」を設定で出す（**初期オフ**）。**1.1.3 は trk213 を配る版**。1.1.0→1.1.1→1.1.2 のレビュー反映もそれぞれのZIPに同梱済み。1.0.9〜1.1.2 の配布ZIPの形と時刻もここに集約）**。現在の仕様・守る条件・未確認事項の要約です。過去の詳細な変更履歴・検証記録は [`HANDOFF-ARCHIVE.md`](HANDOFF-ARCHIVE.md)、利用者向け仕様は [`README.md`](../README.md) と [`guide/`](guide/)、権利表記は [`NOTICE.md`](../NOTICE.md)、品質・安全確認は [`QUALITY-CHECKS.md`](QUALITY-CHECKS.md) と [`SECURITY.md`](SECURITY.md) を参照してください。
 >
 > **本書の読み方**：§2＝今の仕様、§3＝壊してはいけない条件、§4＝実機で確認していないこと（ここが最重要）、§5＝ファイルの場所、§6＝自動検査で確かめたこと、§7＝最近の変更、§8＝変更時の点検、§9＝配布ZIPの形と作り方（1.0.8〜・現在 1.1.4）。
 
@@ -272,6 +272,7 @@
 
 ### 維持中の既存機能
 
+- **🎼 譜面生成方式の既定は Bタイプ（方式4）（trk216）**：`settings.chartGen` の既定を `"3"`（Aタイプ）から **`"4"`（Bタイプ）** へ。1.1.4 までは、どの設定を保存しても `chartGen: "3"` がまとめて保存されるため、**既定を変えるだけでは既存の利用者が B にならない**。そこで **`settings.chartGenChosen`**（設定のセレクトで選んだら true）を足し、**印がある人だけその値を尊重**する（インポート・バックアップにも載る）。工場出荷（`resetAllPrefs`）は B＋印なし。Aタイプ（方式3）・旧方式1／2は今までどおり選べる。
 - **🎓 trk's OST Vol.1（`trk-ost-v1`）**：🐔 trk's playlist の Game Vol.1 直下。**trk185 から音源5曲（SUNRISE DASH・POPCORN SMILE・MOONLIT LULLABY・CRIMSON BLAZE・ボーナス NEON DIVE）は同梱をやめ、別リポジトリ music-library の `.stpack`（CC BY 4.0）で別配布**。FIRST SPARK のデモは同梱のまま残す。プレイリストには別配布の案内（`plGuideTrkOst`・4言語・music-library Releases へのリンク）を持ち、公式パック（名前 `trk's OST Vol.1`／作者 `TRMTKB` から算出するパックID）を入れた利用者には `syncTrkOstPackSongs` が曲キー `pack:<ID>/s01〜s05` を未見だけ足す（`trkOstSeenKeys` 共用・利用者が外した曲は戻さない・外部通信なし）。trk189で旧同梱キーだけを一回掃除（`trkOstLegacyClean1`）、見た曲の印は起動時にも読み戻します。同梱経路は `TRK_OST_MANIFEST_INCLUDED=false` の印で manifest を取りに行かない（同梱ビルドだけ true）。手続き生成曲は別の **trk Agent's OST Vol.1（`trk-agent-ost-v1`）** にmanifest経由で接続済み（下記）。trk112が最上位に作った本棚だけを一度trkフォルダへ移し（印は `cat: "trk:ost"`）、以後は利用者が動かした場所を守ります。
 - **🎼 手続き作曲ツール／任意のAgent OST（trk113・trk149〜151）**：`node tools/make-trk-ost.mjs` で5ルール×2曲＝10曲のWAVスケッチと `assets/trk-ost/manifest.json` を生成（外部ライブラリなし・決定的）。アプリ側にはmanifest読込み・専用リスト作成・選択時の音源読込みを実装済みです。ただし音源とmanifestは `.gitignore` 対象で、公開リポジトリには入っていません。既定コードの `AGENT_OST_MANIFEST_INCLUDED=false` は任意資産をfetchしない印です。音源を意図的に含める配布／試験ビルドだけ true にし、生成したmanifest・WAVと一緒に配布します。10曲の実聴取・品質評価は未確認（§4-6）。
 - **🎵 OSTオリジナル曲の作曲パイプライン（trk179〜）**：`tools/ost-scores/<key>.json` に作曲（テンポ・形式・コード・全メロディ・編曲）→ `node tools/make-trk-song.mjs` で決定論的チップシンセ描画（WAVはGit外）＋ABC譜を生成 → `node tools/encode-ost-mp3.mjs` でMP3化 → **trk185 からは同梱せず music-library の `.stpack` で配布**（スコアは本Repo `tools/ost-scores/` と music-library `scores/` の両方に残す。全スコアが描画できることが check-repo／ost-render の検査条件）。1曲目は SUNRISE DASH（150 BPM・32小節・intro-A-B-サビ-outro＋終止・約53秒・823 KiB）。2曲目は POPCORN SMILE（128 BPM・Gメジャー・三角波リード・約61秒・960 KiB）。調は C/G/F 長調（ABC の臨時記号と下方3度は調に従う）、リード音色は pulse/tri/square/saw から選べる（trk180）。3曲目は MOONLIT LULLABY（92 BPM・Fメジャー・約84秒・1.29 MiB）。静かな曲用に `leadVib`・`bassStyle`（soft）・`bassWave`・`arpRate`（8）・`padWave`・ドラム `soft`／`lullaby`・リード `sine` を追加（trk181）。4曲目は CRIMSON BLAZE（160 BPM・Aマイナー響き・約49秒・770 KiB）。ドラム `blaze`（16分ハット＋強フィル）を追加（trk182）。短調は調号Cのまま Am 中心進行＋終止 A で書く（ハモリ適用のサビはダイアトニック限定）。ボーナスは NEON DIVE（240 BPM・Dメジャー・56小節2番形式・約57秒・892 KiB）。BPM上限260・Dメジャー・ドラム `vocaloid`（ハーフタイム＋16分ハット）・メロディ16分 grid・最終スタブのテンポ追従を追加（trk183）。YuE2 本体はこの環境で動かない（GPU＋HuggingFace要）ため自前パイプラインとし、ABC は将来 YuE2 の `abc=` へ渡せる形。
@@ -353,8 +354,10 @@
 | 48 | 1.1.3 の配布ZIP（trk212・trk213 入り・2026-10-27） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻・`--check`・再検証（304）・ローカル配信（`/` 200）は確認済み（§6・§7）。**利用者の実機での起動と、🖥 のホイール／ドラッグ／ピンチ・⏱ のチェックの見え方は未確認** | ①1.1.2 のフォルダーに重ねず、新しいフォルダーへ展開して `index.html` から起動 ②全画面でホイール・ドラッグ・ピンチ ③⚙ 設定 → 📊 スペクトラム の「⏱ 「ここをプレビュー開始位置にする」を表示」のオン／オフ |
 | 49 | trk214：🔍 ドラッグ中に外へ出てもずらせる（ポインターを掴む）・ピンチのあと残った1本指で動かせる | VM の偽 stage（`setPointerCapture`／`releasePointerCapture`）で確認済み（`tests/trk212-video-zoom.test.mjs` の trk214 4件）。捕まえるのはドラッグ開始と2本目の指からで、押しただけでは捕まえないことも確認 | ①全画面で拡大し、動画の外（ウィンドウの外）までドラッグしても止まらない ②スマホでピンチのあと1本離し、そのまま動かせる ③押しただけ（長押しシーク）は従来どおり外で止まる |
 | 50 | trk214：📄 配布物の文書のリンク切れ検査（`checkDocLinks`） | 1.1.3 のZIPに当てて8件を検出（`CONTRIBUTING.md`・`README*.md`・`docs/guide/{en,files,mods}.md`）・`tests/release-layout.test.mjs` の3件は確認済み | 1.1.4 を組むときに8件を直す（§9）。直したあとは `--check` が緑になる |
-| 52 | trk215：⭐ お気に入りの4フォルダ（2軍／🧊フリーズ／📤元お気に入り・📌ピン・🔒凍結・選んでいたフォルダの保存、⭐タブの出し入れ、3秒長押しでの解除） | `tests/trk215-favs.test.mjs` の17件で確認済み（謎設定の既定オフ／`settings.favs` の形／凍結は最初からオフ／1軍→2軍→リロード／5つの状態のリロード／1軍の配列を差し替えない／凍結中の追加・削除を止める／🎲のピン／3秒長押しと1タップ／⭐タブ／空表示／行の☆／4言語／cache）。**実機の見た目と3秒長押しの感触は未確認** | ①⭐タブで 2軍／🧊フリーズ／📤元お気に入り を選んでもお気に入りが消えないこと ②2軍へ入れて再読み込みしても残ること ③🔒 と 🧊 を3秒長押しで解除できること ④❓謎設定のチェックで1タップになること |
 | 51 | 1.1.4 の配布ZIP（trk214 入り・2026-10-27） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻・`--check`（`checkDocLinks` **0件**）・再検証（304）・ローカル配信は確認済み（§6）。**利用者の実機での起動と、外へ出るドラッグ・ピンチ→1本指の感触は未確認** | ①1.1.3 のフォルダーに重ねず新しいフォルダーへ展開して `index.html` から起動 ②全画面で拡大し、映像の外までドラッグ／ピンチのあと1本指 ③同梱の `docs/guide/`・`README-1.1.4.md` に「1.0.4」が残っていないこと |
+| 52 | trk215：⭐ お気に入りの4フォルダ（2軍／🧊フリーズ／📤元お気に入り・📌ピン・🔒凍結・選んでいたフォルダの保存、⭐タブの出し入れ、3秒長押しでの解除） | `tests/trk215-favs.test.mjs` の17件で確認済み（謎設定の既定オフ／`settings.favs` の形／凍結は最初からオフ／1軍→2軍→リロード／5つの状態のリロード／1軍の配列を差し替えない／凍結中の追加・削除を止める／🎲のピン／3秒長押しと1タップ／⭐タブ／空表示／行の☆／4言語／cache）。**実機の見た目と3秒長押しの感触は未確認** | ①⭐タブで 2軍／🧊フリーズ／📤元お気に入り を選んでもお気に入りが消えないこと ②2軍へ入れて再読み込みしても残ること ③🔒 と 🧊 を3秒長押しで解除できること ④❓謎設定のチェックで1タップになること |
+| 53 | trk216：🎼 譜面生成方式の既定を Bタイプ（方式4）へ | `tests/trk216-chartgen-default.test.mjs` の7件＋`npm run check` 704 pass で確認済み（既定の決まり方・印がある人の尊重・工場出荷・4言語・cache）。**実機での譜面の感触（Bが既定として良いか）は利用者の判断を仰ぐ** | ①新規（または設定を触っていない）状態で B になっていること ②一度 A を選ぶと、再読み込みしても A のままであること ③工場出荷で B に戻ること |
+| 54 | 1.1.5 の配布ZIP（trk215・trk216 入り・2026-10-29） | ZIP の形・`unzip -t`・sha256・全エントリ同時刻（`2026-10-29 10:00` UTC）・`--check`（`checkDocLinks` 0件）・ローカル配信・落とし直してのバイト一致は確認済み（§6・§9）。**利用者の実機での起動と、Bタイプの譜面の感触は未確認** | ①1.1.4 のフォルダーに重ねず新しいフォルダーへ展開して `index.html` から起動 ②⚙ 設定 → 🎼 譜面生成方式 が **Bタイプ（標準・方式4）** になっていること ③曲を選んで譜面ができること ④⭐ のお気に入り（2軍／🧊／📤）が再読み込みで残ること |
 
 #### 実ブラウザsmoke／CIの容量（trk162調査）
 
@@ -452,17 +455,30 @@
 | 📦 まるごとバックアップ・ZIP CRC・復元 | `js/backup.js`（歌詞・字幕キーの許可、アドオン概要の確認、復元アドオンの無効化）、`js/zip-io.js`、`js/custom.js`（.stpackのストリーム読書き・`packIdentityFromManifest`）、`tests/backup-codec.test.mjs`、`tests/backup-restore.test.mjs`、`tests/pack-identity.test.mjs`、`tests/pack-zip-stream.test.mjs`、`tests/zip-io.test.mjs`、`tools/check-security.mjs` |
 | CBZ／ZIP書斎のページ展開上限 | `js/study-room.js`（`studyAlbumLimits`・`studyImportArchiveBook`）、`tests/storage-limits.test.mjs` |
 | Endfield楽曲台帳・曲名fixture・検査 | `docs/ARKNIGHTS-ENDFIELD-MUSIC.md`、`tools/endfield-zeroth-directive-tracklist.json`、`tools/endfield-msr-albums-tracklist.json`、`tools/check-repo.mjs` |
-| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.27-trk215`＝trk215。**配布済みの 1.1.4 は `trk214`**。**配布ZIP（1.1.4）は `trk214`**。1.1.2 は `trk211`、1.1.1 は `trk210`、1.1.0 は `trk208`、1.0.9 は `trk207`。アプリ本体が変わらない版では cache 名を上げない） |
+| Service Worker | `sw.js`（現行cache名：`trk-v2026.10.29-trk216`＝trk216。**配布ZIP（1.1.5）は `trk216`**、配布済みの 1.1.4 は `trk214`、1.1.4 の前の trk215 は未配布。1.1.2 は `trk211`、1.1.1 は `trk210`、1.1.0 は `trk208`、1.0.9 は `trk207`。アプリ本体が変わらない版では cache 名を上げない） |
 | 🚪 メディアプレイヤーの抜け方（trk206） | `js/media-player-mode.js`（`mediaExitPlan`・`closeMedia`）、`js/library.js`（`previewContinue`）、`js/core.js`（`mediaReloadOnExit`）、`js/i18n-options.js`＋`index.html`（❓謎設定）、`tests/trk206-media-exit.test.mjs` |
-| 📦 配布ZIPの組み立て（1.0.8〜・現在 1.1.4） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`release/README.txt`（配布用のかんたん起動。`--readme` を省くとこれが入る。**版と `README-1.x.y.md` の名前は `--version` とそろえる**）、`tests/release-layout.test.mjs`（形・時刻・README の版） |
+| 📦 配布ZIPの組み立て（1.0.8〜・現在 1.1.5） | `tools/prepare-release.mjs`（`npm run release`。`index.html`＋`README.txt`＋`trk-files/` に組み、形を検査してZIPにする）、`release/README.txt`（配布用のかんたん起動。`--readme` を省くとこれが入る。**版と `README-1.x.y.md` の名前は `--version` とそろえる**）、`tests/release-layout.test.mjs`（形・時刻・README の版） |
 | 📂 フォルダー共有の共通部品（trk208） | `js/shared-folders.js`（`window.TrkSharedFolders`＝`plan`／`uniqueLabel`／`mergeScans`／`walk`／`pathParts`／`readFileAt`。DOM・IndexedDB・書き込みなし）、`js/library.js`（登録簿 `"folders"`・`addSharedFolder`／`readSharedFolders`／`restoreSharedFolders`／`folderAutoKickShared`／`removeSharedFolder`／`renderSharedFolderList`）、`index.html`（`#libShareVideoBtn`・`#libSharedFolderList`）、`tests/trk208-shared-folders.test.mjs` |
 | 📂 書斎の「フォルダーのまま読む本」（trk208） | `js/study-room.js`（`studyShareImageFolder`／`studyImportSharedFolder`／`studySharedPageBlob`／`studySharedFolderEnsure`・`studyBookClean` の `linked`／`sharedFolder`）、`js/study-room-utils.js`（`folderBookGroups`・`bookSize` の linked 扱い）、`js/backup.js`（`skip` と `checkStudyLimits`）、`index.html`（`#studyShareFolderBtn`） |
 | 🖥 全画面の動画の拡大・縮小（trk212） | `js/video-max.js`（`zoomStepPercent`・`containSize`・`panLimit`／`clampPan`・`accumulateWheel`・`zoomAround`・`zoomFrame`・`paint` の `drawImage`）、`js/core.js`（`videoMaxWheelStep`）、`js/main.js`（`#videoMaxWheelStep`）、`index.html`、`css/style.css`（`.videoMaxZoom`・`.zoomed` のカーソル）、`tests/trk212-video-zoom.test.mjs` |
+| 🎼 譜面生成方式の既定（trk216） | `js/core.js`（`chartGen` の既定 `"4"`・`chartGenChosen`・`resetAllPrefs`）、`js/main.js`（`#chartGen` の change で印を付ける・想定外値の寄せ先 `"4"`）、`js/i18n.js`（`chartGen3`／`chartGen4`／`chartGenHint` の4言語）、`index.html`（セレクトのラベル）、`tests/trk216-chartgen-default.test.mjs` |
 | ⭐ お気に入りの4フォルダ（trk215） | `js/favs.js`（`stored`／`snapshot`／`save`＝`settings.favs`・`quickUnfreeze`／`holdButton`／`chips`）、`js/core.js`（`favs`・`favQuickUnfreeze`・`resetAllPrefs`）、`js/library.js`（`libFavKeys`・`libFavTab`・`libTabMatch`・行の ☆／📌／🧊）、`js/i18n-options.js`＋`index.html`（❓謎設定）、`css/style.css`（`.holding`・`.favPinN`）、`tests/trk215-favs.test.mjs` |
 | ⏱ 曲名タブの開始位置ボタン（trk213） | `js/core.js`（`previewStartShow`・`resetVideoPrefs`）、`js/library.js`（`previewSetShown`・`syncPreviewSetBtn`・`renderBanner`／`updateSpBuilder`）、`js/spectrum.js`（`buildBox` の `specPreviewSet`・TEXT 8キー）、`tests/trk213-preview-set-toggle.test.mjs` |
 | 全体・安全検査 | `tools/check-repo.mjs`、`tools/check-security.mjs`、`tools/check-a11y.mjs`、`tools/check-lite.mjs` |
 
 ## 6. 直近の検証
+
+**1.1.5 の配布ZIP（2026-10-29）の確認**
+
+| 検査 | 結果 | 範囲・注意 |
+|---|---|---|
+| `npm run check` | **704 pass / 0 fail** | 697→+7（`tests/trk216-chartgen-default.test.mjs`）。Static・Security・a11y・lite も緑 |
+| `tools/prepare-release.mjs --check` | **OK（`checkDocLinks` 0件）** | 形は `index.html`・`README.txt`・`trk-files/` の3つだけ。`service_worker_cache` と `sw.js` の `CACHE` が一致（`trk-v2026.10.29-trk216`）・`layout:"wrapper"`・入口に `location.replace` |
+| 配布ZIP（1.1.5） | **226エントリ・3,916,257 bytes・`unzip -t` 破損なし** | 全エントリ **`2026-10-29 10:00`（UTC）**（1.1.4 の `2026-10-27 22:00` より新しい）・`sha256 0b12ae8c35062910aa5c66e2c027c7a85670bd5204e5ee9abc6a2fbd4c8f8599`・`trk-files/` は224ファイル |
+| 1.1.4 のZIPとの差分 | **コード11ファイル＋配布版の文書4本** | `index.html`・`css/style.css`・`sw.js`・`js/{chart-gen,core,favs,i18n-options,i18n,library,main,media}.js`（trk215＋trk216）。文書は `README-1.1.5.md`（改名）・`README.md`・`README-SLIM.md`・`docs/guide/files.md` |
+| コードの同一性 | **OK** | 11ファイルがリポジトリの HEAD と `cmp` でバイト同一 |
+| 落とし直しての確認 | **OK** | Drive から `trk-1.1.5.zip` を取り直して `cmp` バイト一致・`sha256sum -c` OK |
+| Drive への追加（1.1.5） | **OK（2026-10-29）** | `trk-1.1.5` フォルダー（`1j9mIFWIW5m7ZQSwXiy2OaqviT7JiXghw`）に ZIP・`SHA256SUMS-1.1.5.txt`・**`trk216-chartgen-default.diff`**・**`trk-1.1.4-to-1.1.5-code.diff`**・`README-1.1.5-drive.txt`。**APK（1.0.4 ベース）向けに diff を同梱**（利用者の指定） |
 
 **1.1.4 の配布ZIP（2026-10-27）の確認**
 
@@ -536,7 +552,15 @@
 
 ## 7. 最近の変更
 
-- **⭐ trk215：お気に入りの4フォルダを、どれも使えるようにする（2026-10-29・未配布）**：1.1.4 の実機レビューで「⭐1軍 以外が正常に動かない」と確認された4点を直した。
+- **📦 1.1.5：trk215・trk216 を配る版（2026-10-29）**：**アプリ本体は trk216**（お気に入りの4フォルダ＋譜面生成の既定を Bタイプへ）。1.1.4 の配布ZIPの `trk-files/` を土台に、**コード11ファイル**＋`README-1.1.5.md`（改名）・`README.md`・`README-SLIM.md`・`docs/guide/files.md` を差し替え、`release/README.txt` の版と README 名も 1.1.5 へ。
+  - ZIP は **`2026-10-29 10:00`（UTC）** で組み立て＝**226エントリ・3,916,257 bytes**・`unzip -t` 破損なし・全エントリ同時刻・**`sha256 0b12ae8c35062910aa5c66e2c027c7a85670bd5204e5ee9abc6a2fbd4c8f8599`**。
+  - `--check` **OK**（`checkDocLinks` 0件）・落とし直してバイト一致。Drive は **`trk-1.1.5`**（`1j9mIFWIW5m7ZQSwXiy2OaqviT7JiXghw`）に **ZIP＋SHA256SUMS＋今回の diff 2本＋説明**（APK が 1.0.4 ベースで並行開発中のため）。
+  - **1.1.0〜1.1.4 のZIPと Drive の `trk-1.1.0`〜`trk-1.1.4` はそのまま**（同じ名前で作り直さない）。
+- **🎼 trk216：譜面生成方式の既定を Bタイプ（方式4）にする（2026-10-29・1.1.5 で配布）**：利用者の感触で B のほうが良い、という判断。
+  - `settings.chartGen` の既定を **`"4"`** に（`core.js`）。**`settings.chartGenChosen`** を足し、`#chartGen` を選んだら true にして**その選択を尊重**する。印が無い人の保存値（既定が A だったころの `"3"`）は B へ移る。工場出荷は B＋印なし。
+  - ラベルとヒント（4言語）を「**B＝標準・既定／A＝従来**」に入れ替え。`js/chart-gen.js`・`js/media.js` の説明も更新。
+  - `sw.js` の cache は **`trk-v2026.10.29-trk216`**、`tests/trk216-chartgen-default.test.mjs`（7件）で **704 pass**。
+- **⭐ trk215：お気に入りの4フォルダを、どれも使えるようにする（2026-10-29・1.1.5 で配布）**：1.1.4 の実機レビューで「⭐1軍 以外が正常に動かない」と確認された4点を直した。
   - **保存する場所が無かった**：2軍〜元お気に入り・📌ピン・🔒凍結・選んでいたフォルダを `settings.favs` に保存する（`save()` が `snapshot()` を書いて `saveUserPrefs()`）。1軍は今までどおり `tvFav`／`fxFav`／`songFav`。**`tidy()` は1軍の配列を差し替えない**（`rewrite()` で中身だけ入れ替える＝`syncMain` に戻されない）。
   - **凍結は最初からオンにしない**（`locks` の既定を `["frozen"]` → `[]`）。🧊フリーズへ、そのまま入れられる。
   - **⭐タブは、どのフォルダかに1曲でも入っていれば出す**（`libFavTab`）。⭐ を見ているなら0曲でも出す＝**フォルダを選んだだけでタブごと消えない**。チップで4フォルダを行き来でき、0曲のときは `libFavEmpty` で案内する。
@@ -587,16 +611,16 @@
 - [ ] 版を上げたときは §9 の「版を上げるときに直す場所」を全部直し、`release/README.txt`・配布アプリの `README-1.x.y.md`・`sw.js` の `CACHE`・`release-manifest.json` の `version` がそろっていることを確かめた。
 - [ ] Drive へ上げたら、**落とし直してバイト一致**を確かめ、`SHA256SUMS` を新しいハッシュで上書きした（§9）。
 
-## 9. 配布物の形（1.0.8〜／現在 **1.1.4**：`index.html`＋`README.txt`＋`trk-files/`）
+## 9. 配布物の形（1.0.8〜／現在 **1.1.5**：`index.html`＋`README.txt`＋`trk-files/`）
 
-**決めたこと（2026-10-26／1.0.8〜1.1.4）**：ZIPを開いたときに **`index.html`・`README.txt`・`trk-files/` の3つだけ**が見える形にする（1.0.6 のころの試作 `trk-1.0.6-layout-proto.zip` と同じ見た目。利用者からの指定）。**OS別のZIPは作らない**——Windows・macOS・Linux は同じアプリ本体で動くので、1本で足りる（1.0.7 までの win/linux・mac の2本は廃止）。
+**決めたこと（2026-10-26／1.0.8〜1.1.5）**：ZIPを開いたときに **`index.html`・`README.txt`・`trk-files/` の3つだけ**が見える形にする（1.0.6 のころの試作 `trk-1.0.6-layout-proto.zip` と同じ見た目。利用者からの指定）。**OS別のZIPは作らない**——Windows・macOS・Linux は同じアプリ本体で動くので、1本で足りる（1.0.7 までの win/linux・mac の2本は廃止）。
 
 ```
-trk-1.1.4.zip
-└ trk-1.1.4/
+trk-1.1.5.zip
+└ trk-1.1.5/
    ├ index.html   … 入口（meta refresh＋<a>＋location.replace で trk-files/index.html へ）
    ├ README.txt   … かんたん起動・index.html だけでできること・ローカルサーバーの使い方・注意・権利
-   └ trk-files/   … アプリ本体（リポジトリのルートと同じ中身。README-1.1.4.md・LICENSE・docs/ を含む）
+   └ trk-files/   … アプリ本体（リポジトリのルートと同じ中身。README-1.1.5.md・LICENSE・docs/ を含む）
 ```
 
 - **配布ZIPに入れないもの**：`.github/`・`tests/`・`tools/*.mjs`・開発用の `docs/HANDOFF.md`／`HANDOFF-ARCHIVE.md`／`MIGRATIONS.md` など（1.0.7 と同じ切り分け。アプリ本体の `docs/guide/`・`SECURITY.md`・`QUALITY-CHECKS.md` などは入る）。
@@ -605,17 +629,17 @@ trk-1.1.4.zip
 - **`http://127.0.0.1:8000/` で開いたとき**：入口がルート直下に残った **1.0.7 以前の worker だけ**を `unregister()` してから進む（`trk-files/sw.js` は残す）。アプリの worker のスコープは `/trk-files/` になる。
 - **保存データは「開き方」ごとに別**（`file://` と `http://127.0.0.1:8000/` は別のオリジン）。これは 1.0.6 試作の README.txt と同じ注意書きを残している。
 - **`00_START_HERE.html` と `01_README_WIN_LINUX.txt`／`01_README_MAC.txt` は廃止**。起動案内は `README.txt` に集約（`--check` がアプリ側に残っていると fail にする。`README-1.1.4.md` などアプリ自身の README は残す）。
-- **`release-manifest.json`**（`trk-files/` の中）に `version`・`archive:"trk-1.1.4.zip"`・`layout:"wrapper"`・`wrapper{launcher:"index.html", readme:"README.txt", app:"trk-files", platforms:["win","linux","mac"]}`・`service_worker_cache`（`sw.js` の `CACHE` を書き写す）・`built_at` を記録。`platform` は持たない。**このファイルは `--version` から作る（手で書かない）**。
+- **`release-manifest.json`**（`trk-files/` の中）に `version`・`archive:"trk-1.1.5.zip"`・`layout:"wrapper"`・`wrapper{launcher:"index.html", readme:"README.txt", app:"trk-files", platforms:["win","linux","mac"]}`・`service_worker_cache`（`sw.js` の `CACHE` を書き写す）・`built_at` を記録。`platform` は持たない。**このファイルは `--version` から作る（手で書かない）**。
 
-**版を上げるときに直す場所（1.1.4 で実施した順）**
+**版を上げるときに直す場所（1.1.5 で実施した順）**
 
 1. `release/README.txt` — 1行目の版と、末尾の `README-1.x.y.md` の参照（`tests/release-layout.test.mjs` が「版が書いてあること」「アプリ内READMEの名前」を見る）。
 2. 配布アプリの `README-1.x.y.md` — 前の版から改名し、先頭に「今回」の更新点を足して、前回の見出しを「前回」へ。`README.md` も同じ内容にする。`README-SLIM.md` の版・cache・archive 名・ファイル数も直す。
-3. `sw.js` の `CACHE` — `trk-v<日付>-trk<番号>`（**1.1.4 は trk214 の `trk-v2026.10.27-trk214`**、1.1.3 は trk213 の `trk-v2026.10.27-trk213`。アプリ本体が変わらない版では上げない＝1.1.0 は trk208、1.1.1 は trk210 のまま）。`release-manifest.json` は `--version` から作られる。
+3. `sw.js` の `CACHE` — `trk-v<日付>-trk<番号>`（**1.1.5 は trk216 の `trk-v2026.10.29-trk216`**、1.1.4 は trk214 の `trk-v2026.10.27-trk214`、1.1.3 は trk213 の `trk-v2026.10.27-trk213`。アプリ本体が変わらない版では上げない＝1.1.0 は trk208、1.1.1 は trk210 のまま）。`release-manifest.json` は `--version` から作られる。
 4. 本書 — ヘッダ・§2（版の説明）・§4（新しい版の #）・§5（cache 名）・§6・§7・§9。
 5. **配布版だけの文書** — 下の「配布版だけの文書（毎版そろえる）」を読む。`--check` がリンク切れ（`README-1.x.y.md` の名前違い）を止める。
 
-**配布版だけの文書（毎版そろえる・1.1.4 で全部直した／次は「変わったか」だけ見る）**
+**配布版だけの文書（毎版そろえる・1.1.4 で全部直した／1.1.5 は「版と README 名」だけ）**
 
 配布ZIPの `trk-files/` には、リポジトリと同じ名前でも**中身が配布向けに書き換えられた文書**がある（GitHub の URL や開発用の `docs/HANDOFF.md` を出さないため）。前の版の `trk-files/` を土台に差分だけを載せ替える作り方なので、ここは**放っておくと古い版のまま残る**（1.1.3 のレビューで指摘。1.1.1 にもあった）。
 
@@ -649,6 +673,7 @@ unzip -t /home/user/work/rel114/dist/trk-1.1.4.zip && sha256sum /home/user/work/
 - 組み立ては **`js/zip-io.js` の `zipWrite` をそのまま使う**（新しいZIP実装を増やさない）。全エントリ同じ mtime（`--date`）で、並びは名前順＝決定的。
 - **🕒 時刻は前の版より新しくする（必須・trk205）**：`--date` を省くと**組み立てた時刻（分まで）**になる。同じ時刻のZIPを配ると、同じポートの `python -m http.server` が `If-Modified-Since` に **304** を返し、ブラウザーは HTTP キャッシュにある**前の版の `index.html`（入口ではなく旧アプリ）**を使い続ける（`/js/…` が無いので一覧が空の壊れた画面になり、入口の Service Worker 解除も走らない。`file://` と別ポートは影響なし）。1.0.7 と 1.0.8 がどちらも `2026-10-27 12:00` で組まれていたため実際に起きた（2026-10-27 レビュー・必須）。`--newer-than=<前の版の built_at>` を渡すと、それ以前の時刻では組み立てを止める。`release-manifest.json` の **`built_at`** が次の版の基準になる。
 - `.gitignore` に `dist/` を入れてある（ZIPは Git に入れない）。
+- **1.1.5 の実績**：**226エントリ・3,916,257 bytes・`unzip -t` 破損なし**・全エントリ **`2026-10-29 10:00`（UTC）**（1.1.4 の `2026-10-27 22:00` より新しい）。`sha256 0b12ae8c35062910aa5c66e2c027c7a85670bd5204e5ee9abc6a2fbd4c8f8599`。1.1.4 のZIPの `trk-files/` を土台に、**コード11ファイル**（trk215＋trk216）＋`README-1.1.5.md`（改名）・`README.md`・`README-SLIM.md`・`docs/guide/files.md`。`checkDocLinks()` は **0件**。
 - **1.1.4 の実績**：**226エントリ・3,910,309 bytes・`unzip -t` 破損なし**・全エントリ **`2026-10-27 22:00`（UTC）**（1.1.3 の `21:00` より新しい）。`sha256 b8050bc55fa499472079be2ebea3ea190bdd5d1bd408780c4804506a638501b2`。1.1.3 のZIPの `trk-files/` を土台に、**コード2ファイル**（`js/video-max.js`・`sw.js`）＋ガイド2本の1文＋**配布版の文書9本**＋README を差し替え。`checkDocLinks()` は **0件**。
 - **1.1.3 の実績**：**226エントリ・3,908,257 bytes・`unzip -t` 破損なし**・全エントリ **`2026-10-27 21:00`（UTC）**（1.1.2 の `20:00` より新しい）。`sha256 7f4c04a964d681ad450eaf90749e4fb624e465fd7e84bbbcb2da50037f1df3f5`。1.1.2 のZIPの `trk-files/` を土台に9ファイル＋ガイドの段落＋README を差し替え。
 - **1.1.2 の実績**：**226エントリ・3,899,166 bytes・`unzip -t` 破損なし**・全エントリ **`2026-10-27 20:00`（UTC）**（1.1.1 の `19:00` より新しい）。`sha256 837086d22d73f6fdea0952dc4293d27871aa3acfb33bd0fa79c5e4781906556c`（完全な値は Drive の `SHA256SUMS-1.1.2.txt` を正とする）。素材＝`/home/user/work/rel112/app`（**1.1.1 のZIPの `trk-files/` を土台**に、trk211 の2ファイルと `README-1.1.2.md`・`README.md`・`README-SLIM.md` だけを載せ替え＝ほかの差分は混ぜていない）。
@@ -660,4 +685,5 @@ unzip -t /home/user/work/rel114/dist/trk-1.1.4.zip && sha256sum /home/user/work/
 - **Drive（1.1.1）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.1.1` フォルダー**（`17XhNIUAqrQK33Mi-8X6ByeztpNFm-HQO`）を作り、**`trk-1.1.1.zip`（`17pDUAR7xp4pxW6RZTWSV6Up0ZCs6XTD6`・3,898,214 bytes・`sha256 1a6f8a800886aa1da9436c8d046e3ed390a3e0a5018c12d57f17f71a0514ef43`・`built_at 2026-10-27T19:00:00Z`）** と **`SHA256SUMS-1.1.1.txt`（`1U6EbFCrOpTC4x4SVmF9a5iYvweJFH13o`）** を置いた。Drive 側の `sha256Checksum` が手元の値と一致することを確認済み（再ダウンロードはしていない）。**1.1.0 のフォルダーとZIPはそのまま**（同じ名前で差し替えない）。
 - **Drive（1.1.2）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.1.2` フォルダー**（`1JTdv1S0tMb7dlxV93E-ywgUjmcTLy1-x`）を作り、**`trk-1.1.2.zip`（`1KuN9vGcQq40dU5mTKnm3K0cCc4RD-X6w`・3,899,166 bytes・`sha256 837086d22d73f6fdea0952dc4293d27871aa3acfb33bd0fa79c5e4781906556c`・`built_at 2026-10-27T20:00:00Z`）** と **`SHA256SUMS-1.1.2.txt`（`14TmPwEblMf4QUkm5VWrWm0Vz5nfFZKz_`）** を置いた。Drive 側の `sha256Checksum` が手元の値と一致することを確認済み。**1.1.0・1.1.1 のフォルダーとZIPはそのまま**。- **Drive（1.1.2）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.1.2` フォルダー**（`1JTdv1S0tMb7dlxV93E-ywgUjmcTLy1-x`）を作り、**`trk-1.1.2.zip`（`1KuN9vGcQq40dU5mTKnm3K0cCc4RD-X6w`・3,899,166 bytes・`sha256 837086d22d73f6fdea0952dc4293d27871aa3acfb33bd0fa79c5e4781906556c`・`built_at 2026-10-27T20:00:00Z`）** と **`SHA256SUMS-1.1.2.txt`（`14TmPwEblMf4QUkm5VWrWm0Vz5nfFZKz_`）** を置いた。Drive 側の `sha256Checksum` が手元の値と一致することを確認済み。**1.1.0・1.1.1 のフォルダーとZIPはそのまま**。
 - **Drive（1.1.3）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.1.3` フォルダー**（`1RDDIa7yJcwGx_rbslCqUF33MgE_mdi1K`）を作り、**`trk-1.1.3.zip`（`1Bi9FPArUNopM_UDKDVqPDTr0D-mbGN4Q`・3,908,257 bytes・`sha256 7f4c04a964d681ad450eaf90749e4fb624e465fd7e84bbbcb2da50037f1df3f5`・`built_at 2026-10-27T21:00:00Z`）** と **`SHA256SUMS-1.1.3.txt`（`1GN1LHx1I1orY2YIJDvCqgOM2ADqU1DMr`）** を置いた。Drive 側の `sha256Checksum` が手元の値と一致することを確認済み。**1.1.0〜1.1.2 のフォルダーとZIPはそのまま**。- **Drive（1.1.3）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.1.3` フォルダー**（`1RDDIa7yJcwGx_rbslCqUF33MgE_mdi1K`）を作り、**`trk-1.1.3.zip`（`1Bi9FPArUNopM_UDKDVqPDTr0D-mbGN4Q`・3,908,257 bytes・`sha256 7f4c04a964d681ad450eaf90749e4fb624e465fd7e84bbbcb2da50037f1df3f5`・`built_at 2026-10-27T21:00:00Z`）** と **`SHA256SUMS-1.1.3.txt`（`1GN1LHx1I1orY2YIJDvCqgOM2ADqU1DMr`）** を置いた。Drive 側の `sha256Checksum` が手元の値と一致することを確認済み。**1.1.0〜1.1.2 のフォルダーとZIPはそのまま**。
+- **Drive（1.1.5）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.1.5` フォルダー**（`1j9mIFWIW5m7ZQSwXiy2OaqviT7JiXghw`）を作り、**`trk-1.1.5.zip`（`1TQMGHBdI0xMX2m9S1DfBLtYZX07EAiIG`・3,916,257 bytes・`sha256 0b12ae8c35062910aa5c66e2c027c7a85670bd5204e5ee9abc6a2fbd4c8f8599`・`built_at 2026-10-29T10:00:00Z`）**・**`SHA256SUMS-1.1.5.txt`（`1606Js3p3VzMsIp_WyeL3DAoBdHIFnnFd`）**・**`trk216-chartgen-default.diff`（`1iFMhE9l4oVWLfPV_u2yGQp40sekNVAVC`）**・**`trk-1.1.4-to-1.1.5-code.diff`（`19VcEV5YfCwDf2m_b4xF57aSCa0TfsIi0`）**・**`README-1.1.5-drive.txt`（`1I-9m7tKHZk-PXVl_P_K88Dlx06K32ZlRy`）** を置いた。落とし直してバイト一致・`sha256sum -c` OK。**diff を同梱した理由**：`trk-apk`（`TonbokiriRaikiriMuramasa-Taikoubou/trk-apk`）が 1.0.4 をベースに並行開発中で、今回の変更を手で当てるため（利用者の指定）。
 - **Drive（1.1.4）**：親 `10fUiT4Q1POdmpoZOF_2ecFCZFXeOeMIu` の下に **`trk-1.1.4` フォルダー**（`1GEciYn0igWmXUgXYJxnfO6lSaifIHQxe`）を作り、**`trk-1.1.4.zip`（`1Y46GP06hFj7go2NYxO895Z6kHoTX6IN7`・3,910,309 bytes・`sha256 b8050bc55fa499472079be2ebea3ea190bdd5d1bd408780c4804506a638501b2`・`built_at 2026-10-27T22:00:00Z`）** と **`SHA256SUMS-1.1.4.txt`（`1NfDZTvB4-d1wZ058UOgzgLsMGHSagId-`）** を置いた。Drive 側の `sha256Checksum` が手元の値と一致することを確認済み。**1.1.0〜1.1.3 のフォルダーとZIPはそのまま**。
